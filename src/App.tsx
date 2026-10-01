@@ -98,6 +98,8 @@ const PoiVisualPreviewPage = lazy(() => import('./ui/idleVillage/pages/PoiVisual
 const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').then(m => ({ default: m.default })));
 const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabPage').then(m => ({ default: m.PoiMarkerLabPage })));
 const GameFramePage = lazy(() => import('./pages/game-frame').then(m => ({ default: m.default })));
+const MapBenchmarkPage = lazy(() => import('./pages/map-benchmark').then(m => ({ default: m.default })));
+const GameFramePixiPage = lazy(() => import('./pages/game-frame-pixi').then(m => ({ default: m.default })));
 const GameFrameLivingAtlasPage = lazy(() => import('./pages/gameframe-living-atlas').then(m => ({ default: m.default })));
 const GameFrameCartographerPage = lazy(() => import('./pages/gameframe-cartographer').then(m => ({ default: m.default })));
 const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
@@ -333,6 +335,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/world-surface-demo';
   const isGameFramePath =
     typeof window !== 'undefined' && window.location.pathname === '/game-frame';
+  const isMapBenchmarkPath =
+    typeof window !== 'undefined' && window.location.pathname === '/map-benchmark';
+  const isGameFramePixiPath =
+    typeof window !== 'undefined' && window.location.pathname === '/game-frame-pixi';
   const isGameFrameLivingAtlasPath =
     typeof window !== 'undefined' && window.location.pathname === '/gameframe-living-atlas';
   const isGameFrameCartographerPath =
@@ -1241,6 +1247,26 @@ function App() {
       <ErrorBoundary componentName="World Surface Test Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading World Surface...</div>}>
           <WorldSurfaceTestPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isGameFramePixiPath) {
+    return (
+      <ErrorBoundary componentName="Game Frame Pixi Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Game Frame (Pixi)...</div>}>
+          <GameFramePixiPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMapBenchmarkPath) {
+    return (
+      <ErrorBoundary componentName="Map Benchmark Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Map Benchmark...</div>}>
+          <MapBenchmarkPage />
         </Suspense>
       </ErrorBoundary>
     );

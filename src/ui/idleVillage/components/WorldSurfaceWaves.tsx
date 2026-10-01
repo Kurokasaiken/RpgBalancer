@@ -1,8 +1,14 @@
 import { atmosphereAssets } from '../config/atmosphereAssets';
+import { localMaskStyle } from '../utils/localMaskStyle';
+
+const WAVES_MASK = '/assets/atmosphere/terrain/sea_mask.webp';
+const DEFAULT_CANVAS = { width: 4240, height: 2828 };
 
 export interface WorldSurfaceWavesProps {
   enabled?: boolean;
   zIndex: number;
+  /** World canvas size in px, used to align each mark's own sea mask. */
+  canvasSize?: { width: number; height: number };
 }
 
 /**
@@ -22,7 +28,7 @@ export interface WorldSurfaceWavesProps {
  * Positions come from the shoreline itself — sampled in `build-terrain-masks.mjs`
  * from the sea layer's own alpha — so every mark sits on a real coast.
  */
-export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesProps) {
+export function WorldSurfaceWaves({ enabled = true, zIndex, canvasSize = DEFAULT_CANVAS }: WorldSurfaceWavesProps) {
   if (!enabled) return null;
 
   const cfg = atmosphereAssets.waves;
@@ -44,14 +50,6 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
         zIndex,
         overflow: 'hidden',
         pointerEvents: 'none',
-        maskImage: 'url(/assets/atmosphere/terrain/sea_mask.webp)',
-        WebkitMaskImage: 'url(/assets/atmosphere/terrain/sea_mask.webp)',
-        maskSize: '100% 100%',
-        WebkitMaskSize: '100% 100%',
-        maskRepeat: 'no-repeat',
-        WebkitMaskRepeat: 'no-repeat',
-        maskPosition: '0 0',
-        WebkitMaskPosition: '0 0',
       }}
     >
       <style>{`
@@ -68,31 +66,40 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
       `}</style>
 
       {cfg.marks.map((mark) => (
-        <img
+        <div
           key={`${mark.src}-${mark.x}-${mark.y}`}
-          className="ws-wave"
-          src={`/assets/atmosphere/${mark.src}`}
-          alt=""
           style={{
             position: 'absolute',
             left: mark.x,
             top: mark.y,
             width: mark.width,
             height: mark.height,
-            objectFit: 'contain',
-            objectPosition: 'top center',
-            opacity: 0,
-            willChange: 'transform, opacity',
-            ['--ws-wave-opacity' as string]: cfg.opacity,
-            ['--ws-wave-bob' as string]: `${cfg.bobWorldPx}px`,
-            ['--ws-wave-flip' as string]: mark.flip ? -1 : 1,
-            animationName: 'wsWaveBreak',
-            animationDuration: `${cfg.cycleSeconds}s`,
-            animationTimingFunction: 'ease-in-out',
-            animationIterationCount: 'infinite',
-            animationDelay: `${-mark.delaySeconds}s`,
+            ...localMaskStyle(WAVES_MASK, canvasSize, mark),
           }}
-        />
+        >
+          <img
+            className="ws-wave"
+            src={`/assets/atmosphere/${mark.src}`}
+            alt=""
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'top center',
+              opacity: 0,
+              willChange: 'transform, opacity',
+              ['--ws-wave-opacity' as string]: cfg.opacity,
+              ['--ws-wave-bob' as string]: `${cfg.bobWorldPx}px`,
+              ['--ws-wave-flip' as string]: mark.flip ? -1 : 1,
+              animationName: 'wsWaveBreak',
+              animationDuration: `${cfg.cycleSeconds}s`,
+              animationTimingFunction: 'ease-in-out',
+              animationIterationCount: 'infinite',
+              animationDelay: `${-mark.delaySeconds}s`,
+            }}
+          />
+        </div>
       ))}
     </div>
   );

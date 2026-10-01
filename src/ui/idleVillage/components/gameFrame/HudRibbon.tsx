@@ -45,10 +45,18 @@ export interface HudRibbonProps {
  * custom properties so a different skin preset re-materials this ribbon for
  * free instead of leaving it stuck on V9's palette.
  */
-const RIBBON_FILL =
-  'linear-gradient(180deg, color-mix(in srgb, var(--skin-surface-base, #060f16) 92%, black) 0%, var(--skin-surface-base, #060f16) 100%)';
-const RIBBON_FILL_INVERTED =
-  'linear-gradient(0deg, color-mix(in srgb, var(--skin-surface-base, #060f16) 92%, black) 0%, var(--skin-surface-base, #060f16) 100%)';
+const LACQUER = 'color-mix(in srgb, var(--skin-surface-base, #060f16) 62%, var(--hud-lacquer-tint, #0f4a52))';
+const RIBBON_FILL = `linear-gradient(180deg, color-mix(in srgb, ${LACQUER} 80%, black) 0%, ${LACQUER} 100%)`;
+const RIBBON_FILL_INVERTED = `linear-gradient(0deg, color-mix(in srgb, ${LACQUER} 80%, black) 0%, ${LACQUER} 100%)`;
+/** Gold filigree line drawn this many px inside the ribbon's silhouette. */
+const FILIGREE_INSET_PX = 4;
+
+function ribbonPolygon(isTop: boolean, cutPx: number, d = 0): string {
+  // A cut edge slopes, so a perpendicular inset of d shifts its end points by roughly d along x too.
+  return isTop
+    ? `polygon(${d}px ${d}px, calc(100% - ${d}px) ${d}px, calc(100% - ${cutPx + d}px) calc(100% - ${d}px), ${cutPx + d}px calc(100% - ${d}px))`
+    : `polygon(${cutPx + d}px ${d}px, calc(100% - ${cutPx + d}px) ${d}px, calc(100% - ${d}px) calc(100% - ${d}px), ${d}px calc(100% - ${d}px))`;
+}
 const HAIRLINE =
   'linear-gradient(90deg, transparent 0%, var(--skin-surface-border, rgba(223,184,87,0.5)) 12%, var(--skin-title-color, #f0cf6a) 50%, var(--skin-surface-border, rgba(223,184,87,0.5)) 88%, transparent 100%)';
 
@@ -62,9 +70,8 @@ export const HudRibbon: React.FC<HudRibbonProps> = ({
   style,
 }) => {
   const isTop = anchor === 'top';
-  const clipPath = isTop
-    ? `polygon(0 0, 100% 0, calc(100% - ${cutPx}px) 100%, ${cutPx}px 100%)`
-    : `polygon(${cutPx}px 0, calc(100% - ${cutPx}px) 0, 100% 100%, 0 100%)`;
+  const clipPath = ribbonPolygon(isTop, cutPx);
+  const fill = isTop ? RIBBON_FILL : RIBBON_FILL_INVERTED;
   const boxShadow = bevel
     ? '0 8px 22px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -3px 5px rgba(0,0,0,0.5)'
     : '0 6px 18px rgba(0,0,0,0.45)';
@@ -78,11 +85,35 @@ export const HudRibbon: React.FC<HudRibbonProps> = ({
         alignItems: 'center',
         padding: isTop ? '7px 26px 9px' : '9px 26px 7px',
         clipPath,
-        background: isTop ? RIBBON_FILL : RIBBON_FILL_INVERTED,
+        background: fill,
         boxShadow,
         ...style,
       }}
     >
+      <span
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          clipPath: ribbonPolygon(isTop, cutPx, FILIGREE_INSET_PX),
+          background: 'var(--skin-surface-border, rgba(223,184,87,0.55))',
+          opacity: 0.7,
+          pointerEvents: 'none',
+          // clip-path makes this ribbon a stacking context, so -1 lands above its own fill but below its content.
+          zIndex: -1,
+        }}
+      />
+      <span
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          clipPath: ribbonPolygon(isTop, cutPx, FILIGREE_INSET_PX + 1),
+          background: fill,
+          pointerEvents: 'none',
+          zIndex: -1,
+        }}
+      />
       <span
         aria-hidden="true"
         style={{

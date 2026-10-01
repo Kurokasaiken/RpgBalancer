@@ -44,7 +44,7 @@
     --button-border: rgba(255, 215, 0, 0.45);
     --button-text: #f7f2d8;
     --body-bg-overlay: linear-gradient(rgba(4, 6, 10, 0.95), rgba(4, 6, 10, 0.95));
-    --body-bg-texture: url('/assets/ui/bg.png');
+    --body-bg-texture: url('/assets/ui/bg.webp');
 
     /* Legacy palette (still referenced by older components) */
     --bg-abyss: #050706;

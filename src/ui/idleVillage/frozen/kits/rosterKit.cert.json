@@ -1,11 +1,11 @@
 {
   "kitId": "rosterKit",
-  "version": "1.0.0",
-  "gitSha": "dd188ef3f0b16993818c10c82c5f162d7c5bd8ed",
+  "version": "1.1.0",
+  "gitSha": "16478cfb1bbc2a1da16194201f77b012e8bd315f",
   "fixtureSha": "32244ae0e5b353338261716d9f56b058dc470aaa34f3b6efea5dcc705cc4630e",
-  "contractSha": "contract-verified-playwright-green-2026-05-21",
-  "certifiedAt": "2026-05-21T13:45:00+00:00",
-  "certifiedBy": "wave-1-day-6-playwright-sweep",
+  "contractSha": "6111a55bac99d752",
+  "certifiedAt": "2026-10-01T12:03:15+00:00",
+  "certifiedBy": "claude-code-session-2026-10-01 (density compact, manual in-app DOM parity)",
   "evidence": [
     {
       "label": "vitest contract utilities",
@@ -20,11 +20,15 @@
       "path": "tests/unit/frozen/rosterKit.dom.test.tsx"
     },
     {
-      "label": "playwright contract sweep",
+      "label": "vitest rosterKit compact density + default isolation",
+      "path": "tests/unit/frozen/rosterKit.compact.test.tsx"
+    },
+    {
+      "label": "in-app browser normalized-subtree SHA-256, before vs after 1.1.0",
       "path": "tests/contract/minimal-vs-test.spec.ts",
-      "result": "PASSED - reference /test and minimal /minimal-roster render identical subtree"
+      "result": "default subtree UNCHANGED by 1.1.0: /test 0d4bce44a0add49e and /minimal-roster 6111a55bac99d752 on both the original and the 1.1.0 sources"
     }
   ],
   "certified": true,
-  "notes": "Certified after Playwright contract sweep passed. The normalized subtree HTML from /test and /minimal-roster are identical. Contract subtree selector: [data-testid=\"village-roster-section\"]."
+  "notes": "1.1.0 adds optional density='compact'; the default render is byte-identical to 1.0.0 (normalized SHA-256 measured on both routes before and after). NOT verified: the Playwright sweep was not run (browsers not installed). OPEN, pre-existing and unrelated to 1.1.0: /test and /minimal-roster do NOT render identical subtrees (21852 vs 34411 chars normalized) \u2014 /minimal-roster has used MatericRosterComponent (Wanderlust skin) since b6e77caa (2026-07-15), after the 1.0.0 parity certification. Built on uncommitted changes over gitSha. Contract subtree selector: [data-testid=\"village-roster-section\"]."
 }

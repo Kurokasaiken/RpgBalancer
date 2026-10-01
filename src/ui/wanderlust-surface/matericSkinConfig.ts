@@ -84,7 +84,7 @@ export type MatericSkinConfig = z.infer<typeof matericSkinConfigSchema>;
 export const MATERIC_SKIN_CONFIG: MatericSkinConfig = matericSkinConfigSchema.parse({
   track: {
     backgroundColor: '#0a0908',
-    backgroundImage: 'url("/assets/ui/bg.png")',
+    backgroundImage: 'url("/assets/ui/bg.webp")',
     backgroundBlendMode: 'soft-light',
     backgroundRepeat: 'repeat',
     backgroundSize: 'auto',
@@ -125,7 +125,7 @@ export const MATERIC_SKIN_CONFIG: MatericSkinConfig = matericSkinConfigSchema.pa
     borderRadius: '0px',
   },
   grain: {
-    textureUrl: '/assets/ui/bg.png',
+    textureUrl: '/assets/ui/bg.webp',
     opacity: 0.1,
     mixBlendMode: 'normal',
     size: 'auto',

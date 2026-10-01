@@ -1,9 +1,9 @@
 # rosterKit
 
 **Status:** frozen
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Owner:** Devin
-**Last Updated:** 2026-08-15
+**Last Updated:** 2026-10-01
 
 ## Source
 - **Canonical component:** `VillageRosterSection` (`src/ui/idleVillage/components/VillageRosterSection.tsx`)
@@ -34,6 +34,17 @@ function MinimalRoster() {
     </IsolatedShowcase>
   );
 }
+```
+
+## Density (1.1.0)
+
+`density?: 'default' | 'compact'` on `VillageRosterSection` / `RosterDraggable` / `MatericRosterComponent`.
+
+- `default` (or omitted): the certified 1.0.0 layout, unchanged.
+- `compact`: one ~30px strip per resident (portrait 22px, name + status tag, HP and Stamina as 4px bars with values), tight padding, no grain texture or decorative animations (fireflies, border pulse, glow breath). The header keeps the drag handle, filter, stat sort and collapse controls, kept icon-sized by `[data-roster-controls="compact"]` in `skinScope.css`. Drag and drop is unchanged: strips use the same `useDraggable` wiring as the full card. Used by `/game-frame`.
+
+```tsx
+<MatericRosterComponent componentId="game-frame-roster" density="compact" />
 ```
 
 ## Contract

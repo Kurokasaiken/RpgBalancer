@@ -1,7 +1,8 @@
 import React, { type CSSProperties, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MatericBadge, MatericButton } from '@/ui/designSystem/primitives';
+import { MatericButton } from '@/ui/designSystem/primitives';
 import { SkinScope, SkinTitle } from '@/ui/idleVillage/skins/primitives';
+import './gameFrameCursors.css';
 import { HudRibbon } from './HudRibbon';
 import { HudGlyph } from './hudIcons';
 import {
@@ -27,9 +28,10 @@ import {
  *   right edge   — what is coming (the hung tag)
  *   bottom-centre— where I can go (nav)
  *
- * The roster is deliberately NOT here. Director, 2026-09-22: "in basso a
- * sinistra ci sono i pg, non vanno bene, deve essere una cosa a parte,
- * esterna." It is not chrome and it is not a corner of the map.
+ * The roster is not chrome: the page passes it through `rosterSlot` and the shell
+ * only places it (`config.roster`); the roster carries its own shadow and moves by
+ * its own drag handle. Director, 2026-10-01, reversing the 2026-09-22 call to keep it
+ * off this screen.
  *
  * Mechanics are ours only: the reference mockup shows weather, a notification
  * bell and crystal/stone resources, none of which exist in this game — per
@@ -55,10 +57,17 @@ export interface GameFrameProps {
   children: ReactNode;
   /**
    * Optional dressing that floats directly over the map (orb, compass...),
-   * between the map and the ribbons. `pointerEvents: none` is the caller's
-   * responsibility — see `FloatingWorldOrnaments`.
+   * between the map and the ribbons. The wrapper ignores pointer input; interactive
+   * children must set `pointerEvents: 'auto'` themselves.
    */
   floatingSlot?: ReactNode;
+  /**
+   * Non-interactive dressing drawn ABOVE the ribbons (foliage, rolled maps) so it
+   * can overlap and break their edges. Wrapped in `pointerEvents: none`.
+   */
+  dressingSlot?: ReactNode;
+  /** Lower-left: the roster, laid on the table like an object (see `config.roster`). */
+  rosterSlot?: ReactNode;
   config?: GameFrameConfig;
   className?: string;
   style?: CSSProperties;
@@ -85,6 +94,8 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   utilitySlot,
   children,
   floatingSlot,
+  dressingSlot,
+  rosterSlot,
   config = DEFAULT_GAME_FRAME_CONFIG,
   className,
   style,
@@ -104,7 +115,8 @@ export const GameFrame: React.FC<GameFrameProps> = ({
 
       {/* ── Floating dressing: sits over the map, under the ribbons ── */}
       {floatingSlot != null && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 8 }}>{floatingSlot}</div>
+        // Full-screen, so it must not eat map input; each instrument opts back in with `pointerEvents: auto`.
+        <div style={{ position: 'absolute', inset: 0, zIndex: 8, pointerEvents: 'none' }}>{floatingSlot}</div>
       )}
 
       {/* ── Top-left: identity ──────────────────────────────────── */}
@@ -156,14 +168,14 @@ export const GameFrame: React.FC<GameFrameProps> = ({
         bevel={bevel}
         anchor="top"
         cutPx={22}
-        style={{ position: 'absolute', top: 0, right: 0, zIndex: 10, padding: '8px 22px 12px 40px' }}
+        style={{ position: 'absolute', top: 0, right: 0, zIndex: 10, padding: '8px 22px 12px 40px', maxWidth: 'calc(50% - 130px)', overflow: 'hidden' }}
       >
         {resourcesSlot}
       </HudRibbon>
 
       {/* ── Right edge: what is coming, hung from the top ribbon ── */}
       {hangingSlot != null && (
-        <div style={{ position: 'absolute', top: 52, right: inset + 8, zIndex: 9 }}>{hangingSlot}</div>
+        <div style={{ position: 'absolute', top: config.insets.hangingTopPx, right: inset + 8, zIndex: 9 }}>{hangingSlot}</div>
       )}
 
 
@@ -172,6 +184,35 @@ export const GameFrame: React.FC<GameFrameProps> = ({
         <div style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: 10 }}>
           {utilitySlot}
         </div>
+      )}
+
+      {rosterSlot != null && (
+        <div
+          style={{
+            position: 'absolute',
+            left: config.roster.leftPx,
+            bottom: config.roster.bottomPx,
+            width: config.roster.widthPx,
+            zIndex: 9,
+            // No transform unless one is configured: any transform here becomes the
+            // containing block for the roster's position:fixed drag overlay, which then
+            // lands off-target (the portrait medallion never shows under the cursor).
+            // No shadow either: the roster moves inside this box, its own shadow moves
+            // with it, and a shadow here would stay behind as a ghost.
+            ...(config.roster.tiltDeg !== 0 || config.roster.scale !== 1
+              ? {
+                  transform: `rotate(${config.roster.tiltDeg}deg) scale(${config.roster.scale})`,
+                  transformOrigin: 'bottom left',
+                }
+              : {}),
+          }}
+        >
+          {rosterSlot}
+        </div>
+      )}
+
+      {dressingSlot != null && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 11, pointerEvents: 'none' }}>{dressingSlot}</div>
       )}
 
       {/* ── Bottom-centre: where I can go ───────────────────────── */}
@@ -200,7 +241,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
                 disabled={item.locked}
                 onClick={item.locked ? undefined : () => onNavSelect?.(item.id)}
                 aria-pressed={isActive}
-                title={t(item.labelKey)}
+                title={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : t(item.labelKey)}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -210,9 +251,18 @@ export const GameFrame: React.FC<GameFrameProps> = ({
                   minWidth: 40,
                   minHeight: 40,
                   fontSize: 11,
-                  background: isActive ? 'rgba(28,120,132,0.28)' : 'transparent',
                   border: 'none',
-                  boxShadow: isActive ? 'inset 0 -1px 0 var(--skin-title-color, #f0cf6a)' : 'none',
+                  borderRadius: 4,
+                  // Active = prismatic glass; locked = incised into the lacquer, no badge.
+                  background: isActive
+                    ? 'linear-gradient(180deg, rgba(120,220,225,0.30) 0%, rgba(28,120,132,0.22) 55%, rgba(10,50,58,0.35) 100%)'
+                    : 'transparent',
+                  boxShadow: isActive
+                    ? 'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 var(--skin-title-color, #f0cf6a), 0 0 14px rgba(64,190,200,0.25)'
+                    : item.locked
+                      ? 'inset 0 1px 2px rgba(0,0,0,0.6)'
+                      : 'none',
+                  opacity: item.locked ? 0.38 : 1,
                   color: isActive ? 'var(--skin-title-color, #f0cf6a)' : undefined,
                 }}
               >
@@ -223,11 +273,6 @@ export const GameFrame: React.FC<GameFrameProps> = ({
                   style={{ color: isActive ? 'var(--skin-title-color, #f0cf6a)' : 'var(--skin-icon-color, #dfb857)' }}
                 />
                 {t(item.labelKey)}
-                {item.locked && (
-                  <MatericBadge style={{ fontSize: 9, padding: '0 4px' }}>
-                    {t('gameFrame.nav.locked')}
-                  </MatericBadge>
-                )}
               </MatericButton>
             );
           })}

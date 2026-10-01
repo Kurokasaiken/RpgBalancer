@@ -255,7 +255,7 @@ export const HarmonizationGallery: React.FC = () => {
           position: 'fixed',
           inset: 0,
           zIndex: -1,
-          backgroundImage: 'url(/assets/ui/bg.png)',
+          backgroundImage: 'url(/assets/ui/bg.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

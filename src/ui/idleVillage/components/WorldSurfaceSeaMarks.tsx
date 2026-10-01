@@ -1,10 +1,15 @@
 import { defaultSeaMarksConfig, type SeaMarksConfig } from '../config/seaMarksConfig';
+import { localMaskStyle } from '../utils/localMaskStyle';
+
+const DEFAULT_CANVAS = { width: 4240, height: 2828 };
 
 export interface WorldSurfaceSeaMarksProps {
   enabled?: boolean;
   zIndex: number;
   /** Optional override. Defaults to {@link defaultSeaMarksConfig}. */
   config?: SeaMarksConfig;
+  /** World canvas size in px, used to align each mark's own sea mask. */
+  canvasSize?: { width: number; height: number };
 }
 
 /**
@@ -26,6 +31,7 @@ export function WorldSurfaceSeaMarks({
   enabled = true,
   zIndex,
   config,
+  canvasSize = DEFAULT_CANVAS,
 }: WorldSurfaceSeaMarksProps) {
   const cfg = config ?? defaultSeaMarksConfig;
   if (!enabled || !cfg.enabled || cfg.marks.length === 0) return null;
@@ -43,14 +49,6 @@ export function WorldSurfaceSeaMarks({
         zIndex,
         overflow: 'hidden',
         pointerEvents: 'none',
-        maskImage: `url(${cfg.mask})`,
-        WebkitMaskImage: `url(${cfg.mask})`,
-        maskSize: '100% 100%',
-        WebkitMaskSize: '100% 100%',
-        maskRepeat: 'no-repeat',
-        WebkitMaskRepeat: 'no-repeat',
-        maskPosition: '0 0',
-        WebkitMaskPosition: '0 0',
       }}
     >
       <style>{`
@@ -67,32 +65,41 @@ export function WorldSurfaceSeaMarks({
       `}</style>
 
       {cfg.marks.map((mark) => (
-        <img
+        <div
           key={`${mark.src}-${mark.x}-${mark.y}`}
-          className="ws-sea-mark"
-          src={`/assets/atmosphere/${mark.src}`}
-          alt=""
           style={{
             position: 'absolute',
             left: mark.x,
             top: mark.y,
             width: mark.width,
             height: mark.height,
-            objectFit: 'contain',
-            objectPosition: 'top center',
-            opacity: 0,
-            willChange: 'transform, opacity',
-            ['--ws-sea-opacity' as string]: cfg.opacity,
-            ['--ws-sea-drift-x' as string]: `${mark.driftX}px`,
-            ['--ws-sea-drift-y' as string]: `${mark.driftY}px`,
-            ['--ws-sea-flip' as string]: mark.flip ? -1 : 1,
-            animationName: 'wsSeaMark',
-            animationDuration: `${cfg.cycleSeconds}s`,
-            animationTimingFunction: 'ease-in-out',
-            animationIterationCount: 'infinite',
-            animationDelay: `${-mark.delaySeconds}s`,
+            ...localMaskStyle(cfg.mask, canvasSize, mark),
           }}
-        />
+        >
+          <img
+            className="ws-sea-mark"
+            src={`/assets/atmosphere/${mark.src}`}
+            alt=""
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'top center',
+              opacity: 0,
+              willChange: 'transform, opacity',
+              ['--ws-sea-opacity' as string]: cfg.opacity,
+              ['--ws-sea-drift-x' as string]: `${mark.driftX}px`,
+              ['--ws-sea-drift-y' as string]: `${mark.driftY}px`,
+              ['--ws-sea-flip' as string]: mark.flip ? -1 : 1,
+              animationName: 'wsSeaMark',
+              animationDuration: `${cfg.cycleSeconds}s`,
+              animationTimingFunction: 'ease-in-out',
+              animationIterationCount: 'infinite',
+              animationDelay: `${-mark.delaySeconds}s`,
+            }}
+          />
+        </div>
       ))}
     </div>
   );

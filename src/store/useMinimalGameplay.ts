@@ -1461,6 +1461,59 @@ export function selectResourceWarnings(
   };
 }
 
+/** What the HUD shows for each resource: amount, and where it is heading. */
+export interface ResourceOutlook {
+  gold: { value: number; incoming: number };
+  wood: { value: number; incoming: number };
+  food: {
+    value: number;
+    max: number;
+    incoming: number;
+    /** Eaten per day by the current residents (same rule the tick applies). */
+    perDay: number;
+    /** Whole days the current stock lasts at `perDay`; `Infinity` when nobody eats. */
+    daysLeft: number;
+    /** `daysLeft` is at or below `ui.warningThresholds.foodDangerDays`. */
+    danger: boolean;
+  };
+}
+
+/**
+ * Selector: resource amounts plus their trend for the HUD.
+ *
+ * `incoming` sums the base reward of every activity in progress, so it is what the
+ * village gets when they complete (before any reward multiplier).
+ */
+export function selectResourceOutlook(
+  state: MinimalGameplayState['state'],
+  config: MinimalConfig
+): ResourceOutlook {
+  const incoming = { gold: 0, wood: 0, food: 0 };
+  for (const active of state.activeActivities) {
+    const activity = config.activities.find((a) => a.id === active.activityId);
+    if (!activity) continue;
+    incoming.gold += activity.baseReward.gold;
+    incoming.wood += activity.baseReward.wood;
+    incoming.food += activity.baseReward.food;
+  }
+  const perDay = config.globalRules.dailyFoodConsumptionPerResident * Math.max(1, state.residents.length);
+  const daysLeft = perDay > 0 ? Math.floor(state.food / perDay) : Infinity;
+  const dangerDays = config.ui?.warningThresholds?.foodDangerDays ?? 1;
+
+  return {
+    gold: { value: state.gold, incoming: incoming.gold },
+    wood: { value: state.wood, incoming: incoming.wood },
+    food: {
+      value: state.food,
+      max: state.maxFood,
+      incoming: incoming.food,
+      perDay,
+      daysLeft,
+      danger: daysLeft <= dangerDays,
+    },
+  };
+}
+
 /**
  * Selector: roster with status and warnings combined.
  */

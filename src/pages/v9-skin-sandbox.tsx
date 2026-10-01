@@ -327,7 +327,7 @@ export const V9SkinSandbox: React.FC = () => {
     ...(state.backgroundMode === 'marble'    && { backgroundImage: 'url(/assets/alt-visuals/v8/columns/Marble01/marble01_diff_2k.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }),
     ...(state.backgroundMode === 'parchment' && { backgroundColor: '#2a2418', backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(180,140,80,0.15) 0%, transparent 70%)' }),
     ...(state.backgroundMode === 'void'      && { backgroundColor: '#02020b' }),
-    ...(state.backgroundMode === 'bg'        && { backgroundImage: 'url(/assets/ui/bg.png)', backgroundSize: 'cover', backgroundPosition: 'center' }),
+    ...(state.backgroundMode === 'bg'        && { backgroundImage: 'url(/assets/ui/bg.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }),
   };
 
   // Active tab pill style — azure instead of amber

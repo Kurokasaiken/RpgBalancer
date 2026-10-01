@@ -133,6 +133,43 @@
   box-shadow: var(--skin-btn2-shadow);
 }
 .skin-scope [data-skin="button"][data-variant="secondary"]::before { opacity: 0.4; }
+/* The base :hover rule outranks the variant rule above (0,5,0 vs 0,3,0), so without
+   this a secondary button took the primary's gold hover fill under its gold label and
+   the text vanished. Same specificity, later in source: secondary keeps its slate. */
+.skin-scope [data-skin="button"][data-variant="secondary"]:hover:not(:disabled) {
+  background: var(--skin-btn2-hover-bg, var(--skin-btn2-bg));
+  filter: brightness(1.18);
+}
+/* Compact roster header (density="compact"): its icon controls must stay icon-sized.
+   The base button rule (0,3,0) would turn them into full bronze buttons; these
+   selectors are 0,3,1 / 0,5,1 / 0,3,2 so they win over base, :hover and ::before. */
+.skin-scope [data-roster-controls="compact"] button:not([data-skin="cta"]) {
+  padding: 2px 4px;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  line-height: 1;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  border-radius: 3px;
+  background: var(--card-bg, rgba(13, 11, 8, 0.96));
+  border: 1px solid var(--acc-primary-dark, #6a3c10);
+  box-shadow: none;
+  text-shadow: none;
+  transform: none;
+}
+.skin-scope [data-roster-controls="compact"] button:not([data-skin="cta"]):hover:not(:disabled) {
+  background: var(--card-bg, rgba(13, 11, 8, 0.96));
+  box-shadow: none;
+  transform: none;
+  filter: brightness(1.25);
+}
+.skin-scope [data-roster-controls="compact"] button:not([data-skin="cta"])::before { display: none; }
+/* Collapsed compact roster = one line: title + the show toggle (the last control). */
+.skin-scope [data-roster-controls="compact"][data-collapsed] > :not(:last-child) { display: none; }
+/* Keeps the whole compact header on the title's line: the two menus shrink to fit. */
+.skin-scope [data-roster-controls="compact"] label { min-width: 0; max-width: 78px; }
+.skin-scope [data-roster-controls="compact"] select { min-width: 0; width: 100%; text-overflow: ellipsis; }
 
 /* ── Primary CTA plaque (the "AVVIA" look) ────────────────────────────── */
 .skin-scope :where([data-skin="cta"]) {

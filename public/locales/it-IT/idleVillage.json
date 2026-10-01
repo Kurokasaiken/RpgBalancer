@@ -882,7 +882,7 @@
     "status": {
       "dayLabel": "Giorno"
     },
-    "subtitle": "Prismatic Wanderlust",
+    "subtitle": "",
     "place": "Le Marche Orientali",
     "invasion": {
       "body": "Un'orda goblin arriva fra {count} giorni."

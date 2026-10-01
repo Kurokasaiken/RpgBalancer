@@ -60,6 +60,8 @@ export interface VillageRosterSectionProps {
   lockedResidentIds?: string[];
   /** Status label for locked residents (default: 'Assigned') */
   lockedStatusLabel?: string;
+  /** `compact` = one-line resident strips for HUD use. Default keeps the frozen layout. */
+  density?: 'default' | 'compact';
 }
 
 type DragVisualState = {
@@ -117,6 +119,7 @@ export function VillageRosterSection({
   useWanderlustSkin = false,
   lockedResidentIds,
   lockedStatusLabel,
+  density = 'default',
 }: VillageRosterSectionProps) {
   // Apply filtering before sorting
   const filteredResidents = filterResidents(residents, filterCriteria);
@@ -136,7 +139,7 @@ export function VillageRosterSection({
   ) : null;
   
   return (
-    <section data-testid="village-roster-section" className="space-y-4">
+    <section data-testid="village-roster-section" className={density === 'compact' ? 'space-y-2' : 'space-y-4'}>
       {/* Pass existing controls to ResidentRosterPanel */}
       {controls && (
         <div className="mb-2">
@@ -160,6 +163,7 @@ export function VillageRosterSection({
         useWanderlustSkin={useWanderlustSkin}
         lockedResidentIds={lockedResidentIds}
         lockedStatusLabel={lockedStatusLabel}
+        density={density}
       />
     </section>
   );

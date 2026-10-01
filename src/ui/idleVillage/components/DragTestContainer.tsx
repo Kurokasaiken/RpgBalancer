@@ -151,6 +151,12 @@ export interface DragTestContainerProps {
   activeDragFeedback?: DragFeedbackState;
   /** Use Wanderlust skin styling instead of default PgCard */
   useWanderlustSkin?: boolean;
+  /**
+   * `compact`: one-line resident strips, tight padding, small header controls (see
+   * `[data-roster-controls="compact"]` in skinScope.css), no grain or decorative
+   * animations. Default keeps the frozen look.
+   */
+  density?: 'default' | 'compact';
 }
 
 type DragVisualState = {
@@ -184,7 +190,11 @@ function DragTestContainer({
   dragVisualState,
   headerControls,
   useWanderlustSkin = false,
+  density = 'default',
 }: DragTestContainerProps) {
+  const isCompact = density === 'compact';
+  /** Row pitch used by virtualization; must match the rendered card height + gap. */
+  const itemPitchPx = isCompact ? 36 : cardVariant === 'horizontal' ? 80 : 140;
   const isMateric = useMatericSkin();
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [dragStartTime, setDragStartTime] = useState<number | null>(null);
@@ -400,7 +410,7 @@ function DragTestContainer({
   
   const virtualConfig = useVirtualization({
     itemCount: sortedResidents.length,
-    itemHeight: cardVariant === 'horizontal' ? 80 : 140, // Adjust for vertical cards
+    itemHeight: itemPitchPx,
     containerHeight: listMaxHeightPx,
     overscan: 3,
   });
@@ -743,6 +753,24 @@ function DragTestContainer({
             onDragStateChange={handleDragStateChange}
             onSelect={handleResidentSelectSafe}
             isHero={resident.isHero}
+            compact={isCompact}
+            statusKind={
+              !isCompact
+                ? undefined
+                : isLifted
+                ? 'away'
+                : isLocked
+                ? 'assigned'
+                : resident.status === 'dead'
+                ? 'dead'
+                : resident.isInjured || resident.status === 'injured'
+                ? 'injured'
+                : resident.status === 'exhausted'
+                ? 'exhausted'
+                : resident.status === 'away'
+                ? 'away'
+                : 'active'
+            }
             className="w-full"
             data-drag-state={dropState}
             data-resident-id={resident.id}
@@ -775,12 +803,12 @@ function DragTestContainer({
         )}
       </div>
     );
-  }, [activeDragFeedback, lockedSet, getResidentCompatibility, isResidentInteractive, draggingResidentId, diagnostics, handleDragStateChange, handleResidentSelectSafe, describeStatus, lockedStatusLabel, filters, heroFlashIds, isResidentBlocked, cardVariant, recentlyDraggedResidentId, dragVisualState, useWanderlustSkin]);
+  }, [activeDragFeedback, lockedSet, getResidentCompatibility, isResidentInteractive, draggingResidentId, diagnostics, handleDragStateChange, handleResidentSelectSafe, describeStatus, lockedStatusLabel, filters, heroFlashIds, isResidentBlocked, cardVariant, recentlyDraggedResidentId, dragVisualState, useWanderlustSkin, isCompact]);
 
   const renderVirtualizedResident = useCallback((resident: ResidentState, actualIndex: number) => {
     const style: CSSProperties = {
       position: 'absolute',
-      top: actualIndex * (cardVariant === 'horizontal' ? 80 : 140),
+      top: actualIndex * itemPitchPx,
       width: '100%',
     };
 
@@ -789,7 +817,7 @@ function DragTestContainer({
         {renderResidentCard(resident)}
       </div>
     );
-  }, [renderResidentCard, cardVariant]);
+  }, [renderResidentCard, itemPitchPx]);
 
   const wrapperClassName = [
     'relative',
@@ -802,7 +830,7 @@ function DragTestContainer({
     .join(' ');
 
   const listWrapperClassName = [
-    'space-y-2 overflow-y-auto scroll-smooth',
+    isCompact ? 'space-y-1 overflow-y-auto scroll-smooth' : 'space-y-2 overflow-y-auto scroll-smooth',
     styles.scrollArea,
     isInlineLayout ? 'pr-0' : 'pr-1',
     listClassName,
@@ -810,7 +838,9 @@ function DragTestContainer({
     .filter(Boolean)
     .join(' ');
 
-  const _headerTextClassName = useWanderlustSkin
+  const _headerTextClassName = useWanderlustSkin && isCompact
+    ? 'flex items-center gap-2 text-[11px] font-semibold tracking-[0.24em] text-[var(--skin-title-color)]'
+    : useWanderlustSkin
     ? 'flex items-center gap-2 text-[15px] font-semibold tracking-[0.34em] text-[var(--skin-title-color)]'
     : isInlineLayout
       ? 'flex items-center gap-2 text-[9px] uppercase tracking-[0.4em] text-[var(--skin-label-primary)]/80'
@@ -881,6 +911,10 @@ function DragTestContainer({
   // Positional dragging for the roster window (not sortable drag and drop)
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  // While the window is dragged its position is written straight to the element and
+  // committed to state on release: re-rendering the whole roster on every pointer move
+  // made the window trail the cursor (and blank out) on slower WebViews.
+  const livePositionRef = useRef({ x: 0, y: 0 });
   const dragStartRef = useRef({ x: 0, y: 0 });
   const activePointerIdRef = useRef<number | null>(null);
   const FALLBACK_POINTER_ID = -1;
@@ -901,6 +935,7 @@ function DragTestContainer({
         x: clientX - position.x,
         y: clientY - position.y,
       };
+      livePositionRef.current = { ...position };
       activePointerIdRef.current = pointerId;
       setIsDragging(true);
     },
@@ -937,14 +972,21 @@ function DragTestContainer({
   );
 
   useEffect(() => {
+    const moveLive = (x: number, y: number) => {
+      livePositionRef.current = { x, y };
+      const el = containerRef.current;
+      if (el) {
+        el.style.transform = `translate(${x}px, ${y}px)`;
+        el.dataset.rosterPositionX = String(x);
+        el.dataset.rosterPositionY = String(y);
+      }
+    };
+
     const handlePointerMove = (event: PointerEvent) => {
       if (!isDragging || activePointerIdRef.current !== event.pointerId) {
         return;
       }
-      setPosition({
-        x: event.clientX - dragStartRef.current.x,
-        y: event.clientY - dragStartRef.current.y,
-      });
+      moveLive(event.clientX - dragStartRef.current.x, event.clientY - dragStartRef.current.y);
     };
 
     const handlePointerEnd = (event: PointerEvent) => {
@@ -952,6 +994,7 @@ function DragTestContainer({
         return;
       }
       activePointerIdRef.current = null;
+      setPosition({ ...livePositionRef.current });
       setIsDragging(false);
     };
 
@@ -959,10 +1002,7 @@ function DragTestContainer({
       if (!isDragging || activePointerIdRef.current !== FALLBACK_POINTER_ID) {
         return;
       }
-      setPosition({
-        x: event.clientX - dragStartRef.current.x,
-        y: event.clientY - dragStartRef.current.y,
-      });
+      moveLive(event.clientX - dragStartRef.current.x, event.clientY - dragStartRef.current.y);
     };
 
     const handleMouseUp = () => {
@@ -970,6 +1010,7 @@ function DragTestContainer({
         return;
       }
       activePointerIdRef.current = null;
+      setPosition({ ...livePositionRef.current });
       setIsDragging(false);
     };
 
@@ -993,7 +1034,7 @@ function DragTestContainer({
       ref={containerRef}
       style={{
         position: 'relative',
-        transform: `translate(${position.x}px, ${position.y}px)`,
+        transform: `translate(${(isDragging ? livePositionRef.current : position).x}px, ${(isDragging ? livePositionRef.current : position).y}px)`,
         opacity: isDragging ? 0.8 : 1,
         cursor: isDragging ? 'grabbing' : componentId ? 'grab' : 'default',
         zIndex: isDragging ? 1000 : 1,
@@ -1017,7 +1058,7 @@ function DragTestContainer({
       data-accessible-counters="true"
       data-accessible-states="true"
     >
-      {isMateric && (
+      {isMateric && !isCompact && (
         <div
           className="pointer-events-none absolute inset-0 rounded-[20px]"
           style={{
@@ -1030,7 +1071,7 @@ function DragTestContainer({
           aria-hidden="true"
         />
       )}
-      {useWanderlustSkin && (
+      {useWanderlustSkin && !isCompact && (
         <div
           className="pointer-events-none absolute inset-0 rounded-[20px]"
           style={{
@@ -1047,7 +1088,7 @@ function DragTestContainer({
           }}
         />
       )}
-      {useWanderlustSkin && (
+      {useWanderlustSkin && !isCompact && (
         <div 
           className="pointer-events-none absolute inset-0 overflow-hidden rounded-[20px]"
           style={{ opacity: 0.6 }}
@@ -1075,8 +1116,8 @@ function DragTestContainer({
         </div>
       )}
       {useWanderlustSkin && <WellBronzeBezel band={2} rx={19} flush />}
-      <div className={`relative z-10 space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`.trim()}>
-        {useWanderlustSkin && (
+      <div className={`relative z-10 ${isCompact ? (isRosterCollapsed ? 'px-2.5 py-1.5' : 'space-y-2 p-2.5') : `space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`}`.trim()}>
+        {useWanderlustSkin && !isCompact && (
           <div 
             className="block h-px mx-2 mb-5"
             style={{
@@ -1084,7 +1125,7 @@ function DragTestContainer({
             }}
           />
         )}
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className={isCompact ? 'flex flex-nowrap items-center gap-2' : 'flex flex-wrap items-center justify-between gap-2'}>
           <div className={_headerTextClassName}>
             {componentId && (
               <div 
@@ -1107,7 +1148,7 @@ function DragTestContainer({
               {`${sortedResidents.length}/${residents.length}`}
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className={isCompact ? 'flex min-w-0 items-center gap-1' : 'flex items-center gap-1'} data-roster-controls={isCompact ? 'compact' : undefined} data-collapsed={isCompact && isRosterCollapsed ? '' : undefined}>
             <label
               className="flex items-center gap-1 px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em]"
               style={{

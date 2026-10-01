@@ -148,6 +148,9 @@ export default function GameFrameCartographerPage() {
           }}
           breathEnabled={worldDressing.breathEnabled}
           showSeaPattern={worldDressing.showSeaPattern}
+          showFoam={worldDressing.showFoam}
+          safeFit={worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined}
+          showCoastFoam={worldDressing.showCoastFoam}
           showGlass={worldDressing.showGlass}
           visualStateOverrides={worldOverrides}
         />

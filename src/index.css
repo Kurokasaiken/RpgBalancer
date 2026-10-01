@@ -107,7 +107,7 @@
       --button-border: var(--glass-gameplay-border);
       --button-text: var(--cta-gameplay-text);
       --body-bg-overlay: linear-gradient(rgba(4, 6, 10, 0.95), rgba(4, 6, 10, 0.95));
-      --body-bg-texture: url('/assets/ui/bg.png');
+      --body-bg-texture: url('/assets/ui/bg.webp');
 
       /* Legacy palette (still referenced by older components) */
       --bg-abyss: #050706;
@@ -129,7 +129,7 @@
       color: var(--text-primary);
       font-family: var(--font-body, 'Crimson Text', serif);
       background-color: var(--surface-base, #050706);
-      background-image: url('/assets/ui/bg.png');
+      background-image: url('/assets/ui/bg.webp');
       background-size: cover;
       background-repeat: no-repeat;
       background-attachment: fixed;
@@ -274,7 +274,7 @@
       background-color: var(--panel-basalt);
       background-image:
         linear-gradient(rgba(18, 22, 20, 0.95), rgba(18, 22, 20, 0.95)),
-        url('/assets/ui/bg.png');
+        url('/assets/ui/bg.webp');
       background-size: 480px;
       box-shadow: -12px 0 34px rgba(0, 0, 0, 0.85);
     }

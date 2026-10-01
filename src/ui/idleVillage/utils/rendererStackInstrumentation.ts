@@ -122,6 +122,21 @@ class RendererStackInstrumentation {
     this.page = window.location.pathname === '/test' ? 'test' : 'minimal-gameplay';
   }
 
+  /**
+   * Captures run on every render of every roster layer, so an unbounded array grew
+   * by ~40 KB per pointer move while the roster window was dragged (measured: 6 MB
+   * over 150 moves) and the roster got slower the longer the page stayed open.
+   * Keep only the most recent snapshots — divergence analysis compares recent renders.
+   */
+  private static readonly MAX_ENTRIES = 200;
+
+  private record(data: RendererStackData): void {
+    this.data.push(data);
+    if (this.data.length > RendererStackInstrumentation.MAX_ENTRIES) {
+      this.data.splice(0, this.data.length - RendererStackInstrumentation.MAX_ENTRIES);
+    }
+  }
+
   public static getInstance(): RendererStackInstrumentation {
     if (!RendererStackInstrumentation.instance) {
       RendererStackInstrumentation.instance = new RendererStackInstrumentation();
@@ -145,7 +160,7 @@ class RendererStackInstrumentation {
         stats: r.statSnapshot || {}
       }))
     };
-    this.data.push(data);
+    this.record(data);
   }
 
   public captureResidentRosterPanel(residents: ResidentState[]): void {
@@ -160,7 +175,7 @@ class RendererStackInstrumentation {
         count: residents.length
       }
     };
-    this.data.push(data);
+    this.record(data);
   }
 
   public captureDragTestContainer(
@@ -197,7 +212,7 @@ class RendererStackInstrumentation {
         index
       }))
     };
-    this.data.push(data);
+    this.record(data);
   }
 
   public capturePgCard(
@@ -229,7 +244,7 @@ class RendererStackInstrumentation {
       },
       displayValues
     };
-    this.data.push(data);
+    this.record(data);
   }
 
   public exportData(): RendererStackExport {

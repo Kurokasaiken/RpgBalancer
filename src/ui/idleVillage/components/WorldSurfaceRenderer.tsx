@@ -29,6 +29,7 @@ const WorldSurfaceSeaPatternOverlay = lazy(() => import('./WorldSurfaceSeaPatter
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
 const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
 const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
+const WorldSurfaceCoastFoam = lazy(() => import('./WorldSurfaceCoastFoam'));
 const WorldSurfaceBirds = lazy(() => import('./WorldSurfaceBirds'));
 const WorldSurfaceCreatures = lazy(() => import('./WorldSurfaceCreatures'));
 const WorldSurfaceEventCard = lazy(() => import('./WorldSurfaceEventCard'));
@@ -71,6 +72,8 @@ interface BreathSpec {
   /** Amplitude the player should PERCEIVE, in screen pixels. */
   swayPx: number;
 }
+
+const BREATH_MAP: Record<string, BreathSpec> = {};
 
 /**
  * Depth parallax, from the tactical plan section 8.
@@ -151,6 +154,12 @@ interface WorldSurfaceRendererProps {
   showSeaRipple?: boolean;
   /** Optional override for the water field configuration (used by the lab page). */
   waterFieldConfig?: WaterFieldConfig;
+  /** Content drawn inside the world box beneath every layer, in world coordinates (e.g. sea beyond the canvas). */
+  worldBackdrop?: React.ReactNode;
+  /** The older scrolling foam texture. On by default for existing consumers. */
+  showFoam?: boolean;
+  /** Foam that laps the shore (WebGL, baked distance field). */
+  showCoastFoam?: boolean;
   /** When true, the WebGL sea surface line pattern is rendered over the sea. */
   showSeaPattern?: boolean;
   /** Optional override for the sea pattern configuration. */
@@ -294,6 +303,9 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   showAtmosphere = false,
   showGlass = true,
   waterFieldConfig,
+  worldBackdrop,
+  showFoam = true,
+  showCoastFoam = false,
   showSeaPattern = false,
   seaPatternConfig,
   seaRippleConfig,
@@ -812,6 +824,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       </svg>
 
       <div style={worldStyle}>
+        {worldBackdrop}
         {effectiveLayers
           .filter((layer) => layer.visible && layer.opacity > 0 && layer.id !== 'clouds')
           .map((layer) => {
@@ -895,11 +908,20 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           <WorldSurfaceFoam
             canvasSize={manifest.coordinateSystem.canvas}
             zIndex={cloudZIndex - 4}
+            enabled={showFoam}
           />
+          {/* Shore foam: sea-side only, so it needs no mask and sits just above the pattern. */}
+          {showCoastFoam && (
+            <WorldSurfaceCoastFoam
+              active={showCoastFoam}
+              canvasSize={manifest.coordinateSystem.canvas}
+              zIndex={cloudZIndex - 4}
+            />
+          )}
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
-          <WorldSurfaceWaves zIndex={cloudZIndex - 5} enabled={showWaves} />
-          <WorldSurfaceSeaMarks zIndex={cloudZIndex - 5} enabled={showSeaMarks} />
+          <WorldSurfaceWaves zIndex={cloudZIndex - 5} enabled={showWaves} canvasSize={manifest.coordinateSystem.canvas} />
+          <WorldSurfaceSeaMarks zIndex={cloudZIndex - 5} enabled={showSeaMarks} canvasSize={manifest.coordinateSystem.canvas} />
           {/* Sea pattern: WebGL line-texture surface motion. Mounted INSIDE the world
               box (unlike the sea-effect-lab spike this was ported from) so its
               z-index is compared against `frame`/`border` in the same stacking
@@ -1271,12 +1293,12 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, filte
               alt=""
               style={imgStyle}
               draggable={false}
-              // Event shroud layers are always mounted but sit translated off-canvas
-              // until the reveal; native lazy-loading can read that as "far from
-              // viewport" and defer the fetch until the same frame the close
-              // transition starts, competing with it for main-thread time. Force
-              // eager so the fetch/decode happens well ahead of the animation.
-              loading={isEventShroud ? 'eager' : 'lazy'}
+              // Never lazy: every surface layer is part of the first frame, but it sits inside the
+              // camera's scaled box, so the browser's in-viewport heuristic fires late (and never
+              // on a hidden document). Measured on /game-frame: base and sea still unrequested
+              // after 10 s. Shroud layers are eager for the same reason (off-canvas until reveal).
+              loading="eager"
+              fetchPriority={layer.id === 'sea' || layer.id === 'base_flat' || layer.id === 'background' ? 'high' : 'auto'}
               decoding="async"
               onError={handleImageError}
             />

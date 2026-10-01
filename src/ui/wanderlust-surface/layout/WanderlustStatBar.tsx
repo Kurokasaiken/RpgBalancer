@@ -14,7 +14,7 @@ import { MATERIC_SKIN_CONFIG } from '../matericSkinConfig';
  * ════════════════════════════════════════════════════════════════════════ */
 
 export type StatBarVariant = 'hp' | 'stamina' | 'fatigue';
-export type StatBarSize = 'sm' | 'md' | 'lg';
+export type StatBarSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export interface WanderlustStatBarProps {
   label: string;
@@ -23,6 +23,8 @@ export interface WanderlustStatBarProps {
   variant?: StatBarVariant;
   size?: StatBarSize;
   showValue?: boolean;
+  /** Drop the visible label (it stays as the bar's accessible name). For dense rows. */
+  hideLabel?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -48,6 +50,7 @@ const VARIANT_COLORS: Record<StatBarVariant, { start: string; end: string; shado
 
 // Size configurations
 const SIZE_CONFIG: Record<StatBarSize, { height: string; labelSize: string; valueSize: string }> = {
+  xs: { height: '4px', labelSize: '8px', valueSize: '9px' },
   sm: { height: '6px', labelSize: '9px', valueSize: '9px' },
   md: { height: '8px', labelSize: '10px', valueSize: '10px' },
   lg: { height: '12px', labelSize: '11px', valueSize: '11px' },
@@ -79,6 +82,7 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
   variant = 'hp',
   size = 'md',
   showValue = true,
+  hideLabel = false,
   className,
   style,
 }) => {
@@ -194,8 +198,8 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
 
   return (
     <div className={className} style={containerStyle}>
-      <span style={labelStyle}>{label}</span>
-      <div style={trackStyle}>
+      {!hideLabel && <span style={labelStyle}>{label}</span>}
+      <div style={trackStyle} {...(hideLabel ? { role: 'img', 'aria-label': `${label} ${value}/${maxValue}` } : {})}>
         <div style={fillStyle}>
           <div style={fillHighlightStyle} />
         </div>

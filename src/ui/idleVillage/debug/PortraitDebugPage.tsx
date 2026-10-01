@@ -68,7 +68,7 @@ function PortraitDebugContent() {
       style={{
         backgroundColor: 'var(--surface-base, #050509)',
         backgroundImage:
-          'var(--body-bg-overlay, radial-gradient(circle at top, rgba(5,5,9,0.95), rgba(7,10,19,0.92))), var(--body-bg-texture, url(/assets/ui/bg.png))',
+          'var(--body-bg-overlay, radial-gradient(circle at top, rgba(5,5,9,0.95), rgba(7,10,19,0.92))), var(--body-bg-texture, url(/assets/ui/bg.webp))',
         backgroundAttachment: 'fixed',
         backgroundSize: 'cover',
       }}

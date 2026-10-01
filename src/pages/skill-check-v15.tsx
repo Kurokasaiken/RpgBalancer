@@ -38,7 +38,7 @@ export default function SkillCheckV15Page(): JSX.Element {
   useEffect(() => {
     const img = new Image();
     img.onload = () => setBg(img);
-    img.src = '/assets/ui/bg.png';
+    img.src = '/assets/ui/bg.webp';
   }, []);
 
   /* IL CONSUMABILE. Non notifica niente e non conosce il board: alza una stat,

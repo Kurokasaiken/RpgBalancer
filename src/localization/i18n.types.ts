@@ -418,6 +418,80 @@ export default interface Resources {
       "minimize": "Minimise panel",
       "restore": "Restore panel"
     },
+    "gameFrame": {
+      "compass": {
+        "recenter": "Re-centre the map"
+      },
+      "events": {
+        "daysLeft": "{count} d",
+        "empty": "Nothing on the horizon.",
+        "fixtures": {
+          "caravan": "A merchant caravan arrives",
+          "expedition": "Expedition returns from the north",
+          "granary": "Granary finished",
+          "harvest": "Wheat harvest ready",
+          "invasion": "Goblin host reaches the village",
+          "wolves": "Wolves sighted by the old woods"
+        },
+        "move": "Move panel",
+        "showLess": "Show less",
+        "showMore": "Show all ({count})",
+        "sort": {
+          "ariaLabel": "Sort events",
+          "due": "Due",
+          "type": "Type"
+        },
+        "title": "Events",
+        "today": "today",
+        "types": {
+          "construction": "Construction",
+          "expedition": "Expedition",
+          "harvest": "Harvest",
+          "other": "Other",
+          "threat": "Threat",
+          "visit": "Visit"
+        }
+      },
+      "invasion": {
+        "body": "A goblin host arrives in {count} days."
+      },
+      "nav": {
+        "ariaLabel": "Game sections",
+        "locked": "Not yet",
+        "map": "Map",
+        "tavern": "Tavern",
+        "village": "Village",
+        "workshop": "Workshop"
+      },
+      "place": "The Eastern Marches",
+      "questPoi": {
+        "open": "{name} — open the quest"
+      },
+      "resources": {
+        "autonomy": "{count} d left",
+        "food": "Food",
+        "gold": "Gold",
+        "incoming": "+{count} incoming",
+        "perDay": "−{count}/d",
+        "tooltip": {
+          "amount": "{label} {value}.",
+          "food": "{label} {value} of {max}. Residents eat {perDay} a day: enough for {days} days.",
+          "incoming": "Incoming from activities in progress: +{count}."
+        },
+        "wood": "Wood"
+      },
+      "speed": {
+        "ariaLabel": "Simulation speed",
+        "pause": "Pause",
+        "paused": "Paused",
+        "resume": "Resume"
+      },
+      "status": {
+        "dayLabel": "Day"
+      },
+      "subtitle": "",
+      "title": "Wanderlust"
+    },
     "heroComponentsLab": {
       "availableSkills": "Available skills",
       "effect": "Effect",
@@ -455,13 +529,126 @@ export default interface Resources {
       "skills": "Checks to face",
       "wounded": "A hero was wounded during this phase"
     },
+    "missionPlanner": {
+      "addMember": "Add to party",
+      "anyDeath": "At least one fallen",
+      "anyInjury": "At least one wounded",
+      "available": "Available",
+      "band": {
+        "odds": {
+          "high": "Likely",
+          "low": "Unlikely",
+          "mid": "Uncertain"
+        },
+        "risk": {
+          "high": "High",
+          "low": "Low",
+          "mid": "Moderate"
+        }
+      },
+      "byMember": "By member",
+      "cause": {
+        "cover": "{{who}}'s cover",
+        "emptyPenalty": "Empty slots",
+        "slot": "{{slot}} ({{who}})",
+        "stat": "{{who}} · {{stat}}"
+      },
+      "company": "The company",
+      "death": "Death",
+      "duration": "Duration",
+      "equipSlot": {
+        "armor": "Armor",
+        "mount": "Mount",
+        "trinket": "Trinket",
+        "weapon": "Weapon"
+      },
+      "eyebrow": "Expedition plan",
+      "haloHint": "Outer ring: death · inner ring: injury",
+      "hours": "{{count}} h",
+      "hoursShort": "h",
+      "hp": "HP",
+      "ifEmpty": "If left empty:",
+      "injury": "Injury",
+      "input": "Input",
+      "issue": {
+        "CONSUMABLE_OVER_STOCK": "Not enough provisions",
+        "EMPTY_REQUIRED_SLOT": "Required slots are empty",
+        "ITEM_SLOT_MISMATCH": "Item in the wrong slot",
+        "ITEM_UNKNOWN": "Unknown item",
+        "PARTY_TOO_LARGE": "Company too large",
+        "RESIDENT_MISSING": "A member is no longer available"
+      },
+      "items": {
+        "draftHorse": "Draft Horse",
+        "guardianBanner": "Guardian Banner",
+        "healingDraught": "Healing Draught",
+        "heavyPlate": "Heavy Plate",
+        "ironBlade": "Iron Blade",
+        "luckyCoin": "Lucky Coin"
+      },
+      "launch": "Depart",
+      "loadout": "Loadout",
+      "metric": {
+        "death": "Death",
+        "duration": "Duration",
+        "injury": "Injury",
+        "reward": "Reward",
+        "success": "Success"
+      },
+      "modifier": {
+        "death": "Death",
+        "injury": "Injury",
+        "power": "Power"
+      },
+      "noLoadout": "No equipment",
+      "open": "Mission Planner",
+      "outcome": "Outcome",
+      "output": "Outcome",
+      "party": "Party",
+      "perMemberRoll": "Base risk per member, rolled at every trial",
+      "phaseType": {
+        "check": "Trial",
+        "event": "Event",
+        "fight": "Fight",
+        "trap": "Trap"
+      },
+      "phases": "By phase",
+      "pickFromRoster": "Pick someone from the available",
+      "provisions": "Provisions",
+      "remove": "Remove {{name}}",
+      "required": "required",
+      "reset": "Reset",
+      "reward": "Expected reward",
+      "route": "The road",
+      "rule": "Success = passing at least half of the trials",
+      "stage": "Trial {{n}}",
+      "stat": {
+        "agility": "Agility",
+        "endurance": "Endurance",
+        "intelligence": "Intelligence",
+        "perception": "Perception",
+        "strength": "Strength"
+      },
+      "subtitle": "Every change updates the outcomes instantly",
+      "success": "Success",
+      "title": "Planner",
+      "trend": {
+        "better": "improves",
+        "same": "unchanged",
+        "worse": "worsens"
+      },
+      "unavailable": "unavailable",
+      "undo": "Undo",
+      "why": "Why",
+      "whyEmpty": "Form the company to see what decides the outcome."
+    },
     "nearMissBand": "Near Miss Band",
     "pgDetailCard": {
       "close": "Close character sheet",
       "equipment": {
         "armor": "Armor",
         "empty": "Empty",
-        "label": "Equipment",
+        "label": "Loadout",
         "mount": "Mount",
         "offhand": "Off hand",
         "ring": "Ring",
@@ -484,7 +671,12 @@ export default interface Resources {
       "openArchetype": "Open archetype",
       "profile": "Profile",
       "statistics": {
-        "count": "{{count}} values",
+        "category": {
+          "defense": "Defense",
+          "offense": "Offense",
+          "utility": "Utility"
+        },
+        "count": "{count} values",
         "empty": "No snapshot available.",
         "label": "Statistics"
       },
@@ -495,7 +687,11 @@ export default interface Resources {
         "exhausted": "Exhausted",
         "injured": "Injured"
       },
-      "unknownPreset": "Unknown preset: {{id}}"
+      "unknownPreset": "Unknown preset: {id}",
+      "vitals": {
+        "hp": "HP",
+        "stamina": "STA"
+      }
     },
     "poiDetail": {
       "risk": {
@@ -586,6 +782,17 @@ export default interface Resources {
       },
       "step": "Step",
       "tick": "Tick"
+    },
+    "questCheckpoint": {
+      "continue": "Push on",
+      "member": {
+        "alive": "Unscathed",
+        "dead": "Dead",
+        "injured": "Injured"
+      },
+      "retreat": "Retreat",
+      "summary": "Phase {{played}} of {{total}} is behind you.",
+      "title": "Checkpoint"
     },
     "questChronicle": {
       "boardStatus": {
@@ -728,10 +935,39 @@ export default interface Resources {
         "nameDesc": "Name Z → A",
         "nameDescDescription": "Sort by display name alphabetically (Z to A)",
         "nameDescTooltip": "Sort: Name Z → A (click to reverse)"
+      },
+      "status": {
+        "active": "Active",
+        "assigned": "Assigned",
+        "away": "Away",
+        "dead": "Fallen",
+        "exhausted": "Exhausted",
+        "injured": "Injured"
       }
     },
     "slowMo": "Slow Mo",
     "spinDuration": "Spin Duration",
+    "stat": {
+      "accuracy": "Accuracy",
+      "agility": "Agility",
+      "armor": "Armor",
+      "armorPen": "Armor Pen",
+      "block": "Block",
+      "castSpeed": "Cast Speed",
+      "cooldownReduction": "Cooldown",
+      "critChance": "Crit Chance",
+      "critMult": "Crit Mult.",
+      "damage": "Damage",
+      "energyShield": "Energy Shield",
+      "evasion": "Evasion",
+      "lifesteal": "Lifesteal",
+      "movementSpeed": "Move Speed",
+      "penPercent": "Resist. Pen",
+      "regen": "Regen",
+      "resistance": "Resistance",
+      "thorns": "Thorns",
+      "ward": "Ward"
+    },
     "stats": "Stats",
     "threatStatus": {
       "page": {
@@ -774,10 +1010,29 @@ export default interface Resources {
         "camera": "Camera",
         "clearObjects": "Clear",
         "despawnWonders": "Despawn wonders",
+        "hideUi": "Hide UI",
         "mouseWorld": "Mouse (world)",
         "objects": "Objects",
+        "reducedMotion": "reduced motion",
         "regions": "Regions",
         "renderer": "Renderer",
+        "seaPattern": "Pattern",
+        "seaPatternAngle": "Motion angle",
+        "seaPatternClose": "Close",
+        "seaPatternColor": "Line color",
+        "seaPatternLive": "Authored texture A1 / micro scroll",
+        "seaPatternMotion": "Motion amount",
+        "seaPatternMotionEnabled": "Motion on",
+        "seaPatternOpacity": "Line opacity",
+        "seaPatternPeriod": "Motion period",
+        "seaPatternSaveDefault": "Save as default",
+        "seaPatternSaveFailed": "Save failed (dev server only)",
+        "seaPatternSaved": "Defaults written to source",
+        "seaPatternSaving": "Saving…",
+        "seaPatternScale": "Pattern scale",
+        "seaPatternTitle": "Sea pattern — live",
+        "settlementLost": "Settlement Lost",
+        "showUi": "Show UI",
         "spawnObjects": "Spawn 60",
         "spawnWonders": "Spawn wonders",
         "statesTitle": "States",
@@ -790,6 +1045,13 @@ export default interface Resources {
         "daysRemaining": "Days Remaining: {count}",
         "eventLabel": "Goblin Invasion",
         "invasion": "Invasion",
+        "reminder": {
+          "band_closing": "CLOSING IN",
+          "band_distant": "APPROACHING",
+          "band_imminent": "TOMORROW",
+          "days_plural": "DAYS",
+          "days_singular": "DAY"
+        },
         "subtitle": "In {count} days an army will attack!",
         "timerLabel": "DAYS REMAINING",
         "title": "GOBLIN INVASION!",
@@ -845,6 +1107,22 @@ export default interface Resources {
       "loading": "Loading world surface…",
       "region": {
         "enchanted_forest": "Enchanted Forest"
+      },
+      "settlementLost": {
+        "cta": "BEGIN A NEW SETTLEMENT",
+        "losses": {
+          "heroes": "Your heroes have fallen",
+          "stores": "The stores are lost",
+          "walls": "The walls were breached"
+        },
+        "lossesTitle": "What was lost",
+        "stats": {
+          "daysSurvived": "Days survived",
+          "goldEarned": "Gold earned",
+          "residentsLost": "Residents lost"
+        },
+        "subtitle": "The settlement has fallen. What was learned carries on.",
+        "title": "SETTLEMENT LOST"
       },
       "states": {
         "corrupted": "Corrupted",
