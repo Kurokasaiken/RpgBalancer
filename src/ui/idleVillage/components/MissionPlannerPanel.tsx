@@ -430,13 +430,39 @@ export function MissionPlannerPanel({
             <MatericSurface shape="card" material="jade" style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ fontSize: 11, color: C.label, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('missionPlanner.route')}</div>
               {view.phases.map((p, i) => (
-                <div key={p.id} data-testid={`mp-phase-${p.id}`} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-                  <span style={{ color: C.dim, minWidth: 14 }}>{i + 1}.</span>
-                  <span style={{ flex: 1, color: C.text }}>
-                    {p.icon} {p.title}
-                  </span>
-                  <DeltaBadge metric={p.passChance} testid={`mp-delta-phase-${p.id}`} />
-                  <span style={{ color: C.text, fontVariantNumeric: 'tabular-nums' }}>{fmtPct(p.passChance.value)}</span>
+                <div key={p.id} data-testid={`mp-phase-${p.id}`} style={{ display: 'flex', flexDirection: 'column', gap: 2, fontSize: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ color: C.dim, minWidth: 14 }}>{i + 1}.</span>
+                    <span style={{ flex: 1, color: C.text }}>
+                      {p.icon} {p.title}
+                    </span>
+                    <DeltaBadge metric={p.passChance} testid={`mp-delta-phase-${p.id}`} />
+                    <span style={{ color: C.text, fontVariantNumeric: 'tabular-nums' }}>{fmtPct(p.passChance.value)}</span>
+                  </div>
+                  <div
+                    data-testid={`mp-phase-detail-${p.id}`}
+                    style={{ display: 'flex', gap: 8, paddingLeft: 22, fontSize: 10, color: C.dim, fontVariantNumeric: 'tabular-nums', flexWrap: 'wrap' }}
+                  >
+                    {p.memberInjury && p.memberDeath && (
+                      <span>
+                        {t('missionPlanner.phase.memberRisk', {
+                          inj: `${p.memberInjury.min.toFixed(0)}–${p.memberInjury.max.toFixed(0)}`,
+                          dth: `${p.memberDeath.min.toFixed(0)}–${p.memberDeath.max.toFixed(0)}`,
+                        })}
+                      </span>
+                    )}
+                    <span>
+                      {t('missionPlanner.phase.surviveThrough', { pct: p.surviveThrough.toFixed(0) })}
+                    </span>
+                    {p.retreat && (
+                      <span>
+                        {t('missionPlanner.phase.retreat', {
+                          tier: t(`idleVillage:questOutcome.${p.retreat.tier}`),
+                          pct: p.retreat.chance.toFixed(0),
+                        })}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </MatericSurface>

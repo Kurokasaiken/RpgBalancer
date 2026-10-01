@@ -107,6 +107,31 @@ describe('MissionPlannerLive (quest_city_rats)', () => {
     expect(memberRow()).not.toBe(before);
   });
 
+  it('phase preview is distinct from the quest preview (per-member risk, survive-through, retreat)', () => {
+    const { container } = render(<MissionPlannerLive questId={QUEST_ID} />);
+    fireEvent.click(rosterButtons(container)[0]);
+    fireEvent.click(rosterButtons(container)[0]);
+    fireEvent.click(rosterButtons(container)[0]);
+
+    // Each phase row carries its own preview line — conditional pass chance
+    // plus per-member risk, survive-through and the retreat tier — which is
+    // not just the quest aggregate repeated.
+    const details = container.querySelectorAll<HTMLElement>('[data-testid^="mp-phase-detail-"]');
+    expect(details.length).toBe(3);
+    for (const detail of details) {
+      expect(detail.textContent).toContain('per member');
+      expect(detail.textContent).toMatch(/⚕ \d+–\d+%/);
+      expect(detail.textContent).toMatch(/☠ \d+–\d+%/);
+      expect(detail.textContent).toContain('party alive after');
+      expect(detail.textContent).toMatch(/retreat → .+ \(\d+%\)/);
+    }
+    // The phase-level pass chance (conditional on reaching) differs from the
+    // whole-quest success headline — two different previews, two semantics.
+    const phaseRows = container.querySelectorAll<HTMLElement>('[data-testid^="mp-phase-"]');
+    const passText = phaseRows[0].textContent ?? '';
+    expect(passText).not.toContain(successText());
+  });
+
   it('launch invokes onLaunch with a validated payload', () => {
     const launches: Array<{ ok: boolean; payload?: { questId: string; party: unknown[] } }> = [];
     const { container } = render(

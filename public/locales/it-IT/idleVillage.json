@@ -958,7 +958,7 @@
     "launch": "Parti",
     "addMember": "Aggiungi al party",
     "noLoadout": "Nessun equipaggiamento",
-    "remove": "Rimuovi {{name}}",
+    "remove": "Rimuovi {name}",
     "trend": {
       "better": "migliora",
       "worse": "peggiora",
@@ -975,7 +975,7 @@
     "eyebrow": "Piano di spedizione",
     "route": "Il cammino",
     "rule": "Successo = superare almeno metà delle prove",
-    "stage": "Prova {{n}}",
+    "stage": "Prova {n}",
     "hoursShort": "h",
     "perMemberRoll": "Rischio base per membro, tirato a ogni prova",
     "company": "La compagnia",
@@ -1010,10 +1010,10 @@
       "reward": "Ricompensa"
     },
     "cause": {
-      "stat": "{{who}} · {{stat}}",
-      "slot": "{{slot}} ({{who}})",
+      "stat": "{who} · {stat}",
+      "slot": "{slot} ({who})",
       "emptyPenalty": "Slot vuoti",
-      "cover": "Protezione di {{who}}"
+      "cover": "Protezione di {who}"
     },
     "stat": {
       "strength": "Forza",
@@ -1030,9 +1030,14 @@
       "CONSUMABLE_OVER_STOCK": "Provviste insufficienti",
       "PARTY_TOO_LARGE": "Compagnia troppo numerosa"
     },
-    "hours": "{{count}} ore",
+    "hours": "{count} ore",
     "loadout": "Equipaggiamento",
-    "open": "Pianificatore missione"
+    "open": "Pianificatore missione",
+    "phase": {
+      "memberRisk": "per membro ⚕ {inj}% · ☠ {dth}%",
+      "surviveThrough": "superstiti dopo: {pct}%",
+      "retreat": "ritiro → {tier} ({pct}%)"
+    }
   },
   "roster": {
     "status": {
@@ -1046,13 +1051,22 @@
   },
   "questCheckpoint": {
     "title": "Checkpoint",
-    "summary": "La fase {{played}} di {{total}} è alle spalle.",
+    "summary": "La fase {played} di {total} è alle spalle.",
     "member": {
       "alive": "Illeso",
       "injured": "Ferito",
       "dead": "Morto"
     },
     "continue": "Prosegui",
-    "retreat": "Ritirati"
+    "retreat": "Ritirati",
+    "ifContinue": "Se continui",
+    "ifRetreat": "Se ti ritiri ora"
+  },
+  "questOutcome": {
+    "perfect": "Perfetto",
+    "success": "Successo",
+    "partial": "Successo parziale",
+    "fail": "Fallimento",
+    "deadly": "Disastro"
   }
 }

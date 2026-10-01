@@ -37,10 +37,15 @@ import {
   type PlannerLiveState,
 } from '@/engine/game/idleVillage/missionPlannerDraft';
 import {
+  buildMissionInput,
   MissionPlannerEngineError,
   questOutcomeDistribution,
 } from '@/engine/game/idleVillage/missionPlannerEngine';
-import type { MissionPhaseSpec, MissionPreviewResult } from '@/engine/game/idleVillage/missionPlannerMath';
+import type {
+  MissionPhaseSpec,
+  MissionPlannerInput,
+  MissionPreviewResult,
+} from '@/engine/game/idleVillage/missionPlannerMath';
 
 /** Telemetry event name reserved for MP-05 wiring (not emitted here). */
 export const MISSION_PLANNER_DRAFT_CHANGE_EVENT = 'mission_planner_draft_change';
@@ -78,6 +83,13 @@ export interface MissionPlannerDraftContextValue {
    * `null` when the engine refuses the draft (issues carry the reason).
    */
   preview: MissionPreviewResult | null;
+  /**
+   * The resolved engine input behind {@link preview} — member/phase specs,
+   * consumables, item effects. `null` when the draft is invalid. Surfaced so
+   * phase-level views can derive per-phase numbers (memberPhaseRisk etc.)
+   * without rebuilding the draft chain.
+   */
+  input: MissionPlannerInput | null;
   /** Validation against live state (invalidations, missing required slots…). */
   validation: DraftValidation;
   /** Headline deltas vs the preview before the last change (null initially). */
@@ -135,8 +147,10 @@ export function MissionPlannerProvider({
     // instead of feeding stale numbers to the player.
     const missionDraft = toMissionDraft(draft, live, phases);
     let preview: MissionPreviewResult | null = null;
+    let input: MissionPlannerInput | null = null;
     const engineIssues: DraftIssue[] = [];
     try {
+      input = buildMissionInput(missionDraft, config);
       preview = questOutcomeDistribution(missionDraft, config);
     } catch (err) {
       engineIssues.push(engineErrorToIssue(err));
@@ -144,6 +158,7 @@ export function MissionPlannerProvider({
     const validation = validateDraft(draft, live, config);
     return {
       preview,
+      input,
       validation: {
         canEmbark: validation.canEmbark && preview !== null,
         issues: [...validation.issues, ...engineIssues],
@@ -193,6 +208,7 @@ export function MissionPlannerProvider({
     () => ({
       draft,
       preview: resolved.preview,
+      input: resolved.input,
       validation: resolved.validation,
       deltas,
       invalidatedResidentIds: resolved.validation.invalidatedResidentIds,

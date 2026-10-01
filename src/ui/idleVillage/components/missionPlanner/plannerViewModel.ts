@@ -4,7 +4,13 @@
  * engine output (`MissionPreviewResult`), the draft, the live roster, the quest
  * blueprint, the slot blueprints or the item catalog.
  */
-import type { MissionPreviewResult, MissionContribution } from '@/engine/game/idleVillage/missionPlannerMath';
+import {
+  memberPhaseRisk,
+  type MissionContribution,
+  type MissionPlannerInput,
+  type MissionPreviewResult,
+} from '@/engine/game/idleVillage/missionPlannerMath';
+import type { QuestOutcomeTier } from '@/engine/game/idleVillage/questMilestones';
 import type { MissionPlannerDraft } from '@/engine/game/idleVillage/missionPlannerDraft';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import type { QuestBlueprint } from '@/balancing/config/idleVillage/quests/questBlueprints.schema';
@@ -65,7 +71,13 @@ export interface PlannerSlotView {
   member?: PlannerMemberView;
 }
 
-/** One stage of the route. */
+/** A min–max band of effective risk across the drafted company, in pp. */
+export interface PlannerRiskRange {
+  min: number;
+  max: number;
+}
+
+/** One stage of the route — the phase-level preview, distinct from quest totals. */
 export interface PlannerPhaseView {
   id: string;
   icon?: string;
@@ -73,10 +85,20 @@ export interface PlannerPhaseView {
   type: string;
   threatLabel?: string;
   hours: number;
+  /** P(pass | the company reaches this phase) — conditional, not cumulative. */
   passChance: PlannerMetric;
   baseInjury: number;
   baseDeath: number;
+  /** P(at least one member alive after this phase). */
   surviveThrough: number;
+  /**
+   * Effective per-member injury/death risk in this phase (pp, min–max over the
+   * drafted company at full strength). Null when nobody is drafted.
+   */
+  memberInjury: PlannerRiskRange | null;
+  memberDeath: PlannerRiskRange | null;
+  /** Dominant tier if the company retreats right after this phase, conditional on reaching it. */
+  retreat: { tier: QuestOutcomeTier; chance: number } | null;
 }
 
 /** One cause → effect line. */
@@ -120,6 +142,8 @@ export interface PlannerViewInput {
   draft: MissionPlannerDraft;
   preview: MissionPreviewResult | null;
   previous: MissionPreviewResult | null;
+  /** Resolved engine input (member/phase specs) — null when the draft is invalid. */
+  missionInput: MissionPlannerInput | null;
   residentsById: Readonly<Record<string, ResidentState | undefined>>;
   itemCatalog: Readonly<Record<string, QuestItem>>;
   equipSlots: readonly QuestEquipSlot[];
@@ -241,7 +265,7 @@ function buildWhy(input: PlannerViewInput, preview: MissionPreviewResult): Plann
  * @returns The fully derived view
  */
 export function buildPlannerView(input: PlannerViewInput): PlannerView {
-  const { blueprint, slotBlueprints, draft, preview, previous, residentsById, itemCatalog, equipSlots } = input;
+  const { blueprint, slotBlueprints, draft, preview, previous, residentsById, itemCatalog, equipSlots, missionInput } = input;
   const scale = input.timeScale ?? DEFAULT_QUEST_TIME_SCALE;
   const toHours = (ms: number): number => ms / scale.msPerHour;
 
@@ -300,9 +324,48 @@ export function buildPlannerView(input: PlannerViewInput): PlannerView {
     };
   });
 
-  const phases: PlannerPhaseView[] = blueprint.phases.map((phase) => {
+  const allAliveMask = missionInput && missionInput.members.length > 0
+    ? (1 << missionInput.members.length) - 1
+    : 0;
+
+  const phases: PlannerPhaseView[] = blueprint.phases.map((phase, index) => {
     const cp = currPhase.get(phase.id);
     const pp = prevPhase.get(phase.id);
+    const spec = missionInput?.phases[index];
+
+    let memberInjury: PlannerRiskRange | null = null;
+    let memberDeath: PlannerRiskRange | null = null;
+    if (missionInput && spec && missionInput.members.length > 0) {
+      let injMin = Infinity;
+      let injMax = -Infinity;
+      let dthMin = Infinity;
+      let dthMax = -Infinity;
+      for (let i = 0; i < missionInput.members.length; i += 1) {
+        const risk = memberPhaseRisk(
+          missionInput.members,
+          i,
+          spec,
+          allAliveMask,
+          missionInput.consumables,
+          missionInput.emptySlotPenalty,
+        );
+        injMin = Math.min(injMin, risk.injury);
+        injMax = Math.max(injMax, risk.injury);
+        dthMin = Math.min(dthMin, risk.death);
+        dthMax = Math.max(dthMax, risk.death);
+      }
+      memberInjury = { min: injMin * 100, max: injMax * 100 };
+      memberDeath = { min: dthMin * 100, max: dthMax * 100 };
+    }
+
+    let retreat: PlannerPhaseView['retreat'] = null;
+    if (cp?.retreatTiers) {
+      const dominant = (Object.entries(cp.retreatTiers) as Array<[QuestOutcomeTier, number]>).reduce(
+        (best, [tier, p]) => (p > best[1] ? [tier, p] : best),
+      );
+      if (dominant[1] > 0) retreat = { tier: dominant[0], chance: dominant[1] * 100 };
+    }
+
     return {
       id: phase.id,
       icon: phase.icon,
@@ -314,6 +377,9 @@ export function buildPlannerView(input: PlannerViewInput): PlannerView {
       baseInjury: phase.riskProfile?.injuryChance ?? 0,
       baseDeath: phase.riskProfile?.deathChance ?? 0,
       surviveThrough: (cp?.surviveThrough ?? 0) * 100,
+      memberInjury,
+      memberDeath,
+      retreat,
     };
   });
 
