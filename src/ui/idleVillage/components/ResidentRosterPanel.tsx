@@ -44,6 +44,8 @@ export interface ResidentRosterPanelProps {
   lockedResidentIds?: string[];
   /** Status label for locked residents (default: 'Assigned') */
   lockedStatusLabel?: string;
+  /** `compact` = one-line resident strips for HUD use (see DragTestContainer). */
+  density?: 'default' | 'compact';
 }
 
 type DragVisualState = {
@@ -108,6 +110,7 @@ export function ResidentRosterPanel({
   useWanderlustSkin = false,
   lockedResidentIds,
   lockedStatusLabel,
+  density = 'default',
 }: ResidentRosterPanelProps) {
   // Instrument renderer stack at ResidentRosterPanel level
   rendererStackInstrumentation.captureResidentRosterPanel(residents);
@@ -115,7 +118,7 @@ export function ResidentRosterPanel({
   return (
     <section
       data-testid="resident-roster-panel"
-      className="p-4"
+      className={density === 'compact' ? 'p-0' : 'p-4'}
     >
       <DragTestContainer
         residents={residents}
@@ -130,6 +133,11 @@ export function ResidentRosterPanel({
         useWanderlustSkin={useWanderlustSkin}
         lockedResidentIds={lockedResidentIds}
         lockedStatusLabel={lockedStatusLabel}
+        density={density}
+        // The window drag handle needs componentId. It was never forwarded here, so the
+        // handle has never rendered in the default layout; forwarding it there would change
+        // the certified 1.0.0 subtree, so for now only the compact (HUD) layout gets it.
+        componentId={density === 'compact' ? componentId : undefined}
       />
 
       {assignmentFeedback && (

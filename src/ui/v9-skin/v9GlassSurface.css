@@ -87,7 +87,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url('/assets/ui/bg.png');
+  background-image: url('/assets/ui/bg.webp');
   background-size: 220%;
   background-position: 68% 34%;
   transform: rotate(180deg) scale(1.25);

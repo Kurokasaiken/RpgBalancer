@@ -1,5 +1,6 @@
 import { memo, useCallback, useState, type CSSProperties } from 'react';
 import { useDraggable } from '@dnd-kit/core';
+import { useTranslation } from 'react-i18next';
 import { WanderlustStatBar } from '@/ui/wanderlust-surface/layout/WanderlustStatBar';
 import { WanderlustPortrait } from '@/ui/wanderlust-surface/layout/WanderlustPortrait';
 import type { ResidentCompatibilityState } from './ResidentRosterTypes';
@@ -35,7 +36,25 @@ export interface WanderlustRosterCardProps {
   compatibilityLabel?: string;
   isHero?: boolean;
   onPointerDown?: (event: React.PointerEvent<HTMLDivElement>) => void;
+  /**
+   * Dense one-line strip (~30px): portrait, name + status tag, two thin bars with
+   * values. Same drag behaviour; no decorative glow or breathing animations.
+   */
+  compact?: boolean;
+  /** Compact strips only: the resident's state, shown as a short translated tag. */
+  statusKind?: RosterStatusKind;
 }
+
+export type RosterStatusKind = 'active' | 'injured' | 'dead' | 'exhausted' | 'away' | 'assigned';
+
+const STATUS_TONE: Record<RosterStatusKind, string> = {
+  active: 'var(--skin-status-met, #7bc96f)',
+  injured: 'var(--skin-event-danger, #e07a5f)',
+  dead: 'var(--skin-event-danger, #e07a5f)',
+  exhausted: 'var(--skin-event-warning, #e3b04b)',
+  away: 'var(--skin-event-warning, #e3b04b)',
+  assigned: 'var(--skin-event-warning, #e3b04b)',
+};
 
 // V9 skin-aware color tokens (base layout primitives)
 const COLOR = {
@@ -80,7 +99,10 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
   compatibilityLabel,
   isHero = false,
   onPointerDown,
+  compact = false,
+  statusKind,
 }) => {
+  const { t } = useTranslation('idleVillage');
   const [isHovered, setIsHovered] = useState(false);
   const { attributes, listeners, setNodeRef, isDragging: dndIsDragging } = useDraggable({
     id: workerId,
@@ -330,6 +352,96 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
     flexDirection: 'column',
     gap: '5px',
   };
+
+  if (compact) {
+    const statusText = statusKind ? t(`roster.status.${statusKind}`) : subtitle;
+    const statusTone = statusKind
+      ? STATUS_TONE[statusKind]
+      : subtitle === 'Ferito'
+      ? 'var(--skin-event-danger, #e07a5f)'
+      : isUnavailable
+      ? 'var(--skin-event-warning, #e3b04b)'
+      : COLOR.hp;
+    return (
+      <div
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        className={className}
+        style={{
+          ...cardStyle,
+          gridTemplateColumns: '22px minmax(0, 1fr) 116px',
+          gap: '8px',
+          padding: '4px 8px',
+          borderRadius: '8px',
+          // A thin gold filet makes each strip read as a separate, graspable object
+          // on the dark panel; it brightens on hover as the drag affordance.
+          border: `1px solid ${isHovered ? 'rgba(223,184,87,0.42)' : 'rgba(223,184,87,0.16)'}`,
+          boxShadow: cardBoxShadow,
+          transition: 'box-shadow 200ms ease, opacity 200ms ease, border-color 200ms ease',
+        }}
+        onClick={handleClick}
+        onPointerDown={(e) => {
+          handlePointerDown(e);
+          listeners?.onPointerDown?.(e);
+        }}
+        onMouseEnter={() => {
+          if (isInteractive && !isUnavailable) setIsHovered(true);
+        }}
+        onMouseLeave={() => {
+          if (isInteractive && !isUnavailable) setIsHovered(false);
+        }}
+        data-worker-id={workerId}
+        data-compatibility={compatibilityState}
+        data-density="compact"
+      >
+        <WanderlustPortrait
+          portraitUrl={portraitUrl}
+          initials={label.charAt(0).toUpperCase()}
+          size={22}
+          isHero={isHero}
+        />
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', minWidth: 0 }}>
+          <span
+            title={label}
+            style={{
+              fontFamily: FONT.display,
+              fontSize: '13px',
+              fontWeight: 700,
+              letterSpacing: '0.02em',
+              color: COLOR.parchment,
+              textShadow: ENGRAVE.faint,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {label}
+          </span>
+          {statusText && (
+            <span
+              style={{
+                fontFamily: FONT.sans,
+                fontSize: '8px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: statusTone,
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              {statusText}
+            </span>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <WanderlustStatBar label="HP" value={hp} maxValue={maxHp} variant="hp" size="xs" hideLabel />
+          <WanderlustStatBar label="Stamina" value={100 - fatigue} maxValue={100} variant="stamina" size="xs" hideLabel />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

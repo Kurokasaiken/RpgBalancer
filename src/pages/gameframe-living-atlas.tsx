@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 // A/B comparison route (R-075) — same exemption as /game-frame.
 // eslint-disable-next-line no-restricted-imports
 import {
+  buildResourceReadoutItems,
   GameFrame,
-  HudGlyph,
   HudHangingTag,
   ResourceReadout,
   SpeedControl,
@@ -15,7 +15,7 @@ import {
   type WorldSurfaceVisualStateOverride,
 } from '@/ui/idleVillage/frozen/kits/worldSurfaceKit';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
-import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
+import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 
 /**
@@ -81,30 +81,7 @@ export default function GameFrameLivingAtlasPage() {
             placeName={t('gameFrame.place')}
           />
         }
-        resourcesSlot={
-          <ResourceReadout
-            items={[
-              {
-                id: 'gold',
-                icon: <HudGlyph iconId="gold" label={t('gameFrame.resources.gold')} />,
-                label: t('gameFrame.resources.gold'),
-                value: state.gold,
-              },
-              {
-                id: 'food',
-                icon: <HudGlyph iconId="food" label={t('gameFrame.resources.food')} />,
-                label: t('gameFrame.resources.food'),
-                value: `${state.food}/${state.maxFood}`,
-              },
-              {
-                id: 'wood',
-                icon: <HudGlyph iconId="wood" label={t('gameFrame.resources.wood')} />,
-                label: t('gameFrame.resources.wood'),
-                value: state.wood,
-              },
-            ]}
-          />
-        }
+        resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />}
         hangingSlot={
           daysLeft > 0 ? (
             <button
@@ -146,6 +123,9 @@ export default function GameFrameLivingAtlasPage() {
           }}
           breathEnabled={worldDressing.breathEnabled}
           showSeaPattern={worldDressing.showSeaPattern}
+          showFoam={worldDressing.showFoam}
+          safeFit={worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined}
+          showCoastFoam={worldDressing.showCoastFoam}
           showGlass={worldDressing.showGlass}
           visualStateOverrides={worldOverrides}
         />

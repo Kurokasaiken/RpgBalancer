@@ -223,7 +223,7 @@ export function createAstrolabeV3Engine(
   /* materia pittorica */
   const bgImg = new Image();
   bgImg.onload = () => { backdropDirty = true; };
-  bgImg.src = '/assets/ui/bg.png';
+  bgImg.src = '/assets/ui/bg.webp';
   const grainImg = new Image();
   grainImg.onload = () => { backdropDirty = true; };
   grainImg.src = '/assets/ui/oil-grain.png';

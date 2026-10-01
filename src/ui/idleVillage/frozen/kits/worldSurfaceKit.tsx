@@ -25,8 +25,9 @@
  * Reference page: src/ui/idleVillage/pages/WorldSurfaceTestPage.tsx (route /world-surface)
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { WorldSurfaceRenderer } from '@/ui/idleVillage/components/WorldSurfaceRenderer';
+import { WorldSurfaceSeaMargin } from '@/ui/idleVillage/components/WorldSurfaceSeaMargin';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import type { WorldSurfaceVisualStateOverride } from '@/ui/idleVillage/config/worldSurfaceConfig';
 import type { SeaRippleConfig } from '@/ui/idleVillage/config/atmosphereAssets';
@@ -50,6 +51,21 @@ export const WANDERLUST_BASE_MANIFEST = '/assets/world/wanderlust/base/manifest.
  * which exist app-wide. Kept as a named constant for parity with other kits.
  */
 export const WORLD_SURFACE_PROVIDER_CHAIN = [] as const;
+
+/**
+ * Frame the LAND, not the canvas: fit the land's bounding box inside the area the
+ * chrome leaves free, and let the camera run past the left/right canvas edge over
+ * `seaMarginPx` of placeholder sea (see `WorldSurfaceSeaMargin`). Vertical bounds stay
+ * on the canvas.
+ */
+export interface WorldSurfaceSafeFit {
+  /** Bounding box of the land in world px (from the land mask). */
+  landBounds: { x0: number; x1: number; y0: number; y1: number };
+  /** Screen px the chrome occupies at each edge of the container. */
+  insets: { top: number; bottom: number; left?: number; right?: number };
+  /** Extra sea each side of the canvas. Must stay below the land's distance from the canvas sides. */
+  seaMarginPx: number;
+}
 
 export interface WorldSurfaceStandaloneProps {
   /** Manifest to load. Defaults to the Wanderlust base map. */
@@ -86,6 +102,10 @@ export interface WorldSurfaceStandaloneProps {
    * driven by `setInterval` rather than rAF — the GPU path, not the CPU one.
    */
   showSeaPattern?: boolean;
+  /** Older scrolling foam texture (default on, as before). */
+  showFoam?: boolean;
+  /** Foam that laps the shore: WebGL shader over a baked distance-to-coast field. */
+  showCoastFoam?: boolean;
   /**
    * The glass "teca" overlay. Two blurred SVG paths at opacity 0.035-0.05 —
    * measured 369 kpx of filtered surface for something all but invisible.
@@ -100,6 +120,10 @@ export interface WorldSurfaceStandaloneProps {
   visualStateOverrides?: WorldSurfaceVisualStateOverride[];
   /** Extra class on the fill container (must have a sized parent). */
   className?: string;
+  /** Bump to discard the viewer's pan/zoom and re-fit the map (e.g. a "re-centre" control). */
+  recenterSignal?: number;
+  /** Fit the land inside the chrome-free area instead of cover-fitting the canvas. */
+  safeFit?: WorldSurfaceSafeFit;
 }
 
 /**
@@ -118,9 +142,13 @@ export const WorldSurfaceStandalone: React.FC<WorldSurfaceStandaloneProps> = ({
   showSeaRipple = true,
   seaRippleConfig,
   showSeaPattern = false,
+  showFoam = true,
+  showCoastFoam = false,
   showGlass = true,
   visualStateOverrides,
   className,
+  recenterSignal = 0,
+  safeFit,
 }) => {
   const { isLoading, error, manifest, cameraConfig } = useWorldSurface(manifestPath);
 
@@ -129,6 +157,7 @@ export const WorldSurfaceStandalone: React.FC<WorldSurfaceStandaloneProps> = ({
   // Once the viewer pans/zooms by hand, auto-fit must stop overriding them on
   // every resize — otherwise their own camera would snap back mid-interaction.
   const userHasInteracted = useRef(false);
+  const [viewport, setViewport] = useState<{ width: number; height: number } | null>(null);
 
   /**
    * Cover-fit the canvas into whatever the container measures, centred.
@@ -156,10 +185,38 @@ export const WorldSurfaceStandalone: React.FC<WorldSurfaceStandaloneProps> = ({
   useEffect(() => {
     const el = containerRef.current;
     if (!el || !manifest || !cameraConfig) return;
+    // Re-running this effect (manifest change or `recenterSignal` bump) hands the camera back to auto-fit;
+    // the ResizeObserver below fires once on observe, which performs the fit.
+    userHasInteracted.current = false;
 
     const canvas = manifest.coordinateSystem.canvas;
     const fit = (width: number, height: number) => {
-      if (userHasInteracted.current || width <= 0 || height <= 0) return;
+      if (width <= 0 || height <= 0) return;
+      setViewport((prev) => (prev && prev.width === width && prev.height === height ? prev : { width, height }));
+      if (userHasInteracted.current) return;
+      if (safeFit) {
+        const { landBounds: land, insets, seaMarginPx } = safeFit;
+        const left = insets.left ?? 0;
+        const right = insets.right ?? 0;
+        const freeW = width - left - right;
+        const freeH = height - insets.top - insets.bottom;
+        const safeZoom = Math.min(freeW / (land.x1 - land.x0), freeH / (land.y1 - land.y0));
+        // Never show more than canvas + margin horizontally, nor more than the canvas vertically.
+        const floorZoom = Math.max(width / (canvas.width + 2 * seaMarginPx), height / canvas.height);
+        const zoom = Math.min(cameraConfig.maxZoom, Math.max(cameraConfig.minZoom, safeZoom, floorZoom));
+        const landCx = (land.x0 + land.x1) / 2;
+        const landCy = (land.y0 + land.y1) / 2;
+        const panX = landCx - (left + freeW / 2) / zoom;
+        const panY = landCy - (insets.top + freeH / 2) / zoom;
+        const maxPanX = Math.max(-seaMarginPx, canvas.width + seaMarginPx - width / zoom);
+        const maxPanY = Math.max(0, canvas.height - height / zoom);
+        setCamera({
+          panX: Math.min(Math.max(panX, -seaMarginPx), maxPanX),
+          panY: Math.min(Math.max(panY, 0), maxPanY),
+          zoom,
+        });
+        return;
+      }
       const rawZoom = Math.max(width / canvas.width, height / canvas.height);
       const zoom = Math.min(cameraConfig.maxZoom, Math.max(cameraConfig.minZoom, rawZoom));
       const panX = (canvas.width - width / zoom) / 2;
@@ -179,7 +236,42 @@ export const WorldSurfaceStandalone: React.FC<WorldSurfaceStandaloneProps> = ({
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, [manifest, cameraConfig]);
+  }, [manifest, cameraConfig, recenterSignal, safeFit]);
+
+  const rendererManifest = useMemo(() => {
+    if (!manifest || !safeFit) return manifest;
+    const canvas = manifest.coordinateSystem.canvas;
+    const m = safeFit.seaMarginPx;
+    const floorZoom = viewport
+      ? Math.max(viewport.width / (canvas.width + 2 * m), viewport.height / canvas.height)
+      : 0;
+    return {
+      ...manifest,
+      camera: {
+        ...manifest.camera,
+        bounds: { minX: -m, maxX: canvas.width + m, minY: 0, maxY: canvas.height },
+        minZoom: Math.max(manifest.camera.minZoom, floorZoom),
+      },
+    };
+  }, [manifest, safeFit, viewport]);
+
+  const seaMargin = useMemo(() => {
+    if (!manifest || !safeFit) return undefined;
+    const fileUrl = (id: string) => {
+      const layer = manifest.surfaceLayers.find((l) => l.id === id);
+      return layer ? `/assets/world/${manifest.world}/base/layers/${encodeURIComponent(layer.file)}` : null;
+    };
+    const sources = [fileUrl('base_flat') ?? fileUrl('background'), fileUrl('sea')].filter(
+      (u): u is string => u !== null,
+    );
+    return (
+      <WorldSurfaceSeaMargin
+        canvas={manifest.coordinateSystem.canvas}
+        marginPx={safeFit.seaMarginPx}
+        sources={sources}
+      />
+    );
+  }, [manifest, safeFit]);
 
   const resolvedCamera =
     camera ?? { panX: 0, panY: 0, zoom: initialZoom ?? cameraConfig?.defaultZoom ?? 1 };
@@ -203,7 +295,8 @@ export const WorldSurfaceStandalone: React.FC<WorldSurfaceStandaloneProps> = ({
   return (
     <div ref={containerRef} className={className} style={{ position: 'relative', width: '100%', height: '100%' }}>
       <WorldSurfaceRenderer
-        manifest={manifest}
+        manifest={rendererManifest ?? manifest}
+        worldBackdrop={seaMargin}
         camera={resolvedCamera}
         onCameraChange={handleCameraChange}
         showAnchors={showAnchors}
@@ -215,6 +308,8 @@ export const WorldSurfaceStandalone: React.FC<WorldSurfaceStandaloneProps> = ({
         showSeaRipple={showSeaRipple}
         seaRippleConfig={seaRippleConfig}
         showSeaPattern={showSeaPattern}
+        showFoam={showFoam}
+        showCoastFoam={showCoastFoam}
         showGlass={showGlass}
         visualStateOverrides={visualStateOverrides}
         imageFit={manifest.renderer?.imageFit ?? 'none'}

@@ -25,7 +25,7 @@ export interface FieldGrainProps {
 }
 
 export const FieldGrain: React.FC<FieldGrainProps> = ({
-  textureUrl = '/assets/ui/bg.png',
+  textureUrl = '/assets/ui/bg.webp',
   opacity = 0.1,
   mixBlendMode = 'normal',
 }) => (

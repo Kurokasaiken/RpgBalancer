@@ -227,9 +227,12 @@ const snapOverlayCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect,
   };
 };
 
-// Emit a synthetic dragover so legacy listeners (e.g., Playwright harness) can capture drag coords
+// Emit a synthetic dragover so legacy listeners (e.g., Playwright harness) can capture drag coords.
+// Only under automation: dispatched document-wide on every pointer move and every frame, it
+// cost ~5 ms per move in a real session (measured on /game-frame) for no listener but the harness.
 const dispatchSyntheticDragOver = (pos: { x: number; y: number }) => {
   if (!pos) return;
+  if (typeof navigator === 'undefined' || !navigator.webdriver) return;
   try {
     const dragEvent = new DragEvent('dragover', {
       clientX: pos.x,

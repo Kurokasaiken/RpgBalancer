@@ -871,7 +871,7 @@
     "status": {
       "dayLabel": "Day"
     },
-    "subtitle": "Prismatic Wanderlust",
+    "subtitle": "",
     "place": "The Eastern Marches",
     "invasion": {
       "body": "A goblin host arrives in {count} days."

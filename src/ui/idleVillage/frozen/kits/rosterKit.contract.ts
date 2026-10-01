@@ -14,7 +14,12 @@
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 
 /**
- * Frozen contract for the Roster kit, version 1.0.0.
+ * Frozen contract for the Roster kit, version 1.1.0.
+ *
+ * 1.1.0 adds the optional `density` prop. Omitted (or `'default'`) it renders the
+ * exact 1.0.0 subtree — verified byte-identical after normalization on both
+ * /test and /minimal-roster. `'compact'` renders one-line resident strips for HUD
+ * use (e.g. /game-frame) and is outside the /test ↔ /minimal-roster comparison.
  */
 export interface RosterKitContract {
   /**
@@ -27,6 +32,8 @@ export interface RosterKitContract {
      * drag. Defaults to `'minimal-roster-component'` in the page.
      */
     componentId?: string;
+    /** `'compact'` = one-line resident strips (HUD). Default keeps the 1.0.0 layout. */
+    density?: 'default' | 'compact';
   };
 
   /**
@@ -35,9 +42,9 @@ export interface RosterKitContract {
   subtreeSelector: '[data-testid="village-roster-section"]';
 
   /** Semantic version of this contract. */
-  version: '1.0.0';
+  version: '1.1.0';
 }
 
-export const ROSTER_KIT_VERSION: RosterKitContract['version'] = '1.0.0';
+export const ROSTER_KIT_VERSION: RosterKitContract['version'] = '1.1.0';
 export const ROSTER_KIT_SUBTREE_SELECTOR: RosterKitContract['subtreeSelector'] =
   '[data-testid="village-roster-section"]';

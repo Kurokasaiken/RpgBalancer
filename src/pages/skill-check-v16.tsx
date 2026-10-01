@@ -31,7 +31,7 @@ export default function SkillCheckV16Page(): JSX.Element {
   useEffect(() => {
     const img = new Image();
     img.onload = () => setBg(img);
-    img.src = '/assets/ui/bg.png';
+    img.src = '/assets/ui/bg.webp';
   }, []);
 
   /* gli strati animati della V6 — riflesso, archi del nucleo, scintilla — hanno

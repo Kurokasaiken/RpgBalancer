@@ -71,7 +71,7 @@ export const themePresets: ThemePreset[] = [
       'button-border': 'rgba(255, 215, 0, 0.45)',
       'button-text': '#f7f2d8',
       'body-bg-overlay': 'linear-gradient(rgba(4, 6, 10, 0.95), rgba(4, 6, 10, 0.95))',
-      'body-bg-texture': "url('/assets/ui/bg.png')",
+      'body-bg-texture': "url('/assets/ui/bg.webp')",
       'color-basalt': '#0D0F12',
       'color-bronze-light': '#FFD700',
       'color-bronze-mid': '#D4AF37',
@@ -175,7 +175,7 @@ export const themePresets: ThemePreset[] = [
       'button-border': 'rgba(255, 185, 123, 0.4)',
       'button-text': '#f5e8d2',
       'body-bg-overlay': 'linear-gradient(rgba(12, 7, 3, 0.92), rgba(12, 7, 3, 0.92))',
-      'body-bg-texture': "url('/assets/ui/bg.png')",
+      'body-bg-texture': "url('/assets/ui/bg.webp')",
     },
   },
   {
@@ -225,7 +225,7 @@ export const themePresets: ThemePreset[] = [
       'button-border': 'rgba(168, 85, 247, 0.5)',
       'button-text': '#f7f3ff',
       'body-bg-overlay': 'linear-gradient(rgba(2, 1, 8, 0.9), rgba(2, 1, 8, 0.95))',
-      'body-bg-texture': "url('/assets/ui/bg.png')",
+      'body-bg-texture': "url('/assets/ui/bg.webp')",
     },
   },
   {
@@ -275,7 +275,7 @@ export const themePresets: ThemePreset[] = [
       'button-border': 'rgba(28, 27, 31, 0.25)',
       'button-text': '#1c1b1f',
       'body-bg-overlay': 'linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9))',
-      'body-bg-texture': "url('/assets/ui/bg.png')",
+      'body-bg-texture': "url('/assets/ui/bg.webp')",
     },
   },
   {

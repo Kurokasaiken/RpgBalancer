@@ -21,6 +21,8 @@ import type { HudIconId } from '@/ui/idleVillage/components/gameFrame/hudIcons';
 const gameFrameInsetsSchema = z.object({
   /** Distance from the viewport edge to every corner-anchored cluster. */
   edgeInsetPx: z.number().nonnegative(),
+  /** Top of the right-edge hanging slot (event ledger): must clear the resource ribbon. */
+  hangingTopPx: z.number().nonnegative(),
 });
 
 /**
@@ -142,6 +144,28 @@ const gameFrameWorldDressingSchema = z.object({
    * recolour of the sea layer.
    */
   showSeaPattern: z.boolean(),
+  /**
+   * Older foam: a texture sliding sideways under a world-sized mask. It reads as
+   * drift, not as water reaching the shore, and costs a full-size masked layer.
+   */
+  showFoam: z.boolean(),
+  /**
+   * Frame the land inside the area the chrome leaves free, with placeholder sea past the
+   * canvas sides (mirrored edge, valid up to the land's 266 px distance from them).
+   * `landBounds` is the bounding box of `land_mask.webp` scaled to the 4240x2828 canvas.
+   */
+  safeFit: z.object({
+    enabled: z.boolean(),
+    landBounds: z.object({ x0: z.number(), x1: z.number(), y0: z.number(), y1: z.number() }),
+    insets: z.object({ top: z.number(), bottom: z.number() }),
+    seaMarginPx: z.number(),
+  }),
+  /**
+   * Crests that travel toward the coast and dissolve gradually before reaching it (no
+   * standing band of foam along the shore). WebGL shader over a baked distance field;
+   * no filter, no blend.
+   */
+  showCoastFoam: z.boolean(),
   /** The glass "teca" overlay — 369 kpx of blur at opacity 0.035-0.05. */
   showGlass: z.boolean(),
   seaGrade: z.object({
@@ -164,25 +188,88 @@ const gameFrameWorldDressingSchema = z.object({
   }),
 });
 
+/**
+ * One kind of upcoming event. `priority` orders the groups when the ledger is sorted
+ * by type and breaks ties when it is sorted by due date (lower = more important).
+ * `tone` picks the row's signal colour: the louder the consequence of missing it,
+ * the louder the tone (a threat is `danger`, a visitor is `neutral`).
+ */
+const gameFrameEventTypeSchema = z.object({
+  id: z.string(),
+  labelKey: z.string(),
+  icon: z.string(),
+  tone: z.enum(['danger', 'warning', 'neutral', 'good']),
+  priority: z.number().int(),
+});
+
+const gameFrameEventLedgerSchema = z.object({
+  /** Rows shown while the ledger is collapsed (the most pressing first); "Show all" reveals the rest. */
+  maxVisibleRows: z.number().int().positive(),
+  /** At or below this many days left a row is drawn as urgent. */
+  urgentWithinDays: z.number().nonnegative(),
+  defaultSort: z.enum(['due', 'type']),
+  types: z.array(gameFrameEventTypeSchema).min(1),
+});
+
+/**
+ * The roster is shown as an object resting on the table at the map's lower-left, in
+ * its `compact` density (one ~30px strip per character): a fixed width (the canonical
+ * roster stretches to its container) and a contact shadow.
+ */
+const gameFrameRosterSchema = z.object({
+  widthPx: z.number().positive(),
+  /** Visual scale. 1 with the compact density; kept for layouts that need to shrink it whole. */
+  scale: z.number().positive(),
+  leftPx: z.number(),
+  bottomPx: z.number(),
+  tiltDeg: z.number(),
+});
+
+/**
+ * Quest POIs pinned on the world map. Each opens the quest detail of `activityId`
+ * (an activity in the Idle Village config with a quest blueprint).
+ */
+const gameFrameQuestPoiSchema = z.object({
+  id: z.string(),
+  activityId: z.string(),
+  /** World pixels (manifest `coordinateSystem.canvas`). */
+  x: z.number(),
+  y: z.number(),
+  /** Marker diameter on screen; it does not scale with zoom. */
+  sizePx: z.number().positive(),
+});
+
 const gameFrameConfigSchema = z.object({
   insets: gameFrameInsetsSchema,
   /** Default nav rail. Only unlocked ids are expected to have working content. */
   navItems: z.array(gameFrameNavItemSchema),
   worldDressing: gameFrameWorldDressingSchema,
+  eventLedger: gameFrameEventLedgerSchema,
+  roster: gameFrameRosterSchema,
+  questPois: z.array(gameFrameQuestPoiSchema),
 });
 
 export type GameFrameInsetsConfig = z.infer<typeof gameFrameInsetsSchema>;
 export type GameFrameNavItemConfig = Omit<z.infer<typeof gameFrameNavItemSchema>, 'icon'> & {
   icon: HudIconId;
 };
+export type GameFrameQuestPoiConfig = z.infer<typeof gameFrameQuestPoiSchema>;
 export type GameFrameWorldDressingConfig = z.infer<typeof gameFrameWorldDressingSchema>;
-export type GameFrameConfig = Omit<z.infer<typeof gameFrameConfigSchema>, 'navItems'> & {
+export type GameFrameEventTypeConfig = Omit<z.infer<typeof gameFrameEventTypeSchema>, 'icon'> & {
+  icon: HudIconId;
+};
+export type GameFrameEventLedgerConfig = Omit<z.infer<typeof gameFrameEventLedgerSchema>, 'types'> & {
+  types: GameFrameEventTypeConfig[];
+};
+export type GameFrameConfig = Omit<z.infer<typeof gameFrameConfigSchema>, 'navItems' | 'eventLedger'> & {
   navItems: GameFrameNavItemConfig[];
+  eventLedger: GameFrameEventLedgerConfig;
 };
 
 const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   insets: {
     edgeInsetPx: 18,
+    hangingTopPx: 74,
   },
   navItems: [
     { id: 'village', labelKey: 'gameFrame.nav.village', icon: 'settlement', locked: false },
@@ -190,6 +277,28 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     { id: 'workshop', labelKey: 'gameFrame.nav.workshop', icon: 'workshop', locked: true },
     { id: 'tavern', labelKey: 'gameFrame.nav.tavern', icon: 'tavern', locked: true },
   ],
+  roster: {
+    widthPx: 400,
+    scale: 1,
+    leftPx: 24,
+    bottomPx: 150,
+    // Not rotated: the roster's cards run continuous pulse/glow animations, and under a
+    // rotated parent every frame is resampled, which reads as shimmering.
+    tiltDeg: 0,
+  },
+  eventLedger: {
+    maxVisibleRows: 1,
+    urgentWithinDays: 2,
+    defaultSort: 'due',
+    types: [
+      { id: 'threat', labelKey: 'gameFrame.events.types.threat', icon: 'threat', tone: 'danger', priority: 0 },
+      { id: 'expedition', labelKey: 'gameFrame.events.types.expedition', icon: 'company', tone: 'warning', priority: 1 },
+      { id: 'construction', labelKey: 'gameFrame.events.types.construction', icon: 'workshop', tone: 'neutral', priority: 2 },
+      { id: 'harvest', labelKey: 'gameFrame.events.types.harvest', icon: 'food', tone: 'good', priority: 3 },
+      { id: 'visit', labelKey: 'gameFrame.events.types.visit', icon: 'tavern', tone: 'neutral', priority: 4 },
+    ],
+  },
+  questPois: [{ id: 'city-rats', activityId: 'quest_city_rats', x: 2750, y: 1000, sizePx: 96 }],
   worldDressing: {
     manifestPath: '/assets/world/wanderlust/base/manifest-flat.json',
     hiddenLayerIds: ['frame', 'border'],
@@ -201,6 +310,15 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     rippleAnimateFrequency: false,
     breathEnabled: false,
     showSeaPattern: true,
+    showFoam: false,
+    safeFit: {
+      enabled: true,
+      landBounds: { x0: 271, x1: 3974, y0: 305, y1: 2642 },
+      // Ribbon heights are 61 / 67 px, plus 8 px of air.
+      insets: { top: 69, bottom: 75 },
+      seaMarginPx: 260,
+    },
+    showCoastFoam: true,
     showGlass: false,
     seaGrade: {
       enabled: false,

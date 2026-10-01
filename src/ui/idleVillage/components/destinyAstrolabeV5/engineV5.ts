@@ -312,7 +312,7 @@ export function createAstrolabeV5Engine(
   /* ── materia pittorica (identica a V3) ── */
   const bgImg = new Image();
   bgImg.onload = () => { backdropDirty = true; };
-  bgImg.src = '/assets/ui/bg.png';
+  bgImg.src = '/assets/ui/bg.webp';
 
   const toPx = (p: Point): Point => ({ x: cx + p.x * R, y: cy + p.y * R });
 

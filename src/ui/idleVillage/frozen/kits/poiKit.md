@@ -3,11 +3,12 @@
 **Status:** candidate
 **Version:** 1.0.0
 **Owner:** Devin
-**Last Updated:** 2026-08-15
+**Last Updated:** 2026-10-01
 
 ## Source
 - Canonical components: `JobPOI`, `ActivityPOI`, `QuestPOI`, `DayNightPOI`, `GenericPoiSkin`, `DayNightPoiSkin`
-- Reference route: `/minimal-poi` → `src/pages/minimal-poi.tsx`
+- Reference route: `/minimal-poi` → `src/pages/minimal-poi.tsx` (kit showcase)
+- Canonical POI visual variant: `PoiMatericV3_5` — blueprint for new POI placements on maps
 - Minimal route: `/minimal-poi`
 - Provider chain (canonical): `SkinSystemProvider → SandboxTimingProvider → DndContext` via `PoiKitShell`
 

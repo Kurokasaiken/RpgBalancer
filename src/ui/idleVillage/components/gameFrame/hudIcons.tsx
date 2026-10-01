@@ -22,7 +22,8 @@ export type HudIconId =
   | 'company'
   | 'chronicle'
   | 'workshop'
-  | 'tavern';
+  | 'tavern'
+  | 'threat';
 
 type IconComponent = React.FC<React.SVGProps<SVGSVGElement>>;
 
@@ -50,12 +51,15 @@ const FoodIcon: IconComponent = (props) => (
   </svg>
 );
 
+// Three logs stacked end-on, growth rings showing: the old two-bar glyph read as a pill.
 const WoodIcon: IconComponent = (props) => (
   <svg {...base} {...props}>
-    <rect x="4" y="9" width="16" height="4.4" rx="2.2" />
-    <rect x="4" y="14.6" width="16" height="4.4" rx="2.2" />
-    <circle cx="6.2" cy="11.2" r="0.9" fill="currentColor" stroke="none" />
-    <circle cx="6.2" cy="16.8" r="0.9" fill="currentColor" stroke="none" />
+    <circle cx="7.6" cy="15.6" r="3.9" />
+    <circle cx="16.4" cy="15.6" r="3.9" />
+    <circle cx="12" cy="8" r="3.9" />
+    <circle cx="7.6" cy="15.6" r="1.3" />
+    <circle cx="16.4" cy="15.6" r="1.3" />
+    <circle cx="12" cy="8" r="1.3" />
   </svg>
 );
 
@@ -104,6 +108,14 @@ const TavernIcon: IconComponent = (props) => (
   </svg>
 );
 
+const ThreatIcon: IconComponent = (props) => (
+  <svg {...base} {...props}>
+    <path d="M5 4l9.5 9.5M19 4l-9.5 9.5" />
+    <path d="M12.6 15.4l2.2-2.2 2 2-2.2 2.2zM11.4 15.4l-2.2-2.2-2 2 2.2 2.2z" />
+    <path d="M16.8 17.4L20 20.6M7.2 17.4L4 20.6" />
+  </svg>
+);
+
 export const HUD_ICONS: Record<HudIconId, IconComponent> = {
   gold: GoldIcon,
   food: FoodIcon,
@@ -114,6 +126,7 @@ export const HUD_ICONS: Record<HudIconId, IconComponent> = {
   chronicle: ChronicleIcon,
   workshop: WorkshopIcon,
   tavern: TavernIcon,
+  threat: ThreatIcon,
 };
 
 export interface HudGlyphProps extends React.SVGProps<SVGSVGElement> {
