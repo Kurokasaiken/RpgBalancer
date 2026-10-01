@@ -160,7 +160,7 @@ Ogni task richiede lo stato garantito dal precedente.
 - Rollback definito: la bozza è immutabile e mai toccata dal lancio → embark fallito = draft intatto.
 - execution_hint: `verified`. Evidence: `test-results/mp04-2026-09-30.log`.
 
-### T-005 — UI del Planner — **dipende da T-004**
+### T-005 — UI del Planner — ✅ COMPLETATO (MP-05, 2026-10-01) — **dipende da T-004**
 - `FloatingPanel` "Planner", separazione netta INPUT/OUTPUT (rev.2). Pattern dalla ricerca UI (2026-09-30, hat `ui_developer`):
   - **Layout 2 colonne**: INPUT (PARTY 30% + LOADOUT) a sinistra, OUTPUT a destra; stacked sotto ~800px. PARTY = slot con avatar + **risk badge** per membro (pattern XCOM).
   - **OUTCOME headline**: barre stacked Successo/Ferita/Morte (pattern Darkest Dungeon provisioning), Durata come barra/ticks (Frostpunk), Reward.

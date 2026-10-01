@@ -58,6 +58,8 @@ export const emptyMissionPlannerDraft = (): MissionPlannerDraft => ({
 /** Minimal slot info the draft needs from the quest/activity config. */
 export interface PlannerSlotSpec {
   id: string;
+  /** Optional display label (already localized by the caller). */
+  label?: string;
   required?: boolean;
   emptyPenalty?: QuestSlotEmptyPenalty;
   residentRiskModifiers?: QuestSlotResidentRiskModifiers;
@@ -264,7 +266,9 @@ export function toMissionDraft(
     const residentId = draft.assignments[slot.id];
     const resident = residentId ? live.residentsById[residentId] : undefined;
     if (!resident) {
-      if (slot.required && slot.emptyPenalty) {
+      // An empty slot pays its declared penalty whether or not it is
+      // required — optional slots use it to price "leaving support empty".
+      if (slot.emptyPenalty) {
         emptyDeath += slot.emptyPenalty.extraDeathChance ?? 0;
         emptyInjury += slot.emptyPenalty.extraInjuryChance ?? 0;
       }

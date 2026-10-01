@@ -860,10 +860,23 @@
     "resources": {
       "gold": "Oro",
       "food": "Cibo",
-      "wood": "Legno"
+      "wood": "Legno",
+      "incoming": "+{count} in arrivo",
+      "perDay": "−{count}/g",
+      "autonomy": "{count} g",
+      "tooltip": {
+        "amount": "{label} {value}.",
+        "incoming": "In arrivo dalle attività in corso: +{count}.",
+        "food": "{label} {value} su {max}. I residenti ne consumano {perDay} al giorno: basta per {days} giorni."
+      }
     },
     "speed": {
-      "ariaLabel": "Velocità simulazione"
+      "ariaLabel": "Velocità simulazione",
+      "pause": "Pausa",
+      "resume": "Riprendi"
+    },
+    "compass": {
+      "recenter": "Ricentra la mappa"
     },
     "status": {
       "dayLabel": "Giorno"
@@ -872,9 +885,80 @@
     "place": "Le Marche Orientali",
     "invasion": {
       "body": "Un'orda goblin arriva fra {count} giorni."
+    },
+    "events": {
+      "title": "Eventi",
+      "today": "oggi",
+      "daysLeft": "{count} g",
+      "empty": "Nessun evento all'orizzonte.",
+      "showMore": "Mostra tutti ({count})",
+      "showLess": "Mostra meno",
+      "sort": {
+        "ariaLabel": "Ordina gli eventi",
+        "due": "Scadenza",
+        "type": "Tipo"
+      },
+      "types": {
+        "threat": "Minaccia",
+        "expedition": "Spedizione",
+        "construction": "Cantiere",
+        "harvest": "Raccolto",
+        "visit": "Visita",
+        "other": "Altro"
+      },
+      "fixtures": {
+        "invasion": "L'orda goblin raggiunge il villaggio",
+        "wolves": "Lupi avvistati vicino al bosco antico",
+        "expedition": "La spedizione torna dal nord",
+        "granary": "Granaio completato",
+        "harvest": "Raccolto di grano pronto",
+        "caravan": "Arriva una carovana di mercanti"
+      }
     }
   },
   "missionPlanner": {
+    "band": {
+      "odds": {
+        "high": "Probabile",
+        "mid": "Incerto",
+        "low": "Improbabile"
+      },
+      "risk": {
+        "high": "Alto",
+        "mid": "Moderato",
+        "low": "Basso"
+      }
+    },
+    "required": "obbligatorio",
+    "ifEmpty": "Se resta vuoto:",
+    "modifier": {
+      "death": "Morte",
+      "injury": "Ferita",
+      "power": "Potenza"
+    },
+    "title": "Planner",
+    "subtitle": "Ogni modifica aggiorna subito gli esiti",
+    "input": "Input",
+    "output": "Esiti",
+    "party": "Party",
+    "outcome": "Esito",
+    "success": "Successo",
+    "injury": "Ferita",
+    "death": "Morte",
+    "duration": "Durata",
+    "phases": "Per fase",
+    "byMember": "Per membro",
+    "why": "Perché",
+    "hp": "PV",
+    "launch": "Parti",
+    "addMember": "Aggiungi al party",
+    "noLoadout": "Nessun equipaggiamento",
+    "remove": "Rimuovi {{name}}",
+    "trend": {
+      "better": "migliora",
+      "worse": "peggiora",
+      "same": "invariato"
+    },
     "items": {
       "draftHorse": "Cavallo da Tiro",
       "ironBlade": "Lama di Ferro",
@@ -882,6 +966,66 @@
       "guardianBanner": "Vessillo del Guardiano",
       "healingDraught": "Pozione Curativa",
       "luckyCoin": "Moneta Fortunata"
-    }
+    },
+    "eyebrow": "Piano di spedizione",
+    "route": "Il cammino",
+    "rule": "Successo = superare almeno metà delle prove",
+    "stage": "Prova {{n}}",
+    "hoursShort": "h",
+    "perMemberRoll": "Rischio base per membro, tirato a ogni prova",
+    "company": "La compagnia",
+    "available": "Disponibili",
+    "provisions": "Provviste",
+    "anyDeath": "Almeno un caduto",
+    "anyInjury": "Almeno un ferito",
+    "reward": "Ricompensa attesa",
+    "undo": "Annulla",
+    "reset": "Ripristina",
+    "pickFromRoster": "Scegli qualcuno tra i disponibili",
+    "unavailable": "non disponibile",
+    "haloHint": "Anello esterno: morte · anello interno: ferita",
+    "whyEmpty": "Forma la compagnia per vedere cosa decide l’esito.",
+    "phaseType": {
+      "check": "Prova",
+      "fight": "Scontro",
+      "trap": "Trappola",
+      "event": "Evento"
+    },
+    "equipSlot": {
+      "weapon": "Arma",
+      "armor": "Armatura",
+      "mount": "Cavalcatura",
+      "trinket": "Amuleto"
+    },
+    "metric": {
+      "success": "Successo",
+      "injury": "Ferita",
+      "death": "Morte",
+      "duration": "Durata",
+      "reward": "Ricompensa"
+    },
+    "cause": {
+      "stat": "{{who}} · {{stat}}",
+      "slot": "{{slot}} ({{who}})",
+      "emptyPenalty": "Slot vuoti",
+      "cover": "Protezione di {{who}}"
+    },
+    "stat": {
+      "strength": "Forza",
+      "agility": "Agilità",
+      "perception": "Percezione",
+      "intelligence": "Intelligenza",
+      "endurance": "Resistenza"
+    },
+    "issue": {
+      "EMPTY_REQUIRED_SLOT": "Mancano membri negli slot obbligatori",
+      "RESIDENT_MISSING": "Un membro non è più disponibile",
+      "ITEM_UNKNOWN": "Oggetto sconosciuto",
+      "ITEM_SLOT_MISMATCH": "Oggetto nello slot sbagliato",
+      "CONSUMABLE_OVER_STOCK": "Provviste insufficienti",
+      "PARTY_TOO_LARGE": "Compagnia troppo numerosa"
+    },
+    "hours": "{{count}} ore",
+    "loadout": "Equipaggiamento"
   }
 }
