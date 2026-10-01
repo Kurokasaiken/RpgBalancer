@@ -49,6 +49,7 @@ import WorkerCard from '@/ui/idleVillage/components/WorkerCard';
 import SlottedMedal from '@/ui/idleVillage/components/SlottedMedal';
 import PgDetailCard from '@/ui/idleVillage/components/PgDetailCard';
 import SchedaPergamena from '@/ui/idleVillage/components/SchedaPergamena';
+import { MissionPlannerLive } from '@/ui/idleVillage/components/missionPlanner/MissionPlannerLive';
 
 type TabId =
   | 'all'
@@ -68,7 +69,8 @@ type TabId =
   | 'reminder'
   | 'hud'
   | 'window'
-  | 'pgcards';
+  | 'pgcards'
+  | 'planner';
 
 const FIELD_BACKGROUND = [
   'radial-gradient(circle at 50% -10%, rgba(0,229,255,0.13) 0%, rgba(0,150,255,0.03) 50%, transparent 80%)',
@@ -93,6 +95,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'hud', label: 'HUD' },
   { id: 'window', label: 'Window' },
   { id: 'pgcards', label: 'PG Cards' },
+  { id: 'planner', label: 'Planner' },
 ];
 
 /** A compact demo panel that keeps the tab viewport above the fold. */
@@ -812,6 +815,15 @@ function PgCardsTab(): JSX.Element {
   );
 }
 
+/** Demo-only outcome models: configuration A, then A + a companion (deltas vs A). */
+function PlannerTab(): JSX.Element {
+  return (
+    <div style={{ width: 1040, maxWidth: '100%', margin: '0 auto' }}>
+      <MissionPlannerLive questId="quest_city_rats" />
+    </div>
+  );
+}
+
 const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   all: AllTab,
   frame: FrameTab,
@@ -830,10 +842,11 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   hud: HudTab,
   window: WindowTab,
   pgcards: PgCardsTab,
+  planner: PlannerTab,
 };
 
 export default function PrimitivesPage(): JSX.Element {
-  const [tab, setTab] = useState<TabId>('reminder');
+  const [tab, setTab] = useState<TabId>(TABS[TABS.length - 1].id);
   const TabComponent = TAB_CONTENT[tab];
 
   return (

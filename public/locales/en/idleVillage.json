@@ -841,10 +841,23 @@
     "resources": {
       "gold": "Gold",
       "food": "Food",
-      "wood": "Wood"
+      "wood": "Wood",
+      "incoming": "+{count} incoming",
+      "perDay": "−{count}/d",
+      "autonomy": "{count} d left",
+      "tooltip": {
+        "amount": "{label} {value}.",
+        "incoming": "Incoming from activities in progress: +{count}.",
+        "food": "{label} {value} of {max}. Residents eat {perDay} a day: enough for {days} days."
+      }
     },
     "speed": {
-      "ariaLabel": "Simulation speed"
+      "ariaLabel": "Simulation speed",
+      "pause": "Pause",
+      "resume": "Resume"
+    },
+    "compass": {
+      "recenter": "Re-centre the map"
     },
     "status": {
       "dayLabel": "Day"
@@ -853,9 +866,80 @@
     "place": "The Eastern Marches",
     "invasion": {
       "body": "A goblin host arrives in {count} days."
+    },
+    "events": {
+      "title": "Events",
+      "today": "today",
+      "daysLeft": "{count} d",
+      "empty": "Nothing on the horizon.",
+      "showMore": "Show all ({count})",
+      "showLess": "Show less",
+      "sort": {
+        "ariaLabel": "Sort events",
+        "due": "Due",
+        "type": "Type"
+      },
+      "types": {
+        "threat": "Threat",
+        "expedition": "Expedition",
+        "construction": "Construction",
+        "harvest": "Harvest",
+        "visit": "Visit",
+        "other": "Other"
+      },
+      "fixtures": {
+        "invasion": "Goblin host reaches the village",
+        "wolves": "Wolves sighted by the old woods",
+        "expedition": "Expedition returns from the north",
+        "granary": "Granary finished",
+        "harvest": "Wheat harvest ready",
+        "caravan": "A merchant caravan arrives"
+      }
     }
   },
   "missionPlanner": {
+    "band": {
+      "odds": {
+        "high": "Likely",
+        "mid": "Uncertain",
+        "low": "Unlikely"
+      },
+      "risk": {
+        "high": "High",
+        "mid": "Moderate",
+        "low": "Low"
+      }
+    },
+    "required": "required",
+    "ifEmpty": "If left empty:",
+    "modifier": {
+      "death": "Death",
+      "injury": "Injury",
+      "power": "Power"
+    },
+    "title": "Planner",
+    "subtitle": "Every change updates the outcomes instantly",
+    "input": "Input",
+    "output": "Outcome",
+    "party": "Party",
+    "outcome": "Outcome",
+    "success": "Success",
+    "injury": "Injury",
+    "death": "Death",
+    "duration": "Duration",
+    "phases": "By phase",
+    "byMember": "By member",
+    "why": "Why",
+    "hp": "HP",
+    "launch": "Depart",
+    "addMember": "Add to party",
+    "noLoadout": "No equipment",
+    "remove": "Remove {{name}}",
+    "trend": {
+      "better": "improves",
+      "worse": "worsens",
+      "same": "unchanged"
+    },
     "items": {
       "draftHorse": "Draft Horse",
       "ironBlade": "Iron Blade",
@@ -863,6 +947,66 @@
       "guardianBanner": "Guardian Banner",
       "healingDraught": "Healing Draught",
       "luckyCoin": "Lucky Coin"
-    }
+    },
+    "eyebrow": "Expedition plan",
+    "route": "The road",
+    "rule": "Success = passing at least half of the trials",
+    "stage": "Trial {{n}}",
+    "hoursShort": "h",
+    "perMemberRoll": "Base risk per member, rolled at every trial",
+    "company": "The company",
+    "available": "Available",
+    "provisions": "Provisions",
+    "anyDeath": "At least one fallen",
+    "anyInjury": "At least one wounded",
+    "reward": "Expected reward",
+    "undo": "Undo",
+    "reset": "Reset",
+    "pickFromRoster": "Pick someone from the available",
+    "unavailable": "unavailable",
+    "haloHint": "Outer ring: death · inner ring: injury",
+    "whyEmpty": "Form the company to see what decides the outcome.",
+    "phaseType": {
+      "check": "Trial",
+      "fight": "Fight",
+      "trap": "Trap",
+      "event": "Event"
+    },
+    "equipSlot": {
+      "weapon": "Weapon",
+      "armor": "Armor",
+      "mount": "Mount",
+      "trinket": "Trinket"
+    },
+    "metric": {
+      "success": "Success",
+      "injury": "Injury",
+      "death": "Death",
+      "duration": "Duration",
+      "reward": "Reward"
+    },
+    "cause": {
+      "stat": "{{who}} · {{stat}}",
+      "slot": "{{slot}} ({{who}})",
+      "emptyPenalty": "Empty slots",
+      "cover": "{{{who}}}'s cover"
+    },
+    "stat": {
+      "strength": "Strength",
+      "agility": "Agility",
+      "perception": "Perception",
+      "intelligence": "Intelligence",
+      "endurance": "Endurance"
+    },
+    "issue": {
+      "EMPTY_REQUIRED_SLOT": "Required slots are empty",
+      "RESIDENT_MISSING": "A member is no longer available",
+      "ITEM_UNKNOWN": "Unknown item",
+      "ITEM_SLOT_MISMATCH": "Item in the wrong slot",
+      "CONSUMABLE_OVER_STOCK": "Not enough provisions",
+      "PARTY_TOO_LARGE": "Company too large"
+    },
+    "hours": "{{count}} h",
+    "loadout": "Loadout"
   }
 }

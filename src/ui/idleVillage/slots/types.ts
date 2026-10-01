@@ -70,13 +70,13 @@ export interface ResidentSlotBlueprint {
   modifiers?: ActivitySlotModifier;
   /** Semantic role of this slot (e.g. 'combatant', 'support', 'vanguard'). Label/logic only, not a closed enum. */
   role?: string;
-  /** Penalty applied to the party-level calculations when this required slot is left empty. */
+  /** Penalty applied to the party-level calculations while this slot is left empty. */
   emptyPenalty?: QuestSlotEmptyPenalty;
   /** Risk modifiers applied only to the resident occupying this slot (not the whole party). */
   residentRiskModifiers?: QuestSlotResidentRiskModifiers;
 }
 
-/** Party-level penalty applied when a required quest slot is left empty. */
+/** Party-level penalty applied while a quest slot declaring it is left empty. */
 export interface QuestSlotEmptyPenalty {
   /** Multiplier applied to the computed party power (e.g. 0.85 = -15%). */
   partyPowerMult?: number;
@@ -133,7 +133,7 @@ export interface ResidentSlotViewModel {
   modifiers?: ActivitySlotModifier;
   /** Semantic role of this slot (e.g. 'combatant', 'support', 'vanguard'). */
   role?: string;
-  /** Penalty applied to party-level calculations when this required slot is left empty. */
+  /** Penalty applied to party-level calculations while this slot is left empty. */
   emptyPenalty?: QuestSlotEmptyPenalty;
   /** Risk modifiers applied only to the resident occupying this slot. */
   residentRiskModifiers?: QuestSlotResidentRiskModifiers;
