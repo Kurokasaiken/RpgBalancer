@@ -309,6 +309,13 @@ export function rollQuestOutcome(
 /**
  * Resolve injury and death rolls for each party member based on the quest outcome.
  * Returns an array of injury/death events.
+ *
+ * @deprecated MP-06 removed this from the quest flow: per-member consequences
+ * are now produced by the risk rolls the phases actually resolved — see
+ * `resolveMissionRun` / `memberConsequencesFromStates` in
+ * `missionResolver.ts`. Migrated consumer: `useQuestPoiSession` (quest card
+ * party lines). Only retained for `resolveQuestPower` backwards
+ * compatibility outside the quest flow.
  */
 export function resolvePartyConsequences(
   residents: ResidentState[],

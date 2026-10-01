@@ -187,9 +187,15 @@ export function applyConsumableRiskEffects(
   );
 }
 
-/** Whether an astrolabe verdict counts as a passed phase. */
+/**
+ * Whether an astrolabe verdict counts as a passed phase.
+ *
+ * MP-06 semantics (mission_planner_math_spec §2.4): only `win` and `bigwin`
+ * pass — `almost` is a near-miss, not a success. This is a behaviour change
+ * from the pre-MP-06 contract, which let `almost` count as a pass.
+ */
 export function isPassingVerdict(verdict: string): boolean {
-  return verdict === 'bigwin' || verdict === 'win' || verdict === 'almost';
+  return verdict === 'bigwin' || verdict === 'win';
 }
 
 /**
@@ -281,12 +287,20 @@ export type QuestOutcomeTier = 'perfect' | 'success' | 'partial' | 'fail' | 'dea
  * afterwards: this is where "esito combinato finale" is decided. Deliberately
  * not a power roll — a party that passed every trial must never be told it
  * failed, and one that passed none must never be told it was perfect.
+ *
+ * MP-06 (mission_planner_math_spec §4.2–4.3): `almost` no longer counts as a
+ * pass, retreat classifies on the phases actually played (the tier still
+ * requires at least half of them passed for `success`), and a party wipe
+ * (`wiped`) forces `deadly` regardless of verdicts already collected.
  * @param results - Per-phase results, in phase order; nulls count as unresolved
+ * @param opts - `wiped` marks a run that ended with no living member
  * @returns The outcome tier to display
  */
 export function resolveQuestOutcomeTier(
   results: readonly (AstrolabeResultShape | null)[],
+  opts?: { wiped?: boolean },
 ): QuestOutcomeTier {
+  if (opts?.wiped) return 'deadly';
   const resolved = results.filter((entry): entry is AstrolabeResultShape => !!entry);
   if (resolved.length === 0) return 'fail';
 

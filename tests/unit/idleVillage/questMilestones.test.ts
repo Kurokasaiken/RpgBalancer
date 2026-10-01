@@ -384,9 +384,24 @@ describe('resolveQuestOutcomeTier', () => {
   });
 
   it('never announces a loss over phases that all passed', () => {
-    expect(resolveQuestOutcomeTier([result('win'), result('bigwin'), result('almost')])).toBe(
+    expect(resolveQuestOutcomeTier([result('win'), result('bigwin'), result('win')])).toBe(
       'perfect',
     );
+  });
+
+  it('MP-06: an `almost` near-miss no longer counts as a pass', () => {
+    // Pre-MP-06 this was `perfect`; now almost counts as a failed phase, so
+    // 2/3 passed maps to `success` (half-or-more rule).
+    expect(resolveQuestOutcomeTier([result('win'), result('bigwin'), result('almost')])).toBe(
+      'success',
+    );
+    expect(resolveQuestOutcomeTier([result('almost'), result('almost')])).toBe('fail');
+  });
+
+  it('MP-06: a wiped run is forced to deadly regardless of earlier wins', () => {
+    expect(
+      resolveQuestOutcomeTier([result('win'), result('win')], { wiped: true }),
+    ).toBe('deadly');
   });
 
   it('downgrades a clean sweep to success when someone died', () => {
@@ -417,8 +432,8 @@ describe('resolveQuestOutcomeTier', () => {
 });
 
 describe('isPassingVerdict', () => {
-  it('treats a near miss as a pass and a plain failure as a fail', () => {
-    expect(['bigwin', 'win', 'almost'].every(isPassingVerdict)).toBe(true);
-    expect(['fail', 'epicfail'].some(isPassingVerdict)).toBe(false);
+  it('MP-06: only win and bigwin pass; the near miss is a fail', () => {
+    expect(['bigwin', 'win'].every(isPassingVerdict)).toBe(true);
+    expect(['almost', 'fail', 'epicfail'].some(isPassingVerdict)).toBe(false);
   });
 });

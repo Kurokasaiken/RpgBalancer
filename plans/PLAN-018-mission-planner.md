@@ -174,11 +174,14 @@ Ogni task richiede lo stato garantito dal precedente.
 - `QuestAssignmentPreview.tsx` → `deprecated` nel `COMPONENT_MASTER_INDEX`.
 - execution_hint: `verified`.
 
-### T-006 — Integrazione risoluzione (modello A + rev.3)
-- Pulsante "Planner" pre-partenza su `/poi-quest-detail-roster-time-clock`; il lancio consuma il payload della bozza.
-- Resolver: tiri rischio per-residente, morti fuori dalle fasi successive (i feriti restano e continuano a tirare), **checkpoint continua/ritirati dopo ogni fase** (D2: ritiro → tier sulle fasi giocate; wipe → `deadly` forzato), `isPassingVerdict` = `bigwin|win`, `resolvePartyConsequences` rimosso dal flusso (inventario call-site + deprecazione).
-- Test di accordo: resolver seeded vs DP su fixture (tolleranza T-000.5) — verifica che il resolver **campioni dalla stessa distribuzione**, non che produca gli stessi numeri.
-- Regressione: quest non aperte dal Planner seguono lo stesso nuovo modello.
+### T-006 — Integrazione risoluzione — ✅ COMPLETATO (MP-06, 2026-10-01)
+- `src/engine/game/idleVillage/missionResolver.ts` — sampler stocastico duale della DP (`resolveMissionPhase`/`resolveMissionRun`): weakest-tag sui vivi, tiri rischio per-membro sulla mask di inizio fase (cover = D1), morti escono da S, feriti restano, callback checkpoint `shouldContinue`, wipe → `deadly`. `buildSessionMissionInput` costruisce l'input canonico via `toMissionDraft` + `buildMissionInput` (stesso oggetto del Planner).
+- `useQuestPoiSession`: `startQuest(payload?)` → memberStates alive|injured|dead persistenti, skill sui vivi con stat effettive (loadout), durata da `missionRunDuration` (cavalcatura applica), consumabili consumati al lancio ed esclusi dalla lista per-check; checkpoint FloatingPanel continua/ritirati che pausa il clock; wipe → finalise immediato `deadly`; consequences derivate dai memberStates.
+- `questMilestones`: `isPassingVerdict` = `bigwin|win`; `resolveQuestOutcomeTier` con `wiped` + tier di ritiro sulle fasi giocate.
+- `QuestPowerEngine.resolvePartyConsequences` → `@deprecated`; consumatore migrato = `useQuestPoiSession`. NON migrato: `PoiDetailQuestRosterIntegrationPage` (pagina legacy, chiama ancora `resolveQuestPower` — documentato).
+- Pagina: bottone "Mission Planner" pre-partenza monta `MissionPlannerLive`; `onLaunch` → `startQuestWithPayload` con ri-validazione dominio via `validateDraft`.
+- Accordo seeded resolver vs DP: 10k tiri, ±1.5pp (tier, morte/ferita per membro, anyDeath, pass per fase) — il resolver campiona dalla distribuzione mostrata.
+- Safeguards: vitest scope 176/176, tsc pulito sui file toccati, build:check, kanban:lint, smoke route 200. Evidence: `test-results/mp06-2026-10-01.log`.
 - execution_hint: `verified`.
 
 ### T-007 — Documentazione, test, evidence (risultato misurabile)

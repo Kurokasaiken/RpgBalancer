@@ -367,6 +367,14 @@
         "lessThanOrEqualTooltip": "Less than or equal",
         "lessThanOrEqualDescription": "Stat is less than or equal to threshold"
       }
+    },
+    "status": {
+      "active": "Active",
+      "injured": "Injured",
+      "dead": "Fallen",
+      "exhausted": "Exhausted",
+      "away": "Away",
+      "assigned": "Assigned"
     }
   },
   "slowMo": "Slow Mo",
@@ -854,7 +862,8 @@
     "speed": {
       "ariaLabel": "Simulation speed",
       "pause": "Pause",
-      "resume": "Resume"
+      "resume": "Resume",
+      "paused": "Paused"
     },
     "compass": {
       "recenter": "Re-centre the map"
@@ -894,7 +903,11 @@
         "granary": "Granary finished",
         "harvest": "Wheat harvest ready",
         "caravan": "A merchant caravan arrives"
-      }
+      },
+      "move": "Move panel"
+    },
+    "questPoi": {
+      "open": "{name} — open the quest"
     }
   },
   "missionPlanner": {
@@ -989,7 +1002,7 @@
       "stat": "{{who}} · {{stat}}",
       "slot": "{{slot}} ({{who}})",
       "emptyPenalty": "Empty slots",
-      "cover": "{{{who}}}'s cover"
+      "cover": "{{who}}'s cover"
     },
     "stat": {
       "strength": "Strength",
@@ -1007,6 +1020,18 @@
       "PARTY_TOO_LARGE": "Company too large"
     },
     "hours": "{{count}} h",
-    "loadout": "Loadout"
+    "loadout": "Loadout",
+    "open": "Mission Planner"
+  },
+  "questCheckpoint": {
+    "title": "Checkpoint",
+    "summary": "Phase {{played}} of {{total}} is behind you.",
+    "member": {
+      "alive": "Unscathed",
+      "injured": "Injured",
+      "dead": "Dead"
+    },
+    "continue": "Push on",
+    "retreat": "Retreat"
   }
 }

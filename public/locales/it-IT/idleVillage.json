@@ -873,7 +873,8 @@
     "speed": {
       "ariaLabel": "Velocità simulazione",
       "pause": "Pausa",
-      "resume": "Riprendi"
+      "resume": "Riprendi",
+      "paused": "In pausa"
     },
     "compass": {
       "recenter": "Ricentra la mappa"
@@ -913,7 +914,11 @@
         "granary": "Granaio completato",
         "harvest": "Raccolto di grano pronto",
         "caravan": "Arriva una carovana di mercanti"
-      }
+      },
+      "move": "Sposta il pannello"
+    },
+    "questPoi": {
+      "open": "{name} — apri la quest"
     }
   },
   "missionPlanner": {
@@ -1026,6 +1031,28 @@
       "PARTY_TOO_LARGE": "Compagnia troppo numerosa"
     },
     "hours": "{{count}} ore",
-    "loadout": "Equipaggiamento"
+    "loadout": "Equipaggiamento",
+    "open": "Pianificatore missione"
+  },
+  "roster": {
+    "status": {
+      "active": "Attivo",
+      "injured": "Ferito",
+      "dead": "Morto",
+      "exhausted": "Esausto",
+      "away": "Fuori",
+      "assigned": "Assegnato"
+    }
+  },
+  "questCheckpoint": {
+    "title": "Checkpoint",
+    "summary": "La fase {{played}} di {{total}} è alle spalle.",
+    "member": {
+      "alive": "Illeso",
+      "injured": "Ferito",
+      "dead": "Morto"
+    },
+    "continue": "Prosegui",
+    "retreat": "Ritirati"
   }
 }
