@@ -67,6 +67,7 @@ import {
   resolveMilestoneWithoutAnimation,
   resolveQuestOutcomeTier,
   type AstrolabeResultShape,
+  type QuestOutcomeTier,
 } from '@/engine/game/idleVillage/questMilestones';
 import {
   aliveMaskFromStates,
@@ -79,7 +80,12 @@ import {
   type MemberLifeState,
   type MemberRiskRoll,
 } from '@/engine/game/idleVillage/missionResolver';
-import type { MissionPlannerInput } from '@/engine/game/idleVillage/missionPlannerMath';
+import {
+  classifyTier,
+  computeMissionPreview,
+  type MissionPlannerInput,
+  type MissionPreviewResult,
+} from '@/engine/game/idleVillage/missionPlannerMath';
 import {
   validateDraft,
   type MissionLaunchPayload,
@@ -1401,6 +1407,33 @@ export function useQuestPoiSession({
     });
   }, [checkpointPhaseIndex, activity.id, activity.label, phaseResults, finalizeQuestRun, addTelemetry]);
 
+  /**
+   * Checkpoint preview (D2) — the two options get two different previews:
+   *
+   * - CONTINUE re-runs the exact DP on the REMAINING phases with the members
+   *   still alive (injured keep rolling, dead are out) — the quest-total
+   *   forecast for what is left, not a copy of the phase just resolved.
+   * - RETREAT is deterministic: the tier `classifyTier` assigns to the phases
+   *   already played.
+   */
+  const checkpointContinuePreview = useMemo<MissionPreviewResult | null>(() => {
+    if (checkpointPhaseIndex === null || !missionInput) return null;
+    const remainingPhases = missionInput.phases.slice(checkpointPhaseIndex + 1);
+    const aliveMembers = missionInput.members.filter(
+      (m) => memberStates[m.residentId] !== 'dead',
+    );
+    if (remainingPhases.length === 0 || aliveMembers.length === 0) return null;
+    return computeMissionPreview({ ...missionInput, phases: remainingPhases, members: aliveMembers });
+  }, [checkpointPhaseIndex, missionInput, memberStates]);
+
+  const checkpointRetreatTier = useMemo<QuestOutcomeTier | null>(() => {
+    if (checkpointPhaseIndex === null) return null;
+    const played = phaseResults.slice(0, checkpointPhaseIndex + 1).filter(Boolean);
+    const passed = played.filter((r) => isPassingVerdict(r.verdict)).length;
+    const anyDeath = Object.values(memberStates).some((s) => s === 'dead');
+    return classifyTier(passed, played.length, anyDeath);
+  }, [checkpointPhaseIndex, phaseResults, memberStates]);
+
   /** Records the verdict the player just watched and closes the check. */
   const handleMilestoneResolved = useCallback(
     (result: AstrolabeResultShape) => {
@@ -1874,6 +1907,77 @@ export function useQuestPoiSession({
               );
             })}
           </ul>
+
+          {/*
+            The two options show two different previews: "push on" previews
+            the REMAINING quest (DP on the living members), "retreat" shows
+            the deterministic tier of the phases already played.
+          */}
+          {(checkpointContinuePreview || checkpointRetreatTier) && (
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div
+                data-testid="checkpoint-continue-preview"
+                className="rounded border border-emerald-800/40 bg-emerald-950/20 px-3 py-2 space-y-1"
+              >
+                <p className="text-[10px] uppercase tracking-widest text-emerald-300/80">
+                  {t('idleVillage:questCheckpoint.ifContinue', {
+                    defaultValue: 'If you push on',
+                  })}
+                </p>
+                {checkpointContinuePreview ? (
+                  <div className="space-y-0.5 tabular-nums">
+                    <p className="flex justify-between">
+                      <span className="text-slate-400">
+                        {t('idleVillage:missionPlanner.metric.success')}
+                      </span>
+                      <span className="text-slate-200">
+                        {(checkpointContinuePreview.questSuccess * 100).toFixed(0)}%
+                      </span>
+                    </p>
+                    <p className="flex justify-between">
+                      <span className="text-slate-400">
+                        {t('idleVillage:missionPlanner.metric.injury')}
+                      </span>
+                      <span className="text-amber-300">
+                        {(checkpointContinuePreview.aggregate.anyInjury * 100).toFixed(0)}%
+                      </span>
+                    </p>
+                    <p className="flex justify-between">
+                      <span className="text-slate-400">
+                        {t('idleVillage:missionPlanner.metric.death')}
+                      </span>
+                      <span className="text-rose-300">
+                        {(checkpointContinuePreview.aggregate.anyDeath * 100).toFixed(0)}%
+                      </span>
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-slate-500">—</p>
+                )}
+              </div>
+              <div
+                data-testid="checkpoint-retreat-preview"
+                className="rounded border border-sky-800/40 bg-sky-950/20 px-3 py-2 space-y-1"
+              >
+                <p className="text-[10px] uppercase tracking-widest text-sky-300/80">
+                  {t('idleVillage:questCheckpoint.ifRetreat', {
+                    defaultValue: 'If you retreat now',
+                  })}
+                </p>
+                {checkpointRetreatTier ? (
+                  <p className="flex items-center gap-1.5 text-slate-200">
+                    <span aria-hidden>{OUTCOME_CONFIG[checkpointRetreatTier].icon}</span>
+                    {t(`idleVillage:questOutcome.${checkpointRetreatTier}`, {
+                      defaultValue: checkpointRetreatTier,
+                    })}
+                  </p>
+                ) : (
+                  <p className="text-slate-500">—</p>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-center gap-3">
             <SkinButton
               variant="cta"

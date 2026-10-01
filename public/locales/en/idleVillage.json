@@ -947,7 +947,7 @@
     "launch": "Depart",
     "addMember": "Add to party",
     "noLoadout": "No equipment",
-    "remove": "Remove {{name}}",
+    "remove": "Remove {name}",
     "trend": {
       "better": "improves",
       "worse": "worsens",
@@ -964,7 +964,7 @@
     "eyebrow": "Expedition plan",
     "route": "The road",
     "rule": "Success = passing at least half of the trials",
-    "stage": "Trial {{n}}",
+    "stage": "Trial {n}",
     "hoursShort": "h",
     "perMemberRoll": "Base risk per member, rolled at every trial",
     "company": "The company",
@@ -999,10 +999,10 @@
       "reward": "Reward"
     },
     "cause": {
-      "stat": "{{who}} · {{stat}}",
-      "slot": "{{slot}} ({{who}})",
+      "stat": "{who} · {stat}",
+      "slot": "{slot} ({who})",
       "emptyPenalty": "Empty slots",
-      "cover": "{{who}}'s cover"
+      "cover": "{who}'s cover"
     },
     "stat": {
       "strength": "Strength",
@@ -1019,19 +1019,33 @@
       "CONSUMABLE_OVER_STOCK": "Not enough provisions",
       "PARTY_TOO_LARGE": "Company too large"
     },
-    "hours": "{{count}} h",
+    "hours": "{count} h",
     "loadout": "Loadout",
-    "open": "Mission Planner"
+    "open": "Mission Planner",
+    "phase": {
+      "memberRisk": "per member ⚕ {inj}% · ☠ {dth}%",
+      "surviveThrough": "party alive after: {pct}%",
+      "retreat": "retreat → {tier} ({pct}%)"
+    }
   },
   "questCheckpoint": {
     "title": "Checkpoint",
-    "summary": "Phase {{played}} of {{total}} is behind you.",
+    "summary": "Phase {played} of {total} is behind you.",
     "member": {
       "alive": "Unscathed",
       "injured": "Injured",
       "dead": "Dead"
     },
     "continue": "Push on",
-    "retreat": "Retreat"
+    "retreat": "Retreat",
+    "ifContinue": "If you push on",
+    "ifRetreat": "If you retreat now"
+  },
+  "questOutcome": {
+    "perfect": "Perfect",
+    "success": "Success",
+    "partial": "Partial success",
+    "fail": "Failure",
+    "deadly": "Disaster"
   }
 }

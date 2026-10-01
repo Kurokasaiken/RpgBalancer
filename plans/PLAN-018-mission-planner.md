@@ -182,6 +182,7 @@ Ogni task richiede lo stato garantito dal precedente.
 - Pagina: bottone "Mission Planner" pre-partenza monta `MissionPlannerLive`; `onLaunch` → `startQuestWithPayload` con ri-validazione dominio via `validateDraft`.
 - Accordo seeded resolver vs DP: 10k tiri, ±1.5pp (tier, morte/ferita per membro, anyDeath, pass per fase) — il resolver campiona dalla distribuzione mostrata.
 - Safeguards: vitest scope 176/176, tsc pulito sui file toccati, build:check, kanban:lint, smoke route 200. Evidence: `test-results/mp06-2026-10-01.log`.
+- Follow-up (2026-10-01): preview di fase ≠ preview di quest — route del Planner con rischio per-membro effettivo + surviveThrough + tier dominante di ritiro per fase; checkpoint con doppia preview (continua → DP sulle fasi restanti coi vivi / ritirati → tier deterministico sulle fasi giocate). Fix convenzione i18n: con `i18next-icu` l'interpolazione è `{var}` — `{{var}}` restava letterale (convertiti i gruppi missionPlanner/questCheckpoint). Evidence: `test-results/mp06-phase-preview-2026-10-01.log`.
 - execution_hint: `verified`.
 
 ### T-007 — Documentazione, test, evidence (risultato misurabile)

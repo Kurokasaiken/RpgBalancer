@@ -79,6 +79,7 @@ function PlannerBody({
         draft: ctx.draft,
         preview: ctx.preview,
         previous,
+        missionInput: ctx.input,
         residentsById: live.residentsById,
         itemCatalog: live.itemCatalog,
         equipSlots: QUEST_EQUIP_SLOTS,
@@ -86,7 +87,7 @@ function PlannerBody({
         whyLinesPerMetric: DEFAULT_MISSION_PLANNER_UI_CONFIG.whyLinesPerMetric,
         translate: (k) => t(k),
       }),
-    [blueprint, slotBlueprints, ctx.draft, ctx.preview, previous, live, ctx.invalidatedResidentIds, t],
+    [blueprint, slotBlueprints, ctx.draft, ctx.preview, ctx.input, previous, live, ctx.invalidatedResidentIds, t],
   );
 
   const assigned = new Set(Object.values(ctx.draft.assignments));
