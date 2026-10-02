@@ -934,7 +934,7 @@ Tauri mobile deployment and ensuring data integrity across browser tabs.
 
 ### 📋 **PHASE 11: Tactical Missions (Narrative Quest System)**
 
-**Status:** 0% (Concept Defined)  
+**Status:** In progress — implementato dal macro plan [plans/PLAN-019-quest-macro-plan.md](../../plans/PLAN-019-quest-macro-plan.md) (desiderata v24, battezzato 2026-10-01). La regola "reward proporzionale ai successi" qui sotto è sostituita dalla soglia ≥50% dei check affrontati (v24 rev.1, D-8).  
 **Concept:** "Darkest Dungeon Curios" meets "Idle Expedition".
 
 **User Vision:** Sistema di quest "D&D-style" a fasi multiple, puramente

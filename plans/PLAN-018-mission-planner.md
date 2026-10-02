@@ -1,6 +1,7 @@
 ---
 title: 'Mission Planner — spedizione come problema, esiti live (PARTY / LOADOUT / OUTCOME)'
-status: active
+status: completed
+completed: 2026-10-02 (MP-00…MP-07 tutti Completati; remap vs quest modello validato demandato a PLAN-019 S2/S3)
 created: 2026-09-29
 revised: 2026-09-30 (v3.1 — D1–D4 chiuse dal Director: cover sì, checkpoint continua/ritirati tra le fasi, consumabili pool, checkStatTags+partyStatMult)
 baptized: 2026-09-29 (T-000 deciso: opzione A)
@@ -9,6 +10,8 @@ request: R-078 (figlia di R-076)
 ---
 
 # PLAN-018 — Mission Planner
+
+> **Nota 2026-10-01 (desiderata v24, punto 6):** PLAN-018 è precedente implementativo da adattare al macro plan Quest. Non si cancella; quanto sopravvive invariato si decide dopo S1 e si mappa in S2/S3 (riusa / adatta / superato / manca). Status non modificato.
 
 ## Ancoraggio (verbatim, desiderata v23 FROZEN + rev.2 + rev.3)
 

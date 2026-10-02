@@ -1286,3 +1286,97 @@ Tre decisioni sui punti aperti sollevati dalla cold read di PLAN-018:
 4. **D4 — `checkStatTags` + `partyStatMult`:** separata la stat numerica del
    check dal gate di ruolo (`statRequirement`); valore del moltiplicatore dal
    balance report MP-00.
+
+---
+
+## v24 — Macro plan Quest: prima una quest vera e divertente, poi l'integrazione, poi la generazione
+
+**Status:** `FROZEN`
+**Date:** 2026-10-01
+**Authorized by:** Fausto
+**Reason:** avallo in sessione sulla formulazione proposta ("Io la fisserei così, con due piccole precisazioni"), con precisazioni del Director incorporate.
+
+**Relazione con altre desiderata:** risponde a R-076 (da chiarire → aperta). Riposiziona v23/PLAN-018 come precedente implementativo da adattare (vedi punto 6). Recepisce le decisioni 2026-10-01 in `context/DECISION_LOG.md` (informazione secondaria, morte = spesa di risorsa PG, slot obbligatori/secondari).
+
+### User-stated
+- Le quest sono il primo step del prodotto. Serve un macro plan diviso in più plan.
+- *"adesso dobbiamo fare la quest, risolverla e dire 'è interessante'. Poi dobbiamo fare in modo di farla diventare una vera quest: infrastrutture, niente di mockato, ecc. Poi fare in modo di vedere anche la parte precedente: il planning, assegnare gli slot, ecc. Una volta che è 'correttamente integrato' con il resto del progetto, con le schermate corrette ed interessanti, poi pensiamo a come generarle oltre che a mano, cominciando da fare customizzazione per le varie fasi, ecc."*
+- *"nn ho detto che il generatore è fuori scope, ma che deve essere previsto 'dopo questa fase', e sì anche le chain quest."*
+- *"S1 non deve dimostrare che l'architettura è buona: deve dimostrare che la quest, in quanto gioco, è interessante."*
+
+### Formulazione approvata (FROZEN)
+
+1. **Cinque stadi in sequenza**, ciascuno uno o più plan figli:
+
+   | Stage | Obiettivo | Cosa deve essere vero alla fine |
+   |---|---|---|
+   | **S1 — La quest interessante** | Prototipare una quest completa scritta a mano | Il loop di spedizione è divertente anche con mock/placeholder |
+   | **S2 — La quest vera** | Portare quella stessa quest sull'infrastruttura canonica | Nessun mock nel percorso di risoluzione; conseguenze persistenti reali |
+   | **S3 — La parte precedente** | Costruire planning e preparazione della spedizione | Il giocatore può decidere chi mandare e perché |
+   | **S4 — Integrazione** | Collegarla al gioco vero | Villaggio → planning → quest → ritorno → conseguenze funziona come un unico gioco |
+   | **S5 — Oltre lo scritto a mano** | Rendere il sistema componibile e generativo | Personalizzazione fasi → chain → generazione → narrativa emergente |
+
+2. **S5 è fuori dal contratto di S1–S4.** È previsto, non escluso, ma non si progetta oggi un generatore su un sistema di quest di cui non si sa ancora se è divertente. S5 si definisce dopo S4, a partire dalla definizione empirica di "buona quest" prodotta da S1–S4.
+3. **Modello della quest da validare in S1:** `PARTY → QUEST → PHASE → SITUATION → APPROACH → CHECK/CHOICE → CONSEQUENCE → NEXT PHASE` (non solo `party → power → outcome`). Combat sostituibile da fase simulata o risoluzione astratta: se la spedizione non regge senza combat, è un'informazione da registrare.
+4. **S1 è il vero gate. Criterio di "è interessante":** durante la quest il giocatore prende decisioni che cambiano concretamente il problema successivo e ha motivo di preoccuparsi delle conseguenze (situazione → informazione incompleta → scelta dell'approccio → check su combinazione di stat → conseguenza → nuova situazione modificata). Non basta "funziona tecnicamente" né "la storia è carina". Fallisce se il giocatore pensa *"ho cliccato sulle opzioni migliori che mi dava il gioco"*.
+   - **Gate A — Director:** conoscendo il sistema, trova la quest abbastanza interessante da volerla rigiocare.
+   - **Gate B — piccolo playtest** con persone che non conoscono il sistema, solo dopo Gate A: verifica che le decisioni siano percepite come significative e comprensibili (scelte capite, rischio percepito, nessuna scelta dominante, informazioni ricordate, nessuna fase noiosa, morti comprensibili, curiosità per la fase successiva). Non deve dimostrare validità commerciale.
+   - **S1 PASS = Gate A + Gate B.**
+5. **Invarianti trasversali a tutti gli stadi** (non uno stadio a sé): config-first/Zod, i18n, `skinConfigRegistry`, primitive esistenti, slice verticali. **S1 può derogare temporaneamente agli invarianti infrastrutturali** in quanto prototipo di gameplay, ma il suo codice non deve poter essere scambiato per architettura definitiva.
+6. **PLAN-018 non si cancella e non è struttura immutabile:** è infrastruttura/precedente implementativo da adattare alla nuova definizione di quest. S1 viene prima di decidere quanto ne sopravvive. In S2/S3 si mappa: cosa si riusa, cosa si adatta, cosa è concettualmente superato, cosa manca. Il gameplay validato guida; l'implementazione precedente si adegua.
+
+### Domande-guida degli stadi
+S1: "Questa quest è un gioco interessante?" → S2: "Possiamo farla davvero, senza trucchi?" → S3: "Preparare la spedizione è altrettanto interessante?" → S4: "È diventata parte del gioco, non una demo isolata?" → S5: "Ora che sappiamo cosa deve generare il sistema, possiamo automatizzarne la produzione?"
+
+### Still unresolved
+- ~~Dimensione della quest di riferimento S1~~ → rev.1: struttura definita dal Director.
+- ~~Dove vive il prototipo S1~~ → chiuso in rev.1.
+- ~~Composizione e modalità del playtest Gate B~~ → rev.1: Gate B fuori da S1.
+- In quale stadio rientra il playtest esterno (Gate B).
+
+### Emendamento rev.1 — 2026-10-01 (Director, stessa sessione)
+
+1. **Quest di riferimento S1:** *"la quest di riferimento è quella che ho descritto specificamente nella discussione con cui abbiamo iniziato questa conversazione"*, poi precisata dal Director (verbatim):
+
+   ```
+   Partenza
+   Viaggio
+   - durante il viaggio può comparire un evento, per esempio un mercante/vendor;
+   - possibilità di acquistare un consumabile.
+   Esplorazione
+   - devi capire meglio cosa c'è davanti.
+   - possibile approccio con:
+     - Percezione
+     - Percezione + Intelligenza
+     - oppure una soluzione fisica, tipo Forza + Costituzione + Percezione per arrampicarsi e osservare dall'alto.
+   Conseguenza dell'esplorazione
+   - non necessariamente danno;
+   - puoi ottenere informazioni, modificare la difficoltà della fase successiva, scoprire un pericolo, ecc.
+   Scelta di approccio
+   - per esempio:
+     - infiltrarsi furtivamente → Destrezza
+     - entrare dalla porta principale / parlare → Carisma
+   - quindi la scelta determina anche quale competenza diventa rilevante nella fase successiva.
+   Evento
+   - poteva essere combattimento, trappola, ostacolo ambientale, NPC, scoperta, minaccia, opportunità, ecc.
+   Nuova esplorazione
+   Scoperta/lore
+   - qualcosa che aggiunge informazione sul luogo o sul mondo.
+   Ulteriore evento / ricompensa
+   Obiettivo
+   Ritorno
+   ```
+
+   Sostituisce la lettura "spedizione goblin" proposta dall'AI. La dimensione della quest S1 è definita da questa struttura.
+2. **Prototipo S1:** *"pagina lab isolata"*.
+3. **Playtest:** *"io faccio il playtest"*.
+4. **Gate B fuori da S1** (modifica il punto 4): *"in questa fase nn m interessa il gate B particolarmente, posso mandare al max un video, ma nn farlo provare alla gente un gioco così poco finito"*. **S1 PASS = Gate A** (giudizio del Director). Facoltativo: video della quest mostrato ad altri come feedback. Il playtest con persone esterne non è eliminato ma non appartiene a S1; in quale stadio rientri resta da decidere.
+5. **Cosa conta per la vittoria:** *"quello che nn è una 'prova' nn da 'punteggio' x la vittoria, quindi attualmente solo gli skill check, se poi introduciamo anche combattimenti o altro ne parliamo. Ma anche il combattimento sarebbe un evento che puoi superare o no"*. La regola v23 "≥50% delle prove superate" conta solo gli skill check.
+6. **Checkpoint continua/ritirati** (precisa v23 rev.4 D2): *"nn dopo ogni fase, deve essere dopo ogni fase che può avere conseguenze di ferita, morte o perdita di HP, quindi probabilmente gli skill check (prima)"*. Lettura AI **da confermare**: il punto decisionale si colloca a ridosso delle fasi rischiose (skill check), prima di affrontarle. Nota: "perdita di HP" non esiste nel modello attuale (solo ferita/morte).
+7. **Gold e inventario:** *"Gold x comprare le cose, l'inventario ci serve Comunque x gli altri consumables che sn già previsti."* Il mercante del Viaggio vende per gold (risorsa `gold` già in config); l'inventario consumabili è necessario.
+8. **Contenuti S1:** *"Prepara una bozza e io correggo"* — bozza AI in `.mw/runs/20261001-s1-reference-quest-draft/draft.md`, il Director corregge.
+9. **Checkpoint confermato:** il punto continua/ritirati sta **prima** di ogni skill check rischioso (conferma Director: *"si, intendevo quello"*). Chiude l'ambiguità del punto 6.
+10. **Calcolo della vittoria:** *"50% o + di quelli fatti alla fine: alla fine della quest si calcola se è riuscita o no, nn c'è bisogno d saperlo prima. mentre per la preview si fa cn quelle sicure."* Il denominatore sono gli skill check effettivamente affrontati; il Planner/preview calcola solo sui check certi del percorso.
+11. **Fuga:** *"Se scappi hai fallimento, ma t porti dietro tutto quello che hai preso. Magari danni in + qunado fuggi? da decidere/bilanciare in un secondo momento."*
+12. **Stat:** *"nessuna d queste stat dovrebbe esistere, sn mock. le stat sono quelle del balancer. Damge, HP, chanceToHit, ecc."* Le stat `strength`/`agility`/`endurance`/`intelligence`/`perception` in `idleVillage/defaultConfig.ts` sono mock; la fonte di verità sono le stat del balancer (`balancer-default-config.json`, `STAT_DESCRIPTORS`). **Aperto:** come gli approcci non di combattimento (Percezione, Intelligenza, Carisma…) si esprimono con le stat del balancer.
+13. **Competenze derivate (opzione C):** *"percezione probabilmente sarà un sottoprodotto di TiroXColpire, Forza da Damage, Costituzione da HP, ecc. nn toccare il balancer, quindi direi C, ma è secondario"*. Le competenze di quest sono derivate dalle stat del balancer (es. Percezione ← `txc`, Forza ← `damage`, Costituzione ← `hp`); il balancer non si modifica. Mappatura completa (Intelligenza, Carisma, …) da definire, non bloccante per S1.

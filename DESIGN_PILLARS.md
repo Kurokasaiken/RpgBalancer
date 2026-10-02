@@ -48,14 +48,14 @@
 
 **Cosa NON prendiamo:**
 - L'opacità narrativa (Cultist Sim è volutamente criptico). Noi siamo D&D classico, leggibile.
-- Il rischio di permadeath senza recupero: la slice non punisce con perdite definitive.
+- ~~Il rischio di permadeath senza recupero: la slice non punisce con perdite definitive.~~ *(superata 2026-10-01, vedi `context/DECISION_LOG.md`)* Morte di un PG = spesa di una risorsa PG: scambio risorsa↔risorsa, coerente col loop strategico.
 
 ### Pillar 3 — Loop strategico: *Lords of Waterdeep* (approfondito)
 
 **Cosa prendiamo:**
 - **Worker placement come decisione scarsa.** I Peasants sono lavoratori limitati: piazzarli su un job è una scelta che ne preclude un'altra.
 - **Engine building visibile.** Costruire la Locanda sblocca i peasants, costruire la Fucina sblocca equip migliori, ecc. Ogni edificio nuovo *cambia il rate* di qualcosa, e il giocatore vede il numero salire.
-- **Quest come carte con requisiti.** Le quest non sono "click & wait" ma richiedono ingredienti (eroe + stat + licenza + equip). Senza ingredienti, niente quest.
+- **Quest come carte con requisiti.** Le quest non sono "click & wait" ma richiedono ingredienti (eroe + stat + licenza + equip). Senza ingredienti, niente quest. Ingredienti e slot obbligatori + secondari; la preparazione secondaria è facoltativa *(2026-10-01)*.
 - **Blueprint sbloccati come Intrighi.** Come in LoW si compra Intrighi, qui si comprano Blueprint dal Mercante o si guadagnano completando quest: aggiungono mosse al motore.
 
 **Cosa estendiamo rispetto a LoW:**
