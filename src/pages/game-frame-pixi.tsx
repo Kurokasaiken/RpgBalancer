@@ -12,7 +12,7 @@ import GoblinEventModalV17 from '@/ui/idleVillage/trailer/GoblinEventModalV17';
 // GameFrame is a fresh, not-yet-kitted composition (R-075).
 // eslint-disable-next-line no-restricted-imports
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
-import { DirectorPanel } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
+import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
 import type { HudEvent } from '@/ui/idleVillage/components/gameFrame';
 
 /**
@@ -54,6 +54,22 @@ export default function GameFramePixiPage() {
     [poi, questShown, session],
   );
 
+  const directorActions = useMemo<DirectorAction[]>(
+    () => [
+      {
+        id: 'invasion',
+        label: 'Invasione goblin',
+        active: !!invasion,
+        onTrigger: () => {
+          setInvasion({ dueDay: currentDay + 5 });
+          setInvasionOpen(true);
+        },
+      },
+      { id: 'quest', label: 'Mostra quest', active: questShown, onTrigger: () => setQuestShown(true) },
+    ],
+    [invasion, questShown, currentDay],
+  );
+
   return (
     <TooltipProvider>
       <RosterKitShell>
@@ -83,18 +99,7 @@ export default function GameFramePixiPage() {
               <>
                 {session.overlays}
                 <DirectorPanel
-                  actions={[
-                    {
-                      id: 'invasion',
-                      label: 'Invasione goblin',
-                      active: !!invasion,
-                      onTrigger: () => {
-                        setInvasion({ dueDay: currentDay + 5 });
-                        setInvasionOpen(true);
-                      },
-                    },
-                    { id: 'quest', label: 'Mostra quest', active: questShown, onTrigger: () => setQuestShown(true) },
-                  ]}
+                  actions={directorActions}
                   onReset={() => {
                     setInvasion(null);
                     setInvasionOpen(false);

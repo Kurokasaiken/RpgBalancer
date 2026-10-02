@@ -9,6 +9,7 @@ import {
 } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { HudGlyph } from './hudIcons';
 import { HUD_TONE_COLOR as TONE_COLOR } from './hudTones';
+import { HudPanel } from '@/ui/idleVillage/skins/primitives';
 import { useHudPanelDrag } from './useHudPanelDrag';
 
 /** One upcoming event, as the ledger shows it. `title` arrives already translated. */
@@ -39,20 +40,16 @@ const FALLBACK_TYPE: Omit<GameFrameEventTypeConfig, 'id'> = {
 };
 
 /**
- * Material shared with the compact roster (`DragTestContainer` density="compact" +
- * `WanderlustRosterCard` strips), so the two HUD panels read as one family: a dark
- * rounded slab with a faint gold filet, and each row its own thin-bordered strip.
+ * The surface is `HudPanel` (the HUD's floating-panel primitive — chamfered
+ * silhouette, gold filet, filigree); only layout lives here, and each row keeps
+ * its own thin-bordered strip.
  */
 const PANEL_STYLE: CSSProperties = {
   width: 300,
   display: 'flex',
   flexDirection: 'column',
   gap: 6,
-  padding: '8px 10px',
-  borderRadius: 14,
-  background: 'linear-gradient(180deg, rgba(3,2,2,0.95) 0%, rgba(6,4,3,0.98) 100%)',
-  border: '1px solid rgba(223,184,87,0.18)',
-  boxShadow: 'inset 0 1px 0 rgba(216,177,62,0.08), 0 4px 20px rgba(0,0,0,0.6)',
+  padding: '9px 12px 10px',
   pointerEvents: 'auto',
 };
 const STRIP_STYLE: CSSProperties = {
@@ -63,7 +60,7 @@ const STRIP_STYLE: CSSProperties = {
   padding: '4px 8px',
   borderRadius: 8,
   background: 'var(--skin-surface-bg, linear-gradient(160deg, rgba(216,177,62,0.05) 0%, rgba(20,12,7,0.2) 45%, rgba(6,4,3,0.3) 100%))',
-  border: '1px solid rgba(223,184,87,0.16)',
+  border: '1px solid var(--skin-surface-border, rgba(223,184,87,0.16))',
   listStyle: 'none',
 };
 const FONT_DISPLAY = 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)';
@@ -186,7 +183,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
   ];
 
   return (
-    <section aria-label={t('gameFrame.events.title')} style={{ ...PANEL_STYLE, ...style, ...panelStyle }}>
+    <HudPanel as="section" aria-label={t('gameFrame.events.title')} style={{ ...PANEL_STYLE, ...style, ...panelStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap' }}>
         <span
           {...handleProps}
@@ -283,7 +280,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
           </button>
         </div>
       )}
-    </section>
+    </HudPanel>
   );
 };
 
