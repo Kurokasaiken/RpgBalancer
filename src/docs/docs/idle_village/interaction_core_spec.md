@@ -157,22 +157,25 @@ Slots come from an `ActivityDefinition` in `DEFAULT_IDLE_VILLAGE_CONFIG.activiti
 - Rack `overflowBehavior="scroll"` past N slots → themed thin gold scrollbar
   (`RackScroll.module.css`).
 
-### 2.5.1 Quest Assignment deterministic preview
+### 2.5.1 Quest preview — Mission Planner (canonical) and legacy path
 
-Quest pages use `useQuestAssignmentPreview` for a **live, RNG-free preview** of the
-outcome distribution. The hook consumes:
+The canonical quest preview is the **Mission Planner** (`mission_planner_spec.md` +
+`mission_planner_math_spec.md`): a deterministic, RNG-free preview driven by
+`computeMissionPreview` (exact DP over alive-set × passed-count), fed by
+`buildMissionInput` from the expedition draft (`useMissionPlannerDraft` —
+Context-local, never persisted). The preview shows quest success, tier
+distribution, per-member injury/death risk, duration, reward multiplier and WHY
+contributions; each phase row adds the phase-level preview (per-member risk range
+on the all-alive mask, `surviveThrough`, dominant retreat tier). The same model
+is sampled by `missionResolver` at runtime, so the preview is the contract — not
+a suggestion. RNG is consumed only after Embark, inside the resolver.
 
-- `ActivityDefinition` (level, `dangerRating`, `metadata.slotBlueprints`)
-- `ResidentSlotViewModel[]` (assignments, `emptyPenalty`, `residentRiskModifiers`)
-- `QuestPowerRules` (from `DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.questPowerRules`)
-- `QuestItemMock[]` (optional toggle items)
-
-It returns the expected `projectedDeathChance`, `projectedInjuryChance`,
-`projectedRewardMultiplier`, and `canEmbark` (false if any required slot is empty).
-The hook uses only the **pure** functions from `QuestPowerEngine` (`calculatePartyPower`,
-`calculateQuestDifficulty`, `calculatePowerRatio`, `getOutcomeDistribution`). `resolveQuestPower`
-and any other RNG-consuming function must be called only once, by the `onClick` handler
-of the **Embark** CTA.
+**Legacy path (deprecated):** `useQuestAssignmentPreview` / `QuestAssignmentPreview`
+(`QuestPowerEngine` pure functions) remain wired on
+`PoiDetailQuestRosterIntegrationPage` only. It returns `projectedDeathChance`,
+`projectedInjuryChance`, `projectedRewardMultiplier`, `canEmbark` from
+`ActivityDefinition` + `ResidentSlotViewModel[]` + `QuestPowerRules` +
+`QuestItemMock[]`. New quest surfaces MUST use the Mission Planner preview.
 
 ---
 

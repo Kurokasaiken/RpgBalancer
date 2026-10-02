@@ -1,9 +1,9 @@
 # Mission Planner — Mathematical Contract
 
 **Status:** candidate
-**Version:** 1.0.0 (MP-00)
+**Version:** 1.1.0 (MP-00 + MP-06 runtime + phase preview)
 **Owner:** Devin
-**Last Updated:** 2026-10-03
+**Last Updated:** 2026-10-01
 **Authority:** `.mw/desiderata.md` v23 rev.4, `plans/PLAN-018-mission-planner.md` v3.1, `context/DECISION_LOG.md` (D1–D4, checkpoint)
 
 This document is the **single normative source** for the probability model shared by the
@@ -131,7 +131,8 @@ clamped value); `⌊·⌋` applies only to roll counts.
 
 ### 3.1 Composition (all terms in pp, additive)
 
-For member `i ∈ S`, phase `k`:
+For member `i ∈ S`, phase `k` (implemented as `memberPhaseRisk` in
+`missionPlannerMath.ts`; exported for the phase-level preview §4.3):
 
 ```
 d_i,k(S) = clamp( base_d,k
@@ -229,10 +230,28 @@ already played — same table as §4.2 with `n := k` (denominator = played phase
 No checkpoint exists at `k = 0` (retreat before the first phase = abort → `fail`, no risk
 taken).
 
-The Planner v1 evaluates the **full run** only, but MUST emit per-phase
+The Planner evaluates the **full run** and emits per-phase
 `P_surviveThrough(k) = P(S_{k+1} ≠ ∅)` and the retreat-tier distribution at each `k`
-(both are free by-products of the forward pass), so a later "retreat advisor" does not
-need a model change.
+(both are free by-products of the forward pass).
+
+**Dual checkpoint preview (runtime, MP-06):** when the game stops at a checkpoint the
+player sees two distinct forecasts:
+
+- **Continue:** `computeMissionPreview` is re-run on the **remaining** phases
+  (`phases[k+1..n]`) with the members still alive as the new party (injured keep
+  rolling, dead are out). This is a fresh DP over a smaller input — the quest-total
+  forecast for what is left, not a copy of the phase just resolved.
+- **Retreat:** deterministic `classifyTier(passed, playedCount, anyDeath)` over the
+  phases already played — no probability involved.
+
+**Phase-level preview (Planner UI):** each phase row shows metrics computed on the
+**all-alive** mask `M` (a point-in-time forecast, not a DP aggregate):
+
+- `memberPhaseRisk(members, i, phase_k, M, consumables, emptySlotPenalty)` — the
+  §3 composition for member `i` at phase `k`; the row shows the **min–max range**
+  over the drafted members;
+- `surviveThrough(k)` and the **dominant retreat tier** (argmax of
+  `retreatTiers` conditional on reaching `k`) — both from the §4 forward pass.
 
 ### 4.4 Per-member marginals
 
@@ -263,7 +282,9 @@ expectedRewardMult = Σ_tier P(tier) · rewardMultiplier[tier] + Σ_item rewardM
 Phase durations are summed in the blueprint's own units normalized by the existing
 quest-time scale (`questTimeScale.ts`); mount/equipment deltas come from item config
 (MP-02). `durationMin` defaults to `1` in the same unit. Reward multipliers come from
-`questPowerRules.rewardMultipliers` until MP-06 moves them under the planner config.
+`questPowerRules.rewardMultipliers` (fed at the call-site: `useQuestPoiSession` passes
+them into the planner input; MP-06 kept this source rather than moving them under the
+planner config).
 
 ---
 

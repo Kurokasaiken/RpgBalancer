@@ -1742,8 +1742,9 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"dobbiamo lavorare sulle quest. Vorrei che il gioco fosse divertente e interessante anche solo con la scelta e risoluzione delle quest. Visto che il 'core' del progetto è Lords of Waterdeep ++, vorrei che anche solo in questa fase sia interessante. Senza la parte dei combattimenti, diciamo."*
 **Data:** 2026-09-29
-**Stato:** `da chiarire`
-**Desiderata FROZEN:** nessuna corrispondente. v3/v4 coprono la meccanica di risoluzione del POI quest (cerchio magico, skill check per milestone, quest card, pannelli flottanti); v12 copre intenti connessi (più PG degli obbligatori, consumabili, Trial by Fire, pool/authoring quest) ma dichiara "nessuna implementazione prima del planner". Questa richiesta riguarda il *design del divertimento* del loop quest e richiede una **nuova desiderata**.
+**Stato:** `aperta`
+**Desiderata FROZEN (2026-10-01):** `.mw/desiderata.md` **v24** — Macro plan Quest S1→S5 (quest interessante → quest vera → planning → integrazione → generazione). Prossimo passo: macro plan con il planner.
+**Desiderata FROZEN (storico, 2026-09-29):** nessuna corrispondente. v3/v4 coprono la meccanica di risoluzione del POI quest (cerchio magico, skill check per milestone, quest card, pannelli flottanti); v12 copre intenti connessi (più PG degli obbligatori, consumabili, Trial by Fire, pool/authoring quest) ma dichiara "nessuna implementazione prima del planner". Questa richiesta riguarda il *design del divertimento* del loop quest e richiede una **nuova desiderata**.
 **Cosa è emerso dal pre-flight explorer (fatti nel repo):**
 - Loop quest meccanico completo (R-005 `fatta`): POI → assegnazione residenti → cerchio magico → skill check a milestone → `QuestChronicle` → ricompense. Kit `questPoiKit` status `draft`.
 - Skill check: Astrolabe **V1 canonico** per le quest (v3, Q5); V6.x sono laboratori. Metafora ragnatela/goo approvata in lab, non ancora nelle quest.
@@ -1771,7 +1772,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"mi serve una 'interfaccia' per stabilire chi mandare in missione e vedere istantaneamente le modifiche dei risultati. Aggiungo + tizi: cambiano le % di morte/ferita, aggiungo un consumabile, cambio un equip al pg, tolgo un pg, ecc."* — elaborata in sessione come **mission planner reattivo**: la missione è il problema, il giocatore costruisce la soluzione e ogni modifica alla spedizione aggiorna immediatamente gli esiti previsti (successo / ferita / morte / durata / altri effetti), senza alcun pulsante "Simula". I risultati devono essere leggibili come conseguenze delle scelte: delta visibili (`18% → 11%`) e breakdown "WHY" delle cause per sorgente. Tre zone concettuali: **PARTY** (chi parte), **LOADOUT** (equip/consumabili per PG), **OUTCOME** (conseguenza live degli input). Deve esistere già nelle prime quest perché è il tutorial invisibile: "posso mandare qualcuno con lui, ma quel villager non lavora per quei giorni".
 **Data:** 2026-09-29
-**Stato:** `aperta`
+**Stato:** `fatta` — PLAN-018 completo (MP-00…MP-07). Evidence: `test-results/r078-mission-planner-2026-10-02.log`. NOTA: per v24/PLAN-019 il Planner è precedente implementativo da adattare al modello quest validato in S1 (remap in S2/S3), non architettura finale.
 **Desiderata FROZEN:** `.mw/desiderata.md` **v23** — Mission Planner (FROZEN 2026-09-29, avallo "procedi"). È la risposta concreta alla domanda aperta di R-076 (il divertimento vive **prima** della quest). Poggia su v12 (più PG degli obbligatori, consumabili come scelta, deathChance per-slot) e v4 (pannelli flottanti).
 **Emendamento (v23 rev.2, 2026-09-29):** il Planner è uno **spazio di sperimentazione reversibile** — configurazione ripristinata → outcome esattamente identici (caso canonico `A → A+PG → … → A`); distinzione netta INPUT/OUTPUT; blocco **BY MEMBER** obbligatorio (rischio per singolo membro, mai solo aggregato); **WHY** causale raggruppato per metrica; **niente costo opportunità numerico** (emerge dal gioco). Il Planner è feature di gameplay, non UI secondaria.
 **Piano:** `plans/PLAN-018-mission-planner.md` (status `active`, battezzato 2026-09-29). T-000 deciso: modello di rischio **A** (per-fase, esteso per residente — voce in `context/DECISION_LOG.md` 2026-09-29).
@@ -1803,3 +1804,24 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - i18n e skin system su tutta la nuova superficie: `QuestAssignmentPreview` è legacy hardcoded (stringhe IT inline, classi Tailwind ad-hoc) — non va replicato così.
 
 **Correlati:** R-076 (genitore), R-077 (la prima quest banale col planner è il tutorial invisibile), `GAMEPLAY_DESIGN.md` Pillar 3, `DESIGN_PILLARS.md` §3.3, `src/docs/docs/idle_village/interaction_core_spec.md` (quest preview), `src/docs/docs/plans/quest_role_assignment_rework_strategy.md`.
+
+---
+
+## R-079 — Micro-ottimizzazione `/game-frame-pixi`: memoizzare l'actions array del DirectorPanel
+
+**Richiesta:** *"per il progetto RPG /game-frame-pixi che va ottimizzata"* — il Director ha girato una review della pagina che propone due micro-miglioramenti: (1) memoizzare l'array `actions` passato a `DirectorPanel` (ricreato a ogni render); (2) estrarre l'overlay JSX in un componente separato (la review stessa lo marca come opzionale: "leggibile così com'è").
+**Data:** 2026-10-01
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v1 (adozione protocollo Mind Weaver in RPG) — micro-correzione di codice su superficie di test/trailer, nessuna nuova desiderata richiesta.
+**Scope adottato:** solo il punto (1) — `useMemo` su `directorActions`. Il punto (2) resta non applicato perché la stessa review lo giudica opzionale e la pagina è uno strumento di staging, non UI di prodotto.
+**Cosa è successo:** `directorActions` memoizzato con `useMemo<DirectorAction[]>` (deps `[invasion, questShown, currentDay]`); importato `type DirectorAction`; JSX usa `actions={directorActions}`. Safeguard: lint 0 errori (2 warning preesistenti `no-restricted-imports`, pattern R-075), `build:check` ✅, `kanban:lint` ✅, route `/game-frame-pixi` → 200 con modulo trasformato correttamente. Evidence: `test-results/r079-game-frame-pixi-memo-2026-10-01.log`.
+
+---
+
+## R-080 — Primitive per i pannelli HUD: bordi come le altre primitives
+
+**Richiesta:** *"i componenti dell HUD nn sn fatti 'belli' cm quelli delle primitives. fa una nuova PRIMITIVE (se già nn esiste) con quell'HUD, e modificali per farli fighi: i bordi gisuti, ecc cm il resto delle primitives"*
+**Data:** 2026-10-01
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v1 (adozione protocollo Mind Weaver in RPG).
+**Cosa è successo:** creato il primitive **`HudPanel`** (`src/ui/idleVillage/skins/primitives/HudPanel.tsx`, export in index): pannello flottante con la lingua materica di `HudRibbon` — silhouette a ottagono smussato, filet oro perimetrale, filigree interno a 4px, lacquer fill, drop-shadow via `filter` che segue il clip-path; tutto su token `--skin-*`. Applicato ai tre punti con ricetta piatta duplicata: `HudEventLedger` (era `PANEL_STYLE` inline radius-14 + bordo hardcoded), `DirectorPanel` (stessa ricetta copiata), pill speed di `HudAstrolabe` (`cutPx={7}`); bordi strip del ledger e colore bottoni pill tokenizzati. Non toccati: `HudCompass`/`EdgeDressing` (placeholder art dichiarata), `HudHangingTag` (pergamena con identità propria), `SpeedControl`/`ResourceMedallion`/`WhenWhereCluster`/`ResourceReadout` (già su primitives Materic). Safeguard: test ledger 4/4 ✅, `build:check` ✅, `kanban:lint` ✅, route 200. Evidence: `test-results/r080-hud-panel-primitive-2026-10-01.log`. **Da verificare a occhio:** resa visiva dei bordi su `/game-frame` e `/game-frame-pixi`.
