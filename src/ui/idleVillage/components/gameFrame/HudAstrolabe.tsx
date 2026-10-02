@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { HudPanel } from '@/ui/idleVillage/skins/primitives';
 
 export interface HudAstrolabeProps {
   speedMultiplier: number;
@@ -130,7 +131,8 @@ export function HudAstrolabe({
         >
           {isPaused ? '▶' : '❚❚'}
         </button>
-        <div
+        <HudPanel
+          cutPx={7}
           role="group"
           aria-label={t('gameFrame.speed.ariaLabel')}
           style={{
@@ -140,11 +142,7 @@ export function HudAstrolabe({
             transform: 'translateX(-50%)',
             display: 'flex',
             gap: 2,
-            padding: 2,
-            borderRadius: 9,
-            background: 'linear-gradient(180deg, rgba(3,2,2,0.92), rgba(6,4,3,0.96))',
-            border: '1px solid rgba(223,184,87,0.25)',
-            boxShadow: '0 3px 10px rgba(0,0,0,0.5)',
+            padding: 3,
           }}
         >
           {availableSpeeds.map((speed) => {
@@ -168,14 +166,14 @@ export function HudAstrolabe({
                   fontWeight: 700,
                   fontVariantNumeric: 'tabular-nums',
                   background: active ? 'rgba(223,184,87,0.22)' : 'transparent',
-                  color: active ? 'var(--skin-title-color, #f0cf6a)' : 'rgba(240,220,170,0.7)',
+                  color: active ? 'var(--skin-title-color, #f0cf6a)' : 'var(--skin-label-primary, rgba(240,220,170,0.7))',
                 }}
               >
                 {`×${speed}`}
               </button>
             );
           })}
-        </div>
+        </HudPanel>
       </div>
     </div>
   );

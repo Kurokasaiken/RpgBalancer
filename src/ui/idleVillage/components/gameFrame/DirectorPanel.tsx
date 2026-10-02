@@ -1,5 +1,6 @@
 import React from 'react';
 import { GripVertical } from 'lucide-react';
+import { HudPanel } from '@/ui/idleVillage/skins/primitives';
 import { useHudPanelDrag } from './useHudPanelDrag';
 
 export interface DirectorAction {
@@ -26,7 +27,8 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset }
   const { panelStyle, handleProps } = useHudPanelDrag();
   const [open, setOpen] = React.useState(true);
   return (
-    <section
+    <HudPanel
+      as="section"
       aria-label="Director"
       data-testid="director-panel"
       style={{
@@ -38,11 +40,7 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset }
         display: 'flex',
         flexDirection: 'column',
         gap: 6,
-        padding: '8px 10px',
-        borderRadius: 14,
-        background: 'linear-gradient(180deg, rgba(3,2,2,0.95) 0%, rgba(6,4,3,0.98) 100%)',
-        border: '1px solid rgba(223,184,87,0.18)',
-        boxShadow: 'inset 0 1px 0 rgba(216,177,62,0.08), 0 4px 20px rgba(0,0,0,0.6)',
+        padding: '9px 12px 10px',
         pointerEvents: 'auto',
         ...panelStyle,
       }}
@@ -96,7 +94,7 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset }
           Reset scena
         </button>
       )}
-    </section>
+    </HudPanel>
   );
 };
 

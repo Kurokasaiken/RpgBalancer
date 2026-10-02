@@ -6,6 +6,7 @@
  * The scope's CSS lives in `../skinScope.css` (imported globally in main.tsx).
  */
 export { SkinScope, type SkinScopeProps } from './SkinScope';
+export { HudPanel, type HudPanelProps } from './HudPanel';
 export { SkinTitle, type SkinTitleProps } from './SkinTitle';
 export { SkinButton, type SkinButtonProps, type SkinButtonVariant } from './SkinButton';
 export { SkinCloseButton, type SkinCloseButtonProps } from './SkinCloseButton';
