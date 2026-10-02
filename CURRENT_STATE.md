@@ -25,6 +25,7 @@ Questa è una fotografia; per lo stato più aggiornato verificare `RICHIESTE.md`
 - `WorldSurfaceRenderer` con layer DOM/Pixi, onde, uccelli, nuvole, parallasse sulle nuvole, `Window` primitivo.
 - Sistema di skin/config-first, `IdleVillageConfig` editor, `dynamicConfig.json`.
 - Playwright E2E per drag, POI quest, component hub.
+- **Mission Planner** (PLAN-018, R-078): draft PARTY/LOADOUT → preview deterministica (DP esatta, rng-free) → resolver che campiona lo stesso modello; checkpoint continua/ritirati; docs `mission_planner_spec.md` + `mission_planner_math_spec.md`; E2E `missionPlanner.spec.ts`. Sarà rimappato in PLAN-019 S2/S3.
 - Sistema `Mind Weaver`: `AGENTS.md`, `.mw/desiderata.md`, `RICHIESTE.md`, `context/DECISION_LOG.md`, skill cross-IDE.
 
 ## Parzialmente implementato
