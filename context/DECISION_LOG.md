@@ -546,3 +546,58 @@ Director vuole che la velocità competa con la sopravvivenza dentro il loadout.
 - D1+D4 cambiano lo schema item e le fasi: MP-02 è bloccato da MP-00.
 
 **Fonte:** risposte del Director in sessione 2026-09-30; `plans/PLAN-018-mission-planner.md` v3.
+
+---
+
+## 2026-10-01 — Quest: informazione, morte come risorsa, requisiti obbligatori/secondari
+
+**Da:** tensioni sollevate dall'explorer confrontando la discussione "esploratore / informazione /
+narrativa emergente" con `DESIGN_PILLARS.md` e desiderata v23.
+
+**A:** risposte del Director:
+
+1. **Informazione delle quest.** La stat primaria (o le stat primarie) di una quest è sempre
+   rivelata. L'esplorazione/esploratore dà **informazioni secondarie**: stat secondarie delle fasi
+   (ogni fase può avere A principale + B, o A + B e C secondarie, come mostra il componente skill
+   check), pericoli (es. veleno), sorveglianza, presenze non identificate. Nessun conflitto con il
+   Planner v23: il Planner calcola su ciò che è noto.
+2. **Opacità (Pillar 2 "D&D classico, leggibile").** Nessun conflitto secondo il Director.
+3. **Morte di un PG = spesa di una risorsa PG.** Scambiare risorse con altre risorse è un must del
+   genere strategico. Superata la riga di Pillar 2 "la slice non punisce con perdite definitive".
+4. **Requisiti.** Esistono ingredienti e slot **obbligatori** e **secondari**; la preparazione
+   secondaria è facoltativa. Precisa (non contraddice) Pillar 3 "Senza ingredienti, niente quest".
+
+**Implicazioni:** `DESIGN_PILLARS.md` Pillar 2 e Pillar 3 aggiornati (approvazione Director
+2026-10-01, "devi mettere quelle specificazioni").
+
+**Fonte:** sessione 2026-10-01.
+
+---
+
+## 2026-10-01 — Competenze di quest derivate dalle stat del balancer
+
+**Da:** stat di quest mock (`strength`/`agility`/`endurance`/`intelligence`/`perception` in
+`idleVillage/defaultConfig.ts`).
+
+**A:** le stat reali sono quelle del balancer (`balancer-default-config.json`). Le competenze usate
+dagli skill check delle quest (Percezione, Forza, Costituzione, …) sono **derivate** dalle stat del
+balancer — es. Percezione ← `txc`, Forza ← `damage`, Costituzione ← `hp`. **Il balancer non si
+tocca.** Mappatura completa da definire; secondaria per S1 (che può usare mock).
+
+**Fonte:** Director, sessione 2026-10-01; desiderata v24 rev.1 punti 12–13.
+
+---
+
+## 2026-10-01 — PLAN-019: MP-07 procede ora; sconfitta = nessuna reward di quest
+
+**Da:** decisioni aperte D-1 e D-8 del macro plan Quest (`plans/PLAN-019-quest-macro-plan.md` v3).
+
+**A:**
+1. **D-1:** *"D1 lo facciamo ora"* — MP-07 di PLAN-018 (docs/test/evidence del Planner) procede ora,
+   non si congela in attesa della mappatura S2/S3.
+2. **D-8:** *"Sconfitta nn significa che hai reward, è ancora valide"* — la soglia ≥50% dei check
+   affrontati resta valida; sotto soglia la quest è una sconfitta e non dà reward di quest. Sostituisce
+   il "reward proporzionale ai successi" di MASTER_PLAN Phase 11. Il bottino raccolto durante la
+   quest resta (regola della fuga, v24 rev.1 p.11).
+
+**Fonte:** Director, sessione 2026-10-01.
