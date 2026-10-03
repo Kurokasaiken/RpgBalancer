@@ -209,8 +209,9 @@ describe('quest S1 lab — run engine', () => {
     expect(run2.log.some((e) => e.text.includes('Il fumogeno copre'))).toBe(true);
   });
 
-  it('noise accumulates on failures inside the camp and wakes the tower creature at 3', () => {
-    // brute forces noise; run seeds until the creature wakes (noise>=3)
+  it('camp alertness escalates on failures inside: sveglio then the tower wakes', () => {
+    // Named states replaced the noise meter: a loud entry wakes the camp
+    // (campoSveglio + alarm penalty), a further inside failure wakes the tower.
     let sawRisveglio = false;
     for (let seed = 0; seed < 400 && !sawRisveglio; seed++) {
       const run = playToEnd(seed, 'fisico', (_n, ids) =>
@@ -226,10 +227,16 @@ describe('quest S1 lab — run engine', () => {
       );
       if (run.log.some((e) => e.text.includes('Qualcosa si sveglia'))) {
         sawRisveglio = true;
-        expect(run.noise).toBe(3);
+        expect(run.flags).toContain('campoSveglio');
       }
     }
     expect(sawRisveglio).toBe(true);
+    // brute force alone must set the awake state (kills the quiet exit)
+    const loud = createRun('fisico', 1);
+    loud.nodeId = 'approccio';
+    applyChoice(loud, 'brute');
+    expect(loud.flags).toContain('campoSveglio');
+    expect(loud.alarm).toBe(true);
   });
 
   it('sighting intel pays off: sideDoor gates the approach option', () => {
@@ -284,15 +291,15 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
     expect(run.nodeId).toBe('estrazione'); // rejected, still deciding
   });
 
-  it('entering extraction with the camp in alarm removes the quiet way out', () => {
+  it('entering extraction with the camp awake removes the quiet way out', () => {
     const run = createRun('ibrido', 1);
     run.nodeId = 'rientra-o-rischi';
     run.objectiveDone = true;
     run.loot.push('cassa delle sementi');
+    run.flags.push('campoSveglio');
     run.alarm = true;
     applyChoice(run, 'return-now');
     expect(run.nodeId).toBe('estrazione');
-    expect(run.flags).toContain('campoSveglio');
     expect(availableOptions(run).map((o) => o.id)).not.toContain('exit-quiet');
   });
 
@@ -359,13 +366,13 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
   });
 
   it('the waking creature still registers the grab: obiettivo effects land before risveglio', () => {
-    // noise=2 + a failed grab (+1/+2 noise) used to skip the case entirely:
+    // campo sveglio + a failed grab used to skip the case entirely:
     // the check resolved but its effects never applied (silent-drop bug).
     let sawWake = false;
     for (let seed = 0; seed < 400 && !sawWake; seed++) {
       const run = createRun('fisico', seed);
       run.nodeId = 'torre';
-      run.noise = 2;
+      run.flags.push('campoSveglio');
       run.alarm = true;
       applyChoice(run, 'straight-cassa');
       if (run.log.some((e) => e.text.includes('Qualcosa si sveglia'))) {

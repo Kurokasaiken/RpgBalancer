@@ -5,7 +5,7 @@
  * matrix of one single quest («La cassa delle sementi»), frozen by the
  * Director in `.mw/runs/20261002-s1-quest-design/quest-design.md` and
  * restructured after the senior-designer critique (funnel: 2 real decisions
- * + micro, escalating noise meter, the thing in the tower pays off).
+ * + micro, camp alertness states, the thing in the tower pays off).
  * Do not genericize: registries, DSLs, branching engines are S2+ scope.
  */
 
@@ -98,9 +98,9 @@ export const QUEST_BEATS = [
 /**
  * Authored nodes — v2 funnel:
  * merchant (micro) → incident (auto) → sighting (auto check) →
- * DECISION 1 approach → entry check → inside chain w/ noise meter →
- * tower (prisoner micro, noise-conditional) → DECISION 2 push-your-luck →
- * creature wake if noise maxed → return.
+ * DECISION 1 approach → entry check → inside chain w/ camp alertness →
+ * tower (prisoner micro, alertness-conditional) → DECISION 2 push-your-luck →
+ * creature wakes on a further failure inside a sveglio camp → extraction.
  */
 export const SCENARIO_NODES: Record<string, QuestNode> = {
   viaggio: {
