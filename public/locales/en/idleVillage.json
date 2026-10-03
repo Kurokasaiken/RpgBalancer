@@ -1047,5 +1047,82 @@
     "partial": "Partial success",
     "fail": "Failure",
     "deadly": "Disaster"
+  },
+  "questS1Lab": {
+    "kicker": "Isolated lab · S1",
+    "kickerRun": "Isolated lab · S1 · seed {seed}",
+    "title": "The Seed Crate",
+    "objective": "Goal: bring the seed crate back from the Crow Pass. The leader must survive to earn the reward. Choose the expedition:",
+    "primaryTrial": "★ Infiltration trial — {stats}",
+    "primaryNote": "almost every check resolves with these stats",
+    "partyKicker": "Expedition",
+    "depart": "Depart",
+    "retreat": "Retreat",
+    "retreatTitle": "Abandon the quest: keep the loot but no reward",
+    "reset": "Reset",
+    "chestRecovered": "Crate recovered",
+    "item": {
+      "potion": "⚗ Potion — heals a wounded member",
+      "smoke": "✦ Smoke bomb — +15 infiltration",
+      "rope": "🪢 Rope — +15 climbing",
+      "usePotion": "⚗ Potion → heal {name}"
+    },
+    "loot": "Loot: {items}",
+    "intel": "Intel: {items}",
+    "situation": "Situation",
+    "chronicle": "Chronicle",
+    "advancing": "The expedition advances…",
+    "evaluate": "▸ evaluate",
+    "successPct": "~{pct}% success",
+    "woundPct": "wound {pct}%",
+    "deathPct": "death {pct}%",
+    "bodyguardCovers": "🛡 {name} covers the hits — wound {wound}%, death {death}% for him",
+    "intelBonus": "✧ Intel: {label} (+{bonus})",
+    "consumableAvailable": "✦ {label} available: +{bonus} to the roll",
+    "consumableArmed": "✦ {label} — armed (+{bonus})",
+    "consumableStowed": "✦ {label} — stays in the bag",
+    "woundedRisk": "already wounded: increased risk",
+    "slotRisk": "{name} W{wound}% · D{death}%",
+    "faceCheck": "Face the check · ~{pct}%",
+    "throwCounter": "Roll {current} of {total}",
+    "verdictContinue": "{verdict} — continue",
+    "outcome": {
+      "reward": "VICTORY — reward earned",
+      "survived": "Survived — no reward",
+      "fled": "Retreat — quest failed, loot kept",
+      "wipe": "WIPE — everything is lost"
+    },
+    "role": {
+      "leader": "Leader",
+      "bodyguard": "Bodyguard",
+      "member": "Member"
+    },
+    "memberState": {
+      "dead": "Dead",
+      "wounded": "Wounded",
+      "fit": "In shape"
+    },
+    "verdict": {
+      "bigwin": "TRIUMPH",
+      "win": "VICTORY",
+      "almost": "BY A WHISKER",
+      "fail": "DEFEAT",
+      "fail_wound": "DEFEAT · WOUNDED",
+      "fail_dead": "DEFEAT · FALLEN",
+      "epicfail": "RUIN"
+    },
+    "noise": {
+      "label": "Noise",
+      "l0": "QUIET",
+      "l1": "SUSPICION",
+      "l2": "ALARM",
+      "l3": "AWAKENING",
+      "threat1": "◈ stirs in its sleep",
+      "threat2": "◈ is waking up",
+      "threat3": "◈ has awakened",
+      "tower": "— the tower",
+      "tooltip": "Noise accumulates: every failure inside the camp raises it. At 3 ticks something wakes up."
+    },
+    "gold": "gold"
   }
 }

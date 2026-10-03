@@ -16,7 +16,11 @@ export const i18nReady = i18next
     debug: false,
     fallbackLng: 'en',
     supportedLngs: ['en', 'it-IT', 'pseudo', 'de', 'ar', 'ja', 'zh-CN'],
-    nonExplicitSupportedLngs: true,
+    /* nonExplicitSupportedLngs MUST stay off: with it on, isSupportedCode()
+       reduces every code to its language part ('it-IT' → 'it'), which is not
+       in supportedLngs — so region-tagged locales silently fell back to 'en'
+       and it-IT/zh-CN could never resolve. Without it, i18next still maps
+       'it' → 'it-IT' and 'en-US' → 'en' via getBestMatchFromCodes. */
     load: 'currentOnly',
     defaultNS: 'common',
     ns: ['common', 'idleVillage'],

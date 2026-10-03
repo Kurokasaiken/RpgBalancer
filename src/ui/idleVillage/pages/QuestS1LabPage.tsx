@@ -8,9 +8,16 @@
  * component DestinyAstrolabeV62 (route /minimal-destiny-astrolabe-v6-2) with
  * config.mode forced to the resolved verdict (the engine decides, the
  * astrolabe shows it).
+ *
+ * i18n split: all UI chrome goes through `useTranslation('idleVillage')` under
+ * the `questS1Lab.*` keys. Authored narrative (node titles/bodies, option
+ * labels, chronicle text in questScenario/questRun) stays in the scenario
+ * file as content data — quest content belongs to the content pipeline (S2),
+ * not to the i18n string tables.
  */
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PARTY_PRESETS, PRIMARY_STATS, QUEST_BEATS, SCENARIO_NODES } from '@/ui/idleVillage/questS1Lab/questScenario';
 import {
   applyChoice,
@@ -56,14 +63,6 @@ const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }> = {
   ritorno: { src: ART.village, fit: 'contain' },
 };
 
-const OUTCOME_LABEL: Record<QuestRunState['outcome'], string> = {
-  running: '',
-  reward: 'VITTORIA — reward ottenuta',
-  survived: 'Sopravvissuti — senza reward',
-  fled: 'Fuga — quest fallita, bottino conservato',
-  wipe: 'WIPE — si perde tutto',
-};
-
 const LOG_STYLE: Record<string, string> = {
   CHECK: 'text-sky-300',
   WOUND: 'text-amber-400',
@@ -77,12 +76,6 @@ const LOG_STYLE: Record<string, string> = {
   RETREAT: 'text-slate-300',
   CHOICE: 'text-slate-400',
   NODE: 'text-amber-100/80 font-semibold',
-};
-
-const ROLE_LABEL: Record<string, string> = {
-  leader: 'Leader',
-  bodyguard: 'Guardia del corpo',
-  member: 'Membro',
 };
 
 /** Compact stat line — stats drive approach choice, so they must be readable. */
@@ -102,8 +95,13 @@ const PartyStrip: React.FC<{
   hasPotion?: boolean;
   onUsePotion?: () => void;
 }> = ({ member, hasPotion, onUsePotion }) => {
-  const state = member.dead ? 'Morto' : member.wounded ? 'Ferito' : null;
-  const subtitle = [ROLE_LABEL[member.role], state].filter(Boolean).join(' · ');
+  const { t } = useTranslation('idleVillage');
+  const state = member.dead
+    ? t('questS1Lab.memberState.dead')
+    : member.wounded
+      ? t('questS1Lab.memberState.wounded')
+      : null;
+  const subtitle = [t(`questS1Lab.role.${member.role}`), state].filter(Boolean).join(' · ');
   const best = Math.max(...Object.values(member.stats));
   return (
     <div
@@ -122,7 +120,7 @@ const PartyStrip: React.FC<{
         fatigue={member.wounded ? 50 : 0}
         portraitUrl={member.portrait}
         isInteractive={false}
-        statusLabel={state ?? 'In forze'}
+        statusLabel={state ?? t('questS1Lab.memberState.fit')}
       />
       <div className="flex flex-wrap gap-1 px-2 pb-1.5">
         {Object.entries(member.stats).map(([k, v]) => (
@@ -143,7 +141,7 @@ const PartyStrip: React.FC<{
           onClick={onUsePotion}
           className="mx-2 mb-2 w-[calc(100%-1rem)] rounded-lg border border-teal-400/60 bg-teal-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-300 transition hover:bg-teal-500/30"
         >
-          ⚗ Pozione → cura {member.name}
+          {t('questS1Lab.item.usePotion', { name: member.name })}
         </button>
       )}
     </div>
@@ -183,19 +181,27 @@ const QuestProgress: React.FC<{ beat: number; ended: boolean }> = ({ beat, ended
 
 /** Camp alertness — the accumulating danger meter. 3 ticks = the thing wakes. */
 const NoiseMeter: React.FC<{ noise: number }> = ({ noise }) => {
-  const labels = ['QUIETO', 'SOSPETTO', 'ALLARME', 'RISVEGLIO'];
+  const { t } = useTranslation('idleVillage');
   // The threat must be felt BEFORE it fires: name what is stirring under the
   // meter so cautious players see what they avoided and reckless ones see it
   // coming.
   const threat =
-    noise >= 3 ? '◈ si è svegliata' : noise === 2 ? '◈ si sta svegliando' : noise === 1 ? '◈ si agita nel sonno' : null;
+    noise >= 3
+      ? t('questS1Lab.noise.threat3')
+      : noise === 2
+        ? t('questS1Lab.noise.threat2')
+        : noise === 1
+          ? t('questS1Lab.noise.threat1')
+          : null;
   return (
     <div
       className="rounded-lg border border-white/10 bg-slate-950/50 px-2.5 py-1.5"
-      title="Il rumore accumula: ogni fallimento dentro il campo lo fa salire. A 3 tacche qualcosa si sveglia."
+      title={t('questS1Lab.noise.tooltip')}
     >
       <div className="flex items-center gap-2">
-        <span className="text-[9px] uppercase tracking-[0.25em] text-slate-400">Rumore</span>
+        <span className="text-[9px] uppercase tracking-[0.25em] text-slate-400">
+          {t('questS1Lab.noise.label')}
+        </span>
         <div className="flex gap-1">
           {[0, 1, 2].map((i) => (
             <div
@@ -217,12 +223,12 @@ const NoiseMeter: React.FC<{ noise: number }> = ({ noise }) => {
             noise >= 2 ? 'text-red-300' : noise === 1 ? 'text-amber-300' : 'text-slate-400',
           ].join(' ')}
         >
-          {labels[Math.min(noise, 3)]}
+          {t(`questS1Lab.noise.l${Math.min(noise, 3)}`)}
         </span>
       </div>
       {threat && (
         <div className={`mt-1 text-[9px] uppercase tracking-[0.2em] ${noise >= 3 ? 'text-red-400' : 'text-slate-500'}`}>
-          {threat} — la torre
+          {threat} {t('questS1Lab.noise.tower')}
         </div>
       )}
     </div>
@@ -233,6 +239,7 @@ const NoiseMeter: React.FC<{ noise: number }> = ({ noise }) => {
 const rollSeed = () => Math.floor(Math.random() * 100000);
 
 const QuestS1LabPage: React.FC = () => {
+  const { t } = useTranslation('idleVillage');
   const [seed, setSeed] = useState<number>(rollSeed);
   const [run, setRun] = useState<QuestRunState | null>(null);
   // Every check resolved by the last action gets its own astrolabe beat —
@@ -326,25 +333,24 @@ const QuestS1LabPage: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#0a0d12]" />
           <div className="absolute bottom-4 left-6 md:left-10">
-            <Kicker>Lab isolato · S1</Kicker>
+            <Kicker>{t('questS1Lab.kicker')}</Kicker>
             <h1 className="text-3xl font-semibold text-amber-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-              La cassa delle sementi
+              {t('questS1Lab.title')}
             </h1>
           </div>
         </div>
         <div className="p-6 md:p-10">
         <p className="mb-3 max-w-2xl text-sm text-slate-400">
-          Obiettivo: riportare la cassa delle sementi dal Passo del Corvo. Il leader deve sopravvivere
-          per ottenere la reward. Scegli la spedizione:
+          {t('questS1Lab.objective')}
         </p>
         {/* Declared primary stats — the player must know a priori which
             party solves this quest. Every mandatory check uses these. */}
         <div className="mb-8 flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-sky-300">
           <span className="rounded-md border border-sky-400/50 bg-sky-950/40 px-2 py-0.5">
-            ★ Prova di infiltrazione — {PRIMARY_STATS.map((s) => STAT_SHORT[s]).join(' + ')}
+            {t('questS1Lab.primaryTrial', { stats: PRIMARY_STATS.map((s) => STAT_SHORT[s]).join(' + ') })}
           </span>
           <span className="normal-case tracking-normal text-slate-500">
-            quasi tutti i check si risolvono con queste stat
+            {t('questS1Lab.primaryNote')}
           </span>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -355,13 +361,13 @@ const QuestS1LabPage: React.FC = () => {
             >
               <header className="mb-4 flex items-start justify-between gap-3">
                 <div>
-                  <Kicker>Spedizione</Kicker>
+                  <Kicker>{t('questS1Lab.partyKicker')}</Kicker>
                   <div className="mt-1 text-lg font-semibold text-ivory">{p.label}</div>
                   <div className="text-xs text-slate-400">{p.description}</div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <span className="rounded-full border border-amber-300/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
-                    {p.gold} gold
+                    {p.gold} {t('questS1Lab.gold')}
                   </span>
                   <span className="rounded-full border border-sky-400/40 bg-sky-950/40 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-sky-300">
                     ★ {PRIMARY_STATS.map((s) => `${STAT_SHORT[s]} ${Math.max(...p.members.map((m) => m.stats[s]))}`).join(' · ')}
@@ -374,7 +380,7 @@ const QuestS1LabPage: React.FC = () => {
                     <WanderlustRosterCard
                       workerId={m.id}
                       label={m.name}
-                      subtitle={`${ROLE_LABEL[m.role]} · ${statLine(m)}`}
+                      subtitle={`${t(`questS1Lab.role.${m.role}`)} · ${statLine(m)}`}
                       hp={10}
                       maxHp={10}
                       fatigue={0}
@@ -390,7 +396,7 @@ const QuestS1LabPage: React.FC = () => {
                   onClick={() => startRun(p.id)}
                   className="rounded-xl border border-amber-300/60 bg-amber-500/10 px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-200 transition hover:bg-amber-500/20"
                 >
-                  Parti
+                  {t('questS1Lab.depart')}
                 </button>
               </div>
             </section>
@@ -413,8 +419,8 @@ const QuestS1LabPage: React.FC = () => {
       <div className="p-6 md:p-10">
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <Kicker>Lab isolato · S1 · seed {seed}</Kicker>
-          <h1 className="text-2xl font-semibold text-amber-100">La cassa delle sementi</h1>
+          <Kicker>{t('questS1Lab.kickerRun', { seed })}</Kicker>
+          <h1 className="text-2xl font-semibold text-amber-100">{t('questS1Lab.title')}</h1>
           <div className="mt-2">
             <QuestProgress beat={currentBeat} ended={run.ended} />
           </div>
@@ -425,14 +431,14 @@ const QuestS1LabPage: React.FC = () => {
               onClick={() => setRun({ ...flee(run) })}
               className="rounded-xl border border-red-400/50 bg-red-950/30 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-red-300 transition hover:bg-red-950/60"
             >
-              Ritirati
+              {t('questS1Lab.retreat')}
             </button>
           )}
           <button
             onClick={reset}
             className="rounded-xl border border-slate-600/60 bg-slate-900/50 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-slate-300 transition hover:bg-slate-800"
           >
-            Reset
+            {t('questS1Lab.reset')}
           </button>
         </div>
       </div>
@@ -440,7 +446,7 @@ const QuestS1LabPage: React.FC = () => {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Party */}
         <section className="space-y-3">
-          <Kicker>Spedizione</Kicker>
+          <Kicker>{t('questS1Lab.partyKicker')}</Kicker>
           {run.party.map((m) => (
             <PartyStrip
               key={m.id}
@@ -452,12 +458,12 @@ const QuestS1LabPage: React.FC = () => {
           <div className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-xs text-slate-300">
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full border border-amber-300/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
-                {run.gold} gold
+                {run.gold} {t('questS1Lab.gold')}
               </span>
               <NoiseMeter noise={run.noise} />
               {run.objectiveDone && (
                 <span className="rounded-full border border-emerald-400/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-emerald-300">
-                  Cassa recuperata
+                  {t('questS1Lab.chestRecovered')}
                 </span>
               )}
             </div>
@@ -466,23 +472,23 @@ const QuestS1LabPage: React.FC = () => {
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {run.flags.includes('hasPozione') && (
                   <span className="rounded-md border border-teal-400/40 bg-teal-950/40 px-2 py-0.5 text-[10px] text-teal-300">
-                    ⚗ Pozione — cura un ferito
+                    {t('questS1Lab.item.potion')}
                   </span>
                 )}
                 {run.flags.includes('hasFumogeno') && (
                   <span className="rounded-md border border-teal-400/40 bg-teal-950/40 px-2 py-0.5 text-[10px] text-teal-300">
-                    ✦ Fumogeno — +15 infiltrazione
+                    {t('questS1Lab.item.smoke')}
                   </span>
                 )}
                 {run.flags.includes('hasCorda') && (
                   <span className="rounded-md border border-teal-400/40 bg-teal-950/40 px-2 py-0.5 text-[10px] text-teal-300">
-                    🪢 Corda — +15 arrampicata
+                    {t('questS1Lab.item.rope')}
                   </span>
                 )}
               </div>
             )}
-            {run.loot.length > 0 && <div className="mt-2">Bottino: {run.loot.join(', ')}</div>}
-            {run.info.length > 0 && <div className="mt-1 text-slate-400">Info: {run.info.join(', ')}</div>}
+            {run.loot.length > 0 && <div className="mt-2">{t('questS1Lab.loot', { items: run.loot.join(', ') })}</div>}
+            {run.info.length > 0 && <div className="mt-1 text-slate-400">{t('questS1Lab.intel', { items: run.info.join(', ') })}</div>}
           </div>
         </section>
 
@@ -507,7 +513,7 @@ const QuestS1LabPage: React.FC = () => {
             </div>
           )}
           <header className="mb-3">
-            <Kicker>Situazione</Kicker>
+            <Kicker>{t('questS1Lab.situation')}</Kicker>
             <div className="mt-1 text-lg font-semibold text-ivory">{currentNode?.title}</div>
           </header>
           <p className="mb-3 text-sm text-slate-300">{currentNode?.body}</p>
@@ -516,11 +522,11 @@ const QuestS1LabPage: React.FC = () => {
           </p>
           {run.ended ? (
             <div className="rounded-2xl border border-amber-400/60 bg-amber-950/30 p-4 text-center text-sm font-bold uppercase tracking-[0.2em] text-amber-200">
-              {OUTCOME_LABEL[run.outcome]}
+              {run.outcome === 'running' ? '' : t(`questS1Lab.outcome.${run.outcome}`)}
             </div>
           ) : inTransition ? (
             <div className="flex h-24 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-[11px] uppercase tracking-[0.3em] text-slate-500">
-              La spedizione avanza…
+              {t('questS1Lab.advancing')}
             </div>
           ) : (
             <div className="space-y-2">
@@ -554,10 +560,10 @@ const QuestS1LabPage: React.FC = () => {
                   >
                     <span className="block text-sm font-medium text-ivory">
                       {o.label}
-                      {o.costGold ? <span className="ml-2 text-xs text-amber-300">({o.costGold} gold)</span> : null}
+                      {o.costGold ? <span className="ml-2 text-xs text-amber-300">({o.costGold} {t('questS1Lab.gold')})</span> : null}
                       {pv && !committed && (
                         <span className="ml-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                          ▸ valuta
+                          {t('questS1Lab.evaluate')}
                         </span>
                       )}
                     </span>
@@ -595,18 +601,18 @@ const QuestS1LabPage: React.FC = () => {
                             </span>
                           </span>
                           <span className="text-[10px] uppercase tracking-wider text-emerald-300">
-                            ~{pv.successPct}% riuscita
+                            {t('questS1Lab.successPct', { pct: pv.successPct })}
                           </span>
                           {(pv.woundPct > 0 || pv.deathPct > 0) && (
                             <span className="flex gap-1.5">
                               {pv.woundPct > 0 && (
                                 <span className="rounded-md border border-amber-500/40 bg-amber-950/40 px-1.5 py-0.5 text-[10px] text-amber-300">
-                                  ferita {pv.woundPct}%
+                                  {t('questS1Lab.woundPct', { pct: pv.woundPct })}
                                 </span>
                               )}
                               {pv.deathPct > 0 && (
                                 <span className="rounded-md border border-red-500/40 bg-red-950/40 px-1.5 py-0.5 text-[10px] text-red-300">
-                                  morte {pv.deathPct}%
+                                  {t('questS1Lab.deathPct', { pct: pv.deathPct })}
                                 </span>
                               )}
                             </span>
@@ -614,18 +620,21 @@ const QuestS1LabPage: React.FC = () => {
                         </span>
                         {pv.interceptor && (pv.woundPct > 0 || pv.deathPct > 0) && (
                           <span className="block rounded-md border border-purple-400/40 bg-purple-950/30 px-2 py-0.5 text-[10px] uppercase tracking-wider text-purple-300">
-                            🛡 {pv.interceptor.name} copre i colpi — ferita {pv.interceptor.woundPct}%,
-                            morte {pv.interceptor.deathPct}% per lui
+                            {t('questS1Lab.bodyguardCovers', {
+                              name: pv.interceptor.name,
+                              wound: pv.interceptor.woundPct,
+                              death: pv.interceptor.deathPct,
+                            })}
                           </span>
                         )}
                         {pv.intelLabel && (
                           <span className="block rounded-md border border-emerald-400/40 bg-emerald-950/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-emerald-300">
-                            ✧ Info: {pv.intelLabel} (+{pv.intelBonus})
+                            {t('questS1Lab.intelBonus', { label: pv.intelLabel, bonus: pv.intelBonus })}
                           </span>
                         )}
                         {pv.consumableLabel && !committed && (
                           <span className="block rounded-md border border-teal-400/40 bg-teal-950/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-teal-300">
-                            ✦ {pv.consumableLabel} disponibile: +{pv.consumableBonus} al tiro
+                            {t('questS1Lab.consumableAvailable', { label: pv.consumableLabel, bonus: pv.consumableBonus })}
                           </span>
                         )}
                       </span>
@@ -645,7 +654,9 @@ const QuestS1LabPage: React.FC = () => {
                           ].join(' ')}
                         >
                           <span>
-                            ✦ {pv.consumableLabel} {useConsumable ? `— armato (+${pv.consumableBonus})` : '— resta nella sacca'}
+                            {useConsumable
+                              ? t('questS1Lab.consumableArmed', { label: pv.consumableLabel, bonus: pv.consumableBonus })
+                              : t('questS1Lab.consumableStowed', { label: pv.consumableLabel })}
                           </span>
                           <span className={useConsumable ? 'text-teal-300' : 'text-slate-500'}>
                             {useConsumable ? '◉' : '○'}
@@ -668,10 +679,10 @@ const QuestS1LabPage: React.FC = () => {
                                     ? 'border-red-400/50 bg-red-950/40 text-red-300'
                                     : 'border-slate-500/40 bg-slate-900/50 text-slate-300',
                               ].join(' ')}
-                              title={m.wounded ? 'già ferito: rischio maggiorato' : m.role}
+                              title={m.wounded ? t('questS1Lab.woundedRisk') : t(`questS1Lab.role.${m.role}`)}
                             >
                               {pv.interceptor?.name === m.name && '🛡 '}
-                              {m.name} F{m.woundPct}% · M{m.deathPct}%
+                              {t('questS1Lab.slotRisk', { name: m.name, wound: m.woundPct, death: m.deathPct })}
                             </span>
                           ))}
                         </div>
@@ -681,14 +692,14 @@ const QuestS1LabPage: React.FC = () => {
                           onClick={() => choose(o.id, useConsumable)}
                           className="flex-1 rounded-xl border border-amber-300/70 bg-amber-500/15 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-200 transition hover:bg-amber-500/30"
                         >
-                          Affronta il check · ~{pv.successPct}%
+                          {t('questS1Lab.faceCheck', { pct: pv.successPct })}
                         </button>
                         <button
                           onClick={() => setRun({ ...flee(run) })}
                           className="rounded-xl border border-red-400/50 bg-red-950/30 px-3 py-2 text-[11px] uppercase tracking-[0.2em] text-red-300 transition hover:bg-red-950/60"
-                          title="Abbandoni la quest: tieni il bottino ma niente reward"
+                          title={t('questS1Lab.retreatTitle')}
                         >
-                          Ritirati
+                          {t('questS1Lab.retreat')}
                         </button>
                       </div>
                     </div>
@@ -702,7 +713,7 @@ const QuestS1LabPage: React.FC = () => {
 
         {/* Chronicle */}
         <section className="rounded-3xl border border-slate-800/70 bg-black/75 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.65)] backdrop-blur">
-          <Kicker>Cronaca</Kicker>
+          <Kicker>{t('questS1Lab.chronicle')}</Kicker>
           <div className="mt-3 max-h-[70vh] space-y-1 overflow-y-auto font-mono text-xs">
             {run.log.map((e, i) => (
               <div key={i} className={LOG_STYLE[e.kind] ?? 'text-slate-400'}>
@@ -720,7 +731,7 @@ const QuestS1LabPage: React.FC = () => {
           <div className="relative h-[70vh] w-[70vw] overflow-hidden rounded-3xl border border-amber-400/40">
             {checkQueue.length > 1 && (
               <div className="absolute left-4 top-4 z-10 rounded-full border border-amber-300/50 bg-black/70 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
-                Tiro {checkIdx + 1} di {checkQueue.length}
+                {t('questS1Lab.throwCounter', { current: checkIdx + 1, total: checkQueue.length })}
               </div>
             )}
             <DestinyAstrolabeV62Standalone
@@ -748,7 +759,9 @@ const QuestS1LabPage: React.FC = () => {
                   setCheckResolved(false);
                 }}
               >
-                {checkQueue[checkIdx].check.verdict} — continua
+                {t('questS1Lab.verdictContinue', {
+                  verdict: t(`questS1Lab.verdict.${activeMode ?? checkQueue[checkIdx].check.verdict}`),
+                })}
               </button>
             )}
           </div>

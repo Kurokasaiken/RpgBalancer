@@ -11,6 +11,17 @@
     "ja": "!! 日本語 !!",
     "zh-CN": "!! 简体中文 !!"
   },
+  "designVsFidelity": {
+    "kicker": "!! ÜÜÎÎ ÅÅüüδδîîţţ !!",
+    "title": "!! ΔΔééššîîğğññ ŠŠÿÿššţţééṃṃ ṿṿšš ṾṾîîššüüååłł ƑƑîîδδééłłîîţţÿÿ !!",
+    "backToHub": "!! ββååççķķ ţţöö ŢŢééššţţ ĤĤüüββ !!",
+    "missingCount": "!! {{count}} ṃṃîîššššîîññğğ îîţţééṃṃšš !!",
+    "designSystemColumn": "!! ΔΔééššîîğğññ ŠŠÿÿššţţééṃṃ /δδééššîîğğññ-ššÿÿššţţééṃṃ !!",
+    "designSystemFrame": "!! ΔΔééššîîğğññ ŠŠÿÿššţţééṃṃ !!",
+    "visualFidelityColumn": "!! ṾṾîîššüüååłł ƑƑîîδδééłłîîţţÿÿ /ṿṿîîššüüååłł-ƒƒîîδδééłłîîţţÿÿ-łłååββ !!",
+    "visualFidelityFrame": "!! ṾṾîîššüüååłł ƑƑîîδδééłłîîţţÿÿ ŁŁååββ !!",
+    "missingSection": "!! ṀṀîîššššîîññğğ & ṀṀööççķķééδδ ÇÇööṃṃṗṗööññééññţţšš !!"
+  },
   "examples": {
     "swordCount": "!! {count, plural, one {one sword} other {{count} swords}} !!",
     "riskLevel": "!! {level, select, low {Low risk} medium {Medium risk} high {High risk} other {Unknown risk}} !!",

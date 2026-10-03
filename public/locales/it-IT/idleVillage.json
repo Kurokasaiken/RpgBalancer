@@ -1068,5 +1068,82 @@
     "partial": "Successo parziale",
     "fail": "Fallimento",
     "deadly": "Disastro"
+  },
+  "questS1Lab": {
+    "kicker": "Lab isolato · S1",
+    "kickerRun": "Lab isolato · S1 · seed {seed}",
+    "title": "La cassa delle sementi",
+    "objective": "Obiettivo: riportare la cassa delle sementi dal Passo del Corvo. Il leader deve sopravvivere per ottenere la reward. Scegli la spedizione:",
+    "primaryTrial": "★ Prova di infiltrazione — {stats}",
+    "primaryNote": "quasi tutti i check si risolvono con queste stat",
+    "partyKicker": "Spedizione",
+    "depart": "Parti",
+    "retreat": "Ritirati",
+    "retreatTitle": "Abbandoni la quest: tieni il bottino ma niente reward",
+    "reset": "Reset",
+    "chestRecovered": "Cassa recuperata",
+    "item": {
+      "potion": "⚗ Pozione — cura un ferito",
+      "smoke": "✦ Fumogeno — +15 infiltrazione",
+      "rope": "🪢 Corda — +15 arrampicata",
+      "usePotion": "⚗ Pozione → cura {name}"
+    },
+    "loot": "Bottino: {items}",
+    "intel": "Info: {items}",
+    "situation": "Situazione",
+    "chronicle": "Cronaca",
+    "advancing": "La spedizione avanza…",
+    "evaluate": "▸ valuta",
+    "successPct": "~{pct}% riuscita",
+    "woundPct": "ferita {pct}%",
+    "deathPct": "morte {pct}%",
+    "bodyguardCovers": "🛡 {name} copre i colpi — ferita {wound}%, morte {death}% per lui",
+    "intelBonus": "✧ Info: {label} (+{bonus})",
+    "consumableAvailable": "✦ {label} disponibile: +{bonus} al tiro",
+    "consumableArmed": "✦ {label} — armato (+{bonus})",
+    "consumableStowed": "✦ {label} — resta nella sacca",
+    "woundedRisk": "già ferito: rischio maggiorato",
+    "slotRisk": "{name} F{wound}% · M{death}%",
+    "faceCheck": "Affronta il check · ~{pct}%",
+    "throwCounter": "Tiro {current} di {total}",
+    "verdictContinue": "{verdict} — continua",
+    "outcome": {
+      "reward": "VITTORIA — reward ottenuta",
+      "survived": "Sopravvissuti — senza reward",
+      "fled": "Fuga — quest fallita, bottino conservato",
+      "wipe": "WIPE — si perde tutto"
+    },
+    "role": {
+      "leader": "Leader",
+      "bodyguard": "Guardia del corpo",
+      "member": "Membro"
+    },
+    "memberState": {
+      "dead": "Morto",
+      "wounded": "Ferito",
+      "fit": "In forze"
+    },
+    "verdict": {
+      "bigwin": "TRIONFO",
+      "win": "VITTORIA",
+      "almost": "PER UN SOFFIO",
+      "fail": "SCONFITTA",
+      "fail_wound": "SCONFITTA · FERITO",
+      "fail_dead": "SCONFITTA · CADUTO",
+      "epicfail": "ROVINA"
+    },
+    "noise": {
+      "label": "Rumore",
+      "l0": "QUIETO",
+      "l1": "SOSPETTO",
+      "l2": "ALLARME",
+      "l3": "RISVEGLIO",
+      "threat1": "◈ si agita nel sonno",
+      "threat2": "◈ si sta svegliando",
+      "threat3": "◈ si è svegliata",
+      "tower": "— la torre",
+      "tooltip": "Il rumore accumula: ogni fallimento dentro il campo lo fa salire. A 3 tacche qualcosa si sveglia."
+    },
+    "gold": "oro"
   }
 }
