@@ -179,59 +179,26 @@ const QuestProgress: React.FC<{ beat: number; ended: boolean }> = ({ beat, ended
   </div>
 );
 
-/** Camp alertness — the accumulating danger meter. 3 ticks = the thing wakes. */
-const NoiseMeter: React.FC<{ noise: number }> = ({ noise }) => {
+/** Camp alertness badge — named states, not a meter (Director 2026-10-03:
+ *  noise removed). Nothing renders while the camp is quiet; one fumble shows
+ *  "allertato", a second (or a loud entry) shows "sveglio". */
+const CampAlertBadge: React.FC<{ flags: string[] }> = ({ flags }) => {
   const { t } = useTranslation('idleVillage');
-  // The threat must be felt BEFORE it fires: name what is stirring under the
-  // meter so cautious players see what they avoided and reckless ones see it
-  // coming.
-  const threat =
-    noise >= 3
-      ? t('questS1Lab.noise.threat3')
-      : noise === 2
-        ? t('questS1Lab.noise.threat2')
-        : noise === 1
-          ? t('questS1Lab.noise.threat1')
-          : null;
+  const sveglio = flags.includes('campoSveglio');
+  const allertato = flags.includes('campoAllertato');
+  if (!sveglio && !allertato) return null;
   return (
-    <div
-      className="rounded-lg border border-white/10 bg-slate-950/50 px-2.5 py-1.5"
-      title={t('questS1Lab.noise.tooltip')}
+    <span
+      className={[
+        'rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.3em]',
+        sveglio
+          ? 'border-red-400/60 text-red-300'
+          : 'border-amber-400/50 text-amber-300/80',
+      ].join(' ')}
+      title={t('questS1Lab.camp.tooltip')}
     >
-      <div className="flex items-center gap-2">
-        <span className="text-[9px] uppercase tracking-[0.25em] text-slate-400">
-          {t('questS1Lab.noise.label')}
-        </span>
-        <div className="flex gap-1">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className={[
-                'h-2 w-5 rounded-full transition-all duration-500',
-                i < noise
-                  ? noise >= 3 || i === 2
-                    ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]'
-                    : 'bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.6)]'
-                  : 'bg-slate-800',
-              ].join(' ')}
-            />
-          ))}
-        </div>
-        <span
-          className={[
-            'text-[9px] font-semibold uppercase tracking-[0.2em]',
-            noise >= 2 ? 'text-red-300' : noise === 1 ? 'text-amber-300' : 'text-slate-400',
-          ].join(' ')}
-        >
-          {t(`questS1Lab.noise.l${Math.min(noise, 3)}`)}
-        </span>
-      </div>
-      {threat && (
-        <div className={`mt-1 text-[9px] uppercase tracking-[0.2em] ${noise >= 3 ? 'text-red-400' : 'text-slate-500'}`}>
-          {threat} {t('questS1Lab.noise.tower')}
-        </div>
-      )}
-    </div>
+      {t(sveglio ? 'questS1Lab.camp.awake' : 'questS1Lab.camp.alerted')}
+    </span>
   );
 };
 
@@ -460,7 +427,7 @@ const QuestS1LabPage: React.FC = () => {
               <span className="rounded-full border border-amber-300/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
                 {run.gold} {t('questS1Lab.gold')}
               </span>
-              <NoiseMeter noise={run.noise} />
+              <CampAlertBadge flags={run.flags} />
               {run.objectiveDone && (
                 <span
                   className={[

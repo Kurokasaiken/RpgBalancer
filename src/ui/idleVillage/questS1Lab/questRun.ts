@@ -50,9 +50,7 @@ export interface QuestRunState {
   loot: string[];
   info: string[];
   flags: string[];
-  /** Escalating danger inside the camp: 0 quieto → 1 sospetto → 2 allarme → 3 risveglio. */
-  noise: number;
-  /** Derived: noise >= 2 applies the difficulty penalty to checks. */
+  /** Derived: campoSveglio applies the difficulty penalty to checks. */
   alarm: boolean;
   objectiveDone: boolean;
   ended: boolean;
@@ -312,7 +310,6 @@ export function createRun(presetId: string, seed: number): QuestRunState {
     loot: [],
     info: [],
     flags: [],
-    noise: 0,
     alarm: false,
     objectiveDone: false,
     ended: false,
@@ -429,19 +426,30 @@ function intelBonusFor(state: QuestRunState, node: QuestNode): { bonus: number; 
   return null;
 }
 
-/** Escalate the camp's alertness. alarm = noise>=2; noise 3 = the thing wakes. */
-function raiseNoise(state: QuestRunState, ticks: number, reason: string): void {
-  const before = state.noise;
-  state.noise = Math.min(3, state.noise + ticks);
-  state.alarm = state.noise >= 2;
-  if (state.noise === before) return;
-  if (state.noise >= 3) {
-    state.log.push({ kind: 'INFO', text: `RUMORE ◉◉◉ — ${reason} Qualcosa si sta svegliando nella torre.` });
-  } else if (state.noise === 2) {
-    state.log.push({ kind: 'INFO', text: `RUMORE ◉◉○ — ${reason} Il campo è in allarme: i check saranno più difficili.` });
-  } else {
-    state.log.push({ kind: 'INFO', text: `RUMORE ◉○○ — ${reason} Il campo è sospettoso.` });
+/**
+ * Escalate the camp's alertness — named states, not a meter (Director
+ * 2026-10-03: noise meter removed; the camp is quieto / allertato / sveglio).
+ * quiet + fail → campoAllertato (a warning, no mechanical penalty).
+ * campoAllertato + fail, or quiet + epicfail → campoSveglio (+alarm, −10pp).
+ * Any bad verdict while already sveglio → the thing in the tower wakes
+ * (caller diverts to 'risveglio'). Returns true when the camp must wake.
+ */
+function escalateCamp(state: QuestRunState, epicfail: boolean, reason: string): boolean {
+  if (state.flags.includes('campoSveglio')) {
+    state.log.push({ kind: 'INFO', text: `${reason} Qualcosa si sta svegliando nella torre.` });
+    return true;
   }
+  const allertato = state.flags.includes('campoAllertato');
+  if (allertato || epicfail) {
+    if (!allertato) state.flags.push('campoAllertato');
+    state.flags.push('campoSveglio');
+    state.alarm = true;
+    state.log.push({ kind: 'INFO', text: `${reason} Il campo si sveglia: urla e torce ovunque — i check saranno più difficili.` });
+    return false;
+  }
+  state.flags.push('campoAllertato');
+  state.log.push({ kind: 'INFO', text: `${reason} Qualcuno nel campo ha sentito qualcosa.` });
+  return false;
 }
 
 /**
@@ -613,9 +621,8 @@ export function memberRisk(
  * Node-specific, hardcoded — this quest's authored matrix, not a system.
  */
 /**
- * Checks made while INSIDE the camp tick the noise meter on failure.
- * Noise is the quest's dramatic accumulator — the thing in the tower
- * pays off at 3.
+ * Checks made while INSIDE the camp escalate the camp's alertness on
+ * failure — quieto → allertato → sveglio → the thing in the tower wakes.
  */
 const INSIDE_CHECKS = new Set([
   'check-ingresso-agi',
@@ -631,14 +638,15 @@ const INSIDE_CHECKS = new Set([
 function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdict): string {
   const success = verdict === 'win' || verdict === 'bigwin' || verdict === 'almost';
   const bad = verdict === 'fail' || verdict === 'epicfail';
+  let wake = false;
   if (INSIDE_CHECKS.has(node.id) && bad) {
-    raiseNoise(state, verdict === 'epicfail' ? 2 : 1, node.title + '.');
+    wake = escalateCamp(state, verdict === 'epicfail', node.title + '.');
   }
   const next = applyNodeOutcome(state, node, verdict, success, bad);
   // The thing in the tower wakes: Chekhov's gun fires. The check's effects
   // have already landed (you grab the crate AS it wakes) — only the
   // destination is hijacked.
-  if (state.noise >= 3 && node.id !== 'risveglio') {
+  if (wake && node.id !== 'risveglio') {
     return 'risveglio';
   }
   return next;
@@ -667,10 +675,13 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       }
       return 'approccio';
     case 'check-ingresso-forza':
-      raiseNoise(state, 1, 'lo scontro si sente in tutto il campo.');
-      // Forcing the entry wakes the camp for good: the quiet way out is gone.
-      if (!state.flags.includes('campoSveglio')) state.flags.push('campoSveglio');
-      if (state.noise >= 3) return 'risveglio';
+      // Forcing the entry wakes the camp for good, whatever the roll says:
+      // the quiet way out is gone and checks run under alarm.
+      if (!state.flags.includes('campoSveglio')) {
+        state.flags.push('campoSveglio');
+        state.alarm = true;
+        state.log.push({ kind: 'INFO', text: 'Lo scontro si sente in tutto il campo: è sveglio, e resterà sveglio.' });
+      }
       return 'perquisizione';
     case 'check-ingresso-agi':
     case 'check-ingresso-cha':
@@ -705,13 +716,13 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       }
       return 'rientra-o-rischi';
     case 'check-forziere':
-      raiseNoise(state, 1, 'il forziere cigola.');
       if (success) {
         state.gold += 15;
         state.loot.push('forziere goblin');
         state.log.push({ kind: 'LOOT', text: 'Forziere goblin: +15 gold.' });
       }
-      if (state.noise >= 3) return 'risveglio';
+      // The chest creaks even on success — greed is loud. Loot already in hand.
+      if (escalateCamp(state, false, 'Il forziere cigola.')) return 'risveglio';
       return 'estrazione';
     case 'risveglio':
       if (success) {
@@ -789,13 +800,6 @@ function enterNode(state: QuestRunState, nodeId: string): void {
   if (!node) return;
   state.nodeId = nodeId;
   state.log.push({ kind: 'NODE', text: node.title });
-
-  // The extraction reads the state the run wrote: if the camp is in alarm the
-  // quiet way out does not exist. campoSveglio gates it (see estrazione node).
-  if (nodeId === 'estrazione' && state.alarm && !state.flags.includes('campoSveglio')) {
-    state.flags.push('campoSveglio');
-    state.log.push({ kind: 'INFO', text: 'Il campo è in allarme — tornare nell’ombra non è più possibile.' });
-  }
 
   // Check nodes resolve as soon as they are reached: the choice that led here
   // already committed the party; resolution is the consequence.

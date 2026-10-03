@@ -1111,21 +1111,14 @@
       "fail_dead": "DEFEAT · FALLEN",
       "epicfail": "RUIN"
     },
-    "noise": {
-      "label": "Noise",
-      "l0": "QUIET",
-      "l1": "SUSPICION",
-      "l2": "ALARM",
-      "l3": "AWAKENING",
-      "threat1": "◈ stirs in its sleep",
-      "threat2": "◈ is waking up",
-      "threat3": "◈ has awakened",
-      "tower": "— the tower",
-      "tooltip": "Noise accumulates: every failure inside the camp raises it. At 3 ticks something wakes up."
-    },
     "gold": "gold",
     "chestTaken": "Crate in hand — not secured",
     "chestLost": "Crate lost",
-    "onFail": "If it fails: {text}"
+    "onFail": "If it fails: {text}",
+    "camp": {
+      "alerted": "Camp alerted",
+      "awake": "Camp awake",
+      "tooltip": "The camp heard something. Another misstep and it erupts — and the quiet way out closes."
+    }
   }
 }

@@ -1132,21 +1132,14 @@
       "fail_dead": "SCONFITTA · CADUTO",
       "epicfail": "ROVINA"
     },
-    "noise": {
-      "label": "Rumore",
-      "l0": "QUIETO",
-      "l1": "SOSPETTO",
-      "l2": "ALLARME",
-      "l3": "RISVEGLIO",
-      "threat1": "◈ si agita nel sonno",
-      "threat2": "◈ si sta svegliando",
-      "threat3": "◈ si è svegliata",
-      "tower": "— la torre",
-      "tooltip": "Il rumore accumula: ogni fallimento dentro il campo lo fa salire. A 3 tacche qualcosa si sveglia."
-    },
     "gold": "oro",
     "chestTaken": "Cassa in mano — non al sicuro",
     "chestLost": "Cassa perduta",
-    "onFail": "Se fallisce: {text}"
+    "onFail": "Se fallisce: {text}",
+    "camp": {
+      "alerted": "Campo allertato",
+      "awake": "Campo sveglio",
+      "tooltip": "Il campo ha sentito qualcosa. Un altro passo falso ed esplode — e la via tranquilla si chiude."
+    }
   }
 }
