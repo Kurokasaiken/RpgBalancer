@@ -1827,3 +1827,14 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Stato:** `fatta`
 **Desiderata FROZEN:** `.mw/desiderata.md` v1 (adozione protocollo Mind Weaver in RPG).
 **Cosa è successo:** creato il primitive **`HudPanel`** (`src/ui/idleVillage/skins/primitives/HudPanel.tsx`, export in index): pannello flottante con la lingua materica di `HudRibbon` — silhouette a ottagono smussato, filet oro perimetrale, filigree interno a 4px, lacquer fill, drop-shadow via `filter` che segue il clip-path; tutto su token `--skin-*`. Applicato ai tre punti con ricetta piatta duplicata: `HudEventLedger` (era `PANEL_STYLE` inline radius-14 + bordo hardcoded), `DirectorPanel` (stessa ricetta copiata), pill speed di `HudAstrolabe` (`cutPx={7}`); bordi strip del ledger e colore bottoni pill tokenizzati. Non toccati: `HudCompass`/`EdgeDressing` (placeholder art dichiarata), `HudHangingTag` (pergamena con identità propria), `SpeedControl`/`ResourceMedallion`/`WhenWhereCluster`/`ResourceReadout` (già su primitives Materic). Safeguard: test ledger 4/4 ✅, `build:check` ✅, `kanban:lint` ✅, route 200. Evidence: `test-results/r080-hud-panel-primitive-2026-10-01.log`. **Da verificare a occhio:** resa visiva dei bordi su `/game-frame` e `/game-frame-pixi`.
+
+---
+
+## R-081 — Piano di cambiamento S1 (v4) da playtest + critiche web, poi broadcast alle AI web
+
+**Richiesta:** *"fa un plan d cambiamento, poi mandalo alle ai web"* — consolidare la critica interna e le risposte dei web-AI in un piano di cambiamento concreto per la quest S1, poi sottoporlo agli stessi provider web.
+**Data:** 2026-10-03
+**Stato:** `in corso` — v4 scritta e broadcast; serve v5 col feedback
+**Desiderata FROZEN:** `.mw/desiderata.md` v23 + desiderata S1-quest-interessante (PLAN-019). R-076 genitore.
+**Scope adottato:** piano in `.mw/runs/20261003-s1-change-plan/change-plan.md` — 11 cambiamenti ordinati per ROI. Invarianti S1 preservate; noise dichiarato stealth-specifico, non universale.
+**Cosa è successo:** broadcast a 5 provider web — chatgpt MINOR REVISION, claude/grok/deepseek NO al gate così com'è ("spreadsheet con stato"). Convergenze in `.mw/runs/20261003-s1-change-plan/synthesis.md`. Poi: deep research multi-provider via Canary/CDP (ChatGPT Deep Research ✓, DeepSeek DeepThink+Search ✓, Grok-free debole con falsi negativi, Claude free-cap) — risposte in `.mw/runs/20261003-quest-science-deepresearch/`. Wiki vivo `context/QUEST_GAMEPLAY_SCIENCE.md` (~60 fonti verificate, principi P1–P47, correzioni + gap). Proposta redesign `.mw/runs/20261003-quest-v6-science/quest-v6.md` (TAKEN≠SECURED, estrazione come gioco). Playtest live seed 1983 documentato (`playtest-seed1983.md`): confermata la diagnosi — 6 WIN/6, estrazione inesistente, Kran morto su WIN reso come log. Prossimo passo: decisione del Director su spec implementativa v6.
