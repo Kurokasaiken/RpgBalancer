@@ -8,12 +8,16 @@
 // @ts-nocheck
 
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
+import { stepGuidedBall } from './ballGuidance';
 import { createTarGooRenderer } from './tarGooRenderer';
 import { createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
 export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number; mode?: string;
+  /** Host-resolved harm to mirror on the card — when a forced `mode` is active
+      the astrolabe must represent the host's outcome, never re-roll it. */
+  harm?: 'none'|'wound'|'death';
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
@@ -380,7 +384,7 @@ const scene={
   starScale:0,
   pourP:0, streamAlpha:0,
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
-  snapFrom:null,
+  snapMs:0, snapped:false,
   shocks:[], rimHits:[], sparks:[],
   gooRipple:0,                          // boosts displacement scale
   gooReveal:0,                          // 0 in idle → goo wells up cinematically
@@ -477,6 +481,7 @@ function launchRoll(){
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
   scene.warp=0;
+  scene.snapMs=0; scene.snapped=false;
   scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0;
   armed=false; emitArmed(false);
   /* panel result removed */
@@ -614,9 +619,32 @@ function tickTimeline(){
   else if(s==='the-spin'){
     const p=phaseT(cfg.tSpin);
     stepBall(p);
-    /* when ball effectively stops, resolve immediately rather than waiting */
+    /* when ball effectively stops, go into the magnetic snap — the ball
+       lands visibly on its verdict point before the card shows */
     const spd=Math.hypot(scene.ball.vx,scene.ball.vy);
-    if(p>=1||(p>0.7&&spd<0.4)){ resolve(); }
+    if(p>=1||(p>0.7&&spd<0.4)){
+      setState('magnetic-snap');
+    }
+  }
+  else if(s==='magnetic-snap'){
+    /* SEAMLESS ARRIVAL + HOLD — nessun lerp: la STESSA fisica dello spin
+       continua a piena guida finche' la pallina non si ferma da sola sul
+       target (arrive steering → velocita' ~0). Poi beat di lettura e card. */
+    const now=performance.now();
+    const dt=Math.min(40,now-lastBallT); lastBallT=now;
+    physicsStep(1,dt/16.7);
+    const b=scene.ball;
+    const parked=!scene.targetPos
+      ||(Math.hypot(b.x-scene.targetPos.x,b.y-scene.targetPos.y)<4
+         &&Math.hypot(b.vx,b.vy)<0.6);
+    if(parked&&!scene.snapped){
+      scene.snapped=true; scene.snapMs=now;
+      addSpark(b.x,b.y); shake('shake-low');
+    }
+    const HOLD_MS=900;
+    if((scene.snapped&&now-scene.snapMs>=HOLD_MS)||phaseT(cfg.tSnap+HOLD_MS)>=1){
+      scene.snapped=false; resolve();
+    }
   }
   /* decay one-shot fx */
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
@@ -686,74 +714,41 @@ function fireBall(){
   b.vx=Math.cos(a)*sp; b.vy=Math.sin(a)*sp;
 }
 let lastBallT=performance.now();
+/* SEAMLESS GUIDANCE — il Director: «non si deve capire che c'e' una
+   forzatura». La fisica vive in ./ballGuidance (modulo puro, testato
+   headless): Reynolds Arrive steering — la pallina rallenta SUL target da
+   sola, nessun magnete posizionale visibile. Qui restano solo i side-effect
+   visivi: scia, scintille, flash degli obelischi. */
+function physicsStep(grip,f){
+  const b=scene.ball;
+  const fric=Math.pow(0.9996-0.025*grip,f);
+  const chaos=1-grip*0.6;
+  const pillars=scene.blackPillars.concat(scene.whitePillars).map(pl=>({
+    x:CX+Math.cos(pl.ang)*pl.r, y:CY+Math.sin(pl.ang)*pl.r, landed:pl.landed}));
+  const ev=stepGuidedBall(b,{
+    grip, f, fric, chaos,
+    cx:CX, cy:CY,
+    wallEdgeAt:(a)=>rCheckAt(a),
+    pillars, pillarHitR:24,
+    target:scene.targetPos,
+  });
+  /* NIENTE PINBALL visivo — il rimbalzo resta nella fisica, non in grafica. */
+  if(ev.wallHit) addSpark(ev.wallHit.x,ev.wallHit.y);
+  for(const h of ev.pillarHits){
+    const pl=scene.blackPillars.concat(scene.whitePillars)[h.index];
+    if(pl) pl.flash=1;
+    addSpark(h.x,h.y);
+  }
+}
 function stepBall(p){
   const b=scene.ball;
   if(!b.on) return;
   const now=performance.now();
   let dt=Math.min(40,now-lastBallT); lastBallT=now;
   const f=dt/16.7;
-
-  /* Cinematic deceleration + optional target magnetism (for forced verdicts). */
   const decayStart=0.30;
   const grip=clamp((p-decayStart)/(1-decayStart),0,1);
-  const fric=Math.pow(0.9996-0.025*grip,f);
-  b.vx*=fric; b.vy*=fric;
-  /* Magnetic pull toward target zone — grows from 0 at p=0.55 to max at p=1 */
-  if(grip>0.45 && scene.targetPos){
-    const mag=clamp((grip-0.45)/0.55,0,1)*0.022;
-    b.vx+=(scene.targetPos.x-b.x)*mag*f;
-    b.vy+=(scene.targetPos.y-b.y)*mag*f;
-  }
-  b.x+=b.vx*f; b.y+=b.vy*f;
-  /* scatter amount: full early, fades as ball slows */
-  const chaos=1-grip*0.6;
-
-  /* NON-SPECULAR bounce — reflect + random scatter so no clean mirror paths */
-  const chaoticBounce=(nx,ny,extra)=>{
-    const dot=b.vx*nx+b.vy*ny;
-    if(extra&&dot>=0) return false;
-    b.vx-=2*dot*nx; b.vy-=2*dot*ny;
-    const ang=(Math.random()*2-1)*0.55*chaos;
-    const cs=Math.cos(ang), sn=Math.sin(ang);
-    const rvx=b.vx*cs-b.vy*sn, rvy=b.vx*sn+b.vy*cs;
-    b.vx=rvx; b.vy=rvy;
-    const tx=-ny, ty=nx;
-    const spin=(Math.random()*2-1)*2.6*chaos;
-    b.vx+=tx*spin; b.vy+=ty*spin;
-    const rest=0.92+Math.random()*0.08;
-    b.vx*=rest; b.vy*=rest;
-    const od=b.vx*nx+b.vy*ny;
-    if(od>0){ b.vx-=2*od*nx; b.vy-=2*od*ny; }
-    return true;
-  };
-
-  /* CHALLENGE SURFACE bounce — ball is strictly confined inside rCheckAt */
-  const d=dist(b.x,b.y);
-  const aB=angOf(b.x,b.y), edge=rCheckAt(aB)-b.r;
-  if(d>edge){
-    const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
-    chaoticBounce(nx,ny,false);
-    b.x=CX+nx*edge; b.y=CY+ny*edge;
-    /* NIENTE PINBALL. Il Director, due volte: «c'e' ancora l'effetto pinball
-       con dei segmenti che si illuminano rispetto a dove colpisce la pallina,
-       non ci devono essere». Il segmento acceso dice «hai colpito QUI», cioe'
-       trasforma un rimbalzo in un punteggio: e' il linguaggio del flipper, non
-       quello di una prova. L'evento resta nella fisica, non nella grafica. */
-    addSpark(b.x,b.y);
-  }
-
-  /* pillar bounce (skip when ball is nearly stopped) */
-  if(grip<0.9){
-    scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{
-      if(!pl.landed) return;
-      const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
-      const dx=b.x-px, dy=b.y-py, dd=Math.hypot(dx,dy);
-      if(dd<24){
-        const nx=dx/(dd||1), ny=dy/(dd||1);
-        if(chaoticBounce(nx,ny,true)!==false){ b.x=px+nx*24; b.y=py+ny*24; pl.flash=1; addSpark(b.x,b.y); }
-      }
-    });
-  }
+  physicsStep(grip,f);
 
   b.trail.push({x:b.x,y:b.y,life:480});
   for(let i=b.trail.length-1;i>=0;i-=1){
@@ -797,12 +792,22 @@ function resolve(){
   const _d=Math.hypot(b.x-CX,b.y-CY);
   console.log(`[resolve] ball=(${(b.x-CX).toFixed(1)},${(b.y-CY).toFixed(1)}) dist=${_d.toFixed(1)} rStar=${rStarAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} rCheck=${rCheckAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} spd=${Math.hypot(b.vx,b.vy).toFixed(2)}`);
   const _sv=spatialVerdict(b.x,b.y);
-  const forced=(cfg.mode&&cfg.mode!=='random'&&['bigwin','win','almost','fail','epicfail'].includes(cfg.mode))?cfg.mode:null;
+  const forced=(cfg.mode&&cfg.mode!=='random'&&['bigwin','win','almost','fail','epicfail','fail_wound','fail_dead'].includes(cfg.mode))?cfg.mode:null;
   let verdict=forced||_sv;
   let dead=false, wounded=false, riskRoll=0;
   if(verdict==='fail_dead'){verdict='fail';dead=true;riskRoll=1;}
   else if(verdict==='fail_wound'){verdict='fail';wounded=true;riskRoll=cfg.dead+1;}
   else{const rr=spatialRiskRoll();dead=rr.dead;wounded=rr.wounded;riskRoll=rr.riskRoll;}
+  /* Representation honesty (Director: «la geometria rappresenta, non decide»):
+     when the host forced the verdict, the Ferito/Caduto chips mirror the
+     host-resolved harm (`cfg.harm`) — a second internal dice roll would let
+     the card contradict the quest engine (e.g. «VITTORIA · Caduto» when
+     nobody died). */
+  if(forced){
+    if(cfg.harm==='death'){dead=true;wounded=false;riskRoll=1;}
+    else if(cfg.harm==='wound'){dead=false;wounded=true;riskRoll=cfg.dead+1;}
+    else if(cfg.harm==='none'){dead=false;wounded=false;riskRoll=cfg.dead+cfg.wound+1;}
+  }
   const skillIndex=getSkillIndexFromAngle(b.x,b.y);
   recomputeGeometry(skillIndex);
   scene.res={verdict,roll:0,riskRoll,skillIndex,wounded,dead};
@@ -822,7 +827,10 @@ function resolve(){
   }).join('');
   $id('cardSeal').textContent=V.seal;
   $id('cardSub').textContent=V.sub;
-  const posZone=inStar(b.x,b.y)?'Nella Stella':'Fuori dalla Stella';
+  /* «Nella/Fuori dalla Stella» follows the VERDICT, not the raw landing point:
+     the magnetism is soft, so a forced win can physically rest just outside
+     the star edge — printing «fuori» under «VITTORIA» would contradict it. */
+  const posZone=(verdict==='bigwin'||verdict==='win')?'Nella Stella':'Fuori dalla Stella';
   $id('cardNums').textContent=posZone;
   const chips=$id('cardChips');
   chips.innerHTML='';
@@ -1866,7 +1874,7 @@ function drawBall(now){
   });
   ctx.globalAlpha=1;
   /* the energy pinball */
-  const pulse=scene.state==='resolution'?1+.08*Math.sin(now/120):1;
+  const pulse=(scene.state==='resolution'||scene.state==='magnetic-snap')?1+.08*Math.sin(now/120):1;
   const r=b.r*pulse;
   const halo=ctx.createRadialGradient(b.x,b.y,r*.5,b.x,b.y,r*4);
   halo.addColorStop(0,'rgba(255,236,170,.5)'); halo.addColorStop(.5,'rgba(252,232,144,.12)'); halo.addColorStop(1,'transparent');
@@ -1877,6 +1885,14 @@ function drawBall(now){
   ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,r,0,TAU); ctx.fill();
   ctx.lineWidth=1.4; ctx.strokeStyle='rgba(255,244,200,.95)'; ctx.stroke();
   ctx.shadowBlur=0;
+  /* Landing imprint — once the ball has snapped to its verdict point, a soft
+     breathing ring marks «it stopped HERE» while the card hasn't shown yet. */
+  if(scene.snapped||scene.state==='resolution'){
+    ctx.globalAlpha=.55; ctx.strokeStyle='rgba(252,232,144,.85)';
+    ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.r+7+2*Math.sin(now/160),0,TAU); ctx.stroke();
+    ctx.globalAlpha=1;
+  }
 }
 
 /* blueprint preview in idle — zones update live as sliders move */
