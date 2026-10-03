@@ -1,7 +1,7 @@
 ---
 title: Quest Gameplay Science — what research says makes a quest worth playing
 type: reference
-updated: 2026-10-03 (batch 3: DeepSeek DeepThink+Search merged; Grok checked, weak — mostly UNVERIFIED + 2 false negatives)
+updated: 2026-10-03 (batch 3 + live playtest evidence, seed 1983)
 tags: quest design psychology suspense failure choices research
 ---
 
@@ -698,6 +698,31 @@ table. Juice is a multiplier around a zero.
 | 12-15s Astrolabe × 5 checks | P7 without P2 | anticipation budget burned on low-stakes rolls |
 | Deterministic across runs | Sylvester (unique decisions) | run 2 is already solved |
 | Secondary stats undeclared | — | player can't plan (cage needs STR, undeclared) |
+
+### Live playtest evidence (2026-10-03, seed 1983, Preset D → VICTORY)
+
+Instrumented run via Puppeteer — full chronicle in
+`.mw/runs/20261003-quest-v6-science/playtest-seed1983.md`. Findings the
+static audit could not see:
+
+- **Extraction phase does not exist in code.** After the chest roll the
+  run self-concludes ("La spedizione è finita"). TAKEN == SECURED today.
+- **Death-on-WIN rendered as log lines.** Kran died intercepting for Ivo
+  on a WIN 75-vs-74: `[INTERCEPT]`+`[DEATH]` with no beat, no
+  attribution line, and his card still shows HP 10/10 while DEAD.
+  → P11 violation observed live.
+- **"WIN" is a near-false verdict** — the harm band applies even on
+  success (Ivo wounded 3×, two on WINs): WIN = "success AND damage
+  anyway". Verdict taxonomy does not communicate real cost.
+- **Objective check auto-resolved** ("ROLL 1 OF 2") — the single
+  decision that mattered was executed without input or commit surface.
+- **Noise meter still live but inert** — prints `RUMORE ◉○○`, no
+  consequence on the short path. Parked decision ≠ parked code.
+- **Failure path unreachable on prudent play** — 6 WIN / 6 rolls; a FAIL
+  cannot be observed by playing well. → P1/P2 confirmed live: belief
+  variance ≈ 0.
+- **Victory card ignores cost** — death, rescued prisoner, accumulated
+  noise unaccounted; the end does not narrate the *how* → P11/peak-end.
 
 ### Structural fixes implied (not new systems)
 
