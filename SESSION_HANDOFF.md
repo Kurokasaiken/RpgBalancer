@@ -1,5 +1,37 @@
 # Session Handoff — 2026-10-03
 
+## 2026-10-03 (sera) — Slice v6 minimo IMPLEMENTATO e committato (`b35295c6`)
+
+- **Approvato dal Director:** *"solo TAKEN→SECURED + estrazione a 3 forme + epilogo col costo."*
+- **Implementato** in `questS1Lab` (lab isolato, non engine generale):
+  - `estrazione` = nuovo nodo choice tra `rientra-o-rischi` e `ritorno`; la cassa
+    è `objectiveDone` = TAKEN, diventa SECURED solo arrivando a `ritorno` vivi.
+    `cassaPersa` flag la segna come persa; `flee()` la molla (panico ≠ save gratis).
+  - 3 rotte meccaniche: `exit-breach` (requiresFlag `prigionieroLibero`),
+    `exit-quiet` (hiddenIfFlag `campoSveglio` — settato da ingresso forzato o
+    allarme all'ingresso dell'estrazione), `exit-alarm` (sempre, F25/M8).
+    Fail estrazione → il prezzo è il bottino/cassa, dichiarato via `failHint`
+    in preview ("Se fallisce: …").
+  - Epilogo composto in `endRun` (`composeEndingText`): morti per nome, cassa
+    persa, prigioniero salvato, bottino portato a casa — su reward/survived/
+    fled/wipe. Badge cassa: ambra "in mano" → smeraldo "recuperata" / rosso "persa".
+- **Fix correlati dalla stessa evidenza:** (1) epicfail confinato nella banda M
+  dichiarata — un check M0 non uccide più (regola Director); (2) bug pre-esistente:
+  noise≥3 dirottava a `risveglio` PRIMA di applicare gli effetti del check —
+  una presa cassa riuscita a noise 2→3 veniva scartata in silenzio. Ora gli
+  effetti atterrano, poi la destinazione viene dirottata. (3) morti attribuite
+  nel log al check che le ha causate + hp=0 sui morti.
+- **Verificato:** 24/24 unit test (10 nuovi), build:check ✓, kanban:lint ✓,
+  route 200, 2 playtest live Puppeteer (SURVIVED con epilogo costo + WIPE con
+  morti nominati "su «Qualcosa si sveglia nella torre»").
+- **Evidence:** `test-results/r-081-quest-s1-taken-secured-2026-10-03.log`.
+- **Nota osservata:** entrambe le run live hanno preso il path `risveglio`
+  (noise 3) invece del nodo `estrazione` — il nodo choice è coperto da unit
+  test ma manca la verifica "felt" in-browser sul path quiet. Cosmetic:
+  l'astrolabe continua a drenare la coda THROW anche dopo il wipe.
+- **Gate da validare col playtester umano:** "sai dire cosa hai perso e per
+  quale tua scelta?"
+
 ## 2026-10-03 — Deep research multi-provider, wiki scientifico, proposta v6, playtest live
 
 - **Wiki vivo creato:** `context/QUEST_GAMEPLAY_SCIENCE.md` (committato `107706f9`, indicizzato

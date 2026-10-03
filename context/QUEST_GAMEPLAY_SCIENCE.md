@@ -744,6 +744,24 @@ static audit could not see:
    long reveals habituate (P26); reserve the full ceremony for the
    climax/extraction beats (P7 under P26).
 
+### Implementation status (2026-10-03, commit b35295c6)
+
+The Director-approved minimal slice landed: TAKEN→SECURED state, the
+`estrazione` choice node with three mechanically-gated routes (breach
+requires the freed prisoner; calm field requires the camp never woke —
+`campoSveglio` flag; hostile field always at declared price F25/M8 with
+`failHint` shown in preview), and a composed epilogue naming deaths, the
+lost crate, the saved prisoner, and loot brought home. Correlated fixes
+from the same evidence: epicfail now confined inside the declared M band
+(M0 checks cannot kill — Director rule enforced in `resolveCheckHarms`);
+the noise≥3 divert now applies check effects before hijacking the
+destination (a successful crate grab at noise 3 was silently discarded);
+deaths attribute the causing check in the log. 24/24 unit tests + two
+live runs (SURVIVED-with-cost, WIPE-with-named-deaths). Evidence:
+`test-results/r-081-quest-s1-taken-secured-2026-10-03.log`. Validation
+gate now pending on human playtest: "can you say what you lost and for
+which choice?"
+
 ## Parked / to research next
 
 - Noise meter: parked by Director 2026-10-03 — stealth-specific idea for
