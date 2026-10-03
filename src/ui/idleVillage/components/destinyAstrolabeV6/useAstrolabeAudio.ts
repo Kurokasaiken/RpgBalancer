@@ -16,7 +16,7 @@ export function useAstrolabeAudio(muted: boolean) {
   const buffers = useRef<Partial<Record<SoundKey, AudioBuffer>>>({});
 
   const getCtx = useCallback((): AudioContext => {
-    if (!ctxRef.current) ctxRef.current = new AudioContext();
+    if (!ctxRef.current || ctxRef.current.state === 'closed') ctxRef.current = new AudioContext();
     return ctxRef.current;
   }, []);
 
@@ -61,7 +61,13 @@ export function useAstrolabeAudio(muted: boolean) {
   }, [muted, getCtx]);
 
   useEffect(() => {
-    return () => { ctxRef.current?.close(); };
+    return () => {
+      const ctx = ctxRef.current;
+      ctxRef.current = null;
+      // StrictMode double-mount can race this close; the promise rejects on
+      // an already-closed context.
+      ctx?.close().catch(() => {});
+    };
   }, []);
 
   return play;

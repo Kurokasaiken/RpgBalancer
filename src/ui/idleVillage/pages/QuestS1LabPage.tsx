@@ -18,7 +18,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PARTY_PRESETS, PRIMARY_STATS, QUEST_BEATS, SCENARIO_NODES } from '@/ui/idleVillage/questS1Lab/questScenario';
+import { INTEL_LABELS, PARTY_PRESETS, PRIMARY_STATS, QUEST_BEATS, SCENARIO_NODES } from '@/ui/idleVillage/questS1Lab/questScenario';
 import {
   applyChoice,
   availableOptions,
@@ -488,7 +488,7 @@ const QuestS1LabPage: React.FC = () => {
               </div>
             )}
             {run.loot.length > 0 && <div className="mt-2">{t('questS1Lab.loot', { items: run.loot.join(', ') })}</div>}
-            {run.info.length > 0 && <div className="mt-1 text-slate-400">{t('questS1Lab.intel', { items: run.info.join(', ') })}</div>}
+            {run.info.length > 0 && <div className="mt-1 text-slate-400">{t('questS1Lab.intel', { items: run.info.map((key) => INTEL_LABELS[key] ?? key).join(', ') })}</div>}
           </div>
         </section>
 
