@@ -417,6 +417,7 @@ const stateChip=$id('stateChip');
 function emitState(s){ try{ if(typeof opts!=='undefined'&&opts&&opts.onState) opts.onState(s); }catch(e){} }
 function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) opts.onArmed(b); }catch(e){} }
 let armed=false;                 // true while the TIRA button should be shown
+let rollStarted=false;           // true after the first launchRoll — user input may never re-roll
 function setState(s){
   scene.state=s; scene.t0=performance.now();
   suite.dataset.state=s;
@@ -484,6 +485,7 @@ function launchRoll(){
   scene.snapMs=0; scene.snapped=false;
   scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0;
   armed=false; emitArmed(false);
+  rollStarted=true;
   /* panel result removed */
   /* ACT 0 — the Sun-Bronze ring slams into place like an ancient telescope lens */
   scene.ringShaken=false;
@@ -2021,16 +2023,27 @@ function updateResultPanel(preOnly){
   }
 })();
 
-$id('launch').addEventListener('click',()=>{ armed?throwBall():launchRoll(); });
-window.addEventListener('keydown',e=>{
-  if(e.code==='Space'&&!e.repeat){ e.preventDefault(); armed?throwBall():launchRoll(); }
-});
+/* Launch input: TIRA throws while armed; the very first click may launch the
+   roll only if the host did not autoStart one. Once a roll has started, user
+   input can NEVER restart the choreography — re-rolls belong to the host via
+   engine.roll() (queued checks). Previously a click during the reveal called
+   launchRoll() and wiped the whole sequence mid-flight. */
+function onLaunchInput(){
+  if(!engineAlive) return;
+  if(armed){ throwBall(); return; }
+  if(!rollStarted) launchRoll();
+}
+function onKeydown(e){
+  if(e.code==='Space'&&!e.repeat){ e.preventDefault(); onLaunchInput(); }
+}
+let engineAlive = true;           // false after destroy — guards stray listeners
+$id('launch').addEventListener('click', onLaunchInput);
+window.addEventListener('keydown', onKeydown);
 
 recomputeGeometry();
 updateMathPanel();
 
   /* ---- public handle ---- */
-  let engineAlive = true;
   let rafId = requestAnimationFrame(frame);
   recomputeGeometry();
   function setConfig(newSkills, newConfig){
@@ -2045,6 +2058,11 @@ updateMathPanel();
       }
     }
   }
-  function destroy(){ engineAlive=false; cancelAnimationFrame(rafId); gooRenderer?.destroy(); }
+  function destroy(){
+    engineAlive=false;
+    cancelAnimationFrame(rafId);
+    window.removeEventListener('keydown', onKeydown);
+    gooRenderer?.destroy();
+  }
   return { roll: launchRoll, throw: throwBall, setConfig, destroy };
 }
