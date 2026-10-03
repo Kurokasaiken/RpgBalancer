@@ -1,47 +1,50 @@
-# Session handoff
+# Session Handoff — 2026-10-02
 
-**Current state:** `PLAN-017-stylized-sea-pattern-evaluation` attivo. Il Director ha richiesto e approvato di portare il pattern authored A1 in `WorldSurfaceTestPage` come overlay di debug/spike. Implementazione completata.
+## Current state
 
-**Desiderata FROZEN:** `.mw/desiderata.md` v19 (Water Effect Lab: shader custom condizionati, fallback DOM, profilazione).
+- **PLAN-019-S1 battezzato** (`plans/PLAN-019-S1-quest-interessante.md`): «La cassa delle
+  sementi» in lab isolato `/quest-s1-lab`. Criterio Director: *«nn ci interessa che funzioni,
+  deve essere divertente»* — le meccaniche rev.2 (verdetto→rischi, bodyguard, leader, wipe)
+  sono strumenti di tensione nella forma più economica, non sistemi da validare.
+- **Desiderata v24 rev.2 FROZEN**: reward = prova-obiettivo + leader vivo (non più ≥50% check);
+  riuscita dalla partenza compound; HP separati; rischi per slot; bodyguard solo su danni da
+  skill check. PLAN-019 aggiornato a v4; D-4/D-7 chiuse, D-8 superata, D-9 aperta.
+- Matrice di lavoro T-001 preparata: `.mw/runs/20261002-s1-quest-design/quest-design.md`.
 
-**Richiesta:** R-068 — Plan di implementazione per il mare Voronoi, riformulato in Stylized Sea Pattern Evaluation.
+## Next step
 
-**What was done:**
-- Generata texture `sea_pattern_tile.png` (2048x1448, RGBA trasparente) dal riferimento EPS/JPG con high-pass filter.
-- Scritto script riproducibile: `scripts/build-sea-pattern-tile.py`.
-- Creato preset config: `public/sea-spike-config.json`.
-- Riscritto `public/voronoi-sea-spike.html` per renderizzare la texture authored A0/A1 in world-space con micro-scroll.
-- Verificato `npm run build:check` ✅.
-- Preview iniziale: pattern visibile su `Stretto est` a zoom 0.24, patternScale 4500 wpx, lineOpacity 0.35, colore `#8bbac2`, moto 3 wpx / 18 s.
-- **Override Director:** portato lo spike in `WorldSurfaceTestPage` con overlay WebGL (`WorldSurfaceSeaPatternOverlay.tsx`), pulsante `Pattern` e pannello live "Sea pattern — live" / "Pattern mare — dal vivo". Maschera `sea_mask.webp`, ancoraggio world-space a zoom/pan, rispetto `prefers-reduced-motion`, config `public/world-surface-sea-pattern-config.json`.
-|- Aggiunto pulsante `Hide UI`/`Show UI` (default off) per nascondere header, pannelli e HUD lasciando solo la mappa.
+**T-002/T-003 implementati** (non committati): lab `/quest-s1-lab` giocabile end-to-end.
+File: `src/ui/idleVillage/questS1Lab/questScenario.ts` (contenuto hardcoded),
+`questRun.ts` (engine: RNG seedabile, verdetto→rischi per slot, bodyguard che intercetta
+tutti i danni da check, incidente non-check, death save 5%, wipe, fuga, mercante multi-acquisto),
+`src/ui/idleVillage/pages/QuestS1LabPage.tsx` (preset 4 party, stato, scelte, log),
+route registrata in `src/App.tsx`. Test: `tests/unit/idleVillage/questS1Lab/questRun.test.ts`
+(9/9 verdi). Prossimo: T-004 — playtest del Director + `S1-design-findings.md`.
 
-**URLs / files:**
-- Spike live: `http://localhost:5173/voronoi-sea-spike.html` (porta corrente del dev server).
-- World Surface live: `http://localhost:5173/world-surface`.
-- Browser preview del World Surface: `http://127.0.0.1:62674/world-surface`.
-- Screenshot spike: `test-results/sea-spike-screenshot.png`.
-- Screenshot World Surface normal: `test-results/world-surface-normal.png`.
-- Screenshot World Surface clean (UI off): `test-results/world-surface-clean.png`.
-- Texture: `public/assets/world/wanderlust/base/layers/sea_pattern_tile.png`.
-- Script build texture: `scripts/build-sea-pattern-tile.py`.
-- Script screenshot World Surface: `scripts/screenshot-world-surface-ui-toggle.cjs`.
+**2026-10-02 — UI redesign dopo critica Director** («pessimo lavoro di design, manca il bordo»):
+UI ricostruita sul linguaggio di WanderlustRosterCard (party: ritratto oro, nome Cinzel,
+ruolo+stato, barre HP/Stamina, riga stat; morto=grayscale, ferito=ring ambra) e
+QuestDetailPanel (pannelli `rounded-3xl border-amber-400/40 bg-black/75`, kicker tracked,
+InfoRow bordate). Skill check: **componente battezzato = DestinyAstrolabeV62**
+(`/minimal-destiny-astrolabe-v6-2`, tar-goo WebGL2), usato via `destinyAstrolabeV62Kit`
+con `config.mode`=verdetto forzato; bottone «continua» appare solo dopo `onResolve`
+(niente spoiler). Registrato in `COMPONENT_MASTER_INDEX.md`. Verificato in browser
+(intercettazione bodyguard → morte → reward persa). Evidence:
+`test-results/quest-s1-lab-redesign-2026-10-02.log`.
 
-**Next step:**
-- Valutazione visiva del pattern in `WorldSurfaceTestPage`; confermare opacità, densità e colore.
-- `SEA-01` reference board + `SEA-05` motion tuning: catturare screenshot A0 (statico) e A1 (moto) per i tre crop ai tre zoom e valutare percettivamente.
-- Poi implementare B (dual texture crossfade) e C (Voronoi challenger) per la comparativa.
+## Decisions made
 
-**Open questions:**
-- La texture sembra ancora un po' troppo "luce/caustica" rispetto a "linea disegnata". Serve un altro passo di processing per sparare i glints brillanti e/o un colore più desaturato.
-- Il pattern attuale è denso; il Director deve decidere se "molto rade" si ottiene abbassando opacità o serve una texture diversa.
-- `patternScale` 4500 wpx sembra un buon punto medio: celle ~50–100 px a schermo a zoom 0.24–0.30. Da confermare.
+- PLAN-019-S1 battezzato dopo 3 round critica web + critica ChatGPT incollata dal Director.
+- Preview compound fuori da S1 (feature di S3). Death save solo se manca il momento.
+- Skill check riusa i 5 verdetti dell'Astrolabe; nessuna teoria nuova.
+- Gate A = solo giudizio del Director sul core loop; FAIL classificato per causa.
 
-**Do not touch (salvo nuovo override):**
-- `WorldSurfaceRenderer`, `WorldSurfaceWaves`, ripple costiero, layer baked, TestHub finché non esce uno spike approvato.
-- `WorldSurfaceTestPage` è ora un overlay di spike autorizzato; non promuovere in produzione senza approvazione.
+## Do not touch
 
-**Rule candidates:**
-- Separazione tra parametri artistici e algoritmici per effetti condivisibili.
-- Gold standard authored vs challenger procedurale.
-- Pattern world-space: nessuna modalità viewport-space.
+- `missionResolver.ts` / PLAN-018 restano congelati: nessuna modifica al runtime quest finché
+  S1 non ha prodotto i design findings. Niente codice S1 che diventi modello generale.
+
+## Open questions
+
+- Nessuna decisione aperta: i parametri numerici sono mock iniziali in `quest-design.md`, da
+  ritoccare nel playtest. Death save 5% confermato; wipe = si perde tutto.

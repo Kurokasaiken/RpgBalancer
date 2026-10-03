@@ -599,5 +599,68 @@ tocca.** Mappatura completa da definire; secondaria per S1 (che può usare mock)
    affrontati resta valida; sotto soglia la quest è una sconfitta e non dà reward di quest. Sostituisce
    il "reward proporzionale ai successi" di MASTER_PLAN Phase 11. Il bottino raccolto durante la
    quest resta (regola della fuga, v24 rev.1 p.11).
+   **Superata 2026-10-02:** rev.2 lega la reward a una prova-obiettivo e al leader vivo; la soglia
+   ≥50% non decide più la vittoria (resta statistica descrittiva).
 
 **Fonte:** Director, sessione 2026-10-01.
+
+---
+
+## 2026-10-02 — Modello obiettivo/reward, compound, leader, bodyguard, rischi per slot
+
+**Da:** esplorazione sul significato della % di riuscita e delle conseguenze, durante la
+preparazione del plan figlio PLAN-019-S1. Drift registrato in
+`.mw/runs/20261002-plan-019-s1-deliberation/desiderata-drift.md`; avallo del Director con
+*"approvo"*.
+
+**A (desiderata v24 rev.2):**
+
+1. **Reward di quest ≠ conteggio check.** Una **prova-obiettivo precisa** assegna la reward;
+   bottino di fase e reward di quest sono categorie distinte: l'acquisito si tiene, le fasi vinte
+   possono dare extra, fuga = fallimento con bottino conservato.
+2. **Riuscita dalla partenza = compound.** La % vista per decidere se partire comprende rischi e
+   percorsi prima dell'obiettivo; non è la sola probabilità della prova finale. Consumabili e
+   scelte future la rendono una stima su ipotesi, non un valore assoluto.
+3. **Leader.** Slot speciale di spedizione; se il leader muore la reward di quest è persa, anche
+   a obiettivo già superato. Il board wipe resta possibile come esito estremo.
+4. **Rischi per slot.** Ferita/morte tirate per slot con % diverse; il verdetto del check di
+   gruppo modifica le chance **prima** dei tiri personali (`win` −5pp a entrambe, `fail`/`almost`
+   neutri; critici: `bigwin` downgrade morte→ferita, `epicfail` upgrade ferita→morte).
+5. **Bodyguard.** Slot opzionale che intercetta **solo** ferita/morte da skill check (non eventi,
+   spell, combattimenti, effetti diretti): sacrificio leggibile a favore degli slot protetti.
+6. **HP separati** da ferita/morte (D-7). Stop iterazioni S1 = parere del Director (D-4).
+7. **Aperte (D-9):** conseguenze dei fallimenti sulla prosecuzione, wipe, bodyguard su danni
+   multipli/ferito, quantità critici e cumulo con −5pp, death save candidato non approvato.
+
+**Implicazioni:** `missionResolver`/`memberPhaseRisk` attuali (rischi per membro indipendenti dal
+verdetto, cover additiva) **non** implementano questo modello; il piano S1 lo tratta come ipotesi
+da validare nel lab, il runtime si adegua in S2.
+
+**Fonte:** Director, sessione 2026-10-02; desiderata v24 rev.2.
+
+---
+
+## 2026-10-02 — PLAN-019-S1: criterio «divertente, non funzionante» + matrice quest-design
+
+**Da:** battesimo PLAN-019-S1 e chiusura delle decisioni aperte D-9 via Q&A con il Director.
+
+**A:**
+
+1. **Criterio S1:** *«nn ci interessa che funzioni, deve essere divertente»* — le meccaniche
+   rev.2 stanno nel lab come strumenti di tensione nella forma più economica, valutate al Gate
+   sul momento drammatico prodotto, non sulla correttezza.
+2. **Matrice chiusa** (`.mw/runs/20261002-s1-quest-design/quest-design.md`, integrazione
+   serale): leader = slot fisso
+   della quest; ferita = +rischio nei check successivi; wipe = tutti i PG morti; fonte
+   non-check = incidente in viaggio; bodyguard intercetta **tutti** i danni da check finché vivo;
+   `bigwin` = −5pp cumulati + downgrade; «continua ad esplorare» → fuggire non perde niente
+   (rischiano solo le vite); 4 preset incluso uno con bodyguard; nessuna keyword per il
+   modificatore in S1; **wipe = si perde tutto**; **death save dentro: 5%** su esito morte →
+   sopravvive ferito (mock, si calibra al Gate); parametri numerici = mock iniziali ragionevoli
+   fissati dall'AI nella matrice, da ritoccare nel playtest.
+3. **Meta-apprendimento (deriva multi-AI):** le critiche web tendevano a sgonfiare S1 verso il
+   prior «lean MVP», la deliberazione interna a gonfiarlo (timer, panel mandatory, Evidence UI,
+   status FROZEN inventato). Regola registrata: convergenza dei modelli ≠ aderenza all'intento
+   del Director; il criterio decisionale resta il divertimento percepito, non il consenso AI.
+
+**Fonte:** Director, sessione 2026-10-02; `plans/PLAN-019-S1-quest-interessante.md` battezzato.
