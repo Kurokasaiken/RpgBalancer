@@ -764,10 +764,12 @@ which choice?"
 
 ## Parked / to research next
 
-- Noise meter: parked by Director 2026-10-03 — stealth-specific idea for
-  future quest types, not base prototype. Stealth sources now gathered
-  (Thief postmortem, Splinter Cell GDC 2014, AC stealth evolution); the
-  open question remains meter-vs-diegetic pressure (unanswered by
+- Noise meter: REMOVED by Director order 2026-10-03 (commit `f7a55a73`).
+  Replaced by named camp states — quieto → allertato → sveglio (−10pp,
+  closes the quiet extraction) → risveglio on a further inside failure.
+  Stealth literature remains parked for future stealth-specific quest
+  types (Thief postmortem, Splinter Cell GDC 2014, AC stealth evolution);
+  the open question is meter-vs-diegetic pressure (unanswered by
   literature).
 - Risk band / verdict↔harm coupling: Director rule 2026-10-03 —
   epicfail operates *within* declared band; never creates unannounced

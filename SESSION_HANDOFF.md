@@ -26,9 +26,14 @@
   morti nominati "su «Qualcosa si sveglia nella torre»").
 - **Evidence:** `test-results/r-081-quest-s1-taken-secured-2026-10-03.log`.
 - **Nota osservata:** entrambe le run live hanno preso il path `risveglio`
-  (noise 3) invece del nodo `estrazione` — il nodo choice è coperto da unit
-  test ma manca la verifica "felt" in-browser sul path quiet. Cosmetic:
+  invece del nodo `estrazione` — il nodo choice è coperto da unit test ma
+  manca la verifica "felt" in-browser sul path quiet. Cosmetic:
   l'astrolabe continua a drenare la coda THROW anche dopo il wipe.
+- **Noise meter RIMOSSO** (commit `f7a55a73`, ordine Director): il
+  contatore ◉○○ è ora stati nominati `campoAllertato`/`campoSveglio` —
+  stessa escalation (fail +1 livello, epicfail salta, sveglio+fail →
+  risveglio; forza entra sveglio; forziere cigola anche a successo), badge
+  "CAMPO ALLERTATO/SVEGLIO" al posto del meter. Verificato live.
 - **Gate da validare col playtester umano:** "sai dire cosa hai perso e per
   quale tua scelta?"
 
