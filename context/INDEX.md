@@ -11,6 +11,7 @@ Format: `[filename](path) — one sentence — \`tag\``
 
 [DESIGN_PILLARS.md](DESIGN_PILLARS.md) — direction and inspiration pillars — `direction`
 [context/DECISION_LOG.md](DECISION_LOG.md) — history of decisions — `history`
+[context/QUEST_GAMEPLAY_SCIENCE.md](context/QUEST_GAMEPLAY_SCIENCE.md) — living bibliography: real studies on suspense/failure/choice psychology for quest gameplay — `research` `quest` `design`
 [src/docs/docs/MASTER_PLAN.md](src/docs/docs/MASTER_PLAN.md) — roadmap and phase tracking — `planning`
 [src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md](src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md) — trusted component registry — `components` `trusted`
 [.windsurf/rules/00-project-invariants.md](.windsurf/rules/00-project-invariants.md) — non-negotiable project constraints — `invariants`
