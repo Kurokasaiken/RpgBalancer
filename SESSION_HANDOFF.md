@@ -1,4 +1,32 @@
-# Session Handoff — 2026-10-02
+# Session Handoff — 2026-10-03
+
+## 2026-10-03 — Deep research multi-provider, wiki scientifico, proposta v6, playtest live
+
+- **Wiki vivo creato:** `context/QUEST_GAMEPLAY_SCIENCE.md` (committato `107706f9`, indicizzato
+  in `context/INDEX.md`) — ~60 fonti reali verificate, principi derivati P1–P47, correzioni
+  esplicite (Zeigarnik sovrastimato, house-money non legge, fail-forward = dottrina non scienza),
+  gap di letteratura dichiarati (pacing 3–5min e tolleranza RNG non-gambling = non studiati).
+- **Deep research batch** in `.mw/runs/20261003-quest-science-deepresearch/` — prompt unico
+  `prompt.md` a 4 provider via Canary/CDP (driver `dr_driver.py`): ChatGPT Deep Research ✓
+  (risposta completa + follow-up citazioni), DeepSeek DeepThink+Search ✓ (batch più forte),
+  Grok-free ✗ debole (molti UNVERIFIED + 2 falsi negativi su fonti reali — inaffidabile per
+  audit citazioni), Claude ✗ free-cap prima dell'output.
+- **Proposta v6** `.mw/runs/20261003-quest-v6-science/quest-v6.md` — redesign science-based:
+  **TAKEN ≠ SECURED** (la cassa in mano è posta esposta, non vittoria), estrazione come fase
+  di gioco a 3 forme, fail taxonomy (minor/strategic/quest/character/catastrophic), Astrolabe
+  scalato sulla posta, death beat nominato + epilogo con controfattuale.
+- **Playtest live strumentato** (Puppeteer, seed 1983, Preset D → VICTORY):
+  `playtest-seed1983.md`. Conferma in vivo la diagnosi: **estrazione inesistente nel codice**
+  (TAKEN==SECURED), Kran morto su WIN 75-vs-74 reso come 2 righe di log, "WIN" = verdetto quasi
+  finto (harm anche a successo), check obiettivo auto-risolto ("ROLL 1 OF 2"), noise meter ancora
+  attivo ma inerte, failure path irraggiungibile col gioco prudente (6 WIN/6).
+- **Critica consolidata + autocritica v6** in `critique-consolidated.md`: conseguenze v6 ancora
+  fiction-driven (serve forma-della-fuga visibile da F4), gradiente push-your-luck non disegnato,
+  attachment in 3min probabilmente insufficiente, fuga pulita resta dominante, run-variance
+  non risolta.
+- **Prossimo passo proposto:** implementazione minima per testare l'ipotesi centrale —
+  solo TAKEN→SECURED + estrazione a 3 forme + epilogo con costo — in attesa di decisione
+  del Director (v6 integrale vs minimo vs altro).
 
 ## Current state
 

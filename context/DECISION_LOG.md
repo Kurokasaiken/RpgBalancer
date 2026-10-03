@@ -664,3 +664,33 @@ da validare nel lab, il runtime si adegua in S2.
    del Director; il criterio decisionale resta il divertimento percepito, non il consenso AI.
 
 **Fonte:** Director, sessione 2026-10-02; `plans/PLAN-019-S1-quest-interessante.md` battezzato.
+---
+
+## 2026-10-03 — Noise parcheggiato (stealth-specific) + epicfail dentro la banda
+
+**Da:** review del Director sul redesign della quest dopo l'audit di losabilità.
+
+**A:**
+
+1. **Noise meter: parcheggiato.** Il meter di pressione accumulata non entra nel prototipo
+   base/generico di quest — è un'idea valida solo per tipologie dominio-specifiche (es. stealth).
+   Non va reintrodotto nel prototipo generale senza decisione esplicita.
+   (*«il noise nn deve esserci nel prototipo base/generico, è una idea interessante x
+   applicazioni future»*). Nota: il codice lab stampa ancora `RUMORE ◉○○` inerte — da
+   rimuovere o spegnere quando si tocca lo scenario.
+2. **Epicfail opera dentro la banda di rischio dichiarata.** L'epicfail può peggiorare l'esito
+   fino al massimo previsto per quel check (ferita dove era dichiarata ferita, morte solo dove
+   M%>0 era visibile al commit) — mai oltre la banda. La scelta definisce il range di esiti
+   possibili; il dado modula dentro. (*«Epic fail su check nn uccide sempre»* formalizzato).
+   Da formalizzare come check-contract spec in S2.
+3. **Criterio di diagnosi congelato:** «una quest infallibile, dove non c'è mai suspense, non
+   ci sono preoccupazioni né punti di gioia, è inutile. Le scelte non sono scelte se non posso
+   mai fallire.» → la losabilità e l'attribuibilità del fallimento sono il requisito, non una
+   percentuale target.
+
+**Implicazioni:** vincola ogni proposta di redesign della quest (inclusa v6 in
+`.mw/runs/20261003-quest-v6-science/`); documentate come principi operativi in
+`context/QUEST_GAMEPLAY_SCIENCE.md` (risk-band → check-contract; noise → sezione stealth
+dominio-specifica).
+
+**Fonte:** Director, sessione 2026-10-03.
