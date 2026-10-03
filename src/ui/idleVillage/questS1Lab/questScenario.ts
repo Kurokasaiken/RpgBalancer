@@ -23,6 +23,21 @@ export type LabStat = 'perc' | 'int' | 'str' | 'con' | 'agi' | 'cha';
  */
 export const PRIMARY_STATS: LabStat[] = ['agi', 'perc'];
 
+/**
+ * Player-facing labels for `state.info` entries. `info` holds internal keys
+ * used by `requiresInfo` gating — the HUD must show what the party *saw*,
+ * not the flag name.
+ */
+export const INTEL_LABELS: Record<string, string> = {
+  simbolo: 'il simbolo sui goblin',
+  gabbia: 'la gabbia del prigioniero',
+  sideDoor: 'la porta laterale',
+  turni: 'i turni di guardia',
+  pattuglia: 'il giro di pattuglia',
+  qualcosaDiGrosso: 'qualcosa di grosso nella torre',
+  mappaAccampamento: 'la mappa dell’accampamento',
+};
+
 /** A single authored node of the quest. */
 export interface QuestNode {
   id: string;
@@ -87,7 +102,7 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
     id: 'viaggio',
     kind: 'choice',
     title: 'Viaggio — il Passo del Corvo',
-    body: 'La carovana è stata assalita sul Passo. Un ambulante in fuga offre tre oggetti — ma con 20 gold puoi permettertene solo due.',
+    body: 'La carovana è stata assalita sul Passo. Un ambulante in fuga offre tre oggetti — ma la borsa non basta per tutto.',
     beat: 0,
     options: [
       {
