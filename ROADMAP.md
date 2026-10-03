@@ -11,3 +11,4 @@
 | [PLAN-017](plans/PLAN-017-stylized-sea-pattern-evaluation.md) | active | P2 | Stylized Sea Pattern Evaluation: A gold standard, C challenger (desiderata v19) |
 | [PLAN-018](plans/PLAN-018-mission-planner.md) | completed | P1 | Mission Planner: PARTY/LOADOUT/OUTCOME con esiti live (desiderata v23, R-078) — MP-00…MP-07 completati 2026-10-02; adattamento al modello quest validato in PLAN-019 S2/S3 |
 | [PLAN-019](plans/PLAN-019-quest-macro-plan.md) | active | P1 | Macro plan Quest: S1 quest interessante (gate Director) → S2 quest vera → S3 planning → S4 integrazione → S5 generativo (desiderata v24, R-076) |
+| [PLAN-019-S1](plans/PLAN-019-S1-quest-interessante.md) | active | P1 | S1 — «La cassa delle sementi» in lab isolato `/quest-s1-lab`; criterio: divertente, non funzionante. Bloccato su T-001 (correzione contenuti Director) |

@@ -105,6 +105,7 @@ const GameFrameCartographerPage = lazy(() => import('./pages/gameframe-cartograp
 const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
+const QuestS1LabPage = lazy(() => import('./ui/idleVillage/pages/QuestS1LabPage'));
 const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.default })));
 
 interface AppNavControls {
@@ -357,6 +358,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/poi-bronze-compare';
   const isPoiQuestDetailRosterTimeClockIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-quest-detail-roster-time-clock';
+  const isQuestS1LabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/quest-s1-lab';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -1358,6 +1361,16 @@ function App() {
       <ErrorBoundary componentName="Use Client Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Use Client...</div>}>
           <UseClientPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isQuestS1LabPath) {
+    return (
+      <ErrorBoundary componentName="Quest S1 Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest S1 Lab…</div>}>
+          <QuestS1LabPage />
         </Suspense>
       </ErrorBoundary>
     );
