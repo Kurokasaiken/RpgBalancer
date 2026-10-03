@@ -1123,6 +1123,9 @@
       "tower": "— the tower",
       "tooltip": "Noise accumulates: every failure inside the camp raises it. At 3 ticks something wakes up."
     },
-    "gold": "gold"
+    "gold": "gold",
+    "chestTaken": "Crate in hand — not secured",
+    "chestLost": "Crate lost",
+    "onFail": "If it fails: {text}"
   }
 }

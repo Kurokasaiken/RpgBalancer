@@ -462,8 +462,20 @@ const QuestS1LabPage: React.FC = () => {
               </span>
               <NoiseMeter noise={run.noise} />
               {run.objectiveDone && (
-                <span className="rounded-full border border-emerald-400/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-emerald-300">
-                  {t('questS1Lab.chestRecovered')}
+                <span
+                  className={[
+                    'rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.3em]',
+                    run.ended
+                      ? 'border-emerald-400/60 text-emerald-300'
+                      : 'border-amber-400/60 text-amber-300',
+                  ].join(' ')}
+                >
+                  {t(run.ended ? 'questS1Lab.chestRecovered' : 'questS1Lab.chestTaken')}
+                </span>
+              )}
+              {run.flags.includes('cassaPersa') && (
+                <span className="rounded-full border border-red-400/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-red-300">
+                  {t('questS1Lab.chestLost')}
                 </span>
               )}
             </div>
@@ -517,12 +529,19 @@ const QuestS1LabPage: React.FC = () => {
             <div className="mt-1 text-lg font-semibold text-ivory">{currentNode?.title}</div>
           </header>
           <p className="mb-3 text-sm text-slate-300">{currentNode?.body}</p>
-          <p className="mb-4 rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm italic text-amber-200/80">
-            {run.lastEvent}
-          </p>
+          {!run.ended && (
+            <p className="mb-4 rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm italic text-amber-200/80">
+              {run.lastEvent}
+            </p>
+          )}
           {run.ended ? (
-            <div className="rounded-2xl border border-amber-400/60 bg-amber-950/30 p-4 text-center text-sm font-bold uppercase tracking-[0.2em] text-amber-200">
-              {run.outcome === 'running' ? '' : t(`questS1Lab.outcome.${run.outcome}`)}
+            <div className="rounded-2xl border border-amber-400/60 bg-amber-950/30 p-4 text-center">
+              <div className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">
+                {run.outcome === 'running' ? '' : t(`questS1Lab.outcome.${run.outcome}`)}
+              </div>
+              {/* Epilogue: lastEvent carries the composed cost — deaths by name,
+                  crate lost, prisoner saved, loot brought home. */}
+              <p className="mt-2 text-sm normal-case tracking-normal text-amber-100/80">{run.lastEvent}</p>
             </div>
           ) : inTransition ? (
             <div className="flex h-24 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-[11px] uppercase tracking-[0.3em] text-slate-500">
@@ -618,6 +637,11 @@ const QuestS1LabPage: React.FC = () => {
                             </span>
                           )}
                         </span>
+                        {pv.failHint && (
+                          <span className="block rounded-md border border-red-400/30 bg-red-950/20 px-2 py-0.5 text-[10px] text-red-300/90">
+                            {t('questS1Lab.onFail', { text: pv.failHint })}
+                          </span>
+                        )}
                         {pv.interceptor && (pv.woundPct > 0 || pv.deathPct > 0) && (
                           <span className="block rounded-md border border-purple-400/40 bg-purple-950/30 px-2 py-0.5 text-[10px] uppercase tracking-wider text-purple-300">
                             {t('questS1Lab.bodyguardCovers', {
