@@ -185,6 +185,9 @@ function clampSuccessBound(score: number): number {
 interface HarmEvent {
   memberId: string;
   kind: 'wound' | 'death';
+  /** This slot's declared death band (pp) for the check — gates the epicfail
+   *  wound→death upgrade so no death can occur where M% was shown as 0. */
+  deathBand: number;
 }
 
 /**
@@ -192,11 +195,13 @@ interface HarmEvent {
  * Bodyguard rule (rev.2): while a living bodyguard exists, ALL harms rolled
  * on other members are redirected to the bodyguard — even several in one check.
  * Death save (5%) turns any death outcome into a wound.
+ * Director rule 2026-10-03: a death names its cause — the check that inflicted it.
  */
 function applyHarm(
   state: QuestRunState,
   harms: HarmEvent[],
   interceptable: boolean,
+  sourceTitle?: string,
 ): HarmEvent['kind'][] {
   const applied: HarmEvent['kind'][] = [];
   const bodyguard = state.party.find((m) => m.role === 'bodyguard' && !m.dead);
@@ -222,7 +227,11 @@ function applyHarm(
         continue;
       }
       target.dead = true;
-      state.log.push({ kind: 'DEATH', text: `${target.name} è morto.` });
+      target.hp = 0;
+      state.log.push({
+        kind: 'DEATH',
+        text: `${target.name} è morto${sourceTitle ? ` — su «${sourceTitle}»` : ''}.`,
+      });
       applied.push('death');
     } else {
       target.wounded = true;
@@ -261,18 +270,21 @@ function rollCheckHarms(
       death += TUNE.winRiskMod;
     }
     const r = roll(state) * 100;
-    if (r < Math.max(0, death)) harms.push({ memberId: m.id, kind: 'death' });
-    else if (r < Math.max(0, death) + Math.max(0, wound)) harms.push({ memberId: m.id, kind: 'wound' });
+    const deathBand = Math.max(0, death);
+    if (r < deathBand) harms.push({ memberId: m.id, kind: 'death', deathBand });
+    else if (r < deathBand + Math.max(0, wound)) harms.push({ memberId: m.id, kind: 'wound', deathBand });
   }
-  // bigwin: downgrade every death to wound. epicfail: upgrade wounds to deaths.
+  // bigwin: downgrade every death to wound. epicfail: upgrade wounds to
+  // deaths — but ONLY inside the declared band (Director rule 2026-10-03):
+  // where the slot's death risk was shown as 0, an epicfail cannot kill.
   const adjusted = harms.map((h) =>
     verdict === 'bigwin' && h.kind === 'death'
       ? { ...h, kind: 'wound' as const }
-      : verdict === 'epicfail' && h.kind === 'wound'
+      : verdict === 'epicfail' && h.kind === 'wound' && h.deathBand > 0
         ? { ...h, kind: 'death' as const }
         : h,
   );
-  const applied = applyHarm(state, adjusted, true);
+  const applied = applyHarm(state, adjusted, true, node.title);
   return applied.includes('death') ? 'death' : applied.includes('wound') ? 'wound' : 'none';
 }
 
@@ -330,13 +342,36 @@ function endRun(state: QuestRunState, outcome: QuestOutcome, text: string): void
   } else {
     state.log.push({ kind: 'QUEST_END', text });
   }
-  state.lastEvent = text;
+  state.lastEvent = composeEndingText(state, text);
 }
 
-/** Player chooses to flee — quest failed, loot kept (wipe already handled). */
+/** A taken-but-not-secured loot item drops out of the party's hands. */
+function dropLoot(state: QuestRunState, item: string, reason: string): void {
+  if (!state.loot.includes(item)) return;
+  state.loot = state.loot.filter((l) => l !== item);
+  state.log.push({ kind: 'LOOT', text: `${item}: ${reason}` });
+}
+
+/**
+ * TAKEN ≠ SECURED (Director-approved minimal redesign, 2026-10-03): the seed
+ * crate is the quest objective — acquired ≠ banked. It is lost if the escape
+ * fails or the party panics (flee). Once lost it stays at the camp.
+ */
+function dropCrate(state: QuestRunState, reason: string): void {
+  if (!state.objectiveDone) return;
+  state.objectiveDone = false;
+  state.flags.push('cassaPersa');
+  dropLoot(state, 'cassa delle sementi', reason);
+}
+
+/** Player chooses to flee — quest failed, secured loot kept; the crate is
+ *  still "in hand", not banked: panic means dropping it to run. */
 export function flee(state: QuestRunState): QuestRunState {
   if (state.ended) return state;
   state.log.push({ kind: 'RETREAT', text: 'La spedizione si ritira.' });
+  if (state.objectiveDone) {
+    dropCrate(state, 'nella fuga la cassa vi rallenta troppo — la mollate ai bordi del campo.');
+  }
   endRun(state, 'fled', 'Fuggite verso il villaggio con quanto avete raccolto. La quest è fallita.');
   return state;
 }
@@ -499,6 +534,9 @@ export interface OptionPreview {
   /** Which of the quest's declared PRIMARY_STATS this check uses — options
       using them are the "via maestra". */
   primaryStatsUsed: string[];
+  /** Authored state-consequence of failing this check (questScenario.failHint)
+      — shown so the player weighs "what changes", not only "what it costs". */
+  failHint?: string;
 }
 
 /**
@@ -553,6 +591,7 @@ export function previewOption(
       : undefined,
     perSlot,
     primaryStatsUsed,
+    failHint: checkNode.failHint,
   };
 }
 
@@ -595,10 +634,17 @@ function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdi
   if (INSIDE_CHECKS.has(node.id) && bad) {
     raiseNoise(state, verdict === 'epicfail' ? 2 : 1, node.title + '.');
   }
-  // The thing in the tower wakes: Chekhov's gun fires.
+  const next = applyNodeOutcome(state, node, verdict, success, bad);
+  // The thing in the tower wakes: Chekhov's gun fires. The check's effects
+  // have already landed (you grab the crate AS it wakes) — only the
+  // destination is hijacked.
   if (state.noise >= 3 && node.id !== 'risveglio') {
     return 'risveglio';
   }
+  return next;
+}
+
+function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdict, success: boolean, bad: boolean): string {
   switch (node.id) {
     case 'avvistamento':
       if (verdict === 'bigwin') {
@@ -622,6 +668,8 @@ function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdi
       return 'approccio';
     case 'check-ingresso-forza':
       raiseNoise(state, 1, 'lo scontro si sente in tutto il campo.');
+      // Forcing the entry wakes the camp for good: the quiet way out is gone.
+      if (!state.flags.includes('campoSveglio')) state.flags.push('campoSveglio');
       if (state.noise >= 3) return 'risveglio';
       return 'perquisizione';
     case 'check-ingresso-agi':
@@ -648,9 +696,12 @@ function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdi
       if (success) {
         state.objectiveDone = true;
         state.loot.push('cassa delle sementi');
-        state.log.push({ kind: 'LOOT', text: 'Cassa delle sementi recuperata.' });
+        state.log.push({ kind: 'LOOT', text: 'Cassa delle sementi presa — in mano, non ancora al sicuro.' });
       } else {
-        state.log.push({ kind: 'INFO', text: 'La cassa vi sfugge di mano — dovrete tornare a mani vuote.' });
+        // Fail-forward: the crate stays, but the run is not over — now you
+        // must extract empty-handed through whatever your entry left behind.
+        state.log.push({ kind: 'INFO', text: 'La cassa vi sfugge di mano — resta al campo. Ora conta solo uscire vivi.' });
+        return 'estrazione';
       }
       return 'rientra-o-rischi';
     case 'check-forziere':
@@ -661,17 +712,75 @@ function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdi
         state.log.push({ kind: 'LOOT', text: 'Forziere goblin: +15 gold.' });
       }
       if (state.noise >= 3) return 'risveglio';
-      return 'ritorno';
+      return 'estrazione';
     case 'risveglio':
       if (success) {
         state.log.push({ kind: 'INFO', text: 'Correte nella notte. Dietro di voi la torre si sgretola — eravate a un soffio.' });
       } else {
         state.log.push({ kind: 'INFO', text: 'La fuga è un massacro disperato.' });
+        dropCrate(state, 'la lasciate cadere correndo — resta nella torre.');
+      }
+      return 'ritorno';
+    case 'check-uscita-breccia':
+      if (bad) {
+        // The breach is forgiving on lives but not on baggage: the squeeze
+        // costs whatever you could not hold. Only an epicfail drops the crate.
+        dropLoot(state, 'forziere goblin', 'resta incastrato nella breccia.');
+        dropLoot(state, 'segnale della cassa', 'perso nella strettoia.');
+        if (verdict === 'epicfail') {
+          dropCrate(state, 'la cassa si incastra nel varco — per uscire dovete lasciarla.');
+          state.log.push({ kind: 'INFO', text: 'Il prigioniero vi trascina oltre il muro: siete fuori, a mani vuote.' });
+        } else {
+          state.log.push({ kind: 'INFO', text: 'Uscite dalla breccia spinti a forza — qualcosa resta indietro.' });
+        }
+      }
+      return 'ritorno';
+    case 'check-uscita-calma':
+      if (bad) {
+        dropLoot(state, 'forziere goblin', 'troppo pesante per sparire in silenzio.');
+        dropLoot(state, 'segnale della cassa', 'perso nel buio.');
+        if (verdict === 'epicfail') {
+          dropCrate(state, 'una pattuglia taglia la via: per scappare mollate la cassa.');
+        } else {
+          state.log.push({ kind: 'INFO', text: 'Qualcuno alza lo sguardo al momento sbagliato: vi dileguate, più leggeri.' });
+        }
+      }
+      return 'ritorno';
+    case 'check-uscita-allarme':
+      if (bad) {
+        // The loud way out: a fail means the crate is the price of speed.
+        dropCrate(state, 'il campo vi addossa — la cassa vi rallenta troppo, resta qui.');
+        dropLoot(state, 'forziere goblin', 'perso nella corsa.');
+        dropLoot(state, 'segnale della cassa', 'perso nella corsa.');
       }
       return 'ritorno';
     default:
       return 'ritorno';
   }
+}
+
+/**
+ * Epilogue composer: the outcome line must account the *cost*, not only the
+ * result — who died, what was dropped, who was saved. Peak-end research says
+ * this ending line is what the run will be remembered as.
+ */
+function composeEndingText(state: QuestRunState, base: string): string {
+  const pieces = [base];
+  const dead = state.party.filter((m) => m.dead).map((m) => m.name);
+  if (dead.length > 0) {
+    pieces.push(`${dead.join(', ')} non ${dead.length > 1 ? 'sono tornati' : 'è tornato'}.`);
+  }
+  if (state.flags.includes('cassaPersa')) {
+    pieces.push('La cassa delle sementi è rimasta al campo.');
+  }
+  if (state.flags.includes('prigionieroLibero')) {
+    pieces.push('Il prigioniero che avete liberato è con voi.');
+  }
+  const extra = state.loot.filter((l) => l !== 'cassa delle sementi');
+  if (extra.length > 0) {
+    pieces.push(`Portate a casa: ${extra.join(', ')}.`);
+  }
+  return pieces.join(' ');
 }
 
 /** Advance from an info node, computing its dynamic text. */
@@ -680,6 +789,13 @@ function enterNode(state: QuestRunState, nodeId: string): void {
   if (!node) return;
   state.nodeId = nodeId;
   state.log.push({ kind: 'NODE', text: node.title });
+
+  // The extraction reads the state the run wrote: if the camp is in alarm the
+  // quiet way out does not exist. campoSveglio gates it (see estrazione node).
+  if (nodeId === 'estrazione' && state.alarm && !state.flags.includes('campoSveglio')) {
+    state.flags.push('campoSveglio');
+    state.log.push({ kind: 'INFO', text: 'Il campo è in allarme — tornare nell’ombra non è più possibile.' });
+  }
 
   // Check nodes resolve as soon as they are reached: the choice that led here
   // already committed the party; resolution is the consequence.
@@ -730,6 +846,8 @@ function enterNode(state: QuestRunState, nodeId: string): void {
     if (allDead(state)) {
       endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
     } else if (state.objectiveDone && lead && !lead.dead) {
+      // Arriving at 'ritorno' with the crate IS the secure event: TAKEN only
+      // becomes SECURED here, after an extraction the player chose and rolled.
       endRun(state, 'reward', 'Cassa delle sementi riportata al villaggio. La quest è completa — reward ottenuta.');
     } else if (state.objectiveDone && (!lead || lead.dead)) {
       endRun(state, 'survived', 'La cassa torna al villaggio, ma il leader non c’è più. La reward della quest va persa.');
@@ -763,6 +881,7 @@ export function applyChoice(
   const option = node.options?.find((o) => o.id === optionId);
   if (!option) return state;
   if (option.requiresInfo && !state.info.includes(option.requiresInfo)) return state;
+  if (option.requiresFlag && !state.flags.includes(option.requiresFlag)) return state;
   if (option.hiddenIfFlag && state.flags.includes(option.hiddenIfFlag)) return state;
   if (option.costGold && state.gold < option.costGold) return state;
 
@@ -808,7 +927,12 @@ export function availableOptions(state: QuestRunState): { id: string; label: str
   }
   if (node.kind !== 'choice') return [];
   return (node.options ?? [])
-    .filter((o) => (!o.requiresInfo || state.info.includes(o.requiresInfo)) && (!o.hiddenIfFlag || !state.flags.includes(o.hiddenIfFlag)))
+    .filter(
+      (o) =>
+        (!o.requiresInfo || state.info.includes(o.requiresInfo)) &&
+        (!o.requiresFlag || state.flags.includes(o.requiresFlag)) &&
+        (!o.hiddenIfFlag || !state.flags.includes(o.hiddenIfFlag)),
+    )
     .map((o) => ({
       id: o.id,
       label: o.label,

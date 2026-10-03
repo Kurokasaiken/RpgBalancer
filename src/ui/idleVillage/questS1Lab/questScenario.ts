@@ -51,6 +51,9 @@ export interface QuestNode {
   risk?: { wound: number; death: number };
   /** True if the check may wound/kill. */
   risky?: boolean;
+  /** Check nodes: the declared state-consequence of failing — shown in the
+   *  preview so the player knows what a fail *changes*, not only what it costs. */
+  failHint?: string;
   /** Options for choice nodes; checks resolve via resolveCheck. */
   options?: QuestOption[];
   /** Info nodes: text revealed to the player, then next node. */
@@ -69,6 +72,8 @@ export interface QuestOption {
   costGold?: number;
   /** Only shown if this info flag was discovered. */
   requiresInfo?: string;
+  /** Only shown if this run flag is set (e.g. the freed prisoner's breach). */
+  requiresFlag?: string;
   /** Hidden if this flag is already set (e.g. already-bought consumable). */
   hiddenIfFlag?: string;
   /** Sets a flag on the run state. */
@@ -283,6 +288,7 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
     risk: { wound: 20, death: 5 },
     risky: true,
     beat: 6,
+    failHint: 'la cassa vi sfugge — uscirete dal campo a mani vuote.',
   },
   'rientra-o-rischi': {
     id: 'rientra-o-rischi',
@@ -294,8 +300,8 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
       {
         id: 'return-now',
         label: 'Fuggire con la cassa',
-        detail: 'Chiudi la spedizione con quello che hai.',
-        next: 'ritorno',
+        detail: 'Portatela fuori — non è al sicuro finché non siete lontani dal campo.',
+        next: 'estrazione',
       },
       {
         id: 'forziere',
@@ -315,6 +321,73 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
     risky: true,
     beat: 7,
   },
+  /* ---- Estrazione: TAKEN ≠ SECURED -----------------------------------------
+   * The crate in hand is stake on the table, not a win. The escape's *shape*
+   * is written by the run: the breach exists only if you freed the prisoner,
+   * the quiet way out exists only if the camp never woke, and cutting through
+   * the camp is always there — at a declared price. */
+  estrazione: {
+    id: 'estrazione',
+    kind: 'choice',
+    title: 'La via d’uscita',
+    body: 'La cassa pesa e il campo è alle spalle. Come uscite dipende da come siete entrati.',
+    beat: 7,
+    options: [
+      {
+        id: 'exit-breach',
+        label: 'La breccia nel muro',
+        detail: 'Il prigioniero conosce un varco che i goblin non guardano. È la via che vi ha aperto.',
+        next: 'CHECK:check-uscita-breccia',
+        requiresFlag: 'prigionieroLibero',
+      },
+      {
+        id: 'exit-quiet',
+        label: 'Nell’ombra da cui siete venuti',
+        detail: 'Il campo non vi ha mai visti. Rifate il percorso all’indietro, piano.',
+        next: 'CHECK:check-uscita-calma',
+        hiddenIfFlag: 'campoSveglio',
+      },
+      {
+        id: 'exit-alarm',
+        label: 'Attraversare il campo',
+        detail: 'La via più breve e la più vista. Si corre, e chi inciampa paga.',
+        next: 'CHECK:check-uscita-allarme',
+      },
+    ],
+  },
+  'check-uscita-breccia': {
+    id: 'check-uscita-breccia',
+    kind: 'check',
+    title: 'La breccia nel muro',
+    body: 'Il prigioniero vi guida lungo la parete crollata. Stretta, bassa — ma nessuno la guarda.',
+    stats: ['agi', 'con'],
+    risk: { wound: 10, death: 0 },
+    risky: true,
+    beat: 7,
+    failHint: 'perdete il bottino extra nella strettoia. La cassa arriva comunque.',
+  },
+  'check-uscita-calma': {
+    id: 'check-uscita-calma',
+    kind: 'check',
+    title: 'Uscire come siete entrati',
+    body: 'Le stesse ombre, lo stesso passo. Finché qualcuno non si volta.',
+    stats: ['agi', 'perc'],
+    risk: { wound: 15, death: 3 },
+    risky: true,
+    beat: 7,
+    failHint: 'il bottino extra resta indietro. Epicfail: la cassa scivola — resta al campo.',
+  },
+  'check-uscita-allarme': {
+    id: 'check-uscita-allarme',
+    kind: 'check',
+    title: 'Il campo vi ha visti',
+    body: 'Frecce, urla, il barrito dalla torre. Si corre con quello che si riesce a tenere.',
+    stats: ['agi', 'con'],
+    risk: { wound: 25, death: 8 },
+    risky: true,
+    beat: 7,
+    failHint: 'la cassa vi rallenta troppo — la mollate. Resta al campo.',
+  },
   risveglio: {
     id: 'risveglio',
     kind: 'check',
@@ -324,6 +397,7 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
     risk: { wound: 30, death: 10 },
     risky: true,
     beat: 7,
+    failHint: 'è la fine della cautela — quello che non riuscite a portare resta qui.',
   },
   ritorno: {
     id: 'ritorno',

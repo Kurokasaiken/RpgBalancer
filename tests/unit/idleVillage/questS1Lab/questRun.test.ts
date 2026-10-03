@@ -247,3 +247,146 @@ describe('quest S1 lab — run engine', () => {
     expect(gated).toBe(true);
   });
 });
+
+describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () => {
+  /** Stage a run directly at the extraction node with the crate in hand. */
+  function atEstrazione(seed: number, flags: string[] = [], alarm = false) {
+    const run = createRun('ibrido', seed);
+    run.nodeId = 'estrazione';
+    run.objectiveDone = true;
+    run.loot.push('cassa delle sementi');
+    run.flags.push(...flags);
+    run.alarm = alarm;
+    return run;
+  }
+
+  it('the three extraction routes are gated by the run the player wrote', () => {
+    const run = atEstrazione(1);
+    let ids = availableOptions(run).map((o) => o.id);
+    // breach requires the freed prisoner; calm requires a quiet camp
+    expect(ids).not.toContain('exit-breach');
+    expect(ids).toContain('exit-quiet');
+    expect(ids).toContain('exit-alarm');
+
+    run.flags.push('prigionieroLibero');
+    ids = availableOptions(run).map((o) => o.id);
+    expect(ids).toContain('exit-breach');
+
+    run.flags.push('campoSveglio');
+    ids = availableOptions(run).map((o) => o.id);
+    expect(ids).not.toContain('exit-quiet');
+    expect(ids).toContain('exit-alarm');
+  });
+
+  it('the breach option cannot be forced without the prisoner flag', () => {
+    const run = atEstrazione(1);
+    applyChoice(run, 'exit-breach');
+    expect(run.nodeId).toBe('estrazione'); // rejected, still deciding
+  });
+
+  it('entering extraction with the camp in alarm removes the quiet way out', () => {
+    const run = createRun('ibrido', 1);
+    run.nodeId = 'rientra-o-rischi';
+    run.objectiveDone = true;
+    run.loot.push('cassa delle sementi');
+    run.alarm = true;
+    applyChoice(run, 'return-now');
+    expect(run.nodeId).toBe('estrazione');
+    expect(run.flags).toContain('campoSveglio');
+    expect(availableOptions(run).map((o) => o.id)).not.toContain('exit-quiet');
+  });
+
+  it('a taken crate is not yet secured: extraction can still lose it', () => {
+    // check-uscita-allarme (F25) — find a seed where the loud escape fails
+    let lost: ReturnType<typeof createRun> | null = null;
+    for (let seed = 0; seed < 400 && !lost; seed++) {
+      const run = atEstrazione(seed);
+      applyChoice(run, 'exit-alarm');
+      if (run.ended && !run.objectiveDone) lost = run;
+    }
+    expect(lost).not.toBeNull();
+    expect(lost!.flags).toContain('cassaPersa');
+    expect(lost!.loot).not.toContain('cassa delle sementi');
+    expect(lost!.outcome).not.toBe('reward');
+    // epilogue must name the cost
+    expect(lost!.lastEvent).toContain('rimasta al campo');
+  });
+
+  it('a successful extraction secures the crate — reward is decided at ritorno', () => {
+    let secured: ReturnType<typeof createRun> | null = null;
+    for (let seed = 0; seed < 400 && !secured; seed++) {
+      const run = atEstrazione(seed);
+      applyChoice(run, 'exit-alarm');
+      if (run.ended && run.outcome === 'reward') secured = run;
+    }
+    expect(secured).not.toBeNull();
+    expect(secured!.objectiveDone).toBe(true);
+    expect(secured!.loot).toContain('cassa delle sementi');
+  });
+
+  it('fleeing with the crate in hand drops it — panic is not a free save', () => {
+    const run = atEstrazione(3);
+    flee(run);
+    expect(run.ended).toBe(true);
+    expect(run.outcome).toBe('fled');
+    expect(run.flags).toContain('cassaPersa');
+    expect(run.loot).not.toContain('cassa delle sementi');
+  });
+
+  it('epicfail respects the declared risk band: the breach (M0) cannot kill', () => {
+    for (let seed = 0; seed < 300; seed++) {
+      const run = atEstrazione(seed, ['prigionieroLibero']);
+      applyChoice(run, 'exit-breach');
+      expect(run.party.every((m) => !m.dead)).toBe(true);
+    }
+  });
+
+  it('failing the objective check still sends the party to extraction, empty-handed', () => {
+    // 'obiettivo' (F20/M5) — find a seed where grabbing the crate fails
+    let escaped = false;
+    for (let seed = 0; seed < 400 && !escaped; seed++) {
+      const run = createRun('fisico', seed);
+      run.nodeId = 'torre';
+      applyChoice(run, 'straight-cassa');
+      if (!run.objectiveDone && run.nodeId === 'estrazione') {
+        escaped = true;
+        expect(run.ended).toBe(false);
+        expect(run.loot).not.toContain('cassa delle sementi');
+        expect(run.flags).not.toContain('cassaPersa'); // never taken
+      }
+    }
+    expect(escaped).toBe(true);
+  });
+
+  it('the waking creature still registers the grab: obiettivo effects land before risveglio', () => {
+    // noise=2 + a failed grab (+1/+2 noise) used to skip the case entirely:
+    // the check resolved but its effects never applied (silent-drop bug).
+    let sawWake = false;
+    for (let seed = 0; seed < 400 && !sawWake; seed++) {
+      const run = createRun('fisico', seed);
+      run.nodeId = 'torre';
+      run.noise = 2;
+      run.alarm = true;
+      applyChoice(run, 'straight-cassa');
+      if (run.log.some((e) => e.text.includes('Qualcosa si sveglia'))) {
+        sawWake = true;
+        // the grab's verdict must still have been applied before the wake
+        const grabLogged = run.log.some(
+          (e) => e.text.includes('non ancora al sicuro') || e.text.includes('vi sfugge di mano'),
+        );
+        expect(grabLogged).toBe(true);
+      }
+    }
+    expect(sawWake).toBe(true);
+  });
+
+  it('the epilogue accounts the cost: deaths by name, crate, prisoner', () => {
+    const run = atEstrazione(2, ['prigionieroLibero']);
+    run.party[1].dead = true; // someone fell earlier
+    applyChoice(run, 'exit-breach');
+    expect(run.ended).toBe(true);
+    const name = run.party[1].name;
+    expect(run.lastEvent).toContain(name);
+    expect(run.lastEvent).toContain('prigioniero');
+  });
+});
