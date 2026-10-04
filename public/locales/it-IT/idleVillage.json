@@ -1107,6 +1107,79 @@
     "faceCheck": "Affronta il check · ~{pct}%",
     "throwCounter": "Tiro {current} di {total}",
     "verdictContinue": "{verdict} — continua",
+    "sim": {
+      "open": "◈ PREVISIONE QUEST — cosa succede probabilmente (simulazione)",
+      "title": "PREVISIONE QUEST — radiografia probabilistica",
+      "runsLabel": "{runs} run simulati",
+      "whyTitle": "PERCHÉ?",
+      "toggleIn": "includi / escludi dalla sim",
+      "makeLeader": "rendi leader",
+      "woundedOn": "ferito ✓",
+      "woundTest": "ferito?",
+      "healthy": "Sano",
+      "wounded": "Ferito",
+      "dead": "Morto",
+      "downtime": "fermo {days}g",
+      "without": "SENZA",
+      "withC": "CON",
+      "bound": "party {value}",
+      "memberOdds": "{name} F{wound}% · M{death}%",
+      "whyCarrier": "{name} porta {stat} ({value})",
+      "whyIntel": "{label} (+{bonus})",
+      "whyConsumable": "{label} pronto (+{bonus})",
+      "whyAlarm": "il campo è sveglio — i check sono più duri",
+      "whyWounded": "{names} già ferito (+rischio)",
+      "whyCover": "{name} intercetta i colpi",
+      "consequence": {
+        "noHarm": "Nessun danno",
+        "anyWound": "1+ feriti",
+        "anyDeath": "1+ morti",
+        "leaderWound": "Leader ferito",
+        "leaderDeath": "Leader muore"
+      },
+      "cf": {
+        "success": "Successo",
+        "anyWound": "1+ feriti",
+        "anyDeath": "1+ morti"
+      },
+      "outcome": {
+        "reward": "Reward",
+        "survived": "Sopravvissuti",
+        "fled": "Ritirata",
+        "wipe": "Strage"
+      },
+      "deathsTitle": "MORTI",
+      "deathsDist": "0: {zero}% · 1: {one}% · 2+: {twoPlus}%",
+      "avgDeathsOnReward": "x̄ {n} morti su reward",
+      "woundsTitle": "FERITE",
+      "leaderTitle": "LEADER",
+      "leaderLine": "ferito {wound}% · morto {death}%",
+      "timeTitle": "TEMPO",
+      "daysLine": "x̄ {avg}g · {min}–{max}g",
+      "humanDays": "{hd} giorni-uomo · P50 {p50}g P90 {p90}g",
+      "rewardTitle": "RICOMPENSA",
+      "rewardLine": "{gold} oro · {treasure} tesoro · {loot} loot",
+      "opt": {
+        "relic": "reliquia",
+        "guardLoot": "bottino guardie",
+        "chestLoot": "forziere goblin",
+        "viandante": "viandante aiutato"
+      },
+      "strategyTitle": "STRATEGIA SIMULATA",
+      "cp": { "secure": "METTI AL SICURO", "push": "SPINGI OLTRE" },
+      "cpLine": "reward {reward}% · morti {death}% · feriti {wound}% · {days}g · tesoro {treasure}",
+      "benchTitle": "PANCA WHAT-IF — ipotetico, non tocca il run",
+      "why": {
+        "statStrong": "{stat} forte — {name} ({value})",
+        "statWeak": "{stat} debole — il migliore è {name} ({value})",
+        "woundedParty": "{count} già feriti — +rischio a ogni check",
+        "bodyguardCover": "il bodyguard intercetta i colpi altrui",
+        "alarm": "il campo è sveglio — ogni check è più duro",
+        "pushDeeper": "la strategia spinge oltre il checkpoint — più reward, più esposizione",
+        "secureStake": "la strategia mette al sicuro la posta al checkpoint",
+        "stakeOnTable": "{value} oro di tesoro già in mano"
+      }
+    },
     "outcome": {
       "reward": "VITTORIA — reward ottenuta",
       "survived": "Sopravvissuti — senza reward",
@@ -1140,6 +1213,31 @@
       "alerted": "Campo allertato",
       "awake": "Campo sveglio",
       "tooltip": "Il campo ha sentito qualcosa. Un altro passo falso ed esplode — e la via tranquilla si chiude."
+    },
+    "labTitle": "S1 — Laboratorio quest",
+    "pickQuest": "Scegli la spedizione — due quest scritte a mano, due forme di rischio diverse.",
+    "backToQuests": "Tutte le quest",
+    "days": "{days} giorni",
+    "treasureValue": "tesoro ~{value} oro",
+    "risk": {
+      "medium": "Rischio: medio",
+      "high": "Rischio: alto"
+    },
+    "quests": {
+      "cassa": {
+        "title": "La cassa delle sementi",
+        "desc": "Infiltrazione: entra nel campo goblin, prendi la cassa, escine vivo. Quello che porti può ancora essere perso sulla via d'uscita.",
+        "objective": "Obiettivo: riportare la cassa delle sementi dal Passo del Corvo. Il leader deve sopravvivere per ottenere la ricompensa. Scegli la spedizione:",
+        "duration": "una notte",
+        "trial": "★ Prova di infiltrazione — {stats}"
+      },
+      "rovine": {
+        "title": "Le Rovine sotto il Fiume",
+        "desc": "Esplorazione: attraversa il fiume, supera le guardie, porta fuori il tesoro. Tempo e sangue sono il prezzo — fino a dove ti spingi?",
+        "objective": "Obiettivo: riportare il tesoro dalle rovine sotto il fiume. Ogni stanza in più costa giorni e sangue. Il leader deve sopravvivere. Scegli la spedizione:",
+        "duration": "4–9 giorni",
+        "trial": "★ Prova di forza — {stats}"
+      }
     }
   }
 }

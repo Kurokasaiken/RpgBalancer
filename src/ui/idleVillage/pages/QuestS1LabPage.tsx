@@ -18,17 +18,22 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { INTEL_LABELS, PARTY_PRESETS, PRIMARY_STATS, QUEST_BEATS, SCENARIO_NODES } from '@/ui/idleVillage/questS1Lab/questScenario';
+import { INTEL_LABELS, QUEST_BEATS } from '@/ui/idleVillage/questS1Lab/questScenario';
+import { ROVINE_BEATS, ROVINE_INTEL_LABELS } from '@/ui/idleVillage/questS1Lab/questScenarioRovine';
 import {
   applyChoice,
   availableOptions,
   createRun,
   flee,
   drinkPotion,
+  nodesFor,
   previewOption,
+  QUESTS,
 } from '@/ui/idleVillage/questS1Lab/questRun';
 
-import type { QuestRunState, ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import type { QuestId, QuestRunState, ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import { QuestSimulationPreview } from '@/ui/idleVillage/questS1Lab/QuestSimulationPreview';
+import { QuestCheckPreview } from '@/ui/idleVillage/questS1Lab/QuestCheckPreview';
 import { WanderlustRosterCard } from '@/ui/idleVillage/roster';
 import { DestinyAstrolabeV62Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
 import { PgCardKitShell } from '@/ui/idleVillage/frozen/kits/pgcardKit';
@@ -61,7 +66,42 @@ const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }> = {
   'check-forziere': { src: ART.goblinTotem, fit: 'contain' },
   risveglio: { src: ART.goblinMarch, fit: 'contain' },
   ritorno: { src: ART.village, fit: 'contain' },
+  /* ---- Le Rovine sotto il Fiume — downloaded scene art (public domain,
+   *  one image per phase, per Director request 2026-10-04) --------------- */
+  'rv-mercante': { src: '/assets/quest-robine/mercante.jpg', fit: 'cover' },
+  'rv-check-osserva': { src: '/assets/quest-robine/mercante.jpg', fit: 'cover' },
+  'rv-check-incalza': { src: '/assets/quest-robine/mercante.jpg', fit: 'cover' },
+  'rv-fiume': { src: '/assets/quest-robine/fiume.jpg', fit: 'cover' },
+  'rv-guardie': { src: '/assets/quest-robine/guardie.jpg', fit: 'cover' },
+  'rv-check-sneak': { src: '/assets/quest-robine/guardie.jpg', fit: 'cover' },
+  'rv-check-fight': { src: '/assets/quest-robine/guardie.jpg', fit: 'cover' },
+  'rv-sala': { src: '/assets/quest-robine/tesoro.jpg', fit: 'cover' },
+  'rv-check-trappola': { src: '/assets/quest-robine/tesoro.jpg', fit: 'cover' },
+  'rv-tesoro-scelta': { src: '/assets/quest-robine/tesoro.jpg', fit: 'cover' },
+  'rv-check-prendi': { src: '/assets/quest-robine/tesoro.jpg', fit: 'cover' },
+  'rv-check-sicuro': { src: '/assets/quest-robine/tesoro.jpg', fit: 'cover' },
+  'rv-checkpoint': { src: '/assets/quest-robine/rovine-hero.jpg', fit: 'cover' },
+  'rv-attrito': { src: '/assets/quest-robine/crollo.jpg', fit: 'cover' },
+  'rv-camera': { src: '/assets/quest-robine/camera.jpg', fit: 'cover' },
+  'rv-ritorno-evento': { src: '/assets/quest-robine/strada.jpg', fit: 'cover' },
+  'rv-fine': { src: ART.village, fit: 'contain' },
 };
+
+/** Intel labels merged across quests — state.info keys are unique per quest. */
+const ALL_INTEL_LABELS: Record<string, string> = { ...INTEL_LABELS, ...ROVINE_INTEL_LABELS };
+
+/** Per-quest beats for the progress indicator. */
+const QUEST_BEATS_BY_ID: Record<QuestId, readonly string[]> = {
+  cassa: QUEST_BEATS,
+  rovine: ROVINE_BEATS,
+};
+
+/** Quest cards shown on the lab's entry screen — authored content mirrors
+ *  the two mockups; copy keys live under questS1Lab.quests.*. */
+const QUEST_CARDS: { id: QuestId; art: string; riskKey: string }[] = [
+  { id: 'cassa', art: ART.goblinTotem, riskKey: 'medium' },
+  { id: 'rovine', art: '/assets/quest-robine/rovine-hero.jpg', riskKey: 'high' },
+];
 
 const LOG_STYLE: Record<string, string> = {
   CHECK: 'text-sky-300',
@@ -153,9 +193,9 @@ const Kicker: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 /** Quest progress — POI-quest pattern (desiderata v4): when full, the quest is done. */
-const QuestProgress: React.FC<{ beat: number; ended: boolean }> = ({ beat, ended }) => (
+const QuestProgress: React.FC<{ beat: number; ended: boolean; beats: readonly string[] }> = ({ beat, ended, beats }) => (
   <div className="flex items-center gap-1.5">
-    {QUEST_BEATS.map((label, i) => {
+    {beats.map((label, i) => {
       const done = ended || i < beat;
       const active = !ended && i === beat;
       return (
@@ -170,7 +210,7 @@ const QuestProgress: React.FC<{ beat: number; ended: boolean }> = ({ beat, ended
                   : 'border-slate-700 bg-slate-900',
             ].join(' ')}
           />
-          {i < QUEST_BEATS.length - 1 && (
+          {i < beats.length - 1 && (
             <div className={`h-px w-4 transition-colors duration-500 ${done ? 'bg-amber-500/60' : 'bg-slate-800'}`} />
           )}
         </div>
@@ -208,6 +248,7 @@ const rollSeed = () => Math.floor(Math.random() * 100000);
 const QuestS1LabPage: React.FC = () => {
   const { t } = useTranslation('idleVillage');
   const [seed, setSeed] = useState<number>(rollSeed);
+  const [questId, setQuestId] = useState<QuestId | null>(null);
   const [run, setRun] = useState<QuestRunState | null>(null);
   // Every check resolved by the last action gets its own astrolabe beat —
   // the queue preserves the order so chained checks all get the cinematic.
@@ -246,7 +287,7 @@ const QuestS1LabPage: React.FC = () => {
     const s = rollSeed();
     setSeed(s);
     setCheckQueue([]);
-    setRun(createRun(id, s));
+    setRun(createRun(id, s, questId ?? 'cassa'));
   };
 
   const reset = () => {
@@ -271,7 +312,7 @@ const QuestS1LabPage: React.FC = () => {
   };
 
   const currentNode = useMemo(
-    () => (run ? SCENARIO_NODES[shownNodeId ?? run.nodeId] : null),
+    () => (run ? nodesFor(run)[shownNodeId ?? run.nodeId] : null),
     [run, shownNodeId],
   );
 
@@ -286,7 +327,72 @@ const QuestS1LabPage: React.FC = () => {
         ? 'fail_wound'
         : activeCheck?.verdict;
 
+  /* ---------------- Quest selection ---------------- */
+  if (!questId) {
+    return (
+      <WanderlustAmbientField className="min-h-screen bg-[#0a0d12] text-ivory" fireflyCount={5}>
+        <div className="relative h-44 overflow-hidden md:h-56">
+          <img
+            src={ART.map}
+            alt=""
+            className="h-full w-full object-cover opacity-70"
+            style={{ objectPosition: '50% 30%' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#0a0d12]" />
+          <div className="absolute bottom-4 left-6 md:left-10">
+            <Kicker>{t('questS1Lab.kicker')}</Kicker>
+            <h1 className="text-3xl font-semibold text-amber-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+              {t('questS1Lab.labTitle')}
+            </h1>
+          </div>
+        </div>
+        <div className="p-6 md:p-10">
+          <p className="mb-8 max-w-2xl text-sm text-slate-400">{t('questS1Lab.pickQuest')}</p>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {QUEST_CARDS.map((q) => (
+              <button
+                key={q.id}
+                onClick={() => setQuestId(q.id)}
+                className="group overflow-hidden rounded-3xl border border-amber-400/40 bg-black/75 text-left shadow-[0_18px_60px_rgba(0,0,0,0.65)] backdrop-blur transition hover:border-amber-300/80"
+              >
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src={q.art}
+                    alt=""
+                    className="h-full w-full object-cover opacity-80 transition group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                  <div className="absolute bottom-3 left-4">
+                    <div className="text-lg font-semibold text-ivory drop-shadow">
+                      {t(`questS1Lab.quests.${q.id}.title`)}
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 p-4">
+                  <p className="text-sm text-slate-300">{t(`questS1Lab.quests.${q.id}.desc`)}</p>
+                  <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.2em]">
+                    <span className="rounded-full border border-sky-400/40 bg-sky-950/40 px-2 py-0.5 text-sky-300">
+                      ★ {QUESTS[q.id].primaryStats.map((s) => STAT_SHORT[s]).join(' + ')}
+                    </span>
+                    <span className="rounded-full border border-amber-400/40 bg-amber-950/40 px-2 py-0.5 text-amber-300">
+                      {t(`questS1Lab.risk.${q.riskKey}`)}
+                    </span>
+                    <span className="rounded-full border border-slate-500/40 bg-slate-900/60 px-2 py-0.5 text-slate-300">
+                      {t(`questS1Lab.quests.${q.id}.duration`)}
+                    </span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </WanderlustAmbientField>
+    );
+  }
+
   /* ---------------- Preset selection ---------------- */
+  const activeQuest = QUESTS[questId];
+  const activePrimary = activeQuest.primaryStats;
   if (!run) {
     return (
       <WanderlustAmbientField className="min-h-screen bg-[#0a0d12] text-ivory" fireflyCount={5}>
@@ -302,26 +408,34 @@ const QuestS1LabPage: React.FC = () => {
           <div className="absolute bottom-4 left-6 md:left-10">
             <Kicker>{t('questS1Lab.kicker')}</Kicker>
             <h1 className="text-3xl font-semibold text-amber-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-              {t('questS1Lab.title')}
+              {t(`questS1Lab.quests.${questId}.title`)}
             </h1>
           </div>
         </div>
         <div className="p-6 md:p-10">
+        <div className="mb-3 flex items-center gap-3">
+          <button
+            onClick={() => setQuestId(null)}
+            className="rounded-lg border border-slate-600/60 bg-slate-900/50 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400 transition hover:bg-slate-800"
+          >
+            ← {t('questS1Lab.backToQuests')}
+          </button>
+        </div>
         <p className="mb-3 max-w-2xl text-sm text-slate-400">
-          {t('questS1Lab.objective')}
+          {t(`questS1Lab.quests.${questId}.objective`)}
         </p>
         {/* Declared primary stats — the player must know a priori which
             party solves this quest. Every mandatory check uses these. */}
         <div className="mb-8 flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-sky-300">
           <span className="rounded-md border border-sky-400/50 bg-sky-950/40 px-2 py-0.5">
-            {t('questS1Lab.primaryTrial', { stats: PRIMARY_STATS.map((s) => STAT_SHORT[s]).join(' + ') })}
+            {t(`questS1Lab.quests.${questId}.trial`, { stats: activePrimary.map((s) => STAT_SHORT[s]).join(' + ') })}
           </span>
           <span className="normal-case tracking-normal text-slate-500">
             {t('questS1Lab.primaryNote')}
           </span>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {PARTY_PRESETS.map((p) => (
+          {activeQuest.presets.map((p) => (
             <section
               key={p.id}
               className="rounded-3xl border border-amber-400/40 bg-black/75 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.65)] backdrop-blur"
@@ -337,7 +451,7 @@ const QuestS1LabPage: React.FC = () => {
                     {p.gold} {t('questS1Lab.gold')}
                   </span>
                   <span className="rounded-full border border-sky-400/40 bg-sky-950/40 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-sky-300">
-                    ★ {PRIMARY_STATS.map((s) => `${STAT_SHORT[s]} ${Math.max(...p.members.map((m) => m.stats[s]))}`).join(' · ')}
+                    ★ {activePrimary.map((s) => `${STAT_SHORT[s]} ${Math.max(...p.members.map((m) => m.stats[s]))}`).join(' · ')}
                   </span>
                 </div>
               </header>
@@ -387,9 +501,9 @@ const QuestS1LabPage: React.FC = () => {
       <div className="mb-5 flex items-center justify-between">
         <div>
           <Kicker>{t('questS1Lab.kickerRun', { seed })}</Kicker>
-          <h1 className="text-2xl font-semibold text-amber-100">{t('questS1Lab.title')}</h1>
+          <h1 className="text-2xl font-semibold text-amber-100">{t(`questS1Lab.quests.${questId}.title`)}</h1>
           <div className="mt-2">
-            <QuestProgress beat={currentBeat} ended={run.ended} />
+            <QuestProgress beat={currentBeat} ended={run.ended} beats={QUEST_BEATS_BY_ID[questId]} />
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -410,6 +524,15 @@ const QuestS1LabPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Quest X-ray — Monte Carlo forecast of the run from here to the end
+          (R-082). Collapsed by default; the bench's what-if edits never
+          touch the live run state. */}
+      {!run.ended && (
+        <div className="mb-6">
+          <QuestSimulationPreview run={run} />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Party */}
         <section className="space-y-3">
@@ -427,6 +550,16 @@ const QuestS1LabPage: React.FC = () => {
               <span className="rounded-full border border-amber-300/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
                 {run.gold} {t('questS1Lab.gold')}
               </span>
+              {questId === 'rovine' && (
+                <span className="rounded-full border border-sky-400/50 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-sky-300">
+                  {t('questS1Lab.days', { days: run.days })}
+                </span>
+              )}
+              {questId === 'rovine' && run.bottinoOro > 0 && (
+                <span className="rounded-full border border-emerald-400/50 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-emerald-300">
+                  {t('questS1Lab.treasureValue', { value: run.bottinoOro })}
+                </span>
+              )}
               <CampAlertBadge flags={run.flags} />
               {run.objectiveDone && (
                 <span
@@ -467,7 +600,7 @@ const QuestS1LabPage: React.FC = () => {
               </div>
             )}
             {run.loot.length > 0 && <div className="mt-2">{t('questS1Lab.loot', { items: run.loot.join(', ') })}</div>}
-            {run.info.length > 0 && <div className="mt-1 text-slate-400">{t('questS1Lab.intel', { items: run.info.map((key) => INTEL_LABELS[key] ?? key).join(', ') })}</div>}
+            {run.info.length > 0 && <div className="mt-1 text-slate-400">{t('questS1Lab.intel', { items: run.info.map((key) => ALL_INTEL_LABELS[key] ?? key).join(', ') })}</div>}
           </div>
         </section>
 
@@ -563,12 +696,12 @@ const QuestS1LabPage: React.FC = () => {
                               key={c.stat}
                               className={[
                                 'rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider',
-                                (PRIMARY_STATS as readonly string[]).includes(c.stat)
+                                (activePrimary as readonly string[]).includes(c.stat)
                                   ? 'border-amber-300/60 bg-amber-950/40 text-amber-200'
                                   : 'border-sky-400/30 bg-sky-950/40 text-sky-200',
                               ].join(' ')}
                             >
-                              {(PRIMARY_STATS as readonly string[]).includes(c.stat) && '★ '}
+                              {(activePrimary as readonly string[]).includes(c.stat) && '★ '}
                               {c.label} <b className="text-sky-100">{c.bestValue}</b>
                               <span className="ml-1 text-sky-400/80 normal-case tracking-normal">
                                 {c.bestName}
@@ -654,30 +787,11 @@ const QuestS1LabPage: React.FC = () => {
                           </span>
                         </button>
                       )}
-                      {/* Per-slot risk — chi è esposto e chi è coperto.
-                          Il bodyguard assorbe i colpi altrui: gli altri
-                          restano esposti solo ai rischi non intercettabili. */}
-                      {pv.perSlot.some((m) => m.woundPct > 0 || m.deathPct > 0) && (
-                        <div className="flex flex-wrap gap-1.5">
-                          {pv.perSlot.map((m) => (
-                            <span
-                              key={m.id}
-                              className={[
-                                'rounded-md border px-2 py-0.5 text-[10px] tracking-wider',
-                                pv.interceptor?.name === m.name
-                                  ? 'border-purple-400/50 bg-purple-950/40 text-purple-200'
-                                  : m.wounded
-                                    ? 'border-red-400/50 bg-red-950/40 text-red-300'
-                                    : 'border-slate-500/40 bg-slate-900/50 text-slate-300',
-                              ].join(' ')}
-                              title={m.wounded ? t('questS1Lab.woundedRisk') : t(`questS1Lab.role.${m.role}`)}
-                            >
-                              {pv.interceptor?.name === m.name && '🛡 '}
-                              {t('questS1Lab.slotRisk', { name: m.name, wound: m.woundPct, death: m.deathPct })}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      {/* Pre-check forecast — exact analytic X-ray of THIS
+                          check: verdict distribution, consequences, the
+                          consumable counterfactual and per-member exposure
+                          (R-082). Reacts live to the consumable toggle. */}
+                      <QuestCheckPreview run={run} optionId={o.id} useConsumable={useConsumable} />
                       <div className="flex gap-2">
                         <button
                           onClick={() => choose(o.id, useConsumable)}

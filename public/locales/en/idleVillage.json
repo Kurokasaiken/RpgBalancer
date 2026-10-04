@@ -1086,6 +1086,79 @@
     "faceCheck": "Face the check · ~{pct}%",
     "throwCounter": "Roll {current} of {total}",
     "verdictContinue": "{verdict} — continue",
+    "sim": {
+      "open": "◈ QUEST FORECAST — what is likely to happen (simulation)",
+      "title": "QUEST FORECAST — probabilistic X-ray",
+      "runsLabel": "{runs} simulated runs",
+      "whyTitle": "WHY?",
+      "toggleIn": "include / exclude from the sim",
+      "makeLeader": "make leader",
+      "woundedOn": "wounded ✓",
+      "woundTest": "wound?",
+      "healthy": "Healthy",
+      "wounded": "Wounded",
+      "dead": "Dead",
+      "downtime": "downtime {days}d",
+      "without": "WITHOUT",
+      "withC": "WITH",
+      "bound": "party {value}",
+      "memberOdds": "{name} W{wound}% · D{death}%",
+      "whyCarrier": "{name} carries {stat} ({value})",
+      "whyIntel": "{label} (+{bonus})",
+      "whyConsumable": "{label} armed (+{bonus})",
+      "whyAlarm": "the camp is awake — checks are harder",
+      "whyWounded": "{names} already wounded (+risk)",
+      "whyCover": "{name} intercepts the blows",
+      "consequence": {
+        "noHarm": "No injury",
+        "anyWound": "1+ wounded",
+        "anyDeath": "1+ deaths",
+        "leaderWound": "Leader wounded",
+        "leaderDeath": "Leader dies"
+      },
+      "cf": {
+        "success": "Success",
+        "anyWound": "1+ wounded",
+        "anyDeath": "1+ deaths"
+      },
+      "outcome": {
+        "reward": "Reward",
+        "survived": "Survived",
+        "fled": "Retreat",
+        "wipe": "Wipe"
+      },
+      "deathsTitle": "DEATHS",
+      "deathsDist": "0: {zero}% · 1: {one}% · 2+: {twoPlus}%",
+      "avgDeathsOnReward": "x̄ {n} deaths on reward",
+      "woundsTitle": "WOUNDS",
+      "leaderTitle": "LEADER",
+      "leaderLine": "wounded {wound}% · dead {death}%",
+      "timeTitle": "TIME",
+      "daysLine": "x̄ {avg}d · {min}–{max}d",
+      "humanDays": "{hd} man-days · P50 {p50}d P90 {p90}d",
+      "rewardTitle": "REWARD",
+      "rewardLine": "{gold} gold · {treasure} treasure · {loot} loot",
+      "opt": {
+        "relic": "relic",
+        "guardLoot": "guards' loot",
+        "chestLoot": "goblin chest",
+        "viandante": "traveler helped"
+      },
+      "strategyTitle": "SIMULATED STRATEGY",
+      "cp": { "secure": "SECURE THE STAKE", "push": "PUSH DEEPER" },
+      "cpLine": "reward {reward}% · death {death}% · wound {wound}% · {days}d · treasure {treasure}",
+      "benchTitle": "WHAT-IF PARTY BENCH — hypothetical, never touches the run",
+      "why": {
+        "statStrong": "strong {stat} — {name} ({value})",
+        "statWeak": "weak {stat} — best is {name} ({value})",
+        "woundedParty": "{count} already wounded — +risk on every check",
+        "bodyguardCover": "the bodyguard intercepts harm aimed at others",
+        "alarm": "the camp is awake — every check is harder",
+        "pushDeeper": "the strategy pushes past the checkpoint — more reward, more exposure",
+        "secureStake": "the strategy banks the stake at the checkpoint",
+        "stakeOnTable": "{value} gold of treasure already in hand"
+      }
+    },
     "outcome": {
       "reward": "VICTORY — reward earned",
       "survived": "Survived — no reward",
@@ -1119,6 +1192,31 @@
       "alerted": "Camp alerted",
       "awake": "Camp awake",
       "tooltip": "The camp heard something. Another misstep and it erupts — and the quiet way out closes."
+    },
+    "labTitle": "S1 — Quest Lab",
+    "pickQuest": "Choose the expedition — two authored quests, two different shapes of risk.",
+    "backToQuests": "All quests",
+    "days": "{days} days",
+    "treasureValue": "treasure ~{value} gold",
+    "risk": {
+      "medium": "Risk: medium",
+      "high": "Risk: high"
+    },
+    "quests": {
+      "cassa": {
+        "title": "The Seed Crate",
+        "desc": "Infiltration: slip into the goblin camp, grab the crate, get out with it. What you carry can still be lost on the way out.",
+        "objective": "Goal: bring the seed crate back from the Crow Pass. The leader must survive to earn the reward. Choose the expedition:",
+        "duration": "one night",
+        "trial": "★ Infiltration trial — {stats}"
+      },
+      "rovine": {
+        "title": "The Ruins beneath the River",
+        "desc": "Exploration: cross the river, get past the guards, haul the treasure out. Time and blood are the price — how far will you push?",
+        "objective": "Goal: bring the treasure back from the ruins beneath the river. Every extra room costs days and blood. The leader must survive. Choose the expedition:",
+        "duration": "4–9 days",
+        "trial": "★ Strength trial — {stats}"
+      }
     }
   }
 }
