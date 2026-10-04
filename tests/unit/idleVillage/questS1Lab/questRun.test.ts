@@ -397,3 +397,159 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
     expect(run.lastEvent).toContain('prigioniero');
   });
 });
+
+describe('quest S1 lab — Le Rovine sotto il Fiume (attrition gauntlet)', () => {
+  /** Play a rovine run to its end with a fixed option strategy. */
+  function playRovine(seed: number, strategy: (nodeId: string, ids: string[]) => string) {
+    let run = createRun('rv-eroe', seed, 'rovine');
+    let guard = 0;
+    while (!run.ended && guard++ < 60) {
+      const opts = availableOptions(run);
+      if (opts.length === 0) break;
+      run = applyChoice(run, strategy(run.nodeId, opts.map((o) => o.id)));
+    }
+    return run;
+  }
+
+  it('creates a deterministic ruins run: 4 members, base days, merchant fork', () => {
+    const run = createRun('rv-eroe', 42, 'rovine');
+    expect(run.questId).toBe('rovine');
+    expect(run.nodeId).toBe('rv-mercante');
+    expect(run.days).toBe(4);
+    expect(run.party).toHaveLength(4);
+    expect(availableOptions(run).map((o) => o.id)).toEqual(['rv-osserva', 'rv-incalza']);
+    // the merchant fork is a check-choice, not a shop
+    const pv = previewOption(run, 'rv-incalza');
+    expect(pv).not.toBeNull();
+    expect(pv!.primaryStatsUsed).toContain('str');
+  });
+
+  it('incalzare pays in intel + coagulo on success, nothing on fail', () => {
+    let sawPay = false;
+    let sawStonewall = false;
+    for (let seed = 0; seed < 200 && !(sawPay && sawStonewall); seed++) {
+      const run = createRun('rv-eroe', seed, 'rovine');
+      applyChoice(run, 'rv-incalza');
+      // the river check auto-resolves — the fork lands on 'rv-guardie'
+      if (run.flags.includes('hasCoagulo')) sawPay = true;
+      else if (run.log.some((e) => e.text.includes('caccia malamente'))) sawStonewall = true;
+    }
+    expect(sawPay).toBe(true);
+    expect(sawStonewall).toBe(true);
+  });
+
+  it('a full playthrough reaches an end state across seeds', () => {
+    const outcomes = new Set<string>();
+    for (let seed = 0; seed < 40; seed++) {
+      const run = playRovine(seed, (_n, ids) => {
+        if (ids.includes('rv-osserva')) return 'rv-osserva';
+        if (ids.includes('rv-sneak')) return 'rv-sneak';
+        if (ids.includes('rv-prendi')) return 'rv-prendi';
+        if (ids.includes('rv-torna')) return 'rv-torna';
+        if (ids.includes('rv-lascia')) return 'rv-lascia';
+        return ids[0];
+      });
+      expect(run.ended).toBe(true);
+      outcomes.add(run.outcome);
+    }
+    expect([...outcomes]).toContain('reward');
+  });
+
+  it('the treasure take sets objectiveDone + a rolled gold value — TAKEN, not banked', () => {
+    let taken: ReturnType<typeof createRun> | null = null;
+    for (let seed = 0; seed < 200 && !taken; seed++) {
+      const run = createRun('rv-eroe', seed, 'rovine');
+      run.nodeId = 'rv-tesoro-scelta';
+      applyChoice(run, 'rv-prendi');
+      if (run.objectiveDone) taken = run;
+    }
+    expect(taken).not.toBeNull();
+    expect(taken!.bottinoOro).toBeGreaterThanOrEqual(80);
+    expect(taken!.bottinoOro).toBeLessThan(160);
+    expect(taken!.loot).toContain('tesoro delle rovine');
+    expect(taken!.nodeId).toBe('rv-checkpoint');
+    // checkpoint offers the push-your-luck: return or continue
+    const ids = availableOptions(taken!).map((o) => o.id);
+    expect(ids).toContain('rv-torna');
+    expect(ids).toContain('rv-continua');
+  });
+
+  it('the trap cascade: failing the treasure-room check routes through the trap', () => {
+    // stage at the trap node directly — success still damages the treasure
+    const run = createRun('rv-eroe', 1, 'rovine');
+    run.nodeId = 'rv-tesoro-scelta';
+    run.flags.push('tesoroDanneggiato');
+    let halved = false;
+    for (let seed = 0; seed < 200 && !halved; seed++) {
+      const r = createRun('rv-eroe', seed, 'rovine');
+      r.nodeId = 'rv-tesoro-scelta';
+      r.flags.push('tesoroDanneggiato');
+      applyChoice(r, 'rv-prendi');
+      if (r.objectiveDone && r.bottinoOro < 80) halved = true;
+    }
+    expect(halved).toBe(true);
+    void run;
+  });
+
+  it('the wounded-man option is gated on the coagulo and pays it forward', () => {
+    const run = createRun('rv-eroe', 1, 'rovine');
+    run.nodeId = 'rv-ritorno-evento';
+    // without the coagulo the option does not exist
+    expect(availableOptions(run).map((o) => o.id)).not.toContain('rv-aiuta');
+    run.flags.push('hasCoagulo');
+    expect(availableOptions(run).map((o) => o.id)).toContain('rv-aiuta');
+    const goldBefore = run.gold;
+    applyChoice(run, 'rv-aiuta');
+    expect(run.gold).toBe(goldBefore + 50);
+    expect(run.flags).not.toContain('hasCoagulo');
+    expect(run.flags).toContain('viandanteAiutato');
+    expect(run.ended).toBe(true);
+    expect(run.lastEvent).toContain('giorni');
+  });
+
+  it('continuing past the checkpoint always costs a day — attrition has no check', () => {
+    for (const seed of [0, 1, 2, 3]) {
+      const run = createRun('rv-eroe', seed, 'rovine');
+      run.nodeId = 'rv-checkpoint';
+      run.objectiveDone = true;
+      const daysBefore = run.days;
+      applyChoice(run, 'rv-continua');
+      // attrito (harm) + camera (check) resolve automatically → rv-ritorno-evento
+      expect(run.days).toBeGreaterThan(daysBefore);
+      expect(['rv-ritorno-evento', 'rv-fine']).toContain(run.nodeId);
+    }
+  });
+
+  it('the report epilogue counts days, human-days and wounded recovery', () => {
+    const run = playRovine(0, (_n, ids) =>
+      ids.includes('rv-incalza')
+        ? 'rv-incalza'
+        : ids.includes('rv-fight')
+          ? 'rv-fight'
+          : ids.includes('rv-prendi')
+            ? 'rv-prendi'
+            : ids.includes('rv-continua')
+              ? 'rv-continua'
+              : ids.includes('rv-porta')
+                ? 'rv-porta'
+                : ids[0],
+    );
+    expect(run.ended).toBe(true);
+    expect(run.lastEvent).toContain('Durata:');
+    expect(run.lastEvent).toContain('Giorni-uomo');
+  });
+
+  it('fleeing with the treasure in hand drops it — panic is not a free save', () => {
+    const run = createRun('rv-eroe', 3, 'rovine');
+    run.nodeId = 'rv-checkpoint';
+    run.objectiveDone = true;
+    run.bottinoOro = 120;
+    run.loot.push('tesoro delle rovine');
+    flee(run);
+    expect(run.ended).toBe(true);
+    expect(run.outcome).toBe('fled');
+    expect(run.flags).toContain('tesoroPerso');
+    expect(run.loot).not.toContain('tesoro delle rovine');
+    expect(run.bottinoOro).toBe(0);
+  });
+});

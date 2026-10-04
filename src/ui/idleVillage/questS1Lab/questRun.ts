@@ -9,7 +9,44 @@
 
 import { DEFAULT_QUEST_SKILL_CHECK_CONFIG } from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
 import { PARTY_PRESETS, PRIMARY_STATS, SCENARIO_NODES, START_NODE } from './questScenario';
-import type { LabMember, LabStat, QuestNode } from './questScenario';
+import {
+  ROVINE_NODES,
+  ROVINE_PRESETS,
+  ROVINE_PRIMARY_STATS,
+  ROVINE_START_NODE,
+} from './questScenarioRovine';
+import type { LabMember, LabStat, PartyPreset, QuestNode } from './questScenario';
+
+/** The two authored S1 lab quests. 'cassa' = infiltration (agi/perc,
+ *  alertness states); 'rovine' = attrition gauntlet (str/con, days & HP). */
+export type QuestId = 'cassa' | 'rovine';
+
+interface QuestDef {
+  nodes: Record<string, QuestNode>;
+  presets: PartyPreset[];
+  primaryStats: readonly LabStat[];
+  startNode: string;
+}
+
+const QUESTS: Record<QuestId, QuestDef> = {
+  cassa: {
+    nodes: SCENARIO_NODES,
+    presets: PARTY_PRESETS,
+    primaryStats: PRIMARY_STATS,
+    startNode: START_NODE,
+  },
+  rovine: {
+    nodes: ROVINE_NODES,
+    presets: ROVINE_PRESETS,
+    primaryStats: ROVINE_PRIMARY_STATS,
+    startNode: ROVINE_START_NODE,
+  },
+};
+
+/** The active quest's authored node map. */
+export function nodesFor(state: QuestRunState): Record<string, QuestNode> {
+  return QUESTS[state.questId].nodes;
+}
 
 /** Five-verdict scale, reusing the Astrolabe vocabulary. */
 export type Verdict = 'epicfail' | 'fail' | 'almost' | 'win' | 'bigwin';
@@ -43,10 +80,17 @@ export interface LogEntry {
 export interface QuestRunState {
   seed: number;
   rngCalls: number;
+  /** Which authored quest this run is playing. */
+  questId: QuestId;
   presetId: string;
   nodeId: string;
   party: RuntimeMember[];
   gold: number;
+  /** Elapsed quest days — the ruins quest's visible cost currency. */
+  days: number;
+  /** Gold value of the treasure in hand (ruins quest) — the stake shown at
+   *  the checkpoint, reducible by trap damage. */
+  bottinoOro: number;
   loot: string[];
   info: string[];
   flags: string[];
@@ -105,7 +149,7 @@ export function roll(state: QuestRunState): number {
 /* Tunables — mock values, all provisional and easy to tune.            */
 /* ------------------------------------------------------------------ */
 
-const TUNE = {
+export const TUNE = {
   deathSaveChance: 0.05,
   woundedRiskBonus: 5, // pp added to wound+death risk when already wounded
   winRiskMod: -5, // win/bigwin reduce wound & death risk
@@ -116,6 +160,18 @@ const TUNE = {
   alarmDifficultyBonus: 10, // pp the party score loses while alarm is up
   bigwinBand: 5, // lowest N rolls of the D100 = triumph
   almostBand: 5, // N rolls just past the success bound = near-miss
+  /* ---- Rovine quest: days & stakes ---------------------------------------
+   * Time is the visible cost; the treasure's gold value is the stake the
+   * checkpoint shows before the push-your-luck. */
+  rovineBaseDays: 4,
+  rovineWoundedRecoveryDays: 3,
+  treasureMin: 80,
+  treasureSpan: 80, // 80–159 gold rolled at the take
+  deepChamberMin: 60,
+  deepChamberSpan: 61, // 60–120 gold
+  woundedManSale: 50, // the coagulo sells for more than it's worth
+  woundedManRide: 20, // carrying him earns a future favor, cashed now in gold
+  maxAutoSteps: 64, // hard cap on auto-resolved node chains (check/info/harm): an authored cycle degrades to a terminal state instead of a stack overflow
 };
 
 /**
@@ -127,7 +183,7 @@ const TUNE = {
 const CHECK_BANDS = DEFAULT_QUEST_SKILL_CHECK_CONFIG.backgroundResolution;
 
 /** Per-slot extra risk (percentage points) on top of the node's base. */
-const SLOT_RISK: Record<string, { wound: number; death: number }> = {
+export const SLOT_RISK: Record<string, { wound: number; death: number }> = {
   bodyguard: { wound: 10, death: 5 }, // exposed role
   leader: { wound: -5, death: -1 }, // protected position
   member: { wound: 0, death: 0 },
@@ -137,7 +193,7 @@ const SLOT_RISK: Record<string, { wound: number; death: number }> = {
 /* Check resolution                                                     */
 /* ------------------------------------------------------------------ */
 
-const STAT_LABELS: Record<LabStat, string> = {
+export const STAT_LABELS: Record<LabStat, string> = {
   perc: 'Percezione',
   int: 'Intelligenza',
   str: 'Forza',
@@ -150,7 +206,7 @@ const STAT_LABELS: Record<LabStat, string> = {
  * Group check score: best living member per stat, averaged.
  * Composition matters because different approaches use different stats.
  */
-function groupScore(state: QuestRunState, stats: LabStat[]): number {
+export function groupScore(state: QuestRunState, stats: LabStat[]): number {
   const alive = state.party.filter((m) => !m.dead);
   if (alive.length === 0 || stats.length === 0) return 0;
   const total = stats.reduce(
@@ -176,7 +232,7 @@ function verdictFromRoll(die: number, successBound: number): Verdict {
 }
 
 /** Success bound clamped to the canonical floor/ceiling. */
-function clampSuccessBound(score: number): number {
+export function clampSuccessBound(score: number): number {
   return Math.min(CHECK_BANDS.successCeiling, Math.max(CHECK_BANDS.successFloor, score));
 }
 
@@ -290,9 +346,11 @@ function rollCheckHarms(
 /* Engine                                                               */
 /* ------------------------------------------------------------------ */
 
-/** Create a fresh run from a preset + seed. */
-export function createRun(presetId: string, seed: number): QuestRunState {
-  const preset = PARTY_PRESETS.find((p) => p.id === presetId) ?? PARTY_PRESETS[0];
+/** Create a fresh run from a preset + seed. `questId` selects the authored
+ *  quest: 'cassa' (default, infiltration) or 'rovine' (attrition gauntlet). */
+export function createRun(presetId: string, seed: number, questId: QuestId = 'cassa'): QuestRunState {
+  const quest = QUESTS[questId];
+  const preset = quest.presets.find((p) => p.id === presetId) ?? quest.presets[0];
   const party: RuntimeMember[] = preset.members.map((m) => ({
     ...m,
     hp: TUNE.hp,
@@ -300,13 +358,26 @@ export function createRun(presetId: string, seed: number): QuestRunState {
     wounded: false,
     dead: false,
   }));
+  const intro =
+    questId === 'rovine'
+      ? {
+          lastEvent: 'La spedizione parte per le rovine sotto il fiume.',
+          firstLog: 'Partenza — obiettivo: riportare il tesoro delle rovine. La strada conta in giorni.',
+        }
+      : {
+          lastEvent: 'La spedizione parte per il Passo del Corvo.',
+          firstLog: 'Partenza — obiettivo: riportare la cassa delle sementi.',
+        };
   const state: QuestRunState = {
     seed,
     rngCalls: 0,
+    questId,
     presetId: preset.id,
-    nodeId: START_NODE,
+    nodeId: quest.startNode,
     party,
     gold: preset.gold,
+    days: questId === 'rovine' ? TUNE.rovineBaseDays : 0,
+    bottinoOro: 0,
     loot: [],
     info: [],
     flags: [],
@@ -314,9 +385,9 @@ export function createRun(presetId: string, seed: number): QuestRunState {
     objectiveDone: false,
     ended: false,
     outcome: 'running',
-    lastEvent: 'La spedizione parte per il Passo del Corvo.',
+    lastEvent: intro.lastEvent,
     checkQueue: [],
-    log: [{ kind: 'NODE', text: 'Partenza — obiettivo: riportare la cassa delle sementi.' }],
+    log: [{ kind: 'NODE', text: intro.firstLog }],
   };
   return state;
 }
@@ -350,24 +421,36 @@ function dropLoot(state: QuestRunState, item: string, reason: string): void {
 }
 
 /**
- * TAKEN ≠ SECURED (Director-approved minimal redesign, 2026-10-03): the seed
- * crate is the quest objective — acquired ≠ banked. It is lost if the escape
- * fails or the party panics (flee). Once lost it stays at the camp.
+ * TAKEN ≠ SECURED (Director-approved minimal redesign, 2026-10-03): the
+ * objective — the seed crate, or the ruins treasure — is acquired, not
+ * banked. It is lost if the escape fails or the party panics (flee).
+ * Once lost it stays behind.
  */
-function dropCrate(state: QuestRunState, reason: string): void {
+function dropObjective(state: QuestRunState, reason: string): void {
   if (!state.objectiveDone) return;
   state.objectiveDone = false;
-  state.flags.push('cassaPersa');
-  dropLoot(state, 'cassa delle sementi', reason);
+  if (state.questId === 'rovine') {
+    state.flags.push('tesoroPerso');
+    state.bottinoOro = 0;
+    dropLoot(state, 'tesoro delle rovine', reason);
+  } else {
+    state.flags.push('cassaPersa');
+    dropLoot(state, 'cassa delle sementi', reason);
+  }
 }
 
-/** Player chooses to flee — quest failed, secured loot kept; the crate is
- *  still "in hand", not banked: panic means dropping it to run. */
+/** Player chooses to flee — quest failed, secured loot kept; the objective
+ *  is still "in hand", not banked: panic means dropping it to run. */
 export function flee(state: QuestRunState): QuestRunState {
   if (state.ended) return state;
   state.log.push({ kind: 'RETREAT', text: 'La spedizione si ritira.' });
   if (state.objectiveDone) {
-    dropCrate(state, 'nella fuga la cassa vi rallenta troppo — la mollate ai bordi del campo.');
+    dropObjective(
+      state,
+      state.questId === 'rovine'
+        ? 'nella fuga il tesoro vi pesa troppo — lo abbandonate tra i ruderi.'
+        : 'nella fuga la cassa vi rallenta troppo — la mollate ai bordi del campo.',
+    );
   }
   endRun(state, 'fled', 'Fuggite verso il villaggio con quanto avete raccolto. La quest è fallita.');
   return state;
@@ -395,7 +478,7 @@ interface CheckResult {
 }
 
 /** Which owned consumable would boost this check, and by how much (preview + resolution share this). */
-function consumableBonusFor(
+export function consumableBonusFor(
   state: QuestRunState,
   node: QuestNode,
 ): { bonus: number; label: string; flag: string } | null {
@@ -413,7 +496,7 @@ function consumableBonusFor(
  * Discovered intel that changes a check's numbers — the payoff of the
  * sighting phase. turni→sneak, pattuglia→side door, mappa→perquisizione.
  */
-function intelBonusFor(state: QuestRunState, node: QuestNode): { bonus: number; label: string } | null {
+export function intelBonusFor(state: QuestRunState, node: QuestNode): { bonus: number; label: string } | null {
   if (node.id === 'check-ingresso-agi' && state.info.includes('turni')) {
     return { bonus: 10, label: 'conoscete i turni di guardia' };
   }
@@ -422,6 +505,18 @@ function intelBonusFor(state: QuestRunState, node: QuestNode): { bonus: number; 
   }
   if (node.id === 'perquisizione' && state.info.includes('mappaAccampamento')) {
     return { bonus: 10, label: 'avete la mappa mentale del campo' };
+  }
+  // Rovine: the merchant's intel pays on the checks it describes —
+  // the rough map helps at the river and spotting the trap; knowing what
+  // the guards really watch makes sneaking past them easier.
+  if (node.id === 'rv-fiume' && state.info.includes('mappaRovine')) {
+    return { bonus: 10, label: 'la mappa segna il punto di corrente debole' };
+  }
+  if (node.id === 'rv-check-sneak' && state.info.includes('guardiePiuAvanti')) {
+    return { bonus: 10, label: 'sapete cosa sorvegliano davvero' };
+  }
+  if (node.id === 'rv-sala' && state.info.includes('mappaRovine')) {
+    return { bonus: 10, label: 'la mappa segna le lastre trabocchetto' };
   }
   return null;
 }
@@ -558,10 +653,11 @@ export function previewOption(
   opts?: { useConsumable?: boolean },
 ): OptionPreview | null {
   if (state.ended) return null;
-  const node = SCENARIO_NODES[state.nodeId];
+  const nodes = nodesFor(state);
+  const node = nodes[state.nodeId];
   const option = node?.options?.find((o) => o.id === optionId);
   if (!option || !option.next.startsWith('CHECK:')) return null;
-  const checkNode = SCENARIO_NODES[option.next.slice(6)];
+  const checkNode = nodes[option.next.slice(6)];
   if (!checkNode || !checkNode.stats) return null;
 
   const alive = state.party.filter((m) => !m.dead);
@@ -581,7 +677,9 @@ export function previewOption(
     wounded: m.wounded,
     ...memberRisk(m, checkNode),
   }));
-  const primaryStatsUsed = checkNode.stats.filter((s) => PRIMARY_STATS.includes(s));
+  const primaryStatsUsed = checkNode.stats.filter((s) =>
+    QUESTS[state.questId].primaryStats.includes(s),
+  );
   return {
     checkTitle: checkNode.title,
     contributors,
@@ -650,6 +748,13 @@ function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdi
     return 'risveglio';
   }
   return next;
+}
+
+/** Days are the ruins quest's visible cost — every delay is logged so the
+ *  player watches the price accumulate before the checkpoint. */
+function addDays(state: QuestRunState, n: number, reason: string): void {
+  state.days += n;
+  state.log.push({ kind: 'INFO', text: `+${n} ${n === 1 ? 'giorno' : 'giorni'} — ${reason}` });
 }
 
 function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdict, success: boolean, bad: boolean): string {
@@ -729,7 +834,7 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.log.push({ kind: 'INFO', text: 'Correte nella notte. Dietro di voi la torre si sgretola — eravate a un soffio.' });
       } else {
         state.log.push({ kind: 'INFO', text: 'La fuga è un massacro disperato.' });
-        dropCrate(state, 'la lasciate cadere correndo — resta nella torre.');
+        dropObjective(state, 'la lasciate cadere correndo — resta nella torre.');
       }
       return 'ritorno';
     case 'check-uscita-breccia':
@@ -739,7 +844,7 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         dropLoot(state, 'forziere goblin', 'resta incastrato nella breccia.');
         dropLoot(state, 'segnale della cassa', 'perso nella strettoia.');
         if (verdict === 'epicfail') {
-          dropCrate(state, 'la cassa si incastra nel varco — per uscire dovete lasciarla.');
+          dropObjective(state, 'la cassa si incastra nel varco — per uscire dovete lasciarla.');
           state.log.push({ kind: 'INFO', text: 'Il prigioniero vi trascina oltre il muro: siete fuori, a mani vuote.' });
         } else {
           state.log.push({ kind: 'INFO', text: 'Uscite dalla breccia spinti a forza — qualcosa resta indietro.' });
@@ -751,7 +856,7 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         dropLoot(state, 'forziere goblin', 'troppo pesante per sparire in silenzio.');
         dropLoot(state, 'segnale della cassa', 'perso nel buio.');
         if (verdict === 'epicfail') {
-          dropCrate(state, 'una pattuglia taglia la via: per scappare mollate la cassa.');
+          dropObjective(state, 'una pattuglia taglia la via: per scappare mollate la cassa.');
         } else {
           state.log.push({ kind: 'INFO', text: 'Qualcuno alza lo sguardo al momento sbagliato: vi dileguate, più leggeri.' });
         }
@@ -760,11 +865,134 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
     case 'check-uscita-allarme':
       if (bad) {
         // The loud way out: a fail means the crate is the price of speed.
-        dropCrate(state, 'il campo vi addossa — la cassa vi rallenta troppo, resta qui.');
+        dropObjective(state, 'il campo vi addossa — la cassa vi rallenta troppo, resta qui.');
         dropLoot(state, 'forziere goblin', 'perso nella corsa.');
         dropLoot(state, 'segnale della cassa', 'perso nella corsa.');
       }
       return 'ritorno';
+    /* ---- Le Rovine sotto il Fiume ----------------------------------------
+     * Attrition gauntlet: costs are HP and days. The merchant's choice is a
+     * real check-fork; the trap cascade demonstrates fail-forward; the
+     * treasure is TAKEN≠SECURED from the take to the end node. */
+    case 'rv-check-osserva':
+      if (verdict === 'bigwin') {
+        state.info.push('guardiePiuAvanti', 'mappaRovine');
+        state.log.push({
+          kind: 'INFO',
+          text: 'Lo leggete aperto: «le guardie non proteggono l’ingresso — proteggono qualcosa più avanti». E vi lascia la sua mappa abbozzata.',
+        });
+      } else if (verdict === 'win' || verdict === 'almost') {
+        state.info.push('guardiePiuAvanti');
+        state.log.push({
+          kind: 'INFO',
+          text: 'Il mercante rivela: «le guardie non stanno proteggendo l’ingresso. Stanno proteggendo qualcosa più avanti.»',
+        });
+      } else {
+        state.log.push({ kind: 'INFO', text: 'Non capite più di quanto vi ha detto. Entrerete quasi alla cieca.' });
+      }
+      return 'rv-fiume';
+    case 'rv-check-incalza':
+      if (success) {
+        state.info.push('guardiePiuAvanti', 'mappaRovine');
+        state.flags.push('hasCoagulo');
+        state.log.push({
+          kind: 'INFO',
+          text: 'Cede: «le guardie proteggono qualcosa più avanti». Vi lascia la mappa abbozzata e un coagulo — «per la strada, potrebbe servirvi».',
+        });
+        if (verdict === 'bigwin') {
+          state.gold += 10;
+          state.log.push({ kind: 'LOOT', text: 'Vi allunga anche 10 gold per «non dirlo in giro».' });
+        }
+      } else {
+        state.log.push({ kind: 'INFO', text: 'Vi caccia malamente: niente informazioni, e partite con l’amaro in bocca.' });
+      }
+      return 'rv-fiume';
+    case 'rv-fiume':
+      if (verdict === 'almost') {
+        addDays(state, 1, 'la corrente vi trascina mezzo miglio più a valle.');
+      } else if (verdict === 'fail') {
+        addDays(state, 1 + Math.floor(roll(state) * 2), 'trascinati dalla corrente, risalire costa tempo.');
+      } else if (verdict === 'epicfail') {
+        addDays(state, 2, 'sbattuti sugli scogli — zoppicate fuori dall’acqua.');
+      }
+      return 'rv-guardie';
+    case 'rv-check-sneak':
+      if (bad) {
+        state.flags.push('inseguiti');
+        state.log.push({
+          kind: 'INFO',
+          text: 'Vi hanno visti: le picche vi inseguono fino all’uscita della galleria.',
+        });
+      }
+      return 'rv-sala';
+    case 'rv-check-fight':
+      if (verdict === 'bigwin') {
+        state.gold += 40;
+        state.loot.push('bottino delle guardie');
+        state.log.push({ kind: 'LOOT', text: 'Le guardie cadono senza chiamare aiuto: +40 gold di bottino.' });
+      } else if (success) {
+        state.gold += 25;
+        state.loot.push('bottino delle guardie');
+        state.log.push({ kind: 'LOOT', text: 'Le guardie sono a terra: +25 gold di bottino.' });
+      } else {
+        state.log.push({ kind: 'INFO', text: 'Riuscite a passare, ma le picche si sono fatte pagare.' });
+      }
+      return 'rv-sala';
+    case 'rv-sala':
+      if (success) {
+        state.log.push({ kind: 'INFO', text: 'La vedete: la lastra davanti al tesoro è un trabocchetto. Ora potete scegliere come muovervi.' });
+        return 'rv-tesoro-scelta';
+      }
+      state.log.push({ kind: 'INFO', text: 'Niente di strano… finché il pavimento non cede sotto i vostri piedi.' });
+      return 'rv-check-trappola';
+    case 'rv-check-trappola':
+      state.flags.push('tesoroDanneggiato');
+      if (success) {
+        state.log.push({ kind: 'INFO', text: 'Vi tirate fuori dalla fossa — ma parte del tesoro è finito sotto la frana.' });
+      } else {
+        addDays(state, 1, 'scavare per uscire dalla trappola vi costa un giorno.');
+        state.log.push({ kind: 'INFO', text: 'Uscite dalla trappola a fatica: il tesoro si è parzialmente danneggiato.' });
+      }
+      return 'rv-tesoro-scelta';
+    case 'rv-check-prendi':
+    case 'rv-check-sicuro': {
+      if (success) {
+        let value = TUNE.treasureMin + Math.floor(roll(state) * TUNE.treasureSpan);
+        if (state.flags.includes('tesoroDanneggiato')) {
+          value = Math.floor(value / 2);
+          state.log.push({ kind: 'INFO', text: 'Quel che resta dopo la frana vale la metà.' });
+        }
+        if (node.id === 'rv-check-sicuro') {
+          value = Math.round(value * 1.2);
+        }
+        state.bottinoOro = value;
+        state.objectiveDone = true;
+        state.loot.push('tesoro delle rovine');
+        state.log.push({ kind: 'LOOT', text: `Tesoro caricato — in mano, non ancora al sicuro. Vale circa ${value} gold.` });
+        return 'rv-checkpoint';
+      }
+      // Failed take: the treasure stays — the run continues to the exit empty.
+      state.log.push({ kind: 'INFO', text: 'Il tesoro è troppo per le vostre schiene — ne portate via solo briciole. Uscirete quasi a mani vuote.' });
+      state.bottinoOro = Math.floor((TUNE.treasureMin / 4) + roll(state) * 20);
+      return 'rv-checkpoint';
+    }
+    case 'rv-camera':
+      if (verdict === 'bigwin') {
+        const gain = TUNE.deepChamberMin + Math.floor(roll(state) * TUNE.deepChamberSpan);
+        state.bottinoOro += gain;
+        state.loot.push('reliquia antica');
+        state.log.push({ kind: 'LOOT', text: `Il deposito era intatto: +${gain} gold e una reliquia antica.` });
+        addDays(state, 1, 'svuotare la camera profonda.');
+      } else if (success) {
+        const gain = TUNE.deepChamberMin + Math.floor(roll(state) * TUNE.deepChamberSpan);
+        state.bottinoOro += gain;
+        state.log.push({ kind: 'LOOT', text: `Il deposito paga: +${gain} gold.` });
+        addDays(state, 1, 'svuotare la camera profonda.');
+      } else {
+        addDays(state, 1 + Math.floor(roll(state) * 2), 'il deposito era già quasi vuoto — scavare non paga.');
+        state.log.push({ kind: 'INFO', text: 'Qualcuno era passato prima di voi: restano solo scarti.' });
+      }
+      return 'rv-ritorno-evento';
     default:
       return 'ritorno';
   }
@@ -781,6 +1009,34 @@ function composeEndingText(state: QuestRunState, base: string): string {
   if (dead.length > 0) {
     pieces.push(`${dead.join(', ')} non ${dead.length > 1 ? 'sono tornati' : 'è tornato'}.`);
   }
+  if (state.questId === 'rovine') {
+    // Report-style epilogue (mockup): the cost continues after the quest —
+    // days spent, human-days burned, wounded members unavailable.
+    pieces.push(`Durata: ${state.days} giorni.`);
+    pieces.push(`Giorni-uomo utilizzati: ${state.party.length} × ${state.days} = ${state.party.length * state.days}.`);
+    if (state.bottinoOro > 0) {
+      pieces.push(`Bottino riportato: ${state.bottinoOro} gold.`);
+    }
+    if (state.flags.includes('tesoroPerso')) {
+      pieces.push('Il tesoro è rimasto nelle rovine.');
+    }
+    const wounded = state.party.filter((m) => !m.dead && m.wounded).map((m) => m.name);
+    for (const name of wounded) {
+      pieces.push(`${name}: FERITO — indisponibile per ${TUNE.rovineWoundedRecoveryDays} giorni.`);
+    }
+    if (state.flags.includes('viandanteAiutato')) {
+      pieces.push('Il viandante che avete curato vi ha pagato più del dovuto.');
+    } else if (state.flags.includes('viandantePortato')) {
+      pieces.push('Il viandante che avete portato al villaggio vi deve un favore.');
+    } else if (state.flags.includes('viandanteLasciato')) {
+      pieces.push('Il ferito sulla strada è rimasto dove lo avete lasciato.');
+    }
+    const extra = state.loot.filter((l) => l !== 'tesoro delle rovine');
+    if (extra.length > 0) {
+      pieces.push(`Portate a casa: ${extra.join(', ')}.`);
+    }
+    return pieces.join(' ');
+  }
   if (state.flags.includes('cassaPersa')) {
     pieces.push('La cassa delle sementi è rimasta al campo.');
   }
@@ -794,70 +1050,136 @@ function composeEndingText(state: QuestRunState, base: string): string {
   return pieces.join(' ');
 }
 
-/** Advance from an info node, computing its dynamic text. */
+/** Advance through auto-resolving nodes, computing their dynamic text. */
 function enterNode(state: QuestRunState, nodeId: string): void {
-  const node = SCENARIO_NODES[nodeId];
-  if (!node) return;
-  state.nodeId = nodeId;
-  state.log.push({ kind: 'NODE', text: node.title });
-
-  // Check nodes resolve as soon as they are reached: the choice that led here
-  // already committed the party; resolution is the consequence.
-  if (node.kind === 'check') {
-    const result = resolveCheck(state, node);
-    state.lastEvent = `${node.title} — ${result.verdict.toUpperCase()}.`;
-    if (allDead(state)) {
-      endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+  // Iterative, bounded traversal: check/info/harm chains used to recurse.
+  // A cycle in authored `next` links must degrade to a terminal state —
+  // an infinite recursion here crashes the whole React tree with a
+  // RangeError (mount flood → error boundary retry → page reload).
+  let cursor: string | undefined = nodeId;
+  for (let steps = 0; cursor; steps += 1) {
+    if (steps >= TUNE.maxAutoSteps) {
+      state.log.push({ kind: 'INFO', text: `Il percorso si è chiuso in un ciclo (${cursor}). La spedizione torna al villaggio.` });
+      endRun(state, 'survived', 'Il percorso si è chiuso su se stesso: la spedizione è rientrata.');
       return;
     }
-    enterNode(state, applyCheckOutcome(state, node, result.verdict));
-    return;
-  }
+    const node = nodesFor(state)[cursor];
+    if (!node) return;
+    state.nodeId = cursor;
+    state.log.push({ kind: 'NODE', text: node.title });
 
-  // Info nodes are narrative beats, not decisions: they set lastEvent and
-  // auto-advance so the player clicks only on real choices.
-  if (node.kind === 'info') {
-    state.log.push({ kind: 'INFO', text: node.body });
-    state.lastEvent = node.body;
-    enterNode(state, node.next ?? 'ritorno');
-    return;
-  }
+    // Spotted sneaking past the guards: their patrol chases the party out —
+    // the return costs a day.
+    if (cursor === 'rv-ritorno-evento' && state.flags.includes('inseguiti')) {
+      addDays(state, 1, 'seminare le guardie che vi inseguivano.');
+    }
 
-  if (node.kind === 'harm') {
-    // Travel incident: direct, non-check harm — the bodyguard cannot intercept.
-    if (roll(state) < TUNE.incidentChance) {
-      const candidates = state.party.filter((m) => !m.dead);
-      const victim = candidates[Math.floor(roll(state) * candidates.length)];
-      if (victim) {
-        victim.wounded = true;
-        victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
-        state.log.push({ kind: 'HARM', text: `La frana colpisce ${victim.name}: ferito.` });
-        state.lastEvent = `La frana coglie ${victim.name}. Il resto della strada lo farà con una ferita.`;
+    // Check nodes resolve as soon as they are reached: the choice that led here
+    // already committed the party; resolution is the consequence.
+    if (node.kind === 'check') {
+      const result = resolveCheck(state, node);
+      state.lastEvent = `${node.title} — ${result.verdict.toUpperCase()}.`;
+      if (allDead(state)) {
+        endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+        return;
       }
-    } else {
-      state.lastEvent = 'La frana passa a pochi metri: spavento, ma nessun danno.';
+      cursor = applyCheckOutcome(state, node, result.verdict);
+      continue;
     }
-    if (allDead(state)) {
-      endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
-      return;
-    }
-    enterNode(state, node.next ?? 'ritorno');
-    return;
-  }
 
-  if (nodeId === 'ritorno') {
-    const lead = leader(state);
-    if (allDead(state)) {
-      endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
-    } else if (state.objectiveDone && lead && !lead.dead) {
-      // Arriving at 'ritorno' with the crate IS the secure event: TAKEN only
-      // becomes SECURED here, after an extraction the player chose and rolled.
-      endRun(state, 'reward', 'Cassa delle sementi riportata al villaggio. La quest è completa — reward ottenuta.');
-    } else if (state.objectiveDone && (!lead || lead.dead)) {
-      endRun(state, 'survived', 'La cassa torna al villaggio, ma il leader non c’è più. La reward della quest va persa.');
-    } else {
-      endRun(state, 'survived', 'Tornate al villaggio senza la cassa. La quest è fallita, ma siete vivi.');
+    // Info nodes are narrative beats, not decisions: they set lastEvent and
+    // auto-advance so the player clicks only on real choices.
+    if (node.kind === 'info') {
+      state.log.push({ kind: 'INFO', text: node.body });
+      state.lastEvent = node.body;
+      cursor = node.next ?? 'ritorno';
+      continue;
     }
+
+    if (node.kind === 'harm') {
+      if (node.id === 'rv-attrito') {
+        // The unstable zone: no check can erase this cost (Director mockup —
+        // "continuare deve costare qualcosa"). +1 day always, then a roll:
+        // a wound worsens, or someone new is hurt, or luck holds.
+        addDays(state, 1, 'attraversare la zona instabile.');
+        const candidates = state.party.filter((m) => !m.dead);
+        const r = roll(state);
+        if (r < 0.35 && candidates.some((m) => m.wounded)) {
+          const victim = candidates.find((m) => m.wounded);
+          if (victim) {
+            victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
+            state.log.push({ kind: 'HARM', text: `La ferita di ${victim.name} peggiora nella zona instabile.` });
+            state.lastEvent = `${victim.name} peggiora: la zona non perdona chi è già ferito.`;
+          }
+        } else if (r < 0.7) {
+          const victim = candidates[Math.floor(roll(state) * candidates.length)];
+          if (victim) {
+            victim.wounded = true;
+            victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
+            state.log.push({ kind: 'HARM', text: `${victim.name} è ferito nella zona instabile.` });
+            state.lastEvent = `La pietra cede sotto ${victim.name}: ferito. Il costo del passaggio.`;
+          }
+        } else {
+          state.lastEvent = 'La zona scricchiola ma regge: passate indenni — stavolta.';
+        }
+      } else {
+        // Travel incident: direct, non-check harm — the bodyguard cannot intercept.
+        if (roll(state) < TUNE.incidentChance) {
+          const candidates = state.party.filter((m) => !m.dead);
+          const victim = candidates[Math.floor(roll(state) * candidates.length)];
+          if (victim) {
+            victim.wounded = true;
+            victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
+            state.log.push({ kind: 'HARM', text: `La frana colpisce ${victim.name}: ferito.` });
+            state.lastEvent = `La frana coglie ${victim.name}. Il resto della strada lo farà con una ferita.`;
+          }
+        } else {
+          state.lastEvent = 'La frana passa a pochi metri: spavento, ma nessun danno.';
+        }
+      }
+      if (allDead(state)) {
+        endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+        return;
+      }
+      cursor = node.next ?? 'ritorno';
+      continue;
+    }
+
+    if (node.kind === 'end') {
+      const lead = leader(state);
+      if (allDead(state)) {
+        endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+      } else if (state.objectiveDone && lead && !lead.dead) {
+        // Arriving at the end with the objective IS the secure event: TAKEN
+        // only becomes SECURED here, after a route the player chose and rolled.
+        endRun(
+          state,
+          'reward',
+          state.questId === 'rovine'
+            ? 'Il tesoro delle rovine è al villaggio. La quest è completa — reward ottenuta.'
+            : 'Cassa delle sementi riportata al villaggio. La quest è completa — reward ottenuta.',
+        );
+      } else if (state.objectiveDone && (!lead || lead.dead)) {
+        endRun(
+          state,
+          'survived',
+          state.questId === 'rovine'
+            ? 'Il tesoro torna al villaggio, ma il leader non c’è più. La reward della quest va persa.'
+            : 'La cassa torna al villaggio, ma il leader non c’è più. La reward della quest va persa.',
+        );
+      } else {
+        endRun(
+          state,
+          'survived',
+          state.questId === 'rovine'
+            ? 'Tornate al villaggio senza il tesoro. La quest è fallita, ma siete vivi.'
+            : 'Tornate al villaggio senza la cassa. La quest è fallita, ma siete vivi.',
+        );
+      }
+    }
+
+    // Choice nodes (and anything unknown) stop the chain and wait for input.
+    return;
   }
 }
 
@@ -871,7 +1193,8 @@ export function applyChoice(
   opts?: { useConsumable?: boolean },
 ): QuestRunState {
   if (state.ended) return state;
-  const node = SCENARIO_NODES[state.nodeId];
+  const nodes = nodesFor(state);
+  const node = nodes[state.nodeId];
   if (!node) return state;
   // A new player action starts a new burst of checks.
   state.checkQueue = [];
@@ -888,6 +1211,7 @@ export function applyChoice(
   if (option.requiresFlag && !state.flags.includes(option.requiresFlag)) return state;
   if (option.hiddenIfFlag && state.flags.includes(option.hiddenIfFlag)) return state;
   if (option.costGold && state.gold < option.costGold) return state;
+  if (option.consumesFlag && !state.flags.includes(option.consumesFlag)) return state;
 
   if (option.costGold) {
     state.gold -= option.costGold;
@@ -897,12 +1221,25 @@ export function applyChoice(
       state.log.push({ kind: 'INFO', text: 'Il mercante: «non sono goblin qualunque… portano un simbolo».' });
     }
   }
+  if (option.consumesFlag) {
+    state.flags = state.flags.filter((f) => f !== option.consumesFlag);
+  }
+  if (option.grantsGold) {
+    state.gold += option.grantsGold;
+    state.log.push({ kind: 'LOOT', text: `+${option.grantsGold} gold.` });
+  }
+  if (option.grantsInfo && !state.info.includes(option.grantsInfo)) {
+    state.info.push(option.grantsInfo);
+  }
+  if (option.costDays) {
+    addDays(state, option.costDays, 'la scelta fatta.');
+  }
   if (option.sets) state.flags.push(option.sets);
   state.log.push({ kind: 'CHOICE', text: option.label });
 
   const next = option.next;
   if (next.startsWith('CHECK:')) {
-    const checkNode = SCENARIO_NODES[next.slice(6)];
+    const checkNode = nodes[next.slice(6)];
     state.nodeId = checkNode.id;
     const result = resolveCheck(state, checkNode, opts?.useConsumable !== false);
     const hurt = state.log
@@ -924,7 +1261,7 @@ export function applyChoice(
 
 /** Options visible at the current node (filters info-gated options). */
 export function availableOptions(state: QuestRunState): { id: string; label: string; detail: string; costGold?: number; disabled: boolean }[] {
-  const node = SCENARIO_NODES[state.nodeId];
+  const node = nodesFor(state)[state.nodeId];
   if (!node || state.ended) return [];
   if (node.kind === 'info') {
     return [{ id: 'advance', label: 'Continua', detail: 'Prosegui.', disabled: false }];
@@ -946,4 +1283,4 @@ export function availableOptions(state: QuestRunState): { id: string; label: str
     }));
 }
 
-export { SCENARIO_NODES };
+export { QUESTS };

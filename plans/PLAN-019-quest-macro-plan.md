@@ -62,6 +62,10 @@ sotto sono **contratti** (domanda, ingresso, uscita), non design.
    Conseguenza → Scelta di approccio → Evento → Nuova esplorazione → Scoperta/lore → Ulteriore
    evento/ricompensa → Obiettivo → Ritorno). Bozza contenuti:
    `.mw/runs/20261001-s1-reference-quest-draft/draft.md` (da correggere dal Director).
+   **Materiale correlato (2026-10-04, non modifica lo spec):** seconda quest authored «Le Rovine
+   sotto il Fiume» — mockup in `.mw/runs/20261004-rovine-preview-chatgpt/rovine-mockup.md`,
+   implementata nel lab S1 come `questScenarioRovine.ts`; spec preview Monte Carlo per S3 in
+   `preview-prompt.md` della stessa directory (tensione MC vs DP esatta aperta, vedi R-082).
 
 ## Fatti dal repo (2026-10-01)
 

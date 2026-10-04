@@ -78,6 +78,16 @@ export interface QuestOption {
   hiddenIfFlag?: string;
   /** Sets a flag on the run state. */
   sets?: string;
+  /** Consumes an inventory flag when the option is chosen (e.g. selling the
+   *  coagulo to the wounded traveler). */
+  consumesFlag?: string;
+  /** Gold granted when the option is chosen. */
+  grantsGold?: number;
+  /** Intel entry granted when the option is chosen. */
+  grantsInfo?: string;
+  /** Days added to the run's duration when the option is chosen (ruins quest:
+   *  time is a cost the player can see accumulating). */
+  costDays?: number;
 }
 
 /**
