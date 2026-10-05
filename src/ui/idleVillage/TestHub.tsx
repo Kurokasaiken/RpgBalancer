@@ -238,6 +238,16 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🎬',
     status: 'ok',
   },
+  // Non-kit page: Quest S1 Lab — isolated quest runs + Monte Carlo forecast
+  // and exact pre-check preview (R-082), astrolabe cinematics.
+  {
+    id: 'quest-s1-lab',
+    title: 'Quest S1 Lab',
+    description: 'Due quest authored (cassa + rovine): forecast Monte Carlo totale, pre-check analitico e cinematiche astrolabe',
+    path: '/quest-s1-lab',
+    icon: '🗝️',
+    status: 'ok',
+  },
   // Non-kit page: Use Client — client-only ThreatStatusIndicator showcase.
   {
     id: 'use-client',

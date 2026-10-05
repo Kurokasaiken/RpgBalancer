@@ -97,10 +97,12 @@ const QUEST_BEATS_BY_ID: Record<QuestId, readonly string[]> = {
 };
 
 /** Quest cards shown on the lab's entry screen — authored content mirrors
- *  the two mockups; copy keys live under questS1Lab.quests.*. */
+ *  the two mockups; copy keys live under questS1Lab.quests.*. Rovine first:
+ *  it's the Director's mockup quest (R-082/R-083), the one this lab exists
+ *  to X-ray. */
 const QUEST_CARDS: { id: QuestId; art: string; riskKey: string }[] = [
-  { id: 'cassa', art: ART.goblinTotem, riskKey: 'medium' },
   { id: 'rovine', art: '/assets/quest-robine/rovine-hero.jpg', riskKey: 'high' },
+  { id: 'cassa', art: ART.goblinTotem, riskKey: 'medium' },
 ];
 
 const LOG_STYLE: Record<string, string> = {
@@ -830,46 +832,50 @@ const QuestS1LabPage: React.FC = () => {
       </div>
 
       {/* Check cinematics — the engine already resolved; each check in the
-          burst gets its own astrolabe beat, played in order. */}
+          burst gets its own astrolabe beat, played in order. Full-bleed: the
+          suite sizes its stage on the real viewport (min(63.75vh, 69.7%)) and
+          the bronze bezel overflows it by 80px — an inner box was clipping
+          the frame and pushing the disc off-center (scene-col is 65% to make
+          room for a panel that no longer exists → widened to 100% here).
+          removeSounds: the lab is a silent preview surface. */}
       {checkQueue.length > 0 && checkQueue[checkIdx] && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-          <div className="relative h-[70vh] w-[70vw] overflow-hidden rounded-3xl border border-amber-400/40">
-            {checkQueue.length > 1 && (
-              <div className="absolute left-4 top-4 z-10 rounded-full border border-amber-300/50 bg-black/70 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
-                {t('questS1Lab.throwCounter', { current: checkIdx + 1, total: checkQueue.length })}
-              </div>
-            )}
-            <DestinyAstrolabeV62Standalone
-              key={checkQueue[checkIdx].id}
-              skills={[{ name: activeCheck?.title ?? '', stat: activeCheck?.score ?? 50, difficulty: 50 }]}
-              config={{
-                mode: activeMode,
-                wound: activeCheck?.woundPct ?? 0,
-                dead: activeCheck?.deathPct ?? 0,
-                harm: activeCheck?.harm ?? 'none',
+        <div className="fixed inset-0 z-50 bg-black/85 [&_.scene-col]:[flex:1_1_100%]">
+          {checkQueue.length > 1 && (
+            <div className="absolute left-4 top-4 z-10 rounded-full border border-amber-300/50 bg-black/70 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
+              {t('questS1Lab.throwCounter', { current: checkIdx + 1, total: checkQueue.length })}
+            </div>
+          )}
+          <DestinyAstrolabeV62Standalone
+            key={checkQueue[checkIdx].id}
+            skills={[{ name: activeCheck?.title ?? '', stat: activeCheck?.score ?? 50, difficulty: 50 }]}
+            config={{
+              mode: activeMode,
+              wound: activeCheck?.woundPct ?? 0,
+              dead: activeCheck?.deathPct ?? 0,
+              harm: activeCheck?.harm ?? 'none',
+            }}
+            onResolve={() => setCheckResolved(true)}
+            autoStart
+            removeSounds
+          />
+          {checkResolved && (
+            <button
+              className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 rounded-xl border border-amber-300/60 bg-black/80 px-6 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-200 transition hover:bg-amber-950/60"
+              onClick={() => {
+                if (checkIdx + 1 >= checkQueue.length) {
+                  setCheckQueue([]);
+                  setCheckIdx(0);
+                } else {
+                  setCheckIdx(checkIdx + 1);
+                }
+                setCheckResolved(false);
               }}
-              onResolve={() => setCheckResolved(true)}
-              autoStart
-            />
-            {checkResolved && (
-              <button
-                className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-xl border border-amber-300/60 bg-black/80 px-6 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-200 transition hover:bg-amber-950/60"
-                onClick={() => {
-                  if (checkIdx + 1 >= checkQueue.length) {
-                    setCheckQueue([]);
-                    setCheckIdx(0);
-                  } else {
-                    setCheckIdx(checkIdx + 1);
-                  }
-                  setCheckResolved(false);
-                }}
-              >
-                {t('questS1Lab.verdictContinue', {
-                  verdict: t(`questS1Lab.verdict.${activeMode ?? checkQueue[checkIdx].check.verdict}`),
-                })}
-              </button>
-            )}
-          </div>
+            >
+              {t('questS1Lab.verdictContinue', {
+                verdict: t(`questS1Lab.verdict.${activeMode ?? checkQueue[checkIdx].check.verdict}`),
+              })}
+            </button>
+          )}
         </div>
       )}
       </div>

@@ -1145,7 +1145,7 @@
         "viandante": "traveler helped"
       },
       "strategyTitle": "SIMULATED STRATEGY",
-      "cp": { "secure": "SECURE THE STAKE", "push": "PUSH DEEPER" },
+      "cp": { "secure": "SECURE", "push": "PUSH" },
       "cpLine": "reward {reward}% · death {death}% · wound {wound}% · {days}d · treasure {treasure}",
       "benchTitle": "WHAT-IF PARTY BENCH — hypothetical, never touches the run",
       "why": {
