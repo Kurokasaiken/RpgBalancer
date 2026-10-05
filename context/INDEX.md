@@ -90,6 +90,9 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[src/docs/docs/idle_village/quest_simulation_preview_spec.md](src/docs/docs/idle_village/quest_simulation_preview_spec.md) — spec Quest Simulation Preview R-082 (implementata) — `quest` `idle-village` `spec` `preview`
 |[KNOWLEDGE_AUDIT.md](KNOWLEDGE_AUDIT.md) — audit KB per agenti AI (desiderata v25): struttura, gap, 10 contraddizioni, problemi autorità/retrieval, proposte F1–F9 — `audit` `governance` `knowledge`
 |[KNOWLEDGE_REFACTOR_REPORT.md](KNOWLEDGE_REFACTOR_REPORT.md) — health report finale refactor R-085: authority map per dominio, retrieval test 40 domande (33P/3Pa/5F), documenti pericolosi residui — `audit` `governance` `knowledge`
+|[VILLAGE_ECONOMY.md](VILLAGE_ECONOMY.md) — dominio economia villaggio: loop produzione, human-days/leader-capacity/quest-opportunità (proposte OPEN-010) — DRAFT bozza — `village` `economy` `draft` `L1`
+|[PROGRESSION.md](PROGRESSION.md) — dominio progressione eroi/villaggio: XP, sblocchi, blueprint, licenze — DRAFT bozza — `progression` `draft` `L1`
+|[NARRATIVE.md](NARRATIVE.md) — dominio narrativa: setting, struttura quest, semi narrativi, storia emergente — DRAFT bozza — `narrative` `draft` `L1`
 |[QUEST_RULES.md](QUEST_RULES.md) — doc canonico regole quest vigenti (PLAN-020): regola → fonte → stato — `quest` `canonical` `L1`
 |[context/REJECTED.md](context/REJECTED.md) — registro approcci/idee valutati e rifiutati con motivo — `knowledge` `rejected` `L3`
 |[context/OPEN.md](context/OPEN.md) — registro delle questioni irrisolte con link a fonti e piani — `knowledge` `open` `L3`

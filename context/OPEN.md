@@ -137,7 +137,9 @@ Formato voce:
   stato del leader e pool di umani, non da cooldown), economia human-days,
   quest come opportunità 8–10/mese vs 4–5 fattibili — sono solo PROPOSAL:
   vanno ratificate in desiderata/GAMEPLAY_DESIGN?
-- **Status:** `open`
+- **Status:** `open` — in lavorazione: il Director le ha raccolte in
+  `VILLAGE_ECONOMY.md` (DRAFT, «bozza di piano da migliorare», 2026-10-05);
+  la ratifica resta pendente.
 - **Source:** `RICHIESTE.md` R-083;
   `context/QUEST_ECONOMY_NOTES.md` (copia tracciata delle note;
   originali + provenance in `.mw/runs/20261004-rovine-preview-chatgpt/`);
