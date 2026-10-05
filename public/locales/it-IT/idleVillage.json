@@ -1166,7 +1166,7 @@
         "viandante": "viandante aiutato"
       },
       "strategyTitle": "STRATEGIA SIMULATA",
-      "cp": { "secure": "METTI AL SICURO", "push": "SPINGI OLTRE" },
+      "cp": { "secure": "SICURO", "push": "OLTRE" },
       "cpLine": "reward {reward}% · morti {death}% · feriti {wound}% · {days}g · tesoro {treasure}",
       "benchTitle": "PANCA WHAT-IF — ipotetico, non tocca il run",
       "why": {
