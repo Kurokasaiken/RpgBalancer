@@ -340,6 +340,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/map-benchmark';
   const isGameFramePixiPath =
     typeof window !== 'undefined' && window.location.pathname === '/game-frame-pixi';
+  const isGamePath =
+    typeof window !== 'undefined' && window.location.pathname === '/game';
   const isGameFrameLivingAtlasPath =
     typeof window !== 'undefined' && window.location.pathname === '/gameframe-living-atlas';
   const isGameFrameCartographerPath =
@@ -1255,7 +1257,7 @@ function App() {
     );
   }
 
-  if (isGameFramePixiPath) {
+  if (isGameFramePixiPath || isGamePath) {
     return (
       <ErrorBoundary componentName="Game Frame Pixi Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Game Frame (Pixi)...</div>}>
