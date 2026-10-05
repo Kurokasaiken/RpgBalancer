@@ -1,12 +1,12 @@
 # Current State — RpgBalancer
 
 **Ultimo aggiornamento:** 2026-10-05
-**Superficie canonica:** `/minimal-gameplay`
+**Superficie canonica:** `/game` (Game Frame Pixi — raggiungibile dal link «Game» in `/test hub`; R-075 v2)
 **Repo remoto:** `https://github.com/Kurokasaiken/RpgBalancer`
 
 ## Stato di sintesi
 
-Il progetto è un **Village/incremental management RPG con drag & drop**, con un laboratorio di combat/balancing integrato. La superficie di runtime canonica è `/minimal-gameplay`; il lavoro attivo è su Idle Village, World Surface e POI Quest. Il core loop completo non è ancora assemblato.
+Il progetto è un **Village/incremental management RPG con drag & drop**, con un laboratorio di combat/balancing integrato. La superficie di gioco canonica è **`/game` (Game Frame Pixi)**: la vecchia superficie Idle Village è **deprecata** (Director 2026-10-05). Il lavoro attivo è sulla superficie `/game`, World Surface e POI Quest; `/minimal-gameplay` resta il riferimento della vertical slice. Il core loop completo non è ancora assemblato.
 
 Questa è una fotografia; per lo stato più aggiornato verificare `SESSION_HANDOFF.md` (journal), `RICHIESTE.md` e i test. Regola di sync: `.windsurf/rules/70-state-docs-sync.md`.
 
@@ -69,7 +69,7 @@ Vedi `RICHIESTE.md` per la lista completa. Esempi di richieste recenti (stato pr
 
 ## Deprecato
 
-- "Idle Village" page legacy (sostituita da `Village Sandbox`).
+- "Idle Village" page legacy → superficie di gioco deprecata; sostituita da `/game` (Game Frame Pixi, Director 2026-10-05). Il dominio/documentazione `idle_village` mantiene il nome storico.
 - Concetto "Dispatch-like operational map" come modello spaziale canonico (sostituito da `World Surface`).
 
 ## Prossimi passi approvati
