@@ -1,3 +1,5 @@
+> **STATUS: SUPERSEDED (duplicato divergente — vince la copia più recente in src/docs)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: src/docs/docs/ACTIVITY_CAPSULE_TESTING_PLAN.md.
+
 # ActivityCapsule Testing Plan
 ## POI Behavior Analysis & Integration Testing
 

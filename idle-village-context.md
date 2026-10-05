@@ -1,3 +1,5 @@
+> **STATUS: HISTORICAL (context dump Jun 2026, 4373 righe)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: context/INDEX.md + doc trusted.
+
 # Phase 12: Idle Incremental RPG – Implementation Plan
 
 **Status:** Planning  

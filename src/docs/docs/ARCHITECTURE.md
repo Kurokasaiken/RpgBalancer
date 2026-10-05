@@ -1,3 +1,5 @@
+> **STATUS: REFERENCE (deep dive tecnico, Jan 2026 — parzialmente stale)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: src/docs/docs/architecture_state.md (router).
+
 # RPG Balancer - Technical Architecture
 
 ## System Overview

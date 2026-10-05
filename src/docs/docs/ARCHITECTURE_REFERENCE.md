@@ -1,3 +1,5 @@
+> **STATUS: SUPERSEDED — le regole config-first ora vivono in .windsurf/rules/00-project-invariants.md + philosophy.md** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: src/docs/docs/architecture_state.md (router).
+
 # Single Source of Truth - Architecture Reference
 
 **Version:** 1.0  
