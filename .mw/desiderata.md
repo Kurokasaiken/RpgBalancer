@@ -1395,3 +1395,31 @@ S1: "Questa quest è un gioco interessante?" → S2: "Possiamo farla davvero, se
 **AI inference approvata come direzione, non formula canonica:** la reward di quest richiede la prova-obiettivo soddisfatta e il ritorno del leader vivo; la riuscita di altre prove non determina più da sola la vittoria. La preview compound, quando esisterà, dovrà distinguere fatti noti, informazioni nascoste e ipotesi sulle scelte future. La partecipazione del bodyguard modifica a sua volta il rischio per slot: PLAN-018 oggi usa roll per membro indipendenti dal verdetto e cover additiva, quindi non è una prova che questa nuova regola sia già implementata.
 
 **Still unresolved, da trattare nel piano figlio S1 e/o successivi senza assunzioni silenziose:** quantità dei modificatori critici e clamp (parametri di lab, mock iniziali in `quest-design.md`); precisione di una preview compound quando la politica di uso dei consumabili e le diramazioni sono ignote. Scelta motore canonico, stat derivate definitive e persistenza sono di S2/S3, non di S1. *(Chiusi in matrice 2026-10-02: contenuti della quest, transizioni post-fallimento, fuga post-obiettivo = niente perso, bodyguard su danni multipli e da ferito, `bigwin` eredita −5pp, wipe = si perde tutto, death save = 5% su morte → ferito — vedi `quest-design.md` e DECISION_LOG.)*
+
+---
+
+## v25 — Audit e refactoring della knowledge base orientata agli agenti AI
+
+**Status:** FROZEN
+**Date:** 2026-10-05
+**Authorized by:** Fausto
+**Reason:** approvazione esplicita in sessione ("approvo") sulla candidata presentata dall'explorer
+
+**User-stated:**
+- Audit della documentazione di tutti i progetti che usano Mind Weaver, priorità RPG Balancer (`~/progetti_personali/RPG`).
+- Obiettivo: massimizzare retrieval accuracy e consistenza per agenti AI — distinguere fatti/decisioni/assunzioni/ricerca/questioni aperte, autorità esplicita per dominio, tracciabilità tra concetti, resistenza a documenti contraddittori o obsoleti, aggiornamento incrementale, ricostruzione dello stato del progetto senza leggere tutto, identificazione dell'impatto di un cambiamento, preservazione del contesto storico rilevante.
+- **Fase 1 — solo audit, nessuna modifica.** Deliverable: report con sezioni A–H (struttura attuale e problemi, knowledge gap, contraddizioni, problemi di autorità, problemi di retrieval, nuova struttura proposta, piano di migrazione, risk assessment).
+- **Fase 2 — migrazione solo dopo approvazione** del report e della strategia.
+- Gli artefatti che definiscono l'architettura di conoscenza (in MW: `CANON.md`, `CANON-FORMAT.md`, `AGENTS.md`, regole di `plans/INDEX.md`, `.mw/SCHEMA.md`, spec battezzati immutabili; equivalenti nei progetti) **possono essere modificati solo previa autorizzazione diretta del Director, punto per punto, mai automaticamente.** L'AI può produrre «proposte di cambiamento».
+
+**AI inference:**
+- L'architettura di conoscenza già esistente (in RPG: `CANON.md` come mappa delle autorità, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `DECISION_LOG.md`, `RICHIESTE.md`, desiderata, `context/INDEX.md`, rules `.windsurf/`, skills `.devin/`, trusted docs + `COMPONENT_MASTER_INDEX`) è il **vincolo e la baseline** dell'audit, non l'oggetto da riscrivere: l'audit misura dove autorità e retrieval falliscono in pratica.
+- La tassonomia del template (FACT/DECISION/INFERENCE/ASSUMPTION/UNRESOLVED/FROZEN/RESEARCH/OBSOLETE) è la **griglia di valutazione**, non una struttura da imporre: dove coincide con le distinzioni esistenti si usa quella, le divergenze si segnalano.
+- «Tutti i progetti» = il metodo validato su RPG Balancer dev'essere replicabile; la prima applicazione è RPG. Le proposte vanno ancorate a failure di retrieval osservati, non immaginati (MW-P-005) e minimali (MW-P-010).
+- Perimetro RPG da inventariare: `*.md` di root (~245 file a depth ≤2), `docs/`, `context/`, `.windsurf/`, `.devin/`, `.mw/` (INDEX, plans, specs), trusted docs, `test-results/` come evidence.
+- La desiderata vive in `RPG/.mw/desiderata.md` come v25 (file desiderata del progetto oggetto dell'audit).
+
+**Still unresolved:**
+- Inclusione di `.mw/runs/` e `archive/` nel perimetro *ristrutturabile* (default proposto: censiti e marcati storici, non ristrutturati).
+- Collocazione del report: raw in `RPG/.mw/runs/<ts>-kb-audit/` + sintesi indicizzata, oppure doc tracciato (default proposto: entrambi — raw in runs, report in un file linkato da `.mw/INDEX.md`).
+- Formato della «proposta punto per punto» per gli artefatti di architettura (default: elenco numerato una modifica = un punto, con motivo e impatto, nel report sezione F/G).
