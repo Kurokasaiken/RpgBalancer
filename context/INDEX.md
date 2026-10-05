@@ -64,3 +64,4 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[src/docs/docs/balancer/balance_model_v1.md](src/docs/docs/balancer/balance_model_v1.md) — Canonical Mathematical Inventory del Balancer (audit in corso) — `balancer` `audit` `planning`
 |[src/docs/docs/balancer/RPG_BALANCER_MASTER_CONTEXT.md](src/docs/docs/balancer/RPG_BALANCER_MASTER_CONTEXT.md) — Master Context / Handoff completo del Balancer (visione + design intent + audit) — `balancer` `handoff` `design`
 |[.mw/runs/20261004-rovine-preview-chatgpt/](.mw/runs/20261004-rovine-preview-chatgpt/README.md) — conversazione ChatGPT 2026-10-04 archiviata: mockup «Rovine sotto il Fiume», spec preview Monte Carlo (R-082), economia human-days + regola leader-capacity (R-083) — `quest` `idle-village` `design` `proposal`
+|[KNOWLEDGE_AUDIT.md](KNOWLEDGE_AUDIT.md) — audit KB per agenti AI (desiderata v25): struttura, gap, 10 contraddizioni, problemi autorità/retrieval, proposte F1–F9 — `audit` `governance` `knowledge`

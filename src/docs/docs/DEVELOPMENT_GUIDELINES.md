@@ -1,3 +1,5 @@
+> **STATUS: SUPERSEDED (duplicato divergente — vince la copia root citata da CANON)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: DEVELOPMENT_GUIDELINES.md (root).
+
 ---
 title: RPG Balancer – Development Guidelines
 status: active

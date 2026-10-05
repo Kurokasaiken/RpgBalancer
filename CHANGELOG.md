@@ -1,3 +1,5 @@
+> **STATUS: HISTORICAL (fermo a Jul 2026)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: git log + SESSION_HANDOFF.md.
+
 # Changelog - Sistema di Bilanciamento & Vertical Slice Architecture
 
 ## [Unreleased]

@@ -1,30 +1,38 @@
-# 🗺️ Project Architecture State Index
+---
+title: Architecture Router — RPG Balancer
+status: canonical-router
+updated: 2026-10-05
+---
 
-> Context Router — ogni sessione AI parte da qui e poi apre solo i file necessari.
+# Architecture Router — RPG Balancer
 
-## 1. Core Systems
+> **Ruolo:** entry point canonico per le domande di architettura. Non contiene l'architettura —
+> mappa dominio → fonte autorevole. Promosso a router canonico nel KB audit 2026-10-05
+> (desiderata v25): i 4 ex-claimant sono marcati superseded/reference (vedi `KNOWLEDGE_AUDIT.md` §C2).
 
-- **Tick Runner (Game Loop):** `src/engine/game/idleVillage/IdleVillageEngine.ts` + `TimeEngine.ts`. Logica pura, nessun side-effect UI.
-- **Schedulers & Drivers:** `src/ui/idleVillage/hooks/useActivityScheduler.ts`, `map/ticker/useIdleVillageTicker.ts` legano UI ↔ eventi.
-- **Data & Config:** `src/balancing/config/idleVillage/*` (JSON/TS). Ogni stat/peso deve vivere qui, mai inline.
-- **Plans & Master Docs:** `src/docs/docs/plans/idle_village_plan.md`, `.../overlay_mode_plan.md`, `.../PROFIT_LEVERS_IDLE_VILLAGE.md`.
+## Dominio → fonte autorevole
 
-## 2. Module Status & Entry Points
+| Dominio | Fonte autorevole |
+|---|---|
+| Invarianti non negoziabili (persistence, config-first, skin, i18n, state, docs) | `.windsurf/rules/00-project-invariants.md` |
+| Filosofia config-first / weight-based creator (il "perché") | `.windsurf/rules/philosophy.md` |
+| Contratti componenti trusted/frozen | `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md` + `trusted/*_trusted.md` |
+| Sistemi canonici (skin, analytics, ecc.) | `coordinator/canonical-systems.md` |
+| Modello matematico del Balancer | `src/docs/docs/balancer/balance_model_v1.md` + `RPG_BALANCER_MASTER_CONTEXT.md` |
+| Stato operativo dei piani | `plans/INDEX.md` |
+| Decisioni e perché | `context/DECISION_LOG.md` · `.mw/desiderata.md` (FROZEN) |
+| Autorità documentali | `CANON.md` |
+| Deploy/Guardian | `.windsurf/rules/60-guardian-deploy.md` |
+| Shutdown governance | `.windsurf/rules/50-shutdown-governance.md` |
 
-- **Quest / Combat Resolver:** `IdleVillageEngine + QuestResolver` (Phase 12, high-risk). Observer/event log unico.
-- **Village Management:** `useActivityScheduler`, `IdleVillageMapPage` (legacy) → in refactor verso ActivityCard system.
-- **Economy & Resources:** `TimeEngine` resources pipeline + telemetry hooks. Must stay pure.
-- **UI / Presentation:** `src/ui/idleVillage/*` ascolta solo eventi/driver; proibito invocare engine direttamente.
-- **Telemetry & Analytics:** `src/analytics/*` + `scripts/analytics/` per export/stress test.
+## Ex-claimant (non autorevoli)
 
-## 3. Current North Star
+- `ARCHITECTURE.md` — deep dive tecnico (Jan 2026, parzialmente stale) → reference.
+- `ARCHITECTURE_REFERENCE.md` — regole config-first ora in `.windsurf/rules/` → superseded.
+- `ARCHITECTURE_BIBLE.md` — governance assorbita da `CANON.md` + `40-documentation-governance` → superseded.
 
-- **Goal:** Chiudere Phase 12 consolidando Tick Runner condiviso + UI decoupling/Event Buffer.
-- **Guardrail:** Nessun feature merge se la UI tocca engine senza passare dai driver (Ticker/Scheduler).
-- **Active Sprint:** Refactor ActivityCard + Drop Feedback → gating per Overlay Mode / Desktop Companion.
+## Regola d'uso
 
-## 4. How to Extend
-
-- **Nuovo sistema?** prima aggiungi tipi/config in `src/balancing/config`, poi aggiorna piani docs, infine implementa moduli puri sotto `src/engine` e solo dopo UI listener.
-- **Tests obbligatori:** Vitest per engine (`src/engine/**/__tests__`) + playwright per UI se tocca interazioni.
-- **Telemetry Hooks:** ogni nuovo loop deve emettere eventi in `SchedulerTelemetryEvent` per audit future.
+Se una domanda non è coperta dalla tabella, la risposta non ha fonte autorevole: segnalarlo
+al Director invece di dedurla. Per aggiornare questa mappa serve una modifica esplicita —
+non si accumula stato di modulo qui (quello vive in `CURRENT_STATE.md` / `plans/INDEX.md`).

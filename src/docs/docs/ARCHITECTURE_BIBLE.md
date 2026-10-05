@@ -1,3 +1,5 @@
+> **STATUS: SUPERSEDED — governance assorbita da CANON.md + .windsurf/rules/40-documentation-governance.md** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: src/docs/docs/architecture_state.md (router).
+
 ---
 title: RPG Balancer Architecture Bible
 status: active

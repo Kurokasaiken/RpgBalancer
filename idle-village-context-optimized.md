@@ -1,3 +1,5 @@
+> **STATUS: HISTORICAL (context dump Jun 2026)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: context/INDEX.md + doc trusted.
+
 # Idle Village Project - Context Summary for Claude
 
 ## QUICK START - What is this project?

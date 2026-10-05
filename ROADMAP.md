@@ -1,3 +1,5 @@
+> **STATUS: SUPERSEDED** — assorbito da `plans/INDEX.md` (KB audit 2026-10-05, desiderata v25). Non aggiornare questo file: lo stato operativo vive in plans/INDEX.md.
+
 # Roadmap
 
 | Plan | Status | Priority | Notes |
