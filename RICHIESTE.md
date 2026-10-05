@@ -1872,3 +1872,22 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - *"Considera anche che fino a quando il leader nn è stanco o ferito (o morto) puoi continuare a fare quest fino a quando hai altri umani."* — **regola leader-capacity**: la capacità di spedizione del villaggio è limitata dallo stato del leader e dal pool di umani, non da un cooldown «1 quest/X giorni». Candidata a desiderata/GAMEPLAY_DESIGN; oggi solo PROPOSAL.
 - Economia **human-days** come risorsa reale (`uomini × tempo`), ferita = indisponibilità di X giorni, quest come opportunità (8–10 appaiono/mese, 4–5 fattibili) — candidati per `idle_village_gameplay_math_spec.md` e GAMEPLAY_DESIGN dietro avallo.
 - *"la voglio implementare come mockup"* — già soddisfatta in codice (`questScenarioRovine.ts`); la spec archiviata serve per verifica/regressione del mockup.
+
+---
+
+## R-084 — Extraction Ledger, negative/open knowledge registry, QUEST_RULES.md e layered retrieval
+
+**Richiesta:** *"Portare il sistema dall'architettura attuale [knowledge-extractor → post-reconciliation report → canonical docs → documentary retrieval] alla seguente architettura minima: CONVERSATION → KNOWLEDGE EXTRACTION → EXTRACTION LEDGER → RECONCILIATION → CANONICAL KNOWLEDGE → LAYERED RETRIEVAL."* — prompt operativo completo con 10 fasi (ledger, persistenza `context/ingestions/`, `context/REJECTED.md`, `context/OPEN.md`, completamento PLAN-020, router L0–L4, golden test su «Progettare quest strategiche», 7 query di retrieval, regression check).
+**Data:** 2026-10-05
+**Stato:** `in corso`
+**Desiderata FROZEN di riferimento:** `.mw/desiderata.md` v25 (audit e refactoring KB orientata agli agenti AI) — questa richiesta è l'esecuzione della fase 2 di migrazione delineata dall'audit e dalle proposte F1–F9 avallate.
+
+---
+
+## R-085 — Refactor completo del sistema documentale: canonical knowledge, authority, retrieval
+
+**Richiesta:** *"RPG BALANCER — FULL DOCUMENTATION REFACTOR. Canonical Knowledge, Authority, Retrieval & Documentation Architecture."* — playbook completo in 40 sezioni: audit totale del repo (§1–3), inventory documentale, gerarchia di autorità reale, modello canonico L0–L4, router root, refactor di CURRENT_STATE/GAMEPLAY_DESIGN/QUEST_RULES (dominio quest = major refactor), separazione game rules vs design knowledge, audit DECISION_LOG/desiderata/OPEN/REJECTED/proposals/GLOSSARY, architettura e piani, famiglie di duplicati, conoscenza orfana, indici semantici, test suite di retrieval a 40 domande, contratto documentation-impact per i piani, regression check, health report finale.
+**Data:** 2026-10-05
+**Stato:** `in corso`
+**Desiderata FROZEN di riferimento:** `.mw/desiderata.md` v25 — stessa ancora di R-084; questo prompt è la specifica completa della fase di refactoring già autorizzata ("Execute the refactor now").
+**Collegamenti:** R-084 (prima tranche eseguita: QUEST_RULES.md, OPEN.md, REJECTED.md, router L0–L4, ingestions, golden test), `KNOWLEDGE_AUDIT.md` (audit fase 1 + migrazione punti 1–4), PLAN-020.

@@ -17,6 +17,10 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 2. **Baptism/immutability** is not (yet) enforced like in Mind Weaver — adopted per audit v25;
    if the Director wants full MW baptism rules, that's a CANON-level proposal.
 3. One row per plan; task-files attached to a plan are listed under it, not as rows.
+4. **Documentation Impact** (R-085): ogni piano dichiara `Documentation Impact:
+   NONE | OPTIONAL | REQUIRED` + target documentali — contratto in
+   `.windsurf/rules/85-documentation-impact.md`. Un piano `REQUIRED` non è
+   `completed` finché i doc target non sono aggiornati.
 
 ## Status vocabulary
 
@@ -46,7 +50,7 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-MOCKUP-v1](PLAN-MOCKUP-TO-COMPONENT-v1.md) | Mockup→Component v1 | superseded | — | bocciato da delibera multi-AI → v2 |
 | [PLAN-MOCKUP-v2](PLAN-MOCKUP-TO-COMPONENT-v2.md) | Mockup→Component v2 | superseded | — | cold read NO (5 blocking) → v3 |
 | [PLAN-MOCKUP-v3](PLAN-MOCKUP-TO-COMPONENT-v3.md) | Mockup→Component v3 | active | — | decisioni Director ratificate; pilot GoblinEventLabPage |
-| [PLAN-020](PLAN-020-quest-rules-canonical-doc.md) | Canonical Quest Rules Document | proposed | — | da audit KB v25 Q7; parent: PLAN-019; produce `QUEST_RULES.md` + regola di mantenimento |
+| [PLAN-020](PLAN-020-quest-rules-canonical-doc.md) | Canonical Quest Rules Document | completed | — | da audit KB v25 Q7; parent: PLAN-019; T-001 `QUEST_RULES.md`, T-002 `80-quest-rules-maintenance.md`, T-003 CANON — tutti done 2026-10-05 |
 
 ## Sotto-documenti (non piani)
 
