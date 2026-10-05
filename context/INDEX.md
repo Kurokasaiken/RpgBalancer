@@ -1,7 +1,7 @@
 ---
 title: Context Index
 type: reference
-updated: 2026-08-31
+updated: 2026-10-05
 ---
 
 # Context Index
@@ -9,13 +9,32 @@ updated: 2026-08-31
 One line per file. Add a line when a file is discovered and useful; remove when deleted.
 Format: `[filename](path) — one sentence — \`tag\``
 
+## Retrieval layers — «se la risposta non basta, dove guardo dopo?»
+
+- **L0 — Orientation:** `AGENTS.md`, `CURRENT_STATE.md` — cosa è il progetto e
+  dov'è lo stato attuale.
+- **L1 — Canonical facts:** `CANON.md` (mappa delle autorità),
+  `QUEST_RULES.md`, `src/docs/docs/architecture_state.md`, i doc canonici di
+  dominio. Se la domanda è «cosa vale oggi», rispondi da qui.
+- **L2 — Rationale / relationships:** `context/DECISION_LOG.md`,
+  `plans/INDEX.md` + i plan linkati, `.mw/desiderata.md` (intento FROZEN).
+  Per «perché è così» scendi qui.
+- **L3 — Negative / unresolved:** `context/REJECTED.md`,
+  `context/OPEN.md`, piani `superseded`. Per «cosa abbiamo scartato / cosa è
+  ancora aperto».
+- **L4 — Provenance / evidence:** `context/ingestions/`, `.mw/runs/`
+  (scratch, non tracciato), `test-results/`. Per «da dove viene questa
+  conoscenza / cosa è stato detto nella conversazione».
+
 [DESIGN_PILLARS.md](DESIGN_PILLARS.md) — direction and inspiration pillars — `direction`
-[context/DECISION_LOG.md](DECISION_LOG.md) — history of decisions — `history`
+[context/DECISION_LOG.md](context/DECISION_LOG.md) — history of decisions — `history`
 [context/QUEST_GAMEPLAY_SCIENCE.md](context/QUEST_GAMEPLAY_SCIENCE.md) — living bibliography: real studies on suspense/failure/choice psychology for quest gameplay — `research` `quest` `design`
 [src/docs/docs/MASTER_PLAN.md](src/docs/docs/MASTER_PLAN.md) — roadmap and phase tracking — `planning`
 [src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md](src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md) — trusted component registry — `components` `trusted`
 [.windsurf/rules/00-project-invariants.md](.windsurf/rules/00-project-invariants.md) — non-negotiable project constraints — `invariants`
 [.windsurf/rules/40-documentation-governance.md](.windsurf/rules/40-documentation-governance.md) — trusted/frozen doc policy — `governance`
+[.windsurf/rules/80-quest-rules-maintenance.md](.windsurf/rules/80-quest-rules-maintenance.md) — QUEST_RULES.md si aggiorna su nuove regole quest del Director; status vigente/proposta/divergenza, conflitto → domanda — `governance` `quest`
+[.windsurf/rules/85-documentation-impact.md](.windsurf/rules/85-documentation-impact.md) — contratto Documentation Impact dei piani (NONE/OPTIONAL/REQUIRED + routing degli update) — `governance` `documentation`
 [.windsurf/rules/philosophy.md](.windsurf/rules/philosophy.md) — RPG balancer philosophy and config-first rules — `philosophy`
 [.windsurf/skills/strategist-mandate/SKILL.md](.windsurf/skills/strategist-mandate/SKILL.md) — strategic plan prompt generation — `skill` `strategy`
 [.windsurf/skills/coordinator-mandate/SKILL.md](.windsurf/skills/coordinator-mandate/SKILL.md) — task dispatch and Kanban — `skill` `dispatch`
@@ -63,5 +82,16 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[GLOSSARY.md](GLOSSARY.md) — glossario canonico del progetto — `reference`
 |[src/docs/docs/balancer/balance_model_v1.md](src/docs/docs/balancer/balance_model_v1.md) — Canonical Mathematical Inventory del Balancer (audit in corso) — `balancer` `audit` `planning`
 |[src/docs/docs/balancer/RPG_BALANCER_MASTER_CONTEXT.md](src/docs/docs/balancer/RPG_BALANCER_MASTER_CONTEXT.md) — Master Context / Handoff completo del Balancer (visione + design intent + audit) — `balancer` `handoff` `design`
-|[.mw/runs/20261004-rovine-preview-chatgpt/](.mw/runs/20261004-rovine-preview-chatgpt/README.md) — conversazione ChatGPT 2026-10-04 archiviata: mockup «Rovine sotto il Fiume», spec preview Monte Carlo (R-082), economia human-days + regola leader-capacity (R-083) — `quest` `idle-village` `design` `proposal`
+|[.mw/runs/20261004-rovine-preview-chatgpt/](.mw/runs/20261004-rovine-preview-chatgpt/README.md) — conversazione ChatGPT 2026-10-04 archiviata (gitignored): provenance originale — copie tracciate in `context/QUEST_ECONOMY_NOTES.md`, `src/docs/docs/idle_village/quest_rovine_scenario_spec.md`, `quest_simulation_preview_spec.md` — `quest` `idle-village` `design` `proposal`
+|[context/QUEST_S1_DESIGN.md](context/QUEST_S1_DESIGN.md) — matrice di design del lab S1 «La cassa delle sementi» (confermata dal Director 2026-10-02; parametri = mock da Gate A) — `quest` `design` `L2`
+|[context/QUEST_ECONOMY_NOTES.md](context/QUEST_ECONOMY_NOTES.md) — note di design economia-villaggio: human-days, quest-opportunità, leader-capacity, juice — status PROPOSAL (OPEN-010) — `quest` `village` `design` `proposal` `L2`
+|[context/QUEST_V6_REDESIGN.md](context/QUEST_V6_REDESIGN.md) — redesign S1 «TAKEN≠SECURED» guidato da QUEST_GAMEPLAY_SCIENCE — status PROPOSAL — `quest` `design` `proposal` `L2`
+|[src/docs/docs/idle_village/quest_rovine_scenario_spec.md](src/docs/docs/idle_village/quest_rovine_scenario_spec.md) — spec scenario «Le Rovine sotto il Fiume» (implementato, regressione) — `quest` `idle-village` `spec`
+|[src/docs/docs/idle_village/quest_simulation_preview_spec.md](src/docs/docs/idle_village/quest_simulation_preview_spec.md) — spec Quest Simulation Preview R-082 (implementata) — `quest` `idle-village` `spec` `preview`
 |[KNOWLEDGE_AUDIT.md](KNOWLEDGE_AUDIT.md) — audit KB per agenti AI (desiderata v25): struttura, gap, 10 contraddizioni, problemi autorità/retrieval, proposte F1–F9 — `audit` `governance` `knowledge`
+|[KNOWLEDGE_REFACTOR_REPORT.md](KNOWLEDGE_REFACTOR_REPORT.md) — health report finale refactor R-085: authority map per dominio, retrieval test 40 domande (33P/3Pa/5F), documenti pericolosi residui — `audit` `governance` `knowledge`
+|[QUEST_RULES.md](QUEST_RULES.md) — doc canonico regole quest vigenti (PLAN-020): regola → fonte → stato — `quest` `canonical` `L1`
+|[context/REJECTED.md](context/REJECTED.md) — registro approcci/idee valutati e rifiutati con motivo — `knowledge` `rejected` `L3`
+|[context/OPEN.md](context/OPEN.md) — registro delle questioni irrisolte con link a fonti e piani — `knowledge` `open` `L3`
+|[context/ingestions/](context/ingestions/) — report di ingestion del knowledge-extractor (ledger estrazione→reconciliazione, evidence non canonica) — `knowledge` `evidence` `L4`
+|[context/ingestions/2026-10-05-progettare-quest-strategiche.md](context/ingestions/2026-10-05-progettare-quest-strategiche.md) — ingestion report conversazione «Progettare quest strategiche»: Extraction Ledger E-01..E-18 + reconciliazione — `knowledge` `evidence` `quest` `L4`

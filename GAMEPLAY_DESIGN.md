@@ -4,6 +4,23 @@
 **Versione:** 2 (riscritta dopo correzioni utente del 2026-05-12)
 **Cosa è questo file:** descrivere il gameplay reale del progetto e della slice. Non spec tecnica, ma "cosa succede quando si gioca".
 
+> **Status (2026-10-05, refactor R-085):** REFERENCE — visione e loop di gioco.
+> Questo documento descrive il *perché* e il *cosa* dell'esperienza, non le
+> regole vigenti di dettaglio. Autorità per dominio:
+> - **Regole quest correnti** → `QUEST_RULES.md` (canonico)
+> - **Design knowledge / razionale quest** → `context/QUEST_S1_DESIGN.md`,
+>   `context/QUEST_GAMEPLAY_SCIENCE.md`, `context/QUEST_ECONOMY_NOTES.md`
+>   (quest'ultima = PROPOSAL, vedi `context/OPEN.md` OPEN-010)
+> - **Stato implementato reale** → `CURRENT_STATE.md`
+>
+> **Sezioni parzialmente SUPERSEDED** (mantenute come storia, non riscrivere):
+> - §1: modello spaziale «Dispatch / mappa tattica» → sostituito da **World
+>   Surface** (DECISION_LOG 2026-08-31; CURRENT_STATE «Deprecato»)
+> - §1: estetica «Gilded Observatory» → direzione attuale **Prismatic
+>   Wanderlust** (`GLOSSARY.md`, `DESIGN_PILLARS.md`)
+> Il resto (divisione roster, loop economico, drag&drop → action card,
+> FOMO/halo, struttura della slice) resta la visione di riferimento.
+
 ---
 
 ## 1. Identità del gioco

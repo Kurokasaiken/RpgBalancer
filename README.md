@@ -2,6 +2,26 @@
 
 A powerful, web-based tool for designing, testing, and balancing RPG combat systems. Built with React, TypeScript, and Tailwind CSS.
 
+> **Nota (refactor documentale R-085, 2026-10-05):** il titolo sopra descrive
+> l'origine del progetto; lo stato attuale è un village/incremental
+> management RPG con laboratorio di balancing — vedi `CURRENT_STATE.md`.
+>
+> ## 📚 Project Knowledge — dove iniziare
+>
+> | Se vuoi sapere… | Vai a |
+> |---|---|
+> | Cosa è il progetto / come lavorano gli agenti | `AGENTS.md` |
+> | Stato attuale (implementato, in corso, blocchi) | `CURRENT_STATE.md` + `SESSION_HANDOFF.md` |
+> | Quale documento ha autorità su cosa | `CANON.md` |
+> | Regole quest vigenti | `QUEST_RULES.md` |
+> | Direzione di design / pilastri | `DESIGN_PILLARS.md`, `GAMEPLAY_DESIGN.md` |
+> | Decisioni e loro razionale | `context/DECISION_LOG.md` |
+> | Domande aperte / approcci rifiutati | `context/OPEN.md`, `context/REJECTED.md` |
+> | Stato dei piani | `plans/INDEX.md` |
+> | Terminologia | `GLOSSARY.md` |
+> | Router completo a livelli (L0–L4) | `context/INDEX.md` |
+> | Richieste del Director | `RICHIESTE.md` |
+
 ![Grid Arena Preview](/public/assets/tiles/grass.png)
 
 ## 🚀 Key Features
