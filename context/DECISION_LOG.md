@@ -649,7 +649,8 @@ da validare nel lab, il runtime si adegua in S2.
 1. **Criterio S1:** *«nn ci interessa che funzioni, deve essere divertente»* — le meccaniche
    rev.2 stanno nel lab come strumenti di tensione nella forma più economica, valutate al Gate
    sul momento drammatico prodotto, non sulla correttezza.
-2. **Matrice chiusa** (`.mw/runs/20261002-s1-quest-design/quest-design.md`, integrazione
+2. **Matrice chiusa** (`.mw/runs/20261002-s1-quest-design/quest-design.md` — copia tracciata:
+   `context/QUEST_S1_DESIGN.md`; integrazione
    serale): leader = slot fisso
    della quest; ferita = +rischio nei check successivi; wipe = tutti i PG morti; fonte
    non-check = incidente in viaggio; bodyguard intercetta **tutti** i danni da check finché vivo;

@@ -1,11 +1,23 @@
 ---
 title: RPG Balancer – Master Plan
-status: active
+status: superseded
 owner: Strategy-Lead
 last_reviewed: 2026-07-13
 domain: core
 description: "Single source of truth for roadmap, documentation governance, and phase tracking"
 ---
+
+> **Status: SUPERSEDED come fonte di verità operativa (refactor R-085, 2026-10-05).**
+> Questo documento si autodichiara «single source of truth for roadmap» ma il
+> contenuto è fermo a dic 2025 («Phase 10», 740+ task) e non riflette il
+> lavoro reale. Autorità sostitutive:
+> - **Stato operativo dei piani** → `plans/INDEX.md`
+> - **Piano operativo vertical slice** → `VERTICAL_SLICE_ROADMAP.md` (come da `CANON.md`)
+> - **Stato runtime** → `CURRENT_STATE.md` + `SESSION_HANDOFF.md`
+> - **Governance documentale** → `.windsurf/rules/40-documentation-governance.md`
+> Il documento resta come HISTORICAL/planning-detail: le sue gerarchie di fasi
+> e la decomposizione in task file conservano rationale utile. Non citarlo
+> come fonte dello stato attuale.
 
 # 🎯 RPG Balancer - MASTER PLAN
 
