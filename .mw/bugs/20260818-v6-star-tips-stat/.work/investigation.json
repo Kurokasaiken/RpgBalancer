@@ -1,0 +1,19 @@
+{
+  "signals": [
+    "punta stella / rOf(stat) misurato 34.3%..98.0%, mai 100%",
+    "cap Math.min(shape*k, obeliskTip) puo solo ridurre, mai estendere",
+    "caso asimmetrico: tst=90 ma area=51.7% (anche l'area e rotta)",
+    "geo.tst calcolato da UNA skill, geometria globale: bersaglio mal posto"
+  ],
+  "rootCause": "sistema sovradeterminato: 2 vincoli (punta=stat, area=tst) 1 parametro libero (scala k). L'area solve consuma la scala, quindi la punta non e pilotabile.",
+  "filesInvolved": [
+    "src/ui/idleVillage/components/destinyAstrolabeV6/engine.ts"
+  ],
+  "constraints": [
+    "verdetto e spaziale: inStar = min(rStarAt, rCheckAt) — la geometria DECIDE gli esiti",
+    "geo.tst usato solo come bersaglio del solve e per il pannello debug",
+    "valleyF influenza solo la stella (rCheckAt ha la sua interpolazione)"
+  ],
+  "fix": "eliminare l'area solve. punte=stat, goo=diff, valleyF costante tarata su parita=50%, probabilita derivata dalla geometria.",
+  "calibration": { "valleyF": 0.3675, "property": "parita legge 50.00% a ogni livello (scale-invariant)" }
+}

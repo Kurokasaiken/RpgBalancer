@@ -1,0 +1,5 @@
+{
+  "status": "fixed",
+  "tests": "build:check, lint, kanban:lint, WorldSurfaceRenderer tests, smoke /world-surface 200, puppeteer screenshot verified visible coastal marks",
+  "notes": "Root cause: feTurbulence/feDisplacementMap via filter:url() produced no visible motion in the transformed layer stack; zIndex was also too low. Replaced with CSS drift on a masked sea copy and raised zIndex above islands. Water button now drives both WorldSurfaceSeaRipple and WorldSurfaceWaves."
+}

@@ -1,0 +1,32 @@
+{
+  "status": "resolved",
+  "layers": ["metalNoise", "progressHalo"],
+  "fixes": [
+    "Added feComposite in='mono' in2='SourceGraphic' operator='in' to the metalNoiseId filter in DayNightPoiSkin.tsx to clip feTurbulence noise to the circular core medallion",
+    "Changed progress halo <circle> strokeLinecap from 'round' to 'butt' to remove the starting dot at the 12 o'clock origin"
+  ],
+  "files_changed": [
+    "src/ui/idleVillage/components/minimal/DayNightPoiSkin.tsx",
+    "src/docs/docs/idle_village/trusted/daynight_trusted.md",
+    "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md",
+    "src/pages/day-night-poi-skin-debug.tsx",
+    "src/App.tsx",
+    ".mw/runs/2026-08-15/pattern-candidate-metal-noise-square.md",
+    ".mw/runs/2026-08-15/pattern-candidate-halo-stroke-linecap-dot.md",
+    ".mw/observation.jsonl",
+    "RICHIESTE.md"
+  ],
+  "verification": [
+    "npm run build:check passed",
+    "npm run kanban:lint passed",
+    "npm run lint -- src/pages/day-night-poi-skin-debug.tsx passed",
+    "Playwright screenshot /day-night-poi-skin-debug metal noise only: no square",
+    "Playwright progression /day-night-poi-skin-debug 3%: no starting dot"
+  ],
+  "evidence": [
+    "test-results/metal-noise-only.png",
+    "test-results/debug-progress-5.png",
+    "test-results/debug-progress-10.png",
+    "test-results/debug-progress-100.png"
+  ]
+}

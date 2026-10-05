@@ -1,0 +1,24 @@
+{
+  "signals": [
+    "L'utente non riesce a usare il microfono in Devin Desktop su macOS.",
+    "Il dispositivo audio 'Microfono MacBook Air' è rilevato e funzionante a livello di sistema.",
+    "Devin.app è installata in /Applications con bundle ID 'com.exafunction.windsurf'.",
+    "Info.plist contiene NSMicrophoneUsageDescription e NSAudioCaptureUsageDescription, ma entrambe le stringhe sono copiate da Visual Studio Code ('An application in Visual Studio Code wants to use...').",
+    "Non è possibile leggere /Library/Application Support/com.apple.TCC/TCC.db a causa delle protezioni SIP; non si può quindi verificare se 'com.exafunction.windsurf' ha il permesso Microphone.",
+    "L'app è firmata e notarizzata, quindi non è possibile modificare le stringhe Info.plist senza rompere la firma."
+  ],
+  "probable_causes": [
+    "macOS non ha concesso il permesso Microfono a 'com.exafunction.windsurf' (Devin.app).",
+    "L'app potrebbe non aver mai presentato il prompt di richiesta permesso, oppure l'utente lo ha rifiutato in precedenza.",
+    "Le Info.plist strings errate non sono la causa diretta, ma indicano che il bundle eredita strutture VS Code e potrebbe non aver attivato correttamente il flusso TCC."
+  ],
+  "files_involved": [
+    "/Applications/Devin.app/Contents/Info.plist",
+    "/Library/Application Support/com.apple.TCC/TCC.db"
+  ],
+  "constraints": [
+    "Non possiamo modificare l'Info.plist di un'app firmata e notarizzata.",
+    "Non possiamo scrivere direttamente in TCC.db per via di SIP.",
+    "L'intervento deve passare per gli strumenti ufficiali Apple (tccutil) o per le Preferenze di Sistema."
+  ]
+}

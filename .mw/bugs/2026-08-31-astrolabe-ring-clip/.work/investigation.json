@@ -1,0 +1,18 @@
+{
+  "signal": "bordo bronzo esterno mancante in alto a sinistra",
+  "reproduction": "caricare /minimal-destiny-astrolabe-v6-3 e guardare la zona 10-11 ore",
+  "probable_causes": [
+    "SVG .astro-bezel con overflow:hidden tagliava il cerchio con stroke-width=42.5 fuori dalla viewBox",
+    "ring r=455 + stroke/2 21.25 = 976.25, che supera viewBox -100..1100",
+    ".astro-bezel inset:0 non dava margine per il disegno fuori"
+  ],
+  "files_involved": [
+    "src/ui/idleVillage/components/destinyAstrolabeV6/markup.ts",
+    "src/ui/idleVillage/components/destinyAstrolabeV6/astrolabe.css"
+  ],
+  "constraints": [
+    "preservare dimensioni .stage",
+    "non ridurre stroke del ring",
+    "mantenere z-index e pointer-events"
+  ]
+}

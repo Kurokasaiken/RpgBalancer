@@ -1,0 +1,23 @@
+Genera un piano di implementazione concreto per adattare `ReminderComponent` (`src/ui/idleVillage/components/ReminderComponent.tsx`) in un componente Event Reminder ricco, con due varianti visive (gilded e arcane) e stati (normal, urgent, completed).
+
+Il piano deve rispettare il design system del progetto:
+- Component reuse: MatericEventCard, MatericFrame, PoiMatericV3, SkinTitle, SkinScope.
+- No file `.css` standalone; i temi vivono in `skinConfigRegistry`.
+- No colori/tipi/dimensioni hardcoded; tutto da token in `src/balancing/config/idleVillage/`.
+- i18n per tutte le stringhe utente.
+- SVG per le cornici asimmetriche, niente asset raster per la frame.
+- Cliccabile, con telemetria e dettaglio panel.
+- `prefers-reduced-motion` supportato.
+- Nuova sezione in `/primitives` per testare le varianti.
+
+Il context allegato contiene la spec di adattamento e una critica esterna. Usale per produrre un piano con:
+1. File da creare/modificare, con path esatti.
+2. Token contract (struttura Zod, chiavi principali).
+3. API finale del componente.
+4. i18n keys nuove.
+5. SVG frames: geometria, palette, stati.
+6. Integrazione con `MatericEventCard` o sostituzione.
+7. Sequenza di implementazione (step ordinati).
+8. Safeguards da eseguire.
+
+Rispondi in italiano.

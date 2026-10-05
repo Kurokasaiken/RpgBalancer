@@ -1,0 +1,17 @@
+{
+  "unit": "percent",
+  "landmarks": [
+    { "name": "card", "x": 0, "y": 0, "w": 100, "h": 100 },
+    { "name": "hero", "x": 11.0, "y": 18.0, "w": 77.9, "h": null },
+    { "name": "banner", "x": 11.0, "y": 8.3, "w": 77.9, "h": 9.7 },
+    { "name": "title", "x": 50.0, "y": 14.5, "w": null, "h": null },
+    { "name": "panel", "x": 13.8, "y": 53.9, "w": 72.3, "h": 24.5 },
+    { "name": "panelHeader", "x": 50.0, "y": 55.5, "w": null, "h": null },
+    { "name": "body", "x": 50.0, "y": 57.3, "w": null, "h": null },
+    { "name": "warning", "x": 50.0, "y": 60.1, "w": null, "h": null },
+    { "name": "arrivalLabel", "x": 50.0, "y": 66.0, "w": null, "h": null },
+    { "name": "arrivalCount", "x": 50.0, "y": 68.7, "w": null, "h": null },
+    { "name": "arrivalUnit", "x": 50.0, "y": 70.5, "w": null, "h": null },
+    { "name": "primaryButton", "x": 25.8, "y": 81.5, "w": 48.4, "h": 7.6 }
+  ]
+}

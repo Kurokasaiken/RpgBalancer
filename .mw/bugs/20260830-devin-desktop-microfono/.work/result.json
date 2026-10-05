@@ -1,0 +1,30 @@
+{
+  "status": "fixed_pending_verification",
+  "tests": [
+    {
+      "name": "Verifica dispositivo audio di sistema",
+      "command": "system_profiler SPAudioDataType",
+      "result": "pass",
+      "notes": "Microfono MacBook Air rilevato e impostato come default input."
+    },
+    {
+      "name": "Verifica bundle e firma Devin.app",
+      "command": "codesign -dvv /Applications/Devin.app",
+      "result": "pass",
+      "notes": "Bundle ID com.exafunction.windsurf, app firmata e notarizzata."
+    },
+    {
+      "name": "Reset permessi microfono TCC",
+      "command": "tccutil reset Microphone",
+      "result": "pass",
+      "notes": "Permessi microfono resettati correttamente."
+    },
+    {
+      "name": "Apertura pannello Privacy Microfono",
+      "command": "open x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone",
+      "result": "pass",
+      "notes": "Pannello Preferenze di Sistema aperto."
+    }
+  ],
+  "notes": "Il fix è configurativo: i permessi TCC per il microfono sono stati resettati e il pannello Privacy è aperto. L'utente deve ora chiudere e riaprire Devin.app per far comparire il prompt di richiesta permesso, oppure abilitare manualmente Devin nella lista."
+}

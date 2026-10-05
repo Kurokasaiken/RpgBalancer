@@ -1,0 +1,15 @@
+Sei un Lead UI Senior Designer in una compagnia AAA. Analizza il componente "Gilded Event Reminder V2" visibile in /primitives (tab Reminder, versione sotto V1).
+
+Fornisci:
+1. Una critica spietata ma costruttiva del componente.
+2. Punti forti.
+3. Problemi di ierarchia visiva, palette, materialità, semiotica, animazione.
+4. Soluzioni concrete con esempi di codice (React + CSS-in-JS o SVG).
+5. Riferimenti a God of War, Naughty Dog, o altri AAA.
+
+Contesto progetto:
+- Bibbia estetica: Prismatic Wanderlust (deep teal shadows, Solar Triumph gold, no grey/brown, split rendering, matericità).
+- Il componente usa PoiMatericV3_5, cornice dorata, placca countdown, SkinTitle.
+- Target: Tauri/WebView, DOM/CSS + SVG.
+
+Rispondi in italiano.

@@ -1,0 +1,164 @@
+Sei un senior UI/UX artist e system designer di una softwarehouse AAA fantasy (Blizzard style).
+Ti sottopongo una spec di adattamento per il componente `ReminderComponent` di un RPG React.
+
+Il progetto vincola:
+- React + TypeScript
+- Component reuse dallo design system (MatericEventCard, MatericFrame, PoiMatericV3, SkinTitle)
+- Skin tokens in `src/balancing/config/idleVillage/` (no colori hardcoded, no ombre hardcoded)
+- i18n per tutte le stringhe utente
+- No file `.css` standalone per il theming; i preset vivono in `skinConfigRegistry`
+- SVG per cornici asimmetriche e ornamenti
+- `prefers-reduced-motion` supportato
+- Telemetria su click/interazioni
+
+TASK:
+1. Leggi la spec allegata di seguito.
+2. Individua i punti deboli, i rischi architetturali e eventuali violazioni di buon senso per un design system AAA.
+3. Proponi miglioramenti concreti su API, token contract, strategia SVG, i18n, gestione stati e integrazione con il design system esistente.
+4. Rispondi in italiano, conciso ma specifico, con esempi di codice o pseudo-codice solo se utile.
+
+--- SPEC ---
+
+# Event Reminder — Adaptation Spec
+
+## 1. Scope
+
+Adapt the existing `ReminderComponent` (`src/ui/idleVillage/components/ReminderComponent.tsx`) from a plain `MatericEventCard` reminder into a richer, more tactile world-surface artifact.
+
+Goals:
+- Two visual variants: **Gilded** (major/imperial event) and **Arcane** (mysterious/dangerous event).
+- Add `urgent` and `completed` states.
+- Make it clickable to open an event detail panel.
+- Expose it as a new tab/section in the `/primitives` lab page.
+
+## 2. Authorities
+
+- Visual language: `src/docs/docs/plans/art_direction_plan.md`
+- Layer philosophy (8–12 layers, imperfect materials): `src/docs/docs/visual_design_philosophy.md`
+- Skin binding / no standalone CSS: `src/docs/docs/COMPONENT_SKIN_INTEGRATION_GUIDE.md`
+- Frozen kits and trusted components: `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md`
+- Component reuse rule: `.windsurf/rules/00-project-invariants.md`
+
+## 3. Reference
+
+The external proposal describes an asymmetric, hand-forged frame that does not behave like a generic `border`. Key visual intent:
+- Gilded: thin golden brass filigree, sculpted corners, dark enamel plaque, small engraved gems.
+- Arcane: oxidized teal metal with sparse gold botanical filaments growing inward, weathered patina.
+- The component should feel like a physical object resting on the map, not a floating panel.
+- Hover: lift 2–3 px, subtle light increase, single sheen sweep.
+- Urgent: slow pulse on glow/frame, not on the whole card.
+- Completed: desaturated, muted palette.
+
+This reference is **visual intent only**; it must be adapted to the existing design system.
+
+## 4. Candidate Reuse
+
+Before creating new primitives, verify and reuse:
+- `MatericEventCard` — already renders `variant="reminder"`.
+- `MatericFrame` — base molding frame.
+- `MatericPlaque`, `MatericBadge` — labels/CTAs.
+- `PoiMatericV3` — animated medallion.
+- `SkinTitle`, `SkinScope` — typography and spacing tokens.
+
+Decision: extend `MatericEventCard` with an optional `frame` overlay, or wrap `ReminderComponent` around the existing card. The new SVG frames are decorative overlays, not replacements for `MatericFrame`.
+
+## 5. Proposed API
+
+```typescript
+export type ReminderVariant = 'gilded' | 'arcane';
+export type ReminderState = 'normal' | 'urgent' | 'completed';
+
+export interface ReminderComponentProps {
+  /** Localised title, e.g. "INVASION" */
+  title: string;
+  /** Localised days-left label */
+  daysLeftLabel: string;
+  /** Visual skin of the reminder */
+  variant?: ReminderVariant;
+  /** Runtime state affecting animation/colour */
+  state?: ReminderState;
+  /** Diameter of the POI medallion in design pixels */
+  poiSize?: number;
+  /** Duration of the POI fill animation in ms */
+  poiFillDurationMs?: number;
+  /** Opens the event detail panel */
+  onClick?: () => void;
+  /** Extra inline styles */
+  style?: React.CSSProperties;
+}
+```
+
+## 6. Token Contract (new)
+
+Create `src/balancing/config/idleVillage/eventReminderTokens.ts` with Zod schema.
+
+Key tokens (names indicative):
+- `reminder.gilded.frameGradient` — brass metal gradient
+- `reminder.gilded.ornamentColor` — corner highlight
+- `reminder.arcane.frameGradient` — oxidized teal gradient
+- `reminder.arcane.vineColor` — botanical gold
+- `reminder.surface.background` — dark plaque gradient
+- `reminder.glow.ambient` — teal/gold ambient glow
+- `reminder.glow.urgentPulse` — urgent pulse animation
+- `reminder.sizing.width` — 320/420 design px
+- `reminder.sizing.minHeight` — 140 design px
+- `reminder.poi.size` — 92 design px
+- `reminder.poi.fillDurationMs` — fill duration
+
+No hardcoded hex, font family, or shadow in the component itself.
+
+## 7. i18n
+
+All user-facing strings via `react-i18next` / `idleVillage` namespace. Existing keys:
+- `world.goblinInvasion.invasion`
+- `world.goblinInvasion.daysRemaining`
+
+Consider adding:
+- `world.eventReminder.urgent` (optional subtitle)
+- `world.eventReminder.completed`
+- `world.eventReminder.openDetails` (aria label for click)
+
+## 8. SVG Frame Strategy
+
+Create two frame components:
+- `GildedEventFrame.tsx`
+- `ArcaneEventFrame.tsx`
+
+Implementation notes:
+- `viewBox="0 0 420 156"`, `preserveAspectRatio="none"`.
+- `vector-effect: non-scaling-stroke` on all strokes.
+- SVG sits as an absolutely-positioned sibling above the card content (`z-index` above surface, below pointer events where interactive).
+- Defs for gradients/filters are internal to the SVG to keep the component self-contained.
+- No raster assets for the frame; it is pure SVG.
+
+## 9. States & Interactions
+
+| State | Behaviour |
+|---|---|
+| `normal` | Static glow, POI fills counter-clockwise, hover raises card 2–3 px with sheen sweep. |
+| `urgent` | Slow breathing on ambient glow, frame brightness pulse, countdown number glow pulse, `prefers-reduced-motion` disables animation. |
+| `completed` | Desaturated (`saturate(0.55)` or token equivalent), title colour muted, no countdown, no pulse. |
+
+Click:
+- `onClick` emits telemetry `event_reminder_click` and opens the detail panel.
+- `role="button"` and `aria-label` from i18n.
+
+## 10. Primitives Lab Page
+
+Add a new section in `src/pages/primitives.tsx` with rows for:
+- `variant="gilded"` / `state="normal"`
+- `variant="arcane"` / `state="urgent"`
+- `variant="gilded"` / `state="completed"`
+
+## 11. Safeguards
+
+- `npm run build:check` (180 s)
+- `npm run lint -- src/ui/idleVillage/components/ReminderComponent.tsx src/balancing/config/idleVillage/eventReminderTokens.ts src/pages/primitives.tsx` (120 s)
+- `npm run test` if tests are added (300 s)
+
+## 12. Open Questions
+
+1. Should the SVG frame be a new primitive in `src/ui/designSystem/primitives/` or a local helper inside `src/ui/idleVillage/components/`?
+2. Should `MatericEventCard` gain `variant`/`frame` props, or should `ReminderComponent` replace it for the reminder case?
+3. Should `urgent` be driven by `daysRemaining <= threshold` or explicitly passed?
+4. How do we integrate `prefers-reduced-motion` without creating a standalone `.css` file?

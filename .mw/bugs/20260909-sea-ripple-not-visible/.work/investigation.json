@@ -1,0 +1,6 @@
+{
+  "signals": ["no visible motion when Water toggled", ".ws-wave exists but opacity 0 most of the time", ".ws-sea-ripple-smil present but filter produced no displacement"],
+  "probableCauses": ["SVG filter url() not effective on transformed HTML layer", "zIndex below islands", "wave marks too subtle at zoom 0.33"],
+  "files": ["WorldSurfaceRenderer.tsx", "WorldSurfaceSeaRipple.tsx", "WorldSurfaceWaves.tsx", "atmosphereAssets.ts", "WorldSurfaceTestPage.tsx"],
+  "constraints": ["base Mare.webp must stay static", "effect must be masked to shallow water", "must respect prefers-reduced-motion"]
+}

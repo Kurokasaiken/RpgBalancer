@@ -1,0 +1,10 @@
+{
+  "status": "fixed",
+  "tests": [
+    { "name": "npm run build:check", "status": "passed" },
+    { "name": "npm run lint -- <scope>", "status": "passed" },
+    { "name": "Puppeteer: forest_1_top_left.webp bounding-box center", "status": "passed" },
+    { "name": "Puppeteer: goblin visible and moving after PREPARE", "status": "passed" }
+  ],
+  "notes": "Measured the actual forest_1_top_left layer center with Puppeteer. Fixed goblin width collapse (maxWidth: 'none'), centering offset (goblinHalf), and march target (empirical forest center). Goblin now visible and marches toward the center in the world-surface screenshot."
+}
