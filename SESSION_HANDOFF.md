@@ -113,3 +113,43 @@ con `config.mode`=verdetto forzato; bottone «continua» appare solo dopo `onRes
 
 - Nessuna decisione aperta: i parametri numerici sono mock iniziali in `quest-design.md`, da
   ritoccare nel playtest. Death save 5% confermato; wipe = si perde tutto.
+
+## 2026-10-05 — Knowledge pipeline: Extraction Ledger + registry + QUEST_RULES
+
+- **Skill:** `mind-weaver/.agents/skills/knowledge-extractor/SKILL.md` — aggiunto
+  Extraction Ledger (candidati completi: ID/TYPE/STATEMENT/TEMPORAL/VERDICT/REASON/
+  SOURCE/RELATIONSHIPS; verdicts INTEGRATE..DROP; reason obbligatoria per DROP),
+  tipo PROPOSAL, rationale per non-decision, routing verso REJECTED.md/OPEN.md,
+  persistenza report spostata in `context/ingestions/<date>-<slug>.md` (tracked;
+  `.mw/runs/` è gitignored).
+- **RPG:** creati `context/REJECTED.md` (REJ-001..006), `context/OPEN.md`
+  (OPEN-001..011), `QUEST_RULES.md` (PLAN-020 T-001, divergenza C7 dichiarata
+  non risolta); `CANON.md` riga quest aggiornata (T-003); `context/INDEX.md`
+  con router L0–L4 + nuove voci; `plans/INDEX.md` PLAN-020 → active.
+  T-002 (regola mantenimento `.windsurf/rules`) proposta, in attesa avallo testo.
+- **Golden test:** `context/ingestions/2026-10-05-progettare-quest-strategiche.md`
+  — ledger E-01..E-18 sulla conversazione «Progettare quest strategiche»
+  (fixture = artefatti archiviati; transcript grezzo non disponibile nel repo).
+- **Intento registrato:** R-084.
+
+## 2026-10-05 — PLAN-020 chiuso (T-002 applicata)
+
+- **T-002:** regola di mantenimento quest scritta in
+  `.windsurf/rules/80-quest-rules-maintenance.md` (testo equivalente a quello
+  fornito dal Director): same-session update di `QUEST_RULES.md`, status
+  `vigente`/`proposta`/`divergenza-nota`, divergenza da FROZEN → domanda
+  esplicita al Director, nessun assorbimento silenzioso.
+- **PLAN-020 → completed** (T-001/T-002/T-003 done); `plans/INDEX.md` e
+  `context/INDEX.md` aggiornati.
+- **Ora garantito dall'architettura:** distinzione estratto/scartato/integrato
+  via Extraction Ledger; report persistenti in `context/ingestions/`; regole
+  quest correnti in `QUEST_RULES.md`; rejected/open knowledge in registry
+  dedicati; retrieval L0–L4 documentato in `context/INDEX.md`.
+- **Limite ancora noto:** il transcript integrale del golden test
+  («Progettare quest strategiche») non è nel repo — la fixture sono gli
+  artefatti distillati.
+- **Prossimo test consigliato:** una seconda conversazione reale NON
+  preparata come fixture, ingerita con la skill corrente. Criteri:
+  extraction coverage · reconciliation correctness · persistence ·
+  provenance · rejected/open preservation · retrieval L0–L4 ·
+  false canonicalization · missed knowledge.
