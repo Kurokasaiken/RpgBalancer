@@ -1,0 +1,76 @@
+# Bugfix prompt
+
+## Bug report
+# Bug: IdleVillageConfig schema does not expose quest time and skill-check rules
+
+## Component
+
+Idle Village / POI Quest system
+
+## Description
+
+The POI quest page `/poi-quest-detail-roster-time-clock` cannot be fully config-first because `IdleVillageConfig` lacks two quest rule blocks:
+
+- `questTimeScale` (narrative unit to millisecond conversion)
+- `questSkillCheckConfig` (difficulty tables, background resolution, stat floor and ceiling)
+
+As a result, `questTotalDurationMs`, `buildAstrolabeSkillsForPhase` and `resolveMilestoneWithoutAnimation` fall back to `DEFAULT_QUEST_TIME_SCALE` and `DEFAULT_QUEST_SKILL_CHECK_CONFIG` defined in their own modules. These defaults are not editable from the Activities tab and violate the config-first invariant.
+
+## Reproduction
+
+1. Open `src/balancing/config/idleVillage/types.ts` and inspect `IdleVillageConfig`.
+2. Note that `questTimeScale` and `questSkillCheckConfig` are not fields.
+3. Open `src/ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage.tsx` and inspect the imports and usage of `questTotalDurationMs` and `buildAstrolabeSkillsForPhase`.
+4. Observe that no config object is passed to these engine functions; they use module-level defaults.
+
+## Expected behavior
+
+`IdleVillageConfig` should contain `questTimeScale` and `questSkillCheckConfig` as first-class Zod-validated fields, editable via `/idle-village-config` import/export, and the POI quest engine should receive them from `useIdleVillageConfig().config`.
+
+## Actual behavior
+
+The quest engine uses `DEFAULT_QUEST_TIME_SCALE` and `DEFAULT_QUEST_SKILL_CHECK_CONFIG`, bypassing the editable configuration.
+
+## Files involved
+
+- `src/balancing/config/idleVillage/types.ts`
+- `src/balancing/config/idleVillage/schemas.ts`
+- `src/balancing/config/idleVillage/defaultConfig.ts`
+- `src/balancing/config/idleVillage/configNormalizer.ts`
+- `src/balancing/config/idleVillage/IdleVillageConfigStore.ts`
+- `src/ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage.tsx` (consumer, referenced for context)
+
+## Deliverables
+
+- Add `questTimeScale` to `IdleVillageConfig` with the same shape as `DEFAULT_QUEST_TIME_SCALE`.
+- Add `questSkillCheckConfig` to `IdleVillageConfig` with the same shape as `DEFAULT_QUEST_SKILL_CHECK_CONFIG`.
+- Update `defaultConfig.ts` to provide default values for both new fields.
+- Update `configNormalizer.ts` to apply defaults safely when the fields are missing.
+- Update `IdleVillageConfigStore` defaults to include them.
+- Ensure `useIdleVillageConfig().config` exposes both fields at runtime.
+- Verify `npm run kanban:lint` and `npm run build:check` pass.
+
+## Acceptance criteria
+
+- `IdleVillageConfigSchema.safeParse` accepts a JSON config with `questTimeScale` and `questSkillCheckConfig`.
+- `useIdleVillageConfig().config.questTimeScale` and `.questSkillCheckConfig` are defined at runtime.
+- The POI quest page can be updated in the next bug to pass these configs to the engine functions.
+- Existing Playwright suite for `/poi-quest-detail-roster-time-clock` still passes (17 passed, 1 skipped).
+
+## References
+
+- `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_page_workflow.md` §11
+- `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_error_registry.md` ERR-022
+- `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_error_registry.md` ERR-019 to ERR-027 (depend on this schema work)
+
+
+## Investigation
+{
+  "bug_dir": "/Users/faustoboni/progetti_personali/RPG/.mw/bugs/2026-08-15-poi-quest-tp1-schema",
+  "deliverables_count": 22,
+  "tests_files": [],
+  "ambiguous_markers": false
+}
+
+## Instruction
+Fix the bug, then run the tests. Do not ask the user; follow the bug report and the tests.

@@ -1,0 +1,7 @@
+{
+  "status": "fixed",
+  "tests": [
+    "npm run build:check -- passed"
+  ],
+  "notes": "POI V3.5 has a bottom gem that overflows its declared height. In ReminderComponentV2 the image container was sized to the POI's intrinsic size, so the gem pushed the medallion's visual center upward and made it look misaligned. Fixed by expanding the image container height by 14px and adding 7px top padding, which vertically centers the medallion body and lets the gem sit naturally below."
+}

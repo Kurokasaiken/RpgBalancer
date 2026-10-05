@@ -1,0 +1,9 @@
+{
+  "ambiguous": true,
+  "questions": [
+    "Is the square on the compact clock in /poi-quest-detail-roster-time-clock or on the full clock in /minimal-clock?",
+    "Is the square inside the dark base ring (the dark circular band) or the lighter outer track/stroke?",
+    "Does the square appear only when paused, only when running, or both?",
+    "Does it disappear if the dark base ring fill is made transparent (test screenshot available)?"
+  ]
+}

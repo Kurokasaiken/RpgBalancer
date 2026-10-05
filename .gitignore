@@ -93,10 +93,7 @@ public/assets/trailer/
 # Temporary agent tooling
 tools/
 .mw/bin/
-.mw/bugs/
 .mw/observation.jsonl
-.mw/plans/
-.mw/templates/
 
 # Old painted mockup component iterations (keep V17+ if it exists)
 src/ui/idleVillage/trailer/GoblinEventModalV[1-9].tsx
@@ -105,9 +102,6 @@ src/ui/idleVillage/trailer/GoblinEventModalV1[0-6].tsx
 
 
 # Mind Weaver planner and spec artifacts
-.mw/specs/
-plans/
-context/MIND_WEAVER_MULTI_AI_PROTOCOLS.md
 
 # Generated world / atmosphere masks and scripts
 public/assets/world/wanderlust/base/layers/event_shroud_*.png

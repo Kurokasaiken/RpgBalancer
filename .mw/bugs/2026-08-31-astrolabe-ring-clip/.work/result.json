@@ -1,0 +1,5 @@
+{
+  "status": "resolved",
+  "tests": ["npm run build:check", "puppeteer screenshot"],
+  "notes": "Ring bronzeo esterno ora completo in alto a sinistra. .astro-bezel viewBox allargata, overflow:visible, inset:-80px."
+}

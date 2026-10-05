@@ -1,0 +1,39 @@
+Pianifica una passata di polish per il Gilded Event Reminder del progetto RPG React.
+
+Stato attuale:
+- `ReminderComponent` e `GildedEventFrame` hanno una cornice, gemme, countdown e medaglione funzionanti.
+- Il componente builda e renderizza, ma appare ancora grezzo rispetto al mockup AAA.
+- Il mockup mostra: medaglione a sinistra con rune/speculari, INVASION inciso in oro, DAYS REMAINING piccolo, 5 grande, cornice dorata con gemme verdi e maniglie laterali.
+
+Critiche recenti raccolte (lead UI AAA):
+1. Cornice: sembra un contorno piatto, manca rilievo 3D, ombre rilasciate, spessori vari.
+2. Gemme: sembrano adesivi; mancano castone, cabochon, riflesso speculare.
+3. Sfondo: tinta unita; manca grana, vignette, alone laterale.
+4. Medaglione: galleggia sul pannello; manca connessione (alone, luce proiettata).
+5. Titolo: troppo digitale; manca look "inciso" con highlight in rilievo.
+6. Countdown: label troppo opaca; numero isolato.
+
+Obiettivi in scope (5 tweak):
+1. Gemme cabochon con castone e speculare.
+2. Cornice con ombra rilasciata e rilievo.
+3. Sfondo con grana e vignette.
+4. Alone radiale sotto il medaglione.
+5. Titolo inciso e countdown rafforzato.
+
+Vincoli:
+- No file `.css` standalone.
+- Tutti i colori/spessori da `eventReminderTokens.ts` (Zod).
+- i18n per stringhe.
+- Reuse `MatericEventCard`, `PoiMatericV3`, `SkinTitle`.
+- No nuovi componenti se non strettamente necessario.
+- `prefers-reduced-motion`.
+- Build e lint devono passare.
+
+Output richiesto:
+- Ordine ottimale dei task.
+- File da toccare.
+- Token contract aggiornati (quali nuovi campi).
+- Decisioni aperte.
+- Rischi e come mitigarli.
+
+Rispondi in italiano.

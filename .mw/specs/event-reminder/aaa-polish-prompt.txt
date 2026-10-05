@@ -1,0 +1,36 @@
+Pianifica il round 3 di polish per il Gilded Event Reminder in React.
+
+Obiettivo: portare il componente al livello AAA secondo la critica raccolta.
+
+Critiche recenti (lead UI AAA):
+1. Ierarchia visiva confusa: medaglione, 5, placca, gemme competono tutti.
+2. La placca del countdown sembra un buco scuro, non un oggetto metallo.
+3. Il medaglione POI V3.5 è troppo brillante e dominante.
+4. Bordi doppi: cornice + maniglie + rettangoli interni non sembrano un unico artefatto.
+5. Vetro/parallasse non si legge nello screenshot statico.
+6. Semantica errata: la placca marrone/oro sembra "premio", non "allarme" temporale.
+
+Soluzioni proposte:
+- Placca countdown come oggetto metallico con bordo e sfumatura, colori state-driven (calm=teal, urgent=gold, active=red).
+- Ridurre il medaglione del ~15% e ammorbidire il glow.
+- Aggiungere glare statico sul pannello che funzioni senza animazione.
+- Unificare bordi: ridurre maniglie a filetti continui con la cornice.
+- Ierarchia tipografica: 5 hero, INVASION titolo, DAYS REMAINING caption.
+
+Vincoli:
+- No nuovi componenti.
+- Tutto da token `eventReminderTokens.ts` (Zod).
+- No file CSS standalone.
+- i18n per stringhe.
+- `prefers-reduced-motion`.
+- Reuse `MatericEventCard`, `SkinTitle`, `GildedEventFrame`.
+- Build e lint devono passare.
+
+Output richiesto:
+- Task atomici con ordine di esecuzione.
+- Token contract aggiornati (quali nuovi campi e perché).
+- File da toccare.
+- Decisioni aperte.
+- Rischi.
+
+Rispondi in italiano.

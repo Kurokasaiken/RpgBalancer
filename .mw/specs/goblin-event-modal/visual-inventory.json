@@ -1,0 +1,19 @@
+{
+  "reference": "public/mockups/external/goblin-event-lab/reference.png",
+  "width": 1086,
+  "height": 1448,
+  "items": [
+    { "id": "V001", "name": "Base sky / solar glow", "z": 0, "material": "CSS gradient", "implementation": "CSS" },
+    { "id": "V002", "name": "Hero illustration", "z": 0, "material": "painted totem", "implementation": "RASTER_CROP" },
+    { "id": "V003", "name": "Top banner", "z": 10, "material": "parchment", "implementation": "CSS" },
+    { "id": "V004", "name": "Title", "z": 20, "material": "React/i18n", "implementation": "REACT_I18N" },
+    { "id": "V005", "name": "Lower panel", "z": 20, "material": "dark glass/parchment", "implementation": "CSS" },
+    { "id": "V006", "name": "Panel header", "z": 30, "material": "React/i18n", "implementation": "REACT_I18N" },
+    { "id": "V007", "name": "Body text", "z": 30, "material": "React/i18n", "implementation": "REACT_I18N" },
+    { "id": "V008", "name": "Warning text", "z": 30, "material": "React/i18n", "implementation": "REACT_I18N" },
+    { "id": "V009", "name": "Arrival medallion", "z": 30, "material": "gold/green", "implementation": "CSS/SVG" },
+    { "id": "V010", "name": "Primary button", "z": 30, "material": "red/gold plate", "implementation": "CSS" },
+    { "id": "V011", "name": "Carved outer frame", "z": 40, "material": "timber + gold", "implementation": "SVG" },
+    { "id": "V012", "name": "Reference overlay", "z": 50, "material": "mockup image", "implementation": "REFERENCE_ONLY" }
+  ]
+}

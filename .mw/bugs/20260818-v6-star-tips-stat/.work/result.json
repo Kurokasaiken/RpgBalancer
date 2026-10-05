@@ -1,0 +1,23 @@
+{
+  "status": "awaiting Director review",
+  "tests": {
+    "npm run build:check": "pass",
+    "tests/verify.mjs": "24/24 pass — 7 guard statici (3 bloccano clip/velo) + 4 invariante punte + 6 taratura + 2 monotonia + 5 vari",
+    "coverage_note": "V6 non ha unit test nel repo (esistono solo per V3 e V5). verify.mjs e proposto come guard permanente."
+  },
+  "rootCauseFixed": true,
+  "notes": [
+    "eliminato l'area solve: era la causa, non un dettaglio. consumava la scala, unico parametro libero.",
+    "punte ora == rOf(stat) con scarto 0.00e+0 px su tutti gli assi e tutte le configurazioni provate",
+    "VALLEY_F=0.3675 tarato: parita legge 50.00% a ogni livello, scale-invariant",
+    "geo.probPct esposto: probabilita reale derivata dalla geometria",
+    "default single-skill portato a 85/50 nel sorgente della pagina (prima era solo digitato nel form)",
+    "confermato empiricamente engine.ts:526 — la pallina e confinata dentro rCheckAt (bounce Challenge Surface), quindi l'area fuori dal goo e irraggiungibile per costruzione",
+    "drawStar: la stella e disegnata INTERA, piena, sopra il goo. Nessun clip, nessun velo. Due tentativi sbagliati registrati nel commento perche non vengano riprovati.",
+    "errore di ragionamento corretto: il denominatore della probabilita e il GOO, non la stella. L'eccedenza fuori dal goo sta fuori dal confronto, quindi non falsa la lettura e non va marcata."
+  ],
+  "openDecisions": [
+    "il numero mostrato (TST da formula) diverge dalla geometria: -43.8pt nel caso multi-skill",
+    "VALLEY_F 0.3675 (parita=50%) vs 0.5 (forma V1 esatta, parita=58.2%)"
+  ]
+}

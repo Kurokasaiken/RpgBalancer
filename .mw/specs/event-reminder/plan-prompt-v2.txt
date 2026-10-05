@@ -1,0 +1,40 @@
+Pianifica l'implementazione del Gilded Event Reminder per il progetto RPG React.
+
+Stato attuale:
+- `ReminderComponent` in `src/ui/idleVillage/components/ReminderComponent.tsx` base.
+- Usa `MatericEventCard` variant="reminder" con `title`, `daysLeftLabel`, `daysLeftValue`.
+- Cornice `GildedEventFrame.tsx` base.
+- Token `eventReminderTokens.ts` base.
+- Mockup autorevole: gilded event reminder con medaglione a sinistra, INVASION, DAYS REMAINING 5, cornice dorata con gemme verdi.
+
+Critiche raccolte (lead UI AAA):
+1. Cornice troppo "pannello"; manca asimmetria, spessori vari, incisioni.
+2. Oro piatto; mancano gradienti metallici multi-stop e riflessi.
+3. Countdown: label e numero devono avere gerarchia netta; numero più grande, label piccola impilata o a sinistra.
+4. Medaglione OK ma manca profondità: speculare, glow sotto, rune incise.
+5. Sfondo troppo uniforme; serve micro-texture SVG.
+6. Manca sistema di stati temporali (calm/urgent/active) per gameplay.
+
+Obiettivi in scope:
+1. Cornice gilded più scolpita: angoli asimmetrici, gemme incastonate, metallo con gradienti, `feTurbulence` leggero per texture.
+2. Countdown con gerarchia netta (label piccola + numero grande).
+3. Medaglione con speculari e glow.
+4. Sfondo con micro-texture.
+5. Stati temporali (calm/urgent/active) con variazioni di colore/glow/animazione.
+
+Vincoli del progetto:
+- No file `.css` standalone; tutti i colori/spessori da `eventReminderTokens.ts` (Zod).
+- i18n per stringhe utente.
+- Evitare nuovi componenti se non strettamente necessario.
+- Reuse `MatericEventCard`, `PoiMatericV3`, `SkinTitle`.
+- `prefers-reduced-motion` supportato.
+- Build, lint, test devono passare.
+
+Output richiesto:
+- Piano sequenziale con file da toccare/creare.
+- Token contract aggiornato.
+- Sequenza task minima (YAGNI).
+- Safeguards.
+- Eventuali decisioni aperte.
+
+Rispondi in italiano.

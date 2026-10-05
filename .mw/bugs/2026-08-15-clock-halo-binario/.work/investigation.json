@@ -1,0 +1,21 @@
+{
+  "signals": [
+    "visible square/alpha artifact inside the day/night clock outer ring",
+    "artifact in upper-left of the ring/dial",
+    "user calls it 'texture/background image' with sharp corners"
+  ],
+  "files": [
+    "src/ui/idleVillage/components/minimal/TimeEngineStrip.tsx",
+    "src/ui/idleVillage/components/minimal/DayNightPoiSkin.tsx",
+    "src/docs/docs/idle_village/day_night_poi_spec.md"
+  ],
+  "experiments": [
+    "removed conic-gradient from TimeEngineStrip compact wrapper",
+    "set TimeEngineStrip compact wrapper to transparent",
+    "tried DayNightPoiSkin overflow visible",
+    "removed DayNightPoiSkin dark base ring fill",
+    "git log search for prior fix commits returned no specific fix for the square artifact",
+    "created a layer-isolation debug page at /day-night-poi-skin-debug"
+  ],
+  "notes": "The square does not disappear with conic-gradient removal, but the dark base ring fill removal changes the ring appearance. The artifact could be bloom/filter interaction on the dark base ring fill, or the TimeEngineStrip bg-black/45 showing through. A debug page now lets the user toggle each DayNightPoiSkin layer to identify the exact source."
+}

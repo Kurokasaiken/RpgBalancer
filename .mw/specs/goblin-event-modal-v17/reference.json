@@ -1,0 +1,11 @@
+{
+  "fileName": "goblin-invasion-mockup.png",
+  "width": 1086,
+  "height": 1448,
+  "aspectRatio": 0.75,
+  "viewport": "1086x1448",
+  "coordinateSystem": "viewport-pixel",
+  "crop": "exact",
+  "textIsAuthoritative": false,
+  "sha256": "06393bfa2693a13160160ce513be0d8e336125d7dbfe349895cc49e6fdae3eab"
+}
