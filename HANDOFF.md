@@ -1,3 +1,5 @@
+> **STATUS: HISTORICAL (snapshot Jul 2026, progetto restyle Material Language)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: SESSION_HANDOFF.md.
+
 # HANDOFF — Restyle "Material Language" · RPG/Wanderlust
 
 ## 0. Il quadro generale (LEGGI QUESTO PRIMA)

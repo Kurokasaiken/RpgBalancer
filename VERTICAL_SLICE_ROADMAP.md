@@ -1,3 +1,5 @@
+> **STATUS: STALE — da verificare con il Director (CANON lo cita ancora come piano operativo)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: plans/INDEX.md, PLAN-019.
+
 # Vertical Slice Roadmap — Steam Release
 
 **Versione:** 3 (riscritta 2026-05-12 dopo correzioni utente)

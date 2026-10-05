@@ -1,3 +1,5 @@
+> **STATUS: DIRECTION — valida ma da riallineare (fermo a Jan 2026)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: DESIGN_PILLARS.md per direzione prodotto.
+
 # Product Roadmap: Path to Commercialization
 
 ## 📊 Current State Analysis

@@ -22,6 +22,12 @@ Per ogni domanda, il documento di riferimento è:
 - **Catalogo documenti caldi e tracciamento** → `context/INDEX.md`
 - **Glossario dei termini** → `GLOSSARY.md`
 - **Governance per agenti AI** → `AGENTS.md`
+- **Architettura tecnica (mappa dominio → fonte)** → `src/docs/docs/architecture_state.md` (router canonico; i 4 ex-claimant marcati superseded/reference — audit 2026-10-05)
+- **Stato operativo dei piani** → `plans/INDEX.md` (creato 2026-10-05; `ROADMAP.md` assorbito → superseded)
+- **Regole quest correnti** → doc canonico in `PLAN-020` (in corso); fonte intento resta `.mw/desiderata.md` FROZEN + `context/DECISION_LOG.md`
+- **Audit KB 2026-10-05** → `KNOWLEDGE_AUDIT.md`
+
+**Non sono knowledge docs (ops artifacts, nessuna autorità documentale):** `coordinator/manual-dispatch/`, `prompts/`, `test-results/` (evidence), `.mw/runs/` (ephemeral). Le skill vivono in `coordinator/skills/` (fonte unica; `.windsurf/skills` e `.devin/skills` sono symlink).
 
 ## Stati della conoscenza
 

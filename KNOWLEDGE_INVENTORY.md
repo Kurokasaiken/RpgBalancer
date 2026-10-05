@@ -1,3 +1,5 @@
+> **STATUS: HISTORICAL (one-shot PLAN-011, 2026-08-30 — 648 file mai rivisti)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: KNOWLEDGE_AUDIT.md.
+
 # Knowledge Inventory
 
 ## canonical (48)

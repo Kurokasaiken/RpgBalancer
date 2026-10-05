@@ -1,3 +1,5 @@
+> **STATUS: HISTORICAL (fermo a Jun 2026)** — KB audit 2026-10-05 (desiderata v25, `KNOWLEDGE_AUDIT.md`). Canonico: CURRENT_STATE.md / plans/INDEX.md.
+
 # Vertical Slice Progress — Idle Village
 
 **Ultimo aggiornamento:** 2026-06-12
