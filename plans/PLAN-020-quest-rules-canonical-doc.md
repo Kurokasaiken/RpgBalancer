@@ -1,8 +1,9 @@
 ---
 title: "PLAN-020 — Canonical Quest Rules Document"
-status: proposed
+status: completed
 owner: strategist
 created: 2026-10-05
+completed: 2026-10-05
 desiderata: v25 (KB audit), risposta Director Q7
 parent: PLAN-019
 ---
@@ -44,6 +45,18 @@ diverge dalle regole registrate.
 - Rimuovere/riformattare le desiderata FROZEN.
 - GAMEPLAY_DESIGN.md resta «visione» — QUEST_RULES.md è «regole vigenti», ruoli diversi
   dichiarati in testa al doc.
+
+## Stato esecuzione — 2026-10-05
+
+- **T-001 done:** `QUEST_RULES.md` (root) compilato: regole vigenti da
+  desiderata v23/v24+rev, `quest-design.md`, DECISION_LOG, PLAN-018/019.
+  Divergenza C7 (soglia PLAN-018 vs prova-obiettivo rev.2) dichiarata come
+  `divergenza-nota`, non risolta → `context/OPEN.md` OPEN-001.
+- **T-002 done:** regola di mantenimento in
+  `.windsurf/rules/80-quest-rules-maintenance.md` — testo fornito dal Director
+  nel prompt di chiusura PLAN-020 (same-session update, status
+  vigente/proposta/divergenza-nota, nessun assorbimento silenzioso).
+- **T-003 done:** `CANON.md` riga «Regole quest correnti» → `QUEST_RULES.md`.
 
 ## Acceptance
 
