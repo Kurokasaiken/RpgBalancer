@@ -25,6 +25,10 @@ Per ogni domanda, il documento di riferimento è:
 - **Architettura tecnica (mappa dominio → fonte)** → `src/docs/docs/architecture_state.md` (router canonico; i 4 ex-claimant marcati superseded/reference — audit 2026-10-05)
 - **Stato operativo dei piani** → `plans/INDEX.md` (creato 2026-10-05; `ROADMAP.md` assorbito → superseded)
 - **Regole quest correnti** → `QUEST_RULES.md` (doc canonico, PLAN-020 T-001); fonte intento resta `.mw/desiderata.md` FROZEN + `context/DECISION_LOG.md`
+- **Superficie di gioco canonica** → `/game` (Game Frame Pixi, link «Game» in `/test hub`; Director 2026-10-05). Pagina Idle Village → deprecata.
+- **Economia villaggio** → `VILLAGE_ECONOMY.md` (DRAFT — bozza di piano; proposte in OPEN-010)
+- **Progressione** → `PROGRESSION.md` (DRAFT — bozza di piano)
+- **Narrativa** → `NARRATIVE.md` (DRAFT — bozza di piano)
 - **Audit KB 2026-10-05** → `KNOWLEDGE_AUDIT.md`
 
 **Non sono knowledge docs (ops artifacts, nessuna autorità documentale):** `coordinator/manual-dispatch/`, `prompts/`, `test-results/` (evidence), `.mw/runs/` (ephemeral). Le skill vivono in `coordinator/skills/` (fonte unica; `.windsurf/skills` e `.devin/skills` sono symlink).

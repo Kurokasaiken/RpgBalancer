@@ -26,7 +26,8 @@ np-*.log
 src-tauri/target/
 
 # AI tooling directories
-.windsurf/
+.windsurf/*
+!.windsurf/rules/
 .claude/
 
 # Mind Weaver runtime: shared with mind-weaver via symlink; do not commit

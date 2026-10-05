@@ -67,4 +67,5 @@ I termini marcati `proposta` non sono regole vigenti (vedi `context/OPEN.md`).
 ## Note di rinomina / concetti storici
 
 - **Dispatch** — riferimento storico per UI/mappa tattica; non è più il modello spaziale canonico.
-- **Idle Village** — vecchia pagina legacy; il nuovo target è `Village Sandbox`.
+- **Idle Village** — superficie di gioco **deprecata** (Director 2026-10-05); sostituita da `/game`. Il nome resta nel dominio codebase (`src/ui/idleVillage/`, `src/docs/docs/idle_village/`) come riferimento storico.
+- **Game Frame / `/game`** — superficie di gioco canonica: cornice persistente (topbar, roster rail, mappa Pixi, quest rail, status bar) con quest POI e Director panel; raggiungibile dal link «Game» in `/test hub`. R-075 v2.
