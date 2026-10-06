@@ -53,7 +53,7 @@ protetto finché qualcuno dietro vive.
 |---|---|---|
 | Competenze chiave | Forza (base), Percezione (rivelabile), Destrezza, Costituzione, Intelligenza | |
 | Oggetti/consumabili portabili | Bonus Forza ×1 fase · Bonus Percezione ×1 fase · Healing +20 HP | assegnati in partenza |
-| Difficoltà check combattimento | 25 → Forza 0 = 75% fallimento | Director |
+| Difficoltà check combattimento | **−20 allo score** → miglior FOR del party = ~50% riuscita a turno (es. FOR 70 → bound 50, vantage assalto +10 → 60, stealth +15 → 65) | Director, calibrazione 2026-10-06 |
 | Durata | ~4–6 turni di combattimento | Director |
 | Checkpoint | continua / ritirati / consumabile prima di ogni check rischioso | vigente |
 | Consumabili | usabili **solo prima di uno skill check o di una scelta** | Director 2026-10-06 |
@@ -127,7 +127,8 @@ mediamente più Forza che Destrezza):
   **escalation** (vedi sopra: T1 `0/0/20/80` → T3+ `5/10/25/60`).
 - **Attesa Director:** mediamente il bodyguard (S4) muore; S2 ~20–30% del
   danno; S3 ~50–70%.
-- **Difficoltà skill check = 25** (Forza 0 → 75% fallimento).
+- **Difficoltà skill check = −20 allo score** (miglior FOR del party → ~50%
+  riuscita a turno; es. FOR 70 → bound 50). Calibrazione Director 2026-10-06.
 - I bonus/malus di F3 (stealth → danno, assalto → moderato) si applicano qui.
 
 ### F5 — INCALZARE (scelta) — punto di non ritorno psicologico

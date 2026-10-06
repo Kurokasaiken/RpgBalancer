@@ -198,7 +198,7 @@ export const TUNE = {
   woundedManRide: 20, // carrying him earns a future favor, cashed now in gold
   maxAutoSteps: 64, // hard cap on auto-resolved node chains (check/info/harm): an authored cycle degrades to a terminal state instead of a stack overflow
   /* ---- Goblin quest (PLAN-022) — placeholders, MC calibration pending --- */
-  goblinCheckBase: 25, // flat base of the combat-phase success bound
+  goblinCheckDifficulty: 20, // subtracted from the party score: best FOR 70 → ~50% combat bound (Director calibration 2026-10-06)
   ambushFlatDamage: 5, // dry damage to every member at the ambush's start
   ambushWorsenedBonus: 5, // extra hit damage when the pursuit failed
   exploreBaseDamage: 5, // F6: turn N costs 5·N HP, positional target
@@ -810,7 +810,7 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
       ? 10
       : 0;
   const score = groupScore(state, spec.attackStats) + vantage;
-  const bound = clampSuccessBound(TUNE.goblinCheckBase + score);
+  const bound = clampSuccessBound(score - TUNE.goblinCheckDifficulty);
   const die = 1 + Math.floor(roll(state) * 100);
   const verdict = verdictFromRoll(die, bound);
   state.lastCheck = {

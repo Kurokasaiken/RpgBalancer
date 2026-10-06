@@ -118,3 +118,10 @@ smoke manuale su `/quest-s1-lab` (3 scenari).
   combattimento); picker ridotto alla sola quest «Sterminio dei goblin»;
   chiavi i18n `questS1Lab.quests.goblin.*` + `pickQuest` aggiornata; scene art
   usa il campo `fit` (cover/contain) e altezza aumentata.
+- **2026-10-06 — Calibrazione check combattimento (Director).** Il bound del
+  turno F4 era `score + 25` → ~95% a turno (combattimento deterministico).
+  Ora `TUNE.goblinCheckDifficulty = 20` **sottratta** allo score: miglior FOR
+  del party (70) → ~50% a turno; vantage assalto +10 → 60%, stealth +15 → 65%,
+  allarme → 40%. Stessa formula per l'ultima mischia F7 (ora un coin flip
+  drammatico). Spec authored aggiornata (riga parametri + sezione F4).
+  Verificato live: turno 1 bound 60 con `vantaggioPiccolo`.
