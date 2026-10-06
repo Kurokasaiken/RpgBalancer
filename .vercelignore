@@ -1,0 +1,12 @@
+.git
+.vercel
+node_modules
+dist
+.env
+.env.*
+venv
+.mw
+_OLD_DEPRECATED
+coordinator
+test-results
+*.log

@@ -125,3 +125,4 @@ scripts/mw-*.py
 coordinator/skills/mockup-generator/
 coordinator/skills/painter/
 coordinator/skills/skills
+.vercel
