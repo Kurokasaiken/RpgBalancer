@@ -1,7 +1,7 @@
 ---
 title: Rejected Approaches Registry
 type: registry
-updated: 2026-10-05
+updated: 2026-10-06
 ---
 
 # REJECTED — Negative Knowledge Registry
@@ -111,3 +111,20 @@ Formato voce:
   `plans/PLAN-018-mission-planner.md`.
 - **Related decision:** modello di rischio per-fase per-residente
   (DECISION_LOG 2026-09-29).
+
+## REJ-007 — Quest come singolo skill check
+
+- **Rejected approach / idea:** strutturare la quest come *«manda il party →
+  tiro di abilità → successo/fallimento → ricompensa»*.
+- **Why rejected:** collassa la quest in un unico check senza decisioni del
+  giocatore, senza costo/rischio differenziato per scelta e senza conseguenze
+  graduate (successo/fallimento/ferite/morte). Contraddice la struttura
+  multi-fase vigente e il criterio «interessante» della desiderata v24.
+- **Status:** `rejected`
+- **Reopen-if:** mai per la struttura base; un singolo check può restare come
+  *dettaglio* interno a una fase, non come architettura della quest.
+- **Source / provenance:** conversazione ChatGPT «Progettare quest
+  strategiche», continuazione 2026-10-05 (share 6ac4b926); ledger
+  `context/ingestions/2026-10-06-quest-strategiche-continuazione.md` (E-02).
+- **Related decision:** catena `PARTY → QUEST → PHASE → SITUATION → APPROACH →
+  CHECK/CHOICE → CONSEQUENCE` (QUEST_RULES §1, PLAN-019).
