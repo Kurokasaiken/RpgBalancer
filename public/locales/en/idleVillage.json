@@ -1065,6 +1065,9 @@
       "potion": "⚗ Potion — heals a wounded member",
       "smoke": "✦ Smoke bomb — +15 infiltration",
       "rope": "🪢 Rope — +15 climbing",
+      "bonusForza": "⚔ Strength Bonus — +15 to one check",
+      "bonusPerc": "👁 Perception Bonus — +15 to one check",
+      "healing": "✚ Healing — +20 HP to the most hurt",
       "usePotion": "⚗ Potion → heal {name}"
     },
     "loot": "Loot: {items}",
@@ -1197,7 +1200,7 @@
       "tooltip": "The camp heard something. Another misstep and it erupts — and the quiet way out closes."
     },
     "labTitle": "S1 — Quest Lab",
-    "pickQuest": "Choose the expedition — two authored quests, two different shapes of risk.",
+    "pickQuest": "Choose the expedition — one authored quest, every verdict has a price.",
     "backToQuests": "All quests",
     "days": "{days} days",
     "treasureValue": "treasure ~{value} gold",
@@ -1219,6 +1222,13 @@
         "objective": "Goal: bring the treasure back from the ruins beneath the river. Every extra room costs days and blood. The leader must survive. Choose the expedition:",
         "duration": "4–9 days",
         "trial": "★ Strength trial — {stats}"
+      },
+      "goblin": {
+        "title": "Goblin Extermination",
+        "desc": "Combat: hunt the raiders back to their camp and wipe them out. No stealth prize — just steel, and a price for every extra minute you linger.",
+        "objective": "Goal: exterminate the goblins raiding the borders. The fight is won in the approach — stealth or assault set the terms of the battle. Choose the expedition:",
+        "duration": "one day",
+        "trial": "★ Combat trial — {stats}"
       }
     }
   },

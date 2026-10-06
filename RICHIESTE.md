@@ -1910,3 +1910,40 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Desiderata FROZEN:** `.mw/desiderata.md` v26.
 **Deliverable:** (a) skill `strategist` in `coordinator/skills/strategist/` — discussione libera di direzione, scrittura nei doc di direzione su decisione Director, handoff a desiderata; (b) rename skill MW `strategist` → `decomposer` in `mind-weaver/.agents/skills/` + symlink `~/.agents/skills/`; (c) hat `game_director` in `.mw/prompt-enhancers.md`; (d) registrazione in `context/INDEX.md`.
 **Nota:** la regola R-004 cita `strategist` fra le skill MW invocabili — il nome corretto dopo questa voce è `decomposer`; la regola resta invariata nel contenuto.
+
+---
+
+## R-088 — Presentazione della quest nel gioco reale: `QuestTheatre` (direzione B) su superficie `/game`
+
+**Richiesta:** share link ChatGPT (`6ac5017a`, «Presentazione della quest») portato in esplorazione. Il Director ha fissato scope e decisioni in sessione: *"questo è x presentarla nel gioco 'davvero'"* (superficie canonica `/game`, non il lab S1); scelta della direzione **B** (`QuestTheatre` componente nuovo che ospita cronaca/check/reward dentro `FloatingPanel`, con modalità espansa); e la semantica runtime: *"nn devono essere fatte le scelte e gli skill check automaticamente. Solo il tempo deve scorrere. Quando il giocatore apre è sempre fermo alla prima fase, semplicemente nn deve aspettare tempo x risolvere anche le fasi successive, il resto è inalterato"* — *"una storia a nodi che mi aspetta ai bivi, semplicemente nn devi aspettare X tempo perché è già passato, ma il gameplay è identico"*.
+**Data:** 2026-10-06
+**Stato:** `aperta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v27 — avallo «avallo» 2026-10-06. Prossimo passo: `mw-planner` per la spec `QuestTheatre`.
+**Decisioni Director in sessione:**
+- Scopo: presentazione della quest sulla superficie canonica `/game` (Pixi + DOM overlay), non il lab S1 (sperimentale).
+- **Direzione B:** `QuestTheatre` come componente nuovo — stage renderer (narrative/choice/check/consequence/reward) che *ospita* i contenuti esistenti (`QuestChronicle`, skill check, `QuestRewardPanel`, kit, log); container = `FloatingPanel` (v4: spostabile, riducibile a icona, non bloccante) con **modalità expanded** opzionale.
+- **Modello runtime:** la quest è una storia a nodi che **aspetta ai bivi** — scelte e skill check non si auto-risolvono mai. Solo il tempo scorre: i gate temporali (viaggi, durate) maturano in background, quindi quando il giocatore apre il teatro è fermo alla prima fase pendente senza dover attendere.
+- **Scartati dalla proposta ChatGPT:** stato narrativo (`IN DANGER`/`RETURNING`) e livello di pericolo implicito — *"nn mi interessa"*.
+- Dalla proposta restano candidate: timeline narrativa (traccia dei nodi, non %), futuro sconosciuto nascosto (nemmeno `?`), party strip, decision panel, expedition kit drawer, chronicle/log, retreat con anteprima conseguenze, art cinematografica, header obiettivo.
+**Collegamenti:** share ChatGPT `6ac5017a`; desiderata v3/v4 (pannelli flottanti, quest POI), v24 (modello S1, S4 integrazione), QUEST_RULES.md; `useQuestPoiSession.tsx`, `QuestChronicle`, `FloatingPanel`, `QuestS1LabPage` (reference sperimentale).
+**Note di provenienza:** la proposta origina da una conversazione ChatGPT del Director; lo stato narrativo/pericolo implicito era la parte scartata. Il container FloatingPanel è già canone (v4): il teatro cambia contenuto e scala del pannello, non il container.
+
+## R-089 — Implementazione della quest «Sterminio dei goblin» nel lab S1
+
+**Richiesta:** il Director ha authored la quest «Sterminio dei goblin» (fasi F0–F7) e ratificato in sessione il modello di targeting posizionale a cascata, l'escalation di combattimento, HP per-PG (0 HP = morte), F5 a bande di esito, F7 come turno secco + 5 danni secchi, consumabili solo prima di check/scelta, reward XP+trofeo→Gold. Chiesto il piano di implementazione nel lab S1 e l'esecuzione.
+**Data:** 2026-10-06
+**Stato:** `in corso`
+**Desiderata FROZEN:** `.mw/desiderata.md` v24 (stadio S1 — quest authored nel lab).
+**Spec:** `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md` (fasi, regole, testi per esito).
+**Piano:** `plans/PLAN-022-quest-sterminio-goblin.md`.
+**Vincoli:** nessuna modifica al comportamento di «cassa»/«rovine» (regressione); targeting posizionale solo per la nuova quest; valori numerici = placeholder da calibrare via Monte Carlo.
+
+---
+
+## R-090 — Ricerca approfondita su narrativa emergente / quest generator (verso S5)
+
+**Richiesta:** *"prendi il cappello corretto, fa un prompt adeguato x una ricerca online approfondita su come ottenere questo tipo d cose, i principi psicologici, e quasliasi altra cosa che ci serve per questo tipo di lavoro, sotto diversi ambiti, punti di vista, ecc. questa ricerca falla tu e chiedila anche a tutte le AI web. poi dammi un riassunto breve e scrivi nella documentazione adeguata i principi che c serovno"*
+**Data:** 2026-10-06
+**Stato:** `in corso`
+**Contesto:** discussione strategist sulle strategie per arrivare a un quest system con narrativa emergente (chain quest, quest condizionate da requisiti, branching delle fasi sugli esiti) — piano S5 di PLAN-019, proposta E-28/OPEN-014.
+**Hat:** `game_director`. **Metodo:** ricerca web dell'agente + broadcast a tutti i provider web (chatgpt, claude, gemini, grok, deepseek) → sintesi → principi in `context/QUEST_GAMEPLAY_SCIENCE.md` / `NARRATIVE.md`.

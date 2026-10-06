@@ -123,6 +123,35 @@ al Director, non assorbimento silenzioso.
   «sopravvive ferito».
   **STATUS:** `mock-S1` — da calibrare al Gate A (OPEN-006).
   **SOURCE:** `context/QUEST_S1_DESIGN.md`; DECISION_LOG 2026-10-02.
+- **RULE — Targeting posizionale a cascata:** gli esiti pericolosi (morte,
+  ferita) e i danni extra di check e turni di combattimento si assegnano con
+  **un tiro sugli slot occupati**; il profilo è posizionale — il rischio sta
+  in coda: 1 PG → S1 100%; 2 → 20/80; 3 → 0/20/80; 4 → 0/0/20/80. Quando un
+  PG muore gli slot scalano e il profilo si ricalcola sugli occupati. Lo
+  stesso tiro vale per ogni evento pericoloso (un solo concetto, nessuna
+  probabilità separata di «sudden death»: l'eroe davanti vale 0 finché
+  qualcuno è dietro, da solo vale 100). In combattimento **escalation**:
+  T1 `0/0/20/80` → T2 `0/5/25/70` → T3+ `5/10/25/60` stabile (S4 −10%/turno,
+  ridistribuito ai primi slot) — **valori placeholder**, calibrazione ancora
+  da fare (Director 2026-10-06).
+- **RULE — Combattimento (fase dedicata):** il danno arriva in colpi discreti
+  per turno — 1 colpo a T1–T2, **2 colpi da T3 in poi**, mai due volte sullo
+  stesso bersaglio nello stesso turno. **Nessuna morte secca nella fase di
+  combattimento**: il profilo escalation distribuisce solo danno/ferita.
+  **STATUS:** `vigente`. **SOURCE:** Director 2026-10-06
+  (`quest_sterminio_goblin_spec.md` F4).
+- **RULE — Consumabili:** usabili **solo prima di uno skill check o di una
+  scelta** (mai in azione libera).
+  **STATUS:** `vigente`. **SOURCE:** Director 2026-10-06.
+- **RULE — Reward a doppio livello:** **XP sempre assegnata**; il trofeo
+  dell'obiettivo si converte in reward reale (es. Gold) **solo al ritorno in
+  città**. Abbandonare il trofeo = quest persa, nessun reward materiale.
+  **STATUS:** `vigente`. **SOURCE:** Director 2026-10-06.
+- **RULE — HP dei PG:** i membri del party hanno un pool HP (mock: eroe
+  100, altri 60); in produzione gli HP sono ereditati dalle stat reali del
+  PG assegnato. Il danno di check/combattimento consuma HP.
+  **STATUS:** `vigente` per la quest goblin; mappatura stat→HP `open`.
+  **SOURCE:** Director 2026-10-06.
 
 ## 5. Checkpoint, fuga e wipe
 

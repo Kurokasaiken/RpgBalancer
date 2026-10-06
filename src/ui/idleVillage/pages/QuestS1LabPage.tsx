@@ -20,12 +20,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { INTEL_LABELS, QUEST_BEATS } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { ROVINE_BEATS, ROVINE_INTEL_LABELS } from '@/ui/idleVillage/questS1Lab/questScenarioRovine';
+import { GOBLIN_BEATS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
 import {
   applyChoice,
   availableOptions,
   createRun,
   flee,
   drinkPotion,
+  useHealing,
   nodesFor,
   previewOption,
   QUESTS,
@@ -85,6 +87,27 @@ const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }> = {
   'rv-camera': { src: '/assets/quest-robine/camera.jpg', fit: 'cover' },
   'rv-ritorno-evento': { src: '/assets/quest-robine/strada.jpg', fit: 'cover' },
   'rv-fine': { src: ART.village, fit: 'contain' },
+  /* ---- Sterminio dei goblin — one public-domain painting per phase
+   *  (Director 2026-10-06; provenance in public/assets/quest-goblin/SOURCES.md) */
+  'gob-inizio': { src: '/assets/quest-goblin/assegnazione.jpg', fit: 'cover' },
+  'gob-esplora': { src: '/assets/quest-goblin/esplorazione.jpg', fit: 'cover' },
+  'gob-tracce-per': { src: '/assets/quest-goblin/esplorazione.jpg', fit: 'cover' },
+  'gob-tracce-perfor': { src: '/assets/quest-goblin/esplorazione.jpg', fit: 'cover' },
+  'gob-bottino-scelta': { src: '/assets/quest-goblin/bottino.jpg', fit: 'cover' },
+  'gob-bottino': { src: '/assets/quest-goblin/bottino.jpg', fit: 'cover' },
+  'gob-accampamento': { src: '/assets/quest-goblin/accampamento.jpg', fit: 'cover' },
+  'gob-stealth': { src: '/assets/quest-goblin/accampamento.jpg', fit: 'cover' },
+  'gob-assalto': { src: '/assets/quest-goblin/accampamento.jpg', fit: 'cover' },
+  'gob-combattimento': { src: '/assets/quest-goblin/combattimento.jpg', fit: 'cover' },
+  'gob-incalzare': { src: '/assets/quest-goblin/incalzare.jpg', fit: 'cover' },
+  'gob-incalza-check': { src: '/assets/quest-goblin/incalzare.jpg', fit: 'cover' },
+  'gob-esplora-extra': { src: '/assets/quest-goblin/razzia.jpg', fit: 'cover' },
+  'gob-cerca': { src: '/assets/quest-goblin/razzia.jpg', fit: 'cover' },
+  'gob-ritorno': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
+  'gob-agguato': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
+  'gob-agguato-scelta': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
+  'gob-ultimo-scontro': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
+  'gob-fine': { src: ART.village, fit: 'contain' },
 };
 
 /** Intel labels merged across quests — state.info keys are unique per quest. */
@@ -94,15 +117,14 @@ const ALL_INTEL_LABELS: Record<string, string> = { ...INTEL_LABELS, ...ROVINE_IN
 const QUEST_BEATS_BY_ID: Record<QuestId, readonly string[]> = {
   cassa: QUEST_BEATS,
   rovine: ROVINE_BEATS,
+  goblin: GOBLIN_BEATS,
 };
 
-/** Quest cards shown on the lab's entry screen — authored content mirrors
- *  the two mockups; copy keys live under questS1Lab.quests.*. Rovine first:
- *  it's the Director's mockup quest (R-082/R-083), the one this lab exists
- *  to X-ray. */
+/** Quest cards on the lab's entry screen. Only the authored S1 goblin quest
+ *  stays here (Director 2026-10-06: «le altre quest devono essere eliminate
+ *  da questo lab»); copy keys live under questS1Lab.quests.*. */
 const QUEST_CARDS: { id: QuestId; art: string; riskKey: string }[] = [
-  { id: 'rovine', art: '/assets/quest-robine/rovine-hero.jpg', riskKey: 'high' },
-  { id: 'cassa', art: ART.goblinTotem, riskKey: 'medium' },
+  { id: 'goblin', art: '/assets/quest-goblin/quest-card.jpg', riskKey: 'high' },
 ];
 
 const LOG_STYLE: Record<string, string> = {
@@ -332,7 +354,10 @@ const QuestS1LabPage: React.FC = () => {
   /* ---------------- Quest selection ---------------- */
   if (!questId) {
     return (
-      <WanderlustAmbientField className="min-h-screen bg-[#0a0d12] text-ivory" fireflyCount={5}>
+      <WanderlustAmbientField className="h-screen bg-[#0a0d12] text-ivory" fireflyCount={5}>
+        {/* The lab owns its scroll: overflow-y keeps a dedicated scrollbar
+            visible instead of relying on the page-level auto-hidden one. */}
+        <div className="quest-s1-scroll h-screen overflow-y-auto">
         <div className="relative h-44 overflow-hidden md:h-56">
           <img
             src={ART.map}
@@ -362,6 +387,7 @@ const QuestS1LabPage: React.FC = () => {
                     src={q.art}
                     alt=""
                     className="h-full w-full object-cover opacity-80 transition group-hover:scale-105"
+                    style={{ objectPosition: '50% 80%' }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                   <div className="absolute bottom-3 left-4">
@@ -388,6 +414,7 @@ const QuestS1LabPage: React.FC = () => {
             ))}
           </div>
         </div>
+        </div>
       </WanderlustAmbientField>
     );
   }
@@ -397,7 +424,8 @@ const QuestS1LabPage: React.FC = () => {
   const activePrimary = activeQuest.primaryStats;
   if (!run) {
     return (
-      <WanderlustAmbientField className="min-h-screen bg-[#0a0d12] text-ivory" fireflyCount={5}>
+      <WanderlustAmbientField className="h-screen bg-[#0a0d12] text-ivory" fireflyCount={5}>
+        <div className="quest-s1-scroll h-screen overflow-y-auto">
         {/* Cinematic header — the painted Wanderlust world map */}
         <div className="relative h-44 overflow-hidden md:h-56">
           <img
@@ -464,8 +492,8 @@ const QuestS1LabPage: React.FC = () => {
                       workerId={m.id}
                       label={m.name}
                       subtitle={`${t(`questS1Lab.role.${m.role}`)} · ${statLine(m)}`}
-                      hp={10}
-                      maxHp={10}
+                      hp={m.hp ?? 10}
+                      maxHp={m.hp ?? 10}
                       fatigue={0}
                       portraitUrl={m.portrait}
                       isInteractive={false}
@@ -486,6 +514,7 @@ const QuestS1LabPage: React.FC = () => {
           ))}
         </div>
         </div>
+        </div>
       </WanderlustAmbientField>
     );
   }
@@ -498,7 +527,8 @@ const QuestS1LabPage: React.FC = () => {
 
   /* ---------------- Run view ---------------- */
   return (
-    <WanderlustAmbientField className="min-h-screen bg-[#0a0d12] text-ivory" fireflyCount={4}>
+    <WanderlustAmbientField className="h-screen bg-[#0a0d12] text-ivory" fireflyCount={4}>
+      <div className="quest-s1-scroll h-screen overflow-y-auto">
       <div className="p-6 md:p-10">
       <div className="mb-5 flex items-center justify-between">
         <div>
@@ -599,6 +629,25 @@ const QuestS1LabPage: React.FC = () => {
                     {t('questS1Lab.item.rope')}
                   </span>
                 )}
+                {run.flags.includes('hasBonusForza') && (
+                  <span className="rounded-md border border-teal-400/40 bg-teal-950/40 px-2 py-0.5 text-[10px] text-teal-300">
+                    {t('questS1Lab.item.bonusForza')}
+                  </span>
+                )}
+                {run.flags.includes('hasBonusPerc') && (
+                  <span className="rounded-md border border-teal-400/40 bg-teal-950/40 px-2 py-0.5 text-[10px] text-teal-300">
+                    {t('questS1Lab.item.bonusPerc')}
+                  </span>
+                )}
+                {run.flags.includes('hasHealing') && (
+                  <button
+                    type="button"
+                    onClick={() => setRun({ ...useHealing(run) })}
+                    className="rounded-md border border-teal-400/60 bg-teal-950/40 px-2 py-0.5 text-[10px] text-teal-200 transition hover:border-teal-300"
+                  >
+                    {t('questS1Lab.item.healing')}
+                  </button>
+                )}
               </div>
             )}
             {run.loot.length > 0 && <div className="mt-2">{t('questS1Lab.loot', { items: run.loot.join(', ') })}</div>}
@@ -608,9 +657,9 @@ const QuestS1LabPage: React.FC = () => {
 
         {/* Situation + choices */}
         <section className="rounded-3xl border border-amber-400/40 bg-black/75 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.65)] backdrop-blur">
-          {/* Scene art — painted Wanderlust layer for the current node */}
+          {/* Scene art — representative painting for the current phase */}
           {sceneArt && (
-            <div className="relative mb-4 flex h-28 items-end justify-center overflow-hidden rounded-2xl border border-white/10">
+            <div className="relative mb-4 flex h-36 items-end justify-center overflow-hidden rounded-2xl border border-white/10">
               <div
                 className="absolute inset-0"
                 style={{
@@ -621,7 +670,12 @@ const QuestS1LabPage: React.FC = () => {
               <img
                 src={sceneArt.src}
                 alt=""
-                className="relative h-full w-auto max-w-full object-contain object-bottom drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
+                className={[
+                  'relative drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]',
+                  sceneArt.fit === 'cover'
+                    ? 'h-full w-full object-cover object-bottom'
+                    : 'h-full w-auto max-w-full object-contain object-bottom',
+                ].join(' ')}
               />
               <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
@@ -839,7 +893,7 @@ const QuestS1LabPage: React.FC = () => {
           room for a panel that no longer exists → widened to 100% here).
           removeSounds: the lab is a silent preview surface. */}
       {checkQueue.length > 0 && checkQueue[checkIdx] && (
-        <div className="fixed inset-0 z-50 bg-black/85 [&_.scene-col]:[flex:1_1_100%]">
+        <div className="quest-s1-scroll fixed inset-0 z-50 overflow-y-auto bg-black/85 [&_.scene-col]:[flex:1_1_100%]">
           {checkQueue.length > 1 && (
             <div className="absolute left-4 top-4 z-10 rounded-full border border-amber-300/50 bg-black/70 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
               {t('questS1Lab.throwCounter', { current: checkIdx + 1, total: checkQueue.length })}
@@ -859,25 +913,35 @@ const QuestS1LabPage: React.FC = () => {
             removeSounds
           />
           {checkResolved && (
-            <button
-              className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 rounded-xl border border-amber-300/60 bg-black/80 px-6 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-200 transition hover:bg-amber-950/60"
-              onClick={() => {
-                if (checkIdx + 1 >= checkQueue.length) {
-                  setCheckQueue([]);
-                  setCheckIdx(0);
-                } else {
-                  setCheckIdx(checkIdx + 1);
-                }
-                setCheckResolved(false);
-              }}
-            >
-              {t('questS1Lab.verdictContinue', {
-                verdict: t(`questS1Lab.verdict.${activeMode ?? checkQueue[checkIdx].check.verdict}`),
-              })}
-            </button>
+            /* Bottom bar: the verdict's consequence sentence above the
+               continue button — the player reads WHAT the outcome did. */
+            <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 bg-gradient-to-t from-black via-black/80 to-transparent px-6 pb-6 pt-12">
+              {activeCheck?.outcomeText && (
+                <p className="max-w-2xl text-center text-sm italic leading-relaxed text-amber-100/90">
+                  {activeCheck.outcomeText}
+                </p>
+              )}
+              <button
+                className="rounded-xl border border-amber-300/60 bg-black/80 px-6 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-200 transition hover:bg-amber-950/60"
+                onClick={() => {
+                  if (checkIdx + 1 >= checkQueue.length) {
+                    setCheckQueue([]);
+                    setCheckIdx(0);
+                  } else {
+                    setCheckIdx(checkIdx + 1);
+                  }
+                  setCheckResolved(false);
+                }}
+              >
+                {t('questS1Lab.verdictContinue', {
+                  verdict: t(`questS1Lab.verdict.${activeMode ?? checkQueue[checkIdx].check.verdict}`),
+                })}
+              </button>
+            </div>
           )}
         </div>
       )}
+      </div>
       </div>
     </WanderlustAmbientField>
   );

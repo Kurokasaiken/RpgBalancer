@@ -1086,6 +1086,9 @@
       "potion": "⚗ Pozione — cura un ferito",
       "smoke": "✦ Fumogeno — +15 infiltrazione",
       "rope": "🪢 Corda — +15 arrampicata",
+      "bonusForza": "⚔ Bonus Forza — +15 a un check",
+      "bonusPerc": "👁 Bonus Percezione — +15 a un check",
+      "healing": "✚ Cura — +20 HP al più ferito",
       "usePotion": "⚗ Pozione → cura {name}"
     },
     "loot": "Bottino: {items}",
@@ -1218,7 +1221,7 @@
       "tooltip": "Il campo ha sentito qualcosa. Un altro passo falso ed esplode — e la via tranquilla si chiude."
     },
     "labTitle": "S1 — Laboratorio quest",
-    "pickQuest": "Scegli la spedizione — due quest scritte a mano, due forme di rischio diverse.",
+    "pickQuest": "Scegli la spedizione — una quest scritta a mano, ogni esito ha un prezzo.",
     "backToQuests": "Tutte le quest",
     "days": "{days} giorni",
     "treasureValue": "tesoro ~{value} oro",
@@ -1240,6 +1243,13 @@
         "objective": "Obiettivo: riportare il tesoro dalle rovine sotto il fiume. Ogni stanza in più costa giorni e sangue. Il leader deve sopravvivere. Scegli la spedizione:",
         "duration": "4–9 giorni",
         "trial": "★ Prova di forza — {stats}"
+      },
+      "goblin": {
+        "title": "Sterminio dei goblin",
+        "desc": "Combattimento: inseguite i razziatori fino al loro campo e sterminateli. Niente premio furtivo — solo acciaio, e un prezzo per ogni minuto in più passato a frugare.",
+        "objective": "Obiettivo: sterminare i goblin che razziano i confini. Lo scontro si vince nell'avvicinamento — stealth o assalto fissano i termini della battaglia. Scegli la spedizione:",
+        "duration": "un giorno",
+        "trial": "★ Prova di combattimento — {stats}"
       }
     }
   },

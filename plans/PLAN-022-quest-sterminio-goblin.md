@@ -1,0 +1,120 @@
+---
+title: 'PLAN-022 — Quest «Sterminio dei goblin» nel lab S1: targeting posizionale, HP, combattimento a turni'
+status: active
+created: 2026-10-06
+desiderata: v24 (FROZEN) — stadio S1, quest authored nel lab
+request: R-089
+parent: PLAN-019 (stadio S1)
+related: quest_sterminio_goblin_spec.md (authored Director), questRun.ts, questScenario*.ts, QuestS1LabPage
+---
+
+# PLAN-022 — «Sterminio dei goblin» nel lab S1
+
+## Perimetro
+
+Implementare la quest authored dal Director (`quest_sterminio_goblin_spec.md`,
+F0–F7) come **terzo scenario del lab S1** (`questId: 'goblin'`), con il modello
+di **targeting posizionale a cascata** e **HP per-PG** definiti dal Director.
+
+**In scope:** meccaniche della quest, scenario hardcoded, UI lab, simulazione
+MC per calibrazione, testi per esito.
+
+**Fuori scope:** motore generico/DSL (S2+), mapping stat reali → HP
+(produzione), QuestTheatre/PLAN-021, modifiche alle quest cassa/rovine.
+
+## Regole vigenti ratificate (dalla spec — fonte unica)
+
+- **Targeting posizionale:** 1→100 / 2→20·80 / 3→0·20·80 / 4→0·0·20·80 sugli
+  slot **vivi**; a ogni morte gli slot scalano e il profilo si ricalcola.
+- **HP:** eroe 100, altri 60 (mock — ereditati dalle stat reali in produzione).
+  **0 HP = morte.** La ferita resta la meccanica separata vigente.
+- **F4 combattimento:** 4–6 turni; check `FORZA` diff 25 a turno (attacco);
+  colpi al party: 1 a T1–T2, 2 da T3, mai stesso bersaglio nello stesso turno;
+  escalation T1 `0/0/20/80` → T2 `0/5/25/70` → T3+ `5/10/25/60` (placeholder);
+  **nessuna morte secca in F4** — solo danno HP.
+- **F1:** solo 2 check — `PER` (successo → bonus Stealth F3) e `PER+FOR`
+  (successo → apre F2, fallimento → −10 HP).
+- **F2:** gated da F1 `PER+FOR` riuscita; `DEX` → oggetto comunque; fail =
+  10 danni + `campoAllertato` (malus F4).
+- **F3:** Stealth (`DEX`: +Danno F4 / fail = Allerta→malus F4) vs Assalto
+  (`FOR`: +Danno moderato F4 / fail = niente).
+- **F5:** scelta — lasciar fuggire (agguato mite) vs incalzare (`FOR` a bande:
+  bigwin/win = sterminio; almost = fuga, agguato mite; fail = agguato
+  peggiorato; epicfail = danni + agguato peggiorato).
+- **F6:** turni esplorazione — danni 5→10→15… profilo slot + check `INT`/`PER`
+  a turno; fermarsi = libero.
+- **F7:** se F5 non chiude → agguato: **5 danni secchi a tutti** + scelta:
+  lasciare trofeo (quest persa) o combattere (**un turno secco** F4-like,
+  qui la morte esiste — attesa: muoiono quasi tutti tranne l'eroe).
+- **Consumabili:** solo prima di check/scelta — Bonus Forza ×1 fase, Bonus
+  Percezione ×1 fase, Healing +20 HP.
+- **Reward:** XP sempre; trofeo → Gold al ritorno; abbandono trofeo = quest
+  persa.
+- **Testi:** ~75 righe per esito authored nella spec (sezione «Testi per
+  esito») — da usare come narrato dei nodi.
+
+## Must-not-change (regressione)
+
+- `questRun.ts`/`questSimulation.ts`/`QuestS1LabPage.tsx`: il comportamento di
+  `questId 'cassa'` e `'rovine'` resta identico — targeting posizionale e HP
+  attivi solo per `'goblin'` (gating per questId).
+- `SLOT_RISK`, intercettazione bodyguard, `TUNE`, verdicts e bande esistenti.
+- Logica animazioni/UI dei componenti esistenti (vincolo Director).
+
+## Task
+
+- **T-001 — Engine: HP + targeting posizionale.**
+  `RuntimeMember` + `hp`/`maxHp` (mock 100/60, 0=morte). Nuovo
+  `rollPositionalTarget(state)` — profilo su slot vivi, ricalcolo alla morte.
+  Estendere `applyHarm`/risoluzione danni per `'goblin'` senza toccare il
+  path cassa/rovine. Test: profilo per 1/2/3/4 occupati, scaling alla morte,
+  nessun doppio colpo sullo stesso PG nello stesso turno.
+  depends: —
+- **T-002 — Scenario `questScenarioGoblin.ts` + tipi.**
+  Nodi F0–F7 dalla spec con testi authored; `QuestId` + `'goblin'`; party
+  preset fisso (eroe + 3 membri, Forza-based). Nuovi kind minimi:
+  `combat` (F4, F7-fight) con param `turns`, `hitsPerTurn`, `checkPerTurn`,
+  `escalation`; gate per F2 su flag F1; F6 come nodo loop decision/check.
+  Test: grafo raggiungibile, beat monotoni, flag F2.
+  depends: T-001
+- **T-003 — Run engine: fasi goblin.**
+  Resolver per `combat` (turni, escalation, colpi mai stesso bersaglio,
+  no death in F4, death in F7-fight), F5 a bande (map almost→fuga mite),
+  F6 loop (danno crescente 5+5k), F7 (5 danni ingresso + scelta + turno
+  secco), reward XP+trofeo→Gold, consumabili gateati su check/choice.
+  Test: bande F5, escalation T1/T2/T3+, no instant death F4, F7 5-danni,
+  trofeo perso = quest persa, XP sempre.
+  depends: T-002
+- **T-004 — UI lab.**
+  `QuestS1LabPage` + componenti: selezione scenario goblin, rendering turni
+  di combattimento nel log (colpo per colpo, profilo slot visibile), scelta
+  F7 trofeo/combatti, F6 continua/fermati, HP nella party strip,
+  consumabili solo su nodi check/choice. i18n chrome `idleVillage:`.
+  depends: T-003
+- **T-005 — Simulazione MC + calibrazione.**
+  `questSimulation.ts` su scenario goblin: output per-slot morte/danno%;
+  verifica attese Director (S4 muore mediamente, S2 20–30%, S3 50–70%;
+  F7-fight: quasi tutti tranne l'eroe). Correggere i placeholder
+  (danni/turno, agguato mite/peggiorato, +Danno/Allerta F3, limite F6) e
+  riportare i valori finali nella spec.
+  depends: T-004
+
+## Safeguards
+
+`npm run lint -- <scope>` · `npm run test -- <scope>` · `npm run build:check`
+· `npm run kanban:lint` · evidence log `test-results/plan-022-<data>.log` ·
+smoke manuale su `/quest-s1-lab` (3 scenari).
+
+## Changelog
+
+- **2026-10-06 — Polish lab (Director feedback).** Pagina navigabile con
+  scrollbar dedicata sempre visibile (wrapper `quest-s1-scroll` + regole
+  `::-webkit-scrollbar` in `index.css`, ambient fissato a `h-screen`, overlay
+  check scrollabile); arte online public domain per ogni fase goblin
+  (`public/assets/quest-goblin/`, provenance in `SOURCES.md`, mapping
+  `NODE_ART` per tutti i nodi `gob-*`); `ResolvedCheck.outcomeText` — dopo la
+  risoluzione la cinematica mostra la frase che spiega cosa è successo con
+  quell'esito (narrativa authored + conseguenze fisiche, anche per i turni di
+  combattimento); picker ridotto alla sola quest «Sterminio dei goblin»;
+  chiavi i18n `questS1Lab.quests.goblin.*` + `pickQuest` aggiornata; scene art
+  usa il campo `fit` (cover/contain) e altezza aumentata.

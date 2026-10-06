@@ -376,7 +376,9 @@ function runOneSim(
   let guard = 0;
   while (!s.ended && guard++ < 100) {
     const node = nodes[s.nodeId];
-    if (!node || node.kind !== 'choice') break;
+    // Combat nodes wait for per-turn input like choice nodes — the sim just
+    // keeps taking the single 'fight-turn' action until the fight ends.
+    if (!node || (node.kind !== 'choice' && node.kind !== 'combat')) break;
     const opts = availableOptions(s);
     if (opts.length === 0) break;
     const want = strategy[node.id];

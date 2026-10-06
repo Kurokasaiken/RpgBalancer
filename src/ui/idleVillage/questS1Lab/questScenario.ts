@@ -41,8 +41,10 @@ export const INTEL_LABELS: Record<string, string> = {
 /** A single authored node of the quest. */
 export interface QuestNode {
   id: string;
-  /** 'choice' = player picks an option; 'check' = skill check; 'info' = lore beat; 'harm' = direct non-check damage. */
-  kind: 'choice' | 'check' | 'info' | 'harm' | 'end';
+  /** 'choice' = player picks an option; 'check' = skill check; 'info' = lore
+   *  beat; 'harm' = direct non-check damage; 'combat' = turn-based fight
+   *  (goblin quest: resolves one turn per player action). */
+  kind: 'choice' | 'check' | 'info' | 'harm' | 'combat' | 'end';
   title: string;
   body: string;
   /** For check nodes: stats contributing to the group roll. */
@@ -51,6 +53,8 @@ export interface QuestNode {
   risk?: { wound: number; death: number };
   /** True if the check may wound/kill. */
   risky?: boolean;
+  /** Goblin quest: turn-based combat configuration for `kind:'combat'` nodes. */
+  combat?: CombatSpec;
   /** Check nodes: the declared state-consequence of failing — shown in the
    *  preview so the player knows what a fail *changes*, not only what it costs. */
   failHint?: string;
@@ -60,6 +64,33 @@ export interface QuestNode {
   next?: string;
   /** Beat index for the progress component (0..QUEST_BEATS-1). */
   beat?: number;
+}
+
+/**
+ * Turn-based fight configuration (goblin quest, PLAN-022).
+ * The party rolls `attackStats` each turn; the enemies hit back with
+ * `hitsPerTurn(turn)` positional-targeted hits — never twice on the same
+ * member in the same turn (Director rule).
+ */
+export interface CombatSpec {
+  /** Number of combat turns. */
+  turns: number;
+  /** Enemies to kill to clear the fight early (extermination). */
+  enemies: number;
+  /** Stats rolled by the party each turn. */
+  attackStats: LabStat[];
+  /** Enemies killed per win/almost verdict. */
+  killPerWin: number;
+  /** Enemies killed per bigwin verdict. */
+  killPerBigwin: number;
+  /** HP damage dealt by each enemy hit. */
+  hitDamage: number;
+  /** Positional weights escalation per turn (goblin F4 model). */
+  escalateProfile: boolean;
+  /** Route when all enemies die before `turns` run out (else `next`). */
+  nextCleared?: string;
+  /** Route when turns end with enemies alive (else `next`). */
+  nextSurvivors?: string;
 }
 
 export interface QuestOption {
@@ -88,6 +119,9 @@ export interface QuestOption {
   /** Days added to the run's duration when the option is chosen (ruins quest:
    *  time is a cost the player can see accumulating). */
   costDays?: number;
+  /** Choosing this option abandons the objective (goblin quest: leaving the
+   *  trophy to escape the ambush). */
+  abandonsObjective?: boolean;
 }
 
 /**
@@ -428,6 +462,9 @@ export interface LabMember {
   stats: Record<LabStat, number>;
   /** 'leader' = fixed quest slot (slot 0). 'bodyguard' = optional interceptor. */
   role: 'leader' | 'member' | 'bodyguard';
+  /** HP pool — defaults to TUNE.hp when absent (goblin quest: leader 100,
+   *  others 60; in production inherited from the resident's real stats). */
+  hp?: number;
   /** Portrait asset under /assets/portraits (mock mapping for the lab). */
   portrait?: string;
 }
