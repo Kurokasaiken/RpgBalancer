@@ -51,6 +51,8 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-MOCKUP-v2](PLAN-MOCKUP-TO-COMPONENT-v2.md) | Mockup→Component v2 | superseded | — | cold read NO (5 blocking) → v3 |
 | [PLAN-MOCKUP-v3](PLAN-MOCKUP-TO-COMPONENT-v3.md) | Mockup→Component v3 | active | — | decisioni Director ratificate; pilot GoblinEventLabPage |
 | [PLAN-020](PLAN-020-quest-rules-canonical-doc.md) | Canonical Quest Rules Document | completed | — | da audit KB v25 Q7; parent: PLAN-019; T-001 `QUEST_RULES.md`, T-002 `80-quest-rules-maintenance.md`, T-003 CANON — tutti done 2026-10-05 |
+| [PLAN-021](PLAN-021-quest-theatre.md) | QuestTheatre — quest su /game come storia a nodi | active | P1 | desiderata v27, R-088; cold read ×7 (chatgpt/claude); Phase 1: T-001..T-004 live su /game-frame-theatre (adapter finto); Integration Gate aperta |
+| [PLAN-022](PLAN-022-quest-sterminio-goblin.md) | Quest «Sterminio dei goblin» nel lab S1 | active | — | child of PLAN-019 (S1); desiderata v24, R-089; spec authored Director |
 
 ## Sotto-documenti (non piani)
 
