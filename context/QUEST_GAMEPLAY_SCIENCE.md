@@ -463,6 +463,25 @@ DECISION → SECURE / LOSE`.
   across quest phases; trust/progress as camouflaged stakes.
   https://www.gamedeveloper.com/design/deep-dive-roadwarden
 
+### Quest authoring checklist (PROPOSAL — ChatGPT, ingest 2026-10-06)
+
+Rubrica compatta per decomporre una quest prima di scriverla/valutarla.
+Proposta AI, non ratificata; candidata come rubrica operativa per l'authoring
+(PLAN-019 S5) e per la revisione della quest proposta dal Director.
+
+1. Obiettivo della quest.
+2. Ostacolo.
+3. Informazioni che il giocatore possiede.
+4. Informazioni che il giocatore può scoprire.
+5. Scelte possibili.
+6. Costo/rischio di ogni scelta.
+7. Cosa rende una soluzione migliore di un'altra.
+8. Conseguenze di successo, fallimento, ferite e morte.
+
+Corollario: la Preview deve spiegare *perché* una composizione funziona e cosa
+si sacrifica per ottenerla — non solo «vinci al 78%». Anti-pattern da evitare:
+quest ridotta a un singolo skill check (vedi REJ-007 in `context/REJECTED.md`).
+
 ### Source bank — DeepSeek batch (2026-10-03, DeepThink+Search)
 
 Attribution / effectance / character attachment:

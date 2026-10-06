@@ -157,3 +157,46 @@ Formato voce:
 - **Source:** `context/DECISION_LOG.md` sezione «Open Questions» Q1–Q3.
 - **Blocking:** nessuna nota; pre-S1.
 - **Related:** Decision 007/008 era.
+
+## OPEN-012 — Ratifica proposte difesa villaggio e categorie di potere
+
+- **Question:** le proposte emerse dalla conversazione «Progettare quest
+  strategiche» — difesa del villaggio a ondate (checkpoint che competono con
+  le spedizioni per umani/equip/tempo), categorie di potere (Hero /
+  Expedition / Defence / Unlock / Information), eroi come moltiplicatori
+  persistenti che non sostituiscono i villager — sono solo PROPOSAL: vanno
+  ratificate in desiderata/GAMEPLAY_DESIGN?
+- **Status:** `open`
+- **Source:** `context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md`
+  E-35/E-36/E-37; transcript `.mw/runs/20261005-transcript-quest-strategiche/`.
+- **Blocking:** candidati a livello villaggio (S4 / GAMEPLAY_DESIGN) — dietro
+  avallo Director.
+- **Related:** OPEN-010 (stessa famiglia villaggio), PLAN-019 (S4).
+
+## OPEN-013 — Scarsità single-player e modello del party
+
+- **Question:** come si riproduce in single-player la pressione competitiva
+  di Lords of Waterdeep (che nasce dagli avversari)? Cosa rende una quest
+  degna di rischiare capitale umano scarso? Inoltre: il «divisorio netto
+  forza lavoro ↔ forza avventuriera» di `GAMEPLAY_DESIGN.md` §2.3 resta
+  canonico, o è superato dai party misti Eroe+Villager già usati nel lab S1?
+- **Status:** `open` — tensione doc↔pratica dichiarata (E-39).
+- **Source:** `context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md`
+  E-38/E-39; `GAMEPLAY_DESIGN.md` §2.3.
+- **Blocking:** design del loop opportunità villaggio (connesso a OPEN-010);
+  non blocca S1.
+- **Related:** OPEN-010, OPEN-012; PLAN-019 (S4).
+
+## OPEN-014 — Architettura narrativa per situazioni
+
+- **Question:** adottare il modello `Situation → Context → Approach →
+  Narrative → Presentation` (asset per situazione, non per combinazione di
+  stat; vocabolario situazioni/contesti; semi narrativi su
+  `LoreDropService` esistente)?
+- **Status:** `open` — pertinente a S5 (generazione) e art pipeline; nessun
+  impatto prima di S4.
+- **Source:** `context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md`
+  E-28/E-29/E-30/E-31; `NARRATIVE.md` §4.
+- **Blocking:** nessuno nel breve; candidato per la «definizione di buona
+  quest» (artefatto finale PLAN-019).
+- **Related:** PLAN-019 (S5), NARRATIVE.md.

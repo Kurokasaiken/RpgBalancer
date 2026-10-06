@@ -28,6 +28,11 @@ contenuto archiviato della conversazione in
 
 Limite dichiarato: l'analisi copre il contenuto persistito della
 conversazione, non il transcript integrale (non disponibile).
+**Aggiornamento 2026-10-05:** il transcript integrale (200 messaggi) è stato
+recuperato e ingerito — vedi
+`context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md`
+(E-19+). Questo ledger E-01..E-18 resta valido per la coda della
+conversazione; il limite sopra è superato.
 
 ## 2. Extraction Ledger
 
