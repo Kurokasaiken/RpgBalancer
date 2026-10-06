@@ -1423,3 +1423,32 @@ S1: "Questa quest è un gioco interessante?" → S2: "Possiamo farla davvero, se
 - Inclusione di `.mw/runs/` e `archive/` nel perimetro *ristrutturabile* (default proposto: censiti e marcati storici, non ristrutturati).
 - Collocazione del report: raw in `RPG/.mw/runs/<ts>-kb-audit/` + sintesi indicizzata, oppure doc tracciato (default proposto: entrambi — raw in runs, report in un file linkato da `.mw/INDEX.md`).
 - Formato della «proposta punto per punto» per gli artefatti di architettura (default: elenco numerato una modifica = un punto, con motivo e impatto, nel report sezione F/G).
+
+---
+
+## v26 — Strategist: layer di direzione pre-desiderata
+
+**Status:** FROZEN
+**Date:** 2026-10-06
+**Authorized by:** Fausto
+**Reason:** approvazione esplicita in sessione ("approvo") sulla candidata presentata dall'explorer
+
+**User-stated:**
+- Un ruolo/skill `strategist` per **discussioni libere** su direzione, futuro del gioco, bilanciamento e scope ampio — come le discussioni con lo strategist di RPG Balancer prima di Mind Weaver.
+- Produce **documentazione di direzione** e **bozze di macro plan**; arriva a toccare il MASTER_PLAN.
+- Quando in discussione si decide una strada, va **scritta correttamente modificando i documenti esistenti** — non tenuta come proposta in sospeso. Se il Director cambia idea, i documenti si modificano di nuovo.
+- Dalle discussioni emergono **argomenti circoscritti** che entrano nel pipeline standard: desiderata → explorer → planner.
+- Forma approvata: **cappello + skill sottile + regola di handoff**.
+- La skill `strategist` di Mind Weaver (decomposizione dei piani, PLAN-038) viene **rinominata** per liberare il nome; in RPG `strategist` è il nuovo ruolo di direzione.
+
+**AI inference:**
+- Nuovo nome della skill MW: `decomposer` (semantica PLAN-038: classificazione direct/task/sub-plan).
+- Nessun gate di desiderata FROZEN per entrare in modalità strategist: è il layer *pre-desiderata* — lavora proprio per generare le desiderata future.
+- Hat `game_director` aggiunto a `.mw/prompt-enhancers.md` (condiviso via symlink con mind-weaver), usabile via `mw-ask --hat` e `--auto-hat`.
+- Skill sottile in `coordinator/skills/strategist/SKILL.md`, stile dei wrapper `mw-*`: pre-flight contesto, discussione libera, scrittura nei doc di direzione su decisione del Director, regola di handoff. Niente macchina a fasi.
+- Handoff: ogni argomento circoscritto emerso diventa voce `da chiarire` in `.mw/desiderata.md`; gli intenti operativi vanno in `RICHIESTE.md` come da regola standard.
+- Perimetro di scrittura: documenti di direzione (MASTER_PLAN, `src/docs/docs/plans/*_strategic_plan.md`, doc di design) su decisione presa in discussione; `CANON.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md` solo su parola esplicita del Director.
+- La decisione direzionale resta del Director ("se decidiamo... deve essere scritto correttamente"); l'AI cura la forma, non sceglie la direzione.
+
+**Still unresolved:**
+- Propagazione del rename `strategist` → `decomposer` agli altri progetti che montano le skill MW globali (work-solver, jobhunter, ecc.) — la rinomina vale ovunque via `~/.agents/skills`, ma i documenti storici di progetto possono citare il vecchio nome.
