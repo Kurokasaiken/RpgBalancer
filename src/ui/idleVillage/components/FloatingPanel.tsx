@@ -53,6 +53,19 @@ export interface FloatingPanelProps {
   isMinimized?: boolean;
   /** Notified whenever the minimised state changes. */
   onMinimizedChange?: (minimized: boolean) => void;
+  /**
+   * Opt-in expanded mode (PLAN-021 T-003): when provided, the header gains an
+   * expand/collapse control that stretches the panel to a large inset frame —
+   * still movable contract-wise when not expanded, still non-blocking.
+   * Off by default: existing consumers are untouched.
+   */
+  expandable?: boolean;
+  /** Controlled expanded state; omit to let the panel own it. */
+  isExpanded?: boolean;
+  /** Notified whenever the expanded state changes. */
+  onExpandedChange?: (expanded: boolean) => void;
+  /** Uniform viewport inset (px) of the expanded frame. */
+  expandedInsetPx?: number;
 }
 
 /**
@@ -72,6 +85,10 @@ export function FloatingPanel({
   minimizable = true,
   isMinimized,
   onMinimizedChange,
+  expandable = false,
+  isExpanded,
+  onExpandedChange,
+  expandedInsetPx = 24,
 }: FloatingPanelProps): JSX.Element {
   const { t } = useTranslation('idleVillage');
   const rawId = useId();
@@ -82,8 +99,10 @@ export function FloatingPanel({
   );
   const [zIndex, setZIndex] = useState(() => ++stackCounter);
   const [ownMinimized, setOwnMinimized] = useState(false);
+  const [ownExpanded, setOwnExpanded] = useState(false);
 
   const minimized = isMinimized ?? ownMinimized;
+  const expanded = expandable && (isExpanded ?? ownExpanded);
   const dragOffsetRef = useRef<{ dx: number; dy: number } | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +116,14 @@ export function FloatingPanel({
       onMinimizedChange?.(next);
     },
     [isMinimized, onMinimizedChange],
+  );
+
+  const setExpanded = useCallback(
+    (next: boolean) => {
+      if (isExpanded === undefined) setOwnExpanded(next);
+      onExpandedChange?.(next);
+    },
+    [isExpanded, onExpandedChange],
   );
 
   /** Keeps the panel reachable after a drag or a viewport resize. */
@@ -164,6 +191,21 @@ export function FloatingPanel({
 
   const headerControls = (
     <div className="ml-auto flex items-center gap-1">
+      {expandable && (
+        <button
+          type="button"
+          data-testid={`floating-panel-expand-${panelId}`}
+          aria-label={
+            expanded
+              ? t('idleVillage:floatingPanel.collapse', { defaultValue: 'Collapse panel' })
+              : t('idleVillage:floatingPanel.expand', { defaultValue: 'Expand panel' })
+          }
+          onClick={() => setExpanded(!expanded)}
+          className="rounded px-2 py-0.5 text-sm leading-none text-amber-200/80 transition-colors hover:bg-amber-400/10 hover:text-amber-100"
+        >
+          {expanded ? '❐' : '⛶'}
+        </button>
+      )}
       {minimizable && (
         <button
           type="button"
@@ -223,21 +265,34 @@ export function FloatingPanel({
       as="div"
       data-testid={`floating-panel-${panelId}`}
       data-minimized="false"
-      style={{ position: 'fixed', left: position.x, top: position.y, width, zIndex }}
+      data-expanded={expanded || undefined}
+      style={
+        expanded
+          ? {
+              position: 'fixed',
+              left: expandedInsetPx,
+              top: expandedInsetPx,
+              right: expandedInsetPx,
+              bottom: expandedInsetPx,
+              zIndex,
+            }
+          : { position: 'fixed', left: position.x, top: position.y, width, zIndex }
+      }
       onPointerDownCapture={bringToFront}
     >
       <div
         ref={panelRef}
         role="dialog"
         aria-labelledby={headingId}
-        className="overflow-hidden rounded-xl border border-amber-700/50 bg-slate-950/97 shadow-2xl"
+        className="flex flex-col overflow-hidden rounded-xl border border-amber-700/50 bg-slate-950/97 shadow-2xl"
+        style={expanded ? { height: '100%' } : undefined}
       >
         <div
           data-testid={`floating-panel-header-${panelId}`}
-          onPointerDown={handleHeaderPointerDown}
-          onPointerMove={handleHeaderPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
+          onPointerDown={expanded ? undefined : handleHeaderPointerDown}
+          onPointerMove={expanded ? undefined : handleHeaderPointerMove}
+          onPointerUp={expanded ? undefined : endDrag}
+          onPointerCancel={expanded ? undefined : endDrag}
           className="flex cursor-move touch-none select-none items-center gap-2 border-b border-amber-700/30 bg-slate-900/80 px-3 py-2"
         >
           {icon && <span aria-hidden>{icon}</span>}
@@ -252,7 +307,11 @@ export function FloatingPanel({
 
         <div
           className="overflow-y-auto"
-          style={{ maxHeight: maxBodyHeight ?? 'min(78vh, 900px)' }}
+          style={
+            expanded
+              ? { flex: 1, maxHeight: 'none' }
+              : { maxHeight: maxBodyHeight ?? 'min(78vh, 900px)' }
+          }
         >
           {children}
         </div>

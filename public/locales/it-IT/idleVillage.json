@@ -1166,7 +1166,10 @@
         "viandante": "viandante aiutato"
       },
       "strategyTitle": "STRATEGIA SIMULATA",
-      "cp": { "secure": "SICURO", "push": "OLTRE" },
+      "cp": {
+        "secure": "SICURO",
+        "push": "OLTRE"
+      },
       "cpLine": "reward {reward}% · morti {death}% · feriti {wound}% · {days}g · tesoro {treasure}",
       "benchTitle": "PANCA WHAT-IF — ipotetico, non tocca il run",
       "why": {
@@ -1238,6 +1241,32 @@
         "duration": "4–9 giorni",
         "trial": "★ Prova di forza — {stats}"
       }
+    }
+  },
+  "questTheatre": {
+    "poi": {
+      "label": "Quest del teatro"
+    },
+    "awaiting": "La storia attende la tua decisione",
+    "chronicle": "Cronaca",
+    "chronicleEmpty": "La storia non è ancora cominciata.",
+    "unsupported": "Questo momento della storia usa una forma che il teatro non conosce.",
+    "retreat": {
+      "label": "Ritirata",
+      "action": "Ritirati"
+    },
+    "check": {
+      "probability": "Probabilità stimata: {{pct}}%",
+      "submit": "Affronta il check"
+    },
+    "reward": {
+      "collect": "Riscuoti la ricompensa"
+    },
+    "runState": {
+      "running": "In corso",
+      "success": "Missione compiuta",
+      "fled": "Ritirata",
+      "wiped": "Compagnia annientata"
     }
   }
 }

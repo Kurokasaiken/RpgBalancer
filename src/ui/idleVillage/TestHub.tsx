@@ -246,6 +246,16 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🎬',
     status: 'ok',
   },
+  // Non-kit page: Quest Theatre — disposable preview of the quest-as-story
+  // panel over the real Game Frame map (PLAN-021 T-004, fake adapter).
+  {
+    id: 'game-frame-theatre',
+    title: 'Quest Theatre',
+    description: 'Anteprima del QuestTheatre (storia a nodi che aspetta ai bivi) sulla mappa viva — adapter finto, non canonico (PLAN-021)',
+    path: '/game-frame-theatre',
+    icon: '📖',
+    status: 'ok',
+  },
   // Non-kit page: Quest S1 Lab — isolated quest runs + Monte Carlo forecast
   // and exact pre-check preview (R-082), astrolabe cinematics.
   {

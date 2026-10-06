@@ -1145,7 +1145,10 @@
         "viandante": "traveler helped"
       },
       "strategyTitle": "SIMULATED STRATEGY",
-      "cp": { "secure": "SECURE", "push": "PUSH" },
+      "cp": {
+        "secure": "SECURE",
+        "push": "PUSH"
+      },
       "cpLine": "reward {reward}% · death {death}% · wound {wound}% · {days}d · treasure {treasure}",
       "benchTitle": "WHAT-IF PARTY BENCH — hypothetical, never touches the run",
       "why": {
@@ -1217,6 +1220,32 @@
         "duration": "4–9 days",
         "trial": "★ Strength trial — {stats}"
       }
+    }
+  },
+  "questTheatre": {
+    "poi": {
+      "label": "Theatre quest"
+    },
+    "awaiting": "The story awaits your decision",
+    "chronicle": "Chronicle",
+    "chronicleEmpty": "The story has not begun yet.",
+    "unsupported": "This moment of the story uses a form the theatre does not know.",
+    "retreat": {
+      "label": "Retreat",
+      "action": "Retreat"
+    },
+    "check": {
+      "probability": "Estimated probability: {{pct}}%",
+      "submit": "Face the check"
+    },
+    "reward": {
+      "collect": "Claim the reward"
+    },
+    "runState": {
+      "running": "In progress",
+      "success": "Mission accomplished",
+      "fled": "Retreated",
+      "wiped": "Party wiped"
     }
   }
 }
