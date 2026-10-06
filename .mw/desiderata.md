@@ -1452,3 +1452,52 @@ S1: "Questa quest è un gioco interessante?" → S2: "Possiamo farla davvero, se
 
 **Still unresolved:**
 - Propagazione del rename `strategist` → `decomposer` agli altri progetti che montano le skill MW globali (work-solver, jobhunter, ecc.) — la rinomina vale ovunque via `~/.agents/skills`, ma i documenti storici di progetto possono citare il vecchio nome.
+
+---
+
+## v27 — `QuestTheatre`: la quest nel gioco reale è una storia a nodi che aspetta ai bivi
+
+**Status:** `FROZEN`
+**Date:** 2026-10-06
+**Authorized by:** Fausto
+**Reason:** avallo via «avallo» in sessione esplorativa (R-088), dopo discussione della proposta ChatGPT «Presentazione della quest» (share `6ac5017a`).
+
+**Relazione con altre desiderata:** non modifica il gameplay — la catena S1 (`PARTY → QUEST → PHASE → SITUATION → APPROACH → CHECK/CHOICE → CONSEQUENCE`) e QUEST_RULES restano invariate. Definisce **presentazione e semantica temporale** della quest sulla superficie canonica `/game`. v3/v4 restano fonte per il contratto dei pannelli (FloatingPanel: spostabile, riducibile a icona, non bloccante); il teatro eredita il container e ne cambia contenuto e scala. Il lab S1 resta sperimentale e fuori scope.
+
+### User-stated
+
+1. Scelte e skill check **non si risolvono automaticamente**. Solo il tempo scorre.
+2. La quest si ferma alla prima fase che richiede il giocatore e **aspetta ai bivi** — *"una storia a nodi che mi aspetta ai bivi"*.
+3. Il tempo reale pre-paga le durate: chi apre in ritardo gioca le fasi pendenti una dopo l'altra senza attese; *"il gameplay è identico"*.
+4. Direzione **B**: `QuestTheatre` come componente nuovo — stage renderer (narrative / choice / check / consequence / reward) che **ospita** i contenuti esistenti (chronicle, skill check, reward panel, kit, log) dentro `FloatingPanel`, con modalità **expanded**.
+5. **Scartati dalla proposta ChatGPT:** stato narrativo (`IN DANGER` / `RETURNING`) e livello di pericolo implicito — *"nn mi interessa"*.
+
+### AI inference (derivata, marcata come tale — interpretazione avallata con il punto 3)
+
+- Una fase **senza decisione** (puro viaggio, puro evento narrativo) si auto-completa allo scadere del suo tempo: la quest si ferma solo davanti a un bivio, un check o un checkpoint.
+- Se il giocatore guarda *live*, le fasi arrivano man mano che i loro timer completano; i bivi lo aspettano.
+- «Il mondo continua a esistere» resta un requisito percettivo (Pillar 1): il teatro non deve coprire lo stato del mondo più del necessario — coerente con v4 (nessun backdrop).
+
+### Candidate dalla proposta (da validare nel piano)
+
+- **Timeline narrativa** = traccia dei nodi passati + prossimo nodo noto; il futuro ignoto non si mostra, nemmeno come `?` — coerente con QUEST_RULES §2 (stat primaria sempre rivelata, resto intel-gated).
+- **Party strip** sempre leggibile; **decision panel** per check/scelte (probabilità, conseguenze, assistenza disponibile).
+- **Expedition kit** come drawer (non sempre visibile); **chronicle/log** con timestamp narrativi.
+- **Retreat** sempre presente ma distinto, con **anteprima delle conseguenze** al click.
+- **Art cinematografica** che porta il peso emotivo; UI sobria, quasi da libro illustrato.
+- **Header** con titolo + obiettivo (e deadline se esiste).
+
+### Cosa questo NON autorizza
+
+- Nessuna auto-risoluzione di scelte, skill check o checkpoint — nessun default policy silenzioso.
+- Nessun pannello modale bloccante né backdrop: vale v4 integralmente.
+- Nessun duplicato di `QuestChronicle` / `MilestoneCheckModal` / `QuestRewardPanel`: il teatro *ospita*, non rifà (invariante Component Reuse).
+- Nessuna implementazione prima del planner: v27 è desiderata, non mandato di esecuzione.
+- Nessuna applicazione al lab S1 (sperimentale) né alla superficie deprecata.
+
+### Still unresolved
+
+- Forma esatta della modalità expanded (quanto del mondo resta visibile; docked vs floating massimizzato).
+- Se più quest contemporanee = più teatri, o una quest attiva alla volta.
+- Come il teatro segnala "la quest chiede attenzione" quando è ridotto a icona (halo POI, tick sul day-clock, entrambi).
+- Destino del modello v3 (fasi temporizzate auto-risolte) quando il teatro arriva sulla superficie: convergenza o coesistenza.
