@@ -38,6 +38,12 @@ della quest. La conversazione si interrompe lì — thread aperto.
 | E-03 | PROPOSAL | Criterio per la Preview: non deve dire solo «vinci al 78%» ma *perché* quella composizione funziona e cosa si sacrifica per ottenerla | CURRENT | CONFIRM | Già direzione della preview spec (R-082) e del loop cognitivo E-27; rafforza, non aggiunge | msg. 2 | confirms → quest_simulation_preview_spec, PLAN-019 Gate A |
 | E-04 | PROPOSAL | La quest è interessante perché composizione party, risorse e decisioni cambiano concretamente l'approccio — non per la descrizione | CURRENT | CONFIRM | Cuore di v24 FROZEN e E-21; nessuna novità | msg. 2 | confirms → desiderata v24, QUEST_RULES §1 |
 | E-05 | UNRESOLVED | Il Director vuole riscrivere la quest proposta originariamente; passo successivo: incollare la proposta per smontarla con la checklist E-01 | UNRESOLVED | INTEGRATE | Thread aperto di lavoro, registrato in «Ripresa» | msg. finali | blocks → eventuale nuova quest authored |
+| E-06 | PROPOSAL | **Exposure Targeting**: un unico profilo di pesi decide chi assorbe qualsiasi evento pericoloso (danno da check, agguato, sudden death, target narrativi, non-combat). Profilo base S1 0 / S2 0 / S3 20 / S4 80; penetrazione modulabile per evento/quest | CURRENT | INTEGRATE | Sistema unico ed elegante richiesto dal Director («vorrei un sistema unico»); in tensione con intercettazione deterministica bodyguard vigente | share 6ac4f2f9 (stessa conversazione, parte nuova) | conflicts-with → QUEST_RULES §4 bodyguard; candidato S1 lab / mission_planner_math_spec |
+| E-07 | PROPOSAL | **Sudden Death Protection**: l'eroe non può essere ucciso istantaneamente finché un altro membro vive; se targato → sopravvive con conseguenza alternativa (danno pesante). Da ultimo vivo può morire | CURRENT | INTEGRATE | Risponde al requisito Director «danni extra sì, morte no» senza un secondo sistema | share 6ac4f2f9 | depends-on → E-06; → QUEST_RULES §4 proposta |
+| E-08 | RESEARCH | Sim MC (4 round, esiti 15/40/30/15, cascata 80/20): morti S1 0.004% / S2 4.8% / S3 26.9% / S4 72% — la cascata iper-protegge S1/S2; per ~2 morti/scontro servono ~S1 5–10, S2 20–35, S3 40–55, S4 60–75 | CURRENT | INTEGRATE | Evidenza numerica che il profilo flat 80/20 non basta a produrre la letalità voluta | share 6ac4f2f9 | informs → tuning E-06 |
+| E-09 | CONFLICT | Exposure Targeting probabilistico (~80%) vs regola vigente «bodyguard intercetta tutto il danno da check finché vivo» (100%) | UNRESOLVED | CONFLICT | Due modelli di assorbimento incompatibili; serve decisione Director | share 6ac4f2f9 vs QUEST_RULES §4 | blocks → implementazione E-06 |
+| E-10 | DECISION | **Targeting posizionale a cascata (Director, verbatim):** il tiro degli esiti pericolosi/danni extra va sugli slot *occupati*; profilo posizionale 1→100 · 2→20/80 · 3→0/20/80 · 4→0/0/20/80; a ogni morte gli slot scalano e il profilo si ricalcola. In combattimento escalation: dopo T1 S4−10 → S2+5/S3+5; dopo T2 S4−10 → S1+5/S2+5. Attesa: bodyguard muore mediamente, S2 ~20–30%, S3 ~50–70% | CURRENT | CHANGE | Correzione Director a E-06: il modello è posizionale, non pesi fissi per slot; la «sudden death protection» dell'eroe diventa conseguenza della posizione, non regola separata → E-09 risolto | msg. Director 2026-10-06 | supersedes → E-06/E-07; resolves → E-09; → QUEST_RULES §4 vigente; → spec Sterminio dei goblin |
+| E-11 | DECISION | La quest del Director è «**Sterminio dei goblin**» — quest di combattimento basata su Forza; spec completa F0–F7 scritta dal Director e riportata in `quest_sterminio_goblin_spec.md` | CURRENT | CHANGE | Sostituisce «La Torre nel Bosco» come quest di lavoro | msg. Director 2026-10-06 | → quest_sterminio_goblin_spec.md |
 
 ## 3. New Knowledge
 
@@ -56,6 +62,11 @@ spec preview R-082. Nessuna modifica necessaria.
 
 E-01 raffina la famiglia «vocabolario di authoring» (E-22, E-25, E-27) in una
 forma a checklist direttamente applicabile.
+
+E-06/E-07 raffinano il modello di assorbimento del rischio: da «bodyguard
+intercetta tutto» a targeting probabilistico unificato + protezione sudden
+death dell'eroe. E-08 fornisce la prima evidenza numerica contro il profilo
+flat (72% delle morti concentrate su S4, eroe a 0.004%).
 
 ## 6. Corrections
 
@@ -83,7 +94,10 @@ costo/rischio per scelta e conseguenze differenziate.
 
 ## 11. Conflicts
 
-Nessuno — la fonte è coerente con v24 FROZEN e con la KB corrente.
+- **E-09**: Exposure Targeting (assorbimento ~80% probabilistico) vs regola
+  vigente «bodyguard intercetta tutto il danno da check finché vivo»
+  (deterministico, `QUEST_RULES.md` §4, v24 rev.2). Registrato come proposta
+  in QUEST_RULES §4 con status `proposta`; richiede decisione Director.
 
 ## 12. Changes of Direction
 
