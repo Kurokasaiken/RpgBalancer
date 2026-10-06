@@ -189,7 +189,7 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
 **Data:** 2026-08-13
 **Stato:** `fatta` (registrazione della regola; resta in vigore permanentemente)
 **Desiderata FROZEN:** `.mw/desiderata.md` v1 (adozione protocollo Mind Weaver in RPG).
-**Regola:** Quando il Director dice "usa la skill X", il riferimento è sempre alle **skill Mind Weaver** (`explorer`, `planner`, `strategist`, `executor`, `coordinator` in `.agents/skills/` del repo mind-weaver e nelle directory skill degli IDE). Le skill storiche di RPG (`coordinator/skills/*`: `strategist-mandate`, `coordinator-mandate`, `agent-execution-mandate`, `idle-village-task`, `mw-explorer`, `mw-planner`, `mw-executor`, `mw-regression`) **non vanno invocate come skill**: vanno lette e passate alle skill Mind Weaver come **contesto operativo** (invarianti, mandate, execution_hint, file target, safeguard, governance).
+**Regola:** Quando il Director dice "usa la skill X", il riferimento è sempre alle **skill Mind Weaver** (`explorer`, `planner`, `decomposer` *(ex `strategist`, rinominata 2026-10-06 con R-087)*, `executor`, `coordinator` in `.agents/skills/` del repo mind-weaver e nelle directory skill degli IDE). Le skill storiche di RPG (`coordinator/skills/*`: `strategist-mandate`, `coordinator-mandate`, `agent-execution-mandate`, `idle-village-task`, `mw-explorer`, `mw-planner`, `mw-executor`, `mw-regression`) **non vanno invocate come skill**: vanno lette e passate alle skill Mind Weaver come **contesto operativo** (invarianti, mandate, execution_hint, file target, safeguard, governance).
 **Nota di conflitto da allineare:** `AGENTS.md` sezione "Workflow Mind Weaver in RPG" cita `.windsurf/skills/mw-explorer` ecc. come skill da invocare. Va aggiornata con avallo esplicito del Director (riformulazione proposta: le skill RPG sono documenti di contesto caricati dalle skill Mind Weaver, non skill invocabili).
 
 ---
@@ -1892,3 +1892,21 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Desiderata FROZEN di riferimento:** `.mw/desiderata.md` v25 — stessa ancora di R-084; questo prompt è la specifica completa della fase di refactoring già autorizzata ("Execute the refactor now").
 **Collegamenti:** R-084 (prima tranche eseguita: QUEST_RULES.md, OPEN.md, REJECTED.md, router L0–L4, ingestions, golden test), `KNOWLEDGE_AUDIT.md` (audit fase 1 + migrazione punti 1–4), PLAN-020.
 **Cosa è successo (2026-10-05):** tranche 2 — fonti canoniche salvate da `.mw/runs/` in copie tracciate (`QUEST_S1_DESIGN`, `QUEST_ECONOMY_NOTES`, `QUEST_V6_REDESIGN`, spec Rovine + preview), regola consumabili compilata in QUEST_RULES, GAMEPLAY_DESIGN marcato REFERENCE, MASTER_PLAN superseded, GLOSSARY v2, router L0 in README, rule 85 (Documentation Impact), health report `KNOWLEDGE_REFACTOR_REPORT.md` (retrieval 33P/3Pa/5F). Tranche 3 — su risposte Director: `VILLAGE_ECONOMY.md`/`PROGRESSION.md`/`NARRATIVE.md` creati come DRAFT bozze da migliorare; superficie canonica = `/game` (Game Frame Pixi), pagina Idle Village deprecata; `.windsurf/rules/` ora tracciate in git.
+
+## R-086 — Ingestione di due share link ChatGPT (skill knowledge-extractor)
+
+**Richiesta:** *"dovrebbe esserci una nuova skill che fa esattamente questo lavoro"* — invocata `knowledge-extractor` su due share link ChatGPT forniti dal Director: `6ac4b77e` (bollette domestiche) e `6ac4b926` (continuazione «Progettare quest strategiche»).
+**Data:** 2026-10-06
+**Stato:** `completata`
+**Cosa è successo:** link 1 scartato al Pertinence Gate (conoscenza personale, non progettuale — MW-P-003); link 2 ingerito con ledger E-01..E-05: checklist authoring 8 punti → `QUEST_GAMEPLAY_SCIENCE.md` (PROPOSAL), anti-pattern singolo skill check → `REJECTED.md` REJ-007, thread aperto «decomporre la quest originale del Director». Report: `context/ingestions/2026-10-06-quest-strategiche-continuazione.md`.
+
+---
+
+## R-087 — Skill `strategist` RPG (layer di direzione pre-desiderata) + rename `strategist` MW → `decomposer` + hat `game_director`
+
+**Richiesta:** *"adattiamo la skill strategist di RPG x entrare nel flusso/workflow di mind weaver? come? cosa ci servirebbe? cosa ci mancherebbe?"* — chiarita come layer di direzione: *"lo strategist serve principalmente a creare la documentazione e arrivare a parlare di Master Plan, scrivere bozze di macro plan, ma + che altro indirizzare le cose future. Poi quest discussioni andranno a creare davvero argomenti contenuti e circoscritti da poi gestire con explorer + planner"* · *"cambia il nome di strategist mandate di MW, questo deve essere strategist. approvo"*
+**Data:** 2026-10-06
+**Stato:** `in corso`
+**Desiderata FROZEN:** `.mw/desiderata.md` v26.
+**Deliverable:** (a) skill `strategist` in `coordinator/skills/strategist/` — discussione libera di direzione, scrittura nei doc di direzione su decisione Director, handoff a desiderata; (b) rename skill MW `strategist` → `decomposer` in `mind-weaver/.agents/skills/` + symlink `~/.agents/skills/`; (c) hat `game_director` in `.mw/prompt-enhancers.md`; (d) registrazione in `context/INDEX.md`.
+**Nota:** la regola R-004 cita `strategist` fra le skill MW invocabili — il nome corretto dopo questa voce è `decomposer`; la regola resta invariata nel contenuto.
