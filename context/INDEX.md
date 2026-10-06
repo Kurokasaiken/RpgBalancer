@@ -36,7 +36,8 @@ Format: `[filename](path) — one sentence — \`tag\``
 [.windsurf/rules/80-quest-rules-maintenance.md](.windsurf/rules/80-quest-rules-maintenance.md) — QUEST_RULES.md si aggiorna su nuove regole quest del Director; status vigente/proposta/divergenza, conflitto → domanda — `governance` `quest`
 [.windsurf/rules/85-documentation-impact.md](.windsurf/rules/85-documentation-impact.md) — contratto Documentation Impact dei piani (NONE/OPTIONAL/REQUIRED + routing degli update) — `governance` `documentation`
 [.windsurf/rules/philosophy.md](.windsurf/rules/philosophy.md) — RPG balancer philosophy and config-first rules — `philosophy`
-[.windsurf/skills/strategist-mandate/SKILL.md](.windsurf/skills/strategist-mandate/SKILL.md) — strategic plan prompt generation — `skill` `strategy`
+[.windsurf/skills/strategist-mandate/SKILL.md](.windsurf/skills/strategist-mandate/SKILL.md) — strategic plan prompt generation (storico, solo contesto per R-004) — `skill` `strategy`
+[coordinator/skills/strategist/SKILL.md](coordinator/skills/strategist/SKILL.md) — layer di direzione pre-desiderata: discussione libera, macro plan, handoff a desiderata (desiderata v26) — `skill` `strategy` `mind-weaver`
 [.windsurf/skills/coordinator-mandate/SKILL.md](.windsurf/skills/coordinator-mandate/SKILL.md) — task dispatch and Kanban — `skill` `dispatch`
 [.windsurf/skills/agent-execution-mandate/SKILL.md](.windsurf/skills/agent-execution-mandate/SKILL.md) — implementation execution — `skill` `execution`
 [.windsurf/skills/idle-village-task/SKILL.md](.windsurf/skills/idle-village-task/SKILL.md) — idle village specific tasks — `skill` `idle-village`
@@ -97,4 +98,6 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[context/REJECTED.md](context/REJECTED.md) — registro approcci/idee valutati e rifiutati con motivo — `knowledge` `rejected` `L3`
 |[context/OPEN.md](context/OPEN.md) — registro delle questioni irrisolte con link a fonti e piani — `knowledge` `open` `L3`
 |[context/ingestions/](context/ingestions/) — report di ingestion del knowledge-extractor (ledger estrazione→reconciliazione, evidence non canonica) — `knowledge` `evidence` `L4`
-|[context/ingestions/2026-10-05-progettare-quest-strategiche.md](context/ingestions/2026-10-05-progettare-quest-strategiche.md) — ingestion report conversazione «Progettare quest strategiche»: Extraction Ledger E-01..E-18 + reconciliazione — `knowledge` `evidence` `quest` `L4`
+|[context/ingestions/2026-10-05-progettare-quest-strategiche.md](context/ingestions/2026-10-05-progettare-quest-strategiche.md) — ingestion report conversazione «Progettare quest strategiche»: Extraction Ledger E-01..E-18 + reconciliazione (coda conversazione) — `knowledge` `evidence` `quest` `L4`
+|[context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md](context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md) — ingestion del transcript integrale (200 msg, `.mw/runs/20261005-transcript-quest-strategiche/`): Ledger E-19..E-49, nuove OPEN-012/013/014 — `knowledge` `evidence` `quest` `L4`
+|[context/ingestions/2026-10-06-quest-strategiche-continuazione.md](context/ingestions/2026-10-06-quest-strategiche-continuazione.md) — ingestion della continuazione 2026-10-05 (share 6ac4b926): checklist authoring E-01, anti-pattern REJ-007, thread aperto «quest originale del Director da decomporre» — `knowledge` `evidence` `quest` `L4`
