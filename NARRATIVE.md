@@ -52,6 +52,14 @@ storia emergente. Le **regole meccaniche** di risoluzione restano in
   authored (generazione/template): non formalizzata.
 - **OPEN** — il seme narrativo della lettera/simbolo del corvo: destinazione
   non decisa (matrice S1 lo registra, nessuna quest successiva definita).
+- **PROPOSTA (OPEN-014)** — architettura narrativa `Situation → Context →
+  Approach → Narrative → Presentation`: asset per *situazione* (non per
+  combinazione di stat), vocabolario situazioni/contesti, layer Quest
+  Gameplay / Quest Narrative / World Narrative. Fonte: conversazione
+  «Progettare quest strategiche», ingestion E-28/E-29/E-30.
+- **VINCOLO operativo (proposta):** i semi narrativi si appoggiano a
+  `LoreDropService`/`loreDropStore` esistente — non creare un sistema lore
+  parallelo (ingestion E-31).
 
 ## Provenance
 
