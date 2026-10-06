@@ -2,11 +2,30 @@
   "tasks": [
     {
       "id": "MP-00",
-      "status": "todo",
+      "status": "failed",
       "target_file": "",
       "prompt": "Prompt: prompts/MP-00.md",
       "complexity": 1,
-      "execution_hint": "atomic"
+      "execution_hint": "atomic",
+      "error": "Tutti i provider/modelli hanno fallito o sono andati in rate limit. Ultimo errore: cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions",
+      "provider_attempt_log": [
+        "openrouter/cohere/north-mini-code:free: Rate limit (429) per openrouter/cohere/north-mini-code:free",
+        "gemini/gemini-3.5-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "gemini/gemini-3.6-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions",
+        "openrouter/cohere/north-mini-code:free: Rate limit (429) per openrouter/cohere/north-mini-code:free",
+        "gemini/gemini-3.5-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "gemini/gemini-3.6-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions",
+        "openrouter/cohere/north-mini-code:free: Rate limit (429) per openrouter/cohere/north-mini-code:free",
+        "gemini/gemini-3.5-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "gemini/gemini-3.6-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions",
+        "openrouter/cohere/north-mini-code:free: Rate limit (429) per openrouter/cohere/north-mini-code:free",
+        "gemini/gemini-3.5-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "gemini/gemini-3.6-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions"
+      ]
     }
   ]
 }
