@@ -19,9 +19,6 @@ applyPerfTier();
 // Apply the default skin's tokens globally so --skin-* vars exist from boot.
 applySkinCssVariables(resolveInitialSkinPresetId());
 const MinimalGameplayPage = lazy(() => import('./ui/idleVillage/MinimalGameplayPage'));
-const GameplayTestPage = lazy(() => import('./ui/idleVillage/components/GameplayTestPage'));
-const GameplayTestSimple = lazy(() => import('./ui/idleVillage/components/GameplayTestSimple'));
-const GameplayTestMinimal = lazy(() => import('./ui/idleVillage/components/GameplayTestMinimal'));
 const TestRosterPage = lazy(() => import('./ui/idleVillage/TestRosterPage'));
 const TestHub = lazy(() => import('./ui/idleVillage/TestHub').then(m => ({ default: m.TestHub })));
 const MissingHub = lazy(() => import('./ui/idleVillage/MissingHub').then(m => ({ default: m.MissingHub })));
@@ -35,21 +32,15 @@ const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ 
 const VisualGrammarValidationPage = lazy(() => import('./ui/visualGrammarValidation/VisualGrammarValidationPage').then(m => ({ default: m.VisualGrammarValidationPage })));
 const VisualFidelityLabPage = lazy(() => import('./ui/visualFidelityLab/VisualFidelityLabPage').then(m => ({ default: m.VisualFidelityLabPage })));
 const HarmonizationGalleryPage = lazy(() => import('./ui/visualFidelityLab/HarmonizationGallery').then(m => ({ default: m.HarmonizationGallery })));
-const PoiCoronaHaloLabPage = lazy(() => import('./ui/visualFidelityLab/PoiCoronaHaloLab').then(m => ({ default: m.PoiCoronaHaloLab })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
 const PoiDetailQuestRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterIntegrationPage').then(m => ({ default: m.default })));
 const PoiDetailJobRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage').then(m => ({ default: m.default })));
-const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage').then(m => ({ default: m.PoiStandardDetailIntegrationPage })));
-const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/TimeDaynightIntegrationPage').then(m => ({ default: m.TimeDaynightIntegrationPage })));
-const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage').then(m => ({ default: m.DragPoiAssignmentPage })));
-const DragPoiIntegrationPage = lazy(() => import('./ui/idleVillage/pages/DragPoiIntegrationPage').then(m => ({ default: m.DragPoiIntegrationPage })));
 const SlotPage = lazy(() => import('./ui/idleVillage/pages/SlotPage').then(m => ({ default: m.default })));
 // Minimal slice test pages (Phase 1-6)
 const MinimalPoiPage = lazy(() => import('./pages/minimal-poi').then(m => ({ default: m.default })));
 const MinimalRosterPage = lazy(() => import('./pages/minimal-roster').then(m => ({ default: m.default })));
 const MinimalRosterSlotIntegrationPage = lazy(() => import('./pages/minimal-roster-slot-integration').then(m => ({ default: m.default })));
 const MinimalClockPage = lazy(() => import('./pages/minimal-clock').then(m => ({ default: m.default })));
-const DayNightPoiSkinDebugPage = lazy(() => import('./pages/day-night-poi-skin-debug').then(m => ({ default: m.default })));
 const MinimalSlotRackPage = lazy(() => import('./pages/minimal-slotRack').then(m => ({ default: m.default })));
 const MinimalResourceHUDPage = lazy(() => import('./pages/minimal-resourcehud').then(m => ({ default: m.default })));
 const MinimalQuestCardPage = lazy(() => import('./pages/minimal-questcard').then(m => ({ default: m.default })));
@@ -77,33 +68,20 @@ const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').the
 const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market-page').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-integration').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-time-integration').then(m => ({ default: m.default })));
-const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
 const EquipmentCreatorPage = lazy(() => import('./pages/equipment-creator').then(m => ({ default: m.default })));
 const EquipmentLibraryPage = lazy(() => import('./pages/equipment-library').then(m => ({ default: m.default })));
 const TrailerViewer = lazy(() => import('./ui/idleVillage/trailer/TrailerViewer'));
-const TrailerThreatIter = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatIter'));
-const TrailerThreatPage = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatPage').then(m => ({ default: m.TrailerThreatPage })));
-const TrailerChoicePage = lazy(() => import('./ui/idleVillage/trailer/TrailerChoicePage').then(m => ({ default: m.TrailerChoicePage })));
-const TrailerPreparationPage = lazy(() => import('./ui/idleVillage/trailer/TrailerPreparationPage').then(m => ({ default: m.TrailerPreparationPage })));
-const TrailerRiskPage = lazy(() => import('./ui/idleVillage/trailer/TrailerRiskPage').then(m => ({ default: m.TrailerRiskPage })));
-const TrailerConsequencePage = lazy(() => import('./ui/idleVillage/trailer/TrailerConsequencePage').then(m => ({ default: m.TrailerConsequencePage })));
-const TrailerLegacyPage = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyPage').then(m => ({ default: m.TrailerLegacyPage })));
-const TrailerLegacyV2Page = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyV2Page').then(m => ({ default: m.TrailerLegacyV2Page })));
-const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutroPage').then(m => ({ default: m.TrailerOutroPage })));
 const WorldSurfaceTestPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceTestPage').then(m => ({ default: m.WorldSurfaceTestPage })));
 const WorldSurfaceDemoPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceDemoPage').then(m => ({ default: m.WorldSurfaceDemoPage })));
 const SeaEffectLabPage = lazy(() => import('./ui/idleVillage/pages/SeaEffectLabPage').then(m => ({ default: m.SeaEffectLabPage })));
 const WorldPresentationDirectorPage = lazy(() => import('./ui/idleVillage/pages/WorldPresentationDirectorPage').then(m => ({ default: m.default })));
-const PoiVisualPreviewPage = lazy(() => import('./ui/idleVillage/pages/PoiVisualPreviewPage').then(m => ({ default: m.default })));
 const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').then(m => ({ default: m.default })));
 const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabPage').then(m => ({ default: m.PoiMarkerLabPage })));
 const GameFramePage = lazy(() => import('./pages/game-frame').then(m => ({ default: m.default })));
 const MapBenchmarkPage = lazy(() => import('./pages/map-benchmark').then(m => ({ default: m.default })));
 const GameFramePixiPage = lazy(() => import('./pages/game-frame-pixi').then(m => ({ default: m.default })));
 const GameFrameTheatrePage = lazy(() => import('./pages/game-frame-theatre').then(m => ({ default: m.default })));
-const GameFrameLivingAtlasPage = lazy(() => import('./pages/gameframe-living-atlas').then(m => ({ default: m.default })));
-const GameFrameCartographerPage = lazy(() => import('./pages/gameframe-cartographer').then(m => ({ default: m.default })));
 const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
@@ -184,12 +162,6 @@ const enforceAllowedTab = (tabId: AppNavTabId): AppNavTabId => {
 function App() {
   const isMinimalGameplayPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-gameplay';
-  const isGameplayPath =
-    typeof window !== 'undefined' && window.location.pathname === '/gameplay';
-  const isSimplePath =
-    typeof window !== 'undefined' && window.location.pathname === '/simple';
-  const isMinimalPath =
-    typeof window !== 'undefined' && window.location.pathname === '/minimal';
   const isTestPath =
     typeof window !== 'undefined' && window.location.pathname === '/test';
   const isTestHubPath =
@@ -213,22 +185,12 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/visual-fidelity-lab';
   const isHarmonizationGalleryPath =
     typeof window !== 'undefined' && window.location.pathname === '/harmonization-gallery';
-  const isPoiCoronaHaloLabPath =
-    typeof window !== 'undefined' && window.location.pathname === '/poi-corona-lab';
   const isPoiDetailVerificationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-detail-verification';
   const isPoiQuestDetailRosterIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-quest-detail-roster-integration';
   const isPoiJobDetailRosterIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-job-detail-roster-integration';
-  const isPoiStandardDetailIntegrationPath =
-    typeof window !== 'undefined' && window.location.pathname === '/poi-standard-detail-integration';
-  const isTimeDaynightIntegrationPath =
-    typeof window !== 'undefined' && window.location.pathname === '/time-daynight-integration';
-  const isDragPoiAssignmentPath =
-    typeof window !== 'undefined' && window.location.pathname === '/drag-poi-assignment';
-  const isDragPoiIntegrationPath =
-    typeof window !== 'undefined' && window.location.pathname === '/drag-poi-integration';
   const isSlotPath =
     typeof window !== 'undefined' && window.location.pathname === '/slot';
   // Minimal slice test pages (Phase 1-6)
@@ -238,8 +200,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-roster';
   const isMinimalRosterSlotIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-roster-slot-integration';
-  const isDayNightPoiSkinDebugPath =
-    typeof window !== 'undefined' && window.location.pathname === '/day-night-poi-skin-debug';
   const isMinimalClockPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-clock';
   const isMinimalSlotRackPath =
@@ -302,8 +262,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-job-poi-roster-integration';
   const isMinimalJobPoiRosterTimeIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-job-poi-roster-time-integration';
-  const isMinimalTimeDaynightIntegrationPath =
-    typeof window !== 'undefined' && window.location.pathname === '/minimal-time-daynight-integration';
   const isSpellCreatorPath =
     typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
   const isEquipmentCreatorPath =
@@ -312,24 +270,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/equipment-library';
   const isTrailerPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer';
-  const isTrailerThreatPath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-threat';
-  const isTrailerChoicePath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-choice';
-  const isTrailerPreparationPath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-preparation';
-  const isTrailerRiskPath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-risk';
-  const isTrailerConsequencePath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-consequence';
-  const isTrailerLegacyPath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-legacy';
-  const isTrailerLegacyV2Path =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-legacy-v2';
-  const isTrailerOutroPath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-outro';
-  const isTrailerThreatIterPath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-threat-iter';
   const isMockupToComponentPath =
     typeof window !== 'undefined' && window.location.pathname === '/mockup-to-component';
   const isWorldSurfacePath =
@@ -346,16 +286,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/game';
   const isGameFrameTheatrePath =
     typeof window !== 'undefined' && window.location.pathname === '/game-frame-theatre';
-  const isGameFrameLivingAtlasPath =
-    typeof window !== 'undefined' && window.location.pathname === '/gameframe-living-atlas';
-  const isGameFrameCartographerPath =
-    typeof window !== 'undefined' && window.location.pathname === '/gameframe-cartographer';
   const isSeaEffectLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/sea-effect-lab';
   const isWorldPresentationDirectorPath =
     typeof window !== 'undefined' && window.location.pathname === '/world-presentation-director';
-  const isPoiVisualPreviewPath =
-    typeof window !== 'undefined' && window.location.pathname === '/poi-visual-preview';
   const isUseClientPath =
     typeof window !== 'undefined' && window.location.pathname === '/use-client';
   const isPoiMarkerLabPath =
@@ -590,15 +524,6 @@ function App() {
     );
   }
 
-  if (isDayNightPoiSkinDebugPath) {
-    return (
-      <ErrorBoundary componentName="Day Night POI Skin Debug Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Day/Night Debug…</div>}>
-          <DayNightPoiSkinDebugPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isMinimalClockPath) {
     return (
@@ -891,15 +816,6 @@ function App() {
     );
   }
 
-  if (isMinimalTimeDaynightIntegrationPath) {
-    return (
-      <ErrorBoundary componentName="Minimal Time Daynight Integration Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Time Daynight Integration…</div>}>
-          <MinimalTimeDaynightIntegrationPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isSpellCreatorPath) {
     return (
@@ -931,95 +847,14 @@ function App() {
     );
   }
 
-  if (isTrailerThreatPath) {
-    return (
-      <ErrorBoundary componentName="Trailer Threat">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat…</div>}>
-          <TrailerThreatPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTrailerChoicePath) {
-    return (
-      <ErrorBoundary componentName="Trailer Choice">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Choice…</div>}>
-          <TrailerChoicePage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTrailerPreparationPath) {
-    return (
-      <ErrorBoundary componentName="Trailer Preparation">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Preparation…</div>}>
-          <TrailerPreparationPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTrailerRiskPath) {
-    return (
-      <ErrorBoundary componentName="Trailer Risk">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Risk…</div>}>
-          <TrailerRiskPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTrailerConsequencePath) {
-    return (
-      <ErrorBoundary componentName="Trailer Consequence">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Consequence…</div>}>
-          <TrailerConsequencePage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTrailerLegacyPath) {
-    return (
-      <ErrorBoundary componentName="Trailer Legacy">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Legacy…</div>}>
-          <TrailerLegacyPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTrailerLegacyV2Path) {
-    return (
-      <ErrorBoundary componentName="Trailer Legacy V2">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Legacy V2…</div>}>
-          <TrailerLegacyV2Page />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTrailerOutroPath) {
-    return (
-      <ErrorBoundary componentName="Trailer Outro">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Outro…</div>}>
-          <TrailerOutroPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTrailerThreatIterPath) {
-    return (
-      <ErrorBoundary componentName="Trailer Threat Iter">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat Iter…</div>}>
-          <TrailerThreatIter autoStart captureMode={false} />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isTrailerPath) {
     return (
@@ -1081,15 +916,6 @@ function App() {
     );
   }
 
-  if (isPoiCoronaHaloLabPath) {
-    return (
-      <ErrorBoundary componentName="POI Corona Halo Lab">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Corona Halo Lab...</div>}>
-          <PoiCoronaHaloLabPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isPrimitivesPath) {
     return (
@@ -1161,75 +987,12 @@ function App() {
     );
   }
 
-  if (isPoiStandardDetailIntegrationPath) {
-    return (
-      <ErrorBoundary componentName="POI Standard + Detail Integration Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Standard + Detail Integration...</div>}>
-          <PoiStandardDetailIntegrationPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isTimeDaynightIntegrationPath) {
-    return (
-      <ErrorBoundary componentName="Time + Day/Night Integration Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Time + Day/Night Integration...</div>}>
-          <TimeDaynightIntegrationPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isDragPoiAssignmentPath) {
-    return (
-      <ErrorBoundary componentName="Drag + POI Assignment Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Drag + POI Assignment...</div>}>
-          <DragPoiAssignmentPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isDragPoiIntegrationPath) {
-    return (
-      <ErrorBoundary componentName="Drag + POI Integration Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Drag + POI Integration...</div>}>
-          <DragPoiIntegrationPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isSimplePath) {
-    return (
-      <ErrorBoundary componentName="Simple Test Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Simple Test...</div>}>
-          <GameplayTestSimple />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isMinimalPath) {
-    return (
-      <ErrorBoundary componentName="Minimal Test Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Minimal Test...</div>}>
-          <GameplayTestMinimal />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isGameplayPath) {
-    return (
-      <ErrorBoundary componentName="Gameplay Test Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Gameplay Test...</div>}>
-          <GameplayTestPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isMinimalGameplayPath) {
     return (
@@ -1301,25 +1064,7 @@ function App() {
     );
   }
 
-  if (isGameFrameLivingAtlasPath) {
-    return (
-      <ErrorBoundary componentName="Game Frame — Living Atlas">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Living Atlas...</div>}>
-          <GameFrameLivingAtlasPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
-  if (isGameFrameCartographerPath) {
-    return (
-      <ErrorBoundary componentName="Game Frame — Cartographer's Desk">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Cartographer's Desk...</div>}>
-          <GameFrameCartographerPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isSeaEffectLabPath) {
     return (
@@ -1362,15 +1107,6 @@ function App() {
   }
 
 
-  if (isPoiVisualPreviewPath) {
-    return (
-      <ErrorBoundary componentName="POI Visual Preview Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Visual Preview…</div>}>
-          <PoiVisualPreviewPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isUseClientPath) {
     return (
