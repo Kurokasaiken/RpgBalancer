@@ -1234,7 +1234,8 @@
         "pushDeeper": "la strategia spinge oltre il checkpoint — più reward, più esposizione",
         "secureStake": "la strategia mette al sicuro la posta al checkpoint",
         "stakeOnTable": "{value} oro di tesoro già in mano"
-      }
+      },
+      "toll": "pedaggio certo: −{amount} HP su {name} (−{epic} se va malissimo)"
     },
     "outcome": {
       "reward": "VITTORIA — reward ottenuta",

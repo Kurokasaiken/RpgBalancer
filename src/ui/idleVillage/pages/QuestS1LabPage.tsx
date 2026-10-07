@@ -34,6 +34,8 @@ import {
 } from '@/ui/idleVillage/questS1Lab/questRun';
 
 import type { QuestId, QuestRunState, ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import { STAT_ICONS } from '@/ui/idleVillage/questS1Lab/questRun';
+import { getStatIconComponent } from '@/ui/shared/statIconUtils';
 import { QuestSimulationPreview } from '@/ui/idleVillage/questS1Lab/QuestSimulationPreview';
 import { QuestCheckPreview } from '@/ui/idleVillage/questS1Lab/QuestCheckPreview';
 import { WanderlustRosterCard } from '@/ui/idleVillage/roster';
@@ -187,18 +189,22 @@ const PartyStrip: React.FC<{
         statusLabel={state ?? t('questS1Lab.memberState.fit')}
       />
       <div className="flex flex-wrap gap-1 px-2 pb-1.5">
-        {Object.entries(member.stats).map(([k, v]) => (
-          <span
-            key={k}
-            className={[
-              'rounded px-1 py-px font-mono text-[9px] tracking-wider',
-              v === best ? 'bg-amber-400/15 text-amber-300' : 'bg-slate-800/60 text-slate-500',
-            ].join(' ')}
-            title={k}
-          >
-            {STAT_SHORT[k]} {v}
-          </span>
-        ))}
+        {Object.entries(member.stats).map(([k, v]) => {
+          const Icon = getStatIconComponent(STAT_ICONS[k as keyof typeof STAT_ICONS]);
+          return (
+            <span
+              key={k}
+              className={[
+                'flex items-center gap-0.5 rounded px-1 py-px font-mono text-[9px] tracking-wider',
+                v === best ? 'bg-amber-400/15 text-amber-300' : 'bg-slate-800/60 text-slate-500',
+              ].join(' ')}
+              title={k}
+            >
+              {Icon && <Icon className="h-2.5 w-2.5" aria-hidden />}
+              {STAT_SHORT[k]} {v}
+            </span>
+          );
+        })}
       </div>
       {hasPotion && member.wounded && !member.dead && onUsePotion && (
         <button
@@ -747,23 +753,27 @@ const QuestS1LabPage: React.FC = () => {
                       <span className="mt-2 block space-y-1.5">
                         {/* Who carries the roll — one chip per stat with the best member */}
                         <span className="flex flex-wrap gap-1.5">
-                          {pv.contributors.map((c) => (
-                            <span
-                              key={c.stat}
-                              className={[
-                                'rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider',
-                                (activePrimary as readonly string[]).includes(c.stat)
-                                  ? 'border-amber-300/60 bg-amber-950/40 text-amber-200'
-                                  : 'border-sky-400/30 bg-sky-950/40 text-sky-200',
-                              ].join(' ')}
-                            >
-                              {(activePrimary as readonly string[]).includes(c.stat) && '★ '}
-                              {c.label} <b className="text-sky-100">{c.bestValue}</b>
-                              <span className="ml-1 text-sky-400/80 normal-case tracking-normal">
-                                {c.bestName}
+                          {pv.contributors.map((c) => {
+                            const Icon = getStatIconComponent(STAT_ICONS[c.stat as keyof typeof STAT_ICONS]);
+                            return (
+                              <span
+                                key={c.stat}
+                                className={[
+                                  'flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider',
+                                  (activePrimary as readonly string[]).includes(c.stat)
+                                    ? 'border-amber-300/60 bg-amber-950/40 text-amber-200'
+                                    : 'border-sky-400/30 bg-sky-950/40 text-sky-200',
+                                ].join(' ')}
+                              >
+                                {Icon && <Icon className="h-3 w-3" aria-hidden />}
+                                {(activePrimary as readonly string[]).includes(c.stat) && '★ '}
+                                {c.label} <b className="text-sky-100">{c.bestValue}</b>
+                                <span className="ml-1 text-sky-400/80 normal-case tracking-normal">
+                                  {c.bestName}
+                                </span>
                               </span>
-                            </span>
-                          ))}
+                            );
+                          })}
                         </span>
                         {/* Success bar + risk */}
                         <span className="flex items-center gap-3">
