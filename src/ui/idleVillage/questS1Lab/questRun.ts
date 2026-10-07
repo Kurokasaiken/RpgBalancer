@@ -201,6 +201,11 @@ export const TUNE = {
   goblinCheckDifficulty: 20, // subtracted from the party score: best FOR 70 → ~50% combat bound (Director calibration 2026-10-06)
   ambushFlatDamage: 5, // dry damage to every member at the ambush's start
   ambushWorsenedBonus: 5, // extra hit damage when the pursuit failed
+  ambushMiteBonus: -5, // F7 last-stand hit modifier when the ambush is mild (let them flee / pursuit «almost»). agguatoMite was dead code until R-097.
+  ambushPeggioreFlatBonus: 0, // extra flat ambush damage when pursuit failed (R-097: rejected — toll covers it)
+  ambushPeggioreExtraHits: 0, // extra counterattack hits at the last stand when pursuit failed (R-097: rejected — C4 added brutality for marginal effect)
+  pursuitFailDamage: 10, // positional damage taken DURING a failed pursuit (R-097 C2: the fleeing goblins bite on the way out)
+  pursuitEpicfailDamage: 20, // same on epicfail — the chase ends in an ambush-of-the-ambush
   exploreBaseDamage: 5, // F6: turn N costs 5·N HP, positional target
   exploreLootGold: 8, // gold found per winning F6 turn
   trofeoGold: 50, // trophy → gold conversion on return to town
@@ -836,10 +841,14 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
     state.log.push({ kind: 'INFO', text: `Goblin abbattuti: ${kills}. Ne restano ${state.goblinLeft}.` });
   }
   // Counterattack: hits land on positional targets, never twice the same one.
-  const hits = spec.escalateProfile ? (turn >= 3 ? 2 : 1) : 1;
+  const hits =
+    (spec.escalateProfile ? (turn >= 3 ? 2 : 1) : 1) +
+    (state.flags.includes('agguatoPeggiore') ? TUNE.ambushPeggioreExtraHits : 0);
   const used = new Set<string>();
   const hitDamage =
-    spec.hitDamage + (state.flags.includes('agguatoPeggiore') ? TUNE.ambushWorsenedBonus : 0);
+    spec.hitDamage +
+    (state.flags.includes('agguatoPeggiore') ? TUNE.ambushWorsenedBonus : 0) +
+    (state.flags.includes('agguatoMite') ? TUNE.ambushMiteBonus : 0);
   for (let h = 0; h < hits; h += 1) {
     const target = pickPositionalTarget(state, used, spec.escalateProfile ? turn : 0);
     if (!target) break;
@@ -1311,7 +1320,10 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.log.push({ kind: 'INFO', text: 'Vi sfuggono per un soffio, feriti e sparsi. Saranno un’ombra sulla via del ritorno.' });
       } else {
         state.flags.push('agguatoPeggiore');
-        if (verdict === 'epicfail') positionalDamage(state, 10, node.title);
+        // R-097: a failed pursuit costs blood NOW — the fleeing goblins
+        // turn and bite before vanishing.
+        const toll = verdict === 'epicfail' ? TUNE.pursuitEpicfailDamage : TUNE.pursuitFailDamage;
+        if (toll > 0) positionalDamage(state, toll, node.title);
         state.log.push({ kind: 'INFO', text: 'Scappano tra le rocce, ridendo. Vi aspetteranno sulla via del ritorno.' });
       }
       return 'gob-esplora-extra';
@@ -1505,7 +1517,14 @@ function enterNode(state: QuestRunState, nodeId: string): void {
         // The ambush opens with dry damage on EVERYONE (Director 2026-10-06,
         // tunable): no slot roll — the whole party pays the entrance fee.
         for (const m of state.party) {
-          if (!m.dead) applyHpDamage(state, m, TUNE.ambushFlatDamage, node.title);
+          if (!m.dead)
+            applyHpDamage(
+              state,
+              m,
+              TUNE.ambushFlatDamage +
+                (state.flags.includes('agguatoPeggiore') ? TUNE.ambushPeggioreFlatBonus : 0),
+              node.title,
+            );
         }
         state.lastEvent = 'Frecce dal ciglio della strada. Erano rimasti in attesa.';
       } else if (node.id === 'rv-attrito') {
@@ -1751,6 +1770,32 @@ export function availableOptions(state: QuestRunState): { id: string; label: str
       costGold: o.costGold,
       disabled: !!o.costGold && state.gold < o.costGold,
     }));
+}
+
+/**
+ * Authored checks still ahead that accept consumable `flag` — the "save it
+ * for later" surface (R-097). Same consumableBonusFor mapping as the resolver,
+ * evaluated on a hypothetical state where the flag is still held. Ordered by
+ * beat. `excludeCheckId` drops the check currently being previewed.
+ */
+export function consumableFutureChecks(
+  state: QuestRunState,
+  flag: string,
+  excludeCheckId?: string,
+): { nodeId: string; title: string; beat: number }[] {
+  const nodes = nodesFor(state);
+  const curBeat = nodes[state.nodeId]?.beat ?? 0;
+  const hypothetical: QuestRunState = { ...state, flags: [flag] };
+  return Object.values(nodes)
+    .filter(
+      (n) =>
+        n.kind === 'check' &&
+        n.id !== excludeCheckId &&
+        (n.beat ?? 0) > curBeat &&
+        consumableBonusFor(hypothetical, n)?.flag === flag,
+    )
+    .sort((a, b) => (a.beat ?? 0) - (b.beat ?? 0))
+    .map((n) => ({ nodeId: n.id, title: n.title, beat: n.beat ?? 0 }));
 }
 
 export { QUESTS };

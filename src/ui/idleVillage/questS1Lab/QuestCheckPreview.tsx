@@ -18,7 +18,7 @@
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { nodesFor } from './questRun';
+import { consumableFutureChecks, nodesFor } from './questRun';
 import type { QuestRunState, Verdict } from './questRun';
 import { analyzeCheck } from './questSimulation';
 import type { CheckAnalysis } from './questSimulation';
@@ -187,6 +187,15 @@ export const QuestCheckPreview: React.FC<QuestCheckPreviewProps> = ({
         : null,
     [run, checkNode, analysis],
   );
+  // R-097: which future authored checks would still accept this consumable —
+  // recalculated from `run` every render, so it follows party/flag changes.
+  const laterChecks = useMemo(
+    () =>
+      checkNode && analysis?.consumable
+        ? consumableFutureChecks(run, analysis.consumable.flag, checkNode.id)
+        : null,
+    [run, checkNode, analysis],
+  );
 
   if (!analysis) return null;
 
@@ -248,6 +257,18 @@ export const QuestCheckPreview: React.FC<QuestCheckPreviewProps> = ({
             without={analysis.consumableApplied ? counterfactual : analysis}
             withC={analysis.consumableApplied ? analysis : counterfactual}
           />
+        )}
+
+        {/* R-097 — the "now vs later" axis: spending here removes the option
+            on every check listed; if the list is empty, spending is free. */}
+        {analysis.consumable && laterChecks && (
+          <div className="rounded-md border border-teal-400/30 bg-teal-950/20 px-2 py-0.5 text-[10px] text-teal-300/80">
+            {laterChecks.length > 0
+              ? t('questS1Lab.sim.consumableLater', {
+                  list: laterChecks.map((c) => c.title).join(', '),
+                })
+              : t('questS1Lab.sim.consumableLast')}
+          </div>
         )}
 
         {/* Per-member final state — who is actually exposed on this check */}

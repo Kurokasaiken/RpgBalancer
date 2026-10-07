@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import {
   applyChoice,
   availableOptions,
+  consumableFutureChecks,
   createRun,
   nodesFor,
   positionalWeights,
@@ -119,5 +120,81 @@ describe('goblin run flow', () => {
     expect(nodes['gob-incalza-check'].stats).toContain('str');
     expect(nodes['gob-combattimento'].combat?.escalateProfile).toBe(true);
     expect(nodes['gob-ultimo-scontro'].combat?.turns).toBe(1);
+  });
+
+  /* ---- R-097: F5 must be a real risk/reward decision, not a free-roll ---- */
+
+  it('letting them flee sets the MILD ambush flag (spec: flee = agguato mite)', () => {
+    const run = createRun('gob-band', 1, 'goblin');
+    run.nodeId = 'gob-incalzare';
+    const next = applyChoice(run, 'gob-lascia-fuggire');
+    expect(next.flags).toContain('agguatoMite');
+    expect(next.flags).not.toContain('agguatoPeggiore');
+  });
+
+  it('a failed pursuit sets agguatoPeggiore and pays a blood toll NOW', () => {
+    // Find a seed where the pursuit check fails deterministically.
+    let failed: QuestRunState | null = null;
+    for (let seed = 1; seed <= 200 && !failed; seed++) {
+      let run = createRun('gob-band', seed, 'goblin');
+      run.nodeId = 'gob-incalzare';
+      const logMark = run.log.length;
+      run = applyChoice(run, 'gob-insegui', { useConsumable: false });
+      const v = run.lastCheck?.verdict;
+      if (v === 'fail' || v === 'epicfail') {
+        failed = run;
+        expect(run.flags).toContain('agguatoPeggiore');
+        const newLines = run.log.slice(logMark).map((e) => e.text);
+        expect(newLines.some((t) => t.includes('incassa il colpo'))).toBe(true);
+      }
+    }
+    expect(failed).not.toBeNull();
+  });
+
+  it('agguatoPeggiore removes the trophy bail-out at F7 (forced last stand)', () => {
+    const run = createRun('gob-band', 1, 'goblin');
+    run.nodeId = 'gob-agguato-scelta';
+    run.flags.push('agguatoPeggiore');
+    const ids = availableOptions(run).map((o) => o.id);
+    expect(ids).toContain('gob-ultima-mischia');
+    expect(ids).not.toContain('gob-molla-trofeo');
+    // …and a mild ambush keeps the bail-out.
+    const run2 = createRun('gob-band', 1, 'goblin');
+    run2.nodeId = 'gob-agguato-scelta';
+    run2.flags.push('agguatoMite');
+    expect(availableOptions(run2).map((o) => o.id)).toContain('gob-molla-trofeo');
+  });
+
+  it('mild ambush fights a cheaper last stand than worsened (20 vs 30 dmg)', () => {
+    const mite = createRun('gob-band', 1, 'goblin');
+    mite.nodeId = 'gob-ultimo-scontro';
+    mite.flags.push('agguatoMite');
+    const peggiore = createRun('gob-band', 1, 'goblin');
+    peggiore.nodeId = 'gob-ultimo-scontro';
+    peggiore.flags.push('agguatoPeggiore');
+    const m1 = applyChoice(mite, 'fight-turn');
+    const p1 = applyChoice(peggiore, 'fight-turn');
+    const hitsOf = (s: QuestRunState, from: number) =>
+      s.log.slice(from).filter((e) => e.text.includes('incassa il colpo'));
+    void hitsOf;
+    const mHits = m1.log.filter((e) => e.text.includes('incassa il colpo (−20'));
+    const pHits = p1.log.filter((e) => e.text.includes('incassa il colpo (−30'));
+    expect(mHits.length).toBeGreaterThanOrEqual(1);
+    expect(pHits.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('consumableFutureChecks (R-097)', () => {
+  it('lists later checks that accept the consumable flag, ordered by beat', () => {
+    const run = createRun('gob-band', 1, 'goblin');
+    run.nodeId = 'gob-esplora'; // beat 1, previewing the PER-only check
+    const later = consumableFutureChecks(run, 'hasBonusForza', 'gob-tracce-per');
+    expect(later.map((c) => c.nodeId)).toEqual(['gob-assalto', 'gob-incalza-check']);
+  });
+
+  it('returns empty at F5 — the last str check — so spending is "free"', () => {
+    const run = createRun('gob-band', 1, 'goblin');
+    run.nodeId = 'gob-incalzare';
+    expect(consumableFutureChecks(run, 'hasBonusForza', 'gob-incalza-check')).toEqual([]);
   });
 });

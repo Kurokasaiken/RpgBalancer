@@ -137,3 +137,16 @@ smoke manuale su `/quest-s1-lab` (3 scenari).
   con valore futuro reale (save≥1 → reward 63.7% vs always-spend 53.7%);
   designated victim Kran (44% dei colpi); nessun comeback meccanico
   (recovery 1.5%). Nessuna modifica all'engine o al bilanciamento.
+- **2026-10-08 — Micro-iterazione F5 + consumabili (R-097).** F5 non era più un
+  free-roll: `gob-lascia-fuggire` ora setta `agguatoMite` (flag prima morto —
+  mischia F7 a 20), fail/epicfail su `gob-incalza-check` paga pedaggio
+  posizionale immediato (10/20, TUNE `pursuitFailDamage`/`pursuitEpicfailDamage`)
+  e setta `agguatoPeggiore` che (a) alza la mischia a 30 e (b) **nasconde
+  «Lasciare il trofeo»** (`hiddenIfFlag`) — mischia obbligata, niente bailout.
+  Sweep `scripts/quest-goblin-f5-sweep.ts` su 4 candidati → scelto C2.
+  Preview consumabili: `consumableFutureChecks()` in questRun lista i check
+  authored futuri che accettano la flag (stesso `consumableBonusFor` del
+  resolver, stato ipotetico); `QuestCheckPreview` mostra la riga "later"
+  sotto il controfattuale, ricalcolata da `run` a ogni render. Chiavi i18n
+  `sim.consumableLater`/`consumableLast` (en/it-IT/pseudo). Spec authored
+  aggiornata (F5). Test: +6 in questGoblin.test.ts (14/14).

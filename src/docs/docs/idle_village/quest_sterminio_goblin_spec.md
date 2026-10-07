@@ -149,12 +149,21 @@ Bande del check `FORZA` (il juice dei tiri: almost e critici contano):
 | `bigwin` | **Sterminio**, ritorno pulito, nessun costo |
 | `win` | **Sterminio**, ritorno pulito |
 | `almost` | **è un fallimento** (Director): i goblin fuggono → agguato F7 **mite** |
-| `fail` | i goblin fuggono → agguato F7 **peggiorato** |
-| `epicfail` | i goblin reagiscono prima di fuggire: **danni al party** + agguato F7 **peggiorato** |
+| `fail` | i goblin mordono mentre scappano: **−10 HP posizionali ora** + agguato F7 **peggiorato** + **mischia obbligata** (niente bailout) |
+| `epicfail` | la caccia finisce in un contro-agguato: **−20 HP posizionali ora** + agguato F7 **peggiorato** + **mischia obbligata** |
 
 - Stat: **Forza** (coerente con la quest Forza-based).
 - La decisione reale non è «successo sì/no» ma: *nelle condizioni in cui sono
   arrivato qui, voglio esporre ancora il party?*
+
+**Calibrazione R-097 (MC 10k×2 bracci):** prima di questo fix «Incalzare» era un
+free-roll (win = sterminio+no agguato, fail = lo stesso agguato di default).
+Ora il fail **toglie l'assicurazione**: `agguatoPeggiore` nasconde «Lasciare il
+trofeo» a F7 — chi insegue e fallisce *deve* combattere l'ultima mischia a
+danno maggiorato (30 vs 25, mite 20). Flee = costo certo moderato con agency
+preservata; Pursue = 77% esci pulito / 23% sei commesso al peggio. Pursue resta
+EV-favorito col party sano (corretto: l'aggressività deve pagare) ma ha una
+coda letale quando il party è rotto.
 
 ### F6 — CONTINUA L'ESPLORAZIONE (opzionale, post-obiettivo)
 

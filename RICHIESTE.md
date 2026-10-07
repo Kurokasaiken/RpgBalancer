@@ -2013,3 +2013,18 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Richiesta (verbatim):** spec incollata dal Director «QUEST FUN AUDIT — S1 GOBLIN QUEST» — estendere l'analisi MC per valutare *qualità del gameplay* (decisioni significative, tensione, risk/reward, strategia di party, conseguenze a cascata, storie emergenti, rigiocabilità), non il bilanciamento. Vincoli espliciti: preservare l'MC esistente, non semplificare l'engine, non ottimizzare/cambiare probabilità, report per sezioni A–I con score 1–10 e verdict WHAT WORKS / WHAT DOESN'T / WHAT TO TEST.
 **Data:** 2026-10-07
 **Stato:** `completato` — tooling `scripts/quest-goblin-fun-audit.ts` (trace per decisione + policy random esplorativa), report `test-results/quest-goblin-fun-audit-report-2026-10-07.md` (score + verdict), dati grezzi `quest-goblin-fun-audit-2026-10-07.md`, evidence `r096-quest-goblin-fun-audit-2026-10-07.log`.
+
+## R-097 — Micro-iterazione S1 goblin: fix F5 + preview consumabili
+
+**Richiesta (verbatim):** spec incollata dal Director «S1 GOBLIN — MICRO-ITERATION F5 + CONSUMABLE DECISION». Vincoli espliciti: F5 deve diventare scelta vera (Pursue ≠ free-roll, Let Flee ≠ dominato) con cambio strutturale minimo, mantenendo check FOR, 5 bande, sterminio, agguato e distinzione agguato lieve/peggiorato; **F6 e il targeting posizionale non si toccano**; preview consumabili deve mostrare "ora vs dopo" ricalcolando dinamicamente, senza secondo modello di probabilità né dettagli interni. Processo: baseline MC → candidati → report prima/ dopo, poi implementazione.
+**Data:** 2026-10-08
+**Stato:** `in corso`
+
+---
+
+## R-098 — Impronte di storie famose come archetipi di quest
+
+**Richiesta (verbatim):** *"in una d queste discussioni parlavamo del fatto che le quest nn devono essere solo create casualmente, ma mettere anche una componente autoriale. Potrebbe essere utile prendere come 'impronta' delle storie famose e farne ad esempio un archetipo di chainquest? prendendo da libri fantasy, videogames, ecc"*
+**Data:** 2026-10-08
+**Stato:** `proposta` — direzione accolta come candidata; raffinamento in delibera multi-AI (`.mw/runs/20261008-story-archetype-imprints/`): usare *pattern drammatici decontestualizzati* (scheletro causale/emotivo senza nomi), non le storie riconoscibili. Registrata come M-13 in `NARRATIVE.md` §5.
+**Collegamenti:** OPEN-014 (composizione), M-02 casting pool, P48/P53; componente autoriale già documentata in `context/QUEST_GAMEPLAY_SCIENCE.md` (ricombinazione di pezzi authored, non prosa generata).
