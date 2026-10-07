@@ -234,7 +234,10 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
         animate={
           isModal
             ? { x: 0, y: 0, scale: CARD_SCALE }
-            : { x: reminderOffset.x, y: reminderOffset.y, scale: REMINDER_SCALE }
+            : showReminder
+              ? { x: reminderOffset.x, y: reminderOffset.y, scale: REMINDER_SCALE }
+              // The host keeps the reminder elsewhere (its own ledger): the card just fades where it stands.
+              : { x: 0, y: 0, scale: CARD_SCALE }
         }
         transition={{ duration: 1.2, ease: 'easeInOut' }}
         style={{ position: 'absolute', left: 0, top: 0, width: 0, height: 0 }}
