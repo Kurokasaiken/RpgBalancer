@@ -3,14 +3,14 @@
  * inside <DestinyAstrolabeV62> while playing /quest-s1-lab (observed in dev
  * browser, flood of mount+error pairs, boundary retry loop, reload).
  *
- * Mounts the REAL page (StrictMode, same as main.tsx) and drives the rovine
+ * Mounts the REAL page (StrictMode, same as main.tsx) and drives the goblin
  * quest until the first check cinematic mounts — repeated across many fresh
  * mounts to shake out the race. jsdom has no canvas/AudioContext: stub both
  * so the engine boots (its RAF loop self-catches draw errors anyway).
  */
 import React, { StrictMode } from 'react';
 import { describe, it, expect, vi, beforeAll } from 'vitest';
-import { render, fireEvent, cleanup } from '@testing-library/react';
+import { render, fireEvent, cleanup, act } from '@testing-library/react';
 
 class FakeAudioContext {
   state = 'running';
@@ -63,35 +63,50 @@ beforeAll(() => {
 });
 
 async function driveToFirstCheck(): Promise<boolean> {
-  const QuestS1LabPage = (await import('../../../../src/ui/idleVillage/pages/QuestS1LabPage')).default;
-  const view = render(
-    <StrictMode>
-      <QuestS1LabPage />
-    </StrictMode>,
-  );
-  const byText = (re: RegExp) =>
-    Array.from(view.container.querySelectorAll('button')).find((b) => re.test(b.textContent ?? ''));
+  // Fake timers: the phase transition holds a transit beat (~2.6s) before
+  // rendering the destination node — jump it instead of waiting wall-clock.
+  vi.useFakeTimers();
+  try {
+    const QuestS1LabPage = (await import('../../../../src/ui/idleVillage/pages/QuestS1LabPage')).default;
+    const view = render(
+      <StrictMode>
+        <QuestS1LabPage />
+      </StrictMode>,
+    );
+    const byText = (re: RegExp) =>
+      Array.from(view.container.querySelectorAll('button')).find((b) => re.test(b.textContent ?? ''));
 
-  // quest picker → rovine card
-  const rovine = byText(/Rovine|rovine|Ruins/i);
-  if (!rovine) { cleanup(); return false; }
-  fireEvent.click(rovine);
+    // quest picker → goblin card (the only authored quest in the lab since R-089)
+    const goblin = byText(/goblin|Sterminio|Extermination/i);
+    if (!goblin) return false;
+    fireEvent.click(goblin);
 
-  // preset → first Depart button
-  const depart = byText(/Depart|Parti|Partenza/i);
-  if (!depart) { cleanup(); return false; }
-  fireEvent.click(depart);
+    // preset → first Depart button
+    const depart = byText(/Depart|Parti|Partenza/i);
+    if (!depart) return false;
+    fireEvent.click(depart);
 
-  // first choice node: pick the first enabled option, then commit it.
-  const optBtn = Array.from(view.container.querySelectorAll('button'))
-    .find((b) => !b.disabled && /Osserv|Incalza|Osserva/i.test(b.textContent ?? ''));
-  if (optBtn) fireEvent.click(optBtn);
-  const face = byText(/check|affronta|Face/i);
-  if (face) fireEvent.click(face);
+    // F0 assignment: the single «Partire» option travels straight to F1.
+    const partire = byText(/Partire/i);
+    if (!partire) return false;
+    fireEvent.click(partire);
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
 
-  const mounted = !!view.container.querySelector('[data-testid="destiny-astrolabe-v62"]');
-  cleanup();
-  return mounted;
+    // F1: the option commits a check; the commit surface exposes the confirm.
+    const optBtn = Array.from(view.container.querySelectorAll('button'))
+      .find((b) => !b.disabled && /Arrampicarsi|sentiero a forza|masso/i.test(b.textContent ?? ''));
+    if (!optBtn) return false;
+    fireEvent.click(optBtn);
+    const face = byText(/check|affronta|Face/i);
+    if (face) fireEvent.click(face);
+
+    return !!view.container.querySelector('[data-testid="destiny-astrolabe-v62"]');
+  } finally {
+    cleanup();
+    vi.useRealTimers();
+  }
 }
 
 describe('questS1Lab page crash repro', () => {
