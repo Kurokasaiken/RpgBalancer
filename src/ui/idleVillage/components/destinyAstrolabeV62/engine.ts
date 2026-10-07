@@ -8,7 +8,7 @@
 // @ts-nocheck
 
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
-import { stepGuidedBall } from './ballGuidance';
+import { stepGuidedBall, findZonePoint } from './ballGuidance';
 import { createTarGooRenderer } from './tarGooRenderer';
 import { createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
@@ -703,10 +703,29 @@ function computeTargetPos(){
   return null;
 }
 
+/* Forced-mode honesty (quest S1 lab bug, 2026-10-07): the authored target
+   can sit OUTSIDE its own zone — the star shrinks to ~37% of tip radius in
+   the valleys (valleyF), so the 'win' point at 0.68×tip lands in the goo,
+   and past ~82 stat the wall itself cuts it off. The card would then claim
+   WIN while the ball visibly parked on the dark side. If the authored
+   target doesn't claim its zone, park on the nearest point that does; if
+   the zone is empty, keep the authored spot (the verdict is forced anyway —
+   this only fixes where the ball lies). */
+function honestTargetPos(tp){
+  const mode=cfg.mode;
+  if(!tp||!mode||mode==='random') return tp;
+  if(spatialVerdict(tp.x,tp.y)===mode) return tp;
+  return findZonePoint({
+    want:mode, zoneOf:spatialVerdict, cx:CX, cy:CY,
+    inner:geo.rCore, wallEdgeAt:(a)=>rCheckAt(a),
+    preferAngle:angOf(tp.x,tp.y), ballR:scene.ball.r,
+  }) ?? tp;
+}
+
 function fireBall(){
   const b=scene.ball;
   b.on=true; b.x=CX; b.y=CY;
-  const tp=computeTargetPos();
+  const tp=honestTargetPos(computeTargetPos());
   scene.targetPos=tp;
   /* Target-aware kick: aim roughly toward target with wide jitter (still chaotic) */
   const baseAngle=tp ? Math.atan2(tp.y-CY,tp.x-CX) : Math.random()*TAU;

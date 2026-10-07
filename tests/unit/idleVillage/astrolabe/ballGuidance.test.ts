@@ -17,6 +17,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_GUIDANCE,
   arriveAccel,
+  findZonePoint,
   stepGuidedBall,
   type GuideBall,
   type GuidedStepEvents,
@@ -276,5 +277,71 @@ describe('arriveAccel — pure Reynolds arrival (no bounces, no friction)', () =
     const aFar = arriveAccel(far, { x: DEFAULT_GUIDANCE.decelRadius * 3, y: 0 }, 1, 1);
     expect(aNear.ax).toBeLessThan(0); // braking toward the target
     expect(aFar.ax).toBeGreaterThan(0); // still has room to accelerate
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* findZonePoint — forced-mode honesty (ball must park IN its verdict    */
+/* zone; the V62 valley bug parked 'win' targets in the goo, 2026-10-07) */
+/* ------------------------------------------------------------------ */
+
+describe('findZonePoint', () => {
+  /* Synthetic zones mirroring the astrolabe: core=bigwin (r<=40), a star
+     band 'win' (40<r<=110), thin 'almost' (110<r<=120), fail beyond that
+     but inside the wall, 'epicfail' on the outermost 12px. */
+  const CX = 400, CY = 400, INNER = 40;
+  const zoneOf = (x: number, y: number) => {
+    const d = Math.hypot(x - CX, y - CY);
+    const e = wallEdgeAt(Math.atan2(y - CY, x - CX));
+    if (d <= INNER) return 'bigwin';
+    if (d <= 110) return 'win';
+    if (d <= 120) return 'almost';
+    if (d > e - 12 && d <= e) return 'epicfail';
+    return 'fail';
+  };
+  const base = {
+    zoneOf, cx: CX, cy: CY, inner: INNER,
+    wallEdgeAt, ballR: 9,
+  };
+
+  it('finds a point inside the claimed zone for every verdict', () => {
+    for (const want of ['win', 'almost', 'fail', 'epicfail', 'bigwin']) {
+      const p = findZonePoint({ ...base, want });
+      expect(p, `no point found for ${want}`).not.toBeNull();
+      expect(zoneOf(p!.x, p!.y)).toBe(want);
+    }
+  });
+
+  it('stays near the preferred angle when the zone allows it', () => {
+    const p = findZonePoint({ ...base, want: 'win', preferAngle: -Math.PI / 2 });
+    expect(p).not.toBeNull();
+    const ang = Math.atan2(p!.y - CY, p!.x - CX);
+    expect(Math.abs(ang + Math.PI / 2)).toBeLessThan(0.4);
+  });
+
+  it('returns a point inside the wall (ball must be physically reachable)', () => {
+    const p = findZonePoint({ ...base, want: 'fail', preferAngle: 0.9 });
+    expect(p).not.toBeNull();
+    const a = Math.atan2(p!.y - CY, p!.x - CX);
+    const d = Math.hypot(p!.x - CX, p!.y - CY);
+    expect(d).toBeLessThan(wallEdgeAt(a));
+  });
+
+  it('returns null when the zone is empty everywhere', () => {
+    const p = findZonePoint({ ...base, want: 'ghost-zone' });
+    expect(p).toBeNull();
+  });
+
+  it('reproduces the V62 valley bug: a shrunken star is still findable', () => {
+    /* star squeezed to a sliver — only r in (40, 55) is 'win' */
+    const tinyZone = (x: number, y: number) => {
+      const d = Math.hypot(x - CX, y - CY);
+      if (d <= INNER) return 'bigwin';
+      if (d <= 55) return 'win';
+      return 'fail';
+    };
+    const p = findZonePoint({ ...base, zoneOf: tinyZone, want: 'win' });
+    expect(p).not.toBeNull();
+    expect(tinyZone(p!.x, p!.y)).toBe('win');
   });
 });

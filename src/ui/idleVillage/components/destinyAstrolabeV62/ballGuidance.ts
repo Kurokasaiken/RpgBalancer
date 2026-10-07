@@ -217,3 +217,66 @@ export function stepGuidedBall(ball: GuideBall, o: GuidedStepOptions): GuidedSte
 
   return events;
 }
+
+/* ------------------------------------------------------------------ */
+/* Forced-verdict landing spots                                        */
+/* ------------------------------------------------------------------ */
+
+export interface ZonePointOptions {
+  /** zone id the parked point must claim — the forced verdict ('win',
+   *  'fail_wound', …) exactly as `zoneOf` reports it. */
+  want: string;
+  /** zone classifier at canvas point — the engine's spatialVerdict. */
+  zoneOf: (x: number, y: number) => string;
+  cx: number;
+  cy: number;
+  /** inner radius bound (core edge) — bigwin targets live inside it. */
+  inner: number;
+  /** container wall radius at angle — candidate points must stay inside. */
+  wallEdgeAt: (ang: number) => number;
+  /** preferred angle — the scan starts here and spirals outward, so the
+   *  returned point stays visually near the authored composition. */
+  preferAngle?: number;
+  /** ball radius — kept inside the wall with margin. */
+  ballR?: number;
+}
+
+/**
+ * Scan the arena for a point whose `zoneOf` matches the forced verdict.
+ * Forced-mode honesty: when the authored target lands in the goo (valley
+ * dips shrink the star) or beyond the wall (high stat → long tip), the ball
+ * must still park where the card says it landed — never on the dark side
+ * with a WIN card over it.
+ *
+ * Deterministic scan: 48 angles spiralling from `preferAngle`, radius
+ * sampled in 4px steps from `inner` to the wall. Returns null when the
+ * zone is empty everywhere — caller keeps the authored target and the
+ * forced verdict still wins the card.
+ */
+export function findZonePoint(o: ZonePointOptions): { x: number; y: number } | null {
+  const ballR = o.ballR ?? 9;
+  const TAU = Math.PI * 2;
+  const GOLDEN = TAU * 0.61803398875; // irrational step → angles spread evenly
+  const start = o.preferAngle ?? -Math.PI / 2;
+  for (let k = 0; k < 48; k += 1) {
+    const a = start + k * GOLDEN;
+    const wall = o.wallEdgeAt(a) - ballR - 2;
+    for (let r = Math.max(2, o.inner + 2); r <= wall; r += 4) {
+      const x = o.cx + Math.cos(a) * r;
+      const y = o.cy + Math.sin(a) * r;
+      if (o.zoneOf(x, y) === o.want) return { x, y };
+    }
+  }
+  /* bigwin lives INSIDE `inner` — rescan the core disk when that's the want */
+  if (o.want === 'bigwin') {
+    for (let k = 0; k < 24; k += 1) {
+      const a = start + k * GOLDEN;
+      for (let r = 2; r <= o.inner - 2; r += 4) {
+        const x = o.cx + Math.cos(a) * r;
+        const y = o.cy + Math.sin(a) * r;
+        if (o.zoneOf(x, y) === o.want) return { x, y };
+      }
+    }
+  }
+  return null;
+}

@@ -197,14 +197,14 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
       {
         id: 'gob-lascia-fuggire',
         label: 'Lasciarli fuggire',
-        detail: 'Nessun graffio adesso — ma si riorganizzano. Li rivedrete in forze.',
+        detail: 'Torneranno. Li rivedrete sulla strada di casa.',
         next: 'gob-esplora-extra',
         sets: 'agguatoPeggiore', // R-097 v2: letting them go = they regroup → HEAVY ambush at F7
       },
       {
         id: 'gob-insegui',
         label: 'Incalzare',
-        detail: 'Forza. Sangue subito — ma se scappano, tornano a pezzi.',
+        detail: 'Forza. Chiudete la quest qui — o peggiorate il conto.',
         next: 'CHECK:gob-incalza-check',
       },
     ],
@@ -217,8 +217,9 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
     stats: ['str'],
     risk: { wound: 0, death: 0 },
     beat: 5,
-    // R-097 v2: the toll is the deterministic price of the chase itself —
-    // escaping goblins are bloodied → the ambush is the mild one.
+    // R-097 v2: the deterministic price of the chase itself — escaping
+    // goblins are bloodied → the ambush is the mild one.
+    upfrontDamage: { amount: 10, epicfailAmount: 20 },
     failHint: 'La caccia costa sangue comunque. Se scappano, tornano feriti: l’agguato sarà più debole.',
   },
 
