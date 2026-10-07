@@ -215,7 +215,7 @@ Aggiungere un pannello al sistema: aggiungi l'id a `HudPanelId` e a `HUD_PANEL_S
 ## 11. Stato e cose provvisorie
 
 - Tutto quanto sopra **non è committato**.
-- `?hud=legacy` mantiene il vecchio percorso (`HudRibbon`, `HudPanel`) solo per il confronto e per le due pagine di confronto più vecchie (`/gameframe-cartographer`, `/gameframe-living-atlas`, che usano ancora `HudRibbon`, `SpeedControl`, `HudHangingTag`, `ResourceMedallion`). Astrolabio, bussola ritagliata e `EdgeDressing` sono stati eliminati.
+- `?hud=legacy` mantiene il vecchio percorso (`HudRibbon`, `HudPanel`) solo per il confronto. Astrolabio, bussola ritagliata, `EdgeDressing`, `SpeedControl`, `HudHangingTag` e `ResourceMedallion` sono stati eliminati.
 - Roster V2 non è un kit certificato.
 - Il dettaglio quest (`ActivityCapsuleDetailSkinAware`) ha la cornice HUD ma va rifatto compatto **dopo** il rework delle quest.
 - Il livello `edgeWash` (pennellate sui bordi) è pronto ma manca l'immagine.

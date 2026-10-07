@@ -1,12 +1,10 @@
 export { GameFrame, type GameFrameProps } from './GameFrame';
 export { HudRibbon, type HudRibbonProps, type HudRibbonAnchor } from './HudRibbon';
-export { HudHangingTag, type HudHangingTagProps } from './HudHangingTag';
 export { HudEventLedger, type HudEventLedgerProps, type HudEvent, type HudEventSort } from './HudEventLedger';
 export { ResourceReadout, type ResourceReadoutProps, type ResourceReadoutItem } from './ResourceReadout';
 export { buildResourceReadoutItems } from './resourceReadoutItems';
 export { HUD_TONE_COLOR, type HudTone } from './hudTones';
 export { WhenWhereCluster, type WhenWhereClusterProps } from './WhenWhereCluster';
-export { SpeedControl, type SpeedControlProps } from './SpeedControl';
 export { HudGlyph, HUD_ICONS, type HudGlyphProps, type HudIconId } from './hudIcons';
 export { DirectorPanel, type DirectorPanelProps, type DirectorAction } from './DirectorPanel';
 export { HudPanelsMenu, type HudPanelsMenuProps } from './HudPanelsMenu';
