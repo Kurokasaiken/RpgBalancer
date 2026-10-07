@@ -18,7 +18,8 @@ import { DEFAULT_COAST_FOAM_CONFIG } from '@/ui/idleVillage/components/WorldSurf
 import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/resolveWorldManifest';
 import { RosterKitShell } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
-import GoblinEventModalV17 from '@/ui/idleVillage/trailer/GoblinEventModalV17';
+import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
+import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
 // GameFrame is a fresh, not-yet-kitted composition (R-075).
 // eslint-disable-next-line no-restricted-imports
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
@@ -38,6 +39,9 @@ import type { HudEvent, HudObjective } from '@/ui/idleVillage/components/gameFra
  * The Director panel stages beats for tests and the trailer: the goblin invasion (a
  * threat in the ledger plus the announcement) and the quest appearing on the map.
  */
+/** Days the player has between the announcement and the goblin host reaching the village. */
+const INVASION_WARNING_DAYS = 5;
+
 export default function GameFramePixiPage() {
   const { worldDressing, questPois, debug, roster, questDetail, insets } = DEFAULT_GAME_FRAME_CONFIG;
   const safeFit = worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined;
@@ -64,7 +68,15 @@ export default function GameFramePixiPage() {
     document.documentElement.setAttribute('data-skin-preset', skinId);
   }, [skinId]);
   const [invasion, setInvasion] = useState<{ dueDay: number } | null>(null);
-  const [invasionOpen, setInvasionOpen] = useState(false);
+  // Goblin invasion, as on /world-surface: the parchment curtains close over the map, the announcement card
+  // appears at the peak, and confirming it opens the curtains and puts the threat in the ledger.
+  const [shroudCovered, setShroudCovered] = useState(false);
+  const [cardOpen, setCardOpen] = useState(false);
+  useEffect(() => {
+    if (!shroudCovered) return undefined;
+    const timer = window.setTimeout(() => setCardOpen(true), 700);
+    return () => window.clearTimeout(timer);
+  }, [shroudCovered]);
   // Test / trailer tooling: dev builds only, F10 shows or hides it (hide it for a clean capture).
   const directorEnabled = import.meta.env.DEV && debug.directorPanel;
   const [directorVisible, setDirectorVisible] = useState(true);
@@ -133,8 +145,8 @@ export default function GameFramePixiPage() {
         label: t('gameFrame.director.invasion'),
         active: !!invasion,
         onTrigger: () => {
-          setInvasion({ dueDay: currentDay + 5 });
-          setInvasionOpen(true);
+          setCardOpen(false);
+          setShroudCovered(true);
         },
       },
       {
@@ -191,32 +203,51 @@ export default function GameFramePixiPage() {
                     actions={directorActions}
                     onReset={() => {
                       setInvasion(null);
-                      setInvasionOpen(false);
+                      setShroudCovered(false);
+                      setCardOpen(false);
                       setQuestShown(false);
                     }}
                   />
                 )}
-                {invasionOpen && (
-                  <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'grid', placeItems: 'center', background: 'rgba(2,6,10,0.55)' }}>
-                    <GoblinEventModalV17 isOpen daysLeft={invasionDaysLeft} onPrepare={() => setInvasionOpen(false)} />
-                  </div>
-                )}
               </>
             }
             renderMap={({ recenterSignal }) => (
-              <PixiWorldMap
-                manifestPath={resolveWorldManifestPath(worldDressing)}
-                hiddenLayerIds={worldDressing.hiddenLayerIds}
-                safeFit={safeFit}
-                recenterSignal={recenterSignal}
-                anchors={anchors}
-                stageColor={worldDressing.stageColor}
-                seaPatternConfig={seaPatternConfig}
-                coastFoamConfig={coastFoamConfig}
-                cloudShadowOpacity={motion.cloudShadowOpacity}
-                cloudShadowOffset={shadowOffset}
-                cloudSpeed={motion.cloudSpeed}
-              />
+              <div style={{ position: 'absolute', inset: 0, isolation: 'isolate' }}>
+                <PixiWorldMap
+                  manifestPath={resolveWorldManifestPath(worldDressing)}
+                  hiddenLayerIds={worldDressing.hiddenLayerIds}
+                  safeFit={safeFit}
+                  recenterSignal={recenterSignal}
+                  anchors={anchors}
+                  stageColor={worldDressing.stageColor}
+                  seaPatternConfig={seaPatternConfig}
+                  coastFoamConfig={coastFoamConfig}
+                  cloudShadowOpacity={motion.cloudShadowOpacity}
+                  cloudShadowOffset={shadowOffset}
+                  cloudSpeed={motion.cloudSpeed}
+                  worldLayer={(canvas) => (
+                    <div style={{ pointerEvents: 'auto' }}>
+                      <WorldSurfaceEventCard
+                        visible={cardOpen}
+                        zIndex={5}
+                        worldCenter={{ x: canvas.width / 2, y: canvas.height / 2 }}
+                        canvasSize={canvas}
+                        camera={{ panX: 0, panY: 0, zoom: 1 }}
+                        fallTarget={{ x: Math.round(canvas.width * 0.239), y: Math.round(canvas.height * 0.417) }}
+                        marchTarget={{ x: Math.round(canvas.width * 0.486), y: Math.round(canvas.height * 0.554) }}
+                        daysRemaining={INVASION_WARNING_DAYS}
+                        showReminder={false}
+                        onComplete={() => {
+                          setShroudCovered(false);
+                          setInvasion({ dueDay: currentDay + INVASION_WARNING_DAYS });
+                        }}
+                        onClose={() => setCardOpen(false)}
+                      />
+                    </div>
+                  )}
+                />
+                <WorldSurfaceEventShroud covered={shroudCovered} zIndex={6} />
+              </div>
             )}
           />
         </DndContext>

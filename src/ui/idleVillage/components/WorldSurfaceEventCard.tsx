@@ -42,6 +42,11 @@ export interface WorldSurfaceEventCardProps {
   marchTarget: { x: number; y: number };
   /** Days remaining (computed by parent from time engine if available). */
   daysRemaining?: number;
+  /**
+   * Park a reminder chip in the top-right after the player confirms. Default true (World Surface);
+   * a screen with an event ledger turns it off, since the ledger already carries the countdown.
+   */
+  showReminder?: boolean;
 }
 
 type Stage = 'idle' | 'modal' | 'peeling' | 'falling' | 'marching' | 'done';
@@ -107,6 +112,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   fallTarget,
   marchTarget,
   daysRemaining = DEFAULT_TOTAL_DAYS,
+  showReminder = true,
 }) => {
   const { t } = useTranslation('idleVillage');
   const [stage, setStage] = useState<Stage>('modal');
@@ -290,7 +296,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                 }}
               />
             </motion.div>
-          ) : (
+          ) : !showReminder ? null : (
             <motion.div
               key="reminder"
               initial={{ opacity: 0 }}

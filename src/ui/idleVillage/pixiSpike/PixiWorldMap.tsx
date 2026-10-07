@@ -62,6 +62,12 @@ export interface PixiWorldMapProps {
    * it keeps its own screen size, like a map marker.
    */
   anchors?: PixiMapAnchor[];
+  /**
+   * DOM content laid in world pixels and scaled with the map (unlike `anchors`, which keep their screen
+   * size). The box is the manifest canvas; the render prop receives its size. It lets pointer events
+   * through, so wrap interactive content in an element with `pointer-events: auto`.
+   */
+  worldLayer?: (canvas: { width: number; height: number }) => ReactNode;
 }
 
 export interface PixiMapAnchor {
@@ -191,6 +197,7 @@ export function PixiWorldMap({
   recenterSignal = 0,
   effects,
   stageColor = '#0b1a24',
+  worldLayer,
   cloudShadowOpacity,
   cloudShadowOffset = { x: 0, y: 0 },
   cloudSpeed = 1,
@@ -203,6 +210,7 @@ export function PixiWorldMap({
   const hostRef = useRef<HTMLDivElement>(null);
   const refitRef = useRef<(() => void) | null>(null);
   const anchorLayerRef = useRef<HTMLDivElement>(null);
+  const worldBoxRef = useRef<HTMLDivElement>(null);
   /** Current camera, readable by the anchor layer between Pixi frames. */
   const camRef = useRef<{ panX: number; panY: number; zoom: number } | null>(null);
   const syncAnchors = useCallback(() => {
@@ -216,6 +224,8 @@ export function PixiWorldMap({
       const sy = (Number(child.dataset.worldY) - cam.panY) * cam.zoom;
       child.style.transform = `translate3d(${sx}px, ${sy}px, 0) translate(-50%, -50%)`;
     }
+    const box = worldBoxRef.current;
+    if (box) box.style.transform = `translate3d(${-cam.panX * cam.zoom}px, ${-cam.panY * cam.zoom}px, 0) scale(${cam.zoom})`;
   }, []);
   const [error, setError] = useState<string | null>(null);
   const fx = { ...ALL_EFFECTS, ...effects };
@@ -662,6 +672,17 @@ export function PixiWorldMap({
           </div>
         ))}
       </div>
+      {worldLayer && manifest && (
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+          <div
+            ref={worldBoxRef}
+            data-testid="pixi-world-layer"
+            style={{ position: 'absolute', left: 0, top: 0, width: manifest.coordinateSystem.canvas.width, height: manifest.coordinateSystem.canvas.height, transformOrigin: '0 0', pointerEvents: 'none' }}
+          >
+            {worldLayer(manifest.coordinateSystem.canvas)}
+          </div>
+        </div>
+      )}
       {error && <p style={{ position: 'absolute', top: 8, left: 8, color: '#f87171' }}>{error}</p>}
     </div>
   );
