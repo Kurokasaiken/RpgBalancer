@@ -17,6 +17,7 @@ import {
   useHealing,
   type QuestRunState,
 } from '@/ui/idleVillage/questS1Lab/questRun';
+import { analyzeCheck } from '@/ui/idleVillage/questS1Lab/questSimulation';
 
 /** Drive a run forward picking the option whose id contains `match`. */
 function pick(state: QuestRunState, match: string): QuestRunState {
@@ -258,5 +259,33 @@ describe('consumable scope & preview parity (R-097 v2)', () => {
     run.flags.push('hasBonusForza');
     run = applyChoice(run, 'gob-via-assalto', { useConsumable: false });
     expect(run.flags).toContain('hasBonusForza');
+  });
+});
+
+describe('upfrontDamage toll preview (R-097 UI honesty)', () => {
+  it('the F5 toll is surfaced: authored values, modal target, noHarm = 0', () => {
+    const run = createRun('gob-band', 1, 'goblin');
+    run.nodeId = 'gob-incalzare';
+    const checkNode = nodesFor(run)['gob-incalza-check'];
+    const a = analyzeCheck(run, checkNode, { useConsumable: false });
+    expect(a.toll).toBeDefined();
+    expect(a.toll?.amount).toBe(10);
+    expect(a.toll?.epicfailAmount).toBe(20);
+    // Kran (slot 4, weight 80) is the modal positional target at full party.
+    expect(a.toll?.targetName).toBe('Kran');
+    // A guaranteed hit must not read «noHarm 100%».
+    expect(a.noHarmPct).toBe(0);
+    expect(a.anyWoundPct).toBeGreaterThan(0);
+  });
+
+  it('a member below the toll dies for sure — folded into their death odds', () => {
+    const run = createRun('gob-band', 1, 'goblin');
+    run.nodeId = 'gob-incalzare';
+    const checkNode = nodesFor(run)['gob-incalza-check'];
+    const kran = run.party.find((m) => m.name === 'Kran')!;
+    kran.hp = 8; // below the 10 toll → dies whenever the toll lands on him
+    const a = analyzeCheck(run, checkNode, { useConsumable: false });
+    const kranOdds = a.perMember.find((m) => m.name === 'Kran')!;
+    expect(kranOdds.deathPct).toBeGreaterThanOrEqual(80);
   });
 });
