@@ -270,13 +270,33 @@ export function analyzeCheck(
     const pEpic = verdicts.epicfail;
     const epic = node.upfrontDamage.epicfailAmount ?? node.upfrontDamage.amount;
     const w = positionalWeights(alive.length);
+    const amount = node.upfrontDamage.amount;
     const targetIdx = alive.reduce((best, _, i) => (w[i] > (w[best] ?? 0) ? i : best), 0);
     toll = {
-      amount: node.upfrontDamage.amount,
+      amount,
       epicfailAmount: epic,
-      expected: node.upfrontDamage.amount * (1 - pEpic) + epic * pEpic,
+      expected: amount * (1 - pEpic) + epic * pEpic,
       targetName: alive[targetIdx]?.name,
     };
+    /* The toll ALWAYS lands on one positional target: fold it into the
+       per-member odds (independent union with the dice risk) so the
+       consequence rows don't claim «noHarm 100%» next to guaranteed blood.
+       A hit member dies if hp <= amount (every verdict), or hp <= epic on
+       epicfail only; a survivor is wounded by rule. */
+    let pTollDeath = 0;
+    alive.forEach((m, i) => {
+      const wi = w[i] ?? 0;
+      if (wi === 0) return;
+      const dies = m.hp <= amount ? 1 : m.hp <= epic ? pEpic : 0;
+      const acc = perMemberAcc.get(m.id) ?? { dead: 0, wounded: 0 };
+      acc.dead = 1 - (1 - acc.dead) * (1 - wi * dies);
+      acc.wounded = 1 - (1 - acc.wounded) * (1 - wi * (1 - dies));
+      perMemberAcc.set(m.id, acc);
+      pTollDeath += wi * dies;
+    });
+    anyWound = 1 - (1 - anyWound) * pTollDeath;
+    anyDeath = 1 - (1 - anyDeath) * (1 - pTollDeath);
+    noHarm = 0;
   }
 
   const leader = alive.find((m) => m.role === 'leader');
