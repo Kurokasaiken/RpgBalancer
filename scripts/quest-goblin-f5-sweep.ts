@@ -110,19 +110,19 @@ function playArm(seed: number, arm: F5Arm): { st: QuestRunState; a: ArmStats } {
   return { st: s, a };
 }
 
-/* ---- candidates ---- */
+/* ---- candidates (v2 spec: pursue = toll ALWAYS + mild ambush on escape;
+ * flee = no toll + HEAVY ambush. Before = R-097 v1 results, already measured) ---- */
 interface Cfg {
   name: string;
-  miteBonus: number; pursuitFail: number; pursuitEpic: number; pegFlatBonus: number;
-  pegExtraHits: number;
-  fleeSetsMite: boolean; peggioreHidesDrop: boolean;
+  toll: number; epic: number; pegFlatBonus: number; miteBonus: number;
+  fleeFlag: 'agguatoPeggiore' | 'agguatoMite' | null;
+  peggioreHidesDrop: boolean;
 }
 const CANDIDATES: Cfg[] = [
-  { name: 'C0 baseline (current)', miteBonus: 0, pursuitFail: 0, pursuitEpic: 10, pegFlatBonus: 0, pegExtraHits: 0, fleeSetsMite: false, peggioreHidesDrop: false },
-  { name: 'C1 mite works + fail = forced stand', miteBonus: -5, pursuitFail: 0, pursuitEpic: 10, pegFlatBonus: 0, pegExtraHits: 0, fleeSetsMite: true, peggioreHidesDrop: true },
-  { name: 'C2 C1 + blood toll (fail 10 / epic 20)', miteBonus: -5, pursuitFail: 10, pursuitEpic: 20, pegFlatBonus: 0, pegExtraHits: 0, fleeSetsMite: true, peggioreHidesDrop: true },
-  { name: 'C3 C2 + worse ambush flat (+5)', miteBonus: -5, pursuitFail: 10, pursuitEpic: 20, pegFlatBonus: 5, pegExtraHits: 0, fleeSetsMite: true, peggioreHidesDrop: true },
-  { name: 'C4 C2 + forced stand hits x2 (30)', miteBonus: -5, pursuitFail: 10, pursuitEpic: 20, pegFlatBonus: 0, pegExtraHits: 1, fleeSetsMite: true, peggioreHidesDrop: true },
+  { name: 'N1 v2 spec-faithful', toll: 10, epic: 20, pegFlatBonus: 0, miteBonus: -5, fleeFlag: 'agguatoPeggiore', peggioreHidesDrop: false },
+  { name: 'N2 N1 + flee hides bail', toll: 10, epic: 20, pegFlatBonus: 0, miteBonus: -5, fleeFlag: 'agguatoPeggiore', peggioreHidesDrop: true },
+  { name: 'N3 N1 + flee flat +5', toll: 10, epic: 20, pegFlatBonus: 5, miteBonus: -5, fleeFlag: 'agguatoPeggiore', peggioreHidesDrop: false },
+  { name: 'N4 N1 + toll 15', toll: 15, epic: 25, pegFlatBonus: 0, miteBonus: -5, fleeFlag: 'agguatoPeggiore', peggioreHidesDrop: false },
 ];
 
 const mollaOpt = () => GOBLIN_NODES['gob-agguato-scelta'].options?.find((o) => o.id === 'gob-molla-trofeo');
@@ -133,11 +133,10 @@ const pct = (x: number, n: number) => `${((x / n) * 100).toFixed(1)}%`;
 for (const c of CANDIDATES) {
   // apply candidate config
   TUNE.ambushMiteBonus = c.miteBonus;
-  TUNE.pursuitFailDamage = c.pursuitFail;
-  TUNE.pursuitEpicfailDamage = c.pursuitEpic;
+  TUNE.pursuitTollDamage = c.toll;
+  TUNE.pursuitEpicfailDamage = c.epic;
   TUNE.ambushPeggioreFlatBonus = c.pegFlatBonus;
-  TUNE.ambushPeggioreExtraHits = c.pegExtraHits;
-  const fo = fleeOpt()!; if (c.fleeSetsMite) fo.sets = 'agguatoMite'; else delete fo.sets;
+  const fo = fleeOpt()!; if (c.fleeFlag) fo.sets = c.fleeFlag; else delete fo.sets;
   const mo = mollaOpt()!; if (c.peggioreHidesDrop) mo.hiddenIfFlag = 'agguatoPeggiore'; else delete mo.hiddenIfFlag;
 
   console.log(`\n===== ${c.name} =====`);

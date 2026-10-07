@@ -197,14 +197,14 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
       {
         id: 'gob-lascia-fuggire',
         label: 'Lasciarli fuggire',
-        detail: 'Torneranno. Li rivedrete sulla strada di casa.',
+        detail: 'Nessun graffio adesso — ma si riorganizzano. Li rivedrete in forze.',
         next: 'gob-esplora-extra',
-        sets: 'agguatoMite', // R-097: letting them go = the MILD ambush
+        sets: 'agguatoPeggiore', // R-097 v2: letting them go = they regroup → HEAVY ambush at F7
       },
       {
         id: 'gob-insegui',
         label: 'Incalzare',
-        detail: 'Forza. Chiudeteli qui — o vi danno la caccia fino in fondo.',
+        detail: 'Forza. Sangue subito — ma se scappano, tornano a pezzi.',
         next: 'CHECK:gob-incalza-check',
       },
     ],
@@ -217,9 +217,9 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
     stats: ['str'],
     risk: { wound: 0, death: 0 },
     beat: 5,
-    // R-097: pursuit-fail is a commitment, not a free-roll — the ambush is
-    // worsened AND dropping the trophy no longer saves you (forced last stand).
-    failHint: 'Se falliscono, vi hanno visti: l’agguato peggiora e non potrete mollare il trofeo.',
+    // R-097 v2: the toll is the deterministic price of the chase itself —
+    // escaping goblins are bloodied → the ambush is the mild one.
+    failHint: 'La caccia costa sangue comunque. Se scappano, tornano feriti: l’agguato sarà più debole.',
   },
 
   /* F6 — CONTINUA L'ESPLORAZIONE: push-your-luck, damage grows 5→10→15. */
@@ -285,8 +285,6 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
         detail: 'La quest è persa — ma la strada si libera.',
         next: 'gob-fine',
         abandonsObjective: true,
-        // R-097: a failed pursuit removes the bail-out — they SAW you.
-        hiddenIfFlag: 'agguatoPeggiore',
       },
       {
         id: 'gob-ultima-mischia',
