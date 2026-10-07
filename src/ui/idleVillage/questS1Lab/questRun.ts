@@ -204,8 +204,8 @@ export const TUNE = {
   ambushMiteBonus: -5, // F7 last-stand hit modifier when the ambush is mild (let them flee / pursuit «almost»). agguatoMite was dead code until R-097.
   ambushPeggioreFlatBonus: 0, // extra flat ambush damage when pursuit failed (R-097: rejected — toll covers it)
   ambushPeggioreExtraHits: 0, // extra counterattack hits at the last stand when pursuit failed (R-097: rejected — C4 added brutality for marginal effect)
-  pursuitFailDamage: 10, // positional damage taken DURING a failed pursuit (R-097 C2: the fleeing goblins bite on the way out)
-  pursuitEpicfailDamage: 20, // same on epicfail — the chase ends in an ambush-of-the-ambush
+  pursuitTollDamage: 10, // deterministic positional price of pursuing — paid BEFORE the die lands, on every verdict (R-097 v2: pain now vs pain later)
+  pursuitEpicfailDamage: 20, // epicfail pays a heavier toll instead of the base one — the chase ends in an ambush-of-the-ambush
   exploreBaseDamage: 5, // F6: turn N costs 5·N HP, positional target
   exploreLootGold: 8, // gold found per winning F6 turn
   trofeoGold: 50, // trophy → gold conversion on return to town
@@ -1311,7 +1311,12 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.log.push({ kind: 'INFO', text: 'La carica si smorza nel fango. Nessun vantaggio.' });
       }
       return 'gob-combattimento';
-    case 'gob-incalza-check':
+    case 'gob-incalza-check': {
+      // R-097 v2: pursuing costs blood NOW, whatever the die says — that is
+      // the price of trying. If they still escape, they come back bloodied
+      // and scattered: the ambush is MILDER than letting them flee rested.
+      const toll = verdict === 'epicfail' ? TUNE.pursuitEpicfailDamage : TUNE.pursuitTollDamage;
+      if (toll > 0) positionalDamage(state, toll, node.title);
       if (verdict === 'bigwin' || verdict === 'win') {
         state.flags.push('sterminio');
         state.log.push({ kind: 'INFO', text: 'Li raggiungete sul crinale. Non ne resta nessuno.' });
@@ -1319,14 +1324,11 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.flags.push('agguatoMite');
         state.log.push({ kind: 'INFO', text: 'Vi sfuggono per un soffio, feriti e sparsi. Saranno un’ombra sulla via del ritorno.' });
       } else {
-        state.flags.push('agguatoPeggiore');
-        // R-097: a failed pursuit costs blood NOW — the fleeing goblins
-        // turn and bite before vanishing.
-        const toll = verdict === 'epicfail' ? TUNE.pursuitEpicfailDamage : TUNE.pursuitFailDamage;
-        if (toll > 0) positionalDamage(state, toll, node.title);
-        state.log.push({ kind: 'INFO', text: 'Scappano tra le rocce, ridendo. Vi aspetteranno sulla via del ritorno.' });
+        state.flags.push('agguatoMite');
+        state.log.push({ kind: 'INFO', text: 'Scappano tra le rocce, a pezzi. Chi sopravvive non tornerà in forze.' });
       }
       return 'gob-esplora-extra';
+    }
     case 'gob-cerca': {
       state.exploreTurn += 1;
       const dmg = TUNE.exploreBaseDamage * state.exploreTurn;
