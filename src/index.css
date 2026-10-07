@@ -1,4 +1,4 @@
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=EB+Garamond:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 
   @import "tailwindcss/preflight";
   @import "tailwindcss/theme";
@@ -12,6 +12,30 @@
   @import "./ui/styleLab/tokens/hotshots-refined.css";
   /* V8 Skin Architecture — Wanderlust Artifact (Default Skin System) */
   @import "./ui/styleLab/tokens/v8-wanderlust-artifact.css";
+
+/* Self-hosted HUD faces (latin subset, variable weight): no network dependency at runtime. */
+@font-face {
+  font-family: "EB Garamond";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/eb-garamond-latin-wght-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: italic;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/eb-garamond-latin-wght-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cinzel";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("/fonts/cinzel-latin-wght-normal.woff2") format("woff2");
+}
+
 
   @layer base {
     :root {
