@@ -150,3 +150,11 @@ smoke manuale su `/quest-s1-lab` (3 scenari).
   sotto il controfattuale, ricalcolata da `run` a ogni render. Chiavi i18n
   `sim.consumableLater`/`consumableLast` (en/it-IT/pseudo). Spec authored
   aggiornata (F5). Test: +6 in questGoblin.test.ts (14/14).
+- **2026-10-08 — R-097 v2 (Director respec).** Il gradiente F5 è invertito:
+  `gob-lascia-fuggire` → `agguatoPeggiore` (si riorganizzano, mischia a 30);
+  Incalzare paga **sempre** il pedaggio `pursuitTollDamage` (10, epicfail 20)
+  e la fuga post-fail setta `agguatoMite` (mischia a 20). Bailout F7
+  riabilitato su tutte le varianti. Struttura risultante: flee = resa
+  differita (agguato pesante + bailout), pursue = sangue certo ora + 77%
+  pulito + fail→agguato debole. Test consumabili: scope one-check e
+  parity preview↔resolver verificati. 19/19 goblin tests.

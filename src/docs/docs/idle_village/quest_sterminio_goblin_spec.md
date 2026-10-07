@@ -133,37 +133,41 @@ mediamente più Forza che Destrezza):
 
 ### F5 — INCALZARE (scelta) — punto di non ritorno psicologico
 
-I goblin superstiti fuggono. **Lasciarli fuggire non evita il rischio:**
-produce un agguato mite garantito. Incalzare espone il party a un ultimo
-colpo — è ciò che rende la scelta non dominante.
+I goblin superstiti fuggono. La scelta è **dolore ora vs dolore dopo**
+(Director, spec v2 2026-10-08):
+
+- **Lasciarli fuggire** = zero danno immediato, ma si riorganizzano →
+  agguato F7 **pesante** (mischia a 30).
+- **Incalzare** = danno deterministico **sempre** (il prezzo della caccia) +
+  check `FORZA`; se scappano comunque tornano *a pezzi* → agguato F7
+  **mite** (mischia a 20). Se li chiudi → sterminio, ritorno pulito.
 
 | Opzione | Esito |
 |---|---|
-| **Lasciarli fuggire** | agguato **mite** garantito al ritorno (F7) |
-| **Incalzare** | check `FORZA` a bande di esito ↓ |
+| **Lasciarli fuggire** | nessun danno ora → agguato F7 **peggiorato** |
+| **Incalzare** | **−10 HP posizionali sempre** (pedaggio) + check `FORZA` ↓ |
 
 Bande del check `FORZA` (il juice dei tiri: almost e critici contano):
 
 | Esito | Effetto |
 |---|---|
-| `bigwin` | **Sterminio**, ritorno pulito, nessun costo |
-| `win` | **Sterminio**, ritorno pulito |
-| `almost` | **è un fallimento** (Director): i goblin fuggono → agguato F7 **mite** |
-| `fail` | i goblin mordono mentre scappano: **−10 HP posizionali ora** + agguato F7 **peggiorato** + **mischia obbligata** (niente bailout) |
-| `epicfail` | la caccia finisce in un contro-agguato: **−20 HP posizionali ora** + agguato F7 **peggiorato** + **mischia obbligata** |
+| `bigwin` | toll + **Sterminio**, ritorno pulito |
+| `win` | toll + **Sterminio**, ritorno pulito |
+| `almost` | toll + fuggono feriti → agguato F7 **mite** |
+| `fail` | toll + fuggono a pezzi → agguato F7 **mite** |
+| `epicfail` | toll **−20** + fuggono → agguato F7 **mite** |
 
 - Stat: **Forza** (coerente con la quest Forza-based).
-- La decisione reale non è «successo sì/no» ma: *nelle condizioni in cui sono
-  arrivato qui, voglio esporre ancora il party?*
+- Flee resta razionale quando il pedaggio ucciderebbe subito il membro in
+  coda (toll posizionale concentrato vs flat ambush spalmato) o quando il
+  FOR residuo è debole e si prevede comunque di mollare il trofeo.
+- La mischia F7 resta una scelta di valuta su entrambe le vie (bailout
+  sempre disponibile).
 
-**Calibrazione R-097 (MC 10k×2 bracci):** prima di questo fix «Incalzare» era un
-free-roll (win = sterminio+no agguato, fail = lo stesso agguato di default).
-Ora il fail **toglie l'assicurazione**: `agguatoPeggiore` nasconde «Lasciare il
-trofeo» a F7 — chi insegue e fallisce *deve* combattere l'ultima mischia a
-danno maggiorato (30 vs 25, mite 20). Flee = costo certo moderato con agency
-preservata; Pursue = 77% esci pulito / 23% sei commesso al peggio. Pursue resta
-EV-favorito col party sano (corretto: l'aggressività deve pagare) ma ha una
-coda letale quando il party è rotto.
+**Calibrazione R-097 (MC 10k×2 bracci):** v1 (flee=mite, fail=peggiore+
+bailout negato) è stata sostituita dalla struttura v2 sopra — la spec del
+Director inverte il gradiente: flee = agguato pesante rinviato, pursue-fail
+= agguato mite. Sweep: `scripts/quest-goblin-f5-sweep.ts` (N1 scelto).
 
 ### F6 — CONTINUA L'ESPLORAZIONE (opzionale, post-obiettivo)
 
@@ -175,7 +179,8 @@ coda letale quando il party è rotto.
 ### F7 — RITORNO / AGGUATO
 
 - **Se F5 riuscita (sterminio):** ritorno pulito.
-- **Se F5 fallita:** i goblin superstiti fanno un **agguato sulla strada**:
+- **Altrimenti:** i goblin superstiti fanno un **agguato sulla strada** —
+  pesante se lasciati fuggire, mite se inseguiti (spec v2):
   **all'ingresso tutto il party prende 5 danni secchi** (bilanciabile dopo),
   poi scelta:
   1. **Lasciare il trofeo dei goblin** → si perde la quest (niente reward:
@@ -327,9 +332,9 @@ Le bande di esito sono quelle del lab: `epicfail` · `fail` · `almost` ·
 ora) · nessun vincolo min/max party (mock: 4 slot) · escalation piatta dopo
 T3 con valori placeholder · consumabili solo prima di check/scelta · F4 =
 1 colpo a T1–T2, 2 colpi da T3 a bersagli diversi · F1-PERCEZIONE → bonus
-Stealth F3 · F3 semplificato (stesso bonus, rischio diverso) · F5 a bande:
-`almost` = fallimento (agguato mite), `fail` = agguato peggiorato,
-`epicfail` = danni + agguato peggiorato · F6/F7 = greed trap voluta ·
+Stealth F3 · F3 semplificato (stesso bonus, rischio diverso) · F5 a bande
+(**v2 2026-10-08**: pedaggio deterministico sempre, fuga → agguato mite;
+lasciar fuggire → agguato peggiorato) · F6/F7 = greed trap voluta ·
 HP: eroe 100 / altri 60 (mock, ereditati dalle stat reali) · F7 = turno
 secco F4-like + 5 danni secchi a tutti · F1 = solo 2 check.
 
