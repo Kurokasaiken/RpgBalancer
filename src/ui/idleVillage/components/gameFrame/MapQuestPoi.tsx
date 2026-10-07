@@ -2,7 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { useDndContext, useDroppable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import PoiMatericV3_5, { poiMatericV3_5Styles } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
-import type { PoiState } from '@/ui/idleVillage/components/poi/PoiMarker';
+import type { PoiState, PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
 import type { QuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import type { QuestAvailability } from './questAvailability';
 
@@ -11,6 +11,8 @@ export interface MapQuestPoiProps {
   sizePx: number;
   /** Deadline of the open opportunity on the game clock; omit for a marker with no deadline. */
   availability?: QuestAvailability;
+  /** Marker family (palette of the medallion): quest, job or event. Defaults to quest. */
+  poiType?: PoiType;
 }
 
 /** Selector `useQuestPoiSession` flies a dropped resident to while the detail is closed. */
@@ -128,7 +130,7 @@ function LiquidHalo({
   );
 }
 
-export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, availability }) => {
+export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, availability, poiType = 'quest' }) => {
   const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId } = session;
   const { t } = useTranslation('idleVillage');
   const { setNodeRef } = useDroppable({
@@ -192,7 +194,7 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
           <LiquidHalo target={elapsed} running={running} warn={deadline.state !== 'available'} ringPx={ringPx} ringR={ringR} offset={RING_GAP_PX} />
         )}
         <PoiMatericV3_5
-          type="quest"
+          type={poiType}
           state={state}
           progress={progress}
           timerDirection="clockwise"
