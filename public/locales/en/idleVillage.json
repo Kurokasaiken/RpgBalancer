@@ -908,6 +908,37 @@
     },
     "questPoi": {
       "open": "{name} — open the quest"
+    },
+    "director": {
+      "title": "Director",
+      "move": "Move",
+      "reset": "Reset scene",
+      "invasion": "Goblin invasion",
+      "quest": "Show quest",
+      "skin": "Skin: {name}"
+    },
+    "roster": {
+      "title": "Roster",
+      "ariaLabel": "Resident roster",
+      "ariaLabelNight": "Resident roster, night phase: dragging disabled",
+      "show": "Show roster",
+      "hide": "Hide roster",
+      "filter": {
+        "ariaLabel": "Filter residents by status",
+        "all": "All",
+        "heroes": "Heroes",
+        "injured": "Injured",
+        "available": "Available",
+        "exhausted": "Exhausted",
+        "away": "Away",
+        "dead": "Fallen"
+      },
+      "sort": {
+        "ariaLabel": "Sort residents by stat",
+        "placeholder": "Sort by…",
+        "asc": "Ascending",
+        "desc": "Descending"
+      }
     }
   },
   "missionPlanner": {
@@ -1110,6 +1141,8 @@
       "whyIntel": "{label} (+{bonus})",
       "whyConsumable": "{label} armed (+{bonus})",
       "whyAlarm": "the camp is awake — checks are harder",
+      "consumableLater": "if spent: gone for later checks — {list}",
+      "consumableLast": "no later check uses it — spending is free",
       "whyWounded": "{names} already wounded (+risk)",
       "whyCover": "{name} intercepts the blows",
       "consequence": {

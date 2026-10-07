@@ -919,6 +919,37 @@
     },
     "questPoi": {
       "open": "{name} — apri la quest"
+    },
+    "director": {
+      "title": "Regia",
+      "move": "Sposta",
+      "reset": "Reset scena",
+      "invasion": "Invasione goblin",
+      "quest": "Mostra quest",
+      "skin": "Skin: {name}"
+    },
+    "roster": {
+      "title": "Roster",
+      "ariaLabel": "Roster dei residenti",
+      "ariaLabelNight": "Roster dei residenti, fase notturna: trascinamento disattivato",
+      "show": "Mostra roster",
+      "hide": "Nascondi roster",
+      "filter": {
+        "ariaLabel": "Filtra i residenti per stato",
+        "all": "Tutti",
+        "heroes": "Eroi",
+        "injured": "Feriti",
+        "available": "Disponibili",
+        "exhausted": "Esausti",
+        "away": "Impegnati",
+        "dead": "Caduti"
+      },
+      "sort": {
+        "ariaLabel": "Ordina i residenti per statistica",
+        "placeholder": "Ordina per…",
+        "asc": "Crescente",
+        "desc": "Decrescente"
+      }
     }
   },
   "missionPlanner": {
@@ -1131,6 +1162,8 @@
       "whyIntel": "{label} (+{bonus})",
       "whyConsumable": "{label} pronto (+{bonus})",
       "whyAlarm": "il campo è sveglio — i check sono più duri",
+      "consumableLater": "se la usi qui, non l'avrai per: {list}",
+      "consumableLast": "nessun check futuro la usa — spenderla è gratis",
       "whyWounded": "{names} già ferito (+rischio)",
       "whyCover": "{name} intercetta i colpi",
       "consequence": {
