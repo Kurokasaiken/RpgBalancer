@@ -293,12 +293,84 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--wl-separator': 'rgba(216,177,62,0.2)',
   '--wl-status-met': '#7bc96f',
   '--wl-status-unmet': '#d98a4a',
+
+  /* ── HUD plaque material ("Lacquer Atlas") ─────────────────────────────
+   * Sea-teal lacquer in shadow, edged by worn NMM bronze, with an opaque seat
+   * line that draws the border wherever the bronze blends into the map. Read
+   * only by `HudPlaque`; the construction lives there, the values live here. */
+  '--skin-hud-lacquer-lift': '#0f2a35',
+  '--skin-hud-lacquer-base': '#09202a',
+  '--skin-hud-lacquer-deep': '#060f16',
+  '--skin-hud-lacquer-alpha': '0.9',
+  '--skin-hud-seat': '#0b0a08',
+  '--skin-hud-step': 'rgba(3,3,3,0.8)',
+  '--skin-hud-highlight': '#fff0cd',
+  '--skin-hud-highlight-alpha': '0.12',
+  '--skin-hud-grain-alpha': '0.06',
+  '--skin-hud-shadow-filter':
+    'drop-shadow(0 3px 5px rgba(3,26,30,0.55)) drop-shadow(0 10px 24px rgba(3,26,30,0.30))',
+  '--skin-hud-brass-crest': '#d8bd78',
+  '--skin-hud-brass-hi': '#cfaf63',
+  '--skin-hud-brass-mid': '#c2a355',
+  '--skin-hud-brass-low': '#a0762f',
+  '--skin-hud-brass-base': '#5f3f16',
+  '--skin-hud-brass-foot': '#71501f',
+  '--skin-hud-parchment': '#e8d6ae',
+  '--skin-hud-parchment-ink': '#3a2a18',
 };
 
 /* ── Per-preset overrides (inherit from base, override selectively) ────── */
 
 const SKIN_CSS_VAR_OVERRIDES: Partial<Record<SkinPresetId, Partial<SkinCssVarMap>>> = {
   base: {},
+  // Global default. Overrides only what differs from the obsidian base: teal lacquer surfaces,
+  // opaque bronze edges (alpha gold over teal blends to khaki), parchment text, teal HudPlaque lacquer.
+  lacquer_atlas: {
+    '--skin-surface-base': '#0f2627',
+    '--skin-surface-bg': 'radial-gradient(circle at 0% 0%, rgba(127,224,220,0.14) 0%, transparent 55%), #0f2627',
+    '--skin-surface-border': 'rgba(194,163,85,0.70)',
+    '--skin-glow-accent': 'rgba(127,224,220,0.25)',
+    '--skin-glow-primary': 'rgba(216,189,120,0.20)',
+    '--skin-title-color': '#e8cf8e',
+    '--skin-subtitle-color': '#d8bd78',
+    '--skin-body-color': 'rgba(239,228,200,0.92)',
+    '--skin-text-primary': '#efe4c8',
+    '--skin-text-secondary': 'rgba(239,228,200,0.72)',
+    '--skin-text-muted': 'rgba(239,228,200,0.55)',
+    '--skin-label-primary': '#d8bd78',
+    '--skin-label-tertiary': '#a8c0ba',
+    '--skin-separator': 'rgba(194,163,85,0.28)',
+    '--skin-inset-bg': '#0b1f20',
+    '--skin-inset-border': 'rgba(194,163,85,0.50)',
+    '--skin-footer-bg': 'rgba(1,10,12,0.30)',
+    '--skin-footer-border': '1px solid rgba(194,163,85,0.25)',
+    '--skin-icon-color': '#d8bd78',
+    '--skin-icon-accent': '#7fe0dc',
+    '--skin-badge-bg': 'rgba(127,224,220,0.12)',
+    '--skin-badge-border': '1px solid rgba(127,224,220,0.40)',
+    '--skin-badge-color': '#7fe0dc',
+    '--skin-plaque-bg': 'rgba(15,38,39,0.60)',
+    '--skin-plaque-border': '1.5px solid rgba(194,163,85,0.80)',
+    '--skin-plaque-color': '#e8cf8e',
+    '--skin-titlesep-line': 'linear-gradient(90deg, transparent, rgba(194,163,85,0.55), transparent)',
+    '--skin-titlesep-diamond-color': 'rgba(216,189,120,0.90)',
+    '--skin-statbar-track': 'linear-gradient(180deg, #0a1a1b, #050f10)',
+    '--skin-statbar-track-border': 'rgba(194,163,85,0.14)',
+    '--wl-label-primary': '#d8bd78',
+    '--wl-label-tertiary': '#a8c0ba',
+    '--wl-text-title': '#efe4c8',
+    '--wl-text-body': 'rgba(239,228,200,0.92)',
+    '--wl-text-accent': '#e8cf8e',
+    '--wl-separator': 'rgba(194,163,85,0.28)',
+    // HudPlaque material: sea-teal lacquer in shadow, opaque seat line.
+    '--skin-hud-lacquer-lift': '#24484b',
+    '--skin-hud-lacquer-base': '#173436',
+    '--skin-hud-lacquer-deep': '#0f2627',
+    '--skin-hud-lacquer-alpha': '0.94',
+    '--skin-hud-seat': '#0b0a08',
+    // Legacy HUD silhouettes (HudPanel/HudRibbon) read this tint for their lacquer.
+    '--hud-lacquer-tint': '#1d4a4d',
+  },
   // Example of inheritance: another preset only overrides what differs.
   wanderlust: {
     '--skin-surface-base': '#0a0402',

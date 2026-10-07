@@ -48,6 +48,8 @@ export interface HudRibbonProps {
 const LACQUER = 'color-mix(in srgb, var(--skin-surface-base, #060f16) 62%, var(--hud-lacquer-tint, #0f4a52))';
 const RIBBON_FILL = `linear-gradient(180deg, color-mix(in srgb, ${LACQUER} 80%, black) 0%, ${LACQUER} 100%)`;
 const RIBBON_FILL_INVERTED = `linear-gradient(0deg, color-mix(in srgb, ${LACQUER} 80%, black) 0%, ${LACQUER} 100%)`;
+/** Deep-teal contact + ambient shadow (bible §2: shadows are never grey or brown). */
+const SHADOW = 'drop-shadow(0 3px 5px rgba(3,26,30,0.55)) drop-shadow(0 10px 22px rgba(3,26,30,0.3))';
 /** Gold filigree line drawn this many px inside the ribbon's silhouette. */
 const FILIGREE_INSET_PX = 4;
 
@@ -72,24 +74,25 @@ export const HudRibbon: React.FC<HudRibbonProps> = ({
   const isTop = anchor === 'top';
   const clipPath = ribbonPolygon(isTop, cutPx);
   const fill = isTop ? RIBBON_FILL : RIBBON_FILL_INVERTED;
-  const boxShadow = bevel
-    ? '0 8px 22px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -3px 5px rgba(0,0,0,0.5)'
-    : '0 6px 18px rgba(0,0,0,0.45)';
+  const bevelShadow = bevel ? 'inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -3px 5px rgba(0,0,0,0.5)' : undefined;
 
   return (
     <div
       className={className}
       style={{
         position: 'relative',
+        // Own stacking context for the z-index:-1 layers below; the root itself is NOT clipped.
+        isolation: 'isolate',
         display: 'flex',
         alignItems: 'center',
         padding: isTop ? '7px 26px 9px' : '9px 26px 7px',
-        clipPath,
-        background: fill,
-        boxShadow,
         ...style,
       }}
     >
+      {/* clip-path and box-shadow/filter on one node cancel the shadow: it lives on an unclipped wrapper around the clipped silhouette. */}
+      <span aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, pointerEvents: 'none', filter: SHADOW }}>
+        <span style={{ position: 'absolute', inset: 0, clipPath, background: fill, boxShadow: bevelShadow }} />
+      </span>
       <span
         aria-hidden="true"
         style={{

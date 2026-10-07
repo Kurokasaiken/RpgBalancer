@@ -140,7 +140,7 @@ const MinimalUITokensSchema = z.object({
 
 const MinimalUIWarningThresholdsSchema = z.object({
   fatigueDangerPercent: z.number().min(0).max(100).default(70),
-  foodDangerDays: z.number().min(0).default(1),
+  foodDangerDays: z.number().min(0).default(2),
   injuryBadgeCopy: z.string().default('Ferito'),
 });
 
@@ -560,7 +560,7 @@ export const DEFAULT_MINIMAL_CONFIG: MinimalConfig = {
     },
     warningThresholds: {
       fatigueDangerPercent: 70,
-      foodDangerDays: 1,
+      foodDangerDays: 2,
       injuryBadgeCopy: 'Ferito',
     },
     warningCopy: {

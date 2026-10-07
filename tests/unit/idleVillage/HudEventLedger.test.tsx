@@ -49,13 +49,19 @@ describe('HudEventLedger', () => {
     );
   });
 
-  it('shows only the most pressing row when collapsed, all rows when expanded', async () => {
+  it('shows the three most pressing rows when collapsed, all rows when expanded', async () => {
     render(<HudEventLedger events={EVENTS} />);
-    expect(rowTitles()).toEqual(['Granary']);
+    expect(rowTitles()).toEqual(['Granary', 'Wolves', 'Invasion']);
     await userEvent.click(screen.getByRole('button', { name: 'gameFrame.events.showMore:4' }));
     expect(screen.getAllByRole('listitem')).toHaveLength(4);
     await userEvent.click(screen.getByRole('button', { name: 'gameFrame.events.showLess' }));
-    expect(rowTitles()).toEqual(['Granary']);
+    expect(rowTitles()).toEqual(['Granary', 'Wolves', 'Invasion']);
+  });
+
+  it('keeps a pinned threat in view even when a sooner event would take its place', () => {
+    const ONE_ROW = { ...DEFAULT_GAME_FRAME_CONFIG.eventLedger, maxVisibleRows: 1 };
+    render(<HudEventLedger events={EVENTS} config={ONE_ROW} />);
+    expect(rowTitles()).toEqual(['Wolves']);
   });
 
   it('says "today" for events due now and shows an empty state', () => {

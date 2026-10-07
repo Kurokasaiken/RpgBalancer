@@ -1,6 +1,7 @@
 import React from 'react';
 import { MatericField, MatericFieldGroup } from '@/ui/designSystem/primitives';
 import { HUD_TONE_COLOR, type HudTone } from './hudTones';
+import { useCompactTop } from './useCompactTop';
 
 export interface ResourceReadoutItem {
   id: string;
@@ -31,7 +32,9 @@ export interface ResourceReadoutProps {
  *
  * `icon` is expected to already be a self-labelling node (e.g. `HudGlyph`).
  */
-export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items }) => (
+export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items }) => {
+  const compact = useCompactTop();
+  return (
   <MatericFieldGroup layout="columns" density="compact" separators>
     {items.map((item) => {
       const description = item.description ?? `${item.label}: ${item.value}`;
@@ -49,12 +52,12 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items }) => (
                     <span style={{ fontSize: '0.62em', opacity: 0.55, marginLeft: 2 }}>/{item.max}</span>
                   )}
                 </span>
-                {item.detail && (
+                {item.detail && !compact && (
                   <span
                     aria-hidden="true"
                     style={{
                       fontFamily: 'var(--skin-font-body, inherit)',
-                      fontSize: 10,
+                      fontSize: 12,
                       fontWeight: 500,
                       letterSpacing: '0.04em',
                       whiteSpace: 'nowrap',
@@ -74,6 +77,7 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items }) => (
       );
     })}
   </MatericFieldGroup>
-);
+  );
+};
 
 export default ResourceReadout;

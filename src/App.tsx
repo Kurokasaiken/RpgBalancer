@@ -12,11 +12,12 @@ import {
 } from '@/shared/navigation/navConfig';
 import { applyPerfTier } from './ui/idleVillage/skins/perfTier';
 import { applySkinCssVariables } from './ui/idleVillage/skins/skinCssVariables';
+import { resolveInitialSkinPresetId } from './ui/idleVillage/skins/resolveInitialSkin';
 
 // Detect device capability → data-perf-tier on <html> gates parallax/WebGL.
 applyPerfTier();
-// Apply V9 Obsidian skin tokens globally so --skin-* vars exist from boot.
-applySkinCssVariables('base');
+// Apply the default skin's tokens globally so --skin-* vars exist from boot.
+applySkinCssVariables(resolveInitialSkinPresetId());
 const MinimalGameplayPage = lazy(() => import('./ui/idleVillage/MinimalGameplayPage'));
 const GameplayTestPage = lazy(() => import('./ui/idleVillage/components/GameplayTestPage'));
 const GameplayTestSimple = lazy(() => import('./ui/idleVillage/components/GameplayTestSimple'));
