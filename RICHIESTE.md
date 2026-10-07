@@ -1924,6 +1924,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - **Direzione B:** `QuestTheatre` come componente nuovo — stage renderer (narrative/choice/check/consequence/reward) che *ospita* i contenuti esistenti (`QuestChronicle`, skill check, `QuestRewardPanel`, kit, log); container = `FloatingPanel` (v4: spostabile, riducibile a icona, non bloccante) con **modalità expanded** opzionale.
 - **Modello runtime:** la quest è una storia a nodi che **aspetta ai bivi** — scelte e skill check non si auto-risolvono mai. Solo il tempo scorre: i gate temporali (viaggi, durate) maturano in background, quindi quando il giocatore apre il teatro è fermo alla prima fase pendente senza dover attendere.
 - **Scartati dalla proposta ChatGPT:** stato narrativo (`IN DANGER`/`RETURNING`) e livello di pericolo implicito — *"nn mi interessa"*.
+- **Revisione Director 2026-10-07:** lo scarto NON è definitivo — *"questo potrebbe essere interessante, ma dobbiamo esaminarlo meglio, nn escludiamolo a priori"*. Nota di analisi: come *etichetta UI* era rumore di presentazione; come **stato** potrebbe alimentare scheduler/eligibilità (`party.in_danger` → quest di recupero/salvataggio elegibili, chain emergenti — pertinente a OPEN-014/P55). Da riesaminare in sede S5/QuestTheatre.
 - Dalla proposta restano candidate: timeline narrativa (traccia dei nodi, non %), futuro sconosciuto nascosto (nemmeno `?`), party strip, decision panel, expedition kit drawer, chronicle/log, retreat con anteprima conseguenze, art cinematografica, header obiettivo.
 **Collegamenti:** share ChatGPT `6ac5017a`; desiderata v3/v4 (pannelli flottanti, quest POI), v24 (modello S1, S4 integrazione), QUEST_RULES.md; `useQuestPoiSession.tsx`, `QuestChronicle`, `FloatingPanel`, `QuestS1LabPage` (reference sperimentale).
 **Note di provenienza:** la proposta origina da una conversazione ChatGPT del Director; lo stato narrativo/pericolo implicito era la parte scartata. Il container FloatingPanel è già canone (v4): il teatro cambia contenuto e scala del pannello, non il container.
@@ -1944,6 +1945,71 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"prendi il cappello corretto, fa un prompt adeguato x una ricerca online approfondita su come ottenere questo tipo d cose, i principi psicologici, e quasliasi altra cosa che ci serve per questo tipo di lavoro, sotto diversi ambiti, punti di vista, ecc. questa ricerca falla tu e chiedila anche a tutte le AI web. poi dammi un riassunto breve e scrivi nella documentazione adeguata i principi che c serovno"*
 **Data:** 2026-10-06
-**Stato:** `in corso`
+**Stato:** `fatta`
 **Contesto:** discussione strategist sulle strategie per arrivare a un quest system con narrativa emergente (chain quest, quest condizionate da requisiti, branching delle fasi sugli esiti) — piano S5 di PLAN-019, proposta E-28/OPEN-014.
 **Hat:** `game_director`. **Metodo:** ricerca web dell'agente + broadcast a tutti i provider web (chatgpt, claude, gemini, grok, deepseek) → sintesi → principi in `context/QUEST_GAMEPLAY_SCIENCE.md` / `NARRATIVE.md`.
+**Esito:** prompt in `.mw/runs/20261006-emergent-narrative-research/prompt.md`; broadcast completato — chatgpt, grok, deepseek utili; claude fallito (risposta non stabilizzata), gemini soft-rifiuto. 16 principi nuovi integrati come **P48–P63** in `QUEST_GAMEPLAY_SCIENCE.md` (con source bank dedicata + provider audit batch 4); distillato del meccanismo in `NARRATIVE.md` §3 (status `research`, non ratificato); riga evidence in `context/INDEX.md`. Conclusione chiave: il "quest generator" deve generare **condizioni narrative** (eventi authored + stato + memoria + scheduling → prossimo evento rilevante), non storie — la memoria ancorata ai personaggi è il componente a più alto ROI e costa meno.
+
+---
+
+## R-091 — Ingestione share link ChatGPT «Sistema di quest cross direct»
+
+**Richiesta:** *"https://chatgpt.com/share/6ac53990-6910-83eb-802b-8c15da855ef4 — dobbiamo integrare questa conversazione a quello che già abbiamo"*
+**Data:** 2026-10-06
+**Stato:** `fatta`
+**Metodo:** skill knowledge-extractor; share page JS-rendered → transcript acquisito via render Puppeteer (archiviato in `.mw/runs/20261006-quest-cross-direct/transcript.md`).
+**Esito:** lo share espone solo la coda della conversazione (voice mode); il Director ha incollato a mano la porzione precedente con i suoi interventi. Ledger E-01..E-08 in `context/ingestions/2026-10-06-quest-cross-direct.md`: grammatica di 6 primitive dei beat, separazione struttura/flavor, generatore a vincoli in 3 passi (intenzione → catena causale → render); dal Director: premessa LoW+X-Com «carta-flavor», requisito volume/centinaia di ore con varietà *percepita*, e proposta flavor-via-tag con tag adiacenti. Integrato in `NARRATIVE.md` §4 (orbita OPEN-014) e `context/INDEX.md`. Nessuna ratifica formale — intent Director da portare in desiderata se confermato.
+
+---
+
+## R-092 — Conseguenze per ogni quest, anche se non risolta
+
+**Richiesta (verbatim):** *"Una cosa importante: tutte le quest devono avere conseguenze sia se vengono risolte, che come vengono risolte, che se nn vengono risolte."*
+**Data:** 2026-10-07
+**Stato:** `da chiarire`
+**Desiderata FROZEN pertinente:** `.mw/desiderata.md` v24 (conseguenze nella quest S1, persistenza reale in S2 e integrazione in S4); il caso delle quest non risolte e l'obbligo universale di conseguenze non vi sono ancora specificati.
+**Cosa manca:** precisare cosa conta come «non risolta» e quale evento ne fa scattare le conseguenze; nessun tipo, intensità o segno della conseguenza è stato ancora scelto. Nessuna implementazione autorizzata da questa sola annotazione.
+
+---
+
+## R-093 — Acquisire e discutere «Registro narrativo del mondo»
+
+**Richiesta (verbatim):** *"acquisiscilla nella documentazione del progetto, è tutta roba molto promettente e poi parliamone"* (in risposta allo share «Registro narrativo del mondo»).
+**Data:** 2026-10-07
+**Stato:** `in corso` — acquisizione documentale effettuata; discussione e decisioni di design ancora aperte.
+**Fonte:** https://chatgpt.com/share/6ac63cac-f084-83ed-8694-f80bc084e094
+**Report:** `context/ingestions/2026-10-07-registro-narrativo-del-mondo.md` (ledger E-01..E-18); proposte collocate in `NARRATIVE.md` §4; OPEN-016.
+**Autorità:** l'interesse del Director per il tema non approva il macro-piano scritto da ChatGPT alla fine della conversazione. `.mw/desiderata.md` v24 e PLAN-019 continuano a governare la sequenza S1–S5 finché non viene scelta un'eventuale revisione.
+
+---
+
+## R-094 — Dottrina del rischio delle quest: «riesci sempre, varia quanto paghi»
+
+**Richiesta (verbatim):** *"direi ibrido, questa struttura della risoluzione della quest è tipo 'riesci sempre, varia quanto paghi'."*
+**Data:** 2026-10-07
+**Stato:** `proposta` — direzione emersa in esplorazione (run `.mw/runs/20261007-quest-attrition-design/`), da ratificare in desiderata se confermata.
+**Contesto:** MC 80k run sulla quest goblin S1 → reward ~99.7%, wipe 0%, morti concentrate sul bodyguard (36%). Tre muri strutturali rendono il fallimento irraggiungibile: leader a peso 0% nel profilo posizionale con ≥3 vivi, trofeo in-perdibile dopo F4 (F7 win/fail → `gob-fine` comunque), check a rischio zero.
+**Scelta del Director:** asse ibrido — la quest quasi sempre si *chiude*, ciò che varia è il **costo** (carne, consumabili, reward ridotto) e il **grado** di successo. Conseguenza: i lever candidati non sono "fare fallire la quest" ma "graduare quanto paghi" — es. F7 molla-trofeo = paghi in reward invece che in sangue; attrition come prezzo delle scelte rischiose (modello B), non tassa sul tempo.
+**Collegamenti:** R-092 (conseguenze per ogni esito), spec `quest_sterminio_goblin_spec.md`, PLAN-022; dati MC in `test-results/r089-quest-goblin-lab-polish-2026-10-06.log`.
+
+**Precisazioni Director (stesso turno):**
+1. *"nn tutte le quest saranno così, devi dire che può succedere"* — la dottrina «riesci sempre, varia quanto paghi» è **una** struttura di rischio possibile, non universale: il fallimento della quest **deve poter succedere** nel design space (altre quest potranno fallire davvero).
+2. *"no trofeo graduato, F7 come scelta di valuta.. nn è già così?"* — respinto il trofeo a valore scalare; su F7 il Director osserva che la scelta «paga in reward vs paga in sangue» è già presente (verificato: meccanicamente corretto, vedi discussione).
+
+---
+
+## R-095 — Mappa dettagliata delle meccaniche narrative
+
+**Richiesta (verbatim):** *"Va bene C, ma deve essere molto dettagliata, spiegando cosa influenza cosa, il xè, ecc."* e *"penso siano tutte meccaniche importanti ed interessanti"*.
+**Data:** 2026-10-07
+**Stato:** `in corso` — mappa scritta in `NARRATIVE.md` §5; resta mappa d'intenti, ogni meccanica entra nel piano operativo solo al battesimo del suo stadio PLAN-019.
+**Contesto:** alla domanda «plan unico con tutto e poi si approfondisce?» il Director ha scelto l'opzione C: documento unico che elenca tutte le meccaniche (conseguenze, registro mondo, riconoscimento, evoluzione offscreen, composizione, legacy cross-run) con stadio, condizione di ingresso e dipendenze — senza anticipare il design oltre i gate.
+**Decisioni registrate nella stessa discussione:** registro mondo in S2 = fetta minima per *una* quest di riferimento (narrowing OPEN-016); composizione/generazione resta S5.
+
+---
+
+## R-096 — Quest Fun Audit sulla quest goblin S1
+
+**Richiesta (verbatim):** spec incollata dal Director «QUEST FUN AUDIT — S1 GOBLIN QUEST» — estendere l'analisi MC per valutare *qualità del gameplay* (decisioni significative, tensione, risk/reward, strategia di party, conseguenze a cascata, storie emergenti, rigiocabilità), non il bilanciamento. Vincoli espliciti: preservare l'MC esistente, non semplificare l'engine, non ottimizzare/cambiare probabilità, report per sezioni A–I con score 1–10 e verdict WHAT WORKS / WHAT DOESN'T / WHAT TO TEST.
+**Data:** 2026-10-07
+**Stato:** `completato` — tooling `scripts/quest-goblin-fun-audit.ts` (trace per decisione + policy random esplorativa), report `test-results/quest-goblin-fun-audit-report-2026-10-07.md` (score + verdict), dati grezzi `quest-goblin-fun-audit-2026-10-07.md`, evidence `r096-quest-goblin-fun-audit-2026-10-07.log`.

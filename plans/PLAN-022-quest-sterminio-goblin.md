@@ -125,3 +125,15 @@ smoke manuale su `/quest-s1-lab` (3 scenari).
   allarme → 40%. Stessa formula per l'ultima mischia F7 (ora un coin flip
   drammatico). Spec authored aggiornata (riga parametri + sezione F4).
   Verificato live: turno 1 bound 60 con `vantaggioPiccolo`.
+- **2026-10-07 — Fun Audit (R-096).** Tooling `scripts/quest-goblin-fun-audit.ts`:
+  stesso engine reale, 4 policy fisse preservate + policy `random` esplorativa
+  (N=20k) con trace per decisione (snapshot before/after, checkQueue per
+  attribuzione corretta dei verdict). Report designer:
+  `test-results/quest-goblin-fun-audit-report-2026-10-07.md` (sezioni A–I,
+  score + verdict). Findings principali: F5 «Incalzare» strutturalmente
+  dominante (free-roll: win→sterminio+no agguato, fail→stesso agguato di
+  default); F6 razzia = unica sorgente di wipe (escalation danno) e tradeoff
+  gold↔morti vero; F7 = scelta di valuta pulita confermata; timing consumabili
+  con valore futuro reale (save≥1 → reward 63.7% vs always-spend 53.7%);
+  designated victim Kran (44% dei colpi); nessun comeback meccanico
+  (recovery 1.5%). Nessuna modifica all'engine o al bilanciamento.
