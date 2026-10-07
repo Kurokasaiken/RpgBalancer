@@ -42,6 +42,7 @@ import { WanderlustRosterCard } from '@/ui/idleVillage/roster';
 import { DestinyAstrolabeV62Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
 import { PgCardKitShell } from '@/ui/idleVillage/frozen/kits/pgcardKit';
 import { WanderlustAmbientField } from '@/ui/wanderlust-surface/layout';
+import { DEFAULT_QUEST_LAB_PACING } from '@/balancing/config/idleVillage/quests/questLabPacing';
 
 /* Painted Wanderlust assets (art_direction_plan.md — Wilderness pillar). */
 const ART = {
@@ -275,6 +276,66 @@ const CampAlertBadge: React.FC<{ flags: string[] }> = ({ flags }) => {
 /** Random seed for a new run — lab only, called from event handlers. */
 const rollSeed = () => Math.floor(Math.random() * 100000);
 
+/** Mount-triggered fade-in for narrative text — opacity transition only,
+ *  no standalone CSS (skin invariant); remount via `key` restarts it. */
+const FadeIn: React.FC<{ children: React.ReactNode; delayMs?: number }> = ({ children, delayMs = 0 }) => {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <div
+      className="transition-opacity ease-out"
+      style={{
+        opacity: visible ? 1 : 0,
+        transitionDuration: `${DEFAULT_QUEST_LAB_PACING.fadeMs}ms`,
+        transitionDelay: `${delayMs}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+/**
+ * Transition beat between phases — the destination node's `transit` line over
+ * its scene art, holding for `pacing.transitMs`. In the real game this sits
+ * under the party's movement animation; here it IS the animation.
+ * Falls back to the plain «advancing» strip when the node has no transit.
+ */
+const TransitView: React.FC<{
+  transit?: string;
+  art?: { src: string; fit: 'contain' | 'cover' };
+}> = ({ transit, art }) => {
+  const { t } = useTranslation('idleVillage');
+  if (!transit) {
+    return (
+      <div className="flex h-24 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-[11px] uppercase tracking-[0.3em] text-slate-500">
+        {t('questS1Lab.advancing')}
+      </div>
+    );
+  }
+  return (
+    <div className="relative flex h-44 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-slate-950/70">
+      {art && (
+        <img
+          src={art.src}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-40"
+          style={{ objectPosition: '50% 60%' }}
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/70" />
+      <FadeIn>
+        <p className="relative max-w-md px-6 text-center font-serif text-base italic leading-relaxed text-amber-100/90 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+          {transit}
+        </p>
+      </FadeIn>
+    </div>
+  );
+};
+
 const QuestS1LabPage: React.FC = () => {
   const { t } = useTranslation('idleVillage');
   const [seed, setSeed] = useState<number>(rollSeed);
@@ -307,7 +368,11 @@ const QuestS1LabPage: React.FC = () => {
     }
     setCommitOptionId(null);
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
-    transitionTimer.current = setTimeout(() => setShownNodeId(run.nodeId), 900);
+    // A node with a transit line holds the beat long enough to be read —
+    // in the real game this window is the movement animation's duration.
+    const destTransit = nodesFor(run)[run.nodeId]?.transit;
+    const hold = destTransit ? DEFAULT_QUEST_LAB_PACING.transitMs : DEFAULT_QUEST_LAB_PACING.transitionMs;
+    transitionTimer.current = setTimeout(() => setShownNodeId(run.nodeId), hold);
     return () => {
       if (transitionTimer.current) clearTimeout(transitionTimer.current);
     };
@@ -528,7 +593,9 @@ const QuestS1LabPage: React.FC = () => {
   const options = availableOptions(run);
   const hasPotion = run.flags.includes('hasPozione');
   const sceneArt = run ? NODE_ART[shownNodeId ?? run.nodeId] : undefined;
-  const inTransition = !run.ended && shownNodeId !== null && shownNodeId !== run.nodeId;
+  /* Transit also plays on the final hop: the closing line lands BEFORE the
+   *  outcome card, so the epilogue arrives after the world, not instead of it. */
+  const inTransition = shownNodeId !== null && shownNodeId !== run.nodeId;
   const currentBeat = currentNode?.beat ?? 0;
 
   /* ---------------- Run view ---------------- */
@@ -696,7 +763,12 @@ const QuestS1LabPage: React.FC = () => {
               {run.lastEvent}
             </p>
           )}
-          {run.ended ? (
+          {inTransition ? (
+            <TransitView
+              transit={nodesFor(run)[run.nodeId]?.transit}
+              art={NODE_ART[run.nodeId]}
+            />
+          ) : run.ended ? (
             <div className="rounded-2xl border border-amber-400/60 bg-amber-950/30 p-4 text-center">
               <div className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">
                 {run.outcome === 'running' ? '' : t(`questS1Lab.outcome.${run.outcome}`)}
@@ -704,10 +776,6 @@ const QuestS1LabPage: React.FC = () => {
               {/* Epilogue: lastEvent carries the composed cost — deaths by name,
                   crate lost, prisoner saved, loot brought home. */}
               <p className="mt-2 text-sm normal-case tracking-normal text-amber-100/80">{run.lastEvent}</p>
-            </div>
-          ) : inTransition ? (
-            <div className="flex h-24 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-[11px] uppercase tracking-[0.3em] text-slate-500">
-              {t('questS1Lab.advancing')}
             </div>
           ) : (
             <div className="space-y-2">
@@ -909,6 +977,17 @@ const QuestS1LabPage: React.FC = () => {
               {t('questS1Lab.throwCounter', { current: checkIdx + 1, total: checkQueue.length })}
             </div>
           )}
+          {/* Transit line under the spin — the cinematic context of the
+              attempt (what the party is doing while the die is in the air). */}
+          {activeCheck?.transit && !checkResolved && (
+            <div className="pointer-events-none absolute inset-x-0 top-12 z-10 flex justify-center px-6">
+              <FadeIn key={checkQueue[checkIdx].id}>
+                <p className="max-w-xl text-center font-serif text-base italic leading-relaxed text-amber-100/85 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                  {activeCheck.transit}
+                </p>
+              </FadeIn>
+            </div>
+          )}
           <DestinyAstrolabeV62Standalone
             key={checkQueue[checkIdx].id}
             skills={[{ name: activeCheck?.title ?? '', stat: activeCheck?.score ?? 50, difficulty: 50 }]}
@@ -926,10 +1005,19 @@ const QuestS1LabPage: React.FC = () => {
             /* Bottom bar: the verdict's consequence sentence above the
                continue button — the player reads WHAT the outcome did. */
             <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 bg-gradient-to-t from-black via-black/80 to-transparent px-6 pb-6 pt-12">
+              {activeCheck?.flavor && (
+                <FadeIn>
+                  <p className="max-w-2xl text-center font-serif text-lg italic leading-relaxed text-amber-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                    {activeCheck.flavor}
+                  </p>
+                </FadeIn>
+              )}
               {activeCheck?.outcomeText && (
-                <p className="max-w-2xl text-center text-sm italic leading-relaxed text-amber-100/90">
-                  {activeCheck.outcomeText}
-                </p>
+                <FadeIn delayMs={250}>
+                  <p className="max-w-2xl text-center text-sm italic leading-relaxed text-amber-100/70">
+                    {activeCheck.outcomeText}
+                  </p>
+                </FadeIn>
               )}
               <button
                 className="rounded-xl border border-amber-300/60 bg-black/80 px-6 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-200 transition hover:bg-amber-950/60"

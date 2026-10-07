@@ -38,6 +38,13 @@ export const INTEL_LABELS: Record<string, string> = {
   mappaAccampamento: 'la mappa dell’accampamento',
 };
 
+/**
+ * Five-verdict scale, reusing the Astrolabe vocabulary. Declared here (not in
+ * questRun) so authored scenario files can write per-verdict flavor without
+ * importing the run engine — content data stays on the content side.
+ */
+export type Verdict = 'epicfail' | 'fail' | 'almost' | 'win' | 'bigwin';
+
 /** A single authored node of the quest. */
 export interface QuestNode {
   id: string;
@@ -70,6 +77,20 @@ export interface QuestNode {
   next?: string;
   /** Beat index for the progress component (0..QUEST_BEATS-1). */
   beat?: number;
+  /**
+   * Narrative transit line — shown while the party travels *to* this node.
+   * In the lab it fills the transition beat between phases; in the real game
+   * it plays under the movement animation. It tells what the party sees or
+   * does on the way, never the outcome ahead (Director flavor-layer probe,
+   * `context/QUEST_GOBLIN_FLAVOR.md`).
+   */
+  transit?: string;
+  /**
+   * Check/combat nodes: authored flavor per verdict band — what the result
+   * *felt like*, layered over the mechanical consequence text
+   * (`ResolvedCheck.outcomeText` keeps the "what it did" part).
+   */
+  verdictFlavor?: Partial<Record<Verdict, string>>;
 }
 
 /**

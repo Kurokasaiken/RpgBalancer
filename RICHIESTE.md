@@ -2022,6 +2022,14 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 ---
 
+## R-099 — Flavor layer sulla quest goblin nel lab S1
+
+**Richiesta (verbatim):** *"abbiamo la prima quest 'interessante' e la stiamo provando: ma manca di pathos, di narrativa, di feelings, d juice. […] ci serve un po' d testo x contestualizzare. Ad esempio 'arrivate ai margini della foresta' prima dello skill check di percezione, e quello skill check oltre a cosa fa e cosa ottiene dovrebbe avere un nome tipo 'ti arrampichi per vedere in lontananza'. E a seconda della scelta e dell'esito deve esserci una frase di 'flavour' adeguata. Inoltre: tra una fase e l'altra nel gioco reale ci sarà l'animazione di movimento che dura X e magari sarebbe carino fare apparire del testo che spiega cosa sta succedendo nel frattempo: cosa vedi, cosa incontri, ecc. Prova a prendere quella quest, metti i tag, flavour, testo, ecc come se seguisse le regole che abbiamo stabilito"* — poi: *"applica questo flavour a questo componente di prova, cercare di dargli una certa cinematograficità, feelings, pacing, ecc"* (su `/quest-s1-lab`).
+**Data:** 2026-10-08
+**Stato:** `completato` — schema `transit` + `verdictFlavor` su `QuestNode`, `ResolvedCheck.flavor/transit`, pacing da config (`questLabPacing`), flavor pass completo su `questScenarioGoblin.ts`, transizione cinematografica e flavor sotto astrolabio in `QuestS1LabPage`. Spec: `context/QUEST_GOBLIN_FLAVOR.md`. Evidence: `test-results/r099-quest-flavor-layer-2026-10-08.log`. Fix collaterale: `pageCrash.repro.test.tsx` era rotto da R-089 (guidava la card Rovine rimossa dal picker) — ripristinato guidando la quest goblin.
+
+---
+
 ## R-098 — Impronte di storie famose come archetipi di quest
 
 **Richiesta (verbatim):** *"in una d queste discussioni parlavamo del fatto che le quest nn devono essere solo create casualmente, ma mettere anche una componente autoriale. Potrebbe essere utile prendere come 'impronta' delle storie famose e farne ad esempio un archetipo di chainquest? prendendo da libri fantasy, videogames, ecc"*

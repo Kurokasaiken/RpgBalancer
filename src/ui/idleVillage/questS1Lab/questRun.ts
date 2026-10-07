@@ -21,7 +21,7 @@ import {
   GOBLIN_PRIMARY_STATS,
   GOBLIN_START_NODE,
 } from './questScenarioGoblin';
-import type { LabMember, LabStat, PartyPreset, QuestNode } from './questScenario';
+import type { LabMember, LabStat, PartyPreset, QuestNode, Verdict } from './questScenario';
 
 /** The authored S1 lab quests. 'cassa' = infiltration (agi/perc,
  *  alertness states); 'rovine' = attrition gauntlet (str/con, days & HP);
@@ -61,8 +61,9 @@ export function nodesFor(state: QuestRunState): Record<string, QuestNode> {
   return QUESTS[state.questId].nodes;
 }
 
-/** Five-verdict scale, reusing the Astrolabe vocabulary. */
-export type Verdict = 'epicfail' | 'fail' | 'almost' | 'win' | 'bigwin';
+/** Five-verdict scale, reusing the Astrolabe vocabulary — the type lives in
+ *  questScenario (content side) and is re-exported here for engine callers. */
+export type { Verdict };
 
 export type QuestOutcome = 'running' | 'reward' | 'survived' | 'fled' | 'wipe';
 
@@ -147,6 +148,12 @@ export interface ResolvedCheck {
   /** What this verdict caused: authored consequence + physical harms, shown
    *  under the cinematic verdict once the roll resolves (Director 2026-10-06). */
   outcomeText?: string;
+  /** The check node's transit line — shown while the astrolabe spins, as the
+   *  cinematic context of the attempt (Director flavor-layer probe 2026-10-08). */
+  transit?: string;
+  /** Authored per-verdict flavor — what the result *felt like*, kept separate
+   *  from `outcomeText` (which stays the mechanical consequence). */
+  flavor?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -769,6 +776,8 @@ function resolveCheck(state: QuestRunState, node: QuestNode, useConsumable = tru
     harm: 'none',
     woundPct: node.risk?.wound ?? 0,
     deathPct: node.risk?.death ?? 0,
+    transit: node.transit,
+    flavor: node.verdictFlavor?.[verdict],
   };
   state.lastCheck = resolved;
   state.checkQueue.push(resolved);
@@ -836,6 +845,9 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
     harm: 'none',
     woundPct: 0,
     deathPct: 0,
+    // The transit line belongs to the phase entrance, not every round.
+    transit: turn === 1 ? node.transit : undefined,
+    flavor: GOBLIN_ATTACK_LINES[verdict],
   };
   state.checkQueue.push(state.lastCheck);
   state.log.push({
@@ -865,9 +877,9 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
     used.add(target.id);
     applyHpDamage(state, target, hitDamage, node.title);
   }
-  /* The combat cinematic explains itself: attack line + kills + who paid. */
-  const outcomeLines = () =>
-    [GOBLIN_ATTACK_LINES[verdict], ...state.log.slice(consequenceMark).map((e) => e.text)].join(' ');
+  /* The combat cinematic splits flavor from consequence: the attack line
+   *  lives in `lastCheck.flavor`; outcomeText keeps only who paid / what fell. */
+  const outcomeLines = () => state.log.slice(consequenceMark).map((e) => e.text).join(' ');
   if (allDead(state)) {
     state.lastCheck.outcomeText = outcomeLines();
     endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
