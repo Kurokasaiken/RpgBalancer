@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 
 /**
- * Lets the player move a HUD panel by a handle, the same way the roster window
- * moves (pointer capture on the handle, translate on the panel). The offset is
- * relative to the panel's anchored position and resets on reload.
+ * Lets the player move a HUD panel by its title bar: spread `handleProps` on the header
+ * row (no grip icon). Presses on the row's own controls (buttons, menus) never start a
+ * drag, and a double-click puts the panel back where it was anchored. The offset is
+ * relative to the anchored position and resets on reload.
  */
 export function useHudPanelDrag() {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -13,6 +14,7 @@ export function useHudPanelDrag() {
 
   const onPointerDown = useCallback(
     (event: PointerEvent<HTMLElement>) => {
+      if ((event.target as HTMLElement).closest('button, select, input, label, a')) return;
       event.preventDefault();
       event.stopPropagation();
       start.current = { x: event.clientX - offset.x, y: event.clientY - offset.y };
@@ -54,8 +56,10 @@ export function useHudPanelDrag() {
     transform: `translate(${offset.x}px, ${offset.y}px)`,
     zIndex: dragging ? 1000 : undefined,
   };
+  const resetPosition = useCallback(() => setOffset({ x: 0, y: 0 }), []);
   const handleProps = {
     onPointerDown,
+    onDoubleClick: resetPosition,
     style: { cursor: dragging ? 'grabbing' : 'grab', touchAction: 'none' } as CSSProperties,
     'data-dragging': dragging || undefined,
   };

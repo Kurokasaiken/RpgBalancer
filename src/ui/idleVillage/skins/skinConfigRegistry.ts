@@ -95,6 +95,33 @@ const BASE_LAYOUT_PRIMITIVES_CONFIG: SkinPresetConfig = {
   ],
 };
 
+const LACQUER_ATLAS_CONFIG: SkinPresetConfig = {
+  ...BASE_LAYOUT_PRIMITIVES_CONFIG,
+  id: 'lacquer_atlas',
+  label: 'Lacquer Atlas',
+  description:
+    'Selectable skin: sea-teal lacquer in shadow, worn NMM bronze edges with an opaque seat line, parchment text. Built to sit on the painted map (art direction: antithesis of dark fantasy, materic never dirty).',
+  palette: {
+    primary: '#d8bd78',
+    secondary: '#c2a355',
+    accent: '#7fe0dc',
+    glow: 'rgba(127, 224, 220, 0.30)',
+    background: '#0f2627',
+    text: '#efe4c8',
+  },
+  styleLabOverrides: {
+    ...BASE_LAYOUT_PRIMITIVES_CONFIG.styleLabOverrides,
+    palettePreset: 'lacquer-atlas',
+  },
+  telemetry: {
+    ...BASE_LAYOUT_PRIMITIVES_CONFIG.telemetry,
+    context: 'idle_village_lacquer_atlas',
+  },
+  documentation: [
+    'Lacquer Atlas is a selectable skin (not the default). Token values live in skinCssVariables.ts (SKIN_CSS_VAR_OVERRIDES.lacquer_atlas).',
+  ],
+};
+
 const RESIDENT_SLOT_RACK_SIGNATURE_CONFIG: SkinPresetConfig = {
   id: 'resident_slotrack_signature',
   label: 'Resident Slot Signature',
@@ -259,6 +286,7 @@ const WANDERLUST_CONFIG: SkinPresetConfig = {
 
 export const SKIN_CONFIG_REGISTRY: SkinRegistry = {
   [BASE_LAYOUT_PRIMITIVES_CONFIG.id]: BASE_LAYOUT_PRIMITIVES_CONFIG,
+  [LACQUER_ATLAS_CONFIG.id]: LACQUER_ATLAS_CONFIG,
   [MINIMAL_FRONTIER_CONFIG.id]: MINIMAL_FRONTIER_CONFIG,
   [WANDERLUST_CONFIG.id]: WANDERLUST_CONFIG,
   [RESIDENT_SLOT_RACK_SIGNATURE_CONFIG.id]: RESIDENT_SLOT_RACK_SIGNATURE_CONFIG,
@@ -266,7 +294,7 @@ export const SKIN_CONFIG_REGISTRY: SkinRegistry = {
 
 export type SkinPresetId = keyof typeof SKIN_CONFIG_REGISTRY;
 
-// ← VERSIONE DEFAULT: Layout Primitives (base) is now the global default for all components
+// Global default for every skin-aware component. `lacquer_atlas` is selectable (dev: ?skin= or the Director panel).
 export const DEFAULT_SKIN_PRESET_ID: SkinPresetId = BASE_LAYOUT_PRIMITIVES_CONFIG.id;
 
 export function getSkinPresetConfig(presetId?: string): SkinPresetConfig {

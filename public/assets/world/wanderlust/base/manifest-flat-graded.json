@@ -1,0 +1,268 @@
+{
+  "version": "1.1.2",
+  "world": "wanderlust",
+  "variant": "base",
+  "coordinateSystem": {
+    "space": "world_pixels",
+    "origin": "top_left",
+    "unit": "px",
+    "canvas": {
+      "width": 4240,
+      "height": 2828
+    }
+  },
+  "resolutionHint": {
+    "runtime": {
+      "width": 4240,
+      "height": 2828
+    },
+    "source": {
+      "width": 4240,
+      "height": 2828
+    },
+    "scaleTarget": 1
+  },
+  "assetPolicy": {
+    "resolution": "prefer_hd"
+  },
+  "camera": {
+    "minZoom": 0.18,
+    "maxZoom": 3,
+    "defaultZoom": 1,
+    "panEnabled": true,
+    "zoomEnabled": true,
+    "bounds": {
+      "minX": 0,
+      "maxX": 4240,
+      "minY": 0,
+      "maxY": 2828
+    }
+  },
+  "renderer": {
+    "mode": "auto",
+    "domObjectThreshold": 50,
+    "enableForParticles": true,
+    "enableForShaders": true,
+    "fallbackToDom": true,
+    "imageFit": "fill",
+    "autoFit": true
+  },
+  "surfaceLayers": [
+    {
+      "id": "base_flat",
+      "file": "base_flat.graded.webp",
+      "type": "texture",
+      "zIndex": 5,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "background",
+        "flattened"
+      ]
+    },
+    {
+      "id": "sea",
+      "file": "Mare.graded.webp",
+      "type": "texture",
+      "zIndex": 10,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "water"
+      ]
+    },
+    {
+      "id": "island_bottom_left",
+      "file": "Isola basso sinistra.graded.webp",
+      "type": "texture",
+      "zIndex": 15,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "island"
+      ],
+      "rect": {
+        "x": 1063,
+        "y": 1729,
+        "width": 344,
+        "height": 190,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
+    },
+    {
+      "id": "island_bottom_right",
+      "file": "Isola basso a destra.graded.webp",
+      "type": "texture",
+      "zIndex": 20,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "island"
+      ],
+      "rect": {
+        "x": 2528,
+        "y": 1557,
+        "width": 367,
+        "height": 352,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
+    },
+    {
+      "id": "event_shroud_left",
+      "file": "event_shroud_left.png",
+      "type": "texture",
+      "zIndex": 96,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "event",
+        "shroud"
+      ]
+    },
+    {
+      "id": "event_shroud_right",
+      "file": "event_shroud_right.png",
+      "type": "texture",
+      "zIndex": 96,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "event",
+        "shroud"
+      ]
+    },
+    {
+      "id": "border",
+      "file": "Bordo.webp",
+      "type": "ui_overlay",
+      "zIndex": 97,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "border",
+        "ui"
+      ]
+    },
+    {
+      "id": "frame",
+      "file": "Frame.webp",
+      "type": "ui_overlay",
+      "zIndex": 99,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "frame",
+        "ui"
+      ]
+    }
+  ],
+  "atmosphereLayers": [
+    {
+      "id": "clouds",
+      "file": "clouds/cloud_01.webp",
+      "type": "particle_system",
+      "zIndex": 98,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "atmosphere",
+        "clouds"
+      ]
+    }
+  ],
+  "visualStates": [
+    {
+      "id": "default",
+      "labelKey": "world.states.default",
+      "base": true,
+      "overrides": []
+    }
+  ],
+  "regions": [
+    {
+      "id": "enchanted_forest",
+      "nameKey": "world.region.enchanted_forest",
+      "bounds": {
+        "x": 200,
+        "y": 100,
+        "width": 500,
+        "height": 400
+      },
+      "tags": [
+        "forest"
+      ]
+    }
+  ],
+  "anchors": [
+    {
+      "id": "village_01",
+      "x": 624,
+      "y": 416,
+      "type": "settlement",
+      "targetId": "idle_village",
+      "labelKey": "world.anchors.village_01"
+    }
+  ],
+  "tags": [
+    "world-map",
+    "idle-village",
+    "wanderlust"
+  ],
+  "id": "wanderlust_flat_graded"
+}

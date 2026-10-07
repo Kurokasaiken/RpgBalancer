@@ -76,6 +76,25 @@ const gameFrameWorldDressingSchema = z.object({
    * layer for authoring.
    */
   manifestPath: z.string(),
+  /** Baked colour-graded variant of the same map (see scripts/bake-map-grade.py). */
+  gradedManifestPath: z.string(),
+  /** Life of the map (the shipped atmosphere values are near-invisible: 2-4% shadows, 12-35 min cloud crossings). */
+  motion: z.object({
+    cloudShadowOpacity: z.number().min(0).max(1),
+    /** Shadow displacement from its cloud, world px (down-right: light from the top-left). */
+    cloudShadowOffsetX: z.number(),
+    cloudShadowOffsetY: z.number(),
+    cloudSpeed: z.number().positive(),
+    seaMotionAmount: z.number().nonnegative(),
+    seaMotionPeriod: z.number().positive(),
+    seaLineOpacity: z.number().min(0).max(1),
+    foamStrength: z.number().min(0).max(1),
+    foamCrestSpeed: z.number().nonnegative(),
+  }),
+  /** Stage colour behind the map: the sea's edge colour, so a seam between sprites never shows a dark line. */
+  stageColor: z.string(),
+  /** Which one the screen uses; in dev `?map=original|graded` overrides it. */
+  grade: z.enum(['original', 'graded']),
   /** Manifest layer ids the shell hides because it provides the frame itself. */
   hiddenLayerIds: z.array(z.string()),
   /**
@@ -159,6 +178,8 @@ const gameFrameWorldDressingSchema = z.object({
     landBounds: z.object({ x0: z.number(), x1: z.number(), y0: z.number(), y1: z.number() }),
     insets: z.object({ top: z.number(), bottom: z.number() }),
     seaMarginPx: z.number(),
+    /** Extra open sea above and below the canvas (painted sea mirrored; never land). */
+    seaMarginYPx: z.number().nonnegative().optional(),
   }),
   /**
    * Crests that travel toward the coast and dissolve gradually before reaching it (no
@@ -208,7 +229,70 @@ const gameFrameEventLedgerSchema = z.object({
   /** At or below this many days left a row is drawn as urgent. */
   urgentWithinDays: z.number().nonnegative(),
   defaultSort: z.enum(['due', 'type']),
+  /** Event types that stay visible while collapsed, even if they would sort below `maxVisibleRows`. */
+  pinTypesWhenCollapsed: z.array(z.string()),
   types: z.array(gameFrameEventTypeSchema).min(1),
+});
+
+/** What the shell says about the game itself. */
+const gameFrameIdentitySchema = z.object({
+  /** The title plaque in the top-left corner. Off: the corner is left to the map. */
+  showTitle: z.boolean(),
+});
+
+/** Which frame construction the HUD pieces use; `legacy` keeps the pre-redesign look for side-by-side checks. */
+const gameFrameHudSchema = z.object({
+  material: z.enum(['legacy', 'lacquer']),
+});
+
+/**
+ * Where the quest detail opens: in the corridor between the roster (left) and the event
+ * ledger (right), so the roster stays visible and usable as the drag source for its slots.
+ */
+const gameFrameQuestDetailSchema = z.object({
+  /** The detail's own width (px); the component is 680 wide. */
+  widthPx: z.number().positive(),
+  /** Air kept between the detail and the roster / ledger, px. */
+  gapPx: z.number().nonnegative(),
+  /** Distance from the top of the screen (below the top plaques), px. */
+  topPx: z.number().nonnegative(),
+  /** Width the event ledger takes at the right (matches its panel). */
+  ledgerWidthPx: z.number().positive(),
+});
+
+/** Stacking order of the shell's layers (the map is 0). One list instead of numbers sprinkled in components. */
+const gameFrameZLayersSchema = z.object({
+  wash: z.number().int(),
+  floating: z.number().int(),
+  panels: z.number().int(),
+  chrome: z.number().int(),
+  dressing: z.number().int(),
+});
+
+/** Below this viewport width the top row drops its detail (resource trends, place name) to tooltips. */
+const gameFrameBreakpointsSchema = z.object({
+  compactTopPx: z.number().positive(),
+});
+
+/**
+ * Painted dry-brush wash along the screen edges: the "contorno" without a frame. Off by
+ * default until a painted asset exists; `?wash=1` in dev shows it for evaluation.
+ */
+const gameFrameEdgeWashSchema = z.object({
+  enabled: z.boolean(),
+  /** Vertical strip for the left edge and horizontal strip for the bottom edge. */
+  leftSrc: z.string(),
+  bottomSrc: z.string(),
+  opacity: z.number().min(0).max(1),
+  /** Thickness of the left and bottom bands, px. */
+  leftPx: z.number().nonnegative(),
+  bottomPx: z.number().nonnegative(),
+});
+
+/** Test / trailer tooling that must never reach a player build. */
+const gameFrameDebugSchema = z.object({
+  /** Mount the Director panel (dev builds only; F10 shows/hides it). */
+  directorPanel: z.boolean(),
 });
 
 /**
@@ -237,6 +321,8 @@ const gameFrameQuestPoiSchema = z.object({
   y: z.number(),
   /** Marker diameter on screen; it does not scale with zoom. */
   sizePx: z.number().positive(),
+  /** Game days the opportunity stays open once it appears; the marker's ring counts them down. */
+  availableDays: z.number().positive(),
 });
 
 const gameFrameConfigSchema = z.object({
@@ -247,6 +333,13 @@ const gameFrameConfigSchema = z.object({
   eventLedger: gameFrameEventLedgerSchema,
   roster: gameFrameRosterSchema,
   questPois: z.array(gameFrameQuestPoiSchema),
+  identity: gameFrameIdentitySchema,
+  hud: gameFrameHudSchema,
+  questDetail: gameFrameQuestDetailSchema,
+  zLayers: gameFrameZLayersSchema,
+  breakpoints: gameFrameBreakpointsSchema,
+  edgeWash: gameFrameEdgeWashSchema,
+  debug: gameFrameDebugSchema,
 });
 
 export type GameFrameInsetsConfig = z.infer<typeof gameFrameInsetsSchema>;
@@ -269,7 +362,7 @@ export type GameFrameConfig = Omit<z.infer<typeof gameFrameConfigSchema>, 'navIt
 const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   insets: {
     edgeInsetPx: 18,
-    hangingTopPx: 74,
+    hangingTopPx: 92,
   },
   navItems: [
     { id: 'village', labelKey: 'gameFrame.nav.village', icon: 'settlement', locked: false },
@@ -287,9 +380,10 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     tiltDeg: 0,
   },
   eventLedger: {
-    maxVisibleRows: 1,
+    maxVisibleRows: 3,
     urgentWithinDays: 2,
     defaultSort: 'due',
+    pinTypesWhenCollapsed: ['threat'],
     types: [
       { id: 'threat', labelKey: 'gameFrame.events.types.threat', icon: 'threat', tone: 'danger', priority: 0 },
       { id: 'expedition', labelKey: 'gameFrame.events.types.expedition', icon: 'company', tone: 'warning', priority: 1 },
@@ -298,9 +392,13 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
       { id: 'visit', labelKey: 'gameFrame.events.types.visit', icon: 'tavern', tone: 'neutral', priority: 4 },
     ],
   },
-  questPois: [{ id: 'city-rats', activityId: 'quest_city_rats', x: 2750, y: 1000, sizePx: 96 }],
+  questPois: [{ id: 'city-rats', activityId: 'quest_city_rats', x: 2750, y: 1000, sizePx: 55, availableDays: 5 }],
   worldDressing: {
     manifestPath: '/assets/world/wanderlust/base/manifest-flat.json',
+    gradedManifestPath: '/assets/world/wanderlust/base/manifest-flat-graded.json',
+    grade: 'graded',
+    stageColor: '#489397',
+    motion: { cloudShadowOpacity: 0.3, cloudShadowOffsetX: 90, cloudShadowOffsetY: 140, cloudSpeed: 4, seaMotionAmount: 34, seaMotionPeriod: 7, seaLineOpacity: 0.26, foamStrength: 0.7, foamCrestSpeed: 30 },
     hiddenLayerIds: ['frame', 'border'],
     showAtmosphere: false,
     showSeaMarks: true,
@@ -314,9 +412,10 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     safeFit: {
       enabled: true,
       landBounds: { x0: 271, x1: 3974, y0: 305, y1: 2642 },
-      // Ribbon heights are 61 / 67 px, plus 8 px of air.
-      insets: { top: 69, bottom: 75 },
+      // Fixed chrome only (floating roster / ledger may cover land). Top: resources plaque 79 px + 8. Bottom: nav plinth 77 px + 23 (islands sit just above the nav).
+      insets: { top: 87, bottom: 100 },
       seaMarginPx: 260,
+      seaMarginYPx: 300,
     },
     showCoastFoam: true,
     showGlass: false,
@@ -331,6 +430,14 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
       filter: 'hue-rotate(-26deg) saturate(1.5) brightness(1.75)',
     },
   },
+  // Director, 2026-10-07: no game title on the HUD.
+  identity: { showTitle: false },
+  hud: { material: 'lacquer' },
+  questDetail: { widthPx: 680, gapPx: 8, topPx: 100, ledgerWidthPx: 300 },
+  zLayers: { wash: 7, floating: 8, panels: 9, chrome: 10, dressing: 11 },
+  breakpoints: { compactTopPx: 1400 },
+  edgeWash: { enabled: false, leftSrc: '/assets/ui/hud/edge_wash_left.webp', bottomSrc: '/assets/ui/hud/edge_wash_bottom.webp', opacity: 0.55, leftPx: 120, bottomPx: 110 },
+  debug: { directorPanel: true },
 };
 
 /**
