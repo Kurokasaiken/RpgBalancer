@@ -2018,7 +2018,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** spec incollata dal Director «S1 GOBLIN — MICRO-ITERATION F5 + CONSUMABLE DECISION». Vincoli espliciti: F5 deve diventare scelta vera (Pursue ≠ free-roll, Let Flee ≠ dominato) con cambio strutturale minimo, mantenendo check FOR, 5 bande, sterminio, agguato e distinzione agguato lieve/peggiorato; **F6 e il targeting posizionale non si toccano**; preview consumabili deve mostrare "ora vs dopo" ricalcolando dinamicamente, senza secondo modello di probabilità né dettagli interni. Processo: baseline MC → candidati → report prima/ dopo, poi implementazione.
 **Data:** 2026-10-08
-**Stato:** `in corso`
+**Stato:** `in corso` — v1 e v2 (respec Director) implementate e committate. Follow-up 2026-10-07 dopo playtest UI: fix onestà astrolabio (target forzato validato via `findZonePoint`/`honestTargetPos` — la palla non può più atterrare nel catrame sotto una card WIN), icone stat (lucide) su preview/chips, pedaggio F5 spostato a campo authored `upfrontDamage` con riga `sim.toll` in preview e log nel testo di esito, copy authored ripristinato. Evidence `test-results/r097-ui-check-honesty-2026-10-07.log`. In attesa di verifica del Director sul lab.
 
 ---
 

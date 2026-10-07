@@ -204,8 +204,8 @@ export const TUNE = {
   ambushMiteBonus: -5, // F7 last-stand hit modifier when the ambush is mild (let them flee / pursuit «almost»). agguatoMite was dead code until R-097.
   ambushPeggioreFlatBonus: 0, // extra flat ambush damage when pursuit failed (R-097: rejected — toll covers it)
   ambushPeggioreExtraHits: 0, // extra counterattack hits at the last stand when pursuit failed (R-097: rejected — C4 added brutality for marginal effect)
-  pursuitTollDamage: 10, // deterministic positional price of pursuing — paid BEFORE the die lands, on every verdict (R-097 v2: pain now vs pain later)
-  pursuitEpicfailDamage: 20, // epicfail pays a heavier toll instead of the base one — the chase ends in an ambush-of-the-ambush
+  /* F5 pursuit toll moved to authored data: gob-incalza-check.upfrontDamage
+     (R-097 v2) — the preview reads the same field, single source of truth. */
   exploreBaseDamage: 5, // F6: turn N costs 5·N HP, positional target
   exploreLootGold: 8, // gold found per winning F6 turn
   trofeoGold: 50, // trophy → gold conversion on return to town
@@ -314,6 +314,16 @@ export const STAT_LABELS: Record<LabStat, string> = {
   con: 'Costituzione',
   agi: 'Agilità',
   cha: 'Carisma',
+};
+
+/** Lucide icon ids per lab stat — resolved through `getStatIconComponent`. */
+export const STAT_ICONS: Record<LabStat, string> = {
+  str: 'axe',
+  con: 'shield',
+  agi: 'wind',
+  perc: 'sun',
+  int: 'book',
+  cha: 'crown',
 };
 
 /**
@@ -1009,6 +1019,15 @@ const INSIDE_CHECKS = new Set([
 function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdict): string {
   const success = verdict === 'win' || verdict === 'bigwin' || verdict === 'almost';
   const bad = verdict === 'fail' || verdict === 'epicfail';
+  /* Authored upfront toll (R-097 v2): deterministic positional damage paid
+   * whatever the die says — verdict branches see the party already hurt. */
+  if (node.upfrontDamage) {
+    const toll =
+      verdict === 'epicfail'
+        ? (node.upfrontDamage.epicfailAmount ?? node.upfrontDamage.amount)
+        : node.upfrontDamage.amount;
+    if (toll > 0) positionalDamage(state, toll, node.title);
+  }
   let wake = false;
   if (INSIDE_CHECKS.has(node.id) && bad) {
     wake = escalateCamp(state, verdict === 'epicfail', node.title + '.');
@@ -1311,12 +1330,10 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.log.push({ kind: 'INFO', text: 'La carica si smorza nel fango. Nessun vantaggio.' });
       }
       return 'gob-combattimento';
-    case 'gob-incalza-check': {
-      // R-097 v2: pursuing costs blood NOW, whatever the die says — that is
-      // the price of trying. If they still escape, they come back bloodied
-      // and scattered: the ambush is MILDER than letting them flee rested.
-      const toll = verdict === 'epicfail' ? TUNE.pursuitEpicfailDamage : TUNE.pursuitTollDamage;
-      if (toll > 0) positionalDamage(state, toll, node.title);
+    case 'gob-incalza-check':
+      /* v2: the toll is generic `upfrontDamage` — applied before this switch.
+         If they still escape, they come back bloodied and scattered: the
+         ambush is MILDER than letting them flee rested. */
       if (verdict === 'bigwin' || verdict === 'win') {
         state.flags.push('sterminio');
         state.log.push({ kind: 'INFO', text: 'Li raggiungete sul crinale. Non ne resta nessuno.' });
@@ -1325,10 +1342,9 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.log.push({ kind: 'INFO', text: 'Vi sfuggono per un soffio, feriti e sparsi. Saranno un’ombra sulla via del ritorno.' });
       } else {
         state.flags.push('agguatoMite');
-        state.log.push({ kind: 'INFO', text: 'Scappano tra le rocce, a pezzi. Chi sopravvive non tornerà in forze.' });
+        state.log.push({ kind: 'INFO', text: 'Scappano tra le rocce, ridendo. Vi aspetteranno sulla via del ritorno.' });
       }
       return 'gob-esplora-extra';
-    }
     case 'gob-cerca': {
       state.exploreTurn += 1;
       const dmg = TUNE.exploreBaseDamage * state.exploreTurn;

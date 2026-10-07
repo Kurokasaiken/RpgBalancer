@@ -158,3 +158,18 @@ smoke manuale su `/quest-s1-lab` (3 scenari).
   differita (agguato pesante + bailout), pursue = sangue certo ora + 77%
   pulito + fail→agguato debole. Test consumabili: scope one-check e
   parity preview↔resolver verificati. 19/19 goblin tests.
+- **2026-10-07 — UI honesty hotfix (R-097 follow-up).** Tre bug/gap dal
+  playtest del Director: (a) astrolabio V62 — il target forzato del verdetto
+  cadeva fuori dalla propria zona (valli stella a ~37% della punta; bound >82
+  oltre il muro) → palla nel catrame con card WIN; fix `honestTargetPos` +
+  `findZonePoint` in `ballGuidance.ts` (scansione zona-validata,
+  preferenza sull'angolo authored, null→fallback authored). (b) icone stat
+  mancanti: `STAT_ICONS` (LabStat→lucide) in questRun.ts, resi in
+  QuestCheckPreview + chips contributor/party della pagina. (c) pedaggio F5
+  invisibile: spostato da TUNE a campo authored `upfrontDamage` sul nodo
+  (sorgente unica per resolver e preview); `analyzeCheck` espone `toll`
+  (amount/epicfail/expected/targetName modale), la riga `sim.toll` mostra il
+  costo certo prima delle bande, e il log HARM/DEATH del pedaggio entra in
+  `outcomeText` sotto la cinematica. Copy authored F5/F7 ripristinato
+  (semantica v2 invariata). Test: +5 findZonePoint (14/14 astrolabe),
+  19/19 goblin, suite quest 76/77 (pageCrash.repro pre-esistente).

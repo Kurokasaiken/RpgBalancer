@@ -30,6 +30,7 @@ import {
   intelBonusFor,
   memberRisk,
   nodesFor,
+  positionalWeights,
   QUESTS,
   STAT_LABELS,
   TUNE,
@@ -112,6 +113,11 @@ export interface CheckAnalysis {
   interceptorName?: string;
   perMember: MemberOutcome[];
   failHint?: string;
+  /** Authored deterministic toll paid before the verdict (e.g. the F5
+   *  pursuit): `expected` marginalizes `epicfailAmount` over the verdict
+   *  distribution; `targetName` is the most-exposed living member under the
+   *  positional weights. */
+  toll?: { amount: number; epicfailAmount: number; expected: number; targetName?: string };
   primaryStatsUsed: LabStat[];
 }
 
@@ -257,6 +263,22 @@ export function analyzeCheck(
     }
   }
 
+  /* Deterministic upfront toll (authored, positional) — the guaranteed cost
+   * of attempting the check, independent of the verdict bands above. */
+  let toll: CheckAnalysis['toll'];
+  if (node.upfrontDamage) {
+    const pEpic = verdicts.epicfail;
+    const epic = node.upfrontDamage.epicfailAmount ?? node.upfrontDamage.amount;
+    const w = positionalWeights(alive.length);
+    const targetIdx = alive.reduce((best, _, i) => (w[i] > (w[best] ?? 0) ? i : best), 0);
+    toll = {
+      amount: node.upfrontDamage.amount,
+      epicfailAmount: epic,
+      expected: node.upfrontDamage.amount * (1 - pEpic) + epic * pEpic,
+      targetName: alive[targetIdx]?.name,
+    };
+  }
+
   const leader = alive.find((m) => m.role === 'leader');
   const perMember: MemberOutcome[] = alive.map((m) => {
     const acc = perMemberAcc.get(m.id) ?? { dead: 0, wounded: 0 };
@@ -296,6 +318,7 @@ export function analyzeCheck(
     interceptorName: alive.find((m) => m.role === 'bodyguard')?.name,
     perMember,
     failHint: node.failHint,
+    toll,
     primaryStatsUsed: stats.filter((s) => QUESTS[state.questId].primaryStats.includes(s)),
   };
 }

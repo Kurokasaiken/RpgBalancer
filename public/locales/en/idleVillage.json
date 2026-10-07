@@ -1213,7 +1213,8 @@
         "pushDeeper": "the strategy pushes past the checkpoint — more reward, more exposure",
         "secureStake": "the strategy banks the stake at the checkpoint",
         "stakeOnTable": "{value} gold of treasure already in hand"
-      }
+      },
+      "toll": "certain toll: −{amount} HP on {name} (−{epic} on a disaster)"
     },
     "outcome": {
       "reward": "VICTORY — reward earned",

@@ -133,8 +133,7 @@ const pct = (x: number, n: number) => `${((x / n) * 100).toFixed(1)}%`;
 for (const c of CANDIDATES) {
   // apply candidate config
   TUNE.ambushMiteBonus = c.miteBonus;
-  TUNE.pursuitTollDamage = c.toll;
-  TUNE.pursuitEpicfailDamage = c.epic;
+  GOBLIN_NODES['gob-incalza-check'].upfrontDamage = { amount: c.toll, epicfailAmount: c.epic };
   TUNE.ambushPeggioreFlatBonus = c.pegFlatBonus;
   const fo = fleeOpt()!; if (c.fleeFlag) fo.sets = c.fleeFlag; else delete fo.sets;
   const mo = mollaOpt()!; if (c.peggioreHidesDrop) mo.hiddenIfFlag = 'agguatoPeggiore'; else delete mo.hiddenIfFlag;

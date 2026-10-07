@@ -18,7 +18,8 @@
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { consumableFutureChecks, nodesFor } from './questRun';
+import { consumableFutureChecks, nodesFor, STAT_ICONS } from './questRun';
+import { getStatIconComponent } from '@/ui/shared/statIconUtils';
 import type { QuestRunState, Verdict } from './questRun';
 import { analyzeCheck } from './questSimulation';
 import type { CheckAnalysis } from './questSimulation';
@@ -207,15 +208,21 @@ export const QuestCheckPreview: React.FC<QuestCheckPreviewProps> = ({
           <MatericSectionHeader tier="tertiary" marginBottom="sm" style={{ fontSize: 9 }}>
             {t('questS1Lab.sim.whyTitle')}
           </MatericSectionHeader>
-          {analysis.contributors.map((c) => (
-            <WhyLine key={c.stat} tone={c.bestValue >= 60 ? 'up' : 'down'}>
-              {t('questS1Lab.sim.whyCarrier', {
-                name: c.bestName,
-                stat: analysis.statLabels[c.stat],
-                value: c.bestValue,
-              })}
-            </WhyLine>
-          ))}
+          {analysis.contributors.map((c) => {
+            const Icon = getStatIconComponent(STAT_ICONS[c.stat]);
+            return (
+              <WhyLine key={c.stat} tone={c.bestValue >= 60 ? 'up' : 'down'}>
+                <span className="inline-flex items-center gap-1">
+                  {Icon && <Icon className="h-3 w-3" aria-hidden />}
+                  {t('questS1Lab.sim.whyCarrier', {
+                    name: c.bestName,
+                    stat: analysis.statLabels[c.stat],
+                    value: c.bestValue,
+                  })}
+                </span>
+              </WhyLine>
+            );
+          })}
           {analysis.intel && (
             <WhyLine tone="up">{t('questS1Lab.sim.whyIntel', { label: analysis.intel.label, bonus: analysis.intel.bonus })}</WhyLine>
           )}
@@ -239,8 +246,32 @@ export const QuestCheckPreview: React.FC<QuestCheckPreviewProps> = ({
           orientation="horizontal"
           tier="tertiary"
           label={analysis.checkTitle}
-          value={`${analysis.stats.map((s) => analysis.statLabels[s]).join(' + ')} · ${t('questS1Lab.sim.bound', { value: Math.round(analysis.successBound) })}`}
+          value={
+            <span className="inline-flex items-center gap-1">
+              {analysis.stats.map((s) => {
+                const Icon = getStatIconComponent(STAT_ICONS[s]);
+                return Icon ? <Icon key={s} className="h-3 w-3" aria-hidden /> : null;
+              })}
+              <span>
+                {analysis.stats.map((s) => analysis.statLabels[s]).join(' + ')}
+                {' · '}
+                {t('questS1Lab.sim.bound', { value: Math.round(analysis.successBound) })}
+              </span>
+            </span>
+          }
         />
+
+        {/* Authored upfront toll — guaranteed blood, shown before the dice
+            risk so the consequence rows don't pretend a free roll. */}
+        {analysis.toll && (
+          <div className="rounded-md border border-amber-400/30 bg-amber-950/20 px-2 py-0.5 text-[10px] text-amber-300/90">
+            {t('questS1Lab.sim.toll', {
+              amount: analysis.toll.amount,
+              epic: analysis.toll.epicfailAmount,
+              name: analysis.toll.targetName ?? '',
+            })}
+          </div>
+        )}
 
         <VerdictBars analysis={analysis} />
 

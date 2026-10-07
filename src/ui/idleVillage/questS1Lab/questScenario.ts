@@ -58,6 +58,12 @@ export interface QuestNode {
   /** Check nodes: the declared state-consequence of failing — shown in the
    *  preview so the player knows what a fail *changes*, not only what it costs. */
   failHint?: string;
+  /** Deterministic positional HP toll paid BEFORE the verdict is read — the
+   *  authored price of attempting this check (e.g. goblin pursuit: the chase
+   *  costs blood whatever the die says). `epicfailAmount` overrides `amount`
+   *  on the worst band. Surfaced in the check preview so the player sees the
+   *  guaranteed cost, not only the dice risk. */
+  upfrontDamage?: { amount: number; epicfailAmount?: number };
   /** Options for choice nodes; checks resolve via resolveCheck. */
   options?: QuestOption[];
   /** Info nodes: text revealed to the player, then next node. */
