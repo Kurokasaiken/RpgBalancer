@@ -1,6 +1,6 @@
 import React from 'react';
-import { GripVertical } from 'lucide-react';
-import { HudPanel } from '@/ui/idleVillage/skins/primitives';
+import { useTranslation } from 'react-i18next';
+import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
 import { useHudPanelDrag } from './useHudPanelDrag';
 
 export interface DirectorAction {
@@ -17,19 +17,22 @@ export interface DirectorPanelProps {
 }
 
 /**
- * Director panel — a test / trailer instrument, not product UI (same precedent as
- * `/map-benchmark`: not translated). Each button fires one scripted beat on the
+ * Director panel — a test / trailer instrument, not product UI: the page mounts it
+ * in dev builds only. Its own chrome is translated; the action labels arrive
+ * already translated from the caller. Each button fires one scripted beat on the
  * live screen — an invasion announcement, a quest appearing on the map — so a
  * take can be staged on demand. It is draggable by its handle like every HUD
  * panel and collapses to its title bar.
  */
 export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset }) => {
+  const { t } = useTranslation('idleVillage');
   const { panelStyle, handleProps } = useHudPanelDrag();
   const [open, setOpen] = React.useState(true);
   return (
-    <HudPanel
+    <HudPlaque
+      shape="panel"
       as="section"
-      aria-label="Director"
+      aria-label={t('gameFrame.director.title')}
       data-testid="director-panel"
       style={{
         position: 'fixed',
@@ -45,12 +48,9 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset }
         ...panelStyle,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span {...handleProps} role="img" aria-label="Move" style={{ ...handleProps.style, display: 'inline-flex', color: 'var(--skin-icon-color, #dfb857)' }}>
-          <GripVertical width={12} height={12} aria-hidden="true" />
-        </span>
+      <div {...handleProps} title={t('gameFrame.panel.dragHint')} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ flex: 1, fontFamily: 'var(--wl-font-display, "Cinzel", serif)', fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--skin-title-color, #f0cf6a)' }}>
-          Director
+          {t('gameFrame.director.title')}
         </span>
         <button
           type="button"
@@ -91,10 +91,10 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset }
           onClick={onReset}
           style={{ background: 'none', border: 'none', padding: '2px 0 0', textAlign: 'left', cursor: 'pointer', fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--skin-label-tertiary, #9a8246)' }}
         >
-          Reset scena
+          {t('gameFrame.director.reset')}
         </button>
       )}
-    </HudPanel>
+    </HudPlaque>
   );
 };
 

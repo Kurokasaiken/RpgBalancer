@@ -41,6 +41,7 @@ import type {
   SkinValidationResult
 } from '../types/SkinSchema';
 import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
+import { HudPlaque } from '@/ui/idleVillage/skins/primitives/HudPlaque';
 import { InsetPanel } from '@/ui/wanderlust-surface/InsetPanel';
 import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
 import { WanderlustRequirementList } from '@/ui/wanderlust-surface/layout/WanderlustLayout';
@@ -209,6 +210,11 @@ export interface ActivityCapsuleDetailSkinAwareProps {
   position?: { x: number; y: number };
   
   /** Display options */
+  /**
+   * Draw the window as the HUD plaque (lacquer, bronze band, teal shadow) instead of the
+   * bronze Wanderlust surface. Off by default: only the game screen opts in.
+   */
+  hudSurface?: boolean;
   showTelemetry?: boolean;
   showSlots?: boolean;
   showInfo?: boolean;
@@ -237,6 +243,30 @@ export interface ActivityCapsuleDetailSkinAwareProps {
   /** Tags used to match a quest Lore Drop for this POI. When provided and the
    *  activity type is 'quest', the component will show the assigned Lore Drop. */
   questTags?: string[];
+}
+
+/**
+ * HUD-plaque stand-in for `WanderlustSurface` (same children and the same padding as its
+ * `panel` shape). The plaque draws the frame; the window's own background is cleared.
+ */
+function HudSurfaceShell({
+  children,
+  className,
+  style,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  shape?: string;
+  material?: string;
+  interactive?: boolean;
+  isDragging?: boolean;
+}) {
+  return (
+    <HudPlaque shape="panel" className={`${className ?? ''} activity-capsule-detail-surface--hud`.trim()} style={{ ...style, padding: 22 }}>
+      {children}
+    </HudPlaque>
+  );
 }
 
 export function ActivityCapsuleDetailSkinAware({
@@ -275,6 +305,7 @@ export function ActivityCapsuleDetailSkinAware({
   onClose,
   enableDrag = true,
   position,
+  hudSurface = false,
   showTelemetry = true,
   showSlots = true,
   showInfo = true,
@@ -677,8 +708,9 @@ export function ActivityCapsuleDetailSkinAware({
     backdropFilter: 'none',
   };
 
+  const SurfaceShell = hudSurface ? HudSurfaceShell : WanderlustSurface;
   const surface = (
-    <WanderlustSurface
+    <SurfaceShell
       shape="panel"
       material="bronze"
       interactive={enableDrag}
@@ -998,7 +1030,7 @@ export function ActivityCapsuleDetailSkinAware({
                       )}
                       <span
                         style={{
-                          fontSize: '8px',
+                          fontSize: '11px',
                           textTransform: 'uppercase',
                           letterSpacing: '0.16em',
                           color: relationMeta.color,
@@ -1086,7 +1118,8 @@ export function ActivityCapsuleDetailSkinAware({
            The --detail-* tokens are applied INLINE via cssVars, so we override
            the key ones with !important (stylesheet !important beats inline).
            Obsidian base (#060f16) + azure light leak + gold accents + ivory text. */
-        .activity-capsule-detail-surface.ws-root {
+        .activity-capsule-detail-surface.ws-root,
+        .activity-capsule-detail-surface--hud {
           --detail-frame-gradient:
             radial-gradient(circle at 0% 0%, rgba(0,229,255,0.15) 0%, transparent 50%),
             var(--skin-surface-base, #060f16) !important;
@@ -1450,7 +1483,7 @@ export function ActivityCapsuleDetailSkinAware({
         
         .activity-capsule-detail-skin-aware__info-label {
           font-family: var(--detail-primary-font);
-          font-size: 7px;
+          font-size: 11px;
           font-weight: 400;
           letter-spacing: 0.22em;
           text-transform: uppercase;
@@ -1743,7 +1776,7 @@ export function ActivityCapsuleDetailSkinAware({
           color: white;
           padding: 4px 8px;
           border-radius: 4px;
-          font-size: 10px;
+          font-size: 12px;
           z-index: 1000;
           max-width: 200px;
         }
@@ -1754,7 +1787,7 @@ export function ActivityCapsuleDetailSkinAware({
         }
         
         .activity-capsule-detail-skin-aware__validation-error {
-          font-size: 9px;
+          font-size: 12px;
           line-height: 1.2;
         }
         
@@ -1805,7 +1838,7 @@ export function ActivityCapsuleDetailSkinAware({
         <style dangerouslySetInnerHTML={{ __html: slotSkin.cssStyles }} />
       )}
     </div>
-    </WanderlustSurface>
+    </SurfaceShell>
   );
 
   if (inlineMode) return surface;

@@ -230,12 +230,25 @@ export interface QuestPoiSessionOptions {
   exposeTestHooks?: boolean;
   /** Activity the session starts on; defaults to `quest_city_rats`. */
   initialActivityId?: string;
+  /**
+   * How the floating detail is presented. Defaults keep the reference pages as they
+   * were: centred, with the seeded telemetry log. A game screen passes its own.
+   */
+  detail?: {
+    /** Top-left viewport coordinate; omitted = centred. */
+    position?: { x: number; y: number };
+    /** The scripted telemetry log is a developer aid, not player-facing. Default true. */
+    showTelemetry?: boolean;
+    /** Draw the window as the HUD plaque instead of the bronze surface. Default false. */
+    hudSurface?: boolean;
+  };
 }
 
 export function useQuestPoiSession({
   poiFlightTargetSelector = '.poi-detail-stage__medallion [role="button"]',
   exposeTestHooks = true,
   initialActivityId,
+  detail: detailPresentation,
 }: QuestPoiSessionOptions = {}) {
   const { t } = useTranslation('idleVillage');
   const { residentsById } = useRosterKitData();
@@ -1641,7 +1654,9 @@ export function useQuestPoiSession({
       onClose: () => {
         setIsDetailOpen(false);
       },
-      showTelemetry: true,
+      showTelemetry: detailPresentation?.showTelemetry ?? true,
+      position: detailPresentation?.position,
+      hudSurface: detailPresentation?.hudSurface ?? false,
       showSlots: true,
       showInfo: true,
       compact: false,
@@ -1689,6 +1704,10 @@ export function useQuestPoiSession({
       canEmbarkLocal,
       questStartRequested,
       handleEmbark,
+      detailPresentation?.showTelemetry,
+      detailPresentation?.hudSurface,
+      detailPresentation?.position?.x,
+      detailPresentation?.position?.y,
     ],
   );
 

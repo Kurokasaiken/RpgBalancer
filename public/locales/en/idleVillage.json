@@ -939,6 +939,23 @@
         "asc": "Ascending",
         "desc": "Descending"
       }
+    },
+    "objective": {
+      "label": "Objective",
+      "available": "Send a party on “{name}”",
+      "running": "“{name}” is under way",
+      "done": "Collect the rewards of “{name}”"
+    },
+    "panel": {
+      "dragHint": "Drag the title bar to move · double-click to reset"
+    },
+    "panels": {
+      "title": "Panels",
+      "close": "Close panel",
+      "names": {
+        "roster": "Roster",
+        "events": "Events"
+      }
     }
   },
   "missionPlanner": {

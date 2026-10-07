@@ -1,6 +1,6 @@
 import React, { useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GripVertical } from 'lucide-react';
+import { X } from 'lucide-react';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import {
   DEFAULT_GAME_FRAME_CONFIG,
@@ -9,8 +9,9 @@ import {
 } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { HudGlyph } from './hudIcons';
 import { HUD_TONE_COLOR as TONE_COLOR } from './hudTones';
-import { HudPanel } from '@/ui/idleVillage/skins/primitives';
+import { HudPanel, HudPlaque } from '@/ui/idleVillage/skins/primitives';
 import { useHudPanelDrag } from './useHudPanelDrag';
+import { useHudMaterial } from './useHudMaterial';
 
 /** One upcoming event, as the ledger shows it. `title` arrives already translated. */
 export interface HudEvent {
@@ -30,6 +31,8 @@ export interface HudEventLedgerProps {
   /** Telemetry context (where the ledger is mounted). */
   context?: string;
   style?: CSSProperties;
+  /** Adds a close (X) button; the host decides how the panel comes back. */
+  onClose?: () => void;
 }
 
 const FALLBACK_TYPE: Omit<GameFrameEventTypeConfig, 'id'> = {
@@ -80,11 +83,13 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
   config = DEFAULT_GAME_FRAME_CONFIG.eventLedger,
   context = 'game_frame',
   style,
+  onClose,
 }) => {
   const { t } = useTranslation('idleVillage');
   const [sort, setSort] = useState<HudEventSort>(config.defaultSort);
   const [expanded, setExpanded] = useState(false);
   const { panelStyle, handleProps } = useHudPanelDrag();
+  const Surface = useHudMaterial() === 'lacquer' ? HudPlaque : HudPanel;
 
   const typeById = useMemo(() => new Map(config.types.map((type) => [type.id, type])), [config.types]);
   const typeOf = (typeId: string): GameFrameEventTypeConfig =>
@@ -99,7 +104,18 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
     );
   }, [events, sort, typeById]);
 
-  const visible = expanded ? sorted : sorted.slice(0, config.maxVisibleRows);
+  // Collapsed: pinned types (threats) always make the cut, the remaining rows go to the most pressing; sort order is kept.
+  const visible = useMemo(() => {
+    if (expanded) return sorted;
+    const shown = new Set<string>();
+    for (const event of sorted) {
+      if (shown.size < config.maxVisibleRows && config.pinTypesWhenCollapsed.includes(event.typeId)) shown.add(event.id);
+    }
+    for (const event of sorted) {
+      if (shown.size < config.maxVisibleRows) shown.add(event.id);
+    }
+    return sorted.filter((event) => shown.has(event.id));
+  }, [expanded, sorted, config.maxVisibleRows, config.pinTypesWhenCollapsed]);
 
   const changeSort = (next: HudEventSort) => {
     if (next === sort) return;
@@ -133,7 +149,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
           title={event.title}
           style={{
             fontFamily: FONT_DISPLAY,
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 700,
             color: 'var(--skin-text-primary, #F5F2E8)',
             textShadow: '0 1px 2px rgba(0,0,0,0.7)',
@@ -147,9 +163,9 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
         <span
           style={{
             fontFamily: FONT_SANS,
-            fontSize: 9,
+            fontSize: 12,
             fontWeight: 600,
-            letterSpacing: '0.1em',
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
             fontVariantNumeric: 'tabular-nums',
             whiteSpace: 'nowrap',
@@ -183,23 +199,18 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
   ];
 
   return (
-    <HudPanel as="section" aria-label={t('gameFrame.events.title')} style={{ ...PANEL_STYLE, ...style, ...panelStyle }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap' }}>
-        <span
-          {...handleProps}
-          role="img"
-          aria-label={t('gameFrame.events.move')}
-          title={t('gameFrame.events.move')}
-          style={{ ...handleProps.style, display: 'inline-flex', color: 'var(--skin-icon-color, #dfb857)' }}
-        >
-          <GripVertical width={12} height={12} aria-hidden="true" />
-        </span>
+    <Surface as="section" aria-label={t('gameFrame.events.title')} style={{ ...PANEL_STYLE, ...style, ...panelStyle }}>
+      <div
+        {...handleProps}
+        title={t('gameFrame.panel.dragHint')}
+        style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap' }}
+      >
         <span
           style={{
             fontFamily: FONT_DISPLAY,
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 600,
-            letterSpacing: '0.24em',
+            letterSpacing: '0.2em',
             textTransform: 'uppercase',
             color: 'var(--skin-title-color, #f0cf6a)',
             whiteSpace: 'nowrap',
@@ -211,8 +222,8 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
         <div
           role="group"
           aria-label={t('gameFrame.events.sort.ariaLabel')}
-          data-roster-controls="compact"
-          style={{ display: 'flex', gap: 3, marginLeft: 'auto', alignItems: 'center' }}
+          data-hud-controls=""
+          style={{ display: 'flex', gap: 4, marginLeft: 'auto', alignItems: 'center' }}
         >
           {sortOptions.map((option) => {
             const active = option.id === sort;
@@ -222,16 +233,16 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
                 type="button"
                 aria-pressed={active}
                 onClick={() => changeSort(option.id)}
-                style={{
-                  opacity: active ? 1 : 0.55,
-                  color: active ? 'var(--skin-title-color, #f0cf6a)' : 'var(--skin-label-primary, #c9a84e)',
-                  borderColor: active ? 'var(--skin-icon-color, #d8b13e)' : undefined,
-                }}
               >
                 {t(option.labelKey)}
               </button>
             );
           })}
+          {onClose && (
+            <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')}>
+              <X />
+            </button>
+          )}
         </div>
       </div>
 
@@ -249,9 +260,9 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
               <span
                 style={{
                   fontFamily: FONT_SANS,
-                  fontSize: 9,
+                  fontSize: 12,
                   fontWeight: 600,
-                  letterSpacing: '0.2em',
+                  letterSpacing: '0.16em',
                   textTransform: 'uppercase',
                   color: TONE_COLOR[type.tone],
                   opacity: 0.85,
@@ -267,12 +278,11 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
       )}
 
       {sorted.length > config.maxVisibleRows && (
-        <div data-roster-controls="compact" style={{ display: 'flex', justifyContent: 'center' }}>
+        <div data-hud-controls="" style={{ display: 'flex', justifyContent: 'center' }}>
           <button
             type="button"
             onClick={toggleExpanded}
             aria-expanded={expanded}
-            style={{ color: 'var(--skin-label-primary, #c9a84e)', padding: '2px 10px' }}
           >
             {expanded
               ? t('gameFrame.events.showLess')
@@ -280,7 +290,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
           </button>
         </div>
       )}
-    </HudPanel>
+    </Surface>
   );
 };
 

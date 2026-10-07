@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next';
 import {
   buildResourceReadoutItems,
   GameFrame,
-  HudAstrolabe,
-  HudCompass,
   HudEventLedger,
   type HudEvent,
+  type HudObjective,
+  ObjectiveCartouche,
+  HudPanelsMenu,
+  useHudPanels,
   ResourceReadout,
   WhenWhereCluster,
 } from '@/ui/idleVillage/components/gameFrame';
@@ -19,8 +21,12 @@ import {
 } from '@/ui/idleVillage/frozen/kits/worldSurfaceKit';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { MatericRosterComponent } from '@/ui/idleVillage/roster';
+import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
+import { useHudMaterial } from '@/ui/idleVillage/components/gameFrame/useHudMaterial';
+import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/resolveWorldManifest';
 import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
+import { HudRecenterButton } from '@/ui/idleVillage/components/gameFrame/HudRecenterButton';
 import { useTimeEngineLoop } from '@/ui/idleVillage/hooks/useTimeEngineLoop';
 
 /**
@@ -34,18 +40,21 @@ import { useTimeEngineLoop } from '@/ui/idleVillage/hooks/useTimeEngineLoop';
 export interface GameFrameScreenProps {
   renderMap: (opts: { recenterSignal: number }) => ReactNode;
   /** Replaces the default stand-alone roster, e.g. with one wired to quest slots. */
-  rosterSlot?: ReactNode;
+  rosterSlot?: ReactNode | ((api: { onClose: () => void }) => ReactNode);
   /** Screen-level floating UI (quest detail, quest card, skill check, drag flight). */
   overlaySlot?: ReactNode;
   /** Extra events on top of the fixture feed (e.g. a scripted invasion). */
   extraEvents?: HudEvent[];
+  /** What the player should do now; the top-left cartouche is hidden without it. */
+  objective?: HudObjective;
 }
 
-export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents }: GameFrameScreenProps) {
+export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective }: GameFrameScreenProps) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
   useTimeEngineLoop(gameplay);
+  const Roster = useHudMaterial() === 'lacquer' ? MatericRosterComponentV2 : MatericRosterComponent;
 
   const [activeNavId, setActiveNavId] = useState('map');
   // Fixture: no event system exists yet (R-071). Replace with the real feed when it lands.
@@ -60,7 +69,13 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
     [t],
   );
   const events = useMemo(() => [...(extraEvents ?? []), ...fixtureEvents], [extraEvents, fixtureEvents]);
+  const panels = useHudPanels();
   const [recenterSignal, setRecenterSignal] = useState(0);
+  const onSpeedChange = (speed: number) => {
+    gameplay.setSpeedMultiplier(speed);
+    if (state.isPaused) gameplay.resumeGame('user');
+  };
+  const onTogglePause = () => (state.isPaused ? gameplay.resumeGame('user') : gameplay.pauseGame('user'));
 
   const availableSpeeds = [1, 2, 4, 8].filter((s) => s <= config.loop.maxSpeedMultiplier);
 
@@ -69,6 +84,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
       <GameFrame
         title={t('gameFrame.title')}
         subtitle={t('gameFrame.subtitle')}
+        objectiveSlot={<ObjectiveCartouche objective={objective} />}
         navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
         activeNavId={activeNavId}
         onNavSelect={setActiveNavId}
@@ -79,26 +95,14 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
             isPaused={state.isPaused}
             currentDay={state.currentDay}
             placeName={t('gameFrame.place')}
+            speed={{ multiplier: state.speedMultiplier, available: availableSpeeds, onChange: onSpeedChange, onTogglePause }}
           />
         }
         resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />}
-        hangingSlot={<HudEventLedger events={events} context="game_frame" />}
-        rosterSlot={rosterSlot ?? <MatericRosterComponent componentId="game-frame-roster" density="compact" />}
-        floatingSlot={
-          <>
-            <HudAstrolabe
-              speedMultiplier={state.speedMultiplier}
-              availableSpeeds={availableSpeeds}
-              isPaused={state.isPaused}
-              onSpeedChange={(speed) => {
-                gameplay.setSpeedMultiplier(speed);
-                if (state.isPaused) gameplay.resumeGame('user');
-              }}
-              onTogglePause={() => (state.isPaused ? gameplay.resumeGame('user') : gameplay.pauseGame('user'))}
-            />
-            <HudCompass onRecenter={() => setRecenterSignal((n) => n + 1)} />
-          </>
-        }
+        hangingSlot={panels.visible.events ? <HudEventLedger events={events} context="game_frame" onClose={() => panels.set('events', false)} /> : undefined}
+        utilitySlot={<HudPanelsMenu visible={panels.visible} onToggle={panels.toggle} />}
+        rosterSlot={panels.visible.roster ? (typeof rosterSlot === 'function' ? rosterSlot({ onClose: () => panels.set('roster', false) }) : (rosterSlot ?? <Roster componentId="game-frame-roster" density="compact" onClose={() => panels.set('roster', false)} />)) : undefined}
+        recenterSlot={<HudRecenterButton onRecenter={() => setRecenterSignal((n) => n + 1)} />}
       >
         {renderMap({ recenterSignal })}
       </GameFrame>
@@ -132,7 +136,7 @@ function DomWorldMap({ recenterSignal }: { recenterSignal: number }) {
 
   return (
     <WorldSurfaceStandalone
-      manifestPath={worldDressing.manifestPath}
+      manifestPath={resolveWorldManifestPath(worldDressing)}
       showAtmosphere={worldDressing.showAtmosphere}
       showSeaMarks={worldDressing.showSeaMarks}
       showWaves={worldDressing.showWaves}

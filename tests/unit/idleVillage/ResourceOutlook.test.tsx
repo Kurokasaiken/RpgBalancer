@@ -61,7 +61,22 @@ describe('selectResourceOutlook', () => {
 });
 
 describe('ResourceReadout', () => {
+  const setViewportWidth = (width: number) => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
+  };
+  const ITEMS = [
+    { id: 'food', icon: <span />, label: 'Food', value: 8, max: 20, detail: '−3/d · 2 d', tone: 'danger' as const, description: 'Food 8 of 20.' },
+  ];
+
+  it('drops the trend line into the tooltip on a narrow viewport', () => {
+    setViewportWidth(1280);
+    render(<ResourceReadout items={ITEMS} />);
+    expect(screen.getByRole('group', { name: 'Food 8 of 20.' })).toBeInTheDocument();
+    expect(screen.queryByText('−3/d · 2 d')).not.toBeInTheDocument();
+  });
+
   it('shows value, capacity, trend line and an accessible description', () => {
+    setViewportWidth(1600);
     render(
       <ResourceReadout
         items={[

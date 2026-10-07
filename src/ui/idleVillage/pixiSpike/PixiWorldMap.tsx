@@ -15,7 +15,10 @@ import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { defaultSeaMarksConfig } from '@/ui/idleVillage/config/seaMarksConfig';
 import { DEFAULT_SEA_PATTERN_CONFIG, type SeaPatternConfig } from '@/ui/idleVillage/components/WorldSurfaceSeaPatternOverlay';
 import { DEFAULT_COAST_FOAM_CONFIG, type CoastFoamConfig } from '@/ui/idleVillage/components/WorldSurfaceCoastFoam';
-import type { WorldSurfaceSafeFit } from '@/ui/idleVillage/frozen/kits/worldSurfaceKit';
+import type { WorldSurfaceSafeFit as KitSafeFit } from '@/ui/idleVillage/frozen/kits/worldSurfaceKit';
+
+/** The kit's safe-fit plus extra open sea above and below (the kit only extends it sideways). */
+export type WorldSurfaceSafeFit = KitSafeFit & { seaMarginYPx?: number };
 
 /**
  * SPIKE (2026-10-01) — the /game-frame world drawn in ONE WebGL canvas with PixiJS:
@@ -42,6 +45,14 @@ export interface PixiWorldMapProps {
   safeFit?: WorldSurfaceSafeFit;
   recenterSignal?: number;
   effects?: Partial<PixiWorldMapEffects>;
+  /** Overrides every cloud band's shadow opacity (the generated bands ship at 2-4%, which is invisible). */
+  cloudShadowOpacity?: number;
+  /** Where a cloud's shadow falls relative to the cloud, in world px (light from the top-left: down and right). A zero offset hides the shadow under its own cloud. */
+  cloudShadowOffset?: { x: number; y: number };
+  /** Cloud drift speed multiplier (the generated bands cross the world in 12-35 minutes). */
+  cloudSpeed?: number;
+  /** Stage colour behind the map; match the sea so seams between sprites cannot show a dark line. */
+  stageColor?: string;
   seaPatternConfig?: SeaPatternConfig;
   coastFoamConfig?: CoastFoamConfig;
   onStats?: (stats: { textures: number; textureMB: number }) => void;
@@ -60,6 +71,9 @@ export interface PixiMapAnchor {
   y: number;
   node: ReactNode;
 }
+
+/** World px a mirrored sea sprite overlaps its original (> 1 screen px at the lowest zoom). */
+const MIRROR_OVERLAP_PX = 6;
 
 const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true };
 
@@ -176,6 +190,10 @@ export function PixiWorldMap({
   safeFit,
   recenterSignal = 0,
   effects,
+  stageColor = '#0b1a24',
+  cloudShadowOpacity,
+  cloudShadowOffset = { x: 0, y: 0 },
+  cloudSpeed = 1,
   seaPatternConfig = DEFAULT_SEA_PATTERN_CONFIG,
   coastFoamConfig = DEFAULT_COAST_FOAM_CONFIG,
   onStats,
@@ -215,6 +233,8 @@ export function PixiWorldMap({
     const fxOn = JSON.parse(fxKey) as PixiWorldMapEffects;
     const canvas = manifest.coordinateSystem.canvas;
     const margin = fit?.seaMarginPx ?? 0;
+    // Vertical sea is only ever the painted sea layer mirrored: land must never be reflected.
+    const marginY = fit?.seaMarginYPx ?? 0;
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     let cleanupInput = () => {};
     let bytes = 0;
@@ -232,7 +252,7 @@ export function PixiWorldMap({
     (async () => {
       await app.init({
         resizeTo: host,
-        background: '#0b1a24',
+        background: stageColor,
         antialias: false,
         autoDensity: true,
         resolution: Math.min(window.devicePixelRatio || 1, 2),
@@ -272,14 +292,27 @@ export function PixiWorldMap({
         const sprite = new Sprite(texture);
         place(sprite);
         world.addChild(sprite);
-        if (margin > 0 && !layer.rect && (layer.id === 'base_flat' || layer.id === 'background' || layer.id === 'sea')) {
-          // A mirror reuses the same texture: no extra GPU memory.
-          for (const x of [0, canvas.width * 2]) {
-            const mirror = new Sprite(texture);
-            place(mirror);
-            mirror.scale.x *= -1;
-            mirror.x = x;
-            world.addChild(mirror);
+        const isMirrorable = !layer.rect && (layer.id === 'base_flat' || layer.id === 'background' || layer.id === 'sea');
+        if (isMirrorable && (margin > 0 || marginY > 0)) {
+          // Mirrors reuse the same texture (no extra GPU memory) and overlap the original by more than
+          // a screen pixel: butted edges leave the boundary pixel half-covered by each sprite, and the
+          // stage shows through as a dark line.
+          for (const xi of margin > 0 ? [-1, 0, 1] : [0]) {
+            for (const yi of marginY > 0 && layer.id === 'sea' ? [-1, 0, 1] : [0]) {
+              if (xi === 0 && yi === 0) continue;
+              if (yi !== 0 && layer.id !== 'sea') continue;
+              const mirror = new Sprite(texture);
+              place(mirror);
+              if (xi !== 0) {
+                mirror.scale.x *= -1;
+                mirror.x = xi < 0 ? MIRROR_OVERLAP_PX : canvas.width * 2 - MIRROR_OVERLAP_PX;
+              }
+              if (yi !== 0) {
+                mirror.scale.y *= -1;
+                mirror.y = yi < 0 ? MIRROR_OVERLAP_PX : canvas.height * 2 - MIRROR_OVERLAP_PX;
+              }
+              world.addChild(mirror);
+            }
           }
         }
       }
@@ -301,13 +334,14 @@ export function PixiWorldMap({
             const w = s.width * band.scale;
             sprite.width = w;
             sprite.height = tex.height * (w / tex.width);
-            sprite.y = s.y;
-            sprite.alpha = band.shadowOpacity;
+            sprite.y = s.y + cloudShadowOffset.y;
+            sprite.alpha = cloudShadowOpacity ?? band.shadowOpacity;
             sprite.blendMode = 'multiply';
             layer.addChild(sprite);
             ticks.push((t) => {
-              const p = (((t + s.delaySeconds) % band.driftSeconds) + band.driftSeconds) % band.driftSeconds / band.driftSeconds;
-              sprite.x = -w + p * (canvas.width + w);
+              const drift = band.driftSeconds / cloudSpeed;
+              const p = (((t + s.delaySeconds) % drift) + drift) % drift / drift;
+              sprite.x = -w + p * (canvas.width + w) + cloudShadowOffset.x;
             });
           }
         }
@@ -488,7 +522,8 @@ export function PixiWorldMap({
             sprite.alpha = band.opacity;
             layer.addChild(sprite);
             ticks.push((t) => {
-              const p = ((((t + s.delaySeconds) % band.driftSeconds) + band.driftSeconds) % band.driftSeconds) / band.driftSeconds;
+              const drift = band.driftSeconds / cloudSpeed;
+              const p = ((((t + s.delaySeconds) % drift) + drift) % drift) / drift;
               sprite.x = -w + p * (canvas.width + w);
             });
           }
@@ -508,13 +543,13 @@ export function PixiWorldMap({
       // ── Camera: safe-fit like the DOM kit, pan bounded to canvas ± sea margin ──
       const cam = { panX: 0, panY: 0, zoom: 1 };
       const floorZoom = () =>
-        Math.max(app.screen.width / (canvas.width + 2 * margin), app.screen.height / canvas.height);
+        Math.max(app.screen.width / (canvas.width + 2 * margin), app.screen.height / (canvas.height + 2 * marginY));
       const apply = () => {
         cam.zoom = Math.min(cameraConfig.maxZoom, Math.max(floorZoom(), cam.zoom));
         const visW = app.screen.width / cam.zoom;
         const visH = app.screen.height / cam.zoom;
         cam.panX = Math.min(Math.max(cam.panX, -margin), Math.max(-margin, canvas.width + margin - visW));
-        cam.panY = Math.min(Math.max(cam.panY, 0), Math.max(0, canvas.height - visH));
+        cam.panY = Math.min(Math.max(cam.panY, -marginY), Math.max(-marginY, canvas.height + marginY - visH));
         world.scale.set(cam.zoom);
         world.position.set(-cam.panX * cam.zoom, -cam.panY * cam.zoom);
         camRef.current = cam;
@@ -598,7 +633,7 @@ export function PixiWorldMap({
         /* init may not have finished */
       }
     };
-  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, onStats, syncAnchors]);
+  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, onStats, syncAnchors]);
 
   // New or moved anchors get placed before paint, not on the next camera move.
   useLayoutEffect(syncAnchors);

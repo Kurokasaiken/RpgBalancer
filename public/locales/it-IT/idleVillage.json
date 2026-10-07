@@ -950,6 +950,23 @@
         "asc": "Crescente",
         "desc": "Decrescente"
       }
+    },
+    "objective": {
+      "label": "Obiettivo",
+      "available": "Manda una squadra in “{name}”",
+      "running": "“{name}” è in corso",
+      "done": "Ritira le ricompense di “{name}”"
+    },
+    "panel": {
+      "dragHint": "Trascina la barra del titolo per spostare · doppio clic per riportare al suo posto"
+    },
+    "panels": {
+      "title": "Pannelli",
+      "close": "Chiudi pannello",
+      "names": {
+        "roster": "Roster",
+        "events": "Eventi"
+      }
     }
   },
   "missionPlanner": {

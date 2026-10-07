@@ -171,6 +171,84 @@
 .skin-scope [data-roster-controls="compact"] label { min-width: 0; max-width: 78px; }
 .skin-scope [data-roster-controls="compact"] select { min-width: 0; width: 100%; text-overflow: ellipsis; }
 
+/* ── HUD controls: pills in the plaque's own material (tokens only, no brown) ───────────
+   Used by the HUD roster and ledger headers: sort chips, status menu, icon buttons. */
+.skin-scope [data-hud-controls] button:not([data-skin="cta"]),
+.skin-scope [data-hud-controls] label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--skin-surface-border) 80%, transparent);
+  background: color-mix(in srgb, var(--skin-surface-base) 78%, black);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--skin-title-color) 14%, transparent);
+  color: var(--skin-label-primary);
+  font-family: var(--skin-font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: none;
+  cursor: pointer;
+  transition: background 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
+}
+.skin-scope [data-hud-controls] button:not([data-skin="cta"]):has(> svg:only-child) { width: 26px; padding: 0; }
+.skin-scope [data-hud-controls] button svg { width: 14px; height: 14px; }
+.skin-scope [data-hud-controls] button:not([data-skin="cta"]):hover:not(:disabled),
+.skin-scope [data-hud-controls] label:hover {
+  border-color: var(--skin-surface-border);
+  background: color-mix(in srgb, var(--skin-icon-accent) 16%, var(--skin-surface-base));
+  color: var(--skin-title-color);
+}
+.skin-scope [data-hud-controls] button[aria-pressed="true"] {
+  border-color: var(--skin-surface-border);
+  background: color-mix(in srgb, var(--skin-icon-accent) 30%, var(--skin-surface-base));
+  color: var(--skin-title-color);
+}
+.skin-scope [data-hud-controls] button:focus-visible,
+.skin-scope [data-hud-controls] label:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 1.25px var(--skin-hud-seat), 0 0 0 3px var(--skin-icon-accent);
+}
+/* The status menu is a pill with its own chevron; the native control is stripped. */
+.skin-scope [data-hud-controls] label { padding: 0 26px 0 12px; max-width: 120px; }
+.skin-scope [data-hud-controls] label::after {
+  content: '';
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+.skin-scope [data-hud-controls] select {
+  min-width: 0;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.skin-scope [data-hud-controls] select option { color: var(--skin-text-primary); background: var(--skin-surface-base); text-transform: none; }
+/* Collapsed header = the title and the controls marked data-keep (show/hide toggle, close). */
+.skin-scope [data-hud-controls][data-collapsed] > :not([data-keep]) { display: none; }
+
 /* ── Primary CTA plaque (the "AVVIA" look) ────────────────────────────── */
 .skin-scope :where([data-skin="cta"]) {
   position: relative;
