@@ -115,7 +115,7 @@ export default function GameFramePixiPage() {
   const currentDay = session.gameplay.state.currentDay;
   const invasionDaysLeft = invasion ? Math.max(0, invasion.dueDay - currentDay) : 0;
   const extraEvents = useMemo<HudEvent[]>(
-    () => (invasion ? [{ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft }] : []),
+    () => (invasion ? [{ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft, at: { x: 0.486, y: 0.554 } }] : []),
     [invasion, invasionDaysLeft, t],
   );
 
@@ -211,13 +211,14 @@ export default function GameFramePixiPage() {
                 )}
               </>
             }
-            renderMap={({ recenterSignal }) => (
+            renderMap={({ recenterSignal, focusRequest }) => (
               <div style={{ position: 'absolute', inset: 0, isolation: 'isolate' }}>
                 <PixiWorldMap
                   manifestPath={resolveWorldManifestPath(worldDressing)}
                   hiddenLayerIds={worldDressing.hiddenLayerIds}
                   safeFit={safeFit}
                   recenterSignal={recenterSignal}
+                  focusRequest={focusRequest}
                   anchors={anchors}
                   stageColor={worldDressing.stageColor}
                   seaPatternConfig={seaPatternConfig}

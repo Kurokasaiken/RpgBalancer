@@ -21,6 +21,8 @@ export interface HudEvent {
   title: string;
   /** Whole days until it happens; 0 or less reads as "today". */
   daysLeft: number;
+  /** Where it happens on the map, as fractions of the world canvas (0-1); lets the host focus the camera on it. */
+  at?: { x: number; y: number };
 }
 
 export type HudEventSort = 'due' | 'type';

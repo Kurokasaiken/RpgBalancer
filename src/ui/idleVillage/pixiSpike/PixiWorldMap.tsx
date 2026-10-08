@@ -47,6 +47,8 @@ export interface PixiWorldMapProps {
   hiddenLayerIds?: string[];
   safeFit?: WorldSurfaceSafeFit;
   recenterSignal?: number;
+  /** Glide the camera to a point (fractions of the world canvas, 0-1); `n` makes a repeat request on the same point count. */
+  focusRequest?: { x: number; y: number; n: number } | null;
   effects?: Partial<PixiWorldMapEffects>;
   /** Overrides every cloud band's shadow opacity (the generated bands ship at 2-4%, which is invisible). */
   cloudShadowOpacity?: number;
@@ -204,6 +206,7 @@ export function PixiWorldMap({
   hiddenLayerIds = [],
   safeFit,
   recenterSignal = 0,
+  focusRequest = null,
   effects,
   stageColor = '#0b1a24',
   worldLayer,
@@ -219,6 +222,7 @@ export function PixiWorldMap({
   const { manifest, cameraConfig } = useWorldSurface(manifestPath);
   const hostRef = useRef<HTMLDivElement>(null);
   const refitRef = useRef<(() => void) | null>(null);
+  const focusRef = useRef<((x: number, y: number) => void) | null>(null);
   const anchorLayerRef = useRef<HTMLDivElement>(null);
   const worldBoxRef = useRef<HTMLDivElement>(null);
   /** Current camera, readable by the anchor layer between Pixi frames. */
@@ -683,6 +687,33 @@ export function PixiWorldMap({
       };
       refit();
       refitRef.current = refit;
+      // Glide to a world point, centred in the free area; zooms in a little when the map is at its widest.
+      let glide = 0;
+      focusRef.current = (wx, wy) => {
+        cancelAnimationFrame(glide);
+        const left = fit?.insets.left ?? 0;
+        const right = fit?.insets.right ?? 0;
+        const top = fit?.insets.top ?? 0;
+        const bottom = fit?.insets.bottom ?? 0;
+        const zoomTo = Math.min(cameraConfig.maxZoom, Math.max(cam.zoom, floorZoom() * 1.5));
+        const freeW = app.screen.width - left - right;
+        const freeH = app.screen.height - top - bottom;
+        const target = { zoom: zoomTo, panX: wx - (left + freeW / 2) / zoomTo, panY: wy - (top + freeH / 2) / zoomTo };
+        const from = { ...cam };
+        const started = performance.now();
+        const duration = reducedMotion ? 0 : 700;
+        const step = (now: number) => {
+          const k = duration === 0 ? 1 : Math.min(1, (now - started) / duration);
+          const e = 1 - (1 - k) ** 3;
+          cam.zoom = from.zoom + (target.zoom - from.zoom) * e;
+          cam.panX = from.panX + (target.panX - from.panX) * e;
+          cam.panY = from.panY + (target.panY - from.panY) * e;
+          userMoved = true;
+          apply();
+          if (k < 1) glide = requestAnimationFrame(step);
+        };
+        glide = requestAnimationFrame(step);
+      };
 
       let userMoved = false;
       let drag: { x: number; y: number } | null = null;
@@ -727,6 +758,7 @@ export function PixiWorldMap({
         window.removeEventListener('mouseup', onUp);
         el.removeEventListener('wheel', onWheel);
         refitRef.current = null;
+        focusRef.current = null;
         camRef.current = null;
       };
     })().catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
@@ -748,6 +780,13 @@ export function PixiWorldMap({
   useEffect(() => {
     if (recenterSignal > 0) refitRef.current?.();
   }, [recenterSignal]);
+
+  useEffect(() => {
+    if (!focusRequest || !manifest) return;
+    const { width, height } = manifest.coordinateSystem.canvas;
+    focusRef.current?.(focusRequest.x * width, focusRequest.y * height);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusRequest?.n]);
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
