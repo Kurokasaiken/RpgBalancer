@@ -225,6 +225,7 @@ export default function GameFramePixiPage() {
                   cloudShadowOpacity={motion.cloudShadowOpacity}
                   cloudShadowOffset={shadowOffset}
                   cloudSpeed={motion.cloudSpeed}
+                  seabed={worldDressing.seabed}
                   worldLayer={(canvas) => (
                     <div style={{ pointerEvents: 'auto' }}>
                       <WorldSurfaceEventCard

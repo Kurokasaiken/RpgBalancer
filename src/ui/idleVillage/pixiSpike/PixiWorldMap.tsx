@@ -3,6 +3,7 @@ import {
   Application,
   Assets,
   Container,
+  Graphics,
   Mesh,
   MeshGeometry,
   Rectangle,
@@ -10,6 +11,7 @@ import {
   Sprite,
   Texture,
 } from 'pixi.js';
+import { createSeabedArt } from './seabedTexture';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { defaultSeaMarksConfig } from '@/ui/idleVillage/config/seaMarksConfig';
@@ -37,6 +39,7 @@ export interface PixiWorldMapEffects {
   cloudShadows: boolean;
   birds: boolean;
   clouds: boolean;
+  seabed: boolean;
 }
 
 export interface PixiWorldMapProps {
@@ -51,6 +54,12 @@ export interface PixiWorldMapProps {
   cloudShadowOffset?: { x: number; y: number };
   /** Cloud drift speed multiplier (the generated bands cross the world in 12-35 minutes). */
   cloudSpeed?: number;
+  /**
+   * Translucent sea: a seabed (ruins, chests) shows through the water and slides slower than the
+   * camera, so panning reads as depth. `opacity` is how much of it shows; `parallax` < 1 is its
+   * speed against the camera (1 = glued to the map). Omit to keep the sea opaque.
+   */
+  seabed?: { opacity: number; parallax: number };
   /** Stage colour behind the map; match the sea so seams between sprites cannot show a dark line. */
   stageColor?: string;
   seaPatternConfig?: SeaPatternConfig;
@@ -81,7 +90,7 @@ export interface PixiMapAnchor {
 /** World px a mirrored sea sprite overlaps its original (> 1 screen px at the lowest zoom). */
 const MIRROR_OVERLAP_PX = 6;
 
-const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true };
+const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true };
 
 const VERT = `#version 300 es
 in vec2 aPosition;
@@ -201,6 +210,7 @@ export function PixiWorldMap({
   cloudShadowOpacity,
   cloudShadowOffset = { x: 0, y: 0 },
   cloudSpeed = 1,
+  seabed,
   seaPatternConfig = DEFAULT_SEA_PATTERN_CONFIG,
   coastFoamConfig = DEFAULT_COAST_FOAM_CONFIG,
   onStats,
@@ -328,6 +338,92 @@ export function PixiWorldMap({
       }
 
       const ticks: ((seconds: number) => void)[] = [];
+
+      // ── Seabed under the painted sea: shows through the water, slides slower than the camera ──
+      let seabedShift: (panX: number, panY: number, viewW: number, viewH: number) => void = () => {};
+      if (fxOn.seabed && seabed && seabed.opacity > 0) {
+        const pad = 380;
+        const extX = -margin - pad;
+        const extY = -marginY - pad;
+        const extW = canvas.width + 2 * (margin + pad);
+        const extH = canvas.height + 2 * (marginY + pad);
+        const texW = Math.min(2048, Math.round(extW / 2));
+        const art = createSeabedArt(texW, Math.round((texW * extH) / extW));
+        const seabedTexture = Texture.from(art.canvas);
+        const glintCanvas = document.createElement('canvas');
+        glintCanvas.width = 32;
+        glintCanvas.height = 32;
+        const gctx = glintCanvas.getContext('2d');
+        if (gctx) {
+          const g = gctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+          g.addColorStop(0, 'rgba(255,236,170,0.95)');
+          g.addColorStop(1, 'rgba(255,236,170,0)');
+          gctx.fillStyle = g;
+          gctx.fillRect(0, 0, 32, 32);
+          gctx.fillStyle = 'rgba(255,246,210,0.9)';
+          gctx.fillRect(15, 2, 2, 28);
+          gctx.fillRect(2, 15, 28, 2);
+        }
+        const glintTexture = Texture.from(glintCanvas);
+        const seaMaskForBed = await load('/assets/atmosphere/terrain/sea_mask.webp');
+        if (disposed) return;
+
+        const makeBed = () => {
+          const bed = new Container();
+          const floor = new Sprite(seabedTexture);
+          floor.width = extW;
+          floor.height = extH;
+          bed.addChild(floor);
+          art.glints.forEach((glint, index) => {
+            const star = new Sprite(glintTexture);
+            star.anchor.set(0.5);
+            star.x = glint.u * extW;
+            star.y = glint.v * extH;
+            star.scale.set(1.6);
+            star.alpha = 0;
+            bed.addChild(star);
+            if (!reducedMotion || index === 0) {
+              ticks.push((t) => {
+                const p = (((t + glint.phase) % glint.period) + glint.period) % glint.period / glint.period;
+                star.alpha = reducedMotion ? 0.5 : Math.max(0, Math.sin(p * Math.PI)) ** 3 * 0.9;
+              });
+            }
+          });
+          bed.alpha = seabed.opacity;
+          bed.x = extX;
+          bed.y = extY;
+          return bed;
+        };
+
+        // Inside the canvas the sea mask keeps the bed off the land; outside it is open water all the way.
+        const inside = makeBed();
+        const insideMask = new Sprite(seaMaskForBed);
+        insideMask.width = canvas.width;
+        insideMask.height = canvas.height;
+        const insideBox = new Container();
+        insideBox.mask = insideMask;
+        insideBox.addChild(inside);
+        world.addChild(insideMask);
+        world.addChild(insideBox);
+
+        const outside = makeBed();
+        const ring = new Graphics();
+        ring.rect(extX, extY, extW, extH).fill(0xffffff);
+        ring.rect(0, 0, canvas.width, canvas.height).cut();
+        const outsideBox = new Container();
+        outsideBox.mask = ring;
+        outsideBox.addChild(outside);
+        world.addChild(ring);
+        world.addChild(outsideBox);
+
+        seabedShift = (panX, panY, viewW, viewH) => {
+          // Centre-relative: at the middle of the pan range the bed sits exactly where it was authored.
+          const dx = (1 - seabed.parallax) * (panX - (canvas.width / 2 - viewW / 2));
+          const dy = (1 - seabed.parallax) * (panY - (canvas.height / 2 - viewH / 2));
+          inside.position.set(extX + dx, extY + dy);
+          outside.position.set(extX + dx, extY + dy);
+        };
+      }
 
       // ── Cloud shadows: drift across the land, multiplied, masked to the land ──
       if (fxOn.cloudShadows) {
@@ -562,6 +658,7 @@ export function PixiWorldMap({
         cam.panY = Math.min(Math.max(cam.panY, -marginY), Math.max(-marginY, canvas.height + marginY - visH));
         world.scale.set(cam.zoom);
         world.position.set(-cam.panX * cam.zoom, -cam.panY * cam.zoom);
+        seabedShift(cam.panX, cam.panY, visW, visH);
         camRef.current = cam;
         syncAnchors();
       };
@@ -643,7 +740,7 @@ export function PixiWorldMap({
         /* init may not have finished */
       }
     };
-  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, onStats, syncAnchors]);
+  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, onStats, syncAnchors]);
 
   // New or moved anchors get placed before paint, not on the next camera move.
   useLayoutEffect(syncAnchors);

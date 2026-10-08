@@ -78,6 +78,8 @@ const gameFrameWorldDressingSchema = z.object({
   manifestPath: z.string(),
   /** Baked colour-graded variant of the same map (see scripts/bake-map-grade.py). */
   gradedManifestPath: z.string(),
+  /** Translucent sea: seabed opacity and its speed against the camera (< 1 reads as depth). Omit for an opaque sea. */
+  seabed: z.object({ opacity: z.number().min(0).max(1), parallax: z.number().min(0).max(1) }).optional(),
   /** Life of the map (the shipped atmosphere values are near-invisible: 2-4% shadows, 12-35 min cloud crossings). */
   motion: z.object({
     cloudShadowOpacity: z.number().min(0).max(1),
@@ -399,6 +401,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     grade: 'graded',
     stageColor: '#489397',
     motion: { cloudShadowOpacity: 0.3, cloudShadowOffsetX: 90, cloudShadowOffsetY: 140, cloudSpeed: 4, seaMotionAmount: 34, seaMotionPeriod: 7, seaLineOpacity: 0.26, foamStrength: 0.7, foamCrestSpeed: 30 },
+    seabed: { opacity: 0.4, parallax: 0.86 },
     hiddenLayerIds: ['frame', 'border'],
     showAtmosphere: false,
     showSeaMarks: true,
