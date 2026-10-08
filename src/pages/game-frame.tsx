@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 // GameFrame is a fresh, not-yet-kitted composition (R-075) — the
 // `no-restricted-imports` nudge toward `frozen/kits/*` does not apply to it.
@@ -78,6 +78,27 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
   const onTogglePause = () => (state.isPaused ? gameplay.resumeGame('user') : gameplay.pauseGame('user'));
 
   const availableSpeeds = [1, 2, 4, 8].filter((s) => s <= config.loop.maxSpeedMultiplier);
+
+  // Time shortcuts: Space pauses or resumes, 1-4 pick the speed in order. The ref keeps one listener on the latest handlers.
+  const timeKeys = useRef({ onTogglePause, onSpeedChange, availableSpeeds });
+  timeKeys.current = { onTogglePause, onSpeedChange, availableSpeeds };
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.repeat) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(target.tagName))) return;
+      const keys = timeKeys.current;
+      if (event.code === 'Space') {
+        event.preventDefault();
+        keys.onTogglePause();
+      } else if (/^[1-9]$/.test(event.key)) {
+        const speed = keys.availableSpeeds[Number(event.key) - 1];
+        if (speed) keys.onSpeedChange(speed);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#02060a' }}>
