@@ -38,7 +38,7 @@ import { useTimeEngineLoop } from '@/ui/idleVillage/hooks/useTimeEngineLoop';
  * pause and speed act on it, and so does everything that reads the store.
  */
 export interface GameFrameScreenProps {
-  renderMap: (opts: { recenterSignal: number }) => ReactNode;
+  renderMap: (opts: { recenterSignal: number; focusRequest: { x: number; y: number; n: number } | null }) => ReactNode;
   /** Replaces the default stand-alone roster, e.g. with one wired to quest slots. */
   rosterSlot?: ReactNode | ((api: { onClose: () => void }) => ReactNode);
   /** Screen-level floating UI (quest detail, quest card, skill check, drag flight). */
@@ -60,17 +60,21 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
   // Fixture: no event system exists yet (R-071). Replace with the real feed when it lands.
   const fixtureEvents = useMemo(
     () => [
-      { id: 'wolves', typeId: 'threat', title: t('gameFrame.events.fixtures.wolves'), daysLeft: 2 },
-      { id: 'expedition', typeId: 'expedition', title: t('gameFrame.events.fixtures.expedition'), daysLeft: 3 },
-      { id: 'granary', typeId: 'construction', title: t('gameFrame.events.fixtures.granary'), daysLeft: 1 },
-      { id: 'harvest', typeId: 'harvest', title: t('gameFrame.events.fixtures.harvest'), daysLeft: 4 },
-      { id: 'caravan', typeId: 'visit', title: t('gameFrame.events.fixtures.caravan'), daysLeft: 7 },
+      { id: 'wolves', typeId: 'threat', title: t('gameFrame.events.fixtures.wolves'), daysLeft: 2, at: { x: 0.24, y: 0.42 } },
+      { id: 'expedition', typeId: 'expedition', title: t('gameFrame.events.fixtures.expedition'), daysLeft: 3, at: { x: 0.5, y: 0.12 } },
+      { id: 'granary', typeId: 'construction', title: t('gameFrame.events.fixtures.granary'), daysLeft: 1, at: { x: 0.47, y: 0.55 } },
+      { id: 'harvest', typeId: 'harvest', title: t('gameFrame.events.fixtures.harvest'), daysLeft: 4, at: { x: 0.4, y: 0.62 } },
+      { id: 'caravan', typeId: 'visit', title: t('gameFrame.events.fixtures.caravan'), daysLeft: 7, at: { x: 0.8, y: 0.5 } },
     ],
     [t],
   );
   const events = useMemo(() => [...(extraEvents ?? []), ...fixtureEvents], [extraEvents, fixtureEvents]);
   const panels = useHudPanels();
   const [recenterSignal, setRecenterSignal] = useState(0);
+  const [focusRequest, setFocusRequest] = useState<{ x: number; y: number; n: number } | null>(null);
+  const focusEvent = (event: HudEvent) => {
+    if (event.at) setFocusRequest((prev) => ({ ...event.at!, n: (prev?.n ?? 0) + 1 }));
+  };
   const onSpeedChange = (speed: number) => {
     gameplay.setSpeedMultiplier(speed);
     if (state.isPaused) gameplay.resumeGame('user');
@@ -120,12 +124,12 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
           />
         }
         resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />}
-        hangingSlot={panels.visible.events ? <HudEventLedger events={events} context="game_frame" onClose={() => panels.set('events', false)} /> : undefined}
+        hangingSlot={panels.visible.events ? <HudEventLedger events={events} context="game_frame" onSelect={focusEvent} onClose={() => panels.set('events', false)} /> : undefined}
         utilitySlot={<HudPanelsMenu visible={panels.visible} onToggle={panels.toggle} />}
         rosterSlot={panels.visible.roster ? (typeof rosterSlot === 'function' ? rosterSlot({ onClose: () => panels.set('roster', false) }) : (rosterSlot ?? <Roster componentId="game-frame-roster" density="compact" onClose={() => panels.set('roster', false)} />)) : undefined}
         recenterSlot={<HudRecenterButton onRecenter={() => setRecenterSignal((n) => n + 1)} />}
       >
-        {renderMap({ recenterSignal })}
+        {renderMap({ recenterSignal, focusRequest })}
       </GameFrame>
       {overlaySlot}
     </div>
