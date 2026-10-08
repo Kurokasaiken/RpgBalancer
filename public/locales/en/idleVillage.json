@@ -863,7 +863,8 @@
       "ariaLabel": "Simulation speed",
       "pause": "Pause",
       "resume": "Resume",
-      "paused": "Paused"
+      "paused": "Paused",
+      "spaceKey": "Space"
     },
     "compass": {
       "recenter": "Re-centre the map"

@@ -122,7 +122,7 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
               role="radio"
               aria-checked={isPaused}
               aria-label={isPaused ? t('gameFrame.speed.resume') : t('gameFrame.speed.pause')}
-              title={isPaused ? t('gameFrame.speed.resume') : t('gameFrame.speed.pause')}
+              title={`${isPaused ? t('gameFrame.speed.resume') : t('gameFrame.speed.pause')} [${t('gameFrame.speed.spaceKey')}]`}
               onClick={speed.onTogglePause}
               style={stripButtonStyle(isPaused, false)}
             >
@@ -130,13 +130,14 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
                 {isPaused ? <path d="M2.5 1.5v9l8-4.5z" /> : <path d="M2 1.5h3v9H2zM7 1.5h3v9H7z" />}
               </svg>
             </button>
-            {speed.available.map((value) => (
+            {speed.available.map((value, index) => (
               <button
                 key={value}
                 type="button"
                 role="radio"
                 aria-checked={!isPaused && value === speed.multiplier}
                 aria-label={`×${value}`}
+                title={`×${value} [${index + 1}]`}
                 onClick={() => speed.onChange(value)}
                 style={stripButtonStyle(!isPaused && value === speed.multiplier, isPaused && value === speed.multiplier)}
               >
