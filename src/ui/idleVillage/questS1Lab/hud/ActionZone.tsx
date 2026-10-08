@@ -5,7 +5,8 @@
  * `data-hud-controls` toolbar for the belt) — no ad-hoc Tailwind chrome.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import {
   previewOption,
@@ -55,8 +56,43 @@ const bodyText: React.CSSProperties = {
   color: 'var(--skin-body-color)',
 };
 
+/**
+ * XRayPopover — the option's analytic tooltip portaled to `<body>`:
+ * `position: fixed` escapes every `overflow` ancestor (the plinth's own
+ * scroll container would clip an in-flow absolute panel). Anchored above
+ * the option; flips below when the space above is too thin.
+ */
+const XRayPopover: React.FC<{ rect: DOMRect; children: React.ReactNode }> = ({ rect, children }) => {
+  const W = 352; // 22rem
+  const GAP = 8;
+  const left = Math.max(GAP, Math.min(rect.left, window.innerWidth - W - GAP));
+  const spaceAbove = rect.top - 2 * GAP;
+  const pos: React.CSSProperties =
+    spaceAbove >= 180
+      ? { bottom: window.innerHeight - rect.top + GAP, maxHeight: spaceAbove }
+      : { top: rect.bottom + GAP, maxHeight: window.innerHeight - rect.bottom - 2 * GAP };
+  return createPortal(
+    <div className="pointer-events-none fixed z-[60] w-[22rem]" style={{ left, ...pos }}>
+      <div
+        className="quest-s1-scroll overflow-y-auto p-2"
+        style={{
+          maxHeight: 'inherit',
+          borderRadius: 12,
+          border: '1px solid var(--skin-surface-border)',
+          background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 97%, transparent)',
+          boxShadow: 'var(--skin-hud-shadow-filter)',
+        }}
+      >
+        {children}
+      </div>
+    </div>,
+    document.body,
+  );
+};
+
 /** ACTION ZONE — stateful: options ⟷ verdict, same real estate. The outer
- *  `HudPlaque shape="plinth"` in the page supplies the frame and height. */
+ *  `HudPlaque shape="plinth"` hugs the content (max-height, not fixed):
+ *  header/body/belt stay pinned, only the options list scrolls. */
 export const ActionZone: React.FC<ActionZoneProps> = ({
   run, currentNode,
   inTransition, transitText, transitArt, onTransitSkip,
@@ -69,13 +105,17 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
   const { t } = useTranslation('idleVillage');
   const options = availableOptions(run);
   const loneChoice = options.length === 1;
+  const [xray, setXray] = useState<{ optionId: string; rect: DOMRect } | null>(null);
   return (
-    <div className="quest-s1-scroll flex h-full w-full flex-col overflow-y-auto">
+    <div
+      className="quest-s1-scroll flex w-full flex-col overflow-y-auto"
+      style={{ maxHeight: `calc(${PRES.layout.actionZoneVh}vh - 34px)` }}
+    >
       {inTransition ? (
         <TransitView transit={transitText} art={transitArt} onAdvance={onTransitSkip} />
       ) : presenting && activeCheck ? (
         phase === 'cinematic' ? (
-          <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+          <div className="flex min-h-[9rem] flex-col items-center justify-center gap-2 text-center">
             <Kicker tone="muted">{t('questS1Lab.resolving')}</Kicker>
             <div
               style={{
@@ -105,14 +145,14 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
         /* Ambient harm beat — no owning check (ambush, attrition), or
            the inter-check gap inside a burst. The damage plays on the
            formation; options unlock only when the pipeline drains. */
-        <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+        <div className="flex min-h-[9rem] flex-col items-center justify-center gap-2 text-center">
           <p className="max-w-xl" style={{ ...bodyText, fontStyle: 'italic' }}>
             {run.lastEvent}
           </p>
           <Kicker tone="muted">{t('questS1Lab.harmInProgress')}</Kicker>
         </div>
       ) : run.ended ? (
-        <div className="flex h-full items-center justify-center">
+        <div className="flex min-h-[9rem] items-center justify-center">
           <div
             className="w-full max-w-lg p-4 text-center"
             style={{
@@ -139,8 +179,8 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
           </div>
         </div>
       ) : (
-        <div className="flex h-full flex-col">
-          <header className="mb-1 flex items-baseline justify-between gap-3">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <header className="mb-1 flex shrink-0 items-baseline justify-between gap-3">
             <div className="min-w-0">
               <Kicker>{t('questS1Lab.situation')}</Kicker>
               <div
@@ -163,18 +203,23 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
               </p>
             )}
           </header>
-          <p className="mb-2 line-clamp-2" style={{ ...bodyText, color: 'var(--skin-text-secondary)' }}>
+          <p
+            className="mb-2 line-clamp-2 shrink-0"
+            style={{ ...bodyText, color: 'var(--skin-text-secondary)' }}
+          >
             {currentNode?.body}
           </p>
           {/* Consumable belt (artifact §7b): arm BEFORE choosing — the belt
               sits above the options it modifies, as one controls toolbar. */}
-          <ConsumableBelt
-            flags={run.flags}
-            armed={armConsumable}
-            onToggleArmed={onToggleArmed}
-            onDrinkPotion={onDrinkPotion}
-            onUseHealing={onUseHealing}
-          />
+          <div className="shrink-0">
+            <ConsumableBelt
+              flags={run.flags}
+              armed={armConsumable}
+              onToggleArmed={onToggleArmed}
+              onDrinkPotion={onDrinkPotion}
+              onUseHealing={onUseHealing}
+            />
+          </div>
           <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
             {options.map((o) => {
               const pv = previewOption(run, o.id, { useConsumable: armConsumable });
@@ -183,10 +228,18 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
                   ? previewOption(run, o.id, { useConsumable: false })
                   : null;
               return (
-                <div key={o.id} className="group relative">
+                <div key={o.id}>
                   <button
                     disabled={o.disabled}
                     onClick={() => onChoose(o.id)}
+                    onMouseEnter={(e) =>
+                      setXray({ optionId: o.id, rect: e.currentTarget.getBoundingClientRect() })
+                    }
+                    onMouseLeave={() => setXray((v) => (v?.optionId === o.id ? null : v))}
+                    onFocus={(e) =>
+                      setXray({ optionId: o.id, rect: e.currentTarget.getBoundingClientRect() })
+                    }
+                    onBlur={() => setXray((v) => (v?.optionId === o.id ? null : v))}
                     data-skin={loneChoice ? 'cta' : 'button'}
                     data-variant={loneChoice ? undefined : 'secondary'}
                     className="w-full px-4 py-2.5 text-left normal-case tracking-normal"
@@ -248,31 +301,26 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
                       </span>
                     )}
                   </button>
-                  {/* Stakes tooltip — the full analytic X-ray on
-                      hover/focus, not a separate phase (Director D1). */}
-                  {pv && (
-                    <div className="pointer-events-none absolute bottom-full left-0 z-30 mb-1 hidden w-[22rem] group-hover:block group-focus-within:block">
-                      <div
-                        className="quest-s1-scroll max-h-80 overflow-y-auto p-2"
-                        style={{
-                          borderRadius: 12,
-                          border: '1px solid var(--skin-surface-border)',
-                          background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 97%, transparent)',
-                          boxShadow: 'var(--skin-hud-shadow-filter)',
-                        }}
-                      >
-                        <QuestCheckPreview run={run} optionId={o.id} useConsumable={armConsumable} />
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
           </div>
+          {/* Stakes tooltip — the full analytic X-ray on hover/focus
+              (Director D1), portaled out so the plinth's own scroll can't
+              clip it. */}
+          {xray && previewOption(run, xray.optionId, { useConsumable: armConsumable }) && (
+            <XRayPopover rect={xray.rect}>
+              <QuestCheckPreview
+                run={run}
+                optionId={xray.optionId}
+                useConsumable={armConsumable}
+              />
+            </XRayPopover>
+          )}
           {/* Party inventory — loot/intel readout kept inline. */}
           {(run.loot.length > 0 || run.info.length > 0) && (
             <div
-              className="mt-1 flex flex-wrap gap-3"
+              className="mt-1 flex shrink-0 flex-wrap gap-3"
               style={{ fontSize: PRES.type.labelPx, color: 'var(--skin-text-muted)' }}
             >
               {run.loot.length > 0 && (
