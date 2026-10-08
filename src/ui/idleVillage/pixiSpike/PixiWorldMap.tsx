@@ -45,6 +45,7 @@ export interface PixiWorldMapEffects {
   clouds: boolean;
   seabed: boolean;
   wonders: boolean;
+  landLife: boolean;
 }
 
 /** A territory of the id map (`scripts/bake-region-ids.py`). `center` is a fraction of the world canvas. */
@@ -111,7 +112,7 @@ export interface PixiMapAnchor {
 }
 
 
-const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true };
+const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true, landLife: true };
 
 const VERT = `#version 300 es
 in vec2 aPosition;
@@ -212,6 +213,32 @@ void main() {
 }
 `;
 
+
+// Wind over the trees: slow gusts of light travelling across the canopies (no geometry moves, so no ghost edges).
+const CANOPY_GUST_FRAG = `#version 300 es
+precision highp float;
+in vec2 vUV;
+out vec4 outColor;
+uniform sampler2D uTex;
+uniform vec4 uRect;
+uniform float uTime;
+float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+void main() {
+  vec4 t = texture(uTex, vUV);
+  vec2 w = uRect.xy + vUV * uRect.zw;
+  // A gust is a band of noise advected by the wind; the finer ripple rides inside it.
+  float gust = smoothstep(0.5, 0.82, vnoise(w * 0.0022 + vec2(uTime * 0.045, uTime * 0.018)));
+  float ripple = 0.55 + 0.45 * vnoise(w * 0.02 + vec2(uTime * 0.35, 0.0));
+  float a = t.a * gust * ripple * 0.30;
+  outColor = vec4(vec3(0.78, 0.9, 0.5) * a, a);
+}
+`;
+
 // Same math as WorldSurfaceCoastFoam (crests run in and dissolve before the shore).
 const COAST_FOAM_FRAG = `#version 300 es
 precision highp float;
@@ -254,6 +281,35 @@ const CLOUD_ENTRY_PAD_PX = 200;
 const DEEP_SEA_COLOR = '#215c70';
 const DEEP_SEA_FOG = '#16394a';
 const DEEP_SEA_FADE_PX = 650;
+/** Cloud layers (far, mid, near): how much further than the ground each slides when the camera pans. */
+const CLOUD_PARALLAX = [0.1, 0.22, 0.4] as const;
+/** Village roofs where smoke rises (world px), puffs per chimney, and a puff's life. */
+const VILLAGE_CHIMNEYS = [
+  { x: 2119, y: 1473 },
+  { x: 1997, y: 1503 },
+  { x: 2254, y: 1525 },
+] as const;
+const SMOKE_PUFFS = 5;
+const SMOKE_LIFE_S = 7;
+
+function makeGlintCanvas(): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = 32;
+  c.height = 32;
+  const g = c.getContext('2d');
+  if (g) {
+    const r = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+    r.addColorStop(0, 'rgba(255,248,220,0.95)');
+    r.addColorStop(1, 'rgba(255,248,220,0)');
+    g.fillStyle = r;
+    g.fillRect(0, 0, 32, 32);
+    g.fillStyle = 'rgba(255,252,236,0.95)';
+    g.fillRect(15, 3, 2, 26);
+    g.fillRect(3, 15, 26, 2);
+  }
+  return c;
+}
+
 /** Pointer dwell before a territory lights up and shows its name. */
 const REGION_HOVER_DELAY_MS = 1000;
 /** No two waves or sea marks play at the same time closer than this (world px). */
@@ -433,6 +489,7 @@ export function PixiWorldMap({
       }
 
       const ticks: ((seconds: number) => void)[] = [];
+      const bandLayers: { layer: Container; parallax: number }[] = [];
       // Clouds (and their shadows) cross the whole mirrored world, entering and leaving beyond what the camera can
       // show: they never pop into view half-formed at the edge of the screen.
       const cloudX = (p: number, w: number) => -margin - w - CLOUD_ENTRY_PAD_PX + p * (canvas.width + 2 * margin + 2 * w + 2 * CLOUD_ENTRY_PAD_PX);
@@ -921,30 +978,136 @@ export function PixiWorldMap({
       }
 
       // ── Clouds: the same bands as their shadows, drifting above everything ──
+      // ── Land life: wind gusts over the forests, smoke from the village, sun glints on the sea ──
+      if (fxOn.landLife && !reducedMotion) {
+        const layered = (await fetch('/assets/world/wanderlust/base/manifest.json').then((r) => r.json())) as {
+          surfaceLayers: { id: string; file: string; rect?: { x: number; y: number; width: number; height: number; sourceWidth: number; sourceHeight: number } }[];
+        };
+        const gustLayer = new Container();
+        for (const l of layered.surfaceLayers) {
+          if (!l.rect || !/forest|trees/.test(l.id)) continue;
+          const tex = await load(layerUrl(manifest.world, l.file));
+          if (disposed) return;
+          const r = l.rect;
+          const box = {
+            x: (r.x / r.sourceWidth) * canvas.width,
+            y: (r.y / r.sourceHeight) * canvas.height,
+            w: (r.width / r.sourceWidth) * canvas.width,
+            h: (r.height / r.sourceHeight) * canvas.height,
+          };
+          const gustShader = Shader.from({
+            gl: { vertex: VERT, fragment: CANOPY_GUST_FRAG },
+            resources: {
+              uTex: tex.source,
+              u: {
+                uRect: { value: new Float32Array([box.x, box.y, box.w, box.h]), type: 'vec4<f32>' },
+                uTime: { value: 0, type: 'f32' },
+              },
+            },
+          });
+          const mesh = new Mesh({ geometry: quad(box.w, box.h), shader: gustShader });
+          mesh.position.set(box.x, box.y);
+          gustLayer.addChild(mesh);
+          ticks.push((t) => {
+            gustShader.resources.u.uniforms.uTime = t;
+          });
+        }
+        world.addChild(gustLayer);
+
+        // Smoke: a few soft puffs rise from the roofs, lean with the same wind, and thin out.
+        const smokeCanvas = document.createElement('canvas');
+        smokeCanvas.width = 64;
+        smokeCanvas.height = 64;
+        const sctx = smokeCanvas.getContext('2d');
+        if (sctx) {
+          const g = sctx.createRadialGradient(32, 32, 2, 32, 32, 30);
+          g.addColorStop(0, 'rgba(236,230,218,0.85)');
+          g.addColorStop(1, 'rgba(236,230,218,0)');
+          sctx.fillStyle = g;
+          sctx.fillRect(0, 0, 64, 64);
+        }
+        const smokeTexture = Texture.from(smokeCanvas);
+        const smokeLayer = new Container();
+        world.addChild(smokeLayer);
+        for (const chimney of VILLAGE_CHIMNEYS) {
+          for (let i = 0; i < SMOKE_PUFFS; i += 1) {
+            const puff = new Sprite(smokeTexture);
+            puff.anchor.set(0.5);
+            puff.alpha = 0;
+            smokeLayer.addChild(puff);
+            const offset = (i / SMOKE_PUFFS) * SMOKE_LIFE_S + chimney.x * 0.003;
+            ticks.push((t) => {
+              const life = (((t + offset) % SMOKE_LIFE_S) + SMOKE_LIFE_S) / SMOKE_LIFE_S % 1;
+              puff.x = chimney.x + life * 46 + Math.sin(life * 5 + chimney.y) * 4;
+              puff.y = chimney.y - life * 78;
+              puff.scale.set(0.35 + life * 0.85);
+              puff.alpha = Math.sin(Math.PI * Math.min(1, life * 1.15)) * 0.42;
+            });
+          }
+        }
+
+        // Sun glints: small stars that wake and fade on open water, never all at once.
+        const points = (await fetch('/assets/atmosphere/terrain/points.json').then((r) => r.json())) as { sea?: { x: number; y: number }[] };
+        const glintTexture = Texture.from(makeGlintCanvas());
+        const glintLayer = new Container();
+        glintLayer.blendMode = 'add';
+        world.addChild(glintLayer);
+        (points.sea ?? []).forEach((pt, i) => {
+          for (let k = 0; k < 3; k += 1) {
+            const star = new Sprite(glintTexture);
+            star.anchor.set(0.5);
+            const seed = i * 7.31 + k * 3.17;
+            star.position.set(pt.x + Math.sin(seed) * 160, pt.y + Math.cos(seed * 1.3) * 120);
+            star.scale.set(0.7 + (k % 2) * 0.4);
+            star.alpha = 0;
+            glintLayer.addChild(star);
+            const period = 5 + ((seed * 13) % 4);
+            ticks.push((t) => {
+              const p = ((((t + seed * 5) % period) + period) % period) / period;
+              star.alpha = Math.max(0, Math.sin(p * Math.PI * 4)) ** 6 * (p < 0.5 ? 0.9 : 0);
+            });
+          }
+        });
+      }
+
       if (fxOn.clouds) {
-        const layer = new Container();
+        const bandIndex: Record<string, number> = { far: 0, mid: 1, near: 2 };
         for (const band of atmosphereAssets.clouds) {
+          // Each band is a layer of its own at its own height: higher clouds slide further against the ground when
+          // the camera pans (parallax), drift with a slight wind shear, and every cloud slowly changes shape.
+          const level = bandIndex[band.name] ?? 1;
+          const layer = new Container();
+          const parallax = CLOUD_PARALLAX[level];
+          bandLayers.push({ layer, parallax });
+          world.addChild(layer);
           for (const s of band.sprites) {
             const tex = await load(`/assets/atmosphere/${s.src}`);
             const sprite = new Sprite(tex);
+            sprite.anchor.set(0.5);
             const w = s.width * band.scale;
-            sprite.width = w;
-            sprite.height = tex.height * (w / tex.width);
-            sprite.y = s.y;
+            const baseScale = w / tex.width;
+            const h = tex.height * baseScale;
+            sprite.scale.set(baseScale);
             sprite.alpha = band.opacity;
             layer.addChild(sprite);
-            const halfW = w / 2;
-            const halfH = sprite.height / 2;
+            const phase = (s.delaySeconds * 0.37 + level * 2.1) % (Math.PI * 2);
             let shown = 1;
             ticks.push((t) => {
               const drift = band.driftSeconds / cloudSpeed;
               const p = ((((t + s.delaySeconds) % drift) + drift) % drift) / drift;
-              sprite.x = cloudX(p, w);
+              const left = cloudX(p, w);
+              sprite.x = left + w / 2;
+              // Wind shear: the higher the layer, the more its path meanders across the map.
+              sprite.y = s.y + h / 2 + Math.sin(t * 0.045 + phase) * (14 + level * 16);
+              if (!reducedMotion) {
+                sprite.scale.set(baseScale * (1 + 0.045 * Math.sin(t * 0.11 + phase)), baseScale * (1 + 0.04 * Math.sin(t * 0.083 + phase * 1.7)));
+                sprite.rotation = 0.02 * Math.sin(t * 0.07 + phase);
+              }
               // A cloud that would sit on a point of interest thins out instead of hiding it.
               let want = 1;
               for (const anchor of anchorsRef.current) {
-                const dx = Math.max(0, Math.abs(sprite.x + halfW - anchor.x) - halfW);
-                const dy = Math.max(0, Math.abs(sprite.y + halfH - anchor.y) - halfH);
+                const dx = Math.max(0, Math.abs(sprite.x + layer.x - anchor.x) - w / 2);
+                const dy = Math.max(0, Math.abs(sprite.y + layer.y - anchor.y) - h / 2);
                 const d = Math.hypot(dx, dy) / CLOUD_CLEAR_RADIUS_PX;
                 want = Math.min(want, CLOUD_CLEAR_MIN + (1 - CLOUD_CLEAR_MIN) * Math.min(1, d));
               }
@@ -953,7 +1116,13 @@ export function PixiWorldMap({
             });
           }
         }
-        world.addChild(layer);
+        ticks.push(() => {
+          const cam = camRef.current;
+          if (!cam) return;
+          const cx = canvas.width / 2 - app.screen.width / cam.zoom / 2;
+          const cy = canvas.height / 2 - app.screen.height / cam.zoom / 2;
+          for (const { layer, parallax } of bandLayers) layer.position.set(-parallax * (cam.panX - cx), -parallax * (cam.panY - cy));
+        });
       }
 
       if (disposed) return;
