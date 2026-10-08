@@ -2064,3 +2064,21 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 ---
 
+## R-103 — Rework narrativo/emotivo della quest goblin (brief ChatGPT + ricerca + playtest + critica)
+
+**Richiesta (verbatim):** *"Proposte di miglioramento della quest da parte di chatGPT (la traduzione la aggiungiamo, ma facciamo italiano e basta x adesso). Sei un lead senior system designer di una softwarehouse AAA, fa una ricerca online approfondita, scrivine un documento su cosa vogliamo che questa Quest faccia, come che timing/pacing, psicologia per dare emozioni, ecc., poi prendi questa quest, giocala davvero, esaminala e fanne una critica spietata e costruttiva alla luce di tutte le informazioni che abbiamo, poi proponine uno a tua volta"* — seguito dal brief «Task: Improve "Sterminio dei goblin" — Narrative, Suspense & Emotional Rework» (struttura F0–F7, slot-targeting e F5 v2 invariati; alpha; niente overengineering; deliverable = proposta, non codice).
+**Data:** 2026-10-08
+**Stato:** `implementata (P0)` — documento `context/QUEST_GOBLIN_REWORK_PROPOSAL.md` (brief+ricerca, playtest col motore reale, critica alla quest e al brief, proposta P0/P1/P2, metriche emotive). P0 applicato 2026-10-08 a sole stringhe/pacing (zero RNG, zero calibrazione): albero al posto del masso per la scelta di osservazione (Director: «ti devi arrampicare su un albero»), mercanti al guado al posto del mugnaio (Director — la minaccia è sulla strada, come F7), indizio visivo del masso, assalto fisico F3, attack lines F4, righe di danno per gravità HP, fix F5-win che contraddiceva lo sterminio, cassa semibruciata F6 + righe-per-turno, sollievo→shock F7, epilogo con registro + callback al guado, transit hold ∝ parole (`transitMinMs/MaxMs/WordsPerSecond`). Decisioni Director 2026-10-08: F6 solo testo (no +gold su bigwin), agguato flat (no colpo posizionale), no morale (né meccanica né readout), chiusura con callback ok. Rimandati a P1: griglia F4 fase×banda, transit sullo stato, testo condizionato a flag, `options[].consequence`, metriche emotive M2/M6/M7/M8.
+**Collegamenti:** R-099 (flavor layer), R-096 (fun audit), R-097 (F5 v2, calibrazione MC da non toccare), PLAN-022, `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md`, `scripts/quest-goblin-playthrough.ts`.
+
+---
+
+
+## R-104 — Critica AAA del lab quest S1 e restyle secondo la guida HUD (Lacquer Atlas)
+
+**Richiesta (verbatim):** *"prendi il nostro lab http://localhost:5173/quest-s1-lab Sei un lead UI senior designer di una compagnia di videogame AAA, fa una ricerca online, dammi una critica spietata e costruttiva di questo componente. Poi proponi delle soluzioni a tua volta, cn esempi di codice, ecc. La nuova versione si deve rifare alla guida hud_component_guide.md"*
+**Data:** 2026-10-08
+**Stato:** `in corso` (piano) — critica + proposte consegnate in chat (nessuna modifica a codice). Misure sul lab reale a 1366×768: 0 `HudPlaque`, 0 token `--skin-*`, 221 classi colore Tailwind, 47 usi di `text-[9-11px]` (20 nodi di testo <12px a runtime). Decisioni Director 2026-10-08: D1 dipinto come sfondo della stage band, D2 delegata (plinth), D3 cronaca drawer locale. Piano: `plans/PLAN-024-quest-s1-lab-hud-restyle.md` (T-001..T-011), in attesa di via libera.
+**Collegamenti:** R-101 / PLAN-023 (cockpit — l'architettura resta, cambia il linguaggio visivo), R-102 (stash picker), `src/docs/docs/design/hud_component_guide.md`, `primitive_composition_rules.md`, `quest_ui_component_guide.md`, DESIGN_PILLARS Pillar 1 (frame come oggetto fisico), `tests/unit/idleVillage/hudGuards.test.ts`.
+
+---

@@ -1,7 +1,7 @@
 ---
 title: Context Index
 type: reference
-updated: 2026-10-05
+updated: 2026-10-06
 ---
 
 # Context Index
@@ -76,6 +76,8 @@ Format: `[filename](path) — one sentence — \`tag\``
 [src/docs/docs/plans/world_surface_reactive_artifact_plan.md](src/docs/docs/plans/world_surface_reactive_artifact_plan.md) — piano no-parallax: mappa come manufatto reattivo — `plan` `world-surface` `no-parallax`
 [.mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md](.mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md) — pattern: archi progressivi con cap tondo (3a ricorrenza), loop rAF che deve leggere lo store, mix-blend-mode isolato da antenati trasformati — `pattern` `idle-village` `svg` `animation`
 [.mw/pattern-big-rewrite-without-authority.md](.mw/pattern-big-rewrite-without-authority.md) — pattern: assunzione di riscrittura senza autorità dalla desiderata FROZEN; regola: leggere sempre desiderata prima di codare — `pattern` `protocol` `learning`
+[.mw/runs/20261007-learn-coverage-invariant/pattern-candidate.md](.mw/runs/20261007-learn-coverage-invariant/pattern-candidate.md) — pattern candidato: sintesi sopra un ledger atomico perde dettagli «orfani di schema»; fix = coverage check per-ID alla scrittura, non a richiesta — `pattern` `protocol` `learning` `documentation`
+[context/QUEST_IMPRINTS.md](context/QUEST_IMPRINTS.md) — probe S5: imprint IMPR-001 «contratto col cuore» con function spec per beat + 3 istanziazioni su tag diversi (palude/gilda, mare, santuario) — `quest` `narrative` `design` `proposal`
 |[src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md](src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md) — piano ombrello per placeholder scheda/equip/consumabili/skill — `plan` `idle-village` `hero`
 |[src/docs/docs/plans/idle_village_hero_sheet_dynamic_stats_plan.md](src/docs/docs/plans/idle_village_hero_sheet_dynamic_stats_plan.md) — Sub-Plan A2: hero sheet con stat dinamiche dal Balancer registry, Lv/XP mock, skill equipaggiate (R-073) — `plan` `idle-village` `hero`
 |[CANON.md](CANON.md) — mappa delle autorità documentali — `governance` `canon`
@@ -88,7 +90,8 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[context/QUEST_ECONOMY_NOTES.md](context/QUEST_ECONOMY_NOTES.md) — note di design economia-villaggio: human-days, quest-opportunità, leader-capacity, juice — status PROPOSAL (OPEN-010) — `quest` `village` `design` `proposal` `L2`
 |[context/QUEST_V6_REDESIGN.md](context/QUEST_V6_REDESIGN.md) — redesign S1 «TAKEN≠SECURED» guidato da QUEST_GAMEPLAY_SCIENCE — status PROPOSAL — `quest` `design` `proposal` `L2`
 |[src/docs/docs/idle_village/quest_rovine_scenario_spec.md](src/docs/docs/idle_village/quest_rovine_scenario_spec.md) — spec scenario «Le Rovine sotto il Fiume» (implementato, regressione) — `quest` `idle-village` `spec`
-|[src/docs/docs/idle_village/quest_sterminio_goblin_spec.md](src/docs/docs/idle_village/quest_sterminio_goblin_spec.md) — spec authored «Sterminio dei goblin»: targeting posizionale a cascata (Director), fasi F0–F7, escalation in combattimento — DRAFT da ratificare — `quest` `idle-village` `spec` `draft`
+|[context/QUEST_GOBLIN_REWORK_PROPOSAL.md](context/QUEST_GOBLIN_REWORK_PROPOSAL.md) — proposta di rework emotivo/narrativo della quest goblin (R-103): ricerca su pacing/suspense, playtest col motore reale, 12 difetti, critica al brief ChatGPT, interventi P0/P1/P2, metriche emotive — `quest` `proposal` `narrative`
+|[src/docs/docs/idle_village/quest_sterminio_goblin_spec.md](src/docs/docs/idle_village/quest_sterminio_goblin_spec.md) — **documento unico** «Sterminio dei goblin»: targeting posizionale a cascata (Director), fasi F0–F7, escalation, manoscritto narrativo completo (transit/action names/verdictFlavor, R-099), regole di scrittura e budget di rischio — `quest` `idle-village` `spec`
 |[src/docs/docs/idle_village/quest_simulation_preview_spec.md](src/docs/docs/idle_village/quest_simulation_preview_spec.md) — spec Quest Simulation Preview R-082 (implementata) — `quest` `idle-village` `spec` `preview`
 |[KNOWLEDGE_AUDIT.md](KNOWLEDGE_AUDIT.md) — audit KB per agenti AI (desiderata v25): struttura, gap, 10 contraddizioni, problemi autorità/retrieval, proposte F1–F9 — `audit` `governance` `knowledge`
 |[KNOWLEDGE_REFACTOR_REPORT.md](KNOWLEDGE_REFACTOR_REPORT.md) — health report finale refactor R-085: authority map per dominio, retrieval test 40 domande (33P/3Pa/5F), documenti pericolosi residui — `audit` `governance` `knowledge`
@@ -102,3 +105,6 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[context/ingestions/2026-10-05-progettare-quest-strategiche.md](context/ingestions/2026-10-05-progettare-quest-strategiche.md) — ingestion report conversazione «Progettare quest strategiche»: Extraction Ledger E-01..E-18 + reconciliazione (coda conversazione) — `knowledge` `evidence` `quest` `L4`
 |[context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md](context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md) — ingestion del transcript integrale (200 msg, `.mw/runs/20261005-transcript-quest-strategiche/`): Ledger E-19..E-49, nuove OPEN-012/013/014 — `knowledge` `evidence` `quest` `L4`
 |[context/ingestions/2026-10-06-quest-strategiche-continuazione.md](context/ingestions/2026-10-06-quest-strategiche-continuazione.md) — ingestion della continuazione 2026-10-05 (share 6ac4b926): checklist authoring E-01, anti-pattern REJ-007, thread aperto «quest originale del Director da decomporre» — `knowledge` `evidence` `quest` `L4`
+|[.mw/runs/20261006-emergent-narrative-research/](.mw/runs/20261006-emergent-narrative-research/BROADCAST.md) — ricerca R-090 narrativa emergente: prompt + broadcast chatgpt/grok/deepseek (claude fallito, gemini rifiutato) + ricerca propria; principi integrati in `context/QUEST_GAMEPLAY_SCIENCE.md` P48–P63 e `NARRATIVE.md` §3 — `evidence` `quest` `narrative` `research` `L4`
+|[context/ingestions/2026-10-06-quest-cross-direct.md](context/ingestions/2026-10-06-quest-cross-direct.md) — ingestion share «Sistema di quest cross direct» (R-091, coda voice-mode): primitive dei beat, separazione struttura/flavor, generatore a vincoli in 3 passi (orbita OPEN-014) — `knowledge` `evidence` `quest` `narrative` `L4`
+||[context/ingestions/2026-10-07-registro-narrativo-del-mondo.md](context/ingestions/2026-10-07-registro-narrativo-del-mondo.md) — ingestion share «Registro narrativo del mondo» (R-093): intenti Director vs proposte AI su conseguenze, memoria e legacy; macro-piano non ratificato (OPEN-016) — `knowledge` `evidence` `quest` `narrative` `L4`

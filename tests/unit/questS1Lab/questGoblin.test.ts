@@ -154,7 +154,7 @@ describe('goblin run flow', () => {
         won = run;
         expect(run.flags).toContain('sterminio');
         const newLines = run.log.slice(logMark).map((e) => e.text);
-        expect(newLines.some((t) => t.includes('incassa il colpo'))).toBe(true);
+        expect(newLines.some((t) => t.includes('HP).'))).toBe(true);
       }
     }
     expect(won).not.toBeNull();
@@ -173,7 +173,7 @@ describe('goblin run flow', () => {
         expect(run.flags).toContain('agguatoMite');
         expect(run.flags).not.toContain('agguatoPeggiore');
         const newLines = run.log.slice(logMark).map((e) => e.text);
-        expect(newLines.some((t) => t.includes('incassa il colpo'))).toBe(true);
+        expect(newLines.some((t) => t.includes('HP).'))).toBe(true);
       }
     }
     expect(failed).not.toBeNull();
@@ -200,10 +200,10 @@ describe('goblin run flow', () => {
     const m1 = applyChoice(mite, 'fight-turn');
     const p1 = applyChoice(peggiore, 'fight-turn');
     const hitsOf = (s: QuestRunState, from: number) =>
-      s.log.slice(from).filter((e) => e.text.includes('incassa il colpo'));
+      s.log.slice(from).filter((e) => e.kind === 'HARM');
     void hitsOf;
-    const mHits = m1.log.filter((e) => e.text.includes('incassa il colpo (−20'));
-    const pHits = p1.log.filter((e) => e.text.includes('incassa il colpo (−30'));
+    const mHits = m1.log.filter((e) => e.kind === 'HARM' && e.text.includes('(−20'));
+    const pHits = p1.log.filter((e) => e.kind === 'HARM' && e.text.includes('(−30'));
     expect(mHits.length).toBeGreaterThanOrEqual(1);
     expect(pHits.length).toBeGreaterThanOrEqual(1);
   });

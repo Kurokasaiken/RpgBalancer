@@ -343,13 +343,24 @@ function applyHpDamage(state: QuestRunState, target: RuntimeMember, amount: numb
     target.dead = true;
     state.log.push({
       kind: 'DEATH',
-      text: `${target.name} non si rialza${source ? ` — su «${source}»` : ''}.`,
+      text: `${target.name} cade, e non si rialza più${source ? ` — su «${source}»` : ''}.`,
     });
     recordHarm(state, target.id, amount, 'death', hpBefore, 0, source);
     return;
   }
   target.wounded = true;
-  state.log.push({ kind: 'HARM', text: `${target.name} incassa il colpo (−${amount} HP).` });
+  // The wound line reads the *state*, not the number: who is close to the
+  // edge must be visible in the prose, not only in the HP chip.
+  const frac = target.hp / target.maxHp;
+  const line =
+    frac < 0.2
+      ? `${target.name} regge solo perché non c’è altro da fare`
+      : frac < 0.35
+        ? `${target.name} barcolla: c’è sangue sul fianco`
+        : frac <= 0.7
+          ? `${target.name} si piega, poi si rimette dritto`
+          : `${target.name} serra i denti e resta in piedi`;
+  state.log.push({ kind: 'HARM', text: `${line} (−${amount} HP).` });
   recordHarm(state, target.id, amount, 'harm', hpBefore, target.hp, source);
 }
 
@@ -948,12 +959,20 @@ function resolveCheck(state: QuestRunState, node: QuestNode, useConsumable = tru
 
 /** Authored one-liners for the goblin fight's attack verdicts (spec §Testi). */
 const GOBLIN_ATTACK_LINES: Record<Verdict, string> = {
-  bigwin: 'Un’ondata perfetta: i goblin crollano a grappoli.',
-  win: 'Il party colpisce. Un goblin in meno.',
-  almost: 'Sfiorano la rotta — il colpo arriva, ma i goblin reggono.',
-  fail: 'I goblin schivano e riempiono il vuoto.',
-  epicfail: 'L’assalto si spezza sui loro scudi. Rispondono al contrattacco.',
+  bigwin: 'Il colpo li spacca a metà: due goblin crollano insieme.',
+  win: 'Il colpo arriva. La linea cede di un passo.',
+  almost: 'Il colpo morde, non uccide: arretrano e restano in piedi.',
+  fail: 'Scudi serrati. Il colpo muore su legno e cuoio.',
+  epicfail: 'La linea si richiude: per un istante lungo siete circondati.',
 };
+
+/** F6 push-your-luck: the sheltering ruin degrades turn by turn — the rising
+ *  damage IS the structure giving way, narrated once per exploreTurn. */
+const GOBLIN_F6_CREAK_LINES = [
+  'Il palo che regge il telo scricchiola.',
+  'Il telo brucia ancora, in basso. Il caldo arriva al viso.',
+  'Una trave cede. Chi frugava arretra — e vede il cuoio più vicino.',
+] as const;
 
 /**
  * Resolve ONE combat turn (a click = a round):
@@ -1519,15 +1538,17 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       state.exploreTurn += 1;
       const dmg = TUNE.exploreBaseDamage * state.exploreTurn;
       positionalDamage(state, dmg, node.title);
+      const creak = GOBLIN_F6_CREAK_LINES[Math.min(state.exploreTurn, GOBLIN_F6_CREAK_LINES.length) - 1];
+      state.log.push({ kind: 'INFO', text: creak });
       if (verdict === 'bigwin' || verdict === 'win') {
         state.gold += TUNE.exploreLootGold;
         state.loot.push('bottino del campo');
-        state.log.push({ kind: 'LOOT', text: `Tra le tende bruciate, qualcosa di valore. (+${TUNE.exploreLootGold} gold)` });
+        state.log.push({ kind: 'LOOT', text: `Sotto il telo, qualcosa che valeva ancora. (+${TUNE.exploreLootGold} gold)` });
       } else if (verdict === 'almost') {
         state.gold += Math.floor(TUNE.exploreLootGold / 2);
         state.log.push({ kind: 'INFO', text: 'Un bottino misero — e una ferita in più.' });
       } else {
-        state.log.push({ kind: 'INFO', text: 'Solo cenere e spine. Il campo non offre altro.' });
+        state.log.push({ kind: 'INFO', text: 'Solo cenere e spine.' });
       }
       return 'gob-esplora-extra';
     }
@@ -1561,8 +1582,12 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
 function composeEndingText(state: QuestRunState, base: string): string {
   const pieces = [base];
   const dead = state.party.filter((m) => m.dead).map((m) => m.name);
+  const aliveCount = state.party.filter((m) => !m.dead).length;
   if (dead.length > 0) {
     pieces.push(`${dead.join(', ')} non ${dead.length > 1 ? 'sono tornati' : 'è tornato'}.`);
+  }
+  if (aliveCount > 0) {
+    pieces.push(`Tornate in ${aliveCount}.`);
   }
   if (state.questId === 'rovine') {
     // Report-style epilogue (mockup): the cost continues after the quest —
@@ -1790,14 +1815,14 @@ function enterNode(state: QuestRunState, nodeId: string): void {
           state.gold += TUNE.trofeoGold;
           state.loot = state.loot.filter((l) => l !== 'trofeo dei goblin');
           state.log.push({ kind: 'LOOT', text: `Le teste sul banco del giudice: +${TUNE.trofeoGold} gold.` });
-          endRun(state, 'reward', 'Il trofeo dei goblin paga. La quest è completa — reward ottenuta.');
+          endRun(state, 'reward', 'Con il trofeo sulla bilancia: da domani, i carri ripassano dal guado.');
         } else {
           endRun(
             state,
             'survived',
             state.flags.includes('trofeoPerso')
-              ? 'Tornate al villaggio a mani vuote: il trofeo è rimasto sulla strada. La quest è fallita.'
-              : 'Tornate al villaggio senza completare lo sterminio. La quest è fallita.',
+              ? 'A mani vuote: il trofeo è rimasto sulla strada. Il guado resta deserto.'
+              : 'Tornate senza completare lo sterminio. Il guado resta deserto.',
           );
         }
       } else if (allDead(state)) {

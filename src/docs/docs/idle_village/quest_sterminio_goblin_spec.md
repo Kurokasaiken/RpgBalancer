@@ -1,17 +1,26 @@
 ---
 title: Quest «Sterminio dei goblin» — spec authored completa
 type: spec
-status: draft
+status: vigente — documento unico della quest (meccanica + manoscritto);
+  assorbito `context/QUEST_GOBLIN_FLAVOR.md` il 2026-10-08
 date: 2026-10-06
+updated: 2026-10-08
 source: proposta del Director (correzione alla bozza «Torre nel Bosco», 2026-10-06);
-  modello di targeting posizionale a cascata definito dal Director
+  modello di targeting posizionale a cascata definito dal Director;
+  layer narrativo R-099
 ---
 
 # Sterminio dei goblin — spec completa
 
 Quest di **combattimento**, basata su **Forza**. Vincoli di presentazione
-(Director): pochissimo testo — immagine, titolo, opzioni brevi. Il giocatore
-in ogni fase può ritirarsi o usare un consumabile.
+(Director, evoluti 2026-10-08): ~~pochissimo testo~~ → **layer narrativo
+cinematografico** (R-099) — immagine, nomi d'azione, transit tra le fasi,
+flavour per scelta ed esito; il manoscritto completo è in fondo al doc.
+Il giocatore in ogni fase può ritirarsi o usare un consumabile.
+
+> **Questo documento è la fonte unica della quest.** Tutto ciò che il
+> lab (`/quest-s1-lab`) mostra o esegue nasce qui; `questScenarioGoblin.ts`
+> è la traduzione eseguibile, non una fonte parallela.
 
 ---
 
@@ -193,136 +202,387 @@ Director inverte il gradiente: flee = agguato pesante rinviato, pursue-fail
 
 ---
 
-## Testi per esito (una riga per esito, per fase)
+## Layer narrativo — manoscritto (v2, R-099 2026-10-08)
 
-Le bande di esito sono quelle del lab: `epicfail` · `fail` · `almost` ·
-`win` · `bigwin`. Testo minimo per vincolo di presentazione (Director).
+Il vincolo «pochissimo testo» delle origini è **superato**: il Director ha
+chiesto pathos, contesto, nomi d'azione per i check, flavour per scelta ed
+esito, e narrazione durante il movimento tra le fasi. Questa sezione è il
+**testo completo che il lab deve mostrare**, in ordine d'incontro — ogni
+stringa annotata col campo dati che la porta.
 
-### F0 — Assegnazione
+### Campi authored consumati dal lab
 
-- (nessun check) «I goblin razziano i confini. Sterminateli.»
+| Campo | Su quale nodo | Cosa fa |
+|---|---|---|
+| `transit` | choice, combat, end | narrazione durante la transizione cinematografica verso il nodo (~2.6 s, `questLabPacing`) — *cosa vedi, cosa incontri* |
+| `title` | tutti | per i check è il **nome d'azione**, entra nel titolo dell'astrolabio |
+| `body` | tutti | riga di contesto (sotto il check overlay / corpo della card) |
+| `options[].label` | choice | prosa authored — il gesto che il giocatore firma |
+| `options[].detail` | choice | previsione meccanica (stat, costo, rischio) |
+| `verdictFlavor` | check | una riga per banda `bigwin/win/almost/fail/epicfail` |
+| `failHint` | check | testo pre-check che dichiara la posta |
+| `upfrontDamage` | check | pedaggio deterministico narrato nell'esito |
+| attack lines | combat | flavor per banda su ogni turno — canale separato (`GOBLIN_ATTACK_LINES` nel motore) |
+| `body` di `harm`/`end` | harm, end | il colpo subito / la chiusura |
 
-### F1 — Esplorazione
+Presentazione (`ResolvedCheck`, aggiornata 2026-10-08): la cinematica
+separa `flavor` (verdict authored), `harmLines` (ferite e pedaggi),
+`authoredText` (esito authored) e gli **harms ambient** (agguato,
+attrito) senza check proprietario, presentati come beat a sé.
 
-**Check `PERCEZIONE`**
+### Regole di scrittura
 
-- `bigwin` — «Tracce ovunque. Sapete esattamente dove guardare.»
-- `win` — «Orme fresche verso nord. Il campo non è lontano.»
-- `almost` — «Qualche segno confuso. Meglio di niente.»
-- `fail` — «Il bosco tace.»
-- `epicfail` — «Perdete ore a seguire tracce di cervo.»
+1. **Transit** — mostra ciò che i personaggi *vedono/fanno* in movimento,
+   mai l'esito futuro. Copre l'animazione reale di spostamento.
+2. **Action name** — il check si chiama per il gesto, non per la stat.
+   Registro: seconda persona se il gesto è di uno («Ti arrampichi…»),
+   plurale se è del gruppo («Forzate il masso…»), sostantivo se il gesto
+   è già un'immagine («La carica»).
+3. **VerdictFlavor** — riporta ciò che il *mondo* fa in risposta. I costi
+   si possono nominare («costa sangue», «−10 HP») ma le cifre sono
+   **provvisorie finché il budget di rischio non è calibrato**; la riga
+   deve reggere anche senza numero.
+4. **Nomi dei PG — mai hardcoded.** Il testo referenzia *slot*:
+   `{leader}`, `{bodyguard}`, `{nome}` vengono interpolati dal party
+   assegnato (il motore già lo fa nelle righe di danno). Accessorio
+   italiano: costruzioni che **evitano l'accordo di genere** sul
+   placeholder (`{leader} marcia davanti` è sicuro, `{leader} è ferita/o`
+   no).
+5. **Le uscite di un nodo vivono nel transit del nodo successivo** — non
+   esiste «testo di uscita»: l'aftermath dello sterminio è il transit
+   del campo conquistato.
+6. **Le scelte senza check meritano flavor proprio** — oggi compresso in
+   `detail`; campo candidato `options[].consequence` (proposto, non
+   implementato).
+7. **Attack lines = canale separato** — stesse regole del verdictFlavor
+   ma stringate: si leggono 5 volte di fila, nessuna ridondanza.
 
-**Check `PERCEZIONE + FORZA`**
+### Budget di rischio (proposta — cifre placeholder da calibrare MC)
 
-- `bigwin` — «Spostate il masso: sotto, un bottino nascosto.»
-- `win` — «Una traccia che gli altri avrebbero perso. Qualcosa è nascosto qui.»
-- `almost` — «Un graffio nella roccia vi svela il nascondiglio — a costo di un ematoma.»
-- `fail` — «Faticate invano. (−10 HP)»
-- `epicfail` — «Il masso vi ricade addosso. (−10 HP)»
+La quest dichiara *quanto deve costare*: il flavor promette sangue solo
+dove il sangue è reale, e il tuning MC ha un target.
 
-### F2 — Evento opzionale (bottino)
+```yaml
+quest: sterminio-dei-goblin          # party di riferimento: preset gob-band
+danno_atteso_totale: 25–45 HP        # concentrato in coda di formazione
+morte_pg:
+  playthrough_normale: < 5%          # morte solo su chain di sfortuna
+  f7_ultimo_scontro:   ~15–25%       # il prezzo del trofeo, se combatti
+concentrazione_rischio:
+  F1-B: ferita lieve (masso)
+  F4:   danni di scambio, escalation da T3
+  F5:   pedaggio authored (10–20 HP) + intensità agguato
+  F7:   unico nodo dove la morte è attesa come possibilità reale
+regola: un testo che promette morte dove il modello non può uccidere
+        è un bug narrativo.
+```
 
-**Check `DESTREZZA`**
+---
 
-- `bigwin` — «Mani veloci e silenzio assoluto: il bottino è vostro.»
-- `win` — «Preso, senza svegliare nessuno.»
-- `almost` — «Ce l'avete — ma qualcosa si è mosso nel campo.»
-- `fail` — «Un rumore di troppo. I goblin drizzano le orecchie.»
-- `epicfail` — «Una trappola scatta sotto le dita. Il campo è all'erta.»
+## Manoscritto — testo per nodo, in ordine d'incontro
 
-### F3 — Accampamento goblin
+Questo è il testo **corrente** del lab (sincronizzato con
+`questScenarioGoblin.ts` dopo il rework P0 di R-103, 2026-10-08).
+`{nome}`/`{bodyguard}` = interpolazione dal party assegnato (nel motore).
 
-**Stealth (`DESTREZZA`)**
+### F0 — Assegnazione `gob-inizio` (choice)
 
-- `bigwin` — «Vi piazzate alle loro spalle senza un sospiro. Colpirete per primi.»
-- `win` — «Nell'ombra fino all'ultimo passo.»
-- `almost` — «Quasi — un ramo spezzato vi costa il vantaggio perfetto.»
-- `fail` — «Pietre rotolano sotto i piedi. Il campo vi ha visti.»
-- `epicfail` — «Inciampate in un filo di latta. Ogni goblin è sveglio.»
+> **body:** «Terza razzia in un mese. I carri dei mercanti non passano
+> più dal guado: gli ultimi due sono tornati con le casse vuote e le
+> stanghe rotte. Il consiglio non discute più: paga. Sterminateli.»
+>
+> **Opzione:** *Partire* — «Bonus Forza, Bonus Percezione e una cura
+> nella sacca. Si marcia.»
 
-**Assalto (`FORZA`)**
+Il guado è il seme della chiusura (decisione Director 2026-10-08: la
+minaccia è sulla strada — dove avviene F7 — non sul mugnaio).
 
-- `bigwin` — «La carica li travolge prima ancora che urlino.»
-- `win` — «Sfondando la linea, il primo colpo è vostro.»
-- `almost` — «Il campo si accorge di voi un battito prima dell'impatto.»
-- `fail` — «La carica si smorza nel fango. Nessun vantaggio.»
-- `epicfail` — «Vi schiantate contro le palizzate. Nessun vantaggio — e male alle ossa.»
+### F1 — Esplorazione `gob-esplora` (choice)
 
-### F4 — Combattimento (per turno)
+> **transit:** «La strada muore dove il bosco comincia. Il profumo di
+> resina cede alla terra umida e a un fumo basso che non sa di cucina.
+> Davanti marcia chi guida; dietro, gli altri contano i carichi e le
+> uscite.»
+>
+> **body:** «Il bosco tace in un modo che ai boschi non viene naturale.
+> Sul sentiero, un masso sbarra il passo — e da sotto spunta un lembo di
+> straccio, schiacciato come da chi aveva fretta.»
+>
+> **Opzioni:**
+> - *Arrampicarsi sull'albero* — «Percezione. Dall'alto il bosco si
+>   lascia leggere.»
+> - *Spostare il masso* — «Percezione + Forza. Lo straccio là sotto può
+>   valere — o costare schiena.»
 
-**Check `FORZA` del turno (attacco ai goblin)**
+L'indizio visivo (straccio) precede la scelta: il masso è scoperto, non
+inserito — come richiede il brief R-103.
 
-- `bigwin` — «Un'ondata perfetta: i goblin crollano a grappoli.»
-- `win` — «Il party colpisce. Un goblin in meno.»
-- `almost` — «Sfiorano la rotta — il colpo arriva, ma i goblin reggono.»
-- `fail` — «I goblin schivano e riempiono il vuoto.»
-- `epicfail` — «L'assalto si spezza sui loro scudi. Rispondono al contrattacco.»
+#### Check «Ti arrampichi sull'albero» `gob-tracce-per` (PER)
 
-**Colpi subiti (profilo slot)**
+> **transit:** «L'albero giusto sta tre passi fuori dal sentiero. La
+> corteccia è il vostro appiglio, la cima il vostro occhio.»
+>
+> **body:** «Dal basso il bosco è un muro. Da sopra, qualcosa dice dove
+> si apre.»
 
-- Danno — «{nome} incassa il colpo.»
-- Ferita — «{nome} resta a terra, ferito.»
-- Morte — «{nome} non si rialza.»
-- Bodyguard che assorbe — «{bodyguard} si frappone e prende il colpo per {nome}.»
+| esito | verdictFlavor |
+|---|---|
+| bigwin | «Dall'alto: fumo basso a est, una fila di pali appuntiti, una sentinella su un ceppo. E un varco dove nessuno guarda.» |
+| win | «Fumo basso a est e, su un ceppo, una sagoma che non dorme. Il campo è vicino.» |
+| almost | «Qualcosa si muove tra i rami — una volta sola. Scendi con un sospetto, non con una via.» |
+| fail | «L'albero si lascia arrampicare, il bosco no.» |
+| epicfail | «Un ramo marcio: giù di schiena. Ora anche il bosco sa che ci siete.» |
 
-**Fine fase**
+La rivelazione è a scalini: bigwin mostra tutto (fumo, pali, sentinella,
+varco), win la metà essenziale, almost un sospetto.
 
-- Vittoria — «Il campo è conquistato. I superstiti scappano.»
-- Wipe — «L'ultimo respiro si spegne nel fango. La quest finisce qui.»
+#### Check «Spostare il masso» `gob-tracce-perfor` (PER+STR)
 
-### F5 — Incalzare
+> **transit:** «Spalle contro il masso: cede un centimetro per volta.»
+>
+> **body:** «Lo straccio sotto il masso non è caduto lì da solo.
+> Qualcuno ha nascosto qualcosa, in fretta.»
 
-- Scelta «lasciarli fuggire» — «Li guardate disperdersi nel bosco. Torneranno.»
-- `bigwin` — «Li raggiungete sul crinale. Non ne resta nessuno.»
-- `win` — «La caccia è breve. L'ultimo goblin cade.»
-- `almost` — «Vi sfuggono per un soffio, feriti e sparsi. Saranno un'ombra sulla via del ritorno.»
-- `fail` — «Scappano tra le rocce, ridendo. Vi aspetteranno sulla via del ritorno.»
-- `epicfail` — «Vi trascinano in un contrattacco. Scappano — e sanno dove siete.»
+| esito | verdictFlavor |
+|---|---|
+| bigwin | «Il masso si sposta in silenzio — sotto, una nicchia di stracci che qualcuno ha chiuso in fretta.» |
+| win | «Spalle contro il masso. Sotto: stracci, e qualcosa di avvolto.» |
+| almost | «Si sposta, ma il bosco ha sentito qualcosa cadere.» |
+| fail | «Il masso cade dalla parte sbagliata. Il sentiero resta chiuso.» |
+| epicfail | «La roccia prende una caviglia. Si cammina zoppicando, e non era il piano.» |
 
-### F6 — Continua l'esplorazione (per turno)
+### F2 — Bottino `gob-bottino-scelta` → `gob-bottino` (opzionale)
 
-**Check `INTELLIGENZA` o `PERCEZIONE`**
+> **transit:** «Dietro il masso, una nicchia di stracci: qualcuno ha
+> nascosto qualcosa in fretta e non è più tornato.»
+>
+> **body (scelta):** «Sotto il masso, un bottino avvolto in stracci.
+> Prenderlo in silenzio costa mano ferma.»
+>
+> **Opzioni:**
+> - *Prendere il bottino* — «Destrezza. Il rumore può svegliare il campo.»
+> - *Lasciare stare* — «Nessun rumore, nessun rischio — nessun bottino.»
 
-- `bigwin` — «Un nascondiglio intatto: il bottino migliore del campo.»
-- `win` — «Tra le tende bruciate, qualcosa di valore.»
-- `almost` — «Un bottino misero — e una ferita in più.»
-- `fail` — «Solo cenere e spine. Il campo non offre altro.»
-- `epicfail` — «Il terreno cede sotto il peso della ricerca.»
+#### Check «Le mani sul bottino» `gob-bottino` (AGI)
 
-- Scelta «fermarsi» — «Avete preso abbastanza. Si torna a casa.»
+> **body:** «Catene, campanelli, un nodo da sciogliere senza un suono.»
 
-### F7 — Ritorno
+| esito | verdictFlavor |
+|---|---|
+| bigwin | «Nemmeno i campanelli se ne accorgono. In tasca, senza un suono.» |
+| win | «Un nodo alla volta. Il bottino è vostro.» |
+| almost | «Qualcosa tintinna. Fiato trattenuto — niente si muove. Preso a metà.» |
+| fail | «Un campanello tradisce la mano: il suono corre nella valle.» |
+| epicfail | «Il filo resta in mano: i campanelli chiamano, e qualcosa risponde.» |
 
-- Ritorno pulito (F5 riuscita) — «Il villaggio vi vede arrivare col trofeo. Eroe.»
-- Agguato mite — «Una freccia isolata dal ciglio della strada. Erano pochi, e stanchi.»
-- Agguato peggiorato — «Frecce da ogni lato. Vi aspettavano da ore.»
-- Lasciare il trofeo — «Gettate la testa nel fosso e correte. La quest è persa.»
-- Affrontare (vittoria piena) — «L'ultima mischia. Quando è finita, il trofeo è ancora vostro.»
-- Affrontare (perdite) — «Ne esce solo chi era davanti. Gli altri sono rimasti sulla strada.»
-- Wipe — «La strada non vede più nessuno tornare.»
+### F3 — Accampamento `gob-accampamento` (choice)
 
-**Combattimento dell'agguato (per turno — stessa struttura di F4, struttura esatta aperta)**
+> **transit:** «Tra le fronde il fumo si fa spesso: l'accampamento è
+> sotto. Da qui si colpisce in un modo solo — e va scelto bene.»
+>
+> **body:** «Fumi tra le tende. Da qui si colpisce in un modo solo —
+> il vostro.»
+>
+> **Opzioni:**
+> - *Passare il filo dei campanelli* — «Destrezza. Bonus maggiore — ma
+>   se vi vedono, il campo è all'erta.»
+> - *Assalto* — «Forza. Bonus moderato — il fallimento non costa nulla.»
 
-- `bigwin` — «Li avevate già piegati una volta. Non cambia nulla.»
-- `win` — «La mischia gira a vostro favore.»
-- `almost` — «Tenete la strada, ma il sangue scorre.»
-- `fail` — «Sono più organizzati di quanto sembrassero.»
-- `epicfail` — «La trappola si chiude intorno a voi.»
+#### Check «Il filo dei campanelli» `gob-stealth` (AGI)
 
-**Reward al ritorno**
+> **body:** «Un filo teso a mezza gamba porta a campanelli appesi come
+> trappole. Ogni passo è un suono possibile.»
 
-- Trofeo consegnato — «Le teste sul banco del giudice. Il premio è oro sonante.»
-- XP — «La strada insegna. (+XP)»
+| esito | verdictFlavor |
+|---|---|
+| bigwin | «Passate come il fumo tra i paletti. Il campo dorme; la sorpresa è vostra.» |
+| win | «Un passo, un respiro, un passo. Siete dentro.» |
+| almost | «Uno starnuto strozzato. Due teste si alzano dal fuoco, poi tornano giù. Dentro — ma non invisibili.» |
+| fail | «Un filo vibra sotto il palmo. Un campanello decide di vivere.» |
+| epicfail | «Il filo resta in mano: i campanelli chiamano, e qualcosa risponde.» |
 
-### Linee comuni (qualsiasi fase)
+#### Check «La carica» `gob-assalto` (STR)
 
-- Checkpoint «ritirati» — «La quest resta a metà. Meglio vivi che eroi.»
-- Checkpoint «continua» — «Avanti.»
-- Consumabile Bonus Forza — «I muscoli si tendono. La Forza risponde.»
-- Consumabile Bonus Percezione — «Gli occhi si acuiscono. Nulla sfugge.»
-- Consumabile Healing — «La ferita si chiude. +20 HP.»
-- Ferita di un PG — «{nome} si rialza a fatica. Per giorni non combatterà.»
-- Morte di un PG (fuori F4) — «{nome} non si rialza. Il posto dietro resta vuoto.»
+> **body:** «La palizzata è fatta di rifiuti e fango. Sfondarla prima
+> che si organizzino — o subirla.»
+
+| esito | verdictFlavor |
+|---|---|
+| bigwin | «Il primo palo cade prima che qualcuno capisca. Una tenda si accartoccia sul fuoco; due goblin rotolano via ciechi di fumo.» |
+| win | «Sfondate dove la palizzata è più bassa. Una lancia si alza — troppo tardi.» |
+| almost | «La palizzata tiene un respiro di troppo. Qualcuno urla; il campo ha il tempo di afferrare le armi.» |
+| fail | «La carica si pianta nel fango. Vi aspettano già, lance puntate.» |
+| epicfail | «Inciampate nella vostra stessa carica: in mezzo al campo, in disordine.» |
+
+Le due vie si leggono diverse già nel testo: stealth = «quasi scoperti»,
+assalto = «li abbiamo colti prima che si organizzassero».
+
+### F4 — Combattimento `gob-combattimento` (combat)
+
+> **transit:** «Il momento è scelto. Il bosco trattiene il fiato — poi il
+> campo esplode.»
+>
+> **body:** «Li avete. O loro.»
+
+**Attack lines per turno** (canale combat del motore):
+
+| esito | riga |
+|---|---|
+| bigwin | «Il colpo li spacca a metà: due goblin crollano insieme.» |
+| win | «Il colpo arriva. La linea cede di un passo.» |
+| almost | «Il colpo morde, non uccide: arretrano e restano in piedi.» |
+| fail | «Scudi serrati. Il colpo muore su legno e cuoio.» |
+| epicfail | «La linea si richiude: per un istante lungo siete circondati.» |
+
+**Righe del motore (condivise da tutte le quest — `questRun.ts`, nomi
+interpolati). Il danno legge lo stato: la frase dipende dagli HP residui
+del bersaglio, non dal numero subito:**
+
+- Danno, >70% HP — «{nome} serra i denti e resta in piedi (−X HP).»
+- Danno, 35–70% — «{nome} si piega, poi si rimette dritto (−X HP).»
+- Danno, 20–35% — «{nome} barcolla: c'è sangue sul fianco (−X HP).»
+- Danno, <20% — «{nome} regge solo perché non c'è altro da fare (−X HP).»
+- Morte — «{nome} cade, e non si rialza più — su «{fonte}».»
+- Death save — «{nome} è a terra… e si rialza.»
+- Bodyguard — «{bodyguard} si frappone e subisce il colpo destinato a {nome}.»
+
+### F5 — Incalzare `gob-incalzare` (choice, solo se superstiti)
+
+> **transit:** «Polvere e sangue. I goblin che restano spezzano il fronte
+> e corrono verso il bosco, portandosi dietro la vostra faccia.»
+>
+> **body:** «I superstiti corrono verso il bosco. Chiuderli qui — o
+> lasciarli andare.»
+>
+> **Opzioni:**
+> - *Lasciarli fuggire* — «Torneranno. Li rivedrete sulla strada di
+>   casa.» (flag `agguatoPeggiore`)
+> - *Incalzare* — «Forza. Chiudete la quest qui — o peggiorate il conto.»
+
+#### Check «La caccia tra le rocce» `gob-incalza-check` (STR)
+
+> **failHint (pre-check):** «La caccia costa sangue comunque. Se
+> scappano, tornano feriti: l'agguato sarà più debole.»
+>
+> **upfrontDamage:** 10 HP (20 su epicfail) — narrato nell'esito.
+
+| esito | verdictFlavor |
+|---|---|
+| bigwin | «Li chiudete dove il sentiero stringe. Nessuno tornerà a raccontare cosa è successo.» |
+| win | «Li chiudete contro le rocce, uno alla volta. Il sentiero torna silenzioso.» |
+| almost | «Correte fino al fiatone: qualcuno gli taglia la fuga, qualcuno no. Torneranno feriti — e avvisati.» |
+| fail | «Le rocce vi tradiscono. Li vedete svanire, e sapete che li rivedrete.» |
+| epicfail | «La caccia costa sangue e non chiude nulla. Tornano tutti — e torneranno organizzati.» |
+
+Nota: `win`/`bigwin` = sterminio → F7 pulito; `almost`/`fail`/`epicfail`
+= fuga → agguato mite.
+
+### F6 — Razzia `gob-esplora-extra` (choice, push-your-luck)
+
+> **transit:** «Il campo conquistato è un campo aperto: cenere, tende
+> rovesciate, e il bottino che nessuno reclama più.»
+>
+> **body:** «Cenere e tende rovesciate. Sotto il telo della tenda più
+> bassa, un angolo di cuoio con un fermaglio d'ottone.»
+>
+> **Opzioni:**
+> - *Frugare ancora* — «Il telo cede piano. Ogni altro giro costa di più
+>   — in oro e in pelle.»
+> - *Fermarsi* — «Lasciate il cuoio dov'è: si torna a casa.»
+
+La tentazione è un oggetto visibile e incompleto (la cassa semibruciata):
+il danno crescente del check È la struttura che cede.
+
+#### Check «Razzia tra le tende» `gob-cerca` (INT/PER)
+
+| esito | verdictFlavor |
+|---|---|
+| bigwin | «Il fermaglio cede: dentro, il meglio di ciò che restava.» |
+| win | «Un fondo di tenda, un pugno di stracci — qualcosa che valeva la pena.» |
+| almost | «Poca roba, e la trave vi presenta il conto.» |
+| fail | «Solo cenere, spine — e la trappola che chiude il giro.» |
+| epicfail | «Il campo si fa pagare l'ultimo debito: cenere, spine e sangue.» |
+
+**Righe per turno** (motore, `GOBLIN_F6_CREAK_LINES` — la struttura che
+cede, una per `exploreTurn`):
+
+1. «Il palo che regge il telo scricchiola.»
+2. «Il telo brucia ancora, in basso. Il caldo arriva al viso.»
+3+. «Una trave cede. Chi frugava arretra — e vede il cuoio più vicino.»
+
+### F7 — Ritorno / Agguato
+
+> **`gob-ritorno` (info):** «La strada scende verso casa. Qualcuno ha
+> cominciato a fischiettare. Poi smette, senza che nessuno dica perché.»
+>
+> **`gob-agguato` (harm):** «Il fischiettio si interrompe a metà. Una
+> freccia nel palo accanto a voi. Poi tutte le altre.»
+
+Il sollievo PRIMA (valle esplicita), lo shock come interruzione —
+struttura «no, non ora» richiesta dal brief R-103.
+
+#### `gob-agguato-scelta` (choice) — trofeo o sangue
+
+> **transit:** «Attorno, il bosco si stringe di nuovo. Resta una scelta
+> sola: lasciare il trofeo, o lasciare qualcuno.»
+>
+> **Opzioni:**
+> - *Lasciare il trofeo* — «Il trofeo rotola nel fosso. La strada si
+>   libera — a mani vuote.»
+> - *Affrontare* — «Un turno di combattimento. Chi resta a coprire paga.»
+
+#### `gob-ultimo-scontro` (combat, 1 turno)
+
+> **transit:** «L'ultima mischia non è una battaglia: è un conto da
+> chiudere. Chi resta a coprire paga per tutti.»
+>
+> **body:** «Uno scontro secco come un osso che si spezza. Il profilo
+> decide chi paga.»
+
+#### Chiusura `gob-fine` (end)
+
+> **transit:** «La strada si apre sul villaggio. Chi torna conta i nomi
+> di chi non torna — e chi ha visto sa cosa è costato.»
+>
+> **body:** «La spedizione è finita.»
+
+**Epilogo composto dal motore** (`composeEndingText` — la riga più letta
+della run, per il principio peak-end):
+
+- *reward:* «Con il trofeo sulla bilancia: da domani, i carri ripassano
+  dal guado.»
+- *survived (trofeo perso):* «A mani vuote: il trofeo è rimasto sulla
+  strada. Il guado resta deserto.»
+- *survived (senza sterminio):* «Tornate senza completare lo sterminio.
+  Il guado resta deserto.»
+- Registro: «{morti} non sono tornati.» + «Tornate in {vivi}.»
+- Bilancio: loot portato a casa + «Esperienza: +{xp} XP.»
+
+Il guado chiude ciò che F0 ha aperto (callback, decisione Director).
+
+---
+
+## Delta rimasti (dopo il rework P0 di R-103)
+
+Applicati 2026-10-08 (P0, solo testo — zero RNG, zero calibrazione):
+campanelli, albero/masso con indizio visibile, assalto fisico, attack
+lines, righe di danno per gravità, fix F5-win (contraddiceva lo
+sterminio), cassa semibruciata + righe-per-turno in F6, sollievo→shock
+in F7, epilogo con registro e callback al guado, transit hold ∝ parole
+(`questLabPacing`).
+
+Ancora aperti:
+
+1. Interpolazione slot nei transit (`{leader}`…): richiede supporto nel
+   motore — finché non esiste, i transit restano name-agnostic.
+2. `options[].consequence`: campo nuovo candidato — frase d'esito delle
+   scelte senza check (F5 lasciar fuggire, F7 mollare il trofeo).
+3. P1 rimandati (doc R-103): griglia F4 fase×banda, transit F4→F5 sullo
+   stato del party, testo condizionato a flag (sentinella F1→F3, goblin
+   riconoscibile F5→F7), metriche emotive M2/M6/M7/M8 nello script MC.
+4. Morale dei goblin: **deciso dal Director 2026-10-08 — no** (né
+   meccanica né readout; la rotta resta implicita nel contatore turni).
+5. Budget di rischio: calibrare via MC prima di scrivere cifre nei flavor.
 
 ---
 
@@ -349,4 +609,9 @@ secco F4-like + 5 danni secchi a tutti · F1 = solo 2 check.
 - Soglia morte per HP: quando un PG arriva a 0 HP → morte? ferita? Da
   confermare (interpretazione probabile: 0 HP = morte, ferita = meccanica
   separata già vigente).
-- Testi per esito: prima bozza completa, da rifinire durante il playtest.
+- ~~Testi per esito~~ → **sostituiti dal manoscritto v3** (R-099 + rework
+  P0 di R-103, sincronizzato col lab 2026-10-08): transit, action names,
+  verdictFlavor a 5 bande, attack lines, righe di danno per gravità,
+  epilogo composto. Restano i delta di schema (`options[].consequence`,
+  interpolazione `{slot}` nei transit).
+- Budget di rischio: proposta con cifre placeholder, da calibrare via MC.
