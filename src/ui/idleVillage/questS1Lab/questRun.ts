@@ -143,6 +143,20 @@ export interface QuestRunState {
    *  damage, travel incidents, attrition) — the UI plays them as an ambient
    *  beat, then clears. */
   recentHarms: HarmEvent[];
+  /* ---- Temporal frontier (PLAN-025 T-004, desiderata v27) --------------- */
+  /** Schema stamp — persisted runs with a different value are re-migrated or
+   *  discarded, never reinterpreted. */
+  engineSchemaVersion: number;
+  /** Bumped on every committed frontier advance; presentation projections key
+   *  on it and are discarded when it does not match. */
+  frontierVersion: number;
+  /** Frontier contract: 'waiting' = the node needs player input (choice,
+   *  combat turn); 'pending' = a timed node maturing toward `readyAt`.
+   *  Ticks are caller-supplied (game clock on /game, 0 = instant elsewhere). */
+  frontier: { status: 'waiting' | 'pending'; startedAt: number; readyAt: number };
+  /** Caller-tick duration of one maturable node (info/harm). 0 = instant:
+   *  legacy callers keep the old auto-chain behaviour via `matureReady`. */
+  nodeTicks: number;
 }
 
 /** A resolved check shown to the player as an astrolabe cinematic. */
@@ -622,6 +636,9 @@ export function createRun(
   seed: number,
   questId: QuestId = 'cassa',
   loadout?: string[],
+  /** v27 frontier clock: caller-tick duration per maturable node and the tick
+   *  the run starts at. Omitted = instant maturation (lab, Monte Carlo). */
+  frontier?: { nodeTicks?: number; startTick?: number },
 ): QuestRunState {
   const quest = QUESTS[questId];
   const preset = quest.presets.find((p) => p.id === presetId) ?? quest.presets[0];
@@ -677,8 +694,28 @@ export function createRun(
     harmSeq: 0,
     pendingHarms: [],
     recentHarms: [],
+    engineSchemaVersion: ENGINE_SCHEMA_VERSION,
+    frontierVersion: 0,
+    // Every quest starts on a 'choice' node → the initial frontier waits.
+    frontier: { status: 'waiting', startedAt: frontier?.startTick ?? 0, readyAt: frontier?.startTick ?? 0 },
+    nodeTicks: frontier?.nodeTicks ?? 0,
   };
   return state;
+}
+
+/** Persisted-state schema version (PLAN-025 T-005 reads this). */
+export const ENGINE_SCHEMA_VERSION = 1;
+
+/** Maturable nodes = timed, non-decision kinds that carry scene time (v27). */
+export function maturableNodeCount(questId: QuestId): number {
+  return Object.values(QUESTS[questId].nodes).filter((n) => n.kind === 'info' || n.kind === 'harm').length;
+}
+
+/** Duration rule (PLAN-025 T-004): the quest's authored total ticks are shared
+ *  evenly across its maturable nodes — no new duration numbers are invented. */
+export function nodeDurationTicks(questId: QuestId, totalTicks: number): number {
+  const n = maturableNodeCount(questId);
+  return n ? Math.floor(totalTicks / n) : 0;
 }
 
 function allDead(state: QuestRunState): boolean {
@@ -1670,8 +1707,15 @@ function setCheckOutcomeText(state: QuestRunState, preMark: number, outcomeMark:
   resolved.outcomeText = [...harmLines, ...authoredLines].join(' ');
 }
 
-/** Advance through auto-resolving nodes, computing their dynamic text. */
-function enterNode(state: QuestRunState, nodeId: string): void {
+/**
+ * Arrive at a node under v27 frontier semantics (PLAN-025 T-004): choice and
+ * combat nodes commit a 'waiting' frontier (player input), info and harm
+ * commit a 'pending' frontier that matures at `tick + nodeTicks` (the scene
+ * lands on arrival, the effects at maturation — the F7 relief reads BEFORE
+ * the ambush), check nodes resolve inline as the consequence of a committed
+ * choice, end nodes resolve the run.
+ */
+function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
   // Iterative, bounded traversal: check/info/harm chains used to recurse.
   // A cycle in authored `next` links must degrade to a terminal state —
   // an infinite recursion here crashes the whole React tree with a
@@ -1686,6 +1730,7 @@ function enterNode(state: QuestRunState, nodeId: string): void {
     const node = nodesFor(state)[cursor];
     if (!node) return;
     state.nodeId = cursor;
+    state.frontierVersion += 1;
     state.log.push({ kind: 'NODE', text: node.title });
 
     // Spotted sneaking past the guards: their patrol chases the party out —
@@ -1694,12 +1739,13 @@ function enterNode(state: QuestRunState, nodeId: string): void {
       addDays(state, 1, 'seminare le guardie che vi inseguivano.');
     }
 
-    // Combat nodes (goblin quest) stop and wait for per-turn player input:
-    // each click resolves one turn via the 'fight-turn' synthetic option.
+    // Combat nodes stop and wait for per-turn player input: each command
+    // resolves one turn via the 'fight-turn' synthetic option.
     if (node.kind === 'combat') {
       state.combatTurn = 0;
       state.goblinLeft = node.combat?.enemies ?? 0;
       state.lastEvent = node.body;
+      state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick };
       return;
     }
 
@@ -1717,7 +1763,7 @@ function enterNode(state: QuestRunState, nodeId: string): void {
       }
       cursor = applyCheckOutcome(state, node, result.verdict);
       setCheckOutcomeText(state, preMark, outcomeMark);
-      // Same rule as applyChoice: an outcome toll that kills the last member is a wipe.
+      // Same rule as submitCommand: an outcome toll that kills the last member is a wipe.
       if (allDead(state)) {
         endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
         return;
@@ -1725,88 +1771,14 @@ function enterNode(state: QuestRunState, nodeId: string): void {
       continue;
     }
 
-    // Info nodes are narrative beats, not decisions: they set lastEvent and
-    // auto-advance so the player clicks only on real choices.
-    if (node.kind === 'info') {
-      state.log.push({ kind: 'INFO', text: node.body });
-      state.lastEvent = node.body;
-      // Goblin F7 router: a clean extermination walks home — survivors wait
-      // in ambush instead.
-      if (node.id === 'gob-ritorno' && state.flags.includes('sterminio')) {
-        cursor = 'gob-fine';
-        continue;
-      }
-      cursor = node.next ?? 'ritorno';
-      continue;
-    }
-
-    if (node.kind === 'harm') {
-      if (node.id === 'gob-agguato') {
-        // The ambush opens with dry damage on EVERYONE (Director 2026-10-06,
-        // tunable): no slot roll — the whole party pays the entrance fee.
-        for (const m of state.party) {
-          if (!m.dead)
-            applyHpDamage(
-              state,
-              m,
-              TUNE.ambushFlatDamage +
-                (state.flags.includes('agguatoPeggiore') ? TUNE.ambushPeggioreFlatBonus : 0),
-              node.title,
-            );
-        }
-        state.lastEvent = 'Frecce dal ciglio della strada. Erano rimasti in attesa.';
-      } else if (node.id === 'rv-attrito') {
-        // The unstable zone: no check can erase this cost (Director mockup —
-        // "continuare deve costare qualcosa"). +1 day always, then a roll:
-        // a wound worsens, or someone new is hurt, or luck holds.
-        addDays(state, 1, 'attraversare la zona instabile.');
-        const candidates = state.party.filter((m) => !m.dead);
-        const r = roll(state);
-        if (r < 0.35 && candidates.some((m) => m.wounded)) {
-          const victim = candidates.find((m) => m.wounded);
-          if (victim) {
-            const hpBefore = victim.hp;
-            victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
-            state.log.push({ kind: 'HARM', text: `La ferita di ${victim.name} peggiora nella zona instabile.` });
-            recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
-            state.lastEvent = `${victim.name} peggiora: la zona non perdona chi è già ferito.`;
-          }
-        } else if (r < 0.7) {
-          const victim = candidates[Math.floor(roll(state) * candidates.length)];
-          if (victim) {
-            const hpBefore = victim.hp;
-            victim.wounded = true;
-            victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
-            state.log.push({ kind: 'HARM', text: `${victim.name} è ferito nella zona instabile.` });
-            recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
-            state.lastEvent = `La pietra cede sotto ${victim.name}: ferito. Il costo del passaggio.`;
-          }
-        } else {
-          state.lastEvent = 'La zona scricchiola ma regge: passate indenni — stavolta.';
-        }
-      } else {
-        // Travel incident: direct, non-check harm — the bodyguard cannot intercept.
-        if (roll(state) < TUNE.incidentChance) {
-          const candidates = state.party.filter((m) => !m.dead);
-          const victim = candidates[Math.floor(roll(state) * candidates.length)];
-          if (victim) {
-            const hpBefore = victim.hp;
-            victim.wounded = true;
-            victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
-            state.log.push({ kind: 'HARM', text: `La frana colpisce ${victim.name}: ferito.` });
-            recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
-            state.lastEvent = `La frana coglie ${victim.name}. Il resto della strada lo farà con una ferita.`;
-          }
-        } else {
-          state.lastEvent = 'La frana passa a pochi metri: spavento, ma nessun danno.';
-        }
-      }
-      if (allDead(state)) {
-        endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
-        return;
-      }
-      cursor = node.next ?? 'ritorno';
-      continue;
+    // Info and harm nodes are timed beats, not decisions: arrival commits a
+    // pending frontier and shows the scene; the node's effects land when the
+    // frontier matures (matureNode). Only the clock crosses them (v27).
+    if (node.kind === 'info' || node.kind === 'harm') {
+      if (node.kind === 'info') state.log.push({ kind: 'INFO', text: node.body });
+      state.lastEvent = node.body ?? node.title;
+      state.frontier = { status: 'pending', startedAt: tick, readyAt: tick + state.nodeTicks };
+      return;
     }
 
     if (node.kind === 'end') {
@@ -1862,21 +1834,139 @@ function enterNode(state: QuestRunState, nodeId: string): void {
       }
     }
 
-    // Choice nodes (and anything unknown) stop the chain and wait for input.
+    // Choice nodes (and anything unknown) stop and wait for player input.
+    if (!state.ended) state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick };
     return;
   }
 }
 
 /**
- * Apply a player choice on a 'choice' node.
- * `CHECK:<id>` resolves the check immediately, applies harms and branches.
+ * Resolve a matured pending node (PLAN-025 T-004): the node's authored
+ * effects land now — the F7 router, ambush/incident damage — then the run
+ * arrives at the authored next node. No-op while the frontier is not ready.
  */
-export function applyChoice(
+function matureNode(state: QuestRunState, tick: number): void {
+  const node = nodesFor(state)[state.nodeId];
+  if (!node || state.frontier.status !== 'pending' || tick < state.frontier.readyAt) return;
+  // The next node starts when THIS one matured (its readyAt), not when the
+  // player looked: elapsed time pre-pays durations, so a late catch-up
+  // consumes the whole matured chain instead of restarting the clock (v27).
+  const maturedAt = state.frontier.readyAt;
+  if (node.kind === 'info') {
+    // Goblin F7 router: a clean extermination walks home — survivors wait
+    // in ambush instead.
+    arriveNode(state, node.id === 'gob-ritorno' && state.flags.includes('sterminio') ? 'gob-fine' : node.next ?? 'ritorno', maturedAt);
+    return;
+  }
+  if (node.kind === 'harm') {
+    if (node.id === 'gob-agguato') {
+      // The ambush opens with dry damage on EVERYONE (Director 2026-10-06,
+      // tunable): no slot roll — the whole party pays the entrance fee.
+      for (const m of state.party) {
+        if (!m.dead)
+          applyHpDamage(
+            state,
+            m,
+            TUNE.ambushFlatDamage +
+              (state.flags.includes('agguatoPeggiore') ? TUNE.ambushPeggioreFlatBonus : 0),
+            node.title,
+          );
+      }
+      state.lastEvent = 'Frecce dal ciglio della strada. Erano rimasti in attesa.';
+    } else if (node.id === 'rv-attrito') {
+      // The unstable zone: no check can erase this cost (Director mockup —
+      // "continuare deve costare qualcosa"). +1 day always, then a roll:
+      // a wound worsens, or someone new is hurt, or luck holds.
+      addDays(state, 1, 'attraversare la zona instabile.');
+      const candidates = state.party.filter((m) => !m.dead);
+      const r = roll(state);
+      if (r < 0.35 && candidates.some((m) => m.wounded)) {
+        const victim = candidates.find((m) => m.wounded);
+        if (victim) {
+          const hpBefore = victim.hp;
+          victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
+          state.log.push({ kind: 'HARM', text: `La ferita di ${victim.name} peggiora nella zona instabile.` });
+          recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
+          state.lastEvent = `${victim.name} peggiora: la zona non perdona chi è già ferito.`;
+        }
+      } else if (r < 0.7) {
+        const victim = candidates[Math.floor(roll(state) * candidates.length)];
+        if (victim) {
+          const hpBefore = victim.hp;
+          victim.wounded = true;
+          victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
+          state.log.push({ kind: 'HARM', text: `${victim.name} è ferito nella zona instabile.` });
+          recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
+          state.lastEvent = `La pietra cede sotto ${victim.name}: ferito. Il costo del passaggio.`;
+        }
+      } else {
+        state.lastEvent = 'La zona scricchiola ma regge: passate indenni — stavolta.';
+      }
+    } else {
+      // Travel incident: direct, non-check harm — the bodyguard cannot intercept.
+      if (roll(state) < TUNE.incidentChance) {
+        const candidates = state.party.filter((m) => !m.dead);
+        const victim = candidates[Math.floor(roll(state) * candidates.length)];
+        if (victim) {
+          const hpBefore = victim.hp;
+          victim.wounded = true;
+          victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
+          state.log.push({ kind: 'HARM', text: `La frana colpisce ${victim.name}: ferito.` });
+          recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
+          state.lastEvent = `La frana coglie ${victim.name}. Il resto della strada lo farà con una ferita.`;
+        }
+      } else {
+        state.lastEvent = 'La frana passa a pochi metri: spavento, ma nessun danno.';
+      }
+    }
+    if (allDead(state)) {
+      endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+      return;
+    }
+    drainHarmsToAmbient(state);
+    arriveNode(state, node.next ?? 'ritorno', maturedAt);
+    return;
+  }
+  // Unknown pending node kind: never stall the run on it.
+  arriveNode(state, node.next ?? 'ritorno', maturedAt);
+}
+
+/**
+ * v27 catch-up (PLAN-025 T-004): consume every timed node matured by `tick`,
+ * in order, stopping at the first frontier that needs the player. A 'waiting'
+ * frontier never advances here — offline time cannot decide for the player.
+ */
+export function matureReady(state: QuestRunState, tick: number): QuestRunState {
+  for (let steps = 0; !state.ended && state.frontier.status === 'pending' && tick >= state.frontier.readyAt; steps += 1) {
+    if (steps >= TUNE.maxAutoSteps) {
+      state.log.push({ kind: 'INFO', text: `Il percorso si è chiuso in un ciclo (${state.nodeId}). La spedizione torna al villaggio.` });
+      endRun(state, 'survived', 'Il percorso si è chiuso su se stesso: la spedizione è rientrata.');
+      break;
+    }
+    matureNode(state, tick);
+  }
+  return state;
+}
+
+/**
+ * Resolve ONE player command at a 'waiting' frontier (PLAN-025 T-004, v27):
+ * a decision choice, one combat turn, or the synthetic 'advance'. The command
+ * commits at most the current node — a `CHECK:<id>` outcome resolves inline
+ * (it is the consequence of the committed choice), then the run ARRIVES at
+ * the next node and stops: pending nodes mature only via `matureReady(tick)`,
+ * a new 'waiting' frontier waits for the next command. A command issued while
+ * the frontier is still pending is rejected — time, not input, crosses it.
+ * `opts.tick` is the caller's game tick (defaults to the frontier's own tick,
+ * i.e. "no time has passed" for clock-less callers).
+ */
+export function submitCommand(
   state: QuestRunState,
   optionId: string,
-  opts?: { useConsumable?: boolean },
+  opts?: { useConsumable?: boolean; tick?: number },
 ): QuestRunState {
   if (state.ended) return state;
+  if (state.frontier.status === 'pending') return state;
+  const tick = opts?.tick ?? state.frontier.startedAt;
   const nodes = nodesFor(state);
   const node = nodes[state.nodeId];
   if (!node) return state;
@@ -1888,7 +1978,7 @@ export function applyChoice(
   // info nodes expose a single synthetic «continue» action
   if (node.kind === 'info') {
     if (optionId !== 'advance') return state;
-    enterNode(state, node.next ?? 'ritorno');
+    arriveNode(state, node.next ?? 'ritorno', tick);
     drainHarmsToAmbient(state);
     return state;
   }
@@ -1908,7 +1998,7 @@ export function applyChoice(
       }
       const next =
         state.goblinLeft <= 0 ? node.combat.nextCleared : (node.combat.nextSurvivors ?? node.next);
-      if (next) enterNode(state, next);
+      if (next) arriveNode(state, next, tick);
     }
     drainHarmsToAmbient(state);
     return state;
@@ -1955,6 +2045,7 @@ export function applyChoice(
   if (next.startsWith('CHECK:')) {
     const checkNode = nodes[next.slice(6)];
     state.nodeId = checkNode.id;
+    state.frontierVersion += 1;
     const preMark = state.log.length;
     const result = resolveCheck(state, checkNode, opts?.useConsumable !== false);
     // Only this check's lines, HARM included, and written again once the outcome
@@ -1986,18 +2077,33 @@ export function applyChoice(
       endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
       return state;
     }
-    enterNode(state, nextId);
+    arriveNode(state, nextId, tick);
   } else {
-    enterNode(state, next);
+    arriveNode(state, next, tick);
   }
   drainHarmsToAmbient(state);
   return state;
 }
 
+/**
+ * Legacy full-step API (lab cockpit, Monte Carlo, tests): resolve the command,
+ * then mature every timed node instantly — identical net effect to the old
+ * auto-chain, with the frontier machinery underneath.
+ */
+export function applyChoice(
+  state: QuestRunState,
+  optionId: string,
+  opts?: { useConsumable?: boolean },
+): QuestRunState {
+  submitCommand(state, optionId, opts);
+  return matureReady(state, Number.MAX_SAFE_INTEGER);
+}
+
 /** Options visible at the current node (filters info-gated options). */
 export function availableOptions(state: QuestRunState): { id: string; label: string; detail: string; costGold?: number; disabled: boolean }[] {
   const node = nodesFor(state)[state.nodeId];
-  if (!node || state.ended) return [];
+  // A pending frontier is a timed beat, not a decision — no input exists yet.
+  if (!node || state.ended || state.frontier.status === 'pending') return [];
   if (node.kind === 'info') {
     return [{ id: 'advance', label: 'Continua', detail: 'Prosegui.', disabled: false }];
   }
