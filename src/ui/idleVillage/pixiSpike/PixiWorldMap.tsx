@@ -191,6 +191,10 @@ void main() {
 }
 `;
 
+/** Clouds within this many world px of a map anchor fade to CLOUD_CLEAR_MIN of their opacity. */
+const CLOUD_CLEAR_RADIUS_PX = 260;
+const CLOUD_CLEAR_MIN = 0.12;
+
 /** Colour a cloud's shadow is painted in over the land. */
 const CLOUD_SHADOW_TINT = 0x0b1a10;
 
@@ -246,6 +250,9 @@ export function PixiWorldMap({
   const { manifest, cameraConfig } = useWorldSurface(manifestPath);
   const hostRef = useRef<HTMLDivElement>(null);
   const refitRef = useRef<(() => void) | null>(null);
+  /** Anchors the clouds must clear: read every frame, so POIs that come and go need no map rebuild. */
+  const anchorsRef = useRef(anchors);
+  anchorsRef.current = anchors;
   const regionsRef = useRef(regions);
   regionsRef.current = regions;
   const regionsOn = !!regions;
@@ -664,10 +671,23 @@ export function PixiWorldMap({
             sprite.y = s.y;
             sprite.alpha = band.opacity;
             layer.addChild(sprite);
+            const halfW = w / 2;
+            const halfH = sprite.height / 2;
+            let shown = 1;
             ticks.push((t) => {
               const drift = band.driftSeconds / cloudSpeed;
               const p = ((((t + s.delaySeconds) % drift) + drift) % drift) / drift;
               sprite.x = -w + p * (canvas.width + w);
+              // A cloud that would sit on a point of interest thins out instead of hiding it.
+              let want = 1;
+              for (const anchor of anchorsRef.current) {
+                const dx = Math.max(0, Math.abs(sprite.x + halfW - anchor.x) - halfW);
+                const dy = Math.max(0, Math.abs(sprite.y + halfH - anchor.y) - halfH);
+                const d = Math.hypot(dx, dy) / CLOUD_CLEAR_RADIUS_PX;
+                want = Math.min(want, CLOUD_CLEAR_MIN + (1 - CLOUD_CLEAR_MIN) * Math.min(1, d));
+              }
+              shown += (want - shown) * 0.08;
+              sprite.alpha = band.opacity * shown;
             });
           }
         }
