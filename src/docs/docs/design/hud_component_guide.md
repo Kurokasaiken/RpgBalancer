@@ -252,3 +252,15 @@ File di riferimento: `src/ui/idleVillage/questS1Lab/hud/*` (già dentro `STRICT_
 ## Pannelli chiudibili e menu Pannelli
 
 Ogni pannello flottante che il giocatore può chiudere si registra in `components/gameFrame/hudPanelRegistry.ts` (id, tasto, visibilità iniziale, `devOnly` per gli strumenti di test). Il menu Pannelli (bottone in basso a destra, con un contatore dei pannelli chiusi) si genera da quella lista: **per aggiungere un pannello basta una riga nel registro e la stringa `gameFrame.panels.names.<id>` nei due locale** (un test di guardia fallisce se manca). Il pannello deve avere un pulsante di chiusura che chiama `panels.set(id, false)`. In sviluppo ci sono anche Director (D) e Tuning (T): Tuning mostra a schermo i valori di tuning della mappa, con slider, e la riga da incollare in `gameFrameConfig.ts`.
+
+## Pulsanti
+
+Solo tre ruoli, tutti dai token (nessun colore scritto a mano, **mai viola** — il vecchio CTA azzurro-viola è stato sostituito):
+
+| Ruolo | Come si ottiene | Aspetto |
+|---|---|---|
+| **Azione primaria** (AVVIA, Conferma) | `<SkinButton variant="cta">` (o `data-skin="cta"`) dentro `<SkinScope>` | placca smalto verde acqua con cornice d'ottone, bisello; uno solo per schermata |
+| **Comando di testata** (ordina, filtri, chiudi, menu) | un normale `<button>` dentro un contenitore `data-hud-controls` | pillola 26 px nel materiale della placca; `aria-pressed="true"` = attiva (oro) |
+| **Utilità/secondario** (fuori dalle testate) | `<SkinButton>` (`utility` / `secondary`) | placca in bronzo battuto / ardesia incisa |
+
+Regole: (1) un `<button>` nudo non va mai in un pannello HUD, perché eredita lo stile del browser; (2) i controlli nativi (slider, select) prendono `accent-color: var(--skin-title-color)`; (3) l'icona sola sta in un bottone 26×26 con `aria-label` e `title`; (4) stato attivo ≠ hover: l'attivo cambia fondo e bordo, l'hover solo luminosità; (5) un'azione che parte con un tasto lo scrive nel `title` (es. `Pausa [Spazio]`).
