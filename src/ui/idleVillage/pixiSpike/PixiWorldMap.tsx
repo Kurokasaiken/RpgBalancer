@@ -91,7 +91,7 @@ export const DEFAULT_MAP_TUNE: PixiMapTune = {
   cloudParallax: 1,
   cloudMorph: 1,
   smokeAmount: 1,
-  wonderEveryS: 18,
+  wonderEveryS: 600,
   deepSeaFadePx: 650,
   forestSway: 4,
   forestSwaySpeed: 1,
@@ -101,6 +101,8 @@ export const DEFAULT_MAP_TUNE: PixiMapTune = {
 };
 
 export interface PixiWorldMapProps {
+  /** Bump this number to make a sea wonder surface now (Director button). */
+  wonderRequest?: number;
   /**
    * Time of day as a grade over the whole map: `light` 1 = full day, 0 = deepest night; `warm` 0-1 = the amber of
    * dawn and dusk. The map eases toward it over a few seconds; omit for plain daylight.
@@ -325,7 +327,8 @@ const SMOKE_LIFE_S = 7;
 /** Supersampling of a hovered territory's outline (mask pixels -> outline pixels), so its edge is smooth. */
 const REGION_RASTER_SCALE = 2;
 /** Colour of a hovered territory's border (ink black, like a board-game province). */
-const REGION_EDGE_RGBA = [16, 12, 8, 255];
+// The HUD's teal (the CTA enamel): the territory outline reads as part of the interface, not as ink.
+const REGION_EDGE_RGBA = [27, 83, 96, 255];
 /** Glass globe (hold Alt): how far the map tips toward the pointer, and how far the seabed slides with it (world px). */
 const GLOBE_TILT_DEG = 7;
 const GLOBE_BED_SHIFT_PX = 140;
@@ -334,6 +337,12 @@ const GLOBE_BED_SHIFT_PX = 140;
 /** Sea wonders: how often one may surface, how long it stays, how big it is on the map (world px wide). */
 const WONDER_LIFETIME_S = 9;
 const WONDER_WIDTH_PX = 300;
+
+/** Smooth 0..1 ramp (clamped), for the clouds' birth and dissolve. */
+function smoothstep01(x: number): number {
+  const v = Math.min(1, Math.max(0, x));
+  return v * v * (3 - 2 * v);
+}
 
 /** Clouds within this many world px of a map anchor fade to CLOUD_CLEAR_MIN of their opacity. */
 const CLOUD_CLEAR_RADIUS_PX = 260;
@@ -391,6 +400,7 @@ export function PixiWorldMap({
   regions,
   tune: tuneProp,
   ambient,
+  wonderRequest = 0,
   seaPatternConfig = DEFAULT_SEA_PATTERN_CONFIG,
   coastFoamConfig = DEFAULT_COAST_FOAM_CONFIG,
   onStats,
@@ -404,6 +414,8 @@ export function PixiWorldMap({
   anchorsRef.current = anchors;
   const tune = { ...DEFAULT_MAP_TUNE, ...tuneProp };
   const tuneKey = JSON.stringify(tune);
+  const forcedWonderRef = useRef(wonderRequest);
+  forcedWonderRef.current = wonderRequest;
   const ambientRef = useRef(ambient);
   ambientRef.current = ambient;
   const regionsRef = useRef(regions);
@@ -557,9 +569,10 @@ export function PixiWorldMap({
           return;
         }
         const night = 1 - lit.light;
-        const r = (1 - 0.52 * night) * (1 - 0.02 * lit.warm);
-        const g = (1 - 0.44 * night) * (1 - 0.13 * lit.warm);
-        const b = (1 - 0.22 * night) * (1 - 0.32 * lit.warm);
+        // Gentle: the night keeps most of the brightness so the eyes do not strain; the cool tint carries the mood.
+        const r = (1 - 0.16 * night) * (1 - 0.02 * lit.warm);
+        const g = (1 - 0.14 * night) * (1 - 0.08 * lit.warm);
+        const b = (1 - 0.06 * night) * (1 - 0.22 * lit.warm);
         wash.tint = (Math.round(r * 255) << 16) | (Math.round(g * 255) << 8) | Math.round(b * 255);
         if (wash.parent !== world || world.getChildIndex(wash) !== world.children.length - 1) world.addChild(wash);
         wash.position.set(-margin - 2000, -marginY - 2000);
@@ -938,17 +951,17 @@ export function PixiWorldMap({
         if (disposed) return;
         const layer = wonderLayer;
         const live: { x: number; y: number; until: number }[] = [];
-        let nextAt = Math.min(8, tn.wonderEveryS) + Math.random() * 6;
-        ticks.push((t) => {
-          for (let i = live.length - 1; i >= 0; i -= 1) if (live[i].until < t) live.splice(i, 1);
-          if (reducedMotion || t < nextAt || live.length >= wonderSpawnDefaults.maxActiveWonders) return;
-          nextAt = t + tn.wonderEveryS + Math.random() * tn.wonderEveryS * 0.9;
+        let seenForcedWonder = forcedWonderRef.current;
+        // Rare by design: the first one comes somewhere in the first half of the interval, then one every
+        // `wonderEveryS` seconds on average (a random wait of 0.6x to 1.4x, so it never looks metronomic).
+        let nextAt = tn.wonderEveryS * (0.2 + Math.random() * 0.4);
+        const spawnWonder = (t: number) => {
           const free = anchors.filter(
             (a) =>
               !live.some((o) => Math.hypot(o.x - a.x, o.y - a.y) < wonderSpawnDefaults.minWonderSpacing) &&
               !liveMarks.some((m) => m.active && Math.hypot(m.x - a.x, m.y - a.y) < wonderSpawnDefaults.minDistanceFromWaveMarks),
           );
-          if (free.length === 0) return;
+          if (free.length === 0) return false;
           const at = free[Math.floor(Math.random() * free.length)];
           const { w, tex } = sprites[Math.floor(Math.random() * sprites.length)];
           const sprite = new Sprite(tex);
@@ -991,6 +1004,20 @@ export function PixiWorldMap({
             }
           };
           ticks.push(tick);
+          return true;
+        };
+        if (import.meta.env.DEV) Object.assign(window as object, { __wonders: () => live.length });
+        ticks.push((t) => {
+          for (let i = live.length - 1; i >= 0; i -= 1) if (live[i].until < t) live.splice(i, 1);
+          if (forcedWonderRef.current !== seenForcedWonder) {
+            // The Director asked for one now: it ignores the timer (still one at a time, still never on land).
+            seenForcedWonder = forcedWonderRef.current;
+            if (live.length < wonderSpawnDefaults.maxActiveWonders) spawnWonder(t);
+            return;
+          }
+          if (reducedMotion || t < nextAt || live.length >= wonderSpawnDefaults.maxActiveWonders) return;
+          nextAt = t + tn.wonderEveryS * (0.6 + Math.random() * 0.8);
+          spawnWonder(t);
         });
       }
 
@@ -1121,41 +1148,78 @@ export function PixiWorldMap({
           const parallax = CLOUD_PARALLAX[level] * tn.cloudParallax;
           bandLayers.push({ layer, parallax });
           world.addChild(layer);
+          // Clouds are born at the upwind edge and carried across by the wind: a new one every so often, each
+          // formed from a sprite of the band with its own size, height and shape, and dissolved at the far edge.
+          const pool: { tex: Texture; width: number; y: number }[] = [];
           for (const s of band.sprites) {
-            const tex = await load(`/assets/atmosphere/${s.src}`);
-            const sprite = new Sprite(tex);
-            sprite.anchor.set(0.5);
-            const w = s.width * band.scale;
-            const baseScale = w / tex.width;
-            const h = tex.height * baseScale;
-            sprite.scale.set(baseScale);
-            sprite.alpha = band.opacity;
-            layer.addChild(sprite);
-            const phase = (s.delaySeconds * 0.37 + level * 2.1) % (Math.PI * 2);
-            let shown = 1;
-            ticks.push((t) => {
-              const drift = band.driftSeconds / cloudSpeed;
-              const p = ((((t + s.delaySeconds) % drift) + drift) % drift) / drift;
-              const left = cloudX(p, w);
-              sprite.x = left + w / 2;
-              // Wind shear: the higher the layer, the more its path meanders across the map.
-              sprite.y = s.y + h / 2 + Math.sin(t * 0.045 + phase) * (14 + level * 16);
-              if (!reducedMotion) {
-                sprite.scale.set(baseScale * (1 + 0.045 * tn.cloudMorph * Math.sin(t * 0.11 + phase)), baseScale * (1 + 0.04 * tn.cloudMorph * Math.sin(t * 0.083 + phase * 1.7)));
-                sprite.rotation = 0.02 * tn.cloudMorph * Math.sin(t * 0.07 + phase);
+            pool.push({ tex: await load(`/assets/atmosphere/${s.src}`), width: s.width * band.scale, y: s.y });
+          }
+          if (disposed || pool.length === 0) continue;
+          const yMin = Math.min(...pool.map((k) => k.y));
+          const yMax = Math.max(...pool.map((k) => k.y));
+          const crossing = () => band.driftSeconds / cloudSpeed;
+          type Cloud = { sp: Sprite; t0: number; w: number; baseScale: number; h: number; phase: number; y: number; shown: number };
+          const alive: Cloud[] = [];
+          let nextBirth = 0;
+          const birthCloud = (t0: number) => {
+            const k = pool[Math.floor(Math.random() * pool.length)];
+            const sp = new Sprite(k.tex);
+            sp.anchor.set(0.5);
+            const w = k.width * (0.9 + Math.random() * 0.2);
+            const baseScale = w / k.tex.width;
+            sp.scale.set(baseScale);
+            sp.alpha = band.opacity;
+            layer.addChild(sp);
+            alive.push({
+              sp, t0, w, baseScale, h: k.tex.height * baseScale,
+              phase: Math.random() * Math.PI * 2,
+              y: yMin + Math.random() * (yMax - yMin) + (Math.random() - 0.5) * 60,
+              shown: 1,
+            });
+          };
+          // Start the sky already populated: one cloud per sprite of the band, at random points of their crossing.
+          for (let i = 0; i < pool.length * 2; i += 1) birthCloud(-Math.random() * crossing());
+          nextBirth = 0;
+          ticks.push((t) => {
+            // Spawn: the next cloud is born at the upwind edge (the sprite is parked off-world until its crossing starts).
+            const D = crossing();
+            if (t >= nextBirth) {
+              birthCloud(t);
+              nextBirth = t + (D / pool.length) * (0.6 + Math.random() * 0.8);
+            }
+            for (let i = alive.length - 1; i >= 0; i -= 1) {
+              const c = alive[i];
+              const p = (t - c.t0) / D;
+              if (p >= 1) {
+                layer.removeChild(c.sp);
+                c.sp.destroy();
+                alive.splice(i, 1);
+                continue;
               }
-              // A cloud that would sit on a point of interest thins out instead of hiding it.
+              const sp = c.sp;
+              sp.x = cloudX(p, c.w) + c.w / 2;
+              // Born and dissolving: formed over the first 12% of the crossing, gone over the last 12%.
+              const formed = smoothstep01(p / 0.12) * (1 - smoothstep01((p - 0.88) / 0.12));
+              const h = c.h;
+              // Wind shear: the higher the layer, the more its path meanders across the map.
+              sp.y = c.y + h / 2 + Math.sin(t * 0.045 + c.phase) * (14 + level * 16);
+              if (!reducedMotion) {
+                sp.scale.set(c.baseScale * (1 + 0.045 * tn.cloudMorph * Math.sin(t * 0.11 + c.phase)), c.baseScale * (1 + 0.04 * tn.cloudMorph * Math.sin(t * 0.083 + c.phase * 1.7)));
+                sp.rotation = 0.02 * tn.cloudMorph * Math.sin(t * 0.07 + c.phase);
+              }
+              // A cloud over a point of interest thins out instead of hiding it.
               let want = 1;
               for (const anchor of anchorsRef.current) {
-                const dx = Math.max(0, Math.abs(sprite.x + layer.x - anchor.x) - w / 2);
-                const dy = Math.max(0, Math.abs(sprite.y + layer.y - anchor.y) - h / 2);
+                const dx = Math.max(0, Math.abs(sp.x + layer.x - anchor.x) - c.w / 2);
+                const dy = Math.max(0, Math.abs(sp.y + layer.y - anchor.y) - h / 2);
                 const d = Math.hypot(dx, dy) / CLOUD_CLEAR_RADIUS_PX;
                 want = Math.min(want, CLOUD_CLEAR_MIN + (1 - CLOUD_CLEAR_MIN) * Math.min(1, d));
               }
-              shown += (want - shown) * 0.08;
-              sprite.alpha = band.opacity * shown;
-            });
-          }
+              c.shown += (want - c.shown) * 0.08;
+              sp.alpha = band.opacity * c.shown * formed;
+            }
+          });
+          clouds.push({ band: band_, alive, birthCloud, crossing, setNext: (t: number) => { nextBirth = t + crossing() / pool.length * (0.6 + Math.random() * 0.8); }, next: () => nextBirth });
         }
         ticks.push(() => {
           const cam = camRef.current;
