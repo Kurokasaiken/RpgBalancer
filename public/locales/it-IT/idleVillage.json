@@ -968,6 +968,17 @@
         "roster": "Roster",
         "events": "Eventi"
       }
+    },
+    "regions": {
+      "northern_forest": "Boschi Sussurranti",
+      "southern_forest": "Bosco Cavo",
+      "eastern_woods": "Boschetti Orientali",
+      "northern_peaks": "Vette del Nord",
+      "eastern_mountains": "Alture di Brace",
+      "southern_mountains": "Rupi del Sud",
+      "islands": "Le Isole Esterne",
+      "village": "Il Villaggio",
+      "meadows": "I Prati"
     }
   },
   "missionPlanner": {

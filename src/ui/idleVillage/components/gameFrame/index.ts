@@ -10,3 +10,4 @@ export { DirectorPanel, type DirectorPanelProps, type DirectorAction } from './D
 export { HudPanelsMenu, type HudPanelsMenuProps } from './HudPanelsMenu';
 export { useHudPanels, type HudPanelId } from './useHudPanels';
 export { ObjectiveCartouche, type HudObjective } from './ObjectiveCartouche';
+export { RegionTooltip, type RegionTooltipProps } from './RegionTooltip';
