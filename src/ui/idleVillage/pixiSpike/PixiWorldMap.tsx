@@ -378,6 +378,7 @@ export function PixiWorldMap({
       const ticks: ((seconds: number) => void)[] = [];
 
       // ── Seabed under the painted sea: shows through the water, slides slower than the camera ──
+      const seabedReveal = { enabled: false, target: 0, value: 0, scale: 1 };
       let seabedShift: (panX: number, panY: number, viewW: number, viewH: number) => void = () => {};
       if (fxOn.seabed && seabed && seabed.opacity > 0) {
         const pad = 380;
@@ -406,60 +407,73 @@ export function PixiWorldMap({
         const seaMaskForBed = await load('/assets/atmosphere/terrain/sea_mask.webp');
         if (disposed) return;
 
-        const makeBed = () => {
-          const bed = new Container();
-          const floor = new Sprite(seabedTexture);
-          floor.width = extW;
-          floor.height = extH;
-          bed.addChild(floor);
-          art.glints.forEach((glint, index) => {
-            const star = new Sprite(glintTexture);
-            star.anchor.set(0.5);
-            star.x = glint.u * extW;
-            star.y = glint.v * extH;
-            star.scale.set(1.6);
-            star.alpha = 0;
-            bed.addChild(star);
-            if (!reducedMotion || index === 0) {
-              ticks.push((t) => {
-                const p = (((t + glint.phase) % glint.period) + glint.period) % glint.period / glint.period;
-                star.alpha = reducedMotion ? 0.5 : Math.max(0, Math.sin(p * Math.PI)) ** 3 * 0.9;
-              });
-            }
-          });
-          bed.alpha = seabed.opacity;
-          bed.x = extX;
-          bed.y = extY;
-          return bed;
-        };
+        const bed = new Container();
+        const floor = new Sprite(seabedTexture);
+        floor.width = extW;
+        floor.height = extH;
+        bed.addChild(floor);
+        art.glints.forEach((glint, index) => {
+          const star = new Sprite(glintTexture);
+          star.anchor.set(0.5);
+          star.x = glint.u * extW;
+          star.y = glint.v * extH;
+          star.scale.set(1.6);
+          star.alpha = 0;
+          bed.addChild(star);
+          if (!reducedMotion || index === 0) {
+            ticks.push((t) => {
+              const p = (((t + glint.phase) % glint.period) + glint.period) % glint.period / glint.period;
+              star.alpha = reducedMotion ? 0.5 : Math.max(0, Math.sin(p * Math.PI)) ** 3 * 0.9;
+            });
+          }
+        });
+        bed.x = extX;
+        bed.y = extY;
+        bed.alpha = 0;
 
-        // Inside the canvas the sea mask keeps the bed off the land; outside it is open water all the way.
-        const inside = makeBed();
-        const insideMask = new Sprite(seaMaskForBed);
-        insideMask.width = canvas.width;
-        insideMask.height = canvas.height;
-        const insideBox = new Container();
-        insideBox.mask = insideMask;
-        insideBox.addChild(inside);
-        world.addChild(insideMask);
-        world.addChild(insideBox);
+        // One mask for the whole bed (the painted sea mask inside the canvas, open water all around it): two
+        // masks meeting at the canvas edge left a bright seam there.
+        const maskScale = 0.25;
+        const maskCanvas = document.createElement('canvas');
+        maskCanvas.width = Math.ceil(extW * maskScale);
+        maskCanvas.height = Math.ceil(extH * maskScale);
+        const mctx = maskCanvas.getContext('2d');
+        if (mctx) {
+          mctx.fillStyle = '#fff';
+          mctx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+          const cx = (0 - extX) * maskScale;
+          const cy = (0 - extY) * maskScale;
+          mctx.clearRect(cx, cy, canvas.width * maskScale, canvas.height * maskScale);
+          mctx.drawImage(seaMaskForBed.source.resource as CanvasImageSource, cx, cy, canvas.width * maskScale, canvas.height * maskScale);
+        }
+        const bedMask = new Sprite(Texture.from(maskCanvas));
+        bedMask.x = extX;
+        bedMask.y = extY;
+        bedMask.width = extW;
+        bedMask.height = extH;
+        const bedBox = new Container();
+        bedBox.mask = bedMask;
+        bedBox.addChild(bed);
+        world.addChild(bedMask);
+        world.addChild(bedBox);
 
-        const outside = makeBed();
-        const ring = new Graphics();
-        ring.rect(extX, extY, extW, extH).fill(0xffffff);
-        ring.rect(0, 0, canvas.width, canvas.height).cut();
-        const outsideBox = new Container();
-        outsideBox.mask = ring;
-        outsideBox.addChild(outside);
-        world.addChild(ring);
-        world.addChild(outsideBox);
+        // The sea only turns glassy while the map is being dragged: the bed fades in with the drag, tilts a
+        // little with it (extra parallax and a slight scale), and sinks back a moment after release.
+        seabedReveal.enabled = true;
+        ticks.push(() => {
+          const target = seabedReveal.target;
+          seabedReveal.value += (target - seabedReveal.value) * (target > seabedReveal.value ? 0.14 : 0.05);
+          bed.alpha = seabed.opacity * seabedReveal.value;
+          bedBox.visible = bed.alpha > 0.004;
+          seabedReveal.scale = 1 + 0.03 * seabedReveal.value;
+          bed.scale.set(seabedReveal.scale);
+        });
 
         seabedShift = (panX, panY, viewW, viewH) => {
           // Centre-relative: at the middle of the pan range the bed sits exactly where it was authored.
           const dx = (1 - seabed.parallax) * (panX - (canvas.width / 2 - viewW / 2));
           const dy = (1 - seabed.parallax) * (panY - (canvas.height / 2 - viewH / 2));
-          inside.position.set(extX + dx, extY + dy);
-          outside.position.set(extX + dx, extY + dy);
+          bed.position.set(extX + dx - ((seabedReveal.scale - 1) * extW) / 2, extY + dy - ((seabedReveal.scale - 1) * extH) / 2);
         };
       }
 
@@ -888,8 +902,11 @@ export function PixiWorldMap({
       }
 
       const el = app.canvas;
+      let sinkTimer = 0;
       const onDown = (e: MouseEvent) => {
         drag = { x: e.clientX, y: e.clientY };
+        window.clearTimeout(sinkTimer);
+        seabedReveal.target = 1;
       };
       const onMove = (e: MouseEvent) => {
         if (!drag) return;
@@ -901,6 +918,10 @@ export function PixiWorldMap({
       };
       const onUp = () => {
         drag = null;
+        window.clearTimeout(sinkTimer);
+        sinkTimer = window.setTimeout(() => {
+          seabedReveal.target = 0;
+        }, 500);
       };
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
