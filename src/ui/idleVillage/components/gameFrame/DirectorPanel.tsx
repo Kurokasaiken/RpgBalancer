@@ -14,6 +14,8 @@ export interface DirectorAction {
 export interface DirectorPanelProps {
   actions: DirectorAction[];
   onReset?: () => void;
+  /** Adds a close (X); the host brings the panel back from the Panels menu. */
+  onClose?: () => void;
 }
 
 /**
@@ -24,7 +26,7 @@ export interface DirectorPanelProps {
  * take can be staged on demand. It is draggable by its handle like every HUD
  * panel and collapses to its title bar.
  */
-export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset }) => {
+export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset, onClose }) => {
   const { t } = useTranslation('idleVillage');
   const { panelStyle, handleProps } = useHudPanelDrag();
   const [open, setOpen] = React.useState(true);
@@ -60,6 +62,11 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset }
         >
           {open ? '–' : '+'}
         </button>
+        {onClose && (
+          <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--skin-label-primary, #c9a84e)', cursor: 'pointer', fontSize: 12 }}>
+            ×
+          </button>
+        )}
       </div>
       {open &&
         actions.map((action) => (

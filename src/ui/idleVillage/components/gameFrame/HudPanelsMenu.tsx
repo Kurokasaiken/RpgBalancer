@@ -2,18 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LayoutPanelLeft } from 'lucide-react';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
-import { HUD_PANEL_SHORTCUTS, type HudPanelId } from './useHudPanels';
+import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
 
 export interface HudPanelsMenuProps {
   visible: Record<HudPanelId, boolean>;
   onToggle: (id: HudPanelId) => void;
+  /** Offer the dev-only instruments (Director, Tuning). Off in a production build. */
+  includeDev?: boolean;
 }
 
 /**
  * "Panels" menu: the way back for every floating panel that can be closed. A button in
  * the bottom-right corner opens a short list; each row shows its shortcut and state.
  */
-export function HudPanelsMenu({ visible, onToggle }: HudPanelsMenuProps) {
+export function HudPanelsMenu({ visible, onToggle, includeDev = false }: HudPanelsMenuProps) {
   const { t } = useTranslation('idleVillage');
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
@@ -34,7 +36,8 @@ export function HudPanelsMenu({ visible, onToggle }: HudPanelsMenuProps) {
     };
   }, [open]);
 
-  const ids = Object.keys(HUD_PANEL_SHORTCUTS) as HudPanelId[];
+  const ids = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => includeDev || !HUD_PANEL_DEV_ONLY.has(id));
+  const hiddenCount = ids.filter((id) => !visible[id]).length;
   return (
     <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>
       {open && (
@@ -71,9 +74,14 @@ export function HudPanelsMenu({ visible, onToggle }: HudPanelsMenuProps) {
         aria-label={t('gameFrame.panels.title')}
         title={t('gameFrame.panels.title')}
         onClick={() => setOpen((v) => !v)}
-        style={{ width: 40, height: 40 }}
+        style={{ width: 40, height: 40, position: 'relative' }}
       >
         <LayoutPanelLeft />
+        {hiddenCount > 0 && (
+          <span aria-hidden="true" data-badge="" style={{ position: 'absolute', top: -4, right: -4, minWidth: 16, height: 16, padding: '0 4px', borderRadius: 8, font: '700 12px/16px var(--skin-font-display)', textAlign: 'center', background: 'var(--skin-label-primary)', color: 'var(--skin-surface-base)' }}>
+            {hiddenCount}
+          </span>
+        )}
       </button>
     </div>
   );
