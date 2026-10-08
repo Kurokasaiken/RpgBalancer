@@ -26,7 +26,6 @@ export const ConsumableBelt: React.FC<{
   const hasHealing = flags.includes('hasHealing');
   const hasPozione = flags.includes('hasPozione');
   if (!checkItems.length && !hasHealing && !hasPozione) return null;
-  const checkNames = checkItems.map((i) => t(i.labelKey).split('—')[0].trim()).join(' · ');
   return (
     <div
       data-hud-controls=""
@@ -45,20 +44,22 @@ export const ConsumableBelt: React.FC<{
       >
         {t('questS1Lab.belt.label')}
       </span>
-      {checkItems.length > 0 && (
-        <button
-          type="button"
-          onClick={onToggleArmed}
-          aria-pressed={armed}
-          title={`${t('questS1Lab.belt.armTitle')} — ${checkNames}`}
-          style={{ whiteSpace: 'nowrap', flexShrink: 0, minWidth: 'fit-content' }}
-        >
-          {checkItems.map((i) => {
-            const Icon = getStatIconComponent(i.icon);
-            return Icon ? <Icon key={i.flag} aria-hidden /> : null;
-          })}
-        </button>
-      )}
+      {checkItems.map((i) => {
+        const Icon = getStatIconComponent(i.icon);
+        return (
+          <button
+            key={i.flag}
+            type="button"
+            onClick={onToggleArmed}
+            aria-pressed={armed}
+            title={`${t('questS1Lab.belt.armTitle')} — ${t(i.descKey)}`}
+            style={{ whiteSpace: 'nowrap', flexShrink: 0, minWidth: 'fit-content' }}
+          >
+            {Icon && <Icon aria-hidden />}
+            <span>{t(i.labelKey).split('—')[0].trim()}</span>
+          </button>
+        );
+      })}
       {hasPozione && (
         <button type="button" onClick={onDrinkPotion} title={t('questS1Lab.stash.desc.potion')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
           {(() => {
