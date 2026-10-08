@@ -400,7 +400,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     gradedManifestPath: '/assets/world/wanderlust/base/manifest-flat-graded.json',
     grade: 'graded',
     stageColor: '#489397',
-    motion: { cloudShadowOpacity: 0.42, cloudShadowOffsetX: 90, cloudShadowOffsetY: 140, cloudSpeed: 4, seaMotionAmount: 34, seaMotionPeriod: 7, seaLineOpacity: 0.26, foamStrength: 0.7, foamCrestSpeed: 30 },
+    motion: { cloudShadowOpacity: 0.42, cloudShadowOffsetX: 90, cloudShadowOffsetY: 140, cloudSpeed: 10, seaMotionAmount: 34, seaMotionPeriod: 7, seaLineOpacity: 0.26, foamStrength: 0.7, foamCrestSpeed: 30 },
     seabed: { opacity: 0.55, parallax: 0.8 },
     hiddenLayerIds: ['frame', 'border'],
     showAtmosphere: false,
@@ -415,7 +415,8 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     safeFit: {
       enabled: true,
       landBounds: { x0: 271, x1: 3974, y0: 305, y1: 2642 },
-      // Fixed chrome only (floating roster / ledger may cover land). Top: resources plaque 79 px + 8. Bottom: nav plinth 77 px + 23 (islands sit just above the nav).
+      // Fixed chrome. Top: resources plaque 79 px + 8. Bottom: nav plinth 77 px + 23 (islands sit just above the nav).
+      // /game adds the open roster / ledger widths left and right, so the land is framed between them.
       insets: { top: 87, bottom: 100 },
       seaMarginPx: 260,
       seaMarginYPx: 300,

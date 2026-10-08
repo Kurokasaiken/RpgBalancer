@@ -18,6 +18,7 @@ import { createRefractionNoise, createSeabedArt } from './seabedTexture';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { defaultSeaMarksConfig } from '@/ui/idleVillage/config/seaMarksConfig';
+import { seaWonderCatalog, wonderSpawnDefaults } from '@/ui/idleVillage/config/seaWonders';
 import { DEFAULT_SEA_PATTERN_CONFIG, type SeaPatternConfig } from '@/ui/idleVillage/components/WorldSurfaceSeaPatternOverlay';
 import { DEFAULT_COAST_FOAM_CONFIG, type CoastFoamConfig } from '@/ui/idleVillage/components/WorldSurfaceCoastFoam';
 import type { WorldSurfaceSafeFit as KitSafeFit } from '@/ui/idleVillage/frozen/kits/worldSurfaceKit';
@@ -43,6 +44,7 @@ export interface PixiWorldMapEffects {
   birds: boolean;
   clouds: boolean;
   seabed: boolean;
+  wonders: boolean;
 }
 
 /** A territory of the id map (`scripts/bake-region-ids.py`). `center` is a fraction of the world canvas. */
@@ -111,7 +113,7 @@ export interface PixiMapAnchor {
 /** World px a mirrored sea sprite overlaps its original (> 1 screen px at the lowest zoom). */
 const MIRROR_OVERLAP_PX = 6;
 
-const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true };
+const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true };
 
 const VERT = `#version 300 es
 in vec2 aPosition;
@@ -193,6 +195,17 @@ void main() {
   outColor = vec4(uFoamColor * a, a);
 }
 `;
+
+/** Extra distance past the sea margin where a cloud starts and ends its crossing. */
+const CLOUD_ENTRY_PAD_PX = 200;
+/** Pointer dwell before a territory lights up and shows its name. */
+const REGION_HOVER_DELAY_MS = 1000;
+/** No two waves or sea marks play at the same time closer than this (world px). */
+const MARK_MIN_SPACING_PX = 900;
+/** Sea wonders: how often one may surface, how long it stays, how big it is on the map (world px wide). */
+const WONDER_EVERY_S = [18, 34] as const;
+const WONDER_LIFETIME_S = 9;
+const WONDER_WIDTH_PX = 300;
 
 /** Clouds within this many world px of a map anchor fade to CLOUD_CLEAR_MIN of their opacity. */
 const CLOUD_CLEAR_RADIUS_PX = 260;
@@ -384,6 +397,9 @@ export function PixiWorldMap({
       }
 
       const ticks: ((seconds: number) => void)[] = [];
+      // Clouds (and their shadows) cross the whole mirrored world, entering and leaving beyond what the camera can
+      // show: they never pop into view half-formed at the edge of the screen.
+      const cloudX = (p: number, w: number) => -margin - w - CLOUD_ENTRY_PAD_PX + p * (canvas.width + 2 * margin + 2 * w + 2 * CLOUD_ENTRY_PAD_PX);
 
       // ── See-through sea: a seabed under the painted water, shown only while the map is dragged ──
       // Absorption-style look: the water thins out over a light, sandy floor (so it reads as clear water, not
@@ -591,7 +607,7 @@ export function PixiWorldMap({
             ticks.push((t) => {
               const drift = band.driftSeconds / cloudSpeed;
               const p = (((t + s.delaySeconds) % drift) + drift) % drift / drift;
-              sprite.x = -w + p * (canvas.width + w) + cloudShadowOffset.x;
+              sprite.x = cloudX(p, w) + cloudShadowOffset.x;
             });
           }
         }
@@ -634,6 +650,8 @@ export function PixiWorldMap({
 
       // ── Painted waves and sea marks: fade in, hold, fade out, drift ──
       const seaMaskForMarks = fxOn.waves || fxOn.seaMarks ? await load('/assets/atmosphere/terrain/sea_mask.webp') : null;
+      /** Every wave and sea mark, for the spacing rule (also read by the sea creatures). */
+      const liveMarks: { x: number; y: number; active: boolean; cycle: number }[] = [];
       const addMarks = async (
         marks: { src: string; x: number; y: number; width: number; height: number; delaySeconds: number; flip?: boolean; driftX?: number; driftY?: number }[],
         cycleSeconds: number,
@@ -651,6 +669,8 @@ export function PixiWorldMap({
         }
         const visible = Math.min(0.99, Math.max(0.01, visibleFraction));
         for (const mark of marks) {
+          const slot = { x: mark.x + mark.width / 2, y: mark.y + mark.height / 2, active: false, cycle: -1 };
+          liveMarks.push(slot);
           const tex = await load(`/assets/atmosphere/${mark.src}`);
           const sprite = new Sprite(tex);
           sprite.anchor.set(0.5, 0);
@@ -663,7 +683,13 @@ export function PixiWorldMap({
           layer.addChild(sprite);
           ticks.push((t) => {
             const p = (((t + mark.delaySeconds) % cycleSeconds) + cycleSeconds) % cycleSeconds / cycleSeconds;
-            sprite.alpha = opacity * track(p, [[0, 0], [visible * 0.22, 1], [visible * 0.78, 1], [visible, 0], [1, 0]]);
+            // A mark only plays a cycle when no other wave or mark is on screen near it: they never bunch up.
+            const cycle = Math.floor((t + mark.delaySeconds) / cycleSeconds);
+            if (cycle !== slot.cycle) {
+              slot.cycle = cycle;
+              slot.active = !liveMarks.some((o) => o !== slot && o.active && Math.hypot(o.x - slot.x, o.y - slot.y) < MARK_MIN_SPACING_PX);
+            }
+            sprite.alpha = slot.active ? opacity * track(p, [[0, 0], [visible * 0.22, 1], [visible * 0.78, 1], [visible, 0], [1, 0]]) : 0;
             const { dx, dy } = motion(p, visible, mark);
             sprite.x = baseX + dx;
             sprite.y = mark.y + dy;
@@ -685,6 +711,71 @@ export function PixiWorldMap({
           dy: track(p, [[0, cfg.bobWorldPx], [visible, -cfg.bobWorldPx], [1, -cfg.bobWorldPx]]),
         }));
       }
+      // ── Sea wonders (kraken, whale, pirate ship): a rare one surfaces in open water, stays, sinks ──
+      if (fxOn.wonders && seaWonderCatalog.length > 0) {
+        const points = (await fetch('/assets/atmosphere/terrain/points.json').then((r) => r.json())) as { wonder?: { x: number; y: number }[] };
+        const anchors = points.wonder ?? [];
+        const sprites = await Promise.all(seaWonderCatalog.map(async (w) => ({ w, tex: await load(`/assets/atmosphere/${w.src}`) })));
+        if (disposed) return;
+        const layer = new Container();
+        world.addChild(layer);
+        const live: { x: number; y: number; until: number }[] = [];
+        let nextAt = 6 + Math.random() * 6;
+        ticks.push((t) => {
+          for (let i = live.length - 1; i >= 0; i -= 1) if (live[i].until < t) live.splice(i, 1);
+          if (reducedMotion || t < nextAt || live.length >= wonderSpawnDefaults.maxActiveWonders) return;
+          nextAt = t + WONDER_EVERY_S[0] + Math.random() * (WONDER_EVERY_S[1] - WONDER_EVERY_S[0]);
+          const free = anchors.filter(
+            (a) =>
+              !live.some((o) => Math.hypot(o.x - a.x, o.y - a.y) < wonderSpawnDefaults.minWonderSpacing) &&
+              !liveMarks.some((m) => m.active && Math.hypot(m.x - a.x, m.y - a.y) < wonderSpawnDefaults.minDistanceFromWaveMarks),
+          );
+          if (free.length === 0) return;
+          const at = free[Math.floor(Math.random() * free.length)];
+          const { w, tex } = sprites[Math.floor(Math.random() * sprites.length)];
+          const sprite = new Sprite(tex);
+          sprite.anchor.set(0.5);
+          const base = WONDER_WIDTH_PX / tex.width;
+          sprite.scale.set(base);
+          sprite.alpha = 0;
+          layer.addChild(sprite);
+          const born = t;
+          const inS = (w.animation === 'rise' ? wonderSpawnDefaults.riseDurationMs : wonderSpawnDefaults.fadeDurationMs) / 1000;
+          const outS = wonderSpawnDefaults.fadeDurationMs / 1000;
+          const entrance = w.entrance;
+          const sailRad = ((entrance?.sailAngle ?? 0) * Math.PI) / 180;
+          const sailBack = ((entrance?.sailDistance ?? 0) / 100) * WONDER_WIDTH_PX;
+          live.push({ x: at.x, y: at.y, until: t + WONDER_LIFETIME_S });
+          const tick = (now: number) => {
+            const age = now - born;
+            if (age > WONDER_LIFETIME_S) {
+              layer.removeChild(sprite);
+              sprite.destroy();
+              ticks.splice(ticks.indexOf(tick), 1);
+              return;
+            }
+            const enter = Math.min(1, age / inS);
+            const ease = 1 - (1 - enter) ** 3;
+            const leave = Math.min(1, Math.max(0, (age - (WONDER_LIFETIME_S - outS)) / outS));
+            sprite.alpha = w.opacity * ease * (1 - leave);
+            if (entrance?.type === 'sail') {
+              // Sails in along its bow, keeps gliding, fades out.
+              const travel = -sailBack * (1 - ease) + age * 14;
+              sprite.x = at.x + Math.cos(sailRad) * travel;
+              sprite.y = at.y + Math.sin(sailRad) * travel;
+            } else {
+              // Breaks the surface from below: rises and grows, then sinks back as it fades.
+              const off = ((entrance?.riseOffset ?? 0) / 100) * tex.height * base;
+              const grow = entrance?.riseScale ?? 1;
+              sprite.x = at.x;
+              sprite.y = at.y + off * (1 - ease) + off * 0.6 * leave;
+              sprite.scale.set(base * (grow + (1 - grow) * ease) * (1 - 0.15 * leave));
+            }
+          };
+          ticks.push(tick);
+        });
+      }
+
       // ── Coastal foam (shader) ──
       if (fxOn.coastFoam) {
         const dist = await load('/assets/atmosphere/terrain/coast_distance.webp');
@@ -781,7 +872,7 @@ export function PixiWorldMap({
             ticks.push((t) => {
               const drift = band.driftSeconds / cloudSpeed;
               const p = ((((t + s.delaySeconds) % drift) + drift) % drift) / drift;
-              sprite.x = -w + p * (canvas.width + w);
+              sprite.x = cloudX(p, w);
               // A cloud that would sit on a point of interest thins out instead of hiding it.
               let want = 1;
               for (const anchor of anchorsRef.current) {
@@ -908,18 +999,45 @@ export function PixiWorldMap({
           c.height = mh;
           const ctx = c.getContext('2d');
           if (ctx && ids) {
-            const out = ctx.createImageData(mw, mh);
+            // The territory's own shape: its border is drawn as a soft gilded glow on the inside (blurred twice,
+            // sharp core line on top) over a faint warm wash — a lit province, not a flat sticker.
+            const shape = ctx.createImageData(mw, mh);
+            const edge = ctx.createImageData(mw, mh);
             for (let y = 0; y < mh; y += 1) {
               for (let x = 0; x < mw; x += 1) {
                 const i = y * mw + x;
                 if (ids[i * 4] !== index) continue;
-                const edge =
+                shape.data.set([255, 236, 190, 255], i * 4);
+                const border =
                   x === 0 || y === 0 || x === mw - 1 || y === mh - 1 ||
                   ids[(i - 1) * 4] !== index || ids[(i + 1) * 4] !== index || ids[(i - mw) * 4] !== index || ids[(i + mw) * 4] !== index;
-                out.data.set(edge ? [255, 232, 160, 235] : [255, 232, 160, 46], i * 4);
+                if (border) edge.data.set([255, 222, 140, 255], i * 4);
               }
             }
-            ctx.putImageData(out, 0, 0);
+            const layerOf = (data: ImageData) => {
+              const t = document.createElement('canvas');
+              t.width = mw;
+              t.height = mh;
+              t.getContext('2d')?.putImageData(data, 0, 0);
+              return t;
+            };
+            const shapeCanvas = layerOf(shape);
+            const edgeCanvas = layerOf(edge);
+            ctx.globalAlpha = 0.08;
+            ctx.drawImage(shapeCanvas, 0, 0);
+            ctx.globalAlpha = 0.55;
+            ctx.filter = 'blur(6px)';
+            ctx.drawImage(edgeCanvas, 0, 0);
+            ctx.filter = 'blur(2px)';
+            ctx.drawImage(edgeCanvas, 0, 0);
+            ctx.filter = 'none';
+            ctx.globalAlpha = 0.9;
+            ctx.drawImage(edgeCanvas, 0, 0);
+            // Keep the glow inside the territory: nothing spills onto the neighbours or the sea.
+            ctx.globalAlpha = 1;
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.drawImage(shapeCanvas, 0, 0);
+            ctx.globalCompositeOperation = 'source-over';
           }
           sprite = new Sprite(Texture.from(c));
           sprite.width = canvas.width;
@@ -949,21 +1067,48 @@ export function PixiWorldMap({
           const sy = e.clientY - r.top;
           return { sx, sy, wx: cam.panX + sx / cam.zoom, wy: cam.panY + sy / cam.zoom };
         };
-        const onHoverMove = (e: MouseEvent) => {
-          const { sx, sy, wx, wy } = worldPoint(e);
-          const index = drag ? 0 : idAt(wx, wy);
-          if (index !== hoverIndex) {
-            hoverIndex = index;
-            if (index) highlightFor(index);
-          }
+        // The territory lights up and is named only after the pointer has rested on it for a moment: sweeping
+        // across the map must not flash every province on the way.
+        let pendingIndex = 0;
+        let dwellTimer = 0;
+        const report = (index: number) => {
           const region = regionByIndex.get(index);
-          el2.style.cursor = region ? 'pointer' : drag ? 'grabbing' : '';
-          regionsRef.current?.onHover?.(region ? { region, x: sx, y: sy } : null);
+          if (!region) {
+            regionsRef.current?.onHover?.(null);
+            return;
+          }
+          const sx = (region.center[0] * canvas.width - cam.panX) * cam.zoom;
+          const sy = (region.center[1] * canvas.height - cam.panY) * cam.zoom;
+          regionsRef.current?.onHover?.({ region, x: sx, y: sy });
+        };
+        const onHoverMove = (e: MouseEvent) => {
+          const { wx, wy } = worldPoint(e);
+          const index = drag ? 0 : idAt(wx, wy);
+          el2.style.cursor = drag ? 'grabbing' : regionByIndex.has(index) ? 'pointer' : '';
+          if (index === pendingIndex) return;
+          pendingIndex = index;
+          window.clearTimeout(dwellTimer);
+          if (hoverIndex) {
+            hoverIndex = 0;
+            regionsRef.current?.onHover?.(null);
+          }
+          if (!index) return;
+          dwellTimer = window.setTimeout(() => {
+            hoverIndex = index;
+            highlightFor(index);
+            report(index);
+          }, REGION_HOVER_DELAY_MS);
         };
         const onLeave = () => {
+          window.clearTimeout(dwellTimer);
+          pendingIndex = 0;
           hoverIndex = 0;
           regionsRef.current?.onHover?.(null);
         };
+        // The name plate rides on the territory, so it follows pan and zoom.
+        ticks.push(() => {
+          if (hoverIndex) report(hoverIndex);
+        });
         let downAt: { x: number; y: number } | null = null;
         const onDownR = (e: MouseEvent) => {
           downAt = { x: e.clientX, y: e.clientY };
