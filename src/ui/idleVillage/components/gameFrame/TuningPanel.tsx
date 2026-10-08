@@ -10,6 +10,8 @@ export interface TuningField {
   min: number;
   max: number;
   step: number;
+  /** One or two sentences: what the value does and what happens at each end. Shown on hover. */
+  hint?: string;
 }
 
 export interface TuningPanelProps {
@@ -56,10 +58,10 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
           </button>
         )}
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 'calc(100vh - 260px)', overflowY: 'auto', paddingRight: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 'calc(100vh - 260px)', overflowY: 'auto', paddingRight: 8, scrollbarWidth: 'thin', scrollbarColor: 'var(--skin-surface-border) transparent' }}>
       {fields.map((field) => (
-        <label key={field.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 2, fontFamily: 'var(--skin-font-serif)', fontSize: 13, color: 'var(--skin-body-color)' }}>
-          <span>{field.label}</span>
+        <label key={field.id} title={field.hint} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 2, fontFamily: 'var(--skin-font-serif)', fontSize: 13, color: 'var(--skin-body-color)' }}>
+          <span>{field.label}{field.hint && <span aria-hidden="true" style={{ opacity: 0.55, marginLeft: 6 }}>ⓘ</span>}</span>
           <output style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--skin-title-color)' }}>{shown(field)}</output>
           <input
             type="range"

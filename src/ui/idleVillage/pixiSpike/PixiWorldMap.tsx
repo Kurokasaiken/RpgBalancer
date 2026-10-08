@@ -62,7 +62,43 @@ export interface PixiRegionHover {
   y: number;
 }
 
+/** Look-and-feel numbers of the map the Tuning panel can change live. */
+export interface PixiMapTune {
+  /** Multiplier on how far each cloud layer slides against the ground when the camera pans (0 = glued). */
+  cloudParallax: number;
+  /** Multiplier on how much a cloud swells, narrows and tilts as it drifts (0 = rigid). */
+  cloudMorph: number;
+  /** Strength of the wind gusts of light over the forests (0 = off). */
+  gustStrength: number;
+  /** Opacity multiplier of the village smoke (0 = off). */
+  smokeAmount: number;
+  /** Opacity multiplier of the sun glints on the sea (0 = off). */
+  glintAmount: number;
+  /** Seconds between two sea wonders surfacing (kraken, whale, ship): the shortest wait; the longest is 1.9x. */
+  wonderEveryS: number;
+  /** How far (world px) the painted sea's edge colour holds before sinking into deep water. */
+  deepSeaFadePx: number;
+  /** Seconds a territory must be hovered before it lights up and shows its name. */
+  regionHoverDelayS: number;
+  /** No two waves or sea marks play closer than this (world px). */
+  markSpacingPx: number;
+}
+
+export const DEFAULT_MAP_TUNE: PixiMapTune = {
+  cloudParallax: 1,
+  cloudMorph: 1,
+  gustStrength: 1,
+  smokeAmount: 1,
+  glintAmount: 1,
+  wonderEveryS: 18,
+  deepSeaFadePx: 650,
+  regionHoverDelayS: 1,
+  markSpacingPx: 900,
+};
+
 export interface PixiWorldMapProps {
+  /** Live look-and-feel numbers (defaults in `DEFAULT_MAP_TUNE`). */
+  tune?: Partial<PixiMapTune>;
   manifestPath: string;
   hiddenLayerIds?: string[];
   safeFit?: WorldSurfaceSafeFit;
@@ -183,7 +219,7 @@ void main() {
   vec2 w = uExt.xy + vUV * uExt.zw;
   vec2 uv = w / uWorld;
   if (uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) { outColor = vec4(0.0); return; }
-  vec2 c = clamp(uv, vec2(0.003), vec2(0.997));
+  vec2 c = clamp(uv, vec2(0.012), vec2(0.988));
   bool sideEdge = uv.x < 0.0 || uv.x > 1.0;
   bool capEdge = uv.y < 0.0 || uv.y > 1.0;
   vec3 acc = vec3(0.0);
@@ -191,11 +227,12 @@ void main() {
   for (int i = -6; i <= 6; i++) {
     float o = float(i) * 0.02;
     vec4 a = sideEdge ? texture(uSea, c + vec2(0.0, o)) : texture(uSea, c + vec2(o, 0.0));
-    acc += a.rgb * a.a;
+    // Pixi uploads textures premultiplied: the rgb is already weighted by its alpha.
+    acc += a.rgb;
     wsum += a.a;
     if (sideEdge && capEdge) {
       vec4 b = texture(uSea, c + vec2(o, 0.0));
-      acc += b.rgb * b.a;
+      acc += b.rgb;
       wsum += b.a;
     }
   }
@@ -222,6 +259,7 @@ out vec4 outColor;
 uniform sampler2D uTex;
 uniform vec4 uRect;
 uniform float uTime;
+uniform float uStrength;
 float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float vnoise(vec2 p) {
   vec2 i = floor(p), f = fract(p);
@@ -234,7 +272,7 @@ void main() {
   // A gust is a band of noise advected by the wind; the finer ripple rides inside it.
   float gust = smoothstep(0.5, 0.82, vnoise(w * 0.0022 + vec2(uTime * 0.045, uTime * 0.018)));
   float ripple = 0.55 + 0.45 * vnoise(w * 0.02 + vec2(uTime * 0.35, 0.0));
-  float a = t.a * gust * ripple * 0.30;
+  float a = t.a * gust * ripple * 0.30 * uStrength;
   outColor = vec4(vec3(0.78, 0.9, 0.5) * a, a);
 }
 `;
@@ -280,7 +318,6 @@ const CLOUD_ENTRY_PAD_PX = 200;
 /** Open water past the painted sea: its deep colour, the fog of the unexplored, and how far (world px) the edge colour holds. */
 const DEEP_SEA_COLOR = '#215c70';
 const DEEP_SEA_FOG = '#16394a';
-const DEEP_SEA_FADE_PX = 650;
 /** Cloud layers (far, mid, near): how much further than the ground each slides when the camera pans. */
 const CLOUD_PARALLAX = [0.1, 0.22, 0.4] as const;
 /** Village roofs where smoke rises (world px), puffs per chimney, and a puff's life. */
@@ -311,11 +348,8 @@ function makeGlintCanvas(): HTMLCanvasElement {
 }
 
 /** Pointer dwell before a territory lights up and shows its name. */
-const REGION_HOVER_DELAY_MS = 1000;
 /** No two waves or sea marks play at the same time closer than this (world px). */
-const MARK_MIN_SPACING_PX = 900;
 /** Sea wonders: how often one may surface, how long it stays, how big it is on the map (world px wide). */
-const WONDER_EVERY_S = [18, 34] as const;
 const WONDER_LIFETIME_S = 9;
 const WONDER_WIDTH_PX = 300;
 
@@ -371,6 +405,7 @@ export function PixiWorldMap({
   cloudSpeed = 1,
   seabed,
   regions,
+  tune: tuneProp,
   seaPatternConfig = DEFAULT_SEA_PATTERN_CONFIG,
   coastFoamConfig = DEFAULT_COAST_FOAM_CONFIG,
   onStats,
@@ -382,6 +417,8 @@ export function PixiWorldMap({
   /** Anchors the clouds must clear: read every frame, so POIs that come and go need no map rebuild. */
   const anchorsRef = useRef(anchors);
   anchorsRef.current = anchors;
+  const tune = { ...DEFAULT_MAP_TUNE, ...tuneProp };
+  const tuneKey = JSON.stringify(tune);
   const regionsRef = useRef(regions);
   regionsRef.current = regions;
   const regionsOn = !!regions;
@@ -418,6 +455,7 @@ export function PixiWorldMap({
     const hidden = new Set(hiddenKey ? hiddenKey.split('|') : []);
     const fit = safeFitKey ? (JSON.parse(safeFitKey) as WorldSurfaceSafeFit) : undefined;
     const fxOn = JSON.parse(fxKey) as PixiWorldMapEffects;
+    const tn = JSON.parse(tuneKey) as PixiMapTune;
     const canvas = manifest.coordinateSystem.canvas;
     const margin = fit?.seaMarginPx ?? 0;
     // Vertical sea is only ever the painted sea layer mirrored: land must never be reflected.
@@ -511,7 +549,7 @@ export function PixiWorldMap({
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
               uDeep: { value: hexToRgb01(DEEP_SEA_COLOR), type: 'vec3<f32>' },
               uFog: { value: hexToRgb01(DEEP_SEA_FOG), type: 'vec3<f32>' },
-              uFade: { value: DEEP_SEA_FADE_PX, type: 'f32' },
+              uFade: { value: tn.deepSeaFadePx, type: 'f32' },
               uTime: { value: 0, type: 'f32' },
             },
           },
@@ -811,7 +849,7 @@ export function PixiWorldMap({
             const cycle = Math.floor((t + mark.delaySeconds) / cycleSeconds);
             if (cycle !== slot.cycle) {
               slot.cycle = cycle;
-              slot.active = !liveMarks.some((o) => o !== slot && o.active && Math.hypot(o.x - slot.x, o.y - slot.y) < MARK_MIN_SPACING_PX);
+              slot.active = !liveMarks.some((o) => o !== slot && o.active && Math.hypot(o.x - slot.x, o.y - slot.y) < tn.markSpacingPx);
             }
             sprite.alpha = slot.active ? opacity * track(p, [[0, 0], [visible * 0.22, 1], [visible * 0.78, 1], [visible, 0], [1, 0]]) : 0;
             const { dx, dy } = motion(p, visible, mark);
@@ -835,20 +873,20 @@ export function PixiWorldMap({
           dy: track(p, [[0, cfg.bobWorldPx], [visible, -cfg.bobWorldPx], [1, -cfg.bobWorldPx]]),
         }));
       }
+      const wonderLayer = new Container();
       // ── Sea wonders (kraken, whale, pirate ship): a rare one surfaces in open water, stays, sinks ──
       if (fxOn.wonders && seaWonderCatalog.length > 0) {
         const points = (await fetch('/assets/atmosphere/terrain/points.json').then((r) => r.json())) as { wonder?: { x: number; y: number }[] };
         const anchors = points.wonder ?? [];
         const sprites = await Promise.all(seaWonderCatalog.map(async (w) => ({ w, tex: await load(`/assets/atmosphere/${w.src}`) })));
         if (disposed) return;
-        const layer = new Container();
-        world.addChild(layer);
+        const layer = wonderLayer;
         const live: { x: number; y: number; until: number }[] = [];
-        let nextAt = 6 + Math.random() * 6;
+        let nextAt = Math.min(8, tn.wonderEveryS) + Math.random() * 6;
         ticks.push((t) => {
           for (let i = live.length - 1; i >= 0; i -= 1) if (live[i].until < t) live.splice(i, 1);
           if (reducedMotion || t < nextAt || live.length >= wonderSpawnDefaults.maxActiveWonders) return;
-          nextAt = t + WONDER_EVERY_S[0] + Math.random() * (WONDER_EVERY_S[1] - WONDER_EVERY_S[0]);
+          nextAt = t + tn.wonderEveryS + Math.random() * tn.wonderEveryS * 0.9;
           const free = anchors.filter(
             (a) =>
               !live.some((o) => Math.hypot(o.x - a.x, o.y - a.y) < wonderSpawnDefaults.minWonderSpacing) &&
@@ -978,6 +1016,9 @@ export function PixiWorldMap({
       }
 
       // ── Clouds: the same bands as their shadows, drifting above everything ──
+      // Wonders sit above the sea pattern, the waves and the coast foam.
+      world.addChild(wonderLayer);
+
       // ── Land life: wind gusts over the forests, smoke from the village, sun glints on the sea ──
       if (fxOn.landLife && !reducedMotion) {
         const layered = (await fetch('/assets/world/wanderlust/base/manifest.json').then((r) => r.json())) as {
@@ -1002,6 +1043,7 @@ export function PixiWorldMap({
               u: {
                 uRect: { value: new Float32Array([box.x, box.y, box.w, box.h]), type: 'vec4<f32>' },
                 uTime: { value: 0, type: 'f32' },
+                uStrength: { value: tn.gustStrength, type: 'f32' },
               },
             },
           });
@@ -1041,7 +1083,7 @@ export function PixiWorldMap({
               puff.x = chimney.x + life * 46 + Math.sin(life * 5 + chimney.y) * 4;
               puff.y = chimney.y - life * 78;
               puff.scale.set(0.35 + life * 0.85);
-              puff.alpha = Math.sin(Math.PI * Math.min(1, life * 1.15)) * 0.42;
+              puff.alpha = Math.sin(Math.PI * Math.min(1, life * 1.15)) * 0.42 * tn.smokeAmount;
             });
           }
         }
@@ -1064,7 +1106,7 @@ export function PixiWorldMap({
             const period = 5 + ((seed * 13) % 4);
             ticks.push((t) => {
               const p = ((((t + seed * 5) % period) + period) % period) / period;
-              star.alpha = Math.max(0, Math.sin(p * Math.PI * 4)) ** 6 * (p < 0.5 ? 0.9 : 0);
+              star.alpha = Math.max(0, Math.sin(p * Math.PI * 4)) ** 6 * (p < 0.5 ? 0.9 : 0) * tn.glintAmount;
             });
           }
         });
@@ -1077,7 +1119,7 @@ export function PixiWorldMap({
           // the camera pans (parallax), drift with a slight wind shear, and every cloud slowly changes shape.
           const level = bandIndex[band.name] ?? 1;
           const layer = new Container();
-          const parallax = CLOUD_PARALLAX[level];
+          const parallax = CLOUD_PARALLAX[level] * tn.cloudParallax;
           bandLayers.push({ layer, parallax });
           world.addChild(layer);
           for (const s of band.sprites) {
@@ -1100,8 +1142,8 @@ export function PixiWorldMap({
               // Wind shear: the higher the layer, the more its path meanders across the map.
               sprite.y = s.y + h / 2 + Math.sin(t * 0.045 + phase) * (14 + level * 16);
               if (!reducedMotion) {
-                sprite.scale.set(baseScale * (1 + 0.045 * Math.sin(t * 0.11 + phase)), baseScale * (1 + 0.04 * Math.sin(t * 0.083 + phase * 1.7)));
-                sprite.rotation = 0.02 * Math.sin(t * 0.07 + phase);
+                sprite.scale.set(baseScale * (1 + 0.045 * tn.cloudMorph * Math.sin(t * 0.11 + phase)), baseScale * (1 + 0.04 * tn.cloudMorph * Math.sin(t * 0.083 + phase * 1.7)));
+                sprite.rotation = 0.02 * tn.cloudMorph * Math.sin(t * 0.07 + phase);
               }
               // A cloud that would sit on a point of interest thins out instead of hiding it.
               let want = 1;
@@ -1333,7 +1375,7 @@ export function PixiWorldMap({
             hoverIndex = index;
             highlightFor(index);
             report(index);
-          }, REGION_HOVER_DELAY_MS);
+          }, tn.regionHoverDelayS * 1000);
         };
         const onLeave = () => {
           window.clearTimeout(dwellTimer);
@@ -1438,7 +1480,7 @@ export function PixiWorldMap({
         /* init may not have finished */
       }
     };
-  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, regionsOn, onStats, syncAnchors]);
+  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, regionsOn, tuneKey, onStats, syncAnchors]);
 
   // New or moved anchors get placed before paint, not on the next camera move.
   useLayoutEffect(syncAnchors);

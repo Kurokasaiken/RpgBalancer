@@ -132,7 +132,12 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
         }
         resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />}
         hangingSlot={panels.visible.events ? <HudEventLedger events={events} context="game_frame" onSelect={focusEvent} onClose={() => panels.set('events', false)} /> : undefined}
-        utilitySlot={captureMode ? undefined : <HudPanelsMenu visible={panels.visible} onToggle={panels.toggle} includeDev={devPanels} />}
+        utilitySlot={
+          // ?capture=1 fades the button out for clean shots; it comes back under the pointer (and the P/R/E/D/T keys still work).
+          <div style={captureMode ? { opacity: 0, transition: 'opacity 200ms' } : undefined} onMouseEnter={(e) => captureMode && (e.currentTarget.style.opacity = '1')} onMouseLeave={(e) => captureMode && (e.currentTarget.style.opacity = '0')}>
+            <HudPanelsMenu visible={panels.visible} onToggle={panels.toggle} includeDev={devPanels} />
+          </div>
+        }
         rosterSlot={panels.visible.roster ? (typeof rosterSlot === 'function' ? rosterSlot({ onClose: () => panels.set('roster', false) }) : (rosterSlot ?? <Roster componentId="game-frame-roster" density="compact" onClose={() => panels.set('roster', false)} />)) : undefined}
         recenterSlot={<HudRecenterButton onRecenter={() => setRecenterSignal((n) => n + 1)} />}
       >
