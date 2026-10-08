@@ -1324,7 +1324,20 @@
       "label": "Cintura",
       "armTitle": "Armato: il consumabile adatto si spende sul prossimo check — le opzioni mostrano il delta"
     },
-    "consumableDelta": "{base}→{armed} ✦"
+    "consumableDelta": "{base}→{armed} ✦",
+    "stash": {
+      "title": "La sacca",
+      "hint": "Cosa porti — {used}/{slots} posti",
+      "coverage": "Copre",
+      "desc": {
+        "bonusForza": "+15 ai check di Forza",
+        "bonusPerc": "+15 ai check di Percezione",
+        "smoke": "+15 ai check di Agilità",
+        "rope": "+15 ai check di Forza o Costituzione",
+        "healing": "+20 HP al membro più ferito — si usa prima di un check",
+        "potion": "Cura completamente un membro ferito"
+      }
+    }
   },
   "questTheatre": {
     "poi": {

@@ -1303,7 +1303,20 @@
       "label": "Belt",
       "armTitle": "Armed: the matching consumable is spent on the next check — options show the delta"
     },
-    "consumableDelta": "{base}→{armed} ✦"
+    "consumableDelta": "{base}→{armed} ✦",
+    "stash": {
+      "title": "The bag",
+      "hint": "Pick what to pack — {used}/{slots} slots",
+      "coverage": "Covers",
+      "desc": {
+        "bonusForza": "+15 to Strength checks",
+        "bonusPerc": "+15 to Perception checks",
+        "smoke": "+15 to Agility checks",
+        "rope": "+15 to Strength or Constitution checks",
+        "healing": "+20 HP to the most hurt member — usable before a check",
+        "potion": "Fully heals one wounded member"
+      }
+    }
   },
   "questTheatre": {
     "poi": {
