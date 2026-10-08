@@ -8,6 +8,10 @@ export { WhenWhereCluster, type WhenWhereClusterProps } from './WhenWhereCluster
 export { HudGlyph, HUD_ICONS, type HudGlyphProps, type HudIconId } from './hudIcons';
 export { DirectorPanel, type DirectorPanelProps, type DirectorAction } from './DirectorPanel';
 export { HudPanelsMenu, type HudPanelsMenuProps } from './HudPanelsMenu';
-export { useHudPanels, type HudPanelId } from './useHudPanels';
+export { useHudPanels, type HudPanelId, type HudPanelsApi } from './useHudPanels';
+export { HUD_PANELS } from './hudPanelRegistry';
 export { ObjectiveCartouche, type HudObjective } from './ObjectiveCartouche';
 export { RegionTooltip, type RegionTooltipProps } from './RegionTooltip';
+export { TuningPanel, type TuningField, type TuningPanelProps } from './TuningPanel';
+export { MapDemoPoi } from './MapDemoPoi';
+export { usePoiTypeIcon, poiTypeIconUrl } from './usePoiTypeIcon';

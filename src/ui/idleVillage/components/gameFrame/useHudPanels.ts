@@ -1,24 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 
-/** Floating panels the player can close and bring back. Fixed chrome is not in this list. */
-export type HudPanelId = 'roster' | 'events';
+import { HUD_PANEL_DEFAULTS, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
+
+export { HUD_PANEL_SHORTCUTS };
+export type { HudPanelId };
+export type HudPanelsApi = ReturnType<typeof useHudPanels>;
 
 const STORAGE_KEY = 'hud_panels_v1';
-const DEFAULT_VISIBILITY: Record<HudPanelId, boolean> = { roster: true, events: true };
-
-/** Shortcut per panel (no modifier; ignored while typing in a field). */
-export const HUD_PANEL_SHORTCUTS: Record<HudPanelId, string> = { roster: 'r', events: 'e' };
+const DEFAULT_VISIBILITY = HUD_PANEL_DEFAULTS;
 
 /**
  * Which floating panels are on screen. Persisted through PersistenceService, with a
  * one-key shortcut each, so closing a panel is never a one-way door.
  */
-export function useHudPanels() {
+export function useHudPanels({ enabled = true }: { enabled?: boolean } = {}) {
   const [visible, setVisible] = useState<Record<HudPanelId, boolean>>(DEFAULT_VISIBILITY);
   const loaded = useRef(false);
 
   useEffect(() => {
+    if (!enabled) return undefined;
     let cancelled = false;
     loadData<Partial<Record<HudPanelId, boolean>>>(STORAGE_KEY, {}).then((stored) => {
       if (cancelled) return;
@@ -28,7 +29,7 @@ export function useHudPanels() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [enabled]);
 
   const set = useCallback((id: HudPanelId, value: boolean) => {
     setVisible((current) => {
@@ -47,6 +48,7 @@ export function useHudPanels() {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return undefined;
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
@@ -56,7 +58,7 @@ export function useHudPanels() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggle]);
+  }, [toggle, enabled]);
 
   return { visible, set, toggle };
 }

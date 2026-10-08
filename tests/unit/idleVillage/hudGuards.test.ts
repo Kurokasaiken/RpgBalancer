@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { HUD_PANELS } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
 import { BASE_SKIN_CSS_VARS } from '@/ui/idleVillage/skins/skinCssVariables';
 
 /**
@@ -19,6 +20,20 @@ const STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/HudPanelsMenu.tsx',
   'src/ui/idleVillage/components/gameFrame/WhenWhereCluster.tsx',
   'src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx',
+  // PLAN-024 — Quest S1 Lab HUD (full-page action screens, same material).
+  'src/ui/idleVillage/questS1Lab/hud/atoms.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/ActionZone.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/AstroOverlay.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/ChronicleDrawer.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/ConsumableBelt.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/ContextStrip.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/DamageChannel.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/PresetScreen.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/QuestSelectScreen.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/StageBand.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/StashPicker.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/TransitView.tsx',
+  'src/ui/idleVillage/questS1Lab/hud/VerdictCard.tsx',
 ];
 const TOKEN_FILES = [
   ...STRICT_FILES,
@@ -68,5 +83,15 @@ describe('HUD guards', () => {
     expect(start).toBeGreaterThan(-1);
     const block = css.slice(start, css.indexOf('.skin-scope :where([data-skin="cta"])', start));
     expect(block.match(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/g)).toBeNull();
+  });
+
+  it('keeps the Panels menu complete: every registered panel has a name in both locales and a unique shortcut', () => {
+    const shortcuts = HUD_PANELS.map((panel) => panel.shortcut);
+    expect(new Set(shortcuts).size).toBe(shortcuts.length);
+    for (const locale of ['en', 'it-IT']) {
+      const names = JSON.parse(read(`public/locales/${locale}/idleVillage.json`)).gameFrame.panels.names as Record<string, string>;
+      const missing = HUD_PANELS.filter((panel) => !names[panel.id]).map((panel) => `${locale}: ${panel.id}`);
+      expect(missing).toEqual([]);
+    }
   });
 });
