@@ -1,4 +1,5 @@
 import React, { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useHudBandPx } from './hudBand';
 import { cartouchePath, type PlaqueGeometry } from '@/ui/designSystem/primitives/geometry/cartouchePath';
 
 export type HudPlaqueShape = 'hang' | 'plinth' | 'panel';
@@ -9,7 +10,6 @@ const SHAPES: Record<HudPlaqueShape, PlaqueGeometry> = {
   plinth: { shape: 'plinth', size: 30, sag: 3 },
   panel: { shape: 'panel', size: 18 },
 };
-const BAND_PX = 2;
 const SEAT_PX = 1.25;
 const GRAIN_TILE_PX = 256;
 const WEAR_TILE_PX = 128;
@@ -38,6 +38,7 @@ export const HudPlaque: React.FC<HudPlaqueProps> = ({ shape = 'panel', as: Tag =
   const ref = useRef<HTMLElement>(null);
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   const uid = useId().replace(/:/g, '');
+  const BAND_PX = useHudBandPx();
 
   useLayoutEffect(() => {
     const node = ref.current;
