@@ -17,7 +17,10 @@ import { FadeIn, Kicker } from './atoms';
 export const TransitView: React.FC<{
   transit?: string;
   art?: { src: string; fit: 'contain' | 'cover' };
-}> = ({ transit, art }) => {
+  /** Clicking the authored line skips the read-hold and advances (Director: il
+   *  testo di transizione è anche il pulsante «prosegui»). */
+  onAdvance?: () => void;
+}> = ({ transit, art, onAdvance }) => {
   const { t } = useTranslation('idleVillage');
   if (!transit) {
     return (
@@ -28,11 +31,19 @@ export const TransitView: React.FC<{
   }
   return (
     <div
+      role="button"
+      tabIndex={0}
+      onClick={onAdvance}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onAdvance?.();
+      }}
+      title={onAdvance ? t('questS1Lab.transitSkip') : undefined}
       className="relative flex h-44 items-center justify-center overflow-hidden"
       style={{
         borderRadius: 14,
         border: '1px solid color-mix(in srgb, var(--skin-surface-border) 40%, transparent)',
         background: 'var(--skin-hud-lacquer-deep)',
+        cursor: onAdvance ? 'pointer' : undefined,
       }}
     >
       {art && (

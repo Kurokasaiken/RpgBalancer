@@ -28,6 +28,8 @@ export interface ActionZoneProps {
   inTransition: boolean;
   transitText?: string;
   transitArt?: { src: string; fit: 'contain' | 'cover' };
+  /** Click on the transit line skips its read-hold. */
+  onTransitSkip?: () => void;
   presenting: boolean;
   /** The check whose resolution is on stage, if any. */
   activeCheck: ResolvedCheck | null;
@@ -57,7 +59,7 @@ const bodyText: React.CSSProperties = {
  *  `HudPlaque shape="plinth"` in the page supplies the frame and height. */
 export const ActionZone: React.FC<ActionZoneProps> = ({
   run, currentNode,
-  inTransition, transitText, transitArt,
+  inTransition, transitText, transitArt, onTransitSkip,
   presenting, activeCheck, phase, onAck,
   burstCurrent, burstTotal, queuePending,
   armConsumable, onChoose,
@@ -70,7 +72,7 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
   return (
     <div className="quest-s1-scroll flex h-full w-full flex-col overflow-y-auto">
       {inTransition ? (
-        <TransitView transit={transitText} art={transitArt} />
+        <TransitView transit={transitText} art={transitArt} onAdvance={onTransitSkip} />
       ) : presenting && activeCheck ? (
         phase === 'cinematic' ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
