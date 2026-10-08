@@ -86,16 +86,20 @@ protetto finché qualcuno dietro vive.
 
 ### F1 — ESPLORAZIONE (cercare tracce)
 
-Testo minimo. Due check alternativi:
+Testo minimo. Due check alternativi (nomi ratificati Director 2026-10-08):
 
 | Check | Successo | Fallimento |
 |---|---|---|
-| `PERCEZIONE` | **bonus all'approccio Stealth di F3** (→ vantaggio in F4) | nulla |
-| `PERCEZIONE + FORZA` | **apre F2** (l'evento opzionale bottino) | −10 HP |
+| `PERCEZIONE` — **«Cercare tracce»** | **bonus all'approccio Stealth di F3** (→ vantaggio in F4) | nulla |
+| `FORZA + PERCEZIONE` — **«Arrampicarsi sull'albero»** | **apre F2** (dall'alto si avvista la nicchia presso il masso) | −10 HP (caduta) |
 
 - Ratificato (Director 2026-10-06): `PERCEZIONE` semplice non apre nulla —
   il suo successo alimenta la via stealth dell'accampamento.
-- Il «nuovo evento» aperto da `PERCEZIONE+FORZA` **è F2**.
+- Il «nuovo evento» aperto da `FORZA+PERCEZIONE` **è F2**.
+- Re-mapping nomi↔stat (Director 2026-10-08): la Percezione pura è «Cercare
+  tracce» (lettura del suolo); Forza+Percezione è l'arrampicata sull'albero
+  (sforzo fisico + lettura dall'alto). Il masso resta scenografia del nodo F1
+  e sede della nicchia di F2 — scoperta dall'alto, non più «spostato».
 - **Solo questi 2 check** — nessuna altra combinazione in questo esempio
   (Director 2026-10-06).
 - Checkpoint: ritirati / consumabile sempre disponibili.
@@ -309,47 +313,51 @@ minaccia è sulla strada — dove avviene F7 — non sul mugnaio).
 > straccio, schiacciato come da chi aveva fretta.»
 >
 > **Opzioni:**
-> - *Arrampicarsi sull'albero* — «Percezione. Dall'alto il bosco si
->   lascia leggere.»
-> - *Spostare il masso* — «Percezione + Forza. Lo straccio là sotto può
->   valere — o costare schiena.»
+> - *Cercare tracce* — «Percezione. Il suolo racconta chi è passato, e
+>   quanti erano.»
+> - *Arrampicarsi sull'albero* — «Forza + Percezione. Dall'alto: il
+>   campo, e dove nascondono ciò che rubano.»
 
 L'indizio visivo (straccio) precede la scelta: il masso è scoperto, non
-inserito — come richiede il brief R-103.
+inserito — come richiede il brief R-103. Re-mapping nomi↔stat del
+2026-10-08: la Percezione pura è «Cercare tracce»; l'arrampicata è
+Forza+Percezione e dall'alto rivela la nicchia (apre F2).
 
-#### Check «Ti arrampichi sull'albero» `gob-tracce-per` (PER)
+#### Check «Cercare tracce» `gob-tracce-per` (PER)
+
+> **transit:** «Vi spargete lungo il sentiero a leggere il suolo:
+> impronte, terra smossa, il senso di una via che gli altri non
+> vedono.»
+>
+> **body:** «A terra il bosco parla piano: orme nella terra umida, rami
+> spezzati all'altezza sbagliata.»
+
+| esito | verdictFlavor |
+|---|---|
+| bigwin | «Orme fresche, terra rivoltata, un filo di campanelli teso tra i rami: sapete dove vanno, e da dove guardano.» |
+| win | «Orme fresche verso nord, e segni di passaggi ripetuti. Sapete come avvicinarvi.» |
+| almost | «Segni confusi, orme doppie. Un sospetto, non una via.» |
+| fail | «Il suolo è stato rimestato apposta. Il bosco non racconta niente.» |
+| epicfail | «Leggete le tracce al contrario — e qualcuno, da qualche parte, ha letto le vostre.» |
+
+La rivelazione è a scalini: bigwin mostra tutto (orme, campanelli, via di
+guardia), win l'essenziale, almost un sospetto.
+
+#### Check «Ti arrampichi sull'albero» `gob-tracce-perfor` (STR+PER)
 
 > **transit:** «L'albero giusto sta tre passi fuori dal sentiero. La
 > corteccia è il vostro appiglio, la cima il vostro occhio.»
 >
 > **body:** «Dal basso il bosco è un muro. Da sopra, qualcosa dice dove
-> si apre.»
+> si apre — e cosa nasconde.»
 
 | esito | verdictFlavor |
 |---|---|
-| bigwin | «Dall'alto: fumo basso a est, una fila di pali appuntiti, una sentinella su un ceppo. E un varco dove nessuno guarda.» |
-| win | «Fumo basso a est e, su un ceppo, una sagoma che non dorme. Il campo è vicino.» |
-| almost | «Qualcosa si muove tra i rami — una volta sola. Scendi con un sospetto, non con una via.» |
-| fail | «L'albero si lascia arrampicare, il bosco no.» |
-| epicfail | «Un ramo marcio: giù di schiena. Ora anche il bosco sa che ci siete.» |
-
-La rivelazione è a scalini: bigwin mostra tutto (fumo, pali, sentinella,
-varco), win la metà essenziale, almost un sospetto.
-
-#### Check «Spostare il masso» `gob-tracce-perfor` (PER+STR)
-
-> **transit:** «Spalle contro il masso: cede un centimetro per volta.»
->
-> **body:** «Lo straccio sotto il masso non è caduto lì da solo.
-> Qualcuno ha nascosto qualcosa, in fretta.»
-
-| esito | verdictFlavor |
-|---|---|
-| bigwin | «Il masso si sposta in silenzio — sotto, una nicchia di stracci che qualcuno ha chiuso in fretta.» |
-| win | «Spalle contro il masso. Sotto: stracci, e qualcosa di avvolto.» |
-| almost | «Si sposta, ma il bosco ha sentito qualcosa cadere.» |
-| fail | «Il masso cade dalla parte sbagliata. Il sentiero resta chiuso.» |
-| epicfail | «La roccia prende una caviglia. Si cammina zoppicando, e non era il piano.» |
+| bigwin | «Dall'alto: fumo basso a est, una fila di pali appuntiti, una sentinella su un ceppo — e giù, presso il masso, terra smossa dove qualcuno ha chiuso qualcosa in fretta.» |
+| win | «La corteccia cede ma regge. Da sopra: il campo a est, e presso il masso un lembo di straccio che non doveva stare lì.» |
+| almost | «Il ramo cede a mezza altezza — ma basta per scorgere la terra smossa sotto il masso.» |
+| fail | «Il ramo tiene a metà, poi cede: la schiena trova il suolo prima degli occhi il campo.» |
+| epicfail | «Un ramo marcio: giù di schiena, e il tonfo corre per il bosco. Ora anche loro sanno che ci siete.» |
 
 ### F2 — Bottino `gob-bottino-scelta` → `gob-bottino` (opzionale)
 
@@ -565,11 +573,15 @@ Il guado chiude ciò che F0 ha aperto (callback, decisione Director).
 ## Delta rimasti (dopo il rework P0 di R-103)
 
 Applicati 2026-10-08 (P0, solo testo — zero RNG, zero calibrazione):
-campanelli, albero/masso con indizio visibile, assalto fisico, attack
+campanelli, indizio visibile del masso, assalto fisico, attack
 lines, righe di danno per gravità, fix F5-win (contraddiceva lo
 sterminio), cassa semibruciata + righe-per-turno in F6, sollievo→shock
 in F7, epilogo con registro e callback al guado, transit hold ∝ parole
-(`questLabPacing`).
+(`questLabPacing`). Inoltre (2026-10-08, Director): re-mapping nomi↔stat
+in F1 — «Cercare tracce» = PER pura (bonus stealth), «Arrampicarsi
+sull'albero» = STR+PER (dall'alto rivela la nicchia → F2; il fallimento
+è la caduta, −10 HP — e l'epicfail «ramo marcio» ora descrive il
+meccanismo giusto).
 
 Ancora aperti:
 

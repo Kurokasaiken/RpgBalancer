@@ -322,6 +322,8 @@ const VILLAGE_CHIMNEYS = [
 const SMOKE_PUFFS = 5;
 const SMOKE_LIFE_S = 7;
 
+/** Supersampling of a hovered territory's outline (mask pixels -> outline pixels), so its edge is smooth. */
+const REGION_RASTER_SCALE = 2;
 /** Colour of a hovered territory's border (ink black, like a board-game province). */
 const REGION_EDGE_RGBA = [16, 12, 8, 255];
 /** Glass globe (hold Alt): how far the map tips toward the pointer, and how far the seabed slides with it (world px). */
@@ -1276,52 +1278,74 @@ export function PixiWorldMap({
           c.height = mh;
           const ctx = c.getContext('2d');
           if (ctx && ids) {
-            // The territory's own shape: an ink border like a board-game province (soft dark shade inside, sharp
-            // core line on top) over a faint warm wash — a lit province, not a flat sticker.
-            const shape = ctx.createImageData(mw, mh);
-            const edge = ctx.createImageData(mw, mh);
-            for (let y = 0; y < mh; y += 1) {
-              for (let x = 0; x < mw; x += 1) {
-                const i = y * mw + x;
-                if (ids[i * 4] !== index) continue;
-                shape.data.set([255, 236, 190, 255], i * 4);
-                const border =
-                  x === 0 || y === 0 || x === mw - 1 || y === mh - 1 ||
-                  ids[(i - 1) * 4] !== index || ids[(i + 1) * 4] !== index || ids[(i - mw) * 4] !== index || ids[(i + mw) * 4] !== index;
-                if (border) edge.data.set(REGION_EDGE_RGBA, i * 4);
+            // Manga-style outline: the territory's mask is smoothed up to a higher resolution (so no stair steps), the
+            // ink line is a solid band cut inside the shape by erosion (crisp, no blur halo), over a faint warm wash.
+            const U = REGION_RASTER_SCALE;
+            const W = mw * U;
+            const H = mh * U;
+            c.width = W;
+            c.height = H;
+            const base = document.createElement('canvas');
+            base.width = mw;
+            base.height = mh;
+            const bctx = base.getContext('2d');
+            const bimg = bctx?.createImageData(mw, mh);
+            if (bctx && bimg) {
+              for (let i = 0; i < mw * mh; i += 1) {
+                if (ids[i * 4] === index) bimg.data[i * 4 + 3] = 255;
               }
+              bctx.putImageData(bimg, 0, 0);
             }
-            const layerOf = (data: ImageData) => {
+            const shape = document.createElement('canvas');
+            shape.width = W;
+            shape.height = H;
+            const sctx = shape.getContext('2d', { willReadFrequently: true });
+            if (sctx) {
+              sctx.imageSmoothingEnabled = true;
+              sctx.imageSmoothingQuality = 'high';
+              sctx.filter = `blur(${U * 2}px)`;
+              sctx.drawImage(base, 0, 0, W, H);
+              sctx.filter = 'none';
+              const sd = sctx.getImageData(0, 0, W, H);
+              for (let p = 3; p < sd.data.length; p += 4) sd.data[p] = sd.data[p] > 127 ? 255 : 0;
+              sctx.putImageData(sd, 0, 0);
+            }
+            const tint = (colour: string) => {
               const t = document.createElement('canvas');
-              t.width = mw;
-              t.height = mh;
-              t.getContext('2d')?.putImageData(data, 0, 0);
+              t.width = W;
+              t.height = H;
+              const g = t.getContext('2d');
+              if (g) {
+                g.drawImage(shape, 0, 0);
+                g.globalCompositeOperation = 'source-in';
+                g.fillStyle = colour;
+                g.fillRect(0, 0, W, H);
+              }
               return t;
             };
-            const shapeCanvas = layerOf(shape);
-            const edgeCanvas = layerOf(edge);
-            ctx.globalAlpha = 0.08;
-            ctx.drawImage(shapeCanvas, 0, 0);
-            ctx.globalAlpha = 0.4;
-            ctx.filter = 'blur(6px)';
-            ctx.drawImage(edgeCanvas, 0, 0);
-            ctx.filter = 'blur(2px)';
-            ctx.drawImage(edgeCanvas, 0, 0);
-            ctx.filter = 'none';
-            // Bold ink line, anime style: a solid black stroke a few mask px wide (tunable), stamped as a disc so the
-            // corners stay round. It sits inside the territory (clipped below), like a province drawn with a brush pen.
-            ctx.globalAlpha = 1;
-            const radius = Math.max(0.5, tn.regionLinePx / (canvas.width / mw) / 2);
-            for (let oy = -Math.ceil(radius); oy <= Math.ceil(radius); oy += 1) {
-              for (let ox = -Math.ceil(radius); ox <= Math.ceil(radius); ox += 1) {
-                if (ox * ox + oy * oy <= radius * radius + 0.25) ctx.drawImage(edgeCanvas, ox, oy);
+            // Eroded copy: the shape with its outer band removed (AND of the shape shifted in 8 directions).
+            const thick = Math.max(2, Math.round((tn.regionLinePx * W) / canvas.width));
+            const eroded = document.createElement('canvas');
+            eroded.width = W;
+            eroded.height = H;
+            const egx = eroded.getContext('2d');
+            if (egx) {
+              egx.drawImage(shape, 0, 0);
+              egx.globalCompositeOperation = 'destination-in';
+              const k = Math.round(thick * 0.7071);
+              for (const [dx, dy] of [[thick, 0], [-thick, 0], [0, thick], [0, -thick], [k, k], [-k, k], [k, -k], [-k, -k]]) {
+                egx.drawImage(shape, dx, dy);
               }
             }
-            // Keep the glow inside the territory: nothing spills onto the neighbours or the sea.
-            ctx.globalAlpha = 1;
-            ctx.globalCompositeOperation = 'destination-in';
-            ctx.drawImage(shapeCanvas, 0, 0);
-            ctx.globalCompositeOperation = 'source-over';
+            // The ink ring = shape minus the eroded shape.
+            const ring = tint(`rgb(${REGION_EDGE_RGBA[0]}, ${REGION_EDGE_RGBA[1]}, ${REGION_EDGE_RGBA[2]})`);
+            const rctx = ring.getContext('2d');
+            if (rctx) {
+              rctx.globalCompositeOperation = 'destination-out';
+              rctx.drawImage(eroded, 0, 0);
+            }
+            ctx.drawImage(tint('rgba(255, 236, 190, 0.12)'), 0, 0);
+            ctx.drawImage(ring, 0, 0);
           }
           sprite = new Sprite(Texture.from(c));
           sprite.width = canvas.width;
