@@ -77,6 +77,10 @@ export interface PixiMapTune {
   deepSeaFadePx: number;
   /** How far (world px) the forest canopies sway in the wind; 0 keeps them still. */
   forestSway: number;
+  /** Speed multiplier of the wind over the forests (1 = a gust every ~8 s). */
+  forestSwaySpeed: number;
+  /** Thickness of a hovered territory's ink border, in world px. */
+  regionLinePx: number;
   /** Seconds a territory must be hovered before it lights up and shows its name. */
   regionHoverDelayS: number;
   /** No two waves or sea marks play closer than this (world px). */
@@ -89,7 +93,9 @@ export const DEFAULT_MAP_TUNE: PixiMapTune = {
   smokeAmount: 1,
   wonderEveryS: 18,
   deepSeaFadePx: 650,
-  forestSway: 2.5,
+  forestSway: 4,
+  forestSwaySpeed: 1,
+  regionLinePx: 14,
   regionHoverDelayS: 1,
   markSpacingPx: 900,
 };
@@ -529,9 +535,10 @@ export function PixiWorldMap({
             const x = orig[i];
             const y = orig[i + 1];
             // A slow wave of wind rolling over the crowns, with a quicker flutter riding on it.
-            const wave = Math.sin(t * 0.8 + x * 0.014 + y * 0.01 + c.phase) + 0.45 * Math.sin(t * 1.9 + x * 0.05 - y * 0.04 + c.phase * 2);
+            const ts = t * tn.forestSwaySpeed;
+            const wave = Math.sin(ts * 0.8 + x * 0.014 + y * 0.01 + c.phase) + 0.45 * Math.sin(ts * 1.9 + x * 0.05 - y * 0.04 + c.phase * 2);
             pos[i] = x + amp * wave * 0.6;
-            pos[i + 1] = y + amp * Math.cos(t * 0.7 + x * 0.011 - y * 0.012 + c.phase) * 0.35;
+            pos[i + 1] = y + amp * Math.cos(ts * 0.7 + x * 0.011 - y * 0.012 + c.phase) * 0.35;
           }
           c.buffer.update();
         }
@@ -1145,7 +1152,7 @@ export function PixiWorldMap({
         seabedShift(cam.panX, cam.panY, visW, visH);
         camRef.current = cam;
         // Dev only: lets a test read the camera to find where the painted canvas edges land on screen.
-        if (import.meta.env.DEV) (window as unknown as { __worldCam?: unknown }).__worldCam = { ...cam, width: canvas.width, height: canvas.height };
+        if (import.meta.env.DEV) Object.assign(window as object, { __worldCam: { ...cam, width: canvas.width, height: canvas.height }, __canopySway: canopySway });
         syncAnchors();
       };
       const refit = () => {
@@ -1265,9 +1272,15 @@ export function PixiWorldMap({
             ctx.filter = 'blur(2px)';
             ctx.drawImage(edgeCanvas, 0, 0);
             ctx.filter = 'none';
-            // Solid ink core, two mask pixels wide (one would read as a faint brown hairline at map zoom).
+            // Bold ink line, anime style: a solid black stroke a few mask px wide (tunable), stamped as a disc so the
+            // corners stay round. It sits inside the territory (clipped below), like a province drawn with a brush pen.
             ctx.globalAlpha = 1;
-            for (const [ox, oy] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]) ctx.drawImage(edgeCanvas, ox, oy);
+            const radius = Math.max(0.5, tn.regionLinePx / (canvas.width / mw) / 2);
+            for (let oy = -Math.ceil(radius); oy <= Math.ceil(radius); oy += 1) {
+              for (let ox = -Math.ceil(radius); ox <= Math.ceil(radius); ox += 1) {
+                if (ox * ox + oy * oy <= radius * radius + 0.25) ctx.drawImage(edgeCanvas, ox, oy);
+              }
+            }
             // Keep the glow inside the territory: nothing spills onto the neighbours or the sea.
             ctx.globalAlpha = 1;
             ctx.globalCompositeOperation = 'destination-in';
