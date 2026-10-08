@@ -58,12 +58,12 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset, 
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
-          style={{ background: 'none', border: 'none', padding: 0, color: 'var(--skin-label-primary, #c9a84e)', cursor: 'pointer', fontSize: 11 }}
+          style={{ background: 'none', border: 'none', padding: 0, color: 'var(--skin-label-primary, #c9a84e)', cursor: 'pointer', fontSize: 16, width: 22, height: 22, lineHeight: '22px' }}
         >
           {open ? '–' : '+'}
         </button>
         {onClose && (
-          <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--skin-label-primary, #c9a84e)', cursor: 'pointer', fontSize: 12 }}>
+          <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--skin-label-primary, #c9a84e)', cursor: 'pointer', fontSize: 18, width: 22, height: 22, lineHeight: '22px' }}>
             ×
           </button>
         )}
