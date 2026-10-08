@@ -102,6 +102,22 @@ altro → mostra il messaggio del runtime.
 - **Reload:** frontier + seed + versioni persistiti; `matureReady(now)` dopo il
   load riproduce lo stesso catch-up deterministico.
 
+### Adapter runtime reale (PLAN-025 T-006 — `questRunAdapter.ts`)
+
+- `snapshotQuestRun(run, {tick})` → `TheatreRunView` v2: i nodi risolti
+  vengono da `run.visitedNodes` (storia append-only, rivisite incluse — la
+  track mostra ogni passaggio, es. il loop F6), mai dal grafo; il nodo di
+  frontiera è `awaitingPlayer` | `pending` | `resolved`.
+- `pending` espone `node.pending{startedAt,readyAt}` e **nessuna opzione**;
+  `combat` espone `run.combat{turn,enemiesLeft}`; `bag` = flag sacca → item
+  stash (`labelKey` i18n — l'adapter non produce mai copy).
+- `createQuestRunAdapter(getRun,{getTick,onMutate})`: dispatch con guard
+  stale (`expectedFrontierVersion`/`nodeId`), rifiuto su `pending`, dedupe
+  per `commandId` (`rejected:duplicate`); `useItem` solo per oggetti
+  istantanei (pozione/cure — i modificatori di check si armano, non si
+  spendono qui); `retreat`/`collectReward` → rifiuto onesto (il motore non
+  ha flussi generici: il ritiro è un'opzione authored).
+
 ## Acceptance legati (PLAYWRIGHT, T-009)
 
 - Stesso snapshot → stesso render; nessun comando duplicato su reopen/re-render.

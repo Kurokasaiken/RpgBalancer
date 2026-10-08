@@ -11,6 +11,7 @@ import {
   applyChoice,
   availableOptions,
   createRun,
+  ENGINE_SCHEMA_VERSION,
   matureReady,
   maturableNodeCount,
   nodeDurationTicks,
@@ -28,6 +29,7 @@ const timedRun = () => createRun(PARTY, 42, 'goblin', undefined, { nodeTicks: TI
 /** Teleport helper: park the run on a choice node as a waiting frontier. */
 const atChoice = (state: QuestRunState, nodeId: string, tick = 0) => {
   state.nodeId = nodeId;
+  state.visitedNodes.push(nodeId);
   state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick };
 };
 
@@ -35,7 +37,7 @@ describe('quest frontier (v27)', () => {
   it('starts waiting at the first choice, stamped with schema + tick config', () => {
     const run = timedRun();
     expect(run.frontier).toEqual({ status: 'waiting', startedAt: 0, readyAt: 0 });
-    expect(run.engineSchemaVersion).toBe(1);
+    expect(run.engineSchemaVersion).toBe(ENGINE_SCHEMA_VERSION);
     expect(run.nodeTicks).toBe(TICKS);
     expect(maturableNodeCount('goblin')).toBeGreaterThan(0);
     expect(nodeDurationTicks('goblin', 2 * 480)).toBeGreaterThan(0);
