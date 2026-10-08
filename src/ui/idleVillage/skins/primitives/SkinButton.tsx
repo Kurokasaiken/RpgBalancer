@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
  *
  *   variant="utility"   → struck-bronze plate (default)
  *   variant="secondary" → engraved-slate ghost
- *   variant="cta"       → arcane azure-violet notched plate (the "AVVIA" primary action)
+ *   variant="cta"       → teal-enamel plate in a brass frame (the primary action, e.g. "AVVIA")
  */
 export type SkinButtonVariant = 'utility' | 'secondary' | 'cta';
 
