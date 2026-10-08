@@ -374,3 +374,56 @@
   0%, 100% { opacity: 0.55; }
   50% { opacity: 0.85; }
 }
+
+/* ── Choice rows: a line of a dialogue list, not a button plate (R-106) ──────────────
+   The quest window's options. A numbered line on the lacquer; hover/focus lights a brass
+   rule on the left. Scoped under [data-hud-choices] so the selector outranks the bronze
+   button rules above (0,3,1 vs 0,3,0) without editing them. Tokens only. */
+.skin-scope [data-hud-choices] button[data-skin="choice"] {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  column-gap: 8px;
+  align-items: baseline;
+  width: 100%;
+  padding: 7px 10px 8px 8px;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--skin-text-primary);
+  font: inherit;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  text-shadow: none;
+  transform: none;
+  filter: none;
+  cursor: pointer;
+  transition: background 140ms ease-out, border-color 140ms ease-out;
+}
+.skin-scope [data-hud-choices] button[data-skin="choice"]::before { content: none; }
+.skin-scope [data-hud-choices] button[data-skin="choice"] + button[data-skin="choice"] {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--skin-surface-border) 22%, transparent);
+}
+.skin-scope [data-hud-choices] button[data-skin="choice"]:hover:not(:disabled),
+.skin-scope [data-hud-choices] button[data-skin="choice"]:focus-visible {
+  outline: none;
+  border-left-color: var(--skin-title-color);
+  background: color-mix(in srgb, var(--skin-title-color) 9%, transparent);
+  transform: none;
+  filter: none;
+}
+.skin-scope [data-hud-choices] button[data-skin="choice"]:active:not(:disabled) {
+  background: color-mix(in srgb, var(--skin-title-color) 16%, transparent);
+  transform: none;
+  filter: none;
+}
+.skin-scope [data-hud-choices] button[data-skin="choice"] [data-choice-index] {
+  color: var(--skin-label-primary);
+  transition: color 140ms ease-out;
+}
+.skin-scope [data-hud-choices] button[data-skin="choice"]:hover:not(:disabled) [data-choice-index],
+.skin-scope [data-hud-choices] button[data-skin="choice"]:focus-visible [data-choice-index] {
+  color: var(--skin-title-color);
+}

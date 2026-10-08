@@ -52,10 +52,11 @@ export function useHudPanelDrag() {
     };
   }, [dragging]);
 
-  const panelStyle: CSSProperties = {
-    transform: `translate(${offset.x}px, ${offset.y}px)`,
-    zIndex: dragging ? 1000 : undefined,
-  };
+  // No `zIndex` key unless dragging: spreading `zIndex: undefined` over a panel's own
+  // style would erase its layer and drop it under the HUD chrome.
+  const panelStyle: CSSProperties = dragging
+    ? { transform: `translate(${offset.x}px, ${offset.y}px)`, zIndex: 1000 }
+    : { transform: `translate(${offset.x}px, ${offset.y}px)` };
   const resetPosition = useCallback(() => setOffset({ x: 0, y: 0 }), []);
   const handleProps = {
     onPointerDown,
