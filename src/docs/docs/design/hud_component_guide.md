@@ -226,3 +226,9 @@ Aggiungere un pannello al sistema: aggiungi l'id a `HudPanelId` e a `HUD_PANEL_S
 ## 12. Frase da dare a un agente
 
 > Prima di creare o modificare un componente HUD di `/game` leggi `src/docs/docs/design/hud_component_guide.md`. Usa `HudPlaque`, i token `--skin-hud-*`, `data-hud-controls` e `useHudPanelDrag`. Niente letterali colore, niente testo sotto 12px, niente stringhe fisse, niente modifiche ai kit certificati. Verifica a 1440×900 e 1280×800 e riporta cosa hai misurato.
+
+## Catture e debug (`/game`)
+
+- `?capture=1`: niente Director e niente menu pannelli, per screenshot e trailer puliti (F10 nasconde il Director anche senza).
+- `?skin=base|lacquer_atlas`: skin iniziale. `?map=graded|original`: mappa graduata o originale.
+- Mappa: `worldDressing.seabed` (fondale con parallasse sotto il mare), `motion.cloudShadowOpacity` (ombre delle nuvole: gli sprite forniti sono nuvole chiare, vengono tinti di scuro), `regions` su `PixiWorldMap` (regioni da `region_ids.png`, rigenerabile con `scripts/bake-region-ids.py`).
