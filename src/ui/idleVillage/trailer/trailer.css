@@ -522,6 +522,12 @@
   object-position: top left;
 }
 
+/* The right half's clouds sit on the right of its image: anchor the crop there, or a narrow window shows only the
+   image's empty left side. */
+.ws-event-shroud__half--right .ws-event-shroud__image {
+  object-position: top right;
+}
+
 /* ── WorldSurfaceEventCard (world-space layer) ──────────────────────── */
 
 .ws-event-card {

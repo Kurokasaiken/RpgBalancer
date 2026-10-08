@@ -47,6 +47,8 @@ export interface WorldSurfaceEventCardProps {
    * a screen with an event ledger turns it off, since the ledger already carries the countdown.
    */
   showReminder?: boolean;
+  /** Size of the announcement card against the map (1 = the World Surface size). */
+  cardSize?: number;
 }
 
 type Stage = 'idle' | 'modal' | 'peeling' | 'falling' | 'marching' | 'done';
@@ -113,6 +115,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   marchTarget,
   daysRemaining = DEFAULT_TOTAL_DAYS,
   showReminder = true,
+  cardSize = 1,
 }) => {
   const { t } = useTranslation('idleVillage');
   const [stage, setStage] = useState<Stage>('modal');
@@ -230,14 +233,14 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
     >
       {/* Card: modal in the middle of the map, then a small reminder top-right. */}
       <motion.div
-        initial={{ x: 0, y: 0, scale: CARD_SCALE }}
+        initial={{ x: 0, y: 0, scale: CARD_SCALE * cardSize }}
         animate={
           isModal
-            ? { x: 0, y: 0, scale: CARD_SCALE }
+            ? { x: 0, y: 0, scale: CARD_SCALE * cardSize }
             : showReminder
               ? { x: reminderOffset.x, y: reminderOffset.y, scale: REMINDER_SCALE }
               // The host keeps the reminder elsewhere (its own ledger): the card just fades where it stands.
-              : { x: 0, y: 0, scale: CARD_SCALE }
+              : { x: 0, y: 0, scale: CARD_SCALE * cardSize }
         }
         transition={{ duration: 1.2, ease: 'easeInOut' }}
         style={{ position: 'absolute', left: 0, top: 0, width: 0, height: 0 }}
@@ -325,7 +328,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
       {/* The bordered goblin sticker, once torn off the card. */}
       {stickerDetached && (
         <motion.div
-          initial={{ x: 0, y: STICKER_START_Y * CARD_SCALE, scale: STICKER_CARD_SCALE }}
+          initial={{ x: 0, y: STICKER_START_Y * CARD_SCALE * cardSize, scale: STICKER_CARD_SCALE * cardSize }}
           animate={stickerAnimate}
           transition={stickerTransition}
           style={{

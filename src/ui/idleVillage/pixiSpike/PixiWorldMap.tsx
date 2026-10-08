@@ -1564,7 +1564,8 @@ export function PixiWorldMap({
         ))}
       </div>
       {worldLayer && manifest && (
-        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        // Above the map and above an event shroud (z 6) closing over it: the world-space event card appears on the clouds.
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 7 }}>
           <div
             ref={worldBoxRef}
             data-testid="pixi-world-layer"
