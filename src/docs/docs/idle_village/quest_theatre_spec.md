@@ -77,6 +77,31 @@ altro → mostra il messaggio del runtime.
   Il teatro non deduce mai il futuro dal grafo.
 - **Invariante:** dato lo stesso snapshot, render live/reopen identico.
 
+### Frontiera temporale (PLAN-025 T-004 — implementata in `questRun.ts`)
+
+- Il run porta `frontier: { status, startedAt, readyAt }`, `frontierVersion`
+  (bump a ogni avanzamento committed) ed `engineSchemaVersion`.
+- **Un solo modo di avanzare per input:** `submitCommand(run, optionId, {tick})`
+  risolve al massimo il nodo corrente — un `CHECK:` si risolve inline come
+  conseguenza della scelta committata — poi la run *arriva* al nodo successivo
+  e si ferma. Mai oltre un nodo `waiting` aggiuntivo.
+- **Solo il tempo attraversa i non-bivi:** `info`/`harm` entrano come
+  `pending` con `readyAt = startedAt + nodeTicks`; `matureReady(run, tick)`
+  consuma in sequenza i nodi maturati e si ferma al primo `waiting`/`ended`.
+- **Effetti alla maturazione, scena all'arrivo:** l'arrivo mostra il testo
+  (`body`); danni e routing (F7: `gob-ritorno` → `gob-agguato`) scattano a
+  `readyAt` — il sollievo resta leggibile prima dell'agguato.
+- **Catch-up deterministico:** il nodo successivo parte dal `readyAt` del
+  predecessore — chi apre in ritardo consuma tutta la catena maturata in un
+  solo `matureReady`, senza riprodurre attese.
+- **Durate senza numeri nuovi:** `nodeDurationTicks(questId, totalTicks)` =
+  tick autoriali della quest ÷ nodi maturabili; `nodeTicks = 0` (lab, Monte
+  Carlo) = maturazione istantanea.
+- **`applyChoice` legacy** = `submitCommand` + `matureReady(∞)` — lab e MC
+  invariati (test di parità: stesso seed → stesso stato).
+- **Reload:** frontier + seed + versioni persistiti; `matureReady(now)` dopo il
+  load riproduce lo stesso catch-up deterministico.
+
 ## Acceptance legati (PLAYWRIGHT, T-009)
 
 - Stesso snapshot → stesso render; nessun comando duplicato su reopen/re-render.

@@ -923,7 +923,8 @@
       "quest": "Show quest",
       "skin": "Skin: {name}",
       "poiTypes": "POI types",
-      "questRun": "Start goblin quest"
+      "questRun": "Start goblin quest",
+      "wonder": "Sea wonder"
     },
     "roster": {
       "title": "Roster",

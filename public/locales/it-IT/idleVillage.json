@@ -930,7 +930,8 @@
       "quest": "Mostra quest",
       "skin": "Skin: {name}",
       "poiTypes": "Tipi di POI",
-      "questRun": "Avvia quest goblin"
+      "questRun": "Avvia quest goblin",
+      "wonder": "Mostro marino"
     },
     "roster": {
       "title": "Roster",

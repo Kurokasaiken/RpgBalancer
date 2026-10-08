@@ -1,27 +1,57 @@
 /**
  * questS1Lab/useQuestRun — drives one authored quest run outside the lab
- * (R-106: the running-quest window on /game). Same engine as the lab
- * (`createRun` / `applyChoice`), plus the per-phase record the window's
+ * (R-106: the running-quest window on /game; PLAN-025 T-004/T-005: the v27
+ * frontier is live here). Same engine as the lab (`createRun` /
+ * `submitCommand` / `matureReady`), plus the per-phase record the window's
  * phase tiles read. No astrolabe cinematic here: the window is the compact
  * view, the verdict lands as text.
+ *
+ * Frontier contract: `choose` resolves ONE command and stops at the next
+ * frontier; `syncClock(tick)` matures pending timed nodes — the caller passes
+ * the game tick, so a paused game pauses the quest and a late open catches up
+ * deterministically. Runs persist via PersistenceService (schema-stamped).
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { loadData, saveData, clearData } from '@/shared/persistence/PersistenceService';
 // `useHealing` is an engine action, not a React hook: aliased so the hooks lint rule reads it right.
-import { applyChoice, availableOptions, createRun, drinkPotion, nodesFor, useHealing as applyHealing, type QuestId, type QuestRunState } from './questRun';
+import {
+  availableOptions,
+  createRun,
+  drinkPotion,
+  ENGINE_SCHEMA_VERSION,
+  matureReady,
+  nodesFor,
+  submitCommand,
+  useHealing as applyHealing,
+  type QuestId,
+  type QuestRunState,
+} from './questRun';
 import { emptyPhase, recordAction, snapshotRun, type PhaseRecord } from './questPhaseRecord';
 
 const BAG_FLAGS: ReadonlySet<string> = new Set(QUEST_STASH.items.map((item) => item.flag));
+
+/** Persisted envelope: schema-stamped, run + phase records only. */
+interface QuestRunSave {
+  engineSchemaVersion: number;
+  run: QuestRunState;
+  phases: PhaseRecord[];
+}
 
 export interface QuestRunApi {
   run: QuestRunState | null;
   /** Phases in the order they were entered; the last one is the current phase. */
   phases: PhaseRecord[];
-  start: (presetId: string, loadout?: string[]) => void;
+  /** `seed`: fixed seed for reproducible runs (playtests, bug reports).
+   *  `nodeTicks`/`startTick`: the caller's clock — omitted = instant maturation. */
+  start: (presetId: string, opts?: { loadout?: string[]; seed?: number; nodeTicks?: number; startTick?: number }) => void;
   /** `useConsumable`: whether an armed bag item may boost the resolving check —
    *  the player's call, never a silent default (R-106 playtest). */
   choose: (optionId: string, opts?: { useConsumable?: boolean }) => void;
+  /** Advance the committed frontier: matured timed nodes resolve, the run
+   *  stops at the first node needing the player (v27 catch-up). */
+  syncClock: (tick: number) => void;
   /** Bag actions usable at a decision: the healing kit and the potion. */
   useHealing: () => void;
   drinkPotion: () => void;
@@ -33,17 +63,53 @@ const beatOf = (run: QuestRunState) => nodesFor(run)[run.nodeId]?.beat ?? 0;
 export function useQuestRun(questId: QuestId): QuestRunApi {
   const [run, setRun] = useState<QuestRunState | null>(null);
   const [phases, setPhases] = useState<PhaseRecord[]>([]);
+  /** Last tick the caller synced — commands resolve at this tick. */
+  const tickRef = useRef(0);
+  const saveKey = `idleVillage.questRun.${questId}`;
 
-  const start = useCallback(
-    (presetId: string, loadout?: string[]) => {
-      const fresh = createRun(presetId, (Date.now() ^ (Math.random() * 0xffffffff)) >>> 0, questId, loadout);
-      setRun(fresh);
-      setPhases([emptyPhase(beatOf(fresh))]);
+  const persist = useCallback(
+    (nextRun: QuestRunState | null, nextPhases: PhaseRecord[]) => {
+      if (!nextRun) {
+        void clearData(saveKey);
+        return;
+      }
+      const payload: QuestRunSave = { engineSchemaVersion: ENGINE_SCHEMA_VERSION, run: nextRun, phases: nextPhases };
+      void saveData(saveKey, payload);
     },
-    [questId],
+    [saveKey],
   );
 
-  /** Applies one player action and folds its effects into the current phase. */
+  // Reload: restore the committed frontier — same schema only, never
+  // reinterpreted; the caller's first syncClock performs the catch-up.
+  useEffect(() => {
+    void loadData<QuestRunSave | null>(saveKey, null).then((payload) => {
+      if (payload?.engineSchemaVersion !== ENGINE_SCHEMA_VERSION || !payload.run) return;
+      setRun(payload.run);
+      setPhases(payload.phases.length ? payload.phases : [emptyPhase(beatOf(payload.run))]);
+      tickRef.current = payload.run.frontier.startedAt;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saveKey]);
+
+  const start = useCallback(
+    (presetId: string, opts?: { loadout?: string[]; seed?: number; nodeTicks?: number; startTick?: number }) => {
+      const fresh = createRun(
+        presetId,
+        opts?.seed ?? ((Date.now() ^ (Math.random() * 0xffffffff)) >>> 0),
+        questId,
+        opts?.loadout,
+        { nodeTicks: opts?.nodeTicks, startTick: opts?.startTick },
+      );
+      if (opts?.startTick != null) tickRef.current = opts.startTick;
+      const first = [emptyPhase(beatOf(fresh))];
+      setRun(fresh);
+      setPhases(first);
+      persist(fresh, first);
+    },
+    [questId, persist],
+  );
+
+  /** Applies one mutation and folds its effects into the current phase. */
   const act = useCallback(
     (apply: (state: QuestRunState) => QuestRunState, label: string | undefined) => {
       if (!run || run.ended) return;
@@ -52,22 +118,36 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       const before = snapshotRun(run);
       const next = apply(run);
       const nextBeat = beatOf(next);
+      let nextPhases: PhaseRecord[] = phases;
       setPhases((current) => {
         const list = current.length ? [...current] : [emptyPhase(beatOf(next))];
         list[list.length - 1] = recordAction(list[list.length - 1], before, next, label, BAG_FLAGS);
         if (!next.ended && nextBeat !== list[list.length - 1].beat) list.push(emptyPhase(nextBeat));
+        nextPhases = list;
         return list;
       });
-      setRun({ ...next });
+      const shown = { ...next };
+      setRun(shown);
+      persist(next, nextPhases);
     },
-    [run],
+    [run, phases, persist],
   );
 
   const choose = useCallback(
     (optionId: string, opts?: { useConsumable?: boolean }) => {
       if (!run) return;
       const label = availableOptions(run).find((o) => o.id === optionId)?.label;
-      act((state) => applyChoice(state, optionId, opts), label);
+      act((state) => submitCommand(state, optionId, { useConsumable: opts?.useConsumable, tick: tickRef.current }), label);
+    },
+    [run, act],
+  );
+
+  const syncClock = useCallback(
+    (tick: number) => {
+      tickRef.current = tick;
+      // Nothing to do unless a timed frontier has actually matured.
+      if (!run || run.ended || run.frontier.status !== 'pending' || tick < run.frontier.readyAt) return;
+      act((state) => matureReady(state, tick), undefined);
     },
     [run, act],
   );
@@ -89,10 +169,11 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   const clear = useCallback(() => {
     setRun(null);
     setPhases([]);
-  }, []);
+    persist(null, []);
+  }, [persist]);
 
   return useMemo(
-    () => ({ run, phases, start, choose, useHealing: heal, drinkPotion: potion, clear }),
-    [run, phases, start, choose, heal, potion, clear],
+    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear }),
+    [run, phases, start, choose, syncClock, heal, potion, clear],
   );
 }

@@ -267,6 +267,10 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           {node?.body && !run.ended && (
             <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.5, color: TONE.text }}>{node.body}</p>
           )}
+          {/* v27 pending frontier: the node is maturing — show the authored transit as the breath before the consequences land. */}
+          {!run.ended && run.frontier.status === 'pending' && node?.transit && (
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 13, lineHeight: 1.45, color: TONE.secondary }}>{node.transit}</p>
+          )}
           {run.ended && (
             <p style={{ margin: 0, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: run.outcome === 'wipe' ? TONE.death : TONE.label }}>
               {t(`questS1Lab.outcome.${run.outcome}`)}
@@ -293,7 +297,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
                       {pv && (
                         <span style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 3 }}>
                           <HudChip tone="ok" title={base && pv.consumableLabel ? `${pv.consumableLabel} +${pv.consumableBonus}` : undefined}>
-                            {base ? `≤${base.successPct} → ≤${pv.successPct}` : `≤${pv.successPct}`}
+                            {base ? `${base.successPct}% → ${pv.successPct}%` : t('questS1Lab.successPct', { pct: pv.successPct })}
                           </HudChip>
                           {pv.woundPct > 0 && <HudChip tone="warn">{t('questS1Lab.woundPct', { pct: pv.woundPct })}</HudChip>}
                           {pv.deathPct > 0 && <HudChip tone="danger">{t('questS1Lab.deathPct', { pct: pv.deathPct })}</HudChip>}

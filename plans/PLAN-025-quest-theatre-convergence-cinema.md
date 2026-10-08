@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-025 — Un solo componente per la quest in corso su /game: frontiera v27, convergenza QuestRunWindow → QuestTheatre, pacing a beat e juice'
-status: draft
+status: active
 created: 2026-10-08
 revised: 2026-10-08 (v4 — cold read multi-AI web ×3, chatgpt + claude. r1: MAJOR/MAJOR → v2; r2: MAJOR/MAJOR → v3; r3: chatgpt MAJOR (punti di specifica) / claude MINOR → v4. Run `.mw/runs/20261008-plan-025-theatre-convergence/`. Disaccordi residui registrati in fondo.)
 desiderata: v27 (FROZEN — QuestTheatre, "storia a nodi che aspetta ai bivi")
@@ -51,42 +51,32 @@ Run reale su `/game` con Playwright, giocatore avido; screenshot in
 | E10 / E11 | Arte incoerente / roster ≠ party | fuori scope |
 | E12 | **Crash di `/game`** (pedaggio d'esito che uccideva l'ultimo membro senza `wipe`) | **corretto (T-000)** |
 
-## Decisioni del Director (T-001)
+## Decisioni del Director (T-001 — CHIUSE 2026-10-08)
 
-La v27 non è in discussione: questi punti sono decisioni di sequenza, forma o
-UX che la v27 lascia aperte, oppure deroghe che si possono chiedere solo in
-modo esplicito. **Ogni voce ha un default conforme**, usato se il Director non
-decide diversamente.
+Il Director ha risposto «procedi» ai default conformi; D-8 era già decisa
+esplicitamente. Le scelte registrate:
 
-- **D-1 — Integration Gate di PLAN-021.** Proposta: «un solo componente»
-  anticipa il gate per la sola quest goblin S1; la frontiera di T-004 è un
-  contratto provvisorio con scadenza (sostituito in S2, tracciato in kanban).
-  **T-007 (convergenza) e T-012 (rimozione di `QuestRunWindow`) non partono
-  senza D-1 approvato per iscritto.**
-- **D-2 — v27 «nessuna applicazione al lab S1».** Proposta: vieta di
-  sostituire la *pagina* lab, non di leggere il motore S1 tramite adapter.
-- **D-3 — Futuro visibile.** *Default conforme alla regola candidata v27:*
-  solo i nodi risolti e quello corrente, senza conteggi che rivelino la
-  topologia. R-106 chiedeva «la successiva»: tenerla (tile anonima della fase,
-  o «fase N di 8») è una deroga esplicita del Director.
-- **D-4 — Consumabili.** *Default:* il teatro su `/game` parte sempre
-  disarmato; armare è un'intenzione esplicita. Il lab resta armato (D1,
-  pagina sperimentale).
-- **D-5 — Sequenza.** *Default:* frontiera prima, juice dopo. Alternativa:
-  quick win delle sole bande cinema sulla finestra attuale, dichiarato non
-  conforme e da rifare in T-009.
-- **D-6 — Segnale a teatro ridotto.** Due segnali distinti: **bivio in
-  attesa** (urgente) e **novità da presentare** (passivo). Forma: pillola /
-  alone sul POI / tick sul day-clock. *Default:* pillola che pulsa per il
-  bivio, punto statico per le novità.
-- **D-7 — Expanded.** *Default:* nessun expanded. T-002 misura cosa entra in
-  460 px; se non entra, si sceglie qui tra docked e floating massimizzato, non
-  dentro T-010.
-- **D-8 — Peso della morte.** (a) Beat non bloccante: il ritratto resta in
-  grigio nella strip e la riga resta fissa in cima al teatro finché il
-  giocatore non conferma; (b) come (a) più un hold breve skippabile.
-  *Default (a).* I 400 ms di input ignorato servono solo come anti
-  doppio-click, mai come enfasi.
+- **D-1 — Integration Gate di PLAN-021:** anticipato per la sola quest goblin
+  S1. La frontiera di T-004 è un contratto provvisorio con scadenza
+  (sostituito in S2, tracciato in kanban).
+- **D-2:** la v27 «nessuna applicazione al lab S1» vieta di sostituire la
+  *pagina* lab, non di leggere il motore S1 tramite adapter.
+- **D-3 — Futuro visibile:** regola conforme v27 — solo i nodi risolti e
+  quello corrente, senza conteggi che rivelino la topologia. **La tile
+  «prossima fase» di R-106 è ritirata**; se il Director la rivuole è una
+  deroga da dichiarare.
+- **D-4 — Consumabili:** il teatro su `/game` parte sempre disarmato; armare
+  (= premere l'icona dell'oggetto) è un'intenzione esplicita — l'oggetto si
+  spende solo quando il check si risolve. Il lab resta armato.
+- **D-5 — Sequenza:** frontiera prima, juice dopo (T-009, non quick-win).
+- **D-6 — Segnale a teatro ridotto:** pillola che pulsa per il **bivio in
+  attesa** (urgente), punto statico per **novità da presentare** (passivo).
+- **D-7 — Expanded:** nessun expanded; T-002 misura cosa entra in 460 px e
+  fissa il comportamento deterministico in overflow.
+- **D-8 — Peso della morte** (deciso per iscritto): tono spento/scuro su
+  scena e ritratto, riga della morte leggibile, **clic ovunque per
+  continuare**. Niente hold obbligato. La soglia anti doppio-click resta
+  solo come protezione da input accidentale.
 
 ## Invarianti (verificabili)
 
@@ -170,7 +160,7 @@ Ridotta ancora dopo r3.
 | Bivio | scelte + chip rischio | nessuno | attende |
 | Verdetto | badge + flavor | **typewriter** nel colore del verdetto | 1,2–1,8 s |
 | Colpo | strip + orda | **flash del ritratto colpito** + floater −HP | 0,6 s |
-| Morte | ritratto **in grigio come stato** (non fx), riga fissa fino a conferma (D-8) | **letterbox che si chiude** | — |
+| Morte | riga della morte + scena/ritratto in tono spento (D-8: colore, non blocco) | **letterbox che si chiude**; clic ovunque continua | fino al clic |
 | Agguato | arte che si stringe | **letterbox che si chiude** 400 ms | immediato |
 | Sollievo F7 | body leggibile (la frontiera non lo sovrascrive più) | nessuno | ∝ parole |
 
@@ -187,28 +177,45 @@ Ogni task richiede lo stato garantito dal precedente.
   `tests/unit/idleVillage/questRunWindow.test.tsx` (7); Monte Carlo invariato;
   evidence `test-results/r106-quest-window-fixes-2026-10-08.log`.
 - **T-001 — Gate D-1…D-8** (default conformi se non decisi). Nessun codice.
-- **T-002 — Spike del layout a 460 px.** Altezze in pixel per bivio,
-  combattimento, morte multipla e verdetto; limite misurabile del contenuto
-  obbligatorio; comportamento deterministico quando lo supera (input per
-  D-7). Doc + screenshot.
-- **T-003 — Harness + baseline.** Promuove `scripts/_tmp-play-quest-window.ts`
-  a `scripts/quest-theatre-playtest.ts` (seed iniettato, policy, video, beat
-  e overhead → JSON); misura la baseline su seed E1 + 3 seed greedy e cauti;
-  fissa i budget di presentazione.
-- **T-004 — Frontiera v27 nel dominio.** `submitCommand` + `matureReady` +
-  `applyChoice` legacy; durate dai giorni autorati; clock, catch-up,
-  `frontierVersion`, `engineSchemaVersion`; spec in `quest_theatre_spec.md`.
-  **Test di riferimento:** scenario A→B→CHOICE→C→CHECK→D, in cui il clock
-  matura A e B ma mai CHOICE né CHECK; `submitDecision` risolve solo CHOICE e
-  si ferma al primo nodo successivo che richiede input; il catch-up offline dà
-  lo stesso snapshot senza risolvere CHOICE né CHECK; in pausa non matura
-  nulla. Regressione: questGoblin, questRun, repro, questSimulation e Monte
-  Carlo invariati sul percorso legacy.
-- **T-005 — Persistenza.** Si salva **dopo il commit e prima del primo beat**:
-  frontiera + seed + versioni, più la proiezione della coda (id stabili). Test:
-  serializzabilità (RNG incluso); reload a metà di una morte multipla → stessa
-  frontiera e stessa coda residua; mismatch di versione → coda scartata e
-  riepilogo; reload al bivio → stesso bivio.
+- **T-002 — Spike del layout a 460 px (FATTO 2026-10-08).** Baseline misurata
+  dall'harness (seed 1–7 greedy, seed 1 cautious, `?seed=` su
+  `/quest-window-lab`): la finestra è **754–820 px di altezza** a 460 px di
+  larghezza — già ~85–90% di un viewport da 900 px, con `overflow: 0` (niente
+  scroll interno oggi: tutto si impila). 17–20 passi greedy, 12 cauti.
+  Conseguenza: il blocco combat di T-010 **non entra gratis** — serve una
+  regione narrativa con scroll interno oppure la strip party va nel budget
+  header. Comportamento deterministico in overflow: la zona testo+verdetto
+  scorre, header/teatro/scelte restano ancorati.
+- **T-003 — Harness + baseline (FATTO 2026-10-08).**
+  `scripts/quest-theatre-playtest.ts`: seed iniettato via `?seed=`,
+  policy greedy|cautious|first, `--video`, metriche DOM per step
+  (`winH/overflow/choicesH` + altezze sezioni), `metrics.json` + transcript.
+  Baseline: presentazione istantanea (0 ms overhead), 12.7 s wall mediana
+  greedy a 450 ms/passo. **Budget di presentazione:** overhead senza skip
+  ≤ +50% della mediana baseline per passo (≈ +225 ms medi, assegnati ai beat
+  sotto) e mediana con skip ≤ +10%; morte fino al primo clic libero.
+- **T-004 — Frontiera v27 nel dominio (FATTO 2026-10-08).**
+  `submitCommand`/`matureReady`/`arriveNode`/`matureNode` in `questRun.ts`;
+  `applyChoice` = submit + catch-up istantaneo (lab/MC invariati);
+  `frontier{status,startedAt,readyAt}` + `frontierVersion` +
+  `engineSchemaVersion` + `nodeTicks` (0 = istantaneo); durate =
+  `nodeDurationTicks(questId, totalTicks)` dai tick autoriali; effetti harm
+  alla maturazione, scena all'arrivo. Spec: `quest_theatre_spec.md` §
+  «Frontiera temporale». Test: `questFrontier.test.ts` (9 — catena
+  info→harm→choice, rifiuto comandi su pending, catch-up deterministico,
+  parità legacy stesso seed). 115/115 verdi.
+- **T-005 — Persistenza (FATTO 2026-10-08, parziale).** `useQuestRun` ora usa
+  `submitCommand` + `syncClock(tick)` (frontiera viva su `/game` via
+  `currentTick` di sessione — gioco in pausa = quest in pausa; sul lab-window
+  un tick driver locale da 1 s, `LAB_NODE_TICKS=3`). Persistenza via
+  `PersistenceService` (`idleVillage.questRun.<questId>`, busta
+  schema-stamped `ENGINE_SCHEMA_VERSION`: run + phase record; mismatch →
+  scartato). Ripresa al reload = frontiera committata; il primo `syncClock`
+  fa il catch-up deterministico. `QuestRunWindow` mostra `node.transit` in
+  corsivo mentre la frontiera è pending (E6). **Resta per T-006:** la
+  proiezione della coda con id stabili (oggi si persiste lo stato dominio,
+  non la presentazione) e i test di serializzazione espliciti (RNG incluso,
+  reload a metà morte multipla).
 - **T-006 — Contratto v2 + adapter.** Delta su `theatreContract.ts`, fixture
   (morte multipla, combattimento, sacca, nodi pending/ready), adapter puro +
   intent. Test: stesso stato → stesso snapshot; nessun comando duplicato;
