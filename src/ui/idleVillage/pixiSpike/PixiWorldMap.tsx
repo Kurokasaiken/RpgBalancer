@@ -319,6 +319,9 @@ const SMOKE_LIFE_S = 7;
 
 /** Colour of a hovered territory's border (ink black, like a board-game province). */
 const REGION_EDGE_RGBA = [16, 12, 8, 255];
+/** Glass globe (hold Alt): how far the map tips toward the pointer, and how far the seabed slides with it (world px). */
+const GLOBE_TILT_DEG = 7;
+const GLOBE_BED_SHIFT_PX = 140;
 /** Pointer dwell before a territory lights up and shows its name. */
 /** No two waves or sea marks play at the same time closer than this (world px). */
 /** Sea wonders: how often one may surface, how long it stays, how big it is on the map (world px wide). */
@@ -719,8 +722,6 @@ export function PixiWorldMap({
           r.value += (r.target - r.value) * (r.target > r.value ? 0.12 : 0.05);
           r.tiltX += (r.tiltTargetX - r.tiltX) * 0.12;
           r.tiltY += (r.tiltTargetY - r.tiltY) * 0.12;
-          r.tiltTargetX *= 0.9;
-          r.tiltTargetY *= 0.9;
           const on = r.value > 0.004;
           bedBox.visible = on;
           bedBox.filters = on && !reducedMotion ? [refraction] : null;
@@ -1332,7 +1333,9 @@ export function PixiWorldMap({
         const onHoverMove = (e: MouseEvent) => {
           const { wx, wy } = worldPoint(e);
           const index = drag ? 0 : idAt(wx, wy);
-          el2.style.cursor = drag ? 'grabbing' : regionByIndex.has(index) ? 'pointer' : '';
+          if (drag) el2.dataset.cursor = 'move';
+          else if (regionByIndex.has(index)) el2.dataset.cursor = 'point';
+          else delete el2.dataset.cursor;
           if (index === pendingIndex) return;
           pendingIndex = index;
           window.clearTimeout(dwellTimer);
@@ -1385,17 +1388,12 @@ export function PixiWorldMap({
       }
 
       const el = app.canvas;
-      let sinkTimer = 0;
       const onDown = (e: MouseEvent) => {
         drag = { x: e.clientX, y: e.clientY };
-        window.clearTimeout(sinkTimer);
-        seabedReveal.target = 1;
+        el.dataset.cursor = 'move';
       };
       const onMove = (e: MouseEvent) => {
         if (!drag) return;
-        // The faster the drag, the more the see-through sea leans (world px, clamped).
-        seabedReveal.tiltTargetX = Math.max(-60, Math.min(60, seabedReveal.tiltTargetX + (e.clientX - drag.x) * 1.4 / cam.zoom));
-        seabedReveal.tiltTargetY = Math.max(-60, Math.min(60, seabedReveal.tiltTargetY + (e.clientY - drag.y) * 1.4 / cam.zoom));
         cam.panX -= (e.clientX - drag.x) / cam.zoom;
         cam.panY -= (e.clientY - drag.y) / cam.zoom;
         drag = { x: e.clientX, y: e.clientY };
@@ -1403,12 +1401,51 @@ export function PixiWorldMap({
         apply();
       };
       const onUp = () => {
+        if (drag) delete el.dataset.cursor;
         drag = null;
-        window.clearTimeout(sinkTimer);
-        sinkTimer = window.setTimeout(() => {
-          seabedReveal.target = 0;
-        }, 500);
       };
+
+      // Glass globe: while Alt (Option) is held the whole map tilts toward the pointer, as if the world were a glass
+      // slab tipped in the hands, and the sea turns clear so the seabed shows beneath, sliding with the tilt.
+      const tiltRoot = host.parentElement;
+      let tilting = false;
+      const setTilt = (rx: number, ry: number) => {
+        if (!tiltRoot) return;
+        tiltRoot.style.transition = 'transform 380ms cubic-bezier(.2,.8,.2,1)';
+        tiltRoot.style.transformOrigin = '50% 50%';
+        tiltRoot.style.transform = rx || ry ? `perspective(1400px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.06)` : '';
+      };
+      const tiltFrom = (e: MouseEvent) => {
+        const r = el.getBoundingClientRect();
+        const nx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+        const ny = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+        setTilt(-ny * GLOBE_TILT_DEG, nx * GLOBE_TILT_DEG);
+        seabedReveal.tiltTargetX = -nx * GLOBE_BED_SHIFT_PX;
+        seabedReveal.tiltTargetY = -ny * GLOBE_BED_SHIFT_PX;
+      };
+      let lastPointer: MouseEvent | null = null;
+      const onTiltMove = (e: MouseEvent) => {
+        lastPointer = e;
+        if (tilting) tiltFrom(e);
+      };
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key !== 'Alt') return;
+        const down = e.type === 'keydown';
+        if (down === tilting) return;
+        tilting = down;
+        seabedReveal.target = down ? 1 : 0;
+        if (down && lastPointer) tiltFrom(lastPointer);
+        if (!down) {
+          setTilt(0, 0);
+          seabedReveal.tiltTargetX = 0;
+          seabedReveal.tiltTargetY = 0;
+        }
+      };
+      const onBlur = () => onKey(new KeyboardEvent('keyup', { key: 'Alt' }));
+      window.addEventListener('mousemove', onTiltMove);
+      window.addEventListener('keydown', onKey);
+      window.addEventListener('keyup', onKey);
+      window.addEventListener('blur', onBlur);
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
         const r = el.getBoundingClientRect();
@@ -1435,6 +1472,11 @@ export function PixiWorldMap({
         window.removeEventListener('mousemove', onMove);
         window.removeEventListener('mouseup', onUp);
         el.removeEventListener('wheel', onWheel);
+        window.removeEventListener('mousemove', onTiltMove);
+        window.removeEventListener('keydown', onKey);
+        window.removeEventListener('keyup', onKey);
+        window.removeEventListener('blur', onBlur);
+        if (tiltRoot) tiltRoot.style.transform = '';
         refitRef.current = null;
         focusRef.current = null;
         camRef.current = null;

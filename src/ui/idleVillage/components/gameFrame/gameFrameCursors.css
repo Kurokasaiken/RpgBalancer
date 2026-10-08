@@ -1,20 +1,23 @@
-/* Test cursors for the game frame: Kenney "Cursor Pack" (CC0), Outline set — see
-   public/assets/ui/cursors/LICENSE-kenney-cursor-pack.txt. Scoped to .game-frame only. */
+/* The game's own cursors (scripts/draw-cursors.py): brass and ink like the HUD plaques and the inked map.
+   Scoped to .game-frame. On the world canvas, PixiWorldMap sets data-cursor="point" over a territory and
+   data-cursor="move" while the map is dragged. */
 .game-frame {
-  cursor: image-set(url('/assets/ui/cursors/gauntlet-default.png') 1x, url('/assets/ui/cursors/gauntlet-default@2x.png') 2x) 3 2, auto;
+  cursor: image-set(url('/assets/ui/cursors/map-arrow.png') 1x, url('/assets/ui/cursors/map-arrow@2x.png') 2x) 5 5, auto;
+}
+.game-frame .cursor-grab,
+.game-frame .cursor-grab canvas {
+  cursor: image-set(url('/assets/ui/cursors/map-arrow.png') 1x, url('/assets/ui/cursors/map-arrow@2x.png') 2x) 5 5, default !important;
 }
 .game-frame button:not(:disabled),
 .game-frame a[href],
-.game-frame [role='button'] {
-  cursor: image-set(url('/assets/ui/cursors/gauntlet-point.png') 1x, url('/assets/ui/cursors/gauntlet-point@2x.png') 2x) 3 2, pointer !important;
+.game-frame [role='button'],
+.game-frame canvas[data-cursor='point'] {
+  cursor: image-set(url('/assets/ui/cursors/map-point.png') 1x, url('/assets/ui/cursors/map-point@2x.png') 2x) 5 5, pointer !important;
 }
 .game-frame button:disabled {
-  cursor: image-set(url('/assets/ui/cursors/gauntlet-default.png') 1x, url('/assets/ui/cursors/gauntlet-default@2x.png') 2x) 3 2, not-allowed !important;
+  cursor: image-set(url('/assets/ui/cursors/map-arrow.png') 1x, url('/assets/ui/cursors/map-arrow@2x.png') 2x) 5 5, not-allowed !important;
 }
-/* The map root carries Tailwind's cursor-grab / active:cursor-grabbing. */
-.game-frame .cursor-grab {
-  cursor: image-set(url('/assets/ui/cursors/gauntlet-open.png') 1x, url('/assets/ui/cursors/gauntlet-open@2x.png') 2x) 16 16, grab !important;
-}
+.game-frame canvas[data-cursor='move'],
 .game-frame .cursor-grab:active {
-  cursor: image-set(url('/assets/ui/cursors/fist.png') 1x, url('/assets/ui/cursors/fist@2x.png') 2x) 16 16, grabbing !important;
+  cursor: image-set(url('/assets/ui/cursors/map-move.png') 1x, url('/assets/ui/cursors/map-move@2x.png') 2x) 16 16, grabbing !important;
 }
