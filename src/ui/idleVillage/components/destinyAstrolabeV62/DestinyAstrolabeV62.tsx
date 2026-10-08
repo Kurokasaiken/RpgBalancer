@@ -27,6 +27,8 @@ export type { AstrolabeSkill, AstrolabeConfig, AstrolabeResult };
 export interface DestinyAstrolabeV62Handle {
   roll: () => void;
   throw: () => void;
+  /** Presentation-only skip — settles the frame and resolves immediately. */
+  skipToResult: () => void;
 }
 
 export interface DestinyAstrolabeV62Props {
@@ -36,6 +38,8 @@ export interface DestinyAstrolabeV62Props {
   autoStart?: boolean;
   removeSounds?: boolean;
   className?: string;
+  /** Global pace multiplier — folded into the engine config (PLAN-023). */
+  speed?: number;
 }
 
 const SKIN_BINDING = {
@@ -67,6 +71,7 @@ export const DestinyAstrolabeV62 = memo(
       autoStart = true,
       removeSounds = false,
       className,
+      speed,
     },
     ref,
   ) {
@@ -97,7 +102,7 @@ export const DestinyAstrolabeV62 = memo(
 
       const engine = createDestinyAstrolabeV62Engine(root, {
         skills,
-        config,
+        config: speed ? { ...config, speed } : config,
         onResolve: (r) => {
           onResolveRef.current?.(r);
           const isSuccess = r.verdict === 'bigwin' || r.verdict === 'win' || r.verdict === 'almost';
@@ -127,7 +132,11 @@ export const DestinyAstrolabeV62 = memo(
 
     useImperativeHandle(
       ref,
-      () => ({ roll: () => engineRef.current?.roll(), throw: () => engineRef.current?.throw() }),
+      () => ({
+        roll: () => engineRef.current?.roll(),
+        throw: () => engineRef.current?.throw(),
+        skipToResult: () => engineRef.current?.skipToResult(),
+      }),
       [],
     );
 

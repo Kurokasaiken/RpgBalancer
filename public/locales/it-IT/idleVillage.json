@@ -1302,7 +1302,29 @@
         "duration": "un giorno",
         "trial": "★ Prova di combattimento — {stats}"
       }
-    }
+    },
+    "pace": {
+      "title": "Ritmo della presentazione — si sceglie prima del check",
+      "full": "Intero",
+      "fast": "Veloce"
+    },
+    "skip": "Salta ▸",
+    "logToggle": "☰ Cronaca",
+    "combatTurn": "turno {turn}/{turns}",
+    "exposureTitle": "Chance di essere colpito da ogni colpo in arrivo: {pct}%",
+    "spent": "Ha già incassato un colpo in questo turno",
+    "horde": {
+      "intentTitle": "Colpi in arrivo il prossimo turno",
+      "remaining": "in piedi {shown}/{total}"
+    },
+    "verdictAck": "Continua",
+    "harmInProgress": "Le conseguenze si abbattono…",
+    "resolving": "Risoluzione in corso",
+    "belt": {
+      "label": "Cintura",
+      "armTitle": "Armato: il consumabile adatto si spende sul prossimo check — le opzioni mostrano il delta"
+    },
+    "consumableDelta": "{base}→{armed} ✦"
   },
   "questTheatre": {
     "poi": {
