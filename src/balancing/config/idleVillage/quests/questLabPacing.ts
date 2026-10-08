@@ -15,6 +15,12 @@ export const QuestLabPacingSchema = z.object({
   transitionMs: z.number().min(0).max(10000).default(900),
   /** Hold when the destination has a `transit` line the player must read. */
   transitMs: z.number().min(0).max(15000).default(2600),
+  /** Min hold for a transit line, however short. */
+  transitMinMs: z.number().min(0).max(10000).default(2000),
+  /** Max hold for a transit line, however long — it must stay skippable. */
+  transitMaxMs: z.number().min(0).max(20000).default(7000),
+  /** Reading speed used to scale the transit hold with the line's length. */
+  transitWordsPerSecond: z.number().positive().default(3.5),
   /** Fade-in duration for transit / verdict-flavor text blocks. */
   fadeMs: z.number().min(0).max(5000).default(700),
 });

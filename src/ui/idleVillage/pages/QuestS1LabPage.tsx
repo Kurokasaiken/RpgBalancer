@@ -747,9 +747,22 @@ const QuestS1LabPage: React.FC = () => {
     }
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     // A node with a transit line holds the beat long enough to be read —
+    // scaled to its word count (reading speed is a pacing config value);
     // in the real game this window is the movement animation's duration.
     const destTransit = nodesFor(run)[run.nodeId]?.transit;
-    const hold = destTransit ? DEFAULT_QUEST_LAB_PACING.transitMs : DEFAULT_QUEST_LAB_PACING.transitionMs;
+    const hold = destTransit
+      ? Math.min(
+          DEFAULT_QUEST_LAB_PACING.transitMaxMs,
+          Math.max(
+            DEFAULT_QUEST_LAB_PACING.transitMinMs,
+            Math.round(
+              (destTransit.split(/\s+/).filter(Boolean).length /
+                DEFAULT_QUEST_LAB_PACING.transitWordsPerSecond) *
+                1000,
+            ),
+          ),
+        )
+      : DEFAULT_QUEST_LAB_PACING.transitionMs;
     transitionTimer.current = setTimeout(() => setShownNodeId(run.nodeId), hold);
     return () => {
       if (transitionTimer.current) clearTimeout(transitionTimer.current);
