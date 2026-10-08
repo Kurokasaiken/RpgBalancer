@@ -129,6 +129,8 @@ Per il resto usa i token generali: `--skin-surface-base`, `--skin-surface-border
 
 **Controlli (bottoni, menu, chip, icone)**: metti `data-hud-controls=""` sul contenitore e usa elementi nativi (`button`, `label > select`). Forme a pillola da 26px, testo 12px, colori da token, stato `aria-pressed="true"` evidenziato, focus visibile con doppio anello (seat + accento). I bottoni con solo un'icona SVG diventano tondi da soli. Non mettere stili inline di colore o bordo. Non usare `data-roster-controls="compact"`: è lo stile legacy marrone.
 
+> **Trappola icona+testo**: la regola CSS che rende tondo da 26px un pill-icona è `:has(> svg:only-child)` — e `:only-child` conta solo i nodi **elemento**, non i nodi testo. Un bottone `<button><Icon/>Testo</button>` (testo nudo) viene trattato come icon-only e schiacciato a 26px, col testo che straborda sul vicino. **Se un bottone ha icona + etichetta, avvolgi sempre l'etichetta in un `<span>`** (o qualsiasi elemento). Vedi `ContextStrip`/`StashPicker` del lab quest (PLAN-024).
+
 **Trascinamento** (vedi anche §5b): spargi `handleProps` di `useHudPanelDrag()` sull'**intera riga del titolo** (cursore `grab`, tooltip da `gameFrame.panel.dragHint`). I controlli nella riga non avviano il trascinamento; il doppio clic riporta il pannello al suo posto. Niente icone "maniglia".
 
 **Focus e tastiera**: ogni elemento interattivo raggiungibile da tastiera, `aria-label` tradotto, `role="radiogroup"`/`radio` per scelte esclusive (vedi striscia di velocità).
@@ -159,6 +161,20 @@ Aggiungere un pannello al sistema: aggiungi l'id a `HudPanelId` e a `HUD_PANEL_S
 - **Fissi vs fluttuanti**: i soli margini di sicurezza della mappa (`worldDressing.safeFit.insets`) sono calcolati sui fissi. Se cambi l'altezza di un pezzo fisso, aggiorna gli insets (altezza + circa 8-23px) e **rimisura** (§9).
 - **Ombra**: `filter: drop-shadow()` mai sullo stesso elemento di un `clip-path` o di un `overflow: hidden`. `HudPlaque` mette l'ombra sull'SVG fratello, quindi il contenitore non deve tagliare con `overflow`.
 - **Dettaglio quest**: si apre nel corridoio tra Roster e registro (`config.questDetail`), mai sopra il Roster (è la sorgente del drag).
+
+---
+
+## 6b. Schermate d'azione a pagina intera
+
+La guida nasce per i pannelli **sopra la mappa** di `/game`, ma il materiale vale anche per schermate d'azione a pagina intera senza mappa (es. il lab quest `/quest-s1-lab`, PLAN-024). Regole tradotte:
+
+1. **L'eroe cambia**: su `/game` è la mappa; su una schermata d'azione è **il dipinto di scena**. Va a pieno schermo (full-bleed, `object-fit: cover`) dietro le lastre, mai in un francobollo al centro. Bordi ammorbiditi con scrim `linear-gradient` in teal profondo (`SCRIM` in `questS1Lab/hud/atoms.tsx`), non con `mask-image` se le righe ci devono stare sopra.
+2. **Il telaio è sempre `HudPlaque`**, tre lastre e non di più: `hang` in alto (stessa costruzione del cartiglio obiettivo: contesto, progresso, controlli `data-hud-controls`), `panel` implicito per lo stage (il dipinto stesso, senza cornice propria: gli scrim bastano), `plinth` in basso che sale dal fondo (stessa costruzione della nav: decisioni, opzioni, verdetto). Contenitori interni senza bordo/raggio/fondo (regola §2).
+3. **Le liste sono righe, non sotto-scatole**: la formazione usa le card roster canoniche (`WanderlustRosterCard` da `ui/idleVillage/roster`, modo `compact`) come righe dentro lo stage, con i dati extra del gioco (exposure, chip danno) come overlay, mai come fork della card. Stesso principio di §5b: riusa la superficie trusted.
+4. **Uno stile di pillola**: controlli di pagina, di pannello e toolbar di oggetti passano tutti per `data-hud-controls` — niente pill ad hoc.
+5. **Gli overlay narrativi** (cinematica, verdetto) stanno nel plinth o sopra lo stage con scrim; non aprire drawer/pannelli ad hoc fuori dal telaio.
+
+File di riferimento: `src/ui/idleVillage/questS1Lab/hud/*` (già dentro `STRICT_FILES` della guardia).
 
 ---
 
@@ -208,13 +224,13 @@ Aggiungere un pannello al sistema: aggiungi l'id a `HudPanelId` e a `HUD_PANEL_S
 | Valutare un bordo ingrandito 2,4× | Differenze invisibili a 1× | Confronta sempre a dimensione reale |
 | Linea di contorno o gradino blu-verdi sotto la banda oro | L'oro vira all'oliva (tonalità 51° invece di 38°) | Contorno e gradino neutri scuri |
 | Contenitore con `border`, `rounded` o `overflow: hidden` dentro una `HudPlaque` | Il bordo grigio copre la banda oro e l'overflow taglia l'ombra: il Roster V2 sembrava "senza oro" | Dentro una lastra il contenitore non ha bordo, raggio, fondo né overflow: la cornice la disegna solo `HudPlaque` |
+| `<button><Icon/>Testo</button>` in `data-hud-controls` | Il pill viene trattato come icon-only (26px) e il testo straborda sui vicini | Avvolgi l'etichetta in un `<span>`: `svg:only-child` ignora i nodi testo |
 | Attribuire alla HUD un difetto dell'atmosfera | Ombre nuvole al 2-4% sono invisibili per config | Controlla prima la config generata |
 
 ---
 
 ## 11. Stato e cose provvisorie
 
-- Tutto quanto sopra **non è committato**.
 - `?hud=legacy` mantiene il vecchio percorso (`HudRibbon`, `HudPanel`) solo per il confronto. Astrolabio, bussola ritagliata, `EdgeDressing`, `SpeedControl`, `HudHangingTag` e `ResourceMedallion` sono stati eliminati.
 - Roster V2 non è un kit certificato.
 - Il dettaglio quest (`ActivityCapsuleDetailSkinAware`) ha la cornice HUD ma va rifatto compatto **dopo** il rework delle quest.
@@ -225,7 +241,7 @@ Aggiungere un pannello al sistema: aggiungi l'id a `HudPanelId` e a `HUD_PANEL_S
 
 ## 12. Frase da dare a un agente
 
-> Prima di creare o modificare un componente HUD di `/game` leggi `src/docs/docs/design/hud_component_guide.md`. Usa `HudPlaque`, i token `--skin-hud-*`, `data-hud-controls` e `useHudPanelDrag`. Niente letterali colore, niente testo sotto 12px, niente stringhe fisse, niente modifiche ai kit certificati. Verifica a 1440×900 e 1280×800 e riporta cosa hai misurato.
+> Prima di creare o modificare un componente HUD di `/game` o una schermata d'azione a pagina intera leggi `src/docs/docs/design/hud_component_guide.md`. Usa `HudPlaque`, i token `--skin-hud-*`, `data-hud-controls` e `useHudPanelDrag`. Niente letterali colore, niente testo sotto 12px, niente stringhe fisse, niente modifiche ai kit certificati. Verifica a 1440×900 e 1280×800 e riporta cosa hai misurato.
 
 ## Catture e debug (`/game`)
 

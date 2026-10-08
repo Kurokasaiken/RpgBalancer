@@ -695,3 +695,20 @@ da validare nel lab, il runtime si adegua in S2.
 dominio-specifica).
 
 **Fonte:** Director, sessione 2026-10-03.
+
+---
+
+## 2026-10-08 — La guida HUD (Lacquer Atlas) vale anche per le schermate d'azione a pagina intera
+
+**Q:** `hud_component_guide.md` nasce per i pannelli **sopra la mappa** di `/game`.
+Vale anche per schermate d'azione a pagina intera senza mappa (es. il lab quest)?
+
+**A:** Sì — con traduzione di una regola: su `/game` l'eroe è la mappa, sulle schermate
+d'azione l'eroe è **il dipinto di scena** (D1 Director: «Dipinto» come sfondo
+dell'intera stage band). Il telaio resta `HudPlaque` (`hang`/`plinth`), i token
+`--skin-hud-*`, i controlli `data-hud-controls`, testo ≥12px. Le liste sono righe
+di superfici trusted (roster compact), non sotto-scatole. Formalizzato in
+`hud_component_guide.md` §6b (PLAN-024) e la guida è ora indicizzata
+(context/INDEX, KNOWLEDGE_INVENTORY, CLASSIFICATION, checklist mandate).
+
+**Fonte:** decisioni Director D1–D3 durante R-104 (sessione 2026-10-08).

@@ -73,8 +73,13 @@ async function driveToFirstCheck(): Promise<boolean> {
         <QuestS1LabPage />
       </StrictMode>,
     );
+    // PLAN-024: the quest card is a plaque with role="button" (a <button>
+    // would inherit the struck-bronze plate inside SkinScope) — the locator
+    // matches either interactive element.
     const byText = (re: RegExp) =>
-      Array.from(view.container.querySelectorAll('button')).find((b) => re.test(b.textContent ?? ''));
+      Array.from(view.container.querySelectorAll('button, [role="button"]')).find((b) =>
+        re.test(b.textContent ?? ''),
+      );
 
     // quest picker → goblin card (the only authored quest in the lab since R-089)
     const goblin = byText(/goblin|Sterminio|Extermination/i);
@@ -96,8 +101,8 @@ async function driveToFirstCheck(): Promise<boolean> {
     });
 
     // F1: the option commits a check; the commit surface exposes the confirm.
-    const optBtn = Array.from(view.container.querySelectorAll('button'))
-      .find((b) => !b.disabled && /Arrampicarsi|albero|masso/i.test(b.textContent ?? ''));
+    const optBtn = Array.from(view.container.querySelectorAll('button, [role="button"]'))
+      .find((b) => !(b as HTMLButtonElement).disabled && /Arrampicarsi|albero|masso/i.test(b.textContent ?? ''));
     if (!optBtn) return false;
     fireEvent.click(optBtn);
     const face = byText(/check|affronta|Face/i);

@@ -31,6 +31,9 @@ Format: `[filename](path) — one sentence — \`tag\``
 [context/QUEST_GAMEPLAY_SCIENCE.md](context/QUEST_GAMEPLAY_SCIENCE.md) — living bibliography: real studies on suspense/failure/choice psychology for quest gameplay — `research` `quest` `design`
 [src/docs/docs/MASTER_PLAN.md](src/docs/docs/MASTER_PLAN.md) — roadmap and phase tracking — `planning`
 [src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md](src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md) — trusted component registry — `components` `trusted`
+[src/docs/docs/design/hud_component_guide.md](src/docs/docs/design/hud_component_guide.md) — Lacquer Atlas HUD guide: superfici (`HudPlaque`), token `--skin-hud-*`, `data-hud-controls`, guardie — obbligatoria per componenti su `/game` e schermate d'azione — `design` `hud` `guide`
+[src/docs/docs/design/primitive_composition_rules.md](src/docs/docs/design/primitive_composition_rules.md) — come comporre MatericSurface/Inset/Frame, colori di fondo — `design` `primitives` `guide`
+[src/docs/docs/idle_village/quest_ui_component_guide.md](src/docs/docs/idle_village/quest_ui_component_guide.md) — guida componenti quest: cockpit, eventi strutturati, canale danno — `design` `quest` `guide`
 [.windsurf/rules/00-project-invariants.md](.windsurf/rules/00-project-invariants.md) — non-negotiable project constraints — `invariants`
 [.windsurf/rules/40-documentation-governance.md](.windsurf/rules/40-documentation-governance.md) — trusted/frozen doc policy — `governance`
 [.windsurf/rules/80-quest-rules-maintenance.md](.windsurf/rules/80-quest-rules-maintenance.md) — QUEST_RULES.md si aggiorna su nuove regole quest del Director; status vigente/proposta/divergenza, conflitto → domanda — `governance` `quest`
