@@ -79,7 +79,9 @@ export default function GameFramePixiPage() {
     return () => window.clearTimeout(timer);
   }, [shroudCovered]);
   // Test / trailer tooling: dev builds only, F10 shows or hides it (hide it for a clean capture).
-  const directorEnabled = import.meta.env.DEV && debug.directorPanel;
+  // `?capture=1` starts a clean shot: no Director, no panel menu.
+  const capture = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
+  const directorEnabled = import.meta.env.DEV && debug.directorPanel && !capture;
   const [directorVisible, setDirectorVisible] = useState(true);
   useEffect(() => {
     if (!directorEnabled) return undefined;

@@ -70,6 +70,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
   );
   const events = useMemo(() => [...(extraEvents ?? []), ...fixtureEvents], [extraEvents, fixtureEvents]);
   const panels = useHudPanels();
+  const captureMode = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
   const [recenterSignal, setRecenterSignal] = useState(0);
   const [focusRequest, setFocusRequest] = useState<{ x: number; y: number; n: number } | null>(null);
   const focusEvent = (event: HudEvent) => {
@@ -125,7 +126,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
         }
         resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />}
         hangingSlot={panels.visible.events ? <HudEventLedger events={events} context="game_frame" onSelect={focusEvent} onClose={() => panels.set('events', false)} /> : undefined}
-        utilitySlot={<HudPanelsMenu visible={panels.visible} onToggle={panels.toggle} />}
+        utilitySlot={captureMode ? undefined : <HudPanelsMenu visible={panels.visible} onToggle={panels.toggle} />}
         rosterSlot={panels.visible.roster ? (typeof rosterSlot === 'function' ? rosterSlot({ onClose: () => panels.set('roster', false) }) : (rosterSlot ?? <Roster componentId="game-frame-roster" density="compact" onClose={() => panels.set('roster', false)} />)) : undefined}
         recenterSlot={<HudRecenterButton onRecenter={() => setRecenterSignal((n) => n + 1)} />}
       >
