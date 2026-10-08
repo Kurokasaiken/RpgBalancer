@@ -17,6 +17,8 @@ import {
   RotateCcw,
   Scroll,
   Shield,
+  ShieldHalf,
+  Crosshair,
   Skull,
   Star,
   Sun,
@@ -29,6 +31,8 @@ import {
 export const lucideStatIcons: Record<string, ElementType> = {
   swords: Swords,
   shield: Shield,
+  'shield-half': ShieldHalf,
+  crosshair: Crosshair,
   heart: Heart,
   zap: Zap,
   flame: Flame,

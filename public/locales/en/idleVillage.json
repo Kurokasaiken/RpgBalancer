@@ -1281,7 +1281,29 @@
         "duration": "one day",
         "trial": "★ Combat trial — {stats}"
       }
-    }
+    },
+    "pace": {
+      "title": "Presentation pace — chosen before the check",
+      "full": "Full",
+      "fast": "Fast"
+    },
+    "skip": "Skip ▸",
+    "logToggle": "☰ Chronicle",
+    "combatTurn": "turn {turn}/{turns}",
+    "exposureTitle": "Chance of being hit by each incoming hit: {pct}%",
+    "spent": "Already took a hit this turn",
+    "horde": {
+      "intentTitle": "Incoming hits next turn",
+      "remaining": "standing {shown}/{total}"
+    },
+    "verdictAck": "Continue",
+    "harmInProgress": "Consequences are landing…",
+    "resolving": "Resolving",
+    "belt": {
+      "label": "Belt",
+      "armTitle": "Armed: the matching consumable is spent on the next check — options show the delta"
+    },
+    "consumableDelta": "{base}→{armed} ✦"
   },
   "questTheatre": {
     "poi": {
