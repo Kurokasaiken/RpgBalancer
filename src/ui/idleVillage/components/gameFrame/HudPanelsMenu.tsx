@@ -46,7 +46,7 @@ export function HudPanelsMenu({ visible, onToggle, includeDev = false }: HudPane
           as="div"
           role="menu"
           aria-label={t('gameFrame.panels.title')}
-          style={{ position: 'absolute', right: 0, bottom: 'calc(100% + 10px)', display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 14px', minWidth: 200 }}
+          style={{ position: 'absolute', right: 0, bottom: 'calc(100% + 10px)', zIndex: 1100, display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 14px', minWidth: 240 }}
         >
           <span style={{ font: '600 12px var(--skin-font-display)', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--skin-label-primary)' }}>
             {t('gameFrame.panels.title')}
@@ -59,7 +59,7 @@ export function HudPanelsMenu({ visible, onToggle, includeDev = false }: HudPane
               aria-checked={visible[id]}
               aria-pressed={visible[id]}
               onClick={() => onToggle(id)}
-              style={{ justifyContent: 'space-between', width: '100%' }}
+              style={{ justifyContent: 'space-between', width: '100%', whiteSpace: 'nowrap', gap: 16 }}
             >
               <span>{t(`gameFrame.panels.names.${id}`)}</span>
               <span aria-hidden="true" style={{ opacity: 0.75 }}>{HUD_PANEL_SHORTCUTS[id].toUpperCase()}</span>
