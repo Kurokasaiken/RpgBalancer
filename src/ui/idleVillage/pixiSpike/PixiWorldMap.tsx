@@ -68,12 +68,8 @@ export interface PixiMapTune {
   cloudParallax: number;
   /** Multiplier on how much a cloud swells, narrows and tilts as it drifts (0 = rigid). */
   cloudMorph: number;
-  /** Strength of the wind gusts of light over the forests (0 = off). */
-  gustStrength: number;
   /** Opacity multiplier of the village smoke (0 = off). */
   smokeAmount: number;
-  /** Opacity multiplier of the sun glints on the sea (0 = off). */
-  glintAmount: number;
   /** Seconds between two sea wonders surfacing (kraken, whale, ship): the shortest wait; the longest is 1.9x. */
   wonderEveryS: number;
   /** How far (world px) the painted sea's edge colour holds before sinking into deep water. */
@@ -87,9 +83,7 @@ export interface PixiMapTune {
 export const DEFAULT_MAP_TUNE: PixiMapTune = {
   cloudParallax: 1,
   cloudMorph: 1,
-  gustStrength: 1,
   smokeAmount: 1,
-  glintAmount: 1,
   wonderEveryS: 18,
   deepSeaFadePx: 650,
   regionHoverDelayS: 1,
@@ -203,11 +197,13 @@ precision highp float;
 in vec2 vUV;
 out vec4 outColor;
 uniform sampler2D uSea;
+uniform sampler2D uSeaMask;
 uniform vec4 uExt;
 uniform vec2 uWorld;
 uniform vec3 uDeep;
 uniform vec3 uFog;
 uniform float uFade;
+uniform float uBand;
 uniform float uTime;
 float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float vnoise(vec2 p) {
@@ -218,7 +214,12 @@ float vnoise(vec2 p) {
 void main() {
   vec2 w = uExt.xy + vUV * uExt.zw;
   vec2 uv = w / uWorld;
-  if (uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) { outColor = vec4(0.0); return; }
+  bool inside = uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0;
+  // Inside the painted canvas the deep sea only lays a fading veil over open water near the edge, so the two
+  // meet in a gradient instead of a rectangle.
+  float inner = inside ? min(min(uv.x * uWorld.x, (1.0 - uv.x) * uWorld.x), min(uv.y * uWorld.y, (1.0 - uv.y) * uWorld.y)) : 0.0;
+  float veil = inside ? (1.0 - smoothstep(12.0, uBand, inner)) * clamp((texture(uSeaMask, uv).a - 0.16) * 1.8, 0.0, 1.0) : 1.0;
+  if (veil <= 0.001) { outColor = vec4(0.0); return; }
   vec2 c = clamp(uv, vec2(0.012), vec2(0.988));
   bool sideEdge = uv.x < 0.0 || uv.x > 1.0;
   bool capEdge = uv.y < 0.0 || uv.y > 1.0;
@@ -246,36 +247,10 @@ void main() {
   col *= 0.86 + swell * 0.26;
   // Fog of the unexplored: the far edge of the world fades toward the page colour.
   col = mix(col, uFog, smoothstep(uFade * 0.8, uFade * 2.6, dist) * 0.55);
-  outColor = vec4(col, 1.0);
+  outColor = vec4(col * veil, veil);
 }
 `;
 
-
-// Wind over the trees: slow gusts of light travelling across the canopies (no geometry moves, so no ghost edges).
-const CANOPY_GUST_FRAG = `#version 300 es
-precision highp float;
-in vec2 vUV;
-out vec4 outColor;
-uniform sampler2D uTex;
-uniform vec4 uRect;
-uniform float uTime;
-uniform float uStrength;
-float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
-float vnoise(vec2 p) {
-  vec2 i = floor(p), f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-}
-void main() {
-  vec4 t = texture(uTex, vUV);
-  vec2 w = uRect.xy + vUV * uRect.zw;
-  // A gust is a band of noise advected by the wind; the finer ripple rides inside it.
-  float gust = smoothstep(0.5, 0.82, vnoise(w * 0.0022 + vec2(uTime * 0.045, uTime * 0.018)));
-  float ripple = 0.55 + 0.45 * vnoise(w * 0.02 + vec2(uTime * 0.35, 0.0));
-  float a = t.a * gust * ripple * 0.30 * uStrength;
-  outColor = vec4(vec3(0.78, 0.9, 0.5) * a, a);
-}
-`;
 
 // Same math as WorldSurfaceCoastFoam (crests run in and dissolve before the shore).
 const COAST_FOAM_FRAG = `#version 300 es
@@ -318,6 +293,8 @@ const CLOUD_ENTRY_PAD_PX = 200;
 /** Open water past the painted sea: its deep colour, the fog of the unexplored, and how far (world px) the edge colour holds. */
 const DEEP_SEA_COLOR = '#215c70';
 const DEEP_SEA_FOG = '#16394a';
+/** Width (world px) of the fade inside the canvas where the deep sea meets the painted sea. */
+const DEEP_SEA_BAND_PX = 420;
 /** Cloud layers (far, mid, near): how much further than the ground each slides when the camera pans. */
 const CLOUD_PARALLAX = [0.1, 0.22, 0.4] as const;
 /** Village roofs where smoke rises (world px), puffs per chimney, and a puff's life. */
@@ -328,24 +305,6 @@ const VILLAGE_CHIMNEYS = [
 ] as const;
 const SMOKE_PUFFS = 5;
 const SMOKE_LIFE_S = 7;
-
-function makeGlintCanvas(): HTMLCanvasElement {
-  const c = document.createElement('canvas');
-  c.width = 32;
-  c.height = 32;
-  const g = c.getContext('2d');
-  if (g) {
-    const r = g.createRadialGradient(16, 16, 0, 16, 16, 16);
-    r.addColorStop(0, 'rgba(255,248,220,0.95)');
-    r.addColorStop(1, 'rgba(255,248,220,0)');
-    g.fillStyle = r;
-    g.fillRect(0, 0, 32, 32);
-    g.fillStyle = 'rgba(255,252,236,0.95)';
-    g.fillRect(15, 3, 2, 26);
-    g.fillRect(3, 15, 26, 2);
-  }
-  return c;
-}
 
 /** Pointer dwell before a territory lights up and shows its name. */
 /** No two waves or sea marks play at the same time closer than this (world px). */
@@ -535,6 +494,7 @@ export function PixiWorldMap({
       // ── Deep sea around the painted canvas (replaces the mirrored copies of the map) ──
       if (seaTexture && (margin > 0 || marginY > 0)) {
         const edge = seaTexture as Texture;
+        const deepSeaMask = await load('/assets/atmosphere/terrain/sea_mask.webp');
         edge.source.style.addressMode = 'clamp-to-edge';
         const extX = -margin;
         const extY = -marginY;
@@ -544,12 +504,14 @@ export function PixiWorldMap({
           gl: { vertex: VERT, fragment: DEEP_SEA_FRAG },
           resources: {
             uSea: edge.source,
+            uSeaMask: deepSeaMask.source,
             u: {
               uExt: { value: new Float32Array([extX, extY, extW, extH]), type: 'vec4<f32>' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
               uDeep: { value: hexToRgb01(DEEP_SEA_COLOR), type: 'vec3<f32>' },
               uFog: { value: hexToRgb01(DEEP_SEA_FOG), type: 'vec3<f32>' },
               uFade: { value: tn.deepSeaFadePx, type: 'f32' },
+              uBand: { value: DEEP_SEA_BAND_PX, type: 'f32' },
               uTime: { value: 0, type: 'f32' },
             },
           },
@@ -1019,43 +981,8 @@ export function PixiWorldMap({
       // Wonders sit above the sea pattern, the waves and the coast foam.
       world.addChild(wonderLayer);
 
-      // ── Land life: wind gusts over the forests, smoke from the village, sun glints on the sea ──
+      // ── Land life: smoke from the village ──
       if (fxOn.landLife && !reducedMotion) {
-        const layered = (await fetch('/assets/world/wanderlust/base/manifest.json').then((r) => r.json())) as {
-          surfaceLayers: { id: string; file: string; rect?: { x: number; y: number; width: number; height: number; sourceWidth: number; sourceHeight: number } }[];
-        };
-        const gustLayer = new Container();
-        for (const l of layered.surfaceLayers) {
-          if (!l.rect || !/forest|trees/.test(l.id)) continue;
-          const tex = await load(layerUrl(manifest.world, l.file));
-          if (disposed) return;
-          const r = l.rect;
-          const box = {
-            x: (r.x / r.sourceWidth) * canvas.width,
-            y: (r.y / r.sourceHeight) * canvas.height,
-            w: (r.width / r.sourceWidth) * canvas.width,
-            h: (r.height / r.sourceHeight) * canvas.height,
-          };
-          const gustShader = Shader.from({
-            gl: { vertex: VERT, fragment: CANOPY_GUST_FRAG },
-            resources: {
-              uTex: tex.source,
-              u: {
-                uRect: { value: new Float32Array([box.x, box.y, box.w, box.h]), type: 'vec4<f32>' },
-                uTime: { value: 0, type: 'f32' },
-                uStrength: { value: tn.gustStrength, type: 'f32' },
-              },
-            },
-          });
-          const mesh = new Mesh({ geometry: quad(box.w, box.h), shader: gustShader });
-          mesh.position.set(box.x, box.y);
-          gustLayer.addChild(mesh);
-          ticks.push((t) => {
-            gustShader.resources.u.uniforms.uTime = t;
-          });
-        }
-        world.addChild(gustLayer);
-
         // Smoke: a few soft puffs rise from the roofs, lean with the same wind, and thin out.
         const smokeCanvas = document.createElement('canvas');
         smokeCanvas.width = 64;
@@ -1088,28 +1015,6 @@ export function PixiWorldMap({
           }
         }
 
-        // Sun glints: small stars that wake and fade on open water, never all at once.
-        const points = (await fetch('/assets/atmosphere/terrain/points.json').then((r) => r.json())) as { sea?: { x: number; y: number }[] };
-        const glintTexture = Texture.from(makeGlintCanvas());
-        const glintLayer = new Container();
-        glintLayer.blendMode = 'add';
-        world.addChild(glintLayer);
-        (points.sea ?? []).forEach((pt, i) => {
-          for (let k = 0; k < 3; k += 1) {
-            const star = new Sprite(glintTexture);
-            star.anchor.set(0.5);
-            const seed = i * 7.31 + k * 3.17;
-            star.position.set(pt.x + Math.sin(seed) * 160, pt.y + Math.cos(seed * 1.3) * 120);
-            star.scale.set(0.7 + (k % 2) * 0.4);
-            star.alpha = 0;
-            glintLayer.addChild(star);
-            const period = 5 + ((seed * 13) % 4);
-            ticks.push((t) => {
-              const p = ((((t + seed * 5) % period) + period) % period) / period;
-              star.alpha = Math.max(0, Math.sin(p * Math.PI * 4)) ** 6 * (p < 0.5 ? 0.9 : 0) * tn.glintAmount;
-            });
-          }
-        });
       }
 
       if (fxOn.clouds) {
