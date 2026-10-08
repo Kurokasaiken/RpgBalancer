@@ -1,0 +1,4 @@
+medieval-gauntlet*.png — "Gauntlet Cursor" by itsmars, CC0 (public domain),
+https://opengameart.org/content/gauntlet-cursor (edited from yd's "Pointers: part 5", CC0).
+Files used: variations/cursor_shiny.png (default), outlines/cursor_outline_yellow.png (pointer),
+cursor_final.png (dragging the map); @2x versions are nearest-neighbour upscales.
