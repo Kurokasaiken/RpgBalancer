@@ -18,7 +18,9 @@ import {
   useHealing,
   type QuestRunState,
 } from '@/ui/idleVillage/questS1Lab/questRun';
+import { PARTY_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { analyzeCheck } from '@/ui/idleVillage/questS1Lab/questSimulation';
+import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 
 /** Drive a run forward picking the option whose id contains `match`. */
 function pick(state: QuestRunState, match: string): QuestRunState {
@@ -361,5 +363,32 @@ describe('presentation contract (PLAN-023 T-001)', () => {
     const c = run.checkQueue[0];
     expect(c.harmLines.every((l) => !c.authoredText.includes(l))).toBe(true);
     expect(c.outcomeText).toContain(c.harmLines.join(' '));
+  });
+});
+
+describe('stash loadout (R-102)', () => {
+  it('explicit loadout seeds the bag flags', () => {
+    const run = createRun('gob-band', 1, 'goblin', ['hasCorda', 'hasFumogeno']);
+    expect(run.flags.sort()).toEqual(['hasCorda', 'hasFumogeno'].sort());
+  });
+
+  it('loadout is clamped to bagSlots and unknown/dup flags dropped', () => {
+    const run = createRun('gob-band', 1, 'goblin', [
+      'hasBonusForza', 'hasBonusPerc', 'hasHealing', 'hasPozione',
+      'hasBonusForza', 'bogus-flag',
+    ]);
+    expect(run.flags.length).toBe(QUEST_STASH.bagSlots);
+    expect(run.flags).not.toContain('bogus-flag');
+    expect(new Set(run.flags).size).toBe(run.flags.length);
+  });
+
+  it('omitted loadout keeps the config default (pre-R-102 behaviour)', () => {
+    const run = createRun('gob-band', 1, 'goblin');
+    expect(run.flags).toEqual([...QUEST_STASH.defaultLoadout]);
+  });
+
+  it('non-goblin quests ignore the stash (unchanged behaviour)', () => {
+    const run = createRun(PARTY_PRESETS[0].id, 1, 'cassa', ['hasBonusForza']);
+    expect(run.flags).toEqual([]);
   });
 });

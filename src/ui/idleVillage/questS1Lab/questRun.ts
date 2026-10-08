@@ -8,6 +8,7 @@
  */
 
 import { DEFAULT_QUEST_SKILL_CHECK_CONFIG } from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
+import { resolveStashLoadout } from '@/balancing/config/idleVillage/quests/questStash';
 import { PARTY_PRESETS, PRIMARY_STATS, SCENARIO_NODES, START_NODE } from './questScenario';
 import {
   ROVINE_NODES,
@@ -602,8 +603,15 @@ function rollCheckHarms(
 /* ------------------------------------------------------------------ */
 
 /** Create a fresh run from a preset + seed. `questId` selects the authored
- *  quest: 'cassa' (default, infiltration) or 'rovine' (attrition gauntlet). */
-export function createRun(presetId: string, seed: number, questId: QuestId = 'cassa'): QuestRunState {
+ *  quest: 'cassa' (default, infiltration), 'rovine' (attrition gauntlet) or
+ *  'goblin' (combat). `loadout` is the stash pick (R-102): engine flags for
+ *  the consumables packed before departure — omitted = config default. */
+export function createRun(
+  presetId: string,
+  seed: number,
+  questId: QuestId = 'cassa',
+  loadout?: string[],
+): QuestRunState {
   const quest = QUESTS[questId];
   const preset = quest.presets.find((p) => p.id === presetId) ?? quest.presets[0];
   const party: RuntimeMember[] = preset.members.map((m) => ({
@@ -640,11 +648,9 @@ export function createRun(presetId: string, seed: number, questId: QuestId = 'ca
     bottinoOro: 0,
     loot: [],
     info: [],
-    // Goblin quest (mock): the three assignable consumables start in the bag.
-    flags:
-      questId === 'goblin'
-        ? ['hasBonusForza', 'hasBonusPerc', 'hasHealing']
-        : [],
+    // Goblin quest (R-102): the bag is the stash pick, resolved and clamped by
+    // the stash config; no explicit pick = the config default loadout.
+    flags: questId === 'goblin' ? resolveStashLoadout(loadout) : [],
     alarm: false,
     objectiveDone: false,
     ended: false,

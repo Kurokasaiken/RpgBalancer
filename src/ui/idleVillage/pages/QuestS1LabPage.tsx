@@ -36,6 +36,7 @@ import {
 } from '@/ui/idleVillage/questS1Lab/questRun';
 
 import type { HarmEvent, QuestId, QuestRunState, ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import type { LabStat } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { STAT_ICONS } from '@/ui/idleVillage/questS1Lab/questRun';
 import { getStatIconComponent } from '@/ui/shared/statIconUtils';
 import { QuestSimulationPreview } from '@/ui/idleVillage/questS1Lab/QuestSimulationPreview';
@@ -49,6 +50,7 @@ import { PgCardKitShell } from '@/ui/idleVillage/frozen/kits/pgcardKit';
 import { WanderlustAmbientField } from '@/ui/wanderlust-surface/layout';
 import { DEFAULT_QUEST_LAB_PACING } from '@/balancing/config/idleVillage/quests/questLabPacing';
 import { DEFAULT_QUEST_LAB_PRESENTATION as PRES } from '@/balancing/config/idleVillage/quests/questLabPresentation';
+import { QUEST_STASH, loadoutCoverage } from '@/balancing/config/idleVillage/quests/questStash';
 
 /* Painted Wanderlust assets (art_direction_plan.md — Wilderness pillar). */
 const ART = {
@@ -585,6 +587,67 @@ const ConsumableBelt: React.FC<{
   );
 };
 
+/** Stash picker (R-102): pack consumables into the bag before departing.
+ *  One shared bag for whichever preset the player launches — cap is
+ *  `QUEST_STASH.bagSlots`; chips toggle, the coverage hint compares the pick
+ *  against the quest's declared primary stats. */
+const StashPicker: React.FC<{
+  loadout: string[];
+  onToggle: (flag: string) => void;
+  primaryStats: LabStat[];
+}> = ({ loadout, onToggle, primaryStats }) => {
+  const { t } = useTranslation('idleVillage');
+  const coverage = loadoutCoverage(loadout);
+  return (
+    <div className="mb-8 rounded-2xl border border-slate-700/60 bg-black/60 p-4 backdrop-blur">
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-amber-200/90">
+          {t('questS1Lab.stash.title')}
+        </span>
+        <span className="rounded-full border border-slate-600/60 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+          {t('questS1Lab.stash.hint', {
+            used: loadout.length,
+            slots: QUEST_STASH.bagSlots,
+          })}
+        </span>
+        {primaryStats.length > 0 && (
+          <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            {t('questS1Lab.stash.coverage')}:{' '}
+            {primaryStats
+              .map((s) => `${STAT_SHORT[s]} ${coverage.includes(s) ? '✓' : '—'}`)
+              .join(' · ')}
+          </span>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {QUEST_STASH.items.map((item) => {
+          const packed = loadout.includes(item.flag);
+          const full = !packed && loadout.length >= QUEST_STASH.bagSlots;
+          return (
+            <button
+              key={item.flag}
+              type="button"
+              disabled={full}
+              onClick={() => onToggle(item.flag)}
+              title={t(item.descKey)}
+              className={[
+                'rounded-lg border px-3 py-1.5 text-[11px] transition',
+                packed
+                  ? 'border-teal-300/70 bg-teal-500/15 text-teal-200'
+                  : full
+                    ? 'cursor-not-allowed border-slate-800 bg-slate-950/40 text-slate-600'
+                    : 'border-slate-600/60 bg-slate-900/50 text-slate-300 hover:border-slate-400',
+              ].join(' ')}
+            >
+              {packed ? '◉' : '○'} {t(item.labelKey).split('—')[0].trim()}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 /** Phases gated on the astrolabe/player: checks wait on resolve + verdict
  *  ack; ambient harm beats flow on their own timers. Module constants so the
  *  hook's effect deps stay stable across renders. */
@@ -596,6 +659,8 @@ const QuestS1LabPage: React.FC = () => {
   const [seed, setSeed] = useState<number>(rollSeed);
   const [questId, setQuestId] = useState<QuestId | null>(null);
   const [run, setRun] = useState<QuestRunState | null>(null);
+  // R-102 loadout: the bag packed on the preset screen, shared across presets.
+  const [loadout, setLoadout] = useState<string[]>([...QUEST_STASH.defaultLoadout]);
   // Every check resolved by the last action gets its own astrolabe beat —
   // the queue preserves the order so chained checks all get the cinematic.
   // Burst entries remember whether their check resolved on a combat node —
@@ -695,7 +760,17 @@ const QuestS1LabPage: React.FC = () => {
     const s = rollSeed();
     setSeed(s);
     setCheckQueue([]);
-    setRun(createRun(id, s, questId ?? 'cassa'));
+    setRun(createRun(id, s, questId ?? 'cassa', loadout));
+  };
+
+  const toggleStashItem = (flag: string) => {
+    setLoadout((cur) =>
+      cur.includes(flag)
+        ? cur.filter((f) => f !== flag)
+        : cur.length < QUEST_STASH.bagSlots
+          ? [...cur, flag]
+          : cur,
+    );
   };
 
   const reset = () => {
@@ -849,6 +924,11 @@ const QuestS1LabPage: React.FC = () => {
             {t('questS1Lab.primaryNote')}
           </span>
         </div>
+        <StashPicker
+          loadout={loadout}
+          onToggle={toggleStashItem}
+          primaryStats={activePrimary}
+        />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {activeQuest.presets.map((p) => (
             <section
