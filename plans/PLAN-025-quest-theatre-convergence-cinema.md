@@ -216,10 +216,20 @@ Ogni task richiede lo stato garantito dal precedente.
   proiezione della coda con id stabili (oggi si persiste lo stato dominio,
   non la presentazione) e i test di serializzazione espliciti (RNG incluso,
   reload a metà morte multipla).
-- **T-006 — Contratto v2 + adapter.** Delta su `theatreContract.ts`, fixture
-  (morte multipla, combattimento, sacca, nodi pending/ready), adapter puro +
-  intent. Test: stesso stato → stesso snapshot; nessun comando duplicato;
-  `stale` rifiutato.
+- **T-006 — Contratto v2 + adapter (FATTO 2026-10-08).** `theatreContract.ts`
+  v2: `runState+'survived'`, `node.pending{startedAt,readyAt}`, `party hp/maxHp`,
+  `run.tick/bag/combat`, intent `useItem` + `submitDecision.useConsumable`,
+  reject `duplicate`. `questRun.ts`: `visitedNodes` append-only (i nodi
+  risolti dello snapshot vengono dalla storia, mai dal grafo),
+  `ENGINE_SCHEMA_VERSION=2` (save vecchi scartati). `questRunAdapter.ts`:
+  `snapshotQuestRun` puro + `createQuestRunAdapter(getRun,{getTick,onMutate})`
+  con guard stale/nodeId/pending + dedupe commandId; retreat/collectReward
+  rifiutati onestamente (motore senza flussi generici). Fixture = stati reali
+  via `createRun`+`submitCommand` (seed fissi): scelta con preview, pending
+  gob-ritorno, combat live, multi-morte all'agguato, sacca, esiti terminali.
+  Test `questRunAdapter.test.ts` 13: stesso stato → stesso snapshot, stale/
+  duplicate rifiutati, pending rifiuta decisioni, useItem, armed-consumable
+  end-to-end. 102/102 verdi nello scope quest.
 - **T-007 — Convergenza UI** (gate D-1). `QuestTheatre` con la vista di
   `QuestRunWindow`, che resta montabile in parallelo fino a T-012; `/game` con
   l'adapter reale; segnali D-6. RTL: rendering identico live/reopen; chiudi ≠

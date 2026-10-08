@@ -157,6 +157,10 @@ export interface QuestRunState {
   /** Caller-tick duration of one maturable node (info/harm). 0 = instant:
    *  legacy callers keep the old auto-chain behaviour via `matureReady`. */
   nodeTicks: number;
+  /** Node ids in the order they were entered — append-only traversal history
+   *  (revisits included, e.g. the F6 loot loop). The theatre adapter renders
+   *  resolved nodes from this, never from the graph (PLAN-025 T-006). */
+  visitedNodes: string[];
 }
 
 /** A resolved check shown to the player as an astrolabe cinematic. */
@@ -699,12 +703,13 @@ export function createRun(
     // Every quest starts on a 'choice' node → the initial frontier waits.
     frontier: { status: 'waiting', startedAt: frontier?.startTick ?? 0, readyAt: frontier?.startTick ?? 0 },
     nodeTicks: frontier?.nodeTicks ?? 0,
+    visitedNodes: [quest.startNode],
   };
   return state;
 }
 
 /** Persisted-state schema version (PLAN-025 T-005 reads this). */
-export const ENGINE_SCHEMA_VERSION = 1;
+export const ENGINE_SCHEMA_VERSION = 2;
 
 /** Maturable nodes = timed, non-decision kinds that carry scene time (v27). */
 export function maturableNodeCount(questId: QuestId): number {
@@ -1731,6 +1736,7 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
     if (!node) return;
     state.nodeId = cursor;
     state.frontierVersion += 1;
+    state.visitedNodes.push(cursor);
     state.log.push({ kind: 'NODE', text: node.title });
 
     // Spotted sneaking past the guards: their patrol chases the party out —
@@ -2046,6 +2052,7 @@ export function submitCommand(
     const checkNode = nodes[next.slice(6)];
     state.nodeId = checkNode.id;
     state.frontierVersion += 1;
+    state.visitedNodes.push(checkNode.id);
     const preMark = state.log.length;
     const result = resolveCheck(state, checkNode, opts?.useConsumable !== false);
     // Only this check's lines, HARM included, and written again once the outcome
