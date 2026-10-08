@@ -33,6 +33,8 @@ export interface HudEventLedgerProps {
   style?: CSSProperties;
   /** Adds a close (X) button; the host decides how the panel comes back. */
   onClose?: () => void;
+  /** Makes rows actionable (e.g. the host pans the camera to the event). */
+  onSelect?: (event: HudEvent) => void;
 }
 
 const FALLBACK_TYPE: Omit<GameFrameEventTypeConfig, 'id'> = {
@@ -84,6 +86,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
   context = 'game_frame',
   style,
   onClose,
+  onSelect,
 }) => {
   const { t } = useTranslation('idleVillage');
   const [sort, setSort] = useState<HudEventSort>(config.defaultSort);
@@ -143,7 +146,34 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
     const type = typeOf(event.typeId);
     const urgent = event.daysLeft <= config.urgentWithinDays;
     return (
-      <li key={event.id} style={STRIP_STYLE} data-event-type={event.typeId} data-urgent={urgent || undefined}>
+      <li
+        key={event.id}
+        style={{
+          ...STRIP_STYLE,
+          // Severity reads before the words: danger rows carry a tone edge and a faint wash.
+          borderInlineStart: type.tone === 'danger' ? `3px solid ${TONE_COLOR.danger}` : STRIP_STYLE.border,
+          background:
+            type.tone === 'danger' && urgent
+              ? `color-mix(in srgb, ${TONE_COLOR.danger} 14%, transparent)`
+              : STRIP_STYLE.background,
+          cursor: onSelect ? 'pointer' : undefined,
+        }}
+        data-event-type={event.typeId}
+        data-urgent={urgent || undefined}
+        {...(onSelect
+          ? {
+              role: 'button' as const,
+              tabIndex: 0,
+              onClick: () => onSelect(event),
+              onKeyDown: (e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelect(event);
+                }
+              },
+            }
+          : {})}
+      >
         <HudGlyph iconId={type.icon} label={t(type.labelKey)} size={14} style={{ color: TONE_COLOR[type.tone] }} />
         <span
           title={event.title}
@@ -153,9 +183,12 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
             fontWeight: 700,
             color: 'var(--skin-text-primary, #F5F2E8)',
             textShadow: '0 1px 2px rgba(0,0,0,0.7)',
-            whiteSpace: 'nowrap',
+            // Two lines before it gives up: the name is the part that matters.
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            lineHeight: 1.2,
           }}
         >
           {event.title}
