@@ -195,8 +195,9 @@ void main() {
 const CLOUD_CLEAR_RADIUS_PX = 260;
 const CLOUD_CLEAR_MIN = 0.12;
 
-/** Colour a cloud's shadow is painted in over the land. */
-const CLOUD_SHADOW_TINT = 0x0b1a10;
+/** Colour and extra softness of a cloud's shadow (on land and sea). */
+const CLOUD_SHADOW_COLOR = '#0b1a14';
+const CLOUD_SHADOW_BLUR_PX = 10;
 
 const layerUrl = (world: string, file: string) =>
   file.includes('/')
@@ -477,26 +478,43 @@ export function PixiWorldMap({
         };
       }
 
-      // ── Cloud shadows: drift across the land, multiplied, masked to the land ──
+      // ── Cloud shadows: drift over land and sea alike, soft-edged, under the clouds ──
       if (fxOn.cloudShadows) {
         const layer = new Container();
-        const mask = new Sprite(await load('/assets/atmosphere/terrain/cloud_mask_land.png'));
-        mask.width = canvas.width;
-        mask.height = canvas.height;
-        world.addChild(mask);
-        layer.mask = mask;
+        const shadowTextures = new Map<string, Texture>();
+        // The shipped shadow sprites are pale blurred clouds (made for a multiply blend, which barely darkens):
+        // only their shape is kept, blurred once more and filled with a dark green-black, baked into a texture.
+        const shadowTexture = async (src: string) => {
+          const cached = shadowTextures.get(src);
+          if (cached) return cached;
+          const tex = await load(`/assets/atmosphere/${src}`);
+          const pad = CLOUD_SHADOW_BLUR_PX * 2;
+          const c = document.createElement('canvas');
+          c.width = tex.width + pad * 2;
+          c.height = tex.height + pad * 2;
+          const ctx = c.getContext('2d');
+          if (ctx) {
+            ctx.filter = `blur(${CLOUD_SHADOW_BLUR_PX}px)`;
+            ctx.drawImage(tex.source.resource as CanvasImageSource, pad, pad);
+            ctx.filter = 'none';
+            ctx.globalCompositeOperation = 'source-in';
+            ctx.fillStyle = CLOUD_SHADOW_COLOR;
+            ctx.fillRect(0, 0, c.width, c.height);
+          }
+          const baked = Texture.from(c);
+          shadowTextures.set(src, baked);
+          return baked;
+        };
         for (const band of atmosphereAssets.clouds) {
           for (const s of band.sprites) {
-            const tex = await load(`/assets/atmosphere/${s.shadowSrc}`);
+            const tex = await shadowTexture(s.shadowSrc);
             const sprite = new Sprite(tex);
-            const w = s.width * band.scale;
+            // The baked texture carries blur padding on every side: widen the sprite so the cloud keeps its size.
+            const w = s.width * band.scale * (tex.width / (tex.width - CLOUD_SHADOW_BLUR_PX * 4));
             sprite.width = w;
             sprite.height = tex.height * (w / tex.width);
             sprite.y = s.y + cloudShadowOffset.y;
             sprite.alpha = cloudShadowOpacity ?? band.shadowOpacity;
-            // The shipped shadow sprites are pale blurred clouds (made for a multiply blend, which barely darkens):
-            // only their shape is used, filled with a dark green-black.
-            sprite.tint = CLOUD_SHADOW_TINT;
             layer.addChild(sprite);
             ticks.push((t) => {
               const drift = band.driftSeconds / cloudSpeed;
