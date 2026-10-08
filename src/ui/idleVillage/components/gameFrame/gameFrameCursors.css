@@ -1,23 +1,24 @@
-/* The game's own cursors (scripts/draw-cursors.py): brass and ink like the HUD plaques and the inked map.
+/* Medieval gauntlet cursors: "Gauntlet Cursor" by itsmars, CC0 (see public/assets/ui/cursors/LICENSE-gauntlet-cursor.txt).
+   Steel gauntlet by default, gold-outlined over something clickable, dark iron while dragging the map.
    Scoped to .game-frame. On the world canvas, PixiWorldMap sets data-cursor="point" over a territory and
    data-cursor="move" while the map is dragged. */
 .game-frame {
-  cursor: image-set(url('/assets/ui/cursors/map-arrow.png') 1x, url('/assets/ui/cursors/map-arrow@2x.png') 2x) 5 5, auto;
+  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet.png') 1x, url('/assets/ui/cursors/medieval-gauntlet@2x.png') 2x) 4 4, auto;
 }
 .game-frame .cursor-grab,
 .game-frame .cursor-grab canvas {
-  cursor: image-set(url('/assets/ui/cursors/map-arrow.png') 1x, url('/assets/ui/cursors/map-arrow@2x.png') 2x) 5 5, default !important;
+  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet.png') 1x, url('/assets/ui/cursors/medieval-gauntlet@2x.png') 2x) 4 4, default !important;
 }
 .game-frame button:not(:disabled),
 .game-frame a[href],
 .game-frame [role='button'],
 .game-frame canvas[data-cursor='point'] {
-  cursor: image-set(url('/assets/ui/cursors/map-point.png') 1x, url('/assets/ui/cursors/map-point@2x.png') 2x) 5 5, pointer !important;
+  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet-point.png') 1x, url('/assets/ui/cursors/medieval-gauntlet-point@2x.png') 2x) 4 4, pointer !important;
 }
 .game-frame button:disabled {
-  cursor: image-set(url('/assets/ui/cursors/map-arrow.png') 1x, url('/assets/ui/cursors/map-arrow@2x.png') 2x) 5 5, not-allowed !important;
+  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet.png') 1x, url('/assets/ui/cursors/medieval-gauntlet@2x.png') 2x) 4 4, not-allowed !important;
 }
 .game-frame canvas[data-cursor='move'],
 .game-frame .cursor-grab:active {
-  cursor: image-set(url('/assets/ui/cursors/map-move.png') 1x, url('/assets/ui/cursors/map-move@2x.png') 2x) 16 16, grabbing !important;
+  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet-move.png') 1x, url('/assets/ui/cursors/medieval-gauntlet-move@2x.png') 2x) 4 4, grabbing !important;
 }
