@@ -1,0 +1,152 @@
+{
+  "size": [
+    1536,
+    1025
+  ],
+  "regions": [
+    {
+      "id": "northern_forest",
+      "index": 1,
+      "nameKey": "world.region.northern_forest",
+      "center": [
+        0.3496,
+        0.3884
+      ],
+      "bounds": [
+        0.0729,
+        0.2195,
+        0.7025,
+        0.5395
+      ],
+      "areaFraction": 0.1065
+    },
+    {
+      "id": "southern_forest",
+      "index": 2,
+      "nameKey": "world.region.southern_forest",
+      "center": [
+        0.3823,
+        0.6324
+      ],
+      "bounds": [
+        0.0859,
+        0.5112,
+        0.6888,
+        0.7688
+      ],
+      "areaFraction": 0.0891
+    },
+    {
+      "id": "eastern_woods",
+      "index": 3,
+      "nameKey": "world.region.eastern_woods",
+      "center": [
+        0.8283,
+        0.4997
+      ],
+      "bounds": [
+        0.7012,
+        0.2351,
+        0.9349,
+        0.6898
+      ],
+      "areaFraction": 0.0378
+    },
+    {
+      "id": "northern_peaks",
+      "index": 4,
+      "nameKey": "world.region.northern_peaks",
+      "center": [
+        0.5263,
+        0.2133
+      ],
+      "bounds": [
+        0.2337,
+        0.1063,
+        0.8438,
+        0.3337
+      ],
+      "areaFraction": 0.0703
+    },
+    {
+      "id": "eastern_mountains",
+      "index": 5,
+      "nameKey": "world.region.eastern_mountains",
+      "center": [
+        0.6957,
+        0.4658
+      ],
+      "bounds": [
+        0.5169,
+        0.3376,
+        0.8796,
+        0.6322
+      ],
+      "areaFraction": 0.0711
+    },
+    {
+      "id": "southern_mountains",
+      "index": 6,
+      "nameKey": "world.region.southern_mountains",
+      "center": [
+        0.648,
+        0.7895
+      ],
+      "bounds": [
+        0.446,
+        0.641,
+        0.847,
+        0.9346
+      ],
+      "areaFraction": 0.0762
+    },
+    {
+      "id": "islands",
+      "index": 7,
+      "nameKey": "world.region.islands",
+      "center": [
+        0.357,
+        0.8132
+      ],
+      "bounds": [
+        0.0632,
+        0.639,
+        0.9388,
+        0.9307
+      ],
+      "areaFraction": 0.056
+    },
+    {
+      "id": "village",
+      "index": 8,
+      "nameKey": "world.region.village",
+      "center": [
+        0.4884,
+        0.5445
+      ],
+      "bounds": [
+        0.4232,
+        0.478,
+        0.5508,
+        0.5961
+      ],
+      "areaFraction": 0.0105
+    },
+    {
+      "id": "meadows",
+      "index": 9,
+      "nameKey": "world.region.meadows",
+      "center": [
+        0.507,
+        0.4589
+      ],
+      "bounds": [
+        0.0768,
+        0.1854,
+        0.931,
+        0.9366
+      ],
+      "areaFraction": 0.0486
+    }
+  ]
+}
