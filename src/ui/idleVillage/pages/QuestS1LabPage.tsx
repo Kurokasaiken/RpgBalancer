@@ -268,6 +268,15 @@ const QuestS1LabPage: React.FC = () => {
     };
   }, [run, shownNodeId]);
 
+  /** Click on the transit line = "I've read it" — skip the remaining hold. */
+  const skipTransit = () => {
+    if (transitionTimer.current) {
+      clearTimeout(transitionTimer.current);
+      transitionTimer.current = null;
+    }
+    if (run) setShownNodeId(run.nodeId);
+  };
+
   const startRun = (id: string) => {
     const s = rollSeed();
     setSeed(s);
@@ -500,6 +509,7 @@ const QuestS1LabPage: React.FC = () => {
           inTransition={inTransition}
           transitText={nodesFor(run)[run.nodeId]?.transit}
           transitArt={NODE_ART[run.nodeId]}
+          onTransitSkip={skipTransit}
           presenting={presenting}
           activeCheck={activeCheck}
           phase={timeline.state.phase}
