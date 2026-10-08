@@ -133,6 +133,7 @@ uniform sampler2D uPattern;
 uniform sampler2D uSeaMask;
 uniform float uTime;
 uniform vec2 uWorld;
+uniform vec4 uExtent;
 uniform float uPatternScale;
 uniform float uLineOpacity;
 uniform vec3 uLineColor;
@@ -141,12 +142,15 @@ uniform float uMotionAmount;
 uniform float uMotionPeriod;
 uniform vec2 uMotionDir;
 void main() {
-  vec2 w = vUV * uWorld;
+  vec2 w = uExtent.xy + vUV * uExtent.zw;
+  vec2 maskUV = w / uWorld;
+  // Past the painted canvas the mirrored margins are open water all the way.
+  float sea = (maskUV.x < 0.0 || maskUV.y < 0.0 || maskUV.x > 1.0 || maskUV.y > 1.0) ? 1.0 : texture(uSeaMask, maskUV).a;
   vec2 offset = vec2(0.0);
   if (uMotion > 0.5 && uMotionPeriod > 0.0) {
     offset = uMotionDir * uMotionAmount * sin(uTime * 6.2831853 / uMotionPeriod);
   }
-  float a = texture(uPattern, (w + offset) / uPatternScale).a * uLineOpacity * texture(uSeaMask, vUV).a;
+  float a = texture(uPattern, (w + offset) / uPatternScale).a * uLineOpacity * sea;
   outColor = vec4(uLineColor * a, a);
 }
 `;
@@ -186,6 +190,9 @@ void main() {
   outColor = vec4(uFoamColor * a, a);
 }
 `;
+
+/** Colour a cloud's shadow is painted in over the land. */
+const CLOUD_SHADOW_TINT = 0x0b1a10;
 
 const layerUrl = (world: string, file: string) =>
   file.includes('/')
@@ -466,7 +473,9 @@ export function PixiWorldMap({
             sprite.height = tex.height * (w / tex.width);
             sprite.y = s.y + cloudShadowOffset.y;
             sprite.alpha = cloudShadowOpacity ?? band.shadowOpacity;
-            sprite.blendMode = 'multiply';
+            // The shipped shadow sprites are pale blurred clouds (made for a multiply blend, which barely darkens):
+            // only their shape is used, filled with a dark green-black.
+            sprite.tint = CLOUD_SHADOW_TINT;
             layer.addChild(sprite);
             ticks.push((t) => {
               const drift = band.driftSeconds / cloudSpeed;
@@ -492,6 +501,7 @@ export function PixiWorldMap({
             u: {
               uTime: { value: 0, type: 'f32' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
+              uExtent: { value: new Float32Array([-margin, -marginY, canvas.width + 2 * margin, canvas.height + 2 * marginY]), type: 'vec4<f32>' },
               uPatternScale: { value: seaPatternConfig.patternScale, type: 'f32' },
               uLineOpacity: { value: seaPatternConfig.lineOpacity, type: 'f32' },
               uLineColor: { value: hexToRgb01(seaPatternConfig.lineColor), type: 'vec3<f32>' },
@@ -502,7 +512,10 @@ export function PixiWorldMap({
             },
           },
         });
-        world.addChild(new Mesh({ geometry: quad(canvas.width, canvas.height), shader }));
+        const seaQuad = quad(canvas.width + 2 * margin, canvas.height + 2 * marginY);
+        const seaMesh = new Mesh({ geometry: seaQuad, shader });
+        seaMesh.position.set(-margin, -marginY);
+        world.addChild(seaMesh);
         ticks.push((t) => {
           shader.resources.u.uniforms.uTime = t;
         });
