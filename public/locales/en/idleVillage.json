@@ -977,7 +977,9 @@
       "meadows": "The Meadows"
     },
     "tuning": {
-      "reset": "Reset values"
+      "reset": "Reset values",
+      "save": "Save",
+      "saved": "Saved ✓"
     }
   },
   "missionPlanner": {

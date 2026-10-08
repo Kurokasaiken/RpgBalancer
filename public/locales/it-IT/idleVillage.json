@@ -984,7 +984,9 @@
       "meadows": "I Prati"
     },
     "tuning": {
-      "reset": "Ripristina valori"
+      "reset": "Ripristina valori",
+      "save": "Salva",
+      "saved": "Salvato ✓"
     }
   },
   "missionPlanner": {
