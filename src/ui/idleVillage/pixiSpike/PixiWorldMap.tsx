@@ -10,8 +10,11 @@ import {
   Shader,
   Sprite,
   Texture,
+  TilingSprite,
+  DisplacementFilter,
+  AlphaFilter,
 } from 'pixi.js';
-import { createSeabedArt } from './seabedTexture';
+import { createRefractionNoise, createSeabedArt } from './seabedTexture';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { defaultSeaMarksConfig } from '@/ui/idleVillage/config/seaMarksConfig';
@@ -145,7 +148,7 @@ void main() {
   vec2 w = uExtent.xy + vUV * uExtent.zw;
   vec2 maskUV = w / uWorld;
   // Past the painted canvas the mirrored margins are open water all the way.
-  float sea = (maskUV.x < 0.0 || maskUV.y < 0.0 || maskUV.x > 1.0 || maskUV.y > 1.0) ? 1.0 : texture(uSeaMask, maskUV).a;
+  float sea = (maskUV.x < 0.0 || maskUV.y < 0.0 || maskUV.x > 1.0 || maskUV.y > 1.0) ? 1.0 : clamp((texture(uSeaMask, maskUV).a - 0.16) * 1.8, 0.0, 1.0);
   vec2 offset = vec2(0.0);
   if (uMotion > 0.5 && uMotionPeriod > 0.0) {
     offset = uMotionDir * uMotionAmount * sin(uTime * 6.2831853 / uMotionPeriod);
@@ -329,6 +332,8 @@ export function PixiWorldMap({
       app.stage.addChild(world);
 
       // ── Base layers (+ mirrored sea margins for the base and sea layers) ──
+      /** The painted sea and its mirrors: the see-through reveal thins them out. */
+      const seaSprites: Sprite[] = [];
       const layers = manifest.surfaceLayers
         .filter((l) => (l.opacity ?? 1) > 0 && !hidden.has(l.id) && !l.id.startsWith('event_shroud_'))
         .sort((a, b) => a.zIndex - b.zIndex);
@@ -351,6 +356,7 @@ export function PixiWorldMap({
         const sprite = new Sprite(texture);
         place(sprite);
         world.addChild(sprite);
+        if (layer.id === 'sea') seaSprites.push(sprite);
         const isMirrorable = !layer.rect && (layer.id === 'base_flat' || layer.id === 'background' || layer.id === 'sea');
         if (isMirrorable && (margin > 0 || marginY > 0)) {
           // Mirrors reuse the same texture (no extra GPU memory) and overlap the original by more than
@@ -371,6 +377,7 @@ export function PixiWorldMap({
                 mirror.y = yi < 0 ? MIRROR_OVERLAP_PX : canvas.height * 2 - MIRROR_OVERLAP_PX;
               }
               world.addChild(mirror);
+              if (layer.id === 'sea') seaSprites.push(mirror);
             }
           }
         }
@@ -378,18 +385,20 @@ export function PixiWorldMap({
 
       const ticks: ((seconds: number) => void)[] = [];
 
-      // ── Seabed under the painted sea: shows through the water, slides slower than the camera ──
-      const seabedReveal = { enabled: false, target: 0, value: 0, scale: 1 };
+      // ── See-through sea: a seabed under the painted water, shown only while the map is dragged ──
+      // Absorption-style look: the water thins out over a light, sandy floor (so it reads as clear water, not
+      // as darker water), with two depth layers that slide at different speeds and tilt with the drag, a
+      // refraction wobble and moving caustics. The sea mask keeps it off the land.
+      const seabedReveal = { target: 0, value: 0, tiltX: 0, tiltY: 0, tiltTargetX: 0, tiltTargetY: 0 };
       let seabedShift: (panX: number, panY: number, viewW: number, viewH: number) => void = () => {};
-      if (fxOn.seabed && seabed && seabed.opacity > 0) {
-        const pad = 380;
+      if (fxOn.seabed && seabed && seabed.opacity > 0 && seaSprites.length > 0) {
+        const pad = 420;
         const extX = -margin - pad;
         const extY = -marginY - pad;
         const extW = canvas.width + 2 * (margin + pad);
         const extH = canvas.height + 2 * (marginY + pad);
         const texW = Math.min(2048, Math.round(extW / 2));
         const art = createSeabedArt(texW, Math.round((texW * extH) / extW));
-        const seabedTexture = Texture.from(art.canvas);
         const glintCanvas = document.createElement('canvas');
         glintCanvas.width = 32;
         glintCanvas.height = 32;
@@ -406,13 +415,32 @@ export function PixiWorldMap({
         }
         const glintTexture = Texture.from(glintCanvas);
         const seaMaskForBed = await load('/assets/atmosphere/terrain/sea_mask.webp');
+        const causticTexture = await load('/assets/world/wanderlust/base/layers/sea_pattern_tile.png');
+        causticTexture.source.style.addressMode = 'repeat';
         if (disposed) return;
 
-        const bed = new Container();
-        const floor = new Sprite(seabedTexture);
+        // Far layer: sand floor + caustics drifting over it.
+        const far = new Container();
+        const floor = new Sprite(Texture.from(art.floor));
         floor.width = extW;
         floor.height = extH;
-        bed.addChild(floor);
+        far.addChild(floor);
+        const caustics = new TilingSprite({ texture: causticTexture, width: extW, height: extH });
+        caustics.tileScale.set(1.6);
+        caustics.tint = 0xfff6d8;
+        caustics.alpha = 0.55;
+        caustics.blendMode = 'add';
+        far.addChild(caustics);
+        ticks.push((t) => {
+          caustics.tilePosition.set(Math.sin(t * 0.21) * 40 + t * 6, Math.cos(t * 0.17) * 40 + t * 4);
+        });
+
+        // Near layer: rocks, ruins, chests and their glints.
+        const near = new Container();
+        const objects = new Sprite(Texture.from(art.objects));
+        objects.width = extW;
+        objects.height = extH;
+        near.addChild(objects);
         art.glints.forEach((glint, index) => {
           const star = new Sprite(glintTexture);
           star.anchor.set(0.5);
@@ -420,7 +448,7 @@ export function PixiWorldMap({
           star.y = glint.v * extH;
           star.scale.set(1.6);
           star.alpha = 0;
-          bed.addChild(star);
+          near.addChild(star);
           if (!reducedMotion || index === 0) {
             ticks.push((t) => {
               const p = (((t + glint.phase) % glint.period) + glint.period) % glint.period / glint.period;
@@ -428,24 +456,33 @@ export function PixiWorldMap({
             });
           }
         });
-        bed.x = extX;
-        bed.y = extY;
-        bed.alpha = 0;
 
-        // One mask for the whole bed (the painted sea mask inside the canvas, open water all around it): two
-        // masks meeting at the canvas edge left a bright seam there.
+        // One mask for the whole bed: the painted sea mask inside the canvas (its open water lifted to full
+        // strength — it fades to ~75% near the edges, which drew a rectangle) and open water all around it.
         const maskScale = 0.25;
         const maskCanvas = document.createElement('canvas');
         maskCanvas.width = Math.ceil(extW * maskScale);
         maskCanvas.height = Math.ceil(extH * maskScale);
-        const mctx = maskCanvas.getContext('2d');
+        const mctx = maskCanvas.getContext('2d', { willReadFrequently: true });
         if (mctx) {
-          mctx.fillStyle = '#fff';
-          mctx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
-          const cx = (0 - extX) * maskScale;
-          const cy = (0 - extY) * maskScale;
-          mctx.clearRect(cx, cy, canvas.width * maskScale, canvas.height * maskScale);
-          mctx.drawImage(seaMaskForBed.source.resource as CanvasImageSource, cx, cy, canvas.width * maskScale, canvas.height * maskScale);
+          const cx = Math.round((0 - extX) * maskScale);
+          const cy = Math.round((0 - extY) * maskScale);
+          const cw = Math.round(canvas.width * maskScale);
+          const ch = Math.round(canvas.height * maskScale);
+          mctx.drawImage(seaMaskForBed.source.resource as CanvasImageSource, cx, cy, cw, ch);
+          const data = mctx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+          for (let y = 0; y < maskCanvas.height; y += 1) {
+            for (let x = 0; x < maskCanvas.width; x += 1) {
+              const i = (y * maskCanvas.width + x) * 4;
+              const inside = x >= cx && x < cx + cw && y >= cy && y < cy + ch;
+              const a = inside ? Math.min(255, Math.max(0, (data.data[i + 3] - 40) * 1.8)) : 255;
+              data.data[i] = 255;
+              data.data[i + 1] = 255;
+              data.data[i + 2] = 255;
+              data.data[i + 3] = a;
+            }
+          }
+          mctx.putImageData(data, 0, 0);
         }
         const bedMask = new Sprite(Texture.from(maskCanvas));
         bedMask.x = extX;
@@ -454,28 +491,63 @@ export function PixiWorldMap({
         bedMask.height = extH;
         const bedBox = new Container();
         bedBox.mask = bedMask;
-        bedBox.addChild(bed);
-        world.addChild(bedMask);
-        world.addChild(bedBox);
+        bedBox.addChild(far, near);
+        bedBox.visible = false;
 
-        // The sea only turns glassy while the map is being dragged: the bed fades in with the drag, tilts a
-        // little with it (extra parallax and a slight scale), and sinks back a moment after release.
-        seabedReveal.enabled = true;
-        ticks.push(() => {
-          const target = seabedReveal.target;
-          seabedReveal.value += (target - seabedReveal.value) * (target > seabedReveal.value ? 0.14 : 0.05);
-          bed.alpha = seabed.opacity * seabedReveal.value;
-          bedBox.visible = bed.alpha > 0.004;
-          seabedReveal.scale = 1 + 0.03 * seabedReveal.value;
-          bed.scale.set(seabedReveal.scale);
+        // Refraction: a slow wobble over the whole bed (only while it is visible).
+        const noise = new Sprite(Texture.from(createRefractionNoise()));
+        noise.texture.source.style.addressMode = 'repeat';
+        noise.renderable = false;
+        noise.scale.set(6);
+        const refraction = new DisplacementFilter({ sprite: noise, scale: 14 });
+        ticks.push((t) => {
+          noise.x = t * 18;
+          noise.y = t * 11;
         });
 
+        // The bed goes right under the painted sea, above the land base: the sea is what turns transparent.
+        // The sea sprites overlap their mirrors by a few px, so they are thinned out as one flattened group
+        // (AlphaFilter): per-sprite alpha would double up in the overlaps and draw the old canvas rectangle.
+        const seaIndex = Math.min(...seaSprites.map((sprite) => world.getChildIndex(sprite)));
+        const seaGroup = new Container();
+        for (const sprite of seaSprites) seaGroup.addChild(sprite);
+        world.addChildAt(seaGroup, seaIndex);
+        const seaAlpha = new AlphaFilter({ alpha: 1 });
+        world.addChildAt(noise, seaIndex);
+        world.addChildAt(bedMask, seaIndex);
+        world.addChildAt(bedBox, seaIndex + 2);
+
+        const clearest = 1 - seabed.opacity;
+        ticks.push(() => {
+          const r = seabedReveal;
+          r.value += (r.target - r.value) * (r.target > r.value ? 0.12 : 0.05);
+          r.tiltX += (r.tiltTargetX - r.tiltX) * 0.12;
+          r.tiltY += (r.tiltTargetY - r.tiltY) * 0.12;
+          r.tiltTargetX *= 0.9;
+          r.tiltTargetY *= 0.9;
+          const on = r.value > 0.004;
+          bedBox.visible = on;
+          bedBox.filters = on && !reducedMotion ? [refraction] : null;
+          seaAlpha.alpha = 1 - (1 - clearest) * r.value;
+          seaGroup.filters = on ? [seaAlpha] : null;
+        });
+
+        const depthNear = seabed.parallax;
+        const depthFar = Math.max(0.4, seabed.parallax - 0.12);
         seabedShift = (panX, panY, viewW, viewH) => {
-          // Centre-relative: at the middle of the pan range the bed sits exactly where it was authored.
-          const dx = (1 - seabed.parallax) * (panX - (canvas.width / 2 - viewW / 2));
-          const dy = (1 - seabed.parallax) * (panY - (canvas.height / 2 - viewH / 2));
-          bed.position.set(extX + dx - ((seabedReveal.scale - 1) * extW) / 2, extY + dy - ((seabedReveal.scale - 1) * extH) / 2);
+          // Centre-relative parallax per depth, plus the tilt: the drag leans the view, so the far floor lags
+          // more than the near ruins, as if the sea were a glass block seen at an angle.
+          const ox = panX - (canvas.width / 2 - viewW / 2);
+          const oy = panY - (canvas.height / 2 - viewH / 2);
+          const tx = seabedReveal.tiltX;
+          const ty = seabedReveal.tiltY;
+          far.position.set(extX + (1 - depthFar) * ox + tx * 1.6, extY + (1 - depthFar) * oy + ty * 1.6);
+          near.position.set(extX + (1 - depthNear) * ox + tx * 0.7, extY + (1 - depthNear) * oy + ty * 0.7);
         };
+        ticks.push(() => {
+          const cam = camRef.current;
+          if (cam) seabedShift(cam.panX, cam.panY, app.screen.width / cam.zoom, app.screen.height / cam.zoom);
+        });
       }
 
       // ── Cloud shadows: drift over land and sea alike, soft-edged, under the clouds ──
@@ -928,6 +1000,9 @@ export function PixiWorldMap({
       };
       const onMove = (e: MouseEvent) => {
         if (!drag) return;
+        // The faster the drag, the more the see-through sea leans (world px, clamped).
+        seabedReveal.tiltTargetX = Math.max(-60, Math.min(60, seabedReveal.tiltTargetX + (e.clientX - drag.x) * 1.4 / cam.zoom));
+        seabedReveal.tiltTargetY = Math.max(-60, Math.min(60, seabedReveal.tiltTargetY + (e.clientY - drag.y) * 1.4 / cam.zoom));
         cam.panX -= (e.clientX - drag.x) / cam.zoom;
         cam.panY -= (e.clientY - drag.y) / cam.zoom;
         drag = { x: e.clientX, y: e.clientY };
