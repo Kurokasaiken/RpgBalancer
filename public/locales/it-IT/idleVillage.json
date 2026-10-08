@@ -1166,6 +1166,7 @@
     "situation": "Situazione",
     "chronicle": "Cronaca",
     "advancing": "La spedizione avanza…",
+    "transitSkip": "Clicca per proseguire",
     "evaluate": "▸ valuta",
     "successPct": "~{pct}% riuscita",
     "woundPct": "ferita {pct}%",

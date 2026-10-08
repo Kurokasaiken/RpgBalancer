@@ -1145,6 +1145,7 @@
     "situation": "Situation",
     "chronicle": "Chronicle",
     "advancing": "The expedition advances…",
+    "transitSkip": "Click to move on",
     "evaluate": "▸ evaluate",
     "successPct": "~{pct}% success",
     "woundPct": "wound {pct}%",
