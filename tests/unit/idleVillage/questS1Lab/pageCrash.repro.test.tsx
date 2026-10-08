@@ -91,12 +91,13 @@ async function driveToFirstCheck(): Promise<boolean> {
     if (!partire) return false;
     fireEvent.click(partire);
     act(() => {
-      vi.advanceTimersByTime(4000);
+      // transitMs scales with word count up to transitMaxMs (7s) — jump past it.
+      vi.advanceTimersByTime(8000);
     });
 
     // F1: the option commits a check; the commit surface exposes the confirm.
     const optBtn = Array.from(view.container.querySelectorAll('button'))
-      .find((b) => !b.disabled && /Arrampicarsi|sentiero a forza|masso/i.test(b.textContent ?? ''));
+      .find((b) => !b.disabled && /Arrampicarsi|albero|masso/i.test(b.textContent ?? ''));
     if (!optBtn) return false;
     fireEvent.click(optBtn);
     const face = byText(/check|affronta|Face/i);
