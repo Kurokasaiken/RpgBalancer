@@ -218,21 +218,23 @@ void main() {
   // Inside the painted canvas the deep sea only lays a fading veil over open water near the edge, so the two
   // meet in a gradient instead of a rectangle.
   float inner = inside ? min(min(uv.x * uWorld.x, (1.0 - uv.x) * uWorld.x), min(uv.y * uWorld.y, (1.0 - uv.y) * uWorld.y)) : 0.0;
-  float veil = inside ? (1.0 - smoothstep(12.0, uBand, inner)) * clamp((texture(uSeaMask, uv).a - 0.16) * 1.8, 0.0, 1.0) : 1.0;
+  float veil = inside ? (1.0 - smoothstep(48.0, uBand, inner)) * clamp((textureLod(uSeaMask, uv, 0.0).a - 0.16) * 1.8, 0.0, 1.0) : 1.0;
   if (veil <= 0.001) { outColor = vec4(0.0); return; }
-  vec2 c = clamp(uv, vec2(0.012), vec2(0.988));
+  // Explicit mip 0 everywhere: the uv mapping jumps at the canvas edge, and automatic mip selection there picked a
+  // coarser level for one pixel row, drawing a thin dark line.
+  vec2 c = clamp(uv, vec2(0.0035), vec2(0.9965));
   bool sideEdge = uv.x < 0.0 || uv.x > 1.0;
   bool capEdge = uv.y < 0.0 || uv.y > 1.0;
   vec3 acc = vec3(0.0);
   float wsum = 0.0;
   for (int i = -6; i <= 6; i++) {
-    float o = float(i) * 0.02;
-    vec4 a = sideEdge ? texture(uSea, c + vec2(0.0, o)) : texture(uSea, c + vec2(o, 0.0));
+    float o = float(i) * 0.0035;
+    vec4 a = sideEdge ? textureLod(uSea, c + vec2(0.0, o), 0.0) : textureLod(uSea, c + vec2(o, 0.0), 0.0);
     // Pixi uploads textures premultiplied: the rgb is already weighted by its alpha.
     acc += a.rgb;
     wsum += a.a;
     if (sideEdge && capEdge) {
-      vec4 b = texture(uSea, c + vec2(o, 0.0));
+      vec4 b = textureLod(uSea, c + vec2(o, 0.0), 0.0);
       acc += b.rgb;
       wsum += b.a;
     }
@@ -240,8 +242,7 @@ void main() {
   vec3 edge = wsum > 0.5 ? acc / wsum : uDeep;
   float dist = max(max(-uv.x * uWorld.x, (uv.x - 1.0) * uWorld.x), max(-uv.y * uWorld.y, (uv.y - 1.0) * uWorld.y));
   float k = smoothstep(0.0, uFade, dist);
-  // The painted sea carries the line pattern and a light wash the bare edge sample lacks: lift it to meet it.
-  vec3 col = mix(edge * 1.09 + vec3(0.012), uDeep, k);
+  vec3 col = mix(edge, uDeep, k);
   // Slow drifting darker and lighter swells, so the open water is never a flat fill.
   float swell = vnoise(w * 0.0016 + vec2(uTime * 0.01, -uTime * 0.007)) * 0.6 + vnoise(w * 0.0045 - vec2(uTime * 0.014, 0.0)) * 0.4;
   col *= 0.86 + swell * 0.26;
@@ -1097,6 +1098,8 @@ export function PixiWorldMap({
         world.position.set(-cam.panX * cam.zoom, -cam.panY * cam.zoom);
         seabedShift(cam.panX, cam.panY, visW, visH);
         camRef.current = cam;
+        // Dev only: lets a test read the camera to find where the painted canvas edges land on screen.
+        if (import.meta.env.DEV) (window as unknown as { __worldCam?: unknown }).__worldCam = { ...cam, width: canvas.width, height: canvas.height };
         syncAnchors();
       };
       const refit = () => {
