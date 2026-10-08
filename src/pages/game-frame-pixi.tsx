@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { GameFrameScreen } from './game-frame';
-import { PixiWorldMap, type PixiMapAnchor } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { PixiWorldMap, type PixiMapAnchor, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { MatericRosterComponent } from '@/ui/idleVillage/roster';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
@@ -24,7 +24,7 @@ import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceE
 // eslint-disable-next-line no-restricted-imports
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
-import type { HudEvent, HudObjective } from '@/ui/idleVillage/components/gameFrame';
+import { RegionTooltip, type HudEvent, type HudObjective } from '@/ui/idleVillage/components/gameFrame';
 
 /**
  * `/game-frame-pixi` — the /game-frame screen (same HUD, roster, instruments) on the
@@ -67,6 +67,7 @@ export default function GameFramePixiPage() {
     applySkinCssVariables(skinId);
     document.documentElement.setAttribute('data-skin-preset', skinId);
   }, [skinId]);
+  const [regionHover, setRegionHover] = useState<PixiRegionHover | null>(null);
   const [invasion, setInvasion] = useState<{ dueDay: number } | null>(null);
   // Goblin invasion, as on /world-surface: the parchment curtains close over the map, the announcement card
   // appears at the peak, and confirming it opens the curtains and puts the threat in the ledger.
@@ -227,6 +228,7 @@ export default function GameFramePixiPage() {
                   cloudShadowOffset={shadowOffset}
                   cloudSpeed={motion.cloudSpeed}
                   seabed={worldDressing.seabed}
+                  regions={{ assetBase: '/assets/world/wanderlust/base', onHover: setRegionHover }}
                   worldLayer={(canvas) => (
                     <div style={{ pointerEvents: 'auto' }}>
                       <WorldSurfaceEventCard
@@ -248,6 +250,7 @@ export default function GameFramePixiPage() {
                     </div>
                   )}
                 />
+                {regionHover && <RegionTooltip name={t(`gameFrame.regions.${regionHover.region.id}`)} x={regionHover.x} y={regionHover.y} />}
                 <WorldSurfaceEventShroud covered={shroudCovered} zIndex={6} />
               </div>
             )}

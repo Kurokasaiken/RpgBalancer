@@ -42,6 +42,20 @@ export interface PixiWorldMapEffects {
   seabed: boolean;
 }
 
+/** A territory of the id map (`scripts/bake-region-ids.py`). `center` is a fraction of the world canvas. */
+export interface PixiRegion {
+  id: string;
+  index: number;
+  center: [number, number];
+}
+
+/** What the pointer is over: the region and where the pointer is, in px relative to the map. */
+export interface PixiRegionHover {
+  region: PixiRegion;
+  x: number;
+  y: number;
+}
+
 export interface PixiWorldMapProps {
   manifestPath: string;
   hiddenLayerIds?: string[];
@@ -62,6 +76,8 @@ export interface PixiWorldMapProps {
    * speed against the camera (1 = glued to the map). Omit to keep the sea opaque.
    */
   seabed?: { opacity: number; parallax: number };
+  /** Clickable territories: hover lights one up and reports it; a click (not a drag) selects it. Off when omitted. */
+  regions?: { assetBase: string; onHover?: (hover: PixiRegionHover | null) => void; onSelect?: (region: PixiRegion) => void };
   /** Stage colour behind the map; match the sea so seams between sprites cannot show a dark line. */
   stageColor?: string;
   seaPatternConfig?: SeaPatternConfig;
@@ -214,6 +230,7 @@ export function PixiWorldMap({
   cloudShadowOffset = { x: 0, y: 0 },
   cloudSpeed = 1,
   seabed,
+  regions,
   seaPatternConfig = DEFAULT_SEA_PATTERN_CONFIG,
   coastFoamConfig = DEFAULT_COAST_FOAM_CONFIG,
   onStats,
@@ -222,6 +239,9 @@ export function PixiWorldMap({
   const { manifest, cameraConfig } = useWorldSurface(manifestPath);
   const hostRef = useRef<HTMLDivElement>(null);
   const refitRef = useRef<(() => void) | null>(null);
+  const regionsRef = useRef(regions);
+  regionsRef.current = regions;
+  const regionsOn = !!regions;
   const focusRef = useRef<((x: number, y: number) => void) | null>(null);
   const anchorLayerRef = useRef<HTMLDivElement>(null);
   const worldBoxRef = useRef<HTMLDivElement>(null);
@@ -717,6 +737,123 @@ export function PixiWorldMap({
 
       let userMoved = false;
       let drag: { x: number; y: number } | null = null;
+
+      // ── Clickable regions: one 8-bit id map, one highlight sprite per hovered territory ──
+      let cleanupRegions = () => {};
+      if (regionsOn && regionsRef.current) {
+        const base = regionsRef.current.assetBase;
+        const [meta, idTexture] = await Promise.all([
+          fetch(`${base}/regions.json`).then((r) => r.json() as Promise<{ size: [number, number]; regions: PixiRegion[] }>),
+          load(`${base}/region_ids.png`),
+        ]);
+        if (disposed) return;
+        const [mw, mh] = meta.size;
+        const idCanvas = document.createElement('canvas');
+        idCanvas.width = mw;
+        idCanvas.height = mh;
+        const idCtx = idCanvas.getContext('2d', { willReadFrequently: true });
+        const source = idTexture.source.resource as CanvasImageSource;
+        idCtx?.drawImage(source, 0, 0, mw, mh);
+        const ids = idCtx?.getImageData(0, 0, mw, mh).data;
+        const regionByIndex = new Map(meta.regions.map((r) => [r.index, r]));
+        const idAt = (wx: number, wy: number) => {
+          if (!ids || wx < 0 || wy < 0 || wx >= canvas.width || wy >= canvas.height) return 0;
+          const x = Math.floor((wx / canvas.width) * mw);
+          const y = Math.floor((wy / canvas.height) * mh);
+          return ids[(y * mw + x) * 4];
+        };
+        const highlights = new Map<number, Sprite>();
+        const highlightFor = (index: number) => {
+          let sprite = highlights.get(index);
+          if (sprite) return sprite;
+          const c = document.createElement('canvas');
+          c.width = mw;
+          c.height = mh;
+          const ctx = c.getContext('2d');
+          if (ctx && ids) {
+            const out = ctx.createImageData(mw, mh);
+            for (let y = 0; y < mh; y += 1) {
+              for (let x = 0; x < mw; x += 1) {
+                const i = y * mw + x;
+                if (ids[i * 4] !== index) continue;
+                const edge =
+                  x === 0 || y === 0 || x === mw - 1 || y === mh - 1 ||
+                  ids[(i - 1) * 4] !== index || ids[(i + 1) * 4] !== index || ids[(i - mw) * 4] !== index || ids[(i + mw) * 4] !== index;
+                out.data.set(edge ? [255, 232, 160, 235] : [255, 232, 160, 46], i * 4);
+              }
+            }
+            ctx.putImageData(out, 0, 0);
+          }
+          sprite = new Sprite(Texture.from(c));
+          sprite.width = canvas.width;
+          sprite.height = canvas.height;
+          sprite.alpha = 0;
+          sprite.visible = false;
+          world.addChild(sprite);
+          highlights.set(index, sprite);
+          return sprite;
+        };
+        let hoverIndex = 0;
+        const fade = new Map<number, number>();
+        ticks.push((_t) => {
+          for (const [index, sprite] of highlights) {
+            const want = index === hoverIndex ? 1 : 0;
+            const now = fade.get(index) ?? 0;
+            const next = now + (want - now) * 0.18;
+            fade.set(index, Math.abs(next - want) < 0.01 ? want : next);
+            sprite.alpha = fade.get(index) ?? 0;
+            sprite.visible = sprite.alpha > 0.01;
+          }
+        });
+        const el2 = app.canvas;
+        const worldPoint = (e: MouseEvent) => {
+          const r = el2.getBoundingClientRect();
+          const sx = e.clientX - r.left;
+          const sy = e.clientY - r.top;
+          return { sx, sy, wx: cam.panX + sx / cam.zoom, wy: cam.panY + sy / cam.zoom };
+        };
+        const onHoverMove = (e: MouseEvent) => {
+          const { sx, sy, wx, wy } = worldPoint(e);
+          const index = drag ? 0 : idAt(wx, wy);
+          if (index !== hoverIndex) {
+            hoverIndex = index;
+            if (index) highlightFor(index);
+          }
+          const region = regionByIndex.get(index);
+          el2.style.cursor = region ? 'pointer' : drag ? 'grabbing' : '';
+          regionsRef.current?.onHover?.(region ? { region, x: sx, y: sy } : null);
+        };
+        const onLeave = () => {
+          hoverIndex = 0;
+          regionsRef.current?.onHover?.(null);
+        };
+        let downAt: { x: number; y: number } | null = null;
+        const onDownR = (e: MouseEvent) => {
+          downAt = { x: e.clientX, y: e.clientY };
+        };
+        const onUpR = (e: MouseEvent) => {
+          const start = downAt;
+          downAt = null;
+          if (!start || Math.hypot(e.clientX - start.x, e.clientY - start.y) > 4) return;
+          const { wx, wy } = worldPoint(e);
+          const region = regionByIndex.get(idAt(wx, wy));
+          if (region) {
+            focusRef.current?.(region.center[0] * canvas.width, region.center[1] * canvas.height);
+            regionsRef.current?.onSelect?.(region);
+          }
+        };
+        el2.addEventListener('mousemove', onHoverMove);
+        el2.addEventListener('mouseleave', onLeave);
+        el2.addEventListener('mousedown', onDownR);
+        el2.addEventListener('mouseup', onUpR);
+        cleanupRegions = () => {
+          el2.removeEventListener('mousemove', onHoverMove);
+          el2.removeEventListener('mouseleave', onLeave);
+          el2.removeEventListener('mousedown', onDownR);
+          el2.removeEventListener('mouseup', onUpR);
+        };
+      }
+
       const el = app.canvas;
       const onDown = (e: MouseEvent) => {
         drag = { x: e.clientX, y: e.clientY };
@@ -753,6 +890,7 @@ export function PixiWorldMap({
       el.addEventListener('wheel', onWheel, { passive: false });
       app.renderer.on('resize', onResize);
       cleanupInput = () => {
+        cleanupRegions();
         el.removeEventListener('mousedown', onDown);
         window.removeEventListener('mousemove', onMove);
         window.removeEventListener('mouseup', onUp);
@@ -772,7 +910,7 @@ export function PixiWorldMap({
         /* init may not have finished */
       }
     };
-  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, onStats, syncAnchors]);
+  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, regionsOn, onStats, syncAnchors]);
 
   // New or moved anchors get placed before paint, not on the next camera move.
   useLayoutEffect(syncAnchors);

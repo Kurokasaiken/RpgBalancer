@@ -961,6 +961,17 @@
         "roster": "Roster",
         "events": "Events"
       }
+    },
+    "regions": {
+      "northern_forest": "Whispering Woods",
+      "southern_forest": "Hollow Wood",
+      "eastern_woods": "Eastern Groves",
+      "northern_peaks": "Northern Peaks",
+      "eastern_mountains": "Ember Highlands",
+      "southern_mountains": "Southern Crags",
+      "islands": "The Outer Isles",
+      "village": "The Village",
+      "meadows": "The Meadows"
     }
   },
   "missionPlanner": {
