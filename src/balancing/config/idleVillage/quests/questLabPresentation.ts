@@ -105,6 +105,22 @@ export const QuestLabPresentationSchema = z.object({
     })
     .prefault({}),
 
+  /** Typography scale (PLAN-024): the guide's floor is 12px — nothing the
+   *  player must read may render smaller. Sizes are numbers so components
+   *  bind them via inline style; colors stay in skin tokens. */
+  type: z
+    .object({
+      /** Micro-labels, chips, badges — the hard floor. */
+      labelPx: z.number().min(12).default(12),
+      /** Authored body / option detail lines. */
+      bodyPx: z.number().default(15),
+      /** Numerals (HP, %, counters) — tabular, slightly larger. */
+      numberPx: z.number().default(16),
+      /** Node titles / verdict headers inside a region. */
+      titlePx: z.number().default(22),
+    })
+    .prefault({}),
+
   /** Option tooltip disclosure: which stakes to show pre-click (D1). */
   tooltip: z
     .object({

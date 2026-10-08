@@ -202,6 +202,8 @@
 | src/docs/docs/design/INTERACTION_TOKENS.md                                               | candidate      | documentation, pending canonical review           |
 | src/docs/docs/design/game_feel_design_guide.md                                           | candidate      | documentation, pending canonical review           |
 | src/docs/docs/design/primitive_composition_rules.md                                      | candidate      | documentation, pending canonical review           |
+| src/docs/docs/design/hud_component_guide.md                                              | candidate      | documentation, pending canonical review           |
+| src/docs/docs/idle_village/quest_ui_component_guide.md                                   | candidate      | documentation, pending canonical review           |
 | src/docs/docs/devops/multi_app_boot_guard.md                                             | candidate      | documentation, pending canonical review           |
 | src/docs/docs/diagnostics/worker_picker.md                                               | candidate      | documentation, pending canonical review           |
 | src/docs/docs/exports/sts_card_notebook.md                                               | candidate      | documentation, pending canonical review           |
