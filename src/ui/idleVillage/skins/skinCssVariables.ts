@@ -172,21 +172,21 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-titlesep-diamond-color': 'rgba(223,184,87,0.85)',
   '--skin-titlesep-diamond-glow': '0 0 8px rgba(223,184,87,0.5)',
 
-  /* Primary CTA plaque — arcane azure-violet rare plate
-     (the "AVVIA" button) no flanking ornaments, beveled + juice */
+  /* Primary CTA plaque — teal enamel in a brass frame (the HUD's own materials: no violet, no flanking
+     ornaments), beveled + juice. Used by [data-skin="cta"] / SkinButton variant "cta". */
   '--skin-cta-bg':
-    'radial-gradient(circle at 50% 0%, rgba(120,160,255,0.16) 0%, transparent 45%) padding-box, linear-gradient(180deg, #1e1240 0%, #120a25 50%, #0b0618 100%) padding-box, linear-gradient(145deg, #5a4a9f 0%, #3a2780 25%, #1e1240 60%, #120827 100%) border-box',
-  '--skin-cta-border': '6px solid transparent',
+    'radial-gradient(circle at 50% 0%, rgba(255,240,200,0.18) 0%, transparent 52%) padding-box, linear-gradient(180deg, #2c7683 0%, #1b5360 52%, #113743 100%) padding-box, linear-gradient(180deg, #d8bd78 0%, #c2a355 40%, #a0762f 100%) border-box',
+  '--skin-cta-border': '3px solid transparent',
   '--skin-cta-clip':
     'polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px)',
   '--skin-cta-shadow':
-    '0 4px 14px rgba(0,0,0,0.7), 0 0 24px rgba(88,112,255,0.32), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -2px 4px rgba(0,0,0,0.5)',
-  '--skin-cta-color': '#d8e0ff',
-  '--skin-cta-text-shadow': '0 2px 3px rgba(0,0,0,0.95), 0 -1px 0 rgba(255,255,255,0.22)',
-  '--skin-cta-hover-filter': 'brightness(1.15) saturate(1.12) hue-rotate(4deg)',
+    '0 4px 14px rgba(0,0,0,0.6), 0 0 18px rgba(60,170,170,0.28), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -2px 4px rgba(0,0,0,0.45)',
+  '--skin-cta-color': '#f4ead0',
+  '--skin-cta-text-shadow': '0 2px 3px rgba(0,0,0,0.9), 0 -1px 0 rgba(255,255,255,0.18)',
+  '--skin-cta-hover-filter': 'brightness(1.12) saturate(1.08)',
   '--skin-cta-hover-glow':
-    '0 6px 24px rgba(0,0,0,0.55), 0 0 38px rgba(100,140,255,0.55), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 4px rgba(0,0,0,0.45)',
-  '--skin-cta-ornament-color': 'rgba(160,190,255,0.85)',
+    '0 6px 24px rgba(0,0,0,0.5), 0 0 30px rgba(240,207,106,0.4), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.4)',
+  '--skin-cta-ornament-color': 'rgba(240,207,106,0.85)',
 
   /* Text incision (Champlevé): dark cut on top, bright bevel below */
   '--skin-incision-label': '0 1px 0 rgba(0,0,0,0.85), 0 -1px 0 rgba(212,175,119,0.35)',

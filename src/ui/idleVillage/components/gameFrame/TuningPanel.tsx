@@ -66,7 +66,7 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
             onChange={(event) => setDraft((d) => ({ ...d, [field.id]: Number(event.target.value) }))}
             onPointerUp={(event) => commit(field, Number(event.currentTarget.value))}
             onKeyUp={(event) => commit(field, Number(event.currentTarget.value))}
-            style={{ gridColumn: '1 / -1', width: '100%' }}
+            style={{ gridColumn: '1 / -1', width: '100%', accentColor: 'var(--skin-title-color)' }}
           />
         </label>
       ))}
