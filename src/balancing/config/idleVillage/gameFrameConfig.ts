@@ -401,7 +401,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     grade: 'graded',
     stageColor: '#489397',
     motion: { cloudShadowOpacity: 0.42, cloudShadowOffsetX: 90, cloudShadowOffsetY: 140, cloudSpeed: 4, seaMotionAmount: 34, seaMotionPeriod: 7, seaLineOpacity: 0.26, foamStrength: 0.7, foamCrestSpeed: 30 },
-    seabed: { opacity: 0.4, parallax: 0.86 },
+    seabed: { opacity: 0.55, parallax: 0.8 },
     hiddenLayerIds: ['frame', 'border'],
     showAtmosphere: false,
     showSeaMarks: true,
