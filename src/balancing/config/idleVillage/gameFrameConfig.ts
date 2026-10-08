@@ -418,8 +418,9 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
       // Fixed chrome. Top: resources plaque 79 px + 8. Bottom: nav plinth 77 px + 23 (islands sit just above the nav).
       // /game adds the open roster / ledger widths left and right, so the land is framed between them.
       insets: { top: 87, bottom: 100 },
-      seaMarginPx: 260,
-      seaMarginYPx: 300,
+      // Mirrored sea all round: room to zoom out until the island sits between the open side panels.
+      seaMarginPx: 700,
+      seaMarginYPx: 400,
     },
     showCoastFoam: true,
     showGlass: false,
