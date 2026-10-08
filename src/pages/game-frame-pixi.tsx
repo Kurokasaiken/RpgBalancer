@@ -24,6 +24,7 @@ import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceE
 // eslint-disable-next-line no-restricted-imports
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
+import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { MapDemoPoi, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type HudObjective, type TuningField } from '@/ui/idleVillage/components/gameFrame';
 
@@ -42,12 +43,33 @@ import { MapDemoPoi, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, ty
  */
 /** Days the player has between the announcement and the goblin host reaching the village. */
 const INVASION_WARNING_DAYS = 5;
+const TUNING_KEY = 'hud_tuning_v1';
 
 export default function GameFramePixiPage() {
   const { worldDressing, questPois, debug, roster, questDetail, insets } = DEFAULT_GAME_FRAME_CONFIG;
   const safeFit = worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined;
   // Dev tuning (Tuning panel): overrides on top of the config, applied when a slider is released.
   const [tuned, setTuned] = useState<Record<string, number>>({});
+  // Tuning survives reloads: every change is saved at once, and the Save button saves (and copies the values) on demand.
+  const bandNow = useHudBandPx();
+  const [tuningLoaded, setTuningLoaded] = useState(false);
+  const [tuningSaved, setTuningSaved] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    loadData<{ tuned?: Record<string, number>; band?: number }>(TUNING_KEY, {}).then((stored) => {
+      if (cancelled) return;
+      if (stored.tuned) setTuned(stored.tuned);
+      if (typeof stored.band === 'number') setHudBandPx(stored.band);
+      setTuningLoaded(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  useEffect(() => {
+    if (!tuningLoaded) return;
+    void saveData(TUNING_KEY, { tuned, band: bandNow });
+  }, [tuned, bandNow, tuningLoaded]);
   const motion = useMemo(() => {
     const m = worldDressing.motion;
     const pick = (key: keyof typeof m) => tuned[key] ?? m[key];
@@ -57,7 +79,7 @@ export default function GameFramePixiPage() {
     () => (worldDressing.seabed ? { opacity: tuned.seabedOpacity ?? worldDressing.seabed.opacity, parallax: tuned.seabedParallax ?? worldDressing.seabed.parallax } : undefined),
     [worldDressing.seabed, tuned],
   );
-  const bandPx = useHudBandPx();
+  const bandPx = bandNow;
   const tuningFields = useMemo<TuningField[]>(
     () => [
       { id: 'plaqueBand', label: 'Plaque gold band (px)', value: bandPx, min: 1, max: 6, step: 0.5 },
@@ -256,6 +278,13 @@ export default function GameFramePixiPage() {
                     onReset={() => {
                       setTuned({});
                       setHudBandPx(DEFAULT_HUD_BAND_PX);
+                    }}
+                    saved={tuningSaved}
+                    onSave={() => {
+                      void saveData(TUNING_KEY, { tuned, band: bandNow });
+                      void navigator.clipboard?.writeText(tuningFields.map((field) => `${field.id}: ${field.value}`).join(', '));
+                      setTuningSaved(true);
+                      window.setTimeout(() => setTuningSaved(false), 1800);
                     }}
                     onClose={() => panels.set('tuning', false)}
                   />
