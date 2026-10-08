@@ -18,3 +18,4 @@ export {
   type StatBarVariant as MaterialStatBarVariant,
   type StatBarSize as MaterialStatBarSize,
 } from '@/ui/wanderlust-surface/layout/WanderlustStatBar';
+export { setHudBandPx, useHudBandPx, DEFAULT_HUD_BAND_PX } from './hudBand';

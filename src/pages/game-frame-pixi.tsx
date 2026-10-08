@@ -24,6 +24,7 @@ import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceE
 // eslint-disable-next-line no-restricted-imports
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
+import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { MapDemoPoi, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type HudObjective, type TuningField } from '@/ui/idleVillage/components/gameFrame';
 
 /**
@@ -56,8 +57,10 @@ export default function GameFramePixiPage() {
     () => (worldDressing.seabed ? { opacity: tuned.seabedOpacity ?? worldDressing.seabed.opacity, parallax: tuned.seabedParallax ?? worldDressing.seabed.parallax } : undefined),
     [worldDressing.seabed, tuned],
   );
+  const bandPx = useHudBandPx();
   const tuningFields = useMemo<TuningField[]>(
     () => [
+      { id: 'plaqueBand', label: 'Plaque gold band (px)', value: bandPx, min: 1, max: 6, step: 0.5 },
       { id: 'cloudShadowOpacity', label: 'Cloud shadow opacity', value: motion.cloudShadowOpacity, min: 0, max: 1, step: 0.02 },
       { id: 'cloudShadowOffsetX', label: 'Shadow offset X', value: motion.cloudShadowOffsetX, min: 0, max: 300, step: 10 },
       { id: 'cloudShadowOffsetY', label: 'Shadow offset Y', value: motion.cloudShadowOffsetY, min: 0, max: 300, step: 10 },
@@ -68,7 +71,7 @@ export default function GameFramePixiPage() {
       { id: 'seabedOpacity', label: 'Seabed opacity', value: seabed?.opacity ?? 0, min: 0, max: 1, step: 0.05 },
       { id: 'seabedParallax', label: 'Seabed parallax (1 = glued)', value: seabed?.parallax ?? 1, min: 0.5, max: 1, step: 0.02 },
     ],
-    [motion, seabed],
+    [motion, seabed, bandPx],
   );
   const shadowOffset = useMemo(() => ({ x: motion.cloudShadowOffsetX, y: motion.cloudShadowOffsetY }), [motion]);
   const seaPatternConfig = useMemo(
@@ -249,8 +252,11 @@ export default function GameFramePixiPage() {
                 {directorEnabled && panels.visible.tuning && (
                   <TuningPanel
                     fields={tuningFields}
-                    onCommit={(id, value) => setTuned((current) => ({ ...current, [id]: value }))}
-                    onReset={() => setTuned({})}
+                    onCommit={(id, value) => (id === 'plaqueBand' ? setHudBandPx(value) : setTuned((current) => ({ ...current, [id]: value })))}
+                    onReset={() => {
+                      setTuned({});
+                      setHudBandPx(DEFAULT_HUD_BAND_PX);
+                    }}
                     onClose={() => panels.set('tuning', false)}
                   />
                 )}
