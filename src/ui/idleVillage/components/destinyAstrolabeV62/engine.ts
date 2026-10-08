@@ -18,6 +18,8 @@ export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number;
   /** Host-resolved harm to mirror on the card — when a forced `mode` is active
       the astrolabe must represent the host's outcome, never re-roll it. */
   harm?: 'none'|'wound'|'death';
+  /** Global pace multiplier (PLAN-023): scales every beat duration. Default 1. */
+  speed?: number;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
@@ -34,6 +36,8 @@ export interface AstrolabeEngineHandle {
   roll: () => void;
   /** start the spin (TIRA). Warps past any still-playing reveal. */
   throw: () => void;
+  /** presentation-only skip: settles the frame and resolves immediately. */
+  skipToResult: () => void;
   setConfig: (skills: AstrolabeSkill[], config?: AstrolabeConfig) => void;
   destroy: () => void;
 }
@@ -426,6 +430,10 @@ function setState(s){
   if(s==='threat-slam'){ resetDrops(scene.t0); }
 }
 function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
+/* One speed factor scales EVERY beat (PLAN-023 pace control — the timeline
+   never invents per-segment durations). `cfg.speed` defaults to 1. */
+const SPD=()=>Math.max(0.25,cfg.speed||1);
+const phaseTS=(durMs)=>phaseT(durMs/SPD());
 const easeOutCubic=t=>1-Math.pow(1-t,3);
 const easeInCubic=t=>t*t*t;
 /* LE TRE FORME, E LE SOGLIE NON SONO INVENTATE.
@@ -516,13 +524,13 @@ function tickTimeline(){
   if(s==='idle') return;
 
   if(s==='ring-lock'){
-    const p=phaseT(RING_MS);
+    const p=phaseTS(RING_MS);
     scene.ringReveal=clamp(p/0.68,0,1);     // ring fades/locks into being
     scene.ringShaken=true;                  // V6: nessuno shake per la ghiera rimossa
     if(p>=1){ scene.ringReveal=1; setState('threat-slam'); }
   }
   else if(s==='threat-slam'){
-    const p=phaseT(cfg.tSlam);
+    const p=phaseTS(cfg.tSlam);
     /* V6.2 tar seed: no central pool yet — seed drops fall from above and
        merge while the black obelisks slam. The main rim stays at 0. */
     scene.gooReveal=0;
@@ -542,7 +550,7 @@ function tickTimeline(){
     /* V6.2 TAR POUR — the seeded pool spreads outward like a slow colata.
        Curve: S-curve (smoothstep) from seed to full, so the mass is readable
        at every stage and never snaps like water. */
-    const p=phaseT(GOO_MS);
+    const p=phaseTS(GOO_MS);
     scene.gooReveal=tarPour(p);
     /* Calm swell in the middle of the pour: the mass pushes, then settles. */
     const swell=0.24*(1-Math.abs(2*p-1));
@@ -556,10 +564,10 @@ function tickTimeline(){
   else if(s==='axis-read'){
     /* BEAT DI LETTURA — la difficoltà è posata e misurabile, niente si muove.
        È l'unico momento in cui il giocatore può leggere i 5 assi da soli. */
-    if(phaseT(AXIS_READ_MS)>=1) setState('agency-burst');
+    if(phaseTS(AXIS_READ_MS)>=1) setState('agency-burst');
   }
   else if(s==='agency-burst'){
-    const p=phaseT(cfg.tBurst);
+    const p=phaseTS(cfg.tBurst);
     /* Pillars drop first (compressed into first 65% of phase) */
     scene.whitePillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.07))/0.26,0,1);
@@ -580,7 +588,7 @@ function tickTimeline(){
     }
   }
   else if(s==='risk-pour'){
-    const p=phaseT(cfg.tPour);
+    const p=phaseTS(cfg.tPour);
     /* Dopo che la clip del fiore e' terminata, obelischi e scala scompaiono. */
     scene.whitePillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.05))/0.75,0,1);
@@ -619,7 +627,7 @@ function tickTimeline(){
        button is already armed; the spin will not start on its own. */
   }
   else if(s==='the-spin'){
-    const p=phaseT(cfg.tSpin);
+    const p=phaseTS(cfg.tSpin);
     stepBall(p);
     /* when ball effectively stops, go into the magnetic snap — the ball
        lands visibly on its verdict point before the card shows */
@@ -644,7 +652,7 @@ function tickTimeline(){
       addSpark(b.x,b.y); shake('shake-low');
     }
     const HOLD_MS=900;
-    if((scene.snapped&&now-scene.snapMs>=HOLD_MS)||phaseT(cfg.tSnap+HOLD_MS)>=1){
+    if((scene.snapped&&now-scene.snapMs>=HOLD_MS/SPD())||phaseTS(cfg.tSnap+HOLD_MS)>=1){
       scene.snapped=false; resolve();
     }
   }
@@ -2083,5 +2091,23 @@ updateMathPanel();
     window.removeEventListener('keydown', onKeydown);
     gooRenderer?.destroy();
   }
-  return { roll: launchRoll, throw: throwBall, setConfig, destroy };
+  /* SKIP TO RESULT (PLAN-023): the verdict is already forced by the host, so
+     skipping is presentation-only. From ANY point in the choreography this
+     completes the reveal (same warp vocabulary as throwBall), parks the ball
+     on the honest target and resolves — one click, one settled frame. */
+  function skipToResult(){
+    const s=scene.state;
+    if(s==='idle'||s==='resolution') return;
+    scene.ringReveal=1; scene.gooReveal=1; scene.starScale=1; scene.pourP=1;
+    scene.streamAlpha=0.34; scene.axisAlpha=0; scene.gooFullMs=performance.now();
+    scene.tideP=1; scene.tideWave=0;
+    scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=0; pl.landed=true; });
+    armed=false; emitArmed(false);
+    scene.ball.on=true;
+    if(!scene.targetPos) scene.targetPos=honestTargetPos(computeTargetPos());
+    if(scene.targetPos){ scene.ball.x=scene.targetPos.x; scene.ball.y=scene.targetPos.y; }
+    scene.ball.vx=0; scene.ball.vy=0; scene.ball.trail.length=0;
+    resolve();
+  }
+  return { roll: launchRoll, throw: throwBall, setConfig, destroy, skipToResult };
 }

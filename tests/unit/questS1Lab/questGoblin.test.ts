@@ -10,6 +10,7 @@ import {
   clampSuccessBound,
   consumableFutureChecks,
   createRun,
+  currentExposure,
   groupScore,
   nodesFor,
   positionalWeights,
@@ -287,5 +288,78 @@ describe('upfrontDamage toll preview (R-097 UI honesty)', () => {
     const a = analyzeCheck(run, checkNode, { useConsumable: false });
     const kranOdds = a.perMember.find((m) => m.name === 'Kran')!;
     expect(kranOdds.deathPct).toBeGreaterThanOrEqual(80);
+  });
+});
+
+describe('presentation contract (PLAN-023 T-001)', () => {
+  it('every queued check carries a unique chk-N id', () => {
+    let run = createRun('gob-band', 1, 'goblin');
+    const ids = new Set<string>();
+    for (let i = 0; i < 30 && !run.ended; i += 1) {
+      run = pick(run, 'x');
+      for (const c of run.checkQueue) {
+        expect(c.id).toMatch(/^chk-\d+$/);
+        expect(ids.has(c.id)).toBe(false);
+        ids.add(c.id);
+      }
+    }
+    expect(ids.size).toBeGreaterThan(0);
+  });
+
+  it('the F5 toll lands as a structured HarmEvent on the check (hpBefore→hpAfter)', () => {
+    let run = createRun('gob-band', 1, 'goblin');
+    run = playUntil(run, 'gob-incalzare');
+    run = pick(run, 'insegui');
+    const check = run.checkQueue.find((c) => c.id) ?? run.lastCheck;
+    expect(check?.harms.length).toBeGreaterThan(0);
+    const harm = check!.harms[0];
+    expect(['harm', 'death']).toContain(harm.kind);
+    expect(harm.hpBefore - harm.hpAfter).toBe(harm.amount);
+    expect([10, 20]).toContain(harm.amount); // authored toll / epicfail toll
+    const member = run.party.find((m) => m.id === harm.memberId);
+    expect(member).toBeDefined();
+  });
+
+  it('exposure snapshot maps memberId → chance-per-hit and sums to 100', () => {
+    const run = createRun('gob-band', 1, 'goblin');
+    const exp = currentExposure(run);
+    const vals = run.party.filter((m) => !m.dead).map((m) => exp[m.id] ?? -1);
+    expect(vals.every((v) => v >= 0)).toBe(true);
+    expect(vals.reduce((a, b) => a + b, 0)).toBe(100);
+    // Base profile: last living slot carries the 80% rear exposure.
+    const alive = run.party.filter((m) => !m.dead);
+    expect(exp[alive[alive.length - 1].id]).toBe(80);
+  });
+
+  it('combat turns attach kills + harms to the resolution', () => {
+    let run = createRun('gob-band', 7, 'goblin');
+    run = playUntil(run, 'gob-combattimento');
+    run = applyChoice(run, 'fight-turn');
+    const c = run.checkQueue[0];
+    expect(c).toBeDefined();
+    expect(c.id).toMatch(/^chk-/);
+    expect(c.exposure && Object.keys(c.exposure).length).toBeGreaterThan(0);
+    // one counterattack hit at turn 1 → exactly one harm event
+    expect(c.harms.length).toBe(1);
+    expect(c.harms[0].amount).toBe(12); // gob-combattimento hitDamage
+  });
+
+  it('ambush flat damage surfaces as ambient recentHarms, not on a check', () => {
+    let run = createRun('gob-band', 3, 'goblin');
+    run = playUntil(run, 'gob-incalzare');
+    run = pick(run, 'lascia'); // flee → heavy ambush at F7
+    run = playUntil(run, 'gob-agguato-scelta', 10);
+    // The ambush harm node fired during the last action with no check owning it.
+    expect(run.recentHarms.length).toBeGreaterThan(0);
+    expect(run.recentHarms.every((h) => h.amount > 0)).toBe(true);
+  });
+
+  it('authoredText never repeats the harm lines', () => {
+    let run = createRun('gob-band', 1, 'goblin');
+    run = playUntil(run, 'gob-incalzare');
+    run = pick(run, 'insegui');
+    const c = run.checkQueue[0];
+    expect(c.harmLines.every((l) => !c.authoredText.includes(l))).toBe(true);
+    expect(c.outcomeText).toContain(c.harmLines.join(' '));
   });
 });
