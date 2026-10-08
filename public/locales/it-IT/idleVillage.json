@@ -874,7 +874,8 @@
       "ariaLabel": "Velocità simulazione",
       "pause": "Pausa",
       "resume": "Riprendi",
-      "paused": "In pausa"
+      "paused": "In pausa",
+      "spaceKey": "Spazio"
     },
     "compass": {
       "recenter": "Ricentra la mappa"
