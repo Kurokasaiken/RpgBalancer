@@ -6,6 +6,7 @@ import {
   Graphics,
   Mesh,
   MeshGeometry,
+  MeshPlane,
   Rectangle,
   Shader,
   Sprite,
@@ -74,6 +75,8 @@ export interface PixiMapTune {
   wonderEveryS: number;
   /** How far (world px) the painted sea's edge colour holds before sinking into deep water. */
   deepSeaFadePx: number;
+  /** How far (world px) the forest canopies sway in the wind; 0 keeps them still. */
+  forestSway: number;
   /** Seconds a territory must be hovered before it lights up and shows its name. */
   regionHoverDelayS: number;
   /** No two waves or sea marks play closer than this (world px). */
@@ -86,6 +89,7 @@ export const DEFAULT_MAP_TUNE: PixiMapTune = {
   smokeAmount: 1,
   wonderEveryS: 18,
   deepSeaFadePx: 650,
+  forestSway: 2.5,
   regionHoverDelayS: 1,
   markSpacingPx: 900,
 };
@@ -460,11 +464,37 @@ export function PixiWorldMap({
       /** The painted sea and the deep sea around it: the see-through reveal thins them out as one. */
       const seaSprites: Container[] = [];
       let seaTexture: Texture | null = null;
+      const canopySway: { positions: Float32Array; orig: Float32Array; buffer: { update: () => void }; scale: number; phase: number }[] = [];
+      // The forest canopies, cut from the same base they sway over (see scripts/build-canopy.py): a mesh whose vertices
+      // roll in a slow wave, so the crowns breathe with the wind. The base underneath has no canopy to double up with.
+      const addCanopies = async (variant: string) => {
+        const layered = (await fetch('/assets/world/wanderlust/base/manifest.json').then((r) => r.json())) as {
+          surfaceLayers: { id: string; file: string; rect?: { x: number; y: number; width: number; height: number; sourceWidth: number; sourceHeight: number } }[];
+        };
+        for (const l of layered.surfaceLayers) {
+          if (!l.rect || !/forest|trees/.test(l.id)) continue;
+          const stem = l.file.replace('.webp', '');
+          const tex = await load(layerUrl(manifest.world, `${stem}.canopy${variant}.webp`));
+          if (disposed) return;
+          const r = l.rect;
+          const colsX = Math.max(6, Math.round(tex.width / 28));
+          const rowsY = Math.max(5, Math.round(tex.height / 28));
+          const mesh = new MeshPlane({ texture: tex, verticesX: colsX, verticesY: rowsY });
+          mesh.position.set((r.x / r.sourceWidth) * canvas.width, (r.y / r.sourceHeight) * canvas.height);
+          const scale = ((r.width / r.sourceWidth) * canvas.width) / tex.width;
+          mesh.scale.set(scale, ((r.height / r.sourceHeight) * canvas.height) / tex.height);
+          world.addChild(mesh);
+          const positions = mesh.geometry.positions;
+          canopySway.push({ positions, orig: Float32Array.from(positions), buffer: mesh.geometry.getBuffer('aPosition'), scale, phase: canopySway.length * 1.7 });
+        }
+      };
       const layers = manifest.surfaceLayers
         .filter((l) => (l.opacity ?? 1) > 0 && !hidden.has(l.id) && !l.id.startsWith('event_shroud_'))
         .sort((a, b) => a.zIndex - b.zIndex);
+      const canopyOn = fxOn.landLife && !reducedMotion && tn.forestSway > 0;
       for (const layer of layers) {
-        const texture = await load(layerUrl(manifest.world, layer.file));
+        const swapBase = canopyOn && layer.id === 'base_flat';
+        const texture = await load(layerUrl(manifest.world, swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file));
         if (disposed) return;
         const place = (sprite: Sprite) => {
           const rect = layer.rect;
@@ -486,10 +516,26 @@ export function PixiWorldMap({
           seaSprites.push(sprite);
           seaTexture = texture;
         }
+        if (swapBase) await addCanopies(layer.file.includes('.graded') ? '.graded' : '');
       }
 
       const ticks: ((seconds: number) => void)[] = [];
       const bandLayers: { layer: Container; parallax: number }[] = [];
+      ticks.push((t) => {
+        for (const c of canopySway) {
+          const amp = tn.forestSway / c.scale;
+          const { positions: pos, orig } = c;
+          for (let i = 0; i < pos.length; i += 2) {
+            const x = orig[i];
+            const y = orig[i + 1];
+            // A slow wave of wind rolling over the crowns, with a quicker flutter riding on it.
+            const wave = Math.sin(t * 0.8 + x * 0.014 + y * 0.01 + c.phase) + 0.45 * Math.sin(t * 1.9 + x * 0.05 - y * 0.04 + c.phase * 2);
+            pos[i] = x + amp * wave * 0.6;
+            pos[i + 1] = y + amp * Math.cos(t * 0.7 + x * 0.011 - y * 0.012 + c.phase) * 0.35;
+          }
+          c.buffer.update();
+        }
+      });
       // Clouds (and their shadows) cross the whole mirrored world, entering and leaving beyond what the camera can
       // show: they never pop into view half-formed at the edge of the screen.
       const cloudX = (p: number, w: number) => -margin - w - CLOUD_ENTRY_PAD_PX + p * (canvas.width + 2 * margin + 2 * w + 2 * CLOUD_ENTRY_PAD_PX);
