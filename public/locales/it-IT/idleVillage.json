@@ -906,7 +906,8 @@
         "construction": "Cantiere",
         "harvest": "Raccolto",
         "visit": "Visita",
-        "other": "Altro"
+        "other": "Altro",
+        "quest": "Missione"
       },
       "fixtures": {
         "invasion": "L'orda goblin raggiunge il villaggio",

@@ -110,8 +110,6 @@ export interface PixiMapAnchor {
   node: ReactNode;
 }
 
-/** World px a mirrored sea sprite overlaps its original (> 1 screen px at the lowest zoom). */
-const MIRROR_OVERLAP_PX = 6;
 
 const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true };
 
@@ -160,6 +158,60 @@ void main() {
 }
 `;
 
+
+// The sea beyond the painted canvas: the painted sea's own edge colour (blurred along the edge, so no streaks),
+// sinking into a deeper teal and a soft fog the further out it goes. No second copy of the map, no mirrored land.
+const DEEP_SEA_FRAG = `#version 300 es
+precision highp float;
+in vec2 vUV;
+out vec4 outColor;
+uniform sampler2D uSea;
+uniform vec4 uExt;
+uniform vec2 uWorld;
+uniform vec3 uDeep;
+uniform vec3 uFog;
+uniform float uFade;
+uniform float uTime;
+float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+void main() {
+  vec2 w = uExt.xy + vUV * uExt.zw;
+  vec2 uv = w / uWorld;
+  if (uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) { outColor = vec4(0.0); return; }
+  vec2 c = clamp(uv, vec2(0.003), vec2(0.997));
+  bool sideEdge = uv.x < 0.0 || uv.x > 1.0;
+  bool capEdge = uv.y < 0.0 || uv.y > 1.0;
+  vec3 acc = vec3(0.0);
+  float wsum = 0.0;
+  for (int i = -6; i <= 6; i++) {
+    float o = float(i) * 0.02;
+    vec4 a = sideEdge ? texture(uSea, c + vec2(0.0, o)) : texture(uSea, c + vec2(o, 0.0));
+    acc += a.rgb * a.a;
+    wsum += a.a;
+    if (sideEdge && capEdge) {
+      vec4 b = texture(uSea, c + vec2(o, 0.0));
+      acc += b.rgb * b.a;
+      wsum += b.a;
+    }
+  }
+  vec3 edge = wsum > 0.5 ? acc / wsum : uDeep;
+  float dist = max(max(-uv.x * uWorld.x, (uv.x - 1.0) * uWorld.x), max(-uv.y * uWorld.y, (uv.y - 1.0) * uWorld.y));
+  float k = smoothstep(0.0, uFade, dist);
+  // The painted sea carries the line pattern and a light wash the bare edge sample lacks: lift it to meet it.
+  vec3 col = mix(edge * 1.09 + vec3(0.012), uDeep, k);
+  // Slow drifting darker and lighter swells, so the open water is never a flat fill.
+  float swell = vnoise(w * 0.0016 + vec2(uTime * 0.01, -uTime * 0.007)) * 0.6 + vnoise(w * 0.0045 - vec2(uTime * 0.014, 0.0)) * 0.4;
+  col *= 0.86 + swell * 0.26;
+  // Fog of the unexplored: the far edge of the world fades toward the page colour.
+  col = mix(col, uFog, smoothstep(uFade * 0.8, uFade * 2.6, dist) * 0.55);
+  outColor = vec4(col, 1.0);
+}
+`;
+
 // Same math as WorldSurfaceCoastFoam (crests run in and dissolve before the shore).
 const COAST_FOAM_FRAG = `#version 300 es
 precision highp float;
@@ -198,6 +250,10 @@ void main() {
 
 /** Extra distance past the sea margin where a cloud starts and ends its crossing. */
 const CLOUD_ENTRY_PAD_PX = 200;
+/** Open water past the painted sea: its deep colour, the fog of the unexplored, and how far (world px) the edge colour holds. */
+const DEEP_SEA_COLOR = '#215c70';
+const DEEP_SEA_FOG = '#16394a';
+const DEEP_SEA_FADE_PX = 650;
 /** Pointer dwell before a territory lights up and shows its name. */
 const REGION_HOVER_DELAY_MS = 1000;
 /** No two waves or sea marks play at the same time closer than this (world px). */
@@ -345,8 +401,9 @@ export function PixiWorldMap({
       app.stage.addChild(world);
 
       // ── Base layers (+ mirrored sea margins for the base and sea layers) ──
-      /** The painted sea and its mirrors: the see-through reveal thins them out. */
-      const seaSprites: Sprite[] = [];
+      /** The painted sea and the deep sea around it: the see-through reveal thins them out as one. */
+      const seaSprites: Container[] = [];
+      let seaTexture: Texture | null = null;
       const layers = manifest.surfaceLayers
         .filter((l) => (l.opacity ?? 1) > 0 && !hidden.has(l.id) && !l.id.startsWith('event_shroud_'))
         .sort((a, b) => a.zIndex - b.zIndex);
@@ -369,30 +426,9 @@ export function PixiWorldMap({
         const sprite = new Sprite(texture);
         place(sprite);
         world.addChild(sprite);
-        if (layer.id === 'sea') seaSprites.push(sprite);
-        const isMirrorable = !layer.rect && (layer.id === 'base_flat' || layer.id === 'background' || layer.id === 'sea');
-        if (isMirrorable && (margin > 0 || marginY > 0)) {
-          // Mirrors reuse the same texture (no extra GPU memory) and overlap the original by more than
-          // a screen pixel: butted edges leave the boundary pixel half-covered by each sprite, and the
-          // stage shows through as a dark line.
-          for (const xi of margin > 0 ? [-1, 0, 1] : [0]) {
-            for (const yi of marginY > 0 && layer.id === 'sea' ? [-1, 0, 1] : [0]) {
-              if (xi === 0 && yi === 0) continue;
-              if (yi !== 0 && layer.id !== 'sea') continue;
-              const mirror = new Sprite(texture);
-              place(mirror);
-              if (xi !== 0) {
-                mirror.scale.x *= -1;
-                mirror.x = xi < 0 ? MIRROR_OVERLAP_PX : canvas.width * 2 - MIRROR_OVERLAP_PX;
-              }
-              if (yi !== 0) {
-                mirror.scale.y *= -1;
-                mirror.y = yi < 0 ? MIRROR_OVERLAP_PX : canvas.height * 2 - MIRROR_OVERLAP_PX;
-              }
-              world.addChild(mirror);
-              if (layer.id === 'sea') seaSprites.push(mirror);
-            }
-          }
+        if (layer.id === 'sea') {
+          seaSprites.push(sprite);
+          seaTexture = texture;
         }
       }
 
@@ -400,6 +436,37 @@ export function PixiWorldMap({
       // Clouds (and their shadows) cross the whole mirrored world, entering and leaving beyond what the camera can
       // show: they never pop into view half-formed at the edge of the screen.
       const cloudX = (p: number, w: number) => -margin - w - CLOUD_ENTRY_PAD_PX + p * (canvas.width + 2 * margin + 2 * w + 2 * CLOUD_ENTRY_PAD_PX);
+
+      // ── Deep sea around the painted canvas (replaces the mirrored copies of the map) ──
+      if (seaTexture && (margin > 0 || marginY > 0)) {
+        const edge = seaTexture as Texture;
+        edge.source.style.addressMode = 'clamp-to-edge';
+        const extX = -margin;
+        const extY = -marginY;
+        const extW = canvas.width + 2 * margin;
+        const extH = canvas.height + 2 * marginY;
+        const shader = Shader.from({
+          gl: { vertex: VERT, fragment: DEEP_SEA_FRAG },
+          resources: {
+            uSea: edge.source,
+            u: {
+              uExt: { value: new Float32Array([extX, extY, extW, extH]), type: 'vec4<f32>' },
+              uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
+              uDeep: { value: hexToRgb01(DEEP_SEA_COLOR), type: 'vec3<f32>' },
+              uFog: { value: hexToRgb01(DEEP_SEA_FOG), type: 'vec3<f32>' },
+              uFade: { value: DEEP_SEA_FADE_PX, type: 'f32' },
+              uTime: { value: 0, type: 'f32' },
+            },
+          },
+        });
+        const deepSea = new Mesh({ geometry: quad(extW, extH), shader });
+        deepSea.position.set(extX, extY);
+        world.addChild(deepSea);
+        seaSprites.push(deepSea);
+        ticks.push((t) => {
+          shader.resources.u.uniforms.uTime = reducedMotion ? 0 : t;
+        });
+      }
 
       // ── See-through sea: a seabed under the painted water, shown only while the map is dragged ──
       // Absorption-style look: the water thins out over a light, sandy floor (so it reads as clear water, not
