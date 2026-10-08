@@ -1096,6 +1096,10 @@
       "exhausted": "Esausto",
       "away": "Fuori",
       "assigned": "Assegnato"
+    },
+    "stats": {
+      "hp": "Salute",
+      "stamina": "Resistenza"
     }
   },
   "questCheckpoint": {
