@@ -20,6 +20,7 @@ const STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/HudPanelsMenu.tsx',
   'src/ui/idleVillage/components/gameFrame/WhenWhereCluster.tsx',
   'src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx',
+  'src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx',
   // PLAN-024 — Quest S1 Lab HUD (full-page action screens, same material).
   'src/ui/idleVillage/questS1Lab/hud/atoms.tsx',
   'src/ui/idleVillage/questS1Lab/hud/ActionZone.tsx',

@@ -1,8 +1,8 @@
 ---
 title: Quest Gameplay Science — what research says makes a quest worth playing
 type: reference
-updated: 2026-10-03 (batch 3 + live playtest evidence, seed 1983)
-tags: quest design psychology suspense failure choices research
+updated: 2026-10-06 (batch 4: emergent narrative / memory / authoring economics, R-090)
+tags: quest design psychology suspense failure choices research emergent-narrative
 ---
 
 # Quest Gameplay Science
@@ -176,6 +176,113 @@ DECISION → SECURE / LOSE`.
   ambiguous and risky prospects activate different circuitry —
   "unknown odds" and "known odds" are different experiences; choose
   per-check which one you're selling.
+
+## Principles added by emergent-narrative batch (P48–P63, 2026-10-06)
+
+Batch: own web research + broadcast to 4 web providers (chatgpt, grok,
+deepseek usable; claude failed; gemini soft-refused). Raw material:
+`.mw/runs/20261006-emergent-narrative-research/` (prompt + BROADCAST.md)
+— R-090. Driver: toward S5 — emergent narrative from *recombination of
+authored pieces + persistent memory*, not generated prose.
+Headline: **the quest generator should generate narrative conditions,
+not stories** — `events + world state + party state + character history
++ scheduling → next relevant event → new memory → future eligibility`.
+
+- **P48 — Emergence = recombination × memory × scheduling.** Shipped
+  emergent-narrative games do not write stories: they create conditions
+  from which players extract stories (RimWorld "story generator";
+  Dwarf Fortress history; Wildermyth hooks). The generator's job is
+  selecting *which* authored piece fits *now*, not inventing prose.
+- **P49 — Memory ≠ log; memory = future narrative affordance.** Record
+  only events that can alter a future decision, option, or text
+  (`hero.wounded_by_X`, `village.knows_ruin`, `party.failed_relic`).
+  `quest_17_completed_at_t` with no reader is dead data. Dwarf Fortress
+  shows the failure mode of exhaustive memory: the hard problem becomes
+  *salience*, not storage. 10 reusable memories > 1000 unread ones.
+- **P50 — Anchor memory to named characters, not world flags.**
+  "Marta discovered X" is narratively fertile (she can be recalled,
+  wounded, promoted, sent back); "the party discovered X" is a flag.
+  Wildermyth's entire system hangs on per-hero History → Aspects →
+  Hooks. RimWorld keeps the roster ~12 so the player holds a history
+  per person; kinship/relationship *labels* do the emotional work with
+  children's-book simplicity.
+- **P51 — Apophenia does the work; feed it causal readability, not
+  complexity.** Players extract more story than mechanics contain
+  (Sylvester, RPS 2016). The fuel is *legible* interlocking systems —
+  when things explode you can trace the causal chain — not a bigger
+  event table. "Systems you can reason about" > "many random events".
+- **P52 — Perceived agency ≈ acknowledged, foreseen choice — not
+  branch count.** Fendt et al. 2012: a linear story that explicitly
+  acknowledges player choices produced agency reports comparable to a
+  branching one. Cardona-Rivera & Robertson 2014 (n=88): agency rises
+  when options foreseeably lead to *meaningfully different* states.
+  Cost asymmetry: acknowledging a choice is cheap; branching it is not.
+- **P53 — The illusion dies when the template becomes visible.**
+  Recognizable skeletons ("travel → choice → check → loot → return")
+  turn narrative into optimization ("get steel → build killbox →
+  quit"). Mitigation: vary *causes and consequences* more than
+  structure; inter-system dependencies (who, where, what state) over
+  event count. The repetition problem is cause-recognition, not
+  shape-recognition. (Compounds the E-47 Wildermyth warning.)
+- **P54 — Callback payoff = spacing × rarity × relevance.** Wildermyth
+  hard-caps hooks (≈1 resolved per hero per campaign, gated on
+  relationship level). Telltale is the negative lesson: "X will
+  remember that" advertises memory before paying it — a promised
+  consequence that never lands destroys trust worse than no memory
+  (Koenitz et al. 2018; Monchan 2017). Don't announce; deliver later,
+  diegetically.
+- **P55 — Scheduling is narrative: eligible ≠ worth firing now.**
+  RimWorld storytellers differ mainly in *pacing policy*, not content;
+  L4D's Director modulates intensity (build → peak → fade → relax,
+  ~30s decay), not plot; CK3 splits pulse events (weighted, timed) from
+  triggered events (player-caused). A quest selector needs a pacing
+  notion ("is it time to resurface what happened three expeditions
+  ago?"), not only eligibility.
+- **P56 — Bound combinatorics structurally, not by effort.** Authoring
+  Wall (Bruckman 1990; Garbe): branches that never rejoin cost
+  exponentially; the Complexity Ceiling is tracked *state*, not
+  wordcount. Known structures: Ashwell's CYOA patterns (Branch and
+  Bottleneck rejoins; Loop and Grow reuses state; Floating Modules);
+  Failbetter storylets = selection over state ("a river, not a tree").
+  Warning: many invisible qualities are the *new* branching explosion —
+  state parsimony is an authoring discipline, not an optimization.
+- **P57 — Tiered variation: make cost explicit.** Param/text variant <
+  approach variant < outcome variant < extra phase < new chain. Spend
+  the expensive tier only on high-salience moments; most checks change
+  *local state* (next check easier, route revealed), not the tree.
+- **P58 — Exceptional results are for discovery, not bigger numbers.**
+  Crit success should reveal what no normal success could (hidden
+  phase, secret info) — "I found something hidden" beats "I rolled a
+  20". Degrees of success (PF2e four degrees; PbtA success-at-cost;
+  OSR advantage/disadvantage tables) is the established tabletop
+  vocabulary for it. Hidden phases must be *authored* content reached
+  by reroute, and should rejoin the trunk (P56).
+- **P59 — Conditions inclusive at selection, additive in-quest.**
+  World state decides *which* quest appears; inside the quest,
+  conditions *add* options ("if you carry the lantern, an extra phase
+  exists") — never "no X → no content". Narrow conditions = invisible
+  authored content (Failbetter's parsimony lesson). Keep selection-time
+  and in-quest conditionality as two separate tools.
+- **P60 — Choices as actions; consequences must be noticed to exist.**
+  Kennedy (Failbetter): "if players don't notice that something was a
+  consequence, it wasn't"; let players choose *actions* ("answer
+  immediately" vs "think it over"), not emotions or faction algebra —
+  players supply the emotion themselves.
+- **P61 — Don't over-explain resurfaced memory.** Gap-filling
+  interpretation is where "this story is mine" comes from; over-
+  signaling why a memory resurfaced kills it (Edith Finch testing
+  lesson; O'Brien — don't announce that a choice matters, show
+  divergence).
+- **P62 — Retreat/failure leave readable state.** Pyre: the story
+  continues through defeat without becoming fail-safe — consequences
+  touch characters and future. A retreat should deposit memory (site
+  still hostile, `retreated_from_X` aspect queryable later), not a dead
+  end. Fail-forward ≠ fail-safe: the question is "what did I lose",
+  not "how do I avoid feeling bad".
+- **P63 — Chains are growing qualities, not bespoke scripts.** A quest
+  chain = a progress quality that rises + storylets gated on its tiers
+  (Failbetter Chain/Pyramid; CK3 event chains via scope). Much cheaper
+  than hand-linked follow-up quests, and it composes with selection.
 
 ## Studies & theory (verified citations)
 
@@ -600,6 +707,87 @@ Goal proximity / pacing / near-miss additions:
   casino bettors mix hot-hand and gambler's fallacy by context.
   → P17 support.
 
+### Source bank — emergent narrative batch (2026-10-06, R-090)
+
+Shipped-system craft:
+- **Wildermyth wiki — Data Format / History / Writer's Guide / Story
+  Inputs & Outputs.** — History lines (Origin/Anecdote/Motivation) →
+  Hooks → Aspects (queryable workhorse: "missingLeftArm", "lover");
+  events cast heroes into story *roles* by trait/hook, targets picked
+  in order. → P49/P50/P54.
+  https://wildermyth.com/wiki/Data_Format_Overview
+- **Austin, N. — GDC "Getting Players Emotionally Invested in
+  Procedural Characters in 'Wildermyth'".** — Attachment techniques +
+  pitfalls (breach of trust, acting out of character). → P50/P54.
+  https://gdcvault.com/play/1027614
+- **Wiltshire, A. — "How RimWorld Generates Great Stories" (RPS,
+  2016).** — Sylvester on apophenia, ~12-colonist cap for per-person
+  history, relationship labels, "if it's hard to do, don't". → P51/P50.
+  https://www.rockpapershotgun.com/how-rimworld-generates-great-stories
+- **Fåhraeus, H. — GDC 2014 "Designing Crusader Kings II to generate
+  strange, emergent stories"** + CK2 wiki event modding (trigger /
+  MTTH / on_action / scope chains). — Weighted event pools, pulse vs
+  triggered events. → P55/P63.
+  https://www.gamedeveloper.com/design/video-designing-i-crusader-kings-ii-i-to-generate-strange-emergent-stories
+- **Booth, M. — "The AI Systems of Left 4 Dead" (Valve).** — Director
+  = intensity pacing (build/peak/fade/relax, held ~5s, decay ~30s),
+  not plot. → P55.
+- **Pyre (Supergiant, 2017).** — Story continues through defeat;
+  failure changes future without fail-safe. → P62.
+
+Narrative structure / authoring economics:
+- **Short, E. — "Beyond Branching: Quality-Based, Salience-Based, and
+  Waypoint Narrative Structures" (2016).** — QBN (storylets gated on
+  qualities), salience-based selection (most-applicable content wins),
+  waypoint structures; QBN strengths/costs (state bookkeeping).
+  → P56/P59. https://emshort.blog/2016/04/12/beyond-branching-quality-based-and-salience-based-narrative-structures/
+- **Kennedy, A. — "Narrative Architecture" (Stagconf 2011, Failbetter
+  wiki)** + Failbetter "New Narrative Structures" (Chain, Staircase,
+  Pyramid, Buffet) + Dias "Recurring design patterns in storylet
+  systems". — Named reusable patterns for gated content. → P56/P63.
+  http://wiki.failbettergames.com/narrative-architecture
+- **Ashwell, S.K. — "Standard Patterns in Choice-Based Games"
+  (2015).** — Time Cave, Gauntlet, Branch and Bottleneck, Quest, Open
+  Map, Sorting Hat, Floating Modules, Loop and Grow: the vocabulary
+  for structural cost. → P56.
+  https://heterogenoustasks.wordpress.com/2015/01/26/standard-patterns-in-choice-based-games/
+- **Bruckman, A. (1990) "The Combinatorics of Storytelling"** +
+  Garbe's Authoring Wall / Complexity Ceiling via **"Experiencing the
+  Authorial Burden" (ACM 2025)**. — Exponential branching and
+  state-tracking burden formally diagnosed. → P56.
+  https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675134
+- **Cannon, N. — GDC 2024 "How to build branching narrative without a
+  big budget".** — Branching spectrum (consequential / thematic /
+  expressive); wasted content is the real cost. → P57.
+  https://www.gamedeveloper.com/design/how-to-build-branching-narrative-when-you-don-t-have-a-big-budget-
+- **Kreminski, M. et al. — StoryAssembler (FDG/ICIDS)** + storylet
+  design-space survey. — Planner-based dynamic choice narrative;
+  generative authoring patterns. → P48/P56.
+  https://mkremins.github.io/publications/StoryAssembler.pdf
+- **FDG 2025 — "Stories from the Bottom Up: Composable Story Sifting
+  Patterns".** — Event-log sifting: patterns select *interesting*
+  event chains post-hoc/incrementally — a candidate mechanism for
+  choosing which memories become callbacks. → P55/P49.
+  https://dl.acm.org/doi/10.1145/3723498.3723809
+
+Psychology / perception:
+- **Fendt, M. et al. (2012). "Achieving the Illusion of Agency."
+  ICIDS/LNCS 7648.** — Acknowledged-choice linear story ≈ branching for
+  reported agency. → P52. https://qed.games.utah.edu/wp-content/uploads/2025/07/fendt2012agency.pdf
+- **Cardona-Rivera, R.E. & Robertson, J. (2014). "Foreseeing
+  Meaningful Choices."** — n=88: foreseen meaningfully-different
+  outcomes ↑ agency. → P52.
+  https://qed.games.utah.edu/wp-content/uploads/2025/06/cardona-rivera_robertson2014foreseeing.pdf
+- **Koenitz, H., Roth, C., Knoller, N. & Dubbelman, T. (DiGRA 2018).
+  "'Clementine will remember that'"** + **Monchan (2017) thesis**. —
+  Telltale conventions; advertised memory without payoff = broken
+  promise. → P54.
+- **Nature Communications 2026 — agency × episodic memory study**
+  (participants with real choice recalled more idiosyncratic event
+  structure even when half the events were identical). → P52 support.
+  **Claimed by chatgpt-web via PubMed; citation NOT independently
+  verified — treat as provisional until the paper is located.**
+
 ## Provider audit notes (batch 3)
 
 - **Grok (free/Auto):** weak output — many [UNVERIFIED] tags, several
@@ -617,6 +805,21 @@ Goal proximity / pacing / near-miss additions:
 - Convergent independent proposals (ChatGPT-DR + DeepSeek): TAKEN≠SECURED
   extraction state; retreat must sacrifice unsecured value; consequence-
   first preview; habituation-aware astrolabe scheduling.
+
+## Provider audit notes (batch 4 — emergent narrative, 2026-10-06)
+
+- **ChatGPT web:** strongest — dense, sourced (GDC, Failbetter wiki,
+  academic), produced a real synthesis (3 kinds of emergence; generator
+  of *conditions* not stories). One citation needs verification (Nature
+  Comms 2026 agency×memory — flagged in source bank).
+- **DeepSeek web:** strong — precise mechanics (Wildermyth hook gates:
+  relationship level 3–4, 1 hook/hero/campaign; L4D intensity decay
+  numbers), Kennedy quotes. Inline numeric refs, partial link integrity.
+- **Grok web:** usable at design-opinion level, consistent with batch-3
+  audit — no verifiable citations ("133 sources" claim unverifiable).
+- **Gemini web:** soft-fail — status `success` but content was a
+  refusal ("hard time fulfilling"); zero usable content.
+- **Claude web:** failed — "response did not stabilize". No content.
 
 ## Corrections to this document's prior claims (batch 2)
 

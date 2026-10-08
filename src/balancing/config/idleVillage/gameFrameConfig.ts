@@ -262,10 +262,29 @@ const gameFrameQuestDetailSchema = z.object({
   ledgerWidthPx: z.number().positive(),
 });
 
+/** The running-quest window (R-106): a floating HUD panel, like the roster. */
+const gameFrameQuestWindowSchema = z.object({
+  /** Window width (px). */
+  widthPx: z.number().positive(),
+  /** Distance from the top of the screen at its anchored position, px. */
+  topPx: z.number().nonnegative(),
+  /** Theater aspect ratio, width / height (cinema scope ≈ 2.39). */
+  theaterAspect: z.number().positive(),
+  /** How long the expedition lasts on the game clock, in days: the time bar fills over this span. */
+  durationDays: z.number().positive(),
+  /** Log lines a phase tooltip shows before it says "+N more". */
+  tooltipLines: z.number().int().positive(),
+  /** Whether bag items start armed for the next check. `false` = nothing is spent
+   *  unless the player arms it (R-106 playtest: the bonus vanished unasked). The lab
+   *  keeps its own default (armed, Director D1) — divergence flagged in PLAN-025. */
+  consumablesArmedByDefault: z.boolean(),
+});
+
 /** Stacking order of the shell's layers (the map is 0). One list instead of numbers sprinkled in components. */
 const gameFrameZLayersSchema = z.object({
   wash: z.number().int(),
   floating: z.number().int(),
+  /** Floating panels (roster, ledger, running quest): above the chrome and its dressing — the player moves them over the HUD. */
   panels: z.number().int(),
   chrome: z.number().int(),
   dressing: z.number().int(),
@@ -338,6 +357,7 @@ const gameFrameConfigSchema = z.object({
   identity: gameFrameIdentitySchema,
   hud: gameFrameHudSchema,
   questDetail: gameFrameQuestDetailSchema,
+  questWindow: gameFrameQuestWindowSchema,
   zLayers: gameFrameZLayersSchema,
   breakpoints: gameFrameBreakpointsSchema,
   edgeWash: gameFrameEdgeWashSchema,
@@ -388,6 +408,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     pinTypesWhenCollapsed: ['threat'],
     types: [
       { id: 'threat', labelKey: 'gameFrame.events.types.threat', icon: 'threat', tone: 'danger', priority: 0 },
+      { id: 'quest', labelKey: 'gameFrame.events.types.quest', icon: 'chronicle', tone: 'warning', priority: 1 },
       { id: 'expedition', labelKey: 'gameFrame.events.types.expedition', icon: 'company', tone: 'warning', priority: 1 },
       { id: 'construction', labelKey: 'gameFrame.events.types.construction', icon: 'workshop', tone: 'neutral', priority: 2 },
       { id: 'harvest', labelKey: 'gameFrame.events.types.harvest', icon: 'food', tone: 'good', priority: 3 },
@@ -404,7 +425,6 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     seabed: { opacity: 0.55, parallax: 0.8 },
     hiddenLayerIds: ['frame', 'border'],
     showAtmosphere: false,
-      { id: 'quest', labelKey: 'gameFrame.events.types.quest', icon: 'chronicle', tone: 'warning', priority: 1 },
     showSeaMarks: true,
     showWaves: true,
     showSeaRipple: true,
@@ -440,7 +460,8 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   identity: { showTitle: false },
   hud: { material: 'lacquer' },
   questDetail: { widthPx: 680, gapPx: 8, topPx: 100, ledgerWidthPx: 300 },
-  zLayers: { wash: 7, floating: 8, panels: 9, chrome: 10, dressing: 11 },
+  questWindow: { widthPx: 460, topPx: 100, theaterAspect: 2.76, durationDays: 2, tooltipLines: 6, consumablesArmedByDefault: false },
+  zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12 },
   breakpoints: { compactTopPx: 1400 },
   edgeWash: { enabled: false, leftSrc: '/assets/ui/hud/edge_wash_left.webp', bottomSrc: '/assets/ui/hud/edge_wash_bottom.webp', opacity: 0.55, leftPx: 120, bottomPx: 110 },
   debug: { directorPanel: true },

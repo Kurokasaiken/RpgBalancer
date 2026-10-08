@@ -640,7 +640,7 @@ export function createRun(
         }
       : questId === 'goblin'
         ? {
-            lastEvent: 'I goblin razziano i confini. Sterminateli.',
+            lastEvent: 'Il guado è chiuso dalla paura. Sterminateli.',
             firstLog: 'Assegnazione — quest di combattimento, basata su Forza. Il trofeo dei goblin si converte in Gold al ritorno.',
           }
         : {
@@ -1133,6 +1133,7 @@ export function previewOption(
   if (!checkNode || !checkNode.stats) return null;
 
   const alive = state.party.filter((m) => !m.dead);
+  if (!alive.length) return null;
   const contributors = checkNode.stats.map((s) => {
     const best = alive.reduce((a, b) => (b.stats[s] > a.stats[s] ? b : a));
     return { stat: s, label: STAT_LABELS[s], bestName: best.name, bestValue: best.stats[s] };
@@ -1474,11 +1475,11 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       return 'gob-accampamento';
     case 'gob-tracce-perfor':
       if (success) {
-        state.log.push({ kind: 'INFO', text: 'Una traccia che gli altri avrebbero perso: qualcosa è nascosto qui.' });
+        state.log.push({ kind: 'INFO', text: 'Dall’alto si vede ciò che da terra resta invisibile: qualcosa è nascosto presso il masso.' });
         return 'gob-bottino-scelta';
       }
       positionalDamage(state, 10, node.title);
-      state.log.push({ kind: 'INFO', text: 'Faticate invano. (−10 HP)' });
+      state.log.push({ kind: 'INFO', text: 'La caduta vi costa. (−10 HP)' });
       return 'gob-accampamento';
     case 'gob-bottino': {
       state.loot.push('bottino di guerra');
@@ -1716,6 +1717,11 @@ function enterNode(state: QuestRunState, nodeId: string): void {
       }
       cursor = applyCheckOutcome(state, node, result.verdict);
       setCheckOutcomeText(state, preMark, outcomeMark);
+      // Same rule as applyChoice: an outcome toll that kills the last member is a wipe.
+      if (allDead(state)) {
+        endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+        return;
+      }
       continue;
     }
 
@@ -1951,12 +1957,19 @@ export function applyChoice(
     state.nodeId = checkNode.id;
     const preMark = state.log.length;
     const result = resolveCheck(state, checkNode, opts?.useConsumable !== false);
-    const hurt = state.log
-      .filter((e) => e.kind === 'WOUND' || e.kind === 'DEATH' || e.kind === 'DEATH_SAVE' || e.kind === 'INTERCEPT')
-      .slice(-4)
-      .map((e) => e.text)
-      .join(' ');
-    state.lastEvent = `${checkNode.title} — ${result.verdict.toUpperCase()}. ${hurt || 'Nessuna conseguenza fisica.'}`;
+    // Only this check's lines, HARM included, and written again once the outcome
+    // has applied its toll: the F5 pursuit damage lands in applyCheckOutcome, and
+    // the summary must never say «no physical consequence» over it (R-106 playtest).
+    const summarize = () => {
+      const hurt = state.log
+        .slice(preMark)
+        .filter((e) => CHECK_CONSEQUENCE_KINDS.has(e.kind))
+        .slice(-4)
+        .map((e) => e.text)
+        .join(' ');
+      state.lastEvent = `${checkNode.title} — ${result.verdict.toUpperCase()}. ${hurt || 'Nessuna conseguenza fisica.'}`;
+    };
+    summarize();
     if (allDead(state)) {
       drainHarmsIntoLastCheck(state);
       endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
@@ -1965,6 +1978,14 @@ export function applyChoice(
     const outcomeMark = state.log.length;
     const nextId = applyCheckOutcome(state, checkNode, result.verdict);
     setCheckOutcomeText(state, preMark, outcomeMark);
+    summarize();
+    // Outcome tolls (F6 search, F5 pursuit, F1 fall) can kill the last member:
+    // that is a wipe, not a run that keeps waiting with nobody alive (R-106
+    // playtest — previewOption then reduced an empty party and crashed /game).
+    if (allDead(state)) {
+      endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+      return state;
+    }
     enterNode(state, nextId);
   } else {
     enterNode(state, next);

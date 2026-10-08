@@ -922,7 +922,8 @@
       "invasion": "Goblin invasion",
       "quest": "Show quest",
       "skin": "Skin: {name}",
-      "poiTypes": "POI types"
+      "poiTypes": "POI types",
+      "questRun": "Start goblin quest"
     },
     "roster": {
       "title": "Roster",
@@ -963,7 +964,8 @@
         "roster": "Roster",
         "events": "Events",
         "director": "Director",
-        "tuning": "Tuning"
+        "tuning": "Tuning",
+        "quest": "Quest in progress"
       }
     },
     "regions": {
@@ -981,6 +983,30 @@
       "reset": "Reset values",
       "save": "Save",
       "saved": "Saved ✓"
+    },
+    "questWindow": {
+      "roster": "Assigned party",
+      "bag": "Bag",
+      "chronicle": "Chronicle",
+      "minimise": "Minimise",
+      "restore": "Reopen",
+      "waiting": "A decision is waiting",
+      "bagEmpty": "Bag is empty",
+      "dead": "fallen",
+      "hpLost": "−{hp} HP",
+      "loot_one": "+{count} loot",
+      "loot_other": "+{count} loot",
+      "clean": "Safe",
+      "moreLines_one": "+{count} more line in the chronicle",
+      "moreLines_other": "+{count} more lines in the chronicle",
+      "inProgress": "Phase in progress",
+      "nextPhase": "Next phase",
+      "day": "Day {day} of {total}",
+      "returned": "Back home",
+      "noneReturned": "Nobody came back",
+      "phaseOf": "Phase {n} of {total}",
+      "inProgressShort": "now",
+      "close": "Close the report"
     }
   },
   "missionPlanner": {

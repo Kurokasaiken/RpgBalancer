@@ -206,7 +206,27 @@ al Director, non assorbimento silenzioso.
   **STATUS:** `vigente` come direzione; mappatura completa `open` (OPEN-003).
   **SOURCE:** v24 rev.1 p.13.
 
-## 8. Parcheggiato / non-regole
+## 7b. Coerenza della minaccia (quest authoring/generazione)
+
+- **RULE:** il **tipo di minaccia** della quest deve essere correlato a
+  **chi può essere minacciato** dall'antagonista — la vittima/indizio del
+  briefing (F0) deve essere qualcuno che quella minaccia colpirebbe
+  davvero. Es. goblin sulle strade → carri mercantili, viaggiatori,
+  confini del villaggio; *non* chi vive dentro le mura e non viaggia.
+  Il principio governa anche la direzione della generazione futura: la
+  minaccia sceglie la vittima credibile, e la vittima scelta vincola
+  dove la quest può accadere.
+  **STATUS:** `vigente` come principio espresso dal Director.
+  **SOURCE:** Director 2026-10-08 — applicato in F0 goblin (mugnaio →
+  carri al guado, coerente con l'agguato F7 sulla strada).
+
+## 8. Conseguenze oltre l'esito immediato
+
+- **RULE:** tutte le quest devono avere conseguenze se vengono risolte, in base a **come** vengono risolte, e anche se **non** vengono risolte.
+  **STATUS:** `vigente` come principio espresso dal Director; trigger e forma delle conseguenze ancora `open`, non comportamento runtime già implementato.
+  **SOURCE:** Director 2026-10-07, verbatim in `RICHIESTE.md` R-092; `.mw/desiderata.md` v24 S1–S4 copre le conseguenze nella quest e la persistenza degli esiti, ma non specifica ancora la mancata risoluzione.
+
+## 9. Parcheggiato / non-regole
 
 - **Noise meter:** parcheggiato — stealth-specific, non regola generica
   (REJ-001). Rimosso dal lab il 2026-10-03 (stati nominati

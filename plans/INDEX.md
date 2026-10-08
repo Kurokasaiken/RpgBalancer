@@ -54,6 +54,7 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-021](PLAN-021-quest-theatre.md) | QuestTheatre — quest su /game come storia a nodi | active | P1 | desiderata v27, R-088; cold read ×7 (chatgpt/claude); Phase 1: T-001..T-004 live su /game-frame-theatre (adapter finto); Integration Gate aperta |
 | [PLAN-022](PLAN-022-quest-sterminio-goblin.md) | Quest «Sterminio dei goblin» nel lab S1 | active | — | child of PLAN-019 (S1); desiderata v24, R-089; spec authored Director |
 | [PLAN-023](PLAN-023-quest-s1-lab-ui-redesign.md) | Redesign UI lab quest S1 (cockpit/combat HUD/skip) | active | — | artifact-r005 (multi-AI web converged); decisioni D1–D3 Director |
+| [PLAN-025](PLAN-025-quest-theatre-convergence-cinema.md) | Un solo componente per la quest in corso su /game: convergenza QuestRunWindow → QuestTheatre, beat e juice | draft | P1 | R-106 iter 3 (Director: «un solo componente»), desiderata v27; cold read web ×3 chatgpt+claude (r3: MAJOR spec / MINOR) → v4; T-000 (fix bloccanti + crash wipe) fatto; gate D-1…D-5 in attesa |
 | [PLAN-024](PLAN-024-quest-s1-lab-hud-restyle.md) | Restyle lab quest S1 secondo guida HUD (Lacquer Atlas) | completed | — | child of PLAN-023; R-104; decisioni D1–D3 Director (dipinto-sfondo, plinth, cronaca locale); evidence test-results/r104-quest-hud-restyle-2026-10-08.log |
 
 ## Sotto-documenti (non piani)

@@ -7,7 +7,8 @@
 export const HUD_PANELS = [
   { id: 'roster', shortcut: 'r', defaultVisible: true },
   { id: 'events', shortcut: 'e', defaultVisible: true },
-  { id: 'director', shortcut: 'd', defaultVisible: true, devOnly: true },
+  { id: 'quest', shortcut: 'q', defaultVisible: false },
+  { id: 'director', shortcut: 'd', defaultVisible: false, devOnly: true },
   { id: 'tuning', shortcut: 't', defaultVisible: false, devOnly: true },
 ] as const;
 

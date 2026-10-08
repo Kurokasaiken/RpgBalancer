@@ -24,6 +24,12 @@ export const GOBLIN_BEATS = [
   'Ritorno',
 ] as const;
 
+/** Quest identity shown by the running-quest window (R-106): authored content, Italian only (R-103). */
+export const GOBLIN_META = {
+  title: 'Sterminio dei goblin',
+  flavour: 'Il guado è chiuso dalla paura. Sterminateli.',
+} as const;
+
 /* ------------------------------------------------------------------ */
 /* Nodes — F0..F7 from the authored spec.                               */
 /* ------------------------------------------------------------------ */
@@ -48,7 +54,9 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
   },
 
   /* F1 — ESPLORAZIONE: two alternative checks.
-   * PER success → stealth bonus (F3). PER+FOR success → opens F2, fail −10 HP. */
+   * PER "Cercare tracce" success → stealth bonus (F3).
+   * STR+PER "Arrampicarsi sull'albero" success → opens F2 (from above you spot
+   * the stash by the boulder); fail −10 HP (fall). */
   'gob-esplora': {
     id: 'gob-esplora',
     kind: 'choice',
@@ -59,14 +67,14 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
     options: [
       {
         id: 'gob-cerca-tracce',
-        label: 'Arrampicarsi sull’albero',
-        detail: 'Percezione. Dall’alto il bosco si lascia leggere.',
+        label: 'Cercare tracce',
+        detail: 'Percezione. Il suolo racconta chi è passato, e quanti erano.',
         next: 'CHECK:gob-tracce-per',
       },
       {
         id: 'gob-forza-tracce',
-        label: 'Spostare il masso',
-        detail: 'Percezione + Forza. Lo straccio là sotto può valere — o costare schiena.',
+        label: 'Arrampicarsi sull’albero',
+        detail: 'Forza + Percezione. Dall’alto: il campo, e dove nascondono ciò che rubano.',
         next: 'CHECK:gob-tracce-perfor',
       },
     ],
@@ -74,35 +82,35 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-tracce-per': {
     id: 'gob-tracce-per',
     kind: 'check',
-    title: 'Ti arrampichi sull’albero',
-    body: 'Dal basso il bosco è un muro. Da sopra, qualcosa dice dove si apre.',
-    transit: 'L’albero giusto sta tre passi fuori dal sentiero. La corteccia è il vostro appiglio, la cima il vostro occhio.',
+    title: 'Cercare tracce',
+    body: 'A terra il bosco parla piano: orme nella terra umida, rami spezzati all’altezza sbagliata.',
+    transit: 'Vi spargete lungo il sentiero a leggere il suolo: impronte, terra smossa, il senso di una via che gli altri non vedono.',
     stats: ['perc'],
     risk: { wound: 0, death: 0 },
     beat: 1,
     verdictFlavor: {
-      bigwin: 'Dall’alto: fumo basso a est, una fila di pali appuntiti, una sentinella su un ceppo. E un varco dove nessuno guarda.',
-      win: 'Fumo basso a est e, su un ceppo, una sagoma che non dorme. Il campo è vicino.',
-      almost: 'Qualcosa si muove tra i rami — una volta sola. Scendi con un sospetto, non con una via.',
-      fail: 'L’albero si lascia arrampicare, il bosco no.',
-      epicfail: 'Un ramo marcio: giù di schiena. Ora anche il bosco sa che ci siete.',
+      bigwin: 'Orme fresche, terra rivoltata, un filo di campanelli teso tra i rami: sapete dove vanno, e da dove guardano.',
+      win: 'Orme fresche verso nord, e segni di passaggi ripetuti. Sapete come avvicinarvi.',
+      almost: 'Segni confusi, orme doppie. Un sospetto, non una via.',
+      fail: 'Il suolo è stato rimestato apposta. Il bosco non racconta niente.',
+      epicfail: 'Leggete le tracce al contrario — e qualcuno, da qualche parte, ha letto le vostre.',
     },
   },
   'gob-tracce-perfor': {
     id: 'gob-tracce-perfor',
     kind: 'check',
-    title: 'Spostare il masso',
-    body: 'Lo straccio sotto il masso non è caduto lì da solo. Qualcuno ha nascosto qualcosa, in fretta.',
-    transit: 'Spalle contro il masso: cede un centimetro per volta.',
-    stats: ['perc', 'str'],
+    title: 'Ti arrampichi sull’albero',
+    body: 'Dal basso il bosco è un muro. Da sopra, qualcosa dice dove si apre — e cosa nasconde.',
+    transit: 'L’albero giusto sta tre passi fuori dal sentiero. La corteccia è il vostro appiglio, la cima il vostro occhio.',
+    stats: ['str', 'perc'],
     risk: { wound: 0, death: 0 },
     beat: 1,
     verdictFlavor: {
-      bigwin: 'Il masso si sposta in silenzio — sotto, una nicchia di stracci che qualcuno ha chiuso in fretta.',
-      win: 'Spalle contro il masso. Sotto: stracci, e qualcosa di avvolto.',
-      almost: 'Si sposta, ma il bosco ha sentito qualcosa cadere.',
-      fail: 'Il masso cade dalla parte sbagliata. Il sentiero resta chiuso.',
-      epicfail: 'La roccia prende una caviglia. Si cammina zoppicando, e non era il piano.',
+      bigwin: 'Dall’alto: fumo basso a est, una fila di pali appuntiti, una sentinella su un ceppo — e giù, presso il masso, terra smossa dove qualcuno ha chiuso qualcosa in fretta.',
+      win: 'La corteccia cede ma regge. Da sopra: il campo a est, e presso il masso un lembo di straccio che non doveva stare lì.',
+      almost: 'Il ramo cede a mezza altezza — ma basta per scorgere la terra smossa sotto il masso.',
+      fail: 'Il ramo tiene a metà, poi cede: la schiena trova il suolo prima degli occhi il campo.',
+      epicfail: 'Un ramo marcio: giù di schiena, e il tonfo corre per il bosco. Ora anche loro sanno che ci siete.',
     },
   },
 

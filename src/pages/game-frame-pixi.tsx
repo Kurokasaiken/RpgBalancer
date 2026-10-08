@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { GameFrameScreen } from './game-frame';
-import { PixiWorldMap, type PixiMapAnchor, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { DEFAULT_MAP_TUNE, PixiWorldMap, type PixiMapAnchor, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { MatericRosterComponent } from '@/ui/idleVillage/roster';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
@@ -20,13 +20,16 @@ import { RosterKitShell } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
+import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
+import { GOBLIN_BEATS, GOBLIN_META, GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 // GameFrame is a fresh, not-yet-kitted composition (R-075).
 // eslint-disable-next-line no-restricted-imports
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
-import { MapDemoPoi, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type HudObjective, type TuningField } from '@/ui/idleVillage/components/gameFrame';
+import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type TuningField } from '@/ui/idleVillage/components/gameFrame';
 
 /**
  * `/game-frame-pixi` — the /game-frame screen (same HUD, roster, instruments) on the
@@ -43,11 +46,15 @@ import { MapDemoPoi, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, ty
  */
 /** Days the player has between the announcement and the goblin host reaching the village. */
 const INVASION_WARNING_DAYS = 5;
+/** The announcement card against the map: smaller than on World Surface, where the map is shown closer. */
+const INVASION_CARD_SIZE = 0.75;
 const TUNING_KEY = 'hud_tuning_v1';
+/** Share of an open side panel's width the map fit keeps clear. */
+const PANEL_FIT_SHARE = 0.6;
 
 export default function GameFramePixiPage() {
-  const { worldDressing, questPois, debug, roster, questDetail, insets } = DEFAULT_GAME_FRAME_CONFIG;
-  const safeFit = worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined;
+  const { worldDressing, questPois, debug, roster, questDetail, questWindow, insets } = DEFAULT_GAME_FRAME_CONFIG;
+  const baseSafeFit = worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined;
   // Dev tuning (Tuning panel): overrides on top of the config, applied when a slider is released.
   const [tuned, setTuned] = useState<Record<string, number>>({});
   // Tuning survives reloads: every change is saved at once, and the Save button saves (and copies the values) on demand.
@@ -73,27 +80,45 @@ export default function GameFramePixiPage() {
   const motion = useMemo(() => {
     const m = worldDressing.motion;
     const pick = (key: keyof typeof m) => tuned[key] ?? m[key];
-    return { ...m, cloudShadowOpacity: pick('cloudShadowOpacity'), cloudShadowOffsetX: pick('cloudShadowOffsetX'), cloudShadowOffsetY: pick('cloudShadowOffsetY'), cloudSpeed: pick('cloudSpeed'), seaLineOpacity: pick('seaLineOpacity'), seaMotionAmount: pick('seaMotionAmount'), foamStrength: pick('foamStrength') };
+    return { ...m, cloudShadowOpacity: pick('cloudShadowOpacity'), cloudShadowOffsetX: pick('cloudShadowOffsetX'), cloudShadowOffsetY: pick('cloudShadowOffsetY'), cloudSpeed: pick('cloudSpeed'), seaLineOpacity: pick('seaLineOpacity'), seaMotionAmount: pick('seaMotionAmount'), seaMotionPeriod: pick('seaMotionPeriod'), foamStrength: pick('foamStrength'), foamCrestSpeed: pick('foamCrestSpeed') };
   }, [worldDressing.motion, tuned]);
   const seabed = useMemo(
     () => (worldDressing.seabed ? { opacity: tuned.seabedOpacity ?? worldDressing.seabed.opacity, parallax: tuned.seabedParallax ?? worldDressing.seabed.parallax } : undefined),
     [worldDressing.seabed, tuned],
   );
   const bandPx = bandNow;
+  const reducedMotion = useMemo(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, []);
+  const tuneNow = useMemo(() => {
+    const t = { ...DEFAULT_MAP_TUNE };
+    for (const key of Object.keys(t) as (keyof typeof t)[]) if (typeof tuned[key] === 'number') t[key] = tuned[key];
+    return t;
+  }, [tuned]);
   const tuningFields = useMemo<TuningField[]>(
     () => [
-      { id: 'plaqueBand', label: 'Plaque gold band (px)', value: bandPx, min: 1, max: 6, step: 0.5 },
-      { id: 'cloudShadowOpacity', label: 'Cloud shadow opacity', value: motion.cloudShadowOpacity, min: 0, max: 1, step: 0.02 },
-      { id: 'cloudShadowOffsetX', label: 'Shadow offset X', value: motion.cloudShadowOffsetX, min: 0, max: 300, step: 10 },
-      { id: 'cloudShadowOffsetY', label: 'Shadow offset Y', value: motion.cloudShadowOffsetY, min: 0, max: 300, step: 10 },
-      { id: 'cloudSpeed', label: 'Cloud speed', value: motion.cloudSpeed, min: 1, max: 20, step: 1 },
-      { id: 'seaLineOpacity', label: 'Sea lines opacity', value: motion.seaLineOpacity, min: 0, max: 0.6, step: 0.02 },
-      { id: 'seaMotionAmount', label: 'Sea motion amount', value: motion.seaMotionAmount, min: 0, max: 80, step: 2 },
-      { id: 'foamStrength', label: 'Coast foam', value: motion.foamStrength, min: 0, max: 1.5, step: 0.05 },
-      { id: 'seabedOpacity', label: 'Seabed opacity', value: seabed?.opacity ?? 0, min: 0, max: 1, step: 0.05 },
-      { id: 'seabedParallax', label: 'Seabed parallax (1 = glued)', value: seabed?.parallax ?? 1, min: 0.5, max: 1, step: 0.02 },
+      { id: 'cloudShadowOpacity', group: 'Clouds', label: 'Cloud shadow opacity', hint: 'How dark the ground shadow under each cloud is. 0 = no shadows.', value: motion.cloudShadowOpacity, min: 0, max: 1, step: 0.02 },
+      { id: 'cloudShadowOffsetX', group: 'Clouds', label: 'Shadow offset X', hint: 'How far (world px) the shadow falls to the right of its cloud: the taller the cloud, the further.', value: motion.cloudShadowOffsetX, min: 0, max: 300, step: 10 },
+      { id: 'cloudShadowOffsetY', group: 'Clouds', label: 'Shadow offset Y', hint: 'How far (world px) the shadow falls below its cloud.', value: motion.cloudShadowOffsetY, min: 0, max: 300, step: 10 },
+      { id: 'cloudSpeed', group: 'Clouds', label: 'Cloud speed', hint: 'Speed multiplier of every cloud and shadow. 1 = a crossing of the world takes 12-35 minutes; 10 = 1-4 minutes.', value: motion.cloudSpeed, min: 1, max: 20, step: 1 },
+      { id: 'cloudParallax', group: 'Clouds', label: 'Cloud parallax', hint: 'How much higher clouds slide against the ground when you pan the map. 0 = glued to the ground, 1 = default, 2 = very high clouds.', value: tuneNow.cloudParallax, min: 0, max: 2, step: 0.1 },
+      { id: 'cloudMorph', group: 'Clouds', label: 'Cloud shape drift', hint: 'How much each cloud slowly swells, narrows and tilts as it drifts. 0 = rigid sprites.', value: tuneNow.cloudMorph, min: 0, max: 3, step: 0.1 },
+      { id: 'seaLineOpacity', group: 'Sea', label: 'Sea lines opacity', hint: 'Strength of the pale line pattern drawn on open water.', value: motion.seaLineOpacity, min: 0, max: 0.6, step: 0.02 },
+      { id: 'seaMotionAmount', group: 'Sea', label: 'Sea sway amount', hint: 'How far (world px) the sea line pattern slides back and forth. Lower = calmer sea.', value: motion.seaMotionAmount, min: 0, max: 80, step: 2 },
+      { id: 'seaMotionPeriod', group: 'Sea', label: 'Sea sway period (s)', hint: 'Seconds for one full back-and-forth of the sea pattern. Higher = slower, calmer water.', value: motion.seaMotionPeriod, min: 3, max: 40, step: 1 },
+      { id: 'foamStrength', group: 'Sea', label: 'Coast foam', hint: 'Brightness of the foam lines washing onto the shores.', value: motion.foamStrength, min: 0, max: 1.5, step: 0.05 },
+      { id: 'foamCrestSpeed', group: 'Sea', label: 'Coast foam speed', hint: 'How fast the foam crests travel toward the shore (world px per second). Original look: 9.', value: motion.foamCrestSpeed, min: 0, max: 40, step: 1 },
+      { id: 'markSpacingPx', group: 'Sea', label: 'Wave spacing (px)', hint: 'No two painted waves or sea marks play at once closer than this. Higher = sparser, calmer sea.', value: tuneNow.markSpacingPx, min: 300, max: 1800, step: 50 },
+      { id: 'wonderEveryS', group: 'Sea', label: 'Sea wonder every (s)', hint: 'Shortest wait before a kraken, whale or ship surfaces (the longest wait is about double).', value: tuneNow.wonderEveryS, min: 5, max: 120, step: 1 },
+      { id: 'forestSway', group: 'Land', label: 'Forest sway (px)', hint: 'How far (world px) the forest crowns sway in the wind. 0 = still forests (and the original, unsplit base). At the normal map zoom 4 px is about 1 screen px: try 10-16 to see it clearly.', value: tuneNow.forestSway, min: 0, max: 20, step: 0.5 },
+      { id: 'forestSwaySpeed', group: 'Land', label: 'Forest wind speed', hint: 'How fast the gusts roll over the forests. 1 = a gust every ~8 s, 2 = twice as fast.', value: tuneNow.forestSwaySpeed, min: 0.2, max: 4, step: 0.1 },
+      { id: 'regionLinePx', group: 'Regions', label: 'Region border (px)', hint: 'Thickness of the black ink border of a hovered territory, in world px (about a quarter on screen at normal zoom).', value: tuneNow.regionLinePx, min: 3, max: 30, step: 1 },
+      { id: 'smokeAmount', group: 'Land', label: 'Village smoke', hint: 'Opacity of the smoke rising from the village roofs. 0 = off.', value: tuneNow.smokeAmount, min: 0, max: 2, step: 0.1 },
+      { id: 'deepSeaFadePx', group: 'Sea', label: 'Deep sea distance (px)', hint: 'How far the painted sea colour holds beyond the map edge before turning to deep water and fog.', value: tuneNow.deepSeaFadePx, min: 200, max: 1500, step: 50 },
+      { id: 'regionHoverDelayS', group: 'Regions', label: 'Region hover delay (s)', hint: 'How long the pointer must rest on a territory before it lights up and shows its name.', value: tuneNow.regionHoverDelayS, min: 0, max: 3, step: 0.1 },
+      { id: 'seabedOpacity', group: 'Sea', label: 'Seabed opacity', hint: 'How clear the water becomes while you drag the map (0 = never see the bed).', value: seabed?.opacity ?? 0, min: 0, max: 1, step: 0.05 },
+      { id: 'seabedParallax', group: 'Sea', label: 'Seabed parallax (1 = glued)', hint: 'How much slower the seabed slides than the map while dragging. Lower = deeper.', value: seabed?.parallax ?? 1, min: 0.5, max: 1, step: 0.02 },
+      { id: 'plaqueBand', group: 'HUD', label: 'Plaque gold band (px)', hint: 'Thickness of the gold rim of every HUD plaque.', value: bandPx, min: 1, max: 6, step: 0.5 },
     ],
-    [motion, seabed, bandPx],
+    [motion, seabed, bandPx, tuneNow],
   );
   const shadowOffset = useMemo(() => ({ x: motion.cloudShadowOffsetX, y: motion.cloudShadowOffsetY }), [motion]);
   const seaPatternConfig = useMemo(
@@ -131,8 +156,16 @@ export default function GameFramePixiPage() {
   // Test / trailer tooling: dev builds only, F10 shows or hides it (hide it for a clean capture).
   // `?capture=1` starts a clean shot: no Director, no panel menu.
   const capture = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
-  const directorEnabled = import.meta.env.DEV && debug.directorPanel && !capture;
+  const directorEnabled = import.meta.env.DEV && debug.directorPanel;
   const panels = useHudPanels();
+  // The land is framed to keep clear of the open side panels: the fit reserves most of their width (they sit over the
+  // coastal corners, so a full reservation would shrink the island for nothing).
+  const safeFit = useMemo(() => {
+    if (!baseSafeFit) return undefined;
+    const left = panels.visible.roster ? Math.round((roster.leftPx + roster.widthPx) * PANEL_FIT_SHARE) : 0;
+    const right = panels.visible.events ? Math.round((questDetail.ledgerWidthPx + insets.edgeInsetPx) * PANEL_FIT_SHARE) : 0;
+    return { ...baseSafeFit, insets: { ...baseSafeFit.insets, left, right } };
+  }, [baseSafeFit, panels.visible.roster, panels.visible.events, roster.leftPx, roster.widthPx, questDetail.ledgerWidthPx, insets.edgeInsetPx]);
   useEffect(() => {
     if (!directorEnabled) return undefined;
     const onKey = (event: KeyboardEvent) => {
@@ -159,24 +192,68 @@ export default function GameFramePixiPage() {
     detail: { position: questDetailPosition, showTelemetry: false, hudSurface: true },
   });
 
-  const objective = useMemo<HudObjective | undefined>(() => {
-    if (!questShown) return undefined;
-    const key = session.questStatus === 'available' ? 'available' : session.questStatus === 'in_progress' ? 'running' : 'done';
-    return { text: t(`gameFrame.objective.${key}`, { name: session.activity.label }), onSelect: session.handlePoiClick };
-  }, [questShown, session.questStatus, session.activity.label, session.handlePoiClick, t]);
-
   const currentDay = session.gameplay.state.currentDay;
   const invasionDaysLeft = invasion ? Math.max(0, invasion.dueDay - currentDay) : 0;
-  const extraEvents = useMemo<HudEvent[]>(
-    () => (invasion ? [{ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft, at: { x: 0.486, y: 0.554 } }] : []),
-    [invasion, invasionDaysLeft, t],
-  );
-
   const dayLengthTicks = session.gameplay.config.globalRules?.dayLengthInTimeUnits ?? 60;
   const availability = useMemo(
     () => (poi ? questAvailability(session.gameplay.state.currentTick ?? 0, questAppearedTick, dayLengthTicks, poi.availableDays) : undefined),
     [poi, session.gameplay.state.currentTick, questAppearedTick, dayLengthTicks],
   );
+
+  // Open opportunities live in the calendar like any other dated event: the quest is a row in the ledger.
+  const extraEvents = useMemo<HudEvent[]>(() => {
+    const list: HudEvent[] = [];
+    if (invasion) list.push({ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft, at: { x: 0.486, y: 0.554 } });
+    if (poi && questShown && session.questStatus === 'available' && availability && availability.state !== 'expired') {
+      const daysLeft = Math.max(0, Math.ceil(availability.progress * poi.availableDays));
+      list.push({ id: 'quest-open', typeId: 'quest', title: session.activity.label, daysLeft, at: { x: poi.x / 4240, y: poi.y / 2828 } });
+    }
+    return list;
+  }, [invasion, invasionDaysLeft, poi, questShown, session.questStatus, session.activity.label, availability, t]);
+
+  // Time of day on the map, only at normal speed: at x2/x4 the light holds still (a day lasts seconds there, and the map
+  // would flicker), while paused it keeps whatever light it had.
+  const { isDayPhase, cycleProgress, speedMultiplier, isPaused: clockPaused } = session.gameplay.state;
+  const lastAmbient = useRef({ light: 1, warm: 0 });
+  // `?tod=night|dusk|day` previews a time of day (dev), whatever the clock says.
+  const todPreview = useMemo(() => new URLSearchParams(window.location.search).get('tod'), []);
+  const ambient = useMemo(() => {
+    if (todPreview === 'night') return { light: 0.35, warm: 0 };
+    if (todPreview === 'dusk') return { light: 0.7, warm: 1 };
+    if (todPreview === 'day') return { light: 1, warm: 0 };
+    if (clockPaused) return lastAmbient.current;
+    if (speedMultiplier !== 1) return (lastAmbient.current = { light: 1, warm: 0 });
+    const p = cycleProgress ?? 0;
+    const ramp = (a: number, b: number, x: number) => Math.min(1, Math.max(0, (x - a) / (b - a)));
+    const next = isDayPhase
+      ? { light: 1 - 0.65 * ramp(0.8, 1, p), warm: ramp(0.65, 0.85, p) * (1 - ramp(0.95, 1, p)) }
+      : { light: 0.35 + 0.65 * ramp(0.8, 1, p), warm: ramp(0.8, 0.92, p) * (1 - ramp(0.97, 1, p)) };
+    return (lastAmbient.current = next);
+  }, [todPreview, clockPaused, speedMultiplier, isDayPhase, cycleProgress]);
+
+  // The running quest (R-106): the authored goblin quest in its floating window, timed on the game clock.
+  const questRun = useQuestRun('goblin');
+  const [questRunStartTick, setQuestRunStartTick] = useState(0);
+  // Opening "Quest in progress" from the Panels menu (or Q) with nothing running starts the goblin quest, as the
+  // Director button does: otherwise the menu ticked the panel on and nothing appeared.
+  const questPanelOpen = panels.visible.quest;
+  useEffect(() => {
+    if (!questPanelOpen || questRun.run) return;
+    questRun.start(GOBLIN_PRESETS[0].id);
+    setQuestRunStartTick(session.gameplay.state.currentTick ?? 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questPanelOpen]);
+  // Bag arming is the player's call: nothing is spent on a check unless armed.
+  const [questArmed, setQuestArmed] = useState(questWindow.consumablesArmedByDefault);
+  const questRunTime = useMemo(() => {
+    const span = questWindow.durationDays * dayLengthTicks;
+    const elapsed = Math.max(0, (session.gameplay.state.currentTick ?? 0) - questRunStartTick);
+    const progress = questRun.run?.ended ? 1 : Math.min(1, elapsed / span);
+    const label = questRun.run?.ended
+      ? t(questRun.run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
+      : t('gameFrame.questWindow.day', { day: Math.min(questWindow.durationDays, Math.floor(elapsed / dayLengthTicks) + 1), total: questWindow.durationDays });
+    return { progress, label };
+  }, [questWindow.durationDays, dayLengthTicks, session.gameplay.state.currentTick, questRunStartTick, questRun.run?.ended, questRun.run?.outcome, t]);
 
   // An expired opportunity fades (MapQuestPoi), then leaves the map.
   const expiredOpen = availability?.state === 'expired' && session.questStatus === 'available';
@@ -224,6 +301,17 @@ export default function GameFramePixiPage() {
         },
       },
       {
+        id: 'questRun',
+        label: t('gameFrame.director.questRun'),
+        active: !!questRun.run && !questRun.run.ended,
+        onTrigger: () => {
+          questRun.start(GOBLIN_PRESETS[0].id);
+          setQuestArmed(questWindow.consumablesArmedByDefault);
+          setQuestRunStartTick(session.gameplay.state.currentTick ?? 0);
+          panels.set('quest', true);
+        },
+      },
+      {
         id: 'poitypes',
         label: t('gameFrame.director.poiTypes'),
         active: poiDemo,
@@ -236,7 +324,7 @@ export default function GameFramePixiPage() {
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, questShown, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick],
+    [invasion, questShown, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault],
   );
 
   return (
@@ -267,13 +355,35 @@ export default function GameFramePixiPage() {
               />
             )}
             extraEvents={extraEvents}
-            objective={objective}
             overlaySlot={
               <>
                 {session.overlays}
+                {questRun.run && panels.visible.quest && (
+                  <QuestRunWindow
+                    run={questRun.run}
+                    phases={questRun.phases}
+                    beats={GOBLIN_BEATS}
+                    title={GOBLIN_META.title}
+                    flavour={GOBLIN_META.flavour}
+                    artFor={(nodeId) => NODE_ART[nodeId]?.src}
+                    time={questRunTime}
+                    onChoose={(optionId) => questRun.choose(optionId, { useConsumable: questArmed })}
+                    armed={questArmed}
+                    onToggleArmed={() => setQuestArmed((on) => !on)}
+                    onUseHealing={questRun.useHealing}
+                    onDrinkPotion={questRun.drinkPotion}
+                    onClose={() => panels.set('quest', false)}
+                    anchor={{ left: roster.leftPx + roster.widthPx + questDetail.gapPx, top: questWindow.topPx }}
+                    widthPx={questWindow.widthPx}
+                    theaterAspect={questWindow.theaterAspect}
+                    tooltipLines={questWindow.tooltipLines}
+                    zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
+                  />
+                )}
                 {directorEnabled && panels.visible.tuning && (
                   <TuningPanel
                     fields={tuningFields}
+                    notice={reducedMotion ? 'Reduce motion is ON in the system settings: forest sway, smoke, cloud drift and sea wonders are off.' : undefined}
                     onCommit={(id, value) => (id === 'plaqueBand' ? setHudBandPx(value) : setTuned((current) => ({ ...current, [id]: value })))}
                     onReset={() => {
                       setTuned({});
@@ -319,6 +429,8 @@ export default function GameFramePixiPage() {
                   cloudShadowOffset={shadowOffset}
                   cloudSpeed={motion.cloudSpeed}
                   seabed={seabed}
+                  tune={tuneNow}
+                  ambient={ambient}
                   regions={{ assetBase: '/assets/world/wanderlust/base', onHover: setRegionHover }}
                   worldLayer={(canvas) => (
                     <div style={{ pointerEvents: 'auto' }}>
@@ -332,6 +444,7 @@ export default function GameFramePixiPage() {
                         marchTarget={{ x: Math.round(canvas.width * 0.486), y: Math.round(canvas.height * 0.554) }}
                         daysRemaining={INVASION_WARNING_DAYS}
                         showReminder={false}
+                        cardSize={INVASION_CARD_SIZE}
                         onComplete={() => {
                           setShroudCovered(false);
                           setInvasion({ dueDay: currentDay + INVASION_WARNING_DAYS });

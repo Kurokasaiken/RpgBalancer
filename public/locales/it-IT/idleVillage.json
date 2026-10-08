@@ -929,7 +929,8 @@
       "invasion": "Invasione goblin",
       "quest": "Mostra quest",
       "skin": "Skin: {name}",
-      "poiTypes": "Tipi di POI"
+      "poiTypes": "Tipi di POI",
+      "questRun": "Avvia quest goblin"
     },
     "roster": {
       "title": "Roster",
@@ -970,7 +971,8 @@
         "roster": "Roster",
         "events": "Eventi",
         "director": "Director",
-        "tuning": "Tuning"
+        "tuning": "Tuning",
+        "quest": "Quest in corso"
       }
     },
     "regions": {
@@ -988,6 +990,30 @@
       "reset": "Ripristina valori",
       "save": "Salva",
       "saved": "Salvato ✓"
+    },
+    "questWindow": {
+      "roster": "Squadra assegnata",
+      "bag": "Sacca",
+      "chronicle": "Cronaca",
+      "minimise": "Riduci a icona",
+      "restore": "Riapri",
+      "waiting": "Decisione in attesa",
+      "bagEmpty": "Sacca vuota",
+      "dead": "caduto",
+      "hpLost": "−{hp} HP",
+      "loot_one": "+{count} bottino",
+      "loot_other": "+{count} bottino",
+      "clean": "Illesi",
+      "moreLines_one": "+{count} altra riga in cronaca",
+      "moreLines_other": "+{count} altre righe in cronaca",
+      "inProgress": "Fase in corso",
+      "nextPhase": "Prossima fase",
+      "day": "Giorno {day} di {total}",
+      "returned": "Rientrati",
+      "noneReturned": "Nessuno è tornato",
+      "phaseOf": "Fase {n} di {total}",
+      "inProgressShort": "in corso",
+      "close": "Chiudi il rapporto"
     }
   },
   "missionPlanner": {

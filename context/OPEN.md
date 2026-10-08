@@ -196,7 +196,29 @@ Formato voce:
 - **Status:** `open` — pertinente a S5 (generazione) e art pipeline; nessun
   impatto prima di S4.
 - **Source:** `context/ingestions/2026-10-05-progettare-quest-strategiche-transcript-completo.md`
-  E-28/E-29/E-30/E-31; `NARRATIVE.md` §4.
+  E-28/E-29/E-30/E-31; `context/ingestions/2026-10-06-quest-cross-direct.md`
+  E-01/E-03/E-07/E-08 (primitive dei beat, generatore a vincoli in 3 passi —
+  segmento a monte di E-28 —, requisito varietà/volume Director, flavor via
+  tag); `NARRATIVE.md` §4.
 - **Blocking:** nessuno nel breve; candidato per la «definizione di buona
   quest» (artefatto finale PLAN-019).
 - **Related:** PLAN-019 (S5), NARRATIVE.md.
+
+## OPEN-015 — Mancata risoluzione e conseguenze di ogni quest
+
+- **Question:** che cosa significa «non risolta» e quale evento fa scattare le conseguenze di una quest che il giocatore non completa?
+- **Status:** `open` — il principio universale è espresso dal Director, il trigger e le forme delle conseguenze restano da precisare.
+- **Context:** R-092 include quest risolte, modalità della risoluzione e quest non risolte; le regole esistenti coprono soprattutto esiti della spedizione e persistenza prevista in S2.
+- **Source:** `RICHIESTE.md` R-092 (verbatim); `QUEST_RULES.md` §8; `.mw/desiderata.md` v24 S1–S4.
+- **Blocking:** definizione del comportamento delle quest lasciate aperte; non blocca il lab S1.
+- **Related:** PLAN-019 (S2/S4/S5), NARRATIVE.md.
+
+## OPEN-016 — Registro mondo, memoria narrativa e sequenza del macro-piano
+
+- **Question:** quale porzione del mondo persistente serve per rendere leggibili le conseguenze delle quest e quando introdurre evoluzione di personaggi, fazioni/regioni, pattern narrativi e legacy cross-run rispetto a PLAN-019 S1–S5?
+- **Status:** `open` — il Director ha chiesto di acquisire e discutere lo share, non ha approvato il macro-piano finale di ChatGPT.
+- **Context:** tratti che generano scene e hook che generano quest, NPC ricorrenti, world pressures, provenance/riconoscimento e mondi attraverso più run sono intenti o proposte con livelli diversi di certezza. Il programma AI «Foundation → simulazione → storia → legacy» potrebbe anticipare S5, che la desiderata v24 colloca dopo S4; evitare sostituzione silenziosa.
+- **Source:** `context/ingestions/2026-10-07-registro-narrativo-del-mondo.md` E-02..E-18; `NARRATIVE.md` §4; `RICHIESTE.md` R-093.
+- **Blocking:** ratifica di un eventuale nuovo macro-piano e design di simulazione mondiale; non blocca S1. Il trigger delle quest non risolte resta OPEN-015.
+- **Narrowing Director (2026-10-07):** la fetta di registro mondo in S2 è minima — basta a rendere persistenti e leggibili le conseguenze della *singola* quest di riferimento; personaggi/fazioni che ritornano tra quest diverse non sono requisito di S2.
+- **Related:** `.mw/desiderata.md` v24, PLAN-019 (S2/S4/S5), OPEN-014/015, `VILLAGE_ECONOMY.md`.
