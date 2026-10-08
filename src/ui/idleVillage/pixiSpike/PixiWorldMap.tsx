@@ -306,6 +306,8 @@ const VILLAGE_CHIMNEYS = [
 const SMOKE_PUFFS = 5;
 const SMOKE_LIFE_S = 7;
 
+/** Colour of a hovered territory's border (ink black, like a board-game province). */
+const REGION_EDGE_RGBA = [16, 12, 8, 255];
 /** Pointer dwell before a territory lights up and shows its name. */
 /** No two waves or sea marks play at the same time closer than this (world px). */
 /** Sea wonders: how often one may surface, how long it stays, how big it is on the map (world px wide). */
@@ -1182,8 +1184,8 @@ export function PixiWorldMap({
           c.height = mh;
           const ctx = c.getContext('2d');
           if (ctx && ids) {
-            // The territory's own shape: its border is drawn as a soft gilded glow on the inside (blurred twice,
-            // sharp core line on top) over a faint warm wash — a lit province, not a flat sticker.
+            // The territory's own shape: an ink border like a board-game province (soft dark shade inside, sharp
+            // core line on top) over a faint warm wash — a lit province, not a flat sticker.
             const shape = ctx.createImageData(mw, mh);
             const edge = ctx.createImageData(mw, mh);
             for (let y = 0; y < mh; y += 1) {
@@ -1194,7 +1196,7 @@ export function PixiWorldMap({
                 const border =
                   x === 0 || y === 0 || x === mw - 1 || y === mh - 1 ||
                   ids[(i - 1) * 4] !== index || ids[(i + 1) * 4] !== index || ids[(i - mw) * 4] !== index || ids[(i + mw) * 4] !== index;
-                if (border) edge.data.set([255, 222, 140, 255], i * 4);
+                if (border) edge.data.set(REGION_EDGE_RGBA, i * 4);
               }
             }
             const layerOf = (data: ImageData) => {
@@ -1208,14 +1210,15 @@ export function PixiWorldMap({
             const edgeCanvas = layerOf(edge);
             ctx.globalAlpha = 0.08;
             ctx.drawImage(shapeCanvas, 0, 0);
-            ctx.globalAlpha = 0.55;
+            ctx.globalAlpha = 0.4;
             ctx.filter = 'blur(6px)';
             ctx.drawImage(edgeCanvas, 0, 0);
             ctx.filter = 'blur(2px)';
             ctx.drawImage(edgeCanvas, 0, 0);
             ctx.filter = 'none';
-            ctx.globalAlpha = 0.9;
-            ctx.drawImage(edgeCanvas, 0, 0);
+            // Solid ink core, two mask pixels wide (one would read as a faint brown hairline at map zoom).
+            ctx.globalAlpha = 1;
+            for (const [ox, oy] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]) ctx.drawImage(edgeCanvas, ox, oy);
             // Keep the glow inside the territory: nothing spills onto the neighbours or the sea.
             ctx.globalAlpha = 1;
             ctx.globalCompositeOperation = 'destination-in';
