@@ -17,6 +17,10 @@ export interface TuningPanelProps {
   /** Called when a slider is released (rebuilding the map on every pixel of a drag would stutter). */
   onCommit: (id: string, value: number) => void;
   onReset?: () => void;
+  /** Saves now and copies the values; changes are also saved as they are made. */
+  onSave?: () => void;
+  /** Shows the Save button as done for a moment. */
+  saved?: boolean;
   onClose?: () => void;
 }
 
@@ -25,7 +29,7 @@ export interface TuningPanelProps {
  * slider each. The value is shown live while dragging and applied on release; the last line is the current set,
  * ready to paste into `gameFrameConfig.ts`.
  */
-export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onReset, onClose }) => {
+export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onReset, onSave, saved = false, onClose }) => {
   const { t } = useTranslation('idleVillage');
   const { panelStyle, handleProps } = useHudPanelDrag();
   const [draft, setDraft] = useState<Record<string, number>>({});
@@ -73,11 +77,18 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
       <code style={{ fontSize: 12, lineHeight: 1.35, color: 'var(--skin-label-primary)', wordBreak: 'break-word' }}>
         {fields.map((field) => `${field.id}: ${field.value}`).join(', ')}
       </code>
-      {onReset && (
-        <button type="button" onClick={onReset} data-hud-controls="" style={{ alignSelf: 'flex-start' }}>
-          {t('gameFrame.tuning.reset')}
-        </button>
-      )}
+      <div data-hud-controls="" style={{ display: 'flex', gap: 8 }}>
+        {onSave && (
+          <button type="button" onClick={onSave} aria-live="polite">
+            {saved ? t('gameFrame.tuning.saved') : t('gameFrame.tuning.save')}
+          </button>
+        )}
+        {onReset && (
+          <button type="button" onClick={onReset}>
+            {t('gameFrame.tuning.reset')}
+          </button>
+        )}
+      </div>
       </div>
     </HudPlaque>
   );
