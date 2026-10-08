@@ -51,7 +51,7 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
           {t('gameFrame.panels.names.tuning')}
         </span>
         {onClose && (
-          <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--skin-label-primary)', cursor: 'pointer', fontSize: 14 }}>
+          <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--skin-label-primary)', cursor: 'pointer', fontSize: 18, width: 22, height: 22, lineHeight: '22px' }}>
             ×
           </button>
         )}
