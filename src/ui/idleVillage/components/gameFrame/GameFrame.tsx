@@ -267,12 +267,13 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)',
             columnGap: 12,
             padding: '0 20px',
-            alignItems: 'start',
+            // Both top plaques share one height (the resources one carries a second line): same bottom edge.
+            alignItems: 'stretch',
             pointerEvents: 'none',
           }}
         >
           <div style={{ justifySelf: 'start', minWidth: 0, pointerEvents: 'auto' }}>{objectiveSlot}</div>
-          <HudPlaque shape="hang" as="section" style={{ padding: '10px 34px 20px', pointerEvents: 'auto' }}>
+          <HudPlaque shape="hang" as="section" style={{ padding: '10px 34px 20px', pointerEvents: 'auto', display: 'flex', alignItems: 'center' }}>
             {whenWhereSlot}
           </HudPlaque>
           <HudPlaque

@@ -899,7 +899,8 @@
         "construction": "Construction",
         "harvest": "Harvest",
         "visit": "Visit",
-        "other": "Other"
+        "other": "Other",
+        "quest": "Quest"
       },
       "fixtures": {
         "invasion": "Goblin host reaches the village",
