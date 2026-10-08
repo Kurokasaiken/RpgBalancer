@@ -31,8 +31,8 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
   const [draft, setDraft] = useState<Record<string, number>>({});
   useEffect(() => setDraft({}), [fields]);
   const shown = (field: TuningField) => draft[field.id] ?? field.value;
-  const commit = (field: TuningField) => {
-    if (draft[field.id] !== undefined && draft[field.id] !== field.value) onCommit(field.id, draft[field.id]);
+  const commit = (field: TuningField, value: number) => {
+    if (value !== field.value) onCommit(field.id, value);
   };
   return (
     <HudPlaque
@@ -40,7 +40,7 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
       as="section"
       aria-label={t('gameFrame.panels.names.tuning')}
       data-testid="tuning-panel"
-      style={{ position: 'fixed', left: 24, top: 120, zIndex: 1000, width: 260, display: 'flex', flexDirection: 'column', gap: 8, padding: '9px 12px 12px', pointerEvents: 'auto', maxHeight: 'calc(100vh - 220px)', overflowY: 'auto', ...panelStyle }}
+      style={{ position: 'fixed', left: 24, top: 120, zIndex: 1000, width: 260, display: 'flex', flexDirection: 'column', gap: 8, padding: '9px 6px 12px 12px', pointerEvents: 'auto', ...panelStyle }}
     >
       <div {...handleProps} title={t('gameFrame.panel.dragHint')} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ flex: 1, fontFamily: 'var(--skin-font-display)', fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
@@ -52,6 +52,7 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
           </button>
         )}
       </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 'calc(100vh - 260px)', overflowY: 'auto', paddingRight: 8 }}>
       {fields.map((field) => (
         <label key={field.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 2, fontFamily: 'var(--skin-font-serif)', fontSize: 13, color: 'var(--skin-body-color)' }}>
           <span>{field.label}</span>
@@ -63,8 +64,8 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
             step={field.step}
             value={shown(field)}
             onChange={(event) => setDraft((d) => ({ ...d, [field.id]: Number(event.target.value) }))}
-            onPointerUp={() => commit(field)}
-            onKeyUp={() => commit(field)}
+            onPointerUp={(event) => commit(field, Number(event.currentTarget.value))}
+            onKeyUp={(event) => commit(field, Number(event.currentTarget.value))}
             style={{ gridColumn: '1 / -1', width: '100%' }}
           />
         </label>
@@ -77,6 +78,7 @@ export const TuningPanel: React.FC<TuningPanelProps> = ({ fields, onCommit, onRe
           {t('gameFrame.tuning.reset')}
         </button>
       )}
+      </div>
     </HudPlaque>
   );
 };
