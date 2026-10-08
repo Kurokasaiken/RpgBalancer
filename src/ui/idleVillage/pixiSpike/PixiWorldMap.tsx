@@ -14,7 +14,6 @@ import {
   TilingSprite,
   DisplacementFilter,
   AlphaFilter,
-  ColorMatrixFilter,
 } from 'pixi.js';
 import { createRefractionNoise, createSeabedArt } from './seabedTexture';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
@@ -343,26 +342,6 @@ const CLOUD_SHADOW_COLOR = '#0b1a14';
 const CLOUD_SHADOW_BLUR_PX = 10;
 
 
-/**
- * Colour matrix for the time of day: night is darker, cooler and less saturated; dawn and dusk lean amber.
- * `light` 1 = untouched daylight, 0 = deepest night; `warm` 0-1.
- */
-function timeOfDayMatrix(light: number, warm: number): [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number] {
-  const sat = 0.62 + 0.38 * light;
-  const lr = 0.299 * (1 - sat);
-  const lg = 0.587 * (1 - sat);
-  const lb = 0.114 * (1 - sat);
-  const bright = 0.42 + 0.58 * light;
-  const r = bright * (0.78 + 0.22 * light) * (1 + 0.16 * warm);
-  const g = bright * (0.86 + 0.14 * light) * (1 + 0.03 * warm);
-  const b = bright * (1.04 - 0.04 * light) * (1 - 0.18 * warm);
-  return [
-    r * (lr + sat), r * lg, r * lb, 0, 0,
-    g * lr, g * (lg + sat), g * lb, 0, 0,
-    b * lr, b * lg, b * (lb + sat), 0, 0.02 * (1 - light),
-    0, 0, 0, 1, 0,
-  ];
-}
 
 const layerUrl = (world: string, file: string) =>
   file.includes('/')
@@ -561,19 +540,30 @@ export function PixiWorldMap({
 
       const ticks: ((seconds: number) => void)[] = [];
       const bandLayers: { layer: Container; parallax: number }[] = [];
-      // Time of day: one colour grade over the whole world, eased so a change of phase is a slow turn of the light.
-      const grade = new ColorMatrixFilter();
+      // Time of day: a multiply wash over the whole world (no filter: a world-sized filter renders off-screen at a lower
+      // resolution and blurred everything). Night tints blue-grey and darker, dawn and dusk amber; eased slowly.
+      const wash = new Sprite(Texture.WHITE);
+      wash.blendMode = 'multiply';
+      wash.visible = false;
       const lit = { light: 1, warm: 0 };
       ticks.push(() => {
         const target = ambientRef.current ?? { light: 1, warm: 0 };
         lit.light += (target.light - lit.light) * 0.015;
         lit.warm += (target.warm - lit.warm) * 0.015;
         if (lit.light > 0.995 && lit.warm < 0.005) {
-          if (world.filters) world.filters = null;
+          wash.visible = false;
           return;
         }
-        grade.matrix = timeOfDayMatrix(lit.light, lit.warm);
-        if (!world.filters) world.filters = [grade];
+        const night = 1 - lit.light;
+        const r = (1 - 0.52 * night) * (1 - 0.02 * lit.warm);
+        const g = (1 - 0.44 * night) * (1 - 0.13 * lit.warm);
+        const b = (1 - 0.22 * night) * (1 - 0.32 * lit.warm);
+        wash.tint = (Math.round(r * 255) << 16) | (Math.round(g * 255) << 8) | Math.round(b * 255);
+        if (wash.parent !== world || world.getChildIndex(wash) !== world.children.length - 1) world.addChild(wash);
+        wash.position.set(-margin - 2000, -marginY - 2000);
+        wash.width = canvas.width + 2 * margin + 4000;
+        wash.height = canvas.height + 2 * marginY + 4000;
+        wash.visible = true;
       });
       ticks.push((t) => {
         for (const c of canopySway) {
@@ -743,7 +733,7 @@ export function PixiWorldMap({
         noise.texture.source.style.addressMode = 'repeat';
         noise.renderable = false;
         noise.scale.set(6);
-        const refraction = new DisplacementFilter({ sprite: noise, scale: 14 });
+        const refraction = new DisplacementFilter({ sprite: noise, scale: 14, resolution: app.renderer.resolution });
         ticks.push((t) => {
           noise.x = t * 18;
           noise.y = t * 11;
@@ -756,7 +746,7 @@ export function PixiWorldMap({
         const seaGroup = new Container();
         for (const sprite of seaSprites) seaGroup.addChild(sprite);
         world.addChildAt(seaGroup, seaIndex);
-        const seaAlpha = new AlphaFilter({ alpha: 1 });
+        const seaAlpha = new AlphaFilter({ alpha: 1, resolution: app.renderer.resolution, antialias: 'inherit' });
         world.addChildAt(noise, seaIndex);
         world.addChildAt(bedMask, seaIndex);
         world.addChildAt(bedBox, seaIndex + 2);
