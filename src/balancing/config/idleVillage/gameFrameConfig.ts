@@ -404,6 +404,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     seabed: { opacity: 0.55, parallax: 0.8 },
     hiddenLayerIds: ['frame', 'border'],
     showAtmosphere: false,
+      { id: 'quest', labelKey: 'gameFrame.events.types.quest', icon: 'chronicle', tone: 'warning', priority: 1 },
     showSeaMarks: true,
     showWaves: true,
     showSeaRipple: true,
