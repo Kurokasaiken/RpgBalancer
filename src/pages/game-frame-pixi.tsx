@@ -22,6 +22,7 @@ import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfac
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_BEATS, GOBLIN_META, GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { nodeDurationTicks } from '@/ui/idleVillage/questS1Lab/questRun';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 // GameFrame is a fresh, not-yet-kitted composition (R-075).
 // eslint-disable-next-line no-restricted-imports
@@ -107,7 +108,7 @@ export default function GameFramePixiPage() {
       { id: 'foamStrength', group: 'Sea', label: 'Coast foam', hint: 'Brightness of the foam lines washing onto the shores.', value: motion.foamStrength, min: 0, max: 1.5, step: 0.05 },
       { id: 'foamCrestSpeed', group: 'Sea', label: 'Coast foam speed', hint: 'How fast the foam crests travel toward the shore (world px per second). Original look: 9.', value: motion.foamCrestSpeed, min: 0, max: 40, step: 1 },
       { id: 'markSpacingPx', group: 'Sea', label: 'Wave spacing (px)', hint: 'No two painted waves or sea marks play at once closer than this. Higher = sparser, calmer sea.', value: tuneNow.markSpacingPx, min: 300, max: 1800, step: 50 },
-      { id: 'wonderEveryS', group: 'Sea', label: 'Sea wonder every (s)', hint: 'Shortest wait before a kraken, whale or ship surfaces (the longest wait is about double).', value: tuneNow.wonderEveryS, min: 5, max: 120, step: 1 },
+      { id: 'wonderEveryS', group: 'Sea', label: 'Sea wonder every (s)', hint: 'Average wait between sea wonders (kraken, whale, ship), in real seconds. Default 600 = one every 10 minutes; a wait varies between 0.6x and 1.4x of it.', value: tuneNow.wonderEveryS, min: 30, max: 1800, step: 30 },
       { id: 'forestSway', group: 'Land', label: 'Forest sway (px)', hint: 'How far (world px) the forest crowns sway in the wind. 0 = still forests (and the original, unsplit base). At the normal map zoom 4 px is about 1 screen px: try 10-16 to see it clearly.', value: tuneNow.forestSway, min: 0, max: 20, step: 0.5 },
       { id: 'forestSwaySpeed', group: 'Land', label: 'Forest wind speed', hint: 'How fast the gusts roll over the forests. 1 = a gust every ~8 s, 2 = twice as fast.', value: tuneNow.forestSwaySpeed, min: 0.2, max: 4, step: 0.1 },
       { id: 'regionLinePx', group: 'Regions', label: 'Region border (px)', hint: 'Thickness of the black ink border of a hovered territory, in world px (about a quarter on screen at normal zoom).', value: tuneNow.regionLinePx, min: 3, max: 30, step: 1 },
@@ -142,6 +143,7 @@ export default function GameFramePixiPage() {
     document.documentElement.setAttribute('data-skin-preset', skinId);
   }, [skinId]);
   const [poiDemo, setPoiDemo] = useState(false);
+  const [wonderRequest, setWonderRequest] = useState(0);
   const [regionHover, setRegionHover] = useState<PixiRegionHover | null>(null);
   const [invasion, setInvasion] = useState<{ dueDay: number } | null>(null);
   // Goblin invasion, as on /world-surface: the parchment curtains close over the map, the announcement card
@@ -237,12 +239,24 @@ export default function GameFramePixiPage() {
   // Opening "Quest in progress" from the Panels menu (or Q) with nothing running starts the goblin quest, as the
   // Director button does: otherwise the menu ticked the panel on and nothing appeared.
   const questPanelOpen = panels.visible.quest;
+  const currentTick = session.gameplay.state.currentTick ?? 0;
   useEffect(() => {
     if (!questPanelOpen || questRun.run) return;
-    questRun.start(GOBLIN_PRESETS[0].id);
-    setQuestRunStartTick(session.gameplay.state.currentTick ?? 0);
+    // v27 frontier (PLAN-025 T-004): the quest's authored days are shared
+    // evenly across its maturable nodes; the session clock is the tick source.
+    questRun.start(GOBLIN_PRESETS[0].id, {
+      nodeTicks: nodeDurationTicks('goblin', questWindow.durationDays * dayLengthTicks),
+      startTick: currentTick,
+    });
+    setQuestRunStartTick(currentTick);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questPanelOpen]);
+  // The game clock matures timed nodes (v27): paused game = paused quest;
+  // a late open catches up deterministically to the first waiting frontier.
+  useEffect(() => {
+    questRun.syncClock(currentTick);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTick]);
   // Bag arming is the player's call: nothing is spent on a check unless armed.
   const [questArmed, setQuestArmed] = useState(questWindow.consumablesArmedByDefault);
   const questRunTime = useMemo(() => {
@@ -316,6 +330,11 @@ export default function GameFramePixiPage() {
         label: t('gameFrame.director.poiTypes'),
         active: poiDemo,
         onTrigger: () => setPoiDemo((on) => !on),
+      },
+      {
+        id: 'wonder',
+        label: t('gameFrame.director.wonder'),
+        onTrigger: () => setWonderRequest((n) => n + 1),
       },
       {
         id: 'skin',
@@ -431,6 +450,7 @@ export default function GameFramePixiPage() {
                   seabed={seabed}
                   tune={tuneNow}
                   ambient={ambient}
+                  wonderRequest={wonderRequest}
                   regions={{ assetBase: '/assets/world/wanderlust/base', onHover: setRegionHover }}
                   worldLayer={(canvas) => (
                     <div style={{ pointerEvents: 'auto' }}>
