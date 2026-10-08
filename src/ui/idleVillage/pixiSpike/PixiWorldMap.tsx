@@ -14,6 +14,7 @@ import {
   TilingSprite,
   DisplacementFilter,
   AlphaFilter,
+  ColorMatrixFilter,
 } from 'pixi.js';
 import { createRefractionNoise, createSeabedArt } from './seabedTexture';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
@@ -101,6 +102,11 @@ export const DEFAULT_MAP_TUNE: PixiMapTune = {
 };
 
 export interface PixiWorldMapProps {
+  /**
+   * Time of day as a grade over the whole map: `light` 1 = full day, 0 = deepest night; `warm` 0-1 = the amber of
+   * dawn and dusk. The map eases toward it over a few seconds; omit for plain daylight.
+   */
+  ambient?: { light: number; warm: number };
   /** Live look-and-feel numbers (defaults in `DEFAULT_MAP_TUNE`). */
   tune?: Partial<PixiMapTune>;
   manifestPath: string;
@@ -336,6 +342,28 @@ const CLOUD_CLEAR_MIN = 0.12;
 const CLOUD_SHADOW_COLOR = '#0b1a14';
 const CLOUD_SHADOW_BLUR_PX = 10;
 
+
+/**
+ * Colour matrix for the time of day: night is darker, cooler and less saturated; dawn and dusk lean amber.
+ * `light` 1 = untouched daylight, 0 = deepest night; `warm` 0-1.
+ */
+function timeOfDayMatrix(light: number, warm: number): [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number] {
+  const sat = 0.62 + 0.38 * light;
+  const lr = 0.299 * (1 - sat);
+  const lg = 0.587 * (1 - sat);
+  const lb = 0.114 * (1 - sat);
+  const bright = 0.42 + 0.58 * light;
+  const r = bright * (0.78 + 0.22 * light) * (1 + 0.16 * warm);
+  const g = bright * (0.86 + 0.14 * light) * (1 + 0.03 * warm);
+  const b = bright * (1.04 - 0.04 * light) * (1 - 0.18 * warm);
+  return [
+    r * (lr + sat), r * lg, r * lb, 0, 0,
+    g * lr, g * (lg + sat), g * lb, 0, 0,
+    b * lr, b * lg, b * (lb + sat), 0, 0.02 * (1 - light),
+    0, 0, 0, 1, 0,
+  ];
+}
+
 const layerUrl = (world: string, file: string) =>
   file.includes('/')
     ? `/assets/atmosphere/${file.split('/').map(encodeURIComponent).join('/')}`
@@ -381,6 +409,7 @@ export function PixiWorldMap({
   seabed,
   regions,
   tune: tuneProp,
+  ambient,
   seaPatternConfig = DEFAULT_SEA_PATTERN_CONFIG,
   coastFoamConfig = DEFAULT_COAST_FOAM_CONFIG,
   onStats,
@@ -394,6 +423,8 @@ export function PixiWorldMap({
   anchorsRef.current = anchors;
   const tune = { ...DEFAULT_MAP_TUNE, ...tuneProp };
   const tuneKey = JSON.stringify(tune);
+  const ambientRef = useRef(ambient);
+  ambientRef.current = ambient;
   const regionsRef = useRef(regions);
   regionsRef.current = regions;
   const regionsOn = !!regions;
@@ -530,6 +561,20 @@ export function PixiWorldMap({
 
       const ticks: ((seconds: number) => void)[] = [];
       const bandLayers: { layer: Container; parallax: number }[] = [];
+      // Time of day: one colour grade over the whole world, eased so a change of phase is a slow turn of the light.
+      const grade = new ColorMatrixFilter();
+      const lit = { light: 1, warm: 0 };
+      ticks.push(() => {
+        const target = ambientRef.current ?? { light: 1, warm: 0 };
+        lit.light += (target.light - lit.light) * 0.015;
+        lit.warm += (target.warm - lit.warm) * 0.015;
+        if (lit.light > 0.995 && lit.warm < 0.005) {
+          if (world.filters) world.filters = null;
+          return;
+        }
+        grade.matrix = timeOfDayMatrix(lit.light, lit.warm);
+        if (!world.filters) world.filters = [grade];
+      });
       ticks.push((t) => {
         for (const c of canopySway) {
           const amp = tn.forestSway / c.scale;
