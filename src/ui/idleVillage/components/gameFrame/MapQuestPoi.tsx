@@ -5,6 +5,7 @@ import PoiMatericV3_5, { poiMatericV3_5Styles } from '@/ui/idleVillage/component
 import type { PoiState, PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
 import type { QuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import type { QuestAvailability } from './questAvailability';
+import { usePoiTypeIcon } from './usePoiTypeIcon';
 
 export interface MapQuestPoiProps {
   session: QuestPoiSession;
@@ -133,6 +134,7 @@ function LiquidHalo({
 export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, availability, poiType = 'quest' }) => {
   const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId } = session;
   const { t } = useTranslation('idleVillage');
+  const iconUrl = usePoiTypeIcon(poiType);
   const { setNodeRef } = useDroppable({
     id: poiDropId,
     disabled: !canAcceptPoiDrop,
@@ -195,6 +197,7 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
         )}
         <PoiMatericV3_5
           type={poiType}
+          iconUrl={iconUrl}
           state={state}
           progress={progress}
           timerDirection="clockwise"

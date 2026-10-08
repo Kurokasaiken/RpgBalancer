@@ -12,6 +12,7 @@ import {
   ObjectiveCartouche,
   HudPanelsMenu,
   useHudPanels,
+  type HudPanelsApi,
   ResourceReadout,
   WhenWhereCluster,
 } from '@/ui/idleVillage/components/gameFrame';
@@ -47,9 +48,13 @@ export interface GameFrameScreenProps {
   extraEvents?: HudEvent[];
   /** What the player should do now; the top-left cartouche is hidden without it. */
   objective?: HudObjective;
+  /** Panels state owned by the page, so page-level panels (Director, Tuning) share the menu. Defaults to its own. */
+  panels?: HudPanelsApi;
+  /** Offer the dev-only panels in the Panels menu. */
+  devPanels?: boolean;
 }
 
-export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective }: GameFrameScreenProps) {
+export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective, panels: panelsProp, devPanels = false }: GameFrameScreenProps) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
@@ -69,7 +74,8 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
     [t],
   );
   const events = useMemo(() => [...(extraEvents ?? []), ...fixtureEvents], [extraEvents, fixtureEvents]);
-  const panels = useHudPanels();
+  const ownPanels = useHudPanels({ enabled: !panelsProp });
+  const panels = panelsProp ?? ownPanels;
   const captureMode = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
   const [recenterSignal, setRecenterSignal] = useState(0);
   const [focusRequest, setFocusRequest] = useState<{ x: number; y: number; n: number } | null>(null);
@@ -126,7 +132,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
         }
         resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />}
         hangingSlot={panels.visible.events ? <HudEventLedger events={events} context="game_frame" onSelect={focusEvent} onClose={() => panels.set('events', false)} /> : undefined}
-        utilitySlot={captureMode ? undefined : <HudPanelsMenu visible={panels.visible} onToggle={panels.toggle} />}
+        utilitySlot={captureMode ? undefined : <HudPanelsMenu visible={panels.visible} onToggle={panels.toggle} includeDev={devPanels} />}
         rosterSlot={panels.visible.roster ? (typeof rosterSlot === 'function' ? rosterSlot({ onClose: () => panels.set('roster', false) }) : (rosterSlot ?? <Roster componentId="game-frame-roster" density="compact" onClose={() => panels.set('roster', false)} />)) : undefined}
         recenterSlot={<HudRecenterButton onRecenter={() => setRecenterSignal((n) => n + 1)} />}
       >

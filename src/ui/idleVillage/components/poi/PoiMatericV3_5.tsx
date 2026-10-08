@@ -7,6 +7,8 @@ import type { PoiMarkerProps } from './PoiMarker';
 export interface PoiMatericV3_5Props extends PoiMarkerProps {
   portraitUrl?: string;
   isDragging?: boolean;
+  /** Painted glyph for the medallion's centre (replaces the default cross); one per POI family. */
+  iconUrl?: string;
   cursorVelocity?: { x: number; y: number } | null;
   'data-testid'?: string;
 }
@@ -151,6 +153,7 @@ function generateImperfections(base: {
 
 export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
   type,
+  iconUrl,
   state = 'available',
   progress = 1,
   timerDirection = 'counterclockwise',
@@ -809,12 +812,16 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
             </g>
 
             {/* L5: V1 cross icon */}
-            <g className="poiv3_5__cross" transform="translate(43 43) scale(0.9)">
-              {[0, 90, 180, 270].map((a) => (
-                <path key={a} d={CROSS_ARM} fill="#f0cf6a" transform={`rotate(${a})`} />
-              ))}
-              <circle cx="0" cy="0" r="4" fill="#f0cf6a" />
-            </g>
+            {iconUrl ? (
+              <image className="poiv3_5__cross" href={iconUrl} x="24" y="24" width="38" height="38" preserveAspectRatio="xMidYMid meet" />
+            ) : (
+              <g className="poiv3_5__cross" transform="translate(43 43) scale(0.9)">
+                {[0, 90, 180, 270].map((a) => (
+                  <path key={a} d={CROSS_ARM} fill="#f0cf6a" transform={`rotate(${a})`} />
+                ))}
+                <circle cx="0" cy="0" r="4" fill="#f0cf6a" />
+              </g>
+            )}
 
             {/* Portrait rim - bronze ring */}
             <circle cx="43" cy="43" r="27.5" fill="none"

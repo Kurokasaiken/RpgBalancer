@@ -927,7 +927,8 @@
       "reset": "Reset scena",
       "invasion": "Invasione goblin",
       "quest": "Mostra quest",
-      "skin": "Skin: {name}"
+      "skin": "Skin: {name}",
+      "poiTypes": "Tipi di POI"
     },
     "roster": {
       "title": "Roster",
@@ -966,7 +967,9 @@
       "close": "Chiudi pannello",
       "names": {
         "roster": "Roster",
-        "events": "Eventi"
+        "events": "Eventi",
+        "director": "Director",
+        "tuning": "Tuning"
       }
     },
     "regions": {
@@ -979,6 +982,9 @@
       "islands": "Le Isole Esterne",
       "village": "Il Villaggio",
       "meadows": "I Prati"
+    },
+    "tuning": {
+      "reset": "Ripristina valori"
     }
   },
   "missionPlanner": {
@@ -1147,13 +1153,13 @@
     "reset": "Reset",
     "chestRecovered": "Cassa recuperata",
     "item": {
-      "potion": "⚗ Pozione — cura un ferito",
-      "smoke": "✦ Fumogeno — +15 infiltrazione",
-      "rope": "🪢 Corda — +15 arrampicata",
-      "bonusForza": "⚔ Bonus Forza — +15 a un check",
-      "bonusPerc": "👁 Bonus Percezione — +15 a un check",
-      "healing": "✚ Cura — +20 HP al più ferito",
-      "usePotion": "⚗ Pozione → cura {name}"
+      "potion": "Pozione — cura un ferito",
+      "smoke": "Fumogeno — +15 infiltrazione",
+      "rope": "Corda — +15 arrampicata",
+      "bonusForza": "Bonus Forza — +15 a un check",
+      "bonusPerc": "Bonus Percezione — +15 a un check",
+      "healing": "Cura — +20 HP al più ferito",
+      "usePotion": "Pozione → cura {name}"
     },
     "loot": "Bottino: {items}",
     "intel": "Info: {items}",
@@ -1175,7 +1181,8 @@
     "throwCounter": "Tiro {current} di {total}",
     "verdictContinue": "{verdict} — continua",
     "sim": {
-      "open": "◈ PREVISIONE QUEST — cosa succede probabilmente (simulazione)",
+      "open": "PREVISIONE QUEST — cosa succede probabilmente (simulazione)",
+      "pill": "Previsione",
       "title": "PREVISIONE QUEST — radiografia probabilistica",
       "runsLabel": "{runs} run simulati",
       "whyTitle": "PERCHÉ?",
@@ -1325,7 +1332,7 @@
       "fast": "Veloce"
     },
     "skip": "Salta ▸",
-    "logToggle": "☰ Cronaca",
+    "logToggle": "Cronaca",
     "combatTurn": "turno {turn}/{turns}",
     "exposureTitle": "Chance di essere colpito da ogni colpo in arrivo: {pct}%",
     "spent": "Ha già incassato un colpo in questo turno",

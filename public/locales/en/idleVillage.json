@@ -920,7 +920,8 @@
       "reset": "Reset scene",
       "invasion": "Goblin invasion",
       "quest": "Show quest",
-      "skin": "Skin: {name}"
+      "skin": "Skin: {name}",
+      "poiTypes": "POI types"
     },
     "roster": {
       "title": "Roster",
@@ -959,7 +960,9 @@
       "close": "Close panel",
       "names": {
         "roster": "Roster",
-        "events": "Events"
+        "events": "Events",
+        "director": "Director",
+        "tuning": "Tuning"
       }
     },
     "regions": {
@@ -972,6 +975,9 @@
       "islands": "The Outer Isles",
       "village": "The Village",
       "meadows": "The Meadows"
+    },
+    "tuning": {
+      "reset": "Reset values"
     }
   },
   "missionPlanner": {
@@ -1126,13 +1132,13 @@
     "reset": "Reset",
     "chestRecovered": "Crate recovered",
     "item": {
-      "potion": "⚗ Potion — heals a wounded member",
-      "smoke": "✦ Smoke bomb — +15 infiltration",
-      "rope": "🪢 Rope — +15 climbing",
-      "bonusForza": "⚔ Strength Bonus — +15 to one check",
-      "bonusPerc": "👁 Perception Bonus — +15 to one check",
-      "healing": "✚ Healing — +20 HP to the most hurt",
-      "usePotion": "⚗ Potion → heal {name}"
+      "potion": "Potion — heals a wounded member",
+      "smoke": "Smoke bomb — +15 infiltration",
+      "rope": "Rope — +15 climbing",
+      "bonusForza": "Strength Bonus — +15 to one check",
+      "bonusPerc": "Perception Bonus — +15 to one check",
+      "healing": "Healing — +20 HP to the most hurt",
+      "usePotion": "Potion → heal {name}"
     },
     "loot": "Loot: {items}",
     "intel": "Intel: {items}",
@@ -1154,7 +1160,8 @@
     "throwCounter": "Roll {current} of {total}",
     "verdictContinue": "{verdict} — continue",
     "sim": {
-      "open": "◈ QUEST FORECAST — what is likely to happen (simulation)",
+      "open": "QUEST FORECAST — what is likely to happen (simulation)",
+      "pill": "Forecast",
       "title": "QUEST FORECAST — probabilistic X-ray",
       "runsLabel": "{runs} simulated runs",
       "whyTitle": "WHY?",
@@ -1304,7 +1311,7 @@
       "fast": "Fast"
     },
     "skip": "Skip ▸",
-    "logToggle": "☰ Chronicle",
+    "logToggle": "Chronicle",
     "combatTurn": "turn {turn}/{turns}",
     "exposureTitle": "Chance of being hit by each incoming hit: {pct}%",
     "spent": "Already took a hit this turn",

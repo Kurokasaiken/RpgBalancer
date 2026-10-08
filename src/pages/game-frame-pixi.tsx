@@ -24,7 +24,7 @@ import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceE
 // eslint-disable-next-line no-restricted-imports
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
-import { RegionTooltip, type HudEvent, type HudObjective } from '@/ui/idleVillage/components/gameFrame';
+import { MapDemoPoi, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type HudObjective, type TuningField } from '@/ui/idleVillage/components/gameFrame';
 
 /**
  * `/game-frame-pixi` — the /game-frame screen (same HUD, roster, instruments) on the
@@ -45,7 +45,31 @@ const INVASION_WARNING_DAYS = 5;
 export default function GameFramePixiPage() {
   const { worldDressing, questPois, debug, roster, questDetail, insets } = DEFAULT_GAME_FRAME_CONFIG;
   const safeFit = worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined;
-  const { motion } = worldDressing;
+  // Dev tuning (Tuning panel): overrides on top of the config, applied when a slider is released.
+  const [tuned, setTuned] = useState<Record<string, number>>({});
+  const motion = useMemo(() => {
+    const m = worldDressing.motion;
+    const pick = (key: keyof typeof m) => tuned[key] ?? m[key];
+    return { ...m, cloudShadowOpacity: pick('cloudShadowOpacity'), cloudShadowOffsetX: pick('cloudShadowOffsetX'), cloudShadowOffsetY: pick('cloudShadowOffsetY'), cloudSpeed: pick('cloudSpeed'), seaLineOpacity: pick('seaLineOpacity'), seaMotionAmount: pick('seaMotionAmount'), foamStrength: pick('foamStrength') };
+  }, [worldDressing.motion, tuned]);
+  const seabed = useMemo(
+    () => (worldDressing.seabed ? { opacity: tuned.seabedOpacity ?? worldDressing.seabed.opacity, parallax: tuned.seabedParallax ?? worldDressing.seabed.parallax } : undefined),
+    [worldDressing.seabed, tuned],
+  );
+  const tuningFields = useMemo<TuningField[]>(
+    () => [
+      { id: 'cloudShadowOpacity', label: 'Cloud shadow opacity', value: motion.cloudShadowOpacity, min: 0, max: 1, step: 0.02 },
+      { id: 'cloudShadowOffsetX', label: 'Shadow offset X', value: motion.cloudShadowOffsetX, min: 0, max: 300, step: 10 },
+      { id: 'cloudShadowOffsetY', label: 'Shadow offset Y', value: motion.cloudShadowOffsetY, min: 0, max: 300, step: 10 },
+      { id: 'cloudSpeed', label: 'Cloud speed', value: motion.cloudSpeed, min: 1, max: 20, step: 1 },
+      { id: 'seaLineOpacity', label: 'Sea lines opacity', value: motion.seaLineOpacity, min: 0, max: 0.6, step: 0.02 },
+      { id: 'seaMotionAmount', label: 'Sea motion amount', value: motion.seaMotionAmount, min: 0, max: 80, step: 2 },
+      { id: 'foamStrength', label: 'Coast foam', value: motion.foamStrength, min: 0, max: 1.5, step: 0.05 },
+      { id: 'seabedOpacity', label: 'Seabed opacity', value: seabed?.opacity ?? 0, min: 0, max: 1, step: 0.05 },
+      { id: 'seabedParallax', label: 'Seabed parallax (1 = glued)', value: seabed?.parallax ?? 1, min: 0.5, max: 1, step: 0.02 },
+    ],
+    [motion, seabed],
+  );
   const shadowOffset = useMemo(() => ({ x: motion.cloudShadowOffsetX, y: motion.cloudShadowOffsetY }), [motion]);
   const seaPatternConfig = useMemo(
     () => ({ ...DEFAULT_SEA_PATTERN_CONFIG, motionAmount: motion.seaMotionAmount, motionPeriod: motion.seaMotionPeriod, lineOpacity: motion.seaLineOpacity }),
@@ -67,6 +91,7 @@ export default function GameFramePixiPage() {
     applySkinCssVariables(skinId);
     document.documentElement.setAttribute('data-skin-preset', skinId);
   }, [skinId]);
+  const [poiDemo, setPoiDemo] = useState(false);
   const [regionHover, setRegionHover] = useState<PixiRegionHover | null>(null);
   const [invasion, setInvasion] = useState<{ dueDay: number } | null>(null);
   // Goblin invasion, as on /world-surface: the parchment curtains close over the map, the announcement card
@@ -82,17 +107,17 @@ export default function GameFramePixiPage() {
   // `?capture=1` starts a clean shot: no Director, no panel menu.
   const capture = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
   const directorEnabled = import.meta.env.DEV && debug.directorPanel && !capture;
-  const [directorVisible, setDirectorVisible] = useState(true);
+  const panels = useHudPanels();
   useEffect(() => {
     if (!directorEnabled) return undefined;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'F10') return;
       event.preventDefault();
-      setDirectorVisible((visible) => !visible);
+      panels.toggle('director');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [directorEnabled]);
+  }, [directorEnabled, panels]);
 
   // The detail opens between the roster and the ledger, never over either.
   const rosterRight = roster.leftPx + roster.widthPx;
@@ -136,10 +161,22 @@ export default function GameFramePixiPage() {
     return () => window.clearTimeout(timer);
   }, [questShown, expiredOpen]);
 
-  const anchors = useMemo<PixiMapAnchor[]>(
-    () => (poi && questShown ? [{ id: poi.id, x: poi.x, y: poi.y, node: <MapQuestPoi session={session} sizePx={poi.sizePx} availability={availability} /> }] : []),
-    [poi, questShown, session, availability],
-  );
+  const anchors = useMemo<PixiMapAnchor[]>(() => {
+    const list: PixiMapAnchor[] = [];
+    if (poi && questShown) list.push({ id: poi.id, x: poi.x, y: poi.y, node: <MapQuestPoi session={session} sizePx={poi.sizePx} availability={availability} /> });
+    if (poiDemo) {
+      // One of each family in a different territory (canvas 4240 x 2828): eastern mountains, southern forest, northern forest.
+      const demos = [
+        { type: 'quest', x: 0.7, y: 0.5 },
+        { type: 'job', x: 0.38, y: 0.66 },
+        { type: 'event', x: 0.35, y: 0.37 },
+      ] as const;
+      for (const demo of demos) {
+        list.push({ id: `demo-${demo.type}`, x: demo.x * 4240, y: demo.y * 2828, node: <MapDemoPoi type={demo.type} sizePx={poi?.sizePx ?? 55} /> });
+      }
+    }
+    return list;
+  }, [poi, questShown, session, availability, poiDemo]);
 
   const directorActions = useMemo<DirectorAction[]>(
     () => [
@@ -162,13 +199,19 @@ export default function GameFramePixiPage() {
         },
       },
       {
+        id: 'poitypes',
+        label: t('gameFrame.director.poiTypes'),
+        active: poiDemo,
+        onTrigger: () => setPoiDemo((on) => !on),
+      },
+      {
         id: 'skin',
         label: t('gameFrame.director.skin', { name: getSkinPresetConfig(skinId).label }),
         onTrigger: () =>
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, questShown, currentDay, t, skinId, session.gameplay.state.currentTick],
+    [invasion, questShown, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick],
   );
 
   return (
@@ -181,6 +224,8 @@ export default function GameFramePixiPage() {
           onDragCancel={() => session.setDraggingResidentId(null)}
         >
           <GameFrameScreen
+            panels={panels}
+            devPanels={directorEnabled}
             rosterSlot={({ onClose }) => (
               <Roster
                 onClose={onClose}
@@ -201,9 +246,18 @@ export default function GameFramePixiPage() {
             overlaySlot={
               <>
                 {session.overlays}
-                {directorEnabled && directorVisible && (
+                {directorEnabled && panels.visible.tuning && (
+                  <TuningPanel
+                    fields={tuningFields}
+                    onCommit={(id, value) => setTuned((current) => ({ ...current, [id]: value }))}
+                    onReset={() => setTuned({})}
+                    onClose={() => panels.set('tuning', false)}
+                  />
+                )}
+                {directorEnabled && panels.visible.director && (
                   <DirectorPanel
                     actions={directorActions}
+                    onClose={() => panels.set('director', false)}
                     onReset={() => {
                       setInvasion(null);
                       setShroudCovered(false);
@@ -229,7 +283,7 @@ export default function GameFramePixiPage() {
                   cloudShadowOpacity={motion.cloudShadowOpacity}
                   cloudShadowOffset={shadowOffset}
                   cloudSpeed={motion.cloudSpeed}
-                  seabed={worldDressing.seabed}
+                  seabed={seabed}
                   regions={{ assetBase: '/assets/world/wanderlust/base', onHover: setRegionHover }}
                   worldLayer={(canvas) => (
                     <div style={{ pointerEvents: 'auto' }}>

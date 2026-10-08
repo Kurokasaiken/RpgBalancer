@@ -232,3 +232,7 @@ Aggiungere un pannello al sistema: aggiungi l'id a `HudPanelId` e a `HUD_PANEL_S
 - `?capture=1`: niente Director e niente menu pannelli, per screenshot e trailer puliti (F10 nasconde il Director anche senza).
 - `?skin=base|lacquer_atlas`: skin iniziale. `?map=graded|original`: mappa graduata o originale.
 - Mappa: `worldDressing.seabed` (fondale con parallasse sotto il mare), `motion.cloudShadowOpacity` (ombre delle nuvole: gli sprite forniti sono nuvole chiare, vengono tinti di scuro), `regions` su `PixiWorldMap` (regioni da `region_ids.png`, rigenerabile con `scripts/bake-region-ids.py`).
+
+## Pannelli chiudibili e menu Pannelli
+
+Ogni pannello flottante che il giocatore può chiudere si registra in `components/gameFrame/hudPanelRegistry.ts` (id, tasto, visibilità iniziale, `devOnly` per gli strumenti di test). Il menu Pannelli (bottone in basso a destra, con un contatore dei pannelli chiusi) si genera da quella lista: **per aggiungere un pannello basta una riga nel registro e la stringa `gameFrame.panels.names.<id>` nei due locale** (un test di guardia fallisce se manca). Il pannello deve avere un pulsante di chiusura che chiama `panels.set(id, false)`. In sviluppo ci sono anche Director (D) e Tuning (T): Tuning mostra a schermo i valori di tuning della mappa, con slider, e la riga da incollare in `gameFrameConfig.ts`.
