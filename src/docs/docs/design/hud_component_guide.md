@@ -264,3 +264,10 @@ Solo tre ruoli, tutti dai token (nessun colore scritto a mano, **mai viola** —
 | **Utilità/secondario** (fuori dalle testate) | `<SkinButton>` (`utility` / `secondary`) | placca in bronzo battuto / ardesia incisa |
 
 Regole: (1) un `<button>` nudo non va mai in un pannello HUD, perché eredita lo stile del browser; (2) i controlli nativi (slider, select) prendono `accent-color: var(--skin-title-color)`; (3) l'icona sola sta in un bottone 26×26 con `aria-label` e `title`; (4) stato attivo ≠ hover: l'attivo cambia fondo e bordo, l'hover solo luminosità; (5) un'azione che parte con un tasto lo scrive nel `title` (es. `Pausa [Spazio]`).
+
+## Vita della mappa (effetti leggeri, tutti in `PixiWorldMap`)
+
+Tutto gira su uno shader o su pochi sprite, senza ricostruire la scena e senza muovere la geometria della terra (niente bordi fantasma):
+raffiche di vento sulle foreste (`CANOPY_GUST_FRAG`), fumo dai tetti del villaggio (`VILLAGE_CHIMNEYS`), luccichii di sole sul mare (punti `sea` di `points.json`),
+mostri marini rari, onde distanziate, nuvole su tre strati con parallasse e deriva con scostamento di vento, ombre morbide sul suolo e fondale trasparente
+mentre si trascina. `prefers-reduced-motion` spegne vento, fumo e luccichii. Per rifare i ritagli di isole e foreste: `scripts/defringe-layers.py`.
