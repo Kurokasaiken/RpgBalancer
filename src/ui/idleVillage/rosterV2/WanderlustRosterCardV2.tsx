@@ -354,7 +354,8 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
   };
 
   if (compact) {
-    const statusText = statusKind ? t(`roster.status.${statusKind}`) : subtitle;
+    // The normal state says nothing: a status only shows when it is an exception.
+    const statusText = statusKind === 'active' ? '' : statusKind ? t(`roster.status.${statusKind}`) : subtitle;
     const statusTone = statusKind
       ? STATUS_TONE[statusKind]
       : subtitle === 'Ferito'
@@ -436,8 +437,12 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
           )}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-          <WanderlustStatBar label="HP" value={hp} maxValue={maxHp} variant="hp" size="xs" hideLabel />
-          <WanderlustStatBar label="Stamina" value={100 - fatigue} maxValue={100} variant="stamina" size="xs" hideLabel />
+          <div title={`${t('roster.stats.hp')} ${hp}/${maxHp}`}>
+            <WanderlustStatBar label="HP" value={hp} maxValue={maxHp} variant="hp" size="xs" hideLabel />
+          </div>
+          <div title={`${t('roster.stats.stamina')} ${100 - fatigue}/100`}>
+            <WanderlustStatBar label="Stamina" value={100 - fatigue} maxValue={100} variant="stamina" size="xs" hideLabel />
+          </div>
         </div>
       </div>
     );
