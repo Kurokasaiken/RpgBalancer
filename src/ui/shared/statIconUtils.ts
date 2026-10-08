@@ -1,6 +1,7 @@
 import type { ElementType } from 'react';
 import {
   Axe,
+  Cable,
   BookOpen,
   Crown,
   Droplets,
@@ -45,6 +46,7 @@ export const lucideStatIcons: Record<string, ElementType> = {
   scroll: Scroll,
   wand: Wand2,
   axe: Axe,
+  cable: Cable,
   hammer: Hammer,
   feather: Feather,
   sun: Sun,

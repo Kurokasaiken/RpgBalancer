@@ -92,6 +92,7 @@ Prima di creare un nuovo componente UI, tutte e 5 le condizioni devono essere ve
 (3) Hai cercato in src/ui/idleVillage/skins/primitives/ ?
 (4) Il nuovo componente NON duplica markup/styling di una primitiva esistente?
 (5) Se crei una nuova primitiva, la stai aggiungendo alla directory corretta (non lasciandola come componente isolato)?
+(6) Se il componente sta sopra `/game` o è una schermata d'azione a pagina intera: hai letto `src/docs/docs/design/hud_component_guide.md` (Lacquer Atlas: `HudPlaque`, token `--skin-hud-*`, `data-hud-controls`, testo ≥12px)?
 Se anche solo una risposta è 'no' → STOP, segnala.
 Testing Requirements
 Unit Test Coverage

@@ -226,6 +226,10 @@ export interface QuestSimulationPreviewProps {
   run: QuestRunState;
   /** Simulations per forecast — default 10.000 (spec §4). */
   runs?: number;
+  /** Controlled open state (PLAN-024): when set, the built-in trigger is not
+   *  rendered and the parent owns the toggle (e.g. a strip pill). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 /**
@@ -233,9 +237,18 @@ export interface QuestSimulationPreviewProps {
  * party edits, leader, strategy, quest state — each produces a new
  * deterministic seed.
  */
-export const QuestSimulationPreview: React.FC<QuestSimulationPreviewProps> = ({ run, runs = 10000 }) => {
+export const QuestSimulationPreview: React.FC<QuestSimulationPreviewProps> = ({
+  run,
+  runs = 10000,
+  open: openProp,
+  onOpenChange,
+}) => {
   const { t } = useTranslation('idleVillage');
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  /* PLAN-024: the trigger can live outside (a pill in the context strip);
+   *  when `open` is controlled the closed state renders nothing here. */
+  const open = openProp ?? openState;
+  const setOpen = onOpenChange ?? setOpenState;
   const [edits, setEdits] = useState<Record<string, MemberEdit>>({});
   const [leaderId, setLeaderId] = useState<string | null>(null);
   const [strategy, setStrategy] = useState<SimStrategy>(() => defaultStrategy(run));
@@ -294,6 +307,7 @@ export const QuestSimulationPreview: React.FC<QuestSimulationPreviewProps> = ({ 
   const choices = useMemo(() => choiceNodesFor(run), [run]);
 
   if (!open) {
+    if (openProp !== undefined) return null;
     return (
       <SkinScope>
         <MatericButton variant="secondary" onClick={() => setOpen(true)} className="w-full">

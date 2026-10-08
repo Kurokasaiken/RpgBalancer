@@ -5,6 +5,12 @@ redesign cockpit di `QuestS1LabPage` (PLAN-023, artifact multi-AI
 `.mw/runs/20261007-quest-s1-lab-ui-redesign/artifact-r005.md`). Vale per ogni nuova
 superficie quest.
 
+> **Superfici e colori**: questa guida governa *layout e pipeline di presentazione*.
+> Per estetica, superfici (`HudPlaque`), token `--skin-hud-*`, controlli e tipografia
+> il riferimento è `src/docs/docs/design/hud_component_guide.md` (Lacquer Atlas) —
+> in particolare §6b «Schermate d'azione a pagina intera», scritta per questo lab
+> (PLAN-024).
+
 ## 1. Layout: cockpit a tre regioni, zero scroll
 
 Una schermata di quest risponde in uno sguardo a tre domande: *dove sono, chi sta

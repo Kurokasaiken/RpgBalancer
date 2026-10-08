@@ -495,6 +495,10 @@
   - reason: documentation, pending canonical review  
 - `src/docs/docs/design/primitive_composition_rules.md` — Primitive Composition Rules  
   - reason: documentation, pending canonical review  
+- `src/docs/docs/design/hud_component_guide.md` — Guida: creare componenti HUD (Lacquer Atlas) — superfici HudPlaque, token, controlli, schermate d'azione  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/quest_ui_component_guide.md` — Quest UI Component Guide — cockpit, eventi strutturati, canale danno  
+  - reason: documentation, pending canonical review  
 - `src/docs/docs/devops/multi_app_boot_guard.md` — Multi-App Dev Boot Guard & Auto-Recovery (NP-161)  
   - reason: documentation, pending canonical review  
 - `src/docs/docs/diagnostics/worker_picker.md` — worker_picker  

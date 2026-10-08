@@ -21,7 +21,7 @@ export const StashItemSchema = z.object({
   labelKey: z.string().min(1),
   /** i18n key for the tooltip effect description (`questS1Lab.stash.desc.*`). */
   descKey: z.string().min(1),
-  /** Display icon (emoji) on the picker chip and belt. */
+  /** Lucide icon id (resolved via `@/ui/shared/statIconUtils`) on the picker chip and belt. */
   icon: z.string().min(1),
   /** 'check': armed before a check, +bonus when stats match.
    *  'action': used standalone from the belt at a decision node. */
@@ -52,7 +52,7 @@ const RAW_QUEST_STASH = {
       flag: 'hasBonusForza',
       labelKey: 'questS1Lab.item.bonusForza',
       descKey: 'questS1Lab.stash.desc.bonusForza',
-      icon: '💪',
+      icon: 'axe',
       kind: 'check',
       bonus: 15,
       stats: ['str'],
@@ -61,7 +61,7 @@ const RAW_QUEST_STASH = {
       flag: 'hasBonusPerc',
       labelKey: 'questS1Lab.item.bonusPerc',
       descKey: 'questS1Lab.stash.desc.bonusPerc',
-      icon: '👁',
+      icon: 'crosshair',
       kind: 'check',
       bonus: 15,
       stats: ['perc'],
@@ -70,7 +70,7 @@ const RAW_QUEST_STASH = {
       flag: 'hasFumogeno',
       labelKey: 'questS1Lab.item.smoke',
       descKey: 'questS1Lab.stash.desc.smoke',
-      icon: '💨',
+      icon: 'wind',
       kind: 'check',
       bonus: 15,
       stats: ['agi'],
@@ -79,7 +79,7 @@ const RAW_QUEST_STASH = {
       flag: 'hasCorda',
       labelKey: 'questS1Lab.item.rope',
       descKey: 'questS1Lab.stash.desc.rope',
-      icon: '🪢',
+      icon: 'cable',
       kind: 'check',
       bonus: 15,
       stats: ['con', 'str'],
@@ -88,14 +88,14 @@ const RAW_QUEST_STASH = {
       flag: 'hasHealing',
       labelKey: 'questS1Lab.item.healing',
       descKey: 'questS1Lab.stash.desc.healing',
-      icon: '✚',
+      icon: 'heart',
       kind: 'action',
     },
     {
       flag: 'hasPozione',
       labelKey: 'questS1Lab.item.potion',
       descKey: 'questS1Lab.stash.desc.potion',
-      icon: '🧪',
+      icon: 'droplets',
       kind: 'action',
     },
   ],
