@@ -47,12 +47,12 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-018](PLAN-018-mission-planner.md) | Mission Planner PARTY/LOADOUT/OUTCOME | completed | — | MP-00..MP-07 done 2026-10-02; remap pending vs desiderata v24 rev.2 victory rule (C7) |
 | [PLAN-019](PLAN-019-quest-macro-plan.md) | Macro plan Quest S1→S5 | active | P1 | desiderata v24, R-076 |
 | [PLAN-019-S1](PLAN-019-S1-quest-interessante.md) | S1 — «La cassa delle sementi» | active | P1 | child of PLAN-019; blocked on T-001 (correzione contenuti Director) |
-| [PLAN-019-S2](PLAN-019-S2-quest-vera.md) | S2 — quest vera: 2 POI reali su /game (contenitore) | active | P1 | child of PLAN-019; R-107; gate D-A…D-K chiusi; 2 giri critica web sui figli assorbiti; battezzato 2026-10-09 |
+| [PLAN-019-S2](PLAN-019-S2-quest-vera.md) | S2 — quest vera: 2 POI reali su /game (contenitore) | completed | — | child of PLAN-019; R-107; gate D-A…D-K chiusi; 2 giri critica web sui figli assorbiti; tutti i 5 figli completed 2026-10-10 |
 | [PLAN-019-S2.1](PLAN-019-S2.1-scenario-canonico.md) | Scenario canonico: schema Zod + migrazione goblin/rovine | completed | — | child of PLAN-019-S2; done 2026-10-09 — schema+migrazione+fixture+suite 30/30; evidence test-results/s21-scenario-canonico-2026-10-09.log |
-| [PLAN-019-S2.2](PLAN-019-S2.2-party-reale.md) | Party reale: pipeline stats + item + createRun | active | — | child of PLAN-019-S2; eseguibile |
+| [PLAN-019-S2.2](PLAN-019-S2.2-party-reale.md) | Party reale: pipeline stats + item + createRun | completed | — | child of PLAN-019-S2; done 2026-10-09 — adapter+scale+item reali; aperto gate Director T-1b/T-4b (scale+calibrazione); evidence test-results/s22-party-reale-2026-10-09.log |
 | [PLAN-019-S2.3](PLAN-019-S2.3-offerta-scaling.md) | Offerta POI: questPois + bande + resolveQuestOffer + worldScaling | completed | — | child of PLAN-019-S2; T-1…T-6 fatti, 159/159 scope; findings numeri first-pass (2026-10-10) |
 | [PLAN-019-S2.4](PLAN-019-S2.4-planning-lancio.md) | Planning surface + lancio (D-G/D-H/D-J/D-K) | completed | — | child of PLAN-019-S2; T-0…T-6 fatti (2026-10-10); unit 129/129, E2E 9/9, build+kanban ✓ |
-| [PLAN-019-S2.5](PLAN-019-S2.5-settlement-e2e.md) | Settlement idempotente + E2E + chiusura | proposed | — | child of PLAN-019-S2; sbloccato da S2.4 (2026-10-10); T-0 verifica PersistenceService |
+| [PLAN-019-S2.5](PLAN-019-S2.5-settlement-e2e.md) | Settlement idempotente + E2E + chiusura | completed | — | child of PLAN-019-S2; done 2026-10-10 — journal per-effetto + fault-injection 11/11, E2E 11/11 (settlement→conseguenze→rilascio→POI2), build+kanban ✓; evidence test-results/s25-settlement-e2e-2026-10-09.log |
 | [PLAN-MOCKUP-v1](PLAN-MOCKUP-TO-COMPONENT-v1.md) | Mockup→Component v1 | superseded | — | bocciato da delibera multi-AI → v2 |
 | [PLAN-MOCKUP-v2](PLAN-MOCKUP-TO-COMPONENT-v2.md) | Mockup→Component v2 | superseded | — | cold read NO (5 blocking) → v3 |
 | [PLAN-MOCKUP-v3](PLAN-MOCKUP-TO-COMPONENT-v3.md) | Mockup→Component v3 | active | — | decisioni Director ratificate; pilot GoblinEventLabPage |
