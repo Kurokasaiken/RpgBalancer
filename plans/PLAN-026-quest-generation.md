@@ -182,8 +182,19 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   `traits` su `ResidentState`→`LabMember`; gating `requiresTrait`/
   `hiddenIfTrait`; 26 test nuovi, 202/202 suite. Evidence:
   `test-results/plan026-t2-engine-v2-2026-10-09.log`. Residuo T2:
-  **generatore strutturale** (emette `QuestScenario` che passa lo schema).
-- T3 — primo dominio + primo imprint su catalogo v0.
+  **generatore strutturale — fatto** (v. T3).
+- **T3 — primo dominio + imprint v0 — FATTO parziale**: generatore
+  strutturale `generateRaceToPass` parametrizzato (goal/twistChance/names)
+  che emette `QuestScenario` via `parseQuestScenario` —
+  `src/balancing/config/idleVillage/quests/generation/raceToPass.ts`;
+  catalogo v0 `RACE_TO_PASS_SCENARIO`; profilo motore `gen` (QUESTS
+  vuoto per contratto, `createRun` richiede party+istanza, testi
+  generici per intro/end/flee/dropObjective); `ScenarioInstance.
+  primaryStats` congelato per la preview; `createScenarioInstance`
+  accetta override `questId`. 13 test e2e: vars race, armRoll
+  scavezzacollo→imboscata, gating avido/prudente/info, TAKEN→SECURED
+  reward, rival-win survived. Suite quest: 187/187. Residuo T3:
+  secondo kit (palude) e secondo gimmick per la varietà strutturale.
 - T4 — generazione narrativa offline (provider strategy P3) + benchmark.
 - T5 — twist del party (prerequisito: `traits` su ResidentState).
 - T6 — integrazione dopo gate PLAN-019 pertinenti.
