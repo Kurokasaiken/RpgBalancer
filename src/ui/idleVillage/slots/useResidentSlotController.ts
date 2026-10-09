@@ -199,6 +199,7 @@ export const useResidentSlotController = ({
   maxFatigueBeforeExhausted,
   onDuplicatePlaceholder,
   customValidator,
+  dropStateResolver,
 }: ResidentSlotControllerOptions): ResidentSlotControllerResult => {
   const slotViewModels = useMemo(() => {
     const rawSlots = deriveSlotBlueprints(activity, slotBlueprints, assignments);
@@ -206,14 +207,18 @@ export const useResidentSlotController = ({
     return rawSlots.map<ResidentSlotViewModel>((slot) => {
       const assignedResidentId = assignments[slot.id] ?? null;
       const assignedResident = assignedResidentId ? residents[assignedResidentId] : undefined;
-      const computedDropState = computeDropStateForResident(
-        hoveredResidentId,
-        activity,
-        scheduler,
-        slot.requirement,
-        residents,
-        { maxFatigueBeforeExhausted }
-      );
+      /* A surface-specific resolver wins over the built-in rule set —
+       * `undefined` falls through to the default validation. */
+      const computedDropState =
+        (hoveredResidentId ? dropStateResolver?.(hoveredResidentId, slot) : undefined) ??
+        computeDropStateForResident(
+          hoveredResidentId,
+          activity,
+          scheduler,
+          slot.requirement,
+          residents,
+          { maxFatigueBeforeExhausted }
+        );
       const dropState: DropState = assignedResidentId ? 'locked' : computedDropState;
 
       // TODO(style-lab-flexibility): pipe bloomState transitions + interactionPhysics.audioProfile
@@ -242,7 +247,7 @@ export const useResidentSlotController = ({
         telemetryTags,
       };
     });
-  }, [activity, assignments, hoveredResidentId, residents, scheduler, slotBlueprints, maxFatigueBeforeExhausted]);
+  }, [activity, assignments, hoveredResidentId, residents, scheduler, slotBlueprints, maxFatigueBeforeExhausted, dropStateResolver]);
 
   const warnings = useMemo<ResidentSlotWarning[]>(() => {
     const missingRequired = slotViewModels.filter((slot) => slot.required && !slot.assignedResidentId);

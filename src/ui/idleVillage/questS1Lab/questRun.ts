@@ -230,6 +230,11 @@ export interface QuestRunState {
   /** Registry key of the ScenarioInstance this run executes — absent on
    *  legacy/lab runs (authored map, declared migration). */
   scenarioInstanceId?: string;
+  /** Caller tick the run was launched at (S2.4 D-J — the halo's elapsed
+   *  clock). Absent on legacy/lab runs started before the field existed —
+   *  declared fallback: `frontier.startedAt` at load (the halo
+   *  underestimates elapsed on those runs only). */
+  launchedAtTick?: number;
   /** The frozen resolved offer — scales, signals, reward, band ids at
    *  launch time. The settlement reads `rewardResolved` from here (S2.5). */
   resolvedOffer?: ResolvedOfferRecord;
@@ -840,6 +845,7 @@ export function createRun(
     visitedNodes: [quest.startNode],
     ...(scenarioInstance ? { scenarioInstanceId: scenarioInstance.instanceId } : {}),
     ...(resolvedOffer ? { resolvedOffer } : {}),
+    launchedAtTick: frontier?.startTick ?? 0,
   };
   return state;
 }

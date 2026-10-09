@@ -23,8 +23,13 @@ import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceE
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
-import { nodeDurationTicks } from '@/ui/idleVillage/questS1Lab/questRun';
+import { nodeDurationTicks, type QuestId } from '@/ui/idleVillage/questS1Lab/questRun';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
+import { QUEST_POIS, questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
+import { useQuestExpeditionSession } from '@/ui/idleVillage/quests/useQuestExpeditionSession';
+import { scenarioForQuest } from '@/ui/idleVillage/questS1Lab/questOffer';
+import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 // GameFrame is a fresh, not-yet-kitted composition (R-075).
 // eslint-disable-next-line no-restricted-imports
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
@@ -234,41 +239,82 @@ export default function GameFramePixiPage() {
     return (lastAmbient.current = next);
   }, [todPreview, clockPaused, speedMultiplier, isDayPhase, cycleProgress]);
 
-  // The running quest (R-106): the authored goblin quest in its floating window, timed on the game clock.
+  // The running quests (R-106 + PLAN-019-S2.4): one persisted run per questId,
+  // started ONLY by an expedition's «Invia spedizione» — opening the window
+  // never spawns a run (the panels menu just reveals the surface).
   const questRun = useQuestRun('goblin');
+  const questRunRovine = useQuestRun('rovine');
+  const questRuns = useMemo(() => ({ goblin: questRun, rovine: questRunRovine }), [questRun, questRunRovine]);
+  const [activeQuestId, setActiveQuestId] = useState<QuestId>('goblin');
+  const activeQuestRun = questRuns[activeQuestId];
   const [questRunStartTick, setQuestRunStartTick] = useState(0);
-  // Opening "Quest in progress" from the Panels menu (or Q) with nothing running starts the goblin quest, as the
-  // Director button does: otherwise the menu ticked the panel on and nothing appeared.
-  const questPanelOpen = panels.visible.quest;
   const currentTick = session.gameplay.state.currentTick ?? 0;
-  useEffect(() => {
-    if (!questPanelOpen || questRun.run) return;
-    // v27 frontier (PLAN-025 T-004): the quest's authored days are shared
-    // evenly across its maturable nodes; the session clock is the tick source.
-    questRun.start(GOBLIN_PRESETS[0].id, {
-      nodeTicks: nodeDurationTicks('goblin', questWindow.durationDays * dayLengthTicks),
-      startTick: currentTick,
-    });
-    setQuestRunStartTick(currentTick);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questPanelOpen]);
   // The game clock matures timed nodes (v27): paused game = paused quest;
-  // a late open catches up deterministically to the first waiting frontier.
+  // a late open catches up deterministically to the first waiting frontier —
+  // for EVERY active run, window open or not.
   useEffect(() => {
     questRun.syncClock(currentTick);
+    questRunRovine.syncClock(currentTick);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTick]);
+
+  /* Real quest POIs (S2.4): each is a live planning surface + launchpad.
+   * `activeRuns` = every non-terminal persisted run — the global launch gate
+   * and the source of the derived `inExpedition` lock. */
+  const activeRuns = useMemo(
+    () => [questRun.run, questRunRovine.run].filter((r): r is NonNullable<typeof r> => Boolean(r)),
+    [questRun.run, questRunRovine.run],
+  );
+  const openRunWindow = (questId: QuestId) => {
+    setActiveQuestId(questId);
+    panels.set('quest', true);
+  };
+  const poiGoblin = questPoiById('poi-goblin');
+  const poiRovine = questPoiById('poi-rovine');
+  const expeditionGoblin = useQuestExpeditionSession({
+    poi: poiGoblin!,
+    questRun,
+    activeRuns,
+    currentTick,
+    onOpenRun: openRunWindow,
+    detailPosition: questDetailPosition,
+  });
+  const expeditionRovine = useQuestExpeditionSession({
+    poi: poiRovine!,
+    questRun: questRunRovine,
+    activeRuns,
+    currentTick,
+    onOpenRun: openRunWindow,
+    detailPosition: questDetailPosition,
+  });
+  const expeditions = [expeditionGoblin, expeditionRovine];
   // Bag arming is the player's call: nothing is spent on a check unless armed.
   const [questArmed, setQuestArmed] = useState(questWindow.consumablesArmedByDefault);
+  /* The window's time bar reads the same D-J projection the POI halo does:
+   *  elapsed ticks over the live duration (extends past the estimate when
+   *  the path outgrows it). The legacy day-label stays for preset-started
+   *  runs that carry no POI offer. */
+  const activePoi = useMemo(
+    () => QUEST_POIS.find((p) => p.questId === activeQuestId),
+    [activeQuestId],
+  );
   const questRunTime = useMemo(() => {
+    const run = activeQuestRun.run;
+    if (run && activePoi) {
+      const halo = questHaloProgress(run, activePoi, currentTick);
+      const label = run.ended
+        ? t(run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
+        : t('gameFrame.questWindow.ticks', { elapsed: halo.elapsedTicks, total: halo.durationTicks });
+      return { progress: halo.fraction, label };
+    }
     const span = questWindow.durationDays * dayLengthTicks;
-    const elapsed = Math.max(0, (session.gameplay.state.currentTick ?? 0) - questRunStartTick);
-    const progress = questRun.run?.ended ? 1 : Math.min(1, elapsed / span);
-    const label = questRun.run?.ended
-      ? t(questRun.run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
+    const elapsed = Math.max(0, currentTick - questRunStartTick);
+    const progress = run?.ended ? 1 : Math.min(1, elapsed / span);
+    const label = run?.ended
+      ? t(run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
       : t('gameFrame.questWindow.day', { day: Math.min(questWindow.durationDays, Math.floor(elapsed / dayLengthTicks) + 1), total: questWindow.durationDays });
     return { progress, label };
-  }, [questWindow.durationDays, dayLengthTicks, session.gameplay.state.currentTick, questRunStartTick, questRun.run?.ended, questRun.run?.outcome, t]);
+  }, [activeQuestRun.run, activePoi, currentTick, questWindow.durationDays, dayLengthTicks, questRunStartTick, t]);
 
   // An expired opportunity fades (MapQuestPoi), then leaves the map.
   const expiredOpen = availability?.state === 'expired' && session.questStatus === 'available';
@@ -281,6 +327,25 @@ export default function GameFramePixiPage() {
   const anchors = useMemo<PixiMapAnchor[]>(() => {
     const list: PixiMapAnchor[] = [];
     if (poi && questShown) list.push({ id: poi.id, x: poi.x, y: poi.y, node: <MapQuestPoi session={session} sizePx={poi.sizePx} availability={availability} /> });
+    /* Real quest POIs (S2.4): the medallion is the planning entry and, once
+     *  launched, the run's halo clock. An offer past its window with no run
+     *  leaves the map; an active run always stays pinned. */
+    for (const exp of expeditions) {
+      const p = exp.poi;
+      const avail = questAvailability(
+        currentTick,
+        p.availableFromDay * dayLengthTicks,
+        dayLengthTicks,
+        p.availableUntilDay - p.availableFromDay,
+      );
+      if (!exp.run && avail.state === 'expired') continue;
+      list.push({
+        id: p.id,
+        x: p.x,
+        y: p.y,
+        node: <MapQuestPoi session={exp.poiView} sizePx={p.sizePx} availability={avail} />,
+      });
+    }
     if (poiDemo) {
       // One of each family in a different territory (canvas 4240 x 2828): eastern mountains, southern forest, northern forest.
       const demos = [
@@ -293,7 +358,8 @@ export default function GameFramePixiPage() {
       }
     }
     return list;
-  }, [poi, questShown, session, availability, poiDemo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poi, questShown, session, availability, poiDemo, currentTick, dayLengthTicks, expeditionGoblin.poiView, expeditionRovine.poiView]);
 
   const directorActions = useMemo<DirectorAction[]>(
     () => [
@@ -320,7 +386,8 @@ export default function GameFramePixiPage() {
         label: t('gameFrame.director.questRun'),
         active: !!questRun.run && !questRun.run.ended,
         onTrigger: () => {
-          questRun.start(GOBLIN_PRESETS[0].id);
+          questRun.start(GOBLIN_PRESETS[0].id, { startTick: session.gameplay.state.currentTick ?? 0 });
+          setActiveQuestId('goblin');
           setQuestArmed(questWindow.consumablesArmedByDefault);
           setQuestRunStartTick(session.gameplay.state.currentTick ?? 0);
           panels.set('quest', true);
@@ -353,8 +420,14 @@ export default function GameFramePixiPage() {
         <DndContext
           sensors={session.sensors}
           collisionDetection={pointerWithin}
-          onDragStart={session.handleDragStart}
-          onDragCancel={() => session.setDraggingResidentId(null)}
+          onDragStart={(event: DragStartEvent) => {
+            session.handleDragStart(event);
+            expeditions.forEach((exp) => exp.handleDragStart(event));
+          }}
+          onDragCancel={() => {
+            session.setDraggingResidentId(null);
+            expeditions.forEach((exp) => exp.setDraggingResidentId(null));
+          }}
         >
           <GameFrameScreen
             panels={panels}
@@ -365,35 +438,63 @@ export default function GameFramePixiPage() {
                 componentId="game-frame-roster"
                 density="compact"
                 useExternalDndContext
-                onDragEnd={session.handleDragEnd}
-                onFlightComplete={session.handleFlightComplete}
-                onResidentSelect={session.handleResidentSelect}
-                getResidentCompatibility={session.getResidentCompatibility}
-                lockedResidentIds={session.lockedResidentIds}
+                onDragEnd={(event: DragEndEvent) =>
+                  /* Ownership by droppable id: an expedition slot consumes
+                   * the drop; anything else falls to the activity session.
+                   * `false` (rejected) is a verdict too — it must not fall
+                   * through, or a refused drop would land elsewhere. */
+                  expeditionGoblin.handleDragEnd(event) ??
+                  expeditionRovine.handleDragEnd(event) ??
+                  session.handleDragEnd(event)
+                }
+                onFlightComplete={(residentId, slotId) => {
+                  const owner = expeditions.find((exp) => exp.ownsSlotId(slotId));
+                  if (owner) owner.handleFlightComplete(residentId, slotId);
+                  else session.handleFlightComplete(residentId, slotId);
+                }}
+                onResidentSelect={(residentId) => {
+                  if (expeditionGoblin.handleResidentSelect(residentId)) return;
+                  if (expeditionRovine.handleResidentSelect(residentId)) return;
+                  session.handleResidentSelect(residentId);
+                }}
+                getResidentCompatibility={(residentId) =>
+                  expeditionGoblin.getResidentCompatibility(residentId) ??
+                  expeditionRovine.getResidentCompatibility(residentId) ??
+                  session.getResidentCompatibility(residentId)
+                }
+                lockedResidentIds={[
+                  ...new Set([
+                    ...session.lockedResidentIds,
+                    ...expeditionGoblin.lockedResidentIds,
+                    ...expeditionRovine.lockedResidentIds,
+                  ]),
+                ]}
                 lockedStatusLabel={session.t('roster.status.assigned')}
-                activeResidentId={session.draggingResidentId}
+                activeResidentId={session.draggingResidentId ?? expeditionGoblin.draggingResidentId ?? expeditionRovine.draggingResidentId}
               />
             )}
             extraEvents={extraEvents}
             overlaySlot={
               <>
                 {session.overlays}
-                {questRun.run && panels.visible.quest && (
+                {expeditionGoblin.overlays}
+                {expeditionRovine.overlays}
+                {activeQuestRun.run && panels.visible.quest && (
                   <QuestRunWindow
-                    run={questRun.run}
-                    phases={questRun.phases}
-                    beats={GOBLIN_SCENARIO.beats}
-                    queuedBeats={questRun.beats}
+                    run={activeQuestRun.run}
+                    phases={activeQuestRun.phases}
+                    beats={scenarioForQuest(activeQuestId)?.beats ?? GOBLIN_SCENARIO.beats}
+                    queuedBeats={activeQuestRun.beats}
                     beatTiming={questWindow.beats}
-                    title={GOBLIN_SCENARIO.title}
-                    flavour={GOBLIN_SCENARIO.flavour}
+                    title={scenarioForQuest(activeQuestId)?.title ?? GOBLIN_SCENARIO.title}
+                    flavour={scenarioForQuest(activeQuestId)?.flavour ?? ''}
                     artFor={(nodeId) => NODE_ART[nodeId]?.src}
                     time={questRunTime}
-                    onChoose={(optionId) => questRun.choose(optionId, { useConsumable: questArmed })}
+                    onChoose={(optionId) => activeQuestRun.choose(optionId, { useConsumable: questArmed })}
                     armed={questArmed}
                     onToggleArmed={() => setQuestArmed((on) => !on)}
-                    onUseHealing={questRun.useHealing}
-                    onDrinkPotion={questRun.drinkPotion}
+                    onUseHealing={activeQuestRun.useHealing}
+                    onDrinkPotion={activeQuestRun.drinkPotion}
                     onClose={() => panels.set('quest', false)}
                     anchor={{ left: roster.leftPx + roster.widthPx + questDetail.gapPx, top: questWindow.topPx }}
                     widthPx={questWindow.widthPx}

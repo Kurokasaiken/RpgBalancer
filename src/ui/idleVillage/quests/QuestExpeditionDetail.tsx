@@ -1,0 +1,198 @@
+/**
+ * QuestExpeditionDetail — the POI's live planning surface (PLAN-019-S2.4
+ * T-2): offer header, the trusted `ResidentSlotRack`, the dynamic party
+ * forecast, the loadout pick and the «Invia spedizione» commit. Pure
+ * presentation — all numbers come from `resolved` (the frozen offer) and
+ * `estimate` (the chunked Monte Carlo), all strings from i18n.
+ */
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { FloatingPanel } from '@/ui/idleVillage/components/FloatingPanel';
+import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
+import { SkinButton } from '@/ui/idleVillage/skins/primitives';
+import { HudChip, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
+import type { QuestPoi, DangerBand } from '@/balancing/config/idleVillage/quests/questPois';
+import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
+import { REWARD_TIERS } from '@/balancing/config/idleVillage/quests/rewardTiers';
+import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import type { QuestItem } from '@/balancing/config/idleVillage/quests/questItems.schema';
+import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
+import type { PartyEstimate, ResolvedQuestOffer } from '@/ui/idleVillage/questS1Lab/questOffer';
+
+const FONT = { display: 'var(--skin-font-display)', serif: 'var(--skin-font-serif)' } as const;
+
+/** Config i18nKeys are authored `idleVillage.…`-prefixed; the namespace is
+ *  already `idleVillage` — strip the prefix before `t()`. */
+const stripNs = (key: string) => key.replace(/^idleVillage\./, '');
+
+const bandById = (id: string): DangerBand | undefined => DANGER_BANDS.find((b) => b.id === id);
+
+export interface QuestExpeditionDetailProps {
+  poi: QuestPoi;
+  scenario: QuestScenario | undefined;
+  /** Frozen offer — `null` while the resolution (band sim) is pending. */
+  resolved: ResolvedQuestOffer | null;
+  resolvePending: boolean;
+  slots: ResidentSlotViewModel[];
+  /** 'computing' while a fresh sim is in flight, 'incomplete' until every
+   *  required slot is filled, else the banded estimate. */
+  estimate: PartyEstimate | 'computing';
+  requiredFilled: boolean;
+  items: QuestItem[];
+  selectedItemIds: string[];
+  onToggleItem: (itemId: string) => void;
+  canSend: boolean;
+  onSend: () => void;
+  onClose: () => void;
+  onSlotClear: (slotId: string) => void;
+  position?: { x: number; y: number };
+}
+
+export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
+  poi,
+  scenario,
+  resolved,
+  resolvePending,
+  slots,
+  estimate,
+  requiredFilled,
+  items,
+  selectedItemIds,
+  onToggleItem,
+  canSend,
+  onSend,
+  onClose,
+  onSlotClear,
+  position,
+}) => {
+  const { t } = useTranslation('idleVillage');
+  const dangerBand = resolved ? bandById(resolved.resolvedOffer.bandIds.danger) : undefined;
+  const rewardTier = resolved ? REWARD_TIERS.find((rt) => rt.id === resolved.resolvedOffer.bandIds.rewardTier) : undefined;
+
+  return (
+    <FloatingPanel
+      panelId={`quest-expedition-${poi.id}`}
+      title={scenario?.title ?? poi.id}
+      icon="⚔"
+      width={520}
+      initialPosition={position}
+      onClose={onClose}
+    >
+      <div data-testid="quest-expedition-detail" data-poi-id={poi.id} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* Offer header — objective, tags, frozen band/tier/duration. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {scenario?.offer.objective && (
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.45, color: TONE.text }}>
+              {scenario.offer.objective}
+            </p>
+          )}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {scenario?.offer.tags?.map((tag) => (
+              <HudChip key={tag} tone="secondary">{tag}</HudChip>
+            ))}
+            {dangerBand && (
+              <span data-testid="quest-expedition-band">
+                <HudChip tone="danger">
+                  {t('questExpedition.danger')}: {t(stripNs(dangerBand.i18nKey))}
+                </HudChip>
+              </span>
+            )}
+            {rewardTier && resolved && (
+              <span data-testid="quest-expedition-reward">
+                <HudChip tone="ok">
+                  {t(stripNs(rewardTier.i18nKey))} · {resolved.resolvedOffer.rewardResolved}
+                </HudChip>
+              </span>
+            )}
+            <span data-testid="quest-expedition-duration">
+              <HudChip tone="secondary">{t('questExpedition.duration', { ticks: poi.estimatedDurationTicks })}</HudChip>
+            </span>
+          </div>
+        </div>
+
+        {/* Slots — the trusted rack; drop-state comes from the session's
+         *  quest eligibility resolver. */}
+        <ResidentSlotRack
+          slots={slots}
+          layout="detail"
+          onSlotClear={onSlotClear}
+          slotSize={56}
+        />
+
+        {/* Forecast — never partial numbers: 'computing' and 'incomplete'
+         *  are whole states, a stale estimate never bleeds through. */}
+        <div
+          data-testid="quest-expedition-forecast"
+          data-forecast-state={estimate === 'computing' ? 'computing' : estimate === 'incomplete' ? 'incomplete' : 'ready'}
+          style={{ borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}
+        >
+          <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+            {t('questExpedition.forecast.title')}
+          </span>
+          {resolvePending && <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.resolving')}</span>}
+          {!resolvePending && estimate === 'computing' && (
+            <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.computing')}</span>
+          )}
+          {!resolvePending && estimate === 'incomplete' && (
+            <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.incomplete')}</span>
+          )}
+          {!resolvePending && typeof estimate === 'object' && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              <span data-testid="forecast-reward-pct">
+                <HudChip tone="ok">{t('questExpedition.forecast.reward', { pct: estimate.sim.outcomePct.reward.toFixed(0) })}</HudChip>
+              </span>
+              <span data-testid="forecast-wound-pct">
+                <HudChip tone="warn">{t('questExpedition.forecast.wound', { pct: estimate.sim.anyWoundPct.toFixed(0) })}</HudChip>
+              </span>
+              <span data-testid="forecast-death-pct">
+                <HudChip tone="danger">{t('questExpedition.forecast.death', { pct: estimate.sim.anyDeathPct.toFixed(0) })}</HudChip>
+              </span>
+              <span data-testid="forecast-wipe-pct">
+                <HudChip tone="danger">{t('questExpedition.forecast.wipe', { pct: estimate.sim.outcomePct.wipe.toFixed(0) })}</HudChip>
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Loadout — the real item ids (engineFlag bridge), capped by the
+         *  stash's bagSlots. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+            {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
+          </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} data-testid="quest-expedition-loadout">
+            {items.map((item) => {
+              const selected = selectedItemIds.includes(item.id);
+              const full = !selected && selectedItemIds.length >= QUEST_STASH.bagSlots;
+              return (
+                <SkinButton
+                  key={item.id}
+                  variant={selected ? 'cta' : 'utility'}
+                  data-testid={`loadout-item-${item.id}`}
+                  aria-pressed={selected}
+                  disabled={full}
+                  onClick={() => onToggleItem(item.id)}
+                >
+                  {t(stripNs(item.labelKey))}
+                </SkinButton>
+              );
+            })}
+          </div>
+        </div>
+
+        <SkinButton
+          variant="cta"
+          data-testid="quest-expedition-send"
+          disabled={!canSend}
+          aria-disabled={!canSend}
+          onClick={onSend}
+        >
+          {t('questExpedition.send')}
+        </SkinButton>
+      </div>
+    </FloatingPanel>
+  );
+};
+
+export default QuestExpeditionDetail;
