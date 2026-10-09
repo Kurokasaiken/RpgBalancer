@@ -778,3 +778,40 @@ apre dalla Regia — `QuestRunWindow`
 componente quest in progress che si apre dal director, quello è il componente
 corretto. Aggiorna la documentazione x puntare a quello come "componente
 battezzato"»); registrato come D-F in `plans/PLAN-019-S2-quest-vera.md`.
+
+---
+
+## 2026-10-09 — S2: world-scaling, semantica halo e gating temporale dei nodi (D-I, D-J, D-K)
+
+**Contesto:** chiusura dei punti aperti di PLAN-019-S2 dopo la critica multi-AI
+(r1) e la spec verbatim del Director sul POI detail.
+
+**Decisioni:**
+
+1. **D-I — Modificatori esterni = world-scaling reale.** Pericolo e reward
+   dell'offerta si bilanciano su segnali di progressione del mondo:
+   `collectWorldProgressSignals()` (giorni dal TimeEngine — reale; potenza
+   media eroi da `statSnapshot` — metrica da definire, mock-hook tracciato;
+   potenza media equip da `equipmentStorage` — hook reale) → config
+   `worldScaling` (pesi + bande Zod) → `{dangerScale, rewardScale}` nel bag
+   `modifiers` di `resolveQuestOffer`. Formula v0 sostituibile come unità; i
+   valori risolti si congelano nel run alla creazione.
+2. **D-J — Halo = puro elapsed/durata.** L'halo del POI indica «quanto tempo
+   ci vuole a fare la quest»: riempimento = tempo trascorso /
+   `estimatedDuration` da config. **Non si ferma ai bivi** — il badge
+   «decisione in attesa» è un segnale separato (D-H-4), non parte del
+   riempimento.
+3. **D-K — Nodi gated da schedule assoluto + caricamento finestra.** Ogni
+   nodo ha la sua porzione della durata (`1 tick = 1 s`): è risolvibile dal
+   giocatore quando la porzione è maturata, e la maturazione **non dipende
+   dalla risoluzione dei nodi precedenti** — i nodi scaduti si risolvono in
+   sequenza senza attesa (ritorno a metà durata → batch delle fasi scadute).
+   `QuestRunWindow` segue lo stesso modello: tile in fondo = fasi superate +
+   preview della successiva; durante l'attesa si mostra la frase di
+   flavour/transit. Implicazione da verificare in S2.4/T-4: se la frontiera
+   v27 ferma la maturazione su `awaitingPlayer`, questa decisione la modifica
+   (`readyAt` assoluto, risoluzione in batch ammessa).
+
+**Fonte:** Director in sessione 2026-10-09 (R-107, risposte al gate post-critica);
+registrate in `plans/PLAN-019-S2-quest-vera.md` (D-I/D-J/D-K) e rifluese in
+`PLAN-019-S2.4` (post-invio + T-4).
