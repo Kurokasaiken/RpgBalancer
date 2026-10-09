@@ -101,20 +101,25 @@ export function transformScenarioNodes(
  * the same resolution always yields the same instance, and two different
  * scale sets can coexist in the registry.
  */
-export function createScenarioInstance(scenario: QuestScenario, scales: WorldScales): ScenarioInstance {
+export function createScenarioInstance(
+  scenario: QuestScenario,
+  scales: WorldScales,
+  questId: QuestId = scenario.id as QuestId,
+): ScenarioInstance {
   const nodes = transformScenarioNodes(scenario.nodes, scales.dangerScale);
   const scenarioHash = computeScenarioVersion(scenario);
   const instanceId = `qsi-${hashSimInput({ scenarioHash, scales }).toString(16)}`;
   return registerScenarioInstance({
     instanceId,
-    questId: scenario.id as QuestId,
+    questId,
     scenarioHash,
     nodes,
     startNode: scenario.startNode,
-    // Engine v2 (PLAN-026): runstart twist arming + initial vars are content —
-    // they freeze into the instance like the nodes do.
+    // Engine v2 (PLAN-026): runstart twist arming + initial vars + declared
+    // primary stats are content — they freeze into the instance like the nodes.
     ...(scenario.armRolls ? { armRolls: scenario.armRolls } : {}),
     ...(scenario.initialVars ? { initialVars: scenario.initialVars } : {}),
+    primaryStats: scenario.primaryStats,
   });
 }
 
