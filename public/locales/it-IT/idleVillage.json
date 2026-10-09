@@ -1415,8 +1415,12 @@
     "runState": {
       "running": "In corso",
       "success": "Missione compiuta",
+      "survived": "Tornati a mani vuote",
       "fled": "Ritirata",
       "wiped": "Compagnia annientata"
+    },
+    "combat": {
+      "telemetry": "Turno {{turn}} — nemici in piedi: {{enemies}}"
     }
   }
 }
