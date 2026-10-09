@@ -63,6 +63,7 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-025](PLAN-025-quest-theatre-convergence-cinema.md) | Un solo componente per la quest in corso su /game: convergenza in QuestRunWindow, beat e juice | active | P1 | R-106 iter 3 (Director: «un solo componente»), desiderata v27; T-000…T-012 fatti — teardown superficie parallela (rimozione totale) + budget rinegoziato (Director 2026-10-09); **unico residuo: gate umano A** (morte seed E1, playtest Director) |
 | [PLAN-024](PLAN-024-quest-s1-lab-hud-restyle.md) | Restyle lab quest S1 secondo guida HUD (Lacquer Atlas) | completed | — | child of PLAN-023; R-104; decisioni D1–D3 Director (dipinto-sfondo, plinth, cronaca locale); evidence test-results/r104-quest-hud-restyle-2026-10-08.log |
 | [PLAN-026](PLAN-026-quest-generation.md) | Quest Generation System: contratti → delta motore v2 → catalogo v0 → testo → integrazione → archi | active | — | child of PLAN-019 (S5); R-115 ratificato 2026-10-10 con **deroga v24** (S5 in parallelo a S3/S4, non dopo) — decisioni Director: verdictTable+vars+traits+arm misto; cold read r2 MAJOR×4 registrato |
+| [PLAN-019-S3](PLAN-019-S3-parte-precedente.md) | La parte precedente: Planner completo (BY MEMBER + WHY + delta), informazione nota/ignota, check certi, trade-off misurati | active | — | child of PLAN-019 (S3); R-118; battezzato 2026-10-09 (3 decisioni ratificate); T-0 mappatura PLAN-018 fatta |
 
 ## Sotto-documenti (non piani)
 
