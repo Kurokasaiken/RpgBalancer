@@ -194,7 +194,17 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   generici); `ScenarioInstance.primaryStats` congelato; kit-swap
   testato (stesso scheletro, mondo diverso, intel diversa); kit rotto
   fallisce a generation-time. 17 test e2e, suite quest 191/191.
-  Residuo T3: secondo gimmick per la varietà strutturale.
+- **T3 residuo — secondo gimmick — FATTO** (`generation/floodVault.ts` +
+  `floodMiniera.ts`): gimmick «volta che allaga» — loot-vs-fuga,
+  struttura radicalmente diversa dalla corsa (niente cursore rivale:
+  `acqua` sale a OGNI azione all'hub, `uscita` solo sulle spinte;
+  a `fv-piena` si molla il sacco — dropLoot su tutto il TAKEN — o si
+  nuota col carico a rischio). Kit `miniera` (vocabolario
+  QUEST_IMPRINTS); twist `cassa-madre` (armRoll avido + rollFlag in-run)
+  e `parete-cede` (armRoll evento → scorciatoia fail→piena); tratto
+  `prudente` sblocca puntellare (unico `dec` su vars). Catalogo v0 =
+  **2 gimmick × 3 kit**. 15 test e2e con il seam `forceDie` (PLAN-019-S3),
+  suite quest 43/43, build:check PASS. **T3 chiuso.**
 - T4 — generazione narrativa offline (provider strategy P3) + benchmark.
 - T5 — twist del party (prerequisito: `traits` su ResidentState).
 - T6 — integrazione dopo gate PLAN-019 pertinenti.
