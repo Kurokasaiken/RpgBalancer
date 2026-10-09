@@ -189,6 +189,44 @@ UI di presentazione (S2.4) · reward variabili by-party (hook
 numeri no) · sorgenti di scaling oltre i 3 segnali (edifici, eventi —
 arrivano nel bag quando esistono).
 
+## Stato implementazione (2026-10-10 — in working tree, non committato)
+
+- **T-1 FATTO** — `quests/questPois.ts`: `QuestPoiSchema` strict (finestra
+  day-index, `estimatedDurationTicks` normativo = `ticksPerNode ×
+  expectedPathNodes` con refine, slots = partizione per id di
+  `offer.slots`); `QUEST_POIS` poi-goblin (250t)/poi-rovine (100t);
+  **DANGER_BANDS canonico** + `dangerBandFor` (promosso dalla tabella
+  provvisoria del test S2.1 — ora importato da qui).
+- **T-2 FATTO** — `questS1Lab/questOffer.ts`: `deriveOfferBand` (sim
+  `referenceParty` → banda, marcata «ipotesi sul riferimento») +
+  `estimateForParty` → `'incomplete' | {sim, bands.danger(party), nSim}`
+  sullo stesso `ScenarioInstance` del run.
+- **T-3 FATTO** — `quests/rewardTiers.ts`: tier su reward nominale,
+  intervalli semiaperti (confine → tier alto), `resolveReward` =
+  `Math.round(base×scale)` clamp ≥0, chiavi i18n.
+- **T-4 FATTO** — `resolveQuestOffer(poi,{signals?,bandSim?})` →
+  `{resolvedOffer, instance}`: `createScenarioInstance` con `instanceId`
+  content-addressed `qsi-<fnv>`; whitelist r2 in `transformScenarioNodes`
+  (check.risk/combat.enemies+hitDamage scalati, economia/harm/
+  upfrontDamage esclusi, stats = no-op categorico dichiarato);
+  `QuestRunState += scenarioInstanceId/resolvedOffer`, `nodesFor` risolve
+  l'istanza, `createRun` object-form accetta `scenarioInstance`+
+  `resolvedOffer`; `useQuestRun` persiste l'istanza nel save e la
+  re-registra al reload PRIMA di `setRun`.
+- **T-5 FATTO** — `quests/worldScaling.ts`: v0 unico segnale reale
+  `daysPlayed` (domain [0,30], clamp); output `dangerScale` [1.0,1.4] e
+  `rewardScale` [1.0,1.25] increasing; identità a segnali assenti.
+  `collectWorldProgressSignals` legge `currentDay` dallo store canonico.
+- **T-6 FATTO** — `questOffer.test.ts` 28/28; scope quest **159/159**;
+  `build:check` ✓, `kanban:lint` ✓, lint n/a (quarantena). Evidence:
+  `test-results/s23-offerta-scaling-2026-10-09.log`.
+
+**Findings aperti (dall'evidence):** goblin danger-channel stretto
+(dangerScale agisce solo su enemies/hitDamage dei combat — i check goblin
+hanno risk 0/0 authored; estendere a TUNE/harm = decisione Director);
+valori bande/scaling/tier = first-pass (calibrazione numerica = R-105);
+posizioni/finestre POI = placeholder authored.
+
 ## Acceptance
 
 1. I due POI esistono in config con tutti i valori risolti da schema, nessun
