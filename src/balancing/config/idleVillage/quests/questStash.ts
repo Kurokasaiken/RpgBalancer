@@ -12,6 +12,7 @@
 
 import { z } from 'zod';
 import type { LabStat } from '@/ui/idleVillage/questS1Lab/questScenario';
+import { toEngineFlag } from './questItems';
 
 /** One stash item the player may pack into the bag. */
 export const StashItemSchema = z.object({
@@ -105,9 +106,11 @@ const RAW_QUEST_STASH = {
 export const QUEST_STASH = QuestStashSchema.parse(RAW_QUEST_STASH);
 
 /**
- * Resolves a player-picked loadout to engine flags: unknown flags dropped,
- * duplicates removed, result clamped to `bagSlots`.
- * @param loadout - Flags picked in the stash picker (display order preserved).
+ * Resolves a player-picked loadout to engine flags: unknown entries dropped,
+ * duplicates removed, result clamped to `bagSlots`. Entries may be catalog
+ * item ids or historic engine flags interchangeably (S2.2 T-5 alias).
+ * @param loadout - Item ids / engine flags picked in the stash picker
+ *   (display order preserved).
  * @param stash - Stash config override (tests).
  * @returns Flag list to seed `QuestRunState.flags` with.
  */
@@ -116,9 +119,9 @@ export function resolveStashLoadout(
   stash = QUEST_STASH,
 ): string[] {
   const known = new Set(stash.items.map((i) => i.flag));
-  const picked = (loadout ?? stash.defaultLoadout).filter(
-    (f, i, arr) => known.has(f) && arr.indexOf(f) === i,
-  );
+  const picked = (loadout ?? stash.defaultLoadout)
+    .map(toEngineFlag)
+    .filter((f, i, arr) => known.has(f) && arr.indexOf(f) === i);
   return picked.slice(0, stash.bagSlots);
 }
 
