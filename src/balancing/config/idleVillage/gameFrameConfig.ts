@@ -274,6 +274,17 @@ const gameFrameQuestWindowSchema = z.object({
   durationDays: z.number().positive(),
   /** Log lines a phase tooltip shows before it says "+N more". */
   tooltipLines: z.number().int().positive(),
+  /** BeatSequencer pacing (PLAN-025 T-008): per-beat on-stage durations in ms
+   *  and the queue ceiling — overflow compacts into a recap beat. */
+  beats: z.object({
+    sceneMs: z.number().int().positive(),
+    checkMs: z.number().int().positive(),
+    harmMs: z.number().int().positive(),
+    endMs: z.number().int().positive(),
+    recapMs: z.number().int().positive(),
+    /** Max beats replayed per commit delta; the skipped head becomes a recap. */
+    maxQueue: z.number().int().positive(),
+  }),
   /** Whether bag items start armed for the next check. `false` = nothing is spent
    *  unless the player arms it (R-106 playtest: the bonus vanished unasked). The lab
    *  keeps its own default (armed, Director D1) — divergence flagged in PLAN-025. */
@@ -460,7 +471,15 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   identity: { showTitle: false },
   hud: { material: 'lacquer' },
   questDetail: { widthPx: 680, gapPx: 8, topPx: 100, ledgerWidthPx: 300 },
-  questWindow: { widthPx: 460, topPx: 100, theaterAspect: 2.76, durationDays: 2, tooltipLines: 6, consumablesArmedByDefault: false },
+  questWindow: {
+    widthPx: 460,
+    topPx: 100,
+    theaterAspect: 2.76,
+    durationDays: 2,
+    tooltipLines: 6,
+    consumablesArmedByDefault: false,
+    beats: { sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapMs: 1800, maxQueue: 24 },
+  },
   zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12 },
   breakpoints: { compactTopPx: 1400 },
   edgeWash: { enabled: false, leftSrc: '/assets/ui/hud/edge_wash_left.webp', bottomSrc: '/assets/ui/hud/edge_wash_bottom.webp', opacity: 0.55, leftPx: 120, bottomPx: 110 },
