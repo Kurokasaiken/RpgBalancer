@@ -117,19 +117,29 @@ simulazione usata è dichiarata nella UI («ipotesi: percorso X, consumabili Y»
   Segnale per T-4: la preview numerica per-check si accende solo dove la
   struttura la giustifica — coerente col vincolo «niente numeri dove manca
   il modello».
-- **T-2 — OUTCOME zone nel detail.** BY MEMBER (per-slot da
-  `sim.perMember`), delta vs configurazione precedente, WHY con contributi
-  per sorgente. Reversibilità esatta: test `A→A+PG→A+PG+item→A` → stesso
-  outcome bit-identico — il motore è seeded e la deterministica è già
-  invariante testata («same inputs + seed → identical forecast», parità
-  `simulateQuestAsync`); il test S3 copre il giro UI completo. **Overflow
-  contract (rilievo critico):** misurare l'altezza reale a party massimo
-  (slot dello scenario) e fissare la gerarchia `aggregato → BY MEMBER → WHY`
-  con regione scrollabile nel corpo — header/scelte ancorati, la zona
-  dettaglio scorre (stesso pattern D-7 di QuestRunWindow). **Misura MC:**
-  benchmark dei contributi WHY (sim parziali per sorgente) con soglia in
-  `QUEST_PLANNING` config — se il costo sfora, i contributi si degradano a
-  sezioni collassabili lazy, mai per-frame.
+- **T-2 — OUTCOME zone nel detail.** ✅ **Fatto 2026-10-09** — BY MEMBER
+  (per-slot da `sim.perMember`), delta vs configurazione precedente, WHY
+  con contributi per sorgente, contratto overflow e misura MC.
+  **Implementazione:** `QuestSimResult.whyBySource` raccoglie i `HarmEvent`
+  per `source` (titolo nodo — ogni path di danno lo stampa: check, combat,
+  imboscate, toll, attrition) dentro gli STESSI run MC — zero sim extra;
+  `computeForecastDelta` = diff pp sulle metriche headline; la sessione
+  tiene il previous-estimate (mai 'incomplete' come baseline); la UI
+  `QuestExpeditionDetail` mostra `aggregato → BY MEMBER → WHY → intel` in
+  regione scrollabile (`quest-s1-scroll`, cap 320px) mentre header/rack/
+  loadout/send restano ancorati — pattern D-7, `FloatingPanel.maxBodyHeight`
+  700px. Intel authored (`previewHint` sempre + `revealHint` se lo slot
+  `revealAtPlanning` è sbloccato) atterrata qui come prima UI del modello
+  T-1. Config: `QUEST_PLANNER_INFO.outcome` (maxWhySources 5 =
+  degradazione display-side, analysisMaxHeightPx, panelMaxBodyHeightPx).
+  **Misura MC:** forecast completo goblin 400 run = ~65ms vs budget
+  `forecastBudgetMs` 300 — l'attribuzione WHY è O(#eventi) dentro i run,
+  non sim parziali per sorgente: il budget plan temuto non serve, la soglia
+  resta la `forecastBudgetMs` esistente (misura nel log evidence).
+  **Reversibilità:** E2E `A→A+PG→A+PG+item→A` bit-identico verificato; la
+  gamba item documenta il contratto (consumabili esclusi dal forecast →
+  nessun ricalcolo). Test: 4 unit (attribution/shares/delta/reversibilità)
+  + E2E con asserzioni BY MEMBER/WHY/intel.
 - **T-3 — LOADOUT zone.** Estendere la sacca a zona per-membro dove il
   contratto lo richiede; canale durata (`durationDelta`) se item lo
   dichiarano — verificare cosa esiste già, non reinventare.

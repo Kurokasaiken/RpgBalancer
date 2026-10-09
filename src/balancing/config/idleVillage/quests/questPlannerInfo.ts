@@ -47,6 +47,24 @@ export const QuestPlannerInfoConfigSchema = z
       .strict(),
     /** Cap on authored `previewHint`s shown at planning (overflow guard). */
     maxPreviewHints: z.number().int().min(1).max(50),
+    /** OUTCOME zone contract (PLAN-019-S3 T-2): BY MEMBER + WHY live inside
+     *  a scrollable analysis region — the panel's header, slot rack and
+     *  send stay anchored (same pattern as QuestRunWindow D-7). */
+    outcome: z
+      .object({
+        /** Top-N WHY sources rendered; beyond the cap the tail collapses —
+         *  the degradation path of the MC cost contract (attribution is
+         *  harvested inside the same sims, so cost is never per-frame). */
+        maxWhySources: z.number().int().min(1).max(50),
+        /** Max height (px) of the scrollable analysis region at max party:
+         *  measured overflow contract, not a guessed panel height. */
+        analysisMaxHeightPx: z.number().int().min(120).max(1200),
+        /** Outer FloatingPanel body cap (px) — sized so the fixed zones
+         *  (offer header + slot rack + loadout + send) plus the capped
+         *  analysis region never trigger the panel's own scroll. */
+        panelMaxBodyHeightPx: z.number().int().min(300).max(1600),
+      })
+      .strict(),
   })
   .strict();
 export type QuestPlannerInfoConfig = z.infer<typeof QuestPlannerInfoConfigSchema>;
@@ -65,4 +83,14 @@ export const QUEST_PLANNER_INFO: QuestPlannerInfoConfig = QuestPlannerInfoConfig
     maxRevealedHints: 12,
   },
   maxPreviewHints: 12,
+  outcome: {
+    maxWhySources: 5,
+    /* Party max = 4 slots (goblin/rovine): aggregate chips (~30) + BY
+     * MEMBER 4 rows (~90) + WHY top-5 (~120) + intel hints (~60) ≈ 300px
+     * measured; 320 gives the scroll region headroom without an outer
+     * panel scroll. */
+    analysisMaxHeightPx: 320,
+    /* Fixed zones ≈ 350px + analysis 320px + margins ≈ 700. */
+    panelMaxBodyHeightPx: 700,
+  },
 });

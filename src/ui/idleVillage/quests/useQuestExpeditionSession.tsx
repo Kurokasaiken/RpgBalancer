@@ -43,6 +43,9 @@ import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFligh
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { questResidentEligibility, residentInExpedition } from '@/ui/idleVillage/questS1Lab/questEligibility';
 import { resolveQuestOffer, estimateForPartyAsync, scenarioForQuest, type PartyEstimate, type ResolvedQuestOffer } from '@/ui/idleVillage/questS1Lab/questOffer';
+import { computeForecastDelta, type ForecastDelta } from '@/ui/idleVillage/questS1Lab/questSimulation';
+import { memberReveals, planningHints } from '@/ui/idleVillage/questS1Lab/questCertainty';
+import { QUEST_PLANNER_INFO } from '@/balancing/config/idleVillage/quests/questPlannerInfo';
 import { residentToQuestMember } from '@/ui/idleVillage/questS1Lab/residentToQuestMember';
 import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
 import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
@@ -111,6 +114,11 @@ export function useQuestExpeditionSession({
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
   const [estimate, setEstimate] = useState<{ key: string; value: PartyEstimate } | null>(null);
+  /** Last completed estimate of a DIFFERENT configuration — the delta
+   *  baseline (S3 T-2). Only real sims count as baseline ('incomplete'
+   *  never does); reverting the party restores an identical sim because
+   *  the seed derives from the inputs. */
+  const prevEstimateRef = useRef<{ key: string; value: PartyEstimate } | null>(null);
   const sendingRef = useRef(false);
   const { state: pageFlight, startFlight, settle: settleFlight } = useDragOutcome();
 
@@ -313,6 +321,7 @@ export function useQuestExpeditionSession({
   useEffect(() => {
     if (!isDetailOpen || !resolved || !estimateKey) {
       setEstimate(null);
+      prevEstimateRef.current = null;
       return;
     }
     if (!requiredFilled) {
@@ -326,7 +335,14 @@ export function useQuestExpeditionSession({
         chunkRuns: QUEST_PLANNING.forecastChunkRuns,
         signal: controllerAbort.signal,
       })
-        .then((value) => setEstimate({ key: estimateKey, value }))
+        .then((value) =>
+          setEstimate((prev) => {
+            if (prev && prev.key !== estimateKey && typeof prev.value === 'object') {
+              prevEstimateRef.current = prev;
+            }
+            return { key: estimateKey, value };
+          }),
+        )
         .catch(() => {
           /* Aborted = superseded by a newer estimate; swallow. */
         });
@@ -336,6 +352,43 @@ export function useQuestExpeditionSession({
       controllerAbort.abort();
     };
   }, [isDetailOpen, resolved, estimateKey, requiredFilled, partyMembers]);
+
+  /** Signed pp shift vs the previous party configuration (S3 T-2) — only
+   *  when a real previous sim exists and the current one has landed. */
+  const forecastDelta = useMemo<ForecastDelta | null>(() => {
+    const cur = estimate && estimate.key === estimateKey ? estimate.value : null;
+    const prev = prevEstimateRef.current;
+    if (!cur || typeof cur !== 'object' || !prev || typeof prev.value !== 'object') return null;
+    return computeForecastDelta(cur.sim, prev.value.sim);
+  }, [estimate, estimateKey]);
+
+  /* `revealAtPlanning` (S3 T-1/D-S3-3): nodes whose `revealHint` unlocks
+   *  because an assigned member meets the slot's stat threshold. */
+  const revealedNodeIds = useMemo(() => {
+    const revealed = new Set<string>();
+    if (!authoredSlots || !QUEST_PLANNER_INFO.revealAtPlanning.enabled) return revealed;
+    const nodes = resolved?.instance.nodes;
+    for (const slot of [...authoredSlots.required, ...authoredSlots.optional]) {
+      const spec = slot.revealAtPlanning;
+      if (!spec) continue;
+      const residentId = assignments[`${poi.id}:${slot.id}`];
+      const resident = residentId ? residentsById[residentId] : undefined;
+      if (!resident) continue;
+      if (!memberReveals(spec, residentToQuestMember(resident, 'member'))) continue;
+      /* `reveals` absent = every authored `revealHint` unlocks. */
+      const targets = spec.reveals ?? Object.values(nodes ?? {}).filter((n) => n.revealHint).map((n) => n.id);
+      targets.forEach((id) => revealed.add(id));
+    }
+    return revealed;
+  }, [authoredSlots, assignments, residentsById, poi.id, resolved]);
+
+  /** Authored planning intel for the OUTCOME zone: `previewHint` always,
+   *  `revealHint` only through the explorer slot — capped per config. */
+  const intelHints = useMemo(() => {
+    const nodes = resolved?.instance.nodes;
+    if (!nodes) return [];
+    return planningHints(nodes, revealedNodeIds).slice(0, QUEST_PLANNER_INFO.maxPreviewHints);
+  }, [resolved, revealedNodeIds]);
 
   /* ------------------------------------------------------------------ */
   /* Settlement (S2.5) — a terminal run settles once, idempotently.       */
@@ -591,6 +644,8 @@ export function useQuestExpeditionSession({
           resolvePending={resolvePending}
           slots={controller.slots}
           estimate={estimate?.key === estimateKey ? estimate.value : 'computing'}
+          forecastDelta={forecastDelta}
+          intelHints={intelHints}
           requiredFilled={requiredFilled}
           items={EXPEDITION_ITEMS}
           selectedItemIds={selectedItemIds}
@@ -653,6 +708,10 @@ export function useQuestExpeditionSession({
         return true;
       },
       checkEligibility: (slotBlueprintId: string, residentId: string) => eligibilityFor(residentId, slotBlueprintId),
+      /* The slot rack's «Clear» affordance — same path the UI takes, so a
+       *  revert exercises the real recompute chain (S3 T-2 reversibility). */
+      clearSlot: (slotBlueprintId: string) => controller.clearSlot(slotBlueprintId),
+      toggleItem,
       getAssignments: () => assignments,
       getEstimate: () => estimate?.value ?? null,
       /* Serialized estimate — lets a test detect a recomputed forecast
