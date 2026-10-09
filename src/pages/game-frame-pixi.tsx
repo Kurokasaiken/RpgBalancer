@@ -36,7 +36,6 @@ import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/g
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
-import { useCentralizedTiming } from '@/ui/idleVillage/hooks/useCentralizedTiming';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type TuningField } from '@/ui/idleVillage/components/gameFrame';
 
@@ -58,6 +57,10 @@ const INVASION_WARNING_DAYS = 5;
 /** The announcement card against the map: smaller than on World Surface, where the map is shown closer. */
 const INVASION_CARD_SIZE = 0.75;
 const TUNING_KEY = 'hud_tuning_v1';
+/** POIs whose quest has run to completion: once the expedition report is
+ *  dismissed the marker leaves the map for good (PLAN-019-S2.5 terminal
+ *  table: every outcome ⇒ «POI chiude»). */
+const CONSUMED_POIS_KEY = 'idleVillage.questPois.consumed';
 /** Share of an open side panel's width the map fit keeps clear. */
 const PANEL_FIT_SHARE = 0.6;
 
@@ -207,7 +210,8 @@ export default function GameFramePixiPage() {
    * stay in the same epoch across reloads, then drive the shared 1s loop.
    * No offline progression: hydration restores the tick AT save time —
    * wall-clock time elapsed while the game was closed is never credited.
-   * /game has no pause control, so the world is resumed once at mount. */
+   * The single tick driver lives in GameFrameScreen (`useTimeEngineLoop`) —
+   * mounting a second loop here would double the clock rate. */
   useEffect(() => {
     let cancelled = false;
     initializeMinimalGameplayStore()
@@ -221,7 +225,6 @@ export default function GameFramePixiPage() {
       cancelled = true;
     };
   }, []);
-  useCentralizedTiming({ gameplayState: session.gameplay });
 
   const currentDay = session.gameplay.state.currentDay;
   const invasionDaysLeft = invasion ? Math.max(0, invasion.dueDay - currentDay) : 0;
@@ -311,6 +314,43 @@ export default function GameFramePixiPage() {
     detailPosition: questDetailPosition,
   });
   const expeditions = [expeditionGoblin, expeditionRovine];
+
+  /* Consumed quest POIs (persisted): a POI whose run ended, settled and had
+   *  its report dismissed leaves the map — it never comes back, even across
+   *  reloads. Loaded before the markers are composed so a consumed POI does
+   *  not flash in for a frame on boot. */
+  const [consumedPoiIds, setConsumedPoiIds] = useState<string[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    void loadData<string[]>(CONSUMED_POIS_KEY, []).then((stored) => {
+      if (!cancelled) setConsumedPoiIds(Array.isArray(stored) ? stored : []);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /* Dismissal of the expedition report is the POI's exit cue: when the quest
+   *  window transitions visible→closed on an ended+settled run, the run is
+   *  cleared (bag released, save removed) and the POI is consumed. Any close
+   *  path lands here — the window's X, «Chiudi il rapporto», the panels menu,
+   *  the Q key. A live or unsettled run is untouched: closing the window on
+   *  those keeps the expedition pinned on the map. */
+  const prevQuestPanelVisible = useRef(panels.visible.quest);
+  useEffect(() => {
+    const wasVisible = prevQuestPanelVisible.current;
+    prevQuestPanelVisible.current = panels.visible.quest;
+    const run = activeQuestRun.run;
+    if (!wasVisible || panels.visible.quest || !run?.ended || run.settlement?.status !== 'settled') return;
+    const consumedPoi = QUEST_POIS.find((p) => p.questId === activeQuestId);
+    if (consumedPoi && consumedPoiIds && !consumedPoiIds.includes(consumedPoi.id)) {
+      const next = [...consumedPoiIds, consumedPoi.id];
+      setConsumedPoiIds(next);
+      void saveData(CONSUMED_POIS_KEY, next);
+    }
+    activeQuestRun.clear();
+  }, [panels.visible.quest, activeQuestRun, activeQuestId, consumedPoiIds]);
+
   // Bag arming is the player's call: nothing is spent on a check unless armed.
   const [questArmed, setQuestArmed] = useState(questWindow.consumablesArmedByDefault);
   /* The window's time bar reads the same D-J projection the POI halo does:
@@ -361,6 +401,7 @@ export default function GameFramePixiPage() {
         dayLengthTicks,
         p.availableUntilDay - p.availableFromDay,
       );
+      if (consumedPoiIds?.includes(p.id)) continue;
       if (!exp.run && avail.state === 'expired') continue;
       list.push({
         id: p.id,
@@ -382,7 +423,7 @@ export default function GameFramePixiPage() {
     }
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poi, questShown, session, availability, poiDemo, currentTick, dayLengthTicks, expeditionGoblin.poiView, expeditionRovine.poiView]);
+  }, [poi, questShown, session, availability, poiDemo, currentTick, dayLengthTicks, consumedPoiIds, expeditionGoblin.poiView, expeditionRovine.poiView]);
 
   const directorActions = useMemo<DirectorAction[]>(
     () => [

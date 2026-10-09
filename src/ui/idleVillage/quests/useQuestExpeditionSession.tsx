@@ -634,6 +634,12 @@ export function useQuestExpeditionSession({
       store.getState().tick(Math.ceil((Math.max(0, n) * 1000) / speed), 'manual');
       if (wasPaused) store.setState((s) => ({ state: { ...s.state, isPaused: true } }));
     };
+    /* Read-only view of the canonical clock: tick counter, pause flag and
+     *  speed multiplier — the values the HUD time controls drive. */
+    hooks.getClock = () => {
+      const s = useMinimalGameplayStore.getState().state;
+      return { currentTick: s.currentTick ?? 0, isPaused: s.isPaused, speedMultiplier: s.speedMultiplier };
+    };
     const expedition = (hooks.expedition ??= {}) as Record<string, unknown>;
     expedition[poi.id] = {
       openDetail: () => setIsDetailOpen(true),
