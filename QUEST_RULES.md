@@ -223,8 +223,8 @@ al Director, non assorbimento silenzioso.
 ## 8. Conseguenze oltre l'esito immediato
 
 - **RULE:** tutte le quest devono avere conseguenze se vengono risolte, in base a **come** vengono risolte, e anche se **non** vengono risolte.
-  **STATUS:** `vigente` come principio espresso dal Director; trigger e forma delle conseguenze ancora `open`, non comportamento runtime già implementato.
-  **SOURCE:** Director 2026-10-07, verbatim in `RICHIESTE.md` R-092; `.mw/desiderata.md` v24 S1–S4 copre le conseguenze nella quest e la persistenza degli esiti, ma non specifica ancora la mancata risoluzione.
+  **STATUS:** `implementato (parziale)` — conseguenze sulle quest RISOLTE attive dal 2026-10-10 (PLAN-019-S2.5): settlement idempotente su `/game` applica morte/ferita (con `injuredUntilTick` + recovery sweep), reward/bottino/XP e rilascio party come dati persistiti una sola volta (journal per-effetto, ledger co-locato). Restano `open` le conseguenze delle quest NON risolte (mancata presa dell'offerta, scadenza) e la memoria narrativa (OPEN-016 → S4).
+  **SOURCE:** Director 2026-10-07, verbatim in `RICHIESTE.md` R-092; `.mw/desiderata.md` v24 S1–S4; implementazione in `src/ui/idleVillage/quests/questSettlement.ts` + tabella transizioni in `plans/PLAN-019-S2.5-settlement-e2e.md`.
 
 ## 9. Parcheggiato / non-regole
 
