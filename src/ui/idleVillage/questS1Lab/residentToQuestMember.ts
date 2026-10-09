@@ -52,5 +52,6 @@ export function residentToQuestMember(
     stats,
     hp,
     portrait: getResidentPortraitUrl(resident as ResidentState),
+    ...(resident.traits?.length ? { traits: [...resident.traits] } : {}),
   };
 }

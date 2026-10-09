@@ -110,6 +110,11 @@ export function createScenarioInstance(scenario: QuestScenario, scales: WorldSca
     questId: scenario.id as QuestId,
     scenarioHash,
     nodes,
+    startNode: scenario.startNode,
+    // Engine v2 (PLAN-026): runstart twist arming + initial vars are content —
+    // they freeze into the instance like the nodes do.
+    ...(scenario.armRolls ? { armRolls: scenario.armRolls } : {}),
+    ...(scenario.initialVars ? { initialVars: scenario.initialVars } : {}),
   });
 }
 

@@ -259,6 +259,14 @@ export interface ResidentState {
    * Used by assignment UIs to match slot requirements without recalculating against the full StatBlock.
    */
   statTags?: string[];
+  /**
+   * Persistent narrative traits (PLAN-026 — e.g. 'avido', 'scavezzacollo'):
+   * distinct from `statTags` (mechanical stat description). Traits travel with
+   * the resident across quests and can gate options or arm trait twists at run
+   * start. Source of truth for where traits are authored/assigned is the quest
+   * generation pipeline (v0: authored on the member, not yet generated).
+   */
+  traits?: string[];
   currentHp: number;
   maxHp: number;
   isHero: boolean;

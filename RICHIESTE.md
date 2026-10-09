@@ -2297,7 +2297,13 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** il Director ha incollato in sessione un implementation plan completo per il sistema di generazione quest (pipeline Quest Intent → Blueprint → Scene Composition → World Instantiation → Narrative Briefs → Text Generation → Validation → Repair/Reject → Scenario Artifact → Runtime), fasi P0–P7 con gate, contratti componenti (core gimmick, scene archetype, domain kit, imprint, trait trigger/twist, narrative brief), strategia di test a 6 livelli, benchmark con 3 corpus, task T0–T7. Stato dichiarato: «Proposed, non ancora ratificato».
 **Data:** 2026-10-09 (data sessione; il documento incollato non ha data)
-**Stato:** `da chiarire` — piano ricevuto; in attesa di decisione Director su ratifica, collocazione e timing.
+**Stato:** `in corso` — cold read eseguita 2026-10-09; in attesa di decisione Director su ratifica/revisione.
+
+**Cold read (2026-10-09):** `.mw/runs/20261009-quest-generation-plan-critique/` — plan.md + contract.md (v24+rev+§0 spec) + context.md. Web providers tutti in timeout (browser runner); API: codex rate-limited, groq 413, mistral 429, openrouter non utilizzabile. Un solo critico utile: **gemini → MAJOR REVISION** (6+ rilievi). Sintesi integrata con analisi agente in `synthesis.md`: 9 rilievi C1–C9, i principali = sequenza vs v24 (S5 si definisce dopo S4), vincoli canonici §0 mai importati nei contratti/gate, P7 gated su OPEN-016 (non eliminato: intento chain quest esiste in R-113), tratti inesistenti su `ResidentState`, artefatto da vincolare a `QuestScenarioSchema` fin da P1. Secondo parere esterno consigliato quando codex/chatgpt-web tornano disponibili.
+
+**Update 2026-10-09 (v2):** Director ha approvato produzione di **plan v2** incorporando C1–C9 + decisioni 2026-10-10 (verdictTable, `traits` su `ResidentState`, vars layer, arm misto, traducibilità, 75% posticipata) e rilancio del cold read web. Artefatto: `.mw/runs/20261009-quest-generation-plan-v2-critique/plan-v2.md` — status «CANDIDATO GATED» (§1.1 attivazione per fase), §0 importa i vincoli canonici spec §0 come acceptance bloccanti, §0.1 campi fun-judgment `experimental` rivalidati a S4, §4.6 provenance+traducibilità, P3 con strategia provider esplicita, P5 su `traits` deciso, P7 gated su OPEN-016+ratifica, §2 aggiornato a superficie post-S2.x (S2.4 completed). Cold read web rilanciato su v2.
+
+**Update 2 (2026-10-09, cold read r2):** `.mw/runs/20261009-quest-generation-plan-v2-critique/` — web provider tutti riusciti (claude/chatgpt/grok/deepseek). **Verdetto unanime: MAJOR REVISION ×4.** La v2 ha assorbito i rilievi formali di r1 ma resta il nodo strutturale: «ratificabile + attivazione per fase» non soddisfa v24 §2 («S5 si definisce dopo S4») — i critici propongono (a) declassamento a proposta esplorativa con spike solo nel lab S1 (senza toccare questRun.ts/schema/ResidentState) o (b) ratifica rinviata a S4. Rilievi tecnici nuovi assorbibili: gate di fattibilità delta motore prima di T2, matrice di tracciabilità §0→prova, check strutturale crucial∈[3,4], repair a livello scenario + registro fatti mayInvent, regola di presentazione preview-vs-twist nascosti (rev.2), v0=catalogo pre-generato (non generazione on-offer), gate provider degradato a ≥1, prototipo=prova di fattibilità non generalità. Sintesi completa in `synthesis-v2.md`. **In attesa di decisione Director sullo status** (proposta esplorativa vs draft vs candidato gated con deroga registrata).
 
 **Posizionamento rispetto alle autorità esistenti:**
 - Copre il territorio di **PLAN-019 §S5** («Oltre lo scritto a mano»: generazione, chain quest, narrativa emergente) — che la desiderata v24 colloca **dopo S4** e subordina alla «definizione di buona quest» prodotta da S1–S4. Il piano stesso lo riconosce (§10: «collocazione dipende dall'allineamento con S2–S5»; P6/P7 subordinati ai gate PLAN-019).
@@ -2311,3 +2317,45 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 3. Nome/numero del piano figlio.
 
 **Collegamenti:** `plans/PLAN-019-quest-macro-plan.md` (§S5), `context/QUEST_GENERATION_SPEC.md`, `context/QUEST_GENERATION_ARCHITECTURE.md`, `context/QUEST_IMPRINTS.md`, OPEN-014/015/016, R-091/111/112/113/114, `QUEST_RULES.md`, `NARRATIVE.md`.
+
+---
+
+## R-116 — Decisioni micro: traduzione testo generato + 75% posticipata; contratti v0 scritti
+
+**Richiesta (verbatim):** *"Dovremo tradurre tutto / 75%, c pensiamo dopo, adesso vediamo cm viene / procedi"*
+**Data:** 2026-10-10
+**Stato:** `in corso` — decisioni registrate nei doc; contratti v0 prodotti.
+
+**Decisioni registrate:**
+- **Traduzione:** tutto il testo generato va progettato traducibile (chiavi strutturate per nodo, no interpolazioni dipendenti dalla grammatica IT). Registrato in `QUEST_GENERATION_SPEC.md` §5 e `QUEST_GENERATION_CONTRACTS.md` §7.
+- **Regola 75% posticipata:** il contratto scena dichiara gli hook; soglia e denominatore si fissano dopo aver osservato il prototipo.
+
+**Artefatto prodotto:** `context/QUEST_GENERATION_CONTRACTS.md` — contratti v0 dei 6 componenti (CoreGimmick, SceneArchetype, TwistDef, DomainKit, TraitDef, NarrativeBrief) + pipeline a 7 fasi + piano di validazione su strumenti esistenti + catalogo prototipo v0 + **gap motore verificati**:
+- **P0-a (bloccante, scoperta nuova):** `applyNodeOutcome` in `questRun.ts` è uno switch cablato su `node.id` — routing post-verdetto ed effetti (info/flag/loot/allarme) sono codice, non dati. Un generatore non può diramare su verdetto senza estendere schema+motore (tocca I-3 → decisione Director).
+- **P0-b:** tratti assenti su `ResidentState` (già noto).
+- **P1:** vars numeriche core → proposta encoding a flag v0; selezione twist a `createRun`.
+
+**Decisioni che richiede (§11 del doc):** estensione `verdictTable` dichiarativa vs generazione limitata a nodi esistenti; vars flag vs layer numerico; dove vivono i tratti; `arm` twist solo runstart v0; formato chiavi testo traducibile.
+
+**Collegamenti:** `context/QUEST_GENERATION_CONTRACTS.md`, `context/QUEST_GENERATION_SPEC.md`, R-113, R-114, R-115 (piano implementativo in attesa di ratifica — i contratti sono il livello che precede/alimenta quel piano).
+
+**Update 2026-10-10 (risposte del Director alle 4 domande estese):**
+- **P0-a → «Tabella dati + legacy»**: `verdictTable` dichiarativa sui nodi nuovi, switch legacy per i goblin. I-3 si apre in modo additivo.
+- **Tratti → su `ResidentState`** (`traits: string[]`, identità persistente, visibile in planning).
+- **Vars → layer numerico subito** (`vars` nel run state; encoding a flag scartato).
+- **Twist → arm misto** (runstart per tratti, in-run per eventi).
+Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da progettare insieme. Registrato in `QUEST_GENERATION_CONTRACTS.md` §10–11 e `QUEST_GENERATION_SPEC.md` §11.
+**Update 2 (2026-10-10):** forma concreta della `verdictTable` formalizzata in `QUEST_GENERATION_CONTRACTS.md` §12 — `OutcomeSpec` (goto/flags/info/loot/gold/damage/alarm/objective/vars ops/rollFlag/logKey) + `GotoSpec` condizionale (branch su flag/notFlag/varGE/varLT con `else` obbligatorio) + esempio di nodo emesso. `rollFlag` copre entrambi gli arm (runstart a createRun, inrun dentro le tabelle). Verdetto aperto solo sui dettagli (quali effetti ammessi per verdetto, espressività esatta dei `Cond`).
+**Update 3 (2026-10-10):** `QUEST_GENERATION_CONTRACTS.md` §13 — NarrativeBrief lavorato sul nodo `sc-passa-crepa` (facts/knownToPlayer/hiddenFromPlayer/mustConvey/mayInvent compilati dai dati reali del nodo) + testi dimostrativi in due story mode sullo stesso nodo: dimostra che l'asse narrativo cambia dettagli e atmosfera senza toccare la meccanica. §14 — assorbiti i rilievi tecnici assorbibili del cold read r2 di R-115 (check `crucial∈[3,4]` → §8, repair a livello scenario, registro `mayInvent` anti-allucinazione, regola preview-vs-twist-nascosti, v0=catalogo pre-generato non on-offer, prototipo=prova di fattibilità). Lo **status del piano R-115 resta al Director** (MAJOR REVISION ×4: proposta esplorativa vs draft vs candidato gated — i critici spingono per spike lab-only senza toccare motore finché S4 non chiude).
+
+**Update 4 (2026-10-10) — RATIFICATO:** il Director ha scelto «Ratifica ora + engine v2» sulla domanda estesa di strategia. PLAN-026 registrato `active` in `plans/INDEX.md` (figlio PLAN-019/S5), deroga a v24 registrata in `context/DECISION_LOG.md` 2026-10-10. I 4× MAJOR REVISION restano documentati (`.mw/runs/20261009-quest-generation-plan-v2-critique/`); i rilievi tecnici assorbibili sono in `QUEST_GENERATION_CONTRACTS.md` §14. Attivati: P0–P2 + T2 (delta motore v2 additivo).
+
+## R-117 — Plan pagina Steam (Coming Soon): cosa mettere dove, testi, lingue
+
+**Richiesta (verbatim):** *"Creami un plan su come fare la pagina Steam: cosa mettere dove, ecc. noi abbiamo già molte csoe "utilizzabili", e dobbiamo anche decidere cosa scrivere, come, ecc. farlo in lingue diverse"*
+**Data:** 2026-10-09
+**Stato:** `aperta` — plan Proposed, non ratificato.
+**Desiderata FROZEN:** nessuna corrispondente (business/marketing non coperto da `.mw/desiderata.md`).
+**Contesto dichiarato in chat (2026-10-09):** premium ~14.99 con sconto al lancio; obiettivo = reputazione; nessuna pagina Steam; nessuna scadenza; teaser = scene in-engine registrate e montate (R-072); poi demo Next Fest.
+**Artefatto:** `context/STEAM_PAGE_PLAN.md` — decisioni bloccanti D1–D6 (nome del gioco in testa), mappa della pagina, shot list, clip/GIF, bozze testi EN, tag, piano lingue (pagina vs gioco), fasi F0–F8, checklist.
+**Collegamenti:** R-072 (teaser), `context/ESTIMATE_AGENT_PROMPT.md`.
