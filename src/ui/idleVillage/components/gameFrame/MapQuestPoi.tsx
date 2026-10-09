@@ -221,6 +221,7 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
     <div
       ref={setNodeRef}
       data-map-quest-poi-target=""
+      data-quest-poi-id={activity.id}
       role="button"
       tabIndex={0}
       aria-label={t('gameFrame.questPoi.open', { name: activity.label })}

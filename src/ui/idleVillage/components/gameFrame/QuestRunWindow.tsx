@@ -375,7 +375,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
                 );
               })}
             {run.ended && (
-              <button type="button" data-skin="choice" onClick={onClose}>
+              <button type="button" data-skin="choice" data-testid="quest-window-close-report" onClick={onClose}>
                 <span data-choice-index style={{ fontFamily: FONT.display, fontSize: 14 }}>→</span>
                 <span style={{ fontFamily: FONT.display, fontSize: 15, color: 'var(--skin-text-primary)' }}>{t('gameFrame.questWindow.close')}</span>
               </button>
