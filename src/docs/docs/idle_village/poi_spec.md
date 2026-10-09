@@ -8,6 +8,8 @@ type: component-spec
 # POI Spec
 
 > **Note (2026-08-15):** the root of the POI family has moved to [`poi_family_spec.md`](./poi_family_spec.md). This file still holds the original `ActivityCapsule` scenarios; use it as a component reference, but for the full family contract see the root.
+>
+> **Note (2026-10-09):** dove gli scenari citano la «chronicle»/`QuestChronicle`, sulla superficie canonica `/game` il riferimento è il componente battezzato **`QuestRunWindow`** (`src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx`, PLAN-019-S2 D-F) — `QuestChronicle` resta il path milestone della pagina di riferimento deprecata.
 
 ## State Machine (ASCII)
 

@@ -5,6 +5,13 @@ redesign cockpit di `QuestS1LabPage` (PLAN-023, artifact multi-AI
 `.mw/runs/20261007-quest-s1-lab-ui-redesign/artifact-r005.md`). Vale per ogni nuova
 superficie quest.
 
+> **Componente battezzato su `/game` (Director 2026-10-09, PLAN-019-S2 D-F):**
+> `QuestRunWindow` (`src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx`)
+> è la superficie canonica della quest in corso — Regia/menu Pannelli (tasto Q),
+> motore `useQuestRun`/`questRun.ts`; il teatro PLAN-025 converge dentro di esso.
+> Le regole di questa guida si applicano a `QuestRunWindow` e a ogni sua
+> evoluzione.
+
 > **Superfici e colori**: questa guida governa *layout e pipeline di presentazione*.
 > Per estetica, superfici (`HudPlaque`), token `--skin-hud-*`, controlli e tipografia
 > il riferimento è `src/docs/docs/design/hud_component_guide.md` (Lacquer Atlas) —

@@ -2107,3 +2107,29 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Collegamenti:** R-104 (lab restylato), R-101, `hud_component_guide.md`, `tests/unit/idleVillage/questPhaseRecord.test.ts`, `hudGuards.test.ts` (file aggiunto a STRICT_FILES), PLAN-021, `.mw/desiderata.md` v27.
 
 ---
+## R-107 — Un paio di POI funzionanti con POI detail veri su /game (stadio S2)
+
+**Richiesta (verbatim):** *"Adesso abbiamo una idea abbasta "valida" e raffinata e completa x decidere come deve essere un componente QUEST? Anche a livello di programmazione, logica, ecc. Xè vorrei avere un paio di POI che siano funzionanti, cn POI detail veri, ecc"* — poi *"procedi"* dopo la sintesi delle decisioni aperte.
+**Data:** 2026-10-09
+**Stato:** `in corso` — piano figlio S2 in scrittura (mw-planner)
+**Desiderata FROZEN pertinente:** `.mw/desiderata.md` v24 (PLAN-019, stadio S2 «la quest vera»), v27 (QuestTheatre, semantica di frontiera — già implementata in `questRun.ts`).
+
+**Constatazione emersa in esplorazione (FACT):** su `/game` convivono due sistemi quest scollegati: `useQuestPoiSession` (POI→detail→assegnazione roster→quest vecchio modello blueprint+milestone) e `useQuestRun` (motore a grafo `questRun.ts` con frontiera v27, avviato solo dalla Regia). «POI veri» = il detail esistente che lancia il motore nuovo.
+
+**Decisioni portate al Director (2026-10-09):**
+1. **Formato quest canonico** — proposta ratificabile: il grafo di nodi (`QuestNode`/`questRun.ts`) è il modello canonico; `QuestBlueprint` (Zod, fasi lineari) si riduce a *busta offerta* del POI (metadati per detail/planner). Equivale a chiudere PLAN-019 **D-2** a favore del motore a grafo; gli scenari vanno promossi a schema Zod config-first (invariante). Registrare in DECISION_LOG la divergenza dalla formula PLAN-019 «si trasferiscono le regole, non il codice»: il motore è diventato canonico per costruzione (v27 frontiera + teatro ci poggiano sopra).
+2. **Superficie di assegnazione** — opzioni: riuso della session POI esistente (detail + slot roster già montati su `/game`) vs Mission Planner rimappato. Default conforme proposto: session POI esistente per lo slice, planner completo resta S3.
+3. **Mappatura LabStat → stat residenti (PLAN-019 D-3)** — `str→strength`, `con→endurance`, `agi→agility`, `int→intelligence`, `perc→perception` esistono (`statSnapshot`); **`cha` (Carisma) non ha candidato nel balancer** → scelta esplicita richiesta (aggiungere la stat vs rimappare i check cha su int vs riscrivere i contenuti cha).
+
+**Collegamenti:** PLAN-019 (S2, D-2, D-3, D-6), PLAN-025 (teatro — coordinamento: il lancio deve puntare all'API `useQuestRun`, non al componente), R-105 (fascia di pericolosità dichiarata), OPEN-015 (quest non risolta — forma minima), R-092.
+
+**Risposte Director al gate (2026-10-09):**
+1. **D-B assegnazione:** *sì* → riuso della session POI esistente; Mission Planner completo resta S3.
+2. **D-C stat:** *"rimappa su int. Comunque le stat devono essere quelle vere del pg creato da balancer, nn quelli che abbiamo inventato x il mockup. Forza viene da Danno, Costituzione viene da HP, Destrezza viene da %tohit. Per Intelligenza e Carisma facciamo che per adesso sono mockate, ma devono seguire la stessa pipeline, così appena finisco di decidere"* — **correzione Director in sessione:** *"scusa, mi ero confuso: %tohit = percezione, dodge = agilità"* → le competenze quest si **derivano dallo StatBlock combat reale** del residente: `str←damage`, `con←hp`, `perc←%tohit (hitChance/txc)`, `agi←evasion (dodge)`; `int` e `cha` sono **mockate ma dentro la stessa pipeline config-driven** (regola di derivazione in config Zod, si cambia solo quella quando il Director decide); `cha` nei check usa il canale `int`.
+3. **Divergenza «regole non codice» → DECISION_LOG:** *sì, ok*.
+
+**Critica multi-AI web (2026-10-09):** broadcast PLAN-019-S2 a 5 provider — chatgpt/claude/grok/deepseek tutti MAJOR REVISION, gemini-web failed. Convergenze assorbite in v2: deroga esplicita `int`/`cha` (gate S2-a emendato a «nessun mock sui canali reali», `mockChannel` in config), settlement idempotente chiavato su `runId` + tabella transizioni terminali (reward = `objectiveSatisfied && leaderReturnedAlive`), parità seeded → parità strutturale + traccia deterministica completa + test equivalenza `createRun(party≡preset)`, eleggibilità residenti + lock `inExpedition` + rilascio stato session all'Embark, fascia etichettata come ipotesi su party di riferimento + forecast live in assegnazione (R-105), contratto API congelato con PLAN-025, check di calibrazione su banda dichiarata. Disaccordi residui registrati nel piano (scope POI=S3 secondo deepseek — tenuto perché è la richiesta; «quest di riferimento» secondo grok — goblin è il riferimento de facto). Run: `.mw/runs/20261009-plan-s2-web-critique/`.
+
+**Risposta Director (2026-10-09, componente battezzato):** *"dentro la pagina /game c'è il componente quest in progress che si apre dal director, quello è il componente corretto. Aggiorna la documentazione x puntare a quello come 'componente battezzato'"* → **`QuestRunWindow`** (`components/gameFrame/QuestRunWindow.tsx`, R-106) è il componente battezzato per la quest in corso su `/game`; `QuestTheatre` (PLAN-021/PLAN-025) converge *dentro* di esso. Registrato come D-F in PLAN-019-S2 e in `context/DECISION_LOG.md`.
+
+---

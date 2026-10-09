@@ -3,6 +3,11 @@
 **Fonte:** PLAN-021 v8 (`plans/PLAN-021-quest-theatre.md`), desiderata v27 FROZEN, R-088.
 **Status:** `draft` — read-model v1 è una **proposta non normativa**; il contratto
 normativo del runtime nasce in S2 (`contractVersion` lo dichiara).
+**Convergenza (Director 2026-10-09, PLAN-019-S2 D-F):** il componente battezzato
+della quest in corso su `/game` è **`QuestRunWindow`**
+(`src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx`) — questa spec è il
+contributo teatro che converge *dentro* `QuestRunWindow` (R-106 iter. 3 «un solo
+componente»), non un componente separato.
 
 ## Cos'è
 

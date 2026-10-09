@@ -36,6 +36,43 @@ export const EXPIRE_FADE_MS = 700;
 /** How long a new quest takes to ease in. */
 const ENTER_MS = 800;
 
+/** How the marker's seal reads for each stage of the quest (see `mapQuestPoiView`). */
+export interface MapQuestPoiView {
+  /** Marker state passed to `PoiMatericV3_5` — always a progress-driven one, never `available`. */
+  state: PoiState;
+  /** Seal fill 0..1: the run's clock, not the opportunity's. */
+  progress: number;
+  /** The deadline ring only appears while the open window is about to lapse. */
+  deadlineWarn: boolean;
+}
+
+/**
+ * Maps the quest session to what the marker draws (poi_spec scenario 5 +
+ * poi_family_spec S-004): a quest POI that is only `available` is inert — bare
+ * medallion, no arcane ring, it ignores time. The seal starts writing itself
+ * once the expedition is actually running (`in_progress` requires every
+ * required slot filled and the Start fired while the clock runs), it tracks
+ * `activityProgress`, and it stays whole once the run has ended.
+ *
+ * `state` is never `available`/`new` because the marker family reads those as
+ * "seal fully drawn" — the opposite of an unstarted quest. The deadline is a
+ * different clock (the opportunity's window, already counted in the ledger): it
+ * surfaces as the liquid ring only in its last stretch, warn-coloured, so an
+ * idle POI never shows a halo that fills on time alone.
+ */
+export function mapQuestPoiView(
+  questStatus: 'available' | 'in_progress' | 'completed' | 'failed',
+  activityProgress: number,
+  availability: QuestAvailability | undefined,
+): MapQuestPoiView {
+  const deadlineState = questStatus === 'available' ? availability?.state : undefined;
+  return {
+    state: deadlineState === 'expired' ? 'expired' : 'assigned',
+    progress: questStatus === 'in_progress' ? activityProgress : questStatus === 'available' ? 0 : 1,
+    deadlineWarn: deadlineState === 'expiring' || deadlineState === 'expired',
+  };
+}
+
 /**
  * The deadline halo: no track, it appears with the liquid. The game clock only moves in ticks, so
  * the fill is extrapolated between them (rate learned from the last two ticks, held to one tick of
@@ -149,11 +186,11 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
   }, []);
   const isDragActive = Boolean(active || draggingResidentId);
 
-  // While the quest is open the marker stays whole; the deadline is the liquid halo around it, which
-  // starts empty (no track) and fills clockwise. While the quest runs, the marker's own ring is the clock.
+  // While the quest is open the marker stays bare (its seal is the run's clock, unwritten until
+  // embark); the liquid halo speaks only for the window's last stretch — warn, not progress.
   const deadline = questStatus === 'available' && availability ? availability : null;
-  const state: PoiState = questStatus === 'available' ? 'available' : 'assigned';
-  const progress = questStatus === 'in_progress' ? activityProgress : 1;
+  const view = mapQuestPoiView(questStatus, activityProgress, availability);
+  const { state, progress } = view;
   const expired = deadline?.state === 'expired';
   const elapsed = deadline ? 1 - deadline.progress : 0;
   const running = !session.gameplay.state.isPaused;
@@ -192,8 +229,8 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
     >
       <style>{poiMatericV3_5Styles}</style>
       <div style={{ position: 'relative', width: sizePx, height: sizePx }}>
-        {deadline && (
-          <LiquidHalo target={elapsed} running={running} warn={deadline.state !== 'available'} ringPx={ringPx} ringR={ringR} offset={RING_GAP_PX} />
+        {deadline && view.deadlineWarn && (
+          <LiquidHalo target={elapsed} running={running} warn ringPx={ringPx} ringR={ringR} offset={RING_GAP_PX} />
         )}
         <PoiMatericV3_5
           type={poiType}

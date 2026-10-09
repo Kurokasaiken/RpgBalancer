@@ -8,6 +8,14 @@ type: component-spec
 # Quest Spec
 
 > Child of [`poi_family_spec.md`](./poi_family_spec.md). Quest-specific contracts, milestones, skill checks and reward collection live here.
+>
+> **Superficie canonica `/game` (2026-10-09):** il componente battezzato per la
+> quest in corso è `QuestRunWindow`
+> (`src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx`) — si apre dalla
+> Regia/menu Pannelli (tasto Q) ed è mosso dal motore a grafo `questRun.ts`
+> (`useQuestRun`; PLAN-019-S2 D-F). `QuestChronicle`/`MilestoneCheckModal`
+> citati negli scenari sotto sono il path milestone del vecchio blueprint,
+> vivo solo sulla pagina di riferimento `/poi-quest-detail-roster-time-clock`.
 
 ## State Machine (ASCII)
 
