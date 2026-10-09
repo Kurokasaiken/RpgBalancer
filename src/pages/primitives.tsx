@@ -50,13 +50,6 @@ import SlottedMedal from '@/ui/idleVillage/components/SlottedMedal';
 import PgDetailCard from '@/ui/idleVillage/components/PgDetailCard';
 import SchedaPergamena from '@/ui/idleVillage/components/SchedaPergamena';
 import { MissionPlannerLive } from '@/ui/idleVillage/components/missionPlanner/MissionPlannerLive';
-import { QuestTheatre } from '@/ui/idleVillage/questTheatre/QuestTheatre';
-import { useFakeTheatreRun } from '@/ui/idleVillage/questTheatre/fakeTheatreRuntime';
-import {
-  theatreBlockedFixture,
-  theatreDemoFixture,
-  theatreUnsupportedFixture,
-} from '@/ui/idleVillage/questTheatre/fixtures';
 
 type TabId =
   | 'all'
@@ -77,8 +70,7 @@ type TabId =
   | 'hud'
   | 'window'
   | 'pgcards'
-  | 'planner'
-  | 'theatre';
+  | 'planner';
 
 const FIELD_BACKGROUND = [
   'radial-gradient(circle at 50% -10%, rgba(0,229,255,0.13) 0%, rgba(0,150,255,0.03) 50%, transparent 80%)',
@@ -104,7 +96,6 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'window', label: 'Window' },
   { id: 'pgcards', label: 'PG Cards' },
   { id: 'planner', label: 'Planner' },
-  { id: 'theatre', label: 'Theatre' },
 ];
 
 /** A compact demo panel that keeps the tab viewport above the fold. */
@@ -833,76 +824,6 @@ function PlannerTab(): JSX.Element {
   );
 }
 
-const THEATRE_FIXTURES = [theatreDemoFixture, theatreBlockedFixture, theatreUnsupportedFixture];
-
-/**
- * Theatre tab — QuestTheatre on the disposable fake adapter (PLAN-021).
- * The panel is floating/expandable like on the dev route; the tab body hosts
- * a small driver (auto-advance, step, fixture cycle, reopen).
- */
-function TheatreTab(): JSX.Element {
-  const [fixtureIndex, setFixtureIndex] = useState(0);
-  const [open, setOpen] = useState(true);
-  const fixture = THEATRE_FIXTURES[fixtureIndex];
-  const run = useFakeTheatreRun(fixture);
-
-  return (
-    <DemoPanel>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-        <button
-          type="button"
-          data-testid="theatre-tab-open"
-          onClick={() => setOpen((o) => !o)}
-          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(180,130,30,0.5)', background: 'rgba(6,10,16,0.8)', color: '#f0cf6a', cursor: 'pointer', fontSize: 12 }}
-        >
-          Teatro: {open ? 'aperto' : 'chiuso'}
-        </button>
-        <button
-          type="button"
-          onClick={() => run.setAutoAdvance(!run.autoAdvance)}
-          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(180,130,30,0.5)', background: 'rgba(6,10,16,0.8)', color: '#f0cf6a', cursor: 'pointer', fontSize: 12 }}
-        >
-          Auto-avanzamento: {run.autoAdvance ? 'on' : 'off'}
-        </button>
-        <button
-          type="button"
-          onClick={run.advanceOnce}
-          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(180,130,30,0.5)', background: 'rgba(6,10,16,0.8)', color: '#f0cf6a', cursor: 'pointer', fontSize: 12 }}
-        >
-          Avanza nodo temporizzato
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setFixtureIndex((i) => (i + 1) % THEATRE_FIXTURES.length);
-            run.reset();
-          }}
-          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(180,130,30,0.5)', background: 'rgba(6,10,16,0.8)', color: '#f0cf6a', cursor: 'pointer', fontSize: 12 }}
-        >
-          Fixture: {fixture.id}
-        </button>
-        <button
-          type="button"
-          onClick={run.reset}
-          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(180,130,30,0.5)', background: 'rgba(6,10,16,0.8)', color: '#f0cf6a', cursor: 'pointer', fontSize: 12 }}
-        >
-          Reset run
-        </button>
-      </div>
-      <p style={{ marginTop: 12, fontSize: 11, color: 'var(--skin-body-color)', opacity: 0.7 }}>
-        Il teatro è un pannello flottante: trascinalo, riducilo, espandilo (⛶), chiudilo.
-        La run si ferma ai bivi in attesa di decisione — chiudere non è ritirarsi.
-      </p>
-      {open && (
-        <QuestTheatre
-          snapshot={run.snapshot}
-          dispatch={run.dispatch}
-          onClose={() => setOpen(false)}
-        />
-      )}
-    </DemoPanel>
-  );
-}
 
 const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   all: AllTab,
@@ -923,7 +844,6 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   window: WindowTab,
   pgcards: PgCardsTab,
   planner: PlannerTab,
-  theatre: TheatreTab,
 };
 
 export default function PrimitivesPage(): JSX.Element {
