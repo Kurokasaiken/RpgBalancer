@@ -29,6 +29,8 @@ const renderWindow = (run: QuestRunState) =>
         run={run}
         phases={[emptyPhase(0)]}
         beats={GOBLIN_BEATS}
+        queuedBeats={[]}
+        beatTiming={{ sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapMs: 1800 }}
         title={GOBLIN_META.title}
         flavour={GOBLIN_META.flavour}
         artFor={() => undefined}

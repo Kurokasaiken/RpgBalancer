@@ -251,8 +251,21 @@ Ogni task richiede lo stato garantito dal precedente.
   visivo) → T-008; (c) **tinte per tipo di fase** sulle tile (ember/jade/
   amethyst) → T-008; (d) splash d'esito + collect gate — già coperto dal
   rapporto di fine run, non portare il peso.
-- **T-008 — BeatSequencer.** Consuma la proiezione; skip policy; reopen
-  compatto + «vai al bivio»; tetto della coda; I-2 e I-4. Test con fake timer.
+- **T-008 — BeatSequencer (FATTO 2026-10-09).** `questS1Lab/beatSequencer.ts`:
+  `projectBeats(mark, after, {maxBeats})` cammina il diff del log committato
+  (NODE→scene, CHECK→check, WOUND/DEATH/HARM→un beat per harm, QUEST_END→end)
+  con id stabili (`scene-N`, `chk-N`, `harm-seq`, `end`, `recap`); oltre il
+  tetto la testa saltata compatta in un beat `recap` («vai al bivio»).
+  `useBeatCursor` riproduce con timing da `gameFrameConfig.questWindow.beats`,
+  click/Enter/Spazio = skip, `flush` = drain, reduced-motion = drain istantaneo.
+  `useQuestRun` espone `beats` (append-only per commit; reload → coda vuota, il
+  mark parte dalla frontiera ripristinata). `QuestRunWindow` mostra `BeatStage`
+  al posto di scelte/sacca mentre i beat sono in scena; i beat scena tagliano
+  anche l'immagine del teatro. E1 (multi-morte) ora scorre membro per membro.
+  Test: `beatSequencer.test.ts` (11: ordine, id, tetto, fake timer, reduced
+  motion). Fix collaterale: attesa dell'harness riscritta Node-side — la probe
+  in-page compilata da tsx lanciava `__name is not defined` e sviava come
+  timeout.
 - **T-009 — CinemaFx.** Primitiva in `skins/primitives/` (letterbox, flash del
   ritratto, typewriter), config Zod `questTheatreFx`, I-5. Test: reduced
   motion; mappa beat→fx.

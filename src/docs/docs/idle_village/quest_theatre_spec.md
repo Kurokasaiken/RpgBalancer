@@ -123,6 +123,28 @@ altro → mostra il messaggio del runtime.
   spendono qui); `retreat`/`collectReward` → rifiuto onesto (il motore non
   ha flussi generici: il ritiro è un'opzione authored).
 
+### BeatSequencer (PLAN-025 T-008 — `questS1Lab/beatSequencer.ts`)
+
+- Un commit del motore può portare più momenti (scena + check + N harms +
+  fine): `projectBeats(mark, after, {maxBeats})` li proietta in beat ordinati
+  camminando il diff del `run.log` — NODE→`scene`, CHECK→`check`,
+  WOUND/DEATH/HARM→un `harm` beat ciascuno, QUEST_END→`end`. Gli id sono
+  stabili (`scene-<visitedIdx>`, `chk-N`, `harm-<seq>`, `end`, `recap`).
+- **Il sequencer non inventa mai:** i beat arrivano solo da ciò che il motore
+  ha committato nel delta mark→after; niente nodi futuri, niente esiti.
+- **Tetto della coda:** oltre `questWindow.beats.maxQueue` la testa saltata
+  compatta in un beat `recap` («mentre eri via…») — reopen compatto.
+- **`useBeatCursor`** riproduce con i timing di config; click/Enter/Spazio =
+  skip progressivo; `flush` = «vai al bivio» (drain alla frontiera);
+  `prefers-reduced-motion` = drain istantaneo. Il cursore è per-mount del
+  componente: minimizzare non interrompe, riaprire ripropone la coda
+  pendente compattata.
+- **E1:** una multi-morte in un commit presenta un beat a membro — colore
+  spento + icona, click per continuare (D-8), mai un paragrafo unico.
+- `useQuestRun.beats`: coda append-only per commit (`mark` catturato prima
+  della mutazione in-place); reload/start/clear la azzerano — nessun replay
+  spurio su restore.
+
 ## Acceptance legati (PLAYWRIGHT, T-009)
 
 - Stesso snapshot → stesso render; nessun comando duplicato su reopen/re-render.

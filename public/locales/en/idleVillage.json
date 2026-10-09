@@ -1007,7 +1007,14 @@
       "noneReturned": "Nobody came back",
       "phaseOf": "Phase {n} of {total}",
       "inProgressShort": "now",
-      "close": "Close the report"
+      "close": "Close the report",
+      "beats": {
+        "continue": "Click to continue",
+        "more_one": "{count} beat left — click to continue",
+        "more_other": "{count} beats left — click to continue",
+        "skipAll": "Skip to the frontier",
+        "recap": "While you were away: {scenes} scenes, {checks} checks, {deaths} fallen, {wounds} hurt"
+      }
     }
   },
   "missionPlanner": {

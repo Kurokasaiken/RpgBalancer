@@ -98,24 +98,28 @@ const pick = (labels: string[]): number => {
     if (!real.length) {
       // v27 frontier: a pending node exposes no choices while it matures —
       // wait for the frontier to land instead of declaring the run over.
-      const settled = await win
-        .evaluate(
-          (el) =>
-            new Promise<'choices' | 'report' | 'timeout'>((resolve) => {
-              const deadline = Date.now() + 12000;
-              const probe = () => {
-                const labels = [...el.querySelectorAll('[data-hud-choices] button[data-skin="choice"]')]
-                  .map((b) => b.textContent ?? '')
-                  .filter((s) => !/Riduci|Chiudi$|Close$/.test(s));
-                if (labels.some((s) => /Chiudi il rapporto|Close the report/.test(s))) return resolve('report');
-                if (labels.length) return resolve('choices');
-                if (Date.now() > deadline) return resolve('timeout');
-                setTimeout(probe, 250);
-              };
-              probe();
-            }),
-        )
-        .catch(() => 'timeout' as const);
+      // Node-side polling (no in-page evaluate: tsx compiles inner functions
+      // with helpers that don't exist in the browser context).
+      let settled: 'choices' | 'report' | 'timeout' = 'timeout';
+      const deadline = Date.now() + 12000;
+      while (Date.now() < deadline) {
+        const labels = await win
+          .evaluate((el) =>
+            [...el.querySelectorAll('[data-hud-choices] button[data-skin="choice"]')]
+              .map((b) => b.textContent ?? '')
+              .filter((s) => s && s.length > 1 && !/Riduci|Chiudi$|Close$/.test(s)),
+          )
+          .catch(() => [] as string[]);
+        if (labels.some((s) => /Chiudi il rapporto|Close the report/.test(s))) {
+          settled = 'report';
+          break;
+        }
+        if (labels.length) {
+          settled = 'choices';
+          break;
+        }
+        await page.waitForTimeout(250);
+      }
       transcript.push({ step: `${step}-wait`, settled });
       if (settled !== 'choices') break;
       continue;

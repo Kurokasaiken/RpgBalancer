@@ -29,6 +29,8 @@ import {
   type QuestRunState,
 } from './questRun';
 import { emptyPhase, recordAction, snapshotRun, type PhaseRecord } from './questPhaseRecord';
+import { beatMark, projectBeats, type BeatMark, type QuestBeat } from './beatSequencer';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { createQuestRunAdapter } from '@/ui/idleVillage/questTheatre/questRunAdapter';
 import type { TheatreAdapter } from '@/ui/idleVillage/questTheatre/theatreContract';
 
@@ -62,6 +64,10 @@ export interface QuestRunApi {
    *  truth, projected for theatre-shaped consumers. Stable instance — its
    *  commandId dedupe survives re-renders. */
   adapter: TheatreAdapter;
+  /** Committed-but-unpresented moments since the last window seen state
+   *  (PLAN-025 T-008). Append-only per commit; the window's beat cursor
+   *  replays them one at a time and the queue resets on start/clear. */
+  beats: QuestBeat[];
 }
 
 const beatOf = (run: QuestRunState) => nodesFor(run)[run.nodeId]?.beat ?? 0;
@@ -69,6 +75,10 @@ const beatOf = (run: QuestRunState) => nodesFor(run)[run.nodeId]?.beat ?? 0;
 export function useQuestRun(questId: QuestId): QuestRunApi {
   const [run, setRun] = useState<QuestRunState | null>(null);
   const [phases, setPhases] = useState<PhaseRecord[]>([]);
+  /** Committed beats still unseen by the window (PLAN-025 T-008). */
+  const [beats, setBeats] = useState<QuestBeat[]>([]);
+  /** Position in the run's commit history the last projection consumed. */
+  const markRef = useRef<BeatMark | null>(null);
   /** Last tick the caller synced — commands resolve at this tick. */
   const tickRef = useRef(0);
   const saveKey = `idleVillage.questRun.${questId}`;
@@ -93,6 +103,9 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       setRun(payload.run);
       setPhases(payload.phases.length ? payload.phases : [emptyPhase(beatOf(payload.run))]);
       tickRef.current = payload.run.frontier.startedAt;
+      /* The restored frontier is "already presented" — the beat queue starts
+       *  empty; the first syncClock re-marks and projects only new commits. */
+      markRef.current = beatMark(payload.run);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saveKey]);
@@ -110,6 +123,8 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       const first = [emptyPhase(beatOf(fresh))];
       setRun(fresh);
       setPhases(first);
+      setBeats([]);
+      markRef.current = beatMark(fresh);
       persist(fresh, first);
     },
     [questId, persist],
@@ -122,7 +137,13 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       // The engine mutates the run in place: snapshot first, and call it outside a
       // state updater so StrictMode's double-invoked updaters can't apply it twice.
       const before = snapshotRun(run);
+      const mark = markRef.current ?? beatMark(run);
       const next = apply(run);
+      markRef.current = beatMark(next);
+      const projected = projectBeats(mark, next, {
+        maxBeats: DEFAULT_GAME_FRAME_CONFIG.questWindow.beats.maxQueue,
+      });
+      if (projected.length) setBeats((q) => [...q, ...projected]);
       const nextBeat = beatOf(next);
       let nextPhases: PhaseRecord[] = phases;
       setPhases((current) => {
@@ -191,11 +212,13 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   const clear = useCallback(() => {
     setRun(null);
     setPhases([]);
+    setBeats([]);
+    markRef.current = null;
     persist(null, []);
   }, [persist]);
 
   return useMemo(
-    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear, adapter }),
-    [run, phases, start, choose, syncClock, heal, potion, clear, adapter],
+    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear, adapter, beats }),
+    [run, phases, start, choose, syncClock, heal, potion, clear, adapter, beats],
   );
 }
