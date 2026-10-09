@@ -1,10 +1,12 @@
 /**
- * Unit tests for the first GENERATED scenario (PLAN-026 T-3): «La Corsa al
- * Passo» — core gimmick gara-di-avanzamento on the passo-montano kit.
+ * Unit tests for the generated catalog v0 (PLAN-026 T-3): the
+ * gara-di-avanzamento skeleton × two domain kits — «La Corsa al Passo
+ * del Corvo» (passo-montano) and «La Corsa alle Chiuse Vecchie» (palude).
  *
- * Proves the v2 engine can execute a generated catalog scenario end-to-end:
- * schema parse at import, runstart armRolls trait-gating, vars racing to the
- * goal, the 'inseguimento' twist branch changing the route, trait/info-gated
+ * Proves the v2 engine executes generated catalog scenarios end-to-end:
+ * schema parse at import, kit-swap (same skeleton, different world),
+ * runstart armRolls trait-gating, vars racing to the goal, the
+ * 'inseguimento' twist branch changing the route, trait/info-gated
  * options, and the TAKEN→SECURED→reward chain on the 'gen' profile.
  */
 
@@ -18,10 +20,15 @@ import {
 } from '@/ui/idleVillage/questS1Lab/questRun';
 import { createScenarioInstance as createInstance } from '@/ui/idleVillage/questS1Lab/questOffer';
 import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
+import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import {
-  generateRaceToPass,
+  GENERATED_CATALOG,
+  RACE_TO_MARSH_SCENARIO,
   RACE_TO_PASS_SCENARIO,
-} from '@/balancing/config/idleVillage/quests/generation/raceToPass';
+  generateRaceScenario,
+  PALUDE_KIT,
+} from '@/balancing/config/idleVillage/quests/generation/catalog';
+import { generateRaceToPass } from '@/balancing/config/idleVillage/quests/generation/raceToPass';
 
 /* ------------------------------------------------------------------ */
 /* Fixtures                                                            */
@@ -47,13 +54,13 @@ function party(traits?: string[]): LabMember[] {
   ];
 }
 
-/** Instance of the generated scenario at neutral scales, questId 'gen'. */
-function raceInstance() {
-  return createInstance(RACE_TO_PASS_SCENARIO, { dangerScale: 1, rewardScale: 1 }, 'gen');
+/** Instance of a generated scenario at neutral scales, questId 'gen'. */
+function genInstance(scenario: QuestScenario) {
+  return createInstance(scenario, { dangerScale: 1, rewardScale: 1 }, 'gen');
 }
 
-function raceRun(seed: number, traits?: string[]): QuestRunState {
-  return createRun({ party: party(traits), seed, questId: 'gen', scenarioInstance: raceInstance() });
+function genRun(scenario: QuestScenario, seed: number, traits?: string[]): QuestRunState {
+  return createRun({ party: party(traits), seed, questId: 'gen', scenarioInstance: genInstance(scenario) });
 }
 
 /** Drive the run to a terminal state picking a strategy; returns the run. */
@@ -72,28 +79,60 @@ function driveToEnd(
   return run;
 }
 
+const opt = (s: QuestRunState, id: string) => availableOptions(s).find((o) => o.id === id)?.id;
+
 /* ------------------------------------------------------------------ */
-/* Schema + generator                                                  */
+/* Schema + generator + catalog                                        */
 /* ------------------------------------------------------------------ */
 
-describe('raceToPass — generated scenario', () => {
-  it('parses against QuestScenarioSchema at import (frozen catalog)', () => {
-    expect(RACE_TO_PASS_SCENARIO.id).toBe('gen-race-to-pass');
+describe('generated catalog — schema and kit-swap', () => {
+  it('both imprints parse against QuestScenarioSchema at import', () => {
+    expect(RACE_TO_PASS_SCENARIO.id).toBe('gen-race-passo-montano');
     expect(RACE_TO_PASS_SCENARIO.startNode).toBe('rp-partenza');
-    expect(RACE_TO_PASS_SCENARIO.initialVars).toEqual({ you: 0, rival: 0, goal: 6 });
+    expect(RACE_TO_MARSH_SCENARIO.id).toBe('gen-race-palude');
+    expect(RACE_TO_MARSH_SCENARIO.startNode).toBe('rm-partenza');
+    expect(GENERATED_CATALOG['gen-race-palude']).toBe(RACE_TO_MARSH_SCENARIO);
   });
 
   it('generator is parametrized: goal and twistChance propagate', () => {
     const s = generateRaceToPass({ goal: 4, twistChance: 90 });
     expect(s.initialVars?.goal).toBe(4);
     expect(s.armRolls?.[0]?.chance).toBe(90);
-    expect(s.scenarioVersion).toBe('gen-race-4-90');
+    expect(s.scenarioVersion).toBe('gen-race-passo-montano-4-90');
+  });
+
+  it('kit-swap: same skeleton shape, different ids, names and intel', () => {
+    const pass = RACE_TO_PASS_SCENARIO;
+    const marsh = RACE_TO_MARSH_SCENARIO;
+    expect(Object.keys(pass.nodes)).toHaveLength(Object.keys(marsh.nodes).length);
+    // Same skeleton: strip the prefix and the graph is identical.
+    const strip = (id: string) => id.replace(/^[a-z]+-/, '');
+    const passIds = Object.keys(pass.nodes).map(strip).sort();
+    const marshIds = Object.keys(marsh.nodes).map(strip).sort();
+    expect(passIds).toEqual(marshIds);
+    // Different world: the dressing changed.
+    expect(pass.nodes['rp-viaB']?.title).not.toBe(marsh.nodes['rm-viaB']?.title);
+    const marshInfo = marsh.nodes['rm-viaB']?.verdictTable?.win?.setInfo;
+    expect(marshInfo).toEqual(['canale-morto']);
+    // The twist flag/arming is structural — shared across kits.
+    expect(marsh.armRolls?.[0]?.flag).toBe('inseguimento');
+    expect(marsh.armRolls?.[0]?.requiresTrait).toBe('scavezzacollo');
+    // Palude kit content respected (QUEST_IMPRINTS: passarelle, fango).
+    expect(marsh.nodes['rm-viaA']?.body).toMatch(/tavol|passarell|canal/i);
+  });
+
+  it('a kit with a wrong skeleton key fails generation loudly', () => {
+    const broken = { ...PALUDE_KIT, copy: { ...PALUDE_KIT.copy, tappa: undefined } };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => generateRaceScenario(broken as any)).toThrow();
   });
 
   it('every check node carries a verdictTable (data-driven, no legacy path)', () => {
-    const checks = Object.values(RACE_TO_PASS_SCENARIO.nodes).filter((n) => n.kind === 'check');
-    expect(checks.length).toBeGreaterThanOrEqual(6);
-    for (const c of checks) expect(c.verdictTable).toBeDefined();
+    for (const scenario of Object.values(GENERATED_CATALOG)) {
+      const checks = Object.values(scenario.nodes).filter((n) => n.kind === 'check');
+      expect(checks.length).toBeGreaterThanOrEqual(8);
+      for (const c of checks) expect(c.verdictTable).toBeDefined();
+    }
   });
 });
 
@@ -101,13 +140,15 @@ describe('raceToPass — generated scenario', () => {
 /* Run creation on the 'gen' profile                                   */
 /* ------------------------------------------------------------------ */
 
-describe('raceToPass — run on the gen profile', () => {
-  it('createRun on the instance seeds the race vars and starts on rp-partenza', () => {
-    const run = raceRun(1);
-    expect(run.questId).toBe('gen');
-    expect(run.nodeId).toBe('rp-partenza');
-    expect(run.vars).toEqual({ you: 0, rival: 0, goal: 6 });
-    expect(nodesFor(run)).toBe(raceInstance().nodes);
+describe('generated run — gen profile', () => {
+  it('createRun on the instance seeds the race vars and starts on the kit node', () => {
+    const pass = genRun(RACE_TO_PASS_SCENARIO, 1);
+    expect(pass.questId).toBe('gen');
+    expect(pass.nodeId).toBe('rp-partenza');
+    expect(pass.vars).toEqual({ you: 0, rival: 0, goal: 6 });
+    expect(nodesFor(pass)).toBe(genInstance(RACE_TO_PASS_SCENARIO).nodes);
+    const marsh = genRun(RACE_TO_MARSH_SCENARIO, 1);
+    expect(marsh.nodeId).toBe('rm-partenza');
   });
 
   it("questId 'gen' without an instance throws — no empty authored map", () => {
@@ -116,26 +157,28 @@ describe('raceToPass — run on the gen profile', () => {
     ).toThrow(/gen.*ScenarioInstance/);
   });
 
-  it('the Scavezzacollo armRoll gates the twist arming', () => {
-    const instance = createInstance(
+  it('the Scavezzacollo armRoll gates the twist arming (both kits)', () => {
+    const scenarios = [
       generateRaceToPass({ twistChance: 100 }),
-      { dangerScale: 1, rewardScale: 1 },
-      'gen',
-    );
-    const reckless = createRun({
-      party: party(['scavezzacollo']),
-      seed: 1,
-      questId: 'gen',
-      scenarioInstance: instance,
-    });
-    expect(reckless.flags).toContain('inseguimento');
-    const prudent = createRun({
-      party: party(),
-      seed: 1,
-      questId: 'gen',
-      scenarioInstance: instance,
-    });
-    expect(prudent.flags).not.toContain('inseguimento');
+      generateRaceScenario(PALUDE_KIT, { twistChance: 100 }),
+    ];
+    for (const scenario of scenarios) {
+      const instance = genInstance(scenario);
+      const reckless = createRun({
+        party: party(['scavezzacollo']),
+        seed: 1,
+        questId: 'gen',
+        scenarioInstance: instance,
+      });
+      expect(reckless.flags, scenario.id).toContain('inseguimento');
+      const prudent = createRun({
+        party: party(),
+        seed: 1,
+        questId: 'gen',
+        scenarioInstance: instance,
+      });
+      expect(prudent.flags, scenario.id).not.toContain('inseguimento');
+    }
   });
 });
 
@@ -143,10 +186,10 @@ describe('raceToPass — run on the gen profile', () => {
 /* Options gating — info and traits                                    */
 /* ------------------------------------------------------------------ */
 
-describe('raceToPass — gated options at the hub', () => {
-  it('the shortcut is hidden until the orme check yields the intel', () => {
-    const run = raceRun(1);
-    applyChoice(run, 'rp-via-crepa');
+describe('generated run — gated options', () => {
+  it('the shortcut is hidden until the safe check yields the intel', () => {
+    const run = genRun(RACE_TO_PASS_SCENARIO, 1);
+    applyChoice(run, 'rp-via-a');
     if (run.nodeId === 'rp-tappa') {
       const ids = availableOptions(run).map((o) => o.id);
       expect(ids).not.toContain('rp-tagliata'); // no intel yet
@@ -154,87 +197,109 @@ describe('raceToPass — gated options at the hub', () => {
       expect(ids).toContain('rp-passo');
     }
     // with a party carrying the intel the option surfaces — simulated by
-    // injecting the intel (the orme win row does setInfo:'tagliata').
-    const run2 = raceRun(1);
+    // injecting the intel (the viaB win row does setInfo:'tagliata').
+    const run2 = genRun(RACE_TO_PASS_SCENARIO, 1);
     run2.info.push('tagliata');
     run2.nodeId = 'rp-tappa';
     const ids2 = availableOptions(run2).map((o) => o.id);
     expect(ids2).toContain('rp-tagliata');
   });
 
-  it('the avido leap is trait-gated', () => {
-    const greedy = raceRun(1, ['avido']);
-    greedy.nodeId = 'rp-tappa';
-    expect(availableOptions(greedy).map((o) => o.id)).toContain('rp-balzo');
-    const plain = raceRun(1);
-    plain.nodeId = 'rp-tappa';
-    expect(availableOptions(plain).map((o) => o.id)).not.toContain('rp-balzo');
+  it('palude kit: the canale morto option requires its own intel id', () => {
+    const run = genRun(RACE_TO_MARSH_SCENARIO, 1);
+    run.nodeId = 'rm-tappa';
+    expect(availableOptions(run).map((o) => o.id)).not.toContain('rm-tagliata');
+    run.info.push('canale-morto');
+    expect(availableOptions(run).map((o) => o.id)).toContain('rm-tagliata');
+    // the passo intel id does NOT unlock the marsh shortcut
+    const run2 = genRun(RACE_TO_MARSH_SCENARIO, 1);
+    run2.nodeId = 'rm-tappa';
+    run2.info.push('tagliata');
+    expect(availableOptions(run2).map((o) => o.id)).not.toContain('rm-tagliata');
   });
 
-  it('the scavezzacollo hold-the-pass option surfaces only at the vetta', () => {
-    const run = raceRun(1, ['scavezzacollo']);
+  it('the avido leap is trait-gated (both kits)', () => {
+    const greedy = genRun(RACE_TO_PASS_SCENARIO, 1, ['avido']);
+    greedy.nodeId = 'rp-tappa';
+    expect(availableOptions(greedy).map((o) => o.id)).toContain('rp-balzo');
+    const plain = genRun(RACE_TO_PASS_SCENARIO, 1);
+    plain.nodeId = 'rp-tappa';
+    expect(availableOptions(plain).map((o) => o.id)).not.toContain('rp-balzo');
+    const marshGreedy = genRun(RACE_TO_MARSH_SCENARIO, 1, ['avido']);
+    marshGreedy.nodeId = 'rm-tappa';
+    expect(availableOptions(marshGreedy).map((o) => o.id)).toContain('rm-balzo');
+  });
+
+  it('the scavezzacollo hold option surfaces only at the vetta', () => {
+    const run = genRun(RACE_TO_PASS_SCENARIO, 1, ['scavezzacollo']);
     run.nodeId = 'rp-vetta';
     expect(availableOptions(run).map((o) => o.id)).toContain('rp-attesa');
-    const plain2 = raceRun(1);
+    const plain2 = genRun(RACE_TO_PASS_SCENARIO, 1);
     plain2.nodeId = 'rp-vetta';
     expect(availableOptions(plain2).map((o) => o.id)).not.toContain('rp-attesa');
   });
 });
 
 /* ------------------------------------------------------------------ */
-/* Race dynamics — vars and the twist                                  */
+/* Race dynamics — vars, twist, outcomes                               */
 /* ------------------------------------------------------------------ */
 
-describe('raceToPass — race dynamics', () => {
-  it('check outcomes move the race cursors on the run vars', () => {
-    for (let seed = 1; seed <= 20; seed += 1) {
-      const run = raceRun(seed);
-      applyChoice(run, 'rp-via-crepa');
-      const verdict = run.checkQueue[0]?.verdict;
-      if (!verdict) continue;
-      if (verdict === 'win' || verdict === 'bigwin') {
-        expect(run.vars?.you).toBeGreaterThan(0);
-      } else if (verdict === 'fail' || verdict === 'epicfail') {
-        expect(run.vars?.rival).toBeGreaterThan(0);
+describe('generated run — race dynamics', () => {
+  it('check outcomes move the race cursors on the run vars (both kits)', () => {
+    for (const scenario of Object.values(GENERATED_CATALOG)) {
+      const viaA = `${scenario.nodes[scenario.startNode]!.id.replace('partenza', 'via-a')}`;
+      for (let seed = 1; seed <= 20; seed += 1) {
+        const run = genRun(scenario, seed);
+        applyChoice(run, viaA);
+        const verdict = run.checkQueue[0]?.verdict;
+        if (!verdict) continue;
+        if (verdict === 'win' || verdict === 'bigwin') {
+          expect(run.vars?.you).toBeGreaterThan(0);
+        } else if (verdict === 'fail' || verdict === 'epicfail') {
+          expect(run.vars?.rival).toBeGreaterThan(0);
+        }
+        break;
       }
-      return; // one landed verdict is enough
     }
-    throw new Error('no check landed in 20 seeds');
   });
 
-  it('the armed twist diverts the route to rp-imboscata', () => {
-    const instance = createInstance(
-      generateRaceToPass({ twistChance: 100 }),
-      { dangerScale: 1, rewardScale: 1 },
-      'gen',
-    );
-    for (let seed = 1; seed <= 60; seed += 1) {
-      const run = createRun({
-        party: party(['scavezzacollo']),
-        seed,
-        questId: 'gen',
-        scenarioInstance: instance,
-      });
-      expect(run.flags).toContain('inseguimento');
-      applyChoice(run, 'rp-via-crepa');
-      // The twist check resolves on arrival — the proof is in the trail:
-      // the run visited rp-imboscata and the flag was consumed by it.
-      if (run.visitedNodes.includes('rp-imboscata')) {
-        expect(run.flags).not.toContain('inseguimento'); // consumed by the fight
-        return;
+  it('the armed twist diverts the route to the imboscata (both kits)', () => {
+    for (const scenario of Object.values(GENERATED_CATALOG)) {
+      const instance = createInstance(
+        scenario.id === 'gen-race-passo-montano'
+          ? generateRaceToPass({ twistChance: 100 })
+          : generateRaceScenario(PALUDE_KIT, { twistChance: 100 }),
+        { dangerScale: 1, rewardScale: 1 },
+        'gen',
+      );
+      const viaA = `${scenario.startNode.replace('partenza', 'via-a')}`;
+      const imboscata = `${scenario.startNode.replace('partenza', 'imboscata')}`;
+      let witnessed = false;
+      for (let seed = 1; seed <= 60 && !witnessed; seed += 1) {
+        const run = createRun({
+          party: party(['scavezzacollo']),
+          seed,
+          questId: 'gen',
+          scenarioInstance: instance,
+        });
+        expect(run.flags).toContain('inseguimento');
+        applyChoice(run, viaA);
+        // The twist check resolves on arrival — the proof is the trail:
+        // the run visited the imboscata node and consumed the flag.
+        if (run.visitedNodes.includes(imboscata)) {
+          expect(run.flags).not.toContain('inseguimento');
+          witnessed = true;
+        }
       }
+      expect(witnessed, `twist never diverted on ${scenario.id}`).toBe(true);
     }
-    throw new Error('armed twist never diverted to rp-imboscata in 60 seeds');
   });
 
   it('aggressive play can reach the vetta and secure the prize → reward', () => {
     const pick = (s: QuestRunState) =>
-      availableOptions(s).find((o) => o.id === 'rp-via-crepa')?.id ??
-      availableOptions(s).find((o) => o.id === 'rp-sprint')?.id ??
-      availableOptions(s).find((o) => o.id === 'rp-carico')?.id ??
-      availableOptions(s)[0]!.id;
+      opt(s, 'rp-via-a') ?? opt(s, 'rp-sprint') ?? opt(s, 'rp-carico') ?? availableOptions(s)[0]!.id;
     for (let seed = 1; seed <= 200; seed += 1) {
-      const run = driveToEnd(raceRun(seed), pick);
+      const run = driveToEnd(genRun(RACE_TO_PASS_SCENARIO, seed), pick);
       if (run.outcome === 'reward') {
         expect(run.objectiveDone).toBe(true);
         expect(run.loot.length).toBeGreaterThan(0);
@@ -245,12 +310,22 @@ describe('raceToPass — race dynamics', () => {
     throw new Error('aggressive policy never reached a reward in 200 seeds');
   });
 
+  it('marsh kit: aggressive play can also win → reward', () => {
+    const pick = (s: QuestRunState) =>
+      opt(s, 'rm-via-a') ?? opt(s, 'rm-sprint') ?? opt(s, 'rm-carico') ?? availableOptions(s)[0]!.id;
+    for (let seed = 1; seed <= 200; seed += 1) {
+      const run = driveToEnd(genRun(RACE_TO_MARSH_SCENARIO, seed), pick);
+      if (run.outcome === 'reward') {
+        expect(run.objectiveDone).toBe(true);
+        return;
+      }
+    }
+    throw new Error('marsh aggressive policy never reached a reward in 200 seeds');
+  });
+
   it('the rival can win the race → survived without objective', () => {
     const cautiousPick = (s: QuestRunState) =>
-      availableOptions(s).find((o) => o.id === 'rp-via-orme')?.id ??
-      availableOptions(s).find((o) => o.id === 'rp-passo')?.id ??
-      availableOptions(s).find((o) => o.id === 'rp-carico')?.id ??
-      availableOptions(s)[0]!.id;
+      opt(s, 'rp-via-b') ?? opt(s, 'rp-passo') ?? opt(s, 'rp-carico') ?? availableOptions(s)[0]!.id;
     let sawLose = false;
     for (let seed = 1; seed <= 200 && !sawLose; seed += 1) {
       // Weak party to let the rival win more often.
@@ -261,7 +336,7 @@ describe('raceToPass — race dynamics', () => {
         party: weak,
         seed,
         questId: 'gen',
-        scenarioInstance: raceInstance(),
+        scenarioInstance: genInstance(RACE_TO_PASS_SCENARIO),
       });
       driveToEnd(run, cautiousPick);
       if (run.nodeId === 'rp-sconfitta' || (run.ended && run.outcome === 'survived' && !run.objectiveDone)) {
