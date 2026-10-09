@@ -292,10 +292,20 @@ Ogni task richiede lo stato garantito dal precedente.
   T-008, mostravano la chiave grezza) + le nuove chiavi combat. Test:
   `combatStrip.test.tsx` (4: pips orda, esposizione ~100%, assenza fuori
   combat, floater sul membro giusto).
-- **T-011 — Safeguard + acceptance + evidence.** `lint`, `test -- <scope>`,
-  `build:check`, `kanban:lint`, smoke `/game` e `/game-frame-theatre`;
-  harness contro i budget di T-003; docs (`quest_theatre_spec.md`,
-  `COMPONENT_MASTER_INDEX`, `quest_ui_component_guide.md`, PLAN-021).
+- **T-011 — Safeguard + acceptance + evidence (FATTO 2026-10-10).**
+  Safeguard: scope quest 142/142, `build:check`, `kanban:lint`, lint 0 errori.
+  Smoke Playwright (console+pageerror): `/game`, `/game-frame-theatre`,
+  `/quest-window-lab` — tutte 200, zero errori, zero error boundary. Harness
+  seed-42-greedy esteso con `waitMs`/`beatMs`/`pendingMs` + flag `--skip-beats`:
+  no-skip 74.4 s wall (beat 62.5 s su 16 attese, pending frontiera 4 s),
+  skip 24.5 s; 0 righe/opzioni duplicate, overflow 0. **Divergenza registrata —
+  Acceptance 4 parziale:** overhead no-skip ≈ 1750 ms/comando, sopra il budget
+  T-003 (+50% ≈ 675 ms); con skip ≈ 191 ms/comando, dentro (+10% ≈ 495 ms).
+  Il budget era calibrato pre-frontiera su beat-paragrafo: il cinema authored
+  non ci rientra — rinegoziare il budget o stringere `questWindow.beats` è
+  decisione del Director. Gate umano A (morte su seed E1) ancora aperto.
+  Evidence: `test-results/t011-quest-theatre-acceptance-2026-10-10.log` +
+  `test-results/t011/`.
 - **T-012 — Rimozione di `QuestRunWindow`** (dopo l'acceptance 1–5,
   reversibile fino a qui).
 

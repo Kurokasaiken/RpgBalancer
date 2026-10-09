@@ -218,6 +218,34 @@ T-009), `CheckKitProps` feasibility + hosting `MilestoneCheckModal`/`QuestReward
 (T-006 usa stage propri, non i kit), `COMPONENT_MASTER_INDEX`. Evidence:
 `test-results/r088-quest-theatre-2026-10-06.log`.
 
+## Stato implementazione (2026-10-10, convergenza PLAN-025)
+
+La direzione è cambiata per decisione del Director (PLAN-025 D-F): **il teatro
+converge dentro `QuestRunWindow`**, il componente battezzato su `/game` — non il
+contrario. PLAN-021 resta il piano che ha definito il **contratto read-model**
+(`theatreContract.ts` → v2 in `questRunAdapter.ts`) e lo stage renderer
+`QuestTheatre`, entrambi ora provati sul motore reale.
+
+Già assorbito da PLAN-025 (T-004…T-011):
+
+- **Adapter reale su route dev** — `/game-frame-theatre` monta
+  `createQuestRunAdapter` su `useQuestRun` (fixture fake rimossi dalla rotta;
+  tick driver + toggle orologio in Regia). La tesi «aspetta ai bivi nel gioco
+  reale» è ora verificabile dal vivo — pending osservato in run E2E
+  (`quest-theatre-playtest.ts`, `waitMs`/`beatMs`/`pendingMs` separati).
+- **`QuestTheatre` impara `combat`/`pending`** — stage decision con telemetria
+  turno/nemici e barra di maturazione.
+- **Contratto v2** — `node.pending{startedAt,readyAt}`, `party.hp`, intent
+  `useItem`/`useConsumable`, reject `duplicate`; `visitedNodes` dalla traversata
+  reale (finding T-002 risolto: trail serializzato nel dominio).
+- **Integration Gate (T-008 qui)**: di fatto anticipata per la quest goblin
+  (D-1) — il montaggio canonico è `QuestRunWindow` su `/game`; `QuestTheatre`
+  resta la vista dev/Regia. Rimozione definitiva del componente unico → PLAN-025
+  T-012, gated sull'acceptance Director (budget no-skip + gate umano A aperti).
+
+Resta fuori/scoperto: Playwright `questTheatre.spec.ts`, hosting dei kit check/
+reward nel teatro, promozione del contratto a `trusted`.
+
 ## NOT In Scope
 
 - Semantica temporale/scheduling, formato canonico del runtime, persistenza reale,
