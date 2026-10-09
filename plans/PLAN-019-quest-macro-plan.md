@@ -209,7 +209,12 @@ partire dalla "definizione di buona quest": le regole di generazione si subordin
 interesse scoperti, non il contrario. Nessun vincolo di design su S2–S4 per conto di S5.
 Proposta consolidata della conversazione di generazione (R-091/108/111/112/113):
 `context/QUEST_GENERATION_SPEC.md` (specchietto riassuntivo, living doc) +
-`context/QUEST_GENERATION_ARCHITECTURE.md` (analisi FACT/PROPOSAL/OPEN e stato-repo).
+`context/QUEST_GENERATION_ARCHITECTURE.md` (analisi FACT/PROPOSAL/OPEN e stato-repo) +
+`context/QUEST_GENERATION_CONTRACTS.md` (contratti v0 + gap motore verificati).
+**Deroga registrata 2026-10-10:** il Director ha ratificato S5 come
+[PLAN-026](PLAN-026-quest-generation.md) `active` **in parallelo a S3/S4**
+— i campi fun-judgment restano `experimental` fino al gate S4, P6
+(integrazione) resta subordinato ai gate qui sopra.
 
 ## Rientri
 
