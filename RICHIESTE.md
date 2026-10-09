@@ -2282,12 +2282,14 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"committa e pusha tutto quello che c'è in RPG balancer, la landing page deve diventare /game. Poi fa il deploy su vercel con successo"*
 **Data:** 2026-10-10
-**Stato:** `in corso`
+**Stato:** `fatta`
 
 **Intento:**
 - Committare e pushare tutto il lavoro pending (PLAN-019-S2.4 planning surface + lancio, documentazione generazione quest R-111/112/113).
 - La route `/` (landing) deve servire la superficie di gioco canonica `/game` (Game Frame Pixi), non più il FantasyLayout a tab.
 - Deploy production su Vercel (`rpg-balancer`) andato a buon fine.
+
+**Esito:** commit `816b47fa` (58 file) + rebase su `0ba7afe9` pushato su `main`. In `App.tsx` la condizione `isRootPath` entra nel ramo `GameFramePixiPage`: `/` e `/index.html` renderizzano la superficie `/game` (il FantasyLayout a tab resta raggiungibile su path non riconosciuti). Deploy Vercel production riuscito (upload `--archive=tgz`, build 32.5s): `https://rpg-balancer.vercel.app` — verificato via browser: `/` mostra il gioco (canvas Pixi, HUD, roster).
 
 ---
 
