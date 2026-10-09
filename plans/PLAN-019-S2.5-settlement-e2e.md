@@ -131,7 +131,7 @@ secondo POI end-to-end, E2E completo dello slice, documentazione di chiusura.
 |---|---|---|---|---|---|
 | sì | vivo | fine grafo | sì | sì | chiude |
 | sì | morto | fine grafo | **no** | sì | chiude |
-| sì | vivo | fuga/ritiro | **IRRAGGIUNGIBILE nel motore** — `flee()` chiama `dropObjective` prima di `endRun`: al terminale `objectiveDone=false` sempre (enumerazione T-1). La conferma Director «fuga+obiettivo → reward sì» è in tensione con la semantica authored «panic means dropping it»: l'esito osservabile è la riga «no | vivo | fuga». **Da ratificare**: emendare la desiderata oppure cambiare `flee` (mantenere obiettivo = decisione Director, non di questo piano). | se vivesse: conservato | chiude |
+| sì | vivo | fuga/ritiro | **IRRAGGIUNGIBILE nel motore** — `flee()` chiama `dropObjective` prima di `endRun`: al terminale `objectiveDone=false` sempre (enumerazione T-1). **RATIFICATO Director 2026-10-10**: «fuga = missione fallita» — il motore ha ragione, la conferma informale «fuga+obiettivo → reward» decade; prevale QUEST_RULES §5. | se vivesse: conservato | chiude |
 | sì | morto | fuga/ritiro | no (stessa ragione: `flee` ⇒ `objectiveDone=false`) | conservato | chiude |
 | sì | * | wipe | no | **tutto perso** | chiude — **RAGGIUNGIBILE** (verificato T-1: goblin wipe con trofeo in mano all'agguato F7) |
 | no | vivo | fine grafo | no | conservato | chiude |

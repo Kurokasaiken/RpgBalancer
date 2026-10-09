@@ -891,3 +891,30 @@ La trappola indipendente a ramp (P = exploreTurn × r) mantiene la tentazione.
 
 **Fonte:** Director in sessione 2026-10-10 (R-109);
 evidenza in `context/ingestions/2026-10-09-emotional-mechanics-quest/07-round3-f6-validation.md`.
+
+---
+
+## 2026-10-10 — R-107/S2.5: tre decisioni di chiusura del settlement
+
+**Contesto:** chiusura PLAN-019-S2.5. Tre punti aperti al Director sulla
+tabella delle transizioni terminali e sui gate residui di S2.2.
+
+**Decisioni (Director, 2026-10-10, verbatim «1) si, è missione fallita 2) va
+bene così, ci pensiamo poi 3) le quest nn risolte si applicano normalmente»):**
+
+1. **Fuga = missione fallita, sempre.** La cella «obiettivo sì + fuga +
+   leader vivo → reward sì» decade: il motore ha già ragione — `flee()`
+   chiama `dropObjective` prima di `endRun`, quindi un run fuggito termina
+   con `objectiveDone=false` e nessuna reward. La conferma informale
+   «fuga+obiettivo → reward» era in tensione con §5 («fuga/ritirata =
+   fallimento della quest, ma il bottino raccolto resta»): prevale §5,
+   nessun emendamento necessario.
+2. **Scale/calibrazione S2.2 (T-1b, T-4b) rinviati**: i valori PROPOSED
+   restano; la verifica sulle distribuzioni e la classificazione degli
+   scostamenti Δsuccess sono decisioni differite — «va bene così».
+3. **Conseguenze delle quest non risolte**: si applicano **normalmente**
+   — la regola §8 non è più parziale: offerta scaduta/non presa/missione
+   non risolta produce conseguenze come una risolta (trigger e forma da
+   specificare nel piano che le implementa — non S2.5).
+
+**Fonte:** Director in sessione 2026-10-10.

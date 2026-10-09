@@ -163,7 +163,11 @@ al Director, non assorbimento silenzioso.
 - **RULE:** fuga/ritirata = fallimento della quest, **ma il bottino raccolto
   resta**. Dopo l'obiettivo, «continua ad esplorare» espone le vite a rischio
   ma non perde l'acquisito; la regola leader-morto resta attiva.
-  **STATUS:** `vigente`. **SOURCE:** v24 rev.1 p.11; rev.2; `context/QUEST_S1_DESIGN.md`.
+  **STATUS:** `vigente`. **SOURCE:** v24 rev.1 p.11; rev.2; `context/QUEST_S1_DESIGN.md`;
+  confermata 2026-10-10 — «fuga = missione fallita» sempre: chi fugge lascia
+  l'obiettivo sul campo (motore: `dropObjective` prima del terminale), quindi
+  nessuna reward anche se la prova-obiettivo era riuscita. La lettura
+  «fuga+obiettivo → reward» è decaduta.
   Danni extra in fuga: `open` (OPEN-009).
 - **RULE:** wipe = tutti i membri morti → chiusura forzata `deadly`, **si
   perde tutto** (bottino incluso).
@@ -222,9 +226,9 @@ al Director, non assorbimento silenzioso.
 
 ## 8. Conseguenze oltre l'esito immediato
 
-- **RULE:** tutte le quest devono avere conseguenze se vengono risolte, in base a **come** vengono risolte, e anche se **non** vengono risolte.
-  **STATUS:** `implementato (parziale)` — conseguenze sulle quest RISOLTE attive dal 2026-10-10 (PLAN-019-S2.5): settlement idempotente su `/game` applica morte/ferita (con `injuredUntilTick` + recovery sweep), reward/bottino/XP e rilascio party come dati persistiti una sola volta (journal per-effetto, ledger co-locato). Restano `open` le conseguenze delle quest NON risolte (mancata presa dell'offerta, scadenza) e la memoria narrativa (OPEN-016 → S4).
-  **SOURCE:** Director 2026-10-07, verbatim in `RICHIESTE.md` R-092; `.mw/desiderata.md` v24 S1–S4; implementazione in `src/ui/idleVillage/quests/questSettlement.ts` + tabella transizioni in `plans/PLAN-019-S2.5-settlement-e2e.md`.
+- **RULE:** tutte le quest devono avere conseguenze se vengono risolte, in base a **come** vengono risolte, e anche se **non** vengono risolte — quest'ultima parte **si applica normalmente**: un'offerta non presa/scaduta o una missione non risolta produce conseguenze come una risolta (Director 2026-10-10).
+  **STATUS:** `vigente` come regola piena; `implementato (parziale)` sul runtime — conseguenze sulle quest TERMINATE attive dal 2026-10-10 (PLAN-019-S2.5): settlement idempotente su `/game` applica morte/ferita (con `injuredUntilTick` + recovery sweep), reward/bottino/XP e rilascio party come dati persistiti una sola volta (journal per-effetto, ledger co-locato). Da implementare: forma e trigger delle conseguenze da **mancata risoluzione** (scadenza offerta, offerta ignorata) — scope di un piano successivo; memoria narrativa resta OPEN-016 → S4.
+  **SOURCE:** Director 2026-10-07, verbatim in `RICHIESTE.md` R-092; `.mw/desiderata.md` v24 S1–S4; conferma Director 2026-10-10 (DECISION_LOG); implementazione in `src/ui/idleVillage/quests/questSettlement.ts` + tabella transizioni in `plans/PLAN-019-S2.5-settlement-e2e.md`.
 
 ## 9. Parcheggiato / non-regole
 
