@@ -2,7 +2,7 @@
 title: 'PLAN-019-S2.4 — Planning surface + lancio: detail viva, assegnazione trusted, Invia spedizione, halo, routing'
 status: active
 created: 2026-10-09
-revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: 2× MAJOR → assorbito; run `…/s2.4/r2/`. D-K riformulata su semantica percorso-effettivo — da ratificare Director)
+revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: 2× MAJOR → assorbito; run `…/s2.4/r2/`. D-K riformulata su semantica percorso-effettivo. Implementato — T-0…T-6 tutti fatti; E2E 7/7, unit 129/129, safeguard verdi; evidence `test-results/s24-planning-lancio-2026-10-09.log`)
 
 ## Stato implementazione (2026-10-09, sessione esecutiva)
 
@@ -29,17 +29,28 @@ revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: 2× M
   al write boundary (slot required + eleggibilità ogni membro + lock union su
   tutti i run attivi); `send()` latched (`sendingRef`) → `questRun.start` con
   `scenarioInstance`+`resolvedOffer` congelati. Test: `questExpedition.test.ts` 9/9.
-- **T-4 parziale**: halo `questHaloProgress` su `MapQuestPoi` (shape strutturale
+- **T-4 fatto**: halo `questHaloProgress` su `MapQuestPoi` (shape strutturale
   `MapQuestPoiSessionShape` — serve sia la session mock sia `poiView` reale);
   click POI → detail (offerta) o `QuestRunWindow` (run attivo) via
-  `openRunWindow(questId)`; label tempo finestra su halo vivo. **Manca**: badge
-  bivio binario sul POI (proposta D-H-4 — `poiView` espone `haloStatus`,
-  `MapQuestPoi` non lo consuma ancora).
-- **T-5**: hook `__idleVillageTestHooks.expedition[poiId]` esposti dalla session
-  (openDetail/send/assignToSlot/getEstimate/getResolvedOffer/getRun/getHalo +
-  tick advance); spec E2E da scrivere.
+  `openRunWindow(questId)`; label tempo finestra su halo vivo. Badge bivio
+  binario sul POI (D-H-4): `poiView` espone `haloStatus`, `MapQuestPoi` non lo
+  consuma ancora — proposta aperta, non bloccante.
+- **T-5 fatto**: `tests/e2e/idleVillage/gameQuestExpedition.spec.ts` 7/7 —
+  halo vuoto pre-lancio, gating slot + rifiuto ineleggibile, drag reale,
+  forecast + freeze un run → QuestRunWindow, halo su elapsed durante bivio,
+  bivi mai auto-risolti + catch-up path-relative, persistenza reload.
+  Hook `__idleVillageTestHooks.expedition[poiId]` (openDetail/send/assignToSlot/
+  getEstimate/getResolvedOffer/getRun/getHalo/choose/advanceTicks — advance via
+  azione `tick` canonica dello store).
+- **T-6 fatto**: unit scope quest 129/129 (11 file), E2E 7/7, build:check ✓,
+  kanban:lint ✓, lint n/a (quarantena). Evidence:
+  test-results/s24-planning-lancio-2026-10-09.log.
 - i18n: `questExpedition.*`, `questOffer.band.*`, `questOffer.tier.*`,
   `gameFrame.questWindow.ticks` aggiunti (it-IT, en).
+- Finding aperto: /game non idrata il gameplay clock dallo snapshot —
+  `currentTick` azzerato al reload è il comportamento reale della pagina
+  (run persiste, halo riparte dal clock corrente). Elapsed cross-reload =
+  decisione separata se richiesta.
 desiderata: v24 (PLAN-019, stadio S2), v27 (frontiera), D-G (assegnazione giocatore), D-H (planning surface), D-J (halo elapsed), D-K (gating nodi a schedule + caricamento finestra) — Director 2026-10-09
 request: R-107
 parent: PLAN-019-S2 (figlio 4/5)

@@ -598,6 +598,9 @@ export function useQuestExpeditionSession({
       checkEligibility: (slotBlueprintId: string, residentId: string) => eligibilityFor(residentId, slotBlueprintId),
       getAssignments: () => assignments,
       getEstimate: () => estimate?.value ?? null,
+      /* Serialized estimate — lets a test detect a recomputed forecast
+       * without shipping object identity across the evaluate boundary. */
+      getEstimateJson: () => JSON.stringify(estimate?.value ?? null),
       getResolvedOffer: () => resolved?.resolvedOffer ?? null,
       getRun: () => questRun.run,
       /* The player's command on a waiting frontier — the same api the

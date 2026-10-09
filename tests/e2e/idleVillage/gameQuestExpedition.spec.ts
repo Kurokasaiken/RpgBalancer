@@ -249,6 +249,75 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     expect(await beats.count()).toBeGreaterThanOrEqual(1);
   });
 
+  test('forecast is party-dependent and the roster marks the ineligible card', async ({ page }) => {
+    await expedition<void>(page, 'openDetail');
+    await expect(page.getByTestId('quest-expedition-detail')).toBeVisible();
+
+    /* While the detail plans, the roster card of a resident no slot accepts
+     *  carries the compatibility verdict — `data-compatibility="invalid"`
+     *  on the real PgCard, not a parallel marker. */
+    const invalidCard = page.locator(`[data-worker-id="${INVALID_RESIDENT}"]`).first();
+    await expect(invalidCard).toHaveAttribute('data-compatibility', 'invalid');
+    const validCard = page.locator(`[data-worker-id="${VALID_LEADER}"]`).first();
+    await expect(validCard).toHaveAttribute('data-compatibility', 'valid');
+
+    // Solo leader → one estimate.
+    await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
+    await expect(page.getByTestId('quest-expedition-forecast')).toHaveAttribute('data-forecast-state', 'ready', {
+      timeout: 20_000,
+    });
+    const soloJson = await expedition<string>(page, 'getEstimateJson');
+
+    // Adding a member re-runs the sim: the estimate is a different object
+    // with different numbers (party-dependent, not a static label).
+    await expedition<boolean>(page, 'assignToSlot', SLOT_MEMBER, VALID_MEMBER);
+    await page.waitForFunction(
+      (previous) => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'] as
+          | { getEstimateJson?: () => string }
+          | undefined;
+        const current = exp?.getEstimateJson?.();
+        return typeof current === 'string' && current !== previous;
+      },
+      soloJson,
+      { timeout: 20_000 },
+    );
+    const duoJson = await expedition<string>(page, 'getEstimateJson');
+    expect(duoJson).not.toBe(soloJson);
+    await expect(page.getByTestId('quest-expedition-forecast')).toHaveAttribute('data-forecast-state', 'ready');
+  });
+
+  test('a long absence fills the halo past the estimate but never concludes a waiting frontier (catch-up + badge)', async ({ page }) => {
+    await expedition<void>(page, 'openDetail');
+    await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
+    await expect(page.getByTestId('quest-expedition-send')).toBeEnabled({ timeout: 15_000 });
+    await expedition<void>(page, 'send');
+    await expect(page.getByTestId('quest-window')).toBeVisible({ timeout: 10_000 });
+
+    /* One jump past the whole 250-tick estimate: catch-up matures what can
+     *  mature, the halo caps at full, and the run sits `pieno-in-attesa`
+     *  on the first unresolved decision — time passed, nothing decided. */
+    await advanceTicks(page, 300);
+    await page.waitForFunction(
+      () => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'];
+        return (exp?.getHalo?.()?.elapsedTicks ?? 0) >= 300;
+      },
+      undefined,
+      { timeout: 10_000 },
+    );
+    const halo = (await expedition<HaloShape | null>(page, 'getHalo'))!;
+    expect(halo.status).toBe('pieno-in-attesa');
+    const run = (await getRun(page))!;
+    expect(run.nodeId).toBe('gob-inizio');
+    expect(run.frontier.status).toBe('waiting');
+    expect(run.ended).toBe(false);
+
+    // And the map says so: the POI badge marks the awaiting decision.
+    const badge = page.locator('[data-map-quest-poi-target] [data-decision-waiting="true"]').first();
+    await expect(badge).toBeVisible({ timeout: 15_000 });
+  });
+
   test('an active run survives reload and keeps its halo clock (PersistenceService)', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
