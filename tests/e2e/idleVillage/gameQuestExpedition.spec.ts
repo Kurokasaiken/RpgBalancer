@@ -5,9 +5,10 @@
  * contract (halo = elapsed/live-duration, catch-up consumes matured nodes).
  *
  * Resident fixtures are the canonical `TEST_ROSTER_HEROES` the store seeds:
- * - `hero-sir-spaccaculi` (fortitude/warden) → valid for the goblin leader slot
- * - `hero-giggiolillo`    (edge/precision)   → valid for member/bodyguard
- * - `hero-salvatrice`     (ward/clarity)     → INVALID for every goblin slot
+ * - `hero-sir-spaccaculi` (fortitude/warden) → valid for leader/member-1/bodyguard
+ * - `hero-giggiolillo`    (edge/precision)   → valid for leader/member-1/member-2
+ * - `hero-salvatrice`     (ward/clarity)     → valid ONLY for member-2
+ *   (esploratore: clarity|precision); leader/member-1/bodyguard reject her.
  */
 import { test, expect, type Page } from '@playwright/test';
 import { dragResidentPointer } from '../../utils/dragResident';
@@ -15,6 +16,7 @@ import { dragResidentPointer } from '../../utils/dragResident';
 const POI = 'poi-goblin';
 const SLOT_LEADER = `${POI}:goblin-slot-leader`;
 const SLOT_MEMBER = `${POI}:goblin-slot-member-1`;
+const SLOT_MEMBER_2 = `${POI}:goblin-slot-member-2`;
 const VALID_LEADER = 'hero-sir-spaccaculi';
 const VALID_MEMBER = 'hero-giggiolillo';
 const INVALID_RESIDENT = 'hero-salvatrice';
@@ -253,13 +255,20 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await expedition<void>(page, 'openDetail');
     await expect(page.getByTestId('quest-expedition-detail')).toBeVisible();
 
-    /* While the detail plans, the roster card of a resident no slot accepts
-     *  carries the compatibility verdict — `data-compatibility="invalid"`
-     *  on the real PgCard, not a parallel marker. */
-    const invalidCard = page.locator(`[data-worker-id="${INVALID_RESIDENT}"]`).first();
-    await expect(invalidCard).toHaveAttribute('data-compatibility', 'invalid');
+    /* While the detail plans, each roster card carries the compatibility
+     *  verdict — `data-compatibility` on the real PgCard, not a parallel
+     *  marker. Salvatrice starts 'valid' (member-2/esploratore accepts her);
+     *  once giggiolillo fills that slot no remaining slot accepts her and
+     *  the card flips to 'invalid' — the live verdict, not a static label. */
+    const salvatrice = page.locator(`[data-worker-id="${INVALID_RESIDENT}"]`).first();
     const validCard = page.locator(`[data-worker-id="${VALID_LEADER}"]`).first();
+    await expect(salvatrice).toHaveAttribute('data-compatibility', 'valid');
     await expect(validCard).toHaveAttribute('data-compatibility', 'valid');
+    /* member-2 is the esploratore slot (precision|clarity) — the ONLY one
+     *  that accepts salvatrice. Filling it leaves her with no accepting
+     *  slot: the card flips to 'invalid'. */
+    await expedition<boolean>(page, 'assignToSlot', SLOT_MEMBER_2, VALID_MEMBER);
+    await expect(salvatrice).toHaveAttribute('data-compatibility', 'invalid');
 
     // Solo leader → one estimate.
     await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
