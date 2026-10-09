@@ -36,6 +36,7 @@ import {
 import { HudPlaque, SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import { availableOptions, nodesFor, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import { useBeatCursor, type BeatTiming, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import { HudChip, LOG_TONE, SCRIM, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
@@ -60,6 +61,11 @@ export interface QuestRunWindowProps {
   phases: PhaseRecord[];
   /** Phase names, indexed by node `beat`. */
   beats: readonly string[];
+  /** Committed-but-unpresented moments (PLAN-025 T-008): the window replays
+   *  them one at a time — click anywhere on the beat to continue. */
+  queuedBeats: QuestBeat[];
+  /** Per-beat on-stage durations, from `gameFrameConfig.questWindow.beats`. */
+  beatTiming: BeatTiming;
   title: string;
   flavour: string;
   /** Scene art for a node id. */
@@ -87,6 +93,8 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   run,
   phases,
   beats,
+  queuedBeats,
+  beatTiming,
   title,
   flavour,
   artFor,
@@ -109,6 +117,13 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   const [pop, setPop] = useState<Pop>(null);
   const node = nodesFor(run)[run.nodeId];
   const options = useMemo(() => availableOptions(run), [run]);
+  /* Beat replay (T-008): while committed beats are still on stage the window
+   *  presents them one at a time and blocks input — the frontier has already
+   *  committed, choices must not fire mid-beat. Click/Enter/Space skips. */
+  const beatCursor = useBeatCursor(queuedBeats, beatTiming, {
+    reducedMotion: typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches,
+  });
+  const presenting = beatCursor.current !== null;
   // Previews once per run/arming change, not per render: base and armed side by side.
   const previews = useMemo(
     () =>
@@ -137,9 +152,10 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   // The scene's own title, unless it only repeats the quest's: then the phase name.
   const caption = node && !node.title.toLowerCase().includes(title.toLowerCase()) ? node.title : beats[currentBeat] ?? '';
 
-  // 1–9 pick a choice, as in a dialogue list; never while typing or minimised.
+  // 1–9 pick a choice, as in a dialogue list; never while typing, minimised,
+  // or while a beat is still on stage.
   useEffect(() => {
-    if (minimised || !waiting) return undefined;
+    if (minimised || !waiting || presenting) return undefined;
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
@@ -153,7 +169,20 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [minimised, waiting, options, onChoose]);
+  }, [minimised, waiting, presenting, options, onChoose]);
+
+  // While a beat plays, Enter/Space advances it (same as clicking anywhere).
+  useEffect(() => {
+    if (!presenting) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        beatCursor.skip();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [presenting, beatCursor]);
 
   const shell: CSSProperties = { position: 'fixed', left: anchor.left, top: anchor.top, pointerEvents: 'auto', ...panelStyle, zIndex: panelStyle.zIndex ?? zIndex };
 
@@ -243,10 +272,19 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         {/* ── Flavour: the quest's one line, above the picture ── */}
         <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.4, color: TONE.secondary }}>{flavour}</p>
 
-        {/* ── Theater ── */}
-        <Theater src={artFor(run.nodeId)} caption={caption} aspect={theaterAspect} />
+        {/* ── Theater — a scene beat cuts the picture to its node ── */}
+        <Theater src={artFor(beatCursor.current?.kind === 'scene' ? beatCursor.current.nodeId : run.nodeId)} caption={caption} aspect={theaterAspect} />
 
-        {/* ── What just happened, then the scene ── */}
+        {/* ── What just happened: while committed beats replay, the stage shows
+            one moment at a time — click anywhere on it to continue (D-8). ── */}
+        {presenting && beatCursor.current ? (
+          <BeatStage
+            beat={beatCursor.current}
+            remaining={beatCursor.remaining}
+            onSkip={beatCursor.skip}
+            onFlush={beatCursor.flush}
+          />
+        ) : (
         <div className="quest-s1-scroll" style={{ maxHeight: 168, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
           {resolved.map((c) => (
             <div key={c.id} data-testid="quest-window-verdict" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -277,13 +315,14 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             </p>
           )}
         </div>
+        )}
 
         {/* ── Choices: a numbered dialogue list (BG3 / Disco Elysium idiom), never a plate ── */}
         {/* ── The bag: arm before choosing, as in the lab; nothing is spent unasked ── */}
-        {waiting && (
+        {waiting && !presenting && (
           <ConsumableBelt flags={run.flags} armed={armed} onToggleArmed={onToggleArmed} onUseHealing={onUseHealing} onDrinkPotion={onDrinkPotion} />
         )}
-        {(waiting || run.ended) && (
+        {!presenting && (waiting || run.ended) && (
           <div data-hud-choices style={{ display: 'flex', flexDirection: 'column', margin: '0 -4px' }}>
             {waiting &&
               options.map((o, i) => {
@@ -398,6 +437,97 @@ const PartyPips: React.FC<{ run: QuestRunState }> = ({ run }) => (
 const Line: React.FC<{ tone: keyof typeof TONE; children: React.ReactNode }> = ({ tone, children }) => (
   <div style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: TONE[tone] }}>{children}</div>
 );
+
+/** The stage while committed beats replay (T-008): one moment at a time.
+ *  Click anywhere → next beat; «vai al bivio» drains straight to the live
+ *  frontier. Deaths get the muted/dark register and a skull (D-8) — the
+ *  weight is in the colour, never in a forced wait. */
+const BeatStage: React.FC<{ beat: QuestBeat; remaining: number; onSkip: () => void; onFlush: () => void }> = ({
+  beat,
+  remaining,
+  onSkip,
+  onFlush,
+}) => {
+  const { t } = useTranslation('idleVillage');
+  return (
+    <div
+      data-testid="quest-window-beat"
+      role="button"
+      tabIndex={0}
+      onClick={onSkip}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSkip();
+        }
+      }}
+      style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 96, cursor: 'pointer' }}
+      aria-label={t('gameFrame.questWindow.beats.continue')}
+      title={t('gameFrame.questWindow.beats.continue')}
+    >
+      {beat.kind === 'scene' && (
+        <>
+          <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>{beat.title}</span>
+          {beat.body && <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.5, color: TONE.text }}>{beat.body}</p>}
+        </>
+      )}
+      {beat.kind === 'check' && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <HudChip tone={VERDICT_TONE[beat.check.verdict]}>{t(`questS1Lab.verdict.${beat.check.verdict}`)}</HudChip>
+            <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.06em', color: TONE.secondary }}>{beat.check.title}</span>
+          </div>
+          {beat.check.flavor && <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.45, color: TONE.label }}>{beat.check.flavor}</p>}
+          {beat.check.authoredText && <Line tone="secondary">{beat.check.authoredText}</Line>}
+        </>
+      )}
+      {beat.kind === 'harm' && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+            padding: '8px 10px',
+            borderRadius: 6,
+            background: beat.harm.kind === 'death' ? 'color-mix(in srgb, var(--skin-status-death) 10%, transparent)' : 'transparent',
+            borderLeft: beat.harm.kind === 'death' ? `2px solid ${TONE.death}` : `2px solid ${TONE.warn}`,
+          }}
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.06em', color: beat.harm.kind === 'death' ? TONE.death : TONE.warn }}>
+            {beat.harm.kind === 'death' && <Skull aria-hidden style={{ width: 13, height: 13 }} />}
+            {beat.memberName}
+          </span>
+          {beat.line && <span style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: beat.harm.kind === 'death' ? TONE.death : TONE.label }}>{beat.line}</span>}
+        </div>
+      )}
+      {beat.kind === 'end' && (
+        <>
+          <p style={{ margin: 0, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: beat.outcome === 'wipe' ? TONE.death : TONE.label }}>
+            {t(`questS1Lab.outcome.${beat.outcome}`)}
+          </p>
+          <Line tone="secondary">{beat.text}</Line>
+        </>
+      )}
+      {beat.kind === 'recap' && (
+        <Line tone="secondary">
+          {t('gameFrame.questWindow.beats.recap', { scenes: beat.scenes, checks: beat.checks, deaths: beat.deaths, wounds: beat.wounds })}
+        </Line>
+      )}
+      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 'auto' }}>
+        <span style={{ fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.muted }}>
+          {remaining > 0
+            ? t('gameFrame.questWindow.beats.more', { count: remaining + 1 })
+            : t('gameFrame.questWindow.beats.continue')}
+        </span>
+        {remaining > 0 && (
+          <button type="button" onClick={(e) => { e.stopPropagation(); onFlush(); }} style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}>
+            {t('gameFrame.questWindow.beats.skipAll')}
+          </button>
+        )}
+      </span>
+    </div>
+  );
+};
 
 const Popover: React.FC<{ onDismiss: () => void; children: React.ReactNode }> = ({ onDismiss, children }) => {
   const ref = useRef<HTMLDivElement>(null);

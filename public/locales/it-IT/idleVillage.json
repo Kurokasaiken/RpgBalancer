@@ -1014,7 +1014,14 @@
       "noneReturned": "Nessuno è tornato",
       "phaseOf": "Fase {n} di {total}",
       "inProgressShort": "in corso",
-      "close": "Chiudi il rapporto"
+      "close": "Chiudi il rapporto",
+      "beats": {
+        "continue": "Clicca per continuare",
+        "more_one": "Manca {count} momento — clicca per continuare",
+        "more_other": "Mancano {count} momenti — clicca per continuare",
+        "skipAll": "Vai al bivio",
+        "recap": "Mentre eri via: {scenes} scene, {checks} prove, {deaths} caduti, {wounds} feriti"
+      }
     }
   },
   "missionPlanner": {

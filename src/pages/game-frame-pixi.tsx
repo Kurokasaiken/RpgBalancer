@@ -382,6 +382,8 @@ export default function GameFramePixiPage() {
                     run={questRun.run}
                     phases={questRun.phases}
                     beats={GOBLIN_BEATS}
+                    queuedBeats={questRun.beats}
+                    beatTiming={questWindow.beats}
                     title={GOBLIN_META.title}
                     flavour={GOBLIN_META.flavour}
                     artFor={(nodeId) => NODE_ART[nodeId]?.src}
