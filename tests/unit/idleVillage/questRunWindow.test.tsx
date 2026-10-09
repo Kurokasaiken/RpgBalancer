@@ -8,7 +8,8 @@ import { describe, it, expect } from 'vitest';
 import { render, screen, renderHook, act } from '@testing-library/react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { applyChoice, availableOptions, createRun, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
-import { GOBLIN_BEATS, GOBLIN_META, GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
+import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { emptyPhase } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import { QuestRunWindow } from '@/ui/idleVillage/components/gameFrame/QuestRunWindow';
@@ -28,11 +29,11 @@ const renderWindow = (run: QuestRunState) =>
       <QuestRunWindow
         run={run}
         phases={[emptyPhase(0)]}
-        beats={GOBLIN_BEATS}
+        beats={GOBLIN_SCENARIO.beats}
         queuedBeats={[]}
         beatTiming={{ sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapMs: 1800 }}
-        title={GOBLIN_META.title}
-        flavour={GOBLIN_META.flavour}
+        title={GOBLIN_SCENARIO.title}
+        flavour={GOBLIN_SCENARIO.flavour}
         artFor={() => undefined}
         time={{ progress: 0, label: 'Giorno 1 di 2' }}
         onChoose={() => undefined}
@@ -71,7 +72,7 @@ describe('useQuestRun — bag items are the player\'s call', () => {
 describe('QuestRunWindow — what the player reads', () => {
   it('shows the quest flavour once at departure, never repeated as "what happened"', () => {
     renderWindow(createRun(PRESET, 11, 'goblin'));
-    expect(screen.getAllByText(GOBLIN_META.flavour)).toHaveLength(1);
+    expect(screen.getAllByText(GOBLIN_SCENARIO.flavour)).toHaveLength(1);
   });
 
   it('speaks a resolved check through its authored verdict line, not "TITLE — VERDICT."', () => {

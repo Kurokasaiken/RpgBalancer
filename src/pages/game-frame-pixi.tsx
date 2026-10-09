@@ -21,7 +21,8 @@ import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
-import { GOBLIN_BEATS, GOBLIN_META, GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
+import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { nodeDurationTicks } from '@/ui/idleVillage/questS1Lab/questRun';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 // GameFrame is a fresh, not-yet-kitted composition (R-075).
@@ -381,11 +382,11 @@ export default function GameFramePixiPage() {
                   <QuestRunWindow
                     run={questRun.run}
                     phases={questRun.phases}
-                    beats={GOBLIN_BEATS}
+                    beats={GOBLIN_SCENARIO.beats}
                     queuedBeats={questRun.beats}
                     beatTiming={questWindow.beats}
-                    title={GOBLIN_META.title}
-                    flavour={GOBLIN_META.flavour}
+                    title={GOBLIN_SCENARIO.title}
+                    flavour={GOBLIN_SCENARIO.flavour}
                     artFor={(nodeId) => NODE_ART[nodeId]?.src}
                     time={questRunTime}
                     onChoose={(optionId) => questRun.choose(optionId, { useConsumable: questArmed })}

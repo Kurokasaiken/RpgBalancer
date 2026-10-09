@@ -1501,3 +1501,40 @@ S1: "Questa quest è un gioco interessante?" → S2: "Possiamo farla davvero, se
 - Se più quest contemporanee = più teatri, o una quest attiva alla volta.
 - Come il teatro segnala "la quest chiede attenzione" quando è ridotto a icona (halo POI, tick sul day-clock, entrambi).
 - Destino del modello v3 (fasi temporizzate auto-risolte) quando il teatro arriva sulla superficie: convergenza o coesistenza.
+
+---
+
+## v28 — Luce dinamica 2D sulla mappa dipinta: ombre nuvole, god rays, luci su POI/landmark
+
+**Status:** `FROZEN`
+**Date:** 2026-10-09
+**Authorized by:** Fausto
+**Reason:** avallo esplicito — "approvo, procedi" sulla candidata v28 rivista dopo la critica multi-AI web (`.mw/runs/2026-10-09-dynamic-lighting-critique/`).
+
+**Intento del Director (verbatim):**
+- "va bene, e vorrei anche vedere il god rays" (approva penombra nuvole + sprite additivi + god rays).
+- "noi abbiamo un tool dove ci sn gli slidere degli effetti in quella pagina, le cose vanno la dentro. Voglio poterle mettere anche a 0% x vedere la differenza con e senza".
+- Luci su: "POI e landmarks". Sole: "da in alto a sinistra verso basso a destra". Ombre: "nn so, proviamo entrambe le cose e poi decidiamo".
+
+**Formulazione approvata (FROZEN):**
+La mappa mondo dipinta (`/game-frame-pixi`, pipeline PixiJS/WebGL2) guadagna tre effetti di luce dinamica, tutti nel **tuning panel degli slider** (`TuningPanel`/`PixiMapTune`), ognuno con slider **0% = pass smontato dal render graph** (non output nero) per il confronto diretto con/senza:
+
+1. **Ombre nuvole a confronto multi-variante** — selettore `cloudShadowMode: 'sprite' | 'blur' | 'raymarch'`, stesso tetto di opacità per tutte, decisione a pari p95:
+   - `sprite` = gli offset cloud-shadow sprites esistenti;
+   - `blur` = **baseline nuova**: occlusion texture low-res per banda nuvole (scrollata via uniform offset alla stessa velocità dello sprite, nessun rebake a runtime, tiling seamless) + blur direzionale separabile lungo la direzione del sole → penombra morbida;
+   - `raymarch` = variante costosa solo per confronto visivo (marcia per-pixel nel campo di occlusione).
+2. **God rays** — blur **direzionale** (non radiale screen-space) della maschera sintetica dei gap tra nuvole (`1 − occlusion`), in direzione mondo fisso TL→BR, quad viewport-sized, compositing additivo. Se a vista legge come sbavatura il Director lo taglia (slider a 0).
+3. **Luci additive su POI e landmarks** — sprite falloff radiale `blendMode: add`, figli del world container (seguono pan/zoom gratis), flicker via alpha/scale sul ticker, cap ~12 visibili con budget di overdraw, tint per tipo da palette, clamp d'intensità da config.
+
+**Vincoli (critica multi-AI assorbita):**
+- Ogni effetto è un **quad viewport-sized con shader proprio** (blend multiply/add); MAI un Pixi filter sul container della mappa da 12 MP (replica il disastro CSS da 1016 ms).
+- Tutto in PixiJS/WebGL2; DOM/CSS per luce dinamica escluso (misurato: inutilizzabile).
+- Config-first: nuovi campi `PixiMapTune` via Zod, nessun valore hardcoded.
+- **Soglie di abort pre-dichiarate** su `/map-benchmark` (Tauri, finestra visibile): penombra ≤ +2 ms p95, god rays ≤ +1 ms p95, light sprites ≤ +0.5 ms p95, worst frame ≤ 33 ms — più test combinato con tutti gli effetti attivi (i costi non sommano linearmente). Chi sfora non si abilita di default: si torna al piano.
+- Test di parità: tutti gli slider a 0 deve dare la stessa distribuzione p50/p95/worst del renderer senza codice nuovo.
+- Task 0: verificare dove vivono oggi le coordinate POI/landmark e che siano in world-space 4240×2828; se no, adapter esplicito + test che un POI noto cada sul pixel dipinto corretto a zoom 1.0.
+- Niente volumetrica, niente filtri su layer full-res, niente pass a risoluzione mondo.
+
+**Still unresolved:**
+- Criterio finale di scelta `cloudShadowMode` dopo il confronto visivo del Director (decisione sua, post-misura).
+- I landmark specifici che prendono luce e la loro sorgente di coordinate (manifest vs config — dipende da task 0).
