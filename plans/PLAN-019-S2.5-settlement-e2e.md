@@ -7,6 +7,31 @@ desiderata: v24 (PLAN-019, stadio S2, gate S2-a/b/c), v24 rev.2 (reward = obiett
 request: R-107
 parent: PLAN-019-S2 (figlio 5/5 — chiude lo slice)
 depends: PLAN-019-S2.4 (run lanciabile da POI)
+
+## Stato implementazione (2026-10-09, sessione esecutiva)
+
+- **T-0 fatto — verifica `PersistenceService` (output scritto)**:
+  1. *Scrittura singola durevole al return?* **SÌ** — `saveData` risolve solo
+     dopo la scrittura reale: `sessionStorage`/`localStorage` sincroni nel
+     fallback web/playwright, `writeTextFile` awaited nel path Tauri.
+     Caveat: fallimento FS Tauri → fallback silenzioso a localStorage
+     (durevole, ma su backend diverso — vedi 3).
+  2. *Ordine delle scritture preservato tra chiavi?* **SÌ per scritture
+     awaited in sequenza** (chiavi indipendenti = file/item separati;
+     `await` serializza). **NO atomicità multi-chiave**: due chiavi scritte
+     «insieme» possono essere separate da un crash. Scritture concorrenti
+     sulla STESSA chiave: last-write-wins non ordinato.
+  3. *Lettura-dopo-scrittura coerente al boot?* **SÌ entro lo stesso
+     backend** (nessuna cache: `loadData` legge la chiave dal backend
+     risolto). Caveat: asimmetria di fallback Tauri↔localStorage — un save
+     caduto in localStorage e un boot successivo con FS sano leggono backend
+     diversi → valore stale. Edge reale ma stretto: il journal lo tollera
+     perché il replay ri-deriva dal record del run.
+  **Verdetto**: l'atomicità multi-chiave non esiste → vale il «caso atteso»
+  del piano: **journal per-effetto** — ogni aggregato mutato porta il proprio
+  ledger di chiavi `(runId, effectId)` nello stesso record della mutazione;
+  il run record congela il piano degli effetti e il marker `settled` è
+  l'ultima scrittura. Replay al boot deduplica per chiave e converge.
 related: PersistenceService (unico canale), InjuryEngine, QUEST_RULES.md §8 (conseguenze sempre — R-092), OPEN-015 (forma minima), PLAN-018 (mappatura), quest_theatre_spec.md
 ---
 
