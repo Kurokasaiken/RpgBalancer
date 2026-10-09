@@ -29,8 +29,11 @@ import type { SettlementMarker } from '../quests/questSettlement';
 
 /** The authored S1 lab quests. 'cassa' = infiltration (agi/perc,
  *  alertness states); 'rovine' = attrition gauntlet (str/con, days & HP);
- *  'goblin' = combat quest (str, positional targeting, HP pools). */
-export type QuestId = 'cassa' | 'rovine' | 'goblin';
+ *  'goblin' = combat quest (str, positional targeting, HP pools).
+ *  'gen' = generated-quest profile (PLAN-026): no authored nodes of its own —
+ *  every 'gen' run executes a `ScenarioInstance` under generic-objective
+ *  semantics (objectiveDone + living leader → reward). */
+export type QuestId = 'cassa' | 'rovine' | 'goblin' | 'gen';
 
 interface QuestDef {
   nodes: Record<string, QuestNode>;
@@ -58,6 +61,9 @@ const QUESTS: Record<QuestId, QuestDef> = {
     primaryStats: GOBLIN_SCENARIO.primaryStats,
     startNode: GOBLIN_SCENARIO.startNode,
   },
+  /* Generated-quest profile: empty by contract — nodes, startNode and
+   * primaryStats always arrive frozen inside the run's ScenarioInstance. */
+  gen: { nodes: {}, presets: [], primaryStats: [], startNode: '' },
 };
 
 /* ------------------------------------------------------------------ */
@@ -92,6 +98,9 @@ export interface ScenarioInstance {
   armRolls?: ArmRoll[];
   /** Initial numeric vars for the run state (PLAN-026 engine v2). */
   initialVars?: Record<string, number>;
+  /** Declared primary stats (generated scenarios — drives the preview's
+   *  "via maestra" marking; authored quests read QUESTS[questId] instead). */
+  primaryStats?: LabStat[];
 }
 
 const SCENARIO_INSTANCES = new Map<string, ScenarioInstance>();
@@ -812,6 +821,9 @@ export function createRun(
     input = preset;
   }
   if (scenarioInstance) registerScenarioInstance(scenarioInstance);
+  if (questId === 'gen' && (!input || !scenarioInstance)) {
+    throw new Error("createRun: questId 'gen' requires an explicit party and a ScenarioInstance (generated scenarios carry all content in the instance)");
+  }
   const quest = QUESTS[questId];
   const found = input ? undefined : quest.presets.find((p) => p.id === (preset as string));
   const members = input ? input.members : (found ?? quest.presets[0]).members;
@@ -835,10 +847,15 @@ export function createRun(
             lastEvent: 'Il guado è chiuso dalla paura. Sterminateli.',
             firstLog: 'Assegnazione — quest di combattimento, basata su Forza. Il trofeo dei goblin si converte in Gold al ritorno.',
           }
-        : {
-            lastEvent: 'La spedizione parte per il Passo del Corvo.',
-            firstLog: 'Partenza — obiettivo: riportare la cassa delle sementi.',
-          };
+        : questId === 'gen'
+          ? {
+              lastEvent: 'La spedizione parte.',
+              firstLog: 'Partenza — obiettivo: portare a termine la missione.',
+            }
+          : {
+              lastEvent: 'La spedizione parte per il Passo del Corvo.',
+              firstLog: 'Partenza — obiettivo: riportare la cassa delle sementi.',
+            };
   // Generated/scaled instances may carry their own start node (engine v2).
   const startNode = scenarioInstance?.startNode ?? quest.startNode;
   const state: QuestRunState = {
@@ -953,6 +970,9 @@ function dropObjective(state: QuestRunState, reason: string): void {
   } else if (state.questId === 'goblin') {
     state.flags.push('trofeoPerso');
     dropLoot(state, 'trofeo dei goblin', reason);
+  } else if (state.questId === 'gen') {
+    state.flags.push('objectiveLost');
+    for (const l of [...state.loot]) dropLoot(state, l, reason);
   } else {
     state.flags.push('cassaPersa');
     dropLoot(state, 'cassa delle sementi', reason);
@@ -969,7 +989,9 @@ export function flee(state: QuestRunState): QuestRunState {
       state,
       state.questId === 'rovine'
         ? 'nella fuga il tesoro vi pesa troppo — lo abbandonate tra i ruderi.'
-        : 'nella fuga la cassa vi rallenta troppo — la mollate ai bordi del campo.',
+        : state.questId === 'gen'
+          ? 'nella fuga il carico vi rallenta troppo — lo mollate a bordo pista.'
+          : 'nella fuga la cassa vi rallenta troppo — la mollate ai bordi del campo.',
     );
   }
   endRun(state, 'fled', 'Fuggite verso il villaggio con quanto avete raccolto. La quest è fallita.');
@@ -1373,9 +1395,11 @@ export function previewOption(
     wounded: m.wounded,
     ...memberRisk(m, checkNode),
   }));
-  const primaryStatsUsed = checkNode.stats.filter((s) =>
-    QUESTS[state.questId].primaryStats.includes(s),
-  );
+  const inst = state.scenarioInstanceId
+    ? scenarioInstanceById(state.scenarioInstanceId)
+    : undefined;
+  const primaryStats = inst?.primaryStats ?? QUESTS[state.questId].primaryStats;
+  const primaryStatsUsed = checkNode.stats.filter((s) => primaryStats.includes(s));
   return {
     checkTitle: checkNode.title,
     contributors,
@@ -2108,7 +2132,9 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
           'reward',
           state.questId === 'rovine'
             ? 'Il tesoro delle rovine è al villaggio. La quest è completa — reward ottenuta.'
-            : 'Cassa delle sementi riportata al villaggio. La quest è completa — reward ottenuta.',
+            : state.questId === 'gen'
+              ? 'Obiettivo riportato al villaggio. La quest è completa — reward ottenuta.'
+              : 'Cassa delle sementi riportata al villaggio. La quest è completa — reward ottenuta.',
         );
       } else if (state.objectiveDone && (!lead || lead.dead)) {
         endRun(
@@ -2116,7 +2142,9 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
           'survived',
           state.questId === 'rovine'
             ? 'Il tesoro torna al villaggio, ma il leader non c’è più. La reward della quest va persa.'
-            : 'La cassa torna al villaggio, ma il leader non c’è più. La reward della quest va persa.',
+            : state.questId === 'gen'
+              ? 'L’obiettivo torna al villaggio, ma il leader non c’è più. La reward della quest va persa.'
+              : 'La cassa torna al villaggio, ma il leader non c’è più. La reward della quest va persa.',
         );
       } else {
         endRun(
@@ -2124,7 +2152,9 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
           'survived',
           state.questId === 'rovine'
             ? 'Tornate al villaggio senza il tesoro. La quest è fallita, ma siete vivi.'
-            : 'Tornate al villaggio senza la cassa. La quest è fallita, ma siete vivi.',
+            : state.questId === 'gen'
+              ? 'Tornate al villaggio senza l’obiettivo. La quest è fallita, ma siete vivi.'
+              : 'Tornate al villaggio senza la cassa. La quest è fallita, ma siete vivi.',
         );
       }
     }
