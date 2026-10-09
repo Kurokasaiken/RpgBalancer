@@ -51,10 +51,15 @@ revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: 2× M
   test-results/s24-planning-lancio-2026-10-09.log.
 - i18n: `questExpedition.*`, `questOffer.band.*`, `questOffer.tier.*`,
   `gameFrame.questWindow.ticks` aggiunti (it-IT, en).
-- Finding aperto: /game non idrata il gameplay clock dallo snapshot —
-  `currentTick` azzerato al reload è il comportamento reale della pagina
-  (run persiste, halo riparte dal clock corrente). Elapsed cross-reload =
-  decisione separata se richiesta.
+- Finding CHIUSO (Director 2026-10-10): /game ora idrata il gameplay clock
+  dallo snapshot (`initializeMinimalGameplayStore` al mount) e monta il
+  loop canonico `useCentralizedTiming` (1 tick/s, nessuna progressione
+  offline: `currentTime` è il tick al save, il tempo trascorso a gioco
+  chiuso non è mai accreditato). Auto-resume al mount: la pagina non ha
+  controllo pausa. Halo e schedule restano nella stessa epoch dei timbri
+  persistiti del run. Caveat economia: config fallback dello store ha
+  `dayLength=5 tick` e `food=8` → il loop reale consuma tutto in ~15s di
+  gioco; ricalibrazione dei numeri demo resta al Director.
 desiderata: v24 (PLAN-019, stadio S2), v27 (frontiera), D-G (assegnazione giocatore), D-H (planning surface), D-J (halo elapsed), D-K (gating nodi a schedule + caricamento finestra) — Director 2026-10-09
 request: R-107
 parent: PLAN-019-S2 (figlio 4/5)

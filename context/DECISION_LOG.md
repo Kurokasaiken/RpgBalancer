@@ -918,3 +918,58 @@ bene così, ci pensiamo poi 3) le quest nn risolte si applicano normalmente»):*
    specificare nel piano che le implementa — non S2.5).
 
 **Fonte:** Director in sessione 2026-10-10.
+
+---
+
+## 2026-10-10 — R-115 ratificato: PLAN-026 attivo con deroga a v24
+
+**Contesto:** il piano di generazione quest (v2, dopo cold read r1) aveva
+preso MAJOR REVISION ×4 nel cold read r2 (claude/chatgpt/grok/deepseek).
+Il rilievo strutturale: v24 FROZEN dice «S5 si definisce dopo S4, a
+partire dalla definizione empirica di buona quest». I critici proponevano
+declassamento a proposta esplorativa (spike lab-only senza toccare il
+motore) o ratifica rinviata a S4.
+
+**Decisione (Director, 2026-10-10):** ratifica ora + implementazione del
+delta motore v2. La deroga a v24 è **registrata, non silenziosa**:
+
+- PLAN-026 (`plans/PLAN-026-quest-generation.md`) è `active`, figlio di
+  PLAN-019 stadio S5, in parallelo a S3/S4.
+- I campi fun-judgment (soglie, pesi, impactMetric, 75%) restano
+  `experimental` e si rivalidano al gate S4 contro la «definizione di
+  buona quest» — la deroga anticipa il macchinario, non la verità sul
+  divertimento.
+- P6 (integrazione nel flusso canonico) resta subordinato ai gate
+  PLAN-019; P7 (archi narrativi) gated su OPEN-016 + ratifica.
+- Decisioni incorporate: verdictTable dichiarativa sui nodi nuovi +
+  switch legacy intatto (P0-a), `vars` numerici nel run state, `traits`
+  su `ResidentState`, arm twist misto (runstart/inrun), testo traducibile,
+  regola 75% posticipata.
+
+**Fonte:** Director in sessione 2026-10-10 (risposta alle domande estese).
+
+---
+
+## 2026-10-10 — R-107: gameplay clock canonico su `/game`
+
+**Contesto:** chiusura S2.5 — `/game` non idratava il clock gameplay
+(`currentTick` ripartiva da 0 al reload mentre i run persistiti tengono
+timbri assoluti `launchedAtTick`/`readyAt`) e nessun loop avanzava il
+tempo in produzione (solo hook E2E).
+
+**Decisioni (Director, 2026-10-10: «Nn vogliamo progressione offline.
+b»):**
+
+- **Nessuna progressione offline**: il tempo trascorso a gioco chiuso
+  non è mai accreditato. `snapshot.currentTime` ripristina il tick al
+  momento del save — non si riconcilia col wall-clock.
+- **Opzione B**: `/game` chiama `initializeMinimalGameplayStore()` al
+  mount (idrata clock+residenti+risorse+giorno) e monta
+  `useCentralizedTiming` (1 tick/s, il loop canonico delle pagine
+  minimal). Auto-resume al mount: la pagina non ha controllo pausa.
+- Conseguenza aperta: l'economia dello store in fallback è demo-tuned
+  (`dayLengthInTimeUnits=5`, `food=8`) — con il loop reale il villaggio
+  consuma tutto in ~15s. Ricalibrazione rinviata (famiglia «calibrazioni
+  in un secondo tempo»).
+
+**Fonte:** Director in sessione 2026-10-10.

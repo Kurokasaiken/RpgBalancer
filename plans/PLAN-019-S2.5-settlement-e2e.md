@@ -189,7 +189,8 @@ sweep stocastico perché i preset lo proteggono, non perché la cella manchi).
   test-only).
 - **T-3 — Test settlement**: fault point deterministici con crash→replay→
   crash; «obiettivo fallito + leader vivo + fuga» → no reward, sì bottino;
-  «obiettivo sì + fuga + leader vivo» → reward sì; wipe → tutto perso.
+  «obiettivo sì + fuga» → **irraggiungibile** (fuga ⇒ `dropObjective`,
+  ratifica Director 2026-10-10); wipe → tutto perso.
 - **T-4 — Secondo POI end-to-end** (rovine): stesso tubo, contenuto diverso.
 - **T-5 — E2E completo su `/game`** (entrambi i POI, **sequenziale** per
   D-D): POI1 → detail → drag → send → halo → click → `QuestRunWindow` →

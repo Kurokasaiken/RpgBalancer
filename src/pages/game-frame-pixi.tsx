@@ -35,6 +35,8 @@ import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
+import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
+import { useCentralizedTiming } from '@/ui/idleVillage/hooks/useCentralizedTiming';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type TuningField } from '@/ui/idleVillage/components/gameFrame';
 
@@ -199,6 +201,27 @@ export default function GameFramePixiPage() {
     initialActivityId: poi?.activityId,
     detail: { position: questDetailPosition, showTelemetry: false, hudSurface: true },
   });
+
+  /* Canonical game clock on /game (Director decision 2026-10-10): hydrate the
+   * persisted snapshot so quest tick stamps (`launchedAtTick`, `readyAt`)
+   * stay in the same epoch across reloads, then drive the shared 1s loop.
+   * No offline progression: hydration restores the tick AT save time —
+   * wall-clock time elapsed while the game was closed is never credited.
+   * /game has no pause control, so the world is resumed once at mount. */
+  useEffect(() => {
+    let cancelled = false;
+    initializeMinimalGameplayStore()
+      .then(() => {
+        if (cancelled) return;
+        const gameplay = useMinimalGameplayStore.getState();
+        if (gameplay.state.isPaused) gameplay.resumeGame('auto');
+      })
+      .catch((err) => console.error('[GameFrame] minimal gameplay init failed:', err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  useCentralizedTiming({ gameplayState: session.gameplay });
 
   const currentDay = session.gameplay.state.currentDay;
   const invasionDaysLeft = invasion ? Math.max(0, invasion.dueDay - currentDay) : 0;

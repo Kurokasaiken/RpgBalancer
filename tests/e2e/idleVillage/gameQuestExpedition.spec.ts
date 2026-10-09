@@ -375,15 +375,23 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     const restored = (await getRun(page))!;
     expect(restored.nodeId).toBe(launched.nodeId);
     expect(restored.party.map((m) => m.id)).toEqual(launched.party.map((m) => m.id));
-    /* /game does not hydrate the gameplay clock on load (declared page
-     *  behaviour — the store starts fresh, the RUN is what persists). So the
-     *  halo re-opens at elapsed≈0 and resumes filling as canonical ticks
-     *  pass — `launchedAtTick` stays frozen in the run save. */
+    /* /game hydrates the gameplay clock on load (Director decision
+     *  2026-10-10): `currentTick` is restored from the same snapshot epoch
+     *  the run's `launchedAtTick` was stamped in, so the halo resumes with
+     *  its elapsed ticks preserved. Store hydration is async — poll until
+     *  the projected elapsed catches up (the live 1s loop also adds ticks). */
+    await page.waitForFunction(
+      () =>
+        ((window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin']?.getHalo?.()
+          ?.elapsedTicks ?? 0) >= 12,
+      undefined,
+      { timeout: 30_000 },
+    );
     const halo = (await expedition<HaloShape | null>(page, 'getHalo'))!;
     expect(halo.status).toBe('filling');
     await advanceTicks(page, 15);
     const halo2 = (await expedition<HaloShape | null>(page, 'getHalo'))!;
-    expect(halo2.elapsedTicks).toBeGreaterThanOrEqual(15);
+    expect(halo2.elapsedTicks).toBeGreaterThanOrEqual(halo.elapsedTicks + 15);
     // questStatus=in_progress → the POI routes to the run window, not the detail.
     const marker = page.locator('[data-map-quest-poi-target][data-quest-status="in_progress"]').first();
     await expect(marker).toBeVisible({ timeout: 15_000 });
