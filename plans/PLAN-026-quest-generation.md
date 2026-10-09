@@ -174,8 +174,15 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
 - T0 — completamento audit residuo + baseline authored. *(Gap motore già
   verificati: contratti §10.)*
 - T1 — **fatto** (contratti v0) → consolidamento a Zod eseguibile.
-- **T2 — delta motore v2** (verdictTable + vars + traits + arm misto,
-  unico blocco additivo) + generatore strutturale.
+- **T2 — delta motore v2 — FATTO** (commit `86184d59`, 2026-10-09):
+  `verdictTable`/`OutcomeSpec`/`GotoSpec`/`OutcomeCond`/`VarOp` tipi +
+  Zod strict; interprete `applyOutcomeSpec` in `questRun.ts` con fallback
+  legacy intatto (digest MC goblin/rovine bit-identici); `vars` su
+  `QuestRunState`; `ScenarioInstance.startNode`/`armRolls`/`initialVars`;
+  `traits` su `ResidentState`→`LabMember`; gating `requiresTrait`/
+  `hiddenIfTrait`; 26 test nuovi, 202/202 suite. Evidence:
+  `test-results/plan026-t2-engine-v2-2026-10-09.log`. Residuo T2:
+  **generatore strutturale** (emette `QuestScenario` che passa lo schema).
 - T3 — primo dominio + primo imprint su catalogo v0.
 - T4 — generazione narrativa offline (provider strategy P3) + benchmark.
 - T5 — twist del party (prerequisito: `traits` su ResidentState).
