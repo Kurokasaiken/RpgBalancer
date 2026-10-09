@@ -127,3 +127,42 @@ porta solo chip non-HP (kill, trofei, flag).
 Ogni stringa visibile va in `idleVillage.questS1Lab.*` (en + it-IT + pseudo per
 le chiavi nuove). Icone stat via `STAT_ICONS`/`getStatIconComponent` in
 `questRun.ts` — la stessa icona in preview, titolo check e card party.
+
+**Plurale:** il progetto usa `i18next-icu` — i suffissi `_one`/`_other` **non
+risolvono** (chiave grezza a schermo). Usare la sintassi ICU
+`{count, plural, one{…} other{…}}` in una singola chiave.
+
+## 10. La pipeline dei beat (PLAN-025, dentro `QuestRunWindow`)
+
+Sopra le regole §2–§3 c'è un livello più alto: **`beatSequencer.ts`**
+(`questS1Lab`). L'engine committa sul log (`NODE`/`CHECK`/`WOUND`/`DEATH`/`HARM`/
+`QUEST_END`); `projectBeats(mark, after)` proietta **solo il diff committato** in
+beat ordinati con id stabili (`scene-N`, `chk-N`, `harm-seq`, `end`, `recap`):
+
+- una morte = un beat: tre morti in un commit scorrono **membro per membro**,
+  mai in un paragrafo;
+- oltre `questWindow.beats.maxQueue` (config Zod) la testa compatta in un beat
+  `recap` — il reopen non ri-traversa la storia;
+- `useBeatCursor` auto-avanza col timing da config; click/Enter/Spazio = skip
+  (D-8), `flush` = «vai al bivio»; **reduced-motion = drain istantaneo**.
+
+Mentre la coda presenta, `BeatStage` sostituisce scelte/sacca (input gated) e i
+beat `scene` tagliano l'immagine del teatro (`nodeKind` propagato).
+
+**CinemaFx** (`skins/primitives/cinemaFx.tsx`): `Letterbox` (CSS transition,
+token lacquer), `EdgeFlash` (WAAPI, keyed per beat), `TypewriterText`,
+`DamageFloater`. La mappa `fxForBeat` è l'unica fonte beat→fx; letterbox solo
+sui **cambi di tono** (harm/combat scene, check con kills, morte, end). Tutto
+in `quests/questTheatreFx.ts` (Zod), silenziabile per canale e per trigger.
+
+**CombatStrip** (in `QuestRunWindow`, solo nodi `combat`): pips orda
+(`goblinLeft`) + intent (`nextCombatHits`), celle membro `nome + barra HP +
+esposizione%` (`currentExposure`, max in danger), cella del colpito marcata +
+`DamageFloater` durante l'harm beat.
+
+**Frontiera v27**: `submitCommand`/`matureReady` nel dominio — un comando alla
+volta, nodi `info`/`harm` maturano a `readyAt`, gli effetti atterrano alla
+maturazione, catch-up deterministico. Persistenza via `PersistenceService`
+(`idleVillage.questRun.<questId>`, `engineSchemaVersion=2`). Route dev su
+adapter reale: `/game`, `/game-frame-theatre` (Regia + tick driver),
+`/quest-window-lab` (componente isolato).
