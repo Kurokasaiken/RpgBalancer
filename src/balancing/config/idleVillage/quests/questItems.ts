@@ -63,6 +63,60 @@ const RAW_DEFAULT_QUEST_ITEMS: Record<string, QuestItem> = {
     rewardMultiplierDelta: 0.1,
     qty: 1,
   },
+  /* --------------------------------------------------------------------
+   * Expedition-bag items (PLAN-019-S2.2 T-5): the real item identity behind
+   * each graph-engine stash flag. `engineFlag` is the bridge — the engine
+   * consumes flags (I-3), the catalog owns the player-facing id/label/qty.
+   * Effect numbers stay in `questStash` (engine vocabulary, single source).
+   * -------------------------------------------------------------------- */
+  quest_consumable_forza: {
+    id: 'quest_consumable_forza',
+    labelKey: 'questS1Lab.item.bonusForza',
+    icon: 'axe',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasBonusForza',
+  },
+  quest_consumable_percezione: {
+    id: 'quest_consumable_percezione',
+    labelKey: 'questS1Lab.item.bonusPerc',
+    icon: 'crosshair',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasBonusPerc',
+  },
+  quest_consumable_fumogeno: {
+    id: 'quest_consumable_fumogeno',
+    labelKey: 'questS1Lab.item.smoke',
+    icon: 'wind',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasFumogeno',
+  },
+  quest_consumable_corda: {
+    id: 'quest_consumable_corda',
+    labelKey: 'questS1Lab.item.rope',
+    icon: 'cable',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasCorda',
+  },
+  quest_consumable_cura: {
+    id: 'quest_consumable_cura',
+    labelKey: 'questS1Lab.item.healing',
+    icon: 'heart',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasHealing',
+  },
+  quest_consumable_pozione: {
+    id: 'quest_consumable_pozione',
+    labelKey: 'questS1Lab.item.potion',
+    icon: 'droplets',
+    kind: 'consumable',
+    qty: 1,
+    engineFlag: 'hasPozione',
+  },
 };
 
 /** Validated default quest item dictionary. */
@@ -91,4 +145,33 @@ export function loadQuestItem(
  */
 export function validateQuestItems(value: unknown): Record<string, QuestItem> {
   return QuestItemsSchema.parse(value);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Engine-flag aliases (PLAN-019-S2.2 T-5)                                   */
+/* ------------------------------------------------------------------------ */
+
+/** itemId → engine flag for catalog entries that bridge to the graph engine. */
+export const QUEST_ITEM_TO_FLAG: ReadonlyMap<string, string> = new Map(
+  Object.values(defaultQuestItems)
+    .filter((i) => i.engineFlag)
+    .map((i) => [i.id, i.engineFlag as string]),
+);
+
+/** Historic engine flag → catalog item id (the r2 alias map). */
+export const QUEST_FLAG_TO_ITEM: ReadonlyMap<string, string> = new Map(
+  Object.values(defaultQuestItems)
+    .filter((i) => i.engineFlag)
+    .map((i) => [i.engineFlag as string, i.id]),
+);
+
+/**
+ * Translates a loadout entry to its engine flag: catalog item ids become
+ * their `engineFlag`, historic flags pass through unchanged.
+ * @param entry - Item id or engine flag.
+ * @returns The engine flag (unresolved entries returned as-is for the
+ *   caller's known-flag filter to drop).
+ */
+export function toEngineFlag(entry: string): string {
+  return QUEST_ITEM_TO_FLAG.get(entry) ?? entry;
 }

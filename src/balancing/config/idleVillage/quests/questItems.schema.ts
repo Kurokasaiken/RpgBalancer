@@ -74,6 +74,12 @@ export const QuestItemSchema = z.object({
 
   /** Additive delta on the expected reward multiplier (e.g. 0.1 = +10%). */
   rewardMultiplierDelta: z.number().optional(),
+
+  /** Graph-engine flag this item maps to when packed for a graph quest run
+   *  (PLAN-019-S2.2 T-5): the engine consumes `QuestRunState.flags`; the
+   *  catalog item is the player-facing identity. Items without `engineFlag`
+   *  are Mission-Planner-only. */
+  engineFlag: z.string().min(1).optional(),
 })
   .refine(
     (item) => item.kind !== 'equipment' || item.slot !== undefined,

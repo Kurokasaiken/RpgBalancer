@@ -133,6 +133,37 @@ T-2 include un test che fallisce se due residenti con stesso
 `statSnapshot` e equip diverso producono `PartyMember` diversi;
 equip→stat è hook futuro dichiarato, mai implicito.
 
+## Stato implementazione (2026-10-09 — commit su main)
+
+- **T-1 FATTO** — `quests/questMemberStats.ts`: schema Zod strict con scale
+  obbligatorie per canale reale (`linear`/`clamp`/`thresholds` + `round` +
+  `missing` come valore EMesso già in dominio LabStat), `runHp`
+  [150,300]→[45,100], `injured.hpFromCurrentRatio`, `statPenalty:null`
+  (hook dichiarato — InjuryEngine non espone modificatori numerici),
+  `calibrationResidents` (Sir Spaccaculi leader / Salvatrice / Giggiolillo).
+  **Valori scale PROPOSED — gate T-1b Director aperto** (approvazione sulle
+  distribuzioni, non sulle probabilità).
+- **T-2 FATTO** — `questS1Lab/residentToQuestMember.ts`: adapter puro
+  ResidentState→LabMember; golden test con casi limite, equip-invarianza
+  (FACT r2 — `statSnapshot` senza bonus equip), ferito → HP run ridotto.
+- **T-3 FATTO** — `createRun` overload `{party, seed, questId?, loadout?,
+  clock?}` (+`QuestRunPartyInput {members,gold?,presetId?}`); preset path
+  invariato. `member.id` = residentId persistito (contratto lock S2.4).
+  Regressione motore: party hand-built = preset → signature identiche
+  (seed 1/42/777 × goblin/rovine).
+- **T-4 ESEGUITO (diagnostica)** — `questPartyCalibration.test.ts` +
+  report `test-results/s22-calibration-2026-10-09.log`: Δsuccess
+  −25pp (rv-check-fight)…+18pp (gob-tracce-per), Δdeath ≤±3.2pp.
+  **Gate (b) APERTO**: scostamenti da classificare col Director.
+- **T-5 FATTO** — `engineFlag` su `QuestItemSchema`; 6 item reali sacca in
+  `questItems.ts`; alias `QUEST_ITEM_TO_FLAG`/`QUEST_FLAG_TO_ITEM`/
+  `toEngineFlag`; `resolveStashLoadout` bilingue; `expeditionLoadout.ts`
+  (riserva `reserved` chiavata su runId via PersistenceService; rilascio →
+  S2.5 su ogni transizione terminale).
+- **T-6 FATTO** — scope quest 111/111 (9 file), build:check ✓,
+  kanban:lint ✓, lint n/a (quarantena). Evidence:
+  `test-results/s22-party-reale-2026-10-09.log`.
+
 ## Acceptance
 
 1. Un party di residenti reali esegue `goblin`/`rovine` end-to-end con stat
