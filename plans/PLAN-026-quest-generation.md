@@ -183,18 +183,18 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   `hiddenIfTrait`; 26 test nuovi, 202/202 suite. Evidence:
   `test-results/plan026-t2-engine-v2-2026-10-09.log`. Residuo T2:
   **generatore strutturale — fatto** (v. T3).
-- **T3 — primo dominio + imprint v0 — FATTO parziale**: generatore
-  strutturale `generateRaceToPass` parametrizzato (goal/twistChance/names)
-  che emette `QuestScenario` via `parseQuestScenario` —
-  `src/balancing/config/idleVillage/quests/generation/raceToPass.ts`;
-  catalogo v0 `RACE_TO_PASS_SCENARIO`; profilo motore `gen` (QUESTS
+- **T3 — primo dominio + imprint v0 — FATTO** (commit `9254a126` +
+  refactor kit): `generation/raceGimmick.ts` = generatore strutturale
+  `generateRaceScenario(kit, tuning)` — scheletro (grafo, vars, twist,
+  gating) separato dal rivestimento (`RaceDomainKit` per-scena);
+  `generation/kits.ts` = PASSO_MONTANO + PALUDE (vocabolario da
+  QUEST_IMPRINTS); imprints `raceToPass`/`raceToMarsh`; catalogo v0
+  `GENERATED_CATALOG` con lookup per id. Profilo motore `gen` (QUESTS
   vuoto per contratto, `createRun` richiede party+istanza, testi
-  generici per intro/end/flee/dropObjective); `ScenarioInstance.
-  primaryStats` congelato per la preview; `createScenarioInstance`
-  accetta override `questId`. 13 test e2e: vars race, armRoll
-  scavezzacollo→imboscata, gating avido/prudente/info, TAKEN→SECURED
-  reward, rival-win survived. Suite quest: 187/187. Residuo T3:
-  secondo kit (palude) e secondo gimmick per la varietà strutturale.
+  generici); `ScenarioInstance.primaryStats` congelato; kit-swap
+  testato (stesso scheletro, mondo diverso, intel diversa); kit rotto
+  fallisce a generation-time. 17 test e2e, suite quest 191/191.
+  Residuo T3: secondo gimmick per la varietà strutturale.
 - T4 — generazione narrativa offline (provider strategy P3) + benchmark.
 - T5 — twist del party (prerequisito: `traits` su ResidentState).
 - T6 — integrazione dopo gate PLAN-019 pertinenti.
