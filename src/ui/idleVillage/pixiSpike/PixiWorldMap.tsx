@@ -1219,7 +1219,6 @@ export function PixiWorldMap({
               sp.alpha = band.opacity * c.shown * formed;
             }
           });
-          clouds.push({ band: band_, alive, birthCloud, crossing, setNext: (t: number) => { nextBirth = t + crossing() / pool.length * (0.6 + Math.random() * 0.8); }, next: () => nextBirth });
         }
         ticks.push(() => {
           const cam = camRef.current;
