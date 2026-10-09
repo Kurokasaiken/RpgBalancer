@@ -2,7 +2,8 @@
 title: 'PLAN-019-S2 — La quest vera: POI reali → assegnazione → motore a grafo → conseguenze su /game'
 status: draft
 created: 2026-10-09
-revised: 2026-10-09 (v2 — cold read multi-AI web r1: chatgpt + claude + grok + deepseek, 4× MAJOR REVISION → correzioni assorbite; gemini-web failed. Run `.mw/runs/20261009-plan-s2-web-critique/`. Disaccordi residui in fondo.)
+revised: 2026-10-09 (v2 — cold read multi-AI web r1: 4× MAJOR REVISION → correzioni assorbite; v3 — decomposto in 5 figli S2.1…S2.5 su richiesta Director 2026-10-09 «dividilo in sub plan, linkati a questo plan, poi approfondisci plan by plan con le AI web»; questo file resta il contenitore: decisioni, invarianti, contratti condivisi, disaccordi)
+children: PLAN-019-S2.1-scenario-canonico, PLAN-019-S2.2-party-reale, PLAN-019-S2.3-offerta-scaling, PLAN-019-S2.4-planning-lancio, PLAN-019-S2.5-settlement-e2e
 desiderata: v24 (PLAN-019, stadio S2 «la quest vera»), v27 (frontiera — già implementata in `questRun.ts`)
 request: R-107
 parent: PLAN-019 (figlio S2)
@@ -65,6 +66,10 @@ Da registrare in `DECISION_LOG.md` e in PLAN-019.
 | D-D | Quante quest attive | **Una spedizione alla volta** (default conforme; v27 lascia aperto il multi-teatro). |
 | D-E | Vecchio path milestone su `/game` | **Bypassato** per le quest a motore nuovo (default conforme); il kit resta vivo solo sulla superficie deprecata. Nessuna riscrittura del session hook — adapter sottile. |
 | D-G | Assegnazione party | **CHIUSA 2026-10-09** (Director: *«i pg nn devono essere pre assegnati, devono essere assegnati dal giocatore, dal roster vero… C'è tutta una documentazione specifica per l'interazione tra Roster + pgCard + slot+ slot Rack»*): nessun party pre-assegnato né preset nel percorso POI — il giocatore assegna residenti **reali** dal roster vero agli slot del POI detail tramite lo **stack trusted roster↔slot** esistente (vedi sezione dedicata). Test E2E Playwright **reali** obbligatori, non solo unit. |
+| D-H | Contratto POI detail = superficie di planning | **CHIUSA 2026-10-09** (Director, spec verbatim: *«il POI che prende i valori dalla config corretta… i valori sotto che spiegano cosa fanno, che modificiatori hanno, le % di pericolosità, ecc dinamici a seconda di quanti slot sn occupati… la preview della quest totale… la durata, un modo di dire la pericolosità, un modo di esprimere la quantità del reward… un modo x cambiare queste due cose come valori esterni… dopo che i pg sn hanno occupato gli slot obbligatori la quest può essere accettata… "invia spedizione"… l'halo comincia a riempirsi durante il tempo… quando clicchiamo sul POI parte il componente delle quest»*): vedi sezione dedicata — il detail è una superficie di **planning viva**, non una scheda; le parti non ancora implementate (reward-by-party) si marcano come mock tracciati. |
+| D-I | Sorgente dei «valori esterni» | **CHIUSA 2026-10-09** (Director: *«un modificatore al pericolo e un modificatore al reward che vengono… nn so da dove… in base a determinati valori bilanci il reward e la difficoltà, ad esempio: da quanti giorni stai giocando, il livello medio dei tuoi eroi, il livello medio degli equipaggiamenti… poi ricreiamo/miglioriamo solo da dove e come viene fatto quel calcolo e il resto lo cerchiamo di lasciare il + simile possibile»*): si costruisce il **primo world-scaling reale** — `collectWorldProgressSignals()` legge segnali di progressione (giorni di gioco dal TimeEngine — reale; potenza media eroi derivata da `statSnapshot` — metrica da definire; potenza media equip da `equipmentStorage`/`heroItems` — reale con hook) → config `worldScaling` (Zod: pesi + bande) → `{dangerScale, rewardScale}` nel bag `modifiers` di `resolveQuestOffer`. La formula e le sorgenti sono **un'unità sostituibile**: il contratto di consumo (`resolveQuestOffer` + congelamento nel run) resta stabile quando la formula viene rifatta. |
+| D-J | Semantica halo | **CHIUSA 2026-10-09** (Director: «Puro elapsed/durata»): l'halo si riempie come **tempo trascorso / `estimatedDuration`** da config — stima di avanzamento, non legata alla frontiera, **non si ferma ai bivi**: indica quanto tempo ci vuole a fare la quest. Il badge «decisione in attesa» resta come segnale separato (proposta §D-H-4) perché è un problema diverso dal riempimento. |
+| D-K | Gating temporale dei nodi + caricamento della finestra | **CHIUSA 2026-10-09** (Director, verbatim: *«i nodi sono risolti dal giocatore, ma se quella porzione di tempo è già passata puoi risolvere immediatamente anche il nodo successivo. Una quest dura X tick, ha N fasi: devi aspettare la porzione della prima fase, poi della seconda, ecc. Se torni dopo mezza durata puoi risolvere le fasi scadute senza aspettare (e se nel frattempo passa la porzione successiva puoi risolvere anche quella). Anche il componente interno si deve caricare allo stesso modo: solo le icone in fondo — fasi superate + preview della successiva. Durante quegli X tick si mostra la frase di flavour tra l'una e l'altra. Le durate sono in tick, 1 tick = 1 s»*): i nodi hanno **finestre di sblocco su schedule assoluto** — la porzione di tempo di un nodo matura sul clock indipendentemente dalla risoluzione dei nodi precedenti; i nodi scaduti si risolvono dal giocatore **in sequenza senza attesa**. `QuestRunWindow` riflette lo stesso modello: tile fasi = completate + preview della prossima; durante l'attesa si mostra la frase di flavour/transit; durate in **tick** (`1 tick = 1 s`). **Implicazione sul motore (da verificare in T-006):** se la frontiera v27 ferma la maturazione su `awaitingPlayer`, questa decisione la modifica — `readyAt` è schedule-assoluto, la risoluzione del giocatore può avvenire in batch sui nodi scaduti. |
 | D-F | Componente quest in corso su `/game` | **CHIUSA 2026-10-09** (Director: *«dentro la pagina /game c'è il componente quest in progress che si apre dal director, quello è il componente corretto»*): **`QuestRunWindow`** (`components/gameFrame/QuestRunWindow.tsx`) è il componente battezzato — si apre dalla Regia («Start goblin quest») e dal menu Pannelli (tasto Q). `QuestTheatre` (PLAN-021/PLAN-025) converge *dentro* `QuestRunWindow`, non il contrario (R-106 iter. 3 «un solo componente»). |
 
 ## Invarianti (verificabili)
@@ -161,97 +166,93 @@ trusted/frozen già certificato** — non si reinventa:
   `rosterSlotPoiIntegration.spec.ts` — i nuovi test E2E dello slice
   **estendono questo pattern**, non inventano un harness parallelo.
 
-## Task
+### Il POI detail come superficie di planning (contratto, D-H)
 
-Ogni task richiede lo stato garantito dal precedente.
+Il detail non è una scheda descrittiva: è la superficie dove il giocatore
+*capisce e decide* prima di impegnare il party. Contratto dello slice:
 
-- **T-001 — Registrazione decisioni (D-A…D-E CHIUSE 2026-10-09).**
-  Spike-note D-2 (evidenza esistente, non nuovo lavoro), registrazione
-  divergenza «regole non codice» in DECISION_LOG. Nessun codice.
-- **T-002 — `QuestScenarioSchema` Zod + migrazione.** Schema in
-  `balancing/config/idleVillage/quests/`; `goblin` e `rovine` migrati e
-  validati; `QUESTS` legge via parse. **Test a due livelli:** (a) *parità
-  strutturale* — deep-equal dei nodi pre/post migrazione con ordine di
-  `options[]` verificato (il parse Zod non deve cambiare l'ordine di
-  iterazione né la serializzazione dei flag); (b) *parità di traccia* — stesso
-  seed, confronto della sequenza deterministica completa: nodi attraversati,
-  opzioni offerte, verdetti, flag, consumi, transizioni di frontiera, stato
-  finale — non solo l'outcome.
-- **T-003 — Pipeline stats reali (D-C).** Config Zod `questMemberStats`:
-  tabella di derivazione `LabStat → regola` (`{from:'damage'|'hp'|'hitChance'
-  |'evasion'|'mock'|…, scale?}`, `mockChannel` sui canali mock) — unica fonte.
-  Adapter `residentToQuestMember(resident)`: legge `statSnapshot` (StatBlock
-  combat), applica la tabella, HP da config (regola in TUNE), portrait da
-  `getResidentPortraitUrl`, ruolo dagli slot assegnati. `createRun`
-  generalizzato a `{party, loadout, seed, clock}`; il path `presetId` resta
-  per lab/MC. **Test di equivalenza:** un party costruito per riprodurre un
-  preset deve produrre la stessa traiettoria del path `presetId` per N seed.
-  **Check di calibrazione (non tuning):** con il party di riferimento reale
-  (config), `simulateQuest` deve dare per ogni check una probabilità dentro la
-  banda dichiarata in config; fuori banda = finding riportato al Director, non
-  aggiustamento silenzioso.
-- **T-004 — Item reali.** La sacca legge `questItems` (Zod, MP-02) invece dei
-  flag mock `hasPozione`/ecc.; alias config mappa flag storici → item id.
-  Lo stash picker (R-102) e il counterfactual consumabile della preview
-  continuano a funzionare.
-- **T-005 — `questPois` config + fascia.** Due POI (posizione, `questId`,
-  `availableDays`); fascia di pericolosità **derivata** via `simulateQuest` su
-  party di riferimento dichiarato in config (R-105: mai hardcoded). La fascia
-  è **etichettata come ipotesi sul riferimento** nel detail («difficoltà
-  stimata per un party di riferimento»), non come promessa sul party assegnato:
-  il forecast vivo per-membro resta nella schermata di assegnazione (ibrido
-  già ratificato in R-105). Test: la fascia cambia al cambiare dello scenario
-  o del party di riferimento.
-- **T-006 — Assegnazione giocatore + lancio dal POI (D-G).** Il detail della
-  session esistente monta il `ResidentSlotRack` dello stack trusted: il
-  giocatore assegna residenti **reali** dal roster via drag o click-to-assign
-  (D-G: nessun party pre-assegnato). Le regole di eleggibilità quest vivono
-  in `residentDropRules`/`statMatching` da config Zod: residente morto/in
-  spedizione/ferito → `compatibilityState='invalid'` (grayscale,
-  `aria-disabled`, drag soppresso — usa il meccanismo frozen, non una
-  guardia nuova); ruoli obbligatori (leader, bodyguard se richiesto)
-  validati, Embark disabilitato finché il party non è completo e valido.
-  All'Embark: `residentToQuestMember` → `PartyMember[]` reali →
-  `useQuestRun.start` → `QuestRunWindow` presenta (componente battezzato,
-  D-F); la sessione POI **rilascia** il suo stato per quel POI (I-4). Chiudi
-  ≠ ritirati resta vero; segnale bivio compatibile con PLAN-025 D-6.
-  **Contratto congelato con PLAN-025:** firma `useQuestRun` + schema
-  persistito concordati prima di questo task; se `ENGINE_SCHEMA_VERSION`
-  cambia a metà slice, migrazione versionata dichiarata, non assorbita in
-  silenzio. **E2E Playwright reale** (estende il pattern
-  `poiQuestDetailRosterTimeClock.spec.ts` sul percorso `/game` vero, hook
-  `__idleVillageTestHooks` dove la suite esistente li usa): bloom
-  valid/invalid sugli slot mentre si trascina una PgCard reale, residente
-  non eleggibile marcato `data-compatibility='invalid'` e non assegnabile,
-  assegnazione riflessa nel detail (`[data-resident-id]` nello slot), Embark
-  disabilitato a party incompleto.
-- **T-007 — Settlement idempotente + tabella transizioni terminali.** Il
-  settlement di una spedizione è una transizione persistente **idempotente
-  chiavata su `runId`**: un solo write logico applica morti (→ residenti
-  morti), ferite (→ downtime `InjuryEngine`), gold/loot (→ risorse), chiusura
-  POI e riga ledger; l'esito applicato è marcato nella stessa scrittura
-  (`settled: true` nel record persistito). Al boot, un run `ended` non marcato
-  riapplica il settlement **una sola volta**. **Tabella delle transizioni
-  terminali** (in spec, prima dell'implementazione): completato + leader vivo
-  / completato + leader morto / ritirata al checkpoint / abbandono / scadenza
-  dell'offerta — per ciascuna: stato finale del run, reward di quest
-  (`objectiveSatisfied && leaderReturnedAlive`, v24 rev.2 — fuga con obiettivo
-  fallito = bottino conservato, nessuna reward), trattamento del party,
-  chiusura POI, riga ledger. **Test:** reload forzato prima, durante e dopo il
-  writeback → conseguenze applicate una sola volta; caso «obiettivo fallito +
-  leader vivo + fuga» → no reward di quest, sì bottino.
-- **T-008 — Secondo POI end-to-end.** Rovine: stesso tubo, contenuto diverso.
-  **E2E Playwright reale su `/game`** (non pagina lab): click POI → detail →
-  drag PgCard reali → Embark → `QuestRunWindow` si apre sul primo bivio →
-  scelta → run avanza → epilogo → settlement → il roster mostra il residente
-  morto/ferito → reload a metà run → stessa frontiera. Entrambi i POI
-  coperti.
-- **T-009 — Artefatto PLAN-018 + docs.** Mappatura riusa/adatta/superato/manca
-  (contratto S2); QUEST_RULES §modello aggiornato al grafo; CURRENT_STATE,
-  INDEX, kanban, PLAN-019 (S2 avviato).
-- **T-010 — Safeguard + acceptance + evidence.** `lint -- <scope>`,
-  `test -- <scope>`, `build:check`, `kanban:lint`; harness playtest sui 2 POI;
-  evidence `test-results/`.
+- **Offerta da config**: titolo, obiettivo, tags, rewards base, durata e
+  slot richiesti/opzionali vengono da `questPois` + `questScenarios.offer`
+  (Zod); nessun valore testuale o numerico hardcoded, copy via i18n.
+- **Slot con spiegazione**: ogni slot mostra requisito, ruolo coperto
+  («cosa fa»), i modificatori che il residente assegnato riceve, e il suo
+  contributo al rischio — **dinamico rispetto agli slot occupati** (un
+  bodyguard assegnato cambia il rischio del leader, ecc.).
+- **Pericolosità dinamica**: a ogni cambio di assegnazione,
+  `simulateQuest` (Monte Carlo seeded — **esiste, è reale, non mock**)
+  ricalcola la distribuzione esiti del party corrente e il detail mostra
+  bande compatte (pulito/ferite/morti/wipe) con etichetta «stima su N
+  simulazioni» — mai precisione finta (critica r1). Party incompleto →
+  stato «incompleto», non numeri parziali.
+- **Preview della quest totale**: la stessa simulazione alimenta un
+  riepilogo dell'intera run (esiti attesi, reward atteso, durata).
+  **Reward variabili in base al party: non implementati** (Director: «da
+  tenerne conto che arriverà») — lo schema `offer` espone il punto di hook
+  (`rewardPreview`) e il valore mostrato oggi è il base da config marcato
+  come stima.
+- **Espressione di pericolo e reward**: entrambi passano da **bande da
+  config** — `dangerBands` (R-105, esiste) e `rewardTiers` (nuovo schema
+  Zod, stessa idea: label + icona per fascia). Mai numeri crudi in UI.
+- **Modificatori esterni — «constructor» + world-scaling (D-I)**: pericolo e
+  reward passano da un punto unico di risoluzione,
+  `resolveQuestOffer(offer, modifiers)`, dove `modifiers` è un bag di input
+  esterni. Il bag oggi contiene `dangerScale`/`rewardScale`/`durationScale`
+  **più un primo world-scaling reale** (D-I): `collectWorldProgressSignals()`
+  raccoglie i segnali disponibili — `daysPlayed` (TimeEngine, reale),
+  `avgHeroPower` (derivato da `statSnapshot`, metrica canonica da definire —
+  mock-hook tracciato), `avgEquipPower` (da `equipmentStorage`/`heroItems`,
+  hook reale) — la config `worldScaling` (Zod: pesi + bande) li mappa in
+  `{dangerScale, rewardScale}`. Formula v0 minimale e **sostituibile come
+  unità**: solo «da dove e come viene fatto il calcolo» si riscrive quando
+  serve, il contratto di consumo resta. **I valori risolti si congelano
+  nell'istanza di run alla creazione** (stile constructor): un run attivo
+  non cambia se config o mondo cambiano a metà — coerente con la frontiera
+  deterministica.
+- **Gate di invio**: il pulsante **«Invia spedizione»** resta disabilitato
+  finché tutti gli slot `required` non sono occupati da residenti validi;
+  gli slot `optional` (es. bodyguard) non bloccano.
+- **Halo del POI** (D-J): a spedizione inviata, l'halo (oggi vuoto) si
+  riempie come **tempo trascorso / `estimatedDuration`** da config — pura
+  stima di avanzamento, non legata alla frontiera; a run conclusa → pieno +
+  esito. Il «quanto dura» resta visibile in detail prima dell'invio. Il
+  badge «decisione in attesa» sul POI è un **segnale separato** (proposta
+  D-H-4), non parte del riempimento.
+- **Click POI per stato**: offerta disponibile → detail planning;
+  **spedizione attiva → `QuestRunWindow`** (D-F, «il componente delle
+  quest»); dopo settlement → aftermath/riga ledger.
+
+**Aggiunte proposte dal planner** (non nominate dal Director, derivate dal
+contratto — da ratificare):
+
+1. **Badge `inExpedition` sul roster**: il residente lockato (I-4) deve
+  *vedersi* occupato — PgCard badge «in spedizione» + `compatibilityState`
+  per gli altri slot.
+2. **Loadout pre-invio**: lo stash picker consumabili (R-102, esiste nel
+  lab) va nella detail prima dell'invio — il `loadout` si congela nel run
+  come il resto.
+3. **Persistenza assegnazione parziale**: chiudere il detail a metà
+  assegnazione non perde gli slot (la session è montata a livello pagina —
+  verificare che regga anche al reload, altrimenti mock-hook).
+4. **Segnale bivio** sul POI/mappa: badge/pulse quando la spedizione aspetta
+  una decisione — riusa il meccanismo PLAN-025 D-6, non un secondo canale.
+
+## Task — decomposto in 5 figli (2026-10-09, richiesta Director)
+
+Questo file resta il **contenitore**: decisioni D-A…D-J, invarianti I-1…I-7,
+contratti condivisi (stack trusted, planning surface, settlement), gate e
+disaccordi residui. L'esecuzione vive nei figli — ciascuno self-contained e
+sottoposto a cold read web dedicato, plan by plan.
+
+| Figlio | Scope | Task padre assorbiti | Dipende da |
+|---|---|---|---|
+| [PLAN-019-S2.1](PLAN-019-S2.1-scenario-canonico.md) | `QuestScenarioSchema` Zod + migrazione goblin/rovine + parità | T-002 | — |
+| [PLAN-019-S2.2](PLAN-019-S2.2-party-reale.md) | pipeline stats residenti + item reali + `createRun` generalizzato | T-003, T-004 | — |
+| [PLAN-019-S2.3](PLAN-019-S2.3-offerta-scaling.md) | `questPois` + bande + `resolveQuestOffer` + `worldScaling` | T-005 | S2.1 |
+| [PLAN-019-S2.4](PLAN-019-S2.4-planning-lancio.md) | detail planning + assegnazione trusted + send + halo + routing | T-006 | S2.1+S2.2+S2.3 |
+| [PLAN-019-S2.5](PLAN-019-S2.5-settlement-e2e.md) | settlement idempotente + secondo POI + E2E + chiusura | T-007…T-010 | S2.4 |
+
+T-001 (registrazione decisioni D-A…D-J) è **fatto** in questo file: DECISION_LOG
+aggiornato 2026-10-09; deroga `int`/`cha` da registrare a battesimo figli.
 
 ## Fuori scope
 
@@ -281,6 +282,14 @@ no) · quest `cassa` reale (dipende da D-C/cha) · modifiche al balancer.
    `statMatching`); nessun preset/pre-assegnazione nel percorso POI; E2E
    Playwright reali su `/game` coprono assegnazione → lancio → bivio →
    epilogo → settlement → reload.
+6. **Planning surface (D-H):** pericolo dinamico al cambio di assegnazione
+   (bande da `simulateQuest`, etichetta stima, stato «incompleto»), preview
+   quest, durata, bande pericolo+reward, «Invia spedizione» gated sugli slot
+   required, halo che si riempie col tempo (puro elapsed/durata, D-J — non si
+   ferma ai bivi), nodi con sblocco a schedule assoluto e risoluzione in batch
+   degli scaduti (D-K), click POI attivo
+   → `QuestRunWindow`; i mock-hook tracciati (`rewardPreview` base,
+   moltiplicatori neutri) sono elencati esplicitamente nell'evidence.
 6. **Gate (c)** — giudizio del Director sulle 2 quest lanciate dai POI reali.
 7. Safeguard verdi + evidence log.
 
