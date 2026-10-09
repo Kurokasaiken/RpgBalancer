@@ -27,6 +27,7 @@ const POLICY = arg('policy', 'greedy') ?? 'greedy';
 const OUT = arg('out', undefined) ?? `test-results/quest-theatre-playtest/seed-${SEED}-${POLICY}`;
 const VIDEO = has('video');
 const SHOTS = !has('no-shots');
+const SKIP_BEATS = has('skip-beats');
 const BASE = arg('base', 'http://localhost:5173')!;
 mkdirSync(OUT, { recursive: true });
 
@@ -101,26 +102,38 @@ const pick = (labels: string[]): number => {
       // Node-side polling (no in-page evaluate: tsx compiles inner functions
       // with helpers that don't exist in the browser context).
       let settled: 'choices' | 'report' | 'timeout' = 'timeout';
+      const waitT0 = Date.now();
+      let beatMs = 0;
+      let pendingMs = 0;
       const deadline = Date.now() + 12000;
       while (Date.now() < deadline) {
-        const labels = await win
-          .evaluate((el) =>
-            [...el.querySelectorAll('[data-hud-choices] button[data-skin="choice"]')]
+        const phase = await win
+          .evaluate((el) => ({
+            beat: !!el.querySelector('[data-testid="quest-window-beat"]'),
+            labels: [...el.querySelectorAll('[data-hud-choices] button[data-skin="choice"]')]
               .map((b) => b.textContent ?? '')
               .filter((s) => s && s.length > 1 && !/Riduci|Chiudi$|Close$/.test(s)),
-          )
-          .catch(() => [] as string[]);
-        if (labels.some((s) => /Chiudi il rapporto|Close the report/.test(s))) {
+          }))
+          .catch(() => ({ beat: false, labels: [] as string[] }));
+        if (phase.beat) {
+          beatMs += 250;
+          // --skip-beats: the bot clicks the stage like a bored player —
+          // splits beat replay from frontier maturation in the budget.
+          if (SKIP_BEATS) await win.locator('[data-testid="quest-window-beat"]').click().catch(() => undefined);
+        } else {
+          pendingMs += 250;
+        }
+        if (phase.labels.some((s) => /Chiudi il rapporto|Close the report/.test(s))) {
           settled = 'report';
           break;
         }
-        if (labels.length) {
+        if (phase.labels.length) {
           settled = 'choices';
           break;
         }
         await page.waitForTimeout(250);
       }
-      transcript.push({ step: `${step}-wait`, settled });
+      transcript.push({ step: `${step}-wait`, settled, waitMs: Date.now() - waitT0, beatMs, pendingMs });
       if (settled !== 'choices') break;
       continue;
     }
