@@ -1,56 +1,32 @@
 /**
- * LeRovineSottoIlFiume — second authored S1 lab quest (mockup Director
- * 2026-10-04). Exploration/recovery profile on FORZA: attrition gauntlet
- * where the currency of loss is HP and TIME (days), not camp alertness.
+ * QuestScenario «Le Rovine sotto il Fiume» — canonical authored config
+ * (PLAN-019-S2.1, T-3: migration 1:1 from `questS1Lab/questScenarioRovine.ts`).
  *
- * Same engine, different shape: merchant = check-choice (safe info vs risky
- * pressure), mandatory river, variance-vs-certainty guards, trap cascade in
- * the treasure room, checkpoint push-your-luck with VISIBLE stake (gold +
- * days + wounded), unavoidable attrition, deep chamber, return event with an
- * economic callback (the coagulo won at the merchant sells to a wounded
- * traveler for more than its worth), and a report-style epilogue that costs
- * the run in human-days.
+ * Director mockup 2026-10-04. Exploration/recovery profile on FORZA:
+ * attrition gauntlet where the currency of loss is HP and TIME (days), not
+ * camp alertness. Same engine, different shape: merchant = check-choice
+ * (safe info vs risky pressure), mandatory river, variance-vs-certainty
+ * guards, trap cascade in the treasure room, checkpoint push-your-luck with
+ * VISIBLE stake (gold + days + wounded), unavoidable attrition, deep chamber,
+ * return event with an economic callback (the coagulo won at the merchant
+ * sells to a wounded traveler for more than its worth), and a report-style
+ * epilogue that costs the run in human-days.
  *
- * Not a general engine: node ids are hardcoded in questRun.applyNodeOutcome.
+ * Not a general engine: post-verdict routing of check nodes is hardcoded per
+ * node id in `questRun.applyNodeOutcome` (invariant I-3 — engine unchanged).
+ *
+ * The module parses itself at import: `ROVINE_SCENARIO` is the validated
+ * scenario; `ROVINE_SCENARIO_AUTHORED` is the raw literal kept for the parity
+ * test (authored object vs parse output — strict schema, no silent drops).
  */
 
-import type { LabStat, PartyPreset, QuestNode } from './questScenario';
+import type { LabStat, QuestNode } from '@/ui/idleVillage/questS1Lab/questScenario';
+import {
+  parseQuestScenario,
+  type QuestScenario,
+} from '@/balancing/config/idleVillage/quests/questScenario.schema';
 
-/**
- * Declared primary stats (mockup: requisito principale Forza, secondari
- * Percezione/Costituzione/Destrezza). Every mandatory check uses STR or CON
- * — this is the muscle quest; PER/AGI appear only on optional routes.
- */
-export const ROVINE_PRIMARY_STATS: LabStat[] = ['str', 'con'];
-
-/** Player-facing labels for `state.info` entries in this quest. */
-export const ROVINE_INTEL_LABELS: Record<string, string> = {
-  guardiePiuAvanti: 'le guardie proteggono qualcosa più avanti',
-  mappaRovine: 'la mappa approssimativa delle rovine',
-  contattoViandante: 'il viandante che vi deve un favore',
-};
-
-/**
- * Quest beats for the progress indicator — mirrors the mockup's phases:
- * partenza implicit, then the seven authored phases.
- */
-export const ROVINE_BEATS = [
-  'Il mercante',
-  'Il fiume',
-  'Le guardie',
-  'La sala del tesoro',
-  'Oltre',
-  'La camera profonda',
-  'Il ritorno',
-] as const;
-
-/**
- * Authored nodes — mockup «Le Rovine sotto il Fiume»:
- * mercante (check-choice) → fiume (STR+CON mandatory) → guardie (variance
- * choice) → sala (PER) → trappola cascade → tesoro → CHECKPOINT →
- * attrito (no check) → camera profonda → evento ritorno → report.
- */
-export const ROVINE_NODES: Record<string, QuestNode> = {
+const ROVINE_NODES: Record<string, QuestNode> = {
   /* ---- FASE I — il mercante: safe info vs risky pressure ---------------- */
   'rv-mercante': {
     id: 'rv-mercante',
@@ -306,38 +282,86 @@ export const ROVINE_NODES: Record<string, QuestNode> = {
   },
 };
 
-/** First node of the run. */
-export const ROVINE_START_NODE = 'rv-mercante';
-
 /**
- * Party presets for the ruins quest — the mockup party is Eroe (leader,
- * +25% on the quest's primary stat, baked into the numbers below) plus
- * three ordinary villagers. Second preset = same shape, weaker hero:
- * the delta between party stats and quest requirements IS the difficulty.
+ * Authored scenario literal (pre-parse). `intelLabels` = the journal labels
+ * for `state.info` entries of this quest (moved here 1:1 from the lab).
+ * The `offer` block is NEW content — see `GOBLIN_SCENARIO_AUTHORED` for the
+ * ownership rules (S2.1 owns fields, S2.3 owns values).
  */
-export const ROVINE_PRESETS: PartyPreset[] = [
-  {
-    id: 'rv-eroe',
-    label: 'Eroe + Villager — il mockup',
-    description: 'Eroe forte in Forza (+25% sulla primaria), tre villager ordinari.',
-    gold: 0,
-    members: [
-      { id: 'r1', name: 'Aldric', role: 'leader', stats: { str: 90, con: 72, agi: 40, perc: 45, int: 35, cha: 50 }, portrait: '/assets/portraits/portrait male warrior.png' },
-      { id: 'r2', name: 'Pietro', role: 'member', stats: { str: 45, con: 50, agi: 45, perc: 40, int: 35, cha: 40 }, portrait: '/assets/portraits/portrait male warrior.png' },
-      { id: 'r3', name: 'Sara', role: 'member', stats: { str: 35, con: 45, agi: 60, perc: 55, int: 45, cha: 50 }, portrait: '/assets/portraits/portrait female magician.png' },
-      { id: 'r4', name: 'Nando', role: 'member', stats: { str: 50, con: 55, agi: 35, perc: 35, int: 30, cha: 30 }, portrait: '/assets/portraits/portrait male warrior.png' },
-    ],
+export const ROVINE_SCENARIO_AUTHORED = {
+  id: 'rovine',
+  title: 'Le Rovine sotto il Fiume',
+  scenarioVersion: 's2.1-rovine-v1',
+  startNode: 'rv-mercante',
+  primaryStats: ['str', 'con'] as LabStat[],
+  beats: [
+    'Il mercante',
+    'Il fiume',
+    'Le guardie',
+    'La sala del tesoro',
+    'Oltre',
+    'La camera profonda',
+    'Il ritorno',
+  ],
+  intelLabels: {
+    guardiePiuAvanti: 'le guardie proteggono qualcosa più avanti',
+    mappaRovine: 'la mappa approssimativa delle rovine',
+    contattoViandante: 'il viandante che vi deve un favore',
   },
-  {
-    id: 'rv-gracile',
-    label: 'Party debole — stessa quest, più letale',
-    description: 'Nessun muscolo vero: il delta fra requisiti e party decide quanto costa.',
-    gold: 0,
-    members: [
-      { id: 'g1', name: 'Berta', role: 'leader', stats: { str: 45, con: 40, agi: 55, perc: 70, int: 60, cha: 55 }, portrait: '/assets/portraits/portrait female magician.png' },
-      { id: 'g2', name: 'Ugo', role: 'member', stats: { str: 40, con: 35, agi: 60, perc: 50, int: 55, cha: 45 }, portrait: '/assets/portraits/portrait male warrior.png' },
-      { id: 'g3', name: 'Lia', role: 'member', stats: { str: 30, con: 30, agi: 50, perc: 60, int: 50, cha: 60 }, portrait: '/assets/portraits/portrait female magician.png' },
-      { id: 'g4', name: 'Doro', role: 'member', stats: { str: 35, con: 45, agi: 40, perc: 45, int: 40, cha: 35 }, portrait: '/assets/portraits/portrait male warrior.png' },
+  offer: {
+    objective: 'Recuperare il tesoro delle rovine sotto il fiume.',
+    tags: ['quest', 'exploration', 'ruins'],
+    /* Slot gates use the CANONICAL resident statTags vocabulary (role gates:
+     * edge/fortitude/warden/ward/clarity/precision — numeric stat keys are
+     * NOT role tags, `mission_planner_data_model_fix.md` §2.2). */
+    slots: {
+      required: [
+        {
+          id: 'rovine-slot-leader',
+          label: 'Capo spedizione',
+          role: 'leader',
+          statFocus: ['str', 'con'],
+          requirement: { label: 'Capo spedizione', anyOf: ['fortitude', 'edge'] },
+        },
+      ],
+      optional: [
+        {
+          id: 'rovine-slot-member-1',
+          label: 'Portatore',
+          role: 'member',
+          statFocus: ['str', 'con'],
+          requirement: { label: 'Portatore', anyOf: ['edge', 'fortitude', 'warden'] },
+        },
+        {
+          id: 'rovine-slot-member-2',
+          label: 'Portatore',
+          role: 'member',
+          statFocus: ['str', 'con'],
+          requirement: { label: 'Portatore', anyOf: ['edge', 'fortitude', 'warden'] },
+        },
+        {
+          id: 'rovine-slot-esploratore',
+          label: 'Esploratore',
+          role: 'member',
+          statFocus: ['perc', 'agi'],
+          requirement: { label: 'Esploratore', anyOf: ['clarity', 'precision'] },
+        },
+      ],
+    },
+    /* Calibration party for `dangerBandRef` — mirrors the lab `rv-eroe`
+     * preset (the mockup party: strong hero + three ordinary villagers).
+     * hp omitted = engine default, exactly like the preset. */
+    referenceParty: [
+      { id: 'ref-leader', name: 'Aldric', role: 'leader', stats: { str: 90, con: 72, agi: 40, perc: 45, int: 35, cha: 50 } },
+      { id: 'ref-m1', name: 'Pietro', role: 'member', stats: { str: 45, con: 50, agi: 45, perc: 40, int: 35, cha: 40 } },
+      { id: 'ref-m2', name: 'Sara', role: 'member', stats: { str: 35, con: 45, agi: 60, perc: 55, int: 45, cha: 50 } },
+      { id: 'ref-m3', name: 'Nando', role: 'member', stats: { str: 50, con: 55, agi: 35, perc: 35, int: 30, cha: 30 } },
     ],
+    dangerBandRef: 'media',
+    rewardBase: 100,
   },
-];
+  nodes: ROVINE_NODES,
+} satisfies Omit<QuestScenario, 'primaryStats'> & { primaryStats: LabStat[] };
+
+/** Parsed, validated scenario — the single source consumed by the engine. */
+export const ROVINE_SCENARIO: QuestScenario = parseQuestScenario(ROVINE_SCENARIO_AUTHORED);

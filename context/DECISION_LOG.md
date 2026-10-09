@@ -808,10 +808,86 @@ battezzato"»); registrato come D-F in `plans/PLAN-019-S2-quest-vera.md`.
    sequenza senza attesa (ritorno a metà durata → batch delle fasi scadute).
    `QuestRunWindow` segue lo stesso modello: tile in fondo = fasi superate +
    preview della successiva; durante l'attesa si mostra la frase di
-   flavour/transit. Implicazione da verificare in S2.4/T-4: se la frontiera
-   v27 ferma la maturazione su `awaitingPlayer`, questa decisione la modifica
-   (`readyAt` assoluto, risoluzione in batch ammessa).
+   flavour/transit.
+
+   **Raffinamento Director 2026-10-09 (post-critica r2 figli):** la forma
+   «finestra assoluta sulla durata totale» è incoerente su grafo con rami →
+   semantica ratificata `readyAt(nodo) = arrivo sul nodo lungo il percorso
+   effettivo + nodeDuration` (durata per nodo da config), identica
+   all'esempio originale su percorso lineare; **durata viva**: un nodo extra
+   raggiunto aggiunge la sua durata al totale *in quel momento* — halo e
+   tile fasi si adattano a run in corso. Spike bloccante S2.4/T-0: layer
+   sopra `matureReady` o deroga I-3.
+4. **Feriti in spedizione — DECISO (2026-10-09):** i residenti feriti sono
+   **ammessi**, senza warning; la penalità vive nei dati (HP di partenza
+   ridotto + modificatori stat da InjuryEngine nell'adapter
+   `residentToQuestMember`) → il forecast ne tiene conto automaticamente.
+5. **`perc ← txc`** (flat, indipendente da evasion) — chiude la
+   sotto-decisione di D-C; l'anticorrelazione perc/agi con `hitChance` era
+   un difetto reale («l'esploratore agile è cieco»).
+6. **Wipe** = ∀ slot assegnato `morto` (leader morto con sopravvissuti ≠
+   wipe); **obiettivo sì + fuga + leader vivo → reward sì** — confermati
+   contro la matrice.
 
 **Fonte:** Director in sessione 2026-10-09 (R-107, risposte al gate post-critica);
 registrate in `plans/PLAN-019-S2-quest-vera.md` (D-I/D-J/D-K) e rifluese in
 `PLAN-019-S2.4` (post-invio + T-4).
+
+---
+
+## 2026-10-09 — R-108: risposte del Director alle 5 domande del brief «Emotional Mechanics»
+
+**Contesto:** sintesi comparativa delle 4 AI raccolte (manca DeepSeek 2/5) +
+audit repo in `context/ingestions/2026-10-09-emotional-mechanics-quest/SYNTHESIS.md`.
+Le AI convergevano sul «duello a pattern» come prima primitiva — presupposto
+che le risposte del Director ribaltano.
+
+**Decisioni (Director, 2026-10-09):**
+
+1. **Controllo durante la quest = poche decisioni cruciali** (3-4 scelte
+   grandi per run). Escluso il modello «decisione a ogni turno».
+2. **Skill del giocatore = gestire probabilità e rischio.** Esclusa la
+   lettura dei pattern avversari come skill primaria → il modello
+   avversario a pattern non è centrale.
+3. **Rischio = sorprese forti ma eque.** Eventi inattesi ammessi, purché
+   retrospettivamente logici → l'info a costo (check nascosto) è il
+   meccanismo di *fairness*, non di discovery.
+4. **Morte PG = R-105 confermata** (feeling DD/XCOM, nessun cambio).
+5. **Emozioni prioritarie = attaccamento/sacrificio + avidità/rimpianto.**
+6. **Preview = numeri precisi** (la tensione P39 «info perfetta uccide
+   suspense» è accettata consapevolmente).
+7. **Allarme = stati nominati reggono** (quieto/allertato/sveglio; nessun
+   track graduato — conferma la rimozione del meter del 2026-10-03).
+
+**Conseguenza sulla classifica delle primitive (SYNTHESIS §6.1):**
+Tier 1 = push-your-luck approfondito (F6 esiste), esposizione/targeting
+come scelta del giocatore, sorprese eque via info a costo. Tier 3
+(deprioritizzato) = duello a pattern, timer-risorsa.
+
+**Fonte:** risposte Director in sessione 2026-10-09 (R-108);
+registrate in `RICHIESTE.md` R-108 e `SYNTHESIS.md` §6.
+
+---
+
+## 2026-10-10 — R-109: F6 push-your-luck — baseline sperimentale BE@6% + gate sweep
+
+**Contesto:** Round 3 di validazione Monte Carlo su `f6-pushluck-experiment.ts`
+(N=2000 seed accoppiati, party default+weak). Il bust accoppiato al verdetto
+(fail+epicfail ≈53%/turno) collassa la dispersione oro tra policy a ~0.5g →
+«fermati» quasi dominante; il bust solo su epicfail (5%/turno) è decorativo.
+La trappola indipendente a ramp (P = exploreTurn × r) mantiene la tentazione.
+
+**Decisioni (Director, 2026-10-10):**
+
+1. **BE@6%/turno = baseline sperimentale** — trappola F6 indipendente dal
+   check, bust perde solo la pila F6 accumulata; *non* bilanciamento finale.
+2. **Gate prima dell'implementazione**: sweep ramp 4–8% × party diversi —
+   stop/continue deve restare non-dominante su tutti i party.
+3. Implementazione autorizzata solo a gate superato: modifiche authored del
+   report §6 — nessun nuovo kind di nodo, nessun framework generale.
+4. **Vincolo di fairness del bust**: cause e conseguenze comprensibili e
+   leggibili, non necessariamente prevedibile nel momento esatto —
+   «doloroso senza sembrare arbitrario».
+
+**Fonte:** Director in sessione 2026-10-10 (R-109);
+evidenza in `context/ingestions/2026-10-09-emotional-mechanics-quest/07-round3-f6-validation.md`.

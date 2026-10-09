@@ -13,7 +13,7 @@ import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/g
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
 import { QuestTheatre } from '@/ui/idleVillage/questTheatre/QuestTheatre';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
-import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 
 /** World-pixel position of the theatre POI — distinct from the real quest POI. */
 const THEATRE_POI = { x: 2900, y: 1250, sizePx: 64 };

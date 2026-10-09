@@ -1,0 +1,326 @@
+{
+  "presetId": "gob-band",
+  "seed": 777,
+  "analyses": {
+    "gob-tracce-per": {
+      "baseScore": 45,
+      "bonus": 0,
+      "successBound": 45,
+      "successPct": 45,
+      "verdicts": {
+        "epicfail": 0.05,
+        "bigwin": 0.05,
+        "win": 0.4,
+        "almost": 0.05,
+        "fail": 0.45
+      },
+      "noHarmPct": 89.5,
+      "anyWoundPct": 7.412500000000004,
+      "anyDeathPct": 3.0875,
+      "leaderWoundPct": 0,
+      "leaderDeathPct": 0,
+      "toll": null,
+      "perMember": [
+        {
+          "id": "g1",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g2",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g3",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g4",
+          "healthyPct": 89.49999999999999,
+          "woundPct": 7.412500000000004,
+          "deathPct": 3.0875
+        }
+      ]
+    },
+    "gob-tracce-perfor": {
+      "baseScore": 57.5,
+      "bonus": 0,
+      "successBound": 57.5,
+      "successPct": 58,
+      "verdicts": {
+        "epicfail": 0.05,
+        "bigwin": 0.05,
+        "win": 0.525,
+        "almost": 0.05,
+        "fail": 0.325
+      },
+      "noHarmPct": 90.75,
+      "anyWoundPct": 6.756250000000004,
+      "anyDeathPct": 2.4937500000000004,
+      "leaderWoundPct": 0,
+      "leaderDeathPct": 0,
+      "toll": null,
+      "perMember": [
+        {
+          "id": "g1",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g2",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g3",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g4",
+          "healthyPct": 90.74999999999999,
+          "woundPct": 6.756250000000004,
+          "deathPct": 2.4937500000000004
+        }
+      ]
+    },
+    "gob-bottino": {
+      "baseScore": 50,
+      "bonus": 0,
+      "successBound": 50,
+      "successPct": 50,
+      "verdicts": {
+        "epicfail": 0.05,
+        "bigwin": 0.05,
+        "win": 0.45,
+        "almost": 0.05,
+        "fail": 0.4
+      },
+      "noHarmPct": 89.99999999999999,
+      "anyWoundPct": 7.150000000000004,
+      "anyDeathPct": 2.8499999999999996,
+      "leaderWoundPct": 0,
+      "leaderDeathPct": 0,
+      "toll": null,
+      "perMember": [
+        {
+          "id": "g1",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g2",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g3",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g4",
+          "healthyPct": 90,
+          "woundPct": 7.150000000000004,
+          "deathPct": 2.8499999999999996
+        }
+      ]
+    },
+    "gob-stealth": {
+      "baseScore": 50,
+      "bonus": 0,
+      "successBound": 50,
+      "successPct": 50,
+      "verdicts": {
+        "epicfail": 0.05,
+        "bigwin": 0.05,
+        "win": 0.45,
+        "almost": 0.05,
+        "fail": 0.4
+      },
+      "noHarmPct": 89.99999999999999,
+      "anyWoundPct": 7.150000000000004,
+      "anyDeathPct": 2.8499999999999996,
+      "leaderWoundPct": 0,
+      "leaderDeathPct": 0,
+      "toll": null,
+      "perMember": [
+        {
+          "id": "g1",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g2",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g3",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g4",
+          "healthyPct": 90,
+          "woundPct": 7.150000000000004,
+          "deathPct": 2.8499999999999996
+        }
+      ]
+    },
+    "gob-assalto": {
+      "baseScore": 70,
+      "bonus": 0,
+      "successBound": 70,
+      "successPct": 70,
+      "verdicts": {
+        "epicfail": 0.05,
+        "bigwin": 0.05,
+        "win": 0.65,
+        "almost": 0.05,
+        "fail": 0.2
+      },
+      "noHarmPct": 92,
+      "anyWoundPct": 6.100000000000004,
+      "anyDeathPct": 1.9000000000000004,
+      "leaderWoundPct": 0,
+      "leaderDeathPct": 0,
+      "toll": null,
+      "perMember": [
+        {
+          "id": "g1",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g2",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g3",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g4",
+          "healthyPct": 91.99999999999999,
+          "woundPct": 6.100000000000004,
+          "deathPct": 1.9000000000000004
+        }
+      ]
+    },
+    "gob-incalza-check": {
+      "baseScore": 70,
+      "bonus": 0,
+      "successBound": 70,
+      "successPct": 70,
+      "verdicts": {
+        "epicfail": 0.05,
+        "bigwin": 0.05,
+        "win": 0.65,
+        "almost": 0.05,
+        "fail": 0.2
+      },
+      "noHarmPct": 0,
+      "anyWoundPct": 100,
+      "anyDeathPct": 1.9000000000000017,
+      "leaderWoundPct": 0,
+      "leaderDeathPct": 0,
+      "toll": {
+        "amount": 10,
+        "epicfailAmount": 20,
+        "expected": 10.5,
+        "targetName": "Kran"
+      },
+      "perMember": [
+        {
+          "id": "g1",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g2",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g3",
+          "healthyPct": 0,
+          "woundPct": 2000,
+          "deathPct": 0
+        },
+        {
+          "id": "g4",
+          "healthyPct": 0,
+          "woundPct": 7518.099999999999,
+          "deathPct": 1.9000000000000017
+        }
+      ]
+    },
+    "gob-cerca": {
+      "baseScore": 42.5,
+      "bonus": 0,
+      "successBound": 42.5,
+      "successPct": 43,
+      "verdicts": {
+        "epicfail": 0.05,
+        "bigwin": 0.05,
+        "win": 0.375,
+        "almost": 0.05,
+        "fail": 0.475
+      },
+      "noHarmPct": 89.24999999999999,
+      "anyWoundPct": 7.543750000000003,
+      "anyDeathPct": 3.2062499999999994,
+      "leaderWoundPct": 0,
+      "leaderDeathPct": 0,
+      "toll": null,
+      "perMember": [
+        {
+          "id": "g1",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g2",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g3",
+          "healthyPct": 100,
+          "woundPct": 0,
+          "deathPct": 0
+        },
+        {
+          "id": "g4",
+          "healthyPct": 89.25,
+          "woundPct": 7.543750000000003,
+          "deathPct": 3.2062499999999994
+        }
+      ]
+    }
+  }
+}

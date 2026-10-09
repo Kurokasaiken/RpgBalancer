@@ -22,8 +22,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { INTEL_LABELS, QUEST_BEATS } from '@/ui/idleVillage/questS1Lab/questScenario';
-import { ROVINE_BEATS, ROVINE_INTEL_LABELS } from '@/ui/idleVillage/questS1Lab/questScenarioRovine';
-import { GOBLIN_BEATS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
+import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import {
   applyChoice,
   createRun,
@@ -59,13 +59,13 @@ import { AstroOverlay } from '@/ui/idleVillage/questS1Lab/hud/AstroOverlay';
 import { ART, NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 
 /** Intel labels merged across quests — state.info keys are unique per quest. */
-const ALL_INTEL_LABELS: Record<string, string> = { ...INTEL_LABELS, ...ROVINE_INTEL_LABELS };
+const ALL_INTEL_LABELS: Record<string, string> = { ...INTEL_LABELS, ...(ROVINE_SCENARIO.intelLabels ?? {}) };
 
 /** Per-quest beats for the progress indicator. */
 const QUEST_BEATS_BY_ID: Record<QuestId, readonly string[]> = {
   cassa: QUEST_BEATS,
-  rovine: ROVINE_BEATS,
-  goblin: GOBLIN_BEATS,
+  rovine: ROVINE_SCENARIO.beats,
+  goblin: GOBLIN_SCENARIO.beats,
 };
 
 /** Quest cards on the lab's entry screen. Only the authored S1 goblin quest

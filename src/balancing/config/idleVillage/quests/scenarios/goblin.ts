@@ -1,40 +1,30 @@
 /**
- * SterminioGoblinScenario — authored S1 quest «Sterminio dei goblin».
+ * QuestScenario «Sterminio dei goblin» — canonical authored config
+ * (PLAN-019-S2.1, T-2: migration 1:1 from `questS1Lab/questScenarioGoblin.ts`).
  *
  * Director-authored spec: `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md`
  * (PLAN-022). Combat quest, Forza-based, positional slot targeting:
  * the risk lives at the back of the formation — 4 alive → 0/0/20/80 —
- * and compacts when someone dies. NOT a general engine: hardcoded matrix.
+ * and compacts when someone dies. NOT a general engine: post-verdict routing
+ * of check/combat nodes is hardcoded per node id in `questRun.applyNodeOutcome`
+ * (invariant I-3 — the engine is unchanged).
+ *
+ * The module parses itself at import: `GOBLIN_SCENARIO` is the validated
+ * scenario; `GOBLIN_SCENARIO_AUTHORED` is the raw literal kept for the parity
+ * test (authored object vs parse output — strict schema, no silent drops).
  */
 
-import type { LabStat, PartyPreset, QuestNode } from './questScenario';
-
-/** Quest's declared primary stats: Forza solves it, Percezione is the hidden edge. */
-export const GOBLIN_PRIMARY_STATS: LabStat[] = ['str', 'perc'];
-
-/** Progress beats for the quest progress indicator. */
-export const GOBLIN_BEATS = [
-  'Assegnazione',
-  'Esplorazione',
-  'Bottino',
-  'Accampamento',
-  'Combattimento',
-  'Incalzare',
-  'Razzia',
-  'Ritorno',
-] as const;
-
-/** Quest identity shown by the running-quest window (R-106): authored content, Italian only (R-103). */
-export const GOBLIN_META = {
-  title: 'Sterminio dei goblin',
-  flavour: 'Il guado è chiuso dalla paura. Sterminateli.',
-} as const;
+import type { LabStat, QuestNode } from '@/ui/idleVillage/questS1Lab/questScenario';
+import {
+  parseQuestScenario,
+  type QuestScenario,
+} from '@/balancing/config/idleVillage/quests/questScenario.schema';
 
 /* ------------------------------------------------------------------ */
 /* Nodes — F0..F7 from the authored spec.                               */
 /* ------------------------------------------------------------------ */
 
-export const GOBLIN_NODES: Record<string, QuestNode> = {
+const GOBLIN_NODES: Record<string, QuestNode> = {
   /* F0 — ASSEGNAZIONE: combat quest, Forza visible, Percezione revealable,
    * three consumables carried (granted by the preset flags). No check. */
   'gob-inizio': {
@@ -390,21 +380,85 @@ export const GOBLIN_NODES: Record<string, QuestNode> = {
   },
 };
 
-/** First node of the run. */
-export const GOBLIN_START_NODE = 'gob-inizio';
-
-/** Party preset — Forza-based, hero + three members (positional slots). */
-export const GOBLIN_PRESETS: PartyPreset[] = [
-  {
-    id: 'gob-band',
-    label: 'Banda — l’eroe e la sua scorta',
-    description: 'Eroe davanti, tre compagni dietro: il rischio vive in coda.',
-    gold: 0,
-    members: [
-      { id: 'g1', name: 'Edda', role: 'leader', hp: 100, stats: { str: 70, con: 60, agi: 45, perc: 40, int: 35, cha: 40 }, portrait: '/assets/portraits/portrait female magician.png' },
-      { id: 'g2', name: 'Milo', role: 'member', hp: 60, stats: { str: 60, con: 55, agi: 50, perc: 45, int: 40, cha: 35 }, portrait: '/assets/portraits/portrait male warrior.png' },
-      { id: 'g3', name: 'Bruna', role: 'member', hp: 60, stats: { str: 65, con: 60, agi: 40, perc: 35, int: 30, cha: 30 }, portrait: '/assets/portraits/portrait male warrior.png' },
-      { id: 'g4', name: 'Kran', role: 'bodyguard', hp: 60, stats: { str: 60, con: 70, agi: 40, perc: 30, int: 20, cha: 20 }, portrait: '/assets/portraits/portrait male warrior.png' },
+/**
+ * Authored scenario literal (pre-parse). The `offer` block is NEW content —
+ * not 1:1 with the lab: slot requirements reuse the `StatRequirement`
+ * contract; `dangerBandRef`/`rewardBase` are declared placeholders whose value
+ * ownership is S2.3 (`questPois`/`rewardTiers`).
+ */
+export const GOBLIN_SCENARIO_AUTHORED = {
+  id: 'goblin',
+  title: 'Sterminio dei goblin',
+  flavour: 'Il guado è chiuso dalla paura. Sterminateli.',
+  scenarioVersion: 's2.1-goblin-v1',
+  startNode: 'gob-inizio',
+  primaryStats: ['str', 'perc'] as LabStat[],
+  beats: [
+    'Assegnazione',
+    'Esplorazione',
+    'Bottino',
+    'Accampamento',
+    'Combattimento',
+    'Incalzare',
+    'Razzia',
+    'Ritorno',
+  ],
+  offer: {
+    objective: 'Sterminare il campo dei goblin al guado.',
+    tags: ['quest', 'combat', 'goblin'],
+    /* Slot gates use the CANONICAL resident statTags vocabulary (role gates:
+     * edge/fortitude/warden/ward/clarity/precision — see
+     * `mission_planner_data_model_fix.md` §2.2: numeric stat keys are NOT
+     * role tags). `statFocus` is the LabStat the slot is expected to bring —
+     * it drives the offer↔nodes coverage check. */
+    slots: {
+      required: [
+        {
+          id: 'goblin-slot-leader',
+          label: 'Capo spedizione',
+          role: 'leader',
+          statFocus: ['str'],
+          requirement: { label: 'Capo spedizione', anyOf: ['edge', 'fortitude'] },
+        },
+      ],
+      optional: [
+        {
+          id: 'goblin-slot-member-1',
+          label: 'Combattente',
+          role: 'member',
+          statFocus: ['str', 'agi'],
+          requirement: { label: 'Combattente', anyOf: ['edge', 'fortitude', 'warden'] },
+        },
+        {
+          id: 'goblin-slot-member-2',
+          label: 'Esploratore',
+          role: 'member',
+          statFocus: ['perc', 'int'],
+          requirement: { label: 'Esploratore', anyOf: ['precision', 'clarity'] },
+        },
+        {
+          id: 'goblin-slot-bodyguard',
+          label: 'Guardia del corpo',
+          role: 'bodyguard',
+          statFocus: ['con', 'str'],
+          requirement: { label: 'Guardia del corpo', anyOf: ['warden', 'fortitude'] },
+        },
+      ],
+    },
+    /* Calibration party for `dangerBandRef` — mirrors the lab `gob-band`
+     * preset's stats (the party the band was authored against). The parity
+     * test re-simulates it; ±1 grade tolerated, ε-borderline passes. */
+    referenceParty: [
+      { id: 'ref-leader', name: 'Edda', role: 'leader', hp: 100, stats: { str: 70, con: 60, agi: 45, perc: 40, int: 35, cha: 40 } },
+      { id: 'ref-m1', name: 'Milo', role: 'member', hp: 60, stats: { str: 60, con: 55, agi: 50, perc: 45, int: 40, cha: 35 } },
+      { id: 'ref-m2', name: 'Bruna', role: 'member', hp: 60, stats: { str: 65, con: 60, agi: 40, perc: 35, int: 30, cha: 30 } },
+      { id: 'ref-bg', name: 'Kran', role: 'bodyguard', hp: 60, stats: { str: 60, con: 70, agi: 40, perc: 30, int: 20, cha: 20 } },
     ],
+    dangerBandRef: 'alta',
+    rewardBase: 60,
   },
-];
+  nodes: GOBLIN_NODES,
+} satisfies Omit<QuestScenario, 'primaryStats'> & { primaryStats: LabStat[] };
+
+/** Parsed, validated scenario — the single source consumed by the engine. */
+export const GOBLIN_SCENARIO: QuestScenario = parseQuestScenario(GOBLIN_SCENARIO_AUTHORED);

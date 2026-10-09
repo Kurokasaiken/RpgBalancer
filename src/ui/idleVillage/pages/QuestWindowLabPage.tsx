@@ -11,7 +11,8 @@ import { useTranslation } from 'react-i18next';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { QuestRunWindow } from '@/ui/idleVillage/components/gameFrame/QuestRunWindow';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
-import { GOBLIN_BEATS, GOBLIN_META, GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
+import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
@@ -41,10 +42,10 @@ export const QuestWindowLabPage: React.FC = () => {
   }, [questRun.syncClock]);
   const time = useMemo(
     () => ({
-      progress: questRun.run?.ended ? 1 : Math.min(1, questRun.phases.length / GOBLIN_BEATS.length),
+      progress: questRun.run?.ended ? 1 : Math.min(1, questRun.phases.length / GOBLIN_SCENARIO.beats.length),
       label: questRun.run?.ended
         ? t(questRun.run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
-        : t('gameFrame.questWindow.phaseOf', { n: Math.min(GOBLIN_BEATS.length, questRun.phases.length + 1), total: GOBLIN_BEATS.length }),
+        : t('gameFrame.questWindow.phaseOf', { n: Math.min(GOBLIN_SCENARIO.beats.length, questRun.phases.length + 1), total: GOBLIN_SCENARIO.beats.length }),
     }),
     [questRun.run?.ended, questRun.run?.outcome, questRun.phases.length, t],
   );
@@ -64,11 +65,11 @@ export const QuestWindowLabPage: React.FC = () => {
         <QuestRunWindow
           run={questRun.run}
           phases={questRun.phases}
-          beats={GOBLIN_BEATS}
+          beats={GOBLIN_SCENARIO.beats}
           queuedBeats={questRun.beats}
           beatTiming={questWindow.beats}
-          title={GOBLIN_META.title}
-          flavour={GOBLIN_META.flavour}
+          title={GOBLIN_SCENARIO.title}
+          flavour={GOBLIN_SCENARIO.flavour}
           artFor={(nodeId) => NODE_ART[nodeId]?.src}
           time={time}
           onChoose={(optionId) => questRun.choose(optionId, { useConsumable: armed })}

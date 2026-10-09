@@ -1,7 +1,8 @@
 ---
 title: 'PLAN-019-S2.5 — Settlement idempotente, secondo POI, E2E completo e chiusura slice'
-status: draft
+status: proposed
 created: 2026-10-09
+revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: MINOR+MAJOR → assorbito; run `…/s2.5/r2/`)
 desiderata: v24 (PLAN-019, stadio S2, gate S2-a/b/c), v24 rev.2 (reward = obiettivo && leader vivo)
 request: R-107
 parent: PLAN-019-S2 (figlio 5/5 — chiude lo slice)
@@ -18,48 +19,116 @@ persistente **idempotente** — il bug peggiore possibile in un gioco dove la
 morte conta è una conseguenza applicata due volte o zero (critica r1). Poi:
 secondo POI end-to-end, E2E completo dello slice, documentazione di chiusura.
 
-## Settlement (T-7 del piano padre)
+## Settlement (T-7 del piano padre — protocollo per-effetto, critica r1)
 
-- **Idempotente chiavato su `runId`**: un solo write logico applica morti
-  (→ residenti morti), ferite (→ downtime `InjuryEngine`), gold/loot
-  (→ risorse), chiusura POI e riga ledger; l'esito applicato è marcato
-  nella stessa scrittura (`settled: true` nel record persistito).
-- **Reapply-once al boot**: un run `ended` non marcato riapplica il
-  settlement **una sola volta**. Prima dell'implementazione si verifica
-  quali garanzie offre `PersistenceService`; se non supporta una
-  transazione atomica multi-aggregate, la strategia di recupero durevole
-  è definita in spec (marker + replay).
-- **Tabella delle transizioni terminali** (in spec, prima del codice):
+- **T-0 bloccante — tre domande binarie con risposta scritta** (critica
+  r2): (1) la scrittura singola è durevole al return? (2) l'ordine delle
+  scritture è preservato tra chiavi? (3) lettura-dopo-scrittura coerente
+  al boot? **Fallback dichiarato ora**: se una è «no» → T-2 usa un unico
+  aggregate `settlements/{runId}` contenente effetti + stato, scritto in
+  una sola `set`, con gli effetti derivati al boot. L'output decide la
+  forma del protocollo prima di qualunque implementazione.
+- **Journal durevole per-effetto** (protocollo se l'atomica non esiste —
+  caso atteso): (1) **intent record** `settling` nel run con il **piano
+  degli effetti calcolato e congelato**; (2) effetti applicati **uno a
+  uno, ciascuno idempotente per chiave `(runId, effectId)`** — «residente
+  X morto per run R» è un *set*, non un incremento; **la chiave di
+  idempotenza è persistita atomicamente nello stesso aggregate della
+  mutazione** (critica r2 — altrimenti il replay può ripetere o saltare;
+  se non supportato, alternativa equivalente dimostrata con crash test
+  esattamente fra mutazione e registrazione; nessun effetto «completato»
+  solo perché sta nel journal del run); per le **risorse fungibili**
+  (gold/loot) la forma è **ledger di chiavi applicate** — la chiave
+  `(runId, effectId)` è scritta nello stesso record del saldo, oppure il
+  delta è applicato con guardia «chiave già presente → no-op» —
+  **mai `set-to-expected`** sulle risorse (sovrascriverebbe acquisizioni
+  estranee al run tra intent e applicazione); `set-to-expected` solo per
+  stati discreti (morto, ferito); (3) marker `settled` **dopo** tutti gli
+  effetti. Il replay al boot deduplica per chiave.
+- **`inExpedition` e il rilascio** (critica r2): derivato da
+  `run.status ∉ {settled}` — nessun flag separato (coerente col contratto
+  S2.4); se non derivabile, il rilascio è **un effetto del journal** con
+  chiave, incluso nei fault point. Test dichiarato: «crash dopo l'ultimo
+  effetto, prima di `settled` → al reboot il residente è ancora
+  `inExpedition`, sbloccato dopo replay».
+- **Fault injection + fault point deterministici**: seam test-only
+  («fallisci dopo l'N-esimo effetto») per esercitare ogni confine di
+  persistenza del protocollo. Per ogni fault point: crash → riavvio →
+  replay → secondo riavvio. Invariante: **ogni effetto applicato una sola
+  volta; il recupero converge allo stesso stato finale indipendentemente
+  dal punto del crash.**
+- **Definizione di wipe — CONFERMATA Director 2026-10-09**: `wipe ⇔
+  ∀ slot assegnato: stato = morto` valutato al momento del terminale;
+  **leader morto con ≥1 sopravvissuto NON è wipe**; **obiettivo sì +
+  fuga + leader vivo → reward sì** confermato. Verificata contro la
+  matrice quest-design e citata in T-1.
+- **Tabella delle transizioni terminali** = prodotto completo delle
+  variabili (obiettivo {sì,no} × leader {vivo,morto} × uscita {fine grafo,
+  fuga, wipe} = **12 celle**, ognuna con esito o «IRRAGGIUNGIBILE perché
+  <motivo verificabile nel motore>» — nessun default implicito):
 
-| Terminazione | Run | Reward quest | Bottino | Party | POI | Ledger |
-|---|---|---|---|---|---|---|
-| Obiettivo + leader vivo | ended | sì | sì | torna | chiude | riga |
-| Obiettivo + leader morto | ended | **no** (v24 rev.2: `objectiveSatisfied && leaderReturnedAlive`) | sì | torna | chiude | riga |
-| Obiettivo fallito + fuga | ended | no | **conservato** | torna | chiude | riga |
-| Wipe | ended | no | regola config | — | chiude | riga |
-| Abbandono offerta | — | — | — | rilascio slot | chiude offerta | riga |
-| Scadenza `availableDays` | — | — | — | — | offerta scade | riga |
+| Obiettivo | Leader | Uscita | Reward quest | Bottino | POI |
+|---|---|---|---|---|---|
+| sì | vivo | fine grafo | sì | sì | chiude |
+| sì | morto | fine grafo | **no** | sì | chiude |
+| sì | vivo | fuga/ritiro | **sì** (matrice: «niente perso») | sì | chiude |
+| sì | morto | fuga/ritiro | no | conservato | chiude |
+| sì | * | wipe | IRRAGGIUNGIBILE se obiettivo sì implica fine grafo — da verificare in T-1 | — | — |
+| no | vivo | fine grafo | no | conservato | chiude |
+| no | morto | fine grafo | no | conservato | chiude |
+| no | vivo | fuga/ritiro | no | conservato | chiude |
+| no | morto | fuga/ritiro | no | conservato | chiude |
+| no | * | wipe | no | **tutto perso** | chiude |
+| Abbandono offerta (non lanciata) | — | — | — | — | offerta chiusa |
+| Scadenza `availableDays` | — | — | — | — | **solo offerte non lanciate** |
 
-  La tabella è il riferimento: nessuna semantica nuova introdotta
-  implicitamente; «riga ledger» = fatto di cronaca persistito (serve al
-  reload e al POI), non entrypoint del registro narrativo (OPEN-016, S4/S5).
+  Test dichiarato: enumerazione programmatica degli esiti terminali dei
+  grafi goblin/rovine — le celle coperte sono solo quelle raggiungibili,
+  e ogni cella irraggiungibile ha il motivo scritto. «Tutto perso» sul
+  wipe = matrice frozen, nessuna regola config (emendare la desiderata
+  se si vuole cambiare).
 
-- **Lock release**: il settlement o il ritiro rilascia `inExpedition` sui
-  superstiti.
+- **Effetti per residente** (sezione spec): per ogni stato finale (vivo /
+  ferito con durata e fonte dichiarata / morto) la mutazione esatta su
+  stato residente, `inExpedition` (rilascio), `InjuryEngine` — con chiave
+  di idempotenza; e cosa «morto» significa per roster/altri POI (non
+  eleggibile, visibile come tale — acceptance misura il dato, non «il
+  roster mostra»).
+- **Precedenza scadenza**: una volta lanciato, il run congela l'offerta —
+  `availableDays` non si applica più (coerente con D-H); vale solo per
+  offerte non lanciate. Test sul tick di scadenza concorrente al lancio e
+  su scadenza passata durante l'offline al boot.
+- **Esito nel record di settlement**: l'aftermath del POI legge l'esito
+  **dal record di settlement** — nessuno schema ledger separato
+  (critica r2: un ledger con chiave/lettura dedicati è una funzione non
+  richiesta dal contratto S2, già rimandata a OPEN-016/S4). Se un giorno
+  serve, sarà un effetto idempotente del settlement, non una fonte
+  indipendente.
+- **Gate (a) enumerativo, non trasparenza** (critica r2 — elencare i
+  mock usati prova l'onestà, non l'assenza): controllo statico in T-7 —
+  tutti i canali dell'engine consultati nei due scenari ⊆
+  {str,con,perc,agi} ∪ {int,cha dichiarati `mockChannel`}, e i
+  consumabili usati provengono dal catalogo `questItems`, non da flag;
+  altrimenti gate (a) = **NON soddisfatto** con elenco delle deroghe.
 
 ## Task
 
-- **T-1 — Spec transizioni terminali** (tabella sopra verificata contro
-  QUEST_RULES + v24 rev.2).
-- **T-2 — Settlement service idempotente** (marker `settled`, replay-once
-  al boot, verifica garanzie `PersistenceService` documentata).
-- **T-3 — Test settlement**: reload forzato **prima, durante e dopo** il
-  writeback → conseguenze una sola volta; «obiettivo fallito + leader vivo
-  + fuga» → no reward, sì bottino; wipe → regola config.
+- **T-0 — Verifica `PersistenceService`** (bloccante, output scritto).
+- **T-1 — Spec transizioni terminali** (tabella a 12 celle completa con
+  motivi di irraggiungibilità, **definizione di wipe**, effetti
+  per-residente, precedenza scadenza, esito nel record — verificata
+  contro QUEST_RULES + v24 rev.2 + matrice quest-design).
+- **T-2 — Settlement service** (journal per-effetto, seam fault injection
+  test-only).
+- **T-3 — Test settlement**: fault point deterministici con crash→replay→
+  crash; «obiettivo fallito + leader vivo + fuga» → no reward, sì bottino;
+  «obiettivo sì + fuga + leader vivo» → reward sì; wipe → tutto perso.
 - **T-4 — Secondo POI end-to-end** (rovine): stesso tubo, contenuto diverso.
-- **T-5 — E2E completo su `/game`** (entrambi i POI): POI → detail → drag →
-  send → halo → click → `QuestRunWindow` → bivio → epilogo → settlement →
-  roster mostra morto/ferito → reload a metà run → stessa frontiera.
+- **T-5 — E2E completo su `/game`** (entrambi i POI, **sequenziale** per
+  D-D): POI1 → detail → drag → send → halo → click → `QuestRunWindow` →
+  bivio → epilogo → settlement → dati residente aggiornati (morto/ferito
+  come dato, non solo visual) → **`inExpedition` rilasciato** → POI2 parte
+  dopo il settlement di POI1 → reload a metà run → stessa frontiera.
 - **T-6 — Artefatto PLAN-018** (riusa/adatta/superato/manca — contratto S2)
   + QUEST_RULES §modello aggiornato al grafo + CURRENT_STATE, INDEX,
   kanban, PLAN-019 (S2 avanzato).
@@ -78,6 +147,8 @@ calibrazione letalità numerica.
    giocatore dal roster reale.
 3. Conseguenze visibili (morti/feriti/loot) persistite una sola volta e
    sopravvivono al reload.
-4. Tutti i gate del padre valutabili: (a) no mock sui canali reali, (b)
-   proprietà preservate, (c) giudizio Director.
+4. Tutti i gate del padre valutabili: (a) **nessun mock fuori dai canali
+   dichiarati `mockChannel`** (il record di settlement elenca i canali mock
+   che hanno contribuito — il gate si legge, non si assume), (b) proprietà
+   preservate, (c) giudizio Director.
 5. Safeguard verdi + evidence log completo.
