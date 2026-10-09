@@ -18,7 +18,9 @@ import { REWARD_TIERS } from '@/balancing/config/idleVillage/quests/rewardTiers'
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import type { QuestItem } from '@/balancing/config/idleVillage/quests/questItems.schema';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
+import { QUEST_PLANNER_INFO } from '@/balancing/config/idleVillage/quests/questPlannerInfo';
 import type { PartyEstimate, ResolvedQuestOffer } from '@/ui/idleVillage/questS1Lab/questOffer';
+import type { ForecastDelta } from '@/ui/idleVillage/questS1Lab/questSimulation';
 
 const FONT = { display: 'var(--skin-font-display)', serif: 'var(--skin-font-serif)' } as const;
 
@@ -38,6 +40,12 @@ export interface QuestExpeditionDetailProps {
   /** 'computing' while a fresh sim is in flight, 'incomplete' until every
    *  required slot is filled, else the banded estimate. */
   estimate: PartyEstimate | 'computing';
+  /** Signed pp shift vs the previous party configuration (S3 T-2) —
+   *  `null` when no real previous sim exists. */
+  forecastDelta: ForecastDelta | null;
+  /** Planning intel rows: authored `previewHint`s always, `revealHint`s
+   *  when an explorer slot unlocked them (D-S3-3). */
+  intelHints: { nodeId: string; hint: string; revealed: boolean }[];
   requiredFilled: boolean;
   items: QuestItem[];
   selectedItemIds: string[];
@@ -56,6 +64,8 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   resolvePending,
   slots,
   estimate,
+  forecastDelta,
+  intelHints,
   requiredFilled,
   items,
   selectedItemIds,
@@ -69,6 +79,20 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   const { t } = useTranslation('idleVillage');
   const dangerBand = resolved ? bandById(resolved.resolvedOffer.bandIds.danger) : undefined;
   const rewardTier = resolved ? REWARD_TIERS.find((rt) => rt.id === resolved.resolvedOffer.bandIds.rewardTier) : undefined;
+  const ready = !resolvePending && typeof estimate === 'object';
+
+  /** Signed pp badge for a delta metric — `0` renders nothing (no noise). */
+  const deltaMark = (pp: number, goodWhenDown: boolean) => {
+    const v = Math.round(pp);
+    if (v === 0) return null;
+    const improves = goodWhenDown ? v < 0 : v > 0;
+    return (
+      <em style={{ fontStyle: 'normal', fontSize: 10, color: improves ? 'var(--skin-success, #7ed39a)' : 'var(--skin-danger, #e07a7a)' }}>
+        {v > 0 ? '+' : ''}
+        {v}
+      </em>
+    );
+  };
 
   return (
     <FloatingPanel
@@ -76,6 +100,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
       title={scenario?.title ?? poi.id}
       icon="⚔"
       width={520}
+      maxBodyHeight={QUEST_PLANNER_INFO.outcome.panelMaxBodyHeightPx}
       initialPosition={position}
       onClose={onClose}
     >
@@ -120,12 +145,16 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           slotSize={56}
         />
 
-        {/* Forecast — never partial numbers: 'computing' and 'incomplete'
-         *  are whole states, a stale estimate never bleeds through. */}
+        {/* OUTCOME zone (S3 T-2): aggregate → BY MEMBER → WHY inside a
+         *  scrollable analysis region — offer header, slot rack, loadout
+         *  and send stay anchored (same contract as QuestRunWindow D-7).
+         *  Never partial numbers: 'computing' and 'incomplete' are whole
+         *  states, a stale estimate never bleeds through. */}
         <div
           data-testid="quest-expedition-forecast"
           data-forecast-state={estimate === 'computing' ? 'computing' : estimate === 'incomplete' ? 'incomplete' : 'ready'}
-          style={{ borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}
+          className="quest-s1-scroll"
+          style={{ maxHeight: QUEST_PLANNER_INFO.outcome.analysisMaxHeightPx, overflowY: 'auto', borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}
         >
           <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
             {t('questExpedition.forecast.title')}
@@ -137,21 +166,92 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           {!resolvePending && estimate === 'incomplete' && (
             <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.incomplete')}</span>
           )}
-          {!resolvePending && typeof estimate === 'object' && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              <span data-testid="forecast-reward-pct">
-                <HudChip tone="ok">{t('questExpedition.forecast.reward', { pct: estimate.sim.outcomePct.reward.toFixed(0) })}</HudChip>
-              </span>
-              <span data-testid="forecast-wound-pct">
-                <HudChip tone="warn">{t('questExpedition.forecast.wound', { pct: estimate.sim.anyWoundPct.toFixed(0) })}</HudChip>
-              </span>
-              <span data-testid="forecast-death-pct">
-                <HudChip tone="danger">{t('questExpedition.forecast.death', { pct: estimate.sim.anyDeathPct.toFixed(0) })}</HudChip>
-              </span>
-              <span data-testid="forecast-wipe-pct">
-                <HudChip tone="danger">{t('questExpedition.forecast.wipe', { pct: estimate.sim.outcomePct.wipe.toFixed(0) })}</HudChip>
-              </span>
-            </div>
+          {ready && typeof estimate === 'object' && (
+            <>
+              {/* Aggregato — headline chips; the appended mark is the signed
+               *  pp shift vs the previous party configuration. */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                <span data-testid="forecast-reward-pct">
+                  <HudChip tone="ok">
+                    {t('questExpedition.forecast.reward', { pct: estimate.sim.outcomePct.reward.toFixed(0) })}
+                    {forecastDelta && deltaMark(forecastDelta.rewardPp, false)}
+                  </HudChip>
+                </span>
+                <span data-testid="forecast-wound-pct">
+                  <HudChip tone="warn">
+                    {t('questExpedition.forecast.wound', { pct: estimate.sim.anyWoundPct.toFixed(0) })}
+                    {forecastDelta && deltaMark(forecastDelta.woundPp, true)}
+                  </HudChip>
+                </span>
+                <span data-testid="forecast-death-pct">
+                  <HudChip tone="danger">
+                    {t('questExpedition.forecast.death', { pct: estimate.sim.anyDeathPct.toFixed(0) })}
+                    {forecastDelta && deltaMark(forecastDelta.deathPp, true)}
+                  </HudChip>
+                </span>
+                <span data-testid="forecast-wipe-pct">
+                  <HudChip tone="danger">
+                    {t('questExpedition.forecast.wipe', { pct: estimate.sim.outcomePct.wipe.toFixed(0) })}
+                    {forecastDelta && deltaMark(forecastDelta.wipePp, true)}
+                  </HudChip>
+                </span>
+              </div>
+
+              {/* BY MEMBER — per-member wound/death odds and expected
+               *  downtime, straight from `sim.perMember`. */}
+              <div data-testid="forecast-members" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+                  {t('questExpedition.members.title')}
+                </span>
+                {estimate.sim.perMember.map((m) => (
+                  <div key={m.id} data-testid={`forecast-member-${m.id}`} style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontFamily: FONT.serif, fontSize: 12 }}>
+                    <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: TONE.text }}>
+                      {m.name}
+                      <span style={{ color: TONE.secondary }}> · {t(`questExpedition.members.role.${m.role}`)}</span>
+                    </span>
+                    <span style={{ color: TONE.secondary, whiteSpace: 'nowrap' }}>
+                      {t('questExpedition.members.row', { wound: m.woundPct.toFixed(0), death: m.deathPct.toFixed(0) })}
+                    </span>
+                    {m.downtimeDays >= 0.5 && (
+                      <span style={{ color: TONE.secondary, whiteSpace: 'nowrap' }}>
+                        {t('questExpedition.members.downtime', { days: m.downtimeDays.toFixed(1) })}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* WHY — which authored node produced the harm, attributed
+               *  inside the sims (top-N per config; the tail collapses). */}
+              {estimate.sim.whyBySource.length > 0 && (
+                <div data-testid="forecast-why" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+                    {t('questExpedition.why.title')}
+                  </span>
+                  {estimate.sim.whyBySource.slice(0, QUEST_PLANNER_INFO.outcome.maxWhySources).map((src) => (
+                    <div key={src.source} data-testid="forecast-why-row" style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.text, lineHeight: 1.35 }}>
+                      <span style={{ color: TONE.secondary }}>«{src.source}» </span>
+                      {t('questExpedition.why.row', { runs: src.runsPct.toFixed(0), death: src.deathSharePct.toFixed(0), wound: src.woundSharePct.toFixed(0) })}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Intel — authored preview hints always; deeper hints when
+               *  the explorer slot unlocked them (revealAtPlanning). */}
+              {intelHints.length > 0 && (
+                <div data-testid="forecast-intel" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+                    {t('questExpedition.intel.title')}
+                  </span>
+                  {intelHints.map((h) => (
+                    <div key={`${h.nodeId}-${h.revealed ? 'r' : 'p'}`} data-testid="forecast-intel-row" style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.text, lineHeight: 1.35 }}>
+                      {h.revealed && <HudChip tone="ok">{t('questExpedition.intel.scouted')}</HudChip>} {h.hint}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
 

@@ -1397,6 +1397,24 @@
       "wound": "Wounds {pct}%",
       "death": "Deaths {pct}%",
       "wipe": "Wipe {pct}%"
+    },
+    "members": {
+      "title": "By member",
+      "row": "wounds {wound}% · deaths {death}%",
+      "downtime": "≈{days}d down",
+      "role": {
+        "leader": "leader",
+        "bodyguard": "guard",
+        "member": "member"
+      }
+    },
+    "why": {
+      "title": "Where the risk comes from",
+      "row": "— in {runs}% of runs · {death}% of deaths · {wound}% of wounds"
+    },
+    "intel": {
+      "title": "Intel",
+      "scouted": "scouted"
     }
   },
   "questOffer": {
