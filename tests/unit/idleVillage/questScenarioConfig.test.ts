@@ -137,7 +137,16 @@ describe('parity vs frozen oracle (git-HEAD authored)', () => {
     it(`${s.id}: migrated graph/meta is 1:1 with the pre-migration authored object`, () => {
       const oracle = readOracle(s.id);
       // `offer` is new authored content (S2.1 contract) — not part of parity.
-      expect(s.parsed.nodes).toStrictEqual(oracle.authored.nodes);
+      // `previewHint`/`revealHint` are additive planning intel (S3 T-1) —
+      // same class: stripped before the frozen-oracle comparison.
+      const stripPlanningHints = (nodes: Record<string, Record<string, unknown>>) =>
+        Object.fromEntries(
+          Object.entries(nodes).map(([id, n]) => {
+            const { previewHint: _p, revealHint: _r, ...rest } = n;
+            return [id, rest];
+          }),
+        );
+      expect(stripPlanningHints(s.parsed.nodes)).toStrictEqual(oracle.authored.nodes);
       expect(s.parsed.startNode).toBe(oracle.authored.startNode);
       expect([...s.parsed.primaryStats]).toStrictEqual(oracle.authored.primaryStats);
       if (oracle.authored.beats) {

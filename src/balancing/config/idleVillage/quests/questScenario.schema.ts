@@ -109,6 +109,20 @@ export const QuestSlotSchema = z
     role: z.string().optional(),
     emptyPenalty: QuestSlotEmptyPenaltySchema.optional(),
     residentRiskModifiers: QuestSlotResidentRiskModifiersSchema.optional(),
+    /**
+     * `revealAtPlanning` (PLAN-019-S3 D-S3-3): a member meeting the stat
+     * threshold assigned to this slot unlocks deeper authored intel
+     * (`revealHint`s) already at planning — the explorer pays now, not in-run.
+     * `reveals` restricts which nodes unlock (default: every authored one).
+     */
+    revealAtPlanning: z
+      .object({
+        stat: LabStatSchema,
+        threshold: z.number().min(0).max(100),
+        reveals: z.array(z.string()).optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 export type QuestSlotSchemaType = z.infer<typeof QuestSlotSchema>;
@@ -282,6 +296,14 @@ export const QuestNodeSchema = z
     stats: z.array(LabStatSchema).optional(),
     risk: QuestRiskSchema.optional(),
     risky: z.boolean().optional(),
+    /**
+     * Planning-visible authored danger hint (PLAN-019-S3 T-1): shown at
+     * planning always — the declared "what could go wrong" the party sees
+     * before launching.
+     */
+    previewHint: z.string().optional(),
+    /** Deeper authored hint unlocked only via `revealAtPlanning` slots. */
+    revealHint: z.string().optional(),
     combat: CombatSpecSchema.optional(),
     failHint: z.string().optional(),
     upfrontDamage: UpfrontDamageSchema.optional(),

@@ -146,6 +146,12 @@ export interface QuestNode {
   /** Check nodes: the declared state-consequence of failing — shown in the
    *  preview so the player knows what a fail *changes*, not only what it costs. */
   failHint?: string;
+  /** Planning-visible authored danger hint (PLAN-019-S3): shown at planning
+   *  always — the declared "what could go wrong" before launch. */
+  previewHint?: string;
+  /** Deeper authored hint unlocked only via `revealAtPlanning` slots (S3
+   *  D-S3-3): the explorer pays for it at planning, not in-run. */
+  revealHint?: string;
   /** Deterministic positional HP toll paid BEFORE the verdict is read — the
    *  authored price of attempting this check (e.g. goblin pursuit: the chase
    *  costs blood whatever the die says). `epicfailAmount` overrides `amount`
