@@ -50,8 +50,8 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-019-S2](PLAN-019-S2-quest-vera.md) | S2 — quest vera: 2 POI reali su /game (contenitore) | active | P1 | child of PLAN-019; R-107; gate D-A…D-K chiusi; 2 giri critica web sui figli assorbiti; battezzato 2026-10-09 |
 | [PLAN-019-S2.1](PLAN-019-S2.1-scenario-canonico.md) | Scenario canonico: schema Zod + migrazione goblin/rovine | completed | — | child of PLAN-019-S2; done 2026-10-09 — schema+migrazione+fixture+suite 30/30; evidence test-results/s21-scenario-canonico-2026-10-09.log |
 | [PLAN-019-S2.2](PLAN-019-S2.2-party-reale.md) | Party reale: pipeline stats + item + createRun | active | — | child of PLAN-019-S2; eseguibile |
-| [PLAN-019-S2.3](PLAN-019-S2.3-offerta-scaling.md) | Offerta POI: questPois + bande + resolveQuestOffer + worldScaling | active | — | child of PLAN-019-S2; sbloccato da S2.1 (2026-10-09) |
-| [PLAN-019-S2.4](PLAN-019-S2.4-planning-lancio.md) | Planning surface + lancio (D-G/D-H/D-J/D-K) | proposed | — | child of PLAN-019-S2; depends S2.1+S2.2+S2.3; T-0 spike bloccante |
+| [PLAN-019-S2.3](PLAN-019-S2.3-offerta-scaling.md) | Offerta POI: questPois + bande + resolveQuestOffer + worldScaling | completed | — | child of PLAN-019-S2; T-1…T-6 fatti, 159/159 scope; findings numeri first-pass (2026-10-10) |
+| [PLAN-019-S2.4](PLAN-019-S2.4-planning-lancio.md) | Planning surface + lancio (D-G/D-H/D-J/D-K) | active | — | child of PLAN-019-S2; sbloccato da S2.3 (2026-10-10); T-0 spike bloccante |
 | [PLAN-019-S2.5](PLAN-019-S2.5-settlement-e2e.md) | Settlement idempotente + E2E + chiusura | proposed | — | child of PLAN-019-S2; depends S2.4; T-0 verifica PersistenceService |
 | [PLAN-MOCKUP-v1](PLAN-MOCKUP-TO-COMPONENT-v1.md) | Mockup→Component v1 | superseded | — | bocciato da delibera multi-AI → v2 |
 | [PLAN-MOCKUP-v2](PLAN-MOCKUP-TO-COMPONENT-v2.md) | Mockup→Component v2 | superseded | — | cold read NO (5 blocking) → v3 |
