@@ -48,8 +48,82 @@ const QUESTS: Record<QuestId, QuestDef> = {
   },
 };
 
-/** The active quest's authored node map. */
+/* ------------------------------------------------------------------ */
+/* Scenario instances (PLAN-019-S2.3) — a run may execute a scaled copy  */
+/* of the authored nodes produced by `resolveQuestOffer`. The instance  */
+/* nodes live in a process-level registry keyed by `instanceId`; the    */
+/* run state carries only the id (cheap for `structuredClone` in Monte  */
+/* Carlo), the save payload carries the instance itself so a reloaded   */
+/* run re-registers it and never reads the current config (frozen       */
+/* values contract).                                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A scaled node map for one resolved offer. `nodes` is a deep-transformed
+ * copy of `QUESTS[questId].nodes` — never mutate it; the engine and the
+ * Monte Carlo read it exactly like the authored map.
+ */
+export interface ScenarioInstance {
+  /** Registry key — `qsi-<hash>` of the transformed content. */
+  instanceId: string;
+  questId: QuestId;
+  /** `computeScenarioVersion` of the BASE scenario the instance derives
+   *  from — provenance only; the frozen instance travels with the save. */
+  scenarioHash: string;
+  nodes: Record<string, QuestNode>;
+}
+
+const SCENARIO_INSTANCES = new Map<string, ScenarioInstance>();
+
+/** Register an instance (idempotent — same id wins the first write) and
+ *  return it. Called by `resolveQuestOffer`, `createRun`, and the reload
+ *  path that rehydrates a persisted run. */
+export function registerScenarioInstance(instance: ScenarioInstance): ScenarioInstance {
+  if (!SCENARIO_INSTANCES.has(instance.instanceId)) SCENARIO_INSTANCES.set(instance.instanceId, instance);
+  return SCENARIO_INSTANCES.get(instance.instanceId)!;
+}
+
+/** Registry lookup — `undefined` for unknown ids (callers fall back to the
+ *  authored map: a run without a registered instance is by definition a
+ *  legacy run on the base scenario — declared migration). */
+export function scenarioInstanceById(instanceId: string): ScenarioInstance | undefined {
+  return SCENARIO_INSTANCES.get(instanceId);
+}
+
+/**
+ * The resolved-offer record frozen INTO the run (PLAN-019-S2.3): every
+ * external input that produced the run's `ScenarioInstance`, so the run
+ * uses only these values — never the current config.
+ */
+export interface ResolvedOfferRecord {
+  offerSchemaVersion: number;
+  /** POI the offer came from. */
+  poiId: string;
+  /** Instance registry key the run's nodes come from. */
+  instanceId: string;
+  /** `computeScenarioVersion` of the base scenario — provenance. */
+  scenarioHash: string;
+  /** World-scaling multipliers applied to the whitelisted fields. */
+  scales: { dangerScale: number; rewardScale: number };
+  /** Derived band ids — `danger` = «hypothesis on the reference party». */
+  bandIds: { danger: string; rewardTier: string };
+  /** Signals the resolution read — `daysPlayed` fixed at resolve time. */
+  signals: { daysPlayed: number };
+  /** Nominal quest reward ALREADY resolved (integer) — the settlement pays
+   *  this, never a recomputation (S2.5). */
+  rewardResolved: number;
+  /** Day index the offer was resolved at — provenance/staleness marker. */
+  resolvedAtDay: number;
+}
+
+/** The active quest's node map: the run's ScenarioInstance when the run
+ *  was launched on one (S2.3), else the authored map (legacy/lab path —
+ *  declared migration for pre-instance runs). */
 export function nodesFor(state: QuestRunState): Record<string, QuestNode> {
+  if (state.scenarioInstanceId) {
+    const inst = SCENARIO_INSTANCES.get(state.scenarioInstanceId);
+    if (inst) return inst.nodes;
+  }
   return QUESTS[state.questId].nodes;
 }
 
@@ -152,6 +226,13 @@ export interface QuestRunState {
    *  (revisits included, e.g. the F6 loot loop). The theatre adapter renders
    *  resolved nodes from this, never from the graph (PLAN-025 T-006). */
   visitedNodes: string[];
+  /* ---- Resolved offer (PLAN-019-S2.3) -------------------------------- */
+  /** Registry key of the ScenarioInstance this run executes — absent on
+   *  legacy/lab runs (authored map, declared migration). */
+  scenarioInstanceId?: string;
+  /** The frozen resolved offer — scales, signals, reward, band ids at
+   *  launch time. The settlement reads `rewardResolved` from here (S2.5). */
+  resolvedOffer?: ResolvedOfferRecord;
 }
 
 /** A resolved check shown to the player as an astrolabe cinematic. */
@@ -644,6 +725,11 @@ export interface CreateRunInput {
   questId?: QuestId;
   loadout?: string[];
   clock?: { nodeTicks?: number; startTick?: number };
+  /** S2.3: the resolved offer's node map — registered and referenced by
+   *  `state.scenarioInstanceId`; `nodesFor` serves it for the whole run. */
+  scenarioInstance?: ScenarioInstance;
+  /** S2.3: the frozen resolved-offer record — stored verbatim in the run. */
+  resolvedOffer?: ResolvedOfferRecord;
 }
 
 /**
@@ -674,6 +760,8 @@ export function createRun(
   frontier?: { nodeTicks?: number; startTick?: number },
 ): QuestRunState {
   let input: QuestRunPartyInput | undefined;
+  let scenarioInstance: ScenarioInstance | undefined;
+  let resolvedOffer: ResolvedOfferRecord | undefined;
   if (typeof preset !== 'string' && 'party' in preset) {
     const p: QuestRunPartyInput = Array.isArray(preset.party) ? { members: preset.party } : preset.party;
     input = { members: p.members, gold: p.gold, presetId: p.presetId };
@@ -681,9 +769,12 @@ export function createRun(
     questId = preset.questId ?? 'cassa';
     loadout = preset.loadout;
     frontier = preset.clock;
+    scenarioInstance = preset.scenarioInstance;
+    resolvedOffer = preset.resolvedOffer;
   } else if (typeof preset !== 'string') {
     input = preset;
   }
+  if (scenarioInstance) registerScenarioInstance(scenarioInstance);
   const quest = QUESTS[questId];
   const found = input ? undefined : quest.presets.find((p) => p.id === (preset as string));
   const members = input ? input.members : (found ?? quest.presets[0]).members;
@@ -747,6 +838,8 @@ export function createRun(
     frontier: { status: 'waiting', startedAt: frontier?.startTick ?? 0, readyAt: frontier?.startTick ?? 0 },
     nodeTicks: frontier?.nodeTicks ?? 0,
     visitedNodes: [quest.startNode],
+    ...(scenarioInstance ? { scenarioInstanceId: scenarioInstance.instanceId } : {}),
+    ...(resolvedOffer ? { resolvedOffer } : {}),
   };
   return state;
 }

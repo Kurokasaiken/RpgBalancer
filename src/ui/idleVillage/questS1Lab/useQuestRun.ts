@@ -23,10 +23,14 @@ import {
   ENGINE_SCHEMA_VERSION,
   matureReady,
   nodesFor,
+  registerScenarioInstance,
+  scenarioInstanceById,
   submitCommand,
   useHealing as applyHealing,
+  type CreateRunInput,
   type QuestId,
   type QuestRunState,
+  type ScenarioInstance,
 } from './questRun';
 import { emptyPhase, recordAction, snapshotRun, type PhaseRecord } from './questPhaseRecord';
 import { beatMark, projectBeats, type BeatMark, type QuestBeat } from './beatSequencer';
@@ -36,11 +40,15 @@ import type { TheatreAdapter } from '@/ui/idleVillage/questTheatre/theatreContra
 
 const BAG_FLAGS: ReadonlySet<string> = new Set(QUEST_STASH.items.map((item) => item.flag));
 
-/** Persisted envelope: schema-stamped, run + phase records only. */
+/** Persisted envelope: schema-stamped, run + phase records + the frozen
+ *  ScenarioInstance the run executes (S2.3 — the save never re-reads the
+ *  current config; a payload without it is a legacy authored-map run,
+ *  declared migration). */
 interface QuestRunSave {
   engineSchemaVersion: number;
   run: QuestRunState;
   phases: PhaseRecord[];
+  scenarioInstance?: ScenarioInstance;
 }
 
 export interface QuestRunApi {
@@ -49,7 +57,10 @@ export interface QuestRunApi {
   phases: PhaseRecord[];
   /** `seed`: fixed seed for reproducible runs (playtests, bug reports).
    *  `nodeTicks`/`startTick`: the caller's clock — omitted = instant maturation. */
-  start: (presetId: string, opts?: { loadout?: string[]; seed?: number; nodeTicks?: number; startTick?: number }) => void;
+  start: (
+    presetOrInput: string | CreateRunInput,
+    opts?: { loadout?: string[]; seed?: number; nodeTicks?: number; startTick?: number },
+  ) => void;
   /** `useConsumable`: whether an armed bag item may boost the resolving check —
    *  the player's call, never a silent default (R-106 playtest). */
   choose: (optionId: string, opts?: { useConsumable?: boolean }) => void;
@@ -90,6 +101,8 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
         return;
       }
       const payload: QuestRunSave = { engineSchemaVersion: ENGINE_SCHEMA_VERSION, run: nextRun, phases: nextPhases };
+      const inst = nextRun.scenarioInstanceId ? scenarioInstanceById(nextRun.scenarioInstanceId) : undefined;
+      if (inst) payload.scenarioInstance = inst;
       void saveData(saveKey, payload);
     },
     [saveKey],
@@ -100,6 +113,10 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   useEffect(() => {
     void loadData<QuestRunSave | null>(saveKey, null).then((payload) => {
       if (payload?.engineSchemaVersion !== ENGINE_SCHEMA_VERSION || !payload.run) return;
+      /* Re-register the frozen instance BEFORE the run state lands —
+       * `nodesFor` resolves it on the next read; no instance in the payload
+       * = legacy authored-map run (declared migration). */
+      if (payload.scenarioInstance) registerScenarioInstance(payload.scenarioInstance);
       setRun(payload.run);
       setPhases(payload.phases.length ? payload.phases : [emptyPhase(beatOf(payload.run))]);
       tickRef.current = payload.run.frontier.startedAt;
@@ -111,14 +128,25 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   }, [saveKey]);
 
   const start = useCallback(
-    (presetId: string, opts?: { loadout?: string[]; seed?: number; nodeTicks?: number; startTick?: number }) => {
-      const fresh = createRun(
-        presetId,
-        opts?.seed ?? ((Date.now() ^ (Math.random() * 0xffffffff)) >>> 0),
-        questId,
-        opts?.loadout,
-        { nodeTicks: opts?.nodeTicks, startTick: opts?.startTick },
-      );
+    (
+      presetOrInput: string | CreateRunInput,
+      opts?: { loadout?: string[]; seed?: number; nodeTicks?: number; startTick?: number },
+    ) => {
+      const fresh =
+        typeof presetOrInput === 'string'
+          ? createRun(
+              presetOrInput,
+              opts?.seed ?? ((Date.now() ^ (Math.random() * 0xffffffff)) >>> 0),
+              questId,
+              opts?.loadout,
+              { nodeTicks: opts?.nodeTicks, startTick: opts?.startTick },
+            )
+          : createRun({
+              ...presetOrInput,
+              questId: presetOrInput.questId ?? questId,
+              seed: presetOrInput.seed ?? ((Date.now() ^ (Math.random() * 0xffffffff)) >>> 0),
+              clock: presetOrInput.clock ?? { nodeTicks: opts?.nodeTicks, startTick: opts?.startTick },
+            });
       if (opts?.startTick != null) tickRef.current = opts.startTick;
       const first = [emptyPhase(beatOf(fresh))];
       setRun(fresh);
