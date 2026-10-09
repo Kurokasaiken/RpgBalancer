@@ -30,6 +30,9 @@ import {
 } from '@/balancing/config/idleVillage/quests/generation/catalog';
 import { generateRaceToPass } from '@/balancing/config/idleVillage/quests/generation/raceToPass';
 
+/** Only the gara-di-avanzamento entries of the catalog (excludes other gimmicks). */
+const RACE_SCENARIOS = Object.values(GENERATED_CATALOG).filter((s) => s.id.startsWith('gen-race-'));
+
 /* ------------------------------------------------------------------ */
 /* Fixtures                                                            */
 /* ------------------------------------------------------------------ */
@@ -246,7 +249,7 @@ describe('generated run — gated options', () => {
 
 describe('generated run — race dynamics', () => {
   it('check outcomes move the race cursors on the run vars (both kits)', () => {
-    for (const scenario of Object.values(GENERATED_CATALOG)) {
+    for (const scenario of RACE_SCENARIOS) {
       const viaA = `${scenario.nodes[scenario.startNode]!.id.replace('partenza', 'via-a')}`;
       for (let seed = 1; seed <= 20; seed += 1) {
         const run = genRun(scenario, seed);
@@ -264,7 +267,7 @@ describe('generated run — race dynamics', () => {
   });
 
   it('the armed twist diverts the route to the imboscata (both kits)', () => {
-    for (const scenario of Object.values(GENERATED_CATALOG)) {
+    for (const scenario of RACE_SCENARIOS) {
       const instance = createInstance(
         scenario.id === 'gen-race-passo-montano'
           ? generateRaceToPass({ twistChance: 100 })
