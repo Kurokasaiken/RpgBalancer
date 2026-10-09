@@ -230,10 +230,27 @@ Ogni task richiede lo stato garantito dal precedente.
   Test `questRunAdapter.test.ts` 13: stesso stato → stesso snapshot, stale/
   duplicate rifiutati, pending rifiuta decisioni, useItem, armed-consumable
   end-to-end. 102/102 verdi nello scope quest.
-- **T-007 — Convergenza UI** (gate D-1). `QuestTheatre` con la vista di
-  `QuestRunWindow`, che resta montabile in parallelo fino a T-012; `/game` con
-  l'adapter reale; segnali D-6. RTL: rendering identico live/reopen; chiudi ≠
-  ritirati.
+- **T-007 — Convergenza UI (FATTO 2026-10-08/09, direzione invertita da D-F).**
+  D-F (Director 2026-10-09): **`QuestRunWindow` è il componente battezzato** —
+  il teatro converge *dentro* la finestra, non il contrario. Fatto: `useQuestRun`
+  espone `adapter` (istanza stabile, dedupe commandId sopravvive ai re-render,
+  mutazioni via `act` → fasi + persistenza oneste); `/game-frame-theatre`
+  monta `QuestTheatre` **sull'adapter reale** in parallelo (fixture fake
+  rimossi dalla rotta dev; tick driver locale 1s, `THEATRE_NODE_TICKS=3`,
+  toggle orologio in Regia); `QuestTheatre` impara `combat` (decisione +
+  telemetria turno/nemici) e `pending` (barra di maturazione, nessun input);
+  `runState.survived` + i18n en/it/pseudo. `QuestTheatre` resta montabile in
+  parallelo fino a T-012; la finestra canonica resta engine-native (più ricca:
+  verdict flavor, delta armato, tile fasi) — il contratto serve le superfici
+  parallele e la futura presentazione.
+  **Porting candidati da `QuestChronicle` (audit 2026-10-09):** (a) **lore
+  drop sbloccato a completamento** (`useQuestLoreDrop`) — payoff narrativo
+  vero, allineato al pillar delle conseguenze → T-008 o task dedicato;
+  (b) **corda/scadenza quest** — la rope di Chronicle rende il tempo che
+  *manca* (invasione goblin tra 5 giorni, R-092 «non risolta» ha un gancio
+  visivo) → T-008; (c) **tinte per tipo di fase** sulle tile (ember/jade/
+  amethyst) → T-008; (d) splash d'esito + collect gate — già coperto dal
+  rapporto di fine run, non portare il peso.
 - **T-008 — BeatSequencer.** Consuma la proiezione; skip policy; reopen
   compatto + «vai al bivio»; tetto della coda; I-2 e I-4. Test con fake timer.
 - **T-009 — CinemaFx.** Primitiva in `skins/primitives/` (letterbox, flash del

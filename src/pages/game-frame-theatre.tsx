@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
@@ -12,28 +12,25 @@ import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
 import { QuestTheatre } from '@/ui/idleVillage/questTheatre/QuestTheatre';
-import { useFakeTheatreRun } from '@/ui/idleVillage/questTheatre/fakeTheatreRuntime';
-import {
-  theatreBlockedFixture,
-  theatreDemoFixture,
-  theatreUnsupportedFixture,
-} from '@/ui/idleVillage/questTheatre/fixtures';
+import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
+import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
 
-const FIXTURES = [theatreDemoFixture, theatreBlockedFixture, theatreUnsupportedFixture];
-
-/** World-pixel position of the fake theatre POI — distinct from the real quest POI. */
+/** World-pixel position of the theatre POI — distinct from the real quest POI. */
 const THEATRE_POI = { x: 2900, y: 1250, sizePx: 64 };
+/** Local tick: one second of wall time = one tick; a maturable node breathes
+ *  for THEATRE_NODE_TICKS seconds (same pacing as the window lab). */
+const THEATRE_NODE_TICKS = 3;
 
 /**
- * `/game-frame-theatre` — QuestTheatre preview over the real Game Frame
- * surface (PLAN-021 T-004).
+ * `/game-frame-theatre` — QuestTheatre driven by the REAL quest engine
+ * (PLAN-025 T-007, D-F: the theatre converges inside `QuestRunWindow`; this
+ * route keeps it mounted in parallel on the same runtime until acceptance).
  *
  * The world runs the real session (clock, world loop, roster, real quest POI)
- * while a DISPOSABLE fake adapter drives a fixture through the theatre
- * read-model. The theatre quest has its own POI anchor with a binary
- * attention halo; closing the panel parks the run (it does not retreat).
- * Nothing here is canonical — it exists to watch the theatre over the live
- * map before S2 defines the real runtime contract.
+ * while `useQuestRun` + `createQuestRunAdapter` feed the theatre a real
+ * `TheatreRunView`: pending nodes mature on a local 1s tick, decision nodes
+ * wait, `fight-turn` plays combat. Closing the panel parks the run — it does
+ * not retreat.
  */
 export default function GameFrameTheatrePage() {
   const { worldDressing, questPois } = DEFAULT_GAME_FRAME_CONFIG;
@@ -42,20 +39,33 @@ export default function GameFrameTheatrePage() {
   const { t } = useTranslation('idleVillage');
   const [questShown, setQuestShown] = useState(false);
   const [theatreOpen, setTheatreOpen] = useState(true);
-  const [fixtureIndex, setFixtureIndex] = useState(0);
+  const [clockOn, setClockOn] = useState(true);
 
   const session = useQuestPoiSession({
     poiFlightTargetSelector: MAP_QUEST_POI_TARGET,
     initialActivityId: poi?.activityId,
   });
 
-  const fixture = FIXTURES[fixtureIndex];
-  const run = useFakeTheatreRun(fixture);
+  // Real engine: same adapter + frontier the canonical window consumes.
+  const questRun = useQuestRun('goblin');
+  const tickRef = useRef(0);
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    if (!clockOn) return;
+    const id = window.setInterval(() => {
+      tickRef.current += 1;
+      setTick(tickRef.current);
+      questRun.syncClock(tickRef.current);
+    }, 1000);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clockOn, questRun.syncClock]);
 
-  const handleDirectorReset = useCallback(() => {
-    setQuestShown(false);
-    run.reset();
-  }, [run]);
+  const snapshot = useMemo(
+    () => questRun.adapter.getSnapshot(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [questRun.adapter, questRun.run, tick],
+  );
 
   const directorActions = useMemo<DirectorAction[]>(
     () => [
@@ -66,26 +76,30 @@ export default function GameFrameTheatrePage() {
         onTrigger: () => setTheatreOpen((o) => !o),
       },
       {
-        id: 'theatre-auto',
-        label: `Auto-avanzamento: ${run.autoAdvance ? 'on' : 'off'}`,
-        active: run.autoAdvance,
-        onTrigger: () => run.setAutoAdvance(!run.autoAdvance),
+        id: 'theatre-clock',
+        label: `Orologio teatro: ${clockOn ? 'on' : 'off'}`,
+        active: clockOn,
+        onTrigger: () => setClockOn((c) => !c),
       },
-      { id: 'theatre-step', label: 'Avanza nodo temporizzato', onTrigger: run.advanceOnce },
       {
-        id: 'theatre-fixture',
-        label: `Fixture: ${fixture.id}`,
+        id: 'theatre-start',
+        label: questRun.run ? 'Riavvia quest goblin' : 'Avvia quest goblin',
         onTrigger: () => {
-          setFixtureIndex((i) => (i + 1) % FIXTURES.length);
-          run.reset();
+          questRun.clear();
+          questRun.start(GOBLIN_PRESETS[0].id, { nodeTicks: THEATRE_NODE_TICKS, startTick: tickRef.current });
         },
       },
+      { id: 'theatre-clear', label: 'Cancella run', onTrigger: questRun.clear },
       { id: 'quest', label: 'Mostra quest reale', active: questShown, onTrigger: () => setQuestShown(true) },
     ],
-    [theatreOpen, run, fixture.id, questShown],
+    [theatreOpen, clockOn, questRun.run, questRun.clear, questRun.start, questShown],
   );
 
-  const needsAttention = run.snapshot.nodes.some((n) => n.state === 'awaitingPlayer');
+  const needsAttention = snapshot.nodes.some((n) => n.state === 'awaitingPlayer');
+  const handleDirectorReset = () => {
+    setQuestShown(false);
+    questRun.clear();
+  };
 
   const anchors = useMemo<PixiMapAnchor[]>(
     () => [
@@ -146,10 +160,10 @@ export default function GameFrameTheatrePage() {
             overlaySlot={
               <>
                 {session.overlays}
-                {theatreOpen && (
+                {theatreOpen && questRun.run && (
                   <QuestTheatre
-                    snapshot={run.snapshot}
-                    dispatch={run.dispatch}
+                    snapshot={snapshot}
+                    dispatch={questRun.adapter.dispatch}
                     onClose={() => setTheatreOpen(false)}
                   />
                 )}

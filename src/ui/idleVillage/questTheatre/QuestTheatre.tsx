@@ -144,15 +144,53 @@ function StageRenderer({
     case 'timed':
     case 'consequence':
       return (
-        <p className="px-4 py-3 text-sm leading-relaxed text-slate-300" data-testid="stage-timed">
-          {node.text}
-        </p>
+        <div className="px-4 py-3" data-testid="stage-timed">
+          <p className="text-sm leading-relaxed text-slate-300">{node.text}</p>
+          {/* v2 pending frontier: the scene is on stage while it matures on
+              the caller's clock — a thin progress line, never an input. */}
+          {node.pending && snapshot.tick !== undefined && (
+            <div
+              data-testid="stage-pending-progress"
+              className="mt-2 h-0.5 overflow-hidden rounded bg-slate-800"
+              role="progressbar"
+              aria-valuemin={node.pending.startedAt}
+              aria-valuemax={node.pending.readyAt}
+              aria-valuenow={Math.min(snapshot.tick, node.pending.readyAt)}
+            >
+              <div
+                className="h-full bg-amber-500/70 transition-[width] duration-500 ease-linear"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    Math.max(
+                      0,
+                      ((snapshot.tick - node.pending.startedAt) /
+                        Math.max(1, node.pending.readyAt - node.pending.startedAt)) *
+                        100,
+                    ),
+                  )}%`,
+                }}
+              />
+            </div>
+          )}
+        </div>
       );
     case 'choice':
     case 'checkpoint':
+    case 'combat':
       return (
-        <div className="space-y-3 px-4 py-3" data-testid="stage-choice">
+        <div className="space-y-3 px-4 py-3" data-testid={node.kind === 'combat' ? 'stage-combat' : 'stage-choice'}>
           <p className="text-sm leading-relaxed text-slate-300">{node.text}</p>
+          {/* v2 combat telemetry: the horde and the turn, runtime-provided. */}
+          {node.kind === 'combat' && snapshot.combat && (
+            <p className="text-[11px] uppercase tracking-[0.14em] text-rose-300/80" data-testid="combat-telemetry">
+              {t('questTheatre.combat.telemetry', {
+                turn: snapshot.combat.turn + 1,
+                enemies: snapshot.combat.enemiesLeft,
+                defaultValue: 'Turno {{turn}} — nemici in piedi: {{enemies}}',
+              })}
+            </p>
+          )}
           <div className="space-y-2">
             {(node.options ?? []).map((option) => (
               <button

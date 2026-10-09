@@ -6,7 +6,7 @@ revised: 2026-10-09 (v2 — cold read multi-AI web r1: chatgpt + claude + grok +
 desiderata: v24 (PLAN-019, stadio S2 «la quest vera»), v27 (frontiera — già implementata in `questRun.ts`)
 request: R-107
 parent: PLAN-019 (figlio S2)
-related: PLAN-025 (teatro, attivo — coordinamento richiesto), PLAN-018 (precedente da mappare), QUEST_RULES.md, quest_theatre_spec.md
+related: PLAN-025 (teatro, attivo — coordinamento richiesto), PLAN-018 (precedente da mappare), QUEST_RULES.md, quest_theatre_spec.md, roster_drag_trusted.md + roster_slot_rack_interaction_spec.md + roster_slot_interaction_documentation.md + roster_trusted_components.md + slot_rack_spec.md + roster_slot_integration_spec.md + slot_rack_poi_interaction_spec.md (stack assegnazione — trusted/frozen), tests/e2e/idleVillage/poiQuestDetailRosterTimeClock.spec.ts (suite certificata esistente)
 ---
 
 # PLAN-019-S2 — Un paio di POI funzionanti con POI detail veri
@@ -64,6 +64,7 @@ Da registrare in `DECISION_LOG.md` e in PLAN-019.
 | D-C | Mappatura `LabStat` → stat balancer (PLAN-019 D-3) | **CHIUSA 2026-10-09** (correzione Director in sessione: *«%tohit = percezione, dodge = agilità»*): le competenze si **derivano dallo StatBlock combat reale** — `str←damage`, `con←hp`, `perc←%tohit` (`hitChance`, flat `txc` candidato), `agi←evasion` (dodge); `int` e `cha` **mockate ma dentro la stessa pipeline config-driven** (regola di derivazione in config Zod: quando il Director decide la derivazione reale si cambia solo la config); `cha` nei check usa il canale `int` («rimappa su int»). Tutte le derivazioni vivono in un'unica tabella config (`questMemberStats`). |
 | D-D | Quante quest attive | **Una spedizione alla volta** (default conforme; v27 lascia aperto il multi-teatro). |
 | D-E | Vecchio path milestone su `/game` | **Bypassato** per le quest a motore nuovo (default conforme); il kit resta vivo solo sulla superficie deprecata. Nessuna riscrittura del session hook — adapter sottile. |
+| D-G | Assegnazione party | **CHIUSA 2026-10-09** (Director: *«i pg nn devono essere pre assegnati, devono essere assegnati dal giocatore, dal roster vero… C'è tutta una documentazione specifica per l'interazione tra Roster + pgCard + slot+ slot Rack»*): nessun party pre-assegnato né preset nel percorso POI — il giocatore assegna residenti **reali** dal roster vero agli slot del POI detail tramite lo **stack trusted roster↔slot** esistente (vedi sezione dedicata). Test E2E Playwright **reali** obbligatori, non solo unit. |
 | D-F | Componente quest in corso su `/game` | **CHIUSA 2026-10-09** (Director: *«dentro la pagina /game c'è il componente quest in progress che si apre dal director, quello è il componente corretto»*): **`QuestRunWindow`** (`components/gameFrame/QuestRunWindow.tsx`) è il componente battezzato — si apre dalla Regia («Start goblin quest») e dal menu Pannelli (tasto Q). `QuestTheatre` (PLAN-021/PLAN-025) converge *dentro* `QuestRunWindow`, non il contrario (R-106 iter. 3 «un solo componente»). |
 
 ## Invarianti (verificabili)
@@ -89,6 +90,13 @@ Da registrare in `DECISION_LOG.md` e in PLAN-019.
   settlement o dal ritiro) e non eleggibili altrove finché il lock tiene.
 - **I-5 — Persistenza:** tutto via `PersistenceService`; reload a metà run
   riproduce la stessa frontiera (già vero, da non regredire).
+- **I-7 — Assegnazione sullo stack trusted:** il party è composto dal
+  giocatore via lo stack roster↔slot certificato (RT-ROSTER-001, frozen —
+  vedi sezione dedicata); nessun party pre-assegnato o preset nel percorso
+  POI, nessun sistema di drag parallelo, nessun duplicato di
+  `PgCard`/`ResidentSlotRack`/`statMatching`. Toccare il contratto di
+  runtime di questi componenti richiede l'aggiornamento dei trusted doc e di
+  `COMPONENT_MASTER_INDEX.md` (governance documentazione).
 - **I-6 — i18n e skin:** nuove stringhe in locale; nuove superfici su primitives
   e token `--skin-*`.
 
@@ -117,6 +125,41 @@ ruolo di `QuestBlueprint` nel detail. Gli scenari authored migrano da
 `questS1Lab/*.ts` a config `questScenarios.*.ts`; il registry `QUESTS` legge
 via parse. I file lab restano la sorgente della migrazione e il lab continua a
 funzionare sui preset.
+
+### Assegnazione dal roster reale (contratto trusted, D-G)
+
+Il party della quest **non è pre-assegnato**: il giocatore compone la
+spedizione trascinando (o click-to-assign) residenti reali da
+`VillageRosterSection` negli slot del POI detail. Lo slice usa lo **stack
+trusted/frozen già certificato** — non si reinventa:
+
+- **Sorgente**: `VillageRosterSection` + `PgCard` (draggable, `didDragRef`),
+  `CustomDragOverlay` (preview circolare `snapCenterToCursor`),
+  `DragContext`/`DragProvider` per lo stato drag.
+- **Target**: `ResidentSlotRack` nel POI detail (gli slot mappano i ruoli
+  quest: leader/member/bodyguard); `useResidentSlotController` per
+  assegnazione; l'assegnazione si scrive **dopo `onFlightComplete`**, non in
+  `onDragEnd`.
+- **Validazione**: `useResidentDropValidation` + `residentDropRules` +
+  `statMatching` (allOf/anyOf/noneOf) — le regole di eleggibilità quest
+  (morto/in spedizione/ferito, requisiti di slot) si esprimono come regole
+  config in questo motore, così un residente non eleggibile arriva già come
+  `compatibilityState='invalid'` (grayscale, `aria-disabled`, non
+  interattivo) come da spec congelata.
+- **Invarianti d'interazione**: `collisionDetection={pointerWithin}`,
+  sensori da `getCurrentDragConfig()`, `flagResidentAfterRejectedInteraction`
+  su drop fuori target, MIME `RESIDENT_DRAG_MIME`, versioni dnd-kit
+  congelate. Reload durante il drag = stato volatile che si ricompone dal
+  persistito (nessun salvataggio pendente).
+- **Riferimenti**: `trusted/roster_drag_trusted.md`,
+  `roster_slot_rack_interaction_spec.md`,
+  `roster_slot_interaction_documentation.md` (freeze replicabile 1:1),
+  `roster_trusted_components.md`, `slot_rack_spec.md`,
+  `roster_slot_integration_spec.md`, `slot_rack_poi_interaction_spec.md`,
+  `docs/plans/roster_slot_poi_integration.md`. Suite certificata esistente:
+  `tests/e2e/idleVillage/poiQuestDetailRosterTimeClock.spec.ts` e
+  `rosterSlotPoiIntegration.spec.ts` — i nuovi test E2E dello slice
+  **estendono questo pattern**, non inventano un harness parallelo.
 
 ## Task
 
@@ -159,17 +202,29 @@ Ogni task richiede lo stato garantito dal precedente.
   il forecast vivo per-membro resta nella schermata di assegnazione (ibrido
   già ratificato in R-105). Test: la fascia cambia al cambiare dello scenario
   o del party di riferimento.
-- **T-006 — Lancio dal POI.** Il detail della session esistente mostra offerta
-  + fascia + slot assegnati; Embark produce `PartyMember[]` reali →
-  `useQuestRun.start` → `QuestRunWindow` presenta (componente battezzato, D-F).
-  **Eleggibilità da config Zod:** residente morto/in spedizione/ferito non
-  eleggibile (malus o esclusione per regola config); ruoli obbligatori
-  (leader) validati all'Embark. All'Embark la sessione POI **rilascia** il suo
-  stato per quel POI (I-4). Chiudi ≠ ritirati resta vero; segnale bivio
-  compatibile con PLAN-025 D-6. **Contratto congelato con PLAN-025:** firma
-  `useQuestRun` + schema persistito concordati prima di questo task; se
-  `ENGINE_SCHEMA_VERSION` cambia a metà slice, migrazione versionata
-  dichiarata, non assorbita in silenzio.
+- **T-006 — Assegnazione giocatore + lancio dal POI (D-G).** Il detail della
+  session esistente monta il `ResidentSlotRack` dello stack trusted: il
+  giocatore assegna residenti **reali** dal roster via drag o click-to-assign
+  (D-G: nessun party pre-assegnato). Le regole di eleggibilità quest vivono
+  in `residentDropRules`/`statMatching` da config Zod: residente morto/in
+  spedizione/ferito → `compatibilityState='invalid'` (grayscale,
+  `aria-disabled`, drag soppresso — usa il meccanismo frozen, non una
+  guardia nuova); ruoli obbligatori (leader, bodyguard se richiesto)
+  validati, Embark disabilitato finché il party non è completo e valido.
+  All'Embark: `residentToQuestMember` → `PartyMember[]` reali →
+  `useQuestRun.start` → `QuestRunWindow` presenta (componente battezzato,
+  D-F); la sessione POI **rilascia** il suo stato per quel POI (I-4). Chiudi
+  ≠ ritirati resta vero; segnale bivio compatibile con PLAN-025 D-6.
+  **Contratto congelato con PLAN-025:** firma `useQuestRun` + schema
+  persistito concordati prima di questo task; se `ENGINE_SCHEMA_VERSION`
+  cambia a metà slice, migrazione versionata dichiarata, non assorbita in
+  silenzio. **E2E Playwright reale** (estende il pattern
+  `poiQuestDetailRosterTimeClock.spec.ts` sul percorso `/game` vero, hook
+  `__idleVillageTestHooks` dove la suite esistente li usa): bloom
+  valid/invalid sugli slot mentre si trascina una PgCard reale, residente
+  non eleggibile marcato `data-compatibility='invalid'` e non assegnabile,
+  assegnazione riflessa nel detail (`[data-resident-id]` nello slot), Embark
+  disabilitato a party incompleto.
 - **T-007 — Settlement idempotente + tabella transizioni terminali.** Il
   settlement di una spedizione è una transizione persistente **idempotente
   chiavata su `runId`**: un solo write logico applica morti (→ residenti
@@ -186,8 +241,11 @@ Ogni task richiede lo stato garantito dal precedente.
   writeback → conseguenze applicate una sola volta; caso «obiettivo fallito +
   leader vivo + fuga» → no reward di quest, sì bottino.
 - **T-008 — Secondo POI end-to-end.** Rovine: stesso tubo, contenuto diverso.
-  E2E Playwright: POI → detail → assegna → lancia → bivio → epilogo →
-  conseguenze → reload.
+  **E2E Playwright reale su `/game`** (non pagina lab): click POI → detail →
+  drag PgCard reali → Embark → `QuestRunWindow` si apre sul primo bivio →
+  scelta → run avanza → epilogo → settlement → il roster mostra il residente
+  morto/ferito → reload a metà run → stessa frontiera. Entrambi i POI
+  coperti.
 - **T-009 — Artefatto PLAN-018 + docs.** Mappatura riusa/adatta/superato/manca
   (contratto S2); QUEST_RULES §modello aggiornato al grafo; CURRENT_STATE,
   INDEX, kanban, PLAN-019 (S2 avviato).
@@ -218,8 +276,13 @@ no) · quest `cassa` reale (dipende da D-C/cha) · modifiche al balancer.
    transizioni terminali conformi alla tabella.
 4. Config-first: scenari, POI, fascia ed eleggibilità validati Zod; i18n e
    skin su tutta la nuova superficie.
-5. **Gate (c)** — giudizio del Director sulle 2 quest lanciate dai POI reali.
-6. Safeguard verdi + evidence log.
+5. **Assegnazione reale (D-G):** il party è composto dal giocatore dal roster
+   vero via stack trusted (drag/click-to-assign, eleggibilità via
+   `statMatching`); nessun preset/pre-assegnazione nel percorso POI; E2E
+   Playwright reali su `/game` coprono assegnazione → lancio → bivio →
+   epilogo → settlement → reload.
+6. **Gate (c)** — giudizio del Director sulle 2 quest lanciate dai POI reali.
+7. Safeguard verdi + evidence log.
 
 ## Disaccordi residui (critica r1)
 
