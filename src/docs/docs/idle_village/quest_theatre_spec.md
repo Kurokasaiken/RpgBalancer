@@ -160,6 +160,19 @@ altro → mostra il messaggio del runtime.
 - **I-5:** `prefersReducedMotion` → nessuna primitiva renderizza (non
   «animazione più veloce»: assenza dell'effetto).
 
+### CombatStrip (PLAN-025 T-010 — dentro `QuestRunWindow`)
+
+- Visibile solo su nodo `kind:'combat'` e run non terminata — un blocco
+  compatto sotto il teatro (D-7: nessuna superficie expanded).
+- Riga orda: pips `goblinLeft`/`combat.enemies` + `nextCombatHits` — quanti
+  colpi rispondono al prossimo turno (intento nemico dichiarato, non stimato).
+- Riga party: per ogni membro vivo `nome + micro-barra HP + esposizione%` da
+  `currentExposure` — il profilo posizionale del prossimo colpo, mai
+  ricalcolato in UI. Il più esposto in tono danger.
+- Harm beat in scena → la cella del membro colpito si marca e
+  `DamageFloater` fa salire il `-N` (canale `damageFloater` in
+  `questTheatreFx`): chi ha pagato si vede, non è una riga di testo (E7).
+
 ## Acceptance legati (PLAYWRIGHT, T-009)
 
 - Stesso snapshot → stesso render; nessun comando duplicato su reopen/re-render.

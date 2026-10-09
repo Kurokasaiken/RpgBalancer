@@ -71,6 +71,16 @@ export const QuestTheatreFxSchema = z.object({
         .prefault({}),
     })
     .prefault({}),
+
+  /** The -HP floater rising over the hit member's combat cell (T-010):
+   *  one per harm beat, keyed by beat id. */
+  damageFloater: z
+    .object({
+      enabled: z.boolean().default(true),
+      durationMs: z.number().int().min(0).default(900),
+      risePx: z.number().min(0).default(18),
+    })
+    .prefault({}),
 });
 
 export type QuestTheatreFxConfig = z.infer<typeof QuestTheatreFxSchema>;

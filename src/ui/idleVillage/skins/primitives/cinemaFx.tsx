@@ -139,6 +139,61 @@ export const TypewriterText: React.FC<TypewriterTextProps> = ({ text, charsPerSe
 };
 
 /* ------------------------------------------------------------------ */
+/* DamageFloater — the -HP rising over the hit member (T-010)          */
+/* ------------------------------------------------------------------ */
+
+export interface DamageFloaterProps {
+  /** Beat id — a new key re-fires the rise. */
+  floatKey: string;
+  /** HP lost — rendered as `-N`. */
+  amount: number;
+  /** Text/glow colour — caller passes a skin/toned value. */
+  color: string;
+  durationMs: number;
+  risePx: number;
+  reducedMotion?: boolean;
+}
+
+/** One-shot floater anchored at the top-right of its (relative) parent:
+ *  WAAPI so the element's own style resolves even in a frozen tab. */
+export const DamageFloater: React.FC<DamageFloaterProps> = ({ floatKey, amount, color, durationMs, risePx, reducedMotion }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el?.animate || reducedMotion) return undefined;
+    const anim = el.animate(
+      [
+        { transform: 'translateY(0)', opacity: 1 },
+        { transform: `translateY(-${risePx}px)`, opacity: 0 },
+      ],
+      { duration: durationMs, easing: 'ease-out', fill: 'forwards' },
+    );
+    return () => anim.cancel();
+  }, [floatKey, durationMs, risePx, reducedMotion]);
+  if (reducedMotion) return null;
+  return (
+    <span
+      ref={ref}
+      aria-hidden
+      style={{
+        position: 'absolute',
+        top: 0,
+        right: 2,
+        fontFamily: 'var(--skin-font-display)',
+        fontSize: 13,
+        fontVariantNumeric: 'tabular-nums',
+        color,
+        textShadow: `0 0 6px ${color}`,
+        pointerEvents: 'none',
+        zIndex: 3,
+      }}
+    >
+      -{amount}
+    </span>
+  );
+};
+
+/* ------------------------------------------------------------------ */
 /* fxForBeat — the configured beat→fx mapping                          */
 /* ------------------------------------------------------------------ */
 

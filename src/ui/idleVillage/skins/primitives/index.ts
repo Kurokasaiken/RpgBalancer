@@ -26,6 +26,8 @@ export {
   type EdgeFlashProps,
   TypewriterText,
   type TypewriterTextProps,
+  DamageFloater,
+  type DamageFloaterProps,
   fxForBeat,
   useBeatFx,
   prefersReducedMotion,

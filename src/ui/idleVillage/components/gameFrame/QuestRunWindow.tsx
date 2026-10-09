@@ -34,11 +34,11 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { HudPlaque, SkinScope } from '@/ui/idleVillage/skins/primitives';
-import { EdgeFlash, Letterbox, TypewriterText, prefersReducedMotion, useBeatFx, type BeatFx } from '@/ui/idleVillage/skins/primitives';
+import { DamageFloater, EdgeFlash, Letterbox, TypewriterText, prefersReducedMotion, useBeatFx, type BeatFx } from '@/ui/idleVillage/skins/primitives';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import { DEFAULT_QUEST_THEATRE_FX, type QuestTheatreFxConfig } from '@/balancing/config/idleVillage/quests/questTheatreFx';
-import { availableOptions, nodesFor, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
-import { useBeatCursor, type BeatTiming, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
+import { availableOptions, currentExposure, nextCombatHits, nodesFor, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import { useBeatCursor, type BeatTiming, type HarmBeat, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import { HudChip, LOG_TONE, SCRIM, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
@@ -287,6 +287,18 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             reducedMotion={reducedMotion}
           />
         </Theater>
+
+        {/* ── Combat legibility (T-010, E7): horde + who the goblins will most
+            likely hit — read before committing to "Combatti". The harm beat's
+            floater lands on the member's own cell. ── */}
+        {!run.ended && node?.kind === 'combat' && (
+          <CombatStrip
+            run={run}
+            hitBeat={beatCursor.current?.kind === 'harm' ? beatCursor.current : null}
+            fxConfig={DEFAULT_QUEST_THEATRE_FX}
+            reducedMotion={reducedMotion}
+          />
+        )}
 
         {/* ── What just happened: while committed beats replay, the stage shows
             one moment at a time — click anywhere on it to continue (D-8). ── */}
@@ -636,6 +648,119 @@ const RosterList: React.FC<{ run: QuestRunState }> = ({ run }) => {
         );
       })}
     </>
+  );
+};
+
+/** The combat strip (T-010, E7): two compact rows under the theater — the
+ *  horde still standing plus the hits coming back, and per living member the
+ *  chance of taking the next hit. While a harm beat is on stage the hit
+ *  member's cell marks red and the -HP floater rises on it — who paid is
+ *  visible, not buried in a line of text. One block, no expanded surface (D-7). */
+const CombatStrip: React.FC<{
+  run: QuestRunState;
+  hitBeat: HarmBeat | null;
+  fxConfig: QuestTheatreFxConfig;
+  reducedMotion: boolean;
+}> = ({ run, hitBeat, fxConfig, reducedMotion }) => {
+  const { t } = useTranslation('idleVillage');
+  const node = nodesFor(run)[run.nodeId];
+  const spec = node?.kind === 'combat' ? node.combat : null;
+  if (!spec) return null;
+  const exposure = currentExposure(run);
+  const incoming = nextCombatHits(run);
+  const maxExposure = Math.max(1, ...Object.values(exposure));
+  const alive = run.party.filter((m) => !m.dead);
+  return (
+    <div
+      data-testid="quest-combat-strip"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 5,
+        padding: '6px 8px',
+        borderRadius: 6,
+        border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
+        background: SCRIM.chipBg,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Swords aria-hidden style={{ width: 13, height: 13, color: TONE.danger }} />
+        <span data-testid="combat-enemy-pips" aria-label={t('gameFrame.questWindow.combat.enemiesLeft', { count: run.goblinLeft })} style={{ display: 'inline-flex', gap: 3 }}>
+          {Array.from({ length: spec.enemies }, (_, i) => (
+            <span
+              key={i}
+              aria-hidden
+              data-filled={i < run.goblinLeft}
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: 999,
+                background: i < run.goblinLeft ? TONE.danger : 'transparent',
+                border: `1px solid ${i < run.goblinLeft ? TONE.danger : 'color-mix(in srgb, var(--skin-text-muted) 55%, transparent)'}`,
+              }}
+            />
+          ))}
+        </span>
+        <span style={{ marginLeft: 'auto', fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.04em', color: TONE.secondary }}>
+          {t('gameFrame.questWindow.combat.incoming', { count: incoming })}
+        </span>
+      </div>
+      <div style={{ display: 'flex', gap: 6 }}>
+        {alive.map((m) => {
+          const ex = exposure[m.id] ?? 0;
+          const hit = hitBeat?.harm.memberId === m.id;
+          const hpPct = m.maxHp > 0 ? Math.max(0, m.hp) / m.maxHp : 0;
+          const hpTone = hpPct < 0.35 ? TONE.danger : m.wounded ? TONE.warn : TONE.ok;
+          return (
+            <div
+              key={m.id}
+              data-testid={`combat-member-${m.id}`}
+              title={t('gameFrame.questWindow.combat.exposureHint')}
+              style={{
+                position: 'relative',
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+                padding: '4px 6px',
+                borderRadius: 5,
+                border: `1px solid ${hit ? (hitBeat?.harm.kind === 'death' ? TONE.death : TONE.danger) : 'color-mix(in srgb, var(--skin-surface-border) 45%, transparent)'}`,
+                background: hit ? 'color-mix(in srgb, var(--skin-status-death) 14%, transparent)' : 'transparent',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 4 }}>
+                <span style={{ fontFamily: FONT.display, fontSize: 12, color: hit ? TONE.text : TONE.secondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</span>
+                <span
+                  data-testid={`combat-exposure-${m.id}`}
+                  style={{
+                    fontFamily: FONT.display,
+                    fontSize: 12,
+                    fontVariantNumeric: 'tabular-nums',
+                    color: ex >= maxExposure ? TONE.danger : TONE.muted,
+                  }}
+                >
+                  {Math.round(ex)}%
+                </span>
+              </div>
+              <span aria-hidden style={{ height: 4, borderRadius: 2, background: 'color-mix(in srgb, var(--skin-text-muted) 25%, transparent)', overflow: 'hidden' }}>
+                <span style={{ display: 'block', height: '100%', width: `${hpPct * 100}%`, background: hpTone, transition: 'width 400ms ease-out' }} />
+              </span>
+              {hit && hitBeat && (
+                <DamageFloater
+                  floatKey={hitBeat.id}
+                  amount={hitBeat.harm.amount}
+                  color={hitBeat.harm.kind === 'death' ? TONE.death : TONE.danger}
+                  durationMs={fxConfig.damageFloater.durationMs}
+                  risePx={fxConfig.damageFloater.risePx}
+                  reducedMotion={reducedMotion || !fxConfig.damageFloater.enabled}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 
