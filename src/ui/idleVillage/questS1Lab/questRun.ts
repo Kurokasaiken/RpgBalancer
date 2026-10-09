@@ -622,22 +622,74 @@ function rollCheckHarms(
 /* Engine                                                               */
 /* ------------------------------------------------------------------ */
 
-/** Create a fresh run from a preset + seed. `questId` selects the authored
- *  quest: 'cassa' (default, infiltration), 'rovine' (attrition gauntlet) or
- *  'goblin' (combat). `loadout` is the stash pick (R-102): engine flags for
- *  the consumables packed before departure — omitted = config default. */
+/** Explicit party for a run — the real-roster path (PLAN-019-S2.2 T-3).
+ *  `members` are `LabMember`-shaped (the adapter `residentToQuestMember`
+ *  produces them; `member.id` carries the residentId, the persisted lock
+ *  source of S2.4/S2.5). */
+export interface QuestRunPartyInput {
+  members: LabMember[];
+  /** Party purse for the run — defaults to 0 (preset path keeps its own
+   *  authored `gold`). */
+  gold?: number;
+  /** Recorded in `state.presetId` for provenance — defaults to 'party'. */
+  presetId?: string;
+}
+
+/** Object form of {@link createRun} (PLAN-019-S2.2 T-3): the real-roster
+ *  entry — `{party, seed, questId, loadout, clock}`. `party` is either a
+ *  {@link QuestRunPartyInput} or a bare `LabMember[]`. */
+export interface CreateRunInput {
+  party: QuestRunPartyInput | LabMember[];
+  seed: number;
+  questId?: QuestId;
+  loadout?: string[];
+  clock?: { nodeTicks?: number; startTick?: number };
+}
+
+/**
+ * Create a fresh run. Two call shapes:
+ * - `(presetId, seed, questId, loadout?, frontier?)` — lab / Monte Carlo path.
+ * - `({party, seed, questId?, loadout?, clock?})` — real-roster path: `party`
+ *   members are `LabMember`-shaped (built by `residentToQuestMember`);
+ *   `member.id` carries the residentId S2.4/S2.5 derive the expedition lock
+ *   from.
+ * `questId` selects the authored quest: 'cassa' (default, infiltration),
+ * 'rovine' (attrition gauntlet) or 'goblin' (combat). `loadout` is the stash
+ * pick (R-102) — omitted = config default. `clock`/`frontier` is the v27
+ * caller-tick schedule — omitted = instant maturation (lab, Monte Carlo).
+ */
+export function createRun(input: CreateRunInput): QuestRunState;
 export function createRun(
   presetId: string,
   seed: number,
+  questId?: QuestId,
+  loadout?: string[],
+  frontier?: { nodeTicks?: number; startTick?: number },
+): QuestRunState;
+export function createRun(
+  preset: string | CreateRunInput,
+  seed?: number,
   questId: QuestId = 'cassa',
   loadout?: string[],
-  /** v27 frontier clock: caller-tick duration per maturable node and the tick
-   *  the run starts at. Omitted = instant maturation (lab, Monte Carlo). */
   frontier?: { nodeTicks?: number; startTick?: number },
 ): QuestRunState {
+  let input: QuestRunPartyInput | undefined;
+  if (typeof preset !== 'string' && 'party' in preset) {
+    const p: QuestRunPartyInput = Array.isArray(preset.party) ? { members: preset.party } : preset.party;
+    input = { members: p.members, gold: p.gold, presetId: p.presetId };
+    seed = preset.seed;
+    questId = preset.questId ?? 'cassa';
+    loadout = preset.loadout;
+    frontier = preset.clock;
+  } else if (typeof preset !== 'string') {
+    input = preset;
+  }
   const quest = QUESTS[questId];
-  const preset = quest.presets.find((p) => p.id === presetId) ?? quest.presets[0];
-  const party: RuntimeMember[] = preset.members.map((m) => ({
+  const found = input ? undefined : quest.presets.find((p) => p.id === (preset as string));
+  const members = input ? input.members : (found ?? quest.presets[0]).members;
+  const gold = input ? (input.gold ?? 0) : (found ?? quest.presets[0]).gold;
+  const presetId = input ? (input.presetId ?? 'party') : (found ?? quest.presets[0]).id;
+  const party: RuntimeMember[] = members.map((m) => ({
     ...m,
     hp: m.hp ?? TUNE.hp,
     maxHp: m.hp ?? TUNE.hp,
@@ -660,13 +712,13 @@ export function createRun(
             firstLog: 'Partenza — obiettivo: riportare la cassa delle sementi.',
           };
   const state: QuestRunState = {
-    seed,
+    seed: seed ?? 0,
     rngCalls: 0,
     questId,
-    presetId: preset.id,
+    presetId,
     nodeId: quest.startNode,
     party,
-    gold: preset.gold,
+    gold,
     days: questId === 'rovine' ? TUNE.rovineBaseDays : 0,
     bottinoOro: 0,
     loot: [],
