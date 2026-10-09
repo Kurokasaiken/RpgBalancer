@@ -266,9 +266,18 @@ Ogni task richiede lo stato garantito dal precedente.
   motion). Fix collaterale: attesa dell'harness riscritta Node-side — la probe
   in-page compilata da tsx lanciava `__name is not defined` e sviava come
   timeout.
-- **T-009 — CinemaFx.** Primitiva in `skins/primitives/` (letterbox, flash del
-  ritratto, typewriter), config Zod `questTheatreFx`, I-5. Test: reduced
-  motion; mappa beat→fx.
+- **T-009 — CinemaFx (FATTO 2026-10-09).** `skins/primitives/cinemaFx.tsx`:
+  `Letterbox` (bande CSS-transition sul layer teatro, colore dal token
+  `--skin-hud-lacquer-deep`), `EdgeFlash` (Web Animations, keyato per beat),
+  `TypewriterText` (rivelazione per carattere); `fxForBeat` mappa il beat agli
+  effetti: letterbox solo su cambi di tono (scene harm/combat, turno di
+  combattimento = check con kills, morte, fine), flash sul verdetto del check,
+  typewriter sul body delle scene. Config Zod `quests/questTheatreFx.ts`
+  (durate, heightPct, charsPerSecond, toggle per canale e per trigger) — ogni
+  canale può essere silenziato da config. I-5: `detectCapabilities().
+  prefersReducedMotion` → nessuna primitiva renderizza nulla. I beat portano
+  `nodeKind` e `check.kills` dal sequencer. Test: `cinemaFx.test.tsx` (10:
+  mappa beat→fx, override config, reduced-motion, fake timer).
 - **T-010 — Combattimento leggibile.** Strip + orda entro il limite di T-002
   (o la forma decisa in D-7); esposizione visibile; flash e floater sul
   colpito.

@@ -34,7 +34,9 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { HudPlaque, SkinScope } from '@/ui/idleVillage/skins/primitives';
+import { EdgeFlash, Letterbox, TypewriterText, prefersReducedMotion, useBeatFx, type BeatFx } from '@/ui/idleVillage/skins/primitives';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { DEFAULT_QUEST_THEATRE_FX, type QuestTheatreFxConfig } from '@/balancing/config/idleVillage/quests/questTheatreFx';
 import { availableOptions, nodesFor, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
 import { useBeatCursor, type BeatTiming, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
@@ -120,10 +122,11 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   /* Beat replay (T-008): while committed beats are still on stage the window
    *  presents them one at a time and blocks input — the frontier has already
    *  committed, choices must not fire mid-beat. Click/Enter/Space skips. */
-  const beatCursor = useBeatCursor(queuedBeats, beatTiming, {
-    reducedMotion: typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches,
-  });
+  const reducedMotion = prefersReducedMotion();
+  const beatCursor = useBeatCursor(queuedBeats, beatTiming, { reducedMotion });
   const presenting = beatCursor.current !== null;
+  // Cinema FX (T-009): the configured beat→fx mapping for the beat on stage.
+  const beatFx = useBeatFx(beatCursor.current, DEFAULT_QUEST_THEATRE_FX);
   // Previews once per run/arming change, not per render: base and armed side by side.
   const previews = useMemo(
     () =>
@@ -272,8 +275,18 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         {/* ── Flavour: the quest's one line, above the picture ── */}
         <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.4, color: TONE.secondary }}>{flavour}</p>
 
-        {/* ── Theater — a scene beat cuts the picture to its node ── */}
-        <Theater src={artFor(beatCursor.current?.kind === 'scene' ? beatCursor.current.nodeId : run.nodeId)} caption={caption} aspect={theaterAspect} />
+        {/* ── Theater — a scene beat cuts the picture to its node; cinematic
+            beats close the letterbox over it (T-009). ── */}
+        <Theater src={artFor(beatCursor.current?.kind === 'scene' ? beatCursor.current.nodeId : run.nodeId)} caption={caption} aspect={theaterAspect}>
+          <Letterbox
+            active={presenting && beatFx.letterbox}
+            heightPct={DEFAULT_QUEST_THEATRE_FX.letterbox.heightPct}
+            inMs={DEFAULT_QUEST_THEATRE_FX.letterbox.inMs}
+            outMs={DEFAULT_QUEST_THEATRE_FX.letterbox.outMs}
+            color="var(--skin-hud-lacquer-deep)"
+            reducedMotion={reducedMotion}
+          />
+        </Theater>
 
         {/* ── What just happened: while committed beats replay, the stage shows
             one moment at a time — click anywhere on it to continue (D-8). ── */}
@@ -283,6 +296,9 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             remaining={beatCursor.remaining}
             onSkip={beatCursor.skip}
             onFlush={beatCursor.flush}
+            fx={beatFx}
+            fxConfig={DEFAULT_QUEST_THEATRE_FX}
+            reducedMotion={reducedMotion}
           />
         ) : (
         <div className="quest-s1-scroll" style={{ maxHeight: 168, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -441,13 +457,17 @@ const Line: React.FC<{ tone: keyof typeof TONE; children: React.ReactNode }> = (
 /** The stage while committed beats replay (T-008): one moment at a time.
  *  Click anywhere → next beat; «vai al bivio» drains straight to the live
  *  frontier. Deaths get the muted/dark register and a skull (D-8) — the
- *  weight is in the colour, never in a forced wait. */
-const BeatStage: React.FC<{ beat: QuestBeat; remaining: number; onSkip: () => void; onFlush: () => void }> = ({
-  beat,
-  remaining,
-  onSkip,
-  onFlush,
-}) => {
+ *  weight is in the colour, never in a forced wait. T-009 adds the cinema
+ *  accents: verdict edge flash + typewriter where the config earns them. */
+const BeatStage: React.FC<{
+  beat: QuestBeat;
+  remaining: number;
+  onSkip: () => void;
+  onFlush: () => void;
+  fx: BeatFx;
+  fxConfig: QuestTheatreFxConfig;
+  reducedMotion: boolean;
+}> = ({ beat, remaining, onSkip, onFlush, fx, fxConfig, reducedMotion }) => {
   const { t } = useTranslation('idleVillage');
   return (
     <div
@@ -461,14 +481,30 @@ const BeatStage: React.FC<{ beat: QuestBeat; remaining: number; onSkip: () => vo
           onSkip();
         }
       }}
-      style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 96, cursor: 'pointer' }}
+      style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 6, minHeight: 96, cursor: 'pointer' }}
       aria-label={t('gameFrame.questWindow.beats.continue')}
       title={t('gameFrame.questWindow.beats.continue')}
     >
+      {fx.flashTone && (
+        <EdgeFlash
+          flashKey={beat.id}
+          color={TONE[fx.flashTone as keyof typeof TONE] ?? TONE.label}
+          durationMs={fxConfig.edgeFlash.durationMs}
+          reducedMotion={reducedMotion}
+        />
+      )}
       {beat.kind === 'scene' && (
         <>
           <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>{beat.title}</span>
-          {beat.body && <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.5, color: TONE.text }}>{beat.body}</p>}
+          {beat.body && (
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.5, color: TONE.text }}>
+              {fx.typewriter === 'body' ? (
+                <TypewriterText text={beat.body} charsPerSecond={fxConfig.typewriter.charsPerSecond} textKey={beat.id} reducedMotion={reducedMotion} />
+              ) : (
+                beat.body
+              )}
+            </p>
+          )}
         </>
       )}
       {beat.kind === 'check' && (
@@ -477,7 +513,15 @@ const BeatStage: React.FC<{ beat: QuestBeat; remaining: number; onSkip: () => vo
             <HudChip tone={VERDICT_TONE[beat.check.verdict]}>{t(`questS1Lab.verdict.${beat.check.verdict}`)}</HudChip>
             <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.06em', color: TONE.secondary }}>{beat.check.title}</span>
           </div>
-          {beat.check.flavor && <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.45, color: TONE.label }}>{beat.check.flavor}</p>}
+          {beat.check.flavor && (
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.45, color: TONE.label }}>
+              {fx.typewriter === 'flavor' ? (
+                <TypewriterText text={beat.check.flavor} charsPerSecond={fxConfig.typewriter.charsPerSecond} textKey={beat.id} reducedMotion={reducedMotion} />
+              ) : (
+                beat.check.flavor
+              )}
+            </p>
+          )}
           {beat.check.authoredText && <Line tone="secondary">{beat.check.authoredText}</Line>}
         </>
       )}
@@ -596,7 +640,7 @@ const RosterList: React.FC<{ run: QuestRunState }> = ({ run }) => {
 };
 
 /** Cinema-scope picture: cross-fades on a new scene and drifts slowly (Ken Burns). */
-const Theater: React.FC<{ src?: string; caption: string; aspect: number }> = ({ src, caption, aspect }) => {
+const Theater: React.FC<{ src?: string; caption: string; aspect: number; children?: React.ReactNode }> = ({ src, caption, aspect, children }) => {
   const img = useRef<HTMLImageElement>(null);
   useEffect(() => {
     // Web Animations, not rAF: the element's own style is the end state, so a frozen
@@ -615,6 +659,7 @@ const Theater: React.FC<{ src?: string; caption: string; aspect: number }> = ({ 
       {src && <img ref={img} key={src} src={src} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 40%' }} />}
       <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 95% at 50% 40%, transparent 55%, color-mix(in srgb, var(--skin-hud-lacquer-deep) 70%, transparent))' }} />
       <div aria-hidden style={{ position: 'absolute', insetInline: 0, bottom: 0, height: '55%', background: SCRIM.bottom }} />
+      {children}
       <div style={{ position: 'absolute', left: 12, right: 12, bottom: 8, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: 'var(--skin-title-color)', textShadow: 'var(--skin-incision-label)' }}>
         {caption}
       </div>
