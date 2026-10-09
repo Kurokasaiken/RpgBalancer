@@ -1131,10 +1131,19 @@ function escalateCamp(state: QuestRunState, epicfail: boolean, reason: string): 
  * bonus. Forced checks (risveglio, epicfail→scontro) auto-spend: the party is
  * desperate and there is no preview moment to decide in.
  */
-function resolveCheck(state: QuestRunState, node: QuestNode, useConsumable = true): CheckResult {
+function resolveCheck(
+  state: QuestRunState,
+  node: QuestNode,
+  useConsumable = true,
+  forceDie?: number,
+): CheckResult {
   const stats = node.stats ?? [];
   const score = groupScore(state, stats);
-  const die = 1 + Math.floor(roll(state) * 100);
+  /* `forceDie` is the deterministic analysis seam (questCertainty probe):
+   * the verdict is fixed while every downstream consequence (harms, tolls)
+   * still rolls — production callers never pass it. The check's die draw is
+   * skipped when forced so the harm stream stays reproducible per offset. */
+  const die = forceDie ?? 1 + Math.floor(roll(state) * 100);
   // consumables: fumogeno helps agi checks, corda helps the climb
   let bonus = 0;
   const consumable = consumableBonusFor(state, node);
@@ -2287,7 +2296,7 @@ export function matureReady(state: QuestRunState, tick: number): QuestRunState {
 export function submitCommand(
   state: QuestRunState,
   optionId: string,
-  opts?: { useConsumable?: boolean; tick?: number },
+  opts?: { useConsumable?: boolean; tick?: number; forceDie?: number },
 ): QuestRunState {
   if (state.ended) return state;
   if (state.frontier.status === 'pending') return state;
@@ -2375,7 +2384,7 @@ export function submitCommand(
     state.frontierVersion += 1;
     state.visitedNodes.push(checkNode.id);
     const preMark = state.log.length;
-    const result = resolveCheck(state, checkNode, opts?.useConsumable !== false);
+    const result = resolveCheck(state, checkNode, opts?.useConsumable !== false, opts?.forceDie);
     // Only this check's lines, HARM included, and written again once the outcome
     // has applied its toll: the F5 pursuit damage lands in applyCheckOutcome, and
     // the summary must never say «no physical consequence» over it (R-106 playtest).
@@ -2421,7 +2430,7 @@ export function submitCommand(
 export function applyChoice(
   state: QuestRunState,
   optionId: string,
-  opts?: { useConsumable?: boolean },
+  opts?: { useConsumable?: boolean; forceDie?: number },
 ): QuestRunState {
   submitCommand(state, optionId, opts);
   return matureReady(state, Number.MAX_SAFE_INTEGER);

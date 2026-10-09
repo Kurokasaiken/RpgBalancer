@@ -99,10 +99,24 @@ simulazione usata è dichiarata nella UI («ipotesi: percorso X, consumabili Y»
   l'unica decisione è il destino delle superfici lab legacy, già assegnato a
   S4 dal macro-plan. `MissionPlannerLive` resta su `/primitives` (strumento
   storico) finché S4 non decide.
-- **T-1 — Modello informazione.** Schema config (Zod) `questPlannerInfo`:
-  cosa è noto a planning (primaria fasi, `previewHint` authored su pericoli),
-  certezza per check (funzione `certainChecks(scenario)` pura, testata sul
-  grafo goblin+rovine), meccanica `revealAtPlanning` opzionale.
+- **T-1 — Modello informazione (FATTO 2026-10-09).** Schema config (Zod)
+  `questPlannerInfo` (`QUEST_PLANNER_INFO`): budget probe + cap hint +
+  switch `revealAtPlanning`. Schema scenario: `previewHint`/`revealHint` sui
+  nodi, `revealAtPlanning {stat, threshold, reveals?}` sugli slot — authored
+  su goblin (esploratore perc≥60; hint su combattimento/incalza/cerca/
+  agguato). `questCertainty.ts`: `certainChecks` = dominanza-per-rimozione
+  sul grafo nodo→nodo **estratto dal motore reale** (BFS su stati astratti;
+  opzioni check espanse per OGNI dado via seam `forceDie` in `submitCommand`
+  → copertura verdetti esatta, routing legacy e `verdictTable` inclusi;
+  conservativo: edge mancante = certezza negata, mai falsa). `planningHints`
+  + `memberReveals` per la meccanica reveal. Test 10/10: matrice piano
+  (lineare/ramificato/dead-end/ciclo/checkpoint/split-verdict) + goblin/
+  rovine reali. **Finding strutturale: goblin ha ZERO check certi** — ogni
+  check sta su un ramo evitabile (approcci alternativi + ritirate) → il
+  pannello «check certi» sarà vuoto su questa quest; rovine ha `rv-fiume`.
+  Segnale per T-4: la preview numerica per-check si accende solo dove la
+  struttura la giustifica — coerente col vincolo «niente numeri dove manca
+  il modello».
 - **T-2 — OUTCOME zone nel detail.** BY MEMBER (per-slot da
   `sim.perMember`), delta vs configurazione precedente, WHY con contributi
   per sorgente. Reversibilità esatta: test `A→A+PG→A+PG+item→A` → stesso
