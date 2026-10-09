@@ -306,8 +306,11 @@ Ogni task richiede lo stato garantito dal precedente.
   decisione del Director. Gate umano A (morte su seed E1) ancora aperto.
   Evidence: `test-results/t011-quest-theatre-acceptance-2026-10-10.log` +
   `test-results/t011/`.
-- **T-012 — Rimozione di `QuestRunWindow`** (dopo l'acceptance 1–5,
-  reversibile fino a qui).
+- **T-012 — Rimozione del montaggio parallelo** (dopo l'acceptance 1–5,
+  reversibile fino a qui). Direzione D-F: `QuestRunWindow` **resta** il
+  componente canonico — si rimuove la superficie dev `QuestTheatre` su
+  `/game-frame-theatre` (o si retrocede a puro strumento Regia senza run
+  proprio), non la finestra.
 
 ## Fuori scope
 
@@ -316,7 +319,7 @@ segnalino animato sulla mappa · arte (E10) · letalità (R-105) · audio.
 
 ## Acceptance
 
-1. Un solo componente monta la quest in corso su `/game` (dopo T-012, `QuestRunWindow` non esiste più).
+1. Un solo componente monta la quest in corso su `/game`: `QuestRunWindow` (battezzato, D-F). Dopo T-012 non esiste più la superficie parallela `QuestTheatre`/`/game-frame-theatre`.
 2. I-1…I-5 coperti da test, **incluso lo scenario A→B→CHOICE→C→CHECK→D**.
 3. **Seed E1:** 3 morti presentate in sequenza, ciascuna leggibile secondo D-8, nessun input ignorato oltre la soglia anti doppio-click.
 4. **Budget:** overhead e mediana entro le percentuali fissate in T-003; 0 righe duplicate; reopen dopo N fasi maturate → bivio raggiunto senza attese.

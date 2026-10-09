@@ -240,7 +240,7 @@ Già assorbito da PLAN-025 (T-004…T-011):
   reale (finding T-002 risolto: trail serializzato nel dominio).
 - **Integration Gate (T-008 qui)**: di fatto anticipata per la quest goblin
   (D-1) — il montaggio canonico è `QuestRunWindow` su `/game`; `QuestTheatre`
-  resta la vista dev/Regia. Rimozione definitiva del componente unico → PLAN-025
+  resta la vista dev/Regia. La rimozione della superficie parallela → PLAN-025
   T-012, gated sull'acceptance Director (budget no-skip + gate umano A aperti).
 
 Resta fuori/scoperto: Playwright `questTheatre.spec.ts`, hosting dei kit check/
