@@ -81,6 +81,8 @@ storia emergente. Le **regole meccaniche** di risoluzione restano in
   - separazione **struttura/flavor**: lo scheletro meccanico si riveste di
     un flavor (Horror Soprannaturale → spedizione in montagna, stessa
     macchina) — concretizza la separazione Situation/Context;
+  - specchietto riassuntivo consolidato della conversazione di generazione:
+    `context/QUEST_GENERATION_SPEC.md` (living doc);
   - pipeline: (1) *intenzione narrativa* (chi vuole cosa, chi si oppone,
     posta in gioco, info da scoprire) → (2) *catena causale* per primitiva
     (azioni che nascono dalle precedenti) → (3) *render* del grafo in testo

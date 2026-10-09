@@ -1027,7 +1027,7 @@ function App() {
     );
   }
 
-  if (isGameFramePixiPath || isGamePath) {
+  if (isGameFramePixiPath || isGamePath || isRootPath) {
     return (
       <ErrorBoundary componentName="Game Frame Pixi Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Game Frame (Pixi)...</div>}>

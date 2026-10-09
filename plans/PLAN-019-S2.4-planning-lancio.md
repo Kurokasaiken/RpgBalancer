@@ -1,8 +1,45 @@
 ---
 title: 'PLAN-019-S2.4 — Planning surface + lancio: detail viva, assegnazione trusted, Invia spedizione, halo, routing'
-status: proposed
+status: active
 created: 2026-10-09
 revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: 2× MAJOR → assorbito; run `…/s2.4/r2/`. D-K riformulata su semantica percorso-effettivo — da ratificare Director)
+
+## Stato implementazione (2026-10-09, sessione esecutiva)
+
+- **T-0 fatto**: `questS1Lab/questSchedule.ts` — layer read-only sopra `matureReady`
+  (`questElapsedTicks`, `questDurationTicks` con durata viva D-K, `questHaloProgress`
+  con stati `filling`/`pieno-in-attesa`/`concluso`, `phaseTileBeats`).
+  Motore invariato (I-3 intatto). Test: `questSchedule.test.ts` 6/6.
+- **T-1 fatto**: `balancing/…/questEligibility.ts` (config Zod: injured ammessi,
+  dead/away/exhausted fuori) + `questS1Lab/questEligibility.ts`
+  (`questResidentEligibility`, `residentInExpedition` — lock derivato da
+  `run.party[].id`). Test: `questEligibility.test.ts` 12/12.
+  Estensioni trusted: `useResidentSlotController` ora espone `customValidator` +
+  `dropStateResolver` (contratto rack invariato).
+- **T-2 fatto**: `quests/useQuestExpeditionSession.tsx` (session per POI: offer
+  risolta una volta all'apertura + cache per giorno, slot POI-scoped
+  `${poi.id}:${slot.id}`, forecast `estimateForPartyAsync` chunked+abortable,
+  `QUEST_PLANNING` config: 400 run × chunk 100, debounce 150 ms) +
+  `quests/QuestExpeditionDetail.tsx` (FloatingPanel + ResidentSlotRack trusted,
+  bande/tier/durata da offerta risolta, forecast a stati onesti, loadout stash,
+  send gated). `simulateQuestAsync` in `questSimulation.ts` — stesso accumulator
+  del sync, chunk su macrotask, AbortSignal. Parità testata:
+  `questSimAsync.test.ts` 5/5 (bit-identico, abort).
+- **T-3 fatto**: `quests/questExpedition.ts::buildExpeditionParty` — ri-validazione
+  al write boundary (slot required + eleggibilità ogni membro + lock union su
+  tutti i run attivi); `send()` latched (`sendingRef`) → `questRun.start` con
+  `scenarioInstance`+`resolvedOffer` congelati. Test: `questExpedition.test.ts` 9/9.
+- **T-4 parziale**: halo `questHaloProgress` su `MapQuestPoi` (shape strutturale
+  `MapQuestPoiSessionShape` — serve sia la session mock sia `poiView` reale);
+  click POI → detail (offerta) o `QuestRunWindow` (run attivo) via
+  `openRunWindow(questId)`; label tempo finestra su halo vivo. **Manca**: badge
+  bivio binario sul POI (proposta D-H-4 — `poiView` espone `haloStatus`,
+  `MapQuestPoi` non lo consuma ancora).
+- **T-5**: hook `__idleVillageTestHooks.expedition[poiId]` esposti dalla session
+  (openDetail/send/assignToSlot/getEstimate/getResolvedOffer/getRun/getHalo +
+  tick advance); spec E2E da scrivere.
+- i18n: `questExpedition.*`, `questOffer.band.*`, `questOffer.tier.*`,
+  `gameFrame.questWindow.ticks` aggiunti (it-IT, en).
 desiderata: v24 (PLAN-019, stadio S2), v27 (frontiera), D-G (assegnazione giocatore), D-H (planning surface), D-J (halo elapsed), D-K (gating nodi a schedule + caricamento finestra) — Director 2026-10-09
 request: R-107
 parent: PLAN-019-S2 (figlio 4/5)

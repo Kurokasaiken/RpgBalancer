@@ -1,0 +1,96 @@
+
+##### REGRET PROBE (variant B, policy stop4, party=default, N=2000)
+decisions probed: 2000
+continue better: 568 (28.4%) | stop better (regret opportunity): 1325 (66.3%) | tie 107
+Illustrative regret cases (continue was reasonable, stop would have won):
+  seed 2 turn 4 pile 0g → continue: 58g/3d (reward) | stop: 50g/2d (reward)
+  seed 3 turn 4 pile 8g → continue: 50g/2d (reward) | stop: 58g/1d (reward)
+  seed 5 turn 4 pile 16g → continue: 74g/2d (reward) | stop: 66g/1d (reward)
+  seed 8 turn 4 pile 0g → continue: 54g/2d (reward) | stop: 50g/1d (reward)
+  seed 9 turn 4 pile 24g → continue: 50g/1d (reward) | stop: 74g/0d (reward)
+Counterfactual cases (continue paid off):
+  seed 4 turn 4 pile 8g → continue: 66g/1d (reward) | stop: 58g/1d (reward)
+  seed 6 turn 4 pile 0g → continue: 58g/3d (reward) | stop: 50g/3d (reward)
+  seed 7 turn 4 pile 0g → continue: 58g/3d (reward) | stop: 50g/3d (reward)
+  seed 12 turn 4 pile 8g → continue: 66g/3d (reward) | stop: 58g/3d (reward)
+  seed 17 turn 4 pile 8g → continue: 66g/2d (reward) | stop: 58g/2d (reward)
+
+##### REGRET PROBE (variant B, policy ev, party=default, N=2000)
+decisions probed: 2000
+continue better: 1067 (53.3%) | stop better (regret opportunity): 461 (23.1%) | tie 472
+Illustrative regret cases (continue was reasonable, stop would have won):
+  seed 2 turn 2 pile 0g → continue: 50g/2d (reward) | stop: 50g/1d (reward)
+  seed 5 turn 1 pile 0g → continue: 58g/1d (reward) | stop: 50g/0d (reward)
+  seed 6 turn 2 pile 0g → continue: 50g/3d (reward) | stop: 50g/1d (reward)
+  seed 7 turn 2 pile 0g → continue: 50g/3d (reward) | stop: 50g/1d (reward)
+  seed 8 turn 2 pile 0g → continue: 50g/1d (reward) | stop: 50g/0d (reward)
+Counterfactual cases (continue paid off):
+  seed 9 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 15 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 16 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 17 turn 2 pile 0g → continue: 58g/2d (reward) | stop: 50g/2d (reward)
+  seed 21 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+
+##### REGRET PROBE (variant B5, policy stop4, party=default, N=2000)
+decisions probed: 2000
+continue better: 568 (28.4%) | stop better (regret opportunity): 868 (43.4%) | tie 564
+Illustrative regret cases (continue was reasonable, stop would have won):
+  seed 2 turn 4 pile 0g → continue: 58g/3d (reward) | stop: 50g/2d (reward)
+  seed 3 turn 4 pile 8g → continue: 58g/2d (reward) | stop: 58g/1d (reward)
+  seed 5 turn 4 pile 16g → continue: 74g/2d (reward) | stop: 66g/1d (reward)
+  seed 8 turn 4 pile 0g → continue: 54g/2d (reward) | stop: 50g/1d (reward)
+  seed 9 turn 4 pile 24g → continue: 74g/1d (reward) | stop: 74g/0d (reward)
+Counterfactual cases (continue paid off):
+  seed 4 turn 4 pile 8g → continue: 66g/1d (reward) | stop: 58g/1d (reward)
+  seed 6 turn 4 pile 0g → continue: 58g/3d (reward) | stop: 50g/3d (reward)
+  seed 7 turn 4 pile 0g → continue: 58g/3d (reward) | stop: 50g/3d (reward)
+  seed 12 turn 4 pile 8g → continue: 66g/3d (reward) | stop: 58g/3d (reward)
+  seed 17 turn 4 pile 8g → continue: 66g/2d (reward) | stop: 58g/2d (reward)
+
+##### REGRET PROBE (variant B5, policy ev, party=default, N=2000)
+decisions probed: 2000
+continue better: 1067 (53.3%) | stop better (regret opportunity): 461 (23.1%) | tie 472
+Illustrative regret cases (continue was reasonable, stop would have won):
+  seed 2 turn 2 pile 0g → continue: 50g/2d (reward) | stop: 50g/1d (reward)
+  seed 5 turn 1 pile 0g → continue: 58g/1d (reward) | stop: 50g/0d (reward)
+  seed 6 turn 2 pile 0g → continue: 50g/3d (reward) | stop: 50g/1d (reward)
+  seed 7 turn 2 pile 0g → continue: 50g/3d (reward) | stop: 50g/1d (reward)
+  seed 8 turn 2 pile 0g → continue: 50g/1d (reward) | stop: 50g/0d (reward)
+Counterfactual cases (continue paid off):
+  seed 9 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 15 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 16 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 17 turn 2 pile 0g → continue: 58g/2d (reward) | stop: 50g/2d (reward)
+  seed 21 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+
+##### REGRET PROBE (variant BE, policy stop4, party=default, N=2000)
+decisions probed: 2000
+continue better: 292 (14.6%) | stop better (regret opportunity): 1305 (65.3%) | tie 403
+Illustrative regret cases (continue was reasonable, stop would have won):
+  seed 2 turn 4 pile 0g → continue: 58g/3d (reward) | stop: 50g/2d (reward)
+  seed 3 turn 4 pile 8g → continue: 50g/2d (reward) | stop: 58g/1d (reward)
+  seed 4 turn 4 pile 8g → continue: 50g/1d (reward) | stop: 58g/1d (reward)
+  seed 5 turn 4 pile 16g → continue: 74g/2d (reward) | stop: 66g/1d (reward)
+  seed 8 turn 4 pile 0g → continue: 54g/2d (reward) | stop: 50g/1d (reward)
+Counterfactual cases (continue paid off):
+  seed 7 turn 4 pile 0g → continue: 58g/3d (reward) | stop: 50g/3d (reward)
+  seed 27 turn 4 pile 8g → continue: 66g/1d (reward) | stop: 58g/1d (reward)
+  seed 28 turn 4 pile 0g → continue: 58g/1d (reward) | stop: 50g/1d (reward)
+  seed 32 turn 4 pile 12g → continue: 70g/1d (reward) | stop: 62g/1d (reward)
+  seed 45 turn 4 pile 16g → continue: 70g/1d (reward) | stop: 66g/1d (reward)
+
+##### REGRET PROBE (variant BE, policy ev, party=default, N=2000)
+decisions probed: 2000
+continue better: 923 (46.2%) | stop better (regret opportunity): 461 (23.1%) | tie 616
+Illustrative regret cases (continue was reasonable, stop would have won):
+  seed 2 turn 2 pile 0g → continue: 50g/2d (reward) | stop: 50g/1d (reward)
+  seed 5 turn 1 pile 0g → continue: 58g/1d (reward) | stop: 50g/0d (reward)
+  seed 6 turn 2 pile 0g → continue: 50g/3d (reward) | stop: 50g/1d (reward)
+  seed 7 turn 2 pile 0g → continue: 50g/3d (reward) | stop: 50g/1d (reward)
+  seed 8 turn 2 pile 0g → continue: 50g/1d (reward) | stop: 50g/0d (reward)
+Counterfactual cases (continue paid off):
+  seed 9 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 15 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 16 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)
+  seed 17 turn 2 pile 0g → continue: 58g/2d (reward) | stop: 50g/2d (reward)
+  seed 21 turn 1 pile 0g → continue: 58g/0d (reward) | stop: 50g/0d (reward)

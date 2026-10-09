@@ -1,0 +1,24 @@
+
+##### PARTY: default  (N=2000 per cell, seeds 1..N paired)
+BE bust=trap 6%/turn | stop2                   | E[gold]   55.5 ±0.3 | bust  9.6% | wipe  0.1% | dead m 0.82 | fruga μ2.0 | lostμ 0.9g
+                                               | dmgF6: Bruna 6.5hp | Kran 10.6hp | Milo 2.0hp | Edda 0.7hp
+BE bust=trap 6%/turn | stop4                   | E[gold]   57.4 ±0.5 | bust 39.4% | wipe  0.4% | dead m 1.64 | fruga μ4.0 | lostμ 5.2g
+                                               | dmgF6: Bruna 23.8hp | Kran 14.6hp | Edda 3.6hp | Milo 11.3hp
+BE bust=trap 6%/turn | hp40                    | E[gold]   50.1 ±0.1 | bust  0.1% | wipe  0.0% | dead m 0.28 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.0hp
+BE bust=trap 6%/turn | ev                      | E[gold]   54.2 ±0.2 | bust  4.4% | wipe  0.0% | dead m 0.62 | fruga μ1.4 | lostμ 0.3g
+                                               | dmgF6: Bruna 4.0hp | Kran 7.3hp | Milo 1.2hp | Edda 0.5hp
+BE bust=trap 6%/turn | always                  | E[gold]    7.4 ±0.4 | bust 88.3% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 22.3g
+                                               | dmgF6: Bruna 31.6hp | Kran 14.8hp | Edda 94.2hp | Milo 47.6hp
+
+##### PARTY: default  (N=2000 per cell, seeds 1..N paired)
+BE bust=trap 8%/turn | stop2                   | E[gold]   55.2 ±0.3 | bust 12.8% | wipe  0.1% | dead m 0.82 | fruga μ2.0 | lostμ 1.2g
+                                               | dmgF6: Bruna 6.5hp | Kran 10.6hp | Milo 2.0hp | Edda 0.7hp
+BE bust=trap 8%/turn | stop4                   | E[gold]   55.8 ±0.5 | bust 49.7% | wipe  0.4% | dead m 1.64 | fruga μ4.0 | lostμ 6.8g
+                                               | dmgF6: Bruna 23.8hp | Kran 14.6hp | Edda 3.6hp | Milo 11.3hp
+BE bust=trap 8%/turn | hp40                    | E[gold]   50.0 ±0.1 | bust  0.1% | wipe  0.0% | dead m 0.28 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.0hp
+BE bust=trap 8%/turn | ev                      | E[gold]   54.1 ±0.2 | bust  5.9% | wipe  0.0% | dead m 0.63 | fruga μ1.4 | lostμ 0.5g
+                                               | dmgF6: Bruna 4.0hp | Kran 7.4hp | Milo 1.2hp | Edda 0.5hp
+BE bust=trap 8%/turn | always                  | E[gold]    5.2 ±0.3 | bust 93.8% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 24.6g
+                                               | dmgF6: Bruna 31.6hp | Kran 14.8hp | Edda 94.2hp | Milo 47.6hp

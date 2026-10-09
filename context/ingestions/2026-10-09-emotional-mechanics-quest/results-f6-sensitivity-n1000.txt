@@ -1,0 +1,257 @@
+
+##### SENSITIVITY (N=1000, party=default)
+--- loot×0.8 dmg×1.0 (loot=6 dmg=5)
+A baseline | stop2                             | E[gold]   54.8 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+A baseline | stop4                             | E[gold]   59.6 ±0.6 | bust  0.0% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+A baseline | hp40                              | E[gold]   50.0 ±0.0 | bust  0.0% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+A baseline | ev                                | E[gold]   52.6 ±0.2 | bust  0.0% | wipe  0.0% | dead m 0.48 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 1.9hp | Kran 5.2hp | Milo 0.5hp | Edda 0.1hp
+A baseline | always                            | E[gold]   23.0 ±0.6 | bust  0.0% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 0.0g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B bust-on-pile (fail+epic) | stop2             | E[gold]   53.4 ±0.4 | bust 24.7% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 1.4g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+B bust-on-pile (fail+epic) | stop4             | E[gold]   53.9 ±0.6 | bust 66.6% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 5.7g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+B bust-on-pile (fail+epic) | hp40              | E[gold]   50.0 ±0.0 | bust  0.2% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+B bust-on-pile (fail+epic) | ev                | E[gold]   52.6 ±0.2 | bust  0.0% | wipe  0.0% | dead m 0.48 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 1.9hp | Kran 5.2hp | Milo 0.5hp | Edda 0.1hp
+B bust-on-pile (fail+epic) | always            | E[gold]    6.2 ±0.4 | bust 94.7% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 16.8g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B5 bust=epicfail only | stop2                  | E[gold]   54.7 ±0.4 | bust  2.1% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 0.1g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+B5 bust=epicfail only | stop4                  | E[gold]   58.9 ±0.6 | bust  8.4% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 0.7g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+B5 bust=epicfail only | hp40                   | E[gold]   50.0 ±0.0 | bust  0.0% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+B5 bust=epicfail only | ev                     | E[gold]   52.6 ±0.2 | bust  0.0% | wipe  0.0% | dead m 0.48 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 1.9hp | Kran 5.2hp | Milo 0.5hp | Edda 0.1hp
+B5 bust=epicfail only | always                 | E[gold]   19.8 ±0.7 | bust 23.8% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 3.2g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+C scav=best | stop2                            | E[gold]   53.4 ±0.4 | bust 24.7% | wipe  0.0% | dead m 0.62 | fruga μ2.0 | lostμ 1.4g
+                                               | dmgF6: Milo 12.5hp | Kran 6.1hp | Bruna 1.5hp | Edda 0.8hp
+C scav=best | stop4                            | E[gold]   54.1 ±0.6 | bust 66.2% | wipe  0.4% | dead m 1.36 | fruga μ4.0 | lostμ 5.7g
+                                               | dmgF6: Milo 37.7hp | Kran 10.8hp | Edda 3.1hp | Bruna 5.6hp
+C scav=best | hp40                             | E[gold]   50.0 ±0.0 | bust  0.3% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 0.0hp | Milo 0.2hp | Edda 0.1hp
+C scav=best | ev                               | E[gold]   52.6 ±0.2 | bust  0.0% | wipe  0.0% | dead m 0.43 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Milo 4.2hp | Kran 3.1hp | Bruna 0.4hp | Edda 0.1hp
+C scav=best | always                           | E[gold]    5.8 ±0.4 | bust 94.1% | wipe 100.0% | dead m 4.00 | fruga μ8.8 | lostμ 15.9g
+                                               | dmgF6: Milo 47.3hp | Kran 14.9hp | Edda 94.6hp | Bruna 31.7hp
+C-cover scav=best cov=tank | stop2             | E[gold]   53.3 ±0.4 | bust 24.7% | wipe  0.0% | dead m 0.61 | fruga μ2.0 | lostμ 1.4g
+                                               | dmgF6: Edda 12.7hp | Kran 6.4hp | Bruna 1.5hp | Milo 0.3hp
+C-cover scav=best cov=tank | stop4             | E[gold]   53.7 ±0.6 | bust 66.8% | wipe  0.9% | dead m 0.98 | fruga μ4.0 | lostμ 5.7g
+                                               | dmgF6: Edda 41.0hp | Kran 10.8hp | Bruna 6.1hp | Milo 2.1hp
+C-cover scav=best cov=tank | hp40              | E[gold]   50.0 ±0.1 | bust  0.5% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 0.1hp | Edda 0.6hp | Milo 0.0hp
+C-cover scav=best cov=tank | ev                | E[gold]   52.6 ±0.2 | bust  0.0% | wipe  0.0% | dead m 0.43 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Edda 4.0hp | Bruna 0.4hp | Kran 3.2hp | Milo 0.0hp
+C-cover scav=best cov=tank | always            | E[gold]    7.2 ±0.5 | bust 95.6% | wipe 100.0% | dead m 4.00 | fruga μ9.1 | lostμ 16.7g
+                                               | dmgF6: Edda 94.6hp | Kran 14.9hp | Bruna 31.7hp | Milo 47.3hp
+--- loot×1.0 dmg×1.0 (loot=8 dmg=5)
+A baseline | stop2                             | E[gold]   56.5 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+A baseline | stop4                             | E[gold]   63.1 ±0.7 | bust  0.0% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+A baseline | hp40                              | E[gold]   50.1 ±0.1 | bust  0.0% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+A baseline | ev                                | E[gold]   55.9 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.74 | fruga μ1.8 | lostμ 0.0g
+                                               | dmgF6: Bruna 5.2hp | Kran 9.4hp | Milo 1.5hp | Edda 0.5hp
+A baseline | always                            | E[gold]   30.7 ±0.8 | bust  0.0% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 0.0g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B bust-on-pile (fail+epic) | stop2             | E[gold]   54.7 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+B bust-on-pile (fail+epic) | stop4             | E[gold]   55.4 ±0.7 | bust 66.6% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 7.7g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+B bust-on-pile (fail+epic) | hp40              | E[gold]   50.0 ±0.0 | bust  0.2% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+B bust-on-pile (fail+epic) | ev                | E[gold]   54.7 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.61 | fruga μ1.4 | lostμ 0.0g
+                                               | dmgF6: Bruna 3.8hp | Kran 7.2hp | Milo 1.2hp | Edda 0.4hp
+B bust-on-pile (fail+epic) | always            | E[gold]    8.3 ±0.6 | bust 94.7% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 22.4g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B5 bust=epicfail only | stop2                  | E[gold]   56.4 ±0.4 | bust  2.1% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 0.2g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+B5 bust=epicfail only | stop4                  | E[gold]   62.2 ±0.7 | bust  8.4% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 0.9g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+B5 bust=epicfail only | hp40                   | E[gold]   50.1 ±0.1 | bust  0.0% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+B5 bust=epicfail only | ev                     | E[gold]   54.7 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.61 | fruga μ1.4 | lostμ 0.0g
+                                               | dmgF6: Bruna 3.8hp | Kran 7.2hp | Milo 1.2hp | Edda 0.4hp
+B5 bust=epicfail only | always                 | E[gold]   26.4 ±0.9 | bust 23.8% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 4.3g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+C scav=best | stop2                            | E[gold]   54.7 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.62 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Milo 12.5hp | Kran 6.1hp | Bruna 1.5hp | Edda 0.8hp
+C scav=best | stop4                            | E[gold]   55.7 ±0.7 | bust 66.2% | wipe  0.4% | dead m 1.36 | fruga μ4.0 | lostμ 7.5g
+                                               | dmgF6: Milo 37.7hp | Kran 10.8hp | Edda 3.1hp | Bruna 5.6hp
+C scav=best | hp40                             | E[gold]   50.0 ±0.0 | bust  0.3% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 0.0hp | Milo 0.2hp | Edda 0.1hp
+C scav=best | ev                               | E[gold]   55.0 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.53 | fruga μ1.5 | lostμ 0.0g
+                                               | dmgF6: Milo 8.8hp | Kran 4.6hp | Bruna 1.1hp | Edda 0.7hp
+C scav=best | always                           | E[gold]    7.8 ±0.6 | bust 94.1% | wipe 100.0% | dead m 4.00 | fruga μ8.8 | lostμ 21.2g
+                                               | dmgF6: Milo 47.3hp | Kran 14.9hp | Edda 94.6hp | Bruna 31.7hp
+C-cover scav=best cov=tank | stop2             | E[gold]   54.6 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.61 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Edda 12.7hp | Kran 6.4hp | Bruna 1.5hp | Milo 0.3hp
+C-cover scav=best cov=tank | stop4             | E[gold]   55.3 ±0.7 | bust 66.8% | wipe  0.9% | dead m 0.98 | fruga μ4.0 | lostμ 7.6g
+                                               | dmgF6: Edda 41.0hp | Kran 10.8hp | Bruna 6.1hp | Milo 2.1hp
+C-cover scav=best cov=tank | hp40              | E[gold]   50.0 ±0.2 | bust  0.5% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.1g
+                                               | dmgF6: Bruna 0.1hp | Edda 0.6hp | Milo 0.0hp
+C-cover scav=best cov=tank | ev                | E[gold]   55.1 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.52 | fruga μ1.5 | lostμ 0.0g
+                                               | dmgF6: Edda 8.7hp | Kran 4.6hp | Bruna 1.1hp | Milo 0.3hp
+C-cover scav=best cov=tank | always            | E[gold]    9.6 ±0.6 | bust 95.6% | wipe 100.0% | dead m 4.00 | fruga μ9.1 | lostμ 22.3g
+                                               | dmgF6: Edda 94.6hp | Kran 14.9hp | Bruna 31.7hp | Milo 47.3hp
+--- loot×1.25 dmg×1.0 (loot=10 dmg=5)
+A baseline | stop2                             | E[gold]   58.3 ±0.5 | bust  0.0% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+A baseline | stop4                             | E[gold]   66.6 ±0.8 | bust  0.0% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+A baseline | hp40                              | E[gold]   50.1 ±0.1 | bust  0.0% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+A baseline | ev                                | E[gold]   57.5 ±0.5 | bust  0.0% | wipe  0.0% | dead m 0.74 | fruga μ1.8 | lostμ 0.0g
+                                               | dmgF6: Bruna 5.3hp | Kran 9.4hp | Milo 1.5hp | Edda 0.6hp
+A baseline | always                            | E[gold]   38.4 ±1.0 | bust  0.0% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 0.0g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B bust-on-pile (fail+epic) | stop2             | E[gold]   55.9 ±0.6 | bust 24.7% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 2.3g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+B bust-on-pile (fail+epic) | stop4             | E[gold]   57.0 ±0.8 | bust 66.6% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 9.6g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+B bust-on-pile (fail+epic) | hp40              | E[gold]   50.0 ±0.0 | bust  0.2% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+B bust-on-pile (fail+epic) | ev                | E[gold]   55.9 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.62 | fruga μ1.4 | lostμ 0.0g
+                                               | dmgF6: Bruna 3.8hp | Kran 7.2hp | Milo 1.2hp | Edda 0.4hp
+B bust-on-pile (fail+epic) | always            | E[gold]   10.4 ±0.7 | bust 94.7% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 28.0g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B5 bust=epicfail only | stop2                  | E[gold]   58.1 ±0.5 | bust  2.1% | wipe  0.0% | dead m 0.82 | fruga μ2.0 | lostμ 0.2g
+                                               | dmgF6: Bruna 6.4hp | Kran 10.6hp | Milo 1.9hp | Edda 0.8hp
+B5 bust=epicfail only | stop4                  | E[gold]   65.5 ±0.8 | bust  8.4% | wipe  0.3% | dead m 1.62 | fruga μ4.0 | lostμ 1.1g
+                                               | dmgF6: Bruna 23.9hp | Kran 14.6hp | Edda 3.3hp | Milo 10.8hp
+B5 bust=epicfail only | hp40                   | E[gold]   50.1 ±0.1 | bust  0.0% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+B5 bust=epicfail only | ev                     | E[gold]   57.3 ±0.5 | bust  1.5% | wipe  0.0% | dead m 0.74 | fruga μ1.8 | lostμ 0.1g
+                                               | dmgF6: Bruna 5.2hp | Kran 9.4hp | Milo 1.5hp | Edda 0.6hp
+B5 bust=epicfail only | always                 | E[gold]   33.0 ±1.1 | bust 23.8% | wipe 100.0% | dead m 4.00 | fruga μ8.9 | lostμ 5.4g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+C scav=best | stop2                            | E[gold]   55.9 ±0.6 | bust 24.7% | wipe  0.0% | dead m 0.62 | fruga μ2.0 | lostμ 2.3g
+                                               | dmgF6: Milo 12.5hp | Kran 6.1hp | Bruna 1.5hp | Edda 0.8hp
+C scav=best | stop4                            | E[gold]   57.2 ±0.8 | bust 66.2% | wipe  0.4% | dead m 1.36 | fruga μ4.0 | lostμ 9.4g
+                                               | dmgF6: Milo 37.7hp | Kran 10.8hp | Edda 3.1hp | Bruna 5.6hp
+C scav=best | hp40                             | E[gold]   50.1 ±0.1 | bust  0.3% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 0.0hp | Milo 0.2hp | Edda 0.1hp
+C scav=best | ev                               | E[gold]   56.3 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.53 | fruga μ1.5 | lostμ 0.0g
+                                               | dmgF6: Milo 8.8hp | Kran 4.6hp | Bruna 1.1hp | Edda 0.7hp
+C scav=best | always                           | E[gold]    9.7 ±0.7 | bust 94.1% | wipe 100.0% | dead m 4.00 | fruga μ8.8 | lostμ 26.5g
+                                               | dmgF6: Milo 47.3hp | Kran 14.9hp | Edda 94.6hp | Bruna 31.7hp
+C-cover scav=best cov=tank | stop2             | E[gold]   55.9 ±0.6 | bust 24.7% | wipe  0.0% | dead m 0.61 | fruga μ2.0 | lostμ 2.3g
+                                               | dmgF6: Edda 12.7hp | Kran 6.4hp | Bruna 1.5hp | Milo 0.3hp
+C-cover scav=best cov=tank | stop4             | E[gold]   57.0 ±0.8 | bust 66.8% | wipe  0.9% | dead m 0.98 | fruga μ4.0 | lostμ 9.5g
+                                               | dmgF6: Edda 41.0hp | Kran 10.8hp | Bruna 6.1hp | Milo 2.1hp
+C-cover scav=best cov=tank | hp40              | E[gold]   50.0 ±0.2 | bust  0.5% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.1g
+                                               | dmgF6: Bruna 0.1hp | Edda 0.6hp | Milo 0.0hp
+C-cover scav=best cov=tank | ev                | E[gold]   56.4 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.52 | fruga μ1.5 | lostμ 0.0g
+                                               | dmgF6: Edda 8.7hp | Kran 4.6hp | Bruna 1.1hp | Milo 0.3hp
+C-cover scav=best cov=tank | always            | E[gold]   11.9 ±0.8 | bust 95.6% | wipe 100.0% | dead m 4.00 | fruga μ9.1 | lostμ 27.9g
+                                               | dmgF6: Edda 94.6hp | Kran 14.9hp | Bruna 31.7hp | Milo 47.3hp
+--- loot×1.0 dmg×0.8 (loot=8 dmg=4)
+A baseline | stop2                             | E[gold]   56.5 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.77 | fruga μ2.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 5.3hp | Kran 9.7hp | Milo 1.6hp | Edda 0.7hp
+A baseline | stop4                             | E[gold]   63.1 ±0.7 | bust  0.0% | wipe  0.3% | dead m 1.49 | fruga μ4.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 20.6hp | Kran 14.4hp | Edda 2.8hp | Milo 8.4hp
+A baseline | hp40                              | E[gold]   50.0 ±0.1 | bust  0.0% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.2hp
+A baseline | ev                                | E[gold]   56.5 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.77 | fruga μ2.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 5.3hp | Kran 9.7hp | Milo 1.6hp | Edda 0.7hp
+A baseline | always                            | E[gold]   32.9 ±0.8 | bust  0.0% | wipe 100.0% | dead m 4.00 | fruga μ9.6 | lostμ 0.0g
+                                               | dmgF6: Bruna 31.7hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B bust-on-pile (fail+epic) | stop2             | E[gold]   54.7 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.77 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Bruna 5.3hp | Kran 9.7hp | Milo 1.6hp | Edda 0.7hp
+B bust-on-pile (fail+epic) | stop4             | E[gold]   55.3 ±0.7 | bust 66.9% | wipe  0.3% | dead m 1.49 | fruga μ4.0 | lostμ 7.7g
+                                               | dmgF6: Bruna 20.6hp | Kran 14.4hp | Edda 2.8hp | Milo 8.4hp
+B bust-on-pile (fail+epic) | hp40              | E[gold]   50.0 ±0.1 | bust  0.4% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.2hp
+B bust-on-pile (fail+epic) | ev                | E[gold]   55.0 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.64 | fruga μ1.5 | lostμ 0.0g
+                                               | dmgF6: Bruna 3.8hp | Kran 7.1hp | Milo 1.3hp | Edda 0.6hp
+B bust-on-pile (fail+epic) | always            | E[gold]    8.6 ±0.6 | bust 95.9% | wipe 100.0% | dead m 4.00 | fruga μ9.6 | lostμ 24.3g
+                                               | dmgF6: Bruna 31.7hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B5 bust=epicfail only | stop2                  | E[gold]   56.4 ±0.4 | bust  2.1% | wipe  0.0% | dead m 0.77 | fruga μ2.0 | lostμ 0.2g
+                                               | dmgF6: Bruna 5.3hp | Kran 9.7hp | Milo 1.6hp | Edda 0.7hp
+B5 bust=epicfail only | stop4                  | E[gold]   62.2 ±0.7 | bust  8.5% | wipe  0.3% | dead m 1.49 | fruga μ4.0 | lostμ 0.9g
+                                               | dmgF6: Bruna 20.6hp | Kran 14.4hp | Edda 2.8hp | Milo 8.4hp
+B5 bust=epicfail only | hp40                   | E[gold]   50.0 ±0.1 | bust  0.0% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.2hp
+B5 bust=epicfail only | ev                     | E[gold]   56.1 ±0.4 | bust  1.5% | wipe  0.0% | dead m 0.75 | fruga μ1.9 | lostμ 0.1g
+                                               | dmgF6: Bruna 4.9hp | Kran 9.1hp | Milo 1.6hp | Edda 0.7hp
+B5 bust=epicfail only | always                 | E[gold]   27.7 ±1.0 | bust 27.6% | wipe 100.0% | dead m 4.00 | fruga μ9.6 | lostμ 5.2g
+                                               | dmgF6: Bruna 31.7hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+C scav=best | stop2                            | E[gold]   54.7 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.60 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Milo 10.2hp | Kran 5.8hp | Bruna 1.3hp | Edda 0.7hp
+C scav=best | stop4                            | E[gold]   55.7 ±0.7 | bust 66.2% | wipe  0.3% | dead m 1.10 | fruga μ4.0 | lostμ 7.5g
+                                               | dmgF6: Milo 31.7hp | Kran 10.4hp | Edda 2.5hp | Bruna 4.8hp
+C scav=best | hp40                             | E[gold]   50.0 ±0.1 | bust  0.4% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 0.0hp | Milo 0.2hp | Edda 0.1hp
+C scav=best | ev                               | E[gold]   55.0 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.52 | fruga μ1.5 | lostμ 0.0g
+                                               | dmgF6: Milo 7.1hp | Kran 4.3hp | Bruna 1.0hp | Edda 0.7hp
+C scav=best | always                           | E[gold]    8.0 ±0.6 | bust 96.0% | wipe 100.0% | dead m 4.00 | fruga μ9.7 | lostμ 23.9g
+                                               | dmgF6: Milo 47.3hp | Kran 14.9hp | Edda 94.6hp | Bruna 31.7hp
+C-cover scav=best cov=tank | stop2             | E[gold]   54.6 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.59 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Edda 10.3hp | Kran 6.1hp | Bruna 1.3hp | Milo 0.3hp
+C-cover scav=best cov=tank | stop4             | E[gold]   55.6 ±0.7 | bust 66.8% | wipe  0.7% | dead m 0.94 | fruga μ4.0 | lostμ 7.6g
+                                               | dmgF6: Edda 33.1hp | Kran 10.5hp | Bruna 5.0hp | Milo 2.0hp
+C-cover scav=best cov=tank | hp40              | E[gold]   50.0 ±0.2 | bust  0.8% | wipe  0.0% | dead m 0.29 | fruga μ0.0 | lostμ 0.1g
+                                               | dmgF6: Bruna 0.1hp | Edda 0.5hp | Milo 0.1hp
+C-cover scav=best cov=tank | ev                | E[gold]   55.1 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.50 | fruga μ1.5 | lostμ 0.0g
+                                               | dmgF6: Edda 7.1hp | Kran 4.4hp | Bruna 1.0hp | Milo 0.3hp
+C-cover scav=best cov=tank | always            | E[gold]    9.4 ±0.6 | bust 97.2% | wipe 100.0% | dead m 4.00 | fruga μ9.8 | lostμ 25.0g
+                                               | dmgF6: Edda 94.6hp | Kran 14.9hp | Bruna 31.7hp | Milo 47.3hp
+--- loot×1.0 dmg×1.2 (loot=8 dmg=6)
+A baseline | stop2                             | E[gold]   56.5 ±0.4 | bust  0.0% | wipe  0.0% | dead m 0.86 | fruga μ2.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 7.5hp | Kran 11.5hp | Milo 2.1hp | Edda 0.8hp
+A baseline | stop4                             | E[gold]   63.1 ±0.7 | bust  0.0% | wipe  0.5% | dead m 1.84 | fruga μ4.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 26.4hp | Kran 14.7hp | Edda 4.3hp | Milo 13.9hp
+A baseline | hp40                              | E[gold]   50.0 ±0.1 | bust  0.0% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+A baseline | ev                                | E[gold]   53.4 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.49 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 2.2hp | Kran 5.8hp | Milo 0.5hp | Edda 0.1hp
+A baseline | always                            | E[gold]   28.4 ±0.7 | bust  0.0% | wipe 100.0% | dead m 4.00 | fruga μ8.2 | lostμ 0.0g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B bust-on-pile (fail+epic) | stop2             | E[gold]   54.7 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.86 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Bruna 7.5hp | Kran 11.5hp | Milo 2.1hp | Edda 0.8hp
+B bust-on-pile (fail+epic) | stop4             | E[gold]   55.5 ±0.7 | bust 66.1% | wipe  0.5% | dead m 1.84 | fruga μ4.0 | lostμ 7.6g
+                                               | dmgF6: Bruna 26.4hp | Kran 14.7hp | Edda 4.3hp | Milo 13.9hp
+B bust-on-pile (fail+epic) | hp40              | E[gold]   50.0 ±0.1 | bust  0.2% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+B bust-on-pile (fail+epic) | ev                | E[gold]   53.4 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.49 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 2.2hp | Kran 5.8hp | Milo 0.5hp | Edda 0.1hp
+B bust-on-pile (fail+epic) | always            | E[gold]    8.9 ±0.6 | bust 93.2% | wipe 100.0% | dead m 4.00 | fruga μ8.2 | lostμ 19.5g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+B5 bust=epicfail only | stop2                  | E[gold]   56.4 ±0.4 | bust  2.1% | wipe  0.0% | dead m 0.86 | fruga μ2.0 | lostμ 0.2g
+                                               | dmgF6: Bruna 7.5hp | Kran 11.5hp | Milo 2.1hp | Edda 0.8hp
+B5 bust=epicfail only | stop4                  | E[gold]   62.3 ±0.7 | bust  8.0% | wipe  0.5% | dead m 1.84 | fruga μ4.0 | lostμ 0.8g
+                                               | dmgF6: Bruna 26.4hp | Kran 14.7hp | Edda 4.3hp | Milo 13.9hp
+B5 bust=epicfail only | hp40                   | E[gold]   50.0 ±0.1 | bust  0.0% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Milo 0.1hp | Bruna 0.1hp | Edda 0.1hp
+B5 bust=epicfail only | ev                     | E[gold]   53.4 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.49 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 2.2hp | Kran 5.8hp | Milo 0.5hp | Edda 0.1hp
+B5 bust=epicfail only | always                 | E[gold]   25.0 ±0.8 | bust 21.1% | wipe 100.0% | dead m 4.00 | fruga μ8.2 | lostμ 3.4g
+                                               | dmgF6: Bruna 31.8hp | Kran 14.9hp | Edda 94.6hp | Milo 47.3hp
+C scav=best | stop2                            | E[gold]   54.7 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.63 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Milo 14.9hp | Kran 6.4hp | Bruna 1.7hp | Edda 0.8hp
+C scav=best | stop4                            | E[gold]   55.6 ±0.7 | bust 66.2% | wipe  0.4% | dead m 1.64 | fruga μ4.0 | lostμ 7.5g
+                                               | dmgF6: Milo 41.6hp | Kran 10.8hp | Edda 5.5hp | Bruna 6.5hp
+C scav=best | hp40                             | E[gold]   50.0 ±0.1 | bust  0.3% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.0g
+                                               | dmgF6: Bruna 0.0hp | Milo 0.2hp | Edda 0.1hp
+C scav=best | ev                               | E[gold]   53.4 ±0.3 | bust  0.0% | wipe  0.0% | dead m 0.43 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Milo 5.0hp | Kran 3.3hp | Bruna 0.5hp | Edda 0.1hp
+C scav=best | always                           | E[gold]    8.0 ±0.6 | bust 91.9% | wipe 100.0% | dead m 4.00 | fruga μ8.1 | lostμ 18.9g
+                                               | dmgF6: Milo 47.3hp | Kran 14.9hp | Edda 94.6hp | Bruna 31.7hp
+C-cover scav=best cov=tank | stop2             | E[gold]   54.6 ±0.5 | bust 24.7% | wipe  0.0% | dead m 0.62 | fruga μ2.0 | lostμ 1.9g
+                                               | dmgF6: Edda 15.1hp | Kran 6.6hp | Bruna 1.7hp | Milo 0.4hp
+C-cover scav=best cov=tank | stop4             | E[gold]   55.4 ±0.7 | bust 66.5% | wipe  1.0% | dead m 1.03 | fruga μ4.0 | lostμ 7.5g
+                                               | dmgF6: Edda 48.7hp | Kran 11.1hp | Bruna 6.9hp | Milo 2.3hp
+C-cover scav=best cov=tank | hp40              | E[gold]   50.0 ±0.2 | bust  0.5% | wipe  0.1% | dead m 0.29 | fruga μ0.0 | lostμ 0.1g
+                                               | dmgF6: Bruna 0.2hp | Edda 0.5hp | Milo 0.1hp
+C-cover scav=best cov=tank | ev                | E[gold]   53.5 ±0.2 | bust  0.0% | wipe  0.0% | dead m 0.43 | fruga μ1.0 | lostμ 0.0g
+                                               | dmgF6: Edda 4.8hp | Bruna 0.5hp | Kran 3.3hp | Milo 0.0hp
+C-cover scav=best cov=tank | always            | E[gold]    9.2 ±0.6 | bust 93.5% | wipe 100.0% | dead m 4.00 | fruga μ8.2 | lostμ 19.6g
+                                               | dmgF6: Edda 94.6hp | Kran 14.9hp | Bruna 31.7hp | Milo 47.3hp

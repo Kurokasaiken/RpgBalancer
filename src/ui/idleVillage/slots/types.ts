@@ -201,6 +201,14 @@ export interface ResidentSlotControllerOptions {
   onDuplicatePlaceholder?: (slotId?: string) => void;
   /** Optional custom validator (e.g., scenario-specific rules) invoked before assignment. */
   customValidator?: (residentId: string, slotId: string) => ResidentSlotAssignResult | null;
+  /**
+   * Optional drop-state override for hover feedback. When provided, its
+   * return value replaces the built-in `computeDropStateForResident` result
+   * (`undefined` falls through to the built-in). Used by surfaces whose
+   * eligibility rules differ from the activity defaults — e.g. quest slots
+   * that admit `injured` residents (PLAN-019-S2.4 T-1).
+   */
+  dropStateResolver?: (residentId: string, slot: ResidentSlotBlueprint) => DropState | undefined;
 }
 
 /**

@@ -27,7 +27,7 @@ import {
   type ResolvedOfferRecord,
   type ScenarioInstance,
 } from './questRun';
-import { defaultStrategy, hashSimInput, simulateQuest, type QuestSimResult, type SimStrategy } from './questSimulation';
+import { defaultStrategy, hashSimInput, simulateQuest, simulateQuestAsync, type QuestSimResult, type SimStrategy } from './questSimulation';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
 import { computeScenarioVersion, type QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
@@ -219,6 +219,42 @@ export function estimateForParty(
   members: LabMember[],
   opts?: { runs?: number; seed?: number; strategy?: SimStrategy },
 ): PartyEstimate {
+  const prepared = prepareEstimateRun(resolvedOffer, members, opts);
+  if (prepared === 'incomplete') return 'incomplete';
+  const sim = simulateQuest(prepared.run, prepared.strategy, { runs: prepared.runs, seed: opts?.seed });
+  return { sim, bands: { danger: dangerBandFor(sim.anyDeathPct).id }, nSim: prepared.runs };
+}
+
+/**
+ * Async chunked variant of `estimateForParty` (S2.4 T-2): identical inputs →
+ * identical result, but the Monte Carlo is spread over `chunkRuns`-sized
+ * macrotasks so the planning surface never blocks a frame. `signal` aborts a
+ * stale estimate between chunks — rejection is the caller's «recompute».
+ */
+export async function estimateForPartyAsync(
+  resolvedOffer: ResolvedOfferRecord,
+  members: LabMember[],
+  opts?: { runs?: number; seed?: number; strategy?: SimStrategy; chunkRuns?: number; signal?: AbortSignal },
+): Promise<PartyEstimate> {
+  const prepared = prepareEstimateRun(resolvedOffer, members, opts);
+  if (prepared === 'incomplete') return 'incomplete';
+  const sim = await simulateQuestAsync(prepared.run, prepared.strategy, {
+    runs: prepared.runs,
+    seed: opts?.seed,
+    chunkRuns: opts?.chunkRuns,
+    signal: opts?.signal,
+  });
+  return { sim, bands: { danger: dangerBandFor(sim.anyDeathPct).id }, nSim: prepared.runs };
+}
+
+/** Shared estimate setup: gates completeness (required-slot count, a
+ *  `leader`, a registered instance) and builds the run + strategy the sim
+ *  consumes — the SAME `ScenarioInstance` a launched run would freeze. */
+function prepareEstimateRun(
+  resolvedOffer: ResolvedOfferRecord,
+  members: LabMember[],
+  opts?: { runs?: number; seed?: number; strategy?: SimStrategy },
+): 'incomplete' | { run: ReturnType<typeof createRun>; strategy: SimStrategy; runs: number } {
   const poi = questPoiById(resolvedOffer.poiId);
   const instance = scenarioInstanceById(resolvedOffer.instanceId);
   if (!poi || !instance) return 'incomplete';
@@ -232,9 +268,7 @@ export function estimateForParty(
     resolvedOffer,
   });
   const strategy = { ...defaultStrategy(run), ...opts?.strategy };
-  const runs = opts?.runs ?? 1000;
-  const sim = simulateQuest(run, strategy, { runs, seed: opts?.seed });
-  return { sim, bands: { danger: dangerBandFor(sim.anyDeathPct).id }, nSim: runs };
+  return { run, strategy, runs: opts?.runs ?? 1000 };
 }
 
 /** The node map an estimate/run resolved through `resolvedOffer` uses —

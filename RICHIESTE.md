@@ -2208,3 +2208,104 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - Profilazione obbligatoria su `/map-benchmark` (desiderata v2) prima di qualsiasi rollout.
 
 **Collegamenti:** desiderata v2 (budget rendering Tauri), `.mw/runs/2026-10-09-dynamic-lighting-explore/`, `src/pages/map-benchmark.tsx`, `PixiMapTune` in `src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx`.
+
+---
+
+## R-111 — Architettura di generazione quest (gimmick/scene/hook) + esperimento flavour-separation
+
+**Richiesta (verbatim):** *"classifica queste info correttamente, crea documentazione, ecc. Poi continuiamo a parlarne"* — sul trascript della conversazione esterna «Generazione quest: gimmick core, scene base, flavour».
+**Data:** 2026-10-10
+**Stato:** `in corso` — materiale classificato e documentato; discussione aperta (fase esplorativa, nessuna implementazione).
+
+**Contenuto classificato:**
+- **Architettura proposta** (PROPOSAL, non canonica): gimmick core (problema + variabili + risoluzione) → scene base (interessanti anche localmente) → hook della core (modificano costi/rischi/opzioni) → climax dipendente da core+storia. La distinzione scena/hook è concettuale.
+- **Regola del 75%**: ≥75% delle scene non finali deve interagire con la core, con 5 criteri espliciti di hook valido; quota minoritaria di scene scollegate legittima.
+- **4 proprietà della scelta vera**: trade-off, conseguenza, contesto, attribuzione.
+- **Contratti scena↔core**: scene dichiarano variabili lette/scritte e decisioni offerte; gimmick dichiara hook accettati — discendente del generatore a vincoli di R-091/OPEN-014.
+- **Esperimento flavour-separation eseguito** (grezzo): gimmick «Gara di avanzamento», 2 flavour estratti (Monastero infestato, Passo montano), stessa struttura. Finding: reskin facile, hook difficile; con +2/successo e soglia 6 le scene restano uniformi → serve modello a 3 approcci (prudente/rapido/interferenza) + MC sulle politiche.
+- Direzione concordata: **dilemma prima, calibrazione dopo**; separare P(successo scena) da P(vittoria quest).
+
+**Collegamenti:** `context/QUEST_GENERATION_ARCHITECTURE.md` (doc strutturato), `context/ingestions/2026-10-10-quest-generation-flavour-experiment.md` (trascript), R-091, OPEN-014, `context/QUEST_IMPRINTS.md` (precedente flavour-separation), R-108/R-109 (vincoli + metodo gate), `FINAL-RESOCONTO.md` (corpus emozioni).
+
+---
+
+## R-112 — Colpi di scena: twist significativi con trigger anche dai tratti PG
+
+**Richiesta (verbatim):** *"ci voglio i "colpi di scena", devono cambiare in maniera significativa la quest. Ad esempio: [...] il pg [Avido] crea una scena in + dove mette a rischio il party e la vittoria. Oppure [...] "scavezzacollo" ti blocca l'opzione di usare solo percezione e ti obbliga a fare la route + pericolosa [...] O comunque diramazioni "a prescindere", nn dobbiamo fare quest che siano solo lineari, ma devono avere anche una certa % di avere un colpo d scena da qualche parte."*
+**Data:** 2026-10-10
+**Stato:** `aperta` — direttiva registrata nel framework di generazione (R-111); nessuna implementazione autorizzata.
+
+**Decisioni/intento del Director:**
+- I colpi di scena devono **cambiare significativamente** la quest (non flavour, non +danno).
+- Trigger desiderato: **tratti caratteriali dei PG** (es. Avido, Scavezzacollo) che aggiungono scene o chiudono opzioni.
+- Le quest non devono essere lineari: **% di presenza di twist**, anche «a prescindere».
+
+**Proposte AI classificate (non ratificate):** tassonomia a 4 tipi (interferenza di personalità, deviazione obbligata, rivelazione che cambia l'obiettivo, conseguenza ritardata); decomposizione trigger→evento→impatto; casualità controllata; criterio «problema diverso dopo il twist»; percorso prototipo in 5 passi con contratto del twist come prerequisito.
+
+**Tensione da risolvere col Director:** % «a prescindere» vs R-108 «sorprese eque» — proposta di sintesi nel doc: la % sceglie *quale* twist tra quelli compatibili, i trigger restano leggibili in preview.
+
+**Collegamenti:** `context/QUEST_GENERATION_ARCHITECTURE.md` §9–10, `context/ingestions/2026-10-10-quest-colpi-di-scena.md`, R-111, R-108, OPEN-014.
+
+---
+
+## R-113 — Deepening generazione quest: contratti, assi del testo, chain quest
+
+**Richiesta (verbatim):** *"stessa cosa anche x questo nuovo trancio di conversazione"* + nel trancio la domanda Director: *"e x fare le chain quest invece? [...] Ha senso "generarla prima" la main quest? ha senso mostrare al giocatore tipo "main quest attive"?"*
+**Data:** 2026-10-10
+**Stato:** `in corso` — classificato e integrato in `QUEST_GENERATION_ARCHITECTURE.md` §13–15; discussione aperta.
+
+**Contenuto classificato:**
+- **Gap analysis** (AI): il quadro ha le idee ma non è spec implementabile — 4 deliverable prima della spec: contratti meccaniche/scene, contratto twist+ciclo di vita (compile-time rami authored → selezione a inizio run → attraversamento a stato; *il grafo non muta*), contratto domain kit+tratti (tratto = abilita / preclude / innesca), piano di validazione con soglie esplicite.
+- **Varietà strutturale** come verifica separata: distanza sulle *strutture decisionali*, non solo sul flavour.
+- **Assi del testo** (risposta ai testi incoerenti del probe): domain kit + story mode + core gimmick + narrative voice + **brief automatico per scena**; niente lista piatta («fantasy» = proprietà del mondo, non tag); test controllato un-asse-alla-volta prima di ratificare la tassonomia.
+- **Chain quest** (domanda Director): main quest = **arco persistente** che genera occasioni e reagisce agli esiti; 3 livelli di generazione (arco alla nascita / segmento quando disponibile / quest prima dell'offerta); UI a fili narrativi; problema chiave = tempo (avanzamento mondo vs disponibilità vs scadenza; ignorare ≠ perdere reward, il mondo cambia).
+
+**Collegamenti:** `context/QUEST_GENERATION_ARCHITECTURE.md` §13–15, `context/ingestions/2026-10-10-quest-generation-deepening.md`, R-111, R-112, R-091, `village_event_system_spec.md`, R-093 (registro narrativo), QUEST_IMPRINTS.md.
+---
+
+## R-114 — Specchietto riassuntivo del sistema di generazione (living doc)
+
+**Richiesta (verbatim):** *"usa questo come 'specchietto riassuntivo', linkalo nei plan dove serve, deve essere aggiornato cn informazioni e decisioni future."*
+**Data:** 2026-10-10
+**Stato:** `in corso` — specchietto salvato e linkato; manutenzione continua.
+
+**Cosa è stato fatto:**
+- `context/QUEST_GENERATION_SPEC.md` — consolidamento AI dell'intera conversazione di generazione (R-091/108/111/112/113): obiettivo, 4 livelli (generazione/narrativa/validazione/persistenza), contratti gimmick-scene-twist-tratti, modello tag a 3 assi, pipeline flavour text, validazione+simulazione, main quest persistenti, piano incrementale in 10 fasi, decisioni aperte.
+- Linkato in: `context/INDEX.md`, PLAN-019 §S5, OPEN-014, NARRATIVE.md §4, frontmatter di `QUEST_GENERATION_ARCHITECTURE.md`.
+- **Obbligo di manutenzione:** il file va aggiornato a ogni decisione nuova sulla generazione (status PROPOSAL, non canonizzato).
+
+**Collegamenti:** `context/QUEST_GENERATION_SPEC.md`, `context/QUEST_GENERATION_ARCHITECTURE.md`, R-111, R-112, R-113, PLAN-019 (S5).
+
+---
+
+## R-114 — Landing page = `/game`, commit/push di tutto il lavoro pending, deploy Vercel
+
+**Richiesta (verbatim):** *"committa e pusha tutto quello che c'è in RPG balancer, la landing page deve diventare /game. Poi fa il deploy su vercel con successo"*
+**Data:** 2026-10-10
+**Stato:** `in corso`
+
+**Intento:**
+- Committare e pushare tutto il lavoro pending (PLAN-019-S2.4 planning surface + lancio, documentazione generazione quest R-111/112/113).
+- La route `/` (landing) deve servire la superficie di gioco canonica `/game` (Game Frame Pixi), non più il FantasyLayout a tab.
+- Deploy production su Vercel (`rpg-balancer`) andato a buon fine.
+
+---
+
+## R-115 — Implementation Plan «Quest Generation System» (macro-plan, Proposed non ratificato)
+
+**Richiesta:** il Director ha incollato in sessione un implementation plan completo per il sistema di generazione quest (pipeline Quest Intent → Blueprint → Scene Composition → World Instantiation → Narrative Briefs → Text Generation → Validation → Repair/Reject → Scenario Artifact → Runtime), fasi P0–P7 con gate, contratti componenti (core gimmick, scene archetype, domain kit, imprint, trait trigger/twist, narrative brief), strategia di test a 6 livelli, benchmark con 3 corpus, task T0–T7. Stato dichiarato: «Proposed, non ancora ratificato».
+**Data:** 2026-10-09 (data sessione; il documento incollato non ha data)
+**Stato:** `da chiarire` — piano ricevuto; in attesa di decisione Director su ratifica, collocazione e timing.
+
+**Posizionamento rispetto alle autorità esistenti:**
+- Copre il territorio di **PLAN-019 §S5** («Oltre lo scritto a mano»: generazione, chain quest, narrativa emergente) — che la desiderata v24 colloca **dopo S4** e subordina alla «definizione di buona quest» prodotta da S1–S4. Il piano stesso lo riconosce (§10: «collocazione dipende dall'allineamento con S2–S5»; P6/P7 subordinati ai gate PLAN-019).
+- È il **livello operativo** di `context/QUEST_GENERATION_SPEC.md` (living doc R-114, consolidamento R-091/111/112/113): stessa architettura a livelli, stessi contratti. Se ratificato diventa un PLAN-0xx figlio di PLAN-019 S5; lo spec resta la fonte d'intento — evitare due fonti concorrenti.
+- P7 (entità persistenti, archi narrativi) si sovrappone a **OPEN-016** (registro mondo / memoria narrativa — macro-piano ChatGPT non ratificato) e OPEN-014; il piano stesso rimanda P7 a dopo P1–P6.
+- Tutti i file citati nel piano (§2) esistono sul branch: verificato 2026-10-09.
+
+**Decisioni che richiede:**
+1. Ratifica sì/no, e come (PLAN-0xx registrato in `plans/INDEX.md` figlio di PLAN-019, o doc in `context/`).
+2. Timing: le fasi P0–P5 (prototipo isolato) possono correre **in parallelo** a S2–S4 senza violare v24 — l'integrazione resta subordinata ai gate. Conferma del Director necessaria perché v24 dice «Si pianifica dopo S4».
+3. Nome/numero del piano figlio.
+
+**Collegamenti:** `plans/PLAN-019-quest-macro-plan.md` (§S5), `context/QUEST_GENERATION_SPEC.md`, `context/QUEST_GENERATION_ARCHITECTURE.md`, `context/QUEST_IMPRINTS.md`, OPEN-014/015/016, R-091/111/112/113/114, `QUEST_RULES.md`, `NARRATIVE.md`.

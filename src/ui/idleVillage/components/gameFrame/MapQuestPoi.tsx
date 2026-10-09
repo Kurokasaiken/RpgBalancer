@@ -3,12 +3,32 @@ import { useDndContext, useDroppable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import PoiMatericV3_5, { poiMatericV3_5Styles } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import type { PoiState, PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
-import type { QuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import type { QuestAvailability } from './questAvailability';
 import { usePoiTypeIcon } from './usePoiTypeIcon';
 
+/**
+ * The session slice the marker actually consumes — structural so both the
+ * mock `useQuestPoiSession` and the real `useQuestExpeditionSession`'s
+ * `poiView` fit (PLAN-019-S2.4 T-4).
+ */
+export interface MapQuestPoiSessionShape {
+  activity: { id: string; label: string };
+  questStatus: 'available' | 'in_progress' | 'completed' | 'failed';
+  /** Seal fill 0..1 — the run clock (expedition: elapsed/duration halo). */
+  activityProgress: number;
+  poiDropId: string;
+  canAcceptPoiDrop: boolean;
+  handlePoiClick: () => void;
+  draggingResidentId: string | null;
+  gameplay: { state: { isPaused: boolean } };
+  /** Awaiting a player decision (frontier `waiting`) — binary badge on the
+   *  marker (D-H-4): independent from the halo fill, so «full halo, waiting
+   *  at a crossroads» reads as such. */
+  decisionWaiting?: boolean;
+}
+
 export interface MapQuestPoiProps {
-  session: QuestPoiSession;
+  session: MapQuestPoiSessionShape;
   sizePx: number;
   /** Deadline of the open opportunity on the game clock; omit for a marker with no deadline. */
   availability?: QuestAvailability;
@@ -169,7 +189,7 @@ function LiquidHalo({
 }
 
 export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, availability, poiType = 'quest' }) => {
-  const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId } = session;
+  const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId, decisionWaiting } = session;
   const { t } = useTranslation('idleVillage');
   const iconUrl = usePoiTypeIcon(poiType);
   const { setNodeRef } = useDroppable({
@@ -229,6 +249,28 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
     >
       <style>{poiMatericV3_5Styles}</style>
       <div style={{ position: 'relative', width: sizePx, height: sizePx }}>
+        {decisionWaiting && (
+          <span
+            data-decision-waiting="true"
+            role="status"
+            aria-label={t('gameFrame.questPoi.decisionWaiting')}
+            style={{
+              position: 'absolute',
+              top: -4,
+              right: -4,
+              width: 14,
+              height: 14,
+              borderRadius: '50%',
+              background: 'var(--skin-status-unmet, #f59e0b)',
+              border: '2px solid var(--skin-panel-bg, #1a120b)',
+              boxShadow: '0 0 8px var(--skin-status-unmet, #f59e0b)',
+              animation: 'mqp-decision-pulse 1.6s ease-in-out infinite',
+              pointerEvents: 'none',
+              zIndex: 2,
+            }}
+          />
+        )}
+        <style>{`@keyframes mqp-decision-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }`}</style>
         {deadline && view.deadlineWarn && (
           <LiquidHalo target={elapsed} running={running} warn ringPx={ringPx} ringR={ringR} offset={RING_GAP_PX} />
         )}

@@ -207,6 +207,9 @@ Per ogni stadio: **domanda** (v24), **ingresso**, **artefatto di uscita**, **gat
 Personalizzazione fasi → chain quest → generazione → narrativa emergente. Si pianifica dopo S4 a
 partire dalla "definizione di buona quest": le regole di generazione si subordinano ai pattern di
 interesse scoperti, non il contrario. Nessun vincolo di design su S2–S4 per conto di S5.
+Proposta consolidata della conversazione di generazione (R-091/108/111/112/113):
+`context/QUEST_GENERATION_SPEC.md` (specchietto riassuntivo, living doc) +
+`context/QUEST_GENERATION_ARCHITECTURE.md` (analisi FACT/PROPOSAL/OPEN e stato-repo).
 
 ## Rientri
 
