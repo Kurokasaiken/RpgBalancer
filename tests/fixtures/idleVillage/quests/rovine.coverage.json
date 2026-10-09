@@ -1,0 +1,47 @@
+{
+  "covered": [
+    "rv-checkpoint/rv-continua",
+    "rv-checkpoint/rv-torna",
+    "rv-guardie/rv-fight",
+    "rv-guardie/rv-sneak",
+    "rv-mercante/rv-incalza",
+    "rv-mercante/rv-osserva",
+    "rv-ritorno-evento/rv-aiuta",
+    "rv-ritorno-evento/rv-lascia",
+    "rv-ritorno-evento/rv-porta",
+    "rv-tesoro-scelta/rv-prendi",
+    "rv-tesoro-scelta/rv-sicuro"
+  ],
+  "nodes": [
+    "rv-attrito",
+    "rv-camera",
+    "rv-check-fight",
+    "rv-check-incalza",
+    "rv-check-osserva",
+    "rv-check-prendi",
+    "rv-check-sicuro",
+    "rv-check-sneak",
+    "rv-check-trappola",
+    "rv-checkpoint",
+    "rv-fine",
+    "rv-fiume",
+    "rv-guardie",
+    "rv-mercante",
+    "rv-ritorno-evento",
+    "rv-sala",
+    "rv-tesoro-scelta"
+  ],
+  "witnessSignatures": {
+    "rv-mercante/rv-osserva": "f8b2c109",
+    "rv-mercante/rv-incalza": "b101fed0",
+    "rv-guardie/rv-sneak": "7806c302",
+    "rv-guardie/rv-fight": "1a840446",
+    "rv-tesoro-scelta/rv-prendi": "9d1d0aa8",
+    "rv-tesoro-scelta/rv-sicuro": "72d58d1c",
+    "rv-checkpoint/rv-torna": "30b4fdf3",
+    "rv-checkpoint/rv-continua": "a3dbfb03",
+    "rv-ritorno-evento/rv-aiuta": "0eaa11fa",
+    "rv-ritorno-evento/rv-porta": "e0f0da61",
+    "rv-ritorno-evento/rv-lascia": "0a58a3e3"
+  }
+}

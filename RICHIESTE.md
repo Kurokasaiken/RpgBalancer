@@ -2138,8 +2138,73 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Decomposizione (2026-10-09):** *«Dividilo in sub plan, linkati a questo plan, poi approfondisci plan by plan con le AI web»* → PLAN-019-S2 resta contenitore (decisioni, invarianti, contratti, gate, disaccordi); creati 5 figli: `PLAN-019-S2.1-scenario-canonico` (T-002), `S2.2-party-reale` (T-003+T-004), `S2.3-offerta-scaling` (T-005), `S2.4-planning-lancio` (T-006), `S2.5-settlement-e2e` (T-007…T-010). Critica web plan by plan in corso.
 
+**Critica figli r1 (2026-10-09, chatgpt+claude per figlio):** S2.1 = 2× MINOR (parità→Monte Carlo uniforme N≥1000 + copertura tutti i nodi + analisi esatta; `.strict()` no defaults; superRefine integrità grafo; `scenarioVersion`; ownership `offer`: slots riusano tipo `statMatching`, `rewardBase` placeholder → S2.3). S2.2 = 2× MAJOR (**scala di conversione obbligatoria** con forma/range — era il vero buco; test separati regressione-motore vs golden-adapter; HP run = f(hp reale); `residentToQuestMember(resident, role)`; FACT: equip non modifica stat combat → check non dipendono da equip in questo slice; contratto consumo item: sacca spedizione, freeze al run, writeback solo in S2.5; fonte `perc` aperta come sotto-decisione di D-C). S2.3 = 2× MAJOR (**`ScenarioInstance` derivato** consumato identico da simulateQuest+createRun — altrimenti dangerScale o non fa nulla o rende falsa la fascia; `offerBand` statica vs `estimateForParty` dinamica; `resolvedOffer` persistito con versioni; worldScaling v0 = **solo `daysPlayed` reale**, hero/equip power non operativi finché non esiste metrica canonica; rewardTiers su reward nominale congelata). S2.4 = 2× MAJOR (invio atomico: lock `inExpedition` **derivato** dal run persistito; feriti = «può continuare ma non ripartire»; forecast con seed deterministico+debounce+cache+budget; halo `pieno-in-attesa`≠`concluso`; **D-K entrata nel piano durante la critica** — attrito schedule-assoluto vs frontiera v27 → T-0 spike bloccante: layer sopra `matureReady` o deroga I-3 da decidere). S2.5 = 2× MAJOR (**journal per-effetto** con intent `settling`→effetti chiavati `(runId,effectId)`→`settled`, mai `+=n`; fault injection + fault point deterministici; tabella a prodotto di variabili + riga «obiettivo sì + fuga + leader vivo»; **wipe = tutto perso** per matrice frozen, tolta «regola config»; precedenza scadenza solo su offerte non lanciate; ledger = effetto idempotente con consumatore=POI aftermath; E2E sequenziale POI1→settlement→POI2). Tutto assorbito nei figli; run `.mw/runs/20261009-plan-s2-children/*/r1/`.
+
+**Critica figli r2 (2026-10-09, claude+chatgpt):** S2.1 MINOR (oracolo = fixture committata, copertura garantita via enumerazione statica+tracce mirate, `computeScenarioVersion` esportata, `Equals<>` type-test, offer↔nodes coherence, `referenceParty` esplicito + borderline ε). S2.2 2×MAJOR (riga `runHp` nella tabella scale; feriti = esclusione unica via noneOf; equip FACT come test; calibrazione a due livelli diagnostica+gate con riferimento per-check versionato indipendente dalle bande offer; item `reserved` chiavati su runId; claude raccomanda `perc←txc` per indipendenza canali — resta decisione Director entro T-1b). S2.3 MINOR (resolveQuestOffer una volta all'apertura detail + byte-identico al congelato; `rewardResolved` assoluto nel record; whitelist campi scalabili con esclusi costGold/grantsGold/harm + validazione semantica sull'istanza agli estremi; durata dichiarata normativa per D-K; avgHeroPower/avgEquipPower fuori dallo schema v0 → nota segnali futuri; test estremi falsificabile con clamp). S2.4 2×MAJOR (**D-K riformulata**: `readyAt = arrivo sul nodo lungo il percorso + nodeDuration` — equivale all'esempio Director su lineare, coerente coi rami, layer sopra matureReady; T-0 = prova eseguibile gate di T-3/T-4; feriti → ASSUNZIONE DA CONFERMARE con default non bloccante warning+forecast ridotto; lock derivato `run.party[].residentId` + tabella stato-run→lock; invio transizione autorevole con precondizioni alla scrittura + doppio invio concorrente; forecast↔run parity E2E; niente fallback sacca vuota; p95 ≤300ms in T-2). S2.5 MINOR+MAJOR (chiave idempotenza atomica con la mutazione; ledger per fungibili mai set-to-expected; wipe ⇔ ∀ slot morto; tabella 12 celle con motivi di irraggiungibilità + enumerazione programmatica; T-0 = 3 domande binarie + fallback aggregate unico; `inExpedition` derivato da run.status∉{settled}; esito nel record, niente schema ledger; gate (a) enumerativo). Assorbito; run `…/*/r2/`.
+
+**Risposte Director post-r2 (2026-10-09):** (1) **durata viva** — *«se la durata aumenta x un nodo extra deve essere aggiunto in quel momento alla durata, nn nella preview, dobbiamo adattarlo (e anche il numero di fasi in basso)»* → D-K ratificata nella forma `readyAt = arrivo + nodeDuration` + denominatore halo e tile fasi si aggiornano quando il percorso raggiunge un nodo extra; (2) **feriti ammessi, senza warning** — *«il forecast ne dovrebbe tener conto (hanno -HP di partenza, quindi suppongo il pool totale di HP sia minore, inoltre dovrebbero avere anche dei modificatori alle stats)»* → la penalità vive nell'adapter S2.2/InjuryEngine, non nell'UI; (3) **`perc = txc`** — chiuso; (4) **wipe = ∀ slot morto** e **obiettivo sì + fuga + leader vivo → reward sì** — confermati.
+
 **Risposta Director (2026-10-09, componente battezzato):** *"dentro la pagina /game c'è il componente quest in progress che si apre dal director, quello è il componente corretto. Aggiorna la documentazione x puntare a quello come 'componente battezzato'"* → **`QuestRunWindow`** (`components/gameFrame/QuestRunWindow.tsx`, R-106) è il componente battezzato per la quest in corso su `/game`; `QuestTheatre` (PLAN-021/PLAN-025) converge *dentro* di esso. Registrato come D-F in PLAN-019-S2 e in `context/DECISION_LOG.md`.
 
 **Risposta Director (2026-10-09, gating temporale nodi):** *"l'halo nn si ferma ai bivi, indica quanto tempo ci vuole x fare la quest. I nodi sono risolti dal giocatore, ma se quella porzione di tempo è già passata puoi risolvere immediatamente anche il nodo successivo. [es. 60 tick, 6 fasi: fase ogni 10 tick; torno a 30 → risolvo le prime 3 senza attesa]… Anche il componente interno si deve caricare allo stesso modo, solo le icone in fondo devono essere mostrate solo con le fasi superate e la preview della successiva. Durante quegli X secondi bisogna mostrare la frase di flavour tra l'una e l'altra. Ah, nel gioco nn deve essere 60 secondi, deve essere X tick totali (un tick è un secondo)"* → **D-K** nel piano: durata in tick; nodi con finestra a schedule assoluto, risoluzione manuale ma in batch per gli scaduti; `QuestRunWindow` con tile = fasi fatte + preview prossima; flavour/transit durante l'attesa. Riflesso in `PLAN-019-S2.4` (post-invio + T-4) e `context/DECISION_LOG.md`.
 
 ---
+
+## R-108 — Continuare qui la conversazione multi-AI «Emotional Mechanics for RpgBalancer Quests»
+
+**Richiesta (verbatim):** *"https://chatgpt.com/share/6ac8a485-838c-83eb-84c4-861c9ce3e4fa — dobbiamo continuare questa conversaione qui. salva le rispsote delle altre AI in file separati, poi t aggiungo quelle mancanti, poi le elaboriamo tutte e continuiamo la conversazione"*
+**Data:** 2026-10-09
+**Stato:** `in corso` — raccolta risposte in corso.
+
+**Contesto:** ChatGPT ha prodotto un research brief («Emotional Mechanics for RpgBalancer Quests»: meccaniche che producono emozioni — decisioni, incertezza, suspense, rimonta, rischio — senza affidarsi alla scrittura narrativa; benchmark RPS best-of-5; caso studio Sterminio dei Goblin; deliverable A–I con audit FACT del repo, catalogo primitive, 3 prototipi, piano di validazione). Il Director lo sta sottoponendo a 5 AI; protocollo: nessuna valutazione finché non arrivano tutte, poi analisi comparativa unica. Qui (Devin) il vantaggio è l'accesso al repository: le sezioni B (audit) e H (piano operativo) che le AI esterne non potevano fare sono verificabili come FACT.
+
+**Archivio:** `context/ingestions/2026-10-09-emotional-mechanics-quest/` — `00-brief-chatgpt.md` (brief integrale + 5 domande aperte al Director), `01-claude.md`, `02-deepseek.md` (era file upload nella share, contenuto da incollare), `03-gemini.md`, `04-grok.md`, `05-chatgpt.md`. Stato raccolta nel `README.md` della cartella. Sintesi comparativa + audit repo verificato: **`SYNTHESIS.md`** nella stessa cartella.
+
+**Sintesi prodotta (2026-10-09):** 4 risposte su 5 raccolte (manca solo DeepSeek 2/5). Convergenza forte 4/4 sulla diagnosi («esito senza decisione») e sul set di primitive (~80% sovrapposte). Audit repo verificato su `questRun.ts`/`questScenarioGoblin.ts`: targeting posizionale, push-your-luck F6, allarme a 3 stati, ritirata con costo, intent primitivo, preview ricca, harms strutturati già esistono; mancano modello avversario, check nascosto, timer-risorsa. Vedi `SYNTHESIS.md` §1–5.
+
+**Risposte Director alle 5 domande del brief (2026-10-09):**
+- *Controllo*: **poche decisioni cruciali** (3-4 scelte grandi per run).
+- *Skill*: **gestire probabilità e rischio** — NO pattern-reading dell'avversario.
+- *Rischio*: **sorprese forti ma eque** — inattese, retrospettivamente logiche.
+- *Morte PG*: **R-105 confermata** — feeling DD/XCOM (morte presente, wipe raro, nessun cambio).
+- *Emozioni prioritarie*: **attaccamento/sacrificio + avidità/rimpianto**.
+- *Preview*: **numeri precisi** (niente bande qualitative).
+- *Allarme*: stati nominati (quieto/allertato/sveglio) **reggono** — nessun track.
+
+**Effetto sulle primitive (SYNTHESIS §6.1):** il duello RPS a pattern — prima scelta unanime delle AI — scende a Tier 3 perché presuppone decisioni frequenti + pattern-reading, entrambi esclusi. Tier 1 = **push-your-luck approfondito** (avidità/rimpianto, F6 esiste), **esposizione/targeting come scelta** (attaccamento/sacrificio, matrice posizionale esiste ma decide il profilo), **sorprese forti ma eque** (info a costo come meccanismo di fairness). Tier 2 = check nascosto (infrastruttura fairness), intent display leggero.
+**Collegamenti:** R-103 (rework narrativo/emotivo quest goblin), R-105 (feeling DD/XCOM), R-107 (S2), PLAN-019, `context/QUEST_GAMEPLAY_SCIENCE.md`, `context/QUEST_GOBLIN_REWORK_PROPOSAL.md`.
+
+---
+
+## R-109 — Round 3 F6: BE@6% approvato come baseline sperimentale + gate sweep
+
+**Richiesta (verbatim):** *"Approverei BE@6% come baseline sperimentale, non ancora come bilanciamento definitivo. Prima dell'implementazione farei una sola verifica aggiuntiva: la sweep della probabilità di bust tra 4% e 8%, mantenendo invariato il resto, per verificare che la scelta stop/continue rimanga significativa anche con party diversi. Poi procederei con le modifiche authored e i test di regressione elencati nel report §6, senza introdurre nuovi kind o ampliare il sistema generale. Un ultimo vincolo: il bust deve essere comprensibile nelle sue cause e conseguenze, ma non necessariamente prevedibile nel momento esatto in cui scatta. È questo equilibrio che può rendere la perdita dolorosa senza farla sembrare arbitraria."*
+**Data:** 2026-10-10
+**Stato:** `in corso` — sweep ramp 4–8% × party {default, weak, three, solo} in esecuzione; implementazione subordinata all'esito.
+
+**Decisione registrata:**
+- **BE@6%/turno** (trappola F6 indipendente dal verdetto, P = `exploreTurn × 6%`, bust perde solo la pila F6) = **baseline sperimentale**, non bilanciamento finale.
+- Gate pre-implementazione: sweep bust 4–8% × party diversi — criterio = la scelta stop/continue resta significativa (non dominante) su tutti i party.
+- Implementazione autorizzata a sweep superata: le 5 modifiche authored + test di regressione del report §6 (`context/ingestions/2026-10-09-emotional-mechanics-quest/07-round3-f6-validation.md`), **nessun nuovo kind, nessun framework generale**.
+- **Vincolo di fairness**: bust comprensibile in cause e conseguenze, non necessariamente prevedibile nel momento esatto — «doloroso senza sembrare arbitrario».
+
+**Collegamenti:** R-108, `07-round3-f6-validation.md` §6-7, `f6-pushluck-experiment.ts`.
+
+---
+
+## R-110 — Luce dinamica 2D sulla mappa: penombra nuvole raymarched + sprite additivi + god rays, nel tuning panel
+
+**Richiesta (verbatim):** *"va bene, e vorrei anche vedere il god rays. Ricorda che noi abbiamo un tool dove ci sn gli slidere degli effetti in quella pagina, le cose vanno la dentro. Voglio poterle mettere anche a 0% x vedere la differenza con e senza"* — approva la direzione esplorata: *"penombra raymarched per le ombre delle nuvole + sprite additivi per le luci — insieme darebbero il 'mondo che respira' senza volumetrica"*.
+**Data:** 2026-10-09
+**Stato:** `aperta` — in attesa di desiderata FROZEN e piano.
+
+**Contesto:** Sessione explorer su illuminazione dinamica per `/game` (origine: link GenerationsRaytracing dal nipote — DXR/Sonic Generations, non riutilizzabile come codice ma spunto per la domanda "che fake 2D"). Deliberazione multi-AI in `.mw/runs/2026-10-09-dynamic-lighting-explore/` (4 tecniche confrontate: sprite additivi, lightmap low-res, normal map 2.5D, shadow casting). Vincolo misurato: niente luce dinamica in DOM/CSS (tint_layer 12MP = 1016ms worst frame) → tutto sulla pipeline PixiJS/WebGL2.
+
+**Direzione approvata dal Director:**
+- **Penombra raymarched** per le ombre delle nuvole (occlusion field bakato dalla texture nuvole, raggio terreno→sole: bordi d'ombra sfumati fisicamente invece di sagoma-netta).
+- **Sprite additivi** per le luci (torce, finestre, bagliori POI — `blendMode: add`, batched, flicker via alpha/scale).
+- **God rays** (radial blur screen-space dalla posizione del sole, pass low-res).
+- **Superficie = il tuning panel degli effetti** sulla pagina Pixi (`/game-frame-pixi`, `TuningPanel`/`TuningField`, `PixiMapTune`): ogni effetto ha uno slider; **a 0% = spento**, per confronto diretto con/senza.
+- Profilazione obbligatoria su `/map-benchmark` (desiderata v2) prima di qualsiasi rollout.
+
+**Collegamenti:** desiderata v2 (budget rendering Tauri), `.mw/runs/2026-10-09-dynamic-lighting-explore/`, `src/pages/map-benchmark.tsx`, `PixiMapTune` in `src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx`.

@@ -10,18 +10,9 @@
 import { DEFAULT_QUEST_SKILL_CHECK_CONFIG } from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
 import { resolveStashLoadout } from '@/balancing/config/idleVillage/quests/questStash';
 import { PARTY_PRESETS, PRIMARY_STATS, SCENARIO_NODES, START_NODE } from './questScenario';
-import {
-  ROVINE_NODES,
-  ROVINE_PRESETS,
-  ROVINE_PRIMARY_STATS,
-  ROVINE_START_NODE,
-} from './questScenarioRovine';
-import {
-  GOBLIN_NODES,
-  GOBLIN_PRESETS,
-  GOBLIN_PRIMARY_STATS,
-  GOBLIN_START_NODE,
-} from './questScenarioGoblin';
+import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
+import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
+import { GOBLIN_PRESETS, ROVINE_PRESETS } from './questLabPresets';
 import type { LabMember, LabStat, PartyPreset, QuestNode, Verdict } from './questScenario';
 
 /** The authored S1 lab quests. 'cassa' = infiltration (agi/perc,
@@ -44,16 +35,16 @@ const QUESTS: Record<QuestId, QuestDef> = {
     startNode: START_NODE,
   },
   rovine: {
-    nodes: ROVINE_NODES,
+    nodes: ROVINE_SCENARIO.nodes,
     presets: ROVINE_PRESETS,
-    primaryStats: ROVINE_PRIMARY_STATS,
-    startNode: ROVINE_START_NODE,
+    primaryStats: ROVINE_SCENARIO.primaryStats,
+    startNode: ROVINE_SCENARIO.startNode,
   },
   goblin: {
-    nodes: GOBLIN_NODES,
+    nodes: GOBLIN_SCENARIO.nodes,
     presets: GOBLIN_PRESETS,
-    primaryStats: GOBLIN_PRIMARY_STATS,
-    startNode: GOBLIN_START_NODE,
+    primaryStats: GOBLIN_SCENARIO.primaryStats,
+    startNode: GOBLIN_SCENARIO.startNode,
   },
 };
 

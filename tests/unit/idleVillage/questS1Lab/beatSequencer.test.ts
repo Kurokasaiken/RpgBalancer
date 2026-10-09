@@ -12,7 +12,7 @@ import {
   submitCommand,
   type QuestRunState,
 } from '@/ui/idleVillage/questS1Lab/questRun';
-import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import {
   beatMark,
   projectBeats,

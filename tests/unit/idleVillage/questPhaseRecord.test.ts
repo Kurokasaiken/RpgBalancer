@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { applyChoice, availableOptions, createRun, nodesFor } from '@/ui/idleVillage/questS1Lab/questRun';
-import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questScenarioGoblin';
+import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { emptyPhase, hpLostByMember, phaseOutcome, recordAction, snapshotRun, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 
 const BAG = new Set(['hasBonusForza', 'hasBonusPerc', 'hasHealing']);
