@@ -995,11 +995,9 @@
       "bagEmpty": "Bag is empty",
       "dead": "fallen",
       "hpLost": "−{hp} HP",
-      "loot_one": "+{count} loot",
-      "loot_other": "+{count} loot",
+      "loot": "+{count, plural, one {# loot} other {# loot}}",
       "clean": "Safe",
-      "moreLines_one": "+{count} more line in the chronicle",
-      "moreLines_other": "+{count} more lines in the chronicle",
+      "moreLines": "+{count, plural, one {# more line in the chronicle} other {# more lines in the chronicle}}",
       "inProgress": "Phase in progress",
       "nextPhase": "Next phase",
       "day": "Day {day} of {total}",
@@ -1010,10 +1008,14 @@
       "close": "Close the report",
       "beats": {
         "continue": "Click to continue",
-        "more_one": "{count} beat left — click to continue",
-        "more_other": "{count} beats left — click to continue",
+        "more": "{count, plural, one {# beat left — click to continue} other {# beats left — click to continue}}",
         "skipAll": "Skip to the frontier",
         "recap": "While you were away: {scenes} scenes, {checks} checks, {deaths} fallen, {wounds} hurt"
+      },
+      "combat": {
+        "enemiesLeft": "{count, plural, one {# goblin standing} other {# goblins standing}}",
+        "incoming": "{count, plural, one {# hit coming} other {# hits coming}}",
+        "exposureHint": "Chance of taking the next hit"
       }
     }
   },

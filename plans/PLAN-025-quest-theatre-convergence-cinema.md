@@ -278,9 +278,20 @@ Ogni task richiede lo stato garantito dal precedente.
   prefersReducedMotion` → nessuna primitiva renderizza nulla. I beat portano
   `nodeKind` e `check.kills` dal sequencer. Test: `cinemaFx.test.tsx` (10:
   mappa beat→fx, override config, reduced-motion, fake timer).
-- **T-010 — Combattimento leggibile.** Strip + orda entro il limite di T-002
-  (o la forma decisa in D-7); esposizione visibile; flash e floater sul
-  colpito.
+- **T-010 — Combattimento leggibile (FATTO 2026-10-10).** `CombatStrip` in
+  `QuestRunWindow` sotto il teatro (solo nodi `combat`, un blocco compatto —
+  nessun expanded, D-7): orda in piedi come pips (`goblinLeft`/`enemies`) +
+  `nextCombatHits` («N colpi in arrivo»), e per ogni membro vivo la cella
+  `nome + micro-barra HP + esposizione%` da `currentExposure` (il più esposto
+  in tono danger). Mentre un harm beat è in scena, la cella del colpito si
+  marca (danger/death) e `DamageFloater` (nuova primitiva cinemaFx, WAAPI,
+  canale `damageFloater` in `questTheatreFx`) fa salire il `-N` — chi paga è
+  visibile, E7 chiuso. i18n `questWindow.combat.*`. **Fix collaterale i18n**:
+  il progetto usa i18next-icu — i suffissi `_one/_other` non risolvono;
+  convertiti in plurale ICU `loot`, `moreLines`, `beats.more` (latenti da
+  T-008, mostravano la chiave grezza) + le nuove chiavi combat. Test:
+  `combatStrip.test.tsx` (4: pips orda, esposizione ~100%, assenza fuori
+  combat, floater sul membro giusto).
 - **T-011 — Safeguard + acceptance + evidence.** `lint`, `test -- <scope>`,
   `build:check`, `kanban:lint`, smoke `/game` e `/game-frame-theatre`;
   harness contro i budget di T-003; docs (`quest_theatre_spec.md`,
