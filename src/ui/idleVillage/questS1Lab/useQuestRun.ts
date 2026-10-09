@@ -29,6 +29,8 @@ import {
   type QuestRunState,
 } from './questRun';
 import { emptyPhase, recordAction, snapshotRun, type PhaseRecord } from './questPhaseRecord';
+import { createQuestRunAdapter } from '@/ui/idleVillage/questTheatre/questRunAdapter';
+import type { TheatreAdapter } from '@/ui/idleVillage/questTheatre/theatreContract';
 
 const BAG_FLAGS: ReadonlySet<string> = new Set(QUEST_STASH.items.map((item) => item.flag));
 
@@ -56,6 +58,10 @@ export interface QuestRunApi {
   useHealing: () => void;
   drinkPotion: () => void;
   clear: () => void;
+  /** Theatre read-model over this run (PLAN-025 T-006/T-007): the same engine
+   *  truth, projected for theatre-shaped consumers. Stable instance — its
+   *  commandId dedupe survives re-renders. */
+  adapter: TheatreAdapter;
 }
 
 const beatOf = (run: QuestRunState) => nodesFor(run)[run.nodeId]?.beat ?? 0;
@@ -166,6 +172,22 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   const heal = useCallback(() => bagAction(applyHealing), [bagAction]);
   const potion = useCallback(() => bagAction((state) => drinkPotion(state, 'hasPozione')), [bagAction]);
 
+  // Theatre adapter (PLAN-025 T-007): stable across renders so its commandId
+  // dedupe set never resets; reads the latest run/tick through refs, and every
+  // engine mutation goes through `act` so phases and persistence stay honest.
+  const runRef = useRef<QuestRunState | null>(null);
+  runRef.current = run;
+  const actRef = useRef(act);
+  actRef.current = act;
+  const adapter = useMemo<TheatreAdapter>(
+    () =>
+      createQuestRunAdapter(() => runRef.current, {
+        getTick: () => tickRef.current,
+        onMutate: (apply) => actRef.current(apply, undefined),
+      }),
+    [],
+  );
+
   const clear = useCallback(() => {
     setRun(null);
     setPhases([]);
@@ -173,7 +195,7 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   }, [persist]);
 
   return useMemo(
-    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear }),
-    [run, phases, start, choose, syncClock, heal, potion, clear],
+    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear, adapter }),
+    [run, phases, start, choose, syncClock, heal, potion, clear, adapter],
   );
 }
