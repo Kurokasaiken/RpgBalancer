@@ -35,6 +35,9 @@ export interface SceneBeat {
   nodeId: string;
   title: string;
   body?: string;
+  /** Engine node kind — lets presentation map tone (harm/combat earn the
+   *  letterbox) without re-reading the graph. */
+  nodeKind?: 'choice' | 'check' | 'info' | 'harm' | 'combat' | 'end';
 }
 
 /** A resolved check / combat turn — verdict + authored flavor + consequence. */
@@ -148,6 +151,7 @@ export function projectBeats(
             nodeId,
             title: node?.title ?? entry.text,
             body: node?.body,
+            nodeKind: node?.kind,
           });
           vi += 1;
         }

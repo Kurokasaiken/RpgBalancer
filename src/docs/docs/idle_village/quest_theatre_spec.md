@@ -145,6 +145,21 @@ altro → mostra il messaggio del runtime.
   della mutazione in-place); reload/start/clear la azzerano — nessun replay
   spurio su restore.
 
+### CinemaFx (PLAN-025 T-009 — `skins/primitives/cinemaFx.tsx`)
+
+- Layer di accenti cinematografici sul teatro: `Letterbox` (bande CSS su
+  token `--skin-hud-lacquer-deep`), `EdgeFlash` (Web Animations, keyed per
+  beat → il flash non sopravvive al beat successivo), `TypewriterText`.
+- `fxForBeat(beat, config)` è l'unica fonte della mappa beat→fx: letterbox
+  solo su **cambi di tono** (scene `harm`/`combat`, turno di combattimento
+  = check con `kills`, morte, `end`); flash sul verdetto del check;
+  typewriter sul body delle scene. Niente juice per beat «neutri».
+- Config Zod `quests/questTheatreFx.ts`: durate, altezza bande, cps del
+  typewriter, toggle per canale e per trigger — un canale si può spegnere
+  da config senza toccare il componente.
+- **I-5:** `prefersReducedMotion` → nessuna primitiva renderizza (non
+  «animazione più veloce»: assenza dell'effetto).
+
 ## Acceptance legati (PLAYWRIGHT, T-009)
 
 - Stesso snapshot → stesso render; nessun comando duplicato su reopen/re-render.

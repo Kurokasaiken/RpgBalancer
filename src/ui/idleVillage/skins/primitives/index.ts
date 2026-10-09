@@ -19,3 +19,15 @@ export {
   type StatBarSize as MaterialStatBarSize,
 } from '@/ui/wanderlust-surface/layout/WanderlustStatBar';
 export { setHudBandPx, useHudBandPx, DEFAULT_HUD_BAND_PX } from './hudBand';
+export {
+  Letterbox,
+  type LetterboxProps,
+  EdgeFlash,
+  type EdgeFlashProps,
+  TypewriterText,
+  type TypewriterTextProps,
+  fxForBeat,
+  useBeatFx,
+  prefersReducedMotion,
+  type BeatFx,
+} from './cinemaFx';
