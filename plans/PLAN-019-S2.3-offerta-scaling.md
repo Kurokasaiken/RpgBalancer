@@ -125,6 +125,42 @@ regola di rounding/clamp ai confini (critica r2 — un `rewardScale` 1.0 vs
 rappresentazione, non seconda fonte. Chiavi i18n nello schema, non
 stringhe.
 
+## Stato implementazione (2026-10-09 — commit su main)
+
+- **T-1 FATTO** — `questPois.ts`: `QuestPoiSchema` strict + `QUEST_POIS`
+  (poi-goblin 10t×25n=250t, poi-rovine 10t×10n=100t, finestre [0,60) day
+  index, slot-partizione per id ⊆ `offer.slots`) + `DANGER_BANDS` canonico
+  + `dangerBandFor` (ownership promossa dalla tabella provvisoria del test
+  S2.1, che ora importa da qui).
+- **T-2 FATTO** — `deriveOfferBand` (sim `referenceParty` sull'istanza →
+  `dangerBandFor`, «ipotesi sul riferimento») + `estimateForParty` →
+  `incomplete | {sim, bands.danger(party), nSim}` sullo stesso
+  ScenarioInstance.
+- **T-3 FATTO** — `rewardTiers.ts`: tier su reward nominale risolta
+  (`resolveReward` = Math.round dichiarato), intervalli semiaperti,
+  confine → tier superiore, chiavi i18n.
+- **T-4 FATTO** — `questOffer.ts`: `resolveQuestOffer` →
+  `{resolvedOffer: ResolvedOfferRecord, instance: ScenarioInstance}`;
+  transform whitelist r2 (check.risk + combat enemies/hitDamage; stats
+  categorico no-op dichiarato; economia/harm/upfrontDamage/end/info
+  esclusi). Engine: registry istanze (`qsi-<fnv>` content-addressed),
+  `nodesFor`/`createRun`/`simulateQuest` su istanza; `QuestRunSave` porta
+  lo ScenarioInstance congelato — reload mai su config corrente; fallback
+  authored-map = migrazione legacy dichiarata. Estremi di scala
+  ri-validati da `QuestScenarioSchema` (test).
+- **T-5 FATTO** — `worldScaling.ts` v0: unico segnale `daysPlayed` reale
+  (`collectWorldProgressSignals` legge `currentDay` dello store canonico);
+  clamp fuori-dominio falsificabile; assenti → identità.
+- **T-6 FATTO** — `questOffer.test.ts` 28 + scope quest 139/139 su 10
+  file, build:check ✓, kanban:lint ✓, lint n/a (quarantena).
+  Evidence: `test-results/s23-offerta-scaling-2026-10-09.log`.
+
+**Finding registrato:** su goblin il canale pericolo scalabile è solo
+`combat` (check `risk` authored 0/0; `upfrontDamage` escluso per
+contratto r2) — `dangerScale` goblin = leva parziale reale; estendere a
+`TUNE`/harm richiede una revisione della whitelist = decisione Director.
+Valori bande/scaling/tier = first-pass (numeri: R-105/gate Director).
+
 ## Task
 
 - **T-1 — `questPois` schema + 2 POI authored** (goblin, rovine; unità e

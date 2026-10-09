@@ -23,7 +23,8 @@
  *  (e) DANGER-BAND CALIBRATION — `offer.dangerBandRef` consistent with a
  *      seeded `simulateQuest` of `offer.referenceParty` under the declared
  *      reference strategy (fixed seed, declared N, ±1 grade, ε-borderline
- *      never fails). Band table PROVISIONAL — S2.3 owns `dangerBands`.
+ *      never fails). Band table = the CANONICAL `DANGER_BANDS` of
+ *      `questPois.ts` (S2.3 took ownership).
  *  (f) STAT-MATCHING PARSABILITY — every slot `requirement` is evaluable.
  */
 
@@ -41,6 +42,7 @@ import { analyzeCheck, defaultStrategy, simulateQuest } from '@/ui/idleVillage/q
 import { GOBLIN_PRESETS, ROVINE_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
+import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
@@ -318,29 +320,24 @@ describe('exact per-check analysis vs fixture (analyzeCheck)', () => {
 /* ------------------------------------------------------------------ */
 
 /**
- * Provisional danger-band table (OWNERSHIP: S2.3 `questPois`/`dangerBands`
- * will own the values; S2.1 only proves the declared `dangerBandRef` is
- * consistent with a simulation of `offer.referenceParty`). Metric:
+ * Danger-band calibration support — the band TABLE is canonical in
+ * `questPois.ts` (S2.3); this suite only proves the declared `dangerBandRef`
+ * is consistent with a simulation of `offer.referenceParty`. Metric:
  * `anyDeathPct` of the reference run — P(≥1 member dies), the player-visible
  * meaning of "danger". ε = 2pp: a metric within ε of a boundary is
  * «borderline» and never fails the assertion.
  */
-const DANGER_BANDS = [
-  { id: 'bassa', max: 15 },
-  { id: 'media', max: 45 },
-  { id: 'alta', max: 75 },
-  { id: 'letale', max: Infinity },
-] as const;
 const BAND_EPSILON_PP = 2;
 const BAND_SIM_RUNS = 2000;
 const BAND_SIM_SEED = 777;
 
 function deriveDangerBand(anyDeathPct: number): { band: string; borderline: boolean } {
-  const idx = DANGER_BANDS.findIndex((b) => anyDeathPct < b.max);
+  const idx = DANGER_BANDS.findIndex((b) => b.maxAnyDeathPct === null || anyDeathPct < b.maxAnyDeathPct);
   const band = DANGER_BANDS[Math.max(0, idx)];
-  const prevMax = idx > 0 ? DANGER_BANDS[idx - 1].max : -Infinity;
+  const prevMax = idx > 0 ? (DANGER_BANDS[idx - 1].maxAnyDeathPct ?? Infinity) : -Infinity;
+  const thisMax = band.maxAnyDeathPct ?? Infinity;
   const borderline =
-    Math.abs(anyDeathPct - band.max) <= BAND_EPSILON_PP ||
+    Math.abs(anyDeathPct - thisMax) <= BAND_EPSILON_PP ||
     Math.abs(anyDeathPct - prevMax) <= BAND_EPSILON_PP;
   return { band: band.id, borderline };
 }
