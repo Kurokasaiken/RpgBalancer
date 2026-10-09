@@ -129,6 +129,9 @@ export const QuestOptionSchema = z
     requiresInfo: z.string().optional(),
     requiresFlag: z.string().optional(),
     hiddenIfFlag: z.string().optional(),
+    /** Trait-gated options (PLAN-026): shown only with a living carrier. */
+    requiresTrait: z.string().optional(),
+    hiddenIfTrait: z.string().optional(),
     sets: z.string().optional(),
     consumesFlag: z.string().optional(),
     grantsGold: z.number().optional(),
@@ -171,6 +174,104 @@ export const QuestRiskSchema = z
   })
   .strict();
 
+/* ------------------------------------------------------------------ */
+/* Declarative outcome model (PLAN-026 engine v2) — mirrors the        */
+/* OutcomeSpec/GotoSpec/VarOp contracts in questScenario.ts. Generated  */
+/* nodes carry `verdictTable`; authored nodes stay on the engine        */
+/* switch. All sub-schemas strict, same rule as the rest of the file.   */
+/* ------------------------------------------------------------------ */
+
+/** Run-state condition — mirrors `OutcomeCond` (AND semantics). */
+export const OutcomeCondSchema = z
+  .object({
+    flag: z.string().optional(),
+    notFlag: z.string().optional(),
+    varGE: z.object({ var: z.string(), value: z.number() }).strict().optional(),
+    varLT: z.object({ var: z.string(), value: z.number() }).strict().optional(),
+  })
+  .strict();
+export type OutcomeCondSchemaType = z.infer<typeof OutcomeCondSchema>;
+
+/** Conditional goto branch — mirrors `GotoBranch`. */
+export const GotoBranchSchema = z
+  .object({
+    when: OutcomeCondSchema,
+    then: z.string(),
+  })
+  .strict();
+
+/** Routing target — mirrors `GotoSpec` (plain id or ordered branches + else). */
+export const GotoSpecSchema = z.union([
+  z.string(),
+  z
+    .object({
+      branches: z.array(GotoBranchSchema).min(1),
+      else: z.string(),
+    })
+    .strict(),
+]);
+export type GotoSpecSchemaType = z.infer<typeof GotoSpecSchema>;
+
+/** Numeric var operation — mirrors `VarOp`. */
+export const VarOpSchema = z
+  .object({
+    var: z.string(),
+    op: z.enum(['set', 'inc', 'dec']),
+    value: z.number(),
+  })
+  .strict();
+
+/** In-run twist arming roll — mirrors `OutcomeSpec.rollFlag`. */
+export const RollFlagSchema = z
+  .object({
+    flag: z.string(),
+    chance: z.number().min(0).max(100),
+  })
+  .strict();
+
+/** Post-verdict outcome — mirrors `OutcomeSpec`. */
+export const OutcomeSpecSchema = z
+  .object({
+    goto: GotoSpecSchema,
+    setFlags: z.array(z.string()).optional(),
+    clearFlags: z.array(z.string()).optional(),
+    setInfo: z.array(z.string()).optional(),
+    takeLoot: z.array(z.string()).optional(),
+    dropLoot: z.array(z.string()).optional(),
+    goldDelta: z.number().optional(),
+    damage: z.number().optional(),
+    setAlarm: z.boolean().optional(),
+    setObjective: z.enum(['done', 'lost']).optional(),
+    vars: z.array(VarOpSchema).optional(),
+    rollFlag: RollFlagSchema.optional(),
+    log: z.string().optional(),
+  })
+  .strict();
+export type OutcomeSpecSchemaType = z.infer<typeof OutcomeSpecSchema>;
+
+/** Verdict → outcome map — mirrors `VerdictTable` (`else` = fallback verdict). */
+export const VerdictTableSchema = z
+  .object({
+    epicfail: OutcomeSpecSchema.optional(),
+    fail: OutcomeSpecSchema.optional(),
+    almost: OutcomeSpecSchema.optional(),
+    win: OutcomeSpecSchema.optional(),
+    bigwin: OutcomeSpecSchema.optional(),
+    else: OutcomeSpecSchema.optional(),
+  })
+  .strict();
+export type VerdictTableSchemaType = z.infer<typeof VerdictTableSchema>;
+
+/** Run-start twist arming roll — mirrors `ArmRoll`. */
+export const ArmRollSchema = z
+  .object({
+    flag: z.string(),
+    chance: z.number().min(0).max(100),
+    requiresTrait: z.string().optional(),
+  })
+  .strict();
+export type ArmRollSchemaType = z.infer<typeof ArmRollSchema>;
+
 /** Authored quest node — mirrors `QuestNode`. */
 export const QuestNodeSchema = z
   .object({
@@ -189,6 +290,12 @@ export const QuestNodeSchema = z
     beat: z.number().optional(),
     transit: z.string().optional(),
     verdictFlavor: z.partialRecord(VerdictSchema, z.string()).optional(),
+    /**
+     * Declarative post-verdict outcomes (PLAN-026 engine v2): when present,
+     * the engine applies these data-driven effects/routing and skips the
+     * legacy `applyNodeOutcome` switch for this node.
+     */
+    verdictTable: VerdictTableSchema.optional(),
   })
   .strict();
 export type QuestNodeSchemaType = z.infer<typeof QuestNodeSchema>;
@@ -292,6 +399,8 @@ export const ENGINE_PRODUCED_FLAGS: ReadonlySet<string> = new Set([
   'vantaggioGrande',
   'vantaggioPiccolo',
   'agguatoPeggiore',
+  // Engine v2 (PLAN-026): setObjective:'lost' produces this marker flag.
+  'objectiveLost',
 ]);
 
 function nodeTargets(node: QuestNodeSchemaType): string[] {
@@ -301,6 +410,21 @@ function nodeTargets(node: QuestNodeSchemaType): string[] {
   if (node.combat?.nextSurvivors) targets.push(node.combat.nextSurvivors);
   return targets;
 }
+
+/** Every node id a `GotoSpec` can route to (plain id or branches + else). */
+function gotoSpecTargets(gotoSpec: GotoSpecSchemaType): string[] {
+  if (typeof gotoSpec === 'string') return [gotoSpec];
+  return [...gotoSpec.branches.map((b) => b.then), gotoSpec.else];
+}
+
+/** Every node id a `verdictTable` can route to. */
+function verdictTableTargets(table: VerdictTableSchemaType): string[] {
+  return Object.values(table).flatMap((outcome) =>
+    outcome ? gotoSpecTargets(outcome.goto) : [],
+  );
+}
+
+const VERDICT_TABLE_KEYS = ['epicfail', 'fail', 'almost', 'win', 'bigwin'] as const;
 
 /**
  * Static graph integrity (data-verifiable part — see file header for what is
@@ -338,6 +462,14 @@ export const QuestScenarioSchema = z
     intelLabels: z.record(z.string(), z.string()).optional(),
     /** Offer header — POI/detail envelope (see `QuestOfferSchema`). */
     offer: QuestOfferSchema,
+    /**
+     * Run-start twist arming (PLAN-026, mixed arming): each entry rolls once
+     * in `createRun`; `requiresTrait` gates the roll to parties carrying the
+     * trait on a living member. In-run arming stays on `OutcomeSpec.rollFlag`.
+     */
+    armRolls: z.array(ArmRollSchema).optional(),
+    /** Initial numeric vars written into the run state (generated scenarios). */
+    initialVars: z.record(z.string(), z.number()).optional(),
     /** Authored nodes keyed by node id. */
     nodes: z.record(z.string(), QuestNodeSchema),
   })
@@ -357,7 +489,13 @@ export const QuestScenarioSchema = z
     const producedFlags = new Set<string>(ENGINE_PRODUCED_FLAGS);
     for (const node of Object.values(nodes)) {
       for (const opt of node.options ?? []) if (opt.sets) producedFlags.add(opt.sets);
+      // Engine-v2 producers: declarative outcomes can set/arm flags too.
+      for (const outcome of Object.values(node.verdictTable ?? {})) {
+        for (const f of outcome?.setFlags ?? []) producedFlags.add(f);
+        if (outcome?.rollFlag) producedFlags.add(outcome.rollFlag.flag);
+      }
     }
+    for (const roll of scenario.armRolls ?? []) producedFlags.add(roll.flag);
 
     for (const [key, node] of Object.entries(nodes)) {
       if (key !== node.id) {
@@ -366,6 +504,35 @@ export const QuestScenarioSchema = z
       for (const t of nodeTargets(node)) {
         if (!nodes[t]) {
           issue(['nodes', key], `target '${t}' dichiarato ma non esiste`);
+        }
+      }
+      if (node.verdictTable) {
+        const vt = node.verdictTable;
+        // Coverage: either `else` exists or every verdict has an entry —
+        // a missing row at runtime would silently drop the outcome.
+        if (!vt.else && !VERDICT_TABLE_KEYS.every((v) => vt[v])) {
+          issue(
+            ['nodes', key, 'verdictTable'],
+            'verdictTable incompleta: servono tutti e 5 i verdict oppure un else',
+          );
+        }
+        for (const t of verdictTableTargets(vt)) {
+          if (!nodes[t]) {
+            issue(['nodes', key, 'verdictTable'], `goto target '${t}' non esiste`);
+          }
+        }
+        for (const [vKey, outcome] of Object.entries(vt)) {
+          if (!outcome || typeof outcome.goto === 'string') continue;
+          for (const [i, branch] of outcome.goto.branches.entries()) {
+            for (const f of [branch.when.flag, branch.when.notFlag]) {
+              if (f && !producedFlags.has(f)) {
+                issue(
+                  ['nodes', key, 'verdictTable', vKey, 'goto', 'branches', i],
+                  `flag '${f}' in condizione goto senza produttore`,
+                );
+              }
+            }
+          }
         }
       }
       for (const [i, opt] of (node.options ?? []).entries()) {
@@ -470,6 +637,9 @@ const PRESENTATION_KEYS = new Set([
   'transit',
   'verdictFlavor',
   'failHint',
+  // Engine v2: OutcomeSpec.log is copy (a log line), not mechanics — same
+  // rule as verdictFlavor.
+  'log',
   'label',
   'detail',
   'objective',

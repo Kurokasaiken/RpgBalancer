@@ -13,7 +13,18 @@ import { PARTY_PRESETS, PRIMARY_STATS, SCENARIO_NODES, START_NODE } from './ques
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
 import { GOBLIN_PRESETS, ROVINE_PRESETS } from './questLabPresets';
-import type { LabMember, LabStat, PartyPreset, QuestNode, Verdict } from './questScenario';
+import type {
+  ArmRoll,
+  GotoSpec,
+  LabMember,
+  LabStat,
+  OutcomeCond,
+  OutcomeSpec,
+  PartyPreset,
+  QuestNode,
+  VarOp,
+  Verdict,
+} from './questScenario';
 import type { SettlementMarker } from '../quests/questSettlement';
 
 /** The authored S1 lab quests. 'cassa' = infiltration (agi/perc,
@@ -72,6 +83,15 @@ export interface ScenarioInstance {
    *  from — provenance only; the frozen instance travels with the save. */
   scenarioHash: string;
   nodes: Record<string, QuestNode>;
+  /**
+   * Own entry node — absent on scaled copies of authored scenarios (they
+   * share `QUESTS[questId].startNode`); generated scenarios carry theirs.
+   */
+  startNode?: string;
+  /** Run-start twist arming rolls (PLAN-026) — frozen into the instance. */
+  armRolls?: ArmRoll[];
+  /** Initial numeric vars for the run state (PLAN-026 engine v2). */
+  initialVars?: Record<string, number>;
 }
 
 const SCENARIO_INSTANCES = new Map<string, ScenarioInstance>();
@@ -245,6 +265,11 @@ export interface QuestRunState {
    *  a live run; absent on legacy terminal runs = not yet settled (the next
    *  settle pass converges them). `inExpedition` releases on `settled`. */
   settlement?: SettlementMarker;
+  /* ---- Declarative outcomes (PLAN-026, engine v2) ---------------------- */
+  /** Numeric run vars — the `you`/`rival`/`goal` counters declarative
+   *  outcomes read and write. Absent on legacy persisted runs (the
+   *  interpreter treats a missing map as all-zeroes). */
+  vars?: Record<string, number>;
 }
 
 /** A resolved check shown to the player as an astrolabe cinematic. */
@@ -814,12 +839,14 @@ export function createRun(
             lastEvent: 'La spedizione parte per il Passo del Corvo.',
             firstLog: 'Partenza — obiettivo: riportare la cassa delle sementi.',
           };
+  // Generated/scaled instances may carry their own start node (engine v2).
+  const startNode = scenarioInstance?.startNode ?? quest.startNode;
   const state: QuestRunState = {
     seed: seed ?? 0,
     rngCalls: 0,
     questId,
     presetId,
-    nodeId: quest.startNode,
+    nodeId: startNode,
     party,
     gold,
     days: questId === 'rovine' ? TUNE.rovineBaseDays : 0,
@@ -849,11 +876,16 @@ export function createRun(
     // Every quest starts on a 'choice' node → the initial frontier waits.
     frontier: { status: 'waiting', startedAt: frontier?.startTick ?? 0, readyAt: frontier?.startTick ?? 0 },
     nodeTicks: frontier?.nodeTicks ?? 0,
-    visitedNodes: [quest.startNode],
+    visitedNodes: [startNode],
     ...(scenarioInstance ? { scenarioInstanceId: scenarioInstance.instanceId } : {}),
     ...(resolvedOffer ? { resolvedOffer } : {}),
     launchedAtTick: frontier?.startTick ?? 0,
   };
+  // Engine v2 (PLAN-026): seed the numeric vars and run the runstart arm
+  // rolls (trait-gated twist arming) — legacy runs without an instance get
+  // neither and stay bit-identical.
+  if (scenarioInstance?.initialVars) state.vars = { ...scenarioInstance.initialVars };
+  runArmRolls(state, scenarioInstance?.armRolls);
   return state;
 }
 
@@ -1397,6 +1429,105 @@ const INSIDE_CHECKS = new Set([
   'check-forziere',
 ]);
 
+/* ------------------------------------------------------------------ */
+/* Declarative outcome interpreter (PLAN-026, engine v2): nodes with a  */
+/* `verdictTable` resolve effects + routing from DATA; nodes without it */
+/* keep the authored per-id switch below — additive, not a migration.   */
+/* ------------------------------------------------------------------ */
+
+/** True when any living party member carries `trait` (option gating +
+ *  armRoll eligibility share this rule). */
+export function partyHasTrait(state: QuestRunState, trait: string): boolean {
+  return state.party.some((m) => !m.dead && (m.traits ?? []).includes(trait));
+}
+
+/** Evaluate an `OutcomeCond` against the run — AND of declared fields. */
+function evalOutcomeCond(state: QuestRunState, cond: OutcomeCond): boolean {
+  if (cond.flag && !state.flags.includes(cond.flag)) return false;
+  if (cond.notFlag && state.flags.includes(cond.notFlag)) return false;
+  if (cond.varGE && (state.vars?.[cond.varGE.var] ?? 0) < cond.varGE.value) return false;
+  if (cond.varLT && (state.vars?.[cond.varLT.var] ?? 0) >= cond.varLT.value) return false;
+  return true;
+}
+
+/** Resolve a `GotoSpec` — plain id, or first matching branch, else `else`. */
+function resolveGotoSpec(state: QuestRunState, gotoSpec: GotoSpec): string {
+  if (typeof gotoSpec === 'string') return gotoSpec;
+  for (const branch of gotoSpec.branches) {
+    if (evalOutcomeCond(state, branch.when)) return branch.then;
+  }
+  return gotoSpec.else;
+}
+
+/** Apply `VarOp`s to the run vars map (created lazily — legacy runs lack it). */
+function applyVarOps(state: QuestRunState, ops: VarOp[]): void {
+  const vars = (state.vars ??= {});
+  for (const op of ops) {
+    const cur = vars[op.var] ?? 0;
+    vars[op.var] = op.op === 'set' ? op.value : op.op === 'inc' ? cur + op.value : cur - op.value;
+  }
+}
+
+/**
+ * Apply one declarative outcome: effects land first (so `goto` branches see
+ * the post-effect state — e.g. `rival` incremented past a threshold routes
+ * differently), then routing resolves to the next node id.
+ * Exported for unit tests; the engine only reaches it via `applyNodeOutcome`.
+ */
+export function applyOutcomeSpec(state: QuestRunState, node: QuestNode, spec: OutcomeSpec): string {
+  if (spec.setFlags) {
+    for (const f of spec.setFlags) if (!state.flags.includes(f)) state.flags.push(f);
+  }
+  if (spec.clearFlags?.length) {
+    const clear = new Set(spec.clearFlags);
+    state.flags = state.flags.filter((f) => !clear.has(f));
+  }
+  if (spec.setInfo) {
+    for (const i of spec.setInfo) if (!state.info.includes(i)) state.info.push(i);
+  }
+  if (spec.takeLoot) {
+    for (const l of spec.takeLoot) {
+      if (!state.loot.includes(l)) {
+        state.loot.push(l);
+        state.log.push({ kind: 'LOOT', text: `${l} — in mano, non ancora al sicuro.` });
+      }
+    }
+  }
+  if (spec.dropLoot?.length) {
+    const drop = new Set(spec.dropLoot);
+    state.loot = state.loot.filter((l) => !drop.has(l));
+  }
+  if (spec.goldDelta) {
+    state.gold += spec.goldDelta;
+    state.log.push({ kind: 'LOOT', text: `${spec.goldDelta > 0 ? '+' : ''}${spec.goldDelta} gold.` });
+  }
+  if (spec.damage && spec.damage > 0) positionalDamage(state, spec.damage, node.title);
+  if (spec.setAlarm !== undefined) state.alarm = spec.setAlarm;
+  if (spec.setObjective === 'done') state.objectiveDone = true;
+  else if (spec.setObjective === 'lost') {
+    state.objectiveDone = false;
+    if (!state.flags.includes('objectiveLost')) state.flags.push('objectiveLost');
+  }
+  if (spec.vars) applyVarOps(state, spec.vars);
+  if (spec.rollFlag && !state.flags.includes(spec.rollFlag.flag)) {
+    if (roll(state) * 100 < spec.rollFlag.chance) state.flags.push(spec.rollFlag.flag);
+  }
+  if (spec.log) state.log.push({ kind: 'INFO', text: spec.log });
+  return resolveGotoSpec(state, spec.goto);
+}
+
+/**
+ * Run `count` arm rolls at run creation (mixed twist arming, runstart half):
+ * a `requiresTrait` roll only happens when a living member carries the trait;
+ * each roll draws from the seeded rng, so arming is deterministic per seed.
+ */
+function runArmRolls(state: QuestRunState, armRolls: ArmRoll[] | undefined): void {
+  for (const ar of armRolls ?? []) {
+    if (ar.requiresTrait && !partyHasTrait(state, ar.requiresTrait)) continue;
+    if (roll(state) * 100 < ar.chance && !state.flags.includes(ar.flag)) state.flags.push(ar.flag);
+  }
+}
+
 function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdict): string {
   const success = verdict === 'win' || verdict === 'bigwin' || verdict === 'almost';
   const bad = verdict === 'fail' || verdict === 'epicfail';
@@ -1431,6 +1562,15 @@ function addDays(state: QuestRunState, n: number, reason: string): void {
 }
 
 function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdict, success: boolean, bad: boolean): string {
+  // Engine v2 (PLAN-026): declarative nodes resolve from data — the authored
+  // switch below is the legacy fallback for Goblin/cassa/rovine nodes.
+  if (node.verdictTable) {
+    const spec = node.verdictTable[verdict] ?? node.verdictTable.else;
+    if (spec) return applyOutcomeSpec(state, node, spec);
+    // Schema enforces full coverage or an `else`; if a malformed table ever
+    // reaches here, extraction is the safe authored default.
+    return 'ritorno';
+  }
   switch (node.id) {
     case 'avvistamento':
       if (verdict === 'bigwin') {
@@ -2164,6 +2304,8 @@ export function submitCommand(
   if (option.requiresInfo && !state.info.includes(option.requiresInfo)) return state;
   if (option.requiresFlag && !state.flags.includes(option.requiresFlag)) return state;
   if (option.hiddenIfFlag && state.flags.includes(option.hiddenIfFlag)) return state;
+  if (option.requiresTrait && !partyHasTrait(state, option.requiresTrait)) return state;
+  if (option.hiddenIfTrait && partyHasTrait(state, option.hiddenIfTrait)) return state;
   if (option.costGold && state.gold < option.costGold) return state;
   if (option.consumesFlag && !state.flags.includes(option.consumesFlag)) return state;
 
@@ -2279,7 +2421,9 @@ export function availableOptions(state: QuestRunState): { id: string; label: str
       (o) =>
         (!o.requiresInfo || state.info.includes(o.requiresInfo)) &&
         (!o.requiresFlag || state.flags.includes(o.requiresFlag)) &&
-        (!o.hiddenIfFlag || !state.flags.includes(o.hiddenIfFlag)),
+        (!o.hiddenIfFlag || !state.flags.includes(o.hiddenIfFlag)) &&
+        (!o.requiresTrait || partyHasTrait(state, o.requiresTrait)) &&
+        (!o.hiddenIfTrait || !partyHasTrait(state, o.hiddenIfTrait)),
     )
     .map((o) => ({
       id: o.id,

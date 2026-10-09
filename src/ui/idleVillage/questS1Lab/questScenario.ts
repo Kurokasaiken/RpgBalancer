@@ -45,6 +45,87 @@ export const INTEL_LABELS: Record<string, string> = {
  */
 export type Verdict = 'epicfail' | 'fail' | 'almost' | 'win' | 'bigwin';
 
+/* ------------------------------------------------------------------ */
+/* Declarative outcome model (PLAN-026, engine v2): generated nodes     */
+/* carry a `verdictTable` so post-verdict effects and routing live in   */
+/* data, not in the legacy `applyNodeOutcome` switch. Authored Goblin/  */
+/* cassa/rovine nodes keep the hardcoded path — additive, not a         */
+/* migration. See context/QUEST_GENERATION_CONTRACTS.md §12.            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Condition over run state — every declared field must hold (AND).
+ * `flag` requires the flag set, `notFlag` requires it absent; `varGE`/`varLT`
+ * compare a numeric run var (missing var reads as 0).
+ */
+export interface OutcomeCond {
+  flag?: string;
+  notFlag?: string;
+  varGE?: { var: string; value: number };
+  varLT?: { var: string; value: number };
+}
+
+/** Conditional branch of a `GotoSpec` — first matching branch wins. */
+export interface GotoBranch {
+  when: OutcomeCond;
+  then: string;
+}
+
+/**
+ * Routing target: a plain node id, or an ordered branch list with a
+ * mandatory `else` fallback so every state resolves to a node.
+ */
+export type GotoSpec = string | { branches: GotoBranch[]; else: string };
+
+/** Numeric variable operation on run `vars` (`set`/`inc`/`dec`). */
+export interface VarOp {
+  var: string;
+  op: 'set' | 'inc' | 'dec';
+  value: number;
+}
+
+/**
+ * Post-verdict outcome for a generated node: the effects land first
+ * (flags, info, loot, gold, damage, alarm, objective, vars, rollFlag),
+ * then `goto` routes — so branches see the state AFTER the effects.
+ */
+export interface OutcomeSpec {
+  goto: GotoSpec;
+  setFlags?: string[];
+  clearFlags?: string[];
+  setInfo?: string[];
+  takeLoot?: string[];
+  dropLoot?: string[];
+  goldDelta?: number;
+  /** Positional HP damage to one member (like upfrontDamage, post-verdict). */
+  damage?: number;
+  setAlarm?: boolean;
+  setObjective?: 'done' | 'lost';
+  vars?: VarOp[];
+  /** In-run twist arming: roll against `chance` (0-100 pct); success sets `flag`. */
+  rollFlag?: { flag: string; chance: number };
+  /** Literal log line pushed on the outcome (generated copy lives in content). */
+  log?: string;
+}
+
+/**
+ * Verdict → outcome map for a generated node. Looked up by verdict; `else`
+ * is the fallback for verdicts without a dedicated entry. A node carrying
+ * this table bypasses the legacy `applyNodeOutcome` switch entirely.
+ */
+export type VerdictTable = Partial<Record<Verdict | 'else', OutcomeSpec>>;
+
+/**
+ * Run-start twist arming roll (mixed arming, Director 2026-10-10): rolled
+ * once in `createRun` — `requiresTrait` gates the roll to parties carrying
+ * that trait on a living member; success sets `flag` on the run.
+ */
+export interface ArmRoll {
+  flag: string;
+  chance: number;
+  requiresTrait?: string;
+}
+
 /** A single authored node of the quest. */
 export interface QuestNode {
   id: string;
@@ -91,6 +172,13 @@ export interface QuestNode {
    * (`ResolvedCheck.outcomeText` keeps the "what it did" part).
    */
   verdictFlavor?: Partial<Record<Verdict, string>>;
+  /**
+   * Declarative post-verdict outcome table (PLAN-026 engine v2). When
+   * present the engine applies `OutcomeSpec` data-driven effects + routing
+   * and skips the legacy `applyNodeOutcome` id-switch for this node.
+   * Generated nodes carry this; authored nodes stay on the switch.
+   */
+  verdictTable?: VerdictTable;
 }
 
 /**
@@ -134,6 +222,10 @@ export interface QuestOption {
   requiresFlag?: string;
   /** Hidden if this flag is already set (e.g. already-bought consumable). */
   hiddenIfFlag?: string;
+  /** Only shown if a living party member carries this trait (PLAN-026). */
+  requiresTrait?: string;
+  /** Hidden if a living party member carries this trait (PLAN-026). */
+  hiddenIfTrait?: string;
   /** Sets a flag on the run state. */
   sets?: string;
   /** Consumes an inventory flag when the option is chosen (e.g. selling the
@@ -494,6 +586,12 @@ export interface LabMember {
   hp?: number;
   /** Portrait asset under /assets/portraits (mock mapping for the lab). */
   portrait?: string;
+  /**
+   * Persistent narrative traits (PLAN-026 — Avido, Scavezzacollo…): distinct
+   * from `statTags` (mechanical stat description). Traits can gate options
+   * (`requiresTrait`/`hiddenIfTrait`) and arm trait twists via `ArmRoll`.
+   */
+  traits?: string[];
 }
 
 export interface PartyPreset {

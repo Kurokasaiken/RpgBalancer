@@ -149,11 +149,13 @@ o a esito puramente casuale sono difetti da rilevare in validazione.
 Target iniziale: almeno il 75% delle scene deve influenzare variabili
 centrali o condizioni strategicamente rilevanti. La metrica deve essere
 definita in modo verificabile e non limitarsi alla presenza nominale di
-una variabile. Aperto: il denominatore (tutte le scene vs solo quelle
-decisionali) e la tensione col budget «3–4 decisioni cruciali» — il
-generatore deve marcare quali scene sono cruciali e quali minori, e la
-sequenza deve avere una curva (pressione → dilemma → conseguenza →
-risoluzione).
+una variabile. **Metrica posticipata** (Director 2026-10-10: «ci pensiamo
+dopo, adesso vediamo come viene») — il contratto scena dichiara gli hook,
+il conteggio si osserva sul prototipo prima di fissare soglia e
+denominatore. Resta aperta la tensione col budget «3–4 decisioni
+cruciali» — il generatore deve marcare quali scene sono cruciali e quali
+minori, e la sequenza deve avere una curva (pressione → dilemma →
+conseguenza → risoluzione).
 
 ### 3.3 Twist
 
@@ -289,10 +291,11 @@ definitiva di qualità. Non è necessario scrivere preventivamente tutte le
 combinazioni di scene e tag: è necessario calibrare il processo su un
 campione rappresentativo di risultati reali.
 
-**Confine i18n/config:** il testo generato è contenuto di scenario e vive
-nella config validata (come oggi); l'invariante i18n copre il chrome UI,
-non il contenuto — la strategia per la localizzazione del testo generato è
-un punto aperto.
+**Traduzione (decisione Director 2026-10-10: «dovremo tradurre tutto»):**
+il testo generato deve essere progettato traducibile fin da ora — chiavi
+strutturate per nodo, niente interpolazioni che dipendano dalla grammatica
+italiana. Le `PRESENTATION_KEYS` dello schema sono già escluse dall'hash
+contenuto: traduzioni e ritocchi di testo non invalidano i run salvati.
 
 ## 6. Generazione del grafo
 
@@ -421,21 +424,29 @@ prima di passare alla successiva.
 
 ## 11. Decisioni ancora aperte
 
-- Modello esatto di selezione dei twist e relativa riproducibilità:
-  la probabilità decide *se* esiste un twist, *quale* tra i compatibili,
-  o entrambi? Selezione una-tantum vs trigger indipendenti in-run?
+**Decise dal Director (2026-10-10) — dettagli in CONTRACTS §11:**
+
+- ✅ Routing verdetti → `verdictTable` dichiarativa sui nodi nuovi,
+  switch legacy per i goblin (estensione additiva a I-3).
+- ✅ Variabili core → layer numerico `vars` nel run state.
+- ✅ Tratti → `traits: string[]` su `ResidentState`.
+- ✅ Twist arm → misto (runstart per tratti, in-run per eventi).
+- ✅ Traduzione → tutto il testo generato progettato traducibile.
+- ✅ Regola 75% → posticipata, si osserva sul prototipo.
+
+**Ancora aperte:**
+
 - Impatto minimo misurabile perché un evento si qualifichi come twist;
   numero massimo di twist negativi per run.
 - Tassonomia canonica dei tag e grafo di adiacenza.
 - Metrica di distanza tra domain kit e tra strutture di gameplay.
-- Contratto persistente dei tratti: dove vivono (`ResidentState` vs
-  profilo separato), come nascono (authored/generati/ereditati),
-  visibilità in scheda e in planning.
-- Denominatore della regola 75% (tutte le scene vs solo quelle
-  decisionali) e come si concilia con il budget «3–4 decisioni cruciali».
+- Come nascono i tratti (authored/generati/ereditati) — dove vivono è
+  deciso, come si creano no.
+- Formato esatto delle chiavi testo traducibili.
+- Regola 75% **posticipata** (Director 2026-10-10): si osserva sul
+  prototipo prima di fissare soglia e denominatore; resta aperta la
+  conciliazione col budget «3–4 decisioni cruciali».
 - Criteri di qualità narrativa e calibrazione del valutatore.
-- Strategia di localizzazione del testo generato (contenuto config vs
-  chrome i18n).
 - Soglie di accettazione delle simulazioni.
 - Regole di avanzamento, sospensione e conclusione delle main quest;
   generazione incrementale vs pre-generata dei segmenti; quanto del
