@@ -1005,3 +1005,24 @@ no-skip violato (≈1750 ms/comando vs soglia 675 ms).
 
 **Fonte:** Director in sessione 2026-10-09 («Rimozione totale»,
 «Rinegozia budget»).
+
+---
+
+## 2026-10-09 — PLAN-019-S3 battezzato: tre decisioni di struttura
+
+**Contesto:** draft S3 sottoposto a cold read (r1 groq, MAJOR assorbita) e
+presentato al Director con tre domande aperte. Risposta: «approvo» — tutte
+ratificate.
+
+**Decisioni ratificate:**
+
+1. **D-S3-1:** `QuestExpeditionDetail` **è** il Planner di v23 — evolve, non
+   si duplica. Il «pannello separato» di v23 era separazione *dalla vista di
+   run*, già soddisfatta dal FloatingPanel aperto dal POI.
+2. **D-S3-3 con `revealAtPlanning` in scope:** l'esploratore rivela indizi
+   secondari già a planning (soglia su stat derivata, config-first).
+3. **Draft persistente:** party/loadout del Planner sopravvivono alla
+   chiusura — draft chiavato su POI+giorno via `PersistenceService`. Chiude
+   l'`unresolved` di v23 rev.2.
+
+**Fonte:** Director in sessione 2026-10-09, «approvo».

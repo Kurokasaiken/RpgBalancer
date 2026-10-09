@@ -2359,3 +2359,25 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Contesto dichiarato in chat (2026-10-09):** premium ~14.99 con sconto al lancio; obiettivo = reputazione; nessuna pagina Steam; nessuna scadenza; teaser = scene in-engine registrate e montate (R-072); poi demo Next Fest.
 **Artefatto:** `context/STEAM_PAGE_PLAN.md` — decisioni bloccanti D1–D6 (nome del gioco in testa), mappa della pagina, shot list, clip/GIF, bozze testi EN, tag, piano lingue (pagina vs gioco), fasi F0–F8, checklist.
 **Collegamenti:** R-072 (teaser), `context/ESTIMATE_AGENT_PROMPT.md`.
+
+## R-118 — PLAN-019-S3: la parte precedente (Planner completo su /game)
+
+**Richiesta (implicita nel flusso):** *"procedi"* dopo la chiusura di PLAN-025 — lo stadio S3 del macro plan Quest era il prossimo della sequenza ratificata v24 («Poi fare in modo di vedere anche la parte precedente: il planning, assegnare gli slot, ecc.»).
+**Data:** 2026-10-09
+**Stato:** `in corso` — plan **battezzato `active`** (Director 2026-10-09 «approvo»: D-S3-1/D-S3-3/draft persistente ratificati); cold read r1 groq MAJOR assorbita.
+**Desiderata FROZEN:** v23 (Mission Planner PARTY/LOADOUT/OUTCOME, BY MEMBER, WHY, delta, reversibilità esatta) + v24 (stadio S3; preview sui check certi, compound su ipotesi dichiarate).
+**Artefatto:** `plans/PLAN-019-S3-parte-precedente.md` — gap analysis vs S2.4, 3 decisioni di struttura (D-S3-1 detail=Planner / D-S3-2 MC non DP / D-S3-3 info secondaria), task T-0…T-6, gate del macro (trade-off reali, non-risolta-nel-planner, preview≡resolver, Director).
+**Collegamenti:** `plans/PLAN-019-quest-macro-plan.md` §S3, `plans/PLAN-018-mission-planner.md`, PLAN-019-S2.* (superficie ereditata), DECISION_LOG 2026-10-01.
+
+## R-119 — Validazione E2E completa del ciclo di vita quest su /game («Sterminio dei goblin»)
+
+**Richiesta (verbatim):** *"sulla pagina /game mi serve validare tutto il flow che parte da Roster alla fine della quest e ricevute ricompense e mandati i pg 'a casa', sparisce il POI. M serve un bel sistema che testi da playwright/pupeteer tutto il workflow, pezzo x pezzo e m controlli che tutto fili liscio, i controlli del tempo, accelerando, stoppando, ecc. la quest deve essere sterminion goblin in quella pagina"*
+**Data:** 2026-10-11
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna nuova — estende la copertura E2E di PLAN-019-S2.4/S2.5 sulla superficie canonica.
+**Artefatto:** `tests/e2e/idleVillage/gameQuestLifecycle.spec.ts` — suite pezzo per pezzo: boot roster+POI → click sul marker reale → planning (gate «Invia», residente non eleggibile) → drag reale dal roster → forecast → lancio → POI `in_progress` → controlli tempo HUD (pausa/ripresa/×1/×4, un solo driver) → frontiera pending che matura sul clock canonico → esito terminale → settlement una volta sola (gold/xp/destini come dati) → PG rilasciati e ri-assegnabili → chiusura rapporto → POI sparisce → persistenza dopo reload.
+**Fix indotti dalla validazione:**
+- `game-frame-pixi.tsx`: rimosso il secondo driver del clock (`useCentralizedTiming` duplicava `useTimeEngineLoop` dentro `GameFrameScreen` — tick ~2×). Contratto «un driver per screen» ora rispettato.
+- Consumo POI: run `ended`+`settled` + chiusura del rapporto (X / «Chiudi il rapporto» / menu pannelli / Q) → `questRun.clear()` + POI marcato `consumed` persistito via `PersistenceService` (`idleVillage.questPois.consumed`) → marker escluso dagli anchor, anche dopo reload (tabella terminali PLAN-019-S2.5: ogni esito ⇒ «POI chiude»).
+- Testability: `data-quest-poi-id` su `MapQuestPoi`, `data-testid="quest-window-close-report"` su `QuestRunWindow`, hook `getClock()` negli `__idleVillageTestHooks`.
+**Collegamenti:** `tests/e2e/idleVillage/gameQuestExpedition.spec.ts` (infrastruttura hook/driveRunToEnd riusata), PLAN-019-S2.4/S2.5, R-107.
