@@ -2,7 +2,7 @@
 title: 'PLAN-019-S2.4 — Planning surface + lancio: detail viva, assegnazione trusted, Invia spedizione, halo, routing'
 status: active
 created: 2026-10-09
-revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: 2× MAJOR → assorbito; run `…/s2.4/r2/`. D-K riformulata su semantica percorso-effettivo. Implementato — T-0…T-6 tutti fatti; E2E 7/7, unit 129/129, safeguard verdi; evidence `test-results/s24-planning-lancio-2026-10-09.log`)
+revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: 2× MAJOR → assorbito; run `…/s2.4/r2/`. D-K riformulata su semantica percorso-effettivo. Implementato — T-0…T-6 tutti fatti; E2E 9/9, unit 129/129, safeguard verdi; badge bivio D-H-4 consumato da MapQuestPoi; slot rack filtrato su `poi.slots`; evidence `test-results/s24-planning-lancio-2026-10-09.log`)
 
 ## Stato implementazione (2026-10-09, sessione esecutiva)
 
@@ -33,17 +33,21 @@ revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: 2× M
   `MapQuestPoiSessionShape` — serve sia la session mock sia `poiView` reale);
   click POI → detail (offerta) o `QuestRunWindow` (run attivo) via
   `openRunWindow(questId)`; label tempo finestra su halo vivo. Badge bivio
-  binario sul POI (D-H-4): `poiView` espone `haloStatus`, `MapQuestPoi` non lo
-  consuma ancora — proposta aperta, non bloccante.
-- **T-5 fatto**: `tests/e2e/idleVillage/gameQuestExpedition.spec.ts` 7/7 —
+  binario sul POI (D-H-4) implementato: `poiView.decisionWaiting` →
+  `[data-decision-waiting]` pulsante sul medallion.
+- **T-5 fatto**: `tests/e2e/idleVillage/gameQuestExpedition.spec.ts` 9/9 —
   halo vuoto pre-lancio, gating slot + rifiuto ineleggibile, drag reale,
-  forecast + freeze un run → QuestRunWindow, halo su elapsed durante bivio,
-  bivi mai auto-risolti + catch-up path-relative, persistenza reload.
+  forecast + freeze un run → QuestRunWindow, parità forecast↔run
+  (offerta congelata byte-identica), halo su elapsed durante bivio,
+  bivi mai auto-risolti + catch-up path-relative, forecast party-dipendente
+  + card `data-compatibility="invalid"`, assenza lunga → `pieno-in-attesa`
+  + badge bivio, persistenza reload.
   Hook `__idleVillageTestHooks.expedition[poiId]` (openDetail/send/assignToSlot/
   getEstimate/getResolvedOffer/getRun/getHalo/choose/advanceTicks — advance via
   azione `tick` canonica dello store).
-- **T-6 fatto**: unit scope quest 129/129 (11 file), E2E 7/7, build:check ✓,
-  kanban:lint ✓, lint n/a (quarantena). Evidence:
+- **T-6 fatto**: unit scope quest 129/129 (11 file), E2E 9/9, build:check ✓
+  (due timeout a 180s per carico macchina, poi verde), kanban:lint ✓,
+  lint n/a (quarantena). Evidence:
   test-results/s24-planning-lancio-2026-10-09.log.
 - i18n: `questExpedition.*`, `questOffer.band.*`, `questOffer.tier.*`,
   `gameFrame.questWindow.ticks` aggiunti (it-IT, en).

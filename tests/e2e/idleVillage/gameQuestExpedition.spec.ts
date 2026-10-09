@@ -27,6 +27,8 @@ type RunShape = {
   visitedNodes: string[];
   party: { id: string }[];
   frontier: { status: string; readyAt: number };
+  scenarioInstanceId?: string;
+  resolvedOffer?: unknown;
 };
 type HaloShape = { fraction: number; elapsedTicks: number; durationTicks: number; status: string };
 type ExpeditionHook = {
@@ -148,6 +150,11 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     expect((estimate as { sim: { outcomePct: { reward: number } } }).sim.outcomePct.reward).toBeGreaterThanOrEqual(0);
     expect((estimate as { sim: { outcomePct: { reward: number } } }).sim.outcomePct.reward).toBeLessThanOrEqual(100);
 
+    /* Parity forecast↔run: the run must freeze THE offer the surface showed
+     *  — same resolved record, same content-addressed instance. */
+    const shownOffer = await expedition<{ instanceId: string }>(page, 'getResolvedOffer');
+    expect(shownOffer).not.toBeNull();
+
     // Double-commit in the same breath → exactly one run (T-3 latch).
     await expedition<void>(page, 'send');
     await expedition<void>(page, 'send');
@@ -155,6 +162,8 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     expect(run).not.toBeNull();
     expect(run!.ended).toBe(false);
     expect(run!.party.map((m) => m.id).sort()).toEqual([VALID_MEMBER, VALID_LEADER].sort());
+    expect(run!.scenarioInstanceId).toBe(shownOffer.instanceId);
+    expect(JSON.stringify(run!.resolvedOffer)).toBe(JSON.stringify(shownOffer));
 
     // The canonical run window opens on the active quest.
     await expect(page.getByTestId('quest-window')).toBeVisible({ timeout: 10_000 });
@@ -257,18 +266,12 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
 
     /* While the detail plans, each roster card carries the compatibility
      *  verdict — `data-compatibility` on the real PgCard, not a parallel
-     *  marker. Salvatrice starts 'valid' (member-2/esploratore accepts her);
-     *  once giggiolillo fills that slot no remaining slot accepts her and
-     *  the card flips to 'invalid' — the live verdict, not a static label. */
+     *  marker. Both heroes start 'valid': spaccaculi for leader, salvatrice
+     *  for member-2/esploratore (clarity) — her only accepting slot. */
     const salvatrice = page.locator(`[data-worker-id="${INVALID_RESIDENT}"]`).first();
-    const validCard = page.locator(`[data-worker-id="${VALID_LEADER}"]`).first();
+    const leaderCard = page.locator(`[data-worker-id="${VALID_LEADER}"]`).first();
     await expect(salvatrice).toHaveAttribute('data-compatibility', 'valid');
-    await expect(validCard).toHaveAttribute('data-compatibility', 'valid');
-    /* member-2 is the esploratore slot (precision|clarity) — the ONLY one
-     *  that accepts salvatrice. Filling it leaves her with no accepting
-     *  slot: the card flips to 'invalid'. */
-    await expedition<boolean>(page, 'assignToSlot', SLOT_MEMBER_2, VALID_MEMBER);
-    await expect(salvatrice).toHaveAttribute('data-compatibility', 'invalid');
+    await expect(leaderCard).toHaveAttribute('data-compatibility', 'valid');
 
     // Solo leader → one estimate.
     await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
@@ -277,9 +280,11 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     });
     const soloJson = await expedition<string>(page, 'getEstimateJson');
 
-    // Adding a member re-runs the sim: the estimate is a different object
-    // with different numbers (party-dependent, not a static label).
-    await expedition<boolean>(page, 'assignToSlot', SLOT_MEMBER, VALID_MEMBER);
+    /* Adding a member re-runs the sim: the estimate is a different object
+     *  with different numbers (party-dependent, not a static label).
+     *  member-2 is the esploratore slot — filling it also leaves salvatrice
+     *  with no accepting slot, so her card flips to 'invalid'. */
+    await expedition<boolean>(page, 'assignToSlot', SLOT_MEMBER_2, VALID_MEMBER);
     await page.waitForFunction(
       (previous) => {
         const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'] as
@@ -294,6 +299,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     const duoJson = await expedition<string>(page, 'getEstimateJson');
     expect(duoJson).not.toBe(soloJson);
     await expect(page.getByTestId('quest-expedition-forecast')).toHaveAttribute('data-forecast-state', 'ready');
+    await expect(salvatrice).toHaveAttribute('data-compatibility', 'invalid');
   });
 
   test('a long absence fills the halo past the estimate but never concludes a waiting frontier (catch-up + badge)', async ({ page }) => {
