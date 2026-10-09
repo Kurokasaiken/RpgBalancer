@@ -19,6 +19,7 @@ import {
   analyzeCheck,
   CHECKPOINT_OPTIONS,
   choiceNodesFor,
+  computeForecastDelta,
   defaultStrategy,
   simulateQuest,
 } from '@/ui/idleVillage/questS1Lab/questSimulation';
@@ -304,5 +305,61 @@ describe('quest simulation — signal vs noise', () => {
     const r = sim(mid);
     expect(mid.nodeId).not.toBe(QUESTS.rovine.startNode);
     expect(r.outcomePct.reward + r.outcomePct.survived + r.outcomePct.fled + r.outcomePct.wipe).toBeCloseTo(100, 5);
+  });
+});
+
+describe('quest simulation — WHY attribution + forecast delta (S3 T-2)', () => {
+  it('attributes every harm event to an authored node title', () => {
+    const run = rovineRun();
+    const r = sim(run, { 'rv-checkpoint': 'rv-continua' }); // push: crosses the risky stretch
+    const titles = new Set(Object.values(nodesFor(run)).map((n) => n.title));
+    expect(r.whyBySource.length).toBeGreaterThan(0);
+    for (const src of r.whyBySource) {
+      expect(titles.has(src.source)).toBe(true);
+      expect(src.runsPct).toBeGreaterThan(0);
+      expect(src.runsPct).toBeLessThanOrEqual(100);
+      expect(src.woundSharePct).toBeGreaterThanOrEqual(0);
+      expect(src.woundSharePct).toBeLessThanOrEqual(100);
+      expect(src.deathSharePct).toBeGreaterThanOrEqual(0);
+      expect(src.deathSharePct).toBeLessThanOrEqual(100);
+    }
+  });
+
+  it('shares partition the totals: death share sums to ~100, rows sorted by impact', () => {
+    const r = sim(rovineRun(), { 'rv-checkpoint': 'rv-continua' });
+    const deathSum = r.whyBySource.reduce((a, s) => a + s.deathSharePct, 0);
+    const woundSum = r.whyBySource.reduce((a, s) => a + s.woundSharePct, 0);
+    if (r.anyDeathPct > 0) expect(deathSum).toBeCloseTo(100, 5);
+    if (r.anyWoundPct > 0) expect(woundSum).toBeCloseTo(100, 5);
+    const impact = r.whyBySource.map((s) => s.deathSharePct + s.woundSharePct);
+    expect(impact).toEqual([...impact].sort((a, b) => b - a));
+  });
+
+  it('computeForecastDelta is the signed pp difference of the headline metrics', () => {
+    const run = rovineRun();
+    const weak = sim(withParty(run, (p) => p.map((m) => ({ ...m, stats: { ...m.stats, fort: 0, edge: 0, perc: 0, ward: 0 } }))));
+    const strong = sim(run);
+    const d = computeForecastDelta(strong, weak);
+    expect(d.deathPp).toBeCloseTo(strong.anyDeathPct - weak.anyDeathPct, 10);
+    expect(d.woundPp).toBeCloseTo(strong.anyWoundPct - weak.anyWoundPct, 10);
+    expect(d.rewardPp).toBeCloseTo(strong.outcomePct.reward - weak.outcomePct.reward, 10);
+    expect(d.wipePp).toBeCloseTo(strong.outcomePct.wipe - weak.outcomePct.wipe, 10);
+    expect(d.days).toBeCloseTo(strong.daysAvg - weak.daysAvg, 10);
+    // The strong party should look strictly safer than the zero-stat one.
+    expect(d.deathPp).toBeLessThanOrEqual(0);
+  });
+
+  it('reversibility: sim is a pure function of inputs — a rebuilt party returns an identical result', () => {
+    const solo = sim(rovineRun());
+    // A different configuration…
+    const two = sim(
+      withParty(rovineRun(), (p) => [
+        ...p,
+        { id: 'extra', name: 'Extra', role: 'member', hp: 20, maxHp: 20, stats: { fort: 10, perc: 10, edge: 10, ward: 10 }, dead: false, wounded: false, traits: [] },
+      ]),
+    );
+    expect(two).not.toEqual(solo);
+    // …then the original again — bit-identical (same inputs → same seed → same numbers).
+    expect(sim(rovineRun())).toEqual(solo);
   });
 });

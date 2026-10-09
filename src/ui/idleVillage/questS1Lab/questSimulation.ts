@@ -35,7 +35,7 @@ import {
   STAT_LABELS,
   TUNE,
 } from './questRun';
-import type { QuestRunState, Verdict } from './questRun';
+import type { HarmEvent, QuestRunState, Verdict } from './questRun';
 import type { LabStat, QuestNode } from './questScenario';
 import { DEFAULT_QUEST_SKILL_CHECK_CONFIG } from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
 
@@ -358,6 +358,50 @@ export interface MemberSimStats {
   downtimeDays: number;
 }
 
+/**
+ * Harm attribution for one scenario source (PLAN-019-S3 T-2 — the OUTCOME
+ * zone's WHY): which authored node produced the wounds/deaths across the
+ * sims. `source` is the node title the engine records on `HarmEvent.source`
+ * — every damage path (checks, combat turns, ambushes, tolls, attrition)
+ * stamps the originating node.
+ */
+export interface WhySourceStat {
+  /** Node title recorded by the engine (`HarmEvent.source`). */
+  source: string;
+  /** Percent of runs where this source dealt ≥1 harm/death event. */
+  runsPct: number;
+  /** Share of ALL surviving-hit events this source produced (%). A harm
+   *  event that leaves the member alive marks them wounded
+   *  (`applyHpDamage` → `wounded = true`), so this reads as wound share. */
+  woundSharePct: number;
+  /** Share of ALL deaths this source produced (%). */
+  deathSharePct: number;
+}
+
+/** Point-delta of the headline forecast metrics between two sims
+ *  (PLAN-019-S3 T-2): current configuration minus the previous one — the
+ *  OUTCOME zone renders signed shifts, not silent re-baselines. */
+export interface ForecastDelta {
+  rewardPp: number;
+  woundPp: number;
+  deathPp: number;
+  wipePp: number;
+  /** Expected expedition days delta (can be negative — a faster clear). */
+  days: number;
+}
+
+/** `current − previous` on the headline metrics. Percentage-point diffs —
+ *  the surface renders them as signed pp shifts. */
+export function computeForecastDelta(current: QuestSimResult, previous: QuestSimResult): ForecastDelta {
+  return {
+    rewardPp: current.outcomePct.reward - previous.outcomePct.reward,
+    woundPp: current.anyWoundPct - previous.anyWoundPct,
+    deathPp: current.anyDeathPct - previous.anyDeathPct,
+    wipePp: current.outcomePct.wipe - previous.outcomePct.wipe,
+    days: current.daysAvg - previous.daysAvg,
+  };
+}
+
 export interface QuestSimResult {
   runs: number;
   /** Outcome distribution in percent. */
@@ -388,6 +432,11 @@ export interface QuestSimResult {
   humanDaysAvg: number;
   woundedDowntimeAvg: number;
   perMember: MemberSimStats[];
+  /** WHY attribution — which authored nodes produced the wounds/deaths,
+   *  sorted by (deathShare + woundShare) desc. Harvested inside each sim
+   *  run from `checkQueue`/`recentHarms`/`pendingHarms`, so it costs the
+   *  SAME Monte Carlo — no extra sims. */
+  whyBySource: WhySourceStat[];
 }
 
 /** FNV-1a 32-bit — stable seed derived from the sim input (no Math.random). */
@@ -415,6 +464,7 @@ function runOneSim(
   s: QuestRunState,
   nodes: Record<string, QuestNode>,
   strategy: SimStrategy,
+  sourceAcc?: Map<string, { wounds: number; deaths: number }>,
 ): void {
   let guard = 0;
   while (!s.ended && guard++ < 100) {
@@ -433,6 +483,23 @@ function runOneSim(
     // consumables entirely (Director 2026-10-04).
     s.flags = s.flags.filter((f) => !CHECK_CONSUMABLE_FLAGS.has(f));
     applyChoice(s, pick.id, { useConsumable: false });
+    /* WHY attribution (S3 T-2): `submitCommand` resets the three harm
+     * buckets at every command, so right here they hold exactly THIS
+     * command's events — check-attributed harms (`checkQueue[].harms`),
+     * ambient beats (`recentHarms`) and any undrained residual
+     * (`pendingHarms`). No second pass, no extra sims. */
+    if (sourceAcc) {
+      const bump = (source: string | undefined, kind: HarmEvent['kind']) => {
+        const key = source ?? '?';
+        const a = sourceAcc.get(key) ?? { wounds: 0, deaths: 0 };
+        if (kind === 'death') a.deaths += 1;
+        else a.wounds += 1;
+        sourceAcc.set(key, a);
+      };
+      for (const chk of s.checkQueue) for (const h of chk.harms) bump(h.source ?? chk.title, h.kind);
+      for (const h of s.recentHarms) bump(h.source, h.kind);
+      for (const h of s.pendingHarms) bump(h.source, h.kind);
+    }
   }
 }
 
@@ -460,6 +527,8 @@ interface SimAccumulator {
   viandante: number;
   humanDaysSum: number;
   woundedDowntimeSum: number;
+  /** source title → runs harmed + wound/death event totals (WHY zone). */
+  whyAcc: Map<string, { runsWithHarm: number; wounds: number; deaths: number }>;
 }
 
 const beginSimAccumulation = (): SimAccumulator => ({
@@ -482,6 +551,7 @@ const beginSimAccumulation = (): SimAccumulator => ({
   viandante: 0,
   humanDaysSum: 0,
   woundedDowntimeSum: 0,
+  whyAcc: new Map(),
 });
 
 /** Runs ONE cloned simulation (`seed = seedBase + i`) and folds its terminal
@@ -497,7 +567,15 @@ function accumulateSimRun(
   const s = cloneForSim(state);
   s.seed = seedBase + i;
   s.rngCalls = 0;
-  runOneSim(s, nodes, strategy);
+  const runSources = new Map<string, { wounds: number; deaths: number }>();
+  runOneSim(s, nodes, strategy, runSources);
+  for (const [source, v] of runSources) {
+    const a = acc.whyAcc.get(source) ?? { runsWithHarm: 0, wounds: 0, deaths: 0 };
+    a.runsWithHarm += 1;
+    a.wounds += v.wounds;
+    a.deaths += v.deaths;
+    acc.whyAcc.set(source, a);
+  }
 
   const outcome = s.outcome === 'running' ? 'running' : s.outcome;
   acc.outcomes[outcome] += 1;
@@ -594,7 +672,30 @@ function finalizeSimResult(acc: SimAccumulator, state: QuestRunState, runs: numb
     humanDaysAvg: humanDaysSum / runs,
     woundedDowntimeAvg: woundedDowntimeSum / runs,
     perMember,
+    whyBySource: finalizeWhy(acc.whyAcc, runs),
   };
+}
+
+/** Fold the per-source tallies into display stats: % of runs harmed, share
+ *  of all wound events, share of all deaths — sorted by total impact. */
+function finalizeWhy(
+  whyAcc: Map<string, { runsWithHarm: number; wounds: number; deaths: number }>,
+  runs: number,
+): WhySourceStat[] {
+  let totalWounds = 0;
+  let totalDeaths = 0;
+  for (const v of whyAcc.values()) {
+    totalWounds += v.wounds;
+    totalDeaths += v.deaths;
+  }
+  return [...whyAcc.entries()]
+    .map(([source, v]) => ({
+      source,
+      runsPct: (v.runsWithHarm / runs) * 100,
+      woundSharePct: totalWounds > 0 ? (v.wounds / totalWounds) * 100 : 0,
+      deathSharePct: totalDeaths > 0 ? (v.deaths / totalDeaths) * 100 : 0,
+    }))
+    .sort((a, b) => b.deathSharePct + b.woundSharePct - (a.deathSharePct + a.woundSharePct));
 }
 
 /**

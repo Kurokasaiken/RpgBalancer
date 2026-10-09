@@ -321,6 +321,72 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await expect(salvatrice).toHaveAttribute('data-compatibility', 'invalid');
   });
 
+  /* PLAN-019-S3 T-2 — exact reversibility: the forecast is a pure function
+   *  of the configuration (seed derives from the inputs), so the full UI
+   *  round-trip A → A+member → A+member+item → A must return BYTE-IDENTICAL.
+   *  The item leg asserts the Director contract: consumables are excluded
+   *  from the total forecast, so toggling the bag must NOT recompute. */
+  test('forecast reversibility: A → A+member → A+member+item → A is bit-identical', async ({ page }) => {
+    await expedition<void>(page, 'openDetail');
+    await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
+    await expect(page.getByTestId('quest-expedition-forecast')).toHaveAttribute('data-forecast-state', 'ready', {
+      timeout: 20_000,
+    });
+    const aJson = await expedition<string>(page, 'getEstimateJson');
+
+    /* OUTCOME zone renders the T-2 sections on the real forecast: the
+     *  BY MEMBER row per assigned resident and the WHY attribution rows
+     *  (the goblin graph always produces harm sources under the default
+     *  strategy). */
+    await expect(page.getByTestId('forecast-members')).toBeVisible();
+    expect(await page.locator('[data-testid^="forecast-member-"]').count()).toBe(1);
+    await expect(page.getByTestId('forecast-why')).toBeVisible();
+    expect(await page.getByTestId('forecast-why-row').count()).toBeGreaterThanOrEqual(1);
+
+    // A + member: a different party → a different forecast.
+    await expedition<boolean>(page, 'assignToSlot', SLOT_MEMBER_2, VALID_MEMBER);
+    await page.waitForFunction(
+      (previous) => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'] as
+          | { getEstimateJson?: () => string }
+          | undefined;
+        const current = exp?.getEstimateJson?.();
+        return typeof current === 'string' && current !== previous;
+      },
+      aJson,
+      { timeout: 20_000 },
+    );
+    const abJson = await expedition<string>(page, 'getEstimateJson');
+    expect(abJson).not.toBe(aJson);
+    /* BY MEMBER tracks the party: two rows now; the intel section shows
+     *  the authored preview hints regardless of the explorer threshold. */
+    expect(await page.locator('[data-testid^="forecast-member-"]').count()).toBe(2);
+    await expect(page.getByTestId('forecast-intel')).toBeVisible();
+    expect(await page.getByTestId('forecast-intel-row').count()).toBeGreaterThanOrEqual(1);
+
+    // A + member + item: the bag is out of the sim by contract — same JSON.
+    await expedition<void>(page, 'toggleItem', 'quest_consumable_fumogeno');
+    const abItemJson = await expedition<string>(page, 'getEstimateJson');
+    expect(abItemJson).toBe(abJson);
+
+    // Revert both: the forecast lands back on A, bit-identical.
+    await expedition<void>(page, 'toggleItem', 'quest_consumable_fumogeno');
+    await expedition<void>(page, 'clearSlot', SLOT_MEMBER_2);
+    await page.waitForFunction(
+      (previous) => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'] as
+          | { getEstimateJson?: () => string }
+          | undefined;
+        const current = exp?.getEstimateJson?.();
+        return typeof current === 'string' && current !== previous && current !== 'null';
+      },
+      abItemJson,
+      { timeout: 20_000 },
+    );
+    const backJson = await expedition<string>(page, 'getEstimateJson');
+    expect(backJson).toBe(aJson);
+  });
+
   test('a long absence fills the halo past the estimate but never concludes a waiting frontier (catch-up + badge)', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);

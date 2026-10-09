@@ -1418,6 +1418,24 @@
       "wound": "Ferite {pct}%",
       "death": "Morti {pct}%",
       "wipe": "Strage {pct}%"
+    },
+    "members": {
+      "title": "Per membro",
+      "row": "ferite {wound}% · morti {death}%",
+      "downtime": "≈{days}g fermo",
+      "role": {
+        "leader": "leader",
+        "bodyguard": "guardia",
+        "member": "membro"
+      }
+    },
+    "why": {
+      "title": "Da dove viene il rischio",
+      "row": "— nel {runs}% dei run · {death}% delle morti · {wound}% delle ferite"
+    },
+    "intel": {
+      "title": "Informazioni",
+      "scouted": "esplorato"
     }
   },
   "questOffer": {
