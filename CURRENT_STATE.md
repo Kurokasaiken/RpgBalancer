@@ -18,7 +18,8 @@ Questa è una fotografia; per lo stato più aggiornato verificare `SESSION_HANDO
 - `ProductionEngine`, `EconomyEngine`, `MarketEngine`, `InjuryEngine`, `SurvivalEngine`.
 - `CharacterToResidentBootstrap`, `VillageStateStore`, `PersistenceService` (versioni da consolidare).
 - `SlottedMedal`, `ActionCardBase`, `ActionHalo`, `JobActionCard`, `QuestActionCard`, `MarketActionCard`.
-- `QuestChronicle` (card a fasi, rope, raccolta ricompense).
+- `QuestChronicle` (card a fasi, rope, raccolta ricompense — superficie del vecchio path milestone, solo sulla pagina di riferimento deprecata).
+- `QuestRunWindow` (`src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx`, R-106/R-107): **componente battezzato per la quest in corso su `/game`** (Director 2026-10-09) — finestra HUD fluttuante (HudPlaque, trascinabile/riducibile), teatro cinema, scelte, barra tempo sul clock di gioco, tile fasi; si apre dalla Regia («Start goblin quest») e dal menu Pannelli (tasto Q); motore `useQuestRun`/`questRun.ts` (grafo, frontiera v27, persistito via PersistenceService). `QuestTheatre` converge dentro di esso.
 - `MagicCircleHalo` (iscrizione dalle ore 12, stop + pulsazione).
 - `MilestoneCheckModal` con `Destiny Astrolabe V1`.
 - `FloatingPanel` per detail / quest card / skill check (pannelli flottanti, spostabili, riducibili a icona).

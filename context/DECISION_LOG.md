@@ -712,3 +712,69 @@ di superfici trusted (roster compact), non sotto-scatole. Formalizzato in
 (context/INDEX, KNOWLEDGE_INVENTORY, CLASSIFICATION, checklist mandate).
 
 **Fonte:** decisioni Director D1–D3 durante R-104 (sessione 2026-10-08).
+
+---
+
+## 2026-10-09 — Motore quest canonico, assegnazione da POI e derivazione delle competenze (S2, R-107)
+
+**Contesto:** avvio di PLAN-019-S2 («un paio di POI funzionanti con POI detail
+veri su /game»). Gate delle decisioni risposto dal Director in sessione.
+
+**Decisioni:**
+
+1. **Motore canonico = grafo di nodi** (`questRun.ts`). Chiude PLAN-019 **D-2**
+   senza spike ex-novo: la prova è già in produzione — 3 quest authored, la
+   frontiera v27 implementata lì, PLAN-025 ci costruisce il teatro sopra, il
+   Monte Carlo lo misura. `QuestBlueprint` (Zod, fasi lineari) si riduce a
+   *busta offerta* del POI (metadati per detail/planner); gli scenari authored
+   migrano a schema Zod config-first.
+2. **Divergenza registrata** (approvata dal Director): PLAN-019 diceva «il
+   codice S1 non viene promosso: si trasferiscono le regole, non
+   l'implementazione». Il motore è diventato canonico **per costruzione**;
+   resta valido il principio che le *regole* validate governano — i contenuti
+   e i parametri si promuovono a config, non si ricopia la pagina lab.
+3. **Assegnazione:** si riusa la session POI esistente (detail + slot roster
+   già montati su `/game`); il Mission Planner completo resta lavoro di S3
+   (v24). Il vecchio path milestone è bypassato per le quest a motore nuovo e
+   resta vivo solo sulla superficie deprecata. Una spedizione attiva alla
+   volta nel primo slice.
+4. **Derivazione competenze (chiude PLAN-019 D-3 in forma pipeline):** le stat
+   dei membri di spedizione si **derivano dallo StatBlock combat reale** del
+   residente, non dal mockup lab: `str←damage`, `con←hp`, `perc←%tohit`
+   (`hitChance`; flat `txc` candidato), `agi←evasion` (dodge) — mappatura
+   corretta dal Director in sessione («%tohit = percezione, dodge = agilità»).
+   `int` e `cha` sono **mockate ma nella
+   stessa pipeline config-driven** — la regola di derivazione vive in config
+   Zod (`questMemberStats`), così la decisione finale del Director cambia solo
+   la config. I check `cha` usano il canale `int` («rimappa su int»).
+
+**Fonte:** Director, risposte al gate T-001 di PLAN-019-S2 (2026-10-09); R-107.
+
+---
+
+## 2026-10-09 — Componente quest in corso battezzato: `QuestRunWindow` (R-107, D-F)
+
+**Contesto:** durante l'esecuzione di R-107 (PLAN-019-S2) il Director ha chiarito
+che il componente corretto per la «quest in progress» su `/game` è quello che si
+apre dalla Regia — `QuestRunWindow`
+(`src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx`), mosso da
+`useQuestRun` sul motore a grafo `questRun.ts`.
+
+**Decisione:**
+
+- **`QuestRunWindow` è il componente battezzato** per la quest in corso su
+  `/game`: pannello HUD fluttuante (HudPlaque, trascinabile, riducibile a
+  icona), teatro cinema, scelte, barra tempo sul clock di gioco, tile delle
+  fasi. Si apre dalla Regia («Start goblin quest») e dal menu Pannelli
+  (tasto Q, pannello `quest`).
+- `QuestTheatre` (PLAN-021) **converge dentro** `QuestRunWindow`, non il
+  contrario — coerente con R-106 iterazione 3 («un solo componente»,
+  direzione B: architettura teatro + contenuti/pezzi del lab).
+- Il POI (`MapQuestPoi` + `useQuestPoiSession`) emette l'intento di lancio;
+  `useQuestRun` resta l'unico owner del run (PLAN-019-S2 I-4); la
+  presentazione è `QuestRunWindow`.
+
+**Fonte:** Director in sessione 2026-10-09 («dentro la pagina /game c'è il
+componente quest in progress che si apre dal director, quello è il componente
+corretto. Aggiorna la documentazione x puntare a quello come "componente
+battezzato"»); registrato come D-F in `plans/PLAN-019-S2-quest-vera.md`.
