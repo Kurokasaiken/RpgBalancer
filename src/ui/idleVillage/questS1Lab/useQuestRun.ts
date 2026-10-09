@@ -38,8 +38,6 @@ import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
 import { releaseLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
 import { beatMark, projectBeats, type BeatMark, type QuestBeat } from './beatSequencer';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
-import { createQuestRunAdapter } from '@/ui/idleVillage/questTheatre/questRunAdapter';
-import type { TheatreAdapter } from '@/ui/idleVillage/questTheatre/theatreContract';
 
 const BAG_FLAGS: ReadonlySet<string> = new Set(QUEST_STASH.items.map((item) => item.flag));
 
@@ -74,10 +72,6 @@ export interface QuestRunApi {
   useHealing: () => void;
   drinkPotion: () => void;
   clear: () => void;
-  /** Theatre read-model over this run (PLAN-025 T-006/T-007): the same engine
-   *  truth, projected for theatre-shaped consumers. Stable instance — its
-   *  commandId dedupe survives re-renders. */
-  adapter: TheatreAdapter;
   /** Committed-but-unpresented moments since the last window seen state
    *  (PLAN-025 T-008). Append-only per commit; the window's beat cursor
    *  replays them one at a time and the queue resets on start/clear. */
@@ -255,15 +249,6 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
     },
     [persist],
   );
-  const adapter = useMemo<TheatreAdapter>(
-    () =>
-      createQuestRunAdapter(() => runRef.current, {
-        getTick: () => tickRef.current,
-        onMutate: (apply) => actRef.current(apply, undefined),
-      }),
-    [],
-  );
-
   const clear = useCallback(() => {
     /* Terminal transition (S2.5): clearing releases the bag reservation on
      * the run's own identity — same key the settlement journal uses. */
@@ -277,7 +262,7 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   }, [persist]);
 
   return useMemo(
-    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear, adapter, beats, applySettlement }),
-    [run, phases, start, choose, syncClock, heal, potion, clear, adapter, beats, applySettlement],
+    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear, beats, applySettlement }),
+    [run, phases, start, choose, syncClock, heal, potion, clear, beats, applySettlement],
   );
 }

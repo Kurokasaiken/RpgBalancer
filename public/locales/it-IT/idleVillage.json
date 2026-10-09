@@ -1404,36 +1404,6 @@
       }
     }
   },
-  "questTheatre": {
-    "poi": {
-      "label": "Quest del teatro"
-    },
-    "awaiting": "La storia attende la tua decisione",
-    "chronicle": "Cronaca",
-    "chronicleEmpty": "La storia non è ancora cominciata.",
-    "unsupported": "Questo momento della storia usa una forma che il teatro non conosce.",
-    "retreat": {
-      "label": "Ritirata",
-      "action": "Ritirati"
-    },
-    "check": {
-      "probability": "Probabilità stimata: {{pct}}%",
-      "submit": "Affronta il check"
-    },
-    "reward": {
-      "collect": "Riscuoti la ricompensa"
-    },
-    "runState": {
-      "running": "In corso",
-      "success": "Missione compiuta",
-      "survived": "Tornati a mani vuote",
-      "fled": "Ritirata",
-      "wiped": "Compagnia annientata"
-    },
-    "combat": {
-      "telemetry": "Turno {{turn}} — nemici in piedi: {{enemies}}"
-    }
-  },
   "questExpedition": {
     "danger": "Pericolo",
     "duration": "Durata stimata ~{ticks} tick",
