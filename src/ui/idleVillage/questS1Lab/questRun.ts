@@ -14,6 +14,7 @@ import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
 import { GOBLIN_PRESETS, ROVINE_PRESETS } from './questLabPresets';
 import type { LabMember, LabStat, PartyPreset, QuestNode, Verdict } from './questScenario';
+import type { SettlementMarker } from '../quests/questSettlement';
 
 /** The authored S1 lab quests. 'cassa' = infiltration (agi/perc,
  *  alertness states); 'rovine' = attrition gauntlet (str/con, days & HP);
@@ -238,6 +239,12 @@ export interface QuestRunState {
   /** The frozen resolved offer — scales, signals, reward, band ids at
    *  launch time. The settlement reads `rewardResolved` from here (S2.5). */
   resolvedOffer?: ResolvedOfferRecord;
+  /* ---- Settlement journal (PLAN-019-S2.5) ------------------------------ */
+  /** Persistent settlement marker: `settling` = intent persisted, effects
+   *  being applied; `settled` = consequences landed exactly once. Absent on
+   *  a live run; absent on legacy terminal runs = not yet settled (the next
+   *  settle pass converges them). `inExpedition` releases on `settled`. */
+  settlement?: SettlementMarker;
 }
 
 /** A resolved check shown to the player as an astrolabe cinematic. */

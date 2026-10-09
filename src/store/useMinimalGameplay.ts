@@ -37,6 +37,7 @@ import { ensureMinimalRngState, type MinimalRngState } from '@/engine/game/idleV
 import type { ResidentState as TimeEngineResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { resolveResidentPortrait } from '@/engine/game/idleVillage/residentVisualResolver';
 import type { StatBlock } from '@/balancing/types';
+import { applyPlanToState, type SettlementPlan } from '@/ui/idleVillage/quests/questSettlement';
 import { IntentBridge } from '@/ui/idleVillage/intent/GameIntent';
 // import { TEST_RESIDENTS } from '@/balancing/config/idleVillage/testResidents'; // Replaced by TEST_ROSTER_HEROES conversion
 import { TEST_ROSTER_HEROES } from '@/balancing/config/idleVillage/testRosterResidents';
@@ -85,7 +86,13 @@ const clampPercentage = (value: number): number => {
   return value;
 };
 
-const deriveHpValues = (stats: Record<string, number> | undefined, fatiguePercent: number, isInjured: boolean) => {
+/**
+ * HP derivation shared by the store projection and the canonical roster
+ * overlay (S2.5): fatigue penalty 40% of max, injury penalty 25% of max.
+ * Exported so the roster bundle applies the SAME numbers — divergent HP
+ * math here vs there would silently break the feriti-hp contract.
+ */
+export const deriveHpValues = (stats: Record<string, number> | undefined, fatiguePercent: number, isInjured: boolean) => {
   const statHp = typeof stats?.hp === 'number' && Number.isFinite(stats.hp) ? Math.max(1, Math.round(stats.hp)) : undefined;
   const maxHp = statHp ?? FALLBACK_RESIDENT_HP;
   const fatigueRatio = clampPercentage(fatiguePercent) / 100;
@@ -97,8 +104,12 @@ const deriveHpValues = (stats: Record<string, number> | undefined, fatiguePercen
 
 const mapStoreStatusToEngineStatus = (
   status: ResidentStatus | undefined,
-  isInjured: boolean
+  isInjured: boolean,
+  isDead?: boolean
 ): TimeEngineResidentState['status'] => {
+  if (isDead || status === 'dead') {
+    return 'dead';
+  }
   if (isInjured || status === 'injured') {
     return 'injured';
   }
@@ -115,7 +126,7 @@ export function selectResidentRosterStates(
   const residentStatuses = selectResidentStatus(state);
 
   return state.residents.map((resident) => {
-    const status = mapStoreStatusToEngineStatus(residentStatuses[resident.id], resident.isInjured);
+    const status = mapStoreStatusToEngineStatus(residentStatuses[resident.id], resident.isInjured, resident.isDead);
     const fatigue = clampPercentage(resident.fatigue);
     const { currentHp, maxHp } = deriveHpValues(resident.stats, fatigue, resident.isInjured);
     const displayName = deriveDisplayName(resident.id, resident.name, config);
@@ -230,6 +241,10 @@ export interface MinimalGameplayState {
     eventLog: MinimalActivityEntry[];
     lastSavedAt?: number;
     rngState?: MinimalRngState;
+    /** S2.5 settlement ledger: `${runId}:${effectKey}` of effects already
+     *  applied — lives INSIDE this aggregate so mutation + dedup key are
+     *  persisted by the same write (no cross-key ordering assumption). */
+    appliedQuestEffectIds: string[];
     // Time engine & day/night cycle state
     isDayPhase: boolean;
     cycleProgress: number; // 0-1 progress through current day/night phase (derived from ticks)
@@ -261,6 +276,15 @@ export interface MinimalGameplayState {
    * loss summary from live state unless an explicit one is passed.
    */
   triggerSettlementLost: (summary?: MinimalGameOverState['summary']) => void;
+  /**
+   * Applies a settlement plan's effects to the gameplay aggregate
+   * (PLAN-019-S2.5): guarded resource deltas + resident consequences +
+   * the applied-keys ledger, committed in ONE state write so the same
+   * persisted snapshot carries mutation and dedup keys. Idempotent —
+   * already-keyed effects are skipped.
+   * @returns The `${runId}:${effectKey}` ids applied by this call.
+   */
+  applyQuestSettlement: (plan: SettlementPlan, tick?: number) => string[];
 }
 
 /**
@@ -289,6 +313,9 @@ function mapStoreStateToSnapshot(state: MinimalGameplayState['state']): MinimalG
       fatigue: resident.fatigue,
       isWorking: resident.isWorking,
       isInjured: resident.isInjured,
+      isDead: resident.isDead,
+      injuredUntilTick: resident.injuredUntilTick,
+      isHero: resident.isHero,
     })),
     activeActivities: state.activeActivities.map((activity) => ({
       activityId: activity.activityId,
@@ -298,6 +325,7 @@ function mapStoreStateToSnapshot(state: MinimalGameplayState['state']): MinimalG
     eventLog: state.eventLog,
     lastSavedAt: Date.now(),
     rngState: state.rngState,
+    appliedQuestEffectIds: state.appliedQuestEffectIds,
   };
 }
 
@@ -321,6 +349,9 @@ function mapSnapshotToStoreState(
       fatigue: resident.fatigue,
       isWorking: resident.isWorking,
       isInjured: resident.isInjured,
+      isHero: resident.isHero ?? false,
+      isDead: resident.isDead,
+      injuredUntilTick: resident.injuredUntilTick,
     })),
     activeActivities: snapshot.activeActivities.map((activity) => ({
       activityId: activity.activityId,
@@ -330,6 +361,7 @@ function mapSnapshotToStoreState(
     eventLog: snapshot.eventLog ?? [],
     rngState: ensureMinimalRngState(snapshot.rngState, fallbackSeed),
     lastSavedAt: snapshot.lastSavedAt,
+    appliedQuestEffectIds: snapshot.appliedQuestEffectIds ?? [],
   };
 }
 
@@ -392,6 +424,7 @@ const createInitialState = (config: MinimalConfig) => ({
       })),
   activeActivities: [],
   eventLog: [],
+  appliedQuestEffectIds: [],
   rngState: ensureMinimalRngState(undefined, config.globalRules.rngSeed),
   // Time engine & day/night cycle initialization
   isDayPhase: true, // Start during day
@@ -525,6 +558,7 @@ const INITIAL_STATE: MinimalGameplayState = {
   gameOver: () => false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   triggerSettlementLost: () => {},
+  applyQuestSettlement: () => [],
 };
 
 function mapStoreStateToEngineState(state: MinimalGameplayState['state']): GameState {
@@ -562,15 +596,24 @@ function mapEngineStateToStoreState(
     maxFood: engineState.maxFood,
     wood: engineState.wood,
     xp: engineState.xp,
-    residents: engineState.residents.map((resident) => ({
-      id: resident.id,
-      name: resident.name,
-      stats: resident.stats,
-      fatigue: resident.fatigue,
-      isWorking: resident.isWorking,
-      isInjured: resident.isInjured,
-      level: resident.level,
-    })),
+    residents: engineState.residents.map((resident) => {
+      /* The engine knows nothing of settlement consequences — death, wound
+       *  expiry and the hero flag ride on the store record and must survive
+       *  the engine→store merge untouched. */
+      const prev = previousState.residents.find((p) => p.id === resident.id);
+      return {
+        id: resident.id,
+        name: resident.name,
+        stats: resident.stats,
+        fatigue: resident.fatigue,
+        isWorking: resident.isWorking,
+        isInjured: resident.isInjured,
+        level: resident.level,
+        isDead: prev?.isDead,
+        injuredUntilTick: prev?.injuredUntilTick,
+        isHero: prev?.isHero ?? false,
+      };
+    }),
     activeActivities: engineState.activeActivities.map((activity) => ({
       activityId: activity.activityId,
       residentId: activity.residentId,
@@ -719,6 +762,16 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
           ...resident,
           fatigue: Math.max(0, resident.fatigue - fatigueRecovery),
         }));
+      }
+
+      // S2.5: settlement wounds expire on the canonical clock — a resident
+      // whose `injuredUntilTick` has passed heals (dead stays dead).
+      if (nextState.residents.some((r) => r.injuredUntilTick != null && r.injuredUntilTick <= updatedTick)) {
+        nextState.residents = nextState.residents.map((resident) =>
+          !resident.isDead && resident.injuredUntilTick != null && resident.injuredUntilTick <= updatedTick
+            ? { ...resident, isInjured: false, injuredUntilTick: undefined }
+            : resident,
+        );
       }
 
       // Advance active activities one integer tick at a time, applying
@@ -918,6 +971,24 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
       questsCompleted: resolvedSummary.questsCompleted,
       residentsLost: resolvedSummary.residentsLost,
     });
+  },
+
+  applyQuestSettlement: (plan, tick) => {
+    /* Single aggregate write: effects + applied-keys ledger land together in
+     * the next persisted snapshot — replay dedups by `${runId}:${effectKey}`
+     * (r2: the ledger is co-located, never a separate table). */
+    const { state } = get();
+    const { next, appliedNow } = applyPlanToState(state, plan, tick ?? state.currentTick);
+    if (appliedNow.length > 0) {
+      set({ state: next });
+    }
+    trackTelemetryEvent('quest_settlement_effects', {
+      runId: plan.runId,
+      outcome: plan.outcome,
+      applied: appliedNow.length,
+      skipped: plan.effects.length - appliedNow.length,
+    });
+    return appliedNow;
   },
 
   buyFood: (quantity) => {
@@ -1394,7 +1465,7 @@ export function selectRosterWithWarnings(
 /**
  * Resident status for UI display.
  */
-export type ResidentStatus = 'available' | 'working' | 'injured';
+export type ResidentStatus = 'available' | 'working' | 'injured' | 'dead';
 
 /**
  * Selector: resident status (Available/Working/Injured).
@@ -1416,10 +1487,17 @@ export function selectResidentStatus(
     }
   });
 
-  // Finally, mark injured residents (overrides working)
+  // Then injured residents (overrides working)
   state.residents.forEach(resident => {
     if (resident.isInjured) {
       statusMap[resident.id] = 'injured';
+    }
+  });
+
+  // Finally, dead residents override every other status (S2.5 terminal consequence)
+  state.residents.forEach(resident => {
+    if (resident.isDead) {
+      statusMap[resident.id] = 'dead';
     }
   });
 

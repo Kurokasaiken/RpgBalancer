@@ -17,6 +17,12 @@ export interface MinimalResident {
   isInjured: boolean;
   isHero: boolean;
   level: number;
+  /** Quest settlement (PLAN-019-S2.5): terminal death — data, not a flag on
+   *  the run. Overrides every other status; the wound fields are cleared. */
+  isDead?: boolean;
+  /** Tick at which a settlement-inflicted wound heals (`tick` clears
+   *  `isInjured` when reached). Undefined = legacy/self-managed injury. */
+  injuredUntilTick?: number;
 }
 
 export type LocationStateMap = Record<string, LocationDropState>;
