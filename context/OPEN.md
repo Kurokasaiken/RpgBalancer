@@ -202,7 +202,9 @@ Formato voce:
   tag); `NARRATIVE.md` §4.
 - **Blocking:** nessuno nel breve; candidato per la «definizione di buona
   quest» (artefatto finale PLAN-019).
-- **Related:** PLAN-019 (S5), NARRATIVE.md.
+- **Related:** PLAN-019 (S5), NARRATIVE.md, `context/QUEST_GENERATION_SPEC.md`
+  (specchietto riassuntivo — lo schema a strati compone con le primitive dei
+  beat: rotta separata ma stessa architettura a 4 livelli).
 
 ## OPEN-015 — Mancata risoluzione e conseguenze di ogni quest
 

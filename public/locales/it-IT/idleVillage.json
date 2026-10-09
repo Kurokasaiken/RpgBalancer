@@ -920,7 +920,8 @@
       "move": "Sposta il pannello"
     },
     "questPoi": {
-      "open": "{name} — apri la quest"
+      "open": "{name} — apri la quest",
+      "decisionWaiting": "La spedizione attende una tua decisione"
     },
     "director": {
       "title": "Regia",
@@ -1023,7 +1024,8 @@
         "enemiesLeft": "{count, plural, one {# goblin in piedi} other {# goblin in piedi}}",
         "incoming": "{count, plural, one {risponde # colpo} other {rispondono # colpi}}",
         "exposureHint": "Probabilità di subire il prossimo colpo"
-      }
+      },
+      "ticks": "{elapsed}/{total} tick"
     }
   },
   "missionPlanner": {
@@ -1430,6 +1432,36 @@
     },
     "combat": {
       "telemetry": "Turno {{turn}} — nemici in piedi: {{enemies}}"
+    }
+  },
+  "questExpedition": {
+    "danger": "Pericolo",
+    "duration": "Durata stimata ~{ticks} tick",
+    "send": "Invia spedizione",
+    "loadout": "Sacca — {count}/{max}",
+    "forecast": {
+      "title": "Previsione",
+      "resolving": "Risoluzione dell'offerta…",
+      "computing": "Stima in corso…",
+      "incomplete": "Assegna gli slot richiesti per una stima.",
+      "reward": "Riuscita {pct}%",
+      "wound": "Ferite {pct}%",
+      "death": "Morti {pct}%",
+      "wipe": "Strage {pct}%"
+    }
+  },
+  "questOffer": {
+    "band": {
+      "bassa": "Bassa",
+      "media": "Media",
+      "alta": "Alta",
+      "letale": "Letale"
+    },
+    "tier": {
+      "magra": "Magra",
+      "discreta": "Discreta",
+      "ricca": "Ricca",
+      "leggendaria": "Leggendaria"
     }
   }
 }

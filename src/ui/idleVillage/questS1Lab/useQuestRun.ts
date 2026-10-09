@@ -147,7 +147,11 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
               seed: presetOrInput.seed ?? ((Date.now() ^ (Math.random() * 0xffffffff)) >>> 0),
               clock: presetOrInput.clock ?? { nodeTicks: opts?.nodeTicks, startTick: opts?.startTick },
             });
-      if (opts?.startTick != null) tickRef.current = opts.startTick;
+      /* The caller clock the launch was stamped on: string path reads
+       * `opts.startTick`, object path `input.clock.startTick` — without this
+       * the first `choose` before a `syncClock` would command at tick 0. */
+      const startTick = typeof presetOrInput === 'string' ? opts?.startTick : presetOrInput.clock?.startTick;
+      if (startTick != null) tickRef.current = startTick;
       const first = [emptyPhase(beatOf(fresh))];
       setRun(fresh);
       setPhases(first);

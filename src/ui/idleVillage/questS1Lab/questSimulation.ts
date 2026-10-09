@@ -436,79 +436,107 @@ function runOneSim(
   }
 }
 
-/**
- * Monte Carlo forecast of the quest from the current state forward.
- * `strategy` declares which option the sim takes at each choice node;
- * `seed` should be a stable hash of the sim inputs so the preview does not
- * jitter on unrelated re-renders.
- */
-export function simulateQuest(
+/** Mutable Monte-Carlo accumulator — the shared state `simulateQuest` and
+ *  `simulateQuestAsync` fold each cloned run into. Keeping it in one object
+ *  lets the async variant spread the same accumulation across macrotasks
+ *  without changing a single number (same order, same rounding). */
+interface SimAccumulator {
+  outcomes: { reward: number; survived: number; fled: number; wipe: number; running: number };
+  deathCounts: Map<number, number>;
+  memberAcc: Map<string, { healthy: number; wounded: number; dead: number }>;
+  daysList: number[];
+  sumDeathsOnReward: number;
+  rewardRuns: number;
+  anyWound: number;
+  sumWounded: number;
+  leaderWounded: number;
+  leaderDead: number;
+  goldSum: number;
+  treasureSum: number;
+  lootSum: number;
+  relic: number;
+  guardLoot: number;
+  chestLoot: number;
+  viandante: number;
+  humanDaysSum: number;
+  woundedDowntimeSum: number;
+}
+
+const beginSimAccumulation = (): SimAccumulator => ({
+  outcomes: { reward: 0, survived: 0, fled: 0, wipe: 0, running: 0 },
+  deathCounts: new Map(),
+  memberAcc: new Map(),
+  daysList: [],
+  sumDeathsOnReward: 0,
+  rewardRuns: 0,
+  anyWound: 0,
+  sumWounded: 0,
+  leaderWounded: 0,
+  leaderDead: 0,
+  goldSum: 0,
+  treasureSum: 0,
+  lootSum: 0,
+  relic: 0,
+  guardLoot: 0,
+  chestLoot: 0,
+  viandante: 0,
+  humanDaysSum: 0,
+  woundedDowntimeSum: 0,
+});
+
+/** Runs ONE cloned simulation (`seed = seedBase + i`) and folds its terminal
+ *  metrics into `acc`. Shared verbatim by the sync and chunked variants. */
+function accumulateSimRun(
+  acc: SimAccumulator,
   state: QuestRunState,
-  strategy: SimStrategy = {},
-  opts?: { runs?: number; seed?: number },
-): QuestSimResult {
-  const runs = Math.max(1, opts?.runs ?? 10000);
-  const seedBase = (opts?.seed ?? 1) >>> 0;
-  const nodes = nodesFor(state);
+  nodes: Record<string, QuestNode>,
+  strategy: SimStrategy,
+  seedBase: number,
+  i: number,
+): void {
+  const s = cloneForSim(state);
+  s.seed = seedBase + i;
+  s.rngCalls = 0;
+  runOneSim(s, nodes, strategy);
 
-  const outcomes = { reward: 0, survived: 0, fled: 0, wipe: 0, running: 0 };
-  const deathCounts = new Map<number, number>();
-  const memberAcc = new Map<string, { healthy: number; wounded: number; dead: number }>();
-  const daysList: number[] = [];
-  let sumDeathsOnReward = 0;
-  let rewardRuns = 0;
-  let anyWound = 0;
-  let sumWounded = 0;
-  let leaderWounded = 0;
-  let leaderDead = 0;
-  let goldSum = 0;
-  let treasureSum = 0;
-  let lootSum = 0;
-  let relic = 0;
-  let guardLoot = 0;
-  let chestLoot = 0;
-  let viandante = 0;
-  let humanDaysSum = 0;
-  let woundedDowntimeSum = 0;
-
-  for (let i = 0; i < runs; i++) {
-    const s = cloneForSim(state);
-    s.seed = seedBase + i;
-    s.rngCalls = 0;
-    runOneSim(s, nodes, strategy);
-
-    const outcome = s.outcome === 'running' ? 'running' : s.outcome;
-    outcomes[outcome] += 1;
-    const dead = s.party.filter((m) => m.dead);
-    const woundedAlive = s.party.filter((m) => !m.dead && m.wounded);
-    deathCounts.set(dead.length, (deathCounts.get(dead.length) ?? 0) + 1);
-    if (outcome === 'reward') {
-      rewardRuns += 1;
-      sumDeathsOnReward += dead.length;
-    }
-    if (woundedAlive.length > 0) anyWound += 1;
-    sumWounded += woundedAlive.length;
-    woundedDowntimeSum += woundedAlive.length * TUNE.rovineWoundedRecoveryDays;
-    humanDaysSum += s.party.length * s.days;
-    daysList.push(s.days);
-    goldSum += s.gold;
-    treasureSum += s.bottinoOro;
-    lootSum += s.loot.length;
-    if (s.loot.includes('reliquia antica')) relic += 1;
-    if (s.loot.includes('bottino delle guardie')) guardLoot += 1;
-    if (s.loot.includes('forziere goblin')) chestLoot += 1;
-    if (s.flags.includes('viandanteAiutato')) viandante += 1;
-    for (const m of s.party) {
-      const acc = memberAcc.get(m.id) ?? { healthy: 0, wounded: 0, dead: 0 };
-      if (m.dead) acc.dead += 1;
-      else if (m.wounded) acc.wounded += 1;
-      else acc.healthy += 1;
-      memberAcc.set(m.id, acc);
-    }
-    const lead = s.party.find((m) => m.role === 'leader');
-    if (lead?.dead) leaderDead += 1;
-    else if (lead?.wounded) leaderWounded += 1;
+  const outcome = s.outcome === 'running' ? 'running' : s.outcome;
+  acc.outcomes[outcome] += 1;
+  const dead = s.party.filter((m) => m.dead);
+  const woundedAlive = s.party.filter((m) => !m.dead && m.wounded);
+  acc.deathCounts.set(dead.length, (acc.deathCounts.get(dead.length) ?? 0) + 1);
+  if (outcome === 'reward') {
+    acc.rewardRuns += 1;
+    acc.sumDeathsOnReward += dead.length;
   }
+  if (woundedAlive.length > 0) acc.anyWound += 1;
+  acc.sumWounded += woundedAlive.length;
+  acc.woundedDowntimeSum += woundedAlive.length * TUNE.rovineWoundedRecoveryDays;
+  acc.humanDaysSum += s.party.length * s.days;
+  acc.daysList.push(s.days);
+  acc.goldSum += s.gold;
+  acc.treasureSum += s.bottinoOro;
+  acc.lootSum += s.loot.length;
+  if (s.loot.includes('reliquia antica')) acc.relic += 1;
+  if (s.loot.includes('bottino delle guardie')) acc.guardLoot += 1;
+  if (s.loot.includes('forziere goblin')) acc.chestLoot += 1;
+  if (s.flags.includes('viandanteAiutato')) acc.viandante += 1;
+  for (const m of s.party) {
+    const mAcc = acc.memberAcc.get(m.id) ?? { healthy: 0, wounded: 0, dead: 0 };
+    if (m.dead) mAcc.dead += 1;
+    else if (m.wounded) mAcc.wounded += 1;
+    else mAcc.healthy += 1;
+    acc.memberAcc.set(m.id, mAcc);
+  }
+  const lead = s.party.find((m) => m.role === 'leader');
+  if (lead?.dead) acc.leaderDead += 1;
+  else if (lead?.wounded) acc.leaderWounded += 1;
+}
+
+function finalizeSimResult(acc: SimAccumulator, state: QuestRunState, runs: number): QuestSimResult {
+  const { outcomes, deathCounts, memberAcc, daysList, sumDeathsOnReward, rewardRuns } = acc;
+  const { anyWound, sumWounded, leaderWounded, leaderDead } = acc;
+  const { goldSum, treasureSum, lootSum, relic, guardLoot, chestLoot, viandante } = acc;
+  const { humanDaysSum, woundedDowntimeSum } = acc;
 
   daysList.sort((a, b) => a - b);
   const pct = (n: number) => (n / runs) * 100;
@@ -519,15 +547,15 @@ export function simulateQuest(
   const twoPlus = 100 - zeroDeaths - pct(deathCounts.get(1) ?? 0);
 
   const perMember: MemberSimStats[] = state.party.map((m) => {
-    const acc = memberAcc.get(m.id) ?? { healthy: 0, wounded: 0, dead: 0 };
+    const mAcc = memberAcc.get(m.id) ?? { healthy: 0, wounded: 0, dead: 0 };
     return {
       id: m.id,
       name: m.name,
       role: m.role,
-      healthyPct: pct(acc.healthy),
-      woundPct: pct(acc.wounded),
-      deathPct: pct(acc.dead),
-      downtimeDays: (acc.wounded / runs) * TUNE.rovineWoundedRecoveryDays,
+      healthyPct: pct(mAcc.healthy),
+      woundPct: pct(mAcc.wounded),
+      deathPct: pct(mAcc.dead),
+      downtimeDays: (mAcc.wounded / runs) * TUNE.rovineWoundedRecoveryDays,
     };
   });
 
@@ -567,6 +595,57 @@ export function simulateQuest(
     woundedDowntimeAvg: woundedDowntimeSum / runs,
     perMember,
   };
+}
+
+/**
+ * Monte Carlo forecast of the quest from the current state forward.
+ * `strategy` declares which option the sim takes at each choice node;
+ * `seed` should be a stable hash of the sim inputs so the preview does not
+ * jitter on unrelated re-renders.
+ */
+export function simulateQuest(
+  state: QuestRunState,
+  strategy: SimStrategy = {},
+  opts?: { runs?: number; seed?: number },
+): QuestSimResult {
+  const runs = Math.max(1, opts?.runs ?? 10000);
+  const seedBase = (opts?.seed ?? 1) >>> 0;
+  const nodes = nodesFor(state);
+  const acc = beginSimAccumulation();
+  for (let i = 0; i < runs; i++) {
+    accumulateSimRun(acc, state, nodes, strategy, seedBase, i);
+  }
+  return finalizeSimResult(acc, state, runs);
+}
+
+/** Yields one macrotask so a chunked sim never blocks a frame longer than
+ *  its own chunk (S2.4 T-2 contract: no task >50ms on the main thread). */
+const yieldToEventLoop = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+/**
+ * Async Monte Carlo — identical result to `simulateQuest` with the same
+ * inputs (same accumulation order, same seeds), spread over `chunkRuns`-sized
+ * macrotasks so the planning surface stays interactive (S2.4 T-2).
+ * `signal` cancels between chunks: an aborted run rejects with the signal's
+ * `reason` (the caller treats it as «stale estimate», not an error).
+ */
+export async function simulateQuestAsync(
+  state: QuestRunState,
+  strategy: SimStrategy = {},
+  opts?: { runs?: number; seed?: number; chunkRuns?: number; signal?: AbortSignal },
+): Promise<QuestSimResult> {
+  const runs = Math.max(1, opts?.runs ?? 10000);
+  const seedBase = (opts?.seed ?? 1) >>> 0;
+  const chunkRuns = Math.max(1, opts?.chunkRuns ?? 100);
+  const nodes = nodesFor(state);
+  const acc = beginSimAccumulation();
+  for (let i = 0; i < runs; i++) {
+    opts?.signal?.throwIfAborted();
+    accumulateSimRun(acc, state, nodes, strategy, seedBase, i);
+    if ((i + 1) % chunkRuns === 0) await yieldToEventLoop();
+  }
+  opts?.signal?.throwIfAborted();
+  return finalizeSimResult(acc, state, runs);
 }
 
 /* ================================================================== */

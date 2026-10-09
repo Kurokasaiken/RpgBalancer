@@ -913,7 +913,8 @@
       "move": "Move panel"
     },
     "questPoi": {
-      "open": "{name} — open the quest"
+      "open": "{name} — open the quest",
+      "decisionWaiting": "The expedition awaits your decision"
     },
     "director": {
       "title": "Director",
@@ -1016,7 +1017,8 @@
         "enemiesLeft": "{count, plural, one {# goblin standing} other {# goblins standing}}",
         "incoming": "{count, plural, one {# hit coming} other {# hits coming}}",
         "exposureHint": "Chance of taking the next hit"
-      }
+      },
+      "ticks": "{elapsed}/{total} ticks"
     }
   },
   "missionPlanner": {
@@ -1409,6 +1411,36 @@
     },
     "combat": {
       "telemetry": "Turn {{turn}} — enemies standing: {{enemies}}"
+    }
+  },
+  "questExpedition": {
+    "danger": "Danger",
+    "duration": "Estimated duration ~{ticks} ticks",
+    "send": "Send expedition",
+    "loadout": "Bag — {count}/{max}",
+    "forecast": {
+      "title": "Forecast",
+      "resolving": "Resolving offer…",
+      "computing": "Estimating…",
+      "incomplete": "Fill the required slots for an estimate.",
+      "reward": "Success {pct}%",
+      "wound": "Wounds {pct}%",
+      "death": "Deaths {pct}%",
+      "wipe": "Wipe {pct}%"
+    }
+  },
+  "questOffer": {
+    "band": {
+      "bassa": "Low",
+      "media": "Medium",
+      "alta": "High",
+      "letale": "Lethal"
+    },
+    "tier": {
+      "magra": "Meagre",
+      "discreta": "Decent",
+      "ricca": "Rich",
+      "leggendaria": "Legendary"
     }
   }
 }
