@@ -148,8 +148,11 @@ export function useQuestExpeditionSession({
   const authoredSlots = useMemo(() => scenario?.offer.slots, [scenario]);
   const slotBlueprints = useMemo<ResidentSlotBlueprint[]>(() => {
     if (!authoredSlots) return [];
+    /* The POI declares WHICH authored slots it offers (a weaker posting may
+     *  offer fewer than the scenario has): required ∪ optional is the rack. */
     const requiredIds = new Set(poi.slots.required);
-    const list = [...authoredSlots.required, ...authoredSlots.optional];
+    const offeredIds = new Set([...poi.slots.required, ...poi.slots.optional]);
+    const list = [...authoredSlots.required, ...authoredSlots.optional].filter((s) => offeredIds.has(s.id));
     return list.map((slot, index) => ({
       /* The droppable id is POI-scoped so a slot of another POI's detail
        * can never intercept this session's drops. */
