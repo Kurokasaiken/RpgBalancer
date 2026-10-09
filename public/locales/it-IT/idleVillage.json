@@ -1002,11 +1002,9 @@
       "bagEmpty": "Sacca vuota",
       "dead": "caduto",
       "hpLost": "−{hp} HP",
-      "loot_one": "+{count} bottino",
-      "loot_other": "+{count} bottino",
+      "loot": "+{count, plural, one {# bottino} other {# bottino}}",
       "clean": "Illesi",
-      "moreLines_one": "+{count} altra riga in cronaca",
-      "moreLines_other": "+{count} altre righe in cronaca",
+      "moreLines": "+{count, plural, one {# altra riga in cronaca} other {# altre righe in cronaca}}",
       "inProgress": "Fase in corso",
       "nextPhase": "Prossima fase",
       "day": "Giorno {day} di {total}",
@@ -1017,10 +1015,14 @@
       "close": "Chiudi il rapporto",
       "beats": {
         "continue": "Clicca per continuare",
-        "more_one": "Manca {count} momento — clicca per continuare",
-        "more_other": "Mancano {count} momenti — clicca per continuare",
+        "more": "{count, plural, one {Manca # momento — clicca per continuare} other {Mancano # momenti — clicca per continuare}}",
         "skipAll": "Vai al bivio",
         "recap": "Mentre eri via: {scenes} scene, {checks} prove, {deaths} caduti, {wounds} feriti"
+      },
+      "combat": {
+        "enemiesLeft": "{count, plural, one {# goblin in piedi} other {# goblin in piedi}}",
+        "incoming": "{count, plural, one {risponde # colpo} other {rispondono # colpi}}",
+        "exposureHint": "Probabilità di subire il prossimo colpo"
       }
     }
   },
