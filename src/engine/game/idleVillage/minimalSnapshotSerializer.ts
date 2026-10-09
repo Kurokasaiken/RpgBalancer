@@ -55,6 +55,12 @@ const MinimalSnapshotSchema = z.object({
       fatigue: z.number(),
       isWorking: z.boolean(),
       isInjured: z.boolean(),
+      /** S2.5 settlement consequence — persisted, never re-derivable. */
+      isDead: z.boolean().optional(),
+      /** Wound expiry stamped at settle time. */
+      injuredUntilTick: z.number().optional(),
+      /** Hero flag — previously dropped on hydrate; now round-tripped. */
+      isHero: z.boolean().optional(),
     })),
     activeActivities: z.array(z.object({
       activityId: z.string(),
@@ -64,6 +70,9 @@ const MinimalSnapshotSchema = z.object({
     eventLog: z.array(MinimalActivityEntrySchema),
     lastSavedAt: z.number().optional(),
     rngState: MinimalRngStateSchema.optional(),
+    /** S2.5: `${runId}:${effectKey}` of already-applied settlement effects —
+     *  co-located in this aggregate so mutation + dedup key share one write. */
+    appliedQuestEffectIds: z.array(z.string()).optional(),
   }),
 });
 

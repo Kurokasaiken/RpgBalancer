@@ -50,6 +50,8 @@ import { availableOptions } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestId, QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestRunApi } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { buildExpeditionParty } from './questExpedition';
+import { settleRun, runIdOf } from './questSettlement';
+import { releaseLoadout, reserveLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
 import { QuestExpeditionDetail } from './QuestExpeditionDetail';
 
 /** Loadout candidates: every catalog item that bridges to an engine flag
@@ -266,11 +268,13 @@ export function useQuestExpeditionSession({
   );
 
   /** Locked = assigned + in-flight + every resident out on an unsettled
-   *  expedition (derived from `activeRuns` — never a stored flag). */
+   *  expedition (derived from `activeRuns` — never a stored flag; a
+   *  `settled` run releases its party). */
   const lockedResidentIds = useMemo(() => {
     const locked = new Set<string>(assignedIds);
     if (flyingResidentId) locked.add(flyingResidentId);
     for (const active of activeRuns) {
+      if (active?.settlement?.status === 'settled') continue;
       active?.party.forEach((m) => locked.add(m.id));
     }
     return [...locked];
@@ -334,9 +338,48 @@ export function useQuestExpeditionSession({
   }, [isDetailOpen, resolved, estimateKey, requiredFilled, partyMembers]);
 
   /* ------------------------------------------------------------------ */
+  /* Settlement (S2.5) — a terminal run settles once, idempotently.       */
+  /*  Journal: persist `settling` → apply effects (ledger-keyed, co-       */
+  /*  located in the gameplay aggregate) → release loadout → persist       */
+  /*  `settled`. A run stuck at `settling` after a crash replays on the    */
+  /*  next render; dedup keys make the replay free.                        */
+  /* ------------------------------------------------------------------ */
+  const settlingRef = useRef(false);
+  const runEnded = Boolean(run?.ended);
+  const runSettled = run?.settlement?.status === 'settled';
+  useEffect(() => {
+    if (!run?.ended || runSettled || settlingRef.current) return;
+    settlingRef.current = true;
+    const runId = runIdOf(run);
+    trackTelemetryEvent('quest_settlement_begin', { poiId: poi.id, runId, outcome: run.outcome });
+    void settleRun(run, {
+      persistRun: (marker) => questRun.applySettlement(marker),
+      applyToStore: (plan) => {
+        useMinimalGameplayStore.getState().applyQuestSettlement(plan);
+      },
+      releaseLoadout,
+      nowTick: () => useMinimalGameplayStore.getState().state.currentTick,
+    })
+      .then(() => trackTelemetryEvent('quest_settlement_done', { poiId: poi.id, runId, outcome: run.outcome }))
+      .catch((error) =>
+        trackTelemetryEvent('quest_settlement_error', {
+          poiId: poi.id,
+          runId,
+          message: error instanceof Error ? error.message : String(error),
+        }),
+      )
+      .finally(() => {
+        settlingRef.current = false;
+      });
+  }, [run, runEnded, runSettled, questRun, poi.id]);
+
+  /* ------------------------------------------------------------------ */
   /* Launch — preconditions re-checked at the write boundary.             */
   /* ------------------------------------------------------------------ */
-  const anyRunActive = activeRuns.some((r) => r && !r.ended);
+  /* Sequential-expeditions gate (T-5): a POI run blocks every other
+   *  launch until it is SETTLED — `ended` alone is not enough (the party
+   *  is still locked, consequences pending). */
+  const anyRunActive = activeRuns.some((r) => r && r.settlement?.status !== 'settled');
   const canSend = Boolean(resolved) && requiredFilled && !anyRunActive && !sendingRef.current;
 
   /* `sending` stays latched until the run lands — a double-click inside the
@@ -376,6 +419,11 @@ export function useQuestExpeditionSession({
       scenarioInstance: resolved.instance,
       resolvedOffer: resolved.resolvedOffer,
     });
+    /* The bag reservation rides the run's identity (scenarioInstanceId —
+     * the same key `runIdOf` uses at settlement). Fire-and-forget: the
+     * run exists now, and release on terminal transition is guaranteed by
+     * the settlement journal regardless of when this write lands. */
+    void reserveLoadout(resolved.instance.instanceId, selectedItemIds);
     setIsDetailOpen(false);
     setAssignments({});
     setSelectedItemIds([]);
@@ -606,6 +654,22 @@ export function useQuestExpeditionSession({
       getEstimateJson: () => JSON.stringify(estimate?.value ?? null),
       getResolvedOffer: () => resolved?.resolvedOffer ?? null,
       getRun: () => questRun.run,
+      getSettlement: () => questRun.run?.settlement ?? null,
+      /* The gameplay aggregate slice settlement mutates — E2E asserts
+       *  consequences as DATA (gold/xp deltas, resident isDead/isInjured). */
+      getVillage: () => {
+        const s = useMinimalGameplayStore.getState().state;
+        return {
+          gold: s.gold,
+          xp: s.xp,
+          residents: s.residents.map((r) => ({
+            id: r.id,
+            isDead: Boolean(r.isDead),
+            isInjured: Boolean(r.isInjured),
+            injuredUntilTick: r.injuredUntilTick ?? null,
+          })),
+        };
+      },
       /* The player's command on a waiting frontier — the same api the
        *  QuestRunWindow buttons call, so catch-up paths stay honest. */
       choose: (optionId: string, useConsumable = false) => questRun.choose(optionId, { useConsumable }),

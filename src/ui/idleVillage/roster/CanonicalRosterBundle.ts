@@ -14,6 +14,7 @@ import { MINIMAL_GAMEPLAY_RESIDENTS } from '@/balancing/config/idleVillage/minim
 import { savedCharacterToResident } from '@/engine/game/idleVillage/characterImport';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import { deriveHpValues, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 
 /**
  * Canonical resident data creation function.
@@ -98,14 +99,56 @@ export const canonicalResidentData = (defaultFatigue: number = 0): ResidentState
 };
 
 /**
- * Hook that provides canonical resident data with memoization.
+ * Quest-settlement overlay (S2.5): the canonical data above is config-derived
+ * and read-only — settlement consequences live in the gameplay store's
+ * resident aggregate (`isDead` / `isInjured` / `injuredUntilTick`, mutated
+ * under the same persisted write as the effect ledger). This merge projects
+ * those consequences onto the canonical residents so roster cards AND quest
+ * eligibility read the dead/injured state as DATA, not presentation.
+ * Only consequence fields are overlaid — every other field stays canonical.
+ *
+ * @param residents - Canonical (config-derived) residents.
+ * @param consequences - Store residents carrying settlement consequences.
+ * @returns Residents with settlement consequences merged in.
+ */
+export const mergeStoreConsequences = (
+  residents: ResidentState[],
+  consequences: { id: string; isDead?: boolean; isInjured?: boolean; injuredUntilTick?: number; fatigue?: number }[],
+): ResidentState[] => {
+  const byId = new Map(consequences.map((c) => [c.id, c]));
+  return residents.map((resident) => {
+    const c = byId.get(resident.id);
+    if (!c || (!c.isDead && !c.isInjured && c.injuredUntilTick == null)) return resident;
+    const isInjured = !c.isDead && Boolean(c.isInjured || (c.injuredUntilTick ?? -1) > -1);
+    const { currentHp } = deriveHpValues(
+      resident.statSnapshot as Record<string, number> | undefined,
+      c.fatigue ?? resident.fatigue ?? 0,
+      c.isDead ? false : isInjured,
+    );
+    return {
+      ...resident,
+      status: c.isDead ? 'dead' : isInjured ? 'injured' : resident.status,
+      isInjured: c.isDead ? false : isInjured,
+      currentHp: c.isDead ? 0 : currentHp,
+      injuryRecoveryTime: isInjured ? c.injuredUntilTick : undefined,
+    };
+  });
+};
+
+/**
+ * Hook that provides canonical resident data with memoization, overlaid with
+ * the gameplay store's settlement consequences (dead/injured survive reload).
  * This replaces the store-based transformation in MinimalGameplayPage.
  * 
  * @param defaultFatigue - Default fatigue value for residents
  * @returns Memoized array of ResidentState
  */
 export const useCanonicalRosterData = (defaultFatigue: number = 0): ResidentState[] => {
-  return useMemo(() => canonicalResidentData(defaultFatigue), [defaultFatigue]);
+  const storeResidents = useMinimalGameplayStore((s) => s.state.residents);
+  return useMemo(
+    () => mergeStoreConsequences(canonicalResidentData(defaultFatigue), storeResidents),
+    [defaultFatigue, storeResidents],
+  );
 };
 
 /**

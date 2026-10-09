@@ -33,6 +33,9 @@ import {
   type ScenarioInstance,
 } from './questRun';
 import { emptyPhase, recordAction, snapshotRun, type PhaseRecord } from './questPhaseRecord';
+import type { SettlementMarker } from '@/ui/idleVillage/quests/questSettlement';
+import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
+import { releaseLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
 import { beatMark, projectBeats, type BeatMark, type QuestBeat } from './beatSequencer';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { createQuestRunAdapter } from '@/ui/idleVillage/questTheatre/questRunAdapter';
@@ -79,6 +82,10 @@ export interface QuestRunApi {
    *  (PLAN-025 T-008). Append-only per commit; the window's beat cursor
    *  replays them one at a time and the queue resets on start/clear. */
   beats: QuestBeat[];
+  /** Settlement journal transitions (S2.5): stamps `settling`/`settled` on
+   *  the run record and persists — bypasses `act` (no engine mutation, no
+   *  beats; the frontier is terminal). No-op unless the run has ended. */
+  applySettlement: (marker: SettlementMarker) => void;
 }
 
 const beatOf = (run: QuestRunState) => nodesFor(run)[run.nodeId]?.beat ?? 0;
@@ -230,8 +237,24 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   // engine mutation goes through `act` so phases and persistence stay honest.
   const runRef = useRef<QuestRunState | null>(null);
   runRef.current = run;
+  const phasesRef = useRef<PhaseRecord[]>([]);
+  phasesRef.current = phases;
   const actRef = useRef(act);
   actRef.current = act;
+
+  /* Settlement journal (S2.5): the marker rides the run record — each
+   * transition persists before the journal's next step, so a crash mid-
+   * settlement replays from the last durable boundary. */
+  const applySettlement = useCallback(
+    (marker: SettlementMarker) => {
+      const current = runRef.current;
+      if (!current?.ended) return;
+      const next = { ...current, settlement: marker };
+      setRun(next);
+      persist(next, phasesRef.current);
+    },
+    [persist],
+  );
   const adapter = useMemo<TheatreAdapter>(
     () =>
       createQuestRunAdapter(() => runRef.current, {
@@ -242,6 +265,10 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   );
 
   const clear = useCallback(() => {
+    /* Terminal transition (S2.5): clearing releases the bag reservation on
+     * the run's own identity — same key the settlement journal uses. */
+    const current = runRef.current;
+    if (current) void releaseLoadout(runIdOf(current));
     setRun(null);
     setPhases([]);
     setBeats([]);
@@ -250,7 +277,7 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   }, [persist]);
 
   return useMemo(
-    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear, adapter, beats }),
-    [run, phases, start, choose, syncClock, heal, potion, clear, adapter, beats],
+    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear, adapter, beats, applySettlement }),
+    [run, phases, start, choose, syncClock, heal, potion, clear, adapter, beats, applySettlement],
   );
 }

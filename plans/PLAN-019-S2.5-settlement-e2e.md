@@ -1,8 +1,8 @@
 ---
 title: 'PLAN-019-S2.5 — Settlement idempotente, secondo POI, E2E completo e chiusura slice'
-status: proposed
+status: completed
 created: 2026-10-09
-revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: MINOR+MAJOR → assorbito; run `…/s2.5/r2/`)
+revised: 2026-10-09 (r1 figli: claude+chatgpt 2× MAJOR → assorbito. r2: MINOR+MAJOR → assorbito; run `…/s2.5/r2/`. Esecuzione 2026-10-09: T-0→T-7 tutti verdi)
 desiderata: v24 (PLAN-019, stadio S2, gate S2-a/b/c), v24 rev.2 (reward = obiettivo && leader vivo)
 request: R-107
 parent: PLAN-019-S2 (figlio 5/5 — chiude lo slice)
@@ -32,6 +32,41 @@ depends: PLAN-019-S2.4 (run lanciabile da POI)
   ledger di chiavi `(runId, effectId)` nello stesso record della mutazione;
   il run record congela il piano degli effetti e il marker `settled` è
   l'ultima scrittura. Replay al boot deduplica per chiave e converge.
+- **T-1 fatto** — `tests/unit/idleVillage/questS1Lab/questTerminalMatrix.test.ts`
+  (8 test): enumerazione esiti reali goblin/rovine; cella «sì|vivo|fuga»
+  dichiarata irraggiungibile (`flee` ⇒ `dropObjective` prima di `endRun`).
+- **T-2 fatto** — `src/ui/idleVillage/quests/questSettlement.ts`:
+  `deriveSettlementPlan` (congela il piano), `applyPlanToState` (ledger
+  `appliedQuestEffectIds` co-locato nell'aggregato store, mai
+  set-to-expected sui fungibili), `settleRun` (journal:
+  `settling`→effetti→`settled`, seam `fault.crashAfter`). Config
+  `questSettlement.ts` (`woundRecoveryTicks`). Store: `isDead`/
+  `injuredUntilTick` persistiti in `MinimalResident`, recovery sweep nel
+  `tick()`, azione `applyQuestSettlement`. `questRun.ts`: `settlement?:`
+  marker; `useQuestRun.applySettlement` persiste il marker sul record;
+  `clear` rilascia la riserva loadout (`runIdOf`). `questEligibility`:
+  `inExpedition` rilascia su `settlement.status==='settled'`. Sessione:
+  `settleRun` su run terminato, `anyRunActive` fino a `settled`, hook E2E
+  `getSettlement`/`getVillage`. Roster: `mergeStoreConsequences` in
+  `useCanonicalRosterData` — le conseguenze dello store si proiettano sul
+  residente canonico (morto/ferito come DATO per eleggibilità e carte,
+  non solo visual). Riserva: `reserveLoadout` cablato al `send`
+  (chiave = `scenarioInstanceId`, quella di `runIdOf`).
+- **T-3 fatto** — `tests/unit/idleVillage/quests/questSettlement.test.ts`
+  (11 test): tabella esiti (reward/fled/survived/wipe), idempotenza
+  in-aggregato, crash dopo intent / dopo effetti / crash→replay→crash →
+  convergenza, no-op su run già settled.
+- **T-4/T-5 fatti** — `tests/e2e/idleVillage/gameQuestExpedition.spec.ts`
+  estesa a **11 test**: `driveRunToEnd` guida la run al terminale; il test
+  settlement asserisce gate sequenziale (POI2 locked mentre POI1 unsettled,
+  `reason==='in-expedition'`), conseguenze come dati (isDead/isInjured/
+  injuredUntilTick), delta esatti gold/xp, rilascio party, lancio rovine
+  post-settle, reload mid-run con frontiera intatta; secondo test rovine
+  standalone (gate esploratore, forecast, lancio, halo).
+- **T-7 safeguard** — vitest quest scope 148/148 · playwright
+  `gameQuestExpedition` **11/11** · `build:check` ✓ · `kanban:lint` ✓ ·
+  eslint scope: file in quarantena preesistente (0 errori). Evidence:
+  `test-results/s25-settlement-e2e-2026-10-09.log`.
 related: PersistenceService (unico canale), InjuryEngine, QUEST_RULES.md §8 (conseguenze sempre — R-092), OPEN-015 (forma minima), PLAN-018 (mappatura), quest_theatre_spec.md
 ---
 
@@ -96,9 +131,9 @@ secondo POI end-to-end, E2E completo dello slice, documentazione di chiusura.
 |---|---|---|---|---|---|
 | sì | vivo | fine grafo | sì | sì | chiude |
 | sì | morto | fine grafo | **no** | sì | chiude |
-| sì | vivo | fuga/ritiro | **sì** (matrice: «niente perso») | sì | chiude |
-| sì | morto | fuga/ritiro | no | conservato | chiude |
-| sì | * | wipe | IRRAGGIUNGIBILE se obiettivo sì implica fine grafo — da verificare in T-1 | — | — |
+| sì | vivo | fuga/ritiro | **IRRAGGIUNGIBILE nel motore** — `flee()` chiama `dropObjective` prima di `endRun`: al terminale `objectiveDone=false` sempre (enumerazione T-1). La conferma Director «fuga+obiettivo → reward sì» è in tensione con la semantica authored «panic means dropping it»: l'esito osservabile è la riga «no | vivo | fuga». **Da ratificare**: emendare la desiderata oppure cambiare `flee` (mantenere obiettivo = decisione Director, non di questo piano). | se vivesse: conservato | chiude |
+| sì | morto | fuga/ritiro | no (stessa ragione: `flee` ⇒ `objectiveDone=false`) | conservato | chiude |
+| sì | * | wipe | no | **tutto perso** | chiude — **RAGGIUNGIBILE** (verificato T-1: goblin wipe con trofeo in mano all'agguato F7) |
 | no | vivo | fine grafo | no | conservato | chiude |
 | no | morto | fine grafo | no | conservato | chiude |
 | no | vivo | fuga/ritiro | no | conservato | chiude |
@@ -106,6 +141,13 @@ secondo POI end-to-end, E2E completo dello slice, documentazione di chiusura.
 | no | * | wipe | no | **tutto perso** | chiude |
 | Abbandono offerta (non lanciata) | — | — | — | — | offerta chiusa |
 | Scadenza `availableDays` | — | — | — | — | **solo offerte non lanciate** |
+
+Esiti del motore verificati (enumerazione `questTerminalMatrix.test.ts`, 8 test):
+`reward` ⇔ `objectiveDone && leader vivo` al nodo end · `fled` ⇒ `objectiveDone=false`
+· `wipe` ⇔ `∀ membri morti` + loot/info svuotati · `survived` = il resto
+(raggiungibilità residua dichiarata: «no|morto|fine grafo» e «sì|morto|fuga»
+coperte da witness forzati nel motore reale — il leader morto è raro nel
+sweep stocastico perché i preset lo proteggono, non perché la cella manchi).
 
   Test dichiarato: enumerazione programmatica degli esiti terminali dei
   grafi goblin/rovine — le celle coperte sono solo quelle raggiungibili,
