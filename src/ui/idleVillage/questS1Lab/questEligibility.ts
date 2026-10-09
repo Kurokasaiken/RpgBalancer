@@ -37,13 +37,14 @@ export interface QuestEligibilityResult {
 
 /**
  * Derived expedition lock: `residentId` is in the party of `activeRun`.
- * `activeRun` = the persisted run for this POI (null = none/settled). The
- * party stays «away» until the run record is released: `ended` alone does
- * not free them — the walk home and the consequences are still pending.
- * S2.5 owns settlement; `clear`/null releases everyone.
+ * `activeRun` = the persisted run for this POI (null = none). The party
+ * stays «away» until the run is SETTLED: `ended` alone does not free them —
+ * consequences are still pending. `settlement.status === 'settled'`
+ * releases survivors; `clear`/null releases everyone.
  */
 export function residentInExpedition(residentId: string, activeRun: QuestRunState | null | undefined): boolean {
   if (!activeRun) return false;
+  if (activeRun.settlement?.status === 'settled') return false;
   return activeRun.party.some((m) => m.id === residentId);
 }
 

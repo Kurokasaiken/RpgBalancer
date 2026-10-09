@@ -17,24 +17,41 @@ const POI = 'poi-goblin';
 const SLOT_LEADER = `${POI}:goblin-slot-leader`;
 const SLOT_MEMBER = `${POI}:goblin-slot-member-1`;
 const SLOT_MEMBER_2 = `${POI}:goblin-slot-member-2`;
+const POI_ROVINE = 'poi-rovine';
+const SLOT_ROVINE_LEADER = `${POI_ROVINE}:rovine-slot-leader`;
+const SLOT_ROVINE_ESPLORATORE = `${POI_ROVINE}:rovine-slot-esploratore`;
 const VALID_LEADER = 'hero-sir-spaccaculi';
 const VALID_MEMBER = 'hero-giggiolillo';
 const INVALID_RESIDENT = 'hero-salvatrice';
+/** Rovine leader gate = fortitude|edge → giggiolillo (edge); the esploratore
+ *  slot takes clarity|precision → salvatrice (clarity). */
 
 type RunShape = {
   ended: boolean;
   nodeId: string;
   visitedNodes: string[];
-  party: { id: string }[];
+  outcome?: string;
+  gold?: number;
+  xp?: number;
+  party: { id: string; dead?: boolean; wounded?: boolean; role?: string }[];
   frontier: { status: string; readyAt: number };
+  settlement?: SettlementShape | null;
   scenarioInstanceId?: string;
-  resolvedOffer?: unknown;
+  resolvedOffer?: { rewardResolved?: number } | null;
 };
 type HaloShape = { fraction: number; elapsedTicks: number; durationTicks: number; status: string };
+type SettlementShape = { status: 'settling' | 'settled'; atTick: number; plan: { runId: string; outcome: string } };
+type VillageShape = {
+  gold: number;
+  xp: number;
+  residents: { id: string; isDead: boolean; isInjured: boolean; injuredUntilTick: number | null }[];
+};
 type ExpeditionHook = {
   getAssignments?: () => Record<string, string | null>;
   getRun?: () => RunShape | null;
   getHalo?: () => HaloShape | null;
+  getSettlement?: () => SettlementShape | null;
+  getVillage?: () => VillageShape;
 };
 
 /* The hooks live in the browser — `evaluate` is the boundary. Small named
@@ -47,7 +64,7 @@ interface TestHooksWindow extends Window {
   };
 }
 
-const callExpedition = async <T,>(page: Page, action: string, ...args: unknown[]): Promise<T> => {
+const callExpedition = async <T,>(page: Page, poiId: string, action: string, ...args: unknown[]): Promise<T> => {
   const result = await page.evaluate(
     ({ poiId, act, fnArgs }) => {
       const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[poiId] as
@@ -56,12 +73,14 @@ const callExpedition = async <T,>(page: Page, action: string, ...args: unknown[]
       if (!exp || typeof exp[act] !== 'function') throw new Error(`expedition hook "${act}" missing`);
       return exp[act](...fnArgs);
     },
-    { poiId: POI, act: action, fnArgs: args },
+    { poiId, act: action, fnArgs: args },
   );
   return result as T;
 };
 
-const expedition = <T,>(page: Page, action: string, ...args: unknown[]) => callExpedition<T>(page, action, ...args);
+const expedition = <T,>(page: Page, action: string, ...args: unknown[]) => callExpedition<T>(page, POI, action, ...args);
+const expeditionFor = <T,>(page: Page, poiId: string, action: string, ...args: unknown[]) =>
+  callExpedition<T>(page, poiId, action, ...args);
 
 const advanceTicks = (page: Page, n: number) =>
   page.evaluate((ticks) => {
@@ -72,13 +91,13 @@ const getRun = (page: Page) => expedition<RunShape | null>(page, 'getRun');
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/game');
-  // Wait for the expedition session + hooks to be live (canvas/map may lag).
+  // Wait for the expedition sessions + hooks to be live (canvas/map may lag).
   await page.waitForFunction(
-    (poiId) =>
-      Boolean(
-        (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[poiId],
-      ),
-    POI,
+    ([goblin, rovine]) => {
+      const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition;
+      return Boolean(exp?.[goblin]) && Boolean(exp?.[rovine]);
+    },
+    [POI, POI_ROVINE],
     { timeout: 30_000 },
   );
 });
@@ -368,5 +387,198 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     // questStatus=in_progress → the POI routes to the run window, not the detail.
     const marker = page.locator('[data-map-quest-poi-target][data-quest-status="in_progress"]').first();
     await expect(marker).toBeVisible({ timeout: 15_000 });
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* PLAN-019-S2.5 — settlement + sequential POIs                        */
+/* ------------------------------------------------------------------ */
+
+/** Drives a live run to its terminal frontier: resolves waiting decisions
+ *  (first option; rotates on a stuck node to escape push-your-luck loops)
+ *  and matures pending timed nodes on the canonical clock. `flee` is never
+ *  an option id — retreat lives outside `availableOptions`. */
+async function driveRunToEnd(page: Page, poiId: string, maxSteps = 120): Promise<RunShape> {
+  let lastNode = '';
+  let repeats = 0;
+  for (let i = 0; i < maxSteps; i++) {
+    const run = await expeditionFor<RunShape | null>(page, poiId, 'getRun');
+    if (!run) throw new Error(`[${poiId}] run vanished mid-drive`);
+    if (run.ended) return run;
+    if (run.frontier.status === 'waiting') {
+      const options = await expeditionFor<string[]>(page, poiId, 'getOptions');
+      if (!options.length) throw new Error(`[${poiId}] waiting frontier without options at ${run.nodeId}`);
+      repeats = run.nodeId === lastNode ? repeats + 1 : 0;
+      lastNode = run.nodeId;
+      await expeditionFor<void>(page, poiId, 'choose', options[Math.min(repeats, options.length - 1)]);
+    } else {
+      await advanceTicks(page, 15);
+      await page.waitForFunction(
+        ({ pid, node, fv }) => {
+          const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
+            | { getRun?: () => RunShape | null }
+            | undefined;
+          const r = exp?.getRun?.();
+          return !r || r.ended || r.nodeId !== node || r.frontier.status !== 'pending' || r.frontier.readyAt !== fv;
+        },
+        { pid: poiId, node: run.nodeId, fv: run.frontier.readyAt },
+        { timeout: 8_000 },
+      ).catch(() => undefined); // timed out mid-beat — next loop re-reads the run
+    }
+  }
+  throw new Error(`[${poiId}] run did not terminate in ${maxSteps} steps`);
+}
+
+test.describe('PLAN-019-S2.5 — settlement + sequential POIs', () => {
+  test('terminal run settles once: consequences as data, party released, POI2 gated until settle', async ({ page }) => {
+    /* --- POI 1 lifecycle: offer → assign → launch. Goblin leader-only so
+     *  giggiolillo (edge) stays free for the rovine leader gate. */
+    const villageBefore = await expedition<VillageShape>(page, 'getVillage');
+    await expedition<void>(page, 'openDetail');
+    await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
+    await expect(page.getByTestId('quest-expedition-send')).toBeEnabled({ timeout: 15_000 });
+    await expedition<void>(page, 'send');
+    await expect(page.getByTestId('quest-window')).toBeVisible({ timeout: 10_000 });
+
+    /* --- Sequential gate: while the goblin run is live (or ended but not
+     *  yet settled), the rovine detail can open and assign, but «Invia»
+     *  stays gated — one expedition out at a time (T-5 ordering). */
+    await expeditionFor<void>(page, POI_ROVINE, 'openDetail');
+    await expeditionFor<boolean>(page, POI_ROVINE, 'assignToSlot', SLOT_ROVINE_LEADER, VALID_MEMBER);
+    const lockedOut = await expeditionFor<{ eligible: boolean; reason?: string }>(
+      page,
+      POI_ROVINE,
+      'checkEligibility',
+      SLOT_ROVINE_LEADER,
+      VALID_LEADER,
+    );
+    expect(lockedOut.eligible).toBe(false);
+    expect(lockedOut.reason).toBe('in-expedition');
+    const rovineSend = page.getByTestId('quest-expedition-send');
+    await expect(rovineSend).toBeDisabled();
+
+    /* --- Terminal: drive the run to its end, then settlement lands. */
+    const terminal = await driveRunToEnd(page, POI);
+    expect(terminal.ended).toBe(true);
+    expect(['reward', 'survived', 'fled', 'wipe']).toContain(terminal.outcome);
+
+    await page.waitForFunction(
+      (pid) => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
+          | { getSettlement?: () => SettlementShape | null }
+          | undefined;
+        return exp?.getSettlement?.()?.status === 'settled';
+      },
+      POI,
+      { timeout: 15_000 },
+    );
+    const settlement = await expedition<SettlementShape | null>(page, 'getSettlement');
+    expect(settlement?.status).toBe('settled');
+
+    /* --- Consequences as DATA: resident fates in the village aggregate. */
+    const villageAfter = await expedition<VillageShape>(page, 'getVillage');
+    for (const member of terminal.party) {
+      const res = villageAfter.residents.find((r) => r.id === member.id);
+      expect(res, `resident ${member.id} in roster`).toBeTruthy();
+      if (member.dead) expect(res!.isDead).toBe(true);
+      else if (member.wounded) {
+        expect(res!.isInjured).toBe(true);
+        expect(res!.injuredUntilTick).not.toBeNull();
+      }
+    }
+    /* Fungible delta — exact, never set-to-expected: rewardResolved only on
+     *  outcome 'reward'; the run's hoarded gold comes home unless wipe. */
+    const expectedGold =
+      (terminal.outcome === 'reward' ? terminal.resolvedOffer?.rewardResolved ?? 0 : 0) +
+      (terminal.outcome === 'wipe' ? 0 : terminal.gold ?? 0);
+    expect(villageAfter.gold - villageBefore.gold).toBe(expectedGold);
+    if (terminal.outcome !== 'wipe') {
+      expect(villageAfter.xp - villageBefore.xp).toBe(terminal.xp ?? 0);
+    }
+
+    /* --- Release: the settled party is assignable again, and POI 2 can
+     *  launch only now (T-5 sequential contract). */
+    const released = await expeditionFor<{ eligible: boolean }>(
+      page,
+      POI_ROVINE,
+      'checkEligibility',
+      SLOT_ROVINE_LEADER,
+      VALID_LEADER,
+    );
+    if (!terminal.party.some((m) => m.id === VALID_LEADER && m.dead)) {
+      expect(released.eligible).toBe(true);
+    }
+    await expect(rovineSend).toBeEnabled({ timeout: 15_000 });
+
+    /* --- POI 2 launches — the second posting's own pipeline (T-4). */
+    await expeditionFor<void>(page, POI_ROVINE, 'send');
+    const rovineRun = await expeditionFor<RunShape | null>(page, POI_ROVINE, 'getRun');
+    expect(rovineRun).not.toBeNull();
+    expect(rovineRun!.ended).toBe(false);
+    expect(rovineRun!.nodeId.startsWith('rv-')).toBe(true);
+    expect(rovineRun!.party.map((m) => m.id)).toEqual([VALID_MEMBER]);
+    expect(rovineRun!.scenarioInstanceId).toBeTruthy();
+
+    /* --- Reload mid-run: the rovine frontier survives intact. */
+    await advanceTicks(page, 12);
+    await page.waitForTimeout(800);
+    const beforeReload = (await expeditionFor<RunShape | null>(page, POI_ROVINE, 'getRun'))!;
+    await page.reload();
+    await page.waitForFunction(
+      (pid) =>
+        Boolean(
+          (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid]?.getRun?.(),
+        ),
+      POI_ROVINE,
+      { timeout: 30_000 },
+    );
+    const restored = (await expeditionFor<RunShape | null>(page, POI_ROVINE, 'getRun'))!;
+    expect(restored.nodeId).toBe(beforeReload.nodeId);
+    expect(restored.settlement?.status ?? null).toBeNull();
+  });
+
+  test('second POI (rovine): planning → assignment → forecast → launch on its own offer', async ({ page }) => {
+    await expeditionFor<void>(page, POI_ROVINE, 'openDetail');
+    await expect(page.getByTestId('quest-expedition-detail')).toBeVisible();
+
+    /* Wrong-tag resident rejected by the esploratore gate (clarity|precision):
+     *  spaccaculi (fortitude/warden) cannot scout. */
+    const verdict = await expeditionFor<{ eligible: boolean }>(
+      page,
+      POI_ROVINE,
+      'checkEligibility',
+      SLOT_ROVINE_ESPLORATORE,
+      VALID_LEADER,
+    );
+    expect(verdict.eligible).toBe(false);
+
+    await expeditionFor<boolean>(page, POI_ROVINE, 'assignToSlot', SLOT_ROVINE_LEADER, VALID_MEMBER);
+    await expeditionFor<boolean>(page, POI_ROVINE, 'assignToSlot', SLOT_ROVINE_ESPLORATORE, INVALID_RESIDENT);
+    await expect(page.getByTestId('quest-expedition-forecast')).toHaveAttribute('data-forecast-state', 'ready', {
+      timeout: 20_000,
+    });
+    const offer = await expeditionFor<{ instanceId: string }>(page, POI_ROVINE, 'getResolvedOffer');
+    expect(offer).not.toBeNull();
+
+    await expeditionFor<void>(page, POI_ROVINE, 'send');
+    const run = await expeditionFor<RunShape | null>(page, POI_ROVINE, 'getRun');
+    expect(run).not.toBeNull();
+    expect(run!.party.map((m) => m.id).sort()).toEqual([VALID_MEMBER, INVALID_RESIDENT].sort());
+    expect(run!.nodeId.startsWith('rv-')).toBe(true);
+
+    /* Its halo ticks on the same canonical clock. */
+    await advanceTicks(page, 15);
+    await page.waitForFunction(
+      (pid) => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
+          | { getHalo?: () => HaloShape | null }
+          | undefined;
+        return (exp?.getHalo?.()?.elapsedTicks ?? 0) >= 15;
+      },
+      POI_ROVINE,
+      { timeout: 8_000 },
+    );
+    const halo = await expeditionFor<HaloShape | null>(page, POI_ROVINE, 'getHalo');
+    expect(halo!.status).toBe('filling');
   });
 });
