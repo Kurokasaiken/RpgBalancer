@@ -210,6 +210,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     title: 'Combattimento — il campo dei goblin',
     body: 'Li avete. O loro.',
     transit: 'Il momento è scelto. Il bosco trattiene il fiato — poi il campo esplode.',
+    previewHint: 'Scontro a turni sul campo: i goblin rispondono colpo per colpo — la pelle si paga.',
     beat: 4,
     combat: {
       turns: 5,
@@ -268,6 +269,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     // goblins are bloodied → the ambush is the mild one.
     upfrontDamage: { amount: 10, epicfailAmount: 20 },
     failHint: 'La caccia costa sangue comunque. Se scappano, tornano feriti: l’agguato sarà più debole.',
+    previewHint: 'Inseguire espone le spalle: la caccia ha un pedaggio certo, il verdetto decide il resto.',
   },
 
   /* F6 — CONTINUA L'ESPLORAZIONE: push-your-luck, damage grows 5→10→15. */
@@ -298,6 +300,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     kind: 'check',
     title: 'Razzia tra le tende',
     body: 'Tra le tende bruciate e le trappole lasciate dai goblin — il campo si fa pagare anche da morto.',
+    previewHint: 'Ogni altro giro di razzia costa più del precedente — il campo non resta stabile.',
     stats: ['int', 'perc'],
     risk: { wound: 0, death: 0 },
     beat: 6,
@@ -326,6 +329,8 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     title: 'Agguato sulla strada',
     body: 'Il fischiettio si interrompe a metà. Una freccia nel palo accanto a voi. Poi tutte le altre.',
     next: 'gob-agguato-scelta',
+    previewHint: 'La via del ritorno non è sicura: qualcuno vi sta aspettando.',
+    revealHint: 'Un occhio allenato leggerebbe le piste: i fuggiaschi che risparmiate tornano a preparare questo agguato.',
     beat: 7,
   },
   'gob-agguato-scelta': {
@@ -435,6 +440,8 @@ export const GOBLIN_SCENARIO_AUTHORED = {
           role: 'member',
           statFocus: ['perc', 'int'],
           requirement: { label: 'Esploratore', anyOf: ['precision', 'clarity'] },
+          // D-S3-3: l'esploratore paga a planning — perc alta svela i revealHint.
+          revealAtPlanning: { stat: 'perc', threshold: 60 },
         },
         {
           id: 'goblin-slot-bodyguard',
