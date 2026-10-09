@@ -194,6 +194,10 @@ Ogni task richiede lo stato garantito dal precedente.
   greedy a 450 ms/passo. **Budget di presentazione:** overhead senza skip
   ≤ +50% della mediana baseline per passo (≈ +225 ms medi, assegnati ai beat
   sotto) e mediana con skip ≤ +10%; morte fino al primo clic libero.
+  **Budget rinegoziato (Director 2026-10-09):** il cinema authored non rientra
+  nella % della baseline — il vincolo vincolante resta il percorso skip
+  (≤ +10%, misurato ≈191 ms/comando ✓); l'overhead no-skip è durata authored
+  (≈1750 ms/comando accettato), non più tarato sulla baseline istantanea.
 - **T-004 — Frontiera v27 nel dominio (FATTO 2026-10-08).**
   `submitCommand`/`matureReady`/`arriveNode`/`matureNode` in `questRun.ts`;
   `applyChoice` = submit + catch-up istantaneo (lab/MC invariati);
@@ -302,15 +306,20 @@ Ogni task richiede lo stato garantito dal precedente.
   Acceptance 4 parziale:** overhead no-skip ≈ 1750 ms/comando, sopra il budget
   T-003 (+50% ≈ 675 ms); con skip ≈ 191 ms/comando, dentro (+10% ≈ 495 ms).
   Il budget era calibrato pre-frontiera su beat-paragrafo: il cinema authored
-  non ci rientra — rinegoziare il budget o stringere `questWindow.beats` è
-  decisione del Director. Gate umano A (morte su seed E1) ancora aperto.
+  non ci rientra — **risolta (Director 2026-10-09): budget rinegoziato**,
+  vedi nota in T-003. Gate umano A (morte su seed E1) ancora aperto.
   Evidence: `test-results/t011-quest-theatre-acceptance-2026-10-10.log` +
   `test-results/t011/`.
-- **T-012 — Rimozione del montaggio parallelo** (dopo l'acceptance 1–5,
-  reversibile fino a qui). Direzione D-F: `QuestRunWindow` **resta** il
-  componente canonico — si rimuove la superficie dev `QuestTheatre` su
-  `/game-frame-theatre` (o si retrocede a puro strumento Regia senza run
-  proprio), non la finestra.
+- **T-012 — Rimozione del montaggio parallelo (FATTO 2026-10-09, rimozione
+  totale — decisione Director).** Rimossi: pagina/route `/game-frame-theatre`,
+  voce TestHub, tab Theatre su `/primitives`, componente `QuestTheatre` +
+  `fakeTheatreRuntime`/`fixtures`/`probeQuestRun`, read-model `questRunAdapter`
+  + `theatreContract` (consumati solo dalla superficie), config
+  `questTheatreConfig`, campo `adapter` di `useQuestRun`, chiavi i18n
+  `questTheatre.*` (3 lingue), 3 test dello stack. Restano, perché canonici:
+  `beatSequencer`, `cinemaFx`, `questTheatreFx`, `CombatStrip` — consumati da
+  `QuestRunWindow` su `/game`. Unico gate residuo: umano A (Director, morte
+  seed E1). Evidence: `test-results/t012-theatre-teardown-2026-10-09.log`.
 
 ## Fuori scope
 
@@ -322,7 +331,7 @@ segnalino animato sulla mappa · arte (E10) · letalità (R-105) · audio.
 1. Un solo componente monta la quest in corso su `/game`: `QuestRunWindow` (battezzato, D-F). Dopo T-012 non esiste più la superficie parallela `QuestTheatre`/`/game-frame-theatre`.
 2. I-1…I-5 coperti da test, **incluso lo scenario A→B→CHOICE→C→CHECK→D**.
 3. **Seed E1:** 3 morti presentate in sequenza, ciascuna leggibile secondo D-8, nessun input ignorato oltre la soglia anti doppio-click.
-4. **Budget:** overhead e mediana entro le percentuali fissate in T-003; 0 righe duplicate; reopen dopo N fasi maturate → bivio raggiunto senza attese.
+4. **Budget (rinegoziato 2026-10-09):** percorso skip entro +10% della mediana baseline; no-skip = durata authored dei beat (vincolo % retirato); 0 righe duplicate; reopen dopo N fasi maturate → bivio raggiunto senza attese.
 5. **Persistenza:** reload a metà beat o al bivio → stessa frontiera; mismatch di versione gestito.
 6. **Gate umano A (Director):** leggibilità della morte sul seed E1 (il punto che il playtest del 2026-10-08 ha mostrato fallito). Il resto della checklist (irritazione, combattimento, tono, sacca) è un rituale di review, non un gate.
 7. Safeguard verdi + evidence log.

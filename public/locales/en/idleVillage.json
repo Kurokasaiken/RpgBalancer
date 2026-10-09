@@ -1383,36 +1383,6 @@
       }
     }
   },
-  "questTheatre": {
-    "poi": {
-      "label": "Theatre quest"
-    },
-    "awaiting": "The story awaits your decision",
-    "chronicle": "Chronicle",
-    "chronicleEmpty": "The story has not begun yet.",
-    "unsupported": "This moment of the story uses a form the theatre does not know.",
-    "retreat": {
-      "label": "Retreat",
-      "action": "Retreat"
-    },
-    "check": {
-      "probability": "Estimated probability: {{pct}}%",
-      "submit": "Face the check"
-    },
-    "reward": {
-      "collect": "Claim the reward"
-    },
-    "runState": {
-      "running": "In progress",
-      "success": "Mission accomplished",
-      "survived": "Came back empty-handed",
-      "fled": "Retreated",
-      "wiped": "Party wiped"
-    },
-    "combat": {
-      "telemetry": "Turn {{turn}} — enemies standing: {{enemies}}"
-    }
-  },
   "questExpedition": {
     "danger": "Danger",
     "duration": "Estimated duration ~{ticks} ticks",

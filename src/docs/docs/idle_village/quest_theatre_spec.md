@@ -9,6 +9,12 @@ della quest in corso su `/game` è **`QuestRunWindow`**
 contributo teatro che converge *dentro* `QuestRunWindow` (R-106 iter. 3 «un solo
 componente»), non un componente separato.
 
+**Smontaggio (PLAN-025 T-012, Director 2026-10-09 — rimozione totale):** la
+superficie parallela non esiste più — via `QuestTheatre`, `/game-frame-theatre`,
+la tab Theatre su `/primitives`, il read-model `theatreContract`/`questRunAdapter`
+e `questTheatreConfig`. I requisiti di questa spec (beat, cinema fx, frontiera)
+sono oggi tutti incarnati da `QuestRunWindow` + `useQuestRun` + `questTheatreFx`.
+
 ## Cos'è
 
 `QuestTheatre` è il componente che presenta una quest node-driven sulla superficie
@@ -107,21 +113,24 @@ altro → mostra il messaggio del runtime.
 - **Reload:** frontier + seed + versioni persistiti; `matureReady(now)` dopo il
   load riproduce lo stesso catch-up deterministico.
 
-### Adapter runtime reale (PLAN-025 T-006 — `questRunAdapter.ts`)
+### Adapter runtime reale (PLAN-025 T-006 — rimosso in T-012)
 
-- `snapshotQuestRun(run, {tick})` → `TheatreRunView` v2: i nodi risolti
-  vengono da `run.visitedNodes` (storia append-only, rivisite incluse — la
-  track mostra ogni passaggio, es. il loop F6), mai dal grafo; il nodo di
-  frontiera è `awaitingPlayer` | `pending` | `resolved`.
+> Storico: `questRunAdapter.ts`/`theatreContract.ts` esistevano solo per la
+> superficie parallela; con T-012 la proiezione teatro non ha più consumatori
+> dedicati — `QuestRunWindow` legge lo stato del run direttamente da
+> `useQuestRun`. I punti sotto restano come requisito dei contenuti mostrati.
+
+- Vista dei nodi: i nodi risolti vengono da `run.visitedNodes` (storia
+  append-only, rivisite incluse — la track mostra ogni passaggio, es. il loop
+  F6), mai dal grafo; il nodo di frontiera è `awaitingPlayer` | `pending` |
+  `resolved`.
 - `pending` espone `node.pending{startedAt,readyAt}` e **nessuna opzione**;
   `combat` espone `run.combat{turn,enemiesLeft}`; `bag` = flag sacca → item
-  stash (`labelKey` i18n — l'adapter non produce mai copy).
-- `createQuestRunAdapter(getRun,{getTick,onMutate})`: dispatch con guard
-  stale (`expectedFrontierVersion`/`nodeId`), rifiuto su `pending`, dedupe
-  per `commandId` (`rejected:duplicate`); `useItem` solo per oggetti
-  istantanei (pozione/cure — i modificatori di check si armano, non si
-  spendono qui); `retreat`/`collectReward` → rifiuto onesto (il motore non
-  ha flussi generici: il ritiro è un'opzione authored).
+  stash (`labelKey` i18n — la superficie non produce mai copy).
+- Comandi alla frontiera: scelta solo quando `awaitingPlayer`, mai su
+  `pending`; `useItem` solo per oggetti istantanei (pozione/cure — i
+  modificatori di check si armano, non si spendono qui); il ritiro è
+  un'opzione authored dello scenario, non un flusso generico.
 
 ### BeatSequencer (PLAN-025 T-008 — `questS1Lab/beatSequencer.ts`)
 

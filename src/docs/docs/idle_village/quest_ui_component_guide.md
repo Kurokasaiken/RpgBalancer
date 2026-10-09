@@ -163,6 +163,7 @@ esposizione%` (`currentExposure`, max in danger), cella del colpito marcata +
 **Frontiera v27**: `submitCommand`/`matureReady` nel dominio — un comando alla
 volta, nodi `info`/`harm` maturano a `readyAt`, gli effetti atterrano alla
 maturazione, catch-up deterministico. Persistenza via `PersistenceService`
-(`idleVillage.questRun.<questId>`, `engineSchemaVersion=2`). Route dev su
-adapter reale: `/game`, `/game-frame-theatre` (Regia + tick driver),
-`/quest-window-lab` (componente isolato).
+(`idleVillage.questRun.<questId>`, `engineSchemaVersion=2`). Route su
+adapter reale: `/game` (canonica), `/quest-window-lab` (componente isolato).
+La superficie parallela `/game-frame-theatre` è stata smontata (PLAN-025
+T-012, rimozione totale 2026-10-09).

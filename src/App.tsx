@@ -81,7 +81,6 @@ const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabP
 const GameFramePage = lazy(() => import('./pages/game-frame').then(m => ({ default: m.default })));
 const MapBenchmarkPage = lazy(() => import('./pages/map-benchmark').then(m => ({ default: m.default })));
 const GameFramePixiPage = lazy(() => import('./pages/game-frame-pixi').then(m => ({ default: m.default })));
-const GameFrameTheatrePage = lazy(() => import('./pages/game-frame-theatre').then(m => ({ default: m.default })));
 const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
@@ -285,8 +284,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/game-frame-pixi';
   const isGamePath =
     typeof window !== 'undefined' && window.location.pathname === '/game';
-  const isGameFrameTheatrePath =
-    typeof window !== 'undefined' && window.location.pathname === '/game-frame-theatre';
   const isSeaEffectLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/sea-effect-lab';
   const isWorldPresentationDirectorPath =
@@ -1032,16 +1029,6 @@ function App() {
       <ErrorBoundary componentName="Game Frame Pixi Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Game Frame (Pixi)...</div>}>
           <GameFramePixiPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
-
-  if (isGameFrameTheatrePath) {
-    return (
-      <ErrorBoundary componentName="Game Frame Theatre Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Theatre...</div>}>
-          <GameFrameTheatrePage />
         </Suspense>
       </ErrorBoundary>
     );

@@ -973,3 +973,35 @@ b»):**
   in un secondo tempo»).
 
 **Fonte:** Director in sessione 2026-10-10.
+
+---
+
+## 2026-10-09 — PLAN-025 T-012 + budget: chiusura della convergenza teatro
+
+**Contesto:** ultimi due punti aperti di PLAN-025 dopo T-011 — il destino
+della superficie parallela `QuestTheatre`/`/game-frame-theatre` e il budget
+no-skip violato (≈1750 ms/comando vs soglia 675 ms).
+
+**Decisioni (Director, 2026-10-09):**
+
+1. **T-012 = rimozione totale.** Non «strumento Regia»: via pagina, route,
+   tab Theatre su `/primitives`, componente `QuestTheatre`, fake runtime,
+   fixture, read-model `theatreContract`/`questRunAdapter`, config
+   `questTheatreConfig`, campo `adapter` di `useQuestRun`, chiavi i18n
+   `questTheatre.*`. Un solo componente monta la quest in corso:
+   `QuestRunWindow` (battezzato D-F). Restano canonici `beatSequencer`,
+   `cinemaFx`, `questTheatreFx`, `CombatStrip` perché consumati dalla
+   finestra.
+2. **Budget rinegoziato.** Il budget T-003 (+50% della baseline istantanea
+   per passo) era tarato pre-frontiera su beat-paragrafo: il cinema authored
+   (letterbox/typewriter/floater con durate da config) non ci rientra per
+   costruzione. Vincolo vincolante = percorso **skip** ≤ +10% baseline
+   (misurato ≈191 ms/comando ✓); il no-skip è durata authored dei beat,
+   accettata a ≈1750 ms/comando. `questWindow.beats` resta la leva se il
+   ritmo risulta lento nel gate umano.
+
+**Residuo aperto:** gate umano A — leggibilità della morte su seed E1
+(playtest Director, unico acceptance non automatizzabile).
+
+**Fonte:** Director in sessione 2026-10-09 («Rimozione totale»,
+«Rinegozia budget»).
