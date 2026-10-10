@@ -180,11 +180,17 @@ simulazione usata è dichiarata nella UI («ipotesi: percorso X, consumabili Y»
   dallo slot Esploratore — il campo resta nello schema come seam authored
   ma la sorgente intel sarà un sistema di scouting esterno (edificio/
   residente esploratore, non esiste su /game): TODO in schema+sessione.
-- **T-5 — Misura dei trade-off (gate a/b preparatorio).** Sweep MC su griglia
-  di party plausibili: asserire (i) nessun party domina su tutte le metriche,
-  (ii) la varianza tra strategie in-run resta significativa (la quest non è
-  risolta nel planner), (iii) un membro «carne da macello» è identificabile
-  dal BY MEMBER. Evidenza tabellare per il gate Director.
+- **T-5 — Misura dei trade-off (gate a/b preparatorio).** ✅ 2026-10-10.
+  `questTradeoffSweep.test.ts` — sweep MC (800 run/cella, seed 7) su 6 party
+  plausibili × 4 archetipi-strategia. Esiti: **(i)** fronte di Pareto ≥2
+  (sentinelle scambiano reward per sopravvivenza, falange il contrario);
+  **(ii)** varianza in-run enorme — sanguinario 99.3% reward/73% morti vs
+  cauto 5.5%/42% (reward richiede inseguire+finire: «sterminio» coerente);
+  **(iii)** BY MEMBER identifica chi paga: il bodyguard intercetta (Kran
+  71.8% morti) e protegge la recluta (19.5%); senza scudo il debole esposto
+  paga lui (64.4%). Evidenza authored: la razzia ricircola e il danno scala
+  per giro — «spingi per sempre» = wipe certo (muro push-your-luck reale).
+  Test con timeout espliciti; tabelle stampate → evidence log.
 - **T-6 — Docs + safeguard + evidence.** Spec, kanban, evidence log,
   aggiornamento mappatura PLAN-018 (righe concluse), DECISION_LOG per le
   ratifiche D-S3-x.
