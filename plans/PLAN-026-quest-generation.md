@@ -214,7 +214,25 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   Bande dichiarate=misurate; nessun dominatore; twist witness su tutti;
   trap legittime segnalate. Evidence:
   `test-results/plan026-p4-benchmark-2026-10-10.log`.
-- T4 — generazione narrativa offline (provider strategy P3) + benchmark.
+- **T4 — generazione narrativa offline — FATTO** (provider strategy P3).
+  Pipeline completa: `domainVocabs.ts` (4 vocabolari tipati da
+  QUEST_IMPRINTS: mayInvent/coerenza/vietati) → `narrative/sceneBrief.ts`
+  (fatti meccanici per nodo, la copy authored non entra mai) →
+  `narrationPrompt.ts` (prompt ~2KB, nominali canonici dal meta) →
+  `validateCopy.ts` (gate deterministico: Zod strict, vietati dominio,
+  cifre, internal-id, campi richiesti) → `scripts/questNarrate.mts`
+  (driver: fallback chain groq→openrouter dimostrata su 429 reale,
+  partial dump + ripresa `--only`/`--reuse`/`--emit-from`, provenance
+  embeddato nell'artefatto). Primo imprint narrato: **`gen-flood-mare`**
+  (`narrated/flood-mare.kit.ts` + `floodMare.ts`) — catalogo v0 = 2
+  gimmick × 3 kit a mano + 1 narrato. Benchmark P4 sul nuovo imprint:
+  numeri **bit-identici** a miniera — la copy non altera la meccanica.
+  20 test nuovi; suite 235/235. Finding reali: leak nomi stub nei fatti
+  (fix: nominali canonici), internal-id in prosa (nuova regola gate),
+  riuso-stale su rigenerazione fallita (fix). Limiti: race `options`
+  record su choice non ancora coperto; qualità testuale dei choice-hub
+  sotto quella dei check (il gate copre il formale, non l'estetico).
+  Evidence: `test-results/plan026-t4-narration-2026-10-10.log`.
 - T5 — twist del party (prerequisito: `traits` su ResidentState).
 - T6 — integrazione dopo gate PLAN-019 pertinenti.
 - T7 — archi narrativi: gated (OPEN-016 + ratifica).
