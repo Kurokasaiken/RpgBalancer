@@ -25,8 +25,10 @@ export const StashItemSchema = z.object({
   /** Lucide icon id (resolved via `@/ui/shared/statIconUtils`) on the picker chip and belt. */
   icon: z.string().min(1),
   /** 'check': armed before a check, +bonus when stats match.
-   *  'action': used standalone from the belt at a decision node. */
-  kind: z.enum(['check', 'action']),
+   *  'action': used standalone from the belt at a decision node.
+   *  'passive' (PLAN-019-S4 T-5): armed by being packed — the engine reads
+   *   its effect continuously; the belt never renders it clickable. */
+  kind: z.enum(['check', 'action', 'passive']),
   /** Check-bonus magnitude (kind 'check' only). */
   bonus: z.number().optional(),
   /** Which check stats this item helps (drives both engine and tooltip hint). */
@@ -98,6 +100,16 @@ const RAW_QUEST_STASH = {
       descKey: 'questS1Lab.stash.desc.potion',
       icon: 'droplets',
       kind: 'action',
+    },
+    {
+      /* PLAN-019-S4 T-5: the guardian banner — `coverRiskDelta` wired into
+       *  the engine (D-S4-3). Passive: packed = armed; the leader bears it
+       *  and every other living member's risk bands drop while he stands. */
+      flag: 'hasGuardianBanner',
+      labelKey: 'missionPlanner.items.guardianBanner',
+      descKey: 'questS1Lab.stash.desc.banner',
+      icon: 'flag',
+      kind: 'passive',
     },
   ],
 };

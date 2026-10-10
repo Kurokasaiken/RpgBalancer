@@ -9,6 +9,7 @@
 
 import { DEFAULT_QUEST_SKILL_CHECK_CONFIG } from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
 import { resolveStashLoadout } from '@/balancing/config/idleVillage/quests/questStash';
+import { defaultQuestItems, QUEST_FLAG_TO_ITEM } from '@/balancing/config/idleVillage/quests/questItems';
 import { PARTY_PRESETS, PRIMARY_STATS, SCENARIO_NODES, START_NODE } from './questScenario';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
@@ -647,6 +648,33 @@ export interface HarmEvent {
 }
 
 /**
+ * Cover (D1, PLAN-019-S4 T-5): the pp deltas packed cover items grant every
+ * OTHER living member while the bearer stands. In the party-level bag there
+ * is no per-member assignment — the **leader** is the designated bearer
+ * (the required quest slot, the standard-bearer): if he falls, the aura
+ * falls with him; he never benefits from his own standard. Deltas are read
+ * off the packed flags through the item catalog — any future
+ * `coverRiskDelta` flag item works without touching the engine.
+ */
+export function coverDeltaFor(
+  state: QuestRunState,
+  memberId: string,
+): { wound: number; death: number } {
+  const bearer = state.party.find((m) => m.role === 'leader' && !m.dead);
+  if (!bearer || bearer.id === memberId) return { wound: 0, death: 0 };
+  let wound = 0;
+  let death = 0;
+  for (const flag of state.flags) {
+    const itemId = QUEST_FLAG_TO_ITEM.get(flag);
+    const cover = itemId ? defaultQuestItems[itemId]?.coverRiskDelta : undefined;
+    if (!cover) continue;
+    wound += cover.injuryChance ?? 0;
+    death += cover.deathChance ?? 0;
+  }
+  return { wound, death };
+}
+
+/**
  * Roll per-slot harm for a skill check.
  * Bodyguard rule (rev.2): while a living bodyguard exists, ALL harms rolled
  * on other members are redirected to the bodyguard — even several in one check.
@@ -721,8 +749,11 @@ function rollCheckHarms(
   for (const m of state.party) {
     if (m.dead) continue;
     const slot = SLOT_RISK[m.role];
-    let wound = base.wound + slot.wound;
-    let death = base.death + slot.death;
+    /* Cover is snapshotted at roll time: a bearer downed ON this check
+     *  still covered it — the standard stood when the blow landed. */
+    const cover = coverDeltaFor(state, m.id);
+    let wound = base.wound + slot.wound + cover.wound;
+    let death = base.death + slot.death + cover.death;
     if (m.wounded) {
       wound += TUNE.woundedRiskBonus;
       death += TUNE.woundedRiskBonus;
@@ -1416,7 +1447,7 @@ export function previewOption(
     name: m.name,
     role: m.role,
     wounded: m.wounded,
-    ...memberRisk(m, checkNode),
+    ...memberRisk(m, checkNode, coverDeltaFor(state, m.id)),
   }));
   const inst = state.scenarioInstanceId
     ? scenarioInstanceById(state.scenarioInstanceId)
@@ -1436,7 +1467,7 @@ export function previewOption(
     woundPct: checkNode.risk?.wound ?? 0,
     deathPct: checkNode.risk?.death ?? 0,
     interceptor: bodyguard
-      ? { name: bodyguard.name, ...memberRisk(bodyguard, checkNode) }
+      ? { name: bodyguard.name, ...memberRisk(bodyguard, checkNode, coverDeltaFor(state, bodyguard.id)) }
       : undefined,
     perSlot,
     primaryStatsUsed,
@@ -1444,16 +1475,19 @@ export function previewOption(
   };
 }
 
-/** The check's harm risk for a specific member (slot modifier + wounded penalty). */
+/** The check's harm risk for a specific member (slot modifier + wounded
+ *  penalty + optional cover — `coverDeltaFor(state, member.id)` when a run
+ *  state is known; callers without one get the bare band). */
 export function memberRisk(
   member: RuntimeMember,
   node: QuestNode,
+  cover: { wound: number; death: number } = { wound: 0, death: 0 },
 ): { woundPct: number; deathPct: number } {
   const slot = SLOT_RISK[member.role] ?? SLOT_RISK.member;
   const extra = member.wounded ? TUNE.woundedRiskBonus : 0;
   return {
-    woundPct: Math.max(0, (node.risk?.wound ?? 0) + slot.wound + extra),
-    deathPct: Math.max(0, (node.risk?.death ?? 0) + slot.death + extra),
+    woundPct: Math.max(0, (node.risk?.wound ?? 0) + slot.wound + extra + cover.wound),
+    deathPct: Math.max(0, (node.risk?.death ?? 0) + slot.death + extra + cover.death),
   };
 }
 

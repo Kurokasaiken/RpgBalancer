@@ -152,10 +152,13 @@ describe('loadoutDuration — S3 T-3 duration channel', () => {
     expect(d.factor).toBe(1);
   });
 
-  it('isExpeditionItem pools engine-flagged consumables and duration items only', () => {
+  it('isExpeditionItem pools engine-flagged, duration and wired-cover items only', () => {
     expect(isExpeditionItem(defaultQuestItems.quest_mount_draft_horse)).toBe(true);
     expect(isExpeditionItem(defaultQuestItems.quest_consumable_pozione)).toBe(true);
-    // Legacy equipment with no engine channel stays catalog-only.
+    // PLAN-019-S4 T-5: coverRiskDelta is wired — the banner re-enters the bag.
+    expect(isExpeditionItem(defaultQuestItems.quest_trinket_guardian_banner)).toBe(true);
+    // Legacy equipment with no engine channel stays catalog-only; the armor's
+    // carrier `deathChanceDelta` is still unwired — honest exclusion.
     expect(isExpeditionItem(defaultQuestItems.quest_weapon_iron_blade)).toBe(false);
     expect(isExpeditionItem(defaultQuestItems.quest_armor_heavy_plate)).toBe(false);
   });

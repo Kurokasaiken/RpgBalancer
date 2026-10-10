@@ -144,10 +144,29 @@ interessanti e invarianti rispettati. Destino delle superfici lab S1 deciso
 - **T-4 — ~~Convergenza superfici~~ → differita (D-S4-4).** Le superfici lab
   restano invariate; si registra solo l'inventario nel piano (T-0) e il
   rinvio esplicito.
-- **T-5 — `coverRiskDelta` cablato (D-S4-3).** Il portatore riduce
-  injury/death chance degli altri membri vivi nel motore; la corazza rientra
-  in sacca senza toccare `isExpeditionItem`; test: item eleggibile +
-  riduzione misurata nel sim.
+- **T-5 — `coverRiskDelta` cablato (D-S4-3).** ✅ **Fatto 2026-10-10.**
+  `coverDeltaFor(state, memberId)` nel motore: pp-delta dei flag-item con
+  `coverRiskDelta` applicato a OGNI altro membro vivo finché il portatore
+  regge. **Portatore = leader** (convenzione S4: nel bag party-level non
+  esiste assegnazione per-membro; il leader è lo slot richiesto — il
+  porta-stendardo; se cade l'aura cade; non beneficia del proprio
+  stendardo). Snapshot al roll: portatore caduto SU quel check copre
+  comunque quel check. Cablato in `rollCheckHarms`, `memberRisk` (param
+  opzionale cover), `previewOption.perSlot`/`interceptor`,
+  `questSimulation` (entrambi i call-site) — forecast e motore dicono lo
+  stesso numero. Stendardo: `engineFlag 'hasGuardianBanner'` + voce stash
+  `kind:'passive'` (nuovo enum — la belt non lo rende cliccabile, il bag
+  popover lo elenca). `isExpeditionItem`: `coverRiskDelta` esce dalla
+  lista fake → stendardo eleggibile; corazza e lama restano fuori
+  (`deathChanceDelta`/`statDeltas` carrier ancora non cablati — onesto).
+  Nota authored: i check goblin hanno tutti `risk:{0,0}` (danno
+  posizionale HP) — il canale è reale e misurato (test su check a banda
+  reale), la presa authored arriverà con bande di rischio future.
+  Residuo preesistente registrato: `createRun` risolve il loadout flag
+  solo su `questId==='goblin'` — item flag packed su rovine sono muti
+  (gap già presente, non T-5). Test: 3 nuovi engine + eleggibilità
+  aggiornata; 186/186 scope quest, digest MC intatti.
+  Evidence: `test-results/s4-t5-cover-risk-2026-10-10.log`.
 - **T-6 — Artefatto finale + loop E2E + chiusura.** «Definizione di buona
   quest» (ingresso S5, da proprietà emerse S1–S4); E2E del loop completo
   villaggio→quest→epilogo→conseguenze→villaggio (incluso POI one-shot

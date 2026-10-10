@@ -1430,7 +1430,8 @@
         "smoke": "+15 ai check di Agilità",
         "rope": "+15 ai check di Forza o Costituzione",
         "healing": "+20 HP al membro più ferito — si usa prima di un check",
-        "potion": "Cura completamente un membro ferito"
+        "potion": "Cura completamente un membro ferito",
+        "banner": "Vessillo del Guardiano — lo porta il leader: −6% ferita, −4% morte per ogni altro membro finché resta in piedi"
       }
     }
   },
