@@ -203,6 +203,97 @@ describe('applyPlanToState', () => {
 });
 
 /* ------------------------------------------------------------------ */
+/* eventLog (PLAN-019-S4 T-1) — the village remembers the run           */
+/* ------------------------------------------------------------------ */
+
+describe('eventLog', () => {
+  it('writes an outcome headline plus one line per applied effect', () => {
+    const plan = deriveSettlementPlan(terminalRun({}), { questTitle: 'Sterminio dei goblin' });
+    const { next } = applyPlanToState(minimalState({}), plan, 200);
+    const log = next.eventLog ?? [];
+    /* Entries: outcome + wounded(hero-member) + goldReward(42) + goldLoot(15)
+     * + xp(3) — loadout-release stays silent. */
+    expect(log).toHaveLength(5);
+
+    const headline = log[0];
+    expect(headline.type).toBe('quest_outcome');
+    expect(headline.severity).toBe('success'); // outcome=reward
+    expect(headline.messageKey).toBe('gameFrame.questLog.outcome.reward');
+    expect(headline.messageParams).toEqual({ quest: 'Sterminio dei goblin' });
+    expect(headline.id).toBe(`${plan.runId}:log:outcome`);
+
+    const wounded = log[1];
+    expect(wounded.type).toBe('quest_settlement');
+    expect(wounded.severity).toBe('warning');
+    expect(wounded.residentId).toBe('hero-member');
+    expect(wounded.messageKey).toBe('gameFrame.questLog.residentWounded');
+    expect(wounded.messageParams).toEqual({ name: 'Member' });
+
+    expect(log[2].messageKey).toBe('gameFrame.questLog.goldReward');
+    expect(log[2].messageParams).toEqual({ amount: 42, quest: 'Sterminio dei goblin' });
+    expect(log[3].messageKey).toBe('gameFrame.questLog.goldLoot');
+    expect(log[3].messageParams).toEqual({ amount: 15, quest: 'Sterminio dei goblin' });
+    expect(log[4].messageKey).toBe('gameFrame.questLog.xp');
+  });
+
+  it('is idempotent — replay never narrates twice', () => {
+    const plan = deriveSettlementPlan(terminalRun({}));
+    const first = applyPlanToState(minimalState({}), plan, 200).next;
+    const second = applyPlanToState(first, plan, 200);
+    expect(second.appliedNow).toHaveLength(0);
+    expect(second.next.eventLog).toEqual(first.eventLog);
+  });
+
+  it('wipe headline is an error line; a dead resident is named', () => {
+    const plan = deriveSettlementPlan(
+      terminalRun({
+        outcome: 'wipe',
+        objectiveDone: false,
+        loot: [],
+        party: [
+          { id: 'hero-leader', name: 'L', stats: {}, role: 'leader', hp: 0, maxHp: 100, wounded: false, dead: true },
+          { id: 'hero-member', name: 'M', stats: {}, role: 'member', hp: 0, maxHp: 60, wounded: false, dead: true },
+        ],
+      }),
+    );
+    const { next } = applyPlanToState(minimalState({}), plan, 200);
+    const log = next.eventLog ?? [];
+    expect(log[0].severity).toBe('error');
+    expect(log[0].messageKey).toBe('gameFrame.questLog.outcome.wipe');
+    const dead = log.filter((e) => e.messageKey === 'gameFrame.questLog.residentDead');
+    expect(dead).toHaveLength(2);
+    expect(dead[0].severity).toBe('error');
+    /* The village names the fallen from the roster, not the run record. */
+    expect(dead[0].messageParams).toEqual({ name: 'Leader' });
+    /* Wipe drops gold/xp — no economy lines. */
+    expect(log.some((e) => e.messageKey === 'gameFrame.questLog.goldReward')).toBe(false);
+    expect(log.some((e) => e.messageKey === 'gameFrame.questLog.xp')).toBe(false);
+  });
+
+  it('falls back to questId in the copy when no title is passed', () => {
+    const plan = deriveSettlementPlan(terminalRun({}));
+    const { next } = applyPlanToState(minimalState({}), plan, 200);
+    expect(next.eventLog?.[0].messageParams).toEqual({ quest: 'goblin' });
+  });
+
+  it('respects the event-log tail cap', () => {
+    const plan = deriveSettlementPlan(terminalRun({}));
+    const prior = Array.from({ length: 98 }, (_, i) => ({
+      id: `old-${i}`,
+      timestamp: i,
+      severity: 'info' as const,
+      message: `old ${i}`,
+    }));
+    const { next } = applyPlanToState(minimalState({ eventLog: prior }), plan, 200, {
+      eventLogLimit: 100,
+    });
+    expect(next.eventLog).toHaveLength(100);
+    expect(next.eventLog?.[99].messageKey).toBe('gameFrame.questLog.xp');
+    expect(next.eventLog?.some((e) => e.id === 'old-0')).toBe(false);
+  });
+});
+
+/* ------------------------------------------------------------------ */
 /* settleRun — journal, fault injection, replay convergence             */
 /* ------------------------------------------------------------------ */
 

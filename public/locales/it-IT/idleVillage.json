@@ -923,6 +923,19 @@
       "open": "{name} — apri la quest",
       "decisionWaiting": "La spedizione attende una tua decisione"
     },
+    "questLog": {
+      "outcome": {
+        "reward": "La spedizione «{quest}» è tornata vittoriosa.",
+        "survived": "La spedizione «{quest}» è tornata al villaggio.",
+        "fled": "La spedizione «{quest}» si è ritirata.",
+        "wipe": "La spedizione «{quest}» non è tornata."
+      },
+      "residentDead": "{name} è caduto in spedizione.",
+      "residentWounded": "{name} è tornato ferito dalla spedizione.",
+      "goldReward": "Ricompensa della missione: +{amount} oro ({quest}).",
+      "goldLoot": "Bottino: +{amount} oro ({quest}).",
+      "xp": "Esperienza della spedizione: +{amount} PE ({quest})."
+    },
     "director": {
       "title": "Regia",
       "move": "Sposta",

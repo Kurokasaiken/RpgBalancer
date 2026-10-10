@@ -6,6 +6,9 @@
  */
 import { z } from 'zod';
 
+/** Severity palette for the village event-log lines a settlement writes. */
+const logSeveritySchema = z.enum(['info', 'success', 'warning', 'error']);
+
 const questSettlementSchema = z
   .object({
     /**
@@ -15,6 +18,19 @@ const questSettlementSchema = z
      * `settleTick + woundRecoveryTicks`.
      */
     woundRecoveryTicks: z.number().int().positive(),
+    /**
+     * Severities for the event-log lines written by `applyPlanToState`
+     * (PLAN-019-S4 T-1). `outcome` is keyed by `run.outcome`; a run outcome
+     * missing from the record falls back to `outcomeFallback`.
+     */
+    logSeverity: z.object({
+      outcome: z.record(z.string(), logSeveritySchema),
+      outcomeFallback: logSeveritySchema,
+      residentDead: logSeveritySchema,
+      residentWounded: logSeveritySchema,
+      villageGold: logSeveritySchema,
+      villageXp: logSeveritySchema,
+    }),
   })
   .strict();
 
@@ -22,4 +38,17 @@ export type QuestSettlementConfig = z.infer<typeof questSettlementSchema>;
 
 export const QUEST_SETTLEMENT: QuestSettlementConfig = questSettlementSchema.parse({
   woundRecoveryTicks: 5,
+  logSeverity: {
+    outcome: {
+      reward: 'success',
+      survived: 'info',
+      fled: 'warning',
+      wipe: 'error',
+    },
+    outcomeFallback: 'info',
+    residentDead: 'error',
+    residentWounded: 'warning',
+    villageGold: 'success',
+    villageXp: 'success',
+  },
 });

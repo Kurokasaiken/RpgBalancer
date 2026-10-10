@@ -916,6 +916,19 @@
       "open": "{name} — open the quest",
       "decisionWaiting": "The expedition awaits your decision"
     },
+    "questLog": {
+      "outcome": {
+        "reward": "The expedition «{quest}» returned victorious.",
+        "survived": "The expedition «{quest}» made it back to the village.",
+        "fled": "The expedition «{quest}» retreated.",
+        "wipe": "The expedition «{quest}» did not come back."
+      },
+      "residentDead": "{name} fell on the expedition.",
+      "residentWounded": "{name} came back wounded from the expedition.",
+      "goldReward": "Quest reward: +{amount} gold ({quest}).",
+      "goldLoot": "Loot: +{amount} gold ({quest}).",
+      "xp": "Expedition experience: +{amount} XP ({quest})."
+    },
     "director": {
       "title": "Director",
       "move": "Move",
