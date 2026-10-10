@@ -137,20 +137,67 @@ describe('parity vs frozen oracle (git-HEAD authored)', () => {
     it(`${s.id}: migrated graph/meta is 1:1 with the pre-migration authored object`, () => {
       const oracle = readOracle(s.id);
       // `offer` is new authored content (S2.1 contract) — not part of parity.
-      // `previewHint`/`revealHint` are additive planning intel (S3 T-1) —
+      // `previewHint`/`revealHint` (S3 T-1) and `hidden` (S3, Director
+      // 2026-10-10 event marker) are additive planning/presentation data —
       // same class: stripped before the frozen-oracle comparison.
       const stripPlanningHints = (nodes: Record<string, Record<string, unknown>>) =>
         Object.fromEntries(
           Object.entries(nodes).map(([id, n]) => {
-            const { previewHint: _p, revealHint: _r, ...rest } = n;
+            const { previewHint: _p, revealHint: _r, hidden: _h, ...rest } = n;
             return [id, rest];
           }),
         );
-      expect(stripPlanningHints(s.parsed.nodes)).toStrictEqual(oracle.authored.nodes);
+      /* Director copy pass 2026-10-10 (S3): the oracle stays frozen on the
+       * pre-migration original; these overrides re-baseline only the authored
+       * strings that were deliberately renamed («Un nascondiglio»→«Tesoro
+       * nascosto», «L'accampamento goblin»→«Assalto», «I goblin
+       * fuggono»→«Incalzare» + the stash trade-off copy). Everything else —
+       * graph, stats, risk, effects — is still compared strictly. */
+      const copyOverrides: Record<string, Record<string, unknown>> =
+        s.id === 'goblin'
+          ? {
+              'gob-bottino-scelta': {
+                title: 'Tesoro nascosto',
+                body: 'Sotto il masso, un bottino avvolto in stracci. Prenderlo in silenzio costa mano ferma — un suono e il campo si sveglia.',
+              },
+              'gob-accampamento': { title: 'Assalto' },
+              'gob-incalzare': { title: 'Incalzare' },
+            }
+          : {};
+      const optionDetailOverrides: Record<string, Record<string, string>> =
+        s.id === 'goblin'
+          ? {
+              'gob-bottino-scelta': {
+                'gob-prendi': 'Destrezza. Se la mano tradisce, il campo si sveglia.',
+                'gob-lascia-bottino': 'Un campo che dorme vale più di un bottino: passate oltre.',
+              },
+            }
+          : {};
+      const expected = {
+        nodes: Object.fromEntries(
+          Object.entries(oracle.authored.nodes).map(([id, n]) => [
+            id,
+            {
+              ...(n as Record<string, unknown>),
+              ...copyOverrides[id],
+              ...('options' in (n as Record<string, unknown>)
+                ? {
+                    options: ((n as { options?: Record<string, unknown>[] }).options ?? []).map((o) => ({
+                      ...o,
+                      detail: optionDetailOverrides[id]?.[String(o.id)] ?? o.detail,
+                    })),
+                  }
+                : {}),
+            },
+          ]),
+        ),
+        beats: (oracle.authored.beats ?? []).map((b) => ({ Bottino: 'Tesoro', Accampamento: 'Assalto' })[b] ?? b),
+      };
+      expect(stripPlanningHints(s.parsed.nodes)).toStrictEqual(expected.nodes);
       expect(s.parsed.startNode).toBe(oracle.authored.startNode);
       expect([...s.parsed.primaryStats]).toStrictEqual(oracle.authored.primaryStats);
       if (oracle.authored.beats) {
-        expect(s.parsed.beats).toStrictEqual([...oracle.authored.beats]);
+        expect(s.parsed.beats).toStrictEqual(expected.beats);
       }
       if (oracle.authored.meta) {
         expect(s.parsed.title).toBe(oracle.authored.meta['title']);
@@ -219,6 +266,7 @@ describe('guaranteed coverage (engine enumeration + witness replay)', () => {
   for (const s of SCENARIOS) {
     it(
       `${s.id}: every authored node and option is realized; witnesses replay deterministically`,
+      { timeout: 600_000 },
       () => {
         const exploration = exploreScenario(s.id, s.presetId, s.parsed);
         expect(exploration.truncated, 'esplorazione troncata: grafo troppo grande').toBe(false);

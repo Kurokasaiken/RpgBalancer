@@ -255,8 +255,9 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                 </div>
               )}
 
-              {/* Intel — authored preview hints always; deeper hints when
-               *  the explorer slot unlocked them (revealAtPlanning). */}
+              {/* Intel — authored preview hints always; deeper `revealHint`s
+               *  unlock via `revealAtPlanning` (D-S3-3). TODO: the source will
+               *  be external scouting, not a party slot (Director 2026-10-10). */}
               {intelHints.length > 0 && (
                 <div data-testid="forecast-intel" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>

@@ -365,7 +365,10 @@ export function useQuestExpeditionSession({
   }, [estimate, estimateKey]);
 
   /* `revealAtPlanning` (S3 T-1/D-S3-3): nodes whose `revealHint` unlocks
-   *  because an assigned member meets the slot's stat threshold. */
+   *  because an assigned member meets the slot's stat threshold.
+   *  TODO(S3, Director 2026-10-10): intel source must move off party slots —
+   *  scouting is an external system (explorer building/resident, not yet on
+   *  /game). The slot-seam stays authored but no canonical slot carries it. */
   const revealedNodeIds = useMemo(() => {
     const revealed = new Set<string>();
     if (!authoredSlots || !QUEST_PLANNER_INFO.revealAtPlanning.enabled) return revealed;
@@ -563,6 +566,46 @@ export function useQuestExpeditionSession({
     onOpenRun,
     clearDraft,
   ]);
+
+  /* ------------------------------------------------------------------ */
+  /* demoLaunch — staging shortcut (Director panel)                       */
+  /* ------------------------------------------------------------------ */
+  const demoLaunchPending = useRef(false);
+  /**
+   * Stages a one-click expedition through the SAME canonical launch a
+   * player triggers: opens the detail, auto-fills required slots with the
+   * first eligible roster residents (one slot per render pass, so
+   * `assignments`/`assignedIds`/`eligibilityFor` recompute for real), then
+   * crosses the real `send` boundary — offer freeze, party re-validation,
+   * loadout reservation, settlement wiring. No lab-preset shortcut. If no
+   * eligible resident exists for a required slot, the detail stays open so
+   * the blocked state stays visible.
+   */
+  const demoLaunch = useCallback(() => {
+    demoLaunchPending.current = true;
+    setIsDetailOpen(true);
+  }, []);
+  useEffect(() => {
+    if (!demoLaunchPending.current || !resolved || anyRunActive) return;
+    const missing = slotBlueprints.find((s) => s.required && !assignments[s.id]);
+    if (missing) {
+      const candidateId = Object.keys(residentsById).find(
+        (id) => !assignedIds.includes(id) && eligibilityFor(id, missing.id).eligible,
+      );
+      if (candidateId) {
+        handleAssign(missing.id, candidateId);
+      } else {
+        /* No eligible resident: the real path can't launch either — leave
+         *  the detail open so the blocked state stays visible. */
+        demoLaunchPending.current = false;
+      }
+      return;
+    }
+    if (canSend) {
+      demoLaunchPending.current = false;
+      send();
+    }
+  }, [resolved, anyRunActive, slotBlueprints, assignments, residentsById, assignedIds, eligibilityFor, handleAssign, canSend, send]);
 
   /* ------------------------------------------------------------------ */
   /* Drag & drop — same flight contract as the mock session: the verdict  */
@@ -829,6 +872,7 @@ export function useQuestExpeditionSession({
     estimate,
     canSend,
     send,
+    demoLaunch,
     closeDetail,
     questStatus,
     halo,

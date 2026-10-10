@@ -152,6 +152,11 @@ export interface QuestNode {
   /** Deeper authored hint unlocked only via `revealAtPlanning` slots (S3
    *  D-S3-3): the explorer pays for it at planning, not in-run. */
   revealHint?: string;
+  /** Marks an optional/secret node — off the main path (e.g. reachable only
+   *  through a successful check). Presentation marks it «evento nascosto»
+   *  (Director 2026-10-10): the player should recognise they found something
+   *  they could have missed. */
+  hidden?: boolean;
   /** Deterministic positional HP toll paid BEFORE the verdict is read — the
    *  authored price of attempting this check (e.g. goblin pursuit: the chase
    *  costs blood whatever the die says). `epicfailAmount` overrides `amount`
