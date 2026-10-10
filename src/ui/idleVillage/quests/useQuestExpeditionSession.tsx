@@ -841,6 +841,16 @@ export function useQuestExpeditionSession({
       getResolvedOffer: () => resolved?.resolvedOffer ?? null,
       getRun: () => questRun.run,
       getSettlement: () => questRun.run?.settlement ?? null,
+      /* The village journal entries settlement narrated (PLAN-019-S4 T-1)
+       *  — the loop test asserts the village HEARD what happened, not just
+       *  that the numbers moved. Read-only tail of `state.eventLog`. */
+      getEventLog: () =>
+        useMinimalGameplayStore.getState().state.eventLog?.map((e) => ({
+          type: e.type ?? null,
+          residentId: e.residentId ?? null,
+          messageKey: e.messageKey ?? null,
+          messageParams: e.messageParams ?? null,
+        })) ?? [],
       /* The gameplay aggregate slice settlement mutates — E2E asserts
        *  consequences as DATA (gold/xp deltas, resident isDead/isInjured). */
       getVillage: () => {
