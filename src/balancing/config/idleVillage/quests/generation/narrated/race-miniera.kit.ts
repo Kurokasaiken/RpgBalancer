@@ -126,11 +126,11 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
     "copy": {
       "partenza": {
         "title": "Before the Turn Bell",
-        "body": "The factor opens the registro dei turni: its signatures alone decide who may claim the Galleria Bassa. You and Mara Vezzi leave the bocca del pozzo for the same front; whoever marks it first earns the Licenza della Galleria Bassa and the turn rations. Lamp oil is scarce, so every detour spends light and breath; the record will make the claim stand."
+        "body": "The factor opens the shift register: its signatures alone decide who may claim the Galleria Bassa. You and Mara Vezzi leave the pit mouth for the same front; whoever marks it first earns the Licenza della Galleria Bassa and the turn rations. Lamp oil is scarce, so every detour spends light and breath; the record will make the claim stand."
       },
       "viaA": {
         "title": "The Side Cut",
-        "body": "The main way to the Galleria Bassa keeps its sigilli e legname d’assegnazione in order, but Mara Vezzi has turned into a side cut after catching the campana del turno through the stone. Your lampade a olio shrink in stale air; the canarino in gabbia has stopped calling beside a support with a fresh cut. Take the side cut, and you may gain ground before the route closes.",
+        "body": "The main way to the Galleria Bassa keeps its assignment seals and timber in order, but Mara Vezzi has turned into a side cut after catching the turn bell through the stone. Your oil lamps shrink in stale air; the caged canary has stopped calling beside a support with a fresh cut. Take the side cut, and you may gain ground before the route closes.",
         "failHint": "The cut support may give way, and the quiet canary warns of bad air.",
         "option": {
           "label": "Take Mara Vezzi’s side cut",
@@ -206,7 +206,7 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
       },
       "tappa": {
         "title": "The Cost of the Next Stage",
-        "body": "At the junction, Mara Vezzi has followed the Turn Bell through the rock and changed the race. Pressing forward spends breath where the braces are uncertain; a steadier pace gives up ground but leaves time to read the numbered boards and marked plugs. You must reach and secure the Galleria Bassa before her, with enough material proof for the registro dei turni.",
+        "body": "At the junction, Mara Vezzi has followed the Turn Bell through the rock and changed the race. Pressing forward spends breath where the braces are uncertain; a steadier pace gives up ground but leaves time to read the numbered boards and marked plugs. You must reach and secure the Galleria Bassa before her, with enough material proof for the shift register.",
         "transit": "The route opens ahead, and its cost will remain in your breath or in the marks you can prove."
       },
       "imboscata": {
@@ -234,7 +234,7 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
       },
       "fine": {
         "title": "Claimed in the Deep",
-        "body": "You reach the Galleria Bassa ahead of Mara Vezzi, driving numbered boards and lead stamps into the rock supports. The steady lamp flame and the fluttering canary prove the gap sound. The registro dei turni awards your squad the Licenza della Galleria Bassa and the contatore viveri—a rich cut won by split palms and sour air."
+        "body": "You reach the Galleria Bassa ahead of Mara Vezzi, driving numbered boards and lead stamps into the rock supports. The steady lamp flame and the fluttering canary prove the gap sound. The shift register awards your squad the Licenza della Galleria Bassa and the shift rations; whoever signs the register signs the cut."
       },
       "sconfitta": {
         "title": "The Recorded Claim",
@@ -249,7 +249,7 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
           "detail": "Constitution. Endure the poisoned air to hammer the marked wood into place."
         },
         "outcomeLog": {
-          "win": "You drive the marked lead into the timber, securing the Licenza della Galleria Bassa in the registro dei turni.",
+          "win": "You drive the marked lead into the timber, securing the Licenza della Galleria Bassa in the shift register.",
           "bigwin": "The rock is secured cleanly, securing the Licenza della Galleria Bassa and surplus pay from the factor."
         }
       },
@@ -271,7 +271,7 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
   "it": {
     "id": "miniera",
     "prefix": "rn",
-    "title": "Prima della campana del cambio",
+    "title": "Prima della campana del turno",
     "flavour": "Corri contro Mara Vezzi nelle viscere della miniera: chi sigilla per primo la Galleria Bassa si prende l’assegnazione al cambio turno.",
     "names": {
       "place": "Galleria Bassa",
@@ -391,11 +391,11 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
       },
       "fine": {
         "title": "Rivendicazione nel fondo",
-        "body": "Raggiungete la Galleria Bassa prima di Mara Vezzi, piantando i sigilli e il legname d’assegnazione nei puntelli di roccia. La fiamma ferma delle lampade a olio e il battito d'ali del canarino in gabbia confermano che il vuoto regge e l'aria tiene. Il registro dei turni assegna alla vostra squadra la licenza di scavo insieme al contatore viveri, garantendo un taglio ricco pagato con i palmi spaccati e il respiro guasto."
+        "body": "Raggiungete la Galleria Bassa prima di Mara Vezzi, piantando i sigilli e il legname d’assegnazione nei puntelli di roccia. La fiamma ferma delle lampade a olio e il battito d'ali del canarino in gabbia confermano che il vuoto regge e l'aria tiene. Il registro dei turni assegna alla vostra squadra la licenza di scavo e le razioni di turno: chi firma il registro, firma il taglio."
       },
       "sconfitta": {
         "title": "Il reclamo a verbale",
-        "body": "Mara Vezzi reclama la Galleria Bassa, portando via la licenza di estrazione e le razioni assegnate al contatore viveri. Riportate indietro la squadra con il fiato ancora in corpo, trascinando legname d'assegnazione spaccato e un canarino in gabbia ormai muto a riprova dell'aria guasta lungo il taglio. Il registro dei turni resta fermo contro di voi, contestabile soltanto con nuovi sigilli, tavole recuperate e i rintocchi misurati della campana del turno."
+        "body": "Mara Vezzi reclama la Galleria Bassa, portando via la licenza di estrazione e le razioni di turno. Riportate indietro la squadra con il fiato ancora in corpo, trascinando legname d'assegnazione spaccato e un canarino in gabbia ormai muto a riprova dell'aria guasta lungo il taglio. Il registro dei turni resta fermo contro di voi, contestabile soltanto con nuovi sigilli, tavole recuperate e i rintocchi misurati della campana del turno."
       },
       "sicuro": {
         "title": "L'ultima trave",
