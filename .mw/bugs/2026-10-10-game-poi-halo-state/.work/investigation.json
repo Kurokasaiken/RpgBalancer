@@ -1,0 +1,19 @@
+{
+  "reproduced": true,
+  "reproduction": "Puppeteer su http://localhost:5173/game: al boot due marker [data-map-quest-poi-target] montati (poi-goblin @995,272 e poi-rovine @1087,409, data-quest-status=available, opacity 1) senza alcuna azione Director. I tre demo di «Tipi di POI» renderizzano col sigillo pieno.",
+  "rootCauses": [
+    "game-frame-pixi.tsx anchors: push incondizionato dei POI expedition (solo expired/consumed esclusi) — nessun gate di reveal",
+    "MapDemoPoi: state='available' progress={1} esplicito → sigillo scritto",
+    "MapQuestPoi: timerDirection fisso 'clockwise' + LiquidHalo separato che riempiva orario (direzione errata per il countdown)",
+    "PoiMatericV3_5: 'expiring' senza palette warn (accento oro famiglia) e available/new forzano sealProgress=1 (contratto famiglia, corretto per il lab)"
+  ],
+  "docContract": {
+    "flag": "questAvailability().state === 'expiring' sotto EXPIRING_BELOW (0.25) della finestra residua",
+    "poi_cooldown_spec": "C-001 countdown: halo piena che scarica antiorario; C-004 pulse warn vicino alla scadenza; ambra→rosso",
+    "desiderata D-H": "halo vuota finché «Invia spedizione», poi si riempie (elapsed/duration, D-J)"
+  },
+  "scopeNotes": [
+    "Il mock legacy city-rats (questPois[0] + useQuestPoiSession) conviveva con le expedition reali: il suo marker e' stato rimosso dalla mappa, la sessione resta come clock/roster condiviso della pagina",
+    "Una run attiva resta pinnata per design ('an active run always stays pinned') — non e' il bug"
+  ]
+}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
@@ -12,7 +12,6 @@ import { applySkinCssVariables } from '@/ui/idleVillage/skins/skinCssVariables';
 import { getSkinPresetConfig, type SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { COMPARABLE_SKIN_IDS, resolveInitialSkinPresetId } from '@/ui/idleVillage/skins/resolveInitialSkin';
 import { questAvailability } from '@/ui/idleVillage/components/gameFrame/questAvailability';
-import { EXPIRE_FADE_MS } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DEFAULT_SEA_PATTERN_CONFIG } from '@/ui/idleVillage/components/WorldSurfaceSeaPatternOverlay';
 import { DEFAULT_COAST_FOAM_CONFIG } from '@/ui/idleVillage/components/WorldSurfaceCoastFoam';
 import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/resolveWorldManifest';
@@ -24,7 +23,7 @@ import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { nodeDurationTicks, type QuestId } from '@/ui/idleVillage/questS1Lab/questRun';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
-import { QUEST_POIS, questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
+import { QUEST_POIS, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
 import { useQuestExpeditionSession } from '@/ui/idleVillage/quests/useQuestExpeditionSession';
 import { scenarioForQuest } from '@/ui/idleVillage/questS1Lab/questOffer';
 import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
@@ -144,8 +143,6 @@ export default function GameFramePixiPage() {
   const { t } = useTranslation('idleVillage');
   const Roster = useHudMaterial() === 'lacquer' ? MatericRosterComponentV2 : MatericRosterComponent;
   const [questShown, setQuestShown] = useState(false);
-  // Game tick at which the quest opportunity appeared: its deadline runs on the game clock.
-  const [questAppearedTick, setQuestAppearedTick] = useState(0);
   // Dev comparison of the two skins from the Director panel (`?skin=` sets the starting one).
   const [skinId, setSkinId] = useState<SkinPresetId>(resolveInitialSkinPresetId);
   useEffect(() => {
@@ -190,6 +187,15 @@ export default function GameFramePixiPage() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [directorEnabled, panels]);
+  /* E2E seam: reveal the quest offers exactly like the Director's «Mostra
+   *  quest» — needed under `?capture=1`, where the panel itself is hidden. */
+  useEffect(() => {
+    const hooks = ((window as unknown as { __idleVillageTestHooks?: Record<string, unknown> }).__idleVillageTestHooks ??= {});
+    hooks.revealQuestPois = () => setQuestShown(true);
+    return () => {
+      delete hooks.revealQuestPois;
+    };
+  }, []);
 
   // The detail opens between the roster and the ledger, never over either.
   const rosterRight = roster.leftPx + roster.widthPx;
@@ -230,21 +236,14 @@ export default function GameFramePixiPage() {
   const currentDay = session.gameplay.state.currentDay;
   const invasionDaysLeft = invasion ? Math.max(0, invasion.dueDay - currentDay) : 0;
   const dayLengthTicks = session.gameplay.config.globalRules?.dayLengthInTimeUnits ?? 60;
-  const availability = useMemo(
-    () => (poi ? questAvailability(session.gameplay.state.currentTick ?? 0, questAppearedTick, dayLengthTicks, poi.availableDays) : undefined),
-    [poi, session.gameplay.state.currentTick, questAppearedTick, dayLengthTicks],
-  );
+  const currentTick = session.gameplay.state.currentTick ?? 0;
 
-  // Open opportunities live in the calendar like any other dated event: the quest is a row in the ledger.
-  const extraEvents = useMemo<HudEvent[]>(() => {
-    const list: HudEvent[] = [];
-    if (invasion) list.push({ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft, at: { x: 0.486, y: 0.554 } });
-    if (poi && questShown && session.questStatus === 'available' && availability && availability.state !== 'expired') {
-      const daysLeft = Math.max(0, Math.ceil(availability.progress * poi.availableDays));
-      list.push({ id: 'quest-open', typeId: 'quest', title: session.activity.label, daysLeft, at: { x: poi.x / 4240, y: poi.y / 2828 } });
-    }
-    return list;
-  }, [invasion, invasionDaysLeft, poi, questShown, session.questStatus, session.activity.label, availability, t]);
+  /** Window left on a real quest offer, on the game clock. */
+  const offerAvailability = useCallback(
+    (p: QuestPoi) =>
+      questAvailability(currentTick, p.availableFromDay * dayLengthTicks, dayLengthTicks, p.availableUntilDay - p.availableFromDay),
+    [currentTick, dayLengthTicks],
+  );
 
   // Time of day on the map, only at normal speed: at x2/x4 the light holds still (a day lasts seconds there, and the map
   // would flicker), while paused it keeps whatever light it had.
@@ -274,7 +273,6 @@ export default function GameFramePixiPage() {
   const questRuns = useMemo(() => ({ goblin: questRun, rovine: questRunRovine }), [questRun, questRunRovine]);
   const [activeQuestId, setActiveQuestId] = useState<QuestId>('goblin');
   const activeQuestRun = questRuns[activeQuestId];
-  const currentTick = session.gameplay.state.currentTick ?? 0;
   // The game clock matures timed nodes (v27): paused game = paused quest;
   // a late open catches up deterministically to the first waiting frontier —
   // for EVERY active run, window open or not.
@@ -314,6 +312,18 @@ export default function GameFramePixiPage() {
     detailPosition: questDetailPosition,
   });
   const expeditions = [expeditionGoblin, expeditionRovine];
+
+  // Open opportunities live in the calendar like any other dated event: the quest is a row in the ledger.
+  const extraEvents = useMemo<HudEvent[]>(() => {
+    const list: HudEvent[] = [];
+    if (invasion) list.push({ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft, at: { x: 0.486, y: 0.554 } });
+    const goblinAvail = offerAvailability(poiGoblin);
+    if (questShown && expeditionGoblin.poiView.questStatus === 'available' && goblinAvail.state !== 'expired') {
+      const daysLeft = Math.max(0, Math.ceil(goblinAvail.progress * (poiGoblin.availableUntilDay - poiGoblin.availableFromDay)));
+      list.push({ id: 'quest-open', typeId: 'quest', title: expeditionGoblin.poiView.activity.label, daysLeft, at: { x: poiGoblin.x / 4240, y: poiGoblin.y / 2828 } });
+    }
+    return list;
+  }, [invasion, invasionDaysLeft, questShown, expeditionGoblin.poiView, offerAvailability, poiGoblin, t]);
 
   /* Consumed quest POIs (persisted): a POI whose run ended, settled and had
    *  its report dismissed leaves the map — it never comes back, even across
@@ -379,30 +389,19 @@ export default function GameFramePixiPage() {
     return { progress, label };
   }, [activeQuestRun.run, activePoi, currentTick, questWindow.durationDays, dayLengthTicks, t]);
 
-  // An expired opportunity fades (MapQuestPoi), then leaves the map.
-  const expiredOpen = availability?.state === 'expired' && session.questStatus === 'available';
-  useEffect(() => {
-    if (!questShown || !expiredOpen) return undefined;
-    const timer = window.setTimeout(() => setQuestShown(false), EXPIRE_FADE_MS + 200);
-    return () => window.clearTimeout(timer);
-  }, [questShown, expiredOpen]);
-
   const anchors = useMemo<PixiMapAnchor[]>(() => {
     const list: PixiMapAnchor[] = [];
-    if (poi && questShown) list.push({ id: poi.id, x: poi.x, y: poi.y, node: <MapQuestPoi session={session} sizePx={poi.sizePx} availability={availability} /> });
+    const anchored = new Set<string>();
     /* Real quest POIs (S2.4): the medallion is the planning entry and, once
-     *  launched, the run's halo clock. An offer past its window with no run
-     *  leaves the map; an active run always stays pinned. */
+     *  launched, the run's halo clock. An offer mounts only once the Director
+     *  reveals it («Mostra quest»); an offer past its window with no run leaves
+     *  the map; an active run always stays pinned. */
     for (const exp of expeditions) {
       const p = exp.poi;
-      const avail = questAvailability(
-        currentTick,
-        p.availableFromDay * dayLengthTicks,
-        dayLengthTicks,
-        p.availableUntilDay - p.availableFromDay,
-      );
+      const avail = offerAvailability(p);
       if (consumedPoiIds?.includes(p.id)) continue;
-      if (!exp.run && avail.state === 'expired') continue;
+      if (!exp.run && (avail.state === 'expired' || !questShown)) continue;
+      anchored.add(p.id);
       list.push({
         id: p.id,
         x: p.x,
@@ -411,9 +410,23 @@ export default function GameFramePixiPage() {
       });
     }
     if (poiDemo) {
-      // One of each family in a different territory (canvas 4240 x 2828): eastern mountains, southern forest, northern forest.
+      /* The quest exemplar is the real goblin offer — the Director's family
+       *  review shows the marker actually in play, at its authored spot, not a
+       *  dummy. Job and event stay static until those systems exist. */
+      if (!anchored.has(poiGoblin.id) && !consumedPoiIds?.includes(poiGoblin.id)) {
+        const avail = offerAvailability(poiGoblin);
+        if (expeditionGoblin.run || avail.state !== 'expired') {
+          anchored.add(poiGoblin.id);
+          list.push({
+            id: poiGoblin.id,
+            x: poiGoblin.x,
+            y: poiGoblin.y,
+            node: <MapQuestPoi session={expeditionGoblin.poiView} sizePx={poiGoblin.sizePx} availability={avail} />,
+          });
+        }
+      }
+      // Job and event exemplars in different territories (canvas 4240 x 2828): southern forest, northern forest.
       const demos = [
-        { type: 'quest', x: 0.7, y: 0.5 },
         { type: 'job', x: 0.38, y: 0.66 },
         { type: 'event', x: 0.35, y: 0.37 },
       ] as const;
@@ -423,7 +436,7 @@ export default function GameFramePixiPage() {
     }
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poi, questShown, session, availability, poiDemo, currentTick, dayLengthTicks, consumedPoiIds, expeditionGoblin.poiView, expeditionRovine.poiView]);
+  }, [poi, questShown, session, poiDemo, currentTick, dayLengthTicks, consumedPoiIds, expeditionGoblin.poiView, expeditionGoblin.run, expeditionRovine.poiView, expeditionRovine.run]);
 
   const directorActions = useMemo<DirectorAction[]>(
     () => [
@@ -440,10 +453,7 @@ export default function GameFramePixiPage() {
         id: 'quest',
         label: t('gameFrame.director.quest'),
         active: questShown,
-        onTrigger: () => {
-          setQuestAppearedTick(session.gameplay.state.currentTick ?? 0);
-          setQuestShown(true);
-        },
+        onTrigger: () => setQuestShown((shown) => !shown),
       },
       {
         id: 'questRun',
