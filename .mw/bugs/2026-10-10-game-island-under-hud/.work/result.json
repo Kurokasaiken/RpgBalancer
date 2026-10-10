@@ -1,0 +1,27 @@
+{
+  "bug": "game-island-under-hud",
+  "date": "2026-10-10",
+  "status": "fixed-verified-visually",
+  "rootCause": "refit(): zoom = max(floorZoom(), fitZoom) + centratura verticale. Su viewport larghi/bassi il floorZoom (termine W: W/(4240+2·700)) supera il fit dell'area libera → terra piu' alta di freeH, centrata → ~45px sotto il nav e ~45px sotto la placca.",
+  "fix": "In refit(): quando landH > freeH, panY pinna land.y1 sul bordo libero (H - insets.bottom) — l'isola poggia sopra il nav come da intent documentato, l'eccesso va a nord. Quando ci sta, comportamento identico a prima.",
+  "filesChanged": [
+    "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx (refit, +7 linee)",
+    "RICHIESTE.md (R-121)",
+    "src/docs/docs/coordinator/agent_assignments.md (riga R-121)",
+    "test-results/r121-island-under-hud-2026-10-10.log"
+  ],
+  "verification": {
+    "visual": [
+      "1600x760 (riproduzione): PRIMA costa sud sotto il nav (~45px) — DOPO l'isola poggia sul confine libero, costa sud interamente visibile (r121-fixed-1600x760 / r121-fixed-final)",
+      "1400x900: invariato — terra entra nell'area libera, centratura invariata (r121-fixed-1400x900)",
+      "1920x800: pin attivo, costa sopra il nav (r121-fixed-1920x800)",
+      "__worldCam conferma: zoom 0.284 (floorZoom>fitZoom 0.245), panY=pin land.y1 → land bottom @ ~660px = H-insets.bottom"
+    ],
+    "esbuild": "parse+transform OK (60.7kb)",
+    "viteDev": "HMR ha re-transformato e servito il modulo live — pagina renderizzata senza errori console (solo log preesistenti)",
+    "buildCheck": "ultimo PASS 16:50 (includeva il fix nuvole); retry post-fix NON completato — build >180s sotto load avg 280-400 (macchina saturata da sessioni parallele), anche con inner timeout esteso a 400s/outer 550s il processo vite gira a 2.7% CPU",
+    "vitest": "BLOCKED ambientale — worker start timeout (hardcoded 60s forks / 90s threads), come per R-120",
+    "kanbanLint": "BLOCKED ambientale — il run non produce output sotto load>300 (passava 40min prima; file kanban gia' validato verde con la riga R-120)",
+    "lint": "n/a — quarantena src/ui/idleVillage/**"
+  }
+}
