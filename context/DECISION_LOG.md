@@ -1026,3 +1026,34 @@ ratificate.
    l'`unresolved` di v23 rev.2.
 
 **Fonte:** Director in sessione 2026-10-09, «approvo».
+
+## 2026-10-10 — R-118-S3 T-4 ridiretto: preview aggregata, naming goblin, scouting fuori dagli slot
+
+**Contesto:** dopo il finding T-1 («goblin: zero check certi») il Director ha
+ridefinito il contratto della preview Planner e chiesto un copy/naming pass
+sulla quest «Sterminio dei goblin».
+
+**Decisioni (Director, sessione corrente):**
+
+1. **Il pannello pre-lancio è aggregato e orientativo:** % successo / ferita /
+   morte del party (già live da T-2 via forecast MC). Non si rivela la strada
+   vera né chance puntuali per check — il risultato dipende da scelte,
+   consumabili e push-your-luck in-run. Il modello `certainChecks` resta come
+   seam (gate (c)) ma il pannello non è per-check.
+2. **Lo scouting esce dagli slot party:** `revealAtPlanning` rimosso dallo
+   slot «Esploratore» goblin. Il campo resta nello schema come seam authored;
+   la sorgente intel sarà un sistema di scouting esterno (edificio/residente
+   esploratore — non esiste ancora su /game). TODO in schema + sessione.
+   Emenda la parte «soglia su slot» di D-S3-3, non il meccanismo.
+3. **Copy/naming goblin:** «Un nascondiglio»→«Tesoro nascosto», titoli scena
+   «Assalto» (accampamento) e «Incalzare» (fuga goblin); beats `Tesoro`/
+   `Assalto`; il trade-off «lasciare il tesoro» è ora esplicito nel copy
+   («un suono e il campo si sveglia»).
+4. **Marker `hidden`:** i nodi fuori percorso (il tesoro) portano `hidden:
+   true`; la UI mostra glyph eye-off + tooltip «Evento nascosto» sulla caption
+   del theatre e sui titoli dei beat. Le fasi hanno già un set icone
+   (`PHASE_ICONS` per beat) — riempito il gap icona fase «Assalto» (Axe).
+5. **Mercante:** resta fiction di apertura («i carri dei mercanti non passano
+   più dal guado»), non una scena NPC — nessuna aggiunta richiesta.
+
+**Fonte:** Director in sessione 2026-10-10.
