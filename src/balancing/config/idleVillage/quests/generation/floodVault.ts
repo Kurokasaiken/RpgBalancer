@@ -67,6 +67,15 @@ export interface FloodDomainKit {
   copy: Record<FloodNodeKey, FloodNodeCopy>;
 }
 
+/**
+ * A flood kit emitted by the PLAN-027 bilingual pipeline — the EN
+ * structural draft and the facts-locked IT re-render of the same kit.
+ */
+export interface LocalizedFloodDomainKit {
+  en: FloodDomainKit;
+  it: FloodDomainKit;
+}
+
 /* ------------------------------------------------------------------ */
 /* Mechanical tuning.                                                 */
 /* ------------------------------------------------------------------ */
