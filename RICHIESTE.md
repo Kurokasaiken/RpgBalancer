@@ -2411,3 +2411,10 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Esiti chiave del dibattito:** (a) "bestia di galleria" era WHITELISTED nel vocab — il problema è «allowed but lazy», non invento; il gate deterministico diventa *regression-locking* + recurrence counter che flagga, non giudica; (b) D2 → hybrid: EN draft → facts-locked IT re-render (non traduzione letterale); (c) Pass 0 = arc contract per kit (1 call frontier, human-approvable); (d) negative anchors respinti 2-1 → corpus difetti nel critic rubric; (e) few-shot solo positivi excerpt-sized; (f) artefatto single .ts nested `{en,it}`; (g) critic condizionale + hard call-ceiling per kit.
 **Requisiti Director (verbatim, non negoziabili):** flavour deve leggersi come competizione; output EN+IT; props usati correttamente («registro dei turni»); niente non-parole («rivalista», «monoli»).
 **Collegamenti:** `plans/PLAN-027-narration-quality.md` (= artifact r001), `test-results/narration-quality-debate/` (artifact r000/r001, report, events, grounding ledger), PLAN-026 T4.
+
+## R-123 — PLAN-019-S4: integrazione completa quest↔gioco (stadio S4 del macro plan)
+
+**Richiesta (verbatim):** *"procedi x il plan"* (dopo chiusura PLAN-019-S3, stadio successivo del roadmap v24 FROZEN)
+**Data:** 2026-10-10
+**Stato:** `in corso` — draft piano S4 in preparazione; battesimo Director pendente (incluse D-5 Gate B e destino superfici lab).
+**Collegamenti:** `plans/PLAN-019-quest-macro-plan.md` (§S4, gate a–d, artefatto «definizione di buona quest»), `plans/PLAN-019-S3-parte-precedente.md` (completed), `.mw/desiderata.md` v24.
