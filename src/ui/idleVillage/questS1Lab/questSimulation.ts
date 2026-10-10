@@ -28,6 +28,7 @@ import {
   consumableBonusFor,
   groupScore,
   intelBonusFor,
+  coverDeltaFor,
   memberRisk,
   nodesFor,
   positionalWeights,
@@ -138,7 +139,7 @@ function harmsForVerdict(
   const save = TUNE.deathSaveChance;
   const living = state.party.filter((m) => !m.dead);
   const events = living.map((m) => {
-    const base = memberRisk(m, node);
+    const base = memberRisk(m, node, coverDeltaFor(state, m.id));
     let d = Math.max(0, base.deathPct + vmod) / 100;
     let w = Math.max(0, base.woundPct + vmod) / 100;
     if (verdict === 'bigwin') {
@@ -216,7 +217,7 @@ export function analyzeCheck(
     const vmod = v === 'win' || v === 'bigwin' ? TUNE.winRiskMod : 0;
     const living = state.party.filter((m) => !m.dead);
     const bands = living.map((m) => {
-      const base = memberRisk(m, node);
+      const base = memberRisk(m, node, coverDeltaFor(state, m.id));
       let d = Math.max(0, base.deathPct + vmod) / 100;
       let w = Math.max(0, base.woundPct + vmod) / 100;
       if (v === 'bigwin') {

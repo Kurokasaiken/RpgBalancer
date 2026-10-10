@@ -7,9 +7,12 @@ import { describe, expect, it } from 'vitest';
 import {
   applyChoice,
   availableOptions,
+  coverDeltaFor,
   createRun,
   flee,
   drinkPotion,
+  memberRisk,
+  nodesFor,
   previewOption,
 } from '@/ui/idleVillage/questS1Lab/questRun';
 
@@ -551,5 +554,55 @@ describe('quest S1 lab — Le Rovine sotto il Fiume (attrition gauntlet)', () =>
     expect(run.flags).toContain('tesoroPerso');
     expect(run.loot).not.toContain('tesoro delle rovine');
     expect(run.bottinoOro).toBe(0);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Guardian banner — coverRiskDelta wired (PLAN-019-S4 T-5, D-S4-3).    */
+/* ------------------------------------------------------------------ */
+
+describe('guardian banner — cover channel', () => {
+  const stats = { str: 60, con: 60, agi: 50, perc: 50, int: 40, cha: 40 };
+  const party = [
+    { id: 'L', name: 'Leader', role: 'leader' as const, stats },
+    { id: 'A', name: 'Anna', role: 'member' as const, stats },
+    { id: 'B', name: 'Berto', role: 'member' as const, stats },
+  ];
+  const bannerRun = () =>
+    createRun({ party, seed: 5, questId: 'goblin', loadout: ['quest_trinket_guardian_banner'] });
+
+  it('enters the bag through the stash — item id resolves to the engine flag', () => {
+    const run = bannerRun();
+    expect(run.flags).toContain('hasGuardianBanner');
+  });
+
+  it('coverDeltaFor: bearer uncovered, every other living member −6/−4, aura dies with the bearer', () => {
+    const run = bannerRun();
+    expect(coverDeltaFor(run, 'L')).toEqual({ wound: 0, death: 0 });
+    for (const id of ['A', 'B']) {
+      expect(coverDeltaFor(run, id)).toEqual({ wound: -6, death: -4 });
+    }
+    // No flag → no cover, even with a living leader.
+    const bare = { ...run, flags: [] as string[] };
+    expect(coverDeltaFor(bare, 'A')).toEqual({ wound: 0, death: 0 });
+    // The standard falls with the bearer: leader down → aura off.
+    const leaderDown = { ...run, party: run.party.map((m) => (m.id === 'L' ? { ...m, dead: true } : m)) };
+    expect(coverDeltaFor(leaderDown, 'A')).toEqual({ wound: 0, death: 0 });
+  });
+
+  it('memberRisk bands shift by exactly the cover delta on a risk-bearing check', () => {
+    // The cassa check nodes carry real risk bands — the channel is measured
+    // where it bites (goblin authored checks are {0,0} today).
+    const run = { ...createRun('percettivo', 5), flags: ['hasGuardianBanner'] };
+    const check = nodesFor(run)['check-ingresso-agi']; // risk {15,3}
+    const member = run.party.find((m) => m.role === 'member')!;
+    const leader = run.party.find((m) => m.role === 'leader')!;
+    const bare = memberRisk(member, check);
+    const covered = memberRisk(member, check, coverDeltaFor(run, member.id));
+    expect(covered.woundPct).toBe(bare.woundPct - 6);
+    expect(covered.deathPct).toBe(Math.max(0, bare.deathPct - 4));
+    // The bearer (leader) never hides behind his own standard.
+    expect(coverDeltaFor(run, leader.id)).toEqual({ wound: 0, death: 0 });
+    expect(memberRisk(leader, check, coverDeltaFor(run, leader.id))).toEqual(memberRisk(leader, check));
   });
 });

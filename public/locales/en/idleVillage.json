@@ -1409,7 +1409,8 @@
         "smoke": "+15 to Agility checks",
         "rope": "+15 to Strength or Constitution checks",
         "healing": "+20 HP to the most hurt member — usable before a check",
-        "potion": "Fully heals one wounded member"
+        "potion": "Fully heals one wounded member",
+        "banner": "Guardian banner — the leader bears it: −6% wound, −4% death for every other member while he stands"
       }
     }
   },
