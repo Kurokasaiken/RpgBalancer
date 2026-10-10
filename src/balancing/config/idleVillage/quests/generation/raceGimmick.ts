@@ -75,6 +75,17 @@ export interface RaceDomainKit {
   copy: Record<RaceNodeKey, RaceNodeCopy>;
 }
 
+/**
+ * A race kit emitted by the PLAN-027 bilingual pipeline — the EN
+ * structural draft and the facts-locked IT re-render of the same kit.
+ * Locale-invariant fields (id, prefix, intelId, names) are identical
+ * across locales; `localeParityIssues` checks the contract.
+ */
+export interface LocalizedRaceDomainKit {
+  en: RaceDomainKit;
+  it: RaceDomainKit;
+}
+
 /* ------------------------------------------------------------------ */
 /* Mechanical tuning — the non-copy knobs.                             */
 /* ------------------------------------------------------------------ */

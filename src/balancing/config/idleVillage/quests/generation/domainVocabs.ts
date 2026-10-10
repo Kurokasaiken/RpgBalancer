@@ -17,6 +17,8 @@ export interface DomainVocab {
   /** A one-line contract pitch for this domain — seeds the scenario meta. */
   contractPitch: string;
   creatureAmmissibili: string[];
+  /** EN rendering of `creatureAmmissibili` — same whitelist, per-locale. */
+  creatureAmmissibiliEn?: string[];
   ruoli: {
     autoritaContratto: string[];
     stakeholderEconomico: string[];
@@ -35,6 +37,8 @@ export interface DomainVocab {
    * VIETATO notes — a hit is a narration failure, not a soft warning.
    */
   vietati: string[];
+  /** EN rendering of `vietati` — the gate checks the draft's own locale. */
+  vietatiEn?: string[];
 }
 
 export const PASSO_MONTANO_VOCAB: DomainVocab = {
@@ -42,6 +46,7 @@ export const PASSO_MONTANO_VOCAB: DomainVocab = {
   label: 'Passo montano',
   contractPitch: 'Una gara su un valico alpino: chi arriva prima prende il premio, chi sbaglia passo paga in caduta.',
   creatureAmmissibili: ['branco di predoni di valico', 'bestia di cresta', 'contrabbandiere del valico'],
+  creatureAmmissibiliEn: ['band of pass brigands', 'ridge beast', 'pass smuggler'],
   ruoli: {
     autoritaContratto: ['capo della guida alpina', 'ufficiale del pedaggio'],
     stakeholderEconomico: ['predoni che vendono il passo', 'oste del rifugio'],
@@ -58,6 +63,7 @@ export const PASSO_MONTANO_VOCAB: DomainVocab = {
     'chi controlla il varco controlla il passo',
   ],
   vietati: ['mare', 'onda', 'marea', 'fango', 'palude', 'galleria', 'miniera', 'deserto', 'duna'],
+  vietatiEn: ['sea', 'wave', 'tide', 'mud', 'swamp', 'gallery', 'mine', 'desert', 'dune'],
 };
 
 export const PALUDE_VOCAB: DomainVocab = {
@@ -65,6 +71,7 @@ export const PALUDE_VOCAB: DomainVocab = {
   label: 'Palude',
   contractPitch: 'Acqua bassa e stagnante, fango che affonda, nebbia che isola: chi possiede le chiuse possiede la terra.',
   creatureAmmissibili: ['fuoco fatuo', 'annegato rianimato', 'bestia da fango', 'persona trasformata'],
+  creatureAmmissibiliEn: ['will-o-wisp', 'drowned revenant', 'mud beast', 'transformed person'],
   ruoli: {
     autoritaContratto: ['capo delle chiuse', 'concistoro dei torbei', 'curato itinerante'],
     stakeholderEconomico: ['guardiano delle chiuse', 'sensale della torba', 'mugnaio', 'compagnia dei dissodamenti'],
@@ -83,6 +90,7 @@ export const PALUDE_VOCAB: DomainVocab = {
     'il potere è il livello dell’acqua, non il denaro',
   ],
   vietati: ['marea', 'onda', 'onda anomala', 'mare aperto', 'relitto affondato', 'cavallo', 'galoppo', 'montagna', 'vetta', 'ghiacciaio', 'deserto', 'duna', 'galleria', 'miniera'],
+  vietatiEn: ['tide', 'wave', 'freak wave', 'open sea', 'sunken wreck', 'horse', 'gallop', 'mountain', 'summit', 'glacier', 'desert', 'dune', 'gallery', 'mine'],
 };
 
 export const MARE_VOCAB: DomainVocab = {
@@ -90,6 +98,7 @@ export const MARE_VOCAB: DomainVocab = {
   label: 'Mare',
   contractPitch: 'La marea restituisce ciò che prende: corpi, reti, relitti. Il potere qui è sui diritti di recupero, non sul denaro.',
   creatureAmmissibili: ['persona-di-mare', 'annegato rianimato', 'bestia di profondità', 'strega del mare'],
+  creatureAmmissibiliEn: ['sea-person', 'drowned revenant', 'deep beast', 'sea witch'],
   ruoli: {
     autoritaContratto: ['capitaneria del porto', 'consiglio dei padroni di barca', 'parroco marinaro'],
     stakeholderEconomico: ['maestro dei recuperi', 'armatore-assicuratore', 'sensale del pescato', 'contrabbandiere delle secche'],
@@ -107,13 +116,15 @@ export const MARE_VOCAB: DomainVocab = {
     'la direzione nativa: «viene dal profondo» vs «torna a riva»',
   ],
   vietati: ['fango', 'torba', 'chiuse', 'galleria', 'miniera', 'piccone', 'vena', 'montagna', 'vetta', 'ghiacciaio', 'deserto', 'duna', 'cavallo', 'galoppo'],
+  vietatiEn: ['mud', 'peat', 'sluice', 'gallery', 'mine', 'pickaxe', 'vein', 'mountain', 'summit', 'glacier', 'desert', 'dune', 'horse', 'gallop'],
 };
 
 export const MINIERA_VOCAB: DomainVocab = {
   id: 'miniera',
   label: 'Miniera',
   contractPitch: 'La vena paga in metallo e prende in fiato: il registro dei turni decide chi era dove, il buio il resto.',
-  creatureAmmissibili: ['persona trasformata dalla vena', 'scavatore impazzito nel buio', 'la vena stessa', 'bestia di galleria'],
+  creatureAmmissibili: ['persona trasformata dalla vena', 'scavatore impazzito nel buio', 'la vena stessa', 'cane da galleria cieco'],
+  creatureAmmissibiliEn: ['vein-transformed person', 'digger gone mad in the dark', 'the vein itself', 'blind gallery dog'],
   ruoli: {
     autoritaContratto: ['fattore della compagnia', 'caposquadra anziano', 'sindaco del campo'],
     stakeholderEconomico: ['fattore', 'proprietario del campo', 'venditore di viveri a prezzi di monopolio'],
@@ -131,6 +142,7 @@ export const MINIERA_VOCAB: DomainVocab = {
     'chi controlla il registro dei turni controlla chi era dove',
   ],
   vietati: ['mare', 'onda', 'marea', 'fango', 'palude', 'torba', 'cavallo', 'galoppo', 'deserto', 'duna', 'cielo aperto'],
+  vietatiEn: ['sea', 'wave', 'tide', 'mud', 'swamp', 'peat', 'horse', 'gallop', 'desert', 'dune', 'open sky'],
 };
 
 export const DOMAIN_VOCABS: Readonly<Record<string, DomainVocab>> = {

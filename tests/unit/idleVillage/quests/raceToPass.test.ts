@@ -40,7 +40,7 @@ const RACE_SCENARIOS = Object.values(GENERATED_CATALOG).filter((s) => s.id.start
  *  `gen-race-${kit.id}`, so the kit for a catalog entry is a lookup,
  *  not a hardcoded pair. */
 const RACE_KITS: Readonly<Record<string, RaceDomainKit>> = Object.fromEntries(
-  [PASSO_MONTANO_KIT, PALUDE_KIT, MINIERA_RACE_KIT].map((k) => [k.id, k]),
+  [PASSO_MONTANO_KIT, PALUDE_KIT, MINIERA_RACE_KIT.it].map((k) => [k.id, k]),
 );
 
 /** The kit backing a race catalog scenario, derived from its id. */
