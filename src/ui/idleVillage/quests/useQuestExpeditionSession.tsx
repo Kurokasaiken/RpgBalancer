@@ -586,7 +586,14 @@ export function useQuestExpeditionSession({
     setIsDetailOpen(true);
   }, []);
   useEffect(() => {
-    if (!demoLaunchPending.current || !resolved || anyRunActive) return;
+    if (!demoLaunchPending.current) return;
+    /* A live run blocks the real send too — cancel instead of holding a
+     *  pending launch that could fire unexpectedly when the run settles. */
+    if (anyRunActive) {
+      demoLaunchPending.current = false;
+      return;
+    }
+    if (!resolved) return;
     const missing = slotBlueprints.find((s) => s.required && !assignments[s.id]);
     if (missing) {
       const candidateId = Object.keys(residentsById).find(

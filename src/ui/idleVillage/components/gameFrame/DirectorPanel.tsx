@@ -73,6 +73,7 @@ export const DirectorPanel: React.FC<DirectorPanelProps> = ({ actions, onReset, 
           <button
             key={action.id}
             type="button"
+            data-action-id={action.id}
             aria-pressed={action.active}
             onClick={action.onTrigger}
             style={{

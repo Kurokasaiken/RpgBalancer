@@ -408,15 +408,41 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     );
     expect(await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER)).toBe(true);
     await expedition<void>(page, 'toggleItem', 'quest_consumable_pozione');
-    // Past the 600 ms debounce — the write has landed before we close.
-    await page.waitForTimeout(800);
+    /* The live clock flips `currentDay` every few ticks, and each flip
+     *  re-keys the draft (draftReady → restore → re-armed debounce) — a
+     *  fixed sleep can lose the race. Poll the persistence store until
+     *  the debounced write lands under whatever day key is current. */
+    /* The playwright-mode backend is sessionStorage; a dev/preview build
+     *  falls back to localStorage — the contract under test is the
+     *  debounced saveData landing, not which backend served it. */
+    await page.waitForFunction(
+      ([leader, item]) =>
+        [sessionStorage, localStorage].some((store) =>
+          Object.keys(store).some((k) => {
+            if (!k.includes('questExpeditionDraft.poi-goblin')) return false;
+            const value = store.getItem(k) ?? '';
+            return value.includes(leader) && value.includes(item);
+          }),
+        ),
+      [VALID_LEADER, 'quest_consumable_pozione'],
+      { timeout: 15_000 },
+    );
 
     /* Write leg: the debounced saveData hit the persistence store under a
-     * `…questExpeditionDraft.poi-goblin.<day>` key, holding both channels. */
-    const persisted = await page.evaluate(() => {
-      const key = Object.keys(sessionStorage).find((k) => k.includes('questExpeditionDraft.poi-goblin'));
-      return key ? { key, value: sessionStorage.getItem(key) ?? '' } : null;
-    });
+     * `…questExpeditionDraft.poi-goblin.<day>` key, holding both channels.
+     *  A stale key from a previous in-game day may still hold an empty
+     *  draft — pick the entry that actually carries both channels. */
+    const persisted = await page.evaluate(([leader, item]) => {
+      for (const store of [sessionStorage, localStorage]) {
+        const key = Object.keys(store).find((k) => {
+          if (!k.includes('questExpeditionDraft.poi-goblin')) return false;
+          const value = store.getItem(k) ?? '';
+          return value.includes(leader) && value.includes(item);
+        });
+        if (key) return { key, value: store.getItem(key) ?? '' };
+      }
+      return null;
+    }, [VALID_LEADER, 'quest_consumable_pozione']);
     expect(persisted).not.toBeNull();
     expect(persisted!.value).toContain(VALID_LEADER);
     expect(persisted!.value).toContain('quest_consumable_pozione');
@@ -454,10 +480,10 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     });
     await page.evaluate(
       ({ day: d, slotId, residentId }) => {
-        sessionStorage.setItem(
-          `idleVillage.questExpeditionDraft.poi-goblin.${d}`,
-          JSON.stringify({ assignments: { [slotId]: residentId }, items: ['quest_consumable_pozione'] }),
-        );
+        const payload = JSON.stringify({ assignments: { [slotId]: residentId }, items: ['quest_consumable_pozione'] });
+        /* Seed whichever backend the current build mode serves. */
+        sessionStorage.setItem(`idleVillage.questExpeditionDraft.poi-goblin.${d}`, payload);
+        localStorage.setItem(`idleVillage.questExpeditionDraft.poi-goblin.${d}`, payload);
       },
       { day, slotId: SLOT_LEADER, residentId: VALID_LEADER },
     );
@@ -741,5 +767,50 @@ test.describe('PLAN-019-S2.5 — settlement + sequential POIs', () => {
     );
     const halo = await expeditionFor<HaloShape | null>(page, POI_ROVINE, 'getHalo');
     expect(halo!.status).toBe('filling');
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Director «start goblin quest» → canonical expedition pipeline        */
+/* ------------------------------------------------------------------ */
+
+test.describe('Director quest button — same path as a real POI', () => {
+  test('stages a real expedition: auto-assigned roster, real send, canonical window', async ({ page }) => {
+    /* The Director panel is a dev/playwright instrument staged with F10.
+     *  Its quest action used to bypass the pipeline (lab preset + direct
+     *  `questRun.start`); it now drives the SAME canonical boundary the
+     *  player crosses — offer resolution, eligibility, party freeze. */
+    await page.keyboard.press('F10');
+    await expect(page.getByTestId('director-panel')).toBeVisible({ timeout: 10_000 });
+    await page.locator('[data-action-id="questRun"]').click();
+
+    // demoLaunch fills required slots with the first eligible residents,
+    // then crosses the real `send` — one active run, real party.
+    await page.waitForFunction(
+      (poiId) => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[poiId] as
+          | { getRun?: () => { ended?: boolean } | null }
+          | undefined;
+        const run = exp?.getRun?.();
+        return Boolean(run && !run.ended);
+      },
+      POI,
+      { timeout: 20_000 },
+    );
+
+    const run = (await getRun(page))!;
+    const village = await expedition<VillageShape>(page, 'getVillage');
+    const rosterIds = new Set(village.residents.map((r) => r.id));
+    expect(run.party.length).toBeGreaterThan(0);
+    /* Every party member is a REAL roster resident — the auto-fill could
+     *  not conjure a preset party. The leader slot is required, so at
+     *  least one member must satisfy it (any goblin-eligible resident). */
+    for (const member of run.party) expect(rosterIds.has(member.id)).toBe(true);
+
+    // The canonical run window opened on the goblin graph.
+    expect(run.nodeId.startsWith('gob-')).toBe(true);
+    await expect(page.getByTestId('quest-window')).toBeVisible({ timeout: 10_000 });
+    // The detail closed behind it — the launch completed, not a draft.
+    await expect(page.getByTestId('quest-expedition-detail')).toHaveCount(0);
   });
 });
