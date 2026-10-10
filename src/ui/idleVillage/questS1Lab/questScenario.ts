@@ -612,34 +612,34 @@ export const PARTY_PRESETS: PartyPreset[] = [
   {
     id: 'fisico',
     label: 'Preset A — Fisico',
-    description: 'Forte in Forza/Costituzione, debole altrove.',
+    description: 'Forte in Forza/Costituzione, debole altrove. Gorik è Avido — apre linee di bottino extra.',
     gold: 20,
     members: [
       { id: 'a1', name: 'Bruna', role: 'leader', stats: { str: 70, con: 65, agi: 40, perc: 35, int: 30, cha: 30 } , portrait: '/assets/portraits/portrait male warrior.png'},
-      { id: 'a2', name: 'Gorik', role: 'member', stats: { str: 75, con: 70, agi: 30, perc: 25, int: 20, cha: 20 } , portrait: '/assets/portraits/portrait male warrior.png'},
+      { id: 'a2', name: 'Gorik', role: 'member', stats: { str: 75, con: 70, agi: 30, perc: 25, int: 20, cha: 20 } , portrait: '/assets/portraits/portrait male warrior.png', traits: ['avido']},
       { id: 'a3', name: 'Teo', role: 'member', stats: { str: 50, con: 55, agi: 45, perc: 40, int: 35, cha: 35 } , portrait: '/assets/portraits/portrait female magician.png'},
     ],
   },
   {
     id: 'percettivo',
     label: 'Preset B — Percettivo',
-    description: 'Forte in Percezione/Intelligenza.',
+    description: 'Forte in Percezione/Intelligenza. Omero è Prudente — compra tempo dove serve.',
     gold: 20,
     members: [
       { id: 'b1', name: 'Leda', role: 'leader', stats: { str: 25, con: 30, agi: 45, perc: 75, int: 70, cha: 50 } , portrait: '/assets/portraits/portrait female magician.png'},
-      { id: 'b2', name: 'Omero', role: 'member', stats: { str: 30, con: 35, agi: 40, perc: 70, int: 75, cha: 45 } , portrait: '/assets/portraits/portrait male warrior.png'},
+      { id: 'b2', name: 'Omero', role: 'member', stats: { str: 30, con: 35, agi: 40, perc: 70, int: 75, cha: 45 } , portrait: '/assets/portraits/portrait male warrior.png', traits: ['prudente']},
       { id: 'b3', name: 'Sira', role: 'member', stats: { str: 35, con: 40, agi: 55, perc: 60, int: 55, cha: 60 } , portrait: '/assets/portraits/portrait female magician.png'},
     ],
   },
   {
     id: 'ibrido',
     label: 'Preset C — Ibrido',
-    description: 'Nessuna specialità dominante.',
+    description: 'Nessuna specialità dominante. Nina è Scavezzacollo — arma i colpi di testa.',
     gold: 20,
     members: [
       { id: 'c1', name: 'Edda', role: 'leader', stats: { str: 50, con: 50, agi: 50, perc: 55, int: 50, cha: 55 } , portrait: '/assets/portraits/portrait female magician.png'},
       { id: 'c2', name: 'Milo', role: 'member', stats: { str: 55, con: 55, agi: 55, perc: 50, int: 45, cha: 45 } , portrait: '/assets/portraits/portrait male warrior.png'},
-      { id: 'c3', name: 'Nina', role: 'member', stats: { str: 45, con: 45, agi: 50, perc: 50, int: 55, cha: 50 } , portrait: '/assets/portraits/portrait female magician.png'},
+      { id: 'c3', name: 'Nina', role: 'member', stats: { str: 45, con: 45, agi: 50, perc: 50, int: 55, cha: 50 } , portrait: '/assets/portraits/portrait female magician.png', traits: ['scavezzacollo']},
     ],
   },
   {
