@@ -128,11 +128,19 @@ interessanti e invarianti rispettati. Destino delle superfici lab S1 deciso
   Authored su goblin: titolo «Sterminatori dei goblin» (reward) + lore.
   Prop `scenario` su QuestRunWindow (mount `/game` + lab page).
   Evidence: `test-results/s4-t2-epilogue-2026-10-10.log`.
-- **T-3 — Lifecycle POI (D-S4-6).** Campo authored `repeatable` su
-  `questPois`: default **one-shot** — quest completata/fallita → offerta
-  consumata, non riappare. I POI ripetibili lo dichiarano esplicitamente.
-  Stato mappa coerente (completed/failed persistito, non derivato da stato
-  volatile).
+- **T-3 — Lifecycle POI (D-S4-6).** ✅ **Fatto 2026-10-10.** `repeatable`
+  authored su `QuestPoiSchema` (absent = one-shot; entrambi i POI dello
+  slice restano one-shot). Il consumo one-shot esisteva già
+  (`consumedPoiIds` persistito, POI consumato alla chiusura del rapporto
+  su run ended+settled); il task ha aggiunto il canale authored e i
+  predicati puri `poiConsumesOnReportClose`/`isPoiConsumed` — un
+  repeatable ignora anche un record consumato stale (migrazione onesta).
+  `game-frame-pixi` li usa nei 3 punti (consume-write, filtro anchor,
+  filtro exemplar). `run.clear()` invariato: `questStatus` derivato torna
+  `available` finché la finestra è aperta. `questStatus` resta derivato
+  dal run — il «persistito» di questa fase è `consumedPoiIds`.
+  Test in `questOffer.test.ts` (29/29).
+  Evidence: `test-results/s4-t3-poi-lifecycle-2026-10-10.log`.
 - **T-4 — ~~Convergenza superfici~~ → differita (D-S4-4).** Le superfici lab
   restano invariate; si registra solo l'inventario nel piano (T-0) e il
   rinvio esplicito.

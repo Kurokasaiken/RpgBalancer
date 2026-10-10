@@ -118,6 +118,14 @@ export const QuestPoiSchema = z
         optional: z.array(z.string().min(1)),
       })
       .strict(),
+    /**
+     * Authored repeatability (PLAN-019-S4 T-3, D-S4-6): absent = the offer
+     * is one-shot — its report dismissed on an ended+settled run consumes
+     * the POI forever (`consumedPoiIds`, persisted). `true` = the offer
+     * comes back once the run is cleared, as long as the availability
+     * window is still open; a stale consumed record is ignored.
+     */
+    repeatable: z.boolean().optional(),
   })
   .strict()
   .refine((p) => p.availableUntilDay > p.availableFromDay, {
@@ -173,4 +181,24 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
 /** Lookup by POI id — single access point, never scan the array. */
 export function questPoiById(id: string): QuestPoi | undefined {
   return QUEST_POIS.find((p) => p.id === id);
+}
+
+/**
+ * Whether dismissing the report consumes the POI (D-S4-6): one-shot by
+ * default, only an authored `repeatable` offer survives its own report.
+ */
+export function poiConsumesOnReportClose(poi: Pick<QuestPoi, 'repeatable'>): boolean {
+  return !poi.repeatable;
+}
+
+/**
+ * Whether the POI is currently consumed off the map. A `repeatable` offer
+ * ignores even a stale consumed record (authored after the POI had already
+ * been consumed — migration honesty).
+ */
+export function isPoiConsumed(
+  poi: Pick<QuestPoi, 'id' | 'repeatable'>,
+  consumedIds: readonly string[] | null | undefined,
+): boolean {
+  return !poi.repeatable && !!consumedIds?.includes(poi.id);
 }
