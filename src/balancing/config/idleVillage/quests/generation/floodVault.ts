@@ -190,8 +190,11 @@ export function generateFloodVault(
     transit: N('crocevia').transit,
     beat: 1,
     options: [
-      { id: `${K}-saccheggia`, label: N('vena').option!.label, detail: N('vena').option!.detail, next: `CHECK:${K}-vena` },
+      /* The push option leads: `defaultStrategy` (first option) is the
+       *  "via maestra" the band calibration measures — leading with the
+       *  greed trap would skew `deriveOfferBand` a grade harder. */
       { id: `${K}-punta`, label: N('punta').option!.label, detail: N('punta').option!.detail, next: `CHECK:${K}-punta` },
+      { id: `${K}-saccheggia`, label: N('vena').option!.label, detail: N('vena').option!.detail, next: `CHECK:${K}-vena` },
       {
         id: `${K}-occulta`,
         label: N('camera').option!.label,
@@ -205,6 +208,12 @@ export function generateFloodVault(
         detail: N('puntella').option!.detail,
         next: `CHECK:${K}-puntella`,
         requiresTrait: 'prudente',
+        /* One-shot: every verdict sets 'falla-puntellata' — the breach is
+         * either shored or the last good timber is spent. Without this the
+         * hub never terminates: dec(acqua) could be farmed forever while
+         * 'uscita' never advances (P4 benchmark: 48.75% non-terminal on a
+         * pure-prudente policy). */
+        hiddenIfFlag: 'falla-puntellata',
       },
       {
         id: `${K}-madre`,
@@ -333,16 +342,18 @@ export function generateFloodVault(
     failHint: N('puntella').failHint,
     beat: 2,
     verdictTable: {
-      epicfail: { vars: [inc('acqua', 2)], damage: 8, goto: floodGoto(`${K}-crocevia`) },
-      fail: { vars: [inc('acqua', 1)], goto: floodGoto(`${K}-crocevia`) },
-      almost: { vars: [dec('acqua', 1)], goto: floodGoto(`${K}-crocevia`) },
+      epicfail: { vars: [inc('acqua', 2)], damage: 8, setFlags: ['falla-puntellata'], goto: floodGoto(`${K}-crocevia`) },
+      fail: { vars: [inc('acqua', 1)], setFlags: ['falla-puntellata'], goto: floodGoto(`${K}-crocevia`) },
+      almost: { vars: [dec('acqua', 1)], setFlags: ['falla-puntellata'], goto: floodGoto(`${K}-crocevia`) },
       win: {
         vars: [dec('acqua', 2)],
+        setFlags: ['falla-puntellata'],
         log: N('puntella').outcomeLog?.win,
         goto: floodGoto(`${K}-crocevia`),
       },
       bigwin: {
         vars: [dec('acqua', 3)],
+        setFlags: ['falla-puntellata'],
         log: N('puntella').outcomeLog?.bigwin ?? N('puntella').outcomeLog?.win,
         goto: floodGoto(`${K}-crocevia`),
       },
@@ -432,12 +443,17 @@ export function generateFloodVault(
     verdictTable: {
       epicfail: { dropLoot: ALL_LOOT, damage: 35, goto: `${K}-fine` },
       fail: { dropLoot: ALL_LOOT, damage: 25, goto: `${K}-fine` },
-      almost: { damage: 15, goto: `${K}-fine` },
+      /* Surfacing with the sack held IS the quest's objective («svuotare
+       *  la vena e risalire col carico») — the greedy win is real success,
+       *  paid in blood. */
+      almost: { setObjective: 'done', damage: 15, goto: `${K}-fine` },
       win: {
+        setObjective: 'done',
         log: N('sacca').outcomeLog?.win,
         goto: `${K}-fine`,
       },
       bigwin: {
+        setObjective: 'done',
         log: N('sacca').outcomeLog?.bigwin ?? N('sacca').outcomeLog?.win,
         goto: `${K}-fine`,
       },
