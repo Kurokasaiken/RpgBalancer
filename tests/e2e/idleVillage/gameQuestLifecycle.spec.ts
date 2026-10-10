@@ -67,6 +67,12 @@ type VillageShape = {
   residents: { id: string; isDead: boolean; isInjured: boolean; injuredUntilTick: number | null }[];
 };
 type ClockShape = { currentTick: number; isPaused: boolean; speedMultiplier: number };
+type EventLogShape = {
+  type: string | null;
+  residentId: string | null;
+  messageKey: string | null;
+  messageParams: Record<string, string | number> | null;
+};
 
 interface TestHooksWindow extends Window {
   __idleVillageTestHooks?: {
@@ -562,6 +568,77 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
     expect(await getRun(page)).toBeNull();
     /* Anche il marker rovine non è stato toccato. */
     await expect(page.locator(`[data-quest-poi-id="${POI_ROVINE}"]`)).toBeVisible({ timeout: 15_000 });
+  });
+
+  /* PLAN-019-S4 T-1+T-2 nel loop reale: la spedizione si chiude su un
+   * rapporto ricco obbligatorio e il villaggio ha SCRITTO l'esito nel suo
+   * journal persistito — non solo numeri mutati. */
+  test('epilogo + journal: il rapporto ricco narra i destini e il villaggio ha scritto l\u2019esito', async ({ page }) => {
+    await launchGoblinQuest(page);
+    const terminal = await driveRunToEnd(page);
+    await waitForSettled(page);
+    await flushBeatTheatre(page);
+
+    /* T-2: il rapporto ricco è obbligatorio — visibile insieme a «Chiudi». */
+    const epilogue = page.getByTestId('quest-epilogue');
+    await expect(epilogue).toBeVisible();
+    await expect(closeReportButton(page)).toBeVisible();
+
+    /* Le sezioni seguono i destini reali: caduti/feriti narrati solo se
+     * accaduti; sul wipe nessuna sezione di resa (i morti sì — vanno pianti). */
+    const dead = terminal.party.filter((m) => m.dead);
+    const wounded = terminal.party.filter((m) => !m.dead && m.wounded);
+    const deadSection = epilogue.locator('[data-epilogue-section="dead"]');
+    const woundedSection = epilogue.locator('[data-epilogue-section="wounded"]');
+    if (dead.length) {
+      await expect(deadSection).toBeVisible();
+      expect(await deadSection.locator('span').count()).toBeGreaterThanOrEqual(dead.length + 1);
+    } else {
+      await expect(deadSection).toHaveCount(0);
+    }
+    if (wounded.length) {
+      await expect(woundedSection).toBeVisible();
+      expect(await woundedSection.locator('span').count()).toBeGreaterThanOrEqual(wounded.length + 1);
+    } else {
+      await expect(woundedSection).toHaveCount(0);
+    }
+    if (terminal.outcome === 'wipe') {
+      await expect(epilogue.locator('[data-epilogue-section="reward"]')).toHaveCount(0);
+      await expect(epilogue.locator('[data-epilogue-section="xp"]')).toHaveCount(0);
+    }
+    if (terminal.outcome === 'reward') {
+      await expect(epilogue.locator('[data-epilogue-section="reward"]')).toBeVisible();
+    }
+    if ((terminal.xp ?? 0) > 0) {
+      await expect(epilogue.locator('[data-epilogue-section="xp"]')).toBeVisible();
+    }
+
+    /* T-1: il journal del villaggio ha narrato l'esito — headline +
+     * una voce per destino, sullo stesso ledger deduplicato degli effetti. */
+    const log = await expedition<EventLogShape[]>(page, 'getEventLog');
+    const questEntries = log.filter((e) => e.messageKey?.startsWith('gameFrame.questLog.'));
+    expect(
+      questEntries.some((e) => e.messageKey === `gameFrame.questLog.outcome.${terminal.outcome}`),
+      `headline outcome.${terminal.outcome} narrata nel journal`,
+    ).toBe(true);
+    for (const m of dead) {
+      expect(
+        questEntries.some((e) => e.messageKey === 'gameFrame.questLog.residentDead' && e.residentId === m.id),
+        `residentDead narrata per ${m.id}`,
+      ).toBe(true);
+    }
+    for (const m of wounded) {
+      expect(
+        questEntries.some((e) => e.messageKey === 'gameFrame.questLog.residentWounded' && e.residentId === m.id),
+        `residentWounded narrata per ${m.id}`,
+      ).toBe(true);
+    }
+
+    /* Il loop si chiude: il rapporto si chiude → POI one-shot consumato. */
+    await closeReportButton(page).click();
+    await expect(questWindow(page)).toHaveCount(0);
+    await expect(poiMarker(page)).toHaveCount(0);
+    expect(await getRun(page)).toBeNull();
   });
 
   test('il POI consumato non torna dopo reload', async ({ page }) => {

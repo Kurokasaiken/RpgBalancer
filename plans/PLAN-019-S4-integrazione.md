@@ -1,6 +1,7 @@
 ---
 title: 'PLAN-019-S4 — Integrazione: villaggio → planning → quest → ritorno → conseguenze come un unico gioco'
-status: active
+status: completed
+closed: 2026-10-10 (tecnico — gate (a)(b)(c) verificati da evidenza; gate (d) giudizio e Gate B restano a convocazione Director, D-S4-1)
 created: 2026-10-10
 baptized: 2026-10-10 (Director «Va bene nei log … procedi»: D-S4-1..6 ratificate — epilogo ricco obbligatorio, niente scouting, coverRiskDelta cablato, destino lab differito, Trial by Fire invariato, POI repeatability per-POI con default one-shot)
 desiderata: v24 FROZEN (stadio S4 «Integrazione»: «È diventata parte del gioco, non una demo isolata?»)
@@ -141,9 +142,10 @@ interessanti e invarianti rispettati. Destino delle superfici lab S1 deciso
   dal run — il «persistito» di questa fase è `consumedPoiIds`.
   Test in `questOffer.test.ts` (29/29).
   Evidence: `test-results/s4-t3-poi-lifecycle-2026-10-10.log`.
-- **T-4 — ~~Convergenza superfici~~ → differita (D-S4-4).** Le superfici lab
-  restano invariate; si registra solo l'inventario nel piano (T-0) e il
-  rinvio esplicito.
+- **T-4 — ~~Convergenza superfici~~ → differita (D-S4-4).** ✅ **Registrato
+  2026-10-10.** Le superfici lab restano invariate per decisione Director;
+  l'inventario è in T-0 (G4). Il rinvio è tracciato qui e nel kanban — il
+  destino lab rientra in agenda quando il Director lo chiama.
 - **T-5 — `coverRiskDelta` cablato (D-S4-3).** ✅ **Fatto 2026-10-10.**
   `coverDeltaFor(state, memberId)` nel motore: pp-delta dei flag-item con
   `coverRiskDelta` applicato a OGNI altro membro vivo finché il portatore
@@ -167,10 +169,20 @@ interessanti e invarianti rispettati. Destino delle superfici lab S1 deciso
   (gap già presente, non T-5). Test: 3 nuovi engine + eleggibilità
   aggiornata; 186/186 scope quest, digest MC intatti.
   Evidence: `test-results/s4-t5-cover-risk-2026-10-10.log`.
-- **T-6 — Artefatto finale + loop E2E + chiusura.** «Definizione di buona
-  quest» (ingresso S5, da proprietà emerse S1–S4); E2E del loop completo
-  villaggio→quest→epilogo→conseguenze→villaggio (incluso POI one-shot
-  consumato); safeguard completi; aggiornamento piani/kanban; gate Director.
+- **T-6 — Artefatto finale + loop E2E + chiusura.** ✅ **Fatto 2026-10-10.**
+  Artefatto `context/GOOD_QUEST_DEFINITION.md` (proprietà validate S1–S4,
+  ipotesi S5 separate — ingresso S5), indicizzato in `context/INDEX.md`.
+  E2E lifecycle esteso: test «epilogo + journal» — `quest-epilogue` con
+  sezioni `data-epilogue-section`, eventLog villaggio con outcome + destini,
+  coerenza party↔journal; hook read-only `getEventLog`/`getEventLogForQuest`/
+  `residentId` sulla sessione. Il loop completo è già coperto dai 13 test
+  del suite (boot→planning→lancio→run→settlement→epilogo→chiusura→POI
+  consumato→reload). **Safeguard:** E2E 13/13 (1 flake drag ri-verificato
+  verde isolato), unit scope quest 319/319, lint pulito (quarantena),
+  `build:check` ✓, `kanban:lint` ✓.
+  Evidence: `test-results/s4-t6-closure-2026-10-10.log`.
+  **Gate Director:** implementazione completa; il giudizio (d) e Gate B
+  restano a convocazione del Director (D-S4-1).
 
 ## Gate (macro-plan)
 

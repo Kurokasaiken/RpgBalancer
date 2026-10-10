@@ -29,6 +29,7 @@ Format: `[filename](path) — one sentence — \`tag\``
 [DESIGN_PILLARS.md](DESIGN_PILLARS.md) — direction and inspiration pillars — `direction`
 [context/DECISION_LOG.md](context/DECISION_LOG.md) — history of decisions — `history`
 [context/QUEST_GAMEPLAY_SCIENCE.md](context/QUEST_GAMEPLAY_SCIENCE.md) — living bibliography: real studies on suspense/failure/choice psychology for quest gameplay — `research` `quest` `design`
+[context/GOOD_QUEST_DEFINITION.md](context/GOOD_QUEST_DEFINITION.md) — artefatto finale PLAN-019: definizione di buona quest, regole validate + proprietà emerse S1–S4, ingresso S5 — `quest` `design` `canon`
 [src/docs/docs/MASTER_PLAN.md](src/docs/docs/MASTER_PLAN.md) — roadmap and phase tracking — `planning`
 [src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md](src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md) — trusted component registry — `components` `trusted`
 [src/docs/docs/design/hud_component_guide.md](src/docs/docs/design/hud_component_guide.md) — Lacquer Atlas HUD guide: superfici (`HudPlaque`), token `--skin-hud-*`, `data-hud-controls`, guardie — obbligatoria per componenti su `/game` e schermate d'azione — `design` `hud` `guide`
