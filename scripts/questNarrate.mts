@@ -56,6 +56,7 @@ interface Args {
   only?: Set<string>;
   reuse?: string;
   emitFrom?: string;
+  prefix?: string;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -81,6 +82,7 @@ function parseArgs(argv: string[]): Args {
     only: get('only') ? new Set(get('only')!.split(',').map((s) => s.trim())) : undefined,
     reuse: get('reuse'),
     emitFrom: get('emit-from'),
+    prefix: get('prefix'),
   };
   if (args.emitFrom) return args;
   if (args.live && (!args.provider || !args.model)) throw new Error('--live richiede --provider e --model');
@@ -152,8 +154,11 @@ async function main() {
 
   /* Structure comes from ANY existing kit — the skeleton is kit-free. */
   const scenario = GIMMICK_META[args.gimmick].stub() as ReturnType<typeof generateFloodVault>;
-  const prefix = args.gimmick === 'flood' ? 'fv' : 'rp';
-  const briefs: SceneBrief[] = briefsForScenario(scenario, vocab, prefix);
+  /* Two prefixes: the stub kit's (node ids/brief extraction) and the
+   * emitted kit's (node ids the skeleton will build). */
+  const stubPrefix = args.gimmick === 'flood' ? MINIERA_FLOOD_KIT.prefix : PASSO_MONTANO_KIT.prefix;
+  const prefix = args.prefix ?? stubPrefix;
+  const briefs: SceneBrief[] = briefsForScenario(scenario, vocab, stubPrefix);
 
   console.log(`== questNarrate — ${args.gimmick} × ${args.domain} ==`);
   console.log(`scenario: ${scenario.id} (${Object.keys(scenario.nodes).length} nodi), brief: ${briefs.length}`);

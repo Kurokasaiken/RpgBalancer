@@ -229,9 +229,19 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   numeri **bit-identici** a miniera — la copy non altera la meccanica.
   20 test nuovi; suite 235/235. Finding reali: leak nomi stub nei fatti
   (fix: nominali canonici), internal-id in prosa (nuova regola gate),
-  riuso-stale su rigenerazione fallita (fix). Limiti: race `options`
-  record su choice non ancora coperto; qualità testuale dei choice-hub
-  sotto quella dei check (il gate copre il formale, non l'estetico).
+  riuso-stale su rigenerazione fallita (fix). Limiti: qualità testuale
+  dei choice-hub sotto quella dei check (il gate copre il formale, non
+  l'estetico).
+  **Secondo artefatto narrato: `gen-race-miniera`** — «Corsa nella
+  Galleria Bassa» (rivale Mordo l'Esploratore, prefix `rn`). Driver:
+  `--prefix` separa stub-kit ed emitted-kit. Live run groq: 14/14 +
+  meta al primo tentativo, 0 issue. Catalogo v0 = **5 imprint**
+  (2 gimmick × 3 kit a mano + 2 narrati). Benchmark: numeri
+  bit-identici agli altri race — seconda prova empirica copy≠meccanica.
+  Correzione al limite noto: `RaceNodeCopy.options` è dichiarato ma
+  mai letto dallo scheletro — le label dei choice arrivano dai check
+  target, quindi la narrata race non richiedeva estensioni
+  all'outputShape.
   Evidence: `test-results/plan026-t4-narration-2026-10-10.log`.
 - **T5 — twist del party — FATTO** (registro tratti chiuso):
   `questTraits.ts` = QuestTraitSchema + QUEST_TRAITS (avido, prudente,
