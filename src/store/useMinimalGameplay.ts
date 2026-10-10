@@ -40,7 +40,7 @@ import type { StatBlock } from '@/balancing/types';
 import { applyPlanToState, type SettlementPlan } from '@/ui/idleVillage/quests/questSettlement';
 import { IntentBridge } from '@/ui/idleVillage/intent/GameIntent';
 // import { TEST_RESIDENTS } from '@/balancing/config/idleVillage/testResidents'; // Replaced by TEST_ROSTER_HEROES conversion
-import { TEST_ROSTER_HEROES } from '@/balancing/config/idleVillage/testRosterResidents';
+import { TEST_ROSTER_RESIDENTS } from '@/balancing/config/idleVillage/testRosterResidents';
 import { savedCharacterToResident } from '@/engine/game/idleVillage/characterImport';
 import type { GameIntent } from '@/ui/idleVillage/intent/GameIntent';
 
@@ -397,8 +397,8 @@ const createInitialState = (config: MinimalConfig) => ({
   currentTick: 0, // Integer tick count - primary source of truth
   isPaused: true,
   speedMultiplier: config.loop.defaultSpeedMultiplier,
-  residents: TEST_ROSTER_HEROES.length > 0 
-    ? TEST_ROSTER_HEROES.map((hero) => {
+  residents: TEST_ROSTER_RESIDENTS.length > 0 
+    ? TEST_ROSTER_RESIDENTS.map((hero) => {
         const resident = savedCharacterToResident(hero, { defaultFatigue: 0 });
         return {
           id: resident.id,
@@ -978,8 +978,12 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
      * the next persisted snapshot — replay dedups by `${runId}:${effectKey}`
      * (r2: the ledger is co-located, never a separate table). */
     const { state } = get();
-    const { next, appliedNow } = applyPlanToState(state, plan, tick ?? state.currentTick);
-    if (appliedNow.length > 0) {
+    const { next, appliedNow } = applyPlanToState(state, plan, tick ?? state.currentTick, {
+      eventLogLimit: EVENT_LOG_LIMIT,
+    });
+    /* Effects or fresh log lines — either is enough to commit the write
+     * (a replay that only owes the outcome headline still lands it). */
+    if (appliedNow.length > 0 || next.eventLog !== state.eventLog) {
       set({ state: next });
     }
     trackTelemetryEvent('quest_settlement_effects', {
