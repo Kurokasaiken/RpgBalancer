@@ -16,8 +16,10 @@ const RAW_DEFAULT_QUEST_ITEMS: Record<string, QuestItem> = {
     icon: '🐎',
     kind: 'equipment',
     // Occupies the mount slot: the speed boost is a real loadout trade-off.
+    // Expedition channel (S3 T-3): `durationMult` halves the run's nodeTicks.
     slot: 'mount',
     durationMult: 0.5,
+    descKey: 'questExpedition.item.draftHorse',
   },
   quest_weapon_iron_blade: {
     id: 'quest_weapon_iron_blade',

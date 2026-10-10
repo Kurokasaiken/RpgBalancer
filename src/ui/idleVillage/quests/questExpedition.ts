@@ -13,6 +13,8 @@ import { questResidentEligibility, residentInExpedition } from '@/ui/idleVillage
 import { residentToQuestMember } from '@/ui/idleVillage/questS1Lab/residentToQuestMember';
 import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
+import { defaultQuestItems } from '@/balancing/config/idleVillage/quests/questItems';
+import type { QuestItem } from '@/balancing/config/idleVillage/quests/questItems.schema';
 
 /** Slot shape the boundary needs — decoupled from the controller's view
  *  model so tests build it directly. */
@@ -51,4 +53,65 @@ export function buildExpeditionParty(
   }
   if (!members.some((m) => m.role === 'leader')) return null;
   return members;
+}
+
+/* ------------------------------------------------------------------ */
+/* Loadout duration channel (PLAN-019-S3 T-3, desiderata v24 #7).       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Effective per-node tick pace of the expedition under a loadout:
+ * `durationMult` multiplies (a mount at 0.5 halves the pace), `durationDelta`
+ * adds caller ticks per node. The catalog declares the numbers; the engine
+ * consumes the result through `clock.nodeTicks` at launch — a real effect
+ * on frontier pacing, not a label.
+ */
+export interface LoadoutDuration {
+  /** Per-node tick pace for `createRun`'s clock (never below 1). */
+  nodeTicks: number;
+  /** The whole-expedition estimate the duration chip shows — the POI's
+   *  authored `estimatedDurationTicks` scaled by the same factor. */
+  estimatedTicks: number;
+  /** nodeTicks / baseNodeTicks — the signed pace change (1 = unmodified). */
+  factor: number;
+}
+
+/** Whether a catalog item belongs to the expedition bag — every declared
+ *  effect channel must be REAL in the graph engine: an `engineFlag` the run
+ *  consumes, or a duration channel (`durationMult`/`durationDelta`) that
+ *  feeds `clock.nodeTicks`. Items whose declared deltas nothing consumes
+ *  (statDeltas/coverRiskDelta/risk deltas — the planner-era channels the
+ *  graph engine ignores) stay OUT: the bag never sells a fake effect. */
+export function isExpeditionItem(item: QuestItem): boolean {
+  if (
+    item.statDeltas !== undefined ||
+    item.injuryChanceDelta !== undefined ||
+    item.deathChanceDelta !== undefined ||
+    item.coverRiskDelta !== undefined ||
+    item.rewardMultiplierDelta !== undefined
+  ) {
+    return false;
+  }
+  return Boolean(item.engineFlag || item.durationMult !== undefined || item.durationDelta !== undefined);
+}
+
+/** Computes the loadout's duration effect for a POI whose per-node pace is
+ *  `baseNodeTicks` and whose authored estimate is `baseEstimatedTicks`. */
+export function loadoutDuration(
+  selectedItemIds: string[],
+  baseNodeTicks: number,
+  baseEstimatedTicks: number,
+  items: Record<string, QuestItem> = defaultQuestItems,
+): LoadoutDuration {
+  let mult = 1;
+  let delta = 0;
+  for (const id of selectedItemIds) {
+    const item = items[id];
+    if (!item) continue;
+    if (item.durationMult !== undefined) mult *= item.durationMult;
+    if (item.durationDelta !== undefined) delta += item.durationDelta;
+  }
+  const nodeTicks = Math.max(1, Math.round(baseNodeTicks * mult + delta));
+  const factor = baseNodeTicks > 0 ? nodeTicks / baseNodeTicks : 1;
+  return { nodeTicks, estimatedTicks: Math.max(1, Math.round(baseEstimatedTicks * factor)), factor };
 }
