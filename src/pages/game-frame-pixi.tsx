@@ -21,7 +21,6 @@ import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
-import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { nodeDurationTicks, type QuestId } from '@/ui/idleVillage/questS1Lab/questRun';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
@@ -169,7 +168,9 @@ export default function GameFramePixiPage() {
   // Test / trailer tooling: dev builds only, F10 shows or hides it (hide it for a clean capture).
   // `?capture=1` starts a clean shot: no Director, no panel menu.
   const capture = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
-  const directorEnabled = import.meta.env.DEV && debug.directorPanel;
+  // The Director panel is a test / trailer instrument: dev builds and the
+  // playwright preview only, never a production bundle.
+  const directorEnabled = (import.meta.env.DEV || import.meta.env.MODE === 'playwright') && debug.directorPanel;
   const panels = useHudPanels();
   // The land is framed to keep clear of the open side panels: the fit reserves most of their width (they sit over the
   // coastal corners, so a full reservation would shrink the island for nothing).
@@ -273,7 +274,6 @@ export default function GameFramePixiPage() {
   const questRuns = useMemo(() => ({ goblin: questRun, rovine: questRunRovine }), [questRun, questRunRovine]);
   const [activeQuestId, setActiveQuestId] = useState<QuestId>('goblin');
   const activeQuestRun = questRuns[activeQuestId];
-  const [questRunStartTick, setQuestRunStartTick] = useState(0);
   const currentTick = session.gameplay.state.currentTick ?? 0;
   // The game clock matures timed nodes (v27): paused game = paused quest;
   // a late open catches up deterministically to the first waiting frontier —
@@ -371,13 +371,13 @@ export default function GameFramePixiPage() {
       return { progress: halo.fraction, label };
     }
     const span = questWindow.durationDays * dayLengthTicks;
-    const elapsed = Math.max(0, currentTick - questRunStartTick);
+    const elapsed = Math.max(0, currentTick - (run?.launchedAtTick ?? 0));
     const progress = run?.ended ? 1 : Math.min(1, elapsed / span);
     const label = run?.ended
       ? t(run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
       : t('gameFrame.questWindow.day', { day: Math.min(questWindow.durationDays, Math.floor(elapsed / dayLengthTicks) + 1), total: questWindow.durationDays });
     return { progress, label };
-  }, [activeQuestRun.run, activePoi, currentTick, questWindow.durationDays, dayLengthTicks, questRunStartTick, t]);
+  }, [activeQuestRun.run, activePoi, currentTick, questWindow.durationDays, dayLengthTicks, t]);
 
   // An expired opportunity fades (MapQuestPoi), then leaves the map.
   const expiredOpen = availability?.state === 'expired' && session.questStatus === 'available';
@@ -449,13 +449,11 @@ export default function GameFramePixiPage() {
         id: 'questRun',
         label: t('gameFrame.director.questRun'),
         active: !!questRun.run && !questRun.run.ended,
-        onTrigger: () => {
-          questRun.start(GOBLIN_PRESETS[0].id, { startTick: session.gameplay.state.currentTick ?? 0 });
-          setActiveQuestId('goblin');
-          setQuestArmed(questWindow.consumablesArmedByDefault);
-          setQuestRunStartTick(session.gameplay.state.currentTick ?? 0);
-          panels.set('quest', true);
-        },
+        /* Real launch path only: the Director stages a one-click expedition
+         *  through the SAME canonical boundary the player crosses (offer
+         *  resolution, slot eligibility, party freeze, loadout reservation,
+         *  settlement) — no lab-preset run. */
+        onTrigger: () => expeditionGoblin.demoLaunch(),
       },
       {
         id: 'poitypes',
@@ -475,7 +473,7 @@ export default function GameFramePixiPage() {
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, questShown, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault],
+    [invasion, questShown, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin],
   );
 
   return (
