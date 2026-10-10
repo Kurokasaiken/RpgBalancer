@@ -78,16 +78,17 @@ export interface LoadoutDuration {
 
 /** Whether a catalog item belongs to the expedition bag — every declared
  *  effect channel must be REAL in the graph engine: an `engineFlag` the run
- *  consumes, or a duration channel (`durationMult`/`durationDelta`) that
- *  feeds `clock.nodeTicks`. Items whose declared deltas nothing consumes
- *  (statDeltas/coverRiskDelta/risk deltas — the planner-era channels the
- *  graph engine ignores) stay OUT: the bag never sells a fake effect. */
+ *  consumes, a duration channel (`durationMult`/`durationDelta`) that feeds
+ *  `clock.nodeTicks`, or `coverRiskDelta` — wired into the harm bands by
+ *  `coverDeltaFor` (PLAN-019-S4 T-5, D-S4-3). Items whose declared deltas
+ *  nothing consumes (statDeltas/carrier risk deltas/rewardMultiplierDelta
+ *  — the planner-era channels the graph engine ignores) stay OUT: the bag
+ *  never sells a fake effect. */
 export function isExpeditionItem(item: QuestItem): boolean {
   if (
     item.statDeltas !== undefined ||
     item.injuryChanceDelta !== undefined ||
     item.deathChanceDelta !== undefined ||
-    item.coverRiskDelta !== undefined ||
     item.rewardMultiplierDelta !== undefined
   ) {
     return false;

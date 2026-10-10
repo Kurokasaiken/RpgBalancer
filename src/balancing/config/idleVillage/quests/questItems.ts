@@ -47,6 +47,9 @@ const RAW_DEFAULT_QUEST_ITEMS: Record<string, QuestItem> = {
     slot: 'trinket',
     // Cover (D1): everyone else is safer while the banner bearer stands.
     coverRiskDelta: { injuryChance: -6, deathChance: -4 },
+    // PLAN-019-S4 T-5: engine flag — the bag carries the banner as a flag
+    // and the graph engine reads the deltas back through the catalog.
+    engineFlag: 'hasGuardianBanner',
   },
   quest_consumable_healing_draught: {
     id: 'quest_consumable_healing_draught',
