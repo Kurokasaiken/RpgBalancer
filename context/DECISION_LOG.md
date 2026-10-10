@@ -1057,3 +1057,24 @@ sulla quest «Sterminio dei goblin».
    più dal guado»), non una scena NPC — nessuna aggiunta richiesta.
 
 **Fonte:** Director in sessione 2026-10-10.
+
+## 2026-10-10 — R-118-S3 gate Director: le misure T-5 sono volute
+
+**Contesto:** lo sweep T-5 ha prodotto tre evidenze presentate al gate (d):
+reward quasi-zero senza completamento violento (sanguinario 99.3% vs cauto
+5.5%), wound=100% su qualunque percorso (almeno un ferito a run), muro
+push-your-luck deterministico (razzia infinita = wipe certo).
+
+**Decisione (Director):** «La missione si chiama sterminio: ovviamente senza
+violenza totale nn la soddisfi. Si, sn tutte cose sensate e volute.»
+
+- Reward dietro inseguimento+ultima mischia = intenzionale (il nome è il
+  contratto).
+- Ferita garantita come pedaggio = intenzionale.
+- Il muro «razzia per sempre → morte» = intenzionale.
+
+**Conseguenza:** PLAN-019-S3 chiuso (status completed, gate a/b/d passati,
+c ridiretto a preview aggregata). Nessuna calibrazione da fare — i numeri
+sono authored.
+
+**Fonte:** Director in sessione 2026-10-10.
