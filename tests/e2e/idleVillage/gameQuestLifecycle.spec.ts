@@ -107,6 +107,16 @@ const speedGroup = (page: Page) => page.locator('[role="radiogroup"]');
 const pauseToggle = (page: Page) => speedGroup(page).getByRole('radio').first();
 const speedButton = (page: Page, mult: 1 | 2 | 4) => speedGroup(page).getByRole('radio', { name: `×${mult}` });
 
+/** The HUD ribbon's gold readout (`ResourceReadout` role=group, aria-label
+ *  «<label>: <value>»): parses the displayed amount — the visible proof the
+ *  settlement moved what the player sees, not just the store. */
+const goldReadoutValue = async (page: Page): Promise<number> => {
+  const label = await page.getByRole('group', { name: /gold|oro/i }).first().getAttribute('aria-label');
+  const digits = (label ?? '').replace(/[^\d]/g, '');
+  if (!digits) throw new Error(`gold readout not parseable: "${label}"`);
+  return Number(digits);
+};
+
 /** Click the real POI marker on the map — the same path a player takes. */
 const openGoblinDetailViaMap = async (page: Page) => {
   await expect(poiMarker(page)).toBeVisible({ timeout: 15_000 });
@@ -119,11 +129,32 @@ const openGoblinDetailViaMap = async (page: Page) => {
   );
 };
 
+/** The expedition panel grew past a 720p viewport (S3 OUTCOME zone):
+ *  drag its header up until «Invia» is inside — the same move a player
+ *  would make. No-op when everything already fits. */
+const bringSendIntoView = async (page: Page) => {
+  const vh = page.viewportSize()?.height ?? 720;
+  for (let i = 0; i < 4; i++) {
+    const box = await sendButton(page).boundingBox();
+    if (box && box.y + box.height <= vh - 8) return;
+    const header = page.getByTestId('floating-panel-header-quest-expedition-poi-goblin');
+    const hb = await header.boundingBox();
+    if (!hb) return;
+    const deficit = box ? Math.ceil(box.y + box.height - (vh - 8)) : 120;
+    const cx = hb.x + hb.width / 2;
+    await page.mouse.move(cx, hb.y + hb.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(cx, hb.y + hb.height / 2 - deficit - 20, { steps: 6 });
+    await page.mouse.up();
+  }
+};
+
 /** Planning → leader assigned → real click on «Invia spedizione». */
 const launchGoblinQuest = async (page: Page) => {
   await openGoblinDetailViaMap(page);
   await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
   await expect(sendButton(page)).toBeEnabled({ timeout: 15_000 });
+  await bringSendIntoView(page);
   await sendButton(page).click();
   await expect(questWindow(page)).toBeVisible({ timeout: 10_000 });
 };
@@ -366,6 +397,7 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
 
   test('esito: settlement applicato una volta — ricompense e destini come dati, nessun doppio settle', async ({ page }) => {
     const villageBefore = await expedition<VillageShape>(page, 'getVillage');
+    const goldReadoutBefore = await goldReadoutValue(page);
     await launchGoblinQuest(page);
 
     const terminal = await driveRunToEnd(page);
@@ -400,6 +432,10 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
       (terminal.outcome === 'reward' ? terminal.resolvedOffer?.rewardResolved ?? 0 : 0) +
       (terminal.outcome === 'wipe' ? 0 : terminal.gold ?? 0);
     expect(villageAfter.gold - villageBefore.gold).toBe(expectedGold);
+
+    /* E il pannello risorse nel ribbon HUD mostra lo stesso delta — la
+     *  ricompensa arriva anche a ciò che il giocatore vede. */
+    expect((await goldReadoutValue(page)) - goldReadoutBefore).toBe(expectedGold);
 
     /* Nessun doppio settle: tick extra non muovono più il villaggio. */
     await advanceTicks(page, 20);
