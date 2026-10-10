@@ -44,7 +44,13 @@ export function questElapsedTicks(state: QuestRunState, nowTick: number): number
  * beat: the party is out there spending real time either way).
  */
 export function questDurationTicks(state: QuestRunState, poi: QuestPoi): number {
-  return Math.max(poi.estimatedDurationTicks, state.visitedNodes.length * poi.ticksPerNode);
+  /* The RUN's own pace (`state.nodeTicks`, set at launch — loadout items can
+   *  modify it, PLAN-019-S3 T-3) scales both terms: a mounted expedition
+   *  matures faster AND gets a shorter estimate. Legacy clock-less runs
+   *  (nodeTicks 0) keep the authored POI pace. */
+  const nodeTicks = state.nodeTicks || poi.ticksPerNode;
+  const paceFactor = nodeTicks / poi.ticksPerNode;
+  return Math.max(poi.estimatedDurationTicks * paceFactor, state.visitedNodes.length * nodeTicks);
 }
 
 /** Declared halo states (critica r1): `filling` while elapsed < duration;

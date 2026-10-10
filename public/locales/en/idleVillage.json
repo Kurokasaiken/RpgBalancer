@@ -1415,7 +1415,11 @@
     "intel": {
       "title": "Intel",
       "scouted": "scouted"
-    }
+    },
+    "item": {
+      "draftHorse": "One mount for the whole expedition — halves the pace of every leg."
+    },
+    "coverage": "Covers"
   },
   "questOffer": {
     "band": {

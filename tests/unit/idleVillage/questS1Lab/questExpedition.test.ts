@@ -5,10 +5,11 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
-import { buildExpeditionParty, type ExpeditionSlotSpec } from '@/ui/idleVillage/quests/questExpedition';
+import { buildExpeditionParty, isExpeditionItem, loadoutDuration, type ExpeditionSlotSpec } from '@/ui/idleVillage/quests/questExpedition';
 import { estimateForParty, estimateForPartyAsync, resolveQuestOffer, collectWorldProgressSignals } from '@/ui/idleVillage/questS1Lab/questOffer';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
+import { defaultQuestItems } from '@/balancing/config/idleVillage/quests/questItems';
 import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 
 const baseResident = (over: Partial<ResidentState>): ResidentState =>
@@ -127,5 +128,41 @@ describe('estimateForPartyAsync — parity with the sync estimate', () => {
     const poi = questPoiById('poi-goblin')!;
     const { resolvedOffer } = resolveQuestOffer(poi, { signals: collectWorldProgressSignals(), bandSim: { runs: 30, seed: 2 } });
     expect(await estimateForPartyAsync(resolvedOffer, [], { runs: 10 })).toBe('incomplete');
+  });
+});
+
+describe('loadoutDuration — S3 T-3 duration channel', () => {
+  it('is identity with an empty bag', () => {
+    const d = loadoutDuration([], 50, 250);
+    expect(d.nodeTicks).toBe(50);
+    expect(d.estimatedTicks).toBe(250);
+    expect(d.factor).toBe(1);
+  });
+
+  it('the draft horse halves the per-node pace and the whole estimate', () => {
+    const d = loadoutDuration(['quest_mount_draft_horse'], 50, 250);
+    expect(d.nodeTicks).toBe(25);
+    expect(d.estimatedTicks).toBe(125);
+    expect(d.factor).toBeCloseTo(0.5, 10);
+  });
+
+  it('consumables without a duration channel do not touch the pace', () => {
+    const d = loadoutDuration(['quest_consumable_fumogeno', 'quest_consumable_pozione'], 50, 250);
+    expect(d.nodeTicks).toBe(50);
+    expect(d.factor).toBe(1);
+  });
+
+  it('isExpeditionItem pools engine-flagged consumables and duration items only', () => {
+    expect(isExpeditionItem(defaultQuestItems.quest_mount_draft_horse)).toBe(true);
+    expect(isExpeditionItem(defaultQuestItems.quest_consumable_pozione)).toBe(true);
+    // Legacy equipment with no engine channel stays catalog-only.
+    expect(isExpeditionItem(defaultQuestItems.quest_weapon_iron_blade)).toBe(false);
+    expect(isExpeditionItem(defaultQuestItems.quest_armor_heavy_plate)).toBe(false);
+  });
+
+  it('never returns a sub-1 pace even under extreme authored deltas', () => {
+    const d = loadoutDuration(['quest_mount_draft_horse'], 1, 4);
+    expect(d.nodeTicks).toBeGreaterThanOrEqual(1);
+    expect(d.estimatedTicks).toBeGreaterThanOrEqual(1);
   });
 });

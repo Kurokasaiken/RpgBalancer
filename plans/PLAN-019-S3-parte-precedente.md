@@ -140,9 +140,33 @@ simulazione usata è dichiarata nella UI («ipotesi: percorso X, consumabili Y»
   gamba item documenta il contratto (consumabili esclusi dal forecast →
   nessun ricalcolo). Test: 4 unit (attribution/shares/delta/reversibilità)
   + E2E con asserzioni BY MEMBER/WHY/intel.
-- **T-3 — LOADOUT zone.** Estendere la sacca a zona per-membro dove il
-  contratto lo richiede; canale durata (`durationDelta`) se item lo
-  dichiarano — verificare cosa esiste già, non reinventare.
+- **T-3 — LOADOUT zone.** ✅ **Fatto 2026-10-10** — canale durata reale
+  (non delta rischio finti), draft persistito POI+giorno, eleggibilità
+  onesta degli item.
+  **Implementazione:** `loadoutDuration(ids, ticksPerNode, estimatedTicks)`
+  in `questExpedition.ts` — `durationMult`/`durationDelta` degli item
+  dichiarati in schema rimappano il passo per-nodo; `send` passa
+  `clock.nodeTicks = expeditionDuration.nodeTicks` → `state.nodeTicks` è
+  il vero passo del run e `questDurationTicks` (halo) lo usa (fallback
+  `poi.ticksPerNode` per run legacy con nodeTicks 0): Planner, run e halo
+  condividono la STESSA derivazione. `isExpeditionItem` stretto: eleggibile
+  solo se OGNI canale di gioco dichiarato è consumato dal motore
+  (engineFlag o durata) — `quest_armor_heavy_plate` escluso perché dichiara
+  `deathChanceDelta` non consumato (niente promesse false nella sacca).
+  `descKey` su item + mount `quest_mount_draft_horse` (×0.5) authored.
+  Detail: chip durata con fattore ×N (tone ok/warn), tooltip effetto.
+  **Draft (ratifica battesimo):** `idleVillage.questExpeditionDraft.<poi>.<day>`
+  via `saveData`/`loadData`/`clearData` (sessionStorage in playwright) —
+  scrittura debounced 600ms, restore con re-validazione per eleggibilità
+  (un caduto non risorge), clear al send. Fix reale trovato dai test: il
+  gate restore→write era un ref (mai re-armato se un edit arrivava durante
+  il load) → `draftReady` come state. Hook E2E: `toggleItem`, `clearSlot`,
+  `getClock` + `currentDay`.
+  **Test:** unit `loadoutDuration` (identità/cavallo ×0.5/consumabili
+  neutri/clamp ≥1) + `isExpeditionItem` onesto; E2E draft — write-path su
+  record persistito reale, close/reopen in-memory, restore post-reload con
+  seed della chiave del giorno corrente (il clock gira live e l'autosave è
+  ≥30s: il legame giorno-chiave non è allineabile in-test — documentato).
 - **T-4 — Preview check certi.** Pannello per-check (primaria, chance
   puntuale sul party assegnato) coerente col resolver: test che il check
   certo simulato ha la stessa chance dichiarata.

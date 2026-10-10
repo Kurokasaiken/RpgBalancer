@@ -80,6 +80,11 @@ export const QuestItemSchema = z.object({
    *  catalog item is the player-facing identity. Items without `engineFlag`
    *  are Mission-Planner-only. */
   engineFlag: z.string().min(1).optional(),
+
+  /** i18n key for the effect tooltip (PLAN-019-S3 T-3): what the item DOES,
+   *  shown on the loadout chip. For flag items the stash's `descKey` wins;
+   *  this covers items with a non-flag channel (duration, …). */
+  descKey: z.string().min(1).optional(),
 })
   .refine(
     (item) => item.kind !== 'equipment' || item.slot !== undefined,

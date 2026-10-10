@@ -15,12 +15,17 @@ import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 import type { QuestPoi, DangerBand } from '@/balancing/config/idleVillage/quests/questPois';
 import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
 import { REWARD_TIERS } from '@/balancing/config/idleVillage/quests/rewardTiers';
-import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { QUEST_STASH, loadoutCoverage } from '@/balancing/config/idleVillage/quests/questStash';
+import { toEngineFlag } from '@/balancing/config/idleVillage/quests/questItems';
 import type { QuestItem } from '@/balancing/config/idleVillage/quests/questItems.schema';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { QUEST_PLANNER_INFO } from '@/balancing/config/idleVillage/quests/questPlannerInfo';
 import type { PartyEstimate, ResolvedQuestOffer } from '@/ui/idleVillage/questS1Lab/questOffer';
 import type { ForecastDelta } from '@/ui/idleVillage/questS1Lab/questSimulation';
+import type { LoadoutDuration } from './questExpedition';
+import { STAT_ICONS } from '@/ui/idleVillage/questS1Lab/questRun';
+import { STAT_SHORT } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import { getStatIconComponent, lucideStatIcons } from '@/ui/shared/statIconUtils';
 
 const FONT = { display: 'var(--skin-font-display)', serif: 'var(--skin-font-serif)' } as const;
 
@@ -29,6 +34,10 @@ const FONT = { display: 'var(--skin-font-display)', serif: 'var(--skin-font-seri
 const stripNs = (key: string) => key.replace(/^idleVillage\./, '');
 
 const bandById = (id: string): DangerBand | undefined => DANGER_BANDS.find((b) => b.id === id);
+
+/** engine flag → stash entry: the static catalog join the loadout zone
+ *  needs for effect tooltips (`descKey` lives on the stash item). */
+const STASH_BY_FLAG = new Map(QUEST_STASH.items.map((i) => [i.flag, i]));
 
 export interface QuestExpeditionDetailProps {
   poi: QuestPoi;
@@ -46,6 +55,9 @@ export interface QuestExpeditionDetailProps {
   /** Planning intel rows: authored `previewHint`s always, `revealHint`s
    *  when an explorer slot unlocked them (D-S3-3). */
   intelHints: { nodeId: string; hint: string; revealed: boolean }[];
+  /** Effective expedition duration under the loadout (S3 T-3):
+   *  `factor ≠ 1` ⇒ the bag changes the run's real pace. */
+  expeditionDuration: LoadoutDuration;
   requiredFilled: boolean;
   items: QuestItem[];
   selectedItemIds: string[];
@@ -66,6 +78,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   estimate,
   forecastDelta,
   intelHints,
+  expeditionDuration,
   requiredFilled,
   items,
   selectedItemIds,
@@ -131,7 +144,12 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
               </span>
             )}
             <span data-testid="quest-expedition-duration">
-              <HudChip tone="secondary">{t('questExpedition.duration', { ticks: poi.estimatedDurationTicks })}</HudChip>
+              <HudChip tone={expeditionDuration.factor < 1 ? 'ok' : expeditionDuration.factor > 1 ? 'warn' : 'secondary'}>
+                {t('questExpedition.duration', { ticks: expeditionDuration.estimatedTicks })}
+                {expeditionDuration.factor !== 1 && (
+                  <em style={{ fontStyle: 'normal', fontSize: 10 }}> ×{expeditionDuration.factor.toFixed(2)}</em>
+                )}
+              </HudChip>
             </span>
           </div>
         </div>
@@ -265,6 +283,9 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
             {items.map((item) => {
               const selected = selectedItemIds.includes(item.id);
               const full = !selected && selectedItemIds.length >= QUEST_STASH.bagSlots;
+              /* Effect tooltip: catalog `descKey` first, then the stash
+               *  entry's `descKey` via the engine-flag join. */
+              const descKey = item.descKey ?? (item.engineFlag ? STASH_BY_FLAG.get(item.engineFlag)?.descKey : undefined);
               return (
                 <SkinButton
                   key={item.id}
@@ -272,6 +293,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                   data-testid={`loadout-item-${item.id}`}
                   aria-pressed={selected}
                   disabled={full}
+                  title={descKey ? t(descKey) : undefined}
                   onClick={() => onToggleItem(item.id)}
                 >
                   {t(stripNs(item.labelKey))}
@@ -279,6 +301,29 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
               );
             })}
           </div>
+          {/* Coverage — which of the quest's declared primary stats the bag
+           *  covers (same vocabulary the check consumables serve). */}
+          {(scenario?.primaryStats?.length ?? 0) > 0 && (
+            <div data-testid="loadout-coverage" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: TONE.secondary }}>
+                {t('questExpedition.coverage')}
+              </span>
+              {scenario!.primaryStats!.map((s) => {
+                const covered = loadoutCoverage(selectedItemIds.map(toEngineFlag)).includes(s);
+                const Icon = getStatIconComponent(STAT_ICONS[s]) ?? lucideStatIcons.star;
+                return (
+                  <span
+                    key={s}
+                    title={STAT_SHORT[s]}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT.display, fontSize: 11, color: covered ? 'var(--skin-success, #7ed39a)' : TONE.secondary }}
+                  >
+                    {Icon && <Icon style={{ width: 12, height: 12 }} aria-hidden />}
+                    {STAT_SHORT[s] ?? s} {covered ? '✓' : '—'}
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <SkinButton

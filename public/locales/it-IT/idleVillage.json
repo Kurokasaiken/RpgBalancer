@@ -1436,7 +1436,11 @@
     "intel": {
       "title": "Informazioni",
       "scouted": "esplorato"
-    }
+    },
+    "item": {
+      "draftHorse": "Una cavalcatura per tutta la spedizione — dimezza il passo di ogni tratto."
+    },
+    "coverage": "Copre"
   },
   "questOffer": {
     "band": {
