@@ -70,6 +70,7 @@ export const QuestWindowLabPage: React.FC = () => {
           beatTiming={questWindow.beats}
           title={GOBLIN_SCENARIO.title}
           flavour={GOBLIN_SCENARIO.flavour}
+          scenario={GOBLIN_SCENARIO}
           artFor={(nodeId) => NODE_ART[nodeId]?.src}
           time={time}
           onChoose={(optionId) => questRun.choose(optionId, { useConsumable: armed })}

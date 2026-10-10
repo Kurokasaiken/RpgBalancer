@@ -560,6 +560,7 @@ export default function GameFramePixiPage() {
                     beatTiming={questWindow.beats}
                     title={scenarioForQuest(activeQuestId)?.title ?? GOBLIN_SCENARIO.title}
                     flavour={scenarioForQuest(activeQuestId)?.flavour ?? ''}
+                    scenario={scenarioForQuest(activeQuestId)}
                     artFor={(nodeId) => NODE_ART[nodeId]?.src}
                     time={questRunTime}
                     onChoose={(optionId) => activeQuestRun.choose(optionId, { useConsumable: questArmed })}
