@@ -22,6 +22,7 @@
  */
 
 import { z } from 'zod';
+import { isQuestTrait } from './questTraits';
 
 /* ------------------------------------------------------------------------ */
 /* Leaf schemas (mirror of questScenario.ts / slots/types.ts contracts).     */
@@ -519,6 +520,14 @@ export const QuestScenarioSchema = z
     }
     for (const roll of scenario.armRolls ?? []) producedFlags.add(roll.flag);
 
+    /* Trait registry is CLOSED (PLAN-026 T5): a gate on an unregistered
+     * trait is a dead gate, so it's a data error, not silent content. */
+    for (const [i, roll] of (scenario.armRolls ?? []).entries()) {
+      if (roll.requiresTrait && !isQuestTrait(roll.requiresTrait)) {
+        issue(['armRolls', i, 'requiresTrait'], `trait '${roll.requiresTrait}' non registrato in QUEST_TRAITS`);
+      }
+    }
+
     for (const [key, node] of Object.entries(nodes)) {
       if (key !== node.id) {
         issue(['nodes', key], `chiave '${key}' != node.id '${node.id}'`);
@@ -573,6 +582,11 @@ export const QuestScenarioSchema = z
         for (const flag of [opt.requiresFlag, opt.consumesFlag]) {
           if (flag && !producedFlags.has(flag)) {
             issue(oPath, `flag '${flag}' richiesto/consumato senza produttore (sets o motore)`);
+          }
+        }
+        for (const trait of [opt.requiresTrait, opt.hiddenIfTrait]) {
+          if (trait && !isQuestTrait(trait)) {
+            issue(oPath, `trait '${trait}' non registrato in QUEST_TRAITS`);
           }
         }
       }
