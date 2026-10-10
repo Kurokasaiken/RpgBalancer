@@ -6,7 +6,7 @@ baptized: 2026-10-01 (Director: "procedi", v3 dopo 2 round di critica multi-AI w
 revised: 2026-10-01 (v3 — round 2: chatgpt + claude minor revision; correzioni di precisione applicate); 2026-10-02 (v4 — desiderata rev.2: modello obiettivo/reward, compound dalla partenza, slot leader/bodyguard, rischi per slot condizionati al verdetto)
 desiderata: v24 (FROZEN 2026-10-01) + rev.1 + rev.2
 request: R-076
-children: PLAN-019-S1 ([battezzato 2026-10-02](PLAN-019-S1-quest-interessante.md)), PLAN-019-S2 ([draft 2026-10-09](PLAN-019-S2-quest-vera.md) — slice R-107 «2 POI funzionanti», completato 2026-10-09), PLAN-019-S3 ([draft 2026-10-09](PLAN-019-S3-parte-precedente.md) — R-118, in attesa di battesimo), S4–S5 (S5 = PLAN-026 active per deroga)
+children: PLAN-019-S1 ([battezzato 2026-10-02](PLAN-019-S1-quest-interessante.md)), PLAN-019-S2 ([draft 2026-10-09](PLAN-019-S2-quest-vera.md) — slice R-107 «2 POI funzionanti», completato 2026-10-09), PLAN-019-S3 ([completato 2026-10-10](PLAN-019-S3-parte-precedente.md) — R-118, gate a–d passati), PLAN-019-S4 ([draft 2026-10-10](PLAN-019-S4-integrazione.md) — R-123, in attesa di battesimo), S5 (S5 = PLAN-026 active per deroga)
 related: PLAN-018 (precedente implementativo da adattare, v24 punto 6)
 ---
 
@@ -189,7 +189,7 @@ Per ogni stadio: **domanda** (v24), **ingresso**, **artefatto di uscita**, **gat
   Planner**: dopo la miglior preparazione restano decisioni significative dentro la quest (se no,
   **rientro in S1**); (c) preview e resolver concordano sui check certi; (d) Gate Director.
 
-### S4 — Integrazione (PLAN-019-S4)
+### S4 — Integrazione ([PLAN-019-S4](PLAN-019-S4-integrazione.md), draft 2026-10-10)
 - **Domanda:** "È diventata parte del gioco, non una demo isolata?"
 - **Ingresso:** S3 completato.
 - **Contratto:** villaggio → planning → quest → ritorno → conseguenze sulla superficie di gioco
