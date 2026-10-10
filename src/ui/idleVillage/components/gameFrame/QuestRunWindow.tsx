@@ -45,6 +45,10 @@ import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } fro
 import { HudChip, LOG_TONE, SCRIM, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { ConsumableBelt } from '@/ui/idleVillage/questS1Lab/hud/ConsumableBelt';
 import { useHudPanelDrag } from './useHudPanelDrag';
+import PgCard from '@/ui/idleVillage/components/PgCard';
+import { useRosterKitData } from '@/ui/idleVillage/frozen/kits/rosterKit';
+import { formatResidentLabel } from '@/ui/idleVillage/residentName';
+import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 
 /** Verdict chip tone: the result reads at a glance, before its authored line. */
 const VERDICT_TONE: Record<Verdict, 'ok' | 'warn' | 'danger'> = { bigwin: 'ok', win: 'ok', almost: 'warn', fail: 'danger', epicfail: 'danger' };
@@ -634,26 +638,36 @@ const Popover: React.FC<{ onDismiss: () => void; children: React.ReactNode }> = 
   );
 };
 
+/**
+ * Traveling party — each member rendered with the real roster `PgCard`
+ * (horizontal bar variant): portrait, name and status are the canonical
+ * resident's; the HP bar carries the QUEST hit points (m.hp/m.maxHp), the
+ * number that actually changes on the road. A fallen member is `disabled`
+ * — the card's own greyscale reads as the corpse. Living cards stay the
+ * real draggable component: an attempted drag hits the same eligibility
+ * boundary as any drop (a member in expedition is refused upstream).
+ */
 const RosterList: React.FC<{ run: QuestRunState }> = ({ run }) => {
   const { t } = useTranslation('idleVillage');
+  const { residentsById } = useRosterKitData();
   return (
     <>
       {run.party.map((m) => {
-        const pct = m.maxHp > 0 ? Math.max(0, m.hp) / m.maxHp : 0;
-        const tone = m.dead ? TONE.death : pct < 0.35 ? TONE.danger : m.wounded ? TONE.warn : TONE.ok;
+        const resident = residentsById[m.id];
+        const statusKey = m.dead ? 'dead' : m.wounded || resident?.isInjured ? 'injured' : 'away';
         return (
-          <div key={m.id} style={{ display: 'grid', gridTemplateColumns: '1fr 110px 56px', alignItems: 'center', gap: 8, opacity: m.dead ? 0.6 : 1 }}>
-            <span style={{ fontFamily: FONT.display, fontSize: 13, color: m.dead ? TONE.muted : TONE.text, display: 'flex', alignItems: 'center', gap: 5 }}>
-              {m.dead && <Skull aria-label={t('gameFrame.questWindow.dead')} style={{ width: 13, height: 13, color: TONE.death }} />}
-              {m.name}
-            </span>
-            <span aria-hidden style={{ height: 5, borderRadius: 3, background: 'color-mix(in srgb, var(--skin-text-muted) 25%, transparent)', overflow: 'hidden' }}>
-              <span style={{ display: 'block', height: '100%', width: `${pct * 100}%`, background: tone, transition: 'width 400ms ease-out' }} />
-            </span>
-            <span style={{ fontFamily: FONT.display, fontSize: 12, textAlign: 'right', color: tone, fontVariantNumeric: 'tabular-nums' }}>
-              {Math.max(0, m.hp)}/{m.maxHp}
-            </span>
-          </div>
+          <PgCard
+            key={m.id}
+            workerId={m.id}
+            label={resident ? formatResidentLabel(resident) : m.name}
+            hp={Math.max(0, m.hp)}
+            maxHp={m.maxHp}
+            fatigue={resident?.fatigue ?? 0}
+            portraitUrl={getResidentPortraitUrl(resident)}
+            statusLabel={t(`roster.status.${statusKey}`)}
+            disabled={m.dead}
+            horizontal
+          />
         );
       })}
     </>
