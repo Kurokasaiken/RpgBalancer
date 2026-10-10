@@ -1,9 +1,9 @@
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDndContext, useDroppable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import PoiMatericV3_5, { poiMatericV3_5Styles } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import type { PoiState, PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
-import type { QuestAvailability } from './questAvailability';
+import { EXPIRING_BELOW, type QuestAvailability } from './questAvailability';
 import { usePoiTypeIcon } from './usePoiTypeIcon';
 
 /**
@@ -48,37 +48,39 @@ export const MAP_QUEST_POI_TARGET = '[data-map-quest-poi-target]';
  * written by `activityProgress`, which advances with the game clock (paused when the
  * clock is paused, faster at ×2/×4).
  */
-/** Gap between the marker and its deadline ring, and the ring's stroke, in px. */
-const RING_GAP_PX = 7;
-const RING_STROKE_PX = 4;
 /** How long an expired opportunity takes to fade away. */
 export const EXPIRE_FADE_MS = 700;
 /** How long a new quest takes to ease in. */
-const ENTER_MS = 800;
+export const ENTER_MS = 800;
 
 /** How the marker's seal reads for each stage of the quest (see `mapQuestPoiView`). */
 export interface MapQuestPoiView {
   /** Marker state passed to `PoiMatericV3_5` — always a progress-driven one, never `available`. */
   state: PoiState;
-  /** Seal fill 0..1: the run's clock, not the opportunity's. */
+  /** Seal fill 0..1: the run's clock — or, while `expiring`, the share of the deadline stretch still left. */
   progress: number;
-  /** The deadline ring only appears while the open window is about to lapse. */
+  /** The offer's window is in its last stretch — the seal itself carries the warn countdown. */
   deadlineWarn: boolean;
+  /** Writing direction: a running quest fills clockwise, an expiring offer drains counter-clockwise. */
+  direction: 'clockwise' | 'counterclockwise';
 }
 
 /**
  * Maps the quest session to what the marker draws (poi_spec scenario 5 +
- * poi_family_spec S-004): a quest POI that is only `available` is inert — bare
- * medallion, no arcane ring, it ignores time. The seal starts writing itself
- * once the expedition is actually running (`in_progress` requires every
- * required slot filled and the Start fired while the clock runs), it tracks
- * `activityProgress`, and it stays whole once the run has ended.
+ * poi_family_spec S-004 + poi_cooldown_spec §visual contract): a quest POI that
+ * is only `available` is inert — bare medallion, no arcane ring, it ignores
+ * time. The seal starts writing itself once the expedition is actually running
+ * (`in_progress` requires every required slot filled and the Start fired while
+ * the clock runs), it tracks `activityProgress`, and it stays whole once the
+ * run has ended.
  *
  * `state` is never `available`/`new` because the marker family reads those as
  * "seal fully drawn" — the opposite of an unstarted quest. The deadline is a
- * different clock (the opportunity's window, already counted in the ledger): it
- * surfaces as the liquid ring only in its last stretch, warn-coloured, so an
- * idle POI never shows a halo that fills on time alone.
+ * different clock (the opportunity's window, already counted in the ledger):
+ * in its last stretch (`expiring`) the seal itself becomes the countdown — it
+ * appears whole when the flag lands, warn-coloured, and unwrites itself
+ * counter-clockwise to zero at the deadline, so an idle POI never shows a halo
+ * that fills on time alone.
  */
 export function mapQuestPoiView(
   questStatus: 'available' | 'in_progress' | 'completed' | 'failed',
@@ -86,106 +88,26 @@ export function mapQuestPoiView(
   availability: QuestAvailability | undefined,
 ): MapQuestPoiView {
   const deadlineState = questStatus === 'available' ? availability?.state : undefined;
+  if (deadlineState === 'expired') {
+    return { state: 'expired', progress: 0, deadlineWarn: true, direction: 'counterclockwise' };
+  }
+  if (deadlineState === 'expiring') {
+    /* The expiring stretch re-normalises to a full ring: the flag lands at
+     * `EXPIRING_BELOW` of the window left, so the warn seal appears whole and
+     * drains to zero exactly at the deadline. */
+    return {
+      state: 'expiring',
+      progress: (availability?.progress ?? 0) / EXPIRING_BELOW,
+      deadlineWarn: true,
+      direction: 'counterclockwise',
+    };
+  }
   return {
-    state: deadlineState === 'expired' ? 'expired' : 'assigned',
+    state: 'assigned',
     progress: questStatus === 'in_progress' ? activityProgress : questStatus === 'available' ? 0 : 1,
-    deadlineWarn: deadlineState === 'expiring' || deadlineState === 'expired',
+    deadlineWarn: false,
+    direction: 'clockwise',
   };
-}
-
-/**
- * The deadline halo: no track, it appears with the liquid. The game clock only moves in ticks, so
- * the fill is extrapolated between them (rate learned from the last two ticks, held to one tick of
- * lead and frozen while paused) and eased, then written straight to the SVG each frame: it flows
- * instead of stepping, and costs no React renders.
- */
-function LiquidHalo({
-  target,
-  running,
-  warn,
-  ringPx,
-  ringR,
-  offset,
-}: {
-  target: number;
-  running: boolean;
-  warn: boolean;
-  ringPx: number;
-  ringR: number;
-  offset: number;
-}) {
-  const uid = useId().replace(/:/g, '');
-  const arc = useRef<SVGCircleElement>(null);
-  const glow = useRef<SVGCircleElement>(null);
-  const bead = useRef<SVGCircleElement>(null);
-  const clock = useRef({ target, at: performance.now(), rate: 0, interval: 1000, shown: target });
-
-  useEffect(() => {
-    const c = clock.current;
-    if (target === c.target) return;
-    const now = performance.now();
-    const dt = Math.min(4000, Math.max(50, now - c.at));
-    c.rate = (target - c.target) / dt;
-    c.interval = c.interval * 0.5 + dt * 0.5;
-    c.target = target;
-    c.at = now;
-  }, [target]);
-
-  useEffect(() => {
-    const centre = ringPx / 2;
-    const paint = (shown: number, time: number) => {
-      const dash = `${(shown * 100).toFixed(3)} 100`;
-      arc.current?.setAttribute('stroke-dasharray', dash);
-      glow.current?.setAttribute('stroke-dasharray', dash);
-      const angle = (-90 + shown * 360) * (Math.PI / 180);
-      const head = bead.current;
-      if (head) {
-        head.setAttribute('cx', (centre + ringR * Math.cos(angle)).toFixed(2));
-        head.setAttribute('cy', (centre + ringR * Math.sin(angle)).toFixed(2));
-        head.setAttribute('r', (RING_STROKE_PX * 0.8 * (1 + 0.14 * Math.sin(time / 230))).toFixed(2));
-        head.setAttribute('opacity', shown > 0.004 ? '1' : '0');
-      }
-      const visible = shown > 0.004 ? '1' : '0';
-      arc.current?.setAttribute('opacity', visible);
-      glow.current?.setAttribute('opacity', shown > 0.004 ? '0.4' : '0');
-    };
-    let frame = 0;
-    let last = performance.now();
-    const tick = (time: number) => {
-      const dt = Math.min(100, time - last);
-      last = time;
-      const c = clock.current;
-      const lead = running ? Math.min(time - c.at, c.interval) * c.rate : 0;
-      const goal = Math.min(1, Math.max(0, c.target + lead));
-      c.shown += (goal - c.shown) * (1 - Math.exp(-dt / 140));
-      paint(c.shown, time);
-      frame = requestAnimationFrame(tick);
-    };
-    paint(clock.current.shown, last);
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [running, ringPx, ringR]);
-
-  const colour = warn ? 'var(--skin-status-unmet)' : 'var(--skin-icon-color)';
-  const common = { cx: ringPx / 2, cy: ringPx / 2, r: ringR, fill: 'none', pathLength: 100, strokeLinecap: 'round' as const, transform: `rotate(-90 ${ringPx / 2} ${ringPx / 2})` };
-  return (
-    <svg
-      aria-hidden="true"
-      width={ringPx}
-      height={ringPx}
-      viewBox={`0 0 ${ringPx} ${ringPx}`}
-      style={{ position: 'absolute', left: -offset, top: -offset, pointerEvents: 'none', overflow: 'visible' }}
-    >
-      <defs>
-        <filter id={`halo-${uid}`} x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="2.6" />
-        </filter>
-      </defs>
-      <circle ref={glow} {...common} strokeWidth={RING_STROKE_PX * 2.4} strokeDasharray="0 100" opacity="0" filter={`url(#halo-${uid})`} style={{ stroke: colour, transition: 'stroke 400ms ease-out' }} />
-      <circle ref={arc} {...common} strokeWidth={RING_STROKE_PX} strokeDasharray="0 100" opacity="0" style={{ stroke: colour, transition: 'stroke 400ms ease-out' }} />
-      <circle ref={bead} cx={ringPx / 2} cy={ringPx / 2 - ringR} r={RING_STROKE_PX * 0.8} opacity="0" style={{ fill: colour, transition: 'fill 400ms ease-out' }} />
-    </svg>
-  );
 }
 
 export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, availability, poiType = 'quest' }) => {
@@ -207,15 +129,10 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
   const isDragActive = Boolean(active || draggingResidentId);
 
   // While the quest is open the marker stays bare (its seal is the run's clock, unwritten until
-  // embark); the liquid halo speaks only for the window's last stretch — warn, not progress.
-  const deadline = questStatus === 'available' && availability ? availability : null;
+  // embark); in the window's last stretch the seal itself becomes the warn countdown.
   const view = mapQuestPoiView(questStatus, activityProgress, availability);
   const { state, progress } = view;
-  const expired = deadline?.state === 'expired';
-  const elapsed = deadline ? 1 - deadline.progress : 0;
-  const running = !session.gameplay.state.isPaused;
-  const ringPx = sizePx + RING_GAP_PX * 2;
-  const ringR = ringPx / 2 - RING_STROKE_PX;
+  const expired = state === 'expired';
 
   return (
     <div
@@ -272,15 +189,12 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
           />
         )}
         <style>{`@keyframes mqp-decision-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }`}</style>
-        {deadline && view.deadlineWarn && (
-          <LiquidHalo target={elapsed} running={running} warn ringPx={ringPx} ringR={ringR} offset={RING_GAP_PX} />
-        )}
         <PoiMatericV3_5
           type={poiType}
           iconUrl={iconUrl}
           state={state}
           progress={progress}
-          timerDirection="clockwise"
+          timerDirection={view.direction}
           size={sizePx}
           grounded
           isDragging={isDragActive && canAcceptPoiDrop}

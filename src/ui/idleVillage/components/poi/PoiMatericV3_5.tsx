@@ -2,6 +2,7 @@ import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '@/localization/useTranslation';
 import { getDefaultPoiColors } from '@/balancing/config/idleVillage/poiColorConfig';
 import { POI_MATERIC_V4_TOKENS } from '@/balancing/config/idleVillage/poiMatericV4Tokens';
+import { BASE_SKIN_CSS_VARS } from '@/ui/idleVillage/skins/skinCssVariables';
 import type { PoiMarkerProps } from './PoiMarker';
 
 export interface PoiMatericV3_5Props extends PoiMarkerProps {
@@ -33,6 +34,11 @@ const LETTERS: string[] = [
   'M -2.2,-1.5 L 2.2,-1.5 Q 2.2,3.5 0,3.5 Q -2.2,3.5 -2.2,-1.5 M -1,-4.2 A 0.7 0.7 0 1 1 -1 -2.8 A 0.7 0.7 0 1 1 -1 -4.2 M 1,-4.2 A 0.7 0.7 0 1 1 1 -2.8 A 0.7 0.7 0 1 1 1 -4.2',
 ];
 const RIM_LETTER_COUNT = 24;
+
+/** Warn accent of the deadline countdown — the skin's `--skin-status-unmet` token. */
+const WARN_ACCENT = BASE_SKIN_CSS_VARS['--skin-status-unmet'] ?? '#d98a4a';
+/** Lightened shade of the warn accent for the crisp letter core (keeps the countdown readable). */
+const WARN_ACCENT_LIGHT = '#ffe1b8';
 
 const T4 = POI_MATERIC_V4_TOKENS;
 
@@ -265,13 +271,20 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
 
   // MAGIC CIRCLE: written by the passage of time.
   const isExpired = state === 'expired';
+  /* `expiring` = the deadline countdown (poi_cooldown_spec): the seal reads in
+   * the warn palette — amber instead of the medallion gold — and unwrites
+   * counter-clockwise (the caller pairs it with `timerDirection`). */
+  const isExpiring = state === 'expiring';
   const ccw = timerDirection === 'counterclockwise';
   const sweep: Sweep = ccw ? -1 : 1;
   const sealProgress = isExpired ? 0 : state === 'available' || state === 'new' ? 1 : clamp(progress);
 
   const geo = T4.geometry;
   const alloyMid = ringMid;
-  const [gr, gg, gb] = channels(ringMid);
+  const sealLight = isExpiring ? WARN_ACCENT : ringLight;
+  const sealMid = isExpiring ? WARN_ACCENT : ringMid;
+  const sealInk = isExpiring ? WARN_ACCENT_LIGHT : T4.seal.coreInk;
+  const [gr, gg, gb] = channels(isExpiring ? WARN_ACCENT : ringMid);
 
   const upperBand = useMemo(
     () => buildBand(geo.sealUpperBand, false, sealProgress * T4.seal.letterCount, sweep),
@@ -407,7 +420,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
       role="img"
       data-testid={dataTestId}
       aria-label={t('idleVillage:medalOverlay.ariaLabel', { defaultValue: 'Resident medal' })}
-      className={`poiv3_5 tok-svg ${className}${burst > 0.001 ? ' poiv3_5--burst' : ''}`}
+      className={`poiv3_5 tok-svg ${className}${burst > 0.001 ? ' poiv3_5--burst' : ''}${isExpiring ? ' poiv3_5--expiring' : ''}`}
       onClick={onClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
@@ -417,7 +430,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
         width: `${sizePx}px`,
         height: `${sizePx}px`,
         visibility: 'visible',
-        '--poi-accent-rgb': `${r}, ${greenCh}, ${b}`,
+        '--poi-accent-rgb': isExpiring ? hexToRgb(WARN_ACCENT) : `${r}, ${greenCh}, ${b}`,
         ...style,
       } as React.CSSProperties}
     >
@@ -551,9 +564,9 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
 
             {/* Meniscus bead for V4 seal. */}
             <radialGradient id={gid('bead')} cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor={T4.seal.coreInk} stopOpacity="0.95" />
-              <stop offset="45%" stopColor={ringLight} stopOpacity="0.55" />
-              <stop offset="100%" stopColor={ringMid} stopOpacity="0" />
+              <stop offset="0%" stopColor={sealInk} stopOpacity="0.95" />
+              <stop offset="45%" stopColor={sealLight} stopOpacity="0.55" />
+              <stop offset="100%" stopColor={sealMid} stopOpacity="0" />
             </radialGradient>
 
             {/* Bloom for V4 seal: derived from SourceAlpha so it never inherits the ink. */}
@@ -613,7 +626,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                     <path
                       d={sealArcPath(radius, sealProgress, sweep)}
                       fill="none"
-                      stroke={ringLight}
+                      stroke={sealLight}
                       strokeOpacity={T4.seal.flow.settledOpacity}
                       strokeWidth={T4.seal.railWidth}
                       strokeLinecap="butt"
@@ -624,7 +637,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                         key={`wake-${radius}-${i}`}
                         d={sealArcSpan(radius, wakeStart + (sealProgress - wakeStart) * step, sealProgress, sweep)}
                         fill="none"
-                        stroke={ringLight}
+                        stroke={sealLight}
                         strokeOpacity={0.16}
                         strokeWidth={T4.seal.railWidth}
                         strokeLinecap="butt"
@@ -634,7 +647,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                     <path
                       d={sealArcSpan(radius, headStart, sealProgress, sweep)}
                       fill="none"
-                      stroke={ringLight}
+                      stroke={sealLight}
                       strokeWidth={T4.seal.railWidth * 1.15}
                       strokeLinecap="butt"
                       vectorEffect="non-scaling-stroke"
@@ -653,7 +666,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                           c.lit
                         }
                       >
-                        <path d={T4.cardinals.path} fill={ringLight} />
+                        <path d={T4.cardinals.path} fill={sealLight} />
                       </g>
                     ),
                 )}
@@ -672,7 +685,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                       <path
                         d={l.d}
                         fill="none"
-                        stroke={ringMid}
+                        stroke={sealMid}
                         strokeOpacity={
                           (T4.seal.flow.settledOpacity + (1 - T4.seal.flow.settledOpacity) * flare(l.age)) *
                           reveal(l.age)
@@ -693,7 +706,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                     key={`core-rail-${radius}`}
                     d={sealArcPath(radius, sealProgress, sweep)}
                     fill="none"
-                    stroke={ringLight}
+                    stroke={sealLight}
                     strokeWidth={T4.seal.coreRailWidth}
                     strokeLinecap="butt"
                     vectorEffect="non-scaling-stroke"
@@ -707,7 +720,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                         transform={`translate(${c.x.toFixed(2)} ${c.y.toFixed(2)}) scale(${T4.cardinals.coreScale})`}
                         opacity={c.lit}
                       >
-                        <path d={T4.cardinals.path} fill={T4.seal.coreInk} />
+                        <path d={T4.cardinals.path} fill={sealInk} />
                       </g>
                     ),
                 )}
@@ -718,7 +731,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                       <path
                         d={l.d}
                         fill="none"
-                        stroke={T4.seal.coreInk}
+                        stroke={sealInk}
                         strokeOpacity={(0.72 + 0.28 * flare(l.age)) * reveal(l.age)}
                         strokeWidth={T4.seal.coreLetterWidth * (1 + 0.3 * flare(l.age))}
                         strokeLinecap="round"
@@ -1017,6 +1030,11 @@ export const poiMatericV3_5Styles = `
 .poiv3_5__gem { transition: transform 250ms ease, filter 250ms ease; }
 .poiv3_5:hover .poiv3_5__gem { transform: translateX(-50%) scale(1.08); filter: brightness(1.15); }
 .poiv3_5__specular { transition: transform 80ms ease-out; }
+/* Deadline countdown (expiring): a slow readable breath on the seal — C-004 wants
+   a pulse near expiration, not a continuous strobe. */
+.poiv3_5--expiring .poiv3_5__seal-halo,
+.poiv3_5--expiring .poiv3_5__seal-core { animation: poiv3_5-expiring-breath 2.8s ease-in-out infinite; }
+@keyframes poiv3_5-expiring-breath { 0%,100% { opacity: 1; } 50% { opacity: 0.62; } }
 .poiv3_5__vignette {
   position: absolute;
   left: 50%;

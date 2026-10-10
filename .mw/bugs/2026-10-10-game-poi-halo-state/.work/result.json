@@ -1,0 +1,34 @@
+{
+  "bug": "game-poi-halo-state",
+  "date": "2026-10-10",
+  "status": "fixed-verified",
+  "rootCause": "POI expedition reali pushati negli anchors senza gate (sempre in mappa); MapDemoPoi con state='available' progress=1 (sigillo pieno); MapQuestPoi con timerDirection fisso clockwise + LiquidHalo separato orario; 'expiring' senza palette warn nel primitivo V3_5",
+  "fix": "mapQuestPoiView → {state, progress, deadlineWarn, direction}: offerta fresca = assigned+0 orario (halo vuota); expiring = stato semantico expiring, progress=stretch rinormalizzato (piena→0), antiorario, palette warn (--skin-status-unmet) + breath C-004; expired = fade. Anchors gated su questShown (Director «Mostra quest») o run attiva; mock city-rats fuori mappa; hook E2E revealQuestPois per ?capture=1",
+  "filesChanged": [
+    "src/pages/game-frame-pixi.tsx (reveal gate, useCallback offerAvailability, hook revealQuestPois, extraEvents goblin, mock rimosso dalla mappa)",
+    "src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx (view model state/direction, via LiquidHalo)",
+    "src/ui/idleVillage/components/gameFrame/MapDemoPoi.tsx (assigned+0 orario + entrata)",
+    "src/ui/idleVillage/components/poi/PoiMatericV3_5.tsx (palette warn expiring + breath)",
+    "src/ui/idleVillage/types/IdleVillageTestHooks.ts (revealQuestPois)",
+    "tests/unit/idleVillage/mapQuestPoi.test.ts (8 test: direction, soglia expiring, ccw)",
+    "tests/e2e/idleVillage/gameQuestLifecycle.spec.ts (boot test + reveal helper)",
+    "tests/e2e/idleVillage/gameQuestExpedition.spec.ts (test reveal + halo vuota)",
+    "tests/e2e/idleVillage/steamCapture.spec.ts + steamCaptureVideo.spec.ts (reveal hook in capture=1)",
+    "RICHIESTE.md (R-124), agent_assignments.md (riga R-124)",
+    "test-results/r124-poi-halo-reveal-2026-10-10.log"
+  ],
+  "verification": {
+    "liveFE": [
+      "boot /game e /game?capture=1: 0 marker montati",
+      "Director F10 + «Show quest»: poi-goblin + poi-rovine compaiono, status available, sigillo VUOTO (0 path disegnati)",
+      "advanceTicks → finestra expiring: classe poiv3_5--expiring + accent warn 217,138,74 (#d98a4a vs oro 240,207,106) + arc sweep flag 0 (antiorario) — screenshot r124-expiring-live",
+      "scaduta la finestra senza run: i POI escono dalla mappa; una run attiva resta pinnata",
+      "«Start goblin quest» (R-123 demoLaunch): run in_progress su path canonico intatto",
+      "marker lab: cella expiring con accent warn + breath"
+    ],
+    "unit": "mapQuestPoi.test.ts 8/8 PASS (vuota-orario, soglia expiring→1, warn ccw, expired fade, in_progress cw)",
+    "lint": "0 errors (warnings preesistenti su file)",
+    "buildCheck": "PASS (22:1x) — test-results/build-check-2026-10-10.log",
+    "kanbanLint": "PASS — 38 prompt validati"
+  }
+}

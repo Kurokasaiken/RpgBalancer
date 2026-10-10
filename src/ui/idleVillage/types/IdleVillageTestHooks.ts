@@ -235,4 +235,10 @@ export interface IdleVillageTestHooks {
    * Toggles rest mode on/off.
    */
   toggleRestMode?: (enabled: boolean) => void;
+  /**
+   * Reveals the real quest offers on the `/game` map, exactly like the
+   * Director's «Mostra quest» action — the E2E seam for `?capture=1`, where
+   * the panel itself is hidden (R-124: no POI mounts before this beat).
+   */
+  revealQuestPois?: () => void;
 }
