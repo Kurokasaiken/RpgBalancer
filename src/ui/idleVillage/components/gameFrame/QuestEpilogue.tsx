@@ -114,7 +114,7 @@ export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario }) =
         const Icon = SECTION_ICON[section.id];
         const tone = TONE[SECTION_TONE[section.id] ?? 'label'];
         return (
-          <div key={section.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <div key={section.id} data-epilogue-section={section.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
             <Icon aria-hidden style={{ width: 14, height: 14, marginTop: 2, flexShrink: 0, color: tone }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
               <span
