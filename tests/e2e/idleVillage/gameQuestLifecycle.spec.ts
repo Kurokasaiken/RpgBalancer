@@ -117,6 +117,13 @@ const goldReadoutValue = async (page: Page): Promise<number> => {
   return Number(digits);
 };
 
+/** Settlement contract on gold: `rewardResolved` pays out only on the
+ *  'reward' outcome; the loot the run carried home survives every ending
+ *  except a wipe. Same formula wherever the launch came from. */
+const expectedGoldDelta = (terminal: RunShape) =>
+  (terminal.outcome === 'reward' ? terminal.resolvedOffer?.rewardResolved ?? 0 : 0) +
+  (terminal.outcome === 'wipe' ? 0 : terminal.gold ?? 0);
+
 /** Click the real POI marker on the map — the same path a player takes. */
 const openGoblinDetailViaMap = async (page: Page) => {
   await expect(poiMarker(page)).toBeVisible({ timeout: 15_000 });
@@ -404,6 +411,14 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
     expect(terminal.ended).toBe(true);
     expect(['reward', 'survived', 'fled', 'wipe']).toContain(terminal.outcome);
 
+    /* Congela il clock SUBITO: le ferite guariscono dopo
+     *  `QUEST_SETTLEMENT.woundRecoveryTicks` (5) tick, e flushBeatTheatre
+     *  da solo può bruciarne di più — su clock vivo la lettura dei destini
+     *  sotto corre contro lo scadere dell'infortunio. In pausa lo snapshot
+     *  non può scadere mentre lo leggiamo. */
+    await pauseToggle(page).click();
+    await expect(pauseToggle(page)).toHaveAttribute('aria-checked', 'true');
+
     /* Il teatro dei beat replaya gli eventi committati: Enter li skipa
      *  finché il rapporto non offre «Chiudi». Il POI è ancora sulla mappa
      *  (completed/failed) finché il report non viene dismissato. */
@@ -418,9 +433,18 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
     /* La release del loadout è modellata come effetto del piano. */
     expect(settlement?.plan.effects.some((e) => e.kind === 'loadout-release')).toBe(true);
 
-    /* Destini come dati: morti e feriti scritti nell'aggregato villaggio. */
+    /* Destini come dati: il piano dichiara l'effetto (contratto
+     *  deterministico) e l'aggregato villaggio lo riflette (clock fermo,
+     *  quindi la ferita non può essere ancora sanata). */
     const villageAfter = await expedition<VillageShape>(page, 'getVillage');
     for (const member of terminal.party) {
+      const expectedKind = member.dead ? 'resident-dead' : member.wounded ? 'resident-wounded' : null;
+      if (expectedKind) {
+        expect(
+          settlement?.plan.effects.some((e) => e.kind === expectedKind && e.residentId === member.id),
+          `plan effects has ${expectedKind} for ${member.id}`,
+        ).toBe(true);
+      }
       const res = villageAfter.residents.find((r) => r.id === member.id);
       expect(res, `resident ${member.id} in roster`).toBeTruthy();
       if (member.dead) expect(res!.isDead).toBe(true);
@@ -428,9 +452,7 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
     }
     /* Delta fungibile esatto: rewardResolved solo su 'reward', il bottino
      *  torna a meno di wipe. */
-    const expectedGold =
-      (terminal.outcome === 'reward' ? terminal.resolvedOffer?.rewardResolved ?? 0 : 0) +
-      (terminal.outcome === 'wipe' ? 0 : terminal.gold ?? 0);
+    const expectedGold = expectedGoldDelta(terminal);
     expect(villageAfter.gold - villageBefore.gold).toBe(expectedGold);
 
     /* E il pannello risorse nel ribbon HUD mostra lo stesso delta — la
@@ -503,5 +525,72 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
       VALID_MEMBER,
     );
     expect(eligible.eligible).toBe(true);
+  });
+
+  test('Director «start goblin quest»: stessa pipeline canonica — settle, HUD, consumo POI, reload', async ({ page }) => {
+    /* Il Director è uno strumento dev/playwright (F10). Da quando punta a
+     *  `demoLaunch`, il bottone attraversa la STESSA `send()` del click su
+     *  «Invia spedizione» (offer freeze, party re-validato, riserva
+     *  loadout): questa prova porta quella run fino al consumo del POI —
+     *  l'equivalenza end-to-end, non solo «la finestra si apre». */
+    const villageBefore = await expedition<VillageShape>(page, 'getVillage');
+    const goldReadoutBefore = await goldReadoutValue(page);
+
+    await page.keyboard.press('F10');
+    await expect(page.getByTestId('director-panel')).toBeVisible({ timeout: 10_000 });
+    await page.locator('[data-action-id="questRun"]').click();
+    await page.keyboard.press('F10'); // ripiega il pannello: non deve coprire il report
+
+    /* demoLaunch assegna i primi residenti eleggibili ai soli slot
+     *  required (goblin: il solo leader), poi varca il vero send(). */
+    await page.waitForFunction(
+      (pid) => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
+          | { getRun?: () => { ended?: boolean } | null }
+          | undefined;
+        const r = exp?.getRun?.();
+        return Boolean(r && !r.ended);
+      },
+      POI,
+      { timeout: 20_000 },
+    );
+    await expect(questWindow(page)).toBeVisible({ timeout: 10_000 });
+    await expect(detail(page)).toHaveCount(0);
+    await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('in_progress');
+
+    const run = (await getRun(page))!;
+    expect(run.nodeId.startsWith('gob-')).toBe(true);
+    /* Party reale: ogni membro è un residente del roster seedato — nessun
+     *  preset può materializzarsi qui. */
+    const rosterIds = new Set(villageBefore.residents.map((r) => r.id));
+    expect(run.party.length).toBeGreaterThan(0);
+    for (const m of run.party) expect(rosterIds.has(m.id)).toBe(true);
+
+    const terminal = await driveRunToEnd(page);
+    expect(terminal.ended).toBe(true);
+    await flushBeatTheatre(page);
+    await waitForSettled(page);
+    const settlement = await expedition<SettlementShape | null>(page, 'getSettlement');
+    expect(settlement?.status).toBe('settled');
+    expect(settlement?.plan.outcome).toBe(terminal.outcome);
+
+    /* Stesso contratto di ricompensa del path POI: delta esatto nello
+     *  store e nel readout HUD del ribbon. */
+    const villageAfter = await expedition<VillageShape>(page, 'getVillage');
+    const expectedGold = expectedGoldDelta(terminal);
+    expect(villageAfter.gold - villageBefore.gold).toBe(expectedGold);
+    expect((await goldReadoutValue(page)) - goldReadoutBefore).toBe(expectedGold);
+
+    /* E il POI si consuma come per una quest lanciata dal marker. */
+    await closeReportButton(page).click();
+    await expect(questWindow(page)).toHaveCount(0);
+    await expect(poiMarker(page)).toHaveCount(0);
+    expect(await getRun(page)).toBeNull();
+
+    await page.reload();
+    await waitForHooks(page);
+    await page.waitForTimeout(500); // lascia al compositing della mappa un attimo
+    await expect(poiMarker(page)).toHaveCount(0);
+    expect(await getRun(page)).toBeNull();
   });
 });
