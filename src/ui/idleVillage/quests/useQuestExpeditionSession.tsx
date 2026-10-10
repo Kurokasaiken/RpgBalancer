@@ -479,6 +479,7 @@ export function useQuestExpeditionSession({
       },
       releaseLoadout,
       nowTick: () => useMinimalGameplayStore.getState().state.currentTick,
+      questTitle: scenario?.title,
     })
       .then(() => trackTelemetryEvent('quest_settlement_done', { poiId: poi.id, runId, outcome: run.outcome }))
       .catch((error) =>

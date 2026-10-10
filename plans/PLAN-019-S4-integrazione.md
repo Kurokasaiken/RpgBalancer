@@ -83,17 +83,34 @@ interessanti e invarianti rispettati. Destino delle superfici lab S1 deciso
 
 ## Task
 
-- **T-0 — Audit integrazione.** Per ogni effetto del settlement e ogni stato
-  del loop: verificare *dove* è visibile e *come* agisce oggi su `/game`
-  (roster, drop-validation, eventLog, POI, HUD, game-over). Output: tabella
-  «effetto → visibile? → agisce?» nel piano + lista gap confermata (G1–G8
-  sopra sono ipotesi da validare, non assiomi). Include l'inventario dei dati
-  disponibili per l'epilogo (T-2): quali categorie il settlement già produce
-  (morti, feriti, bottino, oro/xp) e quali sono seam authored (titoli,
-  malattie, lore, informazioni).
-- **T-1 — Il villaggio sa cosa è successo.** Voci `eventLog` per esito quest,
-  caduti, feriti, bottino — i18n, config-first, tono coerente col HUD
-  (ratificato: «va bene nei log»).
+- **T-0 — Audit integrazione.** ✅ **Fatto 2026-10-10.** Tabella
+  «effetto → visibile? → agisce?» in appendice «Audit T-0» sotto.
+  **Esiti principali:** (1) le conseguenze **agiscono** già (feriti/morti
+  esclusi dal lavoro via `status`, guarigione a `injuredUntilTick`, game
+  over `all_injured`) ma **non sono narrate**: `applyPlanToState` non
+  scrive in `eventLog` → T-1 confermato. (2) Epilogo assente: la quest
+  finisce con una riga `outcome` + «Chiudi il rapporto» → T-2 confermato;
+  i dati ci sono già (`run.party` dead/wounded, `run.gold`, `run.xp`,
+  `run.loot`, `run.log` con WOUND/DEATH/LOOT+`source`, `resolvedOffer.
+  rewardResolved`, flags consumabili). (3) **POI già one-shot**:
+  `consumedPoiIds` persistito consuma il POI alla chiusura del rapporto
+  (`game-frame-pixi.tsx` ~337) → T-3 si riduce al flag authored
+  `repeatable` + test. (4) Loadout: gli item usati sono tracciati solo
+  via flags cancellate — per «cose spese/distrutte» serve un record
+  esplicito sul run (T-2).
+- **T-1 — Il villaggio sa cosa è successo.** ✅ **Fatto 2026-10-10.**
+  `applyPlanToState` scrive in `eventLog` (canale ratificato): headline
+  outcome (ledger key `${runId}:log:outcome`, dedup sullo stesso ledger
+  degli effetti — replay mai narra due volte) + una voce per effetto
+  applicato (dead/wounded nominati dal roster, gold reward/loot distinti,
+  xp; `loadout-release` silenzioso). Entry i18n: `messageKey` +
+  `messageParams` (ICU) con `message` fallback; `type` badge
+  (`quest_outcome`/`quest_settlement`) aggiunto allo schema entry —
+  il campo esisteva già nel contratto del panel/test. Severità da
+  `QUEST_SETTLEMENT.logSeverity`; `SettlementPlan.questTitle` passato dal
+  chiamante (`scenario?.title`, niente ciclo import). `ActivityLogPanel`
+  preferisce `t(messageKey, params)` su `message`.
+  Evidence: `test-results/s4-t1-eventlog-2026-10-10.log`.
 - **T-2 — Schermata di epilogo.** Pannello di chiusura spedizione con
   categorie estensibili config-first (D-S4 ratificata): morti, feriti,
   consumabili spesi/distrutti, reward (oro/loot), exp, **titoli**, **malattie**,
@@ -141,3 +158,35 @@ interessanti e invarianti rispettati. Destino delle superfici lab S1 deciso
   in questo piano.
 - Invarianti: config-first/Zod, i18n, primitive esistenti, PersistenceService,
   Zustand per stato dominio, JSDoc, evidence in `test-results/`.
+
+## Appendice — Audit T-0 (2026-10-10)
+
+Verifica per-effetto: il settlement produce questi effetti
+(`deriveSettlementPlan` → `applyPlanToState` → store + ledger dedup).
+
+| Effetto settlement | Agisce? | Visibile oggi? | Gap |
+|---|---|---|---|
+| `resident-dead` → `isDead`, `isWorking=false` | ✅ roster `status:'dead'` (CanonicalRosterBundle merge), drop-validation esclude ≠'available', permanente | ⚠️ parziale — il roster mostra lo status ma niente lo *racconta* | eventLog |
+| `resident-wounded` → `isInjured`, `injuredUntilTick`, `isWorking=false` | ✅ escluso da lavoro/quest, guarisce a `injuredUntilTick` | ⚠️ parziale — idem | eventLog |
+| `village-gold` / `village-xp` | ✅ risorse aggiornate | ⚠️ implicito nei contatori HUD | eventLog |
+| `loadout-release` | ✅ riserva sacca rilasciata | ❌ nessuna traccia | epilogo (T-2) |
+| outcome quest (reward/survived/fled/wipe) | ✅ `questStatus` POI + blocchi sequenziali | ⚠️ solo chip stato sul POI | eventLog + epilogo |
+
+**Loop POI (verificato):** il POI è già **one-shot** — alla chiusura del
+rapporto su run ended+settled, `game-frame-pixi` marca `consumedPoiIds`
+(persistito via PersistenceService) e fa `run.clear()`: il POI esce dalla
+mappa per sempre. T-3 = flag authored `repeatable` su `questPois` che salta
+il consume (i POI ripetibili restano, le quest di default spariscono —
+D-S4-6).
+
+**Inventario dati per l'epilogo (T-2):**
+
+| Categoria epilogo | Fonte oggi | Stato |
+|---|---|---|
+| Morti / feriti | `run.party[].dead/wounded` + `run.log` (WOUND/DEATH con testo authored) | ✅ |
+| Reward | `run.resolvedOffer.rewardResolved` + `run.gold` (bottino separato) | ✅ |
+| Exp | `run.xp` | ✅ |
+| Bottino / loot | `run.loot[]`, `run.bottinoOro` | ✅ |
+| Informazioni scoperte | `run.info[]` | ✅ |
+| Cose spese/distrutte | flags consumabili rimossi dal set iniziale | ⚠️ serve record esplicito (`consumablesUsed` sul run) |
+| Titoli / malattie / lore | — | 🔲 seam authored: `epilogue` opzionale sullo scenario |

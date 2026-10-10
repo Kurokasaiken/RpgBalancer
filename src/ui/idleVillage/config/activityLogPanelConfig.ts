@@ -19,9 +19,24 @@ export const MinimalActivityEntrySchema = z.object({
   id: z.string(),
   timestamp: z.number(),
   severity: z.enum(['info', 'success', 'warning', 'error']),
+  /** Readable fallback text — always present (telemetry, non-i18n renderers,
+   *  legacy entries). Renderers that support i18n prefer `messageKey`. */
   message: z.string(),
+  /**
+   * i18n key (namespace `idleVillage`) for localizable entries — written by
+   * producers that have one (e.g. quest settlement lines). When present,
+   * `t(messageKey, messageParams)` is the canonical display text.
+   */
+  messageKey: z.string().optional(),
+  /** ICU interpolation params for `messageKey` — baked at write time. */
+  messageParams: z.record(z.union([z.string(), z.number()])).optional(),
   residentId: z.string().optional(),
   activityId: z.string().optional(),
+  /**
+   * Entry category badge (e.g. `activity_started`, `quest_settlement`) —
+   * the ActivityLogPanel renders it as a tag; producers set a stable slug.
+   */
+  type: z.string().optional(),
 });
 
 export type MinimalActivityEntry = z.infer<typeof MinimalActivityEntrySchema>;
