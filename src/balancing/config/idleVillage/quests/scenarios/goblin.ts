@@ -410,6 +410,23 @@ export const GOBLIN_SCENARIO_AUTHORED = {
     'Razzia',
     'Ritorno',
   ],
+  /* S4 T-2 epilogue seam — what the return report tells beyond the ledger.
+   *  Grants ride records that already exist: the outcome (a title on a
+   *  victorious return) and authored flavour that always lands. */
+  epilogue: {
+    titles: [
+      {
+        label: 'Sterminatori dei goblin',
+        requiresOutcome: ['reward'],
+      },
+    ],
+    lore: [
+      {
+        label: 'Le ceneri del campo fumano ancora oltre il guado — i carri dei mercanti le vedranno da lontano.',
+        requiresOutcome: ['reward', 'survived'],
+      },
+    ],
+  },
   offer: {
     objective: 'Sterminare il campo dei goblin al guado.',
     tags: ['quest', 'combat', 'goblin'],

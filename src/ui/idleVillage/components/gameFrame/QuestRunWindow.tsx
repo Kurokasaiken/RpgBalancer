@@ -39,6 +39,8 @@ import { DamageFloater, EdgeFlash, Letterbox, TypewriterText, prefersReducedMoti
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import { DEFAULT_QUEST_THEATRE_FX, type QuestTheatreFxConfig } from '@/balancing/config/idleVillage/quests/questTheatreFx';
 import { availableOptions, currentExposure, nextCombatHits, nodesFor, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
+import { QuestEpilogue } from './QuestEpilogue';
 import { useBeatCursor, type BeatTiming, type HarmBeat, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
@@ -75,6 +77,9 @@ export interface QuestRunWindowProps {
   beatTiming: BeatTiming;
   title: string;
   flavour: string;
+  /** The authored scenario — feeds the epilogue's intel labels and grant
+   *  seams (titles/diseases/lore). Optional on lab paths. */
+  scenario?: QuestScenario;
   /** Scene art for a node id. */
   artFor: (nodeId: string) => string | undefined;
   /** 0..1 of the expedition's time on the game clock, plus its readout. */
@@ -104,6 +109,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   beatTiming,
   title,
   flavour,
+  scenario,
   artFor,
   time,
   onChoose,
@@ -350,6 +356,10 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               {t(`questS1Lab.outcome.${run.outcome}`)}
             </p>
           )}
+          {/* S4 T-2: the mandatory return report — the settlement's own
+           *  numbers (cost first, yield after), shown once the run's last
+           *  beat has played. */}
+          {run.ended && !presenting && <QuestEpilogue run={run} scenario={scenario} />}
         </div>
         )}
 

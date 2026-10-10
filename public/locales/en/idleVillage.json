@@ -929,6 +929,22 @@
       "goldLoot": "Loot: +{amount} gold ({quest}).",
       "xp": "Expedition experience: +{amount} XP ({quest})."
     },
+    "questEpilogue": {
+      "title": "Expedition report",
+      "dead": "Fallen",
+      "wounded": "Wounded",
+      "consumed": "Spent and destroyed",
+      "reward": "Reward",
+      "loot": "Loot",
+      "xp": "Experience",
+      "info": "Learned",
+      "titles": "Titles",
+      "diseases": "Diseases",
+      "lore": "Echoes of the place",
+      "goldAmount": "+{amount} gold",
+      "xpAmount": "+{amount} XP",
+      "recovery": "recovers in ~{days} d"
+    },
     "director": {
       "title": "Director",
       "move": "Move",

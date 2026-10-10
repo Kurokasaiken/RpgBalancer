@@ -111,15 +111,23 @@ interessanti e invarianti rispettati. Destino delle superfici lab S1 deciso
   chiamante (`scenario?.title`, niente ciclo import). `ActivityLogPanel`
   preferisce `t(messageKey, params)` su `message`.
   Evidence: `test-results/s4-t1-eventlog-2026-10-10.log`.
-- **T-2 — Schermata di epilogo.** Pannello di chiusura spedizione con
-  categorie estensibili config-first (D-S4 ratificata): morti, feriti,
-  consumabili spesi/distrutti, reward (oro/loot), exp, **titoli**, **malattie**,
-  **informazioni/lore sbloccate**, ecc. — ogni categoria mostrata solo se
-  presente. Le categorie senza sistema oggi (titoli/malattie/lore) sono seam
-  authored nello schema epilogo: lo scenario le dichiara, il renderer le
-  mostra quando arrivano — niente sistemi nuovi finti. Evoluzione dello stato
-  finale di `QuestRunWindow` o pannello dedicato (decide T-0); cuore del
-  gate (b): «avevi previsto X, ecco cosa è successo».
+- **T-2 — Schermata di epilogo.** ✅ **Fatto 2026-10-10.** `QuestEpilogue`
+  dentro `QuestRunWindow` a `run.ended` (dopo l'ultimo beat — il rapporto È
+  lo stato finale, la chiusura resta «Chiudi il rapporto»).
+  `buildQuestEpilogue(run, scenario)` è il modello puro: sezioni ordinate
+  da `QUEST_EPILOGUE.sections` (Zod), mostrate solo se non vuote, numeri
+  presi dal **piano settlement reale** (`run.settlement?.plan ?? derive`)
+  — report e ledger non possono divergere. Sezioni: dead/wounded (nomi dal
+  party + recovery countdown `~Nd` dal roster), consumed
+  (`run.consumablesUsed` — nuovo record motore ai 4 punti di spesa flag:
+  drinkPotion, useHealing, consumable check, `option.consumesFlag`; flag
+  catalogo → `labelKey`, ignoti raw), reward/loot/xp (split per chiave
+  effetto), info (`intelLabels`), **titoli/malattie/lore** = seam authored
+  `ScenarioEpilogueSchema` sullo scenario con grant `requiresFlag`/
+  `requiresOutcome` — `epilogue` in `PRESENTATION_KEYS` (non invalida run).
+  Authored su goblin: titolo «Sterminatori dei goblin» (reward) + lore.
+  Prop `scenario` su QuestRunWindow (mount `/game` + lab page).
+  Evidence: `test-results/s4-t2-epilogue-2026-10-10.log`.
 - **T-3 — Lifecycle POI (D-S4-6).** Campo authored `repeatable` su
   `questPois`: default **one-shot** — quest completata/fallita → offerta
   consumata, non riappare. I POI ripetibili lo dichiarano esplicitamente.

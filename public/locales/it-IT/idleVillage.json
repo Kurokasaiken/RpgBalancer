@@ -936,6 +936,22 @@
       "goldLoot": "Bottino: +{amount} oro ({quest}).",
       "xp": "Esperienza della spedizione: +{amount} PE ({quest})."
     },
+    "questEpilogue": {
+      "title": "Rapporto di spedizione",
+      "dead": "Caduti",
+      "wounded": "Feriti",
+      "consumed": "Spesi e distrutti",
+      "reward": "Ricompensa",
+      "loot": "Bottino",
+      "xp": "Esperienza",
+      "info": "Scoperto",
+      "titles": "Titoli",
+      "diseases": "Malattie",
+      "lore": "Echi del luogo",
+      "goldAmount": "+{amount} oro",
+      "xpAmount": "+{amount} PE",
+      "recovery": "recupero ~{days} g"
+    },
     "director": {
       "title": "Regia",
       "move": "Sposta",
