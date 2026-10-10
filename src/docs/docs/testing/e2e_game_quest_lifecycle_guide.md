@@ -129,7 +129,8 @@ Residenti: hero-sir-spaccaculi  → eleggibile leader/member/bodyguard
 | 5 | `clock: ×4` | delta tick a ×4 ≥ 2× il delta a ×1 |
 | 6 | `lancio` | «Invia» → QuestRunWindow; POI `in_progress`; party contiene il leader; leader `in-expedition` per altri slot |
 | 7 | `run: frontiera` | Frontiera `pending` congelata in pausa, matura a ×4 sul clock reale |
-| 8 | `esito` | Settlement una sola volta: outcome, `loadout-release`, destini residenti come dati, **delta gold esatto nello store E nel readout HUD**, nessun doppio settle dopo tick extra |
+| 8 | `esito` | Settlement una sola volta: outcome, `loadout-release`, destini residenti come dati (piano **+** store, letti a clock in pausa), **delta gold esatto nello store E nel readout HUD**, nessun doppio settle dopo tick extra |
+| 12 | `Director` | Bottone «start goblin quest» del Director panel (F10): `demoLaunch` attraversa la stessa `send()` del click reale → run su grafo goblin, party ⊆ roster, settle + delta gold store/HUD, POI consumato, assente dopo reload |
 | 9 | `PG a casa` | Dopo il settle il leader è ri-assegnabile su rovine (salvo morte); `isDead` coerente |
 | 10 | `chiusura rapporto` | Click «Chiudi» → window chiusa, **marker goblin sparito**, run `null`, rovine intatto |
 | 11 | `reload` | Il POI consumato non torna dopo reload (persistenza `idleVillage.questPois.consumed`); roster operativo |
@@ -203,6 +204,8 @@ la causa e dove intervenire.
 | `villageAfter.gold - before ≠ expected` | Doppio settle, o `rewardResolved`/`gold` loot non applicato come da contratto (reward solo su `reward`; loot perso su `wipe`). | `questSettlement.ts` `applyQuestSettlement`; marker `settling`→`settled` |
 | POI riappare dopo reload | La lista consumed non è persistita/letta. | `idleVillage.questPois.consumed` via `PersistenceService`; filtro anchors in `game-frame-pixi.tsx` |
 | `assignToSlot` ritorna false su residente «giusto» | Gate di elegibilità cambiato (tag requirement dello slot o stat del residente). | `questResidentEligibility`; requirement nello scenario `goblin.ts`; stat nel seed roster |
+| `member.wounded` ma `resident.isInjured` false (flaky) | **Le ferite scadono**: `QUEST_SETTLEMENT.woundRecoveryTicks` = 5 tick, e `tick()` sana i residenti con `injuredUntilTick <= currentTick`. Sul clock vivo, `flushBeatTheatre`+lettura possono bruciare >5 tick. | Mettere in pausa subito dopo `driveRunToEnd` prima di leggere i destini; il contratto deterministico resta nel `settlement.plan.effects` (`resident-wounded`/`resident-dead`) — asserire entrambi. Nota: i feriti RESTANO eleggibili (`assignableStatuses` include `injured`). |
+| Director «start goblin quest» non apre nulla | Il panel è solo dev/playwright (`import.meta.env.DEV \|\| MODE === 'playwright'`) e F10-toggle; `demoLaunch` riempie solo slot **required** coi primi elegibili — se nessuno è eleggibile il detail resta aperto senza lanciare. | `directorEnabled` in `game-frame-pixi.tsx`; `demoLaunch` in `useQuestExpeditionSession`; verifica che esista un residente eleggibile per `goblin-slot-leader` (edge\|fortitude). |
 | `waiting frontier without options` | Il nodo è waiting ma `getOptions` è vuoto: scena senza opzioni raggiungibili (config rotta). | `availableOptions(run)`; opzioni del nodo nello scenario |
 | Marker mai `available` al boot | Il seed POI non è caricato o è filtrato come consumed residuo da una run precedente. | Seed POI; pulizia storage del context Playwright (ogni test parte da context pulito) |
 
