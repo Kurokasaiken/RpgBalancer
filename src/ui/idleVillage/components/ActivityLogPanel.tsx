@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { resolveHudToken } from '@/ui/idleVillage/tokens/minimalHudTokens';
 import {
@@ -33,11 +34,21 @@ const ActivityLogPanel: React.FC<ActivityLogPanelProps> = ({
   onSelect,
   config: customConfig,
 }) => {
+  const { t } = useTranslation('idleVillage');
+
   // Merge custom config with defaults
   const config = useMemo(
     () => ({ ...defaultActivityLogPanelConfig, ...customConfig }),
     [customConfig]
   );
+
+  /**
+   * Display text for an entry — `messageKey` + `messageParams` (i18n,
+   * written by newer producers like quest settlement) wins over the
+   * baked `message` fallback.
+   */
+  const entryText = (entry: MinimalActivityEntry): string =>
+    entry.messageKey ? t(entry.messageKey, entry.messageParams) : entry.message;
 
   // Limit entries to maxEntries
   const displayEntries = useMemo(
@@ -132,7 +143,7 @@ const ActivityLogPanel: React.FC<ActivityLogPanelProps> = ({
               key={entry.id}
               role="button"
               tabIndex={onSelect ? 0 : -1}
-              aria-label={`${config.ariaLabels.entryLabel}: ${entry.message}`}
+              aria-label={`${config.ariaLabels.entryLabel}: ${entryText(entry)}`}
               onClick={() => handleEntryClick(entry)}
               onKeyDown={(e) => {
                 if ((e.key === 'Enter' || e.key === ' ') && onSelect) {
@@ -184,7 +195,7 @@ const ActivityLogPanel: React.FC<ActivityLogPanelProps> = ({
                     marginBottom: '0.25rem',
                   }}
                 >
-                  {entry.message}
+                  {entryText(entry)}
                 </div>
 
                 <div
