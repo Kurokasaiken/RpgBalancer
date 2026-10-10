@@ -23,15 +23,32 @@ import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import {
   GENERATED_CATALOG,
+  MINIERA_RACE_KIT,
   RACE_TO_MARSH_SCENARIO,
   RACE_TO_PASS_SCENARIO,
   generateRaceScenario,
   PALUDE_KIT,
+  PASSO_MONTANO_KIT,
 } from '@/balancing/config/idleVillage/quests/generation/catalog';
+import type { RaceDomainKit } from '@/balancing/config/idleVillage/quests/generation/raceGimmick';
 import { generateRaceToPass } from '@/balancing/config/idleVillage/quests/generation/raceToPass';
 
 /** Only the gara-di-avanzamento entries of the catalog (excludes other gimmicks). */
 const RACE_SCENARIOS = Object.values(GENERATED_CATALOG).filter((s) => s.id.startsWith('gen-race-'));
+
+/** Domain kits keyed by their domain tag — a race scenario's id is
+ *  `gen-race-${kit.id}`, so the kit for a catalog entry is a lookup,
+ *  not a hardcoded pair. */
+const RACE_KITS: Readonly<Record<string, RaceDomainKit>> = Object.fromEntries(
+  [PASSO_MONTANO_KIT, PALUDE_KIT, MINIERA_RACE_KIT].map((k) => [k.id, k]),
+);
+
+/** The kit backing a race catalog scenario, derived from its id. */
+const kitFor = (scenarioId: string): RaceDomainKit => {
+  const kit = RACE_KITS[scenarioId.replace('gen-race-', '')];
+  if (!kit) throw new Error(`no race kit registered for ${scenarioId}`);
+  return kit;
+};
 
 /* ------------------------------------------------------------------ */
 /* Fixtures                                                            */
@@ -160,11 +177,10 @@ describe('generated run — gen profile', () => {
     ).toThrow(/gen.*ScenarioInstance/);
   });
 
-  it('the Scavezzacollo armRoll gates the twist arming (both kits)', () => {
-    const scenarios = [
-      generateRaceToPass({ twistChance: 100 }),
-      generateRaceScenario(PALUDE_KIT, { twistChance: 100 }),
-    ];
+  it('the Scavezzacollo armRoll gates the twist arming (all kits)', () => {
+    const scenarios = Object.values(RACE_KITS).map((kit) =>
+      generateRaceScenario(kit, { twistChance: 100 }),
+    );
     for (const scenario of scenarios) {
       const instance = genInstance(scenario);
       const reckless = createRun({
@@ -269,9 +285,7 @@ describe('generated run — race dynamics', () => {
   it('the armed twist diverts the route to the imboscata (both kits)', () => {
     for (const scenario of RACE_SCENARIOS) {
       const instance = createInstance(
-        scenario.id === 'gen-race-passo-montano'
-          ? generateRaceToPass({ twistChance: 100 })
-          : generateRaceScenario(PALUDE_KIT, { twistChance: 100 }),
+        generateRaceScenario(kitFor(scenario.id), { twistChance: 100 }),
         { dangerScale: 1, rewardScale: 1 },
         'gen',
       );
