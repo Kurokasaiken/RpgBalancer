@@ -167,9 +167,19 @@ simulazione usata è dichiarata nella UI («ipotesi: percorso X, consumabili Y»
   record persistito reale, close/reopen in-memory, restore post-reload con
   seed della chiave del giorno corrente (il clock gira live e l'autosave è
   ≥30s: il legame giorno-chiave non è allineabile in-test — documentato).
-- **T-4 — Preview check certi.** Pannello per-check (primaria, chance
-  puntuale sul party assegnato) coerente col resolver: test che il check
-  certo simulato ha la stessa chance dichiarata.
+- **T-4 — Preview + authoring pass (ridiretto Director 2026-10-10).**
+  Il pannello pre-lancio mostra il forecast **aggregato e orientativo** del
+  party (% successo / ferita / morte — già live da T-2); **non** rivela la
+  strada vera né chance puntuali per check: il risultato dipende da scelte,
+  consumabili e push-your-luck in-run. Il modello `certainChecks` resta
+  (seam per-gate (c)), ma il pannello non è per-check. Contenuto del task:
+  copy pass goblin («Un nascondiglio»→«Tesoro nascosto», titoli scena
+  «Assalto»/«Incalzare», trade-off tesoro reso esplicito nel copy), marker
+  `hidden` sui nodi fuori percorso (icona eye-off + tooltip «Evento
+  nascosto» in caption e titoli dei beat), rimozione di `revealAtPlanning`
+  dallo slot Esploratore — il campo resta nello schema come seam authored
+  ma la sorgente intel sarà un sistema di scouting esterno (edificio/
+  residente esploratore, non esiste su /game): TODO in schema+sessione.
 - **T-5 — Misura dei trade-off (gate a/b preparatorio).** Sweep MC su griglia
   di party plausibili: asserire (i) nessun party domina su tutte le metriche,
   (ii) la varianza tra strategie in-run resta significativa (la quest non è

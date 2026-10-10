@@ -115,6 +115,11 @@ export const QuestSlotSchema = z
      * threshold assigned to this slot unlocks deeper authored intel
      * (`revealHint`s) already at planning — the explorer pays now, not in-run.
      * `reveals` restricts which nodes unlock (default: every authored one).
+     *
+     * TODO(S3, Director 2026-10-10): the intel source must move OFF the
+     * party slots — scouting is an external system (explorer building /
+     * resident — not yet on /game). This field stays as the authored seam
+     * but no canonical slot should carry it until that system exists.
      */
     revealAtPlanning: z
       .object({
@@ -305,6 +310,9 @@ export const QuestNodeSchema = z
     previewHint: z.string().optional(),
     /** Deeper authored hint unlocked only via `revealAtPlanning` slots. */
     revealHint: z.string().optional(),
+    /** Optional/secret node off the main path — presentation marks it as a
+     *  hidden event (icon + tooltip, Director 2026-10-10). */
+    hidden: z.boolean().optional(),
     combat: CombatSpecSchema.optional(),
     failHint: z.string().optional(),
     upfrontDamage: UpfrontDamageSchema.optional(),

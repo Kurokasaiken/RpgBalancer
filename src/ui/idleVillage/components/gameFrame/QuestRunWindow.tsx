@@ -16,9 +16,11 @@ import React, { useEffect, useMemo, useRef, useState, type CSSProperties } from 
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import {
+  Axe,
   Backpack,
   Check,
   CircleHelp,
+  EyeOff,
   Footprints,
   Gem,
   House,
@@ -27,7 +29,6 @@ import {
   ScrollText,
   Skull,
   Swords,
-  Tent,
   Users,
   Wind,
   X,
@@ -49,7 +50,7 @@ import { useHudPanelDrag } from './useHudPanelDrag';
 const VERDICT_TONE: Record<Verdict, 'ok' | 'warn' | 'danger'> = { bigwin: 'ok', win: 'ok', almost: 'warn', fail: 'danger', epicfail: 'danger' };
 
 /** One glyph per authored phase (index = node `beat`). */
-const PHASE_ICONS: LucideIcon[] = [ScrollText, Footprints, Gem, Tent, Swords, Wind, PackageOpen, House];
+const PHASE_ICONS: LucideIcon[] = [ScrollText, Footprints, Gem, Axe, Swords, Wind, PackageOpen, House];
 
 const OUTCOME_TONE: Record<PhaseOutcome, keyof typeof TONE> = { death: 'death', hurt: 'warn', loot: 'label', clean: 'ok' };
 
@@ -117,7 +118,8 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   const { panelStyle, handleProps } = useHudPanelDrag();
   const [minimised, setMinimised] = useState(false);
   const [pop, setPop] = useState<Pop>(null);
-  const node = nodesFor(run)[run.nodeId];
+  const allNodes = nodesFor(run);
+  const node = allNodes[run.nodeId];
   const options = useMemo(() => availableOptions(run), [run]);
   /* Beat replay (T-008): while committed beats are still on stage the window
    *  presents them one at a time and blocks input — the frontier has already
@@ -154,6 +156,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   const currentBeat = phases[phases.length - 1]?.beat ?? 0;
   // The scene's own title, unless it only repeats the quest's: then the phase name.
   const caption = node && !node.title.toLowerCase().includes(title.toLowerCase()) ? node.title : beats[currentBeat] ?? '';
+  const captionHidden = !!node?.hidden && caption === node.title;
 
   // 1–9 pick a choice, as in a dialogue list; never while typing, minimised,
   // or while a beat is still on stage.
@@ -277,7 +280,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
 
         {/* ── Theater — a scene beat cuts the picture to its node; cinematic
             beats close the letterbox over it (T-009). ── */}
-        <Theater src={artFor(beatCursor.current?.kind === 'scene' ? beatCursor.current.nodeId : run.nodeId)} caption={caption} aspect={theaterAspect}>
+        <Theater src={artFor(beatCursor.current?.kind === 'scene' ? beatCursor.current.nodeId : run.nodeId)} caption={caption} hidden={captionHidden} aspect={theaterAspect}>
           <Letterbox
             active={presenting && beatFx.letterbox}
             heightPct={DEFAULT_QUEST_THEATRE_FX.letterbox.heightPct}
@@ -305,6 +308,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         {presenting && beatCursor.current ? (
           <BeatStage
             beat={beatCursor.current}
+            hidden={beatCursor.current.kind === 'scene' ? !!allNodes[beatCursor.current.nodeId]?.hidden : false}
             remaining={beatCursor.remaining}
             onSkip={beatCursor.skip}
             onFlush={beatCursor.flush}
@@ -473,13 +477,15 @@ const Line: React.FC<{ tone: keyof typeof TONE; children: React.ReactNode }> = (
  *  accents: verdict edge flash + typewriter where the config earns them. */
 const BeatStage: React.FC<{
   beat: QuestBeat;
+  /** The beat's node is authored `hidden` — a marker asks for the eye-off glyph. */
+  hidden?: boolean;
   remaining: number;
   onSkip: () => void;
   onFlush: () => void;
   fx: BeatFx;
   fxConfig: QuestTheatreFxConfig;
   reducedMotion: boolean;
-}> = ({ beat, remaining, onSkip, onFlush, fx, fxConfig, reducedMotion }) => {
+}> = ({ beat, hidden, remaining, onSkip, onFlush, fx, fxConfig, reducedMotion }) => {
   const { t } = useTranslation('idleVillage');
   return (
     <div
@@ -507,7 +513,10 @@ const BeatStage: React.FC<{
       )}
       {beat.kind === 'scene' && (
         <>
-          <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>{beat.title}</span>
+          <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+            {hidden && <HiddenMark />}
+            {beat.title}
+          </span>
           {beat.body && (
             <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.5, color: TONE.text }}>
               {fx.typewriter === 'body' ? (
@@ -764,8 +773,20 @@ const CombatStrip: React.FC<{
   );
 };
 
+/** A marker saying «this scene was avoidable — you found the hidden thing»
+ *  (authored `node.hidden`, Director 2026-10-10). Eye-off glyph + tooltip. */
+const HiddenMark: React.FC = () => {
+  const { t } = useTranslation('idleVillage');
+  const label = t('gameFrame.questWindow.hiddenEvent');
+  return (
+    <EyeOff size={12} strokeWidth={2.2} aria-label={label} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 5, opacity: 0.9 }}>
+      <title>{label}</title>
+    </EyeOff>
+  );
+};
+
 /** Cinema-scope picture: cross-fades on a new scene and drifts slowly (Ken Burns). */
-const Theater: React.FC<{ src?: string; caption: string; aspect: number; children?: React.ReactNode }> = ({ src, caption, aspect, children }) => {
+const Theater: React.FC<{ src?: string; caption: string; hidden?: boolean; aspect: number; children?: React.ReactNode }> = ({ src, caption, hidden, aspect, children }) => {
   const img = useRef<HTMLImageElement>(null);
   useEffect(() => {
     // Web Animations, not rAF: the element's own style is the end state, so a frozen
@@ -786,6 +807,7 @@ const Theater: React.FC<{ src?: string; caption: string; aspect: number; childre
       <div aria-hidden style={{ position: 'absolute', insetInline: 0, bottom: 0, height: '55%', background: SCRIM.bottom }} />
       {children}
       <div style={{ position: 'absolute', left: 12, right: 12, bottom: 8, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: 'var(--skin-title-color)', textShadow: 'var(--skin-incision-label)' }}>
+        {hidden && <HiddenMark />}
         {caption}
       </div>
     </div>

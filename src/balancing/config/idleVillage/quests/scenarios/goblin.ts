@@ -104,26 +104,27 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     },
   },
 
-  /* F2 — EVENTO OPZIONALE (bottino): only if PER+FOR succeeded.
-   * DEX: item anyway; fail → 10 dmg + campo allertato (malus F4). */
+  /* F2 — EVENTO NASCOSTO (bottino): only if PER+FOR succeeded.
+   * DEX: item anyway; fail → 10 dmg + campo sveglio (alarm −10pp a F4+). */
   'gob-bottino-scelta': {
     id: 'gob-bottino-scelta',
     kind: 'choice',
-    title: 'Un nascondiglio',
-    body: 'Sotto il masso, un bottino avvolto in stracci. Prenderlo in silenzio costa mano ferma.',
+    title: 'Tesoro nascosto',
+    hidden: true,
+    body: 'Sotto il masso, un bottino avvolto in stracci. Prenderlo in silenzio costa mano ferma — un suono e il campo si sveglia.',
     transit: 'Dietro il masso, una nicchia di stracci: qualcuno ha nascosto qualcosa in fretta e non è più tornato.',
     beat: 2,
     options: [
       {
         id: 'gob-prendi',
         label: 'Prendere il bottino',
-        detail: 'Destrezza. Il rumore può svegliare il campo.',
+        detail: 'Destrezza. Se la mano tradisce, il campo si sveglia.',
         next: 'CHECK:gob-bottino',
       },
       {
         id: 'gob-lascia-bottino',
         label: 'Lasciare stare',
-        detail: 'Nessun rumore, nessun rischio — nessun bottino.',
+        detail: 'Un campo che dorme vale più di un bottino: passate oltre.',
         next: 'gob-accampamento',
       },
     ],
@@ -132,6 +133,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     id: 'gob-bottino',
     kind: 'check',
     title: 'Le mani sul bottino',
+    hidden: true,
     body: 'Catene, campanelli, un nodo da sciogliere senza un suono.',
     stats: ['agi'],
     verdictFlavor: {
@@ -150,7 +152,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-accampamento': {
     id: 'gob-accampamento',
     kind: 'choice',
-    title: 'L’accampamento goblin',
+    title: 'Assalto',
     body: 'Fumi tra le tende. Da qui si colpisce in un modo solo — il vostro.',
     transit: 'Tra le fronde il fumo si fa spesso: l’accampamento è sotto. Da qui si colpisce in un modo solo — e va scelto bene.',
     beat: 3,
@@ -230,7 +232,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-incalzare': {
     id: 'gob-incalzare',
     kind: 'choice',
-    title: 'I goblin fuggono',
+    title: 'Incalzare',
     body: 'I superstiti corrono verso il bosco. Chiuderli qui — o lasciarli andare.',
     transit: 'Polvere e sangue. I goblin che restano spezzano il fronte e corrono verso il bosco, portandosi dietro la vostra faccia.',
     beat: 5,
@@ -401,8 +403,8 @@ export const GOBLIN_SCENARIO_AUTHORED = {
   beats: [
     'Assegnazione',
     'Esplorazione',
-    'Bottino',
-    'Accampamento',
+    'Tesoro',
+    'Assalto',
     'Combattimento',
     'Incalzare',
     'Razzia',
@@ -440,8 +442,9 @@ export const GOBLIN_SCENARIO_AUTHORED = {
           role: 'member',
           statFocus: ['perc', 'int'],
           requirement: { label: 'Esploratore', anyOf: ['precision', 'clarity'] },
-          // D-S3-3: l'esploratore paga a planning — perc alta svela i revealHint.
-          revealAtPlanning: { stat: 'perc', threshold: 60 },
+          /* Director 2026-10-10: NO revealAtPlanning on party slots — intel
+           * must come from an external scouting system (explorer building/
+           * resident — not yet on /game). The slot is a party role only. */
         },
         {
           id: 'goblin-slot-bodyguard',

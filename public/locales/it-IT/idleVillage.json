@@ -1013,6 +1013,7 @@
       "noneReturned": "Nessuno è tornato",
       "phaseOf": "Fase {n} di {total}",
       "inProgressShort": "in corso",
+      "hiddenEvent": "Evento nascosto — potevi non trovarlo",
       "close": "Chiudi il rapporto",
       "beats": {
         "continue": "Clicca per continuare",

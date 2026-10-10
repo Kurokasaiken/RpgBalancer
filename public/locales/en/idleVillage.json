@@ -1006,6 +1006,7 @@
       "noneReturned": "Nobody came back",
       "phaseOf": "Phase {n} of {total}",
       "inProgressShort": "now",
+      "hiddenEvent": "Hidden event — you could have missed it",
       "close": "Close the report",
       "beats": {
         "continue": "Click to continue",
