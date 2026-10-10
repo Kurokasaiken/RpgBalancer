@@ -233,6 +233,15 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   record su choice non ancora coperto; qualità testuale dei choice-hub
   sotto quella dei check (il gate copre il formale, non l'estetico).
   Evidence: `test-results/plan026-t4-narration-2026-10-10.log`.
-- T5 — twist del party (prerequisito: `traits` su ResidentState).
+- **T5 — twist del party — FATTO** (registro tratti chiuso):
+  `questTraits.ts` = QuestTraitSchema + QUEST_TRAITS (avido, prudente,
+  scavezzacollo — label/description/mechanicalNote); superRefine dello
+  schema rifiuta `requiresTrait`/`hiddenIfTrait`/armRoll su id non
+  registrati (un gate su id morto è data error, non contenuto silenzioso);
+  preset lab traitati (Gorik=avido, Omero=prudente, Nina=scavezzacollo,
+  D senza vettore). Decisione: ReferenceMember resta traits-free (la
+  banda dichiara il party di calibrazione — coerente col bench P4).
+  6 test nuovi; suite 241/241. Evidence:
+  `test-results/plan026-t5-traits-2026-10-10.log`.
 - T6 — integrazione dopo gate PLAN-019 pertinenti.
 - T7 — archi narrativi: gated (OPEN-016 + ratifica).
