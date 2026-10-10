@@ -1,0 +1,27 @@
+{
+  "bug": "game-island-under-hud",
+  "date": "2026-10-10",
+  "signals": [
+    "1600x760: costa sud (~45px) sotto il nav plinto, vette (~45px) sotto la placca giorno",
+    "1400x900: framing corretto — dipende dal viewport, non da stato"
+  ],
+  "probableCauses": [
+    {
+      "cause": "refit(): max(floorZoom, fitZoom) + centratura verticale — floorZoom > fitZoom su schermi larghi/bassi ⇒ terra piu' alta dell'area libera, sborda sopra e sotto",
+      "confidence": "confirmed-by-code+reproduction",
+      "file": "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+      "lines": "1261-1295"
+    }
+  ],
+  "filesInvolved": [
+    "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx (refit)",
+    "src/balancing/config/idleVillage/gameFrameConfig.ts (safeFit: landBounds/insets/seaMargin — nessun cambio valori richiesto)"
+  ],
+  "constraints": [
+    "Intent documentato: 'Bottom: nav plinth 77 px + 23 (islands sit just above the nav)'",
+    "floorZoom e' un vincolo duro: sotto di esso compaiono bordi senza mare",
+    "nessun cambio quando la terra ci sta (landH <= freeH)",
+    "i side panel (roster/ledger) coprono terra per design — solo top/bottom contano"
+  ],
+  "reproduction": "Puppeteer /game?capture=1 a 1600x760 vs 1400x900"
+}

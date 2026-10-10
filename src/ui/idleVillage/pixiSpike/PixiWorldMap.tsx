@@ -797,13 +797,18 @@ export function PixiWorldMap({
         });
       }
 
-      // ── Cloud shadows: drift over land and sea alike, soft-edged, under the clouds ──
+      // ── Cloud shadows: each drifting cloud carries its own soft-edged shadow on the ground ──
+      // Only the shared layer and the silhouette baker live here (below every later layer). The shadow
+      // sprites themselves are spawned by the cloud block, one per cloud — a shadow that drifts without
+      // a cloud above it is the decoupled replay this replaced.
+      let cloudShadowLayer: Container | null = null;
+      let bakeCloudShadow: ((src: string) => Promise<Texture>) | null = null;
       if (fxOn.cloudShadows) {
         const layer = new Container();
         const shadowTextures = new Map<string, Texture>();
         // The shipped shadow sprites are pale blurred clouds (made for a multiply blend, which barely darkens):
         // only their shape is kept, blurred once more and filled with a dark green-black, baked into a texture.
-        const shadowTexture = async (src: string) => {
+        bakeCloudShadow = async (src: string) => {
           const cached = shadowTextures.get(src);
           if (cached) return cached;
           const tex = await load(`/assets/atmosphere/${src}`);
@@ -824,24 +829,7 @@ export function PixiWorldMap({
           shadowTextures.set(src, baked);
           return baked;
         };
-        for (const band of atmosphereAssets.clouds) {
-          for (const s of band.sprites) {
-            const tex = await shadowTexture(s.shadowSrc);
-            const sprite = new Sprite(tex);
-            // The baked texture carries blur padding on every side: widen the sprite so the cloud keeps its size.
-            const w = s.width * band.scale * (tex.width / (tex.width - CLOUD_SHADOW_BLUR_PX * 4));
-            sprite.width = w;
-            sprite.height = tex.height * (w / tex.width);
-            sprite.y = s.y + cloudShadowOffset.y;
-            sprite.alpha = cloudShadowOpacity ?? band.shadowOpacity;
-            layer.addChild(sprite);
-            ticks.push((t) => {
-              const drift = band.driftSeconds / cloudSpeed;
-              const p = (((t + s.delaySeconds) % drift) + drift) % drift / drift;
-              sprite.x = cloudX(p, w) + cloudShadowOffset.x;
-            });
-          }
-        }
+        cloudShadowLayer = layer;
         world.addChild(layer);
       }
 
@@ -1150,15 +1138,20 @@ export function PixiWorldMap({
           world.addChild(layer);
           // Clouds are born at the upwind edge and carried across by the wind: a new one every so often, each
           // formed from a sprite of the band with its own size, height and shape, and dissolved at the far edge.
-          const pool: { tex: Texture; width: number; y: number }[] = [];
+          const pool: { tex: Texture; shadowTex: Texture | null; width: number; y: number }[] = [];
           for (const s of band.sprites) {
-            pool.push({ tex: await load(`/assets/atmosphere/${s.src}`), width: s.width * band.scale, y: s.y });
+            pool.push({
+              tex: await load(`/assets/atmosphere/${s.src}`),
+              shadowTex: bakeCloudShadow ? await bakeCloudShadow(s.shadowSrc) : null,
+              width: s.width * band.scale,
+              y: s.y,
+            });
           }
           if (disposed || pool.length === 0) continue;
           const yMin = Math.min(...pool.map((k) => k.y));
           const yMax = Math.max(...pool.map((k) => k.y));
           const crossing = () => band.driftSeconds / cloudSpeed;
-          type Cloud = { sp: Sprite; t0: number; w: number; baseScale: number; h: number; phase: number; y: number; shown: number };
+          type Cloud = { sp: Sprite; sh: Sprite | null; shBase: number; t0: number; w: number; baseScale: number; h: number; phase: number; y: number; shown: number };
           const alive: Cloud[] = [];
           let nextBirth = 0;
           const birthCloud = (t0: number) => {
@@ -1170,8 +1163,20 @@ export function PixiWorldMap({
             sp.scale.set(baseScale);
             sp.alpha = band.opacity;
             layer.addChild(sp);
+            // Every cloud carries its own shadow: born with it, drifting with it, gone with it.
+            let sh: Sprite | null = null;
+            let shBase = 0;
+            if (cloudShadowLayer && k.shadowTex) {
+              sh = new Sprite(k.shadowTex);
+              sh.anchor.set(0.5);
+              // The baked texture carries blur padding on every side: scale so the silhouette
+              // (the padding-free core) matches the cloud's own width.
+              shBase = w / (k.shadowTex.width - CLOUD_SHADOW_BLUR_PX * 4);
+              sh.scale.set(shBase);
+              cloudShadowLayer.addChild(sh);
+            }
             alive.push({
-              sp, t0, w, baseScale, h: k.tex.height * baseScale,
+              sp, sh, shBase, t0, w, baseScale, h: k.tex.height * baseScale,
               phase: Math.random() * Math.PI * 2,
               y: yMin + Math.random() * (yMax - yMin) + (Math.random() - 0.5) * 60,
               shown: 1,
@@ -1193,6 +1198,7 @@ export function PixiWorldMap({
               if (p >= 1) {
                 layer.removeChild(c.sp);
                 c.sp.destroy();
+                c.sh?.destroy();
                 alive.splice(i, 1);
                 continue;
               }
@@ -1217,6 +1223,18 @@ export function PixiWorldMap({
               }
               c.shown += (want - c.shown) * 0.08;
               sp.alpha = band.opacity * c.shown * formed;
+              // The shadow tracks its cloud: same drift, same meander, same morph — offset by the
+              // sun's projection. It fades with `formed` (born/dissolve) but not with `shown`:
+              // a cloud thinned over a POI still casts its shadow.
+              if (c.sh) {
+                c.sh.x = sp.x + cloudShadowOffset.x;
+                c.sh.y = sp.y + cloudShadowOffset.y;
+                if (!reducedMotion) {
+                  c.sh.scale.set(c.shBase * (1 + 0.045 * tn.cloudMorph * Math.sin(t * 0.11 + c.phase)), c.shBase * (1 + 0.04 * tn.cloudMorph * Math.sin(t * 0.083 + c.phase * 1.7)));
+                  c.sh.rotation = sp.rotation;
+                }
+                c.sh.alpha = (cloudShadowOpacity ?? band.shadowOpacity) * formed;
+              }
             }
           });
         }
@@ -1267,7 +1285,14 @@ export function PixiWorldMap({
           const land = fit.landBounds;
           cam.zoom = Math.max(floorZoom(), Math.min(freeW / (land.x1 - land.x0), freeH / (land.y1 - land.y0)));
           cam.panX = (land.x0 + land.x1) / 2 - (left + freeW / 2) / cam.zoom;
-          cam.panY = (land.y0 + land.y1) / 2 - (fit.insets.top + freeH / 2) / cam.zoom;
+          // When the sea floor forces a zoom taller than the free area (wide, short windows) a centred
+          // land would slide under BOTH the top plaque and the nav. The island must sit just above the
+          // nav instead: pin its south edge to the free-area boundary and let the excess go north.
+          const landH = (land.y1 - land.y0) * cam.zoom;
+          cam.panY =
+            landH > freeH
+              ? land.y1 - (H - fit.insets.bottom) / cam.zoom
+              : (land.y0 + land.y1) / 2 - (fit.insets.top + freeH / 2) / cam.zoom;
         } else {
           cam.zoom = Math.max(W / canvas.width, H / canvas.height);
           cam.panX = (canvas.width - W / cam.zoom) / 2;

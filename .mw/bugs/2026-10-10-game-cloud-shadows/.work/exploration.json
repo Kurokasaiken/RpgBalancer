@@ -1,0 +1,4 @@
+{
+  "ambiguous": false,
+  "notes": "Il bug report punta a una sola cosa: ogni nuvola deve avere la sua ombra e ogni ombra la sua nuvola. Il commento nel codice ('the same bands as their shadows') conferma l'intento originale. Il fix accoppia le due simulazioni; nessuna scelta di design nuova richiesta."
+}

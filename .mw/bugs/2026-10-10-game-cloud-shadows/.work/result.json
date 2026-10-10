@@ -1,0 +1,27 @@
+{
+  "bug": "game-cloud-shadows-decoupled",
+  "date": "2026-10-10",
+  "status": "fixed-verified-visually",
+  "rootCause": "Ombre e nuvole erano due simulazioni indipendenti in PixiWorldMap: 16 sprite ombra deterministiche (delaySeconds/y/larghezza fissi da config) vs nuvole spawnate random (sprite/y/w/t0 casuali). Nessuna ombra corrispondeva mai a una nuvola. Le ombre passavano anche sulla terraferma ma senza la nuvola che le spiegasse non si leggevano come ombre; sul mare uniforme restavano visibili.",
+  "fix": "Ombra accoppiata alla nuvola in birthCloud: stesso t0/w/y, posizione = nuvola + cloudShadowOffset, morph specchiati, alpha = shadowOpacity * formed (non eredita shown/cloud-clear), destroy congiunto. Il blocco cloudShadows ora e' solo infrastruttura: shadowLayer condiviso dentro world (stesso camera transform) + baker silhouette con cache.",
+  "filesChanged": [
+    "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+    "RICHIESTE.md (entry R-120)",
+    "src/docs/docs/coordinator/agent_assignments.md (kanban row R-120)",
+    "test-results/r120-game-cloud-shadows-2026-10-10.log"
+  ],
+  "verification": {
+    "visual": "Puppeteer su /game?capture=1: ogni macchia scura ha la sua nuvola all'offset (+90,+140); coppie su mare e terraferma; moto congiunto fra frame distanti; zero orfane. Screenshot: game-fixed-1, game-fixed-zoom, game-fixed-zoom2, game-recheck.",
+    "buildCheck": "PASS al retry (primo run fallito per race concorrente su dist/ da altra sessione agente — vite-plugin-pwa inietta in-place swDest)",
+    "kanbanLint": "PASS",
+    "lint": "n/a — src/ui/idleVillage/** in quarantena eslint",
+    "tests": "BLOCKED ambientale — vitest worker non parte sotto load avg >400 (START_TIMEOUT hardcoded), 4 tentativi su pool forks e threads. Nessun modulo testato toccato."
+  },
+  "regressionsChecked": [
+    "/world-surface usa i componenti DOM separati — non toccati",
+    "fxOn.cloudShadows solo: layer vuoto, nessuna orfana",
+    "fxOn.clouds solo: nuvole senza ombra, comportamento onorato",
+    "reducedMotion: posizione accoppiata, morph congelato su entrambi",
+    "dispose/rebuild: ombre figlie di world come le nuvole, destroy congiunto"
+  ]
+}

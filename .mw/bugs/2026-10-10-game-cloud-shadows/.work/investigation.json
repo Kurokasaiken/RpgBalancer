@@ -1,0 +1,43 @@
+{
+  "bug": "game-cloud-shadows-decoupled",
+  "date": "2026-10-10",
+  "signals": [
+    "Screenshot /game: macchie scure (ombre) alla deriva sul mare senza nuvole sopra",
+    "Screenshot /game: nuvole sulla terraferma senza ombra al suolo",
+    "Mai osservata una coppia nuvola+ombra allineate",
+    "Le ombre sono leggibili solo sul mare piatto (contrasto)"
+  ],
+  "probableCauses": [
+    {
+      "cause": "Sistemi indipendenti: ombre deterministiche per-sprite-config vs nuvole random (spawn, y, larghezza, t0)",
+      "confidence": "confirmed-by-code",
+      "file": "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+      "lines": "800-846 (ombre) vs 1141-1230 (nuvole)"
+    },
+    {
+      "cause": "Anche a parità di sorgente, cloudX(p,w) dipende dalla larghezza dello sprite → divergenza orizzontale lungo il tragitto",
+      "confidence": "confirmed-by-code",
+      "file": "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+      "lines": "601"
+    },
+    {
+      "cause": "Invisibilità percepita sulla terraferma: contrasto basso sul dipinto scuro + assenza di corrispondenza di moto",
+      "confidence": "supported-by-measurements",
+      "evidence": "land_mask 60-80% nelle bande delle ombre; silhouette alpha core 255; opacity 0.42"
+    }
+  ],
+  "filesInvolved": [
+    "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+    "src/ui/idleVillage/config/generatedClouds.ts",
+    "src/balancing/config/idleVillage/gameFrameConfig.ts",
+    "src/pages/game-frame-pixi.tsx (consumer, nessuna modifica prevista)"
+  ],
+  "constraints": [
+    "Config-first: nessun valore hardcoded nuovo (offset/opacità/colore restano in config/costanti documentate esistenti)",
+    "Nessuna regressione su /world-surface (sistema DOM separato, già accoppiato per-sprite)",
+    "fxOn.cloudShadows / fxOn.clouds devono restare toggle onorevoli",
+    "prefers-reduced-motion rispettato (t=0 → coppie congelate coerenti)",
+    "Performance: nessun nuovo passo di rendering; riuso del bake esistente"
+  ],
+  "reproduction": "Puppeteer su http://localhost:5173/game?capture=1, 2 frame a 8s: ombre vaganti senza nuvole; nuvole senza ombre"
+}
