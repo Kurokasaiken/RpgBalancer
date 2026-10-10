@@ -39,6 +39,7 @@ import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlo
 import type { ResidentSlotBlueprint, DropState } from '@/ui/idleVillage/slots/types';
 import type { GetResidentCompatibility } from '@/ui/idleVillage/components/ResidentRosterTypes';
 import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
+import { saveData, loadData, clearData } from '@/shared/persistence/PersistenceService';
 import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { questResidentEligibility, residentInExpedition } from '@/ui/idleVillage/questS1Lab/questEligibility';
@@ -52,14 +53,15 @@ import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { availableOptions } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestId, QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestRunApi } from '@/ui/idleVillage/questS1Lab/useQuestRun';
-import { buildExpeditionParty } from './questExpedition';
+import { buildExpeditionParty, isExpeditionItem, loadoutDuration } from './questExpedition';
 import { settleRun, runIdOf } from './questSettlement';
 import { releaseLoadout, reserveLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
 import { QuestExpeditionDetail } from './QuestExpeditionDetail';
 
-/** Loadout candidates: every catalog item that bridges to an engine flag
- *  (the real item identity — the engine consumes `engineFlag`). */
-const EXPEDITION_ITEMS = Object.values(defaultQuestItems).filter((i) => i.engineFlag);
+/** Loadout candidates: catalog items carrying a REAL expedition effect —
+ *  engine-flagged consumables plus duration-channel items (mounts)
+ *  (PLAN-019-S3 T-3). Items with no channel stay catalog-only. */
+const EXPEDITION_ITEMS = Object.values(defaultQuestItems).filter(isExpeditionItem);
 
 /** Resolved-offer cache: `resolveQuestOffer` is deterministic on
  *  `(poiId, daysPlayed)` — the expensive part is the reference-band sim,
@@ -390,6 +392,68 @@ export function useQuestExpeditionSession({
     return planningHints(nodes, revealedNodeIds).slice(0, QUEST_PLANNER_INFO.maxPreviewHints);
   }, [resolved, revealedNodeIds]);
 
+  /** LOADOUT duration channel (S3 T-3, desiderata v24 #7): items declaring
+   *  `durationMult`/`durationDelta` reshape the run's real pace — the
+   *  launch clock AND the estimate chip share this one derivation. */
+  const expeditionDuration = useMemo(
+    () => loadoutDuration(selectedItemIds, poi.ticksPerNode, poi.estimatedDurationTicks),
+    [selectedItemIds, poi],
+  );
+
+  /* ------------------------------------------------------------------ */
+  /* Draft persistence (Director 2026-10-09, ratified at S3 baptism): the
+   *  party/loadout draft survives closing the panel — keyed by POI +
+   *  in-game day, mirroring the offer cache's resolution. Cleared at
+   *  send; restored on open only while no run is live.                 */
+  /* ------------------------------------------------------------------ */
+  const draftKey = `idleVillage.questExpeditionDraft.${poi.id}.${Math.floor(currentDay)}`;
+  /* `draftReady` is state, not a ref: the write effect must re-arm when the
+   *  restore completes, otherwise a change made while loadData was in flight
+   *  would never be persisted until the next edit. */
+  const [draftReady, setDraftReady] = useState(false);
+  /* A new day = a new draft identity: the restore gate reopens. */
+  useEffect(() => {
+    setDraftReady(false);
+  }, [draftKey]);
+
+  useEffect(() => {
+    if (!isDetailOpen || !resolved || run || draftReady) return;
+    let cancelled = false;
+    void loadData<{ assignments?: Record<string, string | null>; items?: string[] } | null>(draftKey, null).then((draft) => {
+      if (cancelled) return;
+      if (draft) {
+        const itemIds = new Set(EXPEDITION_ITEMS.map((i) => i.id));
+        /* Re-validate at restore: a resident may have died/left since the
+         *  draft was written — never resurrect an ineligible assignment. */
+        const restored: Record<string, string | null> = {};
+        for (const [slotId, residentId] of Object.entries(draft.assignments ?? {})) {
+          if (residentId && slotBlueprints.some((s) => s.id === slotId) && eligibilityFor(residentId, slotId).eligible) {
+            restored[slotId] = residentId;
+          }
+        }
+        setAssignments(restored);
+        setSelectedItemIds((draft.items ?? []).filter((id) => itemIds.has(id)).slice(0, QUEST_STASH.bagSlots));
+      }
+      setDraftReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isDetailOpen, resolved, run, draftReady, draftKey, slotBlueprints, eligibilityFor]);
+
+  /* Debounced write — drag storms never hit the service per-frame. */
+  useEffect(() => {
+    if (!isDetailOpen || !draftReady) return;
+    const timer = window.setTimeout(() => {
+      void saveData(draftKey, { assignments, items: selectedItemIds });
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [isDetailOpen, draftReady, draftKey, assignments, selectedItemIds]);
+
+  const clearDraft = useCallback(() => {
+    void clearData(draftKey);
+  }, [draftKey]);
+
   /* ------------------------------------------------------------------ */
   /* Settlement (S2.5) — a terminal run settles once, idempotently.       */
   /*  Journal: persist `settling` → apply effects (ledger-keyed, co-       */
@@ -468,7 +532,7 @@ export function useQuestExpeditionSession({
       seed: (Date.now() ^ (Math.random() * 0xffffffff)) >>> 0,
       questId: poi.questId,
       loadout: selectedItemIds,
-      clock: { nodeTicks: poi.ticksPerNode, startTick: currentTick },
+      clock: { nodeTicks: expeditionDuration.nodeTicks, startTick: currentTick },
       scenarioInstance: resolved.instance,
       resolvedOffer: resolved.resolvedOffer,
     });
@@ -477,6 +541,7 @@ export function useQuestExpeditionSession({
      * run exists now, and release on terminal transition is guaranteed by
      * the settlement journal regardless of when this write lands. */
     void reserveLoadout(resolved.instance.instanceId, selectedItemIds);
+    clearDraft();
     setIsDetailOpen(false);
     setAssignments({});
     setSelectedItemIds([]);
@@ -492,9 +557,11 @@ export function useQuestExpeditionSession({
     activeRuns,
     poi,
     selectedItemIds,
+    expeditionDuration,
     currentTick,
     questRun,
     onOpenRun,
+    clearDraft,
   ]);
 
   /* ------------------------------------------------------------------ */
@@ -618,10 +685,12 @@ export function useQuestExpeditionSession({
   /* Overlays — the planning detail + the flight layer.                   */
   /* ------------------------------------------------------------------ */
   const closeDetail = useCallback(() => {
+    /* Draft semantics (S3 T-3): closing keeps the party/loadout — the
+     *  in-memory state IS the draft and the debounced write has already
+     *  persisted it; reopening shows the same configuration. */
     setIsDetailOpen(false);
-    setAssignments({});
-    setSelectedItemIds([]);
     setEstimate(null);
+    prevEstimateRef.current = null;
   }, []);
 
   const toggleItem = useCallback((itemId: string) => {
@@ -646,6 +715,7 @@ export function useQuestExpeditionSession({
           estimate={estimate?.key === estimateKey ? estimate.value : 'computing'}
           forecastDelta={forecastDelta}
           intelHints={intelHints}
+          expeditionDuration={expeditionDuration}
           requiredFilled={requiredFilled}
           items={EXPEDITION_ITEMS}
           selectedItemIds={selectedItemIds}
@@ -693,7 +763,7 @@ export function useQuestExpeditionSession({
      *  speed multiplier — the values the HUD time controls drive. */
     hooks.getClock = () => {
       const s = useMinimalGameplayStore.getState().state;
-      return { currentTick: s.currentTick ?? 0, isPaused: s.isPaused, speedMultiplier: s.speedMultiplier };
+      return { currentTick: s.currentTick ?? 0, currentDay: s.currentDay ?? 0, isPaused: s.isPaused, speedMultiplier: s.speedMultiplier };
     };
     const expedition = (hooks.expedition ??= {}) as Record<string, unknown>;
     expedition[poi.id] = {

@@ -387,6 +387,93 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     expect(backJson).toBe(aJson);
   });
 
+  /* PLAN-019-S3 T-3 — draft persistence (Director 2026-10-09): the
+   *  party/loadout draft survives closing the panel AND a page reload,
+   *  keyed by POI + in-game day. The day part of the key cannot be aligned
+   *  across a reload in-test (the clock runs live, autosave is ≥30 s), so
+   *  the write leg reads the persisted record directly and the restore leg
+   *  seeds the record under the CURRENT post-reload day key — both still
+   *  exercise the real saveData/loadData path. */
+  test('the party/loadout draft survives closing the panel and a reload', async ({ page }) => {
+    await expedition<void>(page, 'openDetail');
+    /* Slot eligibility needs the resolved offer — wait for it instead of
+     *  racing the deferred resolve. */
+    await page.waitForFunction(
+      (poi) => Boolean(
+        (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[poi]
+          ?.getResolvedOffer?.(),
+      ),
+      POI,
+      { timeout: 15_000 },
+    );
+    expect(await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER)).toBe(true);
+    await expedition<void>(page, 'toggleItem', 'quest_consumable_pozione');
+    // Past the 600 ms debounce — the write has landed before we close.
+    await page.waitForTimeout(800);
+
+    /* Write leg: the debounced saveData hit the persistence store under a
+     * `…questExpeditionDraft.poi-goblin.<day>` key, holding both channels. */
+    const persisted = await page.evaluate(() => {
+      const key = Object.keys(sessionStorage).find((k) => k.includes('questExpeditionDraft.poi-goblin'));
+      return key ? { key, value: sessionStorage.getItem(key) ?? '' } : null;
+    });
+    expect(persisted).not.toBeNull();
+    expect(persisted!.value).toContain(VALID_LEADER);
+    expect(persisted!.value).toContain('quest_consumable_pozione');
+
+    /* Close/reopen keeps the draft in-memory — no persistence round-trip
+     * needed while the day hasn't moved. */
+    await expedition<void>(page, 'closeDetail');
+    await expedition<void>(page, 'openDetail');
+    let assignments = await expedition<Record<string, string | null>>(page, 'getAssignments');
+    expect(assignments[SLOT_LEADER]).toBe(VALID_LEADER);
+
+    /* Restore leg: after a reload the in-memory state is gone. Seed the
+     * draft under the day the hydrated clock reports NOW (same format the
+     * writer uses), then open — restore must re-validate and repopulate. */
+    await page.reload();
+    await page.waitForFunction(
+      (poi) => Boolean((window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[poi]),
+      POI,
+      { timeout: 30_000 },
+    );
+    /* Freeze the clock before seeding: the day part of the draft key must
+     *  not flip between the read and the restore lookup. */
+    const pausedNow = await page.evaluate(() => {
+      const hooks = (window as unknown as {
+        __idleVillageTestHooks?: { getClock?: () => { isPaused: boolean } };
+      }).__idleVillageTestHooks;
+      return hooks?.getClock?.().isPaused ?? false;
+    });
+    if (!pausedNow) await page.keyboard.press('Space');
+    const day = await page.evaluate(() => {
+      const hooks = (window as unknown as {
+        __idleVillageTestHooks?: { getClock?: () => { currentDay: number } };
+      }).__idleVillageTestHooks;
+      return hooks?.getClock?.().currentDay ?? 0;
+    });
+    await page.evaluate(
+      ({ day: d, slotId, residentId }) => {
+        sessionStorage.setItem(
+          `idleVillage.questExpeditionDraft.poi-goblin.${d}`,
+          JSON.stringify({ assignments: { [slotId]: residentId }, items: ['quest_consumable_pozione'] }),
+        );
+      },
+      { day, slotId: SLOT_LEADER, residentId: VALID_LEADER },
+    );
+    await expedition<void>(page, 'openDetail');
+    await page.waitForFunction(
+      (slotId) => {
+        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'];
+        return exp?.getAssignments?.()[slotId] === 'hero-sir-spaccaculi';
+      },
+      SLOT_LEADER,
+      { timeout: 10_000 },
+    );
+    assignments = await expedition<Record<string, string | null>>(page, 'getAssignments');
+    expect(assignments[SLOT_LEADER]).toBe(VALID_LEADER);
+  });
+
   test('a long absence fills the halo past the estimate but never concludes a waiting frontier (catch-up + badge)', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
