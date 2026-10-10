@@ -23,7 +23,7 @@ import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { nodeDurationTicks, type QuestId } from '@/ui/idleVillage/questS1Lab/questRun';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
-import { QUEST_POIS, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
+import { isPoiConsumed, poiConsumesOnReportClose, QUEST_POIS, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
 import { useQuestExpeditionSession } from '@/ui/idleVillage/quests/useQuestExpeditionSession';
 import { scenarioForQuest } from '@/ui/idleVillage/questS1Lab/questOffer';
 import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
@@ -353,7 +353,9 @@ export default function GameFramePixiPage() {
     const run = activeQuestRun.run;
     if (!wasVisible || panels.visible.quest || !run?.ended || run.settlement?.status !== 'settled') return;
     const consumedPoi = QUEST_POIS.find((p) => p.questId === activeQuestId);
-    if (consumedPoi && consumedPoiIds && !consumedPoiIds.includes(consumedPoi.id)) {
+    /* D-S4-6: one-shot by default — a `repeatable` offer is never consumed:
+     * clearing the run returns it to `available` while its window lasts. */
+    if (consumedPoi && poiConsumesOnReportClose(consumedPoi) && consumedPoiIds && !consumedPoiIds.includes(consumedPoi.id)) {
       const next = [...consumedPoiIds, consumedPoi.id];
       setConsumedPoiIds(next);
       void saveData(CONSUMED_POIS_KEY, next);
@@ -399,7 +401,9 @@ export default function GameFramePixiPage() {
     for (const exp of expeditions) {
       const p = exp.poi;
       const avail = offerAvailability(p);
-      if (consumedPoiIds?.includes(p.id)) continue;
+      /* A repeatable offer ignores a stale consumed record (authored after
+       *  the POI was already consumed — D-S4-6 migration honesty). */
+      if (isPoiConsumed(p, consumedPoiIds)) continue;
       if (!exp.run && (avail.state === 'expired' || !questShown)) continue;
       anchored.add(p.id);
       list.push({
@@ -413,7 +417,7 @@ export default function GameFramePixiPage() {
       /* The quest exemplar is the real goblin offer — the Director's family
        *  review shows the marker actually in play, at its authored spot, not a
        *  dummy. Job and event stay static until those systems exist. */
-      if (!anchored.has(poiGoblin.id) && !consumedPoiIds?.includes(poiGoblin.id)) {
+      if (!anchored.has(poiGoblin.id) && !isPoiConsumed(poiGoblin, consumedPoiIds)) {
         const avail = offerAvailability(poiGoblin);
         if (expeditionGoblin.run || avail.state !== 'expired') {
           anchored.add(poiGoblin.id);

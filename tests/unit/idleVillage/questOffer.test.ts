@@ -53,6 +53,8 @@ import {
 import {
   DANGER_BANDS,
   dangerBandFor,
+  isPoiConsumed,
+  poiConsumesOnReportClose,
   QUEST_POIS,
   questPoiById,
   QuestPoiSchema,
@@ -121,6 +123,26 @@ describe('questPois config', () => {
       const ratio = Math.abs(poi.expectedPathNodes - median) / median;
       expect(ratio, `${poi.id}: expectedPathNodes=${poi.expectedPathNodes} vs median=${median}`).toBeLessThanOrEqual(0.4);
     }
+  });
+
+  /* PLAN-019-S4 T-3 (D-S4-6): POI lifecycle — one-shot by default, an
+   *  authored `repeatable` offer is never consumed and ignores even a
+   *  stale consumed record. */
+  it('repeatable lifecycle: default one-shot, repeatable survives its report', () => {
+    /* Both slice POIs are one-shot (no flag authored). */
+    for (const poi of QUEST_POIS) {
+      expect(poi.repeatable).toBeUndefined();
+      expect(poiConsumesOnReportClose(poi)).toBe(true);
+      expect(isPoiConsumed(poi, [poi.id])).toBe(true);
+      expect(isPoiConsumed(poi, [])).toBe(false);
+    }
+    /* A repeatable offer parses and is never consumed. */
+    const rep = QuestPoiSchema.parse({ ...QUEST_POIS[0], id: 'poi-rep', repeatable: true });
+    expect(poiConsumesOnReportClose(rep)).toBe(false);
+    /* Stale consumed records are ignored — honest migration for a POI
+     *  consumed before `repeatable` was authored. */
+    expect(isPoiConsumed(rep, ['poi-rep'])).toBe(false);
+    expect(isPoiConsumed(rep, null)).toBe(false);
   });
 });
 
