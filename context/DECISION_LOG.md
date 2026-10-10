@@ -1078,3 +1078,77 @@ c ridiretto a preview aggregata). Nessuna calibrazione da fare — i numeri
 sono authored.
 
 **Fonte:** Director in sessione 2026-10-10.
+
+## 2026-10-10 — R-117 pagina Steam: gate deviation ratificata, 3 meccaniche dichiarate, lingue, GTM storico
+
+**Contesto:** audit documentale pre-rewrite del copy Steam (il primo draft
+conteneva eventi inventati — carovane, lupi come sistema, memoria-mondo).
+Audit claim-per-claim contro CANON/QUEST_RULES/desiderata/CURRENT_STATE.
+Il MASTER_PLAN prevedeva la pagina Steam Coming Soon **dopo** la
+stabilizzazione del ciclo run→meta→nuova run; il Director vuole la pagina
+prima. Sono state sottoposte al Director 4 decisioni.
+
+**Decisioni (Director, verbatim confermato in sessione):**
+
+1. **Gate deviation ratificata:** la pagina Steam Coming Soon si pubblica
+   **prima** della stabilità del ciclo run→meta→run prevista dal
+   MASTER_PLAN. Trattamento: Coming Soon con claim conservativi — solo
+   `true-now` nel copy principale, intenti futuri solo in sezione
+   dichiarata ("What we're building").
+2. **Tre meccaniche di prodotto dichiarate come intento** (non
+   implementate oggi — status `intento-Director`, NON `vigente`):
+   - **Selezione tra offerte di quest:** il giocatore sceglie quale quest
+     soddisfare tra più offerte con reward e costi/rischi diversi e noti
+     ("quella che puoi permetterti") — contrapposto al reward-pick post-
+     combattimento stile StS. Oggi esistono 2 POI-offerta su `/game`
+     (goblin, rovine); il pool come meccanica a scelta è intento.
+   - **Eroi non-template:** skill e caratteristiche degli eroi si trovano
+     generando; il giocatore costruisce combinazioni da ciò che trova.
+   - **Morte → ricomincio con bonus:** meta-progressione tra run è core
+     del prodotto e sarà nella demo. Etichetta pubblica decisa:
+     **roguelite** (non roguelike). Visione di riferimento: GAME_VISION
+     «Lose to Progress».
+3. **Lingue:** pagina store EN/IT subito. Lingue gioco al lancio demo:
+   **EN/IT/DE/FR** (FR incerta — «forse nn francese, vediamo»).
+   **ES/DE/ZH-CN** solo dopo trazione misurata — da comunicare come
+   localization roadmap, non come promessa.
+4. **`go_to_market_steam_first.md` → storico:** il piano GTM H1-2026
+   (calendario Feb–Giu, owner a pod) è trattato come documento storico;
+   nessuna fretta, i KPI restano riferimento non vincolante.
+
+**Fonte:** Director in sessione 2026-10-10; audit in
+`marketing/steam/claim-ledger.md` (riscritto su queste decisioni).
+
+## 2026-10-10 — PLAN-019-S4 battezzato: epilogo ricco, POI one-shot di default, seam ratificati
+
+**Contesto:** chiusura PLAN-019-S3 (planner completo) → apertura S4
+«Integrazione» (v24 FROZEN). Il Director ha ratificato le sei decisioni
+aperte del draft.
+
+**Decisioni (Director, verbatim confermato in sessione):**
+
+1. **Schermata di epilogo obbligatoria e ricca** — *«ci vuole una schermata
+   di epilogo della quest che dice: morti feriti, cose spese/distrutte,
+   reward vari, exp, titoli, malattie, informazioni, lore, ecc.»* — le
+   categorie sono estensibili config-first; quelle senza sistema oggi
+   (titoli, malattie, lore, informazioni) sono **seam authored** dichiarate
+   dallo scenario e mostrate solo se presenti.
+2. **Conseguenze nei log** — *«va bene nei log»*: il canale «il villaggio
+   sa cosa è successo» è l'eventLog/ledger esistente (T-1), non una
+   superficie nuova.
+3. **Niente scouting ora** — *«adesso niente scouting»*: `revealAtPlanning`
+   resta seam documentato; nessun edificio/residente esploratore in S4.
+4. **Gate B** — *«quando siamo convinti lo farò»*: il playtest esterno è
+   attività del Director, scatta a sua convocazione. Chiude macro-plan D-5.
+5. **`coverRiskDelta` cablato** — il canale copertura entra nel motore; la
+   corazza torna eleggibile senza allentare `isExpeditionItem`.
+6. **Destino lab differito** — le superfici lab (`QuestS1LabPage`,
+   `MissionPlannerLive`, `useQuestPoiSession`, `QuestPowerEngine`) restano;
+   la decisione di archivio è rinviata oltre S4.
+7. **Trial by Fire invariato** — *«lasciamo il trial così come è»*: morte/
+   ferita persistenti di S2.5 bastano per S4.
+8. **POI one-shot di default** — *«alcuni POI avranno attività ripetibili,
+   non tutte; di default le quest una volta sparite non riappaiono»* —
+   repeatability è authored per-POI; l'offerta consumata non riappare.
+
+**Fonte:** battesimo PLAN-019-S4 in sessione 2026-10-10.

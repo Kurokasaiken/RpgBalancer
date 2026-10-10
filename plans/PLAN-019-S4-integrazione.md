@@ -1,0 +1,143 @@
+---
+title: 'PLAN-019-S4 — Integrazione: villaggio → planning → quest → ritorno → conseguenze come un unico gioco'
+status: active
+created: 2026-10-10
+baptized: 2026-10-10 (Director «Va bene nei log … procedi»: D-S4-1..6 ratificate — epilogo ricco obbligatorio, niente scouting, coverRiskDelta cablato, destino lab differito, Trial by Fire invariato, POI repeatability per-POI con default one-shot)
+desiderata: v24 FROZEN (stadio S4 «Integrazione»: «È diventata parte del gioco, non una demo isolata?»)
+request: R-123
+parent: PLAN-019 (figlio S4)
+related: PLAN-019-S2.5 (settlement idempotente + overlay conseguenze), PLAN-019-S3 (planner completo — seam `revealAtPlanning`, `coverRiskDelta`), PLAN-025 (teatro/convergenza cinematica), PLAN-026 (generazione, parallela — campi `experimental` fino al gate S4), QUEST_RULES.md, DECISION_LOG (D-5/D-6 da chiudere qui o esplicitamente rinviare)
+---
+
+# PLAN-019-S4 — Integrazione
+
+**Domanda (v24):** «È diventata parte del gioco, non una demo isolata?»
+**Esito voluto (macro-plan):** villaggio → planning → quest → ritorno →
+conseguenze sulla superficie canonica `/game`, con schermate corrette e
+interessanti e invarianti rispettati. Destino delle superfici lab S1 deciso
+(archiviate o strumenti di test).
+
+## Stato ereditato (fatto, non da rifare — audit 2026-10-10)
+
+- **Loop completo su `/game`:** POI → `QuestExpeditionDetail` (planner S3:
+  party/loadout/forecast/BY MEMBER/WHY/draft) → `QuestRunWindow` (teatro,
+  battiti, combat strip, hidden events) → `settleRun` journal idempotente →
+  `applyQuestSettlement` → effetti su store (gold, xp, `isDead`, `isInjured`,
+  `injuredUntilTick`, `isWorking=false`).
+- **Conseguenze come DATO:** `CanonicalRosterBundle` mergea le conseguenze nel
+  roster (`status: 'dead' | 'injured'`); `useResidentDropValidation` ammette
+  solo `status === 'available'` → feriti/morti non assegnabili al lavoro;
+  guarigione automatica a `injuredUntilTick`; `all_injured` → game over.
+- **POI sulla mappa:** `questStatus` available/in_progress/completed/failed,
+  halo di progresso, badge «decisione in attesa».
+- **Seam noti e documentati:** `revealAtPlanning` (scouting esterno futuro —
+  nessun edificio/residente esploratore esiste oggi su `/game`), `coverRiskDelta`
+  (canale dichiarato ma non cablato nel motore — corazza onestamente esclusa
+  dalla sacca), `certainChecks` (modello grafo, non più driver della preview).
+
+## Gap vs contratto S4 — audit preliminare (da validare in T-0)
+
+| # | Contratto | Oggi | Gap candidato |
+|---|---|---|---|
+| G1 | Conseguenze **visibili** sul villaggio (gate a) | dati persistiti e roster con status; `eventLog` del villaggio NON registra esiti quest/morti/feriti | il villaggio «sa cosa è successo»: voci di journal/ledger per esito, caduti, feriti, bottino |
+| G2 | Legame planning → esito → conseguenza riconosciuto (gate b) | la quest finisce con outcome + «chiudi»; nessun debrief | superficie di ritorno: rapporto di spedizione (esito, caduti/feriti, bottino, cosa è cambiato) |
+| G3 | «Ritorno» come fase del gioco | il run finisce e la finestra si chiude; membri rilasciati dal settlement | da verificare: la fiction del rientro esiste già nel grafo («Via del ritorno», «Ritorno al villaggio») — decidere se basta |
+| G4 | Il villaggio continua dopo la quest | POI → completed/failed; blocchi sequenziali ok | lifecycle offerta: il POI ripropone quest? cooldown? nuove offerte? oggi l'offerta è statica |
+| G5 | Schermate corrette e interessanti | planner/run-window/halo funzionano | inventario qualità: cosa manca per «interessante» (valutazione Director) |
+| G6 | Destino superfici lab deciso | `QuestS1LabPage` ancora routata; `MissionPlannerLive` su `/primitives`; `questPoiKit`+`useQuestPoiSession` e `QuestPowerEngine` vivi per le superfici lab | archivio vs strumento di test — decisione + esecuzione |
+| G7 | Seam chiusi o esplicitamente rinviati | `coverRiskDelta` non cablato; scouting esterno assente | cablare o ridefinire; scouting: in scope S4 o differito (edificio esploratore = sistema nuovo) |
+| G8 | Artefatto «definizione di buona quest» | non scritto | sintesi regole validate S1–S4 → ingresso S5 |
+
+## Decisioni ratificate al battesimo (Director, 2026-10-10)
+
+- **D-S4-1 — Gate B:** *«quando siamo convinti lo farò»* — Gate B è
+  un'attività del Director, non un task di S4. S4 prepara la build
+  «giocabile end-to-end»; il playtest esterno scatta quando il Director lo
+  convoca. Chiude macro-plan D-5.
+- **D-S4-2 — Scouting esterno:** *«adesso niente scouting»* — **differito**.
+  Il seam `revealAtPlanning` resta documentato; nessun edificio/residente
+  esploratore in S4.
+- **D-S4-3 — `coverRiskDelta`:** *«cablare»* — il canale va consumato dal
+  motore (il portatore copre gli altri membri vivi). Una volta cablato la
+  corazza rientra in sacca (il gate onesto `isExpeditionItem` la riammette
+  da solo).
+- **D-S4-4 — Destino lab:** *«differito»* — `QuestS1LabPage`,
+  `MissionPlannerLive`, `useQuestPoiSession`/`questPoiKit`,
+  `QuestPowerEngine` restano come sono; la decisione di archivio è rinviata.
+- **D-S4-5 — Trial by Fire:** *«lasciamo il trial così come è»* — morte/
+  ferita persistenti di S2.5 bastano; nessuna conseguenza «forte» ulteriore
+  in S4.
+- **D-S4-6 — Lifecycle offerta POI:** *«alcuni POI avranno attività
+  ripetibili, non tutte; di default le quest una volta sparite non
+  riappaiono»* — campo authored `repeatable` (o equivalente) su `questPois`;
+  default **one-shot**: quest completata/fallita → offerta consumata, non
+  ritorna.
+- **T-1 ledger:** *«va bene nei log»* — il canale «il villaggio sa» è
+  l'`eventLog`/ledger esistente, non una superficie nuova.
+- **T-2 epilogo:** *«ci vuole una schermata di epilogo della quest»* —
+  **obbligatoria e ricca**: morti, feriti, cose spese/distrutte
+  (consumabili), reward vari, exp, titoli, malattie, informazioni, lore,
+  ecc. La lista è estensibile (config-first): categorie mostrate solo se
+  presenti nel settlement — titoli/malattie/lore sono categorie seam
+  (authored sullo scenario, nessun sistema nuovo).
+
+## Task
+
+- **T-0 — Audit integrazione.** Per ogni effetto del settlement e ogni stato
+  del loop: verificare *dove* è visibile e *come* agisce oggi su `/game`
+  (roster, drop-validation, eventLog, POI, HUD, game-over). Output: tabella
+  «effetto → visibile? → agisce?» nel piano + lista gap confermata (G1–G8
+  sopra sono ipotesi da validare, non assiomi). Include l'inventario dei dati
+  disponibili per l'epilogo (T-2): quali categorie il settlement già produce
+  (morti, feriti, bottino, oro/xp) e quali sono seam authored (titoli,
+  malattie, lore, informazioni).
+- **T-1 — Il villaggio sa cosa è successo.** Voci `eventLog` per esito quest,
+  caduti, feriti, bottino — i18n, config-first, tono coerente col HUD
+  (ratificato: «va bene nei log»).
+- **T-2 — Schermata di epilogo.** Pannello di chiusura spedizione con
+  categorie estensibili config-first (D-S4 ratificata): morti, feriti,
+  consumabili spesi/distrutti, reward (oro/loot), exp, **titoli**, **malattie**,
+  **informazioni/lore sbloccate**, ecc. — ogni categoria mostrata solo se
+  presente. Le categorie senza sistema oggi (titoli/malattie/lore) sono seam
+  authored nello schema epilogo: lo scenario le dichiara, il renderer le
+  mostra quando arrivano — niente sistemi nuovi finti. Evoluzione dello stato
+  finale di `QuestRunWindow` o pannello dedicato (decide T-0); cuore del
+  gate (b): «avevi previsto X, ecco cosa è successo».
+- **T-3 — Lifecycle POI (D-S4-6).** Campo authored `repeatable` su
+  `questPois`: default **one-shot** — quest completata/fallita → offerta
+  consumata, non riappare. I POI ripetibili lo dichiarano esplicitamente.
+  Stato mappa coerente (completed/failed persistito, non derivato da stato
+  volatile).
+- **T-4 — ~~Convergenza superfici~~ → differita (D-S4-4).** Le superfici lab
+  restano invariate; si registra solo l'inventario nel piano (T-0) e il
+  rinvio esplicito.
+- **T-5 — `coverRiskDelta` cablato (D-S4-3).** Il portatore riduce
+  injury/death chance degli altri membri vivi nel motore; la corazza rientra
+  in sacca senza toccare `isExpeditionItem`; test: item eleggibile +
+  riduzione misurata nel sim.
+- **T-6 — Artefatto finale + loop E2E + chiusura.** «Definizione di buona
+  quest» (ingresso S5, da proprietà emerse S1–S4); E2E del loop completo
+  villaggio→quest→epilogo→conseguenze→villaggio (incluso POI one-shot
+  consumato); safeguard completi; aggiornamento piani/kanban; gate Director.
+
+## Gate (macro-plan)
+
+- (a) conseguenze visibili **e agenti** sul villaggio — non solo persistite;
+- (b) il giocatore riconosce il legame planning → esito → conseguenza;
+- (c) loop completo verificato E2E + safeguard di progetto verdi;
+- (d) giudizio del Director. Gate B (playtest esterno) candidato qui → D-S4-1.
+
+## Rientri
+
+- Se il gate (b) fallisce perché il problema è la *quest*, non la
+  superficie → si torna a S1/S3 sulle regole, non si rattoppa il debrief.
+- Se T-4 scopre che una superficie lab è ancora l'unica fonte di una
+  funzionalità → si porta la funzionalità, non si cancella la pagina.
+
+## Note di coordinamento
+
+- **PLAN-026 in parallelo:** i campi generazione restano `experimental` fino
+  al gate S4 (deroga registrata 2026-10-10). Non toccare file `generation/**`
+  in questo piano.
+- Invarianti: config-first/Zod, i18n, primitive esistenti, PersistenceService,
+  Zustand per stato dominio, JSDoc, evidence in `test-results/`.
