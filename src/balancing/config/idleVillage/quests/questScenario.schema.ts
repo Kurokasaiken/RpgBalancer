@@ -457,6 +457,45 @@ function verdictTableTargets(table: VerdictTableSchemaType): string[] {
 
 const VERDICT_TABLE_KEYS = ['epicfail', 'fail', 'almost', 'win', 'bigwin'] as const;
 
+/* ------------------------------------------------------------------ */
+/* Epilogue seam (PLAN-019-S4 T-2)                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * One authored epilogue grant — shown in the return report when the run
+ * grants it. Granting uses records that already exist on the terminal run:
+ * `requiresFlag` (a flag an outcome set) and/or `requiresOutcome` (the run
+ * outcome). No backend: the run record IS the grant — categories without a
+ * village-side system today (titles, diseases, lore) appear only when the
+ * scenario authors them here.
+ */
+const EpilogueGrantSchema = z.object({
+  /** Display line (authored content, Italian). */
+  label: z.string(),
+  /** Terminal-run flag that grants the entry; absent = no flag gate. */
+  requiresFlag: z.string().optional(),
+  /** Outcomes that grant the entry; absent = any terminal outcome. */
+  requiresOutcome: z
+    .array(z.enum(['reward', 'survived', 'fled', 'wipe']))
+    .min(1)
+    .optional(),
+});
+
+/** Authored epilogue sections — extensible by construction: a new
+ *  category is a new key here plus a renderer row. */
+export const ScenarioEpilogueSchema = z
+  .object({
+    /** Earned titles («Ammazzagoblin») — seam: no title system exists yet. */
+    titles: z.array(EpilogueGrantSchema).optional(),
+    /** Contracted diseases — seam: no disease system exists yet. */
+    diseases: z.array(EpilogueGrantSchema).optional(),
+    /** Lore/echoes uncovered — seam: presentation only, not `info` intel. */
+    lore: z.array(EpilogueGrantSchema).optional(),
+  })
+  .strict();
+
+export type ScenarioEpilogue = z.infer<typeof ScenarioEpilogueSchema>;
+
 /**
  * Static graph integrity (data-verifiable part — see file header for what is
  * deliberately left to the dynamic coverage test):
@@ -491,6 +530,9 @@ export const QuestScenarioSchema = z
     beats: z.array(z.string()).min(1),
     /** Optional intel id → label map (journal/intel UI). */
     intelLabels: z.record(z.string(), z.string()).optional(),
+    /** Authored return-report sections (S4 T-2) — presentation layer:
+     *  granted by flags/outcome on the terminal run, never by new systems. */
+    epilogue: ScenarioEpilogueSchema.optional(),
     /** Offer header — POI/detail envelope (see `QuestOfferSchema`). */
     offer: QuestOfferSchema,
     /**
@@ -690,6 +732,7 @@ const PRESENTATION_KEYS = new Set([
   'tags',
   'beats',
   'intelLabels',
+  'epilogue',
   'statHint',
   'requirementLabel',
   'name',

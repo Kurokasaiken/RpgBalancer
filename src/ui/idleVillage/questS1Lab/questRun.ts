@@ -279,6 +279,11 @@ export interface QuestRunState {
    *  outcomes read and write. Absent on legacy persisted runs (the
    *  interpreter treats a missing map as all-zeroes). */
   vars?: Record<string, number>;
+  /* ---- Epilogue record (PLAN-019-S4 T-2) ------------------------------- */
+  /** Engine flags spent during the run — consumables used, bag options
+   *  consumed. Append-only record for the return report's «spesi e
+   *  distrutti» section; absent on legacy persisted runs (treated empty). */
+  consumablesUsed?: string[];
 }
 
 /** A resolved check shown to the player as an astrolabe cinematic. */
@@ -998,10 +1003,19 @@ export function flee(state: QuestRunState): QuestRunState {
   return state;
 }
 
+/**
+ * Spend a carried flag — it leaves `flags` and joins the run's consumed
+ * record (`consumablesUsed`, S4 T-2 epilogue «spesi e distrutti»).
+ */
+function consumeFlag(state: QuestRunState, flag: string): void {
+  state.flags = state.flags.filter((f) => f !== flag);
+  (state.consumablesUsed ??= []).push(flag);
+}
+
 /** Use a consumable from the merchant (mock inventory flags). */
 export function drinkPotion(state: QuestRunState, flag: 'hasPozione'): QuestRunState {
   if (state.ended || !state.flags.includes(flag)) return state;
-  state.flags = state.flags.filter((f) => f !== flag);
+  consumeFlag(state, flag);
   const target = state.party.find((m) => !m.dead && (m.wounded || m.hp < m.maxHp));
   if (target) {
     target.wounded = false;
@@ -1022,7 +1036,7 @@ export function useHealing(state: QuestRunState): QuestRunState {
   if (state.ended || !state.flags.includes('hasHealing')) return state;
   const node = nodesFor(state)[state.nodeId];
   if (!node || (node.kind !== 'choice' && node.kind !== 'combat')) return state;
-  state.flags = state.flags.filter((f) => f !== 'hasHealing');
+  consumeFlag(state, 'hasHealing');
   const target = state.party
     .filter((m) => !m.dead)
     .sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
@@ -1149,7 +1163,7 @@ function resolveCheck(
   const consumable = consumableBonusFor(state, node);
   if (consumable && useConsumable) {
     bonus = consumable.bonus;
-    state.flags = state.flags.filter((f) => f !== consumable.flag);
+    consumeFlag(state, consumable.flag);
     if (consumable.flag === 'hasFumogeno') {
       state.log.push({ kind: 'INFO', text: 'Il fumogeno copre la vostra infiltrazione (+15).' });
     } else if (consumable.flag === 'hasCorda') {
@@ -2357,7 +2371,7 @@ export function submitCommand(
     }
   }
   if (option.consumesFlag) {
-    state.flags = state.flags.filter((f) => f !== option.consumesFlag);
+    consumeFlag(state, option.consumesFlag);
   }
   if (option.grantsGold) {
     state.gold += option.grantsGold;
