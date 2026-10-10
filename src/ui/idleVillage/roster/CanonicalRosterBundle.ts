@@ -9,7 +9,7 @@
  */
 
 import { useMemo } from 'react';
-import { TEST_ROSTER_HEROES } from '@/balancing/config/idleVillage/testRosterResidents';
+import { TEST_ROSTER_RESIDENTS } from '@/balancing/config/idleVillage/testRosterResidents';
 import { MINIMAL_GAMEPLAY_RESIDENTS } from '@/balancing/config/idleVillage/minimalGameplayConfig';
 import { savedCharacterToResident } from '@/engine/game/idleVillage/characterImport';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
@@ -24,38 +24,38 @@ import { deriveHpValues, useMinimalGameplayStore } from '@/store/useMinimalGamep
  * @returns Array of ResidentState with full data integrity
  */
 export const canonicalResidentData = (defaultFatigue: number = 0): ResidentState[] => {
-  console.log('DEBUG: TEST_ROSTER_HEROES.length:', TEST_ROSTER_HEROES.length);
-  console.log('DEBUG: TEST_ROSTER_HEROES:', TEST_ROSTER_HEROES);
+  console.log('DEBUG: TEST_ROSTER_RESIDENTS.length:', TEST_ROSTER_RESIDENTS.length);
+  console.log('DEBUG: TEST_ROSTER_RESIDENTS:', TEST_ROSTER_RESIDENTS);
 
-  // Prefer seeded heroes with full SavedCharacter schema (config-first)
-  if (TEST_ROSTER_HEROES.length > 0) {
-    const converted = TEST_ROSTER_HEROES.map((hero) => {
+  // Prefer seeded residents with full SavedCharacter schema (config-first)
+  if (TEST_ROSTER_RESIDENTS.length > 0) {
+    const converted = TEST_ROSTER_RESIDENTS.map((character) => {
       try {
-        const resident = savedCharacterToResident(hero, { defaultFatigue });
+        const resident = savedCharacterToResident(character, { defaultFatigue });
         return {
           ...resident,
           portraitUrl: getResidentPortraitUrl(resident),
         };
       } catch (error) {
-        console.error(`Failed to convert ${hero.name}, using manual fallback:`, error);
+        console.error(`Failed to convert ${character.name}, using manual fallback:`, error);
         // Manual fallback for failed conversions - preserves all data
-        const hpValue = hero.statBlock?.hp ?? 100;
+        const hpValue = character.statBlock?.hp ?? 100;
         const fallbackResident = {
-          id: hero.id,
-          displayName: hero.name,
-          status: hero.status ?? 'available',
+          id: character.id,
+          displayName: character.name,
+          status: character.status ?? 'available',
           fatigue: defaultFatigue,
-          currentHp: hero.currentHp ?? hpValue,
-          maxHp: hero.maxHp ?? hpValue,
-          isHero: hero.isHero ?? false,
-          isInjured: hero.isInjured ?? false,
-          statSnapshot: hero.statSnapshot ?? { hp: hpValue, ...hero.statBlock },
-          statTags: hero.statTags ?? [],
-          portraitUrl: hero.portraitUrl,
-          survivalCount: hero.survivalCount ?? 0,
-          survivalScore: hero.survivalScore ?? 0,
-          statProfileId: hero.statProfileId ?? hero.aiBehavior,
-          visualProfileId: hero.visualProfileId,
+          currentHp: character.currentHp ?? hpValue,
+          maxHp: character.maxHp ?? hpValue,
+          isHero: character.isHero ?? false,
+          isInjured: character.isInjured ?? false,
+          statSnapshot: character.statSnapshot ?? { hp: hpValue, ...character.statBlock },
+          statTags: character.statTags ?? [],
+          portraitUrl: character.portraitUrl,
+          survivalCount: character.survivalCount ?? 0,
+          survivalScore: character.survivalScore ?? 0,
+          statProfileId: character.statProfileId ?? character.aiBehavior,
+          visualProfileId: character.visualProfileId,
         } as ResidentState;
         return {
           ...fallbackResident,
@@ -64,8 +64,8 @@ export const canonicalResidentData = (defaultFatigue: number = 0): ResidentState
       }
     });
 
-    console.log(`Converted ${converted.length}/${TEST_ROSTER_HEROES.length} heroes successfully`, converted);
-    console.log('Available heroes:', TEST_ROSTER_HEROES.map(h => ({ id: h.id, name: h.name, status: h.status })));
+    console.log(`Converted ${converted.length}/${TEST_ROSTER_RESIDENTS.length} residents successfully`, converted);
+    console.log('Available residents:', TEST_ROSTER_RESIDENTS.map(h => ({ id: h.id, name: h.name, status: h.status })));
     return converted;
   }
   

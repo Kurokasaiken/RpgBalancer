@@ -1,7 +1,7 @@
 # Guida E2E — ciclo di vita quest «Sterminio dei goblin» su `/game`
 
-**Richiesta:** R-119 · **Suite:** `tests/e2e/idleVillage/gameQuestLifecycle.spec.ts`
-**Stato:** 11/11 verdi · **Ultima verifica:** 2026-10-11 · **Evidence:** `test-results/r119-quest-lifecycle-e2e-2026-10-11.log`
+**Richiesta:** R-119 (+R-124 reveal, roster 3 eroi + 3 popolani) · **Suite:** `tests/e2e/idleVillage/gameQuestLifecycle.spec.ts`
+**Stato:** 12/12 · **Ultima verifica:** 2026-10-10 · **Evidence:** `test-results/r119-quest-lifecycle-e2e-2026-10-11.log`
 
 Questa guida serve a **far evolvere il flusso poco a poco**: quando un test
 fallisce, qui trovi cosa sta controllando, perché può rompersi, e dove andare
@@ -15,7 +15,7 @@ fallimenti noti è il §6.
 ```bash
 source ~/.nvm/nvm.sh && nvm use        # sempre: Node pinnato da .nvmrc
 
-# Suite intera (~2 min: build + 11 test)
+# Suite intera (~10 min su macchina carica: build + 12 test)
 npx playwright test tests/e2e/idleVillage/gameQuestLifecycle.spec.ts --project="Desktop Chrome"
 
 # Un solo test (match sul titolo)
@@ -55,7 +55,7 @@ regole — `assignToSlot` usa la stessa validazione del drag reale.
 
 | Strato | Meccanismo | Dove |
 |---|---|---|
-| Click sul marker mappa | DOM reale (`data-quest-poi-id`) | `openGoblinDetailViaMap` |
+| Click sul marker mappa | DOM reale (`data-quest-poi-id`), **dopo il reveal** | `openGoblinDetailViaMap` → `revealQuestPois` |
 | Assegnazione al party | **drag pointer reale** (`dragResidentPointer`) in un test; hook `assignToSlot` (stessa eligibilità) negli altri | test «drag reale» vs helper |
 | Click «Invia spedizione» | DOM reale, dopo `bringSendIntoView` | `launchGoblinQuest` |
 | Controlli tempo | DOM reale: radiogroup pausa / `×1` `×2` `×4` nel ribbon HUD | test «clock» |
@@ -86,12 +86,22 @@ getHalo()
 // globali
 advanceTicks(n)                                  // n tick sul clock canonico
 getClock() -> { currentTick, isPaused, speedMultiplier }
+revealQuestPois()                                // R-124: = Director «Mostra quest» → i marker compaiono
 ```
+
+> **R-124 — nessun POI in mappa al boot.** Gli anchor expedition sono gated su
+> `questShown` (Director «Mostra quest») o su una run attiva. Ogni test che
+> vuole il marker chiama prima `revealQuestPois(page)` — lo stesso effetto
+> del toggle Director, necessario anche perché sotto `?capture=1` il pannello
+> non è raggiungibile. Al reveal l'offerta fresca ha halo **vuota** (si
+> riempie solo con `activityProgress` della run); in finestra `expiring`
+> l'anello è ambra warn e scarica antiorario.
 
 ### Selettori stabili (contratto test↔UI)
 
 | Selettore | Elemento |
 |---|---|
+| `[data-map-quest-poi-target]` | ogni marker quest sulla mappa (count 0 = mappa pulita, R-124) |
 | `[data-quest-poi-id="poi-goblin"]` | marker mappa; stato in `data-quest-status` (`available`/`in_progress`/`completed`/`failed`) |
 | `[data-testid="quest-expedition-detail"]` | FloatingPanel del planner |
 | `[data-testid="floating-panel-header-quest-expedition-poi-goblin"]` | header (qui vive il **titolo** «Sterminio dei goblin»; nel body c'è l'objective) |
@@ -111,36 +121,48 @@ POI goblin:    poi-goblin   (quest 'goblin', scenario «Sterminio dei goblin»)
 POI controllo: poi-rovine   (quest 'rovine' — verifica che solo goblin si consumi)
 Slot:   poi-goblin:goblin-slot-leader | -member-1 | -member-2 | -bodyguard
         poi-rovine:rovine-slot-leader
-Residenti: hero-sir-spaccaculi  → eleggibile leader/member/bodyguard
-           hero-giggiolillo    → eleggibile member (clarity|precision)
-           hero-salvatrice     → NON eleggibile al gate leader (ward/clarity vs edge|fortitude)
+Residenti (TEST_ROSTER_RESIDENTS = TEST_ROSTER_HEROES + TEST_ROSTER_VILLAGERS,
+file `src/balancing/config/idleVillage/testRosterResidents.ts` — tutti
+SavedCharacter che passano da `savedCharacterToResident`, la stessa via del
+Character Manager):
+
+  hero-sir-spaccaculi    → eleggibile leader/member/bodyguard
+  hero-giggiolillo       → eleggibile member (clarity|precision)
+  hero-salvatrice        → NON eleggibile al gate leader (ward/clarity vs edge|fortitude)
+  villager-mastro-beppe  → member-1   ('fortitude')
+  villager-lisetta       → member-2   ('precision')
+  villager-baldassarre   → bodyguard  ('warden')
+
+`launchGoblinQuest` trascina REALMENTE 1 eroe + i 3 popolani nei 4 slot
+(party completo) prima di «Invia» — è il flow che il Director gioca a mano.
 ```
 
 ---
 
-## 3. Gli 11 test e cosa inchiodano
+## 3. I 12 test e cosa inchiodano
 
 | # | Test | Invariante verificata |
 |---|---|---|
-| 1 | `boot` | Roster seedato (3 card), marker goblin visibile e `available` |
+| 1 | `boot` | Roster seedato (**6 card**: 3 eroi + 3 popolani); **0 marker prima del reveal** (R-124); dopo `revealQuestPois` il marker è `available` con **sigillo vuoto** (0 path nell'halo) |
 | 2 | `planning` | Click marker → detail; «Invia» disabilitato a slot vuoti; forecast `incomplete`; salvatrice rifiutata (`checkEligibility:false` + `assignToSlot:false` + card `invalid`) |
-| 3 | `planning: drag reale` | Drag pointer card→slot assegna il leader; forecast → `ready`; «Invia» abilitato |
+| 3 | `planning: drag reale` | Drag pointer card→slot (con `scrollIntoViewIfNeeded` su entrambi gli endpoint) assegna il leader; forecast → `ready`; «Invia» abilitato |
 | 4 | `clock: pausa/ripresa` | Pausa: 0 tick in 2.2s; ripresa: tick riparte; **≤3 tick in 2.2s a ×1** (un solo driver!) |
 | 5 | `clock: ×4` | delta tick a ×4 ≥ 2× il delta a ×1 |
-| 6 | `lancio` | «Invia» → QuestRunWindow; POI `in_progress`; party contiene il leader; leader `in-expedition` per altri slot |
+| 6 | `lancio` | 4 drag reali (eroe + 3 popolani) → «Invia» → QuestRunWindow; POI `in_progress`; **party = 4 membri ⊆ roster**; leader `in-expedition` per altri slot |
 | 7 | `run: frontiera` | Frontiera `pending` congelata in pausa, matura a ×4 sul clock reale |
 | 8 | `esito` | Settlement una sola volta: outcome, `loadout-release`, destini residenti come dati (piano **+** store, letti a clock in pausa), **delta gold esatto nello store E nel readout HUD**, nessun doppio settle dopo tick extra |
-| 12 | `Director` | Bottone «start goblin quest» del Director panel (F10): `demoLaunch` attraversa la stessa `send()` del click reale → run su grafo goblin, party ⊆ roster, settle + delta gold store/HUD, POI consumato, assente dopo reload |
-| 9 | `PG a casa` | Dopo il settle il leader è ri-assegnabile su rovine (salvo morte); `isDead` coerente |
+| 9 | `PG a casa` | Dopo il settle il leader è ri-assegnabile su rovine (salvo morte) e **nessun sopravvissuto resta `in-expedition`** (un popolano può fallire il gate rovine per tag — legittimo — mai perché ancora «fuori»); `isDead` coerente |
 | 10 | `chiusura rapporto` | Click «Chiudi» → window chiusa, **marker goblin sparito**, run `null`, rovine intatto |
 | 11 | `reload` | Il POI consumato non torna dopo reload (persistenza `idleVillage.questPois.consumed`); roster operativo |
+| 12 | `Director` | Bottone «start goblin quest» del Director panel (F10): `demoLaunch` attraversa la stessa `send()` del click reale → run su grafo goblin, party ⊆ roster, settle + delta gold store/HUD, POI consumato, assente dopo reload |
 
 ---
 
 ## 4. Il contratto desiderato (cosa deve restare vero)
 
 ```
-marker available → click → planner → slot riempiti → forecast ready
+mappa pulita → reveal «Mostra quest» → marker available, halo vuota
+→ click → planner → slot riempiti → forecast ready
 → «Invia» → run in window + POI in_progress + party locked
 → frontiere pending maturano SOLO col clock (pausa = congelate)
 → bivi waiting = scelta giocatore
@@ -163,9 +185,11 @@ marker available → click → planner → slot riempiti → forecast ready
 | Helper | Uso |
 |---|---|
 | `waitForHooks(page)` | dopo ogni `goto`/`reload`: aspetta che gli hook expedition di goblin+rovine esistano |
-| `openGoblinDetailViaMap(page)` | click reale sul marker + assert header |
+| `revealQuestPois(page)` | R-124: `__idleVillageTestHooks.revealQuestPois()` = Director «Mostra quest» + attesa del marker |
+| `openGoblinDetailViaMap(page)` | reveal + click reale sul marker + assert header |
+| `assignViaRealDrag(page, residentId, slotId)` | drag pointer card→slot con `scrollIntoViewIfNeeded` su entrambi gli endpoint (il planner è più alto del viewport) |
 | `bringSendIntoView(page)` | trascina l'header del FloatingPanel finché «Invia» non rientra nel viewport (necessario se il pannello è più alto dello schermo) |
-| `launchGoblinQuest(page)` | tutto il pre-volo: marker → assign leader → click «Invia» → window aperta |
+| `launchGoblinQuest(page)` | tutto il pre-volo: reveal → marker → **4 drag reali** (eroe+3 popolani) → click «Invia» → window aperta |
 | `driveToPending(page)` | risolve bivi finché la frontiera è `pending` (per testare il clock) |
 | `driveRunToEnd(page)` | guida la run fino a `ended` (scelte + tick) |
 | `waitForSettled(page)` | aspetta `getSettlement().status === 'settled'` |
@@ -207,7 +231,9 @@ la causa e dove intervenire.
 | `member.wounded` ma `resident.isInjured` false (flaky) | **Le ferite scadono**: `QUEST_SETTLEMENT.woundRecoveryTicks` = 5 tick, e `tick()` sana i residenti con `injuredUntilTick <= currentTick`. Sul clock vivo, `flushBeatTheatre`+lettura possono bruciare >5 tick. | Mettere in pausa subito dopo `driveRunToEnd` prima di leggere i destini; il contratto deterministico resta nel `settlement.plan.effects` (`resident-wounded`/`resident-dead`) — asserire entrambi. Nota: i feriti RESTANO eleggibili (`assignableStatuses` include `injured`). |
 | Director «start goblin quest» non apre nulla | Il panel è solo dev/playwright (`import.meta.env.DEV \|\| MODE === 'playwright'`) e F10-toggle; `demoLaunch` riempie solo slot **required** coi primi elegibili — se nessuno è eleggibile il detail resta aperto senza lanciare. | `directorEnabled` in `game-frame-pixi.tsx`; `demoLaunch` in `useQuestExpeditionSession`; verifica che esista un residente eleggibile per `goblin-slot-leader` (edge\|fortitude). |
 | `waiting frontier without options` | Il nodo è waiting ma `getOptions` è vuoto: scena senza opzioni raggiungibili (config rotta). | `availableOptions(run)`; opzioni del nodo nello scenario |
-| Marker mai `available` al boot | Il seed POI non è caricato o è filtrato come consumed residuo da una run precedente. | Seed POI; pulizia storage del context Playwright (ogni test parte da context pulito) |
+| Marker mai `available` al boot | **R-124: è il comportamento corretto** — nessun POI esiste sulla mappa finché la Regia non lo rivela (`questShown`). Se un test cerca il marker senza reveal, fallirà sempre con `element(s) not found`. | Chiama `revealQuestPois(page)` prima (già dentro `openGoblinDetailViaMap`/`launchGoblinQuest`); anchor gate in `game-frame-pixi.tsx` |
+| Marker presente ma `element(s) not found` dopo reload | Il POI era consumato dalla run precedente **dello stesso test** — è il contratto one-shot. | Usa un test separato con context fresco |
+| `getAssignments()` null dopo un drag «andato a buon fine» | Il pointer drop è atterrato fuori dalla drop-zone: lo slot era sotto il fold (planner più alto del viewport) o coperto. | `assignViaRealDrag` fa `scrollIntoViewIfNeeded` su card **e** slot prima del drag — usa quello, mai `dragResidentPointer` nudo |
 
 ---
 
@@ -245,6 +271,7 @@ aggiorna il test e la guida; se no, hai trovato un bug.
 | Driver clock `/game` | `useTimeEngineLoop` (in GameFrameScreen) |
 | Readout risorse HUD | `ResourceReadout` + `buildResourceReadoutItems` |
 | Scenario authored | `src/balancing/config/idleVillage/quests/scenarios/goblin.ts` |
+| Roster di test (3 eroi + 3 popolani) | `src/balancing/config/idleVillage/testRosterResidents.ts` → `CanonicalRosterBundle.canonicalResidentData` + `createInitialState` |
 | Config planner | `QUEST_PLANNER_INFO` |
 | Suite gemella (regressione) | `tests/e2e/idleVillage/gameQuestExpedition.spec.ts` |
 

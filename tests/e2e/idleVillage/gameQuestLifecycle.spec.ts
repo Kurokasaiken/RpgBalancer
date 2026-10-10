@@ -23,11 +23,17 @@ const POI = 'poi-goblin';
 const SLOT_LEADER = `${POI}:goblin-slot-leader`;
 const SLOT_MEMBER = `${POI}:goblin-slot-member-1`;
 const SLOT_MEMBER_2 = `${POI}:goblin-slot-member-2`;
+const SLOT_BODYGUARD = `${POI}:goblin-slot-bodyguard`;
 const POI_ROVINE = 'poi-rovine';
 const SLOT_ROVINE_LEADER = `${POI_ROVINE}:rovine-slot-leader`;
 const VALID_LEADER = 'hero-sir-spaccaculi';
 const VALID_MEMBER = 'hero-giggiolillo';
 const INVALID_RESIDENT = 'hero-salvatrice';
+/* Popolani (isHero:false, stessa SavedCharacter shape del Character
+ *  Manager): tag tarati sugli slot opzionali goblin. */
+const FOLK_FIGHTER = 'villager-mastro-beppe'; // member-1   — 'fortitude'
+const FOLK_SCOUT = 'villager-lisetta'; //        member-2   — 'precision'
+const FOLK_GUARD = 'villager-baldassarre'; //   bodyguard  — 'warden'
 
 /* ---------- browser-hook boundary (same shapes as gameQuestExpedition) ---------- */
 
@@ -67,6 +73,7 @@ interface TestHooksWindow extends Window {
     expedition?: Record<string, Record<string, (...a: unknown[]) => unknown>>;
     advanceTicks?: (n: number) => void;
     getClock?: () => ClockShape;
+    revealQuestPois?: () => void;
   };
 }
 
@@ -124,9 +131,19 @@ const expectedGoldDelta = (terminal: RunShape) =>
   (terminal.outcome === 'reward' ? terminal.resolvedOffer?.rewardResolved ?? 0 : 0) +
   (terminal.outcome === 'wipe' ? 0 : terminal.gold ?? 0);
 
+/** Reveal the quest offers exactly like the Director's «Mostra quest»
+ *  (R-124: no POI sits on the map before that beat — the hook exists for
+ *  `?capture=1`, where the panel itself is hidden). */
+const revealQuestPois = async (page: Page) => {
+  await page.evaluate(() => {
+    (window as TestHooksWindow).__idleVillageTestHooks?.revealQuestPois?.();
+  });
+  await expect(poiMarker(page)).toBeVisible({ timeout: 15_000 });
+};
+
 /** Click the real POI marker on the map — the same path a player takes. */
 const openGoblinDetailViaMap = async (page: Page) => {
-  await expect(poiMarker(page)).toBeVisible({ timeout: 15_000 });
+  await revealQuestPois(page);
   await poiMarker(page).click();
   await expect(detail(page)).toBeVisible();
   /* Il titolo dello scenario vive nel chrome del FloatingPanel (header), il
@@ -156,10 +173,25 @@ const bringSendIntoView = async (page: Page) => {
   }
 };
 
-/** Planning → leader assigned → real click on «Invia spedizione». */
+/** Real pointer drag card→slot inside the planner — the same move a
+ *  player makes on the assignment panel (scrolls each endpoint into view
+ *  first: the panel grew taller than a 720p viewport). */
+const assignViaRealDrag = async (page: Page, residentId: string, slotId: string) => {
+  const card = page.locator(`[data-worker-id="${residentId}"]`).first();
+  const slot = page.locator(`[data-slot-id="${slotId}"]`).first();
+  await slot.scrollIntoViewIfNeeded();
+  await card.scrollIntoViewIfNeeded();
+  await dragResidentPointer(page, card, slot);
+};
+
+/** Planning → 1 eroe + 3 popolani trascinati negli slot (party completo) →
+ *  real click on «Invia spedizione». */
 const launchGoblinQuest = async (page: Page) => {
   await openGoblinDetailViaMap(page);
-  await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
+  await assignViaRealDrag(page, VALID_LEADER, SLOT_LEADER);
+  await assignViaRealDrag(page, FOLK_FIGHTER, SLOT_MEMBER);
+  await assignViaRealDrag(page, FOLK_SCOUT, SLOT_MEMBER_2);
+  await assignViaRealDrag(page, FOLK_GUARD, SLOT_BODYGUARD);
   await expect(sendButton(page)).toBeEnabled({ timeout: 15_000 });
   await bringSendIntoView(page);
   await sendButton(page).click();
@@ -270,12 +302,23 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
     await waitForHooks(page);
   });
 
-  test('boot: roster seedato e marker del POI goblin «available» sulla mappa', async ({ page }) => {
+  test('boot: roster seedato — 3 eroi + 3 popolani — nessun POI in mappa finché la Regia non li rivela', async ({
+    page,
+  }) => {
     await expect(page.locator(`[data-worker-id="${VALID_LEADER}"]`).first()).toBeVisible();
     await expect(page.locator(`[data-worker-id="${VALID_MEMBER}"]`).first()).toBeVisible();
     await expect(page.locator(`[data-worker-id="${INVALID_RESIDENT}"]`).first()).toBeVisible();
-    await expect(poiMarker(page)).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(`[data-worker-id="${FOLK_FIGHTER}"]`).first()).toBeVisible();
+    await expect(page.locator(`[data-worker-id="${FOLK_SCOUT}"]`).first()).toBeVisible();
+    await expect(page.locator(`[data-worker-id="${FOLK_GUARD}"]`).first()).toBeVisible();
+    /* R-124: la mappa parte pulita — nessun marker prima del reveal, e dopo
+     *  «Mostra quest» l'offerta fresca legge `available` con halo VUOTA
+     *  (il sigillo non è scritto finché la run non parte). */
+    await expect(page.locator('[data-map-quest-poi-target]')).toHaveCount(0);
+    await revealQuestPois(page);
     expect(await poiStatus(page)).toBe('available');
+    await expect(poiMarker(page).locator('.poiv3_5--expiring')).toHaveCount(0);
+    await expect(poiMarker(page).locator('.poiv3_5__seal-halo path, .poiv3_5__seal-core path')).toHaveCount(0);
   });
 
   test('planning: click sul marker apre il detail; «Invia» gated sugli slot required; residente non eleggibile rifiutata', async ({
@@ -307,9 +350,7 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
 
   test('planning: drag reale dal roster assegna il leader e il forecast diventa ready', async ({ page }) => {
     await openGoblinDetailViaMap(page);
-    const leaderCard = page.locator(`[data-worker-id="${VALID_LEADER}"]`).first();
-    const leaderSlot = page.locator(`[data-slot-id="${SLOT_LEADER}"]`).first();
-    await dragResidentPointer(page, leaderCard, leaderSlot);
+    await assignViaRealDrag(page, VALID_LEADER, SLOT_LEADER);
 
     const assignments = await expedition<Record<string, string | null>>(page, 'getAssignments');
     expect(assignments[SLOT_LEADER]).toBe(VALID_LEADER);
@@ -365,7 +406,13 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
 
     const run = (await getRun(page))!;
     expect(run.nodeId).toBe('gob-inizio');
-    expect(run.party.map((m) => m.id)).toContain(VALID_LEADER);
+    /* Party completo: 1 eroe + 3 popolani — i quattro id assegnati dai
+     *  drag nel pannello di assegnazione. */
+    const partyIds = run.party.map((m) => m.id);
+    expect(partyIds).toHaveLength(4);
+    expect(partyIds).toEqual(
+      expect.arrayContaining([VALID_LEADER, FOLK_FIGHTER, FOLK_SCOUT, FOLK_GUARD]),
+    );
 
     const locked = await expedition<{ eligible: boolean; reason?: string }>(
       page,
@@ -482,6 +529,20 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
     );
     if (!terminal.party.some((m) => m.id === VALID_LEADER && m.dead)) {
       expect(released.eligible).toBe(true);
+    }
+    /* E OGNI sopravvissuto del party è rilasciato: il motivo di un rifiuto
+     *  non può essere «in-expedition» (un popolano può fallire il gate
+     *  rovine per tag — legittimo — ma mai perché ancora «fuori»). */
+    for (const member of terminal.party) {
+      if (member.dead) continue;
+      const check = await expeditionFor<{ eligible: boolean; reason?: string }>(
+        page,
+        POI_ROVINE,
+        'checkEligibility',
+        SLOT_ROVINE_LEADER,
+        member.id,
+      );
+      expect(check.reason, `${member.id} deve essere rilasciato`).not.toBe('in-expedition');
     }
     const village = await expedition<VillageShape>(page, 'getVillage');
     const leader = village.residents.find((r) => r.id === VALID_LEADER)!;
