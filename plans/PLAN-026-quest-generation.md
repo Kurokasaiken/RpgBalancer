@@ -205,6 +205,15 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   `prudente` sblocca puntellare (unico `dec` su vars). Catalogo v0 =
   **2 gimmick × 3 kit**. 15 test e2e con il seam `forceDie` (PLAN-019-S3),
   suite quest 43/43, build:check PASS. **T3 chiuso.**
+- **P4 — benchmark MC catalogo — FATTO** (`tests/unit/idleVillage/quests/
+  generatedCatalog.bench.test.ts`): 4 politiche × 2 party × 400 run per
+  imprint + `deriveOfferBand` + witness twist + copertura statica.
+  Ha trovato e corretto 3 problemi reali: puntellare non-terminante
+  (one-shot via flag), sacca senza obiettivo (greed = successo vero),
+  banda skewata dalla prima opzione (ordine opzioni = via maestra).
+  Bande dichiarate=misurate; nessun dominatore; twist witness su tutti;
+  trap legittime segnalate. Evidence:
+  `test-results/plan026-p4-benchmark-2026-10-10.log`.
 - T4 — generazione narrativa offline (provider strategy P3) + benchmark.
 - T5 — twist del party (prerequisito: `traits` su ResidentState).
 - T6 — integrazione dopo gate PLAN-019 pertinenti.
