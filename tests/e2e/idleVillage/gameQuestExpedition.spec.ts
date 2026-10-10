@@ -818,5 +818,15 @@ test.describe('Director quest button — same path as a real POI', () => {
     await expect(page.getByTestId('quest-window')).toBeVisible({ timeout: 10_000 });
     // The detail closed behind it — the launch completed, not a draft.
     await expect(page.getByTestId('quest-expedition-detail')).toHaveCount(0);
+
+    /* The «Assigned party» popover renders the REAL roster PgCard per
+     *  traveling member (R: party shown with the canonical card) — one
+     *  [data-testid=pg-card] per run.party entry, keyed by resident id. */
+    const questWindow = page.getByTestId('quest-window');
+    await questWindow.locator('button[aria-pressed]').first().click();
+    const partyCards = questWindow.locator('[data-testid="pg-card"]');
+    await expect(partyCards).toHaveCount(run.party.length, { timeout: 10_000 });
+    const cardIds = await partyCards.evaluateAll((els) => els.map((el) => el.getAttribute('data-worker-id')));
+    expect(cardIds.sort()).toEqual(run.party.map((m) => m.id).sort());
   });
 });
