@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-019-S3 — La parte precedente: Planner vivo (BY MEMBER + WHY + delta), informazione nota/ignota, check certi, trade-off misurati'
-status: active
+status: completed
 created: 2026-10-09
 baptized: 2026-10-09 (Director «approvo»: D-S3-1, D-S3-3 con `revealAtPlanning` in scope, draft party persistente — tutte ratificate)
 desiderata: v23 FROZEN (Mission Planner, rev.1–4), v24 FROZEN (stadio S3 «la parte precedente», rev.1 p.10 preview sui check certi + rev.2 preview compound su ipotesi)
@@ -39,7 +39,7 @@ S2 ha già consegnato una planning surface v0 su `/game` (S2.4):
 | G2 | BY MEMBER obbligatorio (chi assorbe il rischio è visibile, «carne da macello») | `perMember` esiste nel sim, non mostrato | esporre per-slot: ferita/morte/esposizione per membro |
 | G3 | WHY causa→effetto (`+ Companion → +Str → − injury`) | assente | contributi per sorgente (stat, slot, loadout, ferito) in linguaggio non tecnico |
 | G4 | Delta vs configurazione precedente (`18% → 11% ↓`), reversibilità esatta | forecast ricalcola ma non mostra delta | delta su ogni metrica; ripristino config → outcome identici (test) |
-| G5 | Informazione nota/ignota: preview solo sui **check certi**; primaria sempre nota, secondarie/pericoli rivelate | forecast aggregato su tutta la run, nessuna distinzione | modello «cosa si sa a planning» + preview pre-check sui certi |
+| G5 | Informazione nota/ignota: preview solo sui **check certi**; primaria sempre nota, secondarie/pericoli rivelate | forecast aggregato su tutta la run, nessuna distinzione | modello «cosa si sa a planning» (T-1) — preview per-check **ridiretta** dal Director 2026-10-10 a forecast aggregato orientativo |
 | G6 | Successo/durata/rischio leggibili come conseguenza delle scelte | chip aggregati | delta + WHY li rendono causali |
 | G7 | Mappatura PLAN-018 riusa/adatta/superato/manca | mai scritta | artefatto T-0 |
 | G8 | Trade-off reali misurati (gate a/b) | nessuna misura | sweep MC: nessun party dominante + run non risolta nel planner |
@@ -191,20 +191,28 @@ simulazione usata è dichiarata nella UI («ipotesi: percorso X, consumabili Y»
   paga lui (64.4%). Evidenza authored: la razzia ricircola e il danno scala
   per giro — «spingi per sempre» = wipe certo (muro push-your-luck reale).
   Test con timeout espliciti; tabelle stampate → evidence log.
-- **T-6 — Docs + safeguard + evidence.** Spec, kanban, evidence log,
-  aggiornamento mappatura PLAN-018 (righe concluse), DECISION_LOG per le
-  ratifiche D-S3-x.
+- **T-6 — Docs + safeguard + evidence.** ✅ 2026-10-10. Mappatura PLAN-018
+  aggiornata (righe concluse marcate riusa/adatta→seam), gate con esiti,
+  DECISION_LOG: ratifica Director del gate (d) — reward quasi-zero senza
+  violenza totale, wound 100% e muro push-your-luck sono authored voluti.
 
-## Gate (macro-plan S3)
+## Gate (macro-plan S3) — ESITI 2026-10-10
 
-- **(a) Trade-off reali:** la scelta del party non si riduce a «il numero più
-  alto» — chi non lavora al villaggio, chi rischia, cosa non si sa. Misura:
-  T-5.
-- **(b) La quest non è risolta nel Planner:** dopo la miglior preparazione
-  restano decisioni significative in-run — misura T-5 (ii); se fallisce,
-  **rientro in S1** sulle regole.
-- **(c) Preview e resolver concordano sui check certi** — test T-4.
-- **(d) Gate Director.**
+- **(a) Trade-off reali: PASS** — T-5: fronte di Pareto ≥2 (sentinelle
+  reward↔sopravvivenza vs falange/banda); milizia paga di più — difficoltà
+  leggibile. Il BY MEMBER rende esplicito chi paga (bodyguard intercetta,
+  debole esposto identificabile).
+- **(b) La quest non è risolta nel Planner: PASS** — T-5: spread in-run
+  reward 5.5→99.3pp / morti 42→73.4pp tra archetipi a parità di party.
+- **(c) Preview↔resolver sui check certi: RIDIRETTO** — Director 2026-10-10:
+  preview = forecast aggregato orientativo (T-2), niente strada vera né
+  per-check. `certainChecks` (T-1) resta come seam del modello
+  informazione; su goblin ogni check è evitabile (zero certi) — onestà
+  strutturale confermata dalla sweep.
+- **(d) Gate Director: PASS** — 2026-10-10: «La missione si chiama
+  sterminio: ovviamente senza violenza totale nn la soddisfi. Si, sn tutte
+  cose sensate e volute.» Reward quasi-zero senza completamento violento,
+  wound 100% (pedaggio certo) e muro push-your-luck = authored voluti.
 
 ## Fuori scope
 
@@ -271,14 +279,14 @@ Legenda: **riusa** (invariato) · **adatta** (concetto portato, forma nuova) ·
 | Slot obbligatori/secondari | **riusa** | `poi.slots.required/optional` (questPois, S2.3) |
 | Rischio per slot + aggregato | **riusa** | `sim.perMember` (wound/death per membro) + aggregati |
 | `checkStatTags` (stat del check distinte dal gate) | **adatta** | `statFocus`/statTags su slot + scenario (S2.1/2.2) |
-| `coverRiskDelta` (D1 cover) | **adatta** | schema presente su `questItems` ma **non cablato** nel motore nuovo (la sacca produce flag, non delta rischio) — wiring o riformulazione in T-3 |
-| Slot `bodyguard` | **riusa** | `role:'bodyguard'` in schema scenario + `goblin-slot-bodyguard` opzionale nel POI |
+| `coverRiskDelta` (D1 cover) | **adatta** | schema su `questItems`; T-3 ha reso onesta l'eleggibilità: item con canali non cablati esclusi dal pool — wiring del delta resta aperto |
+| Slot `bodyguard` | **riusa** | `role:'bodyguard'` + `goblin-slot-bodyguard`; T-5 misura il valore: intercetta e muore al posto dei membri (BY MEMBER lo mostra) |
 | Consumabili pool party (D3) | **riusa** | sacca run + flag `questStash` |
 | Checkpoint «continua/ritirati» prima dei check rischiosi | **adatta** | non più automatico: è un nodo decisionale authored nel grafo (es. `gob-fermati`) — la frontiera si ferma ai bivi per costruzione |
-| Draft persistente del party | **manca** | T-3 (ratificato al battesimo) |
-| `revealAtPlanning` (esploratore rivela indizi) | **manca** | T-1 (ratificato) |
-| WHY / delta / BY MEMBER UI | **manca** | T-2 (dati già prodotti dal sim) |
-| Preview per-check sui certi | **manca** | T-1+T-4 (`certainChecks`) |
+| Draft persistente del party | **riusa (T-3)** | `idleVillage.questExpeditionDraft.<poi>.<day>` via PersistenceService |
+| `revealAtPlanning` (esploratore rivela indizi) | **adatta→seam esterno** | T-1 schema+engine; T-4 Director 2026-10-10: sorgente = scouting esterno futuro (non slot party) — TODO in schema/sessione |
+| WHY / delta / BY MEMBER UI | **riusa (T-2)** | zona OUTCOME nel Planner: `whyBySource` per nodo, delta ±pp, per-membro |
+| Preview per-check sui certi | **adatta (T-4 redirect)** | preview = forecast aggregato orientativo; `certainChecks` resta seam del modello informazione |
 
 ### Superfici
 
