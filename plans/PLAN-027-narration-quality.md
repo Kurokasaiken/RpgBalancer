@@ -103,3 +103,25 @@ Emit    — single .ts, nested { en: {...}, it: {...} }, provenance
   test: race-miniera r000 deve fallire la validazione).
 - Artefatto bilingue EN+IT emesso e validato; benchmark P4 bit-identico.
 - Provenance: provider/modello/prompt-version/arc-contract embeddati.
+
+## 5. Stato implementazione (2026-10-10, r001 landata)
+
+**Implementato e verificato** (evidence: `test-results/plan027-r001-implementation-2026-10-10.log`):
+
+- Pass 0 `arcContract.ts` — schema, copertura fasi 1:1, prompt architetto,
+  seam `--contract` human-approvable, contract in provenance.
+- Gate esteso — trait/stat/creature/internal-id per-locale, unicità
+  label+titoli, rival-in-flavour, prize-in-objective, recurrence flag;
+  fix boundary destro ('sea' ⊄ 'sealed').
+- Critic (rubrica 10 classi), revise, IT facts-locked re-render,
+  `localeParityIssues`, artefatto nested `{ en, it }`.
+- **Regression DoD**: `tests/fixtures/race-miniera-rejected.kit.ts`
+  fallisce il nuovo gate — `narrationQuality.test.ts` (17 test).
+- **race-miniera rigenerato**: codex/gpt-5.6-terra (quota esaurita a
+  metà run) → fallback gemini-3.8-flash; 86 tentativi, 0 failure.
+  Benchmark P4 su `gen-race-miniera` localizzato: meccaniche intatte.
+- Verifiche: 275/275 scope canonico, build:check ✓, kanban:lint ✓.
+
+**DoD residuo**: review Director (D6 — primo kit del dominio). Flags
+umani aperti: 'campana del turno' 12× IT (motivo da contratto), prop EN
+letterali italiani nei body (glossario prop bilingue = iterazione).
