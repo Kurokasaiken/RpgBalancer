@@ -61,6 +61,7 @@ interface TestHooksWindow extends Window {
   __idleVillageTestHooks?: {
     expedition?: Record<string, ExpeditionHook & Record<string, unknown>>;
     advanceTicks?: (n: number) => void;
+    revealQuestPois?: () => void;
   };
 }
 
@@ -103,12 +104,17 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
-  test('POI is present with an empty halo before launch (D-J)', async ({ page }) => {
-    // questStatus=available → the seal shows no fill (halo empty until «Invia»).
-    const halo = await expedition<HaloShape | null>(page, 'getHalo');
-    expect(halo).toBeNull(); // no run → no halo progress at all
+  test('no POI at boot; the Director reveal mounts offers with an empty halo (D-J)', async ({ page }) => {
+    /* R-124: nothing sits on the map before «Mostra quest»; a fresh offer is
+     *  `available` with the seal unwritten — the halo only exists while a run
+     *  fills it. */
+    await expect(page.locator('[data-map-quest-poi-target]')).toHaveCount(0);
+    await page.evaluate(() => (window as TestHooksWindow).__idleVillageTestHooks?.revealQuestPois?.());
     const marker = page.locator('[data-map-quest-poi-target][data-quest-status="available"]').first();
     await expect(marker).toBeVisible({ timeout: 15_000 });
+    const halo = await expedition<HaloShape | null>(page, 'getHalo');
+    expect(halo).toBeNull(); // no run → no halo progress at all
+    await expect(marker.locator('.poiv3_5__seal-halo path, .poiv3_5__seal-core path')).toHaveCount(0);
   });
 
   test('planning surface opens, gates «Invia spedizione» on required slots, rejects an ineligible resident', async ({ page }) => {
