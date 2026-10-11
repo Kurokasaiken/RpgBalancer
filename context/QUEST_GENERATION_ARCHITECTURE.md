@@ -9,6 +9,8 @@ source: context/ingestions/2026-10-10-quest-generation-flavour-experiment.md,
         context/ingestions/2026-10-10-quest-generation-deepening.md
 related: R-091 (struttura/flavor, generatore a vincoli), R-108 (vincoli quest),
          R-111, R-112 (colpi di scena — direttiva Director), R-113 (deepening),
+         R-127 (approcci alternativi alla core gimmick — §16),
+         R-149 (gimmick «meld» — §17),
          OPEN-014, QUEST_IMPRINTS.md, QUEST_GAMEPLAY_SCIENCE.md,
          PLAN-019-S2.1 (schema scenario canonico)
 ---
@@ -522,3 +524,219 @@ condizioni di sblocco, entità persistenti, conseguenze d'esito).
 Contatto con l'esistente: `village_event_system_spec`, memoria emergente
 P48–P63, registro narrativo (R-093) — ma **nessun contratto di arco
 esiste**: questo è il gap.
+
+## 16. Approcci alternativi alla core gimmick (proposta Director — R-127)
+
+Voice-note Director 2026-10-10: una core gimmick risolvibile su una stat
+può ammettere **canali di check alternativi** su stat/skill diverse.
+
+- **Esempio canonico del ragionamento:** quest di infiltrazione con
+  gimmick «l'allarme sale» — di base si tira Destrezza (passare di
+  soppiatto); con il canale magia si tira **Intelligenza** («invisibilità»),
+  con il canale sociale **Carisma** («camuffamento»).
+- **Vincolo di scope esplicito:** la sostituzione vale **solo per i check
+  che muovono la variabile core** («ogni tiro che dovrebbe far aumentare
+  l'alarm»). I check non-core della stessa quest restano sulle stat
+  native — il «ponte traballante» si tira sempre su Destrezza, le scene
+  di forza su Forza. La quest *non* viene ridipinta: «rimarrà una quest
+  basata sulla destrezza» nelle parti non-gimmick.
+- **Asse diverso dagli approcci di scena:** `approcci-incompatibili`
+  (§3.1/§4) è una scelta *dentro* una scena; il modello a tre approcci
+  §6 (prudente/rapido/interferenza) è una postura rischio/reward. Qui il
+  punto è una proprietà del **gimmick**: *tutti* i check che toccano la
+  var centrale possono essere tirati su un canale diverso.
+- **Distinzione di tipo che ne consegue:** check **core-gimmick**
+  (scrivono/leggono la var centrale) vs check **di scena** (ostacoli
+  locali). Nel contratto v0 questa distinzione non è ancora un campo —
+  è la marcatura che la proposta richiede.
+- **Mapping FACT sul motore attuale:** `QuestNode.stats: LabStat[]` lega
+  già le stat per nodo; l'offerta copre le stat via `statFocus` con check
+  di coerenza. Due forme implementative candidate, **da decidere**:
+  (a) vocabolario stat alternativo sullo stesso nodo core; (b) nodi check
+  paralleli gated da flag/approccio (rami authored, stesso pattern dei
+  twist §9). La quest goblin — allarme reale `campoAllertato`/
+  `campoSveglio` + scelta di approccio in F3 — è il testbed naturale.
+- **INFERENCE marcata:** «tirando invisibilità» suggerisce canali gated
+  da skill/capacità del party (link desiderata v10/v12: skill equip,
+  Int→slot skill) — non dichiarato esplicitamente, da confermare.
+- **Tensione da tenere d'occhio (non conflitto):** se il canale è gated
+  da skill/party, la preview deve mostrare *quali canali il party scelto
+  può usare* — altrimenti la regola «numeri esatti in preview» (R-108)
+  non è rispettata sul check core.
+- **Aperto:** modello di binding (per-check vs per-run vs gated) →
+  **OPEN-017**; status regola in `QUEST_RULES.md` §7 = `proposta`.
+  Risposta AI del transcript troncata a metà — la contro-proposta non è
+  recuperabile (ingestion E-07).
+
+### 16.1 Risultati della ricerca strutturata (2026-10-10 — R-128)
+
+Ricerca multi-provider + ricerca propria su 6 sotto-argomenti — rapporto
+completo in `context/QUEST_GIMMICK_CHANNELS_RESEARCH.md`, evidenza grezza
+in `.mw/runs/20261010-gimmick-channels-research/`. Findings chiave:
+
+- **Binding — ADOTTATO 2026-10-11 (delega Director, R-134):** il modello
+  raccomandato dalla ricerca è un **ibrido**: lock di approccio a
+  run-level (precedente heist/ME2 Suicide Mission), gated dalle
+  capability del party (precedente immersive sim / BG3 / Shadow
+  Tactics), con eccezioni a consumo per singoli check (exception budget
+  stretto). Per-check free choice degrada a shopping di percentuali sotto
+  preview a numeri esatti; best-of-party dissolve l'identità party
+  (anti-pattern WotR). Regola `vigente` in `QUEST_RULES.md` §7;
+  prototipo su quest goblin in `plans/PLAN-028-gimmick-channels-v0.md`;
+  OPEN-017 risolta, monitoraggio espressività in OPEN-018.
+- **Forma dati — leaning:** varianti di canale sullo stesso nodo check
+  (storylet-gating Failbetter), non nodi paralleli con rejoin — crescita
+  del grafo = zero, compatibile con no-runtime-mutation. Corrisponde alla
+  candidata (a) sopra; la (b) è sconsigliata dalla ricerca.
+- **Differenziazione minima:** i canali devono differire su ≥2 assi
+  (costo/rischio/conseguenza/fiction) e soprattutto nei **profili di
+  fallimento** — warning: il nostro allarme è strutturalmente un
+  «failure counter» come le skill challenge 4e fallite; i canali devono
+  produrre transizioni di stato diverse, non alimentare lo stesso
+  contatore.
+- **Preview:** canali bloccati greyed con requisito («Requires: …»),
+  risk tag semantico + stakes accanto alle odds; panel di coverage
+  party×canali pre-quest (UI nuova, nessun precedente shipped trovato).
+- **Narrativa:** Minimal Viable Acknowledgment — un channel-verb nel
+  verdict basta come default (tier T1 ~1.1× costo); divergenza testo
+  fallimento ≥ successo; il canale diventa asse di validazione
+  parallelo al domain-kit (`mustNotImply`/`failureTells`/`channelVerb`).
+- **Validazione:** policy MC per channel health (always-X, party-locked,
+  adaptive-pick-best con soglia degeneracy >70-80%, adaptive-conserve).
+- **Raffinamento scope:** anche tra i check core, menu multi-canale solo
+  sui pivot check (~20-30%) — routine check a canale singolo del lock.
+- **Divergenza-nota:** research segnala che i numeri esatti in preview
+  possono sopprimere la scelta espressiva (EV-shopping). La regola R-108
+  è frozen e non si tocca; la mitigazione è differenziare su assi non-EV
+  + stakes narrative accanto alle odds. Da sottoporre al Director.
+
+## 17. Gimmick «meld» — bonus a scadenza non dichiarata (proposta Director — R-149)
+
+Director 2026-10-12: terza core gimmick candidata, ispirata al **Meld di
+XCOM** — «sai che qualcosa sta per scadere tra X turni non dichiarati;
+hai un indicatore che ti dice che potresti avere un bonus extra se sei
+veloce».
+
+- **Struttura:** un **tracciato bonus parallelo** all'obiettivo
+  principale — non la condizione di vittoria. Il contenitore/meld è
+  raggiungibile solo se il party devia dalla rotta sicura e copre la
+  distanza `rotta → soglia` prima che la `scadenza` arrivi a zero.
+- **Vars:** `rotta` (avanzamento verso il contenitore, mossa dai check
+  del tracciato), `soglia` (fissa, tuning), `scadenza` (turni residui,
+  decresce a ogni azione).
+- **La novità rispetto a race/flood — deadline nascosta, indicatore a
+  stati nominati:** il numero di turni residui **non è dichiarato** al
+  giocatore. L'indicatore mostra solo stati: «disponibile» → «in
+  scadenza» → **«ultima chiamata»** («ultimo turno per raggiungerlo»)
+  → «scaduto». Stessa filosofia degli stati d'allarme nominati
+  (`campoAllertato`/`campoSveglio` vs meter numerico, QUEST_RULES §9)
+  e della soglia nascosta del NarrativeBrief (§13: lo stato corsa è
+  visibile, la soglia no). I numeri delle *scelte* restano esatti
+  (R-108): è lo *stato del mondo* a essere velato.
+- **Opzioni ad alto rischio:** le fasi del tracciato offrono opzioni
+  rapide con **rischio ferita/morte esplicito** che avanzano `rotta`
+  più in fretta — correre costa sangue, andare piano costa il bonus.
+  Stessa famiglia prudente/rapido del §6, proiettata su una deadline.
+- **Risoluzione:** `rotta ≥ soglia` in tempo → bottino extra, TAKEN ma
+  non SECURED fino all'uscita; `scadenza = 0` → il bonus si perde e la
+  quest prosegue sull'obiettivo principale. Perdere il meld non è una
+  sconfitta — è l'occasione mancata, e deve essere *attribuibile*
+  («sono andato piano io», non «il timer mi ha fregato»).
+- **Twist candidati:** `doppio-meld` (secondo contenitore sulla rotta
+  opposta — non prendi entrambi), `meld-presidiato` (contenitore
+  sorvegliato, la raccolta richiede ingaggio).
+- **Status:** `proposta` — registrata nel lab registry
+  (`QUEST_LAB_GIMMICKS.meld`, status `proposal`) con vars, dilemma,
+  twist e sceneKeys; generator `meldGimmick.ts` non ancora scritto.
+  Per il `GimmickRegistry` operativo (PLAN-029) è oltre il cap v1 di 2
+  righe — candidata naturale per «gimmick extra» in v1.1.
+- **Aperto:** la `scadenza` nascosta rende il meld una gimmick con
+  **incertezza di stato** — verificare in playtest che «non so quanti
+  turni ho, ma vedo che sta per chiudere» produca pressione e non
+  frustrazione da informazione negata (equità retrospettiva R-108).
+
+## 18. Hidden check, nodi hazard e «ricompensa ingannevole» (R-151, 2026-10-11)
+
+Richiesta Director: aggiungere il **mimic** — arrivi al tesoro, check
+nascosto di percezione; se fallisci perdi HP e combattimento extra; se
+hai successo non perdi HP, il combattimento è breve (sorpresa tua) ma
+non c'è reward. Più censimento di ciò che manca a gimmick core e di
+fase, con ricerca online (taxonomie Tim Cain, spedizioni Darkest
+Dungeon, XCOM, FTL/StS, letteratura D&D sulle trappole).
+
+### 18.1 Categoria strutturale nuova: nodi hazard
+
+Il catalogo `DecisionFamily` (CONTRACTS §3.1) copre solo **scene con
+scelta**. Il mimic è un **evento senza scelta nel momento**: un check
+nascosto che si auto-innesca su un nodo ricompensa e produce
+conseguenze. È la prima categoria di nodo oltre alle scene decisionali:
+i **nodi hazard** — trigger automatico, check nascosto, esito che può
+includere harms/combat/deviazione. Contratto v0 in
+`QUEST_GENERATION_CONTRACTS.md` §15.
+
+**Regola vigente (QUEST_RULES §3):** il check è nascosto *prima* ma mai
+*dopo* — quando fallisce e l'effetto scatta, il giocatore deve vedere
+che ha fallito un check e su cosa. «Il perché delle cose non si
+nasconde mai dopo» (Director 2026-10-11). Questo trasforma la sorpresa
+in sorpresa **equa retrospettivamente** (P6/P13/P36).
+
+### 18.2 Il mimic nel dettaglio
+
+- **Tre esiti possibili, non due:** la forma Director è check fallito →
+  HP + combat lungo; check riuscito → combat breve a sorpresa, nessun
+  bottino (la cassa È il mostro). Terzo esito candidato: riuscito →
+  opzione di **disimpegno** (eviti lo scontro, rinunci comunque alla
+  «cassa») — trasforma il check in decisione vera, più coerente col
+  framework. Da valutare a design di scena.
+- **Nessun loot in nessun ramo** — si modella pulito con
+  TAKEN≠SECURED: il takeLoot non viene mai emesso.
+- **Frequenza controllata:** armabile come twist/kit-gate
+  (`fakeRewardChance` o ramo authored nei generatori). Se ogni tesoro
+  può essere un mimic a rate alto, i giocatori imparano a
+  «punzecchiare tutto» — comportamento degenerato documentato.
+- **Kit-gated:** il mimic deve stare in `creature_ammissibili` del kit
+  (rovine/dungeon sì, palude aperta no) — regola di coerenza bloccante.
+- **Indizi = equità:** il canale esploratore (QUEST_RULES §2) e i
+  tratti (`prudente`/`sospettoso`) sono i vettori di leggibilità;
+  `NarrativeBrief.hiddenFromPlayer` è il posto dove vive il segreto.
+
+### 18.3 La famiglia «ricompensa ingannevole»
+
+Varianti dello stesso schema (la ricompensa promessa mente):
+
+| Variante | Inganno | Esito |
+|---|---|---|
+| mimic | la cassa è un mostro | combat invece di loot |
+| loot maledetto | il tesoro è reale MA applica malus/cursore | mollare = perdere reward; tenere = portarsi il costo |
+| piedistallo trappolato | prendere X scatta conseguenza salvo compensazione | swap/disinnesco come requisito |
+| tesoro rivendicato | il bottino è di qualcuno | conseguenza di fazione/mondo (gap: fazioni missing) |
+| falso riparo / falsa pista | il «posto sicuro» non lo è; la deviazione è esca | costo tempo/HP |
+
+### 18.4 Decisioni del Director sulla gap map (2026-10-11)
+
+- **Reskin ≠ vera varietà:** gimmick che condividono l'algebra dei
+  cursori con race/flood (preda, salmento, doppio fronte) possono
+  esistere ma **non contano** nella metrica di varietà strutturale
+  (rafforza §13 «varietà strutturale» — la distanza si misura sui
+  dilemmi e sulle scene emesse, non sui nomi delle variabili).
+- **Curio layer (DD): REJ-008** — `context/REJECTED.md`.
+- **Incontri neutrali** (viandanti, mercante errante, prigioniero):
+  al massimo scena minore in quest con molte scene — non una famiglia.
+- **Famiglie candidate non adottate** — registrate come scoperte, non
+  nel catalogo attivo: `male-minore`, `boon-faustiano`, `stanza-?`,
+  `luce-vs-furtivita`, `inganno-agente` (quest'ultimo collega IMPR-002:
+  l'indizio falso è *piazzato* da un agente che ci guadagna).
+- **Combat nodes arricchiti** (props interagibili, boss a stadi):
+  interessante — l'implementazione va pensata a parte, non bloccante.
+
+### 18.5 Core gimmick: il censimento resta aperto
+
+Dalla ricerca restano candidate *strutturalmente nuove* (non reskin):
+**rituale** (boss che si potenzia col tempo → PYL sul climax),
+**scorta** (VIP fragile come secondo cursore), **difesa a ondate**
+(direzione invertita: il mondo viene a te), **cargo volatile**
+(l'obiettivo stesso è il pericolo), **corruzione** (cursore su un
+membro — unico asse interno al party), **indagine a soffio**
+(prove/sospetto/scadenza). Nessuna adottata: per il `GimmickRegistry`
+operativo il prossimo slot dopo `meld` resta una decisione del
+Director (cap v1 di PLAN-029).

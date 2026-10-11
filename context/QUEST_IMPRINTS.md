@@ -576,3 +576,62 @@ solo tra tag, è tra imprint.
   IMPR-001 appare in IMPR-002-C) — la memoria si intreccia senza costruirla.
 - **Le function spec hanno tenuto** su tre domini diversi; gli errori della
   volta scorsa non si ripetono perché ogni dettaglio viene dal kit.
+
+---
+
+## Compilazione imprint→grafo (R-152, 2026-10-12)
+
+Le function spec dei beat non sono più solo istruzioni per il testo: da
+R-152 esiste la compilazione in **grafo meccanico reale**. Primo artefatto:
+`gen-impr002-palude` «The Lock-Keeper's Bargemen» — IMPR-002 × kit palude —
+in `src/balancing/config/idleVillage/quests/generation/impr002Palude.ts`.
+
+### Il contratto di compilazione
+
+| Beat (function spec) | Compilazione meccanica |
+|---|---|
+| B0 PREMISE — manca il mezzo | choice di apertura: accettare l'aiuto (flag `uomini-di-a`, prezzo pagato dopo) o pagare il pedaggio dell'autonomia (check di approccio) |
+| B1 THE HELP — l'aiuto è la trappola | il flag dell'opzione: il costo si materializza nel routing di B3, non in un testo |
+| B2 CRACKS — inconsistenze | vars del run (`sospetto`): N canali one-shot (flag `segna-*` + `hiddenIfFlag`), epicfail arma la trappola (`annusati`) — i segni sono sociali/comportamentali, mai prove fisiche |
+| B3 THE TURN — il piano era suo | check router con `goto` condizionale sullo stato POST-effetto: pronti→sorpresa, sospetto≥2→lettura di conferma, annusati→imboscata pesante, altrimenti→pedaggio cieco. Tutte le rotte finiscono dentro la sua disposizione |
+| B4 INSIDE-OUT — nella sua casa | fork a 4 vie: forza (combat lungo, numeri suoi), sorpresa (combat breve gated `pronti` — il payoff dei crack), fuga (check), recita (check sociale; il fail marca `smascherati` e l'opzione sparisce — una recita non si offre due volte) |
+| B5 IRONY — la posta era un fantasma | il nodo cassa: `posta-mossa` su OGNI riga di verdetto — chiunque tenga il campo trova il contenuto già mosso; solo una buona lettura trova `depositario-traccia` (il seme della chain: chi l'ha svuotata) |
+| B6 FORK — esiti divergenti | flag che il run scrive per il mondo: `a-consegnato` (reward), `a-fuggito` (seme entità ricorrente — può prodursi anche da un check fallito, TAKEN≠SECURED sul prigioniero), `a-padrone`, `soci-onorati`/`soci-traditi` |
+
+### Cosa è generico e cosa resta authored
+
+- **Generico (il ponte, riusabile):** lo scenario compilato è un
+  `QuestScenario` che viaggia sul profilo motore `'gen'` via
+  `ScenarioInstance` — stessa via dei generati skeleton×kit, zero switch
+  authored. `verdictTable`, vars, `armRolls` trait-gated, goto condizionali
+  bastano per esprimere i beat: **nessun delta motore** salvo la copy del
+  combat (sotto). Id `gen-<imprint>-<dominio>` marca la provenance:
+  `labModel.imprintCatalogEntries()` li espone come classe distinta dalle
+  generazioni gimmick×kit — nessun GimmickId coinvolto.
+- **Delta motore minimo:** `CombatSpec` ha ora copy dichiarativa opzionale
+  (`enemyName`, `attackLines`, `clearedText`, `survivorsText`,
+  `holdingText` con placeholder `{turn}`/`{left}`) — fallback goblin
+  identico, nessuna migrazione. Serve a ogni fight non-goblin, incluso il
+  mimic (combattimento breve da sorpresa, nessun bottino).
+- **Authored (per-istanza):** il grafo stesso — nodi, vars, pesi delle
+  tabelle, copy. La compilazione v0 è artigianale: il beat diventa nodo per
+  scelta di design, non per trasformazione automatica. Un compilatore
+  meccanico function-spec→grafo è possibile solo dopo 2-3 istanze (serve
+  vedere cosa si ripete).
+
+### Chain-ready, non chain-executed
+
+I flag B6 e l'intel `depositario-traccia` sono **hook espliciti**: il
+grafo scrive entità e fatti irrisolti nel report (epilogue lore/titles),
+ma il registro mondo che li leggerà (casting persistente, scheduling
+«perché ora?», semi dormienti/consumati) è il gate M-02/M-12 — non
+esiste ancora. La compilazione garantisce che quando arriverà, gli scenari
+imprint avranno già qualcosa da consegnargli.
+
+### Convenzione di naming
+
+Attenzione alla collisione storica: in PLAN-026 «imprint» indicava lo
+scenario generato skeleton×kit. Da R-152: **imprint narrativo** = scheletro
+causale di QUEST_IMPRINTS (IMPR-XXX); **imprint-compiled scenario** =
+questo file (id `gen-imprXXX-*`); **generated scenario** = skeleton×kit
+(id `gen-<gimmick>-<kit>`).

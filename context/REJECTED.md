@@ -128,3 +128,18 @@ Formato voce:
   `context/ingestions/2026-10-06-quest-strategiche-continuazione.md` (E-02).
 - **Related decision:** catena `PARTY → QUEST → PHASE → SITUATION → APPROACH →
   CHECK/CHOICE → CONSEQUENCE` (QUEST_RULES §1, PLAN-019).
+
+## REJ-008 — Curio layer (oggetti interagibili stile Darkest Dungeon)
+
+- **Rejected approach / idea:** un layer di oggetti di interesse opzionali a
+  tabella di rischio nascosta, neutralizzabili dallo «strumento giusto»
+  (pattern dei curio di Darkest Dungeon: interagire a mani nude = rischio,
+  usare il tool corretto = sicuro).
+- **Why rejected:** Director 2026-10-11 — *«B nn m piace, evitiamo»*.
+- **Status:** `rejected`
+- **Reopen-if:** solo su esplicita rivalutazione del Director; non
+  riproporre come famiglia di scene di default.
+- **Source / provenance:** gap map gimmick di fase, esplorazione R-151.
+- **Related decision:** famiglia «ricompensa ingannevole» resta valida
+  (mimic e affini, ARCHITECTURE §18) — il rifiuto riguarda il layer curio
+  generalizzato, non le singole trappole authored.

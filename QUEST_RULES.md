@@ -1,7 +1,7 @@
 ---
 title: Quest Rules — regole vigenti
 type: canonical
-updated: 2026-10-05
+updated: 2026-10-10
 plan: PLAN-020
 ---
 
@@ -111,6 +111,18 @@ al Director, non assorbimento silenzioso.
   check, consumati al lancio. Nel total della simulation preview i
   consumabili sono ignorati (OPEN-008).
   **STATUS:** `vigente`. **SOURCE:** v23 rev.4 D3; DECISION_LOG 2026-09-30.
+- **RULE — Check nascosti e rivelazione post-esito:** un check può essere
+  **nascosto** mentre avviene (es. percezione su una minaccia mimetica,
+  una trappola, un inganno). Se il check fallisce e produce un evento
+  imprevisto (danno, combattimento extra, deviazione), il fallimento e
+  l'oggetto del check **vengono rivelati al giocatore nel momento
+  dell'effetto** — «hai fallito un check di X» è parte dell'esito, non un
+  dettaglio soppresso. Il nascosto vale solo *prima*: il *perché* delle
+  cose non è mai nascosto *dopo*.
+  **STATUS:** `vigente` (principio espresso dal Director).
+  **SOURCE:** Director 2026-10-11 (R-151). Collega P6/P13/P36
+  (attribuzione), le clausole di equità dei twist (trigger leggibili /
+  indizi) e la regola preview-vs-twist-nascosti (CONTRACTS §14).
 
 ## 4. Bodyguard e death save
 
@@ -209,6 +221,26 @@ al Director, non assorbimento silenzioso.
   (Percezione ← `txc`, Forza ← `damage`, Costituzione ← `hp`, …).
   **STATUS:** `vigente` come direzione; mappatura completa `open` (OPEN-003).
   **SOURCE:** v24 rev.1 p.13.
+- **RULE — Canali alternativi sui check della core gimmick:** una core
+  gimmick (es. infiltrazione/allarme che sale) risolvibile normalmente su
+  una stat può ammettere **canali di check alternativi** su stat/skill
+  diverse — es. invisibilità → Intelligenza, camuffamento → Carisma al
+  posto di Destrezza. La sostituzione riguarda **solo i check che muovono
+  la variabile core** («ogni tiro che dovrebbe far aumentare l'alarm»):
+  i check non-core della stessa quest restano sulle stat native.
+  **Modello di binding (adottato):** lock di approccio a run-level,
+  capability-gated dal party, con eccezioni a consumo per singoli check
+  (exception budget ~1/run); roll per **membro nominato** (mai
+  best-of-party); max **3 canali** per check; menu multi-canale solo sui
+  **pivot check** (~20-30% dei check core), routine check sul canale del
+  lock; canali bloccati **greyed con «Requires: …»**; divergenza dei
+  **profili di fallimento** per canale obbligatoria (non solo DC diversa).
+  **STATUS:** `vigente` — adottata su delega Director 2026-10-11
+  («fai cm reputi meglio», R-134) a valle della ricerca R-128;
+  reversibile al playtest del prototipo v0 (PLAN-028).
+  **SOURCE:** `context/ingestions/2026-10-10-quest-gimmick-approcci-alternativi.md`;
+  R-127/R-128/R-134; `context/QUEST_GIMMICK_CHANNELS_RESEARCH.md`;
+  dettaglio in `context/QUEST_GENERATION_ARCHITECTURE.md` §16.
 
 ## 7b. Coerenza della minaccia (quest authoring/generazione)
 
@@ -237,6 +269,14 @@ al Director, non assorbimento silenzioso.
   `campoAllertato`/`campoSveglio`, commit `f7a55a73`).
 - **Proposte villaggio** (leader-capacity, human-days, quest come
   opportunità): `proposta` — non ratificate, tracciate in OPEN-010 e R-083.
+- **Proposte layer opportunità** (2026-10-11, discussione Director↔GPT):
+  tassonomia requisiti a 4 tipi (accesso assoluto / capacità /
+  costo-o-rischio / ottimizzazione), gate assoluti solo per impossibilità
+  effettive, preparazione insufficiente in 3 casi (impossibile /
+  compensabile a costo / tentabile a rischio), ricompense che aprono
+  porte (8 categorie), esploratore orientabile sulla generazione.
+  `proposta` — non ratificate, tracciate in
+  `context/QUEST_OPPORTUNITY_LAYER.md` e OPEN-019/020/021.
 - **Criterio di diagnosi:** *«una quest infallibile è inutile; le scelte non
   sono scelte se non posso mai fallire»* — losabilità e attribuibilità del
   fallimento sono il requisito, non una percentuale target.

@@ -32,9 +32,9 @@ import { QUEST_LAB_GIMMICKS, type LabGimmick } from '@/balancing/config/idleVill
 /* ------------------------------------------------------------------ */
 
 /** Gimmick ids — match the `gen-<gimmick>-<kit>` scenario id segment. */
-export type GimmickId = 'race' | 'flood';
+export type GimmickId = 'race' | 'flood' | 'meld';
 
-const GIMMICK_IDS: readonly GimmickId[] = ['race', 'flood'];
+const GIMMICK_IDS: readonly GimmickId[] = ['race', 'flood', 'meld'];
 
 /** The gimmick a catalog scenario id encodes (`gen-race-x` / `gen-flood-x`). */
 export function gimmickOf(scenarioId: string): GimmickId | undefined {
@@ -301,6 +301,45 @@ export function labCatalogEntries(): LabCatalogEntry[] {
         gimmick: QUEST_LAB_GIMMICKS[gimmickId],
         kitId,
         kit,
+        stats: scenarioStats(scenario),
+        twists: scenarioTwists(scenario),
+        traitsUsed: scenarioTraitsUsed(scenario),
+        mechanicsUsed: scenarioMechanicsUsed(scenario),
+      },
+    ];
+  });
+}
+
+/**
+ * A catalog entry for an imprint-compiled scenario (R-152): the `id` rides
+ * the 'gen' profile (`gen-<imprint>-<domain>`) but encodes no gimmick, so
+ * `labCatalogEntries` skips it by design. These entries keep the lab's
+ * coverage honest — every catalog row is either a gimmick generation or an
+ * imprint spine, never a silent third thing.
+ */
+export interface LabImprintEntry {
+  scenario: QuestScenario;
+  /** Imprint segment of `gen-<imprint>-<domain>` (e.g. `impr002`). */
+  imprintId: string;
+  /** Domain segment of `gen-<imprint>-<domain>` (e.g. `palude`). */
+  domainId: string;
+  stats: ScenarioStats;
+  twists: ScenarioTwist[];
+  traitsUsed: string[];
+  mechanicsUsed: string[];
+}
+
+/** Catalog scenarios that are imprint spines, not skeleton×kit generations. */
+export function imprintCatalogEntries(): LabImprintEntry[] {
+  return Object.values(GENERATED_CATALOG).flatMap((scenario) => {
+    if (gimmickOf(scenario.id)) return [];
+    const m = /^gen-([a-z0-9]+)-(.+)$/.exec(scenario.id);
+    if (!m) return [];
+    return [
+      {
+        scenario,
+        imprintId: m[1]!,
+        domainId: m[2]!,
         stats: scenarioStats(scenario),
         twists: scenarioTwists(scenario),
         traitsUsed: scenarioTraitsUsed(scenario),
