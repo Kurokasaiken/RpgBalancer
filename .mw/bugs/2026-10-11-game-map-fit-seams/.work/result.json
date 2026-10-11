@@ -1,0 +1,32 @@
+{
+  "status": "fixed",
+  "fix": [
+    "gameFrameConfig: seaMarginPx 700→3600, seaMarginYPx 400→1800 — la portata del mare aperto (nebbia piatta oltre ~1700px) fa scendere il coverage floor sotto il fit a tutti i viewport target",
+    "PixiWorldMap: SEA_QUAD_PAD=1600 — quad deepSea/seaPattern estesi oltre i bound di pan → il bordo quad non raggiunge mai lo schermo (niente sliver di stageColor)",
+    "PixiWorldMap: onWheel clampato a max(floor, cameraConfig.minZoom) — minZoom 0.18 del manifest ora onorato solo sullo zoom utente",
+    "PixiWorldMap: seabed cappato a min(margin,700)+pad e deepSea fuori da seaSprites → il reveal drag assottiglia solo il mare dipinto, oggetti del letto mantengono la scala",
+    "PixiWorldMap: refitRef resetta userMoved → dopo recenter i resize rifanno il fit"
+  ],
+  "verification": {
+    "probe": "test-results/probe-game-map-fit/probe-report.json + game-*.png",
+    "results": [
+      "1920x800: zoom 0.2623=fit (era floor-bound 0.3404, land.y0=-95.6) → land y0=87 y1=700, violazioni 0",
+      "1600x760: zoom 0.2452=fit (era 0.2837, land.y0=-3) → land dentro area libera, violazioni 0",
+      "1440x900: zoom 0.2687=fit → violazioni 0",
+      "1280x800: zoom 0.2255=fit → violazioni 0",
+      "1024x700: zoom 0.1564=fit (sotto minZoom: corretto, è il fit non lo zoom utente) → violazioni 0",
+      "resize dopo zoom utente: camera utente mantenuta (contratto = stato a riposo)",
+      "cuciture: profilo RGB continuo alla riga canvas (78,132,136 → 81,137,141); nessuna linea visibile negli screenshot; bordi quad irraggiungibili"
+    ],
+    "env": "load avg >200 durante la sessione: timeout intermittenti di Chrome/vite (ambientali), retry ok"
+  },
+  "safeguards": {
+    "lint_scope": "0 errori (warning preesistenti su game-frame-pixi; PixiWorldMap+config eslint-ignored)",
+    "tsc_app": "pulito sui file toccati",
+    "unit_scope": "28/28 PASS (MapAssetConsistency, useWorldSurface, WorldSurfaceLayerOrder, validateWorldSurfaceAssets, hudGuards)",
+    "build_check": "PASS (test-results/build-check-2026-10-11.log)",
+    "kanban_lint": "PASS (38 prompt)"
+  },
+  "evidence": "test-results/r148-game-map-fit-seams-2026-10-11.log + test-results/probe-game-map-fit/",
+  "notes": " Safeguards completati tutti verdi. Kanban + RICHIESTE aggiornati."
+}

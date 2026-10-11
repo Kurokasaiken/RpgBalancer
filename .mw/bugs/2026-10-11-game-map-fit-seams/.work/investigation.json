@@ -1,0 +1,34 @@
+{
+  "bug": "R-148 — /game: la mappa diventa troppo grande, la HUD copre terra; allargando il mare compaiono linee tra mare 'vecchio' e 'nuovo'",
+  "date": "2026-10-11",
+  "recurrence": "Terzo episodio della stessa famiglia (dopo R-121 south-pin e 8254e8e1 margins 260→700). La trappola T-01 in context/recurring-traps.md lo prevedeva.",
+  "symptoms_observed": [
+    "1920x800 e 1600x760: zoom = floorZoom (0.3404 / 0.2837) > fit (0.262 / 0.245) → land bbox y0 = -95.6px / -3px → terra sotto la placca superiore (chrome fisso)",
+    "480x700: floor domina (0.193) → terra visibile sotto placca menu e plinth nav (screenshot game-480x700.png)",
+    "3440x1440: probe fallito per timeout (load avg 213 — ambientale, da riprovare)",
+    "Linee: nessun gradino di colore alla riga canvas (profilo RGB per colonna continuo a x=181 su 1440x900), MA il bordo del quad deep-sea cade ESATTAMENTE sul bordo schermo quando floor-bound (pan clamped a -700 → quad edge a x=0 e x=W) → sottile riga stage '#489397' possibile per sub-pixel",
+    "Rottura di frequenza della texture alla riga dipinto↔generato (caustiche dipinte finiscono di colpo) — percepita come linea morbida"
+  ],
+  "root_cause": {
+    "fit_vs_floor": "floorZoom() = max(W/(canvas+2*seaMargin), H/(canvas+2*seaMarginY)) è un vincolo di COPERTURA: il viewport deve stare dentro il rettangolo mare renderizzato. refit() usa max(floor, min(fitW, fitH)): quando il floor vince, la terra esce dall'area libera. Con margin 700/400 il floor vince a 1920x800, 1600x760 e sotto ~1280px di larghezza. Aumentare i margini abbassa il floor ma sposta solo la soglia (T-01).",
+    "seam_mechanism": "Quando il floor vince, apply() clampa panX/panY esattamente a -margin: il bordo del quad deepSea si allinea al bordo schermo → slivers di stageColor. I quad mare (deepSea + seaPattern) coprono SOLO ±margin: oltre c'è lo stage '#489397', più chiaro del mare profondo → rettangolo visibile se raggiungibile.",
+    "ignored_minzoom": "manifest camera.minZoom=0.18 è letto dallo schema ma MAI usato: floorZoom fa da min-zoom di fatto, accoppiando copertura e leggibilità.",
+    "seabed_follows_margin": "il letto marino (reveal durante drag) usa margin+pad: con margini grandi gli oggetti (rovine, forzieri) si stirerebbero di proporzioni enormi."
+  },
+  "evidence": {
+    "probe": "test-results/probe-game-map-fit/probe-report.json + game-*.png",
+    "seam_column_profile": "x=178..184 rgb continuo (62,121,127)→(62,121,127): nessun gradino di colore alla riga",
+    "system": "load avg 213 durante il probe: i timeout di 3440x1440 e page.close sono ambientali"
+  },
+  "files": [
+    "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx (floorZoom L1261, apply L1263, refit L1277, deepSea L604-635, seabed L643-798, seaPattern L837-868, onWheel L1600)",
+    "src/balancing/config/idleVillage/gameFrameConfig.ts (safeFit L449-455)",
+    "src/pages/game-frame-pixi.tsx (PANEL_FIT_SHARE L63, safeFit L174-179)"
+  ],
+  "constraints": [
+    "Non risolvere solo ingrandendo il mare (T-01): il floor deve smettere di combattere il fit",
+    "Config-first: gli estremi vanno in gameFrameConfig (schema già esistente)",
+    "Il contratto riguarda lo stato a riposo/apertura: camera utente libera durante l'esplorazione",
+    "HUD guide: chrome fisso mai su terra protetta; pannelli flottanti ammessi se chiudibili/mobili"
+  ]
+}
