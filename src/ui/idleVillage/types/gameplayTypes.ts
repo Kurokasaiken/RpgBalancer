@@ -23,6 +23,11 @@ export interface MinimalResident {
   /** Tick at which a settlement-inflicted wound heals (`tick` clears
    *  `isInjured` when reached). Undefined = legacy/self-managed injury. */
   injuredUntilTick?: number;
+  /** Out on an unsettled quest expedition — set at `send()`, released by
+   *  `applyPlanToState` at settlement. While true the wound countdown may
+   *  pass but `tick()` does NOT heal: recovery only happens at rest
+   *  (R-139: «le ferite si rigenerano a riposo, non mentre sei assegnato»). */
+  isOnExpedition?: boolean;
 }
 
 export type LocationStateMap = Record<string, LocationDropState>;
