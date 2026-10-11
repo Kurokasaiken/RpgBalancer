@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { ROSTER_SORT_MODES } from '@/ui/idleVillage/config/rosterSortConfig';
 import type { RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
+import { GameIconChecklist } from './gameIcons';
 
 /**
  * Props for the RosterSortIcon component
@@ -57,22 +58,9 @@ export function RosterSortIcon({
       aria-label={tooltip}
       data-testid="roster-sort-icon"
     >
-      {/* Sort icon - arrow indicating direction */}
-      <svg 
-        width="16" 
-        height="16" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-        className={`text-slate-400 ${isAscending ? '' : 'rotate-180'}`}
-      >
-        <path d="m3 3 18 18"/>
-        <path d="m6 10 6-6"/>
-        <path d="m11 15 6-6"/>
-      </svg>
+      <GameIconChecklist
+        className={`h-3.5 w-3.5 text-slate-400 ${isAscending ? '' : 'rotate-180'}`}
+      />
     </button>
   );
 }

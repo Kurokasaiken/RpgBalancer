@@ -2543,3 +2543,17 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Fix (2):** generate via pipeline canonica SDXL (`scripts/rpg-gen-mockup.py`, spec `.mw/specs/hud-resource-icons/` con design-intent/identity/prompt, `--enforce-canon`), selezionate, ritagliate a medaglione circolare con alpha e ridotte a 96px WebP: `public/assets/fantasy_ui/icon_{gold,food,wood}.webp`. `HudGlyph` ora serve l'asset per gli id `gold|food|wood` (`HUD_ICON_ASSETS`), SVG invariato per gli altri.
 
 **Safeguards:** lint scope 0 errori (file in quarantena); unit hudGameMenu 7/7; hudGuards: 2 fail = violazioni preesistenti in HEAD (MapQuestPoi hex, QuestRunWindow fontSize 11) — nessuna nuova; build:check PASS; kanban:lint PASS; smoke live /game 200: tre medaglioni renderizzati, nessun errore console.
+
+## R-137 — /game: filtro roster V2 inutile/morto + icone brutte
+
+**Richiesta (verbatim):** *"il componente roster v2 ha il filtro nn funzionante, deve tornare utile e filtrare per tutte le cose che la V1 già faceva. Inoltre: le sue icone sn brutte, scaricale online e usane d migliori che siano a tema cn il nostro progetto"*
+**Data:** 2026-10-11
+**Stato:** `fatta` — verificato live su FE via Puppeteer.
+
+**Diagnosi:** il select status funzionava ma era l'unico controllo vivo dell'header compatto: il select stat-sort era un mockup inerte (stato locale mai consumato) nascosto in compact, e il comparatore interno `sortedResidents` era applicato solo oltre la soglia di virtualizzazione (30) — con roster piccoli l'ordine era quello upstream e il raggruppamento eroi-attivi-bloccati non veniva mai applicato.
+
+**Fix (sort/filtro):** `sortSelection` reale con opzioni complete della superficie V1 — i 4 modi di `rosterSortConfig` (Nome A→Z, Nome Z→A, HP, Fatica) + statistiche dinamiche `stat:<key>` da `getFilterStatKeys()` (tracciano lo StatBlock del Balancer) + toggle direzione (abilitato solo sulle stat). Il comparatore ordina dopo il filtro status, dentro i gruppi eroe/attivo/bloccato, con fallback stabile sull'ordine upstream (il `RosterSortIcon` nome A→Z/Z→A resta vivo). Il ramo non-virtualizzato ora renderizza `sortedResidents` (prima bypassava il comparatore). Select visibile anche in compact. Rimossi i `console.log` di debug dal percorso filtro/selezione.
+
+**Fix (icone):** glifi scaricati da game-icons.net (CC BY 3.0 — Lorc: eyeball/hidden/cross-mark; Delapouite: funnel/checklist/split-arrows), rielaborati come path `currentColor` nel nuovo modulo `src/ui/idleVillage/components/gameIcons.tsx` (attribution in JSDoc). Sostituiscono Eye/EyeOff/X/ArrowUpDown di lucide nell'header V2 e il glifo SVG rotto di `RosterSortIcon`. Il select filtro ha icona funnel, il sort checklist.
+
+**Safeguards:** lint scope 0 errori; test `rosterV2Controls` 5/5 nuovi, `rosterSortIcon` 7/7, `rosterSortConfig` 8/8, `RosterStatFilter` 20/20, `rosterKit.compact` verde; `VillageRosterSection.unit` 4 fail = `sortMode="rarity-desc"` non supportato, crash identico su HEAD (preesistente); `hudGuards` 2 fail preesistenti in HEAD; build:check PASS; kanban:lint PASS; smoke live /game 200: ordinamenti `name-desc`/`stat:damage` e filtro `available` verificati sul DOM (6→5 residenti), pill 26px, 6 glifi fantasy renderizzati.
