@@ -1016,6 +1016,11 @@
       "loadGame": "Carica partita…",
       "quit": "Esci al titolo",
       "theme": "Tema",
+      "language": "Lingua",
+      "languages": {
+        "en": "English",
+        "it-IT": "Italiano"
+      },
       "settings": "Tutte le opzioni…",
       "comingSoon": "Non ancora disponibile"
     },
@@ -1446,6 +1451,89 @@
         "potion": "Cura completamente un membro ferito",
         "banner": "Vessillo del Guardiano — lo porta il leader: −6% ferita, −4% morte per ogni altro membro finché resta in piedi"
       }
+    }
+  },
+  "questGenLab": {
+    "title": "Quest Generation Lab",
+    "subtitle": "Banco di prova della generazione quest (PLAN-026): come nasce una quest, con quali ingredienti, come si gioca e cosa cambia dopo. Gli stati segnano cosa gira davvero, cosa vive solo offline e cosa manca.",
+    "backToHub": "Test Hub",
+    "footer": "Quest Generation Lab · contenuto authored in italiano · R-138",
+    "sections": {
+      "pipeline": "Come nasce una quest",
+      "pipelineDesc": "L'albero di creazione: dall'input al run concluso. Apri ogni passo per dettagli, file e stato reale.",
+      "ingredients": "Ingredienti",
+      "ingredientsDesc": "Gimmick core, domain kit (il «tag» del mondo), trait dei PG, twist e glossario delle meccaniche.",
+      "catalog": "Catalogo generato",
+      "catalogDesc": "Gli scenari pre-generati del catalogo v0: metadati, albero dei nodi e run giocabile sul motore reale (profilo gen).",
+      "consequences": "Cosa cambia dopo",
+      "consequencesDesc": "La matrice delle conseguenze: party, villaggio, fazioni, mondo, quest future — cosa esiste e cosa no.",
+      "systems": "Mappa dell'implementazione",
+      "systemsDesc": "Ogni sottosistema: dove vive, cosa cambia meccanicamente, quali test lo coprono.",
+      "open": "Cosa manca / decisioni aperte",
+      "openDesc": "Le cose facili da dimenticare: tassonomia dei tag, soglie, archi narrativi, canali, offerte ignorate."
+    },
+    "tabs": {
+      "gimmicks": "Gimmick",
+      "kits": "Kit & tag",
+      "traits": "Trait",
+      "twists": "Twist",
+      "mechanics": "Meccaniche"
+    },
+    "status": {
+      "implemented": "implementato",
+      "partial": "parziale",
+      "offline": "offline",
+      "gated": "gated",
+      "proposal": "proposta",
+      "missing": "mancante"
+    },
+    "labels": {
+      "reads": "legge",
+      "writes": "scrive",
+      "resolution": "risoluzione",
+      "twists": "twist",
+      "scenes": "scene",
+      "scenarios": "scenari",
+      "authored": "authored",
+      "narrated": "narrato",
+      "options": "opzioni",
+      "runstart": "inizio run",
+      "inRun": "in-run",
+      "objective": "obiettivo",
+      "primaryStats": "stat primarie",
+      "tags": "tag",
+      "mechanicsUsed": "meccaniche usate",
+      "traitsUsed": "trait usati",
+      "tree": "albero dei nodi",
+      "play": "gioca"
+    },
+    "play": {
+      "setup": "prepara il run",
+      "preset": "party preset",
+      "seed": "seed",
+      "start": "avvia run",
+      "gold": "oro",
+      "flags": "flag",
+      "intel": "intel",
+      "loot": "bottino",
+      "chronicle": "cronaca",
+      "flee": "ritirata",
+      "reset": "reset",
+      "newRun": "nuovo run",
+      "outcome": {
+        "reward": "Ricompensa",
+        "survived": "Sopravvissuti",
+        "fled": "Fuga",
+        "wipe": "Strage"
+      },
+      "objectiveDone": "obiettivo completato",
+      "settlement": "settlement — effetti sul mondo",
+      "epilogue": "epilogo",
+      "roll": "tiro",
+      "success": "successo",
+      "wound": "ferita",
+      "death": "morte",
+      "continue": "continua"
     }
   },
   "questExpedition": {
