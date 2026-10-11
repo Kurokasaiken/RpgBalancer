@@ -105,7 +105,8 @@ export const deriveHpValues = (stats: Record<string, number> | undefined, fatigu
 const mapStoreStatusToEngineStatus = (
   status: ResidentStatus | undefined,
   isInjured: boolean,
-  isDead?: boolean
+  isDead?: boolean,
+  isOnExpedition?: boolean
 ): TimeEngineResidentState['status'] => {
   if (isDead || status === 'dead') {
     return 'dead';
@@ -113,7 +114,9 @@ const mapStoreStatusToEngineStatus = (
   if (isInjured || status === 'injured') {
     return 'injured';
   }
-  if (status === 'working') {
+  /* R-139: «fuori in spedizione» = away anche per il motore — non a riposo,
+   *  non assegnabile ad attività, le ferite non guariscono. */
+  if (status === 'working' || isOnExpedition) {
     return 'away';
   }
   return 'available';
@@ -126,7 +129,7 @@ export function selectResidentRosterStates(
   const residentStatuses = selectResidentStatus(state);
 
   return state.residents.map((resident) => {
-    const status = mapStoreStatusToEngineStatus(residentStatuses[resident.id], resident.isInjured, resident.isDead);
+    const status = mapStoreStatusToEngineStatus(residentStatuses[resident.id], resident.isInjured, resident.isDead, resident.isOnExpedition);
     const fatigue = clampPercentage(resident.fatigue);
     const { currentHp, maxHp } = deriveHpValues(resident.stats, fatigue, resident.isInjured);
     const displayName = deriveDisplayName(resident.id, resident.name, config);
@@ -291,6 +294,15 @@ export interface MinimalGameplayState {
    * @returns The `${runId}:${effectKey}` ids applied by this call.
    */
   applyQuestSettlement: (plan: SettlementPlan, tick?: number) => string[];
+  /**
+   * Marks/unmarks residents as out on a quest expedition (R-139). The
+   * expedition lock itself is derived from the run record — this flag is the
+   * store-side copy the canonical `tick()` needs: an assigned resident does
+   * NOT heal (`injuredUntilTick` may pass, the wound stays until they are
+   * back and resting). Set by the launch boundary (`send`), released by the
+   * settlement aggregate write.
+   */
+  setResidentsOnExpedition: (residentIds: string[], onExpedition: boolean) => void;
 }
 
 /**
@@ -321,6 +333,7 @@ function mapStoreStateToSnapshot(state: MinimalGameplayState['state']): MinimalG
       isInjured: resident.isInjured,
       isDead: resident.isDead,
       injuredUntilTick: resident.injuredUntilTick,
+      isOnExpedition: resident.isOnExpedition,
       isHero: resident.isHero,
     })),
     activeActivities: state.activeActivities.map((activity) => ({
@@ -358,6 +371,7 @@ function mapSnapshotToStoreState(
       isHero: resident.isHero ?? false,
       isDead: resident.isDead,
       injuredUntilTick: resident.injuredUntilTick,
+      isOnExpedition: resident.isOnExpedition,
     })),
     activeActivities: snapshot.activeActivities.map((activity) => ({
       activityId: activity.activityId,
@@ -566,6 +580,8 @@ const INITIAL_STATE: MinimalGameplayState = {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   triggerSettlementLost: () => {},
   applyQuestSettlement: () => [],
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setResidentsOnExpedition: () => {},
 };
 
 function mapStoreStateToEngineState(state: MinimalGameplayState['state']): GameState {
@@ -772,10 +788,16 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
       }
 
       // S2.5: settlement wounds expire on the canonical clock — a resident
-      // whose `injuredUntilTick` has passed heals (dead stays dead).
+      // whose `injuredUntilTick` has passed heals (dead stays dead). R-139:
+      // only while RESTING — assigned residents (work or an unsettled
+      // expedition) keep the wound until they are back in the village.
       if (nextState.residents.some((r) => r.injuredUntilTick != null && r.injuredUntilTick <= updatedTick)) {
         nextState.residents = nextState.residents.map((resident) =>
-          !resident.isDead && resident.injuredUntilTick != null && resident.injuredUntilTick <= updatedTick
+          !resident.isDead &&
+          !resident.isWorking &&
+          !resident.isOnExpedition &&
+          resident.injuredUntilTick != null &&
+          resident.injuredUntilTick <= updatedTick
             ? { ...resident, isInjured: false, injuredUntilTick: undefined }
             : resident,
         );
@@ -1015,6 +1037,18 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
       skipped: plan.effects.length - appliedNow.length,
     });
     return appliedNow;
+  },
+
+  setResidentsOnExpedition: (residentIds, onExpedition) => {
+    const { state } = get();
+    const wanted = new Set(residentIds);
+    let changed = false;
+    const residents = state.residents.map((resident) => {
+      if (!wanted.has(resident.id) || Boolean(resident.isOnExpedition) === onExpedition) return resident;
+      changed = true;
+      return { ...resident, isOnExpedition: onExpedition || undefined };
+    });
+    if (changed) set({ state: { ...state, residents } });
   },
 
   buyFood: (quantity) => {

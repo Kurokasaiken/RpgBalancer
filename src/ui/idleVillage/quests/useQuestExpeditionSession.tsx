@@ -540,6 +540,12 @@ export function useQuestExpeditionSession({
       scenarioInstance: resolved.instance,
       resolvedOffer: resolved.resolvedOffer,
     });
+    /* R-139: the party is «away» for the village store too — wounds do not
+     *  heal while assigned. Released by `applyPlanToState` at settlement. */
+    useMinimalGameplayStore.getState().setResidentsOnExpedition(
+      members.map((m) => m.id),
+      true,
+    );
     /* The bag reservation rides the run's identity (scenarioInstanceId —
      * the same key `runIdOf` uses at settlement). Fire-and-forget: the
      * run exists now, and release on terminal transition is guaranteed by

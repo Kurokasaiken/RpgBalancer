@@ -17,6 +17,10 @@ const DEFAULT_VISIBILITY = HUD_PANEL_DEFAULTS;
 export function useHudPanels({ enabled = true }: { enabled?: boolean } = {}) {
   const [visible, setVisible] = useState<Record<HudPanelId, boolean>>(DEFAULT_VISIBILITY);
   const loaded = useRef(false);
+  /* Toggles fired before the persisted snapshot resolves must win over it:
+   * otherwise a panel opened in the hydration gap would be closed back by
+   * the stale stored state (the F10 → Director race seen in E2E). */
+  const overrides = useRef<Partial<Record<HudPanelId, boolean>>>({});
 
   useEffect(() => {
     if (!enabled) return undefined;
@@ -24,7 +28,7 @@ export function useHudPanels({ enabled = true }: { enabled?: boolean } = {}) {
     loadData<Partial<Record<HudPanelId, boolean>>>(STORAGE_KEY, {}).then((stored) => {
       if (cancelled) return;
       loaded.current = true;
-      setVisible({ ...DEFAULT_VISIBILITY, ...stored });
+      setVisible({ ...DEFAULT_VISIBILITY, ...stored, ...overrides.current });
     });
     return () => {
       cancelled = true;
@@ -32,6 +36,7 @@ export function useHudPanels({ enabled = true }: { enabled?: boolean } = {}) {
   }, [enabled]);
 
   const set = useCallback((id: HudPanelId, value: boolean) => {
+    overrides.current[id] = value;
     setVisible((current) => {
       const next = { ...current, [id]: value };
       void saveData(STORAGE_KEY, next);
@@ -42,6 +47,7 @@ export function useHudPanels({ enabled = true }: { enabled?: boolean } = {}) {
   const toggle = useCallback((id: HudPanelId) => {
     setVisible((current) => {
       const next = { ...current, [id]: !current[id] };
+      overrides.current[id] = next[id];
       void saveData(STORAGE_KEY, next);
       return next;
     });

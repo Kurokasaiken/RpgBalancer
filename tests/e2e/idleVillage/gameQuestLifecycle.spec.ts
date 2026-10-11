@@ -1,6 +1,6 @@
 /**
  * gameQuestLifecycle.spec.ts — R-119: the COMPLETE lifecycle of the quest
- * «Sterminio dei goblin» on the canonical `/game` surface, validated piece
+ * «Goblin Extermination» on the canonical `/game` surface, validated piece
  * by piece:
  *
  *   map + roster boot → click the real POI marker → planning → roster
@@ -64,7 +64,7 @@ type SettlementShape = {
 type VillageShape = {
   gold: number;
   xp: number;
-  residents: { id: string; isDead: boolean; isInjured: boolean; injuredUntilTick: number | null }[];
+  residents: { id: string; isDead: boolean; isInjured: boolean; injuredUntilTick: number | null; isOnExpedition?: boolean }[];
 };
 type ClockShape = { currentTick: number; isPaused: boolean; speedMultiplier: number };
 type EventLogShape = {
@@ -144,6 +144,10 @@ const revealQuestPois = async (page: Page) => {
   await page.evaluate(() => {
     (window as TestHooksWindow).__idleVillageTestHooks?.revealQuestPois?.();
   });
+  /* L'anchor layer Pixi nasce `visibility:hidden` e si accende solo quando la
+   *  camera ha completato l'init (caricamento texture incluso) — sotto carico
+   *  può superare i 15s, quindi prima attendiamo il layer, poi il marker. */
+  await expect(page.getByTestId('pixi-world-anchors')).toBeVisible({ timeout: 60_000 });
   await expect(poiMarker(page)).toBeVisible({ timeout: 15_000 });
 };
 
@@ -153,9 +157,9 @@ const openGoblinDetailViaMap = async (page: Page) => {
   await poiMarker(page).click();
   await expect(detail(page)).toBeVisible();
   /* Il titolo dello scenario vive nel chrome del FloatingPanel (header), il
-   *  body del detail mostra l'objective «Sterminare il campo dei goblin…». */
+   *  body del detail mostra l'objective «Wipe out the goblin camp…». */
   await expect(page.getByTestId('floating-panel-header-quest-expedition-poi-goblin')).toContainText(
-    'Sterminio dei goblin',
+    'Goblin Extermination',
   );
 };
 
@@ -302,7 +306,7 @@ const waitForHooks = async (page: Page) =>
 
 /* ================= tests ================= */
 
-test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () => {
+test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/game');
     await waitForHooks(page);
@@ -553,6 +557,12 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
     const village = await expedition<VillageShape>(page, 'getVillage');
     const leader = village.residents.find((r) => r.id === VALID_LEADER)!;
     expect(Boolean(leader.isDead)).toBe(Boolean(terminal.party.find((m) => m.id === VALID_LEADER)?.dead));
+    /* R-139: il settlement È il rientro — il flag `isOnExpedition` sullo
+     *  store deve essere rilasciato per OGNI membro, vivo o morto. */
+    for (const member of terminal.party) {
+      const res = village.residents.find((r) => r.id === member.id)!;
+      expect(res.isOnExpedition, `${member.id}: flag spedizione rilasciato`).toBeFalsy();
+    }
   });
 
   test('chiusura del rapporto: il POI sparisce dalla mappa e la run è consumata', async ({ page }) => {
@@ -673,6 +683,10 @@ test.describe('R-119 — ciclo di vita «Sterminio dei goblin» su /game', () =>
      *  l'equivalenza end-to-end, non solo «la finestra si apre». */
     const villageBefore = await expedition<VillageShape>(page, 'getVillage');
     const goldReadoutBefore = await goldReadoutValue(page);
+    /* R-129: gli anchor expedition montano solo con `questShown` — niente pin
+     *  della run attiva. Rivela i POI come farebbe «Mostra quest», così il
+     *  marker esiste e la sua transizione a in_progress è osservabile. */
+    await revealQuestPois(page);
 
     await page.keyboard.press('F10');
     await expect(page.getByTestId('director-panel')).toBeVisible({ timeout: 10_000 });

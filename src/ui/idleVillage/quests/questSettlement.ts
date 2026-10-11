@@ -50,6 +50,10 @@ export interface SettlementPlan {
   leaderAlive: boolean;
   objectiveDone: boolean;
   effects: SettlementEffect[];
+  /** Every party member id — `applyPlanToState` releases their
+   *  `isOnExpedition` flag in the same aggregate write as the effects
+   *  (R-139: the release IS part of settlement — the party is «home»). */
+  partyIds?: string[];
 }
 
 export interface SettlementMarker {
@@ -70,6 +74,7 @@ export function deriveSettlementPlan(
   const runId = runIdOf(run);
   const leader = run.party[0];
   const wipe = run.outcome === 'wipe';
+  const partyIds = run.party.map((member) => member.id);
   const effects: SettlementEffect[] = [];
 
   run.party.forEach((member, idx) => {
@@ -110,6 +115,7 @@ export function deriveSettlementPlan(
     leaderAlive: Boolean(leader && !leader.dead),
     objectiveDone: run.objectiveDone,
     effects,
+    partyIds,
   };
 }
 
@@ -323,6 +329,17 @@ export function applyPlanToState(
     appliedNow.push(key);
     const entry = effectLogEntry(effect, plan, residents, now);
     if (entry) logEntries.push(entry);
+  }
+
+  /* R-139: settlement IS the homecoming — release the expedition flag on
+   *  every party member in the same aggregate write. Unconditional (not
+   *  ledger-keyed): setting `false` twice is free, and a replayed plan on a
+   *  snapshot where the flag still stands must still release it. */
+  if (plan.partyIds?.length) {
+    const released = new Set(plan.partyIds);
+    residents.forEach((r) => {
+      if (released.has(r.id)) r.isOnExpedition = false;
+    });
   }
 
   const eventLog =
