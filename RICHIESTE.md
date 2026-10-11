@@ -2528,6 +2528,28 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Fix:** click POI → `run && !run.ended` → `QuestRunWindow`; altrimenti (offerta senza run o run conclusa) → `QuestExpeditionDetail` (gate overlay allargato a `!run || run.ended`). Il report resta raggiungibile dal menu Pannelli («Quest in progress», tasto Q) e dal pulsante «Start goblin quest» (R-130). `canSend` resta protetto da `!anyRunActive` — il dettaglio su run ended non rilancia. `Popover` riposizionato: `right: calc(100% + 10px)`, larghezza 300px, `maxHeight calc(100vh - 180px)` con scroll — pende dal bordo sinistro della finestra, accanto e non sopra (vale per roster, bag e chronicle).
 
 **Safeguards:** lint scope 0 errori; unit mapQuestPoi 8/8; build:check PASS; smoke live: run live (waiting) → click marker → `quest-window` (corretto: in corso); click pill roster → popover misurato `right:422 ≤ window.left:432` — accanto, contenuto finestra non coperto.
+
+## R-134 — Delega Director: adozione del binding model research-backed
+
+**Richiesta (verbatim):** *"fai cm reputi meglio"*
+**Data:** 2026-10-11
+**Stato:** `completata` — interpretata come delega a decidere sui punti lasciati al Director al termine di R-128 (binding model OPEN-017, gestione divergenza preview, avvio spec prototipo v0).
+
+**Contenuto classificato:**
+- **DECISION (per delega, reversibile):** adottato il modello di binding research-backed → **lock di approccio a run-level, capability-gated dal party, con eccezioni a consumo**; roll per membro nominato; max 3 canali per check; menu multi-canale solo sui pivot check; canali bloccati greyed «Requires: …». OPEN-017 → `risolta`.
+- **DECISION (per delega):** la divergenza numeri-esatti vs espressività si gestisce **senza toccare la regola frozen R-108**: mitigazione via risk tag + stakes narrative nel preview + menu solo su pivot check. Monitoraggio al playtest → OPEN-018.
+- **FACT (conseguenze):** `QUEST_RULES.md` §7 → `vigente` (con nota di reversibilità); contract sketch canale in `QUEST_GENERATION_CONTRACTS.md` §11; piano prototipo `plans/PLAN-028-gimmick-channels-v0.md` (draft, testbed quest goblin).
+
+**Collegamenti:** `context/QUEST_GIMMICK_CHANNELS_RESEARCH.md`, OPEN-017 (risolta), OPEN-018, PLAN-028, `QUEST_RULES.md` §7.
+
+## R-135 — /game: la quest goblin e il suo componente devono essere in inglese
+
+**Richiesta (verbatim):** *"la quest principale su cui stiamo lavorando e il suo componente, Sterminio del goblin visibile nella apgina /game quando clicco il pulsante del director deve essere tradotta in inglese"*
+**Data:** 2026-10-12
+**Stato:** `fatta` — titolo «Goblin Extermination»; e2e verificato (marker → detail, Director → QuestRunWindow).
+
+**Scope:** traduzione completa della superficie quest su /game (Director «Start goblin quest» → QuestExpeditionDetail → QuestRunWindow → epilogo/report): scenario `goblin.ts`, e per coerenza di componente anche `rovine.ts` (stesso POI/finestra sulla mappa), TUTTE le stringhe generate dal motore `questRun.ts` (armi, danni, combattimento, log, epiloghi, opzioni sintetiche), preset lab goblin/rovine, etichette stat (`STAT_LABELS`/`STAT_SHORT`), fix logica locale-dipendente (regex `non si rialza` → `deathLines` strutturato), test e fixture (oracolo ricalibrato: sorgente git non più disponibile). Il manoscritto lab-only della quest cassa (`questScenario.ts`) resta in italiano — fuori da /game.
+
 ## R-136 — /game: scritte HUD in alto non centrate + asset icone risorse dipinti
 
 **Richiesta (verbatim):** *"nell'HUD le scritte nei componenti in alto nn m sembrano decidsamente centrate, sembrano in alto. Inoltre ci mancano gli asset delle risorse, scaricali adeguati al nostro progetto e sostituiscili"*
@@ -2557,3 +2579,29 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Fix (icone):** glifi scaricati da game-icons.net (CC BY 3.0 — Lorc: eyeball/hidden/cross-mark; Delapouite: funnel/checklist/split-arrows), rielaborati come path `currentColor` nel nuovo modulo `src/ui/idleVillage/components/gameIcons.tsx` (attribution in JSDoc). Sostituiscono Eye/EyeOff/X/ArrowUpDown di lucide nell'header V2 e il glifo SVG rotto di `RosterSortIcon`. Il select filtro ha icona funnel, il sort checklist.
 
 **Safeguards:** lint scope 0 errori; test `rosterV2Controls` 5/5 nuovi, `rosterSortIcon` 7/7, `rosterSortConfig` 8/8, `RosterStatFilter` 20/20, `rosterKit.compact` verde; `VillageRosterSection.unit` 4 fail = `sortMode="rarity-desc"` non supportato, crash identico su HEAD (preesistente); `hudGuards` 2 fail preesistenti in HEAD; build:check PASS; kanban:lint PASS; smoke live /game 200: ordinamenti `name-desc`/`stat:damage` e filtro `available` verificati sul DOM (6→5 residenti), pill 26px, 6 glifi fantasy renderizzati.
+
+## R-138 — /game: bottoni del menu sbagliati + lingua IT/EN nel menu
+
+**Richiesta (verbatim):** *"i pulstanti di /game menu in alto a destra sn sbagliati. ha seguito la guida su come fare i componenti nel mio progetto? xè se ci sn quei pulsanti considerati corretti allora la guida è sbagliata, devi modificarla. in quel menu ci deve essere anche la lingua IT e EN, e deve funzionare."*
+**Data:** 2026-10-11
+**Stato:** `in corso`
+
+**Diagnosi:** le voci del dropdown di `HudGameMenu` (R-132) renderizzavano come barre bronze-CTA piene invece che pill da 26px: il `data-hud-controls` copriva solo il bottone trigger, non il contenuto del menu. La guida (`hud_component_guide.md` §5) aveva ragione ma non esplicitava la trappola per i menu a tendina — aggiunta regola dedicata.
+
+## R-139 — Ferite guariscono solo a riposo + popolani 50HP/stat basse + race F10 Director
+
+**Richiesta (verbatim):** *"le ferite si rigenerano quando sei nel roster senza fare nulla (a riposo?), insomma quando nn sei assegnato a fare qualcosa, se sei assegnato (quest, lavoro, ecc) le ferite continuano a nn sparire. Si, i feriti possono fare quest. […] Fixa. I popolani devono avere stats e Hp + bassi, tipo massimo +10 nell stats e 50hp base. riprova la run"*
+**Data:** 2026-10-12
+**Stato:** `fatta` — suite lifecycle E2E 13/13 verdi.
+
+**Diagnosi (ferite):** il `tick()` di `useMinimalGameplay` sanava chiunque avesse `injuredUntilTick <= currentTick` senza guardare lo status — un ferito mandato in spedizione (eleggibile per `assignableStatuses`) guariva mentre era fuori. Non esisteva il concetto di «riposo» nella guarigione.
+
+**Fix (ferite):** flag `isOnExpedition` su `MinimalResident` (serializzato nello snapshot): `tick()` guarisce solo se `!isWorking && !isOnExpedition`; la proiezione roster mappa l'expedition a `away` (non assegnabile a lavori mentre è fuori). `setResidentsOnExpedition(ids, on)` settato al confine reale `send()` e rilasciato nella write atomica del settlement (`partyIds` nel plan — il rientro È parte del settlement, idempotente). Unit: 9/9 tick (ferito in spedizione non guarisce, a riposo sì, rilascio al settle). E2E: test «PG tornano a casa» asserisce `isOnExpedition === false` dopo il settle.
+
+**Fix (popolani):** `TEST_ROSTER_VILLAGERS` — HP base 50, ogni stat al massimo DEFAULT+10 (verificato `evaluateStatRequirement`: l'eligibilità legge `statTags` espliciti, i numeri non contano → stats basse sicure). Roster renderizzato: popolani 50/50 HP vs eroi alti.
+
+**Fix (race F10 → Director):** `useHudPanels` idrata `visible` via `loadData` async e faceva `setVisible({...DEFAULT, ...stored})` — un toggle pre-hydration veniva sovrascritto (pannello aperto e richiuso). Ora `overrides` ref: i toggle `set`/`toggle` registrati prima del resolve vincono sullo snapshot persistito. Bug reale oltre il test: utente su macchina lenta che preme un tasto pannello al boot.
+
+**Fix (test):** `revealQuestPois` attende `pixi-world-anchors` visibile (il layer nasce `visibility:hidden` finché la camera Pixi non completa l'init — sotto load superava i 15s, marker nel DOM ma `hidden`); test Director rivela i POI prima di F10 (R-129: nessun pin della run senza `questShown`); titolo scenario asserito «Goblin Extermination» (R-135).
+
+**Safeguards:** suite `gameQuestLifecycle.spec.ts` **13/13 verdi** (4.7m — boot, planning, drag 1 eroe+3 popolani, clock pausa/×4, lancio, frontiera, settle una volta, rilascio party, consumo POI, persistenza reload, epilogo+journal, Director E2E); lint scope 0 errori; unit 25/25 (tick 9 + settlement 16); build:check PASS; kanban:lint PASS. Evidence: `test-results/r139-wounds-rest-villagers-2026-10-12.log`.

@@ -77,3 +77,83 @@ describe('useMinimalGameplay.tick() — activity progression', () => {
     expect(state.wood).toBe(0);
   });
 });
+
+/** R-139: settlement wounds heal ONLY at rest — `isWorking` or
+ *  `isOnExpedition` keeps the wound standing even after `injuredUntilTick`
+ *  has passed; the next tick at rest heals it. */
+describe('useMinimalGameplay.tick() — wound recovery only at rest', () => {
+  const seedWounded = (extra: Record<string, unknown>) => {
+    const base = useMinimalGameplayStore.getState();
+    useMinimalGameplayStore.setState({
+      ...base,
+      config: DEFAULT_MINIMAL_CONFIG,
+      state: {
+        ...base.state,
+        gold: 0,
+        food: 50,
+        currentDay: 0,
+        currentTick: 0,
+        isPaused: false,
+        speedMultiplier: 1,
+        residents: [
+          {
+            id: 'r1',
+            name: 'Aurora',
+            stats: { strength: 5 },
+            fatigue: 0,
+            isWorking: false,
+            isInjured: true,
+            injuredUntilTick: 2,
+            level: 1,
+            ...extra,
+          },
+        ],
+        activeActivities: [],
+        eventLog: [],
+        rngState: createMinimalRngState(42),
+      },
+    });
+  };
+
+  it('heals a resting resident once injuredUntilTick has passed', () => {
+    seedWounded({});
+    useMinimalGameplayStore.getState().tick(4000, 'manual');
+    const r = useMinimalGameplayStore.getState().state.residents[0];
+    expect(r.isInjured).toBe(false);
+    expect(r.injuredUntilTick).toBeUndefined();
+  });
+
+  it('does NOT heal while the resident is on expedition', () => {
+    seedWounded({ isOnExpedition: true });
+    useMinimalGameplayStore.getState().tick(4000, 'manual');
+    const r = useMinimalGameplayStore.getState().state.residents[0];
+    expect(r.isInjured).toBe(true);
+    expect(r.injuredUntilTick).toBe(2);
+  });
+
+  it('does NOT heal while the resident is working', () => {
+    seedWounded({ isWorking: true });
+    useMinimalGameplayStore.getState().tick(4000, 'manual');
+    const r = useMinimalGameplayStore.getState().state.residents[0];
+    expect(r.isInjured).toBe(true);
+  });
+
+  it('heals on the first tick after the expedition flag is released', () => {
+    seedWounded({ isOnExpedition: true });
+    useMinimalGameplayStore.getState().tick(4000, 'manual');
+    expect(useMinimalGameplayStore.getState().state.residents[0].isInjured).toBe(true);
+    useMinimalGameplayStore.getState().setResidentsOnExpedition(['r1'], false);
+    useMinimalGameplayStore.getState().tick(1000, 'manual');
+    const r = useMinimalGameplayStore.getState().state.residents[0];
+    expect(r.isInjured).toBe(false);
+    expect(r.isOnExpedition).toBeUndefined();
+  });
+
+  it('never heals a dead resident', () => {
+    seedWounded({ isDead: true, isInjured: false });
+    useMinimalGameplayStore.getState().tick(4000, 'manual');
+    const r = useMinimalGameplayStore.getState().state.residents[0];
+    expect(r.isDead).toBe(true);
+    expect(r.isInjured).toBe(false);
+  });
+});
