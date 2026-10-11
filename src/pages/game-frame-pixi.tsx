@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { cloneElement, isValidElement, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
@@ -30,7 +30,7 @@ import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 // GameFrame is a fresh, not-yet-kitted composition (R-075).
 // eslint-disable-next-line no-restricted-imports
-import { MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
+import { EXPIRE_FADE_MS, MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
@@ -394,17 +394,19 @@ export default function GameFramePixiPage() {
   const anchors = useMemo<PixiMapAnchor[]>(() => {
     const list: PixiMapAnchor[] = [];
     const anchored = new Set<string>();
-    /* Real quest POIs (S2.4): the medallion is the planning entry and, once
-     *  launched, the run's halo clock. An offer mounts only once the Director
-     *  reveals it («Mostra quest»); an offer past its window with no run leaves
-     *  the map; an active run always stays pinned. */
+    /* Real quest POIs (S2.4 + R-127): the medallion is the planning entry and,
+     *  once launched, the run's halo clock. Nothing pins at boot — a marker
+     *  mounts only while the Director reveals it («Mostra quest» shows the
+     *  real offers/runs, «POI types» the family exemplars below); an offer
+     *  past its window with no run leaves the map. Every exit plays through
+     *  `anchorsWithGhosts` instead of popping off. */
     for (const exp of expeditions) {
       const p = exp.poi;
       const avail = offerAvailability(p);
       /* A repeatable offer ignores a stale consumed record (authored after
        *  the POI was already consumed — D-S4-6 migration honesty). */
       if (isPoiConsumed(p, consumedPoiIds)) continue;
-      if (!exp.run && (avail.state === 'expired' || !questShown)) continue;
+      if (!questShown || (!exp.run && avail.state === 'expired')) continue;
       anchored.add(p.id);
       list.push({
         id: p.id,
@@ -441,6 +443,50 @@ export default function GameFramePixiPage() {
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poi, questShown, session, poiDemo, currentTick, dayLengthTicks, consumedPoiIds, expeditionGoblin.poiView, expeditionGoblin.run, expeditionRovine.poiView, expeditionRovine.run]);
+
+  /* Exit transformation (R-127): an anchor that leaves the set stays mounted
+   *  one beat longer — its node re-rendered with `exiting` plays the same
+   *  fade+shrink it entered with, so a POI never pops off the map when a
+   *  Director toggle hides it, an offer expires, or a report consumes it.
+   *  Ghosts are derived DURING render (adjust-state-on-prop-change pattern):
+   *  on the very commit where an id leaves, the ghost is already in the keyed
+   *  anchor list, the DOM node survives and the exit transition animates —
+   *  an effect would run too late, after React already unmounted it. */
+  const [prevAnchors, setPrevAnchors] = useState<PixiMapAnchor[]>(anchors);
+  const [anchorGhosts, setAnchorGhosts] = useState<ReadonlyMap<string, PixiMapAnchor>>(() => new Map());
+  /* The memo hands out a fresh array on many renders (session deps), so the
+   *  adjustment compares the id SET — identity alone would loop forever. */
+  const anchorIdsEqual = (a: PixiMapAnchor[], b: PixiMapAnchor[]) =>
+    a.length === b.length && a.every((x, i) => x.id === b[i].id);
+  if (!anchorIdsEqual(prevAnchors, anchors)) {
+    setPrevAnchors(anchors);
+    const liveIds = new Set(anchors.map((a) => a.id));
+    const leaving = prevAnchors.filter((a) => !liveIds.has(a.id));
+    if (leaving.length > 0) {
+      setAnchorGhosts((ghosts) => {
+        const next = new Map(ghosts);
+        for (const anchor of leaving) next.set(anchor.id, anchor);
+        return next;
+      });
+    }
+  }
+  /* Ghosts expire together one fade after the last leaver — a slightly longer
+   *  invisible tail is harmless; timers may only be scheduled in an effect. */
+  useEffect(() => {
+    if (anchorGhosts.size === 0) return undefined;
+    const timer = window.setTimeout(() => setAnchorGhosts(new Map()), EXPIRE_FADE_MS + 100);
+    return () => window.clearTimeout(timer);
+  }, [anchorGhosts]);
+  const anchorsWithGhosts = useMemo<PixiMapAnchor[]>(() => {
+    if (anchorGhosts.size === 0) return anchors;
+    const liveIds = new Set(anchors.map((a) => a.id));
+    const list = [...anchors];
+    for (const [id, anchor] of anchorGhosts) {
+      if (liveIds.has(id) || !isValidElement(anchor.node)) continue;
+      list.push({ ...anchor, node: cloneElement(anchor.node as ReactElement<{ exiting?: boolean }>, { exiting: true }) });
+    }
+    return list;
+  }, [anchors, anchorGhosts]);
 
   const directorActions = useMemo<DirectorAction[]>(
     () => [
@@ -621,7 +667,7 @@ export default function GameFramePixiPage() {
                   safeFit={safeFit}
                   recenterSignal={recenterSignal}
                   focusRequest={focusRequest}
-                  anchors={anchors}
+                  anchors={anchorsWithGhosts}
                   stageColor={worldDressing.stageColor}
                   seaPatternConfig={seaPatternConfig}
                   coastFoamConfig={coastFoamConfig}
