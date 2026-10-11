@@ -1,7 +1,7 @@
 ---
 title: Open Questions Registry
 type: registry
-updated: 2026-10-05
+updated: 2026-10-10
 ---
 
 # OPEN — Unresolved Questions Registry
@@ -224,3 +224,81 @@ Formato voce:
 - **Blocking:** ratifica di un eventuale nuovo macro-piano e design di simulazione mondiale; non blocca S1. Il trigger delle quest non risolte resta OPEN-015.
 - **Narrowing Director (2026-10-07):** la fetta di registro mondo in S2 è minima — basta a rendere persistenti e leggibili le conseguenze della *singola* quest di riferimento; personaggi/fazioni che ritornano tra quest diverse non sono requisito di S2.
 - **Related:** `.mw/desiderata.md` v24, PLAN-019 (S2/S4/S5), OPEN-014/015, `VILLAGE_ECONOMY.md`.
+
+## OPEN-017 — Binding degli approcci alternativi ai check della core gimmick
+
+- **Question:** la proposta R-127 — una core gimmick (es. infiltrazione/allarme) che ammette canali di check su stat/skill alternative (invisibilità→INT, camuffamento→CHA invece di DEX) — lascia aperto il **modello di binding**: il canale si sceglie per-check in-run, è un approccio scelto a monte per l'intera run, o è gated da skill/equip/composizione del party (invisibilità richiede un caster)? Sub-questioni: come si marca un check come «core-gimmick» vs check di scena; forma dati (vocabolario stat alternativo sul nodo vs nodi check paralleli gated da flag); come i canali disponibili si rendono leggibili in preview (regola numeri-esatti R-108).
+- **Status:** `risolta` 2026-10-11 — Director delega («fai cm reputi meglio», R-134) → adottato il binding research-backed.
+- **Resolution (vigente, reversibile al playtest):** lock di approccio a run-level, capability-gated dal party, eccezioni a consumo (~1/run); roll per membro nominato; max 3 canali/check, menu solo sui pivot check; canali bloccati greyed «Requires: …»; varianti di canale sullo stesso nodo (no node-splitting); profili di fallimento divergenti obbligatori. Regola: `QUEST_RULES.md` §7 `vigente`. Prototipo: PLAN-028.
+- **Residui delegati a PLAN-028:** mappatura capability gate su skill/equip reali (v10/v12), modello di esposizione wound/death per canale, coverage audit «Karma Police» sul quest set.
+- **Source:** `context/ingestions/2026-10-10-quest-gimmick-approcci-alternativi.md`; `RICHIESTE.md` R-127/R-128/R-134; `QUEST_RULES.md` §7; `context/QUEST_GENERATION_ARCHITECTURE.md` §16; `context/QUEST_GIMMICK_CHANNELS_RESEARCH.md`.
+- **Blocking:** risolta — non blocca più il contratto `CoreGimmick` (S5): il modello è deciso, i dettagli contract sono in §11.9.
+- **Related:** OPEN-014 (architettura generazione), OPEN-018 (tensione preview/espressività), `QUEST_GENERATION_CONTRACTS.md` §2/§3.3/§11, desiderata v10/v12 (skill equip come possibile gate).
+
+## OPEN-018 — Tensione preview a numeri esatti vs scelta espressiva dei canali
+
+- **Question:** la ricerca R-128 (finding F8, divergenza D3) segnala che preview a numeri esatti — regola **frozen** R-108 — possono spingere il giocatore verso ottimizzazione EV invece che scelta espressiva d'identità («sono un mago, lancio invisibilità»). La regola è frozen e non si tocca: la domanda aperta è se le mitigazioni adottate bastano, o se in playtest emerge che il problema è reale.
+- **Mitigazioni adottate (R-134, per delega):** risk tag semantici + stakes narrative accanto alle odds; menu multi-canale solo sui pivot check; differenziazione dei canali su assi non-EV (costo/rischio/fiction) così nessun canale è «ovviamente migliore».
+- **Status:** `open` — da verificare al playtest del prototipo PLAN-028. Metrica indicatrice: i playtester scelgono il canale «per identità/piano» o dichiarano «ho preso la percentuale più alta»?
+- **Source:** `context/QUEST_GIMMICK_CHANNELS_RESEARCH.md` §F8/§D3; R-134.
+- **Related:** OPEN-017 (risolta), R-108 (frozen), `QUEST_RULES.md` §7.
+
+## OPEN-019 — Modello del grafo delle opportunità
+
+- **Question:** come si modella il layer sopra le quest — un grafo in cui
+  opportunità, requisiti, ricompense e capacità si collegano? Più
+  percorsi convergono sulla stessa opportunità e una quest apre porte
+  diverse; il grafo rappresenta relazioni di sblocco persistenti, non
+  solo successione temporale. Sub-questioni: struttura dati e tipi di
+  arco (sblocco/informazione/preparazione); come gli archi persistenti
+  vivono nel save; come il generatore delle offerte lo attraversa;
+  rapporto «famiglia di quest» ↔ (domain kit, core gimmick); relazione
+  con gli archi narrativi delle chain quest.
+- **Status:** `open` — materiale PROPOSAL da discussione Director↔GPT
+  2026-10-11, non ratificato.
+- **Source:** `context/QUEST_OPPORTUNITY_LAYER.md` §1–§2;
+  `context/ingestions/2026-10-11-quest-opportunity-layer.md` E-05..E-07,
+  E-11, E-15, E-22; R-153.
+- **Blocking:** qualsiasi contratto del generatore di offerte e del
+  perimetro di test meta-quest; non blocca i lavori dentro la singola
+  quest (PLAN-028, S5).
+- **Related:** OPEN-014 (architettura generazione), OPEN-016 (persistenza
+  narrativa), OPEN-010/012/013 (economia villaggio), PLAN-026.
+
+## OPEN-020 — Tassonomia requisiti e preparazione insufficiente
+
+- **Question:** la tassonomia a 4 tipi — accesso assoluto / capacità /
+  costo-o-rischio / ottimizzazione — va ratificata? Regole annesse: gate
+  assoluti solo per impossibilità effettive (un equip mancante può essere
+  costruito/noleggiato/ottenuto se il mondo offre l'alternativa);
+  preparazione insufficiente in 3 casi (impossibile / compensabile a
+  costo / tentabile a rischio). Quali requisiti sono generici, quali di
+  famiglia, quali di singola quest, e come si dichiara il tipo nel
+  contratto?
+- **Status:** `open` — `proposta` registrata in `QUEST_RULES.md` §9;
+  dettaglio in `context/QUEST_OPPORTUNITY_LAYER.md` §3.
+- **Source:** `context/ingestions/2026-10-11-quest-opportunity-layer.md`
+  E-08, E-21; R-153.
+- **Blocking:** modello requisiti del generatore di offerte (OPEN-019) e
+  del contratto scena; non blocca il runtime attuale.
+- **Related:** OPEN-019; R-108 (numeri esatti in preview — il giocatore
+  deve sapere a cosa va incontro prima di rischiare).
+
+## OPEN-021 — Orientamento esploratore e risorsa informativa trasversale
+
+- **Question:** due proposte legate all'esploratore: (a) il giocatore può
+  **orientare** la generazione delle offerte verso famiglie/tag
+  preferiti — influenza la distribuzione senza garantirla; (b) esiste
+  una **risorsa trasversale limitata** legata a informazione/preparazione
+  operativa (evitare valute per-famiglia). Qual è il meccanismo di
+  pesatura e la forma economica? Come si collega alle tre dimensioni di
+  crescita del villaggio (visibilità / capacità / capacità operativa)?
+- **Status:** `open` — estende la regola vigente `QUEST_RULES.md` §2
+  (esploratore rivela info) senza modificarla; PROPOSAL.
+- **Source:** `context/QUEST_OPPORTUNITY_LAYER.md` §6/§8/§9;
+  `context/ingestions/2026-10-11-quest-opportunity-layer.md` E-10,
+  E-17, E-19; R-153.
+- **Blocking:** filone economia-villaggio (OPEN-010/012/013) e generatore
+  di offerte (OPEN-019); non blocca il runtime attuale.
+- **Related:** OPEN-010 (leader-capacity, human-days — tensione con
+  «più party in parallelo»), OPEN-019, OPEN-020.

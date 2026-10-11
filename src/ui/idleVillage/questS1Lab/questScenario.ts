@@ -217,6 +217,20 @@ export interface CombatSpec {
   nextCleared?: string;
   /** Route when turns end with enemies alive (else `next`). */
   nextSurvivors?: string;
+  /* ---- Copy overrides (R-152, imprint/gen fights): all optional — absent
+   *  fields fall back to the goblin F4 lines, so authored goblin combat is
+   *  unchanged. Lets a non-goblin fight (bargemen, a mimic) carry its own
+   *  voice from config without touching the engine. */
+  /** Display name of the enemy group in the «down: N. M remain.» log line. */
+  enemyName?: string;
+  /** Attack flavor per verdict band — `GOBLIN_ATTACK_LINES` when absent. */
+  attackLines?: Partial<Record<Verdict, string>>;
+  /** `lastEvent` when every enemy dies before `turns` run out. */
+  clearedText?: string;
+  /** `lastEvent` when `turns` end with enemies alive. */
+  survivorsText?: string;
+  /** `lastEvent` while enemies still stand — `{turn}`/`{left}` placeholders. */
+  holdingText?: string;
 }
 
 export interface QuestOption {
