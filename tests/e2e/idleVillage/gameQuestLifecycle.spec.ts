@@ -189,15 +189,41 @@ const bringSendIntoView = async (page: Page) => {
   }
 };
 
+/** Wait for the session's own assignments map to confirm the drop — the
+ *  same feedback a player reads (the slot shows the resident). Without it
+ *  a missed drop is invisible until `send()` ships a short party. */
+const waitForSlotAssignment = (page: Page, slotId: string, residentId: string, timeout = 5_000) =>
+  page.waitForFunction(
+    ({ pid, sid, rid }) => {
+      const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
+        | { getAssignments?: () => Record<string, string | null> }
+        | undefined;
+      return exp?.getAssignments?.()?.[sid] === rid;
+    },
+    { pid: POI, sid: slotId, rid: residentId },
+    { timeout },
+  );
+
 /** Real pointer drag card→slot inside the planner — the same move a
  *  player makes on the assignment panel (scrolls each endpoint into view
- *  first: the panel grew taller than a 720p viewport). */
+ *  first: the panel grew taller than a 720p viewport). A drop that missed
+ *  is re-dragged once, as a player would; if it still didn't take, the
+ *  test fails on the slot — never silently on the launched party. */
 const assignViaRealDrag = async (page: Page, residentId: string, slotId: string) => {
   const card = page.locator(`[data-worker-id="${residentId}"]`).first();
   const slot = page.locator(`[data-slot-id="${slotId}"]`).first();
-  await slot.scrollIntoViewIfNeeded();
-  await card.scrollIntoViewIfNeeded();
-  await dragResidentPointer(page, card, slot);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await slot.scrollIntoViewIfNeeded();
+    await card.scrollIntoViewIfNeeded();
+    await dragResidentPointer(page, card, slot);
+    try {
+      await waitForSlotAssignment(page, slotId, residentId);
+      return;
+    } catch {
+      /* the drop missed — retry once below */
+    }
+  }
+  throw new Error(`real drag never assigned ${residentId} to ${slotId}`);
 };
 
 /** Planning → 1 eroe + 3 popolani trascinati negli slot (party completo) →

@@ -599,7 +599,7 @@ const BeatStage: React.FC<{
             : t('gameFrame.questWindow.beats.continue')}
         </span>
         {remaining > 0 && (
-          <button type="button" onClick={(e) => { e.stopPropagation(); onFlush(); }} style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}>
+          <button type="button" onClick={(e) => { e.stopPropagation(); onFlush(); }} style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}>
             {t('gameFrame.questWindow.beats.skipAll')}
           </button>
         )}

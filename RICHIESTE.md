@@ -2663,3 +2663,13 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Nota:** l'helper `revealQuestPois` è il confine reveal di tutta la suite; gli altri hook expedition restano di ispezione (getRun/getVillage/getSettlement) e di engine (choose/advanceTicks — comprimono il tempo reale, non sono gesti UI). I gesti utente veri restano reali: click marker, drag, «Invia», controlli clock, Enter sul teatro, chiusura rapporto.
 
 **Safeguards:** playwright focused 3/3 (boot, planning click, lancio) con reveal da pulsante reale; lint scope 0 errori; kanban:lint PASS. Evidence: `test-results/r144-e2e-real-director-reveal-2026-10-12.log`.
+
+## R-146 — Planner spedizione a regime HUD/Lacquer Atlas (HudPlaque, testo ≥12px, token puri, STRICT_FILES)
+**Data:** 2026-10-12
+**Stato:** `fatta`
+
+**Richiesta Director:** «il componente di planning prima della quest è fatta seguendo quella guida? … fixa».
+
+**Scope:** `QuestExpeditionDetail.tsx` convertito da `FloatingPanel` (cornice legacy border/bg Tailwind) al pattern canonico `HudPlaque` + `useHudPanelDrag` + `SkinScope` — stesso idioma di `QuestRunWindow`: drag handle sull'header, minimised → plaque `hang`, close `X`, zIndex `zLayers.panels`. Testo 10/11px → ≥12px; fallback hex `#7ed39a`/`#e07a7a` → `TONE.ok`/`TONE.danger`. `FloatingPanel` (condiviso da POI detail, MissionPlanner, MilestoneCheck, frozen kit) NON toccato. Aggiunto a `STRICT_FILES` dei guard HUD. Fix adiacenti per verde guard: `MapQuestPoi` fallback hex → token `--skin-status-unmet`/`--skin-surface-base`; `QuestRunWindow` skipAll 11→12px (l'hunk parallelo deathLines NON committato — lavoro R-135 in volo). Spec E2E: `assignViaRealDrag` auto-verificante (attende `getAssignments[slotId]===residentId`, retry una volta come farebbe un giocatore — fix flake drop-miss da reflow forecast) + `scrollbarGutter:'stable'` sul body planner. Guida E2E aggiornata (FloatingPanel→HudPlaque, helper table, finding clamp-bottom esteso a `useHudPanelDrag`).
+
+**Safeguards:** playwright lifecycle 13/13 verdi (4.4m, di cui 6/6 drag ripetuti); unit hudGuards 5/5; lint scope 0 errori; build:check PASS; kanban:lint PASS.
