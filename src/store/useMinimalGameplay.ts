@@ -260,6 +260,12 @@ export interface MinimalGameplayState {
   pauseGame: (source: 'user' | 'auto') => void;
   resumeGame: (source: 'user' | 'auto') => void;
   resetGame: () => void;
+  /**
+   * Manual save from the HUD menu (R-132): persists the current snapshot
+   * immediately through the same canonical key/path the autosave loop uses.
+   * @returns `true` when the write completed, `false` on failure.
+   */
+  saveNow: () => Promise<boolean>;
   buyFood: (quantity: number) => { success: boolean; reason?: string; message?: string };
   addResources: (resources: Partial<Record<'gold' | 'food' | 'wood' | 'xp', number>>) => void;
   setSpeedMultiplier: (multiplier: number) => void;
@@ -541,6 +547,7 @@ const INITIAL_STATE: MinimalGameplayState = {
   resumeGame: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   resetGame: () => {},
+  saveNow: () => Promise.resolve(false),
   buyFood: () => ({ success: false, reason: 'not_implemented' }),
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   addResources: () => {},
@@ -949,6 +956,21 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
       reason: gameOverState.reason || 'manual',
       daysSurvived: gameOverState.summary?.daysSurvived || 0,
     });
+  },
+
+  saveNow: async () => {
+    try {
+      const snapshot = mapStoreStateToSnapshot(get().state);
+      await saveMinimalGameplaySnapshot(PERSISTENCE_KEY, snapshot);
+      trackTelemetryEvent('minimal_gameplay_save_now', {
+        day: get().state.currentDay,
+        currentTick: get().state.currentTick,
+      });
+      return true;
+    } catch (error) {
+      console.warn('[MinimalGameplayStore] Manual save failed:', error);
+      return false;
+    }
   },
 
   triggerSettlementLost: (summary) => {

@@ -999,6 +999,19 @@
         "quest": "Quest in progress"
       }
     },
+    "menu": {
+      "title": "Menu",
+      "session": "Session",
+      "options": "Options",
+      "saveNow": "Save now",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "loadGame": "Load game…",
+      "quit": "Quit to title",
+      "theme": "Theme",
+      "settings": "All settings…",
+      "comingSoon": "Not available yet"
+    },
     "regions": {
       "northern_forest": "Whispering Woods",
       "southern_forest": "Hollow Wood",
