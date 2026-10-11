@@ -129,6 +129,17 @@ export const HUD_ICONS: Record<HudIconId, IconComponent> = {
   threat: ThreatIcon,
 };
 
+/**
+ * Painted medallion assets (SDXL pipeline, `.mw/specs/hud-resource-icons`) that
+ * replace the stroke glyph for the resource readouts. Ids absent here keep the
+ * vector glyph — navigation and event icons are symbols, not painted objects.
+ */
+export const HUD_ICON_ASSETS: Partial<Record<HudIconId, string>> = {
+  gold: '/assets/fantasy_ui/icon_gold.webp',
+  food: '/assets/fantasy_ui/icon_food.webp',
+  wood: '/assets/fantasy_ui/icon_wood.webp',
+};
+
 export interface HudGlyphProps extends React.SVGProps<SVGSVGElement> {
   iconId: HudIconId;
   label: string;
@@ -138,9 +149,24 @@ export interface HudGlyphProps extends React.SVGProps<SVGSVGElement> {
 /**
  * Renders a registered icon with an accessible label and no inline color —
  * callers set `color` (or rely on inherited `--skin-icon-color`) rather than
- * passing a hex.
+ * passing a hex. Ids listed in `HUD_ICON_ASSETS` render the painted medallion
+ * instead of the vector glyph; the asset carries its own material.
  */
 export const HudGlyph: React.FC<HudGlyphProps> = ({ iconId, label, size = 18, style, ...rest }) => {
+  const asset = HUD_ICON_ASSETS[iconId];
+  if (asset) {
+    return (
+      <img
+        src={asset}
+        alt=""
+        role="img"
+        aria-label={label}
+        width={size}
+        height={size}
+        style={{ flexShrink: 0, borderRadius: '50%', objectFit: 'cover', display: 'block', ...style }}
+      />
+    );
+  }
   const Icon = HUD_ICONS[iconId];
   return (
     <Icon
