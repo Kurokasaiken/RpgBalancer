@@ -553,6 +553,7 @@ export default function GameFramePixiPage() {
           <GameFrameScreen
             panels={panels}
             devPanels={directorEnabled}
+            skinControl={{ id: skinId, onChange: setSkinId }}
             rosterSlot={({ onClose }) => (
               <Roster
                 onClose={onClose}

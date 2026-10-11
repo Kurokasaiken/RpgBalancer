@@ -69,6 +69,8 @@ export interface GameFrameProps {
   dressingSlot?: ReactNode;
   /** Top-left cartouche: what the player should do now. Omit it and the corner stays free. */
   objectiveSlot?: ReactNode;
+  /** Top-left: the game menu cartouche (R-132) — sits beside the objective in the same cell. */
+  menuSlot?: ReactNode;
   /** Set into the middle of the nav plinth (the map re-centre coin). */
   recenterSlot?: ReactNode;
   /** Lower-left: the roster, laid on the table like an object (see `config.roster`). */
@@ -133,6 +135,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   rosterSlot,
   recenterSlot,
   objectiveSlot,
+  menuSlot,
   config = DEFAULT_GAME_FRAME_CONFIG,
   className,
   style,
@@ -272,7 +275,10 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             pointerEvents: 'none',
           }}
         >
-          <div style={{ justifySelf: 'start', minWidth: 0, pointerEvents: 'auto' }}>{objectiveSlot}</div>
+          <div style={{ justifySelf: 'start', minWidth: 0, pointerEvents: 'auto', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            {menuSlot}
+            {objectiveSlot}
+          </div>
           <HudPlaque shape="hang" as="section" style={{ padding: '10px 34px 20px', pointerEvents: 'auto', display: 'flex', alignItems: 'center' }}>
             {whenWhereSlot}
           </HudPlaque>

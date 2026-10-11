@@ -2504,3 +2504,15 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Fix:** rimossa l'azione `quest` dall'array `directorActions` in `game-frame-pixi.tsx`. `questShown` e l'hook `revealQuestPois` restano: sono il percorso di reveal usato da E2E e `?capture=1`, e gating degli anchor expedition. Comportamento R-129 invariato: 0 marker al boot, reveal/hide con trasformazione solo via «POI types» (demo) o hook (reale). Guida E2E aggiornata.
 
 **Safeguards:** lint scope 0 errori; build:check PASS; kanban:lint PASS; smoke live: Director senza «Show quest», azioni rimaste (invasion, questRun, poitypes, wonder, skin, reset), 0 anchor al boot.
+
+## R-132 — /game: componente HUD in alto a sinistra (menu di gioco)
+
+**Richiesta (verbatim):** *"In alto a sinistra serve un altro componente di HUD come gli altri due, magari cn le opzioni, salvataggi, il pulsante panles, ecc"*
+**Data:** 2026-10-11
+**Stato:** `fatta` — verificato live su FE via Puppeteer.
+
+**Decisioni del Director:** forma = lastra `hang` con menu a tendina; contenuto = voci reali + stub disabilitati; il pulsante Pannelli in basso a destra resta dov'è.
+
+**Implementazione:** nuovo `HudGameMenu` (`components/gameFrame/`) — placca `HudPlaque shape="hang"` con bottone Menu; dropdown `shape="panel"` (chiusura Esc/click fuori, come HudPanelsMenu). Voci: sezione **Pannelli** (stesse righe checkbox del menu Pannelli, incluse dev se `includeDev`), sezione **Partita** («Salva ora» reale con flash «Salvato», «Carica partita…» e «Esci al titolo» stub disabilitati), sezione **Opzioni** (radio skin base/lacquer reali + «Tutte le opzioni…» stub). Nuovo `menuSlot` su `GameFrame` nella cella top-left accanto all'obiettivo; wiring in `GameFrameScreen` (`panels`, `gameplay.saveNow()`); `game-frame-pixi` passa `skinControl` live. Nuova azione store `saveNow()` → stessa chiave/percorso canonico dell'autosave + telemetria `minimal_gameplay_save_now` / `game_menu_*`. Fix collaterale: ref `timeKeys` assegnato in effect (errore lint `react-hooks/refs` preesistente).
+
+**Safeguards:** lint scope 0 errori (fixato anche refs-in-render preesistente); unit `hudGameMenu.test.tsx` 7/7 + file in STRICT_FILES (i 2 fail di hudGuards sono violazioni preesistenti in MapQuestPoi/QuestRunWindow, presenti in HEAD); build:check PASS; smoke live: placca MENU in alto a sx stesso materiale, tendina con tutte le voci, «Save now» → «Saved», skin radio funzionanti, stub grigi.
