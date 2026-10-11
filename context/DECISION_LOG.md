@@ -1152,3 +1152,27 @@ aperte del draft.
    repeatability è authored per-POI; l'offerta consumata non riappare.
 
 **Fonte:** battesimo PLAN-019-S4 in sessione 2026-10-10.
+
+## 2026-10-11 — R-148: il coverage floor va reso irrilevante, non più forte
+
+**Da:** dopo `.mw/bugs/2026-10-10-game-island-under-hud/` la regola T-01 era
+«quando coverage-floor e content-fit collidono, pinna il bordo protetto»;
+i margini mare erano considerati solo misura accessoria (700/400px).
+
+**A:** il floor vinceva ai viewport normali (1920×800, 1600×760, <1280) — il
+pin del fit non bastava perché il floor sostituiva il fit in `refit`. Il fix
+è strutturale e a due facce: (a) margini 700/400→3600/1800 con mare aperto
+economico (nebbia piatta oltre ~1700px) rendono `floorZoom < fitZoom` su
+tutta la matrice target; (b) `SEA_QUAD_PAD=1600` separa l'estensione
+renderizzata dai bound di pan — il bordo quad non raggiunge mai lo schermo,
+eliminando lo sliver di `stageColor` scambiato per cucitura del mare.
+Corollari: `minZoom` da manifest vincola solo lo zoom utente, mai il fit;
+gli scatter decorativi nei margini hanno raggio proprio; `recenter` resetta
+`userMoved`.
+
+**Motivo:** 2ª ricorrenza del conflitto floor↔fit (bug R-148, 3ª segnalazione
+della famiglia mappa↔HUD su `/game`): il meccanismo va reso non-critico per
+progetto, non gestito caso per caso.
+
+**Fonte:** `.mw/bugs/2026-10-11-game-map-fit-seams/.work/pattern-candidate.md`;
+misura: `scripts/probe-game-map-fit.cjs` → `test-results/probe-game-map-fit/`.
