@@ -1436,7 +1436,7 @@
     "title": "Quest Generation Lab",
     "subtitle": "Quest generation workbench (PLAN-026): how a quest is born, from which ingredients, how it plays and what changes afterwards. Statuses mark what truly runs, what lives offline and what is missing.",
     "backToHub": "Test Hub",
-    "footer": "Quest Generation Lab · authored content in Italian · R-138",
+    "footer": "Quest Generation Lab · authored content in Italian · R-140",
     "sections": {
       "pipeline": "How a quest is born",
       "pipelineDesc": "The creation tree: from input to finished run. Open each step for details, files and real status.",

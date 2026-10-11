@@ -85,6 +85,7 @@ const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronze
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
 const QuestS1LabPage = lazy(() => import('./ui/idleVillage/pages/QuestS1LabPage'));
+const QuestGenerationLabPage = lazy(() => import('./ui/idleVillage/pages/QuestGenerationLabPage'));
 const QuestWindowLabPage = lazy(() => import('./ui/idleVillage/pages/QuestWindowLabPage'));
 const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.default })));
 
@@ -298,6 +299,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/poi-quest-detail-roster-time-clock';
   const isQuestS1LabPath =
     typeof window !== 'undefined' && window.location.pathname === '/quest-s1-lab';
+  const isQuestGenerationLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/quest-generation-lab';
   const isQuestWindowLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/quest-window-lab';
   const isRootPath =
@@ -1113,6 +1116,16 @@ function App() {
       <ErrorBoundary componentName="Quest S1 Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest S1 Lab…</div>}>
           <QuestS1LabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isQuestGenerationLabPath) {
+    return (
+      <ErrorBoundary componentName="Quest Generation Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Generation Lab…</div>}>
+          <QuestGenerationLabPage />
         </Suspense>
       </ErrorBoundary>
     );

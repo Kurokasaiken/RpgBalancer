@@ -1457,7 +1457,7 @@
     "title": "Quest Generation Lab",
     "subtitle": "Banco di prova della generazione quest (PLAN-026): come nasce una quest, con quali ingredienti, come si gioca e cosa cambia dopo. Gli stati segnano cosa gira davvero, cosa vive solo offline e cosa manca.",
     "backToHub": "Test Hub",
-    "footer": "Quest Generation Lab · contenuto authored in italiano · R-138",
+    "footer": "Quest Generation Lab · contenuto authored in italiano · R-140",
     "sections": {
       "pipeline": "Come nasce una quest",
       "pipelineDesc": "L'albero di creazione: dall'input al run concluso. Apri ogni passo per dettagli, file e stato reale.",

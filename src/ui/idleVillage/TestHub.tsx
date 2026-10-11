@@ -256,6 +256,17 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🗝️',
     status: 'ok',
   },
+  // Non-kit page: Quest Generation Lab — catalogo generato, pipeline di
+  // creazione, inventario meccaniche/gimmick/kit/trait, run giocabile,
+  // matrice delle conseguenze e mappa dell'implementazione (R-140).
+  {
+    id: 'quest-generation-lab',
+    title: 'Quest Generation Lab',
+    description: 'Catalogo quest generate: albero di creazione, gimmick/kit/tag/trait/twist, run giocabile, conseguenze e mappa sistemi',
+    path: '/quest-generation-lab',
+    icon: '🧪',
+    status: 'ok',
+  },
   // Non-kit page: Use Client — client-only ThreatStatusIndicator showcase.
   {
     id: 'use-client',
