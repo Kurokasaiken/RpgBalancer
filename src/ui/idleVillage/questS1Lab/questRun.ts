@@ -1295,6 +1295,7 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
   const bound = clampSuccessBound(score - TUNE.goblinCheckDifficulty);
   const die = 1 + Math.floor(roll(state) * 100);
   const verdict = verdictFromRoll(die, bound);
+  const attackLine = spec.attackLines?.[verdict] ?? GOBLIN_ATTACK_LINES[verdict];
   state.checkSeq += 1;
   state.lastCheck = {
     id: `chk-${state.checkSeq}`,
@@ -1307,7 +1308,7 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
     deathPct: 0,
     // The transit line belongs to the phase entrance, not every round.
     transit: turn === 1 ? node.transit : undefined,
-    flavor: GOBLIN_ATTACK_LINES[verdict],
+    flavor: attackLine,
     harms: [],
     harmLines: [],
     authoredText: '',
@@ -1316,7 +1317,7 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
   state.checkQueue.push(state.lastCheck);
   state.log.push({
     kind: 'CHECK',
-    text: `Turno ${turn}: ${spec.attackStats.map((s) => STAT_LABELS[s]).join(' + ')} → ${verdict.toUpperCase()} (${Math.round(bound)} vs tiro ${die}). ${GOBLIN_ATTACK_LINES[verdict]}`,
+    text: `Turno ${turn}: ${spec.attackStats.map((s) => STAT_LABELS[s]).join(' + ')} → ${verdict.toUpperCase()} (${Math.round(bound)} vs tiro ${die}). ${attackLine}`,
   });
   // Everything logged after this point is a consequence of the attack roll.
   const consequenceMark = state.log.length;
@@ -1324,7 +1325,7 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
     verdict === 'bigwin' ? spec.killPerBigwin : verdict === 'win' || verdict === 'almost' ? spec.killPerWin : 0;
   if (kills > 0) {
     state.goblinLeft = Math.max(0, state.goblinLeft - kills);
-    state.log.push({ kind: 'INFO', text: `Goblin abbattuti: ${kills}. Ne restano ${state.goblinLeft}.` });
+    state.log.push({ kind: 'INFO', text: `${spec.enemyName ?? 'Goblin'} abbattuti: ${kills}. Ne restano ${state.goblinLeft}.` });
   }
   // Counterattack: hits land on positional targets, never twice the same one.
   const hits =
@@ -1366,11 +1367,13 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
       state.flags.push('sterminio');
       state.log.push({ kind: 'INFO', text: 'Sterminio: non ne resta nessuno.' });
     }
-    state.lastEvent = 'Il campo è conquistato. Non resta un goblin vivo.';
+    state.lastEvent = spec.clearedText ?? 'Il campo è conquistato. Non resta un goblin vivo.';
   } else if (turn >= spec.turns) {
-    state.lastEvent = 'Il campo è conquistato. I superstiti scappano nel bosco.';
+    state.lastEvent = spec.survivorsText ?? 'Il campo è conquistato. I superstiti scappano nel bosco.';
   } else {
-    state.lastEvent = `Turno ${turn} chiuso — i goblin tengono ancora il campo (${state.goblinLeft} in piedi).`;
+    state.lastEvent = spec.holdingText
+      ? spec.holdingText.replace('{turn}', String(turn)).replace('{left}', String(state.goblinLeft))
+      : `Turno ${turn} chiuso — i goblin tengono ancora il campo (${state.goblinLeft} in piedi).`;
   }
   state.lastCheck.outcomeText = outcomeLines();
 }
@@ -2497,7 +2500,7 @@ export function availableOptions(state: QuestRunState): { id: string; label: str
       {
         id: 'fight-turn',
         label: `Combatti — turno ${state.combatTurn + 1}`,
-        detail: `Goblin in piedi: ${state.goblinLeft}. Rispondono colpo per colpo.`,
+        detail: `${node.combat?.enemyName ?? 'Goblin'} in piedi: ${state.goblinLeft}. Rispondono colpo per colpo.`,
         disabled: false,
       },
     ];

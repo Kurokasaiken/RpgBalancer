@@ -11,6 +11,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   gimmickOf,
+  imprintCatalogEntries,
   kitIdOf,
   labCatalogEntries,
   labKits,
@@ -63,16 +64,26 @@ describe('questGenLab — gimmick/kit derivation', () => {
     expect(kitIdOf('gen-race-passo-montano')).toBe('passo-montano');
     expect(kitIdOf('gen-flood-mare')).toBe('mare');
     expect(gimmickOf('goblin')).toBeUndefined();
+    /* R-152: imprint-compiled ids encode no gimmick — a different provenance. */
+    expect(gimmickOf('gen-impr002-palude')).toBeUndefined();
   });
 
-  it('every catalog scenario maps to a registered gimmick and kit', () => {
+  it('every catalog scenario maps to a registered gimmick+kit or an imprint spine', () => {
     const kits = labKits();
-    expect(ENTRIES).toHaveLength(Object.keys(GENERATED_CATALOG).length);
+    const imprint = imprintCatalogEntries();
+    /* gimmick entries + imprint spines cover the whole catalog — no silent
+     * third provenance class. */
+    expect(ENTRIES.length + imprint.length).toBe(Object.keys(GENERATED_CATALOG).length);
     for (const e of ENTRIES) {
       expect(QUEST_LAB_GIMMICKS[e.gimmickId], e.scenario.id).toBeDefined();
       expect(e.kit, e.scenario.id).toBeDefined();
       expect(kits.find((k) => k.key === e.kit!.key)).toBeDefined();
     }
+    for (const i of imprint) {
+      expect(i.imprintId, i.scenario.id).toMatch(/^impr\d+/);
+      expect(i.domainId, i.scenario.id).toBeTruthy();
+    }
+    expect(imprint.some((i) => i.scenario.id === 'gen-impr002-palude')).toBe(true);
   });
 
   it('kits report origin and link back to their scenarios', () => {

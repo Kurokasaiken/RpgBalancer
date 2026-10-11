@@ -343,7 +343,12 @@ Narrative → Presentation`)**
 - *Cautele dalla delibera (da filtrare):* i numeri (15-20 archetipi,
   rotazione, %) sono proposte non decise; «LLM renderizza il testo» è
   compatibile solo con l'uso-presentazione, non con verità di mondo.
-- *Stadio:* S5. *Stato:* `proposta` Director.
+- *Prima compilazione (R-152, 2026-10-12):* IMPR-002 × kit palude gira
+  come quest reale (`gen-impr002-palude`, profilo `gen`) — contratto di
+  compilazione beat→nodi in `context/QUEST_IMPRINTS.md`. I flag B6 sono
+  hook chain pronti per M-02/M-12, non ancora eseguiti.
+- *Stadio:* S5. *Stato:* `proposta` Director (primo artefatto meccanico
+  esistente).
 
 **M-12 — Causalità selettiva (semi dormienti/morti/consumati)**
 - *Cosa è:* evento → conseguenza persistente → cambio di stato → eventuale

@@ -255,3 +255,18 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   `test-results/plan026-t5-traits-2026-10-10.log`.
 - T6 — integrazione dopo gate PLAN-019 pertinenti.
 - T7 — archi narrativi: gated (OPEN-016 + ratifica).
+- **T8 — primo imprint narrativo compilato — FATTO** (R-152,
+  2026-10-12): il ponte mancante imprint→grafo. `gen-impr002-palude`
+  «The Lock-Keeper's Bargemen» — IMPR-002 «Il compagno che ride» × kit
+  palude — compilato come `QuestScenario` authored sul profilo `gen`:
+  beat B0–B6 → nodi/vars/flag (`sospetto`, `pronti`, `annusati`,
+  `smascherati`, `posta-mossa`, `a-*`/`soci-*` come hook chain), tre
+  canali crack one-shot, turn router su stato post-effetto, combat
+  sorpresa gated. Delta motore: `CombatSpec` copy dichiarativa
+  opzionale (fallback goblin invariato). Nuova provenance nel lab:
+  `labModel.imprintCatalogEntries()` per `gen-<imprint>-<dominio>`.
+  Catalogo v0 = 5 generati gimmick×kit + 1 imprint-compiled. Contratto
+  di compilazione documentato in `context/QUEST_IMPRINTS.md`
+  («Compilazione imprint→grafo»). 16 test dedicati + questGenLab 10/10.
+  Chain-ready ≠ chain-executed: i flag B6 sono hook per M-02/M-12.
+  Evidence: `test-results/r152-imprint-compilation-2026-10-12.log`.

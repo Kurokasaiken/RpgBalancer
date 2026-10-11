@@ -2837,12 +2837,13 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"fa una ricerca approfondita su ognuno di questi argomenti, usa le ai web x fare la stesa ricerca approfondita per trovare il modo migliore x risolvere o migliorare qeuste idee, poi salva tutto in file separati e dammi un riassunto finale d tutto quello che abbiamo trovato d rilevante"*
 **Data:** 2026-10-11
-**Stato:** `in corso`
+**Stato:** `fatta`
 **Desiderata FROZEN:** nessuna nuova — ricerca di supporto alle PROPOSAL di `context/QUEST_OPPORTUNITY_LAYER.md` (OPEN-019/020/021). Workflow replicato da R-128 (`20261010-gimmick-channels-research`): prompt per sotto-argomento → `mw-broadcast --web` → report sintetizzato con fonti.
 
 **Sotto-argomenti (7):** T1 grafo delle opportunità e precedenti di strutture a nodi; T2 famiglie di quest come kit meccanici; T3 tassonomia requisiti e gate morbidi/duri; T4 ricompense che aprono porte e capacità che cambiano le regole; T5 orientamento della generazione e informazione come risorsa; T6 tempo, finestre di opportunità e attività concorrenti; T7 metodologia per prototipare il meta-layer senza combattimento.
 
-**Output:** `.mw/runs/20261011-opportunity-layer-research/` — prompt, BROADCAST per provider e `report-tN-*.md` per argomento + sintesi finale.
+**Output:** `.mw/runs/20261011-opportunity-layer-research/` — `README.md` (sintesi esecutiva: 10 scoperte + convergenze + 7 nuove questioni candidate OPEN) + `report-t1..t7-*.md` + `tN-*/BROADCAST.md` raw.
+**Esito:** ogni topic coperto da ≥1 risposta AI sostanziosa + ricerca propria (chatgpt/claude/deepseek intermittenti per cambi UI provider — grok quasi sempre inutilizzabile). Conferme forti: modello qualities+offer generator (Fallen London), famiglia=signature pressure (swap test), capability tags, gate come stato calcolato, reward come interceptor su 5 superfici dichiarate (BYPASS/TRANSFORM/MITIGATE/REVEAL/EXCEPTION), steering=weights, intel a 4 tier (risolve candidatamente OPEN-018), tempo a 3 concetti + acceptance/completion, parallelismo da vincoli reali (no slot), prototipo a 3 gate con policy-sim e metriche pre-registrate. 7 nuove questioni candidate OPEN elencate nel README del run.
 
 ---
 
@@ -2883,6 +2884,8 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"dobbiamo capire gli altri giochi simili che fanno parte della stessa nicchia, cerchiamo d capire come e xè c differenziamo dagli altri, che errori hanno fatto e che cosa hanno fatto bene i nostri competitor. [...] aggiungi altri titoli simili, facciamo una bella ricerca e cerchiamo d fare una mappa concettuale d queste informazioni, anche cercando di capire cm siamo posizionati. Ovviamente c serve anche il prezzo a cui vengon venduti sia al max che 'normalmente' cn gli sconti"*
 **Data:** 2026-10-11
-**Stato:** `in corso`
+**Stato:** `fatta`
 **Desiderata FROZEN:** nessuna — layer di direzione pre-desiderata (strategist). Output atteso: documento di analisi competitiva con lista estesa titoli, prezzi listino/scontati, punti di forza/errori, mappa concettuale e posizionamento di RPG Balancer.
 **Contesto:** il Director ha fornito una lista iniziale da una ricerca ChatGPT: Super Fantasy Kingdom, A Hero's Rest, Fort Triumph, Crown of Greed, Majesty, dotAGE.
+**Cosa è successo:** creato `context/COMPETITIVE_LANDSCAPE.md` (ricerca web 2026-10-11): ~21 titoli in 5 cluster, tabella prezzi listino/saldo/recensioni/vendite stimate, pattern errori E1–E8, mappa di posizionamento diretto↔indiretto × run↔continuo, white space e implicazioni prezzo ($14.99 coerente col tier Loop Hero/SFK-launch). Indicizzato in `context/INDEX.md`. 3 domande aperte per il Director in §10 del doc.
+**Aggiornamento 2026-10-11:** aggiunta §8.1 — prezzi al lancio vs listino attuale. Pattern dominante: lancio basso + rialzo (EA→1.0 o per contenuto) + sconto -10/15% prima settimana.

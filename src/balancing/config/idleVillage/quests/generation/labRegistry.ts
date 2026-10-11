@@ -300,6 +300,41 @@ export const QUEST_LAB_GIMMICKS: Readonly<Record<string, LabGimmick>> = {
     },
     status: 'offline',
   }),
+  meld: LabGimmickSchema.parse({
+    id: 'meld',
+    label: 'Meld — il bonus che scade',
+    dilemma:
+      'Prendere il bonus in scadenza o restare sulla rotta sicura: il contenitore si perde fra pochi turni non dichiarati — le opzioni veloci costano sangue (rischio ferita/morte), quelle prudenti lo lasciano scadere.',
+    vars: [
+      { key: 'rotta', label: 'Avanzamento verso il contenitore', movesWith: 'i verdetti sui check del tracciato meld; le opzioni rapide danno +2 ma portano rischio wound/death' },
+      { key: 'soglia', label: 'Distanza da coprire', movesWith: 'fisso (tuning `soglia`) — a `rotta ≥ soglia` il meld è TAKEN' },
+      { key: 'scadenza', label: 'Turni residui prima della perdita', movesWith: 'decresce a ogni azione della run — valore NON dichiarato al giocatore: la UI mostra solo stati nominati (disponibile / ultima chiamata / scaduto)' },
+    ],
+    resolution:
+      'Tracciato bonus parallelo all’obiettivo: `rotta ≥ soglia` prima che `scadenza` arrivi a 0 → contenitore preso (bottino extra, TAKEN≠SECURED fino all’uscita); `scadenza = 0` → il meld si perde e la quest continua. L’indicatore mostra solo lo stato nominato, mai i turni esatti.',
+    twists: [
+      {
+        flag: 'doppio-meld',
+        label: 'Secondo contenitore',
+        arming: 'armRoll a inizio run (chance tuning) — un secondo contenitore appare sulla rotta opposta: non si possono prendere entrambi',
+      },
+      {
+        flag: 'meld-presidiato',
+        label: 'Contenitore presidiato',
+        arming: 'armRoll/evento (chance tuning) — il contenitore è sorvegliato: la raccolta richiede uno scontro o un check di ingaggio',
+      },
+    ],
+    sceneKeys: [
+      'avvistamento', 'rotta', 'scorciatoia', 'bivio', 'tratto',
+      'contenitore', 'ultima', 'scaduto', 'estrazione', 'fine',
+    ],
+    generator: {
+      file: 'src/balancing/config/idleVillage/quests/generation/meldGimmick.ts',
+      fn: 'generateMeldScenario(kit, tuning?)',
+      tuning: 'soglia, finestraTurni, doppioChance, presidioChance',
+    },
+    status: 'proposal',
+  }),
 };
 
 /**
@@ -532,9 +567,21 @@ export const QUEST_LAB_MECHANICS: readonly LabMechanic[] = [
   {
     id: 'combat',
     label: 'Combattimento a turni',
-    desc: 'Nodi combat: attackStats per turno, nemici con hit posizionali, kill anticipati chiudono lo scontro.',
+    desc: 'Nodi combat: attackStats per turno, nemici con hit posizionali, kill anticipati chiudono lo scontro. Copy dichiarativa opzionale (enemyName/attackLines/clearedText/survivorsText/holdingText) — fallback goblin, fight non-goblin senza toccare il motore.',
     surface: 'node.combat (CombatSpec)',
     files: ['src/ui/idleVillage/questS1Lab/questRun.ts'],
+    status: 'implemented',
+  },
+  {
+    id: 'imprint-compilation',
+    label: 'Compilazione imprint→grafo',
+    desc: 'Le function spec dei beat (QUEST_IMPRINTS) compilate in QuestScenario sul profilo `gen`: vars/verdictTable/goto bastano, zero switch authored. Primo artefatto: gen-impr002-palude (IMPR-002 × palude). Id gen-<imprint>-<dominio> = provenance distinta dai skeleton×kit.',
+    surface: 'impr002Palude.ts, imprintCatalogEntries (labModel)',
+    files: [
+      'src/balancing/config/idleVillage/quests/generation/impr002Palude.ts',
+      'src/ui/idleVillage/questGenLab/labModel.ts',
+      'context/QUEST_IMPRINTS.md',
+    ],
     status: 'implemented',
   },
   {
@@ -586,6 +633,14 @@ export const QUEST_LAB_MECHANICS: readonly LabMechanic[] = [
     desc: 'Approach lock a run-level, capability-gated dal party, max 3 canali per check — adottato (R-134), runtime v0 non integrato.',
     surface: 'QUEST_RULES §7, PLAN-028',
     files: ['plans/PLAN-028-gimmick-channels-v0.md'],
+    status: 'proposal',
+  },
+  {
+    id: 'hidden-check',
+    label: 'Nodi hazard / hiddenCheck',
+    desc: 'Eventi a innesco automatico con check nascosto — nascosto prima, rivelato sempre dopo (QUEST_RULES §3). Primo esemplare: mimic (finta cassa → perc check → combat lungo/breve, nessun bottino). Famiglia ricompensa-ingannevole.',
+    surface: 'HazardNode.hiddenCheck + verdictTable (CONTRACTS §15)',
+    files: ['context/QUEST_GENERATION_CONTRACTS.md'],
     status: 'proposal',
   },
 ];
@@ -949,6 +1004,18 @@ export const QUEST_LAB_OPEN: readonly LabOpenIssue[] = [
     label: 'Playtest umano',
     desc: 'Il framework alza la probabilità di scelte significative, non garantisce il divertimento — serve giocare, non solo misurare.',
     source: 'QUEST_GENERATION_ARCHITECTURE',
+  },
+  {
+    id: 'hazard-node-runtime',
+    label: 'Categoria nodi hazard nel motore',
+    desc: 'hiddenCheck auto-innescato + revealOnResolve non esistono nel runtime — oggi ogni check è dichiarato al giocatore. Primo esemplare: mimic (ricompensa-ingannevole), contratto v0 in CONTRACTS §15.',
+    source: 'QUEST_GENERATION_CONTRACTS §15 + ARCHITECTURE §18 (R-151)',
+  },
+  {
+    id: 'variety-not-reskin',
+    label: 'Varietà strutturale ≠ reskin',
+    desc: 'Director 2026-10-11: gimmick con la stessa algebra di cursori di race/flood (preda, salmento, doppio fronte) possono esistere ma non contano come vera varietà — la metrica si misura sulle strutture decisionali, da definire.',
+    source: 'ARCHITECTURE §18.4 (R-151)',
   },
 ];
 

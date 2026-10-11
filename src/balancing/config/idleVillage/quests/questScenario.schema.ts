@@ -174,6 +174,12 @@ export const CombatSpecSchema = z
     escalateProfile: z.boolean(),
     nextCleared: z.string().optional(),
     nextSurvivors: z.string().optional(),
+    /* Copy overrides (R-152) — optional, goblin lines are the fallback. */
+    enemyName: z.string().optional(),
+    attackLines: z.partialRecord(VerdictSchema, z.string()).optional(),
+    clearedText: z.string().optional(),
+    survivorsText: z.string().optional(),
+    holdingText: z.string().optional(),
   })
   .strict();
 export type CombatSpecSchemaType = z.infer<typeof CombatSpecSchema>;

@@ -7,8 +7,8 @@ status: PROPOSAL — deliverable pre-spec (R-113, deliverable 1-4).
 source: QUEST_GENERATION_SPEC.md (specchietto), QUEST_GENERATION_ARCHITECTURE.md §13,
         ingestions 2026-10-10; schema reale verificato su
         questScenario.schema.ts + questRun.ts (2026-10-10)
-related: R-091, R-108, R-111, R-112, R-113, R-114, R-116, OPEN-014,
-         PLAN-019 (S5), QUEST_RULES.md, QUEST_IMPRINTS.md
+related: R-091, R-108, R-111, R-112, R-113, R-114, R-116, R-127, R-149,
+         OPEN-014, PLAN-019 (S5), QUEST_RULES.md, QUEST_IMPRINTS.md
 ---
 
 # Quest Generation Contracts v0
@@ -304,6 +304,16 @@ Obiettivo: **1 quest generata e validata** che passi tutta la tabella §8.
 - **Accettazione:** nessuna politica dominante ovunque; ≥1 ramo-twist con
   witness; banda misurata = dichiarata; 0 errori schema/coverage.
 
+**Gimmick oltre il catalogo v0:** `flood` è stata implementata
+(`generateFloodVault`, status offline nel lab); `meld` (**proposta
+R-149**) è registrata come terza gimmick — bonus a scadenza *non
+dichiarata* in stile XCOM: vars `rotta`/`soglia`/`scadenza`, indicatore
+a stati nominati («disponibile / ultima chiamata / scaduto»), opzioni
+rapide ad alto rischio wound/death. Descriptor completo in
+`QUEST_GENERATION_ARCHITECTURE.md` §17 e in `labRegistry.ts`
+(`QUEST_LAB_GIMMICKS.meld`, status `proposal`); generator ancora da
+scrivere — entra nel `GimmickRegistry` solo oltre il cap v1 di PLAN-029.
+
 ## 10. Gap motore verificati — prerequisiti per il prototipo
 
 | # | Gap | Dove | Stato |
@@ -347,6 +357,30 @@ vars e flag). Progettarli insieme, non come tre patch separate.
 7. ~~Forma della `verdictTable`~~ → formalizzata in §12.
 8. Se i nodi goblin migrano a verdictTable a regime (decisione rinviata —
    v0 li lascia sullo switch).
+9. **Canali alternativi sui check core** (R-127 → risolta per delega
+   R-134, 2026-10-11): modello **adottato** — lock di approccio a
+   run-level, capability-gated dal party, eccezioni a consumo (~1/run).
+   Sketch contract candidato (da dettagliare in PLAN-028):
+   - `CheckChannel` (sul check node che scrive la var core):
+     `{ id, label(i18n), stat, eligibility(capability/item gate),
+        cost{type: free|consumable|cooldown}, oddsProfile,
+        failureProfile{coreVarOp, memberExposure, sideEffect},
+        availabilityCap?, failureTells[] }` — max 3 per check; almeno 2
+     assi di differenziazione tra canali dello stesso check.
+   - Run state: `approachLock` scelto all'avvio tra i canali/piani
+     eleggibili dal party; `exceptionBudget` per gli sblocchi a consumo.
+   - `channelOverrides` su `NarrativeBrief` per canale:
+     `{ mustConvey[], mustNotImply[], channelVerb, failureTells[] }` +
+     validator dedicato (scan mustNotImply, presence failureTells su fail,
+     presence channelVerb sui channel-aware beats); tier testo T0–T3.5,
+     default T1, fallimento un tier sopra il successo.
+   - Preview: `riskTag` semantico + stakes per canale; locked greyed con
+     `requiresLabel`; coverage party×canali pre-quest.
+   - MC channel-health policies: always-X per canale, party-locked,
+     adaptive-pick-best (degeneracy >70-80% → fail), adaptive-conserve;
+     dead channel = mai scelto da adaptive su roster realistici.
+   Il v0 runtime resta a canale nativo unico finché PLAN-028 non atterra —
+   non blocca il prototipo esistente.
 
 ## 12. `OutcomeSpec` — la forma concreta della verdictTable (v0)
 
@@ -520,3 +554,78 @@ contratti, assorbiti qui mentre lo status del piano resta al Director:
 - **Prototipo = prova di fattibilità**, non generalità: 1 quest validata
   end-to-end basta per decidere se il modello regge (§9 già lo diceva;
   ora è il criterio esplicito di accettazione).
+
+## 15. `HazardNode` e `hiddenCheck` — contratto v0 (R-151)
+
+Categoria di nodo oltre le scene con scelta: **eventi a innesco
+automatico** il cui esito dipende da un check nascosto. Il primo esemplare
+è il **mimic** (Director 2026-10-11): nodo-tesoro con check di percezione
+nascosto — fallito → HP + combat lungo; riuscito → combat breve a
+sorpresa, nessun bottino (la cassa È il mostro).
+
+```ts
+interface HazardNode {
+  id: string;
+  /** Cosa il nodo finge di essere (testo d'offerta — può mentire). */
+  bait: 'loot' | 'rest' | 'info' | 'exit';
+  /** Il check che si auto-innesca all'arrivo. Nessuna scelta qui. */
+  hiddenCheck: {
+    stats: LabStat[];               // tipicamente ['perc']
+    /** Bonus se il party ha copertura: scout/esploratore o trait
+     *  compatibile — il vettore di equità (QUEST_RULES §2). */
+    coverageBonus?: { requiresTrait?: string[]; scoutSlot?: boolean; pp: number };
+  };
+  /** Verdict → effetto. Stessa `verdictTable` di §12 — il hazard è un
+   *  check che nessuno ha chiesto, non un meccanismo nuovo. */
+  verdictTable: Partial<Record<Verdict, OutcomeSpec>>;
+  /** Indizi leggibili *prima* nel testo/kit (equità retrospettiva).
+   *  Il validatore richiede ≥1 clue quando `clues.required`. */
+  clues: { required: boolean; kitNeeds: string[] };
+  /** Gate di dominio: la creatura/fenomeno deve stare in
+   *  `kit.creature_ammissibili`/`physics` — altrimenti non emettibile. */
+  kitGate: string;
+  revealOnResolve: true;            // costante — QUEST_RULES §3
+}
+```
+
+**Regole del contratto:**
+
+1. **Rivelazione obbligatoria.** `revealOnResolve` è fisso a `true`:
+   quando il check fallisce e l'effetto scatta, esito e oggetto del check
+   sono narrati («hai mancato di notare X») — nascosto prima, mai dopo
+   (QUEST_RULES §3, regola vigente). Il `verdictFlavor` del fail deve
+   nominare il check, non solo il danno.
+2. **Nessuna scelta nel nodo.** Opzioni post-reveal ammesse *solo* nel
+   ramo rivelato (es. esito «scoperto» → choice disimpegno-vs-sorpresa).
+   La terza via candidata (scoperto → puoi andartene) è da valutare a
+   design di scena — vedi ARCHITECTURE §18.2.
+3. **Copertura = attribuzione.** `coverageBonus` esiste perché il check
+   nascosto senza vettori di lettura è una tassa RNG: scout, tratti e
+   indizi authored sono come il giocatore *poteva* saperlo.
+4. **Frequenza.** L'armatura è `armRoll`/ramo authored o chance di
+   tuning — mai un default globale sui nodi loot (anti «punzecchia
+   tutto», ARCHITECTURE §18.2).
+5. **Famiglia `ricompensa-ingannevole`:** `bait` copre le varianti
+   (loot→mimic/maledetto/piedistallo/rivendicato; rest→falso riparo;
+   info→falsa pista). Il loot finto non emette `takeLoot` — TAKEN≠SECURED
+   non è violato perché il bottino non è mai esistito.
+6. **Testo che mente, con licenza.** L'offerta del nodo (`bait`) può
+   descrivere la ricompensa falsa: `NarrativeBrief.hiddenFromPlayer`
+   porta il fatto «è una trappola»; `mustConvey` resta onesto sulla
+   *meccanica* una volta rivelata.
+
+### 15.1 Registro scoperte di esplorazione (non adottate)
+
+Famiglie decisionali candidate dalla gap map R-151 e **registrate come
+scoperte** — non nel catalogo §3.1, non bloccanti, riapribili se una
+quest ne mostra il bisogno: `male-minore` (due opzioni entrambe costose:
+scegli la valuta), `boon-faustiano` (buff con prezzo differito/nascosto),
+`stanza-?` (contenuto ignoto a costo noto — incertezza prezzata),
+`luce-vs-furtivita` (risorsa luce: vedi meglio, ti fai vedere),
+`inganno-agente` (indizio falso piazzato da un agente — distinta da
+`info-ambigua` ambientale; collega IMPR-002).
+
+Altre esclusioni decise (ARCHITECTURE §18.4): **incontri neutrali** =
+scena minore opzionale, non famiglia; **combat con props/boss a stadi** =
+candidato interessante, design da pensare a parte; **curio layer DD** =
+REJ-008.

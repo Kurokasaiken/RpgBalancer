@@ -15,12 +15,14 @@ import { RACE_TO_MARSH_SCENARIO } from './raceToMarsh';
 import { FLOOD_MINIERA_SCENARIO } from './floodMiniera';
 import { FLOOD_MARE_SCENARIO } from './narrated/floodMare';
 import { RACE_MINIERA_SCENARIO } from './narrated/raceMiniera';
+import { IMPR002_PALUDE_SCENARIO } from './impr002Palude';
 
 export { RACE_TO_PASS_SCENARIO } from './raceToPass';
 export { RACE_TO_MARSH_SCENARIO } from './raceToMarsh';
 export { FLOOD_MINIERA_SCENARIO } from './floodMiniera';
 export { FLOOD_MARE_SCENARIO, MARE_FLOOD_KIT } from './narrated/floodMare';
 export { RACE_MINIERA_SCENARIO, MINIERA_RACE_KIT } from './narrated/raceMiniera';
+export { IMPR002_PALUDE_SCENARIO } from './impr002Palude';
 export { generateRaceScenario, type RaceDomainKit, type RaceTuning } from './raceGimmick';
 export { generateFloodVault, type FloodDomainKit, type FloodTuning } from './floodVault';
 export { PASSO_MONTANO_KIT, PALUDE_KIT } from './kits';
@@ -33,6 +35,10 @@ export const GENERATED_CATALOG: Readonly<Record<string, QuestScenario>> = {
   [FLOOD_MINIERA_SCENARIO.id]: FLOOD_MINIERA_SCENARIO,
   [FLOOD_MARE_SCENARIO.id]: FLOOD_MARE_SCENARIO,
   [RACE_MINIERA_SCENARIO.id]: RACE_MINIERA_SCENARIO,
+  /* R-152: imprint-compiled scenario (authored spine, 'gen' profile) —
+   * `gen-impr002-*` is NOT a skeleton×kit generation: no GimmickId prefix,
+   * so lab kits never attach it; it is discoverable via `generatedScenarioById`. */
+  [IMPR002_PALUDE_SCENARIO.id]: IMPR002_PALUDE_SCENARIO,
 };
 
 /** Lookup a generated scenario by catalog id. */

@@ -7,12 +7,13 @@ status: PROPOSAL — consolidamento della conversazione di generazione;
 source: consolidamento AI della conversazione R-111/R-112/R-113;
   dettagli e classificazione FACT/PROPOSAL/OPEN in
   context/QUEST_GENERATION_ARCHITECTURE.md + ingestions 2026-10-10
-related: R-091, R-092, R-105, R-108, R-109, R-111, R-112, R-113,
-         OPEN-014, OPEN-015, PLAN-019 (S5),
+related: R-091, R-092, R-105, R-108, R-109, R-111, R-112, R-113, R-127,
+         R-149, R-153, OPEN-014, OPEN-015, OPEN-019, PLAN-019 (S5),
          QUEST_RULES.md (vincoli canonici), .mw/desiderata.md,
          ingestions/2026-10-09-emotional-mechanics-quest/FINAL-RESOCONTO.md,
          QUEST_GENERATION_ARCHITECTURE.md, QUEST_IMPRINTS.md,
-         QUEST_GAMEPLAY_SCIENCE.md, NARRATIVE.md
+         QUEST_GAMEPLAY_SCIENCE.md, NARRATIVE.md,
+         QUEST_OPPORTUNITY_LAYER.md
 ---
 
 # RpgBalancer — Quest Generation System
@@ -128,6 +129,24 @@ Ogni core gimmick specifica:
 - Decisioni e costi caratteristici.
 - Hook ammessi per le scene.
 - Condizioni del climax e relativi esiti.
+- *(vigente, QUEST_RULES §7 — binding adottato R-134)* Canali di check
+  ammessi sui check che muovono la variabile core — nativo + alternativi
+  su stat/skill diverse (es. allarme: Destrezza di base, oppure
+  Intelligenza/invisibilità o Carisma/camuffamento). I check non-core
+  restano sulle stat native. Binding: lock run-level, capability-gated,
+  eccezioni a consumo; dettagli in CONTRACTS §11.9 e PLAN-028.
+  *(deepening R-153, PROPOSAL)* un canale non è solo «stat diversa»: una
+  capacità può cambiare la natura della prova (es. disattivare l'allarme
+  anziché superarlo) — i profili di fallimento divergenti del binding
+  coprono parte dell'idea; vedi anche `QUEST_OPPORTUNITY_LAYER.md` §5.
+
+**Roster delle gimmick** (dettaglio in `QUEST_GENERATION_ARCHITECTURE.md`
+e descriptor in `labRegistry.ts` `QUEST_LAB_GIMMICKS`): `race` (gara di
+avanzamento) e `flood` (la volta che allaga) implementate offline;
+`meld` (**proposta R-149**, 2026-10-12 — bonus a scadenza *non
+dichiarata* in stile XCOM: vars `rotta`/`soglia`/`scadenza`, indicatore
+a stati nominati con «ultima chiamata», opzioni rapide ad alto rischio
+ferita/morte → ARCHITECTURE §17).
 
 ### 3.2 Scene gimmick e archetipi decisionali
 
@@ -156,6 +175,15 @@ denominatore. Resta aperta la tensione col budget «3–4 decisioni
 cruciali» — il generatore deve marcare quali scene sono cruciali e quali
 minori, e la sequenza deve avere una curva (pressione → dilemma →
 conseguenza → risoluzione).
+
+**Seconda categoria di nodi (R-151, 2026-10-11):** oltre alle scene con
+scelta esistono i **nodi hazard** — eventi a innesco automatico con
+`hiddenCheck` (check nascosto al momento, rivelato all'effetto — regola
+vigente QUEST_RULES §3: il perché non si nasconde mai dopo). Primo
+esemplare: **mimic** (check percezione su finta cassa → combat
+lungo/breve, nessun bottino in nessun ramo). Famiglia
+`ricompensa-ingannevole` e contratto v0 in CONTRACTS §15; decisioni
+collaterali in ARCHITECTURE §18.4.
 
 ### 3.3 Twist
 
@@ -371,7 +399,10 @@ precedenti.
 quest e la sua scadenza sono concetti distinti. Ignorare una quest può
 modificare il mondo o le opportunità successive, senza implicare sempre
 una penalità diretta — estende la regola canonica R-092 (conseguenze
-anche per mancata risoluzione, OPEN-015). Nessun contratto di arco esiste
+anche per mancata risoluzione, OPEN-015). *(proposta R-153)* terzo
+concetto temporale: la **finestra di opportunità** — un intervallo in
+cui un'azione è vantaggiosa/possibile senza essere una scadenza dura
+(`QUEST_OPPORTUNITY_LAYER.md` §7). Nessun contratto di arco esiste
 oggi: il più vicino è `village_event_system_spec.md` / R-093 (registro
 narrativo).
 
@@ -433,6 +464,14 @@ prima di passare alla successiva.
 - ✅ Twist arm → misto (runstart per tratti, in-run per eventi).
 - ✅ Traduzione → tutto il testo generato progettato traducibile.
 - ✅ Regola 75% → posticipata, si osserva sul prototipo.
+- ✅ Hidden check (2026-10-11, R-151) → nodi hazard come seconda
+  categoria; check nascosto prima, rivelato sempre dopo (QUEST_RULES §3,
+  `vigente`); contratto `HazardNode`/`hiddenCheck` v0 in CONTRACTS §15;
+  mimic = primo esemplare, famiglia `ricompensa-ingannevole`.
+- ✅ Varietà strutturale (2026-10-11) → reskin ≠ vera varietà: gimmick
+  con la stessa algebra di cursori delle esistenti non contano nella
+  metrica. Curio layer DD → REJ-008. Incontri neutrali → scena minore,
+  non famiglia.
 
 **Ancora aperte:**
 
@@ -451,6 +490,16 @@ prima di passare alla successiva.
 - Regole di avanzamento, sospensione e conclusione delle main quest;
   generazione incrementale vs pre-generata dei segmenti; quanto del
   futuro dell'arco è visibile al giocatore.
+- Layer sopra le quest (R-153, PROPOSAL): grafo delle opportunità,
+  famiglie, tassonomie requisiti/ricompense, esploratore orientabile,
+  tempo a tre concetti, capacità del villaggio → documento dedicato
+  `context/QUEST_OPPORTUNITY_LAYER.md`, tracking OPEN-019/020/021.
+- Binding degli approcci alternativi ai check core-gimmick (R-127):
+  ~~per-check vs per-run vs gated~~ → **risolta** (R-134, delega
+  Director): lock run-level capability-gated + eccezioni a consumo;
+  varianti sullo stesso nodo. Ricerca R-128 →
+  `context/QUEST_GIMMICK_CHANNELS_RESEARCH.md`; contract sketch in
+  `QUEST_GENERATION_CONTRACTS.md` §11.9; prototipo PLAN-028.
 
 ---
 
