@@ -2480,3 +2480,15 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Fix:** gate expeditions su `questShown` («Mostra quest» mostra offerte reali + run); `poiDemo` («POI types») aggiunge l'esemplare goblin reale + demo job/event come prima. Uscite: ghost anchor derivati in render (adjust-state-on-prop-change) — il nodo uscente resta nella lista keyata del commit stesso, il DOM sopravvive e il prop `exiting` riproduce il fade+shrink speculare all'ingresso (implementazione via effect rimuoveva il nodo PRIMA del ghost: pop-off invariato). `MapQuestPoi`: prop `exiting` + write-in del sigillo via rAF 0→progress in `SEAL_WRITE_IN_MS`=800ms («di partenza halo vuota»: anche una run in_progress nasce con sigillo vuoto e si scrive fino allo stato live; `prefers-reduced-motion` salta il tween). `MapDemoPoi`: prop `exiting`. E2E `gameQuestExpedition` aggiornate al reveal (badge decision + marker post-reload non pinnano più).
 
 **Safeguards:** lint scope 0 errori; unit mapQuestPoi 8/8 + quest scope 290/290 (4 timeout ambientali al primo giro, verdi al retry — macchina sotto load, pattern già noto); build:check PASS; kanban:lint PASS; smoke /game 200 + Puppeteer: 0 anchor al boot con run live persistita, reveal → 3 marker con ease-in e sigillo che si scrive da vuoto, hide → fade+shrink sincrono poi unmount. Spec E2E da rilanciare in CI. Evidence: `test-results/r129-poi-director-gate-2026-10-11.log`.
+
+## R-130 — /game: pulsante Director «Start goblin quest» morto con run esistente
+
+**Richiesta (verbatim):** *"il pulsante start goblin quest è sempre attivo e nn fa nulla"*
+**Data:** 2026-10-11
+**Stato:** `fatta` — verificato live su FE via Puppeteer (run goblin live persistita).
+
+**Diagnosi:** due cause sovrapposte: (a) `demoLaunch` apre il detail (`setIsDetailOpen(true)`) ma l'overlay è reso solo se `!run` — con run live non si apre nulla; (b) l'effetto del pending launch si cancella su `anyRunActive` → il click non produceva nulla di visibile. `active: !!run && !ended` restava acceso permanentemente con run persistita.
+
+**Fix:** `onTrigger` del bottone `questRun`: se esiste una run goblin (live o ended) → `openRunWindow('goblin')` — la stessa superficie canonica a cui il marker in mappa reindirizza (finestra run / report); altrimenti `demoLaunch()` invariato. `active` onesto: acceso = spedizione in volo. Fix non-distruttivo: nessuna cancellazione di run da un click accidentale.
+
+**Safeguards:** lint scope 0 errori; build:check PASS; kanban:lint PASS; smoke live: chiusa QuestRunWindow → click «Start goblin quest» → `quest-window` riaperta (prima: nessun effetto visibile). Evidence: `test-results/r129-poi-director-gate-2026-10-11.log` (sezione R-130).
