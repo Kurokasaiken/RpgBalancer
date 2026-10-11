@@ -2528,3 +2528,18 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Fix:** click POI → `run && !run.ended` → `QuestRunWindow`; altrimenti (offerta senza run o run conclusa) → `QuestExpeditionDetail` (gate overlay allargato a `!run || run.ended`). Il report resta raggiungibile dal menu Pannelli («Quest in progress», tasto Q) e dal pulsante «Start goblin quest» (R-130). `canSend` resta protetto da `!anyRunActive` — il dettaglio su run ended non rilancia. `Popover` riposizionato: `right: calc(100% + 10px)`, larghezza 300px, `maxHeight calc(100vh - 180px)` con scroll — pende dal bordo sinistro della finestra, accanto e non sopra (vale per roster, bag e chronicle).
 
 **Safeguards:** lint scope 0 errori; unit mapQuestPoi 8/8; build:check PASS; smoke live: run live (waiting) → click marker → `quest-window` (corretto: in corso); click pill roster → popover misurato `right:422 ≤ window.left:432` — accanto, contenuto finestra non coperto.
+## R-136 — /game: scritte HUD in alto non centrate + asset icone risorse dipinti
+
+**Richiesta (verbatim):** *"nell'HUD le scritte nei componenti in alto nn m sembrano decidsamente centrate, sembrano in alto. Inoltre ci mancano gli asset delle risorse, scaricali adeguati al nostro progetto e sostituiscili"*
+**Data:** 2026-10-11
+**Stato:** `fatta` — verificato live su FE via Puppeteer.
+
+**Diagnosi (1):** le placche `hang` in alto portavano padding asimmetrico `top ~6-10px / bottom ~18-22px` (pensato per non coprire i fianchi curvi della silhouette), che collocava il contenuto ~5-6px sopra il centro geometrico; con il sag inferiore il testo leggeva "in alto".
+
+**Fix (1):** padding ribilanciato verso il centro ottico (misurato su DOM): `GameFrame` placche centro/destra `10/20-22` → `16/15`; `HudGameMenu` `6/18` → `13/11`; `ObjectiveCartouche` `8/20` → `14/14`. Centro contenuto ora al/sotto il mid geometrico (menu 26.2/25.5, centro 36.3/36, destra 36.3/36).
+
+**Diagnosi (2):** le icone risorsa erano glifi SVG a tratto (`HudGlyph` gold/food/wood) — segnaposto wireframe accanto al materiale lacca/ottone dipinto.
+
+**Fix (2):** generate via pipeline canonica SDXL (`scripts/rpg-gen-mockup.py`, spec `.mw/specs/hud-resource-icons/` con design-intent/identity/prompt, `--enforce-canon`), selezionate, ritagliate a medaglione circolare con alpha e ridotte a 96px WebP: `public/assets/fantasy_ui/icon_{gold,food,wood}.webp`. `HudGlyph` ora serve l'asset per gli id `gold|food|wood` (`HUD_ICON_ASSETS`), SVG invariato per gli altri.
+
+**Safeguards:** lint scope 0 errori (file in quarantena); unit hudGameMenu 7/7; hudGuards: 2 fail = violazioni preesistenti in HEAD (MapQuestPoi hex, QuestRunWindow fontSize 11) — nessuna nuova; build:check PASS; kanban:lint PASS; smoke live /game 200: tre medaglioni renderizzati, nessun errore console.

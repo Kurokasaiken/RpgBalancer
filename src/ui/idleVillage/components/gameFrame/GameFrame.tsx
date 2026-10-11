@@ -279,13 +279,13 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             {menuSlot}
             {objectiveSlot}
           </div>
-          <HudPlaque shape="hang" as="section" style={{ padding: '10px 34px 20px', pointerEvents: 'auto', display: 'flex', alignItems: 'center' }}>
+          <HudPlaque shape="hang" as="section" style={{ padding: '16px 34px 15px', pointerEvents: 'auto', display: 'flex', alignItems: 'center' }}>
             {whenWhereSlot}
           </HudPlaque>
           <HudPlaque
             shape="hang"
             as="section"
-            style={{ justifySelf: 'end', maxWidth: '100%', display: 'flex', alignItems: 'center', padding: '10px 40px 22px', pointerEvents: 'auto' }}
+            style={{ justifySelf: 'end', maxWidth: '100%', display: 'flex', alignItems: 'center', padding: '16px 40px 15px', pointerEvents: 'auto' }}
           >
             <div style={{ minWidth: 0, overflow: 'hidden' }}>{resourcesSlot}</div>
           </HudPlaque>

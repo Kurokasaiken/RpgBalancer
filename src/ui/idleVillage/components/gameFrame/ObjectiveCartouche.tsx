@@ -33,7 +33,7 @@ export function ObjectiveCartouche({ objective }: { objective?: HudObjective }) 
       shape="hang"
       as="section"
       aria-labelledby="hud-objective-label"
-      style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 22px 20px', maxWidth: 300, opacity: entered ? 1 : 0, transform: entered ? 'translateY(0)' : 'translateY(-14px)', transition: 'opacity 500ms ease-out, transform 500ms ease-out' }}
+      style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '14px 22px 14px', maxWidth: 300, opacity: entered ? 1 : 0, transform: entered ? 'translateY(0)' : 'translateY(-14px)', transition: 'opacity 500ms ease-out, transform 500ms ease-out' }}
     >
       <span
         id="hud-objective-label"
