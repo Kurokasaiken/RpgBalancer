@@ -2626,9 +2626,11 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"deve essere tradotto anche quello"* (riferito al verdetto italiano «TRIONFO — Il sole stesso firma la tua impresa» visibile nel video astrolabio per la pagina Steam)
 **Data:** 2026-10-12
-**Stato:** `in corso`
+**Stato:** `fatto`
 
 **Scope:** `DestinyAstrolabe` (componente V1 canonico usato in `/game` via `MilestoneCheckModal` → `destinyAstrolabeKit`): titoli/sottotitoli verdetto (`VERDICT_TEXT` in engine.ts), chip `Ferito`/`Caduto`, `posZone`, result panel (`names`, `rRisk`, `rZone`), `stateChip` in markup.ts (+ sorgente `public/destiny-astrolabe.html`), chip `Difficoltà`/`Fortitudine`/`Morte`/`Ferita` in `PhaseCommentary`, narrator FERITA/MORTE, `SkillCheckLegend.tsx` completo, preset skill della pagina `/minimal-destiny-astrolabe` (nomi visibili nel badge del video). Poi ri-registrazione `media/astrolabe.mp4` via `record-astrolabe.mts`.
+
+**Esito:** tutte le stringhe utente dell'astrolabio in EN. Sorgente di verità `public/destiny-astrolabe.html` tradotta, poi `engine.ts`+`markup.ts` rigenerati via `scripts/astrolabe/gen-engine.mjs` (il file è AUTO-GENERATED: mai editarlo a mano — il primo passaggio manuale è stato sovrascritto dalla rigenerazione, da qui il mix EN/IT nel penultimo video). `DestinyAstrolabe.tsx` (PhaseCommentary: DIFFICULTY/FORTITUDE/DEATH/WOUND, narrator WOUND/FALLEN) e `SkillCheckLegend.tsx` tradotti a mano (non generati). Video riregistrato: `media/astrolabe.mp4` 810×810, 24s, 2.3MB — sequenza THREAT-SLAM → AGENCY-BURST → RISK-POUR → THE-SPIN → MAGNETIC-SNAP → RESOLUTION «VICTORY — The peak bows to your stride. D100 29 · THRESHOLD 65» tutta EN. Safeguard: lint ok (dir astrolabe eslint-ignored come generated), build:check ✅, kanban:lint ✅, test astrolabe ✅ (v63-feasibility flaky-timeout isolato, passa da solo, file non toccati).
 
 ## R-142 — Quest Generation Lab completamente operativa (plan + subplan con AI web)
 
@@ -2649,3 +2651,15 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Test:** il test Director della suite lifecycle ora rivela i POI cliccando il VERO pulsante `[data-action-id="quest"]` (non più l'hook) — prova il path utente esatto che mancava; l'hook `revealQuestPois` resta solo per `?capture=1`. Guida E2E aggiornata.
 
 **Safeguards:** tsc clean; lint scope 0 errori; build:check PASS; playwright focused 4/4 (boot, planning×2, Director E2E col reveal da pulsante reale); kanban:lint PASS. Evidence: `test-results/r143-real-quest-poi-reveal-2026-10-12.log`.
+
+## R-144 — E2E: il reveal dei POI deve passare dal vero pulsante Director, mai dall'hook
+
+**Richiesta (verbatim):** *"i test E2E devono essere fatti partendo da quello, nn so come li hai fatti e cosa dice la documentazione, ma in caso è sbaglaita"* («quello» = il vero pulsante «Show quest» ripristinato in R-143)
+**Data:** 2026-10-12
+**Stato:** `fatta` — verificato E2E.
+
+**Fix:** `revealQuestPois(page)` nella suite lifecycle non chiama più `window.__idleVillageTestHooks.revealQuestPois()` — ora guida la stessa sequenza del giocatore/dev: F10 → assert `director-panel` → click `[data-action-id="quest"]` → attesa `pixi-world-anchors` + marker → F10 (richiude il pannello per non coprire il click sul marker). Copre TUTTI i test della suite (boot, planning, clock, lancio, run, settle, rilascio, consumo, reload, epilogo). L'hook window resta solo per `?capture=1`, dove il Director è nascosto. Guida E2E aggiornata (mappa hook, nota R-124/R-143, tabella helper).
+
+**Nota:** l'helper `revealQuestPois` è il confine reveal di tutta la suite; gli altri hook expedition restano di ispezione (getRun/getVillage/getSettlement) e di engine (choose/advanceTicks — comprimono il tempo reale, non sono gesti UI). I gesti utente veri restano reali: click marker, drag, «Invia», controlli clock, Enter sul teatro, chiusura rapporto.
+
+**Safeguards:** playwright focused 3/3 (boot, planning click, lancio) con reveal da pulsante reale; lint scope 0 errori; kanban:lint PASS. Evidence: `test-results/r144-e2e-real-director-reveal-2026-10-12.log`.

@@ -3,7 +3,8 @@
  * «Goblin Extermination» on the canonical `/game` surface, validated piece
  * by piece:
  *
- *   map + roster boot → click the real POI marker → planning → roster
+ *   map + roster boot → Director «Show quest» (the REAL button) → click the
+ *   real POI marker → planning → roster
  *   assignment (real drag + hook, same eligibility) → forecast →
  *   «Invia spedizione» → run in the QuestRunWindow → frontiers maturing on
  *   the canonical clock → HUD time controls (pause / resume / ×N, one
@@ -137,18 +138,23 @@ const expectedGoldDelta = (terminal: RunShape) =>
   (terminal.outcome === 'reward' ? terminal.resolvedOffer?.rewardResolved ?? 0 : 0) +
   (terminal.outcome === 'wipe' ? 0 : terminal.gold ?? 0);
 
-/** Reveal the quest offers exactly like the Director's «Mostra quest»
- *  (R-124: no POI sits on the map before that beat — the hook exists for
- *  `?capture=1`, where the panel itself is hidden). */
+/** Reveal the quest offers through the REAL Director toggle (R-143/R-144):
+ *  F10 → «Show quest» — the exact click a Director makes; the marker that
+ *  mounts is the real POI, never a demo exemplar. The `revealQuestPois`
+ *  window hook stays for `?capture=1` only, where the panel is hidden —
+ *  the suite always drives the button itself. */
 const revealQuestPois = async (page: Page) => {
-  await page.evaluate(() => {
-    (window as TestHooksWindow).__idleVillageTestHooks?.revealQuestPois?.();
-  });
+  await page.keyboard.press('F10');
+  await expect(page.getByTestId('director-panel')).toBeVisible({ timeout: 10_000 });
+  await page.locator('[data-action-id="quest"]').click();
   /* L'anchor layer Pixi nasce `visibility:hidden` e si accende solo quando la
    *  camera ha completato l'init (caricamento texture incluso) — sotto carico
    *  può superare i 15s, quindi prima attendiamo il layer, poi il marker. */
   await expect(page.getByTestId('pixi-world-anchors')).toBeVisible({ timeout: 60_000 });
   await expect(poiMarker(page)).toBeVisible({ timeout: 15_000 });
+  /* Fold the panel back so it can't cover the marker click that follows. */
+  await page.keyboard.press('F10');
+  await expect(page.getByTestId('director-panel')).toBeHidden({ timeout: 5_000 });
 };
 
 /** Click the real POI marker on the map — the same path a player takes. */
