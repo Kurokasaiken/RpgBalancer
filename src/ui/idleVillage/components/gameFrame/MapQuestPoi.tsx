@@ -34,6 +34,10 @@ export interface MapQuestPoiProps {
   availability?: QuestAvailability;
   /** Marker family (palette of the medallion): quest, job or event. Defaults to quest. */
   poiType?: PoiType;
+  /** True while the anchor layer keeps the marker mounted for its exit beat:
+   *  it plays the reverse of the entrance (fade + shrink) and stops taking
+   *  pointer input before unmounting. */
+  exiting?: boolean;
 }
 
 /** Selector `useQuestPoiSession` flies a dropped resident to while the detail is closed. */
@@ -52,6 +56,11 @@ export const MAP_QUEST_POI_TARGET = '[data-map-quest-poi-target]';
 export const EXPIRE_FADE_MS = 700;
 /** How long a new quest takes to ease in. */
 export const ENTER_MS = 800;
+/** How long the seal takes to write itself from empty to the live fill when
+ *  the marker first mounts — «di partenza halo vuota»: a quest POI is always
+ *  born with an unwritten halo, then the ring draws itself up to the real
+ *  progress (D-H grammar, the seal IS the timer). */
+export const SEAL_WRITE_IN_MS = 800;
 
 /** How the marker's seal reads for each stage of the quest (see `mapQuestPoiView`). */
 export interface MapQuestPoiView {
@@ -110,7 +119,7 @@ export function mapQuestPoiView(
   };
 }
 
-export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, availability, poiType = 'quest' }) => {
+export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, availability, poiType = 'quest', exiting = false }) => {
   const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId, decisionWaiting } = session;
   const { t } = useTranslation('idleVillage');
   const iconUrl = usePoiTypeIcon(poiType);
@@ -125,6 +134,23 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30);
     return () => window.clearTimeout(timer);
+  }, []);
+  /* The halo is born empty on every mount and writes itself up to the live
+   *  fill — the same grammar the demo markers use, except theirs stays at 0.
+   *  Reduced motion skips the tween and lands on the real value. */
+  const [sealWriteIn, setSealWriteIn] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setSealWriteIn(1);
+      return undefined;
+    }
+    const start = performance.now();
+    let raf = window.requestAnimationFrame(function step(now) {
+      const p = Math.min(1, (now - start) / SEAL_WRITE_IN_MS);
+      setSealWriteIn(p);
+      if (p < 1) raf = window.requestAnimationFrame(step);
+    });
+    return () => window.cancelAnimationFrame(raf);
   }, []);
   const isDragActive = Boolean(active || draggingResidentId);
 
@@ -158,10 +184,12 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
         gap: 0,
         // A drop it cannot take dims the marker; one it can take lights its rim. When the
         // opportunity runs out it fades and shrinks away instead of vanishing at once.
-        opacity: expired || !entered ? 0 : isDragActive && !canAcceptPoiDrop ? 0.55 : 1,
-        transform: expired ? 'scale(0.85)' : entered ? 'scale(1)' : 'scale(0.7)',
-        pointerEvents: expired ? 'none' : undefined,
-        transition: `opacity ${expired ? EXPIRE_FADE_MS : ENTER_MS}ms ease-out, transform ${expired ? EXPIRE_FADE_MS : ENTER_MS}ms ease-out`,
+        // `exiting` plays the reverse of the entrance — the same fade+shrink the demo
+        // markers use when the Director toggle hides the family.
+        opacity: expired || exiting || !entered ? 0 : isDragActive && !canAcceptPoiDrop ? 0.55 : 1,
+        transform: expired ? 'scale(0.85)' : exiting || !entered ? 'scale(0.7)' : 'scale(1)',
+        pointerEvents: expired || exiting ? 'none' : undefined,
+        transition: `opacity ${expired || exiting ? EXPIRE_FADE_MS : ENTER_MS}ms ease-out, transform ${expired || exiting ? EXPIRE_FADE_MS : ENTER_MS}ms ease-out`,
         cursor: 'pointer',
       }}
     >
@@ -193,7 +221,7 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
           type={poiType}
           iconUrl={iconUrl}
           state={state}
-          progress={progress}
+          progress={progress * sealWriteIn}
           timerDirection={view.direction}
           size={sizePx}
           grounded

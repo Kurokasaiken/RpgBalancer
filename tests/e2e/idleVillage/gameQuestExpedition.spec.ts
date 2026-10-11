@@ -532,7 +532,9 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     expect(run.frontier.status).toBe('waiting');
     expect(run.ended).toBe(false);
 
-    // And the map says so: the POI badge marks the awaiting decision.
+    /* And the map says so — under R-127 the marker needs a Director reveal
+     *  even mid-run (nothing pins at boot; the run itself never pauses). */
+    await page.evaluate(() => (window as TestHooksWindow).__idleVillageTestHooks?.revealQuestPois?.());
     const badge = page.locator('[data-map-quest-poi-target] [data-decision-waiting="true"]').first();
     await expect(badge).toBeVisible({ timeout: 15_000 });
   });
@@ -577,7 +579,10 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await advanceTicks(page, 15);
     const halo2 = (await expedition<HaloShape | null>(page, 'getHalo'))!;
     expect(halo2.elapsedTicks).toBeGreaterThanOrEqual(halo.elapsedTicks + 15);
-    // questStatus=in_progress → the POI routes to the run window, not the detail.
+    /* questStatus=in_progress → the POI routes to the run window, not the
+     *  detail. R-127: the run survives pinned in the store, but its marker
+     *  only mounts once the Director reveals the offers (no boot pin). */
+    await page.evaluate(() => (window as TestHooksWindow).__idleVillageTestHooks?.revealQuestPois?.());
     const marker = page.locator('[data-map-quest-poi-target][data-quest-status="in_progress"]').first();
     await expect(marker).toBeVisible({ timeout: 15_000 });
   });

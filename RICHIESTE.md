@@ -1,7 +1,7 @@
 ---
 title: Richieste esplicite
 type: intent-ledger
-updated: 2026-08-18
+updated: 2026-10-11
 ---
 
 # Richieste esplicite
@@ -2436,3 +2436,47 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Data:** 2026-10-10
 **Stato:** `fatta` — `TEST_ROSTER_VILLAGERS`: 3 `SavedCharacter` `isHero:false` (Mastro Beppe/Lisetta/Baldassarre) nella stessa shape del Character Manager → `savedCharacterToResident` (via corretta da `character_resident_trusted.md`); `TEST_ROSTER_RESIDENTS` combinato consumato da `canonicalResidentData` (roster/eligibilità con `statTags`) e da `createInitialState` dello store. Tag tarati sugli slot goblin: beppe→member-1 'fortitude', lisetta→member-2 'precision', baldassarre→bodyguard 'warden'. Suite lifecycle: `assignViaRealDrag` (scrollIntoView + drag pointer) e `launchGoblinQuest` trascina REALMENTE 1 eroe+3 popolani nei 4 slot; test «lancio» asserisce party=4 ⊆ roster; test «PG a casa» asserisce nessun sopravvissuto `in-expedition`. Guida aggiornata (reveal R-124, fixture, 12 test).
 **Safeguards:** suite lifecycle 12/12 verdi (reveal R-124 + drag 4 slot); lint scope 0 errori; build:check PASS; unit TestRosterPage verdi con timeout ambientale alzato (macchina sotto load — i 5s di default non bastano, non una rottura); kanban:lint PASS.
+
+## R-127 — Approcci alternativi alla core gimmick (check su stat/skill diverse)
+
+**Richiesta (verbatim, voice-note):** *"questa missione può essere risolta usando come infiltrazione al posto di destrezza ad esempio la magia. Però all'interno sempre di questa quest ci saranno dei tiri che saranno comunque basati su destrezza perché rimarrà una quest basata sulla destrezza e che non ha a che fare con l'infiltrazione. Quindi che ne so, devi passare su un ponte traballante"* — *"io soprattutto stavo pensando di andare a toccare la core gimmick di quella quest"* — *"invece di risolvere la core gimmick dell'allarme che sale passando di soppiatto, ogni volta che c'è un tiro che dovrebbe far aumentare l'alarm in quel caso diventa su intelligenza tirando invisibilità o carisma tirando camuffamento. Però tutte le altre parti rimangono invariate [...] ce l'hai presente la quest che io ho fatto che è sul lo sterminio dei goblin ce l'hai in memoria"*
+**Data:** 2026-10-10
+**Stato:** `aperta` — proposta registrata; nessuna ratifica, nessuna implementazione autorizzata.
+**Desiderata FROZEN:** nessuna corrispondente — candidata a livello generazione quest (S5 / OPEN-014 orbita).
+
+**Contenuto classificato:**
+- **PROPOSAL — canali alternativi sui check core:** una core gimmick (es. infiltrazione/allarme che sale) normalmente su Destrezza può ammettere canali di check alternativi: invisibilità → Intelligenza, camuffamento → Carisma.
+- **PROPOSAL — vincolo di scope:** la sostituzione vale **solo per i check che muovono la variabile core** («ogni tiro che dovrebbe far aumentare l'alarm»); i check non-core restano sulle stat native (ponte traballante → Destrezza, scene di forza → Forza). Non si ridipinge la quest.
+- **INFERENCE (marcata):** «tirando invisibilità» suggerisce canali gated da skill/capacità del party (link desiderata v10/v12, skill equip) — da confermare.
+- **UNRESOLVED:** modello di binding — per-check in-run vs approccio scelto a monte vs gated da skill/party → **OPEN-017**. Risposta AI finale troncata a metà generazione: la variante che stava proponendo è irrecuperabile.
+- **FACT (testbed):** la quest goblin ha allarme reale (`campoAllertato`/`campoSveglio`, `alarm` bool, scelta di approccio F3) e i check legano già `stats[]` per nodo — banco naturale se ratificata.
+
+**Collegamenti:** `context/ingestions/2026-10-10-quest-gimmick-approcci-alternativi.md`, `QUEST_RULES.md` §7 (`proposta`), `context/QUEST_GENERATION_ARCHITECTURE.md` §16, OPEN-017, `quest_sterminio_goblin_spec.md`, R-111/R-113/R-116 (framework generazione).
+
+## R-128 — Ricerca strutturata sui canali alternativi alla core gimmick (R-127)
+
+**Richiesta (verbatim):** *"prendi questo argomento, approfondiscilo, crea una documentazion/arricchisci quello che abbiamo: fa una ricerca mirata, dividilo in diversi argomenti di ricerca: usa le Ai web per fare una ricerca approfondita di ognuno di questi argomenti, salvali, creare un rapporto finale x ogni argomento. Poi un rapporto finale x tutti gli argomenti, cosa ahi trovato, cosa ci serve, cosa possiamo usare contestualizzato al nostro progetto: usa cappelli corretti, prompt potenziati, ecc"*
+**Data:** 2026-10-10
+**Stato:** `completata` — ricerca eseguita, rapporti prodotti, docs aggiornati; le proposte emerse restano non ratificate (OPEN-017 resta `open`).
+
+**Contenuto classificato:**
+- **FACT (esecuzione):** 6 sotto-argomenti (precedenti, binding models, bilanciamento, UI/preview, psicologia, narrativa) → broadcast `mw-broadcast.py` su provider web con prompt potenziati + hat + ricerca propria di complemento. Copertura: deepseek 6/6, gemini 4/6, claude 1/6, grok 1/6; fallimenti registrati (chatgpt 6/6, claude 5/6 login/challenge, grok 5/6 stub). Evidenza in `.mw/runs/20261010-gimmick-channels-research/` (prompt + BROADCAST.md + report-t1..t6).
+- **FINDINGS (ricerca, non decisioni):** consenso su binding ibrido — lock run-level capability-gated + eccezioni a consumo; differenziazione ≥2 assi con profili di fallimento distinti; varianti canale sullo stesso nodo (storylet-gating, non node-splitting); canali bloccati greyed «Requires: …» + coverage panel; MVA narrativa + asse validazione world-rules; policy MC channel-health; menu multi-canale solo su pivot check.
+- **PROPOSAL (da ratificare):** P-01..P-07 nel rapporto consolidato — nessuna è decisione; OPEN-017 aggiornato con leaning ma resta `open`.
+- **REJECTED:** best-of-party aggregation; canali su ogni check; reskin identici; >3 canali/check; canali bloccati nascosti; node-splitting per canale; parità EV come target; canali che bypassano la gimmick.
+- **DIVERGENZA-NOTA:** research segnala tensione tra preview a numeri esatti (frozen R-108) e scelta espressiva (EV-shopping sopprime roleplay) — mitigata, non risolta; a giudizio Director.
+
+**Collegamenti:** `context/QUEST_GIMMICK_CHANNELS_RESEARCH.md`, `.mw/runs/20261010-gimmick-channels-research/`, R-127, OPEN-017, `context/QUEST_GENERATION_ARCHITECTURE.md` §16.1, `context/QUEST_GENERATION_CONTRACTS.md` §11.9.
+
+## R-129 — /game: nessun POI al boot + reveal/hide con trasformazione e halo vuota
+
+**Richiesta (verbatim):** *"nella pagina /game c'è un POI di partenza appena viene caricata la pagina. nn c deve essere, deve mostrarsi solo quando dal mnu del director clicco POI types (e anche qulla della quest deve essere come le altre 2, apparire e sparire con una trasformazione, di partenza halo vuoto, ecc, guarda cm si comportanto gli altri due"*
+**Data:** 2026-10-11
+**Stato:** `fatta` — verificato live su FE via Puppeteer.
+**Desiderata FROZEN:** nessuna nuova — bugfix sulla superficie canonica; **supera la clausola «run attiva pinnata» di R-124**: ora nessun marker esiste senza un toggle Regia («Mostra quest» o «POI types»).
+
+**Diagnosi:** due gap distinti: (a) `game-frame-pixi.tsx` montava gli anchor expedition se `exp.run` — qualsiasi run persistita (live o ended+settled non ancora dismissata) pinnava il suo POI al boot — questo era il «POI di partenza»; (b) le uscite erano unmount istantanei per TUTTI i marker (i demo inclusi) e il POI quest mostrava subito l'halo allo stato live invece di nascere vuota.
+
+**Fix:** gate expeditions su `questShown` («Mostra quest» mostra offerte reali + run); `poiDemo` («POI types») aggiunge l'esemplare goblin reale + demo job/event come prima. Uscite: ghost anchor derivati in render (adjust-state-on-prop-change) — il nodo uscente resta nella lista keyata del commit stesso, il DOM sopravvive e il prop `exiting` riproduce il fade+shrink speculare all'ingresso (implementazione via effect rimuoveva il nodo PRIMA del ghost: pop-off invariato). `MapQuestPoi`: prop `exiting` + write-in del sigillo via rAF 0→progress in `SEAL_WRITE_IN_MS`=800ms («di partenza halo vuota»: anche una run in_progress nasce con sigillo vuoto e si scrive fino allo stato live; `prefers-reduced-motion` salta il tween). `MapDemoPoi`: prop `exiting`. E2E `gameQuestExpedition` aggiornate al reveal (badge decision + marker post-reload non pinnano più).
+
+**Safeguards:** lint scope 0 errori; unit mapQuestPoi 8/8 + quest scope 290/290 (4 timeout ambientali al primo giro, verdi al retry — macchina sotto load, pattern già noto); build:check PASS; kanban:lint PASS; smoke /game 200 + Puppeteer: 0 anchor al boot con run live persistita, reveal → 3 marker con ease-in e sigillo che si scrive da vuoto, hide → fade+shrink sincrono poi unmount. Spec E2E da rilanciare in CI. Evidence: `test-results/r129-poi-director-gate-2026-10-11.log`.
