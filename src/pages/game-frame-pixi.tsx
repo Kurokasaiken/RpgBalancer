@@ -512,8 +512,13 @@ export default function GameFramePixiPage() {
         /* Real launch path only: the Director stages a one-click expedition
          *  through the SAME canonical boundary the player crosses (offer
          *  resolution, slot eligibility, party freeze, loadout reservation,
-         *  settlement) — no lab-preset run. */
-        onTrigger: () => expeditionGoblin.demoLaunch(),
+         *  settlement) — no lab-preset run. A run can't be launched twice:
+         *  on an existing goblin run the button opens its canonical window
+         *  instead, the same surface the map marker routes to. */
+        onTrigger: () => {
+          if (questRun.run) openRunWindow('goblin');
+          else expeditionGoblin.demoLaunch();
+        },
       },
       {
         id: 'poitypes',
