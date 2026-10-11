@@ -500,12 +500,6 @@ export default function GameFramePixiPage() {
         },
       },
       {
-        id: 'quest',
-        label: t('gameFrame.director.quest'),
-        active: questShown,
-        onTrigger: () => setQuestShown((shown) => !shown),
-      },
-      {
         id: 'questRun',
         label: t('gameFrame.director.questRun'),
         active: !!questRun.run && !questRun.run.ended,
@@ -538,7 +532,7 @@ export default function GameFramePixiPage() {
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, questShown, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin],
+    [invasion, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin],
   );
 
   return (
