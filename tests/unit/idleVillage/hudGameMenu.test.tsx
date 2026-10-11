@@ -14,6 +14,12 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+const setLocale = vi.fn();
+let currentLocale = 'en';
+vi.mock('@/hooks/useLocalization', () => ({
+  useLocalization: () => ({ locale: currentLocale, setLocale }),
+}));
+
 const visible = Object.fromEntries(HUD_PANELS.map((p) => [p.id, p.defaultVisible])) as Record<HudPanelId, boolean>;
 
 const renderMenu = (props: Partial<Parameters<typeof HudGameMenu>[0]> = {}) =>
@@ -66,11 +72,32 @@ describe('HudGameMenu', () => {
     expect(screen.getByRole('menuitem', { name: 'gameFrame.menu.saveNow' })).toBeDisabled();
   });
 
+  it('keeps the dropdown items inside the data-hud-controls scope (pill controls, R-138)', async () => {
+    renderMenu();
+    await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.title' }));
+    const menu = screen.getByRole('menu');
+    expect(menu.closest('[data-hud-controls]')).not.toBeNull();
+  });
+
+  it('offers EN and IT as language radios wired to setLocale', async () => {
+    renderMenu();
+    await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.title' }));
+    const group = screen.getByRole('radiogroup', { name: 'gameFrame.menu.language' });
+    const radios = screen.getAllByRole('menuitemradio').filter((r) => group.contains(r));
+    expect(radios.map((r) => r.textContent)).toEqual(['gameFrame.menu.languages.en', 'gameFrame.menu.languages.it-IT']);
+    expect(radios[0]).toHaveAttribute('aria-checked', 'true');
+    expect(radios[1]).toHaveAttribute('aria-checked', 'false');
+    await userEvent.click(radios[1]);
+    expect(setLocale).toHaveBeenCalledWith('it-IT');
+    expect(trackTelemetryEvent).toHaveBeenCalledWith('game_menu_language_select', { locale: 'it-IT' });
+  });
+
   it('offers the comparable skins as radios wired to onChange', async () => {
     const onChange = vi.fn();
     renderMenu({ skin: { id: 'base', onChange } });
     await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.title' }));
-    const radios = screen.getAllByRole('menuitemradio');
+    const group = screen.getByRole('radiogroup', { name: 'gameFrame.menu.theme' });
+    const radios = screen.getAllByRole('menuitemradio').filter((r) => group.contains(r));
     expect(radios).toHaveLength(2);
     expect(radios[0]).toHaveAttribute('aria-checked', 'true');
     await userEvent.click(radios[1]);

@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Menu } from 'lucide-react';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { useLocalization } from '@/hooks/useLocalization';
+import type { SupportedLocale } from '@/localization/LocaleConfig';
 import { COMPARABLE_SKIN_IDS } from '@/ui/idleVillage/skins/resolveInitialSkin';
 import { getSkinPresetConfig, type SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
@@ -32,14 +34,18 @@ const SECTION_LABEL_STYLE = {
   color: 'var(--skin-label-primary)',
 } as const;
 
+/** Locales offered in the menu's language switch (R-138). */
+const MENU_LOCALES: readonly SupportedLocale[] = ['en', 'it-IT'];
+
 /**
  * Game menu — the top-left cartouche (R-132). A `hang` plaque like the other two
  * top ribbons; its Menu button opens a dropdown with the real controls that exist
- * today (panel toggles, manual save, skin choice) plus the disabled entries
- * (Load, Options, Quit) reserved for their future screens.
+ * today (panel toggles, manual save, language and skin choice) plus the disabled
+ * entries (Load, Options, Quit) reserved for their future screens.
  */
 export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, includeDev = false }: HudGameMenuProps) {
   const { t } = useTranslation('idleVillage');
+  const { locale, setLocale } = useLocalization();
   const [open, setOpen] = useState(false);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
   const root = useRef<HTMLDivElement>(null);
@@ -86,24 +92,22 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, includeDe
   const stubProps = { disabled: true, title: t('gameFrame.menu.comingSoon'), style: { width: '100%', opacity: 0.45 } } as const;
 
   return (
-    <div ref={root} style={{ position: 'relative', pointerEvents: 'auto' }}>
+    <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>
       <HudPlaque
         shape="hang"
         as="section"
         aria-label={t('gameFrame.menu.title')}
         style={{ display: 'flex', alignItems: 'center', padding: '13px 16px 11px' }}
       >
-        <div data-hud-controls="">
-          <button
-            type="button"
-            aria-haspopup="menu"
-            aria-expanded={open}
-            onClick={toggleMenu}
-          >
-            <Menu size={14} />
-            <span>{t('gameFrame.menu.title')}</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={toggleMenu}
+        >
+          <Menu size={14} />
+          <span>{t('gameFrame.menu.title')}</span>
+        </button>
       </HudPlaque>
 
       {open && (
@@ -153,8 +157,28 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, includeDe
 
           <div aria-hidden="true" style={{ height: 1, margin: '4px 0', background: 'var(--skin-surface-border)' }} />
           <span style={SECTION_LABEL_STYLE}>{t('gameFrame.menu.options')}</span>
+          <span style={SECTION_LABEL_STYLE}>{t('gameFrame.menu.language')}</span>
+          <div role="radiogroup" aria-label={t('gameFrame.menu.language')} style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            {MENU_LOCALES.map((id) => (
+              <button
+                key={id}
+                type="button"
+                role="menuitemradio"
+                aria-checked={locale === id}
+                aria-pressed={locale === id}
+                onClick={() => {
+                  setLocale(id);
+                  trackTelemetryEvent('game_menu_language_select', { locale: id });
+                }}
+              >
+                <span>{t(`gameFrame.menu.languages.${id}`)}</span>
+              </button>
+            ))}
+          </div>
           {skin && (
-            <div role="radiogroup" aria-label={t('gameFrame.menu.theme')} style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            <>
+              <span style={SECTION_LABEL_STYLE}>{t('gameFrame.menu.theme')}</span>
+              <div role="radiogroup" aria-label={t('gameFrame.menu.theme')} style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {COMPARABLE_SKIN_IDS.map((id) => (
                 <button
                   key={id}
@@ -170,7 +194,8 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, includeDe
                   <span>{getSkinPresetConfig(id).label}</span>
                 </button>
               ))}
-            </div>
+              </div>
+            </>
           )}
           <button type="button" role="menuitem" {...stubProps}>
             <span>{t('gameFrame.menu.settings')}</span>
