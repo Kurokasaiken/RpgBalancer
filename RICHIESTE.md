@@ -2889,3 +2889,12 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Contesto:** il Director ha fornito una lista iniziale da una ricerca ChatGPT: Super Fantasy Kingdom, A Hero's Rest, Fort Triumph, Crown of Greed, Majesty, dotAGE.
 **Cosa è successo:** creato `context/COMPETITIVE_LANDSCAPE.md` (ricerca web 2026-10-11): ~21 titoli in 5 cluster, tabella prezzi listino/saldo/recensioni/vendite stimate, pattern errori E1–E8, mappa di posizionamento diretto↔indiretto × run↔continuo, white space e implicazioni prezzo ($14.99 coerente col tier Loop Hero/SFK-launch). Indicizzato in `context/INDEX.md`. 3 domande aperte per il Director in §10 del doc.
 **Aggiornamento 2026-10-11:** aggiunta §8.1 — prezzi al lancio vs listino attuale. Pattern dominante: lancio basso + rialzo (EA→1.0 o per contenuto) + sconto -10/15% prima settimana.
+
+## R-159 — Seconda istanza compilata: IMPR-002 × kit mare
+
+**Richiesta (verbatim):** *"procedi"* (su chiusura R-152: due passi candidati — narrare l'imprint via pipeline o compilare una seconda istanza per misurare cosa è riusabile; scelta la seconda: serve a distinguere scheletro generico da authored prima di valutare un compilatore automatico, e a dimostrare varietà reale non-reskin sulla stessa spina).
+**Data:** 2026-10-12
+**Stato:** `fatta` (2026-10-12)
+**Desiderata FROZEN:** compilare IMPR-002 «Il compagno che ride» istanza B (`mare`, l'armatore-assicuratore) in `gen-impr002-mare` con lo stesso contratto di R-152 — le differenze devono essere meccaniche (prezzi, canali, gate, seed), non solo copy: A = chi controlla il mezzo mancante del dominio (qui il trasporto, non l'acqua); il kit `mare` esclude le vie alternative a piedi — il rifiuto dell'aiuto paga un prezzo diverso; B5 cross-cast `maestro dei recuperi`; B6 variante `sgamato` (due stakeholder si accusano) gated da prova documentale.
+
+**Esito:** `gen-impr002-mare` «The Shipowner's Carrack» in `impr002Mare.ts` (~30 nodi, profilo `gen`, zero delta motore). Riusato alla lettera: turn router B3, canali `segna-*`, armRolls trait-gated, vocabolario flag B6. Diverso per meccanica: fail rotta propria → `annusati` (esposizione, non solo HP); `polizza-ombra` prova documentale che gatea `ma-sgama`; `traccia-maestro` seme cross-cast; via `a-sgamato` → `ma-consegna`. Nota: `costGold` ha side-effect goblin-hardcoded → non usabile in scenari `gen`. Test 9/9 + palude 16/16 + genLab 10/10, lint/build/kanban PASS. Evidence: `test-results/r159-imprint-mare-2026-10-12.log`.

@@ -619,6 +619,45 @@ in `src/balancing/config/idleVillage/quests/generation/impr002Palude.ts`.
   meccanico function-spec→grafo è possibile solo dopo 2-3 istanze (serve
   vedere cosa si ripete).
 
+### Seconda istanza: cosa si è rivelato riusabile (R-159)
+
+`gen-impr002-mare` «The Shipowner's Carrack» — IMPR-002 × kit mare — in
+`src/balancing/config/idleVillage/quests/generation/impr002Mare.ts`. La
+seconda compilazione conferma il contratto e ne misura i confini:
+
+- **Riusabile alla lettera (la spina):** il turn router B3 (stesso
+  `goto` identico, letteralmente riusato), la struttura dei canali crack
+  one-shot `segna-*`, `armRolls` trait-gated, la logica `posta-mossa` su
+  ogni riga di verdetto, il vocabolario dei flag B6
+  (`a-consegnato`/`a-fuggito`/`a-padrone`/`soci-*`).
+- **Diverso per meccanica, non per nomi (anti-reskin):**
+  - B0 — in palude l'autonomia costava fatica (fail = solo HP); in mare
+    **non ci si può nascondere**: il fail della vela solitaria paga danno
+    *e* `annusati` — essere visti remare da soli equivale a essere stati
+    colti a indagare. Stesso flag, causa diversa: il dominio decide cosa
+    costa l'indipendenza.
+  - B2 — il canale "avviso" di palude era informativo puro; il registro
+    portuale di mare produce `polizza-ombra`, **prova documentale** che
+    alimenta `sospetto` *e* gatea il ramo B6 più forte (`ma-sgama` via
+    `requiresInfo`): investigare compra un finale, non solo un bonus.
+  - B5 — il seme chain cambia dominio: `depositario-traccia` (palude) →
+    `traccia-maestro` (il maestro dei recuperi — seconda entità ombra,
+    cross-cast).
+  - B6 — nuova via `a-sgamato` → convoglio-delle-prove (`ma-consegna`,
+    check cha+int: le carte remano al posto tuo): consegnare uomo +
+    documenti mette due stakeholder del kit l'uno contro l'altro.
+- **Apprendimento confermato:** `costGold` sulle opzioni ha un side-effect
+  goblin-hardcoded (intel `simbolo` + log "the merchant") — non usabile
+  negli scenari `gen`. Un prezzo in oro per l'autonomia resta un desiderio
+  authored, ma va espresso in altro modo (o il side-effect va reso
+  dichiarativo in una futura R).
+
+Con due istanze sullo stesso imprint, la parte riusabile è ora
+dimostrata come *meccanica* (router, canali, vocabolario flag), non solo
+come testo. Terza istanza candidata: `miniera` — se i pattern reggono una
+terza volta, il compilatore automatico function-spec→grafo diventa
+valutabile (proposal, non commitment).
+
 ### Chain-ready, non chain-executed
 
 I flag B6 e l'intel `depositario-traccia` sono **hook espliciti**: il
