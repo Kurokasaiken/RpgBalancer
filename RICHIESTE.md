@@ -2584,9 +2584,13 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"i pulstanti di /game menu in alto a destra sn sbagliati. ha seguito la guida su come fare i componenti nel mio progetto? xè se ci sn quei pulsanti considerati corretti allora la guida è sbagliata, devi modificarla. in quel menu ci deve essere anche la lingua IT e EN, e deve funzionare."*
 **Data:** 2026-10-11
-**Stato:** `in corso`
+**Stato:** `fatta` — verificato live su FE via Puppeteer.
 
 **Diagnosi:** le voci del dropdown di `HudGameMenu` (R-132) renderizzavano come barre bronze-CTA piene invece che pill da 26px: il `data-hud-controls` copriva solo il bottone trigger, non il contenuto del menu. La guida (`hud_component_guide.md` §5) aveva ragione ma non esplicitava la trappola per i menu a tendina — aggiunta regola dedicata.
+
+**Fix:** `data-hud-controls` spostato sul root del componente (pattern `HudPanelsMenu`) → trigger e voci sono pill da 26px. Nuova sezione **Lingua** in Opzioni: radiogroup `menuitemradio` English/Italiano via `useLocalization().setLocale` (i18next + persistenza `LocaleConfigStore`→`PersistenceService`), telemetria `game_menu_language_select`; chiavi `gameFrame.menu.language(s)` in en+it-IT. Etichetta visibile «Theme» sul gruppo skin per simmetria. Guida §5 aggiornata con la trappola menu-a-tendina.
+
+**Safeguards:** unit hudGameMenu 9/9 (+2 test nuovi), hudGuards 2 fail preesistenti HEAD (non nuovi), lint 0 errori (quarantena), build:check PASS, kanban:lint PASS; live Puppeteer: pill corrette, IT→`lang=it-IT` etichette italiane, EN→revert, scelta persistita.
 
 ## R-139 — Ferite guariscono solo a riposo + popolani 50HP/stat basse + race F10 Director
 

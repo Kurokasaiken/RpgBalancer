@@ -1009,6 +1009,11 @@
       "loadGame": "Load game…",
       "quit": "Quit to title",
       "theme": "Theme",
+      "language": "Language",
+      "languages": {
+        "en": "English",
+        "it-IT": "Italiano"
+      },
       "settings": "All settings…",
       "comingSoon": "Not available yet"
     },
@@ -1425,6 +1430,89 @@
         "potion": "Fully heals one wounded member",
         "banner": "Guardian banner — the leader bears it: −6% wound, −4% death for every other member while he stands"
       }
+    }
+  },
+  "questGenLab": {
+    "title": "Quest Generation Lab",
+    "subtitle": "Quest generation workbench (PLAN-026): how a quest is born, from which ingredients, how it plays and what changes afterwards. Statuses mark what truly runs, what lives offline and what is missing.",
+    "backToHub": "Test Hub",
+    "footer": "Quest Generation Lab · authored content in Italian · R-138",
+    "sections": {
+      "pipeline": "How a quest is born",
+      "pipelineDesc": "The creation tree: from input to finished run. Open each step for details, files and real status.",
+      "ingredients": "Ingredients",
+      "ingredientsDesc": "Core gimmicks, domain kits (the world «tag» axis), party traits, twists and the mechanics glossary.",
+      "catalog": "Generated catalog",
+      "catalogDesc": "The v0 pre-generated scenarios: metadata, node tree and a playable run on the real engine (gen profile).",
+      "consequences": "What changes afterwards",
+      "consequencesDesc": "The aftermath matrix: party, village, factions, world, future quests — what exists and what does not.",
+      "systems": "Implementation map",
+      "systemsDesc": "Every subsystem: where it lives, what it changes mechanically, which tests cover it.",
+      "open": "Missing / open decisions",
+      "openDesc": "The things easy to forget: tag taxonomy, thresholds, narrative arcs, channels, ignored offers."
+    },
+    "tabs": {
+      "gimmicks": "Gimmicks",
+      "kits": "Kits & tags",
+      "traits": "Traits",
+      "twists": "Twists",
+      "mechanics": "Mechanics"
+    },
+    "status": {
+      "implemented": "implemented",
+      "partial": "partial",
+      "offline": "offline",
+      "gated": "gated",
+      "proposal": "proposal",
+      "missing": "missing"
+    },
+    "labels": {
+      "reads": "reads",
+      "writes": "writes",
+      "resolution": "resolution",
+      "twists": "twists",
+      "scenes": "scenes",
+      "scenarios": "scenarios",
+      "authored": "authored",
+      "narrated": "narrated",
+      "options": "options",
+      "runstart": "run-start",
+      "inRun": "in-run",
+      "objective": "objective",
+      "primaryStats": "primary stats",
+      "tags": "tags",
+      "mechanicsUsed": "mechanics used",
+      "traitsUsed": "traits used",
+      "tree": "node tree",
+      "play": "play"
+    },
+    "play": {
+      "setup": "prepare the run",
+      "preset": "party preset",
+      "seed": "seed",
+      "start": "start run",
+      "gold": "gold",
+      "flags": "flags",
+      "intel": "intel",
+      "loot": "loot",
+      "chronicle": "chronicle",
+      "flee": "retreat",
+      "reset": "reset",
+      "newRun": "new run",
+      "outcome": {
+        "reward": "Reward",
+        "survived": "Survived",
+        "fled": "Fled",
+        "wipe": "Wipe"
+      },
+      "objectiveDone": "objective done",
+      "settlement": "settlement — world effects",
+      "epilogue": "epilogue",
+      "roll": "roll",
+      "success": "success",
+      "wound": "wound",
+      "death": "death",
+      "continue": "continue"
     }
   },
   "questExpedition": {

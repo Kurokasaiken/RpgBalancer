@@ -131,6 +131,8 @@ Per il resto usa i token generali: `--skin-surface-base`, `--skin-surface-border
 
 > **Trappola icona+testo**: la regola CSS che rende tondo da 26px un pill-icona è `:has(> svg:only-child)` — e `:only-child` conta solo i nodi **elemento**, non i nodi testo. Un bottone `<button><Icon/>Testo</button>` (testo nudo) viene trattato come icon-only e schiacciato a 26px, col testo che straborda sul vicino. **Se un bottone ha icona + etichetta, avvolgi sempre l'etichetta in un `<span>`** (o qualsiasi elemento). Vedi `ContextStrip`/`StashPicker` del lab quest (PLAN-024).
 
+> **Trappola menu a tendina**: anche le voci dentro la lastra aperta da un menu sono controlli. Il `data-hud-controls` deve stare sul **contenitore che racchiude sia il grilletto sia il dropdown** (pattern `HudPanelsMenu`: attributo sul root del componente). Se copre solo il bottone che apre, le voci del menu restano fuori scope e prendono il bottone bronze-CTA di default — barre d'oro piene al posto delle pill da 26px. È il bug di `HudGameMenu` corretto in R-138.
+
 **Trascinamento** (vedi anche §5b): spargi `handleProps` di `useHudPanelDrag()` sull'**intera riga del titolo** (cursore `grab`, tooltip da `gameFrame.panel.dragHint`). I controlli nella riga non avviano il trascinamento; il doppio clic riporta il pannello al suo posto. Niente icone "maniglia".
 
 **Focus e tastiera**: ogni elemento interattivo raggiungibile da tastiera, `aria-label` tradotto, `role="radiogroup"`/`radio` per scelte esclusive (vedi striscia di velocità).
