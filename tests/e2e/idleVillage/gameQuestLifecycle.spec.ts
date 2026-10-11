@@ -683,13 +683,17 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
      *  l'equivalenza end-to-end, non solo «la finestra si apre». */
     const villageBefore = await expedition<VillageShape>(page, 'getVillage');
     const goldReadoutBefore = await goldReadoutValue(page);
-    /* R-129: gli anchor expedition montano solo con `questShown` — niente pin
-     *  della run attiva. Rivela i POI come farebbe «Mostra quest», così il
-     *  marker esiste e la sua transizione a in_progress è osservabile. */
-    await revealQuestPois(page);
 
     await page.keyboard.press('F10');
     await expect(page.getByTestId('director-panel')).toBeVisible({ timeout: 10_000 });
+    /* R-143: reveal via il VERO toggle Director — «Mostra quest» è l'unico
+     *  gate UI dei POI reali (goblin + rovine); un marker quest non è mai un
+     *  esemplare demo («POI types» tiene solo job/event finti). */
+    await page.locator('[data-action-id="quest"]').click();
+    /* Stesso gate di revealQuestPois: il layer nasce visibility:hidden finché
+     *  la camera Pixi non completa l'init — sotto carico supera i 15s. */
+    await expect(page.getByTestId('pixi-world-anchors')).toBeVisible({ timeout: 60_000 });
+    await expect(poiMarker(page)).toBeVisible({ timeout: 15_000 });
     await page.locator('[data-action-id="questRun"]').click();
     await page.keyboard.press('F10'); // ripiega il pannello: non deve coprire il report
 

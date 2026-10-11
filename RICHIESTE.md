@@ -2621,3 +2621,31 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Architettura:** `generation/labRegistry.ts` (Zod, config-first: gimmicks/pipeline/mechanics/consequences/subsystems/openIssues) + `questGenLab/labModel.ts` (derivazioni dal codice reale — niente copia duplicata) + `labGraph.ts` (grafi DFS per catalogo/scenario) + componenti in `questGenLab/` (`labUi`, `LabSections`, `ScenarioExplorer`, `GenRunPlayer`). Il player NON crea un motore parallelo: istanzia `createScenarioInstance` + `createRun(questId:'gen')` sul motore canonico. UI sui primitivi skin (`labSurface`); i18n `questGenLab` in it-IT/en (+pseudo rigenerato).
 
 **Safeguards:** unit `questGenLab` 10/10; suite quest scope 9 file / **119 test verdi**; lint scope 0 errori (file in quarantena ESLint); build:check PASS; smoke live 200 + Puppeteer: 6 sezioni, 144 card, run partito su `rp-partenza`, check risolto (`fail` → rival +2), vars live, **0 errori console**. Evidence: `test-results/r140-quest-generation-lab-2026-10-12.log`.
+
+## R-141 — Astrolabio in inglese (verdetto, chip, narrator, legenda) + video Steam riregistrato
+
+**Richiesta (verbatim):** *"deve essere tradotto anche quello"* (riferito al verdetto italiano «TRIONFO — Il sole stesso firma la tua impresa» visibile nel video astrolabio per la pagina Steam)
+**Data:** 2026-10-12
+**Stato:** `in corso`
+
+**Scope:** `DestinyAstrolabe` (componente V1 canonico usato in `/game` via `MilestoneCheckModal` → `destinyAstrolabeKit`): titoli/sottotitoli verdetto (`VERDICT_TEXT` in engine.ts), chip `Ferito`/`Caduto`, `posZone`, result panel (`names`, `rRisk`, `rZone`), `stateChip` in markup.ts (+ sorgente `public/destiny-astrolabe.html`), chip `Difficoltà`/`Fortitudine`/`Morte`/`Ferita` in `PhaseCommentary`, narrator FERITA/MORTE, `SkillCheckLegend.tsx` completo, preset skill della pagina `/minimal-destiny-astrolabe` (nomi visibili nel badge del video). Poi ri-registrazione `media/astrolabe.mp4` via `record-astrolabe.mts`.
+
+## R-142 — Quest Generation Lab completamente operativa (plan + subplan con AI web)
+
+**Richiesta (verbatim):** *"http://localhost:5173/quest-generation-lab deve diventare completamente operativa. Crea un plan insieme alle Ai web per fare tutto, poi dividilo in subplan e approfondiscili uno ad uno sempre cn le AI web"*
+**Data:** 2026-10-12
+**Stato:** `in corso` — fase planning MW.
+
+## R-143 — /game: il POI quest nella demo non deve essere un esemplare — solo contenuto reale
+
+**Richiesta (verbatim):** *"xè quel poi è un esemplare demo? deve diventare un esemplare corretto dalla A alla Z"* (dopo aver chiesto quale componente Director era sparito — «Show quest», R-131)
+**Data:** 2026-10-12
+**Stato:** `fatta` — verificato E2E.
+
+**Diagnosi:** R-131 rimosse «Show quest» («nn fa nulla, può sparire») giudicandola ridondante con «POI types». Effetto collaterale: `questShown` — gate dei marker REALI goblin+rovine — non aveva più alcun accesso UI: in gioco normale i veri POI non si rivelavano mai; «POI types» montava il goblin solo come esemplare demo (tra i finti job/event) e le rovine restavano sempre nascoste.
+
+**Fix:** ripristinata l'azione Director «Show quest» (`id:'quest'`, toggle `questShown`) — unico gate UI dei POI reali end-to-end (offerta → detail → run → settle → consumo). Rimosso l'esemplare goblin dalla famiglia `poiDemo`: «POI types» ora mostra SOLO i tipi senza contenuto reale (job/event). Marker quest = sempre contenuto vero, mai finto.
+
+**Test:** il test Director della suite lifecycle ora rivela i POI cliccando il VERO pulsante `[data-action-id="quest"]` (non più l'hook) — prova il path utente esatto che mancava; l'hook `revealQuestPois` resta solo per `?capture=1`. Guida E2E aggiornata.
+
+**Safeguards:** tsc clean; lint scope 0 errori; build:check PASS; playwright focused 4/4 (boot, planning×2, Director E2E col reveal da pulsante reale); kanban:lint PASS. Evidence: `test-results/r143-real-quest-poi-reveal-2026-10-12.log`.
