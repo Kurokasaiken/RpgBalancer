@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties, type ReactNode } from 'react';
 import styles from '../components/DragTestContainer.module.css';
-import { Eye, EyeOff, ArrowUpDown, X } from 'lucide-react';
-import { getFilterStatKeys, getStatDisplayConfig } from '@/ui/idleVillage/config/rosterFilterConfig';
+import {
+  GameIconChecklist,
+  GameIconCrossMark,
+  GameIconEyeball,
+  GameIconFunnel,
+  GameIconHidden,
+  GameIconSplitArrows,
+} from '@/ui/idleVillage/components/gameIcons';
+import { getFilterStatKeys, getStatDisplayConfig, type FilterStatKey } from '@/ui/idleVillage/config/rosterFilterConfig';
+import { getRosterSortModes, type RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import PgCard, { type PgCardProps } from '@/ui/idleVillage/components/PgCard';
@@ -211,9 +219,12 @@ function DragTestContainerV2({
     minHp: 0,
     maxFatigue: 100,
   });
-  // VISUAL MOCKUP ONLY — see the TODO block above the <select> in the JSX
-  // below for what this control must actually do once implemented.
-  const [statSortMockup, setStatSortMockup] = useState('');
+  /**
+   * Active header sort selection: '' keeps the upstream order (RosterSortIcon /
+   * filterCriteria), a RosterSortMode applies a named sort, and `stat:<key>`
+   * sorts by a dynamic statSnapshot stat combined with statSortDirection.
+   */
+  const [sortSelection, setSortSelection] = useState<'' | RosterSortMode | `stat:${FilterStatKey}`>('');
   const [statSortDirection, setStatSortDirection] = useState<'asc' | 'desc'>('desc');
   const [heroFlashIds, setHeroFlashIds] = useState<string[]>([]);
   const [recentlyDraggedResidentId, setRecentlyDraggedResidentId] = useState<string | null>(null);
@@ -275,42 +286,23 @@ function DragTestContainerV2({
       
       // Phase E: Apply system thresholds as hard filters for the roster
       if (resident.currentHp < minHpThreshold) {
-        console.log(`Filtered ${resident.id}: HP too low (${resident.currentHp} < ${minHpThreshold})`);
         return false;
       }
       if (resident.fatigue > maxFatigueThreshold) {
-        console.log(`Filtered ${resident.id}: Fatigue too high (${resident.fatigue} > ${maxFatigueThreshold})`);
         return false;
       }
-      
+
       // Apply user-defined filters from UI
       if (resident.currentHp < filters.minHp) {
-        console.log(`Filtered ${resident.id}: User HP filter (${resident.currentHp} < ${filters.minHp})`);
         return false;
       }
       if (resident.fatigue > filters.maxFatigue) {
-        console.log(`Filtered ${resident.id}: User fatigue filter (${resident.fatigue} > ${filters.maxFatigue})`);
         return false;
       }
-      
+
       return true;
     });
-    
-    console.log('Resident filtering results:', {
-      total: residents.length,
-      filtered: filtered.length,
-      filters,
-      thresholds: dragConfig.thresholds,
-      residents: residents.map(r => ({
-        id: r.id,
-        name: r.displayName,
-        hp: r.currentHp,
-        fatigue: r.fatigue,
-        status: getEffectiveStatus(r),
-        isHero: r.isHero
-      }))
-    });
-    
+
     return filtered;
   }, [residents, filters, getEffectiveStatus, dragConfig.thresholds]);
 
@@ -320,32 +312,52 @@ function DragTestContainerV2({
       return isResidentBlocked(resident) ? 2 : 1;
     };
 
+    // `stat:<key>` selections read the same field as `matchesCriterion` in
+    // rosterFilterConfig.ts so the sort tracks whatever stats the Balancer defines.
+    const statKey = sortSelection.startsWith('stat:')
+      ? (sortSelection.slice('stat:'.length) as FilterStatKey)
+      : null;
+    const statValue = (resident: ResidentState) => {
+      const value = statKey ? resident.statSnapshot?.[statKey] : undefined;
+      return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+    };
+
+    const compareByMode = (a: ResidentState, b: ResidentState, mode: RosterSortMode) => {
+      switch (mode) {
+        case 'name-desc':
+          return formatResidentLabel(b).localeCompare(formatResidentLabel(a));
+        case 'hp-desc':
+          return b.currentHp - a.currentHp;
+        case 'fatigue-asc':
+          return a.fatigue - b.fatigue;
+        case 'name-asc':
+        default:
+          return formatResidentLabel(a).localeCompare(formatResidentLabel(b));
+      }
+    };
+
     return [...filteredResidents].sort((a, b) => {
       const groupDiff = groupValue(a) - groupValue(b);
       if (groupDiff !== 0) return groupDiff;
 
-      // Within each group, sort alphabetically by display name first
-      const aName = formatResidentLabel(a);
-      const bName = formatResidentLabel(b);
-      const nameCompare = aName.localeCompare(bName);
+      // No explicit header selection: keep the incoming order, which is what the
+      // upstream sortMode (RosterSortIcon) already produced — the toggle stays live.
+      if (sortSelection === '') return 0;
+
+      if (statKey) {
+        const diff = statValue(a) - statValue(b);
+        if (diff !== 0) return statSortDirection === 'asc' ? diff : -diff;
+      } else {
+        const diff = compareByMode(a, b, sortSelection);
+        if (diff !== 0) return diff;
+      }
+
+      // Deterministic tiebreak for explicit sorts.
+      const nameCompare = formatResidentLabel(a).localeCompare(formatResidentLabel(b));
       if (nameCompare !== 0) return nameCompare;
-
-      // Then by survival score (descending) for tie-breaking
-      const aScore = a.survivalScore ?? 0;
-      const bScore = b.survivalScore ?? 0;
-      if (groupValue(a) <= 1 && aScore !== bScore) {
-        return bScore - aScore;
-      }
-
-      // Finally by injury status
-      if (a.isInjured !== b.isInjured) {
-        return a.isInjured ? 1 : -1;
-      }
-
-      // Ultimate fallback by ID
       return a.id.localeCompare(b.id);
     });
-  }, [filteredResidents, isResidentBlocked]);
+  }, [filteredResidents, isResidentBlocked, sortSelection, statSortDirection]);
 
   // Preload & decode every resident portrait as soon as the roster mounts, so
   // the drag-overlay medallion (SVG <image>) can paint the portrait on its very
@@ -660,22 +672,17 @@ function DragTestContainerV2({
 
   const handleResidentSelectSafe = useCallback(
     (residentId: string) => {
-      console.log('🔍 [DragTestContainerV2] handleResidentSelectSafe called:', residentId, 'draggingResidentId:', draggingResidentId, 'recentlyDraggedResidentId:', recentlyDraggedResidentId);
-      
       // Block if currently dragging or recently dragged
       if (draggingResidentId === residentId || recentlyDraggedResidentId === residentId) {
-        console.log('🔍 [DragTestContainerV2] Blocking select due to drag state');
         return;
       }
-      
+
       // Also block if the resident is currently in 'away' status (should not be selectable)
       const resident = residents.find(r => r.id === residentId);
       if (resident?.status === 'away') {
-        console.log('🔍 [DragTestContainerV2] Blocking select due to away status');
         return;
       }
-      
-      console.log('🔍 [DragTestContainerV2] Allowing select for resident:', residentId);
+
       onResidentSelect?.(residentId);
     },
     [draggingResidentId, recentlyDraggedResidentId, onResidentSelect, residents],
@@ -1175,6 +1182,7 @@ function DragTestContainerV2({
           </div>
           <div className={isCompact ? 'flex min-w-0 items-center gap-1' : 'flex items-center gap-1'} data-hud-controls={isCompact ? '' : undefined} data-collapsed={isCompact && isRosterCollapsed ? '' : undefined}>
             <label>
+              <GameIconFunnel className="h-3 w-3 shrink-0" />
               <select
                 value={filters.status}
                 onChange={(e) => handleStatusChange(e.target.value as FilterOptions['status'])}
@@ -1191,66 +1199,45 @@ function DragTestContainerV2({
               </select>
             </label>
 
-            {/*
-             * TODO(roster-stat-sort): VISUAL MOCKUP ONLY — this control does not
-             * sort the roster yet (`statSortMockup`/`statSortDirection` are inert
-             * local state). Real implementation:
-             *
-             * 1. Stat list must stay DYNAMIC, not a hardcoded enum: this project's
-             *    stats are inherited from other systems (e.g. the Balancer), not
-             *    fixed. Keep sourcing options from `getFilterStatKeys()` /
-             *    `getStatDisplayConfig()` in
-             *    `@/ui/idleVillage/config/rosterFilterConfig` — already derived
-             *    from `StatBlock`, so it tracks whatever the Balancer defines.
-             * 2. Must COMBINE with the existing status filter (`filters.status`),
-             *    not replace it: apply the stat sort to `filteredResidents`
-             *    (defined above, ~line 241) — i.e. sort AFTER status filtering,
-             *    never on raw `residents`.
-             * 3. `sortedResidents` (~line 294) currently runs its OWN bespoke
-             *    comparator (hero-group-first, then alphabetical) and does NOT
-             *    go through `rosterSortConfig.ts`'s `sortResidents()` at all.
-             *    Decide: extend that local comparator to also sort by the
-             *    selected stat, or route through `rosterSortConfig.ts` (today
-             *    `RosterSortMode` is a closed union of 4 modes — would need to
-             *    become something like `{ stat: FilterStatKey; direction }` to
-             *    support arbitrary Balancer stats instead of just hp/fatigue).
-             * 4. Read each resident's value the SAME way `matchesCriterion` does
-             *    in rosterFilterConfig.ts: `resident.statSnapshot?.[stat] ?? 0`,
-             *    with a `Number.isFinite` guard before comparing.
-             * 5. Open design question: does hero-group precedence still win over
-             *    stat order, or does selecting a stat bypass hero-first grouping
-             *    entirely? Not decided — surface it for a product call, don't
-             *    assume when implementing.
-             */}
-            {/* The stat sort is an inert mockup (see TODO above): hidden in the compact HUD roster. */}
-            {!isCompact && (
-              <>
+            {/* Ordering control: restores the V1 surface — the four rosterSortConfig
+                modes plus dynamic statSnapshot stats, applied after status filtering
+                and inside the hero/active/blocked groups. */}
             <label>
+              <GameIconChecklist className="h-3 w-3 shrink-0" />
               <select
-                value={statSortMockup}
-                onChange={(e) => setStatSortMockup(e.target.value)}
-                className="bg-transparent text-[12px] uppercase tracking-[0.06em] focus:outline-none"
-                style={{ color: 'var(--t2, #c0a878)' }}
+                value={sortSelection}
+                onChange={(e) => {
+                  const value = e.target.value as typeof sortSelection;
+                  setSortSelection(value);
+                  diagnostics.info('sort_changed', {
+                    sortSelection: value,
+                    timestamp: Date.now(),
+                    location: 'DragTestContainerV2',
+                    payload: { sortSelection: value },
+                  }, ['filter', 'change']);
+                }}
                 aria-label={t('gameFrame.roster.sort.ariaLabel')}
                 data-testid="roster-stat-sort-select"
               >
                 <option value="">{t('gameFrame.roster.sort.placeholder')}</option>
+                {getRosterSortModes().map((mode) => (
+                  <option key={mode.mode} value={mode.mode}>{t(mode.labelKey, mode.label)}</option>
+                ))}
                 {getFilterStatKeys().map((stat) => (
-                  <option key={stat} value={stat}>{getStatDisplayConfig(stat).label}</option>
+                  <option key={stat} value={`stat:${stat}`}>{getStatDisplayConfig(stat).label}</option>
                 ))}
               </select>
             </label>
             <button
               type="button"
               onClick={() => setStatSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'))}
+              disabled={!sortSelection.startsWith('stat:')}
               className={_controlButtonClassName}
               aria-label={statSortDirection === 'asc' ? t('gameFrame.roster.sort.asc') : t('gameFrame.roster.sort.desc')}
               data-testid="roster-stat-sort-direction"
             >
-              <ArrowUpDown className="h-2.5 w-2.5" />
+              <GameIconSplitArrows className="h-3.5 w-3.5" />
             </button>
-              </>
-            )}
 
             {headerControls}
             <button
@@ -1274,11 +1261,11 @@ function DragTestContainerV2({
               aria-pressed={isRosterCollapsed}
               data-keep=""
             >
-              {isRosterCollapsed ? <Eye className="h-2.5 w-2.5" /> : <EyeOff className="h-2.5 w-2.5" />}
+              {isRosterCollapsed ? <GameIconEyeball className="h-3.5 w-3.5" /> : <GameIconHidden className="h-3.5 w-3.5" />}
             </button>
             {onClose && (
               <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} data-keep="">
-                <X className="h-2.5 w-2.5" />
+                <GameIconCrossMark className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
@@ -1341,7 +1328,7 @@ function DragTestContainerV2({
               </div>
             ) : (
               // Standard rendering for small rosters
-              filteredResidents.map((resident) => renderResidentCard(resident))
+              sortedResidents.map((resident) => renderResidentCard(resident))
             )}
           </div>
         )}

@@ -43,6 +43,7 @@
 - When mounting `VillageRosterSection`, pass `componentId="roster-component"` (or equivalent stable id) to enable the positional drag handle; omitting it disables window dragging entirely.
 - The only draggable surface for the roster window is the inline GripVertical handle that sits before the "Roster" label. PgCard dragging must stay isolated.
 - Quick filter buttons (`ALL / HEROES / INJURED`) are deprecated. The only allowed filter UI is the pill-shaped select + eye/collapse buttons documented in `DragTestContainer`.
+- Roster V2 (`rosterV2/`, HUD material): the header ordering select is live — the four `rosterSortConfig` modes plus dynamic `stat:<key>` entries from `getFilterStatKeys()` sort inside the hero/active/blocked groups after status filtering; the direction toggle applies to stat sorts. An empty selection keeps the upstream `sortMode` order (RosterSortIcon stays live). Header glyphs come from `components/gameIcons.tsx` (game-icons.net, CC BY 3.0).
 - PgCard interactions must forward `onDragStateChange` and rely on `CustomDragOverlay` (circular preview) for drag feedback. No alternative overlay implementations are permitted.
 
 ## Interaction contract with Slot Rack
