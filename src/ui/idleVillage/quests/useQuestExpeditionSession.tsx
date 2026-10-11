@@ -692,7 +692,10 @@ export function useQuestExpeditionSession({
   /* POI marker + routing.                                                */
   /* ------------------------------------------------------------------ */
   const handlePoiClick = useCallback(() => {
-    if (run) {
+    /* R-133: the run window answers the click only while the expedition is
+     * actually under way. Offers with no run — and runs already ended — open
+     * the POI detail instead (the report stays reachable via the Panels menu). */
+    if (run && !run.ended) {
       onOpenRun?.(poi.questId);
     } else {
       setIsDetailOpen(true);
@@ -756,7 +759,7 @@ export function useQuestExpeditionSession({
 
   const overlays = (
     <>
-      {isDetailOpen && !run && (
+      {isDetailOpen && (!run || run.ended) && (
         <QuestExpeditionDetail
           poi={poi}
           scenario={scenario}
