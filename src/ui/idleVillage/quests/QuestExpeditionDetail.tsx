@@ -5,12 +5,14 @@
  * presentation — all numbers come from `resolved` (the frozen offer) and
  * `estimate` (the chunked Monte Carlo), all strings from i18n.
  */
-import React from 'react';
+import React, { useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FloatingPanel } from '@/ui/idleVillage/components/FloatingPanel';
+import { Maximize2, Minus, Swords, X } from 'lucide-react';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
-import { SkinButton } from '@/ui/idleVillage/skins/primitives';
+import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { HudChip, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import { useHudPanelDrag } from '@/ui/idleVillage/components/gameFrame/useHudPanelDrag';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 import type { QuestPoi, DangerBand } from '@/balancing/config/idleVillage/quests/questPois';
 import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
@@ -90,9 +92,14 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   position,
 }) => {
   const { t } = useTranslation('idleVillage');
+  const { panelStyle, handleProps } = useHudPanelDrag();
+  const [minimised, setMinimised] = useState(false);
   const dangerBand = resolved ? bandById(resolved.resolvedOffer.bandIds.danger) : undefined;
   const rewardTier = resolved ? REWARD_TIERS.find((rt) => rt.id === resolved.resolvedOffer.bandIds.rewardTier) : undefined;
   const ready = !resolvePending && typeof estimate === 'object';
+  const title = scenario?.title ?? poi.id;
+  const anchor = position ?? { x: 120, y: 96 };
+  const panelId = `quest-expedition-${poi.id}`;
 
   /** Signed pp badge for a delta metric — `0` renders nothing (no noise). */
   const deltaMark = (pp: number, goodWhenDown: boolean) => {
@@ -100,24 +107,96 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     if (v === 0) return null;
     const improves = goodWhenDown ? v < 0 : v > 0;
     return (
-      <em style={{ fontStyle: 'normal', fontSize: 10, color: improves ? 'var(--skin-success, #7ed39a)' : 'var(--skin-danger, #e07a7a)' }}>
+      <em style={{ fontStyle: 'normal', fontSize: 12, color: improves ? TONE.ok : TONE.danger }}>
         {v > 0 ? '+' : ''}
         {v}
       </em>
     );
   };
 
+  const shell: CSSProperties = {
+    position: 'fixed',
+    left: anchor.x,
+    top: anchor.y,
+    pointerEvents: 'auto',
+    ...panelStyle,
+    zIndex: panelStyle.zIndex ?? DEFAULT_GAME_FRAME_CONFIG.zLayers.panels,
+  };
+
+  if (minimised) {
+    return (
+      <SkinScope>
+        <HudPlaque
+          shape="hang"
+          as="section"
+          aria-label={title}
+          data-testid={`floating-panel-${panelId}`}
+          style={{ ...shell, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}
+        >
+          <div {...handleProps} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Swords aria-hidden style={{ width: 18, height: 18, color: TONE.accent }} />
+            <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
+              {title}
+            </span>
+            <button
+              type="button"
+              data-testid={`floating-panel-minimize-${panelId}`}
+              aria-label={t('floatingPanel.restore')}
+              title={t('floatingPanel.restore')}
+              onClick={() => setMinimised(false)}
+              style={{ display: 'inline-flex', alignItems: 'center', background: 'none', border: 'none', padding: 2, cursor: 'pointer', color: TONE.label }}
+            >
+              <Maximize2 style={{ width: 15, height: 15 }} aria-hidden />
+            </button>
+          </div>
+        </HudPlaque>
+      </SkinScope>
+    );
+  }
+
   return (
-    <FloatingPanel
-      panelId={`quest-expedition-${poi.id}`}
-      title={scenario?.title ?? poi.id}
-      icon="⚔"
-      width={520}
-      maxBodyHeight={QUEST_PLANNER_INFO.outcome.panelMaxBodyHeightPx}
-      initialPosition={position}
-      onClose={onClose}
-    >
-      <div data-testid="quest-expedition-detail" data-poi-id={poi.id} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <SkinScope>
+      <HudPlaque
+        shape="panel"
+        as="section"
+        aria-label={title}
+        data-testid={`floating-panel-${panelId}`}
+        style={{ ...shell, width: 520, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
+      >
+        {/* Title row = drag handle; window controls on the right (QuestRunWindow idiom). */}
+        <div {...handleProps} data-testid={`floating-panel-header-${panelId}`} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Swords aria-hidden style={{ width: 16, height: 16, flexShrink: 0, color: TONE.accent }} />
+          <h2 style={{ flex: 1, margin: 0, minWidth: 0, fontFamily: FONT.display, fontSize: 16, lineHeight: 1.2, letterSpacing: '0.06em', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {title}
+          </h2>
+          <div data-hud-controls style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <button
+              type="button"
+              data-testid={`floating-panel-minimize-${panelId}`}
+              aria-label={t('floatingPanel.minimize')}
+              title={t('floatingPanel.minimize')}
+              onClick={() => setMinimised(true)}
+            >
+              <Minus aria-hidden />
+            </button>
+            <button
+              type="button"
+              data-testid={`floating-panel-close-${panelId}`}
+              aria-label={t('floatingPanel.close')}
+              title={t('floatingPanel.close')}
+              onClick={onClose}
+            >
+              <X aria-hidden />
+            </button>
+          </div>
+        </div>
+
+        <div
+          data-testid="quest-expedition-detail"
+          data-poi-id={poi.id}
+          className="quest-s1-scroll"
+          style={{ maxHeight: QUEST_PLANNER_INFO.outcome.panelMaxBodyHeightPx, overflowY: 'auto', scrollbarGutter: 'stable', display: 'flex', flexDirection: 'column', gap: 12 }}
+        >
         {/* Offer header — objective, tags, frozen band/tier/duration. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {scenario?.offer.objective && (
@@ -147,7 +226,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
               <HudChip tone={expeditionDuration.factor < 1 ? 'ok' : expeditionDuration.factor > 1 ? 'warn' : 'secondary'}>
                 {t('questExpedition.duration', { ticks: expeditionDuration.estimatedTicks })}
                 {expeditionDuration.factor !== 1 && (
-                  <em style={{ fontStyle: 'normal', fontSize: 10 }}> ×{expeditionDuration.factor.toFixed(2)}</em>
+                  <em style={{ fontStyle: 'normal', fontSize: 12 }}> ×{expeditionDuration.factor.toFixed(2)}</em>
                 )}
               </HudChip>
             </span>
@@ -218,7 +297,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
               {/* BY MEMBER — per-member wound/death odds and expected
                *  downtime, straight from `sim.perMember`. */}
               <div data-testid="forecast-members" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+                <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
                   {t('questExpedition.members.title')}
                 </span>
                 {estimate.sim.perMember.map((m) => (
@@ -243,7 +322,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                *  inside the sims (top-N per config; the tail collapses). */}
               {estimate.sim.whyBySource.length > 0 && (
                 <div data-testid="forecast-why" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+                  <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
                     {t('questExpedition.why.title')}
                   </span>
                   {estimate.sim.whyBySource.slice(0, QUEST_PLANNER_INFO.outcome.maxWhySources).map((src) => (
@@ -260,7 +339,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                *  be external scouting, not a party slot (Director 2026-10-10). */}
               {intelHints.length > 0 && (
                 <div data-testid="forecast-intel" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+                  <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
                     {t('questExpedition.intel.title')}
                   </span>
                   {intelHints.map((h) => (
@@ -306,7 +385,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
            *  covers (same vocabulary the check consumables serve). */}
           {(scenario?.primaryStats?.length ?? 0) > 0 && (
             <div data-testid="loadout-coverage" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: TONE.secondary }}>
+              <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: TONE.secondary }}>
                 {t('questExpedition.coverage')}
               </span>
               {scenario!.primaryStats!.map((s) => {
@@ -316,7 +395,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                   <span
                     key={s}
                     title={STAT_SHORT[s]}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT.display, fontSize: 11, color: covered ? 'var(--skin-success, #7ed39a)' : TONE.secondary }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT.display, fontSize: 12, color: covered ? TONE.ok : TONE.secondary }}
                   >
                     {Icon && <Icon style={{ width: 12, height: 12 }} aria-hidden />}
                     {STAT_SHORT[s] ?? s} {covered ? '✓' : '—'}
@@ -336,8 +415,9 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
         >
           {t('questExpedition.send')}
         </SkinButton>
-      </div>
-    </FloatingPanel>
+        </div>
+      </HudPlaque>
+    </SkinScope>
   );
 };
 
