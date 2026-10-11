@@ -106,7 +106,7 @@ revealQuestPois()                                // SOLO per `?capture=1` — la
 |---|---|
 | `[data-map-quest-poi-target]` | ogni marker quest sulla mappa (count 0 = mappa pulita, R-124) |
 | `[data-quest-poi-id="poi-goblin"]` | marker mappa; stato in `data-quest-status` (`available`/`in_progress`/`completed`/`failed`) |
-| `[data-testid="quest-expedition-detail"]` | FloatingPanel del planner |
+| `[data-testid="quest-expedition-detail"]` | pannello `HudPlaque` del planner (R-146: ex FloatingPanel) |
 | `[data-testid="floating-panel-header-quest-expedition-poi-goblin"]` | header (qui vive il **titolo** «Sterminio dei goblin»; nel body c'è l'objective) |
 | `[data-testid="quest-expedition-send"]` | bottone «Invia spedizione» |
 | `[data-testid="quest-expedition-forecast"]` | forecast; stato in `data-forecast-state` (`incomplete`/`ready`) |
@@ -190,8 +190,8 @@ mappa pulita → reveal «Mostra quest» → marker available, halo vuota
 | `waitForHooks(page)` | dopo ogni `goto`/`reload`: aspetta che gli hook expedition di goblin+rovine esistano |
 | `revealQuestPois(page)` | R-143: **vero pulsante** F10 → `[data-action-id="quest"]` → F10 + attesa anchor layer + marker (mai l'hook) |
 | `openGoblinDetailViaMap(page)` | reveal + click reale sul marker + assert header |
-| `assignViaRealDrag(page, residentId, slotId)` | drag pointer card→slot con `scrollIntoViewIfNeeded` su entrambi gli endpoint (il planner è più alto del viewport) |
-| `bringSendIntoView(page)` | trascina l'header del FloatingPanel finché «Invia» non rientra nel viewport (necessario se il pannello è più alto dello schermo) |
+| `assignViaRealDrag(page, residentId, slotId)` | drag pointer card→slot con `scrollIntoViewIfNeeded` su entrambi gli endpoint (il planner è più alto del viewport); **auto-verificante** — dopo il drop attende `getAssignments[slotId] === residentId`, ritenta una volta se il drop non ha preso, poi fallisce onestamente |
+| `bringSendIntoView(page)` | trascina l'header della `HudPlaque` finché «Invia» non rientra nel viewport (necessario se il pannello è più alto dello schermo) |
 | `launchGoblinQuest(page)` | tutto il pre-volo: reveal → marker → **4 drag reali** (eroe+3 popolani) → click «Invia» → window aperta |
 | `driveToPending(page)` | risolve bivi finché la frontiera è `pending` (per testare il clock) |
 | `driveRunToEnd(page)` | guida la run fino a `ended` (scelte + tick) |
@@ -220,9 +220,9 @@ la causa e dove intervenire.
 
 | Sintomo | Causa probabile | Dove guardare |
 |---|---|---|
-| `locator.click: element is outside of the viewport` su `quest-expedition-send` | Il planner è più alto dello schermo (es. `panelMaxBodyHeightPx` grande). Il `FloatingPanel` clamp-a solo il top-left, **non** il bordo inferiore. | `QUEST_PLANNER_INFO.outcome.panelMaxBodyHeightPx`; `FloatingPanel` (clamp bottom — **fix UI ancora aperto**, oggi il test aggira con `bringSendIntoView`) |
+| `locator.click: element is outside of the viewport` su `quest-expedition-send` | Il planner è più alto dello schermo (es. `panelMaxBodyHeightPx` grande). Il pannello (`HudPlaque`+`useHudPanelDrag`, R-146) **non** clamp-a il bordo inferiore. | `QUEST_PLANNER_INFO.outcome.panelMaxBodyHeightPx`; `useHudPanelDrag` (clamp bottom — **fix UI ancora aperto**, oggi il test aggira con `bringSendIntoView`) |
 | `quest-window-close-report` mai visibile / timeout | Il teatro dei beat sta ancora replayando (`presenting`): i controlli del report esistono solo a coda vuota. | `flushBeatTheatre` prima del click; `QuestRunWindow` `beatCursor`/`BeatStage` |
-| `toContainText('Sterminio dei goblin')` fallisce sul detail | Il titolo sta nell'**header** del FloatingPanel, non nel body (il body mostra l'objective). | Asserisci su `floating-panel-header-quest-expedition-poi-goblin` |
+| `toContainText('Sterminio dei goblin')` fallisce sul detail | Il titolo sta nell'**header** del pannello, non nel body (il body mostra l'objective). | Asserisci su `floating-panel-header-quest-expedition-poi-goblin` |
 | `data-compatibility` resta `valid` sul residente invalido | La compatibilità visiva si ricalcola solo quando cambia lo stato planning (es. dopo un'assegnazione che le toglie l'unico slot). | Fai prima un'assegnazione valida, poi asserisci `invalid` |
 | Test «pending» trova la run già oltre il nodo atteso | Il clock reale continua a girare mentre il test ragiona: una frontiera può maturare «da sola». | Usa helper tolleranti (`driveToPending`/`driveRunToEnd` accettano transizioni già avvenute); mai asserire un nodo intermedio esatto senza pausa |
 | `POI is not defined` dentro `waitForFunction` | La predicate gira **nel browser**: le costanti Node non esistono lì. | Passa gli argomenti a `waitForFunction(fn, arg, opts)` |
@@ -245,7 +245,7 @@ la causa e dove intervenire.
 Prima di toccare un pezzo coperto dalla suite, chiediti quale invariante
 muovi e quale test lo inchioda:
 
-- **Cambi il planner/panello expedition?** → test 2, 3, 6 + `bringSendIntoView`. Se il pannello cresce ancora, il trascino ha un limite (4 tentativi): il vero fix è il clamp bottom del `FloatingPanel`.
+- **Cambi il planner/panello expedition?** → test 2, 3, 6 + `bringSendIntoView`. Se il pannello cresce ancora, il trascino ha un limite (4 tentativi): il vero fix è il clamp bottom del pannello (`useHudPanelDrag`).
 - **Cambi lo scenario goblin** (nodi, slot, requirement, copia)? → test 2 (gate), 3 (forecast), 7-8 (driver). I titoli dei nodi cambiano: l'unico titolo asserito è quello dello **scenario** nell'header, non dei nodi.
 - **Cambi il clock o i controlli HUD?** → test 4, 5, 7. Il radiogroup deve restare `role=radiogroup` con radio `×N`.
 - **Cambi il settlement/reward?** → test 8. Tocca sia store sia readout HUD: aggiorna entrambi i lati dell'asserzione se il contratto cambia *intenzionalmente*.
@@ -282,11 +282,12 @@ aggiorna il test e la guida; se no, hai trovato un bug.
 
 ## 9. Finding aperti (da chiudere «poco a poco»)
 
-1. **`FloatingPanel` senza clamp sul bordo inferiore** — con
+1. **Pannello planner senza clamp sul bordo inferiore** — con
    `panelMaxBodyHeightPx: 700` e viewport 720p «Invia spedizione» finisce
    fuori schermo. Oggi il test aggira (`bringSendIntoView`), ma un giocatore
-   su schermo piccolo ha lo stesso problema. Fix candidato: clamp bottom o
-   scroll interno del body del panel.
+   su schermo piccolo ha lo stesso problema. Valeva per `FloatingPanel`,
+   vale anche per `useHudPanelDrag` (R-146): nessuno dei due clamp-a il
+   bordo inferiore. Fix candidato: clamp bottom o scroll interno del body.
 2. **Asserzioni visive del forecast** — il test legge `data-forecast-state`
    e l'`estimate` via hook; il contenuto visivo del forecast (probabilità,
    bande) non è asserito nel DOM.
