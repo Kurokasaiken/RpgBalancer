@@ -225,6 +225,25 @@ describe('arc contract — Pass 0', () => {
     const ghost = { ...CONTRACT, phases: [{ nodes: ['fantasma'], role: 'x' }] };
     expect(contractIssues(ghost, BRIEFS).some((i) => i.includes('fantasma'))).toBe(true);
   });
+
+  it('contratto v2 — nodeContracts: coverage obbligatoria se presente', () => {
+    const nc = (node: string) => ({
+      node,
+      narrativeDelta: 'the rival is now audible behind the player',
+      rivalAction: 'gains ground off-screen',
+      motifFunction: 'lamp flame marks the foul air boundary',
+      mechanicalClaims: ['verdict changes physical cost only'],
+      endingClaimsAllowed: [],
+    });
+    const v2 = { ...CONTRACT, nodeContracts: BRIEFS.map((b) => nc(b.nodeKey)) };
+    expect(QuestArcContractSchema.parse(v2)).toBeTruthy();
+    expect(contractIssues(v2, BRIEFS)).toEqual([]);
+
+    const missing = { ...v2, nodeContracts: v2.nodeContracts.filter((c) => c.node !== 'sicuro') };
+    expect(contractIssues(missing, BRIEFS).some((i) => i.includes('sicuro'))).toBe(true);
+    const ghostNc = { ...v2, nodeContracts: [...v2.nodeContracts, nc('fantasma')] };
+    expect(contractIssues(ghostNc, BRIEFS).some((i) => i.includes('fantasma'))).toBe(true);
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -283,5 +302,61 @@ describe('regressione — il kit bocciato dal Director fallisce il nuovo gate', 
     expect(kit.issues.some((i) => i.rule === 'meta')).toBe(true);
     /* «bestia di galleria» ×7 e «registro dei turni»: flaggati per review. */
     expect(kit.flags.length).toBeGreaterThan(0);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* GATE V2 — promesse meccaniche (PLAN-027, critica ChatGPT 2026-10-11) */
+/* ------------------------------------------------------------------ */
+
+describe('gate v2 — premio garantito e meccaniche inesistenti', () => {
+  it('il brief dichiara il premio garantito sui check che lo pagano sempre', () => {
+    const s = brief('sicuro');
+    expect(s.guaranteedRewards?.length).toBeGreaterThan(0);
+    expect(s.facts.join(' ')).toMatch(/premio garantito su OGNI verdetto/);
+    /* Un nodo i cui verdetti divergono sul loot non garantisce nulla. */
+    expect(brief('viaA').guaranteedRewards ?? []).toEqual([]);
+  });
+
+  it('respinge il premio garantito in disgiunzione col rischio — il bug di «sicuro»', () => {
+    const bad = {
+      ...VALID,
+      body: 'Battere il legname d’assegnazione significa reclamare la vena, oppure tirarsi addosso il carico del soffitto.',
+    };
+    const v = validateNodeCopy(bad, brief('sicuro'), MINIERA_VOCAB);
+    expect(v.ok).toBe(false);
+    if (!v.ok) expect(v.issues.some((i) => i.rule === 'guaranteed-reward')).toBe(true);
+  });
+
+  it('la stessa disgiunzione resta lecita su un nodo senza premio garantito', () => {
+    const ok = {
+      ...VALID,
+      body: 'Il taglio laterale promette la vena, oppure il soffitto addosso.',
+    };
+    expect(validateNodeCopy(ok, brief('viaA'), MINIERA_VOCAB).ok).toBe(true);
+  });
+
+  it('respinge il premio garantito presentato come perdibile nei flavor di fallimento', () => {
+    const bad = { ...VALID, failHint: 'Se il legname cede, perdete la licenza e il soffitto.' };
+    const v = validateNodeCopy(bad, brief('sicuro'), MINIERA_VOCAB);
+    expect(v.ok).toBe(false);
+    if (!v.ok) expect(v.issues.some((i) => i.rule === 'guaranteed-reward')).toBe(true);
+  });
+
+  it('respinge la contestazione del verdetto — meccanica inesistente (il bug di «sconfitta»)', () => {
+    const bad = { ...VALID, body: 'Il registro resta fermo contro di voi, contestabile solo con nuovi sigilli.' };
+    const v = validateNodeCopy(bad, brief('sconfitta'), MINIERA_VOCAB);
+    expect(v.ok).toBe(false);
+    if (!v.ok) expect(v.issues.some((i) => i.rule === 'unsupported-mechanic')).toBe(true);
+  });
+
+  it('la copy spedita di «sicuro» e «sconfitta» (IT+EN) passa il gate v2', async () => {
+    const { MINIERA_RACE_KIT } = await import('@/balancing/config/idleVillage/quests/generation/narrated/race-miniera.kit');
+    for (const locale of ['it', 'en'] as const) {
+      for (const key of ['sicuro', 'sconfitta'] as const) {
+        const v = validateNodeCopy(MINIERA_RACE_KIT[locale].copy[key], brief(key), MINIERA_VOCAB, locale);
+        expect(v.ok, `${locale}/${key}: ${v.ok ? '' : JSON.stringify(v.issues)}`).toBe(true);
+      }
+    }
   });
 });

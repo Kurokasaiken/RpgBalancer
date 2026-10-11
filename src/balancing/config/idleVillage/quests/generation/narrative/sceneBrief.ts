@@ -33,6 +33,9 @@ export interface SceneBrief {
   forbidden: string[];
   /** The JSON shape the provider must fill for THIS node. */
   outputShape: string[];
+  /** Loot granted on EVERY verdict row — a reward the check cannot
+   *  take away. Copy must never present it as check-dependent. */
+  guaranteedRewards?: string[];
 }
 
 const RISK_LABEL = (w?: number, d?: number) => {
@@ -74,6 +77,16 @@ function verdictLines(node: QuestNode): string[] {
     .map((k) => `${k}: ${describeOutcome(table[k]!)}`);
 }
 
+/** takeLoot ids granted by EVERY verdict row — rewards a check cannot
+ *  withdraw. Empty when outcomes genuinely differ (or no table). */
+function guaranteedTakeLoot(node: QuestNode): string[] {
+  const rows = Object.values(node.verdictTable ?? {}).filter((r) => r?.takeLoot?.length);
+  const allRows = Object.values(node.verdictTable ?? {}).filter(Boolean);
+  if (!rows.length || rows.length !== allRows.length) return [];
+  const first = new Set(rows[0]!.takeLoot);
+  return [...first].filter((item) => rows.every((r) => r!.takeLoot!.includes(item)));
+}
+
 /** Compile the per-node narration contract from an emitted scenario. */
 export function briefsForScenario(
   scenario: QuestScenario,
@@ -105,6 +118,16 @@ export function briefsForScenario(
 
     const vLines = verdictLines(node);
     if (vLines.length) facts.push(`verdetti: ${vLines.join(' | ')}`);
+
+    /* Reward granted on every verdict = guaranteed: the check prices
+     * the physical cost, never possession. Declared as a fact so the
+     * model cannot frame the prize as at-risk (sicuro/varco bug). */
+    const guaranteed = guaranteedTakeLoot(node);
+    if (guaranteed.length) {
+      facts.push(
+        `premio garantito su OGNI verdetto: ${guaranteed.join(', ')} — il check determina il costo fisico, MAI la perdita del premio`,
+      );
+    }
 
     for (const opt of node.options ?? []) {
       const gates: string[] = [];
@@ -139,6 +162,7 @@ export function briefsForScenario(
       mayInvent,
       forbidden: vocab.vietati,
       outputShape: outputShapeFor(node),
+      guaranteedRewards: guaranteed.length ? guaranteed : undefined,
     });
   }
   return briefs.sort((a, b) => a.beat - b.beat || a.nodeKey.localeCompare(b.nodeKey));

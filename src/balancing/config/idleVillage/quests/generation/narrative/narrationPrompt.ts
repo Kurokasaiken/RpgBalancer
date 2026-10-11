@@ -16,7 +16,7 @@
 import type { SceneBrief } from './sceneBrief';
 import type { DomainVocab } from '../domainVocabs';
 import type { QuestArcContract } from './arcContract';
-import { contractPromptSection, contractRoleFor } from './arcContract';
+import { contractPromptSection, contractRoleFor, nodeContractPromptSection } from './arcContract';
 import type { CopyLocale, NarratedKitMeta, NarratedNodeCopy } from './validateCopy';
 
 export interface NarrationRequest {
@@ -80,6 +80,8 @@ export function promptForNode(
 
   if (opts.contract) {
     lines.push(contractPromptSection(opts.contract), ``);
+    const nodeBlock = nodeContractPromptSection(opts.contract, brief.nodeKey);
+    if (nodeBlock) lines.push(nodeBlock, ``);
   }
 
   lines.push(
