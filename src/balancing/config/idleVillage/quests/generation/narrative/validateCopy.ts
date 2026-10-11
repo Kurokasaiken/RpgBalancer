@@ -103,7 +103,9 @@ export interface ValidationIssue {
     | 'stat-leak'
     | 'creature'
     | 'duplicate'
-    | 'meta';
+    | 'meta'
+    | 'guaranteed-reward'
+    | 'unsupported-mechanic';
   detail: string;
 }
 
@@ -174,6 +176,47 @@ function allowedCreatures(vocab: DomainVocab, locale: CopyLocale): string[] {
 /** Banned imagery for a locale. */
 export function forbiddenTerms(vocab: DomainVocab, locale: CopyLocale): string[] {
   return locale === 'en' ? (vocab.vietatiEn ?? vocab.vietati) : vocab.vietati;
+}
+
+/* ------------------------------------------------------------------ */
+/* Mechanical-promise lexicons (PLAN-027 gate v2 — ChatGPT critique).    */
+/* "A consequence presented as check-dependent must correspond to a     */
+/* real difference between outcomes" — deterministically decidable.     */
+/* ------------------------------------------------------------------ */
+
+/** Lexemes that invoke the reward/prize without naming it —
+ *  «reclamare la vena» IS the prize claim even when the canonical
+ *  name never appears. */
+const REWARD_LEXEMES: Record<CopyLocale, RegExp> = {
+  it: /\b(reclam\w*|premio|licenz\w*|assegnazion\w*|bottino|conquist\w*|vincer\w*|vinta|vinto)\b/i,
+  en: /\b(claim\w*|prize|licen[cs]e\w*|reward\w*|loot|win|wins|won)\b/i,
+};
+
+/** Disjunctive markers — «reclamare la vena, OPpure tirarsi addosso il
+ *  soffitto» puts the prize inside an either/or with catastrophe. */
+const DISJUNCTION_LEXEMES: Record<CopyLocale, RegExp> = {
+  it: /\b(oppure|altrimenti|o\s+rischi\w*)\b/i,
+  en: /\b(or else|otherwise|or)\b/i,
+};
+
+/** Loss verbs — a fail-context sentence pairing a reward lexeme with a
+ *  loss claims the prize can be taken away. */
+const LOSS_LEXEMES: Record<CopyLocale, RegExp> = {
+  it: /\b(perd\w+|sfugg\w+|rinunci\w*|senza|scapp\w+)\b/i,
+  en: /\b(los[et]\w*|lost|forfeit\w*|without|miss\w*|gone)\b/i,
+};
+
+/** Promises of systems that do not exist — contesting a verdict is
+ *  authored lore at most, never a player-accessible mechanic. */
+const UNSUPPORTED_MECHANICS: Record<CopyLocale, RegExp> = {
+  it: /\b(contestabil\w*|contestazion\w*|ricors\w*|impugn\w*|appell\w+)\b/i,
+  en: /\b(contest\w*|appeal\w*|disput(e|ed|ing)|challeng(e|ing) the (register|record|verdict))\b/i,
+};
+
+/** Split into sentence-ish units — commas stay inside the unit so a
+ *  «claim X, oppure Y» disjunction is still one clause. */
+function sentences(text: string): string[] {
+  return text.split(/[.!?;…]+/).map((s) => s.trim()).filter(Boolean);
 }
 
 /** Validate one node's provider output against the brief + vocab. */
@@ -247,6 +290,51 @@ export function validateNodeCopy(
     const lex = CREATURE_LEXEMES[locale].find((l) => hasWord(text, l));
     if (lex && !creatures.some((c) => text.toLowerCase().includes(c.toLowerCase()))) {
       issues.push({ nodeKey: brief.nodeKey, rule: 'creature', detail: `lessema creatura '${lex}' senza un termine ammesso: "${text.slice(0, 80)}…"` });
+    }
+  }
+
+  /* Guaranteed reward (brief.guaranteedRewards): the check prices the
+   * physical cost, never possession. Two decidable presentations are
+   * forbidden — a reward lexeme inside a disjunction with catastrophe
+   * («reclamare la vena, oppure il soffitto»), and, on the fail-side
+   * fields only, a reward lexeme paired with a loss verb. */
+  if (brief.guaranteedRewards?.length) {
+    for (const text of texts) {
+      for (const s of sentences(text)) {
+        if (REWARD_LEXEMES[locale].test(s) && DISJUNCTION_LEXEMES[locale].test(s)) {
+          issues.push({
+            nodeKey: brief.nodeKey,
+            rule: 'guaranteed-reward',
+            detail: `premio garantito (${brief.guaranteedRewards.join(', ')}) in disgiunzione col rischio: "${s.slice(0, 80)}…"`,
+          });
+        }
+      }
+    }
+    const failSide = [copy.failHint, copy.verdictFlavor?.fail, copy.verdictFlavor?.epicfail]
+      .filter((t): t is string => Boolean(t));
+    for (const text of failSide) {
+      for (const s of sentences(text)) {
+        if (REWARD_LEXEMES[locale].test(s) && LOSS_LEXEMES[locale].test(s)) {
+          issues.push({
+            nodeKey: brief.nodeKey,
+            rule: 'guaranteed-reward',
+            detail: `premio garantito presentato come perdibile in contesto di fallimento: "${s.slice(0, 80)}…"`,
+          });
+        }
+      }
+    }
+  }
+
+  /* Unsupported mechanics — the copy must not promise systems that do
+   * not exist (contesting a verdict is lore, not a player mechanic). */
+  for (const text of texts) {
+    const m = text.match(UNSUPPORTED_MECHANICS[locale]);
+    if (m) {
+      issues.push({
+        nodeKey: brief.nodeKey,
+        rule: 'unsupported-mechanic',
+        detail: `'${m[0]}' promette una meccanica inesistente (contestazione del verdetto): "${text.slice(0, 80)}…"`,
+      });
     }
   }
 

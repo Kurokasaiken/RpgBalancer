@@ -125,3 +125,52 @@ Emit    — single .ts, nested { en: {...}, it: {...} }, provenance
 **DoD residuo**: review Director (D6 — primo kit del dominio). Flags
 umani aperti: 'campana del turno' 12× IT (motivo da contratto), prop EN
 letterali italiani nei body (glossario prop bilingue = iterazione).
+
+## 6. Iterazione r002 — critica ChatGPT web (2026-10-11)
+
+Run web `20261011-quest-copy-critique` (ChatGPT, cappello editor
+narrativo). Tesi centrale del provider: *«la distinzione è tra
+ripetizione funzionale e ripetizione che sostituisce la progressione:
+ogni ripresa deve aggiungere informazione, cambiare il rischio o rendere
+più urgente la scelta»*. Esiti assorbiti:
+
+- **Bug meccanico reale trovato**: `sicuro` presentava il premio in
+  disgiunzione col crollo («reclamare la vena, OPpure il soffitto») ma
+  `takeLoot` è su OGNI verdetto — premio garantito, check = solo costo
+  fisico. `sconfitta` prometteva contestazione del verdetto, meccanica
+  inesistente. Corretti a mano IT+EN.
+- **Gate v2 deterministico** (`validateCopy.ts`): regole
+  `guaranteed-reward` (premio garantito mai in disgiunzione col rischio,
+  mai presentato come perdibile nei flavor di fail) e
+  `unsupported-mechanic` (contestazione/appello del verdetto). Regola
+  progettuale confermata: il gate verifica condizioni precise, la
+  qualità letteraria resta al critic.
+- **`SceneBrief.guaranteedRewards`**: `sceneBrief.ts` calcola i
+  `takeLoot` presenti su TUTTI i verdetti e li dichiara nei `facts` —
+  il modello non può più scrivere il bug perché il fatto è nel brief.
+- **Contratto v2** (`arcContract.ts`): `nodeContracts[]` per-nodo —
+  `narrativeDelta` (vs ogni entry state, mai rispetto a un nodo
+  precedente specifico), `rivalAction` (azione varia, non metodo
+  ripetuto), `motifFunction` (funzione del motivo, non obbligo di
+  citarlo), `mechanicalClaims`, `endingClaimsAllowed`. Opzionale nello
+  schema (retrocompat r001); `contractIssues` impone coverage 1:1 se
+  presente. Iniettato nei prompt scena via
+  `nodeContractPromptSection`.
+- **Test controllato**: contratto v2 authored
+  (`test-results/narration-quality-debate/race-miniera-contract-v2.json`,
+  viaA/imboscata/vetta secondo l'analisi del provider), rigenerazione
+  `--only viaA,imboscata,vetta` → miglioramento verificato: Mara
+  *esita* in imboscata (la gara si ferma), canarino muto→immobile
+  (motivo evolve), sabotaggio pre-esistente con prova materiale.
+  Fix manuale `vetta`: il modello aveva inventato un'opzione di
+  «ritirata» inesistente (i soli sbocchi sono CHECK sicuro/varco).
+- **Infra**: fix adapter `mw-web-turn` chatgpt (DOM 2026-10 —
+  `data-message-author-role` rimosso; user `[class*="bg-user-message"]`,
+  assistant `h4.sr-only /^chatgpt/i` + primo `[class*="prose"]`);
+  mind-weaver commit `aae2b41b`. Provider: codex quota esaurita (fino
+  2026-11-09), gemini 429 transitorio → `vetta` generata su groq.
+- Test: `narrationQuality.test.ts` 24 test (61/61 scope narrativo),
+  build:check ✓, kanban:lint ✓.
+
+**Residuo**: review Director sulla copy r002 dei 3 nodi; estensione
+contratto v2 ai restanti domini dopo approvazione.
