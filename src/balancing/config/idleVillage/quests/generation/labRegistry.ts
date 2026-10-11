@@ -575,10 +575,11 @@ export const QUEST_LAB_MECHANICS: readonly LabMechanic[] = [
   {
     id: 'imprint-compilation',
     label: 'Compilazione imprint→grafo',
-    desc: 'Le function spec dei beat (QUEST_IMPRINTS) compilate in QuestScenario sul profilo `gen`: vars/verdictTable/goto bastano, zero switch authored. Primo artefatto: gen-impr002-palude (IMPR-002 × palude). Id gen-<imprint>-<dominio> = provenance distinta dai skeleton×kit.',
-    surface: 'impr002Palude.ts, imprintCatalogEntries (labModel)',
+    desc: 'Le function spec dei beat (QUEST_IMPRINTS) compilate in QuestScenario sul profilo `gen`: vars/verdictTable/goto bastano, zero switch authored. Due istanze: gen-impr002-palude (R-152) e gen-impr002-mare (R-159 — stesso spine, meccaniche di dominio diverse: esposizione vs fatica, prova documentale vs avviso, traccia-maestro cross-cast). Id gen-<imprint>-<dominio> = provenance distinta dai skeleton×kit.',
+    surface: 'impr002Palude.ts, impr002Mare.ts, imprintCatalogEntries (labModel)',
     files: [
       'src/balancing/config/idleVillage/quests/generation/impr002Palude.ts',
+      'src/balancing/config/idleVillage/quests/generation/impr002Mare.ts',
       'src/ui/idleVillage/questGenLab/labModel.ts',
       'context/QUEST_IMPRINTS.md',
     ],
