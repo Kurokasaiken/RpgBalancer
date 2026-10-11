@@ -91,7 +91,7 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, includeDe
         shape="hang"
         as="section"
         aria-label={t('gameFrame.menu.title')}
-        style={{ display: 'flex', alignItems: 'center', padding: '6px 16px 18px' }}
+        style={{ display: 'flex', alignItems: 'center', padding: '13px 16px 11px' }}
       >
         <div data-hud-controls="">
           <button
