@@ -86,18 +86,19 @@ getHalo()
 // globali
 advanceTicks(n)                                  // n tick sul clock canonico
 getClock() -> { currentTick, isPaused, speedMultiplier }
-revealQuestPois()                                // R-124: = Director «Mostra quest» → i marker compaiono
+revealQuestPois()                                // SOLO per `?capture=1` — la suite usa il vero pulsante Director
 ```
 
 > **R-124/R-129/R-131/R-143 — nessun POI in mappa al boot.** Gli anchor
 > expedition sono gated su `questShown`. **R-143: «Mostra quest» è tornata nel
 > Director** — è l'unico gate UI dei POI reali (goblin + rovine); un marker
 > quest NON è mai un esemplare demo («POI types»/`poiDemo` mostra solo i finti
-> job/event, i tipi senza contenuto reale). L'hook `revealQuestPois` resta per
-> `?capture=1` dove il Director è nascosto; il test Director rivela dal vero
-> pulsante `[data-action-id="quest"]`. Al reveal l'offerta fresca ha halo
-> **vuota** (si riempie solo con `activityProgress` della run); in finestra
-> `expiring` l'anello è ambra warn e scarica antiorario.
+> job/event, i tipi senza contenuto reale). **I test rivelano SEMPRE dal vero
+> pulsante**: `revealQuestPois(page)` fa F10 → `[data-action-id="quest"]` → F10
+> (l'hook window resta solo per `?capture=1`, dove il Director è nascosto).
+> Al reveal l'offerta fresca ha halo **vuota** (si riempie solo con
+> `activityProgress` della run); in finestra `expiring` l'anello è ambra warn
+> e scarica antiorario.
 
 ### Selettori stabili (contratto test↔UI)
 
@@ -187,7 +188,7 @@ mappa pulita → reveal «Mostra quest» → marker available, halo vuota
 | Helper | Uso |
 |---|---|
 | `waitForHooks(page)` | dopo ogni `goto`/`reload`: aspetta che gli hook expedition di goblin+rovine esistano |
-| `revealQuestPois(page)` | R-124: `__idleVillageTestHooks.revealQuestPois()` = Director «Mostra quest» + attesa del marker |
+| `revealQuestPois(page)` | R-143: **vero pulsante** F10 → `[data-action-id="quest"]` → F10 + attesa anchor layer + marker (mai l'hook) |
 | `openGoblinDetailViaMap(page)` | reveal + click reale sul marker + assert header |
 | `assignViaRealDrag(page, residentId, slotId)` | drag pointer card→slot con `scrollIntoViewIfNeeded` su entrambi gli endpoint (il planner è più alto del viewport) |
 | `bringSendIntoView(page)` | trascina l'header del FloatingPanel finché «Invia» non rientra nel viewport (necessario se il pannello è più alto dello schermo) |
