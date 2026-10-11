@@ -20,7 +20,10 @@ LAYERS = os.path.join(ROOT, 'layers')
 MATCH = ('forest', 'trees')
 # Only pixels the canopy fully covers are replaced: where its alpha is partial the base shows through the overlay, and a
 # fill colour different from the ground there drew a pale ring around every clump.
-UNDERSTORY = 0.78
+# 0.78 made the whole forest read ~20% darker: every swaying vertex column reveals understory seams, and semi-alpha
+# edges show dark fill year-round. The understory is a smooth blur, never a literal copy, so no darkening is needed
+# to avoid ghosting — 1.0 keeps the revealed seams at the painted local brightness (R-155).
+UNDERSTORY = 1.0
 GROW_PX = 0
 BLUR_RADIUS = 14
 

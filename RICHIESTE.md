@@ -10,9 +10,11 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
 
 ## Stati
 
-`da chiarire` · `aperta` · `in corso` · `fatta` · `ridotta` · `rinviata` · `ritirata`
+`da chiarire` · `proposta` · `aperta` · `in corso` · `fatta` · `ridotta` · `rinviata` · `ritirata`
 
+`proposta` = candidato di design in attesa di ratifica Director (non lavoro impegnato).
 `ridotta`, `rinviata` e `ritirata` solo con approvazione esplicita.
+Triage 2026-10-12 (R-156): 28 voci chiuse su evidenza kanban/artefatto — `context/request-triage-2026-10-12.md`.
 
 ---
 
@@ -20,7 +22,8 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
 
 **Richiesta:** *"Voglio vedere cosa Mind Weaver riesce a fare autonomamente, più che stime di guadagno massimizzate. Se il risultato finale è interessante provo a pubblicarlo. Voglio che tu prenda il più possibile dal progetto RPG."*
 **Data:** 2026-08-10
-**Stato:** `da chiarire`
+**Stato:** `ritirata`
+**Triage R-156 (2026-10-12):** superata — uso corrente di MW (skills, deliberazioni) la sostanzia — meta-direzione evergreen — ritirata su ratifica Director.
 **Desiderata FROZEN:** nessuna corrispondente; `.mw/desiderata.md` v1 riguarda l'adozione del protocollo Mind Weaver in RPG. Questa richiesta richiede una nuova desiderata.
 **Cosa manca:** genere/tema del gioco e stack tecnologico specifici; la base è chiara.
 **Chiarimento del Director (2026-08-10):** il progetto è nuovo (nuovo nome, nuovo brand, nuovo tutto). Da RPG si possono prendere solo riferimenti utili (estetica/Style Lab, filosofia config-first, metodo componenti, ecc.), non asset o brand. Se interessante, può essere pubblicato.
@@ -198,7 +201,8 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
 
 **Richiesta:** *"in day/night nn c'è il componente visivo, deve esserci. il POI deve riempirsi in senso orario, la durata di 'in quanto tempo si riempie' è nelle config e lo trovi anche nel POI detail. Questo è un POI speciale, quest, deve apparire la quest (attualmente nn c'è un componente battezzato, dovrebb essere una card stretta e lunga, cn diverse fasi, e x ogni fase si esegue uno skill check cn /minimal-destiny-astrolabe). Quando il tempo è finito l'Halo è pieno, si ferma e pulsa, ci clicchi sopra e si apre al posto del detail [...] e vedi il risultato dello skill check che t dice se hai vinto o perso. La difficoltà ecc della quest devono essere legati allo skill check e dati come input."*
 **Data:** 2026-08-11
-**Stato:** `aperta`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** sostanza implementata (halo temporale, QuestRunWindow a fasi, skill check); forma «cerchio magico» non usata — chiusa su ratifica Director 2026-10-12.
 **Desiderata FROZEN:** nessuna corrispondente. `.mw/desiderata.md` v2 riguarda World Surface; questa richiesta tocca la meccanica POI/quest (Pillar 2 e 3) e richiede una **nuova desiderata v3**.
 **Documento di esplorazione:** [src/docs/docs/plans/poi_quest_system_exploration.md](src/docs/docs/plans/poi_quest_system_exploration.md)
 
@@ -350,7 +354,8 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 **Richiesta:** *"voglio che tu faccia un set di test per questa pagina, questi test devono verificare tutto quello che ho detto a run time con playwright o quello che preferisci, ma da UI e devono essere veri. TUTTO. Quindi ci serve un sistema per passare dai documenti di specifica ai test di integrazione automaticamente (un workflow? dimmi tu, proponi). Ogni cosa scritta deve essere esaminata, divisa in verità, creato un test, verificato e in caso di trovare un errore popoliamo la lista degli errori da fixare. Procedi uno alla volta. Se ci sono altre cose che ti serve sapere, quando esamini quella riga/parte e non trovi nella documentazione le risposte falle a me. Una volta che finisci dimmi cosa abbiamo di errori, io farò un giro a FE e ti dirò se trovo altri errori, o se alcuni degli errori che hai trovato non sono veri errori, ecc. Io nel workflow ho scordato sicuramente cose, ad esempio quando provi a rilasciare un pgTokenDraggable in un punto non corretto (che deve tornare indietro con lo spring), altri dettagli tipo del roster, ecc. che adesso non erano super pertinenti con questa pagina di preciso, ma lo sono in generale. Devi verificare anche tutte quelle cose degli altri .md. Tutto deve essere corretto e funzionante."*
 **Data:** 2026-08-13
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** obiettivo assorbito — E2E ora coprono /game; la pagina lab è evoluta.
 **Desiderata FROZEN:** `.mw/desiderata.md` v3 — POI quest system (meccaniche base implementate).
 **Cosa è successo:** installati browser Playwright; creato `tests/e2e/idleVillage/poiQuestDetailRosterTimeClock.spec.ts`; test #1 page load e test #3/4 (drop invalid e drag pannello) passati; test #2 Start gating ancora instabile: il `PointerSensor` di dnd-kit non si attiva con `locator.dragTo` / `page.mouse` (emittono solo mouse events) e neppure con `dragResidentCard` in quanto la sequenza pointer synthetic è incompleta; ERR-017 rimosso dal registro perché falso positivo.
 **Cosa manca:** stabilizzare il drag per dnd-kit `PointerSensor`, quindi continuare con gli altri requisiti uno alla volta e creare tracciabilità spec-to-test.
@@ -415,7 +420,8 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 **Richiesta:** *"Io adesso se esploro idee e spiego cose ai miei agenti voglio che usino learn automaticamente x migliorare la documentazione. Funziona su RPG? dovremmo mettere learn come protocollo? la facciamo chiamare da una skill quando trova info nuove? E' molto importante x quel progetto. Il workflow che descrivi sembra ottimale x fare bugfixing, che problemi ci sono a trapiantarla"*
 **Data:** 2026-08-14
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN:** `.mw/desiderata.md` v1 — adozione del protocollo Mind Weaver in RPG.
 **Cosa è successo:** creata `mind-weaver/.agents/skills/learn/SKILL.md` come skill core adattata da `work-solver`; symlinkata in `RPG/.agents/skills/learn` e `RPG/.windsurf/skills/learn`. Integrato il trigger `learn` nelle skill `mw-explorer`, `mw-planner` e `mw-executor` di RPG: ogni sessione che produce una nuova assunzione, workaround, bugfix o pattern invoca `learn` e scrive `.mw/runs/<timestamp>/pattern-candidate.md`.
 **Cosa manca:** testare il trigger reale in una sessione di esplorazione/pianificazione/esecuzione su RPG e verificare che `pattern-candidate.md` venga prodotto.
@@ -426,7 +432,8 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 **Richiesta:** *"contract-ladder è il workflow giusto x fare bugfix. dovrebbe essere generico su tutti i progetti che possono aver bisogno di bugfix, come RPG"*
 **Data:** 2026-08-14
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** skill `bugfix` esiste e workflow generalizzato — chiusa su ratifica Director.
 **Desiderata FROZEN:** `.mw/desiderata.md` v1 — adozione del protocollo Mind Weaver in RPG.
 **Cosa è successo:** creato `mind-weaver/.agents/skills/bugfix/SKILL.md` e `tools/bugfix-run.py` come workflow generico di bugfix ispirato a `contract-ladder`; rinominato `contract-ladder` → `bugfix`; symlink in `RPG/.agents/skills/bugfix` e `RPG/.windsurf/skills/bugfix`. Testato `bugfix-run.py` su un bug di esempio: produce `investigation.json`, `exploration.json`, `plan.md`, `prompt.txt`, `result.json`; il tool di `learn` scatta automaticamente in caso di test falliti.
 **Cosa manca:** testare `bugfix` su un bug reale di RPG e verificare che l'agente lo invochi come workflow.
@@ -437,7 +444,8 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 **Richiesta:** *"learn si deve occupare anche della manutenzione del contesto/documentazione, lo fa? se presento nuove informazioni o cambio idea va e modifica quello che deve modificare? i riferimenti, ecc?"*
 **Data:** 2026-08-14
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** learn attiva + INDEX/ingestions funzionanti — chiusa su ratifica Director.
 **Desiderata FROZEN:** `.mw/desiderata.md` v1 — adozione del protocollo Mind Weaver in RPG.
 **Cosa è successo:** estesa `mind-weaver/.agents/skills/learn/SKILL.md` con la fase `Mantieni contesto`: `learn` ora confronta il nuovo pattern con `context/INDEX.md` e `context/DECISION_LOG.md`, scrive esplicitamente i cambi di idea (`Da... A... Motivo... Fonte...`) e aggiorna i riferimenti. Non modifica `CANON.md`, `DESIGN_PILLARS.md` o `AGENTS.md` senza approvazione esplicita.
 **Cosa manca:** testare il nuovo comportamento in una sessione reale di esplorazione/bugfix in cui emerga un pattern che contraddice una decisione precedente.
@@ -472,7 +480,8 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 **Richiesta:** *"fai tutto tu"* — eseguire il protocollo scelto (C: Flux.1 dev / Stable Diffusion free) per generare mockup, valutarli, scomporli e produrre un componente React funzionante con asset corretti per RPG.
 **Data:** 2026-08-14
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN:** `.mw/desiderata.md` v5 — Mockup AI → componente React + asset ad hoc: protocollo generale.
 **Cosa è successo:** installato venv `/Users/faustoboni/.venvs/rpg-assetgen` con Python 3.12, PyTorch MPS e diffusers; scaricato SDXL `stabilityai/stable-diffusion-xl-base-1.0`; creato `scripts/rpg-gen-mockup.py`; generati primi mockup di prova in `public/mockups/quest-card/` e `public/mockups/quest-card-empire/`; creato skill `.devin/skills/mockup-generator/SKILL.md` e workflow operativo `src/docs/docs/plans/ai_mockup_workflow.md`; aggiornati `context/INDEX.md`, `.gitignore` (`public/mockups/`) e `RICHIESTE.md`.
 
@@ -556,7 +565,8 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 **Richiesta:** *"dobbiamo impedire che vengano create cose senza seguire il workflow corretto, prendere le specifiche, creare i prompt adeguatamente, ecc. Se i prompt non sono adeguati i mockup non sono adeguati, se non lo sono inutile farli diventare componenti. Questo è un problema più pressante."*
 **Data:** 2026-08-15
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** protocollo canonico via skill `painter` — blocco delegato al workflow — chiusa su ratifica Director.
 **Desiderata FROZEN:** `.mw/desiderata.md` v6 — Mockup → CSS/React + asset ad hoc: paintover consentito.
 **Vincoli:** Non fermare il workflow, ma aggiungere un pre-flight gate che obblighi artefatti canonici prima della generazione. Non creare burocrazia, ma prevenire generazione con prompt generici.
 **Cosa è successo:**
@@ -1088,6 +1098,7 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 **Richiesta:** *"1) metti un effetto ottanio sulle nuvole della transizione... in /primitives event dovresti trovare le nuvole cn l'effetto ottanio (devi mettere quell'effetto ottanio sulle nuvole di quella animazione, e possbilmente migliorarlo). 2) il componente finale cn POI e Titolo Invasion nn è interessante o bello, deve avere la forma di una pgCard... Invasion nn sembra un titolo, il POI è praticamente illeggibile a quelle dimensioni."* Poi, a chiarimento: *"intendevo il POI componente (circolare, cn il magic circle che si riempie)"*, *"Deve essere corto e lungo, attualmente è alto e stretto"*, *"nn stiamo facendo una rappresentazione cinematografica, ma i componenti che utilizzerò x il trailer... Questo è x il gameplay vero."*
 **Data:** 2026-08-30
 **Stato:** `fatta`
+**Triage R-156 (2026-10-12):** moto ambientale consegnato in parte (nuvole/ombre R-120, fit R-148); residui in R-057 — chiusa su ratifica Director.
 **Desiderata FROZEN:** `.mw/desiderata.md` v2 — World Surface; v8 — Golden UI Foundation.
 **Cosa è successo:**
 - Creato `src/balancing/config/idleVillage/eventShroudGradeTokens.ts`: rampa gradient-map config-first per lo shroud, con `EVENT_SHROUD_FILTER_ID` e i table values di `feComponentTransfer`.
@@ -1121,7 +1132,8 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 **Richiesta:** *"ho visto un bell'effetto x il mare, onde 'piccole', realistiche e nn stilizzate su MTG arena. vorrei aggiungere un po' + di effetti dinamici, un minimo d parallasse quando muovo il mouse, cose del genere. Qualche effetto di luce, particelle di dust, ecc. Prendi anche il componente window in /primitives, dovrebbe avere un effetto 'vetro', che lo rende + interessante"* e, dopo il video: *"sembra troppo ferma, le nuvole si muovo poco, il mare ha qualche effetto interessante cn asset specifici, uccelli che prendono il volo, ma 'nn respira', deve esserci sempre qualcosa che si muove anche solo di poco"*.
 **Data:** 2026-08-30
-**Stato:** `aperta`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** moto ambientale consegnato in parte (nuvole/ombre R-120, fit R-148); residui in R-057 — chiusa su ratifica Director.
 **Desiderata FROZEN:** `.mw/desiderata.md` v2 — World Surface: mappa viva da esplorare con gli occhi.
 
 **Misura del problema (2026-08-30).** Estratti i frame dal video del Director (`Registrazione schermo 2026-08-30 alle 17.44.28.mov`, 1982x1320, 7s) e calcolato il diff pixel fra il primo e l'ultimo frame. Cambiano soltanto: i contorni delle nuvole (1-2 px), la nave sprite in alto a sinistra, due uccelli, e il pannello di debug. Mare, terra, cornice e luce: zero moto misurabile.
@@ -1412,7 +1424,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *Handoff dalla conversazione precedente su RpgBalancer: continuare l'audit del sistema di balancing, identificare la baseline canonica, consolidare le fonti di verità frammentate e produrre una specifica matematica canonica (Canonical Mathematical Inventory) prima di qualsiasi modifica al bilanciamento.*
 **Data:** 2026-09-04
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN:** nessuna corrispondente; richiesta operativa derivata dall'handoff.
 **Cosa è successo:**
 1. Verificato che l'archivio `RpgBalancer_Source_Clean.zip` non è presente nella workspace; audit eseguito sul sorgente locale in `src/balancing/`.
@@ -1453,7 +1466,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *«lascia solo il mare, togli tutto il resto. poi fammi tanti piccoli riquadri con solo il mare e le diverse soluzioni»* (su `/sea-effect-lab`), preceduta da *«mi serve un piano per mostrare l'effetto del mare che si muove leggermente»* su `/world-surface`.
 **Data:** 2026-09-06
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN:** v19 — «voglio una pagina ad hoc x il mare con diversi tentativi uno accanto all'altro» e «per l'acqua serve un piano intelligente, non altri tentativi alla cieca».
 **Cosa è successo:**
 1. `SeaEffectLabPage.tsx` riscritta: via `WorldSurfaceRenderer`, via nuvole/ombre/schiuma/uccelli/vetro/cornice. Resta il solo layer `Mare.webp` (con `Background.webp` opzionale sotto).
@@ -1501,7 +1515,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *«Crea un plan di miglioramento per /minimal-destiny-astrolabe-v6-3 incorporando le critiche e le proposte di ChatGPT, Claude e Gemini. Usa un hat corretto e la skill explorer.»*
 **Data:** 2026-09-08
-**Stato:** `aperta`
+**Stato:** `ritirata`
+**Triage R-156 (2026-10-12):** superata — lavoro astrolabio andato oltre (goo R-070, inglese R-141, Steam) — ritirata su ratifica Director.
 **Desiderata FROZEN:** `.mw/desiderata.md` v3/v4 (Destiny Astrolabe V1 canonico per skill check POI quest), v9 (geometria avversariale libera), v8 (Golden UI Foundation come processo di congelamento visivo).
 **Cosa è successo:** Il Director ha condiviso tre feedback multi-AI (ChatGPT Lead UI/UX AAA, Claude, Gemini) sull'astrolabe V6.3, evidenziando problemi di semantica, art direction, affordance, tensione e climax.
 **Cosa è successo:** Il Director ha condiviso tre feedback multi-AI (ChatGPT Lead UI/UX AAA, Claude, Gemini) sull'astrolabe V6.3, evidenziando problemi di semantica, art direction, affordance, tensione e climax.
@@ -1533,7 +1548,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *«fa il plan allora: usa multi AI web anche per la delibera di un plan vero e proprio»* per le tre modifiche emerse dalla delibera esplorativa (soft ownership gaussiana, curl domain warp, riduzione orbita) su `public/voronoi-sea-spike.html`.
 **Data:** 2026-09-10
-**Stato:** `completata` — piano battezzato `PLAN-017-stylized-sea-pattern-evaluation.md`
+**Stato:** `fatta` — piano battezzato `PLAN-017-stylized-sea-pattern-evaluation.md`
 **Desiderata FROZEN:** `.mw/desiderata.md` v2 (World Surface mappa viva), v19 (Water Effect Lab e shader custom condizionati).
 **Piano esistente:** `plans/PLAN-016-voronoi-sea-surface.md` (status: proposto).
 **Output atteso:** piano di implementazione con task ordinati, criteri di accettazione, verifiche e vincoli progetto.
@@ -1562,7 +1577,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *«per la 6.3: le gocce iniziali sn troppo "tonde e regolari", mentre dovrebbero dare un'idea d goo/catrame. Possiamo fare un effetto tipo "venom", dove si muovno tipo cn dei piccoli tentacoli e fisica da goo/molto viscooso?»* — design e proposta implementativa per rendere le gocce iniziali del tar-goo V6.3 più organiche/viscose.
 **Data:** 2026-09-10
-**Stato:** `completata` (mini-PoC implementativa)
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. (mini-PoC implementativa)
 **Desiderata FROZEN:** `.mw/desiderata.md` v20 (V6.3 materialità/prisma goo), v9 (geometria avversariale libera), v16 (goo come densità).
 **Cosa è successo:**
 - Ricerca online conclusa: tentacoli Venom/symbiote meglio come catena di nodi con lag e smorzamento; metaballs + domain warp sufficienti per spezzare la rotondità senza fluid solver.
@@ -1650,7 +1666,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"Dobbiamo fare una hero card detail, deve prendere 'dinamicamente' tutte le stats che arrivano dal balancer e le stat del pg vero (come troviamo il nome e il portrait dobbiamo trovare anche tutto il resto). 1) individua attualmente quali dati dobbiamo mostrare 2) fa una ricerca online sul modo migliore di mostrarli 3) proponi come farlo"*. Contesto: `PgDetailCard.tsx` e `SchedaPergamena.tsx` esistono ma mostrano solo HP/Stamina, non le stat reali.
 **Data:** 2026-09-16
-**Stato:** `in corso`
+**Stato:** `ritirata`
+**Triage R-156 (2026-10-12):** superata — PgCard canonico + popover quest (R-125) — ritirata su ratifica Director.
 **Desiderata FROZEN:** `.mw/desiderata.md` v10 — hero components placeholder funzionali e skin-wired. Collegata a R-072 scena 3 (hero sheet nel teaser).
 **Cosa è emerso dall'esplorazione (fase 1, fatti):**
 - Pipeline dati: `SavedCharacter.statBlock` (StatBlock completo del balancer, merged con `DEFAULT_STATS` in `characterStorage.ts`) → `savedCharacterToResident` → `ResidentState.statSnapshot` (~29 stat numeriche) + overlay `useResidentHeroState` (equipment/inventory/skills).
@@ -1674,7 +1691,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"mi serve un Componente HUD da mostrare sopra la mia mappa interattiva. Prendi un hat corretto, fa un prompt potenziato, e leggi le info relative al progetto, alle scelte grafiche, e a come fare i componenti. Poi fammi una HUD che sia il + bella e appropriata per il progetto possibile, che stia 'bene' accanto alla mappa e che rispetti Wanderlust DNA ecc"*
 **Data:** 2026-09-21
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** GameFrame HUD v2 esiste (CURRENT_STATE §4) + R-132/136 — chiusa su ratifica Director.
 **Hat:** `painter` (mandatory per creazione UI) + `idle-village-task` + `agent-execution-mandate`; prompt potenziato con l'hat `create_proposal` di `.mw/prompt-enhancers.md`.
 **Desiderata FROZEN:** `.mw/desiderata.md` v2 (World Surface mappa viva) — copertura parziale. Nessuna desiderata nomina un HUD di mappa: l'autorità più vicina è il Pillar 1 di `DESIGN_PILLARS.md` (§R1.1 "HUD risorse + day-clock in alto", §R1.2 day-clock + timeline eventi) e le decisioni Director di R-071.
 
@@ -1762,7 +1780,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"ne avevamo già parlato. avevamo deciso per un Punch Club Light come inizio: ci sarà un torneo tra X tempo, t devi preparare. Magari mostrare gli incontri, fare un incontro a settimana? bho, dimmi tu, parliamone. Quindi tipo equip o skill o salire di livello (o tutt'e 3) sn i requisiti per questa fase. X entrare nella fase degli attacchi dei goblin c dovranno essere dei requisiti. Tempo probabilmente. Deve essere un po' un tutorial/onboarding. Dopo un paio d quest ne dovrebbe arrivare una tipo: accetta un rifugiato e x farlo devi pagare X cibo."*
 **Data:** 2026-09-29
-**Stato:** `da chiarire`
+**Stato:** `ritirata`
+**Triage R-156 (2026-10-12):** superata — loop quest reale PLAN-019 S1–S4 — ritirata su ratifica Director.
 **Desiderata FROZEN:** nessuna corrispondente. Sorella di R-076 (loop quest divertente); v12 copre equip/skill/consumabili come prerequisiti meccanici.
 **Documento trovato (la domanda del Director):** il design del primo loop/onboarding vive in **`GDD_primo_loop.md`** ("GDD — Primo Loop: dal Boot alla Prima Quest"): contiene già il pattern "deadline + requisiti + preparazione" (quest Cinghiale Nero: Might 2.5 + 15 legna, scade Giorno 8), upkeep come pressione Punch Club, tutorial invisibile. NON contiene: torneo, fase attacchi goblin come gate, quest rifugiato — sono elementi nuovi di questa richiesta.
 **Correlati:** `GAMEPLAY_DESIGN.md` (canon: catena di preparazione, quest urgenti con countdown), `DESIGN_PILLARS.md` R4.2 (tutorial invisibile via gating) e anti-pillar "tutorial scriptato con bolle", `src/docs/docs/archive/2026-Q1/GAME_VISION_IDLE_INCREMENTAL.md` (archiviato — pillar 4 "Ondate periodiche come check di preparazione" è l'antenato concettuale della "fase goblin"), `src/docs/docs/mobile/PunchClubLoop.md` (doc legacy Punch Club, status candidate). "Torneo" nel senso di arco narrativo compare solo nei doc **archmage** (`logs/2026-01-08_archmage_discussion.md`) — progetto diverso.
@@ -1834,7 +1853,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"fa un plan d cambiamento, poi mandalo alle ai web"* — consolidare la critica interna e le risposte dei web-AI in un piano di cambiamento concreto per la quest S1, poi sottoporlo agli stessi provider web.
 **Data:** 2026-10-03
-**Stato:** `in corso` — v4 scritta e broadcast; serve v5 col feedback
+**Stato:** `ritirata`
+**Triage R-156 (2026-10-12):** superata — PLAN-019/S2: superficie canonica /game, non più lab S1 — ritirata su ratifica Director. — v4 scritta e broadcast; serve v5 col feedback
 **Desiderata FROZEN:** `.mw/desiderata.md` v23 + desiderata S1-quest-interessante (PLAN-019). R-076 genitore.
 **Scope adottato:** piano in `.mw/runs/20261003-s1-change-plan/change-plan.md` — 11 cambiamenti ordinati per ROI. Invarianti S1 preservate; noise dichiarato stealth-specifico, non universale.
 **Cosa è successo:** broadcast a 5 provider web — chatgpt MINOR REVISION, claude/grok/deepseek NO al gate così com'è ("spreadsheet con stato"). Convergenze in `.mw/runs/20261003-s1-change-plan/synthesis.md`. Poi: deep research multi-provider via Canary/CDP (ChatGPT Deep Research ✓, DeepSeek DeepThink+Search ✓, Grok-free debole con falsi negativi, Claude free-cap) — risposte in `.mw/runs/20261003-quest-science-deepresearch/`. Wiki vivo `context/QUEST_GAMEPLAY_SCIENCE.md` (~60 fonti verificate, principi P1–P47, correzioni + gap). Proposta redesign `.mw/runs/20261003-quest-v6-science/quest-v6.md` (TAKEN≠SECURED, estrazione come gioco). Playtest live seed 1983 documentato (`playtest-seed1983.md`): confermata la diagnosi — 6 WIN/6, estrazione inesistente, Kran morto su WIN reso come log.
@@ -1879,7 +1899,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"Portare il sistema dall'architettura attuale [knowledge-extractor → post-reconciliation report → canonical docs → documentary retrieval] alla seguente architettura minima: CONVERSATION → KNOWLEDGE EXTRACTION → EXTRACTION LEDGER → RECONCILIATION → CANONICAL KNOWLEDGE → LAYERED RETRIEVAL."* — prompt operativo completo con 10 fasi (ledger, persistenza `context/ingestions/`, `context/REJECTED.md`, `context/OPEN.md`, completamento PLAN-020, router L0–L4, golden test su «Progettare quest strategiche», 7 query di retrieval, regression check).
 **Data:** 2026-10-05
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN di riferimento:** `.mw/desiderata.md` v25 (audit e refactoring KB orientata agli agenti AI) — questa richiesta è l'esecuzione della fase 2 di migrazione delineata dall'audit e dalle proposte F1–F9 avallate.
 
 ---
@@ -1888,7 +1909,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"RPG BALANCER — FULL DOCUMENTATION REFACTOR. Canonical Knowledge, Authority, Retrieval & Documentation Architecture."* — playbook completo in 40 sezioni: audit totale del repo (§1–3), inventory documentale, gerarchia di autorità reale, modello canonico L0–L4, router root, refactor di CURRENT_STATE/GAMEPLAY_DESIGN/QUEST_RULES (dominio quest = major refactor), separazione game rules vs design knowledge, audit DECISION_LOG/desiderata/OPEN/REJECTED/proposals/GLOSSARY, architettura e piani, famiglie di duplicati, conoscenza orfana, indici semantici, test suite di retrieval a 40 domande, contratto documentation-impact per i piani, regression check, health report finale.
 **Data:** 2026-10-05
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN di riferimento:** `.mw/desiderata.md` v25 — stessa ancora di R-084; questo prompt è la specifica completa della fase di refactoring già autorizzata ("Execute the refactor now").
 **Collegamenti:** R-084 (prima tranche eseguita: QUEST_RULES.md, OPEN.md, REJECTED.md, router L0–L4, ingestions, golden test), `KNOWLEDGE_AUDIT.md` (audit fase 1 + migrazione punti 1–4), PLAN-020.
 **Cosa è successo (2026-10-05):** tranche 2 — fonti canoniche salvate da `.mw/runs/` in copie tracciate (`QUEST_S1_DESIGN`, `QUEST_ECONOMY_NOTES`, `QUEST_V6_REDESIGN`, spec Rovine + preview), regola consumabili compilata in QUEST_RULES, GAMEPLAY_DESIGN marcato REFERENCE, MASTER_PLAN superseded, GLOSSARY v2, router L0 in README, rule 85 (Documentation Impact), health report `KNOWLEDGE_REFACTOR_REPORT.md` (retrieval 33P/3Pa/5F). Tranche 3 — su risposte Director: `VILLAGE_ECONOMY.md`/`PROGRESSION.md`/`NARRATIVE.md` creati come DRAFT bozze da migliorare; superficie canonica = `/game` (Game Frame Pixi), pagina Idle Village deprecata; `.windsurf/rules/` ora tracciate in git.
@@ -1897,7 +1919,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"dovrebbe esserci una nuova skill che fa esattamente questo lavoro"* — invocata `knowledge-extractor` su due share link ChatGPT forniti dal Director: `6ac4b77e` (bollette domestiche) e `6ac4b926` (continuazione «Progettare quest strategiche»).
 **Data:** 2026-10-06
-**Stato:** `completata`
+**Stato:** `fatta`
 **Cosa è successo:** link 1 scartato al Pertinence Gate (conoscenza personale, non progettuale — MW-P-003); link 2 ingerito con ledger E-01..E-05: checklist authoring 8 punti → `QUEST_GAMEPLAY_SCIENCE.md` (PROPOSAL), anti-pattern singolo skill check → `REJECTED.md` REJ-007, thread aperto «decomporre la quest originale del Director». Report: `context/ingestions/2026-10-06-quest-strategiche-continuazione.md`.
 
 ---
@@ -1906,7 +1928,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** *"adattiamo la skill strategist di RPG x entrare nel flusso/workflow di mind weaver? come? cosa ci servirebbe? cosa ci mancherebbe?"* — chiarita come layer di direzione: *"lo strategist serve principalmente a creare la documentazione e arrivare a parlare di Master Plan, scrivere bozze di macro plan, ma + che altro indirizzare le cose future. Poi quest discussioni andranno a creare davvero argomenti contenuti e circoscritti da poi gestire con explorer + planner"* · *"cambia il nome di strategist mandate di MW, questo deve essere strategist. approvo"*
 **Data:** 2026-10-06
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN:** `.mw/desiderata.md` v26.
 **Deliverable:** (a) skill `strategist` in `coordinator/skills/strategist/` — discussione libera di direzione, scrittura nei doc di direzione su decisione Director, handoff a desiderata; (b) rename skill MW `strategist` → `decomposer` in `mind-weaver/.agents/skills/` + symlink `~/.agents/skills/`; (c) hat `game_director` in `.mw/prompt-enhancers.md`; (d) registrazione in `context/INDEX.md`.
 **Nota:** la regola R-004 cita `strategist` fra le skill MW invocabili — il nome corretto dopo questa voce è `decomposer`; la regola resta invariata nel contenuto.
@@ -1917,7 +1940,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** share link ChatGPT (`6ac5017a`, «Presentazione della quest») portato in esplorazione. Il Director ha fissato scope e decisioni in sessione: *"questo è x presentarla nel gioco 'davvero'"* (superficie canonica `/game`, non il lab S1); scelta della direzione **B** (`QuestTheatre` componente nuovo che ospita cronaca/check/reward dentro `FloatingPanel`, con modalità espansa); e la semantica runtime: *"nn devono essere fatte le scelte e gli skill check automaticamente. Solo il tempo deve scorrere. Quando il giocatore apre è sempre fermo alla prima fase, semplicemente nn deve aspettare tempo x risolvere anche le fasi successive, il resto è inalterato"* — *"una storia a nodi che mi aspetta ai bivi, semplicemente nn devi aspettare X tempo perché è già passato, ma il gameplay è identico"*.
 **Data:** 2026-10-06
-**Stato:** `aperta`
+**Stato:** `ritirata`
+**Triage R-156 (2026-10-12):** superata — PLAN-025: teardown teatro parallelo, convergenza QuestRunWindow — ritirata su ratifica Director.
 **Desiderata FROZEN:** `.mw/desiderata.md` v27 — avallo «avallo» 2026-10-06. Prossimo passo: `mw-planner` per la spec `QuestTheatre`.
 **Decisioni Director in sessione:**
 - Scopo: presentazione della quest sulla superficie canonica `/game` (Pixi + DOM overlay), non il lab S1 (sperimentale).
@@ -1933,7 +1957,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** il Director ha authored la quest «Sterminio dei goblin» (fasi F0–F7) e ratificato in sessione il modello di targeting posizionale a cascata, l'escalation di combattimento, HP per-PG (0 HP = morte), F5 a bande di esito, F7 come turno secco + 5 danni secchi, consumabili solo prima di check/scelta, reward XP+trofeo→Gold. Chiesto il piano di implementazione nel lab S1 e l'esecuzione.
 **Data:** 2026-10-06
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN:** `.mw/desiderata.md` v24 (stadio S1 — quest authored nel lab).
 **Spec:** `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md` (fasi, regole, testi per esito).
 **Piano:** `plans/PLAN-022-quest-sterminio-goblin.md`.
@@ -1976,7 +2001,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"acquisiscilla nella documentazione del progetto, è tutta roba molto promettente e poi parliamone"* (in risposta allo share «Registro narrativo del mondo»).
 **Data:** 2026-10-07
-**Stato:** `in corso` — acquisizione documentale effettuata; discussione e decisioni di design ancora aperte.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — acquisizione documentale effettuata; discussione e decisioni di design ancora aperte.
 **Fonte:** https://chatgpt.com/share/6ac63cac-f084-83ed-8694-f80bc084e094
 **Report:** `context/ingestions/2026-10-07-registro-narrativo-del-mondo.md` (ledger E-01..E-18); proposte collocate in `NARRATIVE.md` §4; OPEN-016.
 **Autorità:** l'interesse del Director per il tema non approva il macro-piano scritto da ChatGPT alla fine della conversazione. `.mw/desiderata.md` v24 e PLAN-019 continuano a governare la sequenza S1–S5 finché non viene scelta un'eventuale revisione.
@@ -2002,7 +2028,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"Va bene C, ma deve essere molto dettagliata, spiegando cosa influenza cosa, il xè, ecc."* e *"penso siano tutte meccaniche importanti ed interessanti"*.
 **Data:** 2026-10-07
-**Stato:** `in corso` — mappa scritta in `NARRATIVE.md` §5; resta mappa d'intenti, ogni meccanica entra nel piano operativo solo al battesimo del suo stadio PLAN-019.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** coperta da QUEST_GENERATION_* docs + SPEC — chiusa su ratifica Director. — mappa scritta in `NARRATIVE.md` §5; resta mappa d'intenti, ogni meccanica entra nel piano operativo solo al battesimo del suo stadio PLAN-019.
 **Contesto:** alla domanda «plan unico con tutto e poi si approfondisce?» il Director ha scelto l'opzione C: documento unico che elenca tutte le meccaniche (conseguenze, registro mondo, riconoscimento, evoluzione offscreen, composizione, legacy cross-run) con stadio, condizione di ingresso e dipendenze — senza anticipare il design oltre i gate.
 **Decisioni registrate nella stessa discussione:** registro mondo in S2 = fetta minima per *una* quest di riferimento (narrowing OPEN-016); composizione/generazione resta S5.
 
@@ -2012,13 +2039,15 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** spec incollata dal Director «QUEST FUN AUDIT — S1 GOBLIN QUEST» — estendere l'analisi MC per valutare *qualità del gameplay* (decisioni significative, tensione, risk/reward, strategia di party, conseguenze a cascata, storie emergenti, rigiocabilità), non il bilanciamento. Vincoli espliciti: preservare l'MC esistente, non semplificare l'engine, non ottimizzare/cambiare probabilità, report per sezioni A–I con score 1–10 e verdict WHAT WORKS / WHAT DOESN'T / WHAT TO TEST.
 **Data:** 2026-10-07
-**Stato:** `completato` — tooling `scripts/quest-goblin-fun-audit.ts` (trace per decisione + policy random esplorativa), report `test-results/quest-goblin-fun-audit-report-2026-10-07.md` (score + verdict), dati grezzi `quest-goblin-fun-audit-2026-10-07.md`, evidence `r096-quest-goblin-fun-audit-2026-10-07.log`.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — tooling `scripts/quest-goblin-fun-audit.ts` (trace per decisione + policy random esplorativa), report `test-results/quest-goblin-fun-audit-report-2026-10-07.md` (score + verdict), dati grezzi `quest-goblin-fun-audit-2026-10-07.md`, evidence `r096-quest-goblin-fun-audit-2026-10-07.log`.
 
 ## R-097 — Micro-iterazione S1 goblin: fix F5 + preview consumabili
 
 **Richiesta (verbatim):** spec incollata dal Director «S1 GOBLIN — MICRO-ITERATION F5 + CONSUMABLE DECISION». Vincoli espliciti: F5 deve diventare scelta vera (Pursue ≠ free-roll, Let Flee ≠ dominato) con cambio strutturale minimo, mantenendo check FOR, 5 bande, sterminio, agguato e distinzione agguato lieve/peggiorato; **F6 e il targeting posizionale non si toccano**; preview consumabili deve mostrare "ora vs dopo" ricalcolando dinamicamente, senza secondo modello di probabilità né dettagli interni. Processo: baseline MC → candidati → report prima/ dopo, poi implementazione.
 **Data:** 2026-10-08
-**Stato:** `in corso` — v1 e v2 (respec Director) implementate e committate. Follow-up 2026-10-07 dopo playtest UI: fix onestà astrolabio (target forzato validato via `findZonePoint`/`honestTargetPos` — la palla non può più atterrare nel catrame sotto una card WIN), icone stat (lucide) su preview/chips, pedaggio F5 spostato a campo authored `upfrontDamage` con riga `sim.toll` in preview e log nel testo di esito, copy authored ripristinato. Evidence `test-results/r097-ui-check-honesty-2026-10-07.log`. In attesa di verifica del Director sul lab.
+**Stato:** `ritirata`
+**Triage R-156 (2026-10-12):** superata — lab S1 fermo/deprecato a favore di /game — ritirata su ratifica Director. — v1 e v2 (respec Director) implementate e committate. Follow-up 2026-10-07 dopo playtest UI: fix onestà astrolabio (target forzato validato via `findZonePoint`/`honestTargetPos` — la palla non può più atterrare nel catrame sotto una card WIN), icone stat (lucide) su preview/chips, pedaggio F5 spostato a campo authored `upfrontDamage` con riga `sim.toll` in preview e log nel testo di esito, copy authored ripristinato. Evidence `test-results/r097-ui-check-honesty-2026-10-07.log`. In attesa di verifica del Director sul lab.
 
 ---
 
@@ -2026,7 +2055,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"abbiamo la prima quest 'interessante' e la stiamo provando: ma manca di pathos, di narrativa, di feelings, d juice. […] ci serve un po' d testo x contestualizzare. Ad esempio 'arrivate ai margini della foresta' prima dello skill check di percezione, e quello skill check oltre a cosa fa e cosa ottiene dovrebbe avere un nome tipo 'ti arrampichi per vedere in lontananza'. E a seconda della scelta e dell'esito deve esserci una frase di 'flavour' adeguata. Inoltre: tra una fase e l'altra nel gioco reale ci sarà l'animazione di movimento che dura X e magari sarebbe carino fare apparire del testo che spiega cosa sta succedendo nel frattempo: cosa vedi, cosa incontri, ecc. Prova a prendere quella quest, metti i tag, flavour, testo, ecc come se seguisse le regole che abbiamo stabilito"* — poi: *"applica questo flavour a questo componente di prova, cercare di dargli una certa cinematograficità, feelings, pacing, ecc"* (su `/quest-s1-lab`).
 **Data:** 2026-10-08
-**Stato:** `completato` — schema `transit` + `verdictFlavor` su `QuestNode`, `ResolvedCheck.flavor/transit`, pacing da config (`questLabPacing`), flavor pass completo su `questScenarioGoblin.ts`, transizione cinematografica e flavor sotto astrolabio in `QuestS1LabPage`. Spec: manoscritto nel documento unico `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md` (il doc standalone `context/QUEST_GOBLIN_FLAVOR.md` è stato assorbito lì il 2026-10-08). Evidence: `test-results/r099-quest-flavor-layer-2026-10-08.log`. Fix collaterale: `pageCrash.repro.test.tsx` era rotto da R-089 (guidava la card Rovine rimossa dal picker) — ripristinato guidando la quest goblin.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — schema `transit` + `verdictFlavor` su `QuestNode`, `ResolvedCheck.flavor/transit`, pacing da config (`questLabPacing`), flavor pass completo su `questScenarioGoblin.ts`, transizione cinematografica e flavor sotto astrolabio in `QuestS1LabPage`. Spec: manoscritto nel documento unico `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md` (il doc standalone `context/QUEST_GOBLIN_FLAVOR.md` è stato assorbito lì il 2026-10-08). Evidence: `test-results/r099-quest-flavor-layer-2026-10-08.log`. Fix collaterale: `pageCrash.repro.test.tsx` era rotto da R-089 (guidava la card Rovine rimossa dal picker) — ripristinato guidando la quest goblin.
 
 ---
 
@@ -2052,14 +2082,16 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"dopo un esito dello skill check dovrebbe apparire una frase che spiega cosa è successo. quando c sn dei danni a schermo vanno presentati bene come UI. La fase d combattimento devi mostrare gli hp d tutti, cn gli slot cn le % d prendere danni rappresentati, e stessa cosa anche x i goblin. Bisogna capire gaurdando cosa sta succedendo, a che punto siamo, ecc. Inoltre: il componente skill check dovrebbe avere anche dei pulsanti x skippare le animazioni, skippare direttamente il tiro, ecc, che adesso sn scomparse. Inoltre: tutti questi componenti e il layout è molto brutto e fastidioso, c dovrebbe essere una guida su come fare questi componenti, ed il layout dovrebbe mostrare tutto a colpo d'occhio senza che io debba navigare. anche lo spazio laterale x il log è troppo grande."* — poi: *"planner multi AI web"*. Decisioni Director su D1–D3: *"1 manuale, ma devo poterlo magari scegliere prima della selezione dello skill check. le info dello skill check dovrebbero apparire come tooltip della scelta o pulsante, nn una fase a parte. xò nn saprei cm fare aggiungere i consumables con questa modifica / orda token anonimi va bene / chiudono i ranghi e cambiano i valori d pericolosità degli slot"*
 **Data:** 2026-10-08
-**Stato:** `completata` (2026-10-08) — PLAN-023 implementato e verificato live: cockpit 3-regioni zero-scroll, pipeline presented-vs-committed, canale danno duraturo, astrolabio docked+skip+speed, stakes tooltip+cintura consumabili, orda anonima+rank-shift, guida `quest_ui_component_guide.md`. Safeguards verdi (95/95 vitest scope, build:check, kanban:lint). Evidence: `test-results/r101-quest-cockpit-2026-10-08.log`. Contesto: dibattito multi-AI web convergente (run `20261007-quest-s1-lab-ui-redesign`, 3/3 ACCEPT su artifact-r004; r005 = revisione finale con decisioni Director D1–D3 ratificate). Piano esecutivo `plans/PLAN-023-quest-s1-lab-ui-redesign.md` (T-001..T-012). Decisioni chiave: skip manuale + pace control pre-check; stakes in tooltip opzione; consumabili via cintura nella Action Zone; orda a token anonimi; rank-shift alla morte; R-099 flavor layer preservato.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. (2026-10-08) — PLAN-023 implementato e verificato live: cockpit 3-regioni zero-scroll, pipeline presented-vs-committed, canale danno duraturo, astrolabio docked+skip+speed, stakes tooltip+cintura consumabili, orda anonima+rank-shift, guida `quest_ui_component_guide.md`. Safeguards verdi (95/95 vitest scope, build:check, kanban:lint). Evidence: `test-results/r101-quest-cockpit-2026-10-08.log`. Contesto: dibattito multi-AI web convergente (run `20261007-quest-s1-lab-ui-redesign`, 3/3 ACCEPT su artifact-r004; r005 = revisione finale con decisioni Director D1–D3 ratificate). Piano esecutivo `plans/PLAN-023-quest-s1-lab-ui-redesign.md` (T-001..T-012). Decisioni chiave: skip manuale + pace control pre-check; stakes in tooltip opzione; consumabili via cintura nella Action Zone; orda a token anonimi; rank-shift alla morte; R-099 flavor layer preservato.
 **Collegamenti:** PLAN-023, PLAN-022 (quest goblin), PLAN-019 (S1), artifact `.mw/runs/20261007-quest-s1-lab-ui-redesign/` (repo mind-weaver), R-099 (flavor layer — `transit`/`flavor` consumati dal verdict card).
 
 ## R-102 — Loadout picker: scegliere dallo "stash" cosa portare in missione
 
 **Richiesta (verbatim):** *"Visto che abbiamo gli oggeti da poter potertare in missione, ci serve anche un picker x scegliere prima cosa portare dallo \"stash\" che già abbiamo"*
 **Data:** 2026-10-08
-**Stato:** `completata` (2026-10-08) — picker nella schermata preset, catalogo `questStash.ts` (Zod), `bagSlots: 3`, `createRun(..., loadout)`. Verificato live: cap a 3, toggle, cintura riflette la sacca. Contesto: nel lab S1 la goblin oggi concede i consumabili come flag hardcoded in `initQuest` (`hasBonusForza`, `hasBonusPerc`, `hasHealing`) — non esiste ancora uno stash formale né un passo di loadout. Esistono però due pool canonici da riusare: `questItems.ts` (MP-02, equipment+consumabili Zod) e `heroItems.ts` (`consumables.json`/`equippableItems.json`, inventario eroe persistente). Punti aperti: cosa è lo stash nel lab (mock pool vs config canonico), vincolo di capienza (slot/N item), dove vive il picker (schermata preset vs step dedicato), consumabili vs equipaggiamento per-membro.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. (2026-10-08) — picker nella schermata preset, catalogo `questStash.ts` (Zod), `bagSlots: 3`, `createRun(..., loadout)`. Verificato live: cap a 3, toggle, cintura riflette la sacca. Contesto: nel lab S1 la goblin oggi concede i consumabili come flag hardcoded in `initQuest` (`hasBonusForza`, `hasBonusPerc`, `hasHealing`) — non esiste ancora uno stash formale né un passo di loadout. Esistono però due pool canonici da riusare: `questItems.ts` (MP-02, equipment+consumabili Zod) e `heroItems.ts` (`consumables.json`/`equippableItems.json`, inventario eroe persistente). Punti aperti: cosa è lo stash nel lab (mock pool vs config canonico), vincolo di capienza (slot/N item), dove vive il picker (schermata preset vs step dedicato), consumabili vs equipaggiamento per-membro.
 **Collegamenti:** R-101 (cockpit lab — il picker si aggancia alla schermata preset/pre-partenza), R-089 (quest goblin), MP-02 (`questItems.schema.ts`), `useResidentHeroState` (inventario eroe persistente), `.mw/desiderata.md` S1/S2 (lo stash persistente vero è infrastruttura S2 — nel lab va bene un mock config-first).
 
 ---
@@ -2068,7 +2100,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"Proposte di miglioramento della quest da parte di chatGPT (la traduzione la aggiungiamo, ma facciamo italiano e basta x adesso). Sei un lead senior system designer di una softwarehouse AAA, fa una ricerca online approfondita, scrivine un documento su cosa vogliamo che questa Quest faccia, come che timing/pacing, psicologia per dare emozioni, ecc., poi prendi questa quest, giocala davvero, esaminala e fanne una critica spietata e costruttiva alla luce di tutte le informazioni che abbiamo, poi proponine uno a tua volta"* — seguito dal brief «Task: Improve "Sterminio dei goblin" — Narrative, Suspense & Emotional Rework» (struttura F0–F7, slot-targeting e F5 v2 invariati; alpha; niente overengineering; deliverable = proposta, non codice).
 **Data:** 2026-10-08
-**Stato:** `implementata (P0)` — documento `context/QUEST_GOBLIN_REWORK_PROPOSAL.md` (brief+ricerca, playtest col motore reale, critica alla quest e al brief, proposta P0/P1/P2, metriche emotive). P0 applicato 2026-10-08 a sole stringhe/pacing (zero RNG, zero calibrazione): albero al posto del masso per la scelta di osservazione (Director: «ti devi arrampicare su un albero»), mercanti al guado al posto del mugnaio (Director — la minaccia è sulla strada, come F7), indizio visivo del masso, assalto fisico F3, attack lines F4, righe di danno per gravità HP, fix F5-win che contraddiceva lo sterminio, cassa semibruciata F6 + righe-per-turno, sollievo→shock F7, epilogo con registro + callback al guado, transit hold ∝ parole (`transitMinMs/MaxMs/WordsPerSecond`). Decisioni Director 2026-10-08: F6 solo testo (no +gold su bigwin), agguato flat (no colpo posizionale), no morale (né meccanica né readout), chiusura con callback ok. Rimandati a P1: griglia F4 fase×banda, transit sullo stato, testo condizionato a flag, `options[].consequence`, metriche emotive M2/M6/M7/M8.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — documento `context/QUEST_GOBLIN_REWORK_PROPOSAL.md` (brief+ricerca, playtest col motore reale, critica alla quest e al brief, proposta P0/P1/P2, metriche emotive). P0 applicato 2026-10-08 a sole stringhe/pacing (zero RNG, zero calibrazione): albero al posto del masso per la scelta di osservazione (Director: «ti devi arrampicare su un albero»), mercanti al guado al posto del mugnaio (Director — la minaccia è sulla strada, come F7), indizio visivo del masso, assalto fisico F3, attack lines F4, righe di danno per gravità HP, fix F5-win che contraddiceva lo sterminio, cassa semibruciata F6 + righe-per-turno, sollievo→shock F7, epilogo con registro + callback al guado, transit hold ∝ parole (`transitMinMs/MaxMs/WordsPerSecond`). Decisioni Director 2026-10-08: F6 solo testo (no +gold su bigwin), agguato flat (no colpo posizionale), no morale (né meccanica né readout), chiusura con callback ok. Rimandati a P1: griglia F4 fase×banda, transit sullo stato, testo condizionato a flag, `options[].consequence`, metriche emotive M2/M6/M7/M8.
 **Collegamenti:** R-099 (flavor layer), R-096 (fun audit), R-097 (F5 v2, calibrazione MC da non toccare), PLAN-022, `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md`, `scripts/quest-goblin-playthrough.ts`.
 
 ---
@@ -2078,7 +2111,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"prendi il nostro lab http://localhost:5173/quest-s1-lab Sei un lead UI senior designer di una compagnia di videogame AAA, fa una ricerca online, dammi una critica spietata e costruttiva di questo componente. Poi proponi delle soluzioni a tua volta, cn esempi di codice, ecc. La nuova versione si deve rifare alla guida hud_component_guide.md"*
 **Data:** 2026-10-08
-**Stato:** `completata` (2026-10-08) — PLAN-024 eseguito (T-001..T-011). Lab restylato in Lacquer Atlas: `HudPlaque` hang/plinth, dipinto full-bleed, formazione su roster trusted, icone lucide, cronaca drawer locale, forecast→pill. Misure dopo: 0 letterali colore, 0 classi palette e 0 testo <12px nei file di scope, 315 `var(--skin-*)` nel DOM, 0px scroll @1366×768. Test 104/104, build:check, kanban:lint verdi. Evidence: `test-results/r104-quest-hud-restyle-2026-10-08.log`. Nota: il testo <12px residuo nel DOM sta dentro componenti trusted (roster compact 8-9px, sim preview) — contratto loro, non toccato qui.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. (2026-10-08) — PLAN-024 eseguito (T-001..T-011). Lab restylato in Lacquer Atlas: `HudPlaque` hang/plinth, dipinto full-bleed, formazione su roster trusted, icone lucide, cronaca drawer locale, forecast→pill. Misure dopo: 0 letterali colore, 0 classi palette e 0 testo <12px nei file di scope, 315 `var(--skin-*)` nel DOM, 0px scroll @1366×768. Test 104/104, build:check, kanban:lint verdi. Evidence: `test-results/r104-quest-hud-restyle-2026-10-08.log`. Nota: il testo <12px residuo nel DOM sta dentro componenti trusted (roster compact 8-9px, sim preview) — contratto loro, non toccato qui.
 **Collegamenti:** R-101 / PLAN-023 (cockpit — l'architettura resta, cambia il linguaggio visivo), R-102 (stash picker), `src/docs/docs/design/hud_component_guide.md`, `primitive_composition_rules.md`, `quest_ui_component_guide.md`, DESIGN_PILLARS Pillar 1 (frame come oggetto fisico), `tests/unit/idleVillage/hudGuards.test.ts`.
 
 ---
@@ -2101,7 +2135,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"La quest deve essere solo quel componente piccolino dove attualmente vive solo il testo e le scelte. rendilo trascinabile, chidubile, riducibile a icona (cm tutti gli altri componenti del progetto, tipo il roster). Ci serve: una theater con una immagine in "formato cinematografico" sopra le scelte, ma sotto il titolo, cn il flavour che sta sotto il titolo sopra l'immagine. A destra del titolo ci servono tutte le icone. Una delle icone deve essere quella del roster con il roster che attualmente è assegnato alla qeust. Sotto le scelte/pulsanti, ecc ci vuole una barra che poco alla volta si carica/riempie, a seconda del tempo trascorso rispetto a quando la quest è terminata. Sotto questa barra ci devono essere dei "riquadri" che si occupano di mostrare tutte le fai che hai già fatto + la successiva (solo icona e sotto eventualmente come è stata risolta, tooltip t dice "i log" [...])"* — poi: *"la voglio mostrata in /game , deve avere quel "linguaggio""*.
 **Data:** 2026-10-08
-**Stato:** `implementata (v1)` — `QuestRunWindow` (gameFrame) su `HudPlaque` + `useHudPanelDrag`, pannello `quest` nel registro (tasto Q, menu Pannelli), avvio dalla Regia («Avvia quest goblin»). Motore invariato (`useQuestRun` sopra `createRun`/`applyChoice`); registro per fase `questPhaseRecord.ts` da harms strutturati, non dal testo del log; `NODE_ART` spostato in `questS1Lab/questArt.ts`; config `gameFrameConfig.questWindow`. Aperti: la quest non parte ancora dal POI/assegnazione reale (solo Regia, party preset), niente cinematica astrolabio nella finestra, la barra segue il clock di gioco ma le fasi non sono ancora vincolate al tempo.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — `QuestRunWindow` (gameFrame) su `HudPlaque` + `useHudPanelDrag`, pannello `quest` nel registro (tasto Q, menu Pannelli), avvio dalla Regia («Avvia quest goblin»). Motore invariato (`useQuestRun` sopra `createRun`/`applyChoice`); registro per fase `questPhaseRecord.ts` da harms strutturati, non dal testo del log; `NODE_ART` spostato in `questS1Lab/questArt.ts`; config `gameFrameConfig.questWindow`. Aperti: la quest non parte ancora dal POI/assegnazione reale (solo Regia, party preset), niente cinematica astrolabio nella finestra, la barra segue il clock di gioco ma le fasi non sono ancora vincolate al tempo.
 **Iterazione 2 (2026-10-08):** *"l'immagine dovrebbe essere + "cinema" magari + bassa e + lunga? [...] quel pulsante Partire nn m piace. i pannelli fluttuanti devono stare sopra la HUD, nn sotto. fai una critica spietata [...] scena x scena, poi fa una ricerca online su come migliorarlo e fallo"* — theater 2.76:1 (Ultra Panavision) a 460px; scelte come lista di dialogo numerata (ruolo `data-skin="choice"` in skinScope.css, tasti 1–9), niente targa CTA; titolo/flavour come contenuto italiano (`GOBLIN_META`), didascalia senza ripetere il titolo; pip HP squadra nella pillola roster; riga tempo «Giorno x di y · Fase n di 8»; «Chiudi il rapporto» a fine run. Livelli: `zLayers.panels` 9→12 (sopra chrome/dressing) e fix in `useHudPanelDrag` (spargeva `zIndex: undefined` cancellando lo z di ogni pannello — Regia e Tuning inclusi).
 **Iterazione 3 (2026-10-08) — decisione Director:** *"Un solo componente."* → `QuestRunWindow` e `QuestTheatre` (PLAN-021, desiderata v27 FROZEN) convergono in **un unico componente** per la quest in corso su `/game` (direzione B dell'esplorazione: architettura teatro + contenuti/pezzi del lab). Poi: *"Cosa ti può 'aiutare' a capire come migliorare pacing e juice? Giochi tu una partita? vorrei anche solo piccole animazioni, tipo le bande nere che fanno diventare tutto + cinematografico, cose del genere"*. Fix bloccanti emersi (validi in qualunque architettura): consumabili spesi automaticamente (`useConsumable` default true), `verdictFlavor` mai mostrato, `lastEvent` duplicato di `body`/flavour, `transit` mai mostrato, run non persistente. Poi: *"procedi — usa le AI web per fare il plan"*. **Stato 2026-10-08:** T-000 fatto (no consumo automatico + `ConsumableBelt` con delta base→armato, cure/pozione usabili, verdetti con flavor, dedup, riepilogo check onesto sui danni `HARM`, **crash di /game corretto**: pedaggio d'esito che uccideva l'ultimo membro senza `wipe` → `reduce` su party vuoto). Piano `plans/PLAN-025-quest-theatre-convergence-cinema.md` v4 dopo 3 round di cold read web (chatgpt + claude; r3: MAJOR su punti di specifica / MINOR): frontiera v27 nel dominio prima del teatro; gate D-1…D-8 in attesa del Director (default conformi). Evidence: `test-results/r106-quest-window-fixes-2026-10-08.log`.
 **Collegamenti:** R-104 (lab restylato), R-101, `hud_component_guide.md`, `tests/unit/idleVillage/questPhaseRecord.test.ts`, `hudGuards.test.ts` (file aggiunto a STRICT_FILES), PLAN-021, `.mw/desiderata.md` v27.
@@ -2111,7 +2146,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"Adesso abbiamo una idea abbasta "valida" e raffinata e completa x decidere come deve essere un componente QUEST? Anche a livello di programmazione, logica, ecc. Xè vorrei avere un paio di POI che siano funzionanti, cn POI detail veri, ecc"* — poi *"procedi"* dopo la sintesi delle decisioni aperte.
 **Data:** 2026-10-09
-**Stato:** `in corso` — piano figlio S2 in scrittura (mw-planner)
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — piano figlio S2 in scrittura (mw-planner)
 **Desiderata FROZEN pertinente:** `.mw/desiderata.md` v24 (PLAN-019, stadio S2 «la quest vera»), v27 (QuestTheatre, semantica di frontiera — già implementata in `questRun.ts`).
 
 **Constatazione emersa in esplorazione (FACT):** su `/game` convivono due sistemi quest scollegati: `useQuestPoiSession` (POI→detail→assegnazione roster→quest vecchio modello blueprint+milestone) e `useQuestRun` (motore a grafo `questRun.ts` con frontiera v27, avviato solo dalla Regia). «POI veri» = il detail esistente che lancia il motore nuovo.
@@ -2154,7 +2190,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"https://chatgpt.com/share/6ac8a485-838c-83eb-84c4-861c9ce3e4fa — dobbiamo continuare questa conversaione qui. salva le rispsote delle altre AI in file separati, poi t aggiungo quelle mancanti, poi le elaboriamo tutte e continuiamo la conversazione"*
 **Data:** 2026-10-09
-**Stato:** `in corso` — raccolta risposte in corso.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — raccolta risposte in corso.
 
 **Contesto:** ChatGPT ha prodotto un research brief («Emotional Mechanics for RpgBalancer Quests»: meccaniche che producono emozioni — decisioni, incertezza, suspense, rimonta, rischio — senza affidarsi alla scrittura narrativa; benchmark RPS best-of-5; caso studio Sterminio dei Goblin; deliverable A–I con audit FACT del repo, catalogo primitive, 3 prototipi, piano di validazione). Il Director lo sta sottoponendo a 5 AI; protocollo: nessuna valutazione finché non arrivano tutte, poi analisi comparativa unica. Qui (Devin) il vantaggio è l'accesso al repository: le sezioni B (audit) e H (piano operativo) che le AI esterne non potevano fare sono verificabili come FACT.
 
@@ -2180,7 +2217,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"Approverei BE@6% come baseline sperimentale, non ancora come bilanciamento definitivo. Prima dell'implementazione farei una sola verifica aggiuntiva: la sweep della probabilità di bust tra 4% e 8%, mantenendo invariato il resto, per verificare che la scelta stop/continue rimanga significativa anche con party diversi. Poi procederei con le modifiche authored e i test di regressione elencati nel report §6, senza introdurre nuovi kind o ampliare il sistema generale. Un ultimo vincolo: il bust deve essere comprensibile nelle sue cause e conseguenze, ma non necessariamente prevedibile nel momento esatto in cui scatta. È questo equilibrio che può rendere la perdita dolorosa senza farla sembrare arbitraria."*
 **Data:** 2026-10-10
-**Stato:** `in corso` — sweep ramp 4–8% × party {default, weak, three, solo} in esecuzione; implementazione subordinata all'esito.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — sweep ramp 4–8% × party {default, weak, three, solo} in esecuzione; implementazione subordinata all'esito.
 
 **Decisione registrata:**
 - **BE@6%/turno** (trappola F6 indipendente dal verdetto, P = `exploreTurn × 6%`, bust perde solo la pila F6) = **baseline sperimentale**, non bilanciamento finale.
@@ -2297,7 +2335,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta:** il Director ha incollato in sessione un implementation plan completo per il sistema di generazione quest (pipeline Quest Intent → Blueprint → Scene Composition → World Instantiation → Narrative Briefs → Text Generation → Validation → Repair/Reject → Scenario Artifact → Runtime), fasi P0–P7 con gate, contratti componenti (core gimmick, scene archetype, domain kit, imprint, trait trigger/twist, narrative brief), strategia di test a 6 livelli, benchmark con 3 corpus, task T0–T7. Stato dichiarato: «Proposed, non ancora ratificato».
 **Data:** 2026-10-09 (data sessione; il documento incollato non ha data)
-**Stato:** `in corso` — cold read eseguita 2026-10-09; in attesa di decisione Director su ratifica/revisione.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — cold read eseguita 2026-10-09; in attesa di decisione Director su ratifica/revisione.
 
 **Cold read (2026-10-09):** `.mw/runs/20261009-quest-generation-plan-critique/` — plan.md + contract.md (v24+rev+§0 spec) + context.md. Web providers tutti in timeout (browser runner); API: codex rate-limited, groq 413, mistral 429, openrouter non utilizzabile. Un solo critico utile: **gemini → MAJOR REVISION** (6+ rilievi). Sintesi integrata con analisi agente in `synthesis.md`: 9 rilievi C1–C9, i principali = sequenza vs v24 (S5 si definisce dopo S4), vincoli canonici §0 mai importati nei contratti/gate, P7 gated su OPEN-016 (non eliminato: intento chain quest esiste in R-113), tratti inesistenti su `ResidentState`, artefatto da vincolare a `QuestScenarioSchema` fin da P1. Secondo parere esterno consigliato quando codex/chatgpt-web tornano disponibili.
 
@@ -2324,7 +2363,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta (verbatim):** *"Dovremo tradurre tutto / 75%, c pensiamo dopo, adesso vediamo cm viene / procedi"*
 **Data:** 2026-10-10
-**Stato:** `in corso` — decisioni registrate nei doc; contratti v0 prodotti.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — decisioni registrate nei doc; contratti v0 prodotti.
 
 **Decisioni registrate:**
 - **Traduzione:** tutto il testo generato va progettato traducibile (chiavi strutturate per nodo, no interpolazioni dipendenti dalla grammatica IT). Registrato in `QUEST_GENERATION_SPEC.md` §5 e `QUEST_GENERATION_CONTRACTS.md` §7.
@@ -2354,7 +2394,8 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"Creami un plan su come fare la pagina Steam: cosa mettere dove, ecc. noi abbiamo già molte csoe "utilizzabili", e dobbiamo anche decidere cosa scrivere, come, ecc. farlo in lingue diverse"*
 **Data:** 2026-10-09
-**Stato:** `aperta` — plan Proposed, non ratificato.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** copy Steam consegnato (R-145) + capsule — chiusa su ratifica Director. — plan Proposed, non ratificato.
 **Desiderata FROZEN:** nessuna corrispondente (business/marketing non coperto da `.mw/desiderata.md`).
 **Contesto dichiarato in chat (2026-10-09):** premium ~14.99 con sconto al lancio; obiettivo = reputazione; nessuna pagina Steam; nessuna scadenza; teaser = scene in-engine registrate e montate (R-072); poi demo Next Fest.
 **Artefatto:** `context/STEAM_PAGE_PLAN.md` — decisioni bloccanti D1–D6 (nome del gioco in testa), mappa della pagina, shot list, clip/GIF, bozze testi EN, tag, piano lingue (pagina vs gioco), fasi F0–F8, checklist.
@@ -2369,7 +2410,8 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (implicita nel flusso):** *"procedi"* dopo la chiusura di PLAN-025 — lo stadio S3 del macro plan Quest era il prossimo della sequenza ratificata v24 («Poi fare in modo di vedere anche la parte precedente: il planning, assegnare gli slot, ecc.»).
 **Data:** 2026-10-09
-**Stato:** `in corso` — plan **battezzato `active`** (Director 2026-10-09 «approvo»: D-S3-1/D-S3-3/draft persistente ratificati); cold read r1 groq MAJOR assorbita.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — plan **battezzato `active`** (Director 2026-10-09 «approvo»: D-S3-1/D-S3-3/draft persistente ratificati); cold read r1 groq MAJOR assorbita.
 **Desiderata FROZEN:** v23 (Mission Planner PARTY/LOADOUT/OUTCOME, BY MEMBER, WHY, delta, reversibilità esatta) + v24 (stadio S3; preview sui check certi, compound su ipotesi dichiarate).
 **Artefatto:** `plans/PLAN-019-S3-parte-precedente.md` — gap analysis vs S2.4, 3 decisioni di struttura (D-S3-1 detail=Planner / D-S3-2 MC non DP / D-S3-3 info secondaria), task T-0…T-6, gate del macro (trade-off reali, non-risolta-nel-planner, preview≡resolver, Director).
 **Collegamenti:** `plans/PLAN-019-quest-macro-plan.md` §S3, `plans/PLAN-018-mission-planner.md`, PLAN-019-S2.* (superficie ereditata), DECISION_LOG 2026-10-01.
@@ -2378,7 +2420,8 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"sulla pagina /game mi serve validare tutto il flow che parte da Roster alla fine della quest e ricevute ricompense e mandati i pg 'a casa', sparisce il POI. M serve un bel sistema che testi da playwright/pupeteer tutto il workflow, pezzo x pezzo e m controlli che tutto fili liscio, i controlli del tempo, accelerando, stoppando, ecc. la quest deve essere sterminion goblin in quella pagina"*
 **Data:** 2026-10-11
-**Stato:** `in corso`
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`.
 **Desiderata FROZEN:** nessuna nuova — estende la copertura E2E di PLAN-019-S2.4/S2.5 sulla superficie canonica.
 **Artefatto:** `tests/e2e/idleVillage/gameQuestLifecycle.spec.ts` — suite pezzo per pezzo: boot roster+POI → click sul marker reale → planning (gate «Invia», residente non eleggibile) → drag reale dal roster → forecast → lancio → POI `in_progress` → controlli tempo HUD (pausa/ripresa/×1/×4, un solo driver) → frontiera pending che matura sul clock canonico → esito terminale → settlement una volta sola (gold/xp/destini come dati) → PG rilasciati e ri-assegnabili → chiusura rapporto → POI sparisce → persistenza dopo reload.
 **Fix indotti dalla validazione:**
@@ -2417,7 +2460,8 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"procedi x il plan"* (dopo chiusura PLAN-019-S3, stadio successivo del roadmap v24 FROZEN)
 **Data:** 2026-10-10
-**Stato:** `in corso` — draft piano S4 in preparazione; battesimo Director pendente (incluse D-5 Gate B e destino superfici lab).
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — draft piano S4 in preparazione; battesimo Director pendente (incluse D-5 Gate B e destino superfici lab).
 **Collegamenti:** `plans/PLAN-019-quest-macro-plan.md` (§S4, gate a–d, artefatto «definizione di buona quest»), `plans/PLAN-019-S3-parte-precedente.md` (completed), `.mw/desiderata.md` v24.
 
 ## R-124 — /game: POI sempre in mappa + halo che nasce piena
@@ -2441,7 +2485,8 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim, voice-note):** *"questa missione può essere risolta usando come infiltrazione al posto di destrezza ad esempio la magia. Però all'interno sempre di questa quest ci saranno dei tiri che saranno comunque basati su destrezza perché rimarrà una quest basata sulla destrezza e che non ha a che fare con l'infiltrazione. Quindi che ne so, devi passare su un ponte traballante"* — *"io soprattutto stavo pensando di andare a toccare la core gimmick di quella quest"* — *"invece di risolvere la core gimmick dell'allarme che sale passando di soppiatto, ogni volta che c'è un tiro che dovrebbe far aumentare l'alarm in quel caso diventa su intelligenza tirando invisibilità o carisma tirando camuffamento. Però tutte le altre parti rimangono invariate [...] ce l'hai presente la quest che io ho fatto che è sul lo sterminio dei goblin ce l'hai in memoria"*
 **Data:** 2026-10-10
-**Stato:** `aperta` — proposta registrata; nessuna ratifica, nessuna implementazione autorizzata.
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — proposta registrata; nessuna ratifica, nessuna implementazione autorizzata.
 **Desiderata FROZEN:** nessuna corrispondente — candidata a livello generazione quest (S5 / OPEN-014 orbita).
 
 **Contenuto classificato:**
@@ -2457,7 +2502,8 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"prendi questo argomento, approfondiscilo, crea una documentazion/arricchisci quello che abbiamo: fa una ricerca mirata, dividilo in diversi argomenti di ricerca: usa le Ai web per fare una ricerca approfondita di ognuno di questi argomenti, salvali, creare un rapporto finale x ogni argomento. Poi un rapporto finale x tutti gli argomenti, cosa ahi trovato, cosa ci serve, cosa possiamo usare contestualizzato al nostro progetto: usa cappelli corretti, prompt potenziati, ecc"*
 **Data:** 2026-10-10
-**Stato:** `completata` — ricerca eseguita, rapporti prodotti, docs aggiornati; le proposte emerse restano non ratificate (OPEN-017 resta `open`).
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — ricerca eseguita, rapporti prodotti, docs aggiornati; le proposte emerse restano non ratificate (OPEN-017 resta `open`).
 
 **Contenuto classificato:**
 - **FACT (esecuzione):** 6 sotto-argomenti (precedenti, binding models, bilanciamento, UI/preview, psicologia, narrativa) → broadcast `mw-broadcast.py` su provider web con prompt potenziati + hat + ricerca propria di complemento. Copertura: deepseek 6/6, gemini 4/6, claude 1/6, grok 1/6; fallimenti registrati (chatgpt 6/6, claude 5/6 login/challenge, grok 5/6 stub). Evidenza in `.mw/runs/20261010-gimmick-channels-research/` (prompt + BROADCAST.md + report-t1..t6).
@@ -2533,7 +2579,8 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"fai cm reputi meglio"*
 **Data:** 2026-10-11
-**Stato:** `completata` — interpretata come delega a decidere sui punti lasciati al Director al termine di R-128 (binding model OPEN-017, gestione divergenza preview, avvio spec prototipo v0).
+**Stato:** `fatta`
+**Triage R-156 (2026-10-12):** chiusa `fatta` — evidenza in `context/request-triage-2026-10-12.md`. — interpretata come delega a decidere sui punti lasciati al Director al termine di R-128 (binding model OPEN-017, gestione divergenza preview, avvio spec prototipo v0).
 
 **Contenuto classificato:**
 - **DECISION (per delega, reversibile):** adottato il modello di binding research-backed → **lock di approccio a run-level, capability-gated dal party, con eccezioni a consumo**; roll per membro nominato; max 3 canali per check; menu multi-canale solo sui pivot check; canali bloccati greyed «Requires: …». OPEN-017 → `risolta`.
@@ -2626,7 +2673,7 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"deve essere tradotto anche quello"* (riferito al verdetto italiano «TRIONFO — Il sole stesso firma la tua impresa» visibile nel video astrolabio per la pagina Steam)
 **Data:** 2026-10-12
-**Stato:** `fatto`
+**Stato:** `fatta`
 
 **Scope:** `DestinyAstrolabe` (componente V1 canonico usato in `/game` via `MilestoneCheckModal` → `destinyAstrolabeKit`): titoli/sottotitoli verdetto (`VERDICT_TEXT` in engine.ts), chip `Ferito`/`Caduto`, `posZone`, result panel (`names`, `rRisk`, `rZone`), `stateChip` in markup.ts (+ sorgente `public/destiny-astrolabe.html`), chip `Difficoltà`/`Fortitudine`/`Morte`/`Ferita` in `PhaseCommentary`, narrator FERITA/MORTE, `SkillCheckLegend.tsx` completo, preset skill della pagina `/minimal-destiny-astrolabe` (nomi visibili nel badge del video). Poi ri-registrazione `media/astrolabe.mp4` via `record-astrolabe.mts`.
 
@@ -2664,6 +2711,30 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Safeguards:** playwright focused 3/3 (boot, planning click, lancio) con reveal da pulsante reale; lint scope 0 errori; kanban:lint PASS. Evidence: `test-results/r144-e2e-real-director-reveal-2026-10-12.log`.
 
+## R-145 — Steam: nuovo About copy Director (lore Solar Triumph, Trial of Fire, Astrolabe, roadmap EA) + short desc
+
+**Richiesta (verbatim):** *"About This Game (da incollare) […] Descrizione breve"* — il Director incolla il nuovo copy completo EN pronto per Steam (11 sezioni h2 + features + roadmap) e la short description.
+**Data:** 2026-10-12
+**Stato:** `fatta`
+
+**Scope:** `copy/en/about.bbcode` (verbatim Director), `copy/en/short-description.txt` (committed), traduzioni IT, `preview/index.html` EN+IT, re-audit `claim-ledger.md`.
+
+**Esito:** copy EN applicato verbatim; IT tradotto (about + short desc); preview EN/IT rispecchia il bbcode sezione per sezione. Re-audit ledger: **3 ex-vietato riammessi a committed-vision** perché ora dichiarati dal Director — «the world remembers» (h2 dedicato), «Astrolabe» come meccanica (h2+feature; il Director ha anche riscritto `destinyAstrolabe/engine.ts` a motore D100 — integrazione `/game` canonica ancora da confermare), «hundreds of hours» (numero non misurato, re-check alla demo). Nuovi claim registrati in §2: lore Solar Triumph/isola, scala di quest, Trial of Fire, multi-party→elite company, ondate+boss+fasi, EA post-demo, solo dev, modding esplorato, pausa.
+
+**Safeguards:** kanban:lint PASS; preview servita 200; file copy = solo testo/HTML (no build:check rilevante).
+
+## R-147 — Steam: arricchimento About copy (offerte, loop villaggio, GIF embedded)
+
+**Richiesta (verbatim):** *"fa una ricerca online: ci sn altre componenti core importanti che ci conviene sottolineare nella descrizione? ci stiamo scordando qualcosa?"* + *"procedi"*
+**Data:** 2026-10-12
+**Stato:** `fatta`
+
+**Ricerca:** confronto con Against the Storm e dotAGE + guide Steamworks. Gap trovati: loop villaggio momento-a-momento (assegnazione lavori — il "cosa fai tra spedizioni"), offerte che dichiarano i termini e scadono (il differenziale, sparito dal nuovo copy), GIF embedded nella About (best practice #1 di conversione), numeri di scala, feature Steam di piattaforma (achievements/cloud/deck — da decidere nei metadata).
+
+**Esito:** aggiunte al copy EN+IT e preview — h2 "Quests arrive as offers" (dopo l'intro), paragrafo loop villaggio in "A settlement that supports them", 2 bullet in Features (offerte + villaggio), 2 GIF embedded generate dai media esistenti (`about-anim-map.gif` 800px/2.4MB sotto l'intro, `about-anim-astrolabe.gif` 560px/8.1MB sotto la sezione Astrolabe). Tutti i nuovi claim sono `true-now` (offerte a finestra e assegnazione villici esistono in `/game`). ASSETS.md aggiornato. In sospeso per decisione Director: numero di scala quests, ruolo nominato del giocatore, feature Steam (achievements/deck).
+
+**Safeguards:** kanban:lint PASS; copy/HTML only.
+
 ## R-146 — Planner spedizione a regime HUD/Lacquer Atlas (HudPlaque, testo ≥12px, token puri, STRICT_FILES)
 **Data:** 2026-10-12
 **Stato:** `fatta`
@@ -2673,3 +2744,145 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Scope:** `QuestExpeditionDetail.tsx` convertito da `FloatingPanel` (cornice legacy border/bg Tailwind) al pattern canonico `HudPlaque` + `useHudPanelDrag` + `SkinScope` — stesso idioma di `QuestRunWindow`: drag handle sull'header, minimised → plaque `hang`, close `X`, zIndex `zLayers.panels`. Testo 10/11px → ≥12px; fallback hex `#7ed39a`/`#e07a7a` → `TONE.ok`/`TONE.danger`. `FloatingPanel` (condiviso da POI detail, MissionPlanner, MilestoneCheck, frozen kit) NON toccato. Aggiunto a `STRICT_FILES` dei guard HUD. Fix adiacenti per verde guard: `MapQuestPoi` fallback hex → token `--skin-status-unmet`/`--skin-surface-base`; `QuestRunWindow` skipAll 11→12px (l'hunk parallelo deathLines NON committato — lavoro R-135 in volo). Spec E2E: `assignViaRealDrag` auto-verificante (attende `getAssignments[slotId]===residentId`, retry una volta come farebbe un giocatore — fix flake drop-miss da reflow forecast) + `scrollbarGutter:'stable'` sul body planner. Guida E2E aggiornata (FloatingPanel→HudPlaque, helper table, finding clamp-bottom esteso a `useHudPanelDrag`).
 
 **Safeguards:** playwright lifecycle 13/13 verdi (4.4m, di cui 6/6 drag ripetuti); unit hudGuards 5/5; lint scope 0 errori; build:check PASS; kanban:lint PASS.
+
+---
+
+## R-157 — Trappole ricorrenti lette al momento del lavoro (pre-flight scoped, opzione 3)
+
+**Nota numerazione:** originariamente registrata come secondo «R-147» per collisione con la voce Steam — rinumerata R-157 nel triage R-156 (2026-10-12).
+
+**Data:** 2026-10-11
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v29 — 2026-10-11
+
+**Richiesta Director (verbatim):** *"esempio di errore ricorrente: ad esempio: + volte nella pagina /game la mappa continua a diventare troppo grande e l'HUD copre una parte di terrra, e nn dovrebbe. Poi aumenta il mare e appaiono delle linee tra il mare "vecchio" e quello nuovo."* — *"opzione 3, ma dobbiamo assicurarci che vengano lette e utilizzate, tipo preflight e cose del genere"*
+
+**Contesto:** audit degli artefatti RPG sulle domande "gli errori sono stati scritti? c'è ricorrenza?". Esito: attriti dispersi su `.mw/bugs/` (13), `.mw/observation.jsonl` (7, mai promossi), `pattern-candidate.md` in `.mw/runs/` (16), RICHIESTE — nessun registro ATTRITI locale, nessuna pipeline di promozione (`PROPOSALS.md` citato da learn ma assente). Evidenza chiave: `strokeLinecap` registrato 2 volte e reintrodotto in `PoiMatericV4` — scrivere non basta, serve un momento che interroga.
+
+**Cosa è successo:** creato `context/recurring-traps.md` — 7 trappole con ≥2 istanze documentate, taggate per superficie (T-01 map/HUD edge-pinning, T-02 stroke-linecap, T-03 hud-scope boundary, T-04 claim percettivi a occhio, T-05 rewrite-senza-desiderata, T-06 coverage sintesi-su-ledger, T-07 derivati visuali lifecycle). Trigger pre-flight aggiunto a `mw-executor` (step 5) e `mw-planner` (step 5) — le 4 copie (`coordinator/`, `.devin/`, `.windsurf/`, `.agents/` skills) sono hardlink dello stesso inode, aggiornate tutte. Voce in `context/INDEX.md`.
+
+**Nota aperta:** le «linee tra mare vecchio e nuovo» segnalate dal Director sono un possibile side-effect non ancora registrato dell'allargamento margini (`8254e8e1`) — da verificare e, se reale, aprire bug in `.mw/bugs/`.
+
+## R-150 — Steam About: bodyguard + achievements nel copy; ruolo «Hero» provvisorio; numero quest rimandato
+
+**Richiesta (verbatim):** *"riscrivi quella pagina cn queste modifiche — Numero: c pensiamo dopo · Ruolo per adesso Hero, poi vediamo ma lascia che è da decidere, c servirà cm reminder in futuro · achievements sicuramente · aggiungi bodyguard"*
+**Data:** 2026-10-12
+**Stato:** `fatta`
+
+**Esito:** about.bbcode EN/IT + preview aggiornati — clausola bodyguard nella sezione Astrolabe («assign a bodyguard to take the blows meant for someone else» / «assegna una guardia del corpo…»), bullet Features «Party roles that matter — a bodyguard can die in a hero's place» + «Steam Achievements»/«Obiettivi Steam». Reminder registrati in `ASSETS.md` §Manca: ruolo giocatore provvisorio «Hero» (da decidere), numero scala quest rimandato, achievements da abilitare in Steamworks, sysreq da misurare su build Tauri.
+
+**Safeguards:** copy/HTML only.
+
+## R-148 — /game: mappa troppo grande + HUD su terra + linee tra mare vecchio e nuovo
+
+**Richiesta (verbatim):** *"+ volte nella pagina /game la mappa continua a diventare troppo grande e l'HUD copre una parte di terrra, e nn dovrebbe. Poi aumenta il mare e appaiono delle linee tra il mare "vecchio" e quello nuovo. 1) scrivi una guida su come risolvere questa cosa 2) scrivi nella documentazione come dovrebbe essere quella schermata e come misurare che la HUD nn sia mai davanti alla mappa quando viene aperta 3) risolvi questo bug con bugfix 4) scrivi la documentazione 5) learn"*
+**Data:** 2026-10-11
+**Stato:** `fatta` — bugfix completo (`.mw/bugs/2026-10-11-game-map-fit-seams/`): coverage floor non batte più il fit ai viewport target (seaMargin 700/400→3600/1800 = mare aperto a nebbia), quad mare oltre i bound pan (niente sliver stageColor), minZoom solo sullo zoom utente, recenter resetta userMoved. Guida+contratto+misura: `src/docs/docs/design/game_map_fit_contract.md` (+ hook in `hud_component_guide.md` §9, probe `scripts/probe-game-map-fit.cjs`). T-01 aggiornata con la risoluzione. Verifiche: probe multi-viewport 0 violazioni chrome, 28/28 test scope, lint 0, build:check+kanban:lint PASS. Evidence: `test-results/r148-game-map-fit-seams-2026-10-11.log`.
+**Desiderata FROZEN:** nessuna nuova — bugfix sulla superficie canonica (ricorrenza della trappola T-01 in `context/recurring-traps.md`; segue R-121 in `.mw/bugs/2026-10-10-game-island-under-hud/`).
+**Bug dir:** `.mw/bugs/2026-10-11-game-map-fit-seams/`.
+
+## R-149 — Nuova core gimmick «meld» (XCOM): bonus a scadenza non dichiarata
+
+**Richiesta (verbatim):** *"un altra core gimmik che possiamo implementare è il meld di Xcom. Sai che qualcosa sta x scadere tra X turni nn dichiarati, hai un indicatore che t dice che potresti avere un bonus extra se sei veloce. Le opzioni delle varie fasi danno opzioni ad alto rischio morte/ferita ma che danno bonus su quel tracciato. Ci vuole anche un "indicatore" che fa capire "ultimo turno x raggiungerlo" aggiungilo alla documentazione e all'elenco di gimmik core"*
+**Data:** 2026-10-12
+**Stato:** `fatta` — registrata come `proposta` in documentazione e nel lab registry.
+
+**Cosa è successo:** gimmick `meld` aggiunta a `QUEST_LAB_GIMMICKS` (status `proposal` — vars `rotta`/`soglia`/`scadenza` con deadline nascosta a stati nominati «disponibile / ultima chiamata / scaduto», twist `doppio-meld`/`meld-presidiato`, generator `meldGimmick.ts` pianificato); `GimmickId`/`GIMMICK_IDS` estesi in `labModel.ts`. Documentata come sezione §17 in `QUEST_GENERATION_ARCHITECTURE.md`, nota nel roster gimmick in `QUEST_GENERATION_SPEC.md` §3.1 e nel catalogo di `QUEST_GENERATION_CONTRACTS.md` §9. Per il `GimmickRegistry` operativo (PLAN-029) resta oltre il cap v1 di 2 righe — candidata per «gimmick extra» v1.1. Punto aperto registrato: verificare in playtest che la deadline nascosta produca pressione e non frustrazione (equità retrospettiva R-108).
+
+**Safeguards:** unit `questGenLab` 10/10; lint scope 0 errori; build:check PASS; kanban:lint PASS.
+
+## R-151 — Gimmick di fase «mimic» + censimento delle meccaniche core/fase mancanti
+
+**Richiesta (verbatim):** *"nella creazione di quest, fasi, ecc. Dobbiamo aggiungere anche il mimic. arrivi al tesoro, check nascosto di percezione, se fallisci perdi HP e combattimento extra. Se hai successo nn perdi HP, il combattimento dura poco (attacchi tu a sorpresa il mimic) ma nn c'è reward. Che altre meccaniche di Core Gimmik potremmo aggiungere che ancora nn abbiamo descritto? fa una ricerac approfondita online e dimmi cosa nn abbiamo ancora implemnetato. E x le gimmik da fase, tipo questa del mimic cosa stiamo scordando?"*
+**Data:** 2026-10-11
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna nuova — esplorazione di design dentro il framework di generazione quest (PROPOSAL: `context/QUEST_GENERATION_ARCHITECTURE.md`, `QUEST_GENERATION_SPEC.md`, `QUEST_GENERATION_CONTRACTS.md`).
+
+**Esplorazione:** gap map consegnata in sessione — (a) il mimic non è una core gimmick ma una nuova **categoria di nodo**: evento nascosto senza scelta (il catalogo DecisionFamily oggi copre solo scene con scelta); (b) tensione con l'attribuzione P6/P13/P36 — check nascosto che costa HP = «tassa RNG» senza indizi leggibili (canale esploratore QUEST_RULES §2, trait prudente, clue layer); (c) candidati core gimmick da ricerca: preda/cacciato, scorta VIP, difesa a ondate, rituale che potenzia il boss, cargo volatile, corruzione di un membro, indagine con sospetto; (d) famiglie di fase mancanti: ricompensa ingannevole (mimic/loot maledetto/piedistallo/trappola), curio layer DD (strumento-vs-rischio), campo notturno, incontri neutrali, ferito a terra, male-minore, boon faustiano, stanza «?», luce/rumore come risorsa, inganno deliberato da agente.
+
+**Direttive Director (2026-10-11) e risultato:** reskin ok ma non conta come vera varietà (registrato ARCHITECTURE §18.4 + open issue `variety-not-reskin`); curio layer scartato → REJ-008 in `context/REJECTED.md`; incontri neutrali = scena minore, non famiglia; famiglie E registrate come scoperte non adottate (CONTRACTS §15.1); combat con props/boss a stadi = candidato da progettare a parte. **Procedi su hiddenCheck:** regola «nascosto prima, rivelato sempre dopo — il perché non si nasconde mai» registrata `vigente` in `QUEST_RULES.md` §3; contratto v0 `HazardNode`/`hiddenCheck` in `QUEST_GENERATION_CONTRACTS.md` §15; sezione §18 in `QUEST_GENERATION_ARCHITECTURE.md`; meccanica `hidden-check` + open issue `hazard-node-runtime` in `labRegistry.ts`.
+
+## R-152 — Compilazione imprint→grafo: IMPR-002 come quest vera (chain-ready)
+
+**Richiesta (verbatim):** *"procedi"* (su proposta explorer 2026-10-12: «scrivere la compilazione imprint→grafo — le function spec diventano nodi con gate/vars — partendo da IMPR-002 che è il più ricco»; contesto: gli imprint `QUEST_IMPRINTS.md` sono scheletri narrativi senza layer meccanico, la pipeline narrata `questNarrate.mts` narra solo scheletri generati, e la decisione Director era di farne chain quest anziché quest singole).
+**Data:** 2026-10-12
+**Stato:** `fatta`
+**Desiderata FROZEN:** compilare IMPR-002 «Il compagno che ride» in un grafo meccanico reale (`QuestScenario` authored): le function spec dei beat B0–B6 diventano nodi/vars/gate/check; i ponti di chain (B5 «chi ha mosso la posta», B6 entità calde) restano espliciti come hook; il risultato deve essere narrabile dalla pipeline esistente e coerente con `QUEST_RULES.md` (niente single-check, check nascosti rivelati dopo, TAKEN≠SECURED).
+
+**Risultato (2026-10-12):** `gen-impr002-palude` «The Lock-Keeper's Bargemen» nel GENERATED_CATALOG (`generation/impr002Palude.ts`) — 26 nodi: fork B0 accetta/rifiuta l'aiuto, B2 tre canali crack one-shot su var `sospetto` (+`fiuto-prudente` armRoll trait-gated), B3 turn router dichiarativo su stato post-effetto (`pronti`/`sospetto≥2`/`annusati`/blind), B4 fork forza/sorpresa/fuga/recita (bluff fallito → `smascherati`, l'opzione sparisce), B5 `posta-mossa` su ogni verdetto della cassa (+`depositario-traccia` = seme chain), B6 `a-consegnato`/`a-fuggito`/`a-padrone`/`soci-*` come flag per il mondo. Delta motore: `CombatSpec` copy dichiarativa opzionale (enemyName/attackLines/clearedText/survivorsText/holdingText — fallback goblin). Lab: `imprintCatalogEntries()` per la provenance `gen-<imprint>-<dominio>`. Docs: contratto di compilazione in `context/QUEST_IMPRINTS.md`, meccanica `imprint-compilation` in labRegistry, PLAN-026 T8. Test 16/16 + questGenLab 10/10. Chain-ready, non chain-executed (M-02 gated).
+
+---
+
+## R-153 — Ingestion documentale delle idee GPT sul layer delle opportunità delle quest
+
+**Richiesta (verbatim):** *"le cose che ho scritto nel msg sn da una discussione cn GPT, cn cui ho palrato delle cose d cui ho scritto. quelle informazioni idee, ecc devono essere opportunatmente documentate in documenti corretti, eventualmente linkate ad altri documenti, creiamo documenti nuovi, ecc. ci dovrebbero essere idee corrette, interessanti, che approfondiscono, ecc. Se c sn ambiguità chiedi"*
+**Data:** 2026-10-11
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna nuova — materiale di esplorazione design. Classificazione concordata col Director in sessione: **tutto PROPOSAL** (coerente coi precedenti: anche direttive esplicite restano candidati finché non ratificati in regole/desiderata).
+**Sorgente:** sintesi del Director di una discussione con ChatGPT sulle meccaniche RPG Balancer — approcci multipli alle quest, grafo delle opportunità/famiglie, sistema temporale, skill e ricompense che cambiano le regole, perimetro del primo test, crescita del villaggio, risorse, memoria. Esclusi pagina Steam e proiezioni commerciali su richiesta.
+
+**Cosa è successo:**
+- Ingestion report con Extraction Ledger E-01..E-22: `context/ingestions/2026-10-11-quest-opportunity-layer.md`.
+- Doc nuovo dedicato **PROPOSAL** `context/QUEST_OPPORTUNITY_LAYER.md` — il layer sopra le quest: grafo delle opportunità (convergenza/divergenza, archi di sblocco persistenti), famiglie di quest (meccanica riconoscibile vs soluzioni compatibili), tassonomia requisiti a 4 tipi, ricompense-porta a 8 categorie, capacità che cambiano le regole, esploratore orientabile, tempo a 3 concetti (durata/scadenza/**finestra**), crescita villaggio a 3 dimensioni (visibilità/capacità/capacità operativa), risorsa informativa trasversale, perimetro primo test senza combattimento.
+- Decisione di collocazione: separato il layer *sopra* le quest (doc nuovo) dal layer *dentro* la quest (docs di generazione esistenti) — gli argomenti multi-approccio erano già coperti dai canali §7; restano solo deepening registrati in SPEC §3.1.
+- `QUEST_RULES.md` §9: riga `proposta` per tassonomia requisiti/preparazione e ricompense-porta.
+- `context/QUEST_GENERATION_SPEC.md`: `related` aggiornato, nota §3.1 (canale ≠ solo stat diversa), §8 + finestra di opportunità, §11 puntatore al layer.
+- `context/OPEN.md`: **OPEN-019** (modello grafo opportunità), **OPEN-020** (tassonomia requisiti/preparazione), **OPEN-021** (orientamento esploratore + risorsa trasversale).
+- Tensione nominata (non conflitto): «più party in parallelo» vs regola leader-capacity (OPEN-010) — da conciliare in ratifica economia-villaggio.
+- INDEX aggiornato.
+
+---
+
+## R-154 — Ricerca approfondita multi-AI web sui temi del layer opportunità
+
+**Richiesta (verbatim):** *"fa una ricerca approfondita su ognuno di questi argomenti, usa le ai web x fare la stesa ricerca approfondita per trovare il modo migliore x risolvere o migliorare qeuste idee, poi salva tutto in file separati e dammi un riassunto finale d tutto quello che abbiamo trovato d rilevante"*
+**Data:** 2026-10-11
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna nuova — ricerca di supporto alle PROPOSAL di `context/QUEST_OPPORTUNITY_LAYER.md` (OPEN-019/020/021). Workflow replicato da R-128 (`20261010-gimmick-channels-research`): prompt per sotto-argomento → `mw-broadcast --web` → report sintetizzato con fonti.
+
+**Sotto-argomenti (7):** T1 grafo delle opportunità e precedenti di strutture a nodi; T2 famiglie di quest come kit meccanici; T3 tassonomia requisiti e gate morbidi/duri; T4 ricompense che aprono porte e capacità che cambiano le regole; T5 orientamento della generazione e informazione come risorsa; T6 tempo, finestre di opportunità e attività concorrenti; T7 metodologia per prototipare il meta-layer senza combattimento.
+
+**Output:** `.mw/runs/20261011-opportunity-layer-research/` — prompt, BROADCAST per provider e `report-tN-*.md` per argomento + sintesi finale.
+
+---
+
+## R-155 — Foresta a occidente troppo scura per colpa del filtro ondeggiante (ricostruita)
+
+**Richiesta (verbatim ricostruito):** *"la foresta a occidente è troppo scura, x colpa del filtro che la fa ondeggiare, deve tornare + chiara"* — **ricostruzione del Director 2026-10-12**; il verbatim originale è andato perso: inviato a una sessione morta in partenza (2 stub vuoti creati 2026-10-11 ~20:22:43, `early-ricotta`/`nonchalant-honesty`), mai persistita in nessun DB locale né nel batch R-129→R-151. Investigazione completa in sessione `e0f2db06` (2026-10-11).
+**Data:** ~2026-10-11 (originale), registrata 2026-10-12
+**Stato:** `fatta`
+**Chiusa 2026-10-12:** `UNDERSTORY` 0.78→1.0 in `scripts/build-canopy.py` + asset rigenerati — understory rivelato dallo sway era -22% lum; ora ~dipinto (Δlum 7-21 → 0.8-3). Sway invariato. Kanban R-155, evidence `test-results/r155-forest-understory-2026-10-12.log`.
+**Desiderata FROZEN:** la regione foresta a ovest della mappa `/game` deve tornare alla luminosità dell'art originale — il filtro/effetto che la fa ondeggiare la scurisce (verosimilmente displacement/tint sul layer foresta in `WorldSurfacePixiOverlay` o config `worldSurfaceConfig`). Verificare che il fix non rompa l'animazione di vento dove desiderata.
+
+---
+
+## R-156 — Recovery sistematica delle richieste perse (triage + mining + igiene)
+
+**Richiesta (verbatim):** *"scrivimi tutte le richieste che ti ho fatto in questa conversazione e come e se sn risolte, dovrebbero essere tipo 15"* → *"alcune si sn perse e nn so come recuperarle"* → *"procedi con tutte una alla volta"*
+**Data:** 2026-10-12
+**Stato:** `in corso`
+**Desiderata FROZEN:** (a) triage delle ~75 voci non-`fatta` di RICHIESTE.md → classificate fatto-non-chiuso / aperto / obsoleto; (b) mining delle history/DB sessioni per richieste mai loggate; (c) normalizzazione tassonomia stati (`aperta`/`in corso`/`fatta`/`archiviata`) e aggiornamento ledger.
+
+**Esiti intermedi:**
+- La richiesta «foresta scura» è stata **recuperata dal ricordo del Director** (→ R-155): l'investigazione del 2026-10-11 (sessione `e0f2db06`) aveva confermato che il messaggio non fu mai ricevuto — inviato a una sessione morta in partenza. Tutte le altre richieste del batch sono già verbatim in RICHIESTE.md; la conversazione "persa" (`chambray-archeology`) è solo **archiviata** — i messaggi restano visibili riaprendola dalla UI.
+- Store dei messaggi: sessioni `devin-cli` persistono `user_message` in `~/Library/Application Support/Devin/User/acp-messages/<uuid>.db`; le conversazioni Desktop tengono i prompt solo server-side (visibili in UI). Summaries in `~/.local/share/devin/cli/summaries/history_*.md` (~930 file).
+
+---
+
+## R-157 — Aggiungere Mount & Blade e Battle Brothers alle ispirazioni
+
+**Richiesta (verbatim):** *"aggiungi tra le ispirazioni d questo gioco anche mount and blade (mappa/parte gestionale) e battle brothers (sempre mappa/parte gestionale)"*
+**Data:** 2026-10-11
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna nuova — aggiornamento delle fonti d'ispirazione in `DESIGN_PILLARS.md` (direzione, non vincolo). Scope dichiarato dal Director: **mappa / parte gestionale**.
+**Cosa è successo:** aggiunto **Pillar 4** in `DESIGN_PILLARS.md` §1 (Mount & Blade + Battle Brothers come riferimento per mappa strategica e layer gestionale); header/versione e tabella di sintesi §2 allineati.
+
+---
+
+## R-158 — Mappa concettuale dei competitor della nicchia (titoli simili, posizionamento, prezzi)
+
+**Richiesta (verbatim):** *"dobbiamo capire gli altri giochi simili che fanno parte della stessa nicchia, cerchiamo d capire come e xè c differenziamo dagli altri, che errori hanno fatto e che cosa hanno fatto bene i nostri competitor. [...] aggiungi altri titoli simili, facciamo una bella ricerca e cerchiamo d fare una mappa concettuale d queste informazioni, anche cercando di capire cm siamo posizionati. Ovviamente c serve anche il prezzo a cui vengon venduti sia al max che 'normalmente' cn gli sconti"*
+**Data:** 2026-10-11
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna — layer di direzione pre-desiderata (strategist). Output atteso: documento di analisi competitiva con lista estesa titoli, prezzi listino/scontati, punti di forza/errori, mappa concettuale e posizionamento di RPG Balancer.
+**Contesto:** il Director ha fornito una lista iniziale da una ricerca ChatGPT: Super Fantasy Kingdom, A Hero's Rest, Fort Triumph, Crown of Greed, Majesty, dotAGE.
