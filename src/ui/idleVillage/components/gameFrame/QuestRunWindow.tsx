@@ -627,10 +627,14 @@ const Popover: React.FC<{ onDismiss: () => void; children: React.ReactNode }> = 
     <div
       ref={ref}
       style={{
+        /* R-133: the popover hangs off the window's left edge — beside the
+         * quest, not over it (the party list must not cover the theater). */
         position: 'absolute',
         top: 44,
-        right: 12,
-        left: 12,
+        right: 'calc(100% + 10px)',
+        width: 300,
+        maxHeight: 'calc(100vh - 180px)',
+        overflowY: 'auto',
         zIndex: 2,
         display: 'flex',
         flexDirection: 'column',
