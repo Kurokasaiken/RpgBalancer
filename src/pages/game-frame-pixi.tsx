@@ -393,13 +393,14 @@ export default function GameFramePixiPage() {
 
   const anchors = useMemo<PixiMapAnchor[]>(() => {
     const list: PixiMapAnchor[] = [];
-    const anchored = new Set<string>();
-    /* Real quest POIs (S2.4 + R-127): the medallion is the planning entry and,
-     *  once launched, the run's halo clock. Nothing pins at boot — a marker
-     *  mounts only while the Director reveals it («Mostra quest» shows the
-     *  real offers/runs, «POI types» the family exemplars below); an offer
-     *  past its window with no run leaves the map. Every exit plays through
-     *  `anchorsWithGhosts` instead of popping off. */
+    /* Real quest POIs (S2.4 + R-127/R-143): the medallion is the planning
+     *  entry and, once launched, the run's halo clock. Nothing pins at boot —
+     *  a marker mounts only while «Mostra quest» reveals the real offers/runs;
+     *  an offer past its window with no run leaves the map. Every exit plays
+     *  through `anchorsWithGhosts` instead of popping off. A quest marker is
+     *  NEVER a demo exemplar: the goblin/rovine POI is real content A→Z, the
+     *  «POI types» family review keeps only the types that have no real
+     *  content yet (job/event). */
     for (const exp of expeditions) {
       const p = exp.poi;
       const avail = offerAvailability(p);
@@ -407,7 +408,6 @@ export default function GameFramePixiPage() {
        *  the POI was already consumed — D-S4-6 migration honesty). */
       if (isPoiConsumed(p, consumedPoiIds)) continue;
       if (!questShown || (!exp.run && avail.state === 'expired')) continue;
-      anchored.add(p.id);
       list.push({
         id: p.id,
         x: p.x,
@@ -416,21 +416,6 @@ export default function GameFramePixiPage() {
       });
     }
     if (poiDemo) {
-      /* The quest exemplar is the real goblin offer — the Director's family
-       *  review shows the marker actually in play, at its authored spot, not a
-       *  dummy. Job and event stay static until those systems exist. */
-      if (!anchored.has(poiGoblin.id) && !isPoiConsumed(poiGoblin, consumedPoiIds)) {
-        const avail = offerAvailability(poiGoblin);
-        if (expeditionGoblin.run || avail.state !== 'expired') {
-          anchored.add(poiGoblin.id);
-          list.push({
-            id: poiGoblin.id,
-            x: poiGoblin.x,
-            y: poiGoblin.y,
-            node: <MapQuestPoi session={expeditionGoblin.poiView} sizePx={poiGoblin.sizePx} availability={avail} />,
-          });
-        }
-      }
       // Job and event exemplars in different territories (canvas 4240 x 2828): southern forest, northern forest.
       const demos = [
         { type: 'job', x: 0.38, y: 0.66 },
@@ -500,6 +485,16 @@ export default function GameFramePixiPage() {
         },
       },
       {
+        /* R-143: the ONLY UI reveal of the REAL quest offers (goblin + rovine)
+         *  — a quest marker is never a demo exemplar. Restored after R-131:
+         *  «POI types» keeps the fake job/event family, this toggle gates the
+         *  real thing end-to-end (offer → detail → run → settle → consumed). */
+        id: 'quest',
+        label: t('gameFrame.director.quest'),
+        active: questShown,
+        onTrigger: () => setQuestShown((shown) => !shown),
+      },
+      {
         id: 'questRun',
         label: t('gameFrame.director.questRun'),
         active: !!questRun.run && !questRun.run.ended,
@@ -532,7 +527,7 @@ export default function GameFramePixiPage() {
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin],
+    [invasion, questShown, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin],
   );
 
   return (

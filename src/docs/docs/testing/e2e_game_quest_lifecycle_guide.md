@@ -89,13 +89,15 @@ getClock() -> { currentTick, isPaused, speedMultiplier }
 revealQuestPois()                                // R-124: = Director «Mostra quest» → i marker compaiono
 ```
 
-> **R-124/R-129/R-131 — nessun POI in mappa al boot.** Gli anchor expedition
-> sono gated su `questShown` (R-131: il toggle Director «Mostra quest» è stato
-> rimosso — il reveal resta SOLO l'hook E2E, lo stesso usato sotto `?capture=1`)
-> o su `poiDemo` («POI types») per l'esemplare goblin. Ogni test che vuole il
-> marker chiama prima `revealQuestPois(page)`. Al reveal l'offerta fresca ha
-> halo **vuota** (si riempie solo con `activityProgress` della run); in
-> finestra `expiring` l'anello è ambra warn e scarica antiorario.
+> **R-124/R-129/R-131/R-143 — nessun POI in mappa al boot.** Gli anchor
+> expedition sono gated su `questShown`. **R-143: «Mostra quest» è tornata nel
+> Director** — è l'unico gate UI dei POI reali (goblin + rovine); un marker
+> quest NON è mai un esemplare demo («POI types»/`poiDemo` mostra solo i finti
+> job/event, i tipi senza contenuto reale). L'hook `revealQuestPois` resta per
+> `?capture=1` dove il Director è nascosto; il test Director rivela dal vero
+> pulsante `[data-action-id="quest"]`. Al reveal l'offerta fresca ha halo
+> **vuota** (si riempie solo con `activityProgress` della run); in finestra
+> `expiring` l'anello è ambra warn e scarica antiorario.
 
 ### Selettori stabili (contratto test↔UI)
 
