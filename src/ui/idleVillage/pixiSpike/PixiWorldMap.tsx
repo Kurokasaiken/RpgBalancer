@@ -313,6 +313,9 @@ const DEEP_SEA_COLOR = '#215c70';
 const DEEP_SEA_FOG = '#16394a';
 /** Width (world px) of the fade inside the canvas where the deep sea meets the painted sea. */
 const DEEP_SEA_BAND_PX = 420;
+/** Extra sea the deep-sea and pattern quads draw past the camera's reach (±margin): the quads'
+ * far edge stays off-screen in every camera state, so the stage colour can never leak a line. */
+const SEA_QUAD_PAD = 1600;
 /** Cloud layers (far, mid, near): how much further than the ground each slides when the camera pans. */
 const CLOUD_PARALLAX = [0.1, 0.22, 0.4] as const;
 /** Village roofs where smoke rises (world px), puffs per chimney, and a puff's life. */
@@ -605,10 +608,12 @@ export function PixiWorldMap({
         const edge = seaTexture as Texture;
         const deepSeaMask = await load('/assets/atmosphere/terrain/sea_mask.webp');
         edge.source.style.addressMode = 'clamp-to-edge';
-        const extX = -margin;
-        const extY = -marginY;
-        const extW = canvas.width + 2 * margin;
-        const extH = canvas.height + 2 * marginY;
+        // Reach past the pan bounds (±margin): the quad edge is fog-flat and unreachable,
+        // so the stage colour can never draw a bright line at the screen border.
+        const extX = -margin - SEA_QUAD_PAD;
+        const extY = -marginY - SEA_QUAD_PAD;
+        const extW = canvas.width + 2 * (margin + SEA_QUAD_PAD);
+        const extH = canvas.height + 2 * (marginY + SEA_QUAD_PAD);
         const shader = Shader.from({
           gl: { vertex: VERT, fragment: DEEP_SEA_FRAG },
           resources: {
@@ -628,7 +633,8 @@ export function PixiWorldMap({
         const deepSea = new Mesh({ geometry: quad(extW, extH), shader });
         deepSea.position.set(extX, extY);
         world.addChild(deepSea);
-        seaSprites.push(deepSea);
+        // NOT in seaSprites: the drag reveal only thins the painted sea (shallow water);
+        // the deep margin stays opaque — and the capped seabed below has nothing to show out there.
         ticks.push((t) => {
           shader.resources.u.uniforms.uTime = reducedMotion ? 0 : t;
         });
@@ -642,10 +648,15 @@ export function PixiWorldMap({
       let seabedShift: (panX: number, panY: number, viewW: number, viewH: number) => void = () => {};
       if (fxOn.seabed && seabed && seabed.opacity > 0 && seaSprites.length > 0) {
         const pad = 420;
-        const extX = -margin - pad;
-        const extY = -marginY - pad;
-        const extW = canvas.width + 2 * (margin + pad);
-        const extH = canvas.height + 2 * (marginY + pad);
+        // Shallow-water effect: the bed only needs to reach a little past the painted shore.
+        // Capped so the ruins and chests keep their scale no matter how wide the open sea grows —
+        // and the deep margin above stays opaque anyway (the reveal only thins the painted sea).
+        const bedMarginX = Math.min(margin, 700);
+        const bedMarginY = Math.min(marginY, 400);
+        const extX = -bedMarginX - pad;
+        const extY = -bedMarginY - pad;
+        const extW = canvas.width + 2 * (bedMarginX + pad);
+        const extH = canvas.height + 2 * (bedMarginY + pad);
         const texW = Math.min(2048, Math.round(extW / 2));
         const art = createSeabedArt(texW, Math.round((texW * extH) / extW));
         const glintCanvas = document.createElement('canvas');
@@ -847,7 +858,8 @@ export function PixiWorldMap({
             u: {
               uTime: { value: 0, type: 'f32' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
-              uExtent: { value: new Float32Array([-margin, -marginY, canvas.width + 2 * margin, canvas.height + 2 * marginY]), type: 'vec4<f32>' },
+              // Same reach as the deep-sea quad (SEA_QUAD_PAD past the pan bounds).
+              uExtent: { value: new Float32Array([-margin - SEA_QUAD_PAD, -marginY - SEA_QUAD_PAD, canvas.width + 2 * (margin + SEA_QUAD_PAD), canvas.height + 2 * (marginY + SEA_QUAD_PAD)]), type: 'vec4<f32>' },
               uPatternScale: { value: seaPatternConfig.patternScale, type: 'f32' },
               uLineOpacity: { value: seaPatternConfig.lineOpacity, type: 'f32' },
               uLineColor: { value: hexToRgb01(seaPatternConfig.lineColor), type: 'vec3<f32>' },
@@ -858,9 +870,9 @@ export function PixiWorldMap({
             },
           },
         });
-        const seaQuad = quad(canvas.width + 2 * margin, canvas.height + 2 * marginY);
+        const seaQuad = quad(canvas.width + 2 * (margin + SEA_QUAD_PAD), canvas.height + 2 * (marginY + SEA_QUAD_PAD));
         const seaMesh = new Mesh({ geometry: seaQuad, shader });
-        seaMesh.position.set(-margin, -marginY);
+        seaMesh.position.set(-margin - SEA_QUAD_PAD, -marginY - SEA_QUAD_PAD);
         world.addChild(seaMesh);
         ticks.push((t) => {
           shader.resources.u.uniforms.uTime = t;
@@ -1258,8 +1270,14 @@ export function PixiWorldMap({
 
       // ── Camera: safe-fit like the DOM kit, pan bounded to canvas ± sea margin ──
       const cam = { panX: 0, panY: 0, zoom: 1 };
+      // Coverage floor only: the viewport must stay inside the sea the camera can reach
+      // (canvas + margins). It is NOT the content floor — refit() picks the resting zoom
+      // and the margins are wide enough that this only binds at extreme aspect ratios.
       const floorZoom = () =>
         Math.max(app.screen.width / (canvas.width + 2 * margin), app.screen.height / (canvas.height + 2 * marginY));
+      // For the user's own zoom-out the manifest's minZoom also applies (readability floor):
+      // stricter than coverage, but only on wheel — the fit must be free to go lower.
+      const userFloor = () => Math.max(floorZoom(), cameraConfig.minZoom ?? 0);
       const apply = () => {
         cam.zoom = Math.min(cameraConfig.maxZoom, Math.max(floorZoom(), cam.zoom));
         const visW = app.screen.width / cam.zoom;
@@ -1301,7 +1319,13 @@ export function PixiWorldMap({
         apply();
       };
       refit();
-      refitRef.current = refit;
+      // Recentering restores the resting contract: clear userMoved so later resizes refit
+      // instead of only re-clamping a stale user camera (userMoved is declared below —
+      // the closure assigns it at call time, after declaration).
+      refitRef.current = () => {
+        userMoved = false;
+        refit();
+      };
       // Glide to a world point, centred in the free area; zooms in a little when the map is at its widest.
       let glide = 0;
       focusRef.current = (wx, wy) => {
@@ -1601,7 +1625,7 @@ export function PixiWorldMap({
         const wx = cam.panX + sx / cam.zoom;
         const wy = cam.panY + sy / cam.zoom;
         cam.zoom *= e.deltaY < 0 ? 1.1 : 1 / 1.1;
-        cam.zoom = Math.min(cameraConfig.maxZoom, Math.max(floorZoom(), cam.zoom));
+        cam.zoom = Math.min(cameraConfig.maxZoom, Math.max(userFloor(), cam.zoom));
         cam.panX = wx - sx / cam.zoom;
         cam.panY = wy - sy / cam.zoom;
         userMoved = true;

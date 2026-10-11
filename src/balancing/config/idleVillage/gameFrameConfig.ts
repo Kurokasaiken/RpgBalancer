@@ -450,9 +450,13 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
       // Fixed chrome. Top: resources plaque 79 px + 8. Bottom: nav plinth 77 px + 23 (islands sit just above the nav).
       // /game adds the open roster / ledger widths left and right, so the land is framed between them.
       insets: { top: 87, bottom: 100 },
-      // Mirrored sea all round: room to zoom out until the island sits between the open side panels.
-      seaMarginPx: 700,
-      seaMarginYPx: 400,
+      // Open sea all round: how far the camera may travel past the painted canvas. The deep-sea
+      // shader fades to a flat fog ~1700 world px out, so this reach reads as open ocean, not as a
+      // repeated texture. It must stay wide enough that the coverage floor (viewport must fit inside
+      // canvas + 2*margin) never beats the safe-fit zoom at real window sizes — otherwise the land
+      // over-zooms and slides under the fixed chrome (R-148; see game_map_fit_contract.md).
+      seaMarginPx: 3600,
+      seaMarginYPx: 1800,
     },
     showCoastFoam: true,
     showGlass: false,
