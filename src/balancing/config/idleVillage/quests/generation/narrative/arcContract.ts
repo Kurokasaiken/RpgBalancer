@@ -37,6 +37,34 @@ export const PropGlossSchema = z
   })
   .strict();
 
+/** Per-node contract v2 (PLAN-027, ChatGPT critique 2026-10-11): what
+ *  THIS node must change/say — stated against any possible entry state,
+ *  never presuming a single previous node (routes are alternative). */
+export const NodeContractSchema = z
+  .object({
+    node: z.string().min(1),
+    /** What changes in the situation after this node — a delta, not a
+     *  restatement of the quest goal. Must hold whichever route the
+     *  player took to get here. */
+    narrativeDelta: z.string().min(1).max(240),
+    /** What the opposition concretely DOES in or around this node —
+     *  varied per node, not the same method restated. Empty string when
+     *  the rival does not act here. */
+    rivalAction: z.string().max(240),
+    /** What recurring motifs (props/signals) DO in this scene — their
+     *  function, not an obligation to cite them all. Empty string when
+     *  none carry narrative weight here. */
+    motifFunction: z.string().max(240),
+    /** Effects/outcomes this node's copy may claim — only what the
+     *  scene brief's mechanics actually pay. */
+    mechanicalClaims: z.array(z.string().min(1).max(140)).max(6),
+    /** Ending facts this node may anticipate — a subset of endingFacts.
+     *  Empty for mid-arc nodes: they must not foreshadow the ending. */
+    endingClaimsAllowed: z.array(z.string().min(1).max(140)).max(4),
+  })
+  .strict();
+export type NodeContract = z.infer<typeof NodeContractSchema>;
+
 /** The arc contract — Pass 0 output, human-approvable, provenance-embedded. */
 export const QuestArcContractSchema = z
   .object({
@@ -66,6 +94,10 @@ export const QuestArcContractSchema = z
     /** Locale-invariant facts: names, prize identity, who holds what —
      *  the EN draft and the IT re-render must agree on all of these. */
     lockedFacts: z.array(z.string().min(1).max(200)).min(1),
+    /** Contract v2 — per-node deltas/actions/claims. Optional for
+     *  backward compat with r001 artifacts; when present every brief
+     *  nodeKey must be covered exactly once. */
+    nodeContracts: z.array(NodeContractSchema).optional(),
   })
   .strict();
 export type QuestArcContract = z.infer<typeof QuestArcContractSchema>;
@@ -90,12 +122,47 @@ export function contractIssues(
   for (const n of seen.keys()) {
     if (!briefs.some((b) => b.nodeKey === n)) issues.push(`fase cita nodo '${n}' inesistente nel grafo`);
   }
+  if (contract.nodeContracts) {
+    const nc = new Map<string, number>();
+    for (const c of contract.nodeContracts) nc.set(c.node, (nc.get(c.node) ?? 0) + 1);
+    for (const b of briefs) {
+      const count = nc.get(b.nodeKey) ?? 0;
+      if (count === 0) issues.push(`nodo '${b.nodeKey}' senza nodeContract (delta narrativo mancante)`);
+      else if (count > 1) issues.push(`nodo '${b.nodeKey}' ha ${count} nodeContract`);
+    }
+    for (const n of nc.keys()) {
+      if (!briefs.some((b) => b.nodeKey === n)) issues.push(`nodeContract cita nodo '${n}' inesistente`);
+    }
+  }
   return issues;
 }
 
 /** The role a contract assigns to one node — injected into its prompt. */
 export function contractRoleFor(contract: QuestArcContract, nodeKey: string): string | undefined {
   return contract.phases.find((p) => p.nodes.includes(nodeKey))?.role;
+}
+
+/** The per-node contract entry (v2) for one node, if authored. */
+export function nodeContractFor(contract: QuestArcContract, nodeKey: string): NodeContract | undefined {
+  return contract.nodeContracts?.find((c) => c.node === nodeKey);
+}
+
+/** Render the per-node v2 block — what THIS scene must change and may claim. */
+export function nodeContractPromptSection(contract: QuestArcContract, nodeKey: string): string | undefined {
+  const nc = nodeContractFor(contract, nodeKey);
+  if (!nc) return undefined;
+  return [
+    `NODE CONTRACT — what this scene must DO (not what it may repeat):`,
+    `- Narrative delta (what changes here — state it, never restate the goal): ${nc.narrativeDelta}`,
+    ...(nc.rivalAction ? [`- Rival action (what the opposition does here — do not re-explain their method): ${nc.rivalAction}`] : []),
+    ...(nc.motifFunction ? [`- Motif function (what recurring signals DO here — cite only if they serve this function): ${nc.motifFunction}`] : []),
+    ...(nc.mechanicalClaims.length
+      ? [`- Mechanical claims allowed (only what outcomes actually pay):`, ...nc.mechanicalClaims.map((m) => `  · ${m}`)]
+      : []),
+    ...(nc.endingClaimsAllowed.length
+      ? [`- Ending claims this scene may anticipate:`, ...nc.endingClaimsAllowed.map((m) => `  · ${m}`)]
+      : []),
+  ].join('\n');
 }
 
 /** Render the contract as the prompt section every node sees. */
@@ -146,9 +213,17 @@ export function promptForArcContract(
     ` "phases": [{"nodes": ["nodeKey", ...], "role": "what this phase is FOR narratively"}],`,
     ` "propGlossary": [{"term": "prop name", "meaning": "what it IS and DOES concretely"}],`,
     ` "endingFacts": {"win": ["facts the victorious ending may assert"], "lose": ["facts the losing ending may assert"]},`,
-    ` "lockedFacts": ["locale-invariant facts: prize identity, who holds what, names"]`,
+    ` "lockedFacts": ["locale-invariant facts: prize identity, who holds what, names"],`,
+    ` "nodeContracts": [{`,
+    `   "node": "nodeKey — one entry per node",`,
+    `   "narrativeDelta": "what CHANGES in the situation here — must hold whichever route brought the player, never restate the quest goal",`,
+    `   "rivalAction": "what the opposition concretely does here (varied per node — never the same method restated; empty string if absent)",`,
+    `   "motifFunction": "what recurring props/signals DO in this scene (their function — not an obligation to cite them)",`,
+    `   "mechanicalClaims": ["effects this node may claim — only what the mechanical outcomes actually pay"],`,
+    `   "endingClaimsAllowed": ["subset of endingFacts this node may anticipate — empty for mid-arc nodes"]`,
+    ` }]`,
     `}`,
     ``,
-    `Rules: endingFacts must be facts a run can actually produce — never 'you lost a hand' unless a mechanism causes it. Prop meanings must be mundane and concrete.`,
+    `Rules: endingFacts must be facts a run can actually produce — never 'you lost a hand' unless a mechanism causes it. Prop meanings must be mundane and concrete. nodeContracts: exactly one entry per nodeKey; narrativeDelta must describe a change relative to ANY possible entry state (routes are alternative — never assume a specific previous node); rival actions must differ across nodes (gain / misdirection / limitation — not 'listens to the bell' every time); a reward the player is guaranteed must NEVER appear in mechanicalClaims as check-dependent.`,
   ].join('\n');
 }

@@ -3,7 +3,7 @@
  * facts-locked IT re-render). Do not hand-edit: regenerate via
  * `scripts/questNarrate.mts`. Provenance + arc contract:
  * {
- *   "generatedAt": "2026-10-10T17:54:41.425Z",
+ *   "generatedAt": "2026-10-11T13:07:40.228Z",
  *   "scenarioId": "gen-race-passo-montano",
  *   "scenarioVersion": "gen-race-passo-montano-6-50",
  *   "domain": "miniera",
@@ -67,10 +67,6 @@
  *         "meaning": "Piombi marcati e tavole numerate poste ai sostegni; mostrano quale squadra ha aperto, chiuso o manomesso un tratto."
  *       },
  *       {
- *         "term": "contatore viveri",
- *         "meaning": "Tacca metallica della dispensa di turno; determina quante razioni spettano alla squadra che ottiene l’assegnazione."
- *       },
- *       {
  *         "term": "campana del turno",
  *         "meaning": "Campana di superficie con rintocchi codificati per cambio, richiamo e chiusura; il suono guida Mara nei cunicoli."
  *       },
@@ -92,7 +88,7 @@
  *       "lose": [
  *         "Mara ottiene l’assegnazione registrabile della Galleria Bassa, con la licenza e le razioni di turno.",
  *         "La tua squadra conserva la vita e torna con prove materiali o sonore del tratto pericoloso.",
- *         "Il registro resta una fonte contestabile solo attraverso firme, sigilli, tavole e tempi della campana."
+ *         "Il registro resta fermo contro la squadra perdente: ciò che è firmato è firmato."
  *       ]
  *     },
  *     "lockedFacts": [
@@ -102,9 +98,192 @@
  *       "Il registro dei turni controlla l’attribuzione formale di chi era dove.",
  *       "Nel buio nessun esito può dipendere da un testimone oculare: valgono solo prove fisiche o sonore.",
  *       "Mara possiede un orecchio allenato per la campana del turno, tratto che può deviare la corsa verso un taglio laterale."
+ *     ],
+ *     "nodeContracts": [
+ *       {
+ *         "node": "partenza",
+ *         "narrativeDelta": "La gara e la posta sono dichiarate: entrambe le squadre partono insieme verso lo stesso fronte — da qui in poi ogni scena è corsa, mai presentazione.",
+ *         "rivalAction": "Mara parte allo stesso segnale del giocatore: pari merito, nessun vantaggio visibile ancora.",
+ *         "motifFunction": "Il registro fissa la posta; lampade e olio stabiliscono il budget di luce e fiato.",
+ *         "mechanicalClaims": [
+ *           "l’opzione scelta decide solo la prima diramazione del percorso"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "viaA",
+ *         "narrativeDelta": "Prima esposizione al METODO di Mara — un taglio guidato dalla campana — e alle sue prove materiali (puntello tagliato, canarino muto): la scena deve reggere da qualsiasi ingresso perché qui i motivi nascono.",
+ *         "rivalAction": "Mara ha già svoltato nel taglio laterale: la sua scelta è un fatto compiuto che il giocatore può seguire o no, non il suo metodo rispiegato.",
+ *         "motifFunction": "Prima esposizione: lampada bassa e canarino muto introducono l’aria cattiva come novità; il puntello tagliato introduce la manomissione.",
+ *         "mechanicalClaims": [
+ *           "il check decide il costo fisico del taglio — terreno guadagnato, ritardo o ferita"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "viaB",
+ *         "narrativeDelta": "Chi resta sulla via maestra legge le prove (piombi, tavole numerate) che Mara ha saltato: informazione contro velocità.",
+ *         "rivalAction": "Mara è fuori vista nel taglio: si sente solo il colpo secco del suo lavoro oltre la roccia.",
+ *         "motifFunction": "Tavole numerate e piombi sono il registro materiale delle manomissioni; lampada e canarino confermano ciò che l’altra via introduce.",
+ *         "mechanicalClaims": [
+ *           "l’esame rivela il passaggio laterale manomesso — nessun costo fisico diretto"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "balzo",
+ *         "narrativeDelta": "Il giocatore può pagare rischio fisico per tenere il ritmo: un varco tra le tavole accorcia ma può cedere.",
+ *         "rivalAction": "Mara imbocca un taglio parallelo: i suoi passi si spengono più avanti o tornano verso il percorso del giocatore.",
+ *         "motifFunction": "Lampada bassa e canarino muto sono ormai segnali RICONOSCIUTI, non novità: il giocatore li legge per decidere.",
+ *         "mechanicalClaims": [
+ *           "il salto paga terreno immediato a costo di possibile caduta letale"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "passo",
+ *         "narrativeDelta": "La via puntellata costa fiato ma dà legname leggibile: scelta lenta e sicura contro il taglio di Mara.",
+ *         "rivalAction": "Mara prende un altro taglio: il suo ritmo si misura contro il passo cautelativo del giocatore.",
+ *         "motifFunction": "La fiamma corta e il canarino muto pesano qui sulla decisione ritmo-contro-sicurezza, non come monito generico.",
+ *         "mechanicalClaims": [
+ *           "nessun check: il costo è il terreno ceduto"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "sprint",
+ *         "narrativeDelta": "Il puntello incurvato è un preavviso fisico: forzare subito o leggere i segni prima di esporsi.",
+ *         "rivalAction": "Mara si ferma ad ascoltare la campana: per la prima volta il giocatore la vede ESITARE — il suo metodo ha un costo sfruttabile.",
+ *         "motifFunction": "La campana che guida Mara produce qui una pausa sfruttabile; lampada e canarino confermano il puntello pericoloso.",
+ *         "mechanicalClaims": [
+ *           "il check forza il passaggio sotto il puntello: il costo è solo fisico"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "taglio",
+ *         "narrativeDelta": "Un piano spezzato resta praticabile: avanzare leggeri sotto il puntello che si muove per restare davanti a Mara.",
+ *         "rivalAction": "Il taglio di Mara può riportarla davanti: la corsa si stringe verso il fronte.",
+ *         "motifFunction": "Il pietrisco che cola dal puntello traduce il pericolo in tempistica — quanto tempo resta per passare.",
+ *         "mechanicalClaims": [
+ *           "check fisico: un passo perso lascia Mara in testa"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "tappa",
+ *         "narrativeDelta": "Bilancio della gara a metà: spingere consuma fiato, procedere con misura cede terreno ma lascia prove dimostrabili.",
+ *         "rivalAction": "Mara ha mutato corsa dietro la campana: la sua posizione è stimata, non certa.",
+ *         "motifFunction": "Tavole e sigilli sono ciò che il giocatore può ancora dimostrare al fronte — la posta documentale resta aperta.",
+ *         "mechanicalClaims": [
+ *           "hub di transito: nessun costo meccanico proprio"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "imboscata",
+ *         "narrativeDelta": "Rivelazione: il danno ai sostegni è PRECEDENTE all’arrivo delle squadre — il pericolo non nasce dalla gara, e la prova materiale diventa una posta secondaria. Deve reggere da qualsiasi ingresso.",
+ *         "rivalAction": "Mara tende l’orecchio oltre il passaggio: anche lei sta leggendo lo stesso pericolo — la gara si ferma per un attimo.",
+ *         "motifFunction": "Canarino IMMOBILE (non solo muto) alza la scala del pericolo; i segni d’attrezzo freschi trasformano lampada e sostegni in prove di sabotaggio — i motivi cambiano funzione.",
+ *         "mechanicalClaims": [
+ *           "scostare il puntello può ferire o seppellire; conservare le prove vale al fronte"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "vetta",
+ *         "narrativeDelta": "Ultimo hub prima del fronte: convergono gara, prove e compromesso — passare nel rischio o cedere il passo con le prove in mano.",
+ *         "rivalAction": "Mara avanza verso il fronte: il suo vantaggio si decide qui, non si ripete il suo metodo.",
+ *         "motifFunction": "Tutti i motivi convergono — lampada bassa, canarino muto, tagli freschi: la lettura è completa e la scelta finale la chiude.",
+ *         "mechanicalClaims": [
+ *           "hub di transito: la scelta instrada verso sicuro o varco"
+ *         ],
+ *         "endingClaimsAllowed": []
+ *       },
+ *       {
+ *         "node": "sicuro",
+ *         "narrativeDelta": "Il fronte è raggiunto: piantare il legname chiude la gara — il premio è deciso dalla corsa, il check paga solo il corpo.",
+ *         "rivalAction": "",
+ *         "motifFunction": "La lampada ridotta a goccia è la verifica finale dell’aria morta — il motivo conclude la sua funzione di allarme.",
+ *         "mechanicalClaims": [
+ *           "la licenza è garantita su OGNI verdetto: il check determina solo costo fisico e paga straordinaria",
+ *           "MAI presentare la licenza come condizionale al check"
+ *         ],
+ *         "endingClaimsAllowed": [
+ *           "la licenza della Galleria Bassa entra a registro"
+ *         ]
+ *       },
+ *       {
+ *         "node": "varco",
+ *         "narrativeDelta": "Ultimo ostacolo fisico prima del fronte: forzare il varco rischia il crollo, e il premio resta comunque deciso dalla gara.",
+ *         "rivalAction": "I passi di Mara battono oltre la roccia: pressione temporale, non una nuova azione.",
+ *         "motifFunction": "La campana scandisce la chiusura del turno: la scadenza è sonora, non un segnale da seguire.",
+ *         "mechanicalClaims": [
+ *           "il premio è garantito su OGNI verdetto: il check paga solo il corpo",
+ *           "MAI presentare il premio come condizionale al check"
+ *         ],
+ *         "endingClaimsAllowed": [
+ *           "la licenza della Galleria Bassa entra a registro"
+ *         ]
+ *       },
+ *       {
+ *         "node": "fine",
+ *         "narrativeDelta": "Bilancio di vittoria: premio preso, fronte chiuso, costo pagato — chiusura, non celebrazione.",
+ *         "rivalAction": "Mara arriva seconda: il fatto entra a registro.",
+ *         "motifFunction": "Lampada ferma e canarino che batte le ali verificano il vuoto sano — i motivi concludono la loro funzione di rilevatori.",
+ *         "mechanicalClaims": [],
+ *         "endingClaimsAllowed": [
+ *           "licenza e razioni assegnate alla squadra",
+ *           "il registro convalida il reclamo",
+ *           "Mara arriva seconda"
+ *         ]
+ *       },
+ *       {
+ *         "node": "sconfitta",
+ *         "narrativeDelta": "Bilancio di sconfitta: il premio va a Mara, la squadra torna viva con le prove — nessuna promessa di rivincita o contestazione.",
+ *         "rivalAction": "Mara ha vinto: il suo metodo ha pagato — fatto registrato, non da riaprire.",
+ *         "motifFunction": "Canarino muto e legname spaccato restano come prove del tratto pericoloso, non del verdetto.",
+ *         "mechanicalClaims": [],
+ *         "endingClaimsAllowed": [
+ *           "Mara ottiene licenza e razioni",
+ *           "la squadra conserva vita e prove",
+ *           "il registro resta fermo contro la squadra"
+ *         ]
+ *       }
  *     ]
  *   },
- *   "attempts": []
+ *   "attempts": [
+ *     {
+ *       "provider": "groq",
+ *       "model": "openai/gpt-oss-120b",
+ *       "pass": "draft-en:vetta",
+ *       "ok": true
+ *     },
+ *     {
+ *       "provider": "groq",
+ *       "model": "openai/gpt-oss-120b",
+ *       "pass": "critic:vetta",
+ *       "ok": true
+ *     },
+ *     {
+ *       "provider": "groq",
+ *       "model": "openai/gpt-oss-120b",
+ *       "pass": "revise:vetta",
+ *       "ok": true
+ *     },
+ *     {
+ *       "provider": "groq",
+ *       "model": "openai/gpt-oss-120b",
+ *       "pass": "render-it:vetta",
+ *       "ok": true
+ *     },
+ *     {
+ *       "provider": "groq",
+ *       "model": "openai/gpt-oss-120b",
+ *       "pass": "render-it:vetta",
+ *       "ok": true
+ *     }
+ *   ]
  * }
  */
 
@@ -113,7 +292,7 @@ import type { LocalizedRaceDomainKit } from '../raceGimmick';
 export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
   "en": {
     "id": "miniera",
-    "prefix": "rn",
+    "prefix": "rp",
     "title": "Before the Turn Bell",
     "flavour": "You race Mara Vezzi through the mine to seal the Galleria Bassa; the turn bell settles the allocation.",
     "names": {
@@ -126,25 +305,7 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
     "copy": {
       "partenza": {
         "title": "Before the Turn Bell",
-        "body": "The factor opens the shift register: its signatures alone decide who may claim the Galleria Bassa. You and Mara Vezzi leave the pit mouth for the same front; whoever marks it first earns the Licenza della Galleria Bassa and the turn rations. Lamp oil is scarce, so every detour spends light and breath; the record will make the claim stand."
-      },
-      "viaA": {
-        "title": "The Side Cut",
-        "body": "The main way to the Galleria Bassa keeps its assignment seals and timber in order, but Mara Vezzi has turned into a side cut after catching the turn bell through the stone. Your oil lamps shrink in stale air; the caged canary has stopped calling beside a support with a fresh cut. Take the side cut, and you may gain ground before the route closes.",
-        "failHint": "The cut support may give way, and the quiet canary warns of bad air.",
-        "option": {
-          "label": "Take Mara Vezzi’s side cut",
-          "detail": "Agility. Follow the bell through loose footing; a fall or bad air may cost more than time."
-        },
-        "verdictFlavor": {
-          "epicfail": "The support drops. You drag clear with the lamp low, and Mara Vezzi hears the turn before you can move.",
-          "fail": "The footing breaks under you. You regain the route hurt, with Mara Vezzi already beyond the cut.",
-          "win": "You pass the altered support and keep the cage steady; Mara Vezzi’s bell-guided turn has cost her ground."
-        },
-        "outcomeLog": {
-          "win": "The altered support and the silent canary mark the unsafe cut; you reach the Galleria Bassa a step ahead.",
-          "bigwin": "You keep the lamp flame steady and find the sound route; Mara Vezzi’s diversion leaves physical marks behind."
-        }
+        "body": "The factor opens the registro dei turni: its signatures alone decide who may claim the Galleria Bassa. You and Mara Vezzi leave the bocca del pozzo for the same front; whoever marks it first earns the Licenza della Galleria Bassa and the turn rations. Lamp oil is scarce, so every detour spends light and breath; the record will make the claim stand."
       },
       "viaB": {
         "title": "The Main Way",
@@ -206,43 +367,20 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
       },
       "tappa": {
         "title": "The Cost of the Next Stage",
-        "body": "At the junction, Mara Vezzi has followed the Turn Bell through the rock and changed the race. Pressing forward spends breath where the braces are uncertain; a steadier pace gives up ground but leaves time to read the numbered boards and marked plugs. You must reach and secure the Galleria Bassa before her, with enough material proof for the shift register.",
+        "body": "At the junction, Mara Vezzi has followed the Turn Bell through the rock and changed the race. Pressing forward spends breath where the braces are uncertain; a steadier pace gives up ground but leaves time to read the numbered boards and marked plugs. You must reach and secure the Galleria Bassa before her, with enough material proof for the registro dei turni.",
         "transit": "The route opens ahead, and its cost will remain in your breath or in the marks you can prove."
-      },
-      "imboscata": {
-        "title": "The Cut Beneath the Supports",
-        "body": "The lamp flame lowers at a support cut near its foot, and the canary in its cage has gone still. Bad air lies beyond the numbered boards; fresh tool marks show the damage was made before either crew arrived. Mara Vezzi listens toward the Turn Bell from the side passage, leaving you to decide what proof reaches the front.",
-        "failHint": "Bad air waits beyond the cut support, and the boards may give beneath you.",
-        "option": {
-          "label": "Set the cut support aside",
-          "detail": "Make room past the damaged support before Mara Vezzi reaches the front; the work may leave you hurt or buried."
-        },
-        "verdictFlavor": {
-          "epicfail": "The support drops across the boards. You pull clear injured, while Mara Vezzi reaches farther into the passage.",
-          "fail": "The boards sink under the shifted weight. You pass through hurt as Mara Vezzi takes the better line.",
-          "win": "You clear the support and preserve the cut marks, boards, and silent canary as proof of the dangerous stretch."
-        },
-        "outcomeLog": {
-          "win": "The cut support, numbered boards, lamp, and silent canary identify the unsafe route before the front.",
-          "bigwin": "You leave the damaged support and its marks in place, making the danger and the interference easy to verify at the front."
-        }
-      },
-      "vetta": {
-        "title": "The Pocket Under the Supports",
-        "body": "At the junction, the lamp burns low and the canary is silent. Fresh cuts beneath a numbered board show a weakened support beside foul air; both crews race to reach and close the face for the recorded Licenza della Galleria Bassa and its shift rations. Push through and risk the air and timber, or hold at the opening while Mara Vezzi advances.",
-        "transit": "Marked plugs and numbered boards show which crew handled the support; the lamp and the canary’s silence fix the danger."
       },
       "fine": {
         "title": "Claimed in the Deep",
-        "body": "You reach the Galleria Bassa ahead of Mara Vezzi, driving numbered boards and lead stamps into the rock supports. The steady lamp flame and the fluttering canary prove the gap sound. The shift register awards your squad the Licenza della Galleria Bassa and the shift rations; whoever signs the register signs the cut."
+        "body": "You reach the Galleria Bassa ahead of Mara Vezzi, driving numbered boards and lead stamps into the rock supports. The steady lamp flame and the fluttering canary prove the gap sound. The registro dei turni awards your squad the Licenza della Galleria Bassa and the contatore viveri—a rich cut won by split palms and sour air."
       },
       "sconfitta": {
         "title": "The Recorded Claim",
-        "body": "Mara Vezzi claims the Galleria Bassa, taking the extraction license and the shift rations. You bring your crew back with their breath in them, carrying cracked timber and a quiet cage as proof of the foul air along the cut. The shift register stands against you, contestable only through fresh stamps, recovered boards, and the measured strokes of the turn bell."
+        "body": "Mara Vezzi claims the Galleria Bassa, taking the extraction license and the shift rations. You bring your crew back with their breath in them, carrying cracked timber and a quiet cage as proof of the foul air along the cut. The shift register stands against you: what is signed is signed."
       },
       "sicuro": {
         "title": "The Last Timber",
-        "body": "The breach opens into the Galleria Bassa where rock split from the ceiling braces. Stagnant air starves the lamp flame down to a dying bead, pressing against your ribs like flat slate. Driving the assignment timbers home now will claim the vein or bring down the dead weight above.",
+        "body": "The breach opens into the Galleria Bassa where rock split from the ceiling braces. Stagnant air starves the lamp flame down to a dying bead, pressing against your ribs like flat slate. Driving the assignment timbers home seals your claim on the vein; the true risk is the dead weight hanging over every stroke.",
         "failHint": "Foul air and buckling timber threaten broken bones or sudden suffocation.",
         "option": {
           "label": "Drive the assignment timber",
@@ -265,13 +403,54 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
           "win": "You reach the Galleria Bassa first, securing the extraction license and shift rations before Mara Vezzi.",
           "bigwin": "You clear the breach first, taking the extraction license and shift rations before Mara Vezzi arrives."
         }
+      },
+      "viaA": {
+        "title": "The Sawn Timber",
+        "body": "Mara Vezzi has already turned into the side crawl, guided by the turn bell above. At the breach, a severed prop dangles from the rock, and the caged canary sits mute beside a dwindling lamp. The passage cuts half the distance to Galleria Bassa, if the compromised ceiling does not crush what enters.",
+        "failHint": "Failing timber and dead air threaten broken bones or worse in the dark.",
+        "option": {
+          "label": "Vault past the sawn prop",
+          "detail": "Agility. Squeezing past the weakened post risks a cave-in and torn flesh."
+        },
+        "verdictFlavor": {
+          "epicfail": "The timber gives way overhead, crushing flesh and leaving you trapped in dust.",
+          "fail": "The crossbeam scrapes your shoulder, costing blood and precious paces.",
+          "win": "You slip past the hanging beam, gaining hard ground behind Mara Vezzi."
+        },
+        "outcomeLog": {
+          "win": "You cleared the unstable crawl and took ground on Mara Vezzi’s lead.",
+          "bigwin": "You slipped past the sawn brace clean, cutting deep into Mara Vezzi’s lead."
+        }
+      },
+      "imboscata": {
+        "title": "The Sawn Upright",
+        "body": "The canary sits motionless on its perch, neither singing nor fluttering against the wire. Across the drift, Mara Vezzi freezes with her hand flat against the rock, listening past the dead air while your oil lamp reveals deep saw-marks cut into the timber long before either crew entered. Shifting the brace risks a sudden cave-in, but the severed grain proves an older sabotage.",
+        "failHint": "Dislodging the scored prop risks a falling header and burial under shale.",
+        "option": {
+          "label": "Heave clear of the notched upright",
+          "detail": "Strength and Agility. Forcing the narrow gap risks crushing injury or death to slip past ahead."
+        },
+        "verdictFlavor": {
+          "epicfail": "The frame buckles completely, crushing bone beneath dead shale while Mara breaks past into the dark.",
+          "fail": "The header slips and showers stone over your back, stalling your advance while Mara finds her gap.",
+          "win": "The timber groans but holds while you slip through, pocketing a severed lead mark as Mara halts."
+        },
+        "outcomeLog": {
+          "win": "You slip past the rigged timber with physical evidence of prior sabotage, taking a step ahead toward the seam.",
+          "bigwin": "You clear the collapse cleanly and secure the damaged wood, gaining two paces on Mara before the turn bell."
+        }
+      },
+      "vetta": {
+        "title": "The Junction Before the Low Gallery",
+        "body": "Mara Vezzi is past the fork, her oil lamp on a fresh fissure where the vein has pried a support loose. Your lamp flickers, the canary is silent, stale air pools around the marked timber. Two ways remain to the front: the braced path under the split vault, or the narrow gap between the slabs. Both ask the body; the proof of the tampering travels with you to the register.",
+        "transit": "The braced path asks a steady stroke under the vault; the gap asks narrow breath between the slabs. The choice is which danger to pay."
       }
     }
   },
   "it": {
     "id": "miniera",
-    "prefix": "rn",
-    "title": "Prima della campana del turno",
+    "prefix": "rp",
+    "title": "Prima della campana del cambio",
     "flavour": "Corri contro Mara Vezzi nelle viscere della miniera: chi sigilla per primo la Galleria Bassa si prende l’assegnazione al cambio turno.",
     "names": {
       "place": "Galleria Bassa",
@@ -284,24 +463,6 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
       "partenza": {
         "title": "Prima della campana del turno",
         "body": "Il fattore apre il registro dei turni: solo le firme stabiliscono chi può reclamare la Galleria Bassa. Voi e Mara Vezzi lasciate l’imboccatura del pozzo diretti allo stesso fronte; chi lo contrassegna per primo ottiene la licenza di estrazione della Galleria Bassa e le razioni di turno. L’olio delle lampade basta a poco, e ogni deviazione consuma luce e fiato; il registro renderà valido il reclamo."
-      },
-      "viaA": {
-        "title": "Il taglio laterale",
-        "body": "La via principale verso la Galleria Bassa conserva in ordine i sigilli e il legname d’assegnazione, ma Mara Vezzi ha preso un taglio laterale dopo aver udito la campana del turno attraverso la roccia. La fiamma delle vostre lampade a olio si abbassa nell’aria stantia; il canarino in gabbia ha smesso di cantare accanto a un puntello appena tagliato. Se prendete il taglio laterale, potete guadagnare terreno prima che il passaggio si chiuda.",
-        "failHint": "Il puntello tagliato può cedere, e il silenzio del canarino avverte dell’aria cattiva.",
-        "option": {
-          "label": "Seguite il taglio laterale di Mara Vezzi",
-          "detail": "Seguite la campana su un fondo instabile; una caduta o l’aria cattiva possono costare più del ritardo."
-        },
-        "verdictFlavor": {
-          "epicfail": "Il puntello cede. Vi trascinate fuori con la lampada bassa, e Mara Vezzi sente il vostro cambio di direzione prima che possiate riprendere il passo.",
-          "fail": "Il fondo vi manca sotto i piedi. Raggiungete di nuovo il percorso feriti, con Mara Vezzi già oltre il taglio.",
-          "win": "Superate il puntello manomesso e tenete ferma la gabbia; la svolta guidata dalla campana è costata terreno a Mara Vezzi."
-        },
-        "outcomeLog": {
-          "win": "Il puntello manomesso e il canarino silenzioso segnano il taglio pericoloso; raggiungete la Galleria Bassa con un passo di vantaggio.",
-          "bigwin": "Tenete ferma la fiamma della lampada e trovate la via del suono; la deviazione di Mara Vezzi lascia tracce materiali alle sue spalle."
-        }
       },
       "viaB": {
         "title": "La via principale",
@@ -366,40 +527,17 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
         "body": "Al bivio, Mara Vezzi ha seguito la campana del turno attraverso la roccia e ha mutato la corsa. Spingere avanti consuma fiato dove i puntelli non danno certezza; procedere con misura cede terreno, ma lascia il tempo di leggere le tavole numerate e i sigilli marcati. Dovete raggiungere e assicurare la Galleria Bassa prima di lei, ottenendo licenza di estrazione e razioni di turno con prove materiali valide per il registro dei turni.",
         "transit": "La via si apre davanti a voi: il suo prezzo resterà nel fiato che avete speso o nei segni che saprete dimostrare."
       },
-      "imboscata": {
-        "title": "Il taglio sotto i puntelli",
-        "body": "La fiamma della lampada si abbassa accanto a un puntello intaccato alla base, e il canarino nella gabbia è immobile. Oltre le tavole numerate ristagna aria cattiva; i segni freschi degli attrezzi mostrano che il danno era stato fatto prima dell’arrivo di entrambe le squadre. Dal passaggio laterale, Mara Vezzi tende l’orecchio verso la campana del turno. Sta a voi decidere quale prova raggiungerà il fronte.",
-        "failHint": "Oltre il puntello intaccato c’è aria cattiva, e le tavole possono cedere sotto di voi.",
-        "option": {
-          "label": "Scostate il puntello intaccato",
-          "detail": "Fate spazio oltre il puntello danneggiato prima che Mara Vezzi raggiunga il fronte; il lavoro può lasciarvi feriti o sepolti."
-        },
-        "verdictFlavor": {
-          "epicfail": "Il puntello crolla sulle tavole. Vi tirate fuori feriti, mentre Mara Vezzi avanza più a fondo nel cunicolo.",
-          "fail": "Le tavole sprofondano sotto il peso spostato. Passate feriti mentre Mara Vezzi si assicura il tratto migliore.",
-          "win": "Liberate il puntello e conservate i segni del taglio, le tavole e il silenzio del canarino come prova del tratto pericoloso."
-        },
-        "outcomeLog": {
-          "win": "Il puntello intaccato, le tavole numerate, la lampada e il canarino silenzioso indicano quale via non è sicura prima del fronte.",
-          "bigwin": "Lasciate al loro posto il puntello danneggiato e i suoi segni: al fronte, il pericolo e la manomissione si possono verificare senza dubbi."
-        }
-      },
-      "vetta": {
-        "title": "La sacca sotto i puntelli",
-        "body": "Al bivio, la lampada arde bassa e il canarino tace. Tagli recenti sotto una tavola numerata mostrano un puntello indebolito accanto a un’aria cattiva; entrambe le squadre corrono a raggiungere e chiudere il fronte, per la Licenza della Galleria Bassa registrata e le razioni di turno. Potete passare rischiando aria e legname, oppure trattenervi all’imbocco mentre Mara Vezzi avanza.",
-        "transit": "I piombi marcati e le tavole numerate indicano quale squadra ha toccato il puntello; la lampada e il silenzio del canarino fissano il pericolo."
-      },
       "fine": {
         "title": "Rivendicazione nel fondo",
-        "body": "Raggiungete la Galleria Bassa prima di Mara Vezzi, piantando i sigilli e il legname d’assegnazione nei puntelli di roccia. La fiamma ferma delle lampade a olio e il battito d'ali del canarino in gabbia confermano che il vuoto regge e l'aria tiene. Il registro dei turni assegna alla vostra squadra la licenza di scavo e le razioni di turno: chi firma il registro, firma il taglio."
+        "body": "Raggiungete la Galleria Bassa prima di Mara Vezzi, piantando i sigilli e il legname d’assegnazione nei puntelli di roccia. La fiamma ferma delle lampade a olio e il battito d'ali del canarino in gabbia confermano che il vuoto regge e l'aria tiene. Il registro dei turni assegna alla vostra squadra la licenza di scavo insieme al contatore viveri, garantendo un taglio ricco pagato con i palmi spaccati e il respiro guasto."
       },
       "sconfitta": {
         "title": "Il reclamo a verbale",
-        "body": "Mara Vezzi reclama la Galleria Bassa, portando via la licenza di estrazione e le razioni di turno. Riportate indietro la squadra con il fiato ancora in corpo, trascinando legname d'assegnazione spaccato e un canarino in gabbia ormai muto a riprova dell'aria guasta lungo il taglio. Il registro dei turni resta fermo contro di voi, contestabile soltanto con nuovi sigilli, tavole recuperate e i rintocchi misurati della campana del turno."
+        "body": "Mara Vezzi reclama la Galleria Bassa, portando via la licenza di estrazione e le razioni di turno. Riportate indietro la squadra con il fiato ancora in corpo, trascinando legname d'assegnazione spaccato e un canarino in gabbia ormai muto a riprova dell'aria guasta lungo il taglio. Il registro dei turni resta fermo contro di voi: ciò che è firmato è firmato."
       },
       "sicuro": {
         "title": "L'ultima trave",
-        "body": "Lo squarcio dà direttamente nella Galleria Bassa, dove la volta si è spaccata e grava storta sui sostegni. L'aria morta strozza la fiamma delle lampade a olio fino a ridurla a una goccia nera, premendo sulle costole come una lastra di scisto. Battere a fondo il legname d'assegnazione significa reclamare la vena, oppure tirarsi addosso il carico del soffitto.",
+        "body": "Lo squarcio dà direttamente nella Galleria Bassa, dove la volta si è spaccata e grava storta sui sostegni. L'aria morta strozza la fiamma delle lampade a olio fino a ridurla a una goccia nera, premendo sulle costole come una lastra di scisto. Battere a fondo il legname d'assegnazione serra il reclamo della vena; il vero rischio è il carico del soffitto che pende su ogni colpo.",
         "failHint": "Il gas pesante e l'armo che flette minacciano ossa rotte o asfissia improvvisa.",
         "option": {
           "label": "Piantate il legname d'assegnazione",
@@ -422,6 +560,47 @@ export const MINIERA_RACE_KIT: LocalizedRaceDomainKit = {
           "win": "Raggiungete per primi la Galleria Bassa, assicurandovi licenza di estrazione e razioni di turno prima di Mara Vezzi.",
           "bigwin": "Superate per primi il varco, prendendo licenza di estrazione e razioni di turno prima dell'arrivo di Mara Vezzi."
         }
+      },
+      "viaA": {
+        "title": "Il legname reciso",
+        "body": "Mara Vezzi ha già piegato nello stretto cunicolo laterale, guidata dai rintocchi della campana del turno che filtrano dalla superficie. All'imbocco dello squarcio un puntello segato penzola dalla roccia nuda, e il canarino in gabbia siede muto accanto a una lampada a olio dalla fiamma ormai corta. Quel taglio dimezza il cammino verso la Galleria Bassa, purché la volta manomessa non schiacci chi tenta il passo.",
+        "failHint": "Legname cedevole e aria guasta minacciano ossa rotte o la fine di ogni respiro nel buio.",
+        "option": {
+          "label": "Superate d'un balzo il puntello reciso",
+          "detail": "Destrezza. Scivolare oltre il montante indebolito rischia di tirarsi addosso la frana e strappare la carne."
+        },
+        "verdictFlavor": {
+          "epicfail": "La travatura cede dall'alto con uno schianto secco, maciulla la carne e vi lascia intrappolati nella polvere.",
+          "fail": "La trave scheggiata vi scortica la spalla nel passaggio, pretendendo sangue e passi preziosi.",
+          "win": "Scivolate sotto il legno sospeso senza toccarlo, guadagnando pietra solida dietro a Mara Vezzi."
+        },
+        "outcomeLog": {
+          "win": "Avete superato la strettoia instabile, accorciando il distacco da Mara Vezzi.",
+          "bigwin": "Siete passati oltre l'armatura segata senza un'esitazione, mangiando quasi tutto il vantaggio di Mara Vezzi."
+        }
+      },
+      "imboscata": {
+        "title": "Il montante intagliato",
+        "body": "Il canarino in gabbia resta immobile sul posatoio, senza cantare né sbattere le ali contro il ferro. Dall'altro lato della galleria, Mara Vezzi si arresta con il palmo piatto sulla roccia, tendendo l'orecchio nell'aria morta, mentre le vostre lampade a olio rivelano profondi intagli di sega incisi nel legno ben prima dell'ingresso delle squadre. Smottare il puntello rischia di chiamare la frana, ma la fibra recisa resta la prova tangibile di una manomissione precedente.",
+        "failHint": "Smuovere il legno intaccato rischia di far crollare l'architrave e seppellirvi sotto lo scisto.",
+        "option": {
+          "label": "Gettatevi oltre il sostegno intagliato",
+          "detail": "Forza e agilità. Forzare il passaggio stretto rischia lo schiacciamento o la morte pur di scivolare avanti per primi."
+        },
+        "verdictFlavor": {
+          "epicfail": "L'armatura cede di schianto, spezzando le ossa sotto la caduta dello scisto mentre Mara scatta avanti nel buio.",
+          "fail": "L'architrave scivola e scarica pietre sulle vostre schiene, bloccando l'avanzata mentre Mara trova il suo varco.",
+          "win": "Il legname geme ma regge mentre scivolate oltre, strappando un piombo tagliato dai sigilli e legname d'assegnazione mentre Mara esita."
+        },
+        "outcomeLog": {
+          "win": "Superate il legname manomesso portando con voi la prova materiale dell'antico sabotaggio, guadagnando un passo verso la vena.",
+          "bigwin": "Oltrepassate il punto critico in piena sicurezza e recuperate la prova del taglio, staccando Mara di due lunghezze prima dei rintocchi della campana del turno."
+        }
+      },
+      "vetta": {
+        "title": "L’incrocio davanti alla Galleria Bassa",
+        "body": "Mara Vezzi è oltre il bivio, la sua lampada a olio su una spaccatura fresca dove la vena ha allentato un sostegno. La vostra lampada vacilla, il canarino tace, l'aria viziata si raccoglie sul legno segnato. Restano due vie al fronte: la puntellata sotto la volta spaccata o il varco stretto tra le lastre. Entrambe chiedono il corpo; la prova della manomissione viaggia con voi fino al registro.",
+        "transit": "La via puntellata chiede un colpo deciso sotto la volta; il varco chiede il fiato stretto tra le lastre. La scelta è quale pericolo pagare."
       }
     }
   }
