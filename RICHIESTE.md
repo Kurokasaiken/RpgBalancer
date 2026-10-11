@@ -2492,3 +2492,15 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Fix:** `onTrigger` del bottone `questRun`: se esiste una run goblin (live o ended) → `openRunWindow('goblin')` — la stessa superficie canonica a cui il marker in mappa reindirizza (finestra run / report); altrimenti `demoLaunch()` invariato. `active` onesto: acceso = spedizione in volo. Fix non-distruttivo: nessuna cancellazione di run da un click accidentale.
 
 **Safeguards:** lint scope 0 errori; build:check PASS; kanban:lint PASS; smoke live: chiusa QuestRunWindow → click «Start goblin quest» → `quest-window` riaperta (prima: nessun effetto visibile). Evidence: `test-results/r129-poi-director-gate-2026-10-11.log` (sezione R-130).
+
+## R-131 — /game: rimosso il pulsante Director «Show quest» (non funzionale)
+
+**Richiesta (verbatim):** *"il pulsante show quest nn fa nulla, può sparire"*
+**Data:** 2026-10-11
+**Stato:** `fatta` — verificato live su FE via Puppeteer.
+
+**Diagnosi:** il toggle «Show quest» era ridondante rispetto a «POI types» (che presenta gli stessi marker più i demo job/event) e percepito come morto — con nessuna offerta/run da mostrare il click non produceva nulla di visibile.
+
+**Fix:** rimossa l'azione `quest` dall'array `directorActions` in `game-frame-pixi.tsx`. `questShown` e l'hook `revealQuestPois` restano: sono il percorso di reveal usato da E2E e `?capture=1`, e gating degli anchor expedition. Comportamento R-129 invariato: 0 marker al boot, reveal/hide con trasformazione solo via «POI types» (demo) o hook (reale). Guida E2E aggiornata.
+
+**Safeguards:** lint scope 0 errori; build:check PASS; kanban:lint PASS; smoke live: Director senza «Show quest», azioni rimaste (invasion, questRun, poitypes, wonder, skin, reset), 0 anchor al boot.
