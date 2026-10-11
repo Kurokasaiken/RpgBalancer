@@ -1006,6 +1006,19 @@
         "quest": "Quest in corso"
       }
     },
+    "menu": {
+      "title": "Menu",
+      "session": "Partita",
+      "options": "Opzioni",
+      "saveNow": "Salva ora",
+      "saving": "Salvataggio…",
+      "saved": "Salvato",
+      "loadGame": "Carica partita…",
+      "quit": "Esci al titolo",
+      "theme": "Tema",
+      "settings": "Tutte le opzioni…",
+      "comingSoon": "Non ancora disponibile"
+    },
     "regions": {
       "northern_forest": "Boschi Sussurranti",
       "southern_forest": "Bosco Cavo",

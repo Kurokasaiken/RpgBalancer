@@ -18,6 +18,7 @@ const STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/ObjectiveCartouche.tsx',
   'src/ui/idleVillage/components/gameFrame/HudRecenterButton.tsx',
   'src/ui/idleVillage/components/gameFrame/HudPanelsMenu.tsx',
+  'src/ui/idleVillage/components/gameFrame/HudGameMenu.tsx',
   'src/ui/idleVillage/components/gameFrame/WhenWhereCluster.tsx',
   'src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx',
   'src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx',

@@ -10,9 +10,11 @@ import {
   type HudEvent,
   type HudObjective,
   ObjectiveCartouche,
+  HudGameMenu,
   HudPanelsMenu,
   useHudPanels,
   type HudPanelsApi,
+  type HudSkinControl,
   ResourceReadout,
   WhenWhereCluster,
 } from '@/ui/idleVillage/components/gameFrame';
@@ -52,9 +54,11 @@ export interface GameFrameScreenProps {
   panels?: HudPanelsApi;
   /** Offer the dev-only panels in the Panels menu. */
   devPanels?: boolean;
+  /** Live skin selector inside the game menu (the page owns the preset state). Omit to hide the row. */
+  skinControl?: HudSkinControl;
 }
 
-export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective, panels: panelsProp, devPanels = false }: GameFrameScreenProps) {
+export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective, panels: panelsProp, devPanels = false, skinControl }: GameFrameScreenProps) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
@@ -92,7 +96,9 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
 
   // Time shortcuts: Space pauses or resumes, 1-4 pick the speed in order. The ref keeps one listener on the latest handlers.
   const timeKeys = useRef({ onTogglePause, onSpeedChange, availableSpeeds });
-  timeKeys.current = { onTogglePause, onSpeedChange, availableSpeeds };
+  useEffect(() => {
+    timeKeys.current = { onTogglePause, onSpeedChange, availableSpeeds };
+  });
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey || event.repeat) return;
@@ -117,6 +123,15 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
         title={t('gameFrame.title')}
         subtitle={t('gameFrame.subtitle')}
         objectiveSlot={<ObjectiveCartouche objective={objective} />}
+        menuSlot={
+          <HudGameMenu
+            visible={panels.visible}
+            onTogglePanel={panels.toggle}
+            onSaveNow={() => gameplay.saveNow()}
+            skin={skinControl}
+            includeDev={devPanels}
+          />
+        }
         navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
         activeNavId={activeNavId}
         onNavSelect={setActiveNavId}
