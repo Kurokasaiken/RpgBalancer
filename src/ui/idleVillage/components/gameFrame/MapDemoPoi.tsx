@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PoiMatericV3_5, { poiMatericV3_5Styles } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import { usePoiTypeIcon } from './usePoiTypeIcon';
-import { ENTER_MS } from './MapQuestPoi';
+import { ENTER_MS, EXPIRE_FADE_MS } from './MapQuestPoi';
 import type { PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
 
 /**
@@ -10,7 +10,7 @@ import type { PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
  * It reads as a freshly placed marker — the seal is empty (`assigned` at 0, never `available`/`new`,
  * which the family draws as a fully written circle) and it eases in like a real quest POI does.
  */
-export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number }> = ({ type, sizePx }) => {
+export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number; exiting?: boolean }> = ({ type, sizePx, exiting = false }) => {
   const iconUrl = usePoiTypeIcon(type);
   const [entered, setEntered] = useState(false);
   useEffect(() => {
@@ -22,9 +22,9 @@ export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number }> = ({ type, 
     data-testid={`map-demo-poi-${type}`}
     style={{
       pointerEvents: 'none',
-      opacity: entered ? 1 : 0,
-      transform: entered ? 'scale(1)' : 'scale(0.7)',
-      transition: `opacity ${ENTER_MS}ms ease-out, transform ${ENTER_MS}ms ease-out`,
+      opacity: exiting ? 0 : entered ? 1 : 0,
+      transform: exiting || !entered ? 'scale(0.7)' : 'scale(1)',
+      transition: `opacity ${exiting ? EXPIRE_FADE_MS : ENTER_MS}ms ease-out, transform ${exiting ? EXPIRE_FADE_MS : ENTER_MS}ms ease-out`,
     }}
   >
     <style>{poiMatericV3_5Styles}</style>
