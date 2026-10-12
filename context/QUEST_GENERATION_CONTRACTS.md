@@ -269,6 +269,20 @@ renderla impossibile. Le chiavi `PRESENTATION_KEYS` dello schema (title,
 body, transit, verdictFlavor…) sono già escluse dall'hash contenuto —
 edit/traduzioni non invalidano i run salvati (FACT, verificato).
 
+**Meccanismo v0 — overlay facts-locked (R-168, implemented):**
+per gli scenari compiled la localizzazione è un `ImprintLocaleOverlay`
+(`generation/imprintLocale.ts` + `impr002<Kit>.it.ts`): copre SOLO i
+campi presentazione — la spina (id, option id, flag, vars, verdictTable,
+routing) è intraducibile. `applyImprintLocale` produce uno scenario IT
+stesso-id; `localizedScenarioById(id, locale)` nel catalogo applica
+l'overlay con fallback EN. `lockedFacts` per nodo = i fatti che devono
+sopravvivere al render, verificati dal test di parità (coverage, no
+orphan, spina byte-identica, run identico) — la stessa disciplina del
+narrate Pass-5 resa controllabile offline. Peer render, non traduzione
+letterale: la regola 7 del contratto di scrittura (Significato in una
+frase piana) è ciò che rende il render affidabile. Il formato è
+rigenerabile: un futuro Pass-5 su imprint può emettere la stessa shape.
+
 ## 8. Piano di validazione (test concreti, strumenti esistenti)
 
 | Livello | Test | Strumento |

@@ -18,6 +18,8 @@ import { RACE_MINIERA_SCENARIO } from './narrated/raceMiniera';
 import { IMPR002_PALUDE_SCENARIO } from './impr002Palude';
 import { IMPR002_MARE_SCENARIO } from './impr002Mare';
 import { IMPR002_MINIERA_SCENARIO } from './impr002Miniera';
+import { IMPR002_MINIERA_IT } from './impr002Miniera.it';
+import { applyImprintLocale, type ImprintLocaleOverlay } from './imprintLocale';
 
 export { RACE_TO_PASS_SCENARIO } from './raceToPass';
 export { RACE_TO_MARSH_SCENARIO } from './raceToMarsh';
@@ -52,4 +54,33 @@ export const GENERATED_CATALOG: Readonly<Record<string, QuestScenario>> = {
 /** Lookup a generated scenario by catalog id. */
 export function generatedScenarioById(id: string): QuestScenario | undefined {
   return GENERATED_CATALOG[id];
+}
+
+/** Locales a catalog scenario can be rendered in. English is canonical. */
+export type ScenarioLocale = 'en' | 'it';
+
+/**
+ * Facts-locked locale overlays registered per catalog scenario (R-168).
+ * An overlay is a peer render of the canonical EN copy — never a
+ * different scenario: ids, flags, vars and routing are untranslatable.
+ */
+const SCENARIO_LOCALE_OVERLAYS: Partial<
+  Record<string, Partial<Record<ScenarioLocale, ImprintLocaleOverlay>>>
+> = {
+  'gen-impr002-miniera': { it: IMPR002_MINIERA_IT },
+};
+
+/**
+ * Lookup a catalog scenario rendered in the requested locale. Falls back
+ * to the canonical English copy when no overlay is registered for the
+ * pair — the causal spine is identical either way.
+ */
+export function localizedScenarioById(
+  id: string,
+  locale: ScenarioLocale = 'en',
+): QuestScenario | undefined {
+  const scenario = GENERATED_CATALOG[id];
+  if (!scenario) return undefined;
+  const overlay = locale === 'en' ? undefined : SCENARIO_LOCALE_OVERLAYS[id]?.[locale];
+  return overlay ? applyImprintLocale(scenario, overlay) : scenario;
 }
