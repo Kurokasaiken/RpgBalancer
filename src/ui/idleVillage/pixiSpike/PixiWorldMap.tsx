@@ -16,6 +16,9 @@ import {
   DisplacementFilter,
   AlphaFilter,
 } from 'pixi.js';
+// Registers MeshPipe — without this subpath init every Mesh/MeshPlane is silently
+// skipped by the render pipe lookup and crashes validateRenderables (renderPipes['mesh']).
+import 'pixi.js/mesh';
 import { createRefractionNoise, createSeabedArt } from './seabedTexture';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
@@ -532,10 +535,18 @@ export function PixiWorldMap({
       host.appendChild(app.canvas);
       app.canvas.style.display = 'block';
       app.canvas.dataset.testid = 'pixi-world-canvas';
+      // Dev only: lets a test or the console reach the running renderer for diagnostics.
+      if (import.meta.env.DEV) Object.assign(window as object, { __pixiApp: app });
 
       const world = new Container();
       world.sortableChildren = true;
       app.stage.addChild(world);
+
+      /* Mesh effects (canopy sway, deep sea, sea pattern, coast foam) need a real GPU renderer:
+       * on the Canvas fallback (no WebGL available) there is no 'mesh' render pipe, and a Mesh's
+       * renderPipeId crashes validateRenderables — which kills the whole ticker for good.
+       * On that path we simply skip the mesh layers; they were never drawn there anyway. */
+      const meshOk = 'mesh' in (app.renderer.renderPipes as Record<string, unknown>);
 
       // ── Base layers (+ mirrored sea margins for the base and sea layers) ──
       /** The painted sea and the deep sea around it: the see-through reveal thins them out as one. */
@@ -603,7 +614,7 @@ export function PixiWorldMap({
       const layers = manifest.surfaceLayers
         .filter((l) => (l.opacity ?? 1) > 0 && !hidden.has(l.id) && !l.id.startsWith('event_shroud_'))
         .sort((a, b) => a.zIndex - b.zIndex);
-      const canopyOn = fxOn.landLife && !reducedMotion && tn.forestSway > 0;
+      const canopyOn = fxOn.landLife && !reducedMotion && tn.forestSway > 0 && meshOk;
       // Enumerate every URL the build below will await — mirroring the same flag conditions — and
       // resolve it all in parallel. Misses fall back to the lazy `await load()` they used to do;
       // extra URLs are only a little speculative bandwidth.
@@ -741,7 +752,7 @@ export function PixiWorldMap({
       const cloudX = (p: number, w: number) => -margin - w - CLOUD_ENTRY_PAD_PX + p * (canvas.width + 2 * margin + 2 * w + 2 * CLOUD_ENTRY_PAD_PX);
 
       // ── Deep sea around the painted canvas (replaces the mirrored copies of the map) ──
-      if (seaTexture && (margin > 0 || marginY > 0)) {
+      if (seaTexture && (margin > 0 || marginY > 0) && meshOk) {
         const edge = seaTexture as Texture;
         const deepSeaMask = await load('/assets/atmosphere/terrain/sea_mask.webp');
         edge.source.style.addressMode = 'clamp-to-edge';
@@ -983,7 +994,7 @@ export function PixiWorldMap({
 
       buildStep();
       // ── Open-sea pattern (shader) ──
-      if (fxOn.seaPattern) {
+      if (fxOn.seaPattern && meshOk) {
         const pattern = await load('/assets/world/wanderlust/base/layers/sea_pattern_tile.png');
         pattern.source.style.addressMode = 'repeat';
         const seaMask = await load('/assets/atmosphere/terrain/sea_mask.webp');
@@ -1161,7 +1172,7 @@ export function PixiWorldMap({
 
       buildStep();
       // ── Coastal foam (shader) ──
-      if (fxOn.coastFoam) {
+      if (fxOn.coastFoam && meshOk) {
         const dist = await load('/assets/atmosphere/terrain/coast_distance.webp');
         const c = coastFoamConfig;
         const shader = Shader.from({
