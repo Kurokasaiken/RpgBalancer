@@ -587,6 +587,18 @@ export const QUEST_LAB_MECHANICS: readonly LabMechanic[] = [
     status: 'implemented',
   },
   {
+    id: 'imprint-locale',
+    label: 'Overlay locale (imprint→IT)',
+    desc: 'Peer render facts-locked, NON traduzione letterale: l’overlay copre solo i campi presentazione (title/body/transit/hints/verdictFlavor, option label/detail, combat copy, intel/epilogue labels, objective) — la spina (id, flag, vars, verdictTable, routing, option id) è intraducibile. `lockedFacts` per nodo = i fatti che devono sopravvivere al render, verificati offline dal test di parità (stessa disciplina del Pass-5 narrate). `localizedScenarioById(id, locale)` applica l’overlay; EN canonico, fallback quando l’overlay manca. Prima overlay: miniera IT (R-168). Formato rigenerabile: un futuro narrate Pass-5 può emettere la stessa shape.',
+    surface: 'ImprintLocaleOverlay, applyImprintLocale, localizedScenarioById',
+    files: [
+      'src/balancing/config/idleVillage/quests/generation/imprintLocale.ts',
+      'src/balancing/config/idleVillage/quests/generation/impr002Miniera.it.ts',
+      'src/balancing/config/idleVillage/quests/generation/catalog.ts',
+    ],
+    status: 'implemented',
+  },
+  {
     id: 'alarm',
     label: 'Allerta a stati',
     desc: 'Escalation a stati nominati (quieto→allertato→sveglio) non a metro numerico — authored, engine switch legacy.',
