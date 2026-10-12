@@ -65,3 +65,14 @@ corrente** (regola del plan: CONFIRMED solo con URL ufficiale).
 - [ ] **Steam Achievements** — confermati dal Director (2026-10-12): abilitare in Steamworks + definire lista obiettivi
 - [ ] System Requirements misurati su build Tauri (togliere il placeholder dalla preview)
 - [ ] Icone app .ico multi-size (da client-icon 32×32 al momento dell'exe)
+
+## v2 (REVIEW-2026-10-12)
+
+| Cosa | File | Come si rifà |
+|---|---|---|
+| Capsule/hero/logo ricavati dalla key art | `assets/candidates/from-keyart/` | ritagli da `Downloads/{Header,Small,Library} Capsule.png`, `library hero.png` (Library Hero = upscale 2.5×) |
+| Screenshot EN (mappa, scelta, conseguenza, ritorno) | `assets/screenshots-v2/` | `npx tsx marketing/steam/tools/capture-v2.mts` (dev server :5173, Node 20, Chromium headed) |
+| GIF 1 — offerta di quest | `assets/about-gifs-v2/gif-1-quest-offer.gif` (1.3 MB) | `tools/record-offer-gif.mts` + ffmpeg |
+| GIF 2 — Astrolabio | `assets/about-gifs-v2/gif-2-astrolabe.gif` (4.4 MB) | da `media/astrolabe.mp4`, 2.5 s → +10 s |
+| GIF 3 — party/forecast | `assets/about-gifs-v2/gif-3-party.gif` (2.7 MB) | `tools/record-party-gif.mts` + ffmpeg (la ripresa dura ~90 s: lenta in Chromium headed) |
+| Screenshot planner con forecast | `assets/screenshots-v2/b-planner-forecast.png` | `capture-v2.mts` (viewport 1920×1080 solo per questo shot) |

@@ -765,14 +765,26 @@ export function defaultStrategy(state: QuestRunState): SimStrategy {
   for (const n of choiceNodesFor(state)) {
     if (n.options?.length) s[n.id] = n.options[0].id;
   }
-  return s;
+  /* The authored reference line wins over «first option»: for goblin the
+   * first options let the camp flee and loot forever (a certain wipe), so
+   * the forecast would report 0% reward and 100% death for any party. */
+  return { ...s, ...REFERENCE_STRATEGY[state.questId] };
 }
+
+/** The quest-completing line the planner forecast and the offer band assume,
+ *  where «first option at every node» is not it. Quests absent here keep the
+ *  first-option line (their authored order already is the main road). */
+export const REFERENCE_STRATEGY: Record<string, SimStrategy> = {
+  /* Pursue the fleeing goblins (extermination = reward), then stop looting. */
+  goblin: { 'gob-incalzare': 'gob-insegui', 'gob-esplora-extra': 'gob-fermati' },
+};
 
 /** The push-your-luck choice of each authored quest: which option secures
  *  the stake vs which pushes deeper. Used for the RETURN/CONTINUE compare. */
 export const CHECKPOINT_OPTIONS: Record<string, { nodeId: string; secure: string; push: string }> = {
   rovine: { nodeId: 'rv-checkpoint', secure: 'rv-torna', push: 'rv-continua' },
   cassa: { nodeId: 'rientra-o-rischi', secure: 'return-now', push: 'forziere' },
+  goblin: { nodeId: 'gob-esplora-extra', secure: 'gob-fermati', push: 'gob-fruga' },
 };
 
 /** Causal WHY bullets for the total preview — cause → effect, no internals.

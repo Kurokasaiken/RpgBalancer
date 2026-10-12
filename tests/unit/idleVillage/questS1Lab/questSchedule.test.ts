@@ -122,7 +122,8 @@ describe('D-K schedule — layer above matureReady, engine untouched', () => {
     // Start node is a choice → waiting. Elapsed must still advance.
     expect(state.frontier.status).toBe('waiting');
     const early = questHaloProgress(state, poi, START_TICK + 30);
-    const late = questHaloProgress(state, poi, START_TICK + 200);
+    // Relative to the authored duration (was a hard-coded 200 under 250 ticks).
+    const late = questHaloProgress(state, poi, START_TICK + Math.floor(poi.estimatedDurationTicks * 0.8));
     expect(late.elapsedTicks).toBeGreaterThan(early.elapsedTicks);
     expect(late.fraction).toBeGreaterThan(early.fraction);
     expect(late.status).toBe('filling');
