@@ -13,8 +13,11 @@ type Gameplay = ReturnType<typeof useMinimalGameplayWithIdleVillageConfig>;
  * Same loop `DayNightTimeEngineStrip` runs while it is mounted, for screens that
  * show time through other instruments (the GameFrame HUD). Mount exactly one
  * driver per screen, or time advances twice as fast.
+ *
+ * `opts.inputLocked` mutes the Space toggle: while an event theatre holds the
+ * clock, the player must not be able to unpause time under the curtains.
  */
-export function useTimeEngineLoop(gameplay: Gameplay): void {
+export function useTimeEngineLoop(gameplay: Gameplay, opts?: { inputLocked?: boolean }): void {
   const tickRef = useRef(gameplay.tick);
   useEffect(() => {
     tickRef.current = gameplay.tick;
@@ -29,8 +32,10 @@ export function useTimeEngineLoop(gameplay: Gameplay): void {
   }, [isPaused, intervalMs]);
 
   const { pauseGame, resumeGame } = gameplay;
+  const inputLocked = opts?.inputLocked ?? false;
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (inputLocked) return;
       if (e.code !== 'Space' || e.repeat) return;
       const el = e.target as HTMLElement | null;
       if (el?.closest('input, textarea, select, button, a, [contenteditable="true"], [role="button"]')) return;
@@ -40,5 +45,5 @@ export function useTimeEngineLoop(gameplay: Gameplay): void {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isPaused, pauseGame, resumeGame]);
+  }, [isPaused, pauseGame, resumeGame, inputLocked]);
 }
