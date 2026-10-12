@@ -28,10 +28,11 @@
  *   win bypasses the fight entirely, a partial collapse becomes your
  *   ambush, and failure means fighting hurt — the rock doesn't care
  *   whose side it's on.
- * - **B5 the mover is NOT human.** The vein was «bitten» before anyone
- *   arrived — `traccia-morso` seeds the entity of IMPR-001 instance C
- *   (the transformed miner). Cross-imprint bridge: the domain remembers,
- *   no world registry needed yet.
+ * - **B5 the trapped men were TAKEN, not buried.** The stakes are people
+ *   (R-165: «la posta deve sanguinare») — and TAKEN≠SECURED now applies
+ *   to them: tools mid-stroke, drag marks toward the deep drift.
+ *   `traccia-morso` seeds the entity of IMPR-001 instance C directly —
+ *   the next quest looks for the taken.
  * - **B6 'a-sgamato' goes to the company's factor.** Deliver foreman +
  *   register: the company discovers the parallel extraction — and the
  *   dead men's signatures point somewhere worse.
@@ -73,22 +74,22 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
   'mi-partenza': {
     id: 'mi-partenza',
     kind: 'choice',
-    title: 'The cargo under the collapse',
-    body: 'A supply wagon went down with the low gallery after the fall — its load pays the village’s quarter. Nobody walks that rock who doesn’t know it, and the only crew that does belongs to the senior foreman: «my men know where to step — and I know where». He offers them free, for the good of the camp.',
-    transit: 'The headframe creaks over a shaft that swallows lamplight.',
+    title: 'The shift still inside',
+    body: 'The collapse sealed the low gallery with a full shift inside — nine miners on bad air, their families already at the cage asking questions nobody can answer. Reaching them in time means a crew that knows which rock is safe to touch, and the only one belongs to the senior foreman: «my men know where to step — and I know where». He offers them free, for the good of the camp.',
+    transit: 'The headframe creaks over a shaft full of waiting faces.',
     beat: 0,
     options: [
       {
         id: 'mi-accetta',
         label: 'Take the foreman’s crew',
-        detail: 'Fast, guided, official — his miners, his signals, his register. Accepting means his men inside your descent.',
+        detail: 'His miners, his signals, his register — but they know the way down. Accepting puts his crew inside your rescue.',
         next: 'mi-discesa',
         sets: 'squadra-di-a',
       },
       {
         id: 'mi-rifiuta',
         label: 'Drop through the waste gallery',
-        detail: 'Constitution + Intellect. The old adit is rotten timber and bad air — but no crew follows you there. Mind: rock talks down here.',
+        detail: 'Constitution + Intellect. The old adit might bypass his crews entirely — rotten timber, bad air, and every stumble echoes down there.',
         next: 'CHECK:mi-scarico',
         sets: 'rotta-propria',
       },
@@ -100,7 +101,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-discesa',
     kind: 'info',
     title: 'The cage goes down',
-    body: 'The cage drops past lamp-light into working dark. His miners move through it like men on their own stairs — because they are. Every order travels on his whistle-code, not your leader’s voice. The descent is easy. That is exactly the problem.',
+    body: 'The cage drops past lamp-light into working dark. His miners move through it like men on their own stairs — because they are. Every order travels on his whistle-code, not your leader’s voice — and not toward the trapped men either, unless the whistle says so. The descent is easy. That is exactly the problem.',
     transit: 'The miners answer you politely — after the whistle.',
     next: 'mi-segnali',
     beat: 1,
@@ -199,19 +200,19 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-registro',
     kind: 'check',
     title: 'The shift register',
-    body: 'In the lamp-room, the register decides who was where: shifts, crews, galleries. The entries are open — to anyone who knows what a shift looks like when it is also an alibi.',
+    body: 'In the lamp-room the register says who was where: shifts, crews, galleries. Three pages in, the entries stop matching the maps — his crews have been logging a gallery the maps call sealed, for months.',
     stats: ['int'],
     risk: { wound: 0, death: 0 },
     beat: 2,
     verdictFlavor: {
-      bigwin: 'Three pages and the whole expedition rewrites itself: crews assigned to a gallery the maps call sealed — and a shift signed, last week, by a man the camp buried a month ago.',
-      win: 'Shadow shifts: the register shows his crew working the sealed gallery — and one line is signed by a dead man.',
-      almost: 'An entry smells wrong — the hand is his clerk’s, the crew listed is one nobody sees at meals.',
-      fail: 'Names, lamp tallies, galleries. Nothing a fair judge could object to.',
+      bigwin: 'Months of entries, one pattern: his crew in a gallery the maps call sealed — and the timber and candles drawn for it charged to other crews. This is not an error. It is a hidden mine.',
+      win: 'Shadow shifts: his crew has been working a gallery the maps call sealed.',
+      almost: 'A crew listed where no crew should be — the hand is his clerk’s, the explanation missing.',
+      fail: 'Names, lamp counts, galleries. Nothing a fair judge could object to.',
       epicfail: 'The lamp-boy notices your reading and mentions it where it pays to be mentioned.',
     },
     verdictTable: {
-      bigwin: { vars: [inc('sospetto', 1)], setFlags: ['segna-carta'], setInfo: ['turni-ombra'], log: 'Shadow shifts on paper: a crew in the sealed gallery — and a signature from a dead man. Proof AND a chill.', goto: 'mi-segnali' },
+      bigwin: { vars: [inc('sospetto', 1)], setFlags: ['segna-carta'], setInfo: ['turni-ombra'], log: 'The register hides a second mine — and it has been hiding it for months.', goto: 'mi-segnali' },
       win: { vars: [inc('sospetto', 1)], setFlags: ['segna-carta'], setInfo: ['turni-ombra'], goto: 'mi-segnali' },
       almost: { vars: [inc('sospetto', 1)], setFlags: ['segna-carta'], goto: 'mi-segnali' },
       fail: { setFlags: ['segna-carta'], goto: 'mi-segnali' },
@@ -248,7 +249,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-avviso',
     kind: 'info',
     title: 'The cage-boy’s warning',
-    body: 'Halfway down, the cage-boy rides the rope beside you for one dark stretch — long enough to whisper: «don’t let them take you past the third level. His crews come back heavier than they go down.» Then the rope pulls him up and away. Too late to matter for the descent; early enough to count.',
+    body: 'Halfway down, the cage-boy rides the rope beside you for one dark stretch — long enough to whisper: «the low gallery didn’t fall by itself. His crews had been cutting beside it for months.» Then the rope pulls him up and away. Too late to matter for the descent; early enough to count.',
     transit: 'The evidence always arrives after descending — that is what makes it evidence.',
     next: 'mi-schieramento',
     beat: 3,
@@ -257,7 +258,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-schieramento',
     kind: 'check',
     title: 'The low gallery',
-    body: 'The collapsed gallery opens ahead — and his men are already positioned in it, exactly where a recovery crew would not stand. The lamps reveal what the register hinted: the wall they are «clearing» is a worked vein — HIS vein, undeclared. Whatever you suspected, the disposition answers for him: the expedition was his legal cover to pull the last load before the company noticed. You were the witnesses of your own ambush.',
+    body: 'The collapsed gallery opens ahead — and his men are already staged in it, not digging toward the trapped crew but holding the line of an undeclared side vein: HIS vein, cut alongside the seam that fell. The shape lands at once: his hidden digging weakened the roof that buried nine men, and your rescue is the legal cover for pulling the last load before the company notices. You were the witnesses of your own ambush — and of his crime.',
     stats: ['perc'],
     risk: { wound: 0, death: 0 },
     beat: 3,
@@ -352,7 +353,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-scelta',
     kind: 'choice',
     title: 'Inside his gallery',
-    body: 'The worked vein, the pick-line, the deep behind him that only his register maps. Force means his numbers in his dark — they know where to step and you don’t. Flight means the long ascent against the shift bell. And there is a third argument nobody has used yet: the rotten timbering overhead, holding up more rock than any crew.',
+    body: 'The worked vein, the pick-line, nine men somewhere under his bad timbering. Force means his numbers in his dark. The ascent means leaving them to him. The rotten props overhead hold up more mountain than any crew — and his smile still offers a deal priced in silence about who put those men under.',
     transit: 'The kind of position you only get out of by paying.',
     beat: 4,
     options: [
@@ -509,7 +510,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-farsa',
     kind: 'check',
     title: 'The performance',
-    body: 'You keep playing the recovery crew he escorted: polite, useful, blind. The question is who is performing for whom — you offer a partnership in the vein as if there were nothing to forgive.',
+    body: 'You keep playing the rescue crew he escorted: polite, useful, blind. The question is who is performing for whom — you offer a partnership in the vein as if nine men weren’t buried under the bargain.',
     stats: ['cha'],
     risk: { wound: 0, death: 0 },
     beat: 4,
@@ -532,7 +533,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-in-piedi',
     kind: 'choice',
     title: 'The foreman, kneeling',
-    body: 'His crew is buried, broken, or fled, his pick-line done on his own ground. He kneels in the dust of his gallery — calm even now, a man already pricing the future. He knows every level, every seam, every name the register ever signed.',
+    body: 'His crew is buried, broken, or fled — his own arithmetic, this time. He kneels in the dust of the gallery that put nine men under for his ledger — calm even now, already pricing what your party’s silence is worth. He knows every level, every seam, every name the register ever signed.',
     transit: 'The dust settles. Even the rock seems to wait for your call.',
     beat: 4,
     options: [
@@ -604,15 +605,15 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
   'mi-vena': {
     id: 'mi-vena',
     kind: 'check',
-    title: 'The face, at last',
-    body: 'The sealed gallery, exactly where the register never said. You reach the face with expectation — and it answers wrong: the vein is already worked out, and not by picks. The ore was TAKEN — torn out, the way nothing human tears. Whatever his crew was covering, it was covering for something that got here first.',
+    title: 'Where the shift was',
+    body: 'Through the broken seam to where the trapped crew should be — and the dark answers wrong. No men, no bodies. Tools put down mid-stroke, lamps still burning, and drag marks — heavy, wrong-footed — pulling away from the collapse toward the deeper drift. The trapped miners did not die under the rock. Something came through it and took them.',
     stats: ['perc', 'int'],
     risk: { wound: 0, death: 0 },
     beat: 5,
     verdictFlavor: {
-      bigwin: 'The face tells you more than the vein: gnawed props, ore torn not cut — and something that signed the dead man’s shift is still keeping his hours.',
-      win: 'Emptied long ago — and the way it was emptied is itself information: no crew did this.',
-      almost: 'Empty. The only question left is what knew first.',
+      bigwin: 'The drag marks are readable: something came through the broken seam and took the living, not the dead — toward the deeper drift, and the marks are fresh.',
+      win: 'No bodies where bodies should be — the shift was taken, not buried.',
+      almost: 'Empty. The question is no longer where they are — it is what reached them first.',
       fail: 'Empty. Whatever answer the dark held, it slips through your hands.',
       epicfail: 'Empty, and a prop gives way on your shoulder besides.',
     },
@@ -621,7 +622,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
         setFlags: ['posta-mossa'],
         setInfo: ['traccia-morso'],
         goldDelta: 15,
-        log: 'Scraps in the floor — and the bite pattern of something that was never a crew. The thing below keeps the dead man’s hours.',
+        log: 'Drag marks toward the deep drift — the trapped crew was taken alive. The thing below is real, and it is recent.',
         goto: {
           branches: [
             { when: { flag: 'a-prigioniero' }, then: 'mi-convoglio' },
@@ -682,14 +683,14 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
   'mi-vena-lontana': {
     id: 'mi-vena-lontana',
     kind: 'check',
-    title: 'The face, from the level',
-    body: 'You watch his crew reach the face — and watch the foreman’s lantern stop dead. Whatever he expected to load tonight, the gallery holds something older and emptier. The curse he spits into the dark is the answer you would have paid blood for: it was already gone. For him too.',
+    title: 'Where the shift was — from the level',
+    body: 'You watch his crew reach where the trapped men should be — and watch the foreman’s lantern stop dead. No men, no bodies; whatever took them took the value out of his secret too. The curse he spits into the dark is the answer you would have paid blood for: empty. For him too.',
     stats: ['perc'],
     risk: { wound: 0, death: 0 },
     beat: 5,
     verdictFlavor: {
-      bigwin: 'You even catch what his crew won’t look at — the torn face, the gnawed props. No crew did this. Something down here got there first.',
-      win: 'Empty — for him as much as for you. The ghost took everyone.',
+      bigwin: 'You even catch what his crew won’t look at — drag marks toward the drift, tools left mid-stroke. No rock did that. Something down here got there first.',
+      win: 'Empty — for him as much as for you. The taken took everyone’s answer with them.',
       almost: 'His men carry it off empty. You read the defeat in their shoulders.',
       fail: 'Too far to read more than the shape of disappointment.',
       epicfail: 'A pick cracks against rock too close — you press lower than the sound.',
@@ -706,21 +707,21 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-convoglio',
     kind: 'check',
     title: 'The ascent convoy',
-    body: 'Bound and quiet, he climbs your rope through levels his own crews know better than their hands. Every shadow that falls in step behind belongs to him. Getting him to the surface is the whole job now — the deep does not surrender its foreman easily.',
+    body: 'Bound and quiet, he climbs your rope through levels his own crews know — a man who sent nine miners under bad timber for his vein, being carried toward daylight. Every shadow that falls in step behind belongs to him. Getting him to the surface is the whole job now — the deep does not surrender its foreman easily.',
     stats: ['agi', 'con'],
     risk: { wound: 14, death: 4 },
     risky: true,
     failHint: 'his crews shadow the ascent — in the dark, down a side gallery, he is gone.',
     beat: 5,
     verdictFlavor: {
-      bigwin: 'You land him at the headframe before his crews finish planning the rescue — and under oath, he tells you what really signs those dead men’s shifts.',
+      bigwin: 'You land him at the headframe before his crews finish planning the rescue — and under oath, he tells you what really reached the trapped men first.',
       win: 'The convoy holds. He steps into daylight in your custody — and the deep loses its register-keeper.',
       almost: 'One scramble in a side drift, one pick too close — but he arrives bound.',
       fail: 'A lamp flares in a side gallery; a scuffle answers it. By the next level the deep has him back.',
       epicfail: 'His crews take the level like it owes them — the convoy breaks, and he is gone into his own element.',
     },
     verdictTable: {
-      bigwin: { setObjective: 'done', setFlags: ['a-consegnato'], setInfo: ['traccia-morso'], log: 'Delivered — and talking. He names what kept the dead man’s hours, and it was never a crew.', goto: 'mi-fine' },
+      bigwin: { setObjective: 'done', setFlags: ['a-consegnato'], setInfo: ['traccia-morso'], log: 'Delivered — and talking. He names what took the trapped crew, and it was never the rock.', goto: 'mi-fine' },
       win: { setObjective: 'done', setFlags: ['a-consegnato'], goto: 'mi-fine' },
       almost: { setObjective: 'done', setFlags: ['a-consegnato'], damage: 10, goto: 'mi-fine' },
       fail: { setFlags: ['a-fuggito'], damage: 10, log: 'He slipped into a side gallery in the dark — the deep keeps its foreman. You will meet him again.', goto: 'mi-fine' },
@@ -731,42 +732,42 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-consegna',
     kind: 'check',
     title: 'The evidence ascent',
-    body: 'Bound, and bound in paper: the register rides in a sealed pouch beside him. His crews shadow the ascent — but a rescue now means attacking a legal delivery, and the factor already knows. The register does most of the climbing. The question is whether he buys his way out of even this.',
+    body: 'Bound, and bound in paper: the register rides in a sealed pouch beside him — crews in a sealed gallery, timber charged to other names, months of it, and nine men under the roof it bought. The factor will read it as what it is: the cause of the collapse, in his own clerk’s hand.',
     stats: ['cha', 'int'],
     risk: { wound: 0, death: 0 },
     beat: 5,
     verdictFlavor: {
-      bigwin: 'The factor reads the dead man’s signature twice — then asks, quietly, who has been working that gallery since. Two questions begin answering each other in the same ledger.',
+      bigwin: 'The factor reads the shadow shifts twice — then asks, quietly, what the nine trapped men were actually buried over. Two questions begin answering each other in the same ledger.',
       win: 'He surfaces with the register. The factor has both the man and the motive — and a second question to chase.',
       almost: 'The delivery holds, barely — the paperwork survives where the man almost does not.',
       fail: 'Somewhere between the third level and daylight, a tally-man is paid and a rope is loosed. The register stays; the man goes.',
       epicfail: 'The convoy arrives with the register intact and an empty rope — his money climbed faster than your evidence.',
     },
     verdictTable: {
-      bigwin: { setObjective: 'done', setFlags: ['a-consegnato'], setInfo: ['traccia-morso'], goldDelta: 25, log: 'Delivered with the register — the foreman’s secret and the dead man’s hours now point at each other in the same ledger.', goto: 'mi-fine' },
+      bigwin: { setObjective: 'done', setFlags: ['a-consegnato'], setInfo: ['traccia-morso'], goldDelta: 25, log: 'Delivered with the register — his hidden dig and the taken men now point at each other in the same ledger.', goto: 'mi-fine' },
       win: { setObjective: 'done', setFlags: ['a-consegnato'], setInfo: ['traccia-morso'], goldDelta: 15, goto: 'mi-fine' },
       almost: { setObjective: 'done', setFlags: ['a-consegnato'], goto: 'mi-fine' },
-      fail: { setFlags: ['a-fuggito'], setInfo: ['traccia-morso'], log: 'He bought his way off the ascent — but the register stayed. The dead man’s signature is out of the bag.', goto: 'mi-fine' },
-      epicfail: { setFlags: ['a-fuggito'], setInfo: ['traccia-morso'], damage: 8, log: 'He bought his way off the ascent — but the register stayed. The dead man’s signature is out of the bag.', goto: 'mi-fine' },
+      fail: { setFlags: ['a-fuggito'], setInfo: ['traccia-morso'], log: 'He bought his way off the ascent — but the register stayed. His part in the collapse is out of the bag.', goto: 'mi-fine' },
+      epicfail: { setFlags: ['a-fuggito'], setInfo: ['traccia-morso'], damage: 8, log: 'He bought his way off the ascent — but the register stayed. His part in the collapse is out of the bag.', goto: 'mi-fine' },
     },
   },
   'mi-patto': {
     id: 'mi-patto',
     kind: 'check',
     title: 'The letter of the deal',
-    body: 'Partners in a vein that was already bitten. Now you hold him to the letter: a cut of the operation, not of the face — and an answer. He knows exactly what empties a gallery like that. He just needs a reason to say it.',
+    body: 'Partners in a vein whose real price was nine men. Now you hold him to the letter: a cut of the operation — and an answer. He knows exactly what moves in the deeper drift. He just needs a reason to say it.',
     stats: ['cha'],
     risk: { wound: 0, death: 0 },
     beat: 5,
     verdictFlavor: {
       bigwin: 'He pays the share — and gives you the truth like a man settling two debts with one coin. The thing below has a history, and now so do you.',
-      win: 'A thin share, but a real one — and a word about the face whispered like it costs him.',
+      win: 'A thin share, but a real one — and a word about the drag marks whispered like it costs him.',
       almost: 'A token payment and a promise about the face. Half a deal is still a deal.',
       fail: 'He pays you in smiles — the letter of the deal says you are owed exactly nothing.',
       epicfail: 'The deal dissolves like lamplight in deep dark. He owes you nothing, and now he knows you think otherwise.',
     },
     verdictTable: {
-      bigwin: { setObjective: 'done', setFlags: ['soci-onorati'], setInfo: ['traccia-morso'], goldDelta: 30, log: 'His share — and what he knows about the thing that works the dead man’s hours.', goto: 'mi-fine' },
+      bigwin: { setObjective: 'done', setFlags: ['soci-onorati'], setInfo: ['traccia-morso'], goldDelta: 30, log: 'His share — and what he knows about what took his trapped crew.', goto: 'mi-fine' },
       win: { setObjective: 'done', setFlags: ['soci-onorati'], setInfo: ['traccia-morso'], goldDelta: 20, goto: 'mi-fine' },
       almost: { setObjective: 'done', goldDelta: 10, goto: 'mi-fine' },
       fail: { setFlags: ['soci-traditi'], goto: 'mi-fine' },
@@ -779,7 +780,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-ritorno',
     kind: 'info',
     title: 'The levels give you back',
-    body: 'The galleries close behind you with no comment. Whatever happened at the face, the deep keeps its own version — and its foreman, if it kept him. Above, the shift bell rings for a crew that isn’t there.',
+    body: 'The galleries close behind you with no comment. Whatever happened at the seam, nine families still wait at the cage — and the deep keeps its own answer about where their men went.',
     transit: 'A quiet way up, purchased one way or another.',
     next: 'mi-fine',
     beat: 6,
@@ -788,7 +789,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     id: 'mi-fine',
     kind: 'end',
     title: 'Return to the village',
-    body: 'The expedition is over. The quarter the village needed is paid — or the village learns what it actually bought, and what still keeps the dead man’s hours down there.',
+    body: 'The expedition is over. The village gets its answer about the collapse — and a worse question about where the taken went.',
     beat: 6,
   },
 };
@@ -805,18 +806,18 @@ export const IMPR002_MINIERA_SCENARIO_AUTHORED = {
   startNode: 'mi-partenza',
   primaryStats: ['perc', 'int'] as LabStat[],
   beats: [
-    'The cargo under the collapse',
+    'The shift still inside',
     'The cage goes down',
     'Small wrong things',
     'The low gallery',
     'Inside his gallery',
-    'The face that was bitten',
+    'Where the shift was',
     'The ascent',
   ],
   intelLabels: {
-    'equipaggio-suo': 'his crew works to his whistle-code, not the shift bell',
-    'turni-ombra': 'shadow shifts — his crew in the sealed gallery, signed by a dead man; proof AND a chill',
-    'traccia-morso': 'the bite pattern — the vein was emptied by something that was never a crew; the thing below keeps the dead man’s hours',
+    'equipaggio-suo': 'his crew works to his whistle-code, not the shift bell — and their spacing keeps you where he wants you',
+    'turni-ombra': 'his crew has been digging a sealed gallery for months — the register hides it, and hiding it is the crime',
+    'traccia-morso': 'the trapped miners were taken, not buried — drag marks toward the deeper drift; the thing below is real, and it is recent',
   },
   initialVars: { sospetto: 0 },
   armRolls: [
@@ -834,23 +835,23 @@ export const IMPR002_MINIERA_SCENARIO_AUTHORED = {
     ],
     lore: [
       {
-        label: 'He slipped back into his own galleries — the deep keeps its foreman. You will hear his whistle again.',
+        label: 'He slipped back into his own galleries — the man who buried nine miners for a vein is still down there. You will hear his whistle again.',
         requiresFlag: 'a-fuggito',
       },
       {
-        label: 'The register still answers to his hand — and now he knows your faces.',
+        label: 'The register still answers to his hand — and nine families still wait for an answer he already has.',
         requiresFlag: 'a-padrone',
       },
       {
-        label: 'The register you carried to daylight raised two questions at once — his extraction, and whatever signs the dead man’s shifts. Neither ledger is closed.',
+        label: 'The register you carried to daylight told the factor two things at once — who dug the vein, and who paid for the roof it weakened. Neither ledger is closed.',
         requiresFlag: 'a-sgamato',
       },
       {
-        label: 'Partners in a hollow vein — he paid with a smile.',
+        label: 'Partners in a vein paid for in buried men — he paid with a smile.',
         requiresFlag: 'soci-traditi',
       },
       {
-        label: 'The face had been emptied long before — and not by any crew. Something down there keeps the dead man’s hours.',
+        label: 'The trapped crew was never under the rock — drag marks lead to the deeper drift, and something down there is still keeping their hours.',
         requiresFlag: 'posta-mossa',
       },
       {
@@ -858,13 +859,13 @@ export const IMPR002_MINIERA_SCENARIO_AUTHORED = {
         requiresFlag: 'galleria-crollata',
       },
       {
-        label: 'He honoured the letter of the deal — and told you what works the face now.',
+        label: 'He honoured the letter of the deal — and told you what the taken men went toward.',
         requiresFlag: 'soci-onorati',
       },
     ],
   },
   offer: {
-    objective: 'Recover the trapped cargo from the collapsed gallery — or whatever its loss is worth to the village.',
+    objective: 'Reach the miners trapped in the collapsed gallery — or answer for what put them there.',
     tags: ['quest', 'imprint', 'impr002', 'miniera', 'gen'],
     slots: {
       required: [
