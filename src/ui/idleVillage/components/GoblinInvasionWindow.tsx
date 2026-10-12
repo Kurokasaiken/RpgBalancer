@@ -18,6 +18,11 @@ export interface GoblinInvasionWindowProps {
   goblinImageWithBorder?: string;
   /** If provided, the peeled sticker state is controlled from outside. */
   peeled?: boolean;
+  /**
+   * The goblin has left the window as a sticker: hide both window images so the goblin is never drawn twice.
+   * Only the caller knows when the sticker has taken over.
+   */
+  goblinHidden?: boolean;
 }
 
 const W = 520;
@@ -171,6 +176,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   goblinImage = defaultGoblinImage,
   goblinImageWithBorder = defaultGoblinImageWithBorder,
   peeled: peeledProp,
+  goblinHidden = false,
 }) => {
   const [internalPeeled, setInternalPeeled] = useState(false);
   const isPeeled = peeledProp !== undefined ? peeledProp : internalPeeled;
@@ -437,6 +443,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             width: '100%',
             height: '100%',
             objectFit: 'contain',
+            opacity: goblinHidden ? 0 : 1,
             transform: reduced
               ? 'none'
               : `translate3d(calc(var(--mx) * 18px), calc(var(--my) * 12px), 0)`,
@@ -451,6 +458,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             width: '100%',
             height: '100%',
             objectFit: 'contain',
+            opacity: goblinHidden ? 0 : 1,
             clipPath: isPeeled
               ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
               : 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',

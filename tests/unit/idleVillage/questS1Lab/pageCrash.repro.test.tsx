@@ -91,8 +91,8 @@ async function driveToFirstCheck(): Promise<boolean> {
     if (!depart) return false;
     fireEvent.click(depart);
 
-    // F0 assignment: the single «Partire» option travels straight to F1.
-    const partire = byText(/Partire/i);
+    // F0 assignment: the single «Depart» option travels straight to F1.
+    const partire = byText(/Depart/i);
     if (!partire) return false;
     fireEvent.click(partire);
     act(() => {
@@ -102,7 +102,7 @@ async function driveToFirstCheck(): Promise<boolean> {
 
     // F1: the option commits a check; the commit surface exposes the confirm.
     const optBtn = Array.from(view.container.querySelectorAll('button, [role="button"]'))
-      .find((b) => !(b as HTMLButtonElement).disabled && /Arrampicarsi|albero|masso/i.test(b.textContent ?? ''));
+      .find((b) => !(b as HTMLButtonElement).disabled && /Climb|tree|tracks/i.test(b.textContent ?? ''));
     if (!optBtn) return false;
     fireEvent.click(optBtn);
     const face = byText(/check|affronta|Face/i);

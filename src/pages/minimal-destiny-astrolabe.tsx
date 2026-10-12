@@ -9,29 +9,29 @@ import { DestinyAstrolabe } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeK
 import type { AstrolabeResult as DestinyAstrolabeResult, AstrolabeSkill as DestinyAstrolabeSkill, DestinyAstrolabeHandle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeKit';
 
 const SKILL_PRESETS = {
-  hard: [{ name: 'Atletica', stat: 30, difficulty: 80 }],
-  single: [{ name: 'Atletica', stat: 65, difficulty: 50 }],
+  hard: [{ name: 'Athletics', stat: 30, difficulty: 80 }],
+  single: [{ name: 'Athletics', stat: 65, difficulty: 50 }],
   double: [
-    { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare burraco
-    { name: 'Destrezza', stat: 55, difficulty: 60 },     // Disarmare trappola
+    { name: 'Athletics', stat: 65, difficulty: 50 },      // Saltare burraco
+    { name: 'Dexterity', stat: 55, difficulty: 60 },     // Disarmare trappola
   ],
   triple: [
-    { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare
-    { name: 'Destrezza', stat: 55, difficulty: 60 },     // Disarmare
-    { name: 'Forza', stat: 70, difficulty: 45 },         // Rompere porta
+    { name: 'Athletics', stat: 65, difficulty: 50 },      // Saltare
+    { name: 'Dexterity', stat: 55, difficulty: 60 },     // Disarmare
+    { name: 'Strength', stat: 70, difficulty: 45 },         // Rompere porta
   ],
   quadruple: [
-    { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare
-    { name: 'Destrezza', stat: 55, difficulty: 60 },     // Disarmare
-    { name: 'Forza', stat: 70, difficulty: 45 },         // Rompere
-    { name: 'Intelletto', stat: 50, difficulty: 55 },    // Risolvere enigma
+    { name: 'Athletics', stat: 65, difficulty: 50 },      // Saltare
+    { name: 'Dexterity', stat: 55, difficulty: 60 },     // Disarmare
+    { name: 'Strength', stat: 70, difficulty: 45 },         // Rompere
+    { name: 'Intellect', stat: 50, difficulty: 55 },    // Risolvere enigma
   ],
   five: [
-    { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare
-    { name: 'Destrezza', stat: 55, difficulty: 60 },     // Disarmare
-    { name: 'Forza', stat: 70, difficulty: 45 },         // Rompere
-    { name: 'Intelletto', stat: 50, difficulty: 55 },    // Enigma
-    { name: 'Carisma', stat: 60, difficulty: 48 },       // Persuadere
+    { name: 'Athletics', stat: 65, difficulty: 50 },      // Saltare
+    { name: 'Dexterity', stat: 55, difficulty: 60 },     // Disarmare
+    { name: 'Strength', stat: 70, difficulty: 45 },         // Rompere
+    { name: 'Intellect', stat: 50, difficulty: 55 },    // Enigma
+    { name: 'Charisma', stat: 60, difficulty: 48 },       // Persuadere
   ],
 };
 
@@ -149,7 +149,7 @@ export default function MinimalDestinyAstrolabe() {
           className="px-5 py-2 rounded-full font-bold transition-colors text-sm"
           style={{ background: 'linear-gradient(135deg, #e4b048, #a05c18)', color: '#2a1606' }}
         >
-          Rolla di nuovo
+          Roll again
         </button>
       </div>
 
@@ -204,11 +204,11 @@ export default function MinimalDestinyAstrolabe() {
 
       {/* ════════ CONFIG PANEL — always visible, editable skill table ════════ */}
       <div className="bg-gray-800 p-6 rounded-lg border border-amber-600/30">
-        <h2 className="text-xl font-bold text-amber-400 mb-4">⚙️ Configurazione Skill Check</h2>
+        <h2 className="text-xl font-bold text-amber-400 mb-4">⚙️ Skill Check Configuration</h2>
 
         {/* Skill count (keeps your edits) + load-preset shortcut */}
         <div className="flex flex-wrap items-center gap-3 mb-5">
-          <span className="text-sm font-semibold text-gray-300">Numero di skill:</span>
+          <span className="text-sm font-semibold text-gray-300">Skill count:</span>
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
@@ -234,16 +234,16 @@ export default function MinimalDestinyAstrolabe() {
               setSkills(SKILL_PRESETS[presetKey].map((s) => ({ ...s })));
             }}
             className="px-3 h-10 rounded font-semibold bg-gray-700 text-amber-300 hover:bg-gray-600 transition-colors text-sm"
-            title="Ricarica i valori di esempio per il numero di skill corrente"
+            title="Reload the sample values for the current skill count"
           >
-            ↺ Carica preset
+            ↺ Load preset
           </button>
           <button
             onClick={() => setSkills(SKILL_PRESETS.hard.map((s) => ({ ...s })))}
             className="px-3 h-10 rounded font-semibold bg-red-900 text-red-300 hover:bg-red-800 transition-colors text-sm"
-            title="Stat 30 / Difficoltà 80 → forza SCONFITTA"
+            title="Stat 30 / Difficulty 80 → forces DEFEAT"
           >
-            ⚡ HARD (forza fail)
+            ⚡ HARD (force fail)
           </button>
         </div>
 
@@ -254,10 +254,10 @@ export default function MinimalDestinyAstrolabe() {
               <tr className="text-left text-gray-400 border-b border-gray-700">
                 <th className="py-2 pr-4">#</th>
                 <th className="py-2 pr-4">Skill</th>
-                <th className="py-2 pr-4">Stat PG</th>
-                <th className="py-2 pr-4">Check (Difficoltà)</th>
-                <th className="py-2 pr-4">Soglia (TST)</th>
-                <th className="py-2">Punte</th>
+                <th className="py-2 pr-4">Hero Stat</th>
+                <th className="py-2 pr-4">Check (Difficulty)</th>
+                <th className="py-2 pr-4">Threshold (TST)</th>
+                <th className="py-2">Tips</th>
               </tr>
             </thead>
             <tbody>

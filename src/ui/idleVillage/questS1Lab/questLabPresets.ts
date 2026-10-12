@@ -18,8 +18,8 @@ import type { PartyPreset } from './questScenario';
 export const GOBLIN_PRESETS: PartyPreset[] = [
   {
     id: 'gob-band',
-    label: 'Banda — l’eroe e la sua scorta',
-    description: 'Eroe davanti, tre compagni dietro: il rischio vive in coda.',
+    label: 'The band — the hero and his escort',
+    description: 'Hero in front, three companions behind: the risk lives at the back.',
     gold: 0,
     members: [
       { id: 'g1', name: 'Edda', role: 'leader', hp: 100, stats: { str: 70, con: 60, agi: 45, perc: 40, int: 35, cha: 40 }, portrait: '/assets/portraits/portrait female magician.png' },
@@ -39,8 +39,8 @@ export const GOBLIN_PRESETS: PartyPreset[] = [
 export const ROVINE_PRESETS: PartyPreset[] = [
   {
     id: 'rv-eroe',
-    label: 'Eroe + Villager — il mockup',
-    description: 'Eroe forte in Forza (+25% sulla primaria), tre villager ordinari.',
+    label: 'Hero + Villagers — the mockup',
+    description: 'Hero strong in Strength (+25% on the primary stat), three ordinary villagers.',
     gold: 0,
     members: [
       { id: 'r1', name: 'Aldric', role: 'leader', stats: { str: 90, con: 72, agi: 40, perc: 45, int: 35, cha: 50 }, portrait: '/assets/portraits/portrait male warrior.png' },
@@ -51,8 +51,8 @@ export const ROVINE_PRESETS: PartyPreset[] = [
   },
   {
     id: 'rv-gracile',
-    label: 'Party debole — stessa quest, più letale',
-    description: 'Nessun muscolo vero: il delta fra requisiti e party decide quanto costa.',
+    label: 'Weak party — same quest, more lethal',
+    description: 'No real muscle: the delta between requirements and party decides how much it costs.',
     gold: 0,
     members: [
       { id: 'g1', name: 'Berta', role: 'leader', stats: { str: 45, con: 40, agi: 55, perc: 70, int: 60, cha: 55 }, portrait: '/assets/portraits/portrait female magician.png' },

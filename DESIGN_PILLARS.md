@@ -1,8 +1,8 @@
 # Design Pillars — Riferimenti d'ispirazione e raffinamenti
 
-**Versione:** 1 (creato 2026-05-22)
+**Versione:** 2 (creato 2026-05-22; aggiornato 2026-10-11 — aggiunti Mount & Blade e Battle Brothers come riferimenti per mappa/parte gestionale, R-157)
 **Companion di:** `GAMEPLAY_DESIGN.md`, `VERTICAL_SLICE_ROADMAP.md`, `COMPONENTS_SPECIFICATION.md`
-**Cosa è questo file:** fissare in modo chiaro i 3 riferimenti d'ispirazione che guidano il gioco e tradurli in scelte concrete di gameplay/UI/visual che la slice deve esprimere. Ogni volta che si decide qualcosa di nuovo (un componente, una micro-interazione, un suono), questo documento è la lente con cui controllare "è coerente con i pillar?".
+**Cosa è questo file:** fissare in modo chiaro i riferimenti d'ispirazione che guidano il gioco e tradurli in scelte concrete di gameplay/UI/visual che la slice deve esprimere. Ogni volta che si decide qualcosa di nuovo (un componente, una micro-interazione, un suono), questo documento è la lente con cui controllare "è coerente con i pillar?".
 
 > **Gerarchia documentale:**
 > - `GAMEPLAY_DESIGN.md` v2 → visione attuale (eroe esiliato, Mercante, Locanda, Peasants).
@@ -11,7 +11,7 @@
 
 ---
 
-## 1. I tre pillar
+## 1. I pillar
 
 ### Pillar 1 — UI & mappa: *World Surface* (mondo da esplorare con gli occhi)
 
@@ -62,16 +62,37 @@
 - **Eroi che salgono di livello, non solo workers.** Gli eroi sono *campioni* con stamina, XP, equipaggiamento — questa è la deviazione RPG.
 - **Tempo continuo, non a round.** Lo stato del villaggio scorre in tick continui, non in turni discreti. Ma le "decisioni significative" sono comunque rade (1-2 per giorno), così resta strategico.
 
+### Pillar 4 — Mappa strategica & gestione: *Mount & Blade* e *Battle Brothers*
+
+**Scope dichiarato dal Director (R-157, 2026-10-11):** questi due riferimenti ispirano **la mappa e la parte gestionale** del gioco. Non sostituiscono i pillar 1–3: Pillar 1 resta la lente *visiva* della mappa, Pillar 4 è la lente *strategico-gestionale* dello stesso mondo.
+
+**Cosa prendiamo (Mount & Blade):**
+- **La mappa come spazio strategico continuo.** Insediamenti e punti di interesse sono nodi di un'unica superficie leggibile: ciò che conta (insediamenti, attori, pericoli) si vede *sul mondo*, non in un menu.
+- **L'insediamento come hub di verbi.** Entrare in un insediamento apre un set di azioni/attori (commerciare, reclutare, prendere incarichi) — rafforza il nostro "POI = verbo + slot" (Pillar 2) dal lato gestionale.
+- **Attori funzionali che si muovono sul mondo in tempo reale.** Party, carovane e minacce con intenti propri che si spostano mentre il tempo scorre: il mondo è vivo anche perché *ci sono altri che agiscono*, non solo per effetti atmosferici. Integra la "vita ambientale rara" del Pillar 1 con attori leggibili e con conseguenze.
+- **La geografia come risorsa.** Distanza, rotta e tempo di spostamento fanno parte della decisione strategica: il *dove* conta quanto il *cosa*.
+
+**Cosa prendiamo (Battle Brothers):**
+- **I contratti come offerta di lavoro leggibile.** Gli insediamenti offrono contratti con rischio, ricompensa e durata valutabili *prima* dell'impegno — parallelo diretto con le quest card con requisiti (Pillar 3) e con la preview delle probabilità (R2.2).
+- **La gestione della compagnia con costi di mantenimento.** Roster con upkeep (paga, provviste, condizione): la parte gestionale ha un "fondo" che va sostenuto, non solo assegnazioni one-shot.
+- **Eventi narrativi diegetici sulla mappa.** Incontri e scelte testuali scatenati dal muoversi sul mondo: la mappa *genera* decisioni, non solo le ospita.
+- **Tono sobrio e conseguenziale.** Le scelte gestionali pesano (uomini, economia, sopravvivenza) senza melò — coerente con il tono gestionale di frontiera già scelto per le etichette nominali dei POI (R2.1).
+
+**Cosa NON prendiamo:**
+- Non il battle layer tattico dedicato (battle map di Battle Brothers, field battle di Mount & Blade): gli esiti restano carte/skill check (Pillar 2), coerente con l'anti-pillar "combattimento in tempo reale animato".
+- Non il viaggio libero del party come sistema della slice: il riferimento informa mappa e gestione, non introduce un overworld sandbox né un sandbox di fazioni.
+- Non la letalità sistemica di Battle Brothers come tono di default: la morte di un PG resta uno scambio risorsa↔risorsa (decisione 2026-10-01, Pillar 2), non il default a ogni ingaggio.
+
 ---
 
 ## 2. Tabella di sintesi — pillar → meccaniche del progetto
 
 | Meccanica della slice                | Pillar dominante         | Pillar secondari               | Stato componente nel repo                             |
 | ------------------------------------ | ------------------------ | ------------------------------ | ----------------------------------------------------- |
-| Mappa con POI nodi                   | World Surface                 | Cultist Sim                    | `MinimalGameplayPage` + `map/` ✅                      |
+| Mappa con POI nodi                   | World Surface                 | Cultist Sim, M&B/BB            | `MinimalGameplayPage` + `map/` ✅                      |
 | Halo (rosso → giallo) su POI         | Cultist Sim              | World Surface                       | `ActionHalo.tsx` ✅                                    |
 | Drag medaglione → slot POI           | Cultist Sim              | LoW (worker placement)         | `SlottedMedal` + `ActionCardBase` ✅                   |
-| Quest card con requisiti (stat/eq.)  | Cultist Sim              | LoW                            | `QuestActionCard` ✅ (manca preview requisiti)         |
+| Quest card con requisiti (stat/eq.)  | Cultist Sim              | LoW, BB                        | `QuestActionCard` ✅ (manca preview requisiti)         |
 | Skill check resolution pannello      | Cultist Sim              | —                              | **MANCA** (vedi `vertical_slice_completion_analysis`) |
 | Job ripetibile (taglialegna/oro)     | LoW (worker placement)   | World Surface                       | `JobActionCard` ✅                                     |
 | Peasants assegnati permanenti        | LoW (worker placement)   | —                              | **DA AGGIUNGERE** (regola di config + UI badge)       |
@@ -182,14 +203,14 @@ Questa è la sezione operativa: cosa cambiare/aggiungere per rendere il gameplay
 
 **R3.4 — Equip e XP come "carburante" tangibile del motore**
 - *Cosa:* sulla card dell'eroe (medaglione esteso al click): barra XP segmentata in 3 tacche (lvl 1 → 2), slot equip (arma, amuleto) visibili. Quando l'eroe completa una quest, la barra XP si riempie con animazione *sopra* il medaglione, non solo nel modal.
-- *Perché:* feedback ricco e immediato. È quello che manca alla maggior parte degli idle: il "vedo il numero salire" deve avvenire nel posto giusto, sul *personaggio*.
+- *Perché:* feedback ricco e immediato. È quello che manca alla maggior parte dei gestionali a tempo continuo: il "vedo il numero salire" deve avvenire nel posto giusto, sul *personaggio*.
 - *Dove:* estensione `SlottedMedal` o un layer `MedalXPRing.tsx` da sovrapporre.
 
 **R3.5 — Tempo continuo, senza battito di fine giornata** *(decisione utente: continuo)*
 - *Cosa:* niente pausa con summary. Il tempo scorre senza interruzioni e il giocatore può intervenire quando vuole. Per compensare l'assenza del "battito strategico" senza svuotare la dimensione gestionale, si aggiungono **due sostituti diffusi**:
   - **Day-clock + tacche eventi (R1.2):** la timeline mostra in anticipo "tra X tick farà notte / arriva il Mercante / scade quella quest". È lì che il giocatore *legge* il futuro prossimo.
   - **Highlight della scelta corrente:** quando un peasant è ozioso o un eroe è a riposo completo, il loro medaglione pulsa molto delicatamente nel roster. Niente popup, niente modali — solo un richiamo periferico per dire "qui c'è una decisione da prendere".
-- *Perché:* la scelta è coerente col feel idle puro. Il rischio di non avere mai un *istante di riflessione* viene neutralizzato dal day-clock + dall'highlight passivo, che fanno da "sostituti delicati" del battito End-of-Day.
+- *Perché:* la scelta è coerente col feel gestionale a tempo continuo (ritmo rilassato, "second monitor", decisioni rade e pesanti — il gioco NON è un idle game: niente progressione offline, vedi `marketing/steam/claim-ledger.md`). Il rischio di non avere mai un *istante di riflessione* viene neutralizzato dal day-clock + dall'highlight passivo, che fanno da "sostituti delicati" del battito End-of-Day.
 - *Dove:* `DayClockTimeline` (R1.2) gestisce la previsione; il pulse passivo è un layer sul `SlottedMedal` nel roster. Nessun `EndOfDaySummary.tsx` da creare.
 
 **R3.6 — Sinergia Locanda → peasants, IN SLICE** *(decisione utente: in slice)*

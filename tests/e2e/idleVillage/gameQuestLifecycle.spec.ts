@@ -342,6 +342,10 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
   test.beforeEach(async ({ page }) => {
     await page.goto('/game');
     await waitForHooks(page);
+    /* Panels open closed on every /game entry (PLAN-031 follow-up): summon the
+     * roster as a player would before looking for its cards. */
+    await page.keyboard.press('r');
+    await expect(page.locator('[data-testid="drag-test-container"], [data-testid="resident-roster-panel"]').first()).toBeVisible({ timeout: 15_000 });
   });
 
   test('boot: roster seedato — 3 eroi + 3 popolani — nessun POI in mappa finché la Regia non li rivela', async ({

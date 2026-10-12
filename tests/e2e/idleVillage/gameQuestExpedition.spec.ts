@@ -101,6 +101,10 @@ test.beforeEach(async ({ page }) => {
     [POI, POI_ROVINE],
     { timeout: 30_000 },
   );
+  /* Panels open closed on every /game entry (PLAN-031 follow-up): summon the
+   * roster as a player would before looking for its cards. */
+  await page.keyboard.press('r');
+  await expect(page.locator('[data-testid="drag-test-container"], [data-testid="resident-roster-panel"]').first()).toBeVisible({ timeout: 15_000 });
 });
 
 test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
+import { GameBootScreen } from '@/ui/idleVillage/components/gameFrame/GameBootScreen';
 import { FantasyLayout } from './ui/fantasy/FantasyLayout';
 import { ErrorBoundary } from './ui/organisms/ErrorBoundary';
 import { SpellCreatorNew } from './ui/spells/SpellCreatorNew';
@@ -1030,7 +1031,7 @@ function App() {
   if (isGameFramePixiPath || isGamePath || isRootPath) {
     return (
       <ErrorBoundary componentName="Game Frame Pixi Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Game Frame (Pixi)...</div>}>
+        <Suspense fallback={<GameBootScreen phase="manifest" indeterminate />}>
           <GameFramePixiPage />
         </Suspense>
       </ErrorBoundary>

@@ -47,7 +47,7 @@ function terminalRun(over: Partial<QuestRunState>): QuestRunState {
     gold: 15,
     days: 1,
     bottinoOro: 0,
-    loot: ['trofeo dei goblin'],
+    loot: ['goblin trophy'],
     info: [],
     flags: [],
     alarm: false,
@@ -208,7 +208,7 @@ describe('applyPlanToState', () => {
 
 describe('eventLog', () => {
   it('writes an outcome headline plus one line per applied effect', () => {
-    const plan = deriveSettlementPlan(terminalRun({}), { questTitle: 'Sterminio dei goblin' });
+    const plan = deriveSettlementPlan(terminalRun({}), { questTitle: 'Goblin Extermination' });
     const { next } = applyPlanToState(minimalState({}), plan, 200);
     const log = next.eventLog ?? [];
     /* Entries: outcome + wounded(hero-member) + goldReward(42) + goldLoot(15)
@@ -219,7 +219,7 @@ describe('eventLog', () => {
     expect(headline.type).toBe('quest_outcome');
     expect(headline.severity).toBe('success'); // outcome=reward
     expect(headline.messageKey).toBe('gameFrame.questLog.outcome.reward');
-    expect(headline.messageParams).toEqual({ quest: 'Sterminio dei goblin' });
+    expect(headline.messageParams).toEqual({ quest: 'Goblin Extermination' });
     expect(headline.id).toBe(`${plan.runId}:log:outcome`);
 
     const wounded = log[1];
@@ -230,9 +230,9 @@ describe('eventLog', () => {
     expect(wounded.messageParams).toEqual({ name: 'Member' });
 
     expect(log[2].messageKey).toBe('gameFrame.questLog.goldReward');
-    expect(log[2].messageParams).toEqual({ amount: 42, quest: 'Sterminio dei goblin' });
+    expect(log[2].messageParams).toEqual({ amount: 42, quest: 'Goblin Extermination' });
     expect(log[3].messageKey).toBe('gameFrame.questLog.goldLoot');
-    expect(log[3].messageParams).toEqual({ amount: 15, quest: 'Sterminio dei goblin' });
+    expect(log[3].messageParams).toEqual({ amount: 15, quest: 'Goblin Extermination' });
     expect(log[4].messageKey).toBe('gameFrame.questLog.xp');
   });
 

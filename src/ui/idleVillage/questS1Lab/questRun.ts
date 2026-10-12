@@ -316,8 +316,11 @@ export interface ResolvedCheck {
   /** Structured harms applied by this resolution — the presentation plays
    *  them on the formation HUD instead of parsing the log. */
   harms: HarmEvent[];
-  /** Italian log lines describing the harms (log drawer + aria-live only). */
+  /** Log lines describing the harms (log drawer + aria-live only). */
   harmLines: string[];
+  /** The subset of `harmLines` that narrate a death — kind-derived, so the
+   *  presentation can paint fatal lines without matching prose (R-135). */
+  deathLines?: string[];
   /** Non-harm consequence lines (loot, flags, kills…) — the authored part of
    *  the outcome, shown on the verdict card without duplicating harms. */
   authoredText: string;
@@ -485,7 +488,7 @@ function applyHpDamage(state: QuestRunState, target: RuntimeMember, amount: numb
     target.dead = true;
     state.log.push({
       kind: 'DEATH',
-      text: `${target.name} cade, e non si rialza più${source ? ` — su «${source}»` : ''}.`,
+      text: `${target.name} falls, and does not get back up${source ? ` — at «${source}»` : ''}.`,
     });
     recordHarm(state, target.id, amount, 'death', hpBefore, 0, source);
     return;
@@ -496,12 +499,12 @@ function applyHpDamage(state: QuestRunState, target: RuntimeMember, amount: numb
   const frac = target.hp / target.maxHp;
   const line =
     frac < 0.2
-      ? `${target.name} regge solo perché non c’è altro da fare`
+      ? `${target.name} holds on only because there is nothing else to do`
       : frac < 0.35
-        ? `${target.name} barcolla: c’è sangue sul fianco`
+        ? `${target.name} staggers: blood on their side`
         : frac <= 0.7
-          ? `${target.name} si piega, poi si rimette dritto`
-          : `${target.name} serra i denti e resta in piedi`;
+          ? `${target.name} bends, then straightens up`
+          : `${target.name} grits their teeth and stays standing`;
   state.log.push({ kind: 'HARM', text: `${line} (−${amount} HP).` });
   recordHarm(state, target.id, amount, 'harm', hpBefore, target.hp, source);
 }
@@ -566,12 +569,12 @@ export function nextCombatHits(state: QuestRunState): number {
 /* ------------------------------------------------------------------ */
 
 export const STAT_LABELS: Record<LabStat, string> = {
-  perc: 'Percezione',
-  int: 'Intelligenza',
-  str: 'Forza',
-  con: 'Costituzione',
-  agi: 'Agilità',
-  cha: 'Carisma',
+  perc: 'Perception',
+  int: 'Intelligence',
+  str: 'Strength',
+  con: 'Constitution',
+  agi: 'Agility',
+  cha: 'Charisma',
 };
 
 /** Lucide icon ids per lab stat — resolved through `getStatIconComponent`. */
@@ -695,7 +698,7 @@ function applyHarm(
     if (interceptable && bodyguard && target.id !== bodyguard.id) {
       state.log.push({
         kind: 'INTERCEPT',
-        text: `${bodyguard.name} si frappone e subisce il colpo destinato a ${target.name}.`,
+        text: `${bodyguard.name} steps in and takes the blow meant for ${target.name}.`,
       });
       target = bodyguard;
     }
@@ -706,7 +709,7 @@ function applyHarm(
         target.wounded = true;
         state.log.push({
           kind: 'DEATH_SAVE',
-          text: `${target.name} è a terra… e si rialza. Death save riuscito.`,
+          text: `${target.name} is down… and gets back up. Death save succeeded.`,
         });
         recordHarm(state, target.id, 0, 'wound', hpBefore, target.hp, sourceTitle);
         applied.push('wound');
@@ -717,7 +720,7 @@ function applyHarm(
       target.hp = 0;
       state.log.push({
         kind: 'DEATH',
-        text: `${target.name} è morto${sourceTitle ? ` — su «${sourceTitle}»` : ''}.`,
+        text: `${target.name} dies${sourceTitle ? ` — at «${sourceTitle}»` : ''}.`,
       });
       recordHarm(state, target.id, hpBefore, 'death', hpBefore, 0, sourceTitle);
       applied.push('death');
@@ -725,7 +728,7 @@ function applyHarm(
       const hpBefore = target.hp;
       target.wounded = true;
       target.hp = Math.max(1, target.hp - TUNE.woundHpLoss);
-      state.log.push({ kind: 'WOUND', text: `${target.name} è ferito.` });
+      state.log.push({ kind: 'WOUND', text: `${target.name} is wounded.` });
       recordHarm(state, target.id, hpBefore - target.hp, 'wound', hpBefore, target.hp, sourceTitle);
       applied.push('wound');
     }
@@ -875,22 +878,22 @@ export function createRun(
   const intro =
     questId === 'rovine'
       ? {
-          lastEvent: 'La spedizione parte per le rovine sotto il fiume.',
-          firstLog: 'Partenza — obiettivo: riportare il tesoro delle rovine. La strada conta in giorni.',
+          lastEvent: 'The expedition leaves for the ruins beneath the river.',
+          firstLog: 'Departure — objective: bring back the ruins treasure. The road counts in days.',
         }
       : questId === 'goblin'
         ? {
-            lastEvent: 'Il guado è chiuso dalla paura. Sterminateli.',
-            firstLog: 'Assegnazione — quest di combattimento, basata su Forza. Il trofeo dei goblin si converte in Gold al ritorno.',
+            lastEvent: 'The ford is closed by fear. Exterminate them.',
+            firstLog: 'Assignment — combat quest, based on Strength. The goblin trophy converts to Gold on return.',
           }
         : questId === 'gen'
           ? {
-              lastEvent: 'La spedizione parte.',
-              firstLog: 'Partenza — obiettivo: portare a termine la missione.',
+              lastEvent: 'The expedition departs.',
+              firstLog: 'Departure — objective: complete the mission.',
             }
           : {
-              lastEvent: 'La spedizione parte per il Passo del Corvo.',
-              firstLog: 'Partenza — obiettivo: riportare la cassa delle sementi.',
+              lastEvent: 'The expedition leaves for the Crow Pass.',
+              firstLog: 'Departure — objective: bring back the seed crate.',
             };
   // Generated/scaled instances may carry their own start node (engine v2).
   const startNode = scenarioInstance?.startNode ?? quest.startNode;
@@ -971,12 +974,12 @@ function endRun(state: QuestRunState, outcome: QuestOutcome, text: string): void
   if (outcome === 'wipe') {
     state.loot = [];
     state.info = [];
-    state.log.push({ kind: 'QUEST_END', text: 'Nessuno torna. Si perde tutto.' });
+    state.log.push({ kind: 'QUEST_END', text: 'No one comes back. Everything is lost.' });
   } else {
     // Goblin quest (Director): XP is always awarded, whatever the outcome.
     if (state.questId === 'goblin') {
       state.xp = TUNE.goblinXp;
-      state.log.push({ kind: 'INFO', text: `La strada insegna. +${TUNE.goblinXp} XP.` });
+      state.log.push({ kind: 'INFO', text: `The road teaches. +${TUNE.goblinXp} XP.` });
     }
     state.log.push({ kind: 'QUEST_END', text });
   }
@@ -1002,16 +1005,16 @@ function dropObjective(state: QuestRunState, reason: string): void {
   if (state.questId === 'rovine') {
     state.flags.push('tesoroPerso');
     state.bottinoOro = 0;
-    dropLoot(state, 'tesoro delle rovine', reason);
+    dropLoot(state, 'ruins treasure', reason);
   } else if (state.questId === 'goblin') {
     state.flags.push('trofeoPerso');
-    dropLoot(state, 'trofeo dei goblin', reason);
+    dropLoot(state, 'goblin trophy', reason);
   } else if (state.questId === 'gen') {
     state.flags.push('objectiveLost');
     for (const l of [...state.loot]) dropLoot(state, l, reason);
   } else {
     state.flags.push('cassaPersa');
-    dropLoot(state, 'cassa delle sementi', reason);
+    dropLoot(state, 'seed crate', reason);
   }
 }
 
@@ -1019,18 +1022,18 @@ function dropObjective(state: QuestRunState, reason: string): void {
  *  is still "in hand", not banked: panic means dropping it to run. */
 export function flee(state: QuestRunState): QuestRunState {
   if (state.ended) return state;
-  state.log.push({ kind: 'RETREAT', text: 'La spedizione si ritira.' });
+  state.log.push({ kind: 'RETREAT', text: 'The expedition retreats.' });
   if (state.objectiveDone) {
     dropObjective(
       state,
       state.questId === 'rovine'
-        ? 'nella fuga il tesoro vi pesa troppo — lo abbandonate tra i ruderi.'
+        ? 'in the flight the treasure weighs too much — you abandon it among the ruins.'
         : state.questId === 'gen'
-          ? 'nella fuga il carico vi rallenta troppo — lo mollate a bordo pista.'
-          : 'nella fuga la cassa vi rallenta troppo — la mollate ai bordi del campo.',
+          ? 'in the flight the load slows you too much — you drop it by the roadside.'
+          : 'in the flight the crate slows you too much — you drop it at the edge of the camp.',
     );
   }
-  endRun(state, 'fled', 'Fuggite verso il villaggio con quanto avete raccolto. La quest è fallita.');
+  endRun(state, 'fled', 'You flee toward the village with what you gathered. The quest has failed.');
   return state;
 }
 
@@ -1051,9 +1054,9 @@ export function drinkPotion(state: QuestRunState, flag: 'hasPozione'): QuestRunS
   if (target) {
     target.wounded = false;
     target.hp = target.maxHp;
-    state.log.push({ kind: 'INFO', text: `Pozione usata: ${target.name} è di nuovo in forze.` });
+    state.log.push({ kind: 'INFO', text: `Potion used: ${target.name} is back in shape.` });
   } else {
-    state.log.push({ kind: 'INFO', text: 'Pozione usata, ma nessuno ne aveva bisogno.' });
+    state.log.push({ kind: 'INFO', text: 'Potion used, but no one needed it.' });
   }
   return state;
 }
@@ -1074,9 +1077,9 @@ export function useHealing(state: QuestRunState): QuestRunState {
   if (target && target.hp < target.maxHp) {
     target.hp = Math.min(target.maxHp, target.hp + 20);
     if (target.hp >= target.maxHp) target.wounded = false;
-    state.log.push({ kind: 'INFO', text: `La ferita si chiude: ${target.name} recupera 20 HP.` });
+    state.log.push({ kind: 'INFO', text: `The wound closes: ${target.name} recovers 20 HP.` });
   } else {
-    state.log.push({ kind: 'INFO', text: 'La cura non serve a nessuno — conservata per nulla.' });
+    state.log.push({ kind: 'INFO', text: 'The healing helps no one — kept for nothing.' });
   }
   return state;
 }
@@ -1094,16 +1097,16 @@ export function consumableBonusFor(
 ): { bonus: number; label: string; flag: string } | null {
   const stats = node.stats ?? [];
   if (state.flags.includes('hasBonusForza') && stats.includes('str')) {
-    return { bonus: 15, label: 'Bonus Forza', flag: 'hasBonusForza' };
+    return { bonus: 15, label: 'Strength Bonus', flag: 'hasBonusForza' };
   }
   if (state.flags.includes('hasBonusPerc') && stats.includes('perc')) {
-    return { bonus: 15, label: 'Bonus Percezione', flag: 'hasBonusPerc' };
+    return { bonus: 15, label: 'Perception Bonus', flag: 'hasBonusPerc' };
   }
   if (state.flags.includes('hasFumogeno') && stats.includes('agi')) {
-    return { bonus: 15, label: 'Fumogeno', flag: 'hasFumogeno' };
+    return { bonus: 15, label: 'Smoke bomb', flag: 'hasFumogeno' };
   }
   if (state.flags.includes('hasCorda') && (stats.includes('con') || stats.includes('str'))) {
-    return { bonus: 15, label: 'Corda e rampino', flag: 'hasCorda' };
+    return { bonus: 15, label: 'Rope and grappling hook', flag: 'hasCorda' };
   }
   return null;
 }
@@ -1114,32 +1117,32 @@ export function consumableBonusFor(
  */
 export function intelBonusFor(state: QuestRunState, node: QuestNode): { bonus: number; label: string } | null {
   if (node.id === 'check-ingresso-agi' && state.info.includes('turni')) {
-    return { bonus: 10, label: 'conoscete i turni di guardia' };
+    return { bonus: 10, label: 'you know the guard shifts' };
   }
   if (node.id === 'check-ingresso-laterale' && state.info.includes('pattuglia')) {
-    return { bonus: 10, label: 'sapete quando passa la pattuglia' };
+    return { bonus: 10, label: 'you know when the patrol passes' };
   }
   if (node.id === 'perquisizione' && state.info.includes('mappaAccampamento')) {
-    return { bonus: 10, label: 'avete la mappa mentale del campo' };
+    return { bonus: 10, label: 'you have a mental map of the camp' };
   }
   // Rovine: the merchant's intel pays on the checks it describes —
   // the rough map helps at the river and spotting the trap; knowing what
   // the guards really watch makes sneaking past them easier.
   if (node.id === 'rv-fiume' && state.info.includes('mappaRovine')) {
-    return { bonus: 10, label: 'la mappa segna il punto di corrente debole' };
+    return { bonus: 10, label: 'the map marks the weak current point' };
   }
   if (node.id === 'rv-check-sneak' && state.info.includes('guardiePiuAvanti')) {
-    return { bonus: 10, label: 'sapete cosa sorvegliano davvero' };
+    return { bonus: 10, label: 'you know what they are really guarding' };
   }
   if (node.id === 'rv-sala' && state.info.includes('mappaRovine')) {
-    return { bonus: 10, label: 'la mappa segna le lastre trabocchetto' };
+    return { bonus: 10, label: 'the map marks the trapdoor slabs' };
   }
   // Goblin: the F1 tracks pay on the F3 stealth approach (Director rule).
   if (node.id === 'gob-stealth' && state.flags.includes('bonusStealth')) {
-    return { bonus: 10, label: 'le tracce dicono come avvicinarvi' };
+    return { bonus: 10, label: 'the tracks show how to approach' };
   }
   if (node.id === 'gob-stealth' && state.flags.includes('bonusStealthPiccolo')) {
-    return { bonus: 5, label: 'le tracce danno qualche indicazione' };
+    return { bonus: 5, label: 'the tracks give some hints' };
   }
   return null;
 }
@@ -1154,7 +1157,7 @@ export function intelBonusFor(state: QuestRunState, node: QuestNode): { bonus: n
  */
 function escalateCamp(state: QuestRunState, epicfail: boolean, reason: string): boolean {
   if (state.flags.includes('campoSveglio')) {
-    state.log.push({ kind: 'INFO', text: `${reason} Qualcosa si sta svegliando nella torre.` });
+    state.log.push({ kind: 'INFO', text: `${reason} Something is waking up in the tower.` });
     return true;
   }
   const allertato = state.flags.includes('campoAllertato');
@@ -1162,11 +1165,11 @@ function escalateCamp(state: QuestRunState, epicfail: boolean, reason: string): 
     if (!allertato) state.flags.push('campoAllertato');
     state.flags.push('campoSveglio');
     state.alarm = true;
-    state.log.push({ kind: 'INFO', text: `${reason} Il campo si sveglia: urla e torce ovunque — i check saranno più difficili.` });
+    state.log.push({ kind: 'INFO', text: `${reason} The camp wakes: shouts and torches everywhere — checks will be harder.` });
     return false;
   }
   state.flags.push('campoAllertato');
-  state.log.push({ kind: 'INFO', text: `${reason} Qualcuno nel campo ha sentito qualcosa.` });
+  state.log.push({ kind: 'INFO', text: `${reason} Someone in the camp heard something.` });
   return false;
 }
 
@@ -1196,19 +1199,19 @@ function resolveCheck(
     bonus = consumable.bonus;
     consumeFlag(state, consumable.flag);
     if (consumable.flag === 'hasFumogeno') {
-      state.log.push({ kind: 'INFO', text: 'Il fumogeno copre la vostra infiltrazione (+15).' });
+      state.log.push({ kind: 'INFO', text: 'The smoke bomb covers your infiltration (+15).' });
     } else if (consumable.flag === 'hasCorda') {
-      state.log.push({ kind: 'INFO', text: 'Corda e rampino rendono la salita più sicura (+15).' });
+      state.log.push({ kind: 'INFO', text: 'Rope and grappling hook make the climb safer (+15).' });
     } else {
-      state.log.push({ kind: 'INFO', text: `${consumable.label}: il bonus entra in gioco (+${consumable.bonus}).` });
+      state.log.push({ kind: 'INFO', text: `${consumable.label}: the bonus comes into play (+${consumable.bonus}).` });
     }
   } else if (consumable) {
-    state.log.push({ kind: 'INFO', text: `Decidete di tenere ${consumable.label} nella sacca.` });
+    state.log.push({ kind: 'INFO', text: `You decide to keep ${consumable.label} in the bag.` });
   }
   const intel = intelBonusFor(state, node);
   if (intel) {
     bonus += intel.bonus;
-    state.log.push({ kind: 'INFO', text: `L’informazione paga: ${intel.label} (+${intel.bonus}).` });
+    state.log.push({ kind: 'INFO', text: `The intel pays off: ${intel.label} (+${intel.bonus}).` });
   }
   const successBound = clampSuccessBound(score + bonus);
   const verdict = verdictFromRoll(die, successBound);
@@ -1233,20 +1236,20 @@ function resolveCheck(
   state.checkQueue.push(resolved);
   state.log.push({
     kind: 'CHECK',
-    text: `${node.title}: ${stats.map((s) => STAT_LABELS[s]).join(' + ')} → ${verdict.toUpperCase()} (${Math.round(successBound)} vs tiro ${die}).`,
+    text: `${node.title}: ${stats.map((s) => STAT_LABELS[s]).join(' + ')} → ${verdict.toUpperCase()} (${Math.round(successBound)} vs roll ${die}).`,
   });
   // Surface the verdict→risk modifier: the player must FEEL the lucky escape.
   if (verdict === 'win' || verdict === 'bigwin') {
     state.log.push({
       kind: 'INFO',
-      text: `Il ${verdict.toUpperCase()} ha risparmiato il party (−${-TUNE.winRiskMod}pp a ferita e morte).`,
+      text: `The ${verdict.toUpperCase()} spared the party (−${-TUNE.winRiskMod}pp to wound and death).`,
     });
   }
   if (verdict === 'bigwin') {
-    state.log.push({ kind: 'INFO', text: 'Bigwin: ogni esito di morte è degradato a ferita.' });
+    state.log.push({ kind: 'INFO', text: 'Bigwin: every death outcome is downgraded to a wound.' });
   }
   if (verdict === 'epicfail') {
-    state.log.push({ kind: 'INFO', text: 'Epicfail: ogni ferita diventa morte.' });
+    state.log.push({ kind: 'INFO', text: 'Epicfail: every wound becomes a death.' });
   }
   resolved.harm = rollCheckHarms(state, node, verdict);
   return { verdict, score: successBound, rollPct: die };
@@ -1258,19 +1261,19 @@ function resolveCheck(
 
 /** Authored one-liners for the goblin fight's attack verdicts (spec §Testi). */
 const GOBLIN_ATTACK_LINES: Record<Verdict, string> = {
-  bigwin: 'Il colpo li spacca a metà: due goblin crollano insieme.',
-  win: 'Il colpo arriva. La linea cede di un passo.',
-  almost: 'Il colpo morde, non uccide: arretrano e restano in piedi.',
-  fail: 'Scudi serrati. Il colpo muore su legno e cuoio.',
-  epicfail: 'La linea si richiude: per un istante lungo siete circondati.',
+  bigwin: 'The blow splits them in half: two goblins collapse together.',
+  win: 'The blow lands. The line gives a step.',
+  almost: 'The blow bites, does not kill: they fall back but stay standing.',
+  fail: 'Shields locked. The blow dies on wood and leather.',
+  epicfail: 'The line closes back: for one long moment you are surrounded.',
 };
 
 /** F6 push-your-luck: the sheltering ruin degrades turn by turn — the rising
  *  damage IS the structure giving way, narrated once per exploreTurn. */
 const GOBLIN_F6_CREAK_LINES = [
-  'Il palo che regge il telo scricchiola.',
-  'Il telo brucia ancora, in basso. Il caldo arriva al viso.',
-  'Una trave cede. Chi frugava arretra — e vede il cuoio più vicino.',
+  'The pole holding the tarp creaks.',
+  'The tarp still burns below. The heat reaches your face.',
+  'A beam gives way. Whoever was looting steps back — and sees the leather closer.',
 ] as const;
 
 /**
@@ -1299,7 +1302,7 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
   state.checkSeq += 1;
   state.lastCheck = {
     id: `chk-${state.checkSeq}`,
-    title: `${node.title} — turno ${turn}`,
+    title: `${node.title} — turn ${turn}`,
     verdict,
     score: Math.round(bound),
     rollPct: die,
@@ -1317,7 +1320,7 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
   state.checkQueue.push(state.lastCheck);
   state.log.push({
     kind: 'CHECK',
-    text: `Turno ${turn}: ${spec.attackStats.map((s) => STAT_LABELS[s]).join(' + ')} → ${verdict.toUpperCase()} (${Math.round(bound)} vs tiro ${die}). ${attackLine}`,
+    text: `Turn ${turn}: ${spec.attackStats.map((s) => STAT_LABELS[s]).join(' + ')} → ${verdict.toUpperCase()} (${Math.round(bound)} vs roll ${die}). ${attackLine}`,
   });
   // Everything logged after this point is a consequence of the attack roll.
   const consequenceMark = state.log.length;
@@ -1325,7 +1328,7 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
     verdict === 'bigwin' ? spec.killPerBigwin : verdict === 'win' || verdict === 'almost' ? spec.killPerWin : 0;
   if (kills > 0) {
     state.goblinLeft = Math.max(0, state.goblinLeft - kills);
-    state.log.push({ kind: 'INFO', text: `${spec.enemyName ?? 'Goblin'} abbattuti: ${kills}. Ne restano ${state.goblinLeft}.` });
+    state.log.push({ kind: 'INFO', text: `${spec.enemyName ?? 'Goblins'} down: ${kills}. ${state.goblinLeft} remain.` });
   }
   // Counterattack: hits land on positional targets, never twice the same one.
   const hits =
@@ -1351,6 +1354,10 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
     .slice(consequenceMark)
     .filter((e) => CHECK_CONSEQUENCE_KINDS.has(e.kind))
     .map((e) => e.text);
+  lc.deathLines = state.log
+    .slice(consequenceMark)
+    .filter((e) => e.kind === 'DEATH')
+    .map((e) => e.text);
   lc.authoredText = state.log
     .slice(consequenceMark)
     .filter((e) => e.kind !== 'NODE' && !CHECK_CONSEQUENCE_KINDS.has(e.kind))
@@ -1359,21 +1366,21 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
   const outcomeLines = () => state.log.slice(consequenceMark).map((e) => e.text).join(' ');
   if (allDead(state)) {
     lc.outcomeText = outcomeLines();
-    endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+    endRun(state, 'wipe', 'The expedition was wiped out.');
     return;
   }
   if (state.goblinLeft <= 0) {
     if (!state.flags.includes('sterminio')) {
       state.flags.push('sterminio');
-      state.log.push({ kind: 'INFO', text: 'Sterminio: non ne resta nessuno.' });
+      state.log.push({ kind: 'INFO', text: 'Extermination: not one remains.' });
     }
-    state.lastEvent = spec.clearedText ?? 'Il campo è conquistato. Non resta un goblin vivo.';
+    state.lastEvent = spec.clearedText ?? 'The camp is conquered. No goblin left alive.';
   } else if (turn >= spec.turns) {
-    state.lastEvent = spec.survivorsText ?? 'Il campo è conquistato. I superstiti scappano nel bosco.';
+    state.lastEvent = spec.survivorsText ?? 'The camp is conquered. The survivors flee into the woods.';
   } else {
     state.lastEvent = spec.holdingText
       ? spec.holdingText.replace('{turn}', String(turn)).replace('{left}', String(state.goblinLeft))
-      : `Turno ${turn} chiuso — i goblin tengono ancora il campo (${state.goblinLeft} in piedi).`;
+      : `Turn ${turn} closed — the goblins still hold the camp (${state.goblinLeft} standing).`;
   }
   state.lastCheck.outcomeText = outcomeLines();
 }
@@ -1573,7 +1580,7 @@ export function applyOutcomeSpec(state: QuestRunState, node: QuestNode, spec: Ou
     for (const l of spec.takeLoot) {
       if (!state.loot.includes(l)) {
         state.loot.push(l);
-        state.log.push({ kind: 'LOOT', text: `${l} — in mano, non ancora al sicuro.` });
+        state.log.push({ kind: 'LOOT', text: `${l} — in hand, not safe yet.` });
       }
     }
   }
@@ -1642,7 +1649,7 @@ function applyCheckOutcome(state: QuestRunState, node: QuestNode, verdict: Verdi
  *  player watches the price accumulate before the checkpoint. */
 function addDays(state: QuestRunState, n: number, reason: string): void {
   state.days += n;
-  state.log.push({ kind: 'INFO', text: `+${n} ${n === 1 ? 'giorno' : 'giorni'} — ${reason}` });
+  state.log.push({ kind: 'INFO', text: `+${n} ${n === 1 ? 'day' : 'days'} — ${reason}` });
 }
 
 function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdict, success: boolean, bad: boolean): string {
@@ -1661,19 +1668,19 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.info.push('gabbia', 'sideDoor', 'turni', 'pattuglia', 'qualcosaDiGrosso', 'mappaAccampamento');
         state.log.push({
           kind: 'INFO',
-          text: 'Vedete tutto: la gabbia col prigioniero, la porta laterale, i turni, la pattuglia — e qualcosa di grosso che dorme nella torre.',
+          text: 'You see everything: the cage with the prisoner, the side door, the shifts, the patrol — and something big sleeping in the tower.',
         });
       } else if (verdict === 'win') {
         state.info.push('gabbia', 'sideDoor', 'qualcosaDiGrosso');
         state.log.push({
           kind: 'INFO',
-          text: 'Scorgete una gabbia con un prigioniero, una porta laterale… e qualcosa di grosso nella torre.',
+          text: 'You glimpse a cage with a prisoner, a side door… and something big in the tower.',
         });
       } else if (verdict === 'almost') {
         state.info.push('turni');
-        state.log.push({ kind: 'INFO', text: 'Riuscite solo a contare i turni di guardia.' });
+        state.log.push({ kind: 'INFO', text: 'You only manage to count the guard shifts.' });
       } else {
-        state.log.push({ kind: 'INFO', text: 'Nient’altro: entrerete alla cieca.' });
+        state.log.push({ kind: 'INFO', text: 'Nothing else: you will go in blind.' });
       }
       return 'approccio';
     case 'check-ingresso-forza':
@@ -1682,7 +1689,7 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       if (!state.flags.includes('campoSveglio')) {
         state.flags.push('campoSveglio');
         state.alarm = true;
-        state.log.push({ kind: 'INFO', text: 'Lo scontro si sente in tutto il campo: è sveglio, e resterà sveglio.' });
+        state.log.push({ kind: 'INFO', text: 'The fight is heard across the camp: it is awake, and it will stay awake.' });
       }
       return 'perquisizione';
     case 'check-ingresso-agi':
@@ -1692,79 +1699,79 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       return 'perquisizione';
     case 'perquisizione':
       if (success) {
-        state.loot.push('segnale della cassa');
-        state.log.push({ kind: 'INFO', text: 'Trovate la cassa delle sementi, ancora intatta. In cima alla torre.' });
+        state.loot.push('crate signal');
+        state.log.push({ kind: 'INFO', text: 'You find the seed crate, still intact. At the top of the tower.' });
         state.flags.push('knowsCassa');
       } else {
-        state.log.push({ kind: 'INFO', text: 'La ricerca fa rumore e non trovate niente di preciso — tirate a indovinare verso la torre.' });
+        state.log.push({ kind: 'INFO', text: 'The search makes noise and finds nothing certain — you guess your way toward the tower.' });
       }
       return 'torre';
     case 'check-gabbia':
       if (success) {
         state.flags.push('prigionieroLibero');
-        state.log.push({ kind: 'LOOT', text: 'Il prigioniero vi segue in silenzio. Al villaggio potrebbe restare.' });
+        state.log.push({ kind: 'LOOT', text: 'The prisoner follows you in silence. At the village he might stay.' });
       }
       return 'obiettivo';
     case 'obiettivo':
       if (success) {
         state.objectiveDone = true;
-        state.loot.push('cassa delle sementi');
-        state.log.push({ kind: 'LOOT', text: 'Cassa delle sementi presa — in mano, non ancora al sicuro.' });
+        state.loot.push('seed crate');
+        state.log.push({ kind: 'LOOT', text: 'Seed crate taken — in hand, not safe yet.' });
       } else {
         // Fail-forward: the crate stays, but the run is not over — now you
         // must extract empty-handed through whatever your entry left behind.
-        state.log.push({ kind: 'INFO', text: 'La cassa vi sfugge di mano — resta al campo. Ora conta solo uscire vivi.' });
+        state.log.push({ kind: 'INFO', text: 'The crate slips from your hands — it stays at the camp. Now only getting out alive matters.' });
         return 'estrazione';
       }
       return 'rientra-o-rischi';
     case 'check-forziere':
       if (success) {
         state.gold += 15;
-        state.loot.push('forziere goblin');
-        state.log.push({ kind: 'LOOT', text: 'Forziere goblin: +15 gold.' });
+        state.loot.push('goblin chest');
+        state.log.push({ kind: 'LOOT', text: 'Goblin chest: +15 gold.' });
       }
       // The chest creaks even on success — greed is loud. Loot already in hand.
-      if (escalateCamp(state, false, 'Il forziere cigola.')) return 'risveglio';
+      if (escalateCamp(state, false, 'The chest creaks.')) return 'risveglio';
       return 'estrazione';
     case 'risveglio':
       if (success) {
-        state.log.push({ kind: 'INFO', text: 'Correte nella notte. Dietro di voi la torre si sgretola — eravate a un soffio.' });
+        state.log.push({ kind: 'INFO', text: 'You run into the night. Behind you the tower crumbles — you were a breath away.' });
       } else {
-        state.log.push({ kind: 'INFO', text: 'La fuga è un massacro disperato.' });
-        dropObjective(state, 'la lasciate cadere correndo — resta nella torre.');
+        state.log.push({ kind: 'INFO', text: 'The escape is a desperate massacre.' });
+        dropObjective(state, 'you drop it while running — it stays in the tower.');
       }
       return 'ritorno';
     case 'check-uscita-breccia':
       if (bad) {
         // The breach is forgiving on lives but not on baggage: the squeeze
         // costs whatever you could not hold. Only an epicfail drops the crate.
-        dropLoot(state, 'forziere goblin', 'resta incastrato nella breccia.');
-        dropLoot(state, 'segnale della cassa', 'perso nella strettoia.');
+        dropLoot(state, 'goblin chest', 'stays stuck in the breach.');
+        dropLoot(state, 'crate signal', 'lost in the squeeze.');
         if (verdict === 'epicfail') {
-          dropObjective(state, 'la cassa si incastra nel varco — per uscire dovete lasciarla.');
-          state.log.push({ kind: 'INFO', text: 'Il prigioniero vi trascina oltre il muro: siete fuori, a mani vuote.' });
+          dropObjective(state, 'the crate gets stuck in the gap — to get out you must leave it.');
+          state.log.push({ kind: 'INFO', text: 'The prisoner drags you past the wall: you are out, empty-handed.' });
         } else {
-          state.log.push({ kind: 'INFO', text: 'Uscite dalla breccia spinti a forza — qualcosa resta indietro.' });
+          state.log.push({ kind: 'INFO', text: 'You exit the breach pushed hard — something stays behind.' });
         }
       }
       return 'ritorno';
     case 'check-uscita-calma':
       if (bad) {
-        dropLoot(state, 'forziere goblin', 'troppo pesante per sparire in silenzio.');
-        dropLoot(state, 'segnale della cassa', 'perso nel buio.');
+        dropLoot(state, 'goblin chest', 'too heavy to vanish in silence.');
+        dropLoot(state, 'crate signal', 'lost in the dark.');
         if (verdict === 'epicfail') {
-          dropObjective(state, 'una pattuglia taglia la via: per scappare mollate la cassa.');
+          dropObjective(state, 'a patrol cuts your way: to escape you drop the crate.');
         } else {
-          state.log.push({ kind: 'INFO', text: 'Qualcuno alza lo sguardo al momento sbagliato: vi dileguate, più leggeri.' });
+          state.log.push({ kind: 'INFO', text: 'Someone looks up at the wrong moment: you slip away, lighter.' });
         }
       }
       return 'ritorno';
     case 'check-uscita-allarme':
       if (bad) {
         // The loud way out: a fail means the crate is the price of speed.
-        dropObjective(state, 'il campo vi addossa — la cassa vi rallenta troppo, resta qui.');
-        dropLoot(state, 'forziere goblin', 'perso nella corsa.');
-        dropLoot(state, 'segnale della cassa', 'perso nella corsa.');
+        dropObjective(state, 'the camp is on you — the crate slows you too much, it stays here.');
+        dropLoot(state, 'goblin chest', 'lost in the run.');
+        dropLoot(state, 'crate signal', 'lost in the run.');
       }
       return 'ritorno';
     /* ---- Le Rovine sotto il Fiume ----------------------------------------
@@ -1776,16 +1783,16 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.info.push('guardiePiuAvanti', 'mappaRovine');
         state.log.push({
           kind: 'INFO',
-          text: 'Lo leggete aperto: «le guardie non proteggono l’ingresso — proteggono qualcosa più avanti». E vi lascia la sua mappa abbozzata.',
+          text: 'You read him open: «the guards are not protecting the entrance — they are protecting something further on». And he leaves you his rough map.',
         });
       } else if (verdict === 'win' || verdict === 'almost') {
         state.info.push('guardiePiuAvanti');
         state.log.push({
           kind: 'INFO',
-          text: 'Il mercante rivela: «le guardie non stanno proteggendo l’ingresso. Stanno proteggendo qualcosa più avanti.»',
+          text: 'The merchant reveals: «the guards are not guarding the entrance. They are guarding something further on.»',
         });
       } else {
-        state.log.push({ kind: 'INFO', text: 'Non capite più di quanto vi ha detto. Entrerete quasi alla cieca.' });
+        state.log.push({ kind: 'INFO', text: 'You learn no more than what he told you. You will go in almost blind.' });
       }
       return 'rv-fiume';
     case 'rv-check-incalza':
@@ -1794,23 +1801,23 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.flags.push('hasCoagulo');
         state.log.push({
           kind: 'INFO',
-          text: 'Cede: «le guardie proteggono qualcosa più avanti». Vi lascia la mappa abbozzata e un coagulo — «per la strada, potrebbe servirvi».',
+          text: 'He gives in: «the guards are protecting something further on». He leaves you the rough map and a clotting agent — «for the road, you might need it».',
         });
         if (verdict === 'bigwin') {
           state.gold += 10;
-          state.log.push({ kind: 'LOOT', text: 'Vi allunga anche 10 gold per «non dirlo in giro».' });
+          state.log.push({ kind: 'LOOT', text: 'He also hands you 10 gold to «keep it quiet».' });
         }
       } else {
-        state.log.push({ kind: 'INFO', text: 'Vi caccia malamente: niente informazioni, e partite con l’amaro in bocca.' });
+        state.log.push({ kind: 'INFO', text: 'He chases you off with a snarl: no information, and you leave with a bitter taste.' });
       }
       return 'rv-fiume';
     case 'rv-fiume':
       if (verdict === 'almost') {
-        addDays(state, 1, 'la corrente vi trascina mezzo miglio più a valle.');
+        addDays(state, 1, 'the current drags you half a mile downstream.');
       } else if (verdict === 'fail') {
-        addDays(state, 1 + Math.floor(roll(state) * 2), 'trascinati dalla corrente, risalire costa tempo.');
+        addDays(state, 1 + Math.floor(roll(state) * 2), 'dragged by the current, climbing back costs time.');
       } else if (verdict === 'epicfail') {
-        addDays(state, 2, 'sbattuti sugli scogli — zoppicate fuori dall’acqua.');
+        addDays(state, 2, 'battered against the rocks — you limp out of the water.');
       }
       return 'rv-guardie';
     case 'rv-check-sneak':
@@ -1818,37 +1825,37 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         state.flags.push('inseguiti');
         state.log.push({
           kind: 'INFO',
-          text: 'Vi hanno visti: le picche vi inseguono fino all’uscita della galleria.',
+          text: 'They saw you: the pikes chase you to the gallery exit.',
         });
       }
       return 'rv-sala';
     case 'rv-check-fight':
       if (verdict === 'bigwin') {
         state.gold += 40;
-        state.loot.push('bottino delle guardie');
-        state.log.push({ kind: 'LOOT', text: 'Le guardie cadono senza chiamare aiuto: +40 gold di bottino.' });
+        state.loot.push('guards’ loot');
+        state.log.push({ kind: 'LOOT', text: 'The guards fall without calling for help: +40 gold loot.' });
       } else if (success) {
         state.gold += 25;
-        state.loot.push('bottino delle guardie');
-        state.log.push({ kind: 'LOOT', text: 'Le guardie sono a terra: +25 gold di bottino.' });
+        state.loot.push('guards’ loot');
+        state.log.push({ kind: 'LOOT', text: 'The guards are down: +25 gold loot.' });
       } else {
-        state.log.push({ kind: 'INFO', text: 'Riuscite a passare, ma le picche si sono fatte pagare.' });
+        state.log.push({ kind: 'INFO', text: 'You get through, but the pikes made you pay.' });
       }
       return 'rv-sala';
     case 'rv-sala':
       if (success) {
-        state.log.push({ kind: 'INFO', text: 'La vedete: la lastra davanti al tesoro è un trabocchetto. Ora potete scegliere come muovervi.' });
+        state.log.push({ kind: 'INFO', text: 'You see it: the slab in front of the treasure is a trap. Now you can choose how to move.' });
         return 'rv-tesoro-scelta';
       }
-      state.log.push({ kind: 'INFO', text: 'Niente di strano… finché il pavimento non cede sotto i vostri piedi.' });
+      state.log.push({ kind: 'INFO', text: 'Nothing strange… until the floor gives way under your feet.' });
       return 'rv-check-trappola';
     case 'rv-check-trappola':
       state.flags.push('tesoroDanneggiato');
       if (success) {
-        state.log.push({ kind: 'INFO', text: 'Vi tirate fuori dalla fossa — ma parte del tesoro è finito sotto la frana.' });
+        state.log.push({ kind: 'INFO', text: 'You pull yourselves out of the pit — but part of the treasure ended up under the collapse.' });
       } else {
-        addDays(state, 1, 'scavare per uscire dalla trappola vi costa un giorno.');
-        state.log.push({ kind: 'INFO', text: 'Uscite dalla trappola a fatica: il tesoro si è parzialmente danneggiato.' });
+        addDays(state, 1, 'digging out of the trap costs you a day.');
+        state.log.push({ kind: 'INFO', text: 'You get out of the trap with effort: the treasure is partially damaged.' });
       }
       return 'rv-tesoro-scelta';
     case 'rv-check-prendi':
@@ -1857,19 +1864,19 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
         let value = TUNE.treasureMin + Math.floor(roll(state) * TUNE.treasureSpan);
         if (state.flags.includes('tesoroDanneggiato')) {
           value = Math.floor(value / 2);
-          state.log.push({ kind: 'INFO', text: 'Quel che resta dopo la frana vale la metà.' });
+          state.log.push({ kind: 'INFO', text: 'What remains after the collapse is worth half.' });
         }
         if (node.id === 'rv-check-sicuro') {
           value = Math.round(value * 1.2);
         }
         state.bottinoOro = value;
         state.objectiveDone = true;
-        state.loot.push('tesoro delle rovine');
-        state.log.push({ kind: 'LOOT', text: `Tesoro caricato — in mano, non ancora al sicuro. Vale circa ${value} gold.` });
+        state.loot.push('ruins treasure');
+        state.log.push({ kind: 'LOOT', text: `Treasure loaded — in hand, not safe yet. Worth about ${value} gold.` });
         return 'rv-checkpoint';
       }
       // Failed take: the treasure stays — the run continues to the exit empty.
-      state.log.push({ kind: 'INFO', text: 'Il tesoro è troppo per le vostre schiene — ne portate via solo briciole. Uscirete quasi a mani vuote.' });
+      state.log.push({ kind: 'INFO', text: 'The treasure is too much for your backs — you carry away only crumbs. You will leave almost empty-handed.' });
       state.bottinoOro = Math.floor((TUNE.treasureMin / 4) + roll(state) * 20);
       return 'rv-checkpoint';
     }
@@ -1880,59 +1887,59 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
     case 'gob-tracce-per':
       if (verdict === 'bigwin' || verdict === 'win') {
         state.flags.push('bonusStealth');
-        state.log.push({ kind: 'INFO', text: 'Orme fresche verso nord. Sapete come avvicinarvi (bonus Stealth).' });
+        state.log.push({ kind: 'INFO', text: 'Fresh tracks heading north. You know how to approach (Stealth bonus).' });
       } else if (verdict === 'almost') {
         state.flags.push('bonusStealthPiccolo');
-        state.log.push({ kind: 'INFO', text: 'Qualche segno confuso. Meglio di niente.' });
+        state.log.push({ kind: 'INFO', text: 'Some confused signs. Better than nothing.' });
       } else {
-        state.log.push({ kind: 'INFO', text: 'Il bosco tace.' });
+        state.log.push({ kind: 'INFO', text: 'The wood stays silent.' });
       }
       return 'gob-accampamento';
     case 'gob-tracce-perfor':
       if (success) {
-        state.log.push({ kind: 'INFO', text: 'Dall’alto si vede ciò che da terra resta invisibile: qualcosa è nascosto presso il masso.' });
+        state.log.push({ kind: 'INFO', text: 'From above you see what stays invisible from the ground: something is hidden by the boulder.' });
         return 'gob-bottino-scelta';
       }
       positionalDamage(state, 10, node.title);
-      state.log.push({ kind: 'INFO', text: 'La caduta vi costa. (−10 HP)' });
+      state.log.push({ kind: 'INFO', text: 'The fall costs you. (−10 HP)' });
       return 'gob-accampamento';
     case 'gob-bottino': {
-      state.loot.push('bottino di guerra');
+      state.loot.push('war loot');
       state.gold += 12;
-      state.log.push({ kind: 'LOOT', text: 'Bottino di guerra: +12 gold.' });
+      state.log.push({ kind: 'LOOT', text: 'War loot: +12 gold.' });
       if (bad) {
         positionalDamage(state, 10, node.title);
         if (!state.flags.includes('campoAllertato')) state.flags.push('campoAllertato');
         state.alarm = true;
-        state.log.push({ kind: 'INFO', text: 'Un rumore di troppo. I goblin drizzano le orecchie — il campo è all’erta.' });
+        state.log.push({ kind: 'INFO', text: 'One noise too many. The goblins prick up their ears — the camp is alerted.' });
       } else if (verdict === 'almost') {
         if (!state.flags.includes('campoAllertato')) state.flags.push('campoAllertato');
-        state.log.push({ kind: 'INFO', text: 'Ce l’avete — ma qualcosa si è mosso nel campo.' });
+        state.log.push({ kind: 'INFO', text: 'You have it — but something moved in the camp.' });
       }
       return 'gob-accampamento';
     }
     case 'gob-stealth':
       if (verdict === 'bigwin' || verdict === 'win') {
         state.flags.push('vantaggioGrande');
-        state.log.push({ kind: 'INFO', text: 'Vi piazzate alle loro spalle. Colpirete per primi.' });
+        state.log.push({ kind: 'INFO', text: 'You position yourselves behind them. You will strike first.' });
       } else if (verdict === 'almost') {
         state.flags.push('vantaggioPiccolo');
-        state.log.push({ kind: 'INFO', text: 'Un ramo spezzato vi costa il vantaggio perfetto.' });
+        state.log.push({ kind: 'INFO', text: 'A broken branch costs you the perfect vantage.' });
       } else {
         if (!state.flags.includes('campoAllertato')) state.flags.push('campoAllertato');
         state.alarm = true;
-        state.log.push({ kind: 'INFO', text: 'Pietre rotolano sotto i piedi. Il campo vi ha visti.' });
+        state.log.push({ kind: 'INFO', text: 'Stones roll under your feet. The camp has seen you.' });
       }
       return 'gob-combattimento';
     case 'gob-assalto':
       if (verdict === 'bigwin' || verdict === 'win') {
         state.flags.push('vantaggioPiccolo');
-        state.log.push({ kind: 'INFO', text: 'Sfondando la linea, il primo colpo è vostro.' });
+        state.log.push({ kind: 'INFO', text: 'Breaking the line, the first strike is yours.' });
       } else if (verdict === 'epicfail') {
         positionalDamage(state, 5, node.title);
-        state.log.push({ kind: 'INFO', text: 'Vi schiantate contro le palizzate. Nessun vantaggio — e male alle ossa.' });
+        state.log.push({ kind: 'INFO', text: 'You slam into the palisades. No vantage — and aching bones.' });
       } else {
-        state.log.push({ kind: 'INFO', text: 'La carica si smorza nel fango. Nessun vantaggio.' });
+        state.log.push({ kind: 'INFO', text: 'The charge dies in the mud. No vantage.' });
       }
       return 'gob-combattimento';
     case 'gob-incalza-check':
@@ -1941,13 +1948,13 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
          ambush is MILDER than letting them flee rested. */
       if (verdict === 'bigwin' || verdict === 'win') {
         state.flags.push('sterminio');
-        state.log.push({ kind: 'INFO', text: 'Li raggiungete sul crinale. Non ne resta nessuno.' });
+        state.log.push({ kind: 'INFO', text: 'You catch them on the ridge. None remains.' });
       } else if (verdict === 'almost') {
         state.flags.push('agguatoMite');
-        state.log.push({ kind: 'INFO', text: 'Vi sfuggono per un soffio, feriti e sparsi. Saranno un’ombra sulla via del ritorno.' });
+        state.log.push({ kind: 'INFO', text: 'They escape by a breath, wounded and scattered. They will be a shadow on the way back.' });
       } else {
         state.flags.push('agguatoMite');
-        state.log.push({ kind: 'INFO', text: 'Scappano tra le rocce, ridendo. Vi aspetteranno sulla via del ritorno.' });
+        state.log.push({ kind: 'INFO', text: 'They flee among the rocks, laughing. They will be waiting on the way back.' });
       }
       return 'gob-esplora-extra';
     case 'gob-cerca': {
@@ -1958,13 +1965,13 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       state.log.push({ kind: 'INFO', text: creak });
       if (verdict === 'bigwin' || verdict === 'win') {
         state.gold += TUNE.exploreLootGold;
-        state.loot.push('bottino del campo');
-        state.log.push({ kind: 'LOOT', text: `Sotto il telo, qualcosa che valeva ancora. (+${TUNE.exploreLootGold} gold)` });
+        state.loot.push('camp loot');
+        state.log.push({ kind: 'LOOT', text: `Under the tarp, something still worth taking. (+${TUNE.exploreLootGold} gold)` });
       } else if (verdict === 'almost') {
         state.gold += Math.floor(TUNE.exploreLootGold / 2);
-        state.log.push({ kind: 'INFO', text: 'Un bottino misero — e una ferita in più.' });
+        state.log.push({ kind: 'INFO', text: 'A miserable loot — and one more wound.' });
       } else {
-        state.log.push({ kind: 'INFO', text: 'Solo cenere e spine.' });
+        state.log.push({ kind: 'INFO', text: 'Only ash and thorns.' });
       }
       return 'gob-esplora-extra';
     }
@@ -1972,17 +1979,17 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       if (verdict === 'bigwin') {
         const gain = TUNE.deepChamberMin + Math.floor(roll(state) * TUNE.deepChamberSpan);
         state.bottinoOro += gain;
-        state.loot.push('reliquia antica');
-        state.log.push({ kind: 'LOOT', text: `Il deposito era intatto: +${gain} gold e una reliquia antica.` });
-        addDays(state, 1, 'svuotare la camera profonda.');
+        state.loot.push('ancient relic');
+        state.log.push({ kind: 'LOOT', text: `The vault was untouched: +${gain} gold and an ancient relic.` });
+        addDays(state, 1, 'emptying the deep chamber.');
       } else if (success) {
         const gain = TUNE.deepChamberMin + Math.floor(roll(state) * TUNE.deepChamberSpan);
         state.bottinoOro += gain;
-        state.log.push({ kind: 'LOOT', text: `Il deposito paga: +${gain} gold.` });
-        addDays(state, 1, 'svuotare la camera profonda.');
+        state.log.push({ kind: 'LOOT', text: `The vault pays: +${gain} gold.` });
+        addDays(state, 1, 'emptying the deep chamber.');
       } else {
-        addDays(state, 1 + Math.floor(roll(state) * 2), 'il deposito era già quasi vuoto — scavare non paga.');
-        state.log.push({ kind: 'INFO', text: 'Qualcuno era passato prima di voi: restano solo scarti.' });
+        addDays(state, 1 + Math.floor(roll(state) * 2), 'the vault was already almost empty — digging does not pay.');
+        state.log.push({ kind: 'INFO', text: 'Someone had been there before you: only scraps remain.' });
       }
       return 'rv-ritorno-evento';
     default:
@@ -2000,61 +2007,61 @@ function composeEndingText(state: QuestRunState, base: string): string {
   const dead = state.party.filter((m) => m.dead).map((m) => m.name);
   const aliveCount = state.party.filter((m) => !m.dead).length;
   if (dead.length > 0) {
-    pieces.push(`${dead.join(', ')} non ${dead.length > 1 ? 'sono tornati' : 'è tornato'}.`);
+    pieces.push(`${dead.join(', ')} did not come back.`);
   }
   if (aliveCount > 0) {
-    pieces.push(`Tornate in ${aliveCount}.`);
+    pieces.push(`${aliveCount} of you return.`);
   }
   if (state.questId === 'rovine') {
     // Report-style epilogue (mockup): the cost continues after the quest —
     // days spent, human-days burned, wounded members unavailable.
-    pieces.push(`Durata: ${state.days} giorni.`);
-    pieces.push(`Giorni-uomo utilizzati: ${state.party.length} × ${state.days} = ${state.party.length * state.days}.`);
+    pieces.push(`Duration: ${state.days} days.`);
+    pieces.push(`Man-days used: ${state.party.length} × ${state.days} = ${state.party.length * state.days}.`);
     if (state.bottinoOro > 0) {
-      pieces.push(`Bottino riportato: ${state.bottinoOro} gold.`);
+      pieces.push(`Loot brought back: ${state.bottinoOro} gold.`);
     }
     if (state.flags.includes('tesoroPerso')) {
-      pieces.push('Il tesoro è rimasto nelle rovine.');
+      pieces.push('The treasure stayed in the ruins.');
     }
     const wounded = state.party.filter((m) => !m.dead && m.wounded).map((m) => m.name);
     for (const name of wounded) {
-      pieces.push(`${name}: FERITO — indisponibile per ${TUNE.rovineWoundedRecoveryDays} giorni.`);
+      pieces.push(`${name}: WOUNDED — unavailable for ${TUNE.rovineWoundedRecoveryDays} days.`);
     }
     if (state.flags.includes('viandanteAiutato')) {
-      pieces.push('Il viandante che avete curato vi ha pagato più del dovuto.');
+      pieces.push('The traveler you healed paid you more than due.');
     } else if (state.flags.includes('viandantePortato')) {
-      pieces.push('Il viandante che avete portato al villaggio vi deve un favore.');
+      pieces.push('The traveler you brought to the village owes you a favor.');
     } else if (state.flags.includes('viandanteLasciato')) {
-      pieces.push('Il ferito sulla strada è rimasto dove lo avete lasciato.');
+      pieces.push('The wounded man on the road stayed where you left him.');
     }
-    const extra = state.loot.filter((l) => l !== 'tesoro delle rovine');
+    const extra = state.loot.filter((l) => l !== 'ruins treasure');
     if (extra.length > 0) {
-      pieces.push(`Portate a casa: ${extra.join(', ')}.`);
+      pieces.push(`You bring home: ${extra.join(', ')}.`);
     }
     return pieces.join(' ');
   }
   if (state.questId === 'goblin') {
     if (state.flags.includes('trofeoPerso')) {
-      pieces.push('Il trofeo dei goblin è rimasto sulla strada.');
+      pieces.push('The goblin trophy stayed on the road.');
     }
-    const extra = state.loot.filter((l) => l !== 'trofeo dei goblin');
+    const extra = state.loot.filter((l) => l !== 'goblin trophy');
     if (extra.length > 0) {
-      pieces.push(`Portate a casa: ${extra.join(', ')}.`);
+      pieces.push(`You bring home: ${extra.join(', ')}.`);
     }
     if (state.xp > 0) {
-      pieces.push(`Esperienza: +${state.xp} XP.`);
+      pieces.push(`Experience: +${state.xp} XP.`);
     }
     return pieces.join(' ');
   }
   if (state.flags.includes('cassaPersa')) {
-    pieces.push('La cassa delle sementi è rimasta al campo.');
+    pieces.push('The seed crate stayed at the camp.');
   }
   if (state.flags.includes('prigionieroLibero')) {
-    pieces.push('Il prigioniero che avete liberato è con voi.');
+    pieces.push('The prisoner you freed is with you.');
   }
-  const extra = state.loot.filter((l) => l !== 'cassa delle sementi');
+  const extra = state.loot.filter((l) => l !== 'seed crate');
   if (extra.length > 0) {
-    pieces.push(`Portate a casa: ${extra.join(', ')}.`);
+    pieces.push(`You bring home: ${extra.join(', ')}.`);
   }
   return pieces.join(' ');
 }
@@ -2081,6 +2088,7 @@ function setCheckOutcomeText(state: QuestRunState, preMark: number, outcomeMark:
     .filter((e) => e.kind !== 'NODE' && !CHECK_CONSEQUENCE_KINDS.has(e.kind))
     .map((e) => e.text);
   resolved.harmLines = harmLines;
+  resolved.deathLines = window.filter((e) => e.kind === 'DEATH').map((e) => e.text);
   resolved.authoredText = authoredLines.join(' ');
   resolved.outcomeText = [...harmLines, ...authoredLines].join(' ');
 }
@@ -2101,8 +2109,8 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
   let cursor: string | undefined = nodeId;
   for (let steps = 0; cursor; steps += 1) {
     if (steps >= TUNE.maxAutoSteps) {
-      state.log.push({ kind: 'INFO', text: `Il percorso si è chiuso in un ciclo (${cursor}). La spedizione torna al villaggio.` });
-      endRun(state, 'survived', 'Il percorso si è chiuso su se stesso: la spedizione è rientrata.');
+      state.log.push({ kind: 'INFO', text: `The path closed into a loop (${cursor}). The expedition returns to the village.` });
+      endRun(state, 'survived', 'The path closed on itself: the expedition returned.');
       return;
     }
     const node = nodesFor(state)[cursor];
@@ -2115,7 +2123,7 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
     // Spotted sneaking past the guards: their patrol chases the party out —
     // the return costs a day.
     if (cursor === 'rv-ritorno-evento' && state.flags.includes('inseguiti')) {
-      addDays(state, 1, 'seminare le guardie che vi inseguivano.');
+      addDays(state, 1, 'shaking off the guards chasing you.');
     }
 
     // Combat nodes stop and wait for per-turn player input: each command
@@ -2137,14 +2145,14 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
       state.lastEvent = `${node.title} — ${result.verdict.toUpperCase()}.`;
       if (allDead(state)) {
         drainHarmsIntoLastCheck(state);
-        endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+        endRun(state, 'wipe', 'The expedition was wiped out.');
         return;
       }
       cursor = applyCheckOutcome(state, node, result.verdict);
       setCheckOutcomeText(state, preMark, outcomeMark);
       // Same rule as submitCommand: an outcome toll that kills the last member is a wipe.
       if (allDead(state)) {
-        endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+        endRun(state, 'wipe', 'The expedition was wiped out.');
         return;
       }
       continue;
@@ -2167,23 +2175,23 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
         // (Director): held objective + living leader → gold; lost/dropped
         // trophy → quest failed, only XP (awarded in endRun).
         if (allDead(state)) {
-          endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+          endRun(state, 'wipe', 'The expedition was wiped out.');
         } else if (state.objectiveDone && lead && !lead.dead) {
           state.gold += TUNE.trofeoGold;
-          state.loot = state.loot.filter((l) => l !== 'trofeo dei goblin');
-          state.log.push({ kind: 'LOOT', text: `Le teste sul banco del giudice: +${TUNE.trofeoGold} gold.` });
-          endRun(state, 'reward', 'Con il trofeo sulla bilancia: da domani, i carri ripassano dal guado.');
+          state.loot = state.loot.filter((l) => l !== 'goblin trophy');
+          state.log.push({ kind: 'LOOT', text: `The heads on the judge’s bench: +${TUNE.trofeoGold} gold.` });
+          endRun(state, 'reward', 'With the trophy on the scales: from tomorrow, the wagons cross the ford again.');
         } else {
           endRun(
             state,
             'survived',
             state.flags.includes('trofeoPerso')
-              ? 'A mani vuote: il trofeo è rimasto sulla strada. Il guado resta deserto.'
-              : 'Tornate senza completare lo sterminio. Il guado resta deserto.',
+              ? 'Empty-handed: the trophy stayed on the road. The ford remains deserted.'
+              : 'You return without completing the extermination. The ford remains deserted.',
           );
         }
       } else if (allDead(state)) {
-        endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+        endRun(state, 'wipe', 'The expedition was wiped out.');
       } else if (state.objectiveDone && lead && !lead.dead) {
         // Arriving at the end with the objective IS the secure event: TAKEN
         // only becomes SECURED here, after a route the player chose and rolled.
@@ -2191,30 +2199,30 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
           state,
           'reward',
           state.questId === 'rovine'
-            ? 'Il tesoro delle rovine è al villaggio. La quest è completa — reward ottenuta.'
+            ? 'The ruins treasure is at the village. The quest is complete — reward earned.'
             : state.questId === 'gen'
-              ? 'Obiettivo riportato al villaggio. La quest è completa — reward ottenuta.'
-              : 'Cassa delle sementi riportata al villaggio. La quest è completa — reward ottenuta.',
+              ? 'Objective brought back to the village. The quest is complete — reward earned.'
+              : 'Seed crate brought back to the village. The quest is complete — reward earned.',
         );
       } else if (state.objectiveDone && (!lead || lead.dead)) {
         endRun(
           state,
           'survived',
           state.questId === 'rovine'
-            ? 'Il tesoro torna al villaggio, ma il leader non c’è più. La reward della quest va persa.'
+            ? 'The treasure returns to the village, but the leader is gone. The quest reward is lost.'
             : state.questId === 'gen'
-              ? 'L’obiettivo torna al villaggio, ma il leader non c’è più. La reward della quest va persa.'
-              : 'La cassa torna al villaggio, ma il leader non c’è più. La reward della quest va persa.',
+              ? 'The objective returns to the village, but the leader is gone. The quest reward is lost.'
+              : 'The crate returns to the village, but the leader is gone. The quest reward is lost.',
         );
       } else {
         endRun(
           state,
           'survived',
           state.questId === 'rovine'
-            ? 'Tornate al villaggio senza il tesoro. La quest è fallita, ma siete vivi.'
+            ? 'You return to the village without the treasure. The quest failed, but you are alive.'
             : state.questId === 'gen'
-              ? 'Tornate al villaggio senza l’obiettivo. La quest è fallita, ma siete vivi.'
-              : 'Tornate al villaggio senza la cassa. La quest è fallita, ma siete vivi.',
+              ? 'You return to the village without the objective. The quest failed, but you are alive.'
+              : 'You return to the village without the crate. The quest failed, but you are alive.',
         );
       }
     }
@@ -2257,12 +2265,12 @@ function matureNode(state: QuestRunState, tick: number): void {
             node.title,
           );
       }
-      state.lastEvent = 'Frecce dal ciglio della strada. Erano rimasti in attesa.';
+      state.lastEvent = 'Arrows from the roadside ridge. They had been waiting.';
     } else if (node.id === 'rv-attrito') {
       // The unstable zone: no check can erase this cost (Director mockup —
       // "continuare deve costare qualcosa"). +1 day always, then a roll:
       // a wound worsens, or someone new is hurt, or luck holds.
-      addDays(state, 1, 'attraversare la zona instabile.');
+      addDays(state, 1, 'crossing the unstable zone.');
       const candidates = state.party.filter((m) => !m.dead);
       const r = roll(state);
       if (r < 0.35 && candidates.some((m) => m.wounded)) {
@@ -2270,9 +2278,9 @@ function matureNode(state: QuestRunState, tick: number): void {
         if (victim) {
           const hpBefore = victim.hp;
           victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
-          state.log.push({ kind: 'HARM', text: `La ferita di ${victim.name} peggiora nella zona instabile.` });
+          state.log.push({ kind: 'HARM', text: `${victim.name}’s wound worsens in the unstable zone.` });
           recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
-          state.lastEvent = `${victim.name} peggiora: la zona non perdona chi è già ferito.`;
+          state.lastEvent = `${victim.name} worsens: the zone does not forgive those already wounded.`;
         }
       } else if (r < 0.7) {
         const victim = candidates[Math.floor(roll(state) * candidates.length)];
@@ -2280,12 +2288,12 @@ function matureNode(state: QuestRunState, tick: number): void {
           const hpBefore = victim.hp;
           victim.wounded = true;
           victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
-          state.log.push({ kind: 'HARM', text: `${victim.name} è ferito nella zona instabile.` });
+          state.log.push({ kind: 'HARM', text: `${victim.name} is wounded in the unstable zone.` });
           recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
           state.lastEvent = `La pietra cede sotto ${victim.name}: ferito. Il costo del passaggio.`;
         }
       } else {
-        state.lastEvent = 'La zona scricchiola ma regge: passate indenni — stavolta.';
+        state.lastEvent = 'The zone creaks but holds: you pass unharmed — this time.';
       }
     } else {
       // Travel incident: direct, non-check harm — the bodyguard cannot intercept.
@@ -2296,16 +2304,16 @@ function matureNode(state: QuestRunState, tick: number): void {
           const hpBefore = victim.hp;
           victim.wounded = true;
           victim.hp = Math.max(1, victim.hp - TUNE.incidentWoundHpLoss);
-          state.log.push({ kind: 'HARM', text: `La frana colpisce ${victim.name}: ferito.` });
+          state.log.push({ kind: 'HARM', text: `The collapse hits ${victim.name}: wounded.` });
           recordHarm(state, victim.id, hpBefore - victim.hp, 'wound', hpBefore, victim.hp, node.title);
-          state.lastEvent = `La frana coglie ${victim.name}. Il resto della strada lo farà con una ferita.`;
+          state.lastEvent = `The collapse catches ${victim.name}. The rest of the road will be walked with a wound.`;
         }
       } else {
         state.lastEvent = 'La frana passa a pochi metri: spavento, ma nessun danno.';
       }
     }
     if (allDead(state)) {
-      endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+      endRun(state, 'wipe', 'The expedition was wiped out.');
       return;
     }
     drainHarmsToAmbient(state);
@@ -2324,8 +2332,8 @@ function matureNode(state: QuestRunState, tick: number): void {
 export function matureReady(state: QuestRunState, tick: number): QuestRunState {
   for (let steps = 0; !state.ended && state.frontier.status === 'pending' && tick >= state.frontier.readyAt; steps += 1) {
     if (steps >= TUNE.maxAutoSteps) {
-      state.log.push({ kind: 'INFO', text: `Il percorso si è chiuso in un ciclo (${state.nodeId}). La spedizione torna al villaggio.` });
-      endRun(state, 'survived', 'Il percorso si è chiuso su se stesso: la spedizione è rientrata.');
+      state.log.push({ kind: 'INFO', text: `The path closed into a loop (${state.nodeId}). The expedition returns to the village.` });
+      endRun(state, 'survived', 'The path closed on itself: the expedition returned.');
       break;
     }
     matureNode(state, tick);
@@ -2378,8 +2386,8 @@ export function submitCommand(
       // be abandoned at the F7 ambush or lost on a wipe).
       if (node.id === 'gob-combattimento' && !state.objectiveDone) {
         state.objectiveDone = true;
-        state.loot.push('trofeo dei goblin');
-        state.log.push({ kind: 'LOOT', text: 'Trofeo dei goblin preso — in mano, non ancora al sicuro.' });
+        state.loot.push('goblin trophy');
+        state.log.push({ kind: 'LOOT', text: 'Goblin trophy taken — in hand, not safe yet.' });
       }
       const next =
         state.goblinLeft <= 0 ? node.combat.nextCleared : (node.combat.nextSurvivors ?? node.next);
@@ -2404,7 +2412,7 @@ export function submitCommand(
     // buying anything earns the merchant's tip once
     if (!state.info.includes('simbolo')) {
       state.info.push('simbolo');
-      state.log.push({ kind: 'INFO', text: 'Il mercante: «non sono goblin qualunque… portano un simbolo».' });
+      state.log.push({ kind: 'INFO', text: 'The merchant: «these are no ordinary goblins… they carry a symbol».' });
     }
   }
   if (option.consumesFlag) {
@@ -2418,13 +2426,13 @@ export function submitCommand(
     state.info.push(option.grantsInfo);
   }
   if (option.costDays) {
-    addDays(state, option.costDays, 'la scelta fatta.');
+    addDays(state, option.costDays, 'the choice made.');
   }
   if (option.sets) state.flags.push(option.sets);
   if (option.abandonsObjective) {
-    dropObjective(state, 'il trofeo resta nel fosso — la strada si libera.');
+    dropObjective(state, 'the trophy stays in the ditch — the road clears.');
     state.flags.push('trofeoLasciato');
-    state.log.push({ kind: 'INFO', text: 'Gettate la testa nel fosso e correte. La quest è persa.' });
+    state.log.push({ kind: 'INFO', text: 'You throw the head into the ditch and run. The quest is lost.' });
   }
   state.log.push({ kind: 'CHOICE', text: option.label });
 
@@ -2446,12 +2454,12 @@ export function submitCommand(
         .slice(-4)
         .map((e) => e.text)
         .join(' ');
-      state.lastEvent = `${checkNode.title} — ${result.verdict.toUpperCase()}. ${hurt || 'Nessuna conseguenza fisica.'}`;
+      state.lastEvent = `${checkNode.title} — ${result.verdict.toUpperCase()}. ${hurt || 'No physical consequence.'}`;
     };
     summarize();
     if (allDead(state)) {
       drainHarmsIntoLastCheck(state);
-      endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+      endRun(state, 'wipe', 'The expedition was wiped out.');
       return state;
     }
     const outcomeMark = state.log.length;
@@ -2462,7 +2470,7 @@ export function submitCommand(
     // that is a wipe, not a run that keeps waiting with nobody alive (R-106
     // playtest — previewOption then reduced an empty party and crashed /game).
     if (allDead(state)) {
-      endRun(state, 'wipe', 'La spedizione è stata spazzata via.');
+      endRun(state, 'wipe', 'The expedition was wiped out.');
       return state;
     }
     arriveNode(state, nextId, tick);
@@ -2493,14 +2501,14 @@ export function availableOptions(state: QuestRunState): { id: string; label: str
   // A pending frontier is a timed beat, not a decision — no input exists yet.
   if (!node || state.ended || state.frontier.status === 'pending') return [];
   if (node.kind === 'info') {
-    return [{ id: 'advance', label: 'Continua', detail: 'Prosegui.', disabled: false }];
+    return [{ id: 'advance', label: 'Continue', detail: 'Go on.', disabled: false }];
   }
   if (node.kind === 'combat') {
     return [
       {
         id: 'fight-turn',
-        label: `Combatti — turno ${state.combatTurn + 1}`,
-        detail: `${node.combat?.enemyName ?? 'Goblin'} in piedi: ${state.goblinLeft}. Rispondono colpo per colpo.`,
+        label: `Fight — turn ${state.combatTurn + 1}`,
+        detail: `${node.combat?.enemyName ?? 'Goblins'} standing: ${state.goblinLeft}. They answer blow for blow.`,
         disabled: false,
       },
     ];

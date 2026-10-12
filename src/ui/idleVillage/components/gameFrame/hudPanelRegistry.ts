@@ -5,8 +5,9 @@
  * in dev builds.
  */
 export const HUD_PANELS = [
-  { id: 'roster', shortcut: 'r', defaultVisible: true },
-  { id: 'events', shortcut: 'e', defaultVisible: true },
+  // Nothing opens with the map: the player summons every panel by key or menu.
+  { id: 'roster', shortcut: 'r', defaultVisible: false },
+  { id: 'events', shortcut: 'e', defaultVisible: false },
   { id: 'quest', shortcut: 'q', defaultVisible: false },
   { id: 'director', shortcut: 'd', defaultVisible: false, devOnly: true },
   { id: 'tuning', shortcut: 't', defaultVisible: false, devOnly: true },

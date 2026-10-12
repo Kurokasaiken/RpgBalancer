@@ -80,15 +80,15 @@ function playRun(seed: number, policy: Policy): { s: QuestRunState; st: RunStats
     for (; logIdx < state.log.length; logIdx += 1) {
       const e = state.log[logIdx];
       if (e.kind === 'DEATH') {
-        const src = e.text.match(/su «([^»]+)»/);
+        const src = e.text.match(/at «([^»]+)»/);
         st.deathSources.push(src ? src[1] : '(no source)');
       }
       if (e.kind === 'HARM') {
-        const band = e.text.includes('regge solo perché')
+        const band = e.text.includes('holds on only because')
           ? '<20%'
-          : e.text.includes('sangue sul fianco')
+          : e.text.includes('blood on their side')
             ? '20-35%'
-            : e.text.includes('si piega')
+            : e.text.includes('bends, then straightens')
               ? '35-70%'
               : '>70%';
         st.harmBand[band] = (st.harmBand[band] ?? 0) + 1;
@@ -122,13 +122,13 @@ for (const policy of ['optimal', 'greedy', 'cautious'] as const) {
   }
   const pct = (x: number) => `${((x / N) * 100).toFixed(1)}%`;
   console.log(`\n=== ${policy} (N=${N}) ===`);
-  console.log(`min-HP mai <35% durante la run: ${pct(below35)} | mai <20%: ${pct(below20)} | <35% a fine run: ${pct(below35End)}`);
+  console.log(`min-HP never <35% during the run: ${pct(below35)} | never <20%: ${pct(below20)} | <35% at run end: ${pct(below35End)}`);
   const totH = harmLieve + harmSolido + harmGrave + harmLimite;
   console.log(
-    `righe di danno: lieve ${((harmLieve / totH) * 100).toFixed(0)}% | solido ${((harmSolido / totH) * 100).toFixed(0)}% | grave ${((harmGrave / totH) * 100).toFixed(0)}% | al limite ${((harmLimite / totH) * 100).toFixed(0)}% (tot ${totH})`,
+    `harm lines: light ${((harmLieve / totH) * 100).toFixed(0)}% | solid ${((harmSolido / totH) * 100).toFixed(0)}% | heavy ${((harmGrave / totH) * 100).toFixed(0)}% | critical ${((harmLimite / totH) * 100).toFixed(0)}% (tot ${totH})`,
   );
   console.log(
-    `morti per fonte: ${Object.entries(deathSrc)
+    `deaths by source: ${Object.entries(deathSrc)
       .sort((a, b) => b[1] - a[1])
       .map(([s, c]) => `${s} ${((c / deaths) * 100).toFixed(0)}%`)
       .join(' | ')} (tot ${deaths})`,

@@ -137,7 +137,7 @@ for (const policy of policies) {
     goldTot += r.gold;
     xpTot += r.xp;
     if (r.flags.includes('sterminio')) sterminio++;
-    if (r.log.some((e) => e.text.includes('Agguato'))) ambush++;
+    if (r.log.some((e) => e.text.includes('Ambush'))) ambush++;
     if (r.alarm) alarm++;
     if (r.flags.includes('trofeoLasciato') || r.flags.includes('trofeoPerso')) trophyLost++;
     combatTurnsTot += r.combatTurn;
@@ -153,7 +153,7 @@ for (const policy of policies) {
   console.log(`outcome  reward ${pct(reward)} | survived-no-trophy ${pct(survived)} | fled ${pct(fled)} | WIPE ${pct(wipe)}`);
   console.log(`deaths   0: ${pct(d0)} | 1: ${pct(d1)} | 2: ${pct(d2)} | 3+: ${pct(d3p)} | mean ${(deathsTot / N).toFixed(2)}`);
   console.log(`wounds   mean ${(woundsTot / N).toFixed(2)} alive-but-wounded | HP lost mean ${(hpLostTot / N).toFixed(0)}/280`);
-  console.log(`gold     mean ${(goldTot / N).toFixed(1)} | XP mean ${(xpTot / N).toFixed(0)} | sterminio ${pct(sterminio)} | ambush ${pct(ambush)} | alarm ${pct(alarm)} | trophy lost ${pct(trophyLost)}`);
+  console.log(`gold     mean ${(goldTot / N).toFixed(1)} | XP mean ${(xpTot / N).toFixed(0)} | extermination ${pct(sterminio)} | ambush ${pct(ambush)} | alarm ${pct(alarm)} | trophy lost ${pct(trophyLost)}`);
   console.log(`combat   mean turns ${(combatTurnsTot / N).toFixed(1)} | mean goblins left ${(goblinLeftTot / N).toFixed(1)}`);
   console.log(`members  ${Object.keys(deadByMember).concat(Object.keys(woundByMember)).filter((v, i, a) => a.indexOf(v) === i).map((n) => `${n}: dead ${pct(deadByMember[n] ?? 0)} / wounded ${pct(woundByMember[n] ?? 0)}`).join(' | ')}`);
 }

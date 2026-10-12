@@ -299,6 +299,51 @@ const gameFrameZLayersSchema = z.object({
   panels: z.number().int(),
   chrome: z.number().int(),
   dressing: z.number().int(),
+  /** Title veil over everything while /game boots (PLAN-031): nothing may peek through before the reveal. */
+  boot: z.number().int(),
+});
+
+/**
+ * Title veil shown while /game preloads (PLAN-031 T-A1): a branded loading
+ * screen with real progress, skin-independent title art (deep sea + parchment
+ * gold), and a minimum display time so it never flashes.
+ */
+const gameFrameBootVeilSchema = z.object({
+  /** Exit fade once boot completes; reduced-motion skips it entirely. */
+  fadeMs: z.number().nonnegative(),
+  /** Shortest time the veil stays up even if boot is instant, so it never flickers. */
+  minDisplayMs: z.number().nonnegative(),
+  /** Title-screen palette: the HUD's sea-teal lacquer backdrop, parchment-gold accents (CSS colour strings). */
+  colors: z.object({
+    bgDeep: z.string(),
+    bgGlow: z.string(),
+    title: z.string(),
+    caption: z.string(),
+    barTrack: z.string(),
+    barFill: z.string(),
+    rule: z.string(),
+    error: z.string(),
+  }),
+  /** Rendered width of the authored logo plaque on the veil (it keeps its own aspect). */
+  logoWidthPx: z.number().positive(),
+  /** Progress-bar geometry. */
+  barWidthPx: z.number().positive(),
+  barHeightPx: z.number().positive(),
+});
+
+/**
+ * The "hide HUD" gesture: every chrome cluster slides off along its own edge
+ * (top rises, bottom sinks) and a lone pearl stays on screen to call it back.
+ * `offscreenPx` is extra travel past each element's own height/width so tall
+ * instruments (the hung ledger) fully clear the edge.
+ */
+const gameFrameHudHideSchema = z.object({
+  /** Slide duration; reduced-motion makes it instant instead. */
+  slideMs: z.number().nonnegative(),
+  /** Extra px of travel beyond translateY(±100%) so nothing peeks back in. */
+  offscreenPx: z.number().positive(),
+  /** One-key toggle, same guard rules as the panel shortcuts. */
+  shortcut: z.string().length(1),
 });
 
 /** Below this viewport width the top row drops its detail (resource trends, place name) to tooltips. */
@@ -370,6 +415,8 @@ const gameFrameConfigSchema = z.object({
   questDetail: gameFrameQuestDetailSchema,
   questWindow: gameFrameQuestWindowSchema,
   zLayers: gameFrameZLayersSchema,
+  bootVeil: gameFrameBootVeilSchema,
+  hudHide: gameFrameHudHideSchema,
   breakpoints: gameFrameBreakpointsSchema,
   edgeWash: gameFrameEdgeWashSchema,
   debug: gameFrameDebugSchema,
@@ -484,7 +531,27 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     consumablesArmedByDefault: false,
     beats: { sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapMs: 1800, maxQueue: 24 },
   },
-  zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12 },
+  zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12, boot: 40 },
+  bootVeil: {
+    fadeMs: 550,
+    minDisplayMs: 400,
+    colors: {
+      // The HUD's own sea-teal lacquer (--skin-hud-lacquer-deep / --hud-lacquer-tint):
+      // the title screen is painted in the same water the chrome swims in.
+      bgDeep: '#0f2627',
+      bgGlow: '#1d4a4d',
+      title: '#e6d3a3',
+      caption: '#8fb5b2',
+      barTrack: 'rgba(230, 211, 163, 0.16)',
+      barFill: '#d9b26f',
+      rule: 'rgba(217, 178, 111, 0.5)',
+      error: '#e58a7a',
+    },
+    logoWidthPx: 560,
+    barWidthPx: 320,
+    barHeightPx: 3,
+  },
+  hudHide: { slideMs: 520, offscreenPx: 260, shortcut: 'h' },
   breakpoints: { compactTopPx: 1400 },
   edgeWash: { enabled: false, leftSrc: '/assets/ui/hud/edge_wash_left.webp', bottomSrc: '/assets/ui/hud/edge_wash_bottom.webp', opacity: 0.55, leftPx: 120, bottomPx: 110 },
   debug: { directorPanel: true },

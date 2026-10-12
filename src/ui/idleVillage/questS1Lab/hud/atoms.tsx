@@ -45,11 +45,11 @@ export const LOG_TONE: Record<string, Tone> = {
 
 /** Compact stat line — stats drive approach choice, so they must be readable. */
 export const statLine = (m: { stats: Record<string, number> }) =>
-  `F${m.stats.str} · C${m.stats.con} · A${m.stats.agi} · P${m.stats.perc} · I${m.stats.int} · H${m.stats.cha}`;
+  `S${m.stats.str} · C${m.stats.con} · A${m.stats.agi} · P${m.stats.perc} · I${m.stats.int} · H${m.stats.cha}`;
 
 /** Short stat codes used across chips and coverage hints. */
 export const STAT_SHORT: Record<string, string> = {
-  str: 'FOR', con: 'COS', agi: 'AGI', perc: 'PER', int: 'INT', cha: 'CAR',
+  str: 'STR', con: 'CON', agi: 'AGI', perc: 'PER', int: 'INT', cha: 'CHA',
 };
 
 /** Deep-teal scrim pieces — the guide's shadow colour, never grey/brown. */

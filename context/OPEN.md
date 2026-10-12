@@ -249,16 +249,32 @@ Formato voce:
   opportunità, requisiti, ricompense e capacità si collegano? Più
   percorsi convergono sulla stessa opportunità e una quest apre porte
   diverse; il grafo rappresenta relazioni di sblocco persistenti, non
-  solo successione temporale. Sub-questioni: struttura dati e tipi di
+  solo successione temporale.
+- **Progress 2026-10-11 (ricerca R-154 + decisioni Director):** adottate
+  nella proposta — (a) **visibilità parziale** del grafo (nodi
+  persistenti e porte note visibili, quest non sbloccate nascoste);
+  (d) **transizione mid-run tra famiglie** ammessa sullo stesso
+  ScenarioInstance.
+- **RATIFICATO 2026-10-12 (Director):** (b) modello dati **ibrido** —
+  qualities piatte (`access:`/`intel:`/`contact:`/`clock:`) + offer
+  generator transitorio, più pochi nodi authored per milestone/
+  obiettivi strategici visibili; (c) tipi di arco = **set aperto
+  config-first** (enum estendibile; v0: sblocco/informazione/
+  preparazione + clocks come nodi di stato). Regole candidate ancora
+  proposal: ≥2 ingressi per nodo critico, path-dependent modifiers.
+  Restano aperte: persistenza degli archi tra run, traversal del
+  generatore, definizione dei clocks.
+- **Status:** `open` — core model ratificato; dettaglio in
+  `context/QUEST_OPPORTUNITY_LAYER.md` §1-§2 e
+  `.mw/runs/20261011-opportunity-layer-research/report-t1.md`,
+  `report-t2.md`. Sub-questioni residue: struttura dati e tipi di
   arco (sblocco/informazione/preparazione); come gli archi persistenti
   vivono nel save; come il generatore delle offerte lo attraversa;
   rapporto «famiglia di quest» ↔ (domain kit, core gimmick); relazione
   con gli archi narrativi delle chain quest.
-- **Status:** `open` — materiale PROPOSAL da discussione Director↔GPT
-  2026-10-11, non ratificato.
 - **Source:** `context/QUEST_OPPORTUNITY_LAYER.md` §1–§2;
   `context/ingestions/2026-10-11-quest-opportunity-layer.md` E-05..E-07,
-  E-11, E-15, E-22; R-153.
+  E-11, E-15, E-22; R-153; R-154 (ricerca + decisioni).
 - **Blocking:** qualsiasi contratto del generatore di offerte e del
   perimetro di test meta-quest; non blocca i lavori dentro la singola
   quest (PLAN-028, S5).
@@ -275,10 +291,21 @@ Formato voce:
   costo / tentabile a rischio). Quali requisiti sono generici, quali di
   famiglia, quali di singola quest, e come si dichiara il tipo nel
   contratto?
+- **RATIFICATO 2026-10-11/12 (Director):** **stato del gate calcolato
+  sulla offer card** a 4 stati (`Locked` con via di sblocco nominata /
+  `Underprepared` con banda di rischio, mancanza e prezzo / `Ready` /
+  `Over-qualified`) con qualità dello scout report dipendente dal
+  party/esploratore.
+- **NON ratificata 2026-10-12 (scelta Director):** la tassonomia a 4
+  tipi resta **proposal** — si valida col prototipo meta-layer prima
+  della ratifica. Candidati dalla ricerca: prezzo underprepared
+  proporzionale al gap, bande calibrate su esiti simulati, requisiti
+  come capability tag `requires/provides` con match a runtime.
 - **Status:** `open` — `proposta` registrata in `QUEST_RULES.md` §9;
-  dettaglio in `context/QUEST_OPPORTUNITY_LAYER.md` §3.
+  dettaglio in `context/QUEST_OPPORTUNITY_LAYER.md` §3;
+  `.mw/runs/20261011-opportunity-layer-research/report-t3.md`.
 - **Source:** `context/ingestions/2026-10-11-quest-opportunity-layer.md`
-  E-08, E-21; R-153.
+  E-08, E-21; R-153; R-154.
 - **Blocking:** modello requisiti del generatore di offerte (OPEN-019) e
   del contratto scena; non blocca il runtime attuale.
 - **Related:** OPEN-019; R-108 (numeri esatti in preview — il giocatore
@@ -293,11 +320,23 @@ Formato voce:
   operativa (evitare valute per-famiglia). Qual è il meccanismo di
   pesatura e la forma economica? Come si collega alle tre dimensioni di
   crescita del villaggio (visibilità / capacità / capacità operativa)?
+- **RATIFICATO 2026-10-11/12 (Director):** (a) scout-quality sulla
+  offer card **dipendente da party/esploratore** (banda larga con poco
+  intel); (b) **flashback-style prep** come capacità di alto tier entro
+  vincoli dichiarati; (c) **steering = bias di peso dichiarato e
+  visibile**, mai filtro; (d) **niente valuta "intel"** — qualità info
+  solo dalla qualità dell'esploratore/party; (e) capacità parallela =
+  **solo leader-capacity** (un party = un leader; gli edifici
+  supportano, non concedono spedizioni).
+- **Conseguenza:** la mitigazione «numeri esatti come acquisto intel»
+  per OPEN-018 non è più disponibile — OPEN-018 resta da verificare al
+  playtest PLAN-028.
 - **Status:** `open` — estende la regola vigente `QUEST_RULES.md` §2
   (esploratore rivela info) senza modificarla; PROPOSAL.
-- **Source:** `context/QUEST_OPPORTUNITY_LAYER.md` §6/§8/§9;
+- **Source:** `context/QUEST_OPPORTUNITY_LAYER.md` §5/§6/§8/§9;
   `context/ingestions/2026-10-11-quest-opportunity-layer.md` E-10,
-  E-17, E-19; R-153.
+  E-17, E-19; R-153; R-154
+  (`.mw/runs/20261011-opportunity-layer-research/report-t5.md`).
 - **Blocking:** filone economia-villaggio (OPEN-010/012/013) e generatore
   di offerte (OPEN-019); non blocca il runtime attuale.
 - **Related:** OPEN-010 (leader-capacity, human-days — tensione con
