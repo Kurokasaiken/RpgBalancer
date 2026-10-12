@@ -152,9 +152,11 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
     questId: 'goblin',
     availableFromDay: 0,
     availableUntilDay: 60,
-    estimatedDurationTicks: 250,
+    estimatedDurationTicks: 110,
     ticksPerNode: 10,
-    expectedPathNodes: 25,
+    /* 11 nodes = the median path of the reference line (pursue the goblins, stop
+     * looting) — Director 2026-10-12; was 25, calibrated on the looting loop. */
+    expectedPathNodes: 11,
     slots: {
       required: ['goblin-slot-leader'],
       optional: ['goblin-slot-member-1', 'goblin-slot-member-2', 'goblin-slot-bodyguard'],

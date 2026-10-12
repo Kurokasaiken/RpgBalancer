@@ -179,6 +179,14 @@ run artifact.
   evidence fixture con flag FLAKY, seed da provenance, pass pseudo-locale
   scopato, tabella mapping subplan→test, T-1…T-6.
 - **SP-8 — IA/i18n/status-honesty pass** (W10). Chiude v1.
+  → **[approfondito](PLAN-029-SP-8-ia-i18n-honesty.md)**:
+  dibattito `20261012-quest-gen-lab-sp8-ia-i18n-polish`, artifact r003
+  converged 3/3 (grok provider_dead ×6) — IA map unica (drawers annidati
+  per sezione, persistence in header strip), sub-namespaces i18n +
+  status/common condivisi, honesty matrix + assertion su
+  data-status-kind, truthfulness eseguibile del registry (file+capability,
+  mai file-existence da sola), tassonomia stati a 5 valori con "done"
+  solo receipt-backed, T-1…T-5.
 - **SP-9 — Scenario diffing** (W7). v1.1 spec parcheggiata.
 - **SP-10 — MC cost governance & sweep** (W8). v1.1 spec parcheggiata,
   dipende SP-4+SP-9.

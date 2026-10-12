@@ -1,6 +1,6 @@
 ---
 title: PLAN-032 — Componenti teaser su /game: scheda PG, magazzino, mercante, consumabili in quest, level-up
-status: draft
+status: design converged (multi-AI debate) — in attesa dispatch implementazione
 owner: Mind Weaver (planner)
 created: 2026-10-12
 source_request: R-167 (contesto: R-072 teaser, R-166 standard AAA /game)
@@ -135,9 +135,9 @@ la scheda completa del residente. Il click continua ad assegnare.
   apre, click assegna ancora, pannello trascinabile/riducibile, nessun hex,
   nessun testo <12px. Log `test-results/plan-032-sp1-<date>.log`.
 
-**Aperto (default proposto):** la scheda chiude al mouse-out con grace
-(comportamento hover-card standard). Alternativa pinnabile: click su pin la
-fissa — rimandata a feedback Director dopo la prima visione.
+**Risolto dal debate (r003):** chiusura al mouse-out con `graceMs` (timer nello
+stato open) + pin ESPLICITO nel pannello (l'implicit-pin via drag è stato
+bocciato — vedi sezione Debate).
 
 ## SP-2 — Magazzino del villaggio (schermata, mock)
 
@@ -168,10 +168,8 @@ contenuto mock.
 - **T-5 · Verifica + evidence.** Marker visibile a zoom normale, click apre,
   pannello conforme (sampling bordo oro se serve), log evidence.
 
-**Aperto (default proposto):** sorgente apertura = marker sul villaggio
-(diegetico, «tra gli edifici»); la voce nel menù Pannelli resta comunque
-obbligatoria per §5b. Alternativa: solo menù HUD, niente marker — da decidere
-dopo prima visione.
+**Risolto dal debate (r003):** entrambi — marker `MapBuildingPoi` (openOrFocus)
++ voce menù Pannelli/shortcut (toggle standard), con mapping typed `poiToPanel`.
 
 ## SP-3 — Mercante (schermata, mock)
 
@@ -198,11 +196,9 @@ superficie — niente economia, niente `MarketEngine`.
   `merchant_buy_mock`.**
 - **T-5 · Verifica + evidence.**
 
-**Aperto (default proposto):** marker sempre presente vs gated dal Director —
-per il trailer il toggle Director è più controllabile; in gioco vero il
-mercante sarà un'offerta a tempo (pillar «Mercante con countdown»). Il countdown
-v1 è da config statica, non agganciato al clock — valutare se legarlo al day
-tick è quasi gratis.
+**Risolto dal debate (r003):** marker gated dal meccanismo Director esistente
+(`poiDemo`-style); countdown = stringa statica da config — MAI timer o day-tick
+in questo SP.
 
 ## SP-4 — Consumabili visibili durante il viaggio (oltre alle scelte)
 
@@ -224,9 +220,9 @@ scelta. La `ConsumableBelt` interattiva resta com'è ai nodi decisione.
 - **T-4 · Verifica + evidence** (run avviata: strip visibile nei transit,
   belt ai nodi, coerenza armata).
 
-**Aperto (default proposto):** strip read-only durante viaggio/beat. Se il
-Director vuole *usare* consumabili in viaggio (es. curare durante il ritorno),
-è un cambio di semantica motore — secondo giro, fuori da questo SP.
+**Risolto dal debate (r004):** strip read-only durante viaggio/beat; ai nodi
+decisione SOLO la belt (mai la strip — il suo null su bag passive-only è
+design). Uso in viaggio resta fuori scope.
 
 ## SP-5 — Level-up eroe (presentazione mock)
 
@@ -251,8 +247,80 @@ Trigger da Director panel; livelli mock da config. Il sistema vero resta
 - **T-4 · Config + i18n + STRICT_FILES + telemetry `hero_levelup_mock`.**
 - **T-5 · Verifica a occhio (T-04)** + evidence.
 
-**Aperto (default proposto):** livello solo su hero (`isHero`) o su tutti i
-residenti? Proposta: hero only nel teaser (è il protagonista della scena).
+**Risolto dal debate (r009):** hero only — `isHero` gate al render E nei
+`staging.targets` (roster-validated).
+
+---
+
+## Debate multi-AI — design CONVERGED (2026-10-12)
+
+Ogni SP ha completato il dibattito avversariale persistente (clarification →
+grounding → round critiche → convergenza). Gli artifact converged sono la spec
+vincolante per l'implementazione e vivono in
+`mind-weaver/.mw/runs/<run>/artifact-rNNN.md`. Dove l'artifact diverge dai
+task qui sopra, **vince l'artifact**.
+
+| SP | Run | Artifact finale | SHA-256 | Esito |
+|---|---|---|---|---|
+| SP-1 | `20261012-plan-032-sp1-hero-sheet` | `artifact-r003.md` | `d1f26a13…` | ACCEPT 3/3 (claude, deepseek, gemini); chatgpt provider_dead |
+| SP-2 | `20261012-plan-032-sp2-village-stash` | `artifact-r003.md` | `c0432832…` | ACCEPT 4/4 |
+| SP-3 | `20261012-plan-032-sp3-merchant-panel` | `artifact-r003.md` | `7497a638…` | ACCEPT 4/4 |
+| SP-4 | `20261012-plan-032-sp4-bag-strip` | `artifact-r004.md` | `770bc224…` | ACCEPT 3/3; claude provider_dead (free-cap 16:00) |
+| SP-5 | `20261012-plan-032-sp5-hero-levelup` | `artifact-r009.md` | `3d8d1cca…` | ACCEPT 2/2; claude limit_exceeded, chatgpt provider_dead |
+
+### Delta chiave assorbiti dai debate (vs draft iniziale)
+
+- **SP-1 (scheda PG):** pin esplicito (niente pin implicito via drag);
+  reconcile rect-based a fine drag, niente toggle `pointer-events` mid-drag;
+  `grace` come timer nello stato open, non stato separato; eventi delegati sul
+  rail del roster + re-hit-test `elementFromPoint`; dwell prima del retarget;
+  latch Esc capture-phase; shortcut `[`/`]` sostituiti (rotti su layout IT).
+- **SP-2 (magazzino):** righe lista con qty visibile (bocciata la grid
+  tooltip-only); `itemId` validati contro `questItems`; qty/capacità derivate
+  e cross-validate; marker anchor-based `PixiMapAnchor` + mapping typed
+  `poiToPanel`; `openOrFocus` solo dal marker, `toggle` standard da menù/
+  shortcut; marker keyboard-accessible come `MapQuestPoi`; guard pointer-delta
+  <5px per click-vs-map-drag; no hover tooltip su coarse pointer; item icon
+  mapper dedicato; niente telemetry inventata.
+- **SP-3 (mercante):** staging/marker config map-side (`poiDemo`-style), NON
+  dentro `merchantConfig` — le offerte restano single-consumer del panel;
+  `merchantMarkerConfig` named export separato; bottone «Compra» = native
+  disabled (non `aria-disabled` su span) + label preview visibile anche touch;
+  countdown = stringa statica da config, mai timer/day-tick; 3-4 offerte Zod;
+  ul/li semantico; test import-graph fail-closed con allowlist + traversata
+  transitiva; focus-return generico (activeElement on open → restore → menu
+  trigger); nessun fake purchase handler/toast.
+- **SP-4 (BagStrip):** strip read-only MAI ai nodi decisione — il null
+  deliberato del belt su bag passive-only è design rispettato (decision (d)
+  REVERTED); helper `questBag.ts` condiviso (`questBagItems`,
+  `bagItemShortLabel`, `bagEverPacked`, `bagStripVisible` predicato puro a
+  enumerazione positiva); popover title-row rifattorizzato sullo stesso
+  helper (popover = dettaglio on-demand, strip = presenza glanceable); slot
+  riservato persistente per tutta la run via `bagEverPacked`
+  (`flags ∪ consumablesUsed`) — smonta solo quando l'epilogue prende il
+  palco (`ended && !presenting`, verificato: ended è già true nel replay
+  finale); geometria UNICA: strip strict single-row nowrap+ellipsis,
+  min-height 1 riga; strip riflette stato committed, non il replay cursor
+  (decisione esplicita (a), testata positivamente); `chipName` parentetico
+  `"{{label}} ({{qualifier}})"` — no em-dash (collisione con split-idiom);
+  armed = stance boolean bag-level su tutti i check item (verificato
+  `aria-pressed` condiviso); held qualifier per action items in nome a11y.
+- **SP-5 (level-up):** `xpToNext` ELIMINATO (nessun consumatore = leak di
+  wiring futuro); anello a 3 stati espliciti (level null → arco non montato,
+  T-02; level ≥1 idle → resting ring; evento → ignition overlay `ringMs`,
+  retrigger = remount `key={eventId}`); comando
+  `runHeroLevelUpStaging(): {accepted, configuredTargets, dispatchedTargets}`
+  con esiti enumerati (reject invalid / reject zero-eligible / accept);
+  eligibility = roster-valid `isHero` + card montata (registry read-only del
+  layer rosterV2, "mounted" non "viewport"); N targets → 1 telemetry
+  (`{configuredTargets, dispatchedTargets}`) + 1 audio cue + N flares;
+  validazione 2-layer: Zod load-time + roster check command-time uniforme
+  dev/prod (abort — il teaser gira in prod); salvage prod deterministico e
+  TOTALE con wrapper `{config, configInvalid}` (marker fuori dal config;
+  `staging` REQUIRED — assente→invalid, `targets:[]` esplicito→valido che
+  rigetta come no-op); `useHeroLevelUp` = stub di contratto tipizzato, mai
+  API di progressione parziale; floater text-variant: no merge/accumulo,
+  supersede per eventId.
 
 ---
 

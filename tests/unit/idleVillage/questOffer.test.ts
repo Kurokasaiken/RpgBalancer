@@ -326,6 +326,16 @@ describe('resolveQuestOffer', () => {
     expect(JSON.stringify(resolvedOffer)).toBe(before); // estimate does not mutate
   });
 
+  it('planner forecast uses the reference line, not «first option forever» (no 100% wipe)', () => {
+    const { resolvedOffer } = resolveQuestOffer(poi, { signals: { daysPlayed: 8 }, bandSim: { runs: 200 } });
+    const est = estimateForParty(resolvedOffer, PARTY, { runs: 300, seed: 1 });
+    expect(est).not.toBe('incomplete');
+    if (est === 'incomplete') return;
+    // First options at gob-incalzare/gob-esplora-extra = let the camp flee, loot until dead.
+    expect(est.sim.outcomePct.wipe).toBeLessThan(50);
+    expect(est.sim.outcomePct.reward).toBeGreaterThan(0);
+  });
+
   it('identity signals (day 0) → scales 1.0 → instance nodes deep-equal authored', () => {
     const { instance } = resolveQuestOffer(poi, { signals: { daysPlayed: 0 }, bandSim: { runs: 100 } });
     expect(instance.nodes).toEqual(GOBLIN_SCENARIO.nodes);

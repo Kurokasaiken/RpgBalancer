@@ -314,6 +314,17 @@ export default function GameFramePixiPage() {
 
   const currentDay = session.gameplay.state.currentDay;
   const invasionDaysLeft = invasion ? Math.max(0, invasion.dueDay - currentDay) : 0;
+  // E2E seam: the march state the marker is drawn from (dev/playwright builds read it; production builds carry it harmlessly).
+  useEffect(() => {
+    const hooks = ((window as unknown as { __idleVillageTestHooks?: Record<string, unknown> }).__idleVillageTestHooks ??= {});
+    hooks.getInvasion = () =>
+      invasion
+        ? { startDay: invasion.startDay, dueDay: invasion.dueDay, currentDay, progress: Math.min(1, Math.max(0, (currentDay - invasion.startDay) / INVASION_MARCH_DAYS)) }
+        : null;
+    return () => {
+      delete hooks.getInvasion;
+    };
+  }, [invasion, currentDay]);
   const dayLengthTicks = session.gameplay.config.globalRules?.dayLengthInTimeUnits ?? 60;
   const currentTick = session.gameplay.state.currentTick ?? 0;
 
@@ -480,7 +491,7 @@ export default function GameFramePixiPage() {
         id: 'invasion-goblin',
         x: (INVASION_LAND.x + (INVASION_VILLAGE.x - INVASION_LAND.x) * progress) * 4240,
         y: (INVASION_LAND.y + (INVASION_VILLAGE.y - INVASION_LAND.y) * progress) * 2828,
-        node: <img src={goblinStickerImage} alt="" style={{ width: 300, pointerEvents: 'none', filter: 'drop-shadow(0 12px 22px rgba(0,0,0,0.55))' }} />,
+        node: <img data-testid="invasion-goblin-marker" src={goblinStickerImage} alt="" style={{ width: 300, pointerEvents: 'none', filter: 'drop-shadow(0 12px 22px rgba(0,0,0,0.55))' }} />,
       });
     }
     /* Real quest POIs (S2.4 + R-127/R-143): the medallion is the planning
