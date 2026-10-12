@@ -17,6 +17,7 @@ import { FLOOD_MARE_SCENARIO } from './narrated/floodMare';
 import { RACE_MINIERA_SCENARIO } from './narrated/raceMiniera';
 import { IMPR002_PALUDE_SCENARIO } from './impr002Palude';
 import { IMPR002_MARE_SCENARIO } from './impr002Mare';
+import { IMPR002_MINIERA_SCENARIO } from './impr002Miniera';
 
 export { RACE_TO_PASS_SCENARIO } from './raceToPass';
 export { RACE_TO_MARSH_SCENARIO } from './raceToMarsh';
@@ -25,6 +26,7 @@ export { FLOOD_MARE_SCENARIO, MARE_FLOOD_KIT } from './narrated/floodMare';
 export { RACE_MINIERA_SCENARIO, MINIERA_RACE_KIT } from './narrated/raceMiniera';
 export { IMPR002_PALUDE_SCENARIO } from './impr002Palude';
 export { IMPR002_MARE_SCENARIO } from './impr002Mare';
+export { IMPR002_MINIERA_SCENARIO } from './impr002Miniera';
 export { generateRaceScenario, type RaceDomainKit, type RaceTuning } from './raceGimmick';
 export { generateFloodVault, type FloodDomainKit, type FloodTuning } from './floodVault';
 export { PASSO_MONTANO_KIT, PALUDE_KIT } from './kits';
@@ -43,6 +45,8 @@ export const GENERATED_CATALOG: Readonly<Record<string, QuestScenario>> = {
   [IMPR002_PALUDE_SCENARIO.id]: IMPR002_PALUDE_SCENARIO,
   /* R-159: second compiled instance — same IMPR-002 spine, kit mare. */
   [IMPR002_MARE_SCENARIO.id]: IMPR002_MARE_SCENARIO,
+  /* R-161: third compiled instance — same IMPR-002 spine, kit miniera. */
+  [IMPR002_MINIERA_SCENARIO.id]: IMPR002_MINIERA_SCENARIO,
 };
 
 /** Lookup a generated scenario by catalog id. */
