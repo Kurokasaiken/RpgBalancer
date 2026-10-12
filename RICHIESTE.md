@@ -1,7 +1,7 @@
 ---
 title: Richieste esplicite
 type: intent-ledger
-updated: 2026-10-11
+updated: 2026-10-12
 ---
 
 # Richieste esplicite
@@ -3076,3 +3076,44 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 
 **Evidence:** `test-results/r170-goblin-v02-2026-10-12.log`; harness `.mw/runs/2026-10-12-goblin-v02/harness.mjs` (riusabile: `node harness.mjs public/invasione-goblin-v02.html`).
 **Prossimo passo (per lo spec):** il Director gioca la v0.2 (economia vs difesa) e riporta i riepiloghi → discussione design su decisioni dominanti e regole da modificare.
+
+---
+
+## R-171 — Analisi comparativa bilanciamento prototipo Invasione Goblin v0.2
+
+**Richiesta (verbatim):** task strutturato del Director — 100+ run riproducibili su seed distinti, 5 politiche definite a priori (trn/eco/def/rush/adattiva), domande di design su sopravvivenza/economia/trn/finestra di vittoria/qualità decisioni, report `r171-goblin-balance-analysis-2026-10-12.md`. *Nessuna modifica a meccaniche o bilanciamento.*
+
+**Data:** 2026-10-12
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna — raccolta evidenze per le decisioni di design (thread R-170, layer opportunità R-153/R-164).
+
+**Esito:** 1000 run (200 seed × 5 policy) eseguiti con strumentazione wrap-only in VM Node (zero modifiche alle regole; `render` no-op). Report completo: **`test-results/r171-goblin-balance-analysis-2026-10-12.md`**; dati grezzi `.mw/runs/2026-10-12-goblin-balance/` (`runs.json` 1000 run con sequenze complete, `aggregate.json`, `analyze.mjs`, `deep.mjs` — riproducibile).
+
+**Risultati chiave:**
+- Morte **sempre** per invasione, clusterizzata sui giorni d'invasione; minaccia quadratica (70→127→208→313→442) vs tetto difesa ~206. Il muro per strategie bilanciate è **invasione 3 (g360, 65-68%)**; difesa pura muore prima (36.5% all'inv1 — la difesa non si autofinanzia).
+- **Vittoria solo via power-rush**: `rush` 29%, `ada` 15%, `trn`/`eco`/`def` 0/600. Successo condizionato al tentativo ~42-57%; tiro decisivo mediano 50-74% (il 17% di seed 1000 = outlier).
+- **Il collo di bottiglia della vittoria è la velocità di `pw` entro ~g360** (~19% dei run persi arriva a pw≥30): oro×giorni, non oro in assoluto (`eco` muore con +201 oro in cassa).
+- `trn` = investimento keystone (difesa + pw); scadenza Re mediana g360 **sincronizzata** con l'invasione letale — kill-or-die window emergente.
+- Lo stesso seed dà esiti opposti sotto policy diverse: **39% dei seed vincibile** da almeno una policy; la strategia domina la casualità iniziale.
+
+**Aperto (da verificare, non applicato):** politiche >`rush` non testate; tasso di vittoria del giocatore umano vs euristiche; se la curva sia «intenzionalmente punitiva» — giudizio Director.
+**Prossimo passo possibile:** il Director decide se la difficoltà attuale è intenzionale e quali esperimenti (es. fonte oro non-quest, training più corto, indicazione conto alla rovescia potenza) meritano una v0.3.
+
+---
+
+## R-171 — Scheda concept razza «uomini-rana» (nome temporaneo)
+
+**Richiesta (verbatim):** *«stiamo facendo una nuova creatura magica x la mia ambientazione. […] salvala nella documentazione in modo adeguato: nome temporaneo uomini-rana»* — scheda concept di razza anfibia/rettiliana umanoide senziente (gambe ~2,5× busto, pelle viola `#7D00B9`, pustole ambrate, spine dorsali irregolari, veste monastica, due lance primitive, deserto di basalto + rovine antiche; ricostruzione discussione 22 agosto + nuova specifica proporzioni).
+
+**Data:** 2026-10-12
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna corrispondente — concept di art direction, non canonico.
+
+**Cosa è stato fatto:**
+- Creata la scheda nel **Creature IP Development System** (`src/docs/docs/art-direction/creatures/creatures/uomini-rana/`) seguendo la convenzione dei 4 esemplari esistenti: `identity.md`, `design-intent.md`, `reference-card.md`, `prompt.md` (prompt injection pronto, stile Split-Rendering Wanderlust), `decision-log.md`, `versions/v0.1.0.md` — status `draft`, versione `0.1.0`.
+- Registrata in `src/docs/docs/art-direction/creatures/registry.md` (tabella Creatures) e in `context/INDEX.md`.
+
+**Decisioni aperte (segnate nel decision-log):**
+- **Famiglia:** nessuna delle 4 famiglie esistenti ammette anatomia umanoide o cultura senziente → serve una nuova famiglia (es. popoli senzienti) o un ruling esplicito fuori-famiglia.
+- Nome canonico (uomini-rana è temporaneo), world tier, animation grammar, ruolo gameplay — tutti TBD.
+- Immagine di riferimento assente: la prima generazione deve passare il Coherence Test della reference-card.
