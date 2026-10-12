@@ -3117,3 +3117,63 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 - **Famiglia:** nessuna delle 4 famiglie esistenti ammette anatomia umanoide o cultura senziente → serve una nuova famiglia (es. popoli senzienti) o un ruling esplicito fuori-famiglia.
 - Nome canonico (uomini-rana è temporaneo), world tier, animation grammar, ruolo gameplay — tutti TBD.
 - Immagine di riferimento assente: la prima generazione deve passare il Coherence Test della reference-card.
+
+---
+
+## R-172 — Prompt Engineering V2 per umani e creature magiche (anti-banalità)
+
+**Richiesta:** *"nella nostra bibbia di creazione di immagini AI dobbiamo fare un cambiamento. attualmente i mostri e i pg hanno come caratteristiche troppo 'banali'. Voglio che tu faccia una V2 della creazione dei prompt per umani e per mostri/creature magiche. La v1 salviamola come obsoleta. La V2 deve essere allineata con lo stile pittorico a pennellate spesse che già abbiamo utilizzato"*.
+**Data:** 2026-10-12
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna corrispondente — aggiornamento della bibbia artistica (`art_direction_plan.md`), autorità: art direction.
+
+**Cosa è stato fatto:**
+- Bibbia canonica `src/docs/docs/plans/art_direction_plan.md` portata a **v0.12**: nuova **§10 — Prompt Engineering V2** con il **Motore di Unicità** (identity sentence familiare+impossibile, signature hook, contraddizione, story trace, gesture in medias res, cultural anchor, recognition test), template compilabili per **umani** (§10.2, con "regola del terzo elemento" e campi mani/provenance) e **creature magiche** (§10.3, con MAGIC VECTOR materico e THE WORLD REACTS), due esempi compilati (eroe esiliato, Cervo-Faro). Stile pittorico a pennellate spesse confermato: impasto Jaime Jones/Jeff Easley, split-rendering Ruan Jia, Solar Triumph, ombre teal.
+- §4 (regole v0.10) e §5 (master prompt) marcati **OBSOLETI** e conservati per memoria creativa; master Wilderness resta valido per paesaggi.
+- Specchiato in `src/docs/plans/art_direction_plan.md` (copia servita alla pagina dev "Prompt & Bible Style", alias `@docs` → `src/docs`; lì §10 è §7 perché quella copia non ha §6–9).
+- Puntatore V2 aggiunto in testa a `src/docs/docs/prompts/prompt_library.md` e `src/docs/prompts/prompt_library.md`.
+
+**Note:** i 4 prompt creatura `canonical` e i prompt umani della library restano output storici validi; nuove creazioni e rigenerazioni usano V2. Possibile follow-up: rigenerare i 4 prompt creatura canonici con template V2 (bump MINOR/MAJOR per creatura).
+
+---
+
+## R-172 — Asset AI per la quest «Sterminio dei goblin»: inventario scene e generazione immagini
+
+**Richiesta (verbatim):** *«per la quest Sterminio Goblin: dimmi tutte le scene possibili, dobbiamo riprendere la bibbia e creare delle immagini AI come asset da usare»*
+
+**Data:** 2026-10-12
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna corrispondente — produzione asset visivi; la bibbia resta `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md` (fonte unica della quest).
+
+**Contesto:** oggi la quest usa 8 dipinti public domain (John Bauer, Rackham, Loutherbourg, Teniers…) scaricati in `public/assets/quest-goblin/` (provenienza in `SOURCES.md`), mappati nodo→immagine in `src/ui/idleVillage/questS1Lab/questArt.ts` (`NODE_ART`, 19 nodi `gob-*` su 8 immagini + `quest-card.jpg` + `ART.village` per `gob-fine`). La richiesta è sostituire/potenziare con immagini AI generate ad hoc, derivando i soggetti dal manoscritto della spec.
+
+**Deciso 2026-10-12 (Director):**
+- **Stile:** Bibbia Wanderlust (`src/docs/docs/plans/art_direction_plan.md` v0.12) — impasto a pennellate spesse, split-rendering solo sul punto focale, Solar Triumph, ombre deep teal, kill list integrale. I dipinti public domain attuali violano la kill list (mud/brown) → sostituzione coerente col DNA.
+- **Goblin:** sono archetipi TEMPORANEI, non specie canonica → le scene sono POV del party/ambiente/tracce; goblin visibili SOLO dove obbligatori e come massa/sagome, mai primi piani character. Nessun «goblin block» da authorare.
+- **Meccanica confermata:** l'immagine cambia in base alla scelta del giocatore (mapping per nodo in `NODE_ART`) → serve granularità per-scena perché le scelte (stealth vs assalto, tracce vs arrampicata) abbiano payoff visivo.
+
+**Da decidere:** review dei prompt, generazione, poi `provenance.md` per scena + aggiornamento `SOURCES.md` e `NODE_ART`.
+
+**Avanzamento 2026-10-12:** spec authorata in `.mw/specs/quest-goblin-scenes/` — `design-intent.md` (vincoli Director: POV party, goblin solo in 3 scene come massa/sagome, scelta=immagine diversa), `scenes.md` (indice 15 scene + mapping NODE_ART target), `scenes/<slug>/prompt.md` per 15 scene (f0×1, f1×3, f2×1, f3×3, f4, f5, f6, f7×3, quest-card) in formato consumabile da `scripts/rpg-gen-mockup.py --spec-dir` (primo blocco ```text = prompt positivo, tutti ≤77 token CLIP verificati; negative dichiarato per --negative). Params: SDXL MPS, cfg 7.5, steps 30, 1344×768 scene / 832×1216 card.
+
+---
+
+## R-173 — Audit d'integrazione: Invasione Goblin lab ↔ meccaniche reali (R-172 report)
+
+**Richiesta (verbatim):** task strutturato del Director — trasformare progressivamente `invasione-goblin-v02.html` da minigioco autonomo a laboratorio simulativo delle meccaniche reali di Wanderlust. *Fase audit + piano soltanto: nessuna modifica alle meccaniche, nessun push.*
+
+**Data:** 2026-10-12
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna — audit a supporto delle decisioni di design (thread R-170/R-171; layer opportunità R-164/PLAN-030).
+
+**Esito:** report completo **`test-results/r172-goblin-integration-audit-2026-10-12.md`** (il filename dice r172 per lo spec; ID reale R-173 perché R-172 era già occupato).
+
+**Risultati chiave dell'audit:**
+- Il layer strategico **esiste già come engine riusabile**: `src/engine/metaLayer/` (PLAN-030) — deterministico, seeded `mulberry32`, offerte con gate a 4 stati + doppio timer + leader-capacity + esito graduato con harm; il contenuto v0 include già uno scenario d'assedio (`intel:siege-plans`→`race-break-siege`→`ms-siege`).
+- L'**esclusività di disponibilità è già implementata** (`canScheduleActivity`→`away`, `buildExpeditionParty` lock `in-expedition`) — il costo opportunità che il lab vuole osservare è codificato nel gioco, non nel lab.
+- **Invasione reale = solo cinematica** (marcia 30gg su `/game`, esito "futuro non implementato"): la risoluzione del lab è la *proposta* candidata, va marcata come tale.
+- Engine **deprecati da evitare**: `QuestEngine`/`QuestResolver`/`QuestPowerEngine` (E2/C2 legacy); canonico di riferimento `questRun`+`questSettlement` (motore definitivo ancora OPEN-002).
+- Architettura consigliata: `invasione-goblin-v03.html` + **bundle ES generato dagli engine reali** (riuso diretto dei moduli dominio-puri; adapter isolati; meccaniche lab-only marcate PROPOSTA). Roadmap 0→F con test di accettazione.
+- **7 decisioni aperte** che richiedono il Director (D1–D7): forma del lab (HTML+bundle vs harness Node), livello resolve quest, reclutamento, trn/difesa vs stat reali, granularità ferite, win-condition come milestone metaLayer, meta-run.
+
+**Prossimo passo:** il Director sceglie D1–D7 → primo incremento (0+A: `pop`→`ResidentState` reali con esclusività) diventa task implementabile.
