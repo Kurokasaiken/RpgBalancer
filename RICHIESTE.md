@@ -3112,6 +3112,7 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 **Cosa è stato fatto:**
 - Creata la scheda nel **Creature IP Development System** (`src/docs/docs/art-direction/creatures/creatures/uomini-rana/`) seguendo la convenzione dei 4 esemplari esistenti: `identity.md`, `design-intent.md`, `reference-card.md`, `prompt.md` (prompt injection pronto, stile Split-Rendering Wanderlust), `decision-log.md`, `versions/v0.1.0.md` — status `draft`, versione `0.1.0`.
 - Registrata in `src/docs/docs/art-direction/creatures/registry.md` (tabella Creatures) e in `context/INDEX.md`.
+- Correzione stessa data: lo `Style` del `prompt.md` era generico — riallineato allo stile canonico concordato **Split-Rendering con impasto spesso a pennellate larghe** (bibbia §10, invariato); NO LIST estesa (no glazes/airbrush/flat digital paint).
 
 **Decisioni aperte (segnate nel decision-log):**
 - **Famiglia:** nessuna delle 4 famiglie esistenti ammette anatomia umanoide o cultura senziente → serve una nuova famiglia (es. popoli senzienti) o un ruling esplicito fuori-famiglia.
@@ -3177,3 +3178,18 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 - **7 decisioni aperte** che richiedono il Director (D1–D7): forma del lab (HTML+bundle vs harness Node), livello resolve quest, reclutamento, trn/difesa vs stat reali, granularità ferite, win-condition come milestone metaLayer, meta-run.
 
 **Prossimo passo:** il Director sceglie D1–D7 → primo incremento (0+A: `pop`→`ResidentState` reali con esclusività) diventa task implementabile.
+
+---
+
+## R-174 — Goblin Lab v0.3, Incremento 0+A: persone reali con esclusività di disponibilità
+
+**Richiesta:** continuazione del task R-172/R-173 (audit→roadmap) dopo le decisioni del Director 2026-10-12: **D1** harness Node/tsx prima (niente HTML shell), **D2** resolve quest graduato metaLayer (per Inc B), **D3** reclutamento = migranti come offerta metaLayer (Inc B; nel frattempo migranti diretti PROPOSTA-lab), **D4** `trn`/difesa = modello proposto lab su roster reale.
+
+**Data:** 2026-10-12
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna — laboratorio sperimentale, nessuna regola canonica modificata.
+
+**Esito:** `tools/goblin-lab/lab.ts` (locale: `tools/` è gitignored per convenzione repo) — harness tsx che riusa `TimeEngine` (esclusività reale: `away`/`dead`/`injured` bloccano scheduling) e `mulberry32` (metaLayer). `pop` scalare → `ResidentState[]`; `trn` → tag 'trained' su persone; difesa conta solo addestrati **presenti**; perdite = morti specifici permanenti; quest = party eroe+1-2 villager impegnati per la durata.
+**Evidence:** `test-results/r174-goblin-lab-inc-a-2026-10-12.log` — accettazione 5/5 (doppia assegnazione rifiutata, away non riassegnabile, morte permanente, difesa esclude away, replay identico) + sweep 30 seed.
+**Finding emergente:** con persone reali l'attrito dei fallimenti quest (1-2 morti nel party) rende il churn insostenibile — 0/30 vittorie, estinzione villager sistematica (l'eroe resta solo). Prima interazione cross-sistema rivelata dal lab.
+**Prossimi:** Inc B (offerte/metaLayer + migranti come offerte), Inc C (ferite vs morti + `injuredUntilTick`), Inc D (consumo cibo/produzione per-persona sul clock condiviso), Inc E (invasioni con difensori assenti), Inc F (ciclo run).
