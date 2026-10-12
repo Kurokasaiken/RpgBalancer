@@ -86,8 +86,14 @@ export interface GameFrameProps {
    * over a deliberately hidden HUD.
    */
   hudWakeSignal?: number;
-  /** Reports every chrome visibility change (manual, idle, input wake, event wake). */
-  onHudHiddenChange?: (hidden: boolean) => void;
+  /**
+   * Reports every chrome visibility change. `cause` says how it was hidden —
+   * `'idle'` (the stillness timer) vs `'manual'` (the toggle/`h`); on a wake it
+   * reports the cause of the hide it ends. The contemplation reward (sea
+   * wonder) listens for `hidden === true && cause === 'idle'` (Director,
+   * 2026-10-12: a hand-hidden HUD is a deliberate clean view, not a reward).
+   */
+  onHudHiddenChange?: (hidden: boolean, cause: 'manual' | 'idle') => void;
   /**
    * `atlas` (default) is the thin, minimal-line ribbon this shell shipped
    * with. `cartographer` adds the carved-bevel weight the R-075 review asked
@@ -245,7 +251,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   }, [hudWakeSignal]);
 
   useEffect(() => {
-    onHudHiddenChange?.(hudHidden);
+    onHudHiddenChange?.(hudHidden, hiddenBy.current);
   }, [hudHidden, onHudHiddenChange]);
   /** Slide style for one chrome cluster. `base` preserves a transform the element already needs (centering, tilt). */
   const slideChrome = (dir: 'up' | 'down', base = ''): CSSProperties => {
