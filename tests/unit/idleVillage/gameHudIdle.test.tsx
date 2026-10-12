@@ -85,13 +85,23 @@ describe('GameFrame idle hide', () => {
     expect(hudHidden(container)).toBe(false);
   });
 
-  it('reports every visibility change through onHudHiddenChange', () => {
+  it('reports every visibility change through onHudHiddenChange, with its cause', () => {
     const onHudHiddenChange = vi.fn();
     const { container } = renderFrame({ onHudHiddenChange });
     act(() => void fireEvent.keyDown(window, { key: 'h' }));
-    expect(onHudHiddenChange).toHaveBeenLastCalledWith(true);
+    expect(onHudHiddenChange).toHaveBeenLastCalledWith(true, 'manual');
     act(() => void fireEvent.keyDown(window, { key: 'h' }));
-    expect(onHudHiddenChange).toHaveBeenLastCalledWith(false);
+    expect(onHudHiddenChange).toHaveBeenLastCalledWith(false, 'manual');
+    expect(hudHidden(container)).toBe(false);
+  });
+
+  it('reports cause idle when the stillness timer hides the chrome', () => {
+    const onHudHiddenChange = vi.fn();
+    const { container } = renderFrame({ idleHideMs: 50, onHudHiddenChange });
+    act(() => vi.advanceTimersByTime(60));
+    expect(onHudHiddenChange).toHaveBeenLastCalledWith(true, 'idle');
+    act(() => void fireEvent.pointerMove(window));
+    expect(onHudHiddenChange).toHaveBeenLastCalledWith(false, 'manual');
     expect(hudHidden(container)).toBe(false);
   });
 });

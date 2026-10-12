@@ -185,7 +185,7 @@ export default function GameFramePixiPage() {
   const [cardOpen, setCardOpen] = useState(false);
   useEffect(() => {
     if (!shroudCovered) return undefined;
-    const timer = window.setTimeout(() => setCardOpen(true), 700);
+    const timer = window.setTimeout(() => setCardOpen(true), DEFAULT_GAME_FRAME_CONFIG.eventTheatre.cardDelayMs);
     return () => window.clearTimeout(timer);
   }, [shroudCovered]);
 
@@ -218,7 +218,7 @@ export default function GameFramePixiPage() {
       timeFreezeSnapshot.current = null;
       setTimeFrozen(false);
       if (snap && !snap.wasPaused) useMinimalGameplayStore.getState().resumeGame('auto');
-    }, 1000);
+    }, DEFAULT_GAME_FRAME_CONFIG.eventTheatre.freezeReleaseMs);
     return () => globalThis.clearTimeout(release);
   }, [shroudCovered]);
 
@@ -231,12 +231,13 @@ export default function GameFramePixiPage() {
     prevShroudCovered.current = shroudCovered;
   }, [shroudCovered]);
 
-  /* Contemplation reward (Director): when the chrome slides away, a sea wonder
-   * surfaces — `wonderRequest` is the live channel the Director button uses. */
-  const [hudHidden, setHudHidden] = useState(false);
+  /* Contemplation reward (Director): a sea wonder surfaces only when the chrome
+   * slid away on its own (idle) — a hand-hidden HUD is a deliberate clean view,
+   * not contemplation. `wonderRequest` is the live channel the Director button uses. */
+  const [hudIdleHidden, setHudIdleHidden] = useState(false);
   useEffect(() => {
-    if (hudHidden && DEFAULT_GAME_FRAME_CONFIG.hudHide.wonderOnHide) setWonderRequest((n) => n + 1);
-  }, [hudHidden]);
+    if (hudIdleHidden && DEFAULT_GAME_FRAME_CONFIG.hudHide.wonderOnHide) setWonderRequest((n) => n + 1);
+  }, [hudIdleHidden]);
   // Test / trailer tooling: dev builds only, F10 shows or hides it (hide it for a clean capture).
   // `?capture=1` starts a clean shot: no Director, no panel menu.
   const capture = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
@@ -742,7 +743,7 @@ export default function GameFramePixiPage() {
             skinControl={{ id: skinId, onChange: setSkinId }}
             hudWakeSignal={hudWakeSignal}
             timeInputLocked={timeFrozen}
-            onHudHiddenChange={setHudHidden}
+            onHudHiddenChange={(hidden, cause) => setHudIdleHidden(hidden && cause === 'idle')}
             rosterSlot={({ onClose }) => (
               <Roster
                 onClose={onClose}
