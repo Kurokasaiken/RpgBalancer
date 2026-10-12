@@ -2773,6 +2773,16 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Safeguards:** copy/HTML only.
 
+## R-151 — Steam capsule: usare il logo authored (placca+sole), non il wordmark Cinzel
+
+**Richiesta (verbatim):** *"nn abbiamo un asset che si chiama tipo wanderlust logo o qualcosa del genre? ho visto che hai usato una scritta normale e banale, senza il simbolo centrale, ecc"*
+**Data:** 2026-10-12
+**Stato:** `fatta`
+
+**Esito:** trovato `~/Downloads/library logo.png` (1536×1024, **alpha nativa già presente** — placca dorata con sole centrale; il tentativo di bg-removal era superfluo). Crop → `marketing/steam/assets/library-logo.png` (1492×1023). `make-capsule.mts` riscritto: compone il logo authored PNG invece del wordmark Cinzel → rigenerate main/header/small/vertical/event capsule. Preview e ASSETS.md aggiornati (vecchi file tipografici marcati superseded). Nota: `~/Downloads/logo1.png` (1024², tramonto su oceano, senza alpha) disponibile come art di sfondo alternativo.
+
+**Safeguards:** kanban:lint PASS; asset/HTML only.
+
 ## R-148 — /game: mappa troppo grande + HUD su terra + linee tra mare vecchio e nuovo
 
 **Richiesta (verbatim):** *"+ volte nella pagina /game la mappa continua a diventare troppo grande e l'HUD copre una parte di terrra, e nn dovrebbe. Poi aumenta il mare e appaiono delle linee tra il mare "vecchio" e quello nuovo. 1) scrivi una guida su come risolvere questa cosa 2) scrivi nella documentazione come dovrebbe essere quella schermata e come misurare che la HUD nn sia mai davanti alla mappa quando viene aperta 3) risolvi questo bug con bugfix 4) scrivi la documentazione 5) learn"*
@@ -2889,6 +2899,18 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Contesto:** il Director ha fornito una lista iniziale da una ricerca ChatGPT: Super Fantasy Kingdom, A Hero's Rest, Fort Triumph, Crown of Greed, Majesty, dotAGE.
 **Cosa è successo:** creato `context/COMPETITIVE_LANDSCAPE.md` (ricerca web 2026-10-11): ~21 titoli in 5 cluster, tabella prezzi listino/saldo/recensioni/vendite stimate, pattern errori E1–E8, mappa di posizionamento diretto↔indiretto × run↔continuo, white space e implicazioni prezzo ($14.99 coerente col tier Loop Hero/SFK-launch). Indicizzato in `context/INDEX.md`. 3 domande aperte per il Director in §10 del doc.
 **Aggiornamento 2026-10-11:** aggiunta §8.1 — prezzi al lancio vs listino attuale. Pattern dominante: lancio basso + rialzo (EA→1.0 o per contenuto) + sconto -10/15% prima settimana.
+**Aggiornamento 2026-10-11 (2):** aggiunta §11 — voce della community per concorrente diretto (SFK, AHR, CoG, dotAGE, Loop Hero + vicini AtS/TR/Norland/BB/Epic Tavern/Fort Triumph/Hero's Hour/Thronefall/Stacklands): lamentele e consensi titolo per titolo, tassonomia C1–C10, pattern di apprezzamento W1–W7.
+
+---
+
+## R-160 — Strategia prezzo: pattern di nicchia (ingresso basso + rialzo), forse con meno spesa
+
+**Richiesta (verbatim):** *"segna che faremo cm prezzi come hanno fatto tutti gli altri, anche se nn m sento all'altezza di DD, ma magari facciamo la stessa strategia ma cn meno spesa? vedremo"*
+**Data:** 2026-10-11
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna — intenzione di strategia prezzo **provvisoria** ("vedremo"), da confermare al lancio (prezzo non bloccante per pagina Coming Soon, STEAM_PAGE_PLAN D6).
+**Cosa è successo:** registrata in `COMPETITIVE_LANDSCAPE.md` §8.1 (decisione) e §10-Q3 (risposta). Strategia = pattern P1 osservato: ingresso basso + sconto di lancio -10/15% + rialzo come evento alla 1.0/milestone.
+**Chiarimento Director (2026-10-12):** "meno spesa" = stessa traiettoria a prezzi assoluti più bassi — **orientativamente ~$9.99 lancio → ~$14.99 alla 1.0**. Aggiornati `COMPETITIVE_LANDSCAPE.md` §8.1/§10-Q3 e `STEAM_PAGE_PLAN.md` D6 (il "$14.99 premium" ipotizzato in §0 va rivisto in sede di prezzo).
 
 ## R-159 — Seconda istanza compilata: IMPR-002 × kit mare
 
@@ -2899,6 +2921,29 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Esito:** `gen-impr002-mare` «The Shipowner's Carrack» in `impr002Mare.ts` (~30 nodi, profilo `gen`, zero delta motore). Riusato alla lettera: turn router B3, canali `segna-*`, armRolls trait-gated, vocabolario flag B6. Diverso per meccanica: fail rotta propria → `annusati` (esposizione, non solo HP); `polizza-ombra` prova documentale che gatea `ma-sgama`; `traccia-maestro` seme cross-cast; via `a-sgamato` → `ma-consegna`. Nota: `costGold` ha side-effect goblin-hardcoded → non usabile in scenari `gen`. Test 9/9 + palude 16/16 + genLab 10/10, lint/build/kanban PASS. Evidence: `test-results/r159-imprint-mare-2026-10-12.log`.
 
+---
+
+## R-161 — Errata documentazione: il gioco NON è più un idle game
+
+**Richiesta (verbatim):** *"il gioco nn è + considerato idle da un bel po', è sbagliata la documentazione: correggila"*
+**Data:** 2026-10-11
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna — correzione documentale di direzione; autorità preesistente `marketing/steam/claim-ledger.md` («niente offline, posizionamento second monitor»).
+**Contesto:** parte dei documenti (e i prompt della ricerca R-154) descrivevano ancora il gioco come «idle»; la risposta del Director include anche 7 risposte alle domande aperte della ricerca opportunity-layer.
+**Cosa è successo:** audit globale delle occorrenze «idle» e classificazione (corrente-errato / storico-corretto / nome tecnico `idleVillage` / competitor di altri). Corretti: `DESIGN_PILLARS.md` (R3.4/R3.5), `context/RPG_PROJECT_CONTEXT.md`, `context/VERTICAL_SLICE_REFERENCE.md`, `context/COMPETITIVE_LANDSCAPE.md` (3 punti), `context/QUEST_GAMEPLAY_SCIENCE.md`, `context/QUEST_OPPORTUNITY_LAYER.md` (§7 nota modello temporale), run `.mw/runs/20261011-opportunity-layer-research/` (README, report-t1/t6, nota errata sui 7 prompt). Decisione registrata in `context/DECISION_LOG.md` (2026-10-11). «Idle Village» resta codename storico della superficie deprecata e nome del dominio tecnico.
+**Inoltre (stessa sessione):** le 7 risposte del Director alle domande aperte di R-154 integrate in `context/QUEST_OPPORTUNITY_LAYER.md` (§1 visibilità parziale grafo, §2 transizione mid-run tra famiglie, §3 stati gate su offer card + scout quality, §4 conversion rewards posticipate al playtest, §5 flashback-prep alto tier, §7 doppio timer acceptance/completion) e nei Progress di OPEN-019/020/021. Tutto resta PROPOSAL in attesa di ratifica.
+
+---
+
+## R-162 — Nessuna data nel piano go-to-market: si esce quando si è pronti
+
+**Richiesta (verbatim):** *"nel business plan c sn date messe, toglile, nn cè una data. qunado saremo pronti lo faremo e basta"*
+**Data:** 2026-10-12
+**Stato:** `fatta` (2026-10-12)
+**Desiderata FROZEN:** nessuna — decisione operativa di scheduling; il documento di autorità è `src/docs/docs/strategy/go_to_market_steam_first.md` (single source of truth GTM) + sezione omonima in `MASTER_PLAN.md`.
+
+**Esito:** il "business plan" è il piano Go-To-Market "Steam First". De-calendarizzato: rimosse tutte le finestre temporali (header "2026 H1", "Wishlist 25k entro H1 2026", tabella §4 con finestre Feb–Giu 2026 → colonna "Ordine / trigger", "Localization sprint Feb" → "pre-pagina", "Kick-off settimana 1" → "Kick-off"). Il piano resta una **sequenza ordinata di 6 beat con gate di qualità come condizione di ingresso** (Steam Page → Next Fest → Playtest#1 → Devlog/Creator → Playtest#2 → Launch Readiness); i KPI restano target di misura, non scadenze. Nota decisionale aggiunta in header + §4 + change log §10; sezione `MASTER_PLAN.md` Go-To-Market allineata (titolo "(H1 2026)" rimosso, link aggiornato all'anchor §4 rinominata). Date storiche (changelog, header "ultimo aggiornamento", evidence passate) conservate: non sono impegni futuri.
+
 ## R-163 — Terza istanza compilata: IMPR-002 × kit miniera
 
 **Richiesta (verbatim):** *«A — Miniera (3ª istanza)»* (scelta del Director sul menu post-R-159: stessa storia, dominio miniera — prova se il metodo si può automatizzare in un compilatore).
@@ -2908,6 +2953,17 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Esito:** `gen-impr002-miniera` «The Foreman's Crew» in `impr002Miniera.ts` (~31 nodi, profilo `gen`, zero delta motore). Tutti i delta previsti implementati: annusati-per-rumore, `turni-ombra` (un intel, due payoff), `mi-via-puntelli` (primo hazard-ambiente: win salta il fight / almost → ambush / fail → fight ferito), `traccia-morso` non-umana → ponte IMPR-001-C, `mi-consegna` al fattore. Verdetto compilatore in QUEST_IMPRINTS §Terza-istanza: ~70-75% template fisso + foglio parametri dominio — il valore anti-reskin vive nei parametri authored. Test 11/11 + suite imprint 46/46, lint/build/kanban PASS. Evidence: `test-results/r163-imprint-miniera-2026-10-12.log`.
 
+---
+
+## R-164 — Come procedere dopo la ricerca: ratifica layer opportunità + prototipo Gate 1
+
+**Richiesta (verbatim):** *"adesso come dobbiamo procedere?"* (dopo la correzione idle R-161 e le 7 risposte sulle questioni aperte di R-154)
+**Data:** 2026-10-12
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna — decisione di processo: il Director ha scelto «Ratifica + prototipo Gate 1» tra le opzioni presentate.
+**Cosa è successo (ratifica):** sessione di ratifica sui residui di OPEN-019/020/021 → decisioni in `context/DECISION_LOG.md` (2026-10-12) e marcate «ratificato» in `context/QUEST_OPPORTUNITY_LAYER.md`: modello dati grafo **ibrido** (qualities piatte + offer generator + nodi authored per milestone), tipi di arco **config-first aperti**, **niente valuta intel** (info solo da qualità esploratore/party — mitigazione OPEN-018 corrispondente non disponibile), capacità parallela **solo leader-capacity** (edifici supportano, non danno slot). Tassonomia requisiti a 4 tipi: il Director ha scelto di **non ratificarla** — si valida col prototipo.
+**Cosa è successo (piano):** draft `plans/PLAN-030-meta-layer-gate1-harness.md` — Gate A della metodologia R-154/T7: engine deterministico `src/engine/metaLayer/` + config `src/balancing/config/metaLayer/` (3 famiglie × 3 tier, ~15-20 offerte, 2 milestone, doppio timer, 4 stati gate, steering a pesi, leader-capacity), harness a 4 API + driver script, graph linter a 6 check. Senza combattimento, senza UI. In attesa di battesimo Director.
+
 ## R-165 — Contratto di scrittura nodi + revisione stakes di gen-impr002-miniera
 
 **Richiesta (verbatim):** *«procedi»* (accettando la proposta: 1. contratto di scrittura nei doc — 5 regole Wildermyth + «la posta deve sanguinare» + «ogni intel = una frase piana»; 2. revisione di `gen-impr002-miniera` con stakes da salvataggio e indizi in chiaro).
@@ -2916,6 +2972,53 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 **Desiderata FROZEN:** (a) scrivere il contratto di scrittura dei nodi in `QUEST_IMPRINTS.md` (fonte: Wildermyth Event Design Philosophy + anatomia Display→Informazione→Significato degli indizi): il testo serve una scelta, i membri del party entrano nel testo per nome/tratto, atmosfera concreta non fiorita, contesto immediato, brevità monumentale; la posta in gioco deve essere persone o sopravvivenza, non logistica; il Significato di ogni intel si dichiara in una frase piana («qualcuno sta nascondendo queste morti») — se non si può, è troppo intelligente. (b) Rivedere `impr002Miniera.ts`: B0 = minatori intrappolati dal crollo (la vena segreta del caposquadra l'ha causato — aiutare il salvataggio lo espone); indizi riscritti in chiaro (niente «turni firmati dai morti» criptici — il registro mostra squadre in una galleria sigillata e il materiale nascosto sotto altri nomi); B5 = i minatori intrappolati sono stati PRESI, non sepolti — `traccia-morso` diventa tracce di trascinamento verso la galleria profonda (ponte IMPR-001-C più forte: la posta erano persone). Grafo/nodi/flag invariati — revisione di copy e significati.
 
 **Esito:** contratto in `QUEST_IMPRINTS.md` §Contratto-di-scrittura (5 regole Wildermyth + 3 nostre: posta=sanguina, intel=frase piana, seeds comprensibili — con nota motore: la copy oggi non interpola nomi party, gap noto). `impr002Miniera.ts` revisionata copy-only: B0 minatori intrappolati, B2 indizi in chiaro, B3 l'estrazione ha causato il crollo (salvataggio=alibi), B5 presi-non-sepolti. Spec istanza C allineata. Nota: B0 di palude/mare resta posta-oggetto → da rivalutare alla prossima revisione copy. Test 11/11. Evidence: `test-results/r165-writing-contract-2026-10-12.log`.
+
+---
+
+## R-166 — `/game` come schermata principale: audit qualità AAA + funzioni mancanti
+
+**Richiesta (verbatim):** *"la pagina che adesso si chiama /game è quella che dovrà diventare la schermata principale del mio gioco. Fa una ricerca online: c saranno un bel po' di cose "tipiche" che c vogliono e che nn abbiamo aggiunto, inoltre dobbiamo fare dei test x capire se è abbastanza veloce, deve essere tutto "pre caricato", trascinare i componenti deve essere "smooth", ecc. Quali sono le qualità che dovrebbe avere? le funzioni che stiamo scordando tipo selettore di lingua, audio, ecc (nel menù). Deve essere professionale da videogame AAA"*
+**Data:** 2026-10-12
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna nuova — `/game` è già la superficie canonica (CANON.md, R-075 v2); questa richiesta ne alza lo standard a «schermata principale di qualità AAA». Output sessione: audit gap (menu/settings, boot/preload, HUD, performance) + direzioni candidate per il Director.
+**Audit (sessione 2026-10-12):** esistono già — selettore lingua (en/it-IT) e skin in `HudGameMenu`, Save Now, toggle pannelli con shortcut, `AudioCueEngine` con gain per categoria (manca la UI volumi), guida `game_feel_design_guide.md` come autorità juice, perf HUD da R-003 Slice 0. Gap principali identificati: loading screen brandizzato + preload a tier (oggi fallback testuale Suspense), settings screen a tab (Audio/Video/Gameplay/Controlli/Accessibilità) — lo stub «Settings» è disabilitato, musica/ambience assenti, Esc/pausa non collegati, save slots/Load stub, minimap (opzione controversa vs Pillar 1), cheat-sheet shortcut, quality preset effetti, test di performance (fps drag/pan, first-frame, soak memoria).
+
+**Decisioni Director (2026-10-12):**
+- **Title screen APPROVATA** — scopo funzionale: caricare *tutta* la mappa e *tutti* i componenti durante il loading, così dopo non c'è latenza. Importantissimo soprattutto per i **medaglioni** (drag del PG dalla pgCard deve essere istantaneo dal primo gesto).
+- **Sequenza di lavoro approvata:** (1) fix preloading — a pagina aperta zero rallentamenti, zero zoom/posizioni strane, zero attese: si attende solo durante il loading; (2) misurare la responsività di tutto ciò che esiste già; (3) se le misure soddisfano → aggiungere funzioni, altrimenti cambiare strategia.
+- **Piano:** `plans/PLAN-031-game-boot-preload-perf.md` (registrato in plans/INDEX). Ratifiche 2026-10-12: title screen = veil con reveal automatico al 100%; budget p95 ≤33ms / long-frames=0 / first-interactive ≤4s / drag overlay ≤100ms; perf spec anche in CI/headless (verdetto autorevole resta l'esecuzione visibile, T-04).
+
+**Esito implementazione (2026-10-12, PLAN-031 fasi A+B):**
+- Boot: veil `GameBootScreen` brandizzata (WANDERLUST + progresso reale) sopra la mappa montata; `PixiWorldMap` espone `onBootProgress`/`onReady`, prefetch parallelo a tier, `refit` prima del reveal, `renderer.prepare.upload` (warmup GPU). `window.__gameBoot` + telemetry `game_boot_ready`.
+- Fix extra: toggle pannello (roster/eventi) non ricostruisce più l'app Pixi — `safeFit` → `safeFitRef` + `refit()` in place (era un destroy/rebuild completo a ogni toggle).
+- Misura: `__gamePerf` probe + `gamePerfBudgets.ts` (Zod) + `tests/e2e/idleVillage/gamePerf.spec.ts` con evidence log `test-results/plan-031-game-perf-*.log`.
+- **Drag medaglione**: misurato ~117ms di long frame al pickup (commit React pagina + misura droppable dnd-kit nello stesso frame). Fix applicati: `startTransition` su onDragStart/onDragEnd/onDragCancel + `measuring.droppable.strategy = BeforeDragging` (rect droppable pre-misurati a idle → zero layout forzato nel frame di attivazione). Verdetto: spec verde 5/7 run post-fix; `gameQuestExpedition.spec.ts` 14/14 passa (drag→slot funzionale intatto). La spec riprova il real-drag 3× e asserisce il tentativo migliore (il budget misura il capability floor, non la contesa macchina).
+- Numeri floor (headed, preview): boot 2.1–3.6s, pan/zoom/menu p95 ~17.4ms, real-medal-drag 0 long frame al floor.
+
+**Follow-up Director (2026-10-12, stesso piano):** *"usa direttamente il logo vero; sfondo col teal della HUD; niente pannelli aperti all'ingresso nella mappa (neanche da salvataggio precedente); un pulsante per far sparire l'HUD — quelli in alto salgono, quelli in basso scendono"*.
+Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezza `bootVeil.logoWidthPx`); palette veil → sea-teal lacquer HUD (`#1d4a4d`/`#0f2627`); `useHudPanels` senza persistenza + `defaultVisible:false` ovunque → /game apre sempre pulita; `HudHideToggle` + shortcut `h` con slide direzionale top↑/bottom↓ (`hudHide.slideMs`, reduced-motion=istantaneo), toggle persistente bottom-right, telemetry `game_hud_toggle`. Spec e2e aggiornate (roster aperto via `r` nei beforeEach).
+
+---
+
+## R-167 — Teaser trailer: componenti mancanti su `/game` (scheda PG, consumabili base, consumabili in quest)
+
+**Richiesta (verbatim):** *"per il teaser trailer gli elementi che ancora ci mancano nella pagina /game alcuni componenti. la scheda del personaggio ben fatta, secondo le regole e i dettami della pagina /game e del progetto. Che si apre se clicchi (e rilasci, nn trascini) la pgCard. Poi ci serve un componente dove ci sn i consumables della base, il picker per portarteli nella quest e un componente dove mostrare i consumbables durante il viaggio e durante le scelte/skill check durante la quest (pianificazione, ecc). Poi? che altro ci manca del progetto?"*
+**Data:** 2026-10-12
+**Stato:** `in corso` — piano `plans/PLAN-032-teaser-game-components.md` registrato (draft, 2026-10-12): SP-1 scheda PG hover, SP-2 magazzino, SP-3 mercante, SP-4 consumabili in viaggio, SP-5 level-up mock. In attesa di ratifica Director.
+**Desiderata FROZEN:** nessuna corrispondente — collegata a R-072 (teaser, scena 3 = preparation/hero sheet) e R-166 (standard AAA di `/game`).
+
+**Stato reale rilevato (sessione 2026-10-12):**
+- **Scheda PG:** `PgDetailCard` esiste (Materic, draggable, i18n, stat dinamiche via `STAT_DESCRIPTORS`, equip via `useResidentHeroState`) ma è cablata solo su `/primitives` e `/hero-components-lab` — mai su `/game`. Su `/game` il click su pgCard oggi = `onResidentSelect` → **auto-assegnazione** al primo slot che accetta (`useQuestPoiSession.handleResidentSelect` / expedition): conflitto diretto col nuovo significato del click («apri scheda») — da sciogliere col Director. `SchedaPergamena` è legacy/dormant. Idioma `/game` = HudPlaque + `useHudPanelDrag` (guida `hud_component_guide.md`); `PgDetailCard` è su primitivi Materic — da verificare se va ri-espressa.
+- **Consumabili base + picker:** `QUEST_STASH` (catalogo Zod, `bagSlots: 3`, `defaultLoadout`) + `StashPicker` (lab, R-102) + loadout inline già dentro `QuestExpeditionDetail` (chip item, cap, coverage). **Manca:** il magazzino della base come superficie — `QUEST_STASH` è un mock pool statico («the real village stash is S2 infrastructure», commento in `questStash.ts`), nessuno store inventario villaggio persistito, nessun pannello HUD che lo mostri fuori dalla quest.
+- **Consumabili in quest:** `ConsumableBelt` esiste in `QuestRunWindow` (arm prima del check, healing/potion come azioni, banner passivo) + popover «bag» nella title row — ma la belt renderizza solo `waiting && !presenting` (scelte attive): durante viaggio/transit/beat è nascosta.
+- Collegamenti: `questStash.ts`, `questItems.ts` (engineFlag bridge), `StashPicker.tsx`, `ConsumableBelt.tsx`, `QuestExpeditionDetail.tsx` §loadout, `QuestRunWindow.tsx`, `useQuestPoiSession.tsx`.
+
+**Decisioni Director (2026-10-12):**
+- **Gesto scheda PG:** `mouseOver` sulla pgCard apre la scheda del personaggio; `click` resta auto-assegnazione allo slot (comportamento attuale `handleResidentSelect` invariato). Nota di implementazione: gate hover durante il drag (non aprire mentre si trascina sopra il roster) + hover-intent delay.
+- **Scheda da ri-esprimere come HudPlaque:** verificato — `PgDetailCard` **non** segue `hud_component_guide.md`: usa `MatericSurface`/`MatericFrame`/`MatericPlaque` (bocciati per la HUD, guida §2 — ammessi solo `WellBronzeBezel` e `MatericGrain`) e ha colori letterali (`CATEGORY_COLOR` hex, viola regola 10 «colori solo da token `--skin-*`»). Contenuto/dati (stat dinamiche `STAT_DESCRIPTORS`, equip `useResidentHeroState`) da riusare dentro un guscio `HudPlaque` + `useHudPanelDrag` + `SkinScope` + `data-hud-controls`, min 12px, i18n en/it-IT, voce nel menù Pannelli.
+- **Magazzino:** «un magazzino di partenza tra gli edifici del villaggio» — i consumabili vivono in un edificio magazzino del villaggio. **Aperto:** su `/game` non esiste ancora una schermata villaggio/edifici (CURRENT_STATE: progettata, non implementata) — da decidere dove vive il magazzino (POI sulla mappa? pannello HUD?). Il sistema inventario **non deve esistere**: serve la schermata che lo mostra (mock-backed).
+- **Mercante:** schermata mercante con HudPlaque + guida HUD — «il sistema nn deve esistere, mi serve la schermata che lo mostra» (mock-backed, niente `MarketEngine`).
+- **Level-up eroe:** chiesto dal Director → verificato: **non esiste**. XP solo a livello villaggio (effetto `village-xp` in `questSettlement.ts`), nessun modello per-eroe; `MissingHub` lo registra come `missing` («XP assegnato; crescita non connessa»); esistono cue audio `level_up` e l'anello `SlottedMedal` (manca trigger+FX). Dominio in `PROGRESSION.md` (draft).
 
 ## R-168 — Ponte imprint→localizzazione: overlay IT per gen-impr002-miniera
 

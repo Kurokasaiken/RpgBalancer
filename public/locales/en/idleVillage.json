@@ -842,6 +842,18 @@
   },
   "gameFrame": {
     "title": "Wanderlust",
+    "boot": {
+      "progress": "Loading progress",
+      "error": "The world could not be prepared",
+      "phase": {
+        "manifest": "Preparing the world",
+        "assets": "Painting the world",
+        "build": "Raising the islands",
+        "warmup": "Waking the winds",
+        "ready": "Ready"
+      },
+      "logoAlt": "Wanderlust: Triumph"
+    },
     "nav": {
       "ariaLabel": "Game sections",
       "village": "Village",
@@ -1067,6 +1079,10 @@
         "exposureHint": "Chance of taking the next hit"
       },
       "ticks": "{elapsed}/{total} ticks"
+    },
+    "hud": {
+      "hide": "Hide HUD",
+      "show": "Show HUD"
     }
   },
   "missionPlanner": {

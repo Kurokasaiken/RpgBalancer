@@ -390,7 +390,7 @@ select:focus{border-color:var(--gold-soft);}
           <div class="chips" id="cardChips"></div>
         </div>
       </div>
-      <div class="state-chip">stato <b id="stateChip">idle</b></div>
+      <div class="state-chip">state <b id="stateChip">idle</b></div>
     </div>
   </div>
 
@@ -399,45 +399,45 @@ select:focus{border-color:var(--gold-soft);}
     <h2>Destiny Astrolabe</h2>
     <p class="tagline">Wanderlust / Gilded Observatory — suite di collaudo del tiro D100</p>
 
-    <button class="launch pulse" id="launch">⟡ &nbsp;Lancia il Tiro&nbsp; ⟡</button>
+    <button class="launch pulse" id="launch">⟡ &nbsp;Throw&nbsp; ⟡</button>
     <p class="kbd">scorciatoia <b>Spazio</b></p>
 
     <div class="group">
       <span class="gtitle">Statistiche</span>
-      <div class="ctl"><label>Stat del Personaggio <b id="vStat">60</b></label>
+      <div class="ctl"><label>Character Stat <b id="vStat">60</b></label>
         <input type="range" id="sStat" min="1" max="100" value="60"/></div>
-      <div class="ctl"><label>Requisito della Sfida <b id="vReq">55</b></label>
+      <div class="ctl"><label>Challenge Requirement <b id="vReq">55</b></label>
         <input type="range" id="sReq" min="1" max="100" value="55"/></div>
     </div>
 
     <div class="group">
-      <span class="gtitle">Rischi</span>
-      <div class="ctl"><label>Fallimento Critico % <b id="vCrit">5</b></label>
+      <span class="gtitle">Risks</span>
+      <div class="ctl"><label>Critical Failure % <b id="vCrit">5</b></label>
         <input type="range" id="sCrit" min="1" max="20" value="5"/></div>
-      <div class="ctl"><label>Ferito % <b id="vWound">10</b></label>
+      <div class="ctl"><label>Wound % <b id="vWound">10</b></label>
         <input type="range" id="sWound" min="1" max="50" value="10"/></div>
-      <div class="ctl"><label>Morto % <b id="vDead">5</b></label>
+      <div class="ctl"><label>Death % <b id="vDead">5</b></label>
         <input type="range" id="sDead" min="1" max="50" value="5"/></div>
     </div>
 
     <div class="group">
-      <span class="gtitle">Modalità di Tiro</span>
+      <span class="gtitle">Roll Mode</span>
       <select id="mode">
-        <option value="random">Tiro Casuale Reale (D100)</option>
-        <option value="bigwin">Forza · Trionfo (Big Win)</option>
-        <option value="win">Forza · Vittoria</option>
-        <option value="almost">Forza · Quasi (Bronze Rim)</option>
-        <option value="fail">Forza · Sconfitta</option>
-        <option value="epicfail">Forza · Rovina (Epic Fail)</option>
-        <option value="win-wounded">Forza · Vittoria + Ferito</option>
-        <option value="win-dead">Forza · Vittoria + Morto</option>
-        <option value="fail-wounded">Forza · Sconfitta + Ferito</option>
-        <option value="fail-dead">Forza · Sconfitta + Morto</option>
+        <option value="random">Real Random Roll (D100)</option>
+        <option value="bigwin">Force · Triumph (Big Win)</option>
+        <option value="win">Force · Victory</option>
+        <option value="almost">Force · Almost (Bronze Rim)</option>
+        <option value="fail">Force · Defeat</option>
+        <option value="epicfail">Force · Ruin (Epic Fail)</option>
+        <option value="win-wounded">Force · Victory + Wounded</option>
+        <option value="win-dead">Force · Victory + Dead</option>
+        <option value="fail-wounded">Force · Defeat + Wounded</option>
+        <option value="fail-dead">Force · Defeat + Dead</option>
       </select>
     </div>
 
     <div class="group">
-      <span class="gtitle">Tempi di Scena (ms)</span>
+      <span class="gtitle">Scene Timings (ms)</span>
       <div class="ctl"><label>Threat Slam <b id="vTslam">900</b></label>
         <input type="range" id="sTslam" min="300" max="3000" step="50" value="900"/></div>
       <div class="ctl"><label>Agency Burst <b id="vTburst">1100</b></label>
@@ -451,30 +451,30 @@ select:focus{border-color:var(--gold-soft);}
     </div>
 
     <div class="group">
-      <span class="gtitle">Matematica Live</span>
-      <div class="math-row"><span>Soglia di Successo (TST)</span><b id="mTst">55</b></div>
-      <div class="math-row"><span>Successo (dentro la Stella)</span><b id="mWin">1 – 55</b></div>
-      <div class="math-row"><span>Quasi (Bronze Rim)</span><b id="mAlmost">56 – 60</b></div>
-      <div class="math-row"><span>Fallimento (nel Goo)</span><b id="mFail">61 – 100</b></div>
-      <div class="math-row"><span>Rovina (margine esterno)</span><b id="mEpic">99 – 100</b></div>
-      <div class="math-row"><span class="mag">Settore Ferito</span><b class="mag" id="mWound">10%</b></div>
-      <div class="math-row"><span class="ind">Settore Morto</span><b class="ind" id="mDead">5%</b></div>
+      <span class="gtitle">Live Math</span>
+      <div class="math-row"><span>Success Threshold (TST)</span><b id="mTst">55</b></div>
+      <div class="math-row"><span>Success (inside the Star)</span><b id="mWin">1 – 55</b></div>
+      <div class="math-row"><span>Almost (Bronze Rim)</span><b id="mAlmost">56 – 60</b></div>
+      <div class="math-row"><span>Failure (in the Goo)</span><b id="mFail">61 – 100</b></div>
+      <div class="math-row"><span>Ruin (outer rim)</span><b id="mEpic">99 – 100</b></div>
+      <div class="math-row"><span class="mag">Wound Sector</span><b class="mag" id="mWound">10%</b></div>
+      <div class="math-row"><span class="ind">Death Sector</span><b class="ind" id="mDead">5%</b></div>
       <div class="prob-bar" id="probBar"></div>
       <div class="prob-legend">
-        <span><i style="background:#e3b961"></i>successo</span>
-        <span><i style="background:#5e3c12"></i>quasi</span>
-        <span><i style="background:#141026"></i>fallimento</span>
-        <span><i style="background:#3d0a18"></i>rovina</span>
+        <span><i style="background:#e3b961"></i>success</span>
+        <span><i style="background:#5e3c12"></i>almost</span>
+        <span><i style="background:#141026"></i>failure</span>
+        <span><i style="background:#3d0a18"></i>ruin</span>
       </div>
     </div>
 
     <div class="group result-box">
-      <span class="gtitle">Ultimo Tiro</span>
+      <span class="gtitle">Last Roll</span>
       <div class="verdict" id="rVerdict">—</div>
       <div class="math-row"><span>D100</span><b id="rRoll">—</b></div>
-      <div class="math-row"><span>vs Soglia</span><b id="rVs">—</b></div>
-      <div class="math-row"><span>Tiro Rischio</span><b id="rRisk">—</b></div>
-      <div class="math-row"><span>Zona bersaglio</span><b id="rZone">—</b></div>
+      <div class="math-row"><span>vs Threshold</span><b id="rVs">—</b></div>
+      <div class="math-row"><span>Risk Roll</span><b id="rRisk">—</b></div>
+      <div class="math-row"><span>Target zone</span><b id="rZone">—</b></div>
     </div>
   </div>
 </div>
@@ -1082,11 +1082,11 @@ function addSpark(x,y){
    ========================================================================= */
 const card=document.getElementById('card');
 const VERDICT_TEXT={
-  bigwin:{title:'TRIONFO',seal:'★',cls:'triumph',sub:'Il sole stesso firma la tua impresa.'},
-  win:{title:'VITTORIA',seal:'★',cls:'win',sub:'La vetta si inchina al tuo passo.'},
-  almost:{title:'PER UN SOFFIO',seal:'◐',cls:'almost',sub:'La sfera danza sul bronzo… e scivola oltre.'},
-  fail:{title:'SCONFITTA',seal:'✕',cls:'fail',sub:'La montagna respinge i mortali.'},
-  epicfail:{title:'ROVINA',seal:'✕',cls:'epic',sub:'L’abisso reclama ciò che osa troppo.'},
+  bigwin:{title:'TRIUMPH',seal:'★',cls:'triumph',sub:'The sun itself signs your deed.'},
+  win:{title:'VICTORY',seal:'★',cls:'win',sub:'The peak bows to your stride.'},
+  almost:{title:'BY A HAIR',seal:'◐',cls:'almost',sub:'The sphere dances on the bronze… and slips past.'},
+  fail:{title:'DEFEAT',seal:'✕',cls:'fail',sub:'The mountain turns mortals back.'},
+  epicfail:{title:'RUIN',seal:'✕',cls:'epic',sub:'The abyss claims what dares too much.'},
 };
 function resolve(){
   const res=scene.res;
@@ -1105,11 +1105,11 @@ function resolve(){
   }).join('');
   document.getElementById('cardSeal').textContent=V.seal;
   document.getElementById('cardSub').textContent=V.sub;
-  document.getElementById('cardNums').textContent=`D100 ${res.roll} · Soglia ${geo.tst}`;
+  document.getElementById('cardNums').textContent=`D100 ${res.roll} · Threshold ${geo.tst}`;
   const chips=document.getElementById('cardChips');
   chips.innerHTML='';
-  if(res.wounded) chips.innerHTML+='<span class="chip wounded">Ferito</span>';
-  if(res.dead) chips.innerHTML+='<span class="chip dead">Caduto</span>';
+  if(res.wounded) chips.innerHTML+='<span class="chip wounded">Wounded</span>';
+  if(res.dead) chips.innerHTML+='<span class="chip dead">Fallen</span>';
   card.classList.remove('triumph','win','almost','fail','epic');
   card.classList.add(V.cls);
   void card.offsetWidth;
@@ -1140,7 +1140,7 @@ function resolve(){
   const skillIndex=getSkillIndexFromAngle(scene.ball.x,scene.ball.y);
   recomputeGeometry(skillIndex);
   /* Update display with correct TST for this skill */
-  document.getElementById('cardNums').textContent=`D100 ${res.roll} · Soglia ${geo.tst}`;
+  document.getElementById('cardNums').textContent=`D100 ${res.roll} · Threshold ${geo.tst}`;
 
   /* Post result to parent window (for iframe embedding) */
   if(window.parent !== window){
@@ -1902,17 +1902,17 @@ function updateMathPanel(){
 function updateResultPanel(preOnly){
   const r=scene.res;
   if(!r) return;
-  const names={bigwin:'Trionfo',win:'Vittoria',almost:'Per un Soffio',fail:'Sconfitta',epicfail:'Rovina'};
+  const names={bigwin:'Triumph',win:'Victory',almost:'By a Hair',fail:'Defeat',epicfail:'Ruin'};
   const cls={bigwin:'triumph',win:'win',almost:'almost',fail:'fail',epicfail:'epic'};
   const v=document.getElementById('rVerdict');
-  v.textContent=names[r.verdict]+(r.wounded?' · Ferito':'')+(r.dead?' · Caduto':'');
+  v.textContent=names[r.verdict]+(r.wounded?' · Wounded':'')+(r.dead?' · Fallen':'');
   v.className='verdict '+cls[r.verdict];
   document.getElementById('rRoll').textContent=r.roll;
   document.getElementById('rVs').textContent=`${r.roll} ${r.roll<=geo.tst?'≤':'>'} ${geo.tst}`;
-  document.getElementById('rRisk').textContent=`${r.riskRoll} (≤${cfg.dead} morto · ≤${cfg.dead+cfg.wound} ferito)`;
+  document.getElementById('rRisk').textContent=`${r.riskRoll} (≤${cfg.dead} death · ≤${cfg.dead+cfg.wound} wound)`;
   document.getElementById('rZone').textContent=preOnly
-    ? `pre-calcolata (${Math.round(scene.target.x)}, ${Math.round(scene.target.y)})`
-    : `raggiunta (${Math.round(scene.ball.x)}, ${Math.round(scene.ball.y)})`;
+    ? `pre-computed (${Math.round(scene.target.x)}, ${Math.round(scene.target.y)})`
+    : `reached (${Math.round(scene.ball.x)}, ${Math.round(scene.ball.y)})`;
 }
 
 /* frame decorations */

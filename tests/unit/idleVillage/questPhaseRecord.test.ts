@@ -26,7 +26,7 @@ describe('questPhaseRecord', () => {
     const { run, phases } = playthrough(1234);
     expect(run.ended).toBe(true);
     expect(phases[0].beat).toBe(0);
-    expect(phases[0].choices).toEqual(['Partire']);
+    expect(phases[0].choices).toEqual(['Depart']);
     for (let i = 1; i < phases.length; i += 1) expect(phases[i].beat).toBeGreaterThanOrEqual(phases[i - 1].beat);
   });
 

@@ -33,8 +33,8 @@ mkdirSync(OUT, { recursive: true });
 
 /** Bot policies: which numbered option the player prefers at each bivio. */
 const POLICIES: Record<string, RegExp[]> = {
-  greedy: [/Arrampicarsi/, /Prendere il bottino/, /Furtiv|silenzio|Stealth/i, /Incalz|Insegu/i, /Frugare|Cercare ancora/i, /Combatti/, /Razzia/],
-  cautious: [/Tornare|Ritir|Indietro|Casa/i, /Cercare tracce/, /Furtiv|silenzio/i, /Combatti/],
+  greedy: [/Climb/i, /Take the loot/i, /Sneak|silent|Slip|Stealth/i, /Pursue/i, /Keep looting|Search again/i, /Fight|Assault/i, /Loot|Raid/i],
+  cautious: [/Return|Retreat|Back|Home|Leave/i, /Look for tracks/i, /Sneak|silent|Slip/i, /Fight|Assault/i],
   first: [],
 };
 /** Skip policy of the bot, declared: skip at the first usable frame after the anti-double-click threshold. */

@@ -1,4 +1,18 @@
-# Session Handoff — 2026-10-03
+# Session Handoff — 2026-10-12
+
+## 2026-10-12 — PLAN-033 battezzato: /game evento invasione
+
+- **Current state:** `PLAN-033-game-event-shroud-goblin-march` battezzato (active), 8 task. Nessun codice toccato.
+- **Next step:** T-001 (card in spazio schermo, fuori da `worldBoxRef`, slot sopra la HUD).
+- **Decisions made:** ri-esportare asset tendina; goblin persistente che marcia ~30 giorni di gioco da punto di atterraggio sticker, `startDay` salvato; registro si apre e, se era chiuso, si richiude dopo ~1 s; linee regioni semplificate e sotto le nuvole. Esito al giorno 30 fuori scope.
+- **Open questions:** verificare claim 4 (giorno di gioco accessibile) e 7 (punto di atterraggio fuori dal villaggio). Deliberazione multi-AI non eseguita.
+
+## 2026-10-11 — Recurring traps: regole preventive lette in pre-flight (R-147, desiderata v29)
+
+- Audit attriti MW-in-RPG: errori dispersi su `.mw/bugs/` (13), `observation.jsonl` (7 mai promossi), `pattern-candidate.md` in `.mw/runs/` (16), RICHIESTE — nessuna pipeline di promozione, `PROPOSALS.md` assente. Evidenza: `strokeLinecap` registrato 2× e reintrodotto in `PoiMatericV4` → scrivere non basta.
+- **Creato `context/recurring-traps.md`**: 7 trappole con ≥2 istanze, taggate per superficie (T-01 map/HUD edge-pinning, T-02 stroke-linecap, T-03 hud-scope, T-04 claim percettivi a occhio, T-05 rewrite-senza-desiderata, T-06 coverage ledger→sintesi, T-07 derivati visuali lifecycle). Soglia ≥2 istanze per entrare.
+- **Trigger pre-flight** in `mw-executor` step 5 e `mw-planner` step 5 (4 copie = hardlink stesso inode, tutte aggiornate). Voce in `context/INDEX.md`. Desiderata v29 FROZEN, R-147 `fatta`.
+- **Aperto:** cuciture "mare vecchio/nuovo" segnalate dal Director — possibile side-effect di `8254e8e1` non registrato; da verificare e se reale aprire bug in `.mw/bugs/`.
 
 ## 2026-10-03 (sera) — Slice v6 minimo IMPLEMENTATO e committato (`b35295c6`)
 

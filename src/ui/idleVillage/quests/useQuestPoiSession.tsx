@@ -796,8 +796,8 @@ export function useQuestPoiSession({
       addTelemetry(
         'done',
         retreated
-          ? `Quest ${activity.label} — ritiro dopo ${passed}/${questPhases.length} fasi superate`
-          : `Quest ${activity.label} conclusa — ${passed}/${questPhases.length} fasi superate`,
+          ? `Quest ${activity.label} — retreated after ${passed}/${questPhases.length} phases cleared`
+          : `Quest ${activity.label} completed — ${passed}/${questPhases.length} phases cleared`,
       );
       trackTelemetryEvent('quest_completed', {
         activityId: activity.id,
@@ -845,7 +845,7 @@ export function useQuestPoiSession({
       const phase = questPhases[phaseIndex];
       addTelemetry(
         isPassingVerdict(result.verdict) ? 'done' : 'detach',
-        `${phase?.title ?? `Fase ${phaseIndex + 1}`} — ${result.verdict}`,
+        `${phase?.title ?? `Phase ${phaseIndex + 1}`} — ${result.verdict}`,
       );
       trackTelemetryEvent('quest_phase_resolved', {
         activityId: activity.id,
@@ -1297,7 +1297,7 @@ export function useQuestPoiSession({
         setIsDetailOpen(false);
         setIsQuestCardOpen(true);
       }
-      addTelemetry('start', `Quest ${activity.label} avviata — ${questPhases.length} fasi`);
+      addTelemetry('start', `Quest ${activity.label} started — ${questPhases.length} phases`);
       trackTelemetryEvent('poi_detail_quest_roster_start', {
         activityId: activity.id,
         phasesTotal: questPhases.length,
@@ -1408,7 +1408,7 @@ export function useQuestPoiSession({
    */
   const handleCheckpointRetreat = useCallback(() => {
     if (checkpointPhaseIndex === null) return;
-    addTelemetry('detach', `Ritiro dalla quest ${activity.label} dopo la fase ${checkpointPhaseIndex + 1}`);
+    addTelemetry('detach', `Retreated from quest ${activity.label} after phase ${checkpointPhaseIndex + 1}`);
     trackTelemetryEvent('quest_checkpoint_retreat', {
       activityId: activity.id,
       phaseIndex: checkpointPhaseIndex,
@@ -1598,7 +1598,7 @@ export function useQuestPoiSession({
     if (Object.keys(bundle).length > 0) {
       addResources(bundle as Partial<Record<'gold' | 'food' | 'wood' | 'xp', number>>);
     }
-    addTelemetry('done', `Ricompense di ${activity.label} raccolte`);
+    addTelemetry('done', `Rewards of ${activity.label} collected`);
     trackTelemetryEvent('quest_rewards_collected', {
       activityId: activity.id,
       outcome: embarkResult?.outcome,
@@ -1609,7 +1609,7 @@ export function useQuestPoiSession({
 
   /** Abandons a running quest; the party comes home with nothing. */
   const handleAbandon = useCallback(() => {
-    addTelemetry('detach', `Quest ${activity.label} interrotta dal giocatore`);
+    addTelemetry('detach', `Quest ${activity.label} aborted by the player`);
     trackTelemetryEvent('quest_abandoned', {
       activityId: activity.id,
       elapsedMs,
@@ -1670,11 +1670,11 @@ export function useQuestPoiSession({
       startPending: questStartRequested,
       onStart: handleEmbark,
       onCancel: () => {
-        addTelemetry('done', `Attività ${activity.label} annullata`);
+        addTelemetry('done', `Activity ${activity.label} cancelled`);
         trackTelemetryEvent('poi_detail_quest_roster_cancel', { activityId: activity.id });
       },
       onCollect: () => {
-        addTelemetry('done', `Ricompensa ${activity.label} raccolta`);
+        addTelemetry('done', `Reward ${activity.label} collected`);
         trackTelemetryEvent('poi_detail_quest_roster_collect', { activityId: activity.id });
       },
       onSlotDetach: handleSlotClear,

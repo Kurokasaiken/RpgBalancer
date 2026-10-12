@@ -41,7 +41,7 @@ export const WorldSurfaceEventShroud: React.FC<WorldSurfaceEventShroudProps> = (
   };
 
   return (
-    <div className="ws-event-shroud" style={shroudStyle} aria-hidden="true">
+    <div className="ws-event-shroud" data-testid="ws-event-shroud" style={shroudStyle} aria-hidden="true">
       <div
         className={`ws-event-shroud__half ws-event-shroud__half--left ${covered ? 'ws-event-shroud__half--closed' : ''}`}
       >

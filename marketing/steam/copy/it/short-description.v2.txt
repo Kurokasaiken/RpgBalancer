@@ -1,0 +1,1 @@
+Un roguelite strategy RPG in cui gli eroi non nascono: si forgiano. Scegli le quest che valgono il rischio, leggi le probabilità per il party che mandi e lascia decidere all'Astrolabio chi torna. Quando il tuo insediamento cade, ciò che hai guadagnato passa alla run successiva.

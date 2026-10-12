@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { loadData, saveData } from '@/shared/persistence/PersistenceService';
+import { useCallback, useEffect, useState } from 'react';
 
 import { HUD_PANEL_DEFAULTS, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
 
@@ -7,50 +6,23 @@ export { HUD_PANEL_SHORTCUTS };
 export type { HudPanelId };
 export type HudPanelsApi = ReturnType<typeof useHudPanels>;
 
-const STORAGE_KEY = 'hud_panels_v1';
 const DEFAULT_VISIBILITY = HUD_PANEL_DEFAULTS;
 
 /**
- * Which floating panels are on screen. Persisted through PersistenceService, with a
- * one-key shortcut each, so closing a panel is never a one-way door.
+ * Which floating panels are on screen, with a one-key shortcut each so closing a
+ * panel is never a one-way door. Deliberately NOT persisted: opening the map
+ * always lands on a clean HUD (all panels closed) instead of resurrecting the
+ * screens that were open when the game was last saved (PLAN-031 follow-up).
  */
 export function useHudPanels({ enabled = true }: { enabled?: boolean } = {}) {
   const [visible, setVisible] = useState<Record<HudPanelId, boolean>>(DEFAULT_VISIBILITY);
-  const loaded = useRef(false);
-  /* Toggles fired before the persisted snapshot resolves must win over it:
-   * otherwise a panel opened in the hydration gap would be closed back by
-   * the stale stored state (the F10 → Director race seen in E2E). */
-  const overrides = useRef<Partial<Record<HudPanelId, boolean>>>({});
-
-  useEffect(() => {
-    if (!enabled) return undefined;
-    let cancelled = false;
-    loadData<Partial<Record<HudPanelId, boolean>>>(STORAGE_KEY, {}).then((stored) => {
-      if (cancelled) return;
-      loaded.current = true;
-      setVisible({ ...DEFAULT_VISIBILITY, ...stored, ...overrides.current });
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [enabled]);
 
   const set = useCallback((id: HudPanelId, value: boolean) => {
-    overrides.current[id] = value;
-    setVisible((current) => {
-      const next = { ...current, [id]: value };
-      void saveData(STORAGE_KEY, next);
-      return next;
-    });
+    setVisible((current) => ({ ...current, [id]: value }));
   }, []);
 
   const toggle = useCallback((id: HudPanelId) => {
-    setVisible((current) => {
-      const next = { ...current, [id]: !current[id] };
-      overrides.current[id] = next[id];
-      void saveData(STORAGE_KEY, next);
-      return next;
-    });
+    setVisible((current) => ({ ...current, [id]: !current[id] }));
   }, []);
 
   useEffect(() => {

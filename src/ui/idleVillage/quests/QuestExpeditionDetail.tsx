@@ -138,16 +138,17 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
             <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
               {title}
             </span>
-            <button
-              type="button"
-              data-testid={`floating-panel-minimize-${panelId}`}
-              aria-label={t('floatingPanel.restore')}
-              title={t('floatingPanel.restore')}
-              onClick={() => setMinimised(false)}
-              style={{ display: 'inline-flex', alignItems: 'center', background: 'none', border: 'none', padding: 2, cursor: 'pointer', color: TONE.label }}
-            >
-              <Maximize2 style={{ width: 15, height: 15 }} aria-hidden />
-            </button>
+            <span data-hud-controls="" style={{ display: 'inline-flex' }}>
+              <button
+                type="button"
+                data-testid={`floating-panel-minimize-${panelId}`}
+                aria-label={t('floatingPanel.restore')}
+                title={t('floatingPanel.restore')}
+                onClick={() => setMinimised(false)}
+              >
+                <Maximize2 aria-hidden />
+              </button>
+            </span>
           </div>
         </HudPlaque>
       </SkinScope>
@@ -359,7 +360,9 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
             {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
           </span>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} data-testid="quest-expedition-loadout">
+          {/* An item toolbar = HUD pills (hud_component_guide §6b.4): the
+           *  pressed state marks what is packed; the one CTA stays «Send». */}
+          <div data-hud-controls="" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} data-testid="quest-expedition-loadout">
             {items.map((item) => {
               const selected = selectedItemIds.includes(item.id);
               const full = !selected && selectedItemIds.length >= QUEST_STASH.bagSlots;
@@ -367,17 +370,17 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                *  entry's `descKey` via the engine-flag join. */
               const descKey = item.descKey ?? (item.engineFlag ? STASH_BY_FLAG.get(item.engineFlag)?.descKey : undefined);
               return (
-                <SkinButton
+                <button
                   key={item.id}
-                  variant={selected ? 'cta' : 'utility'}
+                  type="button"
                   data-testid={`loadout-item-${item.id}`}
                   aria-pressed={selected}
                   disabled={full}
                   title={descKey ? t(descKey) : undefined}
                   onClick={() => onToggleItem(item.id)}
                 >
-                  {t(stripNs(item.labelKey))}
-                </SkinButton>
+                  <span>{t(stripNs(item.labelKey))}</span>
+                </button>
               );
             })}
           </div>

@@ -1538,3 +1538,32 @@ La mappa mondo dipinta (`/game-frame-pixi`, pipeline PixiJS/WebGL2) guadagna tre
 **Still unresolved:**
 - Criterio finale di scelta `cloudShadowMode` dopo il confronto visivo del Director (decisione sua, post-misura).
 - I landmark specifici che prendono luce e la loro sorgente di coordinate (manifest vs config — dipende da task 0).
+
+---
+
+## v29 — Trappole ricorrenti consumate al momento del lavoro (pre-flight, non registro)
+
+**Status:** FROZEN
+**Date:** 2026-10-11
+**Authorized by:** Fausto
+**Reason:** avallo esplicito — "procedi" sulla candidata presentata in sessione explorer (audit attriti MW-in-RPG)
+
+**Intento del Director (verbatim):**
+- *"esempio di errore ricorrente: ad esempio: + volte nella pagina /game la mappa continua a diventare troppo grande e l'HUD copre una parte di terrra, e nn dovrebbe. Poi aumenta il mare e appaiono delle linee tra il mare "vecchio" e quello nuovo."*
+- *"opzione 3, ma dobbiamo assicurarci che vengano lette e utilizzate, tipo preflight e cose del genere"*
+
+**Formulazione approvata (FROZEN):**
+
+*User-stated*
+1. Gestire gli errori ricorrenti di processo/protocollo emersi in RPG con regole preventive, non con un nuovo registro di osservazioni.
+2. Le regole devono essere lette e usate davvero: meccanismo di pre-flight (o equivalente) che le porta dentro il lavoro al momento giusto.
+
+*AI inference*
+3. Il meccanismo è trigger-scoped: un file di trappole (`context/recurring-traps.md`) indicizzato per superficie; le skill `mw-*` lo consultano nel pre-flight quando il task tocca una superficie taggata.
+4. Una trappola entra nel file solo con ≥2 istanze documentate (soglia `learn` / MW-P-005): niente cimitero di casi singoli.
+5. Non un quindicesimo file `.windsurf/rules/` always-on: "sempre presente" ≠ "letto al momento giusto" (evidenza ATTRITI mind-weaver: regola in posizione di attenzione ottimale violata comunque — il problema è il momento che la interroga, non la posizione).
+6. Contenuto RPG-specifico; se il meccanismo prova di funzionare, la generalizzazione a Mind Weaver è un passo successivo separato.
+
+*Still unresolved*
+- Se serve anche un guard meccanico per le trappole verificabili da codice (es. test "terra mai sotto HUD").
+- Estensione del trigger a skill non-mw (`agent-execution-mandate`, `idle-village-task`) dopo prova d'uso.

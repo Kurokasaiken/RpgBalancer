@@ -48,7 +48,7 @@ export function useQuestAssignmentPreview(
 
     const emptyRequiredSlots = slots.filter((slot) => slot.required && !slot.assignedResidentId);
     const blockingReasons = emptyRequiredSlots.map(
-      (slot) => `${slot.label} è obbligatorio ed è vuoto.`,
+      (slot) => `${slot.label} is required and empty.`,
     );
     const canEmbark = emptyRequiredSlots.length === 0;
 
