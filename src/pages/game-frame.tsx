@@ -61,7 +61,7 @@ export interface GameFrameScreenProps {
   /** While an event theatre holds the clock, pause/speed inputs stay inert. */
   timeInputLocked?: boolean;
   /** Reports HUD chrome visibility changes to the page (ambient effects, ambience cues). */
-  onHudHiddenChange?: (hidden: boolean) => void;
+  onHudHiddenChange?: (hidden: boolean, cause: 'manual' | 'idle') => void;
 }
 
 export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective, panels: panelsProp, devPanels = false, skinControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange }: GameFrameScreenProps) {

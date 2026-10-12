@@ -350,6 +350,19 @@ const gameFrameHudHideSchema = z.object({
   wonderOnHide: z.boolean(),
 });
 
+/**
+ * Event theatre timings (PLAN-033, R-169): the clock freezes while the curtains
+ * close, the card plays and the curtains reopen, then returns to its pre-event
+ * state. The curtain transition itself (~900ms) lives in `trailer.css`.
+ */
+const gameFrameEventTheatreSchema = z.object({
+  /** Beat between the shroud fully closed and the event card entering. */
+  cardDelayMs: z.number().nonnegative(),
+  /** The clock stays frozen this long after the shroud begins reopening, so the
+   *  world never visibly ticks under half-drawn curtains. */
+  freezeReleaseMs: z.number().nonnegative(),
+});
+
 /** Below this viewport width the top row drops its detail (resource trends, place name) to tooltips. */
 const gameFrameBreakpointsSchema = z.object({
   compactTopPx: z.number().positive(),
@@ -421,6 +434,7 @@ const gameFrameConfigSchema = z.object({
   zLayers: gameFrameZLayersSchema,
   bootVeil: gameFrameBootVeilSchema,
   hudHide: gameFrameHudHideSchema,
+  eventTheatre: gameFrameEventTheatreSchema,
   breakpoints: gameFrameBreakpointsSchema,
   edgeWash: gameFrameEdgeWashSchema,
   debug: gameFrameDebugSchema,
@@ -556,6 +570,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     barHeightPx: 3,
   },
   hudHide: { slideMs: 520, offscreenPx: 260, shortcut: 'h', idleHideMs: 30000, wonderOnHide: true },
+  eventTheatre: { cardDelayMs: 700, freezeReleaseMs: 1000 },
   breakpoints: { compactTopPx: 1400 },
   edgeWash: { enabled: false, leftSrc: '/assets/ui/hud/edge_wash_left.webp', bottomSrc: '/assets/ui/hud/edge_wash_bottom.webp', opacity: 0.55, leftPx: 120, bottomPx: 110 },
   debug: { directorPanel: true },
