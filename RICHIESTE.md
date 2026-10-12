@@ -3047,3 +3047,32 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 - **Test**: unit `gameHudIdle.test.tsx` 5/5 (fake timers — pattern `globalThis.setTimeout`; fixato anche un bug reale: l'effetto si risvegliava da solo all'hide perché la chiamata iniziale `onActivity()` contava come wake — ora il wake richiede un evento reale). E2E `gameEventFreeze.spec.ts` 3/3: running→freeze→resume a 2x, paused→paused, HUD hidden→wake su invasione.
 - **Behavioral Verification (SKILL-VERIFICATION, contesto pulito)**: iniziale `BV BLOCKED` con 3 finding → tutti risolti: F-1 (freeze release 1000ms hardcoded → `eventTheatre.freezeReleaseMs` in config Zod), F-2 (wonder on every hide → Director: solo idle), F-3 (coverage gap WebGL → run headed: `renderer:webgl, meshPipe:true`, ticker vivo, wonder spawnato, 0 errori). **Esito finale: BV PASS.** Contratti bootstrap: `CTR-game-001/002/003`, regressione `REG-001` (ticker-morto da pipe mancante).
 - Evidence: `test-results/plan-033-hud-idle-freeze-2026-10-12.log`, `.mw/runs/bv-r169-2026-10-12/bv/` (FINDINGS, DECISION-REPORT, COVERAGE-RECORD).
+
+---
+
+## R-170 — Prototipo «Invasione Goblin» v0.2 (standalone HTML, sistema obiettivi persistenti)
+
+**Richiesta (verbatim):** *«procedi»* — accettando il task generato nella conversazione ChatGPT incollata dal Director (thread layer opportunità/obiettivi persistenti, vedi R-153/R-164): evolvere il prototipo HTML standalone in v0.2 mantenendo v0.1 intoccata, senza integrarlo nel progetto né ribilanciarlo.
+
+**Data:** 2026-10-12
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna corrispondente — è un artefatto di esplorazione gameplay collegato al thread «obiettivi persistenti / layer opportunità» (R-153, R-154, R-164). Le regole su human-days, opportunità, persistenza e pressione crescente restano PROPOSAL finché non ratificate.
+
+**Task eseguito (spec ChatGPT):**
+1. **v0.1 preservata** verbatim in `public/invasione-goblin-v01.html` (convenzione `public/` per gli spike standalone, come `land-breath-spike.html`).
+2. **v0.2** in `public/invasione-goblin-v02.html`: (a) sconfitta immediata a pop≤0 — fix reale: `invade()` applicava `pop+3` *prima* del check di sconfitta → villaggio a 0 abitanti «resuscitava»; (b) RNG seeded (mulberry32, tutta l'aleatorietà di gioco) + controllo seed in UI con restart; (c) end-of-run summary: giorno, invasioni, pop, risorse, difese, investimenti, quest riuscite/fallite + cronologia scelte (`S.hist`); (d) `pr()` riscritta come `c*100/36` — **vedi nota sotto**.
+3. **Vincoli rispettati**: nessun ribilanciamento, nessuna meccanica/risorsa nuova, nessun refactor, nessuna integrazione col runtime `/game`.
+
+**⚠️ Divergenza dallo spec (onestà tecnica):** lo spec ChatGPT dichiarava `pr()` buggata («divide by 0.36 instead of 36»). **Falso allarme**: `c/.36` = `c*100/36` era già la percentuale esatta. Verificato contro la distribuzione 2d6 (pr(7)=58%, pr(12)=3%, …). La v0.2 usa la forma leggibile equivalente — zero cambiamento di comportamento.
+
+**Test (harness Node `.mw/runs/2026-10-12-goblin-v02/harness.mjs`, 11/11 PASS):** probabilità esatte 2d6; sconfitta immediata a pop≤0 senza revive; stesso seed+stesse azioni → stato identico; seed diversi → stati diversi; playthrough sconfitta (villaggio passivo cade all'invasione 1, g120) e **playthrough vittoria (seed 1000: Re sconfitto g356, pw 30 → tiro 17%)**.
+
+**Finding di bilanciamento emersi (da riportare a design):**
+- Il villaggio muore stabilmente all'invasione 3 (g360, minaccia 196): il tetto difesa reale è ~100-130 — trappole one-shot, palizzate a costo crescente, `trn` cap a pop-2.
+- **L'oro è il collo di bottiglia strategico**: nessun edificio lo produce; alimenta `trn` (6 oro), training stat (~25-70 oro l'uno) e Miniera/Segheria. Solo le quest lo danno → la selezione quest diventa la vera leva.
+- La scadenza del Re (spawn g60, `exp` +300 → ~g360) coincide quasi esattamente con l'invasione letale 3 → kill-or-die window emergente, coerente col design dichiarato («sconfiggere il Re prima che le ondate diventino troppo forti»).
+- `trn` è l'investimento keystone: difesa permanente **e** power del Re (`trn/2`).
+- Vittoria dimostrata ma tirata (~17% sul tiro decisivo): il tono «punitivo ma non troppo» è già nell'intervallo giusto per il prototipo.
+
+**Evidence:** `test-results/r170-goblin-v02-2026-10-12.log`; harness `.mw/runs/2026-10-12-goblin-v02/harness.mjs` (riusabile: `node harness.mjs public/invasione-goblin-v02.html`).
+**Prossimo passo (per lo spec):** il Director gioca la v0.2 (economia vs difesa) e riporta i riepiloghi → discussione design su decisioni dominanti e regole da modificare.
