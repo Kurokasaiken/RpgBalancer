@@ -81,6 +81,14 @@ export interface GameFrameProps {
   className?: string;
   style?: CSSProperties;
   /**
+   * Bump this number to call the chrome back on the game's behalf (event
+   * wake): an event must always be able to restore the instruments, even
+   * over a deliberately hidden HUD.
+   */
+  hudWakeSignal?: number;
+  /** Reports every chrome visibility change (manual, idle, input wake, event wake). */
+  onHudHiddenChange?: (hidden: boolean) => void;
+  /**
    * `atlas` (default) is the thin, minimal-line ribbon this shell shipped
    * with. `cartographer` adds the carved-bevel weight the R-075 review asked
    * to see compared side by side ("prendere da Cartographer's Desk la
@@ -141,6 +149,8 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   config = DEFAULT_GAME_FRAME_CONFIG,
   className,
   style,
+  hudWakeSignal,
+  onHudHiddenChange,
   variant = 'atlas',
 }) => {
   const { t } = useTranslation('idleVillage');
@@ -153,14 +163,21 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   /* Hide-HUD: every chrome cluster slides off its own edge — the top row rises,
    * the bottom instruments sink — while one pearl (the toggle) stays in the
    * bottom-right corner to call it all back. Session-only by design: reopening
-   * the map always lands on a dressed HUD. */
+   * the map always lands on a dressed HUD.
+   *
+   * Two ways in, one way out: hidden by hand (`h` / the pearl) it waits for its
+   * toggle — deliberate zen stays deliberate. Hidden by stillness (`idleHideMs`)
+   * ANY input calls it back, and so does the game itself (`hudWakeSignal`) when
+   * an event needs the instruments. `hiddenBy` remembers which case we're in. */
   const [hudHidden, setHudHidden] = useState(false);
+  const hiddenBy = useRef<'manual' | 'idle'>('manual');
   const reducedMotion = useRef(typeof window !== 'undefined' && (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)).current;
   const slideMs = reducedMotion ? 0 : config.hudHide.slideMs;
   const fadeMs = Math.round(slideMs * 0.55);
   const toggleHud = useCallback(() => {
+    hiddenBy.current = 'manual';
     setHudHidden((v) => {
-      trackTelemetryEvent('game_hud_toggle', { hidden: !v });
+      trackTelemetryEvent('game_hud_toggle', { hidden: !v, reason: 'manual' });
       return !v;
     });
   }, []);
@@ -174,6 +191,62 @@ export const GameFrame: React.FC<GameFrameProps> = ({
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [toggleHud, config.hudHide.shortcut]);
+
+  /* Idle hide: any input re-arms the clock; when it fires the chrome slides away
+   * on its own. From there any input wakes it — except a hit on the pearl itself,
+   * which is a deliberate toggle, not a wake. While hidden by hand the listeners
+   * stay but do nothing, so the pearl remains the only way back. */
+  const idleHideMs = config.hudHide.idleHideMs;
+  useEffect(() => {
+    if (idleHideMs <= 0) return undefined;
+    // `globalThis.setTimeout`, not window.setTimeout: vitest fake timers patch the global binding.
+    let timer: ReturnType<typeof globalThis.setTimeout> | undefined;
+    const onActivity = (event?: Event) => {
+      globalThis.clearTimeout(timer);
+      timer = undefined;
+      if (hudHidden) {
+        // A real event only: the effect's own re-run (after the hide commits)
+        // must not count as a wake, or the chrome would bounce straight back.
+        const target = event?.target as HTMLElement | null;
+        if (event && hiddenBy.current === 'idle' && !target?.closest?.('[data-hud-hide-toggle]')) {
+          hiddenBy.current = 'manual';
+          setHudHidden(false);
+          trackTelemetryEvent('game_hud_toggle', { hidden: false, reason: 'input' });
+        }
+        return;
+      }
+      timer = globalThis.setTimeout(() => {
+        hiddenBy.current = 'idle';
+        setHudHidden(true);
+        trackTelemetryEvent('game_hud_toggle', { hidden: true, reason: 'idle' });
+      }, idleHideMs);
+    };
+    onActivity();
+    const ACTIVITY_EVENTS: (keyof WindowEventMap)[] = ['pointerdown', 'pointermove', 'keydown', 'wheel'];
+    ACTIVITY_EVENTS.forEach((name) => window.addEventListener(name, onActivity, { passive: true }));
+    return () => {
+      globalThis.clearTimeout(timer);
+      ACTIVITY_EVENTS.forEach((name) => window.removeEventListener(name, onActivity));
+    };
+  }, [idleHideMs, hudHidden]);
+
+  /* Event wake: the game bumps `hudWakeSignal` when an event needs attention —
+   * the chrome comes back no matter how it left. */
+  const wakeSignalSeen = useRef(hudWakeSignal ?? 0);
+  useEffect(() => {
+    const signal = hudWakeSignal ?? 0;
+    if (signal === wakeSignalSeen.current) return;
+    wakeSignalSeen.current = signal;
+    hiddenBy.current = 'manual';
+    setHudHidden((prev) => {
+      if (prev) trackTelemetryEvent('game_hud_toggle', { hidden: false, reason: 'event' });
+      return false;
+    });
+  }, [hudWakeSignal]);
+
+  useEffect(() => {
+    onHudHiddenChange?.(hudHidden);
+  }, [hudHidden, onHudHiddenChange]);
   /** Slide style for one chrome cluster. `base` preserves a transform the element already needs (centering, tilt). */
   const slideChrome = (dir: 'up' | 'down', base = ''): CSSProperties => {
     const prefix = base && base !== 'none' ? `${base} ` : '';

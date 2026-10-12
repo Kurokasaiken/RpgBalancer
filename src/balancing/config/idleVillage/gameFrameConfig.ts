@@ -344,6 +344,10 @@ const gameFrameHudHideSchema = z.object({
   offscreenPx: z.number().positive(),
   /** One-key toggle, same guard rules as the panel shortcuts. */
   shortcut: z.string().length(1),
+  /** Ms of stillness before the chrome slides away on its own; 0 disables the idle hide. */
+  idleHideMs: z.number().nonnegative(),
+  /** Surface a sea wonder the moment the chrome leaves — the contemplation reward. */
+  wonderOnHide: z.boolean(),
 });
 
 /** Below this viewport width the top row drops its detail (resource trends, place name) to tooltips. */
@@ -551,7 +555,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     barWidthPx: 320,
     barHeightPx: 3,
   },
-  hudHide: { slideMs: 520, offscreenPx: 260, shortcut: 'h' },
+  hudHide: { slideMs: 520, offscreenPx: 260, shortcut: 'h', idleHideMs: 30000, wonderOnHide: true },
   breakpoints: { compactTopPx: 1400 },
   edgeWash: { enabled: false, leftSrc: '/assets/ui/hud/edge_wash_left.webp', bottomSrc: '/assets/ui/hud/edge_wash_bottom.webp', opacity: 0.55, leftPx: 120, bottomPx: 110 },
   debug: { directorPanel: true },
