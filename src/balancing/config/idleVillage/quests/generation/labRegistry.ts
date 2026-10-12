@@ -575,11 +575,12 @@ export const QUEST_LAB_MECHANICS: readonly LabMechanic[] = [
   {
     id: 'imprint-compilation',
     label: 'Compilazione imprint→grafo',
-    desc: 'Le function spec dei beat (QUEST_IMPRINTS) compilate in QuestScenario sul profilo `gen`: vars/verdictTable/goto bastano, zero switch authored. Due istanze: gen-impr002-palude (R-152) e gen-impr002-mare (R-159 — stesso spine, meccaniche di dominio diverse: esposizione vs fatica, prova documentale vs avviso, traccia-maestro cross-cast). Id gen-<imprint>-<dominio> = provenance distinta dai skeleton×kit.',
-    surface: 'impr002Palude.ts, impr002Mare.ts, imprintCatalogEntries (labModel)',
+    desc: 'Le function spec dei beat (QUEST_IMPRINTS) compilate in QuestScenario sul profilo `gen`: vars/verdictTable/goto bastano, zero switch authored. Tre istanze IMPR-002: palude (R-152), mare (R-159), miniera (R-163 — con mi-via-puntelli, primo hazard-ambiente come via al fight). Verdetto compilatore in QUEST_IMPRINTS §Terza-istanza: ~70% template fisso + foglio parametri di dominio. Id gen-<imprint>-<dominio> = provenance distinta dai skeleton×kit.',
+    surface: 'impr002Palude.ts, impr002Mare.ts, impr002Miniera.ts, imprintCatalogEntries (labModel)',
     files: [
       'src/balancing/config/idleVillage/quests/generation/impr002Palude.ts',
       'src/balancing/config/idleVillage/quests/generation/impr002Mare.ts',
+      'src/balancing/config/idleVillage/quests/generation/impr002Miniera.ts',
       'src/ui/idleVillage/questGenLab/labModel.ts',
       'context/QUEST_IMPRINTS.md',
     ],

@@ -658,6 +658,58 @@ come testo. Terza istanza candidata: `miniera` — se i pattern reggono una
 terza volta, il compilatore automatico function-spec→grafo diventa
 valutabile (proposal, non commitment).
 
+### Terza istanza: il verdetto sul compilatore (R-163)
+
+`gen-impr002-miniera` «The Foreman's Crew» — IMPR-002 × kit miniera — in
+`src/balancing/config/idleVillage/quests/generation/impr002Miniera.ts`.
+Con tre istanze la misura è fatta. **Riutilizzato identico (verbatim o
+quasi):**
+
+- il turn router B3 (`goto` letteralmente identico nelle tre istanze);
+- il nodo `avviso` (l'evidenza che arriva tardi: testimone → vedova →
+  ragazzo delle gabbie — stesso ruolo, stesso shape);
+- la famiglia `disposti`/`lettura`/`trappola`/`imboscata` (4 nodi,
+  differiscono solo in copy e pesi);
+- la forcella `scelta` (primo-colpo gated `pronti` / forza / fuga→check /
+  recita→check con `smascherati` one-shot);
+- la forcella `in-piedi` (lega / sgama gated intel / lascialo);
+- il nodo B5 (`posta-mossa` su ogni riga + seed intel su win+) e il suo
+  goto router (`a-prigioniero→convoglio`, `a-sgamato→consegna`,
+  `soci→patto`, else `ritorno`);
+- la famiglia finale `convoglio`/`consegna`/`patto`/`lontana`/`ritorno`/
+  `fine` + epilogue flag→lore/titles.
+
+**Ciò che resta authored — il "foglio di parametri" del dominio:**
+
+- identità di A e il mezzo che controlla (acqua / trasporto / registro);
+- percorso autonomo B0: profilo stat (str+con / agi+con / con+int) e
+  **modo di esposizione** del fail (nessuno / vista / suono — il kit
+  `miniera` formalizza: "il buio non ammette testimoni oculari: le prove
+  sono fisiche o sonore");
+- il canale documentale B2: intel che alimenta `sospetto` E gatea il ramo
+  più forte — `polizza-ombra` e `turni-ombra` sono **lo stesso ruolo
+  riempito due volte** (prova scritta → `a-sgamato`); la variante palude
+  (`avviso-tardivo`, informativo puro) è il grado zero di quel ruolo;
+- opzioni B4 extra: `mi-via-puntelli` (buttare giù la puntellatura — win
+  salta il combattimento, almost diventa la tua imboscata, fail combatte
+  ferito) — **primo uso authored di hazard-ambiente come via al fight**,
+  la via del «combat props» segnata interessante in ARCHITECTURE §18.4;
+- il "chi ha mosso la posta" B5: `depositario-traccia` (umano ignoto) →
+  `traccia-maestro` (umano noto, stakeholder) → `traccia-morso`
+  (**non umano**: ponte diretto all'entità di IMPR-001-C — il dominio
+  ricorda senza registro mondo);
+- l'autorità di `a-sgamato` (porto / fattore della compagnia) e tutta la
+  copy.
+
+**Verdetto:** ~70-75% del grafo è template fisso; il resto è un foglio
+parametri di ~10-15 risposte di dominio. Un compilatore
+function-spec→grafo **è valutabile come proposal** — ma attenzione: ciò
+che rende le istanze non-reskin vive esattamente nei parametri authored
+(modo di esposizione, tipo di entità B5, opzioni extra B4). Un compilatore
+che genera solo il template produce scenari corretti e generici; il valore
+resta nel casting di dominio — che è lavoro di autore o di un LLM guidato
+dal kit, non di una trasformazione meccanica.
+
 ### Chain-ready, non chain-executed
 
 I flag B6 e l'intel `depositario-traccia` sono **hook espliciti**: il
