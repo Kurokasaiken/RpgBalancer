@@ -1176,3 +1176,82 @@ progetto, non gestito caso per caso.
 
 **Fonte:** `.mw/bugs/2026-10-11-game-map-fit-seams/.work/pattern-candidate.md`;
 misura: `scripts/probe-game-map-fit.cjs` → `test-results/probe-game-map-fit/`.
+
+## 2026-10-11 — Errata: il gioco NON è un idle game; documentazione corretta
+
+**Contesto:** diversi documenti descrivevano ancora RPG Balancer come
+«idle game» / «idle/management RPG» / «feel idle puro», inclusi i prompt
+della ricerca R-154. Il Director ha corretto: *«il gioco nn è +
+considerato idle da un bel po', è sbagliata la documentazione:
+correggila»*. L'autorità era già `marketing/steam/claim-ledger.md`:
+niente progressione offline, posizionamento «second monitor».
+
+**Correzione:** il gioco è un **village/incremental management RPG a
+tempo continuo**: il tempo scorre solo a gioco aperto, le offerte non si
+accumulano in assenza, le decisioni sono rade e pesanti. «Idle Village»
+sopravvive solo come **codename storico** della vecchia superficie
+deprecata e come nome del dominio tecnico `idleVillage`/`idle_village`
+(file, i18n namespace, skill, spec) — non come genere del gioco.
+
+**Documenti aggiornati:** `DESIGN_PILLARS.md` (R3.4/R3.5 rationale),
+`context/RPG_PROJECT_CONTEXT.md` (Primary Domain + scope),
+`context/VERTICAL_SLICE_REFERENCE.md`, `context/COMPETITIVE_LANDSCAPE.md`
+(§3 lezione, §7 white space, §10 Q1), `context/QUEST_GAMEPLAY_SCIENCE.md`
+(§gaps), `context/QUEST_OPPORTUNITY_LAYER.md` (§7 nota sul modello
+temporale), run `.mw/runs/20261011-opportunity-layer-research/` (README,
+report-t1/t6, errata sui 7 prompt).
+
+**Lasciati intenzionalmente:** `idle-village-context*.md` (già marcati
+HISTORICAL), `DECISION_LOG`/`RICHIESTE`/`INDEX` (record storici e nomi di
+file), `src/docs/docs/MASTER_PLAN.md` (dati di mercato sul genere idle —
+fonte della decisione «niente offline», non una nostra claim),
+`FILENAMES_METADATA.json` (metadati generati), riferimenti a idle games
+altrui in analisi competitive.
+
+**Conseguenza sulla ricerca R-154:** la questione «accumulo offerte
+offline» decade per premessa errata — a gioco chiuso il tempo non avanza.
+Resta valida la regola *decision rate < event rate* durante il gioco.
+
+**Fonte:** Director in sessione 2026-10-11; R-161.
+
+## 2026-10-12 — Ratifica parziale opportunity layer (OPEN-019/020/021)
+
+**Contesto:** dopo la ricerca R-154 e le 7 risposte del Director
+(2026-10-11), sessione di ratifica sui punti residui delle tre OPEN del
+layer opportunità. Documento: `context/QUEST_OPPORTUNITY_LAYER.md`.
+
+**Ratificato (Director, verbatim da scelte in sessione):**
+
+1. **Modello dati grafo = ibrido** (OPEN-019): qualities piatte
+   (`access:`/`intel:`/`contact:`/`clock:`) + offer generator per lo
+   stato ambientale, più pochi **nodi authored** per le milestone/
+   obiettivi strategici visibili. Le quest sono offerte transitorie,
+   non nodi del grafo.
+2. **Tipi di arco = set aperto config-first** (OPEN-019): enum
+   estendibile in config; v0 suggerito sblocco/informazione/
+   preparazione + clocks come nodi di stato.
+3. **Niente valuta "intel"** (OPEN-021): la qualità dell'informazione
+   dipende solo dalla qualità del party/esploratore. Conseguenza: la
+   mitigazione «numeri esatti come acquisto intel» per OPEN-018 non è
+   disponibile — resta da verificare al playtest PLAN-028.
+4. **Capacità parallela = solo leader-capacity** (OPEN-021/010): un
+   party in missione richiede un leader; la crescita avviene reclutando/
+   addestrando leader. Gli edifici supportano ma non concedono
+   spedizioni — respinto il modello a 3 layer della ricerca.
+
+**Resta proposal per scelta del Director:** tassonomia requisiti a 4
+tipi (OPEN-020) — si valida col prototipo meta-layer prima della
+ratifica. Restano aperti in OPEN-019: persistenza archi tra run,
+traversal del generatore, definizione clocks; in OPEN-021: forma
+economica del costo di preparazione/scouting.
+
+**Già ratificato 2026-10-11 (prime 7 risposte):** visibilità parziale
+grafo, transizione mid-run tra famiglie, 4 stati gate su offer card +
+scout-quality da party, flashback-prep alto tier, doppio timer
+acceptance/completion, conversion rewards posticipate al playtest,
+correzione premessa idle (R-161).
+
+**Prossimo passo concordato:** prototipo meta-layer Gate 1 — harness
+deterministico + graph linter (metodologia R-154 T7), senza combattimento.
+
+**Fonte:** Director in sessione 2026-10-12.

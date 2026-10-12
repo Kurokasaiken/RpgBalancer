@@ -2,7 +2,7 @@
 
 **Version:** 1.0 (2026-05-20)  
 **Project Type:** Personal (non-work, diferente da progetti Promedital)  
-**Primary Domain:** Idle Village Vertical Slice for Steam
+**Primary Domain:** Village/incremental management RPG for Steam (codename storico "Idle Village" — mantenuto come nome di dominio tecnico `idleVillage`; il gioco NON è un idle game: niente progressione offline, posizionamento "second monitor")
 
 ---
 
@@ -10,7 +10,7 @@
 
 ### What This Project Is
 
-A personal indie game project: **Idle Village on Steam** (Forgotten Realms setting, Cultist Simulator aesthetic, D&D skill checks).
+A personal indie game project: **RPG Balancer on Steam** (Forgotten Realms setting, Cultist Simulator aesthetic, D&D skill checks). Village/incremental management RPG a tempo continuo — precedentemente descritto come "Idle Village": **non** un idle game (niente progressione offline, posizionamento "second monitor"; decisione in `marketing/steam/claim-ledger.md`).
 
 **Visual identity:** Medaglioni circolari (board game tokens) su mappa isometrica, azioni drag-and-drop, outcome narrativi.
 

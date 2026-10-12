@@ -1,19 +1,25 @@
 ---
 title: Quest Opportunity Layer — grafo delle opportunità, famiglie, requisiti e ricompense
 type: design-knowledge
-status: PROPOSAL — candidati non ratificati (da discussione Director↔GPT 2026-10-11; tracking in context/OPEN.md OPEN-019/020/021)
-updated: 2026-10-11
+status: PROPOSAL — sotto-decisioni parzialmente ratificate dal Director 2026-10-12 (marcate «ratificato» nel testo); il resto resta candidato (tracking OPEN-019/020/021)
+updated: 2026-10-12
 provenance: sintesi del Director di una discussione con ChatGPT; ledger di estrazione in context/ingestions/2026-10-11-quest-opportunity-layer.md
-related: R-153, QUEST_ECONOMY_NOTES.md, QUEST_GENERATION_SPEC.md,
+related: R-153, R-154, R-161, QUEST_ECONOMY_NOTES.md, QUEST_GENERATION_SPEC.md,
          QUEST_GENERATION_ARCHITECTURE.md (§15 chain quest), QUEST_RULES.md,
          OPEN-010, OPEN-012, OPEN-013, OPEN-015, OPEN-016,
          OPEN-019, OPEN-020, OPEN-021, PLAN-026, PLAN-028, NARRATIVE.md,
          VILLAGE_ECONOMY.md, GAMEPLAY_DESIGN.md
 ---
 
-> **Status:** PROPOSAL. Tutto il contenuto di questo documento è
-> candidato di design — nessuna regola vigente. Ratifica pendente in
-> OPEN-019/020/021 e nel filone economia-villaggio (OPEN-010/012).
+> **Status:** PROPOSAL. Il contenuto è candidato di design — nessuna
+> regola vigente — salvo i punti marcati **«ratificato»** (decisioni
+> Director 2026-10-11/12, registrate in `context/DECISION_LOG.md`):
+> visibilità parziale del grafo, modello dati ibrido, archi config-first,
+> transizione mid-run tra famiglie, stati gate su offer card, flashback
+> prep alto tier, doppio timer, capacità parallela = solo
+> leader-capacity, intel = no valuta (solo esploratore). Restano
+> proposal: tassonomia requisiti (OPEN-020), economia villaggio
+> (OPEN-010/012), conversion rewards (posticipate al playtest).
 
 # Quest Opportunity Layer
 
@@ -60,8 +66,34 @@ Proprietà candidate:
   possedute, accessi acquisiti) è parte del save — candidato al layer D
   «persistenza narrativa» di GENERATION_SPEC §2.
 
-Aperto (OPEN-019): struttura dati del grafo, tipi di arco, come gli archi
-persistenti sopravvivono alle run, come il generatore lo attraversa.
+**Visibilità del grafo** (**ratificato**, Director 2026-10-11):
+**visibilità parziale** — il giocatore vede i nodi persistenti (accessi,
+contatti, luoghi, clocks) e le porte note; le quest non ancora sbloccate
+restano nascoste. Via di mezzo tra board-only (Fallen London) e grafo
+completamente visibile (Slay the Spire).
+
+**Modello dati** (**ratificato**, Director 2026-10-12): **ibrido** —
+(a) **qualities piatte** (`access:`, `intel:`, `contact:`, `clock:`) per
+lo stato ambientale persistente + **offer generator** che interroga lo
+stato e produce offerte transitorie; (b) pochi **nodi authored** per le
+milestone/obiettivi strategici visibili (es. «infiltrarsi nella
+fortezza») che tracciano quali approcci sono aperti. Le quest non sono
+nodi del grafo: sono offerte attraverso lo stato.
+
+**Tipi di arco** (**ratificato**, Director 2026-10-12): **set aperto
+config-first** — i tipi di relazione (sblocco, informazione,
+preparazione, …) sono un enum estendibile in config, non una tassonomia
+chiusa. V0 suggerito: sblocco / informazione / preparazione + clocks
+come nodi di stato.
+
+Regole candidate (dalla ricerca R-154, proposal): ogni nodo critico
+richiede ≥2 ingressi di tipo diverso (Three Clue Rule generalizzata); la
+convergenza è lecita solo con **path-dependent modifiers** (il nodo di
+arrivo registra come ci sei arrivato).
+
+Aperto (OPEN-019): come gli archi persistenti sopravvivono alle run,
+come il generatore attraversa il grafo, definizione dei clocks come
+meccanismo di avanzamento del mondo.
 
 ## 2. Famiglie di quest
 
@@ -89,8 +121,18 @@ molte quest con ambientazioni e conseguenze diverse — è il corrispettivo
 a monte del binomio domain kit/core gimmick del generatore interno.
 
 Relazione con i contratti esistenti (da chiarire, OPEN-019): la famiglia
-è un livello *sopra* core gimmick e domain kit? Una famiglia = insieme
-di gimmick compatibili + catalogo di soluzioni.
+è un livello *sopra* core gimmick e domain kit? La ricerca R-154 propone
+una formalizzazione: **famiglia = signature pressure** (variabile di
+stato + come si muove + condizione di stop) — cioè una classe di core
+gimmick. Criterio di validazione proposto (**swap test**): se scambi la
+fiction e la strategia ottimale resta identica, è un reskin non una
+famiglia.
+
+**Transizione mid-run tra famiglie** (**ratificato**, Director
+2026-10-11): una quest può **cambiare famiglia in corso** sullo stesso
+ScenarioInstance — es. allarme al massimo in un'infiltrazione → la quest
+diventa survival/combattimento mantenendo stato e flag. Le famiglie non
+sono silos.
 
 ## 3. Tassonomia dei requisiti
 
@@ -117,8 +159,20 @@ Corollari candidati:
   termini generali a cosa va incontro — coerente con «numeri esatti in
   preview» (R-108) e «fascia di pericolosità dichiarata» (R-105).
 
-Aperto (OPEN-020): quali requisiti sono generici, quali di famiglia,
-quali di singola quest; come si dichiara il tipo nel contratto.
+**Stato del gate sulla offer card** (**ratificato**, Director
+2026-10-11): ogni offerta mostra uno stato calcolato — `Locked` (con la
+via di sblocco nominata), `Underprepared` (banda di rischio + cosa manca
++ prezzo), `Ready`, `Over-qualified` — e la **qualità dello scout report
+dipende dal party/esploratore** (banda larga con poco intel, stretta con
+tanto). Il gate è uno stato calcolato, non una proprietà binaria della
+quest.
+
+Aperto (OPEN-020): **la tassonomia resta proposal per scelta del
+Director (2026-10-12)** — si valida col prototipo prima della ratifica.
+Questione residue: quali requisiti sono generici, quali di famiglia,
+quali di singola quest; come si dichiara il tipo nel contratto; bande
+di rischio calibrate su esiti reali; prezzo underprepared proporzionale
+al gap.
 
 ## 4. Ricompense che aprono porte
 
@@ -131,7 +185,7 @@ dopo**, non solo un incremento numerico. Otto categorie candidate:
 | Informazione | rivela requisiti, pericoli, approcci alternativi |
 | Mitigazione | riduce danni, rischio o conseguenze future |
 | Eccezione | permette di ignorare una regola in una situazione compatibile |
-| Conversione | trasforma una risorsa/capacità in un vantaggio diverso |
+| Conversione | trasforma una risorsa/capacità in un vantaggio diverso — **POSTICIPATA AL PLAYTEST** (decisione Director 2026-10-11: fragile senza ratio control, fuori dal v0) |
 | Sinergia | rende più efficaci capacità già possedute |
 | Investimento permanente | modifica una possibilità/regola anche nelle quest successive |
 | Consumabile / contromisura | risposta circoscritta a una minaccia specifica |
@@ -152,7 +206,11 @@ affronta una quest, non solo *quanto bene*. Catalogo effetti candidati:
 - rivelare informazioni prima nascoste;
 - aggirare un requisito;
 - modificare il funzionamento di una meccanica (es. accumulo allarme);
-- rendere disponibili nuove quest o ricompense.
+- rendere disponibili nuove quest o ricompense;
+- **preparazione retroattiva** (**ratificato**, Director 2026-10-11):
+  capacità di **alto tier** che permette di dichiarare retroattivamente
+  una preparazione entro vincoli dichiarati («avevamo già corrotto
+  quella guardia» — modello flashback di Blades in the Dark).
 
 Distinzione da formalizzare (OPEN-019/020): capacità **generiche** vs
 effetti validi solo su determinate **meccaniche** vs effetti specifici di
@@ -170,15 +228,25 @@ Regola vigente (QUEST_RULES §2): l'esplorazione rivela informazioni
 secondarie — stat delle fasi, pericoli, sorveglianza; un esploratore più
 capace rivela più dettagli.
 
-Estensioni candidate (nuove, PROPOSAL):
+Estensioni:
 
-- **Orientamento**: il giocatore privilegia famiglie o tag; la
-  preferenza influenza la distribuzione delle quest proposte **senza
-  garantirla** — controllo strategico senza eliminare l'incertezza né le
-  opportunità concorrenti.
-- **Portata**: un sistema di esplorazione più sviluppato rivela più info
-  sulle quest, fa emergere opportunità più difficili con ricompense
-  maggiori e aumenta il numero di quest disponibili contemporanee.
+- **Orientamento** (**ratificato**, Director 2026-10-11/12): il
+  giocatore privilegia famiglie o tag; la preferenza diventa un **bias
+  di peso dichiarato e visibile** sulla distribuzione delle offerte
+  (mai filtro duro) — controllo strategico senza eliminare l'incertezza
+  né le opportunità concorrenti.
+- **Niente valuta "intel"** (**ratificato**, Director 2026-10-12): la
+  qualità delle informazioni dipende **solo dalla qualità del
+  party/esploratore** (livello, ruolo, capacità) — non esiste una
+  risorsa spendibile per comprare scout report più precisi. Conseguenza:
+  la mitigazione "numeri esatti come acquisto intel" per OPEN-018 NON è
+  disponibile; OPEN-018 resta da verificare al playtest di PLAN-028 con
+  le mitigazioni già adottate (risk tag, stakes narrative, multi-canale
+  solo su pivot).
+- **Portata** (PROPOSAL): un sistema di esplorazione più sviluppato
+  rivela più info sulle quest, fa emergere opportunità più difficili
+  con ricompense maggiori e aumenta il numero di quest disponibili
+  contemporanee.
 
 Il generatore delle offerte dovrebbe considerare: quest disponibili
 contemporaneamente, obiettivi a lungo termine, requisiti soddisfatti o
@@ -201,6 +269,19 @@ Questo rende le quest **concorrenti**: prepararsi per una può significare
 rinunciare a un'altra, ritardare un investimento o perdere una finestra —
 stesso principio di «ignorare ≠ perdere reward» delle chain quest
 (ARCHITECTURE §15): il mondo avanza comunque.
+
+**Due clock distinti** (**ratificato**, Director 2026-10-11, modello
+RimWorld): *acceptance timer* (tempo per accettare l'offerta) separato
+da *completion timer* (tempo per completare la quest una volta
+accettata) — commitment ed esecuzione sono vincoli diversi.
+
+**Nota sul modello temporale**: il gioco è un gestionale a tempo
+continuo **senza progressione offline** (posizionamento "second monitor",
+decisione in `marketing/steam/claim-ledger.md`) — NON un idle game: a
+gioco chiuso il tempo non avanza e le offerte non si accumulano in
+assenza. La pressione temporale vive solo durante il gioco; regola
+correlata dalla ricerca R-154: *decision rate < event rate* (più offerte
+di quante fattibili, senza richiedere una decisione per ognuna).
 
 **Palette di meccaniche riutilizzabili** (candidati al roster, non
 matrice definitiva): countdown, livello di allerta, prove contrapposte
@@ -228,8 +309,14 @@ a regime — permette più party in missione parallela.
 successiva semplicemente più facile — più spedizioni portano XP e denaro
 ma anche logoramento del gruppo e pressione gestionale (coerente con
 human-days e leader-capacity, `QUEST_ECONOMY_NOTES.md`, OPEN-010).
-*Tensione aperta*: party multipli in parallelo vs regola leader-capacity —
-da conciliare in sede di ratifica economia-villaggio.
+
+**Capacità parallela** (**ratificato**, Director 2026-10-12): **solo
+leader-capacity** — un party in missione richiede un leader; la
+capacità parallela cresce solo reclutando/addestrando leader (e
+svincolando specialisti/feriti), NON tramite slot arbitrari dagli
+edifici. Più stringente del modello a 3 layer proposto dalla ricerca:
+gli edifici supportano (infermeria → feriti recuperano, ecc.) ma non
+concedono spedizioni.
 
 ## 9. Architettura delle risorse
 
@@ -237,13 +324,16 @@ Candidato anti-moltiplicazione delle valute:
 
 - **risorse comuni**, utili a più attività;
 - **specializzazioni permanenti** dei personaggi;
-- una **risorsa trasversale limitata** legata all'informazione operativa:
-  conoscere meglio una missione è un vantaggio strategico spendibile,
-  senza introdurre una valuta per famiglia (stealth, diplomazia,
-  combattimento…).
+- ~~una risorsa trasversale limitata legata all'informazione operativa~~
+  **RESPINTO dal Director (2026-10-12)**: nessuna valuta "intel" — la
+  qualità dell'informazione vive nella qualità dell'esploratore/party
+  (§6). L'obiettivo anti-moltiplicazione delle valute resta valido, ma
+  si raggiunge senza risorsa dedicata all'informazione.
 
-Aperto (OPEN-021): come rappresentare economicamente l'informazione e il
-costo di preparazione senza rendere le risorse troppo intercambiabili.
+Aperto (OPEN-021): come rappresentare economicamente il costo di
+preparazione senza rendere le risorse troppo intercambiabili — la
+forma della risorsa informativa è decisa (non esiste), resta da
+definire il costo economico di preparazione/scouting.
 
 ## 10. Memoria delle conseguenze
 

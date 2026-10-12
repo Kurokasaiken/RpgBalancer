@@ -94,7 +94,7 @@ describe('quest S1 lab — run engine', () => {
         sawReward = true;
         expect(run.objectiveDone).toBe(true);
         expect(run.party.find((m) => m.role === 'leader')?.dead).toBe(false);
-        expect(run.loot).toContain('cassa delle sementi');
+        expect(run.loot).toContain('seed crate');
       }
     }
     expect(sawReward).toBe(true);
@@ -179,7 +179,7 @@ describe('quest S1 lab — run engine', () => {
     expect(run.nodeId).toBe('approccio');
     const pv = previewOption(run, 'sneak');
     expect(pv).not.toBeNull();
-    expect(pv!.consumableLabel).toBe('Fumogeno');
+    expect(pv!.consumableLabel).toBe('Smoke bomb');
     expect(pv!.consumableBonus).toBe(15);
     // successPct already includes the consumable
     expect(pv!.successPct).toBe(Math.min(100, pv!.score));
@@ -202,14 +202,14 @@ describe('quest S1 lab — run engine', () => {
     // decline → flag survives, no consumable log
     applyChoice(run, 'sneak', { useConsumable: false });
     expect(run.flags).toContain('hasFumogeno');
-    expect(run.log.some((e) => e.text.includes('nella sacca'))).toBe(true);
+    expect(run.log.some((e) => e.text.includes('in the bag'))).toBe(true);
     // armed → consumed
     const run2 = createRun('bodyguard', 5);
     applyChoice(run2, 'buy-fumogeno');
     applyChoice(run2, 'no-buy');
     applyChoice(run2, 'sneak', { useConsumable: true });
     expect(run2.flags).not.toContain('hasFumogeno');
-    expect(run2.log.some((e) => e.text.includes('Il fumogeno copre'))).toBe(true);
+    expect(run2.log.some((e) => e.text.includes('The smoke bomb covers'))).toBe(true);
   });
 
   it('camp alertness escalates on failures inside: sveglio then the tower wakes', () => {
@@ -264,7 +264,7 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
     const run = createRun('ibrido', seed);
     run.nodeId = 'estrazione';
     run.objectiveDone = true;
-    run.loot.push('cassa delle sementi');
+    run.loot.push('seed crate');
     run.flags.push(...flags);
     run.alarm = alarm;
     return run;
@@ -298,7 +298,7 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
     const run = createRun('ibrido', 1);
     run.nodeId = 'rientra-o-rischi';
     run.objectiveDone = true;
-    run.loot.push('cassa delle sementi');
+    run.loot.push('seed crate');
     run.flags.push('campoSveglio');
     run.alarm = true;
     applyChoice(run, 'return-now');
@@ -316,10 +316,10 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
     }
     expect(lost).not.toBeNull();
     expect(lost!.flags).toContain('cassaPersa');
-    expect(lost!.loot).not.toContain('cassa delle sementi');
+    expect(lost!.loot).not.toContain('seed crate');
     expect(lost!.outcome).not.toBe('reward');
     // epilogue must name the cost
-    expect(lost!.lastEvent).toContain('rimasta al campo');
+    expect(lost!.lastEvent).toContain('stayed at the camp');
   });
 
   it('a successful extraction secures the crate — reward is decided at ritorno', () => {
@@ -331,7 +331,7 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
     }
     expect(secured).not.toBeNull();
     expect(secured!.objectiveDone).toBe(true);
-    expect(secured!.loot).toContain('cassa delle sementi');
+    expect(secured!.loot).toContain('seed crate');
   });
 
   it('fleeing with the crate in hand drops it — panic is not a free save', () => {
@@ -340,7 +340,7 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
     expect(run.ended).toBe(true);
     expect(run.outcome).toBe('fled');
     expect(run.flags).toContain('cassaPersa');
-    expect(run.loot).not.toContain('cassa delle sementi');
+    expect(run.loot).not.toContain('seed crate');
   });
 
   it('epicfail respects the declared risk band: the breach (M0) cannot kill', () => {
@@ -361,7 +361,7 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
       if (!run.objectiveDone && run.nodeId === 'estrazione') {
         escaped = true;
         expect(run.ended).toBe(false);
-        expect(run.loot).not.toContain('cassa delle sementi');
+        expect(run.loot).not.toContain('seed crate');
         expect(run.flags).not.toContain('cassaPersa'); // never taken
       }
     }
@@ -378,11 +378,11 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
       run.flags.push('campoSveglio');
       run.alarm = true;
       applyChoice(run, 'straight-cassa');
-      if (run.log.some((e) => e.text.includes('Qualcosa si sveglia'))) {
+      if (run.log.some((e) => e.text.includes('Something is waking up'))) {
         sawWake = true;
         // the grab's verdict must still have been applied before the wake
         const grabLogged = run.log.some(
-          (e) => e.text.includes('non ancora al sicuro') || e.text.includes('vi sfugge di mano'),
+          (e) => e.text.includes('not safe yet') || e.text.includes('slips from your hands'),
         );
         expect(grabLogged).toBe(true);
       }
@@ -397,7 +397,7 @@ describe('quest S1 lab — TAKEN→SECURED extraction (minimal v6 slice)', () =>
     expect(run.ended).toBe(true);
     const name = run.party[1].name;
     expect(run.lastEvent).toContain(name);
-    expect(run.lastEvent).toContain('prigioniero');
+    expect(run.lastEvent).toContain('prisoner');
   });
 });
 
@@ -435,7 +435,7 @@ describe('quest S1 lab — Le Rovine sotto il Fiume (attrition gauntlet)', () =>
       applyChoice(run, 'rv-incalza');
       // the river check auto-resolves — the fork lands on 'rv-guardie'
       if (run.flags.includes('hasCoagulo')) sawPay = true;
-      else if (run.log.some((e) => e.text.includes('caccia malamente'))) sawStonewall = true;
+      else if (run.log.some((e) => e.text.includes('chases you off'))) sawStonewall = true;
     }
     expect(sawPay).toBe(true);
     expect(sawStonewall).toBe(true);
@@ -469,7 +469,7 @@ describe('quest S1 lab — Le Rovine sotto il Fiume (attrition gauntlet)', () =>
     expect(taken).not.toBeNull();
     expect(taken!.bottinoOro).toBeGreaterThanOrEqual(80);
     expect(taken!.bottinoOro).toBeLessThan(160);
-    expect(taken!.loot).toContain('tesoro delle rovine');
+    expect(taken!.loot).toContain('ruins treasure');
     expect(taken!.nodeId).toBe('rv-checkpoint');
     // checkpoint offers the push-your-luck: return or continue
     const ids = availableOptions(taken!).map((o) => o.id);
@@ -507,7 +507,7 @@ describe('quest S1 lab — Le Rovine sotto il Fiume (attrition gauntlet)', () =>
     expect(run.flags).not.toContain('hasCoagulo');
     expect(run.flags).toContain('viandanteAiutato');
     expect(run.ended).toBe(true);
-    expect(run.lastEvent).toContain('giorni');
+    expect(run.lastEvent).toContain('days');
   });
 
   it('continuing past the checkpoint always costs a day — attrition has no check', () => {
@@ -538,8 +538,8 @@ describe('quest S1 lab — Le Rovine sotto il Fiume (attrition gauntlet)', () =>
                 : ids[0],
     );
     expect(run.ended).toBe(true);
-    expect(run.lastEvent).toContain('Durata:');
-    expect(run.lastEvent).toContain('Giorni-uomo');
+    expect(run.lastEvent).toContain('Duration:');
+    expect(run.lastEvent).toContain('Man-days');
   });
 
   it('fleeing with the treasure in hand drops it — panic is not a free save', () => {
@@ -547,12 +547,12 @@ describe('quest S1 lab — Le Rovine sotto il Fiume (attrition gauntlet)', () =>
     run.nodeId = 'rv-checkpoint';
     run.objectiveDone = true;
     run.bottinoOro = 120;
-    run.loot.push('tesoro delle rovine');
+    run.loot.push('ruins treasure');
     flee(run);
     expect(run.ended).toBe(true);
     expect(run.outcome).toBe('fled');
     expect(run.flags).toContain('tesoroPerso');
-    expect(run.loot).not.toContain('tesoro delle rovine');
+    expect(run.loot).not.toContain('ruins treasure');
     expect(run.bottinoOro).toBe(0);
   });
 });

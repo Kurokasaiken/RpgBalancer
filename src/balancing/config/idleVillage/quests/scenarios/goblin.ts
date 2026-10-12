@@ -1,9 +1,10 @@
 /**
- * QuestScenario «Sterminio dei goblin» — canonical authored config
- * (PLAN-019-S2.1, T-2: migration 1:1 from `questS1Lab/questScenarioGoblin.ts`).
+ * QuestScenario «Goblin Extermination» — canonical authored config
+ * (PLAN-019-S2.1, T-2: migration 1:1 from `questS1Lab/questScenarioGoblin.ts`;
+ * R-135: English re-baseline of all authored prose).
  *
  * Director-authored spec: `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md`
- * (PLAN-022). Combat quest, Forza-based, positional slot targeting:
+ * (PLAN-022). Combat quest, Strength-based, positional slot targeting:
  * the risk lives at the back of the formation — 4 alive → 0/0/20/80 —
  * and compacts when someone dies. NOT a general engine: post-verdict routing
  * of check/combat nodes is hardcoded per node id in `questRun.applyNodeOutcome`
@@ -25,46 +26,46 @@ import {
 /* ------------------------------------------------------------------ */
 
 const GOBLIN_NODES: Record<string, QuestNode> = {
-  /* F0 — ASSEGNAZIONE: combat quest, Forza visible, Percezione revealable,
+  /* F0 — ASSIGNMENT: combat quest, Strength visible, Perception revealable,
    * three consumables carried (granted by the preset flags). No check. */
   'gob-inizio': {
     id: 'gob-inizio',
     kind: 'choice',
-    title: 'Assegnazione — Sterminio dei goblin',
-    body: 'Terza razzia in un mese. I carri dei mercanti non passano più dal guado: gli ultimi due sono tornati con le casse vuote e le stanghe rotte. Il consiglio non discute più: paga. Sterminateli.',
+    title: 'Assignment — Goblin Extermination',
+    body: 'Third raid in a month. The merchants’ wagons no longer cross the ford: the last two came back with empty crates and broken shafts. The council no longer debates: it pays. Exterminate them.',
     beat: 0,
     options: [
       {
         id: 'gob-partenza',
-        label: 'Partire',
-        detail: 'Bonus Forza, Bonus Percezione e una cura nella sacca. Si marcia.',
+        label: 'Depart',
+        detail: 'Strength Bonus, Perception Bonus and a healing kit in the bag. We march.',
         next: 'gob-esplora',
       },
     ],
   },
 
-  /* F1 — ESPLORAZIONE: two alternative checks.
-   * PER "Cercare tracce" success → stealth bonus (F3).
-   * STR+PER "Arrampicarsi sull'albero" success → opens F2 (from above you spot
+  /* F1 — EXPLORATION: two alternative checks.
+   * PER "Look for tracks" success → stealth bonus (F3).
+   * STR+PER "Climb the tree" success → opens F2 (from above you spot
    * the stash by the boulder); fail −10 HP (fall). */
   'gob-esplora': {
     id: 'gob-esplora',
     kind: 'choice',
-    title: 'Esplorazione — ai margini del bosco',
-    body: 'Il bosco tace in un modo che ai boschi non viene naturale. Sul sentiero, un masso sbarra il passo — e da sotto spunta un lembo di straccio, schiacciato come da chi aveva fretta.',
-    transit: 'La strada muore dove il bosco comincia. Il profumo di resina cede alla terra umida e a un fumo basso che non sa di cucina. Davanti marcia chi guida; dietro, gli altri contano i carichi e le uscite.',
+    title: 'Exploration — at the edge of the wood',
+    body: 'The wood is silent in a way that does not come naturally to woods. On the trail, a boulder blocks the way — and from underneath a flap of rag sticks out, crushed as if by someone in a hurry.',
+    transit: 'The road dies where the wood begins. The smell of resin gives way to damp earth and a low smoke that is no kitchen fire. Whoever leads marches ahead; behind, the others count loads and exits.',
     beat: 1,
     options: [
       {
         id: 'gob-cerca-tracce',
-        label: 'Cercare tracce',
-        detail: 'Percezione. Il suolo racconta chi è passato, e quanti erano.',
+        label: 'Look for tracks',
+        detail: 'Perception. The ground tells who passed, and how many they were.',
         next: 'CHECK:gob-tracce-per',
       },
       {
         id: 'gob-forza-tracce',
-        label: 'Arrampicarsi sull’albero',
-        detail: 'Forza + Percezione. Dall’alto: il campo, e dove nascondono ciò che rubano.',
+        label: 'Climb the tree',
+        detail: 'Strength + Perception. From above: the camp, and where they hide what they steal.',
         next: 'CHECK:gob-tracce-perfor',
       },
     ],
@@ -72,59 +73,59 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-tracce-per': {
     id: 'gob-tracce-per',
     kind: 'check',
-    title: 'Cercare tracce',
-    body: 'A terra il bosco parla piano: orme nella terra umida, rami spezzati all’altezza sbagliata.',
-    transit: 'Vi spargete lungo il sentiero a leggere il suolo: impronte, terra smossa, il senso di una via che gli altri non vedono.',
+    title: 'Looking for tracks',
+    body: 'On the ground the wood speaks softly: footprints in the damp earth, branches broken at the wrong height.',
+    transit: 'You spread along the trail reading the ground: prints, churned earth, the sense of a path the others cannot see.',
     stats: ['perc'],
     risk: { wound: 0, death: 0 },
     beat: 1,
     verdictFlavor: {
-      bigwin: 'Orme fresche, terra rivoltata, un filo di campanelli teso tra i rami: sapete dove vanno, e da dove guardano.',
-      win: 'Orme fresche verso nord, e segni di passaggi ripetuti. Sapete come avvicinarvi.',
-      almost: 'Segni confusi, orme doppie. Un sospetto, non una via.',
-      fail: 'Il suolo è stato rimestato apposta. Il bosco non racconta niente.',
-      epicfail: 'Leggete le tracce al contrario — e qualcuno, da qualche parte, ha letto le vostre.',
+      bigwin: 'Fresh tracks, turned earth, a thread of bells strung between the branches: you know where they go, and where they watch from.',
+      win: 'Fresh tracks heading north, and signs of repeated passages. You know how to approach.',
+      almost: 'Confused signs, double prints. A suspicion, not a path.',
+      fail: 'The ground was churned on purpose. The wood tells you nothing.',
+      epicfail: 'You read the tracks backwards — and someone, somewhere, has read yours.',
     },
   },
   'gob-tracce-perfor': {
     id: 'gob-tracce-perfor',
     kind: 'check',
-    title: 'Ti arrampichi sull’albero',
-    body: 'Dal basso il bosco è un muro. Da sopra, qualcosa dice dove si apre — e cosa nasconde.',
-    transit: 'L’albero giusto sta tre passi fuori dal sentiero. La corteccia è il vostro appiglio, la cima il vostro occhio.',
+    title: 'You climb the tree',
+    body: 'From below the wood is a wall. From above, something says where it opens — and what it hides.',
+    transit: 'The right tree stands three paces off the trail. The bark is your grip, the top your eye.',
     stats: ['str', 'perc'],
     risk: { wound: 0, death: 0 },
     beat: 1,
     verdictFlavor: {
-      bigwin: 'Dall’alto: fumo basso a est, una fila di pali appuntiti, una sentinella su un ceppo — e giù, presso il masso, terra smossa dove qualcuno ha chiuso qualcosa in fretta.',
-      win: 'La corteccia cede ma regge. Da sopra: il campo a est, e presso il masso un lembo di straccio che non doveva stare lì.',
-      almost: 'Il ramo cede a mezza altezza — ma basta per scorgere la terra smossa sotto il masso.',
-      fail: 'Il ramo tiene a metà, poi cede: la schiena trova il suolo prima degli occhi il campo.',
-      epicfail: 'Un ramo marcio: giù di schiena, e il tonfo corre per il bosco. Ora anche loro sanno che ci siete.',
+      bigwin: 'From above: low smoke to the east, a line of sharpened stakes, a sentry on a stump — and below, by the boulder, churned earth where someone closed something in a hurry.',
+      win: 'The bark gives but holds. From above: the camp to the east, and by the boulder a flap of rag that should not be there.',
+      almost: 'The branch gives halfway up — but it is enough to glimpse the churned earth under the boulder.',
+      fail: 'The branch holds halfway, then gives: your back finds the ground before your eyes find the camp.',
+      epicfail: 'A rotten branch: down on your back, and the thud runs through the wood. Now even they know you are here.',
     },
   },
 
-  /* F2 — EVENTO NASCOSTO (bottino): only if PER+FOR succeeded.
-   * DEX: item anyway; fail → 10 dmg + campo sveglio (alarm −10pp a F4+). */
+  /* F2 — HIDDEN EVENT (loot): only if PER+STR succeeded.
+   * AGI: item anyway; fail → 10 dmg + camp awake (alarm −10pp at F4+). */
   'gob-bottino-scelta': {
     id: 'gob-bottino-scelta',
     kind: 'choice',
-    title: 'Tesoro nascosto',
+    title: 'Hidden treasure',
     hidden: true,
-    body: 'Sotto il masso, un bottino avvolto in stracci. Prenderlo in silenzio costa mano ferma — un suono e il campo si sveglia.',
-    transit: 'Dietro il masso, una nicchia di stracci: qualcuno ha nascosto qualcosa in fretta e non è più tornato.',
+    body: 'Under the boulder, loot wrapped in rags. Taking it in silence costs a steady hand — one sound and the camp wakes.',
+    transit: 'Behind the boulder, a niche of rags: someone hid something in a hurry and never came back.',
     beat: 2,
     options: [
       {
         id: 'gob-prendi',
-        label: 'Prendere il bottino',
-        detail: 'Destrezza. Se la mano tradisce, il campo si sveglia.',
+        label: 'Take the loot',
+        detail: 'Agility. If your hand betrays you, the camp wakes.',
         next: 'CHECK:gob-bottino',
       },
       {
         id: 'gob-lascia-bottino',
-        label: 'Lasciare stare',
-        detail: 'Un campo che dorme vale più di un bottino: passate oltre.',
+        label: 'Leave it be',
+        detail: 'A sleeping camp is worth more than loot: you move on.',
         next: 'gob-accampamento',
       },
     ],
@@ -132,41 +133,41 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-bottino': {
     id: 'gob-bottino',
     kind: 'check',
-    title: 'Le mani sul bottino',
+    title: 'Hands on the loot',
     hidden: true,
-    body: 'Catene, campanelli, un nodo da sciogliere senza un suono.',
+    body: 'Chains, bells, a knot to undo without a sound.',
     stats: ['agi'],
     verdictFlavor: {
-      bigwin: 'Nemmeno i campanelli se ne accorgono. In tasca, senza un suono.',
-      win: 'Un nodo alla volta. Il bottino è vostro.',
-      almost: 'Qualcosa tintinna. Fiato trattenuto — niente si muove. Preso a metà.',
-      fail: 'Un campanello tradisce la mano: il suono corre nella valle.',
-      epicfail: 'Il filo resta in mano: i campanelli chiamano, e qualcosa risponde.',
+      bigwin: 'Not even the bells notice. In the bag, without a sound.',
+      win: 'One knot at a time. The loot is yours.',
+      almost: 'Something jingles. Breath held — nothing moves. Half taken.',
+      fail: 'A bell betrays the hand: the sound runs through the valley.',
+      epicfail: 'The wire stays in your hand: the bells call, and something answers.',
     },
     risk: { wound: 0, death: 0 },
     beat: 2,
   },
 
-  /* F3 — ACCAMPAMENTO: Stealth (DEX) vs Assalto (FOR).
-   * Same lever (+Danno a F4), different risk. */
+  /* F3 — CAMP: Stealth (AGI) vs Assault (STR).
+   * Same lever (+damage at F4), different risk. */
   'gob-accampamento': {
     id: 'gob-accampamento',
     kind: 'choice',
-    title: 'Assalto',
-    body: 'Fumi tra le tende. Da qui si colpisce in un modo solo — il vostro.',
-    transit: 'Tra le fronde il fumo si fa spesso: l’accampamento è sotto. Da qui si colpisce in un modo solo — e va scelto bene.',
+    title: 'Assault',
+    body: 'Smoke among the tents. From here you strike in one way only — yours.',
+    transit: 'Among the leaves the smoke thickens: the camp is below. From here you strike in one way only — choose it well.',
     beat: 3,
     options: [
       {
         id: 'gob-via-stealth',
-        label: 'Passare il filo dei campanelli',
-        detail: 'Destrezza. Bonus maggiore — ma se vi vedono, il campo è all’erta.',
+        label: 'Slip past the bell wire',
+        detail: 'Agility. Bigger bonus — but if they see you, the camp is alerted.',
         next: 'CHECK:gob-stealth',
       },
       {
         id: 'gob-via-assalto',
-        label: 'Assalto',
-        detail: 'Forza. Bonus moderato — il fallimento non costa nulla.',
+        label: 'Assault',
+        detail: 'Strength. Moderate bonus — failure costs nothing.',
         next: 'CHECK:gob-assalto',
       },
     ],
@@ -174,45 +175,45 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-stealth': {
     id: 'gob-stealth',
     kind: 'check',
-    title: 'Il filo dei campanelli',
-    body: 'Un filo teso a mezza gamba porta a campanelli appesi come trappole. Ogni passo è un suono possibile.',
+    title: 'The bell wire',
+    body: 'A wire strung at half-shin leads to bells hung like traps. Every step is a possible sound.',
     stats: ['agi'],
     risk: { wound: 0, death: 0 },
     beat: 3,
     verdictFlavor: {
-      bigwin: 'Passate come il fumo tra i paletti. Il campo dorme; la sorpresa è vostra.',
-      win: 'Un passo, un respiro, un passo. Siete dentro.',
-      almost: 'Uno starnuto strozzato. Due teste si alzano dal fuoco, poi tornano giù. Dentro — ma non invisibili.',
-      fail: 'Un filo vibra sotto il palmo. Un campanello decide di vivere.',
-      epicfail: 'Il filo resta in mano: i campanelli chiamano, e qualcosa risponde.',
+      bigwin: 'You pass like smoke between the stakes. The camp sleeps; the surprise is yours.',
+      win: 'One step, one breath, one step. You are inside.',
+      almost: 'A stifled sneeze. Two heads rise from the fire, then sink back down. Inside — but not invisible.',
+      fail: 'A wire trembles under the palm. A bell decides to live.',
+      epicfail: 'The wire stays in your hand: the bells call, and something answers.',
     },
   },
   'gob-assalto': {
     id: 'gob-assalto',
     kind: 'check',
-    title: 'La carica',
-    body: 'La palizzata è fatta di rifiuti e fango. Sfondarla prima che si organizzino — o subirla.',
+    title: 'The charge',
+    body: 'The palisade is made of refuse and mud. Break through before they organize — or take the hit.',
     stats: ['str'],
     risk: { wound: 0, death: 0 },
     beat: 3,
     verdictFlavor: {
-      bigwin: 'Il primo palo cade prima che qualcuno capisca. Una tenda si accartoccia sul fuoco; due goblin rotolano via ciechi di fumo.',
-      win: 'Sfondate dove la palizzata è più bassa. Una lancia si alza — troppo tardi.',
-      almost: 'La palizzata tiene un respiro di troppo. Qualcuno urla; il campo ha il tempo di afferrare le armi.',
-      fail: 'La carica si pianta nel fango. Vi aspettano già, lance puntate.',
-      epicfail: 'Inciampate nella vostra stessa carica: in mezzo al campo, in disordine.',
+      bigwin: 'The first stake falls before anyone understands. A tent collapses onto the fire; two goblins roll away blind with smoke.',
+      win: 'You break through where the palisade is lowest. A spear rises — too late.',
+      almost: 'The palisade holds one breath too long. Someone shouts; the camp has time to grab their weapons.',
+      fail: 'The charge plants itself in the mud. They are already waiting, spears leveled.',
+      epicfail: 'You trip on your own charge: in the middle of the camp, in disarray.',
     },
   },
 
-  /* F4 — COMBATTIMENTO: X turns of mutual damage, positional targeting with
+  /* F4 — COMBAT: X turns of mutual damage, positional targeting with
    * escalation; no instant death — only HP. */
   'gob-combattimento': {
     id: 'gob-combattimento',
     kind: 'combat',
-    title: 'Combattimento — il campo dei goblin',
-    body: 'Li avete. O loro.',
-    transit: 'Il momento è scelto. Il bosco trattiene il fiato — poi il campo esplode.',
-    previewHint: 'Scontro a turni sul campo: i goblin rispondono colpo per colpo — la pelle si paga.',
+    title: 'Combat — the goblin camp',
+    body: 'You have them. Or they have you.',
+    transit: 'The moment is chosen. The wood holds its breath — then the camp erupts.',
+    previewHint: 'A turn-based fight on the camp: the goblins answer blow for blow — skin pays the price.',
     beat: 4,
     combat: {
       turns: 5,
@@ -220,34 +221,34 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
       attackStats: ['str'],
       killPerWin: 1,
       killPerBigwin: 2,
-      hitDamage: 12, // placeholder — calibrazione MC
+      hitDamage: 12, // placeholder — MC calibration
       escalateProfile: true,
-      nextCleared: 'gob-esplora-extra', // sterminio → F5 skipped
+      nextCleared: 'gob-esplora-extra', // extermination → F5 skipped
       nextSurvivors: 'gob-incalzare',
     },
   },
 
-  /* F5 — INCALZARE: let them flee (mild ambush) or pursue (FORZA check with
-   * verdict bands: almost = fail-mild, fail/epicfail = worsened ambush). */
+  /* F5 — PURSUIT: let them flee (heavy ambush) or pursue (STR check with
+   * verdict bands: almost = fail-mild, fail/epicfail = milder ambush). */
   'gob-incalzare': {
     id: 'gob-incalzare',
     kind: 'choice',
-    title: 'Incalzare',
-    body: 'I superstiti corrono verso il bosco. Chiuderli qui — o lasciarli andare.',
-    transit: 'Polvere e sangue. I goblin che restano spezzano il fronte e corrono verso il bosco, portandosi dietro la vostra faccia.',
+    title: 'Pursuit',
+    body: 'The survivors run toward the wood. Close them here — or let them go.',
+    transit: 'Dust and blood. The remaining goblins break the front and run toward the wood, carrying your faces with them.',
     beat: 5,
     options: [
       {
         id: 'gob-lascia-fuggire',
-        label: 'Lasciarli fuggire',
-        detail: 'Torneranno. Li rivedrete sulla strada di casa.',
+        label: 'Let them flee',
+        detail: 'They will come back. You will see them again on the road home.',
         next: 'gob-esplora-extra',
         sets: 'agguatoPeggiore', // R-097 v2: letting them go = they regroup → HEAVY ambush at F7
       },
       {
         id: 'gob-insegui',
-        label: 'Incalzare',
-        detail: 'Forza. Chiudete la quest qui — o peggiorate il conto.',
+        label: 'Pursue them',
+        detail: 'Strength. Close the quest here — or make the bill worse.',
         next: 'CHECK:gob-incalza-check',
       },
     ],
@@ -255,44 +256,44 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-incalza-check': {
     id: 'gob-incalza-check',
     kind: 'check',
-    title: 'La caccia tra le rocce',
-    body: 'La caccia attraverso le rocce. Ogni metro guadagnato è uno di troppo.',
+    title: 'The hunt among the rocks',
+    body: 'The hunt through the rocks. Every meter gained is one too many.',
     stats: ['str'],
     risk: { wound: 0, death: 0 },
     beat: 5,
     verdictFlavor: {
-      bigwin: 'Li chiudete dove il sentiero stringe. Nessuno tornerà a raccontare cosa è successo.',
-      win: 'Li chiudete contro le rocce, uno alla volta. Il sentiero torna silenzioso.',
-      almost: 'Correte fino al fiatone: qualcuno gli taglia la fuga, qualcuno no. Torneranno feriti — e avvisati.',
-      fail: 'Le rocce vi tradiscono. Li vedete svanire, e sapete che li rivedrete.',
-      epicfail: 'La caccia costa sangue e non chiude nulla. Tornano tutti — e torneranno organizzati.',
+      bigwin: 'You close them where the trail narrows. No one will return to tell what happened.',
+      win: 'You close them against the rocks, one at a time. The trail goes silent again.',
+      almost: 'You run until your lungs burn: some of you cut off their escape, some do not. They will return wounded — and warned.',
+      fail: 'The rocks betray you. You watch them vanish, and you know you will see them again.',
+      epicfail: 'The hunt costs blood and closes nothing. They all get back — and they will return organized.',
     },
     // R-097 v2: the deterministic price of the chase itself — escaping
     // goblins are bloodied → the ambush is the mild one.
     upfrontDamage: { amount: 10, epicfailAmount: 20 },
-    failHint: 'La caccia costa sangue comunque. Se scappano, tornano feriti: l’agguato sarà più debole.',
-    previewHint: 'Inseguire espone le spalle: la caccia ha un pedaggio certo, il verdetto decide il resto.',
+    failHint: 'The hunt costs blood anyway. If they escape, they come back wounded: the ambush will be weaker.',
+    previewHint: 'Pursuing exposes your backs: the hunt has a certain toll, the verdict decides the rest.',
   },
 
-  /* F6 — CONTINUA L'ESPLORAZIONE: push-your-luck, damage grows 5→10→15. */
+  /* F6 — KEEP EXPLORING: push-your-luck, damage grows 5→10→15. */
   'gob-esplora-extra': {
     id: 'gob-esplora-extra',
     kind: 'choice',
-    title: 'Il campo conquistato',
-    body: 'Cenere e tende rovesciate. Sotto il telo della tenda più bassa, un angolo di cuoio con un fermaglio d’ottone.',
-    transit: 'Il campo conquistato è un campo aperto: cenere, tende rovesciate, e il bottino che nessuno reclama più.',
+    title: 'The conquered camp',
+    body: 'Ash and overturned tents. Under the tarp of the lowest tent, a corner of leather with a brass clasp.',
+    transit: 'A conquered camp is an open camp: ash, overturned tents, and loot no one claims anymore.',
     beat: 6,
     options: [
       {
         id: 'gob-fruga',
-        label: 'Frugare ancora',
-        detail: 'Il telo cede piano. Ogni altro giro costa di più — in oro e in pelle.',
+        label: 'Keep looting',
+        detail: 'The tarp gives slowly. Every extra round costs more — in gold and in skin.',
         next: 'CHECK:gob-cerca',
       },
       {
         id: 'gob-fermati',
-        label: 'Fermarsi',
-        detail: 'Lasciate il cuoio dov’è: si torna a casa.',
+        label: 'Stop here',
+        detail: 'Leave the leather where it is: time to go home.',
         next: 'gob-ritorno',
       },
     ],
@@ -300,60 +301,60 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-cerca': {
     id: 'gob-cerca',
     kind: 'check',
-    title: 'Razzia tra le tende',
-    body: 'Tra le tende bruciate e le trappole lasciate dai goblin — il campo si fa pagare anche da morto.',
-    previewHint: 'Ogni altro giro di razzia costa più del precedente — il campo non resta stabile.',
+    title: 'Raiding the tents',
+    body: 'Among burnt tents and traps the goblins left behind — the camp makes you pay even dead.',
+    previewHint: 'Every extra round of looting costs more than the last — the camp does not stay stable.',
     stats: ['int', 'perc'],
     risk: { wound: 0, death: 0 },
     beat: 6,
     verdictFlavor: {
-      bigwin: 'Il fermaglio cede: dentro, il meglio di ciò che restava.',
-      win: 'Un fondo di tenda, un pugno di stracci — qualcosa che valeva la pena.',
-      almost: 'Poca roba, e la trave vi presenta il conto.',
-      fail: 'Solo cenere, spine — e la trappola che chiude il giro.',
-      epicfail: 'Il campo si fa pagare l’ultimo debito: cenere, spine e sangue.',
+      bigwin: 'The clasp gives: inside, the best of what was left.',
+      win: 'A tent floor, a fistful of rags — something worth the trouble.',
+      almost: 'Little stuff, and the beam presents its bill.',
+      fail: 'Only ash, thorns — and the trap that closes the round.',
+      epicfail: 'The camp collects its last debt: ash, thorns and blood.',
     },
   },
 
-  /* F7 — RITORNO / AGGUATO. 'gob-ritorno' routes: sterminio → end clean;
+  /* F7 — RETURN / AMBUSH. 'gob-ritorno' routes: extermination → end clean;
    * else → ambush (5 dry dmg to all) → drop trophy OR last stand. */
   'gob-ritorno': {
     id: 'gob-ritorno',
     kind: 'info',
-    title: 'La via del ritorno',
-    body: 'La strada scende verso casa. Qualcuno ha cominciato a fischiettare. Poi smette, senza che nessuno dica perché.',
+    title: 'The road home',
+    body: 'The road descends toward home. Someone has started whistling. Then stops, without anyone saying why.',
     next: 'gob-agguato',
     beat: 7,
   },
   'gob-agguato': {
     id: 'gob-agguato',
     kind: 'harm',
-    title: 'Agguato sulla strada',
-    body: 'Il fischiettio si interrompe a metà. Una freccia nel palo accanto a voi. Poi tutte le altre.',
+    title: 'Ambush on the road',
+    body: 'The whistling cuts off mid-note. An arrow in the post beside you. Then all the others.',
     next: 'gob-agguato-scelta',
-    previewHint: 'La via del ritorno non è sicura: qualcuno vi sta aspettando.',
-    revealHint: 'Un occhio allenato leggerebbe le piste: i fuggiaschi che risparmiate tornano a preparare questo agguato.',
+    previewHint: 'The road home is not safe: someone is waiting for you.',
+    revealHint: 'A trained eye would read the tracks: the fugitives you spare come back to prepare this ambush.',
     beat: 7,
   },
   'gob-agguato-scelta': {
     id: 'gob-agguato-scelta',
     kind: 'choice',
-    title: 'Trofeo o sangue',
-    body: 'Potete mollare il trofeo e correre — o combattere l’ultima mischia.',
-    transit: 'Attorno, il bosco si stringe di nuovo. Resta una scelta sola: lasciare il trofeo, o lasciare qualcuno.',
+    title: 'Trophy or blood',
+    body: 'You can drop the trophy and run — or fight the last melee.',
+    transit: 'Around you, the wood closes in again. One choice remains: leave the trophy, or leave someone.',
     beat: 7,
     options: [
       {
         id: 'gob-molla-trofeo',
-        label: 'Lasciare il trofeo',
-        detail: 'Il trofeo rotola nel fosso. La strada si libera — a mani vuote.',
+        label: 'Drop the trophy',
+        detail: 'The trophy rolls into the ditch. The road clears — empty-handed.',
         next: 'gob-fine',
         abandonsObjective: true,
       },
       {
         id: 'gob-ultima-mischia',
-        label: 'Affrontare',
-        detail: 'Un turno di combattimento. Chi resta a coprire paga.',
+        label: 'Stand and fight',
+        detail: 'One combat turn. Whoever stays to cover pays.',
         next: 'gob-ultimo-scontro',
       },
     ],
@@ -361,9 +362,9 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-ultimo-scontro': {
     id: 'gob-ultimo-scontro',
     kind: 'combat',
-    title: 'L’ultima mischia',
-    body: 'Uno scontro secco come un osso che si spezza. Il profilo decide chi paga.',
-    transit: 'L’ultima mischia non è una battaglia: è un conto da chiudere. Chi resta a coprire paga per tutti.',
+    title: 'The last melee',
+    body: 'A fight as dry as a bone snapping. The profile decides who pays.',
+    transit: 'The last melee is not a battle: it is a debt to settle. Whoever stays to cover pays for everyone.',
     beat: 7,
     combat: {
       turns: 1,
@@ -371,7 +372,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
       attackStats: ['str'],
       killPerWin: 3,
       killPerBigwin: 3,
-      hitDamage: 25, // placeholder — attesa: muoiono quasi tutti tranne l'eroe
+      hitDamage: 25, // placeholder — expectation: almost everyone dies but the hero
       escalateProfile: false,
       nextCleared: 'gob-fine',
       nextSurvivors: 'gob-fine',
@@ -380,9 +381,9 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-fine': {
     id: 'gob-fine',
     kind: 'end',
-    title: 'Ritorno al villaggio',
-    body: 'La spedizione è finita.',
-    transit: 'La strada si apre sul villaggio. Chi torna conta i nomi di chi non torna — e chi ha visto sa cosa è costato.',
+    title: 'Return to the village',
+    body: 'The expedition is over.',
+    transit: 'The road opens onto the village. Those who return count the names of those who do not — and those who saw it know what it cost.',
     beat: 7,
   },
 };
@@ -395,20 +396,20 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
  */
 export const GOBLIN_SCENARIO_AUTHORED = {
   id: 'goblin',
-  title: 'Sterminio dei goblin',
-  flavour: 'Il guado è chiuso dalla paura. Sterminateli.',
+  title: 'Goblin Extermination',
+  flavour: 'The ford is closed by fear. Exterminate them.',
   scenarioVersion: 's2.1-goblin-v1',
   startNode: 'gob-inizio',
   primaryStats: ['str', 'perc'] as LabStat[],
   beats: [
-    'Assegnazione',
-    'Esplorazione',
-    'Tesoro',
-    'Assalto',
-    'Combattimento',
-    'Incalzare',
-    'Razzia',
-    'Ritorno',
+    'Assignment',
+    'Exploration',
+    'Treasure',
+    'Assault',
+    'Combat',
+    'Pursuit',
+    'Raid',
+    'Return',
   ],
   /* S4 T-2 epilogue seam — what the return report tells beyond the ledger.
    *  Grants ride records that already exist: the outcome (a title on a
@@ -416,19 +417,19 @@ export const GOBLIN_SCENARIO_AUTHORED = {
   epilogue: {
     titles: [
       {
-        label: 'Sterminatori dei goblin',
+        label: 'Goblin Exterminators',
         requiresOutcome: ['reward'],
       },
     ],
     lore: [
       {
-        label: 'Le ceneri del campo fumano ancora oltre il guado — i carri dei mercanti le vedranno da lontano.',
+        label: 'The ashes of the camp still smoke beyond the ford — the merchants’ wagons will see them from far away.',
         requiresOutcome: ['reward', 'survived'],
       },
     ],
   },
   offer: {
-    objective: 'Sterminare il campo dei goblin al guado.',
+    objective: 'Exterminate the goblin camp at the ford.',
     tags: ['quest', 'combat', 'goblin'],
     /* Slot gates use the CANONICAL resident statTags vocabulary (role gates:
      * edge/fortitude/warden/ward/clarity/precision — see
@@ -439,36 +440,36 @@ export const GOBLIN_SCENARIO_AUTHORED = {
       required: [
         {
           id: 'goblin-slot-leader',
-          label: 'Capo spedizione',
+          label: 'Expedition leader',
           role: 'leader',
           statFocus: ['str'],
-          requirement: { label: 'Capo spedizione', anyOf: ['edge', 'fortitude'] },
+          requirement: { label: 'Expedition leader', anyOf: ['edge', 'fortitude'] },
         },
       ],
       optional: [
         {
           id: 'goblin-slot-member-1',
-          label: 'Combattente',
+          label: 'Fighter',
           role: 'member',
           statFocus: ['str', 'agi'],
-          requirement: { label: 'Combattente', anyOf: ['edge', 'fortitude', 'warden'] },
+          requirement: { label: 'Fighter', anyOf: ['edge', 'fortitude', 'warden'] },
         },
         {
           id: 'goblin-slot-member-2',
-          label: 'Esploratore',
+          label: 'Scout',
           role: 'member',
           statFocus: ['perc', 'int'],
-          requirement: { label: 'Esploratore', anyOf: ['precision', 'clarity'] },
+          requirement: { label: 'Scout', anyOf: ['precision', 'clarity'] },
           /* Director 2026-10-10: NO revealAtPlanning on party slots — intel
            * must come from an external scouting system (explorer building/
            * resident — not yet on /game). The slot is a party role only. */
         },
         {
           id: 'goblin-slot-bodyguard',
-          label: 'Guardia del corpo',
+          label: 'Bodyguard',
           role: 'bodyguard',
           statFocus: ['con', 'str'],
-          requirement: { label: 'Guardia del corpo', anyOf: ['warden', 'fortitude'] },
+          requirement: { label: 'Bodyguard', anyOf: ['warden', 'fortitude'] },
         },
       ],
     },

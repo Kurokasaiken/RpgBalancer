@@ -221,9 +221,11 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               {Math.min(currentBeat + 1, beats.length)}/{beats.length}
             </span>
             {waiting && <span aria-label={t('gameFrame.questWindow.waiting')} title={t('gameFrame.questWindow.waiting')} style={{ width: 8, height: 8, borderRadius: 999, background: 'var(--skin-title-color)', boxShadow: '0 0 8px var(--skin-title-color)' }} />}
-            <IconButton label={t('gameFrame.questWindow.restore')} onClick={() => setMinimised(false)}>
-              <ScrollText style={{ width: 15, height: 15 }} />
-            </IconButton>
+            <span data-hud-controls="" style={{ display: 'inline-flex' }}>
+              <button type="button" aria-label={t('gameFrame.questWindow.restore')} title={t('gameFrame.questWindow.restore')} onClick={() => setMinimised(false)}>
+                <ScrollText aria-hidden />
+              </button>
+            </span>
           </div>
         </HudPlaque>
       </SkinScope>
@@ -246,7 +248,8 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           <h2 style={{ flex: 1, margin: 0, minWidth: 0, fontFamily: FONT.display, fontSize: 16, lineHeight: 1.2, letterSpacing: '0.06em', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {title}
           </h2>
-          {/* What the quest carries — HUD pills, the same controls as the roster header. */}
+          {/* What the quest carries, then minimise and close (X last) — one
+              HUD-controls group, as every floating panel header (guide §5b.1). */}
           <div data-hud-controls style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <button type="button" aria-label={t('gameFrame.questWindow.roster')} title={t('gameFrame.questWindow.roster')} aria-pressed={pop === 'roster'} onClick={() => setPop(pop === 'roster' ? null : 'roster')}>
               <Users aria-hidden />
@@ -259,15 +262,12 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             <button type="button" aria-label={t('gameFrame.questWindow.chronicle')} title={t('gameFrame.questWindow.chronicle')} aria-pressed={pop === 'chronicle'} onClick={() => setPop(pop === 'chronicle' ? null : 'chronicle')}>
               <ScrollText aria-hidden />
             </button>
-          </div>
-          {/* Window controls: quiet glyphs, apart from the data (Director panel idiom). */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 2, paddingLeft: 6, borderLeft: '1px solid color-mix(in srgb, var(--skin-surface-border) 35%, transparent)' }}>
-            <WindowGlyph label={t('gameFrame.questWindow.minimise')} onClick={() => setMinimised(true)}>
-              <Minus />
-            </WindowGlyph>
-            <WindowGlyph label={t('gameFrame.panels.close')} onClick={onClose}>
-              <X />
-            </WindowGlyph>
+            <button type="button" data-keep="" aria-label={t('gameFrame.questWindow.minimise')} title={t('gameFrame.questWindow.minimise')} onClick={() => setMinimised(true)}>
+              <Minus aria-hidden />
+            </button>
+            <button type="button" data-keep="" aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} onClick={onClose}>
+              <X aria-hidden />
+            </button>
           </div>
         </div>
 
@@ -336,7 +336,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               </div>
               {c.flavor && <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.45, color: TONE.label }}>{c.flavor}</p>}
               {c.harmLines.map((line, i) => (
-                <Line key={i} tone={/non si rialza/.test(line) ? 'death' : 'warn'}>{line}</Line>
+                <Line key={i} tone={c.deathLines?.includes(line) ? 'death' : 'warn'}>{line}</Line>
               ))}
               {c.authoredText && <Line tone="secondary">{c.authoredText}</Line>}
             </div>
@@ -424,46 +424,6 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
 };
 
 /* ------------------------------------------------------------------ */
-
-const IconButton: React.FC<{ label: string; active?: boolean; onClick: () => void; children: React.ReactNode }> = ({ label, active, onClick, children }) => (
-  <button
-    type="button"
-    aria-label={label}
-    title={label}
-    aria-pressed={active}
-    onClick={onClick}
-    style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 4,
-      height: 26,
-      padding: '0 6px',
-      borderRadius: 6,
-      cursor: 'pointer',
-      color: active ? 'var(--skin-title-color)' : TONE.label,
-      background: active ? 'color-mix(in srgb, var(--skin-title-color) 14%, transparent)' : 'transparent',
-      border: `1px solid ${active ? 'color-mix(in srgb, var(--skin-title-color) 45%, transparent)' : 'transparent'}`,
-    }}
-  >
-    {children}
-  </button>
-);
-
-/** Window controls (minimise, close): bare glyphs on the plaque, in the choice-row material so no bronze plate. */
-const WindowGlyph: React.FC<{ label: string; onClick: () => void; children: React.ReactElement<{ style?: CSSProperties }> }> = ({ label, onClick, children }) => (
-  <span data-hud-choices style={{ display: 'inline-flex' }}>
-    <button
-      type="button"
-      data-skin="choice"
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      style={{ display: 'inline-grid', gridTemplateColumns: '1fr', placeItems: 'center', width: 26, height: 26, padding: 0, borderLeft: 0, color: TONE.label }}
-    >
-      {React.cloneElement(children, { style: { width: 15, height: 15 } })}
-    </button>
-  </span>
-);
 
 /** One micro bar per party member inside the roster pill: the party's state without opening anything. */
 const PartyPips: React.FC<{ run: QuestRunState }> = ({ run }) => (
@@ -599,9 +559,11 @@ const BeatStage: React.FC<{
             : t('gameFrame.questWindow.beats.continue')}
         </span>
         {remaining > 0 && (
-          <button type="button" onClick={(e) => { e.stopPropagation(); onFlush(); }} style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}>
-            {t('gameFrame.questWindow.beats.skipAll')}
-          </button>
+          <span data-hud-controls="" style={{ display: 'inline-flex' }}>
+            <button type="button" onClick={(e) => { e.stopPropagation(); onFlush(); }}>
+              <span>{t('gameFrame.questWindow.beats.skipAll')}</span>
+            </button>
+          </span>
         )}
       </span>
     </div>

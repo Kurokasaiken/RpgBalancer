@@ -1,16 +1,17 @@
 /**
- * QuestScenario «Le Rovine sotto il Fiume» — canonical authored config
- * (PLAN-019-S2.1, T-3: migration 1:1 from `questS1Lab/questScenarioRovine.ts`).
+ * QuestScenario «The Ruins beneath the River» — canonical authored config
+ * (PLAN-019-S2.1, T-3: migration 1:1 from `questS1Lab/questScenarioRovine.ts`;
+ * R-135: English re-baseline of all authored prose).
  *
- * Director mockup 2026-10-04. Exploration/recovery profile on FORZA:
+ * Director mockup 2026-10-04. Exploration/recovery profile on STRENGTH:
  * attrition gauntlet where the currency of loss is HP and TIME (days), not
  * camp alertness. Same engine, different shape: merchant = check-choice
  * (safe info vs risky pressure), mandatory river, variance-vs-certainty
  * guards, trap cascade in the treasure room, checkpoint push-your-luck with
  * VISIBLE stake (gold + days + wounded), unavoidable attrition, deep chamber,
- * return event with an economic callback (the coagulo won at the merchant
+ * return event with an economic callback (the clotting agent won at the merchant
  * sells to a wounded traveler for more than its worth), and a report-style
- * epilogue that costs the run in human-days.
+ * epilogue that costs the run in man-days.
  *
  * Not a general engine: post-verdict routing of check nodes is hardcoded per
  * node id in `questRun.applyNodeOutcome` (invariant I-3 — engine unchanged).
@@ -27,24 +28,24 @@ import {
 } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 
 const ROVINE_NODES: Record<string, QuestNode> = {
-  /* ---- FASE I — il mercante: safe info vs risky pressure ---------------- */
+  /* ---- PHASE I — the merchant: safe info vs risky pressure -------------- */
   'rv-mercante': {
     id: 'rv-mercante',
     kind: 'choice',
-    title: 'Il mercante dell’entrata',
-    body: 'Un mercante sostiene di aver trovato un’antica entrata sotto il fiume. Non è riuscito a entrare — ma sa più di quanto dice.',
+    title: 'The merchant at the entrance',
+    body: 'A merchant claims to have found an ancient entrance beneath the river. He could not get in — but he knows more than he says.',
     beat: 0,
     options: [
       {
         id: 'rv-osserva',
-        label: 'Osservare',
-        detail: 'Percezione. Rischio quasi nullo: informazioni sulla zona.',
+        label: 'Observe him',
+        detail: 'Perception. Almost no risk: information about the area.',
         next: 'CHECK:rv-check-osserva',
       },
       {
         id: 'rv-incalza',
-        label: 'Incalzare il mercante',
-        detail: 'Forza + Percezione. Più informazioni, un possibile extra — e un piccolo rischio.',
+        label: 'Press the merchant',
+        detail: 'Strength + Perception. More information, a possible extra — and a small risk.',
         next: 'CHECK:rv-check-incalza',
       },
     ],
@@ -52,8 +53,8 @@ const ROVINE_NODES: Record<string, QuestNode> = {
   'rv-check-osserva': {
     id: 'rv-check-osserva',
     kind: 'check',
-    title: 'Leggere il mercante',
-    body: 'Lo studiate mentre parla: mani, sguardo, ciò che evita di dire.',
+    title: 'Reading the merchant',
+    body: 'You study him as he talks: hands, eyes, what he avoids saying.',
     stats: ['perc'],
     risk: { wound: 2, death: 0 },
     risky: true,
@@ -62,44 +63,44 @@ const ROVINE_NODES: Record<string, QuestNode> = {
   'rv-check-incalza': {
     id: 'rv-check-incalza',
     kind: 'check',
-    title: 'Incalzare il mercante',
-    body: 'Lo prendete per il bavero della giacca: vuole i vostri soldi, ma voi volete la verità.',
+    title: 'Pressing the merchant',
+    body: 'You grab him by the collar of his jacket: he wants your money, but you want the truth.',
     stats: ['str', 'perc'],
     risk: { wound: 8, death: 0 },
     risky: true,
     beat: 0,
-    failHint: 'vi caccia malamente — nessuna informazione, e partite peggio.',
+    failHint: 'he throws you out badly — no information, and you start worse off.',
   },
-  /* ---- FASE II — il fiume sotterraneo: mandatory, no choice ------------- */
+  /* ---- PHASE II — the underground river: mandatory, no choice ----------- */
   'rv-fiume': {
     id: 'rv-fiume',
     kind: 'check',
-    title: 'Il fiume sotterraneo',
-    body: 'Il passaggio obbligatorio. L’acqua è gelida e la corrente spinge il gruppo contro la parete — qui non si sceglie, si resiste.',
+    title: 'The underground river',
+    body: 'The mandatory passage. The water is freezing and the current pushes the party against the wall — here you do not choose, you endure.',
     stats: ['str', 'con'],
     risk: { wound: 20, death: 3 },
     risky: true,
     beat: 1,
-    failHint: 'la corrente vi trascina: +1–2 giorni e conseguenze fisiche.',
+    failHint: 'the current drags you: +1–2 days and physical consequences.',
   },
-  /* ---- FASE III — le guardie: variance vs certainty --------------------- */
+  /* ---- PHASE III — the guards: variance vs certainty -------------------- */
   'rv-guardie': {
     id: 'rv-guardie',
     kind: 'choice',
-    title: 'Le guardie nella galleria',
-    body: 'Due guardie stanno davanti al passaggio. Potete sparire nell’ombra — o pagare il passaggio in sangue e prendere il loro bottino.',
+    title: 'The guards in the gallery',
+    body: 'Two guards stand before the passage. You can vanish into the shadows — or pay the passage in blood and take their loot.',
     beat: 2,
     options: [
       {
         id: 'rv-sneak',
-        label: 'Passare di soppiatto',
-        detail: 'Destrezza. Successo: nessun danno. Fail: ferita. Tutto o niente.',
+        label: 'Sneak past',
+        detail: 'Agility. Success: no damage. Fail: a wound. All or nothing.',
         next: 'CHECK:rv-check-sneak',
       },
       {
         id: 'rv-fight',
-        label: 'Affrontarle',
-        detail: 'Forza. Costa sempre qualcosa — ma il bottino delle guardie è vostro se vincete.',
+        label: 'Fight them',
+        detail: 'Strength. Always costs something — but the guards’ loot is yours if you win.',
         next: 'CHECK:rv-check-fight',
       },
     ],
@@ -107,65 +108,65 @@ const ROVINE_NODES: Record<string, QuestNode> = {
   'rv-check-sneak': {
     id: 'rv-check-sneak',
     kind: 'check',
-    title: 'Di soppiatto oltre le guardie',
-    body: 'Pietre smosse e respiri trattenuti. Se vi vedono, le picche non chiedono permesso.',
+    title: 'Sneaking past the guards',
+    body: 'Loose stones and held breaths. If they see you, the pikes do not ask permission.',
     stats: ['agi'],
     risk: { wound: 18, death: 4 },
     risky: true,
     beat: 2,
-    failHint: 'vi vedono: danno diretto, e le guardie restano tra voi e l’uscita.',
+    failHint: 'they see you: direct damage, and the guards stay between you and the exit.',
   },
   'rv-check-fight': {
     id: 'rv-check-fight',
     kind: 'check',
-    title: 'Affrontare le guardie',
-    body: 'Due picche contro quattro di voi. Si vince in fretta o si paga in sangue — comunque si paga.',
+    title: 'Fighting the guards',
+    body: 'Two pikes against four of you. Win fast or pay in blood — either way you pay.',
     stats: ['str'],
     risk: { wound: 22, death: 6 },
     risky: true,
     beat: 2,
-    failHint: 'le picche fanno il loro lavoro: danni seri, niente bottino.',
+    failHint: 'the pikes do their job: serious damage, no loot.',
   },
-  /* ---- FASE IV — la sala del tesoro + trappola cascade ------------------- */
+  /* ---- PHASE IV — the treasure room + trap cascade ----------------------- */
   'rv-sala': {
     id: 'rv-sala',
     kind: 'check',
-    title: 'La sala del tesoro',
-    body: 'Il tesoro è lì, alla luce delle torce. Ma qualcosa non torna: troppo facile, troppo in vista.',
+    title: 'The treasure room',
+    body: 'The treasure is there, in the torchlight. But something is off: too easy, too exposed.',
     stats: ['perc'],
     risk: { wound: 5, death: 0 },
     risky: true,
     beat: 3,
-    failHint: 'non vedete la trappola — scatta mentre entrate.',
+    failHint: 'you miss the trap — it springs as you walk in.',
   },
   'rv-check-trappola': {
     id: 'rv-check-trappola',
     kind: 'check',
-    title: 'La trappola scatta',
-    body: 'Il pavimento cede. La caverna si chiude su di voi — uscirne è la sola cosa che conta.',
+    title: 'The trap springs',
+    body: 'The floor gives way. The cavern closes on you — getting out is the only thing that matters.',
     stats: ['agi', 'con'],
     risk: { wound: 25, death: 8 },
     risky: true,
     beat: 3,
-    failHint: 'feriti, forse peggio. E il tesoro si danneggia nella caduta.',
+    failHint: 'wounded, maybe worse. And the treasure is damaged in the fall.',
   },
   'rv-tesoro-scelta': {
     id: 'rv-tesoro-scelta',
     kind: 'choice',
-    title: 'Il tesoro davanti a voi',
-    body: 'Prenderlo in fretta, o cercare un modo sicuro — tempo contro sicurezza contro valore.',
+    title: 'The treasure before you',
+    body: 'Take it fast, or find a safe way — time against safety against value.',
     beat: 3,
     options: [
       {
         id: 'rv-prendi',
-        label: 'Prendere il tesoro',
-        detail: 'Forza + Costituzione per portarlo via. Ricompensa normale, nessun giorno extra.',
+        label: 'Take the treasure',
+        detail: 'Strength + Constitution to haul it away. Normal reward, no extra days.',
         next: 'CHECK:rv-check-prendi',
       },
       {
         id: 'rv-sicuro',
-        label: 'Cercare un modo sicuro',
-        detail: '+1 giorno. Più sicuro, e forse più ricco: studiate i meccanismi della sala.',
+        label: 'Look for a safe way',
+        detail: '+1 day. Safer, and maybe richer: you study the room’s mechanisms.',
         next: 'CHECK:rv-check-sicuro',
         costDays: 1,
       },
@@ -174,80 +175,80 @@ const ROVINE_NODES: Record<string, QuestNode> = {
   'rv-check-prendi': {
     id: 'rv-check-prendi',
     kind: 'check',
-    title: 'Caricare il tesoro',
-    body: 'Monete, calici, un cofanetto antico. È peso — e il peso si porta con la schiena.',
+    title: 'Loading the treasure',
+    body: 'Coins, chalices, an ancient chest. It is weight — and weight rides on the back.',
     stats: ['str', 'con'],
     risk: { wound: 15, death: 3 },
     risky: true,
     beat: 3,
-    failHint: 'fatica e cadute: parte del tesoro resta a terra.',
+    failHint: 'strain and falls: part of the treasure stays on the ground.',
   },
   'rv-check-sicuro': {
     id: 'rv-check-sicuro',
     kind: 'check',
-    title: 'Il modo sicuro',
-    body: 'Studiate le lastre, i pesi, i contrappesi. +1 giorno di lavoro — ma la sala vi paga l’attenzione.',
+    title: 'The safe way',
+    body: 'You study the slabs, the weights, the counterweights. +1 day of work — but the room pays for the attention.',
     stats: ['str', 'con'],
     risk: { wound: 8, death: 1 },
     risky: true,
     beat: 3,
-    failHint: 'il modo «sicuro» non era poi così sicuro.',
+    failHint: 'the “safe” way was not that safe after all.',
   },
   /* ---- CHECKPOINT — the stake is visible, the bet is yours --------------- */
   'rv-checkpoint': {
     id: 'rv-checkpoint',
     kind: 'choice',
-    title: 'Tesoro in mano — tornare o continuare?',
-    body: 'Avete il tesoro. Davanti a voi c’è un altro passaggio, più in basso. Ogni cosa che portate può ancora essere persa.',
+    title: 'Treasure in hand — turn back or push on?',
+    body: 'You have the treasure. Ahead lies another passage, deeper down. Everything you carry can still be lost.',
     beat: 4,
     options: [
       {
         id: 'rv-torna',
-        label: 'Tornare al villaggio',
-        detail: 'Conservate tutto ciò che avete trovato.',
+        label: 'Return to the village',
+        detail: 'You keep everything you found.',
         next: 'rv-ritorno-evento',
       },
       {
         id: 'rv-continua',
-        label: 'Continuare a esplorare',
-        detail: 'Potrebbe esserci qualcosa di molto più prezioso. Costa comunque qualcosa.',
+        label: 'Keep exploring',
+        detail: 'There may be something far more precious. It costs something either way.',
         next: 'rv-attrito',
       },
     ],
   },
-  /* ---- FASE V — attrition without a check (no check can remove this cost) */
+  /* ---- PHASE V — attrition without a check (no check can remove this cost) */
   'rv-attrito': {
     id: 'rv-attrito',
     kind: 'harm',
-    title: 'La zona instabile',
-    body: 'Il passaggio conduce a una seconda camera attraverso pietra che scricchiola. Non c’è check che annulli questo costo: attraversarla paga sempre dazio.',
+    title: 'The unstable zone',
+    body: 'The passage leads to a second chamber through groaning stone. No check erases this cost: crossing it always pays a toll.',
     next: 'rv-camera',
     beat: 4,
   },
-  /* ---- FASE VI — la camera profonda: the optional reward ----------------- */
+  /* ---- PHASE VI — the deep chamber: the optional reward ------------------ */
   'rv-camera': {
     id: 'rv-camera',
     kind: 'check',
-    title: 'La camera profonda',
-    body: 'Un antico deposito, intatto da secoli. Quello che riuscirete a tirar fuori dipende da quanta schiena vi resta.',
+    title: 'The deep chamber',
+    body: 'An ancient vault, untouched for centuries. What you manage to haul out depends on how much back you have left.',
     stats: ['str', 'con'],
     risk: { wound: 18, death: 4 },
     risky: true,
     beat: 5,
-    failHint: '+1–2 giorni per poco: il deposito era già stato svuotato quasi tutto.',
+    failHint: '+1–2 days for little: the vault had already been almost emptied.',
   },
-  /* ---- FASE VII — ritorno: the wounded man on the road ------------------- */
+  /* ---- PHASE VII — return: the wounded man on the road ------------------- */
   'rv-ritorno-evento': {
     id: 'rv-ritorno-evento',
     kind: 'choice',
-    title: 'Il ferito sulla strada',
-    body: 'Sulla via del ritorno trovate un uomo ferito, abbandonato dai suoi. Vi guarda come si guarda un’ultima possibilità.',
+    title: 'The wounded man on the road',
+    body: 'On the way home you find a wounded man, abandoned by his own. He looks at you the way one looks at a last chance.',
     beat: 6,
     options: [
       {
         id: 'rv-aiuta',
-        label: 'Aiutarlo — cedergli il coagulo',
-        detail: 'Consuma il coagulo del mercante. Vi ripagherà più di quanto vale.',
+        label: 'Help him — give him the clotting agent',
+        detail: 'Consumes the merchant’s clotting agent. He will repay you more than it is worth.',
         next: 'rv-fine',
         requiresFlag: 'hasCoagulo',
         consumesFlag: 'hasCoagulo',
@@ -256,8 +257,8 @@ const ROVINE_NODES: Record<string, QuestNode> = {
       },
       {
         id: 'rv-porta',
-        label: 'Prenderlo con voi',
-        detail: '+1 giorno e lo portate al villaggio — potrebbe ricordarsi di voi.',
+        label: 'Take him with you',
+        detail: '+1 day and you bring him to the village — he may remember you.',
         next: 'rv-fine',
         costDays: 1,
         grantsGold: 20,
@@ -266,8 +267,8 @@ const ROVINE_NODES: Record<string, QuestNode> = {
       },
       {
         id: 'rv-lascia',
-        label: 'Lasciarlo',
-        detail: 'Nessun costo. Nessun guadagno. La strada ricorderà.',
+        label: 'Leave him',
+        detail: 'No cost. No gain. The road will remember.',
         next: 'rv-fine',
         sets: 'viandanteLasciato',
       },
@@ -276,8 +277,8 @@ const ROVINE_NODES: Record<string, QuestNode> = {
   'rv-fine': {
     id: 'rv-fine',
     kind: 'end',
-    title: 'Ritorno al villaggio',
-    body: 'La spedizione è finita.',
+    title: 'Return to the village',
+    body: 'The expedition is over.',
     beat: 6,
   },
 };
@@ -290,26 +291,26 @@ const ROVINE_NODES: Record<string, QuestNode> = {
  */
 export const ROVINE_SCENARIO_AUTHORED = {
   id: 'rovine',
-  title: 'Le Rovine sotto il Fiume',
+  title: 'The Ruins beneath the River',
   scenarioVersion: 's2.1-rovine-v1',
   startNode: 'rv-mercante',
   primaryStats: ['str', 'con'] as LabStat[],
   beats: [
-    'Il mercante',
-    'Il fiume',
-    'Le guardie',
-    'La sala del tesoro',
-    'Oltre',
-    'La camera profonda',
-    'Il ritorno',
+    'The merchant',
+    'The river',
+    'The guards',
+    'The treasure room',
+    'Beyond',
+    'The deep chamber',
+    'The return',
   ],
   intelLabels: {
-    guardiePiuAvanti: 'le guardie proteggono qualcosa più avanti',
-    mappaRovine: 'la mappa approssimativa delle rovine',
-    contattoViandante: 'il viandante che vi deve un favore',
+    guardiePiuAvanti: 'the guards are protecting something further on',
+    mappaRovine: 'the rough map of the ruins',
+    contattoViandante: 'the traveler who owes you a favor',
   },
   offer: {
-    objective: 'Recuperare il tesoro delle rovine sotto il fiume.',
+    objective: 'Recover the treasure from the ruins beneath the river.',
     tags: ['quest', 'exploration', 'ruins'],
     /* Slot gates use the CANONICAL resident statTags vocabulary (role gates:
      * edge/fortitude/warden/ward/clarity/precision — numeric stat keys are
@@ -318,33 +319,33 @@ export const ROVINE_SCENARIO_AUTHORED = {
       required: [
         {
           id: 'rovine-slot-leader',
-          label: 'Capo spedizione',
+          label: 'Expedition leader',
           role: 'leader',
           statFocus: ['str', 'con'],
-          requirement: { label: 'Capo spedizione', anyOf: ['fortitude', 'edge'] },
+          requirement: { label: 'Expedition leader', anyOf: ['fortitude', 'edge'] },
         },
       ],
       optional: [
         {
           id: 'rovine-slot-member-1',
-          label: 'Portatore',
+          label: 'Porter',
           role: 'member',
           statFocus: ['str', 'con'],
-          requirement: { label: 'Portatore', anyOf: ['edge', 'fortitude', 'warden'] },
+          requirement: { label: 'Porter', anyOf: ['edge', 'fortitude', 'warden'] },
         },
         {
           id: 'rovine-slot-member-2',
-          label: 'Portatore',
+          label: 'Porter',
           role: 'member',
           statFocus: ['str', 'con'],
-          requirement: { label: 'Portatore', anyOf: ['edge', 'fortitude', 'warden'] },
+          requirement: { label: 'Porter', anyOf: ['edge', 'fortitude', 'warden'] },
         },
         {
           id: 'rovine-slot-esploratore',
-          label: 'Esploratore',
+          label: 'Scout',
           role: 'member',
           statFocus: ['perc', 'agi'],
-          requirement: { label: 'Esploratore', anyOf: ['clarity', 'precision'] },
+          requirement: { label: 'Scout', anyOf: ['clarity', 'precision'] },
         },
       ],
     },

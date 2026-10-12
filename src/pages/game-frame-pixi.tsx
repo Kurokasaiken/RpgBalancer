@@ -1,9 +1,12 @@
-import { cloneElement, isValidElement, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
+import { cloneElement, isValidElement, startTransition, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DndContext, pointerWithin } from '@dnd-kit/core';
+import { DndContext, MeasuringStrategy, pointerWithin } from '@dnd-kit/core';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { GameFrameScreen } from './game-frame';
-import { DEFAULT_MAP_TUNE, PixiWorldMap, type PixiMapAnchor, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { DEFAULT_MAP_TUNE, PixiWorldMap, type PixiBootProgress, type PixiMapAnchor, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { GameBootScreen, type GameBootPhase } from '@/ui/idleVillage/components/gameFrame/GameBootScreen';
+import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { installGamePerfProbe } from '@/ui/idleVillage/utils/gamePerfProbe';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { MatericRosterComponent } from '@/ui/idleVillage/roster';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
@@ -15,7 +18,7 @@ import { questAvailability } from '@/ui/idleVillage/components/gameFrame/questAv
 import { DEFAULT_SEA_PATTERN_CONFIG } from '@/ui/idleVillage/components/WorldSurfaceSeaPatternOverlay';
 import { DEFAULT_COAST_FOAM_CONFIG } from '@/ui/idleVillage/components/WorldSurfaceCoastFoam';
 import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/resolveWorldManifest';
-import { RosterKitShell } from '@/ui/idleVillage/frozen/kits/rosterKit';
+import { RosterKitShell, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
@@ -33,6 +36,7 @@ import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { EXPIRE_FADE_MS, MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
+import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente.webp';
 import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type TuningField } from '@/ui/idleVillage/components/gameFrame';
@@ -54,6 +58,16 @@ import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHudPanels, t
 const INVASION_WARNING_DAYS = 5;
 /** The announcement card against the map: smaller than on World Surface, where the map is shown closer. */
 const INVASION_CARD_SIZE = 0.75;
+/** The card in the viewport: 1 = its 460px design width, so it reads at a player's screen size. */
+const INVASION_SCREEN_SCALE = 1;
+/** How long the ledger stays open to show a new event when the player had it closed. */
+const LEDGER_PEEK_MS = 1000;
+/** The goblin walks from where it lands to the village over this many game days (PLAN-033 T-004). */
+const INVASION_MARCH_DAYS = 30;
+/** Normalised map points: where the sticker lands on the forest, and the village it marches on. */
+const INVASION_LAND = { x: 0.239, y: 0.417 } as const;
+const INVASION_VILLAGE = { x: 0.486, y: 0.554 } as const;
+const INVASION_KEY = 'invasion_v1';
 const TUNING_KEY = 'hud_tuning_v1';
 /** POIs whose quest has run to completion: once the expedition report is
  *  dismissed the marker leaves the map for good (PLAN-019-S2.5 terminal
@@ -140,7 +154,7 @@ export default function GameFramePixiPage() {
     [motion],
   );
   const poi = questPois[0];
-  const { t } = useTranslation('idleVillage');
+  const { t, ready: i18nReady } = useTranslation('idleVillage');
   const Roster = useHudMaterial() === 'lacquer' ? MatericRosterComponentV2 : MatericRosterComponent;
   const [questShown, setQuestShown] = useState(false);
   // Dev comparison of the two skins from the Director panel (`?skin=` sets the starting one).
@@ -152,7 +166,19 @@ export default function GameFramePixiPage() {
   const [poiDemo, setPoiDemo] = useState(false);
   const [wonderRequest, setWonderRequest] = useState(0);
   const [regionHover, setRegionHover] = useState<PixiRegionHover | null>(null);
-  const [invasion, setInvasion] = useState<{ dueDay: number } | null>(null);
+  const [invasion, setInvasion] = useState<{ dueDay: number; startDay: number } | null>(null);
+  // The march is a function of the game day, so the start day is what survives a reload; position is derived from it.
+  const invasionLoadedRef = useRef(false);
+  useEffect(() => {
+    void loadData<{ dueDay: number; startDay: number } | null>(INVASION_KEY, null).then((stored) => {
+      if (stored && typeof stored.dueDay === 'number' && typeof stored.startDay === 'number') setInvasion(stored);
+      invasionLoadedRef.current = true;
+    });
+  }, []);
+  useEffect(() => {
+    if (!invasionLoadedRef.current) return;
+    void saveData(INVASION_KEY, invasion);
+  }, [invasion]);
   // Goblin invasion, as on /world-surface: the parchment curtains close over the map, the announcement card
   // appears at the peak, and confirming it opens the curtains and puts the threat in the ledger.
   const [shroudCovered, setShroudCovered] = useState(false);
@@ -192,8 +218,11 @@ export default function GameFramePixiPage() {
   useEffect(() => {
     const hooks = ((window as unknown as { __idleVillageTestHooks?: Record<string, unknown> }).__idleVillageTestHooks ??= {});
     hooks.revealQuestPois = () => setQuestShown(true);
+    // E2E seam: close the shroud and let the announcement card open at its peak, as the Director's invasion does.
+    hooks.startInvasion = () => setShroudCovered(true);
     return () => {
       delete hooks.revealQuestPois;
+      delete hooks.startInvasion;
     };
   }, []);
 
@@ -393,6 +422,17 @@ export default function GameFramePixiPage() {
 
   const anchors = useMemo<PixiMapAnchor[]>(() => {
     const list: PixiMapAnchor[] = [];
+    if (invasion) {
+      // The goblin is on the map from the day it lands: it walks from the landing point to the village in
+      // INVASION_MARCH_DAYS game days. Progress is clamped, so after the march it waits at the village.
+      const progress = Math.min(1, Math.max(0, (currentDay - invasion.startDay) / INVASION_MARCH_DAYS));
+      list.push({
+        id: 'invasion-goblin',
+        x: (INVASION_LAND.x + (INVASION_VILLAGE.x - INVASION_LAND.x) * progress) * 4240,
+        y: (INVASION_LAND.y + (INVASION_VILLAGE.y - INVASION_LAND.y) * progress) * 2828,
+        node: <img src={goblinStickerImage} alt="" style={{ width: 300, pointerEvents: 'none', filter: 'drop-shadow(0 12px 22px rgba(0,0,0,0.55))' }} />,
+      });
+    }
     /* Real quest POIs (S2.4 + R-127/R-143): the medallion is the planning
      *  entry and, once launched, the run's halo clock. Nothing pins at boot —
      *  a marker mounts only while «Mostra quest» reveals the real offers/runs;
@@ -427,7 +467,7 @@ export default function GameFramePixiPage() {
     }
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poi, questShown, session, poiDemo, currentTick, dayLengthTicks, consumedPoiIds, expeditionGoblin.poiView, expeditionGoblin.run, expeditionRovine.poiView, expeditionRovine.run]);
+  }, [poi, questShown, session, poiDemo, currentTick, dayLengthTicks, consumedPoiIds, expeditionGoblin.poiView, expeditionGoblin.run, expeditionRovine.poiView, expeditionRovine.run, invasion, currentDay]);
 
   /* Exit transformation (R-127): an anchor that leaves the set stays mounted
    *  one beat longer — its node re-rendered with `exiting` plays the same
@@ -472,6 +512,85 @@ export default function GameFramePixiPage() {
     }
     return list;
   }, [anchors, anchorGhosts]);
+
+  /* Title veil (PLAN-031 T-A1): real progress from the map's parallel boot
+   * pipeline plus the page-level gates — tuning, consumed POIs, i18n — so the
+   * reveal never shows a half-built world. `veilGone` latches: tuning/panel
+   * changes may rebuild the map and re-fire onReady, but the veil never returns. */
+  const [boot, setBoot] = useState<{ phase: GameBootPhase; loaded: number; total: number }>({ phase: 'manifest', loaded: 0, total: 0 });
+  const [mapReady, setMapReady] = useState(false);
+  const [bootError, setBootError] = useState<string | null>(null);
+  const [warmDone, setWarmDone] = useState(false);
+  const [veilGone, setVeilGone] = useState(false);
+  const bootMarksRef = useRef(new Set<string>(['manifest']));
+  const bootStartedAtRef = useRef(performance.now());
+  useEffect(() => {
+    try {
+      performance.mark('game-boot:start');
+    } catch {
+      /* marks are best-effort */
+    }
+  }, []);
+  /* `window.__gamePerf` (PLAN-031 T-B1): the perf probe the e2e spec and manual
+   * runs drive — dev builds and the playwright preview only, never production. */
+  useEffect(() => {
+    if (!(import.meta.env.DEV || import.meta.env.MODE === 'playwright')) return;
+    installGamePerfProbe();
+  }, []);
+  /* Progress lands in a ref and flushes 10x/s: a setState per resolved asset
+   * would re-render the whole page dozens of times exactly while the main
+   * thread is busiest decoding. */
+  const bootRef = useRef(boot);
+  const handleBootProgress = useCallback((progress: PixiBootProgress) => {
+    bootRef.current = { phase: progress.phase, loaded: progress.loaded, total: progress.total };
+    if (!bootMarksRef.current.has(progress.phase)) {
+      bootMarksRef.current.add(progress.phase);
+      try {
+        performance.mark(`game-boot:${progress.phase}`);
+      } catch {
+        /* marks are best-effort */
+      }
+    }
+  }, []);
+  useEffect(() => {
+    if (veilGone) return undefined;
+    const flush = window.setInterval(() => {
+      const next = bootRef.current;
+      setBoot((prev) => (prev.phase === next.phase && prev.loaded === next.loaded && prev.total === next.total ? prev : next));
+    }, 100);
+    return () => window.clearInterval(flush);
+  }, [veilGone]);
+  const handleMapReady = useCallback(() => setMapReady(true), []);
+  const handleBootError = useCallback((message: string) => setBootError(message), []);
+  const bootGatesReady = tuningLoaded && consumedPoiIds !== null && mapReady && i18nReady;
+
+  /* DOM warm-up behind the veil (T-A5): roster/medal images decoded and fonts
+   * settled, so the first drag of a PG card pays nothing cold. */
+  useEffect(() => {
+    if (!bootGatesReady || warmDone) return undefined;
+    let cancelled = false;
+    const decodes = Array.from(document.querySelectorAll('img'))
+      .slice(0, 120)
+      .map((img) => (img.complete ? Promise.resolve() : img.decode().catch(() => undefined)));
+    void Promise.allSettled([...decodes, document.fonts?.ready ?? Promise.resolve()]).then(() => {
+      if (!cancelled) setWarmDone(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [bootGatesReady, warmDone]);
+  const bootDone = bootGatesReady && warmDone;
+
+  /* Boot timing evidence (T-A6): a dev-readable handle the perf harness reads
+   * for the first-interactive metric, plus one telemetry event per boot. */
+  const bootReportedRef = useRef(false);
+  useEffect(() => {
+    if (!veilGone || bootReportedRef.current) return;
+    bootReportedRef.current = true;
+    const interactiveMs = Math.round(performance.now() - bootStartedAtRef.current);
+    (window as unknown as { __gameBoot?: Record<string, number> }).__gameBoot = { interactiveMs };
+    trackTelemetryEvent('game_boot_complete', { interactiveMs });
+  }, [veilGone]);
 
   const directorActions = useMemo<DirectorAction[]>(
     () => [
@@ -532,17 +651,40 @@ export default function GameFramePixiPage() {
 
   return (
     <TooltipProvider>
+      {!veilGone && (
+        <GameBootScreen
+          phase={boot.phase}
+          indeterminate={boot.total === 0}
+          fraction={boot.total > 0 ? boot.loaded / boot.total : 0}
+          done={bootDone}
+          error={bootError}
+          onExited={() => setVeilGone(true)}
+        />
+      )}
       <RosterKitShell>
         <DndContext
           sensors={session.sensors}
           collisionDetection={pointerWithin}
+          /* Pre-measure droppable rects while idle (BeforeDragging): the default
+           * WhileDragging defers all getBoundingClientRect reads to the activation
+           * frame, where they land as one forced-layout spike (~1 long frame at
+           * pickup, PLAN-031 T-B4). Droppables don't move mid-drag, so cached
+           * rects keep collision detection correct. */
+          measuring={{ droppable: { strategy: MeasuringStrategy.BeforeDragging } }}
           onDragStart={(event: DragStartEvent) => {
-            session.handleDragStart(event);
-            expeditions.forEach((exp) => exp.handleDragStart(event));
+            /* Drag-start re-renders the whole page (anchors, roster, HUD). Marking
+             * it a transition makes that render interruptible — React splits it
+             * across frames instead of one ~117ms block at pickup (PLAN-031 T-B4). */
+            startTransition(() => {
+              session.handleDragStart(event);
+              expeditions.forEach((exp) => exp.handleDragStart(event));
+            });
           }}
           onDragCancel={() => {
-            session.setDraggingResidentId(null);
-            expeditions.forEach((exp) => exp.setDraggingResidentId(null));
+            startTransition(() => {
+              session.setDraggingResidentId(null);
+              expeditions.forEach((exp) => exp.setDraggingResidentId(null));
+            });
           }}
         >
           <GameFrameScreen
@@ -555,15 +697,24 @@ export default function GameFramePixiPage() {
                 componentId="game-frame-roster"
                 density="compact"
                 useExternalDndContext
-                onDragEnd={(event: DragEndEvent) =>
+                onDragEnd={(event: DragEndEvent) => {
                   /* Ownership by droppable id: an expedition slot consumes
                    * the drop; anything else falls to the activity session.
                    * `false` (rejected) is a verdict too — it must not fall
-                   * through, or a refused drop would land elsewhere. */
-                  expeditionGoblin.handleDragEnd(event) ??
-                  expeditionRovine.handleDragEnd(event) ??
-                  session.handleDragEnd(event)
-                }
+                   * through, or a refused drop would land elsewhere.
+                   * The drop commits the same page-wide render as drag-start —
+                   * the transition splits it across frames (PLAN-031 T-B4).
+                   * `startTransition` runs its scope synchronously, so the
+                   * verdict is still captured in time. */
+                  let verdict: RosterDropVerdict;
+                  startTransition(() => {
+                    verdict =
+                      expeditionGoblin.handleDragEnd(event) ??
+                      expeditionRovine.handleDragEnd(event) ??
+                      session.handleDragEnd(event);
+                  });
+                  return verdict!;
+                }}
                 onFlightComplete={(residentId, slotId) => {
                   const owner = expeditions.find((exp) => exp.ownsSlotId(slotId));
                   if (owner) owner.handleFlightComplete(residentId, slotId);
@@ -593,6 +744,38 @@ export default function GameFramePixiPage() {
             extraEvents={extraEvents}
             overlaySlot={
               <>
+                {/* The announcement lives in the viewport, centred on the free area the HUD leaves (not on the world canvas,
+                 *  which sits under the chrome). `safeFit` is the same inset set that frames the land. */}
+                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 13 }}>
+                  <WorldSurfaceEventCard
+                    visible={cardOpen}
+                    zIndex={1}
+                    screenAnchor={{
+                      left: `calc(${safeFit?.insets.left ?? 0}px + (100% - ${(safeFit?.insets.left ?? 0) + (safeFit?.insets.right ?? 0)}px) / 2)`,
+                      top: `calc(${safeFit?.insets.top ?? 0}px + (100% - ${(safeFit?.insets.top ?? 0) + (safeFit?.insets.bottom ?? 0)}px) / 2)`,
+                    }}
+                    screenScale={INVASION_SCREEN_SCALE}
+                    worldCenter={{ x: 4240 / 2, y: 2828 / 2 }}
+                    canvasSize={{ width: 4240, height: 2828 }}
+                    camera={{ panX: 0, panY: 0, zoom: 1 }}
+                    fallTarget={{ x: Math.round(4240 * INVASION_LAND.x), y: Math.round(2828 * INVASION_LAND.y) }}
+                    marchTarget={{ x: Math.round(4240 * INVASION_VILLAGE.x), y: Math.round(2828 * INVASION_VILLAGE.y) }}
+                    daysRemaining={INVASION_WARNING_DAYS}
+                    showReminder={false}
+                    cardSize={INVASION_CARD_SIZE}
+                    onComplete={() => {
+                      setShroudCovered(false);
+                      setInvasion({ dueDay: currentDay + INVASION_WARNING_DAYS, startDay: currentDay });
+                      // The threat lands in the ledger. If the player had the ledger closed, it opens to show the new row,
+                      // then closes again after a second; if it was already open, it stays open.
+                      if (!panels.visible.events) {
+                        panels.set('events', true);
+                        window.setTimeout(() => panels.set('events', false), LEDGER_PEEK_MS);
+                      }
+                    }}
+                    onClose={() => setCardOpen(false)}
+                  />
+                </div>
                 {session.overlays}
                 {expeditionGoblin.overlays}
                 {expeditionRovine.overlays}
@@ -674,27 +857,9 @@ export default function GameFramePixiPage() {
                   ambient={ambient}
                   wonderRequest={wonderRequest}
                   regions={{ assetBase: '/assets/world/wanderlust/base', onHover: setRegionHover }}
-                  worldLayer={(canvas) => (
-                    <div style={{ pointerEvents: 'auto' }}>
-                      <WorldSurfaceEventCard
-                        visible={cardOpen}
-                        zIndex={5}
-                        worldCenter={{ x: canvas.width / 2, y: canvas.height / 2 }}
-                        canvasSize={canvas}
-                        camera={{ panX: 0, panY: 0, zoom: 1 }}
-                        fallTarget={{ x: Math.round(canvas.width * 0.239), y: Math.round(canvas.height * 0.417) }}
-                        marchTarget={{ x: Math.round(canvas.width * 0.486), y: Math.round(canvas.height * 0.554) }}
-                        daysRemaining={INVASION_WARNING_DAYS}
-                        showReminder={false}
-                        cardSize={INVASION_CARD_SIZE}
-                        onComplete={() => {
-                          setShroudCovered(false);
-                          setInvasion({ dueDay: currentDay + INVASION_WARNING_DAYS });
-                        }}
-                        onClose={() => setCardOpen(false)}
-                      />
-                    </div>
-                  )}
+                  onBootProgress={handleBootProgress}
+                  onReady={handleMapReady}
+                  onBootError={handleBootError}
                 />
                 {regionHover && <RegionTooltip name={t(`gameFrame.regions.${regionHover.region.id}`)} x={regionHover.x} y={regionHover.y} />}
                 <WorldSurfaceEventShroud covered={shroudCovered} zIndex={6} />

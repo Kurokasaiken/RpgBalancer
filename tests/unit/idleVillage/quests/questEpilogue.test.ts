@@ -25,7 +25,7 @@ function terminalRun(over: Partial<QuestRunState>): QuestRunState {
     gold: 15,
     days: 1,
     bottinoOro: 0,
-    loot: ['trofeo dei goblin'],
+    loot: ['goblin trophy'],
     info: ['mappaRovine'],
     flags: [],
     alarm: false,
@@ -82,7 +82,7 @@ describe('buildQuestEpilogue', () => {
     expect(loot?.lines[0]).toEqual(
       expect.objectContaining({ key: 'gameFrame.questEpilogue.goldAmount', params: { amount: 15 } }),
     );
-    expect(loot?.lines[1]).toEqual(expect.objectContaining({ text: 'trofeo dei goblin' }));
+    expect(loot?.lines[1]).toEqual(expect.objectContaining({ text: 'goblin trophy' }));
   });
 
   it('wipe: solo i caduti — niente economia, sezioni vuote filtrate', () => {

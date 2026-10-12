@@ -116,16 +116,16 @@ if (mode === 'play') {
   const p = (a: number, b: number) => `${((a / Math.max(b, 1)) * 100).toFixed(1)}%`;
   console.log(JSON.stringify({
     N,
-    'F4 chiuso (esce dal nodo)': p(m.f4end, N),
-    'F4 end con >=1 PG grave (<35%)': p(m.f4desperate, m.f4end),
-    'F4 end: goblin 1-2 rimasti + PG grave ("quasi spezzati")': p(m.f4broken, m.f4end),
-    'F5 raggiunto': p(m.f5, N),
-    'F5 con dilemma credibile (PG ferito, coda ancora in piedi)': p(m.f5dilemma, m.f5),
-    'F6 raggiunto': p(m.f6, N),
-    'F6 con HP minimo 30-75% (tentante ma pericoloso)': p(m.f6tempt, m.f6),
-    'F7 scelta raggiunta': p(m.f7, N),
-    'F7 con danno accumulato >=40 e coda <70% ("oh no")': p(m.f7oh, m.f7),
-    'morti medie/run': (m.deaths / N).toFixed(2),
+    'F4 closed (leaves the node)': p(m.f4end, N),
+    'F4 end with >=1 critical member (<35%)': p(m.f4desperate, m.f4end),
+    'F4 end: 1-2 goblins left + critical member ("almost broken")': p(m.f4broken, m.f4end),
+    'F5 reached': p(m.f5, N),
+    'F5 with credible dilemma (wounded member, tail still up)': p(m.f5dilemma, m.f5),
+    'F6 reached': p(m.f6, N),
+    'F6 with min HP 30-75% (tempting but dangerous)': p(m.f6tempt, m.f6),
+    'F7 choice reached': p(m.f7, N),
+    'F7 with accumulated damage >=40 and tail <70% ("oh no")': p(m.f7oh, m.f7),
+    'mean deaths/run': (m.deaths / N).toFixed(2),
     wipe: p(m.wipe, N),
   }, null, 1));
 }

@@ -64,13 +64,25 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-024](PLAN-024-quest-s1-lab-hud-restyle.md) | Restyle lab quest S1 secondo guida HUD (Lacquer Atlas) | completed | — | child of PLAN-023; R-104; decisioni D1–D3 Director (dipinto-sfondo, plinth, cronaca locale); evidence test-results/r104-quest-hud-restyle-2026-10-08.log |
 | [PLAN-026](PLAN-026-quest-generation.md) | Quest Generation System: contratti → delta motore v2 → catalogo v0 → testo → integrazione → archi | active | — | child of PLAN-019 (S5); R-115 ratificato 2026-10-10 con **deroga v24** (S5 in parallelo a S3/S4, non dopo) — decisioni Director: verdictTable+vars+traits+arm misto; cold read r2 MAJOR×4 registrato |
 | [PLAN-027](PLAN-027-narration-quality.md) | Narration Quality: pipeline copy di livello professionale (arc contract, critic, gate esteso, EN+IT) | active | — | child of PLAN-026 (T4); kit race-miniera bocciato dal Director 2026-10-10; artifact **r001 converged** via mw-web-debate `20261010-narration-quality` (deepseek+gemini accept; grok dead; chatgpt/claude rate-limited) — evidence test-results/narration-quality-debate/ |
+| [PLAN-028](PLAN-028-gimmick-channels-v0.md) | Gimmick Channels v0: prototipo canali alternativi sulla quest goblin | draft | — | child of PLAN-019; R-127→R-134 (delega Director «fai cm reputi meglio»): binding lock+gating+eccezioni adottato `vigente` reversibile; metrica playtest ownership-vs-regret |
 | [PLAN-019-S3](PLAN-019-S3-parte-precedente.md) | La parte precedente: Planner completo (BY MEMBER + WHY + delta), informazione nota/ignota, check certi, trade-off misurati | completed | — | child of PLAN-019 (S3); R-118; chiuso 2026-10-10 — gate a/b/c/d passati, evidence test-results/s3-closure-2026-10-10.log |
 | [PLAN-019-S4](PLAN-019-S4-integrazione.md) | Integrazione: villaggio→planning→quest→ritorno→conseguenze come unico gioco; destino lab; «definizione di buona quest» | completed | — | child of PLAN-019 (S4); R-123; chiuso 2026-10-10 — D-S4-1..6 ratificate, T-0…T-6 fatti; gate (d)/Gate B a convocazione Director; evidence test-results/s4-t6-closure-2026-10-10.log |
+| [PLAN-029](PLAN-029-quest-gen-lab-operativa.md) | Quest Generation Lab operativa: pick→generate→validate→play→iterate→export | candidate | — | child of PLAN-026; R-142; artifact **r003 converged** via mw-web-debate `20261012-quest-gen-lab-operativa` (chatgpt+gemini+deepseek accept; grok provider_dead); SP-1 approfondito e converged 4/4; SP-2 approfondito e converged 3/3; SP-3 approfondito e converged 4/4; SP-4 approfondito e converged 3/3; SP-5 approfondito e converged 3/3; SP-6 approfondito e converged 2/2 (chatgpt provider_outage, anticipated-accept documentato); SP-7 approfondito e converged 2/2 (chatgpt+grok provider_dead) |
+| [PLAN-031](PLAN-031-game-boot-preload-perf.md) | /game schermata principale: title screen + preload totale (mappa, medaglioni) + misurazione responsività | active | P1 | R-166; fasi A+B implementate 2026-10-12 (veil+preload+probe+fix drag); spec perf verde al floor; gate Director su risultati |
+| [PLAN-032](PLAN-032-teaser-game-components.md) | Componenti teaser /game: scheda PG (hover→HudPlaque), magazzino villaggio, mercante, consumabili in viaggio, level-up (mock) | draft | P1 | R-167; decisioni Director 2026-10-12 (hover apre scheda, click auto-assign; magazzino+mercante solo schermate mock; level-up solo presentazione); SP-1…SP-5 |
+| [PLAN-033](PLAN-033-game-event-shroud-goblin-march.md) | /game evento invasione: tendina, card centrata, goblin che marcia, handoff al registro, linee regioni | active | P1 | 12f8c142 / 2026-10-12 / Director | T-001 | desiderata v2; BV-1…6 |
 
 ## Sotto-documenti (non piani)
 
 | File | È | Di |
 |---|---|---|
+| `PLAN-029-SP-1-contracts-audit.md` | subplan convergente (artifact r003) | PLAN-029 |
+| `PLAN-029-SP-2-generation-panel.md` | subplan convergente (artifact r003) | PLAN-029 |
+| `PLAN-029-SP-3-validation-gates.md` | subplan convergente (artifact r006) | PLAN-029 |
+| `PLAN-029-SP-4-mc-integration.md` | subplan convergente (artifact r003) | PLAN-029 |
+| `PLAN-029-SP-5-authoring-drawers.md` | subplan convergente (artifact r003) | PLAN-029 |
+| `PLAN-029-SP-6-persistence-export.md` | subplan convergente (artifact r003) | PLAN-029 |
+| `PLAN-029-SP-7-test-hardening.md` | subplan convergente (artifact r003) | PLAN-029 |
 | `PLAN-005-poi-family-tasks.md` | task list | PLAN-005 |
 | `.mw/plans/poi-quest-config-first-cleanup.md` | sub-plan TP1–TP5 | cleanup `/poi-quest-detail-roster-time-clock` |
 | `.mw/plans/sea-motion-brief.md` | brief | World Surface sea motion |

@@ -595,9 +595,9 @@ function accumulateSimRun(
   acc.goldSum += s.gold;
   acc.treasureSum += s.bottinoOro;
   acc.lootSum += s.loot.length;
-  if (s.loot.includes('reliquia antica')) acc.relic += 1;
-  if (s.loot.includes('bottino delle guardie')) acc.guardLoot += 1;
-  if (s.loot.includes('forziere goblin')) acc.chestLoot += 1;
+  if (s.loot.includes('ancient relic')) acc.relic += 1;
+  if (s.loot.includes('guards’ loot')) acc.guardLoot += 1;
+  if (s.loot.includes('goblin chest')) acc.chestLoot += 1;
   if (s.flags.includes('viandanteAiutato')) acc.viandante += 1;
   for (const m of s.party) {
     const mAcc = acc.memberAcc.get(m.id) ?? { healthy: 0, wounded: 0, dead: 0 };

@@ -47,11 +47,11 @@ const makeSlot = (overrides?: Partial<ResidentSlotViewModel>): ResidentSlotViewM
 
 describe('useQuestAssignmentPreview', () => {
   it('blocks embark when a required slot is empty', () => {
-    const slots = [makeSlot({ required: true, label: 'Guerriero' })];
+    const slots = [makeSlot({ required: true, label: 'Fighter' })];
     const { result } = renderHook(() => useQuestAssignmentPreview(baseActivity, slots, DEFAULT_QUEST_POWER_RULES));
 
     expect(result.current.canEmbark).toBe(false);
-    expect(result.current.blockingReasons).toContain('Guerriero è obbligatorio ed è vuoto.');
+    expect(result.current.blockingReasons).toContain('Fighter is required and empty.');
     expect(result.current.partyPower).toBe(0);
   });
 

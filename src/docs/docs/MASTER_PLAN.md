@@ -1168,10 +1168,12 @@ Questa sezione definisce la direzione strategica; i dettagli di ciò che
   - Allineare calendario e KPI con il nuovo
     [Go-To-Market “Steam First”](strategy/go_to_market_steam_first.md).
 
-### Go-To-Market “Steam First” (H1 2026)
+### Go-To-Market “Steam First”
 
-- **Calendario pubblico:** consultare `strategy/go_to_market_steam_first.md#3-calendario-campagne-steam--kpi`
-  per le finestre Feb–Giu 2026 (Steam Page, Next Fest, Playtest#1/#2, Devlog Labs, Launch Readiness).
+- **Sequenza beat:** consultare `strategy/go_to_market_steam_first.md#4-sequenza-campagne-steam--kpi`
+  per l'ordine dei beat (Steam Page, Next Fest, Playtest#1/#2, Devlog Labs, Launch Readiness).
+  **Nessuna data (Director, 2026-10-12, R-162):** i beat si eseguono in sequenza quando i gate
+  di qualità sono pronti — nessun calendario pubblico né interno.
 - **KPI condivisi:** wishlist attive (25k), conversione playtest (≥40%), retention sessione 1 (≥55%),
   broadcast CTR (≥8%), installazioni PWA companion (3k). I dati sono raccolti via SteamWorks Dashboard,
   Steam Playtest Analytics, Telemetria interna e PWA analytics.

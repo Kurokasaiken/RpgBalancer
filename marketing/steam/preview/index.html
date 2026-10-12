@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wanderlust: Triumph — Steam Page Preview (R-117)</title>
+<style>
+  :root {
+    --steam-bg: #1b2838;
+    --steam-bg2: #0e141b;
+    --steam-panel: rgba(0,0,0,.25);
+    --steam-text: #acb2b8;
+    --steam-bright: #c7d5e0;
+    --steam-white: #ffffff;
+    --steam-blue: #66c0f4;
+    --steam-link: #66c0f4;
+    --steam-muted: #556772;
+    --steam-header: #171d25;
+    --steam-btn: linear-gradient(to right, #75b022 5%, #588a1b 95%);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--steam-bg);
+    color: var(--steam-text);
+    font-family: "Motiva Sans", "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .page { max-width: 948px; margin: 0 auto; padding: 0 16px; }
+  /* ---- top bar ---- */
+  .topbar {
+    background: var(--steam-header);
+    padding: 8px 0;
+    font-size: 12px;
+    color: var(--steam-muted);
+  }
+  .topbar .page { display: flex; justify-content: space-between; }
+  .topbar .install { color: #e5e5e5; }
+  .breadcrumb { padding: 12px 0 4px; font-size: 12px; color: var(--steam-muted); }
+  .breadcrumb a { color: var(--steam-muted); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--steam-link); }
+  /* ---- game header ---- */
+  .game-title {
+    font-size: 26px; color: var(--steam-white); font-weight: 400;
+    padding: 8px 0 10px; font-family: "Motiva Sans", Arial, sans-serif;
+    letter-spacing: .5px;
+  }
+  .glance { display: flex; gap: 16px; }
+  .glance-left { flex: 0 0 616px; }
+  .glance-right { flex: 1; min-width: 0; }
+  .capsule { width: 616px; height: 353px; object-fit: cover; display: block; background: #000; }
+  .short-desc {
+    padding: 14px 0 10px; font-size: 13px; color: var(--steam-bright);
+  }
+  .glance-row { display: flex; font-size: 12px; padding: 3px 0; }
+  .glance-row .label { flex: 0 0 110px; color: var(--steam-muted); text-transform: uppercase; font-size: 10px; padding-top: 1px; }
+  .glance-row .value { color: var(--steam-text); }
+  .glance-row .value a { color: var(--steam-link); text-decoration: none; }
+  .reviews { color: var(--steam-muted); }
+  .tag-pill {
+    display: inline-block; background: var(--steam-panel); color: var(--steam-bright);
+    padding: 1px 8px; border-radius: 2px; font-size: 11px; margin: 0 4px 4px 0;
+    cursor: default;
+  }
+  /* ---- wishlist bar ---- */
+  .wl-bar {
+    margin-top: 14px; background: var(--steam-panel); padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-radius: 3px;
+  }
+  .wl-bar .wl-text { color: var(--steam-bright); font-size: 14px; }
+  .wl-btn {
+    background: var(--steam-btn); color: #d2efa9; border: none;
+    padding: 8px 20px; font-size: 14px; border-radius: 2px; cursor: pointer;
+    font-weight: 500;
+  }
+  .wl-btn:hover { filter: brightness(1.1); }
+  /* ---- columns ---- */
+  .cols { display: flex; gap: 16px; margin-top: 20px; }
+  .col-main { flex: 1; min-width: 0; }
+  .col-side { flex: 0 0 300px; }
+  .section-head {
+    color: var(--steam-white); font-size: 14px; text-transform: uppercase;
+    letter-spacing: 1px; border-bottom: 1px solid var(--steam-muted);
+    padding-bottom: 4px; margin: 24px 0 10px;
+  }
+  /* ---- media carousel ---- */
+  .carousel-main { width: 100%; display: block; background: #000; cursor: zoom-in; }
+  .thumbs { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .thumbs img, .thumbs video { width: 116px; height: 65px; object-fit: cover; cursor: pointer; opacity: .6; border: 1px solid transparent; }
+  .thumbs img.active, .thumbs video.active { opacity: 1; border-color: var(--steam-blue); }
+  /* ---- about ---- */
+  .about h1, .about h2 { color: var(--steam-bright); font-weight: 400; margin: 18px 0 8px; }
+  .about h1 { font-size: 22px; letter-spacing: 1px; }
+  .about h2 { font-size: 16px; }
+  .about p { margin: 8px 0; font-size: 14px; }
+  .about ul { margin: 8px 0 8px 22px; }
+  .about li { margin: 3px 0; }
+  .about img { width: 100%; margin: 10px 0; }
+  .about i { color: #a4b8c6; }
+  /* ---- side ---- */
+  .side-block {
+    background: var(--steam-panel); padding: 14px; margin-bottom: 12px; font-size: 12px;
+  }
+  .side-block h3 { color: var(--steam-bright); font-size: 12px; text-transform: uppercase; margin-bottom: 8px; font-weight: 400; }
+  .side-block table { width: 100%; border-collapse: collapse; }
+  .side-block td { padding: 3px 0; vertical-align: top; }
+  .side-block td:first-child { color: var(--steam-muted); }
+  .check { color: #59bf40; }
+  .relevance { font-size: 11px; color: var(--steam-muted); padding: 10px 14px; }
+  .relevance strong { color: var(--steam-bright); }
+  /* ---- annotations ---- */
+  .note {
+    background: #3d2b00; border-left: 3px solid #c79a1e; color: #e8d9b0;
+    font-size: 11.5px; padding: 6px 10px; margin: 6px 0;
+  }
+  .lang-switch {
+    position: fixed; top: 10px; right: 14px; z-index: 99;
+    background: var(--steam-header); border: 1px solid var(--steam-muted);
+    border-radius: 3px; padding: 6px 10px;
+  }
+  .lang-switch button {
+    background: none; border: none; color: var(--steam-muted);
+    font-size: 12px; cursor: pointer; padding: 2px 8px;
+  }
+  .lang-switch button.on { color: var(--steam-white); text-decoration: underline; }
+  details.variants { background: #202b3a; padding: 10px 14px; margin-top: 20px; }
+  details.variants summary { color: var(--steam-bright); cursor: pointer; font-size: 13px; }
+  details.variants pre { white-space: pre-wrap; font-size: 12px; color: var(--steam-text); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="lang-switch">
+  Preview lingua: <button id="btn-en" class="on" onclick="setLang('en')">EN</button><button id="btn-it" onclick="setLang('it')">IT</button>
+</div>
+
+<div class="topbar">
+  <div class="page">
+    <span>STORE &nbsp;·&nbsp; COMMUNITY &nbsp;·&nbsp; ABOUT &nbsp;·&nbsp; SUPPORT</span>
+    <span class="install">Install Steam &nbsp;·&nbsp; login &nbsp;·&nbsp; language</span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="breadcrumb">
+    <a href="#">All Games</a> &gt; <a href="#">Indie Games</a> &gt; <a href="#">Wanderlust: Triumph</a>
+  </div>
+
+  <div class="game-title">Wanderlust: Triumph</div>
+
+  <div class="glance">
+    <div class="glance-left">
+      <img class="capsule" src="../assets/candidates/from-keyart/main-1232x706.png" alt="capsule">
+    </div>
+    <div class="glance-right">
+      <div class="short-desc" id="short-desc"></div>
+      <div class="glance-row"><div class="label">Recent Reviews:</div><div class="value reviews">—</div></div>
+      <div class="glance-row"><div class="label">All Reviews:</div><div class="value reviews">—</div></div>
+      <div class="glance-row"><div class="label">Release Date:</div><div class="value">Coming soon</div></div>
+      <div class="glance-row"><div class="label">Developer:</div><div class="value"><a href="#">Kurokasaiken</a></div></div>
+      <div class="glance-row"><div class="label">Publisher:</div><div class="value"><a href="#">Kurokasaiken</a></div></div>
+      <div class="glance-row" style="margin-top:8px"><div class="label">Popular tags:</div>
+        <div class="value" id="tag-pills"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wl-bar">
+    <span class="wl-text">Add to your wishlist to get notified when <b>Wanderlust: Triumph</b> becomes available.</span>
+    <button class="wl-btn">✓ &nbsp;Add to your wishlist</button>
+  </div>
+
+  <div class="cols">
+    <div class="col-main">
+
+      <div class="section-head">Media</div>
+      <img class="carousel-main" id="carousel-main" src="../assets/01-map-living.png" alt="media" style="display:none">
+      <video class="carousel-main" id="carousel-video" src="../media/map-animated.mp4" autoplay muted loop playsinline></video>
+      <div class="thumbs" id="thumbs"></div>
+
+      <div class="section-head">About This Game</div>
+      <div class="about" id="about-en">
+        <h2>Heroes aren't born. They survive.</h2>
+        <p>Exiled to a monster-haunted island, you send small parties into the wild to take the jobs nobody else will. Every quest has a price: some come back richer, some come back wounded, some don't come back at all. The ones who survive become heroes.</p>
+        <img src="../assets/about-anim-map.gif" alt="gif-1-quest-offer.gif"><div class="note">Placeholder: la GIF definitiva <code>gif-1-quest-offer.gif</code> va prodotta (&lt;5 MB, 616 px).</div>
+        <h2>Pick the quests worth the risk</h2>
+        <p>Quests appear on the map, each showing its danger, its reward and how long it stays open. The best ones need more than you have: take smaller jobs to earn the gear, skills and blueprints they demand, then climb one step higher. Wait too long and the offer is gone.</p>
+        <h2>Read the odds. Let the Astrolabe decide.</h2>
+        <p>Before a party leaves, you see a forecast for exactly those people: who might get hurt, who might not come back, and why. Choose the skill that leads, spend items to tilt the odds, put a bodyguard in front of your best hero. Then the Astrolabe spins: five outcomes, from triumph to disaster.</p>
+        <img src="../assets/about-gifs-v2/gif-2-astrolabe.gif" alt="gif-2-astrolabe.gif">
+        <h2>Heroes built from what you find</h2>
+        <p>Heroes start as blank slates and grow into whatever the skills, spells and gear you find make of them. Recruits who survive long enough face the Trial of Fire and can join their ranks. Lose a hero, and everything they carried is gone with them.</p>
+        <div class="note" style="padding:40px 10px;text-align:center">GIF da produrre: <code>gif-3-party.gif</code> (&lt;5 MB, 616 px)</div>
+        <h2>Between expeditions</h2>
+        <p>Your settlement feeds your people, forges their gear and unlocks new spells and equipment. Decide what to build next and who stays behind to work: everyone at home is someone you can't send out.</p>
+        <h2>Fall. Learn. Come back stronger.</h2>
+        <p>Waves of attackers strike the island in cycles. When your settlement falls, the run ends, but your blueprints and building bonuses carry over. Each run you get further, and find the missing piece of your strategy.</p>
+        <h2>Where it's heading</h2>
+        <p>Wanderlust: Triumph is a one-person project, made out of passion for this kind of game. Here is where it's going:</p>
+        <ul>
+        <li>From a single party to several teams, and in the end an elite company for heroic quests</li>
+        <li>Bosses leading the waves: defeat them and the world moves into its next phase</li>
+        <li>A campaign across many runs, with authored stories and consequences that persist</li>
+        <li>A free demo for Steam Next Fest, then Early Access</li>
+        <li>English and Italian first, then Spanish, German and Chinese</li>
+        </ul>
+        <p>Wishlist and follow to play the demo, and tell us in the discussions what you want to see first.</p>
+      </div>
+      <div class="about" id="about-it" style="display:none">
+        <h2>Gli eroi non nascono. Sopravvivono.</h2>
+        <p>Esiliato su un'isola infestata dai mostri, mandi piccoli party nelle terre selvagge ad accettare i lavori che nessun altro vuole. Ogni quest ha un prezzo: c'è chi torna più ricco, chi torna ferito, chi non torna affatto. Chi sopravvive diventa un eroe.</p>
+        <img src="../assets/about-anim-map.gif" alt="gif-1-quest-offer.gif"><div class="note">Placeholder: la GIF definitiva <code>gif-1-quest-offer.gif</code> va prodotta (&lt;5 MB, 616 px).</div>
+        <h2>Scegli le quest che valgono il rischio</h2>
+        <p>Le quest compaiono sulla mappa, ognuna con il suo pericolo, la sua ricompensa e quanto resta aperta. Le migliori chiedono più di quanto hai: accetta lavori minori per guadagnare l'equipaggiamento, le skill e i progetti che servono, poi sali di un gradino. Se aspetti troppo, l'offerta sparisce.</p>
+        <h2>Leggi le probabilità. Lascia decidere all'Astrolabio.</h2>
+        <p>Prima che un party parta, vedi la previsione per esattamente quelle persone: chi rischia di ferirsi, chi potrebbe non tornare, e perché. Scegli la skill che guida, spendi oggetti per spostare le probabilità, metti una guardia del corpo davanti al tuo eroe migliore. Poi l'Astrolabio gira: cinque esiti, dal trionfo al disastro.</p>
+        <img src="../assets/about-gifs-v2/gif-2-astrolabe.gif" alt="gif-2-astrolabe.gif">
+        <h2>Eroi costruiti con ciò che trovi</h2>
+        <p>Gli eroi partono come tele bianche e diventano ciò che ne fanno le skill, gli incantesimi e l'equipaggiamento che trovi. Le reclute che sopravvivono abbastanza a lungo affrontano la Prova del Fuoco e possono unirsi a loro. Se perdi un eroe, perdi tutto quello che portava con sé.</p>
+        <div class="note" style="padding:40px 10px;text-align:center">GIF da produrre: <code>gif-3-party.gif</code> (&lt;5 MB, 616 px)</div>
+        <h2>Tra una spedizione e l'altra</h2>
+        <p>Il tuo insediamento sfama la tua gente, forgia il suo equipaggiamento e sblocca nuovi incantesimi e oggetti. Decidi cosa costruire e chi resta a lavorare: chi rimane a casa è qualcuno che non puoi mandare fuori.</p>
+        <h2>Cadi. Impara. Torna più forte.</h2>
+        <p>Ondate di attaccanti colpiscono l'isola a cicli. Quando il tuo insediamento cade, la run finisce, ma i progetti e i bonus degli edifici restano. A ogni run arrivi più lontano, e trovi il pezzo mancante della tua strategia.</p>
+        <h2>Dove sta andando</h2>
+        <p>Wanderlust: Triumph è il progetto di una sola persona, nato dalla passione per questo genere di giochi. Ecco dove sta andando:</p>
+        <ul>
+        <li>Da un singolo party a più squadre, fino a una compagnia d'élite per le quest eroiche</li>
+        <li>Boss alla guida delle ondate: sconfiggili e il mondo entra nella fase successiva</li>
+        <li>Una campagna attraverso molte run, con storie scritte e conseguenze che restano</li>
+        <li>Una demo gratuita per lo Steam Next Fest, poi l'Early Access</li>
+        <li>Prima inglese e italiano, poi spagnolo, tedesco e cinese</li>
+        </ul>
+        <p>Metti in wishlist e segui il gioco per provare la demo, e dicci nelle discussioni cosa vuoi vedere per primo.</p>
+      </div>
+
+      <div class="section-head">System Requirements</div>
+      <div class="side-block" style="max-width:500px">
+        <strong style="color:var(--steam-bright)">Minimum:</strong>
+        <p style="font-size:12px;color:var(--steam-muted)">[da misurare su build Tauri — WebView2 richiesto]</p>
+      </div>
+
+      <div class="section-head">Store Assets (candidati — key art, misure 2024)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;font-size:11px;color:var(--steam-muted)">
+        <div><img src="../assets/candidates/from-keyart/main-1232x706.png" style="width:100%"><br>Main Capsule 1232×706</div>
+        <div><img src="../assets/candidates/from-keyart/header-920x430.png" style="width:100%"><br>Header Capsule 920×430</div>
+        <div><img src="../assets/candidates/from-keyart/small-462x174.png" style="width:231px"><br>Small Capsule 462×174<br><img src="../assets/candidates/from-keyart/small-462x174.png" style="width:120px;margin-top:6px"><br>a 120×45 (la misura più piccola)</div>
+        <div><img src="../assets/candidates/from-keyart/vertical-748x896.png" style="max-width:200px"><br>Vertical Capsule 748×896 — da <code>Library Capsule.png</code></div>
+        <div><img src="../assets/candidates/from-keyart/library-capsule-600x900.png" style="max-width:200px"><br>Library Capsule 600×900</div>
+        <div><img src="../assets/candidates/from-keyart/event-capsule-800x450.png" style="width:100%"><br>Event Capsule 800×450</div><div><img src="../assets/candidates/from-keyart/library-hero-3840x1240.png" style="width:100%"><br>Library Hero 3840×1240 (ingrandita 2,5× dalla sorgente 1536 px)</div><div><img src="../assets/candidates/from-keyart/page-background-1438x810.png" style="width:100%"><br>Page Background 1438×810</div>
+        <div><img src="../assets/community-icon-184x184.png" style="width:92px"><br>Community Icon 184×184</div>
+        <div><img src="../assets/candidates/from-keyart/library-logo.png" style="max-width:200px;background:repeating-conic-gradient(#333 0 25%,#222 0 50%) 0 0/16px 16px"><br>Library Logo (trasparente) — placca dorata + sole, asset authored</div>
+      </div>
+      <div class="note">Hero libreria (3840×1240), page background e client icon in <code>marketing/steam/assets/</code>. Capsule ricavate da <code>Downloads/Header Capsule.png</code> (logo incorporato). Tutti gli asset sono in <code>assets/candidates/from-keyart/</code>.</div>
+
+      <details class="variants">
+        <summary>📝 Short description — varianti (scegli una / correggi)</summary>
+        <pre id="variants-pre"></pre>
+      </details>
+
+    </div>
+
+    <div class="col-side">
+      <div class="side-block relevance">
+        <strong>Is this game relevant to you?</strong><br>
+        Sign in to see reasons…
+      </div>
+      <div class="side-block">
+        <h3>Languages</h3>
+        <table>
+          <tr style="color:var(--steam-muted)"><td></td><td>Interface</td><td>Full Audio</td><td>Subtitles</td></tr>
+          <tr><td>English</td><td class="check">✔</td><td></td><td></td></tr>
+          <tr><td>Italiano</td><td class="check">✔</td><td></td><td></td></tr>
+          <tr><td>Deutsch*</td><td class="check">✔*</td><td></td><td></td></tr>
+          <tr><td>Français*</td><td class="check">✔*</td><td></td><td></td></tr>
+          <tr style="color:var(--steam-muted)"><td>ES · 中文**</td><td colspan="3" style="font-size:11px">localization roadmap</td></tr>
+        </table>
+        <div class="note">* Target alla demo (FR incerta — Director). ** Solo dopo trazione — elencate nella roadmap dell'About, non come lingue supportate.</div>
+      </div>
+      <div class="side-block">
+        <h3>Features</h3>
+        Single-player<br>Family Sharing <span style="color:var(--steam-muted)">(default)</span>
+      </div>
+      <div class="side-block">
+        <h3>Tags — prime 5 pesano</h3>
+        <div id="tag-side"></div>
+        <div class="note">Roguelite: D3 confermata dal Director (meta-progressione core). Verificare visibilità nel build prima della pubblicazione.</div>
+      </div>
+      <div class="side-block">
+        <h3>AI disclosure</h3>
+        <div style="font-size:12px">Most of the artwork, including the store images, and part of the quest text were made with AI tools during development, then selected and edited by me. The game does not use AI while you play.</div><div class="note">Steam mostra questo riquadro da solo (dal questionario contenuti): non va ripetuto nell'About.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DESC = {
+  en: "A roguelite strategy RPG where heroes are made, not born. Pick the quests worth the risk, read the odds for the exact party you send, and let the Astrolabe decide who comes back. When your settlement falls, what you earned carries into the next run.",
+  it: "Un roguelite strategy RPG in cui gli eroi non nascono: si forgiano. Scegli le quest che valgono il rischio, leggi le probabilità per il party che mandi e lascia decidere all'Astrolabio chi torna. Quando il tuo insediamento cade, ciò che hai guadagnato passa alla run successiva."
+};
+const TAGS = ["Roguelite","Strategy RPG","Management","Perma Death","Choices Matter","Fantasy","RPG","Strategy","Resource Management","Atmospheric","Story Rich","Replay Value","Economy","Time Management","Simulation","Adventure","2D","Singleplayer","Indie"];
+const SHOTS = ["a-map","c-quest-choice","d-quest-consequence","e-quest-outcome"];
+/* Media del Director: video prima (Steam mostra i video prima degli shot),
+ * poi componenti arte e screenshot. */
+const MEDIA = [
+  { t:'v', s:'../media/map-animated.mp4' },
+  { t:'v', s:'../media/astrolabe.mp4' },
+  ...SHOTS.map(s => ({ t:'i', s:`../assets/screenshots-v2/${s}.png` })),
+];
+const VARIANTS = `SHORT DESCRIPTION v2 — proposta 2026-10-12 (REVIEW-2026-10-12.md)
+
+EN (249 char):
+A roguelite strategy RPG where heroes are made, not born. Pick the quests worth the risk, read the odds for the exact party you send, and let the Astrolabe decide who comes back. When your settlement falls, what you earned carries into the next run.
+
+IT (278 char):
+Un roguelite strategy RPG in cui gli eroi non nascono: si forgiano. Scegli le quest che valgono il rischio, leggi le probabilità per il party che mandi e lascia decidere all'Astrolabio chi torna. Quando il tuo insediamento cade, ciò che hai guadagnato passa alla run successiva.`;
+
+let lang = 'en';
+function setLang(l) {
+  lang = l;
+  document.getElementById('short-desc').textContent = DESC[l];
+  document.getElementById('about-en').style.display = l === 'en' ? '' : 'none';
+  document.getElementById('about-it').style.display = l === 'it' ? '' : 'none';
+  document.getElementById('btn-en').classList.toggle('on', l === 'en');
+  document.getElementById('btn-it').classList.toggle('on', l === 'it');
+}
+function setShot(el, src, type) {
+  const img = document.getElementById('carousel-main');
+  const vid = document.getElementById('carousel-video');
+  if (type === 'v') {
+    img.style.display = 'none'; vid.style.display = '';
+    if (!vid.src.endsWith(src)) vid.src = src;
+    vid.play().catch(() => {});
+  } else {
+    vid.pause(); vid.style.display = 'none';
+    img.style.display = ''; img.src = src;
+  }
+  document.querySelectorAll('.thumbs > *').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+document.getElementById('tag-pills').innerHTML = TAGS.slice(0,6).map(t => `<span class="tag-pill">${t}</span>`).join('');
+document.getElementById('tag-side').innerHTML = TAGS.map(t => `<span class="tag-pill">${t}</span>`).join('');
+document.getElementById('thumbs').innerHTML = MEDIA.map((m,i) => m.t === 'v'
+  ? `<video src="${m.s}" muted preload="metadata" class="${i===0?'active':''}" onclick="setShot(this,'${m.s}','v')"></video>`
+  : `<img src="${m.s}" class="${i===0?'active':''}" onclick="setShot(this,'${m.s}','i')">`).join('');
+document.getElementById('variants-pre').textContent = VARIANTS;
+document.getElementById('carousel-main').onclick = (e) => {
+  const el = e.target; el.style.position = el.style.position === 'fixed' ? '' : 'fixed';
+  el.style.inset = el.style.inset ? '' : '0'; el.style.zIndex = el.style.zIndex ? '' : '50';
+  el.style.width = el.style.width === '100%' ? 'auto' : '100%'; el.style.height = 'auto';
+};
+setLang('en');
+</script>
+</body>
+</html>

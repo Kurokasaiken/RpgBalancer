@@ -13,7 +13,8 @@ Use for single, well-defined implementation tasks.
 2. If the task is unclear or conditional (`dovrei`, `vorrei`, `potremmo`), stop and return to `mw-explorer`.
 3. Load `mw-regression` before touching existing code.
 4. For RPG-specific surface work (idle village, UI, gameplay, balancing), also load `agent-execution-mandate` and `idle-village-task`.
-5. If the task is a bugfix, regression, or failure investigation, load `.agents/skills/bugfix/SKILL.md` and run the bugfix workflow (investigate → explore → plan → implement → test → learn) before coding.
+5. Check `context/recurring-traps.md`: if the task touches a tagged surface (map/HUD layout, SVG progress arcs, `data-hud-controls` scope, mockups, visual claims, "improve/rewrite" of a FROZEN-covered component), read the matching trap entries before editing.
+6. If the task is a bugfix, regression, or failure investigation, load `.agents/skills/bugfix/SKILL.md` and run the bugfix workflow (investigate → explore → plan → implement → test → learn) before coding.
 
 ## Rules
 

@@ -1,153 +1,124 @@
 /**
- * generate-quest-scenario-fixture — PLAN-019-S2.1 (critica r2).
+ * generate-quest-scenario-fixture — PLAN-019-S2.1 (critica r2), R-135 re-baseline.
  *
  * Regenerates the FROZEN parity oracle under
  * `tests/fixtures/idleVillage/quests/{id}.oracle.json`:
- *   1. `authored` — the pre-migration scenario objects, extracted from
- *      `git show HEAD:src/ui/idleVillage/questS1Lab/questScenario{Goblin,Rovine}.ts`
- *      (the live lab modules were deleted by the S2.1 migration — the oracle
- *      cannot be a live file, and HEAD is the last commit that still holds
- *      the originals).
+ *   1. `authored` — the scenario authored objects taken from the CANONICAL
+ *      config modules `src/balancing/config/idleVillage/quests/scenarios/*.ts`
+ *      (`*_SCENARIO_AUTHORED` literals). R-135 history: the original oracle
+ *      was extracted from `git show HEAD:` of the deleted lab modules; with
+ *      the English re-baseline the canonical authored config IS the source —
+ *      the oracle is a committed snapshot of it. `offer` is excluded (S2.1
+ *      contract: not part of parity) and the additive planning fields
+ *      `previewHint`/`revealHint`/`hidden` are stripped per node, mirroring
+ *      the test's own comparison window.
  *   2. `traces` — Monte Carlo digests (N declared, fixed seed base) computed
- *      by driving the CANONICAL engine (`questRun.ts`) with the ORIGINAL
- *      definitions injected into `QUESTS`, through the shared seeded
- *      uniform policy (`playRun`/`signatureOf` from
- *      `tests/unit/idleVillage/questScenarioExplorer.ts`).
+ *      by driving the CANONICAL engine (`questRun.ts`) on the live parsed
+ *      scenario in `QUESTS`, through the shared seeded uniform policy
+ *      (`playRun`/`signatureOf` from `tests/unit/idleVillage/questScenarioExplorer.ts`).
  *
  * Usage: `npx tsx --tsconfig tsconfig.app.json scripts/generate-quest-scenario-fixture.mts`
  * Re-run only when intentionally re-baselining; the test suite treats the
  * committed output as the oracle.
  */
 
-import { execFileSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, mkdirSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
 
 const REPO = new URL('..', import.meta.url).pathname;
-const LAB = 'src/ui/idleVillage/questS1Lab';
+const SCEN_DIR = 'src/balancing/config/idleVillage/quests/scenarios';
 const OUT_DIR = join(REPO, 'tests/fixtures/idleVillage/quests');
 const TRACE_RUNS = 1000; // critica r2: N declared, fixed
 const TRACE_SEED_BASE = 1;
 
-interface OriginalModule {
-  nodes: Record<string, unknown>;
-  startNode: string;
-  primaryStats: string[];
-  presets: unknown[];
-  meta?: Record<string, unknown>;
-  beats?: readonly string[];
-  intelLabels?: Record<string, string>;
-}
+/** Per-node fields stripped from the parity window (S3 additive planning data). */
+const STRIPPED_NODE_FIELDS = new Set(['previewHint', 'revealHint', 'hidden']);
 
 interface Spec {
   questId: 'goblin' | 'rovine';
-  headPath: string;
-  exports: {
-    nodes: string;
-    startNode: string;
-    primaryStats: string;
-    presets: string;
-    meta?: string;
-    beats?: string;
-    intelLabels?: string;
-  };
+  /** Module under `scenarios/` exporting `<NAME>_SCENARIO_AUTHORED`. */
+  modulePath: string;
+  authoredExport: string;
+  /** Lab presets module export used as `livePresets` in the test. */
+  presetsExport: string;
+  /** The preset id the trace digests are driven with. */
+  presetId: string;
 }
 
 const SPECS: Spec[] = [
   {
     questId: 'goblin',
-    headPath: `${LAB}/questScenarioGoblin.ts`,
-    exports: {
-      nodes: 'GOBLIN_NODES',
-      startNode: 'GOBLIN_START_NODE',
-      primaryStats: 'GOBLIN_PRIMARY_STATS',
-      presets: 'GOBLIN_PRESETS',
-      meta: 'GOBLIN_META',
-      beats: 'GOBLIN_BEATS',
-    },
+    modulePath: `${SCEN_DIR}/goblin`,
+    authoredExport: 'GOBLIN_SCENARIO_AUTHORED',
+    presetsExport: 'GOBLIN_PRESETS',
+    presetId: 'gob-band',
   },
   {
     questId: 'rovine',
-    headPath: `${LAB}/questScenarioRovine.ts`,
-    exports: {
-      nodes: 'ROVINE_NODES',
-      startNode: 'ROVINE_START_NODE',
-      primaryStats: 'ROVINE_PRIMARY_STATS',
-      presets: 'ROVINE_PRESETS',
-      beats: 'ROVINE_BEATS',
-      intelLabels: 'ROVINE_INTEL_LABELS',
-    },
+    modulePath: `${SCEN_DIR}/rovine`,
+    authoredExport: 'ROVINE_SCENARIO_AUTHORED',
+    presetsExport: 'ROVINE_PRESETS',
+    presetId: 'rv-eroe',
   },
 ];
 
-/** Extracts a module's HEAD content into a temp file and imports it
- *  (the lab modules only have `import type` — erased, never resolved). */
-async function loadOriginal(spec: Spec): Promise<OriginalModule> {
-  const src = execFileSync('git', ['-C', REPO, 'show', `HEAD:${spec.headPath}`], {
-    encoding: 'utf8',
-  });
-  const dir = mkdtempSync(join(tmpdir(), 'questS21-orig-'));
-  const file = join(dir, `${spec.questId}.ts`);
-  writeFileSync(file, src);
-  const mod = (await import(pathToFileURL(file).href)) as Record<string, unknown>;
-  return {
-    nodes: mod[spec.exports.nodes] as OriginalModule['nodes'],
-    startNode: mod[spec.exports.startNode] as string,
-    primaryStats: mod[spec.exports.primaryStats] as string[],
-    presets: mod[spec.exports.presets] as unknown[],
-    meta: spec.exports.meta ? (mod[spec.exports.meta] as Record<string, unknown>) : undefined,
-    beats: spec.exports.beats ? (mod[spec.exports.beats] as readonly string[]) : undefined,
-    intelLabels: spec.exports.intelLabels
-      ? (mod[spec.exports.intelLabels] as Record<string, string>)
-      : undefined,
-  };
+interface AuthoredLiteral {
+  title: string;
+  flavour?: string;
+  startNode: string;
+  primaryStats: string[];
+  beats?: readonly string[];
+  intelLabels?: Record<string, string>;
+  nodes: Record<string, Record<string, unknown>>;
+}
+
+function stripPlanningFields(nodes: AuthoredLiteral['nodes']): AuthoredLiteral['nodes'] {
+  return Object.fromEntries(
+    Object.entries(nodes).map(([id, n]) => [
+      id,
+      Object.fromEntries(Object.entries(n).filter(([k]) => !STRIPPED_NODE_FIELDS.has(k))),
+    ]),
+  );
 }
 
 async function main(): Promise<void> {
-  const { QUESTS } = await import('../src/ui/idleVillage/questS1Lab/questRun');
   const { playRun, signatureOf, fnv1aHex } = await import(
     '../tests/unit/idleVillage/questScenarioExplorer'
   );
+  const presetsMod = (await import('../src/ui/idleVillage/questS1Lab/questLabPresets')) as Record<
+    string,
+    unknown
+  >;
 
   mkdirSync(OUT_DIR, { recursive: true });
 
   for (const spec of SPECS) {
-    const orig = await loadOriginal(spec);
-    const authored = {
-      nodes: orig.nodes,
-      startNode: orig.startNode,
-      primaryStats: orig.primaryStats,
-      presets: orig.presets,
-      ...(orig.meta ? { meta: orig.meta } : {}),
-      ...(orig.beats ? { beats: orig.beats } : {}),
-      ...(orig.intelLabels ? { intelLabels: orig.intelLabels } : {}),
+    const mod = (await import(`../${spec.modulePath}`)) as Record<string, unknown>;
+    const authored = mod[spec.authoredExport] as AuthoredLiteral;
+    const presets = presetsMod[spec.presetsExport];
+
+    const authoredSnapshot = {
+      nodes: stripPlanningFields(authored.nodes),
+      startNode: authored.startNode,
+      primaryStats: authored.primaryStats,
+      presets,
+      meta: { title: authored.title, flavour: authored.flavour },
+      ...(authored.beats ? { beats: authored.beats } : {}),
+      ...(authored.intelLabels ? { intelLabels: authored.intelLabels } : {}),
     };
 
-    // Trace digests on the ORIGINAL definition, injected into the registry.
-    const saved = QUESTS[spec.questId];
-    QUESTS[spec.questId] = {
-      nodes: orig.nodes as never,
-      presets: orig.presets as never,
-      primaryStats: orig.primaryStats as never,
-      startNode: orig.startNode,
-    };
     const perSeed: string[] = [];
-    try {
-      for (let i = 0; i < TRACE_RUNS; i += 1) {
-        const seed = TRACE_SEED_BASE + i;
-        const { state } = playRun(spec.questId, (orig.presets as { id: string }[])[0].id, seed);
-        perSeed.push(fnv1aHex(signatureOf(state)));
-      }
-    } finally {
-      QUESTS[spec.questId] = saved;
+    for (let i = 0; i < TRACE_RUNS; i += 1) {
+      const seed = TRACE_SEED_BASE + i;
+      const { state } = playRun(spec.questId, spec.presetId, seed);
+      if (!state.ended) throw new Error(`${spec.questId} seed ${seed} did not terminate`);
+      perSeed.push(fnv1aHex(signatureOf(state)));
     }
 
     const payload = {
       generatedBy: 'scripts/generate-quest-scenario-fixture.mts',
-      source: `git HEAD:${spec.headPath}`,
-      authored,
+      source: `${spec.modulePath}.ts (${spec.authoredExport}, R-135 English re-baseline)`,
+      authored: authoredSnapshot,
       traces: {
         runs: TRACE_RUNS,
         seedBase: TRACE_SEED_BASE,

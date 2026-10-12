@@ -867,7 +867,7 @@ Psychology / perception:
   a finding).
 - Emotional pacing in 3–5 min quests is unstudied (batch 3, DeepSeek):
   pacing evidence comes from long media; transfer to a short
-  idle/management segment is assumed, not measured.
+  management/quest segment is assumed, not measured.
 - RNG tolerance in non-gambling contexts is unstudied (batch 3):
   near-miss and control literature is gambling-heavy; how much dice
   variance a party-quest player attributes to themselves vs "rigged"

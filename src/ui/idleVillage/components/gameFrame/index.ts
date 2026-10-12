@@ -8,6 +8,7 @@ export { WhenWhereCluster, type WhenWhereClusterProps } from './WhenWhereCluster
 export { HudGlyph, HUD_ICONS, type HudGlyphProps, type HudIconId } from './hudIcons';
 export { DirectorPanel, type DirectorPanelProps, type DirectorAction } from './DirectorPanel';
 export { HudPanelsMenu, type HudPanelsMenuProps } from './HudPanelsMenu';
+export { HudHideToggle, type HudHideToggleProps } from './HudHideToggle';
 export { HudGameMenu, type HudGameMenuProps, type HudSkinControl } from './HudGameMenu';
 export { useHudPanels, type HudPanelId, type HudPanelsApi } from './useHudPanels';
 export { HUD_PANELS } from './hudPanelRegistry';

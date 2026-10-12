@@ -49,6 +49,13 @@ export interface WorldSurfaceEventCardProps {
   showReminder?: boolean;
   /** Size of the announcement card against the map (1 = the World Surface size). */
   cardSize?: number;
+  /**
+   * Screen-space anchor (CSS left/top of the card's centre). When set, the card lives in the viewport, not in the
+   * world: it is scaled by `screenScale` and ignores the world offsets (the sticker does not travel yet).
+   */
+  screenAnchor?: { left: string; top: string };
+  /** Scale of the card in screen space (1 = 460px wide). Only used with `screenAnchor`. */
+  screenScale?: number;
 }
 
 type Stage = 'idle' | 'modal' | 'peeling' | 'falling' | 'marching' | 'done';
@@ -116,19 +123,25 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   daysRemaining = DEFAULT_TOTAL_DAYS,
   showReminder = true,
   cardSize = 1,
+  screenAnchor,
+  screenScale = 1,
 }) => {
   const { t } = useTranslation('idleVillage');
   const [stage, setStage] = useState<Stage>('modal');
   const daysLeft = daysRemaining;
 
+  const screenMode = screenAnchor !== undefined;
+  /** Scale the card is authored at: world blow-up on the map, plain screen size in the viewport. */
+  const cardScale = (screenMode ? screenScale : CARD_SCALE) * cardSize;
+
   const fallOffset = useMemo(
-    () => ({ x: fallTarget.x - worldCenter.x, y: fallTarget.y - worldCenter.y }),
-    [fallTarget, worldCenter],
+    () => (screenMode ? { x: 0, y: 0 } : { x: fallTarget.x - worldCenter.x, y: fallTarget.y - worldCenter.y }),
+    [fallTarget, worldCenter, screenMode],
   );
 
   const marchOffset = useMemo(
-    () => ({ x: marchTarget.x - worldCenter.x, y: marchTarget.y - worldCenter.y }),
-    [marchTarget, worldCenter],
+    () => (screenMode ? { x: 0, y: 0 } : { x: marchTarget.x - worldCenter.x, y: marchTarget.y - worldCenter.y }),
+    [marchTarget, worldCenter, screenMode],
   );
 
   /**
@@ -202,14 +215,22 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
 
   /** The card keeps its modal shape while the sticker is still attached. */
   const isModal = stage === 'modal' || stage === 'peeling';
-  const stickerDetached = stage === 'falling' || stage === 'marching' || stage === 'done';
+  /* The sticker takes over the goblin the moment the peel starts: it is mounted at its card position and the window
+   * hides its own goblin, so the two never show together (the old mount at `falling` drew both for ~0.5 s). */
+  const stickerDetached = stage === 'peeling' || stage === 'falling' || stage === 'marching' || stage === 'done';
+  const stickerStartY = STICKER_START_Y * cardScale;
+  const stickerStartScale = STICKER_CARD_SCALE * (cardScale / CARD_SCALE);
 
-  const stickerAnimate = stage === 'falling'
-    ? { x: fallOffset.x, y: fallOffset.y, scale: STICKER_MAP_SCALE }
-    : { x: marchOffset.x, y: marchOffset.y, scale: STICKER_MAP_SCALE };
+  const stickerAnimate = stage === 'peeling'
+    ? { x: 0, y: stickerStartY, scale: stickerStartScale }
+    : stage === 'falling'
+      ? { x: fallOffset.x, y: fallOffset.y, scale: STICKER_MAP_SCALE }
+      : { x: marchOffset.x, y: marchOffset.y, scale: STICKER_MAP_SCALE };
 
-  const stickerTransition = stage === 'falling'
-    ? {
+  const stickerTransition = stage === 'peeling'
+    ? { duration: 0 }
+    : stage === 'falling'
+      ? {
         x: { duration: FALL_MS / 1000, ease: 'easeIn' as const },
         y: { duration: FALL_MS / 1000, ease: 'easeIn' as const },
         scale: { duration: FALL_MS / 1000, ease: 'easeOut' as const },
@@ -222,25 +243,28 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
 
   return (
     <div
+      data-testid="world-event-card"
       style={{
         position: 'absolute',
-        left: worldCenter.x,
-        top: worldCenter.y,
+        left: screenAnchor ? screenAnchor.left : worldCenter.x,
+        top: screenAnchor ? screenAnchor.top : worldCenter.y,
         width: 0,
         height: 0,
         zIndex,
+        // The host overlay is pointer-transparent; the card itself must still take clicks.
+        pointerEvents: screenMode ? 'auto' : undefined,
       }}
     >
       {/* Card: modal in the middle of the map, then a small reminder top-right. */}
       <motion.div
-        initial={{ x: 0, y: 0, scale: CARD_SCALE * cardSize }}
+        initial={{ x: 0, y: 0, scale: cardScale }}
         animate={
           isModal
-            ? { x: 0, y: 0, scale: CARD_SCALE * cardSize }
+            ? { x: 0, y: 0, scale: cardScale }
             : showReminder
               ? { x: reminderOffset.x, y: reminderOffset.y, scale: REMINDER_SCALE }
               // The host keeps the reminder elsewhere (its own ledger): the card just fades where it stands.
-              : { x: 0, y: 0, scale: CARD_SCALE * cardSize }
+              : { x: 0, y: 0, scale: cardScale }
         }
         transition={{ duration: 1.2, ease: 'easeInOut' }}
         style={{ position: 'absolute', left: 0, top: 0, width: 0, height: 0 }}
@@ -249,6 +273,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
           {isModal ? (
             <motion.div
               key="modal"
+              data-testid="world-event-card-body"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -278,6 +303,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                     <GoblinInvasionWindow
                       ariaLabel={String(t('world.goblinInvasion.title'))}
                       peeled={stage === 'peeling'}
+                      goblinHidden={stickerDetached}
                       style={{
                         position: 'absolute',
                         top: '50%',
@@ -328,7 +354,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
       {/* The bordered goblin sticker, once torn off the card. */}
       {stickerDetached && (
         <motion.div
-          initial={{ x: 0, y: STICKER_START_Y * CARD_SCALE * cardSize, scale: STICKER_CARD_SCALE * cardSize }}
+          initial={{ x: 0, y: stickerStartY, scale: stickerStartScale }}
           animate={stickerAnimate}
           transition={stickerTransition}
           style={{

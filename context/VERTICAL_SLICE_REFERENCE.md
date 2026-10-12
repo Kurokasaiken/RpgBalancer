@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Idle Village RPG uses a **vertical slice architecture** for component development with:
+RPG Balancer (village/incremental management RPG — codename storico "Idle Village", il gioco non è un idle game) uses a **vertical slice architecture** for component development with:
 - **Semantic versioning** (MAJOR.MINOR.PATCH) for each component
 - **Immutable contracts** enforced via test-driven development
 - **Automated CI/CD** validation

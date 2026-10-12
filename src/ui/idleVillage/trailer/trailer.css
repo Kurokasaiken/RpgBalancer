@@ -489,11 +489,15 @@
   pointer-events: none;
 }
 
+/* The painted halves are not opaque to their inner edge: each is solid only to ~55% (left) or from ~60% (right) of its
+   own width, with a transparent seam between. A box of 125vw puts the left half's solid core past the centre and the
+   right half's solid core back past it, so the two overlap and no strip of map shows when the curtains meet. The
+   slide distance (±100% of the box) still clears the viewport. */
 .ws-event-shroud__half {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 58vw;
+  width: 125vw;
   overflow: hidden;
   will-change: transform;
   transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);

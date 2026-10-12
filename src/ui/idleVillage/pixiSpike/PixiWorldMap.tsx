@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { traceBoundaryLoops, simplifyLoop } from './regionOutline';
 import {
   Application,
   Assets,
@@ -100,6 +101,15 @@ export const DEFAULT_MAP_TUNE: PixiMapTune = {
   markSpacingPx: 900,
 };
 
+/** Boot phases the map reports while building the world (PLAN-031 T-A2). */
+export type PixiBootPhase = 'assets' | 'build' | 'warmup' | 'ready';
+/** Progress emitted while the map preloads and builds the scene; `total` may grow as late asset lists resolve. */
+export interface PixiBootProgress {
+  phase: PixiBootPhase;
+  loaded: number;
+  total: number;
+}
+
 export interface PixiWorldMapProps {
   /** Bump this number to make a sea wonder surface now (Director button). */
   wonderRequest?: number;
@@ -136,6 +146,12 @@ export interface PixiWorldMapProps {
   seaPatternConfig?: SeaPatternConfig;
   coastFoamConfig?: CoastFoamConfig;
   onStats?: (stats: { textures: number; textureMB: number }) => void;
+  /** Real boot progress for the title veil: assets resolve in parallel, then the scene builds. */
+  onBootProgress?: (progress: PixiBootProgress) => void;
+  /** Fired once the world is built, the camera fitted, textures uploaded and the first frames rendered. */
+  onReady?: () => void;
+  /** Fired when boot fails, so the veil can show the error instead of hanging at <100%. */
+  onBootError?: (message: string) => void;
   /**
    * DOM content pinned to world points (POIs, markers). Each node is centred on its
    * point and kept there by the camera on every pan/zoom, without re-rendering React;
@@ -318,6 +334,12 @@ const DEEP_SEA_BAND_PX = 420;
 const SEA_QUAD_PAD = 1600;
 /** Cloud layers (far, mid, near): how much further than the ground each slides when the camera pans. */
 const CLOUD_PARALLAX = [0.1, 0.22, 0.4] as const;
+/* Stacking in the world: the cloud bands sit above the land and above the region rings; the rings sit above the land
+ * and below the clouds; the night wash stays over everything. Sorted by zIndex, so the order is explicit, not by the
+ * order the layers happened to be added. */
+const REGION_RING_Z = 5;
+const CLOUD_BAND_Z = 10;
+const NIGHT_WASH_Z = 20;
 /** Village roofs where smoke rises (world px), puffs per chimney, and a puff's life. */
 const VILLAGE_CHIMNEYS = [
   { x: 2119, y: 1473 },
@@ -332,6 +354,8 @@ const REGION_RASTER_SCALE = 2;
 /** Colour of a hovered territory's border (ink black, like a board-game province). */
 // The HUD's teal (the CTA enamel): the territory outline reads as part of the interface, not as ink.
 const REGION_EDGE_RGBA = [27, 83, 96, 255];
+/** Douglas–Peucker tolerance for region outlines, in world px: larger = straighter borders. */
+const REGION_OUTLINE_SIMPLIFY_PX = 40;
 /** Glass globe (hold Alt): how far the map tips toward the pointer, and how far the seabed slides with it (world px). */
 const GLOBE_TILT_DEG = 7;
 const GLOBE_BED_SHIFT_PX = 140;
@@ -407,6 +431,9 @@ export function PixiWorldMap({
   seaPatternConfig = DEFAULT_SEA_PATTERN_CONFIG,
   coastFoamConfig = DEFAULT_COAST_FOAM_CONFIG,
   onStats,
+  onBootProgress,
+  onReady,
+  onBootError,
   anchors = [],
 }: PixiWorldMapProps) {
   const { manifest, cameraConfig } = useWorldSurface(manifestPath);
@@ -424,6 +451,18 @@ export function PixiWorldMap({
   const regionsRef = useRef(regions);
   regionsRef.current = regions;
   const regionsOn = !!regions;
+  // Boot callbacks live in refs: a new identity must never rebuild the world.
+  const onBootProgressRef = useRef(onBootProgress);
+  onBootProgressRef.current = onBootProgress;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
+  const onBootErrorRef = useRef(onBootError);
+  onBootErrorRef.current = onBootError;
+  /* Panel toggles change only the fit insets (roster/ledger widths): keep the
+   * latest fit in a ref so `refit()` reads it live, and only a margin change
+   * (camera bounds) rebuilds the world — not every open/close (PLAN-031 T-A4). */
+  const safeFitRef = useRef(safeFit);
+  safeFitRef.current = safeFit;
   const focusRef = useRef<((x: number, y: number) => void) | null>(null);
   const anchorLayerRef = useRef<HTMLDivElement>(null);
   const worldBoxRef = useRef<HTMLDivElement>(null);
@@ -448,6 +487,7 @@ export function PixiWorldMap({
   const fxKey = JSON.stringify(fx);
   const hiddenKey = hiddenLayerIds.join('|');
   const safeFitKey = safeFit ? JSON.stringify(safeFit) : '';
+  const safeFitMarginKey = safeFit ? JSON.stringify({ x: safeFit.seaMarginPx, y: safeFit.seaMarginYPx }) : '';
 
   useEffect(() => {
     const host = hostRef.current;
@@ -455,7 +495,7 @@ export function PixiWorldMap({
     let disposed = false;
     const app = new Application();
     const hidden = new Set(hiddenKey ? hiddenKey.split('|') : []);
-    const fit = safeFitKey ? (JSON.parse(safeFitKey) as WorldSurfaceSafeFit) : undefined;
+    const fit = safeFitRef.current;
     const fxOn = JSON.parse(fxKey) as PixiWorldMapEffects;
     const tn = JSON.parse(tuneKey) as PixiMapTune;
     const canvas = manifest.coordinateSystem.canvas;
@@ -494,6 +534,7 @@ export function PixiWorldMap({
       app.canvas.dataset.testid = 'pixi-world-canvas';
 
       const world = new Container();
+      world.sortableChildren = true;
       app.stage.addChild(world);
 
       // ── Base layers (+ mirrored sea margins for the base and sea layers) ──
@@ -501,12 +542,47 @@ export function PixiWorldMap({
       const seaSprites: Container[] = [];
       let seaTexture: Texture | null = null;
       const canopySway: { positions: Float32Array; orig: Float32Array; buffer: { update: () => void }; scale: number; phase: number }[] = [];
+      // ── Boot pipeline (PLAN-031): every asset/JSON the world needs is kicked off in parallel up
+      // front, so the sequential build below hits warm caches instead of a ~60-await waterfall.
+      // `buildStep()` marks build milestones so the veil's progress keeps moving during the bakes.
+      let bootLoaded = 0;
+      let bootTotal = 0;
+      const emitBootProgress = (phase: PixiBootPhase) => {
+        if (!disposed) onBootProgressRef.current?.({ phase, loaded: Math.min(bootLoaded, bootTotal), total: bootTotal });
+      };
+      const buildStep = () => {
+        bootLoaded += 1;
+        emitBootProgress('build');
+      };
+      const pendingJson = new Map<string, Promise<unknown>>();
+      const fetchJson = <T,>(url: string): Promise<T> => {
+        let cached = pendingJson.get(url) as Promise<T> | undefined;
+        if (!cached) {
+          cached = fetch(url)
+            .then((r) => r.json() as Promise<T>)
+            .then((json) => {
+              bootLoaded += 1;
+              emitBootProgress('assets');
+              return json;
+            });
+          pendingJson.set(url, cached);
+        }
+        return cached;
+      };
+      const trackBootLoad = (url: string) =>
+        Assets.load(url)
+          .catch(() => null)
+          .then((tex) => {
+            bootLoaded += 1;
+            emitBootProgress('assets');
+            return tex;
+          });
       // The forest canopies, cut from the same base they sway over (see scripts/build-canopy.py): a mesh whose vertices
       // roll in a slow wave, so the crowns breathe with the wind. The base underneath has no canopy to double up with.
       const addCanopies = async (variant: string) => {
-        const layered = (await fetch('/assets/world/wanderlust/base/manifest.json').then((r) => r.json())) as {
+        const layered = await fetchJson<{
           surfaceLayers: { id: string; file: string; rect?: { x: number; y: number; width: number; height: number; sourceWidth: number; sourceHeight: number } }[];
-        };
+        }>('/assets/world/wanderlust/base/manifest.json');
         for (const l of layered.surfaceLayers) {
           if (!l.rect || !/forest|trees/.test(l.id)) continue;
           const stem = l.file.replace('.webp', '');
@@ -528,6 +604,65 @@ export function PixiWorldMap({
         .filter((l) => (l.opacity ?? 1) > 0 && !hidden.has(l.id) && !l.id.startsWith('event_shroud_'))
         .sort((a, b) => a.zIndex - b.zIndex);
       const canopyOn = fxOn.landLife && !reducedMotion && tn.forestSway > 0;
+      // Enumerate every URL the build below will await — mirroring the same flag conditions — and
+      // resolve it all in parallel. Misses fall back to the lazy `await load()` they used to do;
+      // extra URLs are only a little speculative bandwidth.
+      const bootUrls = new Set<string>();
+      const wantAsset = (url: string | undefined | null) => {
+        if (url) bootUrls.add(url);
+      };
+      for (const layer of layers) {
+        const swapBase = canopyOn && layer.id === 'base_flat';
+        wantAsset(layerUrl(manifest.world, swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file));
+      }
+      wantAsset('/assets/atmosphere/terrain/sea_mask.webp');
+      if (fxOn.seaPattern || (fxOn.seabed && (seabed?.opacity ?? 0) > 0)) wantAsset('/assets/world/wanderlust/base/layers/sea_pattern_tile.png');
+      if (fxOn.coastFoam) wantAsset('/assets/atmosphere/terrain/coast_distance.webp');
+      if (fxOn.waves) for (const mark of atmosphereAssets.waves?.marks ?? []) wantAsset(`/assets/atmosphere/${mark.src}`);
+      if (fxOn.seaMarks && defaultSeaMarksConfig.enabled) for (const mark of defaultSeaMarksConfig.marks) wantAsset(`/assets/atmosphere/${mark.src}`);
+      if (fxOn.wonders && seaWonderCatalog.length > 0) {
+        for (const w of seaWonderCatalog) wantAsset(`/assets/atmosphere/${w.src}`);
+        void fetchJson<{ wonder?: { x: number; y: number }[] }>('/assets/atmosphere/terrain/points.json');
+        bootTotal += 1;
+      }
+      if (fxOn.birds && atmosphereAssets.birds && atmosphereAssets.birds.flights.length > 0) wantAsset(`/assets/atmosphere/${atmosphereAssets.birds.strip}`);
+      if (fxOn.clouds) {
+        for (const band of atmosphereAssets.clouds) {
+          for (const s of band.sprites) {
+            wantAsset(`/assets/atmosphere/${s.src}`);
+            if (fxOn.cloudShadows) wantAsset(`/assets/atmosphere/${s.shadowSrc}`);
+          }
+        }
+      }
+      const regionsBase = regionsRef.current?.assetBase;
+      if (regionsOn && regionsBase) {
+        wantAsset(`${regionsBase}/region_ids.png`);
+        void fetchJson<{ size: [number, number]; regions: PixiRegion[] }>(`${regionsBase}/regions.json`);
+        bootTotal += 1;
+      }
+      // Canopy texture names are known only once the variant sub-manifest resolves; they join the
+      // same budget late so the bar keeps moving honestly.
+      const canopyReady = canopyOn
+        ? fetchJson<{ surfaceLayers: { id: string; file: string; rect?: unknown }[] }>('/assets/world/wanderlust/base/manifest.json').then((sub) => {
+            bootTotal += 1;
+            const variant = layers.find((l) => l.id === 'base_flat')?.file.includes('.graded') ? '.graded' : '';
+            const late: Promise<unknown>[] = [];
+            for (const l of sub.surfaceLayers) {
+              if (!l.rect || !/forest|trees/.test(l.id)) continue;
+              const url = layerUrl(manifest.world, `${l.file.replace('.webp', '')}.canopy${variant}.webp`);
+              if (bootUrls.has(url)) continue;
+              bootUrls.add(url);
+              bootTotal += 1;
+              late.push(trackBootLoad(url));
+            }
+            return Promise.all(late);
+          })
+        : Promise.resolve();
+      bootTotal += bootUrls.size;
+      await Promise.all([...bootUrls].map(trackBootLoad), canopyReady);
+      emitBootProgress('build');
+      if (disposed) return;
+
       for (const layer of layers) {
         const swapBase = canopyOn && layer.id === 'base_flat';
         const texture = await load(layerUrl(manifest.world, swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file));
@@ -554,6 +689,7 @@ export function PixiWorldMap({
         }
         if (swapBase) await addCanopies(layer.file.includes('.graded') ? '.graded' : '');
       }
+      buildStep();
 
       const ticks: ((seconds: number) => void)[] = [];
       const bandLayers: { layer: Container; parallax: number }[] = [];
@@ -577,7 +713,8 @@ export function PixiWorldMap({
         const g = (1 - 0.14 * night) * (1 - 0.08 * lit.warm);
         const b = (1 - 0.06 * night) * (1 - 0.22 * lit.warm);
         wash.tint = (Math.round(r * 255) << 16) | (Math.round(g * 255) << 8) | Math.round(b * 255);
-        if (wash.parent !== world || world.getChildIndex(wash) !== world.children.length - 1) world.addChild(wash);
+        wash.zIndex = NIGHT_WASH_Z;
+        if (wash.parent !== world) world.addChild(wash);
         wash.position.set(-margin - 2000, -marginY - 2000);
         wash.width = canvas.width + 2 * margin + 4000;
         wash.height = canvas.height + 2 * marginY + 4000;
@@ -844,6 +981,7 @@ export function PixiWorldMap({
         world.addChild(layer);
       }
 
+      buildStep();
       // ── Open-sea pattern (shader) ──
       if (fxOn.seaPattern) {
         const pattern = await load('/assets/world/wanderlust/base/layers/sea_pattern_tile.png');
@@ -945,7 +1083,7 @@ export function PixiWorldMap({
       const wonderLayer = new Container();
       // ── Sea wonders (kraken, whale, pirate ship): a rare one surfaces in open water, stays, sinks ──
       if (fxOn.wonders && seaWonderCatalog.length > 0) {
-        const points = (await fetch('/assets/atmosphere/terrain/points.json').then((r) => r.json())) as { wonder?: { x: number; y: number }[] };
+        const points = await fetchJson<{ wonder?: { x: number; y: number }[] }>('/assets/atmosphere/terrain/points.json');
         const anchors = points.wonder ?? [];
         const sprites = await Promise.all(seaWonderCatalog.map(async (w) => ({ w, tex: await load(`/assets/atmosphere/${w.src}`) })));
         if (disposed) return;
@@ -1021,6 +1159,7 @@ export function PixiWorldMap({
         });
       }
 
+      buildStep();
       // ── Coastal foam (shader) ──
       if (fxOn.coastFoam) {
         const dist = await load('/assets/atmosphere/terrain/coast_distance.webp');
@@ -1098,6 +1237,7 @@ export function PixiWorldMap({
         world.addChild(layer);
       }
 
+      buildStep();
       // ── Clouds: the same bands as their shadows, drifting above everything ──
       // Wonders sit above the sea pattern, the waves and the coast foam.
       world.addChild(wonderLayer);
@@ -1147,6 +1287,7 @@ export function PixiWorldMap({
           const layer = new Container();
           const parallax = CLOUD_PARALLAX[level] * tn.cloudParallax;
           bandLayers.push({ layer, parallax });
+          layer.zIndex = CLOUD_BAND_Z;
           world.addChild(layer);
           // Clouds are born at the upwind edge and carried across by the wind: a new one every so often, each
           // formed from a sprite of the band with its own size, height and shape, and dissolved at the far edge.
@@ -1268,6 +1409,7 @@ export function PixiWorldMap({
         for (const tick of ticks) tick(t);
       });
 
+      buildStep();
       // ── Camera: safe-fit like the DOM kit, pan bounded to canvas ± sea margin ──
       const cam = { panX: 0, panY: 0, zoom: 1 };
       // Coverage floor only: the viewport must stay inside the sea the camera can reach
@@ -1295,12 +1437,14 @@ export function PixiWorldMap({
       const refit = () => {
         const W = app.screen.width;
         const H = app.screen.height;
-        if (fit) {
-          const left = fit.insets.left ?? 0;
-          const right = fit.insets.right ?? 0;
+        // Read the live fit: panel toggles change only the insets and must refit, not rebuild.
+        const liveFit = safeFitRef.current;
+        if (liveFit) {
+          const left = liveFit.insets.left ?? 0;
+          const right = liveFit.insets.right ?? 0;
           const freeW = W - left - right;
-          const freeH = H - fit.insets.top - fit.insets.bottom;
-          const land = fit.landBounds;
+          const freeH = H - liveFit.insets.top - liveFit.insets.bottom;
+          const land = liveFit.landBounds;
           cam.zoom = Math.max(floorZoom(), Math.min(freeW / (land.x1 - land.x0), freeH / (land.y1 - land.y0)));
           cam.panX = (land.x0 + land.x1) / 2 - (left + freeW / 2) / cam.zoom;
           // When the sea floor forces a zoom taller than the free area (wide, short windows) a centred
@@ -1309,8 +1453,8 @@ export function PixiWorldMap({
           const landH = (land.y1 - land.y0) * cam.zoom;
           cam.panY =
             landH > freeH
-              ? land.y1 - (H - fit.insets.bottom) / cam.zoom
-              : (land.y0 + land.y1) / 2 - (fit.insets.top + freeH / 2) / cam.zoom;
+              ? land.y1 - (H - liveFit.insets.bottom) / cam.zoom
+              : (land.y0 + land.y1) / 2 - (liveFit.insets.top + freeH / 2) / cam.zoom;
         } else {
           cam.zoom = Math.max(W / canvas.width, H / canvas.height);
           cam.panX = (canvas.width - W / cam.zoom) / 2;
@@ -1330,10 +1474,10 @@ export function PixiWorldMap({
       let glide = 0;
       focusRef.current = (wx, wy) => {
         cancelAnimationFrame(glide);
-        const left = fit?.insets.left ?? 0;
-        const right = fit?.insets.right ?? 0;
-        const top = fit?.insets.top ?? 0;
-        const bottom = fit?.insets.bottom ?? 0;
+        const left = safeFitRef.current?.insets.left ?? 0;
+        const right = safeFitRef.current?.insets.right ?? 0;
+        const top = safeFitRef.current?.insets.top ?? 0;
+        const bottom = safeFitRef.current?.insets.bottom ?? 0;
         const zoomTo = Math.min(cameraConfig.maxZoom, Math.max(cam.zoom, floorZoom() * 1.5));
         const freeW = app.screen.width - left - right;
         const freeH = app.screen.height - top - bottom;
@@ -1357,12 +1501,13 @@ export function PixiWorldMap({
       let userMoved = false;
       let drag: { x: number; y: number } | null = null;
 
+      buildStep();
       // ── Clickable regions: one 8-bit id map, one highlight sprite per hovered territory ──
       let cleanupRegions = () => {};
       if (regionsOn && regionsRef.current) {
         const base = regionsRef.current.assetBase;
         const [meta, idTexture] = await Promise.all([
-          fetch(`${base}/regions.json`).then((r) => r.json() as Promise<{ size: [number, number]; regions: PixiRegion[] }>),
+          fetchJson<{ size: [number, number]; regions: PixiRegion[] }>(`${base}/regions.json`),
           load(`${base}/region_ids.png`),
         ]);
         if (disposed) return;
@@ -1397,73 +1542,38 @@ export function PixiWorldMap({
             const H = mh * U;
             c.width = W;
             c.height = H;
-            const base = document.createElement('canvas');
-            base.width = mw;
-            base.height = mh;
-            const bctx = base.getContext('2d');
-            const bimg = bctx?.createImageData(mw, mh);
-            if (bctx && bimg) {
-              for (let i = 0; i < mw * mh; i += 1) {
-                if (ids[i * 4] === index) bimg.data[i * 4 + 3] = 255;
+            // Outline: the territory's boundary is walked on the id grid and simplified (Douglas–Peucker), so the ink
+            // runs in straight-ish segments that follow the shape rather than its stair steps. The ink is clipped to the
+            // shape, so only its inner half shows, and the warm wash fills the same polygon.
+            const thickW = Math.max(2, Math.round((tn.regionLinePx * W) / canvas.width));
+            const loops = traceBoundaryLoops(mw, mh, (x, y) => x >= 0 && y >= 0 && x < mw && y < mh && ids[(y * mw + x) * 4] === index)
+              .map((loop) => simplifyLoop(loop, REGION_OUTLINE_SIMPLIFY_PX * (mw / canvas.width)));
+            const tracePath = () => {
+              ctx.beginPath();
+              for (const loop of loops) {
+                loop.forEach(([px, py], i) => (i === 0 ? ctx.moveTo(px * U, py * U) : ctx.lineTo(px * U, py * U)));
+                ctx.closePath();
               }
-              bctx.putImageData(bimg, 0, 0);
-            }
-            const shape = document.createElement('canvas');
-            shape.width = W;
-            shape.height = H;
-            const sctx = shape.getContext('2d', { willReadFrequently: true });
-            if (sctx) {
-              sctx.imageSmoothingEnabled = true;
-              sctx.imageSmoothingQuality = 'high';
-              sctx.filter = `blur(${U * 2}px)`;
-              sctx.drawImage(base, 0, 0, W, H);
-              sctx.filter = 'none';
-              const sd = sctx.getImageData(0, 0, W, H);
-              for (let p = 3; p < sd.data.length; p += 4) sd.data[p] = sd.data[p] > 127 ? 255 : 0;
-              sctx.putImageData(sd, 0, 0);
-            }
-            const tint = (colour: string) => {
-              const t = document.createElement('canvas');
-              t.width = W;
-              t.height = H;
-              const g = t.getContext('2d');
-              if (g) {
-                g.drawImage(shape, 0, 0);
-                g.globalCompositeOperation = 'source-in';
-                g.fillStyle = colour;
-                g.fillRect(0, 0, W, H);
-              }
-              return t;
             };
-            // Eroded copy: the shape with its outer band removed (AND of the shape shifted in 8 directions).
-            const thick = Math.max(2, Math.round((tn.regionLinePx * W) / canvas.width));
-            const eroded = document.createElement('canvas');
-            eroded.width = W;
-            eroded.height = H;
-            const egx = eroded.getContext('2d');
-            if (egx) {
-              egx.drawImage(shape, 0, 0);
-              egx.globalCompositeOperation = 'destination-in';
-              const k = Math.round(thick * 0.7071);
-              for (const [dx, dy] of [[thick, 0], [-thick, 0], [0, thick], [0, -thick], [k, k], [-k, k], [k, -k], [-k, -k]]) {
-                egx.drawImage(shape, dx, dy);
-              }
-            }
-            // The ink ring = shape minus the eroded shape.
-            const ring = tint(`rgb(${REGION_EDGE_RGBA[0]}, ${REGION_EDGE_RGBA[1]}, ${REGION_EDGE_RGBA[2]})`);
-            const rctx = ring.getContext('2d');
-            if (rctx) {
-              rctx.globalCompositeOperation = 'destination-out';
-              rctx.drawImage(eroded, 0, 0);
-            }
-            ctx.drawImage(tint('rgba(255, 236, 190, 0.12)'), 0, 0);
-            ctx.drawImage(ring, 0, 0);
+            ctx.save();
+            tracePath();
+            ctx.fillStyle = 'rgba(255, 236, 190, 0.12)';
+            ctx.fill('evenodd');
+            tracePath();
+            ctx.clip('evenodd');
+            tracePath();
+            ctx.strokeStyle = `rgb(${REGION_EDGE_RGBA[0]}, ${REGION_EDGE_RGBA[1]}, ${REGION_EDGE_RGBA[2]})`;
+            ctx.lineWidth = thickW * 2;
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            ctx.restore();
           }
           sprite = new Sprite(Texture.from(c));
           sprite.width = canvas.width;
           sprite.height = canvas.height;
           sprite.alpha = 0;
           sprite.visible = false;
+          sprite.zIndex = REGION_RING_Z;
           world.addChild(sprite);
           highlights.set(index, sprite);
           return sprite;
@@ -1652,7 +1762,44 @@ export function PixiWorldMap({
         focusRef.current = null;
         camRef.current = null;
       };
-    })().catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
+
+      // ── Warmup: push every texture to the GPU and let the first frames render behind the veil,
+      // so the reveal is already settled — no upload jank on the first pan, no pre-fit corner flash.
+      emitBootProgress('warmup');
+      if (disposed) return;
+      try {
+        await app.renderer.prepare.upload(world);
+      } catch {
+        /* best-effort: the reveal is still correct, just less warm */
+      }
+      if (disposed) return;
+      // Two rendered frames so shader compiles and first-draw uploads are done; the timeout keeps
+      // boot honest on hidden tabs, where the ticker is throttled.
+      await Promise.race([
+        new Promise<void>((resolve) => {
+          let frames = 0;
+          const tick = () => {
+            frames += 1;
+            if (disposed || frames >= 2) {
+              try {
+                app.ticker.remove(tick);
+              } catch {
+                /* ticker already torn down */
+              }
+              resolve();
+            }
+          };
+          app.ticker.add(tick);
+        }),
+        new Promise<void>((resolve) => setTimeout(resolve, 500)),
+      ]);
+      emitBootProgress('ready');
+      onReadyRef.current?.();
+    })().catch((e: unknown) => {
+      const message = e instanceof Error ? e.message : String(e);
+      setError(message);
+      onBootErrorRef.current?.(message);
+    });
 
     return () => {
       disposed = true;
@@ -1663,7 +1810,7 @@ export function PixiWorldMap({
         /* init may not have finished */
       }
     };
-  }, [manifest, cameraConfig, hiddenKey, safeFitKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, regionsOn, tuneKey, onStats, syncAnchors]);
+  }, [manifest, cameraConfig, hiddenKey, safeFitMarginKey, fxKey, seaPatternConfig, coastFoamConfig, cloudShadowOpacity, cloudShadowOffset.x, cloudShadowOffset.y, cloudSpeed, seabed?.opacity, seabed?.parallax, regionsOn, tuneKey, onStats, syncAnchors]);
 
   // New or moved anchors get placed before paint, not on the next camera move.
   useLayoutEffect(syncAnchors);
@@ -1671,6 +1818,12 @@ export function PixiWorldMap({
   useEffect(() => {
     if (recenterSignal > 0) refitRef.current?.();
   }, [recenterSignal]);
+
+  // Panel open/close changes only the fit insets: refit the camera in place
+  // (the old behaviour tore down and rebuilt the whole Pixi app — a visible hitch).
+  useEffect(() => {
+    refitRef.current?.();
+  }, [safeFitKey]);
 
   useEffect(() => {
     if (!focusRequest || !manifest) return;

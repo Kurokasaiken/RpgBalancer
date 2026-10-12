@@ -89,7 +89,7 @@ describe('QuestRunWindow — what the player reads', () => {
     for (const seed of [3, 17, 58]) {
       const run = atExploration(seed);
       const { unmount } = renderWindow(run);
-      const body = screen.getAllByText(/Il bosco tace/);
+      const body = screen.getAllByText(/The wood is silent/);
       expect(body).toHaveLength(1);
       unmount();
     }
@@ -104,7 +104,7 @@ describe('engine — a party killed by an outcome toll ends the run', () => {
       for (let step = 0; step < 80 && !run.ended; step += 1) {
         const options = availableOptions(run).filter((o) => !o.disabled);
         if (!options.length) break;
-        const greedy = options.find((o) => /Frugare|Incalz|Arrampic|Prendere/.test(o.label)) ?? options[0];
+        const greedy = options.find((o) => /loot|Pursue|Climb|Take|Fight/i.test(o.label)) ?? options[0];
         applyChoice(run, greedy.id);
         expect(run.ended || run.party.some((m) => !m.dead)).toBe(true);
       }
@@ -115,7 +115,7 @@ describe('engine — a party killed by an outcome toll ends the run', () => {
 });
 
 describe('check summary honesty', () => {
-  it('never says «Nessuna conseguenza fisica» for a check that took HP', () => {
+  it('never says «No physical consequences» for a check that took HP', () => {
     let checked = 0;
     for (let seed = 1; seed <= 300; seed += 1) {
       const run = createRun(PRESET, seed, 'goblin');
@@ -126,7 +126,7 @@ describe('check summary honesty', () => {
         const first = run.checkQueue[0];
         if (first && first.harms.length > 0 && run.lastEvent.startsWith(`${first.title} —`)) {
           checked += 1;
-          expect(run.lastEvent).not.toContain('Nessuna conseguenza fisica');
+          expect(run.lastEvent).not.toContain('No physical consequences');
         }
       }
     }

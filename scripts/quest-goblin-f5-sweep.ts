@@ -105,8 +105,8 @@ function playArm(seed: number, arm: F5Arm): { st: QuestRunState; a: ArmStats } {
   a.woundsTot += s.party.filter((m) => m.wounded && !m.dead).length;
   a.goldTot += s.gold;
   a.hpLostTot += s.party.reduce((sum, m) => sum + (m.dead ? m.maxHp : m.maxHp - m.hp), 0);
-  if (s.log.some((e) => e.text.includes('Agguato'))) a.ambush++;
-  if (s.log.some((e) => e.text.includes('ultima mischia')) && s.flags.includes('agguatoPeggiore')) a.forcedFight++;
+  if (s.log.some((e) => e.text.includes('Ambush'))) a.ambush++;
+  if (s.log.some((e) => e.text.includes('last melee')) && s.flags.includes('agguatoPeggiore')) a.forcedFight++;
   return { st: s, a };
 }
 

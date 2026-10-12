@@ -1,10 +1,12 @@
-import React, { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MatericButton } from '@/ui/designSystem/primitives';
 import { HudPlaque, SkinScope, SkinTitle } from '@/ui/idleVillage/skins/primitives';
+import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import './gameFrameCursors.css';
 import { HudRibbon } from './HudRibbon';
 import { HudGlyph } from './hudIcons';
+import { HudHideToggle } from './HudHideToggle';
 import { useHudMaterial } from './useHudMaterial';
 import {
   DEFAULT_GAME_FRAME_CONFIG,
@@ -148,6 +150,55 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   const z = config.zLayers;
   const washOn = config.edgeWash.enabled || (import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('wash') === '1');
 
+  /* Hide-HUD: every chrome cluster slides off its own edge — the top row rises,
+   * the bottom instruments sink — while one pearl (the toggle) stays in the
+   * bottom-right corner to call it all back. Session-only by design: reopening
+   * the map always lands on a dressed HUD. */
+  const [hudHidden, setHudHidden] = useState(false);
+  const reducedMotion = useRef(typeof window !== 'undefined' && (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)).current;
+  const slideMs = reducedMotion ? 0 : config.hudHide.slideMs;
+  const fadeMs = Math.round(slideMs * 0.55);
+  const toggleHud = useCallback(() => {
+    setHudHidden((v) => {
+      trackTelemetryEvent('game_hud_toggle', { hidden: !v });
+      return !v;
+    });
+  }, []);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName))) return;
+      if (event.key.toLowerCase() === config.hudHide.shortcut) toggleHud();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [toggleHud, config.hudHide.shortcut]);
+  /** Slide style for one chrome cluster. `base` preserves a transform the element already needs (centering, tilt). */
+  const slideChrome = (dir: 'up' | 'down', base = ''): CSSProperties => {
+    const prefix = base && base !== 'none' ? `${base} ` : '';
+    return hudHidden
+      ? {
+          transform: `${prefix}translateY(calc(${dir === 'up' ? '-100% -' : '100% +'} ${config.hudHide.offscreenPx}px))`,
+          opacity: 0,
+          visibility: 'hidden',
+          transition: `transform ${slideMs}ms ease, opacity ${fadeMs}ms ease, visibility 0s linear ${slideMs}ms`,
+        }
+      : {
+          transform: base || 'none',
+          opacity: 1,
+          visibility: 'visible',
+          transition: `transform ${slideMs}ms ease, opacity ${fadeMs}ms ease`,
+        };
+  };
+
+  /* Baseline 'none' keeps the roster anchor from becoming a containing block for
+   * its position:fixed drag overlay (see the comment at the anchor below). */
+  const rosterBaseTransform =
+    config.roster.tiltDeg !== 0 || config.roster.scale !== 1
+      ? `rotate(${config.roster.tiltDeg}deg) scale(${config.roster.scale})`
+      : '';
+
   const navContent = (
     <nav aria-label={t('gameFrame.nav.ariaLabel')} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
       {navItems.map((item, index) => {
@@ -202,6 +253,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   return (
     <SkinScope
       className={['game-frame', className].filter(Boolean).join(' ')}
+      data-hud-hidden={hudHidden ? '' : undefined}
       style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', ...style }}
     >
       {/* The world. Full-bleed, edge to edge — and the only frame on screen is this shell. */}
@@ -235,6 +287,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             flexDirection: 'column',
             alignItems: 'flex-start',
             padding: '8px 40px 12px 22px',
+            ...slideChrome('up'),
           }}
         >
           <SkinTitle level="subtitle" style={{ margin: 0, fontSize: 15, letterSpacing: '0.1em' }}>
@@ -273,6 +326,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             // Both top plaques share one height (the resources one carries a second line): same bottom edge.
             alignItems: 'stretch',
             pointerEvents: 'none',
+            ...slideChrome('up'),
           }}
         >
           <div style={{ justifySelf: 'start', minWidth: 0, pointerEvents: 'auto', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -299,7 +353,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             bevel={bevel}
             anchor="top"
             ornament
-            style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: z.chrome }}
+            style={{ position: 'absolute', top: 0, left: '50%', zIndex: z.chrome, ...slideChrome('up', 'translateX(-50%)') }}
           >
             {whenWhereSlot}
           </HudRibbon>
@@ -307,7 +361,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             bevel={bevel}
             anchor="top"
             cutPx={22}
-            style={{ position: 'absolute', top: 0, right: 0, zIndex: z.chrome, padding: '8px 22px 12px 40px', maxWidth: 'calc(50% - 130px)' }}
+            style={{ position: 'absolute', top: 0, right: 0, zIndex: z.chrome, padding: '8px 22px 12px 40px', maxWidth: 'calc(50% - 130px)', ...slideChrome('up') }}
           >
             {/* The clip lives on an inner box: overflow on the ribbon root would cut its shadow. */}
             <div style={{ minWidth: 0, overflow: 'hidden' }}>{resourcesSlot}</div>
@@ -317,16 +371,15 @@ export const GameFrame: React.FC<GameFrameProps> = ({
 
       {/* ── Right edge: what is coming, hung from the top ribbon ── */}
       {hangingSlot != null && (
-        <div style={{ position: 'absolute', top: config.insets.hangingTopPx, right: inset + 8, zIndex: z.panels }}>{hangingSlot}</div>
+        <div style={{ position: 'absolute', top: config.insets.hangingTopPx, right: inset + 8, zIndex: z.panels, ...slideChrome('up') }}>{hangingSlot}</div>
       )}
 
 
-      {/* ── Bottom-right: utility controls ──────────────────────── */}
-      {utilitySlot != null && (
-        <div style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome }}>
-          {utilitySlot}
-        </div>
-      )}
+      {/* ── Bottom-right: utility controls, and the pearl that stays when the rest is hidden ── */}
+      <div style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+        {utilitySlot != null && <div style={slideChrome('down')}>{utilitySlot}</div>}
+        <HudHideToggle hidden={hudHidden} onToggle={toggleHud} />
+      </div>
 
       {rosterSlot != null && (
         <RosterAnchor
@@ -336,17 +389,14 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             bottom: config.roster.bottomPx,
             width: config.roster.widthPx,
             zIndex: z.panels,
+            transformOrigin: 'bottom left',
             // No transform unless one is configured: any transform here becomes the
             // containing block for the roster's position:fixed drag overlay, which then
             // lands off-target (the portrait medallion never shows under the cursor).
             // No shadow either: the roster moves inside this box, its own shadow moves
             // with it, and a shadow here would stay behind as a ghost.
-            ...(config.roster.tiltDeg !== 0 || config.roster.scale !== 1
-              ? {
-                  transform: `rotate(${config.roster.tiltDeg}deg) scale(${config.roster.scale})`,
-                  transformOrigin: 'bottom left',
-                }
-              : {}),
+            // (`slideChrome` returns `transform: 'none'` at rest, which is exempt.)
+            ...slideChrome('down', rosterBaseTransform),
           }}
         >
           {rosterSlot}
@@ -362,7 +412,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
         <HudPlaque
           shape="plinth"
           as="div"
-          style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', zIndex: z.chrome, padding: '20px 40px 8px' }}
+          style={{ position: 'absolute', bottom: 0, left: '50%', zIndex: z.chrome, padding: '20px 40px 8px', ...slideChrome('down', 'translateX(-50%)') }}
         >
           {navContent}
         </HudPlaque>
@@ -376,10 +426,10 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             position: 'absolute',
             bottom: 0,
             left: '50%',
-            transform: 'translateX(-50%)',
             zIndex: z.chrome,
             gap: 2,
             padding: '10px 30px 8px',
+            ...slideChrome('down', 'translateX(-50%)'),
           }}
         >
           {navContent}

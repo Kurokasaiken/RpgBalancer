@@ -82,7 +82,7 @@ describe('quest frontier (v27)', () => {
     atChoice(run, 'gob-esplora-extra');
     submitCommand(run, 'gob-fermati', { tick: 0 });
     // The relief beat exists now: before, the ambush overwrote it in the same click.
-    expect(run.lastEvent).toContain('fischiettare');
+    expect(run.lastEvent).toContain('whistling');
     expect(run.party.every((m) => m.hp === m.maxHp)).toBe(true);
   });
 

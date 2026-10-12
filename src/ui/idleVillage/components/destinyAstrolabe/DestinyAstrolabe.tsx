@@ -99,22 +99,22 @@ function PhaseCommentary({
       {isThreat && (
         <div className="da-phase-chip da-phase-chip--threat">
           <span className="da-phase-chip-icon">◼</span>
-          <span className="da-phase-chip-label">Difficoltà</span>
+          <span className="da-phase-chip-label">Difficulty</span>
           <span className="da-phase-chip-value">{avgDiff}</span>
         </div>
       )}
       {isAgency && (
         <div className="da-phase-chip da-phase-chip--agency">
           <span className="da-phase-chip-icon">◻</span>
-          <span className="da-phase-chip-label">Fortitudine</span>
+          <span className="da-phase-chip-label">Fortitude</span>
           <span className="da-phase-chip-value">{avgStat}</span>
         </div>
       )}
       {isRisk && (
         <div className="da-phase-chip da-phase-chip--risk">
-          <span className="da-phase-risk-item da-phase-risk--dead">⬤ {dead}% Morte</span>
+          <span className="da-phase-risk-item da-phase-risk--dead">⬤ {dead}% Death</span>
           <span className="da-phase-risk-sep">·</span>
-          <span className="da-phase-risk-item da-phase-risk--wound">⬤ {wound}% Ferita</span>
+          <span className="da-phase-risk-item da-phase-risk--wound">⬤ {wound}% Wound</span>
         </div>
       )}
     </div>
@@ -412,17 +412,17 @@ export const DestinyAstrolabe = memo(
                 <div className="da-narrator-item">
                   <span className="da-narrator-dot da-narrator-dot--wound" />
                   <span>
-                    <span className="da-narrator-label">FERITA {wound}%</span>
+                    <span className="da-narrator-label">WOUND {wound}%</span>
                     <br />
-                    <span className="da-narrator-sub">Corona cremisi — zona di rischio attorno alla stella</span>
+                    <span className="da-narrator-sub">Crimson corona — risk zone around the star</span>
                   </span>
                 </div>
                 <div className="da-narrator-item">
                   <span className="da-narrator-dot da-narrator-dot--dead" />
                   <span>
-                    <span className="da-narrator-label">MORTE {dead}%</span>
+                    <span className="da-narrator-label">DEATH {dead}%</span>
                     <br />
-                    <span className="da-narrator-sub">Voragini viola — nelle valli, caduta letale</span>
+                    <span className="da-narrator-sub">Purple chasms — in the valleys, a lethal fall</span>
                   </span>
                 </div>
               </div>

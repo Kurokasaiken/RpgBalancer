@@ -215,18 +215,18 @@ const pct = (x: number, n: number) => (n ? `${((x / n) * 100).toFixed(1)}%` : '�
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
 
 const NODE_LABEL: Record<string, string> = {
-  'gob-esplora': 'F1 Esplorazione', 'gob-bottino-scelta': 'F2 Bottino', 'gob-accampamento': 'F3 Approccio',
-  'gob-combattimento': 'F4 Combattimento', 'gob-incalzare': 'F5 Incalzare', 'gob-esplora-extra': 'F6 Razzia',
-  'gob-agguato-scelta': 'F7 Trofeo-o-sangue', 'gob-ultimo-scontro': 'F7 Ultima mischia',
+  'gob-esplora': 'F1 Exploration', 'gob-bottino-scelta': 'F2 Loot', 'gob-accampamento': 'F3 Approach',
+  'gob-combattimento': 'F4 Combat', 'gob-incalzare': 'F5 Pursuit', 'gob-esplora-extra': 'F6 Raid',
+  'gob-agguato-scelta': 'F7 Trophy-or-blood', 'gob-ultimo-scontro': 'F7 Last stand',
 };
 const OPT_LABEL: Record<string, string> = {
-  'gob-cerca-tracce': 'Cercare tracce (PER)', 'gob-forza-tracce': 'Sentiero a forza (PER+FOR)',
-  'gob-prendi': 'Prendere il bottino (AGI)', 'gob-lascia-bottino': 'Lasciare stare',
-  'gob-via-stealth': 'Stealth (AGI)', 'gob-via-assalto': 'Assalto (FOR)',
-  'gob-lascia-fuggire': 'Lasciarli fuggire', 'gob-insegui': 'Incalzare (FOR)',
-  'gob-fruga': 'Frugare ancora', 'gob-fermati': 'Fermarsi',
-  'gob-molla-trofeo': 'Mollare il trofeo', 'gob-ultima-mischia': 'Affrontare la mischia',
-  'fight-turn': 'Combatti (turno)', 'gob-partenza': 'Partire', 'RETREAT': 'Retreat',
+  'gob-cerca-tracce': 'Look for tracks (PER)', 'gob-forza-tracce': 'Force the trail (PER+STR)',
+  'gob-prendi': 'Take the loot (AGI)', 'gob-lascia-bottino': 'Leave it be',
+  'gob-via-stealth': 'Stealth (AGI)', 'gob-via-assalto': 'Assault (STR)',
+  'gob-lascia-fuggire': 'Let them flee', 'gob-insegui': 'Pursue them (STR)',
+  'gob-fruga': 'Keep looting', 'gob-fermati': 'Stop here',
+  'gob-molla-trofeo': 'Drop the trophy', 'gob-ultima-mischia': 'Stand and fight',
+  'fight-turn': 'Fight (turn)', 'gob-partenza': 'Depart', 'RETREAT': 'Retreat',
 };
 const LVL = ['safe', 'uncertain', 'dangerous', 'crisis'];
 
@@ -260,7 +260,7 @@ for (const policy of ['optimal', 'cautious', 'greedy', 'optimal-flee'] as Policy
     hpLostTot += r.party.reduce((sum, m) => sum + (m.dead ? m.maxHp : m.maxHp - m.hp), 0);
     goldTot += r.gold; xpTot += r.xp;
     if (r.flags.includes('sterminio')) sterminio++;
-    if (r.log.some((e) => e.text.includes('Agguato'))) ambush++;
+    if (r.log.some((e) => e.text.includes('Ambush'))) ambush++;
     if (r.alarm) alarmN++;
     if (r.flags.includes('trofeoLasciato') || r.flags.includes('trofeoPerso')) trophyLost++;
     combatTurnsTot += r.combatTurn; goblinLeftTot += r.goblinLeft;
@@ -269,14 +269,14 @@ for (const policy of ['optimal', 'cautious', 'greedy', 'optimal-flee'] as Policy
       else if (m.wounded) woundBy[m.name] = (woundBy[m.name] ?? 0) + 1;
     }
     for (const e of r.log) {
-      const m = e.text.match(/^([A-Z][a-z]+) incassa il colpo/);
+      const m = e.kind === 'HARM' ? e.text.match(/^([A-Z][a-z]+)\b/) : null;
       if (m) hitBy[m[1]] = (hitBy[m[1]] ?? 0) + 1;
     }
   }
   out(`### ${policy}`);
   out(`- outcome: reward **${pct(reward, N)}** | survived ${pct(survived, N)} | fled ${pct(fledN, N)} | **WIPE ${pct(wipe, N)}**`);
   out(`- deaths: 0 ${pct(deadDist[0], N)} | 1 ${pct(deadDist[1], N)} | 2 ${pct(deadDist[2], N)} | 3+ ${pct(deadDist[3], N)} · mean ${(deathsTot / N).toFixed(2)} · wounds/run ${(woundsTot / N).toFixed(2)} · HP lost ${(hpLostTot / N).toFixed(0)}/280`);
-  out(`- gold ${(goldTot / N).toFixed(1)} · XP ${(xpTot / N).toFixed(0)} · sterminio ${pct(sterminio, N)} · ambush ${pct(ambush, N)} · alarm ${pct(alarmN, N)} · trophy lost ${pct(trophyLost, N)}`);
+  out(`- gold ${(goldTot / N).toFixed(1)} · XP ${(xpTot / N).toFixed(0)} · extermination ${pct(sterminio, N)} · ambush ${pct(ambush, N)} · alarm ${pct(alarmN, N)} · trophy lost ${pct(trophyLost, N)}`);
   out(`- combat turns ${(combatTurnsTot / N).toFixed(1)} · goblins left ${(goblinLeftTot / N).toFixed(1)}`);
   out(`- members: ${['Edda', 'Milo', 'Bruna', 'Kran'].map((n) => `**${n}** dead ${pct(deadBy[n] ?? 0, N)} / wounded ${pct(woundBy[n] ?? 0, N)} / hits ${((hitBy[n] ?? 0) / N).toFixed(1)}/run`).join(' · ')}`);
   out('');
@@ -410,7 +410,7 @@ out('## D. Party analysis\n');
   const hitBy: Record<string, number> = {}; const deadBy: Record<string, number> = {};
   for (const r of randomRuns) {
     for (const e of r.state.log) {
-      const m = e.text.match(/^([A-Z][a-z]+) incassa il colpo/);
+      const m = e.kind === 'HARM' ? e.text.match(/^([A-Z][a-z]+)\b/) : null;
       if (m) hitBy[m[1]] = (hitBy[m[1]] ?? 0) + 1;
     }
     for (const m of r.state.party) if (m.dead) deadBy[m.name] = (deadBy[m.name] ?? 0) + 1;
@@ -482,21 +482,21 @@ out('## G. Representative stories\n');
       .filter((d) => d.optionId !== 'fight-turn')
       .map((d) => {
         const check = d.verdict ? ` → ${d.verdict.toUpperCase()}` : '';
-        const harm = d.events.filter((e) => e.includes('incassa') || e.includes('non si rialza') || e.includes('muore')).map((e) => ` (${e})`).join('');
-        const info = d.events.find((e) => e.includes('sveglia') || e.includes('Agguato') || e.includes('sterminio') || e.includes('trofeo') || e.includes('Trofeo'));
+        const harm = d.events.filter((e) => e.includes('dies') || e.includes('wounded') || e.includes('HP)')).map((e) => ` (${e})`).join('');
+        const info = d.events.find((e) => e.includes('wakes') || e.includes('Ambush') || e.includes('Extermination') || e.includes('trophy') || e.includes('Trophy'));
         return `  ${OPT_LABEL[d.optionId] ?? d.optionId}${check}${harm}${info ? ` — ${info}` : ''}`;
       });
     const fightTurns = r.decisions.filter((d) => d.optionId === 'fight-turn').length;
     return [
-      `**Run #${r.seed}** — ${r.state.outcome.toUpperCase()} · ${dead.length} morti (${dead.join(',') || '—'}) · ${wnd.length} feriti · ${r.state.gold}g · ${r.state.xp}XP · ${fightTurns} turni F4`,
+      `**Run #${r.seed}** — ${r.state.outcome.toUpperCase()} · ${dead.length} dead (${dead.join(',') || '—'}) · ${wnd.length} wounded · ${r.state.gold}g · ${r.state.xp}XP · ${fightTurns} F4 turns`,
       ...ls, '',
     ];
   };
   const bucket = (pred: (r: TracedRun) => boolean) => randomRuns.filter(pred);
   const samples: [string, TracedRun[]][] = [
-    ['Vittoria pulita', bucket((r) => r.state.outcome === 'reward' && r.state.party.every((m) => !m.dead)).slice(-3)],
-    ['Vittoria costosa (morti)', bucket((r) => r.state.outcome === 'reward' && r.state.party.filter((m) => m.dead).length >= 1).slice(-3)],
-    ['Quest fallita / resa', bucket((r) => r.state.outcome !== 'reward' && r.state.outcome !== 'wipe').slice(-3)],
+    ['Clean win', bucket((r) => r.state.outcome === 'reward' && r.state.party.every((m) => !m.dead)).slice(-3)],
+    ['Costly win (deaths)', bucket((r) => r.state.outcome === 'reward' && r.state.party.filter((m) => m.dead).length >= 1).slice(-3)],
+    ['Failed quest / yielded', bucket((r) => r.state.outcome !== 'reward' && r.state.outcome !== 'wipe').slice(-3)],
     ['Wipe', bucket((r) => r.state.outcome === 'wipe').slice(-2)],
     ['Agguato subito', bucket((r) => r.state.log.some((e) => e.text.includes('Agguato'))).slice(-2)],
     ['Campo sveglio', bucket((r) => r.state.alarm).slice(-2)],

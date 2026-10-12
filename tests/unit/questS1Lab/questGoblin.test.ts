@@ -118,7 +118,7 @@ describe('goblin run flow', () => {
     run = playUntil(run, 'gob-fine', 10);
     expect(run.ended).toBe(true);
     expect(run.objectiveDone).toBe(false);
-    expect(run.loot).not.toContain('trofeo dei goblin');
+    expect(run.loot).not.toContain('goblin trophy');
     expect(run.xp).toBeGreaterThan(0);
   });
 
