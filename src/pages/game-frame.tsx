@@ -56,13 +56,19 @@ export interface GameFrameScreenProps {
   devPanels?: boolean;
   /** Live skin selector inside the game menu (the page owns the preset state). Omit to hide the row. */
   skinControl?: HudSkinControl;
+  /** Bump to call the HUD chrome back on the game's behalf (event wake). */
+  hudWakeSignal?: number;
+  /** While an event theatre holds the clock, pause/speed inputs stay inert. */
+  timeInputLocked?: boolean;
+  /** Reports HUD chrome visibility changes to the page (ambient effects, ambience cues). */
+  onHudHiddenChange?: (hidden: boolean) => void;
 }
 
-export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective, panels: panelsProp, devPanels = false, skinControl }: GameFrameScreenProps) {
+export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective, panels: panelsProp, devPanels = false, skinControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange }: GameFrameScreenProps) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
-  useTimeEngineLoop(gameplay);
+  useTimeEngineLoop(gameplay, { inputLocked: timeInputLocked });
   const Roster = useHudMaterial() === 'lacquer' ? MatericRosterComponentV2 : MatericRosterComponent;
 
   const [activeNavId, setActiveNavId] = useState('map');
@@ -87,17 +93,22 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
     if (event.at) setFocusRequest((prev) => ({ ...event.at!, n: (prev?.n ?? 0) + 1 }));
   };
   const onSpeedChange = (speed: number) => {
+    if (timeInputLocked) return;
     gameplay.setSpeedMultiplier(speed);
     if (state.isPaused) gameplay.resumeGame('user');
   };
-  const onTogglePause = () => (state.isPaused ? gameplay.resumeGame('user') : gameplay.pauseGame('user'));
+  const onTogglePause = () => {
+    if (timeInputLocked) return;
+    if (state.isPaused) gameplay.resumeGame('user');
+    else gameplay.pauseGame('user');
+  };
 
   const availableSpeeds = [1, 2, 4, 8].filter((s) => s <= config.loop.maxSpeedMultiplier);
 
   // Time shortcuts: Space pauses or resumes, 1-4 pick the speed in order. The ref keeps one listener on the latest handlers.
-  const timeKeys = useRef({ onTogglePause, onSpeedChange, availableSpeeds });
+  const timeKeys = useRef({ onTogglePause, onSpeedChange, availableSpeeds, locked: timeInputLocked });
   useEffect(() => {
-    timeKeys.current = { onTogglePause, onSpeedChange, availableSpeeds };
+    timeKeys.current = { onTogglePause, onSpeedChange, availableSpeeds, locked: timeInputLocked };
   });
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -105,6 +116,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
       const target = event.target as HTMLElement | null;
       if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(target.tagName))) return;
       const keys = timeKeys.current;
+      if (keys.locked) return;
       if (event.code === 'Space') {
         event.preventDefault();
         keys.onTogglePause();
@@ -155,6 +167,10 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
         }
         rosterSlot={panels.visible.roster ? (typeof rosterSlot === 'function' ? rosterSlot({ onClose: () => panels.set('roster', false) }) : (rosterSlot ?? <Roster componentId="game-frame-roster" density="compact" onClose={() => panels.set('roster', false)} />)) : undefined}
         recenterSlot={<HudRecenterButton onRecenter={() => setRecenterSignal((n) => n + 1)} />}
+        /* A ledger that changes while the chrome is hidden calls it back —
+         * `events.length` is part of the wake signal, no bookkeeping needed. */
+        hudWakeSignal={(hudWakeSignal ?? 0) + events.length}
+        onHudHiddenChange={onHudHiddenChange}
       >
         {renderMap({ recenterSignal, focusRequest })}
       </GameFrame>

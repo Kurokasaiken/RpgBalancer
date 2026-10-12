@@ -19,7 +19,7 @@ export function HudHideToggle({ hidden, onToggle }: HudHideToggleProps) {
   const key = hidden ? 'gameFrame.hud.show' : 'gameFrame.hud.hide';
   const label = `${t(key)} — ${DEFAULT_GAME_FRAME_CONFIG.hudHide.shortcut.toUpperCase()}`;
   return (
-    <div data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>
+    <div data-hud-controls="" data-hud-hide-toggle="" style={{ position: 'relative', pointerEvents: 'auto' }}>
       <button
         type="button"
         data-testid="hud-hide-toggle"

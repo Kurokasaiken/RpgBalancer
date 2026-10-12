@@ -188,6 +188,55 @@ export default function GameFramePixiPage() {
     const timer = window.setTimeout(() => setCardOpen(true), 700);
     return () => window.clearTimeout(timer);
   }, [shroudCovered]);
+
+  /* Event theatre holds the clock (Director, 2026-10-12): from the moment the
+   * curtains start closing until they've fully reopened — card at the peak,
+   * click, curtains open — time stands still. The snapshot taken at trigger is
+   * restored when the theatre ends: a running clock resumes at the speed it had
+   * (the multiplier is never touched), a paused one stays paused. The goblin
+   * march that follows is a world event, not theatre: the clock is already back
+   * when it walks. While frozen, the player's own pause/speed inputs are muted
+   * (`timeInputLocked`) so nothing can unpause under the curtains. */
+  const [timeFrozen, setTimeFrozen] = useState(false);
+  const timeFreezeSnapshot = useRef<{ wasPaused: boolean } | null>(null);
+  useEffect(() => {
+    if (shroudCovered) {
+      setTimeFrozen(true);
+      if (!timeFreezeSnapshot.current) {
+        const gameplay = useMinimalGameplayStore.getState();
+        timeFreezeSnapshot.current = { wasPaused: gameplay.state.isPaused };
+        if (!gameplay.state.isPaused) gameplay.pauseGame('auto');
+      }
+      return undefined;
+    }
+    if (!timeFreezeSnapshot.current) return undefined;
+    // The curtains need ~900ms to reopen (trailer.css transition): the hold
+    // releases a beat after the sequence ends so the world never ticks under
+    // half-drawn curtains.
+    const release = globalThis.setTimeout(() => {
+      const snap = timeFreezeSnapshot.current;
+      timeFreezeSnapshot.current = null;
+      setTimeFrozen(false);
+      if (snap && !snap.wasPaused) useMinimalGameplayStore.getState().resumeGame('auto');
+    }, 1000);
+    return () => globalThis.clearTimeout(release);
+  }, [shroudCovered]);
+
+  /* Event wake for the HUD: the theatre bumping in calls the chrome back even
+   * over a deliberately hidden HUD — the world asking for attention. */
+  const [hudWakeSignal, setHudWakeSignal] = useState(0);
+  const prevShroudCovered = useRef(shroudCovered);
+  useEffect(() => {
+    if (shroudCovered && !prevShroudCovered.current) setHudWakeSignal((n) => n + 1);
+    prevShroudCovered.current = shroudCovered;
+  }, [shroudCovered]);
+
+  /* Contemplation reward (Director): when the chrome slides away, a sea wonder
+   * surfaces — `wonderRequest` is the live channel the Director button uses. */
+  const [hudHidden, setHudHidden] = useState(false);
+  useEffect(() => {
+    if (hudHidden && DEFAULT_GAME_FRAME_CONFIG.hudHide.wonderOnHide) setWonderRequest((n) => n + 1);
+  }, [hudHidden]);
   // Test / trailer tooling: dev builds only, F10 shows or hides it (hide it for a clean capture).
   // `?capture=1` starts a clean shot: no Director, no panel menu.
   const capture = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
@@ -691,6 +740,9 @@ export default function GameFramePixiPage() {
             panels={panels}
             devPanels={directorEnabled}
             skinControl={{ id: skinId, onChange: setSkinId }}
+            hudWakeSignal={hudWakeSignal}
+            timeInputLocked={timeFrozen}
+            onHudHiddenChange={setHudHidden}
             rosterSlot={({ onClose }) => (
               <Roster
                 onClose={onClose}
