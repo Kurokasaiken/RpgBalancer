@@ -541,29 +541,37 @@ solo tra tag, è tra imprint.
 
 ### Istanza IMPR-002-C — tag `miniera`: «La squadra del caposquadra»
 
-- **B0:** un carico è bloccato nella galleria bassa dopo il crollo —
-  recuperarlo paga il trimestre del villaggio. Manca: una squadra che conosce
-  la roccia.
+*(revisionata R-165: la posta passa da «carico» a «persone» — la versione
+originale era una quest di logistica, vedere il contratto di scrittura più
+sotto)*
+
+- **B0:** il crollo ha sigillato la galleria bassa **con un turno intero
+  dentro** — nove minatori su aria cattiva, le famiglie già al pozzo. Manca:
+  una squadra che conosce la roccia per arrivarci in tempo.
 - **B1:** il **caposquadra anziano** offre i suoi minatori — «loro sanno dove
-  camminare, io so dove».
-- **B2:** i minatori prendono gli ordini da lui; il suo registro dei turni
-  conosce la vena meglio delle mappe ufficiali; il ragazzo delle gabbie
-  avvisa a metà discesa *(prop del kit: il registro dei turni decide chi era
+  camminare, io so dove». Aiutare il salvataggio lo espone: la sua vena
+  segreta è vicina al punto che è caduto.
+- **B2:** i minatori prendono gli ordini dal suo fischietto; il suo registro
+  dei turni mostra squadre in una galleria che le mappe danno sigillata (e
+  il materiale occultato sotto altri nomi); il ragazzo delle gabbie avvisa
+  a metà discesa *(prop del kit: il registro dei turni decide chi era
   dove)*.
-- **B3:** nella galleria — la sua squadra stava già estraendo un filone
-  laterale non dichiarato; la spedizione era la copertura per l'ultimo
-  carico prima che la compagnia notasse.
-- **B4:** sottoterra, nelle sue gallerie: forza (loro conoscono il buio), fuga
-  (risalita lunga, campana del turno contro), recita (diventare soci del
-  filone).
-- **B5:** il filone era già stato «morso» — svuotato prima ancora che la
-  squadra arrivasse, da qualcosa che viveva giù *(ponte naturale con
-  l'entità dell'istanza C di IMPR-001: il minatore trasformato — i domini
-  ricordano)*.
-- **B6:** *A catturato* → la compagnia scopre l'estrazione parallela;
-  *A fuggito* → sa la roccia meglio di chiunque, antagonista tecnico;
-  *posta già presa* → la cosa sotto resta in sospeso come pressione del
-  dominio.
+- **B3:** nella galleria — la sua estrazione parallela ha **indebolito il
+  tetto che ha seppellito i nove**: il salvataggio che ha offerto è la
+  copertura legale per l'ultimo carico prima che la compagnia noti. Loro
+  sono le sue vittime; noi i testimoni del suo alibi.
+- **B4:** sottoterra, nelle sue gallerie: forza (loro conoscono il buio),
+  fuga (risalita lunga — e lasciare i nove a lui), recita (società nella
+  vena = silenzio su chi ha causato il crollo), *più* la puntellatura
+  marcia come argomento ambientale.
+- **B5:** i minatori intrappolati non sono sotto la roccia — **sono stati
+  presi**: attrezzi posati a metà, tracce di trascinamento verso la
+  galleria profonda *(ponte diretto all'entità dell'istanza C di IMPR-001:
+  la posta erano persone, e TAKEN≠SECURED ora significa anche loro)*.
+- **B6:** *A catturato* → la compagnia scopre l'estrazione che ha causato
+  il crollo; *A fuggito* → sa la roccia meglio di chiunque, antagonista
+  tecnico; *posta già presa* → i presi sono la pressione del dominio, la
+  prossima quest li cerca.
 
 ### Cosa insegna il secondo render
 
@@ -657,6 +665,57 @@ dimostrata come *meccanica* (router, canali, vocabolario flag), non solo
 come testo. Terza istanza candidata: `miniera` — se i pattern reggono una
 terza volta, il compilatore automatico function-spec→grafo diventa
 valutabile (proposal, non commitment).
+
+### Contratto di scrittura dei nodi (R-165, 2026-10-12)
+
+Regole per la copy di OGNI nodo compiled scenario — fonte: Wildermyth
+*Event Design Philosophy* (le 5 regole degli eventi) + l'anatomia degli
+indizi *Display → Informazione → Significato* (Jack Edward, *The Anatomy
+of a Clue*) + la Three Clue Rule di Alexandrian che già applichiamo ai
+canali B2. Un nodo che viola queste regole è un bug di scrittura, anche se
+il grafo gira.
+
+1. **Il testo serve una scelta.** Ogni nodo prepara la decisione che lo
+   segue o la conseguenza che lo precede — il testo che non serve né
+   l'una né l'altra è rumore.
+2. **I membri del party entrano nel testo.** Quando un tratto o un ruolo
+   ha prodotto un effetto (l'`armRoll` del `prudente`, un check vinto da
+   un membro), il testo lo *nomina* — «Otta scuote la testa: "Quel fischio
+   non è della campana"» — non lo astrae in «la squadra». *(Nota motore:
+   oggi la copy non interpola nomi/tratti del party — gap noto, la regola
+   vale dove il trait ha un canale dedicato come `fiuto-prudente`.)*
+3. **Atmosfera concreta, non fiorita.** Immagini e dettagli materiali,
+   non aggettivi. «Attrezzi posati a metà turno» batte «atmosfera
+   inquietante».
+4. **Contesto immediato.** Chi rischia cosa deve essere leggibile nel
+   primo paragrafo del nodo — non al terzo.
+5. **Brevità monumentale.** Poche frasi, peso massimo. Il giocatore deve
+   poter decidere dopo una lettura, non dopo uno studio.
+
+E tre regole nostre, nate dagli errori di `miniera` v1:
+
+6. **La posta deve sanguinare.** Ciò che si perde fallendo deve essere
+   persone (vite, salvezza, giustizia) — non logistica. «Un carico paga il
+   trimestre» è un bilancio, non una posta; «nove minatori su aria
+   cattiva» è una posta. Se la posta è un oggetto, il suo costo umano va
+   reso visibile nella stessa frase.
+7. **Ogni intel dichiara il suo Significato in una frase piana.**
+   Display può essere evocativo, Informazione può essere parziale, ma il
+   Significato si dice in chiaro: «qualcuno sta nascondendo queste morti»
+   — mai un dettaglio criptico che richiede di ricomporre l'enigma
+   (es. VIETATO: «turni firmati dai morti» senza spiegare cosa significa).
+   Test: se il Significato non sta in una frase che un giocatore ripeterebbe
+   a un amico, è troppo intelligente.
+8. **Le chain seeds sono promesse comprensibili.** `traccia-morso` deve
+   dire «tracce di trascinamento verso la galleria profonda — sono stati
+   presi, non sepolti», non un engramma per il futuro autore. Il seme
+   serve al giocatore prima che al registro mondo.
+
+Applicazione: `impr002Miniera.ts` revisionata in R-165 (B0 da «carico» a
+«minatori intrappolati», indizi in chiaro, B5 «presi non sepolti»). Le
+istanze palude/mare rispettano già la regola 6? B0 palude/mare = la posta
+è la cassa/relitto (oggetto) — **da rivalutare** alla prossima revisione
+di copy: anche lì la posta dovrebbe avere un costo umano visibile.
 
 ### Terza istanza: il verdetto sul compilatore (R-163)
 
