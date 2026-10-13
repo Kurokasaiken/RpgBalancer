@@ -3156,6 +3156,18 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 
 **Da decidere:** review dei prompt, generazione, poi `provenance.md` per scena + aggiornamento `SOURCES.md` e `NODE_ART`.
 
+**Avanzamento 2026-10-13 (riscrittura integrale dei prompt):** su richiesta Director, tutti i 16 prompt riscritti da zero in forma pedissequa alla bibbia — struttura fissa a 8 sezioni (Subject→Composition→Mood→Style→Lighting→**Palette**→Avoid→Aspect), vocabolario materico di bibbia (golden thatch, timber, alpine stone, Dolomites, prismatic dust motes), ombre deep teal-emerald, cielo azure dove visibile, clausola luminosità obbligatoria, kill list integrale. Guida R5 aggiornata con la nuova struttura e la regola del vocabolario materico.
+
+**Avanzamento 2026-10-13 (audit pedissequo vs bibbia):** richiesta Director — la guida non seguiva la bibbia pedissequamente. Gap trovati e corretti: (1) ombre — bibbia dice deep teal/smeraldo/turchese (§2), i prompt dicevano "ultramarine shadow" (letto come blu-notte dai generatori → causa del dark); (2) cielo Wilderness = azure vibrante (§1A) non dichiarato in F0/F5; (3) Sparth (monumentalità/silhouette, §3) aggiunto alle due wide shot F0/F8; (4) §10.7 bibbia risincronizzato (luce libera, palette/ombre/luminosità di bibbia); (5) checklist guida corretta. Tensione nota registrata: §10.3 vieta "pointed ears" come tropo — i goblin li hanno per scelta Director (non si applica perché in scena sono masse/silhouette, non creature card V2).
+
+**Avanzamento 2026-10-13 (luminosità = vincolo di bibbia):** diagnosi Director — le immagini generate uscivano troppo scure. Causa: vocabolario-scurità nei prompt ("dark treeline", "deep shadow", "gloom"), "ultramarine shadow" letto come blu-notte, ref stile (Easley/cinematic) che tirano al dark, e solo «Avoid: grim mood» come freno negativo. Fix: clausola positiva di luminosità in tutti i 16 prompt («the frame stays luminous and high-chroma — light wins over darkness, never black murk») + luci schiarite dove la narrativa lo permette (F2 giorno sul ciglio della ravina, F5 pomeriggio dorato, F6 mattina dorata, F7 strada apertamente in sole, F4 fiamme dominanti). F3/F4/F7 restano notte/tramonto per storia ma come **notte luminosa**. Regola scritta nella guida (R4): la bibbia non vieta il notturno, vieta la *tonalità scura*.
+
+**Avanzamento 2026-10-13 (palette bibbia ripristinata):** correzione Director — il vincolo da togliere era solo quello derivato da UI/HUD, NON la palette della bibbia. Distinzione ratificata e scritta nella guida (R4): **luce libera per scena** (no Solar Triumph forzato) + **palette Wanderlust obbligatoria** (ultramarine, verde Veronese, cinabro, ambra; ombre colorate mai grigio/marrone/fango). Riga `Palette:` per-scena iniettata in tutti i 16 prompt; scheda goblin allineata.
+
+**Avanzamento 2026-10-13 (aspect = 21:9):** correzione Director — il componente scena (`StageBand`, fascia flex full-bleed ~2.6-3:1 + `TransitView` banda h-44) richiede un rapporto cinematografico, non 16:9. Tutti i prompt scena → **21:9 scope**; card resta 3:4. Regola aggiunta alla guida (R5.7: aspect dettato dal componente di destinazione — misurare il container prima di scrivere). La bibbia usa già 21:9 nel master Wilderness.
+
+**Avanzamento 2026-10-13 (granularità = fase):** chiarimento Director — i check sono **pulsanti sulla stessa schermata di fase**, nessuna immagine per pulsante. Set finale: **10 core + 1 opzionale (mercante) + card**. Nodi check riusano l'immagine di fase (NODE_ART aggiornato in `scenes.md`); i 5 prompt dei pulsanti (f1-tracce, f1-albero, f3-intrusi, f3-assalto, f7-ultimo-scontro) marcati NON GENERARE, tenuti come riserva. `f7-agguato` riportato a trappola carica-non-scattata (archi tesi, nessuna freccia partita).
+
 **Avanzamento 2026-10-13 (audit esiti, v2):** correzione Director — 4 scene mostravano ancora esiti e sono state riportate all'istante *prima*: `f4-combattimento` (mischia in corso → l'eruzione pre-contatto, nessun acciaio incontrato), `f5-incalzare` (fuggiaschi quasi chiusi → rotta aperta, divario non chiuso, nessuno preso), `f7-agguato` (freccia piantata+dardi in volo → archi tesi, primo dardo in volo, palo ancora pulito), `f7-ultimo-scontro` (aftermath+scudo caduto → pre-scontro: trofei a bordo strada = ciò che si difende, muro goblin che chiude, nessuno caduto). Minor: `f2-bottino` «spoils spilled» → merce ancora legata dove lasciata.
 
 **Avanzamento 2026-10-13 (guida + rewrite uniforme):** creata `src/docs/docs/art-direction/scene_prompt_authoring_guide.md` — guida operativa per agenti che authorano scene prompt ambientali (regole R0-R6 distillate dai problemi di questa sessione: fonte=testo authored, solo beat pre-scelta/pre-check, party del giocatore mai disegnato ma NPC/esterni ok, creature solo da registry, luce/palette libere, struttura fissa Subject→Composition→Mood→Style→Lighting→Avoid→Aspect, checklist di review, convenzione salvataggio prompt vincenti in provenance.md). Linkata dalla bibbia (§10.7, bump v0.13). I 16 prompt sono stati **riscritti in passata uniforme** sulla struttura della guida; aggregato rigenerato.
@@ -3257,3 +3269,22 @@ Implementato il layer L2 scenario (patch dati ordinate → ri-validazione Zod ca
 - scarce ×entrambe 0% → fame a g23 (eatPer×1.4 > produzione/testa)
 
 Evidence: `test-results/r176-macrosim-s1-2026-10-13.log`.
+
+### R-176 / S1.5 + S2 + matrice 300 (2026-10-13)
+
+**S1.5 — copertura patch:** verificato e chiuso il gap: ora patchabili reward (`cfg.rewards`), party size, `requires[i].min`, `repeatable`, `familydef`, `clock`, `meta.*` escape hatch strict-validated; costi training parametrizzati (formula sigillata). Nuovo test S1.5-D5. Doc confini fedeltà: `tools/goblin-lab/FIDELITY.md`.
+
+**S2 — wound tiers:** durate canoniche light/moderate/severe (1/3/7gg da `globalRules.injuryTiers`) in `cfg.injuryTiers`; mappa outcome→tier dichiarata OBSERVED-ADAPTER (metaLayer non emette severità). **Nota:** il settlement canonico reale usa `woundRecoveryTicks=5` flat — i tier esistono in config ma non sono consumati dal flusso quest: il lab è avanti al canonico su questo punto.
+
+**Terza persona `optimizer`:** policy EV data-driven (reward table + harmProfile + failChance scouted), nessuna soglia cablata. Matrice 300 seed × 3 scenari × 3 persona accoppiati (`test-results/r176-matrix-300.json`):
+
+| cella | win% [CI95] | hero% |
+|---|---|---|
+| base × rush / turtle / optimizer | 70.0 / 87.7 / **89.7** | 20.0 / 10.3 / **5.0** |
+| deadly × rush / turtle | 0 / 0 | ~39 |
+| deadly × **optimizer** | **76.7** | 6.0 |
+| scarce × * | 0 | ~1-2 (fame strutturale g23) |
+
+**Finding chiave per S3:** su `deadly`, optimizer vince 77% via **retry-spam del Re** (P~0.2-0.35/tentativo × 5-8 tentativi nel cooldown 38g, EV>0 per cost accounting) mentre rush/turtle non tentano mai (soglie irraggiungibili sotto gate discreto) → 0%. Nessuna persona allena mai le stat — dead zone confermata comportamentalmente. Il modello discreto canonico premia la ripetizione, non la preparazione: questa è l'evidenza centrale per l'esperimento A/B/C (S3) e la decisione D4.
+
+Test: **18/18**. Evidence: `test-results/r176-macrosim-s15-s2-2026-10-13.log`.
