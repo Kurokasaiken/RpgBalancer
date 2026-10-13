@@ -3156,6 +3156,12 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 
 **Da decidere:** review dei prompt, generazione, poi `provenance.md` per scena + aggiornamento `SOURCES.md` e `NODE_ART`.
 
+**Avanzamento 2026-10-13 (tooltip pinnabili — regola progetto §5b.7):** bug Director — «la forma della preview nn va bene: ne viene mostrata solo una parte» + «devo poterci andare sopra col mouse una volta che è aperta» + «un pulsante per fissare il tooltip… è una regola che vale per tutto il progetto, anche le schede dei pg nelle pgCard». Causa: `XRayPopover` era `pointer-events-none` su colonna fissa 352px → contenuto analitico tagliato e non raggiungibile. Implementato il **contratto hover-pinnable**: pannello interattivo (mai `pointer-events-none`), chiusura ritardata 140ms all'uscita dal trigger (il mouse attraversa il gap), controlli `data-hud-controls` con **pin** (📌/📌off, `aria-pressed`, il pin resiste a una leave che arma il timer prima del commit React — il timer rilegge un ref) + **X** chiusura immediata; pannello largo `min(30rem, 100vw-16px)`, scroll interno come ripiego. Applicato a `XRayPopover` (preview opzioni, `ActionZone.tsx`) e a `SchedaPergamena` (schede PG su hover delle PgCard, `MapPage.tsx` — stesso lifecycle: ref pinned, cancel/schedule close). i18n: `floatingPanel.pin`/`unpin` in en/it-IT/pseudo. **Regola progetto scritta in `hud_component_guide.md` §5b punto 7** — vale per ogni hover-card presente e futura. Verificato live: hover apre (480px, titolo su una riga), transit nel pannello tiene aperto, pin resiste all'uscita, X chiude. Evidence `test-results/r172-tooltip-pinnable-2026-10-13.log`.
+
+**Avanzamento 2026-10-13 (fix opzioni fuori schermo):** bug Director — «non riesco a vedere tutte le opzioni senza usare la barra laterale, anche se sn solo due opzioni. È inaccettabile». Riprodotto a 760px viewport: la lista opzioni scrollava (~30px). Causa: cap action zone 46vh troppo stretto per header+body+belt+2 opzioni. Fix: `actionZoneVh` 46→58 (config `questLabPresentation`, `stageBandVh` 48→36 per la somma ≈100) — a ≥700px zero scroll, a 650px restano leggibili (scroll residuo 7px). Stessa classe di bug in `QuestRunWindow` (/game): pannello fixed senza maxHeight → opzioni sotto il fold irraggiungibili; aggiunto `maxHeight: 100vh-anchor-12` + `overflowY:auto` e la regione testo (`minHeight:0`) che assorbe per prima. Doc `quest_ui_component_guide.md`: regola «le opzioni non scrollano mai». Verificato live su `/quest-s1-lab` a 900/760/650px.
+
+**Avanzamento 2026-10-13 (import + catalogo + integrazione):** 9 immagini generate su AI esterna importate da `~/Downloads` in **`public/assets/scene-library/`** — libreria condivisa cross-quest, file nominati per soggetto non per fase (`sentiero-tracce`, `carro-nascosto`, `accampamento-raider`, `assalto-goblin`, `fuga-goblin`, `saccheggio`, `agguato-foresta`, `totem-goblin`, `mercante-strada`), JPEG q85 progressive 3168×1344. Catalogo + tag riuso + provenance in `CATALOG.md` — tag `goblin-*` espliciti dove le creature sono dipinte (swarm/distant/hidden/craft). Lavorazione: rimosso testo «HAND PAINTED» dal cartello di `mercante-strada.jpg`. `NODE_ART` aggiornato ai nuovi path + `QUEST_CARDS.goblin` → `totem-goblin.jpg`. **Pending:** `viaggio`/`ritorno` non ancora generati (`gob-inizio`/`gob-ritorno` restano sui placeholder public domain); nodo evento mercante non authored — asset già in catalogo.
+
 **Avanzamento 2026-10-13 (F6 = meccanica keep-looting):** correzione Director — il valore tutto esposto toglie il motivo di cercare. La meccanica authored («Keep looting»: ogni round costa di più, trappole goblin) richiede la triade **saggio + promessa + costo**: refurtiva visibile (forziere spaccato, monete, coppa d'oro, ambra), tende/fardelli non perquisiti (la promessa), corde con campanelli e stake-trap nella cenere (il costo). Regola registrata in guida R8 anti-pattern.
 
 **Avanzamento 2026-10-13 (F6 bocciata → refurtiva di valore):** primo render F6 bocciato dal Director — la «cache» generava solo cianfrusaglia (coperta, pettine, pentola), zero valore leggibile. Errore di prompt: descritti *wares* domestici invece di ricchezza. Nuovo SUBJECT: forziere mercantile spaccato, ventaglio di monete, coppa d'oro, filo di perle d'ambra, daga con elsa sun-bronze, stoffe tinte — + glints metallici più in fondo che promettono altro. Regola appresa: **le spoils devono leggere come valore a colpo d'occhio** (monete/metallo/gemme), non come inventario domestico.
@@ -3362,3 +3368,101 @@ Test: **21/21** (+S3-E1 B monotona, +S3-E2 C failChance canonica/epic→0, +S3-E
 **Aperto (Director):** B1 marchio, B2/B3 AI survey + provenance audit, B4 test di comprensione, B6 waiver trailer.
 
 **Esito (2026-10-13):** revisione pubblicata https://claude.ai/artifact/8GCPcaB4LhYjDPdiLr4K7P. Misure: anelli POI attuali sotto 3:1 su mare/sabbia/ocra (evento 1,1:1 su mare e ocra, quest 1,5:1 su sabbia; tinta quest 39° = sabbia 40°); in scala di grigi i POI sono identici. Cursore in uso = pixel art @2x nearest-neighbour, stati drop/disabled mancanti. 4 stili d'icona (dipinte, hudIcons tratto 1.6, lucide, pixel). Nessun POI all'avvio senza Regia; obiettivo mai mostrato. Tensioni segnalate: DESIGN_PILLARS r.33 vs r.43 (POI = verbo + slot), Pillar 1 "cornice intagliata" vs Lacquer Atlas, `poi_icon_prompts.md` (famiglia dal bordo) smentito dalle misure. Proposta: Sigillo (bordo doppio scuro+avorio, sagoma = famiglia, glifo = contenuto, colore = valenza dentro l'halo), cursore 2 famiglie/10 stati, icone 2 livelli, lista asset P0-P2. In attesa di 5 decisioni del Director (vedi pagina).
+
+### R-177 / feedback del Director (2026-10-13)
+
+**Parole del Director:** "La mappa dovrebbe essere cliccabile fin dall'inizio, ancora nn l'abbiamo implementata [...] va bene metterlo come cosa importante da fare. Il registro degli eventi: nn so xè scriva cose random. è un errore. Ancora nn abbiamo fatto un sistema x morire di fame, ma hai ragione sull'interfaccia. POI: dobbiamo fare tutte le icone, ma devono essere adeguate x quello che stiamo facendo e m servono prompt adeguati. I colori dei POI: va bene se m proponi altro. L'halo nn fa due cose: ne fa 1 in due modi diversi. Se è piena e va svuotandosi è un timer entro cui devi farla. deve pulsare se è finito. [...] Gemma, e lucido e pulito le potremmo togliere, ma le lettere nn sn male. Le icone sn prese a caso, sn brutte e troppo piccole e illeggibili, c servono anche le icone per le risorse. E x tutti questi prompt c serve un sistema per creare prompt d questo tipo. Uniforma tu gerarchie e lastre, hai ragione, preferisco come è Roster."
+
+**Lavoro impegnato:**
+- TODO importante (non bug): mappa cliccabile dall'avvio (POI/luoghi presenti al giorno 1).
+- BUG registro eventi → **fatto**: erano 5 eventi fixture cablati in `GameFrameScreen` (R-071, giorni fermi); nuova prop `fixtureEvents` (default true per /game-frame lab), `/game` passa `false` → solo eventi reali (invasione, quest aperta). tsc pulito sui file toccati, HudEventLedger+hudGuards 10/10, verificato su /game che le fixture non compaiono.
+- Sistema fame: non esiste ancora; resta valida la critica d'interfaccia sullo stato critico risorse.
+- Icone: set completo POI + risorse + HUD, adeguato al contenuto canonico, con prompt adeguati e un **sistema per generare prompt** d'icona.
+- Halo = una cosa (tempo) in due modi (si svuota = scadenza; si riempie = lavoro); pulsa a fine. Richiesta ricerca su cambio colore in scadenza.
+- POI: togliere gemma e lucido; lettere ok (da valutare).
+- Uniformare gerarchie e lastre allo stile del Roster.
+
+### R-177 / decisioni e piano (2026-10-13)
+
+**Parole del Director:** "il Roster deve essere la base x gli altri componenti, le guide devono mirare a quello come risultato" · "ok a tutte e tre, fai il plan".
+**Decisioni:** D1 icone di luogo; D2 icone esenti dal divieto di simmetria; D3 niente teschi (artigli, zanne, lance/stendardo, corona spezzata).
+**Piano:** `src/docs/docs/plans/PLAN-058_hud_roster_unification.md` — fasi 0-5 con gate del Director; Opus pianifica/rivede, Sonnet esegue un task per sessione.
+
+**Avanzamento (2026-10-13):** Fase 2 T2.1–T2.6 eseguita ("Fai da T2.1 a T2.6. Consegnami i 6 prompt ancora pronti da incollare in GPT, Gemini e Grok"): bibbia §11, kit + registro icone, generatore, lint, cancello di contrasto, 6 prompt ancora in `.mw/specs/icons/`. In attesa del Gate F2 (il Director genera e sceglie).
+
+### R-177 / PLAN-058 Fase 0 (2026-10-13)
+
+**Parole del Director:** "Fai T0.1, T0.2 e T0.3, poi fermati per il mio sì." — regola madre: il risultato deve sembrare il Roster V2; trappole T-01, T-02, T-03, T-07; Roster V1 intoccato; niente commit.
+**Stato:** `in corso` — T0.1–T0.3 eseguiti (esito in PLAN-058 §Fase 0); in attesa del sì del Director prima di procedere.
+
+### R-177 / PLAN-058 T4.1 (2026-10-13)
+
+**Parole del Director:** "Fai solo T4.1, cioè lo schema. Niente codice." — regola madre Roster V2; trappole T-01, T-02, T-03, T-07; Roster V1 intoccato; niente commit.
+**Stato:** `in corso` (schema Sigillo scritto in `src/docs/docs/idle_village/poi_family_spec.md` §"Map marker visual contract"; T4.2 non iniziato).
+
+**Risposte del Director a Q1–Q4:** "Dobbiamo distingere le quest \"normali\" dagli eventi dalle \"main quest\". le main quest avranno durata molto + lunga e vorrei avessere l'halo pieno fin dall'inizio, le quest normali invece come è adesso." · "confermo che sparisca senza far nulla, dimmi tu se farla pulsare prima d sparire abbia senso o no, decidi tu" · "nn ricordo d preciso" (pillar R2.3) · "le lettere lasciale come sono". → Schema aggiornato (tier main/normal, scaduto senza pulsazione, lettere invariate); D6 in PLAN-058.
+
+### R-177 / PLAN-058 T5.1–T5.2, cursori (2026-10-13)
+
+**Parole del Director:** "Fai T5.1 e T5.2. Niente prova Tauri: quella la faccio io." · poi, sul primo giro: "quando trascino cambia colore, il pallino davanti alla freccia è orribile, ci serve qualcosa di fantasy, non un coso generico così schifoso, scrivilo anche nella documentazione".
+**Decisione D6:** fantasy, mai generico — niente pallini/anelli/dischetti di stato/semaforo; lo stato è la sagoma di un oggetto (scintilla, occhio, clessidra, lucchetto di ferro, lame incrociate), ottone e inchiostro, ferro come unico neutro. Scritta in PLAN-058 (D6), `hud_component_guide.md` (regola 6b, §5c), bibbia §11.3, docstring di `draw-cursors.py` e testata di `gameFrameCursors.css`.
+**Seconda correzione:** "usiamo la freccia e non qualcosa di più carino e fantasy? tipo un guanto d'arme?" → il puntatore è un guanto d'arme con l'indice teso (famiglia `point-*`, hotspot sulla punta del dito), le mani sono guanti con bracciale; D6 aggiornata.
+**Stato:** `in corso` — T5.1/T5.2 eseguiti e rifatti dopo il feedback; T5.3 (prova Tauri) è del Director.
+
+---
+
+## R-179 — RpgBalancer: dalla simulazione isolata al gameplay integrato
+
+**Richiesta (verbatim, sintesi):** audit sul codice reale di ciò che esiste/canonical/lab/assente → scegliere il più piccolo incremento verticale che colleghi meccaniche reali (roster→assegnazione→tempo→esito→conseguenze→disponibilità→decisioni) → implementare con test; niente matrici massive, niente S4/S5 automatici.
+**Data:** 2026-10-13
+**Stato:** `fatta` (incremento Inc F implementato e verificato; audit documentato in `tools/goblin-lab/FIDELITY.md`)
+**Desiderata FROZEN:** coerente con la desiderata macro-sim R-176 (laboratorio per il gameplay reale).
+
+**Audit sul codice (verificato, non da documenti):**
+- CANON: `metaLayer` (board/gate/timer/resolveOutcome), `TimeEngine` (disponibilità, fatigue, recovery, consumo cibo per-resident), `missionResolver` (MP-06 per-member), `questSettlement`→`MinimalGameplayState` (idempotente), `JobResolver`/`useActivityScheduler` (orchestrazione completamenti), `InjuryEngine`, `Survival/Production/EconomyEngine`.
+- ADAPTER lab: `prodPer×pop` (produce anche chi è away/injured!), `eatPer×pop` (eroe non mangia), harm posizionale, `LAB_REWARDS`, invasione v0.2, `people` offers.
+- Gap canonici trovati leggendo il codice: (1) `applyContinuousJobTick` legge `amountFormula` su `ResourceRateDefinition` (che ha `amountPerDay`) → tick streaming dei continuousJob applica 0 — il percorso funzionante è job regolare + `resolveJob` al completamento; (2) `exhausted` è terminale in `VillageState` (la notte abbassa fatigue ma non riporta lo status a `available`); (3) settlement applica `woundRecoveryTicks=5` flat — i tier canonici esistono ma non sono consumati dal settlement; (4) `JobResolver.evaluateRewardAmount` TODO su formule non numeriche; (5) due modelli di residente (`ResidentState` vs `MinimalResident`).
+
+**Incremento scelto:** economia per-persona canonica — la produzione richiede l'assegnazione reale di villager a job (`tags:['job']` + `resolveJob` su completamento, come `useActivityScheduler`), consumo cibo engine-side su `vil.resources.food` (mangia anche l'eroe; adapter unità tick=giorno documentato). Chiude il link "ferite/impegni → disponibilità → sopravvivenza → decisioni" che oggi è reciso.
+
+**Implementato (Inc F, `tools/goblin-lab/lab.ts`):** rimossi `prodPer` e `eatPer×pop` manuali; `cfg.jobs` (3 job patchabili via scenario) → `ActivityDefinition` `resolutionEngineId:'job'`; `assignWorkforce` per-persona (`work.{foodCover,woodKeep,ironKeep}` dati di policy, preferenza non-trained + sort fatigue → rotazione); `advanceDay` fa push `S.res→vil.resources` → `advanceTime` canonico (consumo eroe+feriti inclusi) → `resolveJob` per ogni completamento tag 'job' → pull. Metrica `personDays.jobs`. Bridge `food↔cibo` dichiarato OBSERVED-ADAPTER.
+
+**Test:** 28/28 (7 nuovi F1–F7: produzione solo se assegnata, nessun lavoro→nessuna produzione, injured/away non lavorano, lavoratore away non difende, fame→fine run, consumo conta tutti i vivi, `cfg.jobs.N.rate` patchabile). Evidence: `test-results/r179-lab-test-2026-10-13.log`. Safeguards: lint scope 0 problemi, build:check PASS, kanban:lint PASS.
+
+**Vincoli rispettati:** niente modifiche al resolver canonico, niente matrici massive, A/B/C isolati, nessuna nuova meccanica di gioco.
+
+**Prossimo incremento consigliato:** invasione con difensori realmente disponibili (Inc E — il trade-off lavoro↔difesa è ora reale ma la risoluzione invasione resta l'ultimo blocco PROPOSTA grande) oppure unificare il modello residente lab con `MinimalResident`/questSettlement per chiudere il doppio aggregato.
+
+## R-180 — /game: «POI types» deve mostrare anche il POI dorato delle quest
+
+**Richiesta (verbatim):** *"in /game quando in director clicco su POI types nn esce quello d'orato delle quest, che dovrebe far partire quando cliccato la schermata di preparazione alla quest"*
+**Data:** 2026-10-13
+**Stato:** `fatta` — verificato live su FE via Puppeteer.
+**Desiderata FROZEN:** nessuna nuova — bugfix sulla superficie canonica. Tensione nominata con R-143: lì «POI types» era stato ridotto ai soli tipi senza contenuto reale. Il fix rispetta l'invariante vero di R-143 (il marker quest è **reale**, mai un esemplare finto) — sotto «POI types» si monta l'offerta vera, non una copia demo.
+
+**Diagnosi (live, due cause sovrapposte):**
+- (a) post R-143 il gate degli anchor quest era `questShown` (toggle «Show quest») e `poiDemo` montava solo job/event finti → «POI types» non mostrava più il dorato.
+- (b) le offerte `QUEST_POIS` scadono a `availableUntilDay: 60`, ma il clock del villaggio è compresso (5 tick/giorno) → finestra = ~5 minuti reali; sul save del Director (giorno 80+) entrambe le offerte risultavano `expired` e un marker scaduto renderizza invisibile (`opacity:0`, no click) → il dorado non appariva **con nessun toggle**. Il click→planner funzionava già (`handlePoiClick` → `QuestExpeditionDetail` quando non c'è run live).
+
+**Fix:** (a) `questRevealed = questShown || poiDemo` in `game-frame-pixi.tsx` — gate degli anchor expedition e della riga «quest aperta» nel ledger. «Show quest» resta il gate solo-quest. (b) `availableUntilDay` 60 → `SLICE_OFFER_WINDOW_DAYS` (10_000) in `questPois.ts` — il config dichiara le finestre «generose, availability pressure non è la meccanica in slice»; il path di scadenza resta esercitato dai test di `questAvailability`. Commenti e guida E2E aggiornati. Bug dir `.mw/bugs/20261013-poi-types-quest-marker/`.
+
+**Safeguards:** lint scope 0 errori; build:check PASS; kanban:lint PASS; unit quest scope; verifica live Puppeteer: «POI types» → 4 marker (2 demo + goblin + rovine reali), click dorato → `quest-expedition-detail` con send/forecast; toggle-off → fade+shrink poi unmount. Evidence: `test-results/r180-poi-types-quest-marker-2026-10-13.log`.
+
+### R-177 / PLAN-058 T0.4 fatto (2026-10-13)
+**Parole del Director:** "sì, fai T0.4". Guida HUD §6 «Layout e interazione» scritta (valori marcati Roster/codice/deciso, checklist §6.12 per la Fase 1). Difetto trovato: opacità disabilitati 0,4 (~2:1).
+
+---
+
+## R-181 — /game: le scelte del pannello Tuning devono diventare il nuovo default
+
+**Richiesta (verbatim):** *"qualcosa cambia la velocità di default che ho scelto per tipo le nuvole e cose del genere. xè le scelte in Tuning nn rimangono anche x le altre sessioni? devono essere il nuovo default"*
+**Data:** 2026-10-13
+**Stato:** `fatta` — endpoint testato live (200/400), safeguard verdi. Richiede restart del dev server per registrare la route.
+**Desiderata FROZEN:** nessuna nuova — comportamento del dev-tool Tuning sulla superficie canonica.
+
+**Diagnosi:** il TuningPanel (`/game`, tasto T) persiste già gli override in `hud_tuning_v1` via `PersistenceService` (commit `0882987b`, 2026-10-08) — ma è solo localStorage del browser corrente: non vale per altre origini/modi (es. `preview:playwright` usa `sessionStorage`), non sopravvive a wipe dello storage, e soprattutto **non è il default shipped** — resta un override locale sopra `worldDressing.motion` / `DEFAULT_MAP_TUNE` / `DEFAULT_HUD_BAND_PX`.
+
+**Fix adottato:** il tasto «Salva» del Tuning panel ora fa anche bake dei valori nei default di config via endpoint dev `POST /__hud-tuning-default` (vite.config.ts), stesso pattern di `/__sea-pattern-default`. Riscrive `worldDressing.motion`/`seabed` in `gameFrameConfig.ts`, `DEFAULT_MAP_TUNE` in `PixiWorldMap.tsx`, `DEFAULT_HUD_BAND_PX` in `hudBand.ts`. Il localStorage override resta come fallback runtime; se il bake fallisce (es. preview non-dev) il pannello mostra un avviso i18n `gameFrame.tuning.bakeFailed`.
+
+### R-177 / PLAN-058 Gate F0 approvato (2026-10-13)
+**Parole del Director:** "si" — approvati: Roster invariato, misure del Roster come metro per tutto l'HUD, regole [deciso] di guida §6 (scala 12-24, maiuscolo ≤3 parole, disabilitati 0,65, area 32×32, tooltip 400 ms, numeri abbreviati da 10k, anteprima invece di conferma, multipli di 4). Sbloccate Fase 1 (T1.1-T1.6) e T4.2.
