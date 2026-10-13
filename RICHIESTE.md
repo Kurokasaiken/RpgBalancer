@@ -3156,6 +3156,22 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 
 **Da decidere:** review dei prompt, generazione, poi `provenance.md` per scena + aggiornamento `SOURCES.md` e `NODE_ART`.
 
+**Avanzamento 2026-10-13 (F6 = meccanica keep-looting):** correzione Director — il valore tutto esposto toglie il motivo di cercare. La meccanica authored («Keep looting»: ogni round costa di più, trappole goblin) richiede la triade **saggio + promessa + costo**: refurtiva visibile (forziere spaccato, monete, coppa d'oro, ambra), tende/fardelli non perquisiti (la promessa), corde con campanelli e stake-trap nella cenere (il costo). Regola registrata in guida R8 anti-pattern.
+
+**Avanzamento 2026-10-13 (F6 bocciata → refurtiva di valore):** primo render F6 bocciato dal Director — la «cache» generava solo cianfrusaglia (coperta, pettine, pentola), zero valore leggibile. Errore di prompt: descritti *wares* domestici invece di ricchezza. Nuovo SUBJECT: forziere mercantile spaccato, ventaglio di monete, coppa d'oro, filo di perle d'ambra, daga con elsa sun-bronze, stoffe tinte — + glints metallici più in fondo che promettono altro. Regola appresa: **le spoils devono leggere come valore a colpo d'occhio** (monete/metallo/gemme), non come inventario domestico.
+
+**Avanzamento 2026-10-13 (F6 spoils focal):** Director — il leather satchel non convince. Scelte: **cache di refurtiva goblin** (tronco cavo sotto coperta di pelli, merce che spunta: stoffa cinabro, paiolo di bronzo, pettine intagliato) + **barlumi multipli nella cenere** (perline d'ambra, bordo di moneta ottone, gingillo) — la cache è la massa focale, i glints rendono letterale «ogni sguardo in più costa». Prompt riscritto, tag `satchel`→`plunder-cache, glints`.
+
+**Avanzamento 2026-10-13 (ruoli runtime corretti):** chiarimento Director — Viaggio e Ritorno NON sono fasi (tempo non skippabile + eventi minori, `TransitView`); Mercante è evento che renderizza come fase ma mid-quest; «quest card» NON è un'icona né 3:4 — è la cover wide della card picker (`QuestSelectScreen`, banda h-44 object-cover). scenes.md ristrutturato per ruolo (7 fasi / 2 transiti / 1 evento / 1 cover), aspect card 3:4 → 21:9, guida R5 corretta («card» ≠ verticale), tag card `vertical` → `card-cover, wide`.
+
+**Avanzamento 2026-10-13 (gate di qualità «battezzato»):** richiesta Director — serve una guida che garantisca prompt al livello di quelli già riusciti. Creato `scripts/lint-scene-prompts.py`: lint meccanico con 12 criteri blocanti (densità ≥200 parole, titolo `NOME —`, ancore CAPS SUBJECT/COMPOSITION/LIGHTING/PALETTE/TECHNIQUE/MOOD, pigmenti bibbia, ombre teal, clausola luminosità, impasto+Jones/Easley+rude beauty, Gerard se creature dipinte, direttiva CAPS inline, kill list ≥8 voci, aspect, tags riuso). Guida: nuova sezione R8 con tabella criteri, gate umano e anti-pattern osservati. Lint girato sui 16 prompt: beccati e corretti 4 gap reali (SUBJECT mancante in mercante/card, CAPS inline in F8, tags in 4 riserve) — ora **tutti OK**.
+
+**Avanzamento 2026-10-13 (formato moodboard-library):** feedback Director — i prompt erano troppo brevi/poveri rispetto ai prompt già riusciti della moodboard (`public/docs/prompts/prompt_library.md`). Audit: il formato library è più denso — ancore CAPS embeddate (SUBJECT/COMPOSITION/LIGHTING/PALETTE/TECHNIQUE/MOOD), enumerazione materiale fitta (ogni elemento porta materia+luce), negazioni capsule inline, contrasto di tecnica dichiarato. Riscritti tutti i 16 prompt in quel formato (~210-260 parole), guida R5 aggiornata a canonizzare il formato library, aggregato rigenerato.
+
+**Avanzamento 2026-10-13 (DNA sostantivo):** verifica Director «rude bellezza e tutto il DNA?» — audit: mancavano due elementi sostantivi (non solo rendering). Aggiunti a tutti i prompt: dichiarazione **rude beauty** in chiusura di Style («the world rendered as rude beauty — weathered and tactile, never squalid») e **Justin Gerard whimsy** (§3, «grotesque but vibrant, never horror») nelle 4 scene con goblin. Regole scritte nella guida R5.
+
+**Avanzamento 2026-10-13 (tag riuso cross-quest):** richiesta Director — le immagini devono poter essere riusate in altre quest. Aggiunta riga `Tags riuso` a tutti i 12 prompt attivi (setting/soggetto/figure/ora/creature, mai tag narrativi di quest), tabella tag in `scenes.md`, nuova regola R7 nella guida (niente elementi quest-specifici nel soggetto se non necessari; tag goblin-* vs no-goblins come filtro pratico).
+
 **Avanzamento 2026-10-13 (riscrittura integrale dei prompt):** su richiesta Director, tutti i 16 prompt riscritti da zero in forma pedissequa alla bibbia — struttura fissa a 8 sezioni (Subject→Composition→Mood→Style→Lighting→**Palette**→Avoid→Aspect), vocabolario materico di bibbia (golden thatch, timber, alpine stone, Dolomites, prismatic dust motes), ombre deep teal-emerald, cielo azure dove visibile, clausola luminosità obbligatoria, kill list integrale. Guida R5 aggiornata con la nuova struttura e la regola del vocabolario materico.
 
 **Avanzamento 2026-10-13 (audit pedissequo vs bibbia):** richiesta Director — la guida non seguiva la bibbia pedissequamente. Gap trovati e corretti: (1) ombre — bibbia dice deep teal/smeraldo/turchese (§2), i prompt dicevano "ultramarine shadow" (letto come blu-notte dai generatori → causa del dark); (2) cielo Wilderness = azure vibrante (§1A) non dichiarato in F0/F5; (3) Sparth (monumentalità/silhouette, §3) aggiunto alle due wide shot F0/F8; (4) §10.7 bibbia risincronizzato (luce libera, palette/ombre/luminosità di bibbia); (5) checklist guida corretta. Tensione nota registrata: §10.3 vieta "pointed ears" come tropo — i goblin li hanno per scelta Director (non si applica perché in scena sono masse/silhouette, non creature card V2).
@@ -3288,3 +3304,61 @@ Evidence: `test-results/r176-macrosim-s1-2026-10-13.log`.
 **Finding chiave per S3:** su `deadly`, optimizer vince 77% via **retry-spam del Re** (P~0.2-0.35/tentativo × 5-8 tentativi nel cooldown 38g, EV>0 per cost accounting) mentre rush/turtle non tentano mai (soglie irraggiungibili sotto gate discreto) → 0%. Nessuna persona allena mai le stat — dead zone confermata comportamentalmente. Il modello discreto canonico premia la ripetizione, non la preparazione: questa è l'evidenza centrale per l'esperimento A/B/C (S3) e la decisione D4.
 
 Test: **18/18**. Evidence: `test-results/r176-macrosim-s15-s2-2026-10-13.log`.
+
+### R-176 / S3 — Esperimento resolver A/B/C (evidence pack per D4, 2026-10-13)
+
+Implementati i resolver-variante isolati in `tools/goblin-lab/resolvers.ts` (canonico sigillato: la sessione metaLayer risolve internamente invariata; B/C ri-risolvono l'evento `quest-resolved` sullo stream dedicato `resolve`, annullano le writes canoniche e applicano quelle della variante; divergenze contate). **A** = canonico, **B** = failChance continua nel power (`hi−(hi−lo)·min(power/ref,1)` + gate sopra), **C** = ibrido (failChance canonica, outcome table modulata dal power: epic-fail →0, almost↓, big-win↑). Matrice 3 scenari × 3 persona × 3 resolver × 300 seed accoppiati = **8100 run** (`test-results/r176-s3-matrix-300.json` + evidence pack `r176-s3-abc-evidence-2026-10-13.md`; formule e caveat in `tools/goblin-lab/FIDELITY.md`).
+
+| cella | A | B | C |
+|---|---|---|---|
+| base×rush | 70.0 | **79.3** | 77.0 |
+| base×turtle | 87.7 | **93.3** | 85.0 |
+| base×optimizer | 89.7 | **93.3** | 92.0 |
+| deadly×optimizer | 76.7 | **83.3** | 79.3 |
+| deadly×rush/turtle | 0 | 0 | 0 |
+| scarce×* | 0 | 0 | 0 |
+
+**Findings D4:**
+- **B migliora ovunque**: +5–9pp win, morti eroe dimezzate (deadly rush 39→20%); il power-da-composizione-villaggio (trait→capability) diventa un canale di forza reale assente nel discreto.
+- **C ammorbidisce solo la coda**: ferite severe −97/99% (epic-fail zone→0 a power alto) ma win rate e morti eroe quasi invariati.
+- **La degenerazione non è del resolver**: retry-spam identico sotto tutti i modelli (mediana 3–5 tentativi Re; la manopola è `repeatable`+cooldown dell'offerta), e rush/turtle restano a 0% su deadly in tutti i modelli (blocco = soglie policy + requires for≥8, non resolver).
+- **Nessun modello fa pagare il training stat**: stats flat ovunque; slope B troppo dolce (≈0.009 f/punto vs costo ~30 oro). Se «prepararsi deve pagare», la manopola è pendenza/costo (dati), non il modello.
+- **Gerarchia effetti**: resolver +3–9pp < persona +18pp < scenario (0/tutto). Il resolver cambia la *forma* del rischio, non la sostanza della campagna.
+
+Test: **21/21** (+S3-E1 B monotona, +S3-E2 C failChance canonica/epic→0, +S3-E3 replay B). Safeguards: `build:check` ✅ `kanban:lint` ✅. **In attesa di decisione Director su D4** (opzioni: A invariato / B / B+C combinati; il retry-spam va affrontato sul dato offerta, non sul resolver).
+
+---
+
+## R-177 — Critica spietata HUD/UI/mappa di `/game` + controproposta + piano asset (cursori, icone POI, icone risorse/HUD)
+
+**Richiesta:** "prendi la pagina /game. Sei un lead senior system designer di una softwarehouse AAA, fa una ricerca online, poi prendi questa UI, HUD, mappa, e gli altri elementi e fanne una critica spietata e costruttiva alla luce di tutte le informazioni che abbiamo, poi proponine uno a tua volta. In primis: gli asset sono praticamente assenti tranne la mappa. Dobbiamo generare un indicatore del mouse in tutte le varie versioni, le icone dentro i POI, le icone delle risorse e in generale dell'hud. I colori dei POI nn so se vanno bene con i colori della mappa dove appaiono" (2026-10-13).
+
+**Data:** 2026-10-13
+**Stato:** `in corso` (critica + proposta consegnate; generazione asset in attesa di OK)
+**Desiderata FROZEN:** nessuna nuova — analisi; la proposta tocca R2.1 (etichette nominali), Pillar 2 (halo), veto "no foglie/oggettini", direzione Lacquer Atlas.
+
+---
+
+## R-178 — Pagina Steam: revisione, key art come capsule, testi, asset reali, durata Goblin; moodboard sì/no
+
+**Richiesta (verbatim):** *"esaminala. dimmi cosa c'è di buono, di sbagliato, ecc. ci sono troppe immagini, nn m piace come si vedono l'imagine principale nn m fa impazzire, il testo è da migliorare, ecc. fa ricerche, guarda la documentazione e dammi un risultato ottimale"* → *"noi abbiamo delle immagini già fatte x loghi, capsule e cose del genere. Dovremmo mettere una d quelle al posto della mappa con il logo sopra, no?"* → *"Nn voglio mettere troppo accento sui villager, e village standing nn suona bene"* → *"una parte che descrivere che sono un solo dev che lo fa per passione ha senso metterlo? il disclaimer ai c'è? è breve e senza troppo glamour?"* → *"11 nodi, ti avevo già risposto, fixa quello che devi fixare"* → *"il moodboard con delle belle immagini che ancora nn hanno un posto nel gioco, ha senso pubblicarlo? Finisci il lavoro di quella pagina, così appena siamo soddisfatti la pubblico"*
+**Data:** 2026-10-13
+**Stato:** `in corso` (pacchetto pronto; restano i bloccanti del Director in `marketing/steam/PUBLISH-CHECKLIST.md`)
+**Desiderata FROZEN:** nessuna nuova. Coerente con R-145 («mettere quello che il progetto sarà»): la roadmap resta nel copy, in una sezione dedicata.
+
+**Esito:**
+- Revisione + ricerca (doc Steamworks, Zukowski): `marketing/steam/REVIEW-2026-10-12.md`.
+- Capsule = key art del Director (eroe sulla valle) ritagliata alle misure Steam 2024; pacchetto con i nomi degli slot in `marketing/steam/upload/`.
+- Copy v2 EN/IT promosso a canonico: meno «villager», nessun «village standing», riga «one-person project, made out of passion», roadmap in «Where it's heading».
+- Disclosure AI più breve e in prima persona, estesa alle immagini dello store (`ai-disclosure.md`).
+- 5 screenshot EN reali a 1920×1080 + 3 GIF (<5 MB) catturati dal gioco con `tools/capture-v2.mts`, `record-offer-gif.mts`, `record-party-gif.mts`.
+- **Bug trovato e corretto:** il forecast del planner dava wipe 100% su Goblin perché la simulazione sceglieva «prima opzione» a ogni bivio (loop di saccheggio). `defaultStrategy` ora segue `REFERENCE_STRATEGY` (insegui + fermati). Durata Goblin **11 nodi / 110 tick** (Director) in `questPois.ts`.
+- Pulsanti di Goblin Extermination riportati alla guida HUD (`data-hud-controls`, testata unica, X per ultima).
+- Moodboard: **non sulla pagina store**; sì nel post community con didascalia «concept/mood» (vedi checklist §5).
+- Controlli: `tools/check-page.mts` 45/45.
+
+**Aggiunte 2026-10-13:** lingue = solo EN+IT; requisiti minimi pubblicati subito (stime da validare sul build).
+
+**Aperto (Director):** B1 marchio, B2/B3 AI survey + provenance audit, B4 test di comprensione, B6 waiver trailer.
+
+**Esito (2026-10-13):** revisione pubblicata https://claude.ai/artifact/8GCPcaB4LhYjDPdiLr4K7P. Misure: anelli POI attuali sotto 3:1 su mare/sabbia/ocra (evento 1,1:1 su mare e ocra, quest 1,5:1 su sabbia; tinta quest 39° = sabbia 40°); in scala di grigi i POI sono identici. Cursore in uso = pixel art @2x nearest-neighbour, stati drop/disabled mancanti. 4 stili d'icona (dipinte, hudIcons tratto 1.6, lucide, pixel). Nessun POI all'avvio senza Regia; obiettivo mai mostrato. Tensioni segnalate: DESIGN_PILLARS r.33 vs r.43 (POI = verbo + slot), Pillar 1 "cornice intagliata" vs Lacquer Atlas, `poi_icon_prompts.md` (famiglia dal bordo) smentito dalle misure. Proposta: Sigillo (bordo doppio scuro+avorio, sagoma = famiglia, glifo = contenuto, colore = valenza dentro l'halo), cursore 2 famiglie/10 stati, icone 2 livelli, lista asset P0-P2. In attesa di 5 decisioni del Director (vedi pagina).
