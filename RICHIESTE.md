@@ -3156,6 +3156,12 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 
 **Da decidere:** review dei prompt, generazione, poi `provenance.md` per scena + aggiornamento `SOURCES.md` e `NODE_ART`.
 
+**Avanzamento 2026-10-13 (audit esiti, v2):** correzione Director — 4 scene mostravano ancora esiti e sono state riportate all'istante *prima*: `f4-combattimento` (mischia in corso → l'eruzione pre-contatto, nessun acciaio incontrato), `f5-incalzare` (fuggiaschi quasi chiusi → rotta aperta, divario non chiuso, nessuno preso), `f7-agguato` (freccia piantata+dardi in volo → archi tesi, primo dardo in volo, palo ancora pulito), `f7-ultimo-scontro` (aftermath+scudo caduto → pre-scontro: trofei a bordo strada = ciò che si difende, muro goblin che chiude, nessuno caduto). Minor: `f2-bottino` «spoils spilled» → merce ancora legata dove lasciata.
+
+**Avanzamento 2026-10-13 (guida + rewrite uniforme):** creata `src/docs/docs/art-direction/scene_prompt_authoring_guide.md` — guida operativa per agenti che authorano scene prompt ambientali (regole R0-R6 distillate dai problemi di questa sessione: fonte=testo authored, solo beat pre-scelta/pre-check, party del giocatore mai disegnato ma NPC/esterni ok, creature solo da registry, luce/palette libere, struttura fissa Subject→Composition→Mood→Style→Lighting→Avoid→Aspect, checklist di review, convenzione salvataggio prompt vincenti in provenance.md). Linkata dalla bibbia (§10.7, bump v0.13). I 16 prompt sono stati **riscritti in passata uniforme** sulla struttura della guida; aggregato rigenerato.
+
+**Avanzamento 2026-10-13 (scheda goblin):** creata la creature sheet `src/docs/docs/art-direction/creatures/creatures/goblin/` v0.1.0 **candidate** (fast-track Q&A Director): verde classico matte, piccoli e scattanti (knee-to-waist, swarm MTG-classic), cuoio+legno+war-paint ocra/cremisi (link al totem V002-hero), carattere sciame feroce. Restano archetipi temporanei — la scheda serve coerenza visiva, non canon di specie. Blocco swarm iniettato nelle 4 scene di contatto (f4, f5, f7-agguato, f7-ultimo-scontro): orecchie a punta, war-paint, lance/clave di legno leggibili in silhouette, mai volti/individui. Registry aggiornato.
+
 **Avanzamento 2026-10-12 (v6):** goblin presenti dove obbligatori — confermate massa/sagome in F4 combattimento e F5 incalzare; **aggiunti aggressori mezzi nascosti nella treeline di `f7-agguato`** (prima invisibili). Scene con goblin: f4-combattimento, f5-incalzare, f7-agguato, f7-ultimo-scontro — sempre massa/sagome, mai volti o design.
 
 **Avanzamento 2026-10-12 (v5):** ulteriore precisazione — vietato solo il **party del giocatore**; party *esterni* (altri gruppi di avventurieri, viandanti, guardie) e NPC sono ammessi. Regola aggiornata in `design-intent.md`/`scenes.md`; aggregato rigenerato.
@@ -3242,3 +3248,12 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 **Evidence:** `test-results/r176-macrosim-s0-2026-10-13.log`.
 
 **Prossimi:** S1 (RunReport + patch engine + 2 persona); S2 wound tiers; S3 esperimento Re A/B/C → evidence pack per RFC Director.
+
+### R-176 / S1 — Metrics + Scenario engine (2026-10-13)
+
+Implementato il layer L2 scenario (patch dati ordinate → ri-validazione Zod canonica → configHash) + persona come oggetti versionati + RunReport completo (funnel offerte, esiti per-causa con tag fedeltà, harm, giorni-persona, milestone). Test 17/17. Prima matrice 3 scenari × 2 persona × 100 seed accoppiati:
+- base×rush 67% / base×turtle **85%** → la persona domina lo scenario
+- deadly ×entrambe 0% → campagna strutturalmente impossibile (collasso inv7)
+- scarce ×entrambe 0% → fame a g23 (eatPer×1.4 > produzione/testa)
+
+Evidence: `test-results/r176-macrosim-s1-2026-10-13.log`.
