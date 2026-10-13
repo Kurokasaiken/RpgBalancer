@@ -3113,6 +3113,7 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 - Creata la scheda nel **Creature IP Development System** (`src/docs/docs/art-direction/creatures/creatures/uomini-rana/`) seguendo la convenzione dei 4 esemplari esistenti: `identity.md`, `design-intent.md`, `reference-card.md`, `prompt.md` (prompt injection pronto, stile Split-Rendering Wanderlust), `decision-log.md`, `versions/v0.1.0.md` — status `draft`, versione `0.1.0`.
 - Registrata in `src/docs/docs/art-direction/creatures/registry.md` (tabella Creatures) e in `context/INDEX.md`.
 - Correzione stessa data: lo `Style` del `prompt.md` era generico — riallineato allo stile canonico concordato **Split-Rendering con impasto spesso a pennellate larghe** (bibbia §10, invariato); NO LIST estesa (no glazes/airbrush/flat digital paint).
+- Iterazione stessa data: gambe **ancora più lunghe e strette** (spec ~2,5× → ~3× busto, stick-thin) e **occhi lattei/opachi** — aggiornati `prompt.md`, `identity.md`, `reference-card.md`, `decision-log.md`.
 
 **Decisioni aperte (segnate nel decision-log):**
 - **Famiglia:** nessuna delle 4 famiglie esistenti ammette anatomia umanoide o cultura senziente → serve una nuova famiglia (es. popoli senzienti) o un ruling esplicito fuori-famiglia.
@@ -3155,6 +3156,8 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 
 **Da decidere:** review dei prompt, generazione, poi `provenance.md` per scena + aggiornamento `SOURCES.md` e `NODE_ART`.
 
+**Avanzamento 2026-10-12 (v2):** il Director ha chiarito che la generazione avverrà su AI ESTERNE (Gemini/Grok/GPT) → ogni `prompt.md` contiene ora come blocco principale un **full prompt in prosa** (~150-190 parole, subject authored dal manoscritto + blocco stile bibbia + «Avoid» inline al posto del negative), con il compatto SDXL ≤77 token mantenuto come fallback. Aggregato copy-paste: `.mw/specs/quest-goblin-scenes/prompts-external.md` (15 prompt). Aspect: 16:9 scene, 3:4 card.
+
 **Avanzamento 2026-10-12:** spec authorata in `.mw/specs/quest-goblin-scenes/` — `design-intent.md` (vincoli Director: POV party, goblin solo in 3 scene come massa/sagome, scelta=immagine diversa), `scenes.md` (indice 15 scene + mapping NODE_ART target), `scenes/<slug>/prompt.md` per 15 scene (f0×1, f1×3, f2×1, f3×3, f4, f5, f6, f7×3, quest-card) in formato consumabile da `scripts/rpg-gen-mockup.py --spec-dir` (primo blocco ```text = prompt positivo, tutti ≤77 token CLIP verificati; negative dichiarato per --negative). Params: SDXL MPS, cfg 7.5, steps 30, 1344×768 scene / 832×1216 card.
 
 ---
@@ -3193,3 +3196,21 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 **Evidence:** `test-results/r174-goblin-lab-inc-a-2026-10-12.log` — accettazione 5/5 (doppia assegnazione rifiutata, away non riassegnabile, morte permanente, difesa esclude away, replay identico) + sweep 30 seed.
 **Finding emergente:** con persone reali l'attrito dei fallimenti quest (1-2 morti nel party) rende il churn insostenibile — 0/30 vittorie, estinzione villager sistematica (l'eroe resta solo). Prima interazione cross-sistema rivelata dal lab.
 **Prossimi:** Inc B (offerte/metaLayer + migranti come offerte), Inc C (ferite vs morti + `injuredUntilTick`), Inc D (consumo cibo/produzione per-persona sul clock condiviso), Inc E (invasioni con difensori assenti), Inc F (ciclo run).
+
+---
+
+## R-175 — Goblin Lab v0.3, Incremento B: quest = offerte metaLayer, reclutamento come opportunità
+
+**Richiesta:** "procedi" (2026-10-12) — prosecuzione della roadmap R-172 dopo Inc 0+A. Inc B: board quest via sessione `metaLayer` reale (gate 4 stati, doppio timer, leader-capacity, resolve graduato + harmProfile); migranti = offerte `people` (D3); Re = `king-assault` su `clock:king` + milestone `ms-end-siege`; harm → targeting posizionale canonico (coda 20/80) con ferita → `injured` + recovery sweep TimeEngine.
+
+**Data:** 2026-10-12
+**Stato:** `fatta`
+**Desiderata FROZEN:** nessuna — laboratorio sperimentale; nessuna regola canonica modificata (contenuti OfferDef marcati PROPOSTA-lab).
+
+**Esito:** `tools/goblin-lab/lab.ts` + `labContent.ts` + `sweep.mjs` (locale: `tools/` gitignored). `MetaLayerConfig` authored validata dallo Zod schema canonico; reward→risorse in `LAB_REWARDS` adapter (conversion rewards posticipate in PLAN-030); `access:recruitment` quality adapter gatea le offerte migranti; `trn` reso derivato (conteggio addestrati vivi); eroe mortale e leader-capacity=1 → **eroe caduto = run persa**.
+**Test:** 11/11 — A1-A4 (esclusività/morte/difesa) + B1 no-leader-available, B2 appearsWhen su clock:king, B3 underprepared committabile, B4 migranti via offerta, B5 wound→injured→recovery, B6 offerta scaduta rifiutata, A5/B7 replay deterministico.
+**Evidence:** `test-results/r175-goblin-lab-inc-b-2026-10-12.log` — sweep 30 seed.
+
+**Finding emergente (vs Inc A):** con harmProfile canonico (wound≫death, condizionato al fail) l'attrito crolla: **21/30 vittorie** (era 0/30 in Inc A, 29% in v0.2), pop al cap (31/31 mediana). Nuovi modi di perdere: 5× eroe caduto in missione (slot testa 20% in party da 2), 4× collasso strutturale all'invasione 7 (g840 — il tetto difesa ~pal cap regge fino a threat ~800). Le vittorie si clusterizzano a ~g84/204/324/443/564/685/804 — tentativi Re sincronizzati pre-invasione (finestra disperazione). `trn` quasi mai usato → la morte del tag 'trained' con la persona + pal spam hanno spostato il keystone difesa. L'estinzione di Inc A era guidata dalla regola v0.2 fail→1-2 morti garantiti, non dal costo-opportunità.
+
+**Prossimi:** Inc C (granularità ferite/HP + riammissione injured alle spedizioni), Inc D (produzione/consumo per-persona sul clock), Inc E (invasioni con difensori assenti), Inc F (ciclo run/meta-run). Aperta: `alive=31` al cap suggerisce `access:recruitment` da rifinire; mortalità eroe in party piccoli = leva design.
