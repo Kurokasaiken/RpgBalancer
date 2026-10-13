@@ -3156,6 +3156,14 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 
 **Da decidere:** review dei prompt, generazione, poi `provenance.md` per scena + aggiornamento `SOURCES.md` e `NODE_ART`.
 
+**Avanzamento 2026-10-12 (v6):** goblin presenti dove obbligatori — confermate massa/sagome in F4 combattimento e F5 incalzare; **aggiunti aggressori mezzi nascosti nella treeline di `f7-agguato`** (prima invisibili). Scene con goblin: f4-combattimento, f5-incalzare, f7-agguato, f7-ultimo-scontro — sempre massa/sagome, mai volti o design.
+
+**Avanzamento 2026-10-12 (v5):** ulteriore precisazione — vietato solo il **party del giocatore**; party *esterni* (altri gruppi di avventurieri, viandanti, guardie) e NPC sono ammessi. Regola aggiornata in `design-intent.md`/`scenes.md`; aggregato rigenerato.
+
+**Avanzamento 2026-10-12 (v4):** correttivi Director — il divieto è solo sul **party** (niente avventurieri/mani/stivali alleati); NPC e persone generiche sono ammessi dove servono → il mercante è tornato visibile nella scena `f0-mercante`. Rimossi tutti i residui «blinding white sun / Solar Triumph»: la luce è libera per scena, mai dettata dalla bibbia UI. Titolo F0 ratificato **«Viaggio»** (dir rinominata `f0-viaggio`). Aggregato rigenerato.
+
+**Avanzamento 2026-10-12 (v3):** nuovi vincoli Director applicati ai 16 prompt — **nessuna persona mai disegnata** (il party è del giocatore; tolte anche mani/stivali/sagome alleate: puro ambiente e oggetti), **immagine = beat pre-scelta/pre-check, mai esito** (tolti i reveal: albero visto da sotto, palizzata integra, campanelli del bigwin fuori da F1), **rimossi i vincoli rigidi di palette** (niente teal obbligatorio/pigmenti fissi — luce naturale della scena; restano impasto e kill list non-cromatica). Titoli fase ratificati: F0 Viaggio di andata, F1 Esplorazione, F2 Il bottino, F3 L'accampamento, F4 Combattimento (titolo da confermare), F5 Incalzare, **F6 Spoglie di guerra**, F7 L'agguato, **F8 Ritorno**; trappola F3-stealth rinominata **«Intrusi»**. Design B applicato (da ratificare): masso eliminato, F2 = terzo carro mercantile mai tornato; delta al manoscritto elencati in `scenes.md`. Aggiunta scena opzionale `f0-mercante` (evento casuale di viaggio). Aggregato rigenerato: `prompts-external.md` (16 prompt).
+
 **Avanzamento 2026-10-12 (v2):** il Director ha chiarito che la generazione avverrà su AI ESTERNE (Gemini/Grok/GPT) → ogni `prompt.md` contiene ora come blocco principale un **full prompt in prosa** (~150-190 parole, subject authored dal manoscritto + blocco stile bibbia + «Avoid» inline al posto del negative), con il compatto SDXL ≤77 token mantenuto come fallback. Aggregato copy-paste: `.mw/specs/quest-goblin-scenes/prompts-external.md` (15 prompt). Aspect: 16:9 scene, 3:4 card.
 
 **Avanzamento 2026-10-12:** spec authorata in `.mw/specs/quest-goblin-scenes/` — `design-intent.md` (vincoli Director: POV party, goblin solo in 3 scene come massa/sagome, scelta=immagine diversa), `scenes.md` (indice 15 scene + mapping NODE_ART target), `scenes/<slug>/prompt.md` per 15 scene (f0×1, f1×3, f2×1, f3×3, f4, f5, f6, f7×3, quest-card) in formato consumabile da `scripts/rpg-gen-mockup.py --spec-dir` (primo blocco ```text = prompt positivo, tutti ≤77 token CLIP verificati; negative dichiarato per --negative). Params: SDXL MPS, cfg 7.5, steps 30, 1344×768 scene / 832×1216 card.
@@ -3214,3 +3222,23 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 **Finding emergente (vs Inc A):** con harmProfile canonico (wound≫death, condizionato al fail) l'attrito crolla: **21/30 vittorie** (era 0/30 in Inc A, 29% in v0.2), pop al cap (31/31 mediana). Nuovi modi di perdere: 5× eroe caduto in missione (slot testa 20% in party da 2), 4× collasso strutturale all'invasione 7 (g840 — il tetto difesa ~pal cap regge fino a threat ~800). Le vittorie si clusterizzano a ~g84/204/324/443/564/685/804 — tentativi Re sincronizzati pre-invasione (finestra disperazione). `trn` quasi mai usato → la morte del tag 'trained' con la persona + pal spam hanno spostato il keystone difesa. L'estinzione di Inc A era guidata dalla regola v0.2 fail→1-2 morti garantiti, non dal costo-opportunità.
 
 **Prossimi:** Inc C (granularità ferite/HP + riammissione injured alle spedizioni), Inc D (produzione/consumo per-persona sul clock), Inc E (invasioni con difensori assenti), Inc F (ciclo run/meta-run). Aperta: `alive=31` al cap suggerisce `access:recruitment` da rifinire; mortalità eroe in party piccoli = leva design.
+
+---
+
+## R-176 — Piano macro-sim via dibattito multi-AI web + S0 (determinismo e misura)
+
+**Richiesta:** "lancia questo plan nuovo fatto da te x il planner multi AI web" + "procedi" (2026-10-13). Il piano da artifact-r001 è stato sottoposto al dibattito avversariale `mw-web-debate` (chatgpt proposer / claude critic / grok red-team; gemini escluso per failure servizio), arrivato ad `artifact-r003` con decision_memo.
+
+**Data:** 2026-10-13
+**Stato:** `in corso` (S0 fatta; S1-S5 in roadmap)
+**Desiderata FROZEN:** nessuna — laboratorio sperimentale.
+
+**Esito dibattito:** `decision_memo` — claude ACCEPT su r003; grok OBJECT irriducibile (WITNESS-12: "tuning riskBand = mutazione canon" — disposizionato rebutted: i valori authored nello schema Zod sono le manopole di bilanciamento, la formula del gate resta canonica; il dissenso resta come criterio di audit: patch sempre dichiarate). Artifact: `RPG/.mw/runs/20261013-1046-macrosim-plan/artifact-r003.md` + `decision_memo.md` (mirror in `mind-weaver/.mw/runs/` con journal completo).
+
+**Piano r003 (adottato):** 4 layer ortogonali (L0 engine canonico / L1 fidelity CANON-PROPOSTA-STUB authored / L2 scenario = patch dati ordinate+configHash / L3 persona deterministiche). Sequenza: **S0** determinismo+stats → **S1** metrics+scenario engine → **S2** wound tiers → **S3** King A/B/C (invarianza 3 persona) → **S4** economia per-persona → **S5** invasione.
+
+**S0 implementata** (tools/goblin-lab/, locale): stream splitting per sottosistema (child seed = seed⊕FNV-1a(label): roster/vil/world/harm; meta seedato da child seed, reseed interno canonico intoccato); `d4sweep.ts` — **dead zone D4 misurata**: power 8-33 → failChance fissa 0.50, salto a 0.40 solo ≥34, requisiti non-stat dominanti (0.65 fisso sotto req); `stats.mjs` (Wilson CI, paired-delta); bridge run 300 seed post-split: **win 67.3% CI[62-72], morte eroe 21.0% CI[17-26], collasso 11.7%** — consistente col baseline ritirato.
+**Test:** 13/13 (+S0-C1 read-only zero-draw, +S0-C2 stream independence; replay post-split OK).
+**Evidence:** `test-results/r176-macrosim-s0-2026-10-13.log`.
+
+**Prossimi:** S1 (RunReport + patch engine + 2 persona); S2 wound tiers; S3 esperimento Re A/B/C → evidence pack per RFC Director.
