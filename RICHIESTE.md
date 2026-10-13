@@ -3466,3 +3466,20 @@ Test: **21/21** (+S3-E1 B monotona, +S3-E2 C failChance canonica/epic→0, +S3-E
 
 ### R-177 / PLAN-058 Gate F0 approvato (2026-10-13)
 **Parole del Director:** "si" — approvati: Roster invariato, misure del Roster come metro per tutto l'HUD, regole [deciso] di guida §6 (scala 12-24, maiuscolo ≤3 parole, disabilitati 0,65, area 32×32, tooltip 400 ms, numeri abbreviati da 10k, anteprima invece di conferma, multipli di 4). Sbloccate Fase 1 (T1.1-T1.6) e T4.2.
+
+## R-182 — Goblin lab Inc E: invasione come missione canonica per-membro
+
+**Richiesta (verbatim):** *"procedi"* — sul next incremento consigliato in chiusura di R-179 (invasione con difensori realmente disponibili via `missionResolver`, l'ultimo blocco PROPOSTA grande del lab).
+**Data:** 2026-10-13
+**Stato:** `fatta`
+**Desiderata FROZEN:** coerente con la desiderata macro-sim R-176 / direttiva R-179 (dalla simulazione isolata al gameplay integrato; meccaniche canoniche, adapter dichiarati).
+
+**Design (dall'audit R-179):** `invade()` v0.2 (threat scalare vs difesa flat, vittime random, distruzione edifici flat) → invasione come `resolveMissionRun` canonico: membri = eroe (se `available`) + `trainedPresent` (milizia davvero presente — away/injured/lavoratori non difendono), check di fase weakest-tag su `for` (hero usa `S.st.FOR` reale — allenare l'eroe ora aiuta la difesa), threat→difficulty bridge e fortificazioni→risk/difficulty come OBSERVED-ADAPTER dati in `cfg.siege` (patchabili). Esiti membri canonici (dead/injured persistenti via ResidentState); tier → respinta/breccia; breccia → vittime tra i civili PRESENTI (away = fisicamente assenti) + edifici. Senza difensori la milizia è vuota → breccia.
+
+**Implementato (`tools/goblin-lab/lab.ts`, nessun tocco a `src/`):** `invade()` v0.2 → `resolveMissionRun` MP-06 canonico. Difensori = eroe (se `available`) + `trainedPresent`; check di fase weakest-tag su `for` (eroe usa `S.st.FOR` reale, villager `siege.trnFor` adapter) ×`partyStatMult` 4; threat→difficulty/fortificazioni→sconto/gap→`emptySlotPenalty`/tier→ferita/breccia→civili+edifici = OBSERVED-ADAPTER dati in `cfg.siege` (patchabili). Esiti membri persistenti su `ResidentState` (`eroe caduto in difesa` chiude la run, tag CANON). Civili `away` non vittimizzabili (fuori dal villaggio). Metriche `sieges{repelled,breached,tiers}` nel report. Semplificazione dichiarata: nessun retreat in assedio.
+
+**Finding gameplay:** prima della fix di policy ogni assedio era `fail` (8 brecce/10 seed) — la milizia era `away` in quest/lavoro nel giorno dell'invasione. Aggiunto `persona.holdForSiege` (non commettere quest non-Re con `resolvesAt > nI`; Re esente): 6 respinte/2 brecce su 10 seed. Prima decisione calendario del lab, conseguenza osservabile della disponibilità reale.
+
+**Test:** 36/36 (8 nuovi I1–I8: zero difensori→breccia, collasso senza strutture, milizia away/injured non difende, ferita→recovery canonico, civili away non vittime, difesa forte>debole matched-seeds, report sieges, holdForSiege). Evidence: `test-results/r182-siege-canon-2026-10-13.log`. Safeguards: lint scope 0 problemi, build:check PASS, kanban:lint PASS. Fidelity aggiornata: `tools/goblin-lab/FIDELITY.md`.
+
+**Residuo PROPOSTA:** threat curve, gap→rischio, breccia→civili/edifici (il gioco reale non ha ancora risoluzione invasioni); doppio aggregato residente (ResidentState vs MinimalResident/questSettlement) ancora aperto.
