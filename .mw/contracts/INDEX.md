@@ -8,6 +8,7 @@ Protezione attiva (invariant + check + state). La storia dei difetti vive in
 | CTR-game-001 | Ticker Pixi vivo >10s dopo boot e wonder spawnabile via bump su `/game` | `src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx`, `src/pages/game-frame-pixi.tsx` | active |
 | CTR-game-002 | Clock freeze durante event theatre + ripristino esatto dello stato pre-trigger | `src/pages/game-frame-pixi.tsx`, `src/pages/game-frame.tsx`, `src/ui/idleVillage/hooks/useTimeEngineLoop.ts` | active |
 | CTR-game-003 | HUD idle auto-hide / wake-on-input / wake-on-event, manuale resta fino a toggle | `src/ui/idleVillage/components/gameFrame/GameFrame.tsx`, `src/ui/idleVillage/components/gameFrame/HudHideToggle.tsx`, `src/balancing/config/idleVillage/gameFrameConfig.ts` | active |
+| CTR-game-004 | Coreografia evento invasione: un goblin alla volta, peel→marker, card ripiegata nel registro, camera ferma | `WorldSurfaceEventCard.tsx`, `GoblinInvasionWindow.tsx`, `gameFrame/HudEventLedger.tsx`, `game-frame-pixi.tsx`, `game-frame.tsx` | active |
 
 ## Note
 
