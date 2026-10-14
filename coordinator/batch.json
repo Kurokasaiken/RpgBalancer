@@ -90,15 +90,6 @@
       "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a713",
       "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a713",
       "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a713"
-    },
-    {
-      "task_id": "R-186",
-      "channel": "ai-worker",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": [],
-      "prompt": "Piano: `.mw/plans/r186-settlement-convergence.md` (run `20261014-0930-r186-settlement-plan/report.md`)",
-      "title": "Piano: `.mw/plans/r186-settlement-convergence.md` (run `20261014-0930-r186-settlement-plan/report.md`)",
-      "description": "Piano: `.mw/plans/r186-settlement-convergence.md` (run `20261014-0930-r186-settlement-plan/report.md`)"
     }
   ]
 }
