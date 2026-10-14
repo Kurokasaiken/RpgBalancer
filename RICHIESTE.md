@@ -3528,3 +3528,36 @@ Test: **21/21** (+S3-E1 B monotona, +S3-E2 C failChance canonica/epic→0, +S3-E
 **Test:** lab 44/44 (8 nuove invarianti V1–V8: identita', morte terminale, ferita canonica, esclusivita', no-zombie, no-doppia-applicazione, capability reale, coerenza aggregati); TimeEngine.unit: +3 test invarianti verdi (resurrezione, ferita mid-flight, mai schedulare dead/injured) — 3 test `resolveActivityOutcome` fallivano gia' prima (pre-esistenti, non correlati). Safeguards: lint scope clean, build:check PASS, kanban:lint PASS.
 **Evidence:** `test-results/r184-resident-lifecycle-2026-10-14.log`. Fidelity: `tools/goblin-lab/FIDELITY.md` §R-184.
 **Residuo:** `exhausted` terminale canonico; convergenza `MinimalResident`↔`ResidentState` via residentSync (incremento futuro); threat/breccia restano PROPOSTA-dati.
+
+
+## R-185 — /game: coreografia dell'evento Invasione Goblin (5 difetti dal video del Director)
+
+**Richiesta (verbatim):** vedi `.mw/bugs/20261014-game-invasion-event-choreography/bug.md` (punti 1-5 + «teca adesivo e quando si staccano e vanno in direzioni differenti»).
+**Data:** 2026-10-14
+**Stato:** `parziale` — punti 2, 3, 4, 5 corretti e coperti da `tests/e2e/idleVillage/gameInvasionScene.spec.ts`; punto 1 in attesa di chiarimento.
+**Desiderata FROZEN:** v2 (cinematica per l'Invasione), v29 (processo).
+**Incidente collegato:** `.mw/bugs/20261014-verification-false-pass/bug.md`; piano di prevenzione in bozza `.mw/plans/verification-false-pass-prevention.md`.
+**Evidence:** run Playwright 2026-10-14 (5/5 su Scene+March; 12 test sulle 4 spec); contact sheet nello scratchpad di sessione.
+
+
+### R-177 / T2.6 ancore rivisto (2026-10-14)
+**Parole del Director:** "controlla cosa puoi fare adesso in autonomia, scrivimi i 6 prompt x le icone (devono stare bene cn la UI e HUD, dimensioni giuste)".
+Soggetti riscritti a taglia d'uso (POI 26 px, risorse 28 px); lint I8 aggiunto; pacchetto `.mw/specs/icons/ANCORE-prompt-pack.md`. Generazione e scelta: Director.
+
+## R-186 — Plan: convergenza settlement ↔ VillageState (ciclo di vita condiviso)
+
+**Richiesta (verbatim):** *"ci serve un plan x «far convergere il settlement reale — far scrivere gli esiti di questSettlement (o una proiezione via residentSync) anche su VillageState, così lab e gioco condividono le stesse conseguenze invece di due modelli paralleli»"*
+**Data:** 2026-10-14
+**Stato:** `in corso` — piano in `.mw/plans/r186-settlement-convergence.md` (bozza, attende avallo Director).
+**Desiderata FROZEN:** coerente con R-176/R-179; v12 (rischio per-slot); PLAN-019-S2.5 (settlement idempotente).
+
+**Esito dell'audit per il piano:** `/game` NON vive su `VillageState` — l'aggregato vivo e' `MinimalGameplayState` (`MinimalResident`); `advanceTime`/`useActivityScheduler` solo in legacy/sandbox/test; `selectResidentRosterStates` proietta gia' store→engine in lettura. Scrivere il settlement anche su VillageState nel gioco reale creerebbe un aggregato fantasma → rifiutato. Il problema reale e' la *semantica delle conseguenze* scritta due volte (applyPlanToState vs applyHarm/applySiegeOutcome del lab). Piano: un solo contratto `SettlementPlan`/`SettlementEffect` + applicatore speculare `applyPlanToVillageState` in engine-space; il lab emette effetti canonici; parity test garantisce equivalenza. Decisioni aperte nel piano: flat-5 vs injuryTiers, village-xp su VillageState, ledger persistito.
+
+## R-187 — Report componenti per il trailer: screenshot + assessment funzionamento/animazioni
+
+**Richiesta (verbatim):** *"puoi fare screenhsot del mio progetto? m serve un report di tutti i componenti che ci servono x fare il trailer, completi di screenshot e assessment se funzionano, come, se le animazioni sn smooth, ecc"*
+**Data:** 2026-10-14
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna corrispondente — audit/evidence, collegata a R-072 (teaser 7 scene), R-167 (componenti mancanti su `/game`), R-185 (coreografia invasione).
+**Scope rilevato:** due famiglie di superfici — (a) le 7 scene scripted di `/trailer` (`TrailerViewer`, `?scene=<id>`) e (b) le superfici di gioco reali filmabili su `/game` (boot, mappa Pixi+HUD, invasione goblin, POI quest→planner→QuestRunWindow, settlement lost, astrolabe, scheda PG). Hub per-scene `/test-hub/steam-trailer-hub` ha link a route non registrate (`/trailer-threat` ecc.) — probabili link morti, da verificare.
+**Deliverable:** `test-results/trailer-report-2026-10-14/` con screenshot (1920×1080) + `REPORT.md` per-componente.
