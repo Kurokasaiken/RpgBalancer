@@ -92,7 +92,8 @@ public/assets/ref/
 public/assets/trailer/
 
 # Temporary agent tooling
-tools/
+tools/*
+!tools/goblin-lab/
 .mw/bin/
 .mw/observation.jsonl
 
