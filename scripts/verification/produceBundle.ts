@@ -33,10 +33,18 @@ function parseArgs(argv: string[]): { manifest: string; noExec: boolean } {
 
 const DEFAULT_TIMEOUT_S = 300;
 
-function runCommand(command: string, logPath: string, timeoutS: number, cwd: string): CommandResult {
+function runCommand(
+  command: string,
+  logPath: string,
+  timeoutS: number,
+  runDir: string,
+): CommandResult {
   try {
+    // I comandi girano nella root del repo (npm/script raggiungibili); gli
+    // artefatti devono essere scritti dentro $RUN_DIR per essere valutati.
     const out = execFileSync('bash', ['-lc', command], {
-      cwd,
+      cwd: process.cwd(),
+      env: { ...process.env, RUN_DIR: runDir },
       encoding: 'utf8',
       timeout: timeoutS * 1000,
       maxBuffer: 16 * 1024 * 1024,
@@ -78,9 +86,33 @@ function main(): void {
   }
 
   const logsDir = path.join(runDir, 'command-logs');
+  const resultsPath = path.join(runDir, 'command-results.json');
   const commandResults: Record<string, CommandResult | null> = {};
 
+  // --no-exec: i risultati persistiti (o ricavati dai command log) sono la
+  // prova durevole del run — rivalutiamo quelli, non rieseguiamo.
+  if (noExec) {
+    if (existsSync(resultsPath)) {
+      Object.assign(commandResults, JSON.parse(readFileSync(resultsPath, 'utf8')));
+    } else {
+      for (const obl of parsed.obligations) {
+        if (!obl.command) continue;
+        const logPath = path.join(logsDir, `${obl.id}.log`);
+        if (existsSync(logPath)) {
+          const head = readFileSync(logPath, 'utf8').split('\n')[0] ?? '';
+          const m = head.match(/exit_code:\s*(\d+|null)/);
+          commandResults[obl.id] = {
+            exit_code: m && m[1] !== 'null' ? Number(m[1]) : null,
+            timed_out: head.includes('TIMEOUT'),
+          };
+        }
+      }
+      console.log('(--no-exec: risultati ricavati da command-results.json / command-logs)');
+    }
+  }
+
   for (const obl of parsed.obligations) {
+    if (noExec) break;
     if (obl.waived?.by === 'director') {
       console.log(`- ${obl.id}: WAIVED-DIRECTOR (${obl.waived.reason}) — comando non eseguito`);
       continue;
@@ -89,16 +121,14 @@ function main(): void {
       commandResults[obl.id] = null;
       continue;
     }
-    if (noExec) {
-      commandResults[obl.id] = null;
-      console.log(`- ${obl.id}: --no-exec, comando marcato non eseguito`);
-      continue;
-    }
     mkdirSync(logsDir, { recursive: true });
     const logPath = path.join(logsDir, `${obl.id}.log`);
     console.log(`▶ ${obl.id}: ${obl.command}`);
     commandResults[obl.id] = runCommand(obl.command, logPath, obl.timeout_s ?? DEFAULT_TIMEOUT_S, runDir);
     console.log(`  exit_code=${commandResults[obl.id]?.exit_code ?? 'null'}`);
+  }
+  if (!noExec) {
+    writeFileSync(resultsPath, JSON.stringify(commandResults, null, 2));
   }
 
   const bundle: Bundle = evaluateManifest(parsed, runDir, commandResults);
