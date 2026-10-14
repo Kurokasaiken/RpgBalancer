@@ -1,11 +1,16 @@
+import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   checkEnvAttestation,
   checkKanbanGate,
   checkRichiesteGate,
   criteriaHash,
+  evaluateObligation,
   parseJunit,
   parseKanbanRows,
+  type Obligation,
 } from '../../../scripts/verification/gateCore';
 
 describe('parseJunit', () => {
@@ -128,5 +133,52 @@ describe('checkRichiesteGate', () => {
 describe('criteriaHash', () => {
   it('changes when the criterion text changes', () => {
     expect(criteriaHash('req A', 'src')).not.toBe(criteriaHash('req B', 'src'));
+  });
+});
+
+describe('evaluateObligation — max_errors', () => {
+  const baseObl: Obligation = {
+    id: 'OB-X',
+    requirement: 'nessun errore runtime nella cattura',
+    source: 'test',
+    type: 'pixel-temporal',
+    environment: 'headless-ok',
+    min_samples: 2,
+    min_frames: 1,
+    max_errors: 0,
+    artifacts: [
+      { path: 'metrics.json', kind: 'metrics' },
+      { path: 'frames', kind: 'frames' },
+      { path: 'env.json', kind: 'env' },
+    ],
+    blocking: true,
+  };
+
+  const runDirWith = (errors: string[]) => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'gate-maxerr-'));
+    writeFileSync(
+      path.join(dir, 'metrics.json'),
+      JSON.stringify({ samples: [{}, {}, {}], errors }),
+    );
+    mkdirSync(path.join(dir, 'frames'), { recursive: true });
+    writeFileSync(path.join(dir, 'frames', 'f_00.jpg'), 'frame');
+    writeFileSync(
+      path.join(dir, 'env.json'),
+      JSON.stringify({ visibilityState: 'visible', rafTicks: 20, frameDiff: 0.9, viewport: { width: 100, height: 100 } }),
+    );
+    return dir;
+  };
+
+  it('FAIL quando metrics.errors supera max_errors', () => {
+    const dir = runDirWith(["TypeError: ... 'push'"]);
+    const res = evaluateObligation(baseObl, dir, { exit_code: 0 });
+    expect(res.result).toBe('FAIL');
+    expect(res.reasons.join(' ')).toContain('errori runtime');
+  });
+
+  it('PASS quando errors è vuoto', () => {
+    const dir = runDirWith([]);
+    const res = evaluateObligation(baseObl, dir, { exit_code: 0 });
+    expect(res.result).toBe('PASS');
   });
 });
