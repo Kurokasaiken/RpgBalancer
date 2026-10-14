@@ -72,6 +72,36 @@ When picking a prompt: Set Kanban row to "In corso" with name/date
 Upon delivery: Set Kanban row to "Completato" with evidence links
 End response with: KANBAN STATUS: <Prompt ID> – Completato (Evidence: <log principale>)
 Completed prompts tracked only in documentation, not on Kanban
+
+6. Verification Gate (R-189, obbligatorio e meccanico)
+La chiusura è bloccata da `npm run kanban:lint`: una riga "Completato" o una
+transizione `fatta`/`completata` in RICHIESTE.md senza prove valide fallisce
+il lint. La dichiarazione dell'agente non è evidenza.
+
+All'AVVIO del task (non alla fine): crea `.mw/runs/<task>/verification.json`
+(manifest) con le obbligazioni verificabili derivate dalla richiesta verbatim
+e dai contratti `CTR-*` che coprono i file toccati (`.mw/contracts/INDEX.md`).
+Campi per obbligazione: `id`, `requirement` (verbatim), `source`, `type`
+(state|dom-temporal|pixel-temporal|fps|human-eye), `command` eseguibile,
+`artifacts` attesi, `blocking: true`. Se il task non ha nulla di verificabile
+tecnicamente, la chiusura va marcata `nessuna-verifica-tecnica: "<motivo>"`
+nella riga di completamento.
+
+Alla CHIUSURA:
+1. `npm run verify:bundle -- --manifest=.mw/runs/<task>/verification.json`
+   esegue i comandi e valuta le prove (PASS/FAIL/NOT_RUN/INCONCLUSIVE/
+   INVALID_ENV/MISSING_ARTIFACT/WAIVED_DIRECTOR).
+2. Se il manifest richiede il verificatore (`verifier_required` o
+   obbligazioni non-`state`): fai eseguire la valutazione a un contesto
+   indipendente che riceve richiesta+criteri+artefatti e NON il diff; il
+   verificatore scrive `verifier.json` nella run dir con hash dei criteri e
+   delle prove che ha effettivamente esaminato.
+3. Rilancia `verify:bundle --no-exec` fino a verdict PASS (o WAIVED via
+   Director esplicito).
+4. La riga Kanban/ledger deve citare `bundle: .mw/runs/<task>/bundle.json`.
+
+Deroga: solo il Director può approvare `waived-director: "<motivo verbatim>"`
+nella riga di chiusura — conta come chiusura ammessa, non come PASS.
 Implementation Workflow
 Code Change Requirements
 Read existing files before editing (never edit blind)
