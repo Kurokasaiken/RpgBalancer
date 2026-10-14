@@ -144,16 +144,19 @@ export function parseJunit(xml: string): JunitSummary {
     summary.malformed = true;
     return summary;
   }
-  const suiteMatch = xml.match(/<testsuite\b[^>]*>/);
-  if (suiteMatch) {
+  // Somma gli attributi di TUTTE le <testsuite> (un junit multi-suite come
+  // quello di Playwright conta solo nella prima altrimenti).
+  const suiteRe = /<testsuite\b[^>]*>/g;
+  let suiteTag: RegExpExecArray | null;
+  while ((suiteTag = suiteRe.exec(xml)) !== null) {
     const attr = (name: string): number => {
-      const m = suiteMatch[0].match(new RegExp(`${name}="(\\d+)"`));
-      return m ? Number(m[1]) : 0;
+      const am = suiteTag![0].match(new RegExp(`${name}="(\\d+)"`));
+      return am ? Number(am[1]) : 0;
     };
-    summary.tests = attr('tests');
-    summary.failures = attr('failures');
-    summary.errors = attr('errors');
-    summary.skipped = attr('skipped');
+    summary.tests += attr('tests');
+    summary.failures += attr('failures');
+    summary.errors += attr('errors');
+    summary.skipped += attr('skipped');
   }
   // testcase self-closing `<tc/>` = pass; `<tc>...</tc>` = ispezionare il body.
   const caseRe = /<testcase\b[^>]*\/>|<testcase\b[^>]*>[\s\S]*?<\/testcase>/g;
@@ -255,9 +258,24 @@ export function evaluateObligation(
   manifestCreatedAt?: string,
 ): ObligationEvaluation {
   const reasons: string[] = [];
-  const artifactInfo = obl.artifacts.map((a) => {
+  const artifactInfo = obl.artifacts.flatMap((a) => {
     const full = path.join(runDir, a.path);
-    return { path: a.path, sha256: sha256File(full), exists: existsSync(full) };
+    const exists = existsSync(full);
+    const base = { path: a.path, sha256: sha256File(full), exists };
+    // Una directory (es. kind: frames) va legata per-file: l'hash del
+    // verificatore è sui singoli frame, non sul nome della cartella.
+    if (exists && statSync(full).isDirectory()) {
+      const inner = readdirSync(full)
+        .filter((f) => statSync(path.join(full, f)).isFile())
+        .sort()
+        .map((f) => ({
+          path: `${a.path}/${f}`,
+          sha256: sha256File(path.join(full, f)),
+          exists: true,
+        }));
+      return [base, ...inner];
+    }
+    return [base];
   });
 
   if (obl.waived?.by === 'director') {

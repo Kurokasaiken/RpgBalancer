@@ -8,8 +8,11 @@
  * Exit 0 solo se tutti i casi red producono BLOCKED e il green produce PASS.
  */
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
+  statSync,
   utimesSync,
   writeFileSync,
 } from 'node:fs';
@@ -138,6 +141,17 @@ function writeFixture(root: string, f: Fixture): string {
 }
 
 function verifierFor(oblId: string, dir: string, artifacts: string[], override?: object): object {
+  // Stesso contratto del gate: un artefatto-directory si attesta per-file.
+  const files = artifacts.flatMap((a) => {
+    const full = path.join(dir, a);
+    if (existsSync(full) && statSync(full).isDirectory()) {
+      return readdirSync(full)
+        .filter((f) => statSync(path.join(full, f)).isFile())
+        .sort()
+        .map((f) => `${a}/${f}`);
+    }
+    return [a];
+  });
   return {
     verifier: 'independent-clean-context',
     evaluated_at: new Date().toISOString(),
@@ -146,7 +160,7 @@ function verifierFor(oblId: string, dir: string, artifacts: string[], override?:
         id: oblId,
         verdict: 'CONFIRMED',
         criteria_sha256: criteriaHash(REQ, SRC),
-        evidence_sha256: artifacts
+        evidence_sha256: files
           .map((a) => sha256File(path.join(dir, a)))
           .filter(Boolean),
         ...override,
@@ -327,7 +341,7 @@ const cases: Case[] = [
       files: { 'junit.xml': GOOD_JUNIT, 'metrics.json': goodMetrics() },
       dirs: { frames: 8 },
       commandResults: { 'OB-V': { exit_code: 0 } },
-      verifier: (dir) => verifierFor('OB-V', dir, ['junit.xml', 'metrics.json']),
+      verifier: (dir) => verifierFor('OB-V', dir, ['junit.xml', 'metrics.json', 'frames']),
     }),
     also: (dir) => {
       const check = validateBundleFile(path.join(dir, 'bundle.json'));
