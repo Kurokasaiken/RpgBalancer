@@ -96,9 +96,9 @@
       "channel": "ai-worker",
       "model": "qwen/qwen3-coder:free",
       "file_targets": [],
-      "prompt": "Piano: `.mw/plans/r186-settlement-convergence.md`",
-      "title": "Piano: `.mw/plans/r186-settlement-convergence.md`",
-      "description": "Piano: `.mw/plans/r186-settlement-convergence.md`"
+      "prompt": "Piano: `.mw/plans/r186-settlement-convergence.md` (run `20261014-0930-r186-settlement-plan/report.md`)",
+      "title": "Piano: `.mw/plans/r186-settlement-convergence.md` (run `20261014-0930-r186-settlement-plan/report.md`)",
+      "description": "Piano: `.mw/plans/r186-settlement-convergence.md` (run `20261014-0930-r186-settlement-plan/report.md`)"
     }
   ]
 }
