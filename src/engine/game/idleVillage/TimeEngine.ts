@@ -277,6 +277,11 @@ export interface ResidentState {
    * Used for hero ranking and unlock thresholds.
    */
   survivalScore: number;
+  /**
+   * R-183: quest experience accumulated by the resident — projected from the
+   * gameplay store (settlement `resident-xp`). Raw total; no level curve yet.
+   */
+  xp?: number;
 }
 
 export interface QuestOffer {
@@ -568,9 +573,19 @@ export function advanceTime(
       });
     }
 
-    // Process injury recovery
+    // Process injury recovery. R-139 / R-186: wounds only heal at rest —
+    // a resident still owned by a pending/running activity that ends after
+    // this tick is not resting, so the sweep must not release them early
+    // (they would become schedulable while their activity still runs).
     Object.values(updatedResidents).forEach(r => {
       if (r.status === 'injured' && typeof r.injuryRecoveryTime === 'number' && r.injuryRecoveryTime <= targetTime) {
+        const stillDeployed = Object.values(updatedActivities).some(
+          (a) =>
+            (a.status === 'pending' || a.status === 'running') &&
+            a.endTime > tickEnd &&
+            a.characterIds.includes(r.id),
+        );
+        if (stillDeployed) return;
         updatedResidents[r.id] = { ...r, status: 'available', isInjured: false, injuryRecoveryTime: undefined };
       }
     });
