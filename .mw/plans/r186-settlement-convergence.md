@@ -1,126 +1,120 @@
 ---
-title: Convergenza settlement — un solo contratto di conseguenze sui due aggregati residente
-status: candidate
+title: Convergenza conseguenze residente — kernel puro condiviso tra questSettlement e VillageState/goblin-lab
+status: candidate (artifact-r003, post-Round-2 multi-AI convergence)
 created: 2026-10-14
-desiderata: FROZEN R-176/R-179 (lab verso gameplay reale); v12 (rischio per-slot e aggregato); PLAN-019-S2.5 (settlement idempotente)
-request: R-186 (RICHIESTE.md) — «far scrivere gli esiti di questSettlement anche su VillageState»
+desiderata: FROZEN R-176/R-179 (lab verso gameplay reale); R-139 (ferite guariscono solo a riposo); v12 (rischio per-slot); PLAN-019-S2.5 (settlement idempotente)
+request: R-186 (RICHIESTE.md)
+debate_run: 20261014-0930-r186-settlement-plan
 ---
 
-# BOZZA — non battezzata. Attende avallo del Director.
+# Plan R-186 (Revision r003 — Multi-AI Debate Final)
 
-## Contesto verificato sul codice (R-184 + audit mirato 2026-10-14)
+## 1. Obiezioni del dibattito e risoluzioni (WITNESS-01..05)
 
-Tre rappresentazioni residente, due aggregati vivi:
+- **WITNESS-01 (Unanime 4/4: Claude, ChatGPT, Grok, Gemini — AMENDED)**:
+  `applyPlanToVillageState(state, plan: SettlementPlan)` è una falsa simmetria (metà di `SettlementEffectKind` sono no-op su `VillageState`; il lab non usa `QuestRunState`). Sostituito con un **kernel per-residente puro** (`src/engine/game/idleVillage/residentConsequences.ts`), lasciando `SettlementPlan` e `deriveSettlementPlan` in `questSettlement.ts`.
+- **WITNESS-02 (Claude, Grok, Gemini — AMENDED)**:
+  `wound` porta `durationTicks?: number` opzionale (validato intero finito `>= 1` via `resolveWoundTicks(requested, defaults.woundTicks)`), e `SettlementEffect` guadagna `durationTicks?: number` opzionale retrocompatibile.
+- **WITNESS-03 (Claude, ChatGPT, Grok, accettato da Gemini — AMENDED)**:
+  `VillageState` non viene allargato con `appliedQuestEffectIds?: string[]`. Il modulo condiviso esporta `settlementEffectKey(runId, effectKey)` per single-sourcare `${runId}:${effectKey}`; il ledger resta nello store per `/game` e caller-owned dove serve.
+- **WITNESS-04 (ChatGPT, Claude, Gemini — AMENDED)**:
+  Precedenza di stato `Dead > Injured > Away/Available` e pulizia esplicita dei campi ferita su morte:
+  - Su `MinimalResident`, `resident-dead` imposta `isDead: true, isInjured: false, isWorking: false, injuredUntilTick: undefined`. Nota (dalla review di Claude in T-012): l'azzeramento di `injuredUntilTick: undefined` su morte è un **delta comportamentale intenzionale e dichiarato** che allinea il codice al commento di contratto in `gameplayTypes.ts:20` (*"Overrides every other status; the wound fields are cleared"*); nessun reader in `tick()` legge `injuredUntilTick` quando `isDead` è true, e i vecchi save restano compatibili.
+  - Su `ResidentState`, `death` imposta `status: 'dead', currentHp: 0, isInjured: false, injuryRecoveryTime: undefined`.
+- **WITNESS-05 (ChatGPT T-015 & Claude T-012 — AMENDED)**:
+  **Mid-activity wound hazard & R-139 (`«le ferite si rigenerano a riposo, non mentre sei assegnato»`)**:
+  Se un residente in un'attività multi-giorno (`status === 'pending' | 'running'`, con `endTime > tickEnd`) viene ferito a metà attività (`status = 'injured', isInjured = true, injuryRecoveryTime = T`), lo sweep di recovery in `TimeEngine.ts:578` non deve mai renderlo `status: 'available'` mentre l'attività è ancora attiva (`endTime > tickEnd`), altrimenti il residente diventerebbe prematuramente schedulabile su una seconda attività prima di `endTime` e violerebbe R-139!
+  **Regola canonica in `TimeEngine.ts` + `residentConsequences.ts`**:
+  1. Finché un residente appartiene a un'attività `pending` o `running` che non termina entro `tickEnd` (`activity.endTime > tickEnd`), il residente **non è a riposo** (equivalente a `isOnExpedition || isWorking` nello store): lo sweep di recovery in `TimeEngine.ts` **non lo guarisce mentre è in attività attiva** (proprio come `tick()` in `minimalGameRules.ts` non guarisce quando `isWorking || isOnExpedition`).
+  2. Quando l'attività termina (`activity.endTime <= tickEnd`), il completamento transita `away -> available/exhausted` solo per i membri `status === 'away'` (R-184); un membro `injured` o `dead` resta `injured` (ora finalmente a riposo al villaggio, quindi guarirà allo sweep quando `targetTime >= injuryRecoveryTime`) o `dead`.
+  3. Finché è `injured` o `dead`, `canScheduleActivity` (`r.status === 'available'`) impedisce qualsiasi ri-schedulazione.
 
-| Aggregato | Motore | Chi scrive | Dove vive |
-|---|---|---|---|
-| `MinimalGameplayState` (`MinimalResident[]`) | `tick()` di `minimalGameRules` | `questSettlement.applyPlanToState` | `/game` reale, persistito |
-| `VillageState` (`Record<id, ResidentState>`) | `advanceTime` di `TimeEngine` | `scheduleActivity`, sweep, lab | legacy/sandbox/test + **goblin-lab** |
-| `minimalGameRules.ResidentState` | calcoli interni `tick()` | — | dentro lo store |
+## 2. Contratto e Firme (`src/engine/game/idleVillage/residentConsequences.ts`)
 
-Fatto decisivo: **`VillageState` non è l'aggregato vivo di `/game`** —
-`advanceTime`/`useActivityScheduler` compaiono solo in `legacy/`,
-`VillageSandbox*` e test hooks. Il gioco reale gira su `MinimalResident` +
-`tick()`, e `selectResidentRosterStates` (useMinimalGameplay:125) proietta
-già `MinimalResident → ResidentState` in sola lettura (`isDead`/`isInjured`/
-`isOnExpedition` → `dead`/`injured`/`away`).
+Modulo engine-side puro (zero import da `src/ui/**` o `src/store/**`; importa solo `ResidentState`, `VillageState` da `./TimeEngine`):
 
-## Il problema da non creare
+```ts
+export interface ResidentHealthSlice {
+  dead: boolean;
+  injured: boolean;
+  /** Absolute target tick when the wound heals; null when not injured or dead. */
+  injuredUntil: number | null;
+  xp: number;
+}
 
-Scrivere gli esiti del settlement *anche* su `VillageState` dentro `/game`
-produrrebbe un **aggregato fantasma**: nessuno lo farebbe avanzare
-(niente fatigue/sweep/consumo reale), la doppia scrittura divergerebbe di
-nuovo al primo drift, e si aggiungerebbe una sincronizzazione implicita —
-esattamente ciò che R-184 ha eliminato nel lab. Rifiutato.
+export type ResidentConsequence =
+  | { kind: 'wound'; durationTicks?: number }
+  | { kind: 'death' }
+  | { kind: 'xp'; amount: number };
 
-Il problema reale non è "due aggregati non sincronizzati" ma **"due
-semantiche di conseguenza scritte due volte"**: `applyPlanToState` sa
-come si ferisce/uccide/paga un residente (wound → `injuredUntilTick =
-max(...)`, dead → azzera injury+working, XP come delta guardato, ledger
-idempotente); il lab ri-scrive quella semantica a mano in `applyHarm` /
-`applySiegeOutcome`. Dopo R-184 le due semantiche coincidono *per
-ispezione* — ma niente impedisce che divergano al prossimo edit.
+export interface ConsequenceDefaults {
+  woundTicks: number;
+}
 
-## Decisione (opzione scelta)
+/** Canonical idempotency key format: `${runId}:${effectKey}`. */
+export function settlementEffectKey(runId: string, effectKey: string): string;
 
-**Un solo contratto di conseguenze, due applicatori sottili.**
+/** Validates requested duration (finite integer >= 1) or returns fallback (>= 1). */
+export function resolveWoundTicks(requested: number | undefined, fallback: number): number;
 
-`SettlementPlan`/`SettlementEffect` restano il formato canonico delle
-conseguenze (PLAN-019-S2.5, già journal+idempotente). Si estrae il nucleo
-di semantica per-residente in un modulo engine-side puro e si fornisce
-`applyPlanToVillageState` speculare di `applyPlanToState`. Il lab smette
-di scrivere ferite/morti a mano: emette `SettlementEffect` e li applica
-via la stessa unità. `/game` non cambia comportamento runtime.
+/** Pure per-resident state machine shared by both aggregates. */
+export function reduceResidentHealth(
+  health: ResidentHealthSlice,
+  consequence: ResidentConsequence,
+  nowTick: number,
+  defaults: ConsequenceDefaults,
+): ResidentHealthSlice;
 
-Non si fa: unificazione dei due modelli (R-184: contesti diversi),
-two-way sync live (`residentSync` oggi è solo prune-roster — una sync
-bidirezionale è la migrazione fragile che il Director ha escluso),
-doppia scrittura su aggregato non vivo.
+/** Adapter for TimeEngine ResidentState (preserves status/isInjured/currentHp invariants). */
+export function applyConsequenceToResidentState(
+  resident: ResidentState,
+  consequence: ResidentConsequence,
+  nowTick: number,
+  defaults: ConsequenceDefaults,
+): ResidentState;
 
-## Tasks
+/** Batch applicator for VillageState (deterministic array order, zero RNG, skips missing IDs). */
+export function applyConsequencesToVillage(
+  state: VillageState,
+  entries: ReadonlyArray<{ residentId: string; consequence: ResidentConsequence }>,
+  nowTick: number,
+  defaults: ConsequenceDefaults,
+): VillageState;
 
-### T-1 — Nucleo condiviso engine-side
-`src/engine/game/idleVillage/settlementConsequences.ts` (nuovo, puro,
-zero import UI/store):
-- Tipi `SettlementEffect`/`SettlementPlan` spostati qui (o in
-  `settlementTypes.ts`); `questSettlement.ts` re-exporta → nessun break.
-- Micro-regole pure condivise: `nextRecoveryTick(existing, tick, ticks)`
-  = max; semantica morte (terminale, azzera ferita); delta guardato XP.
-- `applyPlanToVillageState(state, plan, tick, opts)`:
-  `resident-wounded` → `status:'injured'`, `isInjured:true`,
-  `injuryRecoveryTime=max(existing, tick+opts.woundRecoveryTicks)`;
-  `resident-dead` → `status:'dead'`, `currentHp:0`, `isInjured:false`;
-  `resident-xp` → `xp += amount`; `village-gold` → `resources.gold +=`
-  delta guardato; `village-xp`/`loadout-release`/`partyIds` → no-op
-  documentati (VillageState non ha xp pool né flag expedition —
-  la disponibilità torna via completamento attività, fix R-184).
-  Ledger: `opts.appliedEffectKeys: Set<string>` posseduto dal caller
-  (stessa chiave `${runId}:${effect.key}`) → `appliedNow`.
-- Test nuovi `settlementConsequences.test.ts` + **parity test**: stesso
-  plan → esito per-residente equivalente sui due aggregati
-  (wounded↔injured+recovery, dead↔dead/isDead, xp identico).
+export function normalizeMinimalResident(r: {
+  isDead?: boolean;
+  isInjured: boolean;
+  injuredUntilTick?: number;
+  xp?: number;
+}): ResidentHealthSlice;
 
-### T-2 — Refactor `applyPlanToState` sul nucleo
-Le regole wound/dead/xp/ledger diventano chiamate alle micro-regole
-condivise. Nessun cambio di comportamento: la suite settlement esistente
-(tests/unit/idleVillage/quests/questSettlement.test.ts) è la guardia —
-deve restare verde byte-per-byte sul comportamento.
+export function normalizeResidentState(r: ResidentState): ResidentHealthSlice;
+```
 
-### T-3 — Il lab adotta il contratto
-In `tools/goblin-lab/lab.ts`:
-- `applyHarm` → targeting posizionale resta OBSERVED-ADAPTER, ma la
-  scrittura diventa `SettlementEffect` (`resident-wounded`/`resident-dead`)
-  applicata via `applyPlanToVillageState`; `recoveryTicks` = giorni del
-  tier S2 (parametro, non hardcoded — così il lab resta avanti al
-  canonico flat-5 senza mentire).
-- `applySiegeOutcome` + vittime breccia → stesso canale.
-- Ledger lab = `Set` in `LabState` (o riuso di `resolvedInstances` per
-  gli effetti istanza).
-- Niente cambio a metriche/end-run/hero-death (regole lab dichiarate).
+## 3. Task Breakdown
 
-### T-4 — Test, documenti, safeguards
-- Lab suite 44/44 + nuove invarianti di parità semantica.
-- `npm run test` scope settlement/TimeEngine; `build:check`;
-  `kanban:lint`; lint scope.
-- `FIDELITY.md`: il percorso conseguenze promosso da OBSERVED-ADAPTER a
-  CANON-semantica-condivisa (targeting harm resta adapter); residuo
-  "doppio aggregato" riscritto come "doppio aggregato, singolo contratto".
-- Evidence log `test-results/r186-*.log`; chiusura R-186 in RICHIESTE.
+### T-0 — Characterization & Micro-Rule Tests su `questSettlement`
+In `tests/unit/idleVillage/quests/questSettlement.test.ts`:
+- Verificare che `tick()` non abbia reader di `injuredUntilTick` su residenti `isDead: true`.
+- Aggiungere test espliciti per: (a) doppia ferita con timer preesistente più lungo e più corto (`max(existing, tick + duration)`), (b) ferita su residente già morto (no-op), (c) morte su residente già ferito (dichiara e verifica il delta intenzionale `isInjured: false, injuredUntilTick: undefined`), (d) XP delta guardato (`amount <= 0` o su morto).
 
-## Decisioni aperte (da non decidere in silenzio)
+### T-1 — Modulo `residentConsequences.ts` + Guardia R-139 in `TimeEngine.ts` + Parity Suite
+- Creare `src/engine/game/idleVillage/residentConsequences.ts`.
+- In `src/engine/game/idleVillage/TimeEngine.ts` (sweep recovery): non guarire un residente `injured` nel tick corrente se è membro di un'attività `pending`/`running` con `endTime > tickEnd` (parità con R-139 `isWorking || isOnExpedition`).
+- Creare `tests/unit/idleVillage/residentConsequences.test.ts`:
+  1. Parity test su sequenze `(wound, wound-shorter, wound-longer, xp, death, wound-after-death, xp-after-death)` partendo da `{healthy, injured-short, injured-long, dead}`: verifica `normalizeMinimalResident(min) deepEqual normalizeResidentState(vil)` **e** raw equivalence sui morti (`injuredUntilTick === undefined`, `injuryRecoveryTime === undefined`, `isInjured === false`, `currentHp === 0`).
+  2. Test code-verified di **mid-activity wound & death su attività multi-giorno** (`duration = 5`, ferita di `1` giorno a tick `1`): verifica che a tick `2..4` (mentre l'attività è ancora running) il residente **non** diventi `available` e `canScheduleActivity` rifiuti nuove assegnazioni; a tick `5` l'attività completa senza sovrascrivere `injured`; allo sweep successivo a riposo il residente guarisce e torna `available`.
 
-1. **`woundRecoveryTicks` flat-5 vs tier** — l'unità prende il valore dal
-   caller. Il gioco resta a 5 finché una decisione non consuma
-   `globalRules.injuryTiers` (gap già documentato S2/R-184). Riaprire?
-2. **`village-xp`/`loadout-release` su VillageState** — proposta: no-op
-   documentati. Se serve xp-village anche nel lab, mapparlo su una
-   risorsa esplicita.
-3. **Il ledger dentro `VillageState`** — proposta: campo opzionale
-   `appliedQuestEffectIds?: string[]` solo quando servirà persistenza
-   produzione; nel lab il Set vive in `LabState`.
+### T-2 — Refactor `questSettlement.ts` sul kernel condiviso
+- `SettlementEffect` guadagna `durationTicks?: number` opzionale.
+- `applyPlanToState` usa `reduceResidentHealth` e `settlementEffectKey`.
+- Tutte le suite `questSettlement.test.ts`, `residentXpAndSwap.test.ts`, `residentXpPersistence.test.ts` verdi.
 
-## Criterio di successo verificabile
+### T-3 — Adozione in `tools/goblin-lab/lab.ts`
+- `applyHarm`, `applySiegeOutcome` e le morti civili da breccia delegano la mutazione di `ResidentState` a `applyConsequenceToResidentState` con `durationTicks: days` (tier S2 `1/3/7`), mantenendo il guard che le vittime civili da breccia sono scelte solo da `aliveVillagers`.
+- **44/44 test** del lab + nuovo test `V9` (parità kernel e mid-activity wound non-schedulabile) + seed replay byte-identico.
 
-Conseguenza identica sui due modelli garantita da un solo codice
-condiviso (non da ispezione): il parity test T-1 verde + suite settlement
-invariata + lab 44/44 + replay deterministico intatto.
+### T-4 — Documentazione & Safeguards
+- Aggiornare `tools/goblin-lab/FIDELITY.md` e `RICHIESTE.md`.
+- Eseguire `npm run lint -- <scope>`, vitest scope, `npx tsx tools/goblin-lab/lab.ts --test`, `npm run build:check`, `npm run kanban:lint`.
+- Evidence log `test-results/r186-settlement-convergence-2026-10-14.log`.
