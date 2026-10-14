@@ -4,7 +4,7 @@
       "id": "R-186",
       "status": "todo",
       "target_file": "",
-      "prompt": "Piano: `.mw/plans/r186-settlement-convergence.md`",
+      "prompt": "Piano: `.mw/plans/r186-settlement-convergence.md` (run `20261014-0930-r186-settlement-plan/report.md`)",
       "complexity": 1,
       "execution_hint": "atomic"
     }
