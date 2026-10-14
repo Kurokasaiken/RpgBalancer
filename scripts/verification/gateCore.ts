@@ -54,6 +54,8 @@ export interface Obligation {
   min_tests?: number;
   min_frames?: number;
   min_samples?: number;
+  /** Se presente, gli errori runtime registrati nell'artefatto metrics oltre questa soglia = FAIL. */
+  max_errors?: number;
   artifacts: ManifestArtifact[];
   blocking: boolean;
   waived?: { by: 'director'; reason: string };
@@ -358,6 +360,18 @@ export function evaluateObligation(
       tag('INCONCLUSIVE', 'prova temporale senza artefatto metrics: una cattura statica non basta');
     } else if (!metricsOk) {
       tag('INCONCLUSIVE', `metrics senza serie temporale >= ${obl.min_samples ?? 2} campioni`);
+    }
+    if (obl.max_errors !== undefined) {
+      for (const a of metrics) {
+        const data = readJsonSafe(path.join(runDir, a.path));
+        const errs = Array.isArray(data?.errors) ? (data.errors as string[]) : [];
+        if (errs.length > obl.max_errors) {
+          tag(
+            'FAIL',
+            `cattura con ${errs.length} errori runtime (> ${obl.max_errors}): ${String(errs[0]).split('\n')[0].slice(0, 140)}`,
+          );
+        }
+      }
     }
     if (obl.type === 'pixel-temporal' || obl.type === 'fps') {
       const framesDir = obl.artifacts.find((a) => a.kind === 'frames');
