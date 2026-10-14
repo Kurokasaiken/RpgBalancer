@@ -78,6 +78,8 @@ export interface ObligationEvaluation {
   result: ObligationResult;
   reasons: string[];
   artifacts: { path: string; sha256: string | null; exists: boolean }[];
+  /** hash del command log (prova dell'esecuzione), fuori dagli artifacts del verifier */
+  command_log?: { path: string; sha256: string | null };
 }
 
 export interface EnvAttestation {
@@ -365,6 +367,13 @@ export function evaluateObligation(
     }
   }
 
+  // Il command log è la prova durevole dell'esecuzione: il bundle ne lega l'hash.
+  const commandLogRel = `command-logs/${obl.id}.log`;
+  const commandLog =
+    obl.command && existsSync(path.join(runDir, commandLogRel))
+      ? { path: commandLogRel, sha256: sha256File(path.join(runDir, commandLogRel)) }
+      : undefined;
+
   // Classificazione finale — precedenza: artefatto mancante > env invalido >
   // fallimento accertato > non eseguito > prova inconcludente.
   let result: ObligationResult = 'PASS';
@@ -381,7 +390,7 @@ export function evaluateObligation(
     result = 'INCONCLUSIVE';
   }
 
-  return { id: obl.id, result, reasons, artifacts: artifactInfo };
+  return { id: obl.id, result, reasons, artifacts: artifactInfo, command_log: commandLog };
 }
 
 /** Verifica meccanica del verificatore indipendente (C3). */
@@ -405,7 +414,16 @@ export function checkVerifier(
       reasons: ['verifier.json assente o malformato (verificatore indipendente richiesto)'],
     };
   }
-  for (const obl of manifest.obligations.filter((o) => o.blocking && o.type !== 'state' && !o.waived)) {
+  // Se verifier_required, il verificatore giudica TUTTE le obbligazioni
+  // blocking (un test verde sul criterio sbagliato è esattamente l'incidente);
+  // altrimenti solo quelle percettive (type !== 'state').
+  const toJudge = manifest.obligations.filter(
+    (o) =>
+      o.blocking &&
+      !o.waived &&
+      (manifest.verifier_required === true || o.type !== 'state'),
+  );
+  for (const obl of toJudge) {
     const ev = vf.evaluations.find((e) => e.id === obl.id);
     if (!ev) {
       reasons.push(`${obl.id}: nessun verdetto del verificatore`);
@@ -496,6 +514,12 @@ export function validateBundleFile(bundlePath: string): { ok: boolean; reasons: 
       const actual = sha256File(full);
       if (actual !== a.sha256) {
         reasons.push(`${ob.id}: artefatto ${a.path} manomesso o mancante (FORGED)`);
+      }
+    }
+    if (ob.command_log?.sha256) {
+      const actual = sha256File(path.join(runDir, ob.command_log.path));
+      if (actual !== ob.command_log.sha256) {
+        reasons.push(`${ob.id}: command log manomesso o mancante (FORGED)`);
       }
     }
   }
