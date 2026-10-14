@@ -3548,16 +3548,43 @@ Soggetti riscritti a taglia d'uso (POI 26 px, risorse 28 px); lint I8 aggiunto; 
 
 **Richiesta (verbatim):** *"ci serve un plan x «far convergere il settlement reale — far scrivere gli esiti di questSettlement (o una proiezione via residentSync) anche su VillageState, così lab e gioco condividono le stesse conseguenze invece di due modelli paralleli»"*
 **Data:** 2026-10-14
-**Stato:** `in corso` — piano in `.mw/plans/r186-settlement-convergence.md` (bozza, attende avallo Director).
-**Desiderata FROZEN:** coerente con R-176/R-179; v12 (rischio per-slot); PLAN-019-S2.5 (settlement idempotente).
+**Stato:** `in corso` — piano convergente dal dibattito multi-AI web in `.mw/plans/r186-settlement-convergence.md` (`artifact-r003.md`, 4/4 `ACCEPT` da ChatGPT, Claude, Grok, Gemini; attende avallo Director per l'esecuzione).
+**Desiderata FROZEN:** coerente con R-176/R-179; R-139 (ferite guariscono solo a riposo); v12 (rischio per-slot); PLAN-019-S2.5 (settlement idempotente).
 
-**Esito dell'audit per il piano:** `/game` NON vive su `VillageState` — l'aggregato vivo e' `MinimalGameplayState` (`MinimalResident`); `advanceTime`/`useActivityScheduler` solo in legacy/sandbox/test; `selectResidentRosterStates` proietta gia' store→engine in lettura. Scrivere il settlement anche su VillageState nel gioco reale creerebbe un aggregato fantasma → rifiutato. Il problema reale e' la *semantica delle conseguenze* scritta due volte (applyPlanToState vs applyHarm/applySiegeOutcome del lab). Piano: un solo contratto `SettlementPlan`/`SettlementEffect` + applicatore speculare `applyPlanToVillageState` in engine-space; il lab emette effetti canonici; parity test garantisce equivalenza. Decisioni aperte nel piano: flat-5 vs injuryTiers, village-xp su VillageState, ledger persistito.
+**Esito dibattito multi-AI web (`20261014-0930-r186-settlement-plan`, `converged`):**
+- **WITNESS-01 (4/4 unanime)**: `applyPlanToVillageState(state, plan: SettlementPlan)` era una falsa simmetria (meta' degli effect kinds sono no-op su `VillageState`; il lab non gira su `QuestRunState`). Sostituito con un **kernel per-residente puro** (`src/engine/game/idleVillage/residentConsequences.ts`: `ResidentHealthSlice`, `ResidentConsequence`, `reduceResidentHealth`, `applyConsequenceToResidentState`, `applyConsequencesToVillage`, `resolveWoundTicks`, `settlementEffectKey`), lasciando `SettlementPlan` in `questSettlement.ts`.
+- **WITNESS-02**: `wound` e `SettlementEffect` portano `durationTicks?: number` opzionale (validato intero `>= 1`, fallback a `defaults.woundTicks`), cosi' il lab passa i tier S2 `1/3/7d` e `/game` resta a `5`.
+- **WITNESS-03**: niente `appliedQuestEffectIds` su `VillageState` (nessun consumer in `TimeEngine`; il lab deduplica a monte con `resolvedInstances`); esportata `settlementEffectKey(runId, effectKey)`.
+- **WITNESS-04**: precedenza `Dead > Injured > Away/Available`; su `MinimalResident` la morte pulisce anche `injuredUntilTick = undefined` (delta intenzionale dichiarato che allinea il codice al commento di `gameplayTypes.ts:20`).
+- **WITNESS-05 & 06 (bug reale scovato nel dibattito)**: in `TimeEngine.ts:578` lo sweep di recovery guariva qualsiasi `status === 'injured'` con `injuryRecoveryTime <= targetTime` senza controllare se il residente apparteneva ancora a un'attivita' `pending`/`running` (`endTime > tickEnd`), permettendo ri-schedulazione prematura e violando R-139 (`«le ferite si rigenerano a riposo»`). T-1 aggiunge la guardia esistenziale `.some(...)` nello sweep + test multi-giorno mid-activity wound/death/completion/scheduling.
 
 ## R-187 — Report componenti per il trailer: screenshot + assessment funzionamento/animazioni
 
 **Richiesta (verbatim):** *"puoi fare screenhsot del mio progetto? m serve un report di tutti i componenti che ci servono x fare il trailer, completi di screenshot e assessment se funzionano, come, se le animazioni sn smooth, ecc"*
 **Data:** 2026-10-14
-**Stato:** `in corso`
+**Stato:** `completata` (report consegnato; follow-up aperti elencati in Esito)
 **Desiderata FROZEN:** nessuna corrispondente — audit/evidence, collegata a R-072 (teaser 7 scene), R-167 (componenti mancanti su `/game`), R-185 (coreografia invasione).
 **Scope rilevato:** due famiglie di superfici — (a) le 7 scene scripted di `/trailer` (`TrailerViewer`, `?scene=<id>`) e (b) le superfici di gioco reali filmabili su `/game` (boot, mappa Pixi+HUD, invasione goblin, POI quest→planner→QuestRunWindow, settlement lost, astrolabe, scheda PG). Hub per-scene `/test-hub/steam-trailer-hub` ha link a route non registrate (`/trailer-threat` ecc.) — probabili link morti, da verificare.
 **Deliverable:** `test-results/trailer-report-2026-10-14/` con screenshot (1920×1080) + `REPORT.md` per-componente.
+**Esito (2026-10-14):** 43 screenshot + metriche FPS rAF (headed, GPU reale) in `test-results/trailer-report-2026-10-14/` (`REPORT.md`, `metrics.json`, `metrics2.json`, `shots/`). Verdetto: le 7 scene `/trailer` sono complete e fluide (mock, `@trailer-only`); il footage reale `/game` copre invasione→card→peel→volo→ledger e quest end-to-end (planner→loadout→run→report **DEFEAT** d'effetto, ledger "GOBLIN HOST REACHES THE VILLAGE — TODAY"). Follow-up aperti: (1) jank reale quest-window (avg 19-25 fps, p95 116-266 ms) e map-pan/menu-open (p95 67/83 ms); (2) invasion: 2 mega-hitch ~0.8-1 s su mount; R-185.1 ancora in attesa Director; (3) route per-scena hub morte (`/trailer-*` non registrate); (4) gap R-167 confermati (scheda PG, stash villaggio, level-up); (5) settlement-lost solo trigger debug su `/world-surface`; (6) un 400 su `/game` da identificare; (7) `/hero-components-lab` lazy-load ~12 s. Falso allarme chiarito: il jank `trailer-risk` del primo run era occlusione finestra (re-run pulito 57.7 fps, p95 17.7).
+
+### R-177 / ancore montate (2026-10-14)
+**Parole del Director:** "icone.jpeg in download, puoi fare tu l'alpha, ritagliarle, ecc? e metterle nel posto corretto". Ritagliate da `~/Downloads/icone.jpeg`, master 512 + 128/64/32 in `public/assets/ui/poi/` e `public/assets/ui/resources/`. Registro: `candidate`. Da fare: collegare al gioco (T4.2 POI, T1.1 risorse) e decidere se gli artigli vanno ridisegnati con più contrasto.
+
+### R-177 / glifi POI collegati (2026-10-14)
+**Parole del Director:** "Gemini. è la tenda ha orecchie da gatto, tipo? va tutto bene, procedi". Prompt tenda riscritto senza orecchie (lint verde). Glifi collegati a `MapQuestPoi` per id; `PoiMatericV3_5` disegna il glifo sopra vetro e ombra. Verificato: presenti, ma scuri per il sorgente: va chiarito il prompt.
+
+## R-188 — Plan: risoluzione dei 7 problemi emersi dal report trailer (R-187)
+
+**Richiesta (verbatim):** *"mi scrivi un plan x questi 7 problemi trovati?"*
+**Data:** 2026-10-14
+**Stato:** `in corso` — bozza piano in `.mw/plans/r188-trailer-fixes.md` (deliberazione `.mw/runs/20261014-114519/`: 1 ciclo, non convergente, critiche integrate); attende avallo Director + risposte a 3 decisioni aperte.
+**Desiderata FROZEN:** coerente con v2 FROZEN (world surface, tier eventi, invasione goblin — fonte PLAN-033) e decisioni ratificate R-167 (PLAN-032, design converged). Il piano è di fix/integrazione su superfici già approvate, non cambia goal né scope.
+**I 7 problemi (da `test-results/trailer-report-2026-10-14/REPORT.md`):**
+1. Jank reale quest-window su `/game` (avg 19-25 fps, p95 116-266 ms, worst 300) — worst surface misurata.
+2. Map pan (p95 67 ms, worst 134) e menu open (p95 83, worst 150) con long frames.
+3. Invasione: 2 mega-hitch ~0.8-1 s su mount card/peel; R-185.1 (marker a boot / sticker bordato pre-stage) ancora in attesa chiarimento Director.
+4. Link morti hub: `/trailer-threat`…`/trailer-outro` non registrate in `App.tsx` (hub punta a route inesistenti; `/trailer?scene=` funziona).
+5. Gap R-167 su `/game` (scheda PG, stash villaggio, level-up) — coperti da PLAN-032 "design converged", mai dispatchato.
+6. Settlement Lost esiste solo come trigger debug su `/world-surface`; nessun path canonico su `/game` quando la marcia goblin arriva.
+7. Minori: 400 Bad Request su risorsa non identificata in `/game`; `/hero-components-lab` lazy-load ~12 s.
