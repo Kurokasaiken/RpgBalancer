@@ -2,11 +2,30 @@
   "tasks": [
     {
       "id": "R-186",
-      "status": "todo",
+      "status": "failed",
       "target_file": "",
       "prompt": "Piano: `.mw/plans/r186-settlement-convergence.md` (run `20261014-0930-r186-settlement-plan/report.md`)",
       "complexity": 1,
-      "execution_hint": "atomic"
+      "execution_hint": "atomic",
+      "error": "Tutti i provider/modelli hanno fallito o sono andati in rate limit. Ultimo errore: cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions",
+      "provider_attempt_log": [
+        "openrouter/cohere/north-mini-code:free: expected string or bytes-like object, got 'NoneType'",
+        "gemini/gemini-3.5-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "gemini/gemini-3.6-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions",
+        "openrouter/cohere/north-mini-code:free: expected string or bytes-like object, got 'NoneType'",
+        "gemini/gemini-3.5-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "gemini/gemini-3.6-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions",
+        "openrouter/cohere/north-mini-code:free: expected string or bytes-like object, got 'NoneType'",
+        "gemini/gemini-3.5-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "gemini/gemini-3.6-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions",
+        "openrouter/cohere/north-mini-code:free: expected string or bytes-like object, got 'NoneType'",
+        "gemini/gemini-3.5-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "gemini/gemini-3.6-flash: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "cerebras/gpt-oss-120b: 402 Client Error: Payment Required for url: https://api.cerebras.ai/v1/chat/completions"
+      ]
     }
   ]
 }
