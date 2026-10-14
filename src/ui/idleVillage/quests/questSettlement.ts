@@ -17,23 +17,36 @@ import type { MinimalGameplayState } from '@/store/useMinimalGameplay';
 import type { MinimalActivityEntry } from '@/ui/idleVillage/config/activityLogPanelConfig';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { QUEST_SETTLEMENT } from '@/balancing/config/idleVillage/quests/questSettlement';
+import {
+  normalizeMinimalResident,
+  reduceResidentHealth,
+  settlementEffectKey,
+  type ConsequenceDefaults,
+} from '@/engine/game/idleVillage/residentConsequences';
 
 /* ---- Effect plan (pure) ------------------------------------------------ */
 
 export type SettlementEffectKind =
   | 'village-gold'
   | 'village-xp'
+  | 'resident-xp'
   | 'resident-wounded'
   | 'resident-dead'
   | 'loadout-release';
 
 export interface SettlementEffect {
   /** Deduplication key within the run — the full idempotency key is
-   *  `${runId}:${effect.key}`. */
+   *  `${runId}:${effect.key}` (built via `settlementEffectKey`). */
   key: string;
   kind: SettlementEffectKind;
   residentId?: string;
   amount?: number;
+  /**
+   * Optional per-effect wound length in caller ticks (R-186): when present
+   * it overrides `QUEST_SETTLEMENT.woundRecoveryTicks`, letting future
+   * tiered harm ride the same effect shape the lab uses (1/3/7d tiers).
+   */
+  durationTicks?: number;
 }
 
 export interface SettlementPlan {
@@ -98,6 +111,19 @@ export function deriveSettlementPlan(
     }
     if (run.xp > 0) {
       effects.push({ key: 'xp:village', kind: 'village-xp', amount: run.xp });
+      /* R-183: the same XP lands on every member who came home alive. */
+      const survivors = run.party
+        .map((member, idx) => ({ member, idx }))
+        .filter(({ member }) => !member.dead);
+      const each =
+        QUEST_SETTLEMENT.residentXp.mode === 'split'
+          ? Math.floor(run.xp / Math.max(1, survivors.length))
+          : run.xp;
+      if (each > 0) {
+        survivors.forEach(({ member, idx }) => {
+          effects.push({ key: `xp:resident:${idx}:${member.id}`, kind: 'resident-xp', residentId: member.id, amount: each });
+        });
+      }
     }
   }
 
@@ -161,6 +187,7 @@ const LOG_KEY = {
   goldReward: 'gameFrame.questLog.goldReward',
   goldLoot: 'gameFrame.questLog.goldLoot',
   xp: 'gameFrame.questLog.xp',
+  residentXp: 'gameFrame.questLog.residentXp',
 } as const;
 
 /**
@@ -199,7 +226,7 @@ function effectLogEntry(
   const sev = QUEST_SETTLEMENT.logSeverity;
   const quest = plan.questTitle ?? plan.questId;
   const base = {
-    id: `${plan.runId}:${effect.key}`,
+    id: settlementEffectKey(plan.runId, effect.key),
     timestamp,
     activityId: plan.questId,
     type: 'quest_settlement' as const,
@@ -252,6 +279,19 @@ function effectLogEntry(
         messageParams: { amount, quest },
       };
     }
+    case 'resident-xp': {
+      const amount = effect.amount ?? 0;
+      const name =
+        residents.find((r) => r.id === effect.residentId)?.name ?? effect.residentId ?? 'unknown';
+      return {
+        ...base,
+        severity: sev.residentXp,
+        residentId: effect.residentId,
+        message: `${name} gained ${amount} XP (${quest}).`,
+        messageKey: LOG_KEY.residentXp,
+        messageParams: { name, amount, quest },
+      };
+    }
     default:
       return null;
   }
@@ -278,7 +318,12 @@ export function applyPlanToState(
   const appliedNow: string[] = [];
   let gold = state.gold;
   let xp = state.xp;
-  const injuredUntil = tick + QUEST_SETTLEMENT.woundRecoveryTicks;
+  /* R-186: wound/death/xp semantics come from the shared engine kernel —
+   * same reducer the canonical VillageState adapter uses. Store-only
+   * fields (isWorking, isOnExpedition) stay the caller's concern. */
+  const consequenceDefaults: ConsequenceDefaults = {
+    woundTicks: QUEST_SETTLEMENT.woundRecoveryTicks,
+  };
   const residents = state.residents.map((r) => ({ ...r }));
   const logEntries: MinimalActivityEntry[] = [];
   const now = Date.now();
@@ -286,14 +331,14 @@ export function applyPlanToState(
   /* The outcome headline rides the same ledger as effects — it is written
    * once per run even on crash→replay, but it is not an "applied effect"
    * so it stays out of `appliedNow` (telemetry counts real effects only). */
-  const outcomeKey = `${plan.runId}:${OUTCOME_LOG_KEY}`;
+  const outcomeKey = settlementEffectKey(plan.runId, OUTCOME_LOG_KEY);
   if (!ledger.has(outcomeKey)) {
     logEntries.push(outcomeLogEntry(plan, now));
     ledger.add(outcomeKey);
   }
 
   for (const effect of plan.effects) {
-    const key = `${plan.runId}:${effect.key}`;
+    const key = settlementEffectKey(plan.runId, effect.key);
     if (ledger.has(key)) continue;
     switch (effect.kind) {
       case 'village-gold':
@@ -302,21 +347,52 @@ export function applyPlanToState(
       case 'village-xp':
         xp += effect.amount ?? 0;
         break;
+      case 'resident-xp': {
+        /* Guarded delta, like the fungible village totals. */
+        const r = residents.find((x) => x.id === effect.residentId);
+        if (r) {
+          r.xp = reduceResidentHealth(
+            normalizeMinimalResident(r),
+            { kind: 'xp', amount: effect.amount ?? 0 },
+            tick,
+            consequenceDefaults,
+          ).xp;
+        }
+        break;
+      }
       case 'resident-wounded': {
         const r = residents.find((x) => x.id === effect.residentId);
-        if (r && !r.isDead) {
-          r.isInjured = true;
-          r.isWorking = false;
-          r.injuredUntilTick = Math.max(r.injuredUntilTick ?? 0, injuredUntil);
+        if (r) {
+          const next = reduceResidentHealth(
+            normalizeMinimalResident(r),
+            { kind: 'wound', durationTicks: effect.durationTicks },
+            tick,
+            consequenceDefaults,
+          );
+          if (!next.dead) {
+            r.isInjured = next.injured;
+            r.isWorking = false;
+            r.injuredUntilTick = next.injuredUntil ?? undefined;
+          }
         }
         break;
       }
       case 'resident-dead': {
         const r = residents.find((x) => x.id === effect.residentId);
         if (r) {
-          r.isDead = true;
-          r.isInjured = false;
+          /* Death is terminal and clears every wound field — including the
+           * previously-leaked `injuredUntilTick` (declared delta, WITNESS-04:
+           * the type contract says «the wound fields are cleared»). */
+          const next = reduceResidentHealth(
+            normalizeMinimalResident(r),
+            { kind: 'death' },
+            tick,
+            consequenceDefaults,
+          );
+          r.isDead = next.dead;
+          r.isInjured = next.injured;
           r.isWorking = false;
+          r.injuredUntilTick = next.injuredUntil ?? undefined;
         }
         break;
       }

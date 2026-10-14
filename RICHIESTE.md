@@ -3548,7 +3548,7 @@ Soggetti riscritti a taglia d'uso (POI 26 px, risorse 28 px); lint I8 aggiunto; 
 
 **Richiesta (verbatim):** *"ci serve un plan x «far convergere il settlement reale — far scrivere gli esiti di questSettlement (o una proiezione via residentSync) anche su VillageState, così lab e gioco condividono le stesse conseguenze invece di due modelli paralleli»"*
 **Data:** 2026-10-14
-**Stato:** `in corso` — piano convergente dal dibattito multi-AI web in `.mw/plans/r186-settlement-convergence.md` (`artifact-r003.md`, 4/4 `ACCEPT` da ChatGPT, Claude, Grok, Gemini; attende avallo Director per l'esecuzione).
+**Stato:** `completata` — implementato da `artifact-r003` (4/4 ACCEPT). Kernel `residentConsequences.ts` condiviso tra `applyPlanToState` e `VillageState`/lab; guardia R-139 mid-activity in `TimeEngine` (WITNESS-05); morte pulisce `injuredUntilTick` (WITNESS-04). Test: kernel 17/17, settlement 21/21, lab 45/45, replay byte-identico. Evidence: `test-results/r186-settlement-convergence-2026-10-14.log`.
 **Desiderata FROZEN:** coerente con R-176/R-179; R-139 (ferite guariscono solo a riposo); v12 (rischio per-slot); PLAN-019-S2.5 (settlement idempotente).
 
 **Esito dibattito multi-AI web (`20261014-0930-r186-settlement-plan`, `converged`):**
