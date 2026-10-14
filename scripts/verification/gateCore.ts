@@ -662,19 +662,22 @@ export function checkRichiesteGate(
     if (!sec.status || !CLOSING_STATES.has(sec.status)) continue;
     const prev = baseline.get(sec.id);
     if (prev && prev.status && CLOSING_STATES.has(prev.status)) continue; // grandfathered
-    if (!CHIUSURA_RE.test(sec.body)) {
+    // Il token conta solo sulla riga **Chiusura:** — la parola "bundle:"
+    // può comparire nel resto della sezione senza essere una citazione.
+    const chiusura = sec.body.split('\n').find((ln) => CHIUSURA_RE.test(ln));
+    if (!chiusura) {
       errors.push(
         `${sec.id}: transizione a "${sec.status}" senza riga "**Chiusura:**" (bundle:, waived-director: o nessuna-verifica-tecnica:).`,
       );
       continue;
     }
-    const bm = BUNDLE_RE.exec(sec.body);
+    const bm = BUNDLE_RE.exec(chiusura);
     if (bm) {
       const check = validateBundleFile(path.resolve(repoRoot, bm[1]));
       if (!check.ok) {
         errors.push(`${sec.id}: bundle non valido — ${check.reasons.join('; ')}`);
       }
-    } else if (!/waived-director:|nessuna-verifica-tecnica:/.test(sec.body)) {
+    } else if (!/waived-director:|nessuna-verifica-tecnica:/.test(chiusura)) {
       errors.push(
         `${sec.id}: la riga Chiusura deve citare bundle:, waived-director: "<motivo>" o nessuna-verifica-tecnica: "<motivo>".`,
       );
