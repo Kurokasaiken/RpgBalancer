@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { checkKanbanGate, checkRichiesteGate } from './verification/gateCore';
 
 interface KanbanRow {
   id: string;
@@ -18,14 +19,11 @@ interface KanbanRow {
 
 const ALLOWED_STATUSES = new Set(['Non assegnato', 'Assegnato', 'Bloccato', 'In corso', 'Completato']);
 
+const KANBAN_REL_PATH = path.join('src', 'docs', 'docs', 'coordinator', 'agent_assignments.md');
+const RICHIESTE_REL_PATH = 'RICHIESTE.md';
+
 async function loadKanbanRows(): Promise<KanbanRow[]> {
-  const kanbanPath = path.resolve(
-    'src',
-    'docs',
-    'docs',
-    'coordinator',
-    'agent_assignments.md',
-  );
+  const kanbanPath = path.resolve(KANBAN_REL_PATH);
   const raw = await readFile(kanbanPath, 'utf8');
   const lines = raw.split(/\r?\n/);
 
@@ -157,6 +155,32 @@ async function main() {
   }
 
   const errors = validateRows(rows);
+
+  // Gate di chiusura (R-189): nuove transizioni a Completato / fatta devono
+  // citare un bundle.json valido. Baseline = HEAD: le righe già chiuse e
+  // committate sono grandfathered; chi scrive Completato a mano senza bundle
+  // lascia il repo rosso qui (fail-loud).
+  try {
+    const repoRoot = process.cwd();
+    const baselineKanban = execSync(`git show "HEAD:${KANBAN_REL_PATH.replace(/\\/g, '/')}"`, {
+      encoding: 'utf8',
+      maxBuffer: 32 * 1024 * 1024,
+    });
+    const currentKanban = await readFile(path.resolve(KANBAN_REL_PATH), 'utf8');
+    errors.push(...checkKanbanGate(baselineKanban, currentKanban, repoRoot));
+
+    const baselineRichieste = execSync(`git show "HEAD:${RICHIESTE_REL_PATH}"`, {
+      encoding: 'utf8',
+      maxBuffer: 32 * 1024 * 1024,
+    });
+    const currentRichieste = await readFile(path.resolve(RICHIESTE_REL_PATH), 'utf8');
+    errors.push(...checkRichiesteGate(baselineRichieste, currentRichieste, repoRoot));
+  } catch (gateError) {
+    errors.push(
+      `Gate di chiusura non valutabile (baseline git assente?): ${(gateError as Error).message}`,
+    );
+  }
+
   if (errors.length > 0) {
     console.error('Kanban lint fallito. Risolvi i seguenti problemi:');
     for (const err of errors) {
