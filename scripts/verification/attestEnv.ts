@@ -49,11 +49,18 @@ export async function collectEnvAttestation(page: PageLike): Promise<EnvAttestat
     return { visibilityState: document.visibilityState, rafTicks: count };
   });
 
-  // frame-diff: frazione di byte diversi tra due screenshot a ~150ms.
-  // Non è un'analisi pixel-per-pixel: basta a provare che il frame progredisce.
+  // frame-diff con sonda deliberata: un div a copertura piena prova che il
+  // compositor produce frame diversi — misurare su una scena a riposo dà un
+  // falso INVALID_ENV (la scena idle è legittimamente statica).
   const shotA = await page.screenshot();
-  await new Promise((r) => setTimeout(r, 150));
+  await page.evaluate(() => {
+    const d = document.createElement('div');
+    d.id = '__env_probe';
+    d.style.cssText = 'position:fixed;inset:0;background:#f0f;z-index:2147483647;';
+    document.body.appendChild(d);
+  });
   const shotB = await page.screenshot();
+  await page.evaluate(() => document.getElementById('__env_probe')?.remove());
   let diff = 0;
   const len = Math.min(shotA.length, shotB.length);
   for (let i = 0; i < len; i += 1) {
