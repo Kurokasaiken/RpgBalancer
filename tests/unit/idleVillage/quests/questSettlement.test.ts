@@ -203,6 +203,97 @@ describe('applyPlanToState', () => {
 });
 
 /* ------------------------------------------------------------------ */
+/* R-186 T-0 — characterization of resident consequences               */
+/* (wound max-semantics, dead guards, declared injuredUntilTick delta)  */
+/* ------------------------------------------------------------------ */
+
+describe('resident consequences characterization (R-186)', () => {
+  const planWith = (effects: SettlementPlan['effects']): SettlementPlan => ({
+    runId: 'run-char',
+    questId: 'q',
+    outcome: 'test',
+    leaderAlive: true,
+    objectiveDone: true,
+    effects,
+  });
+
+  it('wound on wounded: recovery keeps the LONGER timer (max semantics)', () => {
+    const state = minimalState({});
+    const longer = applyPlanToState(state, planWith([
+      { key: 'w:long', kind: 'resident-wounded', residentId: 'hero-leader', durationTicks: 30 },
+    ]), 100).next;
+    expect(longer.residents[0].injuredUntilTick).toBe(130);
+    /* A shorter re-wound must not shorten the existing recovery. */
+    const shorter = applyPlanToState(longer, planWith([
+      { key: 'w:short', kind: 'resident-wounded', residentId: 'hero-leader', durationTicks: 2 },
+    ]), 110).next;
+    expect(shorter.residents[0].injuredUntilTick).toBe(130);
+    /* A longer one extends past it. */
+    const extended = applyPlanToState(shorter, planWith([
+      { key: 'w:longer', kind: 'resident-wounded', residentId: 'hero-leader', durationTicks: 50 },
+    ]), 110).next;
+    expect(extended.residents[0].injuredUntilTick).toBe(160);
+  });
+
+  it('wound falls back to config woundRecoveryTicks; per-effect durationTicks overrides it', () => {
+    const state = minimalState({});
+    const flat = applyPlanToState(state, planWith([
+      { key: 'w:flat', kind: 'resident-wounded', residentId: 'hero-leader' },
+    ]), 100).next;
+    expect(flat.residents[0].injuredUntilTick).toBe(100 + QUEST_SETTLEMENT.woundRecoveryTicks);
+    const tiered = applyPlanToState(state, planWith([
+      { key: 'w:tier', kind: 'resident-wounded', residentId: 'hero-leader', durationTicks: 7 },
+    ]), 100).next;
+    expect(tiered.residents[0].injuredUntilTick).toBe(107);
+  });
+
+  it('wound on a dead resident is a no-op', () => {
+    const state = minimalState({
+      residents: [
+        { id: 'hero-leader', name: 'L', isWorking: false, isInjured: false, isDead: true, fatigue: 0 } as never,
+      ],
+    });
+    const next = applyPlanToState(state, planWith([
+      { key: 'w:dead', kind: 'resident-wounded', residentId: 'hero-leader' },
+    ]), 100).next;
+    expect(next.residents[0].isInjured).toBe(false);
+    expect(next.residents[0].injuredUntilTick).toBeUndefined();
+  });
+
+  it('death on a wounded resident clears the wound fields (declared R-186 delta)', () => {
+    /* Contract (gameplayTypes.ts:20): «the wound fields are cleared» —
+     * injuredUntilTick must be reset too, not just isInjured. */
+    const state = minimalState({
+      residents: [
+        { id: 'hero-leader', name: 'L', isWorking: true, isInjured: true, injuredUntilTick: 999, fatigue: 0 } as never,
+      ],
+    });
+    const next = applyPlanToState(state, planWith([
+      { key: 'd:0', kind: 'resident-dead', residentId: 'hero-leader' },
+    ]), 100).next;
+    const r = next.residents[0];
+    expect(r.isDead).toBe(true);
+    expect(r.isInjured).toBe(false);
+    expect(r.isWorking).toBe(false);
+    expect(r.injuredUntilTick).toBeUndefined();
+  });
+
+  it('resident-xp is a guarded delta and does not touch health fields', () => {
+    const state = minimalState({
+      residents: [
+        { id: 'hero-leader', name: 'L', isWorking: false, isInjured: false, fatigue: 0, xp: 5 } as never,
+      ],
+    });
+    const next = applyPlanToState(state, planWith([
+      { key: 'xp:1', kind: 'resident-xp', residentId: 'hero-leader', amount: 3 },
+    ]), 100).next;
+    expect(next.residents[0].xp).toBe(8);
+    expect(next.residents[0].isInjured).toBe(false);
+    expect(next.residents[0].isDead).toBeUndefined();
+  });
+});
+
+/* ------------------------------------------------------------------ */
 /* eventLog (PLAN-019-S4 T-1) — the village remembers the run           */
 /* ------------------------------------------------------------------ */
 
@@ -212,8 +303,8 @@ describe('eventLog', () => {
     const { next } = applyPlanToState(minimalState({}), plan, 200);
     const log = next.eventLog ?? [];
     /* Entries: outcome + wounded(hero-member) + goldReward(42) + goldLoot(15)
-     * + xp(3) — loadout-release stays silent. */
-    expect(log).toHaveLength(5);
+     * + xp(3) + R-183 residentXp × 2 survivors — loadout-release stays silent. */
+    expect(log).toHaveLength(7);
 
     const headline = log[0];
     expect(headline.type).toBe('quest_outcome');
@@ -234,6 +325,9 @@ describe('eventLog', () => {
     expect(log[3].messageKey).toBe('gameFrame.questLog.goldLoot');
     expect(log[3].messageParams).toEqual({ amount: 15, quest: 'Goblin Extermination' });
     expect(log[4].messageKey).toBe('gameFrame.questLog.xp');
+    expect(log[5].messageKey).toBe('gameFrame.questLog.residentXp');
+    expect(log[5].messageParams).toEqual({ name: 'Leader', amount: 3, quest: 'Goblin Extermination' });
+    expect(log[6].messageParams).toEqual({ name: 'Member', amount: 3, quest: 'Goblin Extermination' });
   });
 
   it('is idempotent — replay never narrates twice', () => {
@@ -288,7 +382,7 @@ describe('eventLog', () => {
       eventLogLimit: 100,
     });
     expect(next.eventLog).toHaveLength(100);
-    expect(next.eventLog?.[99].messageKey).toBe('gameFrame.questLog.xp');
+    expect(next.eventLog?.[99].messageKey).toBe('gameFrame.questLog.residentXp');
     expect(next.eventLog?.some((e) => e.id === 'old-0')).toBe(false);
   });
 });
