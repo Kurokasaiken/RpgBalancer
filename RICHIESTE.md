@@ -3588,3 +3588,12 @@ Soggetti riscritti a taglia d'uso (POI 26 px, risorse 28 px); lint I8 aggiunto; 
 5. Gap R-167 su `/game` (scheda PG, stash villaggio, level-up) — coperti da PLAN-032 "design converged", mai dispatchato.
 6. Settlement Lost esiste solo come trigger debug su `/world-surface`; nessun path canonico su `/game` quando la marcia goblin arriva.
 7. Minori: 400 Bad Request su risorsa non identificata in `/game`; `/hero-components-lab` lazy-load ~12 s.
+## R-190 — Lab v0.3 giocabile: pagina "Test Macro Gameplay" in /test-hub
+
+**Richiesta (verbatim):** *"m serve una UI cn i pulsanti come era la prima versione / m serve in /test hub, chiamala tipo test Macro Gameplay"*
+**Data:** 2026-10-14
+**Stato:** `fatta` — `src/ui/idleVillage/pages/MacroGameplayLabPage.tsx` su rotta `/macro-gameplay` + card in TestHub; `tools/goblin-lab/` ora committato (`tools/` → `tools/*` + `!tools/goblin-lab/` in .gitignore); `lab.ts` browser-safe (export API + tail CLI gated); `scenario.ts` senza `node:crypto` (FNV-1a). Bonus: fix canonico `exhausted→available` nello sweep notturno TimeEngine + test; rotta orfana `/goblin-event-lab` ripristinata. Verificato: build:check PASS, lab 45/45, smoke Playwright sulla rotta (run avviata, quest accettata/risolta, auto-step, 0 errori console).
+**Desiderata FROZEN:** pagina React che guida il lab canonico `tools/goblin-lab/lab.ts` a pulsanti (difesa/edifici/quest/quest board/avanzamento), rotta `/macro-gameplay`, card "Test Macro Gameplay" in TestHub, fix rotta orfana GoblinEventLabPage.
+**Collegamenti:** R-176 (lab), R-185 (coreografia invasione), R-186 (kernel conseguenze).
+**Chiusura:** 4/4 PASS (lab 45/45, test exhausted R-190, build:check, smoke runtime /macro-gameplay) — bundle: .mw/runs/r190-macro-gameplay-2026-10-14/bundle.json
+

@@ -189,6 +189,31 @@ describe('TimeEngine lifecycle invariants (R-184)', () => {
     expect(healed.residents[resident.id].injuryRecoveryTime).toBeUndefined();
   });
 
+  it('recovers exhausted residents once a night rest drops fatigue below the cap (R-190)', () => {
+    const config = cloneConfig();
+    const deps: TimeEngineDeps = { config, rng: () => 0.5 };
+    const state = createInitialVillageState();
+    const cap = config.globalRules.maxFatigueBeforeExhausted;
+    state.residents = {
+      tired: createResident({ id: 'tired', status: 'exhausted', fatigue: cap }),
+    };
+
+    // Giorno 0-5, notte 5-10: il primo tick notturno recupera fatigue e
+    // sotto la soglia il residente torna schedulabile (prima: terminale).
+    const next = advanceTime(deps, state, 6).state;
+    const r = next.residents.tired;
+    expect(r.fatigue).toBeLessThan(cap);
+    expect(r.status).toBe('available');
+
+    const sched = scheduleActivity(deps, next, {
+      activityId: 'job_chop_wood',
+      characterIds: ['tired'],
+      slotId: 'village_gate',
+    });
+    expect(sched.error).toBeUndefined();
+    expect(sched.scheduledActivity).toBeDefined();
+  });
+
   it('never schedules a dead or injured resident', () => {
     const config = cloneConfig();
     const deps: TimeEngineDeps = { config, rng: () => 0.5 };

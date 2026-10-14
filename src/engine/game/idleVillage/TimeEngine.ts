@@ -550,13 +550,21 @@ export function advanceTime(
 
     // Handle night-time fatigue recovery per tick
     if (!isDaytime(currentTickTime)) {
+      const fatigueCap = deps.config.globalRules.maxFatigueBeforeExhausted ?? 100;
       Object.values(updatedResidents).forEach((resident) => {
         if (resident.status !== 'dead' && resident.status !== 'injured') {
           const recoveredFatigue = Math.max(0, resident.fatigue - fatigueRecoveryPerNightTick);
-          if (recoveredFatigue !== resident.fatigue) {
+          // R-190: 'exhausted' e' la proiezione di fatigue >= cap — una notte di
+          // riposo sotto la soglia rende il residente di nuovo schedulabile
+          // (prima lo status era terminale: fatigue scendeva ma non tornava
+          // mai 'available').
+          const recoveredFromExhaustion =
+            resident.status === 'exhausted' && recoveredFatigue < fatigueCap;
+          if (recoveredFatigue !== resident.fatigue || recoveredFromExhaustion) {
             updatedResidents[resident.id] = {
               ...resident,
               fatigue: recoveredFatigue,
+              status: recoveredFromExhaustion ? 'available' : resident.status,
             };
             newEvents.push({
               time: tickEnd,

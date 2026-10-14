@@ -87,6 +87,8 @@ const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idl
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
 const QuestS1LabPage = lazy(() => import('./ui/idleVillage/pages/QuestS1LabPage'));
 const QuestGenerationLabPage = lazy(() => import('./ui/idleVillage/pages/QuestGenerationLabPage'));
+const MacroGameplayLabPage = lazy(() => import('./ui/idleVillage/pages/MacroGameplayLabPage'));
+const GoblinEventLabPage = lazy(() => import('./ui/idleVillage/pages/GoblinEventLabPage').then(m => ({ default: m.GoblinEventLabPage })));
 const QuestWindowLabPage = lazy(() => import('./ui/idleVillage/pages/QuestWindowLabPage'));
 const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.default })));
 
@@ -302,6 +304,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/quest-s1-lab';
   const isQuestGenerationLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/quest-generation-lab';
+  const isMacroGameplayLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/macro-gameplay';
+  const isGoblinEventLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/goblin-event-lab';
   const isQuestWindowLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/quest-window-lab';
   const isRootPath =
@@ -1127,6 +1133,26 @@ function App() {
       <ErrorBoundary componentName="Quest Generation Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Generation Lab…</div>}>
           <QuestGenerationLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMacroGameplayLabPath) {
+    return (
+      <ErrorBoundary componentName="Macro Gameplay Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Macro Gameplay Lab…</div>}>
+          <MacroGameplayLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isGoblinEventLabPath) {
+    return (
+      <ErrorBoundary componentName="Goblin Event Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Goblin Event Lab…</div>}>
+          <GoblinEventLabPage />
         </Suspense>
       </ErrorBoundary>
     );

@@ -276,6 +276,26 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '⚠️',
     status: 'ok',
   },
+  // Non-kit page: Macro Gameplay Lab — campagna Goblin giocabile a pulsanti
+  // sui motori canonici (metaLayer + TimeEngine + missionResolver). R-190.
+  {
+    id: 'macro-gameplay-lab',
+    title: 'Test Macro Gameplay',
+    description: 'Campagna Goblin interattiva: difesa, lavoro, quest board, invasioni e Re sui motori canonici — stile v0.2 a pulsanti',
+    path: '/macro-gameplay',
+    icon: '🏰',
+    status: 'ok',
+  },
+  // Non-kit page: Goblin Event Lab — storico iterazioni V1–V17 della card
+  // evento invasione (pagina precedentemente orfana, rotta ripristinata R-190).
+  {
+    id: 'goblin-event-lab',
+    title: 'Goblin Event Lab',
+    description: 'Iterazioni V1–V17 del modal evento invasione goblin fianco a fianco',
+    path: '/goblin-event-lab',
+    icon: '👺',
+    status: 'ok',
+  },
 ];
 
 const TEST_PAGES: TestPageLink[] = [
