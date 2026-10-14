@@ -571,7 +571,7 @@ export function advanceTime(
     // Process injury recovery
     Object.values(updatedResidents).forEach(r => {
       if (r.status === 'injured' && typeof r.injuryRecoveryTime === 'number' && r.injuryRecoveryTime <= targetTime) {
-        updatedResidents[r.id] = { ...r, status: 'available', injuryRecoveryTime: undefined };
+        updatedResidents[r.id] = { ...r, status: 'available', isInjured: false, injuryRecoveryTime: undefined };
       }
     });
 
@@ -648,10 +648,12 @@ export function advanceTime(
           payload: { scheduledId: activity.id, activityId: activity.activityId },
         });
 
-        // Activity complete: characters return and update status based on final fatigue
+        // Activity complete: characters return and update status based on final fatigue.
+        // Only 'away' members transition — harm or terminal states applied while
+        // the activity was running (dead / injured / exhausted) outlive completion.
         for (const cid of activity.characterIds) {
           const resident = updatedResidents[cid];
-          if (!resident) continue;
+          if (!resident || resident.status !== 'away') continue;
           const fatigueCap = deps.config.globalRules.maxFatigueBeforeExhausted ?? 100;
           const nextStatus = resident.fatigue >= fatigueCap ? 'exhausted' : 'available';
           updatedResidents[cid] = {

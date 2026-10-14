@@ -143,6 +143,72 @@ describe('TimeEngine.resolveActivityOutcome', () => {
   });
 });
 
+describe('TimeEngine lifecycle invariants (R-184)', () => {
+  const scheduledAway = (resident: ResidentState) => {
+    const config = cloneConfig();
+    const deps: TimeEngineDeps = { config, rng: () => 0.5 };
+    const state = createInitialVillageState();
+    state.residents = { [resident.id]: resident };
+    const result = scheduleActivity(deps, state, {
+      activityId: 'job_chop_wood',
+      characterIds: [resident.id],
+      slotId: 'village_gate',
+    });
+    expect(result.error).toBeUndefined();
+    return { deps, state: result.state };
+  };
+
+  it('does not resurrect a member who dies while the activity is running', () => {
+    const resident = createResident({ id: 'resident-dead' });
+    const { deps, state } = scheduledAway(resident);
+
+    // Harm applied mid-flight (e.g. siege / quest harm): member dies 'away'.
+    state.residents[resident.id] = { ...state.residents[resident.id], status: 'dead', currentHp: 0 };
+    const next = advanceTime(deps, state, 10).state;
+
+    expect(next.residents[resident.id].status).toBe('dead');
+  });
+
+  it('keeps a mid-flight wound: member stays injured until recoveryTime, then isInjured clears', () => {
+    const resident = createResident({ id: 'resident-wounded' });
+    const { deps, state } = scheduledAway(resident);
+
+    state.residents[resident.id] = {
+      ...state.residents[resident.id],
+      status: 'injured',
+      isInjured: true,
+      injuryRecoveryTime: 3,
+    };
+    // Activity completes before recoveryTime: the wound outlives completion.
+    const afterCompletion = advanceTime(deps, state, 1).state;
+    expect(afterCompletion.residents[resident.id].status).toBe('injured');
+
+    const healed = advanceTime(deps, afterCompletion, 3).state;
+    expect(healed.residents[resident.id].status).toBe('available');
+    expect(healed.residents[resident.id].isInjured).toBe(false);
+    expect(healed.residents[resident.id].injuryRecoveryTime).toBeUndefined();
+  });
+
+  it('never schedules a dead or injured resident', () => {
+    const config = cloneConfig();
+    const deps: TimeEngineDeps = { config, rng: () => 0.5 };
+    const state = createInitialVillageState();
+    state.residents = {
+      dead: createResident({ id: 'dead', status: 'dead', currentHp: 0 }),
+      hurt: createResident({ id: 'hurt', status: 'injured', isInjured: true, injuryRecoveryTime: 99 }),
+    };
+
+    for (const id of ['dead', 'hurt']) {
+      const r = scheduleActivity(deps, state, {
+        activityId: 'job_chop_wood',
+        characterIds: [id],
+        slotId: 'village_gate',
+      });
+      expect(r.scheduledActivity).toBeUndefined();
+    }
+  });
+});
+
 describe('TimeEngine.advanceTime - TDZ regression', () => {
   it('does not throw ReferenceError when advancing time with a running activity (TDZ bug fix)', () => {
     // Regression test for TDZ bug: applyActivityFatigueProgress and applyContinuousJobTick

@@ -131,12 +131,15 @@ export type SessionEvent =
   | {
       kind: 'quest-resolved';
       defId: string;
+      /** Which committed instance resolved — lets consumers attribute
+       *  consequences to the right party when two quests share a defId. */
+      instanceId: string;
       outcome: QuestOutcome;
       harm: HarmOutcome;
       writes: QualityDelta[];
       tick: number;
     }
-  | { kind: 'quest-deadline-fail'; defId: string; tick: number };
+  | { kind: 'quest-deadline-fail'; defId: string; instanceId: string; tick: number };
 
 /** Full report returned by advanceTime. */
 export interface AdvanceReport {
@@ -585,7 +588,7 @@ export function advanceTime(
       if (!def) continue;
       if (now >= q.deadlineAt && q.resolvesAt > q.deadlineAt) {
         state.consumed[q.defId] = now;
-        events.push({ kind: 'quest-deadline-fail', defId: q.defId, tick: now });
+        events.push({ kind: 'quest-deadline-fail', defId: q.defId, instanceId: q.instanceId, tick: now });
         resolved.push({ defId: q.defId, outcome: 'fail', harm: 'none' });
         continue;
       }
@@ -598,6 +601,7 @@ export function advanceTime(
         events.push({
           kind: 'quest-resolved',
           defId: q.defId,
+          instanceId: q.instanceId,
           outcome,
           harm,
           writes,

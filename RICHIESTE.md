@@ -3483,3 +3483,48 @@ Test: **21/21** (+S3-E1 B monotona, +S3-E2 C failChance canonica/epic→0, +S3-E
 **Test:** 36/36 (8 nuovi I1–I8: zero difensori→breccia, collasso senza strutture, milizia away/injured non difende, ferita→recovery canonico, civili away non vittime, difesa forte>debole matched-seeds, report sieges, holdForSiege). Evidence: `test-results/r182-siege-canon-2026-10-13.log`. Safeguards: lint scope 0 problemi, build:check PASS, kanban:lint PASS. Fidelity aggiornata: `tools/goblin-lab/FIDELITY.md`.
 
 **Residuo PROPOSTA:** threat curve, gap→rischio, breccia→civili/edifici (il gioco reale non ha ancora risoluzione invasioni); doppio aggregato residente (ResidentState vs MinimalResident/questSettlement) ancora aperto.
+
+## R-183 — /game: suite E2E «quest dal vero» + swap slot↔slot + XP ai PG + documento illustrato
+
+**Richiesta (verbatim):** *"dovrebbe esserci un sistema di test: prendi la pagian /game tutto quello che 'è li deve funzionare, niente + cose mockate. Soprattutto dobbiamo prendere: la creazione del POI di tipo Quest. cliccando deve apparire il POI detail (quest planner), devi poter scegliere dal roster i personaggi che vuoi mandare (devi aggiungere la funzione x cui puoi swappare pg da uno slot ad un altro, senza "estrarli" dallo slot". Scegliere che consumable portare nella quest, far partire la quest, risolvere la quest fase x fase, finire la quest, i pg ricevono exp (ancora nn è implementata, aggiungi quel valore), le risorse o oggetti aggiunti nella HUD. Fa 1documento che spiega come si fanno questi test (dovrebbe già esistere). Creami un documento con screenshot che spiega quando succede cosa e come"*
+**Data:** 2026-10-13
+**Stato:** `fatta` — suite E2E verde, safeguard in fondo.
+**Desiderata FROZEN:** nessuna nuova. Interpretazione: «niente cose mockate» = la suite guida la UI reale (Director, click marker, drag, bottoni consumabili, «Invia», scelte cliccate, controlli tempo HUD, «Chiudi rapporto», readout HUD) — gli hook restano solo in lettura per le asserzioni. XP per-PG: la curva XP è OPEN (`PROGRESSION.md` §3) — si aggiunge solo il valore accumulato, nessun livello.
+
+### R-177 / PLAN-058 T1.2 fatto (2026-10-13)
+**Parole del Director:** "continua". Lastra del tempo: notte argento (niente viola) solo su /game, controlli velocità sui token del Roster con area cliccabile 32×32. Test DayNightPOI già rotti prima (non nostri).
+
+**Implementato:**
+- **Swap slot↔slot** (planner): il token del PG nello slot è un draggable opt-in di `ResidentSlotRack` (`enableSlotSwap`, id `slot-token:<slot>`); drop su slot vuoto = sposta, su slot occupato = scambia; entrambi gli atterraggi passano dal gate di eleggibilità (`planSlotSwap` puro in `questExpedition.ts`); durante il drag gli altri slot si colorano valid/invalid per lo scambio; il press-and-hold fermo estrae ancora.
+- **XP ai PG**: effetto settlement `resident-xp` per ogni membro vivo (config `QUEST_SETTLEMENT.residentXp.mode` = `full` PROPOSTA, alternativa `split`; wipe = nulla; idempotente). Campo `xp` su `MinimalResident`/`ResidentState`, persistito nello snapshot, proiettato sul roster (tooltip nome + `data-resident-xp`), righe per-PG nel rapporto e nel registro (i18n en/it/pseudo).
+- **Suite `tests/e2e/idleVillage/gameQuestFullFlow.spec.ts`**: tutto con input reali (Regia, marker, drag, swap + swap rifiutato, loadout, «Invia», ×4, scelte cliccate, beat con Enter, cintura armata/cura, rapporto, chiusura, reload); hook solo in lettura; screenshot per passaggio (`QUEST_DOC_SHOTS=1` → `src/docs/docs/testing/quest_full_flow/`).
+- Selettori: `quest-window-choice`+`data-option-id`, `quest-consumable-belt`/`belt-*`, `slot-token-*`, `slot-token-ghost`.
+- **Documenti:** guida aggiornata `src/docs/docs/testing/e2e_game_quest_lifecycle_guide.md` (§0 le due suite, selettori, finding 5-6); nuovo `src/docs/docs/testing/quest_full_flow_walkthrough.md` con 17 screenshot.
+
+**Bug trovati dalla suite e corretti:**
+1. **Dopo la prima quest il gioco non salvava più**: `MinimalActivityEntrySchema.messageParams` usava `z.record(valore)` a un argomento → con zod 4 la validazione lanciava; ogni snapshot con righe di settlement falliva in silenzio (warning). Fix `z.record(z.string(), …)`.
+2. **Checksum snapshot instabile**: calcolato sull'input grezzo ma verificato sui dati zod-parsati (riordino/strip chiavi) → caricamento fallito con `isOnExpedition` valorizzato. Fix: checksum sui dati normalizzati. `isOnExpedition` ora nello schema; il merge engine→store non lo perdeva più.
+3. Righe XP del rapporto ereditavano il countdown di guarigione dei feriti.
+
+**Aperto (decisione Director):** inventario consumabili con quantità e inventario di villaggio per il loot non-oro; curva XP/livelli (OPEN `PROGRESSION.md` §3); default `residentXp.mode`; altri `z.record` a un argomento nel repo (task separato proposto).
+
+**Evidence:** `test-results/r183-quest-full-flow-e2e-2026-10-13.log`, `test-results/r183-regression-quest-suites-2026-10-13.log`.
+
+
+## R-184 — RpgBalancer: audit + integrazione ciclo di vita dei residenti
+
+**Richiesta (verbatim):** audit del codice su `ResidentState`/`MinimalResident`/`questSettlement` e ogni altra rappresentazione; invarianti del ciclo arrivo→reclutamento→assegnazione→ferita→recupero/morte→propagazione; scegliere l'intervento minimo (unificazione / fonte unica / adapter esplicito / fix circoscritto) — NON unificare i due modelli per principio; test deterministici sulle transizioni; niente matrici.
+**Data:** 2026-10-14
+**Stato:** `fatta`
+**Desiderata FROZEN:** coerente con la desiderata macro-sim R-176 / direttiva R-179.
+
+**Audit (codice, non documenti):** 3 modelli residente coesistono — `ResidentState` (TimeEngine, canonico, usato dal lab), `MinimalResident` (store UI; `questSettlement` scrive qui: isDead/injuredUntilTick/isOnExpedition/xp), `ResidentState` minimalGameRules (calcoli legacy). metaLayer: nessun modello — solo `PartyCapability` derivata. `liveQuests` lab = adapter istanza→membri.
+
+**Bug veri trovati e corretti — canonici (`src/`):** (1) TimeEngine completamento attivita': status→available/exhausted incondizionato → morto/ferito in missione **resuscitava**; ora solo `away` transita. (2) Sweep recovery non resettava `isInjured` → doppia verita' divergente. (3) `quest-resolved`/`quest-deadline-fail` senza `instanceId` → match conseguenze ambiguo tra quest omonime (contratto additivo).
+**Bug lab corretti:** zombie `liveQuest` su deadline-fail (harm su membri estranei); fallback harm silenzioso sull'eroe; id migranti `m-${day}-${i}` collisione→overwrite (ora contatore monotono); `partyOf` capability fantasma da residenti `away` (ora solo `available`); `resolvedInstances` dedup — nessuna doppia applicazione reward+harm.
+
+**Decisione:** fix circoscritto + adapter rafforzato, **non** unificazione dei due modelli (il lab non consuma questSettlement; i contesti sono diversi — migrazione senza problema).
+
+**Test:** lab 44/44 (8 nuove invarianti V1–V8: identita', morte terminale, ferita canonica, esclusivita', no-zombie, no-doppia-applicazione, capability reale, coerenza aggregati); TimeEngine.unit: +3 test invarianti verdi (resurrezione, ferita mid-flight, mai schedulare dead/injured) — 3 test `resolveActivityOutcome` fallivano gia' prima (pre-esistenti, non correlati). Safeguards: lint scope clean, build:check PASS, kanban:lint PASS.
+**Evidence:** `test-results/r184-resident-lifecycle-2026-10-14.log`. Fidelity: `tools/goblin-lab/FIDELITY.md` §R-184.
+**Residuo:** `exhausted` terminale canonico; convergenza `MinimalResident`↔`ResidentState` via residentSync (incremento futuro); threat/breccia restano PROPOSTA-dati.
