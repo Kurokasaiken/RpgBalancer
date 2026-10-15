@@ -37,6 +37,9 @@ CustomDragOverlay / FlightProxy
 - Portrait URL comes from `getResidentPortraitUrl(resident)`.
 - Fallback: if `portraitUrl` is missing, the component shows the first letter of `label`.
 - The portrait lives inside a `PgCard` frame (see `pgCardFrameConfig` for `frameType` tokens).
+- **Two versions per portrait.** The full landscape PNG (`src/assets/portraits/<name>.png`) is for PgCard and detail views. The medallion uses the generated square `src/assets/portraits/medal/<name>.webp`, resolved by `getMedalPortraitUrl` (`src/balancing/config/idleVillage/medalPortraitAssets.ts`). Callers pass the full URL; the medallion, drag preview and flight proxy swap it.
+- After adding or replacing a portrait, run `npm run portraits:medal` (`scripts/build-medal-portraits.py`). Details in `src/assets/portraits/README.md`.
+- Medallion and drag preview share one decoded cache (`src/ui/idleVillage/utils/portraitDecodeCache.ts`). The medallion appears on its first render when the drag preview already decoded the square.
 
 ### Frame / Rarity Ring
 - `frameType` (`heroic`, `minimal`, `wilderness`, `empire`, etc.) is resolved by `getPgCardFrameTokens` / `getPgCardFrameStyle`.
@@ -98,7 +101,7 @@ idle ──(pointerDown)──► dragging
 - `useDraggable` from `@dnd-kit/core` owns the drag.
 
 ### Drag Overlay
-- `CustomDragOverlay` renders `WanderlustMedalOverlay` (circular portrait) by default.
+- `CustomDragOverlay` renders `WanderlustMedalOverlay` (circular portrait) by default. It draws the medal square, not the full portrait.
 - `snapOverlayCenterToCursor` modifier keeps the overlay center at the pointer position using the captured cursor offset.
 - Magnetic tilt (±8°) is applied when the cursor is within 150px of a drop target (`magnetTargetCenter`).
 
