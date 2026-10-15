@@ -18,15 +18,12 @@
 
 import {
   DndContext,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
   useDndMonitor,
   pointerWithin,
   type DragStartEvent,
   type DragEndEvent,
 } from '@dnd-kit/core';
+import { useIdleVillageDragSensors } from '@/ui/idleVillage/interaction/dragSensors';
 import { useCanonicalRosterBundle } from '../_infra/CanonicalDataBridge';
 import type { CanonicalRosterBundle } from '../_infra/CanonicalDataBridge';
 import { createKitShell, FULL_PROVIDER_CHAIN } from '../_infra/KitShell';
@@ -128,19 +125,7 @@ export function RosterDraggable({
   const { state: dragVisualState, startDrag, startFlight, springBack, settle } = useDragOutcome();
 
   // Sensors configuration
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
-    })
-  );
+  const sensors = useIdleVillageDragSensors();
 
   const handleDragStart = (event: DragStartEvent) => {
     startDrag(event.active.id as string);

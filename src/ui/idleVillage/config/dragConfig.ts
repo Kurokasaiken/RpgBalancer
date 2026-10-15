@@ -30,6 +30,8 @@ export const getDragConfig = () => ({
         // heavier presets can slow down drag start/landing animations.
         /** Delay before showing visual feedback (ms) */
         feedbackDelayMs: 100,
+        /** Press-and-hold time (ms) that starts a drag without movement. Shorter presses are clicks. */
+        holdToDragMs: 180,
         /** Maximum duration for drag operations (ms) */
         dragTimeoutMs: 10000,
         /** Debounce delay for drop state updates (ms) */

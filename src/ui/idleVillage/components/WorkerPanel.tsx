@@ -2,18 +2,15 @@ import { useMemo, useState } from 'react';
 import type { ReactNode, JSX } from 'react';
 import {
   DndContext,
-  PointerSensor,
-  TouchSensor,
   pointerWithin,
-  useSensor,
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
+import { useIdleVillageDragSensors } from '@/ui/idleVillage/interaction/dragSensors';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 import type { MinimalResident } from '@/ui/idleVillage/types/gameplayTypes';
-import { getCurrentDragConfig } from '@/ui/idleVillage/config/dragConfig';
 import WorkerCard from './WorkerCard';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { StyleLabStack } from '@/ui/styleLab/StyleLabStack';
@@ -167,18 +164,7 @@ export function WorkerPanel({
   injuryBadgeCopy = 'Infortunato',
 }: WorkerPanelProps): JSX.Element {
   const [activeResidentId, setActiveResidentId] = useState<string | null>(null);
-  const dragConfig = getCurrentDragConfig();
-  const defaultSensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: dragConfig.thresholds.minDragDistance },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: dragConfig.timing.feedbackDelayMs,
-        tolerance: dragConfig.thresholds.minDragDistance,
-      },
-    }),
-  );
+  const defaultSensors = useIdleVillageDragSensors();
   const resolvedSensors = sensors ?? defaultSensors;
   const fatigueWarningPercent = Number.isFinite(fatigueWarningPercentOverride)
     ? Number(fatigueWarningPercentOverride)

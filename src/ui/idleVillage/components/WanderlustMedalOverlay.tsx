@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '@/localization/useTranslation';
+import { isPortraitDecoded, preloadPortrait } from '@/ui/idleVillage/utils/portraitDecodeCache';
+import { getMedalPortraitUrl } from '@/balancing/config/idleVillage/medalPortraitAssets';
 
 export interface WanderlustMedalOverlayProps {
   portraitUrl?: string;
@@ -29,21 +31,24 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   // Gate: don't show the medallion until the portrait is actually decoded —
   // better a one-frame delay than a medal with a black hole in the middle.
   // If the portrait is already in cache (preloaded by the roster) this is instant.
-  const [portraitReady, setPortraitReady] = useState(!portraitUrl);
+  // The medallion only shows a square crop: load the small medal asset, not the full portrait.
+  const medalUrl = portraitUrl ? getMedalPortraitUrl(portraitUrl) : undefined;
+  const [portraitReady, setPortraitReady] = useState(() => !medalUrl || isPortraitDecoded(medalUrl));
   useEffect(() => {
-    if (!portraitUrl) {
+    if (!medalUrl || isPortraitDecoded(medalUrl)) {
       setPortraitReady(true);
       return;
     }
     let alive = true;
     setPortraitReady(false);
-    const img = new Image();
-    img.onload = () => { if (alive) setPortraitReady(true); };
-    img.onerror = () => { if (alive) setPortraitReady(true); }; // fallback portrait will show
-    img.src = portraitUrl;
-    if (img.complete) setPortraitReady(true);
+    const img = preloadPortrait(medalUrl);
+    // decode() resolves once the shared cached image is painted-ready; a failed
+    // load also resolves the gate so the fallback portrait shows.
+    const reveal = () => { if (alive) setPortraitReady(true); };
+    if (img) img.decode().then(reveal, reveal);
+    else reveal();
     return () => { alive = false; };
-  }, [portraitUrl]);
+  }, [medalUrl]);
 
 
 
@@ -314,7 +319,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
 
             {/* L5: Portrait - real image */}
             <image 
-              href={portraitUrl || fallbackPortrait}
+              href={medalUrl || fallbackPortrait}
               x="15.5" y="15.5" width="55" height="55"
               clipPath="url(#c-port)" 
               preserveAspectRatio="xMidYMin slice"

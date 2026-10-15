@@ -1,31 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { createPortraitPreloadConfig } from '@/balancing/config/idleVillage/portraitPreloadConfig';
+import { preloadPortrait } from '@/ui/idleVillage/utils/portraitDecodeCache';
+import { getMedalPortraitUrl } from '@/balancing/config/idleVillage/medalPortraitAssets';
 
 let dragPreviewHost: HTMLDivElement | null = null;
-
-// Global cache for decoded portrait images
-const portraitCache = new Map<string, HTMLImageElement>();
-const config = createPortraitPreloadConfig();
-
-/**
- * Preload a portrait image globally to prevent drag delays.
- * Call this during idle time or on hover.
- */
-export const preloadPortrait = (url: string) => {
-  if (typeof document === 'undefined' || !url) return;
-  if (portraitCache.has(url)) return;
-
-  // LRU eviction if we exceed maxPortraits
-  if (portraitCache.size >= config.maxPortraits) {
-    const firstKey = portraitCache.keys().next().value;
-    if (firstKey) portraitCache.delete(firstKey);
-  }
-
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.src = url;
-  portraitCache.set(url, img);
-};
 
 const getDragPreviewHost = () => {
   if (typeof document === 'undefined') {
@@ -68,12 +45,14 @@ export function useResidentDragPreview({
   size = 72,
 }: UseResidentDragPreviewOptions) {
   const dragImageRef = useRef<HTMLCanvasElement | null>(null);
+  // The drag preview is a circle: draw the medallion square, not the full portrait.
+  const medalPortraitUrl = portraitUrl ? getMedalPortraitUrl(portraitUrl) : undefined;
   const [isReady, setIsReady] = useState(() => !portraitUrl);
 
   // Eagerly preload if url changes
   useEffect(() => {
-    if (portraitUrl) preloadPortrait(portraitUrl);
-  }, [portraitUrl]);
+    if (portraitUrl) preloadPortrait(medalPortraitUrl);
+  }, [medalPortraitUrl]);
 
   useEffect(() => {
     let active = true;
@@ -172,19 +151,7 @@ export function useResidentDragPreview({
     };
 
     if (portraitUrl) {
-      let img = portraitCache.get(portraitUrl);
-      
-      if (!img) {
-        // Enforce limits for ad-hoc loads too
-        if (portraitCache.size >= config.maxPortraits) {
-          const firstKey = portraitCache.keys().next().value;
-          if (firstKey) portraitCache.delete(firstKey);
-        }
-        img = new Image();
-        img.crossOrigin = 'anonymous'; // Important for canvas export if needed
-        img.src = portraitUrl;
-        portraitCache.set(portraitUrl, img);
-      }
+      const img = preloadPortrait(medalPortraitUrl) ?? undefined;
 
       const handleLoad = () => renderPreview(img, true);
       const handleError = () => renderPreview(undefined, true);

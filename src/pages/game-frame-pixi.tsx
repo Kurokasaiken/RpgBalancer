@@ -8,6 +8,7 @@ import { GameBootScreen, type GameBootPhase } from '@/ui/idleVillage/components/
 import { GameFrameDragCursor } from '@/ui/idleVillage/components/gameFrame/GameFrameDragCursor';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { installGamePerfProbe } from '@/ui/idleVillage/utils/gamePerfProbe';
+import { warmGameAssets } from '@/ui/idleVillage/utils/gameAssetWarmup';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { MatericRosterComponent } from '@/ui/idleVillage/roster';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
@@ -830,6 +831,12 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   const handleMapReady = useCallback(() => setMapReady(true), []);
   const handleBootError = useCallback((message: string) => setBootError(message), []);
   const bootGatesReady = tuningLoaded && consumedPoiIds !== null && mapReady && i18nReady;
+  /* Assets the first interaction needs but the boot DOM does not render: portraits
+   * (roster, hero sheet and medallion are closed panels at boot) and the brass
+   * cursors (fetched on first use — cold, the system white hand shows). Started at
+   * mount so it loads alongside the map; the veil waits for it below. */
+  const assetWarmupRef = useRef<Promise<void> | null>(null);
+  if (assetWarmupRef.current === null && typeof window !== 'undefined') assetWarmupRef.current = warmGameAssets();
 
   /* DOM warm-up behind the veil (T-A5): roster/medal images decoded and fonts
    * settled, so the first drag of a PG card pays nothing cold. */
@@ -839,7 +846,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     const decodes = Array.from(document.querySelectorAll('img'))
       .slice(0, 120)
       .map((img) => (img.complete ? Promise.resolve() : img.decode().catch(() => undefined)));
-    void Promise.allSettled([...decodes, document.fonts?.ready ?? Promise.resolve()]).then(() => {
+    void Promise.allSettled([...decodes, assetWarmupRef.current, document.fonts?.ready ?? Promise.resolve()]).then(() => {
       if (!cancelled) setWarmDone(true);
     });
     return () => {
