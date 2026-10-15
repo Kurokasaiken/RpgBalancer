@@ -303,9 +303,17 @@ export function recoverStaleSessions(registry: SessionRegistry, now = new Date()
       const heartbeatAgeMs = now.getTime() - lastHeartbeat;
       const createdAt = session.createdAt ? new Date(session.createdAt).getTime() : undefined;
 
+      /* Terminal sessions are final — recovery must never resurrect a
+       *  released session into UNKNOWN (a COMPLETED session whose heartbeat
+       *  aged out would otherwise block shutdown forever). */
       if (
-        session.state !== 'TIMED_OUT' &&
-        session.state !== 'ABANDONED_STALE' &&
+        session.state === 'COMPLETED' ||
+        session.state === 'FAILED' ||
+        session.state === 'TIMED_OUT' ||
+        session.state === 'ABANDONED_STALE'
+      ) {
+        sessions[sessionId] = session;
+      } else if (
         session.maxDurationMs !== undefined &&
         createdAt !== undefined &&
         now.getTime() - createdAt > session.maxDurationMs

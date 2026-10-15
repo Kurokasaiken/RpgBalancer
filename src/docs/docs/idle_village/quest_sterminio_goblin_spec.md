@@ -71,6 +71,7 @@ protetto finché qualcuno dietro vive.
 | Reward | **XP sempre**; il trofeo dei goblin si converte al ritorno in città nel reward vero — per ora **Gold** | Director 2026-10-06 |
 | Vincoli party | nessun vincolo sul numero di PG (mock: 4 slot noti) | Director 2026-10-06 |
 | HP | i PG **hanno HP**: mock eroe = **100 HP**, gli altri = **60 HP** — valori ereditati dalle stat reali del PG quando assegnato | Director 2026-10-06 |
+| Lifecycle POI | **`repeatable`** (`poi-goblin`): il marker non viene mai consumato — chiuso il rapporto di una run ended+settled la run si sgancia e l'offerta torna `available` finché la finestra è aperta (rilanciabile); ignora anche record consumati stantii | R-200 (D-1) + D-S4-6, `questPois.ts` |
 
 ---
 
