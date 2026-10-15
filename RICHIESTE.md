@@ -3395,6 +3395,10 @@ Test: **21/21** (+S3-E1 B monotona, +S3-E2 C failChance canonica/epic→0, +S3-E
 **Parole del Director:** "Fai T0.1, T0.2 e T0.3, poi fermati per il mio sì." — regola madre: il risultato deve sembrare il Roster V2; trappole T-01, T-02, T-03, T-07; Roster V1 intoccato; niente commit.
 **Stato:** `in corso` — T0.1–T0.3 eseguiti (esito in PLAN-058 §Fase 0); in attesa del sì del Director prima di procedere.
 
+### R-177 / Sigillo: forme, halo, anello (2026-10-15)
+**Parole del Director:** "le scritte nn va bene cm le hai ritoccate, reverta (le scritte dentro il RING), la lacca teal nn m convince. Dentro la forma quella riga bianca nn convince. Nelle altre forme [...] l'halo attorno sempre tondo nn m convince, sarebbe meglio dare la forma quadrata o romboidale? le scritte dell'halo sn state rimpicciolite? [...] meglio abbastanza grandi da riempire tutto il colore. l'interno dei POI dovrebbe essere in tinta cn la lacca del ring? guarda tu questa pagina [...] giudica le forme, poi dammi un piano e proposte". Prima: "halo dentro il bordo nn è male, ma quella specie d becco è brutto".
+**Stato:** `in corso` — giudizio e piano proposti, in attesa di scelta. Misura: filo interno in bronzo `#d8bd78` al posto dell'avorio → cancello verde (min 3,65:1); senza filo interno → fallisce (foresta 1,09:1).
+
 ### R-177 / PLAN-058 T4.2 resto (2026-10-14)
 **Parole del Director:** "continua" / "riprova" (dopo il riepilogo: T4.2 resta a questa sessione, la sessione «Game UI/HUD critique e redesign» ha lasciato il Sigillo base e ha confermato di non toccare più `PoiMatericV3_5`, `MapQuestPoi`, `MapDemoPoi`).
 **Fatto:** sagome per famiglia, taglie S/M/L, `tier` main/normal, halo avorio/verderame con vermiglio solo in urgenza, scatto unico, pulsazione a run finito, glifo ~57%, token `--skin-poi-*`; lettere invariate. Esito e limiti in PLAN-058 §T4.2. **Errore corretto:** nel piano avevo chiamato D6 una decisione che era già D6 (cursori): ora D7.

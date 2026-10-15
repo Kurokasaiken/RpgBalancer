@@ -72,7 +72,7 @@ export const wonderSpawnDefaults = {
 export const seaWonderCatalog: SeaWonder[] = [
   {
     id: 'kraken',
-    src: 'wonders/kraken1.webp',
+    src: 'wonders/kraken1.webp?v=20261015',
     width: 73,
     height: 64,
     opacity: 0.95,
@@ -81,7 +81,7 @@ export const seaWonderCatalog: SeaWonder[] = [
   },
   {
     id: 'balena',
-    src: 'wonders/balena1.webp',
+    src: 'wonders/balena1.webp?v=20261015',
     width: 60,
     height: 41,
     opacity: 0.95,
@@ -90,7 +90,7 @@ export const seaWonderCatalog: SeaWonder[] = [
   },
   {
     id: 'nave-pirata',
-    src: 'wonders/nave-pirata1.webp',
+    src: 'wonders/nave-pirata1.webp?v=20261015',
     width: 53,
     height: 49,
     opacity: 0.95,

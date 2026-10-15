@@ -64,7 +64,7 @@ const PANEL_STYLE: CSSProperties = {
 };
 const STRIP_STYLE: CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: '16px minmax(0, 1fr) auto',
+  gridTemplateColumns: 'var(--skin-hud-control-icon-size) minmax(0, 1fr) auto',
   alignItems: 'center',
   gap: 'var(--skin-hud-row-column-gap)',
   padding: 'var(--skin-hud-row-padding)',
@@ -77,13 +77,12 @@ const STRIP_STYLE: CSSProperties = {
 const FONT_DISPLAY = 'var(--skin-font-display)';
 const FONT_SERIF = 'var(--skin-font-serif)';
 const FONT_SANS = 'var(--skin-font-sans)';
-/** Short uppercase label (state, countdown, group): the Roster's `caps` scale. */
-const CAPS_STYLE: CSSProperties = {
+/** Short label (countdown, group): the Roster's `caps` scale without the capitals; capitals are for the header and filters only. */
+const LABEL_STYLE: CSSProperties = {
   fontFamily: FONT_SANS,
   fontSize: 'var(--skin-hud-caps-size)',
   fontWeight: 'var(--skin-hud-caps-weight)' as CSSProperties['fontWeight'],
   letterSpacing: 'var(--skin-hud-caps-tracking)',
-  textTransform: 'uppercase',
 };
 
 /**
@@ -169,7 +168,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
         style={{
           ...STRIP_STYLE,
           // Severity reads before the words: danger rows carry a tone edge and a faint wash.
-          borderInlineStart: type.tone === 'danger' ? `3px solid ${TONE_COLOR.danger}` : STRIP_STYLE.border,
+          borderInlineStart: type.tone === 'danger' ? `var(--skin-hud-bar-gap) solid ${TONE_COLOR.danger}` : STRIP_STYLE.border,
           ...(hoveredId === event.id || focusedId === event.id ? { borderColor: 'var(--skin-hud-row-filet-hover)' } : null),
           background:
             type.tone === 'danger' && urgent
@@ -201,12 +200,16 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
             }
           : {})}
       >
-        <HudGlyph iconId={type.icon} label={t(type.labelKey)} size={16} style={{ color: TONE_COLOR[type.tone] }} />
+        <HudGlyph
+          iconId={type.icon}
+          label={t(type.labelKey)}
+          style={{ color: TONE_COLOR[type.tone], width: 'var(--skin-hud-control-icon-size)', height: 'var(--skin-hud-control-icon-size)' }}
+        />
         <span
           title={event.title}
           style={{
             fontFamily: FONT_SERIF,
-            fontSize: 14,
+            fontSize: 'var(--skin-hud-name-size)',
             fontWeight: 500,
             color: 'var(--skin-body-color)',
             // Two lines before it gives up (the full text is in the title): the name is the part that matters.
@@ -221,7 +224,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
         </span>
         <span
           style={{
-            ...CAPS_STYLE,
+            ...LABEL_STYLE,
             fontVariantNumeric: 'tabular-nums',
             whiteSpace: 'nowrap',
             color: urgent ? TONE_COLOR[type.tone] : 'var(--skin-text-secondary)',
@@ -301,7 +304,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
       </div>
 
       {events.length === 0 ? (
-        <p style={{ margin: 0, fontFamily: FONT_SERIF, fontSize: 14, lineHeight: 1.4, color: 'var(--skin-body-color)' }}>
+        <p style={{ margin: 0, fontFamily: FONT_SERIF, fontSize: 'var(--skin-hud-name-size)', lineHeight: 1.4, color: 'var(--skin-body-color)' }}>
           {t('gameFrame.events.empty')}
         </p>
       ) : sort === 'due' ? (
@@ -311,7 +314,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
           const type = typeOf(typeId);
           return (
             <div key={typeId} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-bar-gap)' }}>
-              <span style={{ ...CAPS_STYLE, color: TONE_COLOR[type.tone], paddingLeft: 'var(--skin-hud-control-gap)' }}>
+              <span style={{ ...LABEL_STYLE, color: TONE_COLOR[type.tone], paddingLeft: 'var(--skin-hud-control-gap)' }}>
                 {t(type.labelKey)}
               </span>
               {stripList(list)}

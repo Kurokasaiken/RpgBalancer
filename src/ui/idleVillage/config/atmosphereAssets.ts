@@ -478,13 +478,13 @@ export const atmosphereAssets: AtmosphereConfig = {
     opacity: 1,
     bobWorldPx: 60,
     marks: [
-    { src: 'waves/onda2.webp', x: 3822, y: 1408, width: 340, height: 142, delaySeconds: 0.0, flip: false },
-    { src: 'waves/ondine1.webp', x: 75, y: 1499, width: 280, height: 117, delaySeconds: 4.5, flip: true },
-    { src: 'waves/schiuma1.webp', x: 1142, y: 157, width: 340, height: 142, delaySeconds: 9.0, flip: false },
-    { src: 'waves/onda1.webp', x: 26, y: 596, width: 280, height: 117, delaySeconds: 13.5, flip: true },
-    { src: 'waves/onda2.webp', x: 3585, y: 2012, width: 340, height: 142, delaySeconds: 18.0, flip: false },
-    { src: 'waves/schiuma1.webp', x: 314, y: 182, width: 340, height: 142, delaySeconds: 22.5, flip: false },
-    { src: 'waves/onda2.webp', x: 3229, y: 472, width: 340, height: 142, delaySeconds: 27.0, flip: false }
+    { src: 'waves/onda2.webp?v=20261015', x: 3822, y: 1408, width: 340, height: 142, delaySeconds: 0.0, flip: false },
+    { src: 'waves/ondine1.webp?v=20261015', x: 75, y: 1499, width: 280, height: 117, delaySeconds: 4.5, flip: true },
+    { src: 'waves/schiuma1.webp?v=20261015', x: 1142, y: 157, width: 340, height: 142, delaySeconds: 9.0, flip: false },
+    { src: 'waves/onda1.webp?v=20261015', x: 26, y: 596, width: 280, height: 117, delaySeconds: 13.5, flip: true },
+    { src: 'waves/onda2.webp?v=20261015', x: 3585, y: 2012, width: 340, height: 142, delaySeconds: 18.0, flip: false },
+    { src: 'waves/schiuma1.webp?v=20261015', x: 314, y: 182, width: 340, height: 142, delaySeconds: 22.5, flip: false },
+    { src: 'waves/onda2.webp?v=20261015', x: 3229, y: 472, width: 340, height: 142, delaySeconds: 27.0, flip: false }
     ],
   },
   ambient: {

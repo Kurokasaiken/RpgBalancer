@@ -36,10 +36,10 @@ export const SeaMarksConfigSchema = z.object({
 export type SeaMarksConfig = z.infer<typeof SeaMarksConfigSchema>;
 
 const WAVE_FAMILIES = [
-  { src: 'waves/onda1.webp', width: 280, height: 117 },
-  { src: 'waves/onda2.webp', width: 340, height: 142 },
-  { src: 'waves/ondine1.webp', width: 280, height: 117 },
-  { src: 'waves/schiuma1.webp', width: 340, height: 142 },
+  { src: 'waves/onda1.webp?v=20261015', width: 280, height: 117 },
+  { src: 'waves/onda2.webp?v=20261015', width: 340, height: 142 },
+  { src: 'waves/ondine1.webp?v=20261015', width: 280, height: 117 },
+  { src: 'waves/schiuma1.webp?v=20261015', width: 340, height: 142 },
 ];
 
 const COAST_POINTS = [
