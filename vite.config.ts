@@ -126,6 +126,95 @@ function seaPatternDefaultsPlugin(): Plugin {
   };
 }
 
+/**
+ * Dev-only: bake the /game Tuning panel values into the shipped defaults (R-181).
+ *
+ * The panel already autosaves overrides to `hud_tuning_v1` (PersistenceService),
+ * but those live in one browser's storage. «Save» POSTs the effective values
+ * here and the endpoint rewrites the source constants — `worldDressing.motion`
+ * and `worldDressing.seabed` in gameFrameConfig.ts, `DEFAULT_MAP_TUNE` in
+ * PixiWorldMap.tsx, `DEFAULT_HUD_BAND_PX` in hudBand.ts — so what the Director
+ * dialled in IS the default on every surface, browser and session.
+ */
+function hudTuningDefaultsPlugin(): Plugin {
+  const GAME_FRAME_CONFIG = path.resolve(dirname, 'src/balancing/config/idleVillage/gameFrameConfig.ts');
+  const MAP_TUNE_FILE = path.resolve(dirname, 'src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx');
+  const HUD_BAND_FILE = path.resolve(dirname, 'src/ui/idleVillage/skins/primitives/hudBand.ts');
+  const MOTION_KEYS = [
+    'cloudShadowOpacity', 'cloudShadowOffsetX', 'cloudShadowOffsetY', 'cloudSpeed',
+    'seaMotionAmount', 'seaMotionPeriod', 'seaLineOpacity', 'foamStrength', 'foamCrestSpeed',
+  ] as const;
+  const MAP_TUNE_KEYS = [
+    'cloudParallax', 'cloudMorph', 'smokeAmount', 'wonderEveryS', 'deepSeaFadePx',
+    'forestSway', 'forestSwaySpeed', 'regionLinePx', 'regionHoverDelayS', 'markSpacingPx',
+  ] as const;
+
+  /** Coerces one tuning value to a finite number or throws — nothing else may reach the emitted literal. */
+  const num = (values: Record<string, unknown>, key: string): number => {
+    const value = Number(values[key]);
+    if (!Number.isFinite(value)) throw new Error(`invalid ${key}`);
+    return value;
+  };
+
+  return {
+    name: 'hud-tuning-defaults',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__hud-tuning-default', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('Method Not Allowed');
+          return;
+        }
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk;
+          if (body.length > 8192) req.destroy();
+        });
+        req.on('end', () => {
+          try {
+            const values = (JSON.parse(body) as { values?: Record<string, unknown> }).values ?? {};
+
+            // worldDressing.motion + worldDressing.seabed: single-line literals inside DEFAULT_GAME_FRAME_CONFIG.
+            let frameConfig = fs.readFileSync(GAME_FRAME_CONFIG, 'utf-8');
+            const motionLiteral = `motion: { ${MOTION_KEYS.map((key) => `${key}: ${num(values, key)}`).join(', ')} }`;
+            if (!/motion: \{[^}]*\}/.test(frameConfig)) throw new Error('worldDressing.motion literal not found');
+            frameConfig = frameConfig.replace(/motion: \{[^}]*\}/, motionLiteral);
+            const seabedLiteral = `seabed: { opacity: ${num(values, 'seabedOpacity')}, parallax: ${num(values, 'seabedParallax')} }`;
+            if (!/seabed: \{[^}]*\}/.test(frameConfig)) throw new Error('worldDressing.seabed literal not found');
+            frameConfig = frameConfig.replace(/seabed: \{[^}]*\}/, seabedLiteral);
+            fs.writeFileSync(GAME_FRAME_CONFIG, frameConfig, 'utf-8');
+
+            // DEFAULT_MAP_TUNE block in PixiWorldMap.tsx.
+            let mapSource = fs.readFileSync(MAP_TUNE_FILE, 'utf-8');
+            const tuneMarker = 'export const DEFAULT_MAP_TUNE: PixiMapTune = {';
+            const tuneStart = mapSource.indexOf(tuneMarker);
+            if (tuneStart === -1) throw new Error('DEFAULT_MAP_TUNE not found');
+            const tuneEnd = mapSource.indexOf('};', tuneStart);
+            if (tuneEnd === -1) throw new Error('unterminated DEFAULT_MAP_TUNE');
+            const tuneLines = MAP_TUNE_KEYS.map((key) => `  ${key}: ${num(values, key)},`);
+            mapSource = `${mapSource.slice(0, tuneStart)}${tuneMarker}\n${tuneLines.join('\n')}\n${mapSource.slice(tuneEnd)}`;
+            fs.writeFileSync(MAP_TUNE_FILE, mapSource, 'utf-8');
+
+            // DEFAULT_HUD_BAND_PX in hudBand.ts.
+            let bandSource = fs.readFileSync(HUD_BAND_FILE, 'utf-8');
+            if (!/DEFAULT_HUD_BAND_PX = [0-9.]+/.test(bandSource)) throw new Error('DEFAULT_HUD_BAND_PX not found');
+            bandSource = bandSource.replace(/DEFAULT_HUD_BAND_PX = [0-9.]+/, `DEFAULT_HUD_BAND_PX = ${num(values, 'plaqueBand')}`);
+            fs.writeFileSync(HUD_BAND_FILE, bandSource, 'utf-8');
+
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: true }));
+          } catch (error) {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: false, error: (error as Error).message }));
+          }
+        });
+      });
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -189,6 +278,7 @@ export default defineConfig(({ mode }) => ({
       }
     },
     seaPatternDefaultsPlugin(),
+    hudTuningDefaultsPlugin(),
     ...(process.env.GUARDIAN_BUILD_STATS === 'true' ? [guardianStatsPlugin()] : [])
   ],
   resolve: {

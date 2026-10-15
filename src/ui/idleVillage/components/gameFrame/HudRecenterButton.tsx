@@ -1,5 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { HudGlyph } from './hudIcons';
+import { EngravedIcon } from './engravedIcons';
+
+/** Coin = three control icons wide (42 px at the base skin, over the 32 px hit area); the glyph is one and a half. */
+const COIN = 'calc(var(--skin-hud-control-icon-size) * 3)';
+const GLYPH = 'calc(var(--skin-hud-control-icon-size) * 1.5)';
 
 export interface HudRecenterButtonProps {
   onRecenter: () => void;
@@ -20,21 +24,21 @@ export function HudRecenterButton({ onRecenter }: HudRecenterButtonProps) {
       title={label}
       onClick={onRecenter}
       style={{
-        width: 44,
-        height: 44,
-        margin: '0 8px',
+        width: COIN,
+        height: COIN,
+        margin: '0 var(--skin-hud-stack-gap)',
         padding: 0,
         display: 'grid',
         placeItems: 'center',
         borderRadius: '50%',
-        border: 'none',
+        border: '1px solid var(--skin-hud-row-filet)',
         cursor: 'pointer',
         color: 'var(--skin-icon-color)',
-        background: 'color-mix(in srgb, var(--skin-surface-base) 85%, black)',
-        boxShadow: '0 0 0 1.5px var(--skin-surface-border), inset 0 1px 0 color-mix(in srgb, var(--skin-icon-color) 25%, transparent)',
+        background: 'var(--skin-surface-bg)',
+        boxShadow: 'inset 0 1px 0 color-mix(in srgb, var(--skin-icon-color) 25%, transparent)',
       }}
     >
-      <HudGlyph iconId="world" label={label} size={22} />
+      <EngravedIcon id="cmd-recenter" size={GLYPH} />
     </button>
   );
 }

@@ -3,6 +3,14 @@ import defaultBackgroundImage from '@/assets/ui/idleVillage/goblin-invasion-libr
 import defaultGoblinImage from '@/assets/ui/idleVillage/goblin-invasion-transparent-no-sticker.webp';
 import defaultGoblinImageWithBorder from '@/assets/ui/idleVillage/goblin-march-trasparente.webp';
 
+/** Every image the case draws, so the host can fetch and decode them before the case is first shown. */
+export const GOBLIN_WINDOW_ASSETS: readonly string[] = [
+  defaultBackgroundImage,
+  defaultGoblinImage,
+  defaultGoblinImageWithBorder,
+  '/assets/ui/goblin_case_displacement.png',
+];
+
 export interface GoblinInvasionWindowProps {
   /** Accessible name for the scene. Pass an i18n-resolved string if it is not purely decorative. */
   ariaLabel?: string;
@@ -452,6 +460,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
         />
         <img
           src={goblinImageWithBorder}
+          data-testid="goblin-window-sticker"
           alt=""
           style={{
             position: 'absolute',

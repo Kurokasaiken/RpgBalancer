@@ -15,3 +15,12 @@ Files are local copies — no hotlinking.
 | `razzia.jpg` | F6 Razzia | *Pillage of a village* | David Teniers II | Public domain | https://commons.wikimedia.org/wiki/File:David_Teniers_(II)_-_Pillage_of_a_village.jpg |
 | `ritorno.jpg` | F7 Ritorno / Agguato | *Landscape with travelers ambushed on a road at the edge of a forest* | Dutch School | Public domain | https://commons.wikimedia.org/wiki/File:Landscape_with_travelers_ambushed_on_a_road_at_the_edge_of_a_forest).webp |
 | `quest-card.jpg` | Quest picker card | *The Princess and the Trolls* (1913) | John Bauer | Public domain | https://commons.wikimedia.org/wiki/File:John_Bauer_-_The_Princess_and_the_Trolls_-_Google_Art_Project.jpg |
+
+---
+
+**Update 2026-10-13** — Le fasi coperte da art AI generata sono state
+sostituite da `public/assets/scene-library/` (vedi `CATALOG.md` lì per
+provenance e tag di riuso). Da questa cartella restano in uso solo
+`assegnazione.jpg` (`gob-inizio`, in attesa del transito `viaggio`) e
+`ritorno.jpg` (`gob-ritorno`, in attesa del transito `ritorno`); le altre
+immagini sono conservate come archivio ma non più referenziate.

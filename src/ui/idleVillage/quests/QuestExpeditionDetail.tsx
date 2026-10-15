@@ -235,12 +235,14 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
         </div>
 
         {/* Slots — the trusted rack; drop-state comes from the session's
-         *  quest eligibility resolver. */}
+         *  quest eligibility resolver. R-183: a slotted token can be dragged
+         *  onto another slot (move / swap) without extracting it. */}
         <ResidentSlotRack
           slots={slots}
           layout="detail"
           onSlotClear={onSlotClear}
           slotSize={56}
+          enableSlotSwap
         />
 
         {/* OUTCOME zone (S3 T-2): aggregate → BY MEMBER → WHY inside a

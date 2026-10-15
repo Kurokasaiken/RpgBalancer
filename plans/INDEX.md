@@ -69,8 +69,9 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-019-S4](PLAN-019-S4-integrazione.md) | Integrazione: villaggio→planning→quest→ritorno→conseguenze come unico gioco; destino lab; «definizione di buona quest» | completed | — | child of PLAN-019 (S4); R-123; chiuso 2026-10-10 — D-S4-1..6 ratificate, T-0…T-6 fatti; gate (d)/Gate B a convocazione Director; evidence test-results/s4-t6-closure-2026-10-10.log |
 | [PLAN-029](PLAN-029-quest-gen-lab-operativa.md) | Quest Generation Lab operativa: pick→generate→validate→play→iterate→export | candidate | — | child of PLAN-026; R-142; artifact **r003 converged** via mw-web-debate `20261012-quest-gen-lab-operativa` (chatgpt+gemini+deepseek accept; grok provider_dead); SP-1 approfondito e converged 4/4; SP-2 approfondito e converged 3/3; SP-3 approfondito e converged 4/4; SP-4 approfondito e converged 3/3; SP-5 approfondito e converged 3/3; SP-6 approfondito e converged 2/2 (chatgpt provider_outage, anticipated-accept documentato); SP-7 approfondito e converged 2/2 (chatgpt+grok provider_dead); SP-8 approfondito e converged 3/3 — tutti i subplan v1 converged |
 | [PLAN-031](PLAN-031-game-boot-preload-perf.md) | /game schermata principale: title screen + preload totale (mappa, medaglioni) + misurazione responsività | active | P1 | R-166; fasi A+B implementate 2026-10-12 (veil+preload+probe+fix drag); spec perf verde al floor; gate Director su risultati |
-| [PLAN-032](PLAN-032-teaser-game-components.md) | Componenti teaser /game: scheda PG (hover→HudPlaque), magazzino villaggio, mercante, consumabili in viaggio, level-up (mock) | design converged | P1 | R-167; decisioni Director 2026-10-12; **debate multi-AI CONVERGED su tutti i 5 SP** (artifact in mind-weaver/.mw/runs/, sha nel piano); pronto per dispatch |
+| [PLAN-032](PLAN-032-teaser-game-components.md) | Componenti teaser /game: scheda PG (hover→HudPlaque), magazzino villaggio, mercante, consumabili in viaggio, level-up (mock) | **completed** | P1 | R-167 **completata 2026-10-14**; debate multi-AI CONVERGED su tutti i 5 SP; dispatched T-011 PLAN-034: spec `PLAN-032-SP-1..5-*.md` (sha artifact verificati); **tutti e 5 gli SP completati 2026-10-14** — bundle `.mw/runs/plan032-sp{1,2,3,4,5}-2026-10-14/` PASS, evidence `test-results/PLAN-032-SP{1..5}-2026-10-14.log` + smoke headed en+it |
 | [PLAN-033](PLAN-033-game-event-shroud-goblin-march.md) | /game evento invasione: tendina, card centrata, goblin che marcia, handoff al registro, linee regioni | active | P1 | 12f8c142 / 2026-10-12 / Director | T-001 | desiderata v2; BV-1…6 |
+| [PLAN-034](PLAN-034-trailer-audit-fixes.md) | Fix dei 7 problemi audit trailer R-187: perf /game (quest, pan, menu, invasion), hub trailer, DirectorPanel settlement-lost, dispatch PLAN-032 | completed | P1 | 2026-10-14 / Director («procedi») | T-001 | R-188; 14/14 done — T-011 (dispatch PLAN-032) chiuso il 2026-10-14; esecuzione SP su PLAN-032 |
 
 ## Sotto-documenti (non piani)
 
@@ -84,6 +85,11 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | `PLAN-029-SP-6-persistence-export.md` | subplan convergente (artifact r003) | PLAN-029 |
 | `PLAN-029-SP-7-test-hardening.md` | subplan convergente (artifact r003) | PLAN-029 |
 | `PLAN-029-SP-8-ia-i18n-honesty.md` | subplan convergente (artifact r003) | PLAN-029 |
+| `PLAN-032-SP-1-hero-sheet.md` | subplan convergente (artifact r003, sha d1f26a13) — **completato 2026-10-14** | PLAN-032 |
+| `PLAN-032-SP-2-village-stash.md` | subplan convergente (artifact r003, sha c0432832) — **completato 2026-10-14** | PLAN-032 |
+| `PLAN-032-SP-3-merchant-panel.md` | **completed** 2026-10-14 (bundle `.mw/runs/plan032-sp3-2026-10-14/`) | PLAN-032 |
+| `PLAN-032-SP-4-bag-strip.md` | **completed** 2026-10-14 (bundle `.mw/runs/plan032-sp4-2026-10-14/`; i18n `{label}` ICU — divergenza `{{label}}` documentata) | PLAN-032 |
+| `PLAN-032-SP-5-hero-levelup.md` | **completed** 2026-10-14 (bundle `.mw/runs/plan032-sp5-2026-10-14/`; i18n `{n}` ICU — divergenza `{{n}}` documentata) | PLAN-032 |
 | `PLAN-005-poi-family-tasks.md` | task list | PLAN-005 |
 | `.mw/plans/poi-quest-config-first-cleanup.md` | sub-plan TP1–TP5 | cleanup `/poi-quest-detail-roster-time-clock` |
 | `.mw/plans/sea-motion-brief.md` | brief | World Surface sea motion |

@@ -93,7 +93,9 @@ export const WanderlustPortrait: React.FC<WanderlustPortraitProps> = ({
   };
 
   return (
-    <div className={className} style={containerStyle}>
+    /* `data-wanderlust-portrait` gives decorative layers (e.g. the level badge)
+     * a stable anchor for the portrait bounds without querying the card DOM. */
+    <div className={className} style={containerStyle} data-wanderlust-portrait>
       <div style={frameStyle}>
         {portraitUrl ? (
           <img src={portraitUrl} alt="" style={imageStyle} draggable={false} />

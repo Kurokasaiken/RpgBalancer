@@ -72,7 +72,7 @@ const QUEST_BEATS_BY_ID: Record<QuestId, readonly string[]> = {
  *  stays here (Director 2026-10-06: «le altre quest devono essere eliminate
  *  da questo lab»); copy keys live under questS1Lab.quests.*. */
 const QUEST_CARDS: { id: QuestId; art: string; riskKey: string }[] = [
-  { id: 'goblin', art: '/assets/quest-goblin/quest-card.jpg', riskKey: 'high' },
+  { id: 'goblin', art: '/assets/scene-library/totem-goblin.jpg', riskKey: 'high' },
 ];
 
 /** Random seed for a new run — lab only, called from event handlers. */

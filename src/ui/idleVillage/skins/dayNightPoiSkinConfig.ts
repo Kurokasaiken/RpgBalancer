@@ -98,6 +98,25 @@ export const defaultDayNightPoiConfig: DayNightPoiConfig = {
   },
 };
 
+/**
+ * Night as moonlit silver on teal lacquer, for the /game HUD (PLAN-058 T1.2):
+ * the default night palette is violet, a hue that exists nowhere else in the
+ * HUD or on the map. Opt-in through `DayNightPoiSkin`'s `nightTone="silver"`;
+ * every other page keeps the certified palette.
+ */
+export const DAYNIGHT_SILVER_NIGHT = {
+  palette: {
+    ringColor: '#cfd8d4',
+    glowColor: '#9cc4bf',
+    glowOpacity: [0.26, 0.38],
+    coreColor: '#0f2627',
+    bloomRadius: 0.44,
+    bloomIntensity: 0.8,
+  } satisfies DayNightPoiStatePalette,
+  medallion: { start: '#e8ece6', mid: '#7f918d', end: '#0c1a1b' },
+  moon: { body: 'rgba(236,232,218,0.92)', stroke: 'rgba(196,184,150,0.62)', detail: 'rgba(214,206,182,0.82)' },
+} as const;
+
 export const MINIMAL_FRONTIER_DAYNIGHT_POI_CONFIG: DayNightPoiSkinPresetConfig = {
   id: 'minimal_frontier_daynight_poi',
   label: 'Minimal Frontier Day/Night POI',

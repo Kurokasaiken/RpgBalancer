@@ -59,6 +59,7 @@ const RAW_DEFAULT_QUEST_ITEMS: Record<string, QuestItem> = {
     // Party pool (D3): applies to every living member's roll on each phase.
     injuryChanceDelta: -10,
     qty: 2,
+    descKey: 'questExpedition.item.healingDraught',
   },
   quest_consumable_lucky_coin: {
     id: 'quest_consumable_lucky_coin',
@@ -67,6 +68,7 @@ const RAW_DEFAULT_QUEST_ITEMS: Record<string, QuestItem> = {
     kind: 'consumable',
     rewardMultiplierDelta: 0.1,
     qty: 1,
+    descKey: 'questExpedition.item.luckyCoin',
   },
   /* --------------------------------------------------------------------
    * Expedition-bag items (PLAN-019-S2.2 T-5): the real item identity behind

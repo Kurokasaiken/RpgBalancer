@@ -303,6 +303,21 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-hud-lacquer-deep': '#060f16',
   '--skin-hud-lacquer-alpha': '0.9',
   '--skin-hud-seat': '#0b0a08',
+  /* ── POI "Sigillo" (map markers, PLAN-058 T4.1/T4.2) ───────────────────
+   * Double border + halo tones + sizes. Read by `PoiMatericV3_5` (prop `sigillo`).
+   * Vermilion is urgency only: the expiring deadline and the decision badge. */
+  '--skin-poi-border-outer': '#0b0a08',
+  '--skin-poi-border-outer-width': '2px',
+  '--skin-poi-border-inner': '#efe3c6',
+  '--skin-poi-border-inner-width': '1.5px',
+  '--skin-poi-halo-deadline': '#ead9b0',
+  '--skin-poi-halo-work': '#6fc4a4',
+  '--skin-poi-urgent': '#e8553a',
+  '--skin-poi-veiled-opacity': '0.45',
+  '--skin-poi-pulse-period': '2s',
+  '--skin-poi-size-s': '44px',
+  '--skin-poi-size-m': '55px',
+  '--skin-poi-size-l': '69px',
   '--skin-hud-step': 'rgba(3,3,3,0.8)',
   '--skin-hud-highlight': '#fff0cd',
   '--skin-hud-highlight-alpha': '0.12',
@@ -317,6 +332,35 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-hud-brass-foot': '#71501f',
   '--skin-hud-parchment': '#e8d6ae',
   '--skin-hud-parchment-ink': '#3a2a18',
+
+  /* ── HUD layout and type, measured on the Roster V2 (PLAN-058 T0.1) ───────
+   * The Roster is the reference every HUD plaque must look like: these are its
+   * spacing, rows, controls and type scale, read by the Roster itself and by the
+   * `data-hud-controls` role. Same values in every skin, so no preset overrides. */
+  '--skin-hud-plaque-clearance': '12px',
+  '--skin-hud-panel-padding': '10px',
+  '--skin-hud-stack-gap': '8px',
+  '--skin-hud-control-gap': '4px',
+  '--skin-hud-control-height': '26px',
+  '--skin-hud-control-icon-size': '14px',
+  '--skin-hud-inline-gap': '6px',
+  '--skin-hud-row-gap': '4px',
+  '--skin-hud-row-padding': '4px 8px',
+  '--skin-hud-row-column-gap': '8px',
+  '--skin-hud-row-radius': '8px',
+  '--skin-hud-row-filet': 'rgba(223,184,87,0.16)',
+  '--skin-hud-row-filet-hover': 'rgba(223,184,87,0.42)',
+  '--skin-hud-bar-gap': '3px',
+  '--skin-hud-title-size': '12px',
+  '--skin-hud-title-weight': '600',
+  '--skin-hud-title-tracking': '0.2em',
+  '--skin-hud-name-size': '13px',
+  '--skin-hud-name-weight': '700',
+  '--skin-hud-name-tracking': '0.02em',
+  '--skin-hud-caps-size': '12px',
+  '--skin-hud-caps-weight': '600',
+  '--skin-hud-caps-tracking': '0.06em',
+  '--skin-hud-engrave': '0 1px 1px rgba(0,0,0,0.5)',
 };
 
 /* ── Per-preset overrides (inherit from base, override selectively) ────── */

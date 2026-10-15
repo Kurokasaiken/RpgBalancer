@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LayoutPanelLeft } from 'lucide-react';
+import { EngravedIcon } from './engravedIcons';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
 import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
 
@@ -72,11 +72,12 @@ export function HudPanelsMenu({ visible, onToggle, includeDev = false }: HudPane
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('gameFrame.panels.title')}
+        data-hud-panels-trigger=""
         title={t('gameFrame.panels.title')}
         onClick={() => setOpen((v) => !v)}
         style={{ width: 40, height: 40, position: 'relative' }}
       >
-        <LayoutPanelLeft />
+        <EngravedIcon id="cmd-panels" />
         {hiddenCount > 0 && (
           <span aria-hidden="true" data-badge="" style={{ position: 'absolute', top: -4, right: -4, minWidth: 16, height: 16, padding: '0 4px', borderRadius: 8, font: '700 12px/16px var(--skin-font-display)', textAlign: 'center', background: 'var(--skin-label-primary)', color: 'var(--skin-surface-base)' }}>
             {hiddenCount}

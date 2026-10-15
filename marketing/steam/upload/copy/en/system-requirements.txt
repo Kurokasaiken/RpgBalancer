@@ -1,0 +1,15 @@
+MINIMUM
+OS: Windows 10 (64-bit)
+Processor: Dual-core 2.0 GHz or better
+Memory: 4 GB RAM
+Graphics: Any GPU with WebGL 2 support (integrated graphics are fine)
+Storage: 1 GB available space
+Additional Notes: Microsoft Edge WebView2 Runtime (installed automatically). Designed for 1280×720 and above.
+
+RECOMMENDED
+OS: Windows 10 or 11 (64-bit)
+Processor: Quad-core 2.5 GHz or better
+Memory: 8 GB RAM
+Graphics: Dedicated GPU with WebGL 2 support
+Storage: 1 GB available space
+Additional Notes: 1920×1080 display.

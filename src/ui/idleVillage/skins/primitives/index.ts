@@ -28,6 +28,7 @@ export {
   type TypewriterTextProps,
   DamageFloater,
   type DamageFloaterProps,
+  TextFloater,
   fxForBeat,
   useBeatFx,
   prefersReducedMotion,

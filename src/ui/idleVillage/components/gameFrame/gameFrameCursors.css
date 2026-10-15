@@ -1,24 +1,104 @@
-/* Medieval gauntlet cursors: "Gauntlet Cursor" by itsmars, CC0 (see public/assets/ui/cursors/LICENSE-gauntlet-cursor.txt).
-   Steel gauntlet by default, gold-outlined over something clickable, dark iron while dragging the map.
-   Scoped to .game-frame. On the world canvas, PixiWorldMap sets data-cursor="point" over a territory and
-   data-cursor="move" while the map is dragged. */
+/* /game cursors — PLAN-058 T5.2. House rule D6: fantasy, never generic — a state is a small emblem (spark, eye,
+   hourglass, iron padlock, crossed blades), never a dot, ring or coloured status disc; the cursor does not change
+   colour while dragging. Brass and ink, drawn by scripts/draw-cursors.py (the hotspots live in
+   public/assets/ui/cursors/game-cursors.json and tests/unit/idleVillage/gameFrameCursors.test.ts keeps them equal to the
+   literals below). Point = the pointer, a gauntlet with the index finger out (default, interact, inspect, wait, disabled);
+   hand = the grip, open and closed gauntlets (grab, drag, drop, pan). Scoped to .game-frame; the boot veil sits outside it and is matched on its own.
+
+   State -> cursor. A later rule wins a tie, so the order of the blocks is the precedence:
+     rest < interact < grab < inspect < disabled < wait < pan < drag < drop-yes < drop-no
+   i.e. dragging beats hovering, and a refused drop beats an accepted one.
+   Every rule carries !important because HUD components set `cursor` inline; the [style*=...] selectors catch those
+   inline values, so a component that says cursor:pointer / grab / help / not-allowed gets the matching brass cursor
+   without being edited. New code should prefer the explicit hooks: data-cursor="interact | grab | inspect | wait | disabled".
+
+   Hooks other code already provides:
+     - PixiWorldMap sets data-cursor="point" over a territory and data-cursor="move" while the map is dragged.
+     - html[data-game-drag] is set by GameFrameDragCursor for the length of a dnd-kit drag.
+     - data-drop-state="valid | invalid | idle" is set by the slots and the quest POI from the same dnd-kit drag state. */
+:root {
+  --game-cursor-point-default: image-set(url('/assets/ui/cursors/game-point-default.png') 1x, url('/assets/ui/cursors/game-point-default@1.5x.png') 1.5x, url('/assets/ui/cursors/game-point-default@2x.png') 2x) 3 3, default;
+  --game-cursor-point-interact: image-set(url('/assets/ui/cursors/game-point-interact.png') 1x, url('/assets/ui/cursors/game-point-interact@1.5x.png') 1.5x, url('/assets/ui/cursors/game-point-interact@2x.png') 2x) 3 3, pointer;
+  --game-cursor-point-inspect: image-set(url('/assets/ui/cursors/game-point-inspect.png') 1x, url('/assets/ui/cursors/game-point-inspect@1.5x.png') 1.5x, url('/assets/ui/cursors/game-point-inspect@2x.png') 2x) 3 3, help;
+  --game-cursor-point-wait: image-set(url('/assets/ui/cursors/game-point-wait.png') 1x, url('/assets/ui/cursors/game-point-wait@1.5x.png') 1.5x, url('/assets/ui/cursors/game-point-wait@2x.png') 2x) 3 3, wait;
+  --game-cursor-point-disabled: image-set(url('/assets/ui/cursors/game-point-disabled.png') 1x, url('/assets/ui/cursors/game-point-disabled@1.5x.png') 1.5x, url('/assets/ui/cursors/game-point-disabled@2x.png') 2x) 3 3, not-allowed;
+  --game-cursor-hand-grab: image-set(url('/assets/ui/cursors/game-hand-grab.png') 1x, url('/assets/ui/cursors/game-hand-grab@1.5x.png') 1.5x, url('/assets/ui/cursors/game-hand-grab@2x.png') 2x) 18 17, grab;
+  --game-cursor-hand-drag: image-set(url('/assets/ui/cursors/game-hand-drag.png') 1x, url('/assets/ui/cursors/game-hand-drag@1.5x.png') 1.5x, url('/assets/ui/cursors/game-hand-drag@2x.png') 2x) 16 16, grabbing;
+  --game-cursor-hand-drop-yes: image-set(url('/assets/ui/cursors/game-hand-drop-yes.png') 1x, url('/assets/ui/cursors/game-hand-drop-yes@1.5x.png') 1.5x, url('/assets/ui/cursors/game-hand-drop-yes@2x.png') 2x) 15 15, copy;
+  --game-cursor-hand-drop-no: image-set(url('/assets/ui/cursors/game-hand-drop-no.png') 1x, url('/assets/ui/cursors/game-hand-drop-no@1.5x.png') 1.5x, url('/assets/ui/cursors/game-hand-drop-no@2x.png') 2x) 15 15, no-drop;
+  --game-cursor-hand-pan: image-set(url('/assets/ui/cursors/game-hand-pan.png') 1x, url('/assets/ui/cursors/game-hand-pan@1.5x.png') 1.5x, url('/assets/ui/cursors/game-hand-pan@2x.png') 2x) 16 15, grabbing;
+}
+
+/* rest — the map host used to be `cursor-grab`; at rest the map shows the pointing gauntlet, the fist appears only while it moves */
 .game-frame {
-  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet.png') 1x, url('/assets/ui/cursors/medieval-gauntlet@2x.png') 2x) 4 4, auto;
+  cursor: var(--game-cursor-point-default);
 }
 .game-frame .cursor-grab,
 .game-frame .cursor-grab canvas {
-  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet.png') 1x, url('/assets/ui/cursors/medieval-gauntlet@2x.png') 2x) 4 4, default !important;
+  cursor: var(--game-cursor-point-default) !important;
 }
+
+/* interact — something the player can press */
 .game-frame button:not(:disabled),
 .game-frame a[href],
 .game-frame [role='button'],
+.game-frame [role='menuitem'],
+.game-frame [role='menuitemradio'],
+.game-frame [role='menuitemcheckbox'],
+.game-frame [role='tab'],
+.game-frame [style*='cursor: pointer'],
+.game-frame [data-cursor='interact'],
 .game-frame canvas[data-cursor='point'] {
-  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet-point.png') 1x, url('/assets/ui/cursors/medieval-gauntlet-point@2x.png') 2x) 4 4, pointer !important;
+  cursor: var(--game-cursor-point-interact) !important;
 }
-.game-frame button:disabled {
-  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet.png') 1x, url('/assets/ui/cursors/medieval-gauntlet@2x.png') 2x) 4 4, not-allowed !important;
+
+/* grab — something the player can pick up (a dnd-kit draggable always carries aria-roledescription="draggable") */
+.game-frame [aria-roledescription='draggable'],
+.game-frame [style*='cursor: grab'],
+.game-frame [data-cursor='grab'] {
+  cursor: var(--game-cursor-hand-grab) !important;
 }
+
+/* inspect — a tile that explains itself on hover */
+.game-frame [style*='cursor: help'],
+.game-frame [data-cursor='inspect'] {
+  cursor: var(--game-cursor-point-inspect) !important;
+}
+
+/* disabled — present but not available (a disabled dnd-kit draggable still carries aria-roledescription) */
+.game-frame button:disabled,
+.game-frame [aria-disabled='true'],
+.game-frame [style*='cursor: not-allowed'],
+.game-frame [data-cursor='disabled'] {
+  cursor: var(--game-cursor-point-disabled) !important;
+}
+
+/* wait — work in flight */
+.game-frame [aria-busy='true'],
+.game-frame [data-cursor='wait'],
+[data-boot-phase],
+[data-boot-phase] * {
+  cursor: var(--game-cursor-point-wait) !important;
+}
+
+/* pan — the map is being dragged */
 .game-frame canvas[data-cursor='move'],
 .game-frame .cursor-grab:active {
-  cursor: image-set(url('/assets/ui/cursors/medieval-gauntlet-move.png') 1x, url('/assets/ui/cursors/medieval-gauntlet-move@2x.png') 2x) 4 4, grabbing !important;
+  cursor: var(--game-cursor-hand-pan) !important;
+}
+
+/* drag — a resident is in the air: the whole frame is a grip until a drop target says otherwise */
+html[data-game-drag] .game-frame,
+html[data-game-drag] .game-frame * {
+  cursor: var(--game-cursor-hand-drag) !important;
+}
+
+/* drop — the target under the pointer answers; refused comes last so it wins over accepted */
+html[data-game-drag] .game-frame [data-drop-state='valid'],
+html[data-game-drag] .game-frame [data-drop-state='valid'] * {
+  cursor: var(--game-cursor-hand-drop-yes) !important;
+}
+html[data-game-drag] .game-frame [data-drop-state='invalid'],
+html[data-game-drag] .game-frame [data-drop-state='invalid'] * {
+  cursor: var(--game-cursor-hand-drop-no) !important;
 }

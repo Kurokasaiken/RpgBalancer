@@ -1255,3 +1255,72 @@ correzione premessa idle (R-161).
 deterministico + graph linter (metodologia R-154 T7), senza combattimento.
 
 **Fonte:** Director in sessione 2026-10-12.
+
+## 2026-10-13 — R-178: pagina Steam — capsule dalla key art, durata Goblin 11 nodi, moodboard fuori dallo store
+
+**Decisioni (Director, in sessione):**
+
+1. **La capsule è la key art** (eroe che guarda la valle), non più la mappa con il logo sopra. Formati ricavati dalle immagini già esistenti; il logo stampato resta nelle capsule (consentito: nome del gioco), le immagini vanno dichiarate come AI nel questionario.
+2. **Copy: poco accento sui «villager»**; «village standing» eliminato. L'About descrive eroi costruiti con ciò che si trova e l'insediamento «tra una spedizione e l'altra». La roadmap (compagnia d'élite, boss/fasi, campagna che ricorda, demo, EA, lingue) resta nel copy, in una sezione dedicata, come direzione e non come feature.
+3. **Una riga «progetto di una sola persona, nato dalla passione»** nell'About: sì, in una frase sola.
+4. **Durata Goblin = 11 nodi / 110 tick** (era 25 / 250, calibrata per errore sul loop di saccheggio che la simulazione prendeva come linea di default). `expectedPathNodes` e `estimatedDurationTicks` in `questPois.ts`.
+5. **Trailer:** lo carica il Director quando è pronto; non blocca la preparazione della pagina (il waiver scritto richiesto dal gate §7 va registrato).
+6. **Moodboard fuori dalla pagina store** (screenshot = gameplay reale; ogni immagine dell'About deve mostrare una meccanica): va nel post pinnato della Community Hub, con didascalia «concept/mood, non gioco».
+
+**Correzione di codice collegata:** il forecast del planner dava wipe 100% con qualunque party su Goblin. Causa: `defaultStrategy` prendeva la prima opzione ai bivi, e a `gob-esplora-extra` la prima è `gob-fruga` (saccheggio senza fine). Ora una strategia di riferimento per quest (`REFERENCE_STRATEGY`) ha la precedenza; Rovine invariata (la sua opzione sicura è già la prima).
+
+**Fonte:** Director in sessione 2026-10-12/13. Dettagli e checklist: `marketing/steam/PUBLISH-CHECKLIST.md`.
+
+**Aggiunte (stesso giorno, Director):**
+
+7. **Lingue dichiarate in Steamworks: solo EN + IT.** Chiude l'ambiguità di D4 (il tedesco compariva sia tra le lingue della demo sia tra quelle «dopo trazione»); ES/DE/ZH restano solo roadmap nell'About.
+8. **Requisiti minimi di sistema pubblicati subito**, come stime prudenti da validare sul build prima della demo (`marketing/steam/upload/copy/*/system-requirements.txt`). Piattaforma: Windows.
+
+
+## 2026-10-13 — R-180: «POI types» include il POI quest reale; finestre offerta slice effettivamente aperte
+
+**Richiesta Director:** su /game, «POI types» nella Regia deve mostrare anche il
+marker dorato delle quest, che al click apre la schermata di preparazione.
+
+**Decisioni applicate:**
+
+1. **`questRevealed = questShown || poiDemo`** — la rassegna «POI types»
+   include i marker quest REALI (offerta vera, click → planner, send live).
+   R-143 resta rispettato: nessun esemplare finto; «Show quest» resta il
+   gate solo-quest.
+2. **`SLICE_OFFER_WINDOW_DAYS = 10_000`** per `availableUntilDay` di
+   goblin/rovine — con il clock compresso (5 tick/giorno) la finestra di 60
+   giorni durava ~5 minuti reali e le offerte morivano `expired` (marker
+   invisibile) su qualunque save oltre la prima sessione. Il config dichiara
+   già le finestre «generose, availability pressure non è la meccanica in
+   slice»; il path di scadenza resta testato su `questAvailability`.
+
+**Fonte:** Director in sessione 2026-10-13. Evidence:
+`test-results/r180-poi-types-quest-marker-2026-10-13.log`.
+
+
+## 2026-10-14 — Evento Invasione su /game: il registro resta aperto, il distacco si vede, la card diventa la riga
+
+**Da:** (`GAME_INVASION_SEQUENCE.md` 2026-10-12) lo sticker compare al primo fotogramma dello strappo e la teca nasconde il suo goblin; il registro si apre per 1 s (`LEDGER_PEEK_MS`) e si richiude; la card svanisce in dissolvenza; BV-5 asseriva la richiusura.
+**A:** lo strappo della teca si vede (0,9 s) e lo sticker lo sostituisce alla fine, nella posa misurata; lo sticker vola sul marker (misurato) e gli cede il posto; il registro si apre **senza ri-inquadrare la mappa** e **resta aperto**; la card si ripiega sulla riga (FLIP con schiacciamento, `MORPH_MS` 1,1 s) e la riga appare. BV-5 ora asserisce «resta aperto».
+**Motivo:** video del Director 2026-10-14, 5 difetti (`.mw/bugs/20261014-game-invasion-event-choreography/bug.md`). Direzione card→riga: scelta A fra A/B/C esplorate (il Director ha detto «procedi»). Punto 1 («goblin sulla mappa all'apertura») ancora aperto.
+**Correzione al piano di prevenzione:** la bozza proponeva una nuova trappola «success claim oltre l'evidenza»; esiste già T-04. Il gap reale è il trigger del pre-flight (vive solo in `mw-executor`), non l'assenza della regola.
+**Fonte:** `.mw/runs/20261014-094734-invasion-verification/pattern-candidate.md`
+
+## 2026-10-14 — Invasione su /game: la pagina si apre senza goblin (niente ripristino da `invasion_v1`)
+
+**Da:** PLAN-033 T-004: `startDay` salvato sotto `invasion_v1`, dopo il ricaricamento il goblin tornava sulla mappa con posizione derivata dal giorno.
+**A:** nessun ripristino; `invasion_v1` si cancella all'apertura; l'invasione esiste solo da quando viene avviata. BV-4 ora asserisce «reload = mappa pulita».
+**Motivo:** Director: «all'apertura della pagina vedo lo sticker goblin». L'orologio non si ripristina (R-119), quindi la posizione ripristinata non corrispondeva a nulla; l'unico trigger è il pannello Director (solo dev), quindi il goblin all'apertura era sempre stato di test residuo.
+**Riaprire se:** l'invasione diventa un evento di gioco reale con salvataggio dell'orologio — allora serve persistere insieme `startDay` e il clock.
+**Fonte:** `.mw/bugs/20261014-game-invasion-event-choreography/bug.md`
+
+
+## 2026-10-14 — Chiusura task meccanicamente bloccata dal gate di verifica (R-189)
+
+**Da:** D-20260911-002 / SKILL-VERIFICATION: BV procedurale, controllo a campione del Director, nessun gate automatico.
+**A:** in RPG la chiusura è vincolata tecnicamente: `kanban:lint` blocca nuove righe `Completato` e transizioni `fatta`/`completata` in RICHIESTE.md senza `bundle:` PASS (o `waived-director:`/`nessuna-verifica-tecnica:` espliciti). Contratto a due livelli: `CTR-*` permanenti + manifest `.mw/runs/<task>/verification.json` all'avvio (regola nel mandato executor §6). Verificatore indipendente senza diff per obbligazioni non-`state`. Fail-loud: niente CI/hook (scelta Director).
+**Motivo:** incidente 2026-10-14 — chiusura dichiarata senza prove verificabili; regole preventive e BV non hanno impedito il falso positivo (`.mw/bugs/20261014-verification-false-pass/`). Decisioni Director verbatim in RICHIESTE.md R-189.
+**Provato:** self-test 14/14 (10 bypass bloccati), unit 16/16, blocco live su kanban reale, dogfood visivo R-185 (12/12 E2E + 34 frame + env attestation + verificatore CONFIRMED×2 → bundle PASS).
+**Limite noto:** fail-loud non è fail-safe — chi non lancia `kanban:lint` può committare chiusure fuori dal percorso; gli hash legano l'integrità degli artefatti, non la provenienza del processo.
+**Fonte:** `.mw/runs/r189-closure/bundle.json`, `.mw/runs/r185-closure/bundle.json`, `test-results/r189-verification-gate-2026-10-14.log`.

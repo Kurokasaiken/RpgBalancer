@@ -9,7 +9,7 @@
     "verdictNearMiss": "Per un soffio",
     "verdictFail": "Fallimento",
     "verdictCrit": "Rovina",
-    "riskDeclared": "{{death}}% morte · {{wound}}% ferita",
+    "riskDeclared": "{death}% morte · {wound}% ferita",
     "riskNone": "Nessuno",
     "riskHeld": "Illeso",
     "riskWounded": "Ferito",
@@ -18,7 +18,7 @@
     "skip": "Salta",
     "auto": "Auto",
     "mute": "Muto",
-    "axisReadout": "{{skill}}: {{stat}} contro difficoltà {{difficulty}} — {{relation}}",
+    "axisReadout": "{skill}: {stat} contro difficoltà {difficulty} — {relation}",
     "relation_margin": "sopra la soglia",
     "relation_deficit": "sotto la soglia",
     "relation_even": "pari alla soglia"
@@ -78,6 +78,8 @@
   "floatingPanel": {
     "minimize": "Riduci a icona",
     "restore": "Ripristina il pannello",
+    "pin": "Fissa il pannello",
+    "unpin": "Sblocca il pannello",
     "close": "Chiudi il pannello"
   },
   "interactionMode": {
@@ -696,8 +698,8 @@
     "cost": "Costo",
     "budget": "Budget",
     "balanceBar": "Uso budget",
-    "balanced": "Nel budget ({{balance}} punti liberi)",
-    "overBudget": "Fuori budget di {{balance}} punti",
+    "balanced": "Nel budget ({balance} punti liberi)",
+    "overBudget": "Fuori budget di {balance} punti",
     "save": "Salva equipaggiamento",
     "saved": "Equipaggiamento salvato",
     "saveFailed": "Salvataggio fallito",
@@ -712,12 +714,12 @@
   },
   "astrolabeV63": {
     "check": "Prova",
-    "statVsDc": "{{stat}} contro difficoltà {{difficulty}}",
-    "probability": "Probabilità di riuscita ~{{pct}}%",
-    "risk": "Ferita {{wound}}% · Morte {{dead}}%",
+    "statVsDc": "{stat} contro difficoltà {difficulty}",
+    "probability": "Probabilità di riuscita ~{pct}%",
+    "risk": "Ferita {wound}% · Morte {dead}%",
     "riskWounded": "Ferito",
     "riskDead": "Caduto",
-    "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
+    "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
     "verdict": {
       "bigwin": "TRIONFO",
       "win": "SUCCESSO",
@@ -770,12 +772,12 @@
   },
   "astrolabeV64": {
     "check": "Prova",
-    "statVsDc": "{{stat}} contro difficoltà {{difficulty}}",
-    "probability": "Probabilità di riuscita ~{{pct}}%",
-    "risk": "Ferita {{wound}}% · Morte {{dead}}%",
+    "statVsDc": "{stat} contro difficoltà {difficulty}",
+    "probability": "Probabilità di riuscita ~{pct}%",
+    "risk": "Ferita {wound}% · Morte {dead}%",
     "riskWounded": "Ferito",
     "riskDead": "Caduto",
-    "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
+    "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
     "verdict": {
       "bigwin": "TRIONFO",
       "win": "SUCCESSO",
@@ -946,7 +948,8 @@
       "residentWounded": "{name} è tornato ferito dalla spedizione.",
       "goldReward": "Ricompensa della missione: +{amount} oro ({quest}).",
       "goldLoot": "Bottino: +{amount} oro ({quest}).",
-      "xp": "Esperienza della spedizione: +{amount} PE ({quest})."
+      "xp": "Esperienza della spedizione: +{amount} PE ({quest}).",
+      "residentXp": "{name} ha guadagnato {amount} PE ({quest})."
     },
     "questEpilogue": {
       "title": "Rapporto di spedizione",
@@ -962,7 +965,8 @@
       "lore": "Echi del luogo",
       "goldAmount": "+{amount} oro",
       "xpAmount": "+{amount} PE",
-      "recovery": "recupero ~{days} g"
+      "recovery": "recupero ~{days} g",
+      "memberXp": "{name} +{amount} PE"
     },
     "director": {
       "title": "Regia",
@@ -973,7 +977,10 @@
       "skin": "Skin: {name}",
       "poiTypes": "Tipi di POI",
       "questRun": "Avvia quest goblin",
-      "wonder": "Mostro marino"
+      "wonder": "Mostro marino",
+      "settlementLost": "Insediamento perduto",
+      "merchantMarker": "Marcatore mercante",
+      "levelUp": "Level-up eroe"
     },
     "roster": {
       "title": "Roster",
@@ -1015,7 +1022,20 @@
         "events": "Eventi",
         "director": "Director",
         "tuning": "Tuning",
-        "quest": "Quest in corso"
+        "quest": "Quest in corso",
+        "heroSheet": "Scheda personaggio",
+        "villageStash": "Magazzino",
+        "merchant": "Mercante"
+      }
+    },
+    "stash": {
+      "title": "Magazzino del villaggio",
+      "capacity": "{count} di {max} beni in deposito",
+      "qty": "{qty} in deposito"
+    },
+    "buildings": {
+      "stash": {
+        "name": "Magazzino del villaggio"
       }
     },
     "menu": {
@@ -1029,6 +1049,9 @@
       "quit": "Esci al titolo",
       "theme": "Tema",
       "language": "Lingua",
+      "interfaceSize": "Dimensione interfaccia",
+      "interfaceSizeAuto": "Auto",
+      "interfaceSizeAutoHint": "Automatica: {percent}%",
       "languages": {
         "en": "English",
         "it-IT": "Italiano"
@@ -1050,7 +1073,8 @@
     "tuning": {
       "reset": "Ripristina valori",
       "save": "Salva",
-      "saved": "Salvato ✓"
+      "saved": "Salvato ✓",
+      "bakeFailed": "Salvato per questo browser — i nuovi default non sono stati scritti nel config (solo dev server)."
     },
     "questWindow": {
       "roster": "Squadra assegnata",
@@ -1060,6 +1084,12 @@
       "restore": "Riapri",
       "waiting": "Decisione in attesa",
       "bagEmpty": "Sacca vuota",
+      "bagStrip": {
+        "label": "Borsa preparata",
+        "chipName": "{label} ({qualifier})",
+        "armed": "armato",
+        "held": "portato"
+      },
       "dead": "caduto",
       "hpLost": "−{hp} HP",
       "loot": "+{count, plural, one {# bottino} other {# bottino}}",
@@ -1090,6 +1120,57 @@
     "hud": {
       "hide": "Nascondi HUD",
       "show": "Mostra HUD"
+    },
+    "heroSheet": {
+      "prev": "Personaggio precedente",
+      "next": "Personaggio successivo",
+      "pin": "Fissa scheda",
+      "unpin": "Sblocca scheda",
+      "loadout": "Equipaggiamento",
+      "inventory": "Inventario",
+      "inventoryEmpty": "Vuoto"
+    },
+    "merchant": {
+      "title": "Il mercante Rowen",
+      "previewBadge": "Anteprima",
+      "restockNote": "Rowen rifornisce quando la strada è clemente",
+      "markerName": "Bancarella del mercante",
+      "priceLine": "{price} {currency}",
+      "currency": {
+        "gold": "oro"
+      },
+      "buy": {
+        "button": "Compra",
+        "previewLabel": "solo anteprima",
+        "previewTooltip": "Il commercio arriva con l'aggiornamento dell'economia — questa schermata è un'anteprima"
+      },
+      "offers": {
+        "healingDraught": {
+          "name": "Pozioni curative, tre per cassa",
+          "desc": "Vetro verde amaro sigillato in cera — una ferita che si chiude prima che la strada svoli.",
+          "stock": "Una cassa rimasta"
+        },
+        "fieldRations": {
+          "name": "Razioni da campo per la lunga marcia",
+          "desc": "Gallette, mele secche e pesce salato — cibo che tiene i nervi saldi più a lungo di te.",
+          "stock": "In abbondanza, finché tengono i forni"
+        },
+        "smokeBomb": {
+          "name": "Bombe fumogene, un paio",
+          "desc": "Gusci d'argilla di polvere grigia — coprono una ritirata che nessuno ricorda di aver fatto.",
+          "stock": "Solo un paio"
+        },
+        "wardCharm": {
+          "name": "Talismano di ferro",
+          "desc": "Un chiodo freddo di ferro meteorico al laccio — fortuna che puoi stringere quando il buio si avvicina.",
+          "stock": "L'ultimo che ha portato a nord"
+        }
+      }
+    },
+    "heroLevel": {
+      "badge": "Lv {n}",
+      "floater": "Livello {n}",
+      "a11y": "Eroe livello {n}"
     }
   },
   "missionPlanner": {
@@ -1221,7 +1302,8 @@
     },
     "stats": {
       "hp": "Salute",
-      "stamina": "Resistenza"
+      "stamina": "Resistenza",
+      "xpTitle": "{name} · {xp} PE"
     }
   },
   "questCheckpoint": {
@@ -1586,7 +1668,9 @@
       "scouted": "esplorato"
     },
     "item": {
-      "draftHorse": "Una cavalcatura per tutta la spedizione — dimezza il passo di ogni tratto."
+      "draftHorse": "Una cavalcatura per tutta la spedizione — dimezza il passo di ogni tratto.",
+      "healingDraught": "−10% di ferita a ogni check di tutti i membri.",
+      "luckyCoin": "+10% alla ricompensa della spedizione."
     },
     "coverage": "Copre"
   },

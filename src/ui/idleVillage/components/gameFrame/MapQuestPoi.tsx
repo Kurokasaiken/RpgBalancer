@@ -5,6 +5,8 @@ import PoiMatericV3_5, { poiMatericV3_5Styles } from '@/ui/idleVillage/component
 import type { PoiState, PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
 import { EXPIRING_BELOW, type QuestAvailability } from './questAvailability';
 import { usePoiTypeIcon } from './usePoiTypeIcon';
+import { questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
+import { poiSizePx, type PoiSizeClass } from './poiSigillo';
 
 /**
  * The session slice the marker actually consumes — structural so both the
@@ -34,6 +36,8 @@ export interface MapQuestPoiProps {
   availability?: QuestAvailability;
   /** Marker family (palette of the medallion): quest, job or event. Defaults to quest. */
   poiType?: PoiType;
+  /** Weight of the offer (`QuestPoi.tier`). Defaults to the tier authored on the quest POI with this activity id, else `normal`. */
+  tier?: NonNullable<QuestPoi['tier']>;
   /** True while the anchor layer keeps the marker mounted for its exit beat:
    *  it plays the reverse of the entrance (fade + shrink) and stops taking
    *  pointer input before unmounting. */
@@ -72,6 +76,8 @@ export interface MapQuestPoiView {
   deadlineWarn: boolean;
   /** Writing direction: a running quest fills clockwise, an expiring offer drains counter-clockwise. */
   direction: 'clockwise' | 'counterclockwise';
+  /** The run has ended and awaits the player (open the card, collect): the Sigillo pulses slowly until they act. */
+  done: boolean;
 }
 
 /**
@@ -95,10 +101,23 @@ export function mapQuestPoiView(
   questStatus: 'available' | 'in_progress' | 'completed' | 'failed',
   activityProgress: number,
   availability: QuestAvailability | undefined,
+  tier: NonNullable<QuestPoi['tier']> = 'normal',
 ): MapQuestPoiView {
   const deadlineState = questStatus === 'available' ? availability?.state : undefined;
   if (deadlineState === 'expired') {
-    return { state: 'expired', progress: 0, deadlineWarn: true, direction: 'counterclockwise' };
+    return { state: 'expired', progress: 0, deadlineWarn: true, direction: 'counterclockwise', done: false };
+  }
+  if (tier === 'main' && deadlineState != null) {
+    /* A main quest's deadline halo is full from the moment the offer appears and
+     * drains over the WHOLE window (poi_family_spec §Quest tier); the vermilion flag still
+     * lands below `EXPIRING_BELOW`, with no jump in the ring. */
+    return {
+      state: deadlineState === 'expiring' ? 'expiring' : 'assigned',
+      progress: availability?.progress ?? 0,
+      deadlineWarn: deadlineState === 'expiring',
+      direction: 'counterclockwise',
+      done: false,
+    };
   }
   if (deadlineState === 'expiring') {
     /* The expiring stretch re-normalises to a full ring: the flag lands at
@@ -109,6 +128,7 @@ export function mapQuestPoiView(
       progress: (availability?.progress ?? 0) / EXPIRING_BELOW,
       deadlineWarn: true,
       direction: 'counterclockwise',
+      done: false,
     };
   }
   return {
@@ -116,13 +136,25 @@ export function mapQuestPoiView(
     progress: questStatus === 'in_progress' ? activityProgress : questStatus === 'available' ? 0 : 1,
     deadlineWarn: false,
     direction: 'clockwise',
+    done: questStatus === 'completed' || questStatus === 'failed',
   };
 }
 
-export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, availability, poiType = 'quest', exiting = false }) => {
+/** Painted place glyphs (PLAN-058 T4.2): one per quest POI, keyed by activity id. 128 px master covers the ~24 px medallion centre at 2x. */
+const QUEST_GLYPH_URLS: Readonly<Record<string, string>> = {
+  'poi-goblin': '/assets/ui/poi/poi-goblin-camp-128.webp',
+  'poi-rovine': '/assets/ui/poi/poi-ruins-128.webp',
+};
+
+export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseSizePx, availability, poiType = 'quest', tier: tierProp, exiting = false }) => {
   const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId, decisionWaiting } = session;
   const { t } = useTranslation('idleVillage');
-  const iconUrl = usePoiTypeIcon(poiType);
+  const tier = tierProp ?? questPoiById(activity.id)?.tier ?? 'normal';
+  /* Size = weight of the stake: a main quest is drawn one size up (L), every other quest at M. */
+  const sizeClass: PoiSizeClass = tier === 'main' ? 'L' : 'M';
+  const sizePx = poiSizePx(baseSizePx, sizeClass);
+  const familyIconUrl = usePoiTypeIcon(poiType);
+  const iconUrl = QUEST_GLYPH_URLS[activity.id] ?? familyIconUrl;
   const { setNodeRef } = useDroppable({
     id: poiDropId,
     disabled: !canAcceptPoiDrop,
@@ -156,7 +188,7 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
 
   // While the quest is open the marker stays bare (its seal is the run's clock, unwritten until
   // embark); in the window's last stretch the seal itself becomes the warn countdown.
-  const view = mapQuestPoiView(questStatus, activityProgress, availability);
+  const view = mapQuestPoiView(questStatus, activityProgress, availability, tier);
   const { state, progress } = view;
   const expired = state === 'expired';
 
@@ -207,9 +239,9 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: 'var(--skin-status-unmet)',
+              background: 'var(--skin-poi-urgent)',
               border: '2px solid var(--skin-surface-base)',
-              boxShadow: '0 0 8px var(--skin-status-unmet)',
+              boxShadow: '0 0 8px var(--skin-poi-urgent)',
               animation: 'mqp-decision-pulse 1.6s ease-in-out infinite',
               pointerEvents: 'none',
               zIndex: 2,
@@ -218,11 +250,13 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx, avail
         )}
         <style>{`@keyframes mqp-decision-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }`}</style>
         <PoiMatericV3_5
+          sigillo
           type={poiType}
           iconUrl={iconUrl}
           state={state}
           progress={progress * sealWriteIn}
           timerDirection={view.direction}
+          pulse={view.done}
           size={sizePx}
           grounded
           isDragging={isDragActive && canAcceptPoiDrop}

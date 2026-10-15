@@ -1,0 +1,24 @@
+{
+  "signals": [
+    "«POI types» mostra solo 2 marker demo (job/event), nessun dorato",
+    "«Show quest» attivo (aria-pressed=true) ma 0 marker quest: offerte expired",
+    "getClock() → currentDay 86, availableUntilDay 60, dayLengthInTimeUnits 5 → window = 5 min reali",
+    "MapQuestPoi: expired → opacity 0 + pointerEvents none",
+    "Click su marker reale → quest-expedition-detail (funzionava già)"
+  ],
+  "causes": [
+    "(a) gate anchor quest su questShown solo — R-143 aveva tolto il quest da poiDemo",
+    "(b) finestra offerta 60 giorni bruciata in ~5 min dal clock compresso → expired su ogni save datato"
+  ],
+  "files": [
+    "src/pages/game-frame-pixi.tsx",
+    "src/balancing/config/idleVillage/quests/questPois.ts",
+    "src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx (lettura)",
+    "src/ui/idleVillage/quests/useQuestExpeditionSession.tsx (lettura)"
+  ],
+  "constraints": [
+    "R-143: marker quest mai esemplare finto — sotto poiDemo si monta l'offerta reale",
+    "expired gate resta per le offerte con finestra finita (future)",
+    "no hardcoded values → window in config questPois.ts"
+  ]
+}

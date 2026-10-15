@@ -34,6 +34,7 @@ const defaultExcludes = [
   '**/*.rtl.test.tsx',
   '**/*.integration.test.{ts,tsx}',
   'tests/**/*.spec.tsx',
+  'tests/**/*.spec.ts',
   'tests/villageSandbox-*.spec.ts',
   'tests/villageSandbox-*.spec.tsx',
   'tests/unit/localization/InteractionModeCopySync.test.ts',

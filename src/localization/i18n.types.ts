@@ -71,7 +71,7 @@ export default interface Resources {
       "designSystemColumn": "Design System /design-system",
       "designSystemFrame": "Design System",
       "kicker": "UI Audit",
-      "missingCount": "{{count}} missing items",
+      "missingCount": "{count} missing items",
       "missingSection": "Missing & Mocked Components",
       "title": "Design System vs Visual Fidelity",
       "visualFidelityColumn": "Visual Fidelity /visual-fidelity-lab",
@@ -80,9 +80,12 @@ export default interface Resources {
     "examples": {
       "characterGreeting": "{gender, select, male {Welcome, my lord} female {Welcome, my lady} other {Welcome, adventurer}}",
       "riskLevel": "{level, select, low {Low risk} medium {Medium risk} high {High risk} other {Unknown risk}}",
-      "swordCount": "{count, plural, one {one sword} other {{count} swords}}"
+      "swordCount": "{count, plural, one {one sword} other {# swords}}"
     },
     "language": "Language",
+    "interfaceSize": "Interface size",
+    "interfaceSizeAuto": "Auto",
+    "interfaceSizeAutoHint": "Auto ({percent}%)",
     "locale": {
       "ar": "العربية",
       "de": "Deutsch",
@@ -201,13 +204,13 @@ export default interface Resources {
     "astrolabeV5": {
       "auto": "Auto",
       "awaiting": "Awaiting the throw",
-      "axisReadout": "{{skill}}: {{stat}} against difficulty {{difficulty}} — {{relation}}",
+      "axisReadout": "{skill}: {stat} against difficulty {difficulty} — {relation}",
       "mute": "Mute",
       "relation_deficit": "below the threshold",
       "relation_even": "level with the threshold",
       "relation_margin": "above the threshold",
       "riskDead": "Dead",
-      "riskDeclared": "{{death}}% death · {{wound}}% wound",
+      "riskDeclared": "{death}% death · {wound}% wound",
       "riskHeld": "Unharmed",
       "riskNone": "None",
       "riskWounded": "Wounded",
@@ -224,7 +227,7 @@ export default interface Resources {
     },
     "astrolabeV63": {
       "check": "Check",
-      "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
+      "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
       "narrative": {
         "Atletica": {
           "almost": "Your foot slips, but you catch the edge.",
@@ -267,11 +270,11 @@ export default interface Resources {
         "fail": "Your grip slips.",
         "win": "The trial yields to your effort."
       },
-      "probability": "Success chance ~{{pct}}%",
-      "risk": "Wound {{wound}}% · Death {{dead}}%",
+      "probability": "Success chance ~{pct}%",
+      "risk": "Wound {wound}% · Death {dead}%",
       "riskDead": "Fallen",
       "riskWounded": "Wounded",
-      "statVsDc": "{{stat}} vs difficulty {{difficulty}}",
+      "statVsDc": "{stat} vs difficulty {difficulty}",
       "verdict": {
         "almost": "BY A BREATH",
         "bigwin": "TRIUMPH",
@@ -282,7 +285,7 @@ export default interface Resources {
     },
     "astrolabeV64": {
       "check": "Check",
-      "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
+      "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
       "narrative": {
         "Atletica": {
           "almost": "Your foot slips, but you catch the edge.",
@@ -325,11 +328,11 @@ export default interface Resources {
         "fail": "Your grip slips.",
         "win": "The trial yields to your effort."
       },
-      "probability": "Success chance ~{{pct}}%",
-      "risk": "Wound {{wound}}% · Death {{dead}}%",
+      "probability": "Success chance ~{pct}%",
+      "risk": "Wound {wound}% · Death {dead}%",
       "riskDead": "Fallen",
       "riskWounded": "Wounded",
-      "statVsDc": "{{stat}} vs difficulty {{difficulty}}",
+      "statVsDc": "{stat} vs difficulty {difficulty}",
       "verdict": {
         "almost": "BY A BREATH",
         "bigwin": "TRIUMPH",
@@ -346,7 +349,7 @@ export default interface Resources {
       "addSkill": "Add granted skill",
       "balance": "Balance",
       "balanceBar": "Budget usage",
-      "balanced": "Within budget ({{balance}} points free)",
+      "balanced": "Within budget ({balance} points free)",
       "budget": "Budget",
       "cost": "Cost",
       "defaultSaved": "Default configuration saved",
@@ -361,7 +364,7 @@ export default interface Resources {
       "name": "Name",
       "namePlaceholder": "New equipment",
       "new": "New",
-      "overBudget": "Over budget by {{balance}} points",
+      "overBudget": "Over budget by {balance} points",
       "power": "Power",
       "preview": "Preview",
       "rarity": {
@@ -548,10 +551,10 @@ export default interface Resources {
       },
       "byMember": "By member",
       "cause": {
-        "cover": "{{who}}'s cover",
+        "cover": "{who}'s cover",
         "emptyPenalty": "Empty slots",
-        "slot": "{{slot}} ({{who}})",
-        "stat": "{{who}} · {{stat}}"
+        "slot": "{slot} ({who})",
+        "stat": "{who} · {stat}"
       },
       "company": "The company",
       "death": "Death",
@@ -564,7 +567,7 @@ export default interface Resources {
       },
       "eyebrow": "Expedition plan",
       "haloHint": "Outer ring: death · inner ring: injury",
-      "hours": "{{count}} h",
+      "hours": "{count} h",
       "hoursShort": "h",
       "hp": "HP",
       "ifEmpty": "If left empty:",
@@ -615,13 +618,13 @@ export default interface Resources {
       "phases": "By phase",
       "pickFromRoster": "Pick someone from the available",
       "provisions": "Provisions",
-      "remove": "Remove {{name}}",
+      "remove": "Remove {name}",
       "required": "required",
       "reset": "Reset",
       "reward": "Expected reward",
       "route": "The road",
       "rule": "Success = passing at least half of the trials",
-      "stage": "Trial {{n}}",
+      "stage": "Trial {n}",
       "stat": {
         "agility": "Agility",
         "endurance": "Endurance",
@@ -791,7 +794,7 @@ export default interface Resources {
         "injured": "Injured"
       },
       "retreat": "Retreat",
-      "summary": "Phase {{played}} of {{total}} is behind you.",
+      "summary": "Phase {played} of {total} is behind you.",
       "title": "Checkpoint"
     },
     "questChronicle": {

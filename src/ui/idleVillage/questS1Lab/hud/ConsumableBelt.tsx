@@ -31,6 +31,7 @@ export const ConsumableBelt: React.FC<{
       data-hud-controls=""
       role="toolbar"
       aria-label={t('questS1Lab.belt.label')}
+      data-testid="quest-consumable-belt"
       className="mb-2 flex flex-wrap items-center gap-1.5 pb-1"
     >
       <span
@@ -50,6 +51,7 @@ export const ConsumableBelt: React.FC<{
           <button
             key={i.flag}
             type="button"
+            data-testid={`belt-arm-${i.flag}`}
             onClick={onToggleArmed}
             aria-pressed={armed}
             title={`${t('questS1Lab.belt.armTitle')} — ${t(i.descKey)}`}
@@ -61,7 +63,7 @@ export const ConsumableBelt: React.FC<{
         );
       })}
       {hasPozione && (
-        <button type="button" onClick={onDrinkPotion} title={t('questS1Lab.stash.desc.potion')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+        <button type="button" data-testid="belt-potion" onClick={onDrinkPotion} title={t('questS1Lab.stash.desc.potion')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
           {(() => {
             const Icon = getStatIconComponent(QUEST_STASH.items.find((i) => i.flag === 'hasPozione')?.icon ?? '');
             return Icon ? <Icon aria-hidden /> : null;
@@ -70,7 +72,7 @@ export const ConsumableBelt: React.FC<{
         </button>
       )}
       {hasHealing && (
-        <button type="button" onClick={onUseHealing} title={t('questS1Lab.stash.desc.healing')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+        <button type="button" data-testid="belt-healing" onClick={onUseHealing} title={t('questS1Lab.stash.desc.healing')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
           {(() => {
             const Icon = getStatIconComponent(QUEST_STASH.items.find((i) => i.flag === 'hasHealing')?.icon ?? '');
             return Icon ? <Icon aria-hidden /> : null;

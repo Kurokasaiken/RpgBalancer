@@ -3,6 +3,7 @@ import PoiMatericV3_5, { poiMatericV3_5Styles } from '@/ui/idleVillage/component
 import { usePoiTypeIcon } from './usePoiTypeIcon';
 import { ENTER_MS, EXPIRE_FADE_MS } from './MapQuestPoi';
 import type { PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
+import { poiSizePx, type PoiSizeClass } from './poiSigillo';
 
 /**
  * A POI of any type resting on the map with no session behind it: a Director instrument to judge how each
@@ -10,7 +11,9 @@ import type { PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
  * It reads as a freshly placed marker — the seal is empty (`assigned` at 0, never `available`/`new`,
  * which the family draws as a fully written circle) and it eases in like a real quest POI does.
  */
-export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number; exiting?: boolean }> = ({ type, sizePx, exiting = false }) => {
+/** `magnitude` is the weight of the stake (S/M/L, threats only): it scales the authored base size. */
+export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number; magnitude?: PoiSizeClass; exiting?: boolean }> = ({ type, sizePx: baseSizePx, magnitude = 'M', exiting = false }) => {
+  const sizePx = poiSizePx(baseSizePx, magnitude);
   const iconUrl = usePoiTypeIcon(type);
   const [entered, setEntered] = useState(false);
   useEffect(() => {
@@ -28,7 +31,7 @@ export const MapDemoPoi: React.FC<{ type: PoiType; sizePx: number; exiting?: boo
     }}
   >
     <style>{poiMatericV3_5Styles}</style>
-    <PoiMatericV3_5 type={type} state="assigned" progress={0} timerDirection="clockwise" size={sizePx} grounded iconUrl={iconUrl} />
+    <PoiMatericV3_5 sigillo type={type} state="assigned" progress={0} timerDirection="clockwise" size={sizePx} grounded iconUrl={iconUrl} />
   </div>
   );
 };

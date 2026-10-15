@@ -603,6 +603,41 @@
       "status": "pending",
       "timestamp": "2026-07-24T08:28:31.001910+00:00",
       "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-10-001.md"
+    },
+    {
+      "task_id": "PLAN-032-SP1",
+      "status": "completed",
+      "timestamp": "2026-10-14T13:10:00.000000+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/PLAN-032-SP1.md",
+      "completed_at": "2026-10-14T13:55:00.000000+00:00"
+    },
+    {
+      "task_id": "PLAN-032-SP2",
+      "status": "completed",
+      "timestamp": "2026-10-14T13:10:00.000000+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/PLAN-032-SP2.md",
+      "completed_at": "2026-10-14T14:50:00.000000+00:00"
+    },
+    {
+      "task_id": "PLAN-032-SP3",
+      "status": "completed",
+      "timestamp": "2026-10-14T15:00:00.000000+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/PLAN-032-SP3.md",
+      "completed_at": "2026-10-14T15:15:00.000000+00:00"
+    },
+    {
+      "task_id": "PLAN-032-SP5",
+      "status": "completed",
+      "timestamp": "2026-10-14T16:10:00.000000+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/PLAN-032-SP5.md",
+      "completed_at": "2026-10-14T16:20:00.000000+00:00"
+    },
+    {
+      "task_id": "PLAN-032-SP4",
+      "status": "completed",
+      "timestamp": "2026-10-14T18:15:00.000000+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/PLAN-032-SP4.md",
+      "completed_at": "2026-10-14T18:15:00.000000+00:00"
     }
   ],
   "last_updated": "2026-07-24T08:28:31.002411+00:00"
