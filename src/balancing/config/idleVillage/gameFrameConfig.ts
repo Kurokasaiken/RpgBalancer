@@ -302,6 +302,27 @@ const gameFrameQuestWindowSchema = z.object({
    *  unless the player arms it (R-106 playtest: the bonus vanished unasked). The lab
    *  keeps its own default (armed, Director D1) — divergence flagged in PLAN-025. */
   consumablesArmedByDefault: z.boolean(),
+  /** R-199: the optional companion columns (party roster + belt left,
+   *  chronicle right) start closed — the player opens them from the header
+   *  icons. Overrides the R-196 «all visible» default at the Director's call. */
+  companionsDefaultOpen: z.boolean(),
+  /** R-199: the per-check options popover on the window header. */
+  skillCheck: z.object({
+    /** Mount the options control at all. */
+    optionsPanel: z.boolean(),
+    /** Offer «skip the whole check» — jump straight to the resolved verdict. */
+    allowSkipCheck: z.boolean(),
+    /** Offer «skip the opening animation» — the dice still play out. */
+    allowSkipIntro: z.boolean(),
+  }),
+  /** R-199: the end-of-run report is its own floating, non-modal plaque —
+   *  staged reveal, skippable — outside the theatre's DOM. */
+  rewardPopup: z.object({
+    /** Popup width, px. */
+    widthPx: z.number().positive(),
+    /** Wall-clock between reveal stages (banner → sections → loot). */
+    stageMs: z.number().int().positive(),
+  }),
 });
 
 /** Stacking order of the shell's layers (the map is 0). One list instead of numbers sprinkled in components. */
@@ -596,19 +617,24 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   hud: { material: 'lacquer' },
   questDetail: { widthPx: 680, gapPx: 8, topPx: 100, ledgerWidthPx: 300 },
   questWindow: {
-    /* R-196: the running quest reads as a wide cinematic shell — the theatre
-     * is nearly scope ratio and two companion columns flank it (party roster
-     * + belt left, chronicle right), all inside one drag union. */
-    widthPx: 640,
-    topPx: 88,
-    theaterAspect: 2.9,
-    durationDays: 2,
+    /* R-199: wider and more cinematic — an ~820px shell with a near-scope
+     * theatre (2.4:1 → ~340px of painted scene) and companions that start
+     * closed, opened on demand from the header icons. */
+    widthPx: 820,
+    topPx: 72,
+    theaterAspect: 2.4,
+    /* R-199: the expedition lasts ~5 days on the game clock — the phase bar
+     * fills over this span and later frontiers stay locked until due. */
+    durationDays: 5,
     tooltipLines: 6,
     sidePanelWidthPx: 260,
     sidePanelGapPx: 8,
     minSidePanelWidthPx: 180,
     edgeInsetPx: 18,
     consumablesArmedByDefault: false,
+    companionsDefaultOpen: false,
+    skillCheck: { optionsPanel: true, allowSkipCheck: true, allowSkipIntro: true },
+    rewardPopup: { widthPx: 400, stageMs: 1400 },
     beats: { sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapMs: 1800, maxQueue: 24 },
   },
   zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12, boot: 40 },
