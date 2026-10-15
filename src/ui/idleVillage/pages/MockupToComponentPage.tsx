@@ -9,7 +9,7 @@
 import React, { useState, useMemo } from 'react';
 import { GoblinEventModalV17 } from '@/ui/idleVillage/trailer/GoblinEventModalV17';
 
-const REFERENCE = '/mockups/external/goblin-event-lab/goblin-invasion-mockup.png';
+const REFERENCE = '/assets/ui/goblin-invasion/goblin-invasion-mockup.png';
 
 const ITERATIONS = [
   { id: 'goblin-event-modal-v17-001', version: 1, label: 'V17.1 — skeleton + overlay' },
