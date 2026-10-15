@@ -1567,3 +1567,32 @@ La mappa mondo dipinta (`/game-frame-pixi`, pipeline PixiJS/WebGL2) guadagna tre
 *Still unresolved*
 - Se serve anche un guard meccanico per le trappole verificabili da codice (es. test "terra mai sotto HUD").
 - Estensione del trigger a skill non-mw (`agent-execution-mandate`, `idle-village-task`) dopo prova d'uso.
+
+---
+
+## v30 — Vista Villaggio (`Village` view mode) e Menu Edifici su `/game`
+
+**Status:** `FROZEN`
+**Date:** 2026-10-15
+**Authorized by:** Fausto
+**Reason:** avallo esplicito via "C / mock / si" + "pianifica" sulla candidata v30 presentata in sessione explorer (R-194)
+
+### User-stated
+1. **Superficie in `/game` con `villaggio.png`:** implementare su `/game` la schermata del Villaggio e degli edifici usando `src/assets/mood/villaggio.png` come immagine principale.
+2. **Rimozione watermark Gemini:** eliminare il simbolo a stella di Gemini in basso a destra da `villaggio.png`.
+3. **Ingressi alla vista Villaggio (Direzione C):** la schermata si apre come **vista a tutta area dentro `/game`** (`activeNavId = 'village'`) sia cliccando sulla **regione `village`** della mappa del mondo, sia cliccando sul pulsante **`Village`** nella barra di navigazione in basso (`plinth`). Cliccando **`Map`** nella nav bar si torna alla mappa del continente.
+4. **Icon-first e poco testo:** usare **icone e pochissimo testo** per gli edifici, delegando i dettagli (cosa fanno, livello, costi e valori di upgrade) al **tooltip sull'icona**.
+5. **Rimozione del Warehouse dalla mappa:** il Magazzino (`Warehouse`, `building-stash`) **non** deve più apparire come icona/marker sulla mappa del continente; vive dentro la schermata del Villaggio (insieme all'accesso a `VillageStashPanel` e a `MerchantPanel`).
+6. **Catalogo edifici e upgrade mock:** includere **Taglialegna, Cava/Miniera, Farm/Orto, Warehouse/Magazzino, Palizzata, Torre d'Osservazione** più gli altri edifici di dominio della documentazione (**Locanda, Fucina, Infermeria, Baraccamento, Emporio/Mercato**), completi di livelli, cosa fanno e valori di upgrade. Gli upgrade/costruzioni sono **mock-backed** (sola visualizzazione/controllo inerte come `PLAN-032 SP-2/SP-3`, nessuna mutazione reale dello store economico).
+
+### AI inference
+1. **Persistenza del canvas Pixi nello switch `Map` ↔ `Village`:** quando `activeNavId === 'village'`, la vista Villaggio copre lo slot mappa dentro `GameFrame` lasciando visibili le lastre HUD fisse (Risorse, Orologio/Giorno, Menu, Nav Plinth, Roster/Pannelli se aperti), mentre `PixiWorldMap` resta montato sotto per evitare il teardown/ricreazione del contesto WebGL2 (`PLAN-031` perf gate).
+2. **Tooltip Hover-Pinnable (contratto `hud_component_guide.md` §5b.7, R-172):** poiché il tooltip sull'icona dell'edificio contiene valori di upgrade e, per Warehouse/Emporio, l'azione per aprire `VillageStashPanel` / `MerchantPanel`, il tooltip rispetta il contratto *hover-pinnable* del progetto (140ms grace al passaggio del mouse, pulsante pin e chiusura `X`, `SkinScope` + `data-hud-controls` sul root per trappola **T-03**).
+3. **Inpainting locale + WebP per `villaggio.png`:** il watermark Gemini in basso a destra viene rimosso tramite patch-healing locale dei soli pixel della losanga (senza croppare i bordi dell'immagine 21:9), verificato a occhio nel browser reale (**T-04**).
+4. **Aggiornamento del contratto `PLAN-032 SP-2/SP-3`:** il marker `building-stash` viene rimosso da `anchors` in `game-frame-pixi.tsx` (e i relativi test di SP-2 vengono aggiornati di conseguenza); la scorciatoia `v` e il menu Pannelli continuano a funzionare.
+5. **Invarianti tecnici:** tutti i dati degli edifici (10-11 edifici, livelli, costi in `wood/iron/gold/food`, valori effetto, coordinate pin su `villaggio.png`) vivono in un modulo config validato con **Zod** (`villageBuildingsConfig.ts`, `deepFreeze`); tutte le stringhe usano `react-i18next` (`en` + `it-IT`) con sintassi ICU `{var}` (**T-11**).
+
+### Still unresolved
+- **Tasto rapido da tastiera:** se il tasto `v` debba aprire direttamente la vista `Village` o restare sul `VillageStashPanel` (default nel piano: `v` resta su `villageStash` nel registry `HUD_PANELS` per non rompere `PLAN-032-SP-2`, mentre `Esc` nella vista `Village` senza pannelli aperti riporta a `Map`).
+- **Layout delle icone su `villaggio.png`:** calibrazione visiva a schermo in `1440×900` e `1280×800`.
+
