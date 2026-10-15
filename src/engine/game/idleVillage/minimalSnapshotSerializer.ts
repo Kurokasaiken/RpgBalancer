@@ -61,6 +61,11 @@ const MinimalSnapshotSchema = z.object({
       injuredUntilTick: z.number().optional(),
       /** Hero flag — previously dropped on hydrate; now round-tripped. */
       isHero: z.boolean().optional(),
+      /** R-139 expedition lock copy — was stripped by this schema on hydrate. */
+      isOnExpedition: z.boolean().optional(),
+      /** R-183: accumulated quest XP of the resident (no level curve yet —
+       *  `PROGRESSION.md` §3 OPEN). */
+      xp: z.number().optional(),
     })),
     activeActivities: z.array(z.object({
       activityId: z.string(),
@@ -120,11 +125,21 @@ function createSnapshotMetadata(gameState: MinimalGameState): SnapshotMetadata {
  * @returns Serialized snapshot with metadata
  */
 export function serializeSnapshot(gameState: MinimalGameState): MinimalSnapshot {
-  const metadata = createSnapshotMetadata(gameState);
+  /* R-183: checksum the data AS THE LOADER WILL SEE IT. `deserializeSnapshot`
+   * re-hashes the zod-parsed data, and zod both reorders keys (schema order)
+   * and strips unknown ones — hashing the raw input made every save whose
+   * key order/shape differed from the schema (e.g. a resident with
+   * `isOnExpedition` set, i.e. after any expedition) fail the integrity
+   * check on reload, silently discarding the whole save. */
+  const normalized = MinimalSnapshotSchema.shape.data.safeParse(gameState);
+  if (!normalized.success) {
+    throw new Error(`Snapshot validation failed: ${normalized.error.message}`);
+  }
+  const metadata = createSnapshotMetadata(normalized.data);
 
   const snapshot: MinimalSnapshot = {
     metadata,
-    data: gameState,
+    data: normalized.data,
   };
 
   // Validate the snapshot against the schema

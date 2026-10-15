@@ -15,7 +15,7 @@
     "kicker": "UI Audit",
     "title": "Design System vs Visual Fidelity",
     "backToHub": "Back to Test Hub",
-    "missingCount": "{{count}} missing items",
+    "missingCount": "{count} missing items",
     "designSystemColumn": "Design System /design-system",
     "designSystemFrame": "Design System",
     "visualFidelityColumn": "Visual Fidelity /visual-fidelity-lab",
@@ -23,7 +23,7 @@
     "missingSection": "Missing & Mocked Components"
   },
   "examples": {
-    "swordCount": "{count, plural, one {one sword} other {{count} swords}}",
+    "swordCount": "{count, plural, one {one sword} other {# swords}}",
     "riskLevel": "{level, select, low {Low risk} medium {Medium risk} high {High risk} other {Unknown risk}}",
     "characterGreeting": "{gender, select, male {Welcome, my lord} female {Welcome, my lady} other {Welcome, adventurer}}"
   }

@@ -30,9 +30,11 @@ import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import type { QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
+import { QUEST_HALO_RENDER_MS, QUEST_HALO_STEPS } from '@/balancing/config/idleVillage/quests/questPois';
+import { useThrottledValue } from '@/ui/idleVillage/hooks/useThrottledValue';
 import { QUEST_PLANNING } from '@/balancing/config/idleVillage/quests/questPlanning';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
-import { defaultQuestItems } from '@/balancing/config/idleVillage/quests/questItems';
+import { defaultQuestItems, toEngineFlag } from '@/balancing/config/idleVillage/quests/questItems';
 import { useMinimalGameplayWithIdleVillageConfig, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
@@ -53,7 +55,8 @@ import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { availableOptions } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestId, QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestRunApi } from '@/ui/idleVillage/questS1Lab/useQuestRun';
-import { buildExpeditionParty, isExpeditionItem, loadoutDuration } from './questExpedition';
+import { buildExpeditionParty, isExpeditionItem, loadoutDuration, planSlotSwap } from './questExpedition';
+import type { SlotTokenDragData } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { settleRun, runIdOf } from './questSettlement';
 import { releaseLoadout, reserveLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
 import { QuestExpeditionDetail } from './QuestExpeditionDetail';
@@ -114,6 +117,8 @@ export function useQuestExpeditionSession({
   const [assignments, setAssignments] = useState<Record<string, string | null>>({});
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
+  /** R-183: the slot whose token is being dragged onto another slot. */
+  const [swapFromSlotId, setSwapFromSlotId] = useState<string | null>(null);
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
   const [estimate, setEstimate] = useState<{ key: string; value: PartyEstimate } | null>(null);
   /** Last completed estimate of a DIFFERENT configuration — the delta
@@ -249,6 +254,29 @@ export function useQuestExpeditionSession({
   const assignedIds = useMemo(
     () => Object.values(assignments).filter((v): v is string => Boolean(v)),
     [assignments],
+  );
+
+  /** Same gate a swap commits through (`planSlotSwap`) — shared by the drop
+   *  verdict and the bloom the rack paints while the token is in the air. */
+  const swapAllowed = useCallback(
+    (fromSlotId: string, toSlotId: string) =>
+      planSlotSwap(assignments, fromSlotId, toSlotId, (residentId, slotId) => eligibilityFor(residentId, slotId).eligible) !== null,
+    [assignments, eligibilityFor],
+  );
+
+  /** The rack's view: during a swap drag every other slot blooms valid /
+   *  invalid by the swap gate (the controller marks occupied slots `locked`,
+   *  which says nothing about whether a trade would be accepted). */
+  const rackSlots = useMemo(
+    () =>
+      swapFromSlotId
+        ? controller.slots.map((slot) =>
+            slot.id === swapFromSlotId
+              ? slot
+              : { ...slot, dropState: swapAllowed(swapFromSlotId, slot.id) ? ('valid' as const) : ('invalid' as const) },
+          )
+        : controller.slots,
+    [swapFromSlotId, controller.slots, swapAllowed],
   );
 
   /** First slot that would accept the resident — drives the roster's
@@ -615,11 +643,24 @@ export function useQuestExpeditionSession({
       }
       return;
     }
+    if (selectedItemIds.length === 0) {
+      /* Pack the canonical default bag too — a staged run should look like
+       *  a real packed expedition, not an empty-handed one. The next pass
+       *  re-runs with the loadout applied, then crosses `send()`. */
+      const pack = QUEST_STASH.defaultLoadout
+        .map((flag) => EXPEDITION_ITEMS.find((it) => toEngineFlag(it.id) === flag)?.id)
+        .filter((id): id is string => Boolean(id))
+        .slice(0, QUEST_STASH.bagSlots);
+      if (pack.length > 0) {
+        setSelectedItemIds(pack);
+        return;
+      }
+    }
     if (canSend) {
       demoLaunchPending.current = false;
       send();
     }
-  }, [resolved, anyRunActive, slotBlueprints, assignments, residentsById, assignedIds, eligibilityFor, handleAssign, canSend, send]);
+  }, [resolved, anyRunActive, slotBlueprints, assignments, residentsById, assignedIds, eligibilityFor, handleAssign, canSend, send, selectedItemIds]);
 
   /* ------------------------------------------------------------------ */
   /* Drag & drop — same flight contract as the mock session: the verdict  */
@@ -629,13 +670,47 @@ export function useQuestExpeditionSession({
   /* ------------------------------------------------------------------ */
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    setDraggingResidentId(event.active.id as string);
-  }, []);
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const data = event.active.data.current as Partial<SlotTokenDragData> | undefined;
+      if (data?.type === 'slot-token') {
+        /* A slotted token, not a roster card: only the owning session arms
+         *  the swap preview — a roster resident drag stays untouched. */
+        if (data.slotId && slotBlueprints.some((s) => s.id === data.slotId)) setSwapFromSlotId(data.slotId);
+        return;
+      }
+      setDraggingResidentId(event.active.id as string);
+    },
+    [slotBlueprints],
+  );
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent): RosterDropVerdict => {
       setDraggingResidentId(null);
+      const tokenData = event.active.data.current as Partial<SlotTokenDragData> | undefined;
+      if (tokenData?.type === 'slot-token') {
+        /* R-183 slot↔slot swap: the resident never leaves the rack — the
+         *  drop moves it to an empty slot or trades places with the occupant,
+         *  each landing re-checked by the quest eligibility gate. */
+        const fromSlotId = tokenData.slotId;
+        if (!fromSlotId || !slotBlueprints.some((s) => s.id === fromSlotId)) return; // another session's token
+        setSwapFromSlotId(null);
+        const toSlotId = event.over?.id as string | undefined;
+        if (!toSlotId || !isDetailOpen || run) return false;
+        if (toSlotId === fromSlotId) return true;
+        if (!slotBlueprints.some((s) => s.id === toSlotId)) return false;
+        const next = planSlotSwap(assignments, fromSlotId, toSlotId, (rid, sid) => eligibilityFor(rid, sid).eligible);
+        if (!next) return false;
+        setAssignments(next);
+        trackTelemetryEvent('quest_expedition_swap', {
+          poiId: poi.id,
+          fromSlotId,
+          toSlotId,
+          residentId: assignments[fromSlotId] ?? null,
+          displacedId: assignments[toSlotId] ?? null,
+        });
+        return true;
+      }
       const residentId = event.active.id as string;
       const overId = event.over?.id as string | undefined;
       if (!overId) return;
@@ -650,7 +725,7 @@ export function useQuestExpeditionSession({
       const element = document.querySelector(`[data-slot-id="${slot.id}"]`);
       return { flightToSlot: { slotId: slot.id, element } };
     },
-    [controller.slots, isDetailOpen, run, residentsById, assignedIds, eligibilityFor],
+    [controller.slots, isDetailOpen, run, residentsById, assignedIds, eligibilityFor, slotBlueprints, assignments, poi.id],
   );
 
   const handleFlightComplete = useCallback(
@@ -712,6 +787,16 @@ export function useQuestExpeditionSession({
     () => (run ? questHaloProgress(run, poi, currentTick) : null),
     [run, poi, currentTick],
   );
+  /* PLAN-034 T-005/RC-1: the halo feeds the 1000-line medallion subtree. The
+   * clock ticks faster than the seal can be drawn (~50 attribute writes per
+   * render — the `map-quest-poi` storm of the T-002 trace), so `poiView` samples
+   * the halo at QUEST_HALO_RENDER_MS: the marker subtree stays referentially
+   * stable between samples and React bails out of it on the in-between ticks. */
+  const haloView = useThrottledValue(halo, QUEST_HALO_RENDER_MS);
+  /* …and quantised to the seal's own letter grid (QUEST_HALO_STEPS): steps the
+   * rim cannot show are never rendered. */
+  const haloFraction = Math.round((haloView?.fraction ?? 0) * QUEST_HALO_STEPS) / QUEST_HALO_STEPS;
+  const haloStatus = haloView?.status ?? null;
 
   const questStatus: 'available' | 'in_progress' | 'completed' | 'failed' = !run
     ? 'available'
@@ -721,24 +806,34 @@ export function useQuestExpeditionSession({
         : 'failed'
       : 'in_progress';
 
+  /* `gameplay` is the whole store — a new identity on every tick — while the
+   * marker contract only reads `state.isPaused` (MapQuestPoiSessionShape).
+   * A slim, referentially-stable view keeps it from breaking `poiView`'s
+   * memo on every clock update (PLAN-034 T-005). */
+  const poiGameplay = useMemo(
+    () => ({ state: { isPaused: gameplay.state?.isPaused ?? false } }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gameplay.state?.isPaused],
+  );
+
   const poiView = useMemo(
     () => ({
       activity: { id: poi.id, label: scenario?.title ?? poi.id },
       questStatus,
-      activityProgress: halo?.fraction ?? 0,
+      activityProgress: haloFraction,
       /* No drop-on-POI for the real path: the detail's slot rack is the
        * only landing zone (T-1 trusted contract). */
       poiDropId: `expedition-poi-drop-${poi.id}`,
       canAcceptPoiDrop: false,
       handlePoiClick,
       draggingResidentId,
-      gameplay,
-      haloStatus: halo?.status ?? null,
+      gameplay: poiGameplay,
+      haloStatus,
       /* D-H-4 badge: the frontier sits on a player-owned node — «the
        *  expedition waits for you», independent of halo fill. */
       decisionWaiting: Boolean(run && !run.ended && run.frontier.status === 'waiting'),
     }),
-    [poi.id, scenario?.title, questStatus, halo, handlePoiClick, draggingResidentId, gameplay],
+    [poi.id, scenario?.title, questStatus, haloFraction, haloStatus, handlePoiClick, draggingResidentId, poiGameplay],
   );
 
   /* ------------------------------------------------------------------ */
@@ -771,7 +866,7 @@ export function useQuestExpeditionSession({
           scenario={scenario}
           resolved={resolved}
           resolvePending={resolvePending}
-          slots={controller.slots}
+          slots={rackSlots}
           estimate={estimate?.key === estimateKey ? estimate.value : 'computing'}
           forecastDelta={forecastDelta}
           intelHints={intelHints}
@@ -872,6 +967,8 @@ export function useQuestExpeditionSession({
             isDead: Boolean(r.isDead),
             isInjured: Boolean(r.isInjured),
             injuredUntilTick: r.injuredUntilTick ?? null,
+            /* R-183: quest XP credited to the resident by settlement. */
+            xp: r.xp ?? 0,
           })),
         };
       },
@@ -907,7 +1004,11 @@ export function useQuestExpeditionSession({
     overlays,
     gameplay,
     draggingResidentId,
-    setDraggingResidentId,
+    /** Drag cancel resets both drag kinds (roster card and slot token). */
+    setDraggingResidentId: (id: string | null) => {
+      setDraggingResidentId(id);
+      if (id === null) setSwapFromSlotId(null);
+    },
     sensors,
     handleDragStart,
     handleDragEnd,

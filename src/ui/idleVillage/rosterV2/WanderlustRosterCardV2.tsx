@@ -43,6 +43,8 @@ export interface WanderlustRosterCardV2Props {
   compact?: boolean;
   /** Compact strips only: the resident's state, shown as a short translated tag. */
   statusKind?: RosterStatusKind;
+  /** R-183: quest XP accumulated by the resident — surfaced in the name tooltip. */
+  xp?: number;
 }
 
 export type RosterStatusKind = 'active' | 'injured' | 'dead' | 'exhausted' | 'away' | 'assigned';
@@ -77,7 +79,6 @@ const FONT = {
 
 const ENGRAVE = {
   thin: '0 1px 2px rgba(0,0,0,0.7)',
-  faint: '0 1px 1px rgba(0,0,0,0.5)',
 } as const;
 
 const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
@@ -101,9 +102,11 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
   onPointerDown,
   compact = false,
   statusKind,
+  xp,
 }) => {
   const { t } = useTranslation('idleVillage');
   const [isHovered, setIsHovered] = useState(false);
+  const nameTitle = xp ? t('roster.stats.xpTitle', { name: label, xp }) : label;
   const { attributes, listeners, setNodeRef, isDragging: dndIsDragging } = useDraggable({
     id: workerId,
     disabled: disabled || !isInteractive,
@@ -372,12 +375,12 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
         style={{
           ...cardStyle,
           gridTemplateColumns: '22px minmax(0, 1fr) 116px',
-          gap: '8px',
-          padding: '4px 8px',
-          borderRadius: '8px',
+          gap: 'var(--skin-hud-row-column-gap)',
+          padding: 'var(--skin-hud-row-padding)',
+          borderRadius: 'var(--skin-hud-row-radius)',
           // A thin gold filet makes each strip read as a separate, graspable object
           // on the dark panel; it brightens on hover as the drag affordance.
-          border: `1px solid ${isHovered ? 'rgba(223,184,87,0.42)' : 'rgba(223,184,87,0.16)'}`,
+          border: `1px solid ${isHovered ? 'var(--skin-hud-row-filet-hover)' : 'var(--skin-hud-row-filet)'}`,
           boxShadow: cardBoxShadow,
           transition: 'box-shadow 200ms ease, opacity 200ms ease, border-color 200ms ease',
         }}
@@ -402,16 +405,16 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
           size={22}
           isHero={isHero}
         />
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--skin-hud-inline-gap)', minWidth: 0 }}>
           <span
-            title={label}
+            title={nameTitle}
             style={{
               fontFamily: FONT.display,
-              fontSize: '13px',
-              fontWeight: 700,
-              letterSpacing: '0.02em',
+              fontSize: 'var(--skin-hud-name-size)',
+              fontWeight: 'var(--skin-hud-name-weight)',
+              letterSpacing: 'var(--skin-hud-name-tracking)',
               color: COLOR.parchment,
-              textShadow: ENGRAVE.faint,
+              textShadow: 'var(--skin-hud-engrave)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -423,9 +426,9 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
             <span
               style={{
                 fontFamily: FONT.sans,
-                fontSize: '12px',
-                fontWeight: 600,
-                letterSpacing: '0.06em',
+                fontSize: 'var(--skin-hud-caps-size)',
+                fontWeight: 'var(--skin-hud-caps-weight)',
+                letterSpacing: 'var(--skin-hud-caps-tracking)',
                 textTransform: 'uppercase',
                 color: statusTone,
                 whiteSpace: 'nowrap',
@@ -436,7 +439,7 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
             </span>
           )}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-bar-gap)' }}>
           <div title={`${t('roster.stats.hp')} ${hp}/${maxHp}`}>
             <WanderlustStatBar label="HP" value={hp} maxValue={maxHp} variant="hp" size="xs" hideLabel />
           </div>
@@ -487,7 +490,7 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
 
       {/* Identity section */}
       <div style={identityStyle}>
-        <div style={nameStyle}>{label}</div>
+        <div style={nameStyle} title={nameTitle}>{label}</div>
         {subtitle && (
           <div style={roleStyle}>
             <span style={dotStyle} />

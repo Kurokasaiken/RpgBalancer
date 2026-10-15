@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Menu } from 'lucide-react';
+import { EngravedIcon } from './engravedIcons';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { useLocalization } from '@/hooks/useLocalization';
 import type { SupportedLocale } from '@/localization/LocaleConfig';
 import { COMPARABLE_SKIN_IDS } from '@/ui/idleVillage/skins/resolveInitialSkin';
 import { getSkinPresetConfig, type SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
+import { HUD_SCALE_MODES, type HudScaleControl } from './hudScale';
 import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
 
 /** Live skin switch surfaced inside the menu (the page owns the preset state). */
@@ -23,6 +24,8 @@ export interface HudGameMenuProps {
   onSaveNow?: () => Promise<boolean> | boolean;
   /** Live skin selector; the Options section is omitted without it. */
   skin?: HudSkinControl;
+  /** Interface size (desktop app only); the row is omitted without it. */
+  scale?: HudScaleControl;
   /** Offer the dev-only panels (Director, Tuning). Off in a production build. */
   includeDev?: boolean;
 }
@@ -43,7 +46,7 @@ const MENU_LOCALES: readonly SupportedLocale[] = ['en', 'it-IT'];
  * today (panel toggles, manual save, language and skin choice) plus the disabled
  * entries (Load, Options, Quit) reserved for their future screens.
  */
-export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, includeDev = false }: HudGameMenuProps) {
+export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, scale, includeDev = false }: HudGameMenuProps) {
   const { t } = useTranslation('idleVillage');
   const { locale, setLocale } = useLocalization();
   const [open, setOpen] = useState(false);
@@ -105,7 +108,7 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, includeDe
           aria-expanded={open}
           onClick={toggleMenu}
         >
-          <Menu size={14} />
+          <EngravedIcon id="cmd-menu" size={14} />
           <span>{t('gameFrame.menu.title')}</span>
         </button>
       </HudPlaque>
@@ -194,6 +197,29 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, includeDe
                   <span>{getSkinPresetConfig(id).label}</span>
                 </button>
               ))}
+              </div>
+            </>
+          )}
+          {scale && (
+            <>
+              <span style={SECTION_LABEL_STYLE}>{t('gameFrame.menu.interfaceSize')}</span>
+              <div role="radiogroup" aria-label={t('gameFrame.menu.interfaceSize')} style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                {HUD_SCALE_MODES.map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={scale.mode === id}
+                    aria-pressed={scale.mode === id}
+                    title={id === 'auto' ? t('gameFrame.menu.interfaceSizeAutoHint', { percent: Math.round(scale.effective * 100) }) : undefined}
+                    onClick={() => {
+                      scale.onChange(id);
+                      trackTelemetryEvent('game_menu_scale_select', { scale: id });
+                    }}
+                  >
+                    <span>{id === 'auto' ? t('gameFrame.menu.interfaceSizeAuto') : `${Math.round(id * 100)}%`}</span>
+                  </button>
+                ))}
               </div>
             </>
           )}

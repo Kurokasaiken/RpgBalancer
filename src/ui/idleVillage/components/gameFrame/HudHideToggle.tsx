@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff } from 'lucide-react';
+import { EngravedIcon } from './engravedIcons';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 
 export interface HudHideToggleProps {
@@ -29,7 +29,7 @@ export function HudHideToggle({ hidden, onToggle }: HudHideToggleProps) {
         onClick={onToggle}
         style={{ width: 40, height: 40 }}
       >
-        {hidden ? <EyeOff /> : <Eye />}
+        <EngravedIcon id={hidden ? 'cmd-eye-off' : 'cmd-eye'} />
       </button>
     </div>
   );

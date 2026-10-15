@@ -17,7 +17,7 @@ const expired: QuestAvailability = { progress: 0, state: 'expired' };
 describe('mapQuestPoiView', () => {
   it('keeps the seal unwritten while the quest is only available', () => {
     const view = mapQuestPoiView('available', 0.4, open);
-    expect(view).toEqual({ state: 'assigned', progress: 0, deadlineWarn: false, direction: 'clockwise' });
+    expect(view).toEqual({ state: 'assigned', progress: 0, deadlineWarn: false, direction: 'clockwise', done: false });
   });
 
   it('ignores stale progress in the available state even if a value leaks in', () => {
@@ -31,6 +31,7 @@ describe('mapQuestPoiView', () => {
       progress: 0.35,
       deadlineWarn: false,
       direction: 'clockwise',
+      done: false,
     });
     expect(mapQuestPoiView('in_progress', 0, undefined).progress).toBe(0);
   });
@@ -49,6 +50,7 @@ describe('mapQuestPoiView', () => {
       progress: expiring.progress / EXPIRING_BELOW,
       deadlineWarn: true,
       direction: 'counterclockwise',
+      done: false,
     });
   });
 
@@ -67,6 +69,7 @@ describe('mapQuestPoiView', () => {
       progress: 0,
       deadlineWarn: true,
       direction: 'counterclockwise',
+      done: false,
     });
   });
 
@@ -76,5 +79,62 @@ describe('mapQuestPoiView', () => {
     expect(view.deadlineWarn).toBe(false);
     expect(view.state).toBe('assigned');
     expect(view.direction).toBe('clockwise');
+  });
+});
+
+/**
+ * Quest tier (poi_family_spec §Quest tier, Director 2026-10-13): a normal quest keeps the grammar above;
+ * a main quest shows its deadline halo FULL from the moment the offer appears and drains it over the
+ * whole window, counter-clockwise, with no jump when the vermilion flag lands. Progress and state still
+ * come only from this view-model (T-07).
+ */
+describe('mapQuestPoiView — tier', () => {
+  it('leaves a normal offer bare until the last stretch (default tier)', () => {
+    expect(mapQuestPoiView('available', 0, open, 'normal').progress).toBe(0);
+    expect(mapQuestPoiView('available', 0, open).progress).toBe(0);
+  });
+
+  it('draws a main offer full on appearance and drains it over the whole window', () => {
+    const fresh = mapQuestPoiView('available', 0, { progress: 1, state: 'available' }, 'main');
+    expect(fresh).toEqual({ state: 'assigned', progress: 1, deadlineWarn: false, direction: 'counterclockwise', done: false });
+    expect(mapQuestPoiView('available', 0, { progress: 0.6, state: 'available' }, 'main').progress).toBe(0.6);
+  });
+
+  it('keeps draining a main offer when the urgent flag lands (no renormalisation jump)', () => {
+    const view = mapQuestPoiView('available', 0, expiring, 'main');
+    expect(view.state).toBe('expiring');
+    expect(view.deadlineWarn).toBe(true);
+    expect(view.progress).toBe(expiring.progress);
+    expect(view.direction).toBe('counterclockwise');
+  });
+
+  it('has no halo to draw for a main offer without a deadline, and falls back to work mode once launched', () => {
+    expect(mapQuestPoiView('available', 0, undefined, 'main').progress).toBe(0);
+    expect(mapQuestPoiView('in_progress', 0.4, open, 'main')).toEqual({
+      state: 'assigned',
+      progress: 0.4,
+      deadlineWarn: false,
+      direction: 'clockwise',
+      done: false,
+    });
+  });
+
+  it('lets an expired main offer leave like any other (no pulse)', () => {
+    expect(mapQuestPoiView('available', 0, expired, 'main')).toEqual({
+      state: 'expired',
+      progress: 0,
+      deadlineWarn: true,
+      direction: 'counterclockwise',
+      done: false,
+    });
+  });
+});
+
+describe('mapQuestPoiView — done', () => {
+  it('flags a finished run (completed or failed) so the Sigillo pulses until the player acts', () => {
+    expect(mapQuestPoiView('completed', 1, open).done).toBe(true);
+    expect(mapQuestPoiView('failed', 0.6, open).done).toBe(true);
+    expect(mapQuestPoiView('in_progress', 0.99, open).done).toBe(false);
+    expect(mapQuestPoiView('available', 0, open).done).toBe(false);
   });
 });

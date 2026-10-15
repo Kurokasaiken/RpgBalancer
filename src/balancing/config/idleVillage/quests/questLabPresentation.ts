@@ -22,10 +22,15 @@ export const ExposureTierSchema = z.object({
 export const QuestLabPresentationSchema = z.object({
   layout: z
     .object({
-      /** vh budget of the three cockpit regions (they must sum ≈100). */
+      /** vh budget of the three cockpit regions (they must sum ≈100).
+       *  The action zone must host header+body+belt+2 options without
+       *  scrolling (Director 2026-10-13: "non riesco a vedere tutte le
+       *  opzioni senza usare la barra laterale — inaccettabile"); the
+       *  stage gives back the difference — it is flex-1/min-h-0 and
+       *  crops the art, never the choices. */
       contextStripVh: z.number().default(6),
-      stageBandVh: z.number().default(48),
-      actionZoneVh: z.number().default(46),
+      stageBandVh: z.number().default(36),
+      actionZoneVh: z.number().default(58),
       /** Bounded content width so ultrawide doesn't stretch to emptiness. */
       maxWidthPx: z.number().default(1560),
     })

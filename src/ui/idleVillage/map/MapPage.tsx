@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useRef, useState } from 'react';
 import type { DragEvent as ReactDragEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { StyleLaboratoryPanel } from '@/ui/styleLab/StyleLaboratoryPanel';
@@ -543,6 +543,40 @@ function MapPageContent() {
   const [detailCardResidents, setDetailCardResidents] = useState<Record<string, ResidentState>>({});
   const [hoveredResidentId, setHoveredResidentId] = useState<string | null>(null);
   const [pergamenaAnchor, setPergamenaAnchor] = useState<HTMLElement | null>(null);
+  const [pergamenaPinned, setPergamenaPinnedState] = useState(false);
+  /* Ref mirrors `pinned` so the delayed-close timer reads the CURRENT
+   *  value — a pointerleave may arm it before React commits the pin. */
+  const pergamenaPinnedRef = useRef(false);
+  const pergamenaCloseTimer = useRef<number | null>(null);
+  const setPergamenaPinned = useCallback((v: boolean) => {
+    pergamenaPinnedRef.current = v;
+    setPergamenaPinnedState(v);
+  }, []);
+
+  /* Hover-pinnable card contract (hud_component_guide §5b.7): leaving the
+   *  PgCard schedules a delayed close so the pointer can reach the
+   *  pergamena; entering the panel cancels it; pin freezes it. */
+  const cancelPergamenaClose = useCallback(() => {
+    if (pergamenaCloseTimer.current != null) {
+      window.clearTimeout(pergamenaCloseTimer.current);
+      pergamenaCloseTimer.current = null;
+    }
+  }, []);
+  const schedulePergamenaClose = useCallback(() => {
+    if (pergamenaPinnedRef.current) return;
+    cancelPergamenaClose();
+    pergamenaCloseTimer.current = window.setTimeout(() => {
+      if (pergamenaPinnedRef.current) return;
+      setHoveredResidentId(null);
+      setPergamenaAnchor(null);
+    }, 140);
+  }, [cancelPergamenaClose]);
+  const closePergamena = useCallback(() => {
+    cancelPergamenaClose();
+    setPergamenaPinned(false);
+    setHoveredResidentId(null);
+    setPergamenaAnchor(null);
+  }, [cancelPergamenaClose, setPergamenaPinned]);
 
   const locationPanelFeaturedActivity = useMemo<LocationFeaturedActivity | null>(() => {
     if (locationSlots.length === 0) return null;
@@ -806,15 +840,13 @@ function MapPageContent() {
                         setActiveId(null);
                       }}
                       onPointerEnter={(event: React.PointerEvent<HTMLDivElement>) => {
+                        cancelPergamenaClose();
+                        if (pergamenaPinnedRef.current) return;
                         setHoveredResidentId(resident.id);
                         setPergamenaAnchor(event.currentTarget);
                         setDetailCardResidents(prev => ({ ...prev, [resident.id]: resident }));
                       }}
-                      onPointerLeave={() => {
-                        // Reset hover state immediatamente
-                        setHoveredResidentId(null);
-                        setPergamenaAnchor(null);
-                      }}
+                      onPointerLeave={schedulePergamenaClose}
                       onSelect={(workerId: string) => {
                         // Handle selection - toggle resident detail modal
                         setSelectedResidentIds((prev) =>
@@ -1080,10 +1112,11 @@ function MapPageContent() {
       <SchedaPergamena
         resident={detailCardResidents[hoveredResidentId]}
         isOpen={!!hoveredResidentId}
-        onClose={() => {
-          setHoveredResidentId(null);
-          setPergamenaAnchor(null);
-        }}
+        onClose={closePergamena}
+        pinned={pergamenaPinned}
+        onTogglePin={() => setPergamenaPinned(!pergamenaPinnedRef.current)}
+        onPanelPointerEnter={cancelPergamenaClose}
+        onPanelPointerLeave={schedulePergamenaClose}
         anchorElement={pergamenaAnchor}
       />
     )}

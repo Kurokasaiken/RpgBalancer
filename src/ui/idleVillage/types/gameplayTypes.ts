@@ -28,6 +28,10 @@ export interface MinimalResident {
    *  pass but `tick()` does NOT heal: recovery only happens at rest
    *  (R-139: «le ferite si rigenerano a riposo, non mentre sei assegnato»). */
   isOnExpedition?: boolean;
+  /** R-183: experience the resident has accumulated on quests — written by
+   *  quest settlement (`resident-xp`). A raw total: the XP curve/levels are
+   *  still OPEN (`PROGRESSION.md` §3), nothing consumes it yet. */
+  xp?: number;
 }
 
 export type LocationStateMap = Record<string, LocationDropState>;

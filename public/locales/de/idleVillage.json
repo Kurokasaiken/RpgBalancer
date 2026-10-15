@@ -16,9 +16,9 @@
       "idle": "Aktivität {label} ist inaktiv",
       "progress": "Fortschritt {label}: {percent}%",
       "readyToCollect": "{label} bereit zum Einsammeln",
-      "slotFreed": "{count, plural, one {{count} Slot von {label} freigegeben} other {{count} Slots von {label} freigegeben}}",
+      "slotFreed": "{count, plural, one {# Slot von {label} freigegeben} other {# Slots von {label} freigegeben}}",
       "started": "Aktivität {label} gestartet",
-      "workerAssigned": "{count, plural, one {{count} Arbeiter {label} zugewiesen} other {{count} Arbeiter {label} zugewiesen}}"
+      "workerAssigned": "{count, plural, one {# Arbeiter {label} zugewiesen} other {# Arbeiter {label} zugewiesen}}"
     },
     "defaultHalo": "POI",
     "devTools": {

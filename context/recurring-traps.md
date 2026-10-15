@@ -103,7 +103,9 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
   due volte e mi sono sbagliato"*); correzione Director 2026-09-10: *"prima di
   dire che hai finito devi vederlo tu a schermo se è percepibile da occhio
   umano"*; animazioni non osservabili in browser pane con `document.hidden`
-  (rAF bloccato).
+  (rAF bloccato); invasione `/game` 2026-10-13/14: «funziona» dichiarato da
+  sole misure di posizione in un pane nascosto, il video del Director mostra 5
+  difetti (`.mw/bugs/20261014-verification-false-pass/bug.md`; proposta P-001).
 - **Regola:** un claim percettivo si chiude solo con verifica a occhio in un
   browser reale e viewport realistico. La metrica è supporto, non verdetto. Se
   metrica e occhio divergono, crede l'occhio — e la metrica va corretta prima
@@ -161,3 +163,88 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
   lifecycle/progress normalizzato, muore con esso. Stati semantici del
   contratto (`available`/`expiring`…) si mappano nel view-model, non passando
   progress numerico a casaccio.
+
+## T-08 — Per-tick re-render su superfici con orologio: stabilizzare le reference, non patchare i figli
+
+**Surface:** componenti sotto un clock che ticca (`currentTick` in Zustand): marker mappa, HUD, overlay animati.
+
+- **Cosa succede:** un memo/derivato keyed su un oggetto ricostruito a ogni
+  tick (`useCallback` dep su `currentTick`, sessione che embeda l'intero
+  store, callback non memoizzati passati ai figli) annulla ogni
+  ottimizzazione a valle: il subtree ri-renderizza a frequenza tick anche se
+  nessun valore visibile è cambiato. Le mutazioni DOM per render restano
+  ~50 sul medallion POI; misurare solo i longtask non basta.
+- **Istanze:** PLAN-034 T-002/T-004 — `poiView` instabile per `gameplay`
+  (intero store) e `onOpenRun` non memoizzato; `anchors` memo con dep su
+  `session`/`currentTick` non usati nel corpo.
+- **Regola:** traccia la catena di identità referenziale dalla sorgente del
+  tick fino alla foglia pesante. Throttle/quantize il VALORE alla sorgente
+  (`useThrottledValue` + quantize alla risoluzione visiva, es. step-lettere
+  del sigillo), e rendi stabile ogni prop intermedio — una sola callback
+  non memoizzata in mezzo rompe tutto.
+
+## T-09 — Verifica perf su dev server ≠ perf del gioco: misura su build di produzione prima di ottimizzare
+
+**Surface:** qualsiasi misura di frame time, longtask, CPU su `vite dev` / React dev-mode.
+
+- **Cosa succede:** `react_jsx-dev-runtime` (validazione props/key per
+  elemento) pesa 25–30% della CPU con UI attiva e produce longtask ogni
+  ~300 ms; la stessa scena su `vite preview` crolla (quest run ×4: 37 → 11
+  longtask, max 191 → 104 ms). Ottimizzare sulla base dei numeri dev
+  rischia di rincorrere overhead che in produzione non esiste.
+- **Istanze:** PLAN-034 diag3–6 vs diag-prod (2026-10-14): invasione/quest/
+  pan/menu tutti puliti in prod.
+- **Regola:** prima di pianificare un fix perf, rifai la misura su
+  `npm run build && npx vite preview`. Se il problema sparisce lì, il fix è
+  "registra/testa sulla build di produzione", non codice. Vale anche per le
+  catture trailer/screenshot ufficiali.
+
+## T-10 — `new AudioContext()` è una syscall pesante: mai dentro un'animazione
+
+**Surface:** SFX procedurale (WebAudio) dentro handler/timer di animazione.
+
+- **Cosa succede:** il costruttore `AudioContext` blocca il main thread
+  (~1 s misurato, CDP self-time) — `playThud` al landing dello sticker era il
+  mega-hitch 0.8–1.2 s della sequenza invasione.
+- **Istanze:** PLAN-034 T-008 — `WorldSurfaceEventCard` peel→land.
+- **Regola:** il context si crea UNA volta nel warm-up della superficie
+  (idle callback / mount) e si `resume()` dentro il gesto utente (autoplay
+  policy); il handler di animazione usa solo il context condiviso.
+
+## T-11 — `i18next-icu` è app-wide: le chiavi `{{var}}` renderizzano letterali
+
+**Surface:** qualsiasi chiave i18n con interpolazione (`idleVillage.json`,
+`common.json`).
+
+- **Cosa succede:** il progetto registra `i18next-icu` globalmente
+  (`src/localization/i18n.ts`). La sintassi mustache `{{n}}` è malformata
+  sotto ICU → la stringa renderizza letteralmente (`"Lv {{n}}"` invece di
+  `"Lv 4"`). Sintassi corretta: `{n}` singolo. Nessun errore in console:
+  il testo grezzo passa silenzioso — lo trovi solo a runtime/by-eye.
+- **Istanze:** PLAN-032 SP-5 (2026-10-14) — spec r009 indicava `{{n}}`,
+  smoke headed ha mostrato `Lv {{n}}` letterale; corretto a `{n}`.
+  **R-193 (2026-10-14): audit+fix batch CHIUSO** — 27 placeholder
+  `{{var}}`→`{var}` ×3 locale (en/it-IT/pseudo idleVillage), `missingCount`
+  common en+pseudo, `{{count}` dentro plural ICU → `#` (de slotFreed/
+  workerAssigned, swordCount ×4), defaultValue in design-vs-fidelity,
+  mirror i18n.types.ts. Guard regression: `tests/i18n/icuInterpolation.test.ts`
+  (zero `{{` in tutti i JSON + interpolazione reale via i18next+ICU).
+- **Regola:** chiavi nuove → sempre `{var}` ICU. Quando una spec/artifact
+  indica `{{var}}`, correggi e documenta la divergenza nel plan. Dentro un
+  `plural` ICU il count si scrive `#`, non `{count}`.
+
+## T-12 — `import.meta.env` non esiste fuori da Vite: il gate dev/prod va difensivo
+
+**Surface:** config module in `src/balancing/config/**` importati da test
+vitest/tsx o script node.
+
+- **Cosa succede:** `import.meta.env` è `undefined` fuori dal bundler Vite
+  (tsx diretto, alcuni setup vitest). Un accesso `import.meta.env.PROD` in
+  top-level di un config fa throw a module-eval → tutti gli export
+  risultano `undefined` nei test con errore criptico a valle.
+- **Istanze:** PLAN-032 SP-5 (2026-10-14) — `heroLevelConfig.ts` export
+  `undefined` in vitest; fix `const viteEnv = (import.meta as {env?:{PROD?:boolean}}).env`
+  e gate `viteEnv?.PROD === true` (strict-throw come default sicuro).
+- **Regola:** mai accesso diretto a `import.meta.env.X` in top-level di
+  moduli consumati dai test: optional-chain + default al ramo sicuro
+  (strict/dev). Il salvage permissivo solo se `PROD === true` esplicito.

@@ -1,19 +1,13 @@
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties, type ReactNode } from 'react';
 import styles from '../components/DragTestContainer.module.css';
-import {
-  GameIconChecklist,
-  GameIconCrossMark,
-  GameIconEyeball,
-  GameIconFunnel,
-  GameIconHidden,
-  GameIconSplitArrows,
-} from '@/ui/idleVillage/components/gameIcons';
+import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { getFilterStatKeys, getStatDisplayConfig, type FilterStatKey } from '@/ui/idleVillage/config/rosterFilterConfig';
 import { getRosterSortModes, type RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import PgCard, { type PgCardProps } from '@/ui/idleVillage/components/PgCard';
 import WanderlustRosterCardV2 from '@/ui/idleVillage/rosterV2/WanderlustRosterCardV2';
+import { HeroLevelDecor } from '@/ui/idleVillage/rosterV2/HeroLevelDecor';
 import type { GetResidentCompatibility, ResidentCompatibilityState } from '../components/ResidentRosterTypes';
 import type { DropValidationResult } from '@/ui/idleVillage/config/residentDropRules';
 import { createSandboxDiagnostics } from '@/ui/idleVillage/utils/sandboxDiagnostics';
@@ -119,6 +113,13 @@ const _QUICK_STATUS_FILTERS: Array<{ value: FilterOptions['status']; label: stri
   { value: 'away', label: 'Impegnati' },
   { value: 'dead', label: 'Caduti' },
 ];
+
+/** HUD panel title: the shared `--skin-hud-title-*` scale (PLAN-058 T0.2). */
+const HUD_TITLE_STYLE: CSSProperties = {
+  fontSize: 'var(--skin-hud-title-size)',
+  fontWeight: 'var(--skin-hud-title-weight)',
+  letterSpacing: 'var(--skin-hud-title-tracking)',
+};
 
 /**
  * Props for DragTestContainerV2 component.
@@ -736,6 +737,7 @@ function DragTestContainerV2({
         key={resident.id}
         className="relative group"
         data-resident-id={resident.id}
+        data-resident-xp={resident.xp ?? 0}
         data-hero={resident.isHero}
         data-blocked={isBlocked}
         style={{ pointerEvents: isLifted || isReturningCard ? 'none' : undefined }}
@@ -750,6 +752,11 @@ function DragTestContainerV2({
         )}
         {/* Durante il drag la card resta montata e leggibile: va in alfa
             (isDragging) e lo stato del PG diventa "Away" — mai socket vuoto. */}
+        {/* PLAN-032 SP-5: the level-up decorative layer lives here, in the
+         *  rosterV2 card layer — pgcardKit and both card renderers below stay
+         *  untouched. The badge slot is always mounted; it draws only for a
+         *  leveled hero (view-model gate). */}
+        <HeroLevelDecor resident={resident} />
         {useWanderlustSkin ? (
           <WanderlustRosterCardV2
             workerId={resident.id}
@@ -768,6 +775,7 @@ function DragTestContainerV2({
             onDragStateChange={handleDragStateChange}
             onSelect={handleResidentSelectSafe}
             isHero={resident.isHero}
+            xp={resident.xp}
             compact={isCompact}
             statusKind={
               !isCompact
@@ -838,7 +846,7 @@ function DragTestContainerV2({
   // fill, shadow or `overflow: hidden` (the border painted grey over the bronze band, and the
   // overflow clipped the plaque's shadow).
   const wrapperClassName = hudSurface
-    ? ['relative', isInlineLayout && 'p-3', className].filter(Boolean).join(' ')
+    ? ['relative', isInlineLayout && 'p-(--skin-hud-plaque-clearance)', className].filter(Boolean).join(' ')
     : [
     'relative',
     isInlineLayout && 'rounded-2xl border border-white/10 bg-black/25 p-3 shadow-[0_15px_30px_rgba(0,0,0,0.4)]',
@@ -850,7 +858,7 @@ function DragTestContainerV2({
     .join(' ');
 
   const listWrapperClassName = [
-    isCompact ? 'space-y-1 overflow-y-auto scroll-smooth' : 'space-y-2 overflow-y-auto scroll-smooth',
+    isCompact ? 'space-y-(--skin-hud-row-gap) overflow-y-auto scroll-smooth' : 'space-y-2 overflow-y-auto scroll-smooth',
     styles.scrollArea,
     isInlineLayout ? 'pr-0' : 'pr-1',
     listClassName,
@@ -859,7 +867,7 @@ function DragTestContainerV2({
     .join(' ');
 
   const _headerTextClassName = useWanderlustSkin && isCompact
-    ? 'flex items-center gap-2 text-[12px] font-semibold tracking-[0.2em] text-[var(--skin-title-color)]'
+    ? 'flex items-center gap-(--skin-hud-stack-gap) text-[var(--skin-title-color)]'
     : useWanderlustSkin
     ? 'flex items-center gap-2 text-[15px] font-semibold tracking-[0.34em] text-[var(--skin-title-color)]'
     : isInlineLayout
@@ -1141,7 +1149,7 @@ function DragTestContainerV2({
       ) : (
         useWanderlustSkin && <WellBronzeBezel band={2} rx={19} flush />
       )}
-      <div className={`relative z-10 ${isCompact ? (isRosterCollapsed ? 'px-2.5 py-1.5' : 'space-y-2 p-2.5') : `space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`}`.trim()}>
+      <div className={`relative z-10 ${isCompact ? (isRosterCollapsed ? 'px-(--skin-hud-panel-padding) py-1.5' : 'space-y-(--skin-hud-stack-gap) p-(--skin-hud-panel-padding)') : `space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`}`.trim()}>
         {useWanderlustSkin && !isCompact && (
           <div 
             className="block h-px mx-2 mb-5"
@@ -1151,7 +1159,7 @@ function DragTestContainerV2({
           />
         )}
         <div
-          className={`${isCompact ? 'flex flex-nowrap items-center justify-between gap-2' : 'flex flex-wrap items-center justify-between gap-2'} ${componentId ? 'cursor-grab active:cursor-grabbing' : ''}`}
+          className={`${isCompact ? 'flex flex-nowrap items-center justify-between gap-(--skin-hud-stack-gap)' : 'flex flex-wrap items-center justify-between gap-2'} ${componentId ? 'cursor-grab active:cursor-grabbing' : ''}`}
           onPointerDown={(event) => {
             if ((event.target as HTMLElement).closest('button, select, input, label, a')) return;
             handlePointerDown(event);
@@ -1170,7 +1178,7 @@ function DragTestContainerV2({
           data-testid="roster-drag-handle"
           data-roster-handle-state={isDragging ? 'dragging' : 'idle'}
         >
-          <div className={_headerTextClassName}>
+          <div className={_headerTextClassName} style={useWanderlustSkin && isCompact ? HUD_TITLE_STYLE : undefined}>
             <span style={useWanderlustSkin ? { fontFamily: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)' } : {}}>{t('gameFrame.roster.title')}</span>
             <span 
               className={useWanderlustSkin ? 'text-[var(--skin-title-color)]' : 'text-[var(--skin-text-primary)]'}
@@ -1180,9 +1188,9 @@ function DragTestContainerV2({
               {`${sortedResidents.length}/${residents.length}`}
             </span>
           </div>
-          <div className={isCompact ? 'flex min-w-0 items-center gap-1' : 'flex items-center gap-1'} data-hud-controls={isCompact ? '' : undefined} data-collapsed={isCompact && isRosterCollapsed ? '' : undefined}>
+          <div className={isCompact ? 'flex min-w-0 items-center gap-(--skin-hud-control-gap)' : 'flex items-center gap-1'} data-hud-controls={isCompact ? '' : undefined} data-collapsed={isCompact && isRosterCollapsed ? '' : undefined}>
             <label>
-              <GameIconFunnel className="h-3 w-3 shrink-0" />
+              <EngravedIcon id="cmd-filter" className="h-3 w-3 shrink-0" />
               <select
                 value={filters.status}
                 onChange={(e) => handleStatusChange(e.target.value as FilterOptions['status'])}
@@ -1203,7 +1211,7 @@ function DragTestContainerV2({
                 modes plus dynamic statSnapshot stats, applied after status filtering
                 and inside the hero/active/blocked groups. */}
             <label>
-              <GameIconChecklist className="h-3 w-3 shrink-0" />
+              <EngravedIcon id="cmd-menu" className="h-3 w-3 shrink-0" />
               <select
                 value={sortSelection}
                 onChange={(e) => {
@@ -1236,7 +1244,7 @@ function DragTestContainerV2({
               aria-label={statSortDirection === 'asc' ? t('gameFrame.roster.sort.asc') : t('gameFrame.roster.sort.desc')}
               data-testid="roster-stat-sort-direction"
             >
-              <GameIconSplitArrows className="h-3.5 w-3.5" />
+              <EngravedIcon id="cmd-sort" className="h-3.5 w-3.5" />
             </button>
 
             {headerControls}
@@ -1261,11 +1269,11 @@ function DragTestContainerV2({
               aria-pressed={isRosterCollapsed}
               data-keep=""
             >
-              {isRosterCollapsed ? <GameIconEyeball className="h-3.5 w-3.5" /> : <GameIconHidden className="h-3.5 w-3.5" />}
+              <EngravedIcon id={isRosterCollapsed ? 'cmd-eye' : 'cmd-eye-off'} className="h-3.5 w-3.5" />
             </button>
             {onClose && (
               <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} data-keep="">
-                <GameIconCrossMark className="h-3.5 w-3.5" />
+                <EngravedIcon id="cmd-close" className="h-3.5 w-3.5" />
               </button>
             )}
           </div>

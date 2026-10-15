@@ -11,6 +11,7 @@ export { HudPanelsMenu, type HudPanelsMenuProps } from './HudPanelsMenu';
 export { HudHideToggle, type HudHideToggleProps } from './HudHideToggle';
 export { HudGameMenu, type HudGameMenuProps, type HudSkinControl } from './HudGameMenu';
 export { useHudPanels, type HudPanelId, type HudPanelsApi } from './useHudPanels';
+export { usePanelWhileOpen } from './usePanelWhileOpen';
 export { HUD_PANELS } from './hudPanelRegistry';
 export { ObjectiveCartouche, type HudObjective } from './ObjectiveCartouche';
 export { RegionTooltip, type RegionTooltipProps } from './RegionTooltip';
@@ -18,3 +19,16 @@ export { TuningPanel, type TuningField, type TuningPanelProps } from './TuningPa
 export { MapDemoPoi } from './MapDemoPoi';
 export { usePoiTypeIcon, poiTypeIconUrl } from './usePoiTypeIcon';
 export { QuestRunWindow, type QuestRunWindowProps } from './QuestRunWindow';
+export { HeroSheetPanel, type HeroSheetPanelProps } from './HeroSheetPanel';
+export { VillageStashPanel, type VillageStashPanelProps } from './VillageStashPanel';
+export { MapBuildingPoi, type MapBuildingPoiProps } from './MapBuildingPoi';
+export { villageStashViewModel, resolveStashItemDescKey, type VillageStashViewModel } from './villageStashViewModel';
+/* SP-3: `merchantConfig` is deliberately NOT re-exported — its isolation
+ * boundary allows direct importers only (MerchantPanel, game-frame-pixi,
+ * tests). */
+export { MerchantPanel, type MerchantPanelProps } from './MerchantPanel';
+export { MockBuyControl } from './MockBuyControl';
+export { MerchantOfferIcon } from './merchantOfferIcons';
+export { useHeroSheet, type HeroSheetApi, type UseHeroSheetOptions } from './useHeroSheet';
+export { heroSheetReducer, HERO_SHEET_INITIAL_STATE } from './heroSheetMachine';
+export { heroSheetViewModel, type HeroSheetViewModel } from './heroSheetViewModel';

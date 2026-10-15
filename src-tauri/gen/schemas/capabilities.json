@@ -1,1 +1,1 @@
-{}
+{"default":{"identifier":"default","description":"Main window: native webview zoom, used by the interface size option (PLAN-058). Nothing else is granted.","local":true,"windows":["main"],"permissions":["core:webview:allow-set-webview-zoom"]}}

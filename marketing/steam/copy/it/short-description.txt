@@ -1,4 +1,4 @@
-Wanderlust: Triumph — SHORT DESCRIPTION (IT, committed 2026-10-12 — R-145)
+Wanderlust: Triumph — SHORT DESCRIPTION (IT, v2 — 2026-10-13, REVIEW-2026-10-12)
 Limite Steam: ~300 caratteri, testo semplice, no BBCode.
 
-Un roguelite strategy RPG dove i popolani diventano eroi. Affronta quest sempre più dure, pesa le probabilità e costruisci eroi da ciò che trovi. Quando il tuo insediamento cade, porta ciò che hai guadagnato nella run successiva.
+Un roguelite strategy RPG in cui gli eroi non nascono: si forgiano. Scegli le quest che valgono il rischio, leggi le probabilità per il party che mandi e lascia decidere all'Astrolabio chi torna. Quando il tuo insediamento cade, ciò che hai guadagnato passa alla run successiva.

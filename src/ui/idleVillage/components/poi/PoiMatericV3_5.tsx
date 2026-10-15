@@ -10,8 +10,63 @@ export interface PoiMatericV3_5Props extends PoiMarkerProps {
   isDragging?: boolean;
   /** Painted glyph for the medallion's centre (replaces the default cross); one per POI family. */
   iconUrl?: string;
+  /** PLAN-058 Sigillo (map markers): no glass, no specular, no gem; neutral bronze rim, lacquer field, double border. Off elsewhere. */
+  sigillo?: boolean;
+  /** Sigillo only: the run has ended and awaits the player — the halo pulses slowly (period `--skin-poi-pulse-period`) until they act. Static light under reduced motion. */
+  pulse?: boolean;
   cursorVelocity?: { x: number; y: number } | null;
   'data-testid'?: string;
+}
+
+/** Sigillo palette: the same bronze and lacquer for every family (the family is read from the silhouette and glyph, not from a hue). */
+const SIGILLO_COLORS = {
+  coronaCore: { r: 216, g: 189, b: 120 },
+  coronaGlow: { r: 160, g: 118, b: 47 },
+  rimColors: ['#d8bd78', '#a0762f', '#5f3f16'],
+  stoneColors: ['#173436', '#0a1b1c'],
+  stoneAmbient: 'rgba(216,189,120,.16)',
+  pinColor: 'rgba(216,189,120,.72)',
+} as const;
+
+const SIGILLO_BORDER_OUTER = BASE_SKIN_CSS_VARS['--skin-poi-border-outer'] ?? '#0b0a08';
+const SIGILLO_BORDER_INNER = BASE_SKIN_CSS_VARS['--skin-poi-border-inner'] ?? '#efe3c6';
+/** Border widths in screen px (the vector-effect keeps them identical at S, M and L). */
+const SIGILLO_BORDER_OUTER_PX = parseFloat(BASE_SKIN_CSS_VARS['--skin-poi-border-outer-width'] ?? '2');
+const SIGILLO_BORDER_INNER_PX = parseFloat(BASE_SKIN_CSS_VARS['--skin-poi-border-inner-width'] ?? '1.5');
+/** Halo tones: ivory = the deadline draining, verdigris = work filling, vermilion = urgency only. */
+const SIGILLO_HALO_DEADLINE = BASE_SKIN_CSS_VARS['--skin-poi-halo-deadline'] ?? '#ead9b0';
+const SIGILLO_HALO_WORK = BASE_SKIN_CSS_VARS['--skin-poi-halo-work'] ?? '#6fc4a4';
+const SIGILLO_URGENT = BASE_SKIN_CSS_VARS['--skin-poi-urgent'] ?? '#e8553a';
+
+/**
+ * Silhouette = family (poi_family_spec §Anatomy): round with a tail = enterprise (`quest`),
+ * tile = work (`job`), diamond = threat (`event`). `outer` is the dark border path, `inner` the
+ * ivory one (inset ~2.7 units); `scale` shrinks the circular medallion to the largest circle the
+ * silhouette holds, so every shape stays inside the seal's rails (r >= 45). The tail replaces the gem.
+ */
+const SIGILLO_SILHOUETTES = {
+  quest: {
+    scale: 1,
+    outer: 'M28.3 83.4 L43 97 L57.7 83.4 A43 43 0 1 0 28.3 83.4 Z',
+    inner: 'M29.2 80.9 L43 93 L56.8 80.9 A40.3 40.3 0 1 0 29.2 80.9 Z',
+  },
+  job: {
+    scale: 0.785,
+    outer: 'M19 10 H67 A9 9 0 0 1 76 19 V67 A9 9 0 0 1 67 76 H19 A9 9 0 0 1 10 67 V19 A9 9 0 0 1 19 10 Z',
+    inner: 'M19 12.7 H67 A6.3 6.3 0 0 1 73.3 19 V67 A6.3 6.3 0 0 1 67 73.3 H19 A6.3 6.3 0 0 1 12.7 67 V19 A6.3 6.3 0 0 1 19 12.7 Z',
+  },
+  event: {
+    scale: 0.7,
+    outer: 'M43 0 L86 43 L43 86 L0 43 Z',
+    inner: 'M43 3.8 L82.2 43 L43 82.2 L3.8 43 Z',
+  },
+} as const;
+
+/** Mix a #rrggbb colour toward white — the crisp core of a halo is a lighter shade of its tone. */
+function lighten(hex: string, amount: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const mix = (c: number) => Math.round(c + (255 - c) * amount);
+  return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => mix(c).toString(16).padStart(2, '0')).join('')}`;
 }
 
 /** One heraldic arm, repeated by rotation into a cross fleury. */
@@ -157,9 +212,11 @@ function generateImperfections(base: {
   return { patinaSpots, scratches };
 }
 
-export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
+const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
   type,
   iconUrl,
+  sigillo = false,
+  pulse = false,
   state = 'available',
   progress = 1,
   timerDirection = 'counterclockwise',
@@ -174,7 +231,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
   'data-testid': dataTestId,
 }) => {
   const { t } = useTranslation('idleVillage');
-  const colors = useMemo(() => getDefaultPoiColors(type), [type]);
+  const colors = useMemo(() => (sigillo ? SIGILLO_COLORS : getDefaultPoiColors(type)), [type, sigillo]);
   const [ringLight, ringMid, ringDark] = colors.rimColors;
   const [stoneLight, stoneDark] = colors.stoneColors;
   const uid = useId();
@@ -281,10 +338,14 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
 
   const geo = T4.geometry;
   const alloyMid = ringMid;
-  const sealLight = isExpiring ? WARN_ACCENT : ringLight;
-  const sealMid = isExpiring ? WARN_ACCENT : ringMid;
-  const sealInk = isExpiring ? WARN_ACCENT_LIGHT : T4.seal.coreInk;
-  const [gr, gg, gb] = channels(isExpiring ? WARN_ACCENT : ringMid);
+  /* Sigillo: the halo's tone says what the time is — ivory while a deadline drains, verdigris while work
+   * fills, vermilion only once the deadline is urgent. Same direction/progress as always (view-model). */
+  const sigilloTone = sigillo ? (isExpiring ? SIGILLO_URGENT : ccw ? SIGILLO_HALO_DEADLINE : SIGILLO_HALO_WORK) : null;
+  const sealLight = sigilloTone ?? (isExpiring ? WARN_ACCENT : ringLight);
+  const sealMid = sigilloTone ?? (isExpiring ? WARN_ACCENT : ringMid);
+  const sealInk = sigilloTone ? lighten(sigilloTone, 0.55) : isExpiring ? WARN_ACCENT_LIGHT : T4.seal.coreInk;
+  const [gr, gg, gb] = channels(sigilloTone ?? (isExpiring ? WARN_ACCENT : ringMid));
+  const silhouette = sigillo ? SIGILLO_SILHOUETTES[type] : null;
 
   const upperBand = useMemo(
     () => buildBand(geo.sealUpperBand, false, sealProgress * T4.seal.letterCount, sweep),
@@ -420,7 +481,8 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
       role="img"
       data-testid={dataTestId}
       aria-label={t('idleVillage:medalOverlay.ariaLabel', { defaultValue: 'Resident medal' })}
-      className={`poiv3_5 tok-svg ${className}${burst > 0.001 ? ' poiv3_5--burst' : ''}${isExpiring ? ' poiv3_5--expiring' : ''}`}
+      className={`poiv3_5 tok-svg ${className}${burst > 0.001 ? ' poiv3_5--burst' : ''}${isExpiring ? ' poiv3_5--expiring' : ''}${sigillo ? ' poiv3_5--sigillo' : ''}${sigillo && pulse ? ' poiv3_5--pulse' : ''}`}
+      data-silhouette={sigillo ? type : undefined}
       onClick={onClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
@@ -430,7 +492,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
         width: `${sizePx}px`,
         height: `${sizePx}px`,
         visibility: 'visible',
-        '--poi-accent-rgb': isExpiring ? hexToRgb(WARN_ACCENT) : `${r}, ${greenCh}, ${b}`,
+        '--poi-accent-rgb': sigilloTone ? hexToRgb(sigilloTone) : isExpiring ? hexToRgb(WARN_ACCENT) : `${r}, ${greenCh}, ${b}`,
         ...style,
       } as React.CSSProperties}
     >
@@ -745,8 +807,17 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
             </>
           )}
 
+          {/* Sigillo plate: the silhouette (tail / tile / diamond) in bronze, behind the round medallion */}
+          {silhouette && (
+            <path d={silhouette.outer} fill={`url(#${gid('g-b')})`} stroke="none" aria-hidden="true" data-testid="sigillo-plate" />
+          )}
+
           {/* MEDALLION BODY */}
-          <g className="poiv3_5__medal" clipPath="url(#c-medal)">
+          <g
+            className="poiv3_5__medal"
+            clipPath="url(#c-medal)"
+            transform={silhouette && silhouette.scale !== 1 ? `translate(43 43) scale(${silhouette.scale}) translate(-43 -43)` : undefined}
+          >
             {/* L1: Bronze outer body + texture + bevel */}
             <circle cx="43" cy="43" r="42" fill="#060f16" />
             <circle className="poiv3_5__body" cx="43" cy="43" r="42" fill={`url(#${gid('g-b')})`} opacity=".90" />
@@ -825,9 +896,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
             </g>
 
             {/* L5: V1 cross icon */}
-            {iconUrl ? (
-              <image className="poiv3_5__cross" href={iconUrl} x="24" y="24" width="38" height="38" preserveAspectRatio="xMidYMid meet" />
-            ) : (
+            {!iconUrl && (
               <g className="poiv3_5__cross" transform="translate(43 43) scale(0.9)">
                 {[0, 90, 180, 270].map((a) => (
                   <path key={a} d={CROSS_ARM} fill="#f0cf6a" transform={`rotate(${a})`} />
@@ -843,7 +912,8 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
               stroke="rgba(0,0,0,.65)" strokeWidth="1.9"
               transform="translate(.28,.35)" />
 
-            {/* L6: Glass - V4 single sheet with specular */}
+            {/* L6: Glass - V4 single sheet with specular (removed by the Sigillo, D5) */}
+            {!sigillo && (
             <g className="poiv3_5__glass">
               <circle
                 cx={geo.center}
@@ -864,6 +934,7 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
                 fill={T4.surface.specularFill}
               />
             </g>
+            )}
 
 
             {/* L7: Patina / random wear per instance */}
@@ -895,11 +966,26 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
               stroke="rgba(0,0,0,.52)" strokeWidth="4"
               strokeDasharray="96 96" strokeDashoffset="-48"
               strokeLinecap="round" />
+            {/* L5b: painted glyph — above the glass (L6) and AO (L8), or it reads dim */}
+            {iconUrl && (
+              /* Sigillo: the glyph fills ~57% of the field (35 of its 61-unit diameter); elsewhere the original 38 */
+              <image className="poiv3_5__cross" href={iconUrl} x={sigillo ? 25.5 : 24} y={sigillo ? 25.5 : 24} width={sigillo ? 35 : 38} height={sigillo ? 35 : 38} preserveAspectRatio="xMidYMid meet" />
+            )}
+
           </g>
+
+          {/* Sigillo border on the silhouette: dark 2 px outside, ivory 1.5 px inside it; screen pixels, identical for every family, state and size */}
+          {silhouette && (
+            <g aria-hidden="true" data-testid="sigillo-border" fill="none" strokeLinejoin="round">
+              <path d={silhouette.outer} stroke={SIGILLO_BORDER_OUTER} strokeWidth={SIGILLO_BORDER_OUTER_PX} vectorEffect="non-scaling-stroke" />
+              <path d={silhouette.inner} stroke={SIGILLO_BORDER_INNER} strokeWidth={SIGILLO_BORDER_INNER_PX} vectorEffect="non-scaling-stroke" />
+            </g>
+          )}
         </svg>
       </div>
 
-      {/* GEM - absolutely positioned below medal center */}
+      {/* GEM - absolutely positioned below medal center (removed by the Sigillo, D5) */}
+      {!sigillo && (
       <div className="poiv3_5__gem" style={{ position: 'absolute', left: '50%', bottom: '-14px', transform: 'translateX(-50%)', zIndex: 5, pointerEvents: 'none' }}>
         <svg width="40" height="32" viewBox="-20 -14 40 32" xmlns="http://www.w3.org/2000/svg" overflow="visible">
           <defs>
@@ -1002,9 +1088,16 @@ export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = ({
           </ellipse>
         </svg>
       </div>
+      )}
     </div>
   );
 };
+
+/* Memoised: the medallion is the heaviest leaf in the map subtree — every
+ * re-render rewrites ~50 seal attributes (the `map-quest-poi` mutation storm of
+ * the PLAN-034 T-004 trace). Parents that re-render per clock tick bail out of
+ * the whole SVG when the props are unchanged. */
+export const PoiMatericV3_5: React.FC<PoiMatericV3_5Props> = React.memo(PoiMatericV3_5Inner);
 
 export const poiMatericV3_5Styles = `
 .poiv3_5 {
@@ -1035,6 +1128,20 @@ export const poiMatericV3_5Styles = `
 .poiv3_5--expiring .poiv3_5__seal-halo,
 .poiv3_5--expiring .poiv3_5__seal-core { animation: poiv3_5-expiring-breath 2.8s ease-in-out infinite; }
 @keyframes poiv3_5-expiring-breath { 0%,100% { opacity: 1; } 50% { opacity: 0.62; } }
+/* Sigillo (poi_family_spec §Halo grammar): urgency lands ONCE (a snap), never loops; a finished run pulses
+   slowly until the player acts. Reduced motion: no snap, no pulse — steady light. */
+.poiv3_5--sigillo.poiv3_5--expiring .poiv3_5__seal-halo,
+.poiv3_5--sigillo.poiv3_5--expiring .poiv3_5__seal-core { animation: none; }
+.poiv3_5--sigillo.poiv3_5--expiring .poiv3_5__svg { animation: poiv3_5-urgent-snap 400ms ease-out 1; transform-origin: 50% 50%; }
+@keyframes poiv3_5-urgent-snap { 0% { transform: scale(1); filter: brightness(1); } 40% { transform: scale(1.06); filter: brightness(1.5); } 100% { transform: scale(1); filter: brightness(1); } }
+.poiv3_5--sigillo.poiv3_5--pulse .poiv3_5__seal-halo,
+.poiv3_5--sigillo.poiv3_5--pulse .poiv3_5__seal-core { animation: poiv3_5-done-pulse var(--skin-poi-pulse-period, 2s) ease-in-out infinite; }
+@keyframes poiv3_5-done-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) {
+  .poiv3_5--sigillo.poiv3_5--expiring .poiv3_5__svg,
+  .poiv3_5--sigillo.poiv3_5--pulse .poiv3_5__seal-halo,
+  .poiv3_5--sigillo.poiv3_5--pulse .poiv3_5__seal-core { animation: none; }
+}
 .poiv3_5__vignette {
   position: absolute;
   left: 50%;

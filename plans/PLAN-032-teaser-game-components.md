@@ -1,6 +1,9 @@
 ---
 title: PLAN-032 — Componenti teaser su /game: scheda PG, magazzino, mercante, consumabili in quest, level-up
-status: design converged (multi-AI debate) — in attesa dispatch implementazione
+status: completed — 2026-10-14: tutti e 5 gli SP implementati e verificati
+  (SP-1 scheda PG, SP-2 magazzino, SP-3 mercante, SP-4 bag strip, SP-5
+  level-up mock); bundle `.mw/runs/plan032-sp{1,2,3,4,5}-2026-10-14/`
+  tutti PASS; evidence `test-results/PLAN-032-SP{1..5}-2026-10-14.log`
 owner: Mind Weaver (planner)
 created: 2026-10-12
 source_request: R-167 (contesto: R-072 teaser, R-166 standard AAA /game)

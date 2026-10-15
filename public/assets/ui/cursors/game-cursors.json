@@ -1,0 +1,112 @@
+{
+  "point-default": {
+    "hotspot": [
+      3,
+      3
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "point-interact": {
+    "hotspot": [
+      3,
+      3
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "point-inspect": {
+    "hotspot": [
+      3,
+      3
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "point-wait": {
+    "hotspot": [
+      3,
+      3
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "point-disabled": {
+    "hotspot": [
+      3,
+      3
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "hand-grab": {
+    "hotspot": [
+      18,
+      17
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "hand-drag": {
+    "hotspot": [
+      16,
+      16
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "hand-drop-yes": {
+    "hotspot": [
+      15,
+      15
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "hand-drop-no": {
+    "hotspot": [
+      15,
+      15
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  },
+  "hand-pan": {
+    "hotspot": [
+      16,
+      15
+    ],
+    "sizes": [
+      32,
+      48,
+      64
+    ]
+  }
+}

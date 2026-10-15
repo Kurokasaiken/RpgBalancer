@@ -1,17 +1,13 @@
 import React from 'react';
+import { EngravedIcon, type EngravedIconId } from './engravedIcons';
 
 /**
- * HUD icon registry — semantic SVG glyphs, not emoji.
+ * HUD icon registry — semantic ids for the places the HUD names (resources, navigation,
+ * events). Every glyph is an engraved solid from `engravedIcons.tsx` (bible §11.6, PLAN-058
+ * T3.2): `currentColor` fill, no stroke, so it inherits `--skin-icon-color` (or whatever
+ * colour the caller sets) instead of baking in a hex value.
  *
- * Review R-075 (2026-09-22): "usare emoji come icone" was flagged as a
- * production-blocker — emoji render inconsistently across platforms, carry no
- * skin-token color, and read as placeholder art, not as Wanderlust chrome.
- * Every glyph here is stroke/fill driven by `currentColor` so it inherits
- * `--skin-icon-color` (or whatever color the caller sets) instead of baking
- * in a hex value.
- *
- * Geometry is deliberately simple — these are read at 16–22px in a ribbon,
- * not admired at scale. Add new ids here rather than reaching for an emoji.
+ * Add new ids here rather than reaching for an emoji or a third-party icon library.
  */
 export type HudIconId =
   | 'gold'
@@ -23,122 +19,52 @@ export type HudIconId =
   | 'chronicle'
   | 'workshop'
   | 'tavern'
-  | 'threat';
+  | 'threat'
+  // Event-type glyphs (HudEventLedger): one engraved solid per type, not a reused navigation icon.
+  | 'evt-quest'
+  | 'evt-expedition'
+  | 'evt-construction'
+  | 'evt-harvest'
+  | 'evt-visit';
 
 type IconComponent = React.FC<React.SVGProps<SVGSVGElement>>;
 
-const base: React.SVGProps<SVGSVGElement> = {
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.6,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
+const engraved = (id: EngravedIconId): IconComponent => {
+  const Icon: IconComponent = (props) => <EngravedIcon id={id} {...props} size={props.width ?? 24} />;
+  Icon.displayName = `HudIcon(${id})`;
+  return Icon;
 };
 
-const GoldIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <circle cx="12" cy="12" r="8.5" />
-    <circle cx="12" cy="12" r="5" />
-    <path d="M12 8.6v6.8M9.6 10.4h4.8" />
-  </svg>
-);
+/** Ids drawn as painted images (`HUD_ICON_ASSETS`): they have no engraved glyph. */
+export type PaintedHudIconId = 'gold' | 'food' | 'wood' | 'threat';
 
-const FoodIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <path d="M7 3v7.2a2.2 2.2 0 0 0 4.4 0V3M9.2 3v7.2M7 3v0" />
-    <path d="M17 3c-1.6 0-2.6 1.7-2.6 4.4 0 2 1 3.3 2 3.6V21" />
-  </svg>
-);
-
-// Three logs stacked end-on, growth rings showing: the old two-bar glyph read as a pill.
-const WoodIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <circle cx="7.6" cy="15.6" r="3.9" />
-    <circle cx="16.4" cy="15.6" r="3.9" />
-    <circle cx="12" cy="8" r="3.9" />
-    <circle cx="7.6" cy="15.6" r="1.3" />
-    <circle cx="16.4" cy="15.6" r="1.3" />
-    <circle cx="12" cy="8" r="1.3" />
-  </svg>
-);
-
-const WorldIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <circle cx="12" cy="12" r="8.5" />
-    <path d="M3.5 12h17M12 3.5c3 3 3 14 0 17M12 3.5c-3 3-3 14 0 17" />
-  </svg>
-);
-
-const SettlementIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <path d="M4.5 20V11L12 5l7.5 6v9" />
-    <path d="M9.5 20v-5.5h5V20" />
-  </svg>
-);
-
-const CompanyIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <circle cx="8.5" cy="8" r="2.4" />
-    <circle cx="16" cy="9.5" r="2" />
-    <path d="M3.8 19.5c.5-3.3 2.4-5 4.7-5s4.2 1.7 4.7 5M13.6 19.5c.4-2.6 1.8-4 3.9-4s3.5 1.4 3.9 4" />
-  </svg>
-);
-
-const ChronicleIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <path d="M5 4.5h11a2.5 2.5 0 0 1 2.5 2.5v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z" />
-    <path d="M5 17a2.5 2.5 0 0 1 2.5-2.5H18.5" />
-    <path d="M8.5 8h6M8.5 11h6" />
-  </svg>
-);
-
-const WorkshopIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <path d="M5 15.5 12 9l3 3-7 6.5-3.5.5.5-3.5Z" />
-    <path d="M14 5.5 18.5 10M16.2 4.6a2.2 2.2 0 0 1 3.1 3.1L17 10 14 7l2.2-2.4Z" />
-  </svg>
-);
-
-const TavernIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <path d="M6 9h9v7a4.5 4.5 0 0 1-4.5 4.5A4.5 4.5 0 0 1 6 16V9Z" />
-    <path d="M15 11h1.5a2.5 2.5 0 0 1 0 5H15" />
-    <path d="M6 9V6.5h9V9" />
-  </svg>
-);
-
-const ThreatIcon: IconComponent = (props) => (
-  <svg {...base} {...props}>
-    <path d="M5 4l9.5 9.5M19 4l-9.5 9.5" />
-    <path d="M12.6 15.4l2.2-2.2 2 2-2.2 2.2zM11.4 15.4l-2.2-2.2-2 2 2.2 2.2z" />
-    <path d="M16.8 17.4L20 20.6M7.2 17.4L4 20.6" />
-  </svg>
-);
-
-export const HUD_ICONS: Record<HudIconId, IconComponent> = {
-  gold: GoldIcon,
-  food: FoodIcon,
-  wood: WoodIcon,
-  world: WorldIcon,
-  settlement: SettlementIcon,
-  company: CompanyIcon,
-  chronicle: ChronicleIcon,
-  workshop: WorkshopIcon,
-  tavern: TavernIcon,
-  threat: ThreatIcon,
+export const HUD_ICONS: Record<Exclude<HudIconId, PaintedHudIconId>, IconComponent> = {
+  world: engraved('nav-map'),
+  settlement: engraved('nav-village'),
+  company: engraved('nav-company'),
+  chronicle: engraved('nav-chronicle'),
+  workshop: engraved('nav-shop'),
+  tavern: engraved('nav-tavern'),
+  'evt-quest': engraved('evt-quest'),
+  'evt-expedition': engraved('evt-expedition'),
+  'evt-construction': engraved('evt-construction'),
+  'evt-harvest': engraved('evt-harvest'),
+  'evt-visit': engraved('evt-visit'),
 };
 
 /**
- * Painted medallion assets (SDXL pipeline, `.mw/specs/hud-resource-icons`) that
- * replace the stroke glyph for the resource readouts. Ids absent here keep the
- * vector glyph — navigation and event icons are symbols, not painted objects.
+ * Painted objects (bible §11, `.mw/specs/icons`): the resources and the threat mark are
+ * images with their own material, not engraved glyphs. Navigation and event icons are
+ * commands and stay engraved.
  */
-export const HUD_ICON_ASSETS: Partial<Record<HudIconId, string>> = {
-  gold: '/assets/fantasy_ui/icon_gold.webp',
-  food: '/assets/fantasy_ui/icon_food.webp',
-  wood: '/assets/fantasy_ui/icon_wood.webp',
+export const HUD_ICON_ASSETS: Record<PaintedHudIconId, string> = {
+  gold: '/assets/ui/resources/res-gold-128.webp',
+  food: '/assets/ui/resources/res-food-128.webp',
+  wood: '/assets/ui/resources/res-wood-128.webp',
+  threat: '/assets/ui/poi/threat-claws-128.webp',
 };
+
+const isPainted = (id: HudIconId): id is PaintedHudIconId => id in HUD_ICON_ASSETS;
 
 export interface HudGlyphProps extends React.SVGProps<SVGSVGElement> {
   iconId: HudIconId;
@@ -149,25 +75,24 @@ export interface HudGlyphProps extends React.SVGProps<SVGSVGElement> {
 /**
  * Renders a registered icon with an accessible label and no inline color —
  * callers set `color` (or rely on inherited `--skin-icon-color`) rather than
- * passing a hex. Ids listed in `HUD_ICON_ASSETS` render the painted medallion
- * instead of the vector glyph; the asset carries its own material.
+ * passing a hex. Ids listed in `HUD_ICON_ASSETS` render the painted image
+ * instead of an engraved glyph; the asset carries its own material.
  */
 export const HudGlyph: React.FC<HudGlyphProps> = ({ iconId, label, size = 18, style, ...rest }) => {
-  const asset = HUD_ICON_ASSETS[iconId];
-  if (asset) {
+  if (isPainted(iconId)) {
     return (
       <img
-        src={asset}
+        src={HUD_ICON_ASSETS[iconId]}
         alt=""
         role="img"
         aria-label={label}
         width={size}
         height={size}
-        style={{ flexShrink: 0, borderRadius: '50%', objectFit: 'cover', display: 'block', ...style }}
+        style={{ flexShrink: 0, objectFit: 'contain', display: 'block', ...style }}
       />
     );
   }
-  const Icon = HUD_ICONS[iconId];
+  const Icon = HUD_ICONS[iconId as Exclude<HudIconId, PaintedHudIconId>];
   return (
     <Icon
       role="img"

@@ -15,7 +15,7 @@
     "kicker": "!! ÜÜÎÎ ÅÅüüδδîîţţ !!",
     "title": "!! ΔΔééššîîğğññ ŠŠÿÿššţţééṃṃ ṿṿšš ṾṾîîššüüååłł ƑƑîîδδééłłîîţţÿÿ !!",
     "backToHub": "!! ββååççķķ ţţöö ŢŢééššţţ ĤĤüüββ !!",
-    "missingCount": "!! {{count}} ṃṃîîššššîîññğğ îîţţééṃṃšš !!",
+    "missingCount": "!! {count} ṃṃîîššššîîññğğ îîţţééṃṃšš !!",
     "designSystemColumn": "!! ΔΔééššîîğğññ ŠŠÿÿššţţééṃṃ /δδééššîîğğññ-ššÿÿššţţééṃṃ !!",
     "designSystemFrame": "!! ΔΔééššîîğğññ ŠŠÿÿššţţééṃṃ !!",
     "visualFidelityColumn": "!! ṾṾîîššüüååłł ƑƑîîδδééłłîîţţÿÿ /ṿṿîîššüüååłł-ƒƒîîδδééłłîîţţÿÿ-łłååββ !!",
@@ -23,7 +23,7 @@
     "missingSection": "!! ṀṀîîššššîîññğğ & ṀṀööççķķééδδ ÇÇööṃṃṗṗööññééññţţšš !!"
   },
   "examples": {
-    "swordCount": "!! {count, plural, one {one sword} other {{count} swords}} !!",
+    "swordCount": "!! {count, plural, one {one sword} other {# swords}} !!",
     "riskLevel": "!! {level, select, low {Low risk} medium {Medium risk} high {High risk} other {Unknown risk}} !!",
     "characterGreeting": "!! {gender, select, male {Welcome, my lord} female {Welcome, my lady} other {Welcome, adventurer}} !!"
   }

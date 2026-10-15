@@ -1,5 +1,7 @@
 # Asset Steam — mappa file → slot Steamworks (R-117)
 
+> **Aggiornamento 2026-10-13:** la fonte di verità per l'upload è **`upload/`** (nomi e misure degli slot Steam attuali; vedi `PUBLISH-CHECKLIST.md`). I file in `assets/` con le misure 616×353 / 460×215 / 231×87 / 374×448 e i vecchi `0N-*.png` sono **superati** (mappa + logo, misure pre-2024).
+
 Generati dalla sorgente a 3072×2049 (`public/assets/world/wanderlust/base/
 layers/base_flat.graded.webp`) + screenshot in-engine 1920×1080 + logo
 tipografico Cinzel (`tools/make-logo.mts`).

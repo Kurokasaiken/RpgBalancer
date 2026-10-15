@@ -1,0 +1,428 @@
+# Registro icone — PLAN-058 T2.2, bibbia §11.
+#
+# Una voce per icona. Campi:
+#   id          kebab-case, stabile; per le dipinte è anche il nome di cartella del prompt
+#               (.mw/specs/icons/<id>/prompt.md) e del file finale.
+#   livello     dipinta | incisa (bibbia §11.1).
+#   famiglia    dipinte POI: impresa | minaccia (= sagoma del Sigillo, PLAN-058 T4.1;
+#               "lavoro" non ha ancora glifi); poi: risorsa | medaglione.
+#               incise: comando | navigazione | evento | ruolo | stato | oggetto.
+#   soggetto    UNA frase in inglese: per le dipinte è la riga SUBJECT del prompt, con la
+#               patina d'accento in coda ("; patina accent: ..."). Per le voci `needed`
+#               è una bozza da rifinire in T3.1. Per le incise descrive il glifo.
+#   taglie      dipinte [512, 128, 64, 32]; incise [24] (griglia SVG).
+#   display_px  taglia d'uso nell'HUD (dipinte ancora): glifi POI 26 px (campo interno del
+#               medaglione 44/55/69 px × 55-60%), risorse 28 px (riquadro ICON_BOX). Il soggetto
+#               deve reggere quella taglia: niente raggi, crepe, anelli, rigature (lint I8).
+#   stato       needed → prompted (prompt generato e lint verde) → candidate (immagini
+#               generate, in scelta) → approved (scelta del Director, file montato).
+#   ancora      true solo per le sei ancore di T2.6 (riferimento per i prompt successivi).
+#   prompt      percorso del prompt generato, null finché `needed` o se incisa.
+#   file        destinazione dell'asset finale nel repo (null = da decidere in T3.2).
+#   fonte       da dove viene il soggetto nel contenuto canonico.
+#   file (dipinte) = master 512; le taglie 128/64/32 stanno accanto con suffisso `-128`, `-64`, `-32`.
+#   provenance  null finché non c'è un'immagine; poi
+#               {tool, model, variant: gpt|gemini|grok, date, operator, source_file}.
+#
+# Fuori dal registro, di proposito: quest legacy (city-rats, bandit-camp, …) e il ferro,
+# finché non entra nel config canonico (decisione aperta di PLAN-058).
+
+version: 1
+
+icons:
+  # ── Dipinte · POI luogo (famiglia impresa) ───────────────────────────────
+  - id: poi-goblin-camp
+    livello: dipinta
+    famiglia: impresa
+    soggetto: >-
+      A squat hide tent with a dark arched doorway in its front, the sagging canvas
+      tied at the top with a red cord; patina accent: cinnabar on the cord.
+    display_px: 26
+    taglie: [512, 128, 64, 32]
+    stato: approved
+    ancora: true
+    prompt: .mw/specs/icons/poi-goblin-camp/prompt.md
+    file: public/assets/ui/poi/poi-goblin-camp.webp
+    fonte: questPois.ts `poi-goblin` (Sterminio goblin) · goblin identity.md (orecchie, war-paint)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini (tenda v2, senza orecchie)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/Gemini_Generated_Image_vetjfnvetjfnvetj.jpeg (1024x1024, sfondo magenta FF00FF)"
+
+  - id: poi-ruins
+    livello: dipinta
+    famiglia: impresa
+    soggetto: >-
+      A broken stone gateway: two thick pillars of unequal height, the taller one
+      snapped off at its top, with a heavy lintel fallen across the lower one;
+      weathered pale sandstone with bronze-worn edges, patina accent: ivory on the
+      broken faces.
+    display_px: 26
+    taglie: [512, 128, 64, 32]
+    stato: approved
+    ancora: true
+    prompt: .mw/specs/icons/poi-ruins/prompt.md
+    file: public/assets/ui/poi/poi-ruins.webp
+    fonte: questPois.ts `poi-rovine` (Rovine sotto il Fiume)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini (rovine v2, arenaria chiara)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/rovine.jpeg (1024x1024, sfondo magenta FF00FF)"
+
+  # ── Dipinte · offerte metaLayer (famiglia impresa) — bozze per T3.1 ──────
+  - id: offer-forage
+    livello: dipinta
+    famiglia: impresa
+    soggetto: "A round woven basket overflowing with foraged food: a heaped mound of plump red berries and split walnut halves rising above the rim, two small button mushrooms nestled at the front edge; patina accent: deep cinnabar on the berries."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    materia: harvest
+    stato: approved
+    prompt: .mw/specs/icons/offer-forage/prompt.md
+    file: public/assets/ui/poi/offer-forage.webp
+    fonte: goblin lab v0.3 family `forage` (R-175)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/forage.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  - id: offer-delve
+    livello: dipinta
+    famiglia: impresa
+    soggetto: "A square mine entrance braced by two thick timber posts and a heavy crossbeam, the opening a deep dark mouth; patina accent: lamp-amber glow deep inside the opening."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    stato: approved
+    prompt: .mw/specs/icons/offer-delve/prompt.md
+    file: public/assets/ui/poi/offer-delve.webp
+    fonte: goblin lab v0.3 family `delve` (R-175)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/miniera.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  - id: offer-caravan
+    livello: dipinta
+    famiglia: impresa
+    soggetto: "A covered wagon in isometric view, its long side and its front both visible, a tall arched canvas hood over a boxy wooden bed on big solid wheels; patina accent: sun-faded ultramarine on the canvas."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    stato: approved
+    prompt: .mw/specs/icons/offer-caravan/prompt.md
+    file: public/assets/ui/poi/offer-caravan.webp
+    fonte: goblin lab v0.3 family `caravan` (R-175)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/caravan.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  - id: offer-recon
+    livello: dipinta
+    famiglia: impresa
+    soggetto: "A tall wooden watchtower on four splayed legs, crowned by a small lookout under a peaked roof; patina accent: weathered honey on the timber."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    stato: approved
+    prompt: .mw/specs/icons/offer-recon/prompt.md
+    file: public/assets/ui/poi/offer-recon.webp
+    fonte: goblin lab v0.3 family `recon` (R-175)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/watchtower.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  - id: offer-people
+    livello: dipinta
+    famiglia: impresa
+    soggetto: "A wayside lantern hanging from a stout post with a short crossarm, its square cage holding one big warm flame that welcomes travellers; patina accent: warm lantern amber in the flame."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    stato: approved
+    prompt: .mw/specs/icons/offer-people/prompt.md
+    file: public/assets/ui/poi/offer-people.webp
+    fonte: goblin lab v0.3 family `people` (migranti, R-175 D3)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/lanterna.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  - id: offer-assault
+    livello: dipinta
+    famiglia: impresa
+    soggetto: "A palisade gate of five sharpened stakes, the middle stake tallest, held by one heavy crossbar; patina accent: scorched ochre on the stake points."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    stato: approved
+    prompt: .mw/specs/icons/offer-assault/prompt.md
+    file: public/assets/ui/poi/offer-assault.webp
+    fonte: goblin lab v0.3 family `assault` (R-175)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/palizzata.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  # ── Dipinte · minacce (famiglia minaccia, D3: niente teschi) ─────────────
+  - id: threat-claws
+    livello: dipinta
+    famiglia: minaccia
+    soggetto: >-
+      Three bold claw gashes side by side, the middle one longest, each a wide
+      tapered rip whose bronze lips open onto deep teal lacquer; patina accent: pale
+      ivory on the torn lips.
+    display_px: 26
+    taglie: [512, 128, 64, 32]
+    stato: approved
+    ancora: true
+    prompt: .mw/specs/icons/threat-claws/prompt.md
+    file: public/assets/ui/poi/threat-claws.webp
+    fonte: PLAN-058 D3 (segni d'artiglio) · minaccia generica
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini (artigli v2)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/artigli.jpeg (1024x1024, sfondo magenta FF00FF)"
+
+  - id: threat-invasion
+    livello: dipinta
+    famiglia: minaccia
+    soggetto: "Two crossed goblin spears with broad stone heads, a torn war banner hanging from their crossing; patina accent: dull ochre on the banner cloth."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    stato: approved
+    prompt: .mw/specs/icons/threat-invasion/prompt.md
+    file: public/assets/ui/poi/threat-invasion.webp
+    fonte: PLAN-058 D3 (lance/stendardo) · invasione
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/lance incrociate.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  - id: threat-goblin-king
+    livello: dipinta
+    famiglia: minaccia
+    soggetto: "A crude crown of five jagged stone spikes on a thick band, split clean down the middle so the two halves lean apart; patina accent: dull ochre on the spikes."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    stato: approved
+    prompt: .mw/specs/icons/threat-goblin-king/prompt.md
+    file: public/assets/ui/poi/threat-goblin-king.webp
+    fonte: PLAN-058 D3 (corona spezzata) · `king-assault` / `clock:king` (R-175)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/corona spezzata.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  - id: threat-beasts
+    livello: dipinta
+    famiglia: minaccia
+    soggetto: "A pair of huge curved sabre fangs hanging down side by side, joined at the top by a single short gum ridge, the space below a dark open bite; patina accent: pale ivory on the fang tips."
+    taglie: [512, 128, 64, 32]
+    display_px: 26
+    materia: fang
+    stato: approved
+    prompt: .mw/specs/icons/threat-beasts/prompt.md
+    file: public/assets/ui/poi/threat-beasts.webp
+    fonte: PLAN-058 D3 (zanne/mascella) · bestie
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/zanne.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  # ── Dipinte · risorse ────────────────────────────────────────────────────
+  - id: res-gold
+    livello: dipinta
+    famiglia: risorsa
+    soggetto: >-
+      Exactly three gold coins: two lying stacked with their edges visible and a
+      third leaning upright against them, showing a small head in profile in shallow
+      relief inside a plain rim; patina accent: warm matte gold.
+    display_px: 28
+    taglie: [512, 128, 64, 32]
+    stato: approved
+    ancora: true
+    prompt: .mw/specs/icons/res-gold/prompt.md
+    file: public/assets/ui/resources/res-gold.webp
+    fonte: risorsa canonica `gold` (ResourceReadout)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini (prompt v3 di ANCORE-gemini-oro-legna.md)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/oro.jpeg (1024x1024, sfondo magenta FF00FF)"
+
+  - id: res-food
+    livello: dipinta
+    famiglia: risorsa
+    soggetto: >-
+      A rustic loaf of bread seen head-on: one plump dome of warm golden crust
+      tapering to a narrower base, with a single deep split across the crown
+      revealing soft pale crumb; patina accent: pale flour dust on the crown.
+    display_px: 28
+    materia: baked
+    taglie: [512, 128, 64, 32]
+    stato: approved
+    ancora: true
+    prompt: .mw/specs/icons/res-food/prompt.md
+    file: public/assets/ui/resources/res-food.webp
+    fonte: risorsa canonica `food` (ResourceReadout)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini (pane v2)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/pane.jpeg (1024x1024, quadrettato grigio finto, rimosso per saturazione)"
+
+  - id: res-wood
+    livello: dipinta
+    famiglia: risorsa
+    soggetto: >-
+      A stack of log ends, isometric view, with the pale end face and the bark both
+      visible; patina accent: honey-coloured fresh timber on the cut faces.
+    display_px: 28
+    taglie: [512, 128, 64, 32]
+    stato: approved
+    ancora: true
+    prompt: .mw/specs/icons/res-wood/prompt.md
+    file: public/assets/ui/resources/res-wood.webp
+    fonte: risorsa canonica `wood` (ResourceReadout)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini (prompt v3 di ANCORE-gemini-oro-legna.md)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/legna.jpeg (1024x1024, sfondo magenta FF00FF)"
+
+  # ── Dipinte · medaglione giorno/notte — lega per stato (R-191): alba oro-rosa,
+  #    giorno bronzo, tramonto rame-brace, notte argento (T1.2: niente viola) ──
+  - id: time-dawn
+    livello: dipinta
+    famiglia: medaglione
+    soggetto: "A free-standing half sun rising over one straight heavy horizon bar, not a coin and not a medal, five short blunt flame-points on its crown and a sleepy face carved like a rough folk woodcut with two half-closed almond eyes and a small crescent smile, no nose; patina accent: pale primrose on the flame-points."
+    materia: rosegold
+    taglie: [512, 128, 64, 32]
+    display_px: 24
+    stato: prompted
+    prompt: .mw/specs/icons/time-dawn/prompt.md
+    file: public/assets/ui/time/time-dawn.webp
+    fonte: WhenWhereCluster (medaglione)
+    provenance: null
+  - id: time-day
+    livello: dipinta
+    famiglia: medaglione
+    soggetto: "A free-standing sun cut out as one bold shape, not a coin and not a medal, a round face ringed by eight short blunt flame-points and carved like a rough folk woodcut with two almond eye-holes and one wide crescent grin, no nose and no realistic features; patina accent: warm white-gold on the flame-points."
+    taglie: [512, 128, 64, 32]
+    display_px: 24
+    stato: prompted
+    prompt: .mw/specs/icons/time-day/prompt.md
+    file: public/assets/ui/time/time-day.webp
+    fonte: WhenWhereCluster (medaglione)
+    provenance:
+      tool: "non dichiarato"
+      variant: "Gemini/Grok (sfondo magenta FF00FF)"
+      date: "2026-10-14"
+      operator: "Director"
+      source_file: "~/Downloads/sole.jpeg (1024x1024)"
+      montaggio: "scripts/mount-icon.py"
+
+  - id: time-dusk
+    livello: dipinta
+    famiglia: medaglione
+    soggetto: "A free-standing low sun half sunk into one straight heavy horizon bar, not a coin and not a medal, a smooth dome without flame-points bearing a drowsy face carved like a rough folk woodcut with two downturned eye-slits and a closed crescent mouth; patina accent: deep amber on the dome."
+    materia: ember
+    taglie: [512, 128, 64, 32]
+    display_px: 24
+    stato: prompted
+    prompt: .mw/specs/icons/time-dusk/prompt.md
+    file: public/assets/ui/time/time-dusk.webp
+    fonte: WhenWhereCluster (medaglione)
+    provenance: null
+  - id: time-night
+    livello: dipinta
+    famiglia: medaglione
+    soggetto: "A free-standing thick crescent moon, not a coin and not a medal, its inner curve carved like a rough folk woodcut profile with one almond eye-hole and a wide sly crescent grin, no realistic nose, cradling one small five-pointed star; patina accent: warm pale gold on the star."
+    materia: silver
+    taglie: [512, 128, 64, 32]
+    display_px: 24
+    stato: prompted
+    prompt: .mw/specs/icons/time-night/prompt.md
+    file: public/assets/ui/time/time-night.webp
+    fonte: WhenWhereCluster (medaglione) · PLAN-058 T1.2
+    provenance: null
+  # ── Incise · comandi (SVG pieni currentColor, griglia 24 — T3.2) ─────────
+  - {id: cmd-menu, livello: incisa, famiglia: comando, soggetto: three stacked solid bars, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudGameMenu, provenance: null}
+  - {id: cmd-pause, livello: incisa, famiglia: comando, soggetto: two solid upright bars, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: controlli tempo, provenance: null}
+  - {id: cmd-play, livello: incisa, famiglia: comando, soggetto: solid right-pointing triangle, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: controlli tempo, provenance: null}
+  - {id: cmd-speed, livello: incisa, famiglia: comando, soggetto: two solid right-pointing triangles nose to tail, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: controlli tempo, provenance: null}
+  - {id: cmd-panels, livello: incisa, famiglia: comando, soggetto: two solid overlapping cards, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudPanelsMenu, provenance: null}
+  - {id: cmd-eye, livello: incisa, famiglia: comando, soggetto: solid almond eye with round pupil, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudHideToggle, provenance: null}
+  - {id: cmd-eye-off, livello: incisa, famiglia: comando, soggetto: solid closed eyelid with three lashes, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudHideToggle, provenance: null}
+  - {id: cmd-close, livello: incisa, famiglia: comando, soggetto: solid diagonal cross, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: pannelli HUD, provenance: null}
+  - {id: cmd-filter, livello: incisa, famiglia: comando, soggetto: solid funnel, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: Roster V2 / registro eventi, provenance: null}
+  - {id: cmd-sort, livello: incisa, famiglia: comando, soggetto: up and down solid arrowheads stacked, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: Roster V2, provenance: null}
+  - {id: cmd-lock, livello: incisa, famiglia: comando, soggetto: solid padlock with shackle, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: GameFrame plinth (T1.3), provenance: null}
+  - {id: cmd-recenter, livello: incisa, famiglia: comando, soggetto: solid crosshair ring with four ticks and a centre dot, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudRecenterButton (T1.3), provenance: null}
+  # ── Incise · navigazione ─────────────────────────────────────────────────
+  - {id: nav-village, livello: incisa, famiglia: navigazione, soggetto: solid gabled house with chimney, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: GameFrame plinth, provenance: null}
+  - {id: nav-map, livello: incisa, famiglia: navigazione, soggetto: solid folded map in three panels, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: GameFrame plinth, provenance: null}
+  - {id: nav-shop, livello: incisa, famiglia: navigazione, soggetto: solid medieval hanging shop sign with a money bag cut-out, a wheel and a handle, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: GameFrame plinth (bottega), provenance: null}
+  - {id: nav-tavern, livello: incisa, famiglia: navigazione, soggetto: solid barrel in three hooped pieces, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: GameFrame plinth (taverna), provenance: null}
+  # ── Incise · tipi evento (HudEventLedger) ────────────────────────────────
+  - {id: evt-quest, livello: incisa, famiglia: evento, soggetto: solid exclamation mark, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudEventLedger, provenance: null}
+  - {id: evt-expedition, livello: incisa, famiglia: evento, soggetto: solid tent with a pennant, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudEventLedger, provenance: null}
+  - {id: evt-construction, livello: incisa, famiglia: evento, soggetto: solid hammer on the diagonal, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudEventLedger, provenance: null}
+  - {id: evt-harvest, livello: incisa, famiglia: evento, soggetto: solid wheat ear with paired grains, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudEventLedger, provenance: null}
+  - {id: evt-visit, livello: incisa, famiglia: evento, soggetto: solid open door, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudEventLedger, provenance: null}
+  # ── Incise · ruoli e stato (Roster V2) ───────────────────────────────────
+  - {id: role-leader, livello: incisa, famiglia: ruolo, soggetto: solid three-point crown band, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: Roster V2, provenance: null}
+  - {id: role-member, livello: incisa, famiglia: ruolo, soggetto: solid head-and-shoulders bust, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: Roster V2, provenance: null}
+  - {id: role-bodyguard, livello: incisa, famiglia: ruolo, soggetto: solid heater shield with a chevron cut-out, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: Roster V2, provenance: null}
+  - {id: role-scout, livello: incisa, famiglia: ruolo, soggetto: solid bow with a nocked arrow pointing right, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: Roster V2, provenance: null}
+  - {id: status-wound, livello: incisa, famiglia: stato, soggetto: solid blood drop with a notch, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: Roster V2 (injured), provenance: null}
+  # ── Incise · estensioni T3.2 (finestra quest, epilogo) ───────────────────
+  - {id: cmd-minimize, livello: incisa, famiglia: comando, soggetto: solid short horizontal bar, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: cmd-close next to it in quest window, provenance: null}
+  - {id: cmd-help, livello: incisa, famiglia: comando, soggetto: solid question mark, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow (next phase · unknown), provenance: null}
+  - {id: nav-company, livello: incisa, famiglia: navigazione, soggetto: three solid busts, the centre one in front, the centre one larger, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow (roster) · HudGlyph company, provenance: null}
+  - {id: nav-bag, livello: incisa, famiglia: navigazione, soggetto: solid round-bellied pouch with a flap edged by a double border, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow (bag), provenance: null}
+  - {id: nav-chronicle, livello: incisa, famiglia: navigazione, soggetto: solid open book, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow (chronicle) · QuestEpilogue (titles), provenance: null}
+  - {id: evt-combat, livello: incisa, famiglia: evento, soggetto: solid two crossed blades, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow (combat) · D6 lame di ferro incrociate, provenance: null}
+  - {id: status-fallen, livello: incisa, famiglia: stato, soggetto: solid gravestone with a cross cut-out, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow / QuestEpilogue (dead) · replaces the skull (D3), provenance: null}
+  - {id: ico-scroll, livello: incisa, famiglia: oggetto, soggetto: solid tilted scroll with two rolled ends, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow / QuestEpilogue (briefing · lore), provenance: null}
+  - {id: ico-axe, livello: incisa, famiglia: oggetto, soggetto: solid bearded axe on the diagonal, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow (phase), provenance: null}
+  - {id: ico-gust, livello: incisa, famiglia: oggetto, soggetto: three solid wind streaks with curls, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow (phase flight), provenance: null}
+  - {id: ico-chest, livello: incisa, famiglia: oggetto, soggetto: solid domed chest with keyhole, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow / QuestEpilogue (consumed), provenance: null}
+  - {id: ico-pouch, livello: incisa, famiglia: oggetto, soggetto: solid sack tied at the neck, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestRunWindow / QuestEpilogue (loot), provenance: null}
+  - {id: ico-cup, livello: incisa, famiglia: oggetto, soggetto: solid goblet, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestEpilogue (reward), provenance: null}
+  - {id: ico-vial, livello: incisa, famiglia: oggetto, soggetto: solid round potion flask with liquid and bubbles, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestEpilogue (diseases), provenance: null}
+  - {id: ico-spark, livello: incisa, famiglia: oggetto, soggetto: solid four-point concave spark, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: QuestEpilogue (xp), provenance: null}

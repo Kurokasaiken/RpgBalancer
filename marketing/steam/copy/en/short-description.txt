@@ -1,4 +1,4 @@
-Wanderlust: Triumph — SHORT DESCRIPTION (EN, committed 2026-10-12 — R-145)
+Wanderlust: Triumph — SHORT DESCRIPTION (EN, v2 — 2026-10-13, REVIEW-2026-10-12)
 Steam limit: ~300 chars, plain text, no BBCode.
 
-A roguelite strategy RPG where villagers become heroes. Take on ever-harder quests, weigh the odds, and build heroes from what you find. When your settlement falls, carry your gains into the next run.
+A roguelite strategy RPG where heroes are made, not born. Pick the quests worth the risk, read the odds for the exact party you send, and let the Astrolabe decide who comes back. When your settlement falls, what you earned carries into the next run.

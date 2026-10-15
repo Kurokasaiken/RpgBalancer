@@ -30,6 +30,8 @@ All entries follow the Creature IP Development System lifecycle:
 | [Bronze Relic Guardian](creatures/bronze-relic-guardian/identity.md) | Ancient Constructs | Relic Guardian | Mid — Rare | canonical | 1.0.0 | creature |
 | [Emerald Scale Serpent](creatures/emerald-scale-serpent/identity.md) | Mythic Beasts | Mythic Serpent | Mid/Late — Epic | canonical | 1.0.0 | creature |
 | [Momentum Bruiser](creatures/momentum-bruiser/identity.md) | Beasts | Bruiser | Early/Mid — Common | canonical | 1.0.0 | creature |
+| [Uomini-Rana](creatures/uomini-rana/identity.md) | — (unassigned) | Sapient Race | — | draft | 0.1.0 | creature |
+| [Goblin](creatures/goblin/identity.md) | — (unassigned) | Swarm Raiders | Early — Common | candidate | 0.1.0 | creature |
 
 ## Versioning Rules
 

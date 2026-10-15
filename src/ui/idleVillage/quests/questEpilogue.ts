@@ -12,7 +12,9 @@
  * - consumed — `run.consumablesUsed` flags → catalog items (`labelKey`),
  *   unknown flags shown raw (honest, never dropped);
  * - reward/loot/xp — the settlement's `village-gold`/`village-xp` amounts,
- *   reward vs loot split by the effect key (`reward:`/`loot:`);
+ *   reward vs loot split by the effect key (`reward:`/`loot:`); R-183: when
+ *   the plan credits members (`resident-xp`) the xp section lists who got
+ *   how much instead of the bare village total;
  * - loot names — `run.loot[]` authored labels;
  * - info — `run.info[]` through `scenario.intelLabels`;
  * - titles/diseases/lore — the scenario's `epilogue` authored seam,
@@ -63,6 +65,7 @@ export function buildQuestEpilogue(
   const reward: EpilogueLine[] = [];
   const loot: EpilogueLine[] = [];
   const xp: EpilogueLine[] = [];
+  const memberXp: EpilogueLine[] = [];
 
   for (const e of plan.effects) {
     switch (e.kind) {
@@ -80,6 +83,14 @@ export function buildQuestEpilogue(
         break;
       case 'village-xp':
         xp.push({ key: 'gameFrame.questEpilogue.xpAmount', params: { amount: e.amount ?? 0 } });
+        break;
+      case 'resident-xp':
+        memberXp.push({
+          key: 'gameFrame.questEpilogue.memberXp',
+          params: { name: nameOf(e.residentId), amount: e.amount ?? 0 },
+          /* no `memberId`: the renderer would append the wound countdown,
+           *  which belongs to the «wounded» section only */
+        });
         break;
       default:
         break; // loadout-release: bookkeeping, no report line
@@ -110,7 +121,7 @@ export function buildQuestEpilogue(
     consumed,
     reward,
     loot,
-    xp,
+    xp: memberXp.length > 0 ? memberXp : xp,
     info,
     titles: grants(scenario?.epilogue?.titles),
     diseases: grants(scenario?.epilogue?.diseases),

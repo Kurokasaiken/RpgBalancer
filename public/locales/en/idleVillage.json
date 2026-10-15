@@ -101,7 +101,7 @@
     "verdictNearMiss": "Almost",
     "verdictFail": "Failure",
     "verdictCrit": "Ruin",
-    "riskDeclared": "{{death}}% death · {{wound}}% wound",
+    "riskDeclared": "{death}% death · {wound}% wound",
     "riskNone": "None",
     "riskHeld": "Unharmed",
     "riskWounded": "Wounded",
@@ -110,7 +110,7 @@
     "skip": "Skip",
     "auto": "Auto",
     "mute": "Mute",
-    "axisReadout": "{{skill}}: {{stat}} against difficulty {{difficulty}} — {{relation}}",
+    "axisReadout": "{skill}: {stat} against difficulty {difficulty} — {relation}",
     "relation_margin": "above the threshold",
     "relation_deficit": "below the threshold",
     "relation_even": "level with the threshold"
@@ -122,6 +122,8 @@
   "floatingPanel": {
     "minimize": "Minimise panel",
     "restore": "Restore panel",
+    "pin": "Pin panel open",
+    "unpin": "Unpin panel",
     "close": "Close panel"
   },
   "hitStop": "Hit Stop",
@@ -378,7 +380,8 @@
     },
     "stats": {
       "hp": "Health",
-      "stamina": "Stamina"
+      "stamina": "Stamina",
+      "xpTitle": "{name} · {xp} XP"
     }
   },
   "slowMo": "Slow Mo",
@@ -689,8 +692,8 @@
     "cost": "Cost",
     "budget": "Budget",
     "balanceBar": "Budget usage",
-    "balanced": "Within budget ({{balance}} points free)",
-    "overBudget": "Over budget by {{balance}} points",
+    "balanced": "Within budget ({balance} points free)",
+    "overBudget": "Over budget by {balance} points",
     "save": "Save equipment",
     "saved": "Equipment saved",
     "saveFailed": "Failed to save equipment",
@@ -705,12 +708,12 @@
   },
   "astrolabeV63": {
     "check": "Check",
-    "statVsDc": "{{stat}} vs difficulty {{difficulty}}",
-    "probability": "Success chance ~{{pct}}%",
-    "risk": "Wound {{wound}}% · Death {{dead}}%",
+    "statVsDc": "{stat} vs difficulty {difficulty}",
+    "probability": "Success chance ~{pct}%",
+    "risk": "Wound {wound}% · Death {dead}%",
     "riskWounded": "Wounded",
     "riskDead": "Fallen",
-    "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
+    "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
     "verdict": {
       "bigwin": "TRIUMPH",
       "win": "SUCCESS",
@@ -763,12 +766,12 @@
   },
   "astrolabeV64": {
     "check": "Check",
-    "statVsDc": "{{stat}} vs difficulty {{difficulty}}",
-    "probability": "Success chance ~{{pct}}%",
-    "risk": "Wound {{wound}}% · Death {{dead}}%",
+    "statVsDc": "{stat} vs difficulty {difficulty}",
+    "probability": "Success chance ~{pct}%",
+    "risk": "Wound {wound}% · Death {dead}%",
     "riskWounded": "Wounded",
     "riskDead": "Fallen",
-    "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
+    "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
     "verdict": {
       "bigwin": "TRIUMPH",
       "win": "SUCCESS",
@@ -939,7 +942,8 @@
       "residentWounded": "{name} came back wounded from the expedition.",
       "goldReward": "Quest reward: +{amount} gold ({quest}).",
       "goldLoot": "Loot: +{amount} gold ({quest}).",
-      "xp": "Expedition experience: +{amount} XP ({quest})."
+      "xp": "Expedition experience: +{amount} XP ({quest}).",
+      "residentXp": "{name} gained {amount} XP ({quest})."
     },
     "questEpilogue": {
       "title": "Expedition report",
@@ -955,7 +959,8 @@
       "lore": "Echoes of the place",
       "goldAmount": "+{amount} gold",
       "xpAmount": "+{amount} XP",
-      "recovery": "recovers in ~{days} d"
+      "recovery": "recovers in ~{days} d",
+      "memberXp": "{name} +{amount} XP"
     },
     "director": {
       "title": "Director",
@@ -966,7 +971,10 @@
       "skin": "Skin: {name}",
       "poiTypes": "POI types",
       "questRun": "Start goblin quest",
-      "wonder": "Sea wonder"
+      "wonder": "Sea wonder",
+      "settlementLost": "Settlement lost",
+      "merchantMarker": "Merchant marker",
+      "levelUp": "Hero level-up"
     },
     "roster": {
       "title": "Roster",
@@ -1008,7 +1016,20 @@
         "events": "Events",
         "director": "Director",
         "tuning": "Tuning",
-        "quest": "Quest in progress"
+        "quest": "Quest in progress",
+        "heroSheet": "Character sheet",
+        "villageStash": "Village stash",
+        "merchant": "Merchant"
+      }
+    },
+    "stash": {
+      "title": "Village stash",
+      "capacity": "{count} of {max} goods in store",
+      "qty": "{qty} in store"
+    },
+    "buildings": {
+      "stash": {
+        "name": "Village warehouse"
       }
     },
     "menu": {
@@ -1022,6 +1043,9 @@
       "quit": "Quit to title",
       "theme": "Theme",
       "language": "Language",
+      "interfaceSize": "Interface size",
+      "interfaceSizeAuto": "Auto",
+      "interfaceSizeAutoHint": "Auto ({percent}%)",
       "languages": {
         "en": "English",
         "it-IT": "Italiano"
@@ -1043,7 +1067,8 @@
     "tuning": {
       "reset": "Reset values",
       "save": "Save",
-      "saved": "Saved ✓"
+      "saved": "Saved ✓",
+      "bakeFailed": "Saved for this browser — the new defaults could not be written to the config (dev server only)."
     },
     "questWindow": {
       "roster": "Assigned party",
@@ -1053,6 +1078,12 @@
       "restore": "Reopen",
       "waiting": "A decision is waiting",
       "bagEmpty": "Bag is empty",
+      "bagStrip": {
+        "label": "Packed bag",
+        "chipName": "{label} ({qualifier})",
+        "armed": "armed",
+        "held": "carried"
+      },
       "dead": "fallen",
       "hpLost": "−{hp} HP",
       "loot": "+{count, plural, one {# loot} other {# loot}}",
@@ -1083,6 +1114,57 @@
     "hud": {
       "hide": "Hide HUD",
       "show": "Show HUD"
+    },
+    "heroSheet": {
+      "prev": "Previous character",
+      "next": "Next character",
+      "pin": "Pin sheet",
+      "unpin": "Unpin sheet",
+      "loadout": "Loadout",
+      "inventory": "Inventory",
+      "inventoryEmpty": "Empty"
+    },
+    "merchant": {
+      "title": "Trader Rowen",
+      "previewBadge": "Preview",
+      "restockNote": "Rowen restocks when the road is kind",
+      "markerName": "Trader's stall",
+      "priceLine": "{price} {currency}",
+      "currency": {
+        "gold": "gold"
+      },
+      "buy": {
+        "button": "Buy",
+        "previewLabel": "preview only",
+        "previewTooltip": "Trading arrives with the economy update — this screen is a preview"
+      },
+      "offers": {
+        "healingDraught": {
+          "name": "Healing draughts, three to a crate",
+          "desc": "Bitter green glass, sealed with wax — a wound that closes before the road turns.",
+          "stock": "One crate left"
+        },
+        "fieldRations": {
+          "name": "Field rations for the long march",
+          "desc": "Hardtack, dried apples and salted fish — food that keeps its nerve longer than you will.",
+          "stock": "Plenty, while the ovens hold"
+        },
+        "smokeBomb": {
+          "name": "Smoke bombs, a pair",
+          "desc": "Clay shells of grey powder — cover for a retreat no one remembers making.",
+          "stock": "A pair only"
+        },
+        "wardCharm": {
+          "name": "Iron ward-charm",
+          "desc": "A cold nail of meteoric iron on a cord — luck you can hold when the dark gets close.",
+          "stock": "The last one he brought north"
+        }
+      }
+    },
+    "heroLevel": {
+      "badge": "Lv {n}",
+      "floater": "Level {n}",
+      "a11y": "Level {n} hero"
     }
   },
   "missionPlanner": {
@@ -1565,7 +1647,9 @@
       "scouted": "scouted"
     },
     "item": {
-      "draftHorse": "One mount for the whole expedition — halves the pace of every leg."
+      "draftHorse": "One mount for the whole expedition — halves the pace of every leg.",
+      "healingDraught": "−10% wound chance on every member's check.",
+      "luckyCoin": "+10% to the expedition's reward."
     },
     "coverage": "Covers"
   },

@@ -1,5 +1,12 @@
 # Icone dei POI — prompt (quest, job, event)
 
+> **⛔ SUPERATO dal 2026-10-13 (PLAN-058 T2.6).** Non usare questi prompt. Smentiti dalle misure di R-177
+> (la famiglia letta dal colore del bordo fallisce sui biomi), glifi di azione invece che di luogo (contro D1), oro lucido (contro bibbia §11.3).
+> Al loro posto: bibbia §11 (`src/docs/docs/plans/art_direction_plan.md`), registro e kit in
+> `src/docs/docs/art-direction/icons/`, prompt generati in `.mw/specs/icons/<id>/prompt.md`
+> (`python scripts/gen-icon-prompts.py`, lint `python scripts/lint-icon-prompts.py`).
+> Conservato solo come memoria storica.
+
 Dove vanno: `public/assets/ui/poi/icon_quest.webp`, `icon_job.webp`, `icon_event.webp` (512×512, sfondo trasparente). Il medaglione le carica da solo
 (`usePoiTypeIcon`); finché il file manca resta la croce. Sulla mappa il glifo è ~24 px: una sola sagoma, grossa, leggibile da lontano.
 

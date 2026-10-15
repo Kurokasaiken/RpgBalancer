@@ -5,9 +5,10 @@
  * `data-hud-controls` toolbar for the belt) — no ad-hoc Tailwind chrome.
  */
 
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { Pin, PinOff, X } from 'lucide-react';
 import {
   previewOption,
   availableOptions,
@@ -61,9 +62,24 @@ const bodyText: React.CSSProperties = {
  * `position: fixed` escapes every `overflow` ancestor (the plinth's own
  * scroll container would clip an in-flow absolute panel). Anchored above
  * the option; flips below when the space above is too thin.
+ *
+ * Hover-pinnable contract (hud_component_guide §5b.7): the panel is
+ * interactive — pointer-events on, it stays open while hovered, and it
+ * carries pin + close controls in a `data-hud-controls` corner group.
+ * Width fits the analytic content (the RecordList counterfactual needs
+ * ~30rem, not a 22rem strip).
  */
-const XRayPopover: React.FC<{ rect: DOMRect; children: React.ReactNode }> = ({ rect, children }) => {
-  const W = 352; // 22rem
+const XRayPopover: React.FC<{
+  rect: DOMRect;
+  pinned: boolean;
+  onTogglePin: () => void;
+  onClose: () => void;
+  onHoverStart: () => void;
+  onHoverEnd: () => void;
+  children: React.ReactNode;
+}> = ({ rect, pinned, onTogglePin, onClose, onHoverStart, onHoverEnd, children }) => {
+  const { t } = useTranslation('idleVillage');
+  const W = 480; // 30rem — the analytic preview needs a real panel, not a strip
   const GAP = 8;
   const left = Math.max(GAP, Math.min(rect.left, window.innerWidth - W - GAP));
   const spaceAbove = rect.top - 2 * GAP;
@@ -72,9 +88,14 @@ const XRayPopover: React.FC<{ rect: DOMRect; children: React.ReactNode }> = ({ r
       ? { bottom: window.innerHeight - rect.top + GAP, maxHeight: spaceAbove }
       : { top: rect.bottom + GAP, maxHeight: window.innerHeight - rect.bottom - 2 * GAP };
   return createPortal(
-    <div className="pointer-events-none fixed z-[60] w-[22rem]" style={{ left, ...pos }}>
+    <div
+      className="fixed z-[60] w-[min(30rem,calc(100vw-16px))]"
+      style={{ left, ...pos }}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
+    >
       <div
-        className="quest-s1-scroll overflow-y-auto p-2"
+        className="quest-s1-scroll relative overflow-y-auto p-2 pt-8"
         style={{
           maxHeight: 'inherit',
           borderRadius: 12,
@@ -83,6 +104,25 @@ const XRayPopover: React.FC<{ rect: DOMRect; children: React.ReactNode }> = ({ r
           boxShadow: 'var(--skin-hud-shadow-filter)',
         }}
       >
+        <div data-hud-controls style={{ position: 'absolute', top: 6, right: 6, zIndex: 1 }}>
+          <button
+            type="button"
+            aria-pressed={pinned}
+            aria-label={pinned ? t('floatingPanel.unpin') : t('floatingPanel.pin')}
+            title={pinned ? t('floatingPanel.unpin') : t('floatingPanel.pin')}
+            onClick={onTogglePin}
+          >
+            {pinned ? <PinOff aria-hidden /> : <Pin aria-hidden />}
+          </button>
+          <button
+            type="button"
+            aria-label={t('floatingPanel.close')}
+            title={t('floatingPanel.close')}
+            onClick={onClose}
+          >
+            <X aria-hidden />
+          </button>
+        </div>
         {children}
       </div>
     </div>,
@@ -106,6 +146,47 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
   const options = availableOptions(run);
   const loneChoice = options.length === 1;
   const [xray, setXray] = useState<{ optionId: string; rect: DOMRect } | null>(null);
+  const [xrayPinned, setXrayPinnedState] = useState(false);
+  /* A ref mirrors `pinned` so the delayed-close timer always reads the
+   *  CURRENT value: a mouseleave may arm the timer before React commits
+   *  the pin click — the callback must re-check, not trust the closure. */
+  const xrayPinnedRef = useRef(false);
+  const xrayCloseTimer = useRef<number | null>(null);
+  const setXrayPinned = useCallback((v: boolean) => {
+    xrayPinnedRef.current = v;
+    setXrayPinnedState(v);
+  }, []);
+
+  /* Hover-pinnable tooltip lifecycle (hud_component_guide §5b.7): leaving
+   *  the trigger schedules a delayed close so the pointer can cross the
+   *  gap into the panel; entering the panel cancels it; pin freezes the
+   *  panel until unpinned or closed. */
+  const cancelXrayClose = useCallback(() => {
+    if (xrayCloseTimer.current != null) {
+      window.clearTimeout(xrayCloseTimer.current);
+      xrayCloseTimer.current = null;
+    }
+  }, []);
+  const scheduleXrayClose = useCallback(() => {
+    if (xrayPinnedRef.current) return;
+    cancelXrayClose();
+    xrayCloseTimer.current = window.setTimeout(() => {
+      if (xrayPinnedRef.current) return;
+      setXray(null);
+    }, 140);
+  }, [cancelXrayClose]);
+  const openXray = useCallback(
+    (optionId: string, rect: DOMRect) => {
+      cancelXrayClose();
+      setXray((cur) => (xrayPinnedRef.current ? cur : { optionId, rect }));
+    },
+    [cancelXrayClose],
+  );
+  const closeXray = useCallback(() => {
+    cancelXrayClose();
+    setXrayPinned(false);
+    setXray(null);
+  }, [cancelXrayClose, setXrayPinned]);
   return (
     <div
       className="quest-s1-scroll flex w-full flex-col overflow-y-auto"
@@ -232,14 +313,10 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
                   <button
                     disabled={o.disabled}
                     onClick={() => onChoose(o.id)}
-                    onMouseEnter={(e) =>
-                      setXray({ optionId: o.id, rect: e.currentTarget.getBoundingClientRect() })
-                    }
-                    onMouseLeave={() => setXray((v) => (v?.optionId === o.id ? null : v))}
-                    onFocus={(e) =>
-                      setXray({ optionId: o.id, rect: e.currentTarget.getBoundingClientRect() })
-                    }
-                    onBlur={() => setXray((v) => (v?.optionId === o.id ? null : v))}
+                    onMouseEnter={(e) => openXray(o.id, e.currentTarget.getBoundingClientRect())}
+                    onMouseLeave={scheduleXrayClose}
+                    onFocus={(e) => openXray(o.id, e.currentTarget.getBoundingClientRect())}
+                    onBlur={scheduleXrayClose}
                     data-skin={loneChoice ? 'cta' : 'button'}
                     data-variant={loneChoice ? undefined : 'secondary'}
                     className="w-full px-4 py-2.5 text-left normal-case tracking-normal"
@@ -309,7 +386,14 @@ export const ActionZone: React.FC<ActionZoneProps> = ({
               (Director D1), portaled out so the plinth's own scroll can't
               clip it. */}
           {xray && previewOption(run, xray.optionId, { useConsumable: armConsumable }) && (
-            <XRayPopover rect={xray.rect}>
+            <XRayPopover
+              rect={xray.rect}
+              pinned={xrayPinned}
+              onTogglePin={() => setXrayPinned(!xrayPinnedRef.current)}
+              onClose={closeXray}
+              onHoverStart={cancelXrayClose}
+              onHoverEnd={scheduleXrayClose}
+            >
               <QuestCheckPreview
                 run={run}
                 optionId={xray.optionId}

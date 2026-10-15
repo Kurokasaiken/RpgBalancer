@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { useEffect, useId, useMemo, useRef } from 'react';
 import { useSkinPreferences } from '@/ui/idleVillage/hooks/useSkinPreferences';
 import {
+  DAYNIGHT_SILVER_NIGHT,
   getDayNightPoiSkinForPreset,
   resolveDayNightPoiPresetId,
 } from '@/ui/idleVillage/skins/dayNightPoiSkinConfig';
@@ -34,6 +35,8 @@ interface DayNightPoiSkinProps {
   isPaused: boolean;
   /** Debug layer visibility toggles for isolating visual artifacts */
   debug?: DayNightDebugLayers;
+  /** Night colouring: the certified violet (default) or moonlit silver for the /game HUD. */
+  nightTone?: 'arcane' | 'silver';
 }
 
 function clamp01(value: number): number {
@@ -74,7 +77,8 @@ const defaultDebug: Required<DayNightDebugLayers> = {
 };
 
 export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Element {
-  const { isDayPhase, cycleProgress, isPaused, debug = {} } = props;
+  const { isDayPhase, cycleProgress, isPaused, debug = {}, nightTone = 'arcane' } = props;
+  const silverNight = nightTone === 'silver' && !isDayPhase && !isPaused;
   const d = { ...defaultDebug, ...debug };
 
   const { presetId } = useSkinPreferences();
@@ -110,8 +114,9 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
 
   const palette = useMemo(() => {
     if (isPaused) return config.paused;
+    if (silverNight) return DAYNIGHT_SILVER_NIGHT.palette;
     return isDayPhase ? config.dayRunning : config.nightRunning;
-  }, [config, isDayPhase, isPaused]);
+  }, [config, isDayPhase, isPaused, silverNight]);
 
   const ringColor = palette.ringColor;
   const glowColor = palette.glowColor;
@@ -119,16 +124,16 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
   const coreColor = palette.coreColor;
 
   // Medallion outer shell gradient — follows palette state
-  const medallionGlowStart = isPaused ? '#f5f5f7' : isDayPhase ? '#f0d070' : '#b8a8ff';
-  const medallionGlowMid = isPaused ? '#d8dde5' : isDayPhase ? '#b07828' : '#6d4fff';
-  const medallionGlowEnd = isPaused ? '#8a8f9f' : isDayPhase ? '#200e02' : '#1a0f4d';
+  const medallionGlowStart = silverNight ? DAYNIGHT_SILVER_NIGHT.medallion.start : isPaused ? '#f5f5f7' : isDayPhase ? '#f0d070' : '#b8a8ff';
+  const medallionGlowMid = silverNight ? DAYNIGHT_SILVER_NIGHT.medallion.mid : isPaused ? '#d8dde5' : isDayPhase ? '#b07828' : '#6d4fff';
+  const medallionGlowEnd = silverNight ? DAYNIGHT_SILVER_NIGHT.medallion.end : isPaused ? '#8a8f9f' : isDayPhase ? '#200e02' : '#1a0f4d';
 
   // Frozen metallic platinum used to "crystallize" the icons while paused.
   const frostColor = '#e0e0e6';
   const sunBodyColor = isPaused ? 'rgba(224,224,230,0.95)' : 'rgba(255,215,110,0.92)';
   const sunRayColor = isPaused ? 'rgba(224,224,230,0.85)' : 'rgba(255,215,100,0.90)';
-  const moonBodyColor = isPaused ? 'rgba(224,224,230,0.94)' : 'rgba(221,224,255,0.90)';
-  const moonStrokeColor = isPaused ? 'rgba(208,210,220,0.6)' : 'rgba(205,196,255,0.64)';
+  const moonBodyColor = silverNight ? DAYNIGHT_SILVER_NIGHT.moon.body : isPaused ? 'rgba(224,224,230,0.94)' : 'rgba(221,224,255,0.90)';
+  const moonStrokeColor = silverNight ? DAYNIGHT_SILVER_NIGHT.moon.stroke : isPaused ? 'rgba(208,210,220,0.6)' : 'rgba(205,196,255,0.64)';
 
   // Boundary = dark base ring radius. Nothing may bleed beyond it; all content
   // is wrapped in a master clip at this radius.
@@ -470,7 +475,7 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
                 cy={-coreMedallionInnerRadius * 0.24}
                 r={0.65 * scaleFactor}
                 style={{
-                  fill: isPaused ? 'rgba(228,230,238,0.85)' : 'rgba(220,230,255,0.82)',
+                  fill: silverNight ? DAYNIGHT_SILVER_NIGHT.moon.detail : isPaused ? 'rgba(228,230,238,0.85)' : 'rgba(220,230,255,0.82)',
                   transition: 'fill 400ms ease',
                 }}
               />

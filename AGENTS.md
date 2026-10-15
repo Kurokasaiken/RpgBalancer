@@ -25,6 +25,12 @@ Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione e
 - **Fase esecutiva:** invoca `.windsurf/skills/mw-executor/SKILL.md`, che a sua volta carica il
   mandato `.windsurf/skills/agent-execution-mandate/SKILL.md` per i task specifici di RPG.
 - **Prima di toccare codice esistente:** invoca `.windsurf/skills/mw-regression/SKILL.md`.
+- **Pre-flight delle trappole ricorrenti — anche senza invocare nessuna skill.** Una richiesta diretta
+  («fixa X», «cambia Y») non passa da `mw-executor`, quindi il pre-flight non scatterebbe: prima di toccare
+  codice leggi l'indice per superficie di `context/recurring-traps.md` e le trappole che il task tocca; prima di
+  dichiarare il lavoro fatto, riapplicale. In particolare T-04: un claim su scene, animazioni o UI si chiude solo
+  con un testimone che può vedere ciò che afferma (non basta il diff né una metrica), e ciò che non è stato
+  verificato va detto (vedi la proposta P-001 in `PROPOSALS.md`).
 - Quando il Director esprime un'intenzione operativa, catturala in `RICHIESTE.md` prima di rispondere.
   Il riferimento deve essere `.mw/desiderata.md` v1 (FROZEN).
 

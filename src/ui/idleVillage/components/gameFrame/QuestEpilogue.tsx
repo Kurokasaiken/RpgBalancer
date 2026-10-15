@@ -10,19 +10,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  BookOpen,
-  Cross,
-  Gem,
-  Info,
-  PackageOpen,
-  ScrollText,
-  Skull,
-  Sparkles,
-  Thermometer,
-  Trophy,
-  type LucideIcon,
-} from 'lucide-react';
+import { EngravedIcon, type EngravedIconId } from './engravedIcons';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import type { EpilogueSectionId } from '@/balancing/config/idleVillage/quests/questEpilogue';
@@ -36,17 +24,17 @@ const FONT = {
 } as const;
 
 /** One glyph per report section — the line reads at a glance. */
-const SECTION_ICON: Record<EpilogueSectionId, LucideIcon> = {
-  dead: Skull,
-  wounded: Cross,
-  consumed: PackageOpen,
-  reward: Trophy,
-  loot: Gem,
-  xp: Sparkles,
-  info: Info,
-  titles: BookOpen,
-  diseases: Thermometer,
-  lore: ScrollText,
+const SECTION_ICON: Record<EpilogueSectionId, EngravedIconId> = {
+  dead: 'status-fallen',
+  wounded: 'status-wound',
+  consumed: 'ico-chest',
+  reward: 'ico-cup',
+  loot: 'ico-pouch',
+  xp: 'ico-spark',
+  info: 'cmd-help',
+  titles: 'nav-chronicle',
+  diseases: 'ico-vial',
+  lore: 'ico-scroll',
 };
 
 /** Section tone: the price reads differently from the yield. */
@@ -111,11 +99,11 @@ export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario }) =
         {t('gameFrame.questEpilogue.title')}
       </div>
       {sections.map((section) => {
-        const Icon = SECTION_ICON[section.id];
+        const iconId = SECTION_ICON[section.id];
         const tone = TONE[SECTION_TONE[section.id] ?? 'label'];
         return (
           <div key={section.id} data-epilogue-section={section.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-            <Icon aria-hidden style={{ width: 14, height: 14, marginTop: 2, flexShrink: 0, color: tone }} />
+            <EngravedIcon id={iconId} size={14} style={{ marginTop: 2, color: tone }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
               <span
                 style={{

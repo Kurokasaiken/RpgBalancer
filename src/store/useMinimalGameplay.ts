@@ -335,6 +335,7 @@ function mapStoreStateToSnapshot(state: MinimalGameplayState['state']): MinimalG
       injuredUntilTick: resident.injuredUntilTick,
       isOnExpedition: resident.isOnExpedition,
       isHero: resident.isHero,
+      xp: resident.xp,
     })),
     activeActivities: state.activeActivities.map((activity) => ({
       activityId: activity.activityId,
@@ -372,6 +373,7 @@ function mapSnapshotToStoreState(
       isDead: resident.isDead,
       injuredUntilTick: resident.injuredUntilTick,
       isOnExpedition: resident.isOnExpedition,
+      xp: resident.xp,
     })),
     activeActivities: snapshot.activeActivities.map((activity) => ({
       activityId: activity.activityId,
@@ -634,6 +636,8 @@ function mapEngineStateToStoreState(
         level: resident.level,
         isDead: prev?.isDead,
         injuredUntilTick: prev?.injuredUntilTick,
+        isOnExpedition: prev?.isOnExpedition,
+        xp: prev?.xp,
         isHero: prev?.isHero ?? false,
       };
     }),

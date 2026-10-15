@@ -1,4 +1,4 @@
-# DNA PRISMATIC WANDERLUST – BIBBIA DI DIREZIONE ARTISTICA (v0.10)
+# DNA PRISMATIC WANDERLUST – BIBBIA DI DIREZIONE ARTISTICA (v0.14)
 
 Core Philosophy: Antitesi del dark fantasy. Energia cinetica, libertà, e trionfo solare. Il mondo non è "sporco", è materico. La povertà non è "miseria", è rude bellezza.
 
@@ -53,18 +53,22 @@ Ogni asset deve mostrare un contrasto violento tra due stili di rendering:
 
 ---
 
-## 4. REGOLE DI CREAZIONE PROMPT (Prompt Engineering v0.10)
+## 4. REGOLE DI CREAZIONE PROMPT — V1 (OBSOLETA)
+
+> **⚠️ OBSOLETA dal 2026-10-12 (v0.12).** Sostituita da **§10 — Prompt Engineering V2**. Conservata solo per memoria creativa (il workflow delle creature in §6 resta valido: cambia il *formato* del prompt, non il lifecycle). Non usare queste regole per nuovi prompt.
 
 1. **Zone-Based Instruction:** Separare esplicitamente il trattamento del volto (Clean) dal resto (Impasto).
 2. **Specificità Materica:** Mai usare termini generici. Usare “Golden Thatch” invece di “Roof”, “Baroque Sun-Bronze” invece di “Armor”.
 3. **Terminologia Anti-Sci-Fi:** Vietato usare: pipes, exoskeleton, wires, tech. Usare: structural ribs, ceremonial plates, artisan carvings.
 4. **Guardrail Cromatici:** Inserire sempre “Deep Teal shadows” e “No grey, no brown”.
 
-> **IMPORTANTE – Prompt Authoring per l'AI:** Usa sempre la Bibbia v0.10 come manuale tecnico. Costruisci il prompt dividendo le istruzioni in ZONE (Focal Point vs Matter) e applica la “Kill List” per bloccare automaticamente Sci-Fi e Grim.
+> **IMPORTANTE – Prompt Authoring per l'AI (V1, storico):** la Bibbia v0.10 costruiva il prompt dividendo le istruzioni in ZONE (Focal Point vs Matter) e applicando la “Kill List” per bloccare Sci-Fi e Grim. Questo metodo resta il *modo di renderizzare*, ma da v0.12 non è più sufficiente da solo: manca il Motore di Unicità (§10.1).
 
 ---
 
-## 5. MASTER PROMPT VALIDATI (Copiare/Incollare)
+## 5. MASTER PROMPT V1 (OBSOLETI — riferimento storico)
+
+> **⚠️ OBSOLETI dal 2026-10-12 (v0.12).** I master prompt sotto producono risultati corretti ma troppo generici ("banali"): descrivono categorie, non soggetti. Per umani e creature usare i template §10.2/§10.3. Il master Wilderness resta valido per paesaggi fino a una V2 ambientale.
 
 ### 🌲 Master Prompt: Wilderness (Cuore del Progetto)
 
@@ -380,4 +384,197 @@ Ricette pre-configurate per pattern UI comuni:
 
 ---
 
-Rendering System aggiunto in v0.11.
+## 10. PROMPT ENGINEERING V2 — UMANI E CREATURE MAGICHE
+
+> **Stato:** canonico dal 2026-10-12 (v0.12, R-172). Sostituisce §4 e §5 per **umani** e **mostri/creature magiche**. Gli ambienti/paesaggi restano sui master V1 fino a una futura V2 ambientale.
+
+### 10.0 Perché V2 — il problema della banalità
+
+I prompt V1 producevano soggetti *corretti* ma **banali**: descrivevano categorie (silhouette, materiali, colori) senza imporre ciò che rende un soggetto *quel* soggetto e nessun altro. Il risultato: eroi indistinguibili, mostri da manuale D&D.
+
+V2 aggiunge il **Motore di Unicità**: campi obbligatori che forzano identità, contraddizione e storia visibile *prima* del look. Lo stile non cambia: resta congelato il pittorico a **pennellate spesse** (impasto Jaime Jones / Jeff Easley), split-rendering Ruan Jia sui punti focali, luce Solar Triumph, ombre deep teal, Kill List integrale.
+
+### 10.1 Il Motore di Unicità (obbligatorio in ogni prompt V2)
+
+Ogni prompt V2 — umano o creatura — DEVE compilare tutti i campi del motore. Un prompt senza questi campi è un prompt V1 e va rigettato in review.
+
+| Campo | Domanda a cui risponde | Regola |
+| --- | --- | --- |
+| **IDENTITY SENTENCE** | Chi/cosa è, in una frase? | Formula *familiare + impossibile*: una metà ancorata al mondo noto (mestiere, animale, ruolo), una metà incongruente. |
+| **SIGNATURE HOOK** | Qual è IL dettaglio che solo questo soggetto possiede? | Esattamente uno. Test: "il dettaglio che un bambino ridisegnerebbe a memoria". |
+| **CONTRADICTION** | Quale tensione interna ha? | Obbligatoria. Il forte delicato; la creatura feroce che trema; il santo con mani da macellaio. È l'antidoto principale alla banalità. |
+| **STORY TRACE** | Quale segno racconta un evento passato? | Usura asimmetrica, riparazione visibile, trofeo, voto rituale. Ogni segno implica un evento; mai decorazione gratuita. |
+| **GESTURE** | Cosa sta *facendo*, non come posa? | Azione specifica in medias res. Vietate: T-pose, standing portrait, "heroic pose" generica. |
+| **CULTURAL ANCHOR** | Da quale cultura/mestiere/tradizione proviene? | Origine concreta e nominata (gilda, regione, ordine). Vietato "generic fantasy". |
+| **RECOGNITION TEST** | Si riconosce? | Silhouette nera leggibile; riconoscibile a 64px; ridisegnabile da un bambino; identificabile in 0.5s di trailer. |
+
+### 10.2 Template V2 — UMANI (PG, NPC, eroi)
+
+```text
+SUBJECT TYPE: Human character — Prompt Engineering V2.
+IDENTITY SENTENCE: <mestiere/ruolo concreto> who/that <contraddizione o tratto impossibile>.
+CULTURAL ANCHOR: <gilda, regione, ordine, tradizione specifica del mondo>.
+SIGNATURE HOOK: <un solo dettaglio unico e ridisegnabile a memoria>.
+CONTRADICTION: <tensione interna resa visibile>.
+FACE: Ruan Jia sculptural rendering — clean, luminous subsurface scattering, zero brushstrokes — carrying <un segno narrativo disegnato: cicatrice, marchio rituale, pelle segnata dal sole>. Il segno è progettato, non rumore.
+THE HANDS: <mani che raccontano il mestiere: dita macchiate d'inchiostro, calli da fune, cicatrici da scalpello>.
+GEAR & PROVENANCE: <equipaggiamento con storia: chi l'ha forgiato/riparato/ereditato; materiali del mondo — Sun-Bronze, Golden Thatch, pietra alpina, seta iridescente, basalto venato>.
+GESTURE: <azione specifica in corso, colta in medias res>.
+PALETTE: <max 3 pigmenti della bibbia, ciascuno con un motivo> + deep teal shadows; NO grey, NO brown.
+LIGHTING: Solar Triumph — blinding white light from above, deep cool teal shadows, prismatic dust motes.
+STYLE: Split-rendering — face clean (Ruan Jia); body, gear and world in thick oil impasto (Jaime Jones), broad visible brushstrokes, "crunchy" tactile matter.
+MOOD: <coppia di emozioni specifiche — mai "epic" da solo>.
+STORY TRACE: <oggetto portato che implica un evento passato>.
+NO LIST: generic armor set, catalog beauty, T-pose / standing portrait, symmetrical gear, adventurer starter kit (random belts, pouches, buckles), flawless skin as the only trait, modern clothing, sci-fi tech, grim, mud, brown.
+```
+
+**Regola del terzo elemento (umani):** mestiere + tratto fisico non bastano. Serve un terzo elemento inatteso (oggetto, abitudine, gesto rituale) che nessun altro PG del roster condivide.
+
+### 10.3 Template V2 — CREATURE / ESSENZE MAGICHE
+
+```text
+SUBJECT TYPE: Creature / magical entity — Prompt Engineering V2.
+IDENTITY SENTENCE: <animale/elemento familiare> fused with <impossibile/incongruente>. (NOT a <tropo più vicino da escludere>.)
+FAMILY: <famiglia dal registry §6, se applicabile>.
+SIGNATURE HOOK: <un solo dettaglio unico e ridisegnabile a memoria>.
+CONTRADICTION: <es. massa enorme / movimento da infermiera; aspetto feroce / postura terrorizzata>.
+FUNCTION & ECOLOGY: <cosa fa nel mondo, cosa vuole, di cosa si nutre — il design serve la funzione>.
+MAGIC VECTOR: la magia NON è "generic glow". Si manifesta attraverso un vettore materico: <resina che cristallizza la luce, polline di polvere d'oro, venature iridescenti oil-slick, alito che incurva l'aria come calore, ecoscaglie che suonano>. La magia obbedisce alla materia.
+THE WORLD REACTS: <come l'ambiente mostra la sua presenza: silenzio improvviso, erba che si raddrizza, offerte di sale, uccelli assenti>.
+SILHOUETTE: <forma iconica, asimmetrica>.
+SHAPE LANGUAGE: <2 primitive geometriche>.
+MOVEMENT: <verbi specifici — mai "walks">.
+MATERIALS: <materiali del mondo con storia>.
+COLORS: <palette> + deep teal shadows; NO grey, NO brown, NO mud.
+ANATOMY: <vincoli + cosa NON è (mani umane, volto, ecc.)>.
+ENVIRONMENT: <habitat specifico, non "fondo generico">.
+LIGHTING: Solar Triumph — blinding white light, deep cool teal shadows, prismatic dust motes.
+STYLE: thick oil impasto (Jaime Jones), Jeff Easley heroic weight, Justin Gerard whimsy; split-rendering solo sul punto focale pulito (es. occhi).
+MOOD: <coppia di emozioni specifiche>.
+STORY TRACE: <segno che implica una storia: cattura fallita, migrazione, voto>.
+NO LIST: <tropo specifico da escludere>, generic D&D monster, pokémon-cute, pointed ears, generic dragon silhouette, grim decay, sci-fi tech, flat digital surfaces, symmetry, mud, brown.
+```
+
+### 10.4 Esempio compilato V2 — Umano (Eroe esiliato)
+
+```text
+SUBJECT TYPE: Human character — Prompt Engineering V2.
+IDENTITY SENTENCE: An exiled border captain who still salutes a flag that no longer exists.
+CULTURAL ANCHOR: The Sun-Bronze officer corps of the southern Empire — frontier command tradition.
+SIGNATURE HOOK: A broken bronze officer's compass re-forged into a belt buckle; its needle still points toward the capital that banished him.
+CONTRADICTION: A commander built for armies, reduced to apologizing to the peasants he now leads.
+FACE: Ruan Jia sculptural rendering — clean, luminous subsurface scattering — with the left eyebrow split by an old duel scar, deliberately kept visible as a vow.
+THE HANDS: Sword-calloused palms, fingertips ink-stained from petitions nobody answers.
+GEAR & PROVENANCE: Officer's cuirass in baroque Sun-Bronze with the imperial sigil chiseled off — the pale scar of the removed crest still readable; cloak mended in three different village weaves, each patch a place that sheltered him.
+GESTURE: Kneeling to tie a peasant child's boot, shield planted in the golden stubble like a walking stick.
+PALETTE: Antique bronze, cinnabar sash, weathered alabaster; deep teal shadows. NO grey, NO brown.
+LIGHTING: Solar Triumph late afternoon — low blinding white sun catching the removed-crest scar on the cuirass; prismatic dust motes.
+STYLE: Split-rendering — face clean (Ruan Jia); cuirass, cloak and field in thick Jaime Jones oil impasto, broad visible palette-knife strokes.
+MOOD: Dignity in defeat + stubborn tenderness.
+STORY TRACE: A rolled, sealed petition he carries but never sends.
+NO LIST: generic armor set, catalog beauty, T-pose, symmetrical gear, adventurer starter kit, modern clothing, sci-fi, grim, mud, brown.
+```
+
+### 10.5 Esempio compilato V2 — Creatura magica (il Cervo-Faro)
+
+```text
+SUBJECT TYPE: Magical creature — Prompt Engineering V2.
+IDENTITY SENTENCE: A mountain stag that carries the last light of sunset inside hollow glass antlers — a shepherd of dusk, not a beast of war. (NOT a spirit totem, NOT a glowing elk.)
+FAMILY: Mythic Beasts (candidate).
+SIGNATURE HOOK: Hollow blown-glass antlers filled with captured gold sunlight that drains slowly like sand in an hourglass.
+CONTRADICTION: Monumental, weapon-looking antlers — but the animal moves with the caution of a nurse crossing a sickroom.
+FUNCTION & ECOLOGY: Migrates along shepherd paths at dusk; the antler-light keeps night predators away; villages leave salt offerings on flat stones.
+MAGIC VECTOR: Magic is physical — sunlight stored as slow-draining liquid gold inside the glass; when the antlers run empty, the stag sleeps until dawn.
+THE WORLD REACTS: Moths orbiting the antlers like a private galaxy; grass unbending behind its steps; distant village dogs falling silent.
+SILHOUETTE: Tall, thin-legged stag beneath an oversized branching crown of glowing glass — top-heavy, unmistakable.
+SHAPE LANGUAGE: Vertical lines + branching circles.
+MOVEMENT: Steps slowly, lowers the crown, listens, bleeds light.
+MATERIALS: Blown glass, living deer hide, lichen on the legs, salt-crust on the muzzle.
+COLORS: Burnished gold light, dusk azure sky, emerald grass; deep teal shadows. NO grey, NO brown, NO mud.
+ANATOMY: Real deer anatomy; no human face, no extra limbs, no visible eyes glow — the light is in the antlers, not the body.
+ENVIRONMENT: A high alpine pasture at dusk, Dolomites peaks, a distant village chimney smoke.
+LIGHTING: Solar Triumph fading — the last blinding white ray on the peaks, the antlers as the second light source; deep teal shadows.
+STYLE: Thick Jaime Jones oil impasto on hide, grass and stone; Justin Gerard whimsy; the glass antlers rendered clean and luminous (split-rendering focal point).
+MOOD: Reverence + fragile countdown.
+STORY TRACE: One antler branch cracked and sealed with black resin — it survived a hunter's arrow.
+NO LIST: spirit totem cliché, generic glowing elk, antler Christmas lights, human face, symmetry, pokémon-cute, grim decay, sci-fi tech, mud, brown.
+```
+
+### 10.6 Rapporto con V1 e con il Creature IP System
+
+- **Lifecycle invariato:** per le creature vale sempre il workflow §6 (design-intent → family DNA → identity → coherence test → prompt → reference card → canonical). V2 cambia il *contenuto* del `prompt.md`, non il processo.
+- **Campi V2 nell'identity card:** quando si authora una nuova creatura, i campi del Motore di Unicità (signature hook, contradiction, magic vector, world reaction) vanno compilati in `identity.md` *prima* del prompt — il prompt li eredita, non li inventa.
+- **Prompt canonici esistenti:** i 4 prompt creatura `canonical` (Gnarled Nightmare, Bronze Relic Guardian, Emerald Scale Serpent, Momentum Bruiser) e i prompt umani della prompt library restano validi come output storici. Ogni *nuova* creatura/umano e ogni *rigenerazione* usano V2.
+- **Rigenerazione consigliata:** un soggetto esistente può essere promosso a V2 compilando i campi del motore in una nuova versione (`MINOR` bump se cambia solo il prompt, `MAJOR` se cambia l'identità).
+
+### 10.7 Scene prompt (immagini ambientali di quest/eventi)
+
+Per i quadri ambientali (scene di quest, beat narrativi, card) valgono regole
+diverse dal V2 umani/creature — distillate nella guida dedicata:
+[`src/docs/docs/art-direction/scene_prompt_authoring_guide.md`](../art-direction/scene_prompt_authoring_guide.md).
+Punti chiave: immagine = beat pre-scelta/pre-check (mai esito), party del
+giocatore mai disegnato (NPC/party esterni ammessi), creature solo da
+registry, luce libera per scena (niente Solar Triumph forzato) ma **palette,
+ombre-teal, cielo-azure e luminosità restano vincoli di bibbia** (§1A, §2),
+struttura fissa Subject→Composition→Mood→Style→Lighting→Palette→Avoid→Aspect.
+
+---
+
+## 11. ICONE — DUE LIVELLI, UNA MATERIA
+
+> **Stato:** canonico dal 2026-10-13 (v0.14, R-177, PLAN-058 T2.1). Vale per ogni icona del gioco: glifi dei POI, risorse, medaglione giorno/notte, comandi dell'HUD. Regola madre di PLAN-058: l'icona deve stare accanto al Roster V2 senza sembrare un corpo estraneo.
+
+### 11.1 I due livelli
+
+| Livello | Cosa rappresenta | Come nasce | Formato |
+| --- | --- | --- | --- |
+| **Dipinte** | Oggetti del mondo: glifi dei POI, risorse, medaglione giorno/notte | Immagine generata dal Director con i prompt del kit (§11.5), poi scontornata | Master 512×512 → 128 / 64 / 32 px, WebP con alfa |
+| **Incise** | Comandi e stati dell'interfaccia: menu, pausa, filtri, eventi, ruoli, ferita | Disegnate in codice, mai generate | SVG pieno monocromo, `fill="currentColor"`, griglia 24, nessun tratto |
+
+Il confine è semplice: **se esiste nel mondo, è dipinta; se è un'azione dell'interfaccia, è incisa.** Una risorsa (oro, cibo, legno) è dipinta; il pulsante "pausa" è inciso. Un'icona non cambia livello a seconda di dove compare.
+
+### 11.2 Decisioni che valgono per tutte (D1–D3)
+
+- **D1 — Icone di luogo, non di azione.** Il glifo di un POI dice *dove* (accampamento, rovine, miniera), non *cosa fare*. Il verbo si legge aprendo il POI.
+- **D2 — Esenzione dalla regola di asimmetria (§8.3).** Un'icona ha sagoma **simmetrica e centrata**, vista frontale. L'asimmetria vive nella materia: usura, luce da sinistra-alto, una crepa, un bordo consumato. Il divieto §8.3 resta valido per architetture, pose e scene.
+- **D3 — Niente teschi** (coerente con §8.1). Le minacce si dicono con: segni d'artiglio, zanne/mascella, lance incrociate o stendardo strappato, corona spezzata (Re goblin).
+
+### 11.3 La materia delle dipinte
+
+- **Bronzo consumato su lacca teal.** Ogni icona dipinta è un oggetto fuso in bronzo opaco, lucidato dall'uso solo sugli spigoli in rilievo, con **lacca teal profonda** depositata negli incavi. È la stessa materia delle lastre del Roster (lacca teal + bordo bronzo).
+- **Una sola patina d'accento** per soggetto, dichiarata nella riga del soggetto (oro opaco per la moneta, ambra per la crosta del pane, miele per il legno tagliato). Tutto il resto è bronzo e lacca.
+- **Materia dichiarata (`materia`)** — il bronzo è il default, non una gabbia: il registro può assegnare una materia per icona (`baked`, `harvest`, `fang` nel kit). I soggetti organici tengono i veri colori nei pigmenti di bibbia (cinabro, ambra, miele, avorio); luce, ombre teal e impasto non cambiano. Aggiunta 2026-10-14 (R-191): il bronzo integrale sui soggetti organici leggeva spento.
+- **Niente oro lucido**, niente gemme, niente riflessi speculari, niente cromature.
+- **Niente foglie, rametti, oggettini** sparsi intorno al soggetto (veto Lacquer Atlas).
+- **Niente cornici dipinte.** Bordo, disco, anello, tessera: li mette il codice (il Sigillo POI, la lastra risorse). L'immagine contiene solo l'oggetto.
+- Ombre teal, mai grigie né marroni fangose (§2): la regola della palette vale anche dentro un'icona.
+- **Fantasy, mai generico** (Director, 2026-10-13): niente pallini, anelli, dischetti di stato, spunte/croci da UI kit, niente semaforo verde/rosso. Uno stato si dice con la sagoma di un oggetto del mondo (scintilla, occhio, clessidra, lucchetto di ferro, lame incrociate), nella stessa materia. Se è un cerchio con un simbolo dentro, si ridisegna. Applicata ai cursori in `hud_component_guide.md` §5c.
+
+### 11.4 Luce, leggibilità, prova
+
+- **Luce:** una sola sorgente calda dall'**alto a sinistra**; ombra teal fredda in basso a destra. Stessa direzione per tutte le icone, così una fila di icone sembra illuminata dallo stesso sole.
+- **Leggibilità a 24 px:** una sagoma sola, grossa, che riempie ~80% del quadrato. Se a 24 px non si riconosce, l'icona è sbagliata — non si aggiunge dettaglio, si semplifica.
+- **Prova in scala di grigi:** ogni icona va guardata in grigio accanto alle altre della stessa fila. Due icone che in grigio si confondono vanno ridisegnate (cambia la sagoma, non il colore). Per i POI la prova è meccanica: `scripts/poi-terrain-gate.py` (bordo ≥ 3:1 su 8 ritagli reali della mappa, famiglie distinte in grigio).
+- **Prova del bambino** (§10.1): la sagoma si ridisegna a memoria in tre segni.
+
+### 11.5 Il kit dei prompt
+
+Le icone dipinte non si scrivono a mano: si generano da un sistema unico.
+
+- **Kit** (`src/docs/docs/art-direction/icons/prompt_kit.yaml`): il **blocco di stile fisso**, la **kill list**, i contratti d'uscita per GPT image, Gemini e Grok, i termini vietati. Il blocco di stile vive solo lì ed è bloccato da un hash: cambiarlo è una decisione, non un ritocco.
+- **Registro** (`src/docs/docs/art-direction/icons/registry.yaml`): una voce per icona — `id, livello, famiglia, soggetto (una riga), taglie, stato (needed | prompted | candidate | approved), prompt, file, provenance`.
+- **Generatore** (`scripts/gen-icon-prompts.py`): dal registro scrive `.mw/specs/icons/<id>/prompt.md` con le tre varianti pronte da incollare.
+- **Lint** (`scripts/lint-icon-prompts.py`): blocco di stile presente e invariato, soggetto in una frase, kill list completa, nessun termine vietato fuori dalla kill list, sfondo e uscita dichiarati.
+- **Ancore:** le prime sei icone (rovine, accampamento goblin, segni d'artiglio; oro, cibo, legno) sono le **ancore**. Scelte dal Director, diventano immagini di riferimento allegate a tutti i prompt successivi.
+
+Chi scrive un nuovo soggetto cambia **solo la riga del soggetto** nel registro. Tutto il resto — stile, luce, materia, kill list, uscita — arriva dal kit.
+
+### 11.6 Le incise
+
+- SVG pieni monocromi, `fill="currentColor"`, viewBox `0 0 24 24`, niente `stroke`: il colore lo dà il token del contenitore, come il testo.
+- Stessa sagoma piena e stessa massa ottica per tutta la famiglia (riempimento ~70% della griglia).
+- Sostituiscono `hudIcons.tsx` a tratto 1.6 e `lucide-react` nell'HUD di `/game` (PLAN-058 T3.2).
+
+---
+
+Rendering System aggiunto in v0.11. Prompt Engineering V2 (Motore di Unicità, template umani/creature) aggiunto in v0.12. Scene Prompt Authoring Guide aggiunta 2026-10-13 (v0.13). Capitolo Icone (due livelli, kit dei prompt) aggiunto 2026-10-13 (v0.14).

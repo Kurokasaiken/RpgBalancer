@@ -30,6 +30,7 @@ import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/
 import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { HudRecenterButton } from '@/ui/idleVillage/components/gameFrame/HudRecenterButton';
+import type { HudScaleControl } from '@/ui/idleVillage/components/gameFrame/hudScale';
 import { useTimeEngineLoop } from '@/ui/idleVillage/hooks/useTimeEngineLoop';
 
 /**
@@ -48,6 +49,8 @@ export interface GameFrameScreenProps {
   overlaySlot?: ReactNode;
   /** Extra events on top of the fixture feed (e.g. a scripted invasion). */
   extraEvents?: HudEvent[];
+  /** Show the placeholder fixture events (R-071). Off on /game, where only real events may reach the ledger. */
+  fixtureEvents?: boolean;
   /** What the player should do now; the top-left cartouche is hidden without it. */
   objective?: HudObjective;
   /** Panels state owned by the page, so page-level panels (Director, Tuning) share the menu. Defaults to its own. */
@@ -56,6 +59,8 @@ export interface GameFrameScreenProps {
   devPanels?: boolean;
   /** Live skin selector inside the game menu (the page owns the preset state). Omit to hide the row. */
   skinControl?: HudSkinControl;
+  /** Interface size (desktop app only). */
+  scaleControl?: HudScaleControl;
   /** Bump to call the HUD chrome back on the game's behalf (event wake). */
   hudWakeSignal?: number;
   /** While an event theatre holds the clock, pause/speed inputs stay inert. */
@@ -64,7 +69,7 @@ export interface GameFrameScreenProps {
   onHudHiddenChange?: (hidden: boolean, cause: 'manual' | 'idle') => void;
 }
 
-export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, objective, panels: panelsProp, devPanels = false, skinControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange }: GameFrameScreenProps) {
+export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, fixtureEvents: withFixtures = true, objective, panels: panelsProp, devPanels = false, skinControl, scaleControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange }: GameFrameScreenProps) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
@@ -83,7 +88,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
     ],
     [t],
   );
-  const events = useMemo(() => [...(extraEvents ?? []), ...fixtureEvents], [extraEvents, fixtureEvents]);
+  const events = useMemo(() => [...(extraEvents ?? []), ...(withFixtures ? fixtureEvents : [])], [extraEvents, fixtureEvents, withFixtures]);
   const ownPanels = useHudPanels({ enabled: !panelsProp });
   const panels = panelsProp ?? ownPanels;
   const captureMode = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
@@ -141,6 +146,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
             onTogglePanel={panels.toggle}
             onSaveNow={() => gameplay.saveNow()}
             skin={skinControl}
+            scale={scaleControl}
             includeDev={devPanels}
           />
         }

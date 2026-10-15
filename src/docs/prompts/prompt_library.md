@@ -6,6 +6,8 @@ description: Prompt reference catalog aligned with the DNA Prismatic Wanderlust 
 
 > Reference: [DNA Prismatic Wanderlust – Art Style Bible](../plans/art_direction_plan.md)
 >
+> **Prompt Engineering V2 (v0.12, R-172):** i nuovi prompt per **umani** e **creature magiche** si generano con i template §7.2/§7.3 della bibbia (Motore di Unicità obbligatorio). I prompt V1 sotto restano riferimento storico.
+>
 > **Dev tooling:** in modalità sviluppo, tutti i prompt e la Style Bible sono navigabili dalla pagina “Prompt & Bible Style” (tab dedicato nel menu Observatory). La UI legge dinamicamente questo documento, quindi ogni modifica qui verrà esposta automaticamente.
 
 ## Volto eroico – Elite Portrait Prompt

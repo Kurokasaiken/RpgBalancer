@@ -113,12 +113,16 @@ export const canonicalResidentData = (defaultFatigue: number = 0): ResidentState
  */
 export const mergeStoreConsequences = (
   residents: ResidentState[],
-  consequences: { id: string; isDead?: boolean; isInjured?: boolean; injuredUntilTick?: number; fatigue?: number }[],
+  consequences: { id: string; isDead?: boolean; isInjured?: boolean; injuredUntilTick?: number; fatigue?: number; xp?: number }[],
 ): ResidentState[] => {
   const byId = new Map(consequences.map((c) => [c.id, c]));
   return residents.map((resident) => {
     const c = byId.get(resident.id);
-    if (!c || (!c.isDead && !c.isInjured && c.injuredUntilTick == null)) return resident;
+    if (!c) return resident;
+    /* R-183: quest XP is a settlement consequence too — projected even when
+     *  the resident came home unharmed. */
+    const withXp = c.xp ? { ...resident, xp: c.xp } : resident;
+    if (!c.isDead && !c.isInjured && c.injuredUntilTick == null) return withXp;
     const isInjured = !c.isDead && Boolean(c.isInjured || (c.injuredUntilTick ?? -1) > -1);
     const { currentHp } = deriveHpValues(
       resident.statSnapshot as Record<string, number> | undefined,
@@ -126,7 +130,7 @@ export const mergeStoreConsequences = (
       c.isDead ? false : isInjured,
     );
     return {
-      ...resident,
+      ...withXp,
       status: c.isDead ? 'dead' : isInjured ? 'injured' : resident.status,
       isInjured: c.isDead ? false : isInjured,
       currentHp: c.isDead ? 0 : currentHp,

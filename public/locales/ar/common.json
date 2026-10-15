@@ -12,7 +12,7 @@
     "zh-CN": "简体中文"
   },
   "examples": {
-    "swordCount": "{count, plural, one {سيف واحد} other {{count} سيوف}}",
+    "swordCount": "{count, plural, one {سيف واحد} other {# سيوف}}",
     "riskLevel": "{level, select, low {مخاطرة منخفضة} medium {مخاطرة متوسطة} high {مخاطرة عالية} other {مخاطرة غير معروفة}}",
     "characterGreeting": "{gender, select, male {أهلاً بك يا سيدي} female {أهلاً بك يا سيدتي} other {أهلاً بك يا مغامر}}"
   }

@@ -1,0 +1,146 @@
+# Kit dei prompt d'icona dipinta — PLAN-058 T2.3, bibbia §11.5.
+#
+# UNICA fonte del blocco di stile, della kill list e dei contratti d'uscita.
+# `scripts/gen-icon-prompts.py` li incolla in ogni prompt; `scripts/lint-icon-prompts.py`
+# verifica che ci siano, identici. Il blocco di stile è bloccato da `style_sha256`:
+# cambiarlo richiede di aggiornare l'hash e `style_version` (è una decisione di stile,
+# non un ritocco) e di rigenerare tutti i prompt.
+
+style_version: v1
+style_sha256: 469fd670875f8e5725c51c50e7fe747c5ac32d99927febe63d712b30c18aa82d
+
+style: >-
+  STYLE — Wanderlust painted icon, kit v1. A single emblem object for a fantasy
+  strategy game HUD, centred and seen from the front, with a bold symmetrical
+  silhouette that fills about 80% of the square; it must read as one solid shape
+  at 24 pixels and stay distinct in greyscale. MATERIAL: hand-cast worn bronze,
+  rubbed warm and bright on every raised edge and darker in the hollows, with
+  deep teal lacquer pooled in each recess; the only other colour is the single
+  patina accent named in the subject. Matte metal, never polished. LIGHT: one
+  warm white key light from the upper left, cool deep teal shadow on the lower
+  right; a strong value split between the lit face and the shadow side. The shape
+  is symmetrical; the asymmetry lives only in the wear and the light. RENDERING:
+  painted game icon, rich oil impasto in the manner of Jaime Jones on the worn
+  surfaces, a crisp clean silhouette edge, tactile weight, rude beauty; luminous,
+  never black murk; shadows are deep teal, NO grey, NO muddy brown.
+
+# Materie alternative (PLAN-058, 2026-10-14). Il registro può scegliere una chiave con il
+# campo `materia`; la frase MATERIAL del blocco di stile viene sostituita. Il blocco
+# `style` e il suo hash NON cambiano: oro e legna restano sul bronzo.
+# `bronze` è la frase di default (quella già nel blocco di stile).
+materials:
+  bronze: >-
+    MATERIAL: hand-cast worn bronze, rubbed warm and bright on every raised edge and
+    darker in the hollows, with deep teal lacquer pooled in each recess; the only other
+    colour is the single patina accent named in the subject. Matte metal, never polished.
+  baked: >-
+    MATERIAL: baked bread, a warm golden crust with a soft pale crumb inside the
+    split; a dry matte finish, warm light on the crown, deep teal only in the
+    outer shadow side and never on the crumb; the only other colour is the single
+    patina accent named in the subject. Soft and matte, no sheen, never metal.
+  # Materie organici (2026-10-14, R-191): il bronzo integrale sui soggetti vivi
+  # leggeva spento ("tutto color bronzo, molto triste" — Director). Colori veri
+  # nei pigmenti di bibbia; luce, ombre teal e impasto invariati.
+  harvest: >-
+    MATERIAL: real foraged food in true colour — deep cinnabar red berries, pale
+    tan walnut halves, small ivory-cream button mushrooms — mounded in a basket
+    of woven golden-ochre withies; deep teal lacquer only in the gaps between
+    things and on the shadow side; the patina accent named in the subject is the
+    brightest note. Matte and dry, never polished, NO metal anywhere in the icon.
+  fang: >-
+    MATERIAL: aged ivory and horn, warm cream rubbed bright on every curve and
+    darker toward the root, the gum ridge and the open bite in deep teal lacquer
+    shadow; the only other colour is the single patina accent named in the
+    subject. Matte, never polished.
+  # Medaglioni tempo: una lega per stato (2026-10-14, R-191) — giorno resta
+  # bronzo (sole = Impero), alba oro-rosa, tramonto rame-brace, notte argento
+  # (T1.2: notte bronzo/argento, niente viola).
+  rosegold: >-
+    MATERIAL: pale rose-gilt, a warm pink-gold dawn alloy rubbed bright on every
+    raised edge and darker in the hollows, with deep teal lacquer pooled in each
+    recess; the only other colour is the single patina accent named in the
+    subject. Matte metal, never polished.
+  ember: >-
+    MATERIAL: ember copper, a warm red-gold metal glowing like a coal at sunset,
+    rubbed bright on every raised edge and darker in the hollows, with deep teal
+    lacquer pooled in each recess; the only other colour is the single patina
+    accent named in the subject. Matte metal, never polished.
+  silver: >-
+    MATERIAL: pale moon-silver veering to azure, a cool luminous white-blue
+    metal rubbed bright on every raised edge and darker in the hollows, with
+    deep teal lacquer pooled in each recess; the only other colour is the
+    single patina accent named in the subject. Matte metal, never polished.
+
+# Riga di riferimento (PLAN-058 T3.1): va in ogni prompt che NON è un'ancora, subito dopo
+# SUBJECT. Il Director allega `.mw/specs/icons/ANCORE-reference.png` (le sei ancore approvate).
+reference: >-
+  REFERENCE: if an image of the six approved icons of this set is attached, match
+  its light direction, brush handling and brightness; this icon is a new member
+  of that same set, as bright and as bold as they are, in the material stated
+  below.
+# Per le materie non-bronze (2026-10-14, R-191): l'immagine delle ancore trascina
+# il metallo più del testo — qui il riferimento vale solo per luce e pennellata.
+reference_natural: >-
+  REFERENCE: if an image of the six approved icons of this set is attached, copy
+  ONLY its light direction, brush handling and brightness — NOT its colours and
+  NOT its metal: this icon keeps the true colours stated below.
+
+# Voci della kill list: tutte obbligatorie, in quest'ordine, in ogni variante.
+kill_list:
+  - no text, letters, numbers or runes
+  - no skulls or bones
+  - no frame, border, ring, disc, plaque or badge behind the object
+  - no leaves, vines, flowers or sprigs
+  - no small extra objects, debris or scattered props
+  - no gems, glossy reflections or shiny polished gold
+  - no ground, floor shadow, scene or background texture
+  - no dramatic perspective or three-quarter tilt
+  - no flat vector look, no 3D-render plastic, no cartoon outline
+  - no grim decay, no grey, no mud
+
+# Termini vietati FUORI dalla kill list (riga soggetto e resto del prompt).
+# Regex, case-insensitive, su parola intera.
+banned_terms:
+  - skulls?
+  - bones?
+  - shiny gold
+  - gold shiny
+  - polished gold
+  - glossy
+  - leaf
+  - leaves
+  - vines?
+  - frame[sd]?
+  - borders?
+  - gems?
+  - gemstones?
+  - text
+  - letters?
+  - runes?
+
+# Una variante per strumento: intestazione, nome della kill list, contratto d'uscita.
+variants:
+  gpt:
+    title: GPT image (ChatGPT)
+    intro: Create one image — a single painted game icon.
+    kill_header: "KILL LIST:"
+    output: >-
+      OUTPUT: one square 1024×1024 PNG with a fully transparent background (alpha
+      channel), the object alone, no drop shadow; it will be reduced to a 512 master
+      and then to 128, 64 and 32 px.
+  gemini:
+    title: Gemini
+    intro: Paint a single game icon, square 1:1.
+    kill_header: "STRICT RULES:"
+    output: >-
+      OUTPUT: square 1:1 image, the object alone on a perfectly flat solid magenta
+      background (#FF00FF) with no gradient and no shadow on it; the background will
+      be keyed out and the icon reduced to 512, 128, 64 and 32 px.
+  grok:
+    title: Grok
+    intro: Square 1:1 painted game icon.
+    kill_header: "AVOID:"
+    output: >-
+      OUTPUT: square 1:1 image, the object alone on a flat solid magenta background
+      (#FF00FF), no gradient, no shadow on the background; it will be keyed out and
+      reduced to 512, 128, 64 and 32 px.

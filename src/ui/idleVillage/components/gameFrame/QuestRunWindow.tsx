@@ -15,25 +15,7 @@
 import React, { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import {
-  Axe,
-  Backpack,
-  Check,
-  CircleHelp,
-  EyeOff,
-  Footprints,
-  Gem,
-  House,
-  Minus,
-  PackageOpen,
-  ScrollText,
-  Skull,
-  Swords,
-  Users,
-  Wind,
-  X,
-  type LucideIcon,
-} from 'lucide-react';
+import { EngravedIcon, type EngravedIconId } from './engravedIcons';
 import { HudPlaque, SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { DamageFloater, EdgeFlash, Letterbox, TypewriterText, prefersReducedMotion, useBeatFx, type BeatFx } from '@/ui/idleVillage/skins/primitives';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
@@ -46,6 +28,8 @@ import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import { HudChip, LOG_TONE, SCRIM, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { ConsumableBelt } from '@/ui/idleVillage/questS1Lab/hud/ConsumableBelt';
+import { BagStrip, BAG_CHIP_ROW_PX } from './BagStrip';
+import { bagEverPacked, bagStripVisible, questBagItems } from './questBag';
 import { useHudPanelDrag } from './useHudPanelDrag';
 import PgCard from '@/ui/idleVillage/components/PgCard';
 import { useRosterKitData } from '@/ui/idleVillage/frozen/kits/rosterKit';
@@ -56,7 +40,7 @@ import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisual
 const VERDICT_TONE: Record<Verdict, 'ok' | 'warn' | 'danger'> = { bigwin: 'ok', win: 'ok', almost: 'warn', fail: 'danger', epicfail: 'danger' };
 
 /** One glyph per authored phase (index = node `beat`). */
-const PHASE_ICONS: LucideIcon[] = [ScrollText, Footprints, Gem, Axe, Swords, Wind, PackageOpen, House];
+const PHASE_ICONS: EngravedIconId[] = ['ico-scroll', 'evt-expedition', 'ico-pouch', 'ico-axe', 'evt-combat', 'ico-gust', 'ico-chest', 'nav-village'];
 
 const OUTCOME_TONE: Record<PhaseOutcome, keyof typeof TONE> = { death: 'death', hurt: 'warn', loot: 'label', clean: 'ok' };
 
@@ -200,7 +184,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     return () => window.removeEventListener('keydown', onKey);
   }, [presenting, beatCursor]);
 
-  const shell: CSSProperties = { position: 'fixed', left: anchor.left, top: anchor.top, pointerEvents: 'auto', ...panelStyle, zIndex: panelStyle.zIndex ?? zIndex };
+  const shell: CSSProperties = { position: 'fixed', left: anchor.left, top: anchor.top, pointerEvents: 'auto', maxHeight: `calc(100vh - ${anchor.top}px - 12px)`, ...panelStyle, zIndex: panelStyle.zIndex ?? zIndex };
 
   if (minimised) {
     return (
@@ -213,7 +197,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           style={{ ...shell, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}
         >
           <div {...handleProps} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Swords aria-hidden style={{ width: 18, height: 18, color: TONE.accent }} />
+            <EngravedIcon id="evt-combat" size={18} style={{ color: TONE.accent }} />
             <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
               {title}
             </span>
@@ -223,7 +207,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             {waiting && <span aria-label={t('gameFrame.questWindow.waiting')} title={t('gameFrame.questWindow.waiting')} style={{ width: 8, height: 8, borderRadius: 999, background: 'var(--skin-title-color)', boxShadow: '0 0 8px var(--skin-title-color)' }} />}
             <span data-hud-controls="" style={{ display: 'inline-flex' }}>
               <button type="button" aria-label={t('gameFrame.questWindow.restore')} title={t('gameFrame.questWindow.restore')} onClick={() => setMinimised(false)}>
-                <ScrollText aria-hidden />
+                <EngravedIcon id="ico-scroll" />
               </button>
             </span>
           </div>
@@ -232,7 +216,13 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     );
   }
 
-  const bag = QUEST_STASH.items.filter((item) => run.flags.includes(item.flag));
+  /* PLAN-032 SP-4: one derivation feeds the title-row popover AND the
+   *  strip — same helper output, zero drift. `slotVisible` keeps the slot
+   *  mounted while a loadout was ever packed (spends mid-replay empty the
+   *  bag; unmounting then would yank the stage) until the epilogue retires
+   *  it. Inside: belt at decision nodes, glanceable strip otherwise. */
+  const bag = questBagItems(run.flags);
+  const bagSlotVisible = bagEverPacked(run) && !(run.ended && !presenting);
 
   return (
     <SkinScope>
@@ -241,7 +231,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         as="section"
         aria-label={title}
         data-testid="quest-window"
-        style={{ ...shell, width: widthPx, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
+        style={{ ...shell, width: widthPx, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px', overflowY: 'auto' }}
       >
         {/* ── Title row = drag handle; every icon lives on its right ── */}
         <div {...handleProps} title={t('gameFrame.panel.dragHint')} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -252,21 +242,21 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               HUD-controls group, as every floating panel header (guide §5b.1). */}
           <div data-hud-controls style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <button type="button" aria-label={t('gameFrame.questWindow.roster')} title={t('gameFrame.questWindow.roster')} aria-pressed={pop === 'roster'} onClick={() => setPop(pop === 'roster' ? null : 'roster')}>
-              <Users aria-hidden />
+              <EngravedIcon id="nav-company" />
               <PartyPips run={run} />
             </button>
             <button type="button" aria-label={t('gameFrame.questWindow.bag')} title={t('gameFrame.questWindow.bag')} aria-pressed={pop === 'bag'} onClick={() => setPop(pop === 'bag' ? null : 'bag')}>
-              <Backpack aria-hidden />
+              <EngravedIcon id="nav-bag" />
               {bag.length}
             </button>
             <button type="button" aria-label={t('gameFrame.questWindow.chronicle')} title={t('gameFrame.questWindow.chronicle')} aria-pressed={pop === 'chronicle'} onClick={() => setPop(pop === 'chronicle' ? null : 'chronicle')}>
-              <ScrollText aria-hidden />
+              <EngravedIcon id="nav-chronicle" />
             </button>
             <button type="button" data-keep="" aria-label={t('gameFrame.questWindow.minimise')} title={t('gameFrame.questWindow.minimise')} onClick={() => setMinimised(true)}>
-              <Minus aria-hidden />
+              <EngravedIcon id="cmd-minimize" />
             </button>
             <button type="button" data-keep="" aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} onClick={onClose}>
-              <X aria-hidden />
+              <EngravedIcon id="cmd-close" />
             </button>
           </div>
         </div>
@@ -327,7 +317,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             reducedMotion={reducedMotion}
           />
         ) : (
-        <div className="quest-s1-scroll" style={{ maxHeight: 168, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className="quest-s1-scroll" style={{ maxHeight: 168, minHeight: 0, flexShrink: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
           {resolved.map((c) => (
             <div key={c.id} data-testid="quest-window-verdict" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
@@ -364,9 +354,18 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         )}
 
         {/* ── Choices: a numbered dialogue list (BG3 / Disco Elysium idiom), never a plate ── */}
-        {/* ── The bag: arm before choosing, as in the lab; nothing is spent unasked ── */}
-        {waiting && !presenting && (
-          <ConsumableBelt flags={run.flags} armed={armed} onToggleArmed={onToggleArmed} onUseHealing={onUseHealing} onDrinkPotion={onDrinkPotion} />
+        {/* ── The bag: ONE reserved slot above the choices — belt at
+            decisions (arm before choosing, as in the lab; nothing is spent
+            unasked), read-only strip during transit/beat playback, empty
+            shell while the loadout was spent mid-run. ── */}
+        {bagSlotVisible && (
+          <div data-bag-slot style={{ minHeight: BAG_CHIP_ROW_PX }}>
+            {waiting && !presenting ? (
+              <ConsumableBelt flags={run.flags} armed={armed} onToggleArmed={onToggleArmed} onUseHealing={onUseHealing} onDrinkPotion={onDrinkPotion} />
+            ) : bagStripVisible({ bagEmpty: bag.length === 0, ended: run.ended, waiting, presenting }) ? (
+              <BagStrip items={bag} armed={armed} />
+            ) : null}
+          </div>
         )}
         {!presenting && (waiting || run.ended) && (
           <div data-hud-choices style={{ display: 'flex', flexDirection: 'column', margin: '0 -4px' }}>
@@ -374,7 +373,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               options.map((o, i) => {
                 const { pv, base } = previews[o.id] ?? { pv: null, base: null };
                 return (
-                  <button key={o.id} type="button" data-skin="choice" disabled={o.disabled} onClick={() => onChoose(o.id)}>
+                  <button key={o.id} type="button" data-skin="choice" data-testid="quest-window-choice" data-option-id={o.id} disabled={o.disabled} onClick={() => onChoose(o.id)}>
                     <span data-choice-index style={{ fontFamily: FONT.display, fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>{i + 1}.</span>
                     <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
                       <span style={{ fontFamily: FONT.display, fontSize: 15, color: 'var(--skin-text-primary)' }}>{o.label}</span>
@@ -533,7 +532,7 @@ const BeatStage: React.FC<{
           }}
         >
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.06em', color: beat.harm.kind === 'death' ? TONE.death : TONE.warn }}>
-            {beat.harm.kind === 'death' && <Skull aria-hidden style={{ width: 13, height: 13 }} />}
+            {beat.harm.kind === 'death' && <EngravedIcon id="status-fallen" size={13} />}
             {beat.memberName}
           </span>
           {beat.line && <span style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: beat.harm.kind === 'death' ? TONE.death : TONE.label }}>{beat.line}</span>}
@@ -683,7 +682,7 @@ const CombatStrip: React.FC<{
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <Swords aria-hidden style={{ width: 13, height: 13, color: TONE.danger }} />
+        <EngravedIcon id="evt-combat" size={13} style={{ color: TONE.danger }} />
         <span data-testid="combat-enemy-pips" aria-label={t('gameFrame.questWindow.combat.enemiesLeft', { count: run.goblinLeft })} style={{ display: 'inline-flex', gap: 3 }}>
           {Array.from({ length: spec.enemies }, (_, i) => (
             <span
@@ -769,9 +768,7 @@ const HiddenMark: React.FC = () => {
   const { t } = useTranslation('idleVillage');
   const label = t('gameFrame.questWindow.hiddenEvent');
   return (
-    <EyeOff size={12} strokeWidth={2.2} aria-label={label} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 5, opacity: 0.9 }}>
-      <title>{label}</title>
-    </EyeOff>
+    <EngravedIcon id="cmd-eye-off" size={12} label={label} title={label} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 5, opacity: 0.9 }} />
   );
 };
 
@@ -848,7 +845,7 @@ const tileBox = (borderTone: string, current: boolean): CSSProperties => ({
 
 const PhaseTile: React.FC<{ phase: PhaseRecord; name: string; current: boolean; run: QuestRunState; tooltipLines: number }> = ({ phase, name, current, run, tooltipLines }) => {
   const { t } = useTranslation('idleVillage');
-  const Icon = PHASE_ICONS[phase.beat] ?? CircleHelp;
+  const iconId = PHASE_ICONS[phase.beat] ?? 'cmd-help';
   const outcome = phaseOutcome(phase);
   const played = phase.choices.length > 0 || phase.lines.length > 0;
   const tone = played ? TONE[OUTCOME_TONE[outcome]] : TONE.label;
@@ -878,9 +875,9 @@ const PhaseTile: React.FC<{ phase: PhaseRecord; name: string; current: boolean; 
             aria-current={current ? 'step' : undefined}
             style={{ ...tileBox(current ? 'var(--skin-title-color)' : `color-mix(in srgb, ${tone} 60%, transparent)`, current), position: 'relative', padding: 0, cursor: 'help', color: current ? 'var(--skin-title-color)' : tone }}
           >
-            <Icon style={{ width: 18, height: 18 }} aria-hidden />
-            {played && outcome === 'clean' && <Check aria-hidden style={{ position: 'absolute', right: 2, bottom: 2, width: 12, height: 12, color: TONE.ok }} />}
-            {outcome === 'death' && <Skull aria-hidden style={{ position: 'absolute', right: 2, bottom: 2, width: 12, height: 12, color: TONE.death }} />}
+            <EngravedIcon id={iconId} size={18} />
+            {played && outcome === 'clean' && <EngravedIcon id="role-bodyguard" size={12} style={{ position: 'absolute', right: 2, bottom: 2, color: TONE.ok }} />}
+            {outcome === 'death' && <EngravedIcon id="status-fallen" size={12} style={{ position: 'absolute', right: 2, bottom: 2, color: TONE.death }} />}
           </button>
         </Tooltip.Trigger>
         <Tooltip.Portal>
@@ -919,7 +916,7 @@ const PhaseTile: React.FC<{ phase: PhaseRecord; name: string; current: boolean; 
 const NextTile: React.FC<{ label: string }> = ({ label }) => (
   <li style={{ width: 56, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }} aria-label={label} title={label}>
     <span style={{ ...tileBox('color-mix(in srgb, var(--skin-text-muted) 45%, transparent)', false), borderStyle: 'dashed', color: TONE.muted }}>
-      <CircleHelp style={{ width: 18, height: 18 }} aria-hidden />
+      <EngravedIcon id="cmd-help" size={18} />
     </span>
     <span style={{ fontFamily: FONT.display, fontSize: 12, color: TONE.muted }}>?</span>
   </li>

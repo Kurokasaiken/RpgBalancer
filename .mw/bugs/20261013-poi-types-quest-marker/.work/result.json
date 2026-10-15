@@ -1,0 +1,11 @@
+{
+  "status": "fixed",
+  "tests": {
+    "lint": "0 errors (14 pre-existing warnings)",
+    "build:check": "PASS",
+    "kanban:lint": "PASS",
+    "vitest": "55/55 (mapQuestPoi 8, questAvailability 3, questOffer 30, questScenarioConfig 14)",
+    "live": "Puppeteer: POI types → 4 anchors (2 demo + goblin + rovine reali); click goblin → quest-expedition-detail; toggle-off → fade+shrink → 0"
+  },
+  "notes": "Due cause: gate questShown-only (fix questRevealed) + offerte expired sul save datato (fix SLICE_OFFER_WINDOW_DAYS=10000). Tensione con R-143 risolta: il marker sotto POI types è l'offerta reale, non un esemplare finto."
+}
