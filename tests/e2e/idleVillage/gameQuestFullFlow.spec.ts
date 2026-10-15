@@ -12,7 +12,8 @@
  *   → la run risolta fase per fase: beat saltati con Enter, scelte
  *     cliccate nella QuestRunWindow, consumabili armati/usati dalla cintura
  *   → rapporto finale → XP ai PG (store + roster + report)
- *   → oro nella HUD (readout del ribbon) → «Chiudi rapporto» → POI consumato
+ *   → oro nella HUD (readout del ribbon) → «Chiudi rapporto» → POI goblin
+ *   `repeatable` restituito (R-200: mai consumato, torna available)
  *   → reload: XP e oro restano.
  *
  * Differenza con `gameQuestLifecycle.spec.ts`: qui NESSUNA azione passa

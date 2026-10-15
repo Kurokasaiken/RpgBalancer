@@ -1116,10 +1116,19 @@
       "inProgressShort": "in corso",
       "hiddenEvent": "Evento nascosto — potevi non trovarlo",
       "close": "Chiudi il rapporto",
+      "abandon": "Abbandona la quest",
+      "abandonConfirm": "Sei sicuro di voler abbandonare la quest?",
+      "abandonYes": "Abbandona",
+      "abandonStay": "Continua",
+      "checkOptions": "Opzioni della prova",
+      "checkOptionsSkipCheck": "Salta tutta la prova",
+      "checkOptionsSkipIntro": "Salta l'animazione iniziale",
+      "rewardClose": "Chiudi",
+      "rewardHint": "Clicca o premi un tasto per rivelare",
       "beats": {
         "continue": "Continua",
-        "clickHint": "Clicca per continuare",
-        "more": "{count, plural, one {Manca # momento — clicca per continuare} other {Mancano # momenti — clicca per continuare}}",
+        "clickHint": "Clicca o premi un tasto per continuare",
+        "more": "{count, plural, one {Manca # momento — clicca o premi un tasto} other {Mancano # momenti — clicca o premi un tasto}}",
         "recap": "Mentre eri via: {scenes} scene, {checks} prove, {deaths} caduti, {wounds} feriti"
       },
       "combat": {

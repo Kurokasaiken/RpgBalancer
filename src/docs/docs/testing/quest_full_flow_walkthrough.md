@@ -70,12 +70,21 @@ quello che compare è l'offerta vera, mai un esemplare demo (R-143/R-180).
 ![Planner vuoto](quest_full_flow/04-planner-vuoto.jpg)
 
 **Come:** click sul medaglione. Si apre il **POI detail** (`QuestExpeditionDetail`),
-trascinabile dall'intestazione.
-**Cosa mostra:** obiettivo, tag, pericolo, tier di ricompensa (qui *Decent · 60*
-oro), durata stimata (~110 tick), i **4 slot** (Capo spedizione obbligatorio;
-Combattente, Esploratore, Guardia del corpo opzionali), il forecast, la borsa.
+un'assemblea di **due lastre** che si trascinano come un pezzo unico
+(R-195/PLAN-036): a sinistra il planner vero e proprio, a destra il **sidecar
+del forecast** (una placca esterna, `quest-expedition-forecast-column`).
+**Cosa mostra il planner:** sottotitolo + chip, subito sotto un **banner
+cinematografico** (~2.76:1, `offer.coverArt` — qui il totem goblin), obiettivo,
+tag, pericolo, tier di ricompensa (qui *Decent · 60* oro), durata stimata
+(~110 tick), i **4 slot** (Capo spedizione obbligatorio; Combattente,
+Esploratore, Guardia del corpo opzionali), la **bisaccia** e, in fondo e
+sempre in vista, la CTA **«Send expedition»** (fuori dall'area di scroll).
+**Cosa mostra il sidecar:** le **Stat Chiave** dell'offerta — *Primaria:
+Forza, Secondaria: Percezione* per i goblin (`scenario.keyStats`) — poi il
+forecast aggregato, il dettaglio per membro, il perché dei numeri e l'intel.
 **Regole:** «Send expedition» resta **disabilitato** finché lo slot
-obbligatorio è vuoto; il forecast dice «riempi gli slot».
+obbligatorio è vuoto o il forecast non è pronto; sopra 720px di altezza il
+planner non scrolla affatto (`minZeroScrollViewportHeightPx`, config).
 
 **Il roster segue il detail (R-184):** aprendo un POI detail il roster si
 apre da solo se era chiuso (il planner senza i PG da trascinare non serve);
@@ -126,9 +135,15 @@ slot del capo) viene rifiutato e la formazione non cambia.
 
 ![Borsa con tre consumabili scelti](quest_full_flow/08-loadout-consumabili.jpg)
 
-**Come:** click sui bottoni della **Bag**: scelto = acceso. La borsa ha
-**3 posti**: a borsa piena gli altri si disabilitano. *Covers* mostra quali
-stat primarie della quest (qui STR e PER) sono coperte dai bonus scelti.
+**Come:** la bisaccia ha **3 slot** (`bag-slot-0..2`); un pulsante apre il
+**picker esterno** `quest-bag-external-picker` — una placca a parte con le
+tessere **solo-icona** degli oggetti reali del magazzino del villaggio
+(`VILLAGE_STASH_CONFIG.items`). Ogni tessera ha un tooltip con **nome,
+descrizione/effetto, stat coperte e stock**; una selezione riempie uno slot,
+un click sullo slot pieno lo svuota; a borsa piena le tessere non scelte si
+disabilitano. **Escape** chiude solo il picker e restituisce il focus al
+pulsante. *Covers* mostra quali stat chiave della quest (qui Forza e
+Percezione) sono coperte dai bonus scelti.
 **Qui:** Strength bonus, Perception bonus, Healing.
 **Effetti:** i bonus *+15 a un check* si usano armandoli in run; il cavallo
 dimezza la durata; cura/pozione si usano dalla cintura.
@@ -227,21 +242,25 @@ caduti spariscono dai disponibili.
 come riga del rapporto — non esiste ancora un inventario di villaggio
 (vedi *Limiti*).
 
-## 12. Chiusura: il POI è consumato
+## 12. Chiusura: il POI ripetibile torna disponibile
 
-![Dopo «Close the report»: il POI non c'è più](quest_full_flow/16-poi-consumato.jpg)
+![Dopo «Close the report»: il POI ripetibile resta sulla mappa](quest_full_flow/16-poi-ripetibile-restituito.jpg)
 
-**Come:** «Close the report». **Cosa succede:** la finestra si chiude, la
-run viene archiviata, il POI goblin è **consumato** e lascia la mappa con
-una dissolvenza; al reload non torna. Il test ricarica la pagina e verifica
-che oro, XP dei PG e registro del villaggio siano ancora lì.
+**Come:** «Close the report». **Cosa succede:** la finestra si chiude e la
+run viene archiviata. Il POI goblin è authored **`repeatable`** (R-200 D-1):
+**non viene consumato** — il marker resta sulla mappa e torna subito
+`available`, pronto per essere rilanciato finché la sua finestra dura. (Un
+POI one-shot come le Rovine invece lascia la mappa e al reload non torna:
+finisce in `consumedPoiIds`, persistito.) Il test ricarica la pagina e
+verifica che oro, XP dei PG e registro del villaggio siano ancora lì.
 
 ---
 
 ## Limiti noti (non coperti perché non esistono ancora)
 
-- **Inventario consumabili:** la borsa pesca da un catalogo senza quantità;
-  scegliere/usare un consumabile non scala nessun magazzino.
+- **Inventario consumabili:** il picker legge lo stock reale del magazzino
+  (`VILLAGE_STASH_CONFIG`, qty per item) ma scegliere/usare un consumabile
+  non scala ancora le quantità del villaggio.
 - **Oggetti in HUD:** nessun inventario di villaggio — il loot goblin è già
   tutto convertito in oro; il trofeo resta una riga del rapporto.
 - **Curva XP / livelli:** OPEN.
