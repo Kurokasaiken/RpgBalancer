@@ -262,10 +262,10 @@ export default function GameFramePixiPage() {
   useEffect(() => {
     if (hudIdleHidden && DEFAULT_GAME_FRAME_CONFIG.hudHide.wonderOnHide) setWonderRequest((n) => n + 1);
   }, [hudIdleHidden]);
-  // Test / trailer tooling: dev builds only, F10 shows or hides it (hide it for a clean capture).
-  // The Director panel is a test / trailer instrument: dev builds and the
-  // playwright preview only, never a production bundle.
-  const directorEnabled = (import.meta.env.DEV || import.meta.env.MODE === 'playwright') && debug.directorPanel;
+  // Test / trailer tooling: F10 shows or hides it (hide it for a clean capture).
+  // Director 2026-10-15: the panels ship on the Vercel production deploy too —
+  // it is the Director's own dogfood surface, not a public Steam build.
+  const directorEnabled = debug.directorPanel;
   /* PLAN-032 SP-1: the hero sheet's machine is its single transition owner.
    * `interceptToggle` routes every registry call for it (menu, game menu, the
    * `p` shortcut) into `useHeroSheet`; the registry flag only reflects. */
