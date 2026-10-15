@@ -29,7 +29,9 @@ export const MinimalActivityEntrySchema = z.object({
    */
   messageKey: z.string().optional(),
   /** ICU interpolation params for `messageKey` — baked at write time. */
-  messageParams: z.record(z.union([z.string(), z.number()])).optional(),
+  /* R-183: zod 4 needs the key schema — the 1-arg form threw on parse, so
+   *  every snapshot carrying a settlement line failed to save. */
+  messageParams: z.record(z.string(), z.union([z.string(), z.number()])).optional(),
   residentId: z.string().optional(),
   activityId: z.string().optional(),
   /**

@@ -47,7 +47,7 @@ export default function DesignVsFidelityPage() {
             >
               {t('designVsFidelity.backToHub', 'Back to Test Hub')}
             </a>
-            <SkinBadge>{t('designVsFidelity.missingCount', '{{count}} missing items', { count: MISSING_ITEMS.length })}</SkinBadge>
+            <SkinBadge>{t('designVsFidelity.missingCount', '{count} missing items', { count: MISSING_ITEMS.length })}</SkinBadge>
           </div>
         </header>
 

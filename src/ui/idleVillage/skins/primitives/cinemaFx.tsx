@@ -193,6 +193,59 @@ export const DamageFloater: React.FC<DamageFloaterProps> = ({ floatKey, amount, 
   );
 };
 
+/**
+ * Text variant of `DamageFloater` (PLAN-032 SP-5): same module, same WAAPI
+ * lifecycle — a text payload keyed by `floatKey` so a newer event re-fires the
+ * rise. Supersede is the caller's job (render the newest key only); floaters
+ * never merge or stack.
+ */
+export const TextFloater: React.FC<{
+  /** Event id — a new key re-fires the rise. */
+  floatKey: string;
+  text: string;
+  /** Text/glow colour — caller passes a skin/toned value. */
+  color: string;
+  durationMs: number;
+  risePx: number;
+  reducedMotion?: boolean;
+}> = ({ floatKey, text, color, durationMs, risePx, reducedMotion }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el?.animate || reducedMotion) return undefined;
+    const anim = el.animate(
+      [
+        { transform: 'translateY(0)', opacity: 1 },
+        { transform: `translateY(-${risePx}px)`, opacity: 0 },
+      ],
+      { duration: durationMs, easing: 'ease-out', fill: 'forwards' },
+    );
+    return () => anim.cancel();
+  }, [floatKey, durationMs, risePx, reducedMotion]);
+  if (reducedMotion) return null;
+  return (
+    <span
+      ref={ref}
+      aria-hidden
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        fontFamily: 'var(--skin-font-display)',
+        fontSize: 13,
+        fontVariantNumeric: 'tabular-nums',
+        color,
+        textShadow: `0 0 6px ${color}`,
+        pointerEvents: 'none',
+        whiteSpace: 'nowrap',
+        zIndex: 3,
+      }}
+    >
+      {text}
+    </span>
+  );
+};
+
 /* ------------------------------------------------------------------ */
 /* fxForBeat — the configured beat→fx mapping                          */
 /* ------------------------------------------------------------------ */

@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react';
 import React, { memo, useRef, useEffect } from 'react';
 import { useMemo, useState, useCallback } from 'react';
-import { useDroppable } from '@dnd-kit/core';
+import { createPortal } from 'react-dom';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ResidentSlotViewModel, SlotProgressData, DropState } from '@/ui/idleVillage/slots/types';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
@@ -76,6 +77,15 @@ export interface ResidentSlotRackProps {
   medalStyleConfig?: MedalStyleBridgeConfig;
   slotDebugVisualization?: SlotDebugVisualizationSettings;
   slotSize?: number; // Optional slot size in px for detail layouts
+  /**
+   * R-183 slot↔slot swap (opt-in, detail layout): an occupied slot's token
+   * becomes a dnd-kit draggable (`slot-token:<slotId>`, data
+   * `{ type: 'slot-token', slotId, residentId }`) so the consumer's
+   * `onDragEnd` can move/swap residents between slots without extracting
+   * them first. Press-and-hold extraction keeps working: it only fires when
+   * the pointer stays still, a drag cancels it.
+   */
+  enableSlotSwap?: boolean;
   
   // WanderlustSurface skin integration
   wanderlustShape?: WanderlustShape;
@@ -235,7 +245,18 @@ interface DetailSlotProps {
   medalStyleConfig?: MedalStyleBridgeConfig;
   slotDebugVisualization?: SlotDebugVisualizationSettings;
   slotSize?: number;
+  enableSlotSwap?: boolean;
 }
+
+/** dnd-kit payload of a slotted token picked up for a slot↔slot swap. */
+export interface SlotTokenDragData {
+  type: 'slot-token';
+  slotId: string;
+  residentId: string | null;
+}
+
+/** Draggable id of a slot's token (R-183) — never collides with a roster card id. */
+export const slotTokenDragId = (slotId: string) => `slot-token:${slotId}`;
 
 const DetailSlot = memo(({
   slot,
@@ -252,11 +273,24 @@ const DetailSlot = memo(({
   medalStyleConfig,
   slotDebugVisualization,
   slotSize,
+  enableSlotSwap = false,
 }: DetailSlotProps) => {
   const { setNodeRef } = useDroppable({
     id: slot.id,
     data: { type: 'slot', slotId: slot.id }
   });
+  const tokenDrag = useDraggable({
+    id: slotTokenDragId(slot.id),
+    data: { type: 'slot-token', slotId: slot.id, residentId: slot.assignedResidentId ?? null } satisfies SlotTokenDragData,
+    disabled: !enableSlotSwap || !slot.assignedResidentId,
+  });
+  /* The dragged token is drawn as a fixed ghost in a portal: the slot's
+   *  bloom wrapper is its own stacking context and the planner body scrolls,
+   *  so an in-place transform would be painted under the next slot / clipped. */
+  const [tokenGhostOrigin, setTokenGhostOrigin] = useState<DOMRect | null>(null);
+  useEffect(() => {
+    setTokenGhostOrigin(tokenDrag.isDragging ? tokenDrag.node.current?.getBoundingClientRect() ?? null : null);
+  }, [tokenDrag.isDragging, tokenDrag.node]);
 
   const slotTooltip = slot.statHint ?? slot.requirement?.label ?? 'Any stat';
 
@@ -408,6 +442,13 @@ const DetailSlot = memo(({
     extraction.cancel();
   }, [extraction]);
 
+  /* A swap drag means «move it», never «take it out»: the hold that started
+   *  the press must not complete into an extraction mid-drag. */
+  useEffect(() => {
+    if (tokenDrag.isDragging) extraction.cancel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenDrag.isDragging]);
+
   useEffect(() => {
     return () => {
       clearExtractionTimeouts();
@@ -529,7 +570,14 @@ const DetailSlot = memo(({
         }}
       >
         {isAssigned && (
-          <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div
+            ref={tokenDrag.setNodeRef}
+            {...(enableSlotSwap ? tokenDrag.listeners : {})}
+            data-testid={`slot-token-${slot.id}`}
+            data-swap-dragging={tokenDrag.isDragging ? 'true' : undefined}
+            className={`absolute inset-0 flex items-center justify-center z-10 ${enableSlotSwap ? 'cursor-grab' : ''}`}
+            style={tokenDrag.isDragging ? { opacity: 0.35 } : undefined}
+          >
             <div className="relative">
               {debugVisualization?.showLabels && (
                 <span
@@ -573,6 +621,32 @@ const DetailSlot = memo(({
       <p className="text-[9px] tracking-[0.2em]" style={labelStyle}>
         {slot.label}
       </p>
+      {tokenGhostOrigin && tokenDrag.transform &&
+        createPortal(
+          <span
+            aria-hidden
+            data-testid="slot-token-ghost"
+            className="pointer-events-none fixed flex items-center justify-center overflow-hidden rounded-full bg-black/70"
+            style={{
+              left: tokenGhostOrigin.left + tokenGhostOrigin.width / 2 - 20 + tokenDrag.transform.x,
+              top: tokenGhostOrigin.top + tokenGhostOrigin.height / 2 - 20 + tokenDrag.transform.y,
+              width: 40,
+              height: 40,
+              zIndex: 10000,
+              /* gold rim: the token must read as «in hand» even when the
+               *  portrait is a dark placeholder silhouette */
+              border: '2px solid var(--skin-title-color, #f0cf6a)',
+              boxShadow: '0 6px 18px rgba(0,0,0,0.55), 0 0 12px color-mix(in srgb, var(--skin-title-color, #f0cf6a) 55%, transparent)',
+            }}
+          >
+            {assignedAvatarUrl ? (
+              <img src={assignedAvatarUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span style={initialsStyle}>{assignedInitials || assignedLabel.slice(0, 3)}</span>
+            )}
+          </span>,
+          document.body,
+        )}
     </div>
   );
 });
@@ -595,6 +669,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
   className,
   slotDebugVisualization,
   slotSize,
+  enableSlotSwap = false,
   wanderlustShape = 'panel',
   wanderlustMaterial = 'bronze',
   wanderlustInteractive = false,
@@ -766,6 +841,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
               activityState={getSlotActivityState?.(slot.id)}
               slotDebugVisualization={slotDebugVisualization}
               slotSize={slotSize}
+              enableSlotSwap={enableSlotSwap}
             />
           );
         })}

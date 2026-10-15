@@ -31,20 +31,33 @@ export interface WhenWhereClusterProps {
  * doing, and actually means something: it shows how far through the phase we
  * are, not just which phase it is.
  */
-/** Pause / speed chip: quiet until selected; while paused the held speed keeps a ring. */
-const stripButtonStyle = (checked: boolean, held: boolean): React.CSSProperties => ({
+/**
+ * Pause / speed chip, measured on the Roster's header controls (PLAN-058 T1.2):
+ * the button is the 32 px hit area (guide §6.4), the pill drawn inside it is the
+ * Roster's control height. Quiet until selected; while paused the held speed keeps a ring.
+ */
+const stripButtonStyle: React.CSSProperties = {
   minWidth: 32,
-  height: 28,
-  padding: '0 8px',
+  height: 32,
+  padding: 0,
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   border: 'none',
-  borderRadius: 999,
+  background: 'transparent',
   cursor: 'pointer',
+};
+const stripPillStyle = (checked: boolean, held: boolean): React.CSSProperties => ({
+  minWidth: 'var(--skin-hud-control-height)',
+  height: 'var(--skin-hud-control-height)',
+  padding: '0 var(--skin-hud-inline-gap)',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 999,
   fontFamily: 'var(--skin-font-display)',
-  fontSize: 13,
-  fontWeight: 700,
+  fontSize: 'var(--skin-hud-name-size)',
+  fontWeight: 'var(--skin-hud-name-weight)' as React.CSSProperties['fontWeight'],
   fontVariantNumeric: 'tabular-nums',
   color: checked ? 'var(--skin-title-color)' : 'var(--skin-label-primary)',
   background: checked ? 'color-mix(in srgb, var(--skin-icon-accent) 32%, transparent)' : 'transparent',
@@ -53,6 +66,7 @@ const stripButtonStyle = (checked: boolean, held: boolean): React.CSSProperties 
     : held
       ? 'inset 0 0 0 1.5px var(--skin-label-primary)'
       : 'none',
+  transition: 'background 140ms ease-out, color 140ms ease-out, box-shadow 140ms ease-out',
 });
 
 export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
@@ -67,7 +81,7 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
   const compact = useCompactTop();
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-plaque-clearance)' }}>
       <div
         style={{
           width: 34,
@@ -79,7 +93,7 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
         }}
       >
         <div style={{ transform: 'scale(0.42)', transformOrigin: 'center' }}>
-          <DayNightPoiSkin isDayPhase={isDayPhase} cycleProgress={cycleProgress} isPaused={isPaused} />
+          <DayNightPoiSkin isDayPhase={isDayPhase} cycleProgress={cycleProgress} isPaused={isPaused} nightTone="silver" />
         </div>
       </div>
 
@@ -99,7 +113,7 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
       <span
         style={{
           fontFamily: 'var(--skin-font-serif)',
-          fontSize: 13,
+          fontSize: 'var(--skin-hud-name-size)',
           color: 'var(--skin-body-color)',
           whiteSpace: 'nowrap',
         }}
@@ -115,7 +129,7 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
           <div
             role="radiogroup"
             aria-label={t('gameFrame.speed.ariaLabel')}
-            style={{ display: 'flex', gap: 2, alignItems: 'center' }}
+            style={{ display: 'flex', gap: 0, alignItems: 'center' }}
           >
             <button
               type="button"
@@ -124,11 +138,13 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
               aria-label={isPaused ? t('gameFrame.speed.resume') : t('gameFrame.speed.pause')}
               title={`${isPaused ? t('gameFrame.speed.resume') : t('gameFrame.speed.pause')} [${t('gameFrame.speed.spaceKey')}]`}
               onClick={speed.onTogglePause}
-              style={stripButtonStyle(isPaused, false)}
+              style={stripButtonStyle}
             >
-              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="currentColor">
-                {isPaused ? <path d="M2.5 1.5v9l8-4.5z" /> : <path d="M2 1.5h3v9H2zM7 1.5h3v9H7z" />}
-              </svg>
+              <span style={stripPillStyle(isPaused, false)}>
+                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="currentColor">
+                  {isPaused ? <path d="M2.5 1.5v9l8-4.5z" /> : <path d="M2 1.5h3v9H2zM7 1.5h3v9H7z" />}
+                </svg>
+              </span>
             </button>
             {speed.available.map((value, index) => (
               <button
@@ -139,9 +155,9 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
                 aria-label={`×${value}`}
                 title={`×${value} [${index + 1}]`}
                 onClick={() => speed.onChange(value)}
-                style={stripButtonStyle(!isPaused && value === speed.multiplier, isPaused && value === speed.multiplier)}
+                style={stripButtonStyle}
               >
-                {`×${value}`}
+                <span style={stripPillStyle(!isPaused && value === speed.multiplier, isPaused && value === speed.multiplier)}>{`×${value}`}</span>
               </button>
             ))}
           </div>
@@ -157,15 +173,15 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
             top: '100%',
             left: '50%',
             transform: 'translate(-50%, 6px)',
-            padding: '3px 12px',
+            padding: 'var(--skin-hud-control-gap) var(--skin-hud-plaque-clearance)',
             borderRadius: '0 0 8px 8px',
             background: 'color-mix(in srgb, var(--skin-surface-base) 70%, black)',
             boxShadow: '0 0 0 1px var(--skin-surface-border)',
             color: 'var(--skin-title-color)',
             fontFamily: 'var(--skin-font-display)',
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
+            fontSize: 'var(--skin-hud-caps-size)',
+            fontWeight: 'var(--skin-hud-caps-weight)' as React.CSSProperties['fontWeight'],
+            letterSpacing: 'var(--skin-hud-caps-tracking)',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
             pointerEvents: 'none',

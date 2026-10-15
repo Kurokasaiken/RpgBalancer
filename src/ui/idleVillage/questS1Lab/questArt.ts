@@ -49,25 +49,31 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'rv-camera': { src: '/assets/quest-robine/camera.jpg', fit: 'cover' },
   'rv-ritorno-evento': { src: '/assets/quest-robine/strada.jpg', fit: 'cover' },
   'rv-fine': { src: ART.village, fit: 'contain' },
-  /* ---- Sterminio dei goblin — one public-domain painting per phase
-   *  (Director 2026-10-06; provenance in public/assets/quest-goblin/SOURCES.md) */
+  /* ---- Sterminio dei goblin — AI-painted Wanderlust art (Director
+   *  2026-10-13; prompts .mw/specs/quest-goblin-scenes/, catalog + reuse
+   *  tags in public/assets/scene-library/CATALOG.md). The scene-library
+   *  files are named by subject, not by quest phase, so other quests can
+   *  reuse them. `gob-inizio`/`gob-ritorno` still use the public-domain
+   *  placeholders (transit art viaggio/ritorno not yet generated); the
+   *  optional merchant event node is not authored yet — its art is
+   *  cataloged as mercante-strada.jpg. */
   'gob-inizio': { src: '/assets/quest-goblin/assegnazione.jpg', fit: 'cover' },
-  'gob-esplora': { src: '/assets/quest-goblin/esplorazione.jpg', fit: 'cover' },
-  'gob-tracce-per': { src: '/assets/quest-goblin/esplorazione.jpg', fit: 'cover' },
-  'gob-tracce-perfor': { src: '/assets/quest-goblin/esplorazione.jpg', fit: 'cover' },
-  'gob-bottino-scelta': { src: '/assets/quest-goblin/bottino.jpg', fit: 'cover' },
-  'gob-bottino': { src: '/assets/quest-goblin/bottino.jpg', fit: 'cover' },
-  'gob-accampamento': { src: '/assets/quest-goblin/accampamento.jpg', fit: 'cover' },
-  'gob-stealth': { src: '/assets/quest-goblin/accampamento.jpg', fit: 'cover' },
-  'gob-assalto': { src: '/assets/quest-goblin/accampamento.jpg', fit: 'cover' },
-  'gob-combattimento': { src: '/assets/quest-goblin/combattimento.jpg', fit: 'cover' },
-  'gob-incalzare': { src: '/assets/quest-goblin/incalzare.jpg', fit: 'cover' },
-  'gob-incalza-check': { src: '/assets/quest-goblin/incalzare.jpg', fit: 'cover' },
-  'gob-esplora-extra': { src: '/assets/quest-goblin/razzia.jpg', fit: 'cover' },
-  'gob-cerca': { src: '/assets/quest-goblin/razzia.jpg', fit: 'cover' },
+  'gob-esplora': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
+  'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
+  'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
+  'gob-bottino-scelta': { src: '/assets/scene-library/carro-nascosto.jpg', fit: 'cover' },
+  'gob-bottino': { src: '/assets/scene-library/carro-nascosto.jpg', fit: 'cover' },
+  'gob-accampamento': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
+  'gob-stealth': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
+  'gob-assalto': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
+  'gob-combattimento': { src: '/assets/scene-library/assalto-goblin.jpg', fit: 'cover' },
+  'gob-incalzare': { src: '/assets/scene-library/fuga-goblin.jpg', fit: 'cover' },
+  'gob-incalza-check': { src: '/assets/scene-library/fuga-goblin.jpg', fit: 'cover' },
+  'gob-esplora-extra': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
+  'gob-cerca': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
   'gob-ritorno': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
-  'gob-agguato': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
-  'gob-agguato-scelta': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
-  'gob-ultimo-scontro': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
+  'gob-agguato': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
+  'gob-agguato-scelta': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
+  'gob-ultimo-scontro': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
   'gob-fine': { src: ART.village, fit: 'contain' },
 };

@@ -1,6 +1,6 @@
 import React, { useMemo, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
+import { EngravedIcon } from './engravedIcons';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import {
   DEFAULT_GAME_FRAME_CONFIG,
@@ -23,6 +23,8 @@ export interface HudEvent {
   daysLeft: number;
   /** Where it happens on the map, as fractions of the world canvas (0-1); lets the host focus the camera on it. */
   at?: { x: number; y: number };
+  /** The row is mounted but not yet shown: an announcement card is still travelling to it and hands over on arrival. */
+  arriving?: boolean;
 }
 
 export type HudEventSort = 'due' | 'type';
@@ -49,29 +51,40 @@ const FALLBACK_TYPE: Omit<GameFrameEventTypeConfig, 'id'> = {
 /**
  * The surface is `HudPanel` (the HUD's floating-panel primitive — chamfered
  * silhouette, gold filet, filigree); only layout lives here, and each row keeps
- * its own thin-bordered strip.
+ * its own thin-bordered strip. Every measure is a Roster token (guide §4.2): the
+ * ledger must read as the same family as the Roster panel, not as a second one.
  */
 const PANEL_STYLE: CSSProperties = {
   width: 300,
   display: 'flex',
   flexDirection: 'column',
-  gap: 6,
-  padding: '9px 12px 10px',
+  gap: 'var(--skin-hud-stack-gap)',
+  padding: 'var(--skin-hud-panel-padding)',
   pointerEvents: 'auto',
 };
 const STRIP_STYLE: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '16px minmax(0, 1fr) auto',
   alignItems: 'center',
-  gap: 8,
-  padding: '4px 8px',
-  borderRadius: 8,
-  background: 'var(--skin-surface-bg, linear-gradient(160deg, rgba(216,177,62,0.05) 0%, rgba(20,12,7,0.2) 45%, rgba(6,4,3,0.3) 100%))',
-  border: '1px solid var(--skin-surface-border, rgba(223,184,87,0.16))',
+  gap: 'var(--skin-hud-row-column-gap)',
+  padding: 'var(--skin-hud-row-padding)',
+  borderRadius: 'var(--skin-hud-row-radius)',
+  background: 'var(--skin-surface-bg)',
+  border: '1px solid var(--skin-hud-row-filet)',
   listStyle: 'none',
+  transition: 'border-color 120ms ease-out',
 };
-const FONT_DISPLAY = 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)';
-const FONT_SANS = 'var(--wl-font-sans, system-ui, sans-serif)';
+const FONT_DISPLAY = 'var(--skin-font-display)';
+const FONT_SERIF = 'var(--skin-font-serif)';
+const FONT_SANS = 'var(--skin-font-sans)';
+/** Short uppercase label (state, countdown, group): the Roster's `caps` scale. */
+const CAPS_STYLE: CSSProperties = {
+  fontFamily: FONT_SANS,
+  fontSize: 'var(--skin-hud-caps-size)',
+  fontWeight: 'var(--skin-hud-caps-weight)' as CSSProperties['fontWeight'],
+  letterSpacing: 'var(--skin-hud-caps-tracking)',
+  textTransform: 'uppercase',
+};
 
 /**
  * HUD event ledger — the "what is coming" list: several upcoming events in a small,
@@ -93,6 +106,8 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
   const { t } = useTranslation('idleVillage');
   const [sort, setSort] = useState<HudEventSort>(config.defaultSort);
   const [expanded, setExpanded] = useState(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
   const { panelStyle, handleProps } = useHudPanelDrag();
   const Surface = useHudMaterial() === 'lacquer' ? HudPlaque : HudPanel;
 
@@ -145,6 +160,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
   };
 
   const strip = (event: HudEvent) => {
+    const actionable = Boolean(onSelect);
     const type = typeOf(event.typeId);
     const urgent = event.daysLeft <= config.urgentWithinDays;
     return (
@@ -154,14 +170,23 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
           ...STRIP_STYLE,
           // Severity reads before the words: danger rows carry a tone edge and a faint wash.
           borderInlineStart: type.tone === 'danger' ? `3px solid ${TONE_COLOR.danger}` : STRIP_STYLE.border,
+          ...(hoveredId === event.id || focusedId === event.id ? { borderColor: 'var(--skin-hud-row-filet-hover)' } : null),
           background:
             type.tone === 'danger' && urgent
               ? `color-mix(in srgb, ${TONE_COLOR.danger} 14%, transparent)`
               : STRIP_STYLE.background,
           cursor: onSelect ? 'pointer' : undefined,
+          // Keeps its place in the list (the card measures it) but stays invisible until the card arrives.
+          opacity: event.arriving ? 0 : 1,
+          transition: 'opacity 280ms ease-out',
         }}
+        data-event-id={event.id}
         data-event-type={event.typeId}
         data-urgent={urgent || undefined}
+        onMouseEnter={actionable ? () => setHoveredId(event.id) : undefined}
+        onMouseLeave={actionable ? () => setHoveredId(null) : undefined}
+        onFocus={actionable ? (e) => setFocusedId(e.currentTarget.matches(':focus-visible') ? event.id : null) : undefined}
+        onBlur={actionable ? () => setFocusedId(null) : undefined}
         {...(onSelect
           ? {
               role: 'button' as const,
@@ -176,16 +201,15 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
             }
           : {})}
       >
-        <HudGlyph iconId={type.icon} label={t(type.labelKey)} size={14} style={{ color: TONE_COLOR[type.tone] }} />
+        <HudGlyph iconId={type.icon} label={t(type.labelKey)} size={16} style={{ color: TONE_COLOR[type.tone] }} />
         <span
           title={event.title}
           style={{
-            fontFamily: FONT_DISPLAY,
-            fontSize: 13,
-            fontWeight: 700,
-            color: 'var(--skin-text-primary, #F5F2E8)',
-            textShadow: '0 1px 2px rgba(0,0,0,0.7)',
-            // Two lines before it gives up: the name is the part that matters.
+            fontFamily: FONT_SERIF,
+            fontSize: 14,
+            fontWeight: 500,
+            color: 'var(--skin-body-color)',
+            // Two lines before it gives up (the full text is in the title): the name is the part that matters.
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 2,
@@ -197,14 +221,10 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
         </span>
         <span
           style={{
-            fontFamily: FONT_SANS,
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
+            ...CAPS_STYLE,
             fontVariantNumeric: 'tabular-nums',
             whiteSpace: 'nowrap',
-            color: urgent ? TONE_COLOR[type.tone] : 'var(--skin-label-tertiary, #9a8246)',
+            color: urgent ? TONE_COLOR[type.tone] : 'var(--skin-text-secondary)',
           }}
         >
           {event.daysLeft <= 0
@@ -215,7 +235,7 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
     );
   };
   const stripList = (list: HudEvent[]) => (
-    <ul style={{ margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>{list.map(strip)}</ul>
+    <ul style={{ margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-row-gap)' }}>{list.map(strip)}</ul>
   );
 
   // `visible` follows `sorted`, so in type mode the groups come out in priority order.
@@ -238,27 +258,26 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
       <div
         {...handleProps}
         title={t('gameFrame.panel.dragHint')}
-        style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'nowrap' }}
+        style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-stack-gap)', flexWrap: 'nowrap' }}
       >
         <span
           style={{
             fontFamily: FONT_DISPLAY,
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'var(--skin-title-color, #f0cf6a)',
+            fontSize: 'var(--skin-hud-title-size)',
+            fontWeight: 'var(--skin-hud-title-weight)' as CSSProperties['fontWeight'],
+            letterSpacing: 'var(--skin-hud-title-tracking)',
+            color: 'var(--skin-title-color)',
             whiteSpace: 'nowrap',
           }}
         >
           {t('gameFrame.events.title')}
-          <span style={{ marginLeft: 8, fontVariantNumeric: 'tabular-nums' }}>{events.length}</span>
+          <span style={{ marginLeft: 'var(--skin-hud-stack-gap)', fontVariantNumeric: 'tabular-nums', color: 'var(--skin-body-color)' }}>{events.length}</span>
         </span>
         <div
           role="group"
           aria-label={t('gameFrame.events.sort.ariaLabel')}
           data-hud-controls=""
-          style={{ display: 'flex', gap: 4, marginLeft: 'auto', alignItems: 'center' }}
+          style={{ display: 'flex', gap: 'var(--skin-hud-control-gap)', marginLeft: 'auto', alignItems: 'center' }}
         >
           {sortOptions.map((option) => {
             const active = option.id === sort;
@@ -275,14 +294,14 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
           })}
           {onClose && (
             <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')}>
-              <X />
+              <EngravedIcon id="cmd-close" />
             </button>
           )}
         </div>
       </div>
 
       {events.length === 0 ? (
-        <p style={{ margin: 0, fontSize: 12, color: 'var(--skin-label-tertiary, #9a8246)' }}>
+        <p style={{ margin: 0, fontFamily: FONT_SERIF, fontSize: 14, lineHeight: 1.4, color: 'var(--skin-body-color)' }}>
           {t('gameFrame.events.empty')}
         </p>
       ) : sort === 'due' ? (
@@ -291,19 +310,8 @@ export const HudEventLedger: React.FC<HudEventLedgerProps> = ({
         groups.map(([typeId, list]) => {
           const type = typeOf(typeId);
           return (
-            <div key={typeId} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <span
-                style={{
-                  fontFamily: FONT_SANS,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  color: TONE_COLOR[type.tone],
-                  opacity: 0.85,
-                  paddingLeft: 2,
-                }}
-              >
+            <div key={typeId} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-bar-gap)' }}>
+              <span style={{ ...CAPS_STYLE, color: TONE_COLOR[type.tone], paddingLeft: 'var(--skin-hud-control-gap)' }}>
                 {t(type.labelKey)}
               </span>
               {stripList(list)}

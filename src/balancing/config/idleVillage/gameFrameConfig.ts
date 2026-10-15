@@ -369,6 +369,30 @@ const gameFrameBreakpointsSchema = z.object({
 });
 
 /**
+ * The hero sheet (PLAN-032 SP-1): a read-only `HudPlaque` singleton that opens on
+ * hover/focus-intent over a roster card, anchored rail-adjacent. All timings and
+ * geometry are here; the machine (`heroSheetMachine`) is pure and reads them.
+ */
+const gameFrameHeroSheetSchema = z.object({
+  /** Panel width (px). */
+  widthPx: z.number().positive(),
+  /** Gap between the roster card's right edge and the sheet (px). */
+  railOffsetXPx: z.number().nonnegative(),
+  /** Dwell on a card before the sheet opens (hover intent). */
+  hoverIntentMs: z.number().nonnegative(),
+  /** How long the sheet survives after the pointer leaves card∪panel before closing. */
+  graceMs: z.number().nonnegative(),
+  /** Dwell on a different card before an open sheet retargets to it. */
+  retargetDwellMs: z.number().nonnegative(),
+  /** Re-anchor when the anchor card's rect moved more than this (roster scroll), px. */
+  anchorTolerancePx: z.number().nonnegative(),
+  /** Previous/next keys when focus is in the panel or on the card rail
+   *  (layout-independent: `[`/`]` are broken on Italian keyboards). */
+  navPrevKeys: z.array(z.string()).min(1),
+  navNextKeys: z.array(z.string()).min(1),
+});
+
+/**
  * Painted dry-brush wash along the screen edges: the "contorno" without a frame. Off by
  * default until a painted asset exists; `?wash=1` in dev shows it for evaluation.
  */
@@ -437,6 +461,7 @@ const gameFrameConfigSchema = z.object({
   eventTheatre: gameFrameEventTheatreSchema,
   breakpoints: gameFrameBreakpointsSchema,
   edgeWash: gameFrameEdgeWashSchema,
+  heroSheet: gameFrameHeroSheetSchema,
   debug: gameFrameDebugSchema,
 });
 
@@ -484,11 +509,11 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     pinTypesWhenCollapsed: ['threat'],
     types: [
       { id: 'threat', labelKey: 'gameFrame.events.types.threat', icon: 'threat', tone: 'danger', priority: 0 },
-      { id: 'quest', labelKey: 'gameFrame.events.types.quest', icon: 'chronicle', tone: 'warning', priority: 1 },
-      { id: 'expedition', labelKey: 'gameFrame.events.types.expedition', icon: 'company', tone: 'warning', priority: 1 },
-      { id: 'construction', labelKey: 'gameFrame.events.types.construction', icon: 'workshop', tone: 'neutral', priority: 2 },
-      { id: 'harvest', labelKey: 'gameFrame.events.types.harvest', icon: 'food', tone: 'good', priority: 3 },
-      { id: 'visit', labelKey: 'gameFrame.events.types.visit', icon: 'tavern', tone: 'neutral', priority: 4 },
+      { id: 'quest', labelKey: 'gameFrame.events.types.quest', icon: 'evt-quest', tone: 'warning', priority: 1 },
+      { id: 'expedition', labelKey: 'gameFrame.events.types.expedition', icon: 'evt-expedition', tone: 'warning', priority: 1 },
+      { id: 'construction', labelKey: 'gameFrame.events.types.construction', icon: 'evt-construction', tone: 'neutral', priority: 2 },
+      { id: 'harvest', labelKey: 'gameFrame.events.types.harvest', icon: 'evt-harvest', tone: 'good', priority: 3 },
+      { id: 'visit', labelKey: 'gameFrame.events.types.visit', icon: 'evt-visit', tone: 'neutral', priority: 4 },
     ],
   },
   questPois: [{ id: 'city-rats', activityId: 'quest_city_rats', x: 2750, y: 1000, sizePx: 55, availableDays: 5 }],
@@ -497,7 +522,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     gradedManifestPath: '/assets/world/wanderlust/base/manifest-flat-graded.json',
     grade: 'graded',
     stageColor: '#489397',
-    motion: { cloudShadowOpacity: 0.42, cloudShadowOffsetX: 90, cloudShadowOffsetY: 140, cloudSpeed: 6, seaMotionAmount: 24, seaMotionPeriod: 10, seaLineOpacity: 0.26, foamStrength: 0.7, foamCrestSpeed: 14 },
+    motion: { cloudShadowOpacity: 0.42, cloudShadowOffsetX: 90, cloudShadowOffsetY: 140, cloudSpeed: 1, seaMotionAmount: 24, seaMotionPeriod: 10, seaLineOpacity: 0.26, foamStrength: 0.7, foamCrestSpeed: 14 },
     seabed: { opacity: 0.55, parallax: 0.8 },
     hiddenLayerIds: ['frame', 'border'],
     showAtmosphere: false,
@@ -573,6 +598,16 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   eventTheatre: { cardDelayMs: 700, freezeReleaseMs: 1000 },
   breakpoints: { compactTopPx: 1400 },
   edgeWash: { enabled: false, leftSrc: '/assets/ui/hud/edge_wash_left.webp', bottomSrc: '/assets/ui/hud/edge_wash_bottom.webp', opacity: 0.55, leftPx: 120, bottomPx: 110 },
+  heroSheet: {
+    widthPx: 380,
+    railOffsetXPx: 14,
+    hoverIntentMs: 350,
+    graceMs: 400,
+    retargetDwellMs: 120,
+    anchorTolerancePx: 24,
+    navPrevKeys: ['ArrowLeft', 'PageUp'],
+    navNextKeys: ['ArrowRight', 'PageDown'],
+  },
   debug: { directorPanel: true },
 };
 

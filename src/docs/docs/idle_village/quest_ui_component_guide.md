@@ -37,6 +37,12 @@ per pagare, cosa posso fare*. Il layout è quindi:
 - **Zero scroll** nel viewport di riferimento (1366×768). Le dimensioni verticali
   arrivano da `questLabPresentation.layout` (contextStripVh / stageBandVh /
   actionZoneVh), mai hardcoded nel JSX.
+- **Le opzioni non scrollano mai** nel caso normale (Director 2026-10-13):
+  l'action zone deve contenere header + body + belt + tutte le opzioni del
+  nodo. Budget attuale 6/36/58 — la stage band (flex-1, min-h-0) cede
+  spazio per prima, croppa l'art mai i pulsanti. A ~650px di viewport le
+  opzioni restano interamente leggibili (scroll residuo ≤ 7px); sotto,
+  scrolla solo la lista opzioni, mai l'intera zona.
 - Il **log/cronaca è un drawer**, non una colonna a pari larghezza. La decisione
   domina lo schermo; la consultazione è occasionale.
 - L'**Action Zone è stateful**: `idle` (opzioni) → `presenting` (cinematica) →

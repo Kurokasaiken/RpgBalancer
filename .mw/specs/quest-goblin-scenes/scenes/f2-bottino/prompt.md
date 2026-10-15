@@ -1,0 +1,21 @@
+# F2 — Il bottino (`gob-bottino-scelta`, `gob-bottino`) → `bottino.png`
+
+Nodi: `gob-bottino-scelta`, `gob-bottino`. Beat: pre-scelta — il terzo carro
+mercantile mai tornato (design B, da ratificare), trascinato fuori sentiero;
+la cassa ancora chiusa con la sua trappola a campanelli. Nessuna persona —
+il premio aspetta dove i morti l'hanno lasciato.
+
+## Full prompt — generatori esterni (Gemini / Grok / GPT)
+
+```text
+BOTTINO — A merchant wagon dragged off the forest path and half-hidden under cut branches in a ravine, painted the moment the prize is spotted. SUBJECT: torn canvas, one wheel sunk in wet earth; still aboard, an iron-bound strongbox whose latch is rigged with a crude alarm of cord and small bronze bells; trade goods lashed where the raiders abandoned them, trampled earth around the wheels — the whole place reeking of haste. NOBODY IN SIGHT — the prize waits where it was dropped, closed. COMPOSITION intimate: the strongbox and its bell-trap as focal point, the ravine walls a frame around it. LIGHTING: bright midday sun above the ravine lip, one shaft finding the brass, the shadowed walls still chromatic. PALETTE: deep teal ravine shadow, Veronese moss, brass and bells struck amber-cinnabar; NO grey, NO brown, NO mud. TECHNIQUE: thick oil impasto, broad palette-knife strokes in the Jaime Jones / Jeff Easley tradition, tactile matter on canvas, iron, cord and moss; the bells and clasp rendered clean where light strikes — split-rendering focal; rude beauty — weathered and tactile, never squalid. MOOD: luck found + the certainty it is guarded. Luminous, high-chroma — never black murk. NO grim, NO gore, NO corpses, NO decay, NO mud, NO symmetry, NO flat digital, NO airbrushed smoothness, NO sci-fi, NO text/UI/watermarks/frames, NO people, NO humanoid figures, NO goblins, NO creatures, NO opened chest, NO scattered coins — the prize stays closed. Ultra-wide cinematic 21:9.
+```
+
+**Tags riuso:** `ravine, wagon, strongbox, loot, trap-bells, midday, no-people, no-goblins, generic`
+
+## Generation notes
+
+- La cassa resta chiusa: il contenuto è l'esito del check, non l'immagine.
+- La trappola a campanelli è authored («catene, campanelli, un nodo da
+  sciogliere») e anticipa il tema «Intrusi» di F3.
+- Aspect 16:9.

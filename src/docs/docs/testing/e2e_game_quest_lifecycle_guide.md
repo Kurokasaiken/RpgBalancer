@@ -10,6 +10,38 @@ fallimenti noti è il §6.
 
 ---
 
+## 0. Le due suite — quale lanciare
+
+| Suite | Cosa fa | Quando usarla |
+|---|---|---|
+| `gameQuestFullFlow.spec.ts` (**R-183**) | **Solo input reali**: Regia F10 → «Show quest» → click marker → drag roster→slot → **swap slot↔slot** → bottoni consumabili → «Invia» → ×4 dal ribbon → scelte **cliccate** nella QuestRunWindow, beat saltati con Enter, cintura armata/cura → rapporto → **XP ai PG** → oro nel readout HUD → «Chiudi rapporto» → reload. Gli hook servono **solo in lettura** (assegnazioni, run, settlement, villaggio). Salva uno screenshot per passaggio. | «Il gioco funziona davvero da capo a fondo?» — prova di accettazione, base del documento illustrato |
+| `gameQuestLifecycle.spec.ts` (R-119) | 12 test mirati e deterministici: assegnazioni e scelte via hook, tempo via `advanceTicks`. | Diagnosi: quale invariante si è rotta (gate, clock, settlement, reload) |
+
+Documento illustrato (cosa succede, quando e come, con gli screenshot della
+suite R-183): [`quest_full_flow_walkthrough.md`](./quest_full_flow_walkthrough.md).
+
+```bash
+source ~/.nvm/nvm.sh && nvm use
+# la suite R-183 (una sola run lunga, ~3-6 min incluso build)
+npx playwright test tests/e2e/idleVillage/gameQuestFullFlow.spec.ts --project="Desktop Chrome"
+# rigenerare le immagini del documento illustrato (sovrascrive quest_full_flow/*.jpg)
+QUEST_DOC_SHOTS=1 npx playwright test tests/e2e/idleVillage/gameQuestFullFlow.spec.ts --project="Desktop Chrome"
+# vederla girare
+npx playwright test tests/e2e/idleVillage/gameQuestFullFlow.spec.ts --project="Desktop Chrome" --headed
+```
+
+Senza `QUEST_DOC_SHOTS` gli screenshot finiscono negli allegati del report
+(`npx playwright show-report`) e in `test-results/<cartella-del-test>/`.
+L'esito della run (nodi visitati, scelte, consumabili usati) è nelle
+*annotations* del test nel report.
+
+**La run non è truccata:** l'esito è quello che esce dai dadi del motore
+(seed casuale a ogni «Invia»). La suite accetta `reward|survived|fled|wipe`
+e asserisce il contratto di ciascuno (XP solo ai sopravvissuti, nessuna XP
+su wipe, oro HUD = effetti `village-gold` del settlement).
+
+---
+
 ## 1. Come si lancia
 
 ```bash
@@ -89,11 +121,12 @@ getClock() -> { currentTick, isPaused, speedMultiplier }
 revealQuestPois()                                // SOLO per `?capture=1` — la suite usa il vero pulsante Director
 ```
 
-> **R-124/R-129/R-131/R-143 — nessun POI in mappa al boot.** Gli anchor
-> expedition sono gated su `questShown`. **R-143: «Mostra quest» è tornata nel
-> Director** — è l'unico gate UI dei POI reali (goblin + rovine); un marker
-> quest NON è mai un esemplare demo («POI types»/`poiDemo` mostra solo i finti
-> job/event, i tipi senza contenuto reale). **I test rivelano SEMPRE dal vero
+> **R-124/R-129/R-131/R-143/R-180 — nessun POI in mappa al boot.** Gli anchor
+> expedition sono gated su `questShown || poiDemo`. «Mostra quest» resta il
+> gate solo-quest; **R-180: «POI types» rivela ANCHE i marker quest reali**
+> (goblin + rovine) — un marker quest NON è mai un esemplare demo: sotto
+> `poiDemo` si monta l'offerta vera (click → `QuestExpeditionDetail`), i finti
+> restano solo job/event, i tipi senza contenuto reale. **I test rivelano SEMPRE dal vero
 > pulsante**: `revealQuestPois(page)` fa F10 → `[data-action-id="quest"]` → F10
 > (l'hook window resta solo per `?capture=1`, dove il Director è nascosto).
 > Al reveal l'offerta fresca ha halo **vuota** (si riempie solo con
@@ -116,6 +149,15 @@ revealQuestPois()                                // SOLO per `?capture=1` — la
 | `[data-testid="quest-window-close-report"]` | «Chiudi il rapporto» (visibile **solo** a teatro finito) |
 | `[role="radiogroup"]` → radio `×1`/`×2`/`×4`, primo radio = pausa | controlli tempo HUD |
 | `[role="group"][aria-label^="Gold" o "Oro"]` | readout risorse nel ribbon |
+| `[data-testid="slot-token-<poi>:<slot>"]` | **R-183** token del PG dentro lo slot — trascinabile su un altro slot (move/swap); `data-swap-dragging="true"` mentre è in aria |
+| `[data-testid="slot-token-ghost"]` | **R-183** fantasma del token che segue il puntatore durante lo swap (portal su `body`) |
+| `[data-slot-id] [data-drop-state]` | durante uno swap: `valid`/`invalid` = lo scambio sarebbe accettato/rifiutato dal gate |
+| `[data-testid="loadout-item-<itemId>"]` | bottone consumabile nel planner; scelto = `aria-pressed="true"`; borsa piena = gli altri `disabled` |
+| `[data-testid="quest-window-choice"][data-option-id]` | **R-183** scelta numerata della finestra run (stesso click del giocatore) |
+| `[data-testid="quest-window-beat"]` | beat in scena: input bloccato, Enter/click per avanzare |
+| `[data-testid="quest-consumable-belt"]` → `belt-arm-<flag>` / `belt-healing` / `belt-potion` | **R-183** cintura consumabili nella finestra run |
+| `[data-testid="quest-epilogue"] [data-epilogue-section="xp"]` | rapporto di ritorno; con R-183 la sezione XP elenca **chi** ha preso quanto |
+| `[data-resident-id][data-resident-xp]` | **R-183** XP accumulata dal PG, sulla riga del roster |
 
 ### Fixture
 
@@ -294,4 +336,16 @@ aggiorna il test e la guida; se no, hai trovato un bug.
 3. **Copertura esiti** — il driver accetta qualunque esito; non esiste un
    test che forzi `wipe` o `fled` per verificare i rami di reward/zero-loot.
 4. **Consumabili/scelte numeriche da tastiera** — `choose` via hook copre la
-   logica, i tasti 1–9 del DOM non sono asseriti.
+   logica; la suite R-183 clicca le scelte e la cintura nel DOM, ma i tasti
+   1–9 non sono ancora asseriti.
+5. **Inventario consumabili (R-183)** — la borsa pesca da un catalogo
+   (`QUEST_STASH`/`questItems`) **senza quantità**: scegliere un consumabile
+   non lo toglie a nessun magazzino e quelli usati in run non si scalano da
+   un inventario di villaggio (che non esiste ancora). Il loot non-oro della
+   run (`run.loot`, es. «goblin trophy») compare nel rapporto ma non finisce
+   in un inventario/HUD: oggi tutto il loot goblin è già convertito in oro.
+   È una decisione di design (inventario di villaggio), non un bug del test.
+6. **XP senza curva (R-183)** — i PG accumulano `xp` (store + roster), ma
+   livelli/curva sono OPEN (`PROGRESSION.md` §3): il numero non sblocca
+   ancora nulla. Default `QUEST_SETTLEMENT.residentXp.mode = 'full'` (ogni
+   sopravvissuto prende tutta la XP della run) — PROPOSTA da confermare.

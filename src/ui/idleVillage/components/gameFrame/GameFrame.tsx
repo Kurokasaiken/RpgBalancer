@@ -6,6 +6,7 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import './gameFrameCursors.css';
 import { HudRibbon } from './HudRibbon';
 import { HudGlyph } from './hudIcons';
+import { EngravedIcon } from './engravedIcons';
 import { HudHideToggle } from './HudHideToggle';
 import { useHudMaterial } from './useHudMaterial';
 import {
@@ -290,6 +291,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             onClick={item.locked ? undefined : () => onNavSelect?.(item.id)}
             aria-pressed={isActive}
             title={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : t(item.labelKey)}
+            aria-label={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : undefined}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -310,17 +312,39 @@ export const GameFrame: React.FC<GameFrameProps> = ({
                 : item.locked
                   ? 'inset 0 1px 2px rgba(0,0,0,0.6)'
                   : 'none',
-              opacity: item.locked ? 0.38 : 1,
-              color: isActive ? 'var(--skin-title-color, #f0cf6a)' : undefined,
+              // Locked = veiled, not dimmed: the text stays at the readable secondary colour (≥ 4.5:1 on the lacquer).
+              opacity: 1, // the disabled base style would dim the text again
+              position: 'relative',
+              fontSize: 'var(--skin-hud-caps-size)',
+              color: isActive ? 'var(--skin-title-color, #f0cf6a)' : item.locked ? 'var(--skin-text-secondary)' : undefined,
             }}
           >
             <HudGlyph
               iconId={item.icon}
               label={t(item.labelKey)}
               size={17}
-              style={{ color: isActive ? 'var(--skin-title-color, #f0cf6a)' : 'var(--skin-icon-color, #dfb857)' }}
+              style={{
+                color: isActive
+                  ? 'var(--skin-title-color, #f0cf6a)'
+                  : item.locked
+                    ? 'var(--skin-text-secondary)'
+                    : 'var(--skin-icon-color, #dfb857)',
+              }}
             />
             {t(item.labelKey)}
+            {item.locked && (
+              <EngravedIcon
+                id="cmd-lock"
+                aria-hidden="true"
+                size="calc(var(--skin-hud-inline-gap) * 2)"
+                style={{
+                  position: 'absolute',
+                  top: 'var(--skin-hud-control-gap)',
+                  right: 'var(--skin-hud-inline-gap)',
+                  color: 'var(--skin-label-primary)',
+                }}
+              />
+            )}
           </MatericButton>
           {index === 1 && recenterSlot}
           </React.Fragment>

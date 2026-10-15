@@ -1,7 +1,7 @@
 ---
 title: Richieste esplicite
 type: intent-ledger
-updated: 2026-10-12
+updated: 2026-10-14
 ---
 
 # Richieste esplicite
@@ -3004,7 +3004,7 @@ Implementato: logo authored `wanderlust-logo.png` nella veil (alt i18n, larghezz
 
 **Richiesta (verbatim):** *"per il teaser trailer gli elementi che ancora ci mancano nella pagina /game alcuni componenti. la scheda del personaggio ben fatta, secondo le regole e i dettami della pagina /game e del progetto. Che si apre se clicchi (e rilasci, nn trascini) la pgCard. Poi ci serve un componente dove ci sn i consumables della base, il picker per portarteli nella quest e un componente dove mostrare i consumbables durante il viaggio e durante le scelte/skill check durante la quest (pianificazione, ecc). Poi? che altro ci manca del progetto?"*
 **Data:** 2026-10-12
-**Stato:** `in corso` — piano `plans/PLAN-032-teaser-game-components.md`: SP-1 scheda PG hover, SP-2 magazzino, SP-3 mercante, SP-4 consumabili in viaggio, SP-5 level-up mock. **Debate multi-AI completato su tutti e 5 gli SP (2026-10-12)** — design converged, artifact vincolanti in `mind-weaver/.mw/runs/`: SP-1 r003 (`d1f26a13`), SP-2 r003 (`c0432832`), SP-3 r003 (`7497a638`), SP-4 r004 (`770bc224`), SP-5 r009 (`3d8d1cca`). Provider: chatgpt/claude/deepseek/gemini a rotazione per limiti free-tier (claude dead in SP-4, claude limit+chatgpt dead in SP-5). Pronto per dispatch implementazione.
+**Stato:** `completato` (2026-10-14) — piano `plans/PLAN-032-teaser-game-components.md`: SP-1 scheda PG hover, SP-2 magazzino, SP-3 mercante, SP-4 consumabili in viaggio, SP-5 level-up mock. **Debate multi-AI completato su tutti e 5 gli SP (2026-10-12)** — design converged, artifact vincolanti in `mind-weaver/.mw/runs/`: SP-1 r003 (`d1f26a13`), SP-2 r003 (`c0432832`), SP-3 r003 (`7497a638`), SP-4 r004 (`770bc224`), SP-5 r009 (`3d8d1cca`). Provider: chatgpt/claude/deepseek/gemini a rotazione per limiti free-tier (claude dead in SP-4, claude limit+chatgpt dead in SP-5). **Dispatched 2026-10-14** (T-011 PLAN-034): spec in `plans/PLAN-032-SP-1..5-*.md`, kanban registrato. **SP-1 completato 2026-10-14** — `HeroSheetPanel` (HudPlaque + useHeroSheet machine, hover-intent 350ms, dismissedFor latch, shortcut `p`, rosterV2 zero-touch); bundle `.mw/runs/plan032-sp1-2026-10-14/bundle.json` PASS, evidence `test-results/PLAN-032-SP1-2026-10-14.log` + eyeshot `test-results/plan-032-sp1-eyeshot.png`. **SP-2 completato 2026-10-14** — `VillageStashPanel` (HudPlaque mock-backed da `villageStashConfig` Zod, nessun inventario reale) + `MapBuildingPoi` marker edificio riusabile su anchor `building-stash` @ (2260,1551), openOrFocus/pointer-delta gate/focus-return, shortcut `v`; bundle `.mw/runs/plan032-sp2-2026-10-14/bundle.json` PASS, evidence `test-results/PLAN-032-SP2-2026-10-14.log` + smoke `plan-032-sp2-smoke-2026-10-14/`. **SP-3 completato 2026-10-14** — `MerchantPanel` (HudPlaque mock-backed da `merchantConfig` Zod deepFrozen, 4 offerte ICU, `MockBuyControl` disabled nativo senza callback — Buy inerte per costruzione) + marker gated Director (`merchantmarker`, default OFF) sul riusato `MapBuildingPoi`/`poiToPanel`, shortcut `m` funziona anche senza marker, focus-return al marker; bundle `.mw/runs/plan032-sp3-2026-10-14/bundle.json` PASS (15/15 unit + isolation, 48/48 adiacenti), evidence `test-results/PLAN-032-SP3-2026-10-14.log` + smoke `merchant-smoke-2026-10-14/`. **SP-5 completato 2026-10-14** — level-up eroe mock: `heroLevelConfig` (Zod strict + salvage prod field-level, dev throw, gate `import.meta.env?.PROD`), `HeroLevelDecor` nel layer rosterV2 (badge "Lv {n}" ancorato al portrait, ring resting-lit, ignition keyed per eventId, `TextFloater` portal su body mai clippato — pgcardKit intoccato), command `runHeroLevelUpStaging` (reject su config invalida/target non-hero/zero-eligible, accept → 1 telemetry `hero_levelup_mock` + 1 cue `level_up` + flare per target), Director action `levelup`; bundle `.mw/runs/plan032-sp5-2026-10-14/bundle.json` PASS 4/4 (18/18 unit, 54/54 adiacenti), evidence `test-results/PLAN-032-SP5-2026-10-14.log` + smoke `plan-032-sp5-smoke-2026-10-14/` (en+it). Divergenza documentata: i18n in sintassi ICU `{n}` (la spec diceva `{{n}}` che renderizza letterale sotto i18next-icu). **SP-4 completato 2026-10-14** — `BagStrip` read-only nel `QuestRunWindow` durante stati non-decisione (transit/pending + beat playback incl. replay finale), `questBag.ts` helper condivisi (`questBagItems` unica derivazione strip+popover, `bagItemShortLabel` ⇔ idiom belt, `bagEverPacked` retention-only via `consumablesUsed`, `bagStripVisible` predicato puro), slot riservato `data-bag-slot` (min-height da type token belt, belt XOR strip strutturale, `ConsumableBelt` intoccato); bundle `.mw/runs/plan032-sp4-2026-10-14/bundle.json` PASS 4/4 (22/22 unit, 57/57 adiacenti), evidence `test-results/PLAN-032-SP4-2026-10-14.log` + smoke `plan-032-sp4-smoke-2026-10-14/` (en+it @900×640, loadout 3-item reale). Stessa divergenza ICU `{label}` della SP-5. **PLAN-032 completo: tutti e 5 gli SP chiusi 2026-10-14** — ogni superficie presentational-only (nessun sistema reale di inventario/economia/progressione), tutte verificate unit+headed.
 **Desiderata FROZEN:** nessuna corrispondente — collegata a R-072 (teaser, scena 3 = preparation/hero sheet) e R-166 (standard AAA di `/game`).
 
 **Stato reale rilevato (sessione 2026-10-12):**
@@ -3395,12 +3395,17 @@ Test: **21/21** (+S3-E1 B monotona, +S3-E2 C failChance canonica/epic→0, +S3-E
 **Parole del Director:** "Fai T0.1, T0.2 e T0.3, poi fermati per il mio sì." — regola madre: il risultato deve sembrare il Roster V2; trappole T-01, T-02, T-03, T-07; Roster V1 intoccato; niente commit.
 **Stato:** `in corso` — T0.1–T0.3 eseguiti (esito in PLAN-058 §Fase 0); in attesa del sì del Director prima di procedere.
 
+### R-177 / PLAN-058 T4.2 resto (2026-10-14)
+**Parole del Director:** "continua" / "riprova" (dopo il riepilogo: T4.2 resta a questa sessione, la sessione «Game UI/HUD critique e redesign» ha lasciato il Sigillo base e ha confermato di non toccare più `PoiMatericV3_5`, `MapQuestPoi`, `MapDemoPoi`).
+**Fatto:** sagome per famiglia, taglie S/M/L, `tier` main/normal, halo avorio/verderame con vermiglio solo in urgenza, scatto unico, pulsazione a run finito, glifo ~57%, token `--skin-poi-*`; lettere invariate. Esito e limiti in PLAN-058 §T4.2. **Errore corretto:** nel piano avevo chiamato D6 una decisione che era già D6 (cursori): ora D7.
+**Da decidere / da vedere (Director):** colore degli anelli (prova a occhio); lo schema T4.1 metteva l'halo *dentro* il bordo, il codice lo ha fuori (desiderata v3, «attorno al POI»): confermi?
+
 ### R-177 / PLAN-058 T4.1 (2026-10-13)
 
 **Parole del Director:** "Fai solo T4.1, cioè lo schema. Niente codice." — regola madre Roster V2; trappole T-01, T-02, T-03, T-07; Roster V1 intoccato; niente commit.
 **Stato:** `in corso` (schema Sigillo scritto in `src/docs/docs/idle_village/poi_family_spec.md` §"Map marker visual contract"; T4.2 non iniziato).
 
-**Risposte del Director a Q1–Q4:** "Dobbiamo distingere le quest \"normali\" dagli eventi dalle \"main quest\". le main quest avranno durata molto + lunga e vorrei avessere l'halo pieno fin dall'inizio, le quest normali invece come è adesso." · "confermo che sparisca senza far nulla, dimmi tu se farla pulsare prima d sparire abbia senso o no, decidi tu" · "nn ricordo d preciso" (pillar R2.3) · "le lettere lasciale come sono". → Schema aggiornato (tier main/normal, scaduto senza pulsazione, lettere invariate); D6 in PLAN-058.
+**Risposte del Director a Q1–Q4:** "Dobbiamo distingere le quest \"normali\" dagli eventi dalle \"main quest\". le main quest avranno durata molto + lunga e vorrei avessere l'halo pieno fin dall'inizio, le quest normali invece come è adesso." · "confermo che sparisca senza far nulla, dimmi tu se farla pulsare prima d sparire abbia senso o no, decidi tu" · "nn ricordo d preciso" (pillar R2.3) · "le lettere lasciale come sono". → Schema aggiornato (tier main/normal, scaduto senza pulsazione, lettere invariate); D7 in PLAN-058.
 
 ### R-177 / PLAN-058 T5.1–T5.2, cursori (2026-10-13)
 
@@ -3534,10 +3539,12 @@ Test: **21/21** (+S3-E1 B monotona, +S3-E2 C failChance canonica/epic→0, +S3-E
 
 **Richiesta (verbatim):** vedi `.mw/bugs/20261014-game-invasion-event-choreography/bug.md` (punti 1-5 + «teca adesivo e quando si staccano e vanno in direzioni differenti»).
 **Data:** 2026-10-14
-**Stato:** `parziale` — punti 2, 3, 4, 5 corretti e coperti da `tests/e2e/idleVillage/gameInvasionScene.spec.ts`; punto 1 in attesa di chiarimento.
+**Stato:** `fatta` — punti 1-5 corretti; 2-5 coperti da `tests/e2e/idleVillage/gameInvasionScene.spec.ts`, il punto 1 da BV-4 in `gameInvasionMarch.spec.ts`.
+**Chiusura:** bundle: .mw/runs/r185-closure/bundle.json — dogfood visivo gate 2026-10-14: 12/12 E2E, 34 frame + metrics + attestazione env, verificatore indipendente CONFIRMED×2.
 **Desiderata FROZEN:** v2 (cinematica per l'Invasione), v29 (processo).
 **Incidente collegato:** `.mw/bugs/20261014-verification-false-pass/bug.md`; piano di prevenzione in bozza `.mw/plans/verification-false-pass-prevention.md`.
 **Evidence:** run Playwright 2026-10-14 (5/5 su Scene+March; 12 test sulle 4 spec); contact sheet nello scratchpad di sessione.
+**Chiusura:** bundle: .mw/runs/r185-closure-2026-10-14/bundle.json — evidence e2e registrata sopra (run Playwright 2026-10-14, 5/5 Scene+March, 12 test sulle 4 spec); punti 1-5 corretti e coperti dai test citati nello stato.
 
 
 ### R-177 / T2.6 ancore rivisto (2026-10-14)
@@ -3578,7 +3585,10 @@ Soggetti riscritti a taglia d'uso (POI 26 px, risorse 28 px); lint I8 aggiunto; 
 
 **Richiesta (verbatim):** *"mi scrivi un plan x questi 7 problemi trovati?"*
 **Data:** 2026-10-14
-**Stato:** `in corso` — bozza piano in `.mw/plans/r188-trailer-fixes.md` (deliberazione `.mw/runs/20261014-114519/`: 1 ciclo, non convergente, critiche integrate); attende avallo Director + risposte a 3 decisioni aperte.
+**Stato:** `completata` — **PLAN-034 eseguito e chiuso il 2026-10-14** (14/14): T-001..T-010 + T-012..T-014 (diagnostica gated → fix `AudioContext` condiviso per il mega-hitch invasione, throttle/quantize halo POI + `React.memo` medallion, hub → `?scene=`, pulsante Director "Settlement lost" su `/game` verificato a runtime) e **T-011 dispatch PLAN-032**: artifact converged copiati in `plans/PLAN-032-SP-1..5-*.md` (sha verificati), righe kanban `PLAN-032-SP1..SP5` in `agent_assignments.md` + `strategy_tasks.md`, pending file SP-1; SP-1 in esecuzione Devin, SP-3 bloccato da SP-2. Evidence: `test-results/trailer-report-2026-10-14/{DIAG-034.md,diag-prod.json,shots/t010-*.jpg}`; traps T-08/T-09/T-10 registrate; kanban aggiornato. Nota processo: cattura trailer su `vite preview` (prod build) — dev-mode misura overhead React, non il gioco.
+**Nota 2026-10-14 (sera):** la bozza `.mw/plans/r188-trailer-fixes.md` circolava ancora con «4 risposte per sbloccare» — superata: le decisioni erano già registrate qui e il piano era già battezzato/eseguito. Un piano fuori sync col codice è un bug: allineato qui e nei piani.
+**Chiusura:** bundle: .mw/runs/r188-closure-2026-10-14/bundle.json (4/4 PASS: spec copiate, kanban registrato, pending file SP-1, piani allineati).
+**Decisioni Director (2026-10-14):** (1) R-185.1 → **dichiarato fixato** (marker a boot con marcia salvata = comportamento voluto PLAN-033, doc aggiornata); (2) Settlement Lost = pulsante nel DirectorPanel dev-only di `/game`; (3) voci hub `trailer-threat-iter`/`trailer-legacy-v2` → eliminate; (4) deliberazione multi-AI eseguita 2× (critiche integrate).
 **Desiderata FROZEN:** coerente con v2 FROZEN (world surface, tier eventi, invasione goblin — fonte PLAN-033) e decisioni ratificate R-167 (PLAN-032, design converged). Il piano è di fix/integrazione su superfici già approvate, non cambia goal né scope.
 **I 7 problemi (da `test-results/trailer-report-2026-10-14/REPORT.md`):**
 1. Jank reale quest-window su `/game` (avg 19-25 fps, p95 116-266 ms, worst 300) — worst surface misurata.
@@ -3588,6 +3598,53 @@ Soggetti riscritti a taglia d'uso (POI 26 px, risorse 28 px); lint I8 aggiunto; 
 5. Gap R-167 su `/game` (scheda PG, stash villaggio, level-up) — coperti da PLAN-032 "design converged", mai dispatchato.
 6. Settlement Lost esiste solo come trigger debug su `/world-surface`; nessun path canonico su `/game` quando la marcia goblin arriva.
 7. Minori: 400 Bad Request su risorsa non identificata in `/game`; `/hero-components-lab` lazy-load ~12 s.
+
+## R-189 — Gate tecnico di chiusura: la verifica non può dipendere dall'autodichiarazione
+
+**Richiesta (verbatim, sintesi):** progettare un meccanismo che impedisca tecnicamente di dichiarare completato un task quando le verifiche obbligatorie non sono state eseguite, sono fallite, inconcludenti o non corrispondenti alla richiesta. Chiusura basata su evidenze verificabili, non autovalutazione. Fasi: (1) conservare/completare le evidenze del run Playwright e leggere CTR-game-002, GAME_INVASION_SEQUENCE, le spec, i bug report e il piano di prevenzione; (2) proporre architettura a 4 componenti (contratto obbligatorio, controllo automatico prove/esiti, verificatore indipendente senza diff, gate finale); (3) piano di collaudo del gate con tentativi deliberati di aggiramento. Deliverable in chat + stop prima dell'implementazione. Vincoli: niente prove inventate, niente nuovi documenti normativi ridondanti, niente codice di prodotto.
+**Data:** 2026-10-14
+**Stato:** `fatta` — implementato, collaudato e adottato il 2026-10-14. Self-test 14/14 + unit 16/16; blocco live dimostrato su riga kanban reale; verificatore indipendente reale eseguito su R-189 (`.mw/runs/r189-closure/`: bundle PASS) e su R-185 con prove visive reali (`.mw/runs/r185-closure/`: 12/12 E2E + 34 frame + metrics + env → bundle PASS). Contratto permanente `.mw/contracts/CTR-game-004.md`; regola manifest nel mandato executor.
+**Chiusura:** bundle: .mw/runs/r189-closure/bundle.json
+**Decisioni Director 2026-10-14:** (1) gate su `kanban:lint`/transizione `Completato` ✓; (2) anche `RICHIESTE.md` `fatta` sotto il gate ✓; (3) fail-loud basta, niente CI/hook ✓; (4) deroga `WAIVED-DIRECTOR` esplicita, mai PASS ✓; (5) chiusura meccanicamente bloccata — superata la linea consultiva in RPG ✓; (6) struttura a due livelli CTR-* + manifest per-task — delegata all'agente, adottata.
+**Desiderata FROZEN:** estende v29 (pre-flight; «guard meccanico» era voce Still unresolved) — questa richiesta risponde esattamente a quel punto aperto.
+**Collegamenti:** incidente `.mw/bugs/20261014-verification-false-pass/bug.md`; piano bozza `.mw/plans/verification-false-pass-prevention.md` (non approvato); R-185 (coreografia invasione); contratti CTR-game-001/002/003; SKILL-VERIFICATION (BV procedurale, D-20260911-002 niente gate CI — **da ridiscutere**: il gate richiesto qui è in tensione con quella decisione storica).
+
+### R-177 / oro e legna montate (2026-10-14)
+Ritagliate da `~/Downloads/oro.jpeg` e `legna.jpeg` (magenta FF00FF rimosso), master 512 + 128/64/32 in `public/assets/ui/resources/` (res-gold, res-wood). Registro: `candidate`. Restano da sostituire tenda (con orecchie), rovine (verdi) e artigli, che sono ancora le versioni precedenti.
+
+### R-177 / oro e legna in gioco (2026-10-14)
+`HUD_ICON_ASSETS` (hudIcons.tsx): gold → `res-gold-128.webp`, wood → `res-wood-128.webp`. Verificato sulla barra risorse di /game. Il pane (food) resta sul vecchio medaglione `fantasy_ui/icon_food.webp`: manca l'immagine nuova, e stile diverso dalle altre.
+
+### R-177 / pane v2 montato (2026-10-14)
+Ritagliato da `~/Downloads/pane.jpeg` (finto quadrettato grigio rimosso per saturazione, riempi-buchi). Master 512 + 128/64/32 in `public/assets/ui/resources/res-food*`. `HUD_ICON_ASSETS.food` → `res-food-128.webp`. Stato `candidate`. Verificato in barra risorse di /game con oro e legna.
+
+## R-184 — /game: il roster segue il POI detail; il click sul POI deve portare al planner
+
+**Richiesta (verbatim):** *"quando clicco il POI della quest Sterminio Goblin parte subito sterminio goblin, nn il "planner" delle quest, dove puoi scegliere i pg e il loadout. Quando apriamo un POI detail dovrebbe aprirsi anche il roster se è chiuso, e richiuderlo se prima era chiuso"*
+**Data:** 2026-10-14
+**Stato:** `in corso` — roster fatto e verificato; punto 1 non riproducibile su stato pulito (vedi diagnosi).
+**Desiderata FROZEN:** nessuna nuova.
+
+**Roster (fatto):** hook `usePanelWhileOpen(panels, 'roster', detailAperto)` (`gameFrame/usePanelWhileOpen.ts`), collegato in `game-frame-pixi.tsx` con la stessa condizione dell'overlay del planner (`isDetailOpen && (!run || run.ended)`). Roster chiuso → si apre col detail e si richiude alla chiusura (X o «Invia»); già aperto → non viene toccato. Test: `gameQuestFullFlow.spec.ts` «il roster segue il POI detail». Verificato anche dal vivo (dev server).
+
+**Click sul POI (diagnosi):** su stato pulito il click apre il planner (verificato dal vivo e dalle suite). Si apre la finestra della run solo se esiste una run goblin NON terminata: `handlePoiClick` instrada lì per decisione R-133. La run sopravvive al reload (PersistenceService), e il bottone Director «Avvia quest goblin» fa partire la quest in un click senza planner (auto-assegna i primi eleggibili e invia). Il Reset del Director non cancella le run.
+
+
+### R-177 / Sigillo base e ancore approvate (2026-10-14)
+**Parole del Director:** "si, procedi [...] le icone in download sn approvate [...] i colori dei Ring dei POI nn m convincono tantissimo, su quella mappa". Ancore approvate; tenda/rovine/artigli v2 montate; Sigillo base applicato ai POI della mappa (niente vetro/specular/gemma, anello neutro, bordo doppio). Prova in Tauri: istruzioni date, la fa il Director. Colori degli anelli: in revisione.
+
+### R-177 / velocità nuvole (2026-10-14)
+**Parole del Director:** "le nuvole nn si muovono alla velocità che avevamo salvato [...] metti quel valore ad 1 di default". `worldDressing.motion.cloudSpeed` 6 → 1 in `gameFrameConfig.ts` (storia: 4 → 10 → 6 l'8 ottobre). Il pannello Tuning può ancora sovrascriverlo.
+
+### R-177 / analisi video "Registrazione schermo 2026-10-14 16.23.17.mov" (2026-10-14)
+**Parole del Director:** "quando apro i componenti succedono cose strane, tipo spostamenti della mappa, esamina attentamente questo video".
+**Misura** (OpenCV, similarità sui fotogrammi, 60 fps nei punti di salto; px CSS, recording 2x): la scala della mappa è 1,000 per tutto il video (nessuno zoom); la traslazione è 0 salvo tre salti istantanei (1 fotogramma, nessuna animazione): Eventi aperto −96 px, Roster aperto +127 px, dettaglio quest con Roster aperto +127 px (lo stesso del Roster). Chiusura = ritorno a 0, anch'esso istantaneo. Menu Pannelli e Director: nessuno spostamento.
+**Causa:** `PANEL_FIT_SHARE = 0.6` + `safeFit` in `src/pages/game-frame-pixi.tsx:84,283-284` (R-106, 2026-10-08): ogni pannello laterale aperto riserva il 60% della sua larghezza e la mappa si rifà il fit. Nessuna decisione registrata su questo comportamento. Tensione con la regola del Director: i componenti fluttuanti possono coprire la terra.
+**Non verificato:** il video non mostra un salto nel browser integrato; il comportamento è lo stesso in Tauri e nel browser (stesso codice).
+
+### R-177 / mappa ferma con i pannelli (2026-10-14)
+**Parole del Director:** "i componenti fissi nn sn quelli che posso spostare o chiudere, quindi si deve applicare a quest, Roster, eventi, ecc". `game-frame-pixi.tsx`: `safeFit = baseSafeFit` (tolti `PANEL_FIT_SHARE`, insets laterali dei pannelli e `ledgerFitIgnored`). Misura con OpenCV su Chromium: scala 1,000 e traslazione 0,0 px con Roster, Eventi, entrambi, chiusi. Regola 7 aggiunta a guida HUD §5b. Non verificato in Tauri.
+
 ## R-190 — Lab v0.3 giocabile: pagina "Test Macro Gameplay" in /test-hub
 
 **Richiesta (verbatim):** *"m serve una UI cn i pulsanti come era la prima versione / m serve in /test hub, chiamala tipo test Macro Gameplay"*
@@ -3597,3 +3654,38 @@ Soggetti riscritti a taglia d'uso (POI 26 px, risorse 28 px); lint I8 aggiunto; 
 **Collegamenti:** R-176 (lab), R-185 (coreografia invasione), R-186 (kernel conseguenze).
 **Chiusura:** 4/4 PASS (lab 45/45, test exhausted R-190, build:check, smoke runtime /macro-gameplay) — bundle: .mw/runs/r190-macro-gameplay-2026-10-14/bundle.json
 
+### R-177 / dimensione interfaccia (2026-10-14)
+**Parole del Director:** "come faccio a vedere come si vedrebbe tipo in 2k o 4k [...] fallo tu" (scala UI 100/125/150%). Scelto lo zoom nativo del webview Tauri (CSS `zoom`/`transform` romperebbero l'overlay di trascinamento dei medaglioni: vedi commento in GameFrame.tsx). Nuovi: `hudScale.ts` (auto = min(W/1920,H/1080), passi 0,05, 1–2), `useHudScale.ts` (solo desktop: `__TAURI_INTERNALS__`; salva in `hud_scale_v1`), riga «Dimensione interfaccia» in HudGameMenu (Auto/100/125/150/200%), `src-tauri/capabilities/default.json` con il solo `core:webview:allow-set-webview-zoom`, chiavi i18n en/it-IT/pseudo. Test: `hudScale.test.ts` 6/6, tsc pulito, localizzazione 17/17, hudGuards 9/9. Browser: riga nascosta, nessun errore. **Non verificato:** lo zoom effettivo nella finestra Tauri. Segnalato: crate `tauri` 2.9.3 vs `@tauri-apps/api` 2.10.1 (versioni non allineate).
+
+## R-191 — Set icone T3.1: sole/luna/alba/tramonto più stilizzati, zanne dall'alto, forage = bacche/noci/funghi
+
+**Richiesta (verbatim):** *"sono stati creati 13 prompt SET-T3.1-prompt-pack.md. Luna, sole, alba e tramonto vorrei qualcosa d + stilizzato, prendi ad esempio qualcsoa come Soul Eater che hanno luna e sole molto particolari (ma ovviamente sn due stili differenti). Le zanne sn molto strane, c'è tanta mascella, le zanne solo d sotto mentre starebbero meglio quelle superiori. per forage preferisco bacche e noci e funghi. Per ognuna d queste scene fa una ricerca e trova un modo migliore per rappresentarli. Prendi tutte le info di Wanderlust DNA, cm si fanno i prompt x questo progetto, ecc. X sole, luna, ecc fammi delle proposte di stili particolari, con link ad esempi"*
+**Data:** 2026-10-14
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna nuova — il lavoro è dentro PLAN-058 T3.1 (bibbia §11, kit v1).
+**Cosa è successo:** v1 — soggetti `threat-beasts` e `offer-forage` riscritti. v2 (feedback Director: "tutto color bronzo, molto triste"; zanne uscite come faccia di giaguaro; sole/luna: "niente che mi piaccia, serve qualcosa tipo Soul Eater ma adattato alla nostra logica/mood") — aggiunte materie `harvest` (cibo a veri colori in pigmenti di bibbia) e `fang` (avorio/corno) al kit; riga `REFERENCE` depotenziata a luce/tocco/luminosità (la materia la detta il blocco STYLE); `threat-beasts` = due zanne a sciabola + ridge gengivale (niente testa); `time-*` = corpi celesti con volto in rilievo fuso (sole sovrano ridente, luna sognante serena, alba assonnata, tramonto stanco) — la "personality" Soul Eater tradotta nel registro Wanderlust via metallo fuso, non via linea cartoon. Bibbia §11.3 aggiornata (bullet `materia`). Lint 19/19 verdi. In attesa di generazione e occhio del Director.
+**Collegamenti:** R-177 (ancore, §11 bibbia), PLAN-058 Fase 3 T3.1.
+
+## R-192 — /game: pageerror Pixi `RenderTargetSystem.push` durante la scena invasione
+
+**Richiesta (verbatim):** trovato dal verificatore indipendente del gate (R-189 dogfood, 2026-10-14): durante la scena invasione su `/game` il renderer Pixi emette `TypeError: Cannot read properties of undefined (reading 'push')` in `RenderTargetSystem` (`xe.execute → render`). Riproducibile: presente in tutte le catture (`metrics.json` errors, stack in `.mw/runs/r185-closure/`). Non corrompe il frame visibile (verificatore: non dirimente), ma è un errore reale del layer di render — capire se è benigno o un leak di render-target.
+**Data:** 2026-10-14
+**Stato:** `fatta`
+**Chiusura:** bundle: .mw/runs/r192-pixi-render-target/bundle.json
+**Desiderata FROZEN:** nessuna — bug report da evidenza di verifica.
+**Collegamenti:** R-185 (scena invasione), R-189 (gate), bundle `.mw/runs/r185-closure/`.
+**Risoluzione:** upgrade pixi.js 8.16.0 → 8.22.0 (fix upstream pooling AlphaMaskEffect/bind-group/GC). Crash = race di boot in `AlphaMaskPipe.execute` su `renderer.renderTarget.push` (t≈3.6s, ~1s dopo mount canvas, intermittente sotto carico). Post-fix: 0 errori in cattura completa + 6 boot extra + E2E 12/12. Diagnosi strumentata: `scripts/verification/diagPixiError.ts`.
+
+## R-193 — Chiavi i18n legacy `{{var}}` rotte sotto i18next-icu: audit + fix batch
+
+**Richiesta (verbatim):** *"Fix chiavi {{...}} ICU — audit + fix batch delle chiavi i18n legacy in idleVillage.json che renderizzano letteralmente (bug confermato in SP-5, trap T-11/T-12)"* — scelta Director alla domanda "su cosa procedo" post-PLAN-032.
+**Data:** 2026-10-14
+**Stato:** `fatta`
+**Chiusura:** bundle: .mw/runs/r193-icu-2026-10-14/bundle.json
+**Risoluzione:** `{{var}}`→`{var}` su 27 placeholder ×3 locale (en/it-IT/pseudo idleVillage: astrolabeV5/V63/V64, equipment, interfaceSizeAutoHint); `{{count}` dentro plural ICU → `#` (de slotFreed/workerAssigned, swordCount ×4 locale); `missingCount` common en+pseudo; defaultValue `design-vs-fidelity.tsx`; mirror `i18n.types.ts` allineato. Fuori scope correttamente: `backend.loadPath {{lng}}/{{ns}}` (templating i18next). Fix collaterale: `tests/**/*.spec.ts` aggiunto agli exclude vitest (gli spec Playwright finivano in collection). Regression guard: `tests/i18n/icuInterpolation.test.ts` 9/9 (zero `{{` in tutti i JSON + interpolazione reale i18next+ICU sulle chiavi fixate). 46/46 i18n+localization, 87/87 consumer adiacenti; 3 failure di collection preesistenti su file non toccati (import mancanti/JSX-in-.ts) flaggati. Trap T-11 aggiornata a "risolta".
+**Desiderata FROZEN:** nessuna — bugfix su dati esistenti; convenzione ICU `{var}` già vincolante (SP-5 divergenza documentata).
+**Collegamenti:** R-189 (gate), SP-5 PLAN-032 (bug rivelato a runtime: `Lv {{n}}` letterale), trap T-11/T-12 in `context/recurring-traps.md`.
+**Audit (preliminare):** `idleVillage.json` — 13 chiavi `{{var}}` ×3 locale (en, it-IT, pseudo): `riskDeclared`, `axisReadout`, `balanced`, `overBudget`, `statVsDc`×2, `probability`×2, `risk`×2, `mathFmt`×2, `interfaceSizeAutoHint`. `de/idleVillage.json` — `slotFreed`, `workerAssigned`: plural ICU con `{{count}` dentro i branch → renderizzano RAW il plural intero. `common.json` — `missingCount` (en, pseudo), `swordCount` (en, ar, de, pseudo) con `{{count}` dentro `other` (in ICU il count è `#`). `src/pages/design-vs-fidelity.tsx:50` — defaultValue `'{{count}} missing items'`. `src/localization/i18n.types.ts` — mirror tipizzato da allineare. Fuori scope: `backend.loadPath '/locales/{{lng}}/{{ns}}.json'` (templating interno i18next, NON traduzione).
+
+### R-177 / allineamento versioni Tauri (2026-10-15)
+**Parole del Director:** "allinea". Il crate `tauri` era 2.9.3 e `@tauri-apps/api` 2.10.1. Salendo a 2.10.1 il pinning di `tauri-runtime`/`wry` produceva incompatibilità; il set coerente è `cargo update -p tauri` → tauri 2.12.3, tauri-runtime(-wry) 2.12.1, wry 0.57.0, muda 0.20.0. Lato JS: `@tauri-apps/api` ^2.12.3 (resta in dependencies), `@tauri-apps/cli` ^2.12.2. `cargo check` OK, `tauri dev` compila ed esegue senza l'avviso di versioni. Backup di Cargo.lock/package.json nello scratchpad della sessione. Non verificato: il comportamento dell'app oltre l'avvio (finestra non visibile da qui).

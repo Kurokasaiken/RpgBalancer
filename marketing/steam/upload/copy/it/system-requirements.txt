@@ -1,0 +1,15 @@
+MINIMI
+Sistema operativo: Windows 10 (64 bit)
+Processore: dual-core 2,0 GHz o superiore
+Memoria: 4 GB di RAM
+Scheda video: qualsiasi GPU con supporto WebGL 2 (va bene anche quella integrata)
+Spazio su disco: 1 GB disponibile
+Note aggiuntive: Microsoft Edge WebView2 Runtime (si installa da solo). Pensato per 1280×720 e oltre.
+
+CONSIGLIATI
+Sistema operativo: Windows 10 o 11 (64 bit)
+Processore: quad-core 2,5 GHz o superiore
+Memoria: 8 GB di RAM
+Scheda video: GPU dedicata con supporto WebGL 2
+Spazio su disco: 1 GB disponibile
+Note aggiuntive: schermo 1920×1080.

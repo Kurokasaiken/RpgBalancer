@@ -9,6 +9,12 @@ export const HUD_PANELS = [
   { id: 'roster', shortcut: 'r', defaultVisible: false },
   { id: 'events', shortcut: 'e', defaultVisible: false },
   { id: 'quest', shortcut: 'q', defaultVisible: false },
+  // PLAN-032 SP-1: the hero sheet — the Panels menu/shortcut path is its `sticky` source.
+  { id: 'heroSheet', shortcut: 'p', defaultVisible: false },
+  // PLAN-032 SP-2: the village stash mock — menu/shortcut toggle; its map marker only opens/focuses.
+  { id: 'villageStash', shortcut: 'v', defaultVisible: false },
+  // PLAN-032 SP-3: the merchant mock — same open/focus convention as the stash marker.
+  { id: 'merchant', shortcut: 'm', defaultVisible: false },
   { id: 'director', shortcut: 'd', defaultVisible: false, devOnly: true },
   { id: 'tuning', shortcut: 't', defaultVisible: false, devOnly: true },
 ] as const;

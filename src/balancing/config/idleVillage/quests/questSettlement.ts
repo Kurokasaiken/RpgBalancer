@@ -19,6 +19,17 @@ const questSettlementSchema = z
      */
     woundRecoveryTicks: z.number().int().positive(),
     /**
+     * R-183 — how a run's XP reaches the party members (QUEST_RULES §4
+     * «XP sempre assegnata»). Every member alive at settlement is credited:
+     * `full` = each survivor gets the whole run XP, `split` = the run XP is
+     * divided among survivors (floor). The dead get nothing. The village
+     * total (`village-xp`) is unchanged. PROPOSAL default — the XP curve is
+     * OPEN (`PROGRESSION.md` §3).
+     */
+    residentXp: z.object({
+      mode: z.enum(['full', 'split']),
+    }),
+    /**
      * Severities for the event-log lines written by `applyPlanToState`
      * (PLAN-019-S4 T-1). `outcome` is keyed by `run.outcome`; a run outcome
      * missing from the record falls back to `outcomeFallback`.
@@ -30,6 +41,7 @@ const questSettlementSchema = z
       residentWounded: logSeveritySchema,
       villageGold: logSeveritySchema,
       villageXp: logSeveritySchema,
+      residentXp: logSeveritySchema,
     }),
   })
   .strict();
@@ -38,6 +50,7 @@ export type QuestSettlementConfig = z.infer<typeof questSettlementSchema>;
 
 export const QUEST_SETTLEMENT: QuestSettlementConfig = questSettlementSchema.parse({
   woundRecoveryTicks: 5,
+  residentXp: { mode: 'full' },
   logSeverity: {
     outcome: {
       reward: 'success',
@@ -50,5 +63,6 @@ export const QUEST_SETTLEMENT: QuestSettlementConfig = questSettlementSchema.par
     residentWounded: 'warning',
     villageGold: 'success',
     villageXp: 'success',
+    residentXp: 'info',
   },
 });

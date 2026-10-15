@@ -1,4 +1,267 @@
-# Session Handoff — 2026-10-12
+# Session Handoff — 2026-10-14
+
+## 2026-10-14 pm8 — R-193 (fix chiavi `{{var}}` ICU) completata
+
+- **Current state:** **R-193 `fatta`** — audit+fix batch delle chiavi i18n
+  legacy che renderizzavano letteralmente sotto `i18next-icu` (registrato
+  app-wide in `src/localization/i18n.ts`; `{{var}}` = argomento malformato
+  → parse error → stringa grezza a runtime, nessun errore console).
+- **Fix:** `{{var}}`→`{var}` su 27 placeholder ×3 locale (en/it-IT/pseudo
+  `idleVillage.json`: astrolabeV5/V63/V64, equipment, interfaceSizeAutoHint);
+  `{{count}` dentro plural ICU → `#` idiomatico (de `slotFreed`/
+  `workerAssigned`, `swordCount` en/ar/de/pseudo); `missingCount` common
+  en+pseudo; defaultValue `design-vs-fidelity.tsx`; mirror `i18n.types.ts`.
+  NON toccato: `backend.loadPath '{{lng}}/{{ns}}'` (templating i18next
+  interno, non traduzione). Collaterale: `tests/**/*.spec.ts` aggiunto agli
+  exclude vitest — gli spec Playwright finivano in collection.
+- **Verifica:** nuovo `tests/i18n/icuInterpolation.test.ts` 9/9 — zero `{{`
+  in tutti i JSON locale + interpolazione reale i18next+ICU sulle chiavi
+  fixate (en/it/de/pseudo, plural `#`). 46/46 i18n+localization, 87/87
+  consumer adiacenti (astrolabe, hudGameMenu, hudScale). 3 failure di
+  collection PREESISTENTI su file non toccati (import mancanti, JSX-in-.ts)
+  flaggate. build:check + kanban:lint PASS. Bundle
+  `.mw/runs/r193-icu-2026-10-14/` PASS 3/3. Trap T-11 → risolta.
+- **Nota tecnica:** dentro un `plural` ICU `{{count}` parsea come `{`
+  (sub-message) + `{count}` valido — funziona ma non idiomatico; `#` è il
+  placeholder canonico del count.
+- **Next step:** coda pending ampia (~85 task, direzioni divergenti) —
+  WL-LORE-DROP, REND-SYS, IV-PROG, TRAILER-THREAT-V3, CDA, ADR001;
+  R-191 in attesa occhio Director sulle icone T3.1; bench
+  `generatedCatalog` rosso su file non toccati (in-flight non mio).
+
+## 2026-10-14 pm7 — PLAN-032 SP-4 (BagStrip) completato → PLAN-032 / R-167 CHIUSI
+
+- **Current state:** **tutti e 5 gli SP di PLAN-032 chiusi** — R-167
+  `completato`. `questBag.ts` helper condivisi (`questBagItems` unica
+  derivazione strip+popover title-row refactorato; `bagItemShortLabel` =
+  idiom belt `split('—')` estratto, belt invariato; `bagEverPacked` =
+  flags∪`consumablesUsed` solo retention; `bagStripVisible` predicato puro
+  `!bagEmpty && (presenting || (!waiting && !ended))`). `BagStrip.tsx`:
+  role=list, `data-hud-controls`, flex-nowrap 1 riga, chip listitem non
+  focusabili/zero handler, nome accessibile = label piena + qualificatore
+  via UN template `chipName` "{label} ({qualifier})" (parentesi, mai
+  em-dash), qualificatori armed(check+armed)/held(action)/none(passive),
+  marker dot aria-hidden sui check armati, action muted non-disabled.
+  `QuestRunWindow`: UNO slot `data-bag-slot` (min-height `BAG_CHIP_ROW_PX`
+  da `PRES.type.labelPx` — no magic number) montato finché
+  `bagEverPacked && !(ended && !presenting)`; belt alla decisione, strip
+  altrove, empty-slot inerte dopo spend-to-empty, epilogo ritira lo slot.
+  Belt/strip mai co-render (gate negato, stessa render).
+- **Divergenza (stessa di SP-5):** spec citava `{{label}}` → ICU `{label}`.
+- **Nota smoke:** `demoLaunch` compila SOLO slot resident — il loadout va
+  scelto nel picker del planner prima del send (path reale usato dallo
+  smoke). Bag vuoto → niente slot: corretto a spec.
+- **Risultati:** 22/22 unit bagStrip + 57/57 adiacenti; build:check PASS;
+  kanban:lint PASS. Smoke headed @900×640 en+it-IT: loadout 3-item via
+  picker → run reale; belt alla decisione, strip+2 marker armed in
+  presenting, nomi "(armed)"/"(carried)" / "(armato)"/"(portato)", singola
+  riga no-overflow winFits, belt di ritorno, 0 page errors, co-render
+  violation=0 su 40 render campionati.
+- **Evidence:** bundle `.mw/runs/plan032-sp4-2026-10-14/` (4/4 PASS); log
+  `test-results/PLAN-032-SP4-2026-10-14.log`; smoke+shot
+  `test-results/plan-032-sp4-smoke-2026-10-14/` (en-01/02/03, it-01/02/03).
+- **Nota concorrenza:** osservata una seconda sessione agente sullo stesso
+  SP-4 (preview :5199, smoke.ts proprio) — i suoi risultati live
+  (belt=1/strip=1 mutual exclusion, 3 chip qualificati) confermano i miei;
+  artifacts convergono sui medesimi path canonici.
+- **Next step:** nessuno per PLAN-032 (R-167 chiusa). Restano aperti i
+  follow-up del trailer-audit R-187 (jank quest-window, 400 su /game).
+- **Do not touch:** `ConsumableBelt` (resta inline — il refactor su
+  `bagItemShortLabel` è opzione futura; unica modifica fatta: `data-testid`
+  additivi per le assertion strutturali, zero impatto comportamento); strip
+  resta read-only per costruzione; `consumablesUsed` mai mostrato; nessun
+  inventario reale.
+
+## 2026-10-14 pm6 — PLAN-032 SP-5 (level-up eroe mock) completato
+
+- **Current state:** **SP-5 implementato e verificato** (4/5 SP chiusi —
+  resta solo SP-4). `heroLevelConfig.ts` Zod + salvage deterministico
+  field-level (`parseHeroLevelConfig` → `{config, configInvalid}`: marker
+  FUORI dal config, dev-throw/prod-salvage); `heroLevelViewModel` gate-first
+  (isHero + `levels[id]`, invalid → null); `heroLevelUpEvents` bus tipato +
+  `useHeroLevelUp` stub per la seam futura PROGRESSION.md; `mountedCardRegistry`
+  = predicato "card on-screen" posseduto dal layer card; `runHeroLevelUpStaging`
+  command: reject su config invalida/target non-hero/zero mounted (niente
+  telemetria/cue), accept → N eventi `hero_levelup_mock` (eventId
+  `<seq>:<idx>` monotonico) + UNA telemetry `feature_action` + UNA cue
+  `level_up` (`playLevelUpCue`, WebAudio arpeggio pattern playThud);
+  `HeroLevelDecor` layer decorativo in DragTestContainerV2 (slot sempre
+  montato, badge ancorato top-right del `data-wanderlust-portrait`, ring
+  resting, ignition keyed per eventId, `TextFloater` portaled — mai clipato).
+  pgcardKit/rosterKit intoccati. Director action `levelup` in pagina.
+- **Fix i18n (bug reale trovato in smoke):** le chiavi `heroLevel.*`
+  renderizzavano letteralmente `Lv {{n}}` — `i18next-icu` è registrato
+  app-wide, `{{n}}` è MALFORMED sotto ICU (throw → stringa grezza). Chiavi
+  corrette a `{n}` (convenzione già usata da `stash.capacity` `{count}`).
+  Trap: le chiavi `{{...}}` preesistenti in idleVillage.json sono
+  probabilmente rotte a runtime — da verificare in task dedicato.
+- **Risultati:** 18/18 unit heroLevelUp + 74/74 scope adiacente
+  (hudGuards con HeroLevelDecor in STRICT_FILES, heroSheet, stash,
+  merchant, isolation); build:check PASS. Smoke headed su `dist-playwright`
+  :5179: badge "Lv 4/5/3" ×3 + ring resting ×3, zero leak non-hero,
+  Director trigger → ignition ×3 + floater "Level N" portaled + telemetry
+  ×1 (payload esatto configuredTargets/dispatchedTargets), decay → ring
+  resting, retrigger eventId `2:0..2`, it-IT "Eroe livello 4"/"Livello N",
+  0 page errors.
+- **Evidence:** bundle `.mw/runs/plan032-sp5-2026-10-14/` (4/4 PASS);
+  log `test-results/PLAN-032-SP5-2026-10-14.log`; smoke+shot
+  `test-results/plan-032-sp5-smoke-2026-10-14/`.
+- **Next step:** PLAN-032-SP-4 (bag strip consumabili in QuestRunWindow) —
+  ultimo SP, ordine teaser vincolante.
+- **Do not touch:** nessuna progressione reale (PROGRESSION.md la decide);
+  `hero_levelup_mock` è staging-esplicito; pgcardKit/rosterKit frozen;
+  cue WebAudio dedicata (no audio-registry changes, per scope).
+
+## 2026-10-14 pm5 — SP-3 follow-up: drag clamp nel hook condiviso + smoke esteso
+
+- **Fix post-bundle:** `useHudPanelDrag` non clampa(va) — un drag estremo portava
+  i pannelli fuori viewport (panel a -2050,-2018). Ora il pointerdown cattura il
+  base rect del pannello (`closest('[data-hud-panel]')` o root posizionato) e il
+  pointermove clampata l'offset al viewport. Copre il requisito "drag clamped"
+  dei piani SP-2/SP-3; additivo per tutti i pannelli HUD (QuestRunWindow,
+  HeroSheet, ledger, stash, merchant, Director, Tuning). 54/54 test scope verdi.
+- **Smoke esteso su preview `dist-playwright` :5179** (headed): ghost
+  `data-exiting` non riceve focus (chiusura → `panels-trigger`), lista offerte
+  scrolla senza pan mappa (marker stash immobile), drag clamped a (0,0),
+  IT locale OK (`Il mercante Rowen`, badge, 4 offerte, `Chiudi pannello`).
+  Errori sporadici `TypeError 'push'` in Pixi RenderTargetSystem osservati a
+  baseline SENZA input — flaky preesistente del render loop, non SP-3.
+- **Trap confermata:** `preview:playwright` serve `dist-playwright` (non
+  `dist/`); un `vite preview` sul dist prod ha `directorEnabled=false` →
+  Director invisibile e 'd'/F10 inerti. Verificare sempre l'outDir.
+- **Bundle rigenerato** `.mw/runs/plan032-sp3-2026-10-14/bundle.json` 4/4 PASS
+  con log post-fix. Docs completate: riga Merchant in COMPONENT_MASTER_INDEX,
+  strategy_tasks SP3 → Completato.
+
+## 2026-10-14 pm4 — PLAN-032 SP-3 (mercante mock + marker gated Director) completato
+
+- **Current state:** **SP-3 implementato e verificato** (3/5 SP chiusi).
+  `merchantConfig.ts` Zod (offers 3-4, `I18N_KEY` regex, offerId unique, marker
+  bounds 4240×2828, `panel.widthPx` config-first — niente width hardcoded);
+  `deepFreeze` custom in `freezeConfig` perché zod `.readonly()` congela solo il
+  root. `MerchantPanel` HudPlaque modeless (title + restockNote + badge PREVIEW
+  + X; `ul`/`li` offerte con icona engraved/nome/desc/`priceLine` ICU/stock;
+  body scroll `max-h-[60vh]` fuori dal drag handle). `MockBuyControl`:
+  `<button disabled>` nativo, **zero prop callback** (invarianza per costruzione),
+  `title` tooltip + caption `aria-describedby`. `merchantOfferIcons` mappa
+  iconKey→glifo (vial/pouch/gust/spark). `MapBuildingPoi` riusato: union
+  `VillageBuildingId += 'merchant'`, `VillageBuildingIconKey += 'market'`,
+  `BUILDING_ICON_URLS` += poi-merchant.svg (nuovo). `poiToPanel` ora tipato
+  `{stash,merchant}`; `closeBuildingPanel` generalizzato (focus-return unica
+  regola SP-2/SP-3). Registry `merchant` shortcut `m` (primo libero). i18n
+  `gameFrame.merchant.*` en+it-IT + `director.merchantMarker`.
+- **Risultati chiave:** 15/15 unit merchant+isolation (allowlist import
+  fail-closed, nessun re-export barrel di `merchantConfig`, no `on*` in
+  MockBuyControl), 48/48 adiacenti, build:check PASS, kanban:lint PASS. Smoke
+  headed: marker assente di default → `m` apre senza marker (registrazione
+  indipendente dal marker) → 4 offerte → `m` chiude → Buy 4× disabled →
+  Director "Merchant marker" → marker su villaggio → click apre → X chiude →
+  focus torna al marker; 0 console errors.
+- **Nota ambiente (trap candidata):** dev server :5173 long-running con
+  dep-cache Pixi stale → `Extension type shape-builder already has a handler`.
+  Smoke girato su server fresco :5199. Altra nota: il pannello aperto copre il
+  proprio marker a 1440×900 (corridor placement) — placement marker = art call
+  Director, non bloccante (openOrFocus già coperto da spec/test).
+- **Evidence:** bundle `.mw/runs/plan032-sp3-2026-10-14/` (4/4 PASS); log
+  `test-results/PLAN-032-SP3-2026-10-14.log`; smoke+shot
+  `test-results/merchant-smoke-2026-10-14/`.
+- **Next step:** PLAN-032-SP-5 (hero level-up) poi SP-4 (bag strip) — ordine
+  teaser vincolante SP-1→SP-2→SP-3→SP-5→SP-4.
+- **Do not touch:** `invasion_v1` march semantics (PLAN-033); niente
+  GameOverService/day-30 canonico; pgcardKit/rosterKit frozen; mercante è mock
+  — Buy inerte per contratto, niente economia/persistenza (non-goal).
+
+## 2026-10-14 pm3 — PLAN-032 SP-2 (magazzino villaggio + MapBuildingPoi) completato
+
+- **Current state:** **SP-2 implementato e verificato** (SP-1 già chiuso in
+  sessione precedente). `villageStashConfig.ts` Zod (items ⊂ consumabili
+  canonici `questItems`, Σqty≤capacityMax, marker bounds + distanza anchor);
+  `VillageStashPanel` HudPlaque modeless (role=list, righe non interattive,
+  footer ICU `count/max`); `MapBuildingPoi` riusabile (PoiMatericV3_5 +
+  anchorGhosts exit, Enter/Space, pointer-delta gate anti-pan, tooltip solo
+  fine-pointer, reduced-motion) su anchor `building-stash` @ (2260,1551) —
+  casa lunga a est del centro villaggio. `poiToPanel {stash:'villageStash'}`;
+  marker `openOrFocus` (mai chiude), menu/shortcut `v` toggle; focus-return
+  marker vs panels-trigger. i18n en+it-IT.
+- **Risultati chiave:** 12/12 unit stash + 21/21 con hudGuards (3 nuovi file
+  in STRICT_FILES), build:check PASS, kanban:lint PASS. Smoke headed: pan-gate
+  OK, toggle split marker/menu corretto, focus-return entrambi i path, drag
+  clamp, 900×640 no-overflow, it-IT renderizzato, 0 console errors.
+  **Nota ambiente:** la preview resta EN perché `LocaleConfigStore` persiste
+  `en` — il seed `localStorage['rpg-locale-config']={locale:'it-IT'}` rende
+  l'italiano corretto (risorse it-IT caricate 200). `navigator.language` da
+  solo non basta: la config persistita vince sulla detection.
+- **Evidence:** bundle `.mw/runs/plan032-sp2-2026-10-14/` (4/4 PASS); log
+  `test-results/PLAN-032-SP2-2026-10-14.log`; smoke
+  `test-results/plan-032-sp2-smoke-2026-10-14/` (4 shot).
+- **Next step:** PLAN-032-SP-3 (mercante) — sbloccato: riusa MapBuildingPoi +
+  poiToPanel; poi SP-5, poi SP-4 (ordine vincolante).
+- **Do not touch:** `invasion_v1` march semantics (PLAN-033); niente
+  GameOverService/day-30 canonico; pgcardKit/rosterKit frozen; lo stash è
+  mock — niente inventario/economia reali (non-goal).
+
+## 2026-10-14 pm2 — PLAN-032 SP-1 (scheda PG hover→HudPlaque) completato
+
+- **Current state:** PLAN-032 dispatched (5 spec `PLAN-032-SP-1..5`, kanban
+  SP1..SP5, R-188 chiusa con bundle) e **SP-1 implementato e verificato**.
+  `HeroSheetPanel` dumb renderer (`HudPlaque` singleton, pin/chevron/X,
+  `SkinScope`+`data-hud-controls`), `heroSheetMachine` reducer puro,
+  `useHeroSheet` single transition owner (delega rail rosterV2, reconcile
+  post-commit, Esc capture con priorità DnD, anchor/clamp), `heroSheetViewModel`
+  puro da `PgDetailCard`. Config `heroSheet` Zod, registry shortcut `p`,
+  i18n en+it. File in `components/gameFrame/` (non dir `heroSheet/` — coerenza
+  famiglia HUD).
+- **Risultati chiave:** 17/17 unit nuovi + 26/26 adiacenti, build:check PASS,
+  kanban:lint PASS. Smoke headed /game (Playwright su dev server): hover→open
+  aria-label residente, Esc→`dismissedFor` sopprime riapertura, retarget,
+  grace close, pin `aria-pressed` + chevron disabled, nav DOM-order,
+  `.focus()` non apre (solo `:focus-visible`), 0 console errors.
+  **Gate R-189 appreso:** transizioni `fatta`/`completata` in RICHIESTE.md e
+  `Completato` in kanban richiedono `bundle: <path>/bundle.json` — prodotto
+  via `produceBundle.ts --manifest=<run>/verification.json`; `created_at` nel
+  futuro → artefatti STALE; `type` diversi da `state`/`human-eye` richiedono
+  env attestation + verifier.json. Chiusura retrospettiva R-185 con bundle
+  `.mw/runs/r185-closure-2026-10-14/` (era `fatta` senza riga Chiusura).
+- **Evidence:** bundle `.mw/runs/plan032-sp1-2026-10-14/`; log
+  `test-results/PLAN-032-SP1-2026-10-14.log`; smoke
+  `test-results/hero-sheet-smoke-2026-10-14/` (script + 4 shot + log).
+- **Next step:** PLAN-032-SP-2 (magazzino villaggio) — sblocca SP-3.
+- **Do not touch:** `invasion_v1` march semantics (PLAN-033); niente
+  GameOverService/day-30 canonico; non duplicare il roster canonico.
+
+## 2026-10-14 pm — PLAN-034 eseguito: fix trailer-audit chiusi
+
+- **Current state:** T-001..T-010, T-012..T-014 completati. Resta **T-011**
+  (dispatch PLAN-032: scheda PG, stash consumabili, loadout, level-up) —
+  piano converged pronto, serve esecuzione dedicata.
+- **Risultati chiave:** `playThud`/`AudioContext` era il mega-hitch invasione
+  (1.15 s) → context condiviso nel warm-up, peel max 91 ms in prod. Hub trailer
+  ripuntato su `?scene=`. `Settlement lost` = pulsante Director su `/game`
+  (overlay esistente, dev-only). Perf: **la maggior parte del jank era React
+  dev-mode** — cattura trailer su `vite preview` (trap T-09).
+- **Evidence:** `test-results/trailer-report-2026-10-14/` — DIAG-034.md,
+  diag3-6.json, diag-prod.json, shots/t010-*.jpg. Traps T-08/T-09/T-10 in
+  `context/recurring-traps.md`.
+- **Safeguards:** build:check ✓, eslint 0 err su scope, 61 test ✓, kanban:lint ✓.
+- **Do not touch:** `invasion_v1` march semantics (PLAN-033); niente
+  GameOverService/day-30 canonico.
+- **Anche aperto:** R-189 (verification gate) — architettura in attesa review
+  Director, niente implementazione.
+
+## 2026-10-14 — PLAN-034 battezzato: fix audit trailer R-187
+
+- **Current state:** `PLAN-034-trailer-audit-fixes` battezzato (active), 14 task.
+  R-187 chiusa con report+43 screenshot in `test-results/trailer-report-2026-10-14/`
+  (`REPORT.md`, `REPORT.html`, `metrics.json`, `metrics2.json`).
+- **Next step:** T-001..T-004 (diagnostica: 400 su `/game`, profiling quest-window,
+  pan/menu, invasion mount) — paralleli, sbloccano i fix T-005..T-008.
+- **Decisions made:** R-185.1 chiuso dal Director (marker a boot = voluto PLAN-033);
+  Settlement Lost = pulsante DirectorPanel dev-only; hub: via voci iter/v2, link a
+  `?scene=`; dispatch PLAN-032 incluso nel piano.
+- **Do not touch:** `invasion_v1` march semantics (PLAN-033); niente GameOverService
+  / day-30 canonico fino al futuro piano difesa.
+- **Open questions:** nessuna critica — decisioni Director integrate.
+
 
 ## 2026-10-12 — PLAN-033 battezzato: /game evento invasione
 

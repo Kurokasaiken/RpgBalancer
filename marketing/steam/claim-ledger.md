@@ -127,9 +127,9 @@ remembers` · `Astrolabe` come meccanica.
 - Ogni frase del copy qui sotto mappa a una riga di §1 o §2. Se una frase
   non ha riga, non esce.
 
-## 6. Copy v2 (proposta 2026-10-12, `REVIEW-2026-10-12.md`)
+## 6. Copy v2 (applicata 2026-10-13, `REVIEW-2026-10-12.md`)
 
-File: `copy/{en,it}/short-description.v2.txt`, `copy/{en,it}/about.v2.bbcode`.
+File canonici: `copy/{en,it}/short-description.txt`, `copy/{en,it}/about.bbcode` (copiati in `upload/copy/`).
 Nessun claim nuovo rispetto a R-145: stesse righe di §1/§2, riorganizzate.
 
 | Sezione v2 | Claim | Stato |
@@ -144,3 +144,7 @@ Nessun claim nuovo rispetto a R-145: stesse righe di §1/§2, riorganizzate.
 
 Rimossi dal copy (non dal ledger): «hundreds of hours», «easy to learn, hard to master»,
 «Steam Achievements» come feature, «modding tools being explored».
+
+Aggiunte 2026-10-13: «one-person project, made out of passion» (true-now: sviluppatore unico);
+disclosure AI estesa alle immagini dello store (vedi `ai-disclosure.md`); durata Goblin «~110 ticks»
+(11 nodi, Director) mostrata negli screenshot — claim = valore di config in `questPois.ts`.

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { X, Scroll, User, Heart, Zap, Shield, Sword } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { X, Pin, PinOff, Scroll, User, Heart, Zap, Shield, Sword } from 'lucide-react';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { resolveResidentPortrait } from '@/engine/game/idleVillage/residentVisualResolver';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
@@ -16,6 +17,13 @@ export interface SchedaPergamenaProps {
   isOpen: boolean;
   onClose: () => void;
   anchorElement: HTMLElement | null;
+  /** Hover-pinnable contract (hud_component_guide §5b.7): when the card is
+   *  opened by hover, the parent keeps it alive while the pointer is on
+   *  the card itself and offers pin/close. */
+  pinned?: boolean;
+  onTogglePin?: () => void;
+  onPanelPointerEnter?: () => void;
+  onPanelPointerLeave?: () => void;
 }
 
 const clampPercent = (value: number): number => {
@@ -32,12 +40,17 @@ const clampPercent = (value: number): number => {
  * - Suono carta che si srotola
  * - Design pesante e fisico, non popup fluttuante
  */
-const SchedaPergamena: React.FC<SchedaPergamenaProps> = ({ 
-  resident, 
-  isOpen, 
-  onClose, 
-  anchorElement 
+const SchedaPergamena: React.FC<SchedaPergamenaProps> = ({
+  resident,
+  isOpen,
+  onClose,
+  anchorElement,
+  pinned,
+  onTogglePin,
+  onPanelPointerEnter,
+  onPanelPointerLeave,
 }) => {
+  const { t } = useTranslation('idleVillage');
   const { activePreset } = useThemeSwitcher();
   const { playCue } = useSensoryAudio();
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -188,9 +201,11 @@ const SchedaPergamena: React.FC<SchedaPergamenaProps> = ({
       {/* Container Scheda Pergamena */}
       <div
         ref={containerRef}
+        onPointerEnter={onPanelPointerEnter}
+        onPointerLeave={onPanelPointerLeave}
         className={`absolute pointer-events-auto overflow-hidden rounded-2xl border transition-all duration-500 ease-out ${
-          isAnimating 
-            ? 'scale-95 opacity-0 translate-x-4' 
+          isAnimating
+            ? 'scale-95 opacity-0 translate-x-4'
             : 'scale-100 opacity-100 translate-x-0'
         }`}
         style={{
@@ -238,14 +253,27 @@ const SchedaPergamena: React.FC<SchedaPergamenaProps> = ({
               </div>
             </div>
             
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-full border border-amber-800/30 bg-amber-800/10 p-1.5 text-amber-800 transition hover:border-amber-700/50 hover:bg-amber-700/20"
-              aria-label="Chiudi scheda"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1.5">
+              {onTogglePin && (
+                <button
+                  type="button"
+                  onClick={onTogglePin}
+                  aria-pressed={pinned}
+                  className="rounded-full border border-amber-800/30 bg-amber-800/10 p-1.5 text-amber-800 transition hover:border-amber-700/50 hover:bg-amber-700/20"
+                  aria-label={pinned ? t('floatingPanel.unpin') : t('floatingPanel.pin')}
+                >
+                  {pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full border border-amber-800/30 bg-amber-800/10 p-1.5 text-amber-800 transition hover:border-amber-700/50 hover:bg-amber-700/20"
+                aria-label="Chiudi scheda"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
 

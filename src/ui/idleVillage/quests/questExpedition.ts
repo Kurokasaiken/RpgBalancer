@@ -116,3 +116,27 @@ export function loadoutDuration(
   const factor = baseNodeTicks > 0 ? nodeTicks / baseNodeTicks : 1;
   return { nodeTicks, estimatedTicks: Math.max(1, Math.round(baseEstimatedTicks * factor)), factor };
 }
+
+/**
+ * R-183 slot↔slot swap: the resident in `fromSlot` is dragged onto `toSlot`
+ * without leaving the rack. Empty target → the resident moves; occupied
+ * target → the two residents trade places. Both landings cross the same
+ * eligibility gate a roster drop crosses (`isEligible(residentId, slotId)`),
+ * so a swap can never park a resident where a direct drop would be refused.
+ * @returns The next assignments map, or `null` when the move is refused
+ *   (same slot, empty source, or an ineligible landing).
+ */
+export function planSlotSwap(
+  assignments: Record<string, string | null>,
+  fromSlot: string,
+  toSlot: string,
+  isEligible: (residentId: string, slotId: string) => boolean,
+): Record<string, string | null> | null {
+  if (fromSlot === toSlot) return null;
+  const moving = assignments[fromSlot];
+  if (!moving) return null;
+  const displaced = assignments[toSlot] ?? null;
+  if (!isEligible(moving, toSlot)) return null;
+  if (displaced && !isEligible(displaced, fromSlot)) return null;
+  return { ...assignments, [toSlot]: moving, [fromSlot]: displaced };
+}

@@ -17,13 +17,14 @@ cosa — è esplorazione, non un bug.
 1. **La terra sta dentro l'area libera.** Il bounding box della terra
    (`safeFit.landBounds`) deve stare dentro lo schermo meno gli inset della HUD:
    sopra le placche fisse in alto (`insets.top`), sopra il plinth della nav
-   (`insets.bottom`), tra i pannelli laterali aperti (inset calcolati dalla
-   pagina, `PANEL_FIT_SHARE`).
+   (`insets.bottom`). I pannelli laterali aperti non entrano nel calcolo: la
+   mappa non si muove per nessun pannello (Director, 2026-10-14).
 2. **Il chrome fisso non copre mai terra protetta.** Placche top, plinth nav,
    identity: nessuna intersezione col rettangolo della terra a schermo.
 3. **I pannelli flottanti possono coprire terra** solo perché sono chiudibili o
    trascinabili (roster, ledger, quest window — vedi `hud_component_guide.md`).
-   Il fit gli tiene comunque il 60% della loro larghezza libera.
+   Il fit non riserva spazio per loro: aprirli o chiuderli non sposta né
+   ridimensiona la mappa.
 4. **Mai vuoto oltre il mare.** Lo schermo non mostra mai oltre il rettangolo di
    mare renderizzato: niente colore di stage, niente righe ai bordi.
 5. **Il mare è continuo.** Il mare generato (deep-sea shader) incontra il mare

@@ -5,6 +5,7 @@ import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { GameFrameScreen } from './game-frame';
 import { DEFAULT_MAP_TUNE, PixiWorldMap, type PixiBootProgress, type PixiMapAnchor, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
 import { GameBootScreen, type GameBootPhase } from '@/ui/idleVillage/components/gameFrame/GameBootScreen';
+import { GameFrameDragCursor } from '@/ui/idleVillage/components/gameFrame/GameFrameDragCursor';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { installGamePerfProbe } from '@/ui/idleVillage/utils/gamePerfProbe';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
@@ -14,19 +15,21 @@ import { useHudMaterial } from '@/ui/idleVillage/components/gameFrame/useHudMate
 import { applySkinCssVariables } from '@/ui/idleVillage/skins/skinCssVariables';
 import { getSkinPresetConfig, type SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { COMPARABLE_SKIN_IDS, resolveInitialSkinPresetId } from '@/ui/idleVillage/skins/resolveInitialSkin';
-import { questAvailability } from '@/ui/idleVillage/components/gameFrame/questAvailability';
+import { questAvailability, type QuestAvailability } from '@/ui/idleVillage/components/gameFrame/questAvailability';
+import { useStableValue, useThrottledValue } from '@/ui/idleVillage/hooks/useThrottledValue';
 import { DEFAULT_SEA_PATTERN_CONFIG } from '@/ui/idleVillage/components/WorldSurfaceSeaPatternOverlay';
 import { DEFAULT_COAST_FOAM_CONFIG } from '@/ui/idleVillage/components/WorldSurfaceCoastFoam';
 import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/resolveWorldManifest';
-import { RosterKitShell, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
+import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
+import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLostOverlay';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
-import { nodeDurationTicks, type QuestId } from '@/ui/idleVillage/questS1Lab/questRun';
+import { type QuestId } from '@/ui/idleVillage/questS1Lab/questRun';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
-import { isPoiConsumed, poiConsumesOnReportClose, QUEST_POIS, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
+import { isPoiConsumed, poiConsumesOnReportClose, QUEST_HALO_RENDER_MS, QUEST_HALO_STEPS, QUEST_POIS, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
 import { useQuestExpeditionSession } from '@/ui/idleVillage/quests/useQuestExpeditionSession';
 import { scenarioForQuest } from '@/ui/idleVillage/questS1Lab/questOffer';
 import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
@@ -39,7 +42,15 @@ import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente.webp';
 import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
-import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHudPanels, type HudEvent, type TuningField } from '@/ui/idleVillage/components/gameFrame';
+import { MapBuildingPoi, BUILDING_ICON_URLS } from '@/ui/idleVillage/components/gameFrame/MapBuildingPoi';
+import { useHudScale } from '@/ui/idleVillage/components/gameFrame/useHudScale';
+import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField } from '@/ui/idleVillage/components/gameFrame';
+import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
+import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
+import { VILLAGE_STASH_CONFIG, type VillageBuildingId, type VillageBuildingIconKey } from '@/balancing/config/idleVillage/villageStashConfig';
+import { MERCHANT_CONFIG } from '@/balancing/config/idleVillage/merchantConfig';
+import { runHeroLevelUpStaging } from '@/ui/idleVillage/rosterV2/runHeroLevelUpStaging';
+import { playLevelUpCue } from '@/ui/idleVillage/rosterV2/heroLevelCue';
 
 /**
  * `/game-frame-pixi` — the /game-frame screen (same HUD, roster, instruments) on the
@@ -60,23 +71,23 @@ const INVASION_WARNING_DAYS = 5;
 const INVASION_CARD_SIZE = 0.75;
 /** The card in the viewport: 1 = its 460px design width, so it reads at a player's screen size. */
 const INVASION_SCREEN_SCALE = 1;
-/** How long the ledger stays open to show a new event when the player had it closed. */
-const LEDGER_PEEK_MS = 1000;
 /** The goblin walks from where it lands to the village over this many game days (PLAN-033 T-004). */
 const INVASION_MARCH_DAYS = 30;
 /** Normalised map points: where the sticker lands on the forest, and the village it marches on. */
 const INVASION_LAND = { x: 0.239, y: 0.417 } as const;
 const INVASION_VILLAGE = { x: 0.486, y: 0.554 } as const;
+/* PLAN-032 SP-2: which HUD panel a village building marker opens. `BuildingId`
+ *  is the config's literal union — a mismatch fails at compile time. */
+const poiToPanel: Record<VillageBuildingId, HudPanelId> = { stash: 'villageStash', merchant: 'merchant' };
 const INVASION_KEY = 'invasion_v1';
 const TUNING_KEY = 'hud_tuning_v1';
 /** POIs whose quest has run to completion: once the expedition report is
  *  dismissed the marker leaves the map for good (PLAN-019-S2.5 terminal
  *  table: every outcome ⇒ «POI chiude»). */
 const CONSUMED_POIS_KEY = 'idleVillage.questPois.consumed';
-/** Share of an open side panel's width the map fit keeps clear. */
-const PANEL_FIT_SHARE = 0.6;
 
 export default function GameFramePixiPage() {
+  const hudScale = useHudScale();
   const { worldDressing, questPois, debug, roster, questDetail, questWindow, insets } = DEFAULT_GAME_FRAME_CONFIG;
   const baseSafeFit = worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined;
   // Dev tuning (Tuning panel): overrides on top of the config, applied when a slider is released.
@@ -85,6 +96,8 @@ export default function GameFramePixiPage() {
   const bandNow = useHudBandPx();
   const [tuningLoaded, setTuningLoaded] = useState(false);
   const [tuningSaved, setTuningSaved] = useState(false);
+  // «Save» also bakes the values into the shipped defaults via the dev endpoint; this flags a failed write (R-181).
+  const [tuningBakeFailed, setTuningBakeFailed] = useState(false);
   useEffect(() => {
     let cancelled = false;
     loadData<{ tuned?: Record<string, number>; band?: number }>(TUNING_KEY, {}).then((stored) => {
@@ -164,16 +177,27 @@ export default function GameFramePixiPage() {
     document.documentElement.setAttribute('data-skin-preset', skinId);
   }, [skinId]);
   const [poiDemo, setPoiDemo] = useState(false);
+  /* PLAN-032 SP-3: the merchant marker is Director staging — default OFF,
+   *  flipped by the `merchantmarker` director action (poiDemo convention). */
+  const [merchantMarker, setMerchantMarker] = useState(false);
+  /* R-180: «POI types» reviews the whole marker family — the golden quest
+   *  POI rides along as the REAL offer (never a fake exemplar, R-143), so
+   *  clicking it opens the actual expedition planner. «Show quest» stays
+   *  the quest-only gate. */
+  const questRevealed = questShown || poiDemo;
   const [wonderRequest, setWonderRequest] = useState(0);
   const [regionHover, setRegionHover] = useState<PixiRegionHover | null>(null);
   const [invasion, setInvasion] = useState<{ dueDay: number; startDay: number } | null>(null);
-  // The march is a function of the game day, so the start day is what survives a reload; position is derived from it.
-  const invasionLoadedRef = useRef(false);
+  // The march is a function of the game day, and the clock does not hydrate on reload (R-119): a restored invasion
+  // would put a goblin on the map with a position that matches nothing. The page therefore opens with a clean map
+  // (Director, 2026-10-14) and an invasion exists only from the moment it is triggered. The last one is erased on open.
+  const invasionLoadedRef = useRef(true);
+  // False only between the player's confirmation and the sticker landing.
+  const [goblinLanded, setGoblinLanded] = useState(true);
+  // The invasion's ledger row exists from the confirmation but stays hidden until the announcement card has folded into it.
+  const [rowArriving, setRowArriving] = useState(false);
   useEffect(() => {
-    void loadData<{ dueDay: number; startDay: number } | null>(INVASION_KEY, null).then((stored) => {
-      if (stored && typeof stored.dueDay === 'number' && typeof stored.startDay === 'number') setInvasion(stored);
-      invasionLoadedRef.current = true;
-    });
+    void saveData(INVASION_KEY, null);
   }, []);
   useEffect(() => {
     if (!invasionLoadedRef.current) return;
@@ -239,20 +263,23 @@ export default function GameFramePixiPage() {
     if (hudIdleHidden && DEFAULT_GAME_FRAME_CONFIG.hudHide.wonderOnHide) setWonderRequest((n) => n + 1);
   }, [hudIdleHidden]);
   // Test / trailer tooling: dev builds only, F10 shows or hides it (hide it for a clean capture).
-  // `?capture=1` starts a clean shot: no Director, no panel menu.
-  const capture = useMemo(() => new URLSearchParams(window.location.search).get('capture') === '1', []);
   // The Director panel is a test / trailer instrument: dev builds and the
   // playwright preview only, never a production bundle.
   const directorEnabled = (import.meta.env.DEV || import.meta.env.MODE === 'playwright') && debug.directorPanel;
-  const panels = useHudPanels();
-  // The land is framed to keep clear of the open side panels: the fit reserves most of their width (they sit over the
-  // coastal corners, so a full reservation would shrink the island for nothing).
-  const safeFit = useMemo(() => {
-    if (!baseSafeFit) return undefined;
-    const left = panels.visible.roster ? Math.round((roster.leftPx + roster.widthPx) * PANEL_FIT_SHARE) : 0;
-    const right = panels.visible.events ? Math.round((questDetail.ledgerWidthPx + insets.edgeInsetPx) * PANEL_FIT_SHARE) : 0;
-    return { ...baseSafeFit, insets: { ...baseSafeFit.insets, left, right } };
-  }, [baseSafeFit, panels.visible.roster, panels.visible.events, roster.leftPx, roster.widthPx, questDetail.ledgerWidthPx, insets.edgeInsetPx]);
+  /* PLAN-032 SP-1: the hero sheet's machine is its single transition owner.
+   * `interceptToggle` routes every registry call for it (menu, game menu, the
+   * `p` shortcut) into `useHeroSheet`; the registry flag only reflects. */
+  const heroSheetApiRef = useRef<HeroSheetApi | null>(null);
+  const panels = useHudPanels({
+    interceptToggle: useCallback((id: HudPanelId) => {
+      if (id !== 'heroSheet') return false;
+      heroSheetApiRef.current?.toggle();
+      return true;
+    }, []),
+  });
+  // The map never moves for a panel (Director, 2026-10-14): Roster, ledger, quest detail and every other panel the
+  // player can move or close may cover the land. Only the fixed chrome reserves space (`baseSafeFit` insets top/bottom).
+  const safeFit = baseSafeFit;
   useEffect(() => {
     if (!directorEnabled) return undefined;
     const onKey = (event: KeyboardEvent) => {
@@ -314,6 +341,12 @@ export default function GameFramePixiPage() {
 
   const currentDay = session.gameplay.state.currentDay;
   const invasionDaysLeft = invasion ? Math.max(0, invasion.dueDay - currentDay) : 0;
+  /* PLAN-034 T-010: the Director's Settlement Lost trigger lights its button
+   * while the takeover is on screen (read-only flag — the state itself lives in
+   * the gameplay store's gameOverState). */
+  const settlementLostActive = useMinimalGameplayStore(
+    (s) => s.gameOverState.isGameOver && s.gameOverState.reason === 'settlement_lost',
+  );
   // E2E seam: the march state the marker is drawn from (dev/playwright builds read it; production builds carry it harmlessly).
   useEffect(() => {
     const hooks = ((window as unknown as { __idleVillageTestHooks?: Record<string, unknown> }).__idleVillageTestHooks ??= {});
@@ -328,12 +361,44 @@ export default function GameFramePixiPage() {
   const dayLengthTicks = session.gameplay.config.globalRules?.dayLengthInTimeUnits ?? 60;
   const currentTick = session.gameplay.state.currentTick ?? 0;
 
+/* Structural equality for throttled offer availability (PLAN-034 T-005). */
+const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | undefined): boolean =>
+  a === b || (!!a && !!b && a.state === b.state && a.progress === b.progress);
+
   /** Window left on a real quest offer, on the game clock. */
   const offerAvailability = useCallback(
     (p: QuestPoi) =>
       questAvailability(currentTick, p.availableFromDay * dayLengthTicks, dayLengthTicks, p.availableUntilDay - p.availableFromDay),
     [currentTick, dayLengthTicks],
   );
+
+  /* Per-POI offer availability, quantised to the seal's letter grid and held
+   * referentially stable (PLAN-034 T-005/RC-1): the raw values move on every
+   * game tick, so every consumer below — the anchors memo, extraEvents — would
+   * rebuild the marker subtree with them. Between visible steps these stay
+   * identical objects and React skips the whole branch. */
+  const quantizeAvail = useCallback(
+    (p: QuestPoi | undefined): QuestAvailability | undefined => {
+      if (!p) return undefined;
+      const a = offerAvailability(p);
+      return { ...a, progress: Math.round(a.progress * QUEST_HALO_STEPS) / QUEST_HALO_STEPS };
+    },
+    [offerAvailability],
+  );
+  const availGoblin = useStableValue(
+    useMemo(() => quantizeAvail(questPoiById('poi-goblin')), [quantizeAvail]),
+    availEqual,
+  );
+  const availRovine = useStableValue(
+    useMemo(() => quantizeAvail(questPoiById('poi-rovine')), [quantizeAvail]),
+    availEqual,
+  );
+  const questPoiAvailability = useMemo(() => {
+    const map = new Map<string, QuestAvailability>();
+    if (availGoblin) map.set('poi-goblin', availGoblin);
+    if (availRovine) map.set('poi-rovine', availRovine);
+    return map;
+  }, [availGoblin, availRovine]);
 
   // Time of day on the map, only at normal speed: at x2/x4 the light holds still (a day lasts seconds there, and the map
   // would flicker), while paused it keeps whatever light it had.
@@ -379,10 +444,14 @@ export default function GameFramePixiPage() {
     () => [questRun.run, questRunRovine.run].filter((r): r is NonNullable<typeof r> => Boolean(r)),
     [questRun.run, questRunRovine.run],
   );
-  const openRunWindow = (questId: QuestId) => {
+  /* useCallback, not a plain closure: this reaches `poiView.handlePoiClick` —
+   *  an unstable identity here rebuilt the marker's session object (and the
+   *  whole medallion subtree) on every render (PLAN-034 T-005). */
+  const openRunWindow = useCallback((questId: QuestId) => {
     setActiveQuestId(questId);
     panels.set('quest', true);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panels.set]);
   const poiGoblin = questPoiById('poi-goblin');
   const poiRovine = questPoiById('poi-rovine');
   const expeditionGoblin = useQuestExpeditionSession({
@@ -402,18 +471,110 @@ export default function GameFramePixiPage() {
     detailPosition: questDetailPosition,
   });
   const expeditions = [expeditionGoblin, expeditionRovine];
+  /* R-184: a POI detail (the quest planner) always has the roster beside it —
+   *  opened if it was closed, closed again when the detail goes if it was
+   *  closed before. Same visibility rule the planner overlay uses. */
+  usePanelWhileOpen(
+    panels,
+    'roster',
+    expeditions.some((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended)),
+  );
+
+  /* PLAN-032 SP-1: the hero sheet. The roster's data bundle is the same the kit
+   * feeds its cards with, so the plaque always reads canonical values. The
+   * quest window keeps clear of it via `questBounds` (WCAG 2.4.11). */
+  const { residentsById } = useRosterKitData();
+  const draggingResidentId =
+    session.draggingResidentId ?? expeditionGoblin.draggingResidentId ?? expeditionRovine.draggingResidentId;
+  const questWindowBounds = useMemo(
+    () =>
+      panels.visible.quest && activeQuestRun.run
+        ? {
+            left: roster.leftPx + roster.widthPx + questDetail.gapPx,
+            top: questWindow.topPx,
+            right: roster.leftPx + roster.widthPx + questDetail.gapPx + questWindow.widthPx,
+            bottom: window.innerHeight,
+          }
+        : null,
+    [panels.visible.quest, activeQuestRun.run, roster.leftPx, roster.widthPx, questDetail.gapPx, questWindow.topPx, questWindow.widthPx],
+  );
+  const heroSheet = useHeroSheet({
+    config: DEFAULT_GAME_FRAME_CONFIG.heroSheet,
+    residentsById,
+    panels,
+    dragActive: draggingResidentId != null,
+    questBounds: questWindowBounds,
+    zIndex: DEFAULT_GAME_FRAME_CONFIG.zLayers.panels,
+  });
+  heroSheetApiRef.current = heroSheet;
+  /* The api the shell sees: `heroSheet` calls route into the machine (reflect,
+   * never drive — the internal `p` shortcut is already intercepted). */
+  const panelsForScreen = useMemo<HudPanelsApi>(
+    () => ({
+      visible: panels.visible,
+      set: (id, value) => {
+        if (id === 'heroSheet') {
+          if (value) heroSheet.open();
+          else heroSheet.close('toggle');
+          return;
+        }
+        panels.set(id, value);
+      },
+      toggle: (id) => {
+        if (id === 'heroSheet') {
+          heroSheet.toggle();
+          return;
+        }
+        panels.toggle(id);
+      },
+    }),
+    [panels, heroSheet],
+  );
+
+  /* PLAN-032 SP-2: village building markers open (never toggle) their panel.
+   *  `panels` itself is unstable across renders, so the marker callbacks read
+   *  it through a ref — the anchors memo is deliberately not re-run on every
+   *  panel flip. `buildingOpenerRef` records the marker element so closing the
+   *  panel can return focus to it (menu/shortcut paths leave it null → focus
+   *  falls back to the Panels-menu trigger, never to body). */
+  const panelsApiRef = useRef(panels);
+  panelsApiRef.current = panels;
+  const buildingOpenerRef = useRef<HTMLElement | null>(null);
+  const handleBuildingPoiActivate = useCallback((buildingId: VillageBuildingId, trigger: HTMLElement) => {
+    const panelId = poiToPanel[buildingId];
+    buildingOpenerRef.current = trigger;
+    const p = panelsApiRef.current;
+    if (!p.visible[panelId]) p.set(panelId, true);
+    else document.querySelector<HTMLElement>(`[data-hud-panel="${panelId}"]`)?.focus();
+  }, []);
+  /* SP-3 generalizes the stash's close path into the single focus-return rule
+   *  every building panel shares: back to the marker that opened it if still
+   *  mounted, else to the Panels-menu trigger — never to body. */
+  const closeBuildingPanel = useCallback((panelId: HudPanelId) => {
+    panelsApiRef.current.set(panelId, false);
+    const opener = buildingOpenerRef.current;
+    buildingOpenerRef.current = null;
+    window.requestAnimationFrame(() => {
+      const fallback = document.querySelector<HTMLElement>('[data-hud-panels-trigger]');
+      /* An opener that is mid-exiting (anchor ghost) is still connected but no
+       * longer a valid focus target — the marker re-mounts fresh next time. */
+      (opener && opener.isConnected && !opener.hasAttribute('data-exiting') ? opener : fallback)?.focus();
+    });
+  }, []);
+  const closeVillageStash = useCallback(() => closeBuildingPanel('villageStash'), [closeBuildingPanel]);
+  const closeMerchant = useCallback(() => closeBuildingPanel('merchant'), [closeBuildingPanel]);
 
   // Open opportunities live in the calendar like any other dated event: the quest is a row in the ledger.
   const extraEvents = useMemo<HudEvent[]>(() => {
     const list: HudEvent[] = [];
-    if (invasion) list.push({ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft, at: { x: 0.486, y: 0.554 } });
-    const goblinAvail = offerAvailability(poiGoblin);
-    if (questShown && expeditionGoblin.poiView.questStatus === 'available' && goblinAvail.state !== 'expired') {
+    if (invasion) list.push({ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft, at: { x: 0.486, y: 0.554 }, arriving: rowArriving });
+    const goblinAvail = questPoiAvailability.get('poi-goblin');
+    if (questRevealed && expeditionGoblin.poiView.questStatus === 'available' && goblinAvail && goblinAvail.state !== 'expired') {
       const daysLeft = Math.max(0, Math.ceil(goblinAvail.progress * (poiGoblin.availableUntilDay - poiGoblin.availableFromDay)));
       list.push({ id: 'quest-open', typeId: 'quest', title: expeditionGoblin.poiView.activity.label, daysLeft, at: { x: poiGoblin.x / 4240, y: poiGoblin.y / 2828 } });
     }
     return list;
-  }, [invasion, invasionDaysLeft, questShown, expeditionGoblin.poiView, offerAvailability, poiGoblin, t]);
+  }, [invasion, invasionDaysLeft, rowArriving, questRevealed, expeditionGoblin.poiView, questPoiAvailability, poiGoblin, t]);
 
   /* Consumed quest POIs (persisted): a POI whose run ended, settled and had
    *  its report dismissed leaves the map — it never comes back, even across
@@ -480,6 +641,10 @@ export default function GameFramePixiPage() {
       : t('gameFrame.questWindow.day', { day: Math.min(questWindow.durationDays, Math.floor(elapsed / dayLengthTicks) + 1), total: questWindow.durationDays });
     return { progress, label };
   }, [activeQuestRun.run, activePoi, currentTick, questWindow.durationDays, dayLengthTicks, t]);
+  /* Halo cadence for the window's time bar too: without it every game tick
+   * rebuilds the element and the whole 900-line window re-renders (PLAN-034
+   * T-005). At ≤500ms cadence the countdown still reads as alive. */
+  const questRunTimeView = useThrottledValue(questRunTime, QUEST_HALO_RENDER_MS);
 
   const anchors = useMemo<PixiMapAnchor[]>(() => {
     const list: PixiMapAnchor[] = [];
@@ -491,24 +656,25 @@ export default function GameFramePixiPage() {
         id: 'invasion-goblin',
         x: (INVASION_LAND.x + (INVASION_VILLAGE.x - INVASION_LAND.x) * progress) * 4240,
         y: (INVASION_LAND.y + (INVASION_VILLAGE.y - INVASION_LAND.y) * progress) * 2828,
-        node: <img data-testid="invasion-goblin-marker" src={goblinStickerImage} alt="" style={{ width: 300, pointerEvents: 'none', filter: 'drop-shadow(0 12px 22px rgba(0,0,0,0.55))' }} />,
+        node: <img data-testid="invasion-goblin-marker" src={goblinStickerImage} alt="" style={{ width: 300, pointerEvents: 'none', opacity: goblinLanded ? 1 : 0, filter: 'drop-shadow(0 12px 22px rgba(0,0,0,0.55))' }} />,
       });
     }
-    /* Real quest POIs (S2.4 + R-127/R-143): the medallion is the planning
+    /* Real quest POIs (S2.4 + R-127/R-143/R-180): the medallion is the planning
      *  entry and, once launched, the run's halo clock. Nothing pins at boot —
-     *  a marker mounts only while «Mostra quest» reveals the real offers/runs;
-     *  an offer past its window with no run leaves the map. Every exit plays
-     *  through `anchorsWithGhosts` instead of popping off. A quest marker is
-     *  NEVER a demo exemplar: the goblin/rovine POI is real content A→Z, the
-     *  «POI types» family review keeps only the types that have no real
-     *  content yet (job/event). */
+     *  a marker mounts only while a Director toggle reveals the real
+     *  offers/runs; an offer past its window with no run leaves the map. Every
+     *  exit plays through `anchorsWithGhosts` instead of popping off. A quest
+     *  marker is NEVER a demo exemplar: under «POI types» the goblin/rovine
+     *  POI mounted is the REAL offer (R-180 — the family review includes the
+     *  golden type, real content A→Z); only job/event, the types without real
+     *  content yet, stay fake exemplars. */
     for (const exp of expeditions) {
       const p = exp.poi;
-      const avail = offerAvailability(p);
+      const avail = questPoiAvailability.get(p.id);
       /* A repeatable offer ignores a stale consumed record (authored after
        *  the POI was already consumed — D-S4-6 migration honesty). */
       if (isPoiConsumed(p, consumedPoiIds)) continue;
-      if (!questShown || (!exp.run && avail.state === 'expired')) continue;
+      if (!questRevealed || (!exp.run && avail?.state === 'expired')) continue;
       list.push({
         id: p.id,
         x: p.x,
@@ -526,9 +692,49 @@ export default function GameFramePixiPage() {
         list.push({ id: `demo-${demo.type}`, x: demo.x * 4240, y: demo.y * 2828, node: <MapDemoPoi type={demo.type} sizePx={poi?.sizePx ?? 55} /> });
       }
     }
+    /* PLAN-032 SP-2: the village stash marker — a building POI anchored on a
+     *  painted roof, always on the map while the village exists. Config-derived
+     *  (a typo fails at parse/compile, never silently); ghost removal animates
+     *  through the `exiting` prop like every other anchor. */
+    for (const marker of [VILLAGE_STASH_CONFIG.marker]) {
+      list.push({
+        id: `building-${marker.buildingId}`,
+        x: marker.worldX,
+        y: marker.worldY,
+        node: (
+          <MapBuildingPoi
+            buildingId={marker.buildingId}
+            name={t(`gameFrame.buildings.${marker.buildingId}.name`)}
+            iconUrl={BUILDING_ICON_URLS[marker.iconKey]}
+            sizePx={poi?.sizePx ?? 55}
+            onActivate={(trigger) => handleBuildingPoiActivate(marker.buildingId, trigger)}
+          />
+        ),
+      });
+    }
+    /* PLAN-032 SP-3: the merchant marker only exists while the Director stages
+     *  it (`merchantmarker` toggle). Same MapBuildingPoi contract as the
+     *  stash — it opens/focuses `merchant`, never toggles it shut. */
+    if (merchantMarker) {
+      const marker = MERCHANT_CONFIG.marker;
+      list.push({
+        id: 'building-merchant',
+        x: marker.worldX,
+        y: marker.worldY,
+        node: (
+          <MapBuildingPoi
+            buildingId="merchant"
+            name={t('gameFrame.merchant.markerName')}
+            iconUrl={BUILDING_ICON_URLS[marker.iconKey as VillageBuildingIconKey]}
+            sizePx={poi?.sizePx ?? 55}
+            onActivate={(trigger) => handleBuildingPoiActivate('merchant', trigger)}
+          />
+        ),
+      });
+    }
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poi, questShown, session, poiDemo, currentTick, dayLengthTicks, consumedPoiIds, expeditionGoblin.poiView, expeditionGoblin.run, expeditionRovine.poiView, expeditionRovine.run, invasion, currentDay]);
+  }, [poi, questRevealed, poiDemo, merchantMarker, questPoiAvailability, consumedPoiIds, expeditionGoblin.poiView, expeditionGoblin.run, expeditionRovine.poiView, expeditionRovine.run, invasion, currentDay, goblinLanded, t, handleBuildingPoiActivate]);
 
   /* Exit transformation (R-127): an anchor that leaves the set stays mounted
    *  one beat longer — its node re-rendered with `exiting` plays the same
@@ -653,6 +859,41 @@ export default function GameFramePixiPage() {
     trackTelemetryEvent('game_boot_complete', { interactiveMs });
   }, [veilGone]);
 
+  /* The run window as a memoised element: while the clock ticks the page
+   * re-renders, but an identical element reference lets React skip the whole
+   * 900-line subtree on the ticks where nothing visible changed — the ticking
+   * time bar itself is sampled at the halo cadence (PLAN-034 T-005). */
+  const questWindowNode = useMemo(
+    () =>
+      activeQuestRun.run && panels.visible.quest ? (
+        <QuestRunWindow
+          run={activeQuestRun.run}
+          phases={activeQuestRun.phases}
+          beats={scenarioForQuest(activeQuestId)?.beats ?? GOBLIN_SCENARIO.beats}
+          queuedBeats={activeQuestRun.beats}
+          beatTiming={questWindow.beats}
+          title={scenarioForQuest(activeQuestId)?.title ?? GOBLIN_SCENARIO.title}
+          flavour={scenarioForQuest(activeQuestId)?.flavour ?? ''}
+          scenario={scenarioForQuest(activeQuestId)}
+          artFor={(nodeId) => NODE_ART[nodeId]?.src}
+          time={questRunTimeView}
+          onChoose={(optionId) => activeQuestRun.choose(optionId, { useConsumable: questArmed })}
+          armed={questArmed}
+          onToggleArmed={() => setQuestArmed((on) => !on)}
+          onUseHealing={activeQuestRun.useHealing}
+          onDrinkPotion={activeQuestRun.drinkPotion}
+          onClose={() => panels.set('quest', false)}
+          anchor={{ left: roster.leftPx + roster.widthPx + questDetail.gapPx, top: questWindow.topPx }}
+          widthPx={questWindow.widthPx}
+          theaterAspect={questWindow.theaterAspect}
+          tooltipLines={questWindow.tooltipLines}
+          zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
+        />
+      ) : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeQuestRun, activeQuestId, panels.visible.quest, questRunTimeView, questArmed, questWindow, roster.leftPx, roster.widthPx, questDetail.gapPx],
+  );
+
   const directorActions = useMemo<DirectorAction[]>(
     () => [
       {
@@ -665,10 +906,11 @@ export default function GameFramePixiPage() {
         },
       },
       {
-        /* R-143: the ONLY UI reveal of the REAL quest offers (goblin + rovine)
-         *  — a quest marker is never a demo exemplar. Restored after R-131:
-         *  «POI types» keeps the fake job/event family, this toggle gates the
-         *  real thing end-to-end (offer → detail → run → settle → consumed). */
+        /* R-143/R-180: the quest-only reveal of the REAL quest offers
+         *  (goblin + rovine) — a quest marker is never a demo exemplar.
+         *  «POI types» also surfaces them (family review), this toggle gates
+         *  ONLY the real thing end-to-end (offer → detail → run → settle →
+         *  consumed). */
         id: 'quest',
         label: t('gameFrame.director.quest'),
         active: questShown,
@@ -696,9 +938,34 @@ export default function GameFramePixiPage() {
         onTrigger: () => setPoiDemo((on) => !on),
       },
       {
+        /* PLAN-032 SP-3: stages the merchant building marker for takes —
+         *  staging only, the panel itself also opens via menu/`m`. */
+        id: 'merchantmarker',
+        label: t('gameFrame.director.merchantMarker'),
+        active: merchantMarker,
+        onTrigger: () => setMerchantMarker((on) => !on),
+      },
+      {
         id: 'wonder',
         label: t('gameFrame.director.wonder'),
         onTrigger: () => setWonderRequest((n) => n + 1),
+      },
+      {
+        /* PLAN-032 SP-5: the level-up staging beat — mock presentation only.
+         *  The command itself decides accept/reject (invalid config, non-hero
+         *  targets, or no mounted hero card all reject with no telemetry/cue). */
+        id: 'levelup',
+        label: t('gameFrame.director.levelUp'),
+        onTrigger: () => runHeroLevelUpStaging({ residentsById, playCue: playLevelUpCue }),
+      },
+      {
+        /* PLAN-034 T-010: the settlement-lost takeover, staged on demand for
+         *  trailer takes. This is a DIRECTOR trigger only — the canonical
+         *  day-30 loss path is explicitly out of scope (no GameOverService). */
+        id: 'settlementLost',
+        label: t('gameFrame.director.settlementLost'),
+        active: settlementLostActive,
+        onTrigger: () => useMinimalGameplayStore.getState().triggerSettlementLost(),
       },
       {
         id: 'skin',
@@ -707,7 +974,7 @@ export default function GameFramePixiPage() {
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, questShown, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin],
+    [invasion, questShown, poiDemo, merchantMarker, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin, settlementLostActive, openRunWindow, residentsById],
   );
 
   return (
@@ -737,7 +1004,9 @@ export default function GameFramePixiPage() {
              * it a transition makes that render interruptible — React splits it
              * across frames instead of one ~117ms block at pickup (PLAN-031 T-B4). */
             startTransition(() => {
-              session.handleDragStart(event);
+              /* R-183: a slotted token (slot↔slot swap) belongs to its
+               *  expedition only — the activity session tracks roster cards. */
+              if (event.active.data.current?.type !== 'slot-token') session.handleDragStart(event);
               expeditions.forEach((exp) => exp.handleDragStart(event));
             });
           }}
@@ -748,14 +1017,20 @@ export default function GameFramePixiPage() {
             });
           }}
         >
+          <GameFrameDragCursor />
           <GameFrameScreen
-            panels={panels}
+            panels={panelsForScreen}
             devPanels={directorEnabled}
             skinControl={{ id: skinId, onChange: setSkinId }}
+            scaleControl={hudScale}
             hudWakeSignal={hudWakeSignal}
             timeInputLocked={timeFrozen}
             onHudHiddenChange={(hidden, cause) => setHudIdleHidden(hidden && cause === 'idle')}
             rosterSlot={({ onClose }) => (
+              /* SP-1: the rail wrapper is the delegation boundary — pointer/focus
+               * events on the cards reach the hero-sheet machine here; the frozen
+               * roster inside is untouched. */
+              <div ref={heroSheet.railRef} {...heroSheet.railProps}>
               <Roster
                 onClose={onClose}
                 componentId="game-frame-roster"
@@ -802,10 +1077,12 @@ export default function GameFramePixiPage() {
                   ]),
                 ]}
                 lockedStatusLabel={session.t('roster.status.assigned')}
-                activeResidentId={session.draggingResidentId ?? expeditionGoblin.draggingResidentId ?? expeditionRovine.draggingResidentId}
+                activeResidentId={draggingResidentId}
               />
+              </div>
             )}
             extraEvents={extraEvents}
+            fixtureEvents={false}
             overlaySlot={
               <>
                 {/* The announcement lives in the viewport, centred on the free area the HUD leaves (not on the world canvas,
@@ -826,52 +1103,67 @@ export default function GameFramePixiPage() {
                     marchTarget={{ x: Math.round(4240 * INVASION_VILLAGE.x), y: Math.round(2828 * INVASION_VILLAGE.y) }}
                     daysRemaining={INVASION_WARNING_DAYS}
                     showReminder={false}
+                    warm={bootDone}
+                    landingSelector="[data-testid='invasion-goblin-marker']"
+                    onLand={() => setGoblinLanded(true)}
+                    rowSelector="[data-event-id='invasion']"
+                    onArrive={() => setRowArriving(false)}
                     cardSize={INVASION_CARD_SIZE}
                     onComplete={() => {
                       setShroudCovered(false);
+                      // The marker mounts now but stays hidden until the sticker lands on it.
+                      setGoblinLanded(false);
                       setInvasion({ dueDay: currentDay + INVASION_WARNING_DAYS, startDay: currentDay });
-                      // The threat lands in the ledger. If the player had the ledger closed, it opens to show the new row,
-                      // then closes again after a second; if it was already open, it stays open.
-                      if (!panels.visible.events) {
-                        panels.set('events', true);
-                        window.setTimeout(() => panels.set('events', false), LEDGER_PEEK_MS);
-                      }
+                      // The threat lands in the ledger: it opens and stays open, the card folds into the new row.
+                      // The player closes it when they want.
+                      setRowArriving(true);
+                      if (!panels.visible.events) panels.set('events', true);
                     }}
-                    onClose={() => setCardOpen(false)}
+                    onClose={() => {
+                      setCardOpen(false);
+                      setRowArriving(false);
+                    }}
                   />
                 </div>
                 {session.overlays}
                 {expeditionGoblin.overlays}
                 {expeditionRovine.overlays}
-                {activeQuestRun.run && panels.visible.quest && (
-                  <QuestRunWindow
-                    run={activeQuestRun.run}
-                    phases={activeQuestRun.phases}
-                    beats={scenarioForQuest(activeQuestId)?.beats ?? GOBLIN_SCENARIO.beats}
-                    queuedBeats={activeQuestRun.beats}
-                    beatTiming={questWindow.beats}
-                    title={scenarioForQuest(activeQuestId)?.title ?? GOBLIN_SCENARIO.title}
-                    flavour={scenarioForQuest(activeQuestId)?.flavour ?? ''}
-                    scenario={scenarioForQuest(activeQuestId)}
-                    artFor={(nodeId) => NODE_ART[nodeId]?.src}
-                    time={questRunTime}
-                    onChoose={(optionId) => activeQuestRun.choose(optionId, { useConsumable: questArmed })}
-                    armed={questArmed}
-                    onToggleArmed={() => setQuestArmed((on) => !on)}
-                    onUseHealing={activeQuestRun.useHealing}
-                    onDrinkPotion={activeQuestRun.drinkPotion}
-                    onClose={() => panels.set('quest', false)}
-                    anchor={{ left: roster.leftPx + roster.widthPx + questDetail.gapPx, top: questWindow.topPx }}
-                    widthPx={questWindow.widthPx}
-                    theaterAspect={questWindow.theaterAspect}
-                    tooltipLines={questWindow.tooltipLines}
+                {/* SP-1: the hero sheet floats over the map, rail-adjacent to the
+                 *  card under the pointer. */}
+                {heroSheet.panelNode}
+                {/* SP-2: the village stash mock panel — modeless, anchored at the
+                 *  corridor's left edge, coexists with the quest window. */}
+                {panels.visible.villageStash && (
+                  <VillageStashPanel
+                    config={VILLAGE_STASH_CONFIG}
+                    left={roster.leftPx + roster.widthPx + questDetail.gapPx}
+                    top={questDetail.topPx}
+                    widthPx={Math.min(VILLAGE_STASH_CONFIG.panel.widthPx, window.innerWidth - insets.edgeInsetPx * 2)}
                     zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
+                    onClose={closeVillageStash}
                   />
                 )}
+                {/* SP-3: the merchant mock panel — same corridor convention,
+                 *  offset so an open stash is never hidden underneath it. */}
+                {panels.visible.merchant && (
+                  <MerchantPanel
+                    config={MERCHANT_CONFIG}
+                    left={roster.leftPx + roster.widthPx + questDetail.gapPx + 36}
+                    top={questDetail.topPx + 44}
+                    widthPx={Math.min(MERCHANT_CONFIG.panel.widthPx, window.innerWidth - insets.edgeInsetPx * 2)}
+                    zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
+                    onClose={closeMerchant}
+                  />
+                )}
+                {/* PLAN-034 T-010: dev/Director staging of the loss takeover —
+                 *  fires only when `gameOverState` says so; no canonical
+                 *  day-30 path exists yet. */}
+                <SettlementLostOverlay />
+                {questWindowNode}
                 {directorEnabled && panels.visible.tuning && (
                   <TuningPanel
                     fields={tuningFields}
-                    notice={reducedMotion ? 'Reduce motion is ON in the system settings: forest sway, smoke, cloud drift and sea wonders are off.' : undefined}
+                    notice={tuningBakeFailed ? t('gameFrame.tuning.bakeFailed') : reducedMotion ? 'Reduce motion is ON in the system settings: forest sway, smoke, cloud drift and sea wonders are off.' : undefined}
                     onCommit={(id, value) => (id === 'plaqueBand' ? setHudBandPx(value) : setTuned((current) => ({ ...current, [id]: value })))}
                     onReset={() => {
                       setTuned({});
@@ -881,6 +1173,18 @@ export default function GameFramePixiPage() {
                     onSave={() => {
                       void saveData(TUNING_KEY, { tuned, band: bandNow });
                       void navigator.clipboard?.writeText(tuningFields.map((field) => `${field.id}: ${field.value}`).join(', '));
+                      /* R-181: «Save» also bakes the tuned values into the shipped defaults — the dev endpoint
+                       * rewrites worldDressing.motion/seabed, DEFAULT_MAP_TUNE and DEFAULT_HUD_BAND_PX, so the
+                       * chosen look is the default on every surface and session, not just this browser's
+                       * storage. The storage save above stays as the runtime fallback for non-dev surfaces. */
+                      setTuningBakeFailed(false);
+                      void fetch('/__hud-tuning-default', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ values: Object.fromEntries(tuningFields.map((field) => [field.id, field.value])) }),
+                      })
+                        .then((res) => setTuningBakeFailed(!res.ok))
+                        .catch(() => setTuningBakeFailed(true));
                       setTuningSaved(true);
                       window.setTimeout(() => setTuningSaved(false), 1800);
                     }}

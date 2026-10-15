@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { HUD_PANELS } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
+import { ENGRAVED_ICON_IDS } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { BASE_SKIN_CSS_VARS } from '@/ui/idleVillage/skins/skinCssVariables';
 
 /**
@@ -20,8 +21,30 @@ const STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/HudPanelsMenu.tsx',
   'src/ui/idleVillage/components/gameFrame/HudGameMenu.tsx',
   'src/ui/idleVillage/components/gameFrame/WhenWhereCluster.tsx',
+  'src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx',
+  'src/ui/idleVillage/components/gameFrame/resourceReadoutItems.tsx',
+  'src/ui/idleVillage/components/gameFrame/GameFrameDragCursor.tsx',
+  'src/ui/idleVillage/components/gameFrame/engravedIcons.tsx',
+  'src/ui/idleVillage/components/gameFrame/HudEventLedger.tsx',
   'src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx',
   'src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx',
+  // PLAN-032 SP-1 — the hero sheet plaque.
+  'src/ui/idleVillage/components/gameFrame/HeroSheetPanel.tsx',
+  // PLAN-032 SP-2 — the village stash plaque and its reusable building POI marker.
+  'src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx',
+  'src/ui/idleVillage/components/gameFrame/MapBuildingPoi.tsx',
+  'src/ui/idleVillage/components/gameFrame/villageStashItemIcons.tsx',
+  // PLAN-032 SP-3 — the merchant mock storefront.
+  'src/ui/idleVillage/components/gameFrame/MerchantPanel.tsx',
+  'src/ui/idleVillage/components/gameFrame/MockBuyControl.tsx',
+  'src/ui/idleVillage/components/gameFrame/merchantOfferIcons.tsx',
+  // PLAN-032 SP-4 — the read-only bag strip inside QuestRunWindow.
+  'src/ui/idleVillage/components/gameFrame/BagStrip.tsx',
+  // PLAN-032 SP-5 — the hero level-up decorative layer (rosterV2, same material).
+  'src/ui/idleVillage/rosterV2/HeroLevelDecor.tsx',
+  // PLAN-032 SP-4 — the read-only consumables strip in the quest window.
+  'src/ui/idleVillage/components/gameFrame/BagStrip.tsx',
+  'src/ui/idleVillage/components/gameFrame/questBag.ts',
   'src/ui/idleVillage/quests/QuestExpeditionDetail.tsx',
   // PLAN-024 — Quest S1 Lab HUD (full-page action screens, same material).
   'src/ui/idleVillage/questS1Lab/hud/atoms.tsx',
@@ -38,23 +61,38 @@ const STRICT_FILES = [
   'src/ui/idleVillage/questS1Lab/hud/TransitView.tsx',
   'src/ui/idleVillage/questS1Lab/hud/VerdictCard.tsx',
 ];
+const ROSTER_V2_FILES = [
+  'src/ui/idleVillage/rosterV2/DragTestContainerV2.tsx',
+  'src/ui/idleVillage/rosterV2/WanderlustRosterCardV2.tsx',
+];
 const TOKEN_FILES = [
   ...STRICT_FILES,
   'src/ui/idleVillage/components/gameFrame/GameFrame.tsx',
-  'src/ui/idleVillage/components/gameFrame/HudEventLedger.tsx',
   'src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx',
   'src/ui/idleVillage/skins/skinScope.css',
+  // PLAN-058 — the Roster V2 is the reference the HUD tokens are measured on.
+  ...ROSTER_V2_FILES,
 ];
 
 describe('HUD guards', () => {
   it('defines every --skin-hud-* token that the HUD files read', () => {
     const missing: string[] = [];
     for (const file of TOKEN_FILES) {
-      for (const match of read(file).matchAll(/var\((--skin-hud-[a-z0-9-]+)/g)) {
+      // `var(--x)` in CSS/inline styles, `p-(--x)` in Tailwind v4 classes.
+      for (const match of read(file).matchAll(/(?:var\(|-\()(--skin-hud-[a-z0-9-]+)/g)) {
         if (!(match[1] in BASE_SKIN_CSS_VARS)) missing.push(`${file}: ${match[1]}`);
       }
     }
     expect(missing).toEqual([]);
+  });
+
+  it('makes the Roster V2 and the HUD controls read every layout and type token measured on the Roster', () => {
+    const sources = [...ROSTER_V2_FILES, 'src/ui/idleVillage/skins/skinScope.css'].map(read).join('\n');
+    const measured = Object.keys(BASE_SKIN_CSS_VARS).filter((name) =>
+      /^--skin-hud-(plaque-clearance|panel-|stack-|control-|inline-|row-|bar-|title-|name-|caps-|engrave)/.test(name),
+    );
+    expect(measured.length).toBeGreaterThan(0);
+    expect(measured.filter((name) => !sources.includes(`(${name})`) && !sources.includes(`(${name},`))).toEqual([]);
   });
 
   it('keeps colour literals out of the HUD files built on the material', () => {
@@ -69,7 +107,7 @@ describe('HUD guards', () => {
 
   it('never sets text under 12px in the HUD files', () => {
     const offenders: string[] = [];
-    const files = [...STRICT_FILES, 'src/ui/idleVillage/components/gameFrame/HudEventLedger.tsx', 'src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx'];
+    const files = [...STRICT_FILES, 'src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx'];
     for (const file of files) {
       const code = stripComments(read(file));
       for (const match of code.matchAll(/fontSize:\s*'?(\d+(?:\.\d+)?)(?:px)?'?(?![\d.]|em|rem|%)|font-size:\s*(\d+(?:\.\d+)?)px|text-\[(\d+(?:\.\d+)?)px\]/g)) {
@@ -96,5 +134,34 @@ describe('HUD guards', () => {
       const missing = HUD_PANELS.filter((panel) => !names[panel.id]).map((panel) => `${locale}: ${panel.id}`);
       expect(missing).toEqual([]);
     }
+  });
+
+  // PLAN-058 T3.2 — the engraved set (bible §11.6) replaces lucide-react and the stroke glyphs in the /game HUD.
+  it('keeps lucide-react out of the HUD components of /game', () => {
+    const dir = 'src/ui/idleVillage/components/gameFrame';
+    const offenders = readdirSync(resolve(ROOT, dir))
+      .filter((name) => /\.(tsx?|css)$/.test(name))
+      .filter((name) => /from\s+['"]lucide-react['"]/.test(read(`${dir}/${name}`)))
+      .map((name) => `${dir}/${name}`);
+    expect(offenders).toEqual([]);
+  });
+
+  it('draws the Roster V2 icons from the engraved set, not from gameIcons', () => {
+    for (const file of ROSTER_V2_FILES) expect(read(file), file).not.toContain('components/gameIcons');
+  });
+
+  it('draws the engraved icons solid: no stroke, no colour literal, only currentColor', () => {
+    for (const file of ['engravedIcons.tsx', 'hudIcons.tsx']) {
+      const code = stripComments(read(`src/ui/idleVillage/components/gameFrame/${file}`));
+      expect(code, file).not.toMatch(/\bstroke(?:-?Width|-?Linecap|-?Linejoin)?\s*[=:]/);
+    }
+    expect(read('src/ui/idleVillage/components/gameFrame/engravedIcons.tsx')).toContain('fill="currentColor"');
+  });
+
+  it('has an engraved glyph for every incised entry of the icon registry', () => {
+    const registry = read('src/docs/docs/art-direction/icons/registry.yaml');
+    const incised = [...registry.matchAll(/\{id: ([a-z-]+), livello: incisa/g)].map((match) => match[1]);
+    expect(incised.length).toBeGreaterThan(0);
+    expect(incised.filter((id) => !(ENGRAVED_ICON_IDS as string[]).includes(id))).toEqual([]);
   });
 });

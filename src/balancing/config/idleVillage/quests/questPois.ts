@@ -126,6 +126,14 @@ export const QuestPoiSchema = z
      * window is still open; a stale consumed record is ignored.
      */
     repeatable: z.boolean().optional(),
+    /**
+     * Weight of the offer on the map (poi_family_spec §Quest tier, Director
+     * 2026-10-13). Absent = `normal`: its halo appears only in the last stretch
+     * of the window. `main` = a much longer window, drawn one size up, with the
+     * deadline halo full from the moment it appears and draining over the whole
+     * window.
+     */
+    tier: z.enum(['normal', 'main']).optional(),
   })
   .strict()
   .refine((p) => p.availableUntilDay > p.availableFromDay, {
@@ -139,10 +147,37 @@ export const QuestPoiSchema = z
 export type QuestPoi = z.infer<typeof QuestPoiSchema>;
 
 /**
+ * Max redraw cadence of the run halo on the map marker, in wall-clock ms.
+ * The game clock ticks faster than the medallion SVG subtree can be
+ * re-rendered (~50 seal attribute writes per render — the `map-quest-poi`
+ * mutation storm of the PLAN-034 T-002/T-004 trace), so `poiView` and the
+ * offer's availability are sampled at this cadence: a halo step lands ~4x/sec,
+ * imperceptible at medallion size, and React bails out of the marker subtree
+ * on the in-between ticks.
+ */
+export const QUEST_HALO_RENDER_MS = 500;
+
+/**
+ * Discrete fill steps of the run halo — the medallion rim carries ~24 letters,
+ * so anything finer than its inscription grid is invisible anyway. The seal's
+ * displayed fraction is quantised to this grid: between steps the marker
+ * subtree is referentially stable and the SVG is not re-rendered at all
+ * (PLAN-034 T-005 — the seal's ~50 attribute writes per render were the
+ * dominant DOM churn in the T-002 trace).
+ */
+export const QUEST_HALO_STEPS = 24;
+
+/**
  * The two offers of the S2 slice. Positions are authored world-px
  * coordinates on the `/game` map (Director may relocate); the windows are
  * generous — availability pressure is not the mechanic being sliced.
+ * `SLICE_OFFER_WINDOW_DAYS` keeps the offers effectively open: the
+ * compressed village clock (5 ticks/day) burned a 60-day window in ~5 real
+ * minutes, so a save older than that never showed a quest marker (R-180).
+ * The expiry path itself stays exercised by `questAvailability` tests.
  */
+const SLICE_OFFER_WINDOW_DAYS = 10_000;
+
 export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
   {
     id: 'poi-goblin',
@@ -151,7 +186,7 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
     sizePx: 55,
     questId: 'goblin',
     availableFromDay: 0,
-    availableUntilDay: 60,
+    availableUntilDay: SLICE_OFFER_WINDOW_DAYS,
     estimatedDurationTicks: 110,
     ticksPerNode: 10,
     /* 11 nodes = the median path of the reference line (pursue the goblins, stop
@@ -169,7 +204,7 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
     sizePx: 55,
     questId: 'rovine',
     availableFromDay: 0,
-    availableUntilDay: 60,
+    availableUntilDay: SLICE_OFFER_WINDOW_DAYS,
     estimatedDurationTicks: 100,
     ticksPerNode: 10,
     expectedPathNodes: 10,

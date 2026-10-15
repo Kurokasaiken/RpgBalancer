@@ -1,8 +1,19 @@
-# Prompt — hud-resource-icons (canonical base)
+# Prompt — hud-resource-icons
 
-The canonical prompt is the base recipe; each resource run passes its emblem
-subject through `--prompt` while this file keeps the spec gate satisfied.
+> **Aggiornato 2026-10-13 (PLAN-058 T2.6).** I prompt canonici delle tre risorse sono quelli
+> generati dal kit d'icona, uno per risorsa, in tre varianti (GPT image, Gemini, Grok):
+>
+> - `.mw/specs/icons/res-gold/prompt.md`
+> - `.mw/specs/icons/res-food/prompt.md`
+> - `.mw/specs/icons/res-wood/prompt.md`
+>
+> Per cambiarli: riga `soggetto` in `src/docs/docs/art-direction/icons/registry.yaml`, poi
+> `python scripts/gen-icon-prompts.py` e `python scripts/lint-icon-prompts.py`.
+
+Il blocco sotto resta solo per la pipeline SDXL locale (`scripts/rpg-gen-mockup.py
+--enforce-canon`, limite ~77 token), allineato al kit: oggetto solo, niente bordo.
+Il soggetto della risorsa si passa con `--prompt`.
 
 ```text
-2D painted fantasy game HUD icon, a circular medallion with a worn baroque sun-bronze rim, dark teal lacquer disc inside, painted emblem centered in warm golden light, oil painting, rich impasto, single object on pure black background, game asset icon, no text
+2D painted fantasy game icon, single object centred front view, worn cast bronze with deep teal lacquer in the recesses, warm light from upper left, oil impasto, crisp silhouette, no frame, no rim, no text, plain magenta background
 ```

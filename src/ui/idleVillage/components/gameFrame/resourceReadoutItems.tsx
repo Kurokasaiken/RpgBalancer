@@ -3,6 +3,9 @@ import type { ResourceOutlook } from '@/store/useMinimalGameplay';
 import { HudGlyph } from './hudIcons';
 import type { ResourceReadoutItem } from './ResourceReadout';
 
+/** The readout sizes the icon box; the glyph fills it. */
+const FILL = { width: '100%', height: '100%' } as const;
+
 /**
  * Turns `selectResourceOutlook` into readout items: amount, trend line, tone, and a
  * full sentence for hover / screen readers. `t` must be bound to the `idleVillage`
@@ -17,7 +20,7 @@ export function buildResourceReadoutItems(outlook: ResourceOutlook, t: TFunction
       (incoming > 0 ? ` ${t('gameFrame.resources.tooltip.incoming', { count: incoming })}` : '');
     return {
       id,
-      icon: <HudGlyph iconId={id} label={label} />,
+      icon: <HudGlyph iconId={id} label={label} style={FILL} />,
       label,
       value,
       detail: incoming > 0 ? t('gameFrame.resources.incoming', { count: incoming }) : undefined,
@@ -31,7 +34,7 @@ export function buildResourceReadoutItems(outlook: ResourceOutlook, t: TFunction
   const lasts = Number.isFinite(food.daysLeft);
   const foodItem: ResourceReadoutItem = {
     id: 'food',
-    icon: <HudGlyph iconId="food" label={foodLabel} />,
+    icon: <HudGlyph iconId="food" label={foodLabel} style={FILL} />,
     label: foodLabel,
     value: food.value,
     max: food.max,

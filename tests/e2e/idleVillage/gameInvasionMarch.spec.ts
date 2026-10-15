@@ -1,6 +1,7 @@
 /**
  * PLAN-033 — BV-4 (the goblin marches from the landing point to the village over the march window, and the
- * march state survives a reload) and BV-5 (the event ledger opens for a new event and closes again if it was closed).
+ * page opens with no goblin: the invasion is not restored on reload) and BV-5 (the event ledger opens for a new event and stays open — Director, 2026-10-14: the card folds into its row,
+ * so the ledger can no longer close again after a second).
  */
 import { expect, test, type Page } from '@playwright/test';
 
@@ -74,28 +75,28 @@ test.describe('invasion march — BV-4', () => {
     expect(Math.hypot(at30.x - at0.x, at30.y - at0.y)).toBeGreaterThan(tol);
   });
 
-  test('the march start day is saved, so a reload keeps the same march origin', async ({ page }) => {
+  test('a reload opens a clean map: no goblin until an invasion is triggered', async ({ page }) => {
     await boot(page);
     await landInvasion(page);
-    const before = await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion?.());
+    await expect(page.getByTestId('invasion-goblin-marker')).toBeAttached();
     await page.reload();
     await page.waitForFunction(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion, { timeout: 30_000 });
-    await expect
-      .poll(async () => page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion?.()?.startDay ?? null), { timeout: 10_000 })
-      .toBe(before!.startDay);
-    /* Not asserted here: the game clock does not hydrate on reload (see R-119), so currentDay restarts and the marker
-     * re-derives from it. That is the open decision recorded in the BV record, not something this test can settle. */
+    // Director, 2026-10-14: the goblin sticker must not be on the map when the page opens. (It used to be restored from
+    // `invasion_v1` with a position derived from a clock that does not hydrate, R-119.)
+    await page.waitForTimeout(3_000);
+    await expect(page.getByTestId('invasion-goblin-marker')).toHaveCount(0);
+    expect(await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion?.() ?? null)).toBeNull();
   });
 });
 
 // The ledger is a section labelled with its title.
 const ledgerOpen = (page: Page) => page.getByRole('region', { name: 'Events', exact: true }).isVisible().catch(() => false);
 
-test.describe('event ledger peek — BV-5', () => {
+test.describe('event ledger — BV-5', () => {
   test.use({ locale: 'en-US' });
   const TITLE = 'Goblin host reaches the village';
 
-  test('a closed ledger opens for the new event, then closes again after a second', async ({ page }) => {
+  test('a closed ledger opens for the new event and stays open', async ({ page }) => {
     await boot(page);
     // The ledger is on by default; the `e` shortcut toggles it. Close it first if it is open.
     if (await ledgerOpen(page)) {
@@ -103,8 +104,11 @@ test.describe('event ledger peek — BV-5', () => {
       await expect.poll(() => ledgerOpen(page), { timeout: 3_000 }).toBe(false);
     }
     await landInvasion(page);
-    await expect(page.getByText(TITLE).first()).toBeVisible({ timeout: 3_000 });
-    await expect(page.getByText(TITLE).first()).toBeHidden({ timeout: 4_000 });
+    await expect(page.getByText(TITLE).first()).toBeVisible({ timeout: 4_000 });
+    // It used to close again after a second (peek). It now stays until the player closes it.
+    await page.waitForTimeout(3_000);
+    await expect(page.getByText(TITLE).first()).toBeVisible();
+    expect(await ledgerOpen(page)).toBe(true);
   });
 
   test('an open ledger stays open after the new event', async ({ page }) => {
