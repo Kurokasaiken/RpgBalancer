@@ -21,7 +21,7 @@ precacheAndRoute(self.__WB_MANIFEST);
  */
 
 // Service Worker version for update tracking
-const SW_VERSION = '1.1.0';
+const SW_VERSION = '1.1.1';
 const CACHE_VERSION_PREFIX = 'punch-club-v';
 const STATIC_CACHE = `${CACHE_VERSION_PREFIX}${SW_VERSION.replace(/\./g, '-')}`;
 const DYNAMIC_CACHE = `${CACHE_VERSION_PREFIX}${SW_VERSION.replace(/\./g, '-')}-dynamic`;

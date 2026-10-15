@@ -21,6 +21,7 @@ const STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/HudPanelsMenu.tsx',
   'src/ui/idleVillage/components/gameFrame/HudGameMenu.tsx',
   'src/ui/idleVillage/components/gameFrame/WhenWhereCluster.tsx',
+  'src/ui/idleVillage/components/gameFrame/HudEventLedger.tsx',
   'src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx',
   'src/ui/idleVillage/components/gameFrame/resourceReadoutItems.tsx',
   'src/ui/idleVillage/components/gameFrame/GameFrameDragCursor.tsx',
