@@ -119,6 +119,31 @@ Central documentation of all official project systems. Every UI task must verify
 
 ---
 
+## System: Foreground Windows / No Focus Stealing
+
+**Where it lives in code:**
+- Any `launch()` call (Puppeteer / Chrome for Testing, Playwright), screenshot/capture scripts, perf probes, `open`/`xdg-open` calls, `osascript activate`, `Page.bringToFront`
+- Env opt-in convention: `headless: process.env.HEADLESS !== 'false'` (reference: `scripts/visual/minimalGameplayBaselineRunner.ts`)
+- Static check: `npm run foreground:lint` (`scripts/foregroundLint.ts`)
+
+**Legacy deprecated pattern:**
+- `headless: false` hardcoded in scripts/tests
+- `open` without `-g` on macOS
+- `playwright --headed` / `--ui` / `--debug` launched by an agent
+- Any automation that opens a window in the foreground
+
+**Governing invariant:**
+- `.windsurf/rules/16-no-foreground-windows.md`
+- `.windsurf/rules/00-project-invariants.md` → "Foreground windows" section
+
+**Adoption status:** ✅ ADOPTED (Director ruling 2026-10-15, R-198 — port of Mind Weaver CTR-foreground-001)
+- An agent must never open a window/app/browser in the foreground automatically
+- All automated browser runs are headless or background
+- Headed mode only via explicit Director opt-in (`HEADLESS=false`, manual headed npm scripts)
+- Plans/specs must state headless-only verification; a visible window is a manual Director step
+
+---
+
 ## Usage Guidelines
 
 ### Before drafting any UI task:
@@ -149,3 +174,4 @@ When a new cross-cutting system becomes mandatory:
 ## Last Updated
 
 2026-07-14 - Initial creation with 5 systems documented
+2026-10-15 - Added "Foreground Windows / No Focus Stealing" system (R-198, CTR-foreground-001)

@@ -14,7 +14,7 @@ async function runDragDebugTest() {
   try {
     // Avvia il browser
     browser = await chromium.launch({ 
-      headless: false, // Mostra il browser per debug
+      headless: process.env.HEADLESS !== 'false', // HEADLESS=false mostra il browser per debug
       slowMo: 100 // Rallenta per vedere meglio
     });
     

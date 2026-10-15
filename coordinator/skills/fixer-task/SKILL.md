@@ -24,6 +24,7 @@ Automate the "apri → leggi errore → risolvi → riesegui" loop across every 
 - `material-canvas-v2.html`
 - `.windsurf/plans/style-lab-wanderlust-refinement-9c241b.md`
 - `src/docs/docs/QA/test-route-drag-guidelines.md` (obbligatorio se i fix toccano la pagina `/test`, harness drag, o suite Playwright correlate)
+- `.windsurf/rules/16-no-foreground-windows.md` (mai aprire finestre in primo piano: fix e verifiche sempre headless/background)
 
 Before touching code, list these references at the top of your fixer notes (marking “N/A – backend-only” only when verified) and cite them in the evidence log under a "Docs Consulted" section.
 

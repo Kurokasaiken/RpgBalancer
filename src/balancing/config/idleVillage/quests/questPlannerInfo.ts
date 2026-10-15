@@ -47,6 +47,41 @@ export const QuestPlannerInfoConfigSchema = z
       .strict(),
     /** Cap on authored `previewHint`s shown at planning (overflow guard). */
     maxPreviewHints: z.number().int().min(1).max(50),
+    /**
+     * Two-plaque assembly geometry (PLAN-036, R-195): the planner is a main
+     * plaque (party + bag + anchored CTA) plus a right-hand forecast
+     * sidecar, dragged as one union by `useHudPanelDrag({ shellRef })`.
+     */
+    layout: z
+      .object({
+        /** Left (main) plaque width. */
+        mainWidthPx: z.number().int().min(300).max(700),
+        /** Right (forecast sidecar) plaque width. */
+        sidecarWidthPx: z.number().int().min(240).max(600),
+        /** Air between the two plaques. */
+        gapPx: z.number().int().min(0).max(40),
+        /**
+         * Zero-overflow regime boundary (WITNESS-12): at
+         * `viewportHeight >= minZeroScrollViewportHeightPx` the left plaque
+         * must render with `scrollHeight <= clientHeight + 1`; below it the
+         * middle body scrolls internally (the CTA footer stays anchored
+         * either way).
+         */
+        minZeroScrollViewportHeightPx: z.number().int().min(400).max(1600),
+        /** Cinematic banner ratio (≈21:9) and height cap under the subtitle. */
+        cinemaAspect: z.number().min(1.5).max(4),
+        cinemaMaxHeightPx: z.number().int().min(60).max(300),
+        /** Reserved vertical chrome (top anchor + breathing room): each
+         *  plaque's `maxHeight` is `calc(100vh - plaqueViewportMarginPx)`. */
+        plaqueViewportMarginPx: z.number().int().min(40).max(300),
+      })
+      .strict(),
+    /**
+     * A key stat counts as party-covered when at least one assigned member's
+     * stat meets this bar (bag coverage via `loadoutCoverage` also counts —
+     * deterministic rule in `deriveKeyStats`'s consumer).
+     */
+    keyStatCoverageThreshold: z.number().int().min(0).max(100),
     /** OUTCOME zone contract (PLAN-019-S3 T-2): BY MEMBER + WHY live inside
      *  a scrollable analysis region — the panel's header, slot rack and
      *  send stay anchored (same pattern as QuestRunWindow D-7). */
@@ -83,6 +118,20 @@ export const QUEST_PLANNER_INFO: QuestPlannerInfoConfig = QuestPlannerInfoConfig
     maxRevealedHints: 12,
   },
   maxPreviewHints: 12,
+  layout: {
+    /* 460 + 340 + 10 = 810px assembly — centered, it fits a 1280 viewport
+     *  with ~235px air each side; under ~834px the wrapper wraps the
+     *  sidecar below the main plaque (BV-1/BV-4 contract). */
+    mainWidthPx: 460,
+    sidecarWidthPx: 340,
+    gapPx: 10,
+    minZeroScrollViewportHeightPx: 720,
+    /* ~21:9 — same cinema scope family as `questWindow.theaterAspect`. */
+    cinemaAspect: 2.76,
+    cinemaMaxHeightPx: 136,
+    plaqueViewportMarginPx: 104,
+  },
+  keyStatCoverageThreshold: 55,
   outcome: {
     maxWhySources: 5,
     /* Party max = 4 slots (goblin/rovine): aggregate chips (~30) + BY

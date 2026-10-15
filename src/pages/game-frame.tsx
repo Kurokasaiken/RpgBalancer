@@ -67,16 +67,27 @@ export interface GameFrameScreenProps {
   timeInputLocked?: boolean;
   /** Reports HUD chrome visibility changes to the page (ambient effects, ambience cues). */
   onHudHiddenChange?: (hidden: boolean, cause: 'manual' | 'idle') => void;
+  /** Controlled nav selection (e.g. the page owns the map/village view switch, PLAN-035). Omit for internal state. */
+  activeNavId?: string;
+  /** Nav-select callback in controlled mode; receives the clicked item id. */
+  onNavSelect?: (id: string) => void;
 }
 
-export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, fixtureEvents: withFixtures = true, objective, panels: panelsProp, devPanels = false, skinControl, scaleControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange }: GameFrameScreenProps) {
+export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, fixtureEvents: withFixtures = true, objective, panels: panelsProp, devPanels = false, skinControl, scaleControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange, activeNavId: activeNavIdProp, onNavSelect: onNavSelectProp }: GameFrameScreenProps) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
   useTimeEngineLoop(gameplay, { inputLocked: timeInputLocked });
   const Roster = useHudMaterial() === 'lacquer' ? MatericRosterComponentV2 : MatericRosterComponent;
 
-  const [activeNavId, setActiveNavId] = useState('map');
+  /* Controlled or internal nav (PLAN-035): the page may own the selection so
+   * a click on the painted village region can switch the view too. */
+  const [internalNavId, setInternalNavId] = useState('map');
+  const activeNavId = activeNavIdProp ?? internalNavId;
+  const handleNavSelect = (id: string) => {
+    if (activeNavIdProp === undefined) setInternalNavId(id);
+    onNavSelectProp?.(id);
+  };
   // Fixture: no event system exists yet (R-071). Replace with the real feed when it lands.
   const fixtureEvents = useMemo(
     () => [
@@ -152,7 +163,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
         }
         navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
         activeNavId={activeNavId}
-        onNavSelect={setActiveNavId}
+        onNavSelect={handleNavSelect}
         whenWhereSlot={
           <WhenWhereCluster
             isDayPhase={state.isDayPhase}

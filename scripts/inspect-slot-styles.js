@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 
 async function inspectSlotStyles() {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: process.env.HEADLESS !== 'false' });
   const page = await browser.newPage();
 
   try {

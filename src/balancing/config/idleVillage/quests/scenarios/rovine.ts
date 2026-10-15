@@ -295,6 +295,12 @@ export const ROVINE_SCENARIO_AUTHORED = {
   scenarioVersion: 's2.1-rovine-v1',
   startNode: 'rv-mercante',
   primaryStats: ['str', 'con'] as LabStat[],
+  /* PLAN-036 (R-195): planner key-stat tiers per spec §0 — Forza primary;
+   * Percezione, Costituzione, Destrezza secondary. `con` is BOTH a frozen
+   * primaryStats member AND a secondary display tier — that's legal:
+   * `secondary` has no subset constraint, only tier disjointness vs
+   * `keyStats.primary`. */
+  keyStats: { primary: ['str'], secondary: ['perc', 'con', 'agi'] },
   beats: [
     'The merchant',
     'The river',
@@ -360,6 +366,10 @@ export const ROVINE_SCENARIO_AUTHORED = {
     ],
     dangerBandRef: 'media',
     rewardBase: 100,
+    /* PLAN-036: ~21:9 planner banner. NOTE — the directory's historical
+     * spelling is `quest-robine` (on disk since 2026-10-05); do NOT
+     * "fix" it — renaming would orphan committed references. */
+    coverArt: '/assets/quest-robine/rovine-hero.jpg',
   },
   nodes: ROVINE_NODES,
 } satisfies Omit<QuestScenario, 'primaryStats'> & { primaryStats: LabStat[] };

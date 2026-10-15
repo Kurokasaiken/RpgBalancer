@@ -15,6 +15,8 @@ import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { defaultQuestItems } from '@/balancing/config/idleVillage/quests/questItems';
 import type { QuestItem } from '@/balancing/config/idleVillage/quests/questItems.schema';
+import type { LabStat } from '@/ui/idleVillage/questS1Lab/questScenario';
+import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 
 /** Slot shape the boundary needs — decoupled from the controller's view
  *  model so tests build it directly. */
@@ -115,6 +117,44 @@ export function loadoutDuration(
   const nodeTicks = Math.max(1, Math.round(baseNodeTicks * mult + delta));
   const factor = baseNodeTicks > 0 ? nodeTicks / baseNodeTicks : 1;
   return { nodeTicks, estimatedTicks: Math.max(1, Math.round(baseEstimatedTicks * factor)), factor };
+}
+
+/* ------------------------------------------------------------------ */
+/* Key-stat display tiers (PLAN-036, R-195).                            */
+/* ------------------------------------------------------------------ */
+
+/** One village-stocked consumable offered to the expedition bag (PLAN-036,
+ *  R-195): the warehouse shelf row joined to its catalog entry — `qty`
+ *  feeds the picker's stock badge. Source of truth: `VILLAGE_STASH_CONFIG`
+ *  (its schema already guarantees a bag-legal consumable). */
+export interface BagStockEntry {
+  item: QuestItem;
+  qty: number;
+}
+
+/** Primary/Secondary tier pair the forecast sidecar renders. */
+export interface KeyStatTiers {
+  primary: LabStat[];
+  secondary: LabStat[];
+}
+
+/**
+ * Resolves the scenario's planner key-stat tiers. Authored `keyStats` wins
+ * verbatim (the refined contract — disjoint tiers, `primary ⊆ primaryStats`
+ * — is a parse-time guarantee). Absent ⇒ deterministic presentation-only
+ * fallback over the frozen `primaryStats` (NEVER mutated):
+ *   `primary   = [primaryStats[0]]`             (index 0 exists — min(1))
+ *   `secondary = primaryStats.slice(1).filter(s => s !== primaryStats[0])`
+ * — disjoint by construction even when a legacy array duplicates a stat.
+ * @param scenario Parsed scenario (or `undefined` while it resolves).
+ * @returns The tiers to display; `primary: []` only when no scenario exists.
+ */
+export function deriveKeyStats(scenario: Pick<QuestScenario, 'primaryStats' | 'keyStats'> | undefined): KeyStatTiers {
+  if (scenario?.keyStats) return { primary: scenario.keyStats.primary, secondary: scenario.keyStats.secondary };
+  const stats = scenario?.primaryStats ?? [];
+  const head = stats[0];
+  if (!head) return { primary: [], secondary: [] };
+  return { primary: [head], secondary: stats.slice(1).filter((s) => s !== head) };
 }
 
 /**

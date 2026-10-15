@@ -37,6 +37,7 @@ Format: `[filename](path) — one sentence — \`tag\``
 [src/docs/docs/design/primitive_composition_rules.md](src/docs/docs/design/primitive_composition_rules.md) — come comporre MatericSurface/Inset/Frame, colori di fondo — `design` `primitives` `guide`
 [src/docs/docs/idle_village/quest_ui_component_guide.md](src/docs/docs/idle_village/quest_ui_component_guide.md) — guida componenti quest: cockpit, eventi strutturati, canale danno — `design` `quest` `guide`
 [.windsurf/rules/00-project-invariants.md](.windsurf/rules/00-project-invariants.md) — non-negotiable project constraints — `invariants`
+[.windsurf/rules/16-no-foreground-windows.md](.windsurf/rules/16-no-foreground-windows.md) — mai finestre in primo piano dall'automazione; headless/background di default, `foreground:lint` — `invariants` `governance`
 [.windsurf/rules/40-documentation-governance.md](.windsurf/rules/40-documentation-governance.md) — trusted/frozen doc policy — `governance`
 [.windsurf/rules/80-quest-rules-maintenance.md](.windsurf/rules/80-quest-rules-maintenance.md) — QUEST_RULES.md si aggiorna su nuove regole quest del Director; status vigente/proposta/divergenza, conflitto → domanda — `governance` `quest`
 [.windsurf/rules/85-documentation-impact.md](.windsurf/rules/85-documentation-impact.md) — contratto Documentation Impact dei piani (NONE/OPTIONAL/REQUIRED + routing degli update) — `governance` `documentation`
@@ -45,7 +46,7 @@ Format: `[filename](path) — one sentence — \`tag\``
 [coordinator/skills/strategist/SKILL.md](coordinator/skills/strategist/SKILL.md) — layer di direzione pre-desiderata: discussione libera, macro plan, handoff a desiderata (desiderata v26) — `skill` `strategy` `mind-weaver`
 [.windsurf/skills/coordinator-mandate/SKILL.md](.windsurf/skills/coordinator-mandate/SKILL.md) — task dispatch and Kanban — `skill` `dispatch`
 [.windsurf/skills/agent-execution-mandate/SKILL.md](.windsurf/skills/agent-execution-mandate/SKILL.md) — implementation execution — `skill` `execution`
-[.windsurf/skills/idle-village-task/SKILL.md](.windsurf/skills/idle-village-task/SKILL.md) — idle village specific tasks — `skill` `idle-village`
+[.windsurf/skills/idle-village-task/SKILL.md](.windsurf/skills/idle-village-task/SKILL.md) — task sul dominio di gioco: superficie `/game`, HUD Lacquer Atlas, quest runtime, roster, skin system, frozen kits — `skill` `idle-village` `game`
 [.windsurf/skills/mw-explorer/SKILL.md](.windsurf/skills/mw-explorer/SKILL.md) — Mind Weaver exploration workflow — `skill` `mind-weaver`
 [.windsurf/skills/mw-planner/SKILL.md](.windsurf/skills/mw-planner/SKILL.md) — Mind Weaver planning workflow — `skill` `mind-weaver`
 [.windsurf/skills/mw-executor/SKILL.md](.windsurf/skills/mw-executor/SKILL.md) — Mind Weaver execution workflow — `skill` `mind-weaver`

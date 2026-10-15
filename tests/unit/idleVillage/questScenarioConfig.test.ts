@@ -44,6 +44,7 @@ import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
 import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
+import { computeScenarioVersion, parseQuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import {
@@ -403,5 +404,54 @@ describe('offer slots — statMatching parsability', () => {
         expect(() => evaluateStatRequirement(emptyResident, slot.requirement)).not.toThrow();
       }
     }
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* (g) keyStats — planner display tiers (PLAN-036, R-195)               */
+/* ------------------------------------------------------------------ */
+
+describe('keyStats — authored display tiers (PLAN-036)', () => {
+  it('goblin authors Forza primary + Percezione secondary', () => {
+    expect(GOBLIN_SCENARIO.keyStats).toEqual({ primary: ['str'], secondary: ['perc'] });
+  });
+
+  it('rovine authors Forza primary + Percezione/Costituzione/Destrezza secondary', () => {
+    expect(ROVINE_SCENARIO.keyStats).toEqual({ primary: ['str'], secondary: ['perc', 'con', 'agi'] });
+  });
+
+  it('rejects overlapping tiers — a stat is primary or secondary, never both', async () => {
+    const { GOBLIN_SCENARIO_AUTHORED } = await import('@/balancing/config/idleVillage/quests/scenarios/goblin');
+    expect(() =>
+      parseQuestScenario({
+        ...GOBLIN_SCENARIO_AUTHORED,
+        keyStats: { primary: ['str'], secondary: ['str'] },
+      }),
+    ).toThrow();
+  });
+
+  it('rejects a displayed primary that is not a real scenario key stat', async () => {
+    const { GOBLIN_SCENARIO_AUTHORED } = await import('@/balancing/config/idleVillage/quests/scenarios/goblin');
+    expect(() =>
+      parseQuestScenario({
+        ...GOBLIN_SCENARIO_AUTHORED,
+        keyStats: { primary: ['int'], secondary: ['perc'] },
+      }),
+    ).toThrow();
+  });
+
+  it('keyStats is hashed — a tier change mints a new scenario digest', () => {
+    const a = computeScenarioVersion(GOBLIN_SCENARIO);
+    const b = computeScenarioVersion({ ...GOBLIN_SCENARIO, keyStats: { primary: ['str'], secondary: ['agi'] } });
+    expect(a).not.toBe(b);
+  });
+
+  it('coverArt is presentation-only — a reskin must not mint a new digest', () => {
+    const a = computeScenarioVersion(GOBLIN_SCENARIO);
+    const b = computeScenarioVersion({
+      ...GOBLIN_SCENARIO,
+      offer: { ...GOBLIN_SCENARIO.offer, coverArt: '/assets/other-banner.jpg' },
+    });
+    expect(a).toBe(b);
   });
 });

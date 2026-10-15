@@ -1,10 +1,22 @@
 /**
- * QuestRunWindow — the running quest, as a floating HUD panel on /game (R-106).
+ * QuestRunWindow — the running quest, as a floating HUD shell on /game
+ * (R-106, R-196/PLAN-035).
  *
  * Reading order, top to bottom (Director 2026-10-08):
  *   title + icons (roster assigned to the quest, bag, chronicle, minimise, close)
  *   → flavour → cinema-scope theater → what happened + the scene → choices
  *   → time bar (game clock, start → return) → phase tiles (played + next).
+ *
+ * R-196 shell contract:
+ * - ONE `[data-hud-panel]` wrapper carries the window and its companion
+ *   columns (`[data-hud-companion="left|right"]`) — the drag clamps the union
+ *   (`useHudPanelDrag` + `resolveQuestShellLayout`, never the 640px box alone).
+ * - NO `overflow` on `HudPlaque`: the SVG drop-shadow would clip to the
+ *   section's box (WebKit) and absolutely-placed companions would be cut off.
+ * - Party roster + belt stack LEFT, chronicle RIGHT — each independently
+ *   toggleable (`aria-expanded`/`aria-controls`), all open together by
+ *   default, auto-collapsed by the shared layout predicate on narrow
+ *   viewports.
  *
  * Material: `HudPlaque` panel, dragged by its title row (`useHudPanelDrag`) like
  * every HUD panel; colours only from `--skin-*` tokens; no text under 12px.
@@ -19,22 +31,21 @@ import { EngravedIcon, type EngravedIconId } from './engravedIcons';
 import { HudPlaque, SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { DamageFloater, EdgeFlash, Letterbox, TypewriterText, prefersReducedMotion, useBeatFx, type BeatFx } from '@/ui/idleVillage/skins/primitives';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { DEFAULT_QUEST_THEATRE_FX, type QuestTheatreFxConfig } from '@/balancing/config/idleVillage/quests/questTheatreFx';
-import { availableOptions, currentExposure, nextCombatHits, nodesFor, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import { availableOptions, beltItemStatuses, currentExposure, nextCombatHits, nodesFor, previewArmedActionItems, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { QuestEpilogue } from './QuestEpilogue';
 import { useBeatCursor, type BeatTiming, type HarmBeat, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import { HudChip, LOG_TONE, SCRIM, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
-import { ConsumableBelt } from '@/ui/idleVillage/questS1Lab/hud/ConsumableBelt';
-import { BagStrip, BAG_CHIP_ROW_PX } from './BagStrip';
-import { bagEverPacked, bagStripVisible, questBagItems } from './questBag';
+import { questBagItems } from './questBag';
 import { useHudPanelDrag } from './useHudPanelDrag';
-import PgCard from '@/ui/idleVillage/components/PgCard';
-import { useRosterKitData } from '@/ui/idleVillage/frozen/kits/rosterKit';
-import { formatResidentLabel } from '@/ui/idleVillage/residentName';
-import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
+import { resolveQuestShellLayout } from './questShellLayout';
+import { QuestBeltPlaque } from './QuestBeltPlaque';
+import { QuestPartyRosterPanel } from './QuestPartyRosterPanel';
+import { QuestLogPanel } from './QuestLogPanel';
 
 /** Verdict chip tone: the result reads at a glance, before its authored line. */
 const VERDICT_TONE: Record<Verdict, 'ok' | 'warn' | 'danger'> = { bigwin: 'ok', win: 'ok', almost: 'warn', fail: 'danger', epicfail: 'danger' };
@@ -43,6 +54,17 @@ const VERDICT_TONE: Record<Verdict, 'ok' | 'warn' | 'danger'> = { bigwin: 'ok', 
 const PHASE_ICONS: EngravedIconId[] = ['ico-scroll', 'evt-expedition', 'ico-pouch', 'ico-axe', 'evt-combat', 'ico-gust', 'ico-chest', 'nav-village'];
 
 const OUTCOME_TONE: Record<PhaseOutcome, keyof typeof TONE> = { death: 'death', hurt: 'warn', loot: 'label', clean: 'ok' };
+
+/** Shared "no items armed" set — the previews' consumable-free baseline. */
+const NO_ARMED: ReadonlySet<string> = new Set();
+
+/** Companion geometry fallback for harnesses — the canonical config values. */
+const DEFAULT_COMPANIONS = {
+  widthPx: DEFAULT_GAME_FRAME_CONFIG.questWindow.sidePanelWidthPx,
+  gapPx: DEFAULT_GAME_FRAME_CONFIG.questWindow.sidePanelGapPx,
+  minWidthPx: DEFAULT_GAME_FRAME_CONFIG.questWindow.minSidePanelWidthPx,
+  edgeInsetPx: DEFAULT_GAME_FRAME_CONFIG.questWindow.edgeInsetPx,
+};
 
 const FONT = {
   display: 'var(--skin-font-display)',
@@ -69,21 +91,23 @@ export interface QuestRunWindowProps {
   /** 0..1 of the expedition's time on the game clock, plus its readout. */
   time: { progress: number; label: string };
   onChoose: (optionId: string) => void;
-  /** Bag items armed for the next check — the player's call (R-106 playtest). */
-  armed: boolean;
-  onToggleArmed: () => void;
-  onUseHealing: () => void;
-  onDrinkPotion: () => void;
+  /** R-196: the per-item armed selection of the belt (`useQuestRun`). Optional
+   *  for harnesses that render the window without a live run — defaults to
+   *  "nothing armed" (the R-106 contract). */
+  armedFlags?: ReadonlySet<string>;
+  onToggleArmedFlag?: (flag: string) => void;
   onClose: () => void;
   /** Anchored position (the drag offset applies on top). */
   anchor: { left: number; top: number };
   widthPx: number;
   theaterAspect: number;
   tooltipLines: number;
+  /** Companion geometry + the shell's clamp inset
+   *  (`gameFrameConfig.questWindow.sidePanel*`/`edgeInsetPx`). Optional —
+   *  defaults to the canonical config so lab/test harnesses can omit it. */
+  companions?: { widthPx: number; gapPx: number; minWidthPx: number; edgeInsetPx: number };
   zIndex?: number;
 }
-
-type Pop = 'roster' | 'bag' | 'chronicle' | null;
 
 export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   run,
@@ -97,21 +121,55 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   artFor,
   time,
   onChoose,
-  armed,
-  onToggleArmed,
-  onUseHealing,
-  onDrinkPotion,
+  armedFlags = NO_ARMED,
+  onToggleArmedFlag,
   onClose,
   anchor,
   widthPx,
   theaterAspect,
   tooltipLines,
+  companions = DEFAULT_COMPANIONS,
   zIndex,
 }) => {
   const { t } = useTranslation('idleVillage');
-  const { panelStyle, handleProps } = useHudPanelDrag();
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  /* R-196: three companion panels, each independently toggleable — all open
+   * by default (the Director's "everything visible at once" preference). The
+   * shared layout predicate decides whether they MAY mount at this viewport. */
+  const [partyOpen, setPartyOpen] = useState(true);
+  const [beltOpen, setBeltOpen] = useState(true);
+  const [logOpen, setLogOpen] = useState(true);
+  const partyToggleRef = useRef<HTMLButtonElement | null>(null);
+  const beltToggleRef = useRef<HTMLButtonElement | null>(null);
+  const logToggleRef = useRef<HTMLButtonElement | null>(null);
+  /* Live viewport width — the companions fit/collapse on the SAME predicate
+   * the drag clamps against (WITNESS-01: no divergence between render and
+   * clamp). */
+  const [vw, setVw] = useState(() => (typeof window === 'undefined' ? 1280 : window.innerWidth));
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const layout = useMemo(
+    () =>
+      resolveQuestShellLayout(vw, {
+        widthPx,
+        sidePanelWidthPx: companions.widthPx,
+        sidePanelGapPx: companions.gapPx,
+        minSidePanelWidthPx: companions.minWidthPx,
+        edgeInsetPx: companions.edgeInsetPx,
+      }),
+    [vw, widthPx, companions],
+  );
+  const companionsFit = layout.companionsFit;
+  const sideWidth = layout.effectiveSideWidth;
+  const { panelStyle, handleProps } = useHudPanelDrag({
+    shellRef,
+    edgeInsetPx: companions.edgeInsetPx,
+    reclampDeps: [partyOpen, beltOpen, logOpen, companionsFit, sideWidth],
+  });
   const [minimised, setMinimised] = useState(false);
-  const [pop, setPop] = useState<Pop>(null);
   const allNodes = nodesFor(run);
   const node = allNodes[run.nodeId];
   const options = useMemo(() => availableOptions(run), [run]);
@@ -123,18 +181,38 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   const presenting = beatCursor.current !== null;
   // Cinema FX (T-009): the configured beat→fx mapping for the beat on stage.
   const beatFx = useBeatFx(beatCursor.current, DEFAULT_QUEST_THEATRE_FX);
-  // Previews once per run/arming change, not per render: base and armed side by side.
+  /* R-196 previews: the armed per-item set is the source of truth — check
+   *  items light their winner, action items pre-mutate a clone. `base` is the
+   *  same preview with an empty armed set (the "nothing spent" column). */
   const previews = useMemo(
     () =>
       Object.fromEntries(
         options.map((o) => {
-          const pv = previewOption(run, o.id, { useConsumable: armed });
-          const base = pv && armed && pv.consumableFlag ? previewOption(run, o.id, { useConsumable: false }) : null;
+          const pv = previewOption(run, o.id, { armedFlags });
+          const base = pv && pv.consumableFlag ? previewOption(run, o.id, { armedFlags: NO_ARMED }) : null;
           return [o.id, { pv, base }];
         }),
       ),
-    [run, options, armed],
+    [run, options, armedFlags],
   );
+  /* The checks every option on stage can reach — the belt's winner/shadowed/
+   * inert marking is computed against exactly this frontier (never a guess). */
+  const reachableChecks = useMemo(() => {
+    /* `availableOptions` drops `next` — join the visible, enabled option ids
+     * back to the node's option table to reach the check nodes. */
+    const byId = new Map((node?.options ?? []).map((o) => [o.id, o]));
+    return options
+      .filter((o) => !o.disabled)
+      .map((o) => byId.get(o.id)?.next)
+      .filter((n): n is string => !!n && n.startsWith('CHECK:'))
+      .map((n) => allNodes[n.slice(6)])
+      .filter((n): n is NonNullable<typeof n> => !!n);
+  }, [options, node, allNodes]);
+  const bag = useMemo(() => questBagItems(run.flags), [run.flags]);
+  const beltStatuses = useMemo(() => beltItemStatuses(run, reachableChecks, armedFlags), [run, reachableChecks, armedFlags]);
+  /* Action-item preview: the same deterministic step, on a clone — the
+   * roster's +HP chips read `memberDeltas`, the log stays clean. */
+  const actionPreview = useMemo(() => previewArmedActionItems(run, armedFlags), [run, armedFlags]);
   const waiting = !run.ended && options.length > 0;
   // What just happened: this action's checks speak through their authored verdict
   // lines; `lastEvent` only when it adds something (not the check summary, the
@@ -184,73 +262,144 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     return () => window.removeEventListener('keydown', onKey);
   }, [presenting, beatCursor]);
 
-  const shell: CSSProperties = { position: 'fixed', left: anchor.left, top: anchor.top, pointerEvents: 'auto', maxHeight: `calc(100vh - ${anchor.top}px - 12px)`, ...panelStyle, zIndex: panelStyle.zIndex ?? zIndex };
+  const shell: CSSProperties = { position: 'fixed', left: anchor.left, top: anchor.top, pointerEvents: 'auto', ...panelStyle, zIndex: panelStyle.zIndex ?? zIndex };
+  const plaqueMaxH = `calc(100vh - ${anchor.top}px - ${companions.edgeInsetPx}px)`;
+  const uid = React.useId();
+  const partyPanelId = `${uid}-party`;
+  const beltPanelId = `${uid}-belt`;
+  const logPanelId = `${uid}-log`;
+  /* Panel close → focus returns to its header toggle (WITNESS-04). */
+  const closeParty = () => {
+    setPartyOpen(false);
+    partyToggleRef.current?.focus();
+  };
+  const closeBelt = () => {
+    setBeltOpen(false);
+    beltToggleRef.current?.focus();
+  };
+  const closeLog = () => {
+    setLogOpen(false);
+    logToggleRef.current?.focus();
+  };
+  /* Focus hand-off (WITNESS-04): a choice commit takes focus to the beat
+   * stage's Continue button (or the live region); when the stage empties and
+   * focus was inside the shell, it settles on the narrative live region. */
+  const wasPresenting = useRef(false);
+  useEffect(() => {
+    const became = presenting && !wasPresenting.current;
+    const ended = !presenting && wasPresenting.current;
+    wasPresenting.current = presenting;
+    const shell = shellRef.current;
+    if (!shell) return;
+    if (became) {
+      (shell.querySelector<HTMLElement>('[data-testid="quest-window-beat-continue"]') ??
+        shell.querySelector<HTMLElement>('[data-testid="quest-window-stage"]'))?.focus({ preventScroll: true });
+    } else if (ended && shell.contains(document.activeElement)) {
+      shell.querySelector<HTMLElement>('[data-testid="quest-window-stage"]')?.focus({ preventScroll: true });
+    }
+  }, [presenting]);
+
+  const leftOpen = companionsFit && (partyOpen || beltOpen);
+  const rightOpen = companionsFit && logOpen;
 
   if (minimised) {
     return (
       <SkinScope>
-        <HudPlaque
-          shape="hang"
-          as="section"
-          aria-label={title}
-          data-testid="quest-window-minimised"
-          style={{ ...shell, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}
-        >
-          <div {...handleProps} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <EngravedIcon id="evt-combat" size={18} style={{ color: TONE.accent }} />
-            <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
-              {title}
-            </span>
-            <span style={{ fontFamily: FONT.display, fontSize: 12, color: TONE.secondary }}>
-              {Math.min(currentBeat + 1, beats.length)}/{beats.length}
-            </span>
-            {waiting && <span aria-label={t('gameFrame.questWindow.waiting')} title={t('gameFrame.questWindow.waiting')} style={{ width: 8, height: 8, borderRadius: 999, background: 'var(--skin-title-color)', boxShadow: '0 0 8px var(--skin-title-color)' }} />}
-            <span data-hud-controls="" style={{ display: 'inline-flex' }}>
-              <button type="button" aria-label={t('gameFrame.questWindow.restore')} title={t('gameFrame.questWindow.restore')} onClick={() => setMinimised(false)}>
-                <EngravedIcon id="ico-scroll" />
-              </button>
-            </span>
-          </div>
-        </HudPlaque>
+        <div data-hud-panel="quest" ref={shellRef} style={shell}>
+          <HudPlaque
+            shape="hang"
+            as="section"
+            aria-label={title}
+            data-testid="quest-window-minimised"
+            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}
+          >
+            <div {...handleProps} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <EngravedIcon id="evt-combat" size={18} style={{ color: TONE.accent }} />
+              <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
+                {title}
+              </span>
+              <span style={{ fontFamily: FONT.display, fontSize: 12, color: TONE.secondary }}>
+                {Math.min(currentBeat + 1, beats.length)}/{beats.length}
+              </span>
+              {waiting && <span aria-label={t('gameFrame.questWindow.waiting')} title={t('gameFrame.questWindow.waiting')} style={{ width: 8, height: 8, borderRadius: 999, background: 'var(--skin-title-color)', boxShadow: '0 0 8px var(--skin-title-color)' }} />}
+              <span data-hud-controls="" style={{ display: 'inline-flex' }}>
+                <button type="button" aria-label={t('gameFrame.questWindow.restore')} title={t('gameFrame.questWindow.restore')} onClick={() => setMinimised(false)}>
+                  <EngravedIcon id="ico-scroll" />
+                </button>
+              </span>
+            </div>
+          </HudPlaque>
+        </div>
       </SkinScope>
     );
   }
 
-  /* PLAN-032 SP-4: one derivation feeds the title-row popover AND the
-   *  strip — same helper output, zero drift. `slotVisible` keeps the slot
-   *  mounted while a loadout was ever packed (spends mid-replay empty the
-   *  bag; unmounting then would yank the stage) until the epilogue retires
-   *  it. Inside: belt at decision nodes, glanceable strip otherwise. */
-  const bag = questBagItems(run.flags);
-  const bagSlotVisible = bagEverPacked(run) && !(run.ended && !presenting);
-
+  /* R-196: the belt lives in the LEFT companion column (under the party
+   * roster); the strip/belt slot inside the window is gone. */
   return (
     <SkinScope>
-      <HudPlaque
-        shape="panel"
-        as="section"
-        aria-label={title}
-        data-testid="quest-window"
-        style={{ ...shell, width: widthPx, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px', overflowY: 'auto' }}
-      >
+      <div data-hud-panel="quest" ref={shellRef} style={shell}>
+        {leftOpen && (
+          <div
+            data-hud-companion="left"
+            data-testid="quest-companion-left"
+            style={{ position: 'absolute', right: `calc(100% + ${companions.gapPx}px)`, top: 0, bottom: 0, width: sideWidth, display: 'flex', flexDirection: 'column', gap: companions.gapPx, minHeight: 0 }}
+          >
+            {partyOpen && <QuestPartyRosterPanel panelId={partyPanelId} run={run} healDeltas={actionPreview.memberDeltas} onClose={closeParty} />}
+            {beltOpen && <QuestBeltPlaque panelId={beltPanelId} items={bag} statuses={beltStatuses} armedFlags={armedFlags} onToggleFlag={onToggleArmedFlag ?? (() => undefined)} onClose={closeBelt} />}
+          </div>
+        )}
+        <HudPlaque
+          shape="panel"
+          as="section"
+          aria-label={title}
+          data-testid="quest-window"
+          style={{ width: widthPx, maxHeight: plaqueMaxH, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
+        >
         {/* ── Title row = drag handle; every icon lives on its right ── */}
         <div {...handleProps} title={t('gameFrame.panel.dragHint')} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
           <h2 style={{ flex: 1, margin: 0, minWidth: 0, fontFamily: FONT.display, fontSize: 16, lineHeight: 1.2, letterSpacing: '0.06em', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {title}
           </h2>
-          {/* What the quest carries, then minimise and close (X last) — one
-              HUD-controls group, as every floating panel header (guide §5b.1). */}
+          {/* Companion toggles (R-196): Party Roster left, Belt left, Chronicle
+              right — icon-only, `aria-expanded`/`aria-controls`, each opens and
+              closes its own plaque and stays independent of the others. */}
           <div data-hud-controls style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <button type="button" aria-label={t('gameFrame.questWindow.roster')} title={t('gameFrame.questWindow.roster')} aria-pressed={pop === 'roster'} onClick={() => setPop(pop === 'roster' ? null : 'roster')}>
+            <button
+              type="button"
+              ref={partyToggleRef}
+              aria-label={t('gameFrame.questWindow.roster')}
+              title={t('gameFrame.questWindow.roster')}
+              aria-expanded={partyOpen}
+              aria-controls={partyPanelId}
+              onClick={() => setPartyOpen((v) => !v)}
+            >
               <EngravedIcon id="nav-company" />
               <PartyPips run={run} />
             </button>
-            <button type="button" aria-label={t('gameFrame.questWindow.bag')} title={t('gameFrame.questWindow.bag')} aria-pressed={pop === 'bag'} onClick={() => setPop(pop === 'bag' ? null : 'bag')}>
+            <button
+              type="button"
+              ref={beltToggleRef}
+              aria-label={t('gameFrame.questWindow.bag')}
+              title={t('gameFrame.questWindow.bag')}
+              aria-expanded={beltOpen}
+              aria-controls={beltPanelId}
+              data-testid="quest-belt-toggle"
+              onClick={() => setBeltOpen((v) => !v)}
+            >
               <EngravedIcon id="nav-bag" />
-              {bag.length}
             </button>
-            <button type="button" aria-label={t('gameFrame.questWindow.chronicle')} title={t('gameFrame.questWindow.chronicle')} aria-pressed={pop === 'chronicle'} onClick={() => setPop(pop === 'chronicle' ? null : 'chronicle')}>
-              <EngravedIcon id="nav-chronicle" />
+            <button
+              type="button"
+              ref={logToggleRef}
+              aria-label={t('gameFrame.questWindow.chronicle')}
+              title={t('gameFrame.questWindow.chronicle')}
+              aria-expanded={logOpen}
+              aria-controls={logPanelId}
+              data-testid="quest-log-toggle"
+              onClick={() => setLogOpen((v) => !v)}
+            >
+              <EngravedIcon id="ico-scroll" />
             </button>
             <button type="button" data-keep="" aria-label={t('gameFrame.questWindow.minimise')} title={t('gameFrame.questWindow.minimise')} onClick={() => setMinimised(true)}>
               <EngravedIcon id="cmd-minimize" />
@@ -260,20 +409,6 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             </button>
           </div>
         </div>
-
-        {pop && (
-          <Popover onDismiss={() => setPop(null)}>
-            {pop === 'roster' && <RosterList run={run} />}
-            {pop === 'bag' && (bag.length ? bag.map((item) => <Line key={item.flag} tone="text">{t(item.labelKey)}</Line>) : <Line tone="muted">{t('gameFrame.questWindow.bagEmpty')}</Line>)}
-            {pop === 'chronicle' && (
-              <div className="quest-s1-scroll" style={{ maxHeight: 260, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {run.log.map((e, i) => (
-                  <Line key={i} tone={LOG_TONE[e.kind] ?? 'secondary'}>{e.text}</Line>
-                ))}
-              </div>
-            )}
-          </Popover>
-        )}
 
         {/* ── Flavour: the quest's one line, above the picture ── */}
         <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.4, color: TONE.secondary }}>{flavour}</p>
@@ -311,13 +446,18 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             hidden={beatCursor.current.kind === 'scene' ? !!allNodes[beatCursor.current.nodeId]?.hidden : false}
             remaining={beatCursor.remaining}
             onSkip={beatCursor.skip}
-            onFlush={beatCursor.flush}
             fx={beatFx}
             fxConfig={DEFAULT_QUEST_THEATRE_FX}
             reducedMotion={reducedMotion}
           />
         ) : (
-        <div className="quest-s1-scroll" style={{ maxHeight: 168, minHeight: 0, flexShrink: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div
+          className="quest-s1-scroll"
+          data-testid="quest-window-stage"
+          aria-live="polite"
+          tabIndex={-1}
+          style={{ maxHeight: 168, minHeight: 0, flexShrink: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6, outline: 'none' }}
+        >
           {resolved.map((c) => (
             <div key={c.id} data-testid="quest-window-verdict" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
@@ -353,20 +493,8 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         </div>
         )}
 
-        {/* ── Choices: a numbered dialogue list (BG3 / Disco Elysium idiom), never a plate ── */}
-        {/* ── The bag: ONE reserved slot above the choices — belt at
-            decisions (arm before choosing, as in the lab; nothing is spent
-            unasked), read-only strip during transit/beat playback, empty
-            shell while the loadout was spent mid-run. ── */}
-        {bagSlotVisible && (
-          <div data-bag-slot style={{ minHeight: BAG_CHIP_ROW_PX }}>
-            {waiting && !presenting ? (
-              <ConsumableBelt flags={run.flags} armed={armed} onToggleArmed={onToggleArmed} onUseHealing={onUseHealing} onDrinkPotion={onDrinkPotion} />
-            ) : bagStripVisible({ bagEmpty: bag.length === 0, ended: run.ended, waiting, presenting }) ? (
-              <BagStrip items={bag} armed={armed} />
-            ) : null}
-          </div>
-        )}
+        {/* ── Choices: a numbered dialogue list (BG3 / Disco Elysium idiom) — the
+            bag's belt lives in the LEFT companion plaque (R-196), never inline ── */}
         {!presenting && (waiting || run.ended) && (
           <div data-hud-choices style={{ display: 'flex', flexDirection: 'column', margin: '0 -4px' }}>
             {waiting &&
@@ -417,7 +545,17 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           ))}
           {!run.ended && currentBeat + 1 < beats.length && <NextTile label={t('gameFrame.questWindow.nextPhase')} />}
         </ol>
-      </HudPlaque>
+        </HudPlaque>
+        {rightOpen && (
+          <div
+            data-hud-companion="right"
+            data-testid="quest-companion-right"
+            style={{ position: 'absolute', left: `calc(100% + ${companions.gapPx}px)`, top: 0, bottom: 0, width: sideWidth, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+          >
+            {logOpen && <QuestLogPanel panelId={logPanelId} run={run} onClose={closeLog} />}
+          </div>
+        )}
+      </div>
     </SkinScope>
   );
 };
@@ -443,39 +581,25 @@ const Line: React.FC<{ tone: keyof typeof TONE; children: React.ReactNode }> = (
   <div style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: TONE[tone] }}>{children}</div>
 );
 
-/** The stage while committed beats replay (T-008): one moment at a time.
- *  Click anywhere → next beat; «vai al bivio» drains straight to the live
- *  frontier. Deaths get the muted/dark register and a skull (D-8) — the
- *  weight is in the colour, never in a forced wait. T-009 adds the cinema
- *  accents: verdict edge flash + typewriter where the config earns them. */
+/** The stage while committed beats replay (T-008): one moment at a time. The
+ *  Continue button → next beat (R-196: a real `<button>`, never a div wearing
+ *  `role="button"` — no nested interactives, `aria-live` announces the beat).
+ *  Deaths get the muted/dark register and a skull (D-8) — the weight is in the
+ *  colour, never in a forced wait. T-009 adds the cinema accents: verdict edge
+ *  flash + typewriter where the config earns them. */
 const BeatStage: React.FC<{
   beat: QuestBeat;
   /** The beat's node is authored `hidden` — a marker asks for the eye-off glyph. */
   hidden?: boolean;
   remaining: number;
   onSkip: () => void;
-  onFlush: () => void;
   fx: BeatFx;
   fxConfig: QuestTheatreFxConfig;
   reducedMotion: boolean;
-}> = ({ beat, hidden, remaining, onSkip, onFlush, fx, fxConfig, reducedMotion }) => {
+}> = ({ beat, hidden, remaining, onSkip, fx, fxConfig, reducedMotion }) => {
   const { t } = useTranslation('idleVillage');
   return (
-    <div
-      data-testid="quest-window-beat"
-      role="button"
-      tabIndex={0}
-      onClick={onSkip}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSkip();
-        }
-      }}
-      style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 6, minHeight: 96, cursor: 'pointer' }}
-      aria-label={t('gameFrame.questWindow.beats.continue')}
-      title={t('gameFrame.questWindow.beats.continue')}
-    >
+    <div data-testid="quest-window-beat" aria-live="polite" style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 6, minHeight: 96 }}>
       {fx.flashTone && (
         <EdgeFlash
           flashKey={beat.id}
@@ -553,99 +677,17 @@ const BeatStage: React.FC<{
       )}
       <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 'auto' }}>
         <span style={{ fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.muted }}>
-          {remaining > 0
-            ? t('gameFrame.questWindow.beats.more', { count: remaining + 1 })
-            : t('gameFrame.questWindow.beats.continue')}
+          {remaining > 0 ? t('gameFrame.questWindow.beats.more', { count: remaining + 1 }) : t('gameFrame.questWindow.beats.clickHint')}
         </span>
-        {remaining > 0 && (
-          <span data-hud-controls="" style={{ display: 'inline-flex' }}>
-            <button type="button" onClick={(e) => { e.stopPropagation(); onFlush(); }}>
-              <span>{t('gameFrame.questWindow.beats.skipAll')}</span>
-            </button>
-          </span>
-        )}
+        {/* R-196: a real Continue pill — the only beat control; the "Skip to
+            the frontier" button is gone (Director call). */}
+        <span data-hud-controls="" style={{ display: 'inline-flex' }}>
+          <button type="button" data-testid="quest-window-beat-continue" onClick={onSkip}>
+            {t('gameFrame.questWindow.beats.continue')}
+          </button>
+        </span>
       </span>
     </div>
-  );
-};
-
-const Popover: React.FC<{ onDismiss: () => void; children: React.ReactNode }> = ({ onDismiss, children }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const onDown = (event: PointerEvent) => {
-      const target = event.target as HTMLElement;
-      if (!ref.current?.contains(target) && !target.closest('[aria-pressed]')) onDismiss();
-    };
-    const onKey = (event: KeyboardEvent) => event.key === 'Escape' && onDismiss();
-    window.addEventListener('pointerdown', onDown);
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('pointerdown', onDown);
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [onDismiss]);
-  return (
-    <div
-      ref={ref}
-      style={{
-        /* R-133: the popover hangs off the window's left edge — beside the
-         * quest, not over it (the party list must not cover the theater). */
-        position: 'absolute',
-        top: 44,
-        right: 'calc(100% + 10px)',
-        width: 300,
-        maxHeight: 'calc(100vh - 180px)',
-        overflowY: 'auto',
-        zIndex: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 6,
-        padding: '10px 12px',
-        borderRadius: 8,
-        border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)',
-        background: SCRIM.chipBg,
-        boxShadow: '0 10px 24px color-mix(in srgb, var(--skin-hud-lacquer-deep) 80%, transparent)',
-        backdropFilter: 'blur(6px)',
-      }}
-    >
-      {children}
-    </div>
-  );
-};
-
-/**
- * Traveling party — each member rendered with the real roster `PgCard`
- * (horizontal bar variant): portrait, name and status are the canonical
- * resident's; the HP bar carries the QUEST hit points (m.hp/m.maxHp), the
- * number that actually changes on the road. A fallen member is `disabled`
- * — the card's own greyscale reads as the corpse. Living cards stay the
- * real draggable component: an attempted drag hits the same eligibility
- * boundary as any drop (a member in expedition is refused upstream).
- */
-const RosterList: React.FC<{ run: QuestRunState }> = ({ run }) => {
-  const { t } = useTranslation('idleVillage');
-  const { residentsById } = useRosterKitData();
-  return (
-    <>
-      {run.party.map((m) => {
-        const resident = residentsById[m.id];
-        const statusKey = m.dead ? 'dead' : m.wounded || resident?.isInjured ? 'injured' : 'away';
-        return (
-          <PgCard
-            key={m.id}
-            workerId={m.id}
-            label={resident ? formatResidentLabel(resident) : m.name}
-            hp={Math.max(0, m.hp)}
-            maxHp={m.maxHp}
-            fatigue={resident?.fatigue ?? 0}
-            portraitUrl={getResidentPortraitUrl(resident)}
-            statusLabel={t(`roster.status.${statusKey}`)}
-            disabled={m.dead}
-            horizontal
-          />
-        );
-      })}
-    </>
   );
 };
 

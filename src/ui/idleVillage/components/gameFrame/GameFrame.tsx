@@ -288,6 +288,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
           <MatericButton
             variant="secondary"
             disabled={item.locked}
+            data-nav-id={item.id}
             onClick={item.locked ? undefined : () => onNavSelect?.(item.id)}
             aria-pressed={isActive}
             title={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : t(item.labelKey)}
@@ -300,7 +301,6 @@ export const GameFrame: React.FC<GameFrameProps> = ({
               padding: '6px 18px',
               minWidth: 40,
               minHeight: 40,
-              fontSize: 11,
               border: 'none',
               borderRadius: 4,
               // Active = prismatic glass; locked = incised into the lacquer, no badge.

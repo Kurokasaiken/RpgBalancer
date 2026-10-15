@@ -1,5 +1,57 @@
 # Session Handoff — 2026-10-14
 
+## 2026-10-15 pm — R-196: QuestRunWindow cinematografico completato
+
+- **Current state:** **R-196 `fatta`** — redesign `/game` quest window da
+  `mw-web-debate` artifact-r006 (12 WITNESS chiuse, battesimo «procedi»).
+- **Implementato:** finestra 640px / theatre 2.9 da `gameFrameConfig`;
+  colonne compagne co-visibili — `QuestPartyRosterPanel` (sinistra, solo
+  `run.party`, `RosterKitShell` per la catena provider di `PgCard`),
+  `QuestBeltPlaque` (sotto il roster, icone pure + arm/disarm per-item via
+  `armedFlags`), `QuestLogPanel` (destra, `ico-scroll`, `run.log`);
+  predicato `resolveQuestShellLayout` (collapse < ~1052px) + clamp
+  d'unione in `useHudPanelDrag` con ResizeObserver; header icon-only
+  (`nav-company`/`nav-bag`/`ico-scroll`, `aria-expanded`/`aria-controls`,
+  focus-return); `skipAll` rimosso, `BeatStage` con vero `<button>`
+  Continue; scelte con bordo/sfondo/barra oro a riposo.
+- **Engine:** `stepArmedActionItems` unica routine per preview (clone) e
+  commit (live) — consumo solo su check/combat validati, mai su scelte
+  narrative; `consumableBonusFor` con tie-break copertura→bonus→catalogo
+  sui candidati armati; `useConsumable` legacy preservato.
+- **Verifica:** bundle `.mw/runs/r196-quest-window/bundle.json` **PASS**
+  (BV-1..BV-6, verifier indipendente CONFIRMED ×6 — sessione PLAN-035 +
+  subagent clean-context); metrics-dom.json (env attestation + 3 sample
+  DOM), screenshot `quest-window-open.png`, smoke `/game` +
+  `/quest-window-lab` zero errori console. Test: 47 UI + 52 engine verdi.
+  kanban:lint 42 prompt OK; lint scope 0 err; build:check PASS.
+- **Note per il prossimo:** `BagStrip`/`ConsumableBelt` non sono più
+  montati in `QuestRunWindow` (restano per l'HUD del lab S1). Il bench
+  `generatedCatalog.bench.test.ts` fallisce su nodi orfani
+  `im-a-piede`/`im-rotti` di `gen-impr002-palude` — **pre-esistente**
+  (file generation non toccato; il test non traversa le uscite
+  `combat.nextCleared/nextSurvivors`). La suite idleVillage completa ha
+  ~700 failure pre-esistenti non correlati — usare scope mirati.
+
+## 2026-10-15 — R-197: skill `idle-village-task` riscritta sullo stato attuale
+
+- **Current state:** la skill era ferma al 2026-08-16 (era ancora centrata
+  sulla pagina Idle Village e citava simboli morti). Riscritta
+  `coordinator/skills/idle-village-task/SKILL.md` (fonte unica; `.devin`/`.windsurf`
+  sono symlink): superficie canonica `/game` + deprecazione pagina Idle
+  Village; mappa delle superfici (Game Frame, WorldSurfaceRenderer,
+  QuestRunWindow, planner, `/quest-s1-lab`, rosterV2); knowledge anchors da
+  CANON (QUEST_RULES, plans/INDEX, architecture_state, `.mw/contracts`);
+  pre-flight obbligatorio su `context/recurring-traps.md` (T-01..T-12 rilevanti
+  per il dominio); sezione HUD Lacquer Atlas (HudPlaque, `data-hud-controls`,
+  token `--skin-hud-*`, hudGuards, interaction patterns); i18n ICU `{var}`;
+  anchors di dominio verificati nel codice; smoke test porta 5173 canonica +
+  pre-flight content-type; verification gate R-189 (puntamento a
+  agent-execution-mandate §6, niente duplicazione).
+- **Rimossi riferimenti morti:** `usePOI`, `poiConfigRegistry`, `useActivity`
+  come API corrente, `useSlotRack` come hook di pagina (esiste solo nel kit).
+- **Collegamenti:** R-197 in `RICHIESTE.md`; riga aggiornata in
+  `context/INDEX.md`.
+
 ## 2026-10-14 pm8 — R-193 (fix chiavi `{{var}}` ICU) completata
 
 - **Current state:** **R-193 `fatta`** — audit+fix batch delle chiavi i18n
@@ -430,3 +482,23 @@ con `config.mode`=verdetto forzato; bottone «continua» appare solo dopo `onRes
   extraction coverage · reconciliation correctness · persistence ·
   provenance · rejected/open preservation · retrieval L0–L4 ·
   false canonicalization · missed knowledge.
+
+## 2026-10-15 — R-198: invariante "no foreground windows" propagata in RPG
+
+- **Trigger:** un agente ha aperto Chrome for Testing (Puppeteer) in primo piano
+  durante una sessione di testing, rubando il focus al Director.
+- **Fatto:** port del ruling MW CTR-foreground-001 in RPG —
+  `.windsurf/rules/16-no-foreground-windows.md` + sezione in
+  `00-project-invariants.md`, bullet in `AGENTS.md`, tutte le skill RPG
+  (`coordinator/skills/*/SKILL.md`), `canonical-systems.md`, e i punti di
+  generazione dei piani (`strategist-mandate`, `coordinator-mandate`,
+  `mw-planner`): ogni piano con verifica runtime dichiara esecuzione
+  headless/background; finestra visibile = step manuale del Director.
+- **Codice:** ~13 `headless: false` → `headless: process.env.HEADLESS !==
+  'false'` (opt-in esistente); `open` → `open -g` in `mapAssetConsistency.ts` e
+  `mobilePlaytestLogger.ts`.
+- **Enforcement:** `npm run foreground:lint` (`scripts/foregroundLint.ts`).
+- **Bug log:** `.mw/bugs/20261015-foreground-chrome-testing/`.
+- **Safeguard:** lint 0 err (script eslint-ignored per config), test
+  `tests/unit/verification` 18/18, build:check OK, kanban:lint OK,
+  foreground:lint OK.

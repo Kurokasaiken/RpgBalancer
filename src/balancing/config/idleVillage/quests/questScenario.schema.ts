@@ -398,6 +398,11 @@ export const QuestOfferSchema = z
     referenceParty: z.array(ReferenceMemberSchema).optional(),
     /** Nominal quest reward (gold) before world-scaling — placeholder for S2.3. */
     rewardBase: z.number().nonnegative().optional(),
+    /** Cinematic banner art for the planner (PLAN-036, R-195): a ~21:9
+     *  image rendered under the subtitle. Presentation-only — the engine
+     *  never reads it — so it sits in `PRESENTATION_KEYS` (a reskin must
+     *  not mint a new scenario digest). */
+    coverArt: z.string().min(1).optional(),
   })
   .strict();
 export type QuestOfferSchemaType = z.infer<typeof QuestOfferSchema>;
@@ -532,6 +537,28 @@ export const QuestScenarioSchema = z
     startNode: z.string(),
     /** Declared primary stats (drives previews/party guidance). */
     primaryStats: z.array(LabStatSchema).min(1),
+    /**
+     * Planner key-stat tiers (PLAN-036, R-195): the stats the forecast
+     * sidecar labels Primary/Secondary. AUTHORED display-tier data at the
+     * scenario ROOT — `computeScenarioVersion` hashes it (a tier change is
+     * semantic-adjacent), never under `offer` where `PRESENTATION_KEYS`
+     * would silently fork the vocabulary the planner reasons about.
+     * Constraints enforced in superRefine: `primary ∩ secondary = ∅`
+     * (a stat is exactly one tier — overlap is semantically undefined);
+     * `keyStats.primary ⊆ primaryStats` (displayed primaries must be real
+     * scenario key stats — the planner does not invent stats). `secondary`
+     * MAY name stats outside `primaryStats` (Rovine spec §0 lists
+     * perc/agi, none in frozen `['str','con']` — the sim input is
+     * untouched). Absent ⇒ `deriveKeyStats` computes a deterministic
+     * presentation fallback; `primaryStats` itself is never mutated.
+     */
+    keyStats: z
+      .object({
+        primary: z.array(LabStatSchema).min(1),
+        secondary: z.array(LabStatSchema),
+      })
+      .strict()
+      .optional(),
     /** Beat labels for the progress indicator. */
     beats: z.array(z.string()).min(1),
     /** Optional intel id → label map (journal/intel UI). */
@@ -697,6 +724,26 @@ export const QuestScenarioSchema = z
         issue(['offer', 'slots'], `stat '${s}' richiesta dai check non coperta da alcuno statFocus di slot`);
       }
     }
+
+    /* keyStats tier contract (PLAN-036, R-195): tiers disjoint and
+     *  displayed primaries ⊆ frozen `primaryStats`. `secondary` has NO
+     *  subset constraint — see the field JSDoc (Rovine spec §0 names
+     *  perc/agi, outside `primaryStats`). */
+    if (scenario.keyStats) {
+      const { primary, secondary } = scenario.keyStats;
+      const primarySet = new Set(primary);
+      secondary.forEach((s, i) => {
+        if (primarySet.has(s)) {
+          issue(['keyStats', 'secondary', i], `stat '${s}' è sia primaria che secondaria — i tier devono essere disgiunti`);
+        }
+      });
+      const keySet = new Set(scenario.primaryStats);
+      primary.forEach((s, i) => {
+        if (!keySet.has(s)) {
+          issue(['keyStats', 'primary', i], `stat primaria '${s}' non presente in primaryStats — il planner non può inventare stat chiave`);
+        }
+      });
+    }
   });
 
 export type QuestScenario = z.infer<typeof QuestScenarioSchema>;
@@ -744,6 +791,10 @@ const PRESENTATION_KEYS = new Set([
   'name',
   'portrait',
   'description',
+  /* PLAN-036: the planner's ~21:9 banner art — a reskin must not mint a
+   *  new scenario digest. `keyStats` is intentionally NOT here (display
+   *  tiers are semantic-adjacent: hashed). */
+  'coverArt',
 ]);
 
 /** Canonical JSON: object keys sorted, presentation keys dropped, recursively. */

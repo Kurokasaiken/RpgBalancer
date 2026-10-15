@@ -27,6 +27,8 @@ export const SessionStateSchema = z.enum([
   'FAILED',
   'STOPPING',
   'UNKNOWN',
+  'TIMED_OUT',
+  'ABANDONED_STALE',
 ]);
 
 /** @typedef {z.infer<typeof SessionStateSchema>} SessionState */
@@ -45,6 +47,10 @@ export const SessionSchema = z.object({
   blockingReason: z.string().optional(),
   owner: z.string().min(1),
   ttlSeconds: z.number().int().positive(),
+  /** Registration time; watchdog base for `maxDurationMs`. */
+  createdAt: IsoDateTimeSchema.optional(),
+  /** Hard upper bound on session lifetime; exceeded → TIMED_OUT. */
+  maxDurationMs: z.number().int().positive().optional(),
 });
 
 /** @typedef {z.infer<typeof SessionSchema>} Session */
@@ -59,11 +65,27 @@ export const ProjectSchema = z.object({
 /** @typedef {z.infer<typeof ProjectSchema>} Project */
 export type Project = z.infer<typeof ProjectSchema>;
 
+/** Overnight escalation window (local time, wraps midnight). */
+export const QuietWindowSchema = z.object({
+  enabled: z.boolean().default(false),
+  startHour: z.number().int().min(0).max(23).default(23),
+  endHour: z.number().int().min(0).max(23).default(7),
+});
+
 /** Shutdown policy embedded in the registry. */
 export const ShutdownPolicySchema = z.object({
   dryRun: z.boolean().default(true),
   userIdleThresholdSeconds: z.number().int().nonnegative().default(300),
   shutdownEnabled: z.boolean().default(false),
+  /** UNKNOWN sessions older than this may be released as ABANDONED_STALE in the quiet window. */
+  staleGracePeriodMs: z.number().int().positive().default(1_800_000),
+  /** Daemon warm-up during which an empty registry is not trusted. */
+  bootstrapGracePeriodMs: z.number().int().positive().default(300_000),
+  /** When true, a failed pre-shutdown commit+push vetoes the shutdown. */
+  requireRepoClean: z.boolean().default(false),
+  /** Run the pre-shutdown commit+push backup step. */
+  autoCommitAndPush: z.boolean().default(true),
+  quietWindow: QuietWindowSchema.default({ enabled: false, startHour: 23, endHour: 7 }),
 });
 
 /** @typedef {z.infer<typeof ShutdownPolicySchema>} ShutdownPolicy */
@@ -115,6 +137,11 @@ export function createDefaultRegistry(machineId?: string): SessionRegistry {
       dryRun: true,
       userIdleThresholdSeconds: 300,
       shutdownEnabled: false,
+      staleGracePeriodMs: 1_800_000,
+      bootstrapGracePeriodMs: 300_000,
+      requireRepoClean: false,
+      autoCommitAndPush: true,
+      quietWindow: { enabled: false, startHour: 23, endHour: 7 },
     },
   };
 }
@@ -227,15 +254,41 @@ async function acquireLock(): Promise<() => void> {
 }
 
 /**
- * Marks sessions whose last heartbeat exceeded their TTL as `UNKNOWN`.
+ * Whether `now` falls inside the policy's overnight quiet window.
+ * The window wraps midnight (e.g. 23:00 → 07:00).
  *
- * UNKNOWN sessions are treated as shutdown blockers by the decision engine.
+ * @param now - Current time.
+ * @param quietWindow - Policy quiet window config.
+ * @returns True when the quiet window is enabled and active.
+ */
+export function isQuietWindowActive(
+  now: Date,
+  quietWindow: SessionRegistry['policy']['quietWindow'],
+): boolean {
+  if (!quietWindow.enabled) return false;
+  const hour = now.getHours();
+  if (quietWindow.startHour <= quietWindow.endHour) {
+    return hour >= quietWindow.startHour && hour < quietWindow.endHour;
+  }
+  return hour >= quietWindow.startHour || hour < quietWindow.endHour;
+}
+
+/**
+ * Recovers stale sessions through a two-phase escalation (plan v3 §4.3–4.4):
+ *
+ * 1. `createdAt + maxDurationMs` exceeded → `TIMED_OUT` (terminal; bounds
+ *    even sessions that keep heartbeating while logically stuck).
+ * 2. `heartbeatAt + ttlSeconds` exceeded → `UNKNOWN` (blocks shutdown).
+ * 3. `UNKNOWN` and heartbeat stale beyond `staleGracePeriodMs` while the
+ *    quiet window is active → `ABANDONED_STALE` (terminal, frees the lock).
  *
  * @param registry - Registry to recover.
  * @param now - Optional timestamp; defaults to current time.
  * @returns A new registry with stale sessions recovered.
  */
 export function recoverStaleSessions(registry: SessionRegistry, now = new Date()): SessionRegistry {
+  const quietActive = isQuietWindowActive(now, registry.policy.quietWindow);
+  const staleGrace = registry.policy.staleGracePeriodMs;
   const next: SessionRegistry = {
     ...registry,
     updatedAt: now.toISOString(),
@@ -247,10 +300,27 @@ export function recoverStaleSessions(registry: SessionRegistry, now = new Date()
     for (const [sessionId, session] of Object.entries(project.sessions)) {
       const lastHeartbeat = new Date(session.heartbeatAt).getTime();
       const expiresAt = lastHeartbeat + session.ttlSeconds * 1000;
-      if (now.getTime() > expiresAt) {
+      const heartbeatAgeMs = now.getTime() - lastHeartbeat;
+      const createdAt = session.createdAt ? new Date(session.createdAt).getTime() : undefined;
+
+      if (
+        session.state !== 'TIMED_OUT' &&
+        session.state !== 'ABANDONED_STALE' &&
+        session.maxDurationMs !== undefined &&
+        createdAt !== undefined &&
+        now.getTime() - createdAt > session.maxDurationMs
+      ) {
         sessions[sessionId] = {
           ...session,
-          state: 'UNKNOWN',
+          state: 'TIMED_OUT',
+          blockingReason: session.blockingReason ?? 'maxDurationMs exceeded',
+        };
+      } else if (now.getTime() > expiresAt) {
+        const abandoned =
+          quietActive && heartbeatAgeMs > session.ttlSeconds * 1000 + staleGrace;
+        sessions[sessionId] = {
+          ...session,
+          state: abandoned ? 'ABANDONED_STALE' : 'UNKNOWN',
           blockingReason: session.blockingReason ?? 'heartbeat expired',
           heartbeatAt: now.toISOString(),
         };
@@ -280,6 +350,7 @@ export async function registerSession(
     state?: SessionState;
     ttlSeconds?: number;
     blockingReason?: string;
+    maxDurationMs?: number;
   },
   filePath?: string,
 ): Promise<SessionRegistry> {
@@ -291,6 +362,7 @@ export async function registerSession(
     state = 'RUNNING',
     ttlSeconds = 60,
     blockingReason,
+    maxDurationMs,
   } = params;
 
   return atomicUpdateRegistry((registry) => {
@@ -314,6 +386,8 @@ export async function registerSession(
           state,
           owner,
           ttlSeconds,
+          createdAt: new Date().toISOString(),
+          ...(maxDurationMs !== undefined ? { maxDurationMs } : {}),
           ...(blockingReason ? { blockingReason } : {}),
         },
       },

@@ -18,7 +18,7 @@ const POI = 'poi-goblin';
 
 const run = async () => {
   mkdirSync(OUT, { recursive: true });
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
   const t0 = Date.now();
   const ctx = await browser.newContext({
     viewport: { width: 1440, height: 810 },

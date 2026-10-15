@@ -36,6 +36,7 @@ Component reuse: Check primitives in atoms, atoms, primitives before creating ne
 State management: Zustand for shared domain state, Context for local UI state
 JSDoc: Every new function/interface gets JSDoc
 Node version: Use pinned version from .nvmrc (source ~/.nvm/nvm.sh && nvm use)
+Foreground windows: never open a window/app/browser in the foreground automatically — automated browser/test runs are headless or background; headed only via explicit Director opt-in (.windsurf/rules/16-no-foreground-windows.md)
 4. Safeguard Execution
 Before marking task complete, MUST run and pass:
 

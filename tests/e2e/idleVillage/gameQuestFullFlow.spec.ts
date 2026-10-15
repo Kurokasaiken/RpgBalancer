@@ -6,7 +6,8 @@
  *   → click sul marker → planner (POI detail)
  *   → drag reali roster→slot → SWAP slot↔slot (drag del token, senza
  *     estrarlo) + swap rifiutato dal gate di eleggibilità
- *   → consumabili scelti coi bottoni del loadout
+ *   → consumabili scelti dalle tessere del picker esterno della bisaccia
+ *     (PLAN-036: 3 slot icona + UN toggle «quest-bag-picker-toggle»)
  *   → «Invia spedizione» → controlli tempo HUD (×4)
  *   → la run risolta fase per fase: beat saltati con Enter, scelte
  *     cliccate nella QuestRunWindow, consumabili armati/usati dalla cintura
@@ -304,7 +305,9 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     );
     await page.keyboard.press('r');
     await expect(page.locator(`[data-worker-id="${HERO}"]`).first()).toBeVisible({ timeout: 15_000 });
-    await expect(page.locator('[data-map-quest-poi-target]')).toHaveCount(0);
+    /* R-200: le offerte si rivelano da sole a stagger dopo il veil — il
+     *  contratto R-124 «mappa pulita al boot» è superato, non asseriamo
+     *  più il count-0 (sarebbe una race col primo slot dello stagger). */
     const goldBefore = await goldReadout(page);
     const villageBefore = await read<VillageShape>(page, 'getVillage');
     expect(villageBefore.gold).toBe(goldBefore);
@@ -321,6 +324,27 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     await expect(page.getByTestId(`floating-panel-header-quest-expedition-${POI}`)).toContainText('Goblin Extermination');
     await expect(sendButton(page)).toBeDisabled();
     await expect(page.getByTestId('quest-expedition-forecast')).toHaveAttribute('data-forecast-state', 'incomplete');
+
+    /* ── 3b. PLAN-036: banner cinematografico + placca forecast esterna ── */
+    const cinema = page.getByTestId('quest-expedition-cinema');
+    await expect(cinema).toBeVisible();
+    const cinemaBox = await cinema.boundingBox();
+    expect(cinemaBox).not.toBeNull();
+    /* ~21:9 (config cinemaAspect=2.76) o più panoramico quando maxHeight
+     *  taglia — mai più stretto del cinematografico. */
+    expect(cinemaBox!.width / cinemaBox!.height).toBeGreaterThanOrEqual(2.6);
+    expect(await cinema.locator('img').evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+
+    const forecastCol = page.getByTestId('quest-expedition-forecast-column');
+    await expect(forecastCol).toBeVisible();
+    /* sidecar ESTERNO, a destra della placca principale (BV-4: ≥840px). */
+    const mainBox = await planner(page).boundingBox();
+    const sideBox = await forecastCol.boundingBox();
+    expect(sideBox!.x).toBeGreaterThanOrEqual(mainBox!.x + mainBox!.width - 1);
+    /* Goblin Extermination: Primaria = Forza, Secondaria = Percezione. */
+    await expect(page.getByTestId('forecast-key-stats')).toBeVisible();
+    await expect(page.getByTestId('forecast-primary-stats')).toContainText(/strength|forza/i);
+    await expect(page.getByTestId('forecast-secondary-stats')).toContainText(/perception|percezione/i);
     await shot(page, info, '04-planner-vuoto', planner(page));
 
     /* ── 4. Party dal roster: drag reali ────────────────────────────── */
@@ -353,15 +377,30 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     await page.waitForTimeout(400);
     expect(await assignments(page)).toEqual(afterSwap);
 
-    /* ── 6. Consumabili: tre bottoni del loadout ────────────────────── */
+    /* ── 6. Consumabili: bisaccia a 3 slot + picker esterno (PLAN-036) ── */
+    await expect(page.locator('[data-testid^="bag-slot-"]')).toHaveCount(3);
+    const pickerToggle = page.getByTestId('quest-bag-picker-toggle');
+    await expect(pickerToggle).toBeVisible();
+    await pickerToggle.click();
+    const picker = page.getByTestId('quest-bag-external-picker');
+    await expect(picker).toBeVisible();
     for (const itemId of LOADOUT) {
-      const pill = page.getByTestId(`loadout-item-${itemId}`);
-      await pill.scrollIntoViewIfNeeded();
-      await pill.click();
-      await expect(pill).toHaveAttribute('aria-pressed', 'true');
+      const tile = page.getByTestId(`picker-item-${itemId}`);
+      await tile.scrollIntoViewIfNeeded();
+      await tile.click();
+      await expect(tile).toHaveAttribute('aria-pressed', 'true');
     }
-    /* borsa piena: gli altri si disabilitano */
-    await expect(page.getByTestId('quest-expedition-loadout').locator('button[aria-pressed="false"]').first()).toBeDisabled();
+    /* borsa piena: le tessere non scelte si disabilitano */
+    await expect(picker.locator('button[aria-pressed="false"]').first()).toBeDisabled();
+    /* `loadout-item-<id>` vive SOLO sul bottone dello slot pieno — un nodo
+     *  per item, nessuna collisione strict-mode con le tessere del picker. */
+    for (const itemId of LOADOUT) {
+      await expect(page.getByTestId(`loadout-item-${itemId}`)).toHaveCount(1);
+    }
+    /* Escape chiude SOLO il picker e riporta il focus sul toggle. */
+    await page.keyboard.press('Escape');
+    await expect(picker).toHaveCount(0);
+    await expect(pickerToggle).toBeFocused();
     await expect(page.getByTestId('loadout-coverage')).toBeVisible();
     await shot(page, info, '08-loadout-consumabili', planner(page));
 
@@ -456,12 +495,16 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     await expect.poll(() => goldReadout(page), { timeout: 5_000 }).toBe(goldBefore + goldEffects);
     await shot(page, info, '15-hud-oro-e-roster');
 
-    /* ── 12. Chiudi rapporto → POI consumato ────────────────────────── */
+    /* ── 12. Chiudi rapporto → POI ripetibile restituito ──────────────
+     *  R-200 (D-1): `poi-goblin` è authored `repeatable` — il report non
+     *  consuma il POI: il marker resta sulla mappa, la run è azzerata e
+     *  l'offerta torna `available` (rilanciabile). */
     await closeReport(page).click();
     await expect(questWindow(page)).toHaveCount(0);
-    await expect(marker(page)).toHaveCount(0, { timeout: 10_000 });
+    await expect(marker(page)).toBeVisible({ timeout: 10_000 });
+    await expect(marker(page)).toHaveAttribute('data-quest-status', 'available');
     expect(await read<RunShape | null>(page, 'getRun')).toBeNull();
-    await shot(page, info, '16-poi-consumato');
+    await shot(page, info, '16-poi-ripetibile-restituito');
 
     /* ── 13. Reload: XP e oro sono persistiti ───────────────────────── */
     await page.waitForTimeout(1_500); // lascia passare l'autosave debounced
@@ -480,6 +523,9 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
       .toBe(true);
     const reloaded = await read<VillageShape>(page, 'getVillage');
     expect(reloaded.gold).toBe(village.gold);
+    /* La visibilità del marker dopo reload è governata dal reveal (R-200:
+     *  auto-reveal staggered, contratto in evoluzione) — qui si asserisce solo
+     *  la persistenza dei dati, non il lifecycle del marker. */
     for (const effect of xpEffects) {
       expect(reloaded.residents.find((r) => r.id === effect.residentId)?.xp).toBe(
         village.residents.find((r) => r.id === effect.residentId)?.xp,

@@ -56,7 +56,7 @@ const boot = async (page: Page) => {
 
 const run = async () => {
   mkdirSync(OUT, { recursive: true });
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 810 }, deviceScaleFactor: 4 / 3, locale: 'en-US' });
   const page = await ctx.newPage();
   await boot(page);

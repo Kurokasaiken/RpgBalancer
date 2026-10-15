@@ -36,7 +36,7 @@ class RendererStackExtractor {
 
   async init(): Promise<void> {
     this.browser = await chromium.launch({ 
-      headless: false,
+      headless: process.env.HEADLESS !== 'false',
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
   }

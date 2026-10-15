@@ -10,11 +10,12 @@ import { EngravedIcon, type EngravedIconId } from './engravedIcons';
  */
 const ITEM_ICON_TO_ENGRAVED: Record<string, EngravedIconId> = {
   axe: 'ico-axe',
-  crosshair: 'ico-spark',
+  crosshair: 'ico-target',
   wind: 'ico-gust',
-  cable: 'ico-pouch',
-  heart: 'ico-vial',
+  cable: 'ico-grapnel',
+  heart: 'ico-salve',
   droplets: 'ico-vial',
+  flag: 'ico-banner',
 };
 
 /** The emoji fallback keeps the catalog's own face when no engraved glyph exists. */

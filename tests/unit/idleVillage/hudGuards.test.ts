@@ -43,6 +43,12 @@ const STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/BagStrip.tsx',
   // PLAN-032 SP-5 — the hero level-up decorative layer (rosterV2, same material).
   'src/ui/idleVillage/rosterV2/HeroLevelDecor.tsx',
+  // R-196 — the quest shell's companion plaques and shared layout predicate.
+  'src/ui/idleVillage/components/gameFrame/QuestBeltPlaque.tsx',
+  'src/ui/idleVillage/components/gameFrame/QuestPartyRosterPanel.tsx',
+  'src/ui/idleVillage/components/gameFrame/QuestLogPanel.tsx',
+  'src/ui/idleVillage/components/gameFrame/questShellLayout.ts',
+  'src/ui/idleVillage/components/gameFrame/useHudPanelDrag.ts',
   // PLAN-032 SP-4 — the read-only consumables strip in the quest window.
   'src/ui/idleVillage/components/gameFrame/BagStrip.tsx',
   'src/ui/idleVillage/components/gameFrame/questBag.ts',
@@ -61,6 +67,10 @@ const STRICT_FILES = [
   'src/ui/idleVillage/questS1Lab/hud/StashPicker.tsx',
   'src/ui/idleVillage/questS1Lab/hud/TransitView.tsx',
   'src/ui/idleVillage/questS1Lab/hud/VerdictCard.tsx',
+  // PLAN-035 — the village view and its building pins/tooltip controls.
+  'src/ui/idleVillage/components/gameFrame/VillageScreenView.tsx',
+  'src/ui/idleVillage/components/gameFrame/MockUpgradeControl.tsx',
+  'src/ui/idleVillage/components/gameFrame/villageBuildingIcons.tsx',
 ];
 const ROSTER_V2_FILES = [
   'src/ui/idleVillage/rosterV2/DragTestContainerV2.tsx',

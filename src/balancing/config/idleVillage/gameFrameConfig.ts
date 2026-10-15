@@ -262,7 +262,9 @@ const gameFrameQuestDetailSchema = z.object({
   ledgerWidthPx: z.number().positive(),
 });
 
-/** The running-quest window (R-106): a floating HUD panel, like the roster. */
+/** The running-quest window (R-106, R-196): a floating HUD panel with companion
+ *  plaques — the party roster and belt stack to its left, the chronicle to its
+ *  right — all inside one draggable shell. */
 const gameFrameQuestWindowSchema = z.object({
   /** Window width (px). */
   widthPx: z.number().positive(),
@@ -274,6 +276,17 @@ const gameFrameQuestWindowSchema = z.object({
   durationDays: z.number().positive(),
   /** Log lines a phase tooltip shows before it says "+N more". */
   tooltipLines: z.number().int().positive(),
+  /** Width of each companion column (party roster / belt left, chronicle right), px. */
+  sidePanelWidthPx: z.number().positive(),
+  /** Air between the window and each companion column, px. */
+  sidePanelGapPx: z.number().nonnegative(),
+  /** Minimum usable companion width — below the fit threshold the companions
+   *  auto-collapse (resolveQuestShellLayout); between threshold and
+   *  `sidePanelWidthPx`×2 budget they shrink smoothly. */
+  minSidePanelWidthPx: z.number().positive(),
+  /** Screen-edge inset the shell's whole union (window + companions) is
+   *  clamped into, px (drag + anchor). */
+  edgeInsetPx: z.number().nonnegative(),
   /** BeatSequencer pacing (PLAN-025 T-008): per-beat on-stage durations in ms
    *  and the queue ceiling — overflow compacts into a recap beat. */
   beats: z.object({
@@ -361,6 +374,22 @@ const gameFrameEventTheatreSchema = z.object({
   /** The clock stays frozen this long after the shroud begins reopening, so the
    *  world never visibly ticks under half-drawn curtains. */
   freezeReleaseMs: z.number().nonnegative(),
+});
+
+/**
+ * Auto-reveal of the quest offers on `/game` (R-200, PLAN-037): once the boot
+ * veil is gone, the offers mount one at a time `staggerMs` of wall clock
+ * apart — they never hide again. The Director «Show quest» action only jumps
+ * the queue (one-way); «Reset» re-arms the stagger for a new take. `enabled:
+ * false` restores the legacy boot-dark behaviour (no offer until a reveal
+ * channel opens) for surfaces that stage the reveal by hand.
+ */
+const gameFrameQuestRevealSchema = z.object({
+  enabled: z.boolean(),
+  /** Delay between the veil's exit and the first offer's entrance, ms. */
+  initialDelayMs: z.number().nonnegative(),
+  /** Wall-clock gap between consecutive offer entrances, ms. */
+  staggerMs: z.number().positive(),
 });
 
 /** Below this viewport width the top row drops its detail (resource trends, place name) to tooltips. */
@@ -459,6 +488,7 @@ const gameFrameConfigSchema = z.object({
   bootVeil: gameFrameBootVeilSchema,
   hudHide: gameFrameHudHideSchema,
   eventTheatre: gameFrameEventTheatreSchema,
+  questReveal: gameFrameQuestRevealSchema,
   breakpoints: gameFrameBreakpointsSchema,
   edgeWash: gameFrameEdgeWashSchema,
   heroSheet: gameFrameHeroSheetSchema,
@@ -566,11 +596,18 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   hud: { material: 'lacquer' },
   questDetail: { widthPx: 680, gapPx: 8, topPx: 100, ledgerWidthPx: 300 },
   questWindow: {
-    widthPx: 460,
-    topPx: 100,
-    theaterAspect: 2.76,
+    /* R-196: the running quest reads as a wide cinematic shell — the theatre
+     * is nearly scope ratio and two companion columns flank it (party roster
+     * + belt left, chronicle right), all inside one drag union. */
+    widthPx: 640,
+    topPx: 88,
+    theaterAspect: 2.9,
     durationDays: 2,
     tooltipLines: 6,
+    sidePanelWidthPx: 260,
+    sidePanelGapPx: 8,
+    minSidePanelWidthPx: 180,
+    edgeInsetPx: 18,
     consumablesArmedByDefault: false,
     beats: { sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapMs: 1800, maxQueue: 24 },
   },
@@ -596,6 +633,10 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   },
   hudHide: { slideMs: 520, offscreenPx: 260, shortcut: 'h', idleHideMs: 30000, wonderOnHide: true },
   eventTheatre: { cardDelayMs: 700, freezeReleaseMs: 1000 },
+  /* R-200: goblin enters ~1s after the veil lifts, rovine ~5s later — one
+   *  offer at a time so each entrance reads (and the Director's «Show quest»
+   *  skips straight to all revealed). */
+  questReveal: { enabled: true, initialDelayMs: 1000, staggerMs: 5000 },
   breakpoints: { compactTopPx: 1400 },
   edgeWash: { enabled: false, leftSrc: '/assets/ui/hud/edge_wash_left.webp', bottomSrc: '/assets/ui/hud/edge_wash_bottom.webp', opacity: 0.55, leftPx: 120, bottomPx: 110 },
   heroSheet: {

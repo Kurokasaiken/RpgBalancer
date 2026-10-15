@@ -256,7 +256,7 @@ async function debugRosterPayloads() {
   console.log('🚀 Starting roster payload debugging...');
   
   const browser = await puppeteer.launch({ 
-    headless: false,
+    headless: process.env.HEADLESS !== 'false',
     defaultViewport: { width: 1200, height: 800 }
   });
   

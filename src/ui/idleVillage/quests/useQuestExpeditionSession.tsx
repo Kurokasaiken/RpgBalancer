@@ -55,16 +55,22 @@ import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { availableOptions } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestId, QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestRunApi } from '@/ui/idleVillage/questS1Lab/useQuestRun';
-import { buildExpeditionParty, isExpeditionItem, loadoutDuration, planSlotSwap } from './questExpedition';
+import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
+import { buildExpeditionParty, loadoutDuration, planSlotSwap, type BagStockEntry } from './questExpedition';
 import type { SlotTokenDragData } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { settleRun, runIdOf } from './questSettlement';
 import { releaseLoadout, reserveLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
 import { QuestExpeditionDetail } from './QuestExpeditionDetail';
 
-/** Loadout candidates: catalog items carrying a REAL expedition effect —
- *  engine-flagged consumables plus duration-channel items (mounts)
- *  (PLAN-019-S3 T-3). Items with no channel stay catalog-only. */
-const EXPEDITION_ITEMS = Object.values(defaultQuestItems).filter(isExpeditionItem);
+/** Loadout candidates (PLAN-036, R-195): the bag sells EXACTLY what the
+ *  village warehouse stocks — single source `VILLAGE_STASH_CONFIG.items`,
+ *  whose schema already guarantees every row is a bag-legal consumable
+ *  with a real `engineFlag` channel (`isExpeditionItem`'s bar). The run
+ *  consumes the item's engine flag, never the shelf row. */
+const EXPEDITION_ITEMS: BagStockEntry[] = VILLAGE_STASH_CONFIG.items.map((row) => ({
+  item: defaultQuestItems[row.itemId],
+  qty: row.qty,
+}));
 
 /** Resolved-offer cache: `resolveQuestOffer` is deterministic on
  *  `(poiId, daysPlayed)` — the expensive part is the reference-band sim,
@@ -453,7 +459,7 @@ export function useQuestExpeditionSession({
     void loadData<{ assignments?: Record<string, string | null>; items?: string[] } | null>(draftKey, null).then((draft) => {
       if (cancelled) return;
       if (draft) {
-        const itemIds = new Set(EXPEDITION_ITEMS.map((i) => i.id));
+        const itemIds = new Set(EXPEDITION_ITEMS.map((e) => e.item.id));
         /* Re-validate at restore: a resident may have died/left since the
          *  draft was written — never resurrect an ineligible assignment. */
         const restored: Record<string, string | null> = {};
@@ -648,7 +654,7 @@ export function useQuestExpeditionSession({
        *  a real packed expedition, not an empty-handed one. The next pass
        *  re-runs with the loadout applied, then crosses `send()`. */
       const pack = QUEST_STASH.defaultLoadout
-        .map((flag) => EXPEDITION_ITEMS.find((it) => toEngineFlag(it.id) === flag)?.id)
+        .map((flag) => EXPEDITION_ITEMS.find((e) => toEngineFlag(e.item.id) === flag)?.item.id)
         .filter((id): id is string => Boolean(id))
         .slice(0, QUEST_STASH.bagSlots);
       if (pack.length > 0) {

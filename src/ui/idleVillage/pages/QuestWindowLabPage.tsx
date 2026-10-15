@@ -6,7 +6,7 @@
  * Route: /quest-window-lab
  */
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { QuestRunWindow } from '@/ui/idleVillage/components/gameFrame/QuestRunWindow';
@@ -21,7 +21,6 @@ export const QuestWindowLabPage: React.FC = () => {
   const { t } = useTranslation('idleVillage');
   const { questWindow } = DEFAULT_GAME_FRAME_CONFIG;
   const questRun = useQuestRun('goblin');
-  const [armed, setArmed] = useState(questWindow.consumablesArmedByDefault);
   // `?seed=N` replays the same run: the deterministic surface for the playtest harness (PLAN-025 T-003).
   const seedParam = useMemo(() => {
     const raw = new URLSearchParams(window.location.search).get('seed');
@@ -73,16 +72,15 @@ export const QuestWindowLabPage: React.FC = () => {
           scenario={GOBLIN_SCENARIO}
           artFor={(nodeId) => NODE_ART[nodeId]?.src}
           time={time}
-          onChoose={(optionId) => questRun.choose(optionId, { useConsumable: armed })}
-          armed={armed}
-          onToggleArmed={() => setArmed((on) => !on)}
-          onUseHealing={questRun.useHealing}
-          onDrinkPotion={questRun.drinkPotion}
+          onChoose={(optionId) => questRun.choose(optionId)}
+          armedFlags={questRun.armedFlags}
+          onToggleArmedFlag={questRun.toggleArmedFlag}
           onClose={questRun.clear}
-          anchor={{ left: 60, top: 60 }}
+          anchor={{ left: 320, top: 60 }}
             widthPx={questWindow.widthPx}
             theaterAspect={questWindow.theaterAspect}
             tooltipLines={questWindow.tooltipLines}
+            companions={{ widthPx: questWindow.sidePanelWidthPx, gapPx: questWindow.sidePanelGapPx, minWidthPx: questWindow.minSidePanelWidthPx, edgeInsetPx: questWindow.edgeInsetPx }}
           />
         )}
       </div>

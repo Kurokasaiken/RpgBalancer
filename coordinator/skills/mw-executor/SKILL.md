@@ -22,6 +22,7 @@ Use for single, well-defined implementation tasks.
 - No stubs, TODOs without implementation, debug `console.log`, or commented-out code.
 - Resolve the cause, not the symptom.
 - If scope grows during execution, stop and report instead of silently expanding.
+- Never open a window/app/browser in the foreground automatically — all automated browser/test runs are headless or background; a visible window requires explicit Director opt-in in-session (`.windsurf/rules/16-no-foreground-windows.md`).
 - Run the relevant safeguards (`npm run lint -- <scope>`, `npm run test -- <scope>`, `npm run build:check`) before declaring done.
 - Update the relevant plan, `RICHIESTE.md` item, or evidence log before closing.
 

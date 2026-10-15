@@ -882,7 +882,8 @@
         "amount": "{label} {value}.",
         "incoming": "In arrivo dalle attività in corso: +{count}.",
         "food": "{label} {value} su {max}. I residenti ne consumano {perDay} al giorno: basta per {days} giorni."
-      }
+      },
+      "iron": "Ferro"
     },
     "speed": {
       "ariaLabel": "Velocità simulazione",
@@ -1026,7 +1027,9 @@
         "heroSheet": "Scheda personaggio",
         "villageStash": "Magazzino",
         "merchant": "Mercante"
-      }
+      },
+      "pin": "Fissa pannello",
+      "unpin": "Sblocca pannello"
     },
     "stash": {
       "title": "Magazzino del villaggio",
@@ -1090,6 +1093,15 @@
         "armed": "armato",
         "held": "portato"
       },
+      "belt": {
+        "armed": "armato per la prossima prova",
+        "shadowed": "coperto da un altro oggetto armato",
+        "inert": "nessuna prova qui lo richiede",
+        "actionArmed": "verrà usato alla prossima prova o mischia",
+        "passive": "sempre attivo finché è nella sacca"
+      },
+      "logEmpty": "La cronaca è vuota",
+      "partyStatus": "Squadra assegnata — {alive} su {total} in piedi",
       "dead": "caduto",
       "hpLost": "−{hp} HP",
       "loot": "+{count, plural, one {# bottino} other {# bottino}}",
@@ -1105,9 +1117,9 @@
       "hiddenEvent": "Evento nascosto — potevi non trovarlo",
       "close": "Chiudi il rapporto",
       "beats": {
-        "continue": "Clicca per continuare",
+        "continue": "Continua",
+        "clickHint": "Clicca per continuare",
         "more": "{count, plural, one {Manca # momento — clicca per continuare} other {Mancano # momenti — clicca per continuare}}",
-        "skipAll": "Vai al bivio",
         "recap": "Mentre eri via: {scenes} scene, {checks} prove, {deaths} caduti, {wounds} feriti"
       },
       "combat": {
@@ -1171,6 +1183,93 @@
       "badge": "Lv {n}",
       "floater": "Livello {n}",
       "a11y": "Eroe livello {n}"
+    },
+    "village": {
+      "ariaLabel": "Villaggio — edifici",
+      "pinsToolbar": "Edifici del villaggio",
+      "levelShort": "Lv {level}",
+      "levelBadge": "Lv {level}/{max}",
+      "effectLabel": "Effetto",
+      "costLabel": "Costo",
+      "daysShort": "{days} g",
+      "openStash": "Apri magazzino",
+      "openMerchant": "Apri mercante",
+      "state": {
+        "built": "Costruito",
+        "buildable": "Costruibile",
+        "locked": "Bloccato"
+      },
+      "category": {
+        "production": "Produzione",
+        "civic": "Civile",
+        "defense": "Difesa"
+      },
+      "upgrade": {
+        "build": "Costruisci",
+        "upgrade": "Potenzia",
+        "maxLevel": "Livello massimo",
+        "previewLabel": "solo anteprima",
+        "previewTooltip": "La costruzione arriva con l'aggiornamento dell'economia — questa schermata è un'anteprima"
+      },
+      "buildings": {
+        "lumbermill": {
+          "name": "Taglialegna",
+          "desc": "Ricava legname dai pini a est.",
+          "effect": "Legno al giorno: {value} → {next}"
+        },
+        "quarry": {
+          "name": "Cava",
+          "desc": "Estrae pietra e minerali dalle rupi a ovest.",
+          "effect": "Ferro al giorno: {value} → {next}"
+        },
+        "farm": {
+          "name": "Fattoria",
+          "desc": "Coltiva il prato lungo il fiume.",
+          "effect": "Cibo al giorno: {value} → {next}"
+        },
+        "warehouse": {
+          "name": "Magazzino",
+          "desc": "Custodisce le scorte del villaggio sotto chiave.",
+          "effect": "Capacità magazzino: {value} → {next}"
+        },
+        "inn": {
+          "name": "Locanda",
+          "desc": "Letti caldi e un focolare che attira nuova gente.",
+          "effect": "Capacità abitanti: {value} → {next}"
+        },
+        "smithy": {
+          "name": "Fucina",
+          "desc": "Forgia attrezzi e equipaggiamento per lavoro e quest.",
+          "effect": "Produzione fucina: {value} → {next}"
+        },
+        "market": {
+          "name": "Emporio",
+          "desc": "Il banco del mercante sulla piazza del villaggio.",
+          "effect": "Oro al giorno: {value} → {next}"
+        },
+        "infirmary": {
+          "name": "Infermeria",
+          "desc": "Erbe e letti tranquilli per i feriti.",
+          "effect": "Recupero ferite: {value} → {next}",
+          "unlockHint": "Sbloccata tramite una ricompensa di quest."
+        },
+        "palisade": {
+          "name": "Palizzata",
+          "desc": "Paletti affilati a guardia dell'accesso ovest.",
+          "effect": "Difesa: {value} → {next}"
+        },
+        "watchtower": {
+          "name": "Torre di guardia",
+          "desc": "Occhi sull'imbocco della valle.",
+          "effect": "Preavviso raid: {value} → {next} g"
+        },
+        "barracks": {
+          "name": "Baraccamento",
+          "desc": "Cuccette e addestramento per la milizia.",
+          "effect": "Capacità milizia: {value} → {next}",
+          "unlockHint": "Richiede Palizzata al livello II."
+        }
+      }
     }
   },
   "missionPlanner": {
@@ -1671,6 +1770,27 @@
       "draftHorse": "Una cavalcatura per tutta la spedizione — dimezza il passo di ogni tratto.",
       "healingDraught": "−10% di ferita a ogni check di tutti i membri.",
       "luckyCoin": "+10% alla ricompensa della spedizione."
+    },
+    "bag": {
+      "openPicker": "Scegli oggetti del villaggio",
+      "pickerTitle": "Magazzino del villaggio",
+      "covers": "Copre:",
+      "stock": "In magazzino: ×{qty}",
+      "emptySlot": "Slot bisaccia vuoto {index}",
+      "removeSlot": "Rimuovi {item}"
+    },
+    "keyStats": {
+      "title": "Stat chiave",
+      "primary": "Primaria",
+      "secondary": "Secondaria"
+    },
+    "statName": {
+      "str": "Forza",
+      "perc": "Percezione",
+      "con": "Costituzione",
+      "agi": "Destrezza",
+      "int": "Intelligenza",
+      "cha": "Carisma"
     },
     "coverage": "Copre"
   },

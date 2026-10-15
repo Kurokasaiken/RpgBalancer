@@ -876,7 +876,8 @@
         "amount": "{label} {value}.",
         "incoming": "Incoming from activities in progress: +{count}.",
         "food": "{label} {value} of {max}. Residents eat {perDay} a day: enough for {days} days."
-      }
+      },
+      "iron": "Iron"
     },
     "speed": {
       "ariaLabel": "Simulation speed",
@@ -1020,7 +1021,9 @@
         "heroSheet": "Character sheet",
         "villageStash": "Village stash",
         "merchant": "Merchant"
-      }
+      },
+      "pin": "Pin panel",
+      "unpin": "Unpin panel"
     },
     "stash": {
       "title": "Village stash",
@@ -1084,6 +1087,15 @@
         "armed": "armed",
         "held": "carried"
       },
+      "belt": {
+        "armed": "armed for the next check",
+        "shadowed": "covered by another armed item",
+        "inert": "no trial ahead needs it",
+        "actionArmed": "will be used at the next trial or fight",
+        "passive": "always in effect while packed"
+      },
+      "logEmpty": "The chronicle is empty",
+      "partyStatus": "Assigned party — {alive} of {total} standing",
       "dead": "fallen",
       "hpLost": "−{hp} HP",
       "loot": "+{count, plural, one {# loot} other {# loot}}",
@@ -1099,9 +1111,9 @@
       "hiddenEvent": "Hidden event — you could have missed it",
       "close": "Close the report",
       "beats": {
-        "continue": "Click to continue",
+        "continue": "Continue",
+        "clickHint": "Click to continue",
         "more": "{count, plural, one {# beat left — click to continue} other {# beats left — click to continue}}",
-        "skipAll": "Skip to the frontier",
         "recap": "While you were away: {scenes} scenes, {checks} checks, {deaths} fallen, {wounds} hurt"
       },
       "combat": {
@@ -1165,6 +1177,93 @@
       "badge": "Lv {n}",
       "floater": "Level {n}",
       "a11y": "Level {n} hero"
+    },
+    "village": {
+      "ariaLabel": "Village — buildings",
+      "pinsToolbar": "Village buildings",
+      "levelShort": "Lv {level}",
+      "levelBadge": "Lv {level}/{max}",
+      "effectLabel": "Effect",
+      "costLabel": "Cost",
+      "daysShort": "{days} d",
+      "openStash": "Open warehouse",
+      "openMerchant": "Open merchant",
+      "state": {
+        "built": "Built",
+        "buildable": "Buildable",
+        "locked": "Locked"
+      },
+      "category": {
+        "production": "Production",
+        "civic": "Civic",
+        "defense": "Defense"
+      },
+      "upgrade": {
+        "build": "Build",
+        "upgrade": "Upgrade",
+        "maxLevel": "Max level",
+        "previewLabel": "preview only",
+        "previewTooltip": "Construction arrives with the economy update — this screen is a preview"
+      },
+      "buildings": {
+        "lumbermill": {
+          "name": "Lumbermill",
+          "desc": "Fells timber from the eastern pines.",
+          "effect": "Wood per day: {value} → {next}"
+        },
+        "quarry": {
+          "name": "Quarry",
+          "desc": "Cuts stone and ore from the western cliffs.",
+          "effect": "Iron per day: {value} → {next}"
+        },
+        "farm": {
+          "name": "Farm",
+          "desc": "Tills the meadow along the stream.",
+          "effect": "Food per day: {value} → {next}"
+        },
+        "warehouse": {
+          "name": "Warehouse",
+          "desc": "Keeps the village's stock under lock and key.",
+          "effect": "Storage capacity: {value} → {next}"
+        },
+        "inn": {
+          "name": "Inn",
+          "desc": "Warm beds and a hearth that draw in new folk.",
+          "effect": "Villager capacity: {value} → {next}"
+        },
+        "smithy": {
+          "name": "Smithy",
+          "desc": "Forges tools and gear for work and quest.",
+          "effect": "Forge output: {value} → {next}"
+        },
+        "market": {
+          "name": "Market",
+          "desc": "The trader's stall on the village square.",
+          "effect": "Gold per day: {value} → {next}"
+        },
+        "infirmary": {
+          "name": "Infirmary",
+          "desc": "Herbs and quiet beds for the wounded.",
+          "effect": "Injury recovery: {value} → {next}",
+          "unlockHint": "Unlocked by a quest reward."
+        },
+        "palisade": {
+          "name": "Palisade",
+          "desc": "Sharpened stakes guarding the west approach.",
+          "effect": "Defense: {value} → {next}"
+        },
+        "watchtower": {
+          "name": "Watchtower",
+          "desc": "Eyes over the valley mouth.",
+          "effect": "Raid warning: {value} → {next} d"
+        },
+        "barracks": {
+          "name": "Barracks",
+          "desc": "Bunks and drills for the village militia.",
+          "effect": "Militia capacity: {value} → {next}",
+          "unlockHint": "Requires Palisade at level II."
+        }
+      }
     }
   },
   "missionPlanner": {
@@ -1650,6 +1749,27 @@
       "draftHorse": "One mount for the whole expedition — halves the pace of every leg.",
       "healingDraught": "−10% wound chance on every member's check.",
       "luckyCoin": "+10% to the expedition's reward."
+    },
+    "bag": {
+      "openPicker": "Choose village items",
+      "pickerTitle": "Village warehouse",
+      "covers": "Covers:",
+      "stock": "In store: ×{qty}",
+      "emptySlot": "Empty bag slot {index}",
+      "removeSlot": "Remove {item}"
+    },
+    "keyStats": {
+      "title": "Key stats",
+      "primary": "Primary",
+      "secondary": "Secondary"
+    },
+    "statName": {
+      "str": "Strength",
+      "perc": "Perception",
+      "con": "Constitution",
+      "agi": "Agility",
+      "int": "Intelligence",
+      "cha": "Charisma"
     },
     "coverage": "Covers"
   },

@@ -38,6 +38,7 @@ The Sentinel persona is a post-feature reviewer that protects RPG Balancer from 
 - `material-canvas-v2.html`
 - `.windsurf/plans/style-lab-wanderlust-refinement-9c241b.md`
 - `src/docs/docs/QA/test-route-drag-guidelines.md` (se si revisionano cambi alla route `/test` o drag/drop harness: verificare VRT, mouse reale, trace viewer, evidence log)
+- `.windsurf/rules/16-no-foreground-windows.md` (nessuna finestra in primo piano dall'automazione: flagga `headless: false`, `--headed`/`--ui`, `open` senza `-g`, `activate`/`bringToFront` nei changes)
 
 > Every audit report must explicitly list a "Docs Consulted" section referencing the items above (mark entries as `N/A – backend only` only when confirmed). Missing citations = audit failure.
 

@@ -4,10 +4,7 @@ import '@testing-library/jest-dom';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { MERCHANT_CONFIG, merchantSchema } from '@/balancing/config/idleVillage/merchantConfig';
-import { VILLAGE_STASH_CONFIG, WORLD_CANVAS } from '@/balancing/config/idleVillage/villageStashConfig';
-import { QUEST_POIS } from '@/balancing/config/idleVillage/quests/questPois';
 import { HUD_PANELS } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
-import { BUILDING_ICON_URLS } from '@/ui/idleVillage/components/gameFrame/MapBuildingPoi';
 import { MERCHANT_OFFER_ICON_KEYS } from '@/ui/idleVillage/components/gameFrame/merchantOfferIcons';
 import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
 
@@ -37,24 +34,17 @@ const declaredKeys = (): string[] => [
 ];
 
 describe('merchantConfig', () => {
-  it('parses with unique offerIds and in-bounds marker', () => {
+  it('parses with unique offerIds', () => {
     const ids = CFG.offers.map((o) => o.offerId);
     expect(new Set(ids).size).toBe(ids.length);
     expect(CFG.offers.length).toBeGreaterThanOrEqual(3);
     expect(CFG.offers.length).toBeLessThanOrEqual(4);
-    expect(CFG.marker.worldX).toBeGreaterThanOrEqual(0);
-    expect(CFG.marker.worldX).toBeLessThanOrEqual(4240);
-    expect(CFG.marker.worldY).toBeGreaterThanOrEqual(0);
-    expect(CFG.marker.worldY).toBeLessThanOrEqual(2828);
   });
 
-  it('rejects duplicate offerIds and out-of-bounds markers at parse time', () => {
+  it('rejects duplicate offerIds and malformed keys at parse time', () => {
     const base = structuredClone(CFG) as Parameters<typeof merchantSchema.parse>[0];
     expect(() =>
       merchantSchema.parse({ ...base, offers: [...base.offers, { ...base.offers[0] }] }),
-    ).toThrow();
-    expect(() =>
-      merchantSchema.parse({ ...base, marker: { ...base.marker, worldX: WORLD_CANVAS.widthPx + 1 } }),
     ).toThrow();
     expect(() =>
       merchantSchema.parse({ ...base, countdownLabelKey: 'not a key!!' }),
@@ -65,7 +55,6 @@ describe('merchantConfig', () => {
     expect(Object.isFrozen(CFG)).toBe(true);
     expect(Object.isFrozen(CFG.offers)).toBe(true);
     expect(Object.isFrozen(CFG.offers[0])).toBe(true);
-    expect(Object.isFrozen(CFG.marker)).toBe(true);
   });
 
   it('resolves every declared key non-empty in both locales, with en/it parity', () => {
@@ -86,31 +75,15 @@ describe('merchantConfig', () => {
     }
   });
 
-  it('offer iconKeys ∈ the offer-icon map; marker iconKey ∈ the building-icon map', () => {
+  it('offer iconKeys ∈ the offer-icon map', () => {
     for (const offer of CFG.offers) {
       expect(MERCHANT_OFFER_ICON_KEYS, `unknown offer iconKey ${offer.iconKey}`).toContain(offer.iconKey);
     }
-    expect(Object.keys(BUILDING_ICON_URLS)).toContain(CFG.marker.iconKey);
   });
 
-  it('anchors the merchant marker clear of every other map anchor', () => {
-    const { worldX, worldY } = CFG.marker;
-    const others = [
-      { id: 'building-stash', x: VILLAGE_STASH_CONFIG.marker.worldX, y: VILLAGE_STASH_CONFIG.marker.worldY },
-      ...QUEST_POIS.map((p) => ({ id: p.id, x: p.x, y: p.y })),
-      { id: 'demo-job', x: 0.38 * 4240, y: 0.66 * 2828 },
-      { id: 'demo-event', x: 0.35 * 4240, y: 0.37 * 2828 },
-      { id: 'invasion-land', x: 0.239 * 4240, y: 0.417 * 2828 },
-      { id: 'invasion-village', x: 0.486 * 4240, y: 0.554 * 2828 },
-    ];
-    const MIN_DISTANCE = 120;
-    for (const other of others) {
-      const d = Math.hypot(worldX - other.x, worldY - other.y);
-      expect(d, `merchant marker too close to ${other.id}: ${d.toFixed(0)}u`).toBeGreaterThanOrEqual(MIN_DISTANCE);
-    }
-  });
-
-  it('registers the merchant panel (menu path) while its marker stays Director-staged', () => {
+  /* PLAN-035: no continent-map marker — the emporium tooltip inside the
+   * Village view opens the panel; menu/`m` paths stay registered. */
+  it('registers the merchant panel (menu path)', () => {
     const entry = HUD_PANELS.find((p) => p.id === 'merchant');
     expect(entry, 'merchant missing from HUD_PANELS — menu/shortcut would not open it').toBeTruthy();
     expect(entry?.defaultVisible).toBe(false);
