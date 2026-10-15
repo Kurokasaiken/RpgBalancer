@@ -19,6 +19,15 @@ const KNOWN_WORK_PATTERNS = [
   'dispatcher.py',
   'mw-iterative-deliberate.py',
   'mw-orchestrate.py',
+  /* Dev/test activity — registry integrations (OPS-SHUTDOWN-006) are not
+   *  wired yet, so a running test suite or dev server must still block. */
+  'playwright',
+  'vitest',
+  'vite preview',
+  'vite build',
+  'npm run dev',
+  'npm run build',
+  'npm run test',
 ];
 
 const PS_TIMEOUT_MS = 5_000;
