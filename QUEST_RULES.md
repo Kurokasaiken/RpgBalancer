@@ -262,6 +262,35 @@ al Director, non assorbimento silenzioso.
   **STATUS:** `vigente` come regola piena; `implementato (parziale)` sul runtime — conseguenze sulle quest TERMINATE attive dal 2026-10-10 (PLAN-019-S2.5): settlement idempotente su `/game` applica morte/ferita (con `injuredUntilTick` + recovery sweep), reward/bottino/XP e rilascio party come dati persistiti una sola volta (journal per-effetto, ledger co-locato). Da implementare: forma e trigger delle conseguenze da **mancata risoluzione** (scadenza offerta, offerta ignorata) — scope di un piano successivo; memoria narrativa resta OPEN-016 → S4.
   **SOURCE:** Director 2026-10-07, verbatim in `RICHIESTE.md` R-092; `.mw/desiderata.md` v24 S1–S4; conferma Director 2026-10-10 (DECISION_LOG); implementazione in `src/ui/idleVillage/quests/questSettlement.ts` + tabella transizioni in `plans/PLAN-019-S2.5-settlement-e2e.md`.
 
+## 8b. Offerte quest sulla mappa (POI lifecycle e reveal)
+
+- **RULE — Lifecycle dell'offerta (POI):** una quest POI è **one-shot di
+  default** — quando il rapporto di una run ended+settled viene chiuso, il
+  POI viene **consumato** (`consumedPoiIds`, persistito): lascia la mappa e
+  non torna più, anche dopo reload. Un POI con `repeatable: true` authored
+  in config non viene mai consumato: alla chiusura del rapporto la run si
+  sgancia e l'offerta torna `available`, rilanciabile, finché la finestra
+  `[availableFromDay, availableUntilDay)` resta aperta. Un flag `repeatable`
+  aggiunto dopo ignora anche un eventuale record consumato stantio
+  (migrazione onesta). Attualmente: `poi-goblin` è `repeatable` (caccia
+  ripetibile), `poi-rovine` resta one-shot.
+  **STATUS:** `vigente`. **SOURCE:** D-S4-6 (PLAN-019-S4 T-3) + Director
+  2026-10-15 (R-200); implementazione `questPois.ts`
+  (`repeatable`/`poiConsumesOnReportClose`/`isPoiConsumed`) + consumo in
+  `src/pages/game-frame-pixi.tsx`.
+- **RULE — Reveal delle offerte su `/game`:** i POI quest **compaiono da
+  soli** all'apertura della pagina, uno alla volta sfalsati su wall-clock
+  (`gameFrameConfig.questReveal`: primo ingresso `initialDelayMs` dopo
+  l'uscita del boot veil, poi uno ogni `staggerMs`, default 1s/5s, ordine
+  authored `QUEST_POIS`). Il reveal è **monotono**: ciò che è apparso non
+  scompare per il reveal (l'uscita resta possibile solo per il lifecycle —
+  offerta scaduta senza run, POI one-shot consumato). Il pulsante Director
+  «Show quest» è un trigger **one-way** «reveal ora» che salta la coda;
+  «Reset» ri-arma lo stagger per un nuovo take. Una run attiva monta il
+  proprio POI senza attendere lo stagger.
+  **STATUS:** `vigente`. **SOURCE:** Director 2026-10-15 (R-200); supera
+  R-124 («nessun POI al boot»).
+
 ## 9. Parcheggiato / non-regole
 
 - **Noise meter:** parcheggiato — stealth-specific, non regola generica
