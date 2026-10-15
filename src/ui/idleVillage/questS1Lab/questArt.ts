@@ -8,7 +8,7 @@ export const ART = {
   map: '/Map finale.jpg',
   mountains: '/assets/world/wanderlust/base/layers/Zona montana nord.webp',
   village: '/assets/world/wanderlust/base/layers/Villaggio.webp',
-  goblinTotem: '/mockups/goblin-invasion-painted/goblin-invasion-hero.png',
+  goblinTotem: '/assets/ui/goblin-invasion/goblin-invasion-hero.png',
   goblinMarch: '/goblin-march-trasparente.png',
 } as const;
 

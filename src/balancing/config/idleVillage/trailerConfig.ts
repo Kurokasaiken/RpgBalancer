@@ -104,9 +104,9 @@ export const trailerConfig = {
     eventPlaque: "⚔️ Invasion",
     mapImage: '/Map finale.jpg',
     goblinImage: '/goblin-march-trasparente.png',
-    goblinTotemImage: '/mockups/goblin-totem-pilot/goblin-totem-pilot-20260815-20260814-215742.png',
-    goblinInvasionPanel: '/mockups/goblin-totem-pilot/goblin-totem-ipadapter-20260816-20260814-225603.png',
-    goblinInvasionHeroAsset: '/mockups/goblin-totem-hero/goblin-totem-asset-v2.png',
+    goblinTotemImage: '/assets/ui/goblin-invasion/goblin-totem-pilot-20260815-20260814-215742.png',
+    goblinInvasionPanel: '/assets/ui/goblin-invasion/goblin-totem-ipadapter-20260816-20260814-225603.png',
+    goblinInvasionHeroAsset: '/assets/ui/goblin-invasion/goblin-totem-asset-v2.png',
     goblin: {
       baseWidth: '50vw',
       scale: 0.33,
