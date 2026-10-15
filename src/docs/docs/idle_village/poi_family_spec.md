@@ -204,6 +204,11 @@ Three kinds of map offer must read apart: **normal quest**, **main quest**, **ev
 - **Interpretation to confirm:** "durata molto più lunga" is read as a much longer offer window (`availableDays`), and "halo pieno fin dall'inizio" as the deadline halo being full on appearance. Once embarked, a main quest uses the normal work mode (fills clockwise, verdigris), like every quest (D4: filling = work).
 - **Data source (implemented):** `tier: 'normal' | 'main'` (optional, absent = `normal`) in `QuestPoiSchema` (`balancing/config/idleVillage/quests/questPois.ts`) — the real quest definition, not the demo `questPois` of `gameFrameConfig`. `MapQuestPoi` reads `questPoiById(activity.id)?.tier` (a `tier` prop overrides it) and passes it to `mapQuestPoiView(…, tier)`, which for `main` + an open offer returns `progress: availability.progress` (not renormalised), `direction: 'counterclockwise'`, ivory until `expiring`. Still the only source (T-07). **Today no quest is authored as `main` and the slice offers never expire** (`SLICE_OFFER_WINDOW_DAYS` = 10 000), so this path is covered by unit tests, not yet visible on `/game`.
 
+### Offer lifecycle — consumption and reveal (R-200)
+
+- **Consumption:** an offer is **one-shot by default** — dismissing the report of an ended+settled run writes the POI into `consumedPoiIds` (persisted) and it never comes back. `repeatable: true` on the POI disables consumption: the cleared run returns the marker to `available` while the window stays open, and a stale consumed record is ignored. `poi-goblin` is the authored repeatable offer; `poi-rovine` stays one-shot. Predicates: `poiConsumesOnReportClose` / `isPoiConsumed` in `questPois.ts`.
+- **Reveal:** on `/game` the offers mount on their own, staggered on wall clock (`gameFrameConfig.questReveal` — 1s after the veil, then 5s apart, authored order). The reveal only adds: a marker never un-reveals (exits still come from expiry/consumption, through the ghost fade). The Director «Show quest» action is a one-way «reveal now»; a live run always mounts its POI without waiting for a stagger slot.
+
 ### Halo grammar (D4: one thing, time, in two modes)
 
 | Mode | When | Direction | Colour |
