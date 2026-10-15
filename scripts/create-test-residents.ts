@@ -10,7 +10,7 @@ import { TEST_ROSTER_HEROES } from '../src/balancing/config/idleVillage/testRost
 async function createTestResidents() {
   console.log('🔧 Creando residenti di test...');
   
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
   const context = await browser.newContext();
   const page = await context.newPage();
 

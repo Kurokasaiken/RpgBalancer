@@ -533,7 +533,7 @@ async function analyzeRendererStack() {
   console.log('🚀 Starting renderer stack analysis...');
   
   const browser = await puppeteer.launch({ 
-    headless: false,
+    headless: process.env.HEADLESS !== 'false',
     defaultViewport: { width: 1200, height: 800 }
   });
   

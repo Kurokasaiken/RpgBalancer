@@ -28,6 +28,7 @@ Before running health checks or deployments, re-read and cite the following in t
 - `material-canvas-v2.html`
 - `.windsurf/plans/style-lab-wanderlust-refinement-9c241b.md`
 - `src/docs/docs/QA/test-route-drag-guidelines.md` (se gli script o i deploy includono modifiche al percorso `/test` o ai Playwright harness)
+- `.windsurf/rules/16-no-foreground-windows.md` (l'automazione non apre mai una finestra in primo piano)
 
 Log these under a "Docs Consulted" section whenever you create/update guardian evidence.
 

@@ -401,6 +401,10 @@ export const GOBLIN_SCENARIO_AUTHORED = {
   scenarioVersion: 's2.1-goblin-v1',
   startNode: 'gob-inizio',
   primaryStats: ['str', 'perc'] as LabStat[],
+  /* PLAN-036 (R-195): planner key-stat tiers — Forza primary, Percezione
+   * secondary (spec §0 verbatim). Display tiers only; `primaryStats` —
+   * the frozen simulation input — is untouched. */
+  keyStats: { primary: ['str'], secondary: ['perc'] },
   beats: [
     'Assignment',
     'Exploration',
@@ -484,6 +488,8 @@ export const GOBLIN_SCENARIO_AUTHORED = {
     ],
     dangerBandRef: 'alta',
     rewardBase: 60,
+    /* PLAN-036: ~21:9 planner banner (the goblin totem, scene library). */
+    coverArt: '/assets/scene-library/totem-goblin.jpg',
   },
   nodes: GOBLIN_NODES,
 } satisfies Omit<QuestScenario, 'primaryStats'> & { primaryStats: LabStat[] };

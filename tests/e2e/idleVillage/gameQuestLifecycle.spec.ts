@@ -9,8 +9,9 @@
  *   «Invia spedizione» → run in the QuestRunWindow → frontiers maturing on
  *   the canonical clock → HUD time controls (pause / resume / ×N, one
  *   driver only) → decisions → terminal outcome → settlement applied once
- *   (rewards + resident fates as data) → party back home → the POI leaves
- *   the map when the report is dismissed and stays gone after reload.
+ *   (rewards + resident fates as data) → party back home → il POI goblin è
+ *   `repeatable` (R-200): dismissed il rapporto, il marker torna
+ *   `available` — mai consumato, anche dopo reload — e la quest si rifà.
  *
  * Boundaries: `__idleVillageTestHooks.expedition[poiId]` is the inspection/
  * assignment api (same rules as the real UI path — `assignToSlot` refuses
@@ -348,7 +349,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     await expect(page.locator('[data-testid="drag-test-container"], [data-testid="resident-roster-panel"]').first()).toBeVisible({ timeout: 15_000 });
   });
 
-  test('boot: roster seedato — 3 eroi + 3 popolani — nessun POI in mappa finché la Regia non li rivela', async ({
+  test('boot: roster seedato — 3 eroi + 3 popolani — offerta fresca `available` con halo vuota', async ({
     page,
   }) => {
     await expect(page.locator(`[data-worker-id="${VALID_LEADER}"]`).first()).toBeVisible();
@@ -357,10 +358,11 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     await expect(page.locator(`[data-worker-id="${FOLK_FIGHTER}"]`).first()).toBeVisible();
     await expect(page.locator(`[data-worker-id="${FOLK_SCOUT}"]`).first()).toBeVisible();
     await expect(page.locator(`[data-worker-id="${FOLK_GUARD}"]`).first()).toBeVisible();
-    /* R-124: la mappa parte pulita — nessun marker prima del reveal, e dopo
-     *  «Mostra quest» l'offerta fresca legge `available` con halo VUOTA
-     *  (il sigillo non è scritto finché la run non parte). */
-    await expect(page.locator('[data-map-quest-poi-target]')).toHaveCount(0);
+    /* R-200 supera R-124: le offerte si rivelano da sole a stagger dopo il
+     *  veil («Mostra quest» è ora un trigger one-way che salta la coda).
+     *  Ciò che resta del vecchio contratto: l'offerta fresca legge
+     *  `available` con halo VUOTA — il sigillo non è scritto finché la run
+     *  non parte. */
     await revealQuestPois(page);
     expect(await poiStatus(page)).toBe('available');
     await expect(poiMarker(page).locator('.poiv3_5--expiring')).toHaveCount(0);
@@ -601,17 +603,24 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     }
   });
 
-  test('chiusura del rapporto: il POI sparisce dalla mappa e la run è consumata', async ({ page }) => {
+  test('chiusura del rapporto: il POI goblin RESTA — `repeatable`, run sganciata, riproponibile (R-200)', async ({ page }) => {
     await launchGoblinQuest(page);
     await driveRunToEnd(page);
     await waitForSettled(page);
     await flushBeatTheatre(page);
     await expect(closeReportButton(page)).toBeVisible();
 
+    /* D-1: il report di un'offerta `repeatable` non consuma il POI — la run
+     *  si sgancia e il marker torna `available` (stesso DOM id, il ghost
+     *  exit non scatta perché l'anchor resta in lista). */
     await closeReportButton(page).click();
     await expect(questWindow(page)).toHaveCount(0);
-    await expect(poiMarker(page)).toHaveCount(0);
     expect(await getRun(page)).toBeNull();
+    await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');
+    /* «Dopo il reward puoi rifarla»: il marker riapre il planner — la
+     *  re-launch path è la stessa del primo ciclo. */
+    await poiMarker(page).click();
+    await expect(detail(page)).toBeVisible();
     /* Anche il marker rovine non è stato toccato. */
     await expect(page.locator(`[data-quest-poi-id="${POI_ROVINE}"]`)).toBeVisible({ timeout: 15_000 });
   });

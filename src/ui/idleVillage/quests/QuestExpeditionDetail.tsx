@@ -5,13 +5,16 @@
  * presentation — all numbers come from `resolved` (the frozen offer) and
  * `estimate` (the chunked Monte Carlo), all strings from i18n.
  */
-import React, { useState, type CSSProperties } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { Maximize2, Minus, Swords, X } from 'lucide-react';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { HudChip, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { useHudPanelDrag } from '@/ui/idleVillage/components/gameFrame/useHudPanelDrag';
+import { VillageStashItemIcon } from '@/ui/idleVillage/components/gameFrame/villageStashItemIcons';
+import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 import type { QuestPoi, DangerBand } from '@/balancing/config/idleVillage/quests/questPois';
@@ -19,12 +22,15 @@ import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
 import { REWARD_TIERS } from '@/balancing/config/idleVillage/quests/rewardTiers';
 import { QUEST_STASH, loadoutCoverage } from '@/balancing/config/idleVillage/quests/questStash';
 import { toEngineFlag } from '@/balancing/config/idleVillage/quests/questItems';
-import type { QuestItem } from '@/balancing/config/idleVillage/quests/questItems.schema';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { QUEST_PLANNER_INFO } from '@/balancing/config/idleVillage/quests/questPlannerInfo';
 import type { PartyEstimate, ResolvedQuestOffer } from '@/ui/idleVillage/questS1Lab/questOffer';
 import type { ForecastDelta } from '@/ui/idleVillage/questS1Lab/questSimulation';
-import type { LoadoutDuration } from './questExpedition';
+import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import type { LabStat } from '@/ui/idleVillage/questS1Lab/questScenario';
+import { residentToQuestMember } from '@/ui/idleVillage/questS1Lab/residentToQuestMember';
+import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
+import { deriveKeyStats, type BagStockEntry, type LoadoutDuration } from './questExpedition';
 import { STAT_ICONS } from '@/ui/idleVillage/questS1Lab/questRun';
 import { STAT_SHORT } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { getStatIconComponent, lucideStatIcons } from '@/ui/shared/statIconUtils';
@@ -40,6 +46,47 @@ const bandById = (id: string): DangerBand | undefined => DANGER_BANDS.find((b) =
 /** engine flag → stash entry: the static catalog join the loadout zone
  *  needs for effect tooltips (`descKey` lives on the stash item). */
 const STASH_BY_FLAG = new Map(QUEST_STASH.items.map((i) => [i.flag, i]));
+
+/** Shared tooltip surface styling — same lacquer idiom as QuestRunWindow. */
+const TOOLTIP_STYLE: CSSProperties = {
+  zIndex: 2000,
+  maxWidth: 280,
+  padding: '9px 11px',
+  borderRadius: 8,
+  border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)',
+  background: 'var(--skin-hud-lacquer-deep)',
+  boxShadow: '0 10px 24px color-mix(in srgb, var(--skin-hud-lacquer-deep) 80%, transparent)',
+};
+
+/**
+ * Rich tooltip for a bag item (PLAN-036, R-195): name, effect description,
+ * stat coverage and village stock. Tiles stay icon-only — ALL text lives
+ * here. `labelKey`/`descKey` may carry the `idleVillage.` prefix (stripped)
+ * or be `questS1Lab.*` (verbatim).
+ */
+const BagItemTooltip: React.FC<{ entry: BagStockEntry }> = ({ entry }) => {
+  const { t } = useTranslation('idleVillage');
+  const { item, qty } = entry;
+  const stash = item.engineFlag ? STASH_BY_FLAG.get(item.engineFlag) : undefined;
+  const descKey = item.descKey ?? stash?.descKey;
+  const line: CSSProperties = { fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.35, color: TONE.text };
+  return (
+    <Tooltip.Portal>
+      <Tooltip.Content side="top" sideOffset={6} style={TOOLTIP_STYLE}>
+        <div style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--skin-title-color)', marginBottom: 4 }}>
+          {t(stripNs(item.labelKey))}
+        </div>
+        {descKey && <div style={line}>{t(descKey)}</div>}
+        {stash?.stats && stash.stats.length > 0 && (
+          <div style={{ ...line, color: TONE.secondary }}>
+            {t('questExpedition.bag.covers')} {stash.stats.map((s) => STAT_SHORT[s] ?? s).join(' · ')}
+          </div>
+        )}
+        <div style={{ ...line, color: TONE.secondary }}>{t('questExpedition.bag.stock', { qty })}</div>
+      </Tooltip.Content>
+    </Tooltip.Portal>
+  );
+};
 
 export interface QuestExpeditionDetailProps {
   poi: QuestPoi;
@@ -61,7 +108,9 @@ export interface QuestExpeditionDetailProps {
    *  `factor ≠ 1` ⇒ the bag changes the run's real pace. */
   expeditionDuration: LoadoutDuration;
   requiredFilled: boolean;
-  items: QuestItem[];
+  /** Village-stocked consumables the bag can hold (PLAN-036): the shelf IS
+   *  the picker's catalogue — `qty` feeds each tile's stock badge. */
+  items: BagStockEntry[];
   selectedItemIds: string[];
   onToggleItem: (itemId: string) => void;
   canSend: boolean;
@@ -92,14 +141,77 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   position,
 }) => {
   const { t } = useTranslation('idleVillage');
-  const { panelStyle, handleProps } = useHudPanelDrag();
   const [minimised, setMinimised] = useState(false);
+  /* PLAN-036 (R-195): the external bag picker — conditionally rendered,
+   *  Escape/click-outside close it (picker ONLY — a global capture handler
+   *  stops the key before any panel-level handler sees it) and focus
+   *  returns to the toggle. */
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement | null>(null);
+  const pickerToggleRef = useRef<HTMLButtonElement | null>(null);
+  /* PLAN-036: the two-plaque assembly is ONE drag union — `shellRef` makes
+   *  the clamp/re-clamp (companion resize, viewport resize) cover both
+   *  plaques and the absolutely-positioned picker (`data-hud-companion`). */
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const { panelStyle, handleProps } = useHudPanelDrag({ shellRef, edgeInsetPx: 12, reclampDeps: [pickerOpen] });
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.stopPropagation();
+      setPickerOpen(false);
+      pickerToggleRef.current?.focus();
+    };
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (!pickerRef.current?.contains(target) && !pickerToggleRef.current?.contains(target)) {
+        setPickerOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKey, true);
+    window.addEventListener('pointerdown', onPointerDown, true);
+    return () => {
+      window.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('pointerdown', onPointerDown, true);
+    };
+  }, [pickerOpen]);
   const dangerBand = resolved ? bandById(resolved.resolvedOffer.bandIds.danger) : undefined;
   const rewardTier = resolved ? REWARD_TIERS.find((rt) => rt.id === resolved.resolvedOffer.bandIds.rewardTier) : undefined;
   const ready = !resolvePending && typeof estimate === 'object';
   const title = scenario?.title ?? poi.id;
   const anchor = position ?? { x: 120, y: 96 };
   const panelId = `quest-expedition-${poi.id}`;
+  const LAYOUT = QUEST_PLANNER_INFO.layout;
+
+  /* PLAN-036: authored key-stat tiers (verbatim, never derived by set
+   *  subtraction — Rovine `con` legitimately sits in `primaryStats` AND the
+   *  secondary tier). The deterministic fallback covers unschematized
+   *  scenarios. */
+  const keyTiers = useMemo(() => deriveKeyStats(scenario), [scenario]);
+
+  /* Deterministic coverage (r008 §2.4): a key stat is ✓ when the packed bag
+   *  covers it via `loadoutCoverage` OR an assigned member's derived quest
+   *  stat meets `keyStatCoverageThreshold`. */
+  const bagCoveredStats = useMemo(() => loadoutCoverage(selectedItemIds.map(toEngineFlag)), [selectedItemIds]);
+  const memberStats = useMemo(
+    () =>
+      slots
+        .map((s) => s.assignedResident)
+        .filter((r): r is ResidentState => Boolean(r))
+        .map((r) => residentToQuestMember(r, 'member').stats),
+    [slots],
+  );
+  const keyStatCovered = useCallback(
+    (stat: LabStat) =>
+      bagCoveredStats.includes(stat) ||
+      memberStats.some((stats) => (stats[stat] ?? 0) >= QUEST_PLANNER_INFO.keyStatCoverageThreshold),
+    [bagCoveredStats, memberStats],
+  );
+
+  /* Cinema banner: authored `offer.coverArt`, else the start node's scene
+   *  art — the same image the theatre would open on. */
+  const cinemaSrc = scenario?.offer.coverArt ?? (scenario ? NODE_ART[scenario.startNode]?.src : undefined);
 
   /** Signed pp badge for a delta metric — `0` renders nothing (no noise). */
   const deltaMark = (pp: number, goodWhenDown: boolean) => {
@@ -157,12 +269,28 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
 
   return (
     <SkinScope>
+      {/* PLAN-036: ONE fixed shell dragging BOTH plaques as a union —
+       *  `data-hud-panel` is the drag hook's anchor; flexWrap lets the
+       *  sidecar fold under the main plaque when the pair cannot fit. */}
+      <div
+        ref={shellRef}
+        data-hud-panel={panelId}
+        style={{
+          ...shell,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: LAYOUT.gapPx,
+          maxWidth: 'calc(100vw - 24px)',
+        }}
+      >
       <HudPlaque
         shape="panel"
         as="section"
         aria-label={title}
         data-testid={`floating-panel-${panelId}`}
-        style={{ ...shell, width: 520, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
+        style={{ width: LAYOUT.mainWidthPx, maxHeight: `calc(100vh - ${LAYOUT.plaqueViewportMarginPx}px)`, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
       >
         {/* Title row = drag handle; window controls on the right (QuestRunWindow idiom). */}
         <div {...handleProps} data-testid={`floating-panel-header-${panelId}`} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -196,7 +324,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           data-testid="quest-expedition-detail"
           data-poi-id={poi.id}
           className="quest-s1-scroll"
-          style={{ maxHeight: QUEST_PLANNER_INFO.outcome.panelMaxBodyHeightPx, overflowY: 'auto', scrollbarGutter: 'stable', display: 'flex', flexDirection: 'column', gap: 12 }}
+          style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', scrollbarGutter: 'stable', display: 'flex', flexDirection: 'column', gap: 12 }}
         >
         {/* Offer header — objective, tags, frozen band/tier/duration. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -234,6 +362,29 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           </div>
         </div>
 
+        {/* Cinema banner (R-195): ~21:9 art straight under the subtitle —
+         *  `offer.coverArt` authored, else the start node's scene art. */}
+        {cinemaSrc && (
+          <div
+            data-testid="quest-expedition-cinema"
+            style={{
+              width: '100%',
+              aspectRatio: `${LAYOUT.cinemaAspect} / 1`,
+              maxHeight: LAYOUT.cinemaMaxHeightPx,
+              borderRadius: 8,
+              overflow: 'hidden',
+              border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
+            }}
+          >
+            <img
+              src={cinemaSrc}
+              alt=""
+              aria-hidden
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+          </div>
+        )}
+
         {/* Slots — the trusted rack; drop-state comes from the session's
          *  quest eligibility resolver. R-183: a slotted token can be dragged
          *  onto another slot (move / swap) without extracting it. */}
@@ -245,20 +396,243 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           enableSlotSwap
         />
 
-        {/* OUTCOME zone (S3 T-2): aggregate → BY MEMBER → WHY inside a
-         *  scrollable analysis region — offer header, slot rack, loadout
-         *  and send stay anchored (same contract as QuestRunWindow D-7).
-         *  Never partial numbers: 'computing' and 'incomplete' are whole
-         *  states, a stale estimate never bleeds through. */}
+        {/* Bisaccia (PLAN-036, R-195): `QUEST_STASH.bagSlots` visible slots
+         *  (icon-only; a filled slot's button removes the item) + ONE toggle
+         *  that opens the EXTERNAL village-stock picker. Every surface the
+         *  toggle opens lives inside this `data-hud-controls` scope (T-03). */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+            {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
+          </span>
+          <div data-hud-controls="" data-testid="quest-expedition-loadout" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 6 }}>
+            {Array.from({ length: QUEST_STASH.bagSlots }, (_, i) => {
+              const id = selectedItemIds[i];
+              const entry = id ? items.find((e) => e.item.id === id) : undefined;
+              return (
+                <span
+                  key={i}
+                  data-testid={`bag-slot-${i}`}
+                  style={{
+                    width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
+                    background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
+                    color: entry ? 'var(--skin-title-color)' : TONE.secondary,
+                  }}
+                >
+                  {entry ? (
+                    <Tooltip.Root delayDuration={120}>
+                      <Tooltip.Trigger asChild>
+                        <button
+                          type="button"
+                          data-testid={`loadout-item-${id}`}
+                          aria-label={t(stripNs(entry.item.labelKey))}
+                          title={t(stripNs(entry.item.labelKey))}
+                          onClick={() => onToggleItem(id!)}
+                          style={{ width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}
+                        >
+                          <VillageStashItemIcon icon={entry.item.icon} size={22} />
+                        </button>
+                      </Tooltip.Trigger>
+                      <BagItemTooltip entry={entry} />
+                    </Tooltip.Root>
+                  ) : (
+                    <EngravedIcon id="ico-pouch" size={16} style={{ opacity: 0.4 }} aria-hidden />
+                  )}
+                </span>
+              );
+            })}
+            <button
+              ref={pickerToggleRef}
+              type="button"
+              data-testid="quest-bag-picker-toggle"
+              aria-expanded={pickerOpen}
+              aria-haspopup="dialog"
+              aria-label={t('questExpedition.bag.openPicker')}
+              title={t('questExpedition.bag.openPicker')}
+              onClick={() => setPickerOpen((o) => !o)}
+              style={{
+                width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                border: `1px dashed color-mix(in srgb, ${TONE.accent} 65%, transparent)`,
+                background: pickerOpen ? `color-mix(in srgb, ${TONE.accent} 22%, transparent)` : 'transparent',
+                color: TONE.accent, cursor: 'pointer', padding: 0,
+              }}
+            >
+              <EngravedIcon id="ico-pouch" size={20} aria-hidden />
+            </button>
+            {pickerOpen && (
+              /* HudPlaque keeps its own measurement ref (no forwardRef) —
+               *  the outside-click scope lives on this positioned wrapper. */
+              <div ref={pickerRef} data-hud-companion style={{ position: 'absolute', left: 0, bottom: 'calc(100% + 8px)', zIndex: 30 }}>
+              <HudPlaque
+                as="div"
+                shape="panel"
+                role="dialog"
+                aria-label={t('questExpedition.bag.pickerTitle')}
+                data-testid="quest-bag-external-picker"
+                style={{
+                  display: 'grid', gridTemplateColumns: `repeat(${items.length}, 44px)`, gap: 6, padding: 10,
+                }}
+              >
+                {items.map((entry) => {
+                  const { item, qty } = entry;
+                  const selected = selectedItemIds.includes(item.id);
+                  const full = !selected && selectedItemIds.length >= QUEST_STASH.bagSlots;
+                  return (
+                    <Tooltip.Root key={item.id} delayDuration={120}>
+                      <Tooltip.Trigger asChild>
+                        <button
+                          type="button"
+                          data-testid={`picker-item-${item.id}`}
+                          aria-pressed={selected}
+                          aria-label={t(stripNs(item.labelKey))}
+                          disabled={full}
+                          onClick={() => onToggleItem(item.id)}
+                          style={{
+                            position: 'relative', width: 44, height: 44, borderRadius: 8, padding: 0,
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            border: `1px solid color-mix(in srgb, ${selected ? TONE.accent : 'var(--skin-surface-border)'} ${selected ? 85 : 50}%, transparent)`,
+                            background: selected ? `color-mix(in srgb, ${TONE.accent} 22%, transparent)` : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
+                            color: selected ? TONE.accent : 'var(--skin-title-color)',
+                            opacity: full ? 0.65 : 1,
+                            cursor: full ? 'default' : 'pointer',
+                          }}
+                        >
+                          <VillageStashItemIcon icon={item.icon} size={22} />
+                          <span
+                            aria-hidden
+                            style={{
+                              position: 'absolute', right: 1, bottom: 0, fontFamily: FONT.display, fontSize: 12, lineHeight: 1, color: TONE.secondary,
+                            }}
+                          >
+                            ×{qty}
+                          </span>
+                        </button>
+                      </Tooltip.Trigger>
+                      <BagItemTooltip entry={entry} />
+                    </Tooltip.Root>
+                  );
+                })}
+              </HudPlaque>
+              </div>
+            )}
+          </div>
+          </div>
+        </div>
+
+        {/* Anchored footer CTA (PLAN-036): OUTSIDE the scroll region — the
+         *  commit control is never pushed off-screen (BV-1). */}
+        <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 10 }}>
+          <SkinButton
+            variant="cta"
+            data-testid="quest-expedition-send"
+            disabled={!canSend}
+            aria-disabled={!canSend}
+            onClick={onSend}
+            style={{ width: '100%', opacity: canSend ? 1 : 0.65 }}
+          >
+            {t('questExpedition.send')}
+          </SkinButton>
+          {!canSend && (
+            <span style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.secondary }}>
+              {t('questExpedition.forecast.incomplete')}
+            </span>
+          )}
+        </div>
+      </HudPlaque>
+
+      {/* RIGHT — external forecast sidecar plaque (R-195): key-stat tiers
+       *  fixed on top, the scrollable analysis below. In-flow sibling of
+       *  the shell, so the drag union already covers it — no
+       *  `data-hud-companion` needed (that's for out-of-flow children). */}
+      <HudPlaque
+        shape="panel"
+        as="aside"
+        aria-label={t('questExpedition.forecast.title')}
+        data-testid="quest-expedition-forecast-column"
+        style={{ width: LAYOUT.sidecarWidthPx, maxHeight: `calc(100vh - ${LAYOUT.plaqueViewportMarginPx}px)`, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
+      >
+        <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+            {t('questExpedition.forecast.title')}
+          </span>
+
+          {/* Key Stats — the authored tiers VERBATIM (`keyStats`), or the
+           *  deterministic `deriveKeyStats` fallback. A tier is "covered"
+           *  when the bag or a member's stat meets the configured bar. */}
+          {keyTiers.primary.length > 0 && (
+            <div data-testid="forecast-key-stats" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {(
+                [
+                  { labelKey: 'questExpedition.keyStats.primary', stats: keyTiers.primary, testid: 'forecast-primary-stats' },
+                  { labelKey: 'questExpedition.keyStats.secondary', stats: keyTiers.secondary, testid: 'forecast-secondary-stats' },
+                ] as const
+              ).map((tier) =>
+                tier.stats.length === 0 ? null : (
+                  <div key={tier.testid} data-testid={tier.testid} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary, minWidth: 84 }}>
+                      {t(tier.labelKey)}
+                    </span>
+                    <span style={{ display: 'inline-flex', flexWrap: 'wrap', gap: 4 }}>
+                      {tier.stats.map((s) => {
+                        const covered = keyStatCovered(s);
+                        const Icon = getStatIconComponent(STAT_ICONS[s]) ?? lucideStatIcons.star;
+                        return (
+                          <span
+                            key={s}
+                            title={t(`questExpedition.statName.${s}`)}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 999,
+                              border: `1px solid color-mix(in srgb, ${covered ? TONE.ok : 'var(--skin-surface-border)'} 65%, transparent)`,
+                              fontFamily: FONT.display, fontSize: 12, color: covered ? TONE.ok : TONE.text,
+                            }}
+                          >
+                            {Icon && <Icon style={{ width: 12, height: 12 }} aria-hidden />}
+                            {t(`questExpedition.statName.${s}`)} {covered ? '✓' : '—'}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  </div>
+                ),
+              )}
+            </div>
+          )}
+
+          {/* Coverage — which of the quest's declared primary stats the bag
+           *  covers (same vocabulary the check consumables serve). Kept as
+           *  `loadout-coverage` for E2E compatibility (r008 §2.3). */}
+          {(scenario?.primaryStats?.length ?? 0) > 0 && (
+            <div data-testid="loadout-coverage" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: TONE.secondary }}>
+                {t('questExpedition.coverage')}
+              </span>
+              {scenario!.primaryStats!.map((s) => {
+                const covered = bagCoveredStats.includes(s);
+                const Icon = getStatIconComponent(STAT_ICONS[s]) ?? lucideStatIcons.star;
+                return (
+                  <span
+                    key={s}
+                    title={STAT_SHORT[s]}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT.display, fontSize: 12, color: covered ? TONE.ok : TONE.secondary }}
+                  >
+                    {Icon && <Icon style={{ width: 12, height: 12 }} aria-hidden />}
+                    {STAT_SHORT[s] ?? s} {covered ? '✓' : '—'}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Scrollable analysis body — OUTCOME zone (S3 T-2): aggregate →
+         *  BY MEMBER → WHY → Intel. Never partial numbers: 'computing' and
+         *  'incomplete' are whole states, a stale estimate never bleeds. */}
         <div
           data-testid="quest-expedition-forecast"
           data-forecast-state={estimate === 'computing' ? 'computing' : estimate === 'incomplete' ? 'incomplete' : 'ready'}
           className="quest-s1-scroll"
-          style={{ maxHeight: QUEST_PLANNER_INFO.outcome.analysisMaxHeightPx, overflowY: 'auto', borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}
+          style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}
         >
-          <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
-            {t('questExpedition.forecast.title')}
-          </span>
           {resolvePending && <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.resolving')}</span>}
           {!resolvePending && estimate === 'computing' && (
             <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.computing')}</span>
@@ -355,73 +729,8 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
             </>
           )}
         </div>
-
-        {/* Loadout — the real item ids (engineFlag bridge), capped by the
-         *  stash's bagSlots. */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
-            {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
-          </span>
-          {/* An item toolbar = HUD pills (hud_component_guide §6b.4): the
-           *  pressed state marks what is packed; the one CTA stays «Send». */}
-          <div data-hud-controls="" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} data-testid="quest-expedition-loadout">
-            {items.map((item) => {
-              const selected = selectedItemIds.includes(item.id);
-              const full = !selected && selectedItemIds.length >= QUEST_STASH.bagSlots;
-              /* Effect tooltip: catalog `descKey` first, then the stash
-               *  entry's `descKey` via the engine-flag join. */
-              const descKey = item.descKey ?? (item.engineFlag ? STASH_BY_FLAG.get(item.engineFlag)?.descKey : undefined);
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  data-testid={`loadout-item-${item.id}`}
-                  aria-pressed={selected}
-                  disabled={full}
-                  title={descKey ? t(descKey) : undefined}
-                  onClick={() => onToggleItem(item.id)}
-                >
-                  <span>{t(stripNs(item.labelKey))}</span>
-                </button>
-              );
-            })}
-          </div>
-          {/* Coverage — which of the quest's declared primary stats the bag
-           *  covers (same vocabulary the check consumables serve). */}
-          {(scenario?.primaryStats?.length ?? 0) > 0 && (
-            <div data-testid="loadout-coverage" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: TONE.secondary }}>
-                {t('questExpedition.coverage')}
-              </span>
-              {scenario!.primaryStats!.map((s) => {
-                const covered = loadoutCoverage(selectedItemIds.map(toEngineFlag)).includes(s);
-                const Icon = getStatIconComponent(STAT_ICONS[s]) ?? lucideStatIcons.star;
-                return (
-                  <span
-                    key={s}
-                    title={STAT_SHORT[s]}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT.display, fontSize: 12, color: covered ? TONE.ok : TONE.secondary }}
-                  >
-                    {Icon && <Icon style={{ width: 12, height: 12 }} aria-hidden />}
-                    {STAT_SHORT[s] ?? s} {covered ? '✓' : '—'}
-                  </span>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <SkinButton
-          variant="cta"
-          data-testid="quest-expedition-send"
-          disabled={!canSend}
-          aria-disabled={!canSend}
-          onClick={onSend}
-        >
-          {t('questExpedition.send')}
-        </SkinButton>
-        </div>
       </HudPlaque>
+      </div>
     </SkinScope>
   );
 };

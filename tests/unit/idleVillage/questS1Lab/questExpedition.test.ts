@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
-import { buildExpeditionParty, isExpeditionItem, loadoutDuration, type ExpeditionSlotSpec } from '@/ui/idleVillage/quests/questExpedition';
+import { buildExpeditionParty, deriveKeyStats, isExpeditionItem, loadoutDuration, type ExpeditionSlotSpec } from '@/ui/idleVillage/quests/questExpedition';
 import { estimateForParty, estimateForPartyAsync, resolveQuestOffer, collectWorldProgressSignals } from '@/ui/idleVillage/questS1Lab/questOffer';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
@@ -167,5 +167,37 @@ describe('loadoutDuration — S3 T-3 duration channel', () => {
     const d = loadoutDuration(['quest_mount_draft_horse'], 1, 4);
     expect(d.nodeTicks).toBeGreaterThanOrEqual(1);
     expect(d.estimatedTicks).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('deriveKeyStats — PLAN-036 planner tier display', () => {
+  it('returns authored keyStats verbatim (no derivation, no mutation)', () => {
+    const tiers = deriveKeyStats({
+      primaryStats: ['str', 'con'],
+      keyStats: { primary: ['str'], secondary: ['perc', 'con', 'agi'] },
+    });
+    // Rovine shape: 'con' legitimately appears in both primaryStats and the
+    // secondary tier — verbatim rendering must NOT set-subtract it away.
+    expect(tiers.primary).toEqual(['str']);
+    expect(tiers.secondary).toEqual(['perc', 'con', 'agi']);
+  });
+
+  it('falls back deterministically from primaryStats when keyStats is absent', () => {
+    expect(deriveKeyStats({ primaryStats: ['str', 'perc'], keyStats: undefined })).toEqual({
+      primary: ['str'],
+      secondary: ['perc'],
+    });
+  });
+
+  it('keeps tiers disjoint even when a legacy primaryStats duplicates a stat', () => {
+    const tiers = deriveKeyStats({ primaryStats: ['str', 'str', 'con'], keyStats: undefined });
+    expect(tiers.primary).toEqual(['str']);
+    expect(tiers.secondary).toEqual(['con']);
+    expect(tiers.secondary.some((s) => tiers.primary.includes(s))).toBe(false);
+  });
+
+  it('never invents a primary when no scenario exists', () => {
+    expect(deriveKeyStats(undefined)).toEqual({ primary: [], secondary: [] });
+    expect(deriveKeyStats({ primaryStats: [], keyStats: undefined })).toEqual({ primary: [], secondary: [] });
   });
 });

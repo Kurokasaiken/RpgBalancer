@@ -259,6 +259,20 @@ const performCdpDrag = async (
       button: 'left',
     });
     await sleep(stepDelayMs);
+    /* Dwell: Chrome can coalesce the trailing pointermoves so the last one is
+     * never processed before the release — dnd-kit (`pointerWithin`) then
+     * resolves `over` from a stale mid-path coordinate (null) and the drop
+     * silently misses. Sending several moves at the release point over ~300ms
+     * makes sure the last processed event is inside the target. */
+    for (let dwell = 0; dwell < 4; dwell++) {
+      await client.send('Input.dispatchMouseEvent', {
+        type: 'mouseMoved',
+        x: to.x,
+        y: to.y,
+        button: 'left',
+      });
+      await sleep(75);
+    }
     await client.send('Input.dispatchMouseEvent', {
       type: 'mouseReleased',
       x: to.x,
@@ -493,6 +507,27 @@ export async function dragResidentPointer(
   const targetBox = await target.boundingBox();
   if (!sourceBox || !targetBox) {
     throw new Error('Unable to resolve bounding boxes for pointer drag');
+  }
+
+  /* Hit-target gate: the boot veil (`data-testid=game-boot-screen`) and other
+   * transient overlays sit fullscreen with pointer-events:auto while the map
+   * boots. If the CDP press lands before they unmount it never reaches the
+   * card, dnd-kit never arms and the drag silently does nothing — Playwright's
+   * own actionability checks do not apply to raw CDP input. Wait until the
+   * source is actually the topmost element at its own center. */
+  const from = getElementCenter(sourceBox);
+  const sourceHandle = await source.elementHandle();
+  if (sourceHandle) {
+    await page.waitForFunction(
+      ([el, x, y]) => {
+        const target = el as Element;
+        return document
+          .elementsFromPoint(x as number, y as number)
+          .some((hit) => hit === target || target.contains(hit));
+      },
+      [sourceHandle, from.x, from.y],
+      { timeout: 15_000 },
+    );
   }
 
   await performCdpDrag(page, source, target, stepDelayMs);

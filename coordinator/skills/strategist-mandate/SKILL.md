@@ -83,6 +83,7 @@ Relevant invariants from rules
 Trusted/frozen component constraints
 Config-first requirements
 i18n and skin system requirements
+Foreground windows: all verification/browser runs are headless or background; a visible window is a manual Director step, never an agent action (.windsurf/rules/16-no-foreground-windows.md)
 Implementation Scope
 Files to create/modify
 Component reuse requirements
@@ -93,6 +94,7 @@ Lint scope and timeout (120s max)
 Test scope and timeout (300s max)
 Build:check requirement (180s max)
 Kanban:lint requirement (30s max)
+Foreground:lint requirement for tasks touching scripts/tests (no headless:false, no foreground opens)
 Evidence logging location
 Documentation Updates
 Which plans need updating
@@ -136,6 +138,7 @@ Component reuse is verified
 Testing strategy is comprehensive
 Documentation updates are specified
 Safeguards are properly scoped
+Browser/test runs specified as headless/background (no foreground windows — rule 16)
 Continuous Improvement
 The Strategist must:
 

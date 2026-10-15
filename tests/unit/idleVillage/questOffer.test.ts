@@ -125,22 +125,24 @@ describe('questPois config', () => {
     }
   });
 
-  /* PLAN-019-S4 T-3 (D-S4-6): POI lifecycle — one-shot by default, an
-   *  authored `repeatable` offer is never consumed and ignores even a
-   *  stale consumed record. */
-  it('repeatable lifecycle: default one-shot, repeatable survives its report', () => {
-    /* Both slice POIs are one-shot (no flag authored). */
-    for (const poi of QUEST_POIS) {
-      expect(poi.repeatable).toBeUndefined();
-      expect(poiConsumesOnReportClose(poi)).toBe(true);
-      expect(isPoiConsumed(poi, [poi.id])).toBe(true);
-      expect(isPoiConsumed(poi, [])).toBe(false);
-    }
+  /* PLAN-019-S4 T-3 (D-S4-6) + R-200 (D-1): POI lifecycle — one-shot by
+   *  default; an authored `repeatable` offer is never consumed and ignores
+   *  even a stale consumed record. The goblin camp is the authored
+   *  repeatable offer; rovine stays one-shot. */
+  it('repeatable lifecycle: goblin repeatable, rovine one-shot, stale records ignored', () => {
+    const goblin = questPoiById('poi-goblin')!;
+    const rovine = questPoiById('poi-rovine')!;
+    expect(goblin.repeatable).toBe(true);
+    expect(poiConsumesOnReportClose(goblin)).toBe(false);
+    /* Ignora anche un record consumato stantio (migrazione onesta). */
+    expect(isPoiConsumed(goblin, ['poi-goblin'])).toBe(false);
+    expect(rovine.repeatable).toBeUndefined();
+    expect(poiConsumesOnReportClose(rovine)).toBe(true);
+    expect(isPoiConsumed(rovine, ['poi-rovine'])).toBe(true);
+    expect(isPoiConsumed(rovine, [])).toBe(false);
     /* A repeatable offer parses and is never consumed. */
     const rep = QuestPoiSchema.parse({ ...QUEST_POIS[0], id: 'poi-rep', repeatable: true });
     expect(poiConsumesOnReportClose(rep)).toBe(false);
-    /* Stale consumed records are ignored — honest migration for a POI
-     *  consumed before `repeatable` was authored. */
     expect(isPoiConsumed(rep, ['poi-rep'])).toBe(false);
     expect(isPoiConsumed(rep, null)).toBe(false);
   });

@@ -49,14 +49,12 @@ const renderWindow = (run: QuestRunState, queuedBeats: QuestBeat[] = []) =>
         artFor={() => undefined}
         time={{ progress: 0, label: 'Giorno 1 di 2' }}
         onChoose={() => undefined}
-        armed={false}
-        onToggleArmed={() => undefined}
-        onUseHealing={() => undefined}
-        onDrinkPotion={() => undefined}
+        armedFlags={new Set()}
+        onToggleArmedFlag={() => undefined}
         onClose={() => undefined}
         anchor={{ left: 0, top: 0 }}
-        widthPx={460}
-        theaterAspect={2.76}
+        widthPx={640}
+        theaterAspect={2.9}
         tooltipLines={6}
       />
     </Tooltip.Provider>,

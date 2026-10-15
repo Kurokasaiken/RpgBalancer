@@ -26,6 +26,7 @@ Use for open requests, idea exploration, and direction evaluation before plannin
 - In **EXPLORATION**, generate 2-3 plausible directions and expose the strongest critique of each.
 - Do not converge to a single option before the Director has seen the alternatives.
 - Reuse existing context; do not invent new abstractions without a concrete need.
+- Never open a window/app/browser in the foreground automatically; any demonstration run is headless/background unless the Director explicitly asks for a visible window (`.windsurf/rules/16-no-foreground-windows.md`).
 
 ## Post-session learning
 

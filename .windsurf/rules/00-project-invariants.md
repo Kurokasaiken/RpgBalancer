@@ -65,6 +65,15 @@ follow the invariant and flag the conflict instead of silently breaking it.
 - Use the pinned Node version from `.nvmrc` (`source ~/.nvm/nvm.sh && nvm use`).
 - Never mutate the global Node version.
 
+## Foreground windows
+- An agent must NEVER open a window, app, or browser in the foreground
+  automatically — the Director must never lose the window he is watching.
+- All automated browser runs (Puppeteer / Chrome for Testing, Playwright,
+  captures, perf probes) are headless or background. Headed mode only via
+  explicit Director opt-in (`HEADLESS=false`, manual headed npm scripts).
+- Full contract: `.windsurf/rules/16-no-foreground-windows.md`
+  (Director ruling 2026-10-15, CTR-foreground-001).
+
 ## Mandatory safeguards before "done"
 Run and pass (fix on failure):
 ```bash

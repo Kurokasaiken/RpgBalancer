@@ -196,6 +196,10 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
       required: ['goblin-slot-leader'],
       optional: ['goblin-slot-member-1', 'goblin-slot-member-2', 'goblin-slot-bodyguard'],
     },
+    /* R-200 (D-1): the goblin camp is a repeatable hunt — its report never
+     *  consumes the POI, so once a settled run is cleared the offer goes back
+     *  to `available` and can be launched again (QUEST_RULES §lifecycle). */
+    repeatable: true,
   },
   {
     id: 'poi-rovine',

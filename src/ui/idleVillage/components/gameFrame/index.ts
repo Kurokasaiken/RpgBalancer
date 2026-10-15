@@ -19,6 +19,10 @@ export { TuningPanel, type TuningField, type TuningPanelProps } from './TuningPa
 export { MapDemoPoi } from './MapDemoPoi';
 export { usePoiTypeIcon, poiTypeIconUrl } from './usePoiTypeIcon';
 export { QuestRunWindow, type QuestRunWindowProps } from './QuestRunWindow';
+export { QuestPartyRosterPanel, type QuestPartyRosterPanelProps } from './QuestPartyRosterPanel';
+export { QuestBeltPlaque, type QuestBeltPlaqueProps } from './QuestBeltPlaque';
+export { QuestLogPanel, type QuestLogPanelProps } from './QuestLogPanel';
+export { resolveQuestShellLayout, type QuestShellLayout } from './questShellLayout';
 export { HeroSheetPanel, type HeroSheetPanelProps } from './HeroSheetPanel';
 export { VillageStashPanel, type VillageStashPanelProps } from './VillageStashPanel';
 export { MapBuildingPoi, type MapBuildingPoiProps } from './MapBuildingPoi';
@@ -32,3 +36,7 @@ export { MerchantOfferIcon } from './merchantOfferIcons';
 export { useHeroSheet, type HeroSheetApi, type UseHeroSheetOptions } from './useHeroSheet';
 export { heroSheetReducer, HERO_SHEET_INITIAL_STATE } from './heroSheetMachine';
 export { heroSheetViewModel, type HeroSheetViewModel } from './heroSheetViewModel';
+// PLAN-035 — the village view (full-area buildings screen on /game).
+export { VillageScreenView, VILLAGE_TOOLTIP_ID, placeTooltip, type VillageScreenViewProps, type VillageScreenViewHandle, type TooltipPlacement, type TooltipSide } from './VillageScreenView';
+export { MockUpgradeControl, type MockUpgradeControlProps } from './MockUpgradeControl';
+export { VillageBuildingIcon, VillageCostIcon, type VillageBuildingIconProps } from './villageBuildingIcons';

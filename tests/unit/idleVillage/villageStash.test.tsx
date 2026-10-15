@@ -1,9 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { VILLAGE_STASH_CONFIG, villageStashSchema, WORLD_CANVAS } from '@/balancing/config/idleVillage/villageStashConfig';
+import { VILLAGE_STASH_CONFIG, villageStashSchema } from '@/balancing/config/idleVillage/villageStashConfig';
 import { defaultQuestItems } from '@/balancing/config/idleVillage/quests/questItems';
-import { QUEST_POIS } from '@/balancing/config/idleVillage/quests/questPois';
 import { HUD_PANELS } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
 import { resolveStashItemDescKey, villageStashViewModel } from '@/ui/idleVillage/components/gameFrame/villageStashViewModel';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
@@ -32,6 +31,15 @@ describe('villageStashConfig', () => {
     }
   });
 
+  it('stocks only bag-legal consumables — the shelf IS the planner picker (PLAN-036)', async () => {
+    const { isExpeditionItem } = await import('@/ui/idleVillage/quests/questExpedition');
+    for (const { itemId } of CFG.items) {
+      const item = defaultQuestItems[itemId];
+      expect(item.engineFlag, `${itemId} needs an engineFlag channel to be packable`).toBeTruthy();
+      expect(isExpeditionItem(item), `${itemId} must pass the expedition legality bar`).toBe(true);
+    }
+  });
+
   it('keeps sum(qty) within capacityMax', () => {
     const total = CFG.items.reduce((sum, i) => sum + i.qty, 0);
     expect(total).toBeLessThanOrEqual(CFG.capacityMax);
@@ -50,32 +58,9 @@ describe('villageStashConfig', () => {
     ).toThrow();
   });
 
-  it('anchors the marker in bounds and clear of every other map anchor', () => {
-    const { worldX, worldY } = CFG.marker;
-    expect(worldX).toBeGreaterThanOrEqual(0);
-    expect(worldX).toBeLessThanOrEqual(WORLD_CANVAS.widthPx);
-    expect(worldY).toBeGreaterThanOrEqual(0);
-    expect(worldY).toBeLessThanOrEqual(WORLD_CANVAS.heightPx);
-
-    /* Every other point the page's anchors list can contain: the quest POIs,
-     * the demo exemplars, and both ends of the invasion march (a moving marker
-     * interpolates between them, so the endpoints bound its track). */
-    const others = [
-      ...QUEST_POIS.map((p) => ({ id: p.id, x: p.x, y: p.y })),
-      { id: 'demo-job', x: 0.38 * 4240, y: 0.66 * 2828 },
-      { id: 'demo-event', x: 0.35 * 4240, y: 0.37 * 2828 },
-      { id: 'invasion-land', x: 0.239 * 4240, y: 0.417 * 2828 },
-      { id: 'invasion-village', x: 0.486 * 4240, y: 0.554 * 2828 },
-    ];
-    const MIN_DISTANCE = 120; // world units — the medallion must not sit on another anchor
-    for (const other of others) {
-      const d = Math.hypot(worldX - other.x, worldY - other.y);
-      expect(d, `marker too close to ${other.id}: ${d.toFixed(0)}u`).toBeGreaterThanOrEqual(MIN_DISTANCE);
-    }
-  });
-
+  /* PLAN-035: no continent-map marker — the warehouse tooltip inside the
+   * Village view opens the panel; menu/`v` paths stay registered. */
   it('registers panelId villageStash in the HUD panels registry', () => {
-    expect(CFG.marker.panelId).toBe('villageStash');
     expect(HUD_PANELS.some((p) => p.id === 'villageStash')).toBe(true);
   });
 });

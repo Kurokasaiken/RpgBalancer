@@ -37,14 +37,12 @@ const renderWindow = (run: QuestRunState) =>
         artFor={() => undefined}
         time={{ progress: 0, label: 'Giorno 1 di 2' }}
         onChoose={() => undefined}
-        armed={false}
-        onToggleArmed={() => undefined}
-        onUseHealing={() => undefined}
-        onDrinkPotion={() => undefined}
+        armedFlags={new Set()}
+        onToggleArmedFlag={() => undefined}
         onClose={() => undefined}
         anchor={{ left: 0, top: 0 }}
-        widthPx={460}
-        theaterAspect={2.76}
+        widthPx={640}
+        theaterAspect={2.9}
         tooltipLines={6}
       />
     </Tooltip.Provider>,
@@ -66,6 +64,40 @@ describe('useQuestRun — bag items are the player\'s call', () => {
     act(() => result.current.choose(availableOptions(result.current.run!)[0].id));
     act(() => result.current.choose('gob-cerca-tracce', { useConsumable: true }));
     expect(result.current.run!.flags).not.toContain('hasBonusPerc');
+  });
+
+  /* R-196 per-item path: no opts → the hook's armedFlags set drives. */
+  it('spends ONLY the armed item — unarmed packed siblings stay in the bag', () => {
+    const { result } = renderHook(() => useQuestRun('goblin'));
+    act(() => result.current.start(PRESET));
+    act(() => result.current.choose(availableOptions(result.current.run!)[0].id));
+    // Arm the perc item only; the forza sibling stays packed even though
+    // the perc check would not use it anyway, and shadowed items never burn.
+    act(() => result.current.toggleArmedFlag('hasBonusPerc'));
+    expect(result.current.armedFlags.has('hasBonusPerc')).toBe(true);
+    act(() => result.current.choose('gob-cerca-tracce'));
+    expect(result.current.run!.flags).not.toContain('hasBonusPerc');
+    expect(result.current.armedFlags.has('hasBonusPerc')).toBe(false); // reconciled out
+    expect(result.current.run!.flags).toContain('hasBonusForza');
+  });
+
+  it('nothing armed → nothing spent (armedFlags replace the boolean)', () => {
+    const { result } = renderHook(() => useQuestRun('goblin'));
+    act(() => result.current.start(PRESET));
+    act(() => result.current.choose(availableOptions(result.current.run!)[0].id));
+    act(() => result.current.choose('gob-cerca-tracce'));
+    expect(result.current.run!.flags).toContain('hasBonusPerc');
+  });
+
+  it('toggleArmedFlag is idempotent per item and rejects unheld/passive flags', () => {
+    const { result } = renderHook(() => useQuestRun('goblin'));
+    act(() => result.current.start(PRESET));
+    act(() => result.current.toggleArmedFlag('hasBonusPerc'));
+    act(() => result.current.toggleArmedFlag('hasBonusPerc'));
+    expect(result.current.armedFlags.has('hasBonusPerc')).toBe(false);
+    // Not in the bag → never arms.
+    act(() => result.current.toggleArmedFlag('hasCorda'));
+    expect(result.current.armedFlags.has('hasCorda')).toBe(false);
   });
 });
 

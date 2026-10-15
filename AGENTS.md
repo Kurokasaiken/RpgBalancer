@@ -31,6 +31,11 @@ Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione e
   dichiarare il lavoro fatto, riapplicale. In particolare T-04: un claim su scene, animazioni o UI si chiude solo
   con un testimone che può vedere ciò che afferma (non basta il diff né una metrica), e ciò che non è stato
   verificato va detto (vedi la proposta P-001 in `PROPOSALS.md`).
+- **Mai aprire finestre, app o browser in primo piano in automatico.** Ogni esecuzione
+  automatizzata è headless o in background (Puppeteer/Chrome for Testing, Playwright,
+  screenshot, probe perf, `open` solo con `-g`). Una finestra visibile richiede opt-in
+  esplicito del Director in sessione — invariante `.windsurf/rules/16-no-foreground-windows.md`
+  (ruling 2026-10-15, già CTR-foreground-001 in Mind Weaver).
 - Quando il Director esprime un'intenzione operativa, catturala in `RICHIESTE.md` prima di rispondere.
   Il riferimento deve essere `.mw/desiderata.md` v1 (FROZEN).
 

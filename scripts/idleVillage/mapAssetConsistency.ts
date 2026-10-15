@@ -438,7 +438,7 @@ async function main(): Promise<void> {
     
     if (options.autoOpenReport && process.platform !== 'linux') {
       try {
-        execSync(`open "${outputPath}"`, { stdio: 'ignore' });
+        execSync(`open -g "${outputPath}"`, { stdio: 'ignore' });
         console.log('📖 Report opened in default application');
       } catch (error) {
         console.log('⚠️ Could not open report automatically');

@@ -63,8 +63,16 @@ export interface QuestRunApi {
     opts?: { loadout?: string[]; seed?: number; nodeTicks?: number; startTick?: number },
   ) => void;
   /** `useConsumable`: whether an armed bag item may boost the resolving check —
-   *  the player's call, never a silent default (R-106 playtest). */
+   *  the player's call, never a silent default (R-106 playtest). R-196: the
+   *  window instead passes the per-item `armedFlags` it manages. */
   choose: (optionId: string, opts?: { useConsumable?: boolean }) => void;
+  /** R-196: the bag flags the player illuminated in the belt. Check items boost
+   *  the next check's preview and are consumed on its commit; action items fire
+   *  on the next valid check/combat commit via `stepArmedActionItems`. */
+  armedFlags: ReadonlySet<string>;
+  /** Arm or disarm a held bag flag (toggle; no-op on flags not in `run.flags`
+   *  and on passive items like the guardian banner). */
+  toggleArmedFlag: (flag: string) => void;
   /** Advance the committed frontier: matured timed nodes resolve, the run
    *  stops at the first node needing the player (v27 catch-up). */
   syncClock: (tick: number) => void;
@@ -89,6 +97,9 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   const [phases, setPhases] = useState<PhaseRecord[]>([]);
   /** Committed beats still unseen by the window (PLAN-025 T-008). */
   const [beats, setBeats] = useState<QuestBeat[]>([]);
+  /** R-196 per-item armed selection (`ReadonlySet<string>`): only flags still
+   *  in `run.flags` stay armed — consumed items drop out on every commit. */
+  const [armedFlags, setArmedFlags] = useState<ReadonlySet<string>>(() => new Set());
   /** Position in the run's commit history the last projection consumed. */
   const markRef = useRef<BeatMark | null>(null);
   /** Last tick the caller synced — commands resolve at this tick. */
@@ -157,6 +168,14 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       setRun(fresh);
       setPhases(first);
       setBeats([]);
+      /* R-196: the belt's armed selection starts from the config default —
+       * `false` keeps the "nothing spent unasked" contract (R-106 playtest). */
+      const held = new Set(fresh.flags);
+      setArmedFlags(
+        DEFAULT_GAME_FRAME_CONFIG.questWindow.consumablesArmedByDefault
+          ? new Set(QUEST_STASH.items.filter((i) => i.kind === 'check' && held.has(i.flag)).map((i) => i.flag))
+          : new Set(),
+      );
       markRef.current = beatMark(fresh);
       persist(fresh, first);
     },
@@ -172,6 +191,13 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       const before = snapshotRun(run);
       const mark = markRef.current ?? beatMark(run);
       const next = apply(run);
+      /* R-196: reconcile armed selection with the committed flags — consumed
+       * items leave the belt AND the armed set in the same commit. */
+      setArmedFlags((prev) => {
+        const nextFlags = new Set(next.flags);
+        if (![...prev].some((f) => !nextFlags.has(f))) return prev;
+        return new Set([...prev].filter((f) => nextFlags.has(f)));
+      });
       markRef.current = beatMark(next);
       const projected = projectBeats(mark, next, {
         maxBeats: DEFAULT_GAME_FRAME_CONFIG.questWindow.beats.maxQueue,
@@ -197,9 +223,38 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
     (optionId: string, opts?: { useConsumable?: boolean }) => {
       if (!run) return;
       const label = availableOptions(run).find((o) => o.id === optionId)?.label;
-      act((state) => submitCommand(state, optionId, { useConsumable: opts?.useConsumable, tick: tickRef.current }), label);
+      /* R-196: pass the live armed set (re-read at call time — no stale
+       * closure), filtered to flags the run still holds. A caller that passes
+       * `useConsumable` explicitly (lab, Monte Carlo, legacy tests) keeps the
+       * bag-level boolean semantics — the per-item set is the window's path. */
+      const eff = new Set([...armedFlags].filter((f) => run.flags.includes(f)));
+      act(
+        (state) =>
+          submitCommand(state, optionId, {
+            useConsumable: opts?.useConsumable,
+            tick: tickRef.current,
+            armedFlags: opts?.useConsumable === undefined ? eff : undefined,
+          }),
+        label,
+      );
     },
-    [run, act],
+    [run, act, armedFlags],
+  );
+
+  /** R-196 belt toggle: arms or disarms one held check/action flag. Passive
+   *  items (the guardian banner) and flags not in the bag are inert. */
+  const toggleArmedFlag = useCallback(
+    (flag: string) => {
+      const item = QUEST_STASH.items.find((i) => i.flag === flag);
+      if (!item || item.kind === 'passive' || !run?.flags.includes(flag)) return;
+      setArmedFlags((prev) => {
+        const next = new Set(prev);
+        if (next.has(flag)) next.delete(flag);
+        else next.add(flag);
+        return next;
+      });
+    },
+    [run],
   );
 
   const syncClock = useCallback(
@@ -257,12 +312,26 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
     setRun(null);
     setPhases([]);
     setBeats([]);
+    setArmedFlags(new Set());
     markRef.current = null;
     persist(null, []);
   }, [persist]);
 
   return useMemo(
-    () => ({ run, phases, start, choose, syncClock, useHealing: heal, drinkPotion: potion, clear, beats, applySettlement }),
-    [run, phases, start, choose, syncClock, heal, potion, clear, beats, applySettlement],
+    () => ({
+      run,
+      phases,
+      start,
+      choose,
+      armedFlags,
+      toggleArmedFlag,
+      syncClock,
+      useHealing: heal,
+      drinkPotion: potion,
+      clear,
+      beats,
+      applySettlement,
+    }),
+    [run, phases, start, choose, armedFlags, toggleArmedFlag, syncClock, heal, potion, clear, beats, applySettlement],
   );
 }
