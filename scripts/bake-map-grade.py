@@ -5,8 +5,10 @@ The painted map is greyer than the HUD it sits under (sea saturation ~0.19 on sc
 (`layers/<name>.graded.webp`) instead of running as a runtime filter: zero cost per frame, and the original
 layers stay untouched for A/B (`gameFrameConfig.worldDressing.grade`, `?map=graded|original` in dev).
 
-Usage: python3 scripts/bake-map-grade.py
+Usage: python3 scripts/bake-map-grade.py [--only base_flat.webp ...]
+(`--only` re-bakes just those files: the committed sea/island grades were retouched after the bake.)
 """
+import argparse
 import json
 import os
 
@@ -42,7 +44,12 @@ def graded_name(name):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--only', nargs='*', default=None)
+    only = ap.parse_args().only
     for name, (sat, val, hue) in GRADES.items():
+        if only and name not in only:
+            continue
         grade(os.path.join(LAYERS, name), sat, val, hue).save(os.path.join(LAYERS, graded_name(name)), quality=92, method=6)
         print('baked', name, sat, val, hue)
 
