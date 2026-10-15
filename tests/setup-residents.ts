@@ -12,7 +12,7 @@ import { chromium, Browser, Page } from 'playwright';
 async function saveResidents() {
   console.log('🔧 Salvando i residenti dal Character Manager...');
   
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
   const context = await browser.newContext();
   const page = await context.newPage();
 

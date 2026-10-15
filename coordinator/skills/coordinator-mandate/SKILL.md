@@ -230,6 +230,7 @@ Component reuse verified
 State management (Zustand vs Context)
 JSDoc on all new functions/interfaces
 Node version from .nvmrc
+Foreground windows: agent tasks never open a visible window — runs are headless/background; flag prompts that would launch a headed browser (.windsurf/rules/16-no-foreground-windows.md)
 Harness Execution
 harness:run
 For single task execution:

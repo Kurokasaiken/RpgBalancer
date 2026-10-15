@@ -2,11 +2,17 @@
 title: OPS-SHUTDOWN — Coordinator Implementation Plan
 status: approved
 owner: Coordinator
-last_reviewed: 2026-07-22
+last_reviewed: 2026-10-15
 domain: devops / infrastructure
 ---
 
 # OPS-SHUTDOWN — Coordinator Implementation Plan
+
+> **v3 revision (2026-10-15):** multi-AI planner deliberation (`mw-iterative-deliberate`,
+> config `deliberation-config-planner.yaml`, hat `system_design`) produced an
+> implementation-ready v3 — artifact `.mw/runs/20261015-ops-shutdown-plan/final.md`
+> (exit `AWAIT_DIRECTOR`, 6 open flags, V1–V10 INTACT except V8 WEAKENED).
+> §7 below records the v3 decisions and the 2026-10-15 implementation status.
 
 > **Approved by user:** run `OPS-SHUTDOWN-000` immediately. No other phase may run in parallel until `000` is verified complete.
 
@@ -128,9 +134,48 @@ A match must produce a CI/lint failure, not a warning.
 
 This plan is the coordinator's control document for the `OPS-SHUTDOWN` stream. The strategist has already created:
 
-- `src/docs/docs/plans/global_session_shutdown_manager_plan_v2.md`
+- `src/docs/docs/plans/global_session_shutdown_manager_plan_v2.md` — **MISSING from repo (dead reference, to be recreated or de-referenced)**
 - `.windsurf/rules/50-shutdown-governance.md`
 - `prompts/OPS-SHUTDOWN-000.spec.json`
 - `prompts/OPS-SHUTDOWN-001.spec.json`
 
 The coordinator must now dispatch `OPS-SHUTDOWN-000` immediately and enforce the gating rules above.
+
+## 7. v3 revision — decisions and 2026-10-15 implementation status
+
+Source: `.mw/runs/20261015-ops-shutdown-plan/` (deliberation final.md, critiques, drift report).
+
+### Decisions adopted from v3
+
+- **Executor**: `osascript -e 'tell application "System Events" to shut down'` (passwordless; verified TCC permission 2026-10-15). Fallback passwordless `sudo` requires a documented `/etc/sudoers.d` entry — not configured.
+- **Pre-shutdown commit+push** is a pipeline step in `shutdownManager.ts` (`preShutdownBackup.ts`), not in the executor. Failure is logged; it vetoes shutdown only if `policy.requireRepoClean === true` (default `false`).
+- **Two-phase stale escalation**: heartbeat TTL → `UNKNOWN`; `UNKNOWN` beyond `staleGracePeriodMs` (30m) inside the quiet window → `ABANDONED_STALE` (terminal). `createdAt + maxDurationMs` → `TIMED_OUT` (terminal).
+- **Hard watchdog**: `shutdownManager.ts` applies `MAX_SESSION_AGE_MS` (4h) — heartbeat-stale sessions past it stop vetoing.
+- **Bootstrap safeguard**: `knownProcesses.ts` scans `ps` for harness/coordinator/deliberation processes; unregistered active work blocks shutdown even with an empty registry.
+- **Remote ai-worker**: treated as async remote; local dispatch session releases on push of `kanban.json`. No local waiting for cloud runners.
+
+### Implemented 2026-10-15 (OPS-SHUTDOWN-003/004/005/009 core)
+
+| Component | File | Status |
+|---|---|---|
+| Decision engine | `scripts/shutdownManager/canShutdown.ts` | ✅ 17 unit tests |
+| User idle (ioreg HIDIdleTime) | `scripts/shutdownManager/getUserIdleMs.ts` | ✅ verified live |
+| Daemon + status CLI | `scripts/shutdownManager/shutdownManager.ts` | ✅ `--status`/`--once`/loop |
+| Sole-capability executor | `scripts/shutdownManager/shutdownExecutor.ts` | ✅ dry-run default |
+| Pre-shutdown commit+push | `scripts/shutdownManager/preShutdownBackup.ts` | ✅ |
+| Bootstrap process check | `scripts/shutdownManager/knownProcesses.ts` | ✅ |
+| Static guard | `scripts/shutdownManager/lintCapability.ts` → `npm run shutdown:lint-capability` | ✅ passing |
+| LaunchAgent plist | `scripts/shutdownManager/com.rpgbalancer.shutdown-manager.plist` | ✅ written, **not installed** |
+| npm scripts | `shutdown:status`, `shutdown:once`, `shutdown:daemon`, `shutdown:lint-capability` | ✅ |
+| Schema v3 deltas | `TIMED_OUT`, `ABANDONED_STALE`, `createdAt`, `maxDurationMs`, `quietWindow`, `staleGracePeriodMs`, `bootstrapGracePeriodMs`, `requireRepoClean`, `autoCommitAndPush` | ✅ 40/40 tests |
+
+### Remaining (not done tonight)
+
+- OPS-SHUTDOWN-006: coordinator/harness/manual-dispatch session registration integration (registry CLIs exist; call sites not wired).
+- OPS-SHUTDOWN-007/008: full 16-scenario validation runbook + archived v1 docs.
+- Plist installation (`launchctl bootstrap gui/$(id -u)`) — deferred; `shutdownEnabled=false` anyway.
+- Dead references: `global_session_shutdown_manager_plan_v2.md`, `ops_shutdown_remaining_phases_plan.md` must be recreated from v3 or specs updated.
+
+### Tonight's shutdown guarantee (outside the governed manager)
+
+Per Director order, a one-shot scheduled job (`nohup sleep` → repo `git add -A && commit && push` → `osascript` shut down) fires ~03:46 on 2026-10-16. It is a Director-delegated manual action, not repo automation; the governed manager remains the only *durable* capability owner.

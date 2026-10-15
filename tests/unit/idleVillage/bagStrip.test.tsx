@@ -8,17 +8,17 @@
  * stage never reflows mid-narrative.
  */
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { i18n } from '@/localization/i18n';
 import { QUEST_STASH, type StashItem } from '@/balancing/config/idleVillage/quests/questStash';
-import { BagStrip, BAG_CHIP_ROW_PX } from '@/ui/idleVillage/components/gameFrame/BagStrip';
+import { BagStrip } from '@/ui/idleVillage/components/gameFrame/BagStrip';
 import { bagEverPacked, bagItemShortLabel, bagStripVisible, questBagItems } from '@/ui/idleVillage/components/gameFrame/questBag';
 import { QuestRunWindow } from '@/ui/idleVillage/components/gameFrame/QuestRunWindow';
-import { applyChoice, availableOptions, createRun, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
+import { createRun, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { emptyPhase } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
@@ -33,8 +33,23 @@ const ALL_FLAGS = QUEST_STASH.items.map((i) => i.flag);
 /** A scene beat — enough to hold `presenting` true for a render. */
 const sceneBeat = (id: string): QuestBeat => ({ id, kind: 'scene', nodeId: 'n', title: 'beat' });
 
-const renderWindow = (run: QuestRunState, opts: { queuedBeats?: QuestBeat[]; armed?: boolean } = {}) =>
-  render(
+const COMPANIONS = { widthPx: 260, gapPx: 8, minWidthPx: 180, edgeInsetPx: 18 };
+
+/** jsdom starts at 1024px — the companion predicate (≥1052px) needs room. */
+const setViewportWidth = (w: number) => {
+  Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: w });
+};
+
+interface RenderWindowOpts {
+  queuedBeats?: QuestBeat[];
+  armedFlags?: ReadonlySet<string>;
+  onToggleArmedFlag?: (flag: string) => void;
+  vw?: number;
+}
+
+const renderWindow = (run: QuestRunState, opts: RenderWindowOpts = {}) => {
+  setViewportWidth(opts.vw ?? 1440);
+  return render(
     <Tooltip.Provider>
       <QuestRunWindow
         run={run}
@@ -47,18 +62,18 @@ const renderWindow = (run: QuestRunState, opts: { queuedBeats?: QuestBeat[]; arm
         artFor={() => undefined}
         time={{ progress: 0, label: 'Giorno 1 di 2' }}
         onChoose={() => undefined}
-        armed={opts.armed ?? false}
-        onToggleArmed={() => undefined}
-        onUseHealing={() => undefined}
-        onDrinkPotion={() => undefined}
+        armedFlags={opts.armedFlags ?? new Set()}
+        onToggleArmedFlag={opts.onToggleArmedFlag ?? (() => undefined)}
         onClose={() => undefined}
         anchor={{ left: 0, top: 0 }}
-        widthPx={460}
-        theaterAspect={2.76}
+        widthPx={640}
+        theaterAspect={2.9}
         tooltipLines={6}
+        companions={COMPANIONS}
       />
     </Tooltip.Provider>,
   );
+};
 
 describe('bagStripVisible — truth table (ended × presenting × waiting × bagEmpty)', () => {
   it('enumerates exactly the non-decision states', () => {
@@ -190,74 +205,118 @@ describe('BagStrip — read-only readout', () => {
   });
 });
 
-describe('QuestRunWindow — one reserved bag slot, belt XOR strip', () => {
-  const packedRun = (): QuestRunState => {
-    const run = createRun(PRESET, 7, 'goblin', ALL_FLAGS);
+describe('QuestRunWindow — companion belt (R-196)', () => {
+  /* bagSlots = 3: pack the full kind spread — check, action, passive. */
+  const packedRun = (loadout: string[] = ['hasBonusPerc', 'hasHealing', 'hasGuardianBanner']): QuestRunState => {
+    const run = createRun(PRESET, 7, 'goblin', loadout);
     expect(run.flags.length).toBeGreaterThan(0);
     return run;
   };
 
-  it('decision node (waiting && !presenting): belt renders, strip does NOT — same render', () => {
+  it('left column stacks party roster over the belt; right column carries the chronicle — all visible at once at 1440px', () => {
     renderWindow(packedRun());
-    expect(screen.getByTestId('quest-consumable-belt')).toBeInTheDocument();
-    expect(screen.queryByTestId('quest-bag-strip')).toBeNull();
-    expect(document.querySelector('[data-bag-slot]')).toBeTruthy(); // slot retained
+    const left = screen.getByTestId('quest-companion-left');
+    const right = screen.getByTestId('quest-companion-right');
+    expect(within(left).getByTestId('quest-party-roster')).toBeInTheDocument();
+    expect(within(left).getByTestId('quest-belt')).toBeInTheDocument();
+    // roster above belt in the same column
+    expect(left.firstElementChild).toBe(screen.getByTestId('quest-party-roster'));
+    expect(within(right).getByTestId('quest-log-panel')).toBeInTheDocument();
   });
 
-  it('presenting (beat playback): strip renders, belt does NOT — same render', () => {
-    renderWindow(packedRun(), { queuedBeats: [sceneBeat('b1')] });
-    expect(screen.getByTestId('quest-bag-strip')).toBeInTheDocument();
-    expect(screen.queryByTestId('quest-consumable-belt')).toBeNull();
-  });
-
-  it('ended && presenting (final replay): the strip still shows', () => {
-    const run = packedRun();
-    run.ended = true;
-    renderWindow(run, { queuedBeats: [sceneBeat('end-replay')] });
-    expect(screen.getByTestId('quest-bag-strip')).toBeInTheDocument();
-  });
-
-  it('ended && !presenting: the slot retires with the epilogue', () => {
-    const run = packedRun();
-    run.ended = true;
-    renderWindow(run);
-    expect(document.querySelector('[data-bag-slot]')).toBeNull();
-    expect(screen.queryByTestId('quest-bag-strip')).toBeNull();
-    expect(screen.queryByTestId('quest-consumable-belt')).toBeNull();
-  });
-
-  it('spend-to-empty during presenting: empty slot holds the reserved row, dead space', () => {
-    const run = packedRun();
-    run.flags = [];
-    run.consumablesUsed = ['hasBonusPerc', 'hasHealing'];
-    const { container } = renderWindow(run, { queuedBeats: [sceneBeat('b1')] });
-    const slot = container.querySelector('[data-bag-slot]') as HTMLElement;
-    expect(slot).toBeTruthy();
-    expect(Number.parseFloat(slot.style.minHeight)).toBe(BAG_CHIP_ROW_PX);
-    expect(slot.textContent).toBe(''); // retained dead space — no residual chrome
-    expect(screen.queryByTestId('quest-bag-strip')).toBeNull();
-    expect(screen.queryByTestId('quest-consumable-belt')).toBeNull();
-  });
-
-  it('committed-state contract: a spent item does NOT appear in the strip during presenting', () => {
-    const run = packedRun();
-    // Real spend path: applyChoice with the bag armed consumes a check item.
-    const options = availableOptions(run);
-    const checkOption = options.find((o) => !o.disabled)!;
-    const before = [...run.flags];
-    applyChoice(run, checkOption.id, { useConsumable: true });
-    const spent = before.filter((f) => !run.flags.includes(f));
-    if (spent.length === 0) {
-      // The option may not consume — drive the spend directly.
-      applyChoice(run, checkOption.id); // no-op guard
-      run.flags = run.flags.filter((f) => f !== 'hasBonusForza');
-      run.consumablesUsed = [...(run.consumablesUsed ?? []), 'hasBonusForza'];
+  it('belt items are icon-only buttons; the passive banner is a badge, never a toggle', () => {
+    renderWindow(packedRun());
+    const belt = screen.getByTestId('quest-belt');
+    for (const btn of within(belt).getAllByRole('button')) {
+      const icon = btn.querySelector('svg');
+      expect(icon).toBeTruthy();
+      expect(btn.textContent).toBe(''); // zero visible text — the name lives in aria-label
+      expect(btn).toHaveAccessibleName();
     }
-    const spentFlag = spent[0] ?? 'hasBonusForza';
-    renderWindow(run, { queuedBeats: [sceneBeat('b2')] });
-    expect(document.querySelector(`[data-bag-chip="${spentFlag}"]`)).toBeNull();
-    // …and the same item is gone from the popover derivation too.
-    expect(questBagItems(run.flags).map((i) => i.flag)).not.toContain(spentFlag);
+    const banner = belt.querySelector('[data-belt-item="hasGuardianBanner"]')!;
+    expect(banner.tagName).not.toBe('BUTTON');
+    expect(banner).not.toHaveAttribute('aria-pressed');
+    expect(banner.getAttribute('data-belt-status')).toBe('passive');
+  });
+
+  it('a check item arms on first click and disarms on the second (per-item flags)', () => {
+    const run = packedRun();
+    const Harness: React.FC = () => {
+      const [flags, setFlags] = React.useState<ReadonlySet<string>>(new Set());
+      return (
+        <Tooltip.Provider>
+          <QuestRunWindow
+            run={run}
+            phases={[emptyPhase(0)]}
+            beats={GOBLIN_SCENARIO.beats}
+            queuedBeats={[]}
+            beatTiming={{ sceneMs: 60_000, checkMs: 60_000, harmMs: 60_000, endMs: 60_000, recapMs: 60_000 }}
+            title={GOBLIN_SCENARIO.title}
+            flavour={GOBLIN_SCENARIO.flavour}
+            artFor={() => undefined}
+            time={{ progress: 0, label: 'Giorno 1 di 2' }}
+            onChoose={() => undefined}
+            armedFlags={flags}
+            onToggleArmedFlag={(f) =>
+              setFlags((prev) => {
+                const next = new Set(prev);
+                if (next.has(f)) next.delete(f);
+                else next.add(f);
+                return next;
+              })
+            }
+            onClose={() => undefined}
+            anchor={{ left: 0, top: 0 }}
+            widthPx={640}
+            theaterAspect={2.9}
+            tooltipLines={6}
+            companions={COMPANIONS}
+          />
+        </Tooltip.Provider>
+      );
+    };
+    render(<Harness />);
+    const item = screen.getByTestId('quest-belt').querySelector('[data-belt-item="hasBonusPerc"]')!;
+    expect(item).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(item);
+    expect(item).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(item);
+    expect(item).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('a spent item leaves the belt (the committed flags drive the list)', () => {
+    const run = packedRun();
+    run.flags = run.flags.filter((f) => f !== 'hasBonusPerc');
+    run.consumablesUsed = [...(run.consumablesUsed ?? []), 'hasBonusPerc'];
+    renderWindow(run);
+    expect(document.querySelector('[data-belt-item="hasBonusPerc"]')).toBeNull();
+    expect(questBagItems(run.flags).map((i) => i.flag)).not.toContain('hasBonusPerc');
+  });
+
+  it('the companion columns auto-collapse below the shared predicate (1024px < 1052px)', () => {
+    renderWindow(packedRun(), { vw: 1024 });
+    expect(screen.queryByTestId('quest-belt')).toBeNull();
+    expect(screen.queryByTestId('quest-companion-left')).toBeNull();
+    expect(screen.queryByTestId('quest-companion-right')).toBeNull();
+  });
+
+  it('the log toggle carries the parchment glyph (ico-scroll), not the book', () => {
+    renderWindow(packedRun());
+    const toggle = screen.getByTestId('quest-log-toggle');
+    expect(toggle.querySelector('[data-engraved="ico-scroll"]')).toBeTruthy();
+    expect(toggle.querySelector('[data-engraved="nav-chronicle"]')).toBeNull();
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('no «Skip to the frontier» control exists — beats show only a Continue button', () => {
+    renderWindow(packedRun(), { queuedBeats: [sceneBeat('b1'), sceneBeat('b2')] });
+    expect(screen.queryByText(/skip to the frontier|vai al bivio/i)).toBeNull();
+    const cont = screen.getByTestId('quest-window-beat-continue');
+    expect(cont.tagName).toBe('BUTTON');
+    // BeatStage's outer stage is never a nested interactive control.
+    const stage = screen.getByTestId('quest-window-beat');
+    expect(stage).not.toHaveAttribute('role', 'button');
+    expect(stage).not.toHaveAttribute('tabindex', '0');
   });
 });
 

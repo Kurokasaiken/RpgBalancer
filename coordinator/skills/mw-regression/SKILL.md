@@ -13,6 +13,7 @@ Apply before touching any existing component or contract.
 2. List past decisions (`DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, trusted `*_trusted.md` docs, `.windsurf/rules/`) that constrain it.
 3. Identify exactly which parts you will modify and why.
 4. If a change would violate a documented `Must-not-change` or a design pillar, stop and flag it before proceeding.
+5. If verification involves a browser, keep it headless/background — never open a foreground window automatically (`.windsurf/rules/16-no-foreground-windows.md`).
 
 ## After the change
 

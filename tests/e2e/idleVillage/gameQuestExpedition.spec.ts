@@ -108,11 +108,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
-  test('no POI at boot; the Director reveal mounts offers with an empty halo (D-J)', async ({ page }) => {
-    /* R-124: nothing sits on the map before «Mostra quest»; a fresh offer is
-     *  `available` with the seal unwritten — the halo only exists while a run
-     *  fills it. */
-    await expect(page.locator('[data-map-quest-poi-target]')).toHaveCount(0);
+  test('the Director reveal mounts offers with an empty halo (D-J)', async ({ page }) => {
+    /* R-200 supera R-124: le offerte si rivelano da sole a stagger dopo il
+     *  veil — il gate «nessun POI al boot» non esiste più. Resta vero ciò
+     *  che il test prova: un'offerta fresca è `available` col sigillo non
+     *  scritto (la halo esiste solo mentre una run la riempie). Il hook
+     *  resta la seam di reveal forzato per `?capture=1`. */
     await page.evaluate(() => (window as TestHooksWindow).__idleVillageTestHooks?.revealQuestPois?.());
     const marker = page.locator('[data-map-quest-poi-target][data-quest-status="available"]').first();
     await expect(marker).toBeVisible({ timeout: 15_000 });
@@ -151,16 +152,29 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await expect(card).toBeVisible();
     await expect(slot).toBeVisible();
 
-    await dragResidentPointer(page, card, slot, { stepDelayMs: 30 });
-    await page.waitForTimeout(600); // flight lands, then the assignment commits
-    await page.waitForFunction(
-      (slotId) => {
-        const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'];
-        return exp?.getAssignments?.()[slotId] === 'hero-sir-spaccaculi';
-      },
-      SLOT_LEADER,
-      { timeout: 8_000 },
-    );
+    /* Real drag with a player's retry: dnd-kit's pointerWithin can resolve a
+     *  stale `over` when Chrome coalesces the trailing pointermoves, so a
+     *  missed drop is retried once — the helper dwells at the target before
+     *  releasing to make each attempt deterministic. */
+    const waitAssigned = () =>
+      page.waitForFunction(
+        (slotId) => {
+          const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'];
+          return exp?.getAssignments?.()[slotId] === 'hero-sir-spaccaculi';
+        },
+        SLOT_LEADER,
+        { timeout: 8_000 },
+      );
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await dragResidentPointer(page, card, slot, { stepDelayMs: 30 });
+      await page.waitForTimeout(600); // flight lands, then the assignment commits
+      try {
+        await waitAssigned();
+        break;
+      } catch (err) {
+        if (attempt === 1) throw err;
+      }
+    }
     await expect(page.getByTestId('quest-expedition-send')).toBeEnabled();
   });
 
@@ -828,12 +842,13 @@ test.describe('Director quest button — same path as a real POI', () => {
     // The detail closed behind it — the launch completed, not a draft.
     await expect(page.getByTestId('quest-expedition-detail')).toHaveCount(0);
 
-    /* The «Assigned party» popover renders the REAL roster PgCard per
-     *  traveling member (R: party shown with the canonical card) — one
-     *  [data-testid=pg-card] per run.party entry, keyed by resident id. */
-    const questWindow = page.getByTestId('quest-window');
-    await questWindow.locator('button[aria-pressed]').first().click();
-    const partyCards = questWindow.locator('[data-testid="pg-card"]');
+    /* The party roster companion plaque (R-196) renders the REAL roster
+     *  PgCard per traveling member — one [data-testid=pg-card] per
+     *  run.party entry, keyed by resident id. It mounts open by default
+     *  inside the run window's shell. */
+    const partyPlaque = page.getByTestId('quest-party-roster');
+    await expect(partyPlaque).toBeVisible({ timeout: 10_000 });
+    const partyCards = partyPlaque.locator('[data-testid="pg-card"]');
     await expect(partyCards).toHaveCount(run.party.length, { timeout: 10_000 });
     const cardIds = await partyCards.evaluateAll((els) => els.map((el) => el.getAttribute('data-worker-id')));
     expect(cardIds.sort()).toEqual(run.party.map((m) => m.id).sort());

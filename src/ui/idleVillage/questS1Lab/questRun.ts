@@ -8,7 +8,7 @@
  */
 
 import { DEFAULT_QUEST_SKILL_CHECK_CONFIG } from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
-import { resolveStashLoadout } from '@/balancing/config/idleVillage/quests/questStash';
+import { QUEST_STASH, resolveStashLoadout } from '@/balancing/config/idleVillage/quests/questStash';
 import { defaultQuestItems, QUEST_FLAG_TO_ITEM } from '@/balancing/config/idleVillage/quests/questItems';
 import { PARTY_PRESETS, PRIMARY_STATS, SCENARIO_NODES, START_NODE } from './questScenario';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
@@ -1090,25 +1090,204 @@ interface CheckResult {
   rollPct: number;
 }
 
-/** Which owned consumable would boost this check, and by how much (preview + resolution share this). */
+/** English label of each check consumable — engine-side (log lines are English by convention). */
+const CHECK_CONSUMABLE_LABELS: Record<string, string> = {
+  hasBonusForza: 'Strength Bonus',
+  hasBonusPerc: 'Perception Bonus',
+  hasFumogeno: 'Smoke bomb',
+  hasCorda: 'Rope and grappling hook',
+};
+
+/**
+ * Which owned consumable would boost this check, and by how much (preview +
+ * resolution share this). R-196: candidates come from `QUEST_STASH` check
+ * items; when `armedFlags` is provided ONLY the items the player illuminated
+ * in the belt may apply. The winner covers the most of the check's stats
+ * (coverage desc, bonus desc, catalog order) — one item per check, never two
+ * spent on the same roll.
+ */
 export function consumableBonusFor(
   state: QuestRunState,
   node: QuestNode,
+  armedFlags?: ReadonlySet<string>,
 ): { bonus: number; label: string; flag: string } | null {
   const stats = node.stats ?? [];
-  if (state.flags.includes('hasBonusForza') && stats.includes('str')) {
-    return { bonus: 15, label: 'Strength Bonus', flag: 'hasBonusForza' };
+  if (!stats.length) return null;
+  const candidates = QUEST_STASH.items.filter(
+    (item) =>
+      item.kind === 'check' &&
+      state.flags.includes(item.flag) &&
+      (item.stats?.some((s) => stats.includes(s)) ?? false) &&
+      (!armedFlags || armedFlags.has(item.flag)),
+  );
+  if (!candidates.length) return null;
+  const coverage = (item: (typeof candidates)[number]) => (item.stats ?? []).filter((s) => stats.includes(s)).length;
+  const winner = candidates.reduce((best, item) => {
+    const dc = coverage(item) - coverage(best);
+    if (dc !== 0) return dc > 0 ? item : best;
+    const db = (item.bonus ?? 0) - (best.bonus ?? 0);
+    return db > 0 ? item : best;
+  });
+  return { bonus: winner.bonus ?? 0, label: CHECK_CONSUMABLE_LABELS[winner.flag] ?? winner.flag, flag: winner.flag };
+}
+
+/**
+ * Per-armed-item qualifier for the belt (R-196): given the check the party is
+ * about to face, a held item is 'winner' (it would apply), 'shadowed' (an
+ * armed sibling beats it on coverage — never consumed), 'inert' (no current
+ * option's check needs it — never consumed) or 'available' (held, not armed).
+ */
+export type BeltItemStatus = 'armed' | 'winner' | 'shadowed' | 'inert' | 'available' | 'passive';
+
+/** Resolves the belt status of every packed item for the current frontier.
+ *  `checkNodes` = the check nodes reachable from the options on stage. */
+export function beltItemStatuses(
+  state: QuestRunState,
+  checkNodes: QuestNode[],
+  armedFlags: ReadonlySet<string>,
+): Record<string, BeltItemStatus> {
+  const out: Record<string, BeltItemStatus> = {};
+  const winners = new Set(
+    checkNodes.map((n) => consumableBonusFor(state, n, armedFlags)?.flag).filter((f): f is string => !!f),
+  );
+  for (const item of QUEST_STASH.items) {
+    if (!state.flags.includes(item.flag)) continue;
+    if (item.kind === 'passive') {
+      out[item.flag] = 'passive';
+      continue;
+    }
+    if (!armedFlags.has(item.flag)) {
+      out[item.flag] = 'available';
+      continue;
+    }
+    if (item.kind === 'action') {
+      /* Eligibility of an action item depends on whether the next command can
+       * spend it — `stepArmedActionItems` decides on commit; for display we
+       * mark it armed when a living member could still benefit. */
+      out[item.flag] = armedActionEligible(state) ? 'armed' : 'inert';
+      continue;
+    }
+    const needed = checkNodes.some((n) => (n.stats ?? []).some((s) => item.stats?.includes(s)));
+    if (!needed) {
+      out[item.flag] = 'inert';
+    } else if (winners.has(item.flag)) {
+      out[item.flag] = 'winner';
+    } else {
+      /* Armed and needed by some check, but another armed item covers that
+       * check better — it lights dimmed and is never consumed. */
+      out[item.flag] = 'shadowed';
+    }
   }
-  if (state.flags.includes('hasBonusPerc') && stats.includes('perc')) {
-    return { bonus: 15, label: 'Perception Bonus', flag: 'hasBonusPerc' };
+  return out;
+}
+
+/** Any living member an armed action item could still help (belt display). */
+function armedActionEligible(state: QuestRunState): boolean {
+  return state.party.some((m) => !m.dead && (m.wounded || m.hp < m.maxHp));
+}
+
+/* ------------------------------------------------------------------ */
+/* Armed action items (R-196): one deterministic routine shared by the  */
+/* belt preview (on a clone) and the commit path (on the live state).   */
+/* ------------------------------------------------------------------ */
+
+/** The member `hasHealing` would treat: the living member furthest from full
+ *  health (tie: party order). `null` when nobody needs a heal. */
+function healingTarget(state: QuestRunState): RuntimeMember | undefined {
+  return state.party
+    .filter((m) => !m.dead && m.hp < m.maxHp)
+    .sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
+}
+
+/** The member `hasPozione` would treat: the first living member in party
+ *  order that is wounded or below full HP. */
+function potionTarget(state: QuestRunState): RuntimeMember | undefined {
+  return state.party.find((m) => !m.dead && (m.wounded || m.hp < m.maxHp));
+}
+
+/** What one pass of the armed action items did to a state. */
+export interface ArmedActionStepResult {
+  /** Item flags actually consumed (mutation applied). */
+  consumedFlags: string[];
+  /** memberId → heal delta applied. */
+  memberDeltas: Record<string, { hpDelta: number; clearedWound: boolean }>;
+  /** Armed items that lost their target to an earlier item in the same pass. */
+  shadowedFlags: string[];
+  /** Armed items with no eligible target even before the pass. */
+  inertFlags: string[];
+}
+
+/**
+ * ONE deterministic resolution routine for the armed action items (R-196
+ * WITNESS-11): iterates `QUEST_STASH` action items in catalog order on
+ * `state`, mutating sequentially — `hasHealing` first (+20 HP on the most
+ * hurt living member, wound cleared at full), then `hasPozione` on the
+ * post-heal state (full heal + wound clear on the first living member in
+ * need). An item is consumed ONLY when its mutation is actually applied;
+ * items left without a target are `shadowed` (the pristine state had one,
+ * an earlier heal took it) or `inert` (nobody needed it to begin with).
+ *
+ * Preview runs it on a `structuredClone`, execution on the live state —
+ * identical inputs produce identical results.
+ */
+export function stepArmedActionItems(
+  state: QuestRunState,
+  armedFlags?: ReadonlySet<string>,
+): ArmedActionStepResult {
+  const result: ArmedActionStepResult = { consumedFlags: [], memberDeltas: {}, shadowedFlags: [], inertFlags: [] };
+  if (!armedFlags || armedFlags.size === 0) return result;
+  /* Pristine eligibility decides shadow vs inert when a target vanishes
+   * mid-pass (the kit healed the only wounded member the potion eyed). */
+  const hadHealingTarget = !!healingTarget(state);
+  const hadPotionTarget = !!potionTarget(state);
+  const mergeDelta = (id: string, hpDelta: number, clearedWound: boolean) => {
+    const prev = result.memberDeltas[id];
+    result.memberDeltas[id] = { hpDelta: (prev?.hpDelta ?? 0) + hpDelta, clearedWound: clearedWound || !!prev?.clearedWound };
+  };
+  for (const item of QUEST_STASH.items) {
+    if (item.kind !== 'action' || !armedFlags.has(item.flag) || !state.flags.includes(item.flag)) continue;
+    if (item.flag === 'hasHealing') {
+      const target = healingTarget(state);
+      if (target) {
+        const before = target.hp;
+        const wasWounded = target.wounded;
+        target.hp = Math.min(target.maxHp, target.hp + 20);
+        if (target.hp >= target.maxHp) target.wounded = false;
+        consumeFlag(state, item.flag);
+        state.log.push({ kind: 'INFO', text: `The wound closes: ${target.name} recovers ${target.hp - before} HP.` });
+        result.consumedFlags.push(item.flag);
+        mergeDelta(target.id, target.hp - before, wasWounded && !target.wounded);
+      } else {
+        (hadHealingTarget ? result.shadowedFlags : result.inertFlags).push(item.flag);
+      }
+    } else if (item.flag === 'hasPozione') {
+      const target = potionTarget(state);
+      if (target) {
+        const wasWounded = target.wounded;
+        const hpDelta = Math.max(0, target.maxHp - target.hp);
+        target.hp = target.maxHp;
+        target.wounded = false;
+        consumeFlag(state, item.flag);
+        state.log.push({ kind: 'INFO', text: `Potion used: ${target.name} is back in shape.` });
+        result.consumedFlags.push(item.flag);
+        mergeDelta(target.id, hpDelta, wasWounded);
+      } else {
+        (hadPotionTarget ? result.shadowedFlags : result.inertFlags).push(item.flag);
+      }
+    }
   }
-  if (state.flags.includes('hasFumogeno') && stats.includes('agi')) {
-    return { bonus: 15, label: 'Smoke bomb', flag: 'hasFumogeno' };
-  }
-  if (state.flags.includes('hasCorda') && (stats.includes('con') || stats.includes('str'))) {
-    return { bonus: 15, label: 'Rope and grappling hook', flag: 'hasCorda' };
-  }
-  return null;
+  return result;
+}
+
+/** Preview pass: the SAME routine on a deep clone — what the belt and the
+ *  roster show is exactly what a commit will do (R-196 WITNESS-11). */
+export function previewArmedActionItems(
+  state: QuestRunState,
+  armedFlags: ReadonlySet<string>,
+): ArmedActionStepResult & { state: QuestRunState } {
+  const clone = structuredClone(state);
+  const result = stepArmedActionItems(clone, armedFlags);
+  return { ...result, state: clone };
 }
 
 /**
@@ -1178,12 +1357,16 @@ function escalateCamp(state: QuestRunState, epicfail: boolean, reason: string): 
  * chose to keep the consumable in the bag — it is NOT consumed and adds no
  * bonus. Forced checks (risveglio, epicfail→scontro) auto-spend: the party is
  * desperate and there is no preview moment to decide in.
+ * R-196: when `armedFlags` is provided the per-item belt selection replaces the
+ * bag-level boolean — the coverage winner among the ARMED check items applies
+ * and is consumed; unarmed siblings stay in the bag untouched.
  */
 function resolveCheck(
   state: QuestRunState,
   node: QuestNode,
   useConsumable = true,
   forceDie?: number,
+  armedFlags?: ReadonlySet<string>,
 ): CheckResult {
   const stats = node.stats ?? [];
   const score = groupScore(state, stats);
@@ -1194,8 +1377,8 @@ function resolveCheck(
   const die = forceDie ?? 1 + Math.floor(roll(state) * 100);
   // consumables: fumogeno helps agi checks, corda helps the climb
   let bonus = 0;
-  const consumable = consumableBonusFor(state, node);
-  if (consumable && useConsumable) {
+  const consumable = consumableBonusFor(state, node, armedFlags);
+  if (consumable && (armedFlags ? true : useConsumable)) {
     bonus = consumable.bonus;
     consumeFlag(state, consumable.flag);
     if (consumable.flag === 'hasFumogeno') {
@@ -1205,7 +1388,7 @@ function resolveCheck(
     } else {
       state.log.push({ kind: 'INFO', text: `${consumable.label}: the bonus comes into play (+${consumable.bonus}).` });
     }
-  } else if (consumable) {
+  } else if (consumable && !armedFlags) {
     state.log.push({ kind: 'INFO', text: `You decide to keep ${consumable.label} in the bag.` });
   }
   const intel = intelBonusFor(state, node);
@@ -1431,7 +1614,7 @@ export interface OptionPreview {
 export function previewOption(
   state: QuestRunState,
   optionId: string,
-  opts?: { useConsumable?: boolean },
+  opts?: { useConsumable?: boolean; armedFlags?: ReadonlySet<string> },
 ): OptionPreview | null {
   if (state.ended) return null;
   const nodes = nodesFor(state);
@@ -1441,23 +1624,28 @@ export function previewOption(
   const checkNode = nodes[option.next.slice(6)];
   if (!checkNode || !checkNode.stats) return null;
 
-  const alive = state.party.filter((m) => !m.dead);
+  /* R-196: the armed action items (healing kit, potion) fire BEFORE the roll
+   * on commit — the preview must read the post-heal state, so the same
+   * `stepArmedActionItems` runs on a clone and risk/HP derive from it. */
+  const eff = opts?.armedFlags ? previewArmedActionItems(state, opts.armedFlags).state : state;
+
+  const alive = eff.party.filter((m) => !m.dead);
   if (!alive.length) return null;
   const contributors = checkNode.stats.map((s) => {
     const best = alive.reduce((a, b) => (b.stats[s] > a.stats[s] ? b : a));
     return { stat: s, label: STAT_LABELS[s], bestName: best.name, bestValue: best.stats[s] };
   });
-  const consumable = consumableBonusFor(state, checkNode);
+  const consumable = consumableBonusFor(eff, checkNode, opts?.armedFlags);
   const consumableApplied = consumable && opts?.useConsumable !== false ? consumable : null;
-  const intel = intelBonusFor(state, checkNode);
-  const score = groupScore(state, checkNode.stats) + (consumableApplied?.bonus ?? 0) + (intel?.bonus ?? 0);
-  const bodyguard = state.party.find((m) => m.role === 'bodyguard' && !m.dead);
+  const intel = intelBonusFor(eff, checkNode);
+  const score = groupScore(eff, checkNode.stats) + (consumableApplied?.bonus ?? 0) + (intel?.bonus ?? 0);
+  const bodyguard = eff.party.find((m) => m.role === 'bodyguard' && !m.dead);
   const perSlot = alive.map((m) => ({
     id: m.id,
     name: m.name,
     role: m.role,
     wounded: m.wounded,
-    ...memberRisk(m, checkNode, coverDeltaFor(state, m.id)),
+    ...memberRisk(m, checkNode, coverDeltaFor(eff, m.id)),
   }));
   const inst = state.scenarioInstanceId
     ? scenarioInstanceById(state.scenarioInstanceId)
@@ -1477,7 +1665,7 @@ export function previewOption(
     woundPct: checkNode.risk?.wound ?? 0,
     deathPct: checkNode.risk?.death ?? 0,
     interceptor: bodyguard
-      ? { name: bodyguard.name, ...memberRisk(bodyguard, checkNode, coverDeltaFor(state, bodyguard.id)) }
+      ? { name: bodyguard.name, ...memberRisk(bodyguard, checkNode, coverDeltaFor(eff, bodyguard.id)) }
       : undefined,
     perSlot,
     primaryStatsUsed,
@@ -2355,7 +2543,7 @@ export function matureReady(state: QuestRunState, tick: number): QuestRunState {
 export function submitCommand(
   state: QuestRunState,
   optionId: string,
-  opts?: { useConsumable?: boolean; tick?: number; forceDie?: number },
+  opts?: { useConsumable?: boolean; tick?: number; forceDie?: number; armedFlags?: ReadonlySet<string> },
 ): QuestRunState {
   if (state.ended) return state;
   if (state.frontier.status === 'pending') return state;
@@ -2379,6 +2567,11 @@ export function submitCommand(
   // enemies are dead or the authored turns are spent.
   if (node.kind === 'combat') {
     if (optionId !== 'fight-turn' || !node.combat) return state;
+    /* R-196 atomic commit: the command was validated — armed action items
+     * apply to the LIVE state before the turn resolves, whatever the roll
+     * brings. `stepArmedActionItems` reads the flags and consumes only the
+     * items that actually landed a mutation. */
+    if (!combatDone(state, node)) stepArmedActionItems(state, opts?.armedFlags);
     resolveCombatTurn(state, node);
     if (state.ended) return state;
     if (combatDone(state, node)) {
@@ -2439,11 +2632,18 @@ export function submitCommand(
   const next = option.next;
   if (next.startsWith('CHECK:')) {
     const checkNode = nodes[next.slice(6)];
+    /* R-196 atomic commit: option + target check validated — the armed
+     * action items fire before the roll and stay fired even on a failed
+     * verdict (same synchronous commit; `choose` in the hook re-reads
+     * `armedFlags` at call time so no stale closure is possible). The
+     * heal/potion lines stay above `preMark` so the check summary only
+     * reports the check's own consequences. */
+    stepArmedActionItems(state, opts?.armedFlags);
     state.nodeId = checkNode.id;
     state.frontierVersion += 1;
     state.visitedNodes.push(checkNode.id);
     const preMark = state.log.length;
-    const result = resolveCheck(state, checkNode, opts?.useConsumable !== false, opts?.forceDie);
+    const result = resolveCheck(state, checkNode, opts?.useConsumable !== false, opts?.forceDie, opts?.armedFlags);
     // Only this check's lines, HARM included, and written again once the outcome
     // has applied its toll: the F5 pursuit damage lands in applyCheckOutcome, and
     // the summary must never say «no physical consequence» over it (R-106 playtest).
@@ -2489,7 +2689,7 @@ export function submitCommand(
 export function applyChoice(
   state: QuestRunState,
   optionId: string,
-  opts?: { useConsumable?: boolean; forceDie?: number },
+  opts?: { useConsumable?: boolean; forceDie?: number; armedFlags?: ReadonlySet<string> },
 ): QuestRunState {
   submitCommand(state, optionId, opts);
   return matureReady(state, Number.MAX_SAFE_INTEGER);

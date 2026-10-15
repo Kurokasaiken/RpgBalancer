@@ -18,7 +18,7 @@ const hook = (name: string, ...args: unknown[]) =>
 
 const run = async () => {
   mkdirSync(OUT, { recursive: true });
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
   const ctx = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
     recordVideo: { dir: OUT, size: { width: 1920, height: 1080 } },

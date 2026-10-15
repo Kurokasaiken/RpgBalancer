@@ -25,7 +25,7 @@ const OPEN_SLOT_SELECTOR = '[data-testid^="slot-button-slot-lab-open-slot-"]';
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function main() {
-  const browser = await puppeteer.launch({ headless: false, slowMo: 120 });
+  const browser = await puppeteer.launch({ headless: process.env.HEADLESS !== 'false', slowMo: 120 });
   const page = await browser.newPage();
 
   try {

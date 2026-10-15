@@ -26,7 +26,8 @@ export type EngravedIconId =
   // ruoli e stato
   | 'role-leader' | 'role-member' | 'role-bodyguard' | 'role-scout' | 'status-wound' | 'status-fallen'
   // oggetti usati dalle finestre HUD
-  | 'ico-scroll' | 'ico-axe' | 'ico-gust' | 'ico-chest' | 'ico-pouch' | 'ico-cup' | 'ico-vial' | 'ico-spark';
+  | 'ico-scroll' | 'ico-axe' | 'ico-gust' | 'ico-chest' | 'ico-pouch' | 'ico-cup' | 'ico-vial' | 'ico-spark'
+  | 'ico-target' | 'ico-grapnel' | 'ico-salve' | 'ico-banner';
 
 const EO = { fillRule: 'evenodd', clipRule: 'evenodd' } as const;
 
@@ -288,6 +289,32 @@ const GLYPHS: Record<EngravedIconId, React.ReactNode> = {
     </>
   ),
   'ico-spark': <path d="M12 2.4c.8 5.6 4 8.8 9.6 9.6-5.6.8-8.8 4-9.6 9.6-.8-5.6-4-8.8-9.6-9.6 5.6-.8 8.8-4 9.6-9.6z" />,
+
+  /* R-196 belt items — authored in the set's idiom (solid silhouette, evenodd
+   * holes, ~75% fill). target = two rings + centre; grapnel = ring, shaft and
+   * twin flukes; salve = lobed heart; banner = swallow-tailed pennant on a pole. */
+  'ico-target': (
+    <>
+      <path {...EO} d="M12 2.4a9.6 9.6 0 1 0 0 19.2 9.6 9.6 0 0 0 0-19.2zM12 5.6a6.4 6.4 0 1 1 0 12.8 6.4 6.4 0 0 1 0-12.8z" />
+      <circle cx="12" cy="12" r="2.7" />
+    </>
+  ),
+  'ico-grapnel': (
+    <>
+      <path {...EO} d="M12 1.6a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6zM12 3.4a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+      <rect x="10.9" y="6.8" width="2.2" height="13.8" rx="0.9" />
+      <path {...EO} d="M3.8 12.6l2.8-1.4.4 2.2c.7 3 2.2 4.6 5 5.2 2.8-.6 4.3-2.2 5-5.2l.4-2.2 2.8 1.4-.6 2.4c-1 3.8-3.4 6-7.4 6.8-4-.8-6.4-3-7.4-6.8z" />
+    </>
+  ),
+  'ico-salve': (
+    <path d="M12 20.6C6.8 16.6 3.2 13.4 3.2 9.2 3.2 6.2 5.5 4 8.4 4c1.6 0 3 .8 3.6 2 .6-1.2 2-2 3.6-2 2.9 0 5.2 2.2 5.2 5.2 0 4.2-3.6 7.4-8.8 11.4z" />
+  ),
+  'ico-banner': (
+    <>
+      <rect x="3.8" y="1.8" width="2.2" height="20.4" rx="0.9" />
+      <path d="M6 3h14l-3.4 4.5L20 12H6z" />
+    </>
+  ),
 
 };
 

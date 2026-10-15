@@ -1705,7 +1705,7 @@ function writeOutputs(
  */
 function maybeOpenReport(markdownPath: string): void {
   try {
-    const child = spawn('open', [markdownPath], {
+    const child = spawn('open', ['-g', markdownPath], {
       stdio: 'ignore',
       detached: true,
     });

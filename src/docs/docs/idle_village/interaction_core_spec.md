@@ -65,7 +65,13 @@ hold      : progress 0→1 in 560ms  (drives SlotV12Renderer: TEETH RETRACT FIRS
 bezelWait : 560ms (bezel CSS transition completes)
 overshoot : progress 1.2, held 300ms (spring flare; onOvershoot → medal spring/sounds)
 extracted : progress 1.0 + onExtracted() → remove occupant + start the return flight
-cancel()  : released early → progress eases back to 0 in 300ms
+cancel()  : released early → progress eases back to 0 in 300ms.
+            progress === 0 is NOT "nothing to cancel": start() has already
+            scheduled the rAF hold, so cancel at 0 resets the sequence —
+            a slot-token drag that activates before the first frame must
+            abort the pending extraction (fixed 2026-10-15, R-195/PLAN-036:
+            without it the source slot emptied on a rejected swap).
+            progress ≥ 1 → the hold is committed; cancel is a no-op.
 reset()   : call when the return flight lands
 ```
 

@@ -115,9 +115,17 @@ export function useExtractionSequence({ onExtracted, onOvershoot }: UseExtractio
   }, [clearTimers, schedule, setProgress]);
 
   const cancel = useCallback(() => {
-    // Only cancels an in-progress hold; once extracted, reset() is the way back
+    /* Only cancels an in-progress hold; once extracted, reset() is the way
+     * back. progress === 0 is NOT "nothing to cancel": start() has already
+     * scheduled the rAF hold, so an early cancel (e.g. a slot-token drag
+     * activating before the first frame under main-thread load) must still
+     * stop the sequence — otherwise the occupant is extracted mid-drag. */
     const from = progressRef.current;
-    if (from <= 0 || from >= 1) return;
+    if (from >= 1) return;
+    if (from <= 0) {
+      reset();
+      return;
+    }
     clearTimers();
     const startTime = Date.now();
     const animateClose = () => {
@@ -132,7 +140,7 @@ export function useExtractionSequence({ onExtracted, onOvershoot }: UseExtractio
       }
     };
     rafRef.current = requestAnimationFrame(animateClose);
-  }, [clearTimers, setProgress]);
+  }, [clearTimers, reset, setProgress]);
 
   return { isExtracting, progress, start, cancel, reset };
 }

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DndContext, MeasuringStrategy, pointerWithin } from '@dnd-kit/core';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { GameFrameScreen } from './game-frame';
-import { DEFAULT_MAP_TUNE, PixiWorldMap, type PixiBootProgress, type PixiMapAnchor, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { DEFAULT_MAP_TUNE, PixiWorldMap, type PixiBootProgress, type PixiMapAnchor, type PixiRegion, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
 import { GameBootScreen, type GameBootPhase } from '@/ui/idleVillage/components/gameFrame/GameBootScreen';
 import { GameFrameDragCursor } from '@/ui/idleVillage/components/gameFrame/GameFrameDragCursor';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
@@ -39,16 +39,17 @@ import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 // eslint-disable-next-line no-restricted-imports
 import { EXPIRE_FADE_MS, MAP_QUEST_POI_TARGET, MapQuestPoi } from '@/ui/idleVillage/components/gameFrame/MapQuestPoi';
 import { DirectorPanel, type DirectorAction } from '@/ui/idleVillage/components/gameFrame/DirectorPanel';
+import { isQuestPoiRevealed, questRevealSchedule } from '@/ui/idleVillage/components/gameFrame/questRevealSchedule';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente.webp';
 import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
-import { MapBuildingPoi, BUILDING_ICON_URLS } from '@/ui/idleVillage/components/gameFrame/MapBuildingPoi';
 import { useHudScale } from '@/ui/idleVillage/components/gameFrame/useHudScale';
-import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField } from '@/ui/idleVillage/components/gameFrame';
+import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, VillageScreenView, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
+import { resolveQuestShellLayout } from '@/ui/idleVillage/components/gameFrame/questShellLayout';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
-import { VILLAGE_STASH_CONFIG, type VillageBuildingId, type VillageBuildingIconKey } from '@/balancing/config/idleVillage/villageStashConfig';
+import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { MERCHANT_CONFIG } from '@/balancing/config/idleVillage/merchantConfig';
 import { runHeroLevelUpStaging } from '@/ui/idleVillage/rosterV2/runHeroLevelUpStaging';
 import { playLevelUpCue } from '@/ui/idleVillage/rosterV2/heroLevelCue';
@@ -77,9 +78,6 @@ const INVASION_MARCH_DAYS = 30;
 /** Normalised map points: where the sticker lands on the forest, and the village it marches on. */
 const INVASION_LAND = { x: 0.239, y: 0.417 } as const;
 const INVASION_VILLAGE = { x: 0.486, y: 0.554 } as const;
-/* PLAN-032 SP-2: which HUD panel a village building marker opens. `BuildingId`
- *  is the config's literal union — a mismatch fails at compile time. */
-const poiToPanel: Record<VillageBuildingId, HudPanelId> = { stash: 'villageStash', merchant: 'merchant' };
 const INVASION_KEY = 'invasion_v1';
 const TUNING_KEY = 'hud_tuning_v1';
 /** POIs whose quest has run to completion: once the expedition report is
@@ -89,7 +87,7 @@ const CONSUMED_POIS_KEY = 'idleVillage.questPois.consumed';
 
 export default function GameFramePixiPage() {
   const hudScale = useHudScale();
-  const { worldDressing, questPois, debug, roster, questDetail, questWindow, insets } = DEFAULT_GAME_FRAME_CONFIG;
+  const { worldDressing, questPois, debug, roster, questDetail, questWindow, insets, questReveal } = DEFAULT_GAME_FRAME_CONFIG;
   const baseSafeFit = worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined;
   // Dev tuning (Tuning panel): overrides on top of the config, applied when a slider is released.
   const [tuned, setTuned] = useState<Record<string, number>>({});
@@ -170,7 +168,15 @@ export default function GameFramePixiPage() {
   const poi = questPois[0];
   const { t, ready: i18nReady } = useTranslation('idleVillage');
   const Roster = useHudMaterial() === 'lacquer' ? MatericRosterComponentV2 : MatericRosterComponent;
+  /* R-200 (PLAN-037): «Show quest» is a one-way Director trigger — it jumps
+   *  the reveal queue, never hides a POI back. The offers also reveal
+   *  themselves: `autoRevealedIds` is the stagger's own memory, one entry per
+   *  offer, `staggerMs` of wall clock apart, starting once the boot veil is
+   *  gone; `revealCycle` re-arms the sequence (Director «Reset» replays the
+   *  entrances for a new take). */
   const [questShown, setQuestShown] = useState(false);
+  const [autoRevealedIds, setAutoRevealedIds] = useState<ReadonlySet<string>>(() => new Set());
+  const [revealCycle, setRevealCycle] = useState(0);
   // Dev comparison of the two skins from the Director panel (`?skin=` sets the starting one).
   const [skinId, setSkinId] = useState<SkinPresetId>(resolveInitialSkinPresetId);
   useEffect(() => {
@@ -178,9 +184,6 @@ export default function GameFramePixiPage() {
     document.documentElement.setAttribute('data-skin-preset', skinId);
   }, [skinId]);
   const [poiDemo, setPoiDemo] = useState(false);
-  /* PLAN-032 SP-3: the merchant marker is Director staging — default OFF,
-   *  flipped by the `merchantmarker` director action (poiDemo convention). */
-  const [merchantMarker, setMerchantMarker] = useState(false);
   /* R-180: «POI types» reviews the whole marker family — the golden quest
    *  POI rides along as the REAL offer (never a fake exemplar, R-143), so
    *  clicking it opens the actual expedition planner. «Show quest» stays
@@ -488,16 +491,24 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   const draggingResidentId =
     session.draggingResidentId ?? expeditionGoblin.draggingResidentId ?? expeditionRovine.draggingResidentId;
   const questWindowBounds = useMemo(
-    () =>
-      panels.visible.quest && activeQuestRun.run
-        ? {
-            left: roster.leftPx + roster.widthPx + questDetail.gapPx,
-            top: questWindow.topPx,
-            right: roster.leftPx + roster.widthPx + questDetail.gapPx + questWindow.widthPx,
-            bottom: window.innerHeight,
-          }
-        : null,
-    [panels.visible.quest, activeQuestRun.run, roster.leftPx, roster.widthPx, questDetail.gapPx, questWindow.topPx, questWindow.widthPx],
+    () => {
+      if (!panels.visible.quest || !activeQuestRun.run) return null;
+      /* R-196: the hero sheet keeps clear of the WHOLE shell — the window
+       * plus whichever companion span fits beside it. */
+      const layout = resolveQuestShellLayout(window.innerWidth, questWindow);
+      const sideSpan = layout.companionsFit ? layout.effectiveSideWidth + questWindow.sidePanelGapPx : 0;
+      const vw = window.innerWidth;
+      const centered = Math.round((vw - questWindow.widthPx) / 2);
+      const minLeft = sideSpan + questWindow.edgeInsetPx;
+      const left = Math.min(Math.max(minLeft, centered), Math.max(minLeft, vw - questWindow.widthPx - minLeft));
+      return {
+        left: left - sideSpan,
+        top: questWindow.topPx,
+        right: left + questWindow.widthPx + sideSpan,
+        bottom: window.innerHeight,
+      };
+    },
+    [panels.visible.quest, activeQuestRun.run, questWindow],
   );
   const heroSheet = useHeroSheet({
     config: DEFAULT_GAME_FRAME_CONFIG.heroSheet,
@@ -532,17 +543,16 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     [panels, heroSheet],
   );
 
-  /* PLAN-032 SP-2: village building markers open (never toggle) their panel.
-   *  `panels` itself is unstable across renders, so the marker callbacks read
-   *  it through a ref — the anchors memo is deliberately not re-run on every
-   *  panel flip. `buildingOpenerRef` records the marker element so closing the
-   *  panel can return focus to it (menu/shortcut paths leave it null → focus
-   *  falls back to the Panels-menu trigger, never to body). */
+  /* PLAN-035: building markers left the continent map — the stash and merchant
+   *  panels open from the Village view's tooltip actions (and the Panels menu /
+   *  `v` / `m` shortcuts). `buildingOpenerRef` records the opener element so
+   *  closing the panel returns focus to it (menu/shortcut paths leave it null →
+   *  focus falls back to the Panels-menu trigger, never to body). `panels`
+   *  itself is unstable across renders, so callbacks read it through a ref. */
   const panelsApiRef = useRef(panels);
   panelsApiRef.current = panels;
   const buildingOpenerRef = useRef<HTMLElement | null>(null);
-  const handleBuildingPoiActivate = useCallback((buildingId: VillageBuildingId, trigger: HTMLElement) => {
-    const panelId = poiToPanel[buildingId];
+  const openVillagePanel = useCallback((panelId: 'villageStash' | 'merchant', trigger: HTMLElement) => {
     buildingOpenerRef.current = trigger;
     const p = panelsApiRef.current;
     if (!p.visible[panelId]) p.set(panelId, true);
@@ -565,17 +575,82 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   const closeVillageStash = useCallback(() => closeBuildingPanel('villageStash'), [closeBuildingPanel]);
   const closeMerchant = useCallback(() => closeBuildingPanel('merchant'), [closeBuildingPanel]);
 
+  /* PLAN-035 (Desiderata v30, artifact r005): the Village view — a full-area
+   *  mode inside GameFrame, entered from the nav plinth or the painted village
+   *  region. `goToView` is the ONLY writer of the view: nav select, region
+   *  select, shroud transitions and the village back action all funnel through
+   *  it, so no competing update can split the transition. */
+  const [viewMode, setViewMode] = useState<'map' | 'village'>('map');
+  const viewModeRef = useRef(viewMode);
+  viewModeRef.current = viewMode;
+  const villageViewRef = useRef<VillageScreenViewHandle>(null);
+  const goToView = useCallback((view: 'map' | 'village', opts?: { focusMap?: boolean }) => {
+    setViewMode(view);
+    /* Region hover is transient map state: clear it on every transition so the
+     * village never inherits a stale name chip and the map re-enters clean. */
+    setRegionHover(null);
+    if (view === 'map' && opts?.focusMap) {
+      window.requestAnimationFrame(() => {
+        /* A higher-priority surface may legitimately own focus right now (hero
+         * sheet, quest window): never steal it back. */
+        const active = document.activeElement as HTMLElement | null;
+        if (active?.closest('[data-hud-panel]')) return;
+        document.querySelector<HTMLElement>('[data-nav-id="map"]')?.focus();
+      });
+    }
+  }, []);
+  const handleRegionSelect = useCallback(
+    (region: PixiRegion) => {
+      if (region.id === 'village') goToView('village');
+    },
+    [goToView],
+  );
+  /* CTR-game-004: the invasion theatre always plays on the map — a rising
+   * shroud pulls the view back, whatever the player was looking at. */
+  useEffect(() => {
+    if (shroudCovered) goToView('map');
+  }, [shroudCovered, goToView]);
+  /* Escape arbitration (artifact r005) — ONE window-bubble listener owned by
+   * the page; order inside the same keypress:
+   * 1. Hero sheet: document capture upstream already preventDefault-ed it.
+   * 2. Quest window: a mounted `[data-hud-panel="quest"]` node — presence, not
+   *    listener order, so its own bubble handler may run before or after this
+   *    one without a double dismissal.
+   * 3. Village tooltip: the view's imperative escape() (close + focus the pin).
+   * 4. Village exit → map, focus returning to the Map nav button.
+   * Stash/merchant panels register no Escape handler and never suppress the
+   * exit. One keypress = exactly one dismissal. */
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      if (document.querySelector('[data-hud-panel="quest"]')) return;
+      if (viewModeRef.current !== 'village') return;
+      event.preventDefault();
+      if (villageViewRef.current?.escape()) return;
+      goToView('map', { focusMap: true });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [goToView]);
+
   // Open opportunities live in the calendar like any other dated event: the quest is a row in the ledger.
   const extraEvents = useMemo<HudEvent[]>(() => {
     const list: HudEvent[] = [];
     if (invasion) list.push({ id: 'invasion', typeId: 'threat', title: t('gameFrame.events.fixtures.invasion'), daysLeft: invasionDaysLeft, at: { x: 0.486, y: 0.554 }, arriving: rowArriving });
     const goblinAvail = questPoiAvailability.get('poi-goblin');
-    if (questRevealed && expeditionGoblin.poiView.questStatus === 'available' && goblinAvail && goblinAvail.state !== 'expired') {
+    /* The ledger row rides the same reveal as the marker — auto-stagger,
+     *  Director force or a live run all count (R-200). */
+    const goblinRevealed = isQuestPoiRevealed(poiGoblin.id, {
+      revealAll: questRevealed,
+      autoRevealedIds,
+      hasLiveRun: !!expeditionGoblin.run,
+    });
+    if (goblinRevealed && expeditionGoblin.poiView.questStatus === 'available' && goblinAvail && goblinAvail.state !== 'expired') {
       const daysLeft = Math.max(0, Math.ceil(goblinAvail.progress * (poiGoblin.availableUntilDay - poiGoblin.availableFromDay)));
       list.push({ id: 'quest-open', typeId: 'quest', title: expeditionGoblin.poiView.activity.label, daysLeft, at: { x: poiGoblin.x / 4240, y: poiGoblin.y / 2828 } });
     }
     return list;
-  }, [invasion, invasionDaysLeft, rowArriving, questRevealed, expeditionGoblin.poiView, questPoiAvailability, poiGoblin, t]);
+  }, [invasion, invasionDaysLeft, rowArriving, questRevealed, autoRevealedIds, expeditionGoblin.poiView, expeditionGoblin.run, questPoiAvailability, poiGoblin, t]);
 
   /* Consumed quest POIs (persisted): a POI whose run ended, settled and had
    *  its report dismissed leaves the map — it never comes back, even across
@@ -615,8 +690,20 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     activeQuestRun.clear();
   }, [panels.visible.quest, activeQuestRun, activeQuestId, consumedPoiIds]);
 
-  // Bag arming is the player's call: nothing is spent on a check unless armed.
-  const [questArmed, setQuestArmed] = useState(questWindow.consumablesArmedByDefault);
+  // R-196: bag arming is per-item and lives in `useQuestRun.armedFlags` — the
+  // window toggles flags through `toggleArmedFlag`, nothing is spent unasked.
+  /* R-196: the shell anchors centred — companion columns (roster/belt left,
+   * chronicle right) flank it inside the same drag union, so the left edge
+   * leaves room for the fit span on both sides. */
+  const questAnchor = useMemo(() => {
+    const vw = typeof window === 'undefined' ? 1440 : window.innerWidth;
+    const layout = resolveQuestShellLayout(vw, questWindow);
+    const sideSpan = layout.companionsFit ? layout.effectiveSideWidth + questWindow.sidePanelGapPx : 0;
+    const centered = Math.round((vw - questWindow.widthPx) / 2);
+    const minLeft = sideSpan + questWindow.edgeInsetPx;
+    const left = Math.min(Math.max(minLeft, centered), Math.max(minLeft, vw - questWindow.widthPx - minLeft));
+    return { left, top: questWindow.topPx };
+  }, [questWindow]);
   /* The window's time bar reads the same D-J projection the POI halo does:
    *  elapsed ticks over the live duration (extends past the estimate when
    *  the path outgrows it). The legacy day-label stays for preset-started
@@ -675,7 +762,10 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
       /* A repeatable offer ignores a stale consumed record (authored after
        *  the POI was already consumed — D-S4-6 migration honesty). */
       if (isPoiConsumed(p, consumedPoiIds)) continue;
-      if (!questRevealed || (!exp.run && avail?.state === 'expired')) continue;
+      /* R-200: per-POI reveal — the stagger clock, a Director force, the
+       *  family review or a live run each mount the marker, and nothing on
+       *  this path hides it back (only expiry/consumption still exit it). */
+      if (!isQuestPoiRevealed(p.id, { revealAll: questRevealed, autoRevealedIds, hasLiveRun: !!exp.run }) || (!exp.run && avail?.state === 'expired')) continue;
       list.push({
         id: p.id,
         x: p.x,
@@ -693,49 +783,11 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         list.push({ id: `demo-${demo.type}`, x: demo.x * 4240, y: demo.y * 2828, node: <MapDemoPoi type={demo.type} sizePx={poi?.sizePx ?? 55} /> });
       }
     }
-    /* PLAN-032 SP-2: the village stash marker — a building POI anchored on a
-     *  painted roof, always on the map while the village exists. Config-derived
-     *  (a typo fails at parse/compile, never silently); ghost removal animates
-     *  through the `exiting` prop like every other anchor. */
-    for (const marker of [VILLAGE_STASH_CONFIG.marker]) {
-      list.push({
-        id: `building-${marker.buildingId}`,
-        x: marker.worldX,
-        y: marker.worldY,
-        node: (
-          <MapBuildingPoi
-            buildingId={marker.buildingId}
-            name={t(`gameFrame.buildings.${marker.buildingId}.name`)}
-            iconUrl={BUILDING_ICON_URLS[marker.iconKey]}
-            sizePx={poi?.sizePx ?? 55}
-            onActivate={(trigger) => handleBuildingPoiActivate(marker.buildingId, trigger)}
-          />
-        ),
-      });
-    }
-    /* PLAN-032 SP-3: the merchant marker only exists while the Director stages
-     *  it (`merchantmarker` toggle). Same MapBuildingPoi contract as the
-     *  stash — it opens/focuses `merchant`, never toggles it shut. */
-    if (merchantMarker) {
-      const marker = MERCHANT_CONFIG.marker;
-      list.push({
-        id: 'building-merchant',
-        x: marker.worldX,
-        y: marker.worldY,
-        node: (
-          <MapBuildingPoi
-            buildingId="merchant"
-            name={t('gameFrame.merchant.markerName')}
-            iconUrl={BUILDING_ICON_URLS[marker.iconKey as VillageBuildingIconKey]}
-            sizePx={poi?.sizePx ?? 55}
-            onActivate={(trigger) => handleBuildingPoiActivate('merchant', trigger)}
-          />
-        ),
-      });
-    }
+    /* PLAN-035: no building markers on the continent — Warehouse and Emporium
+     *  open from the Village view's building tooltips instead. */
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poi, questRevealed, poiDemo, merchantMarker, questPoiAvailability, consumedPoiIds, expeditionGoblin.poiView, expeditionGoblin.run, expeditionRovine.poiView, expeditionRovine.run, invasion, currentDay, goblinLanded, t, handleBuildingPoiActivate]);
+  }, [poi, questRevealed, autoRevealedIds, poiDemo, questPoiAvailability, consumedPoiIds, expeditionGoblin.poiView, expeditionGoblin.run, expeditionRovine.poiView, expeditionRovine.run, invasion, currentDay, goblinLanded]);
 
   /* Exit transformation (R-127): an anchor that leaves the set stays mounted
    *  one beat longer — its node re-rendered with `exiting` plays the same
@@ -866,6 +918,29 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     trackTelemetryEvent('game_boot_complete', { interactiveMs });
   }, [veilGone]);
 
+  /* Auto-reveal (R-200): the authored offers mount one at a time once the
+   *  veil is gone — `questRevealSchedule` owns the pacing (initialDelayMs +
+   *  i×staggerMs, wall clock). Additive only: a reveal never removes an id.
+   *  `revealCycle` re-arms the whole sequence after a Director «Reset»; every
+   *  timer is cleared on teardown/re-cycle, so StrictMode's double effect
+   *  leaves exactly one armed set. */
+  useEffect(() => {
+    if (!veilGone || !questReveal.enabled) return undefined;
+    const timers = questRevealSchedule(QUEST_POIS, questReveal).map((entry) =>
+      window.setTimeout(() => {
+        setAutoRevealedIds((prev) => {
+          if (prev.has(entry.poiId)) return prev;
+          const next = new Set(prev);
+          next.add(entry.poiId);
+          return next;
+        });
+      }, entry.delayMs),
+    );
+    return () => {
+      for (const timer of timers) window.clearTimeout(timer);
+    };
+  }, [veilGone, revealCycle, questReveal]);
+
   /* The run window as a memoised element: while the clock ticks the page
    * re-renders, but an identical element reference lets React skip the whole
    * 900-line subtree on the ticks where nothing visible changed — the ticking
@@ -884,21 +959,20 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           scenario={scenarioForQuest(activeQuestId)}
           artFor={(nodeId) => NODE_ART[nodeId]?.src}
           time={questRunTimeView}
-          onChoose={(optionId) => activeQuestRun.choose(optionId, { useConsumable: questArmed })}
-          armed={questArmed}
-          onToggleArmed={() => setQuestArmed((on) => !on)}
-          onUseHealing={activeQuestRun.useHealing}
-          onDrinkPotion={activeQuestRun.drinkPotion}
+          onChoose={(optionId) => activeQuestRun.choose(optionId)}
+          armedFlags={activeQuestRun.armedFlags}
+          onToggleArmedFlag={activeQuestRun.toggleArmedFlag}
           onClose={() => panels.set('quest', false)}
-          anchor={{ left: roster.leftPx + roster.widthPx + questDetail.gapPx, top: questWindow.topPx }}
+          anchor={questAnchor}
           widthPx={questWindow.widthPx}
           theaterAspect={questWindow.theaterAspect}
           tooltipLines={questWindow.tooltipLines}
+          companions={{ widthPx: questWindow.sidePanelWidthPx, gapPx: questWindow.sidePanelGapPx, minWidthPx: questWindow.minSidePanelWidthPx, edgeInsetPx: questWindow.edgeInsetPx }}
           zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
         />
       ) : null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeQuestRun, activeQuestId, panels.visible.quest, questRunTimeView, questArmed, questWindow, roster.leftPx, roster.widthPx, questDetail.gapPx],
+    [activeQuestRun, activeQuestId, panels.visible.quest, questRunTimeView, questAnchor, questWindow],
   );
 
   const directorActions = useMemo<DirectorAction[]>(
@@ -913,15 +987,16 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         },
       },
       {
-        /* R-143/R-180: the quest-only reveal of the REAL quest offers
+        /* R-143/R-180 + R-200: the quest-only reveal of the REAL quest offers
          *  (goblin + rovine) — a quest marker is never a demo exemplar.
-         *  «POI types» also surfaces them (family review), this toggle gates
-         *  ONLY the real thing end-to-end (offer → detail → run → settle →
-         *  consumed). */
+         *  «POI types» also surfaces them (family review). The offers now
+         *  reveal themselves on a stagger after the veil lifts; this action
+         *  is a one-way «reveal now» — it jumps the queue, it can never hide
+         *  a POI back. Pressed once every authored offer is on the map. */
         id: 'quest',
         label: t('gameFrame.director.quest'),
-        active: questShown,
-        onTrigger: () => setQuestShown((shown) => !shown),
+        active: questShown || QUEST_POIS.every((p) => autoRevealedIds.has(p.id)),
+        onTrigger: () => setQuestShown(true),
       },
       {
         id: 'questRun',
@@ -943,14 +1018,6 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         label: t('gameFrame.director.poiTypes'),
         active: poiDemo,
         onTrigger: () => setPoiDemo((on) => !on),
-      },
-      {
-        /* PLAN-032 SP-3: stages the merchant building marker for takes —
-         *  staging only, the panel itself also opens via menu/`m`. */
-        id: 'merchantmarker',
-        label: t('gameFrame.director.merchantMarker'),
-        active: merchantMarker,
-        onTrigger: () => setMerchantMarker((on) => !on),
       },
       {
         id: 'wonder',
@@ -981,7 +1048,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, questShown, poiDemo, merchantMarker, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin, settlementLostActive, openRunWindow, residentsById],
+    [invasion, questShown, autoRevealedIds, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin, settlementLostActive, openRunWindow, residentsById],
   );
 
   return (
@@ -1009,11 +1076,18 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           onDragStart={(event: DragStartEvent) => {
             /* Drag-start re-renders the whole page (anchors, roster, HUD). Marking
              * it a transition makes that render interruptible — React splits it
-             * across frames instead of one ~117ms block at pickup (PLAN-031 T-B4). */
+             * across frames instead of one ~117ms block at pickup (PLAN-031 T-B4).
+             * A slotted token (slot↔slot swap, R-183) is the exception: its
+             * swap-preview bloom must paint WHILE the token is in the air —
+             * scheduled as a transition it can starve behind the drag's
+             * continuous updates and never render. The token path is light, so
+             * it stays synchronous. */
+            if (event.active.data.current?.type === 'slot-token') {
+              expeditions.forEach((exp) => exp.handleDragStart(event));
+              return;
+            }
             startTransition(() => {
-              /* R-183: a slotted token (slot↔slot swap) belongs to its
-               *  expedition only — the activity session tracks roster cards. */
-              if (event.active.data.current?.type !== 'slot-token') session.handleDragStart(event);
+              session.handleDragStart(event);
               expeditions.forEach((exp) => exp.handleDragStart(event));
             });
           }}
@@ -1032,6 +1106,8 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
             scaleControl={hudScale}
             hudWakeSignal={hudWakeSignal}
             timeInputLocked={timeFrozen}
+            activeNavId={viewMode}
+            onNavSelect={(id) => goToView(id === 'village' ? 'village' : 'map')}
             onHudHiddenChange={(hidden, cause) => setHudIdleHidden(hidden && cause === 'idle')}
             rosterSlot={({ onClose }) => (
               /* SP-1: the rail wrapper is the delegation boundary — pointer/focus
@@ -1206,7 +1282,12 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                       setInvasion(null);
                       setShroudCovered(false);
                       setCardOpen(false);
+                      /* R-200: re-arm the stagger — the revealed markers ghost
+                       *  out, then the offers re-enter one every staggerMs
+                       *  (a fresh take of the reveal sequence). */
                       setQuestShown(false);
+                      setAutoRevealedIds(new Set());
+                      setRevealCycle((cycle) => cycle + 1);
                     }}
                   />
                 )}
@@ -1214,30 +1295,54 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
             }
             renderMap={({ recenterSignal, focusRequest }) => (
               <div style={{ position: 'absolute', inset: 0, isolation: 'isolate' }}>
-                <PixiWorldMap
-                  manifestPath={resolveWorldManifestPath(worldDressing)}
-                  hiddenLayerIds={worldDressing.hiddenLayerIds}
-                  safeFit={safeFit}
-                  recenterSignal={recenterSignal}
-                  focusRequest={focusRequest}
-                  anchors={anchorsWithGhosts}
-                  stageColor={worldDressing.stageColor}
-                  seaPatternConfig={seaPatternConfig}
-                  coastFoamConfig={coastFoamConfig}
-                  cloudShadowOpacity={motion.cloudShadowOpacity}
-                  cloudShadowOffset={shadowOffset}
-                  cloudSpeed={motion.cloudSpeed}
-                  seabed={seabed}
-                  tune={tuneNow}
-                  ambient={ambient}
-                  wonderRequest={wonderRequest}
-                  regions={{ assetBase: '/assets/world/wanderlust/base', onHover: setRegionHover }}
-                  onBootProgress={handleBootProgress}
-                  onReady={handleMapReady}
-                  onBootError={handleBootError}
-                />
-                {regionHover && <RegionTooltip name={t(`gameFrame.regions.${regionHover.region.id}`)} x={regionHover.x} y={regionHover.y} />}
-                <WorldSurfaceEventShroud covered={shroudCovered} zIndex={6} />
+                {/* CTR-game-001/REG-001: the map NEVER unmounts in village view —
+                 *  the WebGL context, ticker and camera stay alive under an
+                 *  opaque-hidden layer that is also inert and aria-hidden so
+                 *  nothing inside is clickable or reachable by keyboard. */}
+                <div
+                  data-testid="world-map-layer"
+                  aria-hidden={viewMode !== 'map' || undefined}
+                  inert={viewMode !== 'map' ? true : undefined}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: viewMode === 'map' ? 1 : 0,
+                    pointerEvents: viewMode === 'map' ? 'auto' : 'none',
+                    transition: 'opacity 240ms ease-out',
+                  }}
+                >
+                  <PixiWorldMap
+                    manifestPath={resolveWorldManifestPath(worldDressing)}
+                    hiddenLayerIds={worldDressing.hiddenLayerIds}
+                    safeFit={safeFit}
+                    recenterSignal={recenterSignal}
+                    focusRequest={focusRequest}
+                    anchors={anchorsWithGhosts}
+                    stageColor={worldDressing.stageColor}
+                    seaPatternConfig={seaPatternConfig}
+                    coastFoamConfig={coastFoamConfig}
+                    cloudShadowOpacity={motion.cloudShadowOpacity}
+                    cloudShadowOffset={shadowOffset}
+                    cloudSpeed={motion.cloudSpeed}
+                    seabed={seabed}
+                    tune={tuneNow}
+                    ambient={ambient}
+                    wonderRequest={wonderRequest}
+                    regions={{ assetBase: '/assets/world/wanderlust/base', onHover: setRegionHover, onSelect: handleRegionSelect }}
+                    onBootProgress={handleBootProgress}
+                    onReady={handleMapReady}
+                    onBootError={handleBootError}
+                  />
+                  {viewMode === 'map' && regionHover && <RegionTooltip name={t(`gameFrame.regions.${regionHover.region.id}`)} x={regionHover.x} y={regionHover.y} />}
+                  <WorldSurfaceEventShroud covered={shroudCovered} zIndex={6} />
+                </div>
+                {viewMode === 'village' && (
+                  <VillageScreenView
+                    ref={villageViewRef}
+                    onOpenStash={(trigger) => openVillagePanel('villageStash', trigger)}
+                    onOpenMerchant={(trigger) => openVillagePanel('merchant', trigger)}
+                  />
+                )}
               </div>
             )}
           />

@@ -26,6 +26,7 @@ Use when there is enough clarity to commit to a concrete plan.
 - The last task of the plan must produce a verifiable, measurable result (test passing, build green, evidence log).
 - Do not introduce components or features not explicitly requested (YAGNI).
 - Mark open architectural decisions as open; do not decide them silently.
+- A plan that includes runtime verification, screenshots, playtests, or captures must state that the run is headless/background; a visible window is a manual Director step, never an agent action (`.windsurf/rules/16-no-foreground-windows.md`).
 - Reference and update the relevant plan files in `src/docs/docs/plans/`.
 
 ## Post-plan learning
