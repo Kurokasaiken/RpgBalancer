@@ -85,10 +85,10 @@ public/assets/world/**/manifest.trimmed.bak.json
 *.psd
 
 # Generated atmospheres and masks
+# NOTE: waves/, wonders/ and terrain/cloud_mask* ARE committed: they are
+# runtime assets loaded by the map boot and cloud-shadow CSS, not regenerable
+# on CI. Keep this list to true source/scratch material only.
 assets-source/
-public/assets/atmosphere/waves/
-public/assets/atmosphere/wonders/
-public/assets/atmosphere/terrain/cloud_mask*
 public/assets/ref/
 public/assets/trailer/
 

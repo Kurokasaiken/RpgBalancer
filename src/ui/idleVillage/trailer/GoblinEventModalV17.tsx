@@ -35,8 +35,8 @@ export interface GoblinEventModalV17Props {
 }
 
 const ASSET = {
-  reference: '/mockups/external/goblin-event-lab/reference.png',
-  hero: '/mockups/goblin-invasion-painted/goblin-invasion-hero.png',
+  reference: '/assets/ui/goblin-invasion/reference.png',
+  hero: '/assets/ui/goblin-invasion/goblin-invasion-hero.png',
 };
 
 const { palette, typography, layout, effects } = goblinEventModalTokens;
