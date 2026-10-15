@@ -689,25 +689,28 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
       ).toBe(true);
     }
 
-    /* Il loop si chiude: il rapporto si chiude → POI one-shot consumato. */
+    /* Il loop si chiude: il rapporto si chiude → la run si sgancia e il
+     *  POI `repeatable` torna `available` (R-200 — mai consumato). */
     await closeReportButton(page).click();
     await expect(questWindow(page)).toHaveCount(0);
-    await expect(poiMarker(page)).toHaveCount(0);
     expect(await getRun(page)).toBeNull();
+    await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');
   });
 
-  test('il POI consumato non torna dopo reload', async ({ page }) => {
+  test('il POI `repeatable` torna dopo reload: run sganciata, marker di nuovo available', async ({ page }) => {
     await launchGoblinQuest(page);
     await driveRunToEnd(page);
     await waitForSettled(page);
     await flushBeatTheatre(page);
     await closeReportButton(page).click();
-    await expect(poiMarker(page)).toHaveCount(0);
+    await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');
 
     await page.reload();
     await waitForHooks(page);
-    await page.waitForTimeout(500); // lascia al compositing della mappa un attimo
-    await expect(poiMarker(page)).toHaveCount(0);
+    /* R-200: nessun record consumato è stato scritto — il marker torna via
+     *  auto-reveal (o il reveal forzato) anche dopo un reload. */
+    await revealQuestPois(page);
+    expect(await poiStatus(page)).toBe('available');
     expect(await getRun(page)).toBeNull();
     /* Il roster è ancora lì: i PG sono a casa e il loop può ripartire su rovine. */
     const eligible = await expeditionFor<{ eligible: boolean }>(
@@ -720,7 +723,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     expect(eligible.eligible).toBe(true);
   });
 
-  test('Director «start goblin quest»: stessa pipeline canonica — settle, HUD, consumo POI, reload', async ({ page }) => {
+  test('Director «start goblin quest»: stessa pipeline canonica — settle, HUD, ritorno POI available, reload', async ({ page }) => {
     /* Il Director è uno strumento dev/playwright (F10). Da quando punta a
      *  `demoLaunch`, il bottone attraversa la STESSA `send()` del click su
      *  «Invia spedizione» (offer freeze, party re-validato, riserva
@@ -782,16 +785,18 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     expect(villageAfter.gold - villageBefore.gold).toBe(expectedGold);
     expect((await goldReadoutValue(page)) - goldReadoutBefore).toBe(expectedGold);
 
-    /* E il POI si consuma come per una quest lanciata dal marker. */
+    /* E il POI `repeatable` si comporta come per una quest lanciata dal
+     *  marker: chiuso il rapporto la run si sgancia e il marker torna
+     *  `available` — mai consumato (R-200). */
     await closeReportButton(page).click();
     await expect(questWindow(page)).toHaveCount(0);
-    await expect(poiMarker(page)).toHaveCount(0);
     expect(await getRun(page)).toBeNull();
+    await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');
 
     await page.reload();
     await waitForHooks(page);
-    await page.waitForTimeout(500); // lascia al compositing della mappa un attimo
-    await expect(poiMarker(page)).toHaveCount(0);
+    await revealQuestPois(page);
+    expect(await poiStatus(page)).toBe('available');
     expect(await getRun(page)).toBeNull();
   });
 });
