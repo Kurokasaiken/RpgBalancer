@@ -16,9 +16,6 @@ import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import type { FC } from 'react';
 import {
   DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
   pointerWithin,
   useDroppable,
   useDndContext,
@@ -27,6 +24,7 @@ import {
 } from '@dnd-kit/core';
 import { useTranslation } from '@/localization/useTranslation';
 import { getBloomStyle, type BloomState } from '@/ui/idleVillage/interaction/bloomEffect';
+import { useIdleVillageDragSensors } from '@/ui/idleVillage/interaction/dragSensors';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import {
   RosterDraggable,
@@ -546,9 +544,7 @@ export function useQuestPoiSession({
     return count;
   }, [controller.slots, residentsById, assignedIds, addTelemetry, activity.id]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-  );
+  const sensors = useIdleVillageDragSensors();
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setDraggingResidentId(event.active.id as string);
@@ -594,13 +590,15 @@ export function useQuestPoiSession({
 
   const handleResidentSelect = useCallback(
     (residentId: string) => {
-      if (flyingResidentId) return;
+      // Click-to-assign only fills a quest already open on screen and still in
+      // planning (same rule as useQuestExpeditionSession): a roster click must
+      // never open a quest by itself.
+      if (flyingResidentId || !isDetailOpen || isQuestRunning || embarkResult) return;
       const slot = findAcceptingSlot(residentId);
       if (!slot) return;
       const from = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
       if (!from) return;
 
-      setIsDetailOpen(true);
       setFlyingResidentId(residentId);
       setTimeout(() => {
         const to = elementCenter(document.querySelector(`[data-slot-id="${slot.id}"]`));
@@ -616,7 +614,7 @@ export function useQuestPoiSession({
         });
       }, 50);
     },
-    [flyingResidentId, findAcceptingSlot, setIsDetailOpen, startFlight],
+    [flyingResidentId, isDetailOpen, isQuestRunning, embarkResult, findAcceptingSlot, startFlight],
   );
 
   const handleSlotClear = useCallback(

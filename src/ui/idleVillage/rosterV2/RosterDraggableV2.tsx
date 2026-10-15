@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import {
   DndContext,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
   useDndMonitor,
   pointerWithin,
   type DragStartEvent,
   type DragEndEvent,
 } from '@dnd-kit/core';
+import { useIdleVillageDragSensors } from '@/ui/idleVillage/interaction/dragSensors';
 import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import { CustomDragOverlay } from '@/ui/idleVillage/components/CustomDragOverlay';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
@@ -75,19 +72,7 @@ export function RosterDraggableV2({
   const { state: dragVisualState, startDrag, startFlight, springBack, settle } = useDragOutcome();
 
   // Sensors configuration
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
-    })
-  );
+  const sensors = useIdleVillageDragSensors();
 
   const handleDragStart = (event: DragStartEvent) => {
     startDrag(event.active.id as string);

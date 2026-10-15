@@ -1312,8 +1312,6 @@ export function PixiWorldMap({
             });
           }
           if (disposed || pool.length === 0) continue;
-          const yMin = Math.min(...pool.map((k) => k.y));
-          const yMax = Math.max(...pool.map((k) => k.y));
           const crossing = () => band.driftSeconds / cloudSpeed;
           type Cloud = { sp: Sprite; sh: Sprite | null; shBase: number; t0: number; w: number; baseScale: number; h: number; phase: number; y: number; shown: number };
           const alive: Cloud[] = [];
@@ -1342,7 +1340,9 @@ export function PixiWorldMap({
             alive.push({
               sp, sh, shBase, t0, w, baseScale, h: k.tex.height * baseScale,
               phase: Math.random() * Math.PI * 2,
-              y: yMin + Math.random() * (yMax - yMin) + (Math.random() - 0.5) * 60,
+              // Anywhere over the map, sea included: a random height across the whole painted canvas
+              // plus the sea margins, not the narrow band of the sprite's authored y.
+              y: -marginY + Math.random() * (canvas.height + 2 * marginY),
               shown: 1,
             });
           };

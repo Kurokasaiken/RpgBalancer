@@ -25,8 +25,16 @@ function findHudPanelElement(from: HTMLElement): HTMLElement | null {
 }
 
 export function useHudPanelDrag() {
+  /* Committed offset: React state, applied through `panelStyle`. It changes only on
+   * drag start/end and on double-click reset, never per pointermove. */
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
+  /* Live offset written straight to the panel element while dragging. Per-move
+   * setState re-rendered the whole panel (roster, stats, ledger) every frame, which
+   * is what made the windows stutter. The DOM write is throttled to one per frame. */
+  const liveOffset = useRef({ x: 0, y: 0 });
+  const panelEl = useRef<HTMLElement | null>(null);
+  const frame = useRef<number | null>(null);
   const start = useRef({ x: 0, y: 0 });
   const pointerId = useRef<number | null>(null);
   /* Base rect of the dragged panel at offset (0,0), captured on pointerdown so
@@ -38,11 +46,13 @@ export function useHudPanelDrag() {
       if ((event.target as HTMLElement).closest('button, select, input, label, a')) return;
       event.preventDefault();
       event.stopPropagation();
-      start.current = { x: event.clientX - offset.x, y: event.clientY - offset.y };
+      start.current = { x: event.clientX - liveOffset.current.x, y: event.clientY - liveOffset.current.y };
       pointerId.current = event.pointerId;
-      const rect = findHudPanelElement(event.currentTarget as HTMLElement)?.getBoundingClientRect();
+      const el = findHudPanelElement(event.currentTarget as HTMLElement);
+      panelEl.current = el;
+      const rect = el?.getBoundingClientRect();
       baseRect.current = rect
-        ? { left: rect.left - offset.x, top: rect.top - offset.y, width: rect.width, height: rect.height }
+        ? { left: rect.left - liveOffset.current.x, top: rect.top - liveOffset.current.y, width: rect.width, height: rect.height }
         : null;
       setDragging(true);
       // Capture is a nicety (keeps the drag when the pointer leaves the handle); it throws
@@ -53,11 +63,16 @@ export function useHudPanelDrag() {
         /* window listeners below still track the pointer */
       }
     },
-    [offset],
+    [],
   );
 
   useEffect(() => {
     if (!dragging) return;
+    const paint = () => {
+      frame.current = null;
+      const el = panelEl.current;
+      if (el) el.style.transform = `translate(${liveOffset.current.x}px, ${liveOffset.current.y}px)`;
+    };
     const move = (event: globalThis.PointerEvent) => {
       if (event.pointerId !== pointerId.current) return;
       let nextX = event.clientX - start.current.x;
@@ -71,11 +86,19 @@ export function useHudPanelDrag() {
         nextX = Math.min(Math.max(nextX, Math.min(loX, hiX)), Math.max(loX, hiX));
         nextY = Math.min(Math.max(nextY, Math.min(loY, hiY)), Math.max(loY, hiY));
       }
-      setOffset({ x: nextX, y: nextY });
+      liveOffset.current = { x: nextX, y: nextY };
+      if (frame.current === null) frame.current = requestAnimationFrame(paint);
     };
     const end = (event: globalThis.PointerEvent) => {
       if (event.pointerId !== pointerId.current) return;
       pointerId.current = null;
+      if (frame.current !== null) {
+        cancelAnimationFrame(frame.current);
+        frame.current = null;
+      }
+      paint();
+      setOffset({ ...liveOffset.current });
+      panelEl.current = null;
       setDragging(false);
     };
     window.addEventListener('pointermove', move);
@@ -85,6 +108,10 @@ export function useHudPanelDrag() {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', end);
       window.removeEventListener('pointercancel', end);
+      if (frame.current !== null) {
+        cancelAnimationFrame(frame.current);
+        frame.current = null;
+      }
     };
   }, [dragging]);
 
@@ -93,7 +120,10 @@ export function useHudPanelDrag() {
   const panelStyle: CSSProperties = dragging
     ? { transform: `translate(${offset.x}px, ${offset.y}px)`, zIndex: 1000 }
     : { transform: `translate(${offset.x}px, ${offset.y}px)` };
-  const resetPosition = useCallback(() => setOffset({ x: 0, y: 0 }), []);
+  const resetPosition = useCallback(() => {
+    liveOffset.current = { x: 0, y: 0 };
+    setOffset({ x: 0, y: 0 });
+  }, []);
   const handleProps = {
     onPointerDown,
     onDoubleClick: resetPosition,

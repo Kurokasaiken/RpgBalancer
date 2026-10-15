@@ -87,7 +87,11 @@
   cursor: var(--game-cursor-hand-pan) !important;
 }
 
-/* drag — a resident is in the air: the whole frame is a grip until a drop target says otherwise */
+/* drag — a resident is in the air: the whole page is a grip until a drop target says otherwise.
+   Page-wide, not frame-only: CustomDragOverlay injects `* { cursor: grabbing !important }` for the
+   drag, and outside .game-frame (portals, panels) that system white hand won. `html[...] *` outranks `*`. */
+html[data-game-drag],
+html[data-game-drag] *,
 html[data-game-drag] .game-frame,
 html[data-game-drag] .game-frame * {
   cursor: var(--game-cursor-hand-drag) !important;
