@@ -13,6 +13,7 @@ The Director must never lose the window he is watching. An agent must never stea
   - `playwright test --headed`, `--ui`, `--debug`, `playwright show-report`;
   - `open` without `-g` on macOS, `xdg-open`, `start` (Windows);
   - `osascript -e 'tell application ... to activate'`, `Page.bringToFront`, `window.focus()`, `window.open` issued by automation;
+  - **implicit activation**: attaching to a headed/visible browser (`connectOverCDP`, `puppeteer.connect`, CDP `Target.createTarget` without `background:true`, `newPage()` on an attached headed instance). Creating a tab activates it and raises the window even if the browser was launched hidden — the effect is forbidden, not just the explicit API (Mind Weaver REG-001 v3, `.mw/bugs/2026-10-16-cdp-newtab-focus/`);
   - auto-opening a browser preview, Storybook, report HTML, or any OS window as a side effect of a command.
 
 ## Opt-in convention
@@ -32,6 +33,6 @@ The Director must never lose the window he is watching. An agent must never stea
 
 ## Enforcement
 
-- `npm run foreground:lint` scans the repo and fails on `headless: false` literals, foreground `open`/`xdg-open` calls, `--headed`/`--ui` invocations, `activate`/`bringToFront` in scripts and tests.
+- `npm run foreground:lint` scans the repo and fails on `headless: false` literals, foreground `open`/`xdg-open` calls, `--headed`/`--ui` invocations, `activate`/`bringToFront` in scripts and tests. It does **not** flag `newPage`/`createTarget` (legitimate in self-launched headless runs) — the ban on CDP-attach to headed browsers above is contractual; as of 2026-10-16 no script attaches to an existing browser.
 - A task that opens a foreground window is **failed**, not complete: log it in `.mw/bugs/` and flag the Coordinator.
 - When in doubt, choose the headless path and report that a visible check was not performed (see T-04 in `context/recurring-traps.md` for perceptual claims).
