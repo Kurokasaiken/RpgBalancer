@@ -1,5 +1,5 @@
 import React from 'react';
-import type { VillageBuildingCatalogId } from '@/balancing/config/idleVillage/villageBuildingsConfig';
+import type { VillageBuildingCatalogId, VillageBuildingCategory, VillageBuildingState } from '@/balancing/config/idleVillage/villageBuildingsConfig';
 import { HudGlyph } from './hudIcons';
 import type { VillageBuildingDefinition } from '@/balancing/config/idleVillage/villageBuildingsConfig';
 
@@ -104,7 +104,116 @@ const GLYPHS: Record<VillageBuildingCatalogId, React.ReactNode> = {
       d="M12 2.2l8.2 2.9v6.4c0 5-3.5 8.6-8.2 10.5-4.7-1.9-8.2-5.5-8.2-10.5V5.1zM11 5.6h2v7h-2zM8.4 12.8h7.2v1.8H8.4zM12 16.8a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4z"
     />
   ),
+  /* ——— Registry-only buildings (PLAN-042) — same 24×24 engraved contract. ——— */
+  /* Mage tower — a tapering spire with an arched doorway and a spark crown. */
+  mageTower: (
+    <>
+      <path {...EO} d="M12 2l3.8 5H8.2zM8.8 6.4h6.4l1.4 15.2H7.4zM10.4 21.6v-3.4a1.6 1.6 0 0 1 3.2 0v3.4z" />
+      <circle cx="12" cy="1.4" r="0.9" />
+      <circle cx="5.6" cy="5.2" r="0.7" />
+      <circle cx="18.4" cy="5.2" r="0.7" />
+    </>
+  ),
+  /* Adventurers' guild — crossed swords under a small pennant. */
+  adventurersGuild: (
+    <>
+      <path {...EO} d="M5.6 2.6l9.8 12.6 1.6-1.6L7.2 1zm12.8 0L8.6 13.6l1.6 1.6L20 2.6z" />
+      <path d="M7 16.4l3.4 1.4-1.4 3.4-3.4-1.4zM17 16.4l-3.4 1.4 1.4 3.4 3.4-1.4z" />
+    </>
+  ),
+  /* Sanctuary — a sun disc rising over a three-arch altar arcade. */
+  sanctuary: (
+    <>
+      <circle cx="12" cy="7.4" r="3.6" />
+      <path {...EO} d="M3.6 12.6h16.8v8.8H3.6zM5.4 21.4v-5a1.8 1.8 0 0 1 3.6 0v5zM10.2 21.4v-5a1.8 1.8 0 0 1 3.6 0v5zM15 21.4v-5a1.8 1.8 0 0 1 3.6 0v5z" />
+    </>
+  ),
+  /* Alchemist — a round-bottom alembic with a neck tube and a drop. */
+  alchemist: (
+    <>
+      <path d="M10.4 2.6h3.2v4.4l2 1.8a6.6 6.6 0 1 1-7.2 0l2-1.8z" />
+      <path {...EO} d="M12 9.6a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 11.4a3.2 3.2 0 0 0-2.6 5h5.2a3.2 3.2 0 0 0-2.6-5z" />
+      <path d="M17.8 3.4c1 1.4 1.6 2.4 1.6 3.2a1.6 1.6 0 1 1-3.2 0c0-.8.6-1.8 1.6-3.2z" />
+    </>
+  ),
+  /* Cemetery — a rounded headstone planted in a small mound. */
+  cemetery: (
+    <>
+      <path {...EO} d="M12 3.2a4.6 4.6 0 0 1 4.6 4.6v9.8H7.4V7.8A4.6 4.6 0 0 1 12 3.2zM10.4 7.4h3.2v2h-3.2z" />
+      <path d="M3 20.4c1.6-1.8 4-2.4 9-2.4s7.4.6 9 2.4z" />
+    </>
+  ),
 };
+
+/**
+ * Category → frame silhouette map (PLAN-038, debate artifact r003): the frame
+ * is the redundant channel for `category` so the icon only names the building.
+ * Roundel = production, banner = civic, shield = defense, spire = arcane
+ * (PLAN-042 — registry/legend only; no arcane building is painted yet).
+ */
+export type VillagePinFrameShape = 'roundel' | 'banner' | 'shield' | 'spire';
+
+/** Category → frame silhouette. Exported for tests and the visual legend. */
+export const PIN_FRAME_FOR_CATEGORY: Record<VillageBuildingCategory, VillagePinFrameShape> = {
+  production: 'roundel',
+  civic: 'banner',
+  defense: 'shield',
+  arcane: 'spire',
+};
+
+/** 48-viewBox silhouette paths for the pin frame (aspect-differentiated). */
+const FRAME_PATHS: Record<VillagePinFrameShape, string> = {
+  /* Roundel — plain circle ring (production is the "worker" roundel). */
+  roundel: 'M24 2a22 22 0 1 0 0 44 22 22 0 0 0 0-44z',
+  /* Banner — horizontal civic plaque with V-notched ribbon tails both ends. */
+  banner: 'M9 11h30v24l-6-12 6-12H9zM9 11l-7 12 7 12zM39 11l7 12-7 12z',
+  /* Shield — flat-top heater, taller than wide (defense reads "crest"). */
+  shield: 'M8 3h32v16c0 13-8.5 21-16 24-7.5-3-16-11-16-24z',
+  /* Spire — pointed arcane obelisk: tall tapering shaft with a star-tipped
+   *  needle crown (arcane reads "reaching upward"). */
+  spire: 'M24 2l7 10h-4l6 8-3 24H18l-3-24 6-8h-4z',
+};
+
+export interface VillagePinFrameProps {
+  /** Category-derived silhouette. */
+  frame: VillagePinFrameShape;
+  /** State treatment: built = solid ring, buildable = dashed survey ring,
+   *  locked = desaturated + dimmed (badge itself stays full contrast). */
+  state: VillageBuildingState;
+  /** Render size in CSS px — the pin is ~40px, so default 44 leaves margin. */
+  size?: number;
+}
+
+/**
+ * The decorative frame behind a village pin glyph. `aria-hidden` — the pin
+ * button carries category in its `aria-label`; the frame is redundant visual
+ * encoding only. Dashed stroke = "survey ring" (buildable); solid = built;
+ * desaturated fill = locked. The contrast is guaranteed by the lacquer fill
+ * behind, so the frame itself never has to solve the contrast roulette.
+ */
+export const VillagePinFrame: React.FC<VillagePinFrameProps> = ({ frame, state, size = 44 }) => (
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    width={size}
+    height={size}
+    viewBox="0 0 48 48"
+    /* width/height in STYLE, not just attrs: `skinScope.css` forces
+     * `button svg { width: var(--skin-hud-control-icon-size) }` (14px) on
+     * every svg inside a HUD button — inline style wins that cascade. */
+    style={{ position: 'absolute', left: '50%', top: '50%', translate: '-50% -50%', width: size, height: size, display: 'block', filter: state === 'locked' ? 'saturate(0.35)' : undefined }}
+  >
+    <path
+      d={FRAME_PATHS[frame]}
+      fill="var(--skin-hud-lacquer-deep)"
+      fillOpacity={state === 'locked' ? 0.8 : 1}
+      stroke={state === 'buildable' ? 'var(--skin-hud-brass-hi)' : 'var(--skin-hud-brass-base)'}
+      strokeWidth={frame === 'shield' ? 3 : 2}
+      strokeDasharray={state === 'buildable' ? '5 4' : undefined}
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 export interface VillageBuildingIconProps {
   /** Config `iconKey` — the building id itself, so the table can never drift. */
@@ -124,7 +233,7 @@ export const VillageBuildingIcon: React.FC<VillageBuildingIconProps> = ({ iconKe
     height={size}
     viewBox="0 0 24 24"
     fill="currentColor"
-    style={{ flexShrink: 0, display: 'block' }}
+    style={{ flexShrink: 0, display: 'block', width: size, height: size }}
   >
     {GLYPHS[iconKey]}
   </svg>

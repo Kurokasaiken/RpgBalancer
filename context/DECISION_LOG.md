@@ -1324,3 +1324,25 @@ marker dorato delle quest, che al click apre la schermata di preparazione.
 **Provato:** self-test 14/14 (10 bypass bloccati), unit 16/16, blocco live su kanban reale, dogfood visivo R-185 (12/12 E2E + 34 frame + env attestation + verificatore CONFIRMED×2 → bundle PASS).
 **Limite noto:** fail-loud non è fail-safe — chi non lancia `kanban:lint` può committare chiusure fuori dal percorso; gli hash legano l'integrità degli artefatti, non la provenienza del processo.
 **Fonte:** `.mw/runs/r189-closure/bundle.json`, `.mw/runs/r185-closure/bundle.json`, `test-results/r189-verification-gate-2026-10-14.log`.
+
+## 2026-10-16 — Sessioni parallele: lo stato condiviso rompe le prove, non il codice (T-13)
+
+**Da:** un failure di safeguard/probe veniva trattato come "qualcosa da fixare" nel proprio scope.
+**A:** su worktree condiviso il primo sospetto è la collisione: `ls -la` su run dir e righe kanban (mtime + autore) prima di qualsiasi fix; riprovare prima di intervenire; probe riprovabili con resume su stato persistito; niente commit scoped su worktree condiviso.
+**Motivo:** 5+ incidenti documentati in una settimana (verifier.json estraneo in R-196, kanban rosso su bundle a metà di PLAN-035/R-198/R-202, `safeguards.log` FORGED, dev server killato e HMR reload mid-probe in R-199, `build:check` timeout sotto carico) — e il ritorno del multi-agente (R-204) rende la coesistenza sistemica.
+**Fonte:** `.mw/runs/learn-r199-20261016-092815/pattern-candidate.md` §A, `PROPOSALS.md` P-002, `context/recurring-traps.md` T-13.
+
+## 2026-10-16 — R-200: auto-reveal delle offerte quest + goblin `repeatable` (PLAN-037)
+
+**Da:** R-124/R-180 — nessun POI quest in mappa al boot; reveal solo via «Mostra quest» (toggle globale `questShown`/`poiDemo`); entrambe le offerte one-shot (D-S4-6).
+**A:** (D-1) `poi-goblin` è `repeatable` — mai consumato, ignora record `consumedPoiIds` stale, torna `available` a chiusura report e dopo reload; `poi-rovine` resta one-shot. (D-2) «Mai scomparire» = reveal additivo + goblin mai consumato; la finestra authored `SLICE_OFFER_WINDOW_DAYS` (10.000 gg) resta invariata. (D-3) «Mostra quest» diventa trigger one-way «reveal ora» (salta lo stagger, non nasconde); «Reset» ri-arma lo stagger. (D-4) stagger **wall-clock** (`setTimeout` post-veil, non game-tick), valori in `gameFrameConfig.questReveal` (Zod; default `initialDelayMs` 1000, `staggerMs` 5000). (D-5) lo stagger parte a `veilGone` (entrate visibili, T-04); un run attivo/persistito monta il suo POI subito senza aspettare lo slot.
+**Motivo:** richiesta Director 2026-10-15 verbatim («una ogni 5 secondi e nn scomparire mai», «flagga la quest dei goblin come ripetibile… dopo il reward puoi rifarla»). Il canale `repeatable` era già ratificato in D-S4-6 (PLAN-019-S4) — R-200 è il primo uso authored.
+**Fonte:** `plans/PLAN-037-quest-poi-auto-reveal-goblin-repeatable.md`, `.mw/runs/plan037-quest-reveal-2026-10-15/bundle.json` (PASS 7/7), `test-results/r200-quest-reveal-2026-10-16.log`.
+
+## 2026-10-16 — Kanban e pipeline di dispatch in pausa: workflow single-agent a contratto (R-208)
+
+**Da:** sistema ibrido con kanban board (`agent_assignments.md`) come ledger, coordinator/ai-worker/harness per il dispatch, `kanban:lint` come safeguard.
+**A:** board e dispatch **in pausa** (conservati, non cancellati). Ciclo operativo: plan con contratto → implementazione con l'agente locale → `verify:bundle` → chiusura `fatta` in `RICHIESTE.md`. `kanban:lint` sostituito da `closure:lint` (solo gate di chiusura R-189 su RICHIESTE + diff board; niente validazione tabella). Trigger automatici dei workflow `coordinator.yml` (cron ogni 5 min) e `ai-worker.yml` (workflow_run) rimossi → solo `workflow_dispatch`: eliminati i commit-rumore `Coordinator: auto-migrate`/`AI worker:` (~49% dei commit dei 10gg precedenti).
+**Motivo:** verbatim Director: *"meti questa roba in pausa [...] si crea un plan con un contratto, si implementa con l'agente locale in devin desktop, si controlla il contratto [...] e basta"*. Evidenza audit: board usata solo come ledger post-hoc (`Completato | Devin`), coordinator locale fermo dal 2026-10-09, harness già invocato con `--no-kanban`. Il gate di chiusura sopravvive perché è ciò che blocca i falsi "done" (T-04, R-189).
+**Riaprire se:** PLAN-039 benchmark dimostra che il dispatch esterno conviene — allora si reimplementa una coda (JSON/tool-managed, non tabella markdown su git: T-13).
+**Fonte:** `RICHIESTE.md` R-208, `.mw/desiderata.md` v31, `rules/00-project-invariants.md` §Workflow operativo.

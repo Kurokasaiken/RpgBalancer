@@ -1,7 +1,7 @@
 ---
 title: Recurring Traps
 type: preflight-checklist
-updated: 2026-10-11
+updated: 2026-10-16
 ---
 
 # Recurring Traps — regole preventive lette in pre-flight
@@ -26,6 +26,9 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
 | "migliora X" / "fixa X" su componente coperto da desiderata FROZEN o workflow canonico | T-05 |
 | sintesi, spec o mappe prodotte sopra ledger/requisiti atomici | T-06 |
 | derivati visuali legati a un'entità sorgente (ombre, halo, countdown) | T-07 |
+| `verification.json`, `produceBundle`, `closure:lint`, probe Playwright/`build:check` mentre girano sessioni parallele | T-13 |
+| driver E2E/test unitari dopo un piano che sposta testid, hook, timing o archi del grafo | T-14 |
+| `page.evaluate`, helper Playwright condivisi, script lanciati via tsx | T-15 |
 
 ---
 
@@ -248,3 +251,86 @@ vitest/tsx o script node.
 - **Regola:** mai accesso diretto a `import.meta.env.X` in top-level di
   moduli consumati dai test: optional-chain + default al ramo sicuro
   (strict/dev). Il salvage permissivo solo se `PROD === true` esplicito.
+
+## T-13 — Sessioni parallele sul worktree: lo stato condiviso rompe le prove, non il codice
+
+**Surface:** `.mw/runs/*/verification.json`+`command-logs`, `closure:lint`,
+probe Playwright, `build:check`, dev server — quando un'altra sessione lavora
+sullo stesso worktree.
+
+- **Cosa succede:** i failure non sono nel tuo scope: `verifier.json` scritto
+  da una sessione estranea nella tua run dir (hash stantii → BLOCKED);
+  `closure:lint` rosso su righe/bundle a metà scrittura altrui
+  (`bundle.json non leggibile`); artefatti riscritti post-bundle → FORGED;
+  dev server killato (`ERR_CONNECTION_REFUSED`) o HMR full-reload da edit
+  altrui → `Execution context destroyed` e hook
+  `__idleVillageTestHooks` transientemente `undefined` nella probe;
+  `build:check` timeout a 180s sotto carico condiviso.
+- **Istanze:** R-196 (verifier estraneo, safeguards.log FORGED) · R-198/PLAN-035/R-202
+  (kanban su bundle a metà) · R-199 (2 probe failure HMR + dev server down +
+  build timeout). `.mw/runs/learn-r199-20261016-092815/pattern-candidate.md`
+  §A, `PROPOSALS.md` P-002.
+- **Regola:**
+  1. Prima `ls -la`: mtime recente + autore diverso = collisione →
+     **riprova**, non fixare (la sessione proprietaria chiude da sé).
+  2. Non scrivere nelle run dir/righe kanban altrui; hash drift →
+     `produceBundle --no-exec` (ri-valuta, non riesegue).
+  3. Probe: flusso in retry+reload con resume su stato persistito
+     (`getRun()` esiste → salta launch), selettori-unione (`window` OR
+     `popup`), guard `?.` su hook durante HMR.
+  4. Nessun commit scoped su worktree condiviso: catturerebbe lavoro altrui.
+
+
+## T-14 — Driver e prove contro un contratto mobile: selettori, timing e archi del grafo mentono in silenzio
+
+**Surface:** driver E2E (`tests/e2e/**`), test di copertura grafo/predicati
+statici (`*.bench.test`, `reachableFrom`), dopo ogni piano che sposta
+testid, hook, timing engine o tipi di transizione.
+
+- **Cosa succede:** il contratto evolve (rev UI, gate engine, nuovo tipo di
+  arco) ma la prova resta sulla versione precedente. Il fallimento sembra
+  un bug di prodotto: selettore morto → `checkHoldMs` 45s di attesa invece
+  di errore chiaro; `readyAt` ignorato → comandi rifiutati in silenzio;
+  `reachableFrom` su 2 archi di 4 → 22 nodi "orfani" che l'engine
+  attraversa normalmente.
+- **Istanze:** R-199 (`readyAt` → 5 file di test rotti) · PLAN-040 T-003
+  (astrolabe `quest-check-astrolabe` → `quest-check-overlay` in
+  `#game-modal-root`, testid morti) · PLAN-040 chiusura
+  (`generatedCatalog.bench`: mancavano `node.next` e
+  `combat.nextCleared`/`nextSurvivors` in `edgesOf`).
+  `PROPOSALS.md` P-003 (approvata Director 2026-10-16).
+- **Regola:**
+  1. Dopo un atterraggio parallelo, grep dei selettori/hook/edge-type
+     usati dal driver vs `src/`: match zero = contratto cambiato, non
+     bug di prodotto.
+  2. Driver su affordance **semantiche e version-tolleranti** (`.da-tira`,
+     `aria-label`, `data-drop-state`, hook `getRun`) con fallback, non su
+     testid posizionali di una singola rev.
+  3. Il driver deve fallire diagnostico in secondi, non attendere la
+     guardia: asserire "il controllo atteso esiste" prima del loop.
+  4. Predicato statico di grafo: enumera TUTTI i tipi di arco che
+     l'engine segue (`options.next`, `verdictTable.goto`, `node.next`,
+     `combat.nextCleared`/`nextSurvivors`); un nuovo tipo di transizione
+     → aggiornare la prova nello stesso commit.
+
+## T-15 — `page.evaluate(fn)` sotto tsx/esbuild: la closure non esiste nel browser
+
+**Surface:** script Playwright/Puppeteer lanciati via `tsx` (`scripts/**`,
+helper condivisi come `scripts/verification/attestEnv.ts`).
+
+- **Cosa succede:** `page.evaluate(fn)` con una **funzione** compila sotto
+  tsx/esbuild con l'helper `__name` (keepNames), che non esiste nel
+  contesto pagina → `ReferenceError: __name is not defined`. In un
+  `.catch()` muto diventa un dato nullo silenzioso (`env: null`,
+  `samples: []`) che esplode solo a valle (INVALID_ENV nel bundle).
+- **Istanze:** `quest-theatre-playtest.ts` (nota inline già presente) ·
+  `attestEnv.ts` importato dal harness PLAN-040 → 5 obbligazioni
+  INVALID_ENV finché convertito a string-evaluate.
+  `PROPOSALS.md` P-004 (approvata Director 2026-10-16).
+- **Regola:**
+  1. `page.evaluate` riceve solo **sorgenti stringa** (`page.evaluate(SRC)`),
+     mai closure — vale per ogni runner (tsx, vitest, node).
+  2. Un probe/attestato fallito deve fallire rumoroso: niente
+     `env: null` che scorre fino al gate.
+  3. In pre-flight su uno script evaluate: grep `page.evaluate(` con
+     argomento funzione → convertire a stringa prima di fidarsi.

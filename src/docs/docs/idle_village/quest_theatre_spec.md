@@ -78,6 +78,11 @@ altro → mostra il messaggio del runtime.
 | reward | decision | collect esplicito (precondizione leader vivo visibile) |
 | sconosciuto | unsupported | stato esplicito, nessun avanzamento |
 
+> **Nota R-199 (2026-10-16):** il `kind` reward resta nel modello engine, ma la
+> *presentazione* dell'esito/ricompensa è uscita dalla finestra —
+> `QuestRewardPopup` è una placca page-level non-modale (v.
+> `quest_ui_component_guide.md` §11).
+
 ## Semantica di frontiera
 
 - **Chiudere ≠ ritirarsi:** chiudere il pannello lascia la run in `awaitingPlayer`,

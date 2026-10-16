@@ -20,6 +20,13 @@ Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione e
 
 ## Workflow Mind Weaver in RPG
 
+- **Ciclo operativo (R-208, 2026-10-16):** kanban board e dispatch
+  (coordinator/ai-worker/harness, prompt-spec) sono **in pausa**. Il flusso è:
+  plan con contratto (obbligazioni verificabili) → implementazione con
+  l'agente locale → `verify:bundle` sul contratto → chiusura `fatta` in
+  `RICHIESTE.md` con `bundle:`. Il gate meccanico è `npm run closure:lint`
+  (ex `kanban:lint`, solo gate R-189). Niente righe su
+  `src/docs/docs/coordinator/agent_assignments.md`.
 - **Fase esplorativa:** invoca `.windsurf/skills/mw-explorer/SKILL.md`.
 - **Fase di pianificazione:** invoca `.windsurf/skills/mw-planner/SKILL.md`.
 - **Fase esecutiva:** invoca `.windsurf/skills/mw-executor/SKILL.md`, che a sua volta carica il
@@ -30,7 +37,10 @@ Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione e
   codice leggi l'indice per superficie di `context/recurring-traps.md` e le trappole che il task tocca; prima di
   dichiarare il lavoro fatto, riapplicale. In particolare T-04: un claim su scene, animazioni o UI si chiude solo
   con un testimone che può vedere ciò che afferma (non basta il diff né una metrica), e ciò che non è stato
-  verificato va detto (vedi la proposta P-001 in `PROPOSALS.md`).
+  verificato va detto (vedi la proposta P-001 in `PROPOSALS.md`). Se altre sessioni lavorano sullo
+  stesso worktree, applica anche T-13: un failure di safeguard/probe va prima sospettato come
+  collisione di stato condiviso (mtime + autore), non come bug nel tuo scope — riprova prima di
+  intervenire, e mai commit scoped che catturerebbe lavoro altrui (vedi P-002 in `PROPOSALS.md`).
 - **Mai aprire finestre, app o browser in primo piano in automatico.** Ogni esecuzione
   automatizzata è headless o in background (Puppeteer/Chrome for Testing, Playwright,
   screenshot, probe perf, `open` solo con `-g`). Una finestra visibile richiede opt-in

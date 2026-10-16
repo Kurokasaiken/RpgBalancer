@@ -1,9 +1,17 @@
 ---
 name: coordinator-mandate
-description: Use when dispatching tasks, managing the Kanban, running harness commands, or enforcing governance before execution.
+description: "IN PAUSA (R-208, 2026-10-16): kanban board e pipeline di dispatch sospese nel workflow single-agent — non invocare. Conservato come riferimento storico per un'eventuale riattivazione secondaria."
 ---
 
 # Coordinator Mandate
+
+> **IN PAUSA — R-208 (Director, 2026-10-16).** La kanban board
+> (`src/docs/docs/coordinator/agent_assignments.md`), il dispatch via
+> coordinator/ai-worker/harness e la pipeline prompt-spec non si usano più:
+> il workflow corrente è *plan con contratto → implementazione con l'agente
+> locale → `verify:bundle` sul contratto → chiusura `fatta` in RICHIESTE.md*.
+> Tutto ciò che segue è riferimento storico: da riattivare solo su decisione
+> esplicita del Director.
 
 Purpose
 The Coordinator role manages the Kanban board, dispatches tasks to agents, and enforces governance requirements. This mandate defines the Coordinator's responsibilities for prompt management, task assignment, and safeguard execution.

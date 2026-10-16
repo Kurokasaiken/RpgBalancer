@@ -34,6 +34,7 @@ import { QUEST_HALO_RENDER_MS, QUEST_HALO_STEPS } from '@/balancing/config/idleV
 import { useThrottledValue } from '@/ui/idleVillage/hooks/useThrottledValue';
 import { QUEST_PLANNING } from '@/balancing/config/idleVillage/quests/questPlanning';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { defaultQuestItems, toEngineFlag } from '@/balancing/config/idleVillage/quests/questItems';
 import { useMinimalGameplayWithIdleVillageConfig, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
@@ -431,10 +432,20 @@ export function useQuestExpeditionSession({
 
   /** LOADOUT duration channel (S3 T-3, desiderata v24 #7): items declaring
    *  `durationMult`/`durationDelta` reshape the run's real pace — the
-   *  launch clock AND the estimate chip share this one derivation. */
+   *  launch clock AND the estimate chip share this one derivation.
+   *  R-199: the expedition's span is the configured `questWindow.durationDays`
+   *  on the game clock — the phase bar fills over it, and per-node pacing
+   *  (`nodeTicks` ≈ span / expectedPathNodes) makes each frontier feasible
+   *  only when its own slice of that span has passed. */
+  const dayLengthTicks = gameplay.config.globalRules?.dayLengthInTimeUnits ?? 60;
+  const expeditionSpanTicks = Math.max(
+    1,
+    Math.round(DEFAULT_GAME_FRAME_CONFIG.questWindow.durationDays * dayLengthTicks),
+  );
+  const baseNodeTicks = Math.max(1, Math.round(expeditionSpanTicks / poi.expectedPathNodes));
   const expeditionDuration = useMemo(
-    () => loadoutDuration(selectedItemIds, poi.ticksPerNode, poi.estimatedDurationTicks),
-    [selectedItemIds, poi],
+    () => loadoutDuration(selectedItemIds, baseNodeTicks, expeditionSpanTicks),
+    [selectedItemIds, baseNodeTicks, expeditionSpanTicks],
   );
 
   /* ------------------------------------------------------------------ */

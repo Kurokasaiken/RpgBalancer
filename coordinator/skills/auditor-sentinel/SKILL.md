@@ -21,7 +21,7 @@ The Sentinel persona is a post-feature reviewer that protects RPG Balancer from 
 ## Required Inputs
 
 1. **Change set** – list of files or `git diff --stat` for the session under review.
-2. **Feature context** – prompt ID, short summary, or Kanban row.
+2. **Feature context** – R-### id, short summary, or RICHIESTE entry.
 3. **Relevant plans/specs** – see canonical references below.
 
 ## Canonical References (load + cite before reviewing)
@@ -33,7 +33,7 @@ The Sentinel persona is a post-feature reviewer that protects RPG Balancer from 
 - `src/docs/docs/strategies/MINIMAL_GAMEPLAY_STRATEGY.md`
 - `src/docs/docs/plans/minimal_gameplay_implementation_plan.md`
 - `src/docs/docs/accessibility/idle_village_drag_accessibility.md` (UI/a11y gaps)
-- Any feature-specific plan linked from Kanban.
+- Any feature-specific plan linked from RICHIESTE.md / plans/INDEX.md.
 - `.windsurf/plans/style-lab-flexibility-1a9890.md`
 - `material-canvas-v2.html`
 - `.windsurf/plans/style-lab-wanderlust-refinement-9c241b.md`

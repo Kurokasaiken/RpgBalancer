@@ -23,6 +23,16 @@ export interface TaskSpec {
   safeguards?: string[];
   output?: string[];
   notes?: string[];
+  /**
+   * Documentation Impact contract (.windsurf/rules/85-documentation-impact.md).
+   * Enforced mechanically by `npm run docs:impact` — REQUIRED specs must list
+   * `targets`, and completion fails if declared targets are not in the diff.
+   */
+  documentation_impact?: {
+    level: 'NONE' | 'OPTIONAL' | 'REQUIRED';
+    targets?: string[];
+    justification?: string;
+  } | string;
   /** Computed by the Coordinator before dispatch. */
   executor?: 'ai-worker' | 'harness' | 'manual';
   executor_reason?: string;

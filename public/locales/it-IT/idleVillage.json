@@ -1,1820 +1,1889 @@
 {
-  "astrolabeV5": {
-    "throw": "Tira",
-    "rollAgain": "Tira di nuovo",
-    "awaiting": "In attesa del tiro",
-    "trackCheck": "Prova",
-    "trackRisk": "Rischio",
-    "verdictSuccess": "Successo",
-    "verdictNearMiss": "Per un soffio",
-    "verdictFail": "Fallimento",
-    "verdictCrit": "Rovina",
-    "riskDeclared": "{death}% morte · {wound}% ferita",
-    "riskNone": "Nessuno",
-    "riskHeld": "Illeso",
-    "riskWounded": "Ferito",
-    "riskDead": "Morto",
-    "throwControls": "Controlli di tiro",
-    "skip": "Salta",
-    "auto": "Auto",
-    "mute": "Muto",
-    "axisReadout": "{skill}: {stat} contro difficoltà {difficulty} — {relation}",
-    "relation_margin": "sopra la soglia",
-    "relation_deficit": "sotto la soglia",
-    "relation_even": "pari alla soglia"
+ "astrolabeV5": {
+  "throw": "Tira",
+  "rollAgain": "Tira di nuovo",
+  "awaiting": "In attesa del tiro",
+  "trackCheck": "Prova",
+  "trackRisk": "Rischio",
+  "verdictSuccess": "Successo",
+  "verdictNearMiss": "Per un soffio",
+  "verdictFail": "Fallimento",
+  "verdictCrit": "Rovina",
+  "riskDeclared": "{death}% morte · {wound}% ferita",
+  "riskNone": "Nessuno",
+  "riskHeld": "Illeso",
+  "riskWounded": "Ferito",
+  "riskDead": "Morto",
+  "throwControls": "Controlli di tiro",
+  "skip": "Salta",
+  "auto": "Auto",
+  "mute": "Muto",
+  "axisReadout": "{skill}: {stat} contro difficoltà {difficulty} — {relation}",
+  "relation_margin": "sopra la soglia",
+  "relation_deficit": "sotto la soglia",
+  "relation_even": "pari alla soglia"
+ },
+ "activityCapsule": {
+  "slotLabel": "Slot {index}",
+  "accessibility": {
+   "activityCapsule": "Capsula attività {label}",
+   "closeDetails": "Chiudi il dettaglio"
   },
-  "activityCapsule": {
-    "slotLabel": "Slot {index}",
+  "actions": {
+   "start": "Avvia",
+   "startPending": "In attesa…",
+   "cancel": "Annulla",
+   "collect": "Raccogli"
+  },
+  "status": {
+   "idle": "Inattivo",
+   "inProgress": "In corso",
+   "completed": "Completato",
+   "blocked": "Bloccato"
+  },
+  "sections": {
+   "assignedCharacters": "Personaggi assegnati",
+   "requirements": "Requisiti",
+   "telemetry": "Telemetria",
+   "lore": "Lore"
+  },
+  "info": {
+   "duration": "Durata",
+   "eta": "Tempo rimasto",
+   "reward": "Ricompensa"
+  },
+  "requirements": {
+   "relation": {
+    "all": "tutti",
+    "any": "almeno uno",
+    "none": "nessuno"
+   }
+  },
+  "telemetry": {
+   "empty": "Nessun evento"
+  },
+  "lore": {
+   "locked": "Lore non ancora scoperta"
+  },
+  "devTools": {
+   "validationTitle": "Errori di validazione dello skin"
+  },
+  "type": {
+   "job": "Lavoro",
+   "quest": "Quest",
+   "training": "Allenamento",
+   "maintenance": "Manutenzione"
+  }
+ },
+ "floatingPanel": {
+  "minimize": "Riduci a icona",
+  "restore": "Ripristina il pannello",
+  "pin": "Fissa il pannello",
+  "unpin": "Sblocca il pannello",
+  "close": "Chiudi il pannello"
+ },
+ "interactionMode": {
+  "mode": {
+   "sandbox": {
+    "text": "Sandbox",
+    "description": "Modalità sandbox per test e sperimentazione",
+    "fallback": "Sandbox",
+    "category": "mode",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 20,
     "accessibility": {
-      "activityCapsule": "Capsula attività {label}",
-      "closeDetails": "Chiudi il dettaglio"
-    },
-    "actions": {
-      "start": "Avvia",
-      "startPending": "In attesa…",
-      "cancel": "Annulla",
-      "collect": "Raccogli"
-    },
-    "status": {
-      "idle": "Inattivo",
-      "inProgress": "In corso",
-      "completed": "Completato",
-      "blocked": "Bloccato"
-    },
-    "sections": {
-      "assignedCharacters": "Personaggi assegnati",
-      "requirements": "Requisiti",
-      "telemetry": "Telemetria",
-      "lore": "Lore"
-    },
-    "info": {
-      "duration": "Durata",
-      "eta": "Tempo rimasto",
-      "reward": "Ricompensa"
-    },
-    "requirements": {
-      "relation": {
-        "all": "tutti",
-        "any": "almeno uno",
-        "none": "nessuno"
-      }
-    },
-    "telemetry": {
-      "empty": "Nessun evento"
-    },
-    "lore": {
-      "locked": "Lore non ancora scoperta"
-    },
-    "devTools": {
-      "validationTitle": "Errori di validazione dello skin"
-    },
-    "type": {
-      "job": "Lavoro",
-      "quest": "Quest",
-      "training": "Allenamento",
-      "maintenance": "Manutenzione"
+     "ariaLabel": "Modalità Sandbox",
+     "keyHint": "S"
     }
-  },
-  "floatingPanel": {
-    "minimize": "Riduci a icona",
-    "restore": "Ripristina il pannello",
-    "pin": "Fissa il pannello",
-    "unpin": "Sblocca il pannello",
-    "close": "Chiudi il pannello"
-  },
-  "interactionMode": {
-    "mode": {
-      "sandbox": {
-        "text": "Sandbox",
-        "description": "Modalità sandbox per test e sperimentazione",
-        "fallback": "Sandbox",
-        "category": "mode",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 20,
-        "accessibility": {
-          "ariaLabel": "Modalità Sandbox",
-          "keyHint": "S"
-        }
-      },
-      "planning": {
-        "text": "Pianificazione",
-        "description": "Modalità pianificazione per organizzare attività",
-        "fallback": "Planning",
-        "category": "mode",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 20,
-        "accessibility": {
-          "ariaLabel": "Modalità Pianificazione",
-          "keyHint": "P"
-        }
-      },
-      "execution": {
-        "text": "Esecuzione",
-        "description": "Modalità esecuzione per attività in corso",
-        "fallback": "Execution",
-        "category": "mode",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 20,
-        "accessibility": {
-          "ariaLabel": "Modalità Esecuzione",
-          "keyHint": "E"
-        }
-      },
-      "analytics": {
-        "text": "Analitica",
-        "description": "Modalità analitica per statistiche e report",
-        "fallback": "Analytics",
-        "category": "mode",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 20,
-        "accessibility": {
-          "ariaLabel": "Modalità Analitica",
-          "keyHint": "A"
-        }
-      }
-    },
-    "action": {
-      "switch_mode": {
-        "text": "Cambia modalità",
-        "description": "Cambia la modalità di interazione corrente",
-        "fallback": "Switch mode",
-        "category": "action",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 30,
-        "accessibility": {
-          "ariaLabel": "Cambia modalità di interazione",
-          "keyHint": "M"
-        }
-      },
-      "confirm_switch": {
-        "text": "Conferma cambio",
-        "description": "Conferma il cambio di modalità",
-        "fallback": "Confirm switch",
-        "category": "action",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 25,
-        "accessibility": {
-          "ariaLabel": "Conferma cambio modalità",
-          "keyHint": "Enter"
-        }
-      },
-      "cancel_switch": {
-        "text": "Annulla",
-        "description": "Annulla il cambio di modalità",
-        "fallback": "Cancel",
-        "category": "action",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 15,
-        "accessibility": {
-          "ariaLabel": "Annulla cambio",
-          "keyHint": "Escape"
-        }
-      }
-    },
-    "help": {
-      "mode_description": {
-        "text": "Seleziona la modalità di interazione per il villaggio",
-        "description": "Descrizione del selettore modalità di interazione",
-        "fallback": "Select interaction mode for the village",
-        "category": "help",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 60,
-        "accessibility": {
-          "ariaLabel": "Aiuto selezione modalità",
-          "ariaDescription": "Usa le frecce per navigare tra le modalità disponibili"
-        }
-      }
-    },
-    "tooltip": {
-      "sandbox_info": {
-        "text": "Modalità sandbox: testa nuove funzionalità senza effetti persistenti",
-        "description": "Informazioni sulla modalità sandbox",
-        "fallback": "Sandbox mode: test new features without persistent effects",
-        "category": "tooltip",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 80
-      },
-      "planning_info": {
-        "text": "Modalità pianificazione: organizza attività e assegna residenti",
-        "description": "Informazioni sulla modalità pianificazione",
-        "fallback": "Planning mode: organize activities and assign residents",
-        "category": "tooltip",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 80
-      },
-      "execution_info": {
-        "text": "Modalità esecuzione: monitora attività in tempo reale",
-        "description": "Informazioni sulla modalità esecuzione",
-        "fallback": "Execution mode: monitor activities in real time",
-        "category": "tooltip",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 80
-      },
-      "analytics_info": {
-        "text": "Modalità analitica: visualizza statistiche e report",
-        "description": "Informazioni sulla modalità analitica",
-        "fallback": "Analytics mode: view statistics and reports",
-        "category": "tooltip",
-        "context": "picker",
-        "translatable": true,
-        "maxLength": 80
-      }
-    },
-    "ftue": {
-      "welcome_title": {
-        "text": "Benvenuto nel Villaggio Idlio",
-        "description": "Titolo di benvenuto per il FTUE",
-        "fallback": "Welcome to Idle Village",
-        "category": "help",
-        "context": "ftue",
-        "translatable": true,
-        "maxLength": 40,
-        "accessibility": {
-          "ariaLabel": "Titolo di benvenuto"
-        }
-      },
-      "mode_selection_title": {
-        "text": "Scegli la tua modalità",
-        "description": "Titolo per la selezione della modalità nel FTUE",
-        "fallback": "Choose your mode",
-        "category": "help",
-        "context": "ftue",
-        "translatable": true,
-        "maxLength": 30,
-        "accessibility": {
-          "ariaLabel": "Selezione modalità"
-        }
-      },
-      "mode_selection_description": {
-        "text": "Ogni modalità offre un modo diverso di interagire con il villaggio. Inizia con la modalità Sandbox per imparare!",
-        "description": "Descrizione della selezione modalità nel FTUE",
-        "fallback": "Each mode offers a different way to interact with the village. Start with Sandbox mode to learn!",
-        "category": "help",
-        "context": "ftue",
-        "translatable": true,
-        "maxLength": 120,
-        "accessibility": {
-          "ariaLabel": "Descrizione modalità",
-          "ariaDescription": "Informazioni sulle diverse modalità di interazione disponibili"
-        }
-      }
-    },
+   },
+   "planning": {
+    "text": "Pianificazione",
+    "description": "Modalità pianificazione per organizzare attività",
+    "fallback": "Planning",
+    "category": "mode",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 20,
     "accessibility": {
-      "mode_changed": {
-        "text": "Modalità cambiata in {mode}",
-        "description": "Annuncio di cambio modalità per screen reader",
-        "fallback": "Mode changed to {mode}",
-        "category": "help",
-        "context": "accessibility",
-        "translatable": true,
-        "maxLength": 50,
-        "accessibility": {
-          "ariaLabel": "Notifica cambio modalità",
-          "ariaDescription": "Annuncio quando la modalità di interazione viene cambiata"
-        }
-      },
-      "mode_selector_open": {
-        "text": "Selettore modalità aperto",
-        "description": "Annuncio di apertura selettore modalità",
-        "fallback": "Mode selector opened",
-        "category": "help",
-        "context": "accessibility",
-        "translatable": true,
-        "maxLength": 30,
-        "accessibility": {
-          "ariaLabel": "Selettore modalità aperto",
-          "ariaDescription": "Il selettore di modalità è stato aperto"
-        }
-      },
-      "mode_selector_closed": {
-        "text": "Selettore modalità chiuso",
-        "description": "Annuncio di chiusura selettore modalità",
-        "fallback": "Mode selector closed",
-        "category": "help",
-        "context": "accessibility",
-        "translatable": true,
-        "maxLength": 30,
-        "accessibility": {
-          "ariaLabel": "Selettore modalità chiuso",
-          "ariaDescription": "Il selettore di modalità è stato chiuso"
-        }
-      }
+     "ariaLabel": "Modalità Pianificazione",
+     "keyHint": "P"
     }
-  },
-  "milestoneCheck": {
-    "ariaLabel": "Prova di abilità della fase",
-    "eyebrow": "Milestone",
-    "skills": "Prove da affrontare",
-    "partyStat": "Party {value}",
-    "difficulty": "Difficoltà {value}",
-    "consumables": "Spendi consumabili",
-    "riskLine": "Ferite {injury}% · Morte {death}%",
-    "roll": "Consulta il destino",
-    "passed": "Fase superata",
-    "failed": "Fase fallita",
-    "wounded": "Un eroe è stato ferito in questa fase",
-    "casualty": "Un eroe è caduto in questa fase",
-    "dismiss": "Continua"
-  },
-  "poiDetail": {
-    "risk": {
-      "injury": {
-        "title": "Probabilità che un residente venga ferito"
-      },
-      "death": {
-        "title": "Probabilità che un residente muoia"
-      },
-      "danger": {
-        "title": "Grado di pericolo di questa attività"
-      }
-    }
-  },
-  "poiMarkerLab": {
-    "title": "POI Marker Lab",
-    "subtitle": "Baseline del marker opportunità: colore + icona = cosa, anello timer = quando, materiale = dove. Posato sulla superficie Wanderlust canonica, l'unico test onesto.",
-    "inContext": "In contesto",
-    "matrix": "Matrice tipo / stato",
-    "playground": "Banco di prova",
-    "type": "Tipo",
-    "state": "Stato",
-    "importance": "Importanza",
-    "progress": "Tempo residuo",
-    "size": "Dimensione",
-    "counterClockwise": "Antiorario (scadenza)",
-    "grounded": "Ombra di appoggio",
-    "showMap": "Mostra la mappa",
-    "types": {
-      "quest": "Quest",
-      "job": "Lavoro",
-      "event": "Evento"
-    },
-    "states": {
-      "new": "Nuovo",
-      "available": "Disponibile",
-      "assigned": "Assegnato",
-      "expiring": "In scadenza",
-      "expired": "Scaduto"
-    },
-    "importances": {
-      "normal": "Normale",
-      "important": "Importante",
-      "critical": "Critico"
-    },
-    "variant": "Variante",
-    "variants": {
-      "runic": "Runica (V2)",
-      "runicV3": "Runica V3",
-      "runicV1": "Runica V1",
-      "runicV5": "Runica V5"
-    }
-  },
-  "questChronicle": {
-    "title": "Cronaca della Quest",
-    "journal": "Diario",
-    "openTheater": "Apri il Teatro",
-    "collectRewards": "Raccogli ricompense",
-    "ropeLabel": "Tempo della quest",
-    "boardStatus": {
-      "success": "Ultima prova superata",
-      "failure": "Prova fallita",
-      "pending": "In attesa dell'esito della spedizione"
-    },
-    "outcome": {
-      "success": "Successo",
-      "failure": "Fallimento"
-    },
-    "risk": {
-      "injury": "{percent}% ferite",
-      "death": "{percent}% morte"
-    },
-    "phaseType": {
-      "check": "prova",
-      "fight": "combattimento",
-      "stealth": "furtività",
-      "trap": "trappola",
-      "explore": "esplorazione",
-      "dialogue": "dialogo",
-      "branch": "diramazione",
-      "timedChoice": "scelta a tempo"
-    }
-  },
-  "questReward": {
-    "panelTitle": "Ricompense",
-    "eyebrowVictory": "La spedizione è tornata",
-    "eyebrowDefeat": "La spedizione è stata spezzata",
-    "trialsPassed": "{passed} prove superate su {total}",
-    "trials": "Prove",
-    "passed": "Superata",
-    "failed": "Fallita",
-    "rewards": "Ricompense",
-    "noRewards": "La spedizione non ha portato nulla a casa",
-    "party": "Party",
-    "stateNone": "Illeso",
-    "stateInjured": "Ferito",
-    "stateDead": "Caduto",
-    "collect": "Raccogli ricompense"
-  },
-  "workerTooltip": {
-    "labels": {
-      "hp": "HP",
-      "fatigue": "Fatica",
-      "performance": "Prestazione",
-      "specialties": "Specialità",
-      "bio": "Bio",
-      "recommendations": "Raccomandazioni",
-      "risk": "Livello di Rischio"
-    },
-    "statuses": {
-      "working": "In Incarico",
-      "resting": "In Riposo",
-      "injured": "Ferito",
-      "recovering": "In Recupero",
-      "available": "Disponibile",
-      "away": "Assente",
-      "exhausted": "Esausto",
-      "dead": "Caduto"
-    },
-    "riskLevels": {
-      "low": "Rischio Basso",
-      "medium": "Rischio Medio",
-      "high": "Rischio Alto",
-      "critical": "Rischio Critico"
-    },
-    "recommendations": {
-      "lowHp": "Riposo necessario - HP critico",
-      "highFatigue": "Fatica alta - considera riposo",
-      "injured": "In recupero da ferita",
-      "critical": "Riposo immediato richiesto"
-    },
+   },
+   "execution": {
+    "text": "Esecuzione",
+    "description": "Modalità esecuzione per attività in corso",
+    "fallback": "Execution",
+    "category": "mode",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 20,
     "accessibility": {
-      "tooltipDetails": "{name} - Dettagli lavoratore",
-      "riskBadge": "Stato {level}",
-      "closeTooltip": "Chiudi tooltip per {name}"
-    },
-    "actions": {
-      "close": "Chiudi tooltip"
-    },
-    "sections": {
-      "quote": "Citazione"
+     "ariaLabel": "Modalità Esecuzione",
+     "keyHint": "E"
     }
-  },
-  "world": {
-    "goblinInvasion": {
-      "title": "INVASIONE GOBLIN!",
-      "subtitle": "Fra {count} giorni un esercito attaccherà!",
-      "action": "PREPARA LE DIFESE",
-      "viewDefenses": "VEDI DIFESE",
-      "invasion": "Invasione",
-      "eventLabel": "Invasione Goblin",
-      "daysRemaining": "Giorni Rimanenti: {count}",
-      "timerLabel": "GIORNI RIMANENTI",
-      "warTable": {
-        "eventLabel": "EVENTO MONDIALE · MINACCIA",
-        "description": "Un esercito goblin sta marciando verso le tue terre.",
-        "parchmentDescription": "Un esercito goblin sta marciando sulle nostre terre. I nostri esploratori hanno avvistato grandi forze nemiche che scendono dal nord verso la tua roccaforte.",
-        "willBeAttacked": "IL TUO VILLAGGIO SARÀ ATTACCATO.",
-        "scoutReport": "I nostri esploratori segnalano un massiccio avanguardia goblin che marcia dalle Distese del Nord. Il loro obiettivo è chiaro: la tua roccaforte sarà rasa al suolo a meno che non vengano preparate le difese.",
-        "worldEvent": "Evento Mondiale",
-        "enemy": "FORZA NEMICA",
-        "enemySub": "Si muove dal nord",
-        "village": "IL TUO VILLAGGIO",
-        "villageSub": "Obiettivo principale",
-        "targetObjective": "Obiettivo Primario",
-        "threatLevelHigh": "Livello Minaccia: Alto",
-        "threatLevelCritical": "Livello Minaccia: Critico",
-        "threat": "MINACCIA",
-        "faction": "ESERCITO GOBLIN",
-        "factionSub": "Grande forza ostile rilevata",
-        "hostileForce": "Forza Ostile",
-        "warbands": "~3.500 Banda",
-        "enemyCount": "3.200+",
-        "enemyUnit": "GOBLIN",
-        "arrivalCount": "2",
-        "arrivalUnit": "GIORNI",
-        "targetName": "IL TUO VILLAGGIO",
-        "arrival": "ARRIVO",
-        "arrivalIn": "Arrivo tra",
-        "days": "GIORNI",
-        "remaining": "RIMANENTI",
-        "estimatedArrival": "Arrivo Stimato",
-        "timeRemaining": "Tempo Rimanente",
-        "dismiss": "Ignora",
-        "dismissReport": "Chiudi Rapporto"
-      },
-      "reminder": {
-        "days_singular": "GIORNO",
-        "days_plural": "GIORNI",
-        "band_distant": "APPROSSIMAMENTO",
-        "band_closing": "IMMINENTE",
-        "band_imminent": "DOMANI"
-      }
-    },
-    "clouds": {
-      "scales": "Dimensioni nuvole",
-      "scale": "scala",
-      "far": "Lontane",
-      "mid": "Medie",
-      "near": "Vicine"
-    },
-    "debug": {
-      "spawnWonders": "Mostra meraviglie",
-      "despawnWonders": "Nascondi meraviglie",
-      "breath": "Respira",
-      "water": "Acqua",
-      "atmosphere": "Atmosfera",
-      "seaPattern": "Pattern",
-      "seaPatternTitle": "Pattern mare — dal vivo",
-      "seaPatternLive": "Texture authored A1 / micro scroll",
-      "seaPatternClose": "Chiudi",
-      "seaPatternScale": "Scala pattern",
-      "seaPatternOpacity": "Opacità linee",
-      "seaPatternColor": "Colore linee",
-      "seaPatternMotion": "Ampiezza moto",
-      "seaPatternPeriod": "Periodo moto",
-      "seaPatternAngle": "Angolo moto",
-      "seaPatternMotionEnabled": "Moto attivo",
-      "reducedMotion": "moto ridotto",
-      "hideUi": "Nascondi UI",
-      "showUi": "Mostra UI",
-      "settlementLost": "Insediamento Perso",
-      "seaPatternSaveDefault": "Salva come default",
-      "seaPatternSaving": "Salvataggio…",
-      "seaPatternSaved": "Default aggiornati nel sorgente",
-      "seaPatternSaveFailed": "Salvataggio fallito (solo in dev)"
-    },
-    "settlementLost": {
-      "title": "INSEDIAMENTO PERSO",
-      "subtitle": "L'insediamento è caduto. Ciò che è stato appreso sopravvive.",
-      "lossesTitle": "Cosa è stato perso",
-      "cta": "INIZIA UN NUOVO INSEDIAMENTO",
-      "losses": {
-        "walls": "Le mura sono state violate",
-        "heroes": "I tuoi eroi sono caduti",
-        "stores": "Le scorte sono perdute"
-      },
-      "stats": {
-        "daysSurvived": "Giorni sopravvissuti",
-        "residentsLost": "Residenti persi",
-        "goldEarned": "Oro guadagnato"
-      }
+   },
+   "analytics": {
+    "text": "Analitica",
+    "description": "Modalità analitica per statistiche e report",
+    "fallback": "Analytics",
+    "category": "mode",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 20,
+    "accessibility": {
+     "ariaLabel": "Modalità Analitica",
+     "keyHint": "A"
     }
+   }
   },
-  "pgDetailCard": {
-    "close": "Chiudi scheda",
-    "profile": "Profilo",
-    "fullFigure": "Figura intera",
-    "openArchetype": "Apri archetipo",
-    "unknownPreset": "Preset sconosciuto: {id}",
-    "hp": {
-      "label": "HP"
-    },
-    "fatigue": {
-      "label": "Fatica",
-      "ready": "Pronto",
-      "exhausted": "Esausto"
-    },
-    "statistics": {
-      "label": "Statistiche",
-      "count": "{count} valori",
-      "empty": "Nessuno snapshot disponibile.",
-      "category": {
-        "offense": "Offesa",
-        "defense": "Difesa",
-        "utility": "Utilità"
-      }
-    },
-    "inventory": {
-      "label": "Inventario",
-      "empty": "Nessun oggetto registrato."
-    },
-    "equipment": {
-      "label": "Equipaggiamento",
-      "weapon": "Arma",
-      "offhand": "Mano secondaria",
-      "armor": "Armatura",
-      "trinket": "Trinket",
-      "ring": "Anello",
-      "mount": "Cavalcatura",
-      "empty": "Vuoto"
-    },
-    "status": {
-      "available": "Disponibile",
-      "away": "Assente",
-      "exhausted": "Esausto",
-      "injured": "Ferito",
-      "dead": "Caduto"
-    },
-    "vitals": {
-      "hp": "PV",
-      "stamina": "VIG"
+  "action": {
+   "switch_mode": {
+    "text": "Cambia modalità",
+    "description": "Cambia la modalità di interazione corrente",
+    "fallback": "Switch mode",
+    "category": "action",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 30,
+    "accessibility": {
+     "ariaLabel": "Cambia modalità di interazione",
+     "keyHint": "M"
     }
+   },
+   "confirm_switch": {
+    "text": "Conferma cambio",
+    "description": "Conferma il cambio di modalità",
+    "fallback": "Confirm switch",
+    "category": "action",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 25,
+    "accessibility": {
+     "ariaLabel": "Conferma cambio modalità",
+     "keyHint": "Enter"
+    }
+   },
+   "cancel_switch": {
+    "text": "Annulla",
+    "description": "Annulla il cambio di modalità",
+    "fallback": "Cancel",
+    "category": "action",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 15,
+    "accessibility": {
+     "ariaLabel": "Annulla cambio",
+     "keyHint": "Escape"
+    }
+   }
   },
-  "heroComponentsLab": {
-    "title": "Hero Components Lab",
-    "subtitle": "Vetrina placeholder per la scheda, equip, oggetti, consumabili e skill.",
-    "sectionA": "A — Scheda del personaggio",
-    "sectionB": "B — Raccoglitore slot equip",
-    "sectionC": "C — Card oggetto equippabile",
-    "sectionD": "D — Mazzo consumabili",
-    "sectionE": "E — Deck skill equippabili",
-    "rarity": "Rarità",
-    "effect": "Effetto",
-    "slot": "Slot",
-    "use": "Usa",
-    "availableSkills": "Skill disponibili",
-    "equippedSkills": "Skill equipaggiate",
-    "empty": "Vuoto",
-    "grantedSkill": "Concessa dall'equipaggiamento",
-    "selectedSlot": "Slot selezionato",
-    "unequip": "Rimuovi",
-    "selectItem": "Scegli oggetto",
-    "equip": "Equipaggia"
+  "help": {
+   "mode_description": {
+    "text": "Seleziona la modalità di interazione per il villaggio",
+    "description": "Descrizione del selettore modalità di interazione",
+    "fallback": "Select interaction mode for the village",
+    "category": "help",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 60,
+    "accessibility": {
+     "ariaLabel": "Aiuto selezione modalità",
+     "ariaDescription": "Usa le frecce per navigare tra le modalità disponibili"
+    }
+   }
+  },
+  "tooltip": {
+   "sandbox_info": {
+    "text": "Modalità sandbox: testa nuove funzionalità senza effetti persistenti",
+    "description": "Informazioni sulla modalità sandbox",
+    "fallback": "Sandbox mode: test new features without persistent effects",
+    "category": "tooltip",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 80
+   },
+   "planning_info": {
+    "text": "Modalità pianificazione: organizza attività e assegna residenti",
+    "description": "Informazioni sulla modalità pianificazione",
+    "fallback": "Planning mode: organize activities and assign residents",
+    "category": "tooltip",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 80
+   },
+   "execution_info": {
+    "text": "Modalità esecuzione: monitora attività in tempo reale",
+    "description": "Informazioni sulla modalità esecuzione",
+    "fallback": "Execution mode: monitor activities in real time",
+    "category": "tooltip",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 80
+   },
+   "analytics_info": {
+    "text": "Modalità analitica: visualizza statistiche e report",
+    "description": "Informazioni sulla modalità analitica",
+    "fallback": "Analytics mode: view statistics and reports",
+    "category": "tooltip",
+    "context": "picker",
+    "translatable": true,
+    "maxLength": 80
+   }
+  },
+  "ftue": {
+   "welcome_title": {
+    "text": "Benvenuto nel Villaggio Idlio",
+    "description": "Titolo di benvenuto per il FTUE",
+    "fallback": "Welcome to Idle Village",
+    "category": "help",
+    "context": "ftue",
+    "translatable": true,
+    "maxLength": 40,
+    "accessibility": {
+     "ariaLabel": "Titolo di benvenuto"
+    }
+   },
+   "mode_selection_title": {
+    "text": "Scegli la tua modalità",
+    "description": "Titolo per la selezione della modalità nel FTUE",
+    "fallback": "Choose your mode",
+    "category": "help",
+    "context": "ftue",
+    "translatable": true,
+    "maxLength": 30,
+    "accessibility": {
+     "ariaLabel": "Selezione modalità"
+    }
+   },
+   "mode_selection_description": {
+    "text": "Ogni modalità offre un modo diverso di interagire con il villaggio. Inizia con la modalità Sandbox per imparare!",
+    "description": "Descrizione della selezione modalità nel FTUE",
+    "fallback": "Each mode offers a different way to interact with the village. Start with Sandbox mode to learn!",
+    "category": "help",
+    "context": "ftue",
+    "translatable": true,
+    "maxLength": 120,
+    "accessibility": {
+     "ariaLabel": "Descrizione modalità",
+     "ariaDescription": "Informazioni sulle diverse modalità di interazione disponibili"
+    }
+   }
+  },
+  "accessibility": {
+   "mode_changed": {
+    "text": "Modalità cambiata in {mode}",
+    "description": "Annuncio di cambio modalità per screen reader",
+    "fallback": "Mode changed to {mode}",
+    "category": "help",
+    "context": "accessibility",
+    "translatable": true,
+    "maxLength": 50,
+    "accessibility": {
+     "ariaLabel": "Notifica cambio modalità",
+     "ariaDescription": "Annuncio quando la modalità di interazione viene cambiata"
+    }
+   },
+   "mode_selector_open": {
+    "text": "Selettore modalità aperto",
+    "description": "Annuncio di apertura selettore modalità",
+    "fallback": "Mode selector opened",
+    "category": "help",
+    "context": "accessibility",
+    "translatable": true,
+    "maxLength": 30,
+    "accessibility": {
+     "ariaLabel": "Selettore modalità aperto",
+     "ariaDescription": "Il selettore di modalità è stato aperto"
+    }
+   },
+   "mode_selector_closed": {
+    "text": "Selettore modalità chiuso",
+    "description": "Annuncio di chiusura selettore modalità",
+    "fallback": "Mode selector closed",
+    "category": "help",
+    "context": "accessibility",
+    "translatable": true,
+    "maxLength": 30,
+    "accessibility": {
+     "ariaLabel": "Selettore modalità chiuso",
+     "ariaDescription": "Il selettore di modalità è stato chiuso"
+    }
+   }
+  }
+ },
+ "milestoneCheck": {
+  "ariaLabel": "Prova di abilità della fase",
+  "eyebrow": "Milestone",
+  "skills": "Prove da affrontare",
+  "partyStat": "Party {value}",
+  "difficulty": "Difficoltà {value}",
+  "consumables": "Spendi consumabili",
+  "riskLine": "Ferite {injury}% · Morte {death}%",
+  "roll": "Consulta il destino",
+  "passed": "Fase superata",
+  "failed": "Fase fallita",
+  "wounded": "Un eroe è stato ferito in questa fase",
+  "casualty": "Un eroe è caduto in questa fase",
+  "dismiss": "Continua"
+ },
+ "poiDetail": {
+  "risk": {
+   "injury": {
+    "title": "Probabilità che un residente venga ferito"
+   },
+   "death": {
+    "title": "Probabilità che un residente muoia"
+   },
+   "danger": {
+    "title": "Grado di pericolo di questa attività"
+   }
+  }
+ },
+ "poiMarkerLab": {
+  "title": "POI Marker Lab",
+  "subtitle": "Baseline del marker opportunità: colore + icona = cosa, anello timer = quando, materiale = dove. Posato sulla superficie Wanderlust canonica, l'unico test onesto.",
+  "inContext": "In contesto",
+  "matrix": "Matrice tipo / stato",
+  "playground": "Banco di prova",
+  "type": "Tipo",
+  "state": "Stato",
+  "importance": "Importanza",
+  "progress": "Tempo residuo",
+  "size": "Dimensione",
+  "counterClockwise": "Antiorario (scadenza)",
+  "grounded": "Ombra di appoggio",
+  "showMap": "Mostra la mappa",
+  "types": {
+   "quest": "Quest",
+   "job": "Lavoro",
+   "event": "Evento"
+  },
+  "states": {
+   "new": "Nuovo",
+   "available": "Disponibile",
+   "assigned": "Assegnato",
+   "expiring": "In scadenza",
+   "expired": "Scaduto"
+  },
+  "importances": {
+   "normal": "Normale",
+   "important": "Importante",
+   "critical": "Critico"
+  },
+  "variant": "Variante",
+  "variants": {
+   "runic": "Runica (V2)",
+   "runicV3": "Runica V3",
+   "runicV1": "Runica V1",
+   "runicV5": "Runica V5"
+  }
+ },
+ "questChronicle": {
+  "title": "Cronaca della Quest",
+  "journal": "Diario",
+  "openTheater": "Apri il Teatro",
+  "collectRewards": "Raccogli ricompense",
+  "closeReport": "Chiudi il rapporto",
+  "ropeLabel": "Tempo della quest",
+  "boardStatus": {
+   "success": "Ultima prova superata",
+   "failure": "Prova fallita",
+   "pending": "In attesa dell'esito della spedizione"
+  },
+  "outcome": {
+   "success": "Successo",
+   "failure": "Fallimento"
+  },
+  "risk": {
+   "injury": "{percent}% ferite",
+   "death": "{percent}% morte"
+  },
+  "phaseType": {
+   "check": "prova",
+   "fight": "combattimento",
+   "stealth": "furtività",
+   "trap": "trappola",
+   "explore": "esplorazione",
+   "dialogue": "dialogo",
+   "branch": "diramazione",
+   "timedChoice": "scelta a tempo"
+  }
+ },
+ "questReward": {
+  "panelTitle": "Ricompense",
+  "eyebrowVictory": "La spedizione è tornata",
+  "eyebrowDefeat": "La spedizione è stata spezzata",
+  "trialsPassed": "{passed} prove superate su {total}",
+  "trials": "Prove",
+  "passed": "Superata",
+  "failed": "Fallita",
+  "rewards": "Ricompense",
+  "noRewards": "La spedizione non ha portato nulla a casa",
+  "party": "Party",
+  "stateNone": "Illeso",
+  "stateInjured": "Ferito",
+  "stateDead": "Caduto",
+  "collect": "Raccogli ricompense"
+ },
+ "workerTooltip": {
+  "labels": {
+   "hp": "HP",
+   "fatigue": "Fatica",
+   "performance": "Prestazione",
+   "specialties": "Specialità",
+   "bio": "Bio",
+   "recommendations": "Raccomandazioni",
+   "risk": "Livello di Rischio"
+  },
+  "statuses": {
+   "working": "In Incarico",
+   "resting": "In Riposo",
+   "injured": "Ferito",
+   "recovering": "In Recupero",
+   "available": "Disponibile",
+   "away": "Assente",
+   "exhausted": "Esausto",
+   "dead": "Caduto"
+  },
+  "riskLevels": {
+   "low": "Rischio Basso",
+   "medium": "Rischio Medio",
+   "high": "Rischio Alto",
+   "critical": "Rischio Critico"
+  },
+  "recommendations": {
+   "lowHp": "Riposo necessario - HP critico",
+   "highFatigue": "Fatica alta - considera riposo",
+   "injured": "In recupero da ferita",
+   "critical": "Riposo immediato richiesto"
+  },
+  "accessibility": {
+   "tooltipDetails": "{name} - Dettagli lavoratore",
+   "riskBadge": "Stato {level}",
+   "closeTooltip": "Chiudi tooltip per {name}"
+  },
+  "actions": {
+   "close": "Chiudi tooltip"
+  },
+  "sections": {
+   "quote": "Citazione"
+  }
+ },
+ "world": {
+  "goblinInvasion": {
+   "title": "INVASIONE GOBLIN!",
+   "subtitle": "Fra {count} giorni un esercito attaccherà!",
+   "action": "PREPARA LE DIFESE",
+   "viewDefenses": "VEDI DIFESE",
+   "invasion": "Invasione",
+   "eventLabel": "Invasione Goblin",
+   "daysRemaining": "Giorni Rimanenti: {count}",
+   "timerLabel": "GIORNI RIMANENTI",
+   "warTable": {
+    "eventLabel": "EVENTO MONDIALE · MINACCIA",
+    "description": "Un esercito goblin sta marciando verso le tue terre.",
+    "parchmentDescription": "Un esercito goblin sta marciando sulle nostre terre. I nostri esploratori hanno avvistato grandi forze nemiche che scendono dal nord verso la tua roccaforte.",
+    "willBeAttacked": "IL TUO VILLAGGIO SARÀ ATTACCATO.",
+    "scoutReport": "I nostri esploratori segnalano un massiccio avanguardia goblin che marcia dalle Distese del Nord. Il loro obiettivo è chiaro: la tua roccaforte sarà rasa al suolo a meno che non vengano preparate le difese.",
+    "worldEvent": "Evento Mondiale",
+    "enemy": "FORZA NEMICA",
+    "enemySub": "Si muove dal nord",
+    "village": "IL TUO VILLAGGIO",
+    "villageSub": "Obiettivo principale",
+    "targetObjective": "Obiettivo Primario",
+    "threatLevelHigh": "Livello Minaccia: Alto",
+    "threatLevelCritical": "Livello Minaccia: Critico",
+    "threat": "MINACCIA",
+    "faction": "ESERCITO GOBLIN",
+    "factionSub": "Grande forza ostile rilevata",
+    "hostileForce": "Forza Ostile",
+    "warbands": "~3.500 Banda",
+    "enemyCount": "3.200+",
+    "enemyUnit": "GOBLIN",
+    "arrivalCount": "2",
+    "arrivalUnit": "GIORNI",
+    "targetName": "IL TUO VILLAGGIO",
+    "arrival": "ARRIVO",
+    "arrivalIn": "Arrivo tra",
+    "days": "GIORNI",
+    "remaining": "RIMANENTI",
+    "estimatedArrival": "Arrivo Stimato",
+    "timeRemaining": "Tempo Rimanente",
+    "dismiss": "Ignora",
+    "dismissReport": "Chiudi Rapporto"
+   },
+   "reminder": {
+    "days_singular": "GIORNO",
+    "days_plural": "GIORNI",
+    "band_distant": "APPROSSIMAMENTO",
+    "band_closing": "IMMINENTE",
+    "band_imminent": "DOMANI"
+   }
+  },
+  "clouds": {
+   "scales": "Dimensioni nuvole",
+   "scale": "scala",
+   "far": "Lontane",
+   "mid": "Medie",
+   "near": "Vicine"
+  },
+  "debug": {
+   "spawnWonders": "Mostra meraviglie",
+   "despawnWonders": "Nascondi meraviglie",
+   "breath": "Respira",
+   "water": "Acqua",
+   "atmosphere": "Atmosfera",
+   "seaPattern": "Pattern",
+   "seaPatternTitle": "Pattern mare — dal vivo",
+   "seaPatternLive": "Texture authored A1 / micro scroll",
+   "seaPatternClose": "Chiudi",
+   "seaPatternScale": "Scala pattern",
+   "seaPatternOpacity": "Opacità linee",
+   "seaPatternColor": "Colore linee",
+   "seaPatternMotion": "Ampiezza moto",
+   "seaPatternPeriod": "Periodo moto",
+   "seaPatternAngle": "Angolo moto",
+   "seaPatternMotionEnabled": "Moto attivo",
+   "reducedMotion": "moto ridotto",
+   "hideUi": "Nascondi UI",
+   "showUi": "Mostra UI",
+   "settlementLost": "Insediamento Perso",
+   "seaPatternSaveDefault": "Salva come default",
+   "seaPatternSaving": "Salvataggio…",
+   "seaPatternSaved": "Default aggiornati nel sorgente",
+   "seaPatternSaveFailed": "Salvataggio fallito (solo in dev)"
+  },
+  "settlementLost": {
+   "title": "INSEDIAMENTO PERSO",
+   "subtitle": "L'insediamento è caduto. Ciò che è stato appreso sopravvive.",
+   "lossesTitle": "Cosa è stato perso",
+   "cta": "INIZIA UN NUOVO INSEDIAMENTO",
+   "losses": {
+    "walls": "Le mura sono state violate",
+    "heroes": "I tuoi eroi sono caduti",
+    "stores": "Le scorte sono perdute"
+   },
+   "stats": {
+    "daysSurvived": "Giorni sopravvissuti",
+    "residentsLost": "Residenti persi",
+    "goldEarned": "Oro guadagnato"
+   }
+  }
+ },
+ "pgDetailCard": {
+  "close": "Chiudi scheda",
+  "profile": "Profilo",
+  "fullFigure": "Figura intera",
+  "openArchetype": "Apri archetipo",
+  "unknownPreset": "Preset sconosciuto: {id}",
+  "hp": {
+   "label": "HP"
+  },
+  "fatigue": {
+   "label": "Fatica",
+   "ready": "Pronto",
+   "exhausted": "Esausto"
+  },
+  "statistics": {
+   "label": "Statistiche",
+   "count": "{count} valori",
+   "empty": "Nessuno snapshot disponibile.",
+   "category": {
+    "offense": "Offesa",
+    "defense": "Difesa",
+    "utility": "Utilità"
+   }
+  },
+  "inventory": {
+   "label": "Inventario",
+   "empty": "Nessun oggetto registrato."
   },
   "equipment": {
-    "label": "Equipaggiamento",
-    "title": "Crea Equipaggiamento",
-    "subtitle": "Forgia oggetti dai template base",
-    "description": "Scegli un tipo di oggetto, regola i modificatori di stat, spendi il budget e salva. Le armi collegano sempre una skill base di attacco; armature e trinket forniscono modificatori passivi.",
-    "identity": "Identità",
-    "name": "Nome",
-    "namePlaceholder": "Nuovo oggetto",
-    "type": "Tipo",
-    "rarityLabel": "Rarità",
-    "types": {
-      "weapon": "Arma",
-      "armor": "Armatura",
-      "offhand": "Mano secondaria",
-      "trinket": "Trinket",
-      "ring": "Anello",
-      "mount": "Cavalcatura"
-    },
-    "rarity": {
-      "poor": "Scarso",
-      "common": "Comune",
-      "uncommon": "Non comune",
-      "rare": "Raro",
-      "epic": "Epico",
-      "legendary": "Leggendario",
-      "masterpiece": "Capolavoro"
-    },
-    "preview": "Anteprima",
-    "tier": "Livello",
-    "searchSkill": "Cerca skill...",
-    "addSkill": "Aggiungi skill concessa",
-    "removeSkill": "Rimuovi skill concessa",
-    "defaultSaved": "Configurazione default salvata",
-    "grantedSkill": "Skill associata",
-    "stats": "Modificatori di stat",
-    "stat": {
-      "hp": "HP",
-      "damage": "Danno",
-      "txc": "TxC",
-      "evasion": "Evasione",
-      "critChance": "Critico %",
-      "critMult": "Moltiplicatore crit",
-      "armor": "Armatura",
-      "resistance": "Resistenza",
-      "armorPen": "Pen armatura",
-      "penPercent": "Pen %",
-      "lifesteal": "Ruba vita",
-      "regen": "Rigenerazione",
-      "ward": "Scudo ward",
-      "block": "Blocco",
-      "movementSpeed": "Velocità movimento"
-    },
-    "balance": "Bilancio",
-    "power": "Potere",
-    "cost": "Costo",
-    "budget": "Budget",
-    "balanceBar": "Uso budget",
-    "balanced": "Nel budget ({balance} punti liberi)",
-    "overBudget": "Fuori budget di {balance} punti",
-    "save": "Salva equipaggiamento",
-    "saved": "Equipaggiamento salvato",
-    "saveFailed": "Salvataggio fallito",
-    "unnamed": "Oggetto senza nome",
-    "reset": "Reset",
-    "saveDefault": "Salva default",
-    "library": "Libreria equipaggiamento",
-    "new": "Nuovo",
-    "emptyLibrary": "Nessun oggetto in libreria.",
-    "edit": "Modifica",
-    "loading": "Caricamento..."
+   "label": "Equipaggiamento",
+   "weapon": "Arma",
+   "offhand": "Mano secondaria",
+   "armor": "Armatura",
+   "trinket": "Trinket",
+   "ring": "Anello",
+   "mount": "Cavalcatura",
+   "empty": "Vuoto"
   },
-  "astrolabeV63": {
-    "check": "Prova",
-    "statVsDc": "{stat} contro difficoltà {difficulty}",
-    "probability": "Probabilità di riuscita ~{pct}%",
-    "risk": "Ferita {wound}% · Morte {dead}%",
-    "riskWounded": "Ferito",
-    "riskDead": "Caduto",
-    "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
-    "verdict": {
-      "bigwin": "TRIONFO",
-      "win": "SUCCESSO",
-      "almost": "PER UN SOFFIO",
-      "fail": "FALLIMENTO",
-      "epicfail": "DISASTRO"
-    },
-    "narrative": {
-      "bigwin": "Il destino si inchina al tuo passo.",
-      "win": "La prova cede sotto il tuo sforzo.",
-      "almost": "Un soffio, e la verità ti sfugge.",
-      "fail": "La presa scivola.",
-      "epicfail": "Il mondo ti respinge.",
-      "Atletica": {
-        "bigwin": "Superi ogni barriera con un balzo leggendario.",
-        "win": "Il tuo corpo oltrepassa l'ostacolo.",
-        "almost": "Il piede scivola, ma raggiungi il bordo.",
-        "fail": "L'ostacolo resiste al tuo slancio.",
-        "epicfail": "Cadi rovinosamente, il fiato spezzato."
-      },
-      "Destrezza": {
-        "bigwin": "I tuoi polsi superano la trappola in un istante.",
-        "win": "Le dita trovano il meccanismo senza esitazione.",
-        "almost": "Un ronzio: il grilletto sfiora il tuo dito.",
-        "fail": "Il meccanismo si blocca prima del previsto.",
-        "epicfail": "La trappola scatta, implacabile."
-      },
-      "Forza": {
-        "bigwin": "La porta cede sotto un colpo terribile.",
-        "win": "Le cerniere cedono con un gemito.",
-        "almost": "Il legno si spacca, ma tiene ancora.",
-        "fail": "La porta resiste, più dura del previsto.",
-        "epicfail": "Il pugno rimbalza, ferendoti."
-      },
-      "Intelletto": {
-        "bigwin": "Le tessere si riuniscono in una verità luminosa.",
-        "win": "L'enigma si apre come una rosa.",
-        "almost": "Un dettaglio sfugge, ma quasi ci sei.",
-        "fail": "La soluzione ti sfugge tra le dita.",
-        "epicfail": "La mente si annebbia di fronte al mistero."
-      },
-      "Carisma": {
-        "bigwin": "Le parole piegano il mondo al tuo volere.",
-        "win": "L'interlocutore cede con un sospiro.",
-        "almost": "Per un istante sembra cedere, poi no.",
-        "fail": "Il tuo tono non trova presa.",
-        "epicfail": "La stanza si fa gelida: sei solo."
-      }
-    }
+  "status": {
+   "available": "Disponibile",
+   "away": "Assente",
+   "exhausted": "Esausto",
+   "injured": "Ferito",
+   "dead": "Caduto"
   },
-  "astrolabeV64": {
-    "check": "Prova",
-    "statVsDc": "{stat} contro difficoltà {difficulty}",
-    "probability": "Probabilità di riuscita ~{pct}%",
-    "risk": "Ferita {wound}% · Morte {dead}%",
-    "riskWounded": "Ferito",
-    "riskDead": "Caduto",
-    "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
-    "verdict": {
-      "bigwin": "TRIONFO",
-      "win": "SUCCESSO",
-      "almost": "PER UN SOFFIO",
-      "fail": "FALLIMENTO",
-      "epicfail": "DISASTRO"
-    },
-    "narrative": {
-      "bigwin": "Il destino si inchina al tuo passo.",
-      "win": "La prova cede sotto il tuo sforzo.",
-      "almost": "Un soffio, e la verità ti sfugge.",
-      "fail": "La presa scivola.",
-      "epicfail": "Il mondo ti respinge.",
-      "Atletica": {
-        "bigwin": "Superi ogni barriera con un balzo leggendario.",
-        "win": "Il tuo corpo oltrepassa l'ostacolo.",
-        "almost": "Il piede scivola, ma raggiungi il bordo.",
-        "fail": "L'ostacolo resiste al tuo slancio.",
-        "epicfail": "Cadi rovinosamente, il fiato spezzato."
-      },
-      "Destrezza": {
-        "bigwin": "I tuoi polsi superano la trappola in un istante.",
-        "win": "Le dita trovano il meccanismo senza esitazione.",
-        "almost": "Un ronzio: il grilletto sfiora il tuo dito.",
-        "fail": "Il meccanismo si blocca prima del previsto.",
-        "epicfail": "La trappola scatta, implacabile."
-      },
-      "Forza": {
-        "bigwin": "La porta cede sotto un colpo terribile.",
-        "win": "Le cerniere cedono con un gemito.",
-        "almost": "Il legno si spacca, ma tiene ancora.",
-        "fail": "La porta resiste, più dura del previsto.",
-        "epicfail": "Il pugno rimbalza, ferendoti."
-      },
-      "Intelletto": {
-        "bigwin": "Le tessere si riuniscono in una verità luminosa.",
-        "win": "L'enigma si apre come una rosa.",
-        "almost": "Un dettaglio sfugge, ma quasi ci sei.",
-        "fail": "La soluzione ti sfugge tra le dita.",
-        "epicfail": "La mente si annebbia di fronte al mistero."
-      },
-      "Carisma": {
-        "bigwin": "Le parole piegano il mondo al tuo volere.",
-        "win": "L'interlocutore cede con un sospiro.",
-        "almost": "Per un istante sembra cedere, poi no.",
-        "fail": "Il tuo tono non trova presa.",
-        "epicfail": "La stanza si fa gelida: sei solo."
-      }
-    }
+  "vitals": {
+   "hp": "PV",
+   "stamina": "VIG"
+  }
+ },
+ "heroComponentsLab": {
+  "title": "Hero Components Lab",
+  "subtitle": "Vetrina placeholder per la scheda, equip, oggetti, consumabili e skill.",
+  "sectionA": "A — Scheda del personaggio",
+  "sectionB": "B — Raccoglitore slot equip",
+  "sectionC": "C — Card oggetto equippabile",
+  "sectionD": "D — Mazzo consumabili",
+  "sectionE": "E — Deck skill equippabili",
+  "rarity": "Rarità",
+  "effect": "Effetto",
+  "slot": "Slot",
+  "use": "Usa",
+  "availableSkills": "Skill disponibili",
+  "equippedSkills": "Skill equipaggiate",
+  "empty": "Vuoto",
+  "grantedSkill": "Concessa dall'equipaggiamento",
+  "selectedSlot": "Slot selezionato",
+  "unequip": "Rimuovi",
+  "selectItem": "Scegli oggetto",
+  "equip": "Equipaggia"
+ },
+ "equipment": {
+  "label": "Equipaggiamento",
+  "title": "Crea Equipaggiamento",
+  "subtitle": "Forgia oggetti dai template base",
+  "description": "Scegli un tipo di oggetto, regola i modificatori di stat, spendi il budget e salva. Le armi collegano sempre una skill base di attacco; armature e trinket forniscono modificatori passivi.",
+  "identity": "Identità",
+  "name": "Nome",
+  "namePlaceholder": "Nuovo oggetto",
+  "type": "Tipo",
+  "rarityLabel": "Rarità",
+  "types": {
+   "weapon": "Arma",
+   "armor": "Armatura",
+   "offhand": "Mano secondaria",
+   "trinket": "Trinket",
+   "ring": "Anello",
+   "mount": "Cavalcatura"
   },
+  "rarity": {
+   "poor": "Scarso",
+   "common": "Comune",
+   "uncommon": "Non comune",
+   "rare": "Raro",
+   "epic": "Epico",
+   "legendary": "Leggendario",
+   "masterpiece": "Capolavoro"
+  },
+  "preview": "Anteprima",
+  "tier": "Livello",
+  "searchSkill": "Cerca skill...",
+  "addSkill": "Aggiungi skill concessa",
+  "removeSkill": "Rimuovi skill concessa",
+  "defaultSaved": "Configurazione default salvata",
+  "grantedSkill": "Skill associata",
+  "stats": "Modificatori di stat",
   "stat": {
-    "damage": "Danno",
-    "accuracy": "Precisione",
-    "critChance": "Crit %",
-    "critMult": "Molt. Crit",
-    "armorPen": "Perf. Armatura",
-    "penPercent": "Perf. Resistenza",
-    "armor": "Armatura",
-    "resistance": "Resistenza",
-    "evasion": "Elusione",
-    "block": "Parata",
-    "ward": "Scudo",
-    "energyShield": "Scudo Energ.",
-    "thorns": "Spine",
-    "agility": "Agilità",
-    "regen": "Rigenerazione",
-    "lifesteal": "Assorb. Vita",
-    "movementSpeed": "Velocità",
-    "cooldownReduction": "Rid. Ricarica",
-    "castSpeed": "Vel. Lancio"
+   "hp": "HP",
+   "damage": "Danno",
+   "txc": "TxC",
+   "evasion": "Evasione",
+   "critChance": "Critico %",
+   "critMult": "Moltiplicatore crit",
+   "armor": "Armatura",
+   "resistance": "Resistenza",
+   "armorPen": "Pen armatura",
+   "penPercent": "Pen %",
+   "lifesteal": "Ruba vita",
+   "regen": "Rigenerazione",
+   "ward": "Scudo ward",
+   "block": "Blocco",
+   "movementSpeed": "Velocità movimento"
   },
-  "gameFrame": {
-    "title": "Wanderlust",
-    "boot": {
-      "progress": "Avanzamento del caricamento",
-      "error": "Il mondo non ha potuto essere preparato",
-      "phase": {
-        "manifest": "Preparazione del mondo",
-        "assets": "Il mondo prende colore",
-        "build": "Le isole emergono",
-        "warmup": "I venti si destano",
-        "ready": "Pronto"
-      },
-      "logoAlt": "Wanderlust: Triumph"
-    },
-    "nav": {
-      "ariaLabel": "Sezioni di gioco",
-      "village": "Villaggio",
-      "map": "Mappa",
-      "workshop": "Officina",
-      "tavern": "Taverna",
-      "locked": "Non ancora"
-    },
-    "resources": {
-      "gold": "Oro",
-      "food": "Cibo",
-      "wood": "Legno",
-      "incoming": "+{count} in arrivo",
-      "perDay": "−{count}/g",
-      "autonomy": "{count} g",
-      "tooltip": {
-        "amount": "{label} {value}.",
-        "incoming": "In arrivo dalle attività in corso: +{count}.",
-        "food": "{label} {value} su {max}. I residenti ne consumano {perDay} al giorno: basta per {days} giorni."
-      },
-      "iron": "Ferro"
-    },
-    "speed": {
-      "ariaLabel": "Velocità simulazione",
-      "pause": "Pausa",
-      "resume": "Riprendi",
-      "paused": "In pausa",
-      "spaceKey": "Spazio"
-    },
-    "compass": {
-      "recenter": "Ricentra la mappa"
-    },
-    "status": {
-      "dayLabel": "Giorno"
-    },
-    "subtitle": "",
-    "place": "Le Marche Orientali",
-    "invasion": {
-      "body": "Un'orda goblin arriva fra {count} giorni."
-    },
-    "events": {
-      "title": "Eventi",
-      "today": "oggi",
-      "daysLeft": "{count} g",
-      "empty": "Nessun evento all'orizzonte.",
-      "showMore": "Mostra tutti ({count})",
-      "showLess": "Mostra meno",
-      "sort": {
-        "ariaLabel": "Ordina gli eventi",
-        "due": "Scadenza",
-        "type": "Tipo"
-      },
-      "types": {
-        "threat": "Minaccia",
-        "expedition": "Spedizione",
-        "construction": "Cantiere",
-        "harvest": "Raccolto",
-        "visit": "Visita",
-        "other": "Altro",
-        "quest": "Missione"
-      },
-      "fixtures": {
-        "invasion": "L'orda goblin raggiunge il villaggio",
-        "wolves": "Lupi avvistati vicino al bosco antico",
-        "expedition": "La spedizione torna dal nord",
-        "granary": "Granaio completato",
-        "harvest": "Raccolto di grano pronto",
-        "caravan": "Arriva una carovana di mercanti"
-      },
-      "move": "Sposta il pannello"
-    },
-    "questPoi": {
-      "open": "{name} — apri la quest",
-      "decisionWaiting": "La spedizione attende una tua decisione"
-    },
-    "questLog": {
-      "outcome": {
-        "reward": "La spedizione «{quest}» è tornata vittoriosa.",
-        "survived": "La spedizione «{quest}» è tornata al villaggio.",
-        "fled": "La spedizione «{quest}» si è ritirata.",
-        "wipe": "La spedizione «{quest}» non è tornata."
-      },
-      "residentDead": "{name} è caduto in spedizione.",
-      "residentWounded": "{name} è tornato ferito dalla spedizione.",
-      "goldReward": "Ricompensa della missione: +{amount} oro ({quest}).",
-      "goldLoot": "Bottino: +{amount} oro ({quest}).",
-      "xp": "Esperienza della spedizione: +{amount} PE ({quest}).",
-      "residentXp": "{name} ha guadagnato {amount} PE ({quest})."
-    },
-    "questEpilogue": {
-      "title": "Rapporto di spedizione",
-      "dead": "Caduti",
-      "wounded": "Feriti",
-      "consumed": "Spesi e distrutti",
-      "reward": "Ricompensa",
-      "loot": "Bottino",
-      "xp": "Esperienza",
-      "info": "Scoperto",
-      "titles": "Titoli",
-      "diseases": "Malattie",
-      "lore": "Echi del luogo",
-      "goldAmount": "+{amount} oro",
-      "xpAmount": "+{amount} PE",
-      "recovery": "recupero ~{days} g",
-      "memberXp": "{name} +{amount} PE"
-    },
-    "director": {
-      "title": "Regia",
-      "move": "Sposta",
-      "reset": "Reset scena",
-      "invasion": "Invasione goblin",
-      "quest": "Mostra quest",
-      "skin": "Skin: {name}",
-      "poiTypes": "Tipi di POI",
-      "questRun": "Avvia quest goblin",
-      "wonder": "Mostro marino",
-      "settlementLost": "Insediamento perduto",
-      "merchantMarker": "Marcatore mercante",
-      "levelUp": "Level-up eroe"
-    },
-    "roster": {
-      "title": "Roster",
-      "ariaLabel": "Roster dei residenti",
-      "ariaLabelNight": "Roster dei residenti, fase notturna: trascinamento disattivato",
-      "show": "Mostra roster",
-      "hide": "Nascondi roster",
-      "filter": {
-        "ariaLabel": "Filtra i residenti per stato",
-        "all": "Tutti",
-        "heroes": "Eroi",
-        "injured": "Feriti",
-        "available": "Disponibili",
-        "exhausted": "Esausti",
-        "away": "Impegnati",
-        "dead": "Caduti"
-      },
-      "sort": {
-        "ariaLabel": "Ordina i residenti per statistica",
-        "placeholder": "Ordina per…",
-        "asc": "Crescente",
-        "desc": "Decrescente"
-      }
-    },
-    "objective": {
-      "label": "Obiettivo",
-      "available": "Manda una squadra in “{name}”",
-      "running": "“{name}” è in corso",
-      "done": "Ritira le ricompense di “{name}”"
-    },
-    "panel": {
-      "dragHint": "Trascina la barra del titolo per spostare · doppio clic per riportare al suo posto"
-    },
-    "panels": {
-      "title": "Pannelli",
-      "close": "Chiudi pannello",
-      "names": {
-        "roster": "Roster",
-        "events": "Eventi",
-        "director": "Director",
-        "tuning": "Tuning",
-        "quest": "Quest in corso",
-        "heroSheet": "Scheda personaggio",
-        "villageStash": "Magazzino",
-        "merchant": "Mercante"
-      },
-      "pin": "Fissa pannello",
-      "unpin": "Sblocca pannello"
-    },
-    "stash": {
-      "title": "Magazzino del villaggio",
-      "capacity": "{count} di {max} beni in deposito",
-      "qty": "{qty} in deposito"
-    },
-    "buildings": {
-      "stash": {
-        "name": "Magazzino del villaggio"
-      }
-    },
-    "menu": {
-      "title": "Menu",
-      "session": "Partita",
-      "options": "Opzioni",
-      "saveNow": "Salva ora",
-      "saving": "Salvataggio…",
-      "saved": "Salvato",
-      "loadGame": "Carica partita…",
-      "quit": "Esci al titolo",
-      "theme": "Tema",
-      "language": "Lingua",
-      "interfaceSize": "Dimensione interfaccia",
-      "interfaceSizeAuto": "Auto",
-      "interfaceSizeAutoHint": "Automatica: {percent}%",
-      "languages": {
-        "en": "English",
-        "it-IT": "Italiano"
-      },
-      "settings": "Tutte le opzioni…",
-      "comingSoon": "Non ancora disponibile"
-    },
-    "regions": {
-      "northern_forest": "Boschi Sussurranti",
-      "southern_forest": "Bosco Cavo",
-      "eastern_woods": "Boschetti Orientali",
-      "northern_peaks": "Vette del Nord",
-      "eastern_mountains": "Alture di Brace",
-      "southern_mountains": "Rupi del Sud",
-      "islands": "Le Isole Esterne",
-      "village": "Il Villaggio",
-      "meadows": "I Prati"
-    },
-    "tuning": {
-      "reset": "Ripristina valori",
-      "save": "Salva",
-      "saved": "Salvato ✓",
-      "bakeFailed": "Salvato per questo browser — i nuovi default non sono stati scritti nel config (solo dev server)."
-    },
-    "questWindow": {
-      "roster": "Squadra assegnata",
-      "bag": "Sacca",
-      "chronicle": "Cronaca",
-      "minimise": "Riduci a icona",
-      "restore": "Riapri",
-      "waiting": "Decisione in attesa",
-      "bagEmpty": "Sacca vuota",
-      "bagStrip": {
-        "label": "Borsa preparata",
-        "chipName": "{label} ({qualifier})",
-        "armed": "armato",
-        "held": "portato"
-      },
-      "belt": {
-        "armed": "armato per la prossima prova",
-        "shadowed": "coperto da un altro oggetto armato",
-        "inert": "nessuna prova qui lo richiede",
-        "actionArmed": "verrà usato alla prossima prova o mischia",
-        "passive": "sempre attivo finché è nella sacca"
-      },
-      "logEmpty": "La cronaca è vuota",
-      "partyStatus": "Squadra assegnata — {alive} su {total} in piedi",
-      "dead": "caduto",
-      "hpLost": "−{hp} HP",
-      "loot": "+{count, plural, one {# bottino} other {# bottino}}",
-      "clean": "Illesi",
-      "moreLines": "+{count, plural, one {# altra riga in cronaca} other {# altre righe in cronaca}}",
-      "inProgress": "Fase in corso",
-      "nextPhase": "Prossima fase",
-      "day": "Giorno {day} di {total}",
-      "returned": "Rientrati",
-      "noneReturned": "Nessuno è tornato",
-      "phaseOf": "Fase {n} di {total}",
-      "inProgressShort": "in corso",
-      "hiddenEvent": "Evento nascosto — potevi non trovarlo",
-      "close": "Chiudi il rapporto",
-      "abandon": "Abbandona la quest",
-      "abandonConfirm": "Sei sicuro di voler abbandonare la quest?",
-      "abandonYes": "Abbandona",
-      "abandonStay": "Continua",
-      "checkOptions": "Opzioni della prova",
-      "checkOptionsSkipCheck": "Salta tutta la prova",
-      "checkOptionsSkipIntro": "Salta l'animazione iniziale",
-      "rewardClose": "Chiudi",
-      "rewardHint": "Clicca o premi un tasto per rivelare",
-      "beats": {
-        "continue": "Continua",
-        "clickHint": "Clicca o premi un tasto per continuare",
-        "more": "{count, plural, one {Manca # momento — clicca o premi un tasto} other {Mancano # momenti — clicca o premi un tasto}}",
-        "recap": "Mentre eri via: {scenes} scene, {checks} prove, {deaths} caduti, {wounds} feriti"
-      },
-      "combat": {
-        "enemiesLeft": "{count, plural, one {# goblin in piedi} other {# goblin in piedi}}",
-        "incoming": "{count, plural, one {risponde # colpo} other {rispondono # colpi}}",
-        "exposureHint": "Probabilità di subire il prossimo colpo"
-      },
-      "ticks": "{elapsed}/{total} tick"
-    },
-    "hud": {
-      "hide": "Nascondi HUD",
-      "show": "Mostra HUD"
-    },
-    "heroSheet": {
-      "prev": "Personaggio precedente",
-      "next": "Personaggio successivo",
-      "pin": "Fissa scheda",
-      "unpin": "Sblocca scheda",
-      "loadout": "Equipaggiamento",
-      "inventory": "Inventario",
-      "inventoryEmpty": "Vuoto"
-    },
-    "merchant": {
-      "title": "Il mercante Rowen",
-      "previewBadge": "Anteprima",
-      "restockNote": "Rowen rifornisce quando la strada è clemente",
-      "markerName": "Bancarella del mercante",
-      "priceLine": "{price} {currency}",
-      "currency": {
-        "gold": "oro"
-      },
-      "buy": {
-        "button": "Compra",
-        "previewLabel": "solo anteprima",
-        "previewTooltip": "Il commercio arriva con l'aggiornamento dell'economia — questa schermata è un'anteprima"
-      },
-      "offers": {
-        "healingDraught": {
-          "name": "Pozioni curative, tre per cassa",
-          "desc": "Vetro verde amaro sigillato in cera — una ferita che si chiude prima che la strada svoli.",
-          "stock": "Una cassa rimasta"
-        },
-        "fieldRations": {
-          "name": "Razioni da campo per la lunga marcia",
-          "desc": "Gallette, mele secche e pesce salato — cibo che tiene i nervi saldi più a lungo di te.",
-          "stock": "In abbondanza, finché tengono i forni"
-        },
-        "smokeBomb": {
-          "name": "Bombe fumogene, un paio",
-          "desc": "Gusci d'argilla di polvere grigia — coprono una ritirata che nessuno ricorda di aver fatto.",
-          "stock": "Solo un paio"
-        },
-        "wardCharm": {
-          "name": "Talismano di ferro",
-          "desc": "Un chiodo freddo di ferro meteorico al laccio — fortuna che puoi stringere quando il buio si avvicina.",
-          "stock": "L'ultimo che ha portato a nord"
-        }
-      }
-    },
-    "heroLevel": {
-      "badge": "Lv {n}",
-      "floater": "Livello {n}",
-      "a11y": "Eroe livello {n}"
-    },
-    "village": {
-      "ariaLabel": "Villaggio — edifici",
-      "pinsToolbar": "Edifici del villaggio",
-      "levelShort": "Lv {level}",
-      "levelBadge": "Lv {level}/{max}",
-      "effectLabel": "Effetto",
-      "costLabel": "Costo",
-      "daysShort": "{days} g",
-      "openStash": "Apri magazzino",
-      "openMerchant": "Apri mercante",
-      "state": {
-        "built": "Costruito",
-        "buildable": "Costruibile",
-        "locked": "Bloccato"
-      },
-      "category": {
-        "production": "Produzione",
-        "civic": "Civile",
-        "defense": "Difesa"
-      },
-      "upgrade": {
-        "build": "Costruisci",
-        "upgrade": "Potenzia",
-        "maxLevel": "Livello massimo",
-        "previewLabel": "solo anteprima",
-        "previewTooltip": "La costruzione arriva con l'aggiornamento dell'economia — questa schermata è un'anteprima"
-      },
-      "buildings": {
-        "lumbermill": {
-          "name": "Taglialegna",
-          "desc": "Ricava legname dai pini a est.",
-          "effect": "Legno al giorno: {value} → {next}"
-        },
-        "quarry": {
-          "name": "Cava",
-          "desc": "Estrae pietra e minerali dalle rupi a ovest.",
-          "effect": "Ferro al giorno: {value} → {next}"
-        },
-        "farm": {
-          "name": "Fattoria",
-          "desc": "Coltiva il prato lungo il fiume.",
-          "effect": "Cibo al giorno: {value} → {next}"
-        },
-        "warehouse": {
-          "name": "Magazzino",
-          "desc": "Custodisce le scorte del villaggio sotto chiave.",
-          "effect": "Capacità magazzino: {value} → {next}"
-        },
-        "inn": {
-          "name": "Locanda",
-          "desc": "Letti caldi e un focolare che attira nuova gente.",
-          "effect": "Capacità abitanti: {value} → {next}"
-        },
-        "smithy": {
-          "name": "Fucina",
-          "desc": "Forgia attrezzi e equipaggiamento per lavoro e quest.",
-          "effect": "Produzione fucina: {value} → {next}"
-        },
-        "market": {
-          "name": "Emporio",
-          "desc": "Il banco del mercante sulla piazza del villaggio.",
-          "effect": "Oro al giorno: {value} → {next}"
-        },
-        "infirmary": {
-          "name": "Infermeria",
-          "desc": "Erbe e letti tranquilli per i feriti.",
-          "effect": "Recupero ferite: {value} → {next}",
-          "unlockHint": "Sbloccata tramite una ricompensa di quest."
-        },
-        "palisade": {
-          "name": "Palizzata",
-          "desc": "Paletti affilati a guardia dell'accesso ovest.",
-          "effect": "Difesa: {value} → {next}"
-        },
-        "watchtower": {
-          "name": "Torre di guardia",
-          "desc": "Occhi sull'imbocco della valle.",
-          "effect": "Preavviso raid: {value} → {next} g"
-        },
-        "barracks": {
-          "name": "Baraccamento",
-          "desc": "Cuccette e addestramento per la milizia.",
-          "effect": "Capacità milizia: {value} → {next}",
-          "unlockHint": "Richiede Palizzata al livello II."
-        }
-      }
-    }
+  "balance": "Bilancio",
+  "power": "Potere",
+  "cost": "Costo",
+  "budget": "Budget",
+  "balanceBar": "Uso budget",
+  "balanced": "Nel budget ({balance} punti liberi)",
+  "overBudget": "Fuori budget di {balance} punti",
+  "save": "Salva equipaggiamento",
+  "saved": "Equipaggiamento salvato",
+  "saveFailed": "Salvataggio fallito",
+  "unnamed": "Oggetto senza nome",
+  "reset": "Reset",
+  "saveDefault": "Salva default",
+  "library": "Libreria equipaggiamento",
+  "new": "Nuovo",
+  "emptyLibrary": "Nessun oggetto in libreria.",
+  "edit": "Modifica",
+  "loading": "Caricamento..."
+ },
+ "astrolabeV63": {
+  "check": "Prova",
+  "statVsDc": "{stat} contro difficoltà {difficulty}",
+  "probability": "Probabilità di riuscita ~{pct}%",
+  "risk": "Ferita {wound}% · Morte {dead}%",
+  "riskWounded": "Ferito",
+  "riskDead": "Caduto",
+  "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
+  "verdict": {
+   "bigwin": "TRIONFO",
+   "win": "SUCCESSO",
+   "almost": "PER UN SOFFIO",
+   "fail": "FALLIMENTO",
+   "epicfail": "DISASTRO"
   },
-  "missionPlanner": {
-    "band": {
-      "odds": {
-        "high": "Probabile",
-        "mid": "Incerto",
-        "low": "Improbabile"
-      },
-      "risk": {
-        "high": "Alto",
-        "mid": "Moderato",
-        "low": "Basso"
-      }
-    },
-    "required": "obbligatorio",
-    "ifEmpty": "Se resta vuoto:",
-    "modifier": {
-      "death": "Morte",
-      "injury": "Ferita",
-      "power": "Potenza"
-    },
-    "title": "Planner",
-    "subtitle": "Ogni modifica aggiorna subito gli esiti",
-    "input": "Input",
-    "output": "Esiti",
-    "party": "Party",
-    "outcome": "Esito",
-    "success": "Successo",
-    "injury": "Ferita",
-    "death": "Morte",
-    "duration": "Durata",
-    "phases": "Per fase",
-    "byMember": "Per membro",
-    "why": "Perché",
-    "hp": "PV",
-    "launch": "Parti",
-    "addMember": "Aggiungi al party",
-    "noLoadout": "Nessun equipaggiamento",
-    "remove": "Rimuovi {name}",
-    "trend": {
-      "better": "migliora",
-      "worse": "peggiora",
-      "same": "invariato"
-    },
-    "items": {
-      "draftHorse": "Cavallo da Tiro",
-      "ironBlade": "Lama di Ferro",
-      "heavyPlate": "Piastra Pesante",
-      "guardianBanner": "Vessillo del Guardiano",
-      "healingDraught": "Pozione Curativa",
-      "luckyCoin": "Moneta Fortunata"
-    },
-    "eyebrow": "Piano di spedizione",
-    "route": "Il cammino",
-    "rule": "Successo = superare almeno metà delle prove",
-    "stage": "Prova {n}",
-    "hoursShort": "h",
-    "perMemberRoll": "Rischio base per membro, tirato a ogni prova",
-    "company": "La compagnia",
-    "available": "Disponibili",
-    "provisions": "Provviste",
-    "anyDeath": "Almeno un caduto",
-    "anyInjury": "Almeno un ferito",
-    "reward": "Ricompensa attesa",
-    "undo": "Annulla",
-    "reset": "Ripristina",
-    "pickFromRoster": "Scegli qualcuno tra i disponibili",
-    "unavailable": "non disponibile",
-    "haloHint": "Anello esterno: morte · anello interno: ferita",
-    "whyEmpty": "Forma la compagnia per vedere cosa decide l’esito.",
-    "phaseType": {
-      "check": "Prova",
-      "fight": "Scontro",
-      "trap": "Trappola",
-      "event": "Evento"
-    },
-    "equipSlot": {
-      "weapon": "Arma",
-      "armor": "Armatura",
-      "mount": "Cavalcatura",
-      "trinket": "Amuleto"
-    },
-    "metric": {
-      "success": "Successo",
-      "injury": "Ferita",
-      "death": "Morte",
-      "duration": "Durata",
-      "reward": "Ricompensa"
-    },
-    "cause": {
-      "stat": "{who} · {stat}",
-      "slot": "{slot} ({who})",
-      "emptyPenalty": "Slot vuoti",
-      "cover": "Protezione di {who}"
-    },
-    "stat": {
-      "strength": "Forza",
-      "agility": "Agilità",
-      "perception": "Percezione",
-      "intelligence": "Intelligenza",
-      "endurance": "Resistenza"
-    },
-    "issue": {
-      "EMPTY_REQUIRED_SLOT": "Mancano membri negli slot obbligatori",
-      "RESIDENT_MISSING": "Un membro non è più disponibile",
-      "ITEM_UNKNOWN": "Oggetto sconosciuto",
-      "ITEM_SLOT_MISMATCH": "Oggetto nello slot sbagliato",
-      "CONSUMABLE_OVER_STOCK": "Provviste insufficienti",
-      "PARTY_TOO_LARGE": "Compagnia troppo numerosa"
-    },
-    "hours": "{count} ore",
-    "loadout": "Equipaggiamento",
-    "open": "Pianificatore missione",
-    "phase": {
-      "memberRisk": "per membro ⚕ {inj}% · ☠ {dth}%",
-      "surviveThrough": "superstiti dopo: {pct}%",
-      "retreat": "ritiro → {tier} ({pct}%)"
-    }
+  "narrative": {
+   "bigwin": "Il destino si inchina al tuo passo.",
+   "win": "La prova cede sotto il tuo sforzo.",
+   "almost": "Un soffio, e la verità ti sfugge.",
+   "fail": "La presa scivola.",
+   "epicfail": "Il mondo ti respinge.",
+   "Atletica": {
+    "bigwin": "Superi ogni barriera con un balzo leggendario.",
+    "win": "Il tuo corpo oltrepassa l'ostacolo.",
+    "almost": "Il piede scivola, ma raggiungi il bordo.",
+    "fail": "L'ostacolo resiste al tuo slancio.",
+    "epicfail": "Cadi rovinosamente, il fiato spezzato."
+   },
+   "Destrezza": {
+    "bigwin": "I tuoi polsi superano la trappola in un istante.",
+    "win": "Le dita trovano il meccanismo senza esitazione.",
+    "almost": "Un ronzio: il grilletto sfiora il tuo dito.",
+    "fail": "Il meccanismo si blocca prima del previsto.",
+    "epicfail": "La trappola scatta, implacabile."
+   },
+   "Forza": {
+    "bigwin": "La porta cede sotto un colpo terribile.",
+    "win": "Le cerniere cedono con un gemito.",
+    "almost": "Il legno si spacca, ma tiene ancora.",
+    "fail": "La porta resiste, più dura del previsto.",
+    "epicfail": "Il pugno rimbalza, ferendoti."
+   },
+   "Intelletto": {
+    "bigwin": "Le tessere si riuniscono in una verità luminosa.",
+    "win": "L'enigma si apre come una rosa.",
+    "almost": "Un dettaglio sfugge, ma quasi ci sei.",
+    "fail": "La soluzione ti sfugge tra le dita.",
+    "epicfail": "La mente si annebbia di fronte al mistero."
+   },
+   "Carisma": {
+    "bigwin": "Le parole piegano il mondo al tuo volere.",
+    "win": "L'interlocutore cede con un sospiro.",
+    "almost": "Per un istante sembra cedere, poi no.",
+    "fail": "Il tuo tono non trova presa.",
+    "epicfail": "La stanza si fa gelida: sei solo."
+   }
+  }
+ },
+ "astrolabeV64": {
+  "check": "Prova",
+  "statVsDc": "{stat} contro difficoltà {difficulty}",
+  "probability": "Probabilità di riuscita ~{pct}%",
+  "risk": "Ferita {wound}% · Morte {dead}%",
+  "riskWounded": "Ferito",
+  "riskDead": "Caduto",
+  "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
+  "verdict": {
+   "bigwin": "TRIONFO",
+   "win": "SUCCESSO",
+   "almost": "PER UN SOFFIO",
+   "fail": "FALLIMENTO",
+   "epicfail": "DISASTRO"
+  },
+  "narrative": {
+   "bigwin": "Il destino si inchina al tuo passo.",
+   "win": "La prova cede sotto il tuo sforzo.",
+   "almost": "Un soffio, e la verità ti sfugge.",
+   "fail": "La presa scivola.",
+   "epicfail": "Il mondo ti respinge.",
+   "Atletica": {
+    "bigwin": "Superi ogni barriera con un balzo leggendario.",
+    "win": "Il tuo corpo oltrepassa l'ostacolo.",
+    "almost": "Il piede scivola, ma raggiungi il bordo.",
+    "fail": "L'ostacolo resiste al tuo slancio.",
+    "epicfail": "Cadi rovinosamente, il fiato spezzato."
+   },
+   "Destrezza": {
+    "bigwin": "I tuoi polsi superano la trappola in un istante.",
+    "win": "Le dita trovano il meccanismo senza esitazione.",
+    "almost": "Un ronzio: il grilletto sfiora il tuo dito.",
+    "fail": "Il meccanismo si blocca prima del previsto.",
+    "epicfail": "La trappola scatta, implacabile."
+   },
+   "Forza": {
+    "bigwin": "La porta cede sotto un colpo terribile.",
+    "win": "Le cerniere cedono con un gemito.",
+    "almost": "Il legno si spacca, ma tiene ancora.",
+    "fail": "La porta resiste, più dura del previsto.",
+    "epicfail": "Il pugno rimbalza, ferendoti."
+   },
+   "Intelletto": {
+    "bigwin": "Le tessere si riuniscono in una verità luminosa.",
+    "win": "L'enigma si apre come una rosa.",
+    "almost": "Un dettaglio sfugge, ma quasi ci sei.",
+    "fail": "La soluzione ti sfugge tra le dita.",
+    "epicfail": "La mente si annebbia di fronte al mistero."
+   },
+   "Carisma": {
+    "bigwin": "Le parole piegano il mondo al tuo volere.",
+    "win": "L'interlocutore cede con un sospiro.",
+    "almost": "Per un istante sembra cedere, poi no.",
+    "fail": "Il tuo tono non trova presa.",
+    "epicfail": "La stanza si fa gelida: sei solo."
+   }
+  }
+ },
+ "stat": {
+  "damage": "Danno",
+  "accuracy": "Precisione",
+  "critChance": "Crit %",
+  "critMult": "Molt. Crit",
+  "armorPen": "Perf. Armatura",
+  "penPercent": "Perf. Resistenza",
+  "armor": "Armatura",
+  "resistance": "Resistenza",
+  "evasion": "Elusione",
+  "block": "Parata",
+  "ward": "Scudo",
+  "energyShield": "Scudo Energ.",
+  "thorns": "Spine",
+  "agility": "Agilità",
+  "regen": "Rigenerazione",
+  "lifesteal": "Assorb. Vita",
+  "movementSpeed": "Velocità",
+  "cooldownReduction": "Rid. Ricarica",
+  "castSpeed": "Vel. Lancio"
+ },
+ "gameFrame": {
+  "title": "Wanderlust",
+  "boot": {
+   "progress": "Avanzamento del caricamento",
+   "error": "Il mondo non ha potuto essere preparato",
+   "phase": {
+    "manifest": "Preparazione del mondo",
+    "assets": "Il mondo prende colore",
+    "build": "Le isole emergono",
+    "warmup": "I venti si destano",
+    "ready": "Pronto"
+   },
+   "logoAlt": "Wanderlust: Triumph"
+  },
+  "nav": {
+   "ariaLabel": "Sezioni di gioco",
+   "village": "Villaggio",
+   "map": "Mappa",
+   "workshop": "Officina",
+   "tavern": "Taverna",
+   "locked": "Non ancora"
+  },
+  "resources": {
+   "gold": "Oro",
+   "food": "Cibo",
+   "wood": "Legno",
+   "incoming": "+{count} in arrivo",
+   "perDay": "−{count}/g",
+   "autonomy": "{count} g",
+   "tooltip": {
+    "amount": "{label} {value}.",
+    "incoming": "In arrivo dalle attività in corso: +{count}.",
+    "food": "{label} {value} su {max}. I residenti ne consumano {perDay} al giorno: basta per {days} giorni."
+   },
+   "iron": "Ferro"
+  },
+  "speed": {
+   "ariaLabel": "Velocità simulazione",
+   "pause": "Pausa",
+   "resume": "Riprendi",
+   "paused": "In pausa",
+   "spaceKey": "Spazio"
+  },
+  "compass": {
+   "recenter": "Ricentra la mappa"
+  },
+  "status": {
+   "dayLabel": "Giorno"
+  },
+  "subtitle": "",
+  "place": "Le Marche Orientali",
+  "invasion": {
+   "body": "Un'orda goblin arriva fra {count} giorni."
+  },
+  "events": {
+   "title": "Eventi",
+   "today": "oggi",
+   "daysLeft": "{count} g",
+   "empty": "Nessun evento all'orizzonte.",
+   "showMore": "Mostra tutti ({count})",
+   "showLess": "Mostra meno",
+   "sort": {
+    "ariaLabel": "Ordina gli eventi",
+    "due": "Scadenza",
+    "type": "Tipo"
+   },
+   "types": {
+    "threat": "Minaccia",
+    "expedition": "Spedizione",
+    "construction": "Cantiere",
+    "harvest": "Raccolto",
+    "visit": "Visita",
+    "other": "Altro",
+    "quest": "Missione"
+   },
+   "fixtures": {
+    "invasion": "L'orda goblin raggiunge il villaggio",
+    "wolves": "Lupi avvistati vicino al bosco antico",
+    "expedition": "La spedizione torna dal nord",
+    "granary": "Granaio completato",
+    "harvest": "Raccolto di grano pronto",
+    "caravan": "Arriva una carovana di mercanti"
+   },
+   "move": "Sposta il pannello"
+  },
+  "questPoi": {
+   "open": "{name} — apri la quest",
+   "decisionWaiting": "La spedizione attende una tua decisione"
+  },
+  "questLog": {
+   "outcome": {
+    "reward": "La spedizione «{quest}» è tornata vittoriosa.",
+    "survived": "La spedizione «{quest}» è tornata al villaggio.",
+    "fled": "La spedizione «{quest}» si è ritirata.",
+    "wipe": "La spedizione «{quest}» non è tornata."
+   },
+   "residentDead": "{name} è caduto in spedizione.",
+   "residentWounded": "{name} è tornato ferito dalla spedizione.",
+   "goldReward": "Ricompensa della missione: +{amount} oro ({quest}).",
+   "goldLoot": "Bottino: +{amount} oro ({quest}).",
+   "xp": "Esperienza della spedizione: +{amount} PE ({quest}).",
+   "residentXp": "{name} ha guadagnato {amount} PE ({quest})."
+  },
+  "questEpilogue": {
+   "title": "Rapporto di spedizione",
+   "dead": "Caduti",
+   "wounded": "Feriti",
+   "consumed": "Spesi e distrutti",
+   "reward": "Ricompensa",
+   "loot": "Bottino",
+   "xp": "Esperienza",
+   "info": "Scoperto",
+   "titles": "Titoli",
+   "diseases": "Malattie",
+   "lore": "Echi del luogo",
+   "goldAmount": "+{amount} oro",
+   "xpAmount": "+{amount} PE",
+   "recovery": "recupero ~{days} g",
+   "memberXp": "{name} +{amount} PE"
+  },
+  "director": {
+   "title": "Regia",
+   "move": "Sposta",
+   "reset": "Reset scena",
+   "invasion": "Invasione goblin",
+   "quest": "Mostra quest",
+   "skin": "Skin: {name}",
+   "poiTypes": "Tipi di POI",
+   "questRun": "Avvia quest goblin",
+   "wonder": "Mostro marino",
+   "settlementLost": "Insediamento perduto",
+   "merchantMarker": "Marcatore mercante",
+   "levelUp": "Level-up eroe"
   },
   "roster": {
-    "status": {
-      "active": "Attivo",
-      "injured": "Ferito",
-      "dead": "Morto",
-      "exhausted": "Esausto",
-      "away": "Fuori",
-      "assigned": "Assegnato"
+   "title": "Roster",
+   "ariaLabel": "Roster dei residenti",
+   "ariaLabelNight": "Roster dei residenti, fase notturna: trascinamento disattivato",
+   "show": "Mostra roster",
+   "hide": "Nascondi roster",
+   "filter": {
+    "ariaLabel": "Filtra i residenti per stato",
+    "all": "Tutti",
+    "heroes": "Eroi",
+    "injured": "Feriti",
+    "available": "Disponibili",
+    "exhausted": "Esausti",
+    "away": "Impegnati",
+    "dead": "Caduti"
+   },
+   "sort": {
+    "ariaLabel": "Ordina i residenti per statistica",
+    "placeholder": "Ordina per…",
+    "asc": "Crescente",
+    "desc": "Decrescente"
+   }
+  },
+  "objective": {
+   "label": "Obiettivo",
+   "available": "Manda una squadra in “{name}”",
+   "running": "“{name}” è in corso",
+   "done": "Ritira le ricompense di “{name}”"
+  },
+  "panel": {
+   "dragHint": "Trascina la barra del titolo per spostare · doppio clic per riportare al suo posto"
+  },
+  "panels": {
+   "title": "Pannelli",
+   "close": "Chiudi pannello",
+   "names": {
+    "roster": "Roster",
+    "events": "Eventi",
+    "director": "Director",
+    "tuning": "Tuning",
+    "quest": "Quest in corso",
+    "heroSheet": "Scheda personaggio",
+    "villageStash": "Magazzino",
+    "merchant": "Mercante"
+   },
+   "pin": "Fissa pannello",
+   "unpin": "Sblocca pannello"
+  },
+  "stash": {
+   "title": "Magazzino del villaggio",
+   "capacity": "{count} di {max} beni in deposito",
+   "qty": "{qty} in deposito"
+  },
+  "buildings": {
+   "stash": {
+    "name": "Magazzino del villaggio"
+   }
+  },
+  "menu": {
+   "title": "Menu",
+   "session": "Partita",
+   "options": "Opzioni",
+   "saveNow": "Salva ora",
+   "saving": "Salvataggio…",
+   "saved": "Salvato",
+   "loadGame": "Carica partita…",
+   "quit": "Esci al titolo",
+   "theme": "Tema",
+   "language": "Lingua",
+   "interfaceSize": "Dimensione interfaccia",
+   "interfaceSizeAuto": "Auto",
+   "interfaceSizeAutoHint": "Automatica: {percent}%",
+   "languages": {
+    "en": "English",
+    "it-IT": "Italiano"
+   },
+   "settings": "Tutte le opzioni…",
+   "comingSoon": "Non ancora disponibile"
+  },
+  "regions": {
+   "northern_forest": "Boschi Sussurranti",
+   "southern_forest": "Bosco Cavo",
+   "eastern_woods": "Boschetti Orientali",
+   "northern_peaks": "Vette del Nord",
+   "eastern_mountains": "Alture di Brace",
+   "southern_mountains": "Rupi del Sud",
+   "islands": "Le Isole Esterne",
+   "village": "Il Villaggio",
+   "meadows": "I Prati"
+  },
+  "tuning": {
+   "reset": "Ripristina valori",
+   "save": "Salva",
+   "saved": "Salvato ✓",
+   "bakeFailed": "Salvato per questo browser — i nuovi default non sono stati scritti nel config (solo dev server)."
+  },
+  "questWindow": {
+   "roster": "Squadra assegnata",
+   "bag": "Sacca",
+   "chronicle": "Cronaca",
+   "minimise": "Riduci a icona",
+   "restore": "Riapri",
+   "waiting": "Decisione in attesa",
+   "phaseLocked": "La fase è ancora in cammino — le sue scelte si aprono quando arriva il suo momento.",
+   "bagEmpty": "Sacca vuota",
+   "bagStrip": {
+    "label": "Borsa preparata",
+    "chipName": "{label} ({qualifier})",
+    "armed": "armato",
+    "held": "portato"
+   },
+   "belt": {
+    "armed": "armato per la prossima prova",
+    "shadowed": "coperto da un altro oggetto armato",
+    "inert": "nessuna prova qui lo richiede",
+    "actionArmed": "verrà usato alla prossima prova o mischia",
+    "passive": "sempre attivo finché è nella sacca"
+   },
+   "logEmpty": "La cronaca è vuota",
+   "partyStatus": "Squadra assegnata — {alive} su {total} in piedi",
+   "dead": "caduto",
+   "hpLost": "−{hp} HP",
+   "loot": "+{count, plural, one {# bottino} other {# bottino}}",
+   "clean": "Illesi",
+   "moreLines": "+{count, plural, one {# altra riga in cronaca} other {# altre righe in cronaca}}",
+   "inProgress": "Fase in corso",
+   "nextPhase": "Prossima fase",
+   "day": "Giorno {day} di {total}",
+   "returned": "Rientrati",
+   "noneReturned": "Nessuno è tornato",
+   "phaseOf": "Fase {n} di {total}",
+   "inProgressShort": "in corso",
+   "hiddenEvent": "Evento nascosto — potevi non trovarlo",
+   "close": "Chiudi il rapporto",
+   "abandon": "Abbandona la quest",
+   "abandonConfirm": "Sei sicuro di voler abbandonare la quest?",
+   "abandonYes": "Abbandona",
+   "abandonStay": "Continua",
+   "checkOptions": "Opzioni della prova",
+   "checkOptionsSkipCheck": "Salta tutta la prova",
+   "checkOptionsSkipIntro": "Salta l'animazione iniziale",
+   "rewardClose": "Chiudi",
+   "rewardHint": "Clicca o premi un tasto per rivelare",
+   "beats": {
+    "continue": "Continua",
+    "clickHint": "Clicca o premi un tasto per continuare",
+    "more": "{count, plural, one {Manca # momento — clicca o premi un tasto} other {Mancano # momenti — clicca o premi un tasto}}",
+    "recap": "Mentre eri via: {scenes} scene, {checks} prove, {deaths} caduti, {wounds} feriti"
+   },
+   "combat": {
+    "enemiesLeft": "{count, plural, one {# goblin in piedi} other {# goblin in piedi}}",
+    "incoming": "{count, plural, one {risponde # colpo} other {rispondono # colpi}}",
+    "exposureHint": "Probabilità di subire il prossimo colpo"
+   },
+   "ticks": "{elapsed}/{total} tick",
+   "checkOverlay": {
+    "titleSuffix": "prova di abilità",
+    "dismiss": "Chiudi",
+    "dismissHint": "Clicca ovunque per continuare — i dettagli restano nel log.",
+    "scoreTitle": "Abilità {{score}} contro difficoltà {{difficulty}}"
+   },
+   "outcomeToast": {
+    "dismiss": "Chiudi esito",
+    "logHint": "Annotato nella cronaca — clicca per chiudere."
+   }
+  },
+  "hud": {
+   "hide": "Nascondi HUD",
+   "show": "Mostra HUD"
+  },
+  "heroSheet": {
+   "prev": "Personaggio precedente",
+   "next": "Personaggio successivo",
+   "pin": "Fissa scheda",
+   "unpin": "Sblocca scheda",
+   "loadout": "Equipaggiamento",
+   "inventory": "Inventario",
+   "inventoryEmpty": "Vuoto"
+  },
+  "merchant": {
+   "title": "Il mercante Rowen",
+   "previewBadge": "Anteprima",
+   "restockNote": "Rowen rifornisce quando la strada è clemente",
+   "markerName": "Bancarella del mercante",
+   "priceLine": "{price} {currency}",
+   "currency": {
+    "gold": "oro"
+   },
+   "buy": {
+    "button": "Compra",
+    "previewLabel": "solo anteprima",
+    "previewTooltip": "Il commercio arriva con l'aggiornamento dell'economia — questa schermata è un'anteprima"
+   },
+   "offers": {
+    "healingDraught": {
+     "name": "Pozioni curative, tre per cassa",
+     "desc": "Vetro verde amaro sigillato in cera — una ferita che si chiude prima che la strada svoli.",
+     "stock": "Una cassa rimasta"
     },
-    "stats": {
-      "hp": "Salute",
-      "stamina": "Resistenza",
-      "xpTitle": "{name} · {xp} PE"
+    "fieldRations": {
+     "name": "Razioni da campo per la lunga marcia",
+     "desc": "Gallette, mele secche e pesce salato — cibo che tiene i nervi saldi più a lungo di te.",
+     "stock": "In abbondanza, finché tengono i forni"
+    },
+    "smokeBomb": {
+     "name": "Bombe fumogene, un paio",
+     "desc": "Gusci d'argilla di polvere grigia — coprono una ritirata che nessuno ricorda di aver fatto.",
+     "stock": "Solo un paio"
+    },
+    "wardCharm": {
+     "name": "Talismano di ferro",
+     "desc": "Un chiodo freddo di ferro meteorico al laccio — fortuna che puoi stringere quando il buio si avvicina.",
+     "stock": "L'ultimo che ha portato a nord"
     }
+   }
   },
-  "questCheckpoint": {
-    "title": "Checkpoint",
-    "summary": "La fase {played} di {total} è alle spalle.",
-    "member": {
-      "alive": "Illeso",
-      "injured": "Ferito",
-      "dead": "Morto"
-    },
-    "continue": "Prosegui",
-    "retreat": "Ritirati",
-    "ifContinue": "Se continui",
-    "ifRetreat": "Se ti ritiri ora"
+  "heroLevel": {
+   "badge": "Lv {n}",
+   "floater": "Livello {n}",
+   "a11y": "Eroe livello {n}"
   },
-  "questOutcome": {
-    "perfect": "Perfetto",
-    "success": "Successo",
-    "partial": "Successo parziale",
-    "fail": "Fallimento",
-    "deadly": "Disastro"
-  },
-  "questS1Lab": {
-    "kicker": "Lab isolato · S1",
-    "kickerRun": "Lab isolato · S1 · seed {seed}",
-    "title": "La cassa delle sementi",
-    "objective": "Obiettivo: riportare la cassa delle sementi dal Passo del Corvo. Il leader deve sopravvivere per ottenere la reward. Scegli la spedizione:",
-    "primaryTrial": "★ Prova di infiltrazione — {stats}",
-    "primaryNote": "quasi tutti i check si risolvono con queste stat",
-    "partyKicker": "Spedizione",
-    "depart": "Parti",
-    "retreat": "Ritirati",
-    "retreatTitle": "Abbandoni la quest: tieni il bottino ma niente reward",
-    "reset": "Reset",
-    "chestRecovered": "Cassa recuperata",
-    "item": {
-      "potion": "Pozione — cura un ferito",
-      "smoke": "Fumogeno — +15 infiltrazione",
-      "rope": "Corda — +15 arrampicata",
-      "bonusForza": "Bonus Forza — +15 a un check",
-      "bonusPerc": "Bonus Percezione — +15 a un check",
-      "healing": "Cura — +20 HP al più ferito",
-      "usePotion": "Pozione → cura {name}"
+  "village": {
+   "ariaLabel": "Villaggio — edifici",
+   "pinsToolbar": "Edifici del villaggio",
+   "levelShort": "Lv {level}",
+   "levelBadge": "Lv {level}/{max}",
+   "effectLabel": "Effetto",
+   "costLabel": "Costo",
+   "daysShort": "{days} g",
+   "openStash": "Apri magazzino",
+   "openMerchant": "Apri mercante",
+   "state": {
+    "built": "Costruito",
+    "buildable": "Costruibile",
+    "locked": "Bloccato"
+   },
+   "category": {
+    "production": "Produzione",
+    "civic": "Civile",
+    "defense": "Difesa",
+    "arcane": "Arcano"
+   },
+   "upgrade": {
+    "build": "Costruisci",
+    "upgrade": "Potenzia",
+    "maxLevel": "Livello massimo",
+    "previewLabel": "solo anteprima",
+    "previewTooltip": "La costruzione arriva con l'aggiornamento dell'economia — questa schermata è un'anteprima"
+   },
+   "buildings": {
+    "lumbermill": {
+     "name": "Taglialegna",
+     "desc": "Ricava legname dai pini a est.",
+     "effect": "Legno al giorno: {value} → {next}"
     },
-    "loot": "Bottino: {items}",
-    "intel": "Info: {items}",
-    "situation": "Situazione",
-    "chronicle": "Cronaca",
-    "advancing": "La spedizione avanza…",
-    "transitSkip": "Clicca per proseguire",
-    "evaluate": "▸ valuta",
-    "successPct": "~{pct}% riuscita",
-    "woundPct": "ferita {pct}%",
-    "deathPct": "morte {pct}%",
-    "bodyguardCovers": "🛡 {name} copre i colpi — ferita {wound}%, morte {death}% per lui",
-    "intelBonus": "✧ Info: {label} (+{bonus})",
-    "consumableAvailable": "✦ {label} disponibile: +{bonus} al tiro",
-    "consumableArmed": "✦ {label} — armato (+{bonus})",
-    "consumableStowed": "✦ {label} — resta nella sacca",
-    "woundedRisk": "già ferito: rischio maggiorato",
-    "slotRisk": "{name} F{wound}% · M{death}%",
-    "faceCheck": "Affronta il check · ~{pct}%",
-    "throwCounter": "Tiro {current} di {total}",
-    "verdictContinue": "{verdict} — continua",
-    "sim": {
-      "open": "PREVISIONE QUEST — cosa succede probabilmente (simulazione)",
-      "pill": "Previsione",
-      "title": "PREVISIONE QUEST — radiografia probabilistica",
-      "runsLabel": "{runs} run simulati",
-      "whyTitle": "PERCHÉ?",
-      "toggleIn": "includi / escludi dalla sim",
-      "makeLeader": "rendi leader",
-      "woundedOn": "ferito ✓",
-      "woundTest": "ferito?",
-      "healthy": "Sano",
-      "wounded": "Ferito",
-      "dead": "Morto",
-      "downtime": "fermo {days}g",
-      "without": "SENZA",
-      "withC": "CON",
-      "bound": "party {value}",
-      "memberOdds": "{name} F{wound}% · M{death}%",
-      "whyCarrier": "{name} porta {stat} ({value})",
-      "whyIntel": "{label} (+{bonus})",
-      "whyConsumable": "{label} pronto (+{bonus})",
-      "whyAlarm": "il campo è sveglio — i check sono più duri",
-      "consumableLater": "se la usi qui, non l'avrai per: {list}",
-      "consumableLast": "nessun check futuro la usa — spenderla è gratis",
-      "whyWounded": "{names} già ferito (+rischio)",
-      "whyCover": "{name} intercetta i colpi",
-      "consequence": {
-        "noHarm": "Nessun danno",
-        "anyWound": "1+ feriti",
-        "anyDeath": "1+ morti",
-        "leaderWound": "Leader ferito",
-        "leaderDeath": "Leader muore"
-      },
-      "cf": {
-        "success": "Successo",
-        "anyWound": "1+ feriti",
-        "anyDeath": "1+ morti"
-      },
-      "outcome": {
-        "reward": "Reward",
-        "survived": "Sopravvissuti",
-        "fled": "Ritirata",
-        "wipe": "Strage"
-      },
-      "deathsTitle": "MORTI",
-      "deathsDist": "0: {zero}% · 1: {one}% · 2+: {twoPlus}%",
-      "avgDeathsOnReward": "x̄ {n} morti su reward",
-      "woundsTitle": "FERITE",
-      "leaderTitle": "LEADER",
-      "leaderLine": "ferito {wound}% · morto {death}%",
-      "timeTitle": "TEMPO",
-      "daysLine": "x̄ {avg}g · {min}–{max}g",
-      "humanDays": "{hd} giorni-uomo · P50 {p50}g P90 {p90}g",
-      "rewardTitle": "RICOMPENSA",
-      "rewardLine": "{gold} oro · {treasure} tesoro · {loot} loot",
-      "opt": {
-        "relic": "reliquia",
-        "guardLoot": "bottino guardie",
-        "chestLoot": "forziere goblin",
-        "viandante": "viandante aiutato"
-      },
-      "strategyTitle": "STRATEGIA SIMULATA",
-      "cp": {
-        "secure": "SICURO",
-        "push": "OLTRE"
-      },
-      "cpLine": "reward {reward}% · morti {death}% · feriti {wound}% · {days}g · tesoro {treasure}",
-      "benchTitle": "PANCA WHAT-IF — ipotetico, non tocca il run",
-      "why": {
-        "statStrong": "{stat} forte — {name} ({value})",
-        "statWeak": "{stat} debole — il migliore è {name} ({value})",
-        "woundedParty": "{count} già feriti — +rischio a ogni check",
-        "bodyguardCover": "il bodyguard intercetta i colpi altrui",
-        "alarm": "il campo è sveglio — ogni check è più duro",
-        "pushDeeper": "la strategia spinge oltre il checkpoint — più reward, più esposizione",
-        "secureStake": "la strategia mette al sicuro la posta al checkpoint",
-        "stakeOnTable": "{value} oro di tesoro già in mano"
-      },
-      "toll": "pedaggio certo: −{amount} HP su {name} (−{epic} se va malissimo)"
+    "quarry": {
+     "name": "Cava",
+     "desc": "Estrae pietra e minerali dalle rupi a ovest.",
+     "effect": "Ferro al giorno: {value} → {next}"
     },
-    "outcome": {
-      "reward": "VITTORIA — reward ottenuta",
-      "survived": "Sopravvissuti — senza reward",
-      "fled": "Fuga — quest fallita, bottino conservato",
-      "wipe": "WIPE — si perde tutto"
+    "farm": {
+     "name": "Fattoria",
+     "desc": "Coltiva il prato lungo il fiume.",
+     "effect": "Cibo al giorno: {value} → {next}"
     },
-    "role": {
-      "leader": "Leader",
-      "bodyguard": "Guardia del corpo",
-      "member": "Membro"
+    "warehouse": {
+     "name": "Magazzino",
+     "desc": "Custodisce le scorte del villaggio sotto chiave.",
+     "effect": "Capacità magazzino: {value} → {next}"
     },
-    "memberState": {
-      "dead": "Morto",
-      "wounded": "Ferito",
-      "fit": "In forze"
+    "inn": {
+     "name": "Locanda",
+     "desc": "Letti caldi e un focolare che attira nuova gente.",
+     "effect": "Capacità abitanti: {value} → {next}"
     },
-    "verdict": {
-      "bigwin": "TRIONFO",
-      "win": "VITTORIA",
-      "almost": "PER UN SOFFIO",
-      "fail": "SCONFITTA",
-      "fail_wound": "SCONFITTA · FERITO",
-      "fail_dead": "SCONFITTA · CADUTO",
-      "epicfail": "ROVINA"
+    "smithy": {
+     "name": "Fucina",
+     "desc": "Forgia attrezzi e equipaggiamento per lavoro e quest.",
+     "effect": "Produzione fucina: {value} → {next}"
     },
-    "gold": "oro",
-    "chestTaken": "Cassa in mano — non al sicuro",
-    "chestLost": "Cassa perduta",
-    "onFail": "Se fallisce: {text}",
-    "camp": {
-      "alerted": "Campo allertato",
-      "awake": "Campo sveglio",
-      "tooltip": "Il campo ha sentito qualcosa. Un altro passo falso ed esplode — e la via tranquilla si chiude."
+    "market": {
+     "name": "Emporio",
+     "desc": "Il banco del mercante sulla piazza del villaggio.",
+     "effect": "Oro al giorno: {value} → {next}"
     },
-    "labTitle": "S1 — Laboratorio quest",
-    "pickQuest": "Scegli la spedizione — una quest scritta a mano, ogni esito ha un prezzo.",
-    "backToQuests": "Tutte le quest",
-    "days": "{days} giorni",
-    "treasureValue": "tesoro ~{value} oro",
-    "risk": {
-      "medium": "Rischio: medio",
-      "high": "Rischio: alto"
+    "infirmary": {
+     "name": "Infermeria",
+     "desc": "Erbe e letti tranquilli per i feriti.",
+     "effect": "Recupero ferite: {value} → {next}",
+     "unlockHint": "Sbloccata tramite una ricompensa di quest."
     },
-    "quests": {
-      "cassa": {
-        "title": "La cassa delle sementi",
-        "desc": "Infiltrazione: entra nel campo goblin, prendi la cassa, escine vivo. Quello che porti può ancora essere perso sulla via d'uscita.",
-        "objective": "Obiettivo: riportare la cassa delle sementi dal Passo del Corvo. Il leader deve sopravvivere per ottenere la ricompensa. Scegli la spedizione:",
-        "duration": "una notte",
-        "trial": "★ Prova di infiltrazione — {stats}"
-      },
-      "rovine": {
-        "title": "Le Rovine sotto il Fiume",
-        "desc": "Esplorazione: attraversa il fiume, supera le guardie, porta fuori il tesoro. Tempo e sangue sono il prezzo — fino a dove ti spingi?",
-        "objective": "Obiettivo: riportare il tesoro dalle rovine sotto il fiume. Ogni stanza in più costa giorni e sangue. Il leader deve sopravvivere. Scegli la spedizione:",
-        "duration": "4–9 giorni",
-        "trial": "★ Prova di forza — {stats}"
-      },
-      "goblin": {
-        "title": "Sterminio dei goblin",
-        "desc": "Combattimento: inseguite i razziatori fino al loro campo e sterminateli. Niente premio furtivo — solo acciaio, e un prezzo per ogni minuto in più passato a frugare.",
-        "objective": "Obiettivo: sterminare i goblin che razziano i confini. Lo scontro si vince nell'avvicinamento — stealth o assalto fissano i termini della battaglia. Scegli la spedizione:",
-        "duration": "un giorno",
-        "trial": "★ Prova di combattimento — {stats}"
-      }
+    "palisade": {
+     "name": "Palizzata",
+     "desc": "Paletti affilati a guardia dell'accesso ovest.",
+     "effect": "Difesa: {value} → {next}"
     },
-    "pace": {
-      "title": "Ritmo della presentazione — si sceglie prima del check",
-      "full": "Intero",
-      "fast": "Veloce"
+    "watchtower": {
+     "name": "Torre di guardia",
+     "desc": "Occhi sull'imbocco della valle.",
+     "effect": "Preavviso raid: {value} → {next} g"
     },
-    "skip": "Salta ▸",
-    "logToggle": "Cronaca",
-    "combatTurn": "turno {turn}/{turns}",
-    "exposureTitle": "Chance di essere colpito da ogni colpo in arrivo: {pct}%",
-    "spent": "Ha già incassato un colpo in questo turno",
-    "horde": {
-      "intentTitle": "Colpi in arrivo il prossimo turno",
-      "remaining": "in piedi {shown}/{total}"
+    "barracks": {
+     "name": "Baraccamento",
+     "desc": "Cuccette e addestramento per la milizia.",
+     "effect": "Capacità milizia: {value} → {next}",
+     "unlockHint": "Richiede Palizzata al livello II."
     },
-    "verdictAck": "Continua",
-    "harmInProgress": "Le conseguenze si abbattono…",
-    "resolving": "Risoluzione in corso",
-    "belt": {
-      "label": "Cintura",
-      "armTitle": "Armato: il consumabile adatto si spende sul prossimo check — le opzioni mostrano il delta"
+    "mageTower": {
+     "name": "Torre del Mago",
+     "desc": "Una guglia storta dove la strega del villaggio legge il vento.",
+     "effect": "Ricerca al giorno: {value} → {next}"
     },
-    "consumableDelta": "{base}→{armed} ✦",
-    "stash": {
-      "title": "La sacca",
-      "hint": "Cosa porti — {used}/{slots} posti",
-      "coverage": "Copre",
-      "desc": {
-        "bonusForza": "+15 ai check di Forza",
-        "bonusPerc": "+15 ai check di Percezione",
-        "smoke": "+15 ai check di Agilità",
-        "rope": "+15 ai check di Forza o Costituzione",
-        "healing": "+20 HP al membro più ferito — si usa prima di un check",
-        "potion": "Cura completamente un membro ferito",
-        "banner": "Vessillo del Guardiano — lo porta il leader: −6% ferita, −4% morte per ogni altro membro finché resta in piedi"
-      }
+    "adventurersGuild": {
+     "name": "Gilda degli Avventurieri",
+     "desc": "Una sala di mappe, contratti e abitué segnati dalle cicatrici.",
+     "effect": "Slot quest: +{value} → +{next}",
+     "unlockHint": "Sbloccata completando la prima quest line."
+    },
+    "sanctuary": {
+     "name": "Santuario",
+     "desc": "Un sacrario al lume di candela per i caduti e i fedeli.",
+     "effect": "Bonus morale: +{value} → +{next}",
+     "unlockHint": "Richiede la ricompensa della quest del Santuario."
+    },
+    "alchemist": {
+     "name": "Alchimista",
+     "desc": "Fiale che ribollono e polveri che mordono.",
+     "effect": "Pozioni al giorno: {value} → {next}",
+     "unlockHint": "Richiede un tomo alchemico recuperato."
+    },
+    "cemetery": {
+     "name": "Cimitero",
+     "desc": "File silenziose di pietre ai piedi della collina.",
+     "effect": "Memoria: {value} → {next}",
+     "unlockHint": "Richiede il Santuario."
     }
-  },
-  "questGenLab": {
-    "title": "Quest Generation Lab",
-    "subtitle": "Banco di prova della generazione quest (PLAN-026): come nasce una quest, con quali ingredienti, come si gioca e cosa cambia dopo. Gli stati segnano cosa gira davvero, cosa vive solo offline e cosa manca.",
-    "backToHub": "Test Hub",
-    "footer": "Quest Generation Lab · contenuto authored in italiano · R-140",
-    "sections": {
-      "pipeline": "Come nasce una quest",
-      "pipelineDesc": "L'albero di creazione: dall'input al run concluso. Apri ogni passo per dettagli, file e stato reale.",
-      "ingredients": "Ingredienti",
-      "ingredientsDesc": "Gimmick core, domain kit (il «tag» del mondo), trait dei PG, twist e glossario delle meccaniche.",
-      "catalog": "Catalogo generato",
-      "catalogDesc": "Gli scenari pre-generati del catalogo v0: metadati, albero dei nodi e run giocabile sul motore reale (profilo gen).",
-      "consequences": "Cosa cambia dopo",
-      "consequencesDesc": "La matrice delle conseguenze: party, villaggio, fazioni, mondo, quest future — cosa esiste e cosa no.",
-      "systems": "Mappa dell'implementazione",
-      "systemsDesc": "Ogni sottosistema: dove vive, cosa cambia meccanicamente, quali test lo coprono.",
-      "open": "Cosa manca / decisioni aperte",
-      "openDesc": "Le cose facili da dimenticare: tassonomia dei tag, soglie, archi narrativi, canali, offerte ignorate."
+   },
+   "title": "Villaggio",
+   "builtCount": "{built} di {total} costruiti",
+   "legend": {
+    "title": "Legenda",
+    "badgeLevel": "livello costruito",
+    "badgeBuild": "costruibile",
+    "badgeLocked": "bloccato",
+    "keys": "← → edifici · Invio dettagli · Esc mappa"
+   },
+   "registry": {
+    "chip": "Registro",
+    "pending": "{count} da costruire o sbloccare",
+    "title": "Registro dell'Insediamento",
+    "hint": "Esc per chiudere",
+    "filterLabel": "Filtra edifici",
+    "filter": {
+     "all": "Tutti",
+     "built": "Costruiti",
+     "buildable": "Costruibili",
+     "locked": "Bloccati"
     },
-    "tabs": {
-      "gimmicks": "Gimmick",
-      "kits": "Kit & tag",
-      "traits": "Trait",
-      "twists": "Twist",
-      "mechanics": "Meccaniche"
-    },
-    "status": {
-      "implemented": "implementato",
-      "partial": "parziale",
-      "offline": "offline",
-      "gated": "gated",
-      "proposal": "proposta",
-      "missing": "mancante"
-    },
-    "labels": {
-      "reads": "legge",
-      "writes": "scrive",
-      "resolution": "risoluzione",
-      "twists": "twist",
-      "scenes": "scene",
-      "scenarios": "scenari",
-      "authored": "authored",
-      "narrated": "narrato",
-      "options": "opzioni",
-      "runstart": "inizio run",
-      "inRun": "in-run",
-      "objective": "obiettivo",
-      "primaryStats": "stat primarie",
-      "tags": "tag",
-      "mechanicsUsed": "meccaniche usate",
-      "traitsUsed": "trait usati",
-      "tree": "albero dei nodi",
-      "play": "gioca"
-    },
-    "play": {
-      "setup": "prepara il run",
-      "preset": "party preset",
-      "seed": "seed",
-      "start": "avvia run",
-      "gold": "oro",
-      "flags": "flag",
-      "intel": "intel",
-      "loot": "bottino",
-      "chronicle": "cronaca",
-      "flee": "ritirata",
-      "reset": "reset",
-      "newRun": "nuovo run",
-      "outcome": {
-        "reward": "Ricompensa",
-        "survived": "Sopravvissuti",
-        "fled": "Fuga",
-        "wipe": "Strage"
-      },
-      "objectiveDone": "obiettivo completato",
-      "settlement": "settlement — effetti sul mondo",
-      "epilogue": "epilogo",
-      "roll": "tiro",
-      "success": "successo",
-      "wound": "ferita",
-      "death": "morte",
-      "continue": "continua"
-    }
-  },
-  "questExpedition": {
-    "danger": "Pericolo",
-    "duration": "Durata stimata ~{ticks} tick",
-    "send": "Invia spedizione",
-    "loadout": "Sacca — {count}/{max}",
-    "forecast": {
-      "title": "Previsione",
-      "resolving": "Risoluzione dell'offerta…",
-      "computing": "Stima in corso…",
-      "incomplete": "Assegna gli slot richiesti per una stima.",
-      "reward": "Riuscita {pct}%",
-      "wound": "Ferite {pct}%",
-      "death": "Morti {pct}%",
-      "wipe": "Strage {pct}%"
-    },
-    "members": {
-      "title": "Per membro",
-      "row": "ferite {wound}% · morti {death}%",
-      "downtime": "≈{days}g fermo",
-      "role": {
-        "leader": "leader",
-        "bodyguard": "guardia",
-        "member": "membro"
-      }
-    },
-    "why": {
-      "title": "Da dove viene il rischio",
-      "row": "— nel {runs}% dei run · {death}% delle morti · {wound}% delle ferite"
-    },
-    "intel": {
-      "title": "Informazioni",
-      "scouted": "esplorato"
-    },
-    "item": {
-      "draftHorse": "Una cavalcatura per tutta la spedizione — dimezza il passo di ogni tratto.",
-      "healingDraught": "−10% di ferita a ogni check di tutti i membri.",
-      "luckyCoin": "+10% alla ricompensa della spedizione."
-    },
-    "bag": {
-      "openPicker": "Scegli oggetti del villaggio",
-      "pickerTitle": "Magazzino del villaggio",
-      "covers": "Copre:",
-      "stock": "In magazzino: ×{qty}",
-      "emptySlot": "Slot bisaccia vuoto {index}",
-      "removeSlot": "Rimuovi {item}"
-    },
-    "keyStats": {
-      "title": "Stat chiave",
-      "primary": "Primaria",
-      "secondary": "Secondaria"
-    },
-    "statName": {
-      "str": "Forza",
-      "perc": "Percezione",
-      "con": "Costituzione",
-      "agi": "Destrezza",
-      "int": "Intelligenza",
-      "cha": "Carisma"
-    },
-    "coverage": "Copre"
-  },
-  "questOffer": {
-    "band": {
-      "bassa": "Bassa",
-      "media": "Media",
-      "alta": "Alta",
-      "letale": "Letale"
-    },
-    "tier": {
-      "magra": "Magra",
-      "discreta": "Discreta",
-      "ricca": "Ricca",
-      "leggendaria": "Leggendaria"
-    }
+    "sectionCount": "{built}/{total}",
+    "onMap": "Sulla mappa",
+    "offMap": "Solo nel registro",
+    "back": "Indietro",
+    "effectLadder": "Effetti per livello"
+   }
   }
+ },
+ "missionPlanner": {
+  "band": {
+   "odds": {
+    "high": "Probabile",
+    "mid": "Incerto",
+    "low": "Improbabile"
+   },
+   "risk": {
+    "high": "Alto",
+    "mid": "Moderato",
+    "low": "Basso"
+   }
+  },
+  "required": "obbligatorio",
+  "ifEmpty": "Se resta vuoto:",
+  "modifier": {
+   "death": "Morte",
+   "injury": "Ferita",
+   "power": "Potenza"
+  },
+  "title": "Planner",
+  "subtitle": "Ogni modifica aggiorna subito gli esiti",
+  "input": "Input",
+  "output": "Esiti",
+  "party": "Party",
+  "outcome": "Esito",
+  "success": "Successo",
+  "injury": "Ferita",
+  "death": "Morte",
+  "duration": "Durata",
+  "phases": "Per fase",
+  "byMember": "Per membro",
+  "why": "Perché",
+  "hp": "PV",
+  "launch": "Parti",
+  "addMember": "Aggiungi al party",
+  "noLoadout": "Nessun equipaggiamento",
+  "remove": "Rimuovi {name}",
+  "trend": {
+   "better": "migliora",
+   "worse": "peggiora",
+   "same": "invariato"
+  },
+  "items": {
+   "draftHorse": "Cavallo da Tiro",
+   "ironBlade": "Lama di Ferro",
+   "heavyPlate": "Piastra Pesante",
+   "guardianBanner": "Vessillo del Guardiano",
+   "healingDraught": "Pozione Curativa",
+   "luckyCoin": "Moneta Fortunata"
+  },
+  "eyebrow": "Piano di spedizione",
+  "route": "Il cammino",
+  "rule": "Successo = superare almeno metà delle prove",
+  "stage": "Prova {n}",
+  "hoursShort": "h",
+  "perMemberRoll": "Rischio base per membro, tirato a ogni prova",
+  "company": "La compagnia",
+  "available": "Disponibili",
+  "provisions": "Provviste",
+  "anyDeath": "Almeno un caduto",
+  "anyInjury": "Almeno un ferito",
+  "reward": "Ricompensa attesa",
+  "undo": "Annulla",
+  "reset": "Ripristina",
+  "pickFromRoster": "Scegli qualcuno tra i disponibili",
+  "unavailable": "non disponibile",
+  "haloHint": "Anello esterno: morte · anello interno: ferita",
+  "whyEmpty": "Forma la compagnia per vedere cosa decide l’esito.",
+  "phaseType": {
+   "check": "Prova",
+   "fight": "Scontro",
+   "trap": "Trappola",
+   "event": "Evento"
+  },
+  "equipSlot": {
+   "weapon": "Arma",
+   "armor": "Armatura",
+   "mount": "Cavalcatura",
+   "trinket": "Amuleto"
+  },
+  "metric": {
+   "success": "Successo",
+   "injury": "Ferita",
+   "death": "Morte",
+   "duration": "Durata",
+   "reward": "Ricompensa"
+  },
+  "cause": {
+   "stat": "{who} · {stat}",
+   "slot": "{slot} ({who})",
+   "emptyPenalty": "Slot vuoti",
+   "cover": "Protezione di {who}"
+  },
+  "stat": {
+   "strength": "Forza",
+   "agility": "Agilità",
+   "perception": "Percezione",
+   "intelligence": "Intelligenza",
+   "endurance": "Resistenza"
+  },
+  "issue": {
+   "EMPTY_REQUIRED_SLOT": "Mancano membri negli slot obbligatori",
+   "RESIDENT_MISSING": "Un membro non è più disponibile",
+   "ITEM_UNKNOWN": "Oggetto sconosciuto",
+   "ITEM_SLOT_MISMATCH": "Oggetto nello slot sbagliato",
+   "CONSUMABLE_OVER_STOCK": "Provviste insufficienti",
+   "PARTY_TOO_LARGE": "Compagnia troppo numerosa"
+  },
+  "hours": "{count} ore",
+  "loadout": "Equipaggiamento",
+  "open": "Pianificatore missione",
+  "phase": {
+   "memberRisk": "per membro ⚕ {inj}% · ☠ {dth}%",
+   "surviveThrough": "superstiti dopo: {pct}%",
+   "retreat": "ritiro → {tier} ({pct}%)"
+  }
+ },
+ "roster": {
+  "status": {
+   "active": "Attivo",
+   "injured": "Ferito",
+   "dead": "Morto",
+   "exhausted": "Esausto",
+   "away": "Fuori",
+   "assigned": "Assegnato"
+  },
+  "stats": {
+   "hp": "Salute",
+   "stamina": "Resistenza",
+   "xpTitle": "{name} · {xp} PE"
+  }
+ },
+ "questCheckpoint": {
+  "title": "Checkpoint",
+  "summary": "La fase {played} di {total} è alle spalle.",
+  "member": {
+   "alive": "Illeso",
+   "injured": "Ferito",
+   "dead": "Morto"
+  },
+  "continue": "Prosegui",
+  "retreat": "Ritirati",
+  "ifContinue": "Se continui",
+  "ifRetreat": "Se ti ritiri ora"
+ },
+ "questOutcome": {
+  "perfect": "Perfetto",
+  "success": "Successo",
+  "partial": "Successo parziale",
+  "fail": "Fallimento",
+  "deadly": "Disastro"
+ },
+ "questS1Lab": {
+  "kicker": "Lab isolato · S1",
+  "kickerRun": "Lab isolato · S1 · seed {seed}",
+  "title": "La cassa delle sementi",
+  "objective": "Obiettivo: riportare la cassa delle sementi dal Passo del Corvo. Il leader deve sopravvivere per ottenere la reward. Scegli la spedizione:",
+  "primaryTrial": "★ Prova di infiltrazione — {stats}",
+  "primaryNote": "quasi tutti i check si risolvono con queste stat",
+  "partyKicker": "Spedizione",
+  "depart": "Parti",
+  "retreat": "Ritirati",
+  "retreatTitle": "Abbandoni la quest: tieni il bottino ma niente reward",
+  "reset": "Reset",
+  "chestRecovered": "Cassa recuperata",
+  "item": {
+   "potion": "Pozione — cura un ferito",
+   "smoke": "Fumogeno — +15 infiltrazione",
+   "rope": "Corda — +15 arrampicata",
+   "bonusForza": "Bonus Forza — +15 a un check",
+   "bonusPerc": "Bonus Percezione — +15 a un check",
+   "healing": "Cura — +20 HP al più ferito",
+   "usePotion": "Pozione → cura {name}"
+  },
+  "loot": "Bottino: {items}",
+  "intel": "Info: {items}",
+  "situation": "Situazione",
+  "chronicle": "Cronaca",
+  "advancing": "La spedizione avanza…",
+  "transitSkip": "Clicca per proseguire",
+  "evaluate": "▸ valuta",
+  "successPct": "~{pct}% riuscita",
+  "woundPct": "ferita {pct}%",
+  "deathPct": "morte {pct}%",
+  "bodyguardCovers": "🛡 {name} copre i colpi — ferita {wound}%, morte {death}% per lui",
+  "intelBonus": "✧ Info: {label} (+{bonus})",
+  "consumableAvailable": "✦ {label} disponibile: +{bonus} al tiro",
+  "consumableArmed": "✦ {label} — armato (+{bonus})",
+  "consumableStowed": "✦ {label} — resta nella sacca",
+  "woundedRisk": "già ferito: rischio maggiorato",
+  "slotRisk": "{name} F{wound}% · M{death}%",
+  "faceCheck": "Affronta il check · ~{pct}%",
+  "throwCounter": "Tiro {current} di {total}",
+  "verdictContinue": "{verdict} — continua",
+  "sim": {
+   "open": "PREVISIONE QUEST — cosa succede probabilmente (simulazione)",
+   "pill": "Previsione",
+   "title": "PREVISIONE QUEST — radiografia probabilistica",
+   "runsLabel": "{runs} run simulati",
+   "whyTitle": "PERCHÉ?",
+   "toggleIn": "includi / escludi dalla sim",
+   "makeLeader": "rendi leader",
+   "woundedOn": "ferito ✓",
+   "woundTest": "ferito?",
+   "healthy": "Sano",
+   "wounded": "Ferito",
+   "dead": "Morto",
+   "downtime": "fermo {days}g",
+   "without": "SENZA",
+   "withC": "CON",
+   "bound": "party {value}",
+   "memberOdds": "{name} F{wound}% · M{death}%",
+   "whyCarrier": "{name} porta {stat} ({value})",
+   "whyIntel": "{label} (+{bonus})",
+   "whyConsumable": "{label} pronto (+{bonus})",
+   "whyAlarm": "il campo è sveglio — i check sono più duri",
+   "consumableLater": "se la usi qui, non l'avrai per: {list}",
+   "consumableLast": "nessun check futuro la usa — spenderla è gratis",
+   "whyWounded": "{names} già ferito (+rischio)",
+   "whyCover": "{name} intercetta i colpi",
+   "consequence": {
+    "noHarm": "Nessun danno",
+    "anyWound": "1+ feriti",
+    "anyDeath": "1+ morti",
+    "leaderWound": "Leader ferito",
+    "leaderDeath": "Leader muore"
+   },
+   "cf": {
+    "success": "Successo",
+    "anyWound": "1+ feriti",
+    "anyDeath": "1+ morti"
+   },
+   "outcome": {
+    "reward": "Reward",
+    "survived": "Sopravvissuti",
+    "fled": "Ritirata",
+    "wipe": "Strage"
+   },
+   "deathsTitle": "MORTI",
+   "deathsDist": "0: {zero}% · 1: {one}% · 2+: {twoPlus}%",
+   "avgDeathsOnReward": "x̄ {n} morti su reward",
+   "woundsTitle": "FERITE",
+   "leaderTitle": "LEADER",
+   "leaderLine": "ferito {wound}% · morto {death}%",
+   "timeTitle": "TEMPO",
+   "daysLine": "x̄ {avg}g · {min}–{max}g",
+   "humanDays": "{hd} giorni-uomo · P50 {p50}g P90 {p90}g",
+   "rewardTitle": "RICOMPENSA",
+   "rewardLine": "{gold} oro · {treasure} tesoro · {loot} loot",
+   "opt": {
+    "relic": "reliquia",
+    "guardLoot": "bottino guardie",
+    "chestLoot": "forziere goblin",
+    "viandante": "viandante aiutato"
+   },
+   "strategyTitle": "STRATEGIA SIMULATA",
+   "cp": {
+    "secure": "SICURO",
+    "push": "OLTRE"
+   },
+   "cpLine": "reward {reward}% · morti {death}% · feriti {wound}% · {days}g · tesoro {treasure}",
+   "benchTitle": "PANCA WHAT-IF — ipotetico, non tocca il run",
+   "why": {
+    "statStrong": "{stat} forte — {name} ({value})",
+    "statWeak": "{stat} debole — il migliore è {name} ({value})",
+    "woundedParty": "{count} già feriti — +rischio a ogni check",
+    "bodyguardCover": "il bodyguard intercetta i colpi altrui",
+    "alarm": "il campo è sveglio — ogni check è più duro",
+    "pushDeeper": "la strategia spinge oltre il checkpoint — più reward, più esposizione",
+    "secureStake": "la strategia mette al sicuro la posta al checkpoint",
+    "stakeOnTable": "{value} oro di tesoro già in mano"
+   },
+   "toll": "pedaggio certo: −{amount} HP su {name} (−{epic} se va malissimo)"
+  },
+  "outcome": {
+   "reward": "VITTORIA — reward ottenuta",
+   "survived": "Sopravvissuti — senza reward",
+   "fled": "Fuga — quest fallita, bottino conservato",
+   "wipe": "WIPE — si perde tutto"
+  },
+  "role": {
+   "leader": "Leader",
+   "bodyguard": "Guardia del corpo",
+   "member": "Membro"
+  },
+  "memberState": {
+   "dead": "Morto",
+   "wounded": "Ferito",
+   "fit": "In forze"
+  },
+  "verdict": {
+   "bigwin": "TRIONFO",
+   "win": "VITTORIA",
+   "almost": "PER UN SOFFIO",
+   "fail": "SCONFITTA",
+   "fail_wound": "SCONFITTA · FERITO",
+   "fail_dead": "SCONFITTA · CADUTO",
+   "epicfail": "ROVINA"
+  },
+  "gold": "oro",
+  "chestTaken": "Cassa in mano — non al sicuro",
+  "chestLost": "Cassa perduta",
+  "onFail": "Se fallisce: {text}",
+  "camp": {
+   "alerted": "Campo allertato",
+   "awake": "Campo sveglio",
+   "tooltip": "Il campo ha sentito qualcosa. Un altro passo falso ed esplode — e la via tranquilla si chiude."
+  },
+  "labTitle": "S1 — Laboratorio quest",
+  "pickQuest": "Scegli la spedizione — una quest scritta a mano, ogni esito ha un prezzo.",
+  "backToQuests": "Tutte le quest",
+  "days": "{days} giorni",
+  "treasureValue": "tesoro ~{value} oro",
+  "risk": {
+   "medium": "Rischio: medio",
+   "high": "Rischio: alto"
+  },
+  "quests": {
+   "cassa": {
+    "title": "La cassa delle sementi",
+    "desc": "Infiltrazione: entra nel campo goblin, prendi la cassa, escine vivo. Quello che porti può ancora essere perso sulla via d'uscita.",
+    "objective": "Obiettivo: riportare la cassa delle sementi dal Passo del Corvo. Il leader deve sopravvivere per ottenere la ricompensa. Scegli la spedizione:",
+    "duration": "una notte",
+    "trial": "★ Prova di infiltrazione — {stats}"
+   },
+   "rovine": {
+    "title": "Le Rovine sotto il Fiume",
+    "desc": "Esplorazione: attraversa il fiume, supera le guardie, porta fuori il tesoro. Tempo e sangue sono il prezzo — fino a dove ti spingi?",
+    "objective": "Obiettivo: riportare il tesoro dalle rovine sotto il fiume. Ogni stanza in più costa giorni e sangue. Il leader deve sopravvivere. Scegli la spedizione:",
+    "duration": "4–9 giorni",
+    "trial": "★ Prova di forza — {stats}"
+   },
+   "goblin": {
+    "title": "Sterminio dei goblin",
+    "desc": "Combattimento: inseguite i razziatori fino al loro campo e sterminateli. Niente premio furtivo — solo acciaio, e un prezzo per ogni minuto in più passato a frugare.",
+    "objective": "Obiettivo: sterminare i goblin che razziano i confini. Lo scontro si vince nell'avvicinamento — stealth o assalto fissano i termini della battaglia. Scegli la spedizione:",
+    "duration": "un giorno",
+    "trial": "★ Prova di combattimento — {stats}"
+   }
+  },
+  "pace": {
+   "title": "Ritmo della presentazione — si sceglie prima del check",
+   "full": "Intero",
+   "fast": "Veloce"
+  },
+  "skip": "Salta ▸",
+  "logToggle": "Cronaca",
+  "combatTurn": "turno {turn}/{turns}",
+  "exposureTitle": "Chance di essere colpito da ogni colpo in arrivo: {pct}%",
+  "spent": "Ha già incassato un colpo in questo turno",
+  "horde": {
+   "intentTitle": "Colpi in arrivo il prossimo turno",
+   "remaining": "in piedi {shown}/{total}"
+  },
+  "verdictAck": "Continua",
+  "harmInProgress": "Le conseguenze si abbattono…",
+  "resolving": "Risoluzione in corso",
+  "belt": {
+   "label": "Cintura",
+   "armTitle": "Armato: il consumabile adatto si spende sul prossimo check — le opzioni mostrano il delta"
+  },
+  "consumableDelta": "{base}→{armed} ✦",
+  "stash": {
+   "title": "La sacca",
+   "hint": "Cosa porti — {used}/{slots} posti",
+   "coverage": "Copre",
+   "desc": {
+    "bonusForza": "+15 ai check di Forza",
+    "bonusPerc": "+15 ai check di Percezione",
+    "smoke": "+15 ai check di Agilità",
+    "rope": "+15 ai check di Forza o Costituzione",
+    "healing": "+20 HP al membro più ferito — si usa prima di un check",
+    "potion": "Cura completamente un membro ferito",
+    "banner": "Vessillo del Guardiano — lo porta il leader: −6% ferita, −4% morte per ogni altro membro finché resta in piedi"
+   }
+  }
+ },
+ "questGenLab": {
+  "title": "Quest Generation Lab",
+  "subtitle": "Banco di prova della generazione quest (PLAN-026): come nasce una quest, con quali ingredienti, come si gioca e cosa cambia dopo. Gli stati segnano cosa gira davvero, cosa vive solo offline e cosa manca.",
+  "backToHub": "Test Hub",
+  "footer": "Quest Generation Lab · contenuto authored in italiano · R-140",
+  "sections": {
+   "pipeline": "Come nasce una quest",
+   "pipelineDesc": "L'albero di creazione: dall'input al run concluso. Apri ogni passo per dettagli, file e stato reale.",
+   "ingredients": "Ingredienti",
+   "ingredientsDesc": "Gimmick core, domain kit (il «tag» del mondo), trait dei PG, twist e glossario delle meccaniche.",
+   "catalog": "Catalogo generato",
+   "catalogDesc": "Gli scenari pre-generati del catalogo v0: metadati, albero dei nodi e run giocabile sul motore reale (profilo gen).",
+   "consequences": "Cosa cambia dopo",
+   "consequencesDesc": "La matrice delle conseguenze: party, villaggio, fazioni, mondo, quest future — cosa esiste e cosa no.",
+   "systems": "Mappa dell'implementazione",
+   "systemsDesc": "Ogni sottosistema: dove vive, cosa cambia meccanicamente, quali test lo coprono.",
+   "open": "Cosa manca / decisioni aperte",
+   "openDesc": "Le cose facili da dimenticare: tassonomia dei tag, soglie, archi narrativi, canali, offerte ignorate."
+  },
+  "tabs": {
+   "gimmicks": "Gimmick",
+   "kits": "Kit & tag",
+   "traits": "Trait",
+   "twists": "Twist",
+   "mechanics": "Meccaniche"
+  },
+  "status": {
+   "implemented": "implementato",
+   "partial": "parziale",
+   "offline": "offline",
+   "gated": "gated",
+   "proposal": "proposta",
+   "missing": "mancante"
+  },
+  "labels": {
+   "reads": "legge",
+   "writes": "scrive",
+   "resolution": "risoluzione",
+   "twists": "twist",
+   "scenes": "scene",
+   "scenarios": "scenari",
+   "authored": "authored",
+   "narrated": "narrato",
+   "options": "opzioni",
+   "runstart": "inizio run",
+   "inRun": "in-run",
+   "objective": "obiettivo",
+   "primaryStats": "stat primarie",
+   "tags": "tag",
+   "mechanicsUsed": "meccaniche usate",
+   "traitsUsed": "trait usati",
+   "tree": "albero dei nodi",
+   "play": "gioca"
+  },
+  "play": {
+   "setup": "prepara il run",
+   "preset": "party preset",
+   "seed": "seed",
+   "start": "avvia run",
+   "gold": "oro",
+   "flags": "flag",
+   "intel": "intel",
+   "loot": "bottino",
+   "chronicle": "cronaca",
+   "flee": "ritirata",
+   "reset": "reset",
+   "newRun": "nuovo run",
+   "outcome": {
+    "reward": "Ricompensa",
+    "survived": "Sopravvissuti",
+    "fled": "Fuga",
+    "wipe": "Strage"
+   },
+   "objectiveDone": "obiettivo completato",
+   "settlement": "settlement — effetti sul mondo",
+   "epilogue": "epilogo",
+   "roll": "tiro",
+   "success": "successo",
+   "wound": "ferita",
+   "death": "morte",
+   "continue": "continua"
+  }
+ },
+ "questExpedition": {
+  "danger": "Pericolo",
+  "duration": "Durata stimata ~{ticks} tick",
+  "send": "Invia spedizione",
+  "loadout": "Sacca — {count}/{max}",
+  "forecast": {
+   "title": "Previsione",
+   "resolving": "Risoluzione dell'offerta…",
+   "computing": "Stima in corso…",
+   "incomplete": "Assegna gli slot richiesti per una stima.",
+   "reward": "Riuscita {pct}%",
+   "wound": "Ferite {pct}%",
+   "death": "Morti {pct}%",
+   "wipe": "Strage {pct}%"
+  },
+  "members": {
+   "title": "Per membro",
+   "row": "ferite {wound}% · morti {death}%",
+   "downtime": "≈{days}g fermo",
+   "role": {
+    "leader": "leader",
+    "bodyguard": "guardia",
+    "member": "membro"
+   }
+  },
+  "why": {
+   "title": "Da dove viene il rischio",
+   "row": "— nel {runs}% dei run · {death}% delle morti · {wound}% delle ferite"
+  },
+  "intel": {
+   "title": "Informazioni",
+   "scouted": "esplorato"
+  },
+  "item": {
+   "draftHorse": "Una cavalcatura per tutta la spedizione — dimezza il passo di ogni tratto.",
+   "healingDraught": "−10% di ferita a ogni check di tutti i membri.",
+   "luckyCoin": "+10% alla ricompensa della spedizione."
+  },
+  "bag": {
+   "openPicker": "Scegli oggetti del villaggio",
+   "pickerTitle": "Magazzino del villaggio",
+   "covers": "Copre:",
+   "stock": "In magazzino: ×{qty}",
+   "emptySlot": "Slot bisaccia vuoto {index}",
+   "removeSlot": "Rimuovi {item}"
+  },
+  "keyStats": {
+   "title": "Stat chiave",
+   "primary": "Primaria",
+   "secondary": "Secondaria"
+  },
+  "statName": {
+   "str": "Forza",
+   "perc": "Percezione",
+   "con": "Costituzione",
+   "agi": "Destrezza",
+   "int": "Intelligenza",
+   "cha": "Carisma"
+  },
+  "coverage": "Copre"
+ },
+ "questOffer": {
+  "band": {
+   "bassa": "Bassa",
+   "media": "Media",
+   "alta": "Alta",
+   "letale": "Letale"
+  },
+  "tier": {
+   "magra": "Magra",
+   "discreta": "Discreta",
+   "ricca": "Ricca",
+   "leggendaria": "Leggendaria"
+  }
+ }
 }

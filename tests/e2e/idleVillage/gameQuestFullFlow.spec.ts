@@ -117,6 +117,22 @@ const planner = (page: Page) => page.getByTestId(`floating-panel-quest-expeditio
 const sendButton = (page: Page) => page.getByTestId('quest-expedition-send');
 const questWindow = (page: Page) => page.getByTestId('quest-window');
 const closeReport = (page: Page) => page.getByTestId('quest-window-close-report');
+/* R-199 pt.14: il rapporto di ritorno vive nel `quest-reward-popup` — placca
+ *  centrata sopra la window che copre `quest-window-close-report`. Chiuderlo
+ *  è il dismissal canonico (`closeReward` → run sganciata, POI reso). */
+const dismissReport = async (page: Page) => {
+  const popup = page.getByTestId('quest-reward-popup');
+  if (await popup.isVisible()) {
+    const stagedClose = popup.getByTestId('quest-reward-close');
+    if (await stagedClose.isVisible()) {
+      await stagedClose.click();
+    } else {
+      await popup.locator('[data-hud-controls] button').first().click();
+    }
+    return;
+  }
+  await closeReport(page).click();
+};
 const speed = (page: Page, mult: 1 | 2 | 4) => page.locator('[role="radiogroup"]').getByRole('radio', { name: `×${mult}` });
 
 const goldReadout = async (page: Page): Promise<number> => {
@@ -158,25 +174,40 @@ async function dragFromRoster(page: Page, residentId: string, slotId: string) {
 
 /**
  * Drag reale del TOKEN già nello slot verso un altro slot (R-183 swap).
- * Movimento rapido (> 8 px entro i 560 ms dell'estrazione press-and-hold):
- * è un trascinamento, non un'estrazione. `onMidway` gira a metà strada,
- * col token in aria — per lo screenshot.
+ * Tre punti delicati:
+ * - il DndContext usa `pointerWithin`: `over` è il droppable sotto il
+ *   PUNTATORE, non il token — si mira al centro di `slot-button-*` (il
+ *   setNodeRef di useDroppable), non al wrapper `data-slot-id` i cui margini
+ *   (label sotto il cerchio) davano `over: null` → drop perso in silenzio;
+ * - l'attivazione è a 8 px: il primo move supera subito la soglia, perché
+ *   sullo stesso mousedown corre il press-and-hold di estrazione (~560 ms);
+ * - il rilascio deve trovare `over` già risolto: micro-move + settle finale
+ *   così l'ultimo collision tick registra il puntatore dentro il target.
+ * `onMidway` gira col puntatore FERMO SOPRA il target e il drag ancora
+ * attivo — il momento in cui lo slot mostra il verdetto `data-drop-state`.
  */
 async function dragSlotToken(page: Page, fromSlot: string, toSlot: string, onMidway?: () => Promise<void>) {
   const token = page.getByTestId(`slot-token-${fromSlot}`);
-  const target = page.locator(`[data-slot-id="${toSlot}"]`).first();
+  const target = page.getByTestId(`slot-button-${toSlot}`);
   const a = await token.boundingBox();
   const b = await target.boundingBox();
   if (!a || !b) throw new Error('slot token / target not measurable');
   const from = { x: a.x + a.width / 2, y: a.y + a.height / 2 };
-  const to = { x: b.x + b.width / 2, y: b.y + b.height / 3 };
+  const to = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
-  const steps = 10;
+  /* supera gli 8px di attivazione prima che il hold di estrazione maturi */
+  const kick = { x: from.x + (to.x >= from.x ? 14 : -14), y: from.y + (to.y >= from.y ? 6 : -6) };
+  await page.mouse.move(kick.x, kick.y, { steps: 2 });
+  await expect(page.getByTestId('slot-token-ghost')).toBeVisible();
+  const steps = 8;
   for (let i = 1; i <= steps; i++) {
-    await page.mouse.move(from.x + ((to.x - from.x) * i) / steps, from.y + ((to.y - from.y) * i) / steps);
-    if (i === steps / 2 && onMidway) await onMidway();
+    await page.mouse.move(kick.x + ((to.x - kick.x) * i) / steps, kick.y + ((to.y - kick.y) * i) / steps);
   }
+  if (onMidway) await onMidway();
+  await page.mouse.move(to.x + 1, to.y);
+  await page.mouse.move(to.x, to.y);
+  await page.waitForTimeout(60);
   await page.mouse.up();
 }
 
@@ -226,7 +257,15 @@ async function playRunPhaseByPhase(page: Page, info: TestInfo): Promise<PhaseRec
         await shot(page, info, '12-run-beat-in-scena', questWindow(page));
       }
       phases.push({ nodeId: run.nodeId, kind: 'beat' });
-      await page.keyboard.press('Enter');
+      /* PLAN-040: un check beat armato tiene sull'overlay esterno finché il
+       *  giocatore non lancia — `skipToResult` è no-op pre-throw, quindi il
+       *  driver clicca THROW quando lo vede (`.da-tira` è page-level). */
+      const astroThrow = page.locator('.da-tira');
+      if (await astroThrow.isVisible()) {
+        await astroThrow.click().catch(() => undefined);
+      } else {
+        await page.keyboard.press('Enter');
+      }
       await page.waitForTimeout(120);
       continue;
     }
@@ -297,7 +336,7 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
   test('POI → planner → roster + swap → consumabili → run fase per fase → XP ai PG → oro in HUD', async ({ page }, info) => {
     test.setTimeout(420_000);
 
-    /* ── 1. Boot: mappa pulita, roster aperto col tasto R ────────────── */
+    /* ── 1. Boot: auto-reveal R-200, roster aperto col tasto R ───────── */
     await page.goto('/game');
     await page.waitForFunction(
       (pid) => Boolean((window as HooksWindow).__idleVillageTestHooks?.expedition?.[pid]),
@@ -312,7 +351,10 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     const goldBefore = await goldReadout(page);
     const villageBefore = await read<VillageShape>(page, 'getVillage');
     expect(villageBefore.gold).toBe(goldBefore);
-    await shot(page, info, '01-boot-mappa-pulita');
+    /* Doc shot deterministico: il primo marker (goblin, ~1s post-veil) è
+     *  già sulla mappa — lo shot documenta l'auto-reveal, non l'attesa. */
+    await expect(marker(page)).toBeVisible({ timeout: 15_000 });
+    await shot(page, info, '01-boot-auto-reveal');
 
     /* ── 2. Creazione del POI quest: la Regia lo rivela ──────────────── */
     await revealQuestPoiViaDirector(page, info);
@@ -359,11 +401,17 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     await shot(page, info, '05-party-prima-dello-swap', planner(page));
 
     /* ── 5. SWAP slot↔slot senza estrarre: eroe ⇄ Beppe ─────────────── */
-    await dragSlotToken(page, SLOT_LEADER, SLOT_MEMBER_1, async () => {
-      await expect(page.getByTestId('slot-token-ghost')).toBeVisible();
-      await expect(page.locator(`[data-slot-id="${SLOT_MEMBER_1}"]`).first()).toHaveAttribute('data-drop-state', 'valid');
-      await shot(page, info, '06-swap-token-in-aria', planner(page), true);
-    });
+    /* drop perso (pointerWithin): un giocatore riproverebbe una volta —
+     *  lo swap è idempotente, un secondo tentativo è safe. */
+    let swapped = false;
+    for (let attempt = 0; attempt < 2 && !swapped; attempt++) {
+      await dragSlotToken(page, SLOT_LEADER, SLOT_MEMBER_1, async () => {
+        await expect(page.getByTestId('slot-token-ghost')).toBeVisible();
+        await expect(page.locator(`[data-slot-id="${SLOT_MEMBER_1}"]`).first()).toHaveAttribute('data-drop-state', 'valid');
+        await shot(page, info, '06-swap-token-in-aria', planner(page), true);
+      });
+      swapped = await waitForAssignment(page, SLOT_LEADER, HERO).then(() => true, () => false);
+    }
     await waitForAssignment(page, SLOT_LEADER, HERO);
     await waitForAssignment(page, SLOT_MEMBER_1, FOLK_FIGHTER);
     /* nessuno è uscito dal rack: il party è ancora di 4 */
@@ -449,7 +497,12 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     const settlement = await read<SettlementShape>(page, 'getSettlement');
     const report = page.getByTestId('quest-epilogue');
     await expect(report).toBeVisible();
-    await shot(page, info, '14-rapporto-di-ritorno', questWindow(page));
+    /* R-199: per esito `reward` l'epilogo sta nel `quest-reward-popup`
+     *  esterno; per survived/wipe resta nella window — lo shot punta a
+     *  quello che lo contiene davvero. */
+    const rewardPopup = page.getByTestId('quest-reward-popup');
+    const reportHost = (await rewardPopup.isVisible()) ? rewardPopup : questWindow(page);
+    await shot(page, info, '14-rapporto-di-ritorno', reportHost);
 
     /* consumabili usati → riga «consumati» nel rapporto */
     if ((terminal.consumablesUsed ?? []).length > 0) {
@@ -477,9 +530,9 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
       const xpSection = report.locator('[data-epilogue-section="xp"]');
       await expect(xpSection).toBeVisible();
       for (const m of survivors) await expect(xpSection).toContainText(m.name);
-      /* il rapporto scorre dentro la finestra: porta in vista la XP per lo scatto */
+      /* il rapporto scorre dentro il suo host (popup o window): porta in vista la XP per lo scatto */
       await xpSection.scrollIntoViewIfNeeded();
-      await shot(page, info, '14b-rapporto-xp-ai-pg', questWindow(page));
+      await shot(page, info, '14b-rapporto-xp-ai-pg', reportHost);
       /* i morti non prendono nulla */
       for (const m of terminal.party.filter((p) => p.dead)) {
         expect(village.residents.find((r) => r.id === m.id)?.xp ?? 0).toBe(
@@ -500,7 +553,7 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
      *  R-200 (D-1): `poi-goblin` è authored `repeatable` — il report non
      *  consuma il POI: il marker resta sulla mappa, la run è azzerata e
      *  l'offerta torna `available` (rilanciabile). */
-    await closeReport(page).click();
+    await dismissReport(page);
     await expect(questWindow(page)).toHaveCount(0);
     await expect(marker(page)).toBeVisible({ timeout: 10_000 });
     await expect(marker(page)).toHaveAttribute('data-quest-status', 'available');

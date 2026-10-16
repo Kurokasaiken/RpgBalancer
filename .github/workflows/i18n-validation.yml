@@ -62,5 +62,5 @@ jobs:
       - name: Run build check
         run: npm run build:check
 
-      - name: Run Kanban lint
-        run: npm run kanban:lint
+      - name: Run closure gate
+        run: npm run closure:lint

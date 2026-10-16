@@ -3,14 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives/HudPlaque';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
 import { EngravedIcon } from './engravedIcons';
-import { VillageBuildingIcon, VillageCostIcon, type VillageCostResource } from './villageBuildingIcons';
+import { VillageBuildingIcon, VillageCostIcon, VillagePinFrame, PIN_FRAME_FOR_CATEGORY, type VillageCostResource } from './villageBuildingIcons';
+import { VillageSlotOverlay } from './VillageSlotOverlay';
+import { VillageRegistry, VILLAGE_REGISTRY_ID, type VillageRegistryHandle } from './VillageRegistry';
 import { MockUpgradeControl } from './MockUpgradeControl';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import {
-  BUILDING_IDS,
+  PAINTED_BUILDING_IDS,
+  hasFootprint,
   toRomanLevel,
   VILLAGE_BUILDINGS_CONFIG,
   VILLAGE_CANVAS,
+  VILLAGE_REGISTRY,
   type VillageBuildingCatalogId,
   type VillageBuildingDefinition,
 } from '@/balancing/config/idleVillage/villageBuildingsConfig';
@@ -49,6 +53,12 @@ const SIDE_HYSTERESIS_PX = 16;
 /** Narrow-viewport fallback: tooltip body scrolls above this height. */
 const TIP_MAX_BODY_PX = 320;
 const TIP_CHROME_RESERVE_PX = 64;
+/** PLAN-038 small-scale regime: stage narrower than this renders pins at 0.8×. */
+const SMALL_SCALE_CUTOFF_PX = 1100;
+const SMALL_PIN_SCALE = 0.8;
+/** PLAN-042: the Registro chip pulses once per session (module flag — no
+ *  PersistenceService involvement: this is a discoverability nudge). */
+let registryPulseConsumed = false;
 
 export type TooltipSide = 'right' | 'left' | 'above' | 'below';
 export interface TooltipPlacement {
@@ -116,8 +126,14 @@ export interface VillageScreenViewProps {
 
 const ASPECT = VILLAGE_CANVAS.widthPx / VILLAGE_CANVAS.heightPx;
 const BUILDINGS = VILLAGE_BUILDINGS_CONFIG.buildings;
+/* PLAN-042: the stage pins are painted entries only — registry-only buildings
+ * (slotKind 'registry') have no anchor and live in the VillageRegistry drawer. */
+const PAINTED = BUILDINGS.filter(hasFootprint);
 const RESOURCES: VillageCostResource[] = ['wood', 'iron', 'gold', 'food'];
 
+/* PLAN-038: the disc is now only the guaranteed-contrast halo behind the
+ *  frame silhouette — the `VillagePinFrame` (lacquer fill + brass ring)
+ *  provides the actual backing, so the disc must not paint over its shape. */
 const pinDisc: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -125,9 +141,7 @@ const pinDisc: CSSProperties = {
   width: PIN_PX,
   height: PIN_PX,
   borderRadius: '50%',
-  background: 'var(--skin-hud-lacquer-deep)',
-  border: '1px solid var(--skin-surface-border)',
-  boxShadow: 'var(--skin-hud-engrave)',
+  boxShadow: '0 2px 10px color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
   position: 'relative',
 };
 
@@ -147,6 +161,17 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
   const [pos, setPos] = useState<TooltipPlacement | null>(null);
   const [stageSize, setStageSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
   const [roverIndex, setRoverIndex] = useState(0);
+  /* PLAN-042: the Settlement Registry drawer + the shared `activeBuildingId`
+   *  contract (artifact r005). `selected` = the building whose tooltip is
+   *  open; `hovered` is the transient pointer/focus candidate. Precedence:
+   *  selected > hovered > idle. */
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [hoveredId, setHoveredId] = useState<VillageBuildingCatalogId | null>(null);
+  const registryRef = useRef<VillageRegistryHandle>(null);
+  const chipRef = useRef<HTMLButtonElement>(null);
+  /* One-time-per-session pulse on the Registro chip (module flag — no
+   *  persistence: the pulse is a discoverability nudge, not user state). */
+  const pulseArmed = useRef(!registryPulseConsumed);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipNodeRef = useRef<HTMLElement | null>(null);
@@ -157,6 +182,11 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
    * not commit). */
   const tooltipStateRef = useRef(tooltip);
   tooltipStateRef.current = tooltip;
+  /* Where the open tooltip came from — 'pin' (stage) or 'row' (registry).
+   *  Focus returns to the row when the drawer opened the tooltip. */
+  const tooltipOriginRef = useRef<'pin' | 'row'>('pin');
+  const drawerOpenRef = useRef(drawerOpen);
+  drawerOpenRef.current = drawerOpen;
   const closeTimer = useRef<number | null>(null);
   const lastSideRef = useRef<TooltipSide | null>(null);
   /* Focus-restore suppression: `closeTooltip(true)` focuses the pin that owned
@@ -205,8 +235,15 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
     setTooltip(null);
     setPos(null);
     if (restoreFocus && current) {
-      suppressFocusOpenRef.current = true;
-      pinRefs.current.get(current.id)?.focus();
+      /* Focus return honours the origin: a tooltip opened from a registry row
+       *  hands focus back to that row; a pin-opened one returns to the pin. */
+      if (tooltipOriginRef.current === 'row' && drawerOpenRef.current) {
+        registryRef.current?.focusRow(current.id);
+      } else {
+        suppressFocusOpenRef.current = true;
+        pinRefs.current.get(current.id)?.focus();
+      }
+      tooltipOriginRef.current = 'pin';
     }
   }, [cancelClose]);
 
@@ -233,16 +270,52 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
     setTooltip({ id, pinned: true });
   }, [cancelClose]);
 
-  /* Imperative Escape for the page arbitrator (artifact r005): closes the
-   * tooltip and returns true; false hands the keypress back to the page,
-   * which exits to the map. One keypress = exactly one dismissal. */
+  const closeDrawer = useCallback(() => {
+    setDrawerOpen(false);
+    trackTelemetryEvent('village_registry_toggle', { open: false });
+    /* Focus returns to the Registro chip (artifact r005). The chip is inside
+     *  the stage — focusable even while the drawer collapses. */
+    requestAnimationFrame(() => chipRef.current?.focus());
+  }, []);
+
+  /* Imperative Escape for the page arbitrator (artifact r005). Conceptual
+   * stack, one layer per keypress:
+   *   detail card → drawer → pin tooltip → map.
+   * The drawer closes BEFORE the tooltip so a pinned tooltip never eats an
+   * Escape meant for the drawer; false hands the keypress to the page, which
+   * exits to the map. */
   useImperativeHandle(ref, () => ({
     escape: () => {
+      if (registryRef.current?.escape()) return true;
+      if (drawerOpenRef.current) {
+        closeDrawer();
+        return true;
+      }
       if (!tooltipStateRef.current) return false;
       closeTooltip(true);
       return true;
     },
-  }), [closeTooltip]);
+  }), [closeTooltip, closeDrawer]);
+
+  /* `r` hotkey — toggles the drawer. Guarded (artifact r005): only when the
+   *  village surface is live (this view is mounted only in village mode),
+   *  no modifiers, and the event target is not typing (input/textarea/
+   *  contenteditable) nor inside another keyboard-owning panel. */
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'r' && event.key !== 'R') return;
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, [contenteditable="true"], [data-hud-panel]')) return;
+      event.preventDefault();
+      setDrawerOpen((prev) => {
+        trackTelemetryEvent('village_registry_toggle', { open: !prev, via: 'hotkey' });
+        return !prev;
+      });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   /* Measure the mounted tooltip against the stage (not the viewport) and flip
    * + clamp it; a ResizeObserver re-places it when fonts/content resize it. */
@@ -259,7 +332,11 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
     const place = () => {
       const rect = tip.getBoundingClientRect();
       const pin = { x: building.anchor.x * stage.w, y: building.anchor.y * stage.h };
-      const next = placeTooltip(pin, { w: rect.width, h: rect.height }, stage, lastSideRef.current);
+      /* Drawer-as-obstacle (artifact r005, D-10): the tooltip clamps against
+       *  the drawer's left edge by shrinking the effective stage width while
+       *  the drawer is open. */
+      const effectiveStage = { w: stage.w - (drawerOpenRef.current ? Math.min(VILLAGE_REGISTRY.widthPx, stage.w) : 0), h: stage.h };
+      const next = placeTooltip(pin, { w: rect.width, h: rect.height }, effectiveStage, lastSideRef.current);
       lastSideRef.current = next.side;
       setPos((prev) => (prev && prev.x === next.x && prev.y === next.y && prev.side === next.side ? prev : next));
     };
@@ -267,10 +344,25 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
     const observer = new ResizeObserver(place);
     observer.observe(tip);
     return () => observer.disconnect();
-  }, [tooltip, stageSize]);
+  }, [tooltip, stageSize, drawerOpen]);
 
   const activeBuilding = tooltip ? BUILDINGS.find((b) => b.id === tooltip.id) : undefined;
   const tipBodyMaxPx = Math.max(120, Math.min(TIP_MAX_BODY_PX, stageSize.h - TIP_CHROME_RESERVE_PX));
+  /* Shared `activeBuildingId` (artifact r005): the open tooltip counts as
+   *  `selected` and wins over the transient `hovered` candidate. Consumed by
+   *  the registry rows, the overlay ping and the pin ring below. */
+  const activeBuildingId = tooltip?.id ?? hoveredId;
+
+  /* Painted row click inside the registry → pin the stage tooltip; the row
+   *  is the origin so dismissal returns focus to the row, not the pin. */
+  const onRegistryShowTooltip = useCallback((id: VillageBuildingCatalogId) => {
+    tooltipOriginRef.current = 'row';
+    pinTooltip(id);
+  }, [pinTooltip]);
+
+  /* Pending count on the chip badge: buildable + locked across the whole
+   *  catalog (the drawer exists to surface exactly those). */
+  const pendingCount = BUILDINGS.filter((b) => b.initialState !== 'built').length;
 
   const onToolbarKeyDown = (event: React.KeyboardEvent) => {
     const keys: Record<string, number> = {
@@ -279,20 +371,23 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
       ArrowLeft: roverIndex - 1,
       ArrowUp: roverIndex - 1,
       Home: 0,
-      End: BUILDING_IDS.length - 1,
+      End: PAINTED_BUILDING_IDS.length - 1,
     };
     const next = keys[event.key];
     if (next === undefined) return;
     event.preventDefault();
-    const clamped = (next + BUILDING_IDS.length) % BUILDING_IDS.length;
+    const clamped = (next + PAINTED_BUILDING_IDS.length) % PAINTED_BUILDING_IDS.length;
     setRoverIndex(clamped);
-    pinRefs.current.get(BUILDING_IDS[clamped])?.focus();
+    pinRefs.current.get(PAINTED_BUILDING_IDS[clamped])?.focus();
   };
 
   const pinHandlers = (b: VillageBuildingDefinition) => ({
     onPointerEnter: (event: React.PointerEvent) => {
       if (event.pointerType === 'touch' || coarsePointer.current) return;
       openTooltip(b.id);
+      /* Pin → registry sync: the matching row lights (via activeId) and
+       *  scrolls into view while the drawer is open. */
+      if (drawerOpenRef.current) registryRef.current?.scrollToRow(b.id);
     },
     onPointerLeave: () => {
       if (coarsePointer.current) return;
@@ -328,6 +423,19 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
   const levelBadge = (b: VillageBuildingDefinition) =>
     b.initialState === 'locked' ? t('gameFrame.village.state.locked') : t('gameFrame.village.levelBadge', { level: toRomanLevel(b.initialLevel), max: toRomanLevel(b.tiers.length) });
 
+  /* PLAN-038 a11y contract: the pin's accessible name exposes name, category,
+   * state AND level — the frame/badge are `aria-hidden` decoration. */
+  const pinAriaLabel = (b: VillageBuildingDefinition) =>
+    `${t(b.nameKey)} — ${t(`gameFrame.village.category.${b.category}`)} · ${t(`gameFrame.village.state.${b.initialState}`)} · ${t('gameFrame.village.levelBadge', { level: toRomanLevel(b.initialLevel), max: toRomanLevel(b.tiers.length) })}`;
+
+  /* Badge tab content (r003): built → roman level, buildable → "+", locked →
+   * lock glyph. Arabic >IV is handled by `toRomanLevel`'s lint in config. */
+  const badgeTab = (b: VillageBuildingDefinition): React.ReactNode => {
+    if (b.initialState === 'locked') return <EngravedIcon id="cmd-lock" size={10} style={{ width: 10, height: 10 }} />;
+    if (b.initialState === 'buildable') return '+';
+    return toRomanLevel(b.initialLevel);
+  };
+
   return (
     <div data-testid="village-screen-view" style={{ position: 'absolute', inset: 0 }}>
       <SkinScope data-hud-controls="" style={{ position: 'absolute', inset: 0 }}>
@@ -359,9 +467,14 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
               draggable={false}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'fill', userSelect: 'none' }}
             />
+            {/* PLAN-038 slot overlay: painted state treatments between the
+             *  artwork and the pins. pointer-events:none — never a target.
+             *  PLAN-042: `activeId` drives the row→footprint highlight. */}
+            <VillageSlotOverlay activeId={activeBuildingId} />
             {stageSize.w > 0 &&
-              BUILDINGS.map((b, index) => {
+              PAINTED.map((b, index) => {
                 const isTip = tooltip?.id === b.id;
+                const frame = PIN_FRAME_FOR_CATEGORY[b.category];
                 return (
                   <button
                     key={b.id}
@@ -371,21 +484,26 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                     }}
                     type="button"
                     data-building-pin={b.id}
+                    data-pin-frame={frame}
+                    data-pin-state={b.initialState}
+                    data-active={activeBuildingId === b.id || undefined}
                     tabIndex={index === roverIndex ? 0 : -1}
-                    aria-label={`${t(b.nameKey)} — ${levelBadge(b)}`}
+                    aria-label={pinAriaLabel(b)}
                     aria-expanded={isTip}
                     aria-controls={isTip ? VILLAGE_TOOLTIP_ID : undefined}
                     aria-pressed={isTip && tooltip.pinned}
                     {...pinHandlers(b)}
                     style={{
                       position: 'absolute',
-                      left: `${b.anchor.x * 100}%`,
-                      top: `${b.anchor.y * 100}%`,
+                      left: `${(b.anchor.x + (b.anchorNudge?.x ?? 0)) * 100}%`,
+                      top: `${(b.anchor.y + (b.anchorNudge?.y ?? 0)) * 100}%`,
                       transform: 'translate(-50%, -50%)',
+                      /* Standalone `scale`, never `transform: scale()` — the
+                       * latter would clobber the translate above (debate W-11). */
+                      scale: stageSize.w < SMALL_SCALE_CUTOFF_PX ? `${SMALL_PIN_SCALE}` : '1',
                       display: 'flex',
-                      flexDirection: 'column',
                       alignItems: 'center',
-                      gap: 3,
+                      justifyContent: 'center',
                       padding: 0,
                       cursor: 'pointer',
                       background: 'none',
@@ -393,47 +511,210 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                       color: b.initialState === 'locked' ? 'var(--skin-text-secondary)' : 'var(--skin-icon-color)',
                     }}
                   >
-                    <span style={pinDisc}>
+                    <span
+                      style={{
+                        ...pinDisc,
+                        /* Registry row → pin ping (artifact r005): a brass
+                         *  halo, the same channel as the footprint ping. */
+                        boxShadow: activeBuildingId === b.id
+                          ? '0 0 0 3px var(--skin-hud-brass-hi), 0 0 18px color-mix(in srgb, var(--skin-hud-brass-hi) 60%, transparent)'
+                          : pinDisc.boxShadow,
+                      }}
+                    >
+                      <VillagePinFrame frame={frame} state={b.initialState} />
                       <VillageBuildingIcon iconKey={b.iconKey} size={20} />
-                      {b.initialState !== 'built' && (
-                        <span
-                          aria-hidden="true"
-                          style={{
-                            position: 'absolute',
-                            right: -3,
-                            top: -3,
-                            display: 'inline-flex',
-                            width: 16,
-                            height: 16,
-                            borderRadius: '50%',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            background: 'var(--skin-hud-lacquer-deep)',
-                            border: '1px solid var(--skin-surface-border)',
-                            color: b.initialState === 'locked' ? 'var(--skin-text-secondary)' : 'var(--skin-icon-accent)',
-                          }}
-                        >
-                          <EngravedIcon id={b.initialState === 'locked' ? 'cmd-lock' : 'ico-spark'} size={10} />
-                        </span>
-                      )}
                     </span>
                     <span
                       aria-hidden="true"
                       style={{
-                        font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
-                        letterSpacing: 'var(--skin-hud-caps-tracking)',
-                        color: 'var(--skin-title-color)',
+                        position: 'absolute',
+                        right: -5,
+                        top: -5,
+                        display: 'inline-flex',
+                        minWidth: 16,
+                        height: 16,
+                        padding: '0 3px',
+                        borderRadius: 8,
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         background: 'var(--skin-hud-lacquer-deep)',
-                        borderRadius: 'var(--skin-hud-row-radius)',
-                        padding: '1px 6px',
-                        textShadow: 'var(--skin-hud-engrave)',
+                        border: '1px solid var(--skin-hud-brass-base)',
+                        color: b.initialState === 'locked' ? 'var(--skin-text-secondary)' : b.initialState === 'buildable' ? 'var(--skin-icon-accent)' : 'var(--skin-title-color)',
+                        font: '600 10px/1 var(--skin-font-display)',
+                        letterSpacing: '0.04em',
                       }}
                     >
-                      {toRomanLevel(b.initialLevel)}
+                      {badgeTab(b)}
                     </span>
                   </button>
                 );
               })}
+
+            {/* Settlement plaque + Registro chip (PLAN-038/042). The wrapper
+             *  is the layout row; the plaque stays pointer-events:none
+             *  read-only, the chip is the drawer's always-visible handle. */}
+            <div
+              style={{
+                position: 'absolute',
+                left: 14,
+                top: 12,
+                display: 'flex',
+                alignItems: 'stretch',
+                gap: 8,
+              }}
+            >
+              <div
+                data-testid="village-plaque"
+                aria-hidden="true"
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 8,
+                  padding: '4px 10px',
+                  borderRadius: 'var(--skin-hud-row-radius)',
+                  background: 'var(--skin-hud-lacquer-deep)',
+                  border: '1px solid var(--skin-hud-brass-base)',
+                  pointerEvents: 'none',
+                  opacity: 0.92,
+                }}
+              >
+                <span
+                  style={{
+                    font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
+                    letterSpacing: 'var(--skin-hud-caps-tracking)',
+                    color: 'var(--skin-title-color)',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {t('gameFrame.village.title')}
+                </span>
+                <span style={{ font: '11px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+                  {t('gameFrame.village.builtCount', { built: BUILDINGS.filter((b) => b.initialState === 'built').length, total: BUILDINGS.length })}
+                </span>
+              </div>
+
+              <button
+                ref={chipRef}
+                type="button"
+                data-testid="village-registry-chip"
+                aria-expanded={drawerOpen}
+                aria-controls={VILLAGE_REGISTRY_ID}
+                onClick={() => {
+                  setDrawerOpen((prev) => {
+                    trackTelemetryEvent('village_registry_toggle', { open: !prev, via: 'chip' });
+                    return !prev;
+                  });
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 10px',
+                  borderRadius: 'var(--skin-hud-row-radius)',
+                  background: drawerOpen ? 'color-mix(in srgb, var(--skin-hud-brass-base) 30%, var(--skin-hud-lacquer-deep))' : 'var(--skin-hud-lacquer-deep)',
+                  border: '1px solid var(--skin-hud-brass-base)',
+                  color: 'var(--skin-title-color)',
+                  font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
+                  letterSpacing: 'var(--skin-hud-caps-tracking)',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  /* One-time session pulse (discoverability nudge, r005). */
+                  animation: pulseArmed.current ? 'village-chip-pulse 1.8s ease-in-out 3' : undefined,
+                }}
+                onAnimationEnd={() => {
+                  pulseArmed.current = false;
+                  registryPulseConsumed = true;
+                }}
+              >
+                <span aria-hidden="true" style={{ display: 'inline-flex' }}><EngravedIcon id="nav-village" size={12} /></span>
+                {t('gameFrame.village.registry.chip')}
+                <span
+                  aria-label={t('gameFrame.village.registry.pending', { count: pendingCount })}
+                  style={{
+                    display: 'inline-flex',
+                    minWidth: 16,
+                    height: 16,
+                    padding: '0 4px',
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--skin-hud-brass-base)',
+                    color: 'var(--skin-hud-lacquer-deep)',
+                    font: '700 10px/1 var(--skin-font-display)',
+                  }}
+                >
+                  {pendingCount}
+                </span>
+                <kbd style={{ font: '9px var(--skin-font-display)', color: 'var(--skin-text-secondary)', border: '1px solid var(--skin-surface-border)', borderRadius: 3, padding: '0 3px' }}>
+                  r
+                </kbd>
+              </button>
+            </div>
+            {/* Chip pulse keyframes — opacity/box-shadow only. */}
+            <style>{`
+              @keyframes village-chip-pulse {
+                0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--skin-hud-brass-hi) 0%, transparent); }
+                50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--skin-hud-brass-hi) 45%, transparent); }
+              }
+              @media (prefers-reduced-motion: reduce) {
+                [data-testid="village-registry-chip"] { animation: none !important; }
+              }
+            `}</style>
+
+            {/* Visual legend (PLAN-038 decode contract): category frames, badge
+             *  semantics, keyboard. Bottom-left, subordinate to the scene. */}
+            <div
+              data-testid="village-legend"
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 14,
+                bottom: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '4px 10px',
+                borderRadius: 'var(--skin-hud-row-radius)',
+                background: 'var(--skin-hud-lacquer-deep)',
+                border: '1px solid var(--skin-surface-border)',
+                pointerEvents: 'none',
+                opacity: 0.85,
+              }}
+            >
+              {(['production', 'civic', 'defense'] as const).map((cat) => (
+                <span key={cat} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ position: 'relative', display: 'inline-flex', width: 18, height: 18 }}>
+                    <VillagePinFrame frame={PIN_FRAME_FOR_CATEGORY[cat]} state="built" size={18} />
+                  </span>
+                  <span style={{ font: '10px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+                    {t(`gameFrame.village.category.${cat}`)}
+                  </span>
+                </span>
+              ))}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, font: '10px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+                <span style={{ display: 'inline-flex', minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-hud-brass-base)', color: 'var(--skin-icon-accent)', fontSize: 12, fontWeight: 600 }}>I</span>
+                {t('gameFrame.village.legend.badgeLevel')}
+                <span style={{ display: 'inline-flex', minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-hud-brass-base)', color: 'var(--skin-icon-accent)', fontSize: 12, fontWeight: 600 }}>+</span>
+                {t('gameFrame.village.legend.badgeBuild')}
+                <span style={{ display: 'inline-flex', minWidth: 13, height: 13, borderRadius: 7, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-surface-border)', color: 'var(--skin-text-secondary)' }}><EngravedIcon id="cmd-lock" size={8} /></span>
+                {t('gameFrame.village.legend.badgeLocked')}
+              </span>
+              <span style={{ font: '10px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', letterSpacing: '0.02em' }}>
+                {t('gameFrame.village.legend.keys')}
+              </span>
+            </div>
+
+            {/* PLAN-042: the Settlement Registry slide-over. It overlaps the
+             *  stage's right edge — the painting stays the surface, the
+             *  drawer is the operational menu layered on it. */}
+            <VillageRegistry
+              ref={registryRef}
+              open={drawerOpen}
+              buildings={BUILDINGS}
+              activeId={activeBuildingId}
+              onActiveChange={setHoveredId}
+              onShowTooltip={onRegistryShowTooltip}
+            />
 
             {/* The single hover-pinnable tooltip (§5b.7 + artifact r005). The
              *  measured box is a positioned wrapper: `HudPlaque` does not

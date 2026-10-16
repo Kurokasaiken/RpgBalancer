@@ -20,11 +20,18 @@ export function useAstrolabeAudio(muted: boolean) {
     return ctxRef.current;
   }, []);
 
-  // Pre-warm buffers on mount (non-blocking)
+  // Pre-warm buffers on mount (non-blocking). PLAN-040 T-004: muted mounts
+  // (the quest window's `removeSounds`) must NOT pay an AudioContext + 5
+  // fetches for sound that never plays — `getCtx` stays lazy until the
+  // first unmuted `play()`, and unmuting later re-arms the preload.
   useEffect(() => {
+    if (muted) return undefined;
     let cancelled = false;
     async function preload() {
-      const ctx = getCtx();
+      /* Decoding only needs a BaseAudioContext — an OfflineAudioContext
+       * decodes without touching audio hardware or the autoplay policy, so
+       * the real AudioContext stays lazy until the first unmuted play(). */
+      const ctx = new OfflineAudioContext(1, 1, 44100);
       await Promise.all(
         (Object.entries(SOUNDS) as [SoundKey, string][]).map(async ([key, url]) => {
           if (cancelled) return;
@@ -40,7 +47,7 @@ export function useAstrolabeAudio(muted: boolean) {
     }
     preload();
     return () => { cancelled = true; };
-  }, [getCtx]);
+  }, [muted, getCtx]);
 
   const play = useCallback((key: SoundKey, { volume = 1, when = 0 }: { volume?: number; when?: number } = {}) => {
     if (muted) return;

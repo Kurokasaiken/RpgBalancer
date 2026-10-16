@@ -224,7 +224,7 @@ git log -1 >> "$LOG_FILE"
 npm run lint -- src >> "$LOG_FILE" 2>&1
 npm run test >> "$LOG_FILE" 2>&1
 npm run build:check >> "$LOG_FILE" 2>&1
-npm run kanban:lint >> "$LOG_FILE" 2>&1
+npm run closure:lint >> "$LOG_FILE" 2>&1
 ```
 
 1. **If safeguards pass**: Retry commit/push
@@ -281,7 +281,7 @@ sudo shutdown -h now
 **MANDATORY**: Guardian initiates system shutdown when unattended work session ends, regardless of pipeline status.
 
 ### Success Path (Green Status)
-1. Safeguards pass (lint/test/build/kanban)
+1. Safeguards pass (lint/test/build/closure)
 2. Commit completed successfully
 3. Push completed successfully  
 4. **Deployment verification passes** (only on main branch)

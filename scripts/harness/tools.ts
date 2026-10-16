@@ -6,7 +6,7 @@
  * traversal, and shell commands are restricted to a whitelist.
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import {
   mkdirSync,
   readFileSync,
@@ -92,6 +92,22 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
           new_string: { type: 'string', description: 'Replacement text.' },
         },
         required: ['path', 'old_string', 'new_string'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'search',
+      description:
+        'Recursive text search (grep) inside the workspace. Returns matching lines as path:line: text, capped at 40 lines.',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'Directory path relative to workspace root. Use "." for root.' },
+          query: { type: 'string', description: 'Plain-text string to search for (fixed string, not regex).' },
+        },
+        required: ['query'],
       },
     },
   },
@@ -243,6 +259,26 @@ export function createToolExecutor(workspaceRoot: string, config: HarnessConfig)
     return { ok: true, output: `Edited ${relative}` };
   }
 
+  function searchTool(relative: string, query: string): ToolResult {
+    const abs = safeResolve(relative || '.');
+    try {
+      const output = execFileSync(
+        'grep',
+        ['-rn', '-F', '-I', '--exclude-dir=node_modules', '--exclude-dir=.git', '--exclude-dir=dist',
+          '--exclude-dir=tmp', '--exclude-dir=test-results', '--exclude-dir=marketing',
+          '--exclude-dir=assets-source', '--exclude-dir=coverage', '--exclude-dir=.claude',
+          '--exclude-dir=.mw', query, abs],
+        { cwd: root, encoding: 'utf8', stdio: 'pipe', maxBuffer: 1024 * 1024 * 4, timeout: 60000 },
+      );
+      const lines = output.split('\n').slice(0, 40).join('\n').replaceAll(`${root}/`, '');
+      return { ok: true, output: lines || '(no matches)' };
+    } catch (error) {
+      const err = error as { status?: number; stdout?: string };
+      if (err.status === 1) return { ok: true, output: '(no matches)' };
+      return { ok: false, output: `search failed: ${String(error).slice(0, 300)}` };
+    }
+  }
+
   function runCommandTool(command: string): ToolResult {
     const allowed = config.allowedCommands.some((prefix) =>
       command.trim().startsWith(prefix),
@@ -306,6 +342,8 @@ export function createToolExecutor(workspaceRoot: string, config: HarnessConfig)
               String(args.old_string),
               String(args.new_string),
             );
+          case 'search':
+            return searchTool(String(args.path ?? '.'), String(args.query ?? args.pattern ?? ''));
           case 'run_command':
             return runCommandTool(String(args.command));
           case TASK_COMPLETE_TOOL:
