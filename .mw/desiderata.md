@@ -1502,6 +1502,11 @@ S1: "Questa quest è un gioco interessante?" → S2: "Possiamo farla davvero, se
 - Come il teatro segnala "la quest chiede attenzione" quando è ridotto a icona (halo POI, tick sul day-clock, entrambi).
 - Destino del modello v3 (fasi temporizzate auto-risolte) quando il teatro arriva sulla superficie: convergenza o coesistenza.
 
+### Emendamenti approvati
+
+- **Deroga R-199 (2026-10-16):** la schermata di esito/ricompensa NON è ospitata nel teatro (contravviene al punto 4 «ospita… reward panel») — `QuestRewardPopup` è una placca page-level non-modale montata fuori dal DOM della finestra; il teatro conserva la narrativa di chiusura. Richiesta verbatim del Director: *"quando la quest finisce la schermata di reward deve essere un componente /popup esterno, nn all'interno della quest stessa"*. Valgono comunque v4 (niente backdrop/modali) e Component Reuse (corpo = `QuestEpilogue` condiviso).
+- **Deroga R-199 (2026-10-16):** i companion opzionali (party/belt/log) partono **chiusi di default** (`questWindow.companionsDefaultOpen: false`) — revoca il «tutto visibile» di R-196, richiesta verbatim *"i componenti opzionali devono essere chiusi d default"*.
+
 ---
 
 ## v28 — Luce dinamica 2D sulla mappa dipinta: ombre nuvole, god rays, luci su POI/landmark
@@ -1596,3 +1601,24 @@ La mappa mondo dipinta (`/game-frame-pixi`, pipeline PixiJS/WebGL2) guadagna tre
 - **Tasto rapido da tastiera:** se il tasto `v` debba aprire direttamente la vista `Village` o restare sul `VillageStashPanel` (default nel piano: `v` resta su `villageStash` nel registry `HUD_PANELS` per non rompere `PLAN-032-SP-2`, mentre `Esc` nella vista `Village` senza pannelli aperti riporta a `Map`).
 - **Layout delle icone su `villaggio.png`:** calibrazione visiva a schermo in `1440×900` e `1280×800`.
 
+
+---
+
+## v31 — Workflow single-agent: kanban/dispatch in pausa, chiusura a contratto
+
+**Status:** `FROZEN`
+**Date:** 2026-10-16
+**Authorized by:** Fausto
+**Reason:** direttiva verbatim in sessione — "x adesso meti questa roba in pausa, in caso c servirà lo reimplementeremo secondariamente. quindi metti nei plan, nelle skill e qualsiasi altro riferimento di nn usare + il kanban e cose del genere. si crea un plan con un contratto, si implementa con l'agente locale in devin desktop, si controlla il contratto per vedere se tutto è stato fatto correttamente e basta"
+
+**Formulazione approvata (FROZEN):**
+La kanban board, il dispatch coordinator/ai-worker/harness e la pipeline
+prompt-spec sono **in pausa**: non fanno più parte del workflow operativo e
+non vengono cancellati (riattivazione solo su decisione esplicita del
+Director, informata dal benchmark PLAN-039). Il ciclo operativo è:
+**plan con contratto di verifica → implementazione con l'agente locale
+(Devin Desktop) → controllo del contratto (`verify:bundle` → `bundle.json`)
+→ chiusura `fatta` in `RICHIESTE.md` con citazione bundle.** Il gate
+meccanico di chiusura resta attivo come `closure:lint` (ex `kanban:lint`,
+solo gate R-189 su RICHIESTE/board-diff). Ledger operativo: `RICHIESTE.md`
++ `plans/INDEX.md`.

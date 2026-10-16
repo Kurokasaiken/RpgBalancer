@@ -27,7 +27,10 @@ Use when there is enough clarity to commit to a concrete plan.
 - Do not introduce components or features not explicitly requested (YAGNI).
 - Mark open architectural decisions as open; do not decide them silently.
 - A plan that includes runtime verification, screenshots, playtests, or captures must state that the run is headless/background; a visible window is a manual Director step, never an agent action (`.windsurf/rules/16-no-foreground-windows.md`).
+- Ogni piano dichiara il suo **contratto di chiusura**: le obbligazioni verificabili che l'esecuzione trasforma in `.mw/runs/<task>/verification.json` → `verify:bundle` → `bundle.json`, citato dalla voce `fatta` in `RICHIESTE.md` (workflow single-agent R-208: niente kanban, niente dispatch).
+- **Contenuto del contesto — regola del giudizio vs lookup.** Un riferimento va nel plan quando è *frutto di un giudizio* (questo file, questo pattern, questa trappola, questa decisione) — sempre, anche se lo stesso agente eseguirà nella stessa conversazione: le conversazioni muoiono (compaction, crash) e il plan è l'unico artifact che sopravvive. Non va nel plan ciò che è *riscopribile con un lookup* (ricerca di file, convenzioni ovvie) — quello l'esecutore lo ritrova da sé. Context pack dettagliati per esecutori esterni si generano a dispatch-time dal manifest/codice, non a mano nel documento.
 - Reference and update the relevant plan files in `src/docs/docs/plans/`.
+- Quando il plan è battezzato (o entra `in corso`): `npm run plan:stamp -- open PLAN-NNN` — apre il ledger di misura per-plan (R-208: dimostrare ≥30min risparmiati).
 
 ## Post-plan learning
 

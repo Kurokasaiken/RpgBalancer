@@ -69,7 +69,7 @@ const DEFAULT_COMMANDS: CommandSpec[] = [
   { name: 'lint', command: 'npm run lint' },
   { name: 'test', command: 'npm run test' },
   { name: 'build:check', command: 'npm run build:check' },
-  { name: 'kanban:lint', command: 'npm run kanban:lint' },
+  { name: 'closure:lint', command: 'npm run closure:lint' },
 ];
 
 /**

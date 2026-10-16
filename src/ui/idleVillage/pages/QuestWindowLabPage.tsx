@@ -6,10 +6,12 @@
  * Route: /quest-window-lab
  */
 
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { QuestRunWindow } from '@/ui/idleVillage/components/gameFrame/QuestRunWindow';
+import { QuestRewardPopup } from '@/ui/idleVillage/components/gameFrame/QuestRewardPopup';
+import { QuestOverlays } from '@/ui/idleVillage/components/gameFrame/questOverlays';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
@@ -27,14 +29,24 @@ export const QuestWindowLabPage: React.FC = () => {
     const n = raw ? Number(raw) : NaN;
     return Number.isFinite(n) ? n >>> 0 : undefined;
   }, []);
+  /* PLAN-040 T-000: `?reward=1` mounts the page-level report plaque so the
+   * playtest harness can witness the reward phase without /game. */
+  const rewardParam = useMemo(() => new URLSearchParams(window.location.search).get('reward') === '1', []);
+  const [rewardDismissed, setRewardDismissed] = useState(false);
   // No game clock here: a local tick every second drives the v27 frontier —
   // a maturable node breathes for LAB_NODE_TICKS seconds before resolving.
+  // PLAN-040 T-000: the tick lives in STATE, not a ref — `nowTick` must reach
+  // the window on every second or a 'waiting' frontier stays visually locked
+  // forever (syncClock alone does not re-render when nothing matures).
   const LAB_NODE_TICKS = 3;
-  const tickRef = useRef(0);
+  const [tick, setTick] = useState(0);
   useEffect(() => {
     const id = window.setInterval(() => {
-      tickRef.current += 1;
-      questRun.syncClock(tickRef.current);
+      setTick((t) => {
+        const next = t + 1;
+        questRun.syncClock(next);
+        return next;
+      });
     }, 1000);
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -44,9 +56,9 @@ export const QuestWindowLabPage: React.FC = () => {
       progress: questRun.run?.ended ? 1 : Math.min(1, questRun.phases.length / GOBLIN_SCENARIO.beats.length),
       label: questRun.run?.ended
         ? t(questRun.run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
-        : t('gameFrame.questWindow.phaseOf', { n: Math.min(GOBLIN_SCENARIO.beats.length, questRun.phases.length + 1), total: GOBLIN_SCENARIO.beats.length }),
+        : t('gameFrame.questWindow.ticks', { elapsed: Math.max(0, tick - (questRun.run?.launchedAtTick ?? tick)), total: GOBLIN_SCENARIO.beats.length * LAB_NODE_TICKS }),
     }),
-    [questRun.run?.ended, questRun.run?.outcome, questRun.phases.length, t],
+    [questRun.run?.ended, questRun.run?.outcome, questRun.run?.launchedAtTick, questRun.phases.length, tick, t],
   );
   return (
     <TooltipProvider>
@@ -54,7 +66,7 @@ export const QuestWindowLabPage: React.FC = () => {
         {!questRun.run && (
         <button
           type="button"
-          onClick={() => questRun.start(GOBLIN_PRESETS[0].id, { seed: seedParam, nodeTicks: LAB_NODE_TICKS, startTick: tickRef.current })}
+          onClick={() => questRun.start(GOBLIN_PRESETS[0].id, { seed: seedParam, nodeTicks: LAB_NODE_TICKS, startTick: tick })}
           style={{ fontFamily: 'var(--skin-font-display, serif)', fontSize: 15, color: TONE.text, border: `1px solid ${TONE.muted}`, borderRadius: 6, padding: '8px 16px', background: 'transparent', cursor: 'pointer' }}
         >
           {t('gameFrame.director.questRun')}
@@ -73,6 +85,8 @@ export const QuestWindowLabPage: React.FC = () => {
           artFor={(nodeId) => NODE_ART[nodeId]?.src}
           time={time}
           onChoose={(optionId) => questRun.choose(optionId)}
+          nowTick={tick}
+          onAbandon={questRun.abandon}
           armedFlags={questRun.armedFlags}
           onToggleArmedFlag={questRun.toggleArmedFlag}
           onClose={questRun.clear}
@@ -81,6 +95,19 @@ export const QuestWindowLabPage: React.FC = () => {
             theaterAspect={questWindow.theaterAspect}
             tooltipLines={questWindow.tooltipLines}
             companions={{ widthPx: questWindow.sidePanelWidthPx, gapPx: questWindow.sidePanelGapPx, minWidthPx: questWindow.minSidePanelWidthPx, edgeInsetPx: questWindow.edgeInsetPx }}
+          />
+        )}
+        {/* PLAN-040 T-003a: the same overlay host /game mounts — the skill
+            check paints in `#game-modal-root` in the lab exactly as in
+            production (debate r007: shared surface, shared behaviour). */}
+        <QuestOverlays questId="goblin" onDismissOutcome={questRun.dismissOutcome} />
+        {rewardParam && questRun.run?.ended && !rewardDismissed && (
+          <QuestRewardPopup
+            run={questRun.run}
+            scenario={GOBLIN_SCENARIO}
+            widthPx={questWindow.rewardPopup.widthPx}
+            stageMs={questWindow.rewardPopup.stageMs}
+            onClose={() => setRewardDismissed(true)}
           />
         )}
       </div>

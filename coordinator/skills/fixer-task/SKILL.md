@@ -1,6 +1,6 @@
 ---
 name: fixer-task
-description: Sequential fixer agent that scans each Idle Village surface for errors, diagnoses root causes, and applies project-aligned fixes before re-validating.
+description: "STORICO (R-208, 2026-10-16): era il fixer della pipeline di dispatch sequenziale, ora in pausa — invocare solo se il Director chiede esplicitamente un giro di fixer su una superficie. Per bugfix singoli usa la skill `bugfix`."
 triggers:
   - "fixer"
   - "page fixer"
@@ -13,8 +13,8 @@ triggers:
 Automate the "apri → leggi errore → risolvi → riesegui" loop across every surface (pages, components, tests) affected by Idle Village / Minimal Gameplay, ensuring each fix respects:
 - Project philosophy (`.windsurf/rules/philosophy.md`)
 - Implementation plans (`src/docs/docs/plans/idle_village_plan.md`, `minimal_gameplay_implementation_plan.md`, `minimal-to-vertical-slice-roadmap-*.md`)
-- Coordinator prompts (`src/docs/docs/coordinator/agent_assignments.md`, `minimal_gameplay_prompts.md`)
-- Closed tasks/Evidence logs (scan `test-results/*.log` & Kanban history to understand prior work before altering shared modules)
+- Voci ledger (`RICHIESTE.md`, `plans/INDEX.md`; la kanban board `agent_assignments.md` è in pausa R-208 — consultabile come storico, non scrivere righe)
+- Closed tasks/Evidence logs (scan `test-results/*.log` & RICHIESTE history to understand prior work before altering shared modules)
 
 ### Mandatory References (consult + cite every run)
 
@@ -29,15 +29,14 @@ Automate the "apri → leggi errore → risolvi → riesegui" loop across every 
 Before touching code, list these references at the top of your fixer notes (marking “N/A – backend-only” only when verified) and cite them in the evidence log under a "Docs Consulted" section.
 
 ## Required Skills
-1. Invoke `agent-execution-mandate` to enforce lock checks, Kanban updates, safeguards.
+1. Invoke `agent-execution-mandate` to enforce lock checks, closure ledger, safeguards.
 2. Invoke `idle-village-task` immediately after (Style Lab, config-first, telemetry, persistence, dnd-kit).
-3. If coordinating with other agents or splitting fixes, load `coordinator-mandate`.
 
 ## Workflow
 ### Phase 1 – Discovery & Context
 1. **Enumerate Targets**: Build the list of pages/components/tests to audit (source: failing CI, QA list, Playwright/visual suites, manual roster). Document order in evidence log.
 2. **Load Context** for each target before touching code:
-   - Read associated prompt row in Kanban and any closed tasks mentioning the same files.
+   - Read the associated R-### entry in RICHIESTE.md and any closed tasks mentioning the same files.
    - Review latest plan section (IMPLEMENTED_PLAN / DEVELOPMENT_GUIDELINES) for layout/density/audio/token rules.
 3. **Execute Detection**:
    - Run the most relevant check (Playwright spec, Puppeteer scripted flow if available, visual baseline, RTL test, lint, manual page load) for the current target only.
@@ -63,11 +62,11 @@ Before touching code, list these references at the top of your fixer notes (mark
 ### Phase 3 – Documentation & Reporting
 1. **Evidence Log**: `test-results/fixer-task-<date>.log` summarizing:
    - Pages scanned, errors detected, actions taken, commands executed (lint/test/build/visual/e2e).
-   - Links to prior tasks consulted (Kanban rows, evidence files).
+   - Links to prior tasks consulted (R-### entries, evidence files).
    - **Docs Consulted**: list every mandatory reference (noting any N/A with justification) so reviewers can trace compliance.
-2. **Kanban**:
-   - If fixing an existing prompt, note the fixer intervention in the “Note” column (e.g., “Fixer pass resolved Playwright import issue”).
-   - For newly discovered issues outside active prompts, add backlog rows via `/kanban-update` if they require follow-up work beyond the fixer session.
+2. **Ledger**:
+   - If fixing an existing request, note the fixer intervention nella voce R-### in RICHIESTE.md.
+   - For newly discovered issues outside active requests, aggiungi una voce `da chiarire`/`aperta` in RICHIESTE.md se richiedono lavoro oltre la sessione fixer.
 3. **Completion Report**: Use Idle Village completion template; highlight remaining known issues (if any) and attach command outputs.
 
 ## Safeguards (per fixer run)
@@ -77,7 +76,7 @@ npm run test -- <targeted suites>
 npm run test:e2e -- <playwright specs>
 # Puppeteer regression commands when applicable (e.g., npm run test:pupeteer -- <spec>)
 npm run build:check
-npm run kanban:lint
+npm run closure:lint
 ```
 Re-run failing commands after each fix until all pass.
 

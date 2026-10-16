@@ -67,7 +67,7 @@ describe('projectBeats — committed deltas become ordered beats', () => {
     const run = timedRun();
     submitCommand(run, 'gob-partenza', { tick: 0 });
     const mark = beatMark(run);
-    submitCommand(run, 'gob-cerca-tracce', { tick: 10 });
+    submitCommand(run, 'gob-cerca-tracce', { tick: run.frontier.readyAt });
     const beats = projectBeats(mark, run, { maxBeats: MAX });
     const check = beats.find((b) => b.kind === 'check');
     expect(check).toBeDefined();

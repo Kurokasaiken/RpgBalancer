@@ -341,3 +341,28 @@ Formato voce:
   di offerte (OPEN-019); non blocca il runtime attuale.
 - **Related:** OPEN-010 (leader-capacity, human-days — tensione con
   «più party in parallelo»), OPEN-019, OPEN-020.
+
+## OPEN-022 — Sistema macro di ricompense e requisiti (ciclo di campagna)
+
+- **Question:** come si completa il sistema generale delle ricompense e
+  dei requisiti delineato dalla discussione sul ciclo macro della
+  campagna (invasione goblin come esempio)? Sub-questioni: (a) sottotipi
+  delle quattro famiglie di ricompense (capacità per le quest / economia
+  e risorse / potenziamenti combattivi del party / difese del villaggio);
+  (b) rappresentazione dei requisiti, comprese le **skill a livelli di
+  applicazione** (una capacità nota che si estende a nuove situazioni);
+  (c) crescita di requisiti e valore tra i livelli delle quest senza
+  rendere obsolete le scelte precedenti; (d) modello di valutazione delle
+  ricompense che pesi **tempo, rischio, disponibilità e stato della
+  campagna** — non solo valore nominale.
+- **Status:** `open` — direzioni chiarite in conversazione 2026-10-16,
+  tutte PROPOSAL; nessun numero di bilanciamento definito.
+- **Source:** `context/QUEST_CAMPAIGN_MACRO.md` (§1–§6); R-209.
+- **Blocking:** qualsiasi ratifica del ciclo macro di campagna e del
+  sistema ricompense/requisiti; non blocca il runtime attuale né i lavori
+  dentro la singola quest.
+- **Related:** OPEN-012 (difesa villaggio a ondate, stessa famiglia);
+  OPEN-019/020/021 (grafo opportunità, tassonomia requisiti, esploratore —
+  le due tassonomie ricompense vanno composte, MACRO §7); OPEN-010
+  (economia villaggio); `QUEST_RULES.md` §7 (canali — la skill a livelli
+  si appoggia al meccanismo vigente).

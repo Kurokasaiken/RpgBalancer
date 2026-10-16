@@ -23,7 +23,9 @@ Use for single, well-defined implementation tasks.
 - Resolve the cause, not the symptom.
 - If scope grows during execution, stop and report instead of silently expanding.
 - Never open a window/app/browser in the foreground automatically — all automated browser/test runs are headless or background; a visible window requires explicit Director opt-in in-session (`.windsurf/rules/16-no-foreground-windows.md`).
-- Run the relevant safeguards (`npm run lint -- <scope>`, `npm run test -- <scope>`, `npm run build:check`) before declaring done.
+- Run the relevant safeguards (`npm run lint -- <scope>`, `npm run test -- <scope>`, `npm run build:check`, `npm run closure:lint`) before declaring done.
+- A chiusura: `verify:bundle` sul manifest del task e voce `RICHIESTE.md` a `fatta` con `bundle:` — niente righe kanban né dispatch (in pausa, R-208).
+- Quando un plan passa a `completed`: `npm run plan:stamp -- close PLAN-NNN` — chiude il ledger per-plan; `npm run plan:stamp -- report` aggrega i tempi per misurare il risparmio R-208.
 - Update the relevant plan, `RICHIESTE.md` item, or evidence log before closing.
 
 ## Post-execution learning

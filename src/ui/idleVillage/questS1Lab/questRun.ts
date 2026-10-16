@@ -257,6 +257,18 @@ export interface QuestRunState {
    *  (revisits included, e.g. the F6 loot loop). The theatre adapter renders
    *  resolved nodes from this, never from the graph (PLAN-025 T-006). */
   visitedNodes: string[];
+  /* ---- Overlay identity (PLAN-040 T-003a) ------------------------------- */
+  /** Monotonic visit counter — bumped once per node entry (one per
+   *  `visitedNodes` push, revisits included). Overlay controllers tell a
+   *  check is "settled" (its presentation window is over) when
+   *  `check.visitSeq < cursorVisitSeq` — immune to graph loops, unlike
+   *  queue positions or beat indices. */
+  cursorVisitSeq: number;
+  /** High-water mark of check sequences whose outcome no longer needs
+   *  surfacing (toast dismissed, or settled history from before the overlay
+   *  era). Persisted; hydration takes `max(persisted, highestSettled)` and
+   *  never lowers it. */
+  dismissedUpTo: number;
   /* ---- Resolved offer (PLAN-019-S2.3) -------------------------------- */
   /** Registry key of the ScenarioInstance this run executes — absent on
    *  legacy/lab runs (authored map, declared migration). */
@@ -329,6 +341,20 @@ export interface ResolvedCheck {
   exposure: Record<string, number>;
   /** Enemies killed by this resolution (combat turns only). */
   kills?: number;
+  /* ---- Overlay identity (PLAN-040 T-003a) ------------------------------- */
+  /** Run-scoped resolution sequence — strictly monotonic and unique for the
+   *  whole run (never reused after queue trims or graph loops). Allocated
+   *  atomically with the check's creation from the run-level `checkSeq`
+   *  counter; for records written by this schema it equals the N in `id`. */
+  checkSeq: number;
+  /** `cursorVisitSeq` value of the visit during which this check resolved —
+   *  the check is settled once `visitSeq < run.cursorVisitSeq`. Stamped in
+   *  the same state mutation as the resolution, so a crash between resolve
+   *  and cursor advance can never invent a settled check. */
+  visitSeq: number;
+  /** Position within the committing action's check batch (queue order at
+   *  push time — the queue resets per command). Debug/dedupe aid. */
+  beatIndex: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -933,6 +959,8 @@ export function createRun(
     frontier: { status: 'waiting', startedAt: frontier?.startTick ?? 0, readyAt: frontier?.startTick ?? 0 },
     nodeTicks: frontier?.nodeTicks ?? 0,
     visitedNodes: [startNode],
+    cursorVisitSeq: 1,
+    dismissedUpTo: 0,
     ...(scenarioInstance ? { scenarioInstanceId: scenarioInstance.instanceId } : {}),
     ...(resolvedOffer ? { resolvedOffer } : {}),
     launchedAtTick: frontier?.startTick ?? 0,
@@ -1414,6 +1442,9 @@ function resolveCheck(
     harmLines: [],
     authoredText: '',
     exposure: exposureSnapshot(state, 0),
+    checkSeq: state.checkSeq,
+    visitSeq: state.cursorVisitSeq,
+    beatIndex: state.checkQueue.length,
   };
   state.lastCheck = resolved;
   state.checkQueue.push(resolved);
@@ -1499,6 +1530,9 @@ function resolveCombatTurn(state: QuestRunState, node: QuestNode): void {
     harmLines: [],
     authoredText: '',
     exposure: exposureSnapshot(state, spec.escalateProfile ? turn : 0),
+    checkSeq: state.checkSeq,
+    visitSeq: state.cursorVisitSeq,
+    beatIndex: state.checkQueue.length,
   };
   state.checkQueue.push(state.lastCheck);
   state.log.push({
@@ -2306,6 +2340,7 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
     state.nodeId = cursor;
     state.frontierVersion += 1;
     state.visitedNodes.push(cursor);
+    state.cursorVisitSeq += 1;
     state.log.push({ kind: 'NODE', text: node.title });
 
     // Spotted sneaking past the guards: their patrol chases the party out —
@@ -2315,12 +2350,14 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
     }
 
     // Combat nodes stop and wait for per-turn player input: each command
-    // resolves one turn via the 'fight-turn' synthetic option.
+    // resolves one turn via the 'fight-turn' synthetic option. R-199: the
+    // march TO the node costs `nodeTicks` — the frontier opens at readyAt,
+    // then turns are immediate (the frontier is not re-armed inside a node).
     if (node.kind === 'combat') {
       state.combatTurn = 0;
       state.goblinLeft = node.combat?.enemies ?? 0;
       state.lastEvent = node.body;
-      state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick };
+      state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick + state.nodeTicks };
       return;
     }
 
@@ -2416,7 +2453,9 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
     }
 
     // Choice nodes (and anything unknown) stop and wait for player input.
-    if (!state.ended) state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick };
+    // R-199: arrival also costs `nodeTicks` — the choice is VISIBLE at once
+    // but committable only when the phase's own slot on the bar has come.
+    if (!state.ended) state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick + state.nodeTicks };
     return;
   }
 }
@@ -2547,7 +2586,13 @@ export function submitCommand(
 ): QuestRunState {
   if (state.ended) return state;
   if (state.frontier.status === 'pending') return state;
-  const tick = opts?.tick ?? state.frontier.startedAt;
+  /* Clock-less callers (lab `applyChoice`, legacy paths) command «as if
+   *  always on time»: defaulting to `readyAt` keeps the pre-R-199 full-step
+   *  semantics while a real clock (the hook passes `tickRef`) enforces the
+   *  phase schedule — options commit only once their slice of the bar has
+   *  passed. */
+  const tick = opts?.tick ?? Math.max(state.frontier.startedAt, state.frontier.readyAt);
+  if (tick < state.frontier.readyAt) return state;
   const nodes = nodesFor(state);
   const node = nodes[state.nodeId];
   if (!node) return state;
@@ -2642,6 +2687,7 @@ export function submitCommand(
     state.nodeId = checkNode.id;
     state.frontierVersion += 1;
     state.visitedNodes.push(checkNode.id);
+    state.cursorVisitSeq += 1;
     const preMark = state.log.length;
     const result = resolveCheck(state, checkNode, opts?.useConsumable !== false, opts?.forceDie, opts?.armedFlags);
     // Only this check's lines, HARM included, and written again once the outcome
@@ -2695,13 +2741,16 @@ export function applyChoice(
   return matureReady(state, Number.MAX_SAFE_INTEGER);
 }
 
-/** Options visible at the current node (filters info-gated options). */
-export function availableOptions(state: QuestRunState): { id: string; label: string; detail: string; costGold?: number; disabled: boolean }[] {
+/** Options visible at the current node (filters info-gated options). R-199:
+ *  `nowTick` lets the caller mark a waiting frontier's options locked while
+ *  the phase's slot on the time bar has not arrived — visible, not feasible. */
+export function availableOptions(state: QuestRunState, nowTick?: number): { id: string; label: string; detail: string; costGold?: number; disabled: boolean }[] {
   const node = nodesFor(state)[state.nodeId];
   // A pending frontier is a timed beat, not a decision — no input exists yet.
   if (!node || state.ended || state.frontier.status === 'pending') return [];
+  const locked = nowTick !== undefined && nowTick < state.frontier.readyAt;
   if (node.kind === 'info') {
-    return [{ id: 'advance', label: 'Continue', detail: 'Go on.', disabled: false }];
+    return [{ id: 'advance', label: 'Continue', detail: 'Go on.', disabled: locked }];
   }
   if (node.kind === 'combat') {
     return [
@@ -2709,7 +2758,7 @@ export function availableOptions(state: QuestRunState): { id: string; label: str
         id: 'fight-turn',
         label: `Fight — turn ${state.combatTurn + 1}`,
         detail: `${node.combat?.enemyName ?? 'Goblins'} standing: ${state.goblinLeft}. They answer blow for blow.`,
-        disabled: false,
+        disabled: locked,
       },
     ];
   }
@@ -2728,7 +2777,7 @@ export function availableOptions(state: QuestRunState): { id: string; label: str
       label: o.label,
       detail: o.detail,
       costGold: o.costGold,
-      disabled: !!o.costGold && state.gold < o.costGold,
+      disabled: locked || (!!o.costGold && state.gold < o.costGold),
     }));
 }
 
@@ -2759,3 +2808,94 @@ export function consumableFutureChecks(
 }
 
 export { QUESTS };
+
+/* ------------------------------------------------------------------ */
+/* Overlay identity (PLAN-040 T-003a)                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Every check record of the run that overlay controllers may still reference
+ * — the presentation queue plus `lastCheck` (which may have been evicted
+ * from the queue by a later command). `lastCheck` is appended only when it
+ * is not already the queue's own tail entry.
+ */
+export function checkHistory(run: QuestRunState): ResolvedCheck[] {
+  const queue = Array.isArray(run.checkQueue) ? run.checkQueue.filter((c) => !!c && typeof c === 'object') : [];
+  const last = run.lastCheck;
+  if (last && !queue.includes(last)) queue.push(last);
+  return queue;
+}
+
+/**
+ * The highest `checkSeq` whose presentation is over — checks settled because
+ * the cursor has since entered another node (`visitSeq < cursorVisitSeq`).
+ * Checks resolved on the CURRENT visit (a held check, a run-ending one) are
+ * never counted settled by this predicate.
+ */
+export function highestSettledCheckSeq(run: QuestRunState): number {
+  return checkHistory(run).reduce(
+    (max, c) => ((c.visitSeq ?? 0) < run.cursorVisitSeq ? Math.max(max, c.checkSeq ?? 0) : max),
+    0,
+  );
+}
+
+const CHECK_ID_SEQ = /^chk-(\d+)$/;
+
+/**
+ * PLAN-040 T-003a: backfill and validate the overlay-identity fields on a
+ * persisted run (added after engine v2 shipped — legacy saves carry plain
+ * `chk-N` ids and none of `checkSeq`/`visitSeq`/`beatIndex`/`cursorVisitSeq`/
+ * `dismissedUpTo`). Mutates the run in place, deterministic, replay-safe.
+ *
+ * Rules (debate r007):
+ * - `cursorVisitSeq` backfills to `visitedNodes.length` — the counter and the
+ *   history are 1:1 since the start node counts as visit 1.
+ * - `checkSeq` backfills from the `chk-N` id when valid; duplicate or
+ *   malformed sequences are NOT repaired by inference — the whole check
+ *   history is re-sequenced deterministically in queue order, starting
+ *   AFTER the run allocator's high mark (fresh seq space, never reused).
+ * - `visitSeq` of unknown provenance becomes 0 — the record is treated as
+ *   settled history, and `dismissedUpTo` absorbs it via the max() below.
+ * - `dismissedUpTo` lands at `max(persisted, highestSettled)` — never
+ *   lowered: a remount mid-hold must not resurface an already-shown toast.
+ */
+export function normalizeRunOverlayIdentity(run: QuestRunState): QuestRunState {
+  if (!Number.isFinite(run.cursorVisitSeq) || run.cursorVisitSeq < 1) {
+    run.cursorVisitSeq = Math.max(1, Array.isArray(run.visitedNodes) ? run.visitedNodes.length : 1);
+  }
+  if (!Number.isFinite(run.dismissedUpTo) || run.dismissedUpTo < 0) {
+    run.dismissedUpTo = 0;
+  }
+  const checks = checkHistory(run);
+  const seqs = checks.map((c) => {
+    if (Number.isInteger(c.checkSeq) && c.checkSeq > 0) return c.checkSeq;
+    const m = CHECK_ID_SEQ.exec(typeof c.id === 'string' ? c.id : '');
+    return m ? Number.parseInt(m[1], 10) : Number.NaN;
+  });
+  const valid =
+    checks.length > 0 &&
+    seqs.every((s) => Number.isInteger(s) && s > 0) &&
+    new Set(seqs).size === seqs.length;
+  if (checks.length && !valid) {
+    /* Re-sequence deterministically in queue order, in a seq space that the
+     * allocator can never reach — order is only as meaningful as the queue
+     * itself; nothing is inferred beyond it. */
+    let next = Math.max(0, Math.floor(run.checkSeq ?? 0)) + 1;
+    checks.forEach((c, i) => {
+      c.checkSeq = next + i;
+      c.id = `chk-${next + i}`;
+    });
+  } else {
+    checks.forEach((c, i) => {
+      c.checkSeq = seqs[i];
+    });
+  }
+  checks.forEach((c, i) => {
+    if (!Number.isFinite(c.visitSeq)) c.visitSeq = 0;
+    if (!Number.isFinite(c.beatIndex)) c.beatIndex = i;
+  });
+  const maxSeq = checks.reduce((m, c) => Math.max(m, c.checkSeq), 0);
+  if (!Number.isFinite(run.checkSeq) || run.checkSeq < maxSeq) run.checkSeq = maxSeq;
+  run.dismissedUpTo = Math.max(run.dismissedUpTo, highestSettledCheckSeq(run));
+  return run;
+}

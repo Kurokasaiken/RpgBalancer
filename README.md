@@ -175,7 +175,7 @@ These secrets are used by the multi-provider AI worker system to distribute load
 ### Component Lab → Minimal Promotion Guard
 
 - Use `npm run component-lab:promote -- --featureId=<id> [--screenshot=/path/to/evidence.png]` every time a Lab component graduates into Minimal Gameplay.
-- The guard sequentially runs lint → test → build:check → kanban:lint, persists the raw output under `test-results/minimal-vertical-slice-<featureId>-<timestamp>.log`, and appends an entry to `src/docs/docs/IMPLEMENTED_PLAN.md`.
+- The guard sequentially runs lint → test → build:check → closure:lint, persists the raw output under `test-results/minimal-vertical-slice-<featureId>-<timestamp>.log`, and appends an entry to `src/docs/docs/IMPLEMENTED_PLAN.md`.
 - In CI, call the same script before deploying Minimal updates so the generated log can be uploaded as an artifact (e.g., GitHub Actions `actions/upload-artifact`) and attached to the promotion ticket.
 
 ## 📚 Documentation
@@ -200,7 +200,7 @@ Contributions are welcome! Please read the [implementation plan](docs/implementa
 
 ### Checklist "Prima di scrivere un prompt"
 - [ ] ID univoco assegnato? (non duplicato)
-- [ ] `npm run kanban:lint` eseguito e superato?
+- [ ] `npm run closure:lint` eseguito e superato?
 - [ ] Placeholder rimosso se usato temporaneamente?
 - [ ] Documentazione correlata aggiornata dopo completamento?
 

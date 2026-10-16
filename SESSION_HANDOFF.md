@@ -1,5 +1,31 @@
 # Session Handoff — 2026-10-14
 
+## 2026-10-16 — R-199: QuestRunWindow rev.2 completata (bundle PASS 8/8)
+
+- **Current state:** **R-199 `fatta`** — rev.2 della quest window su `/game`
+  (13+1 punti Director, piano `.mw/runs/r199-quest-window-rev2/plan.md`).
+- **Implementato:** skip implicito senza pulsante (click/tasto sullo stage,
+  `isInteractiveTarget` esclude i controlli); companions chiusi di default
+  (revoca «tutto visibile» R-196); `widthPx 820` + `stageMaxHeightPx`; scelte
+  bordate + trigger bag adiacente; abbandona in header (`ico-gust`) con
+  conferma inline → `abandon()`→`flee` engine; `durationDays: 5` in
+  `gameFrameConfig` pilota `nodeTicks`/barra fasi — fasi future visibili ma
+  gated su `frontier.readyAt`; astrolabe `DestinyAstrolabeV62Standalone`
+  docked sul teatro ai check (verdetto engine-only) + `QuestCheckOptionsPanel`
+  (salta intro→`throw()` / salta check→undock, persistito `questCheckOpts` via
+  PersistenceService); `QuestRewardPopup` page-level non-modale, staged
+  (`stageMs` config) + skippabile, `Esc`→focus-return.
+- **Verifica:** bundle `.mw/runs/r199-quest-window-rev2/bundle.json` **PASS**
+  (RV-1..RV-8, verifier indipendente CONFIRMED ×8); 27/27 RTL
+  window+popup+checkOpts, 52/52 engine, lint 0 err, build:check PASS,
+  kanban:lint 42; witness `quest-window-open.png` + `reward-popup.png`.
+- **Note per il prossimo:** punti 2-3 della richiesta (POI→detail, immagini)
+  erano già risolti da PLAN-036 — smoke li conferma. Esiste già **R-205
+  `in corso` (rev.3)**: 7 difetti noti dal Director (contenuto fuoriesce dalla
+  placca, bag toggle grande, astrolabe→overlay esterno click-to-dismiss,
+  pre-scaldare il check nel boot veil, esiti post-check in popup-testo,
+  reward lento). I driver test engine ora avanzano il clock a `readyAt`.
+
 ## 2026-10-15 pm — R-196: QuestRunWindow cinematografico completato
 
 - **Current state:** **R-196 `fatta`** — redesign `/game` quest window da

@@ -1,9 +1,14 @@
 /**
- * Kanban Lint Integration Script
- * 
+ * Kanban Lint Integration Script — **LEGACY / IN PAUSA (R-208, 2026-10-16)**
+ *
+ * The kanban board and dispatch pipeline are paused by Director decision:
+ * this module is kept for possible reactivation but is NOT part of the
+ * active workflow. The live closure gate is `scripts/closureLint.ts`
+ * (`npm run closure:lint`); the compat shim is `scripts/kanbanLint.ts`.
+ *
  * CI guardrails for kanban lint validation and policy enforcement.
  * Integrates with GitHub Actions, pre-commit hooks, and CI pipelines.
- * 
+ *
  * @module kanbanLintIntegration
  * @since 2026-01-14
  * @author CI-Coordinator

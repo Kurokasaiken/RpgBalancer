@@ -9,6 +9,7 @@
  */
 
 import {
+  isQuietWindowActive,
   type Session,
   type SessionRegistry,
   type SessionState,
@@ -67,6 +68,7 @@ export interface CanShutdownOptions {
  *
  * Blocking rules (in order):
  * 1. `policy.shutdownEnabled === false` → blocked.
+ * 1b. `policy.quietWindow.enabled` and now outside the window → blocked.
  * 2. `userIdleMs === 'UNKNOWN'` or below threshold → blocked.
  * 3. Any session in a non-terminal state → blocked. Sessions whose
  *    heartbeat age exceeds `maxSessionAgeMs` are treated as stuck and
@@ -115,6 +117,19 @@ export function canShutdown(
 
   if (!policy.shutdownEnabled) {
     return { allowed: false, reason: 'policy.shutdownEnabled=false', blockers, userIdleMs, policy };
+  }
+  /* Quiet-window veto (Director ruling 2026-10-16): when enabled, shutdown is
+   * only allowed inside the configured overnight window — a drained queue at
+   * 15:00 must not power off the machine the Director may still be using. */
+  if (policy.quietWindow?.enabled && !isQuietWindowActive(now, policy.quietWindow)) {
+    const w = policy.quietWindow;
+    return {
+      allowed: false,
+      reason: `outside quiet window (allowed ${w.startHour}:00–${w.endHour}:00)`,
+      blockers,
+      userIdleMs,
+      policy,
+    };
   }
   if (userIdleMs === 'UNKNOWN') {
     return { allowed: false, reason: 'user idle unreadable (fail-closed)', blockers, userIdleMs, policy };

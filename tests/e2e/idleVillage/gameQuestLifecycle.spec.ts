@@ -118,6 +118,25 @@ const detail = (page: Page) => page.getByTestId('quest-expedition-detail');
 const questWindow = (page: Page) => page.getByTestId('quest-window');
 const sendButton = (page: Page) => page.getByTestId('quest-expedition-send');
 const closeReportButton = (page: Page) => page.getByTestId('quest-window-close-report');
+/* R-199 pt.14: la relazione di ritorno vive nel `quest-reward-popup` — placca
+ *  centrata SOPRA la window che copre fisicamente `quest-window-close-report`.
+ *  Chiuderla (bottone staged «Chiudi» o la X sempre presente in title row) è
+ *  il dismissal canonico del report: `closeReward` sgancia la run e rende il
+ *  POI, esattamente come il «Chiudi il rapporto» della window — che resta il
+ *  fallback quando il popup non è montato. */
+const dismissQuestReport = async (page: Page) => {
+  const popup = page.getByTestId('quest-reward-popup');
+  if (await popup.isVisible()) {
+    const stagedClose = popup.getByTestId('quest-reward-close');
+    if (await stagedClose.isVisible()) {
+      await stagedClose.click();
+    } else {
+      await popup.locator('[data-hud-controls] button').first().click();
+    }
+    return;
+  }
+  await closeReportButton(page).click();
+};
 const speedGroup = (page: Page) => page.locator('[role="radiogroup"]');
 const pauseToggle = (page: Page) => speedGroup(page).getByRole('radio').first();
 const speedButton = (page: Page, mult: 1 | 2 | 4) => speedGroup(page).getByRole('radio', { name: `×${mult}` });
@@ -254,6 +273,12 @@ async function driveRunToEnd(page: Page, maxSteps = 120): Promise<RunShape> {
     if (!run) throw new Error('run vanished mid-drive');
     if (run.ended) return run;
     if (run.frontier.status === 'waiting') {
+      /* R-199: a waiting frontier is visible at once but committable only at
+       *  `readyAt` (the march to the node costs nodeTicks) — the driver waits
+       *  the phase slot on the canonical clock before choosing. */
+      const clock = await getClock(page);
+      const lead = Math.max(0, run.frontier.readyAt - clock.currentTick);
+      if (lead > 0) await advanceTicks(page, lead + 1);
       const options = await expedition<string[]>(page, 'getOptions');
       if (!options.length) throw new Error(`waiting frontier without options at ${run.nodeId}`);
       repeats = run.nodeId === lastNode ? repeats + 1 : 0;
@@ -288,6 +313,9 @@ async function driveToPending(page: Page, maxSteps = 20): Promise<RunShape> {
     if (run.ended) throw new Error('run ended before a pending frontier');
     if (run.frontier.status === 'pending') return run;
     if (run.frontier.status === 'waiting') {
+      const clock = await getClock(page);
+      const lead = Math.max(0, run.frontier.readyAt - clock.currentTick);
+      if (lead > 0) await advanceTicks(page, lead + 1);
       const options = await expedition<string[]>(page, 'getOptions');
       if (!options.length) throw new Error(`waiting frontier without options at ${run.nodeId}`);
       repeats = run.nodeId === lastNode ? repeats + 1 : 0;
@@ -319,9 +347,18 @@ const waitForSettled = (page: Page) =>
  * once the queue is empty. Presses Enter until the report surfaces.
  */
 const flushBeatTheatre = async (page: Page) => {
-  for (let i = 0; i < 240; i++) {
+  /* PLAN-040: i check beat si tengono sull'overlay esterno
+   *  `quest-check-overlay` (#game-modal-root) — il pulsante Throw (`.da-tira`)
+   *  è page-level, non più dentro la window. Enter resta valido: la window
+   *  lo instrada in `advancePresentation` → `skipToResult`/`skip` via bridge. */
+  const astroThrow = page.locator('.da-tira');
+  for (let i = 0; i < 400; i++) {
     if (await closeReportButton(page).isVisible()) return;
-    await page.keyboard.press('Enter');
+    if (await astroThrow.isVisible()) {
+      await astroThrow.click().catch(() => undefined);
+    } else {
+      await page.keyboard.press('Enter');
+    }
     await page.waitForTimeout(120);
   }
   throw new Error('beat theatre never reached the expedition report');
@@ -475,12 +512,15 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
   test('run: la frontiera pending non matura in pausa e matura a ×4 sul clock reale', async ({ page }) => {
     await launchGoblinQuest(page);
 
-    /* Risolve le decisioni di apertura finché la frontiera non è pending. */
+    /* Pausa PRIMA di drivare: con la semantica `readyAt` (R-199) il gap fra
+     *  frontiera pending e click di pausa lascerebbe ai tick reali il tempo
+     *  di maturare — race. Il driver risolve le attese via `advanceTicks`
+     *  imperativo, che funziona anche a simulazione ferma. */
+    await pauseToggle(page).click();
     const pendingRun = await driveToPending(page);
     expect(pendingRun.frontier.status).toBe('pending');
     const nodeAtPause = pendingRun.nodeId;
 
-    await pauseToggle(page).click();
     const tickAtPause = (await getClock(page)).currentTick;
     await page.waitForTimeout(2200);
     expect((await getClock(page)).currentTick).toBe(tickAtPause);
@@ -543,7 +583,17 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
       const res = villageAfter.residents.find((r) => r.id === member.id);
       expect(res, `resident ${member.id} in roster`).toBeTruthy();
       if (member.dead) expect(res!.isDead).toBe(true);
-      else if (member.wounded) expect(res!.isInjured).toBe(true);
+      /* R-199: the march now spans `questWindow.durationDays` on the game
+       *  clock — a wound taken early can legitimately expire during the run
+       *  and heal at release (isInjured=false + injuredUntilTick cleared).
+       *  The durable record is the `resident-wounded` plan effect above; here
+       *  the aggregate must be consistent: still injured, or healed. */
+      else if (member.wounded) {
+        expect(
+          res!.isInjured || res!.injuredUntilTick == null,
+          `resident ${member.id}: wounded but mid-state (isInjured=${res!.isInjured}, injuredUntilTick=${res!.injuredUntilTick})`,
+        ).toBe(true);
+      }
     }
     /* Delta fungibile esatto: rewardResolved solo su 'reward', il bottino
      *  torna a meno di wipe. */
@@ -613,7 +663,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     /* D-1: il report di un'offerta `repeatable` non consuma il POI — la run
      *  si sgancia e il marker torna `available` (stesso DOM id, il ghost
      *  exit non scatta perché l'anchor resta in lista). */
-    await closeReportButton(page).click();
+    await dismissQuestReport(page);
     await expect(questWindow(page)).toHaveCount(0);
     expect(await getRun(page)).toBeNull();
     await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');
@@ -691,7 +741,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
 
     /* Il loop si chiude: il rapporto si chiude → la run si sgancia e il
      *  POI `repeatable` torna `available` (R-200 — mai consumato). */
-    await closeReportButton(page).click();
+    await dismissQuestReport(page);
     await expect(questWindow(page)).toHaveCount(0);
     expect(await getRun(page)).toBeNull();
     await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');
@@ -702,7 +752,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     await driveRunToEnd(page);
     await waitForSettled(page);
     await flushBeatTheatre(page);
-    await closeReportButton(page).click();
+    await dismissQuestReport(page);
     await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');
 
     await page.reload();
@@ -788,7 +838,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     /* E il POI `repeatable` si comporta come per una quest lanciata dal
      *  marker: chiuso il rapporto la run si sgancia e il marker torna
      *  `available` — mai consumato (R-200). */
-    await closeReportButton(page).click();
+    await dismissQuestReport(page);
     await expect(questWindow(page)).toHaveCount(0);
     expect(await getRun(page)).toBeNull();
     await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');

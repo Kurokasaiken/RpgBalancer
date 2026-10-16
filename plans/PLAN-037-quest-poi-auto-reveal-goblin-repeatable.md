@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-037 — /game: comparsa automatica sfalsata dei POI quest (una ogni 5s, mai scomparse) + goblin `repeatable`'
-status: proposed
+status: completed
 created: 2026-10-15
 request: R-200
 desiderata: nessuna nuova — decisione Director in sessione; lifecycle offerta già ratificato (D-S4-6, PLAN-019-S4, 2026-10-10)
@@ -190,3 +190,25 @@ un marker quest non è mai un demo).
   (`order` su `QuestPoiSchema` o sequenza in `questReveal`) — non deciso qui.
 - Aperta: se il reveal stagger debba valere anche su altre superfici che
   montano i POI quest (nessuna oggi — solo `/game`).
+
+## Stato di avanzamento (2026-10-16 — COMPLETATO)
+
+- T-001 ✅ `gameFrameConfig.questReveal` (Zod, default 1000/5000) +
+  `poi-goblin.repeatable: true`.
+- T-002 ✅ `questRevealSchedule.ts` + auto-reveal post-veil in
+  `game-frame-pixi.tsx`; «Mostra quest» one-way; Reset ri-arma; run attivo →
+  marker immediato (D-5).
+- T-003 ✅ `questRevealSchedule.test.ts` 8/8, `questOffer.test.ts` 30/30,
+  `gameQuestReveal.spec.ts` 3/3; assert «count 0 al boot» R-124 superati e
+  riscritti; suite lifecycle 13/13 con contratto repeatable.
+- T-004 ✅ `QUEST_RULES.md` §8b (lifecycle offerta + auto-reveal, `vigente`),
+  `quest_sterminio_goblin_spec.md` (lifecycle ripetibile), `poi_family_spec.md`
+  (nota consumo vs repeatable).
+- T-005 ✅ Bundle `.mw/runs/plan037-quest-reveal-2026-10-15/bundle.json`
+  **PASS 7/7** + `verifier.json` CONFIRMED ×3; evidence
+  `test-results/r200-quest-reveal-2026-10-16.log`; T-04 coperto da signoff su
+  screenshot ispezionati (conferma Director su live benvenuta).
+- Divergenze dal piano: nessuna funzionale; i driver E2E sono stati adattati
+  alla semantica R-199 atterrata nel tree in parallelo (astrolabe Throw,
+  `QuestRewardPopup` esterno, `frontier.readyAt`, companions chiusi) —
+  dettagli nell'evidence log.

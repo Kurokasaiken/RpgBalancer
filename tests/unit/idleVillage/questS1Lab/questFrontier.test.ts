@@ -55,7 +55,7 @@ describe('quest frontier (v27)', () => {
   it('a CHECK: outcome resolves inline as consequence, then stops at the decision', () => {
     const run = timedRun();
     submitCommand(run, 'gob-partenza', { tick: 0 });
-    submitCommand(run, 'gob-cerca-tracce', { tick: 10 });
+    submitCommand(run, 'gob-cerca-tracce', { tick: run.frontier.readyAt });
     expect(run.checkQueue).toHaveLength(1);
     // The check is a consequence, not a frontier: the run stops at the choice
     // the verdict routed to (gob-accampamento or gob-bottino-scelta).
@@ -144,7 +144,7 @@ describe('quest frontier (v27)', () => {
         if (run.ended) break;
         if (legacy) applyChoice(run, opt);
         else {
-          submitCommand(run, opt, { tick: 0 });
+          submitCommand(run, opt, { tick: run.frontier.readyAt });
           matureReady(run, Number.MAX_SAFE_INTEGER);
         }
       }

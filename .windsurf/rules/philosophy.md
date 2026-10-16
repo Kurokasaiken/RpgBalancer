@@ -34,6 +34,6 @@ UI targets < 16ms/frame, animates with transform/opacity, uses layered feedback
 (visual + audio + tactile). See `docs/plans/ui_game_dev_system_prompt.md`.
 
 ## Evidence and safety
-Nothing is "done" until safeguards pass (lint, test, build:check, kanban:lint) with an
+Nothing is "done" until safeguards pass (lint, test, build:check, closure:lint) with an
 evidence log in `test-results/`. If a request conflicts with an invariant, flag it —
 do not silently deviate.

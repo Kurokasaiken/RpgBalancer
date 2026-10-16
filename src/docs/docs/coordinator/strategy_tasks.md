@@ -1,5 +1,11 @@
 # Strategy Task Intake
 
+> **IN PAUSA — R-208 (Director, 2026-10-16).** Questa intake alimentava la
+> pipeline kanban/dispatch, oggi sospesa: non aggiungere righe qui. Le nuove
+> richieste vanno in `RICHIESTE.md` e i piani in `plans/INDEX.md`; la
+> chiusura è `npm run closure:lint` + `verify:bundle`. File storico,
+> riattivabile solo su decisione esplicita del Director.
+
 |Task ID|Descrizione / Link piano|Origine (Strategia)|File / Aree impattate|Stato|Priorità / KPI|Note coordinator|
 |-------|------------------------|-------------------|----------------------|-----|--------------|----------------|
 |MG-01|Minimal Gameplay – Hook & HUD reale (`minimal_gameplay_vertical_slice_plan.md` §MG-01)|Phase 12 vertical slice plan|src/ui/idleVillage/MinimalWireframePage.tsx → MinimalGameplayPage, src/balancing/config/idleVillage/minimalConfig.ts, src/store/useMinimalGameplay.ts, tests/unit/idleVillage/MinimalGameplayPage.test.tsx|pending|KPI: HUD dati reali, zero magic numbers, lint/test/build pass|Prereq per tutte le milestone successive|

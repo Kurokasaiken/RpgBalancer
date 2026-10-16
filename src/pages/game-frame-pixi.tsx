@@ -8,7 +8,9 @@ import { GameBootScreen, type GameBootPhase } from '@/ui/idleVillage/components/
 import { GameFrameDragCursor } from '@/ui/idleVillage/components/gameFrame/GameFrameDragCursor';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { installGamePerfProbe } from '@/ui/idleVillage/utils/gamePerfProbe';
+import { GAME_PERF_BUDGETS } from '@/ui/idleVillage/config/gamePerfBudgets';
 import { warmGameAssets } from '@/ui/idleVillage/utils/gameAssetWarmup';
+import { isSkillCheckWarmEnabled, prewarmQuestSkillCheck } from '@/ui/idleVillage/components/gameFrame/questSkillCheckWarm';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { MatericRosterComponent } from '@/ui/idleVillage/roster';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
@@ -29,6 +31,7 @@ import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLos
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { type QuestId } from '@/ui/idleVillage/questS1Lab/questRun';
+import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import { isPoiConsumed, poiConsumesOnReportClose, QUEST_HALO_RENDER_MS, QUEST_HALO_STEPS, QUEST_POIS, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
 import { useQuestExpeditionSession } from '@/ui/idleVillage/quests/useQuestExpeditionSession';
@@ -45,7 +48,7 @@ import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente
 import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { useHudScale } from '@/ui/idleVillage/components/gameFrame/useHudScale';
-import { MapDemoPoi, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, VillageScreenView, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
+import { MapDemoPoi, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, VillageScreenView, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
 import { resolveQuestShellLayout } from '@/ui/idleVillage/components/gameFrame/questShellLayout';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
@@ -667,18 +670,33 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     };
   }, []);
 
+  /* R-199 pt.14: the run's report lives OUTSIDE the window — the page-level
+   *  `QuestRewardPopup` opens once the run ended AND the window's beats have
+   *  all presented (or the window is closed — nothing left to watch). Its
+   *  dismissal is the same «report closed» cue as the window's X. */
+  const [questPresenting, setQuestPresenting] = useState(false);
+  const [rewardDismissed, setRewardDismissed] = useState(false);
+  const rewardRunId = activeQuestRun.run ? runIdOf(activeQuestRun.run) : null;
+  const prevRewardRunId = useRef(rewardRunId);
+  if (prevRewardRunId.current !== rewardRunId) {
+    prevRewardRunId.current = rewardRunId;
+    setRewardDismissed(false);
+  }
+  const rewardVisible = Boolean(
+    activeQuestRun.run?.ended &&
+    !rewardDismissed &&
+    (!panels.visible.quest || !questPresenting),
+  );
+
   /* Dismissal of the expedition report is the POI's exit cue: when the quest
    *  window transitions visible→closed on an ended+settled run, the run is
    *  cleared (bag released, save removed) and the POI is consumed. Any close
    *  path lands here — the window's X, «Chiudi il rapporto», the panels menu,
-   *  the Q key. A live or unsettled run is untouched: closing the window on
-   *  those keeps the expedition pinned on the map. */
-  const prevQuestPanelVisible = useRef(panels.visible.quest);
-  useEffect(() => {
-    const wasVisible = prevQuestPanelVisible.current;
-    prevQuestPanelVisible.current = panels.visible.quest;
+   *  the Q key — and, R-199, the reward popup's close (same semantics: the
+   *  report is dismissed). A live or unsettled run is untouched. */
+  const dismissSettledRun = useCallback(() => {
     const run = activeQuestRun.run;
-    if (!wasVisible || panels.visible.quest || !run?.ended || run.settlement?.status !== 'settled') return;
+    if (!run?.ended || run.settlement?.status !== 'settled') return;
     const consumedPoi = QUEST_POIS.find((p) => p.questId === activeQuestId);
     /* D-S4-6: one-shot by default — a `repeatable` offer is never consumed:
      * clearing the run returns it to `available` while its window lasts. */
@@ -688,7 +706,19 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
       void saveData(CONSUMED_POIS_KEY, next);
     }
     activeQuestRun.clear();
-  }, [panels.visible.quest, activeQuestRun, activeQuestId, consumedPoiIds]);
+  }, [activeQuestRun, activeQuestId, consumedPoiIds]);
+  const prevQuestPanelVisible = useRef(panels.visible.quest);
+  useEffect(() => {
+    const wasVisible = prevQuestPanelVisible.current;
+    prevQuestPanelVisible.current = panels.visible.quest;
+    if (!wasVisible || panels.visible.quest) return;
+    dismissSettledRun();
+  }, [panels.visible.quest, dismissSettledRun]);
+  const closeReward = useCallback(() => {
+    setRewardDismissed(true);
+    if (panels.visible.quest) panels.set('quest', false);
+    dismissSettledRun();
+  }, [panels, dismissSettledRun]);
 
   // R-196: bag arming is per-item and lives in `useQuestRun.armedFlags` — the
   // window toggles flags through `toggleArmedFlag`, nothing is spent unasked.
@@ -918,6 +948,22 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     trackTelemetryEvent('game_boot_complete', { interactiveMs });
   }, [veilGone]);
 
+  /* PLAN-040 T-004: pre-warm the skill-check astrolabe in the boot slack —
+   *  after the map's `prepare.upload` + first frames (`mapReady`), while the
+   *  veil keeps its minimum display time. Runs only when enabled (measured
+   *  gate, `skillCheck.warmEnabled`/`?warmcheck=1`), only with real boot
+   *  slack left under the ≤4s budget, inside an idle slice, bounded by its
+   *  own ~600ms guard — it never delays `onReady` or `bootDone`. */
+  useEffect(() => {
+    if (!mapReady || !isSkillCheckWarmEnabled()) return undefined;
+    const cfg = DEFAULT_GAME_FRAME_CONFIG.questWindow.skillCheck;
+    const slackMs = GAME_PERF_BUDGETS.budgets.firstInteractiveMaxMs - (performance.now() - bootStartedAtRef.current);
+    if (slackMs < cfg.warmSlackMinMs) return undefined;
+    const ctl = new AbortController();
+    void prewarmQuestSkillCheck({ signal: ctl.signal });
+    return () => ctl.abort();
+  }, [mapReady]);
+
   /* Auto-reveal (R-200): the authored offers mount one at a time once the
    *  veil is gone — `questRevealSchedule` owns the pacing (initialDelayMs +
    *  i×staggerMs, wall clock). Additive only: a reveal never removes an id.
@@ -960,6 +1006,9 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           artFor={(nodeId) => NODE_ART[nodeId]?.src}
           time={questRunTimeView}
           onChoose={(optionId) => activeQuestRun.choose(optionId)}
+          nowTick={currentTick}
+          onAbandon={activeQuestRun.abandon}
+          onPresentingChange={setQuestPresenting}
           armedFlags={activeQuestRun.armedFlags}
           onToggleArmedFlag={activeQuestRun.toggleArmedFlag}
           onClose={() => panels.set('quest', false)}
@@ -972,7 +1021,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         />
       ) : null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeQuestRun, activeQuestId, panels.visible.quest, questRunTimeView, questAnchor, questWindow],
+    [activeQuestRun, activeQuestId, panels.visible.quest, currentTick, questRunTimeView, questAnchor, questWindow],
   );
 
   const directorActions = useMemo<DirectorAction[]>(
@@ -1243,6 +1292,23 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                  *  day-30 path exists yet. */}
                 <SettlementLostOverlay />
                 {questWindowNode}
+                {/* PLAN-040 T-003a: quest overlays (skill check in front of
+                    the window, outcome toast in T-005) live in
+                    `#game-modal-root` as siblings of the window — the drag
+                    transform on the window shell could never trap them. */}
+                <QuestOverlays questId={activeQuestId} onDismissOutcome={activeQuestRun.dismissOutcome} />
+                {/* R-199 pt.14: the end-of-run report is its own floating
+                    plaque OUTSIDE the quest window's DOM — staged reveal,
+                    skippable, draggable, non-modal. */}
+                {rewardVisible && activeQuestRun.run && (
+                  <QuestRewardPopup
+                    run={activeQuestRun.run}
+                    scenario={scenarioForQuest(activeQuestId)}
+                    widthPx={questWindow.rewardPopup.widthPx}
+                    stageMs={questWindow.rewardPopup.stageMs}
+                    onClose={closeReward}
+                  />
+                )}
                 {directorEnabled && panels.visible.tuning && (
                   <TuningPanel
                     fields={tuningFields}

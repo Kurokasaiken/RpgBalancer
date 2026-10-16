@@ -383,11 +383,11 @@
 .skin-scope [data-hud-choices] button[data-skin="choice"] {
   display: grid;
   grid-template-columns: 24px 1fr;
-  column-gap: 8px;
+  column-gap: var(--skin-hud-row-column-gap, 8px);
   align-items: baseline;
   width: 100%;
-  padding: 8px 12px;
-  margin-top: 6px;
+  padding: var(--skin-hud-row-padding, 4px 8px);
+  margin-top: var(--skin-hud-row-gap, 4px);
   border: 1px solid var(--skin-hud-row-filet, color-mix(in srgb, var(--skin-surface-border) 55%, transparent));
   border-left: 3px solid color-mix(in srgb, var(--skin-title-color) 55%, transparent);
   border-radius: var(--skin-hud-row-radius, 8px);

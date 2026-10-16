@@ -104,6 +104,9 @@ function driveToEnd(
     }
     const options = availableOptions(state).filter((o) => !o.disabled);
     if (options.length === 0) break;
+    /* R-199: a waiting frontier commits only at readyAt — the driver plays a
+     *  real clock and waits for the phase's slot before commanding. */
+    tick = Math.max(tick, state.frontier.readyAt);
     submitCommand(state, pick(state, options), { tick });
   }
   markObjective(state);
@@ -164,7 +167,7 @@ function enumerateTerminals(
           }
           const options = availableOptions(run).filter((o) => !o.disabled);
           if (options.length === 0) break;
-          submitCommand(run, prefer({ 'gob-esplora-extra': 'gob-fermati' })(run, options), { tick: START_TICK + i });
+          submitCommand(run, prefer({ 'gob-esplora-extra': 'gob-fermati' })(run, options), { tick: Math.max(START_TICK + i, run.frontier.readyAt) });
         }
         markObjective(run);
         if (run.ended) out.push(signatureOf(run));

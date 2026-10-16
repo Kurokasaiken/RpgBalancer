@@ -71,6 +71,10 @@ const STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/VillageScreenView.tsx',
   'src/ui/idleVillage/components/gameFrame/MockUpgradeControl.tsx',
   'src/ui/idleVillage/components/gameFrame/villageBuildingIcons.tsx',
+  // PLAN-038 — the painted-over slot overlay (ellipse rings, vignettes, pennants).
+  'src/ui/idleVillage/components/gameFrame/VillageSlotOverlay.tsx',
+  // PLAN-042 — the Settlement Registry drawer (catalog rows + drill-in card).
+  'src/ui/idleVillage/components/gameFrame/VillageRegistry.tsx',
 ];
 const ROSTER_V2_FILES = [
   'src/ui/idleVillage/rosterV2/DragTestContainerV2.tsx',

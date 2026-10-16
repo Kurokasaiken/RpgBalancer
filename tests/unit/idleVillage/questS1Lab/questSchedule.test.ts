@@ -67,6 +67,10 @@ function driveWithSchedule(
     } else {
       const options = availableOptions(state).filter((o) => !o.disabled);
       if (options.length === 0) break;
+      /* R-199: a waiting frontier commits only at readyAt — the driver's clock
+       *  waits for the phase's slot, so the next pending window still starts
+       *  at the command tick (lastCommittedAt). */
+      tick = Math.max(tick, f.readyAt);
       submitCommand(state, pick(state, options), { tick });
       lastCommittedAt = tick;
     }
@@ -179,7 +183,7 @@ describe('D-K schedule — layer above matureReady, engine untouched', () => {
           ? 'gob-fruga'
           : options.find((o) => o.id === 'gob-fermati')?.id ?? options[0].id;
       const beatsBefore = phaseTileBeats(state, beatOf).length;
-      submitCommand(state, pick, { tick: state.launchedAtTick! + guard * 5 });
+      submitCommand(state, pick, { tick: Math.max(state.launchedAtTick! + guard * 5, state.frontier.readyAt) });
       if (extendedAt === null && state.visitedNodes.length > poi.expectedPathNodes) {
         extendedAt = state.visitedNodes.length;
         // Denominator grows exactly by the extra nodes' nodeDurations.
@@ -193,7 +197,7 @@ describe('D-K schedule — layer above matureReady, engine untouched', () => {
     // Keep looping once more: every further node adds its nodeDuration.
     const beforeExtra = questDurationTicks(state, poi);
     if (!state.ended && state.nodeId === 'gob-esplora-extra') {
-      submitCommand(state, 'gob-fruga', { tick: state.launchedAtTick! + guard * 5 });
+      submitCommand(state, 'gob-fruga', { tick: Math.max(state.launchedAtTick! + guard * 5, state.frontier.readyAt) });
       expect(questDurationTicks(state, poi)).toBeGreaterThanOrEqual(beforeExtra + poi.ticksPerNode);
     }
   });
