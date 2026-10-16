@@ -1,0 +1,90 @@
+diff --git a/src/balancing/config/idleVillage/quests/questPois.ts b/src/balancing/config/idleVillage/quests/questPois.ts
+index 595419bc..12ee6e63 100644
+--- a/src/balancing/config/idleVillage/quests/questPois.ts
++++ b/src/balancing/config/idleVillage/quests/questPois.ts
+@@ -154,6 +154,8 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
+     availableUntilDay: 60,
+     estimatedDurationTicks: 250,
+     ticksPerNode: 10,
++    // Authored pacing, not the median (≈ 12 nodes): kept by the Director
++    // 2026-10-12 — the test only requires it to cover the median path.
+     expectedPathNodes: 25,
+     slots: {
+       required: ['goblin-slot-leader'],
+diff --git a/src/ui/idleVillage/questS1Lab/questSimulation.ts b/src/ui/idleVillage/questS1Lab/questSimulation.ts
+index 317db689..1678f4ca 100644
+--- a/src/ui/idleVillage/questS1Lab/questSimulation.ts
++++ b/src/ui/idleVillage/questS1Lab/questSimulation.ts
+@@ -759,15 +759,26 @@ export function choiceNodesFor(state: QuestRunState): QuestNode[] {
+   return Object.values(nodesFor(state)).filter((n) => n.kind === 'choice');
+ }
+ 
+-/** Default strategy: the first authored option of every choice node. */
++/** Default strategy: the first authored option of every choice node, except
++ *  the goblin F6 checkpoint, where the default is the secure «Stop here».
++ *  A static «keep looting» pick loops back to the same node with escalating
++ *  damage until the party is wiped: 100% wipe, a line no player plays. */
+ export function defaultStrategy(state: QuestRunState): SimStrategy {
+   const s: SimStrategy = {};
+   for (const n of choiceNodesFor(state)) {
+     if (n.options?.length) s[n.id] = n.options[0].id;
+   }
++  for (const [nodeId, optionId] of Object.entries(DEFAULT_PICK_OVERRIDES[state.questId] ?? {})) {
++    if (s[nodeId]) s[nodeId] = optionId;
++  }
+   return s;
+ }
+ 
++/** Per-quest default picks that differ from «first authored option». */
++const DEFAULT_PICK_OVERRIDES: Record<string, Record<string, string>> = {
++  goblin: { 'gob-esplora-extra': 'gob-fermati' },
++};
++
+ /** The push-your-luck choice of each authored quest: which option secures
+  *  the stake vs which pushes deeper. Used for the RETURN/CONTINUE compare. */
+ export const CHECKPOINT_OPTIONS: Record<string, { nodeId: string; secure: string; push: string }> = {
+diff --git a/tests/unit/idleVillage/questOffer.test.ts b/tests/unit/idleVillage/questOffer.test.ts
+index dcc97259..98a7fd3f 100644
+--- a/tests/unit/idleVillage/questOffer.test.ts
++++ b/tests/unit/idleVillage/questOffer.test.ts
+@@ -117,9 +117,21 @@ describe('questPois config', () => {
+     }
+   });
+ 
++  /* POIs whose `expectedPathNodes` is an authored pacing choice, not a
++   *  median estimate. Goblin's 25 was measured when the default strategy
++   *  looted F6 forever (median ≈ 25); with the loop exited the median is
++   *  ≈ 12, and the Director kept 25 as the intended duration (2026-10-12).
++   *  Only the floor holds: the estimate must cover the typical path, so the
++   *  live duration does not extend mid-run for an ordinary party. */
++  const AUTHORED_PATH_NODES = new Set(['poi-goblin']);
++
+   it('expectedPathNodes within ±40% of the simulated median path', () => {
+     for (const poi of QUEST_POIS) {
+       const median = medianPathLength(poi.questId as 'goblin' | 'rovine');
++      if (AUTHORED_PATH_NODES.has(poi.id)) {
++        expect(poi.expectedPathNodes, `${poi.id}: expectedPathNodes=${poi.expectedPathNodes} vs median=${median}`).toBeGreaterThanOrEqual(median);
++        continue;
++      }
+       const ratio = Math.abs(poi.expectedPathNodes - median) / median;
+       expect(ratio, `${poi.id}: expectedPathNodes=${poi.expectedPathNodes} vs median=${median}`).toBeLessThanOrEqual(0.4);
+     }
+@@ -385,6 +397,18 @@ describe('estimateForParty', () => {
+     expect(a.sim.outcomePct).toEqual(b.sim.outcomePct);
+   });
+ 
++  it('default strategy exits the F6 looting loop — not a guaranteed wipe', () => {
++    // Regression: the default pick at 'gob-esplora-extra' is «keep looting»,
++    // which loops back to the same node with escalating damage. Repeated
++    // forever, every simulated run ended in a wipe (100% wipe, leader 100%
++    // dead) while real runs with the same party come home.
++    const est = estimateForParty(resolved(), PARTY, { runs: 400, seed: 3 });
++    if (est === 'incomplete') throw new Error('incomplete');
++    expect(est.sim.outcomePct.wipe).toBeLessThan(10);
++    expect(est.sim.leaderDeathPct).toBeLessThan(10);
++    expect(est.sim.outcomePct.reward + est.sim.outcomePct.survived + est.sim.outcomePct.fled).toBeGreaterThan(10);
++  });
++
+   it('party band is the planning number — distinct field from the reference band', () => {
+     const { resolvedOffer } = resolveQuestOffer(poi, { signals: { daysPlayed: 8 }, bandSim: { runs: 200 } });
+     const est = estimateForParty(resolvedOffer, PARTY, { runs: 200, seed: 9 });

@@ -1,0 +1,46 @@
+diff --git a/src/ui/idleVillage/components/WorldSurfaceRenderer.tsx b/src/ui/idleVillage/components/WorldSurfaceRenderer.tsx
+index 8c7a68c2..1ac8fd57 100644
+--- a/src/ui/idleVillage/components/WorldSurfaceRenderer.tsx
++++ b/src/ui/idleVillage/components/WorldSurfaceRenderer.tsx
+@@ -520,9 +520,10 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
+       return;
+     }
+ 
+-    // Defer to next animation frame so the container has been laid out and has a non-zero size.
+-    const raf = requestAnimationFrame(() => {
+-      if (!containerRef.current) return;
++    const el = containerRef.current;
++
++    const tryFit = () => {
++      if (hasAutoFitted.current || !containerRef.current) return;
+       const rect = containerRef.current.getBoundingClientRect();
+       if (rect.width === 0 || rect.height === 0) return;
+ 
+@@ -537,8 +538,25 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
+ 
+       onCameraChange({ panX: 0, panY: 0, zoom: clampedZoom });
+       hasAutoFitted.current = true;
+-    });
+-    return () => cancelAnimationFrame(raf);
++    };
++
++    // Defer to next animation frame so the container has had a layout pass, then
++    // keep watching until it reports a non-zero size: a flex/grid ancestor (e.g.
++    // `main.flex-1`) can take more than one paint to settle its size, and a single
++    // rAF check that bails on a zero rect never got retried, leaving the camera
++    // stuck at pan(0,0) zoom(1).
++    const raf = requestAnimationFrame(tryFit);
++
++    let observer: ResizeObserver | undefined;
++    if (el && typeof ResizeObserver !== 'undefined') {
++      observer = new ResizeObserver(tryFit);
++      observer.observe(el);
++    }
++
++    return () => {
++      cancelAnimationFrame(raf);
++      observer?.disconnect();
++    };
+   }, [
+     resolvedAutoFit,
+     autoFitTrigger,
