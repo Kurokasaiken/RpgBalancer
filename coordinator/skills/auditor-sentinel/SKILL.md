@@ -39,6 +39,7 @@ The Sentinel persona is a post-feature reviewer that protects RPG Balancer from 
 - `.windsurf/plans/style-lab-wanderlust-refinement-9c241b.md`
 - `src/docs/docs/QA/test-route-drag-guidelines.md` (se si revisionano cambi alla route `/test` o drag/drop harness: verificare VRT, mouse reale, trace viewer, evidence log)
 - `.windsurf/rules/16-no-foreground-windows.md` (nessuna finestra in primo piano dall'automazione: flagga `headless: false`, `--headed`/`--ui`, `open` senza `-g`, `activate`/`bringToFront` nei changes)
+- `../SKILL-SESSION-GUARD.md` (anti-drift session guard — apply its Yellow/Red protocol when the audit session runs long or after compaction; declare loudly if the file does not resolve)
 
 > Every audit report must explicitly list a "Docs Consulted" section referencing the items above (mark entries as `N/A – backend only` only when confirmed). Missing citations = audit failure.
 
@@ -67,6 +68,12 @@ The Sentinel persona is a post-feature reviewer that protects RPG Balancer from 
    5. **Performance** – Watch for unguarded effects, derived arrays created each render, or store selectors that cause re-renders.
    6. **Policy Hooks** – Persistence must go through `PersistenceService`; telemetry via `trackTelemetryEvent`; UI tokens/components must come from Style Laboratory (no legacy “observatory-*” CSS or hardcoded palettes).
    7. **Test Route QA** – Se il change set tocca `/test`, ResidentSlotRack harness o drag/drop UI, conferma che `src/docs/docs/QA/test-route-drag-guidelines.md` sia stato seguito (baselines Pixelmatch/Applitools, trace artifacts, evidence log `test-results/test-route-drag-vrt-<date>.log`).
+   8. **AI Debt** — patterns AI-generated code produces that humans would not (adapted from `ai-debt-detector`, wshobson/agents):
+      - **Failure modes**: what happens when this fails? catch blocks must catch specific errors, not swallow; resources cleaned up on failure paths.
+      - **Orphans**: every addEventListener/subscription/interval/PixiJS texture has a matching cleanup/destroy; no leaked listeners on unmount.
+      - **Edge cases**: empty array, null/undefined, huge input, concurrent calls — AI code assumes the happy path by default.
+      - **Hallucinated deps**: every import resolves and exists in package.json; API methods are real (AI invents plausible-sounding ones); version still exports them.
+      - **Architectural drift**: uses project utilities (PersistenceService, skinConfigRegistry, i18n keys) instead of reinventing; error-handling style matches existing code.
 
 5. **Score & Verdict**  
    - Assign a **0–10** score (10 = flawless).  

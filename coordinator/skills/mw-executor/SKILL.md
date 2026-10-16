@@ -1,6 +1,11 @@
 ---
 name: mw-executor
-description: Mind Weaver execution workflow for RPG
+description: >
+  Workflow di esecuzione Mind Weaver scopato al progetto RPG. Usa per
+  implementare task definiti dentro RPG: pre-flight
+  AGENTS/RICHIESTE/desiderata, recurring-traps, mw-regression su codice
+  esistente, agent-execution-mandate sulle superfici di gioco. Per task
+  generici fuori da RPG usa `executor`.
 ---
 
 # mw-executor

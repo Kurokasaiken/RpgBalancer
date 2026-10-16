@@ -1,6 +1,11 @@
 ---
 name: mw-planner
-description: Mind Weaver planning workflow for RPG
+description: >
+  Workflow di pianificazione Mind Weaver scopato al progetto RPG. Usa
+  quando si pianifica un task dentro RPG: verifica desiderata FROZEN,
+  MASTER_PLAN scope e recurring-traps delle superfici toccate, poi
+  produce un plan con contratto. Per pianificazione generica fuori da
+  RPG usa `planner`.
 ---
 
 # mw-planner

@@ -1,6 +1,11 @@
 ---
 name: mw-explorer
-description: Mind Weaver exploration workflow for RPG
+description: >
+  Workflow di esplorazione Mind Weaver scopato al progetto RPG. Usa per
+  richieste aperte, valutazione di direzione o brainstorming dentro RPG:
+  legge desiderata FROZEN, RICHIESTE, DESIGN_PILLARS e recurring-traps
+  prima di rispondere. Per esplorazione generica fuori da RPG usa
+  `explorer`.
 ---
 
 # mw-explorer
