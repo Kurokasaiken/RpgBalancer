@@ -1,0 +1,116 @@
+diff --git a/src/ui/styleLab/presets/presetBridge.ts b/src/ui/styleLab/presets/presetBridge.ts
+index 84fe2e9c..64a5c15a 100644
+--- a/src/ui/styleLab/presets/presetBridge.ts
++++ b/src/ui/styleLab/presets/presetBridge.ts
+@@ -104,40 +104,87 @@ export function isBuiltInPresetId(value: string): value is PresetId {
+   return Object.prototype.hasOwnProperty.call(presetMetadata, value);
+ }
+ 
++/**
++ * Prismatic Wanderlust art bible (art_direction_plan.md §7): shadows are never
++ * grey/brown, only deep cool teal/emerald/turquoise. Wilderness = raw timber,
++ * Golden Thatch, forest green on vibrant azure. Empire = Baroque Sun-Bronze on
++ * veined black basalt / deep indigo. Frontier is the neutral alpine-stone
++ * default, teal-shadowed like the other two but less saturated.
++ */
++const ACTION_CARD_FEEL_TOKENS: Record<StyleLabPillar, ReturnType<typeof getActionCardFeelTokens>> = {
++  frontier: {
++    frameColor: 'rgb(90, 112, 106)',
++    frameGlow: 'rgba(212, 163, 79, 0.32)',
++    backgroundColor: 'rgb(19, 46, 45)',
++    rimLightIntensity: 0.25,
++  },
++  wilderness: {
++    frameColor: 'rgb(139, 94, 52)',
++    frameGlow: 'rgba(230, 184, 86, 0.45)',
++    backgroundColor: 'rgb(15, 54, 45)',
++    rimLightIntensity: 0.35,
++  },
++  empire: {
++    frameColor: 'rgb(205, 127, 50)',
++    frameGlow: 'rgba(255, 200, 120, 0.5)',
++    backgroundColor: 'rgb(24, 22, 58)',
++    rimLightIntensity: 0.45,
++  },
++};
++
++const MAP_HALO_FEEL_TOKENS: Record<StyleLabPillar, ReturnType<typeof getMapHaloFeelTokens>> = {
++  frontier: {
++    haloColor: 'rgb(90, 140, 130)',
++    haloGlow: 'rgba(90, 140, 130, 0.5)',
++    pulseIntensity: 0.35,
++    pulseSpeed: 2.5,
++    shadowBlur: 10,
++    interaction: {
++      transitionMs: 180,
++      hoverScale: 1.04,
++      activeScale: 0.98,
++    },
++  },
++  wilderness: {
++    haloColor: 'rgb(58, 150, 90)',
++    haloGlow: 'rgba(58, 150, 90, 0.6)',
++    pulseIntensity: 0.75,
++    pulseSpeed: 2.5,
++    shadowBlur: 12,
++    interaction: {
++      transitionMs: 180,
++      hoverScale: 1.1,
++      activeScale: 0.97,
++    },
++  },
++  empire: {
++    haloColor: 'rgb(205, 127, 50)',
++    haloGlow: 'rgba(205, 127, 50, 0.7)',
++    pulseIntensity: 0.85,
++    pulseSpeed: 2.0,
++    shadowBlur: 16,
++    interaction: {
++      transitionMs: 220,
++      hoverScale: 1.15,
++      activeScale: 0.96,
++    },
++  },
++};
++
+ /**
+  * Get pillar-specific tokens for ActionCardFeel
+  */
+ export function getActionCardFeelTokens(presetId: PresetId, pillar?: StyleLabPillar) {
+-  const _targetPillar = pillar ?? PRESET_PILLARS[presetId];
+-  // This will be populated by preset-specific appliers in WL-STY-003
+-  // For now, return frontier defaults as fallback
+-  return {
+-    frameColor: 'rgb(71, 85, 105)',
+-    frameGlow: 'rgba(71, 85, 105, 0.4)',
+-    backgroundColor: 'rgb(30, 41, 59)',
+-    rimLightIntensity: 0.2,
+-  };
++  const targetPillar = pillar ?? PRESET_PILLARS[presetId];
++  return ACTION_CARD_FEEL_TOKENS[targetPillar];
+ }
+ 
+ /**
+  * Get pillar-specific tokens for MapHaloFeel
+  */
+ export function getMapHaloFeelTokens(presetId: PresetId, pillar?: StyleLabPillar) {
+-  const _targetPillar = pillar ?? PRESET_PILLARS[presetId];
+-  // This will be populated by preset-specific appliers in WL-STY-003
+-  // For now, return frontier defaults as fallback
+-  return {
+-    haloColor: 'rgb(71, 85, 105)',
+-    haloGlow: 'rgba(71, 85, 105, 0.6)',
+-    pulseIntensity: 0.4,
+-    pulseSpeed: 2.2,
+-    shadowBlur: 10,
+-    interaction: {
+-      transitionMs: 180,
+-      hoverScale: 1.05,
+-      activeScale: 0.98,
+-    },
+-  };
++  const targetPillar = pillar ?? PRESET_PILLARS[presetId];
++  return MAP_HALO_FEEL_TOKENS[targetPillar];
+ }
+ 
+ /**
