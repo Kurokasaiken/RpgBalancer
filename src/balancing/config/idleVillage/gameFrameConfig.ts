@@ -274,6 +274,25 @@ const gameFrameQuestWindowSchema = z.object({
   theaterAspect: z.number().positive(),
   /** How long the expedition lasts on the game clock, in days: the time bar fills over this span. */
   durationDays: z.number().positive(),
+  /** R-199: narrative stage max height — the "what is happening" area reads
+   *  wide and tall, scrolling only past this. */
+  stageMaxHeightPx: z.number().positive(),
+  /** PLAN-040 T-001: when the plaque is height-capped the stage may shrink to
+   *  this floor before scrolling — keeps at least a line of "what is
+   *  happening" readable instead of collapsing to zero. */
+  stageMinHeightPx: z.number().nonnegative(),
+  /** PLAN-040 T-001: the choices column scrolls internally past this cap —
+   *  the phase tiles below must never spill under the plaque border. */
+  choicesMaxHeightPx: z.number().positive(),
+  /** PLAN-040 T-001: the theatre is the flex-shrink reservoir of the window —
+   *  when the plaque is capped it shrinks, but never under this floor. */
+  theaterMinHeightPx: z.number().positive(),
+  /** PLAN-040 T-001: on short viewports the theatre's floor lowers further so
+   *  at least one choice row + the phase tiles stay reachable above the
+   *  scroll fold — `min(theaterMinHeightPx, max(this, plaqueCap*share))`. */
+  theaterMinHeightShortPx: z.number().positive(),
+  /** Share of the capped plaque height the theatre floor may claim. */
+  theaterMaxShareOfPlaque: z.number().positive().max(1),
   /** Log lines a phase tooltip shows before it says "+N more". */
   tooltipLines: z.number().int().positive(),
   /** Width of each companion column (party roster / belt left, chronicle right), px. */
@@ -292,6 +311,11 @@ const gameFrameQuestWindowSchema = z.object({
   beats: z.object({
     sceneMs: z.number().int().positive(),
     checkMs: z.number().int().positive(),
+    /** R-199: while the docked astrolabe presents a check the beat is held —
+     *  this is only the leak-guard cap (the resolve drives advancement). */
+    checkHoldMs: z.number().int().positive(),
+    /** R-199: dwell after the astrolabe resolves, so the verdict text lands. */
+    checkVerdictMs: z.number().int().positive(),
     harmMs: z.number().int().positive(),
     endMs: z.number().int().positive(),
     recapMs: z.number().int().positive(),
@@ -306,7 +330,10 @@ const gameFrameQuestWindowSchema = z.object({
    *  chronicle right) start closed — the player opens them from the header
    *  icons. Overrides the R-196 «all visible» default at the Director's call. */
   companionsDefaultOpen: z.boolean(),
-  /** R-199: the per-check options popover on the window header. */
+  /** R-199: the per-check options popover on the window header.
+   *  PLAN-040 T-003: the skill check itself is an external overlay in
+   *  `#game-modal-root` (sibling of the window, in front of it) — its sizing
+   *  is layout-driven and every geometric constant lives here. */
   skillCheck: z.object({
     /** Mount the options control at all. */
     optionsPanel: z.boolean(),
@@ -314,6 +341,37 @@ const gameFrameQuestWindowSchema = z.object({
     allowSkipCheck: z.boolean(),
     /** Offer «skip the opening animation» — the dice still play out. */
     allowSkipIntro: z.boolean(),
+    /** Viewport margin the overlay plaque keeps on every side (px) — its
+     *  max-height is `100dvh − 2·overlayMarginPx`. */
+    overlayMarginPx: z.number().positive(),
+    /** Floor for the board square (px): the plaque's flex layout never lets
+     *  the astrolabe board render smaller than this; below it the plaque
+     *  scrolls internally instead of clipping the board. */
+    boardMinPx: z.number().positive(),
+    /** Preferred board square size (px) — the layout shrinks it toward
+     *  `boardMinPx` when the viewport cannot fit it. */
+    boardSizePx: z.number().positive(),
+    /** Viewport width below which the board cap drops to the compact rule
+     *  (`min(50vh, 90vw)`), px. */
+    compactBelowPx: z.number().positive(),
+    /** Ms between the painted verdict and the armed click-to-dismiss —
+     *  a skip-click landing exactly as the verdict appears must not erase it
+     *  before it is seen (PLAN-040 debate r007). */
+    dismissArmDelayMs: z.number().int().nonnegative(),
+    /** Post-verdict auto-dismiss (ms). 0 = manual only — the player clicks
+     *  the overlay away; the outcome stays readable in the log. */
+    verdictAutoDismissMs: z.number().int().nonnegative(),
+    /** T-004: paired-delta lower bound (p25, ms) the warm path must beat on
+     *  `vite preview` before `prewarmQuestSkillCheck` ships — inconclusive
+     *  measurements mean the audio fix alone ships. */
+    warmMinGainMs: z.number().int().nonnegative(),
+    /** T-004: minimum boot-slack (ms) left under the ≤4s budget before the
+     *  warm path is scheduled at all. */
+    warmSlackMinMs: z.number().int().nonnegative(),
+    /** T-004: the warm path itself — enabled only after the measured
+     *  paired-delta p25 clears `warmMinGainMs`; `?warmcheck=1` force-enables
+     *  it for the probe regardless. */
+    warmEnabled: z.boolean(),
   }),
   /** R-199: the end-of-run report is its own floating, non-modal plaque —
    *  staged reveal, skippable — outside the theatre's DOM. */
@@ -322,6 +380,25 @@ const gameFrameQuestWindowSchema = z.object({
     widthPx: z.number().positive(),
     /** Wall-clock between reveal stages (banner → sections → loot). */
     stageMs: z.number().int().positive(),
+  }),
+  /** PLAN-040 T-005: the post-check outcome toast — small fixed plaque under
+   *  `zLayers.questToast`, all text painted at once, dismissed by click. */
+  outcomeToast: z.object({
+    /** Toast width, px (~320 by spec). */
+    widthPx: z.number().positive(),
+    /** 0 = stays until clicked (default); >0 auto-dismisses after N ms. */
+    autoDismissMs: z.number().int().nonnegative(),
+    /** End-of-run hold (ms): the toast waits for the reward report's
+     *  first-frame acknowledgement; past this it flushes anyway so an
+     *  outcome is never lost. */
+    rewardAckTimeoutMs: z.number().int().positive(),
+    /** Where the toast anchors: centred above the bottom edge, or the
+     *  bottom-right corner. */
+    anchor: z.enum(['bottom-center', 'right']),
+    /** Horizontal offset (px) from the anchor edge — and the min side gap. */
+    offsetXPx: z.number().int().nonnegative(),
+    /** Vertical offset (px) from the bottom edge. */
+    offsetYPx: z.number().int().nonnegative(),
   }),
 });
 
@@ -333,6 +410,15 @@ const gameFrameZLayersSchema = z.object({
   panels: z.number().int(),
   chrome: z.number().int(),
   dressing: z.number().int(),
+  /** PLAN-040 T-005: post-check outcome toast — above panels, below the
+   *  end-of-run report. */
+  questToast: z.number().int(),
+  /** PLAN-040 T-006: the reward/report popup — above the toast, below a
+   *  running check (a check in flight must never sit under the report). */
+  reward: z.number().int(),
+  /** PLAN-040 T-003: the external skill-check overlay — in front of the
+   *  quest window and the report, under the boot veil. */
+  questCheck: z.number().int(),
   /** Title veil over everything while /game boots (PLAN-031): nothing may peek through before the reveal. */
   boot: z.number().int(),
 });
@@ -626,6 +712,12 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     /* R-199: the expedition lasts ~5 days on the game clock — the phase bar
      * fills over this span and later frontiers stay locked until due. */
     durationDays: 5,
+    stageMaxHeightPx: 260,
+    stageMinHeightPx: 44,
+    choicesMaxHeightPx: 190,
+    theaterMinHeightPx: 190,
+    theaterMinHeightShortPx: 96,
+    theaterMaxShareOfPlaque: 0.36,
     tooltipLines: 6,
     sidePanelWidthPx: 260,
     sidePanelGapPx: 8,
@@ -633,11 +725,25 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     edgeInsetPx: 18,
     consumablesArmedByDefault: false,
     companionsDefaultOpen: false,
-    skillCheck: { optionsPanel: true, allowSkipCheck: true, allowSkipIntro: true },
-    rewardPopup: { widthPx: 400, stageMs: 1400 },
-    beats: { sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapMs: 1800, maxQueue: 24 },
+    skillCheck: {
+      optionsPanel: true,
+      allowSkipCheck: true,
+      allowSkipIntro: true,
+      overlayMarginPx: 16,
+      boardMinPx: 240,
+      boardSizePx: 480,
+      compactBelowPx: 1300,
+      dismissArmDelayMs: 300,
+      verdictAutoDismissMs: 0,
+      warmMinGainMs: 150,
+      warmSlackMinMs: 300,
+      warmEnabled: false,
+    },
+    rewardPopup: { widthPx: 400, stageMs: 280 },
+    outcomeToast: { widthPx: 320, autoDismissMs: 0, rewardAckTimeoutMs: 4000, anchor: 'bottom-center', offsetXPx: 24, offsetYPx: 24 },
+    beats: { sceneMs: 1600, checkMs: 1800, checkHoldMs: 45000, checkVerdictMs: 2400, harmMs: 1200, endMs: 1600, recapMs: 1800, maxQueue: 24 },
   },
-  zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12, boot: 40 },
+  zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12, questToast: 20, reward: 25, questCheck: 30, boot: 40 },
   bootVeil: {
     fadeMs: 550,
     minDisplayMs: 400,

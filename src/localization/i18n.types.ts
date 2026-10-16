@@ -635,6 +635,10 @@ export default interface Resources {
         "open": "{name} — open the quest"
       },
       "questWindow": {
+        "abandon": "Abandon quest",
+        "abandonConfirm": "Are you sure you want to abandon the quest?",
+        "abandonStay": "Keep going",
+        "abandonYes": "Abandon",
         "bag": "Bag",
         "bagEmpty": "Bag is empty",
         "bagStrip": {
@@ -644,9 +648,9 @@ export default interface Resources {
           "label": "Packed bag"
         },
         "beats": {
-          "clickHint": "Click to continue",
+          "clickHint": "Click or press a key to continue",
           "continue": "Continue",
-          "more": "{count, plural, one {# beat left — click to continue} other {# beats left — click to continue}}",
+          "more": "{count, plural, one {# beat left — click or press a key} other {# beats left — click or press a key}}",
           "recap": "While you were away: {scenes} scenes, {checks} checks, {deaths} fallen, {wounds} hurt"
         },
         "belt": {
@@ -656,6 +660,9 @@ export default interface Resources {
           "passive": "always in effect while packed",
           "shadowed": "covered by another armed item"
         },
+        "checkOptions": "Check options",
+        "checkOptionsSkipCheck": "Skip the whole check",
+        "checkOptionsSkipIntro": "Skip the opening animation",
         "chronicle": "Chronicle",
         "clean": "Safe",
         "close": "Close the report",
@@ -677,9 +684,12 @@ export default interface Resources {
         "nextPhase": "Next phase",
         "noneReturned": "Nobody came back",
         "partyStatus": "Assigned party — {alive} of {total} standing",
+        "phaseLocked": "The phase is still on the road — its choices unlock when its time comes.",
         "phaseOf": "Phase {n} of {total}",
         "restore": "Reopen",
         "returned": "Back home",
+        "rewardClose": "Close",
+        "rewardHint": "Click or press a key to reveal",
         "roster": "Assigned party",
         "ticks": "{elapsed}/{total} ticks",
         "waiting": "A decision is waiting"
@@ -816,6 +826,7 @@ export default interface Resources {
             "name": "Watchtower"
           }
         },
+        "builtCount": "{built} of {total} built",
         "category": {
           "civic": "Civic",
           "defense": "Defense",
@@ -824,6 +835,13 @@ export default interface Resources {
         "costLabel": "Cost",
         "daysShort": "{days} d",
         "effectLabel": "Effect",
+        "legend": {
+          "badgeBuild": "can be built",
+          "badgeLevel": "level built",
+          "badgeLocked": "locked",
+          "keys": "← → buildings · Enter details · Esc map",
+          "title": "Legend"
+        },
         "levelBadge": "Lv {level}/{max}",
         "levelShort": "Lv {level}",
         "openMerchant": "Open merchant",
@@ -834,6 +852,7 @@ export default interface Resources {
           "built": "Built",
           "locked": "Locked"
         },
+        "title": "Village",
         "upgrade": {
           "build": "Build",
           "maxLevel": "Max level",
@@ -1185,8 +1204,10 @@ export default interface Resources {
     "questExpedition": {
       "bag": {
         "covers": "Covers:",
-        "openPicker": "Open the village warehouse",
+        "emptySlot": "Empty bag slot {index}",
+        "openPicker": "Choose village items",
         "pickerTitle": "Village warehouse",
+        "removeSlot": "Remove {item}",
         "stock": "In store: ×{qty}"
       },
       "coverage": "Covers",
@@ -1228,6 +1249,14 @@ export default interface Resources {
         "title": "By member"
       },
       "send": "Send expedition",
+      "statName": {
+        "agi": "Agility",
+        "cha": "Charisma",
+        "con": "Constitution",
+        "int": "Intelligence",
+        "perc": "Perception",
+        "str": "Strength"
+      },
       "why": {
         "row": "— in {runs}% of runs · {death}% of deaths · {wound}% of wounds",
         "title": "Where the risk comes from"

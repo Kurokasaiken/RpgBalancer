@@ -207,3 +207,233 @@ for (const shot of shots) {
     });
   });
 }
+
+/* PLAN-038 (artifact-r003): the pin language + painted-over slot overlay.
+ *  BV-7a structural grammar; BV-7b pin→region glow; BV-7c disclosure UI. */
+test.describe('PLAN-038 — pin language & slot overlay', () => {
+  test.use({ locale: 'en-US' });
+
+  test('BV-7a — overlay is inert (aria-hidden, pointer-events:none) with one g[data-region] per building and state grammar', async ({ page }) => {
+    await waitForGame(page);
+    await page.locator('[data-nav-id="village"]').click();
+    await expect(page.locator(VIEW)).toBeVisible();
+
+    const overlay = page.locator('[data-testid="village-slot-overlay"]');
+    await expect(overlay).toHaveAttribute('aria-hidden', 'true');
+    await expect(overlay).toHaveCSS('pointer-events', 'none');
+
+    /* 11 stable groups, tagged by state; pop-in leaves them opaque. */
+    const groups = overlay.locator('g[data-region]');
+    await expect(groups).toHaveCount(11);
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll('[data-testid="village-slot-overlay"] g[data-region]')]
+        .every((g) => Number(getComputedStyle(g).opacity) === 1 || getComputedStyle(g).scale !== '0'),
+    );
+
+    /* Grammar: built → no dashed ring; buildable → dashed ring; locked →
+     * dotted ring + vignette. Barracks/infirmary are the locked fixtures,
+     * inn/smithy/watchtower the buildable ones. */
+    for (const id of ['inn', 'smithy', 'watchtower']) {
+      await expect(overlay.locator(`g[data-region="${id}"] ellipse[stroke-dasharray]`).first()).toBeAttached();
+    }
+    for (const id of ['infirmary', 'barracks']) {
+      await expect(overlay.locator(`g[data-region="${id}"] ellipse[stroke-dasharray]`).first()).toBeAttached();
+      await expect(overlay.locator(`g[data-region="${id}"] ellipse[fill^="url(#vslot-scrim"]`)).toBeAttached();
+    }
+    for (const id of ['lumbermill', 'quarry', 'farm', 'warehouse', 'market', 'palisade']) {
+      await expect(overlay.locator(`g[data-region="${id}"] ellipse[stroke-dasharray]`)).toHaveCount(0);
+    }
+  });
+
+  test('BV-7b — pins carry frame/state data and a badge tab; hovering a pin lights its region', async ({ page }) => {
+    await waitForGame(page);
+    await page.locator('[data-nav-id="village"]').click();
+    await expect(page.locator(VIEW)).toBeVisible();
+
+    /* Category frames and badge semantics on three archetypes. */
+    await expect(page.locator('[data-building-pin="barracks"]')).toHaveAttribute('data-pin-frame', 'shield');
+    await expect(page.locator('[data-building-pin="smithy"]')).toHaveAttribute('data-pin-frame', 'banner');
+    await expect(page.locator('[data-building-pin="farm"]')).toHaveAttribute('data-pin-frame', 'roundel');
+    await expect(page.locator('[data-building-pin="barracks"]')).toHaveAttribute('data-pin-state', 'locked');
+    await expect(page.locator('[data-building-pin="inn"]')).toHaveText('+');
+    await expect(page.locator('[data-building-pin="farm"]')).toHaveText('II');
+
+    /* Pin→region glow (:has): before hover the ping is transparent; after a
+     * real pointer hover (only :hover can feed :has()) it goes solid — and the
+     * overlay still eats no events. */
+    const ping = page.locator('g[data-region="smithy"] .vslot-ping');
+    await expect(ping).toHaveCSS('opacity', '0');
+    await page.locator('[data-building-pin="smithy"]').hover();
+    await expect(ping).toHaveCSS('opacity', '1');
+    await expect(page.locator(TOOLTIP)).toBeVisible();
+  });
+
+  test('BV-7c — settlement plaque and visual legend are rendered inside the stage', async ({ page }) => {
+    await waitForGame(page);
+    await page.locator('[data-nav-id="village"]').click();
+    await expect(page.locator(VIEW)).toBeVisible();
+    await expect(page.locator('[data-testid="village-plaque"]')).toContainText('Village');
+    await expect(page.locator('[data-testid="village-plaque"]')).toContainText('of 16 built');
+    await expect(page.locator('[data-testid="village-legend"]')).toBeVisible();
+    await expect(page.locator('[data-testid="village-legend"]')).toContainText('Esc');
+  });
+});
+
+/* PLAN-042 (artifact-r005): the Settlement Registry drawer — chip + `r`
+ *  hotkey, category sections, painted/registry rows, drill-in card, shared
+ *  activeBuildingId highlight, focus-scoped Escape order, viewport matrix. */
+const REGISTRY = '[data-testid="village-registry"]';
+const CHIP = '[data-testid="village-registry-chip"]';
+const EVIDENCE_DIR_042 = resolve(dirname(fileURLToPath(import.meta.url)), '../../../test-results/plan-042-village-registry');
+
+test.describe('PLAN-042 — Settlement Registry drawer', () => {
+  test.describe.configure({ mode: 'serial' });
+  test.use({ locale: 'en-US' });
+
+  test('BV-8a — chip opens the drawer, `r` toggles it, sections list the full catalog', async ({ page }) => {
+    await waitForGame(page);
+    await page.locator('[data-nav-id="village"]').click();
+    await expect(page.locator(VIEW)).toBeVisible();
+
+    /* Closed by default; the chip is visible with the pending-count badge. */
+    const chip = page.locator(CHIP);
+    await expect(chip).toBeVisible();
+    await expect(chip).toHaveAttribute('aria-expanded', 'false');
+    await expect(chip).toHaveAttribute('aria-controls', 'village-registry');
+
+    await chip.click();
+    const drawer = page.locator(REGISTRY);
+    await expect(drawer).toBeVisible();
+    await expect(drawer).toHaveAttribute('role', 'complementary');
+    await expect(chip).toHaveAttribute('aria-expanded', 'true');
+
+    /* 4 category sections; default-expanded sections carry 13 rows (the
+     *  production section starts collapsed — no buildable entries in it). */
+    await expect(page.locator('[data-registry-section]')).toHaveCount(4);
+    await expect(page.locator('[data-registry-section="arcane"]')).toBeVisible();
+    await expect(page.locator('[data-registry-row]')).toHaveCount(13);
+    /* Expand production → all 16 catalog rows. */
+    await page.locator('[data-registry-section="production"] > button').click();
+    await expect(page.locator('[data-registry-row]')).toHaveCount(16);
+    await expect(page.locator('[data-registry-row="mageTower"]')).toBeVisible();
+
+    /* `r` closes it; `r` again reopens. Focus must not be in a field. */
+    await page.locator('body').click({ position: { x: 10, y: 10 } });
+    await page.keyboard.press('r');
+    await expect(drawer).toBeHidden();
+    await page.keyboard.press('r');
+    await expect(drawer).toBeVisible();
+  });
+
+  test('BV-8b — Escape order: card → drawer → tooltip → map (one layer per keypress)', async ({ page }) => {
+    await waitForGame(page);
+    await page.locator('[data-nav-id="village"]').click();
+    await expect(page.locator(VIEW)).toBeVisible();
+
+    const drawer = page.locator(REGISTRY);
+    await page.locator(CHIP).click();
+    await expect(drawer).toBeVisible();
+
+    /* Drill into a registry-only row → the card is the topmost layer. */
+    await page.locator('[data-registry-row="mageTower"]').click();
+    await expect(page.locator('[data-testid="village-registry-card"]')).toBeVisible();
+
+    /* Esc 1: card closes, drawer stays, focus returns to the row. */
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-testid="village-registry-card"]')).toHaveCount(0);
+    await expect(drawer).toBeVisible();
+    await expect(page.locator('[data-registry-row="mageTower"]')).toBeFocused();
+
+    /* Esc 2: drawer closes, view stays, focus lands on the chip. */
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+    await expect(page.locator(VIEW)).toBeVisible();
+    await expect(page.locator(CHIP)).toBeFocused();
+
+    /* Pin a tooltip, open the drawer again, then drain the stack. */
+    await page.locator('[data-building-pin="smithy"]').click();
+    await expect(page.locator(TOOLTIP)).toBeVisible();
+    await page.locator(CHIP).click();
+    await expect(drawer).toBeVisible();
+    /* Esc: drawer first (it is above the tooltip in the stack). */
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+    await expect(page.locator(TOOLTIP)).toBeVisible();
+    /* Esc: the pinned tooltip. */
+    await page.keyboard.press('Escape');
+    await expect(page.locator(TOOLTIP)).toHaveCount(0);
+    /* Esc: the view exits to the map. */
+    await page.keyboard.press('Escape');
+    await expect(page.locator(VIEW)).toHaveCount(0);
+  });
+
+  test('BV-8c — row hover pings the painted footprint; registry-only rows glow internally', async ({ page }) => {
+    await waitForGame(page);
+    await page.locator('[data-nav-id="village"]').click();
+    await page.locator(CHIP).click();
+    await expect(page.locator(REGISTRY)).toBeVisible();
+
+    /* Painted row hover → data-highlight on the footprint + pin ping. */
+    const smithyRow = page.locator('[data-registry-row="smithy"]');
+    await smithyRow.hover();
+    await expect(page.locator('g[data-region="smithy"]')).toHaveAttribute('data-highlight', 'true');
+    await expect(page.locator('g[data-region="smithy"] .vslot-ping')).toHaveCSS('opacity', '1');
+    await expect(page.locator('[data-building-pin="smithy"]')).toHaveAttribute('data-active', 'true');
+
+    /* Registry-only row: internal glow, NO ghost ellipse on the painting. */
+    await page.locator('[data-registry-row="mageTower"]').hover();
+    await expect(page.locator('g[data-region="mageTower"]')).toHaveCount(0);
+    await expect(page.locator('[data-registry-row="mageTower"]')).toHaveAttribute('data-active', 'true');
+
+    /* Painted row click → the stage tooltip pins. Stack order: the drawer is
+     *  ABOVE the tooltip, so the first Escape closes the drawer (focus →
+     *  chip), the second closes the tooltip (focus → pin). */
+    await page.locator('[data-registry-row="smithy"]').click();
+    await expect(page.locator(TOOLTIP)).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator(REGISTRY)).toBeHidden();
+    await expect(page.locator(TOOLTIP)).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator(TOOLTIP)).toHaveCount(0);
+    await expect(page.locator('[data-building-pin="smithy"]')).toBeFocused();
+  });
+});
+
+/* BV-8d witness — drawer open + card + locales at the viewport matrix. */
+const shots042: { locale: string; tag: string; w: number; h: number; lng: string }[] = [
+  { locale: 'en-US', tag: 'en-1280x800', w: 1280, h: 800, lng: 'en' },
+  { locale: 'en-US', tag: 'en-1440x900', w: 1440, h: 900, lng: 'en' },
+  { locale: 'en-US', tag: 'en-1920x1080', w: 1920, h: 1080, lng: 'en' },
+  { locale: 'it-IT', tag: 'it-1440x900', w: 1440, h: 900, lng: 'it-IT' },
+  { locale: 'it-IT', tag: 'it-1280x800', w: 1280, h: 800, lng: 'it-IT' },
+];
+
+for (const shot of shots042) {
+  test.describe(`BV-8d visual witness — ${shot.tag}`, () => {
+    test.use({ locale: shot.locale, viewport: { width: shot.w, height: shot.h } });
+    test(`registry drawer screenshot ${shot.tag}`, async ({ page }) => {
+      mkdirSync(EVIDENCE_DIR_042, { recursive: true });
+      await waitForGame(page);
+      await page.evaluate(async (lng) => {
+        await (window as HooksWindow).__i18n?.changeLanguage(lng);
+      }, shot.lng);
+      await expect
+        .poll(async () => page.evaluate(() => (window as HooksWindow).__i18n?.language))
+        .toBe(shot.lng);
+      await page.locator('[data-nav-id="village"]').click();
+      await expect(page.locator(VIEW)).toBeVisible();
+      await page.waitForTimeout(400);
+      /* Open the drawer and hover a painted row for the highlight state
+       *  (smithy is civic — its section starts expanded). */
+      await page.locator(CHIP).click();
+      await expect(page.locator(REGISTRY)).toBeVisible();
+      await page.locator('[data-registry-row="smithy"]').hover();
+      await expect(page.locator('g[data-region="smithy"]')).toHaveAttribute('data-highlight', 'true');
+      await page.screenshot({ path: resolve(EVIDENCE_DIR_042, `registry-${shot.tag}.png`), timeout: 30_000 });
+      /* The drill-in card on the first registry-only special. */
+      await page.locator('[data-registry-row="mageTower"]').click();
+      await expect(page.locator('[data-testid="village-registry-card"]')).toBeVisible();
+      await page.screenshot({ path: resolve(EVIDENCE_DIR_042, `registry-card-${shot.tag}.png`), timeout: 30_000 });
+    });
+  });
+}

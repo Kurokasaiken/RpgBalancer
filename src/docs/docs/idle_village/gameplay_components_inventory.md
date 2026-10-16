@@ -7,6 +7,12 @@ type: catalog
 
 # Gameplay Components Inventory
 
+> **Stato (2026-10-16):** catalogo fermo al 2026-08-13 — antecede la superficie
+> `/game` (GameFrame Pixi, `QuestRunWindow` + companions, `QuestRewardPopup`,
+> `QuestExpeditionDetail` PLAN-036, `VillageScreenView` PLAN-035/038).
+> L'autorità corrente è `COMPONENT_MASTER_INDEX.md` + `CURRENT_STATE.md`;
+> questa tabella resta come storico del layer Idle Village pre-GameFrame.
+
 ## Purpose
 
 Single catalog of all gameplay-relevant components, hooks, stores and config modules for the Idle Village vertical slice. Used as the source for spec generation, interaction mapping and end-to-end system documentation.

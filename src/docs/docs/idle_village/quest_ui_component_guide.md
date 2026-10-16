@@ -173,3 +173,38 @@ maturazione, catch-up deterministico. Persistenza via `PersistenceService`
 adapter reale: `/game` (canonica), `/quest-window-lab` (componente isolato).
 La superficie parallela `/game-frame-theatre` è stata smontata (PLAN-025
 T-012, rimozione totale 2026-10-09).
+
+## 11. Contratto rev.2 (R-199, 2026-10-16)
+
+- **Skip implicito, nessun pulsante**: lo stage avanza/salta il beat su click
+  ovunque o su *qualunque* tasto; gli eventi da controlli interattivi
+  (`isInteractiveTarget`: bottoni, input, l'astrolabe) non avanzano. Il vecchio
+  `<button>` Continue (D-8) è ritirato — stesso path reducer, a11y via
+  aria-live + focus handoff.
+- **Companion chiusi di default**: `party`/`belt`/`log` partono da
+  `questWindow.companionsDefaultOpen` (false) — revoca esplicita del
+  «tutto visibile» di R-196. Il trigger della Belt vive **accanto alle
+  scelte** (`quest-action-strip`), non in header.
+- **Abbandono**: icona `ico-gust` in header (prima di minimize/close) →
+  conferma inline «Sei sicuro…» → `abandon()` sull'hook → `flee` engine
+  (ritirata = quest fallita, bottino raccolto resta — QUEST_RULES).
+- **Tempo**: `questWindow.durationDays` (5) → `nodeTicks` via
+  `useQuestExpeditionSession`; ogni `waiting`/`pending` arma `readyAt` —
+  scelte e fasi future **visibili ma non committabili** finché il clock non
+  matura (`availableOptions` le marca disabled). La barra fasi segue lo stesso
+  span.
+- **Check**: `DestinyAstrolabeV62Standalone` docked sopra il teatro mentre il
+  beat check presenta; `QuestCheckOptionsPanel` (icona `ico-spark` in header,
+  persistito `questCheckOpts` via PersistenceService) decide `skipIntro`
+  (→`throw()`) e `skipCheck` (→ l'astrolabe non si monta). Verdetto **sempre**
+  engine (`ResolvedCheck`), l'astrolabe solo dipinge; il beat tiene `hold`
+  finché l'animazione non atterra (`beats.checkHoldMs`/`checkVerdictMs`).
+- **Esiti fuori**: a run finito e beat presentati, `QuestRewardPopup` si apre
+  a **livello pagina** (`game-frame-pixi`), placca `HudPlaque` fluttuante
+  **non modale** (no backdrop/`aria-modal`, mappa visibile, draggable):
+  reveal staged `rewardPopup.stageMs` (esito → sezioni `QuestEpilogue` →
+  Chiudi), click/tasto anticipa lo stadio, `Esc` chiude con focus-return e
+  valgono le stesse semantiche di dismiss del report (settled-run clear +
+  release loadout + consumo POI). `QuestEpilogue` non è più renderizzato
+  dentro lo stage della window — questa è la deroga alla direzione B di v27
+  («ospita il reward panel»), richiesta esplicita del Director in R-199.

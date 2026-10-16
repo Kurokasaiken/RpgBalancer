@@ -1,7 +1,12 @@
 #!/usr/bin/env tsx
 
 /**
- * Master Plan & Kanban Alignment Check Script
+ * Master Plan & Kanban Alignment Check Script — **LEGACY / IN PAUSA (R-208, 2026-10-16)**
+ *
+ * The kanban board and strategy_tasks intake are paused by Director decision:
+ * this sync check is kept for possible reactivation but is NOT part of the
+ * active workflow (ledger = RICHIESTE.md + plans/INDEX.md; closure gate =
+ * `npm run closure:lint`).
  * 
  * This script performs automated checks to ensure consistency between:
  * - Strategy Task Intake (strategy_tasks.md)
@@ -332,7 +337,7 @@ function generateChecklist(report: SyncReport): string {
   checklist.push('2. Verify kanban assignments in `docs/docs/coordinator/agent_assignments.md`');
   checklist.push('3. Check vision document alignment in `docs/docs/strategy/idle_village_punch_club_vision.md`');
   checklist.push('4. Update any missing or mismatched entries');
-  checklist.push('5. Run safeguard checks: `npm run lint -- docs && npm run build:check && npm run kanban:lint`');
+  checklist.push('5. Run safeguard checks: `npm run lint -- docs && npm run build:check && npm run closure:lint`');
   checklist.push('');
   
   return checklist.join('\n');

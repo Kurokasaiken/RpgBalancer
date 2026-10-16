@@ -44,16 +44,29 @@ const SECTION_TONE: Partial<Record<EpilogueSectionId, keyof typeof TONE>> = {
   diseases: 'warn',
 };
 
+/** PLAN-040 T-006: the yield rows carry their own glyph — every loot and
+ *  reward line reads as treasure at a glance (the cost sections keep the
+ *  plain text, grief needs no ornament). */
+const ROW_ICON: Partial<Record<EpilogueSectionId, EngravedIconId>> = {
+  reward: 'ico-cup',
+  loot: 'ico-pouch',
+  xp: 'ico-spark',
+  lore: 'ico-scroll',
+};
+
 export interface QuestEpilogueProps {
   run: QuestRunState;
   /** The authored scenario — feeds intel labels and the epilogue seam
    *  (titles/diseases/lore). Optional: lab paths may omit it. */
   scenario?: QuestScenario;
+  /** R-199: staged reveal for `QuestRewardPopup` — only the first N
+   *  sections render while the reveal plays; `undefined` = all. */
+  visibleSections?: number;
 }
 
 /** One report line — i18n key wins over baked text; wounded lines carry
  *  the resident's recovery countdown when the roster knows it. */
-const EpilogueRow: React.FC<{ line: EpilogueLine }> = ({ line }) => {
+const EpilogueRow: React.FC<{ line: EpilogueLine; icon?: EngravedIconId }> = ({ line, icon }) => {
   const { t } = useTranslation('idleVillage');
   const recoveryDays = useMinimalGameplayStore((s) => {
     if (!line.memberId) return undefined;
@@ -64,7 +77,8 @@ const EpilogueRow: React.FC<{ line: EpilogueLine }> = ({ line }) => {
     return left > 0 ? Math.ceil(left / ticksPerDay) : undefined;
   });
   return (
-    <span style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: 'var(--skin-text-primary)' }}>
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: 'var(--skin-text-primary)' }}>
+      {icon && <EngravedIcon id={icon} size={11} style={{ flexShrink: 0, color: 'var(--skin-text-secondary)', transform: 'translateY(1px)' }} />}
       {line.key ? t(line.key, line.params) : line.text}
       {recoveryDays !== undefined && (
         <span style={{ color: TONE.secondary }}>
@@ -76,9 +90,10 @@ const EpilogueRow: React.FC<{ line: EpilogueLine }> = ({ line }) => {
   );
 };
 
-export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario }) => {
+export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario, visibleSections }) => {
   const { t } = useTranslation('idleVillage');
-  const sections = buildQuestEpilogue(run, scenario);
+  const allSections = buildQuestEpilogue(run, scenario);
+  const sections = visibleSections === undefined ? allSections : allSections.slice(0, visibleSections);
   if (sections.length === 0) return null;
   return (
     <div
@@ -117,7 +132,7 @@ export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario }) =
                 {t(`gameFrame.questEpilogue.${section.id}`)}
               </span>
               {section.lines.map((line, i) => (
-                <EpilogueRow key={i} line={line} />
+                <EpilogueRow key={i} line={line} icon={ROW_ICON[section.id]} />
               ))}
             </div>
           </div>

@@ -237,6 +237,13 @@ const memberNameOf = (run: QuestRunState, memberId: string): string =>
 export interface BeatTiming {
   sceneMs: number;
   checkMs: number;
+  /** R-199: while an external presenter (the docked astrolabe) holds a check
+   *  beat, auto-advance parks at this leak-guard cap — the holder drives
+   *  advancement itself via `skip()` once its verdict has settled. */
+  checkHoldMs?: number;
+  /** R-199: dwell after the astrolabe resolves — the window reads it, not
+   *  the cursor (the beat stays held; the caller's timer calls `skip()`). */
+  checkVerdictMs?: number;
   harmMs: number;
   endMs: number;
   recapMs: number;
@@ -282,7 +289,7 @@ export interface BeatCursor {
 export function useBeatCursor(
   beats: QuestBeat[],
   timing: BeatTiming,
-  opts: { reducedMotion?: boolean } = {},
+  opts: { reducedMotion?: boolean; hold?: (beat: QuestBeat) => boolean } = {},
 ): BeatCursor {
   const [cursor, setCursor] = useState(0);
   const lenRef = useRef(beats.length);
@@ -305,9 +312,18 @@ export function useBeatCursor(
   const skip = useCallback(() => setCursor((c) => Math.min(c + 1, beats.length)), [beats.length]);
   const flush = useCallback(() => setCursor(beats.length), [beats.length]);
 
+  /* Held beats (R-199): an external presenter owns the moment — the docked
+   *  astrolabe on a check — and advances it through `skip()` once it has
+   *  resolved. Auto-advance still runs as a leak-guard at `checkHoldMs` so a
+   *  stuck presenter can never freeze the queue forever. `hold` is read
+   *  through a ref: the decision is taken when the beat schedules, and a
+   *  re-rendered predicate must not reset the beat's own timer. */
+  const holdRef = useRef(opts.hold);
+  holdRef.current = opts.hold;
   useEffect(() => {
     if (!current) return;
-    const id = setTimeout(() => setCursor((c) => c + 1), beatMs(current, timing));
+    const ms = holdRef.current?.(current) ? (timing.checkHoldMs ?? beatMs(current, timing)) : beatMs(current, timing);
+    const id = setTimeout(() => setCursor((c) => c + 1), ms);
     return () => clearTimeout(id);
   }, [current, timing]);
 

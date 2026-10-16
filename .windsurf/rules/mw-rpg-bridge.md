@@ -40,5 +40,5 @@ Load the `executor` skill when the Director's message contains:
 ## Notes
 
 - RPG has no CANON.md, so planner's pre-flight check for FROZEN desiderata is skipped or adapted.
-- The RPG project has its own skill system (coordinator-mandate, strategist-mandate, agent-execution-mandate, idle-village-task). This rule is for **Mind Weaver skills only**, not RPG skills.
+- The RPG project has its own skill system (agent-execution-mandate, idle-village-task, mw-*; `coordinator-mandate`/`strategist-mandate` kanban-dispatch parts are IN PAUSA — R-208). This rule is for **Mind Weaver skills only**, not RPG skills.
 - When a request clearly belongs to an RPG skill (e.g., "execute prompt", "run harness"), defer to the RPG skill system instead of MW.

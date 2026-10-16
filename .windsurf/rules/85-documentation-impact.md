@@ -35,3 +35,16 @@ non è completo finché i documenti indicati non sono aggiornati.
   riferimenti (vedi `CANON.md` mappa delle autorità).
 - Documentation impact `NONE` con motivazione assente = piano incompleto.
 - Aggiornamenti meccanici (link, banner di stato) non richiedono questo campo.
+
+## Enforcement meccanico (R-204 / PLAN-039)
+
+- `npm run docs:impact -- --plan plans/PLAN-XXX.md` — verifica che la
+  dichiarazione esista, che `REQUIRED` elenchi i target, che `NONE` abbia
+  motivazione. `--strict` trasforma i warning in violazioni (gate per piani nuovi).
+- `npm run docs:impact -- --plan <p> --touched a,b` oppure `--diff-base <sha>`
+  — un `REQUIRED` fallisce se i target dichiarati non compaiono nel diff.
+- Spec harness (pipeline di dispatch in pausa, R-208 — si riattiva solo su
+  decisione Director): campo `documentation_impact` in `prompts/<id>.spec.json`
+  (`{level, targets[], justification}`); `harness:dispatch` applica il gate
+  post-esecuzione sul diff del worktree — un task REQUIRED senza i doc nel diff
+  resta FAILED, non completato.

@@ -46,7 +46,7 @@ bash
 npm run lint -- <scope>
 npm run test -- <scope>
 npm run build:check
-npm run kanban:lint
+npm run closure:lint
 Content validation gate (prima di chiamare task_complete):
 1. Per ogni file_target creato o modificato, verifica che NON contenga:
    - Commenti TODO senza implementazione circostante
@@ -65,19 +65,23 @@ Runtime smoke test: per ogni pagina creata o modificata, verifica che la route s
 2. curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/<route> deve restituire 200
 3. Se la pagina usa React: verifica assenza di errori in console (nessun 'Cannot read properties of undefined', nessun React error boundary triggered)
 Se il smoke test fallisce: task è BLOCKED, non Completato.
-Il Coordinator verifica la presenza del log del smoke test nell'evidence log prima di chiudere la riga del Kanban.
+Il log del smoke test va nell'evidence log prima di chiudere la voce in RICHIESTE.md.
 If any safeguard fails, task is BLOCKED, not complete.
 
-5. Kanban Status Management
-When picking a prompt: Set Kanban row to "In corso" with name/date
-Upon delivery: Set Kanban row to "Completato" with evidence links
-End response with: KANBAN STATUS: <Prompt ID> – Completato (Evidence: <log principale>)
-Completed prompts tracked only in documentation, not on Kanban
+5. Closure Ledger (RICHIESTE.md — kanban in pausa, R-208)
+La kanban board (`src/docs/docs/coordinator/agent_assignments.md`) e la
+pipeline di dispatch sono IN PAUSA: non si scrivono né si aggiornano righe
+sulla board, non si usano coordinator/ai-worker/manual-dispatch. Lo stato di
+lavoro vive solo in `RICHIESTE.md` (voce R-###) e `plans/INDEX.md`.
+When picking a task: porta la voce R-### a `in corso` (con data).
+Upon delivery: voce a `fatta` con citazione `bundle: .mw/runs/<task>/bundle.json`.
+Completed work is tracked only in RICHIESTE.md / plans + evidence logs.
 
 6. Verification Gate (R-189, obbligatorio e meccanico)
-La chiusura è bloccata da `npm run kanban:lint`: una riga "Completato" o una
-transizione `fatta`/`completata` in RICHIESTE.md senza prove valide fallisce
-il lint. La dichiarazione dell'agente non è evidenza.
+La chiusura è bloccata da `npm run closure:lint`: una transizione
+`fatta`/`completata` in RICHIESTE.md (o una riga "Completato" sulla board,
+congelata) senza prove valide fallisce il lint. La dichiarazione dell'agente
+non è evidenza.
 
 All'AVVIO del task (non alla fine): crea `.mw/runs/<task>/verification.json`
 (manifest) con le obbligazioni verificabili derivate dalla richiesta verbatim
@@ -99,7 +103,7 @@ Alla CHIUSURA:
    delle prove che ha effettivamente esaminato.
 3. Rilancia `verify:bundle --no-exec` fino a verdict PASS (o WAIVED via
    Director esplicito).
-4. La riga Kanban/ledger deve citare `bundle: .mw/runs/<task>/bundle.json`.
+4. La chiusura in `RICHIESTE.md` deve citare `bundle: .mw/runs/<task>/bundle.json`.
 
 Deroga: solo il Director può approvare `waived-director: "<motivo verbatim>"`
 nella riga di chiusura — conta come chiusura ammessa, non come PASS.
@@ -161,9 +165,9 @@ Update last certified timestamp
 Log evidence in test-results
 Evidence Logging
 Create evidence log in test-results with timestamp
-Include safeguard results (lint, test, build, kanban)
+Include safeguard results (lint, test, build, closure)
 Document any failures and resolutions
-Link evidence log in Kanban completion message
+Link evidence log nella voce RICHIESTE.md di chiusura
 Safeguard Checklist
 Pre-Completion Checks
 All invariants from rules followed
@@ -192,20 +196,20 @@ Run npm run test -- <scope> (timeout: 300s max)
 Ensure all tests pass
 Fix failing tests before completion
 Document test coverage in evidence log
-Kanban Verification
-Run npm run kanban:lint (timeout: 30s max)
-Ensure Kanban status is "Completato"
+Closure Verification
+Run npm run closure:lint (timeout: 30s max)
+Ensure la voce RICHIESTE è "fatta" con citazione `bundle:`
 Verify evidence links present
-Fix any Kanban lint errors
+Fix any closure lint errors
 Command Timeouts
 Respect maximum runtimes:
 
-kanban:lint: 30s
+closure:lint: 30s
 npm run lint -- <scope>: 120s
 npm run build:check / npm run build: 180s
 npm run test -- <scope>: 300s
-harness:run per task: 600s
-harness:dispatch total: 1800s
+harness:run per task: 600s (harness in pausa R-208, solo benchmark PLAN-039)
+harness:dispatch total: 1800s (in pausa R-208)
 If timeout exceeded: stop command, log event, switch to narrower scope or alternative approach. A command that hangs is treated as failure, not "still running".
 
 Canonical Anchors
@@ -261,14 +265,14 @@ Reference idle village implementation plans
 Completion Protocol
 Before marking task complete:
 
-All safeguards pass (lint, test, build:check, kanban:lint)
+All safeguards pass (lint, test, build:check, closure:lint)
 Trusted docs updated if touching frozen components
 COMPONENT_MASTER_INDEX updated if applicable
 Evidence log created in test-results
-Kanban status set to "Completato"
+Voce RICHIESTE.md impostata a "fatta" con citazione `bundle:`
 
 Git commit gate (obbligatorio, NON saltabile):
-Prima di chiamare task_complete o scrivere KANBAN STATUS Completato,
+Prima di chiamare task_complete o scrivere la chiusura `fatta` in RICHIESTE.md,
 DEVI eseguire in sequenza:
 
 1. Verifica che i file creati/modificati esistono su disco:
@@ -290,17 +294,16 @@ DEVI eseguire in sequenza:
    Se fallisce ancora: logga l'errore, task è BLOCKED.
 
 Solo dopo che tutti e 4 gli step passano:
-→ aggiorna Kanban a 'Completato'
-→ scrivi KANBAN STATUS: <ID> - Completato (Evidence: ...)
+→ aggiorna la voce RICHIESTE a 'fatta'
+→ scrivi CHIUSURA: <R-ID> - fatta (bundle: .mw/runs/<task>/bundle.json)
 
 Un task senza commit è un task non fatto.
 
-Response ends with: KANBAN STATUS: <Prompt ID> – Completato (Evidence: <log principale>)
 Failure Modes
 If unable to complete task:
 
 Document blockers in evidence log
-Set Kanban status appropriately
+Set RICHIESTE status appropriately
 Flag for human review if needed
 Provide clear next steps
 Do not mark task complete if safeguards fail

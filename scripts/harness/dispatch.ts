@@ -277,6 +277,42 @@ function copyTouchedFilesFromWorktree(taskId: string, worktreePath: string, repo
 /**
  * Run tasks in a wave with limited concurrency.
  */
+/**
+ * Post-execution gate: if the task spec declares
+ * `documentation_impact: { level: 'REQUIRED', targets: [...] }`, every target
+ * doc must appear in the worktree diff — otherwise the task is not complete.
+ * Specs without the field pass (declaration lint is a separate concern,
+ * enforced by `npm run docs:impact` at plan/spec review).
+ */
+function checkDocImpactGate(
+  specAbsPath: string,
+  worktreePath: string,
+): { ok: boolean; reason?: string } {
+  if (!existsSync(specAbsPath)) return { ok: true };
+  let spec: { documentation_impact?: { level?: string; targets?: string[] } | string };
+  try {
+    spec = JSON.parse(readFileSync(specAbsPath, 'utf8'));
+  } catch {
+    return { ok: true };
+  }
+  const di = spec.documentation_impact;
+  const level = typeof di === 'string' ? di.match(/\b(NONE|OPTIONAL|REQUIRED)\b/)?.[1] : di?.level;
+  if (level !== 'REQUIRED') return { ok: true };
+  const targets = typeof di === 'object' && di ? (di.targets ?? []) : [];
+  if (targets.length === 0) {
+    return { ok: false, reason: 'documentation_impact REQUIRED but no targets declared' };
+  }
+  const touched = execSync('git status --porcelain | awk \'{print $2}\'', {
+    cwd: worktreePath, encoding: 'utf8',
+  }).split('\n').map((s) => s.trim()).filter(Boolean);
+  const missing = targets.filter(
+    (t) => !touched.some((f) => f === t || f.endsWith(`/${t}`) || t.endsWith(`/${f}`)),
+  );
+  return missing.length === 0
+    ? { ok: true }
+    : { ok: false, reason: `declared doc targets not updated: ${missing.join(', ')}` };
+}
+
 async function runWave(
   taskIds: string[],
   worktreeBase: string,
@@ -318,7 +354,17 @@ async function runWave(
         const result = await runTask(taskId, worktreePath, dryRun, timeoutMs);
         if (!dryRun) {
           if (result.ok) {
-            copyTouchedFilesFromWorktree(taskId, worktreePath, repoRoot);
+            // Documentation Impact gate (.windsurf/rules/85): a spec that
+            // declares REQUIRED targets is not complete until those docs are
+            // actually in the worktree diff.
+            const specPath = path.resolve('prompts', `${taskId}.spec.json`);
+            const docCheck = checkDocImpactGate(specPath, worktreePath);
+            if (!docCheck.ok) {
+              result.ok = false;
+              result.output += `\n[doc-impact] ${docCheck.reason}`;
+            } else {
+              copyTouchedFilesFromWorktree(taskId, worktreePath, repoRoot);
+            }
           }
           removeWorktree(worktreePath, dryRun);
         }

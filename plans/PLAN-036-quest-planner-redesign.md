@@ -163,9 +163,16 @@ Questo documento è il piano operativo; l'artifact r008 è la spec tecnica conve
   (`test-results/build-check-2026-10-15.log`); `kanban:lint` ✅.
 - **E2E:** `gameQuestFullFlow` 2/2, `gameQuestExpedition` 14/14, `gameQuestPlannerLayout`
   7/7 (BV-1/BV-4 matrix + zero console/pageerror), `gameQuestLifecycle` 13/13.
-  `poiQuestRegressions.spec.ts` (3 fail) pre-esistente: selector morti su superficie
-  legacy `/poi-quest-detail-roster-time-clock` — non toccata da questo piano.
-- **Bug reale fixato:** starvation del bloom swap in `startTransition` (vedi T-004).
+  CTR-game regression: `gameEventFreeze` 3/3 + invasion march/scene/sequence 9/9
+  (12/12). `poiQuestRegressions.spec.ts` (3 fail) pre-esistente: selector morti su
+  superficie legacy `/poi-quest-detail-roster-time-clock` — non toccata da questo piano.
+- **Bug reali fixati:** (a) starvation del bloom swap in `startTransition` (vedi T-004);
+  (b) `useExtractionSequence.cancel()` a `progress===0` non fermava il rAF hold →
+  token-drag poteva svuotare lo slot sorgente ~1.4s dopo (componente trusted — contratto
+  documentato in `interaction_core_spec.md`, unit test dedicato 3/3).
 - **Fix helper E2E:** gate hit-target vs boot-veil + dwell finale sullo slot (T-004).
+- **Bundle verifica (R-189):** `.mw/runs/plan036-quest-planner-2026-10-15/bundle.json`
+  **PASS** — 7/7 obbligazioni OB-1..OB-7 eseguite da `produceBundle` (OB-7 eseguita
+  manualmente e rivalutata via `--no-exec`).
 - **Evidence:** `test-results/r195-quest-planner-redesign-2026-10-15.log`; manifest
   `.mw/runs/plan036-quest-planner-2026-10-15/verification.json` (OB-1..OB-7).

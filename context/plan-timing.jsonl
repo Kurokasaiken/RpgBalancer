@@ -1,0 +1,7 @@
+{"plan":"PLAN-042","event":"open","at":"2026-10-16T12:41:26.503Z","lane":"local"}
+{"plan":"PLAN-042","event":"note","at":"2026-10-16T12:41:26.923Z","kind":"gate"}
+{"plan":"PLAN-040","event":"open","at":"2026-10-16T08:30:00.000Z","lane":"local"}
+{"plan":"PLAN-040","event":"note","at":"2026-10-16T08:30:00.000Z","kind":"gate","text":"retroactive stamp — ledger creato a plan chiuso; open ≈ battesimo Director (dopo 2° dibattito converged)"}
+{"plan":"PLAN-040","event":"close","at":"2026-10-16T11:25:00.000Z","lane":"local"}
+{"plan":"PLAN-040","event":"note","at":"2026-10-16T11:25:00.000Z","kind":"gate","text":"close ≈ bundle PASS (13:21 +0200) + closure:lint verde"}
+{"plan":"PLAN-042","event":"close","at":"2026-10-16T13:34:47.914Z"}

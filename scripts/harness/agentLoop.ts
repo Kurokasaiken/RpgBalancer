@@ -8,7 +8,7 @@
 
 import type { HarnessConfig } from './config.js';
 import type { ChatMessage, ProviderAdapter, ToolCall } from './providers/types.js';
-import { createToolExecutor, buildToolHelpText, TASK_COMPLETE_TOOL } from './tools.js';
+import { createToolExecutor, buildToolHelpText, TASK_COMPLETE_TOOL, TOOL_DEFINITIONS } from './tools.js';
 
 /** Outcome of a single executor run. */
 export interface AgentRunResult {
@@ -139,11 +139,34 @@ export async function runAgentLoop(
   let duplicateCount = 0;
   let usedProvider: string | undefined;
 
+  /* Groq's free tier is ~8k tokens-per-request-minute: an unbounded transcript
+   *  of 8k-char tool outputs kills the run by iteration ~6. Keep each tool
+   *  payload small and compact older tool messages once the transcript
+   *  crosses a conservative char budget (~4 chars/token). */
+  const TOOL_MSG_CAP = 2000;
+  const TRANSCRIPT_CHAR_BUDGET = 24_000;
+  const KEEP_RECENT_TOOL_MSGS = 4;
+  const compactTranscript = (): void => {
+    const totalChars = messages.reduce((s, m) => s + (m.content?.length ?? 0), 0);
+    if (totalChars <= TRANSCRIPT_CHAR_BUDGET) return;
+    const toolIdx = messages
+      .map((m, i) => (m.role === 'tool' ? i : -1))
+      .filter((i) => i >= 0);
+    const cutoff = toolIdx.length - KEEP_RECENT_TOOL_MSGS;
+    for (let k = 0; k < cutoff; k += 1) {
+      const m = messages[toolIdx[k]];
+      if (m.content && m.content.length > 200) {
+        m.content = `${m.content.slice(0, 200)}…[${m.content.length - 200} chars elided]`;
+      }
+    }
+  };
+
   while (iterations < config.maxIterations) {
     iterations += 1;
     log(`iteration ${iterations}/${config.maxIterations}`);
 
-    const result = await provider.complete(messages, []);
+    compactTranscript();
+    const result = await provider.complete(messages, TOOL_DEFINITIONS);
 
     // Capture the provider that successfully executed this completion
     if (result.usedProvider && !usedProvider) {
@@ -206,7 +229,7 @@ export async function runAgentLoop(
         role: 'tool',
         tool_call_id: call.id,
         name: call.function.name,
-        content: toolResult.output.slice(0, 8000),
+        content: toolResult.output.slice(0, TOOL_MSG_CAP),
       });
     }
 

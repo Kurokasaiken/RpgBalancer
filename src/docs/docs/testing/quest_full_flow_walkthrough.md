@@ -18,8 +18,8 @@ descrive le regole, le immagini un'istanza.
 ## Mappa del flusso
 
 ```
- Regia (F10) «Show quest»
-        │  il POI quest REALE compare sulla mappa (stato available)
+ boot ──► AUTO-REVEAL (R-200): i POI quest compaiono da soli, uno ogni ~5s
+        │  (Regia «Show quest» = «reveal ora» one-way, utile solo per i take)
         ▼
  click sul marker ──► POI detail = quest planner
         │  roster → slot (drag)     slot ⇄ slot (drag del token: swap)
@@ -28,37 +28,40 @@ descrive le regole, le immagini un'istanza.
  «Send expedition» ──► la run parte: party bloccato, POI in_progress
         │
         ▼  (clock di gioco: pausa / ×1 / ×2 / ×4 dal ribbon in alto)
- fase per fase:  scena → scelta (1-9 o click) → beat (Enter) → viaggio (il tempo matura la fase)
+ fase per fase:  scena → scelta (1-9 o click) → beat (click) → viaggio (il tempo matura la fase)
         │        cintura: arma i bonus prima di un check, cura prima di una scelta
         ▼
  esito (reward | survived | fled | wipe) ──► settlement, UNA volta sola
         │   oro al villaggio (HUD) · XP a ogni PG sopravvissuto · ferite/morti · borsa rilasciata
         ▼
- rapporto di ritorno ──► «Close the report» ──► POI consumato, sparisce dalla mappa
-        │
+ rapporto di ritorno (popup esterno, R-199) ──► «Chiudi» ──► goblin `repeatable`:
+        │   il POI RESTA sulla mappa e si ripropone (rovine resta one-shot)
         ▼
  salvataggio automatico ──► dopo un reload oro, XP, morti e registro sono ancora lì
 ```
 
 ---
 
-## 1. Avvio: la mappa è pulita
+## 1. Avvio: auto-reveal al boot
 
-![Boot di /game: mappa pulita, roster aperto](quest_full_flow/01-boot-mappa-pulita.jpg)
+![Boot di /game: primo marker auto-rivelato, roster aperto](quest_full_flow/01-boot-auto-reveal.jpg)
 
 **Quando:** all'apertura di `/game`, dopo il velo di caricamento.
 **Cosa c'è:** la mappa, il ribbon in alto (giorno, controlli tempo, risorse
-oro/cibo/legna), il roster aperto col tasto **R**. **Nessun POI**: le quest
-non sono sulla mappa finché la Regia non le rivela (R-124).
-**Il test verifica:** 0 marker quest; l'oro del ribbon = l'oro dello store.
+oro/cibo/legna), il roster aperto col tasto **R**. I POI quest **compaiono da
+soli** nei primi secondi (R-200: un marker ~1s dopo il veil, il successivo
+~5s dopo — entrata sfalsata, mai scomparsi).
+**Il test verifica:** il reveal avviene e l'oro del ribbon = l'oro dello store.
 
-## 2. Creazione del POI quest: la Regia
+## 2. Il POI quest: reveal automatico + override Regia
 
 ![Pannello Regia con «Show quest»](quest_full_flow/02-regia-show-quest.jpg)
 
 **Come:** **F10** apre il pannello Regia (solo build dev/playwright) →
-**«Show quest»**. È il gate dei POI quest **reali** (goblin + rovine):
-quello che compare è l'offerta vera, mai un esemplare demo (R-143/R-180).
+**«Show quest»** — oggi un trigger **one-way** «reveal ora» (R-200): forza la
+comparsa immediata di tutti i POI saltando lo stagger, e non li nasconde mai
+più. I marker sono le offerte **reali** (goblin + rovine), mai esemplari demo
+(R-143/R-180).
 
 ![Il POI quest dorato sulla mappa](quest_full_flow/03-poi-quest-sulla-mappa.jpg)
 

@@ -7,16 +7,27 @@
  *   → flavour → cinema-scope theater → what happened + the scene → choices
  *   → time bar (game clock, start → return) → phase tiles (played + next).
  *
- * R-196 shell contract:
+ * R-196 shell contract, revised by R-199 (Director 2026-10-15):
  * - ONE `[data-hud-panel]` wrapper carries the window and its companion
- *   columns (`[data-hud-companion="left|right"]`) — the drag clamps the union
- *   (`useHudPanelDrag` + `resolveQuestShellLayout`, never the 640px box alone).
+ *   columns (`[data-hud-companion="left|right|belt"]`) — the drag clamps the union
+ *   (`useHudPanelDrag` + `resolveQuestShellLayout`, never the box alone).
  * - NO `overflow` on `HudPlaque`: the SVG drop-shadow would clip to the
  *   section's box (WebKit) and absolutely-placed companions would be cut off.
- * - Party roster + belt stack LEFT, chronicle RIGHT — each independently
- *   toggleable (`aria-expanded`/`aria-controls`), all open together by
- *   default, auto-collapsed by the shared layout predicate on narrow
- *   viewports.
+ * - Party roster LEFT, chronicle RIGHT, belt as a bottom strip near the
+ *   choices (R-199 pt.13) — each independently toggleable
+ *   (`aria-expanded`/`aria-controls`), CLOSED by default
+ *   (`questWindow.companionsDefaultOpen`), auto-collapsed by the shared
+ *   layout predicate on narrow viewports.
+ * - Beats advance on click-anywhere or any key — there is NO skip button.
+ * - Check beats hand the frozen `DestinyAstrolabeV62` to the external
+ *   `QuestSkillCheckOverlay` (`#game-modal-root`, PLAN-040) — published
+ *   through `questRunStore`'s bridge while the beat is held
+ *   (engine-resolved verdict, presentation only); its options popover lives
+ *   on the header.
+ * - The end-of-run report is OUT of this window — `QuestRewardPopup`,
+ *   mounted at page level (R-199 pt.14).
+ * - «Abbandona quest» sits in the header icons, asks for an inline confirm,
+ *   and routes through `useQuestRun.abandon` → engine `flee`.
  *
  * Material: `HudPlaque` panel, dragged by its title row (`useHudPanelDrag`) like
  * every HUD panel; colours only from `--skin-*` tokens; no text under 12px.
@@ -24,7 +35,7 @@
  * while a decision is waiting; closing keeps the run (the Panels menu reopens it).
  */
 
-import React, { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { EngravedIcon, type EngravedIconId } from './engravedIcons';
@@ -35,8 +46,9 @@ import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFr
 import { DEFAULT_QUEST_THEATRE_FX, type QuestTheatreFxConfig } from '@/balancing/config/idleVillage/quests/questTheatreFx';
 import { availableOptions, beltItemStatuses, currentExposure, nextCombatHits, nodesFor, previewArmedActionItems, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
-import { QuestEpilogue } from './QuestEpilogue';
 import { useBeatCursor, type BeatTiming, type HarmBeat, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
+import { publishCheckBridge, type QuestCheckOverlayHandle } from '@/ui/idleVillage/questS1Lab/questRunStore';
+import { QuestCheckOptionsPanel, type QuestCheckOptions } from './QuestCheckOptionsPanel';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import { HudChip, LOG_TONE, SCRIM, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
@@ -83,14 +95,24 @@ export interface QuestRunWindowProps {
   beatTiming: BeatTiming;
   title: string;
   flavour: string;
-  /** The authored scenario — feeds the epilogue's intel labels and grant
-   *  seams (titles/diseases/lore). Optional on lab paths. */
+  /** The authored scenario — kept on the props contract for harnesses; the
+   *  end-of-run report that consumed it moved to the external
+   *  `QuestRewardPopup` (R-199 pt.14), the window no longer renders it. */
   scenario?: QuestScenario;
   /** Scene art for a node id. */
   artFor: (nodeId: string) => string | undefined;
   /** 0..1 of the expedition's time on the game clock, plus its readout. */
   time: { progress: number; label: string };
   onChoose: (optionId: string) => void;
+  /** R-199: current game-clock tick — gates options on the frontier's
+   *  `readyAt` (a phase is visible the whole time but committable only once
+   *  its slice of the time bar has passed). Omit for clock-less harnesses. */
+  nowTick?: number;
+  /** R-199: «abbandona quest» — `useQuestRun.abandon` → engine `flee`. */
+  onAbandon?: () => void;
+  /** R-199: the page learns when the beat queue is still presenting — the
+   *  external `QuestRewardPopup` opens only after the last beat lands. */
+  onPresentingChange?: (presenting: boolean) => void;
   /** R-196: the per-item armed selection of the belt (`useQuestRun`). Optional
    *  for harnesses that render the window without a live run — defaults to
    *  "nothing armed" (the R-106 contract). */
@@ -102,6 +124,10 @@ export interface QuestRunWindowProps {
   widthPx: number;
   theaterAspect: number;
   tooltipLines: number;
+  /** R-199 pt.5: cap on the narrative stage's height — the "what is
+   *  happening" column reads wide and tall, scrolling only past this.
+   *  Defaults to `questWindow.stageMaxHeightPx`. */
+  stageMaxHeightPx?: number;
   /** Companion geometry + the shell's clamp inset
    *  (`gameFrameConfig.questWindow.sidePanel*`/`edgeInsetPx`). Optional —
    *  defaults to the canonical config so lab/test harnesses can omit it. */
@@ -117,10 +143,12 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   beatTiming,
   title,
   flavour,
-  scenario,
   artFor,
   time,
   onChoose,
+  nowTick,
+  onAbandon,
+  onPresentingChange,
   armedFlags = NO_ARMED,
   onToggleArmedFlag,
   onClose,
@@ -128,26 +156,44 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   widthPx,
   theaterAspect,
   tooltipLines,
+  stageMaxHeightPx = DEFAULT_GAME_FRAME_CONFIG.questWindow.stageMaxHeightPx,
   companions = DEFAULT_COMPANIONS,
   zIndex,
 }) => {
   const { t } = useTranslation('idleVillage');
   const shellRef = useRef<HTMLDivElement | null>(null);
-  /* R-196: three companion panels, each independently toggleable — all open
-   * by default (the Director's "everything visible at once" preference). The
-   * shared layout predicate decides whether they MAY mount at this viewport. */
-  const [partyOpen, setPartyOpen] = useState(true);
-  const [beltOpen, setBeltOpen] = useState(true);
-  const [logOpen, setLogOpen] = useState(true);
+  /* R-199 pt.4: the optional companions start CLOSED — the player opens
+   * each from its header/belt icon (`companionsDefaultOpen`, default false;
+   * overrides the R-196 «all visible» default). The shared layout predicate
+   * decides whether they MAY mount at this viewport. */
+  const companionsDefault = DEFAULT_GAME_FRAME_CONFIG.questWindow.companionsDefaultOpen;
+  const [partyOpen, setPartyOpen] = useState(companionsDefault);
+  const [beltOpen, setBeltOpen] = useState(companionsDefault);
+  const [logOpen, setLogOpen] = useState(companionsDefault);
+  /* R-199 pt.9: the per-check presentation options popover (skip intro /
+   * skip the astrolabe entirely — the verdict still lands as a beat). */
+  const checkCfg = DEFAULT_GAME_FRAME_CONFIG.questWindow.skillCheck;
+  /* PLAN-040 T-001: the window's vertical budget — stage floor, choices cap
+   *  and theatre shrink floor all live in config (config-first). */
+  const questWindow = DEFAULT_GAME_FRAME_CONFIG.questWindow;
+  const [checkOptsOpen, setCheckOptsOpen] = useState(false);
+  const [checkOpts, setCheckOpts] = useState<QuestCheckOptions>({ skipIntro: false, skipCheck: false });
+  /* R-199 pt.12: «abbandona quest» asks inline before committing. */
+  const [abandonAsked, setAbandonAsked] = useState(false);
   const partyToggleRef = useRef<HTMLButtonElement | null>(null);
   const beltToggleRef = useRef<HTMLButtonElement | null>(null);
   const logToggleRef = useRef<HTMLButtonElement | null>(null);
+  const checkOptsToggleRef = useRef<HTMLButtonElement | null>(null);
   /* Live viewport width — the companions fit/collapse on the SAME predicate
    * the drag clamps against (WITNESS-01: no divergence between render and
    * clamp). */
   const [vw, setVw] = useState(() => (typeof window === 'undefined' ? 1280 : window.innerWidth));
+  const [vh, setVh] = useState(() => (typeof window === 'undefined' ? 800 : window.innerHeight));
   useEffect(() => {
-    const onResize = () => setVw(window.innerWidth);
+    const onResize = () => {
+      setVw(window.innerWidth);
+      setVh(window.innerHeight);
+    };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -172,13 +218,95 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   const [minimised, setMinimised] = useState(false);
   const allNodes = nodesFor(run);
   const node = allNodes[run.nodeId];
-  const options = useMemo(() => availableOptions(run), [run]);
+  /* R-199 pt.11: `nowTick` marks options locked while their frontier's slot
+   *  on the time bar has not arrived — visible, not yet committable. */
+  const options = useMemo(() => availableOptions(run, nowTick), [run, nowTick]);
+  const frontierLocked = !run.ended && run.frontier.status === 'waiting' && nowTick !== undefined && nowTick < run.frontier.readyAt;
   /* Beat replay (T-008): while committed beats are still on stage the window
    *  presents them one at a time and blocks input — the frontier has already
-   *  committed, choices must not fire mid-beat. Click/Enter/Space skips. */
+   *  committed, choices must not fire mid-beat. Click or ANY key skips
+   *  (R-199 pt.1: there is no skip button at all). */
   const reducedMotion = prefersReducedMotion();
-  const beatCursor = useBeatCursor(queuedBeats, beatTiming, { reducedMotion });
+  /* R-199 pt.10: check beats dock the frozen astrolabe over the theatre —
+   *  it paints the engine-resolved verdict (presentation only). The beat is
+   *  HELD while it spins (`hold` → cursor parks at `checkHoldMs` as a
+   *  leak-guard); resolve → verdict dwell → advance. `skipCheck` opts out
+   *  of the theatre entirely and lets the normal text beat run. */
+  const [astroSettledIds, setAstroSettledIds] = useState<ReadonlySet<string>>(new Set());
+  const astroSettledRef = useRef<ReadonlySet<string>>(new Set());
+  astroSettledRef.current = astroSettledIds;
+  /* PLAN-040 T-003b: the astrolabe lives in `QuestSkillCheckOverlay` now —
+   *  a sibling under `#game-modal-root`. This slot is the imperative channel
+   *  it fills on mount (skipToResult / throwNow). */
+  const checkHandleRef = useRef<QuestCheckOverlayHandle | null>(null);
+  const astroShownFor = useCallback(
+    (b: QuestBeat | null | undefined) => b?.kind === 'check' && !checkOpts.skipCheck,
+    [checkOpts.skipCheck],
+  );
+  const beatCursor = useBeatCursor(queuedBeats, beatTiming, { reducedMotion, hold: astroShownFor });
   const presenting = beatCursor.current !== null;
+  const currentBeat_ = beatCursor.current;
+  const astroActive = astroShownFor(currentBeat_);
+  const astroSettled = currentBeat_ ? astroSettledIds.has(currentBeat_.id) : false;
+  /* The engine already resolved verdict AND harm; the astrolabe only paints
+   *  it — same forced-mode contract as the S1 lab. */
+  const astroCheck = astroActive && currentBeat_.kind === 'check' ? currentBeat_.check : null;
+  const astroMode = astroCheck
+    ? astroCheck.verdict === 'fail' && astroCheck.harm === 'death'
+      ? 'fail_dead'
+      : astroCheck.verdict === 'fail' && astroCheck.harm === 'wound'
+        ? 'fail_wound'
+        : astroCheck.verdict
+    : undefined;
+
+  /* Read-through ref for the imperative handlers (resolve → dismiss → skip). */
+  const cursorRef = useRef(beatCursor);
+  cursorRef.current = beatCursor;
+
+  /** Astrolabe resolved → the verdict is painted; the beat stays held until
+   *  the player dismisses the overlay (`onDismiss` → `cursor.skip()`) or the
+   *  `checkHoldMs` leak-guard fires. PLAN-040 T-003b: no more timed dwell —
+   *  the verdict lives on the overlay, dismissed by click. */
+  const handleAstroResolve = useCallback((beatId: string) => {
+    setAstroSettledIds((prev) => (prev.has(beatId) ? prev : new Set(prev).add(beatId)));
+  }, []);
+
+  /* PLAN-040 T-003a: while a check beat is held the window publishes the
+   *  presentation bridge — `questOverlays` (sibling under `#game-modal-root`)
+   *  paints the astrolabe from it and reports resolve/dismiss back. Cleared
+   *  the moment the beat is no longer a held check. */
+  useEffect(() => {
+    if (!astroActive || !astroCheck || !currentBeat_ || !astroMode) return;
+    const beatId = currentBeat_.id;
+    publishCheckBridge(run.questId, {
+      beatId,
+      check: astroCheck,
+      mode: astroMode,
+      autoThrow: checkOpts.skipIntro,
+      handle: checkHandleRef,
+      onResolved: (id) => handleAstroResolve(id),
+      /* Dismiss settles the held beat — idempotent on any other beat id. */
+      onDismiss: (id) => {
+        if (cursorRef.current.current?.id === id) cursorRef.current.skip();
+      },
+    });
+    return () => publishCheckBridge(run.questId, null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [astroActive, astroCheck, currentBeat_?.id, astroMode, checkOpts.skipIntro, run.questId, handleAstroResolve]);
+
+  /** Progressive skip — the ONLY fast-forward affordance (R-199 pt.1: no
+   *  button). During the astrolabe's spin it settles the verdict (through the
+   *  overlay's imperative handle); after resolve the overlay's own dismiss
+   *  path settles the beat; anywhere else it ends the beat. */
+  const advancePresentation = useCallback(() => {
+    const c = cursorRef.current;
+    const beat = c.current;
+    if (beat && astroShownFor(beat) && !astroSettledRef.current.has(beat.id)) {
+      checkHandleRef.current?.skipToResult();
+      return;
+    }
+    c.skip();
+  }, [astroShownFor]);
   // Cinema FX (T-009): the configured beat→fx mapping for the beat on stage.
   const beatFx = useBeatFx(beatCursor.current, DEFAULT_QUEST_THEATRE_FX);
   /* R-196 previews: the armed per-item set is the source of truth — check
@@ -249,25 +377,52 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     return () => window.removeEventListener('keydown', onKey);
   }, [minimised, waiting, presenting, options, onChoose]);
 
-  // While a beat plays, Enter/Space advances it (same as clicking anywhere).
+  // R-199 pt.1: while a beat plays, ANY key advances it — same as clicking
+  // on the presentation. Interactive surfaces (buttons, inputs, links) keep
+  // their own keys; plain presses route through `advancePresentation`.
   useEffect(() => {
-    if (!presenting) return undefined;
+    if (!presenting || minimised) return undefined;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        // window/document target (nothing focused) — still advances.
         event.preventDefault();
-        beatCursor.skip();
+        advancePresentation();
+        return;
       }
+      if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName))) return;
+      if (target.closest('button, a[href]')) return;
+      event.preventDefault();
+      advancePresentation();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [presenting, beatCursor]);
+  }, [presenting, minimised, advancePresentation]);
+
+  // The page learns when beats are on stage — the external reward popup
+  // waits for the last beat to land before it opens.
+  useEffect(() => {
+    onPresentingChange?.(presenting);
+  }, [presenting, onPresentingChange]);
 
   const shell: CSSProperties = { position: 'fixed', left: anchor.left, top: anchor.top, pointerEvents: 'auto', ...panelStyle, zIndex: panelStyle.zIndex ?? zIndex };
   const plaqueMaxH = `calc(100vh - ${anchor.top}px - ${companions.edgeInsetPx}px)`;
+  /* PLAN-040 T-001: on short viewports the theatre floor lowers so a choice
+   * row + the phase tiles stay reachable above the scroll fold —
+   * `min(theaterMinHeightPx, max(theaterMinHeightShortPx, cap*share))`. The
+   * cap mirrors `plaqueMaxH` numerically (same anchor + edge inset). */
+  const plaqueCapPx = Math.max(0, vh - anchor.top - companions.edgeInsetPx);
+  const theatreMinH = Math.min(
+    questWindow.theaterMinHeightPx,
+    Math.max(questWindow.theaterMinHeightShortPx, Math.floor(plaqueCapPx * questWindow.theaterMaxShareOfPlaque)),
+  );
   const uid = React.useId();
   const partyPanelId = `${uid}-party`;
   const beltPanelId = `${uid}-belt`;
   const logPanelId = `${uid}-log`;
+  const checkOptsPanelId = `${uid}-checkopts`;
+  const abandonPanelId = `${uid}-abandon`;
   /* Panel close → focus returns to its header toggle (WITNESS-04). */
   const closeParty = () => {
     setPartyOpen(false);
@@ -292,14 +447,16 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     const shell = shellRef.current;
     if (!shell) return;
     if (became) {
-      (shell.querySelector<HTMLElement>('[data-testid="quest-window-beat-continue"]') ??
-        shell.querySelector<HTMLElement>('[data-testid="quest-window-stage"]'))?.focus({ preventScroll: true });
+      // R-199: no Continue button — the beat stage itself is the live region.
+      shell.querySelector<HTMLElement>('[data-testid="quest-window-beat"]')?.focus({ preventScroll: true });
     } else if (ended && shell.contains(document.activeElement)) {
       shell.querySelector<HTMLElement>('[data-testid="quest-window-stage"]')?.focus({ preventScroll: true });
     }
   }, [presenting]);
 
-  const leftOpen = companionsFit && (partyOpen || beltOpen);
+  /* R-199 pt.13: the belt no longer lives in the left column — its trigger
+   *  sits beside the choices and its plaque pops up from there. */
+  const leftOpen = companionsFit && partyOpen;
   const rightOpen = companionsFit && logOpen;
 
   if (minimised) {
@@ -346,7 +503,6 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             style={{ position: 'absolute', right: `calc(100% + ${companions.gapPx}px)`, top: 0, bottom: 0, width: sideWidth, display: 'flex', flexDirection: 'column', gap: companions.gapPx, minHeight: 0 }}
           >
             {partyOpen && <QuestPartyRosterPanel panelId={partyPanelId} run={run} healDeltas={actionPreview.memberDeltas} onClose={closeParty} />}
-            {beltOpen && <QuestBeltPlaque panelId={beltPanelId} items={bag} statuses={beltStatuses} armedFlags={armedFlags} onToggleFlag={onToggleArmedFlag ?? (() => undefined)} onClose={closeBelt} />}
           </div>
         )}
         <HudPlaque
@@ -361,9 +517,9 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           <h2 style={{ flex: 1, margin: 0, minWidth: 0, fontFamily: FONT.display, fontSize: 16, lineHeight: 1.2, letterSpacing: '0.06em', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {title}
           </h2>
-          {/* Companion toggles (R-196): Party Roster left, Belt left, Chronicle
-              right — icon-only, `aria-expanded`/`aria-controls`, each opens and
-              closes its own plaque and stays independent of the others. */}
+          {/* Companion + option toggles (R-196, rev. R-199): Party Roster left,
+              Chronicle right, check options popover, «abbandona» — icon-only,
+              `aria-expanded`/`aria-controls`, each opens its own plaque. */}
           <div data-hud-controls style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <button
               type="button"
@@ -379,18 +535,6 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             </button>
             <button
               type="button"
-              ref={beltToggleRef}
-              aria-label={t('gameFrame.questWindow.bag')}
-              title={t('gameFrame.questWindow.bag')}
-              aria-expanded={beltOpen}
-              aria-controls={beltPanelId}
-              data-testid="quest-belt-toggle"
-              onClick={() => setBeltOpen((v) => !v)}
-            >
-              <EngravedIcon id="nav-bag" />
-            </button>
-            <button
-              type="button"
               ref={logToggleRef}
               aria-label={t('gameFrame.questWindow.chronicle')}
               title={t('gameFrame.questWindow.chronicle')}
@@ -401,6 +545,55 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             >
               <EngravedIcon id="ico-scroll" />
             </button>
+            {checkCfg.optionsPanel && !run.ended && (
+              <button
+                type="button"
+                ref={checkOptsToggleRef}
+                aria-label={t('gameFrame.questWindow.checkOptions')}
+                title={t('gameFrame.questWindow.checkOptions')}
+                aria-expanded={checkOptsOpen}
+                aria-controls={checkOptsPanelId}
+                data-testid="quest-check-options-toggle"
+                onClick={() => setCheckOptsOpen((v) => !v)}
+              >
+                <EngravedIcon id="ico-spark" />
+              </button>
+            )}
+            {/* PLAN-040 T-002: the bag's toggle is a header icon like the
+                roster/log ones — it used to sit in the action strip outside
+                `data-hud-controls` and rendered as a full bronze pill that
+                ate the choices' vertical space. Its plaque still pops up
+                beside the choices (the armed dot rides inside the button). */}
+            <button
+              type="button"
+              ref={beltToggleRef}
+              aria-label={t('gameFrame.questWindow.bag')}
+              title={t('gameFrame.questWindow.bag')}
+              aria-expanded={beltOpen}
+              aria-controls={beltPanelId}
+              data-testid="quest-belt-toggle"
+              onClick={() => setBeltOpen((v) => !v)}
+            >
+              <EngravedIcon id="nav-bag" />
+              {armedFlags.size > 0 && (
+                <span aria-hidden style={{ display: 'inline-block', width: 6, height: 6, borderRadius: 999, background: 'var(--skin-title-color)' }} />
+              )}
+            </button>
+            {/* R-199 pt.12: «abbandona» lives up here with the option icons —
+                it asks inline before routing to the engine's `flee`. */}
+            {onAbandon && !run.ended && (
+              <button
+                type="button"
+                aria-label={t('gameFrame.questWindow.abandon')}
+                title={t('gameFrame.questWindow.abandon')}
+                aria-expanded={abandonAsked}
+                aria-controls={abandonPanelId}
+                data-testid="quest-abandon-toggle"
+                onClick={() => setAbandonAsked((v) => !v)}
+              >
+                <EngravedIcon id="ico-gust" />
+              </button>
+            )}
             <button type="button" data-keep="" aria-label={t('gameFrame.questWindow.minimise')} title={t('gameFrame.questWindow.minimise')} onClick={() => setMinimised(true)}>
               <EngravedIcon id="cmd-minimize" />
             </button>
@@ -410,11 +603,118 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           </div>
         </div>
 
+        {/* R-199 pt.9+12: two small popovers hang off the header — the check
+            presentation options and the inline abandon confirm (non-modal:
+            no backdrop, `Escape`/icon dismiss, focus returns to its toggle). */}
+        {checkOptsOpen && checkCfg.optionsPanel && (
+          <div data-hud-companion="opts" style={{ position: 'absolute', top: 44, right: 14, zIndex: 6 }}>
+            <QuestCheckOptionsPanel
+              panelId={checkOptsPanelId}
+              options={checkOpts}
+              allowSkipIntro={checkCfg.allowSkipIntro}
+              allowSkipCheck={checkCfg.allowSkipCheck}
+              onToggle={(key) => setCheckOpts((o) => ({ ...o, [key]: !o[key] }))}
+              onClose={() => {
+                setCheckOptsOpen(false);
+                checkOptsToggleRef.current?.focus();
+              }}
+            />
+          </div>
+        )}
+        {abandonAsked && onAbandon && !run.ended && (
+          <div
+            data-hud-companion="abandon"
+            id={abandonPanelId}
+            role="alertdialog"
+            aria-label={t('gameFrame.questWindow.abandon')}
+            data-testid="quest-abandon-confirm"
+            style={{ position: 'absolute', top: 44, right: 14, zIndex: 6, display: 'flex', flexDirection: 'column', gap: 8, width: 240, padding: '10px 12px 12px', borderRadius: 8, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)', background: 'var(--skin-hud-lacquer-deep)', boxShadow: '0 10px 24px color-mix(in srgb, var(--skin-hud-lacquer-deep) 80%, transparent)' }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                e.stopPropagation();
+                setAbandonAsked(false);
+              }
+            }}
+          >
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: TONE.label }}>
+              {t('gameFrame.questWindow.abandonConfirm')}
+            </p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                data-testid="quest-abandon-stay"
+                onClick={() => setAbandonAsked(false)}
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: 6,
+                  border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)',
+                  background: 'transparent',
+                  color: TONE.label,
+                  fontFamily: FONT.display,
+                  fontSize: 13,
+                  letterSpacing: '0.06em',
+                  cursor: 'pointer',
+                }}
+              >
+                {t('gameFrame.questWindow.abandonStay')}
+              </button>
+              <button
+                type="button"
+                data-testid="quest-abandon-yes"
+                onClick={() => {
+                  setAbandonAsked(false);
+                  onAbandon();
+                }}
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: 6,
+                  border: `1px solid ${TONE.danger}`,
+                  background: 'color-mix(in srgb, var(--skin-status-death) 16%, transparent)',
+                  color: TONE.death,
+                  fontFamily: FONT.display,
+                  fontSize: 13,
+                  letterSpacing: '0.06em',
+                  cursor: 'pointer',
+                }}
+              >
+                {t('gameFrame.questWindow.abandonYes')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Content column: everything under the pinned title row lives in
+            ONE internally-scrolling region. On a height-capped plaque (short
+            viewports) the theatre still yields first via its min-height
+            floor, and whatever remains scrolls inside the plaque — content
+            never paints past the frame (the plaque itself keeps
+            `overflow:visible`: its SVG drop-shadow must not clip). ── */}
+        <div className="quest-s1-scroll" style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
+
         {/* ── Flavour: the quest's one line, above the picture ── */}
         <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.4, color: TONE.secondary }}>{flavour}</p>
 
         {/* ── Theater — a scene beat cuts the picture to its node; cinematic
-            beats close the letterbox over it (T-009). ── */}
+            beats close the letterbox over it (T-009). R-199 pt.10: a check
+            beat docks the frozen astrolabe over the whole frame — it paints
+            the engine-resolved verdict, never decides it. Clicking it is the
+            same progressive skip as clicking the stage. ── */}
+        {/* PLAN-040 T-001: the theatre is the plaque's shrink reservoir —
+            when the window is height-capped it compresses down to
+            `theaterMinHeightPx` before anything else gives. The inner frame
+            keeps its aspect normally and clamps to the wrapper when shrunk. */}
+        <div
+          onClick={
+            presenting
+              ? (e) => {
+                  // The astrolabe's own TIRA button must throw, not advance.
+                  if ((e.target as HTMLElement).closest('button')) return;
+                  advancePresentation();
+                }
+              : undefined
+          }
+          style={{ display: 'flex', flexDirection: 'column', minHeight: theatreMinH, flexShrink: 1, ...(presenting ? { cursor: 'pointer' } : {}) }}
+        >
         <Theater src={artFor(beatCursor.current?.kind === 'scene' ? beatCursor.current.nodeId : run.nodeId)} caption={caption} hidden={captionHidden} aspect={theaterAspect}>
           <Letterbox
             active={presenting && beatFx.letterbox}
@@ -424,7 +724,12 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             color="var(--skin-hud-lacquer-deep)"
             reducedMotion={reducedMotion}
           />
+          {/* PLAN-040 T-003b: the astrolabe is no longer docked in the
+              theatre — `questOverlays` paints it in `#game-modal-root` as a
+              sibling overlay in front of this window. The theatre stays
+              visible behind it. */}
         </Theater>
+        </div>
 
         {/* ── Combat legibility (T-010, E7): horde + who the goblins will most
             likely hit — read before committing to "Combatti". The harm beat's
@@ -439,16 +744,22 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         )}
 
         {/* ── What just happened: while committed beats replay, the stage shows
-            one moment at a time — click anywhere on it to continue (D-8). ── */}
+            one moment at a time — click anywhere on it to continue (D-8).
+            R-199 pt.5: the stage keeps the current scene generous (config
+            `stageMaxHeightPx`); the RUNNING record of esiti lives in the
+            chronicle companion (pt.8) and the end report in the external
+            `QuestRewardPopup` (pt.14) — no more verdict pile-up here. ── */}
         {presenting && beatCursor.current ? (
           <BeatStage
             beat={beatCursor.current}
             hidden={beatCursor.current.kind === 'scene' ? !!allNodes[beatCursor.current.nodeId]?.hidden : false}
             remaining={beatCursor.remaining}
-            onSkip={beatCursor.skip}
+            onAdvance={advancePresentation}
+            checkSpinning={astroActive && !astroSettled}
             fx={beatFx}
             fxConfig={DEFAULT_QUEST_THEATRE_FX}
             reducedMotion={reducedMotion}
+            maxHeightPx={stageMaxHeightPx}
           />
         ) : (
         <div
@@ -456,47 +767,54 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           data-testid="quest-window-stage"
           aria-live="polite"
           tabIndex={-1}
-          style={{ maxHeight: 168, minHeight: 0, flexShrink: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6, outline: 'none' }}
+          style={{ maxHeight: stageMaxHeightPx, minHeight: questWindow.stageMinHeightPx, flexShrink: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6, outline: 'none' }}
         >
-          {resolved.map((c) => (
-            <div key={c.id} data-testid="quest-window-verdict" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                <HudChip tone={VERDICT_TONE[c.verdict]}>{t(`questS1Lab.verdict.${c.verdict}`)}</HudChip>
-                <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.06em', color: TONE.secondary }}>{c.title}</span>
-              </div>
-              {c.flavor && <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.45, color: TONE.label }}>{c.flavor}</p>}
-              {c.harmLines.map((line, i) => (
-                <Line key={i} tone={c.deathLines?.includes(line) ? 'death' : 'warn'}>{line}</Line>
-              ))}
-              {c.authoredText && <Line tone="secondary">{c.authoredText}</Line>}
-            </div>
-          ))}
+          {/* PLAN-040 T-005: the resolved-check verdict block left the stage —
+              the outcome surfaces in the external `QuestOutcomeToast` (all
+              text at once, click to dismiss) and stays readable in the
+              chronicle companion. The stage keeps scene and flavour only. */}
           {showLastEvent && (
             <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.45, color: TONE.label }}>{run.lastEvent}</p>
           )}
           {node?.body && !run.ended && (
-            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.5, color: TONE.text }}>{node.body}</p>
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 15, lineHeight: 1.55, color: TONE.text }}>{node.body}</p>
           )}
           {/* v27 pending frontier: the node is maturing — show the authored transit as the breath before the consequences land. */}
           {!run.ended && run.frontier.status === 'pending' && node?.transit && (
             <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 13, lineHeight: 1.45, color: TONE.secondary }}>{node.transit}</p>
+          )}
+          {/* R-199 pt.11: a waiting frontier whose slot has not come yet says
+              so — the choices below stay visible but locked. */}
+          {frontierLocked && (
+            <p data-testid="quest-window-locked" style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 13, lineHeight: 1.45, color: TONE.secondary }}>
+              {t('gameFrame.questWindow.phaseLocked')}
+            </p>
           )}
           {run.ended && (
             <p style={{ margin: 0, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: run.outcome === 'wipe' ? TONE.death : TONE.label }}>
               {t(`questS1Lab.outcome.${run.outcome}`)}
             </p>
           )}
-          {/* S4 T-2: the mandatory return report — the settlement's own
-           *  numbers (cost first, yield after), shown once the run's last
-           *  beat has played. */}
-          {run.ended && !presenting && <QuestEpilogue run={run} scenario={scenario} />}
         </div>
         )}
 
-        {/* ── Choices: a numbered dialogue list (BG3 / Disco Elysium idiom) — the
-            bag's belt lives in the LEFT companion plaque (R-196), never inline ── */}
+        {/* ── Choices: a numbered dialogue list (BG3 / Disco Elysium idiom).
+            R-199 pt.13: the belt's icon and plaque live right here — arming
+            an item happens beside the choice it will affect. ── */}
         {!presenting && (waiting || run.ended) && (
-          <div data-hud-choices style={{ display: 'flex', flexDirection: 'column', margin: '0 -4px' }}>
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0, flexShrink: 1 }}>
+          {/* PLAN-040 T-001: the choices column is a shrinkable, internally
+              scrolling region — capped by `choicesMaxHeightPx` so the phase
+              tiles below can never spill past the plaque border. */}
+          <div data-hud-choices className="quest-s1-scroll" style={{ display: 'flex', flexDirection: 'column', margin: '0 -4px', padding: '0 4px', maxHeight: questWindow.choicesMaxHeightPx, minHeight: 0, overflowY: 'auto' }}>
+            {waiting && frontierLocked && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 4px 2px' }} data-testid="quest-action-strip">
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.muted }}>
+                  <EngravedIcon id="cmd-lock" size={12} />
+                  {t('gameFrame.questWindow.phaseLocked')}
+                </span>
+              </div>
+            )}
             {waiting &&
               options.map((o, i) => {
                 const { pv, base } = previews[o.id] ?? { pv: null, base: null };
@@ -526,6 +844,18 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               </button>
             )}
           </div>
+          {/* Belt popover: opens upward from beside the choices, as its own
+              companion plaque — the drag union tracks it via
+              `data-hud-companion`. */}
+          {beltOpen && (
+            <div
+              data-hud-companion="belt"
+              style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 0, width: Math.min(sideWidth, 280), zIndex: 7 }}
+            >
+              <QuestBeltPlaque panelId={beltPanelId} items={bag} statuses={beltStatuses} armedFlags={armedFlags} onToggleFlag={onToggleArmedFlag ?? (() => undefined)} onClose={closeBelt} />
+            </div>
+          )}
+          </div>
         )}
 
         {/* ── Time: start of the expedition → its return, on the game clock ── */}
@@ -545,6 +875,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           ))}
           {!run.ended && currentBeat + 1 < beats.length && <NextTile label={t('gameFrame.questWindow.nextPhase')} />}
         </ol>
+        </div>
         </HudPlaque>
         {rightOpen && (
           <div
@@ -581,25 +912,39 @@ const Line: React.FC<{ tone: keyof typeof TONE; children: React.ReactNode }> = (
   <div style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: TONE[tone] }}>{children}</div>
 );
 
-/** The stage while committed beats replay (T-008): one moment at a time. The
- *  Continue button → next beat (R-196: a real `<button>`, never a div wearing
- *  `role="button"` — no nested interactives, `aria-live` announces the beat).
- *  Deaths get the muted/dark register and a skull (D-8) — the weight is in the
- *  colour, never in a forced wait. T-009 adds the cinema accents: verdict edge
- *  flash + typewriter where the config earns them. */
+/** The stage while committed beats replay (T-008): one moment at a time.
+ *  R-199 pt.1: the whole card is the continue affordance — clicking it (or
+ *  pressing any key, handled window-level) advances; there is NO skip
+ *  button. `aria-live` announces the beat, `tabIndex` lets the keyboard
+ *  land on it for focus hand-off. Deaths get the muted/dark register and a
+ *  skull (D-8); T-009 adds the cinema accents (verdict edge flash +
+ *  typewriter where the config earns them). R-199 pt.10: while the docked
+ *  astrolabe spins (`checkSpinning`) the check beat shows only the
+ *  attempt's transit — the verdict text lands once the roll resolves. */
 const BeatStage: React.FC<{
   beat: QuestBeat;
   /** The beat's node is authored `hidden` — a marker asks for the eye-off glyph. */
   hidden?: boolean;
   remaining: number;
-  onSkip: () => void;
+  onAdvance: () => void;
+  /** A docked astrolabe is still presenting this check — hide the verdict. */
+  checkSpinning?: boolean;
   fx: BeatFx;
   fxConfig: QuestTheatreFxConfig;
   reducedMotion: boolean;
-}> = ({ beat, hidden, remaining, onSkip, fx, fxConfig, reducedMotion }) => {
+  /** Cap on the narrative column's height (config `stageMaxHeightPx`). */
+  maxHeightPx?: number;
+}> = ({ beat, hidden, remaining, onAdvance, checkSpinning, fx, fxConfig, reducedMotion, maxHeightPx }) => {
   const { t } = useTranslation('idleVillage');
   return (
-    <div data-testid="quest-window-beat" aria-live="polite" style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 6, minHeight: 96 }}>
+    <div
+      data-testid="quest-window-beat"
+      aria-live="polite"
+      tabIndex={-1}
+      onClick={onAdvance}
+      className="quest-s1-scroll"
+      style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 6, minHeight: 96, maxHeight: maxHeightPx, overflowY: 'auto', outline: 'none', cursor: 'pointer' }}
+    >
       {fx.flashTone && (
         <EdgeFlash
           flashKey={beat.id}
@@ -615,7 +960,7 @@ const BeatStage: React.FC<{
             {beat.title}
           </span>
           {beat.body && (
-            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.5, color: TONE.text }}>
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 15, lineHeight: 1.55, color: TONE.text }}>
               {fx.typewriter === 'body' ? (
                 <TypewriterText text={beat.body} charsPerSecond={fxConfig.typewriter.charsPerSecond} textKey={beat.id} reducedMotion={reducedMotion} />
               ) : (
@@ -625,7 +970,17 @@ const BeatStage: React.FC<{
           )}
         </>
       )}
-      {beat.kind === 'check' && (
+      {beat.kind === 'check' && checkSpinning && (
+        <>
+          <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
+            {beat.check.title}
+          </span>
+          {beat.check.transit && (
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.45, color: TONE.secondary }}>{beat.check.transit}</p>
+          )}
+        </>
+      )}
+      {beat.kind === 'check' && !checkSpinning && (
         <>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
             <HudChip tone={VERDICT_TONE[beat.check.verdict]}>{t(`questS1Lab.verdict.${beat.check.verdict}`)}</HudChip>
@@ -675,17 +1030,10 @@ const BeatStage: React.FC<{
           {t('gameFrame.questWindow.beats.recap', { scenes: beat.scenes, checks: beat.checks, deaths: beat.deaths, wounds: beat.wounds })}
         </Line>
       )}
-      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 'auto' }}>
-        <span style={{ fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.muted }}>
-          {remaining > 0 ? t('gameFrame.questWindow.beats.more', { count: remaining + 1 }) : t('gameFrame.questWindow.beats.clickHint')}
-        </span>
-        {/* R-196: a real Continue pill — the only beat control; the "Skip to
-            the frontier" button is gone (Director call). */}
-        <span data-hud-controls="" style={{ display: 'inline-flex' }}>
-          <button type="button" data-testid="quest-window-beat-continue" onClick={onSkip}>
-            {t('gameFrame.questWindow.beats.continue')}
-          </button>
-        </span>
+      {/* No control here — R-199 pt.1: the whole card is the affordance,
+          the hint says so (click or any key). */}
+      <span style={{ fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.muted, marginTop: 'auto' }}>
+        {remaining > 0 ? t('gameFrame.questWindow.beats.more', { count: remaining + 1 }) : t('gameFrame.questWindow.beats.clickHint')}
       </span>
     </div>
   );
@@ -830,7 +1178,7 @@ const Theater: React.FC<{ src?: string; caption: string; hidden?: boolean; aspec
     };
   }, [src]);
   return (
-    <div style={{ position: 'relative', aspectRatio: String(aspect), overflow: 'hidden', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)', background: 'var(--skin-hud-lacquer-deep)' }}>
+    <div style={{ position: 'relative', aspectRatio: String(aspect), flexShrink: 1, minHeight: 0, overflow: 'hidden', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)', background: 'var(--skin-hud-lacquer-deep)' }}>
       {src && <img ref={img} key={src} src={src} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 40%' }} />}
       <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 95% at 50% 40%, transparent 55%, color-mix(in srgb, var(--skin-hud-lacquer-deep) 70%, transparent))' }} />
       <div aria-hidden style={{ position: 'absolute', insetInline: 0, bottom: 0, height: '55%', background: SCRIM.bottom }} />

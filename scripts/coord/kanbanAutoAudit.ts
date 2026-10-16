@@ -1,6 +1,11 @@
 /**
- * Kanban Auto Audit Script
- * 
+ * Kanban Auto Audit Script — **LEGACY / IN PAUSA (R-208, 2026-10-16)**
+ *
+ * The kanban board is frozen (see banner at top of
+ * `src/docs/docs/coordinator/agent_assignments.md`); this audit is kept for
+ * possible reactivation but is NOT part of the active workflow. The live
+ * closure gate is `scripts/closureLint.ts` (`npm run closure:lint`).
+ *
  * Automatically audits the Kanban (agent_assignments.md) to verify:
  * - "In corso" entries have agent/date
  * - "Completato" entries have evidence

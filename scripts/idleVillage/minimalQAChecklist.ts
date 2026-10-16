@@ -20,7 +20,7 @@ const DEFAULT_SAFEGUARDS = [
   'npm run lint -- scripts/idleVillage',
   'npm run test -- tests/unit/scripts/MinimalQaChecklist.test.ts',
   'npm run build:check',
-  'npm run kanban:lint',
+  'npm run closure:lint',
 ];
 
 /**

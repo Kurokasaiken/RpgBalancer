@@ -1,15 +1,10 @@
 name: Coordinator
 
 on:
-  push:
-    paths:
-      - "src/docs/docs/coordinator/agent_assignments.md"
-      - "src/docs/docs/coordinator/strategy_tasks.md"
-      - ".github/workflows/coordinator.yml"
+  # IN PAUSA (R-208, 2026-10-16): kanban board e pipeline di dispatch
+  # sospese nel workflow single-agent. Trigger automatici rimossi;
+  # riattivazione solo su decisione esplicita del Director.
   workflow_dispatch:
-  schedule:
-    # Run every 5 minutes to check for new tasks
-    - cron: '*/5 * * * *'
 
 permissions:
   contents: write

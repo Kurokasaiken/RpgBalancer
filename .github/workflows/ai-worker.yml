@@ -1,13 +1,9 @@
 name: AI Worker
 
 on:
-  push:
-    paths:
-      - "ai-worker/kanban.json"
-  workflow_run:
-    workflows: ["Coordinator"]
-    types: [completed]
-    branches: [main]
+  # IN PAUSA (R-208, 2026-10-16): kanban board e pipeline di dispatch
+  # sospese nel workflow single-agent. Trigger automatici rimossi;
+  # riattivazione solo su decisione esplicita del Director.
   workflow_dispatch:
 
 permissions:

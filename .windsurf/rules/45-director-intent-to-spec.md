@@ -19,7 +19,7 @@ The Director's statements about expected behavior, visual contracts, and runtime
 3. Add the expected behavior as a new scenario, invariant, or `Comportamento atteso` section in the spec/workflow.
 4. If the new behavior exposes an unimplemented/misbehaving contract, open an `ERR-NNN` in the relevant error registry and link back to the spec.
 5. Add or update the Playwright/RTL test to match the spec text.
-6. Run `npm run build:check` and `npm run kanban:lint` before considering the turn complete.
+6. Run `npm run build:check` and `npm run closure:lint` before considering the turn complete.
 
 ## Examples
 

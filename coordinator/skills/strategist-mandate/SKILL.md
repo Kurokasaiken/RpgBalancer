@@ -1,6 +1,6 @@
 ---
 name: strategist-mandate
-description: Use when generating plans, prompts, or specs for any RPG project task. Invoke before drafting any .spec.json or .md prompt.
+description: "STORICO (R-208, 2026-10-16): la pipeline prompt-spec/dispatch è in pausa — NON invocare per task correnti nel workflow single-agent (plan → implement → verify:bundle → closure:lint). Conservato come riferimento per un'eventuale riattivazione del dispatch (era: generazione di plan/prompt/spec per task RPG)."
 ---
 
 # Strategist Mandate
@@ -93,7 +93,7 @@ Safeguards
 Lint scope and timeout (120s max)
 Test scope and timeout (300s max)
 Build:check requirement (180s max)
-Kanban:lint requirement (30s max)
+Closure:lint requirement (30s max)
 Foreground:lint requirement for tasks touching scripts/tests (no headless:false, no foreground opens)
 Evidence logging location
 Documentation Updates
@@ -118,12 +118,10 @@ Implementation diverges from design
 New dependencies are discovered
 Architecture decisions change
 Component reuse opportunities are identified
-Handoff to Coordinator
-After drafting a prompt, the Strategist must:
+Handoff (kanban/dispatch in pausa — R-208)
+After drafting a plan/spec, the Strategist must:
 
-Insert the prompt into coordinator/agent_assignments Kanban as a new row marked "Non assegnato"
-Include the full prompt in the Note field
-Reference the corresponding entry in strategy_tasks.md
+Registrare il lavoro nel piano (`plans/PLAN-*.md`) e, se serve tracciamento a ledger, una voce in `RICHIESTE.md` — MAI righe sulla kanban board (`agent_assignments.md`, in pausa) né in `strategy_tasks.md` (superseded).
 Flag any trusted/frozen component impacts
 Note any cross-cutting system implications
 Quality Gates

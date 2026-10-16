@@ -33,6 +33,8 @@ Per ogni domanda, il documento di riferimento è:
 
 **Non sono knowledge docs (ops artifacts, nessuna autorità documentale):** `coordinator/manual-dispatch/`, `prompts/`, `test-results/` (evidence), `.mw/runs/` (ephemeral). Le skill vivono in `coordinator/skills/` (fonte unica; `.windsurf/skills` e `.devin/skills` sono symlink).
 
+**Kanban/dispatch in pausa (R-208, 2026-10-16):** `src/docs/docs/coordinator/agent_assignments.md`, `coordinator/`, `ai-worker/` e i workflow `coordinator.yml`/`ai-worker.yml` non sono più il workflow operativo (conservati, non cancellati — riattivazione solo su decisione Director). Ciclo corrente: plan con contratto → agente locale → `verify:bundle` → chiusura in `RICHIESTE.md`. Il gate meccanico di chiusura è `closure:lint` (ex `kanban:lint`, solo gate R-189).
+
 ## Stati della conoscenza
 
 Ogni affermazione su progetto, codice o design deve essere classificata così:

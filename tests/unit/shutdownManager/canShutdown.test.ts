@@ -59,6 +59,41 @@ describe('canShutdown — policy gate', () => {
     expect(r.allowed).toBe(true);
     expect(r.policy.dryRun).toBe(true);
   });
+
+  it('blocks outside the quiet window even when idle and sessions are terminal', () => {
+    /* NOW = 00:00 UTC. Window 22→07 would be active — use 08→12 to be out. */
+    const r = canShutdown(
+      registryWith([], {
+        quietWindow: { enabled: true, startHour: 8, endHour: 12 },
+      }),
+      IDLE_OK,
+      opts,
+    );
+    expect(r.allowed).toBe(false);
+    expect(r.reason).toContain('outside quiet window');
+  });
+
+  it('allows inside the quiet window when all other gates pass', () => {
+    const r = canShutdown(
+      registryWith([{ id: 'a', state: 'COMPLETED' }], {
+        quietWindow: { enabled: true, startHour: 22, endHour: 7 },
+      }),
+      IDLE_OK,
+      opts,
+    );
+    expect(r.allowed).toBe(true);
+  });
+
+  it('ignores the quiet window when disabled', () => {
+    const r = canShutdown(
+      registryWith([], {
+        quietWindow: { enabled: false, startHour: 8, endHour: 12 },
+      }),
+      IDLE_OK,
+      opts,
+    );
+    expect(r.allowed).toBe(true);
+  });
 });
 
 describe('canShutdown — user idle gate', () => {

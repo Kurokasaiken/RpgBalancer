@@ -59,10 +59,10 @@ const safeguardSteps = [
     description: 'All unit tests must pass'
   },
   {
-    name: 'Kanban Validation',
-    command: 'npm run kanban:lint',
+    name: 'Closure Gate',
+    command: 'npm run closure:lint',
     critical: true,
-    description: 'Kanban must be properly formatted'
+    description: 'No fatta/Completato transition without a valid verification bundle (R-189)'
   }
 ];
 
@@ -133,20 +133,20 @@ console.log(`\n📄 Evidence log saved: ${evidenceFile}`);
 if (allPassed) {
   console.log(`\n🎉 SAFEGUARD SUITE PASSED`);
   console.log(`✅ Task ${TASK_ID} can be marked as COMPLETED`);
-  console.log(`\n📋 Next steps:`);
+  console.log(`\n📋 Next steps (workflow single-agent, R-208 — kanban in pausa):`);
   if (MANIFEST) {
     const bundleDir = path.dirname(path.resolve(MANIFEST));
-    console.log(`1. Update Kanban row to "Completato" con nota: bundle: ${path.relative(process.cwd(), bundleDir)}/bundle.json`);
-    console.log(`   (il gate rifiuta "Completato" senza bundle valido — vedi R-189)`);
+    console.log(`1. Porta la voce RICHIESTE.md a "fatta" citando: bundle: ${path.relative(process.cwd(), bundleDir)}/bundle.json`);
+    console.log(`   (il gate rifiuta "fatta" senza bundle valido — vedi R-189)`);
     console.log(`2. Se il manifest richiede il verificatore indipendente: fai esaminare gli artefatti`);
     console.log(`   in clean-context (senza diff) e rilancia con lo stesso manifest dopo verifier.json`);
   } else {
-    console.log(`1. Update Kanban row to "Completato"`);
+    console.log(`1. Porta la voce RICHIESTE.md a "fatta" con citazione bundle`);
     console.log(`   ⚠️  ATTENZIONE: senza --manifest il gate rifiuterà la chiusura (R-189).`);
     console.log(`   Crea .mw/runs/<task>/verification.json e rilancia con --manifest.`);
   }
   console.log(`3. Include evidence: test-results/${TASK_ID}-safeguard-${timestamp}.log`);
-  console.log(`4. Run npm run kanban:lint to verify`);
+  console.log(`4. Run npm run closure:lint to verify`);
   process.exit(0);
 } else {
   console.log(`\n🚨 SAFEGUARD SUITE FAILED`);

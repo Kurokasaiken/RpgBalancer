@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "name": "replay-v1",
+  "description": "R-204 / PLAN-039 replay benchmark: same task × 3 dispatch approaches × N repeats, isolated git worktrees, harness+Groq executor, measured wall time + contract pass + scope adherence.",
+  "defaults": {
+    "repeats": 2,
+    "approaches": ["raw", "contract", "context"],
+    "worktreeRoot": "tmp/bench-worktrees",
+    "resultsDir": "test-results/bench-replay",
+    "model": "openai/gpt-oss-120b",
+    "maxIterations": 48,
+    "taskTimeoutMs": 1800000,
+    "installTimeoutMs": 420000,
+    "verifyTimeoutMs": 300000
+  },
+  "cases": [
+    {
+      "id": "B1-i18n-icu",
+      "archetype": "mechanical-bugfix",
+      "source": "R-193 / commit 1c8ed9e1 (real historical task replayed)",
+      "baseCommit": "8b28392e4751f7e40788b90575d97b28d5a5281b",
+      "seedFiles": [
+        { "path": "tests/i18n/icuInterpolation.test.ts", "fromCommit": "1c8ed9e1" }
+      ],
+      "testCommand": "npm run test -- tests/i18n/icuInterpolation.test.ts",
+      "goldenCommit": "1c8ed9e1",
+      "goldenPaths": [
+        "public/locales/en/idleVillage.json",
+        "public/locales/it-IT/idleVillage.json",
+        "public/locales/pseudo/idleVillage.json",
+        "public/locales/en/common.json",
+        "public/locales/de/common.json",
+        "public/locales/ar/common.json",
+        "public/locales/pseudo/common.json",
+        "public/locales/de/idleVillage.json",
+        "src/localization/i18n.types.ts"
+      ],
+      "forbidden": [
+        "src/ui/**",
+        "plans/**",
+        ".mw/**",
+        "tests/i18n/icuInterpolation.test.ts"
+      ]
+    },
+    {
+      "id": "B2-metalayer-offers",
+      "archetype": "additive-config",
+      "source": "metaLayer authoring task (PLAN-030 style), spec authored for benchmark",
+      "baseCommit": "91880b0bcb5eb869791bce8047cbc17152089105",
+      "seedFiles": [
+        { "path": "tests/unit/metaLayer/benchMetaLayerOffers.contract.test.ts", "fromFile": "benchmarks/contracts/benchMetaLayerOffers.contract.test.ts" }
+      ],
+      "testCommand": "npm run test -- tests/unit/metaLayer/benchMetaLayerOffers.contract.test.ts",
+      "goldenCommit": null,
+      "goldenPaths": ["src/balancing/config/metaLayer/content.ts"],
+      "forbidden": [
+        "src/ui/**",
+        "plans/**",
+        ".mw/**",
+        "src/engine/**",
+        "tests/unit/metaLayer/benchMetaLayerOffers.contract.test.ts"
+      ]
+    },
+    {
+      "id": "B3-stash-item",
+      "archetype": "additive-config-i18n",
+      "source": "questS1Lab stash item addition (R-102 style), spec authored for benchmark",
+      "baseCommit": "91880b0bcb5eb869791bce8047cbc17152089105",
+      "seedFiles": [
+        { "path": "tests/unit/idleVillage/benchStashItem.contract.test.ts", "fromFile": "benchmarks/contracts/benchStashItem.contract.test.ts" }
+      ],
+      "testCommand": "npm run test -- tests/unit/idleVillage/benchStashItem.contract.test.ts",
+      "goldenCommit": null,
+      "goldenPaths": [
+        "src/balancing/config/idleVillage/quests/questStash.ts",
+        "public/locales/en/idleVillage.json",
+        "public/locales/it-IT/idleVillage.json",
+        "public/locales/pseudo/idleVillage.json"
+      ],
+      "forbidden": [
+        "src/ui/**",
+        "src/engine/**",
+        "plans/**",
+        ".mw/**",
+        "tests/unit/idleVillage/benchStashItem.contract.test.ts"
+      ]
+    }
+  ]
+}

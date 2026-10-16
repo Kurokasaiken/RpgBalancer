@@ -215,12 +215,16 @@ async function main(): Promise<void> {
     clearTimeout(timeoutId);
     result = outcome.result;
     safeguard = outcome.safeguard;
-  } catch {
+  } catch (error) {
     timedOut = true;
-    console.error(`\nTask ${taskId} timed out after ${timeoutMs}ms`);
+    /* The rejection may be a real error (provider failure, tool crash), not
+     *  just the timeout — surface it instead of reporting a false timeout. */
+    const reason = error instanceof Error ? error.message : String(error);
+    const isRealTimeout = reason === 'timeout';
+    console.error(`\nTask ${taskId} ${isRealTimeout ? `timed out after ${timeoutMs}ms` : `failed: ${reason}`}`);
     result = {
       completed: false,
-      summary: `Task timed out after ${timeoutMs}ms`,
+      summary: isRealTimeout ? `Task timed out after ${timeoutMs}ms` : `Task failed: ${reason}`,
       touchedFiles: [],
       iterations: 0,
       transcript: [],

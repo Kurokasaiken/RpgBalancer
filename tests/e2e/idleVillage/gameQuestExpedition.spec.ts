@@ -61,6 +61,7 @@ interface TestHooksWindow extends Window {
   __idleVillageTestHooks?: {
     expedition?: Record<string, ExpeditionHook & Record<string, unknown>>;
     advanceTicks?: (n: number) => void;
+    getClock?: () => { currentTick: number; currentDay: number; isPaused: boolean; speedMultiplier: number };
     revealQuestPois?: () => void;
   };
 }
@@ -87,6 +88,12 @@ const advanceTicks = (page: Page, n: number) =>
   page.evaluate((ticks) => {
     (window as TestHooksWindow).__idleVillageTestHooks?.advanceTicks?.(ticks);
   }, n);
+
+const getClock = (page: Page) =>
+  page.evaluate(() => {
+    const c = (window as TestHooksWindow).__idleVillageTestHooks?.getClock?.();
+    return { currentTick: c?.currentTick ?? 0 };
+  });
 
 const getRun = (page: Page) => expedition<RunShape | null>(page, 'getRun');
 
@@ -237,8 +244,11 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     const halo = (await expedition<HaloShape | null>(page, 'getHalo'))!;
     expect(halo.elapsedTicks).toBeGreaterThanOrEqual(25);
     expect(halo.fraction).toBeGreaterThan(0);
-    // 250-tick estimate on goblin → still filling, not clamped.
-    expect(halo.status).toBe('filling');
+    /* R-199: la durata viva segue `state.nodeTicks` (pacing per-nodo) — la
+     *  barra può già essere piena mentre la decisione attende: `filling`
+     *  oppure `pieno-in-attesa` sono entrambi legittimi; ciò che il contratto
+     *  D-J vieta è `concluso` senza un nodo `end` risolto. */
+    expect(['filling', 'pieno-in-attesa']).toContain(halo.status);
 
     // The halo keeps writing while the run sits on an unresolved decision:
     // elapsed time is the player-visible cost of thinking (D-J, no pause).
@@ -622,6 +632,12 @@ async function driveRunToEnd(page: Page, poiId: string, maxSteps = 120): Promise
     if (!run) throw new Error(`[${poiId}] run vanished mid-drive`);
     if (run.ended) return run;
     if (run.frontier.status === 'waiting') {
+      /* R-199: a waiting frontier is visible at once but committable only at
+       *  `readyAt` (the march to the node costs nodeTicks) — the driver waits
+       *  the phase slot on the canonical clock before choosing. */
+      const clock = await getClock(page);
+      const lead = Math.max(0, run.frontier.readyAt - clock.currentTick);
+      if (lead > 0) await advanceTicks(page, lead + 1);
       const options = await expeditionFor<string[]>(page, poiId, 'getOptions');
       if (!options.length) throw new Error(`[${poiId}] waiting frontier without options at ${run.nodeId}`);
       repeats = run.nodeId === lastNode ? repeats + 1 : 0;
@@ -844,8 +860,12 @@ test.describe('Director quest button — same path as a real POI', () => {
 
     /* The party roster companion plaque (R-196) renders the REAL roster
      *  PgCard per traveling member — one [data-testid=pg-card] per
-     *  run.party entry, keyed by resident id. It mounts open by default
-     *  inside the run window's shell. */
+     *  run.party entry, keyed by resident id. R-199 pt.4: the companions
+     *  start CLOSED (`companionsDefaultOpen`) — the plaque mounts from its
+     *  roster toggle in the window's header row. */
+    const partyToggle = page.getByTestId('quest-window').locator('button[aria-controls$="-party"]');
+    await partyToggle.click();
+    await expect(partyToggle).toHaveAttribute('aria-expanded', 'true');
     const partyPlaque = page.getByTestId('quest-party-roster');
     await expect(partyPlaque).toBeVisible({ timeout: 10_000 });
     const partyCards = partyPlaque.locator('[data-testid="pg-card"]');

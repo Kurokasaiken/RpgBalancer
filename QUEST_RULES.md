@@ -306,6 +306,15 @@ al Director, non assorbimento silenzioso.
   porte (8 categorie), esploratore orientabile sulla generazione.
   `proposta` — non ratificate, tracciate in
   `context/QUEST_OPPORTUNITY_LAYER.md` e OPEN-019/020/021.
+- **Proposte macro campagna** (2026-10-16, sintesi Director di una
+  discussione di design): ciclo di campagna come crisi crescente a ondate
+  con doppio obiettivo (resistere + sconfiggere), difese passive
+  contenitive non risolutive, valore delle ricompense dipendente dal
+  momento, quattro famiglie di ricompense (capacità quest / economia /
+  combattimento party / infrastrutture), skill a **livelli di
+  applicazione**, livelli delle quest con requisiti crescenti.
+  `proposta` — non ratificate, nessun numero definito; tracciate in
+  `context/QUEST_CAMPAIGN_MACRO.md` e OPEN-022.
 - **Criterio di diagnosi:** *«una quest infallibile è inutile; le scelte non
   sono scelte se non posso mai fallire»* — losabilità e attribuibilità del
   fallimento sono il requisito, non una percentuale target.

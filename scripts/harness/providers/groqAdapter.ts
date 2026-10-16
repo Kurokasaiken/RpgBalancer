@@ -50,13 +50,16 @@ async function tryProvider(
   body: Record<string, unknown>,
   providerName: string,
 ): Promise<CompletionResult> {
-  const endpoint = `${providerConfig.baseUrl}/chat/completions`;
+  const endpoint = `${providerConfig.baseUrl.replace(/\/+$/, '')}/chat/completions`;
   const apiKey = process.env[providerConfig.apiKeyEnv];
   if (!apiKey) {
     throw new Error(`Missing API key for ${providerName}: ${providerConfig.apiKeyEnv} not set`);
   }
 
-  const maxAttempts = 4;
+  /* 503 bursts (Gemini free tier "high demand") last minutes — cheap
+   *  requests must out-wait them inside a lane. Still bounded by the
+   *  outer task timeout. */
+  const maxAttempts = 8;
   let lastError = '';
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -86,11 +89,22 @@ async function tryProvider(
     if (response.status === 429 || response.status >= 500) {
       const retryAfter = Number(response.headers.get('retry-after') ?? '0');
       lastError = `HTTP ${response.status}`;
-      await sleep(retryAfter > 0 ? retryAfter * 1000 : 1500 * attempt);
+      /* Exponential backoff capped at 45s — long enough to ride out a 503
+       *  burst, short enough to fail a dead lane within the task budget. */
+      await sleep(
+        retryAfter > 0 ? Math.min(retryAfter * 1000, 45000) : Math.min(3000 * attempt, 45000),
+      );
       continue;
     }
 
-    const json = (await response.json()) as RawResponse;
+    const rawText = await response.text();
+    let json: RawResponse;
+    try {
+      json = JSON.parse(rawText) as RawResponse;
+    } catch {
+      lastError = `HTTP ${response.status}: ${rawText.slice(0, 200) || 'empty body'}`;
+      continue;
+    }
 
     // If provider returns a failed_generation but the request was otherwise OK,
     // surface it as assistant content so the text parser can try to recover.
@@ -163,21 +177,33 @@ export function createGroqAdapter(config: HarnessConfig): ProviderAdapter {
       messages: ChatMessage[],
       tools: ToolDefinition[],
     ): Promise<CompletionResult> {
-      const body = {
-        model: config.model,
-        messages,
-        tools: tools.length > 0 ? tools : undefined,
-        tool_choice: tools.length > 0 ? 'auto' : undefined,
-        temperature: config.temperature,
-        max_tokens: config.maxTokens,
-      };
+      /* Model ids are per-provider — sending the configured model id to a
+       *  different provider is a guaranteed 404. `config.model` (HARNESS_MODEL
+       *  / preset) overrides ONLY the primary provider (first in the chain);
+       *  every other provider always speaks its own configured id. */
+      const primaryName = availableProviders[0]?.name;
 
       let lastError = '';
 
       // Try each provider in priority order
       for (const providerConfig of availableProviders) {
+        /* config.model (HARNESS_MODEL) overrides ONLY when the run pinned a
+         * provider via HARNESS_PROVIDER (arena lanes). Otherwise every
+         * provider speaks its own preset id — sending gpt-oss ids to Gemini
+         * or Cerebras is a guaranteed 404. */
+        const body = {
+          model:
+            providerConfig.name === primaryName && process.env.HARNESS_PROVIDER
+              ? config.model
+              : providerConfig.model,
+          messages,
+          tools: tools.length > 0 ? tools : undefined,
+          tool_choice: tools.length > 0 ? 'auto' : undefined,
+          temperature: config.temperature,
+          max_tokens: config.maxTokens,
+        };
         try {
-          console.log(`[HARNESS] Trying provider: ${providerConfig.name}`);
+          console.log(`[HARNESS] Trying provider: ${providerConfig.name} (${body.model})`);
           const result = await tryProvider(providerConfig, body, providerConfig.name);
           console.log(`[HARNESS] Success with provider: ${providerConfig.name}`);
           return result;

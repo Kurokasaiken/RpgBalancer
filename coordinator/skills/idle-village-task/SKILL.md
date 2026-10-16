@@ -297,11 +297,11 @@ Before marking a task complete:
 
 - Safeguards pass (con timeout massimi da `00-project-invariants`):
   `npm run lint -- <scope>` (120 s) · `npm run test -- <scope>` (300 s) ·
-  `npm run build:check` (180 s) · `npm run kanban:lint` (30 s).
+  `npm run build:check` (180 s) · `npm run closure:lint` (30 s).
 - **Verification gate R-189** (meccanico, vedi `agent-execution-mandate` §6):
   manifest `.mw/runs/<task>/verification.json` all'avvio; `npm run
   verify:bundle` alla chiusura; verificatore indipendente per obbligazioni
-  non-`state`; la riga Kanban cita `bundle: .mw/runs/<task>/bundle.json`.
+  non-`state`; la voce RICHIESTE cita `bundle: .mw/runs/<task>/bundle.json`.
 - Runtime smoke test eseguito e loggato.
 - Trusted/frozen toccati → `*_trusted.md` + riga `COMPONENT_MASTER_INDEX.md`
   aggiornati (regola `40-documentation-governance`); nessuna chiusura doc
@@ -310,9 +310,8 @@ Before marking a task complete:
   nelle spec (regola 45); regole quest in `QUEST_RULES.md` (regola 80);
   milestone → riga in `SESSION_HANDOFF.md` (+ `CURRENT_STATE.md` se lo stato
   cambia, regola 70).
-- Evidence log in `test-results/`; Kanban
-  (`src/docs/docs/coordinator/agent_assignments.md`) a "Completato".
-- Response ends with: `KANBAN STATUS: <Prompt ID> – Completato (Evidence: <log>)`.
+- Evidence log in `test-results/`; voce `RICHIESTE.md` a `fatta` con
+  citazione `bundle:` (la kanban board è in pausa — R-208).
 
 ## Quality Standards
 
@@ -328,7 +327,7 @@ Before marking a task complete:
 
 If unable to complete:
 
-- Document blockers in evidence log; set Kanban status appropriately.
+- Document blockers in evidence log; set RICHIESTE status appropriately.
 - Flag for human review if needed; provide clear next steps.
 - Never mark complete if safeguards fail — un task senza verifica è BLOCKED,
   non Completato.

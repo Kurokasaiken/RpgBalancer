@@ -1,5 +1,11 @@
 # Agent Execution Guidelines
 
+> **IN PAUSA — R-208 (Director, 2026-10-16).** Questo documento descrive il
+> protocollo del kanban/dispatch, che non è più il workflow operativo. Ciclo
+> corrente: plan con contratto → agente locale → `verify:bundle` → chiusura
+> `fatta` in `RICHIESTE.md` (gate `npm run closure:lint`). Mantenuto come
+> riferimento storico per un'eventuale riattivazione.
+
 **Last updated**: 2026-01-07  
 **Purpose**: Standardized execution rules for all agent prompts to ensure consistency, quality, and proper task completion.
 

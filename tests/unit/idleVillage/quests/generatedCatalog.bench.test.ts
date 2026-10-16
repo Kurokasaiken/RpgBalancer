@@ -104,7 +104,11 @@ function driveToEnd(run: QuestRunState, strategy: SimStrategy, maxSteps = 60): Q
 }
 
 /** Static graph coverage — every node reachable from startNode via
- *  option.next (CHECK:x → x) and verdictTable gotos. */
+ *  option.next (CHECK:x → x), verdictTable gotos, node.next (info and
+ *  fallthrough edges — the engine routes `node.next ?? 'ritorno'`), and
+ *  combat exits (`combat.nextCleared`/`nextSurvivors` — the engine
+ *  follows them at questRun.ts combat resolution; post-battle nodes
+ *  with no other inbound edge are legitimately reachable only this way). */
 function reachableFrom(start: string, nodes: Record<string, QuestNode>): Set<string> {
   const edgesOf = (n: QuestNode): string[] => {
     const out: string[] = [];
@@ -112,6 +116,9 @@ function reachableFrom(start: string, nodes: Record<string, QuestNode>): Set<str
       if (o.next.startsWith('CHECK:')) out.push(o.next.slice(6));
       else out.push(o.next);
     }
+    if (n.next) out.push(n.next);
+    if (n.combat?.nextCleared) out.push(n.combat.nextCleared);
+    if (n.combat?.nextSurvivors) out.push(n.combat.nextSurvivors);
     for (const row of Object.values(n.verdictTable ?? {})) {
       const g = row.goto;
       if (!g) continue;

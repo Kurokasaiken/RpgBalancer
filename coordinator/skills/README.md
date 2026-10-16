@@ -9,20 +9,31 @@
 - **All changes to agent skills must be made here first**, then committed to git.
 - **`.windsurf/skills/` should be treated as a read-only cache** that gets synced from this directory.
 
-## Directory Structure
+## Directory Structure (2026-10-16)
 
 ```text
-coordinator/skills/
+coordinator/skills/              # dir reale — .devin/.windsurf/.claude/skills sono symlink qui
 ├── README.md                    # This file
-├── strategist-mandate/
-│   └── SKILL.md                 # Strategist role definition
-├── coordinator-mandate/
-│   └── SKILL.md                 # Coordinator role definition
-├── agent-execution-mandate/
-│   └── SKILL.md                 # Agent Execution role definition
-└── idle-village-task/
-    └── SKILL.md                 # Idle Village specific task mandate
+├── agent-execution-mandate/     # Agent Execution role
+├── auditor-sentinel/            # Code Auditor workflow
+├── coordinator-mandate/         # IN PAUSA (R-208) — kanban/dispatch sospesi
+├── fixer-task/                  # STORICO (R-208) — fixer pipeline dispatch, solo su richiesta
+├── guardian-mandate/            # auto-commit/auto-shutdown safeguards
+├── idle-village-task/           # dominio /game (Pixi, HUD, quest, skin, frozen kits)
+├── mockup-generator/
+├── mw-executor|mw-explorer|mw-planner|mw-regression/  # wrapper MW per RPG
+├── painter/                     # mockup visuali → componenti React
+├── strategist/                  # direzione pre-desiderata (macro, non dispatch)
+├── strategist-mandate/          # STORICO (R-208) — pipeline prompt-spec in pausa
+├── bugfix -> mind-weaver/.agents/skills/bugfix   (symlink)
+├── learn  -> mind-weaver/.agents/skills/learn    (symlink)
+└── skills -> mind-weaver/.agents/skills          (mount condiviso: skill MW + vendored)
 ```
+
+Le skill globali Mind Weaver (incluse quelle vendored: pixijs-*, vercel-*,
+frontend-design, webapp-testing, web-design-guidelines, skill-creator,
+playwright-cli) vivono in `mind-weaver/.agents/skills` e sono visibili qui via
+il mount `skills/` e in `~/.agents/skills` via symlink.
 
 ## Sync Process
 
@@ -55,15 +66,10 @@ cp -r coordinator/skills/* .windsurf/skills/
 
 ## Status
 
-Currently, the SKILL.md files in this directory are **placeholders**. The actual content needs to be exported from Windsurf/Devin Desktop's `.windsurf/skills/` directory and pasted here.
-
-**Action required:**
-
-1. Open Windsurf/Devin Desktop
-2. Navigate to `.windsurf/skills/*/SKILL.md` for each skill
-3. Copy the content
-4. Replace the placeholder files in `coordinator/skills/*/SKILL.md`
-5. Commit the changes
+Le SKILL.md qui sono reali e mantenute (non più placeholder). Le skill di
+metodologia globale vivono in `mind-weaver/.agents/skills` — modificarle lì,
+mai qui. Skill sospese/storiche: `coordinator-mandate`, `strategist-mandate`,
+`fixer-task` (R-208 — marcate nella description, non invocare).
 
 ## Governance References
 

@@ -1,0 +1,3 @@
+Several user-facing strings in this repo use `{{var}}` mustache-style interpolation placeholders, but the project's i18n stack uses ICU message format, where placeholders are `{var}` (single braces). Inside ICU plural/select blocks the count placeholder is written `#`, never `{{count}` or `{count}` doubled.
+
+Find every malformed interpolation placeholder in the JSON locale resources under `public/locales/` and fix it to the correct ICU form. Do not touch i18next `loadPath`/`backend` URL templating (those legitimately use `{{lng}}`/`{{ns}}`). Do not change key names, do not restructure files, do not modify any test.

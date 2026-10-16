@@ -80,20 +80,34 @@ Run and pass (fix on failure):
 npm run lint -- <scope>
 npm run test -- <scope>
 npm run build:check
-npm run kanban:lint
+npm run closure:lint
 ```
 If any safeguard fails, the task is **BLOCKED**, not complete.
+
+## Workflow operativo (R-208, Director 2026-10-16)
+
+- La kanban board (`src/docs/docs/coordinator/agent_assignments.md`), il
+  dispatch coordinator/ai-worker e la pipeline prompt-spec sono **in pausa**:
+  nessuna nuova riga sulla board, nessun dispatch, workflow GitHub
+  coordinator/ai-worker solo `workflow_dispatch`.
+- Ciclo corrente: **plan con contratto** (obbligazioni verificabili) →
+  **implementazione con l'agente locale** → **`verify:bundle`** sul contratto →
+  chiusura `fatta` in `RICHIESTE.md` con citazione `bundle:`.
+- `closure:lint` resta il gate meccanico di chiusura (R-189): blocca
+  transizioni `fatta`/`Completato` senza bundle valido.
+- Riattivazione del dispatch solo su decisione esplicita del Director
+  (PLAN-039 benchmark informa la scelta).
 
 ## Command timeouts
 
 Every command must have a maximum runtime. If the timeout is exceeded, stop the command, log the event, and switch to a narrower scope or an alternative approach. Default maxima:
 
-- `kanban:lint`: 30s
+- `closure:lint`: 30s
 - `npm run lint -- <scope>`: 120s
 - `npm run build:check` / `npm run build`: 180s
 - `npm run test -- <scope>`: 300s
-- `harness:run` per task: 600s
-- `harness:dispatch` total: 1800s
+- `harness:run` per task: 600s (harness in pausa R-208, solo benchmark dedicati)
+- `harness:dispatch` total: 1800s (in pausa R-208)
 
 A command that hangs is treated as a failure, not as "still running".
 

@@ -21,8 +21,10 @@ import {
   createRun,
   drinkPotion,
   ENGINE_SCHEMA_VERSION,
+  flee,
   matureReady,
   nodesFor,
+  normalizeRunOverlayIdentity,
   registerScenarioInstance,
   scenarioInstanceById,
   submitCommand,
@@ -37,6 +39,7 @@ import type { SettlementMarker } from '@/ui/idleVillage/quests/questSettlement';
 import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
 import { releaseLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
 import { beatMark, projectBeats, type BeatMark, type QuestBeat } from './beatSequencer';
+import { publishQuestRun } from './questRunStore';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 
 const BAG_FLAGS: ReadonlySet<string> = new Set(QUEST_STASH.items.map((item) => item.flag));
@@ -76,6 +79,10 @@ export interface QuestRunApi {
   /** Advance the committed frontier: matured timed nodes resolve, the run
    *  stops at the first node needing the player (v27 catch-up). */
   syncClock: (tick: number) => void;
+  /** R-199: the player's «abandon quest» — routes through the engine's
+   *  existing `flee` (outcome `fled`, secured loot kept, objective lost),
+   *  not a second retreat model. Live-run only; no-op once ended. */
+  abandon: () => void;
   /** Bag actions usable at a decision: the healing kit and the potion. */
   useHealing: () => void;
   drinkPotion: () => void;
@@ -88,6 +95,10 @@ export interface QuestRunApi {
    *  the run record and persists — bypasses `act` (no engine mutation, no
    *  beats; the frontier is terminal). No-op unless the run has ended. */
   applySettlement: (marker: SettlementMarker) => void;
+  /** PLAN-040 T-005: raises `run.dismissedUpTo` to `checkSeq` and persists —
+   *  the outcome toast's durable dismissal. Idempotent, never lowers the
+   *  mark, works on ended runs too (same bypass class as applySettlement). */
+  dismissOutcome: (checkSeq: number) => void;
 }
 
 const beatOf = (run: QuestRunState) => nodesFor(run)[run.nodeId]?.beat ?? 0;
@@ -129,6 +140,10 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
        * `nodesFor` resolves it on the next read; no instance in the payload
        * = legacy authored-map run (declared migration). */
       if (payload.scenarioInstance) registerScenarioInstance(payload.scenarioInstance);
+      /* PLAN-040 T-003a: backfill the overlay-identity fields (checkSeq /
+       *  visitSeq / beatIndex / cursorVisitSeq / dismissedUpTo) on legacy
+       *  saves — deterministic, never lowers the dismissed high-water mark. */
+      normalizeRunOverlayIdentity(payload.run);
       setRun(payload.run);
       setPhases(payload.phases.length ? payload.phases : [emptyPhase(beatOf(payload.run))]);
       tickRef.current = payload.run.frontier.startedAt;
@@ -138,6 +153,18 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saveKey]);
+
+  /* PLAN-040 T-003a: publish every committed run state to the external
+   *  store — the quest overlays are React siblings of the window (mounted in
+   *  `#game-modal-root`) and subscribe to this instead of props. The null
+   *  publish lives on UNMOUNT only: running it inside this effect's cleanup
+   *  would blank the channel on every commit and remount held overlays. */
+  useEffect(() => {
+    publishQuestRun(questId, run);
+  }, [questId, run]);
+  useEffect(() => {
+    return () => publishQuestRun(questId, null);
+  }, [questId]);
 
   const start = useCallback(
     (
@@ -222,6 +249,11 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   const choose = useCallback(
     (optionId: string, opts?: { useConsumable?: boolean }) => {
       if (!run) return;
+      /* R-199: a frontier still inside its time slot is not committable —
+       * bail BEFORE `act` so a rejected click can't leave a phantom choice
+       * label in the phase record (the engine gate inside `submitCommand`
+       * is the second line of defence for non-hook callers). */
+      if (!run.ended && run.frontier.status === 'waiting' && tickRef.current < run.frontier.readyAt) return;
       const label = availableOptions(run).find((o) => o.id === optionId)?.label;
       /* R-196: pass the live armed set (re-read at call time — no stale
        * closure), filtered to flags the run still holds. A caller that passes
@@ -281,6 +313,10 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   const heal = useCallback(() => bagAction(applyHealing), [bagAction]);
   const potion = useCallback(() => bagAction((state) => drinkPotion(state, 'hasPozione')), [bagAction]);
 
+  /* R-199: abandon is a real engine command (flee) — beats, phase records
+   *  and persistence all follow the same commit path as a choice. */
+  const abandon = useCallback(() => act((state) => flee(state), undefined), [act]);
+
   // Theatre adapter (PLAN-025 T-007): stable across renders so its commandId
   // dedupe set never resets; reads the latest run/tick through refs, and every
   // engine mutation goes through `act` so phases and persistence stay honest.
@@ -299,6 +335,19 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       const current = runRef.current;
       if (!current?.ended) return;
       const next = { ...current, settlement: marker };
+      setRun(next);
+      persist(next, phasesRef.current);
+    },
+    [persist],
+  );
+  /* PLAN-040 T-005: the outcome toast's durable dismissal — raises the
+   *  persisted high-water mark and republishes the run so the overlay
+   *  controllers re-derive eligibility. Never lowers, no-ops on junk seqs. */
+  const dismissOutcome = useCallback(
+    (checkSeq: number) => {
+      const current = runRef.current;
+      if (!current || !Number.isInteger(checkSeq) || checkSeq <= (current.dismissedUpTo ?? 0)) return;
+      const next = { ...current, dismissedUpTo: checkSeq };
       setRun(next);
       persist(next, phasesRef.current);
     },
@@ -326,12 +375,14 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       armedFlags,
       toggleArmedFlag,
       syncClock,
+      abandon,
       useHealing: heal,
       drinkPotion: potion,
       clear,
       beats,
       applySettlement,
+      dismissOutcome,
     }),
-    [run, phases, start, choose, armedFlags, toggleArmedFlag, syncClock, heal, potion, clear, beats, applySettlement],
+    [run, phases, start, choose, armedFlags, toggleArmedFlag, syncClock, abandon, heal, potion, clear, beats, applySettlement, dismissOutcome],
   );
 }
