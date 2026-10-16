@@ -1,7 +1,0 @@
-{
-  "appName": "RPG Balancer",
-  "greeting": "Hello {name}",
-  "nested": {
-    "label": "Items"
-  }
-}
