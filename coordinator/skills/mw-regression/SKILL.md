@@ -1,6 +1,10 @@
 ---
 name: mw-regression
-description: Mind Weaver anti-regression guard for RPG
+description: >
+  Guard anti-regressione Mind Weaver scopato al progetto RPG. Usa prima
+  di toccare codice RPG esistente: pre-modification check su
+  recurring-traps e componenti trusted/frozen. Specifico di RPG; fuori
+  progetto non applicabile.
 ---
 
 # mw-regression
