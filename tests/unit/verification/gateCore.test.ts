@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   checkEnvAttestation,
   checkKanbanGate,
+  checkNestedAgentsGate,
   checkRichiesteGate,
   criteriaHash,
   evaluateObligation,
@@ -180,5 +181,51 @@ describe('evaluateObligation — max_errors', () => {
     const dir = runDirWith([]);
     const res = evaluateObligation(baseObl, dir, { exit_code: 0 });
     expect(res.result).toBe('PASS');
+  });
+});
+
+describe('checkNestedAgentsGate (PLAN-044 T-001)', () => {
+  const makeRoot = (files: Record<string, string>) => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'gate-agents-'));
+    for (const [rel, content] of Object.entries(files)) {
+      const full = path.join(dir, rel);
+      mkdirSync(path.dirname(full), { recursive: true });
+      writeFileSync(full, content);
+    }
+    return dir;
+  };
+
+  it('flagga pattern di workflow sospeso in un AGENTS.md annidato', () => {
+    const dir = makeRoot({ 'src/ui/x/AGENTS.md': 'Aggiorna la board e usa kanban:lint.' });
+    const errors = checkNestedAgentsGate(dir);
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0]).toContain('src/ui/x/AGENTS.md');
+  });
+
+  it('flagga CLAUDE.md annidati e altri pattern sospesi', () => {
+    const dir = makeRoot({
+      'a/b/CLAUDE.md': 'Invoca il coordinator per il dispatch.',
+      'a/c/agents.md': 'passa da prompt-spec e harness:run',
+    });
+    const errors = checkNestedAgentsGate(dir);
+    expect(errors.some((e) => e.includes('a/b/CLAUDE.md'))).toBe(true);
+    expect(errors.some((e) => e.includes('a/c/agents.md'))).toBe(true);
+  });
+
+  it('il file di root è esente (fonte unica)', () => {
+    const dir = makeRoot({ 'AGENTS.md': 'Il kanban è in pausa; la board resta storica.' });
+    expect(checkNestedAgentsGate(dir)).toEqual([]);
+  });
+
+  it('un pointer pulito passa', () => {
+    const dir = makeRoot({
+      'src/ui/idleVillage/AGENTS.md': 'Pointer: leggi AGENTS.md root e .windsurf/rules/.',
+    });
+    expect(checkNestedAgentsGate(dir)).toEqual([]);
+  });
+
+  it('ignora le directory escluse', () => {
+    const dir = makeRoot({ 'node_modules/x/AGENTS.md': 'kanban dispatch' });
+    expect(checkNestedAgentsGate(dir)).toEqual([]);
   });
 });

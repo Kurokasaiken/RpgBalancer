@@ -1,0 +1,190 @@
+{
+  "created_at": "2026-10-18T06:28:59.666Z",
+  "created_by": "agent",
+  "entries": [
+    {
+      "id": "game-map-pixi",
+      "globs": [
+        "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+        "src/pages/game-frame-pixi.tsx",
+        "src/pages/game-frame.tsx"
+      ],
+      "expected_checks": [
+        "CTR-game-001",
+        "CTR-game-002"
+      ],
+      "proposed_by": "plan044-t002-seed",
+      "source": "CTR-game-001/002 components",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "game-hud",
+      "globs": [
+        "src/ui/idleVillage/components/gameFrame/**",
+        "src/ui/idleVillage/hooks/**",
+        "src/balancing/config/idleVillage/gameFrameConfig.ts"
+      ],
+      "expected_checks": [
+        "CTR-game-002",
+        "CTR-game-003",
+        "CTR-game-004"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "CTR-game-002/003/004 components + HUD subtree",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "game-interaction",
+      "globs": [
+        "src/ui/idleVillage/interaction/**",
+        "src/ui/idleVillage/slots/**",
+        "src/ui/idleVillage/config/**",
+        "src/ui/idleVillage/components/ResidentSlotRack.tsx",
+        "src/ui/idleVillage/components/SlotV12Renderer.tsx"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/idleVillage"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "drag/drop, bloom, slot medallions",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "game-quests",
+      "globs": [
+        "src/ui/idleVillage/quests/**",
+        "src/ui/idleVillage/questS1Lab/**",
+        "src/balancing/config/idleVillage/quests/**"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/idleVillage",
+        "e2e idleVillage quest specs"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "quest runtime/planner/scenarios",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "game-tests",
+      "globs": [
+        "tests/unit/idleVillage/**",
+        "tests/e2e/idleVillage/**",
+        "tests/helpers/**"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/idleVillage"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "test surface /game",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "shutdown-manager",
+      "globs": [
+        "scripts/shutdownManager/**",
+        "tests/unit/shutdownManager/**",
+        ".windsurf/rules/50-shutdown-governance.md"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/shutdownManager",
+        "npm run shutdown:lint-capability"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "R-211/R-212 domain",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "i18n",
+      "globs": [
+        "public/locales/**",
+        "src/localization/**"
+      ],
+      "expected_checks": [
+        "npm run i18n:validate"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "locale resources + i18n types",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "bv-gate",
+      "globs": [
+        "scripts/verification/**",
+        "scripts/agentsLint.ts",
+        "scripts/closureLint.ts",
+        "scripts/contractsCheck.ts",
+        "scripts/mappingProposal.ts",
+        "scripts/coverageException.ts",
+        "scripts/directorAnswer.ts",
+        "tests/unit/verification/**",
+        ".mw/surface-map.json",
+        ".mw/contracts/**",
+        "scripts/redFirst.ts"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/verification",
+        "npm run closure:lint"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "PLAN-044 gate machinery",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "repo-tooling",
+      "globs": [
+        "package.json",
+        "playwright*.ts",
+        "*.config.ts",
+        "*.config.js",
+        "tsconfig*.json",
+        ".nvmrc",
+        "stageprobe.mjs"
+      ],
+      "expected_checks": [
+        "npm run build:check"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "build/test tooling root-level",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "governance-docs",
+      "globs": [
+        "*.md",
+        "plans/**",
+        "context/**",
+        ".windsurf/**",
+        "src/docs/**",
+        ".mw/desiderata.md",
+        ".mw/specs/**",
+        ".mw/regression/**",
+        ".mw/*.yaml",
+        ".mw/*.json"
+      ],
+      "expected_checks": [],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "docs/ledger/rules — scrutiny via closure:lint e agents:lint, non surface checks",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    },
+    {
+      "id": "app-shell",
+      "globs": [
+        "src/App.tsx",
+        "src/pages/**"
+      ],
+      "expected_checks": [],
+      "anti_glob_confirmed": true,
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    }
+  ],
+  "removed_ids": []
+}
