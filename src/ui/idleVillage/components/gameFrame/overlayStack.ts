@@ -40,6 +40,22 @@ export function overlayStackSnapshot(): readonly string[] {
   return overlayStack;
 }
 
+/** Imperative stack push/pop — for hooks that gate registration on a
+ *  condition (e.g. a stage panel that must deregister the same commit it
+ *  suspends). Callers own ordering; unregister is idempotent. */
+export function registerOverlay(id: string, handler: () => void): void {
+  escapeHandlers.set(id, handler);
+  overlayStack.push(id);
+  armEscapeListener();
+}
+
+/** Removes `id` from the stack — no-op when absent. */
+export function unregisterOverlay(id: string): void {
+  escapeHandlers.delete(id);
+  const at = overlayStack.lastIndexOf(id);
+  if (at >= 0) overlayStack.splice(at, 1);
+}
+
 /**
  * Registers `id` on the overlay stack for `onEscape`. The handler always
  * calls the latest render's closure; Escape reaches only the topmost id.
@@ -50,13 +66,7 @@ export function useOverlayEscape(id: string, onEscape: () => void): void {
   const handlerRef = useRef(onEscape);
   handlerRef.current = onEscape;
   useEffect(() => {
-    escapeHandlers.set(id, () => handlerRef.current());
-    overlayStack.push(id);
-    armEscapeListener();
-    return () => {
-      escapeHandlers.delete(id);
-      const at = overlayStack.lastIndexOf(id);
-      if (at >= 0) overlayStack.splice(at, 1);
-    };
+    registerOverlay(id, () => handlerRef.current());
+    return () => unregisterOverlay(id);
   }, [id]);
 }

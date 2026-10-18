@@ -590,6 +590,8 @@ export default interface Resources {
           "heroSheet": "Character sheet",
           "merchant": "Merchant",
           "quest": "Quest in progress",
+          "questDetail": "Quest planner",
+          "questForecast": "Expedition forecast",
           "roster": "Roster",
           "tuning": "Tuning",
           "villageStash": "Village stash"
@@ -663,6 +665,12 @@ export default interface Resources {
         "checkOptions": "Check options",
         "checkOptionsSkipCheck": "Skip the whole check",
         "checkOptionsSkipIntro": "Skip the opening animation",
+        "checkOverlay": {
+          "dismiss": "Dismiss",
+          "dismissHint": "Click anywhere to continue — the details stay in the log.",
+          "scoreTitle": "Skill {score} vs difficulty {difficulty}",
+          "titleSuffix": "skill check"
+        },
         "chronicle": "Chronicle",
         "clean": "Safe",
         "close": "Close the report",
@@ -673,6 +681,10 @@ export default interface Resources {
         },
         "day": "Day {day} of {total}",
         "dead": "fallen",
+        "footer": {
+          "collapse": "Fold the journey strip",
+          "expand": "Unfold the journey strip"
+        },
         "hiddenEvent": "Hidden event — you could have missed it",
         "hpLost": "−{hp} HP",
         "inProgress": "Phase in progress",
@@ -683,6 +695,10 @@ export default interface Resources {
         "moreLines": "+{count, plural, one {# more line in the chronicle} other {# more lines in the chronicle}}",
         "nextPhase": "Next phase",
         "noneReturned": "Nobody came back",
+        "outcomeToast": {
+          "dismiss": "Dismiss outcome",
+          "logHint": "Recorded in the chronicle — click to dismiss."
+        },
         "partyStatus": "Assigned party — {alive} of {total} standing",
         "phaseLocked": "The phase is still on the road — its choices unlock when its time comes.",
         "phaseOf": "Phase {n} of {total}",
@@ -691,7 +707,14 @@ export default interface Resources {
         "rewardClose": "Close",
         "rewardHint": "Click or press a key to reveal",
         "roster": "Assigned party",
+        "rosterFolded": "ROSTER {alive}/{total}",
         "ticks": "{elapsed}/{total} ticks",
+        "verdictCard": {
+          "consequence": "Consequence",
+          "death": "Death {pct}%",
+          "harmNone": "No harm",
+          "wound": "Wound {pct}%"
+        },
         "waiting": "A decision is waiting"
       },
       "regions": {
@@ -749,6 +772,10 @@ export default interface Resources {
         "resume": "Resume",
         "spaceKey": "Space"
       },
+      "stage": {
+        "expandPanel": "Show {name}",
+        "openRejected": "{name} is available after the quest"
+      },
       "stash": {
         "capacity": "{count} of {max} goods in store",
         "qty": "{qty} in store",
@@ -768,11 +795,29 @@ export default interface Resources {
       "village": {
         "ariaLabel": "Village — buildings",
         "buildings": {
+          "adventurersGuild": {
+            "desc": "A hall of maps, contracts and scarred regulars.",
+            "effect": "Quest slots: +{value} → +{next}",
+            "name": "Adventurers' Guild",
+            "unlockHint": "Unlocked after completing the first quest line."
+          },
+          "alchemist": {
+            "desc": "Bubbling flasks and powders that bite back.",
+            "effect": "Potion brewing: {value} → {next}",
+            "name": "Alchemist",
+            "unlockHint": "Requires a recovered alchemical tome."
+          },
           "barracks": {
             "desc": "Bunks and drills for the village militia.",
             "effect": "Militia capacity: {value} → {next}",
             "name": "Barracks",
             "unlockHint": "Requires Palisade at level II."
+          },
+          "cemetery": {
+            "desc": "Quiet rows of stones at the foot of the hill.",
+            "effect": "Remembrance: {value} → {next}",
+            "name": "Cemetery",
+            "unlockHint": "Requires the Sanctuary."
           },
           "farm": {
             "desc": "Tills the meadow along the stream.",
@@ -795,6 +840,11 @@ export default interface Resources {
             "effect": "Wood per day: {value} → {next}",
             "name": "Lumbermill"
           },
+          "mageTower": {
+            "desc": "A crooked spire where the village witch reads the wind.",
+            "effect": "Research per day: {value} → {next}",
+            "name": "Mage Tower"
+          },
           "market": {
             "desc": "The trader's stall on the village square.",
             "effect": "Gold per day: {value} → {next}",
@@ -809,6 +859,12 @@ export default interface Resources {
             "desc": "Cuts stone and ore from the western cliffs.",
             "effect": "Iron per day: {value} → {next}",
             "name": "Quarry"
+          },
+          "sanctuary": {
+            "desc": "A candlelit shrine for the fallen and the faithful.",
+            "effect": "Morale bonus: +{value} → +{next}",
+            "name": "Sanctuary",
+            "unlockHint": "Requires the Sanctuary quest reward."
           },
           "smithy": {
             "desc": "Forges tools and gear for work and quest.",
@@ -828,6 +884,7 @@ export default interface Resources {
         },
         "builtCount": "{built} of {total} built",
         "category": {
+          "arcane": "Arcane",
           "civic": "Civic",
           "defense": "Defense",
           "production": "Production"
@@ -847,6 +904,24 @@ export default interface Resources {
         "openMerchant": "Open merchant",
         "openStash": "Open warehouse",
         "pinsToolbar": "Village buildings",
+        "registry": {
+          "back": "Back",
+          "chip": "Registry",
+          "effectLadder": "Effects by level",
+          "filter": {
+            "all": "All",
+            "buildable": "Buildable",
+            "built": "Built",
+            "locked": "Locked"
+          },
+          "filterLabel": "Filter buildings",
+          "hint": "Esc to close",
+          "offMap": "Registry only",
+          "onMap": "On the map",
+          "pending": "{count} to build or unlock",
+          "sectionCount": "{built}/{total}",
+          "title": "Settlement Registry"
+        },
         "state": {
           "buildable": "Buildable",
           "built": "Built",
@@ -1177,6 +1252,7 @@ export default interface Resources {
         "pending": "Waiting for patrol outcome",
         "success": "Last trial passed"
       },
+      "closeReport": "Close the report",
       "collectRewards": "Collect rewards",
       "journal": "Journal",
       "openTheater": "Open Theater",
@@ -1202,6 +1278,7 @@ export default interface Resources {
       "title": "Quest Chronicle"
     },
     "questExpedition": {
+      "backToMap": "Back to map",
       "bag": {
         "covers": "Covers:",
         "emptySlot": "Empty bag slot {index}",
@@ -1213,6 +1290,7 @@ export default interface Resources {
       "coverage": "Covers",
       "danger": "Danger",
       "duration": "Estimated duration ~{ticks} ticks",
+      "durationDays": "{count, plural, one {# day} other {# days}}",
       "forecast": {
         "computing": "Estimating…",
         "death": "Deaths {pct}%",
@@ -1238,6 +1316,13 @@ export default interface Resources {
         "title": "Key stats"
       },
       "loadout": "Bag — {count}/{max}",
+      "marching": {
+        "coda": "CODA",
+        "exposure": "Exposure",
+        "leader": "Leader",
+        "testa": "TESTA",
+        "title": "Marching order"
+      },
       "members": {
         "downtime": "≈{days}d down",
         "role": {
@@ -1248,6 +1333,11 @@ export default interface Resources {
         "row": "wounds {wound}% · deaths {death}%",
         "title": "By member"
       },
+      "seals": {
+        "danger": "Danger",
+        "duration": "Duration",
+        "reward": "Reward"
+      },
       "send": "Send expedition",
       "statName": {
         "agi": "Agility",
@@ -1256,6 +1346,15 @@ export default interface Resources {
         "int": "Intelligence",
         "perc": "Perception",
         "str": "Strength"
+      },
+      "tray": {
+        "close": "Close tray",
+        "dragHint": "Drag a companion onto a slot",
+        "empty": "No companions available",
+        "modeItems": "Bag",
+        "modeResidents": "Companions",
+        "open": "Choose",
+        "title": "Selection"
       },
       "why": {
         "row": "— in {runs}% of runs · {death}% of deaths · {wound}% of wounds",
@@ -1411,6 +1510,10 @@ export default interface Resources {
       "exposureTitle": "Chance of being hit by each incoming hit: {pct}%",
       "faceCheck": "Face the check · ~{pct}%",
       "gold": "gold",
+      "harmChip": {
+        "death": "FALLEN",
+        "wound": "WOUNDED"
+      },
       "harmInProgress": "Consequences are landing…",
       "horde": {
         "intentTitle": "Incoming hits next turn",

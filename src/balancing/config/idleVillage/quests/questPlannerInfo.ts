@@ -48,29 +48,48 @@ export const QuestPlannerInfoConfigSchema = z
     /** Cap on authored `previewHint`s shown at planning (overflow guard). */
     maxPreviewHints: z.number().int().min(1).max(50),
     /**
-     * Two-plaque assembly geometry (PLAN-036, R-195): the planner is a main
-     * plaque (party + bag + anchored CTA) plus a right-hand forecast
-     * sidecar, dragged as one union by `useHudPanelDrag({ shellRef })`.
+     * Dispatch Table geometry (PLAN-043 WS-3, artifact-r005 D-a): the planner
+     * is ONE draggable unit on the CENTER STAGE (hero letterbox → marching
+     * rack → loadout → Selection Tray → anchored footer) and the forecast is
+     * a separate plaque pinned to the RIGHT WING — no shared drag union.
+     *
+     * Vertical budget (WITNESS-WS3-03): every zone is max-height capped so
+     * the component bounding boxes at 1280×720 total ≤ the stage's 540px:
+     *   tray closed  hero150 + rack120 + loadout76 + footer72 + gaps84 = 502
+     *   tray open    hero56  + rack120 + loadout76 + tray88 + footer72 + gaps84 = 496
      */
     layout: z
       .object({
-        /** Left (main) plaque width. */
-        mainWidthPx: z.number().int().min(300).max(700),
-        /** Right (forecast sidecar) plaque width. */
-        sidecarWidthPx: z.number().int().min(240).max(600),
-        /** Air between the two plaques. */
+        /** CENTER unit natural width (stageZones `questDetail` naturalWidth). */
+        plannerNaturalWidthPx: z.number().int().min(300).max(900),
+        /** CENTER unit floor width — below this the unit is illegible. */
+        plannerMinWidthPx: z.number().int().min(300).max(700),
+        /** RIGHT WING forecast column width (stageZones `rightWing` = 340). */
+        forecastWidthPx: z.number().int().min(240).max(420),
+        /** Air between the planner unit and the forecast wing. */
         gapPx: z.number().int().min(0).max(40),
+        /** Hero letterbox heights: rest / open-tray / compact regime. */
+        heroRestPx: z.number().int().min(60).max(300),
+        heroTrayPx: z.number().int().min(40).max(200),
+        heroCompactPx: z.number().int().min(40).max(200),
+        /** Marching-order rack row (TESTA→CODA castones + exposure strip). */
+        rackPx: z.number().int().min(60).max(220),
+        /** Loadout row (bag slots + coverage marks + tray toggle). */
+        loadoutPx: z.number().int().min(40).max(160),
+        /** Selection Tray height when open (residents|items). */
+        trayPx: z.number().int().min(40).max(160),
+        /** Anchored footer (reason line + Back to map + Send expedition). */
+        footerPx: z.number().int().min(40).max(160),
+        /** Paddings, section labels and inter-zone gaps allowance. */
+        gapsPx: z.number().int().min(0).max(200),
         /**
-         * Zero-overflow regime boundary (WITNESS-12): at
-         * `viewportHeight >= minZeroScrollViewportHeightPx` the left plaque
-         * must render with `scrollHeight <= clientHeight + 1`; below it the
-         * middle body scrolls internally (the CTA footer stays anchored
-         * either way).
+         * Zero-overflow regime boundary: at
+         * `viewportHeight >= minZeroScrollViewportHeightPx` the planner
+         * renders with `scrollHeight <= clientHeight + 1`; below it the
+         * rack/loadout body scrolls internally (hero and footer stay
+         * anchored either way — documented terminal fallback).
          */
         minZeroScrollViewportHeightPx: z.number().int().min(400).max(1600),
-        /** Cinematic banner ratio (≈21:9) and height cap under the subtitle. */
-        cinemaAspect: z.number().min(1.5).max(4),
-        cinemaMaxHeightPx: z.number().int().min(60).max(300),
         /** Reserved vertical chrome (top anchor + breathing room): each
          *  plaque's `maxHeight` is `calc(100vh - plaqueViewportMarginPx)`. */
         plaqueViewportMarginPx: z.number().int().min(40).max(300),
@@ -104,9 +123,9 @@ export const QuestPlannerInfoConfigSchema = z
   .strict();
 export type QuestPlannerInfoConfig = z.infer<typeof QuestPlannerInfoConfigSchema>;
 
-/** Authored v0. */
+/** Authored v1 — Dispatch Table geometry (artifact-r005). */
 export const QUEST_PLANNER_INFO: QuestPlannerInfoConfig = QuestPlannerInfoConfigSchema.parse({
-  schemaVersion: 1,
+  schemaVersion: 2,
   certainty: {
     probeSeed: 7331,
     maxStates: 20_000,
@@ -119,16 +138,22 @@ export const QUEST_PLANNER_INFO: QuestPlannerInfoConfig = QuestPlannerInfoConfig
   },
   maxPreviewHints: 12,
   layout: {
-    /* 460 + 340 + 10 = 810px assembly — centered, it fits a 1280 viewport
-     *  with ~235px air each side; under ~834px the wrapper wraps the
-     *  sidecar below the main plaque (BV-1/BV-4 contract). */
-    mainWidthPx: 460,
-    sidecarWidthPx: 340,
-    gapPx: 10,
+    /* 680 planner + 8 + 340 forecast = 1028 — inside the stageZones floorB
+     *  right wing reservation; the planner shrinks to plannerMinWidthPx on
+     *  narrow corridors so the pinned wing never overlaps it. */
+    plannerNaturalWidthPx: 680,
+    plannerMinWidthPx: 460,
+    forecastWidthPx: 340,
+    gapPx: 8,
+    heroRestPx: 150,
+    heroTrayPx: 56,
+    heroCompactPx: 56,
+    rackPx: 120,
+    loadoutPx: 76,
+    trayPx: 88,
+    footerPx: 72,
+    gapsPx: 84,
     minZeroScrollViewportHeightPx: 720,
-    /* ~21:9 — same cinema scope family as `questWindow.theaterAspect`. */
-    cinemaAspect: 2.76,
-    cinemaMaxHeightPx: 136,
     plaqueViewportMarginPx: 104,
   },
   keyStatCoverageThreshold: 55,

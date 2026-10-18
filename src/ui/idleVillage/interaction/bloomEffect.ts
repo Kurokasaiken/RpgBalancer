@@ -41,6 +41,7 @@ const AMBER = 'oklch(0.77 0.18 68)';
 const EMBER = 'oklch(0.62 0.16 52)';
 
 const BLOOM_ANIMATION_NAME = 'aaa-bloom-pulse';
+const BRASS_BLOOM_ANIMATION_NAME = 'brass-bloom-breathe';
 
 /** Reference size the layer radii are tuned against. */
 const REFERENCE_SIZE_PX = 120;
@@ -92,6 +93,30 @@ const BLOOM_KEYFRAMES = `
 }
 `;
 
+/**
+ * «Worn brass» look (slots of the quest planners, PLAN-043): the receiving slot is lit like warm metal, not like a
+ * neon sign. A tight rim light and one soft brass halo, slow breath, NO near-white core and no outward waves — the
+ * colours are the HUD's brass tokens, so the light follows the skin and reads as the same gold as the plates.
+ */
+const BRASS_HI = 'var(--skin-hud-brass-hi, #cfaf63)';
+const BRASS_LOW = 'var(--skin-hud-brass-low, #a0762f)';
+const mix = (color: string, pct: number): string => `color-mix(in srgb, ${color} ${pct.toFixed(0)}%, transparent)`;
+/* PLAN-043 T0.4: worn-brass bloom caps every layer at 0.25 alpha — a warm
+ * metal read on the magnet target, never a neon ring. Zero bloom at rest is
+ * guaranteed by the 'idle' branch (filter: none). */
+const BRASS_MAX_ALPHA_PCT = 25;
+const brassFilter = (i: number): string =>
+  [
+    `drop-shadow(0 0 ${px(2.2 * i)} ${mix(BRASS_HI, BRASS_MAX_ALPHA_PCT * i)})`,
+    `drop-shadow(0 0 ${px(8 * i)} ${mix(BRASS_LOW, BRASS_MAX_ALPHA_PCT * 0.64 * i)})`,
+  ].join(' ');
+const BRASS_KEYFRAMES = `
+@keyframes ${BRASS_BLOOM_ANIMATION_NAME} {
+  0%, 100% { filter: ${brassFilter(0.7)}; }
+  50%      { filter: ${brassFilter(1)}; }
+}
+`;
+
 let keyframesInjected = false;
 
 /** Injects the shared bloom keyframes once per document. */
@@ -99,12 +124,15 @@ export function ensureBloomKeyframes(): void {
   if (keyframesInjected || typeof document === 'undefined') return;
   const style = document.createElement('style');
   style.setAttribute('data-bloom-effect', 'true');
-  style.textContent = BLOOM_KEYFRAMES;
+  style.textContent = BLOOM_KEYFRAMES + BRASS_KEYFRAMES;
   document.head.appendChild(style);
   keyframesInjected = true;
 }
 
 export type BloomState = 'idle' | 'valid' | 'invalid';
+
+/** `aaa`: the shared ember-aurora bloom (POIs, demos). `brass`: the worn-brass bloom of the planner slots. */
+export type BloomLook = 'aaa' | 'brass';
 
 /**
  * Style for a drop-target in the given highlight state.
@@ -113,12 +141,22 @@ export type BloomState = 'idle' | 'valid' | 'invalid';
  * - invalid → cooled to a desaturated dim (not a receiver for the token in hand)
  * - idle    → no effect
  */
-export function getBloomStyle(state: BloomState, sizePx: number = REFERENCE_SIZE_PX): CSSProperties {
+export function getBloomStyle(state: BloomState, sizePx: number = REFERENCE_SIZE_PX, look: BloomLook = 'aaa'): CSSProperties {
   ensureBloomKeyframes();
   const unit = Math.max(0.35, sizePx / REFERENCE_SIZE_PX);
   const withUnit = { ['--bloom-unit' as string]: unit.toFixed(3) };
   switch (state) {
     case 'valid':
+      if (look === 'brass') {
+        return {
+          ...withUnit,
+          filter: brassFilter(0.85),
+          animation: `${BRASS_BLOOM_ANIMATION_NAME} 2.8s ease-in-out infinite`,
+          transition: 'filter 220ms ease, opacity 220ms ease',
+          opacity: 1,
+          willChange: 'filter',
+        };
+      }
       return {
         ...withUnit,
         filter: bloomFilter(1.1, 0.25),

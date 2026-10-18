@@ -147,7 +147,21 @@ export interface ResidentSlotViewModel {
   status: ResidentSlotStatus;
   /** Optional telemetry tags describing slot context (requirement, modifiers, etc.). */
   telemetryTags: string[];
+  /**
+   * PLAN-043 WS-1 swap re-bite: seat counter bumped by `commitSwap` when a
+   * slot↔slot swap commits — keys the renderer's SeatCycle so both slots replay
+   * the seat choreography (pre → bezelSlam → teeth). `undefined`/`0` = no replay.
+   */
+  seatNonce?: number;
 }
+
+/**
+ * Extraction-seat phase of a detail slot, reported upward for the swap guard
+ * (PLAN-043 WS-1): `extracting` while a hold runs (or eases back), `completing`
+ * once the occupant is released until the seat resets, else `idle`. A slot
+ * whose own token is mid-drag reports `idle` — the drag itself cancelled its hold.
+ */
+export type SlotSeatPhase = 'idle' | 'extracting' | 'completing';
 
 /**
  * Result object returned when attempting to assign a resident to a slot.

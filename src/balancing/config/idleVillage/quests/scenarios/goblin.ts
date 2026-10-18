@@ -26,23 +26,8 @@ import {
 /* ------------------------------------------------------------------ */
 
 const GOBLIN_NODES: Record<string, QuestNode> = {
-  /* F0 — ASSIGNMENT: combat quest, Strength visible, Perception revealable,
-   * three consumables carried (granted by the preset flags). No check. */
-  'gob-inizio': {
-    id: 'gob-inizio',
-    kind: 'choice',
-    title: 'Assignment — Goblin Extermination',
-    body: 'Third raid in a month. The merchants’ wagons no longer cross the ford: the last two came back with empty crates and broken shafts. The council no longer debates: it pays. Exterminate them.',
-    beat: 0,
-    options: [
-      {
-        id: 'gob-partenza',
-        label: 'Depart',
-        detail: 'Strength Bonus, Perception Bonus and a healing kit in the bag. We march.',
-        next: 'gob-esplora',
-      },
-    ],
-  },
+  /* F0 (ASSIGNMENT) is no longer a node: the consumables the player brings from the village are
+   * armed in the planner, so the run opens straight on the first real decision (Director, 2026-10-16). */
 
   /* F1 — EXPLORATION: two alternative checks.
    * PER "Look for tracks" success → stealth bonus (F3).
@@ -215,6 +200,9 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     transit: 'The moment is chosen. The wood holds its breath — then the camp erupts.',
     previewHint: 'A turn-based fight on the camp: the goblins answer blow for blow — skin pays the price.',
     beat: 4,
+    /* PLAN-043 WS-4: the camp fight earns the full cut — aperture reveal,
+     * dolly-in on the eruption, impact on each exchange. */
+    stageDirection: { cut: ['reveal', 'impact', 'push'] },
     combat: {
       turns: 5,
       enemies: 6,
@@ -325,6 +313,9 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     body: 'The road descends toward home. Someone has started whistling. Then stops, without anyone saying why.',
     next: 'gob-agguato',
     beat: 7,
+    /* PLAN-043 WS-4: the road home is a J-cut — the whistling dies before
+     * the ambush image lands. */
+    stageDirection: { cut: ['j-cut', 'reveal'] },
   },
   'gob-agguato': {
     id: 'gob-agguato',
@@ -335,6 +326,9 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     previewHint: 'The road home is not safe: someone is waiting for you.',
     revealHint: 'A trained eye would read the tracks: the fugitives you spare come back to prepare this ambush.',
     beat: 7,
+    /* PLAN-043 WS-4: the ambush is a tone change — bars close, the stage
+     * jolts, the scene opens through the aperture. */
+    stageDirection: { cut: ['bars', 'reveal', 'impact'] },
   },
   'gob-agguato-scelta': {
     id: 'gob-agguato-scelta',
@@ -366,6 +360,9 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     body: 'A fight as dry as a bone snapping. The profile decides who pays.',
     transit: 'The last melee is not a battle: it is a debt to settle. Whoever stays to cover pays for everyone.',
     beat: 7,
+    /* PLAN-043 WS-4: the last melee takes the wide stage (BV-11 fixture) —
+     * expanded + breath before the blows land. */
+    stageDirection: { cut: ['expanded', 'reveal', 'impact', 'breath'] },
     combat: {
       turns: 1,
       enemies: 3,
@@ -399,7 +396,7 @@ export const GOBLIN_SCENARIO_AUTHORED = {
   title: 'Goblin Extermination',
   flavour: 'The ford is closed by fear. Exterminate them.',
   scenarioVersion: 's2.1-goblin-v1',
-  startNode: 'gob-inizio',
+  startNode: 'gob-esplora',
   primaryStats: ['str', 'perc'] as LabStat[],
   /* PLAN-036 (R-195): planner key-stat tiers — Forza primary, Percezione
    * secondary (spec §0 verbatim). Display tiers only; `primaryStats` —
@@ -434,6 +431,8 @@ export const GOBLIN_SCENARIO_AUTHORED = {
   },
   offer: {
     objective: 'Exterminate the goblin camp at the ford.',
+    /* WS-3 dispatch line — the terse order under the hero title. */
+    dispatch: 'Strike the ford camp before the smoke spreads to the road.',
     tags: ['quest', 'combat', 'goblin'],
     /* Slot gates use the CANONICAL resident statTags vocabulary (role gates:
      * edge/fortitude/warden/ward/clarity/precision — see

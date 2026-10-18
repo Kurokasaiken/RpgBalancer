@@ -4,7 +4,7 @@ import { useMemo, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { ResidentSlotViewModel, SlotProgressData, DropState } from '@/ui/idleVillage/slots/types';
+import type { ResidentSlotViewModel, SlotProgressData, DropState, SlotSeatPhase } from '@/ui/idleVillage/slots/types';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import type { VerbVisualVariant } from '@/ui/idleVillage/legacy/VerbCard';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
@@ -19,12 +19,13 @@ import { resolveSlotState } from '@/ui/idleVillage/utils/slotStateMapping';
 import type { MedalStyleBridgeConfig } from '@/ui/idleVillage/skins/slotRackSkinConfig';
 import type { SlotActivityState } from '@/ui/idleVillage/slots/types';
 import { Slot } from '@/ui/idleVillage/components/Slot';
+import type { BezelPreset } from '@/ui/idleVillage/components/SlotV12Renderer';
 import { WanderlustSurface, type WanderlustShape } from '@/ui/wanderlust-surface/WanderlustSurface';
 import { type MaterialPreset } from '@/ui/wanderlust-surface/materialPresets';
 import styles from './SlotShake.module.css';
 import rackScrollStyles from './RackScroll.module.css';
 import type { SlotDebugVisualizationSettings } from '@/balancing/config/idleVillage/slotDebugVisualizationConfig';
-import { useExtractionSequence } from '@/ui/idleVillage/interaction/useExtractionSequence';
+import { movedBeyondHold, useExtractionSequence } from '@/ui/idleVillage/interaction/useExtractionSequence';
 import { getBloomStyle } from '@/ui/idleVillage/interaction/bloomEffect';
 import { useV9Tooltip } from '@/ui/v9-skin/useV9Tooltip';
 
@@ -66,6 +67,10 @@ export interface ResidentSlotRackProps {
   onSlotDrop?: (slotId: string, residentId: string | null) => void;
   onSlotClear?: (slotId: string) => void;
   onSlotClick?: (slotId: string) => void;
+  /** Pointer/focus hover over a castone (null on leave/blur) — lets the
+   *  consumer mirror the highlight onto another surface (WS-3 forecast
+   *  row ↔ slot). */
+  onSlotHover?: (slotId: string | null) => void;
   onSlotInspect?: (slotId: string) => void;
   onSlotPointerDown?: (slotId: string) => void;
   onSlotPointerUp?: (slotId: string) => void;
@@ -77,6 +82,26 @@ export interface ResidentSlotRackProps {
   medalStyleConfig?: MedalStyleBridgeConfig;
   slotDebugVisualization?: SlotDebugVisualizationSettings;
   slotSize?: number; // Optional slot size in px for detail layouts
+  /** `hud-gold` (detail layout): the slot's metal in the HUD's brass scale and the worn-brass bloom (PLAN-043 F2). Absent = unchanged. */
+  slotMaterial?: 'hud-gold';
+  /**
+   * PLAN-043 WS-1 slot variant: `hud64` renders the 64px two-plane mechanical
+   * slot (visible bezel/lock over a 44px portrait, engraved role glyph in the
+   * empty cavity). Absent/`lab` = the certified 210-unit look, unchanged.
+   */
+  slotVariant?: 'lab' | 'hud64';
+  /**
+   * Bezel preset forwarded to the hud64 renderer. Absent/`stock` = certified
+   * paint, unchanged. `b` is the Director-ruled production bezel (R-214);
+   * `a`/`c`/`ab` are lab-only comparisons (`/bezel-variants`).
+   */
+  bezelPreset?: BezelPreset;
+  /**
+   * PLAN-043 WS-1 swap guard: reports each detail slot's extraction-seat phase
+   * (`idle` | `extracting` | `completing`) so the consumer's `commitSwap` can
+   * reject a swap while either seat is mid-extraction.
+   */
+  onSlotPhaseChange?: (slotId: string, phase: SlotSeatPhase) => void;
   /**
    * R-183 slot↔slot swap (opt-in, detail layout): an occupied slot's token
    * becomes a dnd-kit draggable (`slot-token:<slotId>`, data
@@ -86,6 +111,9 @@ export interface ResidentSlotRackProps {
    * the pointer stays still, a drag cancels it.
    */
   enableSlotSwap?: boolean;
+  /** Optional annotation rendered inside each detail column, under the
+   *  slot label — position-indexed (WS-3 marching-order exposure strip). */
+  renderSlotFooter?: (slot: ResidentSlotViewModel, index: number) => React.ReactNode;
   
   // WanderlustSurface skin integration
   wanderlustShape?: WanderlustShape;
@@ -237,6 +265,9 @@ interface DetailSlotProps {
   _onSlotDrop?: (slotId: string, residentId: string) => void;
   onSlotClear?: (slotId: string) => void;
   onSlotClick?: (slotId: string) => void;
+  onSlotHover?: (slotId: string | null) => void;
+  slotIndex: number;
+  renderSlotFooter?: (slot: ResidentSlotViewModel, index: number) => React.ReactNode;
   isHighlighted: boolean;
   isSelected: boolean;
   draggingResidentId?: string | null;
@@ -245,6 +276,10 @@ interface DetailSlotProps {
   medalStyleConfig?: MedalStyleBridgeConfig;
   slotDebugVisualization?: SlotDebugVisualizationSettings;
   slotSize?: number;
+  slotMaterial?: 'hud-gold';
+  slotVariant?: 'lab' | 'hud64';
+  bezelPreset?: BezelPreset;
+  onSlotPhaseChange?: (slotId: string, phase: SlotSeatPhase) => void;
   enableSlotSwap?: boolean;
 }
 
@@ -265,6 +300,9 @@ const DetailSlot = memo(({
   _onSlotDrop,
   onSlotClear,
   onSlotClick,
+  onSlotHover,
+  slotIndex,
+  renderSlotFooter,
   isHighlighted,
   isSelected,
   draggingResidentId,
@@ -273,9 +311,13 @@ const DetailSlot = memo(({
   medalStyleConfig,
   slotDebugVisualization,
   slotSize,
+  slotMaterial,
+  slotVariant,
+  bezelPreset,
+  onSlotPhaseChange,
   enableSlotSwap = false,
 }: DetailSlotProps) => {
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: slot.id,
     data: { type: 'slot', slotId: slot.id }
   });
@@ -321,6 +363,16 @@ const DetailSlot = memo(({
   const isExtracting = extraction.isExtracting;
   const extractionTimeoutsRef = useRef<number[]>([]);
 
+  /* PLAN-043 WS-1 swap guard: publish this seat's extraction phase so the
+   * consumer's commitSwap can refuse a swap while either seat is busy. The
+   * slot whose own token is mid-drag reports `idle` — the drag cancelled its
+   * hold, so its occupant is stable for the swap commit. */
+  const seatPhase: SlotSeatPhase =
+    extractionProgress >= 1 ? 'completing' : isExtracting && !tokenDrag.isDragging ? 'extracting' : 'idle';
+  useEffect(() => {
+    onSlotPhaseChange?.(slot.id, seatPhase);
+  }, [onSlotPhaseChange, slot.id, seatPhase]);
+
   // Drop impact animation state
   const [dropImpactScale, setDropImpactScale] = useState(1);
   const [isDropAnimating, setIsDropAnimating] = useState(false);
@@ -356,37 +408,31 @@ const DetailSlot = memo(({
   const medalBehaviorRef = useRef<MedalBehaviorControls | null>(null);
   const lastMedalResidentIdRef = useRef<string | null>(null);
 
-  // SlottedMedal integration - always enabled for Phase 5 rollout
+  // SlottedMedal integration - always enabled for Phase 5 rollout; hud64 seats
+  // the Wanderlust portrait on EVERY assigned slot (PLAN-043 WS-1).
   const slotId = slot.id ?? '';
   const isSlot0 = slotId.endsWith('slot0');
-  const shouldShowMedal = isSlot0 && isAssigned;
+  const isHud64 = slotVariant === 'hud64';
+  const shouldShowMedal = (isSlot0 || isHud64) && isAssigned;
   const debugVisualization = slotDebugVisualization?.enabled ? slotDebugVisualization : null;
 
   // Handle activity state changes (including failed state)
   useEffect(() => {
-    if (activityState && medalBehaviorRef.current) {
-      const behavior = medalBehaviorRef.current;
-      
-      if (activityState.state === 'failed') {
-        // Trigger failed animation on medal
-        if (behavior.handleFailed) {
-          behavior.handleFailed(activityState.failureType);
-        }
-        
-        // Track failure telemetry
-        trackTelemetryEvent('slot_activity_failed', {
-          slotId: slot.id,
-          residentId: slot.assignedResidentId,
-          failureType: activityState.failureType,
-          progress: activityState.progress,
-          timestamp: Date.now(),
-        });
-      } else if (activityState.state === 'completing') {
-        // Trigger completion animation
-        if (behavior.handleComplete) {
-          behavior.handleComplete();
-        }
-      }
+    if (!activityState) return;
+    /* The medal-behavior hook is reserved for a behavior-controlled medal
+     * (WanderlustMedalOverlay has none today) — it must NOT gate telemetry. */
+    const behavior = medalBehaviorRef.current;
+    if (activityState.state === 'failed') {
+      behavior?.handleFailed?.(activityState.failureType);
+      trackTelemetryEvent('slot_activity_failed', {
+        slotId: slot.id,
+        residentId: slot.assignedResidentId,
+        failureType: activityState.failureType,
+        progress: activityState.progress,
+        timestamp: Date.now(),
+      });
+    } else if (activityState.state === 'completing') {
+      behavior?.handleComplete?.();
     }
   }, [activityState, slot.id, slot.assignedResidentId]);
 
@@ -433,19 +479,51 @@ const DetailSlot = memo(({
   }, [isAssigned, shouldShowMedal, slot.id, slot.assignedResidentId, slotSounds]);
 
   // Press-and-hold extraction mechanism — delegates to the shared sequence
-  const startExtraction = useCallback(() => {
-    if (!isAssigned || !onSlotClear) return;
-    extraction.start();
-  }, [isAssigned, onSlotClear, extraction]);
+  /* While the hold runs, a pointer that travels away is a drag: stop the hold at once (PLAN-043 T1.1). */
+  const stopHoldWatchRef = useRef<(() => void) | null>(null);
+  const stopHoldWatch = useCallback(() => {
+    stopHoldWatchRef.current?.();
+    stopHoldWatchRef.current = null;
+  }, []);
+
+  const startExtraction = useCallback(
+    (event?: { clientX?: number; clientY?: number }) => {
+      if (!isAssigned || !onSlotClear) return;
+      stopHoldWatch();
+      extraction.start();
+      if (typeof event?.clientX !== 'number' || typeof event?.clientY !== 'number') return;
+      const origin = { x: event.clientX, y: event.clientY };
+      const onMove = (move: PointerEvent) => {
+        if (!movedBeyondHold(origin, { x: move.clientX, y: move.clientY })) return;
+        /* Drag intent must abort the sequence outright — `cancel()` no-ops
+         * once progress hit 1, so under input lag the hold could still run
+         * bezelWait→overshoot→onExtracted and empty the seat mid-drag. */
+        extraction.reset();
+        stopHoldWatch();
+      };
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', stopHoldWatch);
+      window.addEventListener('pointercancel', stopHoldWatch);
+      stopHoldWatchRef.current = () => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', stopHoldWatch);
+        window.removeEventListener('pointercancel', stopHoldWatch);
+      };
+    },
+    [isAssigned, onSlotClear, extraction, stopHoldWatch],
+  );
 
   const cancelExtraction = useCallback(() => {
+    stopHoldWatch();
     extraction.cancel();
-  }, [extraction]);
+  }, [extraction, stopHoldWatch]);
+
+  useEffect(() => stopHoldWatch, [stopHoldWatch]);
 
   /* A swap drag means «move it», never «take it out»: the hold that started
    *  the press must not complete into an extraction mid-drag. */
   useEffect(() => {
-    if (tokenDrag.isDragging) extraction.cancel();
+    if (tokenDrag.isDragging) extraction.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenDrag.isDragging]);
 
@@ -463,7 +541,19 @@ const DetailSlot = memo(({
     // For assigned slots, extraction is handled by press-and-hold
   };
 
+  /* Keyboard parity for the empty-slot click path (WS-3): Enter/Space on
+   *  the focused castone fires the same `onSlotClick` a pointer click does —
+   *  the planner opens the Selection Tray from it. */
+  const handleSlotKeyDown = (event: React.KeyboardEvent) => {
+    if (event.defaultPrevented) return;
+    if ((event.key === 'Enter' || event.key === ' ') && !isAssigned) {
+      event.preventDefault();
+      onSlotClick?.(slot.id);
+    }
+  };
+
   const slotState = dropState === 'valid' ? 'valid' : dropState === 'invalid' ? 'invalid' : isAssigned ? 'assigned' : 'empty';
+  const bloomState = resolveSlotBloomState(slotState, isAssigned, isOver);
   const resolvedMedalSkinPreset = medalStyleConfig?.skinPreset ?? 'minimal';
 
   const slotButtonStyle: CSSProperties = {
@@ -538,20 +628,35 @@ const DetailSlot = memo(({
           extractionProgress,
           debugVisualization: debugVisualization ?? undefined,
           sizePx: slotSize,
+          palette: slotMaterial,
+          variant: slotVariant,
+          bezelPreset,
+          seatNonce: slot.seatNonce,
+          role: slot.role,
         }}
         wrapperProps={{
           role: 'button',
           tabIndex: 0,
           'data-testid': `slot-button-${slot.id}`,
           onClick: handleClick,
+          onKeyDown: handleSlotKeyDown,
+          onMouseEnter: () => onSlotHover?.(slot.id),
+          onMouseLeave: () => {
+            if (isAssigned) cancelExtraction();
+            onSlotHover?.(null);
+          },
+          onFocus: () => onSlotHover?.(slot.id),
+          onBlur: () => onSlotHover?.(null),
           onMouseDown: isAssigned ? startExtraction : undefined,
           onMouseUp: isAssigned ? cancelExtraction : undefined,
-          onMouseLeave: isAssigned ? cancelExtraction : undefined,
           onTouchStart: isAssigned ? startExtraction : undefined,
           onTouchEnd: isAssigned ? cancelExtraction : undefined,
           className: [
             'relative',
-            shouldShowMedal ? '[&_.slot-v12]:hidden' : '',
+            /* PLAN-043 WS-1: the whole-SVG hide is a LAB-only workaround — the
+             * hud64 two-plane layout keeps bezel+teeth painted OVER the portrait
+             * (the visible lock the Director asked for). */
+            shouldShowMedal && !isHud64 ? '[&_.slot-v12]:hidden' : '',
             dropState === 'invalid' ? 'cursor-not-allowed' : '',
             isExtracting ? 'cursor-grabbing' : '',
           ]
@@ -559,7 +664,7 @@ const DetailSlot = memo(({
             .join(' '),
           style: {
             // Shared AAA bloom — identical to the POI medallion (alpha-shaped halo + pulse)
-            ...getBloomStyle(slotState === 'valid' ? 'valid' : slotState === 'invalid' ? 'invalid' : 'idle', slotSize ?? 96),
+            ...getBloomStyle(bloomState, slotSize ?? 96, slotMaterial === 'hud-gold' ? 'brass' : 'aaa'),
             ...(isHighlighted && slotState !== 'valid' ? { filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' } : {}),
             ...(isSelected ? { outline: '2px solid var(--slot-rack-slot-ring-color, rgba(255, 255, 255, 0.4))', outlineOffset: '4px', borderRadius: '50%' } : {}),
             ...(isExtracting ? { filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.8))' } : {}),
@@ -573,12 +678,20 @@ const DetailSlot = memo(({
           <div
             ref={tokenDrag.setNodeRef}
             {...(enableSlotSwap ? tokenDrag.listeners : {})}
+            {...(enableSlotSwap ? tokenDrag.attributes : {})}
             data-testid={`slot-token-${slot.id}`}
             data-swap-dragging={tokenDrag.isDragging ? 'true' : undefined}
+            role={enableSlotSwap ? 'button' : undefined}
+            tabIndex={enableSlotSwap ? 0 : undefined}
+            aria-label={enableSlotSwap ? assignedLabel : undefined}
             className={`absolute inset-0 flex items-center justify-center z-10 ${enableSlotSwap ? 'cursor-grab' : ''}`}
             style={tokenDrag.isDragging ? { opacity: 0.35 } : undefined}
           >
-            <div className="relative">
+            {/* Sized to the medal: when the only child is absolutely
+             *  positioned the wrapper collapses to 0×0, flex-shrink then
+             *  squashes the medal to width 0 at the box centre and the
+             *  portrait paints shifted right (R-214 "medaglione decentrato"). */}
+            <div className={`relative ${isHud64 ? 'h-11 w-11' : 'h-10 w-10'}`}>
               {debugVisualization?.showLabels && (
                 <span
                   className="absolute -top-6 left-1/2 -translate-x-1/2 rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.2em]"
@@ -598,8 +711,12 @@ const DetailSlot = memo(({
                   <WanderlustMedalOverlay
                     portraitUrl={assignedAvatarUrl}
                     isDragging={false}
-                    sizePx={40}
-                    className="h-10 w-10"
+                    sizePx={isHud64 ? 44 : 40}
+                    className={isHud64 ? 'h-11 w-11' : 'h-10 w-10'}
+                    /* hud64: the slot paints its own 6-o'clock gem pointer —
+                     * a second pendant dangles past the bezel and reads as an
+                     * off-centre medallion (R-214). */
+                    gemPendant={!isHud64}
                   />
                 </div>
               ) : (
@@ -621,6 +738,7 @@ const DetailSlot = memo(({
       <p className="text-[9px] tracking-[0.2em]" style={labelStyle}>
         {slot.label}
       </p>
+      {renderSlotFooter?.(slot, slotIndex)}
       {tokenGhostOrigin && tokenDrag.transform &&
         createPortal(
           <span
@@ -651,6 +769,23 @@ const DetailSlot = memo(({
   );
 });
 
+/**
+ * Resolve the animated bloom separately from slot compatibility. Empty seats
+ * remain static even when compatible or hovered; only an occupied, valid swap
+ * target may use the breathing bloom.
+ */
+export function resolveSlotBloomState(
+  slotState: 'valid' | 'invalid' | 'assigned' | 'empty',
+  isAssigned: boolean,
+  isOver: boolean,
+): 'valid' | 'invalid' | 'idle' {
+  if (!isOver) return 'idle';
+  if (slotState === 'invalid') return 'invalid';
+  if (!isAssigned) return 'idle';
+  if (slotState === 'valid') return 'valid';
+  return 'idle';
+}
+
 export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
   slots,
   layout = 'detail',
@@ -661,7 +796,9 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
   onSlotDrop,
   onSlotClear,
   onSlotClick,
+  onSlotHover,
   onSlotInspect,
+  renderSlotFooter,
   selectedSlotId,
   highlightedSlotId,
   draggingResidentId,
@@ -669,6 +806,10 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
   className,
   slotDebugVisualization,
   slotSize,
+  slotMaterial,
+  slotVariant,
+  bezelPreset,
+  onSlotPhaseChange,
   enableSlotSwap = false,
   wanderlustShape = 'panel',
   wanderlustMaterial = 'bronze',
@@ -773,7 +914,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
         data-testid="resident-slot-rack"
       >
         {overflowEnabled && <span ref={leftRef} className="shrink-0 w-px h-full opacity-0" aria-hidden />}
-        {slots.map((slot) => {
+        {slots.map((slot, slotIndex) => {
           const dropState = slot.dropState ?? 'idle';
           const displayInfo = resolveDisplayInfo?.(slot) ?? { icon: DEFAULT_ICON, label: slot.label };
           const progress = getSlotProgress?.(slot.id) ?? null;
@@ -829,11 +970,14 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
             <DetailSlot
               key={slot.id}
               slot={slot}
+              slotIndex={slotIndex}
               dropState={dropState}
               displayInfo={displayInfo}
               _onSlotDrop={onSlotDrop}
               onSlotClear={onSlotClear}
               onSlotClick={onSlotClick}
+              onSlotHover={onSlotHover}
+              renderSlotFooter={renderSlotFooter}
               isHighlighted={isHighlighted}
               isSelected={isSelected}
               draggingResidentId={draggingResidentId}
@@ -841,6 +985,10 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
               activityState={getSlotActivityState?.(slot.id)}
               slotDebugVisualization={slotDebugVisualization}
               slotSize={slotSize}
+              slotMaterial={slotMaterial}
+              slotVariant={slotVariant}
+              bezelPreset={bezelPreset}
+              onSlotPhaseChange={onSlotPhaseChange}
               enableSlotSwap={enableSlotSwap}
             />
           );

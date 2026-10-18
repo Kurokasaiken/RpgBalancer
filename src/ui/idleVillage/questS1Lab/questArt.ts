@@ -53,11 +53,10 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
    *  2026-10-13; prompts .mw/specs/quest-goblin-scenes/, catalog + reuse
    *  tags in public/assets/scene-library/CATALOG.md). The scene-library
    *  files are named by subject, not by quest phase, so other quests can
-   *  reuse them. `gob-inizio`/`gob-ritorno` still use the public-domain
+   *  reuse them. `gob-ritorno` still uses the public-domain
    *  placeholders (transit art viaggio/ritorno not yet generated); the
    *  optional merchant event node is not authored yet — its art is
    *  cataloged as mercante-strada.jpg. */
-  'gob-inizio': { src: '/assets/quest-goblin/assegnazione.jpg', fit: 'cover' },
   'gob-esplora': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },

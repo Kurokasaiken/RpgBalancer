@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { HudGameMenu } from '@/ui/idleVillage/components/gameFrame/HudGameMenu';
-import { HUD_PANELS, HUD_PANEL_DEV_ONLY, type HudPanelId } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
+import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_KEY_TO_ID, HUD_PANEL_UNLISTED, isHudPanelListed, type HudPanelId } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
 
 const trackTelemetryEvent = vi.fn();
 vi.mock('@/analytics/telemetry/telemetryProvider', () => ({
@@ -44,7 +44,7 @@ describe('HudGameMenu', () => {
     await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.title' }));
     const items = screen.getAllByRole('menuitemcheckbox');
     expect(items.map((i) => i.textContent)).toEqual(
-      HUD_PANELS.filter((p) => !HUD_PANEL_DEV_ONLY.has(p.id)).map((p) => `gameFrame.panels.names.${p.id}${p.shortcut.toUpperCase()}`),
+      HUD_PANELS.filter((p) => !HUD_PANEL_DEV_ONLY.has(p.id) && isHudPanelListed(p.id)).map((p) => `gameFrame.panels.names.${p.id}${p.shortcut.toUpperCase()}`),
     );
     await userEvent.click(items[0]);
     expect(onTogglePanel).toHaveBeenCalledWith('roster');
@@ -53,7 +53,7 @@ describe('HudGameMenu', () => {
   it('includes dev panels only when includeDev is set', async () => {
     renderMenu({ includeDev: true });
     await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.title' }));
-    expect(screen.getAllByRole('menuitemcheckbox')).toHaveLength(HUD_PANELS.length);
+    expect(screen.getAllByRole('menuitemcheckbox')).toHaveLength(HUD_PANELS.filter((p) => isHudPanelListed(p.id)).length);
   });
 
   it('runs the manual save and flashes the saved state', async () => {
@@ -110,5 +110,22 @@ describe('HudGameMenu', () => {
     for (const key of ['loadGame', 'quit', 'settings']) {
       expect(screen.getByRole('menuitem', { name: `gameFrame.menu.${key}` })).toBeDisabled();
     }
+  });
+});
+
+describe('unlisted panels (PLAN-043 T1.3, Director 2026-10-16)', () => {
+  it('the quest window, the planner and the hero sheet have no menu entry and no key', () => {
+    expect([...HUD_PANEL_UNLISTED].sort()).toEqual(['heroSheet', 'quest', 'questDetail']);
+    expect(HUD_PANEL_KEY_TO_ID.q).toBeUndefined();
+    expect(HUD_PANEL_KEY_TO_ID.p).toBeUndefined();
+    /* WS-2: the planner is a stage-managed centerStage occupant — it opens
+     *  from a POI click only, so `o` must not summon it either. */
+    expect(HUD_PANEL_KEY_TO_ID.o).toBeUndefined();
+  });
+  it('every other panel keeps its key', () => {
+    expect(HUD_PANEL_KEY_TO_ID.r).toBe('roster');
+    expect(HUD_PANEL_KEY_TO_ID.e).toBe('events');
+    expect(HUD_PANEL_KEY_TO_ID.v).toBe('villageStash');
+    expect(HUD_PANEL_KEY_TO_ID.m).toBe('merchant');
   });
 });

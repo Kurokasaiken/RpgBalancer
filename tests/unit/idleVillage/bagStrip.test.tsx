@@ -205,7 +205,7 @@ describe('BagStrip — read-only readout', () => {
   });
 });
 
-describe('QuestRunWindow — companion belt (R-196)', () => {
+describe('QuestRunWindow — companion belt (R-196 → WS-4 tabbed column)', () => {
   /* bagSlots = 3: pack the full kind spread — check, action, passive. */
   const packedRun = (loadout: string[] = ['hasBonusPerc', 'hasHealing', 'hasGuardianBanner']): QuestRunState => {
     const run = createRun(PRESET, 7, 'goblin', loadout);
@@ -213,19 +213,29 @@ describe('QuestRunWindow — companion belt (R-196)', () => {
     return run;
   };
 
-  it('left column stacks party roster over the belt; right column carries the chronicle — all visible at once at 1440px', () => {
+  /* WS-4 (artifact-r003 §2): ONE left companion column, tabbed by the header
+   * pills — Party / Bag / Chronicle never paint side by side; the "right
+   * column" is now the SkillCheckColumn wing. */
+  it('the header pills open ONE tab at a time in the single left column', () => {
     renderWindow(packedRun());
+    // closed by default
+    expect(screen.queryByTestId('quest-companion-left')).toBeNull();
+    fireEvent.click(screen.getByTestId('quest-party-toggle'));
+    expect(within(screen.getByTestId('quest-companion-left')).getByTestId('quest-party-roster')).toBeInTheDocument();
+    // switching pills swaps the tab, never stacks
+    fireEvent.click(screen.getByTestId('quest-belt-toggle'));
     const left = screen.getByTestId('quest-companion-left');
-    const right = screen.getByTestId('quest-companion-right');
-    expect(within(left).getByTestId('quest-party-roster')).toBeInTheDocument();
     expect(within(left).getByTestId('quest-belt')).toBeInTheDocument();
-    // roster above belt in the same column
-    expect(left.firstElementChild).toBe(screen.getByTestId('quest-party-roster'));
-    expect(within(right).getByTestId('quest-log-panel')).toBeInTheDocument();
+    expect(within(left).queryByTestId('quest-party-roster')).toBeNull();
+    fireEvent.click(screen.getByTestId('quest-log-toggle'));
+    expect(within(screen.getByTestId('quest-companion-left')).getByTestId('quest-log-panel')).toBeInTheDocument();
+    // no right companion column exists at all — the wing is the check's
+    expect(screen.queryByTestId('quest-companion-right')).toBeNull();
   });
 
   it('belt items are icon-only buttons; the passive banner is a badge, never a toggle', () => {
     renderWindow(packedRun());
+    fireEvent.click(screen.getByTestId('quest-belt-toggle'));
     const belt = screen.getByTestId('quest-belt');
     for (const btn of within(belt).getAllByRole('button')) {
       const icon = btn.querySelector('svg');
@@ -276,6 +286,7 @@ describe('QuestRunWindow — companion belt (R-196)', () => {
       );
     };
     render(<Harness />);
+    fireEvent.click(screen.getByTestId('quest-belt-toggle'));
     const item = screen.getByTestId('quest-belt').querySelector('[data-belt-item="hasBonusPerc"]')!;
     expect(item).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(item);
@@ -305,16 +316,21 @@ describe('QuestRunWindow — companion belt (R-196)', () => {
     const toggle = screen.getByTestId('quest-log-toggle');
     expect(toggle.querySelector('[data-engraved="ico-scroll"]')).toBeTruthy();
     expect(toggle.querySelector('[data-engraved="nav-chronicle"]')).toBeNull();
+    // pills start collapsed; opening reflects aria-expanded
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
   });
 
-  it('no «Skip to the frontier» control exists — beats show only a Continue button', () => {
+  /* R-199 pt.1: NO Continue/skip control anywhere — the beat stage itself is
+   * the advancement affordance (click / any key). */
+  it('no «Skip to the frontier» or «Continue» control exists — the beat stage itself advances', () => {
     renderWindow(packedRun(), { queuedBeats: [sceneBeat('b1'), sceneBeat('b2')] });
-    expect(screen.queryByText(/skip to the frontier|vai al bivio/i)).toBeNull();
-    const cont = screen.getByTestId('quest-window-beat-continue');
-    expect(cont.tagName).toBe('BUTTON');
-    // BeatStage's outer stage is never a nested interactive control.
+    expect(screen.queryByText(/skip to the frontier|vai al bivio|continua|continue/i)).toBeNull();
+    expect(screen.queryByTestId('quest-window-beat-continue')).toBeNull();
+    // The stage is the live region — never a nested interactive control.
     const stage = screen.getByTestId('quest-window-beat');
+    expect(stage.tagName).not.toBe('BUTTON');
     expect(stage).not.toHaveAttribute('role', 'button');
     expect(stage).not.toHaveAttribute('tabindex', '0');
   });

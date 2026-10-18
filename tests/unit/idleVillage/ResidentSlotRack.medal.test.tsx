@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { DndContext } from '@dnd-kit/core';
 import type { ReactElement } from 'react';
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
@@ -89,14 +89,17 @@ describe('ResidentSlotRack – SlottedMedal integration', () => {
       expect(screen.getByTestId('slot-medal-activity-slot0')).toBeInTheDocument();
     });
 
-    it('does not render SlottedMedal when flag disabled or slot id not ending with slot0', () => {
+    it('renders SlottedMedal even when the flag is off (Phase 5: always-on for slot0)', () => {
+      // Contract: the slottedMedalIntegration flag no longer gates rendering —
+      // the medal is always-on for an assigned slot0 (Phase 5 rollout).
       FeatureFlags.idleVillage.slottedMedalIntegration = false;
       renderRack(
         buildSlot({ assignedResidentId: 'resident-1', status: 'assigned' }),
       );
-      expect(screen.queryByTestId('slot-medal-activity-slot0')).not.toBeInTheDocument();
+      expect(screen.getByTestId('slot-medal-activity-slot0')).toBeInTheDocument();
+    });
 
-      FeatureFlags.idleVillage.slottedMedalIntegration = true;
+    it('does not render SlottedMedal for slot ids not ending with slot0', () => {
       renderRack(
         buildSlot({ id: 'activity-slot1', assignedResidentId: 'resident-1', status: 'assigned' }),
       );
@@ -156,23 +159,40 @@ describe('ResidentSlotRack – SlottedMedal integration', () => {
       );
     });
 
-    it('emits detach telemetry and sound when clearing slot0 medal', () => {
-      const onSlotClear = vi.fn();
-      renderRack(
-        buildSlot({ assignedResidentId: 'resident-1', status: 'assigned' }),
-        { onSlotClear },
-      );
+    it('emits detach telemetry and sound when clearing slot0 medal via press-and-hold', () => {
+      /* Contract: click no longer clears — extraction is press-and-hold.
+       * Sequence: hold 560ms → bezelWait 560ms → overshoot (detach telemetry
+       * + sound) → overshootHold 300ms → onExtracted → onSlotClear. */
+      vi.useFakeTimers();
+      try {
+        const onSlotClear = vi.fn();
+        renderRack(
+          buildSlot({ assignedResidentId: 'resident-1', status: 'assigned' }),
+          { onSlotClear },
+        );
 
-      (trackTelemetryEvent as ReturnType<typeof vi.fn>).mockClear();
+        (trackTelemetryEvent as ReturnType<typeof vi.fn>).mockClear();
 
-      fireEvent.click(screen.getByTestId('slot-button-activity-slot0'));
+        fireEvent.mouseDown(screen.getByTestId('slot-button-activity-slot0'), { clientX: 10, clientY: 10 });
 
-      expect(onSlotClear).toHaveBeenCalledWith('activity-slot0');
-      expect(trackTelemetryEvent).toHaveBeenCalledWith(
-        'slot_medal_detached',
-        expect.objectContaining({ slotId: 'activity-slot0', residentId: 'resident-1' }),
-      );
-      expect(slotSoundsControls.detach).toHaveBeenCalledTimes(1);
+        act(() => {
+          vi.advanceTimersByTime(1120); // hold 560 + bezelWait 560 → overshoot
+        });
+
+        expect(trackTelemetryEvent).toHaveBeenCalledWith(
+          'slot_medal_detached',
+          expect.objectContaining({ slotId: 'activity-slot0', residentId: 'resident-1' }),
+        );
+        expect(slotSoundsControls.detach).toHaveBeenCalledTimes(1);
+
+        act(() => {
+          vi.advanceTimersByTime(300); // overshootHold → onExtracted
+        });
+
+        expect(onSlotClear).toHaveBeenCalledWith('activity-slot0');
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('tracks slot activity failure telemetry for slot0 medals', async () => {

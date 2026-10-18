@@ -1,1868 +1,1912 @@
 {
- "SKIP": "Skip",
- "THROW": "Throw",
- "activityCapsule": {
-  "slotLabel": "Slot {index}",
-  "accessibility": {
-   "activityCapsule": "{label} activity capsule",
-   "closeDetails": "Close details"
+  "SKIP": "Skip",
+  "THROW": "Throw",
+  "activityCapsule": {
+    "slotLabel": "Slot {index}",
+    "accessibility": {
+      "activityCapsule": "{label} activity capsule",
+      "closeDetails": "Close details"
+    },
+    "actions": {
+      "start": "Start",
+      "startPending": "Pending…",
+      "cancel": "Cancel",
+      "collect": "Collect"
+    },
+    "status": {
+      "idle": "Idle",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "blocked": "Blocked"
+    },
+    "sections": {
+      "assignedCharacters": "Assigned characters",
+      "requirements": "Requirements",
+      "telemetry": "Telemetry",
+      "lore": "Lore"
+    },
+    "info": {
+      "duration": "Duration",
+      "eta": "ETA",
+      "reward": "Reward"
+    },
+    "requirements": {
+      "relation": {
+        "all": "all of",
+        "any": "any of",
+        "none": "none of"
+      }
+    },
+    "telemetry": {
+      "empty": "No events yet"
+    },
+    "lore": {
+      "locked": "Lore not yet discovered"
+    },
+    "devTools": {
+      "validationTitle": "Skin Validation Errors"
+    },
+    "type": {
+      "job": "Job",
+      "quest": "Quest",
+      "training": "Training",
+      "maintenance": "Maintenance"
+    }
   },
-  "actions": {
-   "start": "Start",
-   "startPending": "Pending…",
-   "cancel": "Cancel",
-   "collect": "Collect"
+  "astrolabeV3": {
+    "verdictSuccess": "Victory",
+    "verdictNearMiss": "By a Whisker",
+    "verdictFail": "Defeat",
+    "verdictCrit": "Ruin",
+    "wounded": "Wounded",
+    "dead": "Fallen",
+    "rollAgain": "Roll again",
+    "throwControls": "Throw controls",
+    "skip": "Skip",
+    "auto": "Auto",
+    "mute": "Mute",
+    "onboardingStar": "Your strength: the higher the stat, the longer the ivory lobe stretches.",
+    "onboardingRisk": "Crimson crown: land there and you are wounded. Violet chasms: a lethal fall.",
+    "onboardingThrow": "Throw the spark — where it stops is the proof of your fate."
   },
-  "status": {
-   "idle": "Idle",
-   "inProgress": "In progress",
-   "completed": "Completed",
-   "blocked": "Blocked"
+  "astrolabeV4": {
+    "verdictBigwin": "Triumph",
+    "subBigwin": "The sun itself signs your deed.",
+    "subSuccess": "The summit bows to your stride.",
+    "subNearMiss": "The spark danced on the rim… and slipped beyond.",
+    "subFail": "The mountain repels mortals.",
+    "subCrit": "The abyss claims those who dare too much.",
+    "explanation": "Explanation",
+    "explainContinue": "Continue",
+    "explainRequired": "The black columns are the values demanded by the trial: one for each axis of the check.",
+    "explainEnemy": "This surface is the Enemy. If the spark stops here, the check fails.",
+    "explainStats": "The white columns are your expedition's stats: the higher they rise, the further your star reaches.",
+    "explainStar": "The ivory star is your ground. If the spark stops inside it, the check succeeds.",
+    "explainLegend": "Every colour is a fate. Read the field before you throw:",
+    "legendStar": "White — star interior: success",
+    "legendAlmost": "Bronze — star rim: Almost (failed by a whisker)",
+    "legendEnemy": "Slate — the Enemy: failure",
+    "legendCrit": "Dark band inside the Enemy's edge: critical failure",
+    "legendNucleus": "Central core: critical success",
+    "legendWound": "Crimson stripe: wound",
+    "legendDeath": "Black stripe: death"
   },
-  "sections": {
-   "assignedCharacters": "Assigned characters",
-   "requirements": "Requirements",
-   "telemetry": "Telemetry",
-   "lore": "Lore"
+  "astrolabeV5": {
+    "throw": "Throw",
+    "rollAgain": "Roll again",
+    "awaiting": "Awaiting the throw",
+    "trackCheck": "Trial",
+    "trackRisk": "Risk",
+    "verdictSuccess": "Success",
+    "verdictNearMiss": "Almost",
+    "verdictFail": "Failure",
+    "verdictCrit": "Ruin",
+    "riskDeclared": "{death}% death · {wound}% wound",
+    "riskNone": "None",
+    "riskHeld": "Unharmed",
+    "riskWounded": "Wounded",
+    "riskDead": "Dead",
+    "throwControls": "Throw controls",
+    "skip": "Skip",
+    "auto": "Auto",
+    "mute": "Mute",
+    "axisReadout": "{skill}: {stat} against difficulty {difficulty} — {relation}",
+    "relation_margin": "above the threshold",
+    "relation_deficit": "below the threshold",
+    "relation_even": "level with the threshold"
   },
-  "info": {
-   "duration": "Duration",
-   "eta": "ETA",
-   "reward": "Reward"
+  "critPercent": "Crit Percent",
+  "deathPercent": "Death Percent",
+  "difficulty": "Difficulty",
+  "dpr": "DPR",
+  "floatingPanel": {
+    "minimize": "Minimise panel",
+    "restore": "Restore panel",
+    "pin": "Pin panel open",
+    "unpin": "Unpin panel",
+    "close": "Close panel"
   },
-  "requirements": {
-   "relation": {
-    "all": "all of",
-    "any": "any of",
-    "none": "none of"
-   }
+  "hitStop": "Hit Stop",
+  "milestoneCheck": {
+    "ariaLabel": "Quest phase skill check",
+    "eyebrow": "Milestone",
+    "skills": "Checks to face",
+    "partyStat": "Party {value}",
+    "difficulty": "Difficulty {value}",
+    "consumables": "Spend consumables",
+    "riskLine": "Injury {injury}% · Death {death}%",
+    "roll": "Consult destiny",
+    "passed": "Phase passed",
+    "failed": "Phase failed",
+    "wounded": "A hero was wounded during this phase",
+    "casualty": "A hero fell during this phase",
+    "dismiss": "Continue"
   },
-  "telemetry": {
-   "empty": "No events yet"
+  "nearMissBand": "Near Miss Band",
+  "poiDetail": {
+    "risk": {
+      "injury": {
+        "title": "Chance a resident is injured"
+      },
+      "death": {
+        "title": "Chance a resident dies"
+      },
+      "danger": {
+        "title": "Danger rating of this activity"
+      }
+    }
   },
-  "lore": {
-   "locked": "Lore not yet discovered"
+  "poiMarkerLab": {
+    "title": "POI Marker Lab",
+    "subtitle": "Opportunity marker baseline: colour + icon = what, timer ring = when, material = where. Placed over the canonical Wanderlust surface, because that is the only honest test.",
+    "inContext": "In context",
+    "matrix": "Type / state matrix",
+    "playground": "Playground",
+    "type": "Type",
+    "state": "State",
+    "importance": "Importance",
+    "progress": "Time left",
+    "size": "Size",
+    "counterClockwise": "Counter-clockwise (deadline)",
+    "grounded": "Contact shadow",
+    "showMap": "Show world surface",
+    "types": {
+      "quest": "Quest",
+      "job": "Job",
+      "event": "Event"
+    },
+    "states": {
+      "new": "New",
+      "available": "Available",
+      "assigned": "Assigned",
+      "expiring": "Expiring",
+      "expired": "Expired"
+    },
+    "importances": {
+      "normal": "Normal",
+      "important": "Important",
+      "critical": "Critical"
+    },
+    "variant": "Variant",
+    "variants": {
+      "runic": "Runic (V2)",
+      "runicV3": "Runic V3",
+      "runicV1": "Runic V1",
+      "runicV5": "Runic V5"
+    }
   },
-  "devTools": {
-   "validationTitle": "Skin Validation Errors"
+  "presentation": {
+    "play": "Play",
+    "pause": "Pause",
+    "step": "Step",
+    "seed": "Seed",
+    "tick": "Tick",
+    "objects": "Objects",
+    "layers": "Layers",
+    "layerOrder": {
+      "title": "Layer Order",
+      "moveUp": "move up",
+      "moveDown": "move down"
+    },
+    "states": {
+      "unknown": "Unknown"
+    },
+    "director": {
+      "title": "World Presentation Director"
+    },
+    "inspector": {
+      "title": "Output Inspector",
+      "activeState": "Active State",
+      "runtimeObjects": "Runtime Objects",
+      "visualStateOverrides": "Visual Overrides",
+      "tick": "Tick"
+    },
+    "scenarios": {
+      "title": "Scenario",
+      "peaceful": "Peaceful",
+      "threat": "Threat",
+      "corruption": "Corruption"
+    }
   },
-  "type": {
-   "job": "Job",
-   "quest": "Quest",
-   "training": "Training",
-   "maintenance": "Maintenance"
-  }
- },
- "astrolabeV3": {
-  "verdictSuccess": "Victory",
-  "verdictNearMiss": "By a Whisker",
-  "verdictFail": "Defeat",
-  "verdictCrit": "Ruin",
-  "wounded": "Wounded",
-  "dead": "Fallen",
-  "rollAgain": "Roll again",
-  "throwControls": "Throw controls",
-  "skip": "Skip",
-  "auto": "Auto",
-  "mute": "Mute",
-  "onboardingStar": "Your strength: the higher the stat, the longer the ivory lobe stretches.",
-  "onboardingRisk": "Crimson crown: land there and you are wounded. Violet chasms: a lethal fall.",
-  "onboardingThrow": "Throw the spark — where it stops is the proof of your fate."
- },
- "astrolabeV4": {
-  "verdictBigwin": "Triumph",
-  "subBigwin": "The sun itself signs your deed.",
-  "subSuccess": "The summit bows to your stride.",
-  "subNearMiss": "The spark danced on the rim… and slipped beyond.",
-  "subFail": "The mountain repels mortals.",
-  "subCrit": "The abyss claims those who dare too much.",
-  "explanation": "Explanation",
-  "explainContinue": "Continue",
-  "explainRequired": "The black columns are the values demanded by the trial: one for each axis of the check.",
-  "explainEnemy": "This surface is the Enemy. If the spark stops here, the check fails.",
-  "explainStats": "The white columns are your expedition's stats: the higher they rise, the further your star reaches.",
-  "explainStar": "The ivory star is your ground. If the spark stops inside it, the check succeeds.",
-  "explainLegend": "Every colour is a fate. Read the field before you throw:",
-  "legendStar": "White — star interior: success",
-  "legendAlmost": "Bronze — star rim: Almost (failed by a whisker)",
-  "legendEnemy": "Slate — the Enemy: failure",
-  "legendCrit": "Dark band inside the Enemy's edge: critical failure",
-  "legendNucleus": "Central core: critical success",
-  "legendWound": "Crimson stripe: wound",
-  "legendDeath": "Black stripe: death"
- },
- "astrolabeV5": {
-  "throw": "Throw",
-  "rollAgain": "Roll again",
-  "awaiting": "Awaiting the throw",
-  "trackCheck": "Trial",
-  "trackRisk": "Risk",
-  "verdictSuccess": "Success",
-  "verdictNearMiss": "Almost",
-  "verdictFail": "Failure",
-  "verdictCrit": "Ruin",
-  "riskDeclared": "{death}% death · {wound}% wound",
-  "riskNone": "None",
-  "riskHeld": "Unharmed",
-  "riskWounded": "Wounded",
-  "riskDead": "Dead",
-  "throwControls": "Throw controls",
-  "skip": "Skip",
-  "auto": "Auto",
-  "mute": "Mute",
-  "axisReadout": "{skill}: {stat} against difficulty {difficulty} — {relation}",
-  "relation_margin": "above the threshold",
-  "relation_deficit": "below the threshold",
-  "relation_even": "level with the threshold"
- },
- "critPercent": "Crit Percent",
- "deathPercent": "Death Percent",
- "difficulty": "Difficulty",
- "dpr": "DPR",
- "floatingPanel": {
-  "minimize": "Minimise panel",
-  "restore": "Restore panel",
-  "pin": "Pin panel open",
-  "unpin": "Unpin panel",
-  "close": "Close panel"
- },
- "hitStop": "Hit Stop",
- "milestoneCheck": {
-  "ariaLabel": "Quest phase skill check",
-  "eyebrow": "Milestone",
-  "skills": "Checks to face",
-  "partyStat": "Party {value}",
-  "difficulty": "Difficulty {value}",
-  "consumables": "Spend consumables",
-  "riskLine": "Injury {injury}% · Death {death}%",
-  "roll": "Consult destiny",
-  "passed": "Phase passed",
-  "failed": "Phase failed",
-  "wounded": "A hero was wounded during this phase",
-  "casualty": "A hero fell during this phase",
-  "dismiss": "Continue"
- },
- "nearMissBand": "Near Miss Band",
- "poiDetail": {
-  "risk": {
-   "injury": {
-    "title": "Chance a resident is injured"
-   },
-   "death": {
-    "title": "Chance a resident dies"
-   },
-   "danger": {
-    "title": "Danger rating of this activity"
-   }
-  }
- },
- "poiMarkerLab": {
-  "title": "POI Marker Lab",
-  "subtitle": "Opportunity marker baseline: colour + icon = what, timer ring = when, material = where. Placed over the canonical Wanderlust surface, because that is the only honest test.",
-  "inContext": "In context",
-  "matrix": "Type / state matrix",
-  "playground": "Playground",
-  "type": "Type",
-  "state": "State",
-  "importance": "Importance",
-  "progress": "Time left",
-  "size": "Size",
-  "counterClockwise": "Counter-clockwise (deadline)",
-  "grounded": "Contact shadow",
-  "showMap": "Show world surface",
-  "types": {
-   "quest": "Quest",
-   "job": "Job",
-   "event": "Event"
+  "questChronicle": {
+    "title": "Quest Chronicle",
+    "journal": "Journal",
+    "openTheater": "Open Theater",
+    "collectRewards": "Collect rewards",
+    "closeReport": "Close the report",
+    "ropeLabel": "Quest time",
+    "boardStatus": {
+      "success": "Last trial passed",
+      "failure": "Trial failed",
+      "pending": "Waiting for patrol outcome"
+    },
+    "outcome": {
+      "success": "Success",
+      "failure": "Failure"
+    },
+    "risk": {
+      "injury": "{percent}% injury",
+      "death": "{percent}% death"
+    },
+    "phaseType": {
+      "check": "check",
+      "fight": "fight",
+      "stealth": "stealth",
+      "trap": "trap",
+      "explore": "explore",
+      "dialogue": "dialogue",
+      "branch": "branch",
+      "timedChoice": "timed choice"
+    }
   },
-  "states": {
-   "new": "New",
-   "available": "Available",
-   "assigned": "Assigned",
-   "expiring": "Expiring",
-   "expired": "Expired"
-  },
-  "importances": {
-   "normal": "Normal",
-   "important": "Important",
-   "critical": "Critical"
-  },
-  "variant": "Variant",
-  "variants": {
-   "runic": "Runic (V2)",
-   "runicV3": "Runic V3",
-   "runicV1": "Runic V1",
-   "runicV5": "Runic V5"
-  }
- },
- "presentation": {
-  "play": "Play",
-  "pause": "Pause",
-  "step": "Step",
-  "seed": "Seed",
-  "tick": "Tick",
-  "objects": "Objects",
-  "layers": "Layers",
-  "layerOrder": {
-   "title": "Layer Order",
-   "moveUp": "move up",
-   "moveDown": "move down"
-  },
-  "states": {
-   "unknown": "Unknown"
-  },
-  "director": {
-   "title": "World Presentation Director"
-  },
-  "inspector": {
-   "title": "Output Inspector",
-   "activeState": "Active State",
-   "runtimeObjects": "Runtime Objects",
-   "visualStateOverrides": "Visual Overrides",
-   "tick": "Tick"
-  },
-  "scenarios": {
-   "title": "Scenario",
-   "peaceful": "Peaceful",
-   "threat": "Threat",
-   "corruption": "Corruption"
-  }
- },
- "questChronicle": {
-  "title": "Quest Chronicle",
-  "journal": "Journal",
-  "openTheater": "Open Theater",
-  "collectRewards": "Collect rewards",
-  "closeReport": "Close the report",
-  "ropeLabel": "Quest time",
-  "boardStatus": {
-   "success": "Last trial passed",
-   "failure": "Trial failed",
-   "pending": "Waiting for patrol outcome"
-  },
-  "outcome": {
-   "success": "Success",
-   "failure": "Failure"
-  },
-  "risk": {
-   "injury": "{percent}% injury",
-   "death": "{percent}% death"
-  },
-  "phaseType": {
-   "check": "check",
-   "fight": "fight",
-   "stealth": "stealth",
-   "trap": "trap",
-   "explore": "explore",
-   "dialogue": "dialogue",
-   "branch": "branch",
-   "timedChoice": "timed choice"
-  }
- },
- "questReward": {
-  "panelTitle": "Rewards",
-  "eyebrowVictory": "Expedition returned",
-  "eyebrowDefeat": "Expedition broken",
-  "trialsPassed": "{passed} of {total} trials passed",
-  "trials": "Trials",
-  "passed": "Passed",
-  "failed": "Failed",
-  "rewards": "Rewards",
-  "noRewards": "The expedition brought nothing home",
-  "party": "Party",
-  "stateNone": "Unharmed",
-  "stateInjured": "Wounded",
-  "stateDead": "Fallen",
-  "collect": "Collect rewards"
- },
- "roster": {
-  "sort": {
-   "label": "Sort",
-   "nameAsc": "Name A → Z",
-   "nameDesc": "Name Z → A",
-   "hpDesc": "HP",
-   "fatigueAsc": "Fatigue",
-   "nameAscTooltip": "Sort: Name A → Z (click to reverse)",
-   "nameDescTooltip": "Sort: Name Z → A (click to reverse)",
-   "hpDescTooltip": "Sort: HP (highest first)",
-   "fatigueAscTooltip": "Sort: Fatigue (lowest first)",
-   "nameAscDescription": "Sort by display name alphabetically (A to Z)",
-   "nameDescDescription": "Sort by display name alphabetically (Z to A)",
-   "hpDescDescription": "Sort by current HP (highest first)",
-   "fatigueAscDescription": "Sort by fatigue (lowest first)"
-  },
-  "filter": {
-   "label": "Filter",
-   "statLabel": "Stat",
-   "operatorLabel": "Operator",
-   "thresholdLabel": "Threshold",
-   "thresholdAriaLabel": "Filter threshold value",
-   "addFilter": "Add",
-   "addFilterAriaLabel": "Add filter",
-   "clearFilters": "Clear",
-   "clearFiltersAriaLabel": "Clear all filters",
-   "removeFilterAriaLabel": "Remove filter",
-   "noResults": "No residents match current filters",
-   "stat": {
-    "hp": "HP",
-    "hpTooltip": "Health Points",
-    "hpDescription": "Current health points",
-    "damage": "Damage",
-    "damageTooltip": "Damage",
-    "damageDescription": "Base damage value",
-    "txc": "TxC",
-    "txcTooltip": "To-Hit Chance",
-    "txcDescription": "Flat to-hit chance bonus",
-    "evasion": "Evasion",
-    "evasionTooltip": "Evasion",
-    "evasionDescription": "Flat evasion value",
-    "agility": "Agility",
-    "agilityTooltip": "Agility",
-    "agilityDescription": "Initiative stat for turn order",
-    "hitChance": "Hit Chance",
-    "hitChanceTooltip": "Hit Chance %",
-    "hitChanceDescription": "Calculated hit chance percentage",
-    "effectiveDamage": "Effective Damage",
-    "effectiveDamageTooltip": "Effective Damage",
-    "effectiveDamageDescription": "Damage after mitigation",
-    "htk": "Hits to Kill",
-    "htkTooltip": "Hits to Kill",
-    "htkDescription": "Number of hits to kill target",
-    "critChance": "Crit Chance",
-    "critChanceTooltip": "Critical Chance %",
-    "critChanceDescription": "Critical hit chance percentage",
-    "armor": "Armor",
-    "armorTooltip": "Armor",
-    "armorDescription": "Flat armor value",
-    "resistance": "Resistance",
-    "resistanceTooltip": "Resistance %",
-    "resistanceDescription": "Damage resistance percentage",
-    "lifesteal": "Lifesteal",
-    "lifestealTooltip": "Lifesteal %",
-    "lifestealDescription": "Lifesteal percentage",
-    "regen": "Regen",
-    "regenTooltip": "Regeneration",
-    "regenDescription": "Health regeneration per turn",
-    "ward": "Ward",
-    "wardTooltip": "Ward",
-    "wardDescription": "Flat shield value",
-    "block": "Block",
-    "blockTooltip": "Block %",
-    "blockDescription": "Block chance percentage",
-    "unknown": "Unknown",
-    "unknownTooltip": "Unknown stat",
-    "unknownDescription": "Unknown stat"
-   },
-   "operator": {
-    "greaterThan": ">",
-    "greaterThanTooltip": "Greater than",
-    "greaterThanDescription": "Stat is greater than threshold",
-    "lessThan": "<",
-    "lessThanTooltip": "Less than",
-    "lessThanDescription": "Stat is less than threshold",
-    "equals": "=",
-    "equalsTooltip": "Equals",
-    "equalsDescription": "Stat equals threshold",
-    "greaterThanOrEqual": ">=",
-    "greaterThanOrEqualTooltip": "Greater than or equal",
-    "greaterThanOrEqualDescription": "Stat is greater than or equal to threshold",
-    "lessThanOrEqual": "<=",
-    "lessThanOrEqualTooltip": "Less than or equal",
-    "lessThanOrEqualDescription": "Stat is less than or equal to threshold"
-   }
-  },
-  "status": {
-   "active": "Active",
-   "injured": "Injured",
-   "dead": "Fallen",
-   "exhausted": "Exhausted",
-   "away": "Away",
-   "assigned": "Assigned"
-  },
-  "stats": {
-   "hp": "Health",
-   "stamina": "Stamina",
-   "xpTitle": "{name} · {xp} XP"
-  }
- },
- "slowMo": "Slow Mo",
- "spinDuration": "Spin Duration",
- "stats": "Stats",
- "threatStatus": {
-  "title": "THREAT STATUS",
-  "page": {
-   "title": "Threat Status Indicator",
-   "description": "Client-only component showcase for use client directive"
-  },
-  "urgency": {
-   "calm": "CALM",
-   "warning": "WARNING",
-   "critical": "CRITICAL"
-  },
-  "type": {
-   "GOBLIN_RAID": "Goblin Raid",
-   "PLAGUE": "Plague",
-   "SIEGE": "Siege"
-  }
- },
- "verdict": "Verdict",
- "world": {
-  "title": "World Surface",
-  "loading": "Loading world surface…",
-  "error": "Failed to load world surface",
-  "lab": {
-   "title": "Sea Effect Lab",
-   "baseline": "Baseline",
-   "waterField": "Water field",
-   "back": "Back"
-  },
-  "back": "Back",
-  "camera": {
-   "reset": "Reset camera"
-  },
-  "layers": {
-   "title": "Layers",
-   "scale": "Scale",
-   "offsetX": "Offset X",
-   "offsetY": "Offset Y",
-   "saveDefaults": "Save defaults",
-   "dragHandle": "Drag to reorder"
-  },
-  "clouds": {
-   "scales": "Cloud scales",
-   "scale": "scale",
-   "far": "Far",
-   "mid": "Mid",
-   "near": "Near"
-  },
-  "states": {
-   "default": "Default",
-   "corrupted": "Corrupted",
-   "threat_manifesting": "Manifesting",
-   "threatened": "Threatened"
-  },
-  "region": {
-   "enchanted_forest": "Enchanted Forest"
-  },
-  "anchors": {
-   "village_01": "Village 01"
-  },
-  "goblinInvasion": {
-   "title": "GOBLIN INVASION!",
-   "subtitle": "In {count} days an army will attack!",
-   "action": "PREPARE THE DEFENSES",
-   "viewDefenses": "VIEW DEFENSES",
-   "invasion": "Invasion",
-   "eventLabel": "Goblin Invasion",
-   "daysRemaining": "Days Remaining: {count}",
-   "timerLabel": "DAYS REMAINING",
-   "warTable": {
-    "eventLabel": "WORLD EVENT · THREAT",
-    "description": "A goblin army is marching on your lands.",
-    "parchmentDescription": "A goblin army is marching on our lands. Our scouts have spotted large enemy forces moving in from the north toward your stronghold.",
-    "willBeAttacked": "YOUR VILLAGE WILL BE ATTACKED.",
-    "scoutReport": "Our scouts report a massive goblin vanguard marching from the Northern Wastes. Their target is clear: your stronghold will be razed unless defenses are prepared.",
-    "worldEvent": "World Event",
-    "enemy": "ENEMY FORCE",
-    "enemySub": "Moving from the north",
-    "village": "YOUR VILLAGE",
-    "villageSub": "Primary target",
-    "targetObjective": "Target Objective",
-    "threatLevelHigh": "Threat Level: High",
-    "threatLevelCritical": "Threat Level: Critical",
-    "threat": "THREAT",
-    "faction": "GOBLIN ARMY",
-    "factionSub": "Large hostile force detected",
-    "hostileForce": "Hostile Force",
-    "warbands": "~3,500 Warbands",
-    "enemyCount": "3,200+",
-    "enemyUnit": "GOBLINS",
-    "arrivalCount": "2",
-    "arrivalUnit": "DAYS",
-    "targetName": "YOUR VILLAGE",
-    "arrival": "ARRIVAL",
-    "arrivalIn": "Arrival In",
-    "days": "DAYS",
-    "remaining": "REMAINING",
-    "estimatedArrival": "Estimated Arrival",
-    "timeRemaining": "Time Remaining",
-    "dismiss": "Dismiss",
-    "dismissReport": "Dismiss Report"
-   },
-   "reminder": {
-    "days_singular": "DAY",
-    "days_plural": "DAYS",
-    "band_distant": "APPROACHING",
-    "band_closing": "CLOSING IN",
-    "band_imminent": "TOMORROW"
-   }
-  },
-  "debug": {
-   "title": "Debug",
-   "statesTitle": "States",
-   "camera": "Camera",
-   "mouseWorld": "Mouse (world)",
-   "activeState": "Active state",
-   "regions": "Regions",
-   "anchors": "Anchors",
-   "renderer": "Renderer",
-   "objects": "Objects",
-   "spawnObjects": "Spawn 60",
-   "clearObjects": "Clear",
-   "spawnWonders": "Spawn wonders",
-   "despawnWonders": "Despawn wonders",
-   "breath": "Breath",
-   "water": "Water",
-   "atmosphere": "Atmosphere",
-   "seaPattern": "Pattern",
-   "seaPatternTitle": "Sea pattern — live",
-   "seaPatternLive": "Authored texture A1 / micro scroll",
-   "seaPatternClose": "Close",
-   "seaPatternScale": "Pattern scale",
-   "seaPatternOpacity": "Line opacity",
-   "seaPatternColor": "Line color",
-   "seaPatternMotion": "Motion amount",
-   "seaPatternPeriod": "Motion period",
-   "seaPatternAngle": "Motion angle",
-   "seaPatternMotionEnabled": "Motion on",
-   "reducedMotion": "reduced motion",
-   "hideUi": "Hide UI",
-   "showUi": "Show UI",
-   "settlementLost": "Settlement Lost",
-   "seaPatternSaveDefault": "Save as default",
-   "seaPatternSaving": "Saving…",
-   "seaPatternSaved": "Defaults written to source",
-   "seaPatternSaveFailed": "Save failed (dev server only)"
-  },
-  "settlementLost": {
-   "title": "SETTLEMENT LOST",
-   "subtitle": "The settlement has fallen. What was learned carries on.",
-   "lossesTitle": "What was lost",
-   "cta": "BEGIN A NEW SETTLEMENT",
-   "losses": {
-    "walls": "The walls were breached",
-    "heroes": "Your heroes have fallen",
-    "stores": "The stores are lost"
-   },
-   "stats": {
-    "daysSurvived": "Days survived",
-    "residentsLost": "Residents lost",
-    "goldEarned": "Gold earned"
-   }
-  }
- },
- "worldEvents": {
-  "weather": "Weather",
-  "threat": "Threat",
-  "resource": "Resource",
-  "weather-tint": "Weather Tint",
-  "threat-tint": "Threat Tint",
-  "resource-tint": "Resource Tint"
- },
- "woundPercent": "Wound Percent",
- "pgDetailCard": {
-  "close": "Close character sheet",
-  "profile": "Profile",
-  "fullFigure": "Full figure",
-  "openArchetype": "Open archetype",
-  "unknownPreset": "Unknown preset: {id}",
-  "hp": {
-   "label": "HP"
-  },
-  "fatigue": {
-   "label": "Fatigue",
-   "ready": "Ready",
-   "exhausted": "Exhausted"
-  },
-  "statistics": {
-   "label": "Statistics",
-   "count": "{count} values",
-   "empty": "No snapshot available.",
-   "category": {
-    "offense": "Offense",
-    "defense": "Defense",
-    "utility": "Utility"
-   }
-  },
-  "inventory": {
-   "label": "Inventory",
-   "empty": "No items recorded."
-  },
-  "equipment": {
-   "label": "Loadout",
-   "weapon": "Weapon",
-   "offhand": "Off hand",
-   "armor": "Armor",
-   "trinket": "Trinket",
-   "ring": "Ring",
-   "mount": "Mount",
-   "empty": "Empty"
-  },
-  "status": {
-   "available": "Available",
-   "away": "Away",
-   "exhausted": "Exhausted",
-   "injured": "Injured",
-   "dead": "Dead"
-  },
-  "vitals": {
-   "hp": "HP",
-   "stamina": "STA"
-  }
- },
- "heroComponentsLab": {
-  "title": "Hero Components Lab",
-  "subtitle": "Placeholder catalog for the hero sheet, equipment, items, consumables and skills.",
-  "sectionA": "A — Character Sheet",
-  "sectionB": "B — Equip Slot Rack",
-  "sectionC": "C — Equippable Item Card",
-  "sectionD": "D — Consumable Pile",
-  "sectionE": "E — Equippable Skill Deck",
-  "rarity": "Rarity",
-  "effect": "Effect",
-  "slot": "Slot",
-  "use": "Use",
-  "availableSkills": "Available skills",
-  "equippedSkills": "Equipped skills",
-  "empty": "Empty",
-  "grantedSkill": "Granted by equipment",
-  "selectedSlot": "Selected slot",
-  "unequip": "Unequip",
-  "selectItem": "Select item",
-  "equip": "Equip"
- },
- "poiVisualPreview": {
-  "title": "POI Medallion Preview",
-  "v1Label": "GenericPoiSkin V1 (Amber)",
-  "v2Label": "GenericPoiSkin V2 (Materic)"
- },
- "equipment": {
-  "label": "Equipment",
-  "title": "Equipment Creator",
-  "subtitle": "Forge items from base templates",
-  "description": "Choose an item type, adjust stat modifiers, spend your equipment budget, and save. Weapons always link a base attack skill; armor and trinkets provide passive modifiers.",
-  "identity": "Identity",
-  "name": "Name",
-  "namePlaceholder": "New equipment",
-  "type": "Type",
-  "rarityLabel": "Rarity",
-  "types": {
-   "weapon": "Weapon",
-   "armor": "Armor",
-   "offhand": "Off hand",
-   "trinket": "Trinket",
-   "ring": "Ring",
-   "mount": "Mount"
-  },
-  "rarity": {
-   "poor": "Poor",
-   "common": "Common",
-   "uncommon": "Uncommon",
-   "rare": "Rare",
-   "epic": "Epic",
-   "legendary": "Legendary",
-   "masterpiece": "Masterpiece"
-  },
-  "preview": "Preview",
-  "tier": "Tier",
-  "searchSkill": "Search skill...",
-  "addSkill": "Add granted skill",
-  "removeSkill": "Remove granted skill",
-  "defaultSaved": "Default configuration saved",
-  "grantedSkill": "Granted skill",
-  "stats": "Stat modifiers",
-  "stat": {
-   "hp": "HP",
-   "damage": "Damage",
-   "txc": "TxC",
-   "evasion": "Evasion",
-   "critChance": "Crit chance",
-   "critMult": "Crit mult",
-   "armor": "Armor",
-   "resistance": "Resistance",
-   "armorPen": "Armor pen",
-   "penPercent": "Pen %",
-   "lifesteal": "Lifesteal",
-   "regen": "Regen",
-   "ward": "Ward",
-   "block": "Block",
-   "movementSpeed": "Movement speed"
-  },
-  "balance": "Balance",
-  "power": "Power",
-  "cost": "Cost",
-  "budget": "Budget",
-  "balanceBar": "Budget usage",
-  "balanced": "Within budget ({balance} points free)",
-  "overBudget": "Over budget by {balance} points",
-  "save": "Save equipment",
-  "saved": "Equipment saved",
-  "saveFailed": "Failed to save equipment",
-  "unnamed": "Unnamed equipment",
-  "reset": "Reset",
-  "saveDefault": "Save default",
-  "library": "Equipment library",
-  "new": "New",
-  "emptyLibrary": "No equipment in library.",
-  "edit": "Edit",
-  "loading": "Loading..."
- },
- "astrolabeV63": {
-  "check": "Check",
-  "statVsDc": "{stat} vs difficulty {difficulty}",
-  "probability": "Success chance ~{pct}%",
-  "risk": "Wound {wound}% · Death {dead}%",
-  "riskWounded": "Wounded",
-  "riskDead": "Fallen",
-  "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
-  "verdict": {
-   "bigwin": "TRIUMPH",
-   "win": "SUCCESS",
-   "almost": "BY A BREATH",
-   "fail": "FAILURE",
-   "epicfail": "DISASTER"
-  },
-  "narrative": {
-   "bigwin": "Fate bows to your step.",
-   "win": "The trial yields to your effort.",
-   "almost": "A breath, and the truth escapes you.",
-   "fail": "Your grip slips.",
-   "epicfail": "The world pushes you back.",
-   "Atletica": {
-    "bigwin": "You clear every barrier with a legendary leap.",
-    "win": "Your body sails past the obstacle.",
-    "almost": "Your foot slips, but you catch the edge.",
-    "fail": "The obstacle holds against your push.",
-    "epicfail": "You fall hard, breath knocked from your lungs."
-   },
-   "Destrezza": {
-    "bigwin": "Your wrists outrace the trap in an instant.",
-    "win": "Your fingers find the mechanism without hesitation.",
-    "almost": "A click: the trigger grazes your finger.",
-    "fail": "The mechanism jams before the release.",
-    "epicfail": "The trap springs, merciless."
-   },
-   "Forza": {
-    "bigwin": "The door gives under a terrible blow.",
-    "win": "The hinges groan and yield.",
-    "almost": "The wood splits but still holds.",
-    "fail": "The door stands harder than you thought.",
-    "epicfail": "Your fist rebounds, hurting you."
-   },
-   "Intelletto": {
-    "bigwin": "The pieces snap into a luminous truth.",
-    "win": "The riddle opens like a rose.",
-    "almost": "One detail escapes, but you are close.",
-    "fail": "The solution slips through your fingers.",
-    "epicfail": "Your mind clouds before the mystery."
-   },
-   "Carisma": {
-    "bigwin": "Your words bend the world to your will.",
-    "win": "The listener relents with a sigh.",
-    "almost": "For a moment they almost yield, then no.",
-    "fail": "Your tone finds no purchase.",
-    "epicfail": "The room turns cold: you stand alone."
-   }
-  }
- },
- "astrolabeV64": {
-  "check": "Check",
-  "statVsDc": "{stat} vs difficulty {difficulty}",
-  "probability": "Success chance ~{pct}%",
-  "risk": "Wound {wound}% · Death {dead}%",
-  "riskWounded": "Wounded",
-  "riskDead": "Fallen",
-  "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
-  "verdict": {
-   "bigwin": "TRIUMPH",
-   "win": "SUCCESS",
-   "almost": "BY A BREATH",
-   "fail": "FAILURE",
-   "epicfail": "DISASTER"
-  },
-  "narrative": {
-   "bigwin": "Fate bows to your step.",
-   "win": "The trial yields to your effort.",
-   "almost": "A breath, and the truth escapes you.",
-   "fail": "Your grip slips.",
-   "epicfail": "The world pushes you back.",
-   "Atletica": {
-    "bigwin": "You clear every barrier with a legendary leap.",
-    "win": "Your body sails past the obstacle.",
-    "almost": "Your foot slips, but you catch the edge.",
-    "fail": "The obstacle holds against your push.",
-    "epicfail": "You fall hard, breath knocked from your lungs."
-   },
-   "Destrezza": {
-    "bigwin": "Your wrists outrace the trap in an instant.",
-    "win": "Your fingers find the mechanism without hesitation.",
-    "almost": "A click: the trigger grazes your finger.",
-    "fail": "The mechanism jams before the release.",
-    "epicfail": "The trap springs, merciless."
-   },
-   "Forza": {
-    "bigwin": "The door gives under a terrible blow.",
-    "win": "The hinges groan and yield.",
-    "almost": "The wood splits but still holds.",
-    "fail": "The door stands harder than you thought.",
-    "epicfail": "Your fist rebounds, hurting you."
-   },
-   "Intelletto": {
-    "bigwin": "The pieces snap into a luminous truth.",
-    "win": "The riddle opens like a rose.",
-    "almost": "One detail escapes, but you are close.",
-    "fail": "The solution slips through your fingers.",
-    "epicfail": "Your mind clouds before the mystery."
-   },
-   "Carisma": {
-    "bigwin": "Your words bend the world to your will.",
-    "win": "The listener relents with a sigh.",
-    "almost": "For a moment they almost yield, then no.",
-    "fail": "Your tone finds no purchase.",
-    "epicfail": "The room turns cold: you stand alone."
-   }
-  }
- },
- "stat": {
-  "damage": "Damage",
-  "accuracy": "Accuracy",
-  "critChance": "Crit Chance",
-  "critMult": "Crit Mult.",
-  "armorPen": "Armor Pen",
-  "penPercent": "Resist. Pen",
-  "armor": "Armor",
-  "resistance": "Resistance",
-  "evasion": "Evasion",
-  "block": "Block",
-  "ward": "Ward",
-  "energyShield": "Energy Shield",
-  "thorns": "Thorns",
-  "agility": "Agility",
-  "regen": "Regen",
-  "lifesteal": "Lifesteal",
-  "movementSpeed": "Move Speed",
-  "cooldownReduction": "Cooldown",
-  "castSpeed": "Cast Speed"
- },
- "gameFrame": {
-  "title": "Wanderlust",
-  "boot": {
-   "progress": "Loading progress",
-   "error": "The world could not be prepared",
-   "phase": {
-    "manifest": "Preparing the world",
-    "assets": "Painting the world",
-    "build": "Raising the islands",
-    "warmup": "Waking the winds",
-    "ready": "Ready"
-   },
-   "logoAlt": "Wanderlust: Triumph"
-  },
-  "nav": {
-   "ariaLabel": "Game sections",
-   "village": "Village",
-   "map": "Map",
-   "workshop": "Workshop",
-   "tavern": "Tavern",
-   "locked": "Not yet"
-  },
-  "resources": {
-   "gold": "Gold",
-   "food": "Food",
-   "wood": "Wood",
-   "incoming": "+{count} incoming",
-   "perDay": "−{count}/d",
-   "autonomy": "{count} d left",
-   "tooltip": {
-    "amount": "{label} {value}.",
-    "incoming": "Incoming from activities in progress: +{count}.",
-    "food": "{label} {value} of {max}. Residents eat {perDay} a day: enough for {days} days."
-   },
-   "iron": "Iron"
-  },
-  "speed": {
-   "ariaLabel": "Simulation speed",
-   "pause": "Pause",
-   "resume": "Resume",
-   "paused": "Paused",
-   "spaceKey": "Space"
-  },
-  "compass": {
-   "recenter": "Re-centre the map"
-  },
-  "status": {
-   "dayLabel": "Day"
-  },
-  "subtitle": "",
-  "place": "The Eastern Marches",
-  "invasion": {
-   "body": "A goblin host arrives in {count} days."
-  },
-  "events": {
-   "title": "Events",
-   "today": "today",
-   "daysLeft": "{count} d",
-   "empty": "Nothing on the horizon.",
-   "showMore": "Show all ({count})",
-   "showLess": "Show less",
-   "sort": {
-    "ariaLabel": "Sort events",
-    "due": "Due",
-    "type": "Type"
-   },
-   "types": {
-    "threat": "Threat",
-    "expedition": "Expedition",
-    "construction": "Construction",
-    "harvest": "Harvest",
-    "visit": "Visit",
-    "other": "Other",
-    "quest": "Quest"
-   },
-   "fixtures": {
-    "invasion": "Goblin host reaches the village",
-    "wolves": "Wolves sighted by the old woods",
-    "expedition": "Expedition returns from the north",
-    "granary": "Granary finished",
-    "harvest": "Wheat harvest ready",
-    "caravan": "A merchant caravan arrives"
-   },
-   "move": "Move panel"
-  },
-  "questPoi": {
-   "open": "{name} — open the quest",
-   "decisionWaiting": "The expedition awaits your decision"
-  },
-  "questLog": {
-   "outcome": {
-    "reward": "The expedition «{quest}» returned victorious.",
-    "survived": "The expedition «{quest}» made it back to the village.",
-    "fled": "The expedition «{quest}» retreated.",
-    "wipe": "The expedition «{quest}» did not come back."
-   },
-   "residentDead": "{name} fell on the expedition.",
-   "residentWounded": "{name} came back wounded from the expedition.",
-   "goldReward": "Quest reward: +{amount} gold ({quest}).",
-   "goldLoot": "Loot: +{amount} gold ({quest}).",
-   "xp": "Expedition experience: +{amount} XP ({quest}).",
-   "residentXp": "{name} gained {amount} XP ({quest})."
-  },
-  "questEpilogue": {
-   "title": "Expedition report",
-   "dead": "Fallen",
-   "wounded": "Wounded",
-   "consumed": "Spent and destroyed",
-   "reward": "Reward",
-   "loot": "Loot",
-   "xp": "Experience",
-   "info": "Learned",
-   "titles": "Titles",
-   "diseases": "Diseases",
-   "lore": "Echoes of the place",
-   "goldAmount": "+{amount} gold",
-   "xpAmount": "+{amount} XP",
-   "recovery": "recovers in ~{days} d",
-   "memberXp": "{name} +{amount} XP"
-  },
-  "director": {
-   "title": "Director",
-   "move": "Move",
-   "reset": "Reset scene",
-   "invasion": "Goblin invasion",
-   "quest": "Show quest",
-   "skin": "Skin: {name}",
-   "poiTypes": "POI types",
-   "questRun": "Start goblin quest",
-   "wonder": "Sea wonder",
-   "settlementLost": "Settlement lost",
-   "merchantMarker": "Merchant marker",
-   "levelUp": "Hero level-up"
+  "questReward": {
+    "panelTitle": "Rewards",
+    "eyebrowVictory": "Expedition returned",
+    "eyebrowDefeat": "Expedition broken",
+    "trialsPassed": "{passed} of {total} trials passed",
+    "trials": "Trials",
+    "passed": "Passed",
+    "failed": "Failed",
+    "rewards": "Rewards",
+    "noRewards": "The expedition brought nothing home",
+    "party": "Party",
+    "stateNone": "Unharmed",
+    "stateInjured": "Wounded",
+    "stateDead": "Fallen",
+    "collect": "Collect rewards"
   },
   "roster": {
-   "title": "Roster",
-   "ariaLabel": "Resident roster",
-   "ariaLabelNight": "Resident roster, night phase: dragging disabled",
-   "show": "Show roster",
-   "hide": "Hide roster",
-   "filter": {
-    "ariaLabel": "Filter residents by status",
-    "all": "All",
-    "heroes": "Heroes",
-    "injured": "Injured",
-    "available": "Available",
-    "exhausted": "Exhausted",
-    "away": "Away",
-    "dead": "Fallen"
-   },
-   "sort": {
-    "ariaLabel": "Sort residents by stat",
-    "placeholder": "Sort by…",
-    "asc": "Ascending",
-    "desc": "Descending"
-   }
-  },
-  "objective": {
-   "label": "Objective",
-   "available": "Send a party on “{name}”",
-   "running": "“{name}” is under way",
-   "done": "Collect the rewards of “{name}”"
-  },
-  "panel": {
-   "dragHint": "Drag the title bar to move · double-click to reset"
-  },
-  "panels": {
-   "title": "Panels",
-   "close": "Close panel",
-   "names": {
-    "roster": "Roster",
-    "events": "Events",
-    "director": "Director",
-    "tuning": "Tuning",
-    "quest": "Quest in progress",
-    "heroSheet": "Character sheet",
-    "villageStash": "Village stash",
-    "merchant": "Merchant"
-   },
-   "pin": "Pin panel",
-   "unpin": "Unpin panel"
-  },
-  "stash": {
-   "title": "Village stash",
-   "capacity": "{count} of {max} goods in store",
-   "qty": "{qty} in store"
-  },
-  "buildings": {
-   "stash": {
-    "name": "Village warehouse"
-   }
-  },
-  "menu": {
-   "title": "Menu",
-   "session": "Session",
-   "options": "Options",
-   "saveNow": "Save now",
-   "saving": "Saving…",
-   "saved": "Saved",
-   "loadGame": "Load game…",
-   "quit": "Quit to title",
-   "theme": "Theme",
-   "language": "Language",
-   "interfaceSize": "Interface size",
-   "interfaceSizeAuto": "Auto",
-   "interfaceSizeAutoHint": "Auto ({percent}%)",
-   "languages": {
-    "en": "English",
-    "it-IT": "Italiano"
-   },
-   "settings": "All settings…",
-   "comingSoon": "Not available yet"
-  },
-  "regions": {
-   "northern_forest": "Whispering Woods",
-   "southern_forest": "Hollow Wood",
-   "eastern_woods": "Eastern Groves",
-   "northern_peaks": "Northern Peaks",
-   "eastern_mountains": "Ember Highlands",
-   "southern_mountains": "Southern Crags",
-   "islands": "The Outer Isles",
-   "village": "The Village",
-   "meadows": "The Meadows"
-  },
-  "tuning": {
-   "reset": "Reset values",
-   "save": "Save",
-   "saved": "Saved ✓",
-   "bakeFailed": "Saved for this browser — the new defaults could not be written to the config (dev server only)."
-  },
-  "questWindow": {
-   "roster": "Assigned party",
-   "bag": "Bag",
-   "chronicle": "Chronicle",
-   "minimise": "Minimise",
-   "restore": "Reopen",
-   "waiting": "A decision is waiting",
-   "phaseLocked": "The phase is still on the road — its choices unlock when its time comes.",
-   "bagEmpty": "Bag is empty",
-   "bagStrip": {
-    "label": "Packed bag",
-    "chipName": "{label} ({qualifier})",
-    "armed": "armed",
-    "held": "carried"
-   },
-   "belt": {
-    "armed": "armed for the next check",
-    "shadowed": "covered by another armed item",
-    "inert": "no trial ahead needs it",
-    "actionArmed": "will be used at the next trial or fight",
-    "passive": "always in effect while packed"
-   },
-   "logEmpty": "The chronicle is empty",
-   "partyStatus": "Assigned party — {alive} of {total} standing",
-   "dead": "fallen",
-   "hpLost": "−{hp} HP",
-   "loot": "+{count, plural, one {# loot} other {# loot}}",
-   "clean": "Safe",
-   "moreLines": "+{count, plural, one {# more line in the chronicle} other {# more lines in the chronicle}}",
-   "inProgress": "Phase in progress",
-   "nextPhase": "Next phase",
-   "day": "Day {day} of {total}",
-   "returned": "Back home",
-   "noneReturned": "Nobody came back",
-   "phaseOf": "Phase {n} of {total}",
-   "inProgressShort": "now",
-   "hiddenEvent": "Hidden event — you could have missed it",
-   "close": "Close the report",
-   "abandon": "Abandon quest",
-   "abandonConfirm": "Are you sure you want to abandon the quest?",
-   "abandonYes": "Abandon",
-   "abandonStay": "Keep going",
-   "checkOptions": "Check options",
-   "checkOptionsSkipCheck": "Skip the whole check",
-   "checkOptionsSkipIntro": "Skip the opening animation",
-   "rewardClose": "Close",
-   "rewardHint": "Click or press a key to reveal",
-   "beats": {
-    "continue": "Continue",
-    "clickHint": "Click or press a key to continue",
-    "more": "{count, plural, one {# beat left — click or press a key} other {# beats left — click or press a key}}",
-    "recap": "While you were away: {scenes} scenes, {checks} checks, {deaths} fallen, {wounds} hurt"
-   },
-   "combat": {
-    "enemiesLeft": "{count, plural, one {# goblin standing} other {# goblins standing}}",
-    "incoming": "{count, plural, one {# hit coming} other {# hits coming}}",
-    "exposureHint": "Chance of taking the next hit"
-   },
-   "ticks": "{elapsed}/{total} ticks",
-   "checkOverlay": {
-    "titleSuffix": "skill check",
-    "dismiss": "Dismiss",
-    "dismissHint": "Click anywhere to continue — the details stay in the log.",
-    "scoreTitle": "Skill {{score}} vs difficulty {{difficulty}}"
-   },
-   "outcomeToast": {
-    "dismiss": "Dismiss outcome",
-    "logHint": "Recorded in the chronicle — click to dismiss."
-   }
-  },
-  "hud": {
-   "hide": "Hide HUD",
-   "show": "Show HUD"
-  },
-  "heroSheet": {
-   "prev": "Previous character",
-   "next": "Next character",
-   "pin": "Pin sheet",
-   "unpin": "Unpin sheet",
-   "loadout": "Loadout",
-   "inventory": "Inventory",
-   "inventoryEmpty": "Empty"
-  },
-  "merchant": {
-   "title": "Trader Rowen",
-   "previewBadge": "Preview",
-   "restockNote": "Rowen restocks when the road is kind",
-   "markerName": "Trader's stall",
-   "priceLine": "{price} {currency}",
-   "currency": {
-    "gold": "gold"
-   },
-   "buy": {
-    "button": "Buy",
-    "previewLabel": "preview only",
-    "previewTooltip": "Trading arrives with the economy update — this screen is a preview"
-   },
-   "offers": {
-    "healingDraught": {
-     "name": "Healing draughts, three to a crate",
-     "desc": "Bitter green glass, sealed with wax — a wound that closes before the road turns.",
-     "stock": "One crate left"
+    "sort": {
+      "label": "Sort",
+      "nameAsc": "Name A → Z",
+      "nameDesc": "Name Z → A",
+      "hpDesc": "HP",
+      "fatigueAsc": "Fatigue",
+      "nameAscTooltip": "Sort: Name A → Z (click to reverse)",
+      "nameDescTooltip": "Sort: Name Z → A (click to reverse)",
+      "hpDescTooltip": "Sort: HP (highest first)",
+      "fatigueAscTooltip": "Sort: Fatigue (lowest first)",
+      "nameAscDescription": "Sort by display name alphabetically (A to Z)",
+      "nameDescDescription": "Sort by display name alphabetically (Z to A)",
+      "hpDescDescription": "Sort by current HP (highest first)",
+      "fatigueAscDescription": "Sort by fatigue (lowest first)"
     },
-    "fieldRations": {
-     "name": "Field rations for the long march",
-     "desc": "Hardtack, dried apples and salted fish — food that keeps its nerve longer than you will.",
-     "stock": "Plenty, while the ovens hold"
-    },
-    "smokeBomb": {
-     "name": "Smoke bombs, a pair",
-     "desc": "Clay shells of grey powder — cover for a retreat no one remembers making.",
-     "stock": "A pair only"
-    },
-    "wardCharm": {
-     "name": "Iron ward-charm",
-     "desc": "A cold nail of meteoric iron on a cord — luck you can hold when the dark gets close.",
-     "stock": "The last one he brought north"
-    }
-   }
-  },
-  "heroLevel": {
-   "badge": "Lv {n}",
-   "floater": "Level {n}",
-   "a11y": "Level {n} hero"
-  },
-  "village": {
-   "ariaLabel": "Village — buildings",
-   "pinsToolbar": "Village buildings",
-   "levelShort": "Lv {level}",
-   "levelBadge": "Lv {level}/{max}",
-   "effectLabel": "Effect",
-   "costLabel": "Cost",
-   "daysShort": "{days} d",
-   "openStash": "Open warehouse",
-   "openMerchant": "Open merchant",
-   "state": {
-    "built": "Built",
-    "buildable": "Buildable",
-    "locked": "Locked"
-   },
-   "category": {
-    "production": "Production",
-    "civic": "Civic",
-    "defense": "Defense",
-    "arcane": "Arcane"
-   },
-   "upgrade": {
-    "build": "Build",
-    "upgrade": "Upgrade",
-    "maxLevel": "Max level",
-    "previewLabel": "preview only",
-    "previewTooltip": "Construction arrives with the economy update — this screen is a preview"
-   },
-   "buildings": {
-    "lumbermill": {
-     "name": "Lumbermill",
-     "desc": "Fells timber from the eastern pines.",
-     "effect": "Wood per day: {value} → {next}"
-    },
-    "quarry": {
-     "name": "Quarry",
-     "desc": "Cuts stone and ore from the western cliffs.",
-     "effect": "Iron per day: {value} → {next}"
-    },
-    "farm": {
-     "name": "Farm",
-     "desc": "Tills the meadow along the stream.",
-     "effect": "Food per day: {value} → {next}"
-    },
-    "warehouse": {
-     "name": "Warehouse",
-     "desc": "Keeps the village's stock under lock and key.",
-     "effect": "Storage capacity: {value} → {next}"
-    },
-    "inn": {
-     "name": "Inn",
-     "desc": "Warm beds and a hearth that draw in new folk.",
-     "effect": "Villager capacity: {value} → {next}"
-    },
-    "smithy": {
-     "name": "Smithy",
-     "desc": "Forges tools and gear for work and quest.",
-     "effect": "Forge output: {value} → {next}"
-    },
-    "market": {
-     "name": "Market",
-     "desc": "The trader's stall on the village square.",
-     "effect": "Gold per day: {value} → {next}"
-    },
-    "infirmary": {
-     "name": "Infirmary",
-     "desc": "Herbs and quiet beds for the wounded.",
-     "effect": "Injury recovery: {value} → {next}",
-     "unlockHint": "Unlocked by a quest reward."
-    },
-    "palisade": {
-     "name": "Palisade",
-     "desc": "Sharpened stakes guarding the west approach.",
-     "effect": "Defense: {value} → {next}"
-    },
-    "watchtower": {
-     "name": "Watchtower",
-     "desc": "Eyes over the valley mouth.",
-     "effect": "Raid warning: {value} → {next} d"
-    },
-    "barracks": {
-     "name": "Barracks",
-     "desc": "Bunks and drills for the village militia.",
-     "effect": "Militia capacity: {value} → {next}",
-     "unlockHint": "Requires Palisade at level II."
-    },
-    "mageTower": {
-     "name": "Mage Tower",
-     "desc": "A crooked spire where the village witch reads the wind.",
-     "effect": "Research per day: {value} → {next}"
-    },
-    "adventurersGuild": {
-     "name": "Adventurers' Guild",
-     "desc": "A hall of maps, contracts and scarred regulars.",
-     "effect": "Quest slots: +{value} → +{next}",
-     "unlockHint": "Unlocked after completing the first quest line."
-    },
-    "sanctuary": {
-     "name": "Sanctuary",
-     "desc": "A candlelit shrine for the fallen and the faithful.",
-     "effect": "Morale bonus: +{value} → +{next}",
-     "unlockHint": "Requires the Sanctuary quest reward."
-    },
-    "alchemist": {
-     "name": "Alchemist",
-     "desc": "Bubbling flasks and powders that bite back.",
-     "effect": "Potion brewing: {value} → {next}",
-     "unlockHint": "Requires a recovered alchemical tome."
-    },
-    "cemetery": {
-     "name": "Cemetery",
-     "desc": "Quiet rows of stones at the foot of the hill.",
-     "effect": "Remembrance: {value} → {next}",
-     "unlockHint": "Requires the Sanctuary."
-    }
-   },
-   "title": "Village",
-   "builtCount": "{built} of {total} built",
-   "legend": {
-    "title": "Legend",
-    "badgeLevel": "level built",
-    "badgeBuild": "can be built",
-    "badgeLocked": "locked",
-    "keys": "← → buildings · Enter details · Esc map"
-   },
-   "registry": {
-    "chip": "Registry",
-    "pending": "{count} to build or unlock",
-    "title": "Settlement Registry",
-    "hint": "Esc to close",
-    "filterLabel": "Filter buildings",
     "filter": {
-     "all": "All",
-     "built": "Built",
-     "buildable": "Buildable",
-     "locked": "Locked"
+      "label": "Filter",
+      "statLabel": "Stat",
+      "operatorLabel": "Operator",
+      "thresholdLabel": "Threshold",
+      "thresholdAriaLabel": "Filter threshold value",
+      "addFilter": "Add",
+      "addFilterAriaLabel": "Add filter",
+      "clearFilters": "Clear",
+      "clearFiltersAriaLabel": "Clear all filters",
+      "removeFilterAriaLabel": "Remove filter",
+      "noResults": "No residents match current filters",
+      "stat": {
+        "hp": "HP",
+        "hpTooltip": "Health Points",
+        "hpDescription": "Current health points",
+        "damage": "Damage",
+        "damageTooltip": "Damage",
+        "damageDescription": "Base damage value",
+        "txc": "TxC",
+        "txcTooltip": "To-Hit Chance",
+        "txcDescription": "Flat to-hit chance bonus",
+        "evasion": "Evasion",
+        "evasionTooltip": "Evasion",
+        "evasionDescription": "Flat evasion value",
+        "agility": "Agility",
+        "agilityTooltip": "Agility",
+        "agilityDescription": "Initiative stat for turn order",
+        "hitChance": "Hit Chance",
+        "hitChanceTooltip": "Hit Chance %",
+        "hitChanceDescription": "Calculated hit chance percentage",
+        "effectiveDamage": "Effective Damage",
+        "effectiveDamageTooltip": "Effective Damage",
+        "effectiveDamageDescription": "Damage after mitigation",
+        "htk": "Hits to Kill",
+        "htkTooltip": "Hits to Kill",
+        "htkDescription": "Number of hits to kill target",
+        "critChance": "Crit Chance",
+        "critChanceTooltip": "Critical Chance %",
+        "critChanceDescription": "Critical hit chance percentage",
+        "armor": "Armor",
+        "armorTooltip": "Armor",
+        "armorDescription": "Flat armor value",
+        "resistance": "Resistance",
+        "resistanceTooltip": "Resistance %",
+        "resistanceDescription": "Damage resistance percentage",
+        "lifesteal": "Lifesteal",
+        "lifestealTooltip": "Lifesteal %",
+        "lifestealDescription": "Lifesteal percentage",
+        "regen": "Regen",
+        "regenTooltip": "Regeneration",
+        "regenDescription": "Health regeneration per turn",
+        "ward": "Ward",
+        "wardTooltip": "Ward",
+        "wardDescription": "Flat shield value",
+        "block": "Block",
+        "blockTooltip": "Block %",
+        "blockDescription": "Block chance percentage",
+        "unknown": "Unknown",
+        "unknownTooltip": "Unknown stat",
+        "unknownDescription": "Unknown stat"
+      },
+      "operator": {
+        "greaterThan": ">",
+        "greaterThanTooltip": "Greater than",
+        "greaterThanDescription": "Stat is greater than threshold",
+        "lessThan": "<",
+        "lessThanTooltip": "Less than",
+        "lessThanDescription": "Stat is less than threshold",
+        "equals": "=",
+        "equalsTooltip": "Equals",
+        "equalsDescription": "Stat equals threshold",
+        "greaterThanOrEqual": ">=",
+        "greaterThanOrEqualTooltip": "Greater than or equal",
+        "greaterThanOrEqualDescription": "Stat is greater than or equal to threshold",
+        "lessThanOrEqual": "<=",
+        "lessThanOrEqualTooltip": "Less than or equal",
+        "lessThanOrEqualDescription": "Stat is less than or equal to threshold"
+      }
     },
-    "sectionCount": "{built}/{total}",
-    "onMap": "On the map",
-    "offMap": "Registry only",
+    "status": {
+      "active": "Active",
+      "injured": "Injured",
+      "dead": "Fallen",
+      "exhausted": "Exhausted",
+      "away": "Away",
+      "assigned": "Assigned"
+    },
+    "stats": {
+      "hp": "Health",
+      "stamina": "Stamina",
+      "xpTitle": "{name} · {xp} XP"
+    }
+  },
+  "slowMo": "Slow Mo",
+  "spinDuration": "Spin Duration",
+  "stats": "Stats",
+  "threatStatus": {
+    "title": "THREAT STATUS",
+    "page": {
+      "title": "Threat Status Indicator",
+      "description": "Client-only component showcase for use client directive"
+    },
+    "urgency": {
+      "calm": "CALM",
+      "warning": "WARNING",
+      "critical": "CRITICAL"
+    },
+    "type": {
+      "GOBLIN_RAID": "Goblin Raid",
+      "PLAGUE": "Plague",
+      "SIEGE": "Siege"
+    }
+  },
+  "verdict": "Verdict",
+  "world": {
+    "title": "World Surface",
+    "loading": "Loading world surface…",
+    "error": "Failed to load world surface",
+    "lab": {
+      "title": "Sea Effect Lab",
+      "baseline": "Baseline",
+      "waterField": "Water field",
+      "back": "Back"
+    },
     "back": "Back",
-    "effectLadder": "Effects by level"
-   }
-  }
- },
- "missionPlanner": {
-  "band": {
-   "odds": {
-    "high": "Likely",
-    "mid": "Uncertain",
-    "low": "Unlikely"
-   },
-   "risk": {
-    "high": "High",
-    "mid": "Moderate",
-    "low": "Low"
-   }
+    "camera": {
+      "reset": "Reset camera"
+    },
+    "layers": {
+      "title": "Layers",
+      "scale": "Scale",
+      "offsetX": "Offset X",
+      "offsetY": "Offset Y",
+      "saveDefaults": "Save defaults",
+      "dragHandle": "Drag to reorder"
+    },
+    "clouds": {
+      "scales": "Cloud scales",
+      "scale": "scale",
+      "far": "Far",
+      "mid": "Mid",
+      "near": "Near"
+    },
+    "states": {
+      "default": "Default",
+      "corrupted": "Corrupted",
+      "threat_manifesting": "Manifesting",
+      "threatened": "Threatened"
+    },
+    "region": {
+      "enchanted_forest": "Enchanted Forest"
+    },
+    "anchors": {
+      "village_01": "Village 01"
+    },
+    "goblinInvasion": {
+      "title": "GOBLIN INVASION!",
+      "subtitle": "In {count} days an army will attack!",
+      "action": "PREPARE THE DEFENSES",
+      "viewDefenses": "VIEW DEFENSES",
+      "invasion": "Invasion",
+      "eventLabel": "Goblin Invasion",
+      "daysRemaining": "Days Remaining: {count}",
+      "timerLabel": "DAYS REMAINING",
+      "warTable": {
+        "eventLabel": "WORLD EVENT · THREAT",
+        "description": "A goblin army is marching on your lands.",
+        "parchmentDescription": "A goblin army is marching on our lands. Our scouts have spotted large enemy forces moving in from the north toward your stronghold.",
+        "willBeAttacked": "YOUR VILLAGE WILL BE ATTACKED.",
+        "scoutReport": "Our scouts report a massive goblin vanguard marching from the Northern Wastes. Their target is clear: your stronghold will be razed unless defenses are prepared.",
+        "worldEvent": "World Event",
+        "enemy": "ENEMY FORCE",
+        "enemySub": "Moving from the north",
+        "village": "YOUR VILLAGE",
+        "villageSub": "Primary target",
+        "targetObjective": "Target Objective",
+        "threatLevelHigh": "Threat Level: High",
+        "threatLevelCritical": "Threat Level: Critical",
+        "threat": "THREAT",
+        "faction": "GOBLIN ARMY",
+        "factionSub": "Large hostile force detected",
+        "hostileForce": "Hostile Force",
+        "warbands": "~3,500 Warbands",
+        "enemyCount": "3,200+",
+        "enemyUnit": "GOBLINS",
+        "arrivalCount": "2",
+        "arrivalUnit": "DAYS",
+        "targetName": "YOUR VILLAGE",
+        "arrival": "ARRIVAL",
+        "arrivalIn": "Arrival In",
+        "days": "DAYS",
+        "remaining": "REMAINING",
+        "estimatedArrival": "Estimated Arrival",
+        "timeRemaining": "Time Remaining",
+        "dismiss": "Dismiss",
+        "dismissReport": "Dismiss Report"
+      },
+      "reminder": {
+        "days_singular": "DAY",
+        "days_plural": "DAYS",
+        "band_distant": "APPROACHING",
+        "band_closing": "CLOSING IN",
+        "band_imminent": "TOMORROW"
+      }
+    },
+    "debug": {
+      "title": "Debug",
+      "statesTitle": "States",
+      "camera": "Camera",
+      "mouseWorld": "Mouse (world)",
+      "activeState": "Active state",
+      "regions": "Regions",
+      "anchors": "Anchors",
+      "renderer": "Renderer",
+      "objects": "Objects",
+      "spawnObjects": "Spawn 60",
+      "clearObjects": "Clear",
+      "spawnWonders": "Spawn wonders",
+      "despawnWonders": "Despawn wonders",
+      "breath": "Breath",
+      "water": "Water",
+      "atmosphere": "Atmosphere",
+      "seaPattern": "Pattern",
+      "seaPatternTitle": "Sea pattern — live",
+      "seaPatternLive": "Authored texture A1 / micro scroll",
+      "seaPatternClose": "Close",
+      "seaPatternScale": "Pattern scale",
+      "seaPatternOpacity": "Line opacity",
+      "seaPatternColor": "Line color",
+      "seaPatternMotion": "Motion amount",
+      "seaPatternPeriod": "Motion period",
+      "seaPatternAngle": "Motion angle",
+      "seaPatternMotionEnabled": "Motion on",
+      "reducedMotion": "reduced motion",
+      "hideUi": "Hide UI",
+      "showUi": "Show UI",
+      "settlementLost": "Settlement Lost",
+      "seaPatternSaveDefault": "Save as default",
+      "seaPatternSaving": "Saving…",
+      "seaPatternSaved": "Defaults written to source",
+      "seaPatternSaveFailed": "Save failed (dev server only)"
+    },
+    "settlementLost": {
+      "title": "SETTLEMENT LOST",
+      "subtitle": "The settlement has fallen. What was learned carries on.",
+      "lossesTitle": "What was lost",
+      "cta": "BEGIN A NEW SETTLEMENT",
+      "losses": {
+        "walls": "The walls were breached",
+        "heroes": "Your heroes have fallen",
+        "stores": "The stores are lost"
+      },
+      "stats": {
+        "daysSurvived": "Days survived",
+        "residentsLost": "Residents lost",
+        "goldEarned": "Gold earned"
+      }
+    }
   },
-  "required": "required",
-  "ifEmpty": "If left empty:",
-  "modifier": {
-   "death": "Death",
-   "injury": "Injury",
-   "power": "Power"
+  "worldEvents": {
+    "weather": "Weather",
+    "threat": "Threat",
+    "resource": "Resource",
+    "weather-tint": "Weather Tint",
+    "threat-tint": "Threat Tint",
+    "resource-tint": "Resource Tint"
   },
-  "title": "Planner",
-  "subtitle": "Every change updates the outcomes instantly",
-  "input": "Input",
-  "output": "Outcome",
-  "party": "Party",
-  "outcome": "Outcome",
-  "success": "Success",
-  "injury": "Injury",
-  "death": "Death",
-  "duration": "Duration",
-  "phases": "By phase",
-  "byMember": "By member",
-  "why": "Why",
-  "hp": "HP",
-  "launch": "Depart",
-  "addMember": "Add to party",
-  "noLoadout": "No equipment",
-  "remove": "Remove {name}",
-  "trend": {
-   "better": "improves",
-   "worse": "worsens",
-   "same": "unchanged"
+  "woundPercent": "Wound Percent",
+  "pgDetailCard": {
+    "close": "Close character sheet",
+    "profile": "Profile",
+    "fullFigure": "Full figure",
+    "openArchetype": "Open archetype",
+    "unknownPreset": "Unknown preset: {id}",
+    "hp": {
+      "label": "HP"
+    },
+    "fatigue": {
+      "label": "Fatigue",
+      "ready": "Ready",
+      "exhausted": "Exhausted"
+    },
+    "statistics": {
+      "label": "Statistics",
+      "count": "{count} values",
+      "empty": "No snapshot available.",
+      "category": {
+        "offense": "Offense",
+        "defense": "Defense",
+        "utility": "Utility"
+      }
+    },
+    "inventory": {
+      "label": "Inventory",
+      "empty": "No items recorded."
+    },
+    "equipment": {
+      "label": "Loadout",
+      "weapon": "Weapon",
+      "offhand": "Off hand",
+      "armor": "Armor",
+      "trinket": "Trinket",
+      "ring": "Ring",
+      "mount": "Mount",
+      "empty": "Empty"
+    },
+    "status": {
+      "available": "Available",
+      "away": "Away",
+      "exhausted": "Exhausted",
+      "injured": "Injured",
+      "dead": "Dead"
+    },
+    "vitals": {
+      "hp": "HP",
+      "stamina": "STA"
+    }
   },
-  "items": {
-   "draftHorse": "Draft Horse",
-   "ironBlade": "Iron Blade",
-   "heavyPlate": "Heavy Plate",
-   "guardianBanner": "Guardian Banner",
-   "healingDraught": "Healing Draught",
-   "luckyCoin": "Lucky Coin"
+  "heroComponentsLab": {
+    "title": "Hero Components Lab",
+    "subtitle": "Placeholder catalog for the hero sheet, equipment, items, consumables and skills.",
+    "sectionA": "A — Character Sheet",
+    "sectionB": "B — Equip Slot Rack",
+    "sectionC": "C — Equippable Item Card",
+    "sectionD": "D — Consumable Pile",
+    "sectionE": "E — Equippable Skill Deck",
+    "rarity": "Rarity",
+    "effect": "Effect",
+    "slot": "Slot",
+    "use": "Use",
+    "availableSkills": "Available skills",
+    "equippedSkills": "Equipped skills",
+    "empty": "Empty",
+    "grantedSkill": "Granted by equipment",
+    "selectedSlot": "Selected slot",
+    "unequip": "Unequip",
+    "selectItem": "Select item",
+    "equip": "Equip"
   },
-  "eyebrow": "Expedition plan",
-  "route": "The road",
-  "rule": "Success = passing at least half of the trials",
-  "stage": "Trial {n}",
-  "hoursShort": "h",
-  "perMemberRoll": "Base risk per member, rolled at every trial",
-  "company": "The company",
-  "available": "Available",
-  "provisions": "Provisions",
-  "anyDeath": "At least one fallen",
-  "anyInjury": "At least one wounded",
-  "reward": "Expected reward",
-  "undo": "Undo",
-  "reset": "Reset",
-  "pickFromRoster": "Pick someone from the available",
-  "unavailable": "unavailable",
-  "haloHint": "Outer ring: death · inner ring: injury",
-  "whyEmpty": "Form the company to see what decides the outcome.",
-  "phaseType": {
-   "check": "Trial",
-   "fight": "Fight",
-   "trap": "Trap",
-   "event": "Event"
+  "poiVisualPreview": {
+    "title": "POI Medallion Preview",
+    "v1Label": "GenericPoiSkin V1 (Amber)",
+    "v2Label": "GenericPoiSkin V2 (Materic)"
   },
-  "equipSlot": {
-   "weapon": "Weapon",
-   "armor": "Armor",
-   "mount": "Mount",
-   "trinket": "Trinket"
+  "equipment": {
+    "label": "Equipment",
+    "title": "Equipment Creator",
+    "subtitle": "Forge items from base templates",
+    "description": "Choose an item type, adjust stat modifiers, spend your equipment budget, and save. Weapons always link a base attack skill; armor and trinkets provide passive modifiers.",
+    "identity": "Identity",
+    "name": "Name",
+    "namePlaceholder": "New equipment",
+    "type": "Type",
+    "rarityLabel": "Rarity",
+    "types": {
+      "weapon": "Weapon",
+      "armor": "Armor",
+      "offhand": "Off hand",
+      "trinket": "Trinket",
+      "ring": "Ring",
+      "mount": "Mount"
+    },
+    "rarity": {
+      "poor": "Poor",
+      "common": "Common",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary",
+      "masterpiece": "Masterpiece"
+    },
+    "preview": "Preview",
+    "tier": "Tier",
+    "searchSkill": "Search skill...",
+    "addSkill": "Add granted skill",
+    "removeSkill": "Remove granted skill",
+    "defaultSaved": "Default configuration saved",
+    "grantedSkill": "Granted skill",
+    "stats": "Stat modifiers",
+    "stat": {
+      "hp": "HP",
+      "damage": "Damage",
+      "txc": "TxC",
+      "evasion": "Evasion",
+      "critChance": "Crit chance",
+      "critMult": "Crit mult",
+      "armor": "Armor",
+      "resistance": "Resistance",
+      "armorPen": "Armor pen",
+      "penPercent": "Pen %",
+      "lifesteal": "Lifesteal",
+      "regen": "Regen",
+      "ward": "Ward",
+      "block": "Block",
+      "movementSpeed": "Movement speed"
+    },
+    "balance": "Balance",
+    "power": "Power",
+    "cost": "Cost",
+    "budget": "Budget",
+    "balanceBar": "Budget usage",
+    "balanced": "Within budget ({balance} points free)",
+    "overBudget": "Over budget by {balance} points",
+    "save": "Save equipment",
+    "saved": "Equipment saved",
+    "saveFailed": "Failed to save equipment",
+    "unnamed": "Unnamed equipment",
+    "reset": "Reset",
+    "saveDefault": "Save default",
+    "library": "Equipment library",
+    "new": "New",
+    "emptyLibrary": "No equipment in library.",
+    "edit": "Edit",
+    "loading": "Loading..."
   },
-  "metric": {
-   "success": "Success",
-   "injury": "Injury",
-   "death": "Death",
-   "duration": "Duration",
-   "reward": "Reward"
+  "astrolabeV63": {
+    "check": "Check",
+    "statVsDc": "{stat} vs difficulty {difficulty}",
+    "probability": "Success chance ~{pct}%",
+    "risk": "Wound {wound}% · Death {dead}%",
+    "riskWounded": "Wounded",
+    "riskDead": "Fallen",
+    "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
+    "verdict": {
+      "bigwin": "TRIUMPH",
+      "win": "SUCCESS",
+      "almost": "BY A BREATH",
+      "fail": "FAILURE",
+      "epicfail": "DISASTER"
+    },
+    "narrative": {
+      "bigwin": "Fate bows to your step.",
+      "win": "The trial yields to your effort.",
+      "almost": "A breath, and the truth escapes you.",
+      "fail": "Your grip slips.",
+      "epicfail": "The world pushes you back.",
+      "Atletica": {
+        "bigwin": "You clear every barrier with a legendary leap.",
+        "win": "Your body sails past the obstacle.",
+        "almost": "Your foot slips, but you catch the edge.",
+        "fail": "The obstacle holds against your push.",
+        "epicfail": "You fall hard, breath knocked from your lungs."
+      },
+      "Destrezza": {
+        "bigwin": "Your wrists outrace the trap in an instant.",
+        "win": "Your fingers find the mechanism without hesitation.",
+        "almost": "A click: the trigger grazes your finger.",
+        "fail": "The mechanism jams before the release.",
+        "epicfail": "The trap springs, merciless."
+      },
+      "Forza": {
+        "bigwin": "The door gives under a terrible blow.",
+        "win": "The hinges groan and yield.",
+        "almost": "The wood splits but still holds.",
+        "fail": "The door stands harder than you thought.",
+        "epicfail": "Your fist rebounds, hurting you."
+      },
+      "Intelletto": {
+        "bigwin": "The pieces snap into a luminous truth.",
+        "win": "The riddle opens like a rose.",
+        "almost": "One detail escapes, but you are close.",
+        "fail": "The solution slips through your fingers.",
+        "epicfail": "Your mind clouds before the mystery."
+      },
+      "Carisma": {
+        "bigwin": "Your words bend the world to your will.",
+        "win": "The listener relents with a sigh.",
+        "almost": "For a moment they almost yield, then no.",
+        "fail": "Your tone finds no purchase.",
+        "epicfail": "The room turns cold: you stand alone."
+      }
+    }
   },
-  "cause": {
-   "stat": "{who} · {stat}",
-   "slot": "{slot} ({who})",
-   "emptyPenalty": "Empty slots",
-   "cover": "{who}'s cover"
+  "astrolabeV64": {
+    "check": "Check",
+    "statVsDc": "{stat} vs difficulty {difficulty}",
+    "probability": "Success chance ~{pct}%",
+    "risk": "Wound {wound}% · Death {dead}%",
+    "riskWounded": "Wounded",
+    "riskDead": "Fallen",
+    "mathFmt": "D100 {roll} · TST = 50 + ({stat} − {difficulty}) = {tst}",
+    "verdict": {
+      "bigwin": "TRIUMPH",
+      "win": "SUCCESS",
+      "almost": "BY A BREATH",
+      "fail": "FAILURE",
+      "epicfail": "DISASTER"
+    },
+    "narrative": {
+      "bigwin": "Fate bows to your step.",
+      "win": "The trial yields to your effort.",
+      "almost": "A breath, and the truth escapes you.",
+      "fail": "Your grip slips.",
+      "epicfail": "The world pushes you back.",
+      "Atletica": {
+        "bigwin": "You clear every barrier with a legendary leap.",
+        "win": "Your body sails past the obstacle.",
+        "almost": "Your foot slips, but you catch the edge.",
+        "fail": "The obstacle holds against your push.",
+        "epicfail": "You fall hard, breath knocked from your lungs."
+      },
+      "Destrezza": {
+        "bigwin": "Your wrists outrace the trap in an instant.",
+        "win": "Your fingers find the mechanism without hesitation.",
+        "almost": "A click: the trigger grazes your finger.",
+        "fail": "The mechanism jams before the release.",
+        "epicfail": "The trap springs, merciless."
+      },
+      "Forza": {
+        "bigwin": "The door gives under a terrible blow.",
+        "win": "The hinges groan and yield.",
+        "almost": "The wood splits but still holds.",
+        "fail": "The door stands harder than you thought.",
+        "epicfail": "Your fist rebounds, hurting you."
+      },
+      "Intelletto": {
+        "bigwin": "The pieces snap into a luminous truth.",
+        "win": "The riddle opens like a rose.",
+        "almost": "One detail escapes, but you are close.",
+        "fail": "The solution slips through your fingers.",
+        "epicfail": "Your mind clouds before the mystery."
+      },
+      "Carisma": {
+        "bigwin": "Your words bend the world to your will.",
+        "win": "The listener relents with a sigh.",
+        "almost": "For a moment they almost yield, then no.",
+        "fail": "Your tone finds no purchase.",
+        "epicfail": "The room turns cold: you stand alone."
+      }
+    }
   },
   "stat": {
-   "strength": "Strength",
-   "agility": "Agility",
-   "perception": "Perception",
-   "intelligence": "Intelligence",
-   "endurance": "Endurance"
+    "damage": "Damage",
+    "accuracy": "Accuracy",
+    "critChance": "Crit Chance",
+    "critMult": "Crit Mult.",
+    "armorPen": "Armor Pen",
+    "penPercent": "Resist. Pen",
+    "armor": "Armor",
+    "resistance": "Resistance",
+    "evasion": "Evasion",
+    "block": "Block",
+    "ward": "Ward",
+    "energyShield": "Energy Shield",
+    "thorns": "Thorns",
+    "agility": "Agility",
+    "regen": "Regen",
+    "lifesteal": "Lifesteal",
+    "movementSpeed": "Move Speed",
+    "cooldownReduction": "Cooldown",
+    "castSpeed": "Cast Speed"
   },
-  "issue": {
-   "EMPTY_REQUIRED_SLOT": "Required slots are empty",
-   "RESIDENT_MISSING": "A member is no longer available",
-   "ITEM_UNKNOWN": "Unknown item",
-   "ITEM_SLOT_MISMATCH": "Item in the wrong slot",
-   "CONSUMABLE_OVER_STOCK": "Not enough provisions",
-   "PARTY_TOO_LARGE": "Company too large"
+  "gameFrame": {
+    "title": "Wanderlust",
+    "boot": {
+      "progress": "Loading progress",
+      "error": "The world could not be prepared",
+      "phase": {
+        "manifest": "Preparing the world",
+        "assets": "Painting the world",
+        "build": "Raising the islands",
+        "warmup": "Waking the winds",
+        "ready": "Ready"
+      },
+      "logoAlt": "Wanderlust: Triumph"
+    },
+    "nav": {
+      "ariaLabel": "Game sections",
+      "village": "Village",
+      "map": "Map",
+      "workshop": "Workshop",
+      "tavern": "Tavern",
+      "locked": "Not yet"
+    },
+    "resources": {
+      "gold": "Gold",
+      "food": "Food",
+      "wood": "Wood",
+      "incoming": "+{count} incoming",
+      "perDay": "−{count}/d",
+      "autonomy": "{count} d left",
+      "tooltip": {
+        "amount": "{label} {value}.",
+        "incoming": "Incoming from activities in progress: +{count}.",
+        "food": "{label} {value} of {max}. Residents eat {perDay} a day: enough for {days} days."
+      },
+      "iron": "Iron"
+    },
+    "speed": {
+      "ariaLabel": "Simulation speed",
+      "pause": "Pause",
+      "resume": "Resume",
+      "paused": "Paused",
+      "spaceKey": "Space"
+    },
+    "compass": {
+      "recenter": "Re-centre the map"
+    },
+    "status": {
+      "dayLabel": "Day"
+    },
+    "subtitle": "",
+    "place": "The Eastern Marches",
+    "invasion": {
+      "body": "A goblin host arrives in {count} days."
+    },
+    "events": {
+      "title": "Events",
+      "today": "today",
+      "daysLeft": "{count} d",
+      "empty": "Nothing on the horizon.",
+      "showMore": "Show all ({count})",
+      "showLess": "Show less",
+      "sort": {
+        "ariaLabel": "Sort events",
+        "due": "Due",
+        "type": "Type"
+      },
+      "types": {
+        "threat": "Threat",
+        "expedition": "Expedition",
+        "construction": "Construction",
+        "harvest": "Harvest",
+        "visit": "Visit",
+        "other": "Other",
+        "quest": "Quest"
+      },
+      "fixtures": {
+        "invasion": "Goblin host reaches the village",
+        "wolves": "Wolves sighted by the old woods",
+        "expedition": "Expedition returns from the north",
+        "granary": "Granary finished",
+        "harvest": "Wheat harvest ready",
+        "caravan": "A merchant caravan arrives"
+      },
+      "move": "Move panel"
+    },
+    "questPoi": {
+      "open": "{name} — open the quest",
+      "decisionWaiting": "The expedition awaits your decision"
+    },
+    "questLog": {
+      "outcome": {
+        "reward": "The expedition «{quest}» returned victorious.",
+        "survived": "The expedition «{quest}» made it back to the village.",
+        "fled": "The expedition «{quest}» retreated.",
+        "wipe": "The expedition «{quest}» did not come back."
+      },
+      "residentDead": "{name} fell on the expedition.",
+      "residentWounded": "{name} came back wounded from the expedition.",
+      "goldReward": "Quest reward: +{amount} gold ({quest}).",
+      "goldLoot": "Loot: +{amount} gold ({quest}).",
+      "xp": "Expedition experience: +{amount} XP ({quest}).",
+      "residentXp": "{name} gained {amount} XP ({quest})."
+    },
+    "questEpilogue": {
+      "title": "Expedition report",
+      "dead": "Fallen",
+      "wounded": "Wounded",
+      "consumed": "Spent and destroyed",
+      "reward": "Reward",
+      "loot": "Loot",
+      "xp": "Experience",
+      "info": "Learned",
+      "titles": "Titles",
+      "diseases": "Diseases",
+      "lore": "Echoes of the place",
+      "goldAmount": "+{amount} gold",
+      "xpAmount": "+{amount} XP",
+      "recovery": "recovers in ~{days} d",
+      "memberXp": "{name} +{amount} XP"
+    },
+    "director": {
+      "title": "Director",
+      "move": "Move",
+      "reset": "Reset scene",
+      "invasion": "Goblin invasion",
+      "quest": "Show quest",
+      "skin": "Skin: {name}",
+      "poiTypes": "POI types",
+      "questRun": "Start goblin quest",
+      "wonder": "Sea wonder",
+      "settlementLost": "Settlement lost",
+      "merchantMarker": "Merchant marker",
+      "levelUp": "Hero level-up"
+    },
+    "roster": {
+      "title": "Roster",
+      "ariaLabel": "Resident roster",
+      "ariaLabelNight": "Resident roster, night phase: dragging disabled",
+      "show": "Show roster",
+      "hide": "Hide roster",
+      "filter": {
+        "ariaLabel": "Filter residents by status",
+        "all": "All",
+        "heroes": "Heroes",
+        "injured": "Injured",
+        "available": "Available",
+        "exhausted": "Exhausted",
+        "away": "Away",
+        "dead": "Fallen"
+      },
+      "sort": {
+        "ariaLabel": "Sort residents by stat",
+        "placeholder": "Sort by…",
+        "asc": "Ascending",
+        "desc": "Descending"
+      }
+    },
+    "objective": {
+      "label": "Objective",
+      "available": "Send a party on “{name}”",
+      "running": "“{name}” is under way",
+      "done": "Collect the rewards of “{name}”"
+    },
+    "panel": {
+      "dragHint": "Drag the title bar to move · double-click to reset"
+    },
+    "panels": {
+      "title": "Panels",
+      "close": "Close panel",
+      "names": {
+        "roster": "Roster",
+        "events": "Events",
+        "director": "Director",
+        "tuning": "Tuning",
+        "quest": "Quest in progress",
+        "questDetail": "Quest planner",
+        "heroSheet": "Character sheet",
+        "villageStash": "Village stash",
+        "merchant": "Merchant",
+        "questForecast": "Expedition forecast"
+      },
+      "pin": "Pin panel",
+      "unpin": "Unpin panel"
+    },
+    "stage": {
+      "expandPanel": "Show {name}",
+      "openRejected": "{name} is available after the quest"
+    },
+    "stash": {
+      "title": "Village stash",
+      "capacity": "{count} of {max} goods in store",
+      "qty": "{qty} in store"
+    },
+    "buildings": {
+      "stash": {
+        "name": "Village warehouse"
+      }
+    },
+    "menu": {
+      "title": "Menu",
+      "session": "Session",
+      "options": "Options",
+      "saveNow": "Save now",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "loadGame": "Load game…",
+      "quit": "Quit to title",
+      "theme": "Theme",
+      "language": "Language",
+      "interfaceSize": "Interface size",
+      "interfaceSizeAuto": "Auto",
+      "interfaceSizeAutoHint": "Auto ({percent}%)",
+      "languages": {
+        "en": "English",
+        "it-IT": "Italiano"
+      },
+      "settings": "All settings…",
+      "comingSoon": "Not available yet"
+    },
+    "regions": {
+      "northern_forest": "Whispering Woods",
+      "southern_forest": "Hollow Wood",
+      "eastern_woods": "Eastern Groves",
+      "northern_peaks": "Northern Peaks",
+      "eastern_mountains": "Ember Highlands",
+      "southern_mountains": "Southern Crags",
+      "islands": "The Outer Isles",
+      "village": "The Village",
+      "meadows": "The Meadows"
+    },
+    "tuning": {
+      "reset": "Reset values",
+      "save": "Save",
+      "saved": "Saved ✓",
+      "bakeFailed": "Saved for this browser — the new defaults could not be written to the config (dev server only)."
+    },
+    "questWindow": {
+      "roster": "Assigned party",
+      "bag": "Bag",
+      "chronicle": "Chronicle",
+      "minimise": "Minimise",
+      "restore": "Reopen",
+      "waiting": "A decision is waiting",
+      "phaseLocked": "The phase is still on the road — its choices unlock when its time comes.",
+      "bagEmpty": "Bag is empty",
+      "bagStrip": {
+        "label": "Packed bag",
+        "chipName": "{label} ({qualifier})",
+        "armed": "armed",
+        "held": "carried"
+      },
+      "belt": {
+        "armed": "armed for the next check",
+        "shadowed": "covered by another armed item",
+        "inert": "no trial ahead needs it",
+        "actionArmed": "will be used at the next trial or fight",
+        "passive": "always in effect while packed"
+      },
+      "logEmpty": "The chronicle is empty",
+      "partyStatus": "Assigned party — {alive} of {total} standing",
+      "dead": "fallen",
+      "hpLost": "−{hp} HP",
+      "loot": "+{count, plural, one {# loot} other {# loot}}",
+      "clean": "Safe",
+      "moreLines": "+{count, plural, one {# more line in the chronicle} other {# more lines in the chronicle}}",
+      "inProgress": "Phase in progress",
+      "nextPhase": "Next phase",
+      "day": "Day {day} of {total}",
+      "returned": "Back home",
+      "noneReturned": "Nobody came back",
+      "phaseOf": "Phase {n} of {total}",
+      "inProgressShort": "now",
+      "hiddenEvent": "Hidden event — you could have missed it",
+      "close": "Close the report",
+      "abandon": "Abandon quest",
+      "abandonConfirm": "Are you sure you want to abandon the quest?",
+      "abandonYes": "Abandon",
+      "abandonStay": "Keep going",
+      "checkOptions": "Check options",
+      "checkOptionsSkipCheck": "Skip the whole check",
+      "checkOptionsSkipIntro": "Skip the opening animation",
+      "rewardClose": "Close",
+      "rewardHint": "Click or press a key to reveal",
+      "beats": {
+        "continue": "Continue",
+        "clickHint": "Click or press a key to continue",
+        "more": "{count, plural, one {# beat left — click or press a key} other {# beats left — click or press a key}}",
+        "recap": "While you were away: {scenes} scenes, {checks} checks, {deaths} fallen, {wounds} hurt"
+      },
+      "combat": {
+        "enemiesLeft": "{count, plural, one {# goblin standing} other {# goblins standing}}",
+        "incoming": "{count, plural, one {# hit coming} other {# hits coming}}",
+        "exposureHint": "Chance of taking the next hit"
+      },
+      "ticks": "{elapsed}/{total} ticks",
+      "checkOverlay": {
+        "titleSuffix": "skill check",
+        "dismiss": "Dismiss",
+        "dismissHint": "Click anywhere to continue — the details stay in the log.",
+        "scoreTitle": "Skill {score} vs difficulty {difficulty}"
+      },
+      "outcomeToast": {
+        "dismiss": "Dismiss outcome",
+        "logHint": "Recorded in the chronicle — click to dismiss."
+      },
+      "rosterFolded": "ROSTER {alive}/{total}",
+      "footer": {
+        "collapse": "Fold the journey strip",
+        "expand": "Unfold the journey strip"
+      },
+      "verdictCard": {
+        "consequence": "Consequence",
+        "wound": "Wound {pct}%",
+        "death": "Death {pct}%",
+        "harmNone": "No harm"
+      }
+    },
+    "hud": {
+      "hide": "Hide HUD",
+      "show": "Show HUD"
+    },
+    "heroSheet": {
+      "prev": "Previous character",
+      "next": "Next character",
+      "pin": "Pin sheet",
+      "unpin": "Unpin sheet",
+      "loadout": "Loadout",
+      "inventory": "Inventory",
+      "inventoryEmpty": "Empty"
+    },
+    "merchant": {
+      "title": "Trader Rowen",
+      "previewBadge": "Preview",
+      "restockNote": "Rowen restocks when the road is kind",
+      "markerName": "Trader's stall",
+      "priceLine": "{price} {currency}",
+      "currency": {
+        "gold": "gold"
+      },
+      "buy": {
+        "button": "Buy",
+        "previewLabel": "preview only",
+        "previewTooltip": "Trading arrives with the economy update — this screen is a preview"
+      },
+      "offers": {
+        "healingDraught": {
+          "name": "Healing draughts, three to a crate",
+          "desc": "Bitter green glass, sealed with wax — a wound that closes before the road turns.",
+          "stock": "One crate left"
+        },
+        "fieldRations": {
+          "name": "Field rations for the long march",
+          "desc": "Hardtack, dried apples and salted fish — food that keeps its nerve longer than you will.",
+          "stock": "Plenty, while the ovens hold"
+        },
+        "smokeBomb": {
+          "name": "Smoke bombs, a pair",
+          "desc": "Clay shells of grey powder — cover for a retreat no one remembers making.",
+          "stock": "A pair only"
+        },
+        "wardCharm": {
+          "name": "Iron ward-charm",
+          "desc": "A cold nail of meteoric iron on a cord — luck you can hold when the dark gets close.",
+          "stock": "The last one he brought north"
+        }
+      }
+    },
+    "heroLevel": {
+      "badge": "Lv {n}",
+      "floater": "Level {n}",
+      "a11y": "Level {n} hero"
+    },
+    "village": {
+      "ariaLabel": "Village — buildings",
+      "pinsToolbar": "Village buildings",
+      "levelShort": "Lv {level}",
+      "levelBadge": "Lv {level}/{max}",
+      "effectLabel": "Effect",
+      "costLabel": "Cost",
+      "daysShort": "{days} d",
+      "openStash": "Open warehouse",
+      "openMerchant": "Open merchant",
+      "state": {
+        "built": "Built",
+        "buildable": "Buildable",
+        "locked": "Locked"
+      },
+      "category": {
+        "production": "Production",
+        "civic": "Civic",
+        "defense": "Defense",
+        "arcane": "Arcane"
+      },
+      "upgrade": {
+        "build": "Build",
+        "upgrade": "Upgrade",
+        "maxLevel": "Max level",
+        "previewLabel": "preview only",
+        "previewTooltip": "Construction arrives with the economy update — this screen is a preview"
+      },
+      "buildings": {
+        "lumbermill": {
+          "name": "Lumbermill",
+          "desc": "Fells timber from the eastern pines.",
+          "effect": "Wood per day: {value} → {next}"
+        },
+        "quarry": {
+          "name": "Quarry",
+          "desc": "Cuts stone and ore from the western cliffs.",
+          "effect": "Iron per day: {value} → {next}"
+        },
+        "farm": {
+          "name": "Farm",
+          "desc": "Tills the meadow along the stream.",
+          "effect": "Food per day: {value} → {next}"
+        },
+        "warehouse": {
+          "name": "Warehouse",
+          "desc": "Keeps the village's stock under lock and key.",
+          "effect": "Storage capacity: {value} → {next}"
+        },
+        "inn": {
+          "name": "Inn",
+          "desc": "Warm beds and a hearth that draw in new folk.",
+          "effect": "Villager capacity: {value} → {next}"
+        },
+        "smithy": {
+          "name": "Smithy",
+          "desc": "Forges tools and gear for work and quest.",
+          "effect": "Forge output: {value} → {next}"
+        },
+        "market": {
+          "name": "Market",
+          "desc": "The trader's stall on the village square.",
+          "effect": "Gold per day: {value} → {next}"
+        },
+        "infirmary": {
+          "name": "Infirmary",
+          "desc": "Herbs and quiet beds for the wounded.",
+          "effect": "Injury recovery: {value} → {next}",
+          "unlockHint": "Unlocked by a quest reward."
+        },
+        "palisade": {
+          "name": "Palisade",
+          "desc": "Sharpened stakes guarding the west approach.",
+          "effect": "Defense: {value} → {next}"
+        },
+        "watchtower": {
+          "name": "Watchtower",
+          "desc": "Eyes over the valley mouth.",
+          "effect": "Raid warning: {value} → {next} d"
+        },
+        "barracks": {
+          "name": "Barracks",
+          "desc": "Bunks and drills for the village militia.",
+          "effect": "Militia capacity: {value} → {next}",
+          "unlockHint": "Requires Palisade at level II."
+        },
+        "mageTower": {
+          "name": "Mage Tower",
+          "desc": "A crooked spire where the village witch reads the wind.",
+          "effect": "Research per day: {value} → {next}"
+        },
+        "adventurersGuild": {
+          "name": "Adventurers' Guild",
+          "desc": "A hall of maps, contracts and scarred regulars.",
+          "effect": "Quest slots: +{value} → +{next}",
+          "unlockHint": "Unlocked after completing the first quest line."
+        },
+        "sanctuary": {
+          "name": "Sanctuary",
+          "desc": "A candlelit shrine for the fallen and the faithful.",
+          "effect": "Morale bonus: +{value} → +{next}",
+          "unlockHint": "Requires the Sanctuary quest reward."
+        },
+        "alchemist": {
+          "name": "Alchemist",
+          "desc": "Bubbling flasks and powders that bite back.",
+          "effect": "Potion brewing: {value} → {next}",
+          "unlockHint": "Requires a recovered alchemical tome."
+        },
+        "cemetery": {
+          "name": "Cemetery",
+          "desc": "Quiet rows of stones at the foot of the hill.",
+          "effect": "Remembrance: {value} → {next}",
+          "unlockHint": "Requires the Sanctuary."
+        }
+      },
+      "title": "Village",
+      "builtCount": "{built} of {total} built",
+      "legend": {
+        "title": "Legend",
+        "badgeLevel": "level built",
+        "badgeBuild": "can be built",
+        "badgeLocked": "locked",
+        "keys": "← → buildings · Enter details · Esc map"
+      },
+      "registry": {
+        "chip": "Registry",
+        "pending": "{count} to build or unlock",
+        "title": "Settlement Registry",
+        "hint": "Esc to close",
+        "filterLabel": "Filter buildings",
+        "filter": {
+          "all": "All",
+          "built": "Built",
+          "buildable": "Buildable",
+          "locked": "Locked"
+        },
+        "sectionCount": "{built}/{total}",
+        "onMap": "On the map",
+        "offMap": "Registry only",
+        "back": "Back",
+        "effectLadder": "Effects by level"
+      }
+    }
   },
-  "hours": "{count} h",
-  "loadout": "Loadout",
-  "open": "Mission Planner",
-  "phase": {
-   "memberRisk": "per member ⚕ {inj}% · ☠ {dth}%",
-   "surviveThrough": "party alive after: {pct}%",
-   "retreat": "retreat → {tier} ({pct}%)"
-  }
- },
- "questCheckpoint": {
-  "title": "Checkpoint",
-  "summary": "Phase {played} of {total} is behind you.",
-  "member": {
-   "alive": "Unscathed",
-   "injured": "Injured",
-   "dead": "Dead"
-  },
-  "continue": "Push on",
-  "retreat": "Retreat",
-  "ifContinue": "If you push on",
-  "ifRetreat": "If you retreat now"
- },
- "questOutcome": {
-  "perfect": "Perfect",
-  "success": "Success",
-  "partial": "Partial success",
-  "fail": "Failure",
-  "deadly": "Disaster"
- },
- "questS1Lab": {
-  "kicker": "Isolated lab · S1",
-  "kickerRun": "Isolated lab · S1 · seed {seed}",
-  "title": "The Seed Crate",
-  "objective": "Goal: bring the seed crate back from the Crow Pass. The leader must survive to earn the reward. Choose the expedition:",
-  "primaryTrial": "★ Infiltration trial — {stats}",
-  "primaryNote": "almost every check resolves with these stats",
-  "partyKicker": "Expedition",
-  "depart": "Depart",
-  "retreat": "Retreat",
-  "retreatTitle": "Abandon the quest: keep the loot but no reward",
-  "reset": "Reset",
-  "chestRecovered": "Crate recovered",
-  "item": {
-   "potion": "Potion — heals a wounded member",
-   "smoke": "Smoke bomb — +15 infiltration",
-   "rope": "Rope — +15 climbing",
-   "bonusForza": "Strength Bonus — +15 to one check",
-   "bonusPerc": "Perception Bonus — +15 to one check",
-   "healing": "Healing — +20 HP to the most hurt",
-   "usePotion": "Potion → heal {name}"
-  },
-  "loot": "Loot: {items}",
-  "intel": "Intel: {items}",
-  "situation": "Situation",
-  "chronicle": "Chronicle",
-  "advancing": "The expedition advances…",
-  "transitSkip": "Click to move on",
-  "evaluate": "▸ evaluate",
-  "successPct": "~{pct}% success",
-  "woundPct": "wound {pct}%",
-  "deathPct": "death {pct}%",
-  "bodyguardCovers": "🛡 {name} covers the hits — wound {wound}%, death {death}% for him",
-  "intelBonus": "✧ Intel: {label} (+{bonus})",
-  "consumableAvailable": "✦ {label} available: +{bonus} to the roll",
-  "consumableArmed": "✦ {label} — armed (+{bonus})",
-  "consumableStowed": "✦ {label} — stays in the bag",
-  "woundedRisk": "already wounded: increased risk",
-  "slotRisk": "{name} W{wound}% · D{death}%",
-  "faceCheck": "Face the check · ~{pct}%",
-  "throwCounter": "Roll {current} of {total}",
-  "verdictContinue": "{verdict} — continue",
-  "sim": {
-   "open": "QUEST FORECAST — what is likely to happen (simulation)",
-   "pill": "Forecast",
-   "title": "QUEST FORECAST — probabilistic X-ray",
-   "runsLabel": "{runs} simulated runs",
-   "whyTitle": "WHY?",
-   "toggleIn": "include / exclude from the sim",
-   "makeLeader": "make leader",
-   "woundedOn": "wounded ✓",
-   "woundTest": "wound?",
-   "healthy": "Healthy",
-   "wounded": "Wounded",
-   "dead": "Dead",
-   "downtime": "downtime {days}d",
-   "without": "WITHOUT",
-   "withC": "WITH",
-   "bound": "party {value}",
-   "memberOdds": "{name} W{wound}% · D{death}%",
-   "whyCarrier": "{name} carries {stat} ({value})",
-   "whyIntel": "{label} (+{bonus})",
-   "whyConsumable": "{label} armed (+{bonus})",
-   "whyAlarm": "the camp is awake — checks are harder",
-   "consumableLater": "if spent: gone for later checks — {list}",
-   "consumableLast": "no later check uses it — spending is free",
-   "whyWounded": "{names} already wounded (+risk)",
-   "whyCover": "{name} intercepts the blows",
-   "consequence": {
-    "noHarm": "No injury",
-    "anyWound": "1+ wounded",
-    "anyDeath": "1+ deaths",
-    "leaderWound": "Leader wounded",
-    "leaderDeath": "Leader dies"
-   },
-   "cf": {
+  "missionPlanner": {
+    "band": {
+      "odds": {
+        "high": "Likely",
+        "mid": "Uncertain",
+        "low": "Unlikely"
+      },
+      "risk": {
+        "high": "High",
+        "mid": "Moderate",
+        "low": "Low"
+      }
+    },
+    "required": "required",
+    "ifEmpty": "If left empty:",
+    "modifier": {
+      "death": "Death",
+      "injury": "Injury",
+      "power": "Power"
+    },
+    "title": "Planner",
+    "subtitle": "Every change updates the outcomes instantly",
+    "input": "Input",
+    "output": "Outcome",
+    "party": "Party",
+    "outcome": "Outcome",
     "success": "Success",
-    "anyWound": "1+ wounded",
-    "anyDeath": "1+ deaths"
-   },
-   "outcome": {
-    "reward": "Reward",
-    "survived": "Survived",
-    "fled": "Retreat",
-    "wipe": "Wipe"
-   },
-   "deathsTitle": "DEATHS",
-   "deathsDist": "0: {zero}% · 1: {one}% · 2+: {twoPlus}%",
-   "avgDeathsOnReward": "x̄ {n} deaths on reward",
-   "woundsTitle": "WOUNDS",
-   "leaderTitle": "LEADER",
-   "leaderLine": "wounded {wound}% · dead {death}%",
-   "timeTitle": "TIME",
-   "daysLine": "x̄ {avg}d · {min}–{max}d",
-   "humanDays": "{hd} man-days · P50 {p50}d P90 {p90}d",
-   "rewardTitle": "REWARD",
-   "rewardLine": "{gold} gold · {treasure} treasure · {loot} loot",
-   "opt": {
-    "relic": "relic",
-    "guardLoot": "guards' loot",
-    "chestLoot": "goblin chest",
-    "viandante": "traveler helped"
-   },
-   "strategyTitle": "SIMULATED STRATEGY",
-   "cp": {
-    "secure": "SECURE",
-    "push": "PUSH"
-   },
-   "cpLine": "reward {reward}% · death {death}% · wound {wound}% · {days}d · treasure {treasure}",
-   "benchTitle": "WHAT-IF PARTY BENCH — hypothetical, never touches the run",
-   "why": {
-    "statStrong": "strong {stat} — {name} ({value})",
-    "statWeak": "weak {stat} — best is {name} ({value})",
-    "woundedParty": "{count} already wounded — +risk on every check",
-    "bodyguardCover": "the bodyguard intercepts harm aimed at others",
-    "alarm": "the camp is awake — every check is harder",
-    "pushDeeper": "the strategy pushes past the checkpoint — more reward, more exposure",
-    "secureStake": "the strategy banks the stake at the checkpoint",
-    "stakeOnTable": "{value} gold of treasure already in hand"
-   },
-   "toll": "certain toll: −{amount} HP on {name} (−{epic} on a disaster)"
+    "injury": "Injury",
+    "death": "Death",
+    "duration": "Duration",
+    "phases": "By phase",
+    "byMember": "By member",
+    "why": "Why",
+    "hp": "HP",
+    "launch": "Depart",
+    "addMember": "Add to party",
+    "noLoadout": "No equipment",
+    "remove": "Remove {name}",
+    "trend": {
+      "better": "improves",
+      "worse": "worsens",
+      "same": "unchanged"
+    },
+    "items": {
+      "draftHorse": "Draft Horse",
+      "ironBlade": "Iron Blade",
+      "heavyPlate": "Heavy Plate",
+      "guardianBanner": "Guardian Banner",
+      "healingDraught": "Healing Draught",
+      "luckyCoin": "Lucky Coin"
+    },
+    "eyebrow": "Expedition plan",
+    "route": "The road",
+    "rule": "Success = passing at least half of the trials",
+    "stage": "Trial {n}",
+    "hoursShort": "h",
+    "perMemberRoll": "Base risk per member, rolled at every trial",
+    "company": "The company",
+    "available": "Available",
+    "provisions": "Provisions",
+    "anyDeath": "At least one fallen",
+    "anyInjury": "At least one wounded",
+    "reward": "Expected reward",
+    "undo": "Undo",
+    "reset": "Reset",
+    "pickFromRoster": "Pick someone from the available",
+    "unavailable": "unavailable",
+    "haloHint": "Outer ring: death · inner ring: injury",
+    "whyEmpty": "Form the company to see what decides the outcome.",
+    "phaseType": {
+      "check": "Trial",
+      "fight": "Fight",
+      "trap": "Trap",
+      "event": "Event"
+    },
+    "equipSlot": {
+      "weapon": "Weapon",
+      "armor": "Armor",
+      "mount": "Mount",
+      "trinket": "Trinket"
+    },
+    "metric": {
+      "success": "Success",
+      "injury": "Injury",
+      "death": "Death",
+      "duration": "Duration",
+      "reward": "Reward"
+    },
+    "cause": {
+      "stat": "{who} · {stat}",
+      "slot": "{slot} ({who})",
+      "emptyPenalty": "Empty slots",
+      "cover": "{who}'s cover"
+    },
+    "stat": {
+      "strength": "Strength",
+      "agility": "Agility",
+      "perception": "Perception",
+      "intelligence": "Intelligence",
+      "endurance": "Endurance"
+    },
+    "issue": {
+      "EMPTY_REQUIRED_SLOT": "Required slots are empty",
+      "RESIDENT_MISSING": "A member is no longer available",
+      "ITEM_UNKNOWN": "Unknown item",
+      "ITEM_SLOT_MISMATCH": "Item in the wrong slot",
+      "CONSUMABLE_OVER_STOCK": "Not enough provisions",
+      "PARTY_TOO_LARGE": "Company too large"
+    },
+    "hours": "{count} h",
+    "loadout": "Loadout",
+    "open": "Mission Planner",
+    "phase": {
+      "memberRisk": "per member ⚕ {inj}% · ☠ {dth}%",
+      "surviveThrough": "party alive after: {pct}%",
+      "retreat": "retreat → {tier} ({pct}%)"
+    }
   },
-  "outcome": {
-   "reward": "VICTORY — reward earned",
-   "survived": "Survived — no reward",
-   "fled": "Retreat — quest failed, loot kept",
-   "wipe": "WIPE — everything is lost"
+  "questCheckpoint": {
+    "title": "Checkpoint",
+    "summary": "Phase {played} of {total} is behind you.",
+    "member": {
+      "alive": "Unscathed",
+      "injured": "Injured",
+      "dead": "Dead"
+    },
+    "continue": "Push on",
+    "retreat": "Retreat",
+    "ifContinue": "If you push on",
+    "ifRetreat": "If you retreat now"
   },
-  "role": {
-   "leader": "Leader",
-   "bodyguard": "Bodyguard",
-   "member": "Member"
+  "questOutcome": {
+    "perfect": "Perfect",
+    "success": "Success",
+    "partial": "Partial success",
+    "fail": "Failure",
+    "deadly": "Disaster"
   },
-  "memberState": {
-   "dead": "Dead",
-   "wounded": "Wounded",
-   "fit": "In shape"
-  },
-  "verdict": {
-   "bigwin": "TRIUMPH",
-   "win": "VICTORY",
-   "almost": "BY A WHISKER",
-   "fail": "DEFEAT",
-   "fail_wound": "DEFEAT · WOUNDED",
-   "fail_dead": "DEFEAT · FALLEN",
-   "epicfail": "RUIN"
-  },
-  "gold": "gold",
-  "chestTaken": "Crate in hand — not secured",
-  "chestLost": "Crate lost",
-  "onFail": "If it fails: {text}",
-  "camp": {
-   "alerted": "Camp alerted",
-   "awake": "Camp awake",
-   "tooltip": "The camp heard something. Another misstep and it erupts — and the quiet way out closes."
-  },
-  "labTitle": "S1 — Quest Lab",
-  "pickQuest": "Choose the expedition — one authored quest, every verdict has a price.",
-  "backToQuests": "All quests",
-  "days": "{days} days",
-  "treasureValue": "treasure ~{value} gold",
-  "risk": {
-   "medium": "Risk: medium",
-   "high": "Risk: high"
-  },
-  "quests": {
-   "cassa": {
+  "questS1Lab": {
+    "kicker": "Isolated lab · S1",
+    "kickerRun": "Isolated lab · S1 · seed {seed}",
     "title": "The Seed Crate",
-    "desc": "Infiltration: slip into the goblin camp, grab the crate, get out with it. What you carry can still be lost on the way out.",
     "objective": "Goal: bring the seed crate back from the Crow Pass. The leader must survive to earn the reward. Choose the expedition:",
-    "duration": "one night",
-    "trial": "★ Infiltration trial — {stats}"
-   },
-   "rovine": {
-    "title": "The Ruins beneath the River",
-    "desc": "Exploration: cross the river, get past the guards, haul the treasure out. Time and blood are the price — how far will you push?",
-    "objective": "Goal: bring the treasure back from the ruins beneath the river. Every extra room costs days and blood. The leader must survive. Choose the expedition:",
-    "duration": "4–9 days",
-    "trial": "★ Strength trial — {stats}"
-   },
-   "goblin": {
-    "title": "Goblin Extermination",
-    "desc": "Combat: hunt the raiders back to their camp and wipe them out. No stealth prize — just steel, and a price for every extra minute you linger.",
-    "objective": "Goal: exterminate the goblins raiding the borders. The fight is won in the approach — stealth or assault set the terms of the battle. Choose the expedition:",
-    "duration": "one day",
-    "trial": "★ Combat trial — {stats}"
-   }
+    "primaryTrial": "★ Infiltration trial — {stats}",
+    "primaryNote": "almost every check resolves with these stats",
+    "partyKicker": "Expedition",
+    "depart": "Depart",
+    "retreat": "Retreat",
+    "retreatTitle": "Abandon the quest: keep the loot but no reward",
+    "reset": "Reset",
+    "chestRecovered": "Crate recovered",
+    "item": {
+      "potion": "Potion — heals a wounded member",
+      "smoke": "Smoke bomb — +15 infiltration",
+      "rope": "Rope — +15 climbing",
+      "bonusForza": "Strength Bonus — +15 to one check",
+      "bonusPerc": "Perception Bonus — +15 to one check",
+      "healing": "Healing — +20 HP to the most hurt",
+      "usePotion": "Potion → heal {name}"
+    },
+    "loot": "Loot: {items}",
+    "intel": "Intel: {items}",
+    "situation": "Situation",
+    "chronicle": "Chronicle",
+    "advancing": "The expedition advances…",
+    "transitSkip": "Click to move on",
+    "evaluate": "▸ evaluate",
+    "successPct": "~{pct}% success",
+    "woundPct": "wound {pct}%",
+    "deathPct": "death {pct}%",
+    "bodyguardCovers": "🛡 {name} covers the hits — wound {wound}%, death {death}% for him",
+    "intelBonus": "✧ Intel: {label} (+{bonus})",
+    "consumableAvailable": "✦ {label} available: +{bonus} to the roll",
+    "consumableArmed": "✦ {label} — armed (+{bonus})",
+    "consumableStowed": "✦ {label} — stays in the bag",
+    "woundedRisk": "already wounded: increased risk",
+    "slotRisk": "{name} W{wound}% · D{death}%",
+    "faceCheck": "Face the check · ~{pct}%",
+    "throwCounter": "Roll {current} of {total}",
+    "verdictContinue": "{verdict} — continue",
+    "sim": {
+      "open": "QUEST FORECAST — what is likely to happen (simulation)",
+      "pill": "Forecast",
+      "title": "QUEST FORECAST — probabilistic X-ray",
+      "runsLabel": "{runs} simulated runs",
+      "whyTitle": "WHY?",
+      "toggleIn": "include / exclude from the sim",
+      "makeLeader": "make leader",
+      "woundedOn": "wounded ✓",
+      "woundTest": "wound?",
+      "healthy": "Healthy",
+      "wounded": "Wounded",
+      "dead": "Dead",
+      "downtime": "downtime {days}d",
+      "without": "WITHOUT",
+      "withC": "WITH",
+      "bound": "party {value}",
+      "memberOdds": "{name} W{wound}% · D{death}%",
+      "whyCarrier": "{name} carries {stat} ({value})",
+      "whyIntel": "{label} (+{bonus})",
+      "whyConsumable": "{label} armed (+{bonus})",
+      "whyAlarm": "the camp is awake — checks are harder",
+      "consumableLater": "if spent: gone for later checks — {list}",
+      "consumableLast": "no later check uses it — spending is free",
+      "whyWounded": "{names} already wounded (+risk)",
+      "whyCover": "{name} intercepts the blows",
+      "consequence": {
+        "noHarm": "No injury",
+        "anyWound": "1+ wounded",
+        "anyDeath": "1+ deaths",
+        "leaderWound": "Leader wounded",
+        "leaderDeath": "Leader dies"
+      },
+      "cf": {
+        "success": "Success",
+        "anyWound": "1+ wounded",
+        "anyDeath": "1+ deaths"
+      },
+      "outcome": {
+        "reward": "Reward",
+        "survived": "Survived",
+        "fled": "Retreat",
+        "wipe": "Wipe"
+      },
+      "deathsTitle": "DEATHS",
+      "deathsDist": "0: {zero}% · 1: {one}% · 2+: {twoPlus}%",
+      "avgDeathsOnReward": "x̄ {n} deaths on reward",
+      "woundsTitle": "WOUNDS",
+      "leaderTitle": "LEADER",
+      "leaderLine": "wounded {wound}% · dead {death}%",
+      "timeTitle": "TIME",
+      "daysLine": "x̄ {avg}d · {min}–{max}d",
+      "humanDays": "{hd} man-days · P50 {p50}d P90 {p90}d",
+      "rewardTitle": "REWARD",
+      "rewardLine": "{gold} gold · {treasure} treasure · {loot} loot",
+      "opt": {
+        "relic": "relic",
+        "guardLoot": "guards' loot",
+        "chestLoot": "goblin chest",
+        "viandante": "traveler helped"
+      },
+      "strategyTitle": "SIMULATED STRATEGY",
+      "cp": {
+        "secure": "SECURE",
+        "push": "PUSH"
+      },
+      "cpLine": "reward {reward}% · death {death}% · wound {wound}% · {days}d · treasure {treasure}",
+      "benchTitle": "WHAT-IF PARTY BENCH — hypothetical, never touches the run",
+      "why": {
+        "statStrong": "strong {stat} — {name} ({value})",
+        "statWeak": "weak {stat} — best is {name} ({value})",
+        "woundedParty": "{count} already wounded — +risk on every check",
+        "bodyguardCover": "the bodyguard intercepts harm aimed at others",
+        "alarm": "the camp is awake — every check is harder",
+        "pushDeeper": "the strategy pushes past the checkpoint — more reward, more exposure",
+        "secureStake": "the strategy banks the stake at the checkpoint",
+        "stakeOnTable": "{value} gold of treasure already in hand"
+      },
+      "toll": "certain toll: −{amount} HP on {name} (−{epic} on a disaster)"
+    },
+    "outcome": {
+      "reward": "VICTORY — reward earned",
+      "survived": "Survived — no reward",
+      "fled": "Retreat — quest failed, loot kept",
+      "wipe": "WIPE — everything is lost"
+    },
+    "role": {
+      "leader": "Leader",
+      "bodyguard": "Bodyguard",
+      "member": "Member"
+    },
+    "memberState": {
+      "dead": "Dead",
+      "wounded": "Wounded",
+      "fit": "In shape"
+    },
+    "verdict": {
+      "bigwin": "TRIUMPH",
+      "win": "VICTORY",
+      "almost": "BY A WHISKER",
+      "fail": "DEFEAT",
+      "fail_wound": "DEFEAT · WOUNDED",
+      "fail_dead": "DEFEAT · FALLEN",
+      "epicfail": "RUIN"
+    },
+    "gold": "gold",
+    "chestTaken": "Crate in hand — not secured",
+    "chestLost": "Crate lost",
+    "onFail": "If it fails: {text}",
+    "camp": {
+      "alerted": "Camp alerted",
+      "awake": "Camp awake",
+      "tooltip": "The camp heard something. Another misstep and it erupts — and the quiet way out closes."
+    },
+    "labTitle": "S1 — Quest Lab",
+    "pickQuest": "Choose the expedition — one authored quest, every verdict has a price.",
+    "backToQuests": "All quests",
+    "days": "{days} days",
+    "treasureValue": "treasure ~{value} gold",
+    "risk": {
+      "medium": "Risk: medium",
+      "high": "Risk: high"
+    },
+    "quests": {
+      "cassa": {
+        "title": "The Seed Crate",
+        "desc": "Infiltration: slip into the goblin camp, grab the crate, get out with it. What you carry can still be lost on the way out.",
+        "objective": "Goal: bring the seed crate back from the Crow Pass. The leader must survive to earn the reward. Choose the expedition:",
+        "duration": "one night",
+        "trial": "★ Infiltration trial — {stats}"
+      },
+      "rovine": {
+        "title": "The Ruins beneath the River",
+        "desc": "Exploration: cross the river, get past the guards, haul the treasure out. Time and blood are the price — how far will you push?",
+        "objective": "Goal: bring the treasure back from the ruins beneath the river. Every extra room costs days and blood. The leader must survive. Choose the expedition:",
+        "duration": "4–9 days",
+        "trial": "★ Strength trial — {stats}"
+      },
+      "goblin": {
+        "title": "Goblin Extermination",
+        "desc": "Combat: hunt the raiders back to their camp and wipe them out. No stealth prize — just steel, and a price for every extra minute you linger.",
+        "objective": "Goal: exterminate the goblins raiding the borders. The fight is won in the approach — stealth or assault set the terms of the battle. Choose the expedition:",
+        "duration": "one day",
+        "trial": "★ Combat trial — {stats}"
+      }
+    },
+    "pace": {
+      "title": "Presentation pace — chosen before the check",
+      "full": "Full",
+      "fast": "Fast"
+    },
+    "skip": "Skip ▸",
+    "logToggle": "Chronicle",
+    "combatTurn": "turn {turn}/{turns}",
+    "exposureTitle": "Chance of being hit by each incoming hit: {pct}%",
+    "spent": "Already took a hit this turn",
+    "horde": {
+      "intentTitle": "Incoming hits next turn",
+      "remaining": "standing {shown}/{total}"
+    },
+    "verdictAck": "Continue",
+    "harmInProgress": "Consequences are landing…",
+    "resolving": "Resolving",
+    "belt": {
+      "label": "Belt",
+      "armTitle": "Armed: the matching consumable is spent on the next check — options show the delta"
+    },
+    "consumableDelta": "{base}→{armed} ✦",
+    "stash": {
+      "title": "The bag",
+      "hint": "Pick what to pack — {used}/{slots} slots",
+      "coverage": "Covers",
+      "desc": {
+        "bonusForza": "+15 to Strength checks",
+        "bonusPerc": "+15 to Perception checks",
+        "smoke": "+15 to Agility checks",
+        "rope": "+15 to Strength or Constitution checks",
+        "healing": "+20 HP to the most hurt member — usable before a check",
+        "potion": "Fully heals one wounded member",
+        "banner": "Guardian banner — the leader bears it: −6% wound, −4% death for every other member while he stands"
+      }
+    },
+    "harmChip": {
+      "wound": "WOUNDED",
+      "death": "FALLEN"
+    }
   },
-  "pace": {
-   "title": "Presentation pace — chosen before the check",
-   "full": "Full",
-   "fast": "Fast"
+  "questGenLab": {
+    "title": "Quest Generation Lab",
+    "subtitle": "Quest generation workbench (PLAN-026): how a quest is born, from which ingredients, how it plays and what changes afterwards. Statuses mark what truly runs, what lives offline and what is missing.",
+    "backToHub": "Test Hub",
+    "footer": "Quest Generation Lab · authored content in Italian · R-140",
+    "sections": {
+      "pipeline": "How a quest is born",
+      "pipelineDesc": "The creation tree: from input to finished run. Open each step for details, files and real status.",
+      "ingredients": "Ingredients",
+      "ingredientsDesc": "Core gimmicks, domain kits (the world «tag» axis), party traits, twists and the mechanics glossary.",
+      "catalog": "Generated catalog",
+      "catalogDesc": "The v0 pre-generated scenarios: metadata, node tree and a playable run on the real engine (gen profile).",
+      "consequences": "What changes afterwards",
+      "consequencesDesc": "The aftermath matrix: party, village, factions, world, future quests — what exists and what does not.",
+      "systems": "Implementation map",
+      "systemsDesc": "Every subsystem: where it lives, what it changes mechanically, which tests cover it.",
+      "open": "Missing / open decisions",
+      "openDesc": "The things easy to forget: tag taxonomy, thresholds, narrative arcs, channels, ignored offers."
+    },
+    "tabs": {
+      "gimmicks": "Gimmicks",
+      "kits": "Kits & tags",
+      "traits": "Traits",
+      "twists": "Twists",
+      "mechanics": "Mechanics"
+    },
+    "status": {
+      "implemented": "implemented",
+      "partial": "partial",
+      "offline": "offline",
+      "gated": "gated",
+      "proposal": "proposal",
+      "missing": "missing"
+    },
+    "labels": {
+      "reads": "reads",
+      "writes": "writes",
+      "resolution": "resolution",
+      "twists": "twists",
+      "scenes": "scenes",
+      "scenarios": "scenarios",
+      "authored": "authored",
+      "narrated": "narrated",
+      "options": "options",
+      "runstart": "run-start",
+      "inRun": "in-run",
+      "objective": "objective",
+      "primaryStats": "primary stats",
+      "tags": "tags",
+      "mechanicsUsed": "mechanics used",
+      "traitsUsed": "traits used",
+      "tree": "node tree",
+      "play": "play"
+    },
+    "play": {
+      "setup": "prepare the run",
+      "preset": "party preset",
+      "seed": "seed",
+      "start": "start run",
+      "gold": "gold",
+      "flags": "flags",
+      "intel": "intel",
+      "loot": "loot",
+      "chronicle": "chronicle",
+      "flee": "retreat",
+      "reset": "reset",
+      "newRun": "new run",
+      "outcome": {
+        "reward": "Reward",
+        "survived": "Survived",
+        "fled": "Fled",
+        "wipe": "Wipe"
+      },
+      "objectiveDone": "objective done",
+      "settlement": "settlement — world effects",
+      "epilogue": "epilogue",
+      "roll": "roll",
+      "success": "success",
+      "wound": "wound",
+      "death": "death",
+      "continue": "continue"
+    }
   },
-  "skip": "Skip ▸",
-  "logToggle": "Chronicle",
-  "combatTurn": "turn {turn}/{turns}",
-  "exposureTitle": "Chance of being hit by each incoming hit: {pct}%",
-  "spent": "Already took a hit this turn",
-  "horde": {
-   "intentTitle": "Incoming hits next turn",
-   "remaining": "standing {shown}/{total}"
+  "questExpedition": {
+    "danger": "Danger",
+    "duration": "Estimated duration ~{ticks} ticks",
+    "send": "Send expedition",
+    "loadout": "Bag — {count}/{max}",
+    "forecast": {
+      "title": "Forecast",
+      "resolving": "Resolving offer…",
+      "computing": "Estimating…",
+      "incomplete": "Fill the required slots for an estimate.",
+      "reward": "Success {pct}%",
+      "wound": "Wounds {pct}%",
+      "death": "Deaths {pct}%",
+      "wipe": "Wipe {pct}%"
+    },
+    "members": {
+      "title": "By member",
+      "row": "wounds {wound}% · deaths {death}%",
+      "downtime": "≈{days}d down",
+      "role": {
+        "leader": "leader",
+        "bodyguard": "guard",
+        "member": "member"
+      }
+    },
+    "why": {
+      "title": "Where the risk comes from",
+      "row": "— in {runs}% of runs · {death}% of deaths · {wound}% of wounds"
+    },
+    "intel": {
+      "title": "Intel",
+      "scouted": "scouted"
+    },
+    "item": {
+      "draftHorse": "One mount for the whole expedition — halves the pace of every leg.",
+      "healingDraught": "−10% wound chance on every member's check.",
+      "luckyCoin": "+10% to the expedition's reward."
+    },
+    "bag": {
+      "openPicker": "Choose village items",
+      "pickerTitle": "Village warehouse",
+      "covers": "Covers:",
+      "stock": "In store: ×{qty}",
+      "emptySlot": "Empty bag slot {index}",
+      "removeSlot": "Remove {item}"
+    },
+    "keyStats": {
+      "title": "Key stats",
+      "primary": "Primary",
+      "secondary": "Secondary"
+    },
+    "statName": {
+      "str": "Strength",
+      "perc": "Perception",
+      "con": "Constitution",
+      "agi": "Agility",
+      "int": "Intelligence",
+      "cha": "Charisma"
+    },
+    "coverage": "Covers",
+    "backToMap": "Back to map",
+    "durationDays": "{count, plural, one {# day} other {# days}}",
+    "marching": {
+      "title": "Marching order",
+      "testa": "TESTA",
+      "coda": "CODA",
+      "exposure": "Exposure",
+      "leader": "Leader"
+    },
+    "seals": {
+      "danger": "Danger",
+      "reward": "Reward",
+      "duration": "Duration"
+    },
+    "tray": {
+      "title": "Selection",
+      "open": "Choose",
+      "modeItems": "Bag",
+      "modeResidents": "Companions",
+      "close": "Close tray",
+      "dragHint": "Drag a companion onto a slot",
+      "empty": "No companions available"
+    }
   },
-  "verdictAck": "Continue",
-  "harmInProgress": "Consequences are landing…",
-  "resolving": "Resolving",
-  "belt": {
-   "label": "Belt",
-   "armTitle": "Armed: the matching consumable is spent on the next check — options show the delta"
-  },
-  "consumableDelta": "{base}→{armed} ✦",
-  "stash": {
-   "title": "The bag",
-   "hint": "Pick what to pack — {used}/{slots} slots",
-   "coverage": "Covers",
-   "desc": {
-    "bonusForza": "+15 to Strength checks",
-    "bonusPerc": "+15 to Perception checks",
-    "smoke": "+15 to Agility checks",
-    "rope": "+15 to Strength or Constitution checks",
-    "healing": "+20 HP to the most hurt member — usable before a check",
-    "potion": "Fully heals one wounded member",
-    "banner": "Guardian banner — the leader bears it: −6% wound, −4% death for every other member while he stands"
-   }
+  "questOffer": {
+    "band": {
+      "bassa": "Low",
+      "media": "Medium",
+      "alta": "High",
+      "letale": "Lethal"
+    },
+    "tier": {
+      "magra": "Meagre",
+      "discreta": "Decent",
+      "ricca": "Rich",
+      "leggendaria": "Legendary"
+    }
   }
- },
- "questGenLab": {
-  "title": "Quest Generation Lab",
-  "subtitle": "Quest generation workbench (PLAN-026): how a quest is born, from which ingredients, how it plays and what changes afterwards. Statuses mark what truly runs, what lives offline and what is missing.",
-  "backToHub": "Test Hub",
-  "footer": "Quest Generation Lab · authored content in Italian · R-140",
-  "sections": {
-   "pipeline": "How a quest is born",
-   "pipelineDesc": "The creation tree: from input to finished run. Open each step for details, files and real status.",
-   "ingredients": "Ingredients",
-   "ingredientsDesc": "Core gimmicks, domain kits (the world «tag» axis), party traits, twists and the mechanics glossary.",
-   "catalog": "Generated catalog",
-   "catalogDesc": "The v0 pre-generated scenarios: metadata, node tree and a playable run on the real engine (gen profile).",
-   "consequences": "What changes afterwards",
-   "consequencesDesc": "The aftermath matrix: party, village, factions, world, future quests — what exists and what does not.",
-   "systems": "Implementation map",
-   "systemsDesc": "Every subsystem: where it lives, what it changes mechanically, which tests cover it.",
-   "open": "Missing / open decisions",
-   "openDesc": "The things easy to forget: tag taxonomy, thresholds, narrative arcs, channels, ignored offers."
-  },
-  "tabs": {
-   "gimmicks": "Gimmicks",
-   "kits": "Kits & tags",
-   "traits": "Traits",
-   "twists": "Twists",
-   "mechanics": "Mechanics"
-  },
-  "status": {
-   "implemented": "implemented",
-   "partial": "partial",
-   "offline": "offline",
-   "gated": "gated",
-   "proposal": "proposal",
-   "missing": "missing"
-  },
-  "labels": {
-   "reads": "reads",
-   "writes": "writes",
-   "resolution": "resolution",
-   "twists": "twists",
-   "scenes": "scenes",
-   "scenarios": "scenarios",
-   "authored": "authored",
-   "narrated": "narrated",
-   "options": "options",
-   "runstart": "run-start",
-   "inRun": "in-run",
-   "objective": "objective",
-   "primaryStats": "primary stats",
-   "tags": "tags",
-   "mechanicsUsed": "mechanics used",
-   "traitsUsed": "traits used",
-   "tree": "node tree",
-   "play": "play"
-  },
-  "play": {
-   "setup": "prepare the run",
-   "preset": "party preset",
-   "seed": "seed",
-   "start": "start run",
-   "gold": "gold",
-   "flags": "flags",
-   "intel": "intel",
-   "loot": "loot",
-   "chronicle": "chronicle",
-   "flee": "retreat",
-   "reset": "reset",
-   "newRun": "new run",
-   "outcome": {
-    "reward": "Reward",
-    "survived": "Survived",
-    "fled": "Fled",
-    "wipe": "Wipe"
-   },
-   "objectiveDone": "objective done",
-   "settlement": "settlement — world effects",
-   "epilogue": "epilogue",
-   "roll": "roll",
-   "success": "success",
-   "wound": "wound",
-   "death": "death",
-   "continue": "continue"
-  }
- },
- "questExpedition": {
-  "danger": "Danger",
-  "duration": "Estimated duration ~{ticks} ticks",
-  "send": "Send expedition",
-  "loadout": "Bag — {count}/{max}",
-  "forecast": {
-   "title": "Forecast",
-   "resolving": "Resolving offer…",
-   "computing": "Estimating…",
-   "incomplete": "Fill the required slots for an estimate.",
-   "reward": "Success {pct}%",
-   "wound": "Wounds {pct}%",
-   "death": "Deaths {pct}%",
-   "wipe": "Wipe {pct}%"
-  },
-  "members": {
-   "title": "By member",
-   "row": "wounds {wound}% · deaths {death}%",
-   "downtime": "≈{days}d down",
-   "role": {
-    "leader": "leader",
-    "bodyguard": "guard",
-    "member": "member"
-   }
-  },
-  "why": {
-   "title": "Where the risk comes from",
-   "row": "— in {runs}% of runs · {death}% of deaths · {wound}% of wounds"
-  },
-  "intel": {
-   "title": "Intel",
-   "scouted": "scouted"
-  },
-  "item": {
-   "draftHorse": "One mount for the whole expedition — halves the pace of every leg.",
-   "healingDraught": "−10% wound chance on every member's check.",
-   "luckyCoin": "+10% to the expedition's reward."
-  },
-  "bag": {
-   "openPicker": "Choose village items",
-   "pickerTitle": "Village warehouse",
-   "covers": "Covers:",
-   "stock": "In store: ×{qty}",
-   "emptySlot": "Empty bag slot {index}",
-   "removeSlot": "Remove {item}"
-  },
-  "keyStats": {
-   "title": "Key stats",
-   "primary": "Primary",
-   "secondary": "Secondary"
-  },
-  "statName": {
-   "str": "Strength",
-   "perc": "Perception",
-   "con": "Constitution",
-   "agi": "Agility",
-   "int": "Intelligence",
-   "cha": "Charisma"
-  },
-  "coverage": "Covers"
- },
- "questOffer": {
-  "band": {
-   "bassa": "Low",
-   "media": "Medium",
-   "alta": "High",
-   "letale": "Lethal"
-  },
-  "tier": {
-   "magra": "Meagre",
-   "discreta": "Decent",
-   "ricca": "Rich",
-   "leggendaria": "Legendary"
-  }
- }
 }

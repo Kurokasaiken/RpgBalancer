@@ -137,11 +137,11 @@ describe('D-K schedule — layer above matureReady, engine untouched', () => {
     const state = startRun('goblin', GOBLIN_PRESETS[0].id);
     const nodeBefore = state.nodeId;
     const steps = driveWithSchedule(state, greedy({ 'gob-esplora-extra': 'gob-fermati' }));
-    expect(nodeBefore).toBe('gob-inizio');
+    expect(nodeBefore).toBe('gob-esplora');
     // Replay: at any waiting frontier, a huge tick does not advance the run.
     const again = startRun('goblin', GOBLIN_PRESETS[0].id);
     matureReady(again, START_TICK + 1_000_000);
-    expect(again.nodeId).toBe('gob-inizio');
+    expect(again.nodeId).toBe('gob-esplora');
     expect(again.frontier.status).toBe('waiting');
     expect(steps.observations.length).toBeGreaterThanOrEqual(1);
   });
