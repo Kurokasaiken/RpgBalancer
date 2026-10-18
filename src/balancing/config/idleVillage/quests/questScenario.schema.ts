@@ -23,6 +23,7 @@
 
 import { z } from 'zod';
 import { isQuestTrait } from './questTraits';
+import { CameraShotIdSchema, CinemaCutTagSchema } from './questTheatreFx';
 
 /* ------------------------------------------------------------------------ */
 /* Leaf schemas (mirror of questScenario.ts / slots/types.ts contracts).     */
@@ -298,6 +299,18 @@ export const ArmRollSchema = z
   .strict();
 export type ArmRollSchemaType = z.infer<typeof ArmRollSchema>;
 
+/** Authored cinema direction — mirrors `QuestNode.stageDirection`
+ *  (PLAN-043 WS-4, artifact-r003 §4). */
+export const StageDirectionSchema = z
+  .object({
+    /** Ordered cinema cut tags for this node's beats. */
+    cut: z.array(CinemaCutTagSchema).optional(),
+    /** PLAN-046: authored camera shot override (highest precedence). */
+    camera: CameraShotIdSchema.optional(),
+  })
+  .strict();
+export type StageDirectionSchemaType = z.infer<typeof StageDirectionSchema>;
+
 /** Authored quest node — mirrors `QuestNode`. */
 export const QuestNodeSchema = z
   .object({
@@ -333,6 +346,8 @@ export const QuestNodeSchema = z
      * legacy `applyNodeOutcome` switch for this node.
      */
     verdictTable: VerdictTableSchema.optional(),
+    /** PLAN-043 WS-4: authored cinema direction (presentation only). */
+    stageDirection: StageDirectionSchema.optional(),
   })
   .strict();
 export type QuestNodeSchemaType = z.infer<typeof QuestNodeSchema>;
@@ -372,6 +387,10 @@ export const QuestOfferSchema = z
   .object({
     /** One-line objective shown in the POI detail header. */
     objective: z.string(),
+    /** PLAN-043 WS-3 (artifact-r005 D-d): optional authored dispatch line —
+     *  the terse order text the Dispatch Table hero shows under the title.
+     *  Falls back to `objective` when absent. Presentation-only copy. */
+    dispatch: z.string().optional(),
     /** Free-form tags for the offer card (quest type, tone, …). */
     tags: z.array(z.string()).optional(),
     /** Slots the player must fill to embark (gate «Invia spedizione»). */
@@ -795,6 +814,9 @@ const PRESENTATION_KEYS = new Set([
    *  new scenario digest. `keyStats` is intentionally NOT here (display
    *  tiers are semantic-adjacent: hashed). */
   'coverArt',
+  /* PLAN-043 WS-3: `dispatch` is authored copy (like `objective`) — a
+   *  reskin must not mint a new scenario digest. */
+  'dispatch',
 ]);
 
 /** Canonical JSON: object keys sorted, presentation keys dropped, recursively. */
