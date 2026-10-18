@@ -1622,3 +1622,143 @@ Director, informata dal benchmark PLAN-039). Il ciclo operativo è:
 meccanico di chiusura resta attivo come `closure:lint` (ex `kanban:lint`,
 solo gate R-189 su RICHIESTE/board-diff). Ledger operativo: `RICHIESTE.md`
 + `plans/INDEX.md`.
+
+---
+
+## v32 — Verifica comportamentale meccanica: da fatica del Director a gate (piano S0–S5)
+
+**Status:** `FROZEN`
+**Date:** 2026-10-17
+**Authorized by:** Fausto — *"avallo"* (2026-10-17)
+**Provenance:** bozza prodotta dal dibattito multi-AI `20261017-s0s5-debate` in mind-weaver (CONVERGED su `artifact-r002`) + ruling Director seq 50-51
+**Reason:** il Director perde tempo nel ciclo "agente dichiara fatto → lui ritesta → fallisce → rispiega → ripete". Esiste già la materia prima (`verify:bundle` + `closure:lint`, CTR-001..004 con `components`, `.mw/regression/`, `recurring-traps.md` T-01..T-15); manca il binding meccanico file→check e la fase BV dentro le skill.
+
+**Formulazione (bozza — da congelare):**
+
+*User-stated (fonte: desiderata v52 mind-weaver + dibattito + ruling)*
+
+1. Ridurre la fatica di verifica del Director: meno difetti trovati da lui dopo il "concluso", non una review in più.
+2. Le verifiche diventano **gate meccanici fail-closed** dentro il circuito `verify:bundle`/`closure:lint` esistente — nessun secondo giudice LLM.
+3. Un file toccato senza superficie mappata richiede una **disposition esplicita** (mappatura o `coverage_exception` auditabile); il bundle è ROSSO senza.
+4. `coverage_exception` su comportamento non verificato → **gate bloccante `awaiting_director`** fino a `director_answer` (nessuna auto-approvazione dell'agente).
+5. Bugfix: test di riproduzione prima del fix, con hash del file **e hash dell'output della run rossa**; modifiche legittime → nuova riproduzione protocollata, mai mutazione silenziosa.
+6. Baseline rossa su superfici non toccate: **nessun escape hatch** — si ripara; se i presupposti del test non sussistono più, il test va **scartato** (rimozione registrata).
+7. `verifier.json` = receipt generato da script (exit code + hash check legati all'albero finale); schema backward-compatible; giudizio LLM solo advisory.
+8. La fase BV entra nelle skill: planner shift-left (CTR+traps delle superfici toccate → acceptance criteria), executor gate di chiusura meccanico; decision report con campi `resolved`/`open`/`escalated` (schema-check, contenuto advisory).
+9. Misura: `found-by: agent-bv|director|gate` — quota `director` → ~0 in ~5 plan; tool AI a pagamento solo se resta gap misurato.
+
+*Riferimento piano:* `.mw/runs/20261017-bv-rpg-critique/plan-s0-s5.md` (mind-weaver, status converged r003). Slice usabili singolarmente: S0 igiene AGENTS → S1 `contracts:check` nativo → S2 red-first lockato → S3 verifier.json receipt → S4 BV nelle skill → S5 dogfood+metrica.
+
+*Still unresolved*
+- Forma operativa della risposta Director a `awaiting_director` nel repo RPG (il meccanismo `director_answer` esiste nel runtime di dibattito mind-weaver; in RPG serve la porta equivalente nel circuito bundle/skill).
+- Budget di completezza del mapping file→superficie per /game.
+
+---
+
+## v33 — Gate d'intento alla chiusura: risultato vs desiderata e chiarimenti, non solo vs plan
+
+**Status:** `FROZEN`
+**Date:** 2026-10-17
+**Authorized by:** Fausto
+**Reason:** Director, verbatim: *"rispetto a quello che voglio cm implementazione o fix, il risultato finale nn sia soddisfacente o sbagliato. il risultato nn deve essere misurato rispetto al plan e basta, ma anche rispetto alla desiderata e chiarimenti del director, magari controllato con ai esterne o qualcosa del genere x essere oggettivo"* — e: *"se alla conclusione del plan, il risultato finale nn è allineato alla desiderata, significa che qualcosa è andato storto nel planning o dopo, e va rifatto. nn è un plan concluso."*
+
+**Formulazione (bozza — da congelare):**
+
+*User-stated*
+
+1. Il risultato finale di un plan è misurato rispetto alla **desiderata FROZEN + chiarimenti del Director**, non solo rispetto al plan e al suo contratto.
+2. Se a conclusione il risultato non è allineato alla desiderata → qualcosa è andato storto nel planning o dopo → **va rifatto: non è un plan concluso.**
+3. Il controllo d'allineamento può essere affidato a **AI esterne** o meccanismo equivalente, per obiettività.
+
+*AI inference (bozza)*
+
+4. **Gate bloccante su `fatta`/`completed`**, stesso rango di `closure:lint`: nessuna chiusura senza `intent PASS` o `waived-director` esplicito del Director.
+5. **Intent ledger per task** (es. `.mw/runs/<task>/intent.md` creato all'avvio): slice della desiderata FROZEN pertinente + richiesta verbatim + ruling Director emersi in sessione. Ogni item mappa su obbligazione tecnica (`verification.json`), `intent-check`, o `human-eye` — coverage per-ID (pattern T-06).
+6. **Audit in contesto pulito**: il revisore (AI esterna via `mw-ask`/broadcast o clean-context come `verifier.json`) riceve ledger + artefatti di evidenza, **non il diff**; per ogni item: `covered | gap | unverifiable` con citazione dell'evidenza. `gap`/`unverifiable` → blocco o escalation al Director.
+7. **Confine onesto del giudice AI:** l'audit copre fedeltà/copertura dei requisiti dichiarati; il giudizio estetico/"soddisfacente" resta `human-eye` + signoff Director. Il check riduce i miss d'intento, non sostituisce il veto del Director.
+8. **Diagnosi obbligatoria su fallimento:** intent rosso → la chiusura riporta se il disallineamento nasce nel plan (re-planning) o nell'esecuzione (re-implementazione) — il rework riparte dal punto guasto, non dal "non concluso" generico.
+9. **Relazione con v32:** v32 copre l'asse contratto→evidenza (gate meccanici, *nessun giudice LLM*); v33 copre l'asse intento→risultato (giudice LLM ammesso, solo qui). I due gate sono cumulativi: `fatta` richiede bundle PASS **e** intent PASS.
+
+*Decisioni Director (2026-10-17)*
+
+10. **Revisore = pannello di AI esterne** (multi-provider, come i dibattiti web), non singolo modello.
+11. **Check d'intento anche shift-left:** il plan viene controllato contro desiderata+chiarimenti **prima del battesimo** — l'errore di planning si paga una volta, non due.
+12. **Slice FROZEN, mai il file intero — invariante globale:** nessun tool, skill o agente può passare l'intero `desiderata.md` a un modello/revisore; si passa **solo la versione FROZEN pertinente** estratta in file dedicato (precedente operativo: v49 estratta a mano per PLAN-060). Da fixare in tutti i consumatori (`mw-critique-plan.py` — bug noto T-014/PLAN-062, `mw-iterative-deliberate.py` con `--desiderata`, dibattiti web, skill che citano `--desiderata`). Lista completa dei consumatori da auditare nel plan.
+
+*Still unresolved*
+- Posizione del ledger (`intent.md` nella run dir vs sezione del manifest) e meccanismo di voto del pannello (maggioranza vs unanimità su `gap`).
+
+---
+
+## v34 — Cinematica delle scene quest: depth-parallax sistematico + regia dei beat
+
+**Status:** `FROZEN`
+**Date:** 2026-10-17
+**Authorized by:** Fausto — *"procedi"* (2026-10-17, avallo sulla formulazione proposta presentata in sessione)
+**Reason:** richiesta Director in sessione 2026-10-17 — *"x le immagini che stiamo
+usando cm asset x le quest (cinematografiche, ecc). potresti prenderle e dividerle
+in vari layer e fare degli effetti di parallasse per ciascuna, sistematicamente?
+[...] Oppure sarebbe meglio generare le immagini direttamente cm prompt che danno
+i layer distaccati e il parallasse? [...] Sei un lead UI senior designer [...] fa
+una ricerca online, dammi una critica spietata e costruttiva [...] Poi proponi
+delle soluzioni a tua volta, cn esempi di codice"* — e poi *"tutte, plan multi ai
+web"*.
+
+*Esplorazione svolta (sintesi):* ricerca online su stato dell'arte (layer
+decomposition = ricerca 2025 non production-ready; parallasse 2.5D via depth map
+= commodity matura; text-to-layered = research, non affidabile su scene
+pittoriche) + audit del codice (Theater/StageBand = `<img>` DOM con Ken Burns +
+cinemaFx config-driven; `DESIGN_PILLARS.md` §1 vieta parallasse a quad full-canvas
+e prescrive deformazione in-place, v21). Direzione ibrida proposta e scelta dal
+Director con *"tutte"*.
+
+*User-stated*
+
+1. Valutare e migliorare la qualità cinematografica delle immagini usate come
+   asset delle quest (scene in `Theater`/QuestRunWindow e `StageBand`/S1 lab).
+2. Il Director vuole **tutte** le parti della proposta ibrida presentata, e il
+   piano prodotto tramite **dibattito multi-AI web**.
+
+*AI inference (marcata)*
+
+3. *"tutte"* = la direzione ibrida completa: (A) depth-parallax sistematico via
+   depth map, (B) camera diretta dal beat, (C) overlay atmosferici separabili,
+   (D) cutout 2-layer manuale solo su poche scene hero — più la dimostrazione
+   tecnica su scena reale come prima slice.
+4. Accettando la critica, restano fuori: slice sistematico in N layer dei raster
+   esistenti; generazione "layered by prompt"; video loop AI (parcheggiato,
+   candidato futuro per il trailer).
+5. Scope: superfici quest (`Theater`, `StageBand`). La mappa mondo NON è in scope
+   (già governata dalla decisione pillar + v21).
+6. Vincoli ereditati: config-first (`questTheatreFx`/`atmosphereAssets`),
+   reduced-motion ⇒ nessun effetto (I-5), token skin, budget WebView/Tauri
+   profilato, verifiche solo headless/background (CTR-foreground-001).
+
+*Still unresolved (delegati al dibattito/piano, non bloccano il freeze)*
+
+- Quali scene hero ricevono il cutout 2-layer (scelta Director o proposta del piano).
+- Ampiezza di drift, overscan e budget percettivo (da tarare sullo spike).
+- Forma runtime del depth-parallax nel Theater (canvas Pixi vs WebGL minimo vs
+  altra tecnica) — decisione tecnica delegata al piano.
+- Se la depth bake entra nella pipeline `rpg-gen-mockup.py` o resta script separato.
+- Criterio "abbastanza cinematografico": eye-check del Director sulla demo.
+
+**Formulazione approvata (FROZEN):**
+<!-- REQ:v34-goal -->Le scene quest su /game guadagnano qualità cinematografica
+percepita in modo **sistematico** su tutti gli asset presenti e futuri, non solo
+su casi singoli.<!-- REQ:v34-depth -->Parallasse via **depth map precalcolata**
+per asset (es. Depth Anything V2 o equivalente) con **deformazione in-place dei
+pixel** — coerente con DESIGN_PILLARS §1 (niente translate di quad interi;
+ampiezza contenuta + overscan per non esporre bordi).<!-- REQ:v34-camera -->Mosse
+di camera dirette dal tipo di beat (es. push-in su combat/harm, pan su viaggio,
+hold+letterbox su dialogo, zoom su verdict), config-driven in `questTheatreFx`.
+<!-- REQ:v34-atmo -->Overlay atmosferici separabili per scena (nebbia, luce,
+particelle) — la classe di layer che i pillar ammettono in parallasse.
+<!-- REQ:v34-cutout -->Cutout 2-layer manuale riservato a un piccolo set di scene
+hero scelte dal Director (cutout + inpaint via pipeline locale esistente).
+<!-- REQ:v34-exclusions -->Escluse: slice sistematico in N layer dei raster
+esistenti; generazione layered-by-prompt; video loop AI.<!-- REQ:v34-slice -->
+Prima slice verticale: **spike dimostrabile** del depth-parallax su una scena
+reale (Theater o lab), valutabile a occhio dal Director prima dell'estensione al
+catalogo.<!-- REQ:v34-invariants -->Config-first, reduced-motion ⇒ nessun
+effetto, skin token, budget WebView profilato, verifiche headless.

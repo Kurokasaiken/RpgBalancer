@@ -1,5 +1,145 @@
 # Session Handoff — 2026-10-14
 
+## 2026-10-18 — PLAN-044 T-004 (S2): red-first lockato + geometria T-01 (bundle PASS 7/7)
+
+- **Current state:** **PLAN-044 T-004 `fatta`** — riproduzione rossa lockata
+  per identità+esecuzione: `npm run redfirst:record -- --test <f> --command "<cmd>"`
+  esegue il comando, rifiuta se exit=0, salva il log in `.mw/red-first/` e
+  appende a `.mw/red-first.jsonl` (canonical hash test + sha256 log + exit_code).
+  `checkRedFirstGate` (in `verify:bundle` via `manifest.red_first` e in
+  `closure:lint` via journal∩diff) → test mutato/log manomesso/exit 0 → rosso;
+  `redfirst:retire` = test scartato con motivo (nessun escape hatch).
+  Geometria T-01: `tests/helpers/geometry.ts` + `gameGeometryT01.spec.ts`
+  (3 viewport, canvas⊇viewport, chrome dentro/disgiunto) — 3/3 PASS.
+  Bundle `.mw/runs/plan044-t004-red-first-lock/bundle.json` **PASS** 7/7 dopo
+  disposizioni Director (mapping:approve proposal-22-21-51: bv-gate+=redFirst,
+  game-tests+=tests/helpers/**, nuova app-shell=App.tsx+src/pages/**;
+  director:answer --gate-diff su 12 gate-file).
+- **Lezioni:** spawn failure transitorio (exit_code null, killed false) sotto
+  carico di sessione parallela — retry del bundle è la risposta giusta;
+  il matcher glob NON supporta brace expansion (usare glob letterali);
+  file sporchi di sessioni parallele → coverage_exception con motivo, non
+  mapping affrettato. Residuo v1: posizione isola in-canvas è pixel WebGL,
+  non DOM-assertabile (contratto T-01 pixel-level da coprire con check visual).
+- **Next step:** PLAN-044 **T-005** (S3 — `verifier.json` receipt generato
+  da script, LLM→advisory). PLAN-045 sbloccato (T-003+mappa landed).
+
+## 2026-10-17 — PLAN-044 T-003 (S1b): awaiting_director + gate su versione committata (bundle PASS 7/7)
+
+- **Current state:** **PLAN-044 T-003 `fatta`** — `coverage_exception` con
+  `--unverified-behavior` va in `awaiting_director`: blocca la chiusura finché
+  un `director_answer` non lega exception-id + hash del record + canonical
+  hash dei file coperti. I gate-file modificati sono valutati dal **gate
+  committato a HEAD** (materializzato in temp dir + runner tsx); gate assente
+  a HEAD → bootstrap `director_answer --gate-diff` (canonical-hash-bound).
+  Bundle `.mw/runs/plan044-t003-awaiting-director/bundle.json` **PASS** 7/7
+  dopo le disposizioni Director (mapping:approve proposal-20-47 +
+  director:answer --gate-diff su 10 file).
+- **Macchina:** `canonicalizeText`/`canonicalFileHash` in gateCore (EOL,
+  trailing ws, blank collapse — niente strip commenti, fail-closed);
+  `exceptionRecordHash` + `DirectorAnswer` + `lastAnswer` + `GATE_FILES` +
+  `runCommittedGate` in contractsCheck; CLI `coverage:exception --id
+  --unverified-behavior`, `director:answer --exception|--gate-diff|list`.
+  Boundary PROCEDURALE — non prova crittografica di authorship (v2).
+- **Attenzione:** se un gate-file (`scripts/verification/**`, `agentsLint`,
+  `closureLint`, `contractsCheck`, `mappingProposal`, `coverageException`,
+  `directorAnswer`) è dirty vs HEAD: se il gate esiste a HEAD la diff è
+  valutata dalla versione committata (automatico); altrimenti serve
+  `npm run director:answer -- --gate-diff --answer "<t>"` — modifica
+  post-risposta → ri-approvazione. `coverage:exception --unverified-behavior`
+  → `npm run director:answer -- --exception <id> --answer "<t>"`.
+- **Prossimo step:** PLAN-044 **T-004** (S2 — red-first lockato: bundle
+  registra hash file test + hash output run rossa al commit di riproduzione;
+  ricontrollo a fine task; asserzioni geometriche Playwright su harness /game
+  T-01). PLAN-045 sbloccato su T-005a (state machine) e mappa.
+
+## 2026-10-17 — PLAN-044 T-002 (S1a): contracts:check nativo + mappa file→superficie (bundle PASS 7/7)
+
+- **Current state:** **PLAN-044 T-002 `fatta`** — gate fail-closed
+  file→superficie operativo in `verify:bundle` e `closure:lint`.
+  Bundle `.mw/runs/plan044-t002-contracts-check/bundle.json` **PASS**
+  OB-1..OB-7. Mappa seed `.mw/surface-map.json` (10 superfici) **approvata
+  dal Director** — batch sha256 `5751cf1d…` in `.mw/mapping-approvals.jsonl`.
+- **Macchina:** `scripts/verification/surfaceMap.ts` (schema, globToRegExp/
+  globMatch, anti-glob, diffSurfaceMaps, functionalKey) +
+  `scripts/verification/contractsCheck.ts` (`checkContractsGate`: unmapped
+  senza disposition → errore; diff mappa ⊆ batch approvati; anti-glob
+  K=5/root-glob → `anti_glob_confirmed`). CLI: `contracts:check`,
+  `mapping:propose|approve|status`, `coverage:exception`. Wired:
+  `produceBundle` (campo `contracts` → verdict BLOCKED, backward-compat) +
+  `closureLint`. Dogfood live: primo bundle BLOCKED su mappa non
+  approvata → `mapping:approve` Director → PASS.
+- **Attenzione:** da ora `closure:lint` e `verify:bundle` sono ROSSI se un
+  file toccato non ha superficie mappata né `coverage_exception`, o se la
+  mappa cambia senza batch approvato. Workflow: file nuovo non coperto →
+  aggiungere glob a una superficie esistente o creare entry →
+  `npm run mapping:propose` → Director `mapping:approve`. File one-off →
+  `npm run coverage:exception -- --glob "<g>" --reason "<r>"`.
+- **Scope notes:** `awaiting_director`/`director_answer` e gate-file su
+  versione committata = T-003; `coverage_exception` è audit trail, non
+  auto-approvazione; mis-mapping = rischio residuo v1 (misurato in S5).
+- **Evidence:** `test-results/plan044-t002-contracts-check-2026-10-17.log`.
+- **Prossimo step:** PLAN-044 **T-003** (S1b — `awaiting_director` su
+  `coverage_exception` di comportamento non verificato: `director_answer`
+  legato a exception-id + hash record + content-hash del file coperto;
+  boundary procedurale `tools/mw-director`-style; gate-file diffs valutati
+  dalla versione gate committata — baseline HEAD, no bootstrap-loop).
+  Sblocca anche PLAN-045 T-005a (state machine) e la mappa per T-006.
+
+## 2026-10-17 — PLAN-044 T-001 (S0): igiene AGENTS annidati (bundle PASS 6/6)
+
+- **Current state:** **PLAN-044 T-001 `fatta`** — `src/ui/idleVillage/AGENTS.md`
+  riscritto come pointer alla fonte unica (root `AGENTS.md` →
+  `.windsurf/rules/00-project-invariants.md` → `context/recurring-traps.md`);
+  il workflow sospeso R-208 (board, ruoli/script della pipeline, prompt-spec)
+  non è più ripetuto lì. Bundle `.mw/runs/plan044-t001-agents-hygiene/bundle.json`
+  **PASS** OB-1..OB-6.
+- **Gate meccanico:** `checkNestedAgentsGate(repoRoot)` in
+  `scripts/verification/gateCore.ts` flagga i pattern del workflow sospeso in
+  ogni `AGENTS.md`/`CLAUDE.md` annidato (i file di root sono esenti: fonte
+  unica). Esposto come `npm run agents:lint` (`scripts/agentsLint.ts`) e
+  **wired in `closure:lint`** → il drift non si reintroduce a nessuna
+  chiusura. Test: +5 casi in `tests/unit/verification/gateCore.test.ts`
+  (23/23 verdi); seeded red→green provato in-repo (seed con "kanban"+
+  "harness:run" → exit 1 → rimosso → OK).
+- **Evidence:** `test-results/plan044-t001-agents-hygiene-2026-10-17.log`.
+- **Nota operativa:** `created_at` del manifest è UTC — scriverlo con l'ora
+  locale + `Z` rende tutti gli artefatti STALE (bundle BLOCKED).
+- **Prossimo step:** PLAN-044 **T-002** (S1a — mapping file/glob→superficie +
+  port `contracts:check` nativo TS in `verify:bundle`, con hardening
+  `mapping-proposal` sha256-batched + flag anti-glob K=5 proposto).
+
+## 2026-10-17 — PLAN-043 WS-2: Three-Zone Stage implementato (bundle PASS 5/5)
+
+- **Current state:** **WS-2 `implemented`** — stage deterministico a 3 zone su
+  `/game` (`leftWing`/`centerStage`/`rightWing` + overlay `heroSheet`).
+  Bundle `.mw/runs/20261017-plan043-ws2-three-zone-stage/bundle.json` **PASS**
+  OB-01..OB-05; verifier indipendente `verifier.json` 4/4 CONFIRMED.
+  R-207 resta `in corso` (WS-0/1/3/4/5 ancora attive su worktree parallelo).
+- **Implementato:** config `stageZones` Zod in `gameFrameConfig` (**floorB**
+  260/616/340 — roster min-content misurato 460px > 236, edge E=24);
+  solver puro `solveStageLayout` + `layoutSignature`; reducer (occupancy,
+  `openSeq`, `activeDrag`, commit `{state,revision}`, hysteresis 24px);
+  provider `useGameStageZones` (Context); sospensione
+  hidden+inert+aria-hidden+focus-redirect+dereg overlay; strip rail 32px ali /
+  tab 28×160 centro (split intent/effective, LRU); rail-drop→strip,
+  tab-click→expand; handoff atomico run↔generic (retire/suspend §D.2,
+  open-in-run → reject+toast i18n); `questDetail` nel registry
+  (`hudGameMenu` aggiornato).
+- **Bug reali trovati dalla probe:** (1) DROP con revision campionata dal
+  caller → self-reject se React batchava DRAG_START+DROP — staleness ora
+  interna al reducer (`activeDrag.startRevision`); (2) listener drag in
+  `useEffect` → press/release più veloce del commit React lasciava
+  `activeDrag` appeso per sempre — attach ora imperativo su pointerdown.
+- **Verifica:** unit 37/37 (solver+config+menu), runtime probe
+  strip-lifecycle + detail + `0px²` overlap, capture 4 viewport × DPR 1/2,
+  build:check + closure:lint + i18n scoped verdi; signoff agent-eye T-04 su
+  `stage-1280x720-dpr1.png` (floorB leggibile, nomi troncati).
+- **Aperto:** conferma visiva **Director** su G.6 (roster compatto 260px) e
+  G.7 (heroSheet overlay puro entrambi i regimi — implementato come ruling).
+  `i18n:validate` repo-wide fallisce su chiavi di sessioni parallele
+  (WS-3/4/5) — fuori scope WS-2, non toccare quei file.
+
 ## 2026-10-16 — R-199: QuestRunWindow rev.2 completata (bundle PASS 8/8)
 
 - **Current state:** **R-199 `fatta`** — rev.2 della quest window su `/game`
