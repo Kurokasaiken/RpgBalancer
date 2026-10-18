@@ -1,7 +1,9 @@
 import { execSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { checkKanbanGate, checkRichiesteGate } from './verification/gateCore';
+import { checkKanbanGate, checkNestedAgentsGate, checkRichiesteGate } from './verification/gateCore';
+import { checkContractsGate, gitChangedFiles } from './verification/contractsCheck';
+import { checkRedFirstGate } from './verification/redFirst';
 
 /**
  * closure:lint — gate di chiusura (R-189), ridotto all'essenziale (R-208).
@@ -72,6 +74,21 @@ async function main() {
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
+
+  // Gate igiene AGENTS (PLAN-044 T-001): nessun pattern di workflow
+  // sospeso nei file agente annidati — il drift non si reintroduce.
+  errors.push(...checkNestedAgentsGate(process.cwd()));
+
+  // Gate file→superficie (PLAN-044 T-002): file toccato senza superficie
+  // mappata né disposition → rosso (fail-closed).
+  errors.push(...checkContractsGate(process.cwd()).errors);
+
+  // Gate red-first (PLAN-044 T-004): un file test con record attivo
+  // mutato nella diff corrente senza re-record/retire → rosso.
+  errors.push(
+    ...checkRedFirstGate(process.cwd(), { changedFiles: gitChangedFiles(process.cwd()) })
+      .errors,
+  );
 
   if (errors.length > 0) {
     console.error('Closure lint fallito. Risolvi i seguenti problemi:');

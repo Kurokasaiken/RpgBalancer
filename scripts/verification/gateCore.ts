@@ -66,6 +66,8 @@ export interface Manifest {
   run_id: string;
   created_at: string;
   verifier_required?: boolean;
+  /** PLAN-044 T-004: file test la cui riproduzione rossa deve risultare registrata e immutata. */
+  red_first?: string[];
   obligations: Obligation[];
 }
 
@@ -112,6 +114,22 @@ export function sha256Text(text: string): string {
 export function sha256File(filePath: string): string | null {
   if (!existsSync(filePath) || !statSync(filePath).isFile()) return null;
   return createHash('sha256').update(readFileSync(filePath)).digest('hex');
+}
+
+/**
+ * Hash canonizzato del contenuto (PLAN-044 T-003): normalizza EOL,
+ * trailing whitespace e righe vuote consecutive — i tweak benigni non
+ * invalidano un `director_answer`, le modifiche sostanziali sì.
+ * Non strippe commenti: un edit ai commenti invalida (fail-closed).
+ */
+export function canonicalizeText(text: string): string {
+  const lines = text.replace(/\r\n?/g, '\n').split('\n').map((l) => l.trimEnd());
+  return lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+export function canonicalFileHash(filePath: string): string | null {
+  if (!existsSync(filePath) || !statSync(filePath).isFile()) return null;
+  return sha256Text(canonicalizeText(readFileSync(filePath, 'utf8')));
 }
 
 /** Hash del criterio: ciò che il verificatore deve aver ricevuto verbatim. */
@@ -495,12 +513,18 @@ export interface Bundle {
   verdict: 'PASS' | 'BLOCKED';
   obligations: ObligationEvaluation[];
   verifier: { required: boolean; ok: boolean; reasons: string[] };
+  /** Gate file→superficie (PLAN-044 T-002): assente = non valutato. */
+  contracts?: { ok: boolean; reasons: string[] };
+  /** Gate red-first lockato (PLAN-044 T-004): assente = non valutato. */
+  red_first?: { ok: boolean; reasons: string[] };
 }
 
 export function evaluateManifest(
   manifest: Manifest,
   runDir: string,
   commandResults: Record<string, CommandResult | null>,
+  contracts?: { ok: boolean; reasons: string[] },
+  redFirst?: { ok: boolean; reasons: string[] },
 ): Bundle {
   const manifestPath = path.join(runDir, 'verification.json');
   const evaluations = manifest.obligations.map((obl) =>
@@ -509,7 +533,9 @@ export function evaluateManifest(
   const verifier = checkVerifier(manifest, runDir, evaluations);
   const blocked =
     evaluations.some((e) => e.result !== 'PASS' && e.result !== 'WAIVED_DIRECTOR' && isBlocking(manifest, e.id)) ||
-    !verifier.ok;
+    !verifier.ok ||
+    contracts?.ok === false ||
+    redFirst?.ok === false;
   return {
     task: manifest.task,
     run_id: manifest.run_id,
@@ -518,6 +544,8 @@ export function evaluateManifest(
     verdict: blocked ? 'BLOCKED' : 'PASS',
     obligations: evaluations,
     verifier,
+    contracts,
+    red_first: redFirst,
   };
 }
 
@@ -695,6 +723,74 @@ export function checkRichiesteGate(
       errors.push(
         `${sec.id}: la riga Chiusura deve citare bundle:, waived-director: "<motivo>" o nessuna-verifica-tecnica: "<motivo>".`,
       );
+    }
+  }
+  return errors;
+}
+
+/**
+ * Gate igiene AGENTS (PLAN-044 T-001 / S0): i file di istruzioni agente
+ * ANNIDATI (`AGENTS.md` / `CLAUDE.md` sotto la root) sono pointer alla fonte
+ * unica, non fonti proprie. I pattern del workflow sospeso R-208 (board
+ * kanban, pipeline di dispatch coordinator/ai-worker/harness, prompt-spec)
+ * non possono comparire in un file annidato: se compaiono è drift
+ * reintrodotto → rosso.
+ *
+ * I file di root sono esenti: sono la fonte unica e documentano
+ * legittimamente lo stato "in pausa" del workflow.
+ */
+const AGENT_INSTRUCTION_FILES = new Set(['agents.md', 'claude.md']);
+
+const AGENTS_GATE_SKIP_DIRS = new Set([
+  'node_modules', '.git', 'dist', 'build', 'venv', '.venv', '.mw',
+  'archive', 'test-results', 'coverage', '.next', '.turbo', 'out',
+  'worktrees',
+]);
+
+const SUSPENDED_WORKFLOW_PATTERNS: { name: string; re: RegExp }[] = [
+  { name: 'board kanban (sospesa R-208)', re: /kanban/i },
+  { name: 'board agent_assignments (sospesa R-208)', re: /agent_assignments/i },
+  { name: 'pipeline coordinator (sospesa R-208)', re: /coordinator/i },
+  { name: 'pipeline ai-worker (sospesa R-208)', re: /ai[-_ ]?worker/i },
+  { name: 'pipeline prompt-spec (sospesa R-208)', re: /prompt[-_ ]?spec/i },
+  { name: 'pipeline harness (sospesa R-208)', re: /\bharness\b/i },
+  { name: 'pipeline dispatch (sospesa R-208)', re: /\bdispatch\b/i },
+];
+
+function* walkAgentFiles(dir: string): Generator<string> {
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (!AGENTS_GATE_SKIP_DIRS.has(entry.name)) yield* walkAgentFiles(full);
+    } else if (entry.isFile() && AGENT_INSTRUCTION_FILES.has(entry.name.toLowerCase())) {
+      yield full;
+    }
+  }
+}
+
+export function checkNestedAgentsGate(repoRoot: string): string[] {
+  const errors: string[] = [];
+  for (const file of walkAgentFiles(repoRoot)) {
+    const rel = path.relative(repoRoot, file).split(path.sep).join('/');
+    if (!rel.includes('/')) continue; // root = fonte unica, esente
+    let content: string;
+    try {
+      content = readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
+    for (const { name, re } of SUSPENDED_WORKFLOW_PATTERNS) {
+      if (re.test(content)) {
+        errors.push(
+          `${rel}: "${name}" — i file agente annidati sono pointer alla fonte unica (root AGENTS.md + .windsurf/rules/); il workflow sospeso non può essere reintrodotto (PLAN-044 T-001).`,
+        );
+      }
     }
   }
   return errors;

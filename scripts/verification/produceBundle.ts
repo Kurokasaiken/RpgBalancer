@@ -18,6 +18,8 @@ import {
   Manifest,
   evaluateManifest,
 } from './gateCore';
+import { checkContractsGate, gitChangedFiles } from './contractsCheck';
+import { checkRedFirstGate } from './redFirst';
 
 function parseArgs(argv: string[]): { manifest: string; noExec: boolean } {
   const manifestArg = argv.find((a) => a.startsWith('--manifest='));
@@ -131,7 +133,21 @@ function main(): void {
     writeFileSync(resultsPath, JSON.stringify(commandResults, null, 2));
   }
 
-  const bundle: Bundle = evaluateManifest(parsed, runDir, commandResults);
+  // Gate file→superficie (PLAN-044 T-002): file toccato senza superficie
+  // mappata né disposition → il bundle fallisce (fail-closed).
+  const contractsReport = checkContractsGate(process.cwd());
+  const contracts = { ok: contractsReport.errors.length === 0, reasons: contractsReport.errors };
+
+  // Gate red-first lockato (PLAN-044 T-004): i test dichiarati in
+  // manifest.red_first devono avere un record con hash test + hash log
+  // rossa immutati; mutare un test registrato nella diff → rosso.
+  const redFirstReport = checkRedFirstGate(process.cwd(), {
+    required: parsed.red_first,
+    changedFiles: gitChangedFiles(process.cwd()),
+  });
+  const redFirst = { ok: redFirstReport.errors.length === 0, reasons: redFirstReport.errors };
+
+  const bundle: Bundle = evaluateManifest(parsed, runDir, commandResults, contracts, redFirst);
   const bundlePath = path.join(runDir, 'bundle.json');
   writeFileSync(bundlePath, JSON.stringify(bundle, null, 2));
 
@@ -142,6 +158,14 @@ function main(): void {
   if (bundle.verifier.reasons.length > 0) {
     console.log('\n=== Verificatore indipendente ===');
     bundle.verifier.reasons.forEach((r) => console.log(`  • ${r}`));
+  }
+  if (bundle.contracts && !bundle.contracts.ok) {
+    console.log('\n=== contracts:check (file→superficie) ===');
+    bundle.contracts.reasons.forEach((r) => console.log(`  • ${r}`));
+  }
+  if (bundle.red_first && !bundle.red_first.ok) {
+    console.log('\n=== redfirst:check (red-first lockato) ===');
+    bundle.red_first.reasons.forEach((r) => console.log(`  • ${r}`));
   }
   console.log(`\nVerdict: ${bundle.verdict} — bundle: ${bundlePath}`);
   process.exit(bundle.verdict === 'PASS' ? 0 : 1);
