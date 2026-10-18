@@ -64,7 +64,12 @@ describe('canShutdown — policy gate', () => {
     /* NOW = 00:00 UTC. Window 22→07 would be active — use 08→12 to be out. */
     const r = canShutdown(
       registryWith([], {
-        quietWindow: { enabled: true, startHour: 8, endHour: 12 },
+        quietWindow: {
+          enabled: true,
+          startHour: 8,
+          endHour: 12,
+          restrictedDaysOfWeek: [1, 2, 3, 4, 5],
+        },
       }),
       IDLE_OK,
       opts,
@@ -76,7 +81,12 @@ describe('canShutdown — policy gate', () => {
   it('allows inside the quiet window when all other gates pass', () => {
     const r = canShutdown(
       registryWith([{ id: 'a', state: 'COMPLETED' }], {
-        quietWindow: { enabled: true, startHour: 22, endHour: 7 },
+        quietWindow: {
+          enabled: true,
+          startHour: 22,
+          endHour: 7,
+          restrictedDaysOfWeek: [1, 2, 3, 4, 5],
+        },
       }),
       IDLE_OK,
       opts,
@@ -87,12 +97,87 @@ describe('canShutdown — policy gate', () => {
   it('ignores the quiet window when disabled', () => {
     const r = canShutdown(
       registryWith([], {
-        quietWindow: { enabled: false, startHour: 8, endHour: 12 },
+        quietWindow: {
+          enabled: false,
+          startHour: 8,
+          endHour: 12,
+          restrictedDaysOfWeek: [1, 2, 3, 4, 5],
+        },
       }),
       IDLE_OK,
       opts,
     );
     expect(r.allowed).toBe(true);
+  });
+});
+
+describe('canShutdown — quiet window day restriction (R-211)', () => {
+  const WEEKDAYS_ONLY = {
+    enabled: true,
+    startHour: 22,
+    endHour: 7,
+    restrictedDaysOfWeek: [1, 2, 3, 4, 5],
+  };
+
+  it('blocks at 15:00 on a restricted weekday', () => {
+    const monday15 = new Date(2026, 9, 19, 15); // Monday 2026-10-19, local time
+    const r = canShutdown(
+      registryWith([], { quietWindow: WEEKDAYS_ONLY }),
+      IDLE_OK,
+      { now: monday15 },
+    );
+    expect(r.allowed).toBe(false);
+    expect(r.reason).toContain('outside quiet window');
+  });
+
+  it('blocks at 21:00 on a restricted weekday (before window start)', () => {
+    const friday21 = new Date(2026, 9, 16, 21); // Friday 2026-10-16, local time
+    const r = canShutdown(
+      registryWith([], { quietWindow: WEEKDAYS_ONLY }),
+      IDLE_OK,
+      { now: friday21 },
+    );
+    expect(r.allowed).toBe(false);
+  });
+
+  it('allows at 15:00 on Saturday — unrestricted day is active all day', () => {
+    const saturday15 = new Date(2026, 9, 17, 15); // Saturday 2026-10-17, local time
+    const r = canShutdown(
+      registryWith([], { quietWindow: WEEKDAYS_ONLY }),
+      IDLE_OK,
+      { now: saturday15 },
+    );
+    expect(r.allowed).toBe(true);
+  });
+
+  it('allows at 03:00 on Sunday — unrestricted day is active all day', () => {
+    const sunday3 = new Date(2026, 9, 18, 3); // Sunday 2026-10-18, local time
+    const r = canShutdown(
+      registryWith([], { quietWindow: WEEKDAYS_ONLY }),
+      IDLE_OK,
+      { now: sunday3 },
+    );
+    expect(r.allowed).toBe(true);
+  });
+
+  it('is active all day, every day, when restrictedDaysOfWeek is empty', () => {
+    const monday15 = new Date(2026, 9, 19, 15);
+    const r = canShutdown(
+      registryWith([], {
+        quietWindow: { enabled: true, startHour: 22, endHour: 7, restrictedDaysOfWeek: [] },
+      }),
+      IDLE_OK,
+      { now: monday15 },
+    );
+    expect(r.allowed).toBe(true);
+  });
+
+  it('resolves a missing restrictedDaysOfWeek to the Mon–Fri default', () => {
+    const saturday15 = new Date(2026, 9, 17, 15);
+    const monday15 = new Date(2026, 9, 19, 15);
+    const legacy = { enabled: true, startHour: 22, endHour: 7 } as SessionRegistry['policy']['quietWindow'];
+    expect(canShutdown(registryWith([], { quietWindow: legacy }), IDLE_OK, { now: saturday15 }).allowed).toBe(true);
+    expect(canShutdown(registryWith([], { quietWindow: legacy }), IDLE_OK, { now: monday15 }).allowed).toBe(false);
   });
 });
 
