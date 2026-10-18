@@ -9,6 +9,8 @@
  * Do not genericize: registries, DSLs, branching engines are S2+ scope.
  */
 
+import type { CameraShotId, CinemaCutTag } from '@/balancing/config/idleVillage/quests/questTheatreFx';
+
 /** Mock competence ids used by the lab (mapping to balancer stats is S2 work). */
 export type LabStat = 'perc' | 'int' | 'str' | 'con' | 'agi' | 'cha';
 
@@ -183,6 +185,14 @@ export interface QuestNode {
    * (`ResolvedCheck.outcomeText` keeps the "what it did" part).
    */
   verdictFlavor?: Partial<Record<Verdict, string>>;
+  /**
+   * PLAN-043 WS-4 (artifact-r003 §4): authored cinema direction — the
+   * ordered cut tags (`reveal|impact|breath|push|bars|j-cut|expanded`)
+   * this node's beats render on the quest stage. Absent = the beat kind's
+   * default from `questTheatreFx.cinema.cutOn`. Pure presentation; the
+   * engine never reads it.
+   */
+  stageDirection?: { cut?: CinemaCutTag[]; camera?: CameraShotId };
   /**
    * Declarative post-verdict outcome table (PLAN-026 engine v2). When
    * present the engine applies `OutcomeSpec` data-driven effects + routing
