@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { DragOverlay, type Modifier, type DropAnimation, type DropAnimationFunctionArguments } from '@dnd-kit/core';
 import { useDragContext } from './DragContextStore';
 import { useDragPreviewInstrumentation } from '@/ui/idleVillage/hooks/useDragPreviewInstrumentation';
@@ -444,7 +445,7 @@ export function CustomDragOverlay({
     <DragOverlayContent label={activeId} resident={activeResident} />
   );
 
-  return (
+  const overlay = (
     <>
       {isForcedOverlay && activeId ? (
         <div
@@ -496,4 +497,6 @@ export function CustomDragOverlay({
       </DragOverlay>
     </>
   );
+
+  return typeof document === 'undefined' ? null : createPortal(overlay, document.body);
 }
