@@ -182,9 +182,9 @@ const openGoblinDetailViaMap = async (page: Page) => {
   await revealQuestPois(page);
   await poiMarker(page).click();
   await expect(detail(page)).toBeVisible();
-  /* Il titolo dello scenario vive nel chrome del FloatingPanel (header), il
-   *  body del detail mostra l'objective «Wipe out the goblin camp…». */
-  await expect(page.getByTestId('floating-panel-header-quest-expedition-poi-goblin')).toContainText(
+  /* WS-3 Dispatch Table: il titolo dello scenario vive nella hero
+   *  letterbox (drag handle); la dispatch line sta sotto di esso. */
+  await expect(page.getByTestId('quest-planner-hero')).toContainText(
     'Goblin Extermination',
   );
 };
@@ -197,7 +197,7 @@ const bringSendIntoView = async (page: Page) => {
   for (let i = 0; i < 4; i++) {
     const box = await sendButton(page).boundingBox();
     if (box && box.y + box.height <= vh - 8) return;
-    const header = page.getByTestId('floating-panel-header-quest-expedition-poi-goblin');
+    const header = page.getByTestId('quest-planner-hero');
     const hb = await header.boundingBox();
     if (!hb) return;
     const deficit = box ? Math.ceil(box.y + box.height - (vh - 8)) : 120;
@@ -490,7 +490,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('in_progress');
 
     const run = (await getRun(page))!;
-    expect(run.nodeId).toBe('gob-inizio');
+    expect(run.nodeId).toBe('gob-esplora');
     /* Party completo: 1 eroe + 3 popolani — i quattro id assegnati dai
      *  drag nel pannello di assegnazione. */
     const partyIds = run.party.map((m) => m.id);

@@ -24,6 +24,25 @@ export const EXTRACTION_SEQUENCE_TIMING = {
   cancelMs: 300,
 } as const;
 
+/**
+ * A press-and-hold is STILL: once the pointer travels farther than this from where it went down, the player is
+ * dragging, not extracting. The hold must stop right then — not when dnd-kit's 8 px activation finally commits
+ * (PLAN-043 T1.1: on a busy page the activation came after the 560 ms hold, the extraction completed first and
+ * emptied the slot mid-drag).
+ * 7 px, not less: hand tremor during a press (4–6 px) used to cancel the hold ring before it could show, so the
+ * swap lost its slot animation. 7 keeps the stop ahead of dnd-kit's 8 px activation.
+ */
+export const EXTRACTION_HOLD_MOVE_TOLERANCE_PX = 7;
+
+/** True when `point` is farther than `tolerancePx` from `origin`. */
+export function movedBeyondHold(
+  origin: { x: number; y: number },
+  point: { x: number; y: number },
+  tolerancePx: number = EXTRACTION_HOLD_MOVE_TOLERANCE_PX,
+): boolean {
+  return Math.hypot(point.x - origin.x, point.y - origin.y) > tolerancePx;
+}
+
 export interface UseExtractionSequenceOptions {
   /** The occupant must be removed here (and any return flight started). */
   onExtracted: () => void;

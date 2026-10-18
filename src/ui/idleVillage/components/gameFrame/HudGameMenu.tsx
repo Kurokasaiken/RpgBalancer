@@ -8,7 +8,7 @@ import type { SupportedLocale } from '@/localization/LocaleConfig';
 import { COMPARABLE_SKIN_IDS } from '@/ui/idleVillage/skins/resolveInitialSkin';
 import { getSkinPresetConfig, type SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { HUD_SCALE_MODES, type HudScaleControl } from './hudScale';
-import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
+import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, isHudPanelListed, type HudPanelId } from './hudPanelRegistry';
 
 /** Live skin switch surfaced inside the menu (the page owns the preset state). */
 export interface HudSkinControl {
@@ -72,7 +72,7 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, scale, in
     };
   }, [open]);
 
-  const panelIds = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => includeDev || !HUD_PANEL_DEV_ONLY.has(id));
+  const panelIds = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => isHudPanelListed(id) && (includeDev || !HUD_PANEL_DEV_ONLY.has(id)));
 
   const toggleMenu = () => {
     setOpen((v) => {

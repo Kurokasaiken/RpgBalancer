@@ -39,9 +39,9 @@ import { defaultQuestItems, toEngineFlag } from '@/balancing/config/idleVillage/
 import { useMinimalGameplayWithIdleVillageConfig, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
-import type { ResidentSlotBlueprint, DropState } from '@/ui/idleVillage/slots/types';
+import type { ResidentSlotBlueprint, DropState, SlotSeatPhase } from '@/ui/idleVillage/slots/types';
 import type { GetResidentCompatibility } from '@/ui/idleVillage/components/ResidentRosterTypes';
-import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
+import { useDragOutcome, elementCenter, getSlotComponentElement } from '@/ui/idleVillage/interaction/useDragOutcome';
 import { saveData, loadData, clearData } from '@/shared/persistence/PersistenceService';
 import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
@@ -95,6 +95,13 @@ export interface QuestExpeditionSessionOptions {
   onOpenRun?: (questId: QuestId) => void;
   /** Where the planning panel first appears (viewport px). */
   detailPosition?: { x: number; y: number };
+  /**
+   * PLAN-043 WS-2: optional wrapper applied around the mounted
+   * `QuestExpeditionDetail` — the three-zone stage wraps it in a
+   * `StagePanelFrame` (suspension treatment + zone-aware drag claim) while
+   * the session keeps owning `isDetailOpen`. Identity `node => node` default.
+   */
+  wrapDetail?: (node: React.ReactNode) => React.ReactNode;
 }
 
 /** Whether `residentId` rides in ANY non-terminal run's party — the union
@@ -111,6 +118,7 @@ export function useQuestExpeditionSession({
   currentTick,
   onOpenRun,
   detailPosition,
+  wrapDetail,
 }: QuestExpeditionSessionOptions) {
   const { t } = useTranslation('idleVillage');
   const { residentsById } = useRosterKitData();
@@ -126,6 +134,21 @@ export function useQuestExpeditionSession({
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   /** R-183: the slot whose token is being dragged onto another slot. */
   const [swapFromSlotId, setSwapFromSlotId] = useState<string | null>(null);
+  /* PLAN-043 WS-1 swap re-bite: per-seat replay counter — bumped by
+   * `commitSwap` on BOTH seats when a slot↔slot swap lands, merged into the
+   * rack's view models so each SeatCycle re-seats exactly once. */
+  const [seatNonces, setSeatNonces] = useState<Record<string, number>>({});
+  /* Swap guard: latest extraction-seat phase reported by each DetailSlot.
+   * Ref (not state): the verdict must read the CURRENT phase inside
+   * handleDragEnd/commitSwap, not a render-old snapshot. */
+  const slotPhaseRef = useRef<Record<string, SlotSeatPhase>>({});
+  const handleSlotPhaseChange = useCallback((slotId: string, phase: SlotSeatPhase) => {
+    slotPhaseRef.current[slotId] = phase;
+  }, []);
+  /* A swap that passed the drag-end gate and is flying to the target seat —
+   * commits atomically at the flight's `onComplete` (PLAN-043 WS-1), never at
+   * pointer release. */
+  const pendingSwapRef = useRef<{ fromSlotId: string; toSlotId: string; residentId: string } | null>(null);
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
   const [estimate, setEstimate] = useState<{ key: string; value: PartyEstimate } | null>(null);
   /** Last completed estimate of a DIFFERENT configuration — the delta
@@ -274,17 +297,19 @@ export function useQuestExpeditionSession({
   /** The rack's view: during a swap drag every other slot blooms valid /
    *  invalid by the swap gate (the controller marks occupied slots `locked`,
    *  which says nothing about whether a trade would be accepted). */
-  const rackSlots = useMemo(
-    () =>
-      swapFromSlotId
-        ? controller.slots.map((slot) =>
-            slot.id === swapFromSlotId
-              ? slot
-              : { ...slot, dropState: swapAllowed(swapFromSlotId, slot.id) ? ('valid' as const) : ('invalid' as const) },
-          )
-        : controller.slots,
-    [swapFromSlotId, controller.slots, swapAllowed],
-  );
+  const rackSlots = useMemo(() => {
+    const base = swapFromSlotId
+      ? controller.slots.map((slot) =>
+          slot.id === swapFromSlotId
+            ? slot
+            : { ...slot, dropState: swapAllowed(swapFromSlotId, slot.id) ? ('valid' as const) : ('invalid' as const) },
+        )
+      : controller.slots;
+    /* PLAN-043 WS-1: surface each seat's replay counter — defined only after
+     * a committed swap, so `data-seat-nonce` never appears on untouched seats
+     * and the lab markup is byte-identical. */
+    return base.map((slot) => (seatNonces[slot.id] !== undefined ? { ...slot, seatNonce: seatNonces[slot.id] } : slot));
+  }, [swapFromSlotId, controller.slots, swapAllowed, seatNonces]);
 
   /** First slot that would accept the resident — drives the roster's
    *  per-card compatibility (grayscale/aria-disabled come from there). */
@@ -716,15 +741,28 @@ export function useQuestExpeditionSession({
         if (!toSlotId || !isDetailOpen || run) return false;
         if (toSlotId === fromSlotId) return true;
         if (!slotBlueprints.some((s) => s.id === toSlotId)) return false;
+        /* PLAN-043 WS-1 seat guard: a trade is refused while EITHER seat's
+         * extraction machine is busy — the token returns to its own castone
+         * (BV-05). The origin seat reports `idle` during its own token drag:
+         * the drag itself cancelled the hold, so the occupant is stable. */
+        if (slotPhaseRef.current[fromSlotId] !== 'idle' || slotPhaseRef.current[toSlotId] !== 'idle') return false;
         const next = planSlotSwap(assignments, fromSlotId, toSlotId, (rid, sid) => eligibilityFor(rid, sid).eligible);
         if (!next) return false;
-        setAssignments(next);
-        trackTelemetryEvent('quest_expedition_swap', {
-          poiId: poi.id,
-          fromSlotId,
-          toSlotId,
-          residentId: assignments[fromSlotId] ?? null,
-          displacedId: assignments[toSlotId] ?? null,
+        /* Commit at the flight's LANDING, not at pointer release (PLAN-043
+         * WS-1): the token flies from the release point to the target seat;
+         * `handlePageFlightComplete` → `commitSwap` swaps both occupants and
+         * bumps both seat nonces in one render. */
+        const to = elementCenter(getSlotComponentElement(toSlotId));
+        if (!to) return false;
+        const movingResidentId = tokenData.residentId ?? assignments[fromSlotId];
+        if (!movingResidentId) return false;
+        pendingSwapRef.current = { fromSlotId, toSlotId, residentId: movingResidentId };
+        startFlight({
+          residentId: movingResidentId,
+          slotId: toSlotId,
+          isInset: true,
+          toX: to.x,
+          toY: to.y,
         });
         return true;
       }
@@ -739,10 +777,42 @@ export function useQuestExpeditionSession({
       if (!resident || assignedIds.includes(residentId)) return false;
       if (slot.assignedResidentId || !eligibilityFor(residentId, slot.id).eligible) return false;
 
-      const element = document.querySelector(`[data-slot-id="${slot.id}"]`);
+      const element = getSlotComponentElement(slot.id);
       return { flightToSlot: { slotId: slot.id, element } };
     },
-    [controller.slots, isDetailOpen, run, residentsById, assignedIds, eligibilityFor, slotBlueprints, assignments, poi.id],
+    [controller.slots, isDetailOpen, run, residentsById, assignedIds, eligibilityFor, slotBlueprints, assignments, poi.id, startFlight],
+  );
+
+  /* PLAN-043 WS-1 swap commit: fires at the token's LANDING on the target
+   * seat, never at pointer release. One atomic render swaps both occupants
+   * AND bumps both seat nonces — the two SeatCycles re-seat together, no
+   * empty flash, no A/B desync (WITNESS-07's grok race). The idle-seat guard
+   * is re-checked on the TARGET only: a hold started on it during the flight
+   * still refuses. The SOURCE seat is deliberately not re-checked — its
+   * cancelled-pull decay keeps `isExtracting` true for up to cancelMs after
+   * the drop, which would silently eat the swap it belongs to (the drag-end
+   * guard already vetted the pre-drag state). */
+  const commitSwap = useCallback(
+    (fromSlotId: string, toSlotId: string, residentId: string) => {
+      if (slotPhaseRef.current[toSlotId] !== 'idle') return false;
+      const next = planSlotSwap(assignments, fromSlotId, toSlotId, (rid, sid) => eligibilityFor(rid, sid).eligible);
+      if (!next) return false;
+      setAssignments(next);
+      setSeatNonces((prev) => ({
+        ...prev,
+        [fromSlotId]: (prev[fromSlotId] ?? 0) + 1,
+        [toSlotId]: (prev[toSlotId] ?? 0) + 1,
+      }));
+      trackTelemetryEvent('quest_expedition_swap', {
+        poiId: poi.id,
+        fromSlotId,
+        toSlotId,
+        residentId,
+        displacedId: assignments[toSlotId] ?? null,
+      });
+      return true;
+    },
+    [assignments, eligibilityFor, poi.id],
   );
 
   const handleFlightComplete = useCallback(
@@ -765,7 +835,7 @@ export function useQuestExpeditionSession({
       if (!from) return false;
       setFlyingResidentId(residentId);
       window.setTimeout(() => {
-        const to = elementCenter(document.querySelector(`[data-slot-id="${slot.id}"]`));
+        const to = elementCenter(getSlotComponentElement(slot.id));
         if (!to) {
           setFlyingResidentId(null);
           return;
@@ -779,11 +849,20 @@ export function useQuestExpeditionSession({
 
   const handlePageFlightComplete = useCallback(
     (residentId: string, slotId?: string, isInset?: boolean) => {
-      if (isInset && slotId) handleAssign(slotId, residentId);
+      /* A swap that passed the drag-end gate commits HERE, at landing — the
+       * residentId check keeps a stale pending swap from hijacking a later
+       * roster flight that happens to land on the same seat. */
+      const swap = pendingSwapRef.current;
+      pendingSwapRef.current = null;
+      if (swap && isInset && slotId === swap.toSlotId && residentId === swap.residentId) {
+        commitSwap(swap.fromSlotId, swap.toSlotId, residentId);
+      } else if (isInset && slotId) {
+        handleAssign(slotId, residentId);
+      }
       setFlyingResidentId(null);
       settleFlight();
     },
-    [handleAssign, settleFlight],
+    [handleAssign, settleFlight, commitSwap],
   );
 
   /* ------------------------------------------------------------------ */
@@ -863,6 +942,7 @@ export function useQuestExpeditionSession({
     setIsDetailOpen(false);
     setEstimate(null);
     prevEstimateRef.current = null;
+    pendingSwapRef.current = null;
   }, []);
 
   const toggleItem = useCallback((itemId: string) => {
@@ -877,7 +957,8 @@ export function useQuestExpeditionSession({
 
   const overlays = (
     <>
-      {isDetailOpen && (!run || run.ended) && (
+      {isDetailOpen && (!run || run.ended) &&
+        (wrapDetail ?? ((node) => node))(
         <QuestExpeditionDetail
           poi={poi}
           scenario={scenario}
@@ -896,6 +977,7 @@ export function useQuestExpeditionSession({
           onSend={send}
           onClose={closeDetail}
           onSlotClear={controller.clearSlot}
+          onSlotPhaseChange={handleSlotPhaseChange}
           position={detailPosition}
         />
       )}
@@ -953,6 +1035,12 @@ export function useQuestExpeditionSession({
       /* The slot rack's «Clear» affordance — same path the UI takes, so a
        *  revert exercises the real recompute chain (S3 T-2 reversibility). */
       clearSlot: (slotBlueprintId: string) => controller.clearSlot(slotBlueprintId),
+      /* PLAN-043 WS-1 witnesses: the swap commit itself (phase guard included)
+       *  and the seat observables BV-04/BV-05 assert on. */
+      commitSwap: (fromSlotId: string, toSlotId: string) =>
+        commitSwap(fromSlotId, toSlotId, assignments[fromSlotId] ?? ''),
+      getSlotPhase: (slotBlueprintId: string) => slotPhaseRef.current[slotBlueprintId] ?? 'idle',
+      getSeatNonces: () => seatNonces,
       toggleItem,
       getAssignments: () => assignments,
       getEstimate: () => estimate?.value ?? null,
@@ -995,6 +1083,10 @@ export function useQuestExpeditionSession({
       getOptions: () => (questRun.run ? availableOptions(questRun.run).map((o) => o.id) : []),
       getHalo: () => halo,
       isDetailOpen: () => isDetailOpen,
+      /* PLAN-043 WS-4 BV probes: one canonical launch (real send boundary,
+       *  default bag packed) — the same path the Director's demo button
+       *  takes, so cluster/geometry witnesses never stage a fake run. */
+      demoLaunch: () => demoLaunch(),
     };
     return () => {
       delete expedition[poi.id];

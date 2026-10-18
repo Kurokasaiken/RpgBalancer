@@ -9,6 +9,7 @@ import { heroSheetReducer, HERO_SHEET_INITIAL_STATE, type HeroSheetState } from 
 import { heroSheetViewModel, type HeroSheetViewModel } from './heroSheetViewModel';
 import { HeroSheetPanel } from './HeroSheetPanel';
 import type { HudPanelsApi } from './useHudPanels';
+import { chooseSheetPlacement, type PlacementRect } from './heroSheetPlacement';
 
 /**
  * useHeroSheet — the single transition owner behind `HeroSheetPanel` (PLAN-032 SP-1).
@@ -37,6 +38,8 @@ export interface UseHeroSheetOptions {
   questBounds: { left: number; top: number; right: number; bottom: number } | null;
   /** Stacking order for the sheet (`zLayers.panels`). */
   zIndex: number;
+  /** Fixed HUD chrome (top bar / menu, bottom navigation) the sheet stays out of. */
+  chromeInsets?: { top: number; bottom: number };
 }
 
 export interface HeroSheetApi {
@@ -71,8 +74,11 @@ const cardOf = (el: EventTarget | Element | null, rail: HTMLElement | null): HTM
 const rectsOverlap = (a: { left: number; top: number; right: number; bottom: number }, b: { left: number; top: number; right: number; bottom: number }): boolean =>
   a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
-export function useHeroSheet({ config, residentsById, panels, dragActive, questBounds, zIndex }: UseHeroSheetOptions): HeroSheetApi {
+export function useHeroSheet({ config, residentsById, panels, dragActive, questBounds, zIndex, chromeInsets }: UseHeroSheetOptions): HeroSheetApi {
   const { t } = useTranslation('idleVillage');
+  /* primitives, not the object: a fresh `{ top, bottom }` every render would re-create `computeAnchor` and loop the anchor effect */
+  const chromeTop = chromeInsets?.top ?? 0;
+  const chromeBottom = chromeInsets?.bottom ?? 0;
   const [state, dispatch] = useReducer(
     heroSheetReducer,
     HERO_SHEET_INITIAL_STATE,
@@ -370,30 +376,43 @@ export function useHeroSheet({ config, residentsById, panels, dragActive, questB
       const gap = config.railOffsetXPx;
       const inset = 8;
 
-      // Candidates, in preference order: right of card, then left of card.
-      const candidates = [rect.right + gap, rect.left - gap - w].map((left) => ({
-        left: Math.max(inset, Math.min(left, vw - w - inset)),
-        natural: left,
-      }));
+      /* Everything the sheet should not cover: the quest window and every other open HUD panel (the expedition
+       * planner, the village stash, …), read from the DOM so a panel opened later is seen too. The sheet's own
+       * plaque is excluded. */
+      const obstacles: PlacementRect[] = [];
       const quest = questBoundsRef.current;
-      let best = candidates[0];
-      let bestPenalty = Number.POSITIVE_INFINITY;
-      for (const c of candidates) {
-        const clamped = c.left !== c.natural;
-        const box = { left: c.left, right: c.left + w, top: rect.top, bottom: rect.top + h };
-        const onCard = rectsOverlap(box, { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom });
-        if (onCard) continue; // never cover the anchor card
-        const onQuest = quest ? rectsOverlap(box, quest) : false;
-        const penalty = (onQuest ? 2 : 0) + (clamped ? 1 : 0);
-        if (penalty < bestPenalty) {
-          bestPenalty = penalty;
-          best = c;
-        }
+      if (quest) obstacles.push({ ...quest, weight: 4 });
+      document.querySelectorAll<HTMLElement>('[data-hud-panel]').forEach((el) => {
+        /* not the sheet itself, and not the panel the anchor card lives in (the roster) */
+        if (panelRef.current?.contains(el) || el.contains(panelRef.current) || el.contains(card)) return;
+        /* WS-2: a suspended stage panel keeps its DOM mounted (hidden + inert
+         *  + aria-hidden on its `[data-stage-panel]` frame) — its rect is real
+         *  but must not steer the sheet toward a window that isn't there. */
+        if (el.closest<HTMLElement>('[data-stage-panel]')?.getAttribute('aria-hidden') === 'true') return;
+        const r = el.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) obstacles.push({ left: r.left, top: r.top, right: r.right, bottom: r.bottom, weight: 4 });
+      });
+      /* The roster itself (header, filters, the neighbouring cards): the sheet describes ONE card and must not sit on
+       * the rest of the list. Its box is cut at the right edge of the card column, so the natural spot beside the
+       * column — over the panel's padding — stays free. */
+      const columnRight = Math.max(rect.right, ...Array.from(rail.querySelectorAll<HTMLElement>('[data-resident-id]')).map((el) => el.getBoundingClientRect().right));
+      const rosterPanel = card.closest<HTMLElement>('[data-testid="resident-roster-panel"]');
+      if (rosterPanel) {
+        const r = rosterPanel.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) obstacles.push({ left: r.left, top: r.top, right: Math.min(r.right, columnRight), bottom: r.bottom });
       }
-      const top = Math.max(inset, Math.min(rect.top, vh - h - inset));
-      return { left: Math.round(best.left), top: Math.round(top), cardTop: rect.top };
+      const placed = chooseSheetPlacement({
+        card: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom },
+        sheet: { width: w, height: h },
+        viewport: { width: vw, height: vh },
+        obstacles,
+        gap,
+        inset,
+        chrome: { top: chromeTop, bottom: chromeBottom },
+      });
+      return { left: placed.left, top: placed.top, cardTop: rect.top };
     },
-    [railEl, config.widthPx, config.railOffsetXPx],
+    [railEl, config.widthPx, config.railOffsetXPx, chromeTop, chromeBottom],
   );
 
   /* Anchor on open/retarget. */
@@ -414,6 +433,25 @@ export function useHeroSheet({ config, residentsById, panels, dragActive, questB
     }
     return undefined;
   }, [state, railEl, computeAnchor]);
+
+  /* A panel opened or closed while the sheet is up: place it again, away from whatever just appeared. Run once on
+   * the change and once after the entrance transitions settle (a panel measured mid-animation has a wrong rect). */
+  const visibleKey = JSON.stringify(panels.visible);
+  useEffect(() => {
+    if (state.status !== 'open') return undefined;
+    const targetId = state.targetId;
+    const replace = () => {
+      const base = computeAnchor(targetId);
+      if (!base) return;
+      anchorCardTopRef.current = base.cardTop;
+      setAnchor((prev) => (prev && prev.left === base.left && prev.top === base.top ? prev : { left: base.left, top: base.top }));
+    };
+    replace();
+    const timer = window.setTimeout(replace, 450);
+    return () => window.clearTimeout(timer);
+    // the sheet re-places on panel changes only, not on every state tick
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleKey]);
 
   /* Measured panel height feeds the next clamp; last rect feeds pinned persistence. */
   useLayoutEffect(() => {

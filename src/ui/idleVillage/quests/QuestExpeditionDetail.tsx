@@ -1,22 +1,42 @@
 /**
- * QuestExpeditionDetail — the POI's live planning surface (PLAN-019-S2.4
- * T-2): offer header, the trusted `ResidentSlotRack`, the dynamic party
- * forecast, the loadout pick and the «Invia spedizione» commit. Pure
- * presentation — all numbers come from `resolved` (the frozen offer) and
- * `estimate` (the chunked Monte Carlo), all strings from i18n.
+ * QuestExpeditionDetail — «Dispatch Table» (PLAN-043 WS-3, artifact-r005).
+ *
+ * The POI's live planning surface, redrawn as a three-zone composition:
+ *
+ *   CENTER STAGE — ONE draggable planner unit (hero letterbox with the
+ *     engraved seals → marching-order rack TESTA→CODA → loadout →
+ *     Selection Tray → anchored footer) under the shared anchor-only drag
+ *     grammar (`useHudPanelDrag` persists only the user's offset — the
+ *     stageZones solver owns the placement once WS-2's provider lands);
+ *   RIGHT WING — the forecast plaque, pinned: it never hides while the
+ *     party is being edited and keeps the live ±pp deltas (desiderata v23);
+ *   LEFT WING — the companions roster: drags and keyboard drops land on
+ *     the rack through the shared page DndContext.
+ *
+ * Pure presentation — all numbers come from `resolved` (the frozen offer)
+ * and `estimate` (the chunked Monte Carlo), all strings from i18n.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import { useDraggable } from '@dnd-kit/core';
 import { Maximize2, Minus, Swords, X } from 'lucide-react';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { HudChip, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { useHudPanelDrag } from '@/ui/idleVillage/components/gameFrame/useHudPanelDrag';
 import { VillageStashItemIcon } from '@/ui/idleVillage/components/gameFrame/villageStashItemIcons';
-import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
+import { EngravedIcon, type EngravedIconId } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
+import { useReducedMotion } from '@/ui/idleVillage/hooks/useReducedMotion';
+import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
+import { useCanonicalRosterBundle } from '@/ui/idleVillage/roster';
+import { QUEST_ELIGIBILITY } from '@/balancing/config/idleVillage/quests/questEligibility';
+import { formatResidentLabel } from '@/ui/idleVillage/residentName';
+import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
-import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
+import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
+import type { ResidentSlotViewModel, SlotSeatPhase } from '@/ui/idleVillage/slots/types';
 import type { QuestPoi, DangerBand } from '@/balancing/config/idleVillage/quests/questPois';
 import { DANGER_BANDS } from '@/balancing/config/idleVillage/quests/questPois';
 import { REWARD_TIERS } from '@/balancing/config/idleVillage/quests/rewardTiers';
@@ -26,12 +46,12 @@ import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questS
 import { QUEST_PLANNER_INFO } from '@/balancing/config/idleVillage/quests/questPlannerInfo';
 import type { PartyEstimate, ResolvedQuestOffer } from '@/ui/idleVillage/questS1Lab/questOffer';
 import type { ForecastDelta } from '@/ui/idleVillage/questS1Lab/questSimulation';
+import { positionalWeights, STAT_ICONS } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import type { LabStat } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { residentToQuestMember } from '@/ui/idleVillage/questS1Lab/residentToQuestMember';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
-import { deriveKeyStats, type BagStockEntry, type LoadoutDuration } from './questExpedition';
-import { STAT_ICONS } from '@/ui/idleVillage/questS1Lab/questRun';
+import { deriveKeyStats, formatExpeditionSpan, type BagStockEntry, type LoadoutDuration } from './questExpedition';
 import { STAT_SHORT } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { getStatIconComponent, lucideStatIcons } from '@/ui/shared/statIconUtils';
 
@@ -56,6 +76,23 @@ const TOOLTIP_STYLE: CSSProperties = {
   border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)',
   background: 'var(--skin-hud-lacquer-deep)',
   boxShadow: '0 10px 24px color-mix(in srgb, var(--skin-hud-lacquer-deep) 80%, transparent)',
+};
+
+/** WS-3 open choreography (artifact-r005, TS-6): compositor-only keyframes —
+ *  a slow scale on the cover art, a fade-up on the lower-third, a staggered
+ *  seal stamp. `prefers-reduced-motion` skips all of it at the call site. */
+const MOTION_CSS = `
+@keyframes qed-hero-scale { from { transform: scale(1.08); } to { transform: scale(1); } }
+@keyframes qed-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes qed-seal-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+`;
+
+const SECTION_LABEL: CSSProperties = {
+  fontFamily: FONT.display,
+  fontSize: 12,
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  color: TONE.secondary,
 };
 
 /**
@@ -88,6 +125,110 @@ const BagItemTooltip: React.FC<{ entry: BagStockEntry }> = ({ entry }) => {
   );
 };
 
+/**
+ * A companion tile inside the Selection Tray (WS-3): a compact portrait
+ * token the player drags onto a marching-order slot — the payload reaches
+ * the expedition session through the shared page DndContext exactly like a
+ * roster card (`active.id` = residentId). While dragged, the tile dims and
+ * a fixed portal ghost follows the pointer (the rack token's pattern — an
+ * in-place transform would paint under the scrollable neighbours).
+ */
+const TrayResidentTile: React.FC<{ resident: ResidentState }> = ({ resident }) => {
+  const drag = useDraggable({ id: resident.id, data: { type: 'resident', residentId: resident.id } });
+  const [ghostOrigin, setGhostOrigin] = useState<DOMRect | null>(null);
+  useEffect(() => {
+    setGhostOrigin(drag.isDragging ? drag.node.current?.getBoundingClientRect() ?? null : null);
+  }, [drag.isDragging, drag.node]);
+  const name = formatResidentLabel(resident);
+  const portrait = getResidentPortraitUrl(resident);
+  const initials = name.split(' ').filter(Boolean).slice(0, 2).map((c) => c[0]).join('').toUpperCase();
+  return (
+    <>
+      <div
+        ref={drag.setNodeRef}
+        {...drag.listeners}
+        {...drag.attributes}
+        data-resident-id={resident.id}
+        data-testid={`tray-resident-${resident.id}`}
+        title={name}
+        style={{
+          flexShrink: 0,
+          width: 52,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 3,
+          cursor: 'grab',
+          opacity: drag.isDragging ? 0.35 : 1,
+        }}
+      >
+        <span
+          style={{
+            width: 40, height: 40, borderRadius: '50%', overflow: 'hidden',
+            border: '2px solid color-mix(in srgb, var(--skin-surface-border) 65%, transparent)',
+            background: 'rgba(0,0,0,0.55)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.1em', color: TONE.text,
+          }}
+        >
+          {portrait ? <img src={portrait} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+        </span>
+        <span style={{ fontFamily: FONT.serif, fontSize: 10, color: TONE.secondary, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {name}
+        </span>
+      </div>
+      {ghostOrigin && drag.transform &&
+        createPortal(
+          <span
+            aria-hidden
+            data-testid="tray-resident-ghost"
+            className="pointer-events-none fixed flex items-center justify-center overflow-hidden rounded-full bg-black/70"
+            style={{
+              left: ghostOrigin.left + ghostOrigin.width / 2 - 20 + drag.transform.x,
+              top: ghostOrigin.top + drag.transform.y,
+              width: 40,
+              height: 40,
+              zIndex: 10000,
+              border: '2px solid var(--skin-title-color, #f0cf6a)',
+              boxShadow: '0 6px 18px rgba(0,0,0,0.55), 0 0 12px color-mix(in srgb, var(--skin-title-color, #f0cf6a) 55%, transparent)',
+            }}
+          >
+            {portrait ? <img src={portrait} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+          </span>,
+          document.body,
+        )}
+    </>
+  );
+};
+
+/**
+ * An engraved read-only seal on the hero (Danger / Reward / Duration) —
+ * WS-3: the offer's frozen facts are shown as immutable stamps, never as
+ * editable controls.
+ */
+const EngravedSeal: React.FC<{ testId: string; label: string; value: string; delta?: string | null; icon: EngravedIconId; tone?: 'ok' | 'warn' | 'danger' }> = ({ testId, label, value, delta, icon, tone }) => {
+  const color = tone === 'ok' ? TONE.ok : tone === 'warn' ? TONE.warn : tone === 'danger' ? TONE.danger : TONE.text;
+  return (
+    <span
+      data-testid={testId}
+      title={`${label}: ${value}`}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 6,
+        border: '1px solid color-mix(in srgb, var(--skin-surface-border) 55%, transparent)',
+        background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 72%, transparent)',
+      }}
+    >
+      <EngravedIcon id={icon} size={13} aria-hidden style={{ color }} />
+      <span style={{ fontFamily: FONT.display, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: TONE.secondary }}>
+        {label}
+      </span>
+      <span style={{ fontFamily: FONT.display, fontSize: 12, color }}>
+        {value}
+        {delta && <em style={{ fontStyle: 'normal', fontSize: 11, marginLeft: 4 }}>{delta}</em>}
+      </span>
+    </span>
+  );
+};
+
 export interface QuestExpeditionDetailProps {
   poi: QuestPoi;
   scenario: QuestScenario | undefined;
@@ -117,6 +258,9 @@ export interface QuestExpeditionDetailProps {
   onSend: () => void;
   onClose: () => void;
   onSlotClear: (slotId: string) => void;
+  /** PLAN-043 WS-1 swap guard: the rack reports each seat's extraction phase;
+   *  the session's commitSwap refuses a swap while either seat is non-idle. */
+  onSlotPhaseChange?: (slotId: string, phase: SlotSeatPhase) => void;
   position?: { x: number; y: number };
 }
 
@@ -138,36 +282,118 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   onSend,
   onClose,
   onSlotClear,
+  onSlotPhaseChange,
   position,
 }) => {
   const { t } = useTranslation('idleVillage');
+  const reducedMotion = useReducedMotion();
   const [minimised, setMinimised] = useState(false);
-  /* PLAN-036 (R-195): the external bag picker — conditionally rendered,
-   *  Escape/click-outside close it (picker ONLY — a global capture handler
-   *  stops the key before any panel-level handler sees it) and focus
-   *  returns to the toggle. */
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const pickerRef = useRef<HTMLDivElement | null>(null);
-  const pickerToggleRef = useRef<HTMLButtonElement | null>(null);
-  /* PLAN-036: the two-plaque assembly is ONE drag union — `shellRef` makes
-   *  the clamp/re-clamp (companion resize, viewport resize) cover both
-   *  plaques and the absolutely-positioned picker (`data-hud-companion`). */
+  /* WS-3 Selection Tray: one on-demand strip with two modes (residents |
+   *  items) that replaces the PLAN-036 external popover. Escape/outside
+   *  pointer close ONLY the tray; focus returns to the origin control. */
+  const [trayMode, setTrayMode] = useState<'items' | 'residents' | null>(null);
+  const trayOpen = trayMode !== null;
+  const trayRef = useRef<HTMLDivElement | null>(null);
+  const trayReturnRef = useRef<HTMLElement | null>(null);
+  /* The origin control may unmount while the tray is open (empty bag slot →
+   *  item chip): keep its nearest testid ancestor as a re-query fallback so
+   *  focus return still lands inside the same slot (AC-20). */
+  const trayReturnHostRef = useRef<string | null>(null);
+  const trayToggleRef = useRef<HTMLButtonElement | null>(null);
+  const companionsToggleRef = useRef<HTMLButtonElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
-  const { panelStyle, handleProps } = useHudPanelDrag({ shellRef, edgeInsetPx: 12, reclampDeps: [pickerOpen] });
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const [bodyOverflows, setBodyOverflows] = useState(false);
+  const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
+  const [viewport, setViewport] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+
+  const LAYOUT = QUEST_PLANNER_INFO.layout;
+  const STAGE = DEFAULT_GAME_FRAME_CONFIG.stageZones;
+  const QD = DEFAULT_GAME_FRAME_CONFIG.questDetail;
+  const EDGE_INSET = DEFAULT_GAME_FRAME_CONFIG.insets.edgeInsetPx;
+  const DAY_TICKS = DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.dayLengthInTimeUnits;
+
+  /* CENTER-unit width: the corridor between the roster's right edge and
+   *  the RIGHT WING reservation (`questDetailPosition` already anchors x to
+   *  the corridor start — mirror the same arithmetic for the width). The
+   *  drag bound below needs this, so it is computed before the hook. */
+  const rosterRight = DEFAULT_GAME_FRAME_CONFIG.roster.leftPx + DEFAULT_GAME_FRAME_CONFIG.roster.widthPx;
+  const corridorW = Math.max(0, viewport.w - (EDGE_INSET + 8) - QD.ledgerWidthPx - QD.gapPx - (rosterRight + QD.gapPx));
+  const plannerWidth = Math.min(LAYOUT.plannerNaturalWidthPx, Math.max(LAYOUT.plannerMinWidthPx, corridorW));
+
+  const anchor = position ?? { x: 120, y: 96 };
+
+  /* Drag containment (AC-01): the CENTER unit may never cross into the
+   *  pinned RIGHT WING — its right edge stops `gapPx` short of the wing's
+   *  left edge. Interim containment until the stageZones provider owns
+   *  zone bounds natively. At viewports narrower than planner + wing the
+   *  band would be physically impossible (loX > hiX and the clamp pushed
+   *  the unit off-screen left) — floor the bound at edgeInset + width so a
+   *  feasible placement always exists; wing overlap beats off-viewport. */
+  const dragBoundsRight = Math.max(
+    viewport.w - (EDGE_INSET + QD.gapPx) - LAYOUT.forecastWidthPx - QD.gapPx,
+    EDGE_INSET + plannerWidth,
+  );
+  const { panelStyle, handleProps } = useHudPanelDrag({
+    shellRef,
+    edgeInsetPx: EDGE_INSET,
+    boundsRightPx: dragBoundsRight,
+    /* anchor deps: when the solver re-anchors the unit the committed offset
+     *  must re-clamp against the NEW base rect, not the stale one. */
+    reclampDeps: [trayOpen, viewport.w, viewport.h, anchor.x, anchor.y],
+  });
+
   useEffect(() => {
-    if (!pickerOpen) return;
+    const onResize = () => setViewport({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const closeTray = useCallback(() => {
+    setTrayMode(null);
+    let target = trayReturnRef.current;
+    if (target && !target.isConnected && trayReturnHostRef.current) {
+      const host = document.querySelector<HTMLElement>(`[data-testid="${trayReturnHostRef.current}"]`);
+      if (host) {
+        target = host.matches('button, [role="button"], [tabindex]')
+          ? host
+          : host.querySelector<HTMLElement>('button, [role="button"], [tabindex="0"]') ?? host;
+      }
+    }
+    target?.focus?.();
+  }, []);
+
+  useEffect(() => {
+    if (!trayOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       e.stopPropagation();
-      setPickerOpen(false);
-      pickerToggleRef.current?.focus();
+      closeTray();
     };
+    /* AC-20: click-outside closes the tray EXCEPT drags originating in the
+     *  LEFT WING roster and clicks on Forecast rows (row↔slot highlight —
+     *  closing mid-edit would lose the tray under a hover gesture). The
+     *  planner's own pick controls (toggles, empty slots, bag slots) are
+     *  also excluded so consecutive picks re-aim instead of close+open. */
     const onPointerDown = (e: PointerEvent) => {
-      const target = e.target as Node | null;
+      const target = e.target as Element | null;
       if (!target) return;
-      if (!pickerRef.current?.contains(target) && !pickerToggleRef.current?.contains(target)) {
-        setPickerOpen(false);
+      if (
+        trayRef.current?.contains(target) ||
+        trayToggleRef.current?.contains(target) ||
+        companionsToggleRef.current?.contains(target)
+      ) {
+        return;
       }
+      if (
+        target.closest('[data-testid="resident-roster-panel"]') ||
+        target.closest('[data-testid="quest-expedition-forecast-column"]') ||
+        target.closest('[data-testid^="bag-slot-"]') ||
+        target.closest('[data-testid^="slot-button-"]')
+      ) {
+        return;
+      }
+      closeTray();
     };
     window.addEventListener('keydown', onKey, true);
     window.addEventListener('pointerdown', onPointerDown, true);
@@ -175,14 +401,42 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
       window.removeEventListener('keydown', onKey, true);
       window.removeEventListener('pointerdown', onPointerDown, true);
     };
-  }, [pickerOpen]);
+  }, [trayOpen, closeTray]);
+
+  const compact = viewport.h < LAYOUT.minZeroScrollViewportHeightPx;
+  /* WITNESS-WS3-02: the hero resize is a DISCRETE one-frame swap (150→56),
+   *  never a layout-property animation — `transition` touches opacity and
+   *  transform only. */
+  const heroPx = trayOpen ? LAYOUT.heroTrayPx : compact ? LAYOUT.heroCompactPx : LAYOUT.heroRestPx;
+
+  /* Terminal fallback probe (artifact-r005): when the rack/loadout body
+   *  needs an internal scroll to stay inside the stage, flag it — hero and
+   *  footer stay pinned either way. */
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const check = () => setBodyOverflows(el.scrollHeight > el.clientHeight + 1);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [compact, trayOpen, slots, selectedItemIds]);
+
   const dangerBand = resolved ? bandById(resolved.resolvedOffer.bandIds.danger) : undefined;
   const rewardTier = resolved ? REWARD_TIERS.find((rt) => rt.id === resolved.resolvedOffer.bandIds.rewardTier) : undefined;
   const ready = !resolvePending && typeof estimate === 'object';
   const title = scenario?.title ?? poi.id;
-  const anchor = position ?? { x: 120, y: 96 };
   const panelId = `quest-expedition-${poi.id}`;
-  const LAYOUT = QUEST_PLANNER_INFO.layout;
+  const panelZ = DEFAULT_GAME_FRAME_CONFIG.zLayers.panels;
+
+  /* The dispatch line: authored `offer.dispatch` when present (r005 D-d),
+   *  else the objective — never the raw tick span. */
+  const dispatchLine = scenario?.offer.dispatch ?? scenario?.offer.objective ?? '';
+
+  /* Duration seal: whole days, `1 day`/`N days` (D-c) — the loadout's
+   *  pace factor is folded in via `estimatedTicks`. */
+  const durationDays = expeditionDuration.estimatedTicks / Math.max(1, DAY_TICKS);
+  const durationDelta = forecastDelta ? Math.round(forecastDelta.days) : 0;
 
   /* PLAN-036: authored key-stat tiers (verbatim, never derived by set
    *  subtraction — Rovine `con` legitimately sits in `primaryStats` AND the
@@ -209,9 +463,63 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     [bagCoveredStats, memberStats],
   );
 
-  /* Cinema banner: authored `offer.coverArt`, else the start node's scene
-   *  art — the same image the theatre would open on. */
-  const cinemaSrc = scenario?.offer.coverArt ?? (scenario ? NODE_ART[scenario.startNode]?.src : undefined);
+  /* Hero art fallback chain (r005): `coverArt → sceneArt → engraved crest`. */
+  const heroArt = scenario?.offer.coverArt ?? (scenario ? NODE_ART[scenario.startNode]?.src : undefined);
+
+  /* Marching order exposure strip (QUEST_RULES §4, AC-08): the static
+   *  planning-time profile is driven by the OCCUPIED party size — n=1→100,
+   *  2→20/80, 3→0/20/80, 4→0/0/20/80 — and recomputes on member add/remove.
+   *  TESTA rides slot 1, CODA follows the last occupied slot; the n=1 edge
+   *  shows both tags on the single member (100%). */
+  const occupiedCount = useMemo(() => slots.filter((s) => s.assignedResidentId).length, [slots]);
+  const exposureWeights = useMemo(() => positionalWeights(Math.max(1, occupiedCount), 0), [occupiedCount]);
+  const lastOccupiedIndex = useMemo(
+    () => slots.reduce((last, s, i) => (s.assignedResidentId ? i : last), -1),
+    [slots],
+  );
+
+  /* Selection Tray companion pool — draggable tiles. The assignment gate
+   *  still lives in the session (a refused drop returns `false`), so the
+   *  tray lists every available resident the rack could take. */
+  /* The tray pool mirrors the canonical roster the session validates against
+   *  (`residentsById` = ResidentState with a real `status`), gated by the
+   *  same assignable-status list — plus the LIVE expedition/death flags the
+   *  minimal store carries on MinimalResident. */
+  const { residentsById } = useCanonicalRosterBundle();
+  const liveResidents = useMinimalGameplayStore((s) => s.state.residents);
+  const assignedIds = useMemo(
+    () => new Set(slots.map((s) => s.assignedResidentId).filter(Boolean) as string[]),
+    [slots],
+  );
+  const liveById = useMemo(() => new Map(liveResidents.map((r) => [r.id, r])), [liveResidents]);
+  const trayResidents = useMemo(
+    () =>
+      Object.values(residentsById).filter((r) => {
+        if (!QUEST_ELIGIBILITY.assignableStatuses.includes(r.status)) return false;
+        const live = liveById.get(r.id);
+        if (live?.isOnExpedition || live?.isDead) return false;
+        return !assignedIds.has(r.id);
+      }),
+    [residentsById, liveById, assignedIds],
+  );
+
+  /** Opens the tray in `mode` and remembers the origin control for focus
+   *  return (AC: focus returns to the invoker on close). */
+  const openTray = useCallback((mode: 'items' | 'residents', origin?: HTMLElement | null) => {
+    const el = origin ?? (document.activeElement as HTMLElement | null);
+    trayReturnRef.current = el;
+    const host = el?.closest('[data-testid]') as HTMLElement | null;
+    trayReturnHostRef.current = host?.dataset.testid ?? null;
+    setTrayMode(mode);
+  }, []);
+
+  const handleSlotPick = useCallback(
+    (slotId: string) => {
+      const origin = document.querySelector<HTMLElement>(`[data-testid="slot-button-${slotId}"]`);
+      openTray('residents', origin);
+    },
+    [openTray],
+  );
 
   /** Signed pp badge for a delta metric — `0` renders nothing (no noise). */
   const deltaMark = (pp: number, goodWhenDown: boolean) => {
@@ -220,347 +528,672 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     const improves = goodWhenDown ? v < 0 : v > 0;
     return (
       <em style={{ fontStyle: 'normal', fontSize: 12, color: improves ? TONE.ok : TONE.danger }}>
-        {v > 0 ? '+' : ''}
-        {v}
+        {' '}({v > 0 ? '+' : ''}
+        {v}pp)
       </em>
     );
   };
+
+  /** The slot a BY MEMBER forecast row refers to (hover → castone link). */
+  const slotIdForMember = useCallback(
+    (memberId: string) => slots.find((s) => s.assignedResidentId === memberId)?.id ?? null,
+    [slots],
+  );
+  const hoveredMemberId = useMemo(() => {
+    if (!hoveredSlotId) return null;
+    return slots.find((s) => s.id === hoveredSlotId)?.assignedResidentId ?? null;
+  }, [hoveredSlotId, slots]);
+
+  /** Exposure-strip cell under one castone (AC-08/AC-18/AC-21): the TESTA
+   *  tag marks slot 1, the leader crown follows the authored `role:'leader'`
+   *  castone, CODA tracks the last occupied slot, and an empty castone
+   *  shows a bare dash — the profile weight is the member's ordinal in
+   *  marching order. */
+  const renderSlotFooter = useCallback(
+    (slot: ResidentSlotViewModel, index: number) => {
+      const occupied = Boolean(slot.assignedResidentId);
+      const ordinal = slots.slice(0, index + 1).filter((s) => s.assignedResidentId).length - 1;
+      const isTesta = index === 0;
+      const isCoda = occupied && index === lastOccupiedIndex;
+      const isLeader = slot.role === 'leader';
+      const tags: string[] = [];
+      if (isTesta) tags.push(t('questExpedition.marching.testa'));
+      if (isCoda) tags.push(t('questExpedition.marching.coda'));
+      return (
+        <div
+          data-testid={`exposure-cell-${index}`}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, minHeight: 30 }}
+        >
+          {isLeader && (
+            <span data-testid="exposure-leader-crown" title={t('questExpedition.marching.leader')} style={{ color: 'var(--skin-title-color)', lineHeight: 1 }}>
+              <EngravedIcon id="role-leader" size={11} aria-hidden />
+            </span>
+          )}
+          {tags.length > 0 && (
+            <span style={{ display: 'inline-flex', gap: 3 }}>
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  data-testid={`exposure-tag-${index}`}
+                  style={{
+                    fontFamily: FONT.display, fontSize: 8, letterSpacing: '0.12em',
+                    color: isCoda && !isTesta ? TONE.danger : TONE.secondary,
+                    border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)',
+                    borderRadius: 3, padding: '0 3px',
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </span>
+          )}
+          <span style={{ fontFamily: FONT.display, fontSize: 9, color: TONE.secondary }}>
+            {occupied ? `${Math.round(exposureWeights[Math.max(0, ordinal)] ?? 0)}%` : '—'}
+          </span>
+        </div>
+      );
+    },
+    [slots, lastOccupiedIndex, exposureWeights, t],
+  );
 
   const shell: CSSProperties = {
     position: 'fixed',
     left: anchor.x,
     top: anchor.y,
+    width: plannerWidth,
     pointerEvents: 'auto',
     ...panelStyle,
-    zIndex: panelStyle.zIndex ?? DEFAULT_GAME_FRAME_CONFIG.zLayers.panels,
+    zIndex: panelStyle.zIndex ?? panelZ,
+  };
+
+  const plaqueStyle: CSSProperties = {
+    width: '100%',
+    maxHeight: `calc(100vh - ${anchor.y + STAGE.chrome.bottomPx}px)`,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+    padding: '10px 12px 12px',
+    overflow: 'hidden',
+  };
+
+  const wingStyle: CSSProperties = {
+    position: 'fixed',
+    right: EDGE_INSET + QD.gapPx,
+    top: STAGE.chrome.topPx + QD.gapPx,
+    width: LAYOUT.forecastWidthPx,
+    maxHeight: `calc(100vh - ${STAGE.chrome.topPx + QD.gapPx + STAGE.chrome.bottomPx}px)`,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    padding: '12px 14px 14px',
+    zIndex: panelZ,
+    pointerEvents: 'auto',
   };
 
   if (minimised) {
     return (
       <SkinScope>
-        <HudPlaque
-          shape="hang"
-          as="section"
-          aria-label={title}
-          data-testid={`floating-panel-${panelId}`}
-          style={{ ...shell, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}
-        >
-          <div {...handleProps} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Swords aria-hidden style={{ width: 18, height: 18, color: TONE.accent }} />
-            <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
-              {title}
-            </span>
-            <span data-hud-controls="" style={{ display: 'inline-flex' }}>
-              <button
-                type="button"
-                data-testid={`floating-panel-minimize-${panelId}`}
-                aria-label={t('floatingPanel.restore')}
-                title={t('floatingPanel.restore')}
-                onClick={() => setMinimised(false)}
-              >
-                <Maximize2 aria-hidden />
-              </button>
-            </span>
-          </div>
-        </HudPlaque>
+        <div ref={shellRef} data-hud-panel={panelId} style={shell}>
+          <HudPlaque
+            shape="hang"
+            as="section"
+            aria-label={title}
+            data-testid={`floating-panel-${panelId}`}
+            style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}
+          >
+            <div {...handleProps} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Swords aria-hidden style={{ width: 18, height: 18, color: TONE.accent }} />
+              <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
+                {title}
+              </span>
+              <span data-hud-controls="" style={{ display: 'inline-flex' }}>
+                <button
+                  type="button"
+                  data-testid={`floating-panel-minimize-${panelId}`}
+                  aria-label={t('floatingPanel.restore')}
+                  title={t('floatingPanel.restore')}
+                  onClick={() => setMinimised(false)}
+                >
+                  <Maximize2 aria-hidden />
+                </button>
+              </span>
+            </div>
+          </HudPlaque>
+        </div>
       </SkinScope>
     );
   }
 
   return (
     <SkinScope>
-      {/* PLAN-036: ONE fixed shell dragging BOTH plaques as a union —
-       *  `data-hud-panel` is the drag hook's anchor; flexWrap lets the
-       *  sidecar fold under the main plaque when the pair cannot fit. */}
-      <div
-        ref={shellRef}
-        data-hud-panel={panelId}
-        style={{
-          ...shell,
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
-          gap: LAYOUT.gapPx,
-          maxWidth: 'calc(100vw - 24px)',
-        }}
-      >
-      <HudPlaque
-        shape="panel"
-        as="section"
-        aria-label={title}
-        data-testid={`floating-panel-${panelId}`}
-        style={{ width: LAYOUT.mainWidthPx, maxHeight: `calc(100vh - ${LAYOUT.plaqueViewportMarginPx}px)`, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
-      >
-        {/* Title row = drag handle; window controls on the right (QuestRunWindow idiom). */}
-        <div {...handleProps} data-testid={`floating-panel-header-${panelId}`} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Swords aria-hidden style={{ width: 16, height: 16, flexShrink: 0, color: TONE.accent }} />
-          <h2 style={{ flex: 1, margin: 0, minWidth: 0, fontFamily: FONT.display, fontSize: 16, lineHeight: 1.2, letterSpacing: '0.06em', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {title}
-          </h2>
-          <div data-hud-controls style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <button
-              type="button"
-              data-testid={`floating-panel-minimize-${panelId}`}
-              aria-label={t('floatingPanel.minimize')}
-              title={t('floatingPanel.minimize')}
-              onClick={() => setMinimised(true)}
-            >
-              <Minus aria-hidden />
-            </button>
-            <button
-              type="button"
-              data-testid={`floating-panel-close-${panelId}`}
-              aria-label={t('floatingPanel.close')}
-              title={t('floatingPanel.close')}
-              onClick={onClose}
-            >
-              <X aria-hidden />
-            </button>
-          </div>
-        </div>
-
-        <div
-          data-testid="quest-expedition-detail"
-          data-poi-id={poi.id}
-          className="quest-s1-scroll"
-          style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', scrollbarGutter: 'stable', display: 'flex', flexDirection: 'column', gap: 12 }}
+      {!reducedMotion && <style>{MOTION_CSS}</style>}
+      {/* ── CENTER STAGE · the planner unit (draggable; the shared drag
+           grammar persists only the user's anchor offset) ────────────── */}
+      <div ref={shellRef} data-hud-panel={panelId} style={shell}>
+        <HudPlaque
+          shape="panel"
+          as="section"
+          aria-label={title}
+          data-testid={`floating-panel-${panelId}`}
+          style={plaqueStyle}
         >
-        {/* Offer header — objective, tags, frozen band/tier/duration. */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {scenario?.offer.objective && (
-            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 14, lineHeight: 1.45, color: TONE.text }}>
-              {scenario.offer.objective}
-            </p>
-          )}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {scenario?.offer.tags?.map((tag) => (
-              <HudChip key={tag} tone="secondary">{tag}</HudChip>
-            ))}
-            {dangerBand && (
-              <span data-testid="quest-expedition-band">
-                <HudChip tone="danger">
-                  {t('questExpedition.danger')}: {t(stripNs(dangerBand.i18nKey))}
-                </HudChip>
-              </span>
-            )}
-            {rewardTier && resolved && (
-              <span data-testid="quest-expedition-reward">
-                <HudChip tone="ok">
-                  {t(stripNs(rewardTier.i18nKey))} · {resolved.resolvedOffer.rewardResolved}
-                </HudChip>
-              </span>
-            )}
-            <span data-testid="quest-expedition-duration">
-              <HudChip tone={expeditionDuration.factor < 1 ? 'ok' : expeditionDuration.factor > 1 ? 'warn' : 'secondary'}>
-                {t('questExpedition.duration', { ticks: expeditionDuration.estimatedTicks })}
-                {expeditionDuration.factor !== 1 && (
-                  <em style={{ fontStyle: 'normal', fontSize: 12 }}> ×{expeditionDuration.factor.toFixed(2)}</em>
-                )}
-              </HudChip>
-            </span>
-          </div>
-        </div>
-
-        {/* Cinema banner (R-195): ~21:9 art straight under the subtitle —
-         *  `offer.coverArt` authored, else the start node's scene art. */}
-        {cinemaSrc && (
           <div
-            data-testid="quest-expedition-cinema"
-            style={{
-              width: '100%',
-              aspectRatio: `${LAYOUT.cinemaAspect} / 1`,
-              maxHeight: LAYOUT.cinemaMaxHeightPx,
-              borderRadius: 8,
-              overflow: 'hidden',
-              border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
-            }}
+            data-testid="quest-expedition-detail"
+            data-poi-id={poi.id}
+            data-regime={compact ? 'compact' : 'rest'}
+            data-layout-fallback={bodyOverflows ? 'body-scroll' : undefined}
+            style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto', minHeight: 0 }}
           >
-            <img
-              src={cinemaSrc}
-              alt=""
-              aria-hidden
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            />
-          </div>
-        )}
-
-        {/* Slots — the trusted rack; drop-state comes from the session's
-         *  quest eligibility resolver. R-183: a slotted token can be dragged
-         *  onto another slot (move / swap) without extracting it. */}
-        <ResidentSlotRack
-          slots={slots}
-          layout="detail"
-          onSlotClear={onSlotClear}
-          slotSize={56}
-          enableSlotSwap
-        />
-
-        {/* Bisaccia (PLAN-036, R-195): `QUEST_STASH.bagSlots` visible slots
-         *  (icon-only; a filled slot's button removes the item) + ONE toggle
-         *  that opens the EXTERNAL village-stock picker. Every surface the
-         *  toggle opens lives inside this `data-hud-controls` scope (T-03). */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
-            {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
-          </span>
-          <div data-hud-controls="" data-testid="quest-expedition-loadout" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 6 }}>
-            {Array.from({ length: QUEST_STASH.bagSlots }, (_, i) => {
-              const id = selectedItemIds[i];
-              const entry = id ? items.find((e) => e.item.id === id) : undefined;
-              return (
-                <span
-                  key={i}
-                  data-testid={`bag-slot-${i}`}
-                  style={{
-                    width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
-                    background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
-                    color: entry ? 'var(--skin-title-color)' : TONE.secondary,
-                  }}
-                >
-                  {entry ? (
-                    <Tooltip.Root delayDuration={120}>
-                      <Tooltip.Trigger asChild>
-                        <button
-                          type="button"
-                          data-testid={`loadout-item-${id}`}
-                          aria-label={t(stripNs(entry.item.labelKey))}
-                          title={t(stripNs(entry.item.labelKey))}
-                          onClick={() => onToggleItem(id!)}
-                          style={{ width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}
-                        >
-                          <VillageStashItemIcon icon={entry.item.icon} size={22} />
-                        </button>
-                      </Tooltip.Trigger>
-                      <BagItemTooltip entry={entry} />
-                    </Tooltip.Root>
-                  ) : (
-                    <EngravedIcon id="ico-pouch" size={16} style={{ opacity: 0.4 }} aria-hidden />
-                  )}
-                </span>
-              );
-            })}
-            <button
-              ref={pickerToggleRef}
-              type="button"
-              data-testid="quest-bag-picker-toggle"
-              aria-expanded={pickerOpen}
-              aria-haspopup="dialog"
-              aria-label={t('questExpedition.bag.openPicker')}
-              title={t('questExpedition.bag.openPicker')}
-              onClick={() => setPickerOpen((o) => !o)}
+            {/* HERO — the letterbox: art behind a scrim, title + dispatch
+             *  on the lower edge, the three engraved seals, and the window
+             *  controls. It is also the drag handle. */}
+            <section
+              {...handleProps}
+              data-testid="quest-planner-hero"
+              aria-label={title}
               style={{
-                width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                border: `1px dashed color-mix(in srgb, ${TONE.accent} 65%, transparent)`,
-                background: pickerOpen ? `color-mix(in srgb, ${TONE.accent} 22%, transparent)` : 'transparent',
-                color: TONE.accent, cursor: 'pointer', padding: 0,
+                ...handleProps.style,
+                position: 'relative',
+                flexShrink: 0,
+                height: heroPx,
+                borderRadius: 8,
+                overflow: 'hidden',
+                border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
+                transition: reducedMotion ? 'none' : 'opacity 160ms ease',
               }}
             >
-              <EngravedIcon id="ico-pouch" size={20} aria-hidden />
-            </button>
-            {pickerOpen && (
-              /* HudPlaque keeps its own measurement ref (no forwardRef) —
-               *  the outside-click scope lives on this positioned wrapper. */
-              <div ref={pickerRef} data-hud-companion style={{ position: 'absolute', left: 0, bottom: 'calc(100% + 8px)', zIndex: 30 }}>
-              <HudPlaque
-                as="div"
-                shape="panel"
-                role="dialog"
-                aria-label={t('questExpedition.bag.pickerTitle')}
-                data-testid="quest-bag-external-picker"
+              {heroArt ? (
+                <img
+                  src={heroArt}
+                  alt=""
+                  aria-hidden
+                  style={{
+                    position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                    animation: reducedMotion ? undefined : 'qed-hero-scale 900ms ease-out both',
+                  }}
+                />
+              ) : (
+                <div
+                  data-testid="quest-planner-hero-crest"
+                  style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-deep)' }}
+                >
+                  <EngravedIcon id="ico-banner" size={48} aria-hidden style={{ color: 'color-mix(in srgb, var(--skin-title-color) 30%, transparent)' }} />
+                </div>
+              )}
+              {/* letterbox scrim — cinematic lower band, internal layer only */}
+              <div
+                aria-hidden
                 style={{
-                  display: 'grid', gridTemplateColumns: `repeat(${items.length}, 44px)`, gap: 6, padding: 10,
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(180deg, color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent) 0%, transparent 34%, transparent 55%, color-mix(in srgb, var(--skin-hud-lacquer-deep) 92%, transparent) 100%)',
                 }}
-              >
-                {items.map((entry) => {
-                  const { item, qty } = entry;
-                  const selected = selectedItemIds.includes(item.id);
-                  const full = !selected && selectedItemIds.length >= QUEST_STASH.bagSlots;
-                  return (
-                    <Tooltip.Root key={item.id} delayDuration={120}>
-                      <Tooltip.Trigger asChild>
-                        <button
-                          type="button"
-                          data-testid={`picker-item-${item.id}`}
-                          aria-pressed={selected}
-                          aria-label={t(stripNs(item.labelKey))}
-                          disabled={full}
-                          onClick={() => onToggleItem(item.id)}
-                          style={{
-                            position: 'relative', width: 44, height: 44, borderRadius: 8, padding: 0,
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            border: `1px solid color-mix(in srgb, ${selected ? TONE.accent : 'var(--skin-surface-border)'} ${selected ? 85 : 50}%, transparent)`,
-                            background: selected ? `color-mix(in srgb, ${TONE.accent} 22%, transparent)` : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
-                            color: selected ? TONE.accent : 'var(--skin-title-color)',
-                            opacity: full ? 0.65 : 1,
-                            cursor: full ? 'default' : 'pointer',
-                          }}
-                        >
-                          <VillageStashItemIcon icon={item.icon} size={22} />
-                          <span
-                            aria-hidden
-                            style={{
-                              position: 'absolute', right: 1, bottom: 0, fontFamily: FONT.display, fontSize: 12, lineHeight: 1, color: TONE.secondary,
-                            }}
-                          >
-                            ×{qty}
-                          </span>
-                        </button>
-                      </Tooltip.Trigger>
-                      <BagItemTooltip entry={entry} />
-                    </Tooltip.Root>
-                  );
-                })}
-              </HudPlaque>
+              />
+              {/* controls — top right, never a drag source */}
+              <div data-hud-controls="" style={{ position: 'absolute', top: 6, right: 6, display: 'flex', gap: 4 }}>
+                <button
+                  type="button"
+                  data-testid={`floating-panel-minimize-${panelId}`}
+                  aria-label={t('floatingPanel.minimize')}
+                  title={t('floatingPanel.minimize')}
+                  onClick={() => setMinimised(true)}
+                >
+                  <Minus aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  data-testid={`floating-panel-close-${panelId}`}
+                  aria-label={t('floatingPanel.close')}
+                  title={t('floatingPanel.close')}
+                  onClick={onClose}
+                >
+                  <X aria-hidden />
+                </button>
               </div>
-            )}
-          </div>
-          </div>
-        </div>
+              {/* engraved seals — Danger / Reward / Duration (read-only) */}
+              <div
+                data-testid="quest-planner-seals"
+                style={{ position: 'absolute', top: 6, left: 8, right: 80, display: 'flex', flexWrap: 'wrap', gap: 6, animation: reducedMotion ? undefined : 'qed-seal-in 300ms ease-out 180ms both' }}
+              >
+                {dangerBand && (
+                  <EngravedSeal
+                    testId="quest-expedition-band"
+                    label={t('questExpedition.seals.danger')}
+                    value={t(stripNs(dangerBand.i18nKey))}
+                    icon="ico-target"
+                    tone="danger"
+                  />
+                )}
+                {rewardTier && resolved && (
+                  <EngravedSeal
+                    testId="quest-expedition-reward"
+                    label={t('questExpedition.seals.reward')}
+                    value={`${t(stripNs(rewardTier.i18nKey))} · ${resolved.resolvedOffer.rewardResolved}`}
+                    icon="ico-chest"
+                    tone="ok"
+                  />
+                )}
+                <EngravedSeal
+                  testId="quest-expedition-duration"
+                  label={t('questExpedition.seals.duration')}
+                  value={formatExpeditionSpan(durationDays, t)}
+                  delta={durationDelta !== 0 ? `${durationDelta > 0 ? '+' : ''}${durationDelta}d` : null}
+                  icon="ico-gust"
+                  tone={expeditionDuration.factor < 1 ? 'ok' : expeditionDuration.factor > 1 ? 'warn' : undefined}
+                />
+              </div>
+              {/* title + dispatch — lower edge of the letterbox */}
+              <div style={{ position: 'absolute', left: 10, right: 10, bottom: 6, minWidth: 0, animation: reducedMotion ? undefined : 'qed-fade-up 420ms ease-out 120ms both' }}>
+                <h2
+                  style={{ margin: 0, fontFamily: FONT.display, fontSize: 17, lineHeight: 1.15, letterSpacing: '0.06em', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                >
+                  {title}
+                </h2>
+                {dispatchLine && heroPx > LAYOUT.heroCompactPx && (
+                  <p
+                    data-testid="quest-planner-dispatch"
+                    style={{ margin: '2px 0 0', fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.3, color: TONE.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  >
+                    {dispatchLine}
+                  </p>
+                )}
+              </div>
+            </section>
 
-        {/* Anchored footer CTA (PLAN-036): OUTSIDE the scroll region — the
-         *  commit control is never pushed off-screen (BV-1). */}
-        <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 10 }}>
-          <SkinButton
-            variant="cta"
-            data-testid="quest-expedition-send"
-            disabled={!canSend}
-            aria-disabled={!canSend}
-            onClick={onSend}
-            style={{ width: '100%', opacity: canSend ? 1 : 0.65 }}
-          >
-            {t('questExpedition.send')}
-          </SkinButton>
-          {!canSend && (
-            <span style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.secondary }}>
-              {t('questExpedition.forecast.incomplete')}
-            </span>
-          )}
-        </div>
-      </HudPlaque>
+            {/* BODY — rack + loadout + tray in ONE scroll region (compact /
+             *  terminal fallback only; ≥720px renders fully inside). */}
+            <div
+              ref={bodyRef}
+              data-testid="quest-planner-body"
+              className="quest-s1-scroll"
+              style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', scrollbarGutter: 'stable', display: 'flex', flexDirection: 'column', gap: 10 }}
+            >
+              {/* MARCHING ORDER — TESTA→CODA rack (64px castones) with the
+               *  static exposure strip under each slot. When the CTA is
+               *  gated by a missing required member this zone carries the
+               *  contract's subtle pulse (killed under reduced motion). */}
+              <section
+                data-testid="quest-planner-rack"
+                className={!requiredFilled && !reducedMotion ? 'animate-pulse' : undefined}
+                style={{ flexShrink: 0 }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <span style={SECTION_LABEL}>{t('questExpedition.marching.title')}</span>
+                  <button
+                    ref={companionsToggleRef}
+                    type="button"
+                    data-testid="quest-tray-companions-toggle"
+                    aria-expanded={trayOpen && trayMode === 'residents'}
+                    aria-pressed={trayOpen && trayMode === 'residents'}
+                    title={t('questExpedition.tray.modeResidents')}
+                    onClick={(e) =>
+                      trayOpen && trayMode === 'residents' ? closeTray() : openTray('residents', e.currentTarget)
+                    }
+                    style={{ ...SECTION_LABEL, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)', borderRadius: 4, padding: '1px 8px', cursor: 'pointer', background: 'none' }}
+                  >
+                    {t('questExpedition.tray.modeResidents')}
+                  </button>
+                </div>
+                <ResidentSlotRack
+                  slots={slots}
+                  layout="detail"
+                  onSlotClear={onSlotClear}
+                  onSlotClick={handleSlotPick}
+                  onSlotHover={setHoveredSlotId}
+                  highlightedSlotId={hoveredSlotId}
+                  slotSize={64}
+                  slotMaterial="hud-gold"
+                  slotVariant="hud64"
+                  bezelPreset="b"
+                  onSlotPhaseChange={onSlotPhaseChange}
+                  enableSlotSwap
+                  renderSlotFooter={renderSlotFooter}
+                />
+              </section>
 
-      {/* RIGHT — external forecast sidecar plaque (R-195): key-stat tiers
-       *  fixed on top, the scrollable analysis below. In-flow sibling of
-       *  the shell, so the drag union already covers it — no
-       *  `data-hud-companion` needed (that's for out-of-flow children). */}
+              {/* LOADOUT — bag slots + coverage marks + tray toggle. */}
+              <section data-testid="quest-expedition-loadout" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <span style={SECTION_LABEL}>
+                    {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
+                  </span>
+                  {!compact && (scenario?.primaryStats?.length ?? 0) > 0 && (
+                    <span data-testid="loadout-coverage" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ ...SECTION_LABEL, fontSize: 10 }}>{t('questExpedition.coverage')}</span>
+                      {scenario!.primaryStats!.map((s) => {
+                        const covered = bagCoveredStats.includes(s);
+                        const Icon = getStatIconComponent(STAT_ICONS[s]) ?? lucideStatIcons.star;
+                        return (
+                          <span
+                            key={s}
+                            title={STAT_SHORT[s]}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT.display, fontSize: 12, color: covered ? TONE.ok : TONE.secondary }}
+                          >
+                            {Icon && <Icon style={{ width: 12, height: 12 }} aria-hidden />}
+                            {STAT_SHORT[s] ?? s} {covered ? '✓' : '—'}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  )}
+                  <button
+                    ref={trayToggleRef}
+                    type="button"
+                    data-testid="quest-tray-toggle"
+                    aria-expanded={trayOpen && trayMode === 'items'}
+                    aria-pressed={trayOpen && trayMode === 'items'}
+                    title={t('questExpedition.bag.openPicker')}
+                    onClick={() =>
+                      trayOpen && trayMode === 'items' ? closeTray() : openTray('items', trayToggleRef.current)
+                    }
+                    style={{ ...SECTION_LABEL, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)', borderRadius: 4, padding: '1px 8px', cursor: 'pointer', background: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                  >
+                    <EngravedIcon id="ico-pouch" size={12} aria-hidden />
+                    {t('questExpedition.tray.open')}
+                  </button>
+                </div>
+                <div data-hud-controls="" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {Array.from({ length: QUEST_STASH.bagSlots }, (_, i) => {
+                    const id = selectedItemIds[i];
+                    const entry = id ? items.find((e) => e.item.id === id) : undefined;
+                    const slotChrome: CSSProperties = {
+                      width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
+                      background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
+                    };
+                    return (
+                      <span key={i} data-testid={`bag-slot-${i}`} style={slotChrome}>
+                        {entry ? (
+                          <Tooltip.Root delayDuration={120}>
+                            <Tooltip.Trigger asChild>
+                              <button
+                                type="button"
+                                data-testid={`loadout-item-${entry.item.id}`}
+                                aria-label={t('questExpedition.bag.removeSlot', { item: t(stripNs(entry.item.labelKey)) })}
+                                onClick={() => onToggleItem(entry.item.id)}
+                                style={{ width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: 'var(--skin-title-color)', cursor: 'pointer', padding: 0 }}
+                              >
+                                <VillageStashItemIcon icon={entry.item.icon} size={22} />
+                              </button>
+                            </Tooltip.Trigger>
+                            <BagItemTooltip entry={entry} />
+                          </Tooltip.Root>
+                        ) : (
+                          <button
+                            type="button"
+                            aria-label={t('questExpedition.bag.emptySlot', { index: i + 1 })}
+                            onClick={(e) => openTray('items', e.currentTarget)}
+                            style={{ width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: TONE.secondary, cursor: 'pointer', padding: 0 }}
+                          >
+                            <EngravedIcon id="ico-pouch" size={16} style={{ opacity: 0.4 }} aria-hidden />
+                          </button>
+                        )}
+                      </span>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* SELECTION TRAY — on-demand ~88px strip, residents|items. */}
+              {trayOpen && (
+                <section
+                  ref={trayRef}
+                  data-testid="quest-selection-tray"
+                  data-tray-mode={trayMode}
+                  role="region"
+                  aria-label={t('questExpedition.tray.title')}
+                  style={{ flexShrink: 0, height: LAYOUT.trayPx, display: 'flex', flexDirection: 'column', gap: 4, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)', borderRadius: 8, padding: 6 }}
+                >
+                  <div role="tablist" aria-label={t('questExpedition.tray.title')} style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    {(['residents', 'items'] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        role="tab"
+                        data-testid={`quest-tray-mode-${mode}`}
+                        aria-selected={trayMode === mode}
+                        onClick={(e) => { trayReturnRef.current = e.currentTarget; setTrayMode(mode); }}
+                        style={{
+                          ...SECTION_LABEL, fontSize: 10, cursor: 'pointer',
+                          border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)',
+                          borderRadius: 4, padding: '1px 8px',
+                          background: trayMode === mode ? 'color-mix(in srgb, var(--skin-title-color) 14%, transparent)' : 'none',
+                          color: trayMode === mode ? 'var(--skin-title-color)' : TONE.secondary,
+                        }}
+                      >
+                        {t(`questExpedition.tray.mode${mode === 'items' ? 'Items' : 'Residents'}`)}
+                      </button>
+                    ))}
+                    <span style={{ flex: 1 }} />
+                    <button
+                      type="button"
+                      data-testid="quest-tray-close"
+                      aria-label={t('questExpedition.tray.close')}
+                      title={t('questExpedition.tray.close')}
+                      onClick={closeTray}
+                      style={{ background: 'none', border: 'none', color: TONE.secondary, cursor: 'pointer', display: 'inline-flex', padding: 2 }}
+                    >
+                      <X aria-hidden style={{ width: 12, height: 12 }} />
+                    </button>
+                  </div>
+                  {trayMode === 'items' ? (
+                    <div style={{ display: 'flex', gap: 6, overflowX: 'auto', flex: '1 1 auto', minHeight: 0, alignItems: 'center' }}>
+                      {items.map((entry) => {
+                        const { item, qty } = entry;
+                        const selected = selectedItemIds.includes(item.id);
+                        const full = !selected && selectedItemIds.length >= QUEST_STASH.bagSlots;
+                        return (
+                          <Tooltip.Root key={item.id} delayDuration={120}>
+                            <Tooltip.Trigger asChild>
+                              <button
+                                type="button"
+                                data-testid={`picker-item-${item.id}`}
+                                aria-pressed={selected}
+                                aria-label={t(stripNs(item.labelKey))}
+                                disabled={full}
+                                onClick={() => onToggleItem(item.id)}
+                                style={{
+                                  position: 'relative', width: 44, height: 44, borderRadius: 8, padding: 0, flexShrink: 0,
+                                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                  border: `1px solid color-mix(in srgb, ${selected ? TONE.accent : 'var(--skin-surface-border)'} ${selected ? 85 : 50}%, transparent)`,
+                                  background: selected ? `color-mix(in srgb, ${TONE.accent} 22%, transparent)` : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
+                                  color: selected ? TONE.accent : 'var(--skin-title-color)',
+                                  opacity: full ? 0.65 : 1,
+                                  cursor: full ? 'default' : 'pointer',
+                                }}
+                              >
+                                <VillageStashItemIcon icon={item.icon} size={22} />
+                                <span aria-hidden style={{ position: 'absolute', right: 1, bottom: 0, fontFamily: FONT.display, fontSize: 12, lineHeight: 1, color: TONE.secondary }}>
+                                  ×{qty}
+                                </span>
+                              </button>
+                            </Tooltip.Trigger>
+                            <BagItemTooltip entry={entry} />
+                          </Tooltip.Root>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', flex: '1 1 auto', minHeight: 0, alignItems: 'center' }}>
+                      {trayResidents.length === 0 ? (
+                        <span style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.secondary }}>{t('questExpedition.tray.empty')}</span>
+                      ) : (
+                        trayResidents.map((r) => <TrayResidentTile key={r.id} resident={r} />)
+                      )}
+                      <span style={{ flexShrink: 0, alignSelf: 'center', fontFamily: FONT.serif, fontSize: 11, color: TONE.secondary, whiteSpace: 'nowrap' }}>
+                        {t('questExpedition.tray.dragHint')}
+                      </span>
+                    </div>
+                  )}
+                </section>
+              )}
+            </div>
+
+            {/* FOOTER — anchored: reason line + Back to map + Send expedition. */}
+            <footer
+              data-testid="quest-planner-footer"
+              style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 8 }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <SkinButton
+                  variant="cta"
+                  data-testid="quest-expedition-send"
+                  disabled={!canSend}
+                  aria-disabled={!canSend}
+                  aria-describedby={!canSend ? 'quest-planner-reason-line' : undefined}
+                  onClick={onSend}
+                  style={{ flex: 1, opacity: canSend ? 1 : 0.65 }}
+                >
+                  {t('questExpedition.send')}
+                </SkinButton>
+                <SkinButton
+                  variant="secondary"
+                  data-testid="quest-expedition-back"
+                  onClick={onClose}
+                >
+                  {t('questExpedition.backToMap')}
+                </SkinButton>
+              </div>
+              {!canSend && (
+                <span
+                  id="quest-planner-reason-line"
+                  data-testid="quest-planner-reason"
+                  style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.secondary }}
+                >
+                  {t('questExpedition.forecast.incomplete')}
+                </span>
+              )}
+            </footer>
+          </div>
+        </HudPlaque>
+      </div>
+
+      {/* ── RIGHT WING · the pinned forecast — it never yields while the
+           party is being edited (live ±pp deltas preserved, v23) ─────── */}
       <HudPlaque
         shape="panel"
         as="aside"
         aria-label={t('questExpedition.forecast.title')}
+        aria-live="polite"
         data-testid="quest-expedition-forecast-column"
-        style={{ width: LAYOUT.sidecarWidthPx, maxHeight: `calc(100vh - ${LAYOUT.plaqueViewportMarginPx}px)`, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
+        style={wingStyle}
       >
+        {/* Pinned head — title + aggregate + BY MEMBER (adjacent, TESTA→CODA). */}
         <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
-            {t('questExpedition.forecast.title')}
-          </span>
+          <span style={SECTION_LABEL}>{t('questExpedition.forecast.title')}</span>
+          <div
+            data-testid="quest-expedition-forecast"
+            data-forecast-state={estimate === 'computing' ? 'computing' : estimate === 'incomplete' ? 'incomplete' : 'ready'}
+            style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+          >
+            {resolvePending && <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.resolving')}</span>}
+            {!resolvePending && estimate === 'computing' && (
+              <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.computing')}</span>
+            )}
+            {!resolvePending && estimate === 'incomplete' && (
+              <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.incomplete')}</span>
+            )}
+            {ready && typeof estimate === 'object' && (
+              <>
+                {/* Aggregate — headline chips; the mark after each is the
+                 *  signed pp shift vs the previous party configuration. */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  <span data-testid="forecast-reward-pct">
+                    <HudChip tone="ok">
+                      {t('questExpedition.forecast.reward', { pct: estimate.sim.outcomePct.reward.toFixed(0) })}
+                      {forecastDelta && deltaMark(forecastDelta.rewardPp, false)}
+                    </HudChip>
+                  </span>
+                  <span data-testid="forecast-wound-pct">
+                    <HudChip tone="warn">
+                      {t('questExpedition.forecast.wound', { pct: estimate.sim.anyWoundPct.toFixed(0) })}
+                      {forecastDelta && deltaMark(forecastDelta.woundPp, true)}
+                    </HudChip>
+                  </span>
+                  <span data-testid="forecast-death-pct">
+                    <HudChip tone="danger">
+                      {t('questExpedition.forecast.death', { pct: estimate.sim.anyDeathPct.toFixed(0) })}
+                      {forecastDelta && deltaMark(forecastDelta.deathPp, true)}
+                    </HudChip>
+                  </span>
+                  <span data-testid="forecast-wipe-pct">
+                    <HudChip tone="danger">
+                      {t('questExpedition.forecast.wipe', { pct: estimate.sim.outcomePct.wipe.toFixed(0) })}
+                      {forecastDelta && deltaMark(forecastDelta.wipePp, true)}
+                    </HudChip>
+                  </span>
+                </div>
 
-          {/* Key Stats — the authored tiers VERBATIM (`keyStats`), or the
-           *  deterministic `deriveKeyStats` fallback. A tier is "covered"
-           *  when the bag or a member's stat meets the configured bar. */}
+                {/* BY MEMBER — adjacent to the aggregate, TESTA→CODA order;
+                 *  hovering a row lights its castone (and vice versa). */}
+                <div data-testid="forecast-members" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <span style={SECTION_LABEL}>{t('questExpedition.members.title')}</span>
+                  {estimate.sim.perMember.map((m) => {
+                    const slotId = slotIdForMember(m.id);
+                    const lit = hoveredMemberId === m.id;
+                    return (
+                      <div
+                        key={m.id}
+                        data-testid={`forecast-member-${m.id}`}
+                        data-slot-id={slotId ?? undefined}
+                        data-highlighted={lit ? 'true' : undefined}
+                        onMouseEnter={() => slotId && setHoveredSlotId(slotId)}
+                        onMouseLeave={() => setHoveredSlotId(null)}
+                        onFocus={() => slotId && setHoveredSlotId(slotId)}
+                        onBlur={() => setHoveredSlotId(null)}
+                        tabIndex={0}
+                        style={{
+                          display: 'flex', alignItems: 'baseline', gap: 8, fontFamily: FONT.serif, fontSize: 12,
+                          padding: '1px 4px', borderRadius: 4,
+                          background: lit ? 'color-mix(in srgb, var(--skin-title-color) 12%, transparent)' : 'transparent',
+                        }}
+                      >
+                        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: TONE.text }}>
+                          {m.name}
+                          <span style={{ color: TONE.secondary }}> · {t(`questExpedition.members.role.${m.role}`)}</span>
+                        </span>
+                        <span style={{ color: TONE.secondary, whiteSpace: 'nowrap' }}>
+                          {t('questExpedition.members.row', { wound: m.woundPct.toFixed(0), death: m.deathPct.toFixed(0) })}
+                        </span>
+                        {m.downtimeDays >= 0.5 && (
+                          <span style={{ color: TONE.secondary, whiteSpace: 'nowrap' }}>
+                            {t('questExpedition.members.downtime', { days: m.downtimeDays.toFixed(1) })}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* The ONE scroll region — WHY → Needs → Intel (contract order).
+         *  WHY is sim attribution (needs a ready estimate); Needs and Intel
+         *  are authored scenario info and stay visible even when the
+         *  forecast is incomplete — the player reads them while composing. */}
+        <div
+          data-testid="quest-expedition-forecast-scroll"
+          className="quest-s1-scroll"
+          style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}
+        >
+          {ready && typeof estimate === 'object' && estimate.sim.whyBySource.length > 0 && (
+            <div data-testid="forecast-why" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span style={SECTION_LABEL}>{t('questExpedition.why.title')}</span>
+              {estimate.sim.whyBySource.slice(0, QUEST_PLANNER_INFO.outcome.maxWhySources).map((src) => (
+                <div key={src.source} data-testid="forecast-why-row" style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.text, lineHeight: 1.35 }}>
+                  <span style={{ color: TONE.secondary }}>«{src.source}» </span>
+                  {t('questExpedition.why.row', { runs: src.runsPct.toFixed(0), death: src.deathSharePct.toFixed(0), wound: src.woundSharePct.toFixed(0) })}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* NEEDS — the authored key-stat tiers; a tier reads covered when
+           *  the bag or a member meets the configured bar. */}
           {keyTiers.primary.length > 0 && (
             <div data-testid="forecast-key-stats" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={SECTION_LABEL}>{t('questExpedition.keyStats.title')}</span>
               {(
                 [
                   { labelKey: 'questExpedition.keyStats.primary', stats: keyTiers.primary, testid: 'forecast-primary-stats' },
@@ -598,139 +1231,20 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
             </div>
           )}
 
-          {/* Coverage — which of the quest's declared primary stats the bag
-           *  covers (same vocabulary the check consumables serve). Kept as
-           *  `loadout-coverage` for E2E compatibility (r008 §2.3). */}
-          {(scenario?.primaryStats?.length ?? 0) > 0 && (
-            <div data-testid="loadout-coverage" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: TONE.secondary }}>
-                {t('questExpedition.coverage')}
-              </span>
-              {scenario!.primaryStats!.map((s) => {
-                const covered = bagCoveredStats.includes(s);
-                const Icon = getStatIconComponent(STAT_ICONS[s]) ?? lucideStatIcons.star;
-                return (
-                  <span
-                    key={s}
-                    title={STAT_SHORT[s]}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT.display, fontSize: 12, color: covered ? TONE.ok : TONE.secondary }}
-                  >
-                    {Icon && <Icon style={{ width: 12, height: 12 }} aria-hidden />}
-                    {STAT_SHORT[s] ?? s} {covered ? '✓' : '—'}
-                  </span>
-                );
-              })}
+          {/* Intel — authored preview hints always; deeper `revealHint`s
+           *  unlock via `revealAtPlanning` (D-S3-3). */}
+          {intelHints.length > 0 && (
+            <div data-testid="forecast-intel" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span style={SECTION_LABEL}>{t('questExpedition.intel.title')}</span>
+              {intelHints.map((h) => (
+                <div key={`${h.nodeId}-${h.revealed ? 'r' : 'p'}`} data-testid="forecast-intel-row" style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.text, lineHeight: 1.35 }}>
+                  {h.revealed && <HudChip tone="ok">{t('questExpedition.intel.scouted')}</HudChip>} {h.hint}
+                </div>
+              ))}
             </div>
           )}
         </div>
-
-        {/* Scrollable analysis body — OUTCOME zone (S3 T-2): aggregate →
-         *  BY MEMBER → WHY → Intel. Never partial numbers: 'computing' and
-         *  'incomplete' are whole states, a stale estimate never bleeds. */}
-        <div
-          data-testid="quest-expedition-forecast"
-          data-forecast-state={estimate === 'computing' ? 'computing' : estimate === 'incomplete' ? 'incomplete' : 'ready'}
-          className="quest-s1-scroll"
-          style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}
-        >
-          {resolvePending && <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.resolving')}</span>}
-          {!resolvePending && estimate === 'computing' && (
-            <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.computing')}</span>
-          )}
-          {!resolvePending && estimate === 'incomplete' && (
-            <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.incomplete')}</span>
-          )}
-          {ready && typeof estimate === 'object' && (
-            <>
-              {/* Aggregato — headline chips; the appended mark is the signed
-               *  pp shift vs the previous party configuration. */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                <span data-testid="forecast-reward-pct">
-                  <HudChip tone="ok">
-                    {t('questExpedition.forecast.reward', { pct: estimate.sim.outcomePct.reward.toFixed(0) })}
-                    {forecastDelta && deltaMark(forecastDelta.rewardPp, false)}
-                  </HudChip>
-                </span>
-                <span data-testid="forecast-wound-pct">
-                  <HudChip tone="warn">
-                    {t('questExpedition.forecast.wound', { pct: estimate.sim.anyWoundPct.toFixed(0) })}
-                    {forecastDelta && deltaMark(forecastDelta.woundPp, true)}
-                  </HudChip>
-                </span>
-                <span data-testid="forecast-death-pct">
-                  <HudChip tone="danger">
-                    {t('questExpedition.forecast.death', { pct: estimate.sim.anyDeathPct.toFixed(0) })}
-                    {forecastDelta && deltaMark(forecastDelta.deathPp, true)}
-                  </HudChip>
-                </span>
-                <span data-testid="forecast-wipe-pct">
-                  <HudChip tone="danger">
-                    {t('questExpedition.forecast.wipe', { pct: estimate.sim.outcomePct.wipe.toFixed(0) })}
-                    {forecastDelta && deltaMark(forecastDelta.wipePp, true)}
-                  </HudChip>
-                </span>
-              </div>
-
-              {/* BY MEMBER — per-member wound/death odds and expected
-               *  downtime, straight from `sim.perMember`. */}
-              <div data-testid="forecast-members" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
-                  {t('questExpedition.members.title')}
-                </span>
-                {estimate.sim.perMember.map((m) => (
-                  <div key={m.id} data-testid={`forecast-member-${m.id}`} style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontFamily: FONT.serif, fontSize: 12 }}>
-                    <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: TONE.text }}>
-                      {m.name}
-                      <span style={{ color: TONE.secondary }}> · {t(`questExpedition.members.role.${m.role}`)}</span>
-                    </span>
-                    <span style={{ color: TONE.secondary, whiteSpace: 'nowrap' }}>
-                      {t('questExpedition.members.row', { wound: m.woundPct.toFixed(0), death: m.deathPct.toFixed(0) })}
-                    </span>
-                    {m.downtimeDays >= 0.5 && (
-                      <span style={{ color: TONE.secondary, whiteSpace: 'nowrap' }}>
-                        {t('questExpedition.members.downtime', { days: m.downtimeDays.toFixed(1) })}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* WHY — which authored node produced the harm, attributed
-               *  inside the sims (top-N per config; the tail collapses). */}
-              {estimate.sim.whyBySource.length > 0 && (
-                <div data-testid="forecast-why" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
-                    {t('questExpedition.why.title')}
-                  </span>
-                  {estimate.sim.whyBySource.slice(0, QUEST_PLANNER_INFO.outcome.maxWhySources).map((src) => (
-                    <div key={src.source} data-testid="forecast-why-row" style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.text, lineHeight: 1.35 }}>
-                      <span style={{ color: TONE.secondary }}>«{src.source}» </span>
-                      {t('questExpedition.why.row', { runs: src.runsPct.toFixed(0), death: src.deathSharePct.toFixed(0), wound: src.woundSharePct.toFixed(0) })}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Intel — authored preview hints always; deeper `revealHint`s
-               *  unlock via `revealAtPlanning` (D-S3-3). TODO: the source will
-               *  be external scouting, not a party slot (Director 2026-10-10). */}
-              {intelHints.length > 0 && (
-                <div data-testid="forecast-intel" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
-                    {t('questExpedition.intel.title')}
-                  </span>
-                  {intelHints.map((h) => (
-                    <div key={`${h.nodeId}-${h.revealed ? 'r' : 'p'}`} data-testid="forecast-intel-row" style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.text, lineHeight: 1.35 }}>
-                      {h.revealed && <HudChip tone="ok">{t('questExpedition.intel.scouted')}</HudChip>} {h.hint}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </div>
       </HudPlaque>
-      </div>
     </SkinScope>
   );
 };

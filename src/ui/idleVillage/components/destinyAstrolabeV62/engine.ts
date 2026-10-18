@@ -20,6 +20,15 @@ export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number;
   harm?: 'none'|'wound'|'death';
   /** Global pace multiplier (PLAN-023): scales every beat duration. Default 1. */
   speed?: number;
+  /** PLAN-043 WS-4: the internal `#card` verdict overlay is suppressed — the
+   *  host paints its own external Verdict Card under the column. */
+  hideInternalCard?: boolean;
+  /** PLAN-043 WS-4: after the verdict settles the rAF loop parks — the board
+   *  holds its last frame at 0 redraws/s until `redrawOnce()` (host resize)
+   *  or a new `roll()`. */
+  settledIdle?: boolean;
+  /** Ms after `resolve()` before the settled-idle park engages (BV-04: 700). */
+  settledIdleDelayMs?: number;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
@@ -40,6 +49,9 @@ export interface AstrolabeEngineHandle {
   skipToResult: () => void;
   setConfig: (skills: AstrolabeSkill[], config?: AstrolabeConfig) => void;
   destroy: () => void;
+  /** PLAN-043 WS-4: one manual frame while the loop is parked in settledIdle
+   *  (host resize) — never restarts the loop. No-op while running. */
+  redrawOnce: () => void;
 }
 
 export function createDestinyAstrolabeV62Engine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
@@ -477,6 +489,10 @@ function shake(kind){
 }
 
 function launchRoll(){
+  /* A fresh roll unparks the settled-idle frame (WS-4). */
+  idleParked=false;
+  delete suite.dataset.astroIdle;
+  if(engineAlive && rafId===null) rafId=requestAnimationFrame(frame);
   /* clear previous resolution */
   card.classList.remove('show','triumph','win','almost','fail','epic');
   suite.dataset.tone='';
@@ -867,8 +883,12 @@ function resolve(){
   if(res.dead) chips.innerHTML+='<span class="chip dead">Caduto</span>';
   card.classList.remove('triumph','win','almost','fail','epic');
   card.classList.add(V.cls);
-  void card.offsetWidth;
-  card.classList.add('show');
+  /* WS-4 `hideInternalCard`: the host renders its own external Verdict Card —
+   *  the internal one stays mounted (markup contract) but never `.show`s. */
+  if(!cfg.hideInternalCard){
+    void card.offsetWidth;
+    card.classList.add('show');
+  }
   /* tone per verdict */
   const isLoss=(res.verdict==='fail'||res.verdict==='epicfail');
   if(res.verdict==='bigwin'||res.verdict==='win'){
@@ -895,6 +915,16 @@ function resolve(){
   if(opts.onResolve){
     const skillName=skills.length>0?skills[skillIndex].name:'Skill';
     opts.onResolve({verdict,roll:0,riskRoll,skillIndex,skillName,wounded,dead});
+  }
+  /* WS-4 settledIdle: the verdict's dwell breathes a moment, then the rAF
+   *  loop parks — 0 redraws/s while the card is held (BV-04). */
+  if(cfg.settledIdle){
+    window.setTimeout(()=>{
+      if(!engineAlive) return;
+      idleParked=true;
+      if(rafId!==null){ cancelAnimationFrame(rafId); rafId=null; }
+      suite.dataset.astroIdle='parked';
+    }, cfg.settledIdleDelayMs ?? 700);
   }
 }
 
@@ -1971,9 +2001,15 @@ function frame(now){
   drawMotes(now,dt);
   drawBall(now);
  }catch(e){ if(!window.__frameErrLogged){ window.__frameErrLogged=true; console.error('FRAME ERROR:', e && e.stack || e); } }
+ /* BV-04 witness: with `settledIdle` the frame counter lands on the suite
+    DOM so a probe can measure the parked delta — one attribute write per
+    frame, only on surfaces that opted into the park contract. */
+ if(cfg.settledIdle) suite.dataset.astroFrames=String(++frameNo);
  /* V6.2: guarded re-schedule — the V6 clone had two parallel self-rescheduling
-    rAF loops that destroy() could never stop (leaked frames after unmount). */
- if(engineAlive) rafId=requestAnimationFrame(frame);
+    rAF loops that destroy() could never stop (leaked frames after unmount).
+    WS-4 `settledIdle`: after the verdict parks, the loop stops — the last
+    frame holds until `redrawOnce()` or a fresh `roll()`. */
+ rafId = (engineAlive && !idleParked) ? requestAnimationFrame(frame) : null;
 }
 
 /* =========================================================================
@@ -2064,6 +2100,7 @@ function onKeydown(e){
   if(e.code==='Space'&&!e.repeat){ e.preventDefault(); onLaunchInput(); }
 }
 let engineAlive = true;           // false after destroy — guards stray listeners
+let frameNo = 0;                  // BV-04 witness counter (stamped only under settledIdle)
 $id('launch').addEventListener('click', onLaunchInput);
 window.addEventListener('keydown', onKeydown);
 
@@ -2071,7 +2108,10 @@ recomputeGeometry();
 updateMathPanel();
 
   /* ---- public handle ---- */
-  let rafId = requestAnimationFrame(frame);
+  let rafId: number | null = requestAnimationFrame(frame);
+  /* WS-4 settledIdle: once true, `frame` draws once per explicit call and
+   *  never re-schedules (BV-04: 0 rAF/s with a held verdict). */
+  let idleParked = false;
   recomputeGeometry();
   function setConfig(newSkills, newConfig){
     if(newSkills){ skills = newSkills.slice(); recomputeSkillAxes(); }
@@ -2087,9 +2127,16 @@ updateMathPanel();
   }
   function destroy(){
     engineAlive=false;
-    cancelAnimationFrame(rafId);
+    if(rafId!==null) cancelAnimationFrame(rafId);
+    rafId=null;
     window.removeEventListener('keydown', onKeydown);
     gooRenderer?.destroy();
+  }
+  /* settledIdle: a resize on the host must repaint once — and only once.
+     `frame`'s own reschedule tail sees `idleParked` and parks again. */
+  function redrawOnce(){
+    if(!engineAlive || !idleParked || rafId!==null) return;
+    rafId=requestAnimationFrame(frame);
   }
   /* SKIP TO RESULT (PLAN-023): the verdict is already forced by the host, so
      skipping is presentation-only. From ANY point in the choreography this
@@ -2109,5 +2156,5 @@ updateMathPanel();
     scene.ball.vx=0; scene.ball.vy=0; scene.ball.trail.length=0;
     resolve();
   }
-  return { roll: launchRoll, throw: throwBall, setConfig, destroy, skipToResult };
+  return { roll: launchRoll, throw: throwBall, setConfig, destroy, skipToResult, redrawOnce };
 }

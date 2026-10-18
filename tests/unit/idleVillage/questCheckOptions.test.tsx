@@ -1,21 +1,25 @@
 /**
- * R-199 pt.9/10 — the quest window exposes a per-check presentation panel
- * (skip the whole cinematic / skip only the intro) and docks the frozen
- * `DestinyAstrolabeV62` over the theatre on check beats. The engine stays
- * authoritative: the astrolabe only PAINTS the committed verdict — the test
- * stubs the frozen kit and verifies the wiring, not its internals.
+ * R-199 pt.9/10 + PLAN-043 WS-4 — the quest window exposes a per-check
+ * presentation panel (skip the whole cinematic / skip only the intro) and,
+ * on check beats, publishes the presentation bridge `QuestOverlays` projects
+ * into the check surface (the cluster's `QuestSkillCheckColumn` in run
+ * regime, `QuestSkillCheckOverlay` as the standalone fallback). The engine
+ * stays authoritative: the astrolabe only PAINTS the committed verdict —
+ * the test stubs the frozen kit and verifies the wiring, not its internals.
  */
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { afterEach, describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { applyChoice, availableOptions, createRun, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import { applyChoice, createRun, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import { publishQuestRun } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { emptyPhase } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import type { CheckBeat, QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
 import { QuestRunWindow } from '@/ui/idleVillage/components/gameFrame/QuestRunWindow';
 import { QuestCheckOptionsPanel } from '@/ui/idleVillage/components/gameFrame/QuestCheckOptionsPanel';
+import { QuestOverlays } from '@/ui/idleVillage/components/gameFrame/questOverlays';
 
 /* Stub the frozen kit: jsdom has no canvas, and the contract under test is
  * the WINDOW's wiring — the imperative handle (`throw`/`skipToResult`), the
@@ -49,15 +53,22 @@ const TIMING = { sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapM
 /** A run with one resolved check in the queue — the authored way (R-106). */
 const runWithCheck = (seed = 42): { run: QuestRunState; check: ResolvedCheck } => {
   const run = createRun(PRESET, seed, 'goblin');
-  applyChoice(run, availableOptions(run)[0].id); // depart → F1 exploration
+  /* The departure IS the first check — 'gob-cerca-tracce' resolves from the
+   * run's own start (the in-run F0 assignment node is gone; the bag packs in
+   * the planner). A second applyChoice with an unavailable id would drain
+   * the queue. */
   applyChoice(run, 'gob-cerca-tracce', { useConsumable: false });
   const check = run.checkQueue[0];
   expect(check).toBeTruthy();
   return { run, check };
 };
 
-const renderWindow = (run: QuestRunState, queuedBeats: QuestBeat[] = []) =>
-  render(
+/* WS-4: the astrolabe surface reads the bridge through the quest run store
+ * — the test publishes the run and mounts `QuestOverlays` (the standalone
+ * fallback path, `checkInColumn` off) exactly like the lab page does. */
+const renderWindow = (run: QuestRunState, queuedBeats: QuestBeat[] = []) => {
+  publishQuestRun('goblin', run);
+  return render(
     <Tooltip.Provider>
       <QuestRunWindow
         run={run}
@@ -76,8 +87,14 @@ const renderWindow = (run: QuestRunState, queuedBeats: QuestBeat[] = []) =>
         theaterAspect={2.4}
         tooltipLines={6}
       />
+      <QuestOverlays questId="goblin" />
     </Tooltip.Provider>,
   );
+};
+
+afterEach(() => {
+  publishQuestRun('goblin', null);
+});
 
 describe('QuestCheckOptionsPanel — the popover itself', () => {
   it('renders both options as aria-pressed rows and honours the config gates', () => {
@@ -105,26 +122,31 @@ describe('QuestCheckOptionsPanel — the popover itself', () => {
   });
 });
 
-describe('QuestRunWindow — check options + docked astrolabe (R-199 pt.9/10)', () => {
-  it('a check beat docks the astrolabe over the theatre, fed the engine verdict', () => {
+describe('QuestRunWindow — check options + astrolabe surface (R-199 pt.9/10, WS-4)', () => {
+  it('a check beat publishes the bridge — the check surface paints the astrolabe, fed the engine verdict', () => {
     const { run, check } = runWithCheck();
     const beat: CheckBeat = { id: check.id, kind: 'check', check };
     renderWindow(run, [beat]);
-    expect(screen.getByTestId('quest-check-astrolabe')).toBeInTheDocument();
-    const stub = screen.getByTestId('astro-stub');
+    /* WS-4: the astrolabe left the theatre DOM — `QuestOverlays` paints the
+     * bridge inside `quest-check-overlay` (standalone) / the right-wing
+     * column (cluster). The stub proves the wiring, not the surface. */
+    const overlay = screen.getByTestId('quest-check-overlay');
+    const stub = within(overlay).getByTestId('astro-stub');
     // The engine's verdict/harm drives the painted mode — the astrolabe never rolls.
     expect(stub.dataset.mode).toBe(check.harm === 'death' && check.verdict === 'fail' ? 'fail_dead' : check.harm === 'wound' && check.verdict === 'fail' ? 'fail_wound' : check.verdict);
   });
 
-  it('«skip the whole check» undocks the astrolabe — the verdict beat still presents', () => {
+  it('«skip the whole check» suppresses the bridge — the verdict beat still presents', () => {
     const { run, check } = runWithCheck();
     const beat: CheckBeat = { id: check.id, kind: 'check', check };
     renderWindow(run, [beat]);
     fireEvent.click(screen.getByTestId('quest-check-options-toggle'));
     fireEvent.click(screen.getByTestId('quest-check-opt-skip-check'));
-    expect(screen.queryByTestId('quest-check-astrolabe')).toBeNull();
-    // The authored verdict line still lands — presentation, not outcome, was skipped.
-    if (check.flavor) expect(screen.getByText(check.flavor)).toBeInTheDocument();
+    expect(screen.queryByTestId('astro-stub')).toBeNull();
+    // The authored verdict line still lands on the stage — presentation, not
+    // outcome, was skipped (the outcome toast may echo it too: scope the assert).
+    if (check.flavor)
+      expect(within(screen.getByTestId('quest-window-beat')).getByText(check.flavor)).toBeInTheDocument();
   });
 
   it('«skip intro» calls the astrolabe throw() — spin and verdict are kept', () => {
@@ -136,7 +158,7 @@ describe('QuestRunWindow — check options + docked astrolabe (R-199 pt.9/10)', 
       fireEvent.click(screen.getByTestId('quest-check-options-toggle'));
       astroThrow.mockClear();
       fireEvent.click(screen.getByTestId('quest-check-opt-skip-intro'));
-      act(() => vi.advanceTimersByTime(0)); // the window's 0ms warmup fires
+      act(() => vi.advanceTimersByTime(0)); // the overlay's 0ms auto-throw fires
       expect(astroThrow).toHaveBeenCalled();
     } finally {
       vi.useRealTimers();
@@ -151,11 +173,13 @@ describe('QuestRunWindow — check options + docked astrolabe (R-199 pt.9/10)', 
       const after: QuestBeat = { id: 'scene-after', kind: 'scene', nodeId: run.nodeId, title: 'After' };
       renderWindow(run, [beat, after]);
       astroSkip.mockClear();
-      // The dock is over the theatre — a plain click settles the verdict.
-      fireEvent.click(screen.getByTestId('astro-stub'));
+      // The astrolabe lives outside the theatre now — clicking the theatre
+      // reaches the published imperative handle → settle the verdict.
+      fireEvent.click(screen.getByTestId('quest-theatre'));
       expect(astroSkip).toHaveBeenCalledTimes(1);
-      // Resolve happened via the stub's skipToResult → dwell → next beat.
-      act(() => vi.advanceTimersByTime(TIMING.checkVerdictMs + 50));
+      // Verdict painted → the beat stays held until the player dismisses it
+      // (no timed dwell): the next stage click settles it and moves on.
+      fireEvent.click(screen.getByTestId('quest-theatre'));
       expect(screen.getByText('After')).toBeInTheDocument();
     } finally {
       vi.useRealTimers();

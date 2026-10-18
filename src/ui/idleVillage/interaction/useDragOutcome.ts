@@ -131,3 +131,14 @@ export function elementCenter(el: Element | null): { x: number; y: number } | nu
   const r = el.getBoundingClientRect();
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
+
+/**
+ * Find the actual Slot component wrapper for flight geometry, not the rack
+ * cell that also contains its caption and footer.
+ */
+export function getSlotComponentElement(slotId: string): Element | null {
+  if (typeof document === 'undefined') return null;
+  const testId = `slot-button-${slotId}`;
+  return Array.from(document.querySelectorAll('[data-testid^="slot-button-"]'))
+    .find((element) => element.getAttribute('data-testid') === testId) ?? null;
+}

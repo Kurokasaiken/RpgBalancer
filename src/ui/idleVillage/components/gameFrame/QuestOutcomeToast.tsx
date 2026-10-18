@@ -149,6 +149,11 @@ export interface QuestOutcomeToastHostProps {
   /** Persists the dismissal into the run (`dismissedUpTo`) — the durable
    *  half of the gate; the session floor below is the immediate one. */
   onDismissOutcome?: (checkSeq: number) => void;
+  /** PLAN-043 WS-4: the right-wing column owns the check's verdict surface —
+   *  seqs whose bridge the column painted are consumed there (exactly-once,
+   *  BV-05), never re-toasted. A `skipCheck` beat publishes no bridge, so
+   *  its outcome still lands here — the documented fallback. */
+  columnMode?: boolean;
 }
 
 /**
@@ -160,7 +165,7 @@ export interface QuestOutcomeToastHostProps {
  * - `rewardConsumed` — seqs the acknowledged end-of-run report absorbed;
  * - `flushOverdue` — seqs whose report never acknowledged in time.
  */
-export const QuestOutcomeToastHost: React.FC<QuestOutcomeToastHostProps> = ({ questId, onDismissOutcome }) => {
+export const QuestOutcomeToastHost: React.FC<QuestOutcomeToastHostProps> = ({ questId, onDismissOutcome, columnMode = false }) => {
   const run = useQuestRunFromStore(questId);
   const bridge = useCheckBridge(questId);
   const rewardAckRunId = useRewardAck(questId);
@@ -172,6 +177,9 @@ export const QuestOutcomeToastHost: React.FC<QuestOutcomeToastHostProps> = ({ qu
   const [flushOverdue, setFlushOverdue] = useState<ReadonlySet<number>>(new Set());
   const flushTimers = useRef(new Map<number, number>());
   const shownFor = useRef<number | null>(null);
+  /* WS-4: seqs whose bridge the right-wing column presented — a presented
+   * verdict must never re-surface as a toast (exactly-once, BV-05). */
+  const columnPresented = useRef(new Set<number>());
 
   /* New run → the session ledgers reset with its identity (the persisted
    * `dismissedUpTo` inside the run is the durable floor). */
@@ -180,9 +188,17 @@ export const QuestOutcomeToastHost: React.FC<QuestOutcomeToastHostProps> = ({ qu
     setRewardConsumed(new Set());
     setFlushOverdue(new Set());
     shownFor.current = null;
+    columnPresented.current.clear();
     for (const t of flushTimers.current.values()) window.clearTimeout(t);
     flushTimers.current.clear();
   }, [runId]);
+
+  /* A live bridge in column mode marks its seq consumed-by-column — the
+   * ledger persists after the bridge clears so the dismissal never revives
+   * the toast. */
+  useEffect(() => {
+    if (columnMode && bridge) columnPresented.current.add(bridge.check.checkSeq);
+  }, [columnMode, bridge]);
 
   /** Latest-wins eligibility: highest unsettled-elsewhere, undismissed seq. */
   const eligible = useMemo<ResolvedCheck | null>(() => {
@@ -192,10 +208,11 @@ export const QuestOutcomeToastHost: React.FC<QuestOutcomeToastHostProps> = ({ qu
     for (const c of checkHistory(run)) {
       if (!Number.isInteger(c.checkSeq) || c.checkSeq <= floor) continue;
       if (bridge && bridge.check.checkSeq === c.checkSeq) continue;
+      if (columnMode && columnPresented.current.has(c.checkSeq)) continue;
       if (!best || c.checkSeq > best.checkSeq) best = c;
     }
     return best;
-  }, [run, bridge, sessionFloor]);
+  }, [run, bridge, sessionFloor, columnMode]);
   const seq = eligible?.checkSeq;
 
   const ended = !!run?.ended;

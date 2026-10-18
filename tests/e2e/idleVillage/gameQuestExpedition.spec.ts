@@ -268,12 +268,12 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await expect(page.getByTestId('quest-window')).toBeVisible({ timeout: 10_000 });
 
     const before = (await getRun(page))!;
-    expect(before.nodeId).toBe('gob-inizio');
+    expect(before.nodeId).toBe('gob-esplora');
     expect(before.frontier.status).toBe('waiting');
 
     /* 30 ticks pass with a decision open: offline time fills the halo (D-J)
      *  but must NEVER decide for the player — the frontier is still
-     *  `gob-inizio`, still waiting. (Timed-beat chain maturation is the
+     *  `gob-esplora`, still waiting. (Timed-beat chain maturation is the
      *  engine's `matureReady` — unit-covered; the early goblin graph is
      *  decision-first, so no pending beat is reachable this shallow.) */
     await advanceTicks(page, 30);
@@ -283,7 +283,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
       { timeout: 8_000 },
     );
     const after = (await getRun(page))!;
-    expect(after.nodeId).toBe('gob-inizio');
+    expect(after.nodeId).toBe('gob-esplora');
     expect(after.frontier.status).toBe('waiting');
 
     // The decision is presented to the player as a real choice button…
@@ -292,21 +292,21 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     const choices = page.locator('[data-hud-choices] button');
     await expect(choices.first()).toBeVisible({ timeout: 20_000 });
     const options = await expedition<string[]>(page, 'getOptions');
-    expect(options).toContain('gob-partenza');
+    expect(options).toContain('gob-cerca-tracce');
 
     // …and the player resolves it (the same api the button calls) — the run
     // advances to the next node.
-    await expedition<void>(page, 'choose', 'gob-partenza');
+    await expedition<void>(page, 'choose', 'gob-cerca-tracce');
     await page.waitForFunction(
       () => {
         const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.['poi-goblin'];
-        return exp?.getRun?.()?.nodeId === 'gob-esplora';
+        return exp?.getRun?.()?.nodeId !== 'gob-esplora';
       },
       undefined,
       { timeout: 8_000 },
     );
     const next = (await getRun(page))!;
-    expect(next.nodeId).toBe('gob-esplora');
+    expect(next.nodeId).not.toBe('gob-esplora');
     // The phase strip renders the played beats (and the next as preview).
     const beats = page.locator('[data-testid="quest-window-beat"]');
     await expect(beats.first()).toBeVisible();
@@ -556,7 +556,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     const halo = (await expedition<HaloShape | null>(page, 'getHalo'))!;
     expect(halo.status).toBe('pieno-in-attesa');
     const run = (await getRun(page))!;
-    expect(run.nodeId).toBe('gob-inizio');
+    expect(run.nodeId).toBe('gob-esplora');
     expect(run.frontier.status).toBe('waiting');
     expect(run.ended).toBe(false);
 

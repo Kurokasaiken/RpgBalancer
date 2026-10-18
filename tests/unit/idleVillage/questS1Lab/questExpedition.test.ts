@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
-import { buildExpeditionParty, deriveKeyStats, isExpeditionItem, loadoutDuration, type ExpeditionSlotSpec } from '@/ui/idleVillage/quests/questExpedition';
+import { buildExpeditionParty, deriveKeyStats, expeditionDays, formatExpeditionSpan, isExpeditionItem, loadoutDuration, type ExpeditionSlotSpec } from '@/ui/idleVillage/quests/questExpedition';
 import { estimateForParty, estimateForPartyAsync, resolveQuestOffer, collectWorldProgressSignals } from '@/ui/idleVillage/questS1Lab/questOffer';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
@@ -199,5 +199,31 @@ describe('deriveKeyStats — PLAN-036 planner tier display', () => {
   it('never invents a primary when no scenario exists', () => {
     expect(deriveKeyStats(undefined)).toEqual({ primary: [], secondary: [] });
     expect(deriveKeyStats({ primaryStats: [], keyStats: undefined })).toEqual({ primary: [], secondary: [] });
+  });
+});
+
+describe('expeditionDays / formatExpeditionSpan — WS-3 whole-day vocabulary (AC-11)', () => {
+  it.each([
+    [0, 1], [0.3, 1], [0.49, 1], [0.5, 1], [1, 1],
+    [1.4, 1], [1.5, 2], [1.6, 2], [2.25, 2], [2.5, 3], [4.6, 5],
+  ])('rounds %d fractional days → %d whole days (round-half-up, min 1)', (input, expected) => {
+    expect(expeditionDays(input)).toBe(expected);
+  });
+
+  it('clamps NaN/negative to the 1-day floor', () => {
+    expect(expeditionDays(Number.NaN)).toBe(1);
+    expect(expeditionDays(-3)).toBe(1);
+  });
+
+  it('renders the ICU-plural key with the rounded count, never ticks', () => {
+    const calls: { key: string; opts?: Record<string, unknown> }[] = [];
+    const t = (key: string, opts?: Record<string, unknown>) => {
+      calls.push({ key, opts });
+      return `${key}:${opts?.count}`;
+    };
+    expect(formatExpeditionSpan(0.3, t)).toBe('questExpedition.durationDays:1');
+    expect(formatExpeditionSpan(1.6, t)).toBe('questExpedition.durationDays:2');
+    expect(formatExpeditionSpan(2.25, t)).toBe('questExpedition.durationDays:2');
+    expect(calls.every((c) => c.key === 'questExpedition.durationDays')).toBe(true);
   });
 });
