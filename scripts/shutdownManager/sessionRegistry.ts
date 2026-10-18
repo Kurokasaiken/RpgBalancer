@@ -65,11 +65,26 @@ export const ProjectSchema = z.object({
 /** @typedef {z.infer<typeof ProjectSchema>} Project */
 export type Project = z.infer<typeof ProjectSchema>;
 
+/**
+ * Days (0=Sunday … 6=Saturday) on which the quiet window is restricted to
+ * the configured hours. Weekdays by default (R-211): Mon–Fri restricted,
+ * Sat–Sun active all day.
+ */
+export const DEFAULT_RESTRICTED_DAYS_OF_WEEK: readonly number[] = [1, 2, 3, 4, 5];
+
 /** Overnight escalation window (local time, wraps midnight). */
 export const QuietWindowSchema = z.object({
   enabled: z.boolean().default(false),
   startHour: z.number().int().min(0).max(23).default(23),
   endHour: z.number().int().min(0).max(23).default(7),
+  /**
+   * Days (0=Sunday … 6=Saturday) on which the window covers only
+   * `startHour`–`endHour`. On unlisted days the window is active all day;
+   * an empty array lifts the hour restriction entirely.
+   */
+  restrictedDaysOfWeek: z
+    .array(z.number().int().min(0).max(6))
+    .default([...DEFAULT_RESTRICTED_DAYS_OF_WEEK]),
 });
 
 /** Shutdown policy embedded in the registry. */
@@ -141,7 +156,12 @@ export function createDefaultRegistry(machineId?: string): SessionRegistry {
       bootstrapGracePeriodMs: 300_000,
       requireRepoClean: false,
       autoCommitAndPush: true,
-      quietWindow: { enabled: false, startHour: 23, endHour: 7 },
+      quietWindow: {
+        enabled: false,
+        startHour: 23,
+        endHour: 7,
+        restrictedDaysOfWeek: [...DEFAULT_RESTRICTED_DAYS_OF_WEEK],
+      },
     },
   };
 }
@@ -255,7 +275,9 @@ async function acquireLock(): Promise<() => void> {
 
 /**
  * Whether `now` falls inside the policy's overnight quiet window.
- * The window wraps midnight (e.g. 23:00 → 07:00).
+ * The window wraps midnight (e.g. 23:00 → 07:00). On days absent from
+ * `restrictedDaysOfWeek` (0=Sunday … 6=Saturday) the window is active all
+ * day; a missing field resolves to the weekday default (R-211).
  *
  * @param now - Current time.
  * @param quietWindow - Policy quiet window config.
@@ -266,6 +288,8 @@ export function isQuietWindowActive(
   quietWindow: SessionRegistry['policy']['quietWindow'],
 ): boolean {
   if (!quietWindow.enabled) return false;
+  const restrictedDays = quietWindow.restrictedDaysOfWeek ?? DEFAULT_RESTRICTED_DAYS_OF_WEEK;
+  if (!restrictedDays.includes(now.getDay())) return true;
   const hour = now.getHours();
   if (quietWindow.startHour <= quietWindow.endHour) {
     return hour >= quietWindow.startHour && hour < quietWindow.endHour;

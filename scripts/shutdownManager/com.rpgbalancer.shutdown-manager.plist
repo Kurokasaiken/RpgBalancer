@@ -6,7 +6,8 @@
   <string>com.rpgbalancer.shutdown-manager</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/faustoboni/progetti_personali/RPG/node_modules/.bin/tsx</string>
+    <string>/Users/faustoboni/.nvm/versions/node/v22.23.1/bin/node</string>
+    <string>/Users/faustoboni/progetti_personali/RPG/node_modules/tsx/dist/cli.mjs</string>
     <string>/Users/faustoboni/progetti_personali/RPG/scripts/shutdownManager/shutdownManager.ts</string>
   </array>
   <key>WorkingDirectory</key>
@@ -24,7 +25,7 @@
   <key>EnvironmentVariables</key>
   <dict>
     <key>PATH</key>
-    <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+    <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin</string>
   </dict>
 </dict>
 </plist>

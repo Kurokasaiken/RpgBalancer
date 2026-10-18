@@ -81,6 +81,8 @@ export async function evaluateOnce(): Promise<ShutdownDecision> {
 
   // Bootstrap safeguard: known work processes running but unregistered must
   // block shutdown even when the registry is empty (OPS-SHUTDOWN-006 gap).
+  // R-212: server fixtures (vite preview, dev servers) are reported, never
+  // veto — a leftover server is not work.
   const activeWork = await findActiveWorkProcesses();
   const registeredPids = new Set(
     Object.values(registry.projects).flatMap((p) =>
@@ -88,9 +90,16 @@ export async function evaluateOnce(): Promise<ShutdownDecision> {
     ),
   );
   const unregistered = activeWork.filter((p) => !registeredPids.has(p.pid));
-  if (decision.allowed && unregistered.length > 0) {
+  const blockingWork = unregistered.filter((p) => p.kind === 'work');
+  const serverLeftovers = unregistered.filter((p) => p.kind === 'server');
+  if (decision.allowed && blockingWork.length > 0) {
     decision.allowed = false;
-    decision.reason = `unregistered work processes active: ${unregistered.map((p) => p.command).join('; ')}`;
+    decision.reason = `unregistered work processes active: ${blockingWork.map((p) => p.command).join('; ')}`;
+  }
+  if (serverLeftovers.length > 0) {
+    await logLine(
+      `server leftovers (non-blocking): ${serverLeftovers.map((p) => `${p.pid}:${p.command}`).join('; ')}`,
+    );
   }
 
   await logLine(

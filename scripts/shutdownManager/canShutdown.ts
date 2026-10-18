@@ -9,11 +9,15 @@
  */
 
 import {
+  DEFAULT_RESTRICTED_DAYS_OF_WEEK,
   isQuietWindowActive,
   type Session,
   type SessionRegistry,
   type SessionState,
 } from './sessionRegistry.js';
+
+/** Short day labels for quiet-window diagnostics (index = `Date.getDay()`). */
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 /** Session states that always block shutdown. */
 const BLOCKING_STATES: ReadonlySet<SessionState> = new Set([
@@ -69,6 +73,8 @@ export interface CanShutdownOptions {
  * Blocking rules (in order):
  * 1. `policy.shutdownEnabled === false` → blocked.
  * 1b. `policy.quietWindow.enabled` and now outside the window → blocked.
+ *     The window covers `startHour`–`endHour` on `restrictedDaysOfWeek`
+ *     and the whole day on unlisted days (R-211: weekends unrestricted).
  * 2. `userIdleMs === 'UNKNOWN'` or below threshold → blocked.
  * 3. Any session in a non-terminal state → blocked. Sessions whose
  *    heartbeat age exceeds `maxSessionAgeMs` are treated as stuck and
@@ -118,14 +124,19 @@ export function canShutdown(
   if (!policy.shutdownEnabled) {
     return { allowed: false, reason: 'policy.shutdownEnabled=false', blockers, userIdleMs, policy };
   }
-  /* Quiet-window veto (Director ruling 2026-10-16): when enabled, shutdown is
-   * only allowed inside the configured overnight window — a drained queue at
-   * 15:00 must not power off the machine the Director may still be using. */
+  /* Quiet-window veto (Director rulings 2026-10-16 + 2026-10-17 R-211): when
+   * enabled, shutdown is only allowed inside the configured overnight window
+   * on restricted days — a drained queue at 15:00 on a weekday must not power
+   * off the machine the Director may still be using. Days not listed in
+   * `restrictedDaysOfWeek` (Sat/Sun by default) are active all day. */
   if (policy.quietWindow?.enabled && !isQuietWindowActive(now, policy.quietWindow)) {
     const w = policy.quietWindow;
+    const days = (w.restrictedDaysOfWeek ?? DEFAULT_RESTRICTED_DAYS_OF_WEEK)
+      .map((d) => DAY_NAMES[d])
+      .join(',');
     return {
       allowed: false,
-      reason: `outside quiet window (allowed ${w.startHour}:00–${w.endHour}:00)`,
+      reason: `outside quiet window (allowed ${w.startHour}:00–${w.endHour}:00 on ${days}; all day on other days)`,
       blockers,
       userIdleMs,
       policy,
