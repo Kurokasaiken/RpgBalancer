@@ -151,7 +151,7 @@ Source: `.mw/runs/20261015-ops-shutdown-plan/` (deliberation final.md, critiques
 - **Pre-shutdown commit+push** is a pipeline step in `shutdownManager.ts` (`preShutdownBackup.ts`), not in the executor. Failure is logged; it vetoes shutdown only if `policy.requireRepoClean === true` (default `false`).
 - **Two-phase stale escalation**: heartbeat TTL → `UNKNOWN`; `UNKNOWN` beyond `staleGracePeriodMs` (30m) inside the quiet window → `ABANDONED_STALE` (terminal). `createdAt + maxDurationMs` → `TIMED_OUT` (terminal).
 - **Hard watchdog**: `shutdownManager.ts` applies `MAX_SESSION_AGE_MS` (4h) — heartbeat-stale sessions past it stop vetoing.
-- **Bootstrap safeguard**: `knownProcesses.ts` scans `ps` for harness/coordinator/deliberation processes; unregistered active work blocks shutdown even with an empty registry.
+- **Bootstrap safeguard**: `knownProcesses.ts` scans `ps` for harness/coordinator/deliberation processes; unregistered active work blocks shutdown even with an empty registry. R-212 (2026-10-17): match classificati — lavoro reale veto, fixture server (`vite preview`, dev server) solo report, mai veto.
 - **Remote ai-worker**: treated as async remote; local dispatch session releases on push of `kanban.json`. No local waiting for cloud runners.
 
 ### Implemented 2026-10-15 (OPS-SHUTDOWN-003/004/005/009 core)
@@ -168,6 +168,7 @@ Source: `.mw/runs/20261015-ops-shutdown-plan/` (deliberation final.md, critiques
 | LaunchAgent plist | `scripts/shutdownManager/com.rpgbalancer.shutdown-manager.plist` | ✅ written, **not installed** |
 | npm scripts | `shutdown:status`, `shutdown:once`, `shutdown:daemon`, `shutdown:lint-capability` | ✅ |
 | Schema v3 deltas | `TIMED_OUT`, `ABANDONED_STALE`, `createdAt`, `maxDurationMs`, `quietWindow`, `staleGracePeriodMs`, `bootstrapGracePeriodMs`, `requireRepoClean`, `autoCommitAndPush` | ✅ 40/40 tests |
+| Quiet window per-giorno (R-211) | `quietWindow.restrictedDaysOfWeek` (0=dom…6=sab, default lun–ven): giorni non elencati → finestra attiva tutto il giorno | ✅ 2026-10-17 |
 
 ### Remaining (not done tonight)
 

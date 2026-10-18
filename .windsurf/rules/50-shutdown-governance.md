@@ -23,6 +23,18 @@ Applies to every task that touches or introduces auto-shutdown, auto-commit, aut
 - Dry-run mode (`DRY_RUN=true`) must be implemented and verified before real shutdown is enabled.
 - Unknown, expired, corrupted, or unreadable registry state blocks shutdown.
 
+## Quiet window
+
+- When `policy.quietWindow.enabled` is true, shutdown is allowed only while the quiet window is active.
+- `restrictedDaysOfWeek` (0=Sunday … 6=Saturday, default `[1,2,3,4,5]`) names the days on which the window covers only `startHour`–`endHour` (overnight, wraps midnight). On days not listed, the window is active all day — Director ruling 2026-10-17 (R-211): weekdays 22:00→07:00, Saturday and Sunday unrestricted.
+- An empty `restrictedDaysOfWeek` means no day is restricted: the window is active all day, every day.
+- A missing `restrictedDaysOfWeek` field (legacy registries or hand-built policy objects) resolves to the Mon–Fri default.
+
+## Unregistered-process backstop
+
+- The `ps`-based backstop classifies matches before vetoing (R-212): real work — test runners, builds, harness, coordinator, deliberation — blocks shutdown; server fixtures (`vite preview`, dev servers) are reported but **never** veto. A leftover server is not work: its consumer is what the blocking patterns detect.
+- New blocking patterns may be added only for actual work; new server/fixture patterns must go to the non-blocking list.
+
 ## Auto-commit / auto-push separation
 
 - Automated Git backup (`auto-commit`, `auto-push`) may be preserved as an opt-in per-project policy.
