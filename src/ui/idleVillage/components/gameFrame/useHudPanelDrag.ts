@@ -62,9 +62,21 @@ export interface HudPanelDragOptions {
   /** Values that re-arm the re-clamp effect when they change — pass the
    *  companion open flags so opening/closing a column re-fits the union. */
   reclampDeps?: readonly unknown[];
+  /* PLAN-043 WS-3: optional outer bounds the dragged union may never cross
+   *  (viewport coords, same convention as `edgeInsetPx`). The Dispatch Table
+   *  planner uses it to keep the CENTER unit out of the pinned RIGHT WING
+   *  while dragging — containment the stageZones solver owns natively once
+   *  its provider lands; until then this keeps AC-01's post-drag
+   *  zero-overlap gate enforceable. */
+  boundsRightPx?: number;
+  /** PLAN-043 WS-4: inert mode — the QuestStageCluster owns the run window's
+   *  drag + position, so this hook must not observe, clamp or transform the
+   *  shell (its reclamp would misread the slot-bounded box and shove it). */
+  disabled?: boolean;
 }
 
 export function useHudPanelDrag(options?: HudPanelDragOptions) {
+  const disabled = options?.disabled ?? false;
   /* Committed offset: React state, applied through `panelStyle`. It changes only on
    * drag start/end and on double-click reset, never per pointermove. */
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -82,6 +94,7 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
   const baseRect = useRef<{ left: number; top: number; width: number; height: number } | null>(null);
   const shellRef = options?.shellRef;
   const edgeInsetPx = options?.edgeInsetPx ?? 0;
+  const boundsRightPx = options?.boundsRightPx;
   const reclampDeps = options?.reclampDeps;
 
   const onPointerDown = useCallback(
@@ -118,7 +131,7 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
   );
 
   useEffect(() => {
-    if (!dragging) return;
+    if (!dragging || disabled) return;
     const paint = () => {
       frame.current = null;
       const el = panelEl.current;
@@ -131,7 +144,7 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
       const base = baseRect.current;
       if (base) {
         const loX = edgeInsetPx - base.left;
-        const hiX = window.innerWidth - edgeInsetPx - base.left - base.width;
+        const hiX = (boundsRightPx ?? window.innerWidth - edgeInsetPx) - base.left - base.width;
         const loY = edgeInsetPx - base.top;
         const hiY = window.innerHeight - edgeInsetPx - base.top - base.height;
         nextX = Math.min(Math.max(nextX, Math.min(loX, hiX)), Math.max(loX, hiX));
@@ -164,7 +177,7 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
         frame.current = null;
       }
     };
-  }, [dragging, edgeInsetPx]);
+  }, [dragging, edgeInsetPx, boundsRightPx]);
 
   /* Re-clamp the committed offset when the union's footprint changes without a
    * drag: companion open/close (reclampDeps), content height (ResizeObserver on
@@ -174,7 +187,7 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
     if (!shell) return;
     const base = untransformedUnionRect(shell, liveOffset.current);
     const loX = edgeInsetPx - base.left;
-    const hiX = window.innerWidth - edgeInsetPx - base.left - base.width;
+    const hiX = (boundsRightPx ?? window.innerWidth - edgeInsetPx) - base.left - base.width;
     const loY = edgeInsetPx - base.top;
     const hiY = window.innerHeight - edgeInsetPx - base.top - base.height;
     const x = Math.min(Math.max(liveOffset.current.x, Math.min(loX, hiX)), Math.max(loX, hiX));
@@ -183,9 +196,10 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
     liveOffset.current = { x, y };
     shell.style.transform = `translate(${x}px, ${y}px)`;
     setOffset({ x, y });
-  }, [shellRef, edgeInsetPx]);
+  }, [shellRef, edgeInsetPx, boundsRightPx]);
 
   useEffect(() => {
+    if (disabled) return;
     const shell = shellRef?.current;
     if (!shell) return;
     reclamp();
@@ -198,13 +212,25 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
       window.removeEventListener('resize', reclamp);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reclamp, ...(reclampDeps ?? [])]);
+  }, [reclamp, disabled, ...(reclampDeps ?? [])]);
 
   // No `zIndex` key unless dragging: spreading `zIndex: undefined` over a panel's own
   // style would erase its layer and drop it under the HUD chrome.
-  const panelStyle: CSSProperties = dragging
+  const panelStyle: CSSProperties = disabled
+    ? {}
+    : dragging
     ? { transform: `translate(${offset.x}px, ${offset.y}px)`, zIndex: 1000 }
     : { transform: `translate(${offset.x}px, ${offset.y}px)` };
+  /* Going inert mid-flight (standalone → cluster hand-off) must not leave a
+   * committed translate painted on the shell. */
+  useEffect(() => {
+    if (!disabled) return;
+    const shell = shellRef?.current;
+    liveOffset.current = { x: 0, y: 0 };
+    setOffset({ x: 0, y: 0 });
+    if (shell) shell.style.transform = '';
+  }, [disabled, shellRef]);
+
   const resetPosition = useCallback(() => {
     liveOffset.current = { x: 0, y: 0 };
     setOffset({ x: 0, y: 0 });
@@ -214,6 +240,9 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
     onDoubleClick: resetPosition,
     style: { cursor: dragging ? 'grabbing' : 'grab', touchAction: 'none' } as CSSProperties,
     'data-dragging': dragging || undefined,
+    /* PLAN-043 WS-2: marks the row a stage frame may claim for a zone-aware
+     *  drag (capture-phase, before this hook's own pointerdown). */
+    'data-hud-drag-handle': '',
   };
 
   return { panelStyle, handleProps, dragging, resetPosition };

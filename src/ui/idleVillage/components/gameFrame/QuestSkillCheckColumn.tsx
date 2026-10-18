@@ -1,0 +1,302 @@
+/**
+ * QuestSkillCheckColumn — PLAN-043 WS-4 (artifact-r003 §4.2, T5.5): the skill
+ * check as the cluster's RIGHT WING — a naked Astrolabe (no plaque, no scrim,
+ * no drag) with the external Verdict Card painted directly below it.
+ *
+ * Same bridge contract as the old centered `QuestSkillCheckOverlay`
+ * (`questRunStore.QuestCheckBridge`): the engine already resolved verdict AND
+ * harm — this column only paints (`mode` forced, `harm` mirrored so the card
+ * cannot contradict the engine), reports `onResolved`/`onDismiss` back and
+ * fills the imperative `handle` slot (`skipToResult`/`throwNow`).
+ *
+ * Differences from the overlay it replaces:
+ * - docked, not floating: the cluster solver owns its rect — no drag handle,
+ *   no scrim, pointer-events only inside the column;
+ * - `hideInternalCard` suppresses the engine's `#card`; the verdict lives in
+ *   the external card under the board — verdict + flavor + authored
+ *   consequences, information only, NO continue/advance control;
+ * - `settledIdle` parks the astrolabe's rAF loop after the verdict (BV-04);
+ * - post-verdict dismissal = click anywhere on the column once armed
+ *   (`dismissArmDelayMs` = 350ms — a skip-click landing as the card appears
+ *   cannot erase it, BV-12) or Escape when topmost. Exactly-once via
+ *   `dismissedFor`.
+ */
+import React, { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
+import { EngravedIcon } from './engravedIcons';
+import { SkinScope, prefersReducedMotion } from '@/ui/idleVillage/skins/primitives';
+import { HudChip } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import { DestinyAstrolabeV62Standalone, type DestinyAstrolabeV62Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
+import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
+import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
+import type { QuestCheckBridge } from '@/ui/idleVillage/questS1Lab/questRunStore';
+import { useOverlayEscape } from './overlayStack';
+
+const FONT = {
+  display: 'var(--skin-font-display)',
+  serif: 'var(--skin-font-serif)',
+} as const;
+
+/** Checks whose verdict this session already painted — a remount of a held
+ *  check hydrates straight to `resolved-held` (no second spin). */
+const seenCheckKeys = new Set<string>();
+
+/** Max pointer travel (px) a click may carry before it counts as a drag tail. */
+const CLICK_DRAG_TOLERANCE_PX = 4;
+
+/** Same presentation baseline the overlay used (`engine.ts` defaults to
+ *  `{stat:60, difficulty:50}`) — `check.score` is the success bound after
+ *  clamps; the column's chip and the board's paint share the constant. */
+const ASTROLABE_DIFFICULTY_BASELINE = 50;
+
+/** The verdict card's entrance — one fade/rise, disabled under reduced motion.
+ *  `data-astro-idle="parked"` freezes the frozen-kit ambient loops (fog, rays,
+ *  fate pulses) so the held verdict is a real still frame, not a wallpaper of
+ *  composited infinite animations (BV-04). */
+const COLUMN_CSS = `
+@keyframes questCheckColumnIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+@keyframes questVerdictCardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+[data-astro-idle="parked"] * { animation-play-state: paused !important; }`;
+
+export interface QuestSkillCheckColumnProps {
+  bridge: QuestCheckBridge;
+  run: QuestRunState;
+}
+
+export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ bridge, run }) => {
+  const { t } = useTranslation('idleVillage');
+  const cfg = DEFAULT_GAME_FRAME_CONFIG.questWindow.skillCheck;
+  const clusterCfg = DEFAULT_GAME_FRAME_CONFIG.questWindow.cluster;
+  const { beatId, check, mode } = bridge;
+  const checkKey = `${runIdOf(run)}#${check.checkSeq}`;
+
+  /* `resolved` = the astrolabe painted the verdict; `armed` = the post-verdict
+   * dismiss accepts input (arm delay elapsed). */
+  const [resolved, setResolved] = useState(() => seenCheckKeys.has(checkKey));
+  const [armed, setArmed] = useState(false);
+  const columnRef = useRef<HTMLDivElement | null>(null);
+  const astroRef = useRef<DestinyAstrolabeV62Handle | null>(null);
+  const armTimer = useRef<number | null>(null);
+  const autoDismissTimer = useRef<number | null>(null);
+  const pointerDownAt = useRef<{ x: number; y: number } | null>(null);
+  /* Double-dismiss guard (debate r007): the settle is keyed to THIS check. */
+  const dismissedFor = useRef<string | null>(null);
+
+  const overlayId = `quest-check:${beatId}`;
+
+  /** The only valid dismiss: verdict painted + arm delay elapsed, once. */
+  const dismiss = useCallback(() => {
+    if (!armed || dismissedFor.current === checkKey) return;
+    dismissedFor.current = checkKey;
+    trackTelemetryEvent('quest_check_dismissed', {
+      runId: runIdOf(run),
+      checkSeq: check.checkSeq,
+      visitSeq: check.visitSeq,
+      beatIndex: check.beatIndex,
+      outcome: check.verdict,
+    });
+    bridge.onDismiss(beatId);
+  }, [armed, bridge, beatId, run, check, checkKey]);
+
+  /* Escape reaches only the topmost overlay; mid-spin it is a no-op. */
+  useOverlayEscape(overlayId, dismiss);
+
+  /* Fill the imperative slot: the owner's click-to-skip reaches the astrolabe
+   * through `bridge.handle` (skipToResult / throwNow). */
+  useEffect(() => {
+    bridge.handle.current = {
+      skipToResult: () => astroRef.current?.skipToResult(),
+      throwNow: () => astroRef.current?.throw(),
+    };
+    return () => {
+      if (bridge.handle.current) bridge.handle.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bridge.handle]);
+
+  /* skipIntro: throw right after the mount has confirmed (debate W-08).
+   * Resolved-held hydration skips the spin via skipToResult on the same
+   * deferred path — the astrolabe's own arm must exist first. */
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      if (seenCheckKeys.has(checkKey)) astroRef.current?.skipToResult();
+      else if (bridge.autoThrow) astroRef.current?.throw();
+    }, 0);
+    return () => window.clearTimeout(id);
+    /* `bridge.autoThrow` is a live toggle — flipping «skip intro» mid-spin
+     * throws immediately (the deferred 0ms keeps the arm-order guarantee). */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkKey, bridge.autoThrow]);
+
+  /* Arm the dismiss once the verdict is painted + the configured 350ms; the
+   * optional auto-dismiss rides the same moment. */
+  useEffect(() => {
+    if (!resolved) return;
+    armTimer.current = window.setTimeout(() => setArmed(true), cfg.dismissArmDelayMs);
+    if (cfg.verdictAutoDismissMs > 0) {
+      autoDismissTimer.current = window.setTimeout(() => {
+        setArmed(true);
+        /* Dismiss needs `armed` true — the state above lands next render;
+         * the owner's settle is idempotent, so call it directly here. */
+        bridge.onDismiss(beatId);
+      }, cfg.dismissArmDelayMs + cfg.verdictAutoDismissMs);
+    }
+    columnRef.current?.focus();
+    return () => {
+      if (armTimer.current !== null) window.clearTimeout(armTimer.current);
+      if (autoDismissTimer.current !== null) window.clearTimeout(autoDismissTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolved]);
+
+  /** Astrolabe painted the verdict → tell the owner (dwell) and arm up. */
+  const handleAstroResolve = useCallback(() => {
+    seenCheckKeys.add(checkKey);
+    setResolved(true);
+    bridge.onResolved(beatId);
+  }, [bridge, beatId, checkKey]);
+
+  const verdictLabel = t(`questS1Lab.verdict.${mode.startsWith('fail') ? 'fail' : mode}`);
+  const verdictTone = mode.startsWith('fail') || mode === 'epicfail' ? 'danger' : mode === 'almost' ? 'warn' : 'ok';
+  const harm = check.harm;
+
+  /* Click policy: during the spin the BOARD click settles the verdict
+   * (progressive skip); after resolve + arm the whole column dismisses —
+   * buttons, double-clicks and drag tails are ignored. */
+  const onColumnClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (event.detail > 1) return;
+    if ((event.target as HTMLElement).closest('button')) return;
+    if (!resolved || !armed) return;
+    const down = pointerDownAt.current;
+    if (down && Math.abs(event.clientX - down.x) + Math.abs(event.clientY - down.y) > CLICK_DRAG_TOLERANCE_PX) return;
+    dismiss();
+  };
+  const onBoardClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (resolved) return;
+    if ((event.target as HTMLElement).closest('button')) return;
+    astroRef.current?.skipToResult();
+    event.stopPropagation();
+  };
+
+  const boardWidth = `min(100%, ${clusterCfg.skillCheckColumn.astrolabeMaxPx}px)`;
+
+  return (
+    <SkinScope>
+      <style>{COLUMN_CSS}</style>
+      <div
+        ref={columnRef}
+        data-testid="quest-check-column"
+        data-check-resolved={resolved || undefined}
+        data-check-armed={armed || undefined}
+        role="dialog"
+        aria-modal="false"
+        aria-label={check.title}
+        tabIndex={-1}
+        onPointerDown={(e) => {
+          pointerDownAt.current = { x: e.clientX, y: e.clientY };
+        }}
+        onClick={onColumnClick}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10,
+          width: '100%',
+          maxHeight: '100%',
+          outline: 'none',
+          animation: prefersReducedMotion() ? undefined : 'questCheckColumnIn 180ms ease-out both',
+        } as CSSProperties}
+      >
+        {/* Title row — the check's name + the stat/difficulty chip (same pair
+            the board paints), then the verdict chip once resolved. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 24 }}>
+          <EngravedIcon id="ico-spark" size={14} style={{ color: 'var(--skin-title-color)' }} />
+          <span style={{ flex: 1, minWidth: 0, fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', color: 'var(--skin-title-color)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {check.title}
+          </span>
+          <HudChip tone="label" title={t('gameFrame.questWindow.checkOverlay.scoreTitle', { score: check.score, difficulty: ASTROLABE_DIFFICULTY_BASELINE })}>
+            {check.score}/{ASTROLABE_DIFFICULTY_BASELINE}
+          </HudChip>
+        </div>
+        {/* The board square — naked (no plaque), capped at the column's
+            astrolabe budget, never under `boardMinPx`. */}
+        <div
+          data-testid="quest-check-board"
+          onClick={onBoardClick}
+          style={{
+            width: boardWidth,
+            maxWidth: '100%',
+            aspectRatio: '1 / 1',
+            minHeight: cfg.boardMinPx,
+            alignSelf: 'center',
+            overflow: 'hidden',
+            cursor: resolved ? 'default' : 'pointer',
+          }}
+        >
+          <DestinyAstrolabeV62Standalone
+            key={beatId}
+            ref={astroRef}
+            skills={[{ name: check.title, stat: check.score, difficulty: ASTROLABE_DIFFICULTY_BASELINE }]}
+            config={{ mode, wound: check.woundPct, dead: check.deathPct, harm: check.harm }}
+            onResolve={handleAstroResolve}
+            autoStart
+            removeSounds
+            hideInternalCard
+            settledIdle
+          />
+        </div>
+        {/* The external Verdict Card — informational only (artifact-r003
+            §4.2: NO continue/advance control). Click anywhere on the column
+            dismisses once armed. */}
+        {resolved && (
+          <div
+            data-testid="quest-verdict-card"
+            role="status"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              padding: '10px 12px 12px',
+              borderRadius: 8,
+              border: `1px solid color-mix(in srgb, ${verdictTone === 'danger' ? 'var(--skin-status-death, #a33)' : 'var(--skin-surface-border)'} 60%, transparent)`,
+              background: 'var(--skin-hud-lacquer-deep)',
+              boxShadow: '0 10px 24px color-mix(in srgb, var(--skin-hud-lacquer-deep) 80%, transparent)',
+              animation: prefersReducedMotion() ? undefined : 'questVerdictCardIn 220ms ease-out both',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <HudChip tone={verdictTone}>{verdictLabel}</HudChip>
+              {harm === 'wound' && <HudChip tone="warn">{t('questS1Lab.harmChip.wound')}</HudChip>}
+              {harm === 'death' && <HudChip tone="danger">{t('questS1Lab.harmChip.death')}</HudChip>}
+            </div>
+            {check.flavor && (
+              <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 13, lineHeight: 1.45, color: 'var(--skin-text-primary)' }}>
+                {check.flavor}
+              </p>
+            )}
+            {check.outcomeText && (
+              <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.4, color: 'var(--skin-text-muted)' }}>
+                {check.outcomeText}
+              </p>
+            )}
+            {check.authoredText && (
+              <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.4, color: 'var(--skin-text-secondary)' }}>
+                {check.authoredText}
+              </p>
+            )}
+            <span style={{ fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: 'var(--skin-text-muted)' }}>
+              {t('gameFrame.questWindow.checkOverlay.dismissHint')}
+            </span>
+          </div>
+        )}
+        {/* Verdict announcement for assistive tech. */}
+        <div aria-live="polite" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)' }}>
+          {resolved ? `${check.title}: ${verdictLabel}` : ''}
+        </div>
+      </div>
+    </SkinScope>
+  );
+};
+
+export default QuestSkillCheckColumn;

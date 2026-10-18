@@ -45,16 +45,17 @@ describe('quest frontier (v27)', () => {
 
   it('a command resolves ONLY the current node and stops at the next frontier', () => {
     const run = timedRun();
-    submitCommand(run, 'gob-partenza', { tick: 0 });
     expect(run.nodeId).toBe('gob-esplora');
     expect(run.frontier.status).toBe('waiting');
-    // The frontier bumped once — one committed advance.
-    expect(run.frontierVersion).toBe(1);
+    expect(run.frontierVersion).toBe(0);
+    submitCommand(run, 'gob-cerca-tracce', { tick: run.frontier.readyAt });
+    // The choice and its check outcome each commit once (two bumps), then the run waits at the next decision.
+    expect(run.frontierVersion).toBe(2);
+    expect(run.frontier.status).toBe('waiting');
   });
 
   it('a CHECK: outcome resolves inline as consequence, then stops at the decision', () => {
     const run = timedRun();
-    submitCommand(run, 'gob-partenza', { tick: 0 });
     submitCommand(run, 'gob-cerca-tracce', { tick: run.frontier.readyAt });
     expect(run.checkQueue).toHaveLength(1);
     // The check is a consequence, not a frontier: the run stops at the choice
@@ -139,7 +140,7 @@ describe('quest frontier (v27)', () => {
   it('legacy parity: applyChoice === submitCommand + instant catch-up, same seed', () => {
     const play = (legacy: boolean): QuestRunState => {
       const run = createRun(PARTY, 7, 'goblin');
-      const steps = ['gob-partenza', 'gob-cerca-tracce', 'gob-via-assalto', 'fight-turn', 'fight-turn', 'fight-turn', 'fight-turn', 'fight-turn'];
+      const steps = ['gob-cerca-tracce', 'gob-via-assalto', 'fight-turn', 'fight-turn', 'fight-turn', 'fight-turn', 'fight-turn'];
       for (const opt of steps) {
         if (run.ended) break;
         if (legacy) applyChoice(run, opt);

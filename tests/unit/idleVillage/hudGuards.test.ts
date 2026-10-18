@@ -4,6 +4,13 @@ import { resolve } from 'node:path';
 import { HUD_PANELS } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
 import { ENGRAVED_ICON_IDS } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { BASE_SKIN_CSS_VARS } from '@/ui/idleVillage/skins/skinCssVariables';
+import {
+  GAME_SURFACE_FILES,
+  GAME_SURFACE_LUCIDE_FILES,
+  GAME_SURFACE_PANEL_BINDINGS,
+  GAME_SURFACE_VIOLATION_BASELINE,
+} from './gameSurfaceManifest';
+import { discoverGameSurface, isStyleCheckedFile } from '../../../scripts/verification/discoverGameSurface';
 
 /**
  * Guards for the rules in src/docs/docs/design/hud_component_guide.md that a machine can check:
@@ -13,8 +20,11 @@ const ROOT = resolve(__dirname, '../../..');
 const read = (path: string) => readFileSync(resolve(ROOT, path), 'utf8');
 const stripComments = (source: string) => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
-/** Files built on the HUD material from scratch (the legacy ribbon/panel/astrolabe files are excluded on purpose). */
-const STRICT_FILES = [
+/**
+ * Historical hand-maintained list (kept for provenance — the mechanical set
+ * below now owns the contract). Files built on the HUD material from scratch.
+ */
+const LEGACY_STRICT_FILES = [
   'src/ui/idleVillage/skins/primitives/HudPlaque.tsx',
   'src/ui/idleVillage/components/gameFrame/ObjectiveCartouche.tsx',
   'src/ui/idleVillage/components/gameFrame/HudRecenterButton.tsx',
@@ -76,6 +86,16 @@ const STRICT_FILES = [
   // PLAN-042 — the Settlement Registry drawer (catalog rows + drill-in card).
   'src/ui/idleVillage/components/gameFrame/VillageRegistry.tsx',
 ];
+/**
+ * PLAN-043 WS-5 (artifact-r002 §C): the guarded /game surface is the
+ * mechanically discovered set D = A ∪ B ∪ C ∪ Dq — generated into
+ * `gameSurfaceManifest.ts` by `discoverGameSurface.ts`. Style checks apply
+ * to UI sources (`isStyleCheckedFile`); the anti-drift test below covers
+ * every file in D, engine/config included. Pre-existing debt is recorded in
+ * `GAME_SURFACE_VIOLATION_BASELINE` and burns down during implementation —
+ * NEW violations fail the checks below.
+ */
+const STRICT_FILES = [...new Set([...LEGACY_STRICT_FILES, ...GAME_SURFACE_FILES.filter(isStyleCheckedFile)])];
 const ROSTER_V2_FILES = [
   'src/ui/idleVillage/rosterV2/DragTestContainerV2.tsx',
   'src/ui/idleVillage/rosterV2/WanderlustRosterCardV2.tsx',
@@ -93,9 +113,10 @@ describe('HUD guards', () => {
   it('defines every --skin-hud-* token that the HUD files read', () => {
     const missing: string[] = [];
     for (const file of TOKEN_FILES) {
+      const baseline = GAME_SURFACE_VIOLATION_BASELINE[file]?.missingTokens ?? [];
       // `var(--x)` in CSS/inline styles, `p-(--x)` in Tailwind v4 classes.
       for (const match of read(file).matchAll(/(?:var\(|-\()(--skin-hud-[a-z0-9-]+)/g)) {
-        if (!(match[1] in BASE_SKIN_CSS_VARS)) missing.push(`${file}: ${match[1]}`);
+        if (!(match[1] in BASE_SKIN_CSS_VARS) && !baseline.includes(match[1])) missing.push(`${file}: ${match[1]}`);
       }
     }
     expect(missing).toEqual([]);
@@ -113,9 +134,12 @@ describe('HUD guards', () => {
   it('keeps colour literals out of the HUD files built on the material', () => {
     const offenders: string[] = [];
     for (const file of STRICT_FILES) {
+      if (file.endsWith('.css')) continue; /* css literals live in their own skin-scope guard below */
+      const baseline = GAME_SURFACE_VIOLATION_BASELINE[file]?.colorLiterals ?? [];
       const code = stripComments(read(file));
-      const literal = code.match(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/g);
-      if (literal) offenders.push(`${file}: ${[...new Set(literal)].join(' ')}`);
+      for (const literal of new Set(code.match(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/g) ?? [])) {
+        if (!baseline.includes(literal)) offenders.push(`${file}: ${literal}`);
+      }
     }
     expect(offenders).toEqual([]);
   });
@@ -124,10 +148,12 @@ describe('HUD guards', () => {
     const offenders: string[] = [];
     const files = [...STRICT_FILES, 'src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx'];
     for (const file of files) {
+      if (file.endsWith('.css')) continue;
+      const baseline = GAME_SURFACE_VIOLATION_BASELINE[file]?.smallFonts ?? [];
       const code = stripComments(read(file));
       for (const match of code.matchAll(/fontSize:\s*'?(\d+(?:\.\d+)?)(?:px)?'?(?![\d.]|em|rem|%)|font-size:\s*(\d+(?:\.\d+)?)px|text-\[(\d+(?:\.\d+)?)px\]/g)) {
         const size = Number(match[1] ?? match[2] ?? match[3]);
-        if (size < 12) offenders.push(`${file}: ${match[0]}`);
+        if (size < 12 && !baseline.includes(match[0])) offenders.push(`${file}: ${match[0]}`);
       }
     }
     expect(offenders).toEqual([]);
@@ -161,6 +187,20 @@ describe('HUD guards', () => {
     expect(offenders).toEqual([]);
   });
 
+  /* WS-5 B6.2 — the same rule over the whole discovered /game surface D:
+   * GAME_SURFACE_LUCIDE_FILES records the residual migration debt (the
+   * five shipped files that still import lucide — see component-inventory
+   * for the engraved mapping). A NEW lucide import anywhere on /game fails
+   * here; removing one makes this list stale → regenerate the manifest. */
+  it('keeps lucide-react contained to the recorded /game migration debt', () => {
+    const offenders = GAME_SURFACE_FILES.filter(
+      (file) => !file.endsWith('.css') && /from\s+['"]lucide-react['"]/.test(read(file)),
+    ).sort();
+    const known = [...GAME_SURFACE_LUCIDE_FILES].sort();
+    expect({ newImports: offenders.filter((f) => !known.includes(f)) }).toEqual({ newImports: [] });
+    expect(known.filter((f) => !offenders.includes(f)), 'stale entries — regenerate the manifest').toEqual([]);
+  });
+
   it('draws the Roster V2 icons from the engraved set, not from gameIcons', () => {
     for (const file of ROSTER_V2_FILES) expect(read(file), file).not.toContain('components/gameIcons');
   });
@@ -179,4 +219,26 @@ describe('HUD guards', () => {
     expect(incised.length).toBeGreaterThan(0);
     expect(incised.filter((id) => !(ENGRAVED_ICON_IDS as string[]).includes(id))).toEqual([]);
   });
+
+  /* PLAN-043 WS-5 (artifact-r002 §C) — anti-drift: the guarded surface is
+   * recomputed mechanically and must equal the generated manifest. A new
+   * file reaching /game outside the manifest (or a manifest entry leaving
+   * the surface) fails here: regenerate with
+   * `npx tsx scripts/verification/discoverGameSurface.ts --emit-manifest
+   *  tests/unit/idleVillage/gameSurfaceManifest.ts` after reviewing the
+   * delta, or fix the drift. */
+  it('keeps the guarded /game surface in sync with the generated manifest (anti-drift)', () => {
+    const live = discoverGameSurface(ROOT);
+    const manifestSet = [...GAME_SURFACE_FILES].sort();
+    const liveSet = [...live.sets.D].sort();
+    const added = liveSet.filter((f) => !manifestSet.includes(f));
+    const missing = manifestSet.filter((f) => !liveSet.includes(f));
+    expect({ added, missing }).toEqual({ added: [], missing: [] });
+    /* Panel bindings drift too (a registry id losing/gaining its source). */
+    for (const [id, files] of Object.entries(live.sets.A.panels)) {
+      expect([...files].sort(), `panel ${id}`).toEqual([...(GAME_SURFACE_PANEL_BINDINGS[id] ?? [])].sort());
+    }
+    /* Structural findings (e.g. a panel with no source) fail the guard. */
+    expect(live.findings).toEqual([]);
+  }, 120_000);
 });

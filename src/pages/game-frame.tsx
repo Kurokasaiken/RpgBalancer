@@ -7,6 +7,7 @@ import {
   buildResourceReadoutItems,
   GameFrame,
   HudEventLedger,
+  StagePanelFrame,
   type HudEvent,
   type HudObjective,
   ObjectiveCartouche,
@@ -71,9 +72,16 @@ export interface GameFrameScreenProps {
   activeNavId?: string;
   /** Nav-select callback in controlled mode; receives the clicked item id. */
   onNavSelect?: (id: string) => void;
+  /**
+   * PLAN-043 WS-2: the three-zone stage owns the roster/ledger anchors — pass
+   * the flag so GameFrame mounts those slots unanchored and the page's
+   * `StagePanelFrame`s position them (requires a `GameStageContext` provider
+   * above; the page wraps panel content in frames itself).
+   */
+  stageMode?: boolean;
 }
 
-export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, fixtureEvents: withFixtures = true, objective, panels: panelsProp, devPanels = false, skinControl, scaleControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange, activeNavId: activeNavIdProp, onNavSelect: onNavSelectProp }: GameFrameScreenProps) {
+export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, fixtureEvents: withFixtures = true, objective, panels: panelsProp, devPanels = false, skinControl, scaleControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange, activeNavId: activeNavIdProp, onNavSelect: onNavSelectProp, stageMode = false }: GameFrameScreenProps) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
@@ -175,7 +183,20 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
           />
         }
         resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />}
-        hangingSlot={panels.visible.events ? <HudEventLedger events={events} context="game_frame" onSelect={focusEvent} onClose={() => panels.set('events', false)} /> : undefined}
+        hangingSlot={
+          panels.visible.events ? (
+            /* WS-2: under stageMode the frame supplies the rightWing rect and
+             *  the suspension treatment; the ledger keeps its own width when
+             *  legacied (the hung tag path). */
+            stageMode ? (
+              <StagePanelFrame panelId="events">
+                {(res) => <HudEventLedger events={events} context="game_frame" onSelect={focusEvent} onClose={() => panels.set('events', false)} style={{ width: res.rect?.w }} />}
+              </StagePanelFrame>
+            ) : (
+              <HudEventLedger events={events} context="game_frame" onSelect={focusEvent} onClose={() => panels.set('events', false)} />
+            )
+          ) : undefined
+        }
         utilitySlot={
           // ?capture=1 fades the button out for clean shots; it comes back under the pointer (and the P/R/E/D/T keys still work).
           <div style={captureMode ? { opacity: 0, transition: 'opacity 200ms' } : undefined} onMouseEnter={(e) => captureMode && (e.currentTarget.style.opacity = '1')} onMouseLeave={(e) => captureMode && (e.currentTarget.style.opacity = '0')}>
@@ -188,6 +209,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
          * `events.length` is part of the wake signal, no bookkeeping needed. */
         hudWakeSignal={(hudWakeSignal ?? 0) + events.length}
         onHudHiddenChange={onHudHiddenChange}
+        stageMode={stageMode}
       >
         {renderMap({ recenterSignal, focusRequest })}
       </GameFrame>

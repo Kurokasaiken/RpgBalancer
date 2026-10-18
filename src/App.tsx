@@ -90,7 +90,9 @@ const QuestGenerationLabPage = lazy(() => import('./ui/idleVillage/pages/QuestGe
 const MacroGameplayLabPage = lazy(() => import('./ui/idleVillage/pages/MacroGameplayLabPage'));
 const GoblinEventLabPage = lazy(() => import('./ui/idleVillage/pages/GoblinEventLabPage').then(m => ({ default: m.GoblinEventLabPage })));
 const QuestWindowLabPage = lazy(() => import('./ui/idleVillage/pages/QuestWindowLabPage'));
+const TheaterLabPage = lazy(() => import('./ui/idleVillage/pages/TheaterLabPage'));
 const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.default })));
+const BezelVariantsPage = lazy(() => import('./pages/bezel-variants').then(m => ({ default: m.default })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -210,6 +212,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-slotRack';
   const isMinimalSlottedMedalPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-slottedmedal';
+  const isBezelVariantsPath =
+    typeof window !== 'undefined' && window.location.pathname === '/bezel-variants';
   const isMinimalResourceHUDPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-resourcehud';
   const isMinimalQuestCardPath =
@@ -310,6 +314,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/goblin-event-lab';
   const isQuestWindowLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/quest-window-lab';
+  const isTheaterLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/theater-lab';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -560,6 +566,16 @@ function App() {
       <ErrorBoundary componentName="Minimal SlottedMedal Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SlottedMedal Test…</div>}>
           <MinimalSlottedMedalPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isBezelVariantsPath) {
+    return (
+      <ErrorBoundary componentName="Bezel Variants Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Bezel Variants…</div>}>
+          <BezelVariantsPage />
         </Suspense>
       </ErrorBoundary>
     );
@@ -1163,6 +1179,16 @@ function App() {
       <ErrorBoundary componentName="Quest Window Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Window Lab…</div>}>
           <QuestWindowLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTheaterLabPath) {
+    return (
+      <ErrorBoundary componentName="Theater Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Theater Lab…</div>}>
+          <TheaterLabPage />
         </Suspense>
       </ErrorBoundary>
     );

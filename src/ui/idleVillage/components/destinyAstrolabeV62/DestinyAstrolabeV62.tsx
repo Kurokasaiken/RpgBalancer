@@ -29,6 +29,8 @@ export interface DestinyAstrolabeV62Handle {
   throw: () => void;
   /** Presentation-only skip — settles the frame and resolves immediately. */
   skipToResult: () => void;
+  /** One repaint while the loop is parked in settledIdle (no loop restart). */
+  redrawOnce: () => void;
 }
 
 export interface DestinyAstrolabeV62Props {
@@ -40,6 +42,12 @@ export interface DestinyAstrolabeV62Props {
   className?: string;
   /** Global pace multiplier — folded into the engine config (PLAN-023). */
   speed?: number;
+  /** PLAN-043 WS-4: suppress the internal `#card` — the host paints its own
+   *  Verdict Card below the board. */
+  hideInternalCard?: boolean;
+  /** PLAN-043 WS-4: park the rAF loop once the verdict settles; a host
+   *  resize triggers exactly one redraw via `redrawOnce()`. */
+  settledIdle?: boolean;
 }
 
 const SKIN_BINDING = {
@@ -72,6 +80,8 @@ export const DestinyAstrolabeV62 = memo(
       removeSounds = false,
       className,
       speed,
+      hideInternalCard,
+      settledIdle,
     },
     ref,
   ) {
@@ -102,7 +112,7 @@ export const DestinyAstrolabeV62 = memo(
 
       const engine = createDestinyAstrolabeV62Engine(root, {
         skills,
-        config: speed ? { ...config, speed } : config,
+        config: { ...config, ...(speed ? { speed } : null), ...(hideInternalCard ? { hideInternalCard } : null), ...(settledIdle ? { settledIdle } : null) },
         onResolve: (r) => {
           onResolveRef.current?.(r);
           const isSuccess = r.verdict === 'bigwin' || r.verdict === 'win' || r.verdict === 'almost';
@@ -127,8 +137,19 @@ export const DestinyAstrolabeV62 = memo(
     }, []);
 
     useEffect(() => {
-      engineRef.current?.setConfig(skills, config);
-    }, [skills, config]);
+      engineRef.current?.setConfig(skills, { ...config, ...(hideInternalCard ? { hideInternalCard } : null), ...(settledIdle ? { settledIdle } : null) });
+    }, [skills, config, hideInternalCard, settledIdle]);
+
+    /* WS-4 settledIdle: while the loop is parked a resize still deserves a
+     *  repaint — `redrawOnce()` fires exactly one frame and parks again. */
+    useEffect(() => {
+      if (!settledIdle) return undefined;
+      const root = rootRef.current;
+      if (!root || typeof ResizeObserver === 'undefined') return undefined;
+      const observer = new ResizeObserver(() => engineRef.current?.redrawOnce());
+      observer.observe(root);
+      return () => observer.disconnect();
+    }, [settledIdle]);
 
     useImperativeHandle(
       ref,
@@ -136,6 +157,7 @@ export const DestinyAstrolabeV62 = memo(
         roll: () => engineRef.current?.roll(),
         throw: () => engineRef.current?.throw(),
         skipToResult: () => engineRef.current?.skipToResult(),
+        redrawOnce: () => engineRef.current?.redrawOnce(),
       }),
       [],
     );

@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render, screen, renderHook, act, fireEvent, within } from '@testing-library/react';
+import { render, screen, renderHook, act, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { applyChoice, availableOptions, createRun, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
@@ -15,6 +15,7 @@ import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { emptyPhase } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import type { QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
 import { QuestRunWindow } from '@/ui/idleVillage/components/gameFrame/QuestRunWindow';
+import { QuestOutcomeToast } from '@/ui/idleVillage/components/gameFrame/QuestOutcomeToast';
 
 const PRESET = GOBLIN_PRESETS[0].id;
 
@@ -60,52 +61,57 @@ const renderWindow = (run: QuestRunState, opts: WindowOpts = {}) =>
   );
 
 describe('useQuestRun — bag items are the player\'s call', () => {
-  it('does not spend the Perception bonus on a PER check unless armed', () => {
+  /* WS-3/WS-4 model: the bag is PACKED at run start via `start(_, {loadout})`
+   *  (the planner's pick — the in-run F0 assignment node is gone) and check
+   *  items arrive ARMED (`consumablesArmedByDefault` — the planner armed
+   *  them). The player's per-item call is the toggle: disarm to keep. */
+  const LOADOUT = ['hasBonusPerc', 'hasBonusForza'];
+
+  it('does not spend the Perception bonus on a PER check when disarmed', () => {
     const { result } = renderHook(() => useQuestRun('goblin'));
-    act(() => result.current.start(PRESET));
-    act(() => result.current.choose(availableOptions(result.current.run!)[0].id));
+    act(() => result.current.start(PRESET, { loadout: LOADOUT }));
     expect(result.current.run!.flags).toContain('hasBonusPerc');
-    act(() => result.current.choose('gob-cerca-tracce', { useConsumable: false }));
+    act(() => result.current.toggleArmedFlag('hasBonusPerc')); // disarm
+    act(() => result.current.choose('gob-cerca-tracce'));
     expect(result.current.run!.flags).toContain('hasBonusPerc');
   });
 
-  it('spends it when the player armed the bag', () => {
+  it('spends it when the player keeps the item armed', () => {
     const { result } = renderHook(() => useQuestRun('goblin'));
-    act(() => result.current.start(PRESET));
-    act(() => result.current.choose(availableOptions(result.current.run!)[0].id));
-    act(() => result.current.choose('gob-cerca-tracce', { useConsumable: true }));
+    act(() => result.current.start(PRESET, { loadout: LOADOUT }));
+    expect(result.current.armedFlags.has('hasBonusPerc')).toBe(true); // armed by default
+    act(() => result.current.choose('gob-cerca-tracce'));
     expect(result.current.run!.flags).not.toContain('hasBonusPerc');
   });
 
   /* R-196 per-item path: no opts → the hook's armedFlags set drives. */
   it('spends ONLY the armed item — unarmed packed siblings stay in the bag', () => {
     const { result } = renderHook(() => useQuestRun('goblin'));
-    act(() => result.current.start(PRESET));
-    act(() => result.current.choose(availableOptions(result.current.run!)[0].id));
-    // Arm the perc item only; the forza sibling stays packed even though
-    // the perc check would not use it anyway, and shadowed items never burn.
-    act(() => result.current.toggleArmedFlag('hasBonusPerc'));
-    expect(result.current.armedFlags.has('hasBonusPerc')).toBe(true);
+    act(() => result.current.start(PRESET, { loadout: LOADOUT }));
+    // Keep the perc item armed, disarm the forza sibling — a packed sibling
+    // must never burn on a check it was not armed for.
+    act(() => result.current.toggleArmedFlag('hasBonusForza'));
     act(() => result.current.choose('gob-cerca-tracce'));
     expect(result.current.run!.flags).not.toContain('hasBonusPerc');
     expect(result.current.armedFlags.has('hasBonusPerc')).toBe(false); // reconciled out
     expect(result.current.run!.flags).toContain('hasBonusForza');
   });
 
-  it('nothing armed → nothing spent (armedFlags replace the boolean)', () => {
+  it('the legacy useConsumable:false path never spends', () => {
     const { result } = renderHook(() => useQuestRun('goblin'));
-    act(() => result.current.start(PRESET));
-    act(() => result.current.choose(availableOptions(result.current.run!)[0].id));
-    act(() => result.current.choose('gob-cerca-tracce'));
+    act(() => result.current.start(PRESET, { loadout: LOADOUT }));
+    act(() => result.current.choose('gob-cerca-tracce', { useConsumable: false }));
     expect(result.current.run!.flags).toContain('hasBonusPerc');
   });
 
   it('toggleArmedFlag is idempotent per item and rejects unheld/passive flags', () => {
     const { result } = renderHook(() => useQuestRun('goblin'));
-    act(() => result.current.start(PRESET));
-    act(() => result.current.toggleArmedFlag('hasBonusPerc'));
+    act(() => result.current.start(PRESET, { loadout: LOADOUT }));
+    expect(result.current.armedFlags.has('hasBonusPerc')).toBe(true);
     act(() => result.current.toggleArmedFlag('hasBonusPerc'));
     expect(result.current.armedFlags.has('hasBonusPerc')).toBe(false);
+    act(() => result.current.toggleArmedFlag('hasBonusPerc'));
+    expect(result.current.armedFlags.has('hasBonusPerc')).toBe(true);
     // Not in the bag → never arms.
     act(() => result.current.toggleArmedFlag('hasCorda'));
     expect(result.current.armedFlags.has('hasCorda')).toBe(false);
@@ -119,11 +125,18 @@ describe('QuestRunWindow — what the player reads', () => {
   });
 
   it('speaks a resolved check through its authored verdict line, not "TITLE — VERDICT."', () => {
-    const run = atExploration(42);
+    const run = createRun(PRESET, 42, 'goblin');
     applyChoice(run, 'gob-cerca-tracce', { useConsumable: false });
     const check = run.checkQueue[0];
     expect(check.flavor).toBeTruthy();
-    renderWindow(run);
+    /* WS-4: the verdict's authored line lives on the outcome surface
+     * (Verdict Card in the column / toast fallback) — the stage no longer
+     * renders a resolved-check block. */
+    render(
+      <Tooltip.Provider>
+        <QuestOutcomeToast run={run} check={check} onDismiss={() => undefined} />
+      </Tooltip.Provider>,
+    );
     expect(screen.getByText(check.flavor!)).toBeInTheDocument();
     expect(screen.queryByText(new RegExp(`${check.title} — ${check.verdict.toUpperCase()}`))).not.toBeInTheDocument();
   });
@@ -132,8 +145,11 @@ describe('QuestRunWindow — what the player reads', () => {
     for (const seed of [3, 17, 58]) {
       const run = atExploration(seed);
       const { unmount } = renderWindow(run);
-      const body = screen.getAllByText(/The wood is silent/);
-      expect(body).toHaveLength(1);
+      /* The stage renders the CURRENT node's body exactly once — the
+       * lastEvent/echo filters suppress every duplicate. */
+      const node = run.nodeId;
+      const body = (GOBLIN_SCENARIO.nodes as Record<string, { body?: string }>)[node]?.body;
+      if (body) expect(screen.getAllByText(body)).toHaveLength(1);
       unmount();
     }
   });
@@ -154,13 +170,17 @@ describe('R-199 — no skip button, companions closed, frontier gating', () => {
     expect(screen.queryByTestId('quest-window-beat')).toBeNull();
   });
 
-  it('companion panels are closed by default; the belt trigger sits beside the choices', () => {
+  it('companion panels are closed by default; the bag is reachable via header pill and Micro-Belt', () => {
     renderWindow(atExploration(42));
     expect(screen.queryByTestId('quest-companion-left')).toBeNull();
+    /* WS-4: ONE left column hosts Party/Bag/Log — there is no right
+     * companion on the window (the right wing belongs to the skill check). */
     expect(screen.queryByTestId('quest-companion-right')).toBeNull();
-    // The bag/belt icon lives in the action strip next to the numbered choices.
-    const strip = screen.getByTestId('quest-action-strip');
-    expect(within(strip).getByTestId('quest-belt-toggle')).toBeInTheDocument();
+    // The three labeled header pills; the bag also surfaces as the inline
+    // Micro-Belt above the choices when the run packed items (default loadout).
+    expect(screen.getByTestId('quest-belt-toggle')).toBeInTheDocument();
+    expect(screen.getByTestId('quest-log-toggle')).toBeInTheDocument();
+    expect(screen.getByTestId('quest-micro-belt')).toBeInTheDocument();
   });
 
   it('«abbandona quest» asks inline before routing to the engine flee', () => {

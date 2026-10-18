@@ -34,7 +34,7 @@
 import React, { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EngravedIcon } from './engravedIcons';
-import { HudPlaque, SkinCloseButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
+import { HudPlaque, SkinCloseButton, SkinScope, prefersReducedMotion } from '@/ui/idleVillage/skins/primitives';
 import { HudChip } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { DestinyAstrolabeV62Standalone, type DestinyAstrolabeV62Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
@@ -62,6 +62,17 @@ const CLICK_DRAG_TOLERANCE_PX = 4;
  *  clamps, the kit paints `<title>:score/difficulty` — one constant for the
  *  skills prop and the title-row chip so they can never drift apart. */
 const ASTROLABE_DIFFICULTY_BASELINE = 50;
+
+/** The check is the scene's main character (PLAN-043 T3.2): the screen behind it dims, softly and without blocking
+ *  input (the check is not modal — v4), and the plaque arrives instead of popping in. */
+const STAGE_CSS = `
+@keyframes questCheckScrimIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes questCheckPlaqueIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.965); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}`;
+const SCRIM_BACKGROUND =
+  'radial-gradient(ellipse at 50% 52%, color-mix(in srgb, var(--skin-hud-lacquer-deep, #060f16) 28%, transparent) 0%, color-mix(in srgb, var(--skin-hud-lacquer-deep, #060f16) 62%, transparent) 100%)';
 
 export interface QuestSkillCheckOverlayProps {
   bridge: QuestCheckBridge;
@@ -177,8 +188,10 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
       else if (bridge.autoThrow) astroRef.current?.throw();
     }, 0);
     return () => window.clearTimeout(id);
+    /* `bridge.autoThrow` is a live toggle — flipping «skip intro» mid-spin
+     * throws immediately (the deferred 0ms keeps the arm-order guarantee). */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checkKey]);
+  }, [checkKey, bridge.autoThrow]);
 
   /* Arm the dismiss once the verdict is painted + the configured delay; the
    * optional auto-dismiss rides the same moment. */
@@ -211,7 +224,15 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
 
   const titleId = `${overlayId}-title`;
   const verdictLabel = t(`questS1Lab.verdict.${mode}`);
-  const boardCap = compact ? 'min(50vh, 90vw)' : `${cfg.boardSizePx}px`;
+  /* The board's WIDTH is explicit (PLAN-043 T3.2): left to the plaque's content width it collapsed to `boardMinPx`
+   * (240 px at every screen size) and the kit — drawn larger — was clipped on three sides. It now grows with the
+   * screen (`boardVh` % of the height, between `boardSizePx` and `boardMaxPx`) and is always limited by what fits:
+   * the viewport height minus the margins and the title bar, and the viewport width. Compact screens keep their rule. */
+  const fitH = `calc(100dvh - ${cfg.overlayMarginPx * 2 + 96}px)`;
+  const fitW = `calc(100vw - ${cfg.overlayMarginPx * 2 + 24}px)`;
+  const boardWidth = compact
+    ? `min(50vh, 90vw)`
+    : `min(clamp(${cfg.boardSizePx}px, ${cfg.boardVh}dvh, ${cfg.boardMaxPx}px), ${fitH}, ${fitW})`;
 
   /* Click policy: during the spin only the BOARD settles the verdict; after
    * resolve (and the arm delay) the whole plaque dismisses — except real
@@ -240,6 +261,18 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
         data-testid="quest-check-overlay-shell"
         style={{ position: 'fixed', inset: 0, zIndex, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}
       >
+        <style>{STAGE_CSS}</style>
+        <div
+          aria-hidden
+          data-testid="quest-check-scrim"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            background: SCRIM_BACKGROUND,
+            animation: prefersReducedMotion() ? undefined : 'questCheckScrimIn 260ms ease-out both',
+          }}
+        />
         {/* Drag/focus host — HudPlaque forwards no ref, so the wrapper carries
             `data-hud-panel` (the transform lands here) and the dialog a11y. */}
         <div
@@ -277,6 +310,7 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
             flex: '1 1 auto',
             minHeight: 0,
             overflowY: 'auto',
+            animation: prefersReducedMotion() ? undefined : 'questCheckPlaqueIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both',
           } as CSSProperties}
         >
           {/* Title bar = drag handle; the close X dismisses once armed. */}
@@ -312,9 +346,9 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
             data-testid="quest-check-board"
             onClick={onBoardClick}
             style={{
-              flex: '1 1 auto',
+              flex: '0 0 auto',
+              width: boardWidth,
               minHeight: cfg.boardMinPx,
-              maxHeight: boardCap,
               aspectRatio: '1 / 1',
               alignSelf: 'center',
               maxWidth: '100%',

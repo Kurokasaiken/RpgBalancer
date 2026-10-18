@@ -104,6 +104,13 @@ export interface GameFrameProps {
    * not a second shell to maintain.
    */
   variant?: 'atlas' | 'cartographer';
+  /**
+   * PLAN-043 WS-2: when the three-zone stage owns panel placement, the
+   * roster/hanging slots render inside a neutral full-area layer and the
+   * stage's `StagePanelFrame` supplies position + suspension — the anchor and
+   * the hung-tag wrapper would double-position them.
+   */
+  stageMode?: boolean;
 }
 
 /**
@@ -159,6 +166,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   hudWakeSignal,
   onHudHiddenChange,
   variant = 'atlas',
+  stageMode = false,
 }) => {
   const { t } = useTranslation('idleVillage');
   const inset = config.insets.edgeInsetPx;
@@ -474,7 +482,13 @@ export const GameFrame: React.FC<GameFrameProps> = ({
 
       {/* ── Right edge: what is coming, hung from the top ribbon ── */}
       {hangingSlot != null && (
-        <div style={{ position: 'absolute', top: config.insets.hangingTopPx, right: inset + 8, zIndex: z.panels, ...slideChrome('up') }}>{hangingSlot}</div>
+        stageMode ? (
+          /* WS-2: the stage layer — the frame inside the slot positions itself
+           *  from the rightWing rect; `pointerEvents` is re-armed per frame. */
+          <div style={{ position: 'absolute', inset: 0, zIndex: z.panels, pointerEvents: 'none' }}>{hangingSlot}</div>
+        ) : (
+          <div style={{ position: 'absolute', top: config.insets.hangingTopPx, right: inset + 8, zIndex: z.panels, ...slideChrome('up') }}>{hangingSlot}</div>
+        )
       )}
 
 
@@ -485,25 +499,31 @@ export const GameFrame: React.FC<GameFrameProps> = ({
       </div>
 
       {rosterSlot != null && (
-        <RosterAnchor
-          style={{
-            position: 'absolute',
-            left: config.roster.leftPx,
-            bottom: config.roster.bottomPx,
-            width: config.roster.widthPx,
-            zIndex: z.panels,
-            transformOrigin: 'bottom left',
-            // No transform unless one is configured: any transform here becomes the
-            // containing block for the roster's position:fixed drag overlay, which then
-            // lands off-target (the portrait medallion never shows under the cursor).
-            // No shadow either: the roster moves inside this box, its own shadow moves
-            // with it, and a shadow here would stay behind as a ghost.
-            // (`slideChrome` returns `transform: 'none'` at rest, which is exempt.)
-            ...slideChrome('down', rosterBaseTransform),
-          }}
-        >
-          {rosterSlot}
-        </RosterAnchor>
+        stageMode ? (
+          /* WS-2: the stage owns the roster rect (leftWing) — the anchor's
+           *  fixed corner placement and held-height trick are superseded. */
+          <div style={{ position: 'absolute', inset: 0, zIndex: z.panels, pointerEvents: 'none' }}>{rosterSlot}</div>
+        ) : (
+          <RosterAnchor
+            style={{
+              position: 'absolute',
+              left: config.roster.leftPx,
+              bottom: config.roster.bottomPx,
+              width: config.roster.widthPx,
+              zIndex: z.panels,
+              transformOrigin: 'bottom left',
+              // No transform unless one is configured: any transform here becomes the
+              // containing block for the roster's position:fixed drag overlay, which then
+              // lands off-target (the portrait medallion never shows under the cursor).
+              // No shadow either: the roster moves inside this box, its own shadow moves
+              // with it, and a shadow here would stay behind as a ghost.
+              // (`slideChrome` returns `transform: 'none'` at rest, which is exempt.)
+              ...slideChrome('down', rosterBaseTransform),
+            }}
+          >
+            {rosterSlot}
+          </RosterAnchor>
+        )
       )}
 
       {dressingSlot != null && (

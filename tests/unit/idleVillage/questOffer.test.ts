@@ -102,7 +102,7 @@ describe('questPois config', () => {
     expect(QUEST_POIS.map((p) => p.questId).sort()).toEqual(['goblin', 'rovine']);
     for (const poi of QUEST_POIS) {
       expect(() => QuestPoiSchema.parse(poi)).not.toThrow();
-      expect(poi.availableUntilDay).toBeGreaterThan(poi.availableFromDay);
+      expect(poi.availableUntilDay).toBeUndefined(); // senza scadenza: l'offerta non scade
       expect(poi.estimatedDurationTicks).toBe(poi.ticksPerNode * poi.expectedPathNodes);
     }
   });

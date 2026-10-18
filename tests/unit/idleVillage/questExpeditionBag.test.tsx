@@ -1,10 +1,12 @@
 /**
  * questExpeditionBag.test.tsx — PLAN-036 (R-195) bag-zone contract:
  * exactly `QUEST_STASH.bagSlots` visible slots, ONE toggle opening the
- * external village-stock picker (icon-only `picker-item-*` tiles with
- * stock badge + rich tooltip), `loadout-item-*` strictly unique (a filled
- * slot's inner button, never a picker tile), Escape/click-outside close
- * the picker only and focus returns to the toggle.
+ * Selection Tray (PLAN-043 WS-3, replaces the retired
+ * `quest-bag-external-picker` popover — see ws3 testid migration list):
+ * icon-only `picker-item-*` tiles with stock badge + rich tooltip,
+ * `loadout-item-*` strictly unique (a filled slot's inner button, never a
+ * picker tile), Escape/click-outside close the tray only and focus
+ * returns to the toggle.
  */
 import { describe, expect, it, vi } from 'vitest';
 import React, { useState } from 'react';
@@ -64,21 +66,21 @@ const Harness = () => {
   );
 };
 
-describe('PLAN-036 bag zone — 3 slots + external village picker', () => {
+describe('bag zone — 3 slots + WS-3 Selection Tray', () => {
   it('renders exactly bagSlots slots plus ONE picker toggle, picker closed', () => {
     render(<Harness />);
     for (let i = 0; i < QUEST_STASH.bagSlots; i++) {
       expect(screen.getByTestId(`bag-slot-${i}`)).toBeInTheDocument();
     }
     expect(screen.queryByTestId(`bag-slot-${QUEST_STASH.bagSlots}`)).toBeNull();
-    expect(screen.getByTestId('quest-bag-picker-toggle')).toBeInTheDocument();
-    expect(screen.queryByTestId('quest-bag-external-picker')).toBeNull();
+    expect(screen.getByTestId('quest-tray-toggle')).toBeInTheDocument();
+    expect(screen.queryByTestId('quest-selection-tray')).toBeNull();
   });
 
-  it('opens the picker on the toggle and shows one icon-only tile per village item', () => {
+  it('opens the tray on the toggle and shows one icon-only tile per village item', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-bag-picker-toggle'));
-    const picker = screen.getByTestId('quest-bag-external-picker');
+    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
+    const picker = screen.getByTestId('quest-selection-tray');
     expect(picker).toBeInTheDocument();
     for (const { itemId } of VILLAGE_STASH_CONFIG.items) {
       const tile = screen.getByTestId(`picker-item-${itemId}`);
@@ -90,9 +92,9 @@ describe('PLAN-036 bag zone — 3 slots + external village picker', () => {
     }
   });
 
-  it('selecting three tiles fills the three bag slots; picker stays open', () => {
+  it('selecting three tiles fills the three bag slots; tray stays open', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-bag-picker-toggle'));
+    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
     const first3 = VILLAGE_STASH_CONFIG.items.slice(0, 3);
     for (const { itemId } of first3) {
       fireEvent.click(screen.getByTestId(`picker-item-${itemId}`));
@@ -110,12 +112,12 @@ describe('PLAN-036 bag zone — 3 slots + external village picker', () => {
     /* Bag full: the remaining tiles are disabled. */
     const fourth = VILLAGE_STASH_CONFIG.items[3].itemId;
     expect(screen.getByTestId(`picker-item-${fourth}`)).toBeDisabled();
-    expect(screen.getByTestId('quest-bag-external-picker')).toBeInTheDocument();
+    expect(screen.getByTestId('quest-selection-tray')).toBeInTheDocument();
   });
 
   it('clicking a filled bag slot removes the item', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-bag-picker-toggle'));
+    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
     const id = VILLAGE_STASH_CONFIG.items[0].itemId;
     fireEvent.click(screen.getByTestId(`picker-item-${id}`));
     expect(screen.getAllByTestId(`loadout-item-${id}`)).toHaveLength(1);
@@ -123,29 +125,29 @@ describe('PLAN-036 bag zone — 3 slots + external village picker', () => {
     expect(screen.queryByTestId(`loadout-item-${id}`)).toBeNull();
   });
 
-  it('Escape closes ONLY the picker and focus returns to the toggle', () => {
+  it('Escape closes ONLY the tray and focus returns to the toggle', () => {
     render(<Harness />);
-    const toggle = screen.getByTestId('quest-bag-picker-toggle');
+    const toggle = screen.getByTestId('quest-tray-toggle');
     fireEvent.click(toggle);
-    expect(screen.getByTestId('quest-bag-external-picker')).toBeInTheDocument();
+    expect(screen.getByTestId('quest-selection-tray')).toBeInTheDocument();
     fireEvent.keyDown(window, { key: 'Escape' });
-    expect(screen.queryByTestId('quest-bag-external-picker')).toBeNull();
+    expect(screen.queryByTestId('quest-selection-tray')).toBeNull();
     /* The panel itself stays mounted (the detail plaque survives). */
     expect(screen.getByTestId('quest-expedition-detail')).toBeInTheDocument();
     expect(document.activeElement).toBe(toggle);
   });
 
-  it('a pointer down outside picker and toggle closes it', () => {
+  it('a pointer down outside tray and toggle closes it', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-bag-picker-toggle'));
-    expect(screen.getByTestId('quest-bag-external-picker')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
+    expect(screen.getByTestId('quest-selection-tray')).toBeInTheDocument();
     fireEvent.pointerDown(document.body);
-    expect(screen.queryByTestId('quest-bag-external-picker')).toBeNull();
+    expect(screen.queryByTestId('quest-selection-tray')).toBeNull();
   });
 
   it('focusing a picker tile exposes name + description + stock in a tooltip', async () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-bag-picker-toggle'));
+    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
     const id = VILLAGE_STASH_CONFIG.items[0].itemId;
     const tile = screen.getByTestId(`picker-item-${id}`);
     fireEvent.focus(tile);

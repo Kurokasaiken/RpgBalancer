@@ -106,7 +106,7 @@ import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
-import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
+import { useDragOutcome, elementCenter, getSlotComponentElement } from '@/ui/idleVillage/interaction/useDragOutcome';
 import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
@@ -574,7 +574,7 @@ export function useQuestPoiSession({
       if (!accepted) return false;
 
       const element = isDetailOpen
-        ? document.querySelector(`[data-slot-id="${slot.id}"]`)
+        ? getSlotComponentElement(slot.id)
         : document.querySelector(poiFlightTargetSelector);
       return { flightToSlot: { slotId: slot.id, element } };
     },
@@ -601,7 +601,7 @@ export function useQuestPoiSession({
 
       setFlyingResidentId(residentId);
       setTimeout(() => {
-        const to = elementCenter(document.querySelector(`[data-slot-id="${slot.id}"]`));
+        const to = elementCenter(getSlotComponentElement(slot.id));
         if (!to) return;
         startFlight({
           residentId,
@@ -622,7 +622,7 @@ export function useQuestPoiSession({
       const residentId = assignments[slotId];
       handleClear(slotId);
       if (!residentId) return;
-      const from = elementCenter(document.querySelector(`[data-slot-id="${slotId}"]`));
+      const from = elementCenter(getSlotComponentElement(slotId));
       const to = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
       if (from && to) {
         setFlyingResidentId(residentId);

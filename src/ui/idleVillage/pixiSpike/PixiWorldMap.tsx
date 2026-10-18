@@ -1662,10 +1662,9 @@ export function PixiWorldMap({
           if (!start || Math.hypot(e.clientX - start.x, e.clientY - start.y) > 4) return;
           const { wx, wy } = worldPoint(e);
           const region = regionByIndex.get(idAt(wx, wy));
-          if (region) {
-            focusRef.current?.(region.center[0] * canvas.width, region.center[1] * canvas.height);
-            regionsRef.current?.onSelect?.(region);
-          }
+          /* Selecting a territory never moves the camera (Director 2026-10-16, PLAN-043 D7): it only reports the
+           * selection. Camera focus stays for explicit requests (`focusRequest`, e.g. a ledger row with a place). */
+          if (region) regionsRef.current?.onSelect?.(region);
         };
         el2.addEventListener('mousemove', onHoverMove);
         el2.addEventListener('mouseleave', onLeave);

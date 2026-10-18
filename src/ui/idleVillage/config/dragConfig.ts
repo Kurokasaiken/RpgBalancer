@@ -52,6 +52,11 @@ export const getDragConfig = () => ({
     magnetism: {
         /** Radius (px) in which a slot starts attracting the token */
         radiusPx: 120,
+        /** PLAN-043 WS-1: slot-droppables-only radius. The 64px HUD box shrinks
+         *  the registered rect (half-width 41.5 → 32); +9.5 restores identical
+         *  axis reach (32+129.5 = 41.5+120 = 161.5px). Corners lose ≤4.1px on
+         *  the diagonal — documented, accepted. */
+        slotRadiusPx: 129.5,
         /** Amount of cursor-to-slot lerp (0-1) */
         lerpStrength: 0.35,
         /** Audio cue throttling in ms to avoid spam */

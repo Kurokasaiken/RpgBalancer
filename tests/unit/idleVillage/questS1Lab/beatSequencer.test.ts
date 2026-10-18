@@ -65,7 +65,6 @@ describe('projectBeats — committed deltas become ordered beats', () => {
 
   it('a resolved check becomes a check beat carrying the authored verdict', () => {
     const run = timedRun();
-    submitCommand(run, 'gob-partenza', { tick: 0 });
     const mark = beatMark(run);
     submitCommand(run, 'gob-cerca-tracce', { tick: run.frontier.readyAt });
     const beats = projectBeats(mark, run, { maxBeats: MAX });

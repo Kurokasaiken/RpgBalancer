@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { HUD_PANEL_DEFAULTS, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
+import { HUD_PANEL_DEFAULTS, HUD_PANEL_KEY_TO_ID, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
 
 export { HUD_PANEL_SHORTCUTS };
 export type { HudPanelId };
@@ -46,7 +46,7 @@ export function useHudPanels({ enabled = true, interceptToggle }: UseHudPanelsOp
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
       if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName))) return;
-      const id = (Object.keys(HUD_PANEL_SHORTCUTS) as HudPanelId[]).find((key) => HUD_PANEL_SHORTCUTS[key] === event.key.toLowerCase());
+      const id = HUD_PANEL_KEY_TO_ID[event.key.toLowerCase()];
       if (id) toggle(id);
     };
     window.addEventListener('keydown', onKey);

@@ -1,6 +1,8 @@
-import { cloneElement, isValidElement, startTransition, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
+import { cloneElement, isValidElement, startTransition, useCallback, useEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DndContext, MeasuringStrategy, pointerWithin } from '@dnd-kit/core';
+import { DndContext, MeasuringStrategy } from '@dnd-kit/core';
+import { getCurrentDragConfig } from '@/ui/idleVillage/config/dragConfig';
+import { createMagneticSlotCollision } from '@/ui/idleVillage/interaction/magneticCollision';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { GameFrameScreen } from './game-frame';
 import { DEFAULT_MAP_TUNE, PixiWorldMap, type PixiBootProgress, type PixiMapAnchor, type PixiRegion, type PixiRegionHover } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
@@ -11,6 +13,7 @@ import { installGamePerfProbe } from '@/ui/idleVillage/utils/gamePerfProbe';
 import { GAME_PERF_BUDGETS } from '@/ui/idleVillage/config/gamePerfBudgets';
 import { warmGameAssets } from '@/ui/idleVillage/utils/gameAssetWarmup';
 import { isSkillCheckWarmEnabled, prewarmQuestSkillCheck } from '@/ui/idleVillage/components/gameFrame/questSkillCheckWarm';
+import { CONSUMED_POIS_KEY, INVASION_KEY, clearGameProgress } from '@/ui/idleVillage/components/gameFrame/questInitialState';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { MatericRosterComponent } from '@/ui/idleVillage/roster';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
@@ -49,9 +52,21 @@ import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { useHudScale } from '@/ui/idleVillage/components/gameFrame/useHudScale';
 import { MapDemoPoi, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, VillageScreenView, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
-import { resolveQuestShellLayout } from '@/ui/idleVillage/components/gameFrame/questShellLayout';
+import { resolveQuestShellLayout, solveQuestClusterGeometry } from '@/ui/idleVillage/components/gameFrame/questShellLayout';
+import { QuestStageCluster } from '@/ui/idleVillage/components/gameFrame/QuestStageCluster';
+import { QuestSkillCheckColumn } from '@/ui/idleVillage/components/gameFrame/QuestSkillCheckColumn';
+import { checkEventOf, isStaleCheckEvent, useCheckBridge } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
+import {
+  GameStageProvider,
+  StagePanelEscape,
+  StagePanelFrame,
+  StageRejectedToast,
+  StageStripsLayer,
+  isStageManagedPanel,
+  useGameStageZonesState,
+} from '@/ui/idleVillage/components/gameFrame/stageZones/useGameStageZones';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { MERCHANT_CONFIG } from '@/balancing/config/idleVillage/merchantConfig';
 import { runHeroLevelUpStaging } from '@/ui/idleVillage/rosterV2/runHeroLevelUpStaging';
@@ -81,16 +96,25 @@ const INVASION_MARCH_DAYS = 30;
 /** Normalised map points: where the sticker lands on the forest, and the village it marches on. */
 const INVASION_LAND = { x: 0.239, y: 0.417 } as const;
 const INVASION_VILLAGE = { x: 0.486, y: 0.554 } as const;
-const INVASION_KEY = 'invasion_v1';
 const TUNING_KEY = 'hud_tuning_v1';
 /** POIs whose quest has run to completion: once the expedition report is
  *  dismissed the marker leaves the map for good (PLAN-019-S2.5 terminal
  *  table: every outcome ⇒ «POI chiude»). */
-const CONSUMED_POIS_KEY = 'idleVillage.questPois.consumed';
+
+/** Exact hit first, then the nearest slot within the config's magnet radius (PLAN-043 T1.2).
+ *  `slotRadiusPx` is the slot-scoped override (PLAN-043 WS-1 T1.3): it applies
+ *  only to `data.type === 'slot'` droppables inside the resolver — every other
+ *  droppable kind keeps exact-hit behaviour. */
+const SLOT_MAGNET = createMagneticSlotCollision(getCurrentDragConfig().magnetism.slotRadiusPx);
 
 export default function GameFramePixiPage() {
+  const slotMagnet = SLOT_MAGNET;
   const hudScale = useHudScale();
-  const { worldDressing, questPois, debug, roster, questDetail, questWindow, insets, questReveal } = DEFAULT_GAME_FRAME_CONFIG;
+  /* PLAN-043 WS-2: the three-zone stage — reducer-owned occupancy solved by
+   *  `solveStageLayout`. Runs before `useHudPanels` so the registry's
+   *  shortcut/menu path can route zone-managed ids straight into it. */
+  const stage = useGameStageZonesState();
+  const { worldDressing, questPois, debug, questWindow, insets, questReveal, stageZones } = DEFAULT_GAME_FRAME_CONFIG;
   const baseSafeFit = worldDressing.safeFit.enabled ? worldDressing.safeFit : undefined;
   // Dev tuning (Tuning panel): overrides on top of the config, applied when a slider is released.
   const [tuned, setTuned] = useState<Record<string, number>>({});
@@ -276,13 +300,26 @@ export default function GameFramePixiPage() {
   /* PLAN-032 SP-1: the hero sheet's machine is its single transition owner.
    * `interceptToggle` routes every registry call for it (menu, game menu, the
    * `p` shortcut) into `useHeroSheet`; the registry flag only reflects. */
-  const heroSheetApiRef = useRef<HeroSheetApi | null>(null);
+  const heroSheetApiRef = useRef<HeroSheetApi>(null);
+  /* Zone-managed ids (roster/events/villageStash/merchant/questForecast/quest)
+   *  never enter `panels.visible` — `panelsForScreen.visible` below merges the
+   *  reducer's derived occupancy over it, so the legacy `visible` surface and
+   *  the stage can't drift apart. */
   const panels = useHudPanels({
-    interceptToggle: useCallback((id: HudPanelId) => {
-      if (id !== 'heroSheet') return false;
-      heroSheetApiRef.current?.toggle();
-      return true;
-    }, []),
+    interceptToggle: useCallback(
+      (id: HudPanelId) => {
+        if (isStageManagedPanel(stageZones, id)) {
+          stage.api.toggle(id);
+          return true;
+        }
+        if (id === 'heroSheet') {
+          heroSheetApiRef.current?.toggle();
+          return true;
+        }
+        return false;
+      },
+      [stage.api, stageZones],
+    ),
   });
   // The map never moves for a panel (Director, 2026-10-14): Roster, ledger, quest detail and every other panel the
   // player can move or close may cover the land. Only the fixed chrome reserves space (`baseSafeFit` insets top/bottom).
@@ -310,14 +347,14 @@ export default function GameFramePixiPage() {
     };
   }, []);
 
-  // The detail opens between the roster and the ledger, never over either.
-  const rosterRight = roster.leftPx + roster.widthPx;
-  const ledgerLeft = window.innerWidth - (insets.edgeInsetPx + 8) - questDetail.ledgerWidthPx;
-  const corridor = ledgerLeft - questDetail.gapPx - (rosterRight + questDetail.gapPx);
-  const questDetailPosition = {
-    x: rosterRight + questDetail.gapPx + Math.max(0, (corridor - questDetail.widthPx) / 2),
-    y: questDetail.topPx,
-  };
+  /* PLAN-043 WS-2: no corridor math here — the planner's first-open rect is
+   *  the solver's `questDetail` occupant rect (centerStage zone). The stage
+   *  frame wraps the node, so its geometry is authoritative; this position is
+   *  only a pre-solver mount hint for `useQuestExpeditionDetail`. */
+  const questDetailPosition = useMemo(() => {
+    const rect = stage.layout?.panels.questDetail.rect;
+    return rect ? { x: rect.x, y: rect.y } : undefined;
+  }, [stage.layout]);
 
   const session = useQuestPoiSession({
     poiFlightTargetSelector: MAP_QUEST_POI_TARGET,
@@ -375,7 +412,9 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   /** Window left on a real quest offer, on the game clock. */
   const offerAvailability = useCallback(
     (p: QuestPoi) =>
-      questAvailability(currentTick, p.availableFromDay * dayLengthTicks, dayLengthTicks, p.availableUntilDay - p.availableFromDay),
+      p.availableUntilDay === undefined
+        ? { progress: 1, state: 'available' as const }
+        : questAvailability(currentTick, (p.availableFromDay ?? 0) * dayLengthTicks, dayLengthTicks, p.availableUntilDay - (p.availableFromDay ?? 0)),
     [currentTick, dayLengthTicks],
   );
 
@@ -456,11 +495,21 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
    *  whole medallion subtree) on every render (PLAN-034 T-005). */
   const openRunWindow = useCallback((questId: QuestId) => {
     setActiveQuestId(questId);
-    panels.set('quest', true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [panels.set]);
+    stage.api.open('quest');
+  }, [stage.api]);
   const poiGoblin = questPoiById('poi-goblin');
   const poiRovine = questPoiById('poi-rovine');
+  /* WS-2: the planner mounts inside its stage frame — suspension treatment +
+   *  zone-aware drag claim — while keeping its own dnd-kit drag and absolute
+   *  rect (positioned=false: the detail self-positions). */
+  const wrapQuestDetail = useCallback(
+    (node: ReactNode) => (
+      <StagePanelFrame panelId="questDetail" positioned={false} className="hud-panel">
+        {node}
+      </StagePanelFrame>
+    ),
+    [],
+  );
   const expeditionGoblin = useQuestExpeditionSession({
     poi: poiGoblin!,
     questRun,
@@ -468,6 +517,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     currentTick,
     onOpenRun: openRunWindow,
     detailPosition: questDetailPosition,
+    wrapDetail: wrapQuestDetail,
   });
   const expeditionRovine = useQuestExpeditionSession({
     poi: poiRovine!,
@@ -476,16 +526,81 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     currentTick,
     onOpenRun: openRunWindow,
     detailPosition: questDetailPosition,
+    wrapDetail: wrapQuestDetail,
   });
   const expeditions = [expeditionGoblin, expeditionRovine];
+  const anyExpeditionDetailOpen = expeditions.some((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended));
+  /* WS-2: the planner is a stage occupant — `isDetailOpen` (which any POI may
+   *  flip via a medallion click) is the session truth; the stage mirrors it.
+   *  During `run` the detail retires per its runPolicy via REGIME_CHANGED. */
+  useEffect(() => {
+    stage.api.setOpen('questDetail', anyExpeditionDetailOpen);
+  }, [stage.api, anyExpeditionDetailOpen]);
+  /* Reconciliation: `quest` occupancy means "a run is on stage". A cleared
+   *  run (abandon, dismiss from another path) must release the whole stage —
+   *  otherwise the `run` regime would keep every other panel suspended
+   *  against an empty occupant. */
+  useEffect(() => {
+    if (!activeQuestRun.run && stage.isOpen('quest')) stage.api.close('quest');
+  }, [stage.api, stage, activeQuestRun.run]);
+  /* Read inside StagePanelEscape callbacks without re-binding the hooks. */
+  const expeditionsRef = useRef(expeditions);
+  expeditionsRef.current = expeditions;
+  /* Escape on the planner closes whichever expedition detail is open — the
+   *  sessions own `isDetailOpen`; the stage mirrors via the effect above. */
+  const closeAnyExpeditionDetail = useCallback(() => {
+    expeditionsRef.current.forEach((exp) => {
+      if (exp.isDetailOpen) exp.closeDetail();
+    });
+  }, []);
+  /* The api the shell sees: `heroSheet` calls route into the machine (reflect,
+   *  never drive — the internal `p` shortcut is already intercepted), zone-
+   *  managed ids route into the stage (WS-2), everything else hits `panels`.
+   *  Managed `visible` values come pre-synced from `GameStageProvider`. */
+  const panelsForScreen = useMemo<HudPanelsApi>(() => {
+    /* Managed ids are stage-owned: their `visible` mirrors occupancy (open,
+     *  strip or suspended — the frame decides presentation and keeps the node
+     *  mounted-hidden so DOM-level reads still see it). This is the sync the
+     *  header comment promises — without it `rosterSlot` never mounts because
+     *  `toggle` is intercepted before `panels.visible` flips. */
+    const visible = { ...panels.visible };
+    for (const id of Object.keys(stageZones.panels) as HudPanelId[]) {
+      if (isStageManagedPanel(stageZones, id)) {
+        visible[id] = stage.isOpen(id);
+      }
+    }
+    return {
+      visible,
+      set: (id, value) => {
+        if (isStageManagedPanel(stageZones, id)) {
+          stage.api.setOpen(id, value);
+          return;
+        }
+        if (id === 'heroSheet') {
+          if (value) heroSheetApiRef.current?.open();
+          else heroSheetApiRef.current?.close('toggle');
+          return;
+        }
+        panels.set(id, value);
+      },
+      toggle: (id) => {
+        if (isStageManagedPanel(stageZones, id)) {
+          stage.api.toggle(id);
+          return;
+        }
+        if (id === 'heroSheet') {
+          heroSheetApiRef.current?.toggle();
+          return;
+        }
+        panels.toggle(id);
+      },
+    };
+  }, [panels, stage, stageZones]);
   /* R-184: a POI detail (the quest planner) always has the roster beside it —
    *  opened if it was closed, closed again when the detail goes if it was
-   *  closed before. Same visibility rule the planner overlay uses. */
-  usePanelWhileOpen(
-    panels,
-    'roster',
-    expeditions.some((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended)),
-  );
+   *  closed before. Same visibility rule the planner overlay uses — routed
+   *  through `panelsForScreen` so the stage owns the occupancy write. */
+  usePanelWhileOpen(panelsForScreen, 'roster', anyExpeditionDetailOpen);
 
   /* PLAN-032 SP-1: the hero sheet. The roster's data bundle is the same the kit
    * feeds its cards with, so the plaque always reads canonical values. The
@@ -493,11 +608,44 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   const { residentsById } = useRosterKitData();
   const draggingResidentId =
     session.draggingResidentId ?? expeditionGoblin.draggingResidentId ?? expeditionRovine.draggingResidentId;
+  /* PLAN-043 WS-4: the quest cluster — one solver owns CompanionLeft /
+   *  window / SkillCheckColumn. The page holds the two pieces of intent the
+   *  solver needs: the requested left tab (`questPill`) and the live beat's
+   *  `expanded` tag (reported up by the window). The right wing's request
+   *  comes from the published check bridge (engine-first: the overlay
+   *  never recomputes the outcome). */
+  const [questPill, setQuestPill] = useState<'party' | 'bag' | 'log' | null>(null);
+  const [questExpandedStage, setQuestExpandedStage] = useState(false);
+  const checkBridge = useCheckBridge(activeQuestId);
+  const liveCheckEvent = activeQuestRun.run && checkBridge ? checkEventOf(activeQuestRun.run, checkBridge.check) : null;
+  const checkLive = !!liveCheckEvent && !isStaleCheckEvent(liveCheckEvent, activeQuestRun.run);
+  const clusterEnvelope = stage.layout.clusterEnvelope;
+  const clusterGeometry = useMemo(() => {
+    if (!clusterEnvelope || !activeQuestRun.run || !panelsForScreen.visible.quest) return null;
+    return solveQuestClusterGeometry(
+      stage.state.viewport,
+      clusterEnvelope,
+      { userCenterX: stage.state.userCenterX, userTopY: stage.state.userTopY },
+      { leftOpen: questPill !== null, rightOpen: checkLive, expanded: questExpandedStage },
+    );
+  }, [clusterEnvelope, activeQuestRun.run, panelsForScreen.visible.quest, stage.state.viewport, stage.state.userCenterX, stage.state.userTopY, questPill, checkLive, questExpandedStage]);
+
   const questWindowBounds = useMemo(
     () => {
-      if (!panels.visible.quest || !activeQuestRun.run) return null;
-      /* R-196: the hero sheet keeps clear of the WHOLE shell — the window
-       * plus whichever companion span fits beside it. */
+      if (!stage.isOpen('quest') || !activeQuestRun.run) return null;
+      /* WS-4: the hero sheet keeps clear of the whole CLUSTER union —
+       * window + whichever wings the solver mounted. */
+      if (clusterGeometry) {
+        const rects = [clusterGeometry.window, clusterGeometry.leftWing, clusterGeometry.leftTab, clusterGeometry.rightWing].filter(
+          (r): r is NonNullable<typeof r> => !!r,
+        );
+        return {
+          left: Math.min(...rects.map((r) => r.x)),
+          top: Math.min(...rects.map((r) => r.y)),
+          right: Math.max(...rects.map((r) => r.x + r.w)),
+          bottom: Math.max(...rects.map((r) => r.y + r.h)),
+        };
+      }
       const layout = resolveQuestShellLayout(window.innerWidth, questWindow);
       const sideSpan = layout.companionsFit ? layout.effectiveSideWidth + questWindow.sidePanelGapPx : 0;
       const vw = window.innerWidth;
@@ -511,40 +659,19 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         bottom: window.innerHeight,
       };
     },
-    [panels.visible.quest, activeQuestRun.run, questWindow],
+    [stage, activeQuestRun.run, questWindow, clusterGeometry],
   );
   const heroSheet = useHeroSheet({
     config: DEFAULT_GAME_FRAME_CONFIG.heroSheet,
     residentsById,
-    panels,
+    panels: panelsForScreen,
     dragActive: draggingResidentId != null,
     questBounds: questWindowBounds,
     zIndex: DEFAULT_GAME_FRAME_CONFIG.zLayers.panels,
+    /* the sheet never enters the fixed chrome: the top bar / menu and the bottom navigation */
+    chromeInsets: { top: insets.hangingTopPx, bottom: baseSafeFit?.insets.bottom ?? 0 },
   });
   heroSheetApiRef.current = heroSheet;
-  /* The api the shell sees: `heroSheet` calls route into the machine (reflect,
-   * never drive — the internal `p` shortcut is already intercepted). */
-  const panelsForScreen = useMemo<HudPanelsApi>(
-    () => ({
-      visible: panels.visible,
-      set: (id, value) => {
-        if (id === 'heroSheet') {
-          if (value) heroSheet.open();
-          else heroSheet.close('toggle');
-          return;
-        }
-        panels.set(id, value);
-      },
-      toggle: (id) => {
-        if (id === 'heroSheet') {
-          heroSheet.toggle();
-          return;
-        }
-        panels.toggle(id);
-      },
-    }),
-    [panels, heroSheet],
-  );
 
   /* PLAN-035: building markers left the continent map — the stash and merchant
    *  panels open from the Village view's tooltip actions (and the Panels menu /
@@ -552,8 +679,8 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
    *  closing the panel returns focus to it (menu/shortcut paths leave it null →
    *  focus falls back to the Panels-menu trigger, never to body). `panels`
    *  itself is unstable across renders, so callbacks read it through a ref. */
-  const panelsApiRef = useRef(panels);
-  panelsApiRef.current = panels;
+  const panelsApiRef = useRef(panelsForScreen);
+  panelsApiRef.current = panelsForScreen;
   const buildingOpenerRef = useRef<HTMLElement | null>(null);
   const openVillagePanel = useCallback((panelId: 'villageStash' | 'merchant', trigger: HTMLElement) => {
     buildingOpenerRef.current = trigger;
@@ -616,9 +743,9 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   /* Escape arbitration (artifact r005) — ONE window-bubble listener owned by
    * the page; order inside the same keypress:
    * 1. Hero sheet: document capture upstream already preventDefault-ed it.
-   * 2. Quest window: a mounted `[data-hud-panel="quest"]` node — presence, not
-   *    listener order, so its own bubble handler may run before or after this
-   *    one without a double dismissal.
+   * 2. Quest window: a LIVE quest stage occupant — WS-2 keeps the node mounted
+   *    while suspended, so DOM presence is no longer the test; the solver's
+   *    `expanded` resolution is (same arbitration intent, presence→live).
    * 3. Village tooltip: the view's imperative escape() (close + focus the pin).
    * 4. Village exit → map, focus returning to the Map nav button.
    * Stash/merchant panels register no Escape handler and never suppress the
@@ -626,7 +753,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape' || event.defaultPrevented) return;
-      if (document.querySelector('[data-hud-panel="quest"]')) return;
+      if (stage.resolution('quest').presentationEffective === 'expanded') return;
       if (viewModeRef.current !== 'village') return;
       event.preventDefault();
       if (villageViewRef.current?.escape()) return;
@@ -634,7 +761,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [goToView]);
+  }, [goToView, stage]);
 
   // Open opportunities live in the calendar like any other dated event: the quest is a row in the ledger.
   const extraEvents = useMemo<HudEvent[]>(() => {
@@ -648,8 +775,9 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
       autoRevealedIds,
       hasLiveRun: !!expeditionGoblin.run,
     });
-    if (goblinRevealed && expeditionGoblin.poiView.questStatus === 'available' && goblinAvail && goblinAvail.state !== 'expired') {
-      const daysLeft = Math.max(0, Math.ceil(goblinAvail.progress * (poiGoblin.availableUntilDay - poiGoblin.availableFromDay)));
+    /* The ledger counts down a window; an offer with no window has nothing to count. */
+    if (goblinRevealed && poiGoblin.availableUntilDay !== undefined && expeditionGoblin.poiView.questStatus === 'available' && goblinAvail && goblinAvail.state !== 'expired') {
+      const daysLeft = Math.max(0, Math.ceil(goblinAvail.progress * (poiGoblin.availableUntilDay - (poiGoblin.availableFromDay ?? 0))));
       list.push({ id: 'quest-open', typeId: 'quest', title: expeditionGoblin.poiView.activity.label, daysLeft, at: { x: poiGoblin.x / 4240, y: poiGoblin.y / 2828 } });
     }
     return list;
@@ -685,7 +813,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   const rewardVisible = Boolean(
     activeQuestRun.run?.ended &&
     !rewardDismissed &&
-    (!panels.visible.quest || !questPresenting),
+    (!panelsForScreen.visible.quest || !questPresenting),
   );
 
   /* Dismissal of the expedition report is the POI's exit cue: when the quest
@@ -707,18 +835,18 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     }
     activeQuestRun.clear();
   }, [activeQuestRun, activeQuestId, consumedPoiIds]);
-  const prevQuestPanelVisible = useRef(panels.visible.quest);
+  const prevQuestPanelVisible = useRef(panelsForScreen.visible.quest);
   useEffect(() => {
     const wasVisible = prevQuestPanelVisible.current;
-    prevQuestPanelVisible.current = panels.visible.quest;
-    if (!wasVisible || panels.visible.quest) return;
+    prevQuestPanelVisible.current = panelsForScreen.visible.quest;
+    if (!wasVisible || panelsForScreen.visible.quest) return;
     dismissSettledRun();
-  }, [panels.visible.quest, dismissSettledRun]);
+  }, [panelsForScreen, dismissSettledRun]);
   const closeReward = useCallback(() => {
     setRewardDismissed(true);
-    if (panels.visible.quest) panels.set('quest', false);
+    if (panelsForScreen.visible.quest) panelsForScreen.set('quest', false);
     dismissSettledRun();
-  }, [panels, dismissSettledRun]);
+  }, [panelsForScreen, dismissSettledRun]);
 
   // R-196: bag arming is per-item and lives in `useQuestRun.armedFlags` — the
   // window toggles flags through `toggleArmedFlag`, nothing is spent unasked.
@@ -993,7 +1121,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
    * time bar itself is sampled at the halo cadence (PLAN-034 T-005). */
   const questWindowNode = useMemo(
     () =>
-      activeQuestRun.run && panels.visible.quest ? (
+      activeQuestRun.run && panelsForScreen.visible.quest ? (
         <QuestRunWindow
           run={activeQuestRun.run}
           phases={activeQuestRun.phases}
@@ -1009,9 +1137,10 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           nowTick={currentTick}
           onAbandon={activeQuestRun.abandon}
           onPresentingChange={setQuestPresenting}
+          onExpandedStageChange={setQuestExpandedStage}
           armedFlags={activeQuestRun.armedFlags}
           onToggleArmedFlag={activeQuestRun.toggleArmedFlag}
-          onClose={() => panels.set('quest', false)}
+          onClose={() => panelsForScreen.set('quest', false)}
           anchor={questAnchor}
           widthPx={questWindow.widthPx}
           theaterAspect={questWindow.theaterAspect}
@@ -1020,8 +1149,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
         />
       ) : null,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeQuestRun, activeQuestId, panels.visible.quest, currentTick, questRunTimeView, questAnchor, questWindow],
+    [activeQuestRun, activeQuestId, panelsForScreen, currentTick, questRunTimeView, questAnchor, questWindow],
   );
 
   const directorActions = useMemo<DirectorAction[]>(
@@ -1046,6 +1174,16 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         label: t('gameFrame.director.quest'),
         active: questShown || QUEST_POIS.every((p) => autoRevealedIds.has(p.id)),
         onTrigger: () => setQuestShown(true),
+      },
+      {
+        /* Director «Stato iniziale»: wipes the game's progress (clock, village,
+         *  quests, drafts) and reloads — the page boots as a new game and
+         *  nothing stays in memory. Preferences (HUD, skin, tuning) are kept. */
+        id: 'resetInitial',
+        label: t('gameFrame.director.resetInitial'),
+        onTrigger: () => {
+          void clearGameProgress().finally(() => window.location.reload());
+        },
       },
       {
         id: 'questRun',
@@ -1115,7 +1253,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
       <RosterKitShell>
         <DndContext
           sensors={session.sensors}
-          collisionDetection={pointerWithin}
+          collisionDetection={slotMagnet}
           /* Pre-measure droppable rects while idle (BeforeDragging): the default
            * WhileDragging defers all getBoundingClientRect reads to the activation
            * frame, where they land as one forced-layout spike (~1 long frame at
@@ -1148,8 +1286,10 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           }}
         >
           <GameFrameDragCursor />
+          <GameStageProvider value={stage}>
           <GameFrameScreen
             panels={panelsForScreen}
+            stageMode
             devPanels={directorEnabled}
             skinControl={{ id: skinId, onChange: setSkinId }}
             scaleControl={hudScale}
@@ -1159,9 +1299,11 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
             onNavSelect={(id) => goToView(id === 'village' ? 'village' : 'map')}
             onHudHiddenChange={(hidden, cause) => setHudIdleHidden(hidden && cause === 'idle')}
             rosterSlot={({ onClose }) => (
-              /* SP-1: the rail wrapper is the delegation boundary — pointer/focus
+              /* WS-2: the stage frame supplies the leftWing rect + suspension;
+               * SP-1: the rail wrapper is the delegation boundary — pointer/focus
                * events on the cards reach the hero-sheet machine here; the frozen
                * roster inside is untouched. */
+              <StagePanelFrame panelId="roster">
               <div ref={heroSheet.railRef} {...heroSheet.railProps}>
               <Roster
                 onClose={onClose}
@@ -1212,6 +1354,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                 activeResidentId={draggingResidentId}
               />
               </div>
+              </StagePanelFrame>
             )}
             extraEvents={extraEvents}
             fixtureEvents={false}
@@ -1249,7 +1392,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                       // The threat lands in the ledger: it opens and stays open, the card folds into the new row.
                       // The player closes it when they want.
                       setRowArriving(true);
-                      if (!panels.visible.events) panels.set('events', true);
+                      if (!panelsForScreen.visible.events) panelsForScreen.set('events', true);
                     }}
                     onClose={() => {
                       setCardOpen(false);
@@ -1263,40 +1406,83 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                 {/* SP-1: the hero sheet floats over the map, rail-adjacent to the
                  *  card under the pointer. */}
                 {heroSheet.panelNode}
-                {/* SP-2: the village stash mock panel — modeless, anchored at the
-                 *  corridor's left edge, coexists with the quest window. */}
-                {panels.visible.villageStash && (
-                  <VillageStashPanel
-                    config={VILLAGE_STASH_CONFIG}
-                    left={roster.leftPx + roster.widthPx + questDetail.gapPx}
-                    top={questDetail.topPx}
-                    widthPx={Math.min(VILLAGE_STASH_CONFIG.panel.widthPx, window.innerWidth - insets.edgeInsetPx * 2)}
-                    zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
-                    onClose={closeVillageStash}
-                  />
+                {/* SP-2: the village stash mock panel — WS-2 moves it into the
+                 *  leftWing zone; the stage frame supplies the rect and the
+                 *  suspension treatment, the panel fills it. */}
+                {stage.isOpen('villageStash') && (
+                  <StagePanelFrame panelId="villageStash" positioned={false}>
+                    {(res) => (
+                      <VillageStashPanel
+                        config={VILLAGE_STASH_CONFIG}
+                        left={res.rect?.x ?? 0}
+                        top={res.rect?.y ?? 0}
+                        widthPx={res.rect?.w ?? VILLAGE_STASH_CONFIG.panel.widthPx}
+                        zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
+                        onClose={closeVillageStash}
+                      />
+                    )}
+                  </StagePanelFrame>
                 )}
-                {/* SP-3: the merchant mock panel — same corridor convention,
-                 *  offset so an open stash is never hidden underneath it. */}
-                {panels.visible.merchant && (
-                  <MerchantPanel
-                    config={MERCHANT_CONFIG}
-                    left={roster.leftPx + roster.widthPx + questDetail.gapPx + 36}
-                    top={questDetail.topPx + 44}
-                    widthPx={Math.min(MERCHANT_CONFIG.panel.widthPx, window.innerWidth - insets.edgeInsetPx * 2)}
-                    zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
-                    onClose={closeMerchant}
-                  />
+                {/* SP-3: the merchant mock panel — same zone convention via the
+                 *  stage frame (rightWing occupant). */}
+                {stage.isOpen('merchant') && (
+                  <StagePanelFrame panelId="merchant" positioned={false}>
+                    {(res) => (
+                      <MerchantPanel
+                        config={MERCHANT_CONFIG}
+                        left={res.rect?.x ?? 0}
+                        top={res.rect?.y ?? 0}
+                        widthPx={res.rect?.w ?? MERCHANT_CONFIG.panel.widthPx}
+                        zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
+                        onClose={closeMerchant}
+                      />
+                    )}
+                  </StagePanelFrame>
                 )}
                 {/* PLAN-034 T-010: dev/Director staging of the loss takeover —
                  *  fires only when `gameOverState` says so; no canonical
                  *  day-30 path exists yet. */}
                 <SettlementLostOverlay />
-                {questWindowNode}
-                {/* PLAN-040 T-003a: quest overlays (skill check in front of
-                    the window, outcome toast in T-005) live in
-                    `#game-modal-root` as siblings of the window — the drag
-                    transform on the window shell could never trap them. */}
-                <QuestOverlays questId={activeQuestId} onDismissOutcome={activeQuestRun.dismissOutcome} />
+                {/* WS-2/WS-4: in `run` regime the QuestStageCluster owns the
+                    whole-stage geometry — the window fills the solver's center
+                    slot, the right wing hosts the naked Astrolabe + Verdict
+                    Card, and the left companion paints inside the window shell
+                    at the solver's reserved slot (folded → roster tab). The
+                    group drag commits only `userCenterX`/`userTopY` intent. */}
+                {questWindowNode &&
+                  (clusterGeometry && clusterEnvelope ? (
+                    <QuestStageCluster
+                      viewport={stage.state.viewport}
+                      envelope={clusterEnvelope}
+                      intent={{ userCenterX: stage.state.userCenterX, userTopY: stage.state.userTopY }}
+                      onCommitIntent={(userCenterX, userTopY) => stage.api.stageDrag(userCenterX, userTopY)}
+                      wings={{ leftOpen: questPill !== null, rightOpen: checkLive, expanded: questExpandedStage }}
+                      renderWindow={() =>
+                        cloneElement(questWindowNode, {
+                          inCluster: true,
+                          activePill: questPill,
+                          onPillToggle: setQuestPill,
+                          companionFolded: clusterGeometry.leftFolded,
+                          expandedStage: clusterGeometry.expandedEffective,
+                        })
+                      }
+                      renderRightWing={
+                        checkLive && checkBridge && activeQuestRun.run
+                          ? () => <QuestSkillCheckColumn bridge={checkBridge} run={activeQuestRun.run} />
+                          : undefined
+                      }
+                      zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
+                    />
+                  ) : (
+                    <StagePanelFrame panelId="quest" positioned={false}>
+                      {questWindowNode}
+                    </StagePanelFrame>
+                  ))}
+                {/* PLAN-040 T-003a → WS-4: the centered check overlay is now
+                    only the `skipCheck` fallback — the normal flow paints the
+                    check in the cluster's right wing. The outcome toast still
+                    portals into `#game-modal-root`. */}
+                <QuestOverlays questId={activeQuestId} onDismissOutcome={activeQuestRun.dismissOutcome} checkInColumn={!!clusterGeometry} />
                 {/* R-199 pt.14: the end-of-run report is its own floating
                     plaque OUTSIDE the quest window's DOM — staged reveal,
                     skippable, draggable, non-modal. */}
@@ -1357,6 +1543,18 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                     }}
                   />
                 )}
+                {/* WS-2 stage chrome: wing rails + strip tabs, the run-regime
+                 *  rejection toast, and Escape bindings for the zone-managed
+                 *  panels (the run cluster keeps its own overlay arbitration;
+                 *  heroSheet is overlay-exempt and manages Escape itself). */}
+                <StagePanelEscape panelId="roster" onEscape={() => panelsForScreen.set('roster', false)} />
+                <StagePanelEscape panelId="events" onEscape={() => panelsForScreen.set('events', false)} />
+                <StagePanelEscape panelId="villageStash" onEscape={closeVillageStash} />
+                <StagePanelEscape panelId="merchant" onEscape={closeMerchant} />
+                <StagePanelEscape panelId="questForecast" onEscape={() => stage.api.close('questForecast')} />
+                <StagePanelEscape panelId="questDetail" onEscape={closeAnyExpeditionDetail} />
+                <StageStripsLayer />
+                <StageRejectedToast />
               </>
             }
             renderMap={({ recenterSignal, focusRequest }) => (
@@ -1412,6 +1610,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
               </div>
             )}
           />
+          </GameStageProvider>
         </DndContext>
       </RosterKitShell>
     </TooltipProvider>

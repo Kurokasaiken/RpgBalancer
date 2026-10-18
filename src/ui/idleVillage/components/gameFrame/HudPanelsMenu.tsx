@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EngravedIcon } from './engravedIcons';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
-import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, type HudPanelId } from './hudPanelRegistry';
+import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, isHudPanelListed, type HudPanelId } from './hudPanelRegistry';
 
 export interface HudPanelsMenuProps {
   visible: Record<HudPanelId, boolean>;
@@ -36,7 +36,7 @@ export function HudPanelsMenu({ visible, onToggle, includeDev = false }: HudPane
     };
   }, [open]);
 
-  const ids = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => includeDev || !HUD_PANEL_DEV_ONLY.has(id));
+  const ids = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => isHudPanelListed(id) && (includeDev || !HUD_PANEL_DEV_ONLY.has(id)));
   const hiddenCount = ids.filter((id) => !visible[id]).length;
   return (
     <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>

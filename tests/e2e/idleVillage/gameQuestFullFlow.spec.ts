@@ -7,7 +7,7 @@
  *   → drag reali roster→slot → SWAP slot↔slot (drag del token, senza
  *     estrarlo) + swap rifiutato dal gate di eleggibilità
  *   → consumabili scelti dalle tessere del picker esterno della bisaccia
- *     (PLAN-036: 3 slot icona + UN toggle «quest-bag-picker-toggle»)
+ *     (WS-3: 3 slot icona + UN toggle «quest-tray-toggle» → Selection Tray)
  *   → «Invia spedizione» → controlli tempo HUD (×4)
  *   → la run risolta fase per fase: beat saltati con Enter, scelte
  *     cliccate nella QuestRunWindow, consumabili armati/usati dalla cintura
@@ -364,17 +364,16 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     /* ── 3. Click sul marker → POI detail (quest planner) ────────────── */
     await marker(page).click();
     await expect(planner(page)).toBeVisible();
-    await expect(page.getByTestId(`floating-panel-header-quest-expedition-${POI}`)).toContainText('Goblin Extermination');
+    await expect(page.getByTestId('quest-planner-hero')).toContainText('Goblin Extermination');
     await expect(sendButton(page)).toBeDisabled();
     await expect(page.getByTestId('quest-expedition-forecast')).toHaveAttribute('data-forecast-state', 'incomplete');
 
-    /* ── 3b. PLAN-036: banner cinematografico + placca forecast esterna ── */
-    const cinema = page.getByTestId('quest-expedition-cinema');
+    /* ── 3b. WS-3: hero letterbox + placca forecast esterna (pinned wing) ── */
+    const cinema = page.getByTestId('quest-planner-hero');
     await expect(cinema).toBeVisible();
     const cinemaBox = await cinema.boundingBox();
     expect(cinemaBox).not.toBeNull();
-    /* ~21:9 (config cinemaAspect=2.76) o più panoramico quando maxHeight
-     *  taglia — mai più stretto del cinematografico. */
+    /* letterbox cinematografica — mai più stretta del ~21:9. */
     expect(cinemaBox!.width / cinemaBox!.height).toBeGreaterThanOrEqual(2.6);
     expect(await cinema.locator('img').evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
 
@@ -407,7 +406,9 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     for (let attempt = 0; attempt < 2 && !swapped; attempt++) {
       await dragSlotToken(page, SLOT_LEADER, SLOT_MEMBER_1, async () => {
         await expect(page.getByTestId('slot-token-ghost')).toBeVisible();
-        await expect(page.locator(`[data-slot-id="${SLOT_MEMBER_1}"]`).first()).toHaveAttribute('data-drop-state', 'valid');
+        /* `[data-drop-state]` qualifica il castone: `data-slot-id` da solo
+         * matcha anche le righe BY MEMBER del forecast (WS-3). */
+        await expect(page.locator(`[data-slot-id="${SLOT_MEMBER_1}"][data-drop-state]`).first()).toHaveAttribute('data-drop-state', 'valid');
         await shot(page, info, '06-swap-token-in-aria', planner(page), true);
       });
       swapped = await waitForAssignment(page, SLOT_LEADER, HERO).then(() => true, () => false);
@@ -421,17 +422,17 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
 
     /* swap RIFIUTATO: Lisetta (precision) non può fare il capo (edge|fortitude) */
     await dragSlotToken(page, SLOT_MEMBER_2, SLOT_LEADER, async () => {
-      await expect(page.locator(`[data-slot-id="${SLOT_LEADER}"]`).first()).toHaveAttribute('data-drop-state', 'invalid');
+      await expect(page.locator(`[data-slot-id="${SLOT_LEADER}"][data-drop-state]`).first()).toHaveAttribute('data-drop-state', 'invalid');
     });
     await page.waitForTimeout(400);
     expect(await assignments(page)).toEqual(afterSwap);
 
-    /* ── 6. Consumabili: bisaccia a 3 slot + picker esterno (PLAN-036) ── */
+    /* ── 6. Consumabili: bisaccia a 3 slot + Selection Tray (WS-3) ── */
     await expect(page.locator('[data-testid^="bag-slot-"]')).toHaveCount(3);
-    const pickerToggle = page.getByTestId('quest-bag-picker-toggle');
+    const pickerToggle = page.getByTestId('quest-tray-toggle');
     await expect(pickerToggle).toBeVisible();
     await pickerToggle.click();
-    const picker = page.getByTestId('quest-bag-external-picker');
+    const picker = page.getByTestId('quest-selection-tray');
     await expect(picker).toBeVisible();
     for (const itemId of LOADOUT) {
       const tile = page.getByTestId(`picker-item-${itemId}`);
@@ -439,14 +440,15 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
       await tile.click();
       await expect(tile).toHaveAttribute('aria-pressed', 'true');
     }
-    /* borsa piena: le tessere non scelte si disabilitano */
-    await expect(picker.locator('button[aria-pressed="false"]').first()).toBeDisabled();
+    /* borsa piena: le tessere non scelte si disabilitano (i tab del tray
+     *  usano `aria-selected`, non `aria-pressed` — restano fuori). */
+    await expect(picker.locator('[data-testid^="picker-item-"][aria-pressed="false"]').first()).toBeDisabled();
     /* `loadout-item-<id>` vive SOLO sul bottone dello slot pieno — un nodo
      *  per item, nessuna collisione strict-mode con le tessere del picker. */
     for (const itemId of LOADOUT) {
       await expect(page.getByTestId(`loadout-item-${itemId}`)).toHaveCount(1);
     }
-    /* Escape chiude SOLO il picker e riporta il focus sul toggle. */
+    /* Escape chiude SOLO il tray e riporta il focus sul toggle. */
     await page.keyboard.press('Escape');
     await expect(picker).toHaveCount(0);
     await expect(pickerToggle).toBeFocused();

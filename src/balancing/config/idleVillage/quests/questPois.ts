@@ -68,8 +68,9 @@ export function dangerBandFor(anyDeathPct: number): DangerBand {
 /**
  * POI offer config. Time fields use the TimeEngine day index (the same
  * `currentDay` the store derives from `currentTick / dayLengthInTimeUnits`):
- * `[availableFromDay, availableUntilDay)` is the open window of the OFFER —
- * once launched, the run's own tick schedule applies (D-K).
+ * `[availableFromDay, availableUntilDay)` is the open window of the OFFER when
+ * one is authored — absent (the slice's choice) the offer never expires. Once
+ * launched, the run's own tick schedule applies (D-K).
  *
  * `slots` partitions the scenario's authored `offer.slots` by id; a POI may
  * declare fewer optional slots than the scenario offers (a weaker posting),
@@ -85,10 +86,10 @@ export const QuestPoiSchema = z
     sizePx: z.number().positive(),
     /** The scenario this offer launches — `QuestId` vocabulary. */
     questId: z.enum(['cassa', 'goblin', 'rovine']),
-    /** First day index the offer is open (inclusive). */
-    availableFromDay: z.number().int().nonnegative(),
-    /** Last day index the offer is open (exclusive). */
-    availableUntilDay: z.number().int().nonnegative(),
+    /** First day index the offer is open (inclusive). Absent with `availableUntilDay`: open from the start. */
+    availableFromDay: z.number().int().nonnegative().optional(),
+    /** Last day index the offer is open (exclusive). Absent: the offer never expires. */
+    availableUntilDay: z.number().int().nonnegative().optional(),
     /**
      * Normative total duration of the quest in game ticks (1 tick = 1s on
      * the /game clock). D-K splits it into per-node `readyAt` windows along
@@ -136,7 +137,7 @@ export const QuestPoiSchema = z
     tier: z.enum(['normal', 'main']).optional(),
   })
   .strict()
-  .refine((p) => p.availableUntilDay > p.availableFromDay, {
+  .refine((p) => p.availableUntilDay === undefined || p.availableUntilDay > (p.availableFromDay ?? 0), {
     message: 'availableUntilDay deve essere > availableFromDay',
     path: ['availableUntilDay'],
   })
@@ -169,14 +170,11 @@ export const QUEST_HALO_STEPS = 24;
 
 /**
  * The two offers of the S2 slice. Positions are authored world-px
- * coordinates on the `/game` map (Director may relocate); the windows are
- * generous — availability pressure is not the mechanic being sliced.
- * `SLICE_OFFER_WINDOW_DAYS` keeps the offers effectively open: the
- * compressed village clock (5 ticks/day) burned a 60-day window in ~5 real
- * minutes, so a save older than that never showed a quest marker (R-180).
- * The expiry path itself stays exercised by `questAvailability` tests.
+ * coordinates on the `/game` map (Director may relocate). No window is
+ * authored: the offers never expire (Director, 2026-10-16 — the 10 000-day
+ * window of R-180 hid them on a long-running save). The expiry path stays
+ * exercised by `questAvailability` tests for any offer that authors one.
  */
-const SLICE_OFFER_WINDOW_DAYS = 10_000;
 
 export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
   {
@@ -185,8 +183,6 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
     y: 1000,
     sizePx: 55,
     questId: 'goblin',
-    availableFromDay: 0,
-    availableUntilDay: SLICE_OFFER_WINDOW_DAYS,
     estimatedDurationTicks: 110,
     ticksPerNode: 10,
     /* 11 nodes = the median path of the reference line (pursue the goblins, stop
@@ -207,8 +203,6 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
     y: 1450,
     sizePx: 55,
     questId: 'rovine',
-    availableFromDay: 0,
-    availableUntilDay: SLICE_OFFER_WINDOW_DAYS,
     estimatedDurationTicks: 100,
     ticksPerNode: 10,
     expectedPathNodes: 10,

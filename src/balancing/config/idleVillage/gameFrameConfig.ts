@@ -306,6 +306,66 @@ const gameFrameQuestWindowSchema = z.object({
   /** Screen-edge inset the shell's whole union (window + companions) is
    *  clamped into, px (drag + anchor). */
   edgeInsetPx: z.number().nonnegative(),
+  /** PLAN-043 WS-4 / artifact-r003: the QuestStageCluster — a three-zone,
+   *  zero-overlap arrangement the cluster itself solves every resize, drag,
+   *  wing-open and beat-stage change. The window's nominal width is the
+   *  ratified `clamp(760px, 50vw, 1040px)`; both wings reserve real estate
+   *  inside the envelope margins and the group recenters as one body so the
+   *  pieces never intersect. */
+  cluster: z.object({
+    /** Nominal window width lower bound, px (viewport ≥ this column+envelope). */
+    widthMinPx: z.number().positive(),
+    /** Nominal window width = vw × this fraction, between min and max. */
+    widthVwFraction: z.number().positive(),
+    /** Nominal window width upper bound, px. */
+    widthMaxPx: z.number().positive(),
+    /** Vertical inset of the window under the stage-envelope top, px. */
+    topOffsetPx: z.number().nonnegative(),
+    /** Air between the window and each wing, px. */
+    gapPx: z.number().nonnegative(),
+    /** Minimum viewport margin the solved group keeps on both sides, px. */
+    marginPx: z.number().nonnegative(),
+    /** Left companion column (party roster + micro-belt zone). */
+    companionLeft: z.object({
+      /** Column width on viewports below `wideAtPx`. */
+      widthPx: z.number().positive(),
+      /** Column width on viewports ≥ `wideAtPx`. */
+      wideWidthPx: z.number().positive(),
+      /** Viewport width that flips the column to its wide variant, px. */
+      wideAtPx: z.number().positive(),
+      /** Viewport width below which the column never unfolds even alone. */
+      neverBelowPx: z.number().positive(),
+      /** Folded roster-tab footprint width — counts into the solved group so
+       *  a left-clamped cluster can never overlap it (BV-01). */
+      foldedTabWidthPx: z.number().positive(),
+    }),
+    /** Right wing: the skill-check column (astrolabe + verdict card). */
+    skillCheckColumn: z.object({
+      /** Column width on viewports below `wideAtPx`. */
+      widthPx: z.number().positive(),
+      /** Column width on viewports ≥ `wideAtPx`. */
+      wideWidthPx: z.number().positive(),
+      /** Viewport width that flips the column to its wide variant, px. */
+      wideAtPx: z.number().positive(),
+      /** Viewport width below which the column never opens. */
+      neverBelowPx: z.number().positive(),
+      /** Astrolabe backing-store cap inside the column, px. */
+      astrolabeMaxPx: z.number().positive(),
+    }),
+    /** Below this viewport width both wings cannot coexist — the right wing
+     *  wins while a check is live and the left companion auto-folds into
+     *  its header tab (mutual exclusion, artifact-r003 §2/BV-03). */
+    bothWingsBelowPx: z.number().positive(),
+    /** Wing fold/unfold transition lock, ms — geometry is re-solved while the
+     *  lock runs; a user toggle during it replays the lock, never an overlap. */
+    wingTransitionMs: z.number().int().nonnegative(),
+    /** `expanded` beat stage: the window widens to
+     *  `min(expandedWidthPx, vw − 2·marginPx)` with the wide theatre aspect
+     *  (BV-11); a skill check on top re-solves back to the nominal floor. */
+    expandedWidthPx: z.number().positive(),
+    /** Wide theatre aspect used while `expanded`. */
+    expandedTheaterAspect: z.number().positive(),
+  }),
   /** BeatSequencer pacing (PLAN-025 T-008): per-beat on-stage durations in ms
    *  and the queue ceiling — overflow compacts into a recap beat. */
   beats: z.object({
@@ -351,6 +411,9 @@ const gameFrameQuestWindowSchema = z.object({
     /** Preferred board square size (px) — the layout shrinks it toward
      *  `boardMinPx` when the viewport cannot fit it. */
     boardSizePx: z.number().positive(),
+    /** The board grows with the screen: `boardVh` % of the viewport height, between `boardSizePx` and `boardMaxPx`. */
+    boardVh: z.number().positive(),
+    boardMaxPx: z.number().positive(),
     /** Viewport width below which the board cap drops to the compact rule
      *  (`min(50vh, 90vw)`), px. */
     compactBelowPx: z.number().positive(),
@@ -550,6 +613,85 @@ const gameFrameDebugSchema = z.object({
 });
 
 /**
+ * PLAN-043 WS-2 — the three-zone stage (ratified artifact-r005): the `/game`
+ * window manager splits the area between the fixed chrome bands into three
+ * logical allocation regions — `leftWing` (roster/stash), `centerStage`
+ * (planner or the whole-stage quest cluster), `rightWing` (ledger/merchant) —
+ * plus the zone-exempt `heroSheet` overlay. Zones are logical regions, never
+ * painted rectangles: a wing with no expanded occupant shrinks to its strip
+ * rail, and everything the solver, the drag clamp and the BV probes need is
+ * declared here.
+ */
+const gameFrameStageZoneIdSchema = z.enum(['leftWing', 'centerStage', 'rightWing']);
+const gameFrameStagePanelRoleSchema = z.enum(['home', 'session', 'persistent-transient', 'exempt']);
+
+const gameFrameStageZonesSchema = z.object({
+  /** Fixed chrome bands the stage never enters (existing top bar / bottom nav). */
+  chrome: z.object({ topPx: z.number().nonnegative(), bottomPx: z.number().nonnegative() }),
+  /** Outer edge inset E and inter-zone gutter G (DIRECTOR G.5: E frozen at 24). */
+  outer: z.object({ edgePx: z.number().nonnegative(), gutterPx: z.number().nonnegative() }),
+  /** Contract width budget: contractViewportPx − (2E + 2G). */
+  budgetPx: z.number().positive(),
+  /** The contract viewport width the arithmetic invariant is verified at. */
+  contractViewportPx: z.number().positive(),
+  zones: z.object({
+    leftWing: z.object({ minPx: z.number().positive(), maxPx: z.number().positive() }),
+    centerStage: z.object({ minPx: z.number().positive(), maxPx: z.number().positive() }),
+    rightWing: z.object({ minPx: z.number().positive(), maxPx: z.number().positive() }),
+  }),
+  /**
+   * Deterministic floor selection (WITNESS-03): exactly two legal floor sets,
+   * committed once after measuring the roster's min-content (T-WS2.1) — never
+   * a live solver alternative. `zones.minPx` mirrors the selected preset.
+   */
+  floorConfig: z.enum(['floorA', 'floorB']),
+  floorPresets: z.object({
+    floorA: z.object({ left: z.number().positive(), center: z.number().positive(), right: z.number().positive() }),
+    floorB: z.object({ left: z.number().positive(), center: z.number().positive(), right: z.number().positive() }),
+  }),
+  /** Strip chrome geometry (§A.3b): wing rail at the zone's outer edge; the
+   *  center tab sits at the stage top aligned to `userCenterX`. */
+  strip: z.object({
+    wingRailPx: z.number().positive(),
+    /** Wing strip boxes on the rail, stacked with `gapPx`, capped `maxPerZone`. */
+    wingTabPx: z.object({ wPx: z.number().positive(), hPx: z.number().positive() }),
+    gapPx: z.number().nonnegative(),
+    centerTab: z.object({ wPx: z.number().positive(), hPx: z.number().positive() }),
+    maxPerZone: z.number().int().positive(),
+  }),
+  /** Unordered, non-transitive co-expansion permits — only `[roster, villageStash]` (leftWing stack). */
+  authorizedPairs: z.array(z.tuple([z.string(), z.string()])),
+  /** Wing-collapse hysteresis band (px): collapse below the threshold, re-expand at threshold + this. */
+  hysteresisPx: z.number().nonnegative(),
+  /**
+   * The declarative panel → zone map (§E). `BagExternalPicker` is deliberately
+   * absent: it is a `[data-hud-companion]` inside the planner shell, travels
+   * with `questDetail` occupancy and retires with it at run start (§D.2).
+   */
+  panels: z.record(
+    z.string(),
+    z.object({
+      zone: gameFrameStageZoneIdSchema,
+      role: gameFrameStagePanelRoleSchema,
+      /** Occupancy tie-break seed (§A.1) — lower wins. */
+      priority: z.number().int(),
+      /** Zone-exempt overlay (heroSheet): overlay-registered, never occupies a zone. */
+      overlay: z.boolean().optional(),
+      /** Run-regime disposition (§D.2): `retire` clears occupancy (placements kept); `suspend` keeps it mounted-hidden. */
+      runPolicy: z.enum(['retire', 'suspend']).optional(),
+      /** Expanded-admission fit gate (§D.1 rule b): `minWidthPx ≤ zoneWidth(vw)`. */
+      minWidthPx: z.number().positive(),
+      /** `zone-fill` renders at the zone width (elastic wings); `natural` at `naturalWidthPx` clamped to the zone. */
+      widthMode: z.enum(['zone-fill', 'natural']),
+      naturalWidthPx: z.number().positive(),
+      /** Stack-fit test and the rendered `max-height` budget. */
+      minHeightPx: z.number().positive(),
+      naturalHeightPx: z.number().positive(),
+    }),
+  ),
+});
+
+/**
  * The roster is shown as an object resting on the table at the map's lower-left, in
  * its `compact` density (one ~30px strip per character): a fixed width (the canonical
  * roster stretches to its container) and a contact shadow.
@@ -600,6 +742,7 @@ const gameFrameConfigSchema = z.object({
   edgeWash: gameFrameEdgeWashSchema,
   heroSheet: gameFrameHeroSheetSchema,
   debug: gameFrameDebugSchema,
+  stageZones: gameFrameStageZonesSchema,
 });
 
 export type GameFrameInsetsConfig = z.infer<typeof gameFrameInsetsSchema>;
@@ -701,7 +844,9 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   // Director, 2026-10-07: no game title on the HUD.
   identity: { showTitle: false },
   hud: { material: 'lacquer' },
-  questDetail: { widthPx: 680, gapPx: 8, topPx: 100, ledgerWidthPx: 300 },
+  /* WS-3 Dispatch Table: `ledgerWidthPx` is the RIGHT WING reservation the
+   *  pinned forecast occupies (stageZones `rightWing` = 340). */
+  questDetail: { widthPx: 680, gapPx: 8, topPx: 100, ledgerWidthPx: 340 },
   questWindow: {
     /* R-199: wider and more cinematic — an ~820px shell with a near-scope
      * theatre (2.4:1 → ~340px of painted scene) and companions that start
@@ -723,7 +868,24 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     sidePanelGapPx: 8,
     minSidePanelWidthPx: 180,
     edgeInsetPx: 18,
-    consumablesArmedByDefault: false,
+    /* PLAN-043 WS-4 (artifact-r003): the solved quest cluster.
+     * Window width = clamp(760px, 50vw, 1040px); wings 280/340 at
+     * 1280–1440, 320/420 ≥1920; mutual exclusion below 1440px. */
+    cluster: {
+      widthMinPx: 760,
+      widthVwFraction: 0.5,
+      widthMaxPx: 1040,
+      topOffsetPx: 24,
+      gapPx: 14,
+      marginPx: 16,
+      companionLeft: { widthPx: 280, wideWidthPx: 320, wideAtPx: 1920, neverBelowPx: 1100, foldedTabWidthPx: 40 },
+      skillCheckColumn: { widthPx: 340, wideWidthPx: 420, wideAtPx: 1920, neverBelowPx: 1100, astrolabeMaxPx: 480 },
+      bothWingsBelowPx: 1440,
+      wingTransitionMs: 180,
+      expandedWidthPx: 1180,
+      expandedTheaterAspect: 2.1,
+    },
+    consumablesArmedByDefault: true,
     companionsDefaultOpen: false,
     skillCheck: {
       optionsPanel: true,
@@ -732,8 +894,10 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
       overlayMarginPx: 16,
       boardMinPx: 240,
       boardSizePx: 480,
+      boardVh: 40,
+      boardMaxPx: 680,
       compactBelowPx: 1300,
-      dismissArmDelayMs: 300,
+      dismissArmDelayMs: 350,
       verdictAutoDismissMs: 0,
       warmMinGainMs: 150,
       warmSlackMinMs: 300,
@@ -782,6 +946,126 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     navNextKeys: ['ArrowRight', 'PageDown'],
   },
   debug: { directorPanel: true },
+  /* PLAN-043 WS-2 — ratified artifact-r005. T-WS2.1 measured the roster's
+   *  min-content at 460px (clone shrink-to-fit on /game, 1280×720) — over the
+   *  236 floor → `floorB` committed (260/616/340, still 1280-exact). */
+  stageZones: {
+    chrome: { topPx: 92, bottomPx: 100 },
+    outer: { edgePx: 24, gutterPx: 8 },
+    budgetPx: 1216,
+    contractViewportPx: 1280,
+    zones: {
+      leftWing: { minPx: 260, maxPx: 400 },
+      centerStage: { minPx: 616, maxPx: 1040 },
+      rightWing: { minPx: 340, maxPx: 340 },
+    },
+    floorConfig: 'floorB',
+    floorPresets: {
+      floorA: { left: 236, center: 640, right: 340 },
+      floorB: { left: 260, center: 616, right: 340 },
+    },
+    strip: { wingRailPx: 32, wingTabPx: { wPx: 32, hPx: 160 }, gapPx: 4, centerTab: { wPx: 160, hPx: 28 }, maxPerZone: 4 },
+    authorizedPairs: [['roster', 'villageStash']],
+    hysteresisPx: 24,
+    panels: {
+      roster: {
+        zone: 'leftWing',
+        role: 'home',
+        priority: 0,
+        runPolicy: 'suspend',
+        minWidthPx: 200,
+        widthMode: 'zone-fill',
+        naturalWidthPx: 400,
+        minHeightPx: 240,
+        naturalHeightPx: 300,
+      },
+      villageStash: {
+        zone: 'leftWing',
+        role: 'persistent-transient',
+        priority: 1,
+        runPolicy: 'suspend',
+        minWidthPx: 236,
+        widthMode: 'zone-fill',
+        naturalWidthPx: 320,
+        minHeightPx: 200,
+        naturalHeightPx: 360,
+      },
+      events: {
+        zone: 'rightWing',
+        role: 'home',
+        priority: 0,
+        runPolicy: 'suspend',
+        minWidthPx: 280,
+        widthMode: 'zone-fill',
+        naturalWidthPx: 300,
+        minHeightPx: 160,
+        naturalHeightPx: 320,
+      },
+      merchant: {
+        zone: 'rightWing',
+        role: 'persistent-transient',
+        priority: 1,
+        runPolicy: 'suspend',
+        minWidthPx: 320,
+        widthMode: 'zone-fill',
+        naturalWidthPx: 360,
+        minHeightPx: 240,
+        naturalHeightPx: 420,
+      },
+      questDetail: {
+        zone: 'centerStage',
+        role: 'home',
+        priority: 0,
+        runPolicy: 'retire',
+        minWidthPx: 460,
+        widthMode: 'natural',
+        naturalWidthPx: 680,
+        minHeightPx: 300,
+        naturalHeightPx: 520,
+      },
+      /* WS-3 Dispatch Table: the expedition forecast is a pinned RIGHT WING
+       *  tenant while the planner is open — it never yields to other wings
+       *  (the provider pins its occupant) and retires with the detail. */
+      questForecast: {
+        zone: 'rightWing',
+        role: 'session',
+        priority: 0,
+        runPolicy: 'retire',
+        minWidthPx: 300,
+        widthMode: 'zone-fill',
+        naturalWidthPx: 340,
+        minHeightPx: 240,
+        naturalHeightPx: 520,
+      },
+      /* The run window/cluster claims the whole stage envelope in `run`
+       *  regime — WS-2 sees it as ONE occupant; F5 internals own its columns.
+       *  `suspend` keeps it in occupancy (the solver hands it the envelope);
+       *  its OPEN is the only zone-managed open admitted during `run`. */
+      quest: {
+        zone: 'centerStage',
+        role: 'session',
+        priority: 0,
+        runPolicy: 'suspend',
+        minWidthPx: 640,
+        widthMode: 'natural',
+        naturalWidthPx: 820,
+        minHeightPx: 400,
+        naturalHeightPx: 600,
+      },
+      heroSheet: {
+        zone: 'rightWing',
+        role: 'persistent-transient',
+        priority: 9,
+        overlay: true,
+        runPolicy: 'suspend',
+        minWidthPx: 280,
+        widthMode: 'natural',
+        naturalWidthPx: 380,
+        minHeightPx: 200,
+        naturalHeightPx: 400,
+      },
+    },
+  },
 };
 
 /**

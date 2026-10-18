@@ -86,19 +86,16 @@ async function driveToFirstCheck(): Promise<boolean> {
     if (!goblin) return false;
     fireEvent.click(goblin);
 
-    // preset → first Depart button
-    const depart = byText(/Depart|Parti|Partenza/i);
-    if (!depart) return false;
-    fireEvent.click(depart);
-
-    // F0 assignment: the single «Depart» option travels straight to F1.
+    /* The run opens on F1 (no F0 assignment node since the planner arms the
+     * consumables): a leftover «Depart» button, if any, is pressed to clear it. */
     const partire = byText(/Depart/i);
-    if (!partire) return false;
-    fireEvent.click(partire);
-    act(() => {
-      // transitMs scales with word count up to transitMaxMs (7s) — jump past it.
-      vi.advanceTimersByTime(8000);
-    });
+    if (partire) {
+      fireEvent.click(partire);
+      act(() => {
+        // transitMs scales with word count up to transitMaxMs (7s) — jump past it.
+        vi.advanceTimersByTime(8000);
+      });
+    }
 
     // F1: the option commits a check; the commit surface exposes the confirm.
     const optBtn = Array.from(view.container.querySelectorAll('button, [role="button"]'))

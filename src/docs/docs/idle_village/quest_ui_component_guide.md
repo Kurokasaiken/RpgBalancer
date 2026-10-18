@@ -14,9 +14,11 @@ superficie quest.
 
 > **Superfici e colori**: questa guida governa *layout e pipeline di presentazione*.
 > Per estetica, superfici (`HudPlaque`), token `--skin-hud-*`, controlli e tipografia
-> il riferimento è `src/docs/docs/design/hud_component_guide.md` (Lacquer Atlas) —
+> il riferimento è `src/docs/docs/design/hud_component_guide.md` —
 > in particolare §6b «Schermate d'azione a pagina intera», scritta per questo lab
-> (PLAN-024).
+> (PLAN-024). Per gli slot meccanici della pianificazione il metallo è la rampa
+> **worn brass** (`--skin-hud-brass-*` + profilo bloom `brass` in `bloomEffect.ts`,
+> PLAN-043 WS-0/WS-1) — non la rampa Lacquer Atlas.
 
 ## 1. Layout: cockpit a tre regioni, zero scroll
 

@@ -120,6 +120,36 @@ export function loadoutDuration(
 }
 
 /* ------------------------------------------------------------------ */
+/* Whole-day expedition span (PLAN-043 WS-3, artifact-r005 D-c).        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Expedition span in whole days — round-half-up with a 1-day floor. The
+ * duration seal's vocabulary is `1 day` / `N days` (ICU plural), never raw
+ * ticks. `durationDays` is the loadout-scaled `estimatedTicks` divided by
+ * the village day length (`globalRules.dayLengthInTimeUnits`).
+ * @param durationDays fractional span
+ * @returns whole days, always ≥ 1
+ */
+export function expeditionDays(durationDays: number): number {
+  const d = Number.isFinite(durationDays) ? Math.max(0, durationDays) : 0;
+  return Math.max(1, Math.round(d));
+}
+
+/**
+ * Renders the expedition span via the ICU-plural key
+ * `questExpedition.durationDays` (`{count, plural, one {# day} other {# days}}`).
+ * @param durationDays fractional span (see {@link expeditionDays})
+ * @param t the `idleVillage` namespace translator
+ */
+export function formatExpeditionSpan(
+  durationDays: number,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  return t('questExpedition.durationDays', { count: expeditionDays(durationDays), ns: 'idleVillage' });
+}
+
+/* ------------------------------------------------------------------ */
 /* Key-stat display tiers (PLAN-036, R-195).                            */
 /* ------------------------------------------------------------------ */
 

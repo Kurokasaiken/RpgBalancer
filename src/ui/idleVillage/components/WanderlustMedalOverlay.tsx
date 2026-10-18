@@ -10,6 +10,13 @@ export interface WanderlustMedalOverlayProps {
   className?: string;
   style?: React.CSSProperties;
   cursorVelocity?: { x: number; y: number } | null;
+  /**
+   * The dangling gem pendant below the medal (14px outside the medal box).
+   * Suppressed inside the `hud64` seat: the bezel already paints its own
+   * 6-o'clock gem pointer, and the extra pendant breaks the Director-ruled
+   * "medallion centre = slot centre" contract (R-214).
+   */
+  gemPendant?: boolean;
   'data-testid'?: string;
 }
 
@@ -20,6 +27,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   className = '',
   style,
   cursorVelocity = null,
+  gemPendant = true,
   'data-testid': dataTestId,
 }) => {
   const { t } = useTranslation('idleVillage');
@@ -381,7 +389,8 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
         </svg>
       </div>
 
-      {/* GEM - absolutely positioned below medal center */}
+      {/* GEM - absolutely positioned below medal center (suppressed inside the hud64 seat) */}
+      {gemPendant && (
       <div style={{ position: 'absolute', left: '50%', bottom: '-14px', transform: 'translateX(-50%)', zIndex: 2, pointerEvents: 'none' }}>
         <svg width="40" height="32" viewBox="-20 -14 40 32" xmlns="http://www.w3.org/2000/svg" overflow="visible">
           <defs>
@@ -484,6 +493,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
           </ellipse>
         </svg>
       </div>
+      )}
     </div>
   );
 };

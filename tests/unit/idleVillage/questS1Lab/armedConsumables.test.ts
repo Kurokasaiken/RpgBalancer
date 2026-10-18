@@ -30,7 +30,6 @@ const PRESET = 'gob-band';
  *  (gob-cerca-tracce → perc, gob-forza-tracce → str+perc). */
 const atEsplora = (loadout: string[]): QuestRunState => {
   const run = createRun(PRESET, 7, 'goblin', loadout);
-  applyChoice(run, 'gob-partenza'); // narrative step — never consumes
   expect(run.nodeId).toBe('gob-esplora');
   return run;
 };
@@ -127,13 +126,6 @@ describe('previewArmedActionItems — parity with the commit path', () => {
 });
 
 describe('submitCommand — atomic armed commit boundary', () => {
-  it('narrative-only options never consume armed items', () => {
-    const run = createRun(PRESET, 7, 'goblin', ['hasHealing', 'hasBonusPerc']);
-    woundMilo(run);
-    submitCommand(run, 'gob-partenza', { armedFlags: new Set(['hasHealing', 'hasBonusPerc']) });
-    expect(run.flags).toEqual(expect.arrayContaining(['hasHealing', 'hasBonusPerc']));
-    expect(run.party[1].hp).toBe(40);
-  });
 
   it('unknown/invalid options consume nothing', () => {
     const run = atEsplora(['hasHealing', 'hasBonusPerc']);

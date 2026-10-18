@@ -58,6 +58,11 @@ export interface QuestOverlaysProps {
   /** Durable dismissal path for the outcome toast (`useQuestRun.dismissOutcome`)
    *  — raises the run's persisted `dismissedUpTo`. */
   onDismissOutcome?: (checkSeq: number) => void;
+  /** PLAN-043 WS-4: the QuestStageCluster's right wing owns the skill check
+   *  (naked Astrolabe + Verdict Card) — the centered overlay stays mounted
+   *  only as the lab/fallback surface, and the outcome toast yields to the
+   *  column's card for seqs the column presented. */
+  checkInColumn?: boolean;
 }
 
 /**
@@ -66,7 +71,7 @@ export interface QuestOverlaysProps {
  * never owns quest state, it projects it (debate r007: controller state is
  * per-domain UI only; the engine stays the single source of truth).
  */
-export const QuestOverlays: React.FC<QuestOverlaysProps> = ({ questId, onDismissOutcome }) => {
+export const QuestOverlays: React.FC<QuestOverlaysProps> = ({ questId, onDismissOutcome, checkInColumn = false }) => {
   const [root] = useState(() => ensureGameModalRoot());
   const run = useQuestRunFromStore(questId);
   const bridge = useCheckBridge(questId);
@@ -79,8 +84,8 @@ export const QuestOverlays: React.FC<QuestOverlaysProps> = ({ questId, onDismiss
   if (!root) return null;
   return createPortal(
     <>
-      {run && bridge && live ? <QuestSkillCheckOverlay bridge={bridge} run={run} /> : null}
-      <QuestOutcomeToastHost questId={questId} onDismissOutcome={onDismissOutcome} />
+      {run && bridge && live && !checkInColumn ? <QuestSkillCheckOverlay bridge={bridge} run={run} /> : null}
+      <QuestOutcomeToastHost questId={questId} onDismissOutcome={onDismissOutcome} columnMode={checkInColumn} />
     </>,
     root,
   );

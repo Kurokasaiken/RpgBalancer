@@ -311,3 +311,305 @@ export const prefersReducedMotion = (): boolean =>
 export function useBeatFx(beat: QuestBeat | null, fx: QuestTheatreFxConfig): BeatFx {
   return useMemo(() => (beat ? fxForBeat(beat, fx) : NO_FX), [beat, fx]);
 }
+
+/* ==================================================================== */
+/* PLAN-043 WS-4 (artifact-r003 §4) — the cinema layer system.           */
+/* One primitive per ratified tag; each renders `data-fx` so the         */
+/* zero-overlap / timing probes can observe which layers are on stage.   */
+/* All primitives honour I-5: reduced motion renders no animation (the   */
+/* reveal degrades to a short fade — it is the cut itself).              */
+/* ==================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* reveal — CenterApertureReveal: the scene opens through an aperture    */
+/* ------------------------------------------------------------------ */
+
+export interface CenterApertureRevealProps {
+  /** Beat key — re-fires the aperture only when the beat changes. */
+  cueKey: string;
+  /** Aperture open duration (normal motion). */
+  durationMs: number;
+  /** Reduced-motion fallback: a plain fade of this length (BV-09). */
+  fadeMs: number;
+  /** The veil colour — caller passes the lacquer-deep token. */
+  color: string;
+  reducedMotion?: boolean;
+}
+
+/** An opaque veil whose clip-path opens from a thin center slit to full
+ *  transparency — the classic aperture cut between scenes. Under reduced
+ *  motion the veil simply fades out over `fadeMs`. */
+export const CenterApertureReveal: React.FC<CenterApertureRevealProps> = ({
+  cueKey,
+  durationMs,
+  fadeMs,
+  color,
+  reducedMotion,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el?.animate) return undefined;
+    const anim = reducedMotion
+      ? el.animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: fadeMs,
+          easing: 'linear',
+          fill: 'forwards',
+        })
+      : el.animate(
+          [
+            { clipPath: 'inset(46% 0% 46% 0%)', opacity: 1 },
+            { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, offset: 0.55 },
+            { clipPath: 'inset(0% 0% 0% 0%)', opacity: 0 },
+          ],
+          { duration: durationMs, easing: 'cubic-bezier(.22,.61,.36,1)', fill: 'forwards' },
+        );
+    return () => anim.cancel();
+  }, [cueKey, durationMs, fadeMs, reducedMotion]);
+  return (
+    <div
+      ref={ref}
+      data-fx="reveal"
+      aria-hidden
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background: color,
+        pointerEvents: 'none',
+        zIndex: 4,
+      }}
+    />
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* impact — StageImpactShake: the stage frame jolts on the verdict       */
+/* ------------------------------------------------------------------ */
+
+export interface StageImpactShakeProps {
+  /** Beat key — re-fires the jolt per beat. */
+  cueKey: string;
+  active: boolean;
+  ampPx: number;
+  durationMs: number;
+  reducedMotion?: boolean;
+  children: React.ReactNode;
+}
+
+/** Wraps the stage frame; on each keyed beat with `active` it plays a short
+ *  decaying shake (WAAPI, so a frozen tab resolves to the rest pose). */
+export const StageImpactShake: React.FC<StageImpactShakeProps> = ({
+  cueKey,
+  active,
+  ampPx,
+  durationMs,
+  reducedMotion,
+  children,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el?.animate || !active || reducedMotion) return undefined;
+    const a = ampPx;
+    const anim = el.animate(
+      [
+        { transform: 'translate(0,0)' },
+        { transform: `translate(${-a}px, ${a * 0.4}px)`, offset: 0.2 },
+        { transform: `translate(${a * 0.8}px, ${-a * 0.3}px)`, offset: 0.45 },
+        { transform: `translate(${-a * 0.5}px, ${a * 0.2}px)`, offset: 0.7 },
+        { transform: 'translate(0,0)' },
+      ],
+      { duration: durationMs, easing: 'ease-out' },
+    );
+    return () => anim.cancel();
+  }, [cueKey, active, ampPx, durationMs, reducedMotion]);
+  /* NOTE: a real box is required — `display:contents` generates none and
+   * the WAAPI transform would silently do nothing. */
+  return (
+    <div ref={ref} data-fx={active && !reducedMotion ? 'impact' : undefined} style={{ position: 'relative', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}>
+      {children}
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* breath — PreVerdictBreath: a pulse on the frame before the verdict    */
+/* ------------------------------------------------------------------ */
+
+export interface PreVerdictBreathProps {
+  /** Beat key — the pulse plays once per beat. */
+  cueKey: string;
+  active: boolean;
+  durationMs: number;
+  /** When false (BV-14 fallback) the pulse uses an inset-shadow overlay
+   *  instead of animating `filter` — engines where the filter costs more
+   *  than a frame still read the beat. */
+  usesFilter: boolean;
+  reducedMotion?: boolean;
+  children: React.ReactNode;
+}
+
+/** Wraps the theatre; a single saturate/contrast breath while `active`
+ *  (pre-verdict tension). `usesFilter:false` swaps the filter animation
+ *  for a cheap inset glow — same read, no filter cost. */
+export const PreVerdictBreath: React.FC<PreVerdictBreathProps> = ({
+  cueKey,
+  active,
+  durationMs,
+  usesFilter,
+  reducedMotion,
+  children,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const veilRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!active || reducedMotion) return undefined;
+    const el = ref.current;
+    if (usesFilter && el?.animate) {
+      const anim = el.animate(
+        [
+          { filter: 'saturate(1) contrast(1)' },
+          { filter: 'saturate(1.25) contrast(1.08)', offset: 0.5 },
+          { filter: 'saturate(1) contrast(1)' },
+        ],
+        { duration: durationMs, easing: 'ease-in-out' },
+      );
+      return () => anim.cancel();
+    }
+    const veil = veilRef.current;
+    if (!veil?.animate) return undefined;
+    const anim = veil.animate([{ opacity: 0 }, { opacity: 0.5, offset: 0.5 }, { opacity: 0 }], {
+      duration: durationMs,
+      easing: 'ease-in-out',
+    });
+    return () => anim.cancel();
+  }, [cueKey, active, durationMs, usesFilter, reducedMotion]);
+  return (
+    <div ref={ref} data-fx={active && !reducedMotion ? 'breath' : undefined} style={{ position: 'relative' }}>
+      {children}
+      {!usesFilter && active && !reducedMotion && (
+        <div
+          ref={veilRef}
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            boxShadow: 'inset 0 0 26px rgba(255, 238, 200, 0.45)',
+            opacity: 0,
+            pointerEvents: 'none',
+            zIndex: 3,
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* push — KenBurnsDolly: the slow push-in on the scene                   */
+/* ------------------------------------------------------------------ */
+
+export interface KenBurnsDollyProps {
+  /** Beat key — the dolly restarts per beat. */
+  cueKey: string;
+  active: boolean;
+  scaleTo: number;
+  durationMs: number;
+  reducedMotion?: boolean;
+  children: React.ReactNode;
+}
+
+/** Wraps the theatre scene; pushes scale 1 → `scaleTo` over the beat so a
+ *  still frame breathes. The element's own style is the end state — a
+ *  frozen tab resolves zoomed, never mid-flight. */
+export const KenBurnsDolly: React.FC<KenBurnsDollyProps> = ({
+  cueKey,
+  active,
+  scaleTo,
+  durationMs,
+  reducedMotion,
+  children,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el?.animate || !active || reducedMotion) return undefined;
+    const anim = el.animate([{ transform: 'scale(1)' }, { transform: `scale(${scaleTo})` }], {
+      duration: durationMs,
+      easing: 'linear',
+      fill: 'forwards',
+    });
+    return () => anim.cancel();
+  }, [cueKey, active, scaleTo, durationMs, reducedMotion]);
+  /* Transform-only wrapper — no layout role: the child's own sizing (the
+   *  theatre's aspect-ratio) still drives the box; the scale overscan is
+   *  clipped by the caller's overflow boundary. */
+  return (
+    <div
+      ref={ref}
+      data-fx={active && !reducedMotion ? 'push' : undefined}
+      style={{
+        transformOrigin: '50% 50%',
+        transform: active && !reducedMotion ? `scale(${scaleTo})` : undefined,
+        display: 'flex',
+        flexDirection: 'column',
+        flex: '1 1 auto',
+        minHeight: 0,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* j-cut — JCutStage: the beat's audio leads its visual cut              */
+/* ------------------------------------------------------------------ */
+
+export interface JCutStageProps {
+  /** Beat key — the lead fires once per beat. */
+  cueKey: string;
+  active: boolean;
+  /** How many ms the audio leads the perceived cut (config). */
+  leadMs: number;
+  /** Fire the beat's audio cue — called at mount (`leadMs` before the cut
+   *  is marked landed). Reduced motion never fires audio. */
+  onLead?: () => void;
+  reducedMotion?: boolean;
+  children: React.ReactNode;
+}
+
+/** The J-cut contract: when a tagged beat mounts, its audio fires
+ *  immediately — `leadMs` before the cut is marked landed — so the sound of
+ *  the incoming moment precedes its image. Exposes `data-audio-state`
+ *  (`lead` → `cut`) for the probe; children render throughout. */
+export const JCutStage: React.FC<JCutStageProps> = ({
+  cueKey,
+  active,
+  leadMs,
+  onLead,
+  reducedMotion,
+  children,
+}) => {
+  const [cut, setCut] = useState(false);
+  useEffect(() => {
+    if (!active) {
+      setCut(false);
+      return undefined;
+    }
+    setCut(false);
+    if (!reducedMotion) onLead?.();
+    const id = window.setTimeout(() => setCut(true), leadMs);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cueKey, active, leadMs, reducedMotion]);
+  return (
+    <div
+      data-fx={active ? 'j-cut' : undefined}
+      data-audio-state={active ? (cut ? 'cut' : 'lead') : undefined}
+      style={{ display: 'contents' }}
+    >
+      {children}
+    </div>
+  );
+};
