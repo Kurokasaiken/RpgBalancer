@@ -58,3 +58,15 @@ Soglia: pattern visto in almeno due contesti distinti o in due sessioni diverse.
 1. `page.evaluate` riceve solo **sorgenti stringa** (`page.evaluate(SRC)`), mai closure, in qualsiasi script che possa girare sotto tsx/esbuild (`keepNames` wrappa le funzioni con `__name`, assente nel contesto pagina).
 2. Un attestato fallito deve fallire rumoroso (`env: null` → errore esplicito del probe), non propagarsi come dato nullo fino al gate.
 3. Fix già applicato a `attestEnv.ts` (DOM_PROBE_SRC/PROBE_INJECT_SRC/PROBE_REMOVE_SRC) — serve la regola per gli script futuri.
+
+## P-005 — `vite preview` serve una build statica: il bundle stantio mente come un bug nel codice (2026-10-17)
+
+**Stato:** proposta — 2 contesti distinti in una settimana.
+**Pattern:** `.mw/runs/20261017-learn-ws0ws1-slot-drag-evidence/pattern-candidate.md` §"stale-preview-bundle".
+**Istanze (2 contesti distinti):** (1) WS-0+WS-1 — `[swapdbg]` log emessi dal bundle :5179 ma rimossi dal sorgente: la suite falliva su un path già riscritto, diagnosi su codice fantasma finché `dist-playwright` non è stata ribuildata (dpr2 capture verde subito dopo). (2) WS-2 probe-port-collision — server preview su porta condivisa, pkill di un probe parallelo uccide il server della `verify:bundle` (exit_code=null su OB-03); cfr. observation.jsonl.
+
+**Cosa si propone (trappola candidata, es. T-16):**
+1. Prima di diagnosticare un failure su `vite preview`: `curl -s localhost:<port>/game | grep -o 'src/main.tsx\|assets/index-[A-Za-z0-9_-]*\.js'` — `src/main.tsx` = dev vivo, `assets/index-*.js` = build (confronta mtime con l'ultimo edit sorgente).
+2. `preview:playwright` va ribuildato dopo OGNI edit sorgente toccato dalla prova; mai diagnosticare su un bundle la cui età non hai verificato.
+3. Probe/spec usa una porta dedicata e dichiarata (`CAPTURE_BASE_URL`), mai la porta del bundle/verify condivisa.
+
