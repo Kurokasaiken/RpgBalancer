@@ -209,11 +209,13 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/config/hudCrewConfig.ts',
   'src/ui/idleVillage/config/minimalFeedbackConfig.ts',
   'src/ui/idleVillage/config/pgCardFrameConfig.ts',
+  'src/ui/idleVillage/config/presentationConfig.ts',
   'src/ui/idleVillage/config/residentDropRules.ts',
   'src/ui/idleVillage/config/rosterFilterConfig.ts',
   'src/ui/idleVillage/config/rosterSortConfig.ts',
   'src/ui/idleVillage/config/seaMarksConfig.ts',
   'src/ui/idleVillage/config/seaWonders.ts',
+  'src/ui/idleVillage/config/wanderlustBaseManifest.json',
   'src/ui/idleVillage/config/worldSurfaceConfig.ts',
   'src/ui/idleVillage/controllers/CrewSchedulerController.ts',
   'src/ui/idleVillage/drag/resolveSlotRequirements.ts',
@@ -323,6 +325,8 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/quests/questEpilogue.ts',
   'src/ui/idleVillage/quests/questExpedition.ts',
   'src/ui/idleVillage/quests/questJourney.ts',
+  'src/ui/idleVillage/quests/questJourneyAuthoring.ts',
+  'src/ui/idleVillage/quests/questJourneyEngine.ts',
   'src/ui/idleVillage/quests/questSettlement.ts',
   'src/ui/idleVillage/quests/useQuestExpeditionSession.tsx',
   'src/ui/idleVillage/quests/useQuestPoiSession.tsx',
@@ -461,7 +465,7 @@ export const GAME_SURFACE_LUCIDE_FILES: readonly string[] = [
 
 /**
  * Pre-existing guard debt on the discovered surface — recorded at baseline
- * (2026-10-19T15:49:41.956Z). The ratchet rule: entries here pass once; any NEW
+ * (2026-10-19T18:09:19.485Z). The ratchet rule: entries here pass once; any NEW
  * violation (new file in the list, or a new offense inside a listed file)
  * fails the hudGuards surface checks. Debt entries are tracked as WS-5
  * defect records and burn down during implementation.

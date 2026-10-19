@@ -53,8 +53,11 @@ import { QUEST_PLANNER_INFO } from '@/balancing/config/idleVillage/quests/questP
 import { residentToQuestMember } from '@/ui/idleVillage/questS1Lab/residentToQuestMember';
 import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
 import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
-import { availableOptions } from '@/ui/idleVillage/questS1Lab/questRun';
+import { availableOptions, ENGINE_SCHEMA_VERSION } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestId, QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
+import { journeyFasiOf } from './questJourney';
+import { resolveQuestJourneyLaunchSpec } from './questJourneyAuthoring';
+import { WANDERLUST_PRESENTATION_MANIFEST } from '@/ui/idleVillage/config/presentationConfig';
 import type { QuestRunApi } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { buildExpeditionParty, loadoutDuration, planSlotSwap, type BagStockEntry } from './questExpedition';
@@ -77,6 +80,15 @@ const EXPEDITION_ITEMS: BagStockEntry[] = VILLAGE_STASH_CONFIG.items.map((row) =
  *  `(poiId, daysPlayed)` — the expensive part is the reference-band sim,
  *  which must not rerun on every detail open. */
 const offerCache = new Map<string, ResolvedQuestOffer>();
+
+/** PLAN-053: the journey route's origin — the settlement anchor authored
+ *  in the world manifest (`village_01`). Fail-safe: a missing anchor would
+ *  silently draw a broken route, so the lookup throws at module load. */
+const VILLAGE_ORIGIN = (() => {
+  const anchor = WANDERLUST_PRESENTATION_MANIFEST.anchors?.find((a) => a.type === 'settlement');
+  if (!anchor) throw new Error('useQuestExpeditionSession: nessun anchor di tipo settlement nel manifest di presentazione');
+  return { x: anchor.x, y: anchor.y };
+})();
 
 export interface QuestExpeditionSessionOptions {
   /** The authored POI this session plans/launches. */
@@ -601,14 +613,35 @@ export function useQuestExpeditionSession({
       loadout: selectedItemIds,
       launchTick: currentTick,
     });
+    const seed = (Date.now() ^ (Math.random() * 0xffffffff)) >>> 0;
+    /* PLAN-053 T-004: a journey-enabled POI (authored `fasi`) freezes its
+     *  launch spec here — route endpoints, authored beat plans, the
+     *  sampled day-length — so the run's andata/svolgimento/ritorno legs
+     *  replay identically after a reload. Legacy POIs get `undefined` and
+     *  keep the pre-journey lifecycle. */
+    const journey = journeyFasiOf(poi)
+      ? resolveQuestJourneyLaunchSpec({
+          poi,
+          nodes: resolved.instance.nodes,
+          startNode: resolved.instance.startNode,
+          origin: VILLAGE_ORIGIN,
+          ticksPerDay: useMinimalGameplayStore.getState().config.globalRules.dayLengthInTimeUnits,
+          nodeTicks: expeditionDuration.nodeTicks,
+          runSeed: seed,
+          engineSchemaVersion: ENGINE_SCHEMA_VERSION,
+          scenarioHash: resolved.instance.scenarioHash,
+          launchedAtTick: currentTick,
+        })
+      : null;
     questRun.start({
       party: { members },
-      seed: (Date.now() ^ (Math.random() * 0xffffffff)) >>> 0,
+      seed,
       questId: poi.questId,
       loadout: selectedItemIds,
       clock: { nodeTicks: expeditionDuration.nodeTicks, startTick: currentTick },
       scenarioInstance: resolved.instance,
       resolvedOffer: resolved.resolvedOffer,
+      ...(journey ? { journey } : {}),
     });
     /* R-139: the party is «away» for the village store too — wounds do not
      *  heal while assigned. Released by `applyPlanToState` at settlement. */

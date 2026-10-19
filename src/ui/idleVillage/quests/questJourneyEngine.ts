@@ -177,7 +177,7 @@ export interface JourneyEngineOps {
     nodeId: string,
     optionId: string,
     tick: number,
-    opts?: { useConsumable?: boolean; armedFlags?: ReadonlySet<string> },
+    opts?: { useConsumable?: boolean; forceDie?: number; armedFlags?: ReadonlySet<string> },
   ): void;
 }
 
@@ -188,6 +188,16 @@ export interface JourneyEngineOps {
 /** Travel ticks consumed in the current fase (route-driving clock). */
 function consumedTravel(journal: JourneyJournal): number {
   return Math.max(0, journal.processedUpToTick - journal.faseStartedAtTick - journal.accumulatedParkedTicks);
+}
+
+/**
+ * True while the host frontier is the travel sentinel — a pending frontier
+ * that never matures (`travelFrontier`, readyAt = MAX_SAFE_INTEGER). A real
+ * pending chain node mid-flight is NOT idle: the boundary must wait for
+ * its effects, or a fill that lands mid-maturation would clobber them.
+ */
+export function frontierIsTravelSentinel(state: QuestRunState): boolean {
+  return state.frontier.status === 'pending' && state.frontier.readyAt === Number.MAX_SAFE_INTEGER;
 }
 
 /** A beat counts as complete when a waiting beat is resolved or a pending
@@ -316,41 +326,59 @@ function processEventsAtTick(state: QuestRunState, t: number, ops: JourneyEngine
     // pin exactly at the park DOES open (it caused the park).
     for (const beat of j.beats) {
       if (beat.openedAtTick !== null || beat.pin * total > consumed) continue;
-      beat.openedAtTick = t;
-      acted = true;
       if (beat.kind === 'waiting') {
-        if (j.parkedNodeId === null) {
+        /* A waiting beat claims the party's single cursor — the frontier.
+         * While a chain hop is still in flight (pending mid-maturation,
+         * e.g. the ambush damage walking to its choice) the marker has
+         * already crossed the pin but the scene cannot interrupt: the
+         * opening stays DUE and is retried once the road frees. A second
+         * waiting beat arriving while another is parked is a degenerate
+         * config (the T-004 validator rejects it) and is skipped rather
+         * than deadlocking. */
+        if (j.parkedNodeId === null && frontierIsTravelSentinel(state)) {
+          beat.openedAtTick = t;
           j.parkedNodeId = beat.nodeId;
           j.parkedAtTick = t;
           ops.openWaitingBeat(state, beat.nodeId, t);
-        } else {
-          // Degenerate authoring (two waiting beats on one pin — the T-004
-          // validator rejects it): without a free frontier this beat could
-          // never resolve, so it is skipped rather than deadlocking.
+          acted = true;
+        } else if (j.parkedNodeId !== null) {
+          beat.openedAtTick = t;
           beat.resolvedAtTick = t;
           beat.skipped = true;
+          acted = true;
         }
+        /* frontier busy on a chain: leave the beat unopened — retry. */
       } else {
+        beat.openedAtTick = t;
         const plan = planOf(runtime.snapshot, j.currentFase as 'andata' | 'ritorno', beat.nodeId);
         beat.resolvedAtTick = t + (plan?.durationTicks ?? 0);
         ops.presentPendingBeat(state, beat.nodeId, t);
+        acted = true;
       }
       if (state.ended) return;
     }
 
-    // (3) Pending maturations due at or before `t`.
+    // (3) Pending maturations due at or before `t`. The beat's effects run
+    // through the frontier (matureNode) — a pending beat can only mature
+    // while the party's cursor is on the road (the sentinel). A frontier
+    // mid-chain (a spawned hop still maturing, or a parked decision) keeps
+    // the beat due; its effects land when the party is back on the road.
     for (const beat of j.beats) {
       if (beat.kind !== 'pending' || beat.openedAtTick === null) continue;
       if ((beat.appliedAtTick ?? null) !== null || beat.resolvedAtTick === null || beat.resolvedAtTick > t) continue;
+      if (!frontierIsTravelSentinel(state)) continue;
       ops.maturePendingBeat(state, beat.nodeId, t);
       beat.appliedAtTick = t;
       acted = true;
       if (state.ended) return;
     }
 
-    // (5) Phase boundary: route full AND every beat of the fase resolved.
+    // (5) Phase boundary: route full AND every beat of the fase resolved
+    // AND the frontier is the travel sentinel — a real pending chain node
+    // still in flight keeps the fase open until its effects land.
     if (
       j.parkedNodeId === null &&
+      frontierIsTravelSentinel(state) &&
       consumed >= total &&
       j.beats.every(beatComplete)
     ) {
@@ -425,20 +453,32 @@ export function advanceJourney(state: QuestRunState, t1: number, ops: JourneyEng
     const consumed = consumedTravel(j);
 
     // --- Actionable-now discovery: events already due at `t` drain in
-    // place (hydrate-safe — a reload mid-schedule re-enters here).
+    // place (hydrate-safe — a reload mid-schedule re-enters here). A
+    // pending maturation due but blocked by a busy frontier (a chain hop
+    // mid-flight) is NOT actionable: claiming it now would stall the loop
+    // re-draining the same tick — it retries once the road frees.
+    const frontierFree = frontierIsTravelSentinel(state);
     let dueNow = false;
     for (const beat of j.beats) {
-      if (beat.openedAtTick === null && beat.pin * total <= consumed) dueNow = true;
+      if (beat.openedAtTick === null && beat.pin * total <= consumed) {
+        /* Pending beats always open (presentation never claims the
+         * frontier). Waiting beats claim the single cursor: actionable
+         * only when they will actually progress — free frontier → opens;
+         * already parked → the degenerate double-park is skipped. A
+         * waiting beat due while a chain hop is mid-flight stays DUE. */
+        if (beat.kind === 'pending' || j.parkedNodeId !== null || frontierFree) dueNow = true;
+      }
       if (
         beat.kind === 'pending' &&
         beat.openedAtTick !== null &&
         (beat.appliedAtTick ?? null) === null &&
         beat.resolvedAtTick !== null &&
-        beat.resolvedAtTick <= t
+        beat.resolvedAtTick <= t &&
+        frontierFree
       ) dueNow = true;
     }
     const boundaryDue =
-      j.parkedNodeId === null && consumed >= total && j.beats.every(beatComplete);
+      j.parkedNodeId === null && frontierIsTravelSentinel(state) && consumed >= total && j.beats.every(beatComplete);
 
     if (dueNow || boundaryDue) {
       processEventsAtTick(state, t, ops);
@@ -507,7 +547,7 @@ export function resolveJourneyDecision(
   optionId: string,
   nowTick: number,
   ops: JourneyEngineOps,
-  opts?: { useConsumable?: boolean; armedFlags?: ReadonlySet<string> },
+  opts?: { useConsumable?: boolean; forceDie?: number; armedFlags?: ReadonlySet<string> },
 ): void {
   const runtime = state.journey;
   if (!runtime || state.ended) return;
