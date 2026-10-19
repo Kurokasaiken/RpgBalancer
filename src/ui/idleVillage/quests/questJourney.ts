@@ -69,8 +69,20 @@ export interface JourneyBeatEntry {
    *  open). */
   openedAtTick: number | null;
   /** Quest tick the beat resolved — null while unresolved. For pending
-   *  beats: `openedAtTick + authoredDurationTicks`. */
+   *  beats this is the SCHEDULED maturation (`openedAtTick +
+   *  authoredDurationTicks`), fixed at open time; `appliedAtTick` records
+   *  when the effects actually landed (the two coincide on the happy path,
+   *  differ across a hydrate between schedule and application). */
   resolvedAtTick: number | null;
+  /** Quest tick the pending beat's effects were applied — null until the
+   *  scheduled `resolvedAtTick` is reached (waiting beats resolve
+   *  atomically at `resolvedAtTick` and never set this). The drain/journal
+   *  authority for "this beat's effects already landed". */
+  appliedAtTick?: number | null;
+  /** Authored pin already behind the marker at fase entry (e.g. a flee
+   *  mid-andata that enters ritorno past some return beats): the beat is
+   *  marked resolved without ever opening — `skipped` records why. */
+  skipped?: boolean;
 }
 
 /**
@@ -91,8 +103,13 @@ export interface JourneyJournal {
   /** Σ parked intervals inside the current fase. */
   accumulatedParkedTicks: number;
   /** Node id of the waiting frontier currently parking the marker, or
-   *  null when the marker is free to move. */
+   *  null when the marker is free to move. A chained node without its own
+   *  beat entry can hold the park — then {@link parkedAtTick} is the only
+   *  park-start record. */
   parkedNodeId: string | null;
+  /** Quest tick the current park began — set/cleared with `parkedNodeId`.
+   *  For beat-bound parks it equals the beat's `openedAtTick`. */
+  parkedAtTick?: number | null;
   /** Travel beats of the current fase (opened or still scheduled). */
   beats: JourneyBeatEntry[];
 }
@@ -246,10 +263,16 @@ export function faseAt(snapshot: JourneySnapshot, journal: JourneyJournal): Fase
   const parked = journal.parkedNodeId !== null;
   const parkedBeat = parked ? journal.beats.find((b) => b.nodeId === journal.parkedNodeId) : undefined;
   const pendingDecision = parked && (parkedBeat === undefined || parkedBeat.kind === 'waiting');
+  // "Complete" mirrors the engine's beatComplete(): a pending beat is done
+  // only when its effects landed (appliedAtTick — resolvedAtTick is the
+  // schedule, set at open); a waiting beat resolves atomically on input.
+  const beatDone = (b: JourneyBeatEntry) =>
+    b.skipped === true ||
+    (b.kind === 'waiting' ? b.resolvedAtTick !== null : (b.appliedAtTick ?? null) !== null);
   const endpointResolving =
     !parked &&
     routeProgress >= 1 &&
-    journal.beats.some((b) => b.openedAtTick !== null && b.resolvedAtTick === null);
+    journal.beats.some((b) => b.openedAtTick !== null && !beatDone(b));
   return {
     fase: journal.currentFase,
     faseElapsedTicks,
