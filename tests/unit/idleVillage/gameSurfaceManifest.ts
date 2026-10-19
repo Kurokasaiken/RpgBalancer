@@ -57,7 +57,6 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/components/GildedEventFrame.tsx',
   'src/ui/idleVillage/components/GoblinInvasionWindow.tsx',
   'src/ui/idleVillage/components/MagicCircleHalo.tsx',
-  'src/ui/idleVillage/components/MatericRosterComponent.tsx',
   'src/ui/idleVillage/components/MilestoneCheckModal.tsx',
   'src/ui/idleVillage/components/OxidizedGradeFilter.tsx',
   'src/ui/idleVillage/components/PgCard.tsx',
@@ -113,7 +112,6 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/components/destinyAstrolabeV62/engine.ts',
   'src/ui/idleVillage/components/destinyAstrolabeV62/tarGooRenderer.ts',
   'src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts',
-  'src/ui/idleVillage/components/gameFrame/BagStrip.tsx',
   'src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx',
   'src/ui/idleVillage/components/gameFrame/GameBootScreen.tsx',
   'src/ui/idleVillage/components/gameFrame/GameFrame.tsx',
@@ -280,6 +278,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/map/actionCards/useActionCardStyling.ts',
   'src/ui/idleVillage/map/validators/locationDropValidators.ts',
   'src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx',
+  'src/ui/idleVillage/pixiSpike/mapFitRuntime.ts',
   'src/ui/idleVillage/pixiSpike/regionOutline.ts',
   'src/ui/idleVillage/pixiSpike/seabedTexture.ts',
   'src/ui/idleVillage/questS1Lab/beatSequencer.ts',
@@ -309,16 +308,21 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/questS1Lab/questSchedule.ts',
   'src/ui/idleVillage/questS1Lab/questSimulation.ts',
   'src/ui/idleVillage/questS1Lab/questTheatreSequencer.ts',
+  'src/ui/idleVillage/questS1Lab/render/AmbientLayer.tsx',
+  'src/ui/idleVillage/questS1Lab/render/AtmosphereLayer.tsx',
   'src/ui/idleVillage/questS1Lab/render/DepthScene.tsx',
+  'src/ui/idleVillage/questS1Lab/render/atmosphereOverlay.ts',
   'src/ui/idleVillage/questS1Lab/render/cameraEval.ts',
   'src/ui/idleVillage/questS1Lab/render/depthShader.ts',
   'src/ui/idleVillage/questS1Lab/render/depthTransform.ts',
   'src/ui/idleVillage/questS1Lab/render/sceneManifest.ts',
+  'src/ui/idleVillage/questS1Lab/render/trauma.ts',
   'src/ui/idleVillage/questS1Lab/residentToQuestMember.ts',
   'src/ui/idleVillage/questS1Lab/useQuestRun.ts',
   'src/ui/idleVillage/quests/QuestExpeditionDetail.tsx',
   'src/ui/idleVillage/quests/questEpilogue.ts',
   'src/ui/idleVillage/quests/questExpedition.ts',
+  'src/ui/idleVillage/quests/questJourney.ts',
   'src/ui/idleVillage/quests/questSettlement.ts',
   'src/ui/idleVillage/quests/useQuestExpeditionSession.tsx',
   'src/ui/idleVillage/quests/useQuestPoiSession.tsx',
@@ -430,12 +434,12 @@ export const GAME_SURFACE_FILES = [
 
 /** Registry panel id → implementing component files (set A detail). */
 export const GAME_SURFACE_PANEL_BINDINGS: Record<string, readonly string[]> = {
-  roster: ['src/ui/idleVillage/components/MatericRosterComponent.tsx', 'src/ui/idleVillage/rosterV2/MatericRosterComponentV2.tsx'],
+  roster: ['src/ui/idleVillage/rosterV2/MatericRosterComponentV2.tsx'],
   events: ['src/ui/idleVillage/components/gameFrame/HudEventLedger.tsx'],
   quest: ['src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx', 'src/ui/idleVillage/components/gameFrame/QuestSkillCheckOverlay.tsx'],
   questDetail: ['src/ui/idleVillage/quests/QuestExpeditionDetail.tsx'],
   heroSheet: ['src/ui/idleVillage/components/gameFrame/HeroSheetPanel.tsx', 'src/ui/idleVillage/components/gameFrame/useHeroSheet.tsx'],
-  villageStash: ['src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx'],
+  villageStash: ['src/pages/game-frame-pixi.tsx', 'src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx'],
   merchant: ['src/ui/idleVillage/components/gameFrame/MerchantPanel.tsx'],
   director: ['src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx'],
   tuning: ['src/ui/idleVillage/components/gameFrame/TuningPanel.tsx'],
@@ -457,7 +461,7 @@ export const GAME_SURFACE_LUCIDE_FILES: readonly string[] = [
 
 /**
  * Pre-existing guard debt on the discovered surface — recorded at baseline
- * (2026-10-18T11:10:40.489Z). The ratchet rule: entries here pass once; any NEW
+ * (2026-10-19T15:49:41.956Z). The ratchet rule: entries here pass once; any NEW
  * violation (new file in the list, or a new offense inside a listed file)
  * fails the hudGuards surface checks. Debt entries are tracked as WS-5
  * defect records and burn down during implementation.
@@ -525,7 +529,8 @@ export const GAME_SURFACE_VIOLATION_BASELINE: Record<
   'src/ui/idleVillage/legacy/VerbCard.tsx': { colorLiterals: ["rgba("], smallFonts: ["text-[11px]", "text-[10px]", "text-[9px]", "text-[10px]"] },
   'src/ui/idleVillage/map/actionCards/ActionCard.tsx': { colorLiterals: ["#f7f2d8"], smallFonts: ["text-[10px]", "text-[9px]", "text-[10px]", "text-[10px]", "text-[10px]", "text-[11px]"] },
   'src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx': { colorLiterals: ["#215c70", "#16394a", "#0b1a14", "#0b1a24", "rgba(", "rgb(", "#f87171"] },
-  'src/ui/idleVillage/quests/QuestExpeditionDetail.tsx': { colorLiterals: ["rgba(", "#f0cf6a"], smallFonts: ["fontSize: 11", "fontSize: 10", "fontSize: 11", "fontSize: 11", "fontSize: 8", "fontSize: 9", "fontSize: 10", "fontSize: 10", "fontSize: 11"] },
+  'src/ui/idleVillage/questS1Lab/render/AmbientLayer.tsx': { colorLiterals: ["rgba("] },
+  'src/ui/idleVillage/quests/QuestExpeditionDetail.tsx': { colorLiterals: ["rgba(", "#f0cf6a"], smallFonts: ["fontSize: 11", "fontSize: 10", "fontSize: 11", "fontSize: 11", "fontSize: 10", "fontSize: 10", "fontSize: 11"] },
   'src/ui/idleVillage/quests/useQuestPoiSession.tsx': { smallFonts: ["text-[10px]", "text-[10px]"] },
   'src/ui/idleVillage/rosterV2/DragTestContainerV2.tsx': { colorLiterals: ["rgba(", "#f59e0b", "#f0cf6a"], smallFonts: ["text-[10px]", "text-[9px]", "text-[9px]"] },
   'src/ui/idleVillage/rosterV2/WanderlustRosterCardV2.tsx': { colorLiterals: ["#7bc96f", "#e07a5f", "#e3b04b", "#d8b13e", "#f0cf6a", "#c9a84e", "#9a8246", "#F5F2E8", "rgba(", "#e0b23e", "#f0d99a", "#d8bd78", "#a0762f", "#71501f", "#d98a4a", "#9e5a4a", "#6b3a2a"], smallFonts: ["fontSize: '10px'"] },

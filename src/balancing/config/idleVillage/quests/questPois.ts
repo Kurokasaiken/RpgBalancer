@@ -62,6 +62,48 @@ export function dangerBandFor(anyDeathPct: number): DangerBand {
 }
 
 /* ------------------------------------------------------------------ */
+/* Quest journey fasi (PLAN-053, R-226) — additive travel contract.     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Authored journey contract of a quest POI (PLAN-053 `fasi`).
+ *
+ * `travelDays` is the outbound AND return duration in game days
+ * (ritorno = andata, one authored number — Director verbatim). Ticks are
+ * derived at launch via `ticksPerDay = dayLengthInTimeUnits` — never
+ * `msPerDay`/`questTimeScale` (different subsystem).
+ *
+ * `waypoints` are optional authored intermediate points (world px, same
+ * space as `x`/`y`) between the village anchor and the POI; absent = the
+ * default straight route. Degenerate chains (consecutive duplicates,
+ * zero-length segments, waypoint coincident with an endpoint) are
+ * rejected by `buildJourneyPolyline` — the schema only carries them.
+ *
+ * `pins` maps scenario nodeIds → arc-length fraction in the phase-local
+ * progress space (`andata`: 0 = village → 1 = POI; `ritorno`: 0 = POI →
+ * 1 = village). Values outside [0,1] are rejected — never silently
+ * clamped. Phase attribution and monotonicity along each phase path are
+ * validated by the T-004 DAG validator, not here.
+ *
+ * Absence of `fasi` is the legacy sentinel: `journeyFasiOf(poi) === null`
+ * and the run keeps pre-journey behaviour (PLAN-053 §8 — strictly
+ * additive, no default injected into existing POIs).
+ */
+export const QuestJourneyFasiSchema = z
+  .object({
+    /** Authored outbound/return travel duration in game days — integer >= 1. */
+    travelDays: z.number().int().min(1),
+    /** Optional authored intermediate route points in world px. */
+    waypoints: z
+      .array(z.object({ x: z.number(), y: z.number() }).strict())
+      .optional(),
+    /** scenario nodeId → pin in [0,1] (phase-local arc-length fraction). */
+    pins: z.record(z.string().min(1), z.number().min(0).max(1)).optional(),
+  })
+  .strict();
+export type QuestJourneyFasi = z.infer<typeof QuestJourneyFasiSchema>;
+
+/* ------------------------------------------------------------------ */
 /* Quest POI — the offer envelope on the map.                           */
 /* ------------------------------------------------------------------ */
 
@@ -135,6 +177,12 @@ export const QuestPoiSchema = z
      * window.
      */
     tier: z.enum(['normal', 'main']).optional(),
+    /**
+     * PLAN-053 journey contract — authored andata/svolgimento/ritorno fasi.
+     * Optional and strictly additive: absent = legacy non-journey run
+     * (`fasi === null` sentinel; the offer keeps current behaviour).
+     */
+    fasi: QuestJourneyFasiSchema.optional(),
   })
   .strict()
   .refine((p) => p.availableUntilDay === undefined || p.availableUntilDay > (p.availableFromDay ?? 0), {
