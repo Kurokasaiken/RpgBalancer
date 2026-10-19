@@ -27,6 +27,19 @@ import type {
   Verdict,
 } from './questScenario';
 import type { SettlementMarker } from '../quests/questSettlement';
+import {
+  advanceJourney,
+  buildJourneyRuntime,
+  enterJourneyFase,
+  resolveJourneyDecision,
+} from '../quests/questJourneyEngine';
+import type {
+  JourneyEngineOps,
+  JourneyTerminal,
+  QuestJourneyLaunchSpec,
+  QuestJourneyRuntime,
+} from '../quests/questJourneyEngine';
+import type { QuestFase } from '../quests/questJourney';
 
 /** The authored S1 lab quests. 'cassa' = infiltration (agi/perc,
  *  alertness states); 'rovine' = attrition gauntlet (str/con, days & HP);
@@ -297,6 +310,32 @@ export interface QuestRunState {
    *  consumed. Append-only record for the return report's «spesi e
    *  distrutti» section; absent on legacy persisted runs (treated empty). */
   consumablesUsed?: string[];
+  /* ---- Quest journey (PLAN-053 T-003, artifact r011) ------------------- */
+  /** Journey runtime (frozen snapshot + mutable journal) — present only on
+   *  journey-enabled runs (POI with `fasi`); absent = legacy lifecycle. */
+  journey?: QuestJourneyRuntime;
+  /** Tick the outcome resolved: end of svolgimento (POI verdict frozen) or
+   *  a wipe in any fase. Distinct from {@link settledAtTick}: a returning
+   *  party has a verdict but is not home yet. */
+  outcomeResolvedAtTick?: number | null;
+  /** First tick the run can settle: ritorno arrival (fill 100% + beats
+   *  resolved) or `outcomeResolvedAtTick` on a wipe — a wiped party never
+   *  arrives, so it settles in place or the sequential gate deadlocks. */
+  settledAtTick?: number | null;
+  /** Typed terminal: `contentCompleteAtPoi` (opens ritorno),
+   *  `returnWithSurvivors` (arrival settles), `wiped`. */
+  terminalKind?: JourneyTerminal | null;
+  /** Fase the run ended in — the report's double verdict (success at POI
+   *  ≠ success home). */
+  lastFase?: QuestFase | null;
+  /** The verdict frozen at svolgimento end (or the latest non-wipe outcome
+   *  during travel, e.g. a flee). Awarded at arrival — party state (wounds,
+   *  deaths) stays mutable until then. */
+  verdictAtPoi?: QuestOutcome | null;
+  /** Transient current quest tick — refreshed by every engine entry point
+   *  (submitCommand/matureNode/arriveNode/journey ops); read by `endRun`
+   *  for the journey lifecycle ticks. Persisted harmlessly; never a t0. */
+  nowTick?: number;
 }
 
 /** A resolved check shown to the player as an astrolabe cinematic. */
@@ -841,6 +880,12 @@ export interface CreateRunInput {
   scenarioInstance?: ScenarioInstance;
   /** S2.3: the frozen resolved-offer record — stored verbatim in the run. */
   resolvedOffer?: ResolvedOfferRecord;
+  /** PLAN-053 T-003 launch seam: when the POI carries authored `fasi`, the
+   *  caller passes the resolved {@link QuestJourneyLaunchSpec} (beat plans,
+   *  route geometry, frozen clock) and the run is born journey-enabled.
+   *  `runSeed`/`launchedAtTick` are re-derived from the run itself — a
+   *  caller-side spec can never drift from the run it attaches to. */
+  journey?: QuestJourneyLaunchSpec;
 }
 
 /**
@@ -873,6 +918,7 @@ export function createRun(
   let input: QuestRunPartyInput | undefined;
   let scenarioInstance: ScenarioInstance | undefined;
   let resolvedOffer: ResolvedOfferRecord | undefined;
+  let journeySpec: QuestJourneyLaunchSpec | undefined;
   if (typeof preset !== 'string' && 'party' in preset) {
     const p: QuestRunPartyInput = Array.isArray(preset.party) ? { members: preset.party } : preset.party;
     input = { members: p.members, gold: p.gold, presetId: p.presetId };
@@ -882,6 +928,7 @@ export function createRun(
     frontier = preset.clock;
     scenarioInstance = preset.scenarioInstance;
     resolvedOffer = preset.resolvedOffer;
+    journeySpec = preset.journey;
   } else if (typeof preset !== 'string') {
     input = preset;
   }
@@ -909,7 +956,7 @@ export function createRun(
         }
       : questId === 'goblin'
         ? {
-            lastEvent: 'The ford is closed by fear. Exterminate them.',
+            lastEvent: 'The wood has gone quiet. The goblins have not.',
             firstLog: 'Assignment — combat quest, based on Strength. The goblin trophy converts to Gold on return.',
           }
         : questId === 'gen'
@@ -970,6 +1017,14 @@ export function createRun(
   // neither and stay bit-identical.
   if (scenarioInstance?.initialVars) state.vars = { ...scenarioInstance.initialVars };
   runArmRolls(state, scenarioInstance?.armRolls);
+  if (journeySpec) {
+    attachQuestJourney(state, {
+      ...journeySpec,
+      runSeed: state.seed,
+      engineSchemaVersion: state.engineSchemaVersion,
+      launchedAtTick: state.launchedAtTick,
+    });
+  }
   return state;
 }
 
@@ -997,6 +1052,19 @@ function leader(state: QuestRunState): RuntimeMember | undefined {
 }
 
 function endRun(state: QuestRunState, outcome: QuestOutcome, text: string): void {
+  if (state.journey) {
+    journeyOutcome(state, outcome, text);
+  } else {
+    finishRun(state, outcome, text);
+  }
+  /* `nowTick` is caller context for the current engine call, not run
+   * state — it must not leak into the persisted record (the golden
+   * characterization suite pins the terminal shape byte-identical). */
+  delete state.nowTick;
+}
+
+/** The terminal write shared by legacy ends and journey arrivals/wipes. */
+function finishRun(state: QuestRunState, outcome: QuestOutcome, text: string): void {
   state.ended = true;
   state.outcome = outcome;
   if (outcome === 'wipe') {
@@ -1007,11 +1075,68 @@ function endRun(state: QuestRunState, outcome: QuestOutcome, text: string): void
     // Goblin quest (Director): XP is always awarded, whatever the outcome.
     if (state.questId === 'goblin') {
       state.xp = TUNE.goblinXp;
-      state.log.push({ kind: 'INFO', text: `The road teaches. +${TUNE.goblinXp} XP.` });
+      state.log.push({ kind: 'INFO', text: `The hunt teaches. +${TUNE.goblinXp} XP.` });
     }
     state.log.push({ kind: 'QUEST_END', text });
   }
   state.lastEvent = composeEndingText(state, text);
+}
+
+/**
+ * PLAN-053 lifecycle split (artifact r011): inside a journey-enabled run a
+ * non-wipe outcome is a VERDICT, not an arrival — the verdict freezes
+ * (`verdictAtPoi`, `outcomeResolvedAtTick`, `terminalKind:
+ * contentCompleteAtPoi`) and the party walks home; `ended` stays false so
+ * every legacy consumer (expedition lock, halo, gates) keeps reading an
+ * in-flight run. A wipe is terminal wherever it lands: it settles in place
+ * (`settledAtTick = outcomeResolvedAtTick`) or the gate would deadlock.
+ * XP is awarded by {@link finishRun} at arrival — provisional Director
+ * default: no XP on a return wipe (the PR of the ruling may update the
+ * pinned test).
+ */
+function journeyOutcome(state: QuestRunState, outcome: QuestOutcome, text: string): void {
+  const jr = state.journey!;
+  const j = jr.journal;
+  const t = state.nowTick ?? j.processedUpToTick;
+  if (outcome === 'wipe') {
+    state.outcomeResolvedAtTick = t;
+    state.settledAtTick = t;
+    state.terminalKind = 'wiped';
+    state.lastFase = j.currentFase;
+    finishRun(state, 'wipe', text);
+    return;
+  }
+  state.outcomeResolvedAtTick = state.outcomeResolvedAtTick ?? t;
+  state.verdictAtPoi = outcome;
+  state.terminalKind = state.terminalKind ?? 'contentCompleteAtPoi';
+  state.log.push({ kind: 'QUEST_END', text });
+  state.lastEvent = composeEndingText(state, text);
+  if (j.currentFase === 'svolgimento') {
+    enterReturnFase(state, t, 0);
+  } else if (j.currentFase === 'andata') {
+    // A flee mid-andata turns the party around: the reversed route keeps
+    // the physical position — consumed(ritorno) = total − consumed(andata).
+    const total = jr.snapshot.travelDays * jr.snapshot.ticksPerDay;
+    const consumed = Math.max(0, t - j.faseStartedAtTick - j.accumulatedParkedTicks);
+    enterReturnFase(state, t, Math.max(0, total - consumed));
+  }
+  // A non-wipe verdict during ritorno (e.g. a retreat choice) only
+  // overwrites the frozen verdict — the party is already walking home.
+}
+
+/** Enter the ritorno fase: journal side lives in the journey engine, the
+ *  engine side drops the frontier back to the travel sentinel. */
+function enterReturnFase(state: QuestRunState, tick: number, initialConsumedTicks: number): void {
+  const jr = state.journey;
+  if (!jr) return;
+  enterJourneyFase(jr, 'ritorno', tick, initialConsumedTicks);
+  state.frontier = travelFrontier(tick);
+}
+
+/** The travel sentinel frontier: pending forever — the ROUTE is the
+ *  frontier while no beat is open (`matureReady` never matures it). */
+function travelFrontier(tick: number): QuestRunState['frontier'] {
+  return { status: 'pending', startedAt: tick, readyAt: Number.MAX_SAFE_INTEGER };
 }
 
 /** A taken-but-not-secured loot item drops out of the party's hands. */
@@ -1048,8 +1173,9 @@ function dropObjective(state: QuestRunState, reason: string): void {
 
 /** Player chooses to flee — quest failed, secured loot kept; the objective
  *  is still "in hand", not banked: panic means dropping it to run. */
-export function flee(state: QuestRunState): QuestRunState {
+export function flee(state: QuestRunState, tick?: number): QuestRunState {
   if (state.ended) return state;
+  state.nowTick = tick ?? state.frontier.startedAt;
   state.log.push({ kind: 'RETREAT', text: 'The expedition retreats.' });
   if (state.objectiveDone) {
     dropObjective(
@@ -1475,19 +1601,19 @@ function resolveCheck(
 
 /** Authored one-liners for the goblin fight's attack verdicts (spec §Testi). */
 const GOBLIN_ATTACK_LINES: Record<Verdict, string> = {
-  bigwin: 'The blow splits them in half: two goblins collapse together.',
-  win: 'The blow lands. The line gives a step.',
-  almost: 'The blow bites, does not kill: they fall back but stay standing.',
-  fail: 'Shields locked. The blow dies on wood and leather.',
-  epicfail: 'The line closes back: for one long moment you are surrounded.',
+  bigwin: 'The impact booms across the clearing. The enemy line buckles and the din of shields drowns under a volley of blows.',
+  win: 'Iron grates on iron. The shapes in front of you stagger and the first rank falls back into the fire’s uncertain light.',
+  almost: 'The blade opens a gap through leather and shields, but at once another shape slips into the space left free.',
+  fail: 'The blow smashes into wood. A spearhead darts out of the smoke, close enough that you feel its air on your face.',
+  epicfail: 'There is no room to raise your weapon. Blows, screams and iron points close on you from every side while the smoke wipes out every landmark.',
 };
 
 /** F6 push-your-luck: the sheltering ruin degrades turn by turn — the rising
  *  damage IS the structure giving way, narrated once per exploreTurn. */
 const GOBLIN_F6_CREAK_LINES = [
   'The pole holding the tarp creaks.',
-  'The tarp still burns below. The heat reaches your face.',
-  'A beam gives way. Whoever was looting steps back — and sees the leather closer.',
+  'The embers still smoulder beneath the blackened canvas; the heat licks at your face.',
+  'A beam tears free with a crash and falls where, an instant before, you were rummaging.',
 ] as const;
 
 /**
@@ -2113,33 +2239,29 @@ function applyNodeOutcome(state: QuestRunState, node: QuestNode, verdict: Verdic
       } else if (verdict === 'almost') {
         state.flags.push('bonusStealthPiccolo');
         state.log.push({ kind: 'INFO', text: 'Some confused signs. Better than nothing.' });
+      } else if (verdict === 'epicfail') {
+        /* r008 (2026-10-19): the epicfail is the crash-down through dead
+         * branches — the wired −10 HP (v3 ruling) stays, the log names
+         * the cause the verdict text implies. */
+        positionalDamage(state, 10, node.title);
+        state.log.push({ kind: 'INFO', text: 'The dead branches tear you on the way down. (−10 HP)' });
       } else {
         state.log.push({ kind: 'INFO', text: 'The wood stays silent.' });
       }
       return 'gob-accampamento';
     case 'gob-tracce-perfor':
       if (success) {
-        state.log.push({ kind: 'INFO', text: 'From above you see what stays invisible from the ground: something is hidden by the boulder.' });
-        return 'gob-bottino-scelta';
+        state.log.push({ kind: 'INFO', text: 'From above you see what stays invisible from the ground: a hiding place under a too-regular weave of branches.' });
+        return 'gob-bottino';
       }
       positionalDamage(state, 10, node.title);
-      state.log.push({ kind: 'INFO', text: 'The fall costs you. (−10 HP)' });
+      state.log.push({
+        kind: 'INFO',
+        text: verdict === 'epicfail'
+          ? 'The fall costs you. (−10 HP)'
+          : 'The climb costs you. (−10 HP)',
+      });
       return 'gob-accampamento';
-    case 'gob-bottino': {
-      state.loot.push('war loot');
-      state.gold += 12;
-      state.log.push({ kind: 'LOOT', text: 'War loot: +12 gold.' });
-      if (bad) {
-        positionalDamage(state, 10, node.title);
-        if (!state.flags.includes('campoAllertato')) state.flags.push('campoAllertato');
-        state.alarm = true;
-        state.log.push({ kind: 'INFO', text: 'One noise too many. The goblins prick up their ears — the camp is alerted.' });
-      } else if (verdict === 'almost') {
-        if (!state.flags.includes('campoAllertato')) state.flags.push('campoAllertato');
-        state.log.push({ kind: 'INFO', text: 'You have it — but something moved in the camp.' });
-      }
-      return 'gob-accampamento';
-    }
     case 'gob-stealth':
       if (verdict === 'bigwin' || verdict === 'win') {
         state.flags.push('vantaggioGrande');
@@ -2264,7 +2386,7 @@ function composeEndingText(state: QuestRunState, base: string): string {
   }
   if (state.questId === 'goblin') {
     if (state.flags.includes('trofeoPerso')) {
-      pieces.push('The goblin trophy stayed on the road.');
+      pieces.push('The goblin trophy stayed in the ditch.');
     }
     const extra = state.loot.filter((l) => l !== 'goblin trophy');
     if (extra.length > 0) {
@@ -2324,6 +2446,8 @@ function setCheckOutcomeText(state: QuestRunState, preMark: number, outcomeMark:
  * choice, end nodes resolve the run.
  */
 function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
+  state.nowTick = tick;
+  if (journeyDeferToPin(state, nodeId)) return;
   // Iterative, bounded traversal: check/info/harm chains used to recurse.
   // A cycle in authored `next` links must degrade to a terminal state —
   // an infinite recursion here crashes the whole React tree with a
@@ -2405,14 +2529,14 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
           state.gold += TUNE.trofeoGold;
           state.loot = state.loot.filter((l) => l !== 'goblin trophy');
           state.log.push({ kind: 'LOOT', text: `The heads on the judge’s bench: +${TUNE.trofeoGold} gold.` });
-          endRun(state, 'reward', 'With the trophy on the scales: from tomorrow, the wagons cross the ford again.');
+          endRun(state, 'reward', 'The trophy is on the scales. The village breathes again.');
         } else {
           endRun(
             state,
             'survived',
             state.flags.includes('trofeoPerso')
-              ? 'Empty-handed: the trophy stayed on the road. The ford remains deserted.'
-              : 'You return without completing the extermination. The ford remains deserted.',
+              ? 'Empty-handed: the trophy stayed in the ditch. The goblins keep the wood.'
+              : 'You return without completing the extermination. The goblins keep the wood.',
           );
         }
       } else if (allDead(state)) {
@@ -2455,7 +2579,15 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
     // Choice nodes (and anything unknown) stop and wait for player input.
     // R-199: arrival also costs `nodeTicks` — the choice is VISIBLE at once
     // but committable only when the phase's own slot on the bar has come.
-    if (!state.ended) state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick + state.nodeTicks };
+    // R-231: `immediate: true` intra-phase discoveries (e.g. `gob-bottino`)
+    // carry weight 0 and unlock immediately on arrival (`readyAt = tick`).
+    // PLAN-053: a journey run does not end at an end node — `journeyOutcome`
+    // already opened ritorno and set the travel sentinel; do not re-arm a
+    // waiting frontier on the end node.
+    if (!state.ended && !(state.journey && node.kind === 'end')) {
+      const waitTicks = node.kind === 'choice' && node.immediate ? 0 : state.nodeTicks;
+      state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick + waitTicks };
+    }
     return;
   }
 }
@@ -2466,6 +2598,7 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
  * arrives at the authored next node. No-op while the frontier is not ready.
  */
 function matureNode(state: QuestRunState, tick: number): void {
+  state.nowTick = tick;
   const node = nodesFor(state)[state.nodeId];
   if (!node || state.frontier.status !== 'pending' || tick < state.frontier.readyAt) return;
   // The next node starts when THIS one matured (its readyAt), not when the
@@ -2492,7 +2625,7 @@ function matureNode(state: QuestRunState, tick: number): void {
             node.title,
           );
       }
-      state.lastEvent = 'Arrows from the roadside ridge. They had been waiting.';
+      state.lastEvent = 'Arrows out of the undergrowth. They had been waiting.';
     } else if (node.id === 'rv-attrito') {
       // The unstable zone: no check can erase this cost (Director mockup —
       // "continuare deve costare qualcosa"). +1 day always, then a roll:
@@ -2592,6 +2725,7 @@ export function submitCommand(
    *  phase schedule — options commit only once their slice of the bar has
    *  passed. */
   const tick = opts?.tick ?? Math.max(state.frontier.startedAt, state.frontier.readyAt);
+  state.nowTick = tick;
   if (tick < state.frontier.readyAt) return state;
   const nodes = nodesFor(state);
   const node = nodes[state.nodeId];
@@ -2660,6 +2794,13 @@ export function submitCommand(
     state.gold += option.grantsGold;
     state.log.push({ kind: 'LOOT', text: `+${option.grantsGold} gold.` });
   }
+  /* Goblin F2 (v3, Director 2026-10-18): «Recover the loot» is a single
+   * take-it-all action — the stash's gold and the loot item land
+   * together, no check, no leave option. */
+  if (option.id === 'gob-prendi' && !state.loot.includes('war loot')) {
+    state.loot.push('war loot');
+    state.log.push({ kind: 'LOOT', text: 'War loot from the hiding place.' });
+  }
   if (option.grantsInfo && !state.info.includes(option.grantsInfo)) {
     state.info.push(option.grantsInfo);
   }
@@ -2668,7 +2809,7 @@ export function submitCommand(
   }
   if (option.sets) state.flags.push(option.sets);
   if (option.abandonsObjective) {
-    dropObjective(state, 'the trophy stays in the ditch — the road clears.');
+    dropObjective(state, 'the trophy stays in the ditch — the goblins let you pass.');
     state.flags.push('trofeoLasciato');
     state.log.push({ kind: 'INFO', text: 'You throw the head into the ditch and run. The quest is lost.' });
   }
@@ -2880,7 +3021,7 @@ export function normalizeRunOverlayIdentity(run: QuestRunState): QuestRunState {
     /* Re-sequence deterministically in queue order, in a seq space that the
      * allocator can never reach — order is only as meaningful as the queue
      * itself; nothing is inferred beyond it. */
-    let next = Math.max(0, Math.floor(run.checkSeq ?? 0)) + 1;
+    const next = Math.max(0, Math.floor(run.checkSeq ?? 0)) + 1;
     checks.forEach((c, i) => {
       c.checkSeq = next + i;
       c.id = `chk-${next + i}`;
@@ -2898,4 +3039,193 @@ export function normalizeRunOverlayIdentity(run: QuestRunState): QuestRunState {
   if (!Number.isFinite(run.checkSeq) || run.checkSeq < maxSeq) run.checkSeq = maxSeq;
   run.dismissedUpTo = Math.max(run.dismissedUpTo, highestSettledCheckSeq(run));
   return run;
+}
+
+/* ------------------------------------------------------------------ */
+/* Quest journey integration (PLAN-053 T-003, artifact r011)            */
+/*                                                                     */
+/* The journey engine (`questJourneyEngine.ts`) owns the travel fasi    */
+/* schedule — pins, parking, maturations, phase boundaries — through    */
+/* injected host ops implemented here, where the private node machinery */
+/* (arriveNode/matureNode/submitCommand/endRun) lives.                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Pin-defer rule (artifact r011): inside a travel fase a node carrying its
+ * OWN authored pin that the marker has not reached yet defers — the
+ * scheduler opens it at the crossing. A node without a pin INHERITS the
+ * reaching pin and opens immediately. Returns true when the arrival was
+ * deferred (frontier dropped to the travel sentinel).
+ */
+function journeyDeferToPin(state: QuestRunState, nodeId: string): boolean {
+  const jr = state.journey;
+  if (!jr) return false;
+  const fase = jr.journal.currentFase;
+  if (fase === 'svolgimento') return false;
+  const plan = jr.snapshot.fasePlans[fase].find((p) => p.nodeId === nodeId);
+  if (plan) {
+    const entry = jr.journal.beats.find((b) => b.nodeId === nodeId);
+    if (entry && entry.openedAtTick !== null) return false;
+    state.frontier = { status: 'pending', startedAt: state.frontier.startedAt, readyAt: Number.MAX_SAFE_INTEGER };
+    return true;
+  }
+  /* Chain-end convention: inside a travel fase a `next`/goto target that
+   * resolves to no node keeps the party on the road — the route itself is
+   * the frontier. Without this a dangling target would leave a matured
+   * pending frontier behind and `matureReady` would spin on it. */
+  if (!nodesFor(state)[nodeId]) {
+    state.frontier = { status: 'pending', startedAt: state.frontier.startedAt, readyAt: Number.MAX_SAFE_INTEGER };
+    return true;
+  }
+  return false;
+}
+
+/** Waiting beat opens: the party reaches a decision/combat node — the
+ *  normal arrival path makes the frontier interactive. The beat is
+ *  already marked `openedAtTick` so the pin-defer lets it through. */
+function journeyOpenWaitingBeat(state: QuestRunState, nodeId: string, tick: number): void {
+  arriveNode(state, nodeId, tick);
+}
+
+/** Pending beat opens: the scene shows now (node title/body, lastEvent);
+ *  its authored effects land at `resolvedAtTick` via maturePendingBeat.
+ *  The frontier is NOT touched — the journal owns this beat's clock. */
+function journeyPresentPendingBeat(state: QuestRunState, nodeId: string, tick: number): void {
+  const node = nodesFor(state)[nodeId];
+  if (!node) return;
+  state.nowTick = tick;
+  state.nodeId = nodeId;
+  state.frontierVersion += 1;
+  state.visitedNodes.push(nodeId);
+  state.cursorVisitSeq += 1;
+  state.log.push({ kind: 'NODE', text: node.title });
+  if (node.kind === 'info') state.log.push({ kind: 'INFO', text: node.body });
+  state.lastEvent = node.body ?? node.title;
+}
+
+/**
+ * Pending beat matures at `tick`: apply the node's authored effects
+ * through the SAME semantics the timed frontier uses — info/harm via a
+ * matured `matureNode`, checks resolving inline like the arrival branch.
+ * A `next` chain then defers or arrives per the pin rule.
+ */
+function journeyMaturePendingBeat(state: QuestRunState, nodeId: string, tick: number): void {
+  const node = nodesFor(state)[nodeId];
+  if (!node || state.ended) return;
+  state.nowTick = tick;
+  state.nodeId = nodeId;
+  if (node.kind === 'check') {
+    state.frontierVersion += 1;
+    const preMark = state.log.length;
+    const result = resolveCheck(state, node);
+    const outcomeMark = state.log.length;
+    state.lastEvent = `${node.title} — ${result.verdict.toUpperCase()}.`;
+    if (allDead(state)) {
+      drainHarmsIntoLastCheck(state);
+      endRun(state, 'wipe', 'The expedition was wiped out.');
+      return;
+    }
+    const nextId = applyCheckOutcome(state, node, result.verdict);
+    setCheckOutcomeText(state, preMark, outcomeMark);
+    if (allDead(state)) {
+      endRun(state, 'wipe', 'The expedition was wiped out.');
+      return;
+    }
+    arriveNode(state, nextId, tick);
+    drainHarmsToAmbient(state);
+    return;
+  }
+  state.frontier = { status: 'pending', startedAt: tick, readyAt: tick };
+  matureNode(state, tick);
+  // A beat whose `next` resolves nowhere (unmapped fallback) leaves the
+  // swapped matured frontier behind — restore the travel sentinel so the
+  // run never stalls on it.
+  if (!state.ended && state.frontier.status === 'pending' && state.frontier.readyAt <= tick) {
+    state.frontier = travelFrontier(tick);
+  }
+}
+
+/** Andata complete: the engine takes over at the POI — arrival at the
+ *  frozen svolgimento entry node (fase already switched by the caller, so
+ *  the pin-defer is off). */
+function journeyEnterSvolgimento(state: QuestRunState, tick: number): void {
+  const jr = state.journey;
+  if (!jr) return;
+  arriveNode(state, jr.snapshot.svolgimentoEntryNodeId, tick);
+}
+
+/** Ritorno complete: the party reaches the village — terminal arrival.
+ *  The frozen POI verdict becomes the outcome (encumbered loot banks);
+ *  party state applied what the road did to it along the way. */
+function journeyArriveHome(state: QuestRunState, tick: number): void {
+  state.nowTick = tick;
+  state.terminalKind = 'returnWithSurvivors';
+  state.lastFase = 'ritorno';
+  state.settledAtTick = tick;
+  state.outcomeResolvedAtTick = state.outcomeResolvedAtTick ?? tick;
+  finishRun(state, state.verdictAtPoi ?? 'survived', 'The expedition is back at the village.');
+}
+
+/** Waiting beat resolves via the normal command path (choice/combat turn). */
+function journeyResolveWaiting(
+  state: QuestRunState,
+  _nodeId: string,
+  optionId: string,
+  tick: number,
+  opts?: { useConsumable?: boolean; armedFlags?: ReadonlySet<string> },
+): void {
+  submitCommand(state, optionId, { tick, useConsumable: opts?.useConsumable, armedFlags: opts?.armedFlags });
+}
+
+/** The host seam the journey engine drives — single instance per module. */
+const JOURNEY_ENGINE_OPS: JourneyEngineOps = {
+  openWaitingBeat: journeyOpenWaitingBeat,
+  presentPendingBeat: journeyPresentPendingBeat,
+  maturePendingBeat: journeyMaturePendingBeat,
+  enterSvolgimento: journeyEnterSvolgimento,
+  arriveHome: journeyArriveHome,
+  resolveWaiting: journeyResolveWaiting,
+};
+
+/**
+ * Attach the journey runtime to a fresh run (launch-time, once — artifact
+ * r011 "frozen at launch"). The initial frontier becomes the travel
+ * sentinel; pinned beats open as the marker crosses them. Idempotent.
+ */
+export function attachQuestJourney(state: QuestRunState, spec: QuestJourneyLaunchSpec): QuestRunState {
+  if (state.journey) return state;
+  state.journey = buildJourneyRuntime(spec);
+  state.nowTick = spec.launchedAtTick;
+  state.frontier = travelFrontier(spec.launchedAtTick);
+  return state;
+}
+
+/**
+ * Drive a journey-enabled run's travel clock to `t1` — the discrete-event
+ * loop (pins → maturations → boundary, park accounting, watermark). During
+ * svolgimento it only tracks the watermark: the scenario engine owns the
+ * clock there (`matureReady`/`submitCommand` as usual). No-op on legacy
+ * runs and on `t1 <= processedUpToTick`; throws if `t1` is behind the
+ * watermark.
+ */
+export function advanceJourneyRun(state: QuestRunState, t1: number): QuestRunState {
+  advanceJourney(state, t1, JOURNEY_ENGINE_OPS);
+  return state;
+}
+
+/**
+ * Resolve a parked journey decision at `tick`: park accounting, the host
+ * resolution path, then the idempotent drain-at-T in canonical order —
+ * before any advance beyond T. During svolgimento (or for legacy runs)
+ * callers keep using `submitCommand` directly.
+ */
+export function resolveJourneyRunDecision(
+  state: QuestRunState,
+  optionId: string,
+  tick: number,
+  opts?: { useConsumable?: boolean; armedFlags?: ReadonlySet<string> },
+): QuestRunState {
+  state.nowTick = tick;
+  resolveJourneyDecision(state, optionId, tick, JOURNEY_ENGINE_OPS, opts);
+  return state;
 }

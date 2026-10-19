@@ -27,6 +27,8 @@ import {
   normalizeRunOverlayIdentity,
   registerScenarioInstance,
   scenarioInstanceById,
+  advanceJourneyRun,
+  resolveJourneyRunDecision,
   submitCommand,
   useHealing as applyHealing,
   type CreateRunInput,
@@ -151,7 +153,6 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
        *  empty; the first syncClock re-marks and projects only new commits. */
       markRef.current = beatMark(payload.run);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saveKey]);
 
   /* PLAN-040 T-003a: publish every committed run state to the external
@@ -260,13 +261,30 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
        * `useConsumable` explicitly (lab, Monte Carlo, legacy tests) keeps the
        * bag-level boolean semantics — the per-item set is the window's path. */
       const eff = new Set([...armedFlags].filter((f) => run.flags.includes(f)));
+      /* PLAN-053: a parked journey beat resolves through the drain-at-T
+       * path (park accounting + coincident-event drain), not a bare
+       * `submitCommand` — outside a park the normal path applies. */
+      const parked =
+        run.journey !== undefined &&
+        run.journey.journal.currentFase !== 'svolgimento' &&
+        run.journey.journal.parkedNodeId !== null;
+      /* The decision lands at the caller's tick, but never behind the
+       * watermark — a click can arrive before this tick's syncClock ran. */
+      const decisionTick = parked
+        ? Math.max(tickRef.current, run.journey!.journal.processedUpToTick)
+        : tickRef.current;
       act(
         (state) =>
-          submitCommand(state, optionId, {
-            useConsumable: opts?.useConsumable,
-            tick: tickRef.current,
-            armedFlags: opts?.useConsumable === undefined ? eff : undefined,
-          }),
+          parked
+            ? resolveJourneyRunDecision(state, optionId, decisionTick, {
+                useConsumable: opts?.useConsumable,
+                armedFlags: opts?.useConsumable === undefined ? eff : undefined,
+              })
+            : submitCommand(state, optionId, {
+                useConsumable: opts?.useConsumable,
+                tick: tickRef.current,
+                armedFlags: opts?.useConsumable === undefined ? eff : undefined,
+              }),
         label,
       );
     },
@@ -292,8 +310,32 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   const syncClock = useCallback(
     (tick: number) => {
       tickRef.current = tick;
+      if (!run || run.ended) return;
+      /* PLAN-053: journey runs drive the discrete-event scheduler every
+       * tick — pin crossings, park accounting, beat maturations, fase
+       * boundaries — while the frontier clock still matures chained
+       * pending nodes (inherited pins) and all of svolgimento. */
+      if (run.journey) {
+        /* Production clamp (artifact r011): a caller tick behind the
+         * persisted watermark is a clock regression — skip with a
+         * structured warning instead of the engine's dev-time throw. */
+        if (tick < run.journey.journal.processedUpToTick) {
+          console.warn('[questJourney] clock regression: syncClock tick behind processedUpToTick', {
+            tick,
+            processedUpToTick: run.journey.journal.processedUpToTick,
+            fase: run.journey.journal.currentFase,
+          });
+          return;
+        }
+        act((state) => {
+          advanceJourneyRun(state, tick);
+          matureReady(state, tick);
+          return state;
+        }, undefined);
+        return;
+      }
       // Nothing to do unless a timed frontier has actually matured.
-      if (!run || run.ended || run.frontier.status !== 'pending' || tick < run.frontier.readyAt) return;
+      if (run.frontier.status !== 'pending' || tick < run.frontier.readyAt) return;
       act((state) => matureReady(state, tick), undefined);
     },
     [run, act],
@@ -315,7 +357,7 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
 
   /* R-199: abandon is a real engine command (flee) — beats, phase records
    *  and persistence all follow the same commit path as a choice. */
-  const abandon = useCallback(() => act((state) => flee(state), undefined), [act]);
+  const abandon = useCallback(() => act((state) => flee(state, tickRef.current), undefined), [act]);
 
   // Theatre adapter (PLAN-025 T-007): stable across renders so its commandId
   // dedupe set never resets; reads the latest run/tick through refs, and every

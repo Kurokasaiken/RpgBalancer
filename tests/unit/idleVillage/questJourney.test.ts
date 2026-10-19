@@ -48,6 +48,7 @@ const SNAPSHOT = { travelDays: 2, ticksPerDay: 5, route: buildJourneyPolyline({ 
 /* ------------------------------------------------------------------ */
 
 describe('QuestPoiSchema.fasi (additive journey contract)', () => {
+  // INV:quest-run.INV-2
   it('parses a legacy POI without fasi → journeyFasiOf is null (legacy sentinel)', () => {
     const poi = QuestPoiSchema.parse(BASE_POI);
     expect(poi.fasi).toBeUndefined();
@@ -197,7 +198,9 @@ describe('travelTicksConsumed / faseAt', () => {
   });
 
   it('endpointResolving false when the opened beat is resolved or unopened', () => {
-    const resolved: JourneyBeatEntry = { nodeId: 'n-a', pin: 0.9, kind: 'pending', openedAtTick: 8, resolvedAtTick: 12 };
+    // T-003 semantics: a pending beat is done when its effects LANDED —
+    // resolvedAtTick is only the schedule, appliedAtTick the authority.
+    const resolved: JourneyBeatEntry = { nodeId: 'n-a', pin: 0.9, kind: 'pending', openedAtTick: 8, resolvedAtTick: 12, appliedAtTick: 12 };
     const unopened: JourneyBeatEntry = { nodeId: 'n-b', pin: 0.9, kind: 'pending', openedAtTick: null, resolvedAtTick: null };
     expect(faseAt(SNAPSHOT, journal({ processedUpToTick: 10, beats: [resolved] })).endpointResolving).toBe(false);
     expect(faseAt(SNAPSHOT, journal({ processedUpToTick: 10, beats: [unopened] })).endpointResolving).toBe(false);
