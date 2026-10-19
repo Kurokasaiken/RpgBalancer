@@ -191,9 +191,16 @@ describe('PLAN-053 T-002 — legacy run characterization (fasi === null)', () =>
   const goblin = questPoiById('poi-goblin')!;
   const rovine = questPoiById('poi-rovine')!;
 
-  it('every shipped POI is still journey-free — the frozen surface IS the legacy one', () => {
-    expect(goblin.fasi).toBeUndefined();
-    expect(rovine.fasi).toBeUndefined();
+  it('the golden runs stay on the legacy lifecycle — `fasi` authoring never self-activates', () => {
+    /* T-004 authored `fasi` on the shipped POIs, but journey mode is opt-in
+     * at LAUNCH (`CreateRunInput.journey`), never injected by the POI alone.
+     * `traceRun` launches without it → `run.journey` must stay absent and the
+     * golden surface below remains the legacy lifecycle. A task that changes
+     * this (auto-wiring fasi → spec at createRun level) must regenerate the
+     * goldens in the same PR. */
+    expect(goblin.fasi).toBeDefined();
+    const run = createRun(GOBLIN_PRESETS[0].id, SEED, 'goblin', undefined, { nodeTicks: NODE_TICKS, startTick: START_TICK });
+    expect(run.journey).toBeUndefined();
   });
 
   it('goblin — complete path: journal, poiView timeline, terminal record, settlement', async () => {

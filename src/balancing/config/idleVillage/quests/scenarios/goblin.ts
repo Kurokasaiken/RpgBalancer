@@ -305,10 +305,14 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   },
 
   /* F7 — RETURN / AMBUSH. 'gob-ritorno' routes: extermination → end clean;
-   * else → ambush (5 dry dmg to all) → drop trophy OR last stand. */
+   * else → ambush (5 dry dmg to all) → drop trophy OR last stand.
+   * PLAN-053 T-004: the whole cluster is `fase:'ritorno'` — road beats on
+   * the way home; only 'gob-ritorno' and 'gob-fine' carry authored pins
+   * (questPois.fasi), the ambush chain inherits the reaching pin. */
   'gob-ritorno': {
     id: 'gob-ritorno',
     kind: 'info',
+    fase: 'ritorno',
     title: 'The road home',
     body: 'The road descends toward home. Someone has started whistling. Then stops, without anyone saying why.',
     next: 'gob-agguato',
@@ -320,6 +324,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-agguato': {
     id: 'gob-agguato',
     kind: 'harm',
+    fase: 'ritorno',
     title: 'Ambush on the road',
     body: 'The whistling cuts off mid-note. An arrow in the post beside you. Then all the others.',
     next: 'gob-agguato-scelta',
@@ -333,6 +338,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-agguato-scelta': {
     id: 'gob-agguato-scelta',
     kind: 'choice',
+    fase: 'ritorno',
     title: 'Trophy or blood',
     body: 'You can drop the trophy and run — or fight the last melee.',
     transit: 'Around you, the wood closes in again. One choice remains: leave the trophy, or leave someone.',
@@ -356,6 +362,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-ultimo-scontro': {
     id: 'gob-ultimo-scontro',
     kind: 'combat',
+    fase: 'ritorno',
     title: 'The last melee',
     body: 'A fight as dry as a bone snapping. The profile decides who pays.',
     transit: 'The last melee is not a battle: it is a debt to settle. Whoever stays to cover pays for everyone.',
@@ -378,6 +385,7 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-fine': {
     id: 'gob-fine',
     kind: 'end',
+    fase: 'ritorno',
     title: 'Return to the village',
     body: 'The expedition is over.',
     transit: 'The road opens onto the village. Those who return count the names of those who do not — and those who saw it know what it cost.',

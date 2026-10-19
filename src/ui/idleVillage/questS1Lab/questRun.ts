@@ -2482,6 +2482,7 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
       state.goblinLeft = node.combat?.enemies ?? 0;
       state.lastEvent = node.body;
       state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick + state.nodeTicks };
+      journeyParkWaiting(state, cursor, tick);
       return;
     }
 
@@ -2583,10 +2584,15 @@ function arriveNode(state: QuestRunState, nodeId: string, tick: number): void {
     // carry weight 0 and unlock immediately on arrival (`readyAt = tick`).
     // PLAN-053: a journey run does not end at an end node — `journeyOutcome`
     // already opened ritorno and set the travel sentinel; do not re-arm a
-    // waiting frontier on the end node.
+    // waiting frontier on the end node. During ritorno an end node is road
+    // content, not the terminal: restore the sentinel so the boundary can
+    // still fire once the marker reaches the village.
     if (!state.ended && !(state.journey && node.kind === 'end')) {
       const waitTicks = node.kind === 'choice' && node.immediate ? 0 : state.nodeTicks;
       state.frontier = { status: 'waiting', startedAt: tick, readyAt: tick + waitTicks };
+      journeyParkWaiting(state, cursor, tick);
+    } else if (state.journey && !state.ended && node.kind === 'end') {
+      state.frontier = travelFrontier(tick);
     }
     return;
   }
@@ -3051,30 +3057,67 @@ export function normalizeRunOverlayIdentity(run: QuestRunState): QuestRunState {
 /* ------------------------------------------------------------------ */
 
 /**
- * Pin-defer rule (artifact r011): inside a travel fase a node carrying its
- * OWN authored pin that the marker has not reached yet defers — the
- * scheduler opens it at the crossing. A node without a pin INHERITS the
- * reaching pin and opens immediately. Returns true when the arrival was
- * deferred (frontier dropped to the travel sentinel).
+ * Pin-defer rule (artifact r011, extended in T-004): inside a travel fase a
+ * node carrying its OWN authored pin that the marker has not reached yet
+ * defers — the scheduler opens it at the crossing. A node without a pin
+ * INHERITS the reaching pin and opens immediately when it shares the
+ * current fase; a node attributed to a DIFFERENT fase never arrives during
+ * a travel leg — the party stays on the road (the route is the frontier).
+ * During `svolgimento` the first `ritorno`-attributed node the scenario
+ * reaches IS the phase boundary: the POI verdict freezes
+ * (`journeyOutcome`), the journal switches to ritorno and the node defers
+ * to its pin like any other return beat. Returns true when the arrival
+ * was deferred (frontier dropped to the travel sentinel).
  */
 function journeyDeferToPin(state: QuestRunState, nodeId: string): boolean {
   const jr = state.journey;
   if (!jr) return false;
   const fase = jr.journal.currentFase;
-  if (fase === 'svolgimento') return false;
+  const node = nodesFor(state)[nodeId];
+  if (fase === 'svolgimento') {
+    if (!node || (node.fase ?? 'svolgimento') !== 'ritorno') return false;
+    /* Boundary crossing: freeze the POI verdict and open the return leg —
+     * same lifecycle write `journeyOutcome` performs on an end node. */
+    const lead = leader(state);
+    journeyOutcome(
+      state,
+      allDead(state) ? 'wipe' : state.objectiveDone && lead && !lead.dead ? 'reward' : 'survived',
+      'The work at the site is done — the party turns toward home.',
+    );
+    if (state.ended) return true;
+    return journeyDeferToPin(state, nodeId);
+  }
   const plan = jr.snapshot.fasePlans[fase].find((p) => p.nodeId === nodeId);
   if (plan) {
     const entry = jr.journal.beats.find((b) => b.nodeId === nodeId);
-    if (entry && entry.openedAtTick !== null) return false;
-    state.frontier = { status: 'pending', startedAt: state.frontier.startedAt, readyAt: Number.MAX_SAFE_INTEGER };
+    if (entry && entry.openedAtTick !== null) {
+      /* The chain reached an already-opened pinned beat — the arrival IS
+       * the beat's discharge (an end node's verdict overwrite, an info's
+       * effects already shown at its pin). Mark it applied so the
+       * scheduled maturation does not re-run the node a second time. */
+      if (entry.kind === 'pending' && entry.appliedAtTick === null) {
+        entry.appliedAtTick = state.nowTick ?? null;
+      }
+      return false;
+    }
+    state.frontier = travelFrontier(state.nowTick ?? state.frontier.startedAt);
     return true;
   }
   /* Chain-end convention: inside a travel fase a `next`/goto target that
    * resolves to no node keeps the party on the road — the route itself is
    * the frontier. Without this a dangling target would leave a matured
    * pending frontier behind and `matureReady` would spin on it. */
-  if (!nodesFor(state)[nodeId]) {
-    state.frontier = { status: 'pending', startedAt: state.frontier.startedAt, readyAt: Number.MAX_SAFE_INTEGER };
+  if (!node) {
+    state.frontier = travelFrontier(state.nowTick ?? state.frontier.startedAt);
+    return true;
+  }
+  /* Fase attribution (T-004): an unpinned node tagged with the current fase
+   * inherits the reaching pin and arrives; a node of another fase is
+   * out-of-leg content — the marker keeps walking and the node waits on
+   * the road (andata content never skips into the POI early; svolgimento
+   * content never re-opens on the way home). */
+  if ((node.fase ?? 'svolgimento') !== fase) {
+    state.frontier = travelFrontier(state.nowTick ?? state.frontier.startedAt);
     return true;
   }
   return false;
@@ -3087,15 +3130,32 @@ function journeyOpenWaitingBeat(state: QuestRunState, nodeId: string, tick: numb
   arriveNode(state, nodeId, tick);
 }
 
+/**
+ * Park registration for UNPINNED waiting arrivals (T-004): a chain node
+ * that inherits the reaching pin arrives normally — when it commits a
+ * waiting frontier during a travel leg the marker must freeze on it, or
+ * the route would keep filling while a decision waits. Pinned beats are
+ * already parked by the scheduler before `openWaitingBeat`, so the guard
+ * never double-registers.
+ */
+function journeyParkWaiting(state: QuestRunState, nodeId: string, tick: number): void {
+  const j = state.journey?.journal;
+  if (!j || (j.currentFase !== 'andata' && j.currentFase !== 'ritorno')) return;
+  if (j.parkedNodeId !== null) return;
+  j.parkedNodeId = nodeId;
+  j.parkedAtTick = tick;
+}
+
 /** Pending beat opens: the scene shows now (node title/body, lastEvent);
  *  its authored effects land at `resolvedAtTick` via maturePendingBeat.
- *  The frontier is NOT touched — the journal owns this beat's clock. */
+ *  `nodeId`/`frontier` stay untouched — they belong to the run's single
+ *  content cursor (`matureNode` resolves `state.nodeId` against the
+ *  frontier's node): a beat presenting while a chain is mid-flight must
+ *  not hijack the in-flight node. */
 function journeyPresentPendingBeat(state: QuestRunState, nodeId: string, tick: number): void {
   const node = nodesFor(state)[nodeId];
   if (!node) return;
   state.nowTick = tick;
-  state.nodeId = nodeId;
-  state.frontierVersion += 1;
   state.visitedNodes.push(nodeId);
   state.cursorVisitSeq += 1;
   state.log.push({ kind: 'NODE', text: node.title });
@@ -3172,9 +3232,9 @@ function journeyResolveWaiting(
   _nodeId: string,
   optionId: string,
   tick: number,
-  opts?: { useConsumable?: boolean; armedFlags?: ReadonlySet<string> },
+  opts?: { useConsumable?: boolean; forceDie?: number; armedFlags?: ReadonlySet<string> },
 ): void {
-  submitCommand(state, optionId, { tick, useConsumable: opts?.useConsumable, armedFlags: opts?.armedFlags });
+  submitCommand(state, optionId, { tick, useConsumable: opts?.useConsumable, forceDie: opts?.forceDie, armedFlags: opts?.armedFlags });
 }
 
 /** The host seam the journey engine drives — single instance per module. */
@@ -3223,9 +3283,111 @@ export function resolveJourneyRunDecision(
   state: QuestRunState,
   optionId: string,
   tick: number,
-  opts?: { useConsumable?: boolean; armedFlags?: ReadonlySet<string> },
+  opts?: { useConsumable?: boolean; forceDie?: number; armedFlags?: ReadonlySet<string> },
 ): QuestRunState {
   state.nowTick = tick;
   resolveJourneyDecision(state, optionId, tick, JOURNEY_ENGINE_OPS, opts);
   return state;
+}
+
+/* ------------------------------------------------------------------ */
+/* DAG-validator edge probe (PLAN-053 T-004)                            */
+/*                                                                      */
+/* The validator needs the REAL destination set of every node — the     */
+/* declarative fields are static, but legacy check nodes route through  */
+/* the id-keyed `applyNodeOutcome` switch, opaque to static reading.    */
+/* The probe drives `applyCheckOutcome` over all five verdicts on       */
+/* throwaway run states, twice: clean and `campoSveglio`-flagged (the   */
+/* INSIDE_CHECKS → 'risveglio' hijack only fires on a waking camp).    */
+/* ------------------------------------------------------------------ */
+
+/** The five verdicts `resolveCheck` can produce — the probe's sweep. */
+const JOURNEY_PROBE_VERDICTS: readonly Verdict[] = ['epicfail', 'fail', 'almost', 'win', 'bigwin'];
+
+/**
+ * State-dependent destinations the probe cannot enumerate per-verdict:
+ * `matureNode`'s `gob-ritorno` router branches on the `sterminio` flag,
+ * not on a verdict. Mirrors the line `node.id === 'gob-ritorno' &&
+ * flags.includes('sterminio') ? 'gob-fine' : node.next` — drift-checked by
+ * `questJourneyAuthoring.test.ts`, which drives the real router on both
+ * flag states and asserts every destination is declared here or in
+ * `node.next`.
+ */
+export const JOURNEY_ROUTE_EXTRAS: Readonly<Record<string, readonly string[]>> = {
+  'gob-ritorno': ['gob-fine'],
+};
+
+/** Every id a `GotoSpec` may route to (plain id, or branches + else). */
+function gotoSpecTargetsOf(spec: GotoSpec): string[] {
+  if (typeof spec === 'string') return [spec];
+  return [...spec.branches.map((b) => b.then), spec.else];
+}
+
+/** Probe instance counter — registry ids must be unique per call. */
+let journeyProbeSeq = 0;
+
+/** A minimal probe run — a fully shaped state the outcome switch can
+ *  legally mutate. `extraFlags` seeds camp-alertness variants. */
+function journeyProbeState(nodes: Record<string, QuestNode>, startNode: string, extraFlags: readonly string[]): QuestRunState {
+  const state = createRun({
+    party: {
+      members: [
+        { id: 'probe-lead', name: 'Probe', role: 'leader', hp: 999, stats: { str: 50, con: 50, agi: 50, perc: 50, int: 50, cha: 50 } },
+      ],
+    },
+    seed: 1,
+    questId: 'gen',
+    scenarioInstance: {
+      instanceId: `qsi-journey-probe-${(journeyProbeSeq += 1)}`,
+      questId: 'gen',
+      scenarioHash: 'journey-probe',
+      nodes,
+      startNode,
+    },
+  });
+  state.flags.push(...extraFlags);
+  return state;
+}
+
+/**
+ * The destination set the DAG validator reasons over: every node id a
+ * node can route to under the real engine. Declared edges (`next`,
+ * options — `CHECK:<id>` resolved to the check node — combat routes,
+ * `verdictTable` gotos) are collected statically; legacy check nodes are
+ * probed live per verdict; state-dependent router specials come from
+ * {@link JOURNEY_ROUTE_EXTRAS}. Targets that resolve to no node (the
+ * `?? 'ritorno'` magic fallback on maps without one) are reported too —
+ * the validator treats them as road-sentinel terminals, not errors.
+ */
+export function probeQuestJourneyEdges(
+  nodes: Record<string, QuestNode>,
+  startNode: string,
+): Record<string, string[]> {
+  const out: Record<string, Set<string>> = {};
+  const add = (from: string, to: string | undefined) => {
+    if (!to) return;
+    (out[from] ??= new Set<string>()).add(to);
+  };
+  for (const node of Object.values(nodes)) {
+    if (node.next) add(node.id, node.next);
+    for (const opt of node.options ?? []) {
+      add(node.id, opt.next.startsWith('CHECK:') ? opt.next.slice('CHECK:'.length) : opt.next);
+    }
+    if (node.combat?.nextCleared) add(node.id, node.combat.nextCleared);
+    if (node.combat?.nextSurvivors) add(node.id, node.combat.nextSurvivors);
+    if (node.verdictTable) {
+      for (const spec of Object.values(node.verdictTable)) {
+        if (spec) for (const t of gotoSpecTargetsOf(spec.goto)) add(node.id, t);
+      }
+    } else if (node.kind === 'check') {
+      for (const flags of [[], ['campoSveglio']] as const) {
+        const probe = journeyProbeState(nodes, startNode, flags);
+        for (const verdict of JOURNEY_PROBE_VERDICTS) {
+          add(node.id, applyCheckOutcome(probe, node, verdict));
+        }
+      }
+    }
+    for (const extra of JOURNEY_ROUTE_EXTRAS[node.id] ?? []) add(node.id, extra);
+  }
+  return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, [...v]]));
 }

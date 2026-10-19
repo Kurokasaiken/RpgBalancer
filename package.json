@@ -45,6 +45,7 @@
     "world:crop-verify": "node scripts/verify-world-layer-crops.mjs",
     "world:dilate": "node --max-old-space-size=8192 scripts/dilate-silhouettes.mjs",
     "validate:systems": "tsx scripts/validate-systems.ts",
+    "quest:journey:lint": "npm run test:unit -- tests/unit/idleVillage/questJourneyAuthoring.test.ts",
     "devops:boot-guard": "tsx scripts/devtools/multiAppBootGuard.ts",
     "safeguard:full": "npm run test && npm run build:check && npm run closure:lint",
     "preview": "vite preview",

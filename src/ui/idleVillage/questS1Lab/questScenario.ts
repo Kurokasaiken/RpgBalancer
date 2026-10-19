@@ -200,6 +200,15 @@ export interface QuestNode {
    * Generated nodes carry this; authored nodes stay on the switch.
    */
   verdictTable?: VerdictTable;
+  /**
+   * PLAN-053 journey attribution (T-004): which fase the node belongs to
+   * when the run is journey-enabled (`QuestPoi.fasi` authored). Absent =
+   * `svolgimento` (POI content). `andata`/`ritorno` nodes are road beats —
+   * reachable only while the route marker walks that leg; a pinned one
+   * (`fasi.pins`) opens at its arc-length fraction, an unpinned one
+   * inherits the reaching pin. On legacy runs the field is inert.
+   */
+  fase?: 'andata' | 'svolgimento' | 'ritorno';
 }
 
 /**
@@ -304,6 +313,7 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
   viaggio: {
     id: 'viaggio',
     kind: 'choice',
+    fase: 'andata',
     title: 'Viaggio — il Passo del Corvo',
     body: 'La carovana è stata assalita sul Passo. Un ambulante in fuga offre tre oggetti — ma la borsa non basta per tutto.',
     beat: 0,
@@ -346,6 +356,7 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
   incidente: {
     id: 'incidente',
     kind: 'harm',
+    fase: 'andata',
     title: 'Incidente sul Passo',
     body: 'Una frana improvvisa coglie la spedizione. Non è una prova: è un pericolo diretto — il bodyguard non può intercettarlo.',
     next: 'avvistamento',
@@ -600,6 +611,7 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
   ritorno: {
     id: 'ritorno',
     kind: 'end',
+    fase: 'ritorno',
     title: 'Ritorno al villaggio',
     body: 'La spedizione è finita.',
     beat: 7,
