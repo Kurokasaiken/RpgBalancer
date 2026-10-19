@@ -99,6 +99,13 @@ export const QuestJourneyFasiSchema = z
       .optional(),
     /** scenario nodeId → pin in [0,1] (phase-local arc-length fraction). */
     pins: z.record(z.string().min(1), z.number().min(0).max(1)).optional(),
+    /**
+     * Scenario node the engine arrives at when `svolgimento` opens
+     * (T-004). Required only when `startNode` itself is attributed to a
+     * travel fase (e.g. an `andata` merchant beat); otherwise the entry is
+     * the scenario `startNode`.
+     */
+    svolgimentoEntryNodeId: z.string().min(1).optional(),
   })
   .strict();
 export type QuestJourneyFasi = z.infer<typeof QuestJourneyFasiSchema>;
@@ -244,6 +251,14 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
      *  consumes the POI, so once a settled run is cleared the offer goes back
      *  to `available` and can be launched again (QUEST_RULES §lifecycle). */
     repeatable: true,
+    /* PLAN-053 T-004: journey-enabled — 2 game days each leg (placeholder
+     *  balanced with the POI's 110-tick scenario span). Pins: the ambush
+     *  router opens a fifth of the way home (its chain inherits), the end
+     *  node lands at the village. */
+    fasi: {
+      travelDays: 2,
+      pins: { 'gob-ritorno': 0.2, 'gob-fine': 1 },
+    },
   },
   {
     id: 'poi-rovine',
@@ -257,6 +272,13 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
     slots: {
       required: ['rovine-slot-leader'],
       optional: ['rovine-slot-member-1', 'rovine-slot-member-2', 'rovine-slot-esploratore'],
+    },
+    /* PLAN-053 T-004: journey-enabled — 3 game days each leg (the ruins
+     *  sit further out). The wounded man waits mid-route (parked decision),
+     *  'rv-fine' lands at the village. */
+    fasi: {
+      travelDays: 3,
+      pins: { 'rv-ritorno-evento': 0.5, 'rv-fine': 1 },
     },
   },
 ]);

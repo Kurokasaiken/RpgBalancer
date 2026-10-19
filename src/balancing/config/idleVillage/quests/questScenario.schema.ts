@@ -348,6 +348,12 @@ export const QuestNodeSchema = z
     verdictTable: VerdictTableSchema.optional(),
     /** PLAN-043 WS-4: authored cinema direction (presentation only). */
     stageDirection: StageDirectionSchema.optional(),
+    /**
+     * PLAN-053 journey fase attribution (T-004): absent = `svolgimento`.
+     * `andata`/`ritorno` nodes are road beats driven by the route marker;
+     * pins live on `QuestPoi.fasi.pins`. Inert on legacy runs.
+     */
+    fase: z.enum(['andata', 'svolgimento', 'ritorno']).optional(),
   })
   .strict();
 export type QuestNodeSchemaType = z.infer<typeof QuestNodeSchema>;

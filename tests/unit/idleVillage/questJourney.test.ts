@@ -48,17 +48,19 @@ const SNAPSHOT = { travelDays: 2, ticksPerDay: 5, route: buildJourneyPolyline({ 
 /* ------------------------------------------------------------------ */
 
 describe('QuestPoiSchema.fasi (additive journey contract)', () => {
-  // INV:quest-run.INV-2
+  // INV:quest-journey.INV-1
   it('parses a legacy POI without fasi → journeyFasiOf is null (legacy sentinel)', () => {
     const poi = QuestPoiSchema.parse(BASE_POI);
     expect(poi.fasi).toBeUndefined();
     expect(journeyFasiOf(poi)).toBeNull();
   });
 
-  it('keeps every shipped POI journey-free at T-001 (no default injected — T-004 re-authors)', () => {
-    // Tripwire: T-001 must stay strictly additive. When T-004 authors
-    // `fasi` on the real POIs this expectation is updated in the same PR.
-    expect(QUEST_POIS.every((p) => p.fasi === undefined)).toBe(true);
+  it('enables journeys only on the T-004-authored POIs (no default injected elsewhere)', () => {
+    // Tripwire updated at T-004: `fasi` is authored on exactly the shipped
+    // journey POIs; every other POI still carries the legacy sentinel —
+    // the schema never injects a default.
+    const enabled = QUEST_POIS.filter((p) => p.fasi !== undefined).map((p) => p.id);
+    expect(enabled.sort()).toEqual(['poi-goblin', 'poi-rovine']);
   });
 
   it('accepts travelDays integer >= 1 and carries waypoints + pins', () => {
@@ -212,6 +214,7 @@ describe('travelTicksConsumed / faseAt', () => {
 /* ------------------------------------------------------------------ */
 
 describe('beatSeed / beatDraw', () => {
+  // INV:quest-journey-engine.INV-1
   it('is deterministic per (runSeed, nodeId, callIndex)', () => {
     const s = beatSeed(42, 'n-mercante');
     expect(beatDraw(s, 0)).toBe(beatDraw(s, 0));

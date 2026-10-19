@@ -241,6 +241,7 @@ const ROVINE_NODES: Record<string, QuestNode> = {
   'rv-ritorno-evento': {
     id: 'rv-ritorno-evento',
     kind: 'choice',
+    fase: 'ritorno',
     title: 'The wounded man on the road',
     body: 'On the way home you find a wounded man, abandoned by his own. He looks at you the way one looks at a last chance.',
     beat: 6,
@@ -277,6 +278,7 @@ const ROVINE_NODES: Record<string, QuestNode> = {
   'rv-fine': {
     id: 'rv-fine',
     kind: 'end',
+    fase: 'ritorno',
     title: 'Return to the village',
     body: 'The expedition is over.',
     beat: 6,

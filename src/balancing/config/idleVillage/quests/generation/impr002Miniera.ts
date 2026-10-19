@@ -779,6 +779,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
   'mi-ritorno': {
     id: 'mi-ritorno',
     kind: 'info',
+    fase: 'ritorno',
     title: 'The levels give you back',
     body: 'The galleries close behind you with no comment. Whatever happened at the seam, nine families still wait at the cage — and the deep keeps its own answer about where their men went.',
     transit: 'A quiet way up, purchased one way or another.',
@@ -788,6 +789,7 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
   'mi-fine': {
     id: 'mi-fine',
     kind: 'end',
+    fase: 'ritorno',
     title: 'Return to the village',
     body: 'The expedition is over. The village gets its answer about the collapse — and a worse question about where the taken went.',
     beat: 6,
