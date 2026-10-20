@@ -29,6 +29,7 @@ import {
 } from './questRun';
 import { defaultStrategy, hashSimInput, simulateQuest, simulateQuestAsync, type QuestSimResult, type SimStrategy } from './questSimulation';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
+import { localizeScenario } from '@/balancing/config/idleVillage/quests/questContentLocale';
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
 import { computeScenarioVersion, type QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { dangerBandFor, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
@@ -49,6 +50,14 @@ const SCENARIOS: Partial<Record<QuestId, QuestScenario>> = {
 /** Parsed scenario for a quest id — `undefined` for quests without a
  *  canonical scenario (cassa stays lab-only in this slice). */
 export function scenarioForQuest(questId: QuestId): QuestScenario | undefined {
+  const base = SCENARIOS[questId];
+  /* The scenario the UI reads follows the content locale (R-234). `resolveQuestOffer` keeps resolving
+   * on `baseScenarioForQuest`: the instance hash and the persisted offer never depend on the language. */
+  return base ? localizeScenario(base, questId) : undefined;
+}
+
+/** The authored (English) scenario — hash input and simulation base; never localized. */
+export function baseScenarioForQuest(questId: QuestId): QuestScenario | undefined {
   return SCENARIOS[questId];
 }
 
@@ -151,7 +160,7 @@ export function resolveQuestOffer(
     bandSim?: { runs?: number; seed?: number; strategy?: SimStrategy };
   },
 ): ResolvedQuestOffer {
-  const scenario = scenarioForQuest(poi.questId);
+  const scenario = baseScenarioForQuest(poi.questId);
   if (!scenario) throw new Error(`resolveQuestOffer: nessuno scenario canonico per questId '${poi.questId}'`);
   const signals = opts?.signals ?? collectWorldProgressSignals();
   const scales = computeWorldScales(signals);
