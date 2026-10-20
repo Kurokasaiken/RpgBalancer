@@ -976,7 +976,8 @@
       "wonder": "Sea wonder",
       "settlementLost": "Settlement lost",
       "merchantMarker": "Merchant marker",
-      "levelUp": "Hero level-up"
+      "levelUp": "Hero level-up",
+      "resetInitial": "Initial state"
     },
     "roster": {
       "title": "Roster",
