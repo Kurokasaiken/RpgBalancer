@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fork visivi /game v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --border:rgba(223,184,87,.50);
+  --display:"Cinzel","Trajan Pro",serif; --serif:"EB Garamond",Georgia,serif;
+  --title:#f0cf6a; --text:#F5F2E8; --text2:rgba(245,242,232,.72); --label:#c9a84e;
+  --lift:#0f2a35; --deep:#060f16;
+  --crest:#d8bd78; --hi:#cfaf63; --mid:#c2a355; --low:#a0762f; --base:#5f3f16;
+  --parch:#e8d6ae; --ink:#2b1d10; --ember:#c9663a; --ember2:#f2b38f; --iron:#7d8a8c;
+  --page:#0b1c22; --body:#e9dfc6; --dim:#a9b3ad; --rule:rgba(223,184,87,.22);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--body);font:16px/1.5 var(--serif)}
+header,main,footer{max-width:1180px;margin:0 auto;padding-left:16px;padding-right:16px}
+header{padding-top:32px}
+h1{font:600 26px var(--display);letter-spacing:.06em;color:var(--title);margin:0 0 6px}
+header p,.why{color:var(--dim);max-width:920px;margin:0 0 12px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+nav.toc a{font:500 12px var(--display);letter-spacing:.08em;color:var(--crest);text-decoration:none;border:1px solid var(--rule);border-radius:999px;padding:3px 10px}
+code{font:.82em ui-monospace,Menlo,monospace;color:var(--crest)}
+.fork{border-top:1px solid var(--rule);padding:28px 0}
+.fork h2{font:600 18px var(--display);letter-spacing:.05em;color:var(--crest);margin:0 0 4px}
+.row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.row{grid-template-columns:1fr}}
+.col h3{font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:0 0 8px}
+.note{font-size:14px;color:var(--dim);margin-top:8px}
+.base img{width:100%;border-radius:8px;border:1px solid var(--rule);display:block}
+.stage{background:radial-gradient(120% 90% at 50% 0%,#14343a 0%,#0b1f25 60%,#081419 100%);border:1px solid var(--rule);border-radius:8px;padding:14px;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden}
+.stage.map{background:radial-gradient(130% 110% at 40% 30%,#6f8a4c 0%,#4f6a3a 35%,#8b6a3e 60%,#2f6f74 85%)}
+.matrix{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;table-layout:fixed}
+.matrix th,.matrix td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:top}
+.matrix th:first-child,.matrix td:first-child{width:34%}
+.matrix th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label);text-transform:uppercase}
+.win{color:var(--title)}
+.replay{font:500 12px var(--display);letter-spacing:.08em;color:var(--crest);background:var(--deep);border:1px solid var(--border);border-radius:999px;padding:4px 12px;min-height:32px;cursor:pointer}
+/* --- primitive di famiglia --- */
+.plaque{background:linear-gradient(180deg,var(--lift),var(--deep));border:1.5px solid var(--hi);border-radius:12px;box-shadow:0 10px 24px rgba(3,26,30,.6),inset 0 0 0 3px var(--deep),inset 0 0 0 4px rgba(207,175,99,.3);padding:14px 16px;color:var(--text)}
+.t-disp{font:600 13px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--title)}
+.t-label{font:500 11px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label)}
+.t-body{font:400 15px/1.4 var(--serif);color:var(--text)}
+.t-small{font:400 13px/1.35 var(--serif);color:var(--text2)}
+.rule{height:1px;background:linear-gradient(90deg,transparent,rgba(207,175,99,.55),transparent);margin:8px 0}
+.btn{font:600 12px var(--display);letter-spacing:.14em;color:var(--title);background:linear-gradient(180deg,var(--lift),var(--deep));border:1px solid var(--border);border-radius:8px;padding:8px 16px;min-height:36px}
+.portrait{width:56px;height:56px;border-radius:10px;border:1.5px solid var(--hi);background-size:cover;background-position:center;flex:0 0 auto}
+.parch{background:radial-gradient(120% 140% at 30% 20%,#f1e3bf,#e2cc9c 60%,#cdb37f);color:var(--ink);border-radius:6px;box-shadow:0 10px 22px rgba(0,0,0,.45)}
+.parch .t-disp{color:#5a3a16} .parch .t-small{color:#5b4a33} .parch .t-body{color:#2b1d10} .parch .t-label{color:#7a5a2a}
+.burnt{-webkit-mask:radial-gradient(130% 120% at 50% 45%,#000 62%,transparent 78%);mask:radial-gradient(130% 120% at 50% 45%,#000 62%,transparent 78%)}
+/* --- LVL --- */
+.rcard{display:flex;align-items:center;gap:10px;width:100%;max-width:340px;padding:8px 10px;border-radius:10px;border:1px solid rgba(207,175,99,.35);background:linear-gradient(180deg,#0f2a35,#081a22);position:relative}
+.rcard .nm{font:600 13px var(--display);letter-spacing:.06em;color:var(--text)}
+.lv{position:relative;width:34px;height:40px;display:grid;place-items:center;font:700 13px var(--display);color:var(--ink)}
+.lv svg{position:absolute;inset:0}
+.lv span{position:relative;z-index:1}
+.glow{animation:lvglow 2.6s ease-out 1}
+@keyframes lvglow{0%{box-shadow:0 0 0 0 rgba(240,207,106,0)}20%{box-shadow:0 0 0 2px rgba(240,207,106,.9),0 0 26px rgba(240,207,106,.7)}100%{box-shadow:0 0 0 0 rgba(240,207,106,0)}}
+.flip span{display:inline-block;animation:flip 1.2s ease-in-out 1}
+@keyframes flip{0%,30%{transform:rotateX(0)}50%{transform:rotateX(90deg)}70%,100%{transform:rotateX(0)}}
+.floater{position:absolute;right:12px;top:-6px;font:600 12px var(--display);letter-spacing:.08em;color:var(--title);opacity:0;animation:float 2.4s ease-out .6s 1 forwards}
+@keyframes float{0%{opacity:0;transform:translateY(8px)}25%{opacity:1}100%{opacity:0;transform:translateY(-22px)}}
+.cer{width:100%;max-width:300px;text-align:center;position:relative}
+.cer .seal{width:86px;height:86px;margin:-52px auto 6px;position:relative}
+.stamp{animation:stamp .7s cubic-bezier(.2,1.6,.4,1) .3s both}
+@keyframes stamp{0%{transform:scale(1.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.gain{display:flex;justify-content:space-between;font:400 14px var(--serif);padding:3px 0;border-bottom:1px dashed rgba(207,175,99,.25)}
+.gain b{font:600 14px var(--display);color:var(--title)}
+/* --- EXP LOST --- */
+.scene{width:100%;height:110px;border-radius:8px;background-size:cover;background-position:center;filter:grayscale(.85) brightness(.55) sepia(.2);border:1px solid rgba(207,175,99,.35)}
+.tomb{display:flex;gap:10px;align-items:flex-end;justify-content:center;margin-top:-60px;position:relative}
+.stone{width:92px;height:112px;background-image:radial-gradient(circle at 30% 85%,rgba(90,110,60,.55) 0 10px,transparent 11px),linear-gradient(180deg,#6b777c,#323d41)!important;border-radius:30px 30px 6px 6px;background:linear-gradient(180deg,#59656a,#2e383c);border:1px solid #8a979a;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6px;box-shadow:0 6px 14px rgba(0,0,0,.6)}
+.stone small{font:600 11px var(--display);text-shadow:0 1px 0 #1b2225;letter-spacing:.06em;color:#d9e0e1;text-align:center;line-height:1.1}
+.cracked{width:36px;height:36px;border-radius:8px;border:1px solid var(--ember);background:linear-gradient(180deg,#2a1a12,#120a07);position:relative;display:grid;place-items:center;color:var(--ember2)}
+.cracked::after{content:"";position:absolute;inset:6px 14px 6px 12px;border-right:2px solid var(--ember);transform:skewX(-18deg)}
+.strike{text-decoration:line-through;text-decoration-color:#7a1f12;text-decoration-thickness:2px}
+/* --- SETTLE --- */
+.ox{position:absolute;inset:0;background:radial-gradient(60% 60% at 50% 50%,transparent 0,rgba(6,15,22,.65) 70%,rgba(3,8,10,.95) 100%);pointer-events:none}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.stat3 div{border:1px solid rgba(207,175,99,.35);border-radius:8px;padding:6px;text-align:center}
+.stat3 b{display:block;font:600 20px var(--serif);color:var(--text)}
+.village-crack{width:120px;height:80px;position:relative;margin:4px auto}
+.ash-fall i{position:absolute;width:3px;height:3px;border-radius:50%;background:#bfc6c7;opacity:.0;animation:ash 5s linear infinite}
+@keyframes ash{0%{transform:translateY(-20px);opacity:0}15%{opacity:.8}100%{transform:translateY(260px);opacity:0}}
+/* --- LEGACY --- */
+.table3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.cell{border:1px solid rgba(207,175,99,.45);border-radius:10px;background:linear-gradient(180deg,#132f37,#0a1a20);padding:10px 6px;text-align:center;position:relative;min-height:150px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.cell .icon{width:46px;height:46px;color:var(--crest)}
+.cell .lock{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);width:20px;height:20px}
+.cell .t-small{font-size:12px}
+.sweep{position:relative;overflow:hidden}
+.sweep::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(90deg,transparent,rgba(240,207,106,.35),transparent);animation:sw 3.2s ease-in-out infinite}
+@keyframes sw{0%{left:-60%}60%,100%{left:120%}}
+.chest{width:100%;max-width:320px}
+.slots5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.s5{aspect-ratio:1;border-radius:8px;border:1px solid rgba(207,175,99,.4);background:#0a1a20;display:grid;place-items:center;color:var(--crest);position:relative}
+.s5.on{border-color:var(--title);box-shadow:0 0 10px rgba(240,207,106,.45)}
+.s5.off{opacity:.45}
+.s5 svg{width:60%;height:60%}
+.s5 .pv{position:absolute;inset:3px;border-radius:6px;background-size:cover;background-position:center}
+/* --- FAM / sheet --- */
+.sheet{width:100%;max-width:330px}
+.sheet .top{display:flex;gap:10px;align-items:center}
+.bars{flex:1}
+.bar{height:6px;border-radius:3px;background:var(--deep);border:1px solid rgba(207,175,99,.3);margin:4px 0;position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--low),var(--title))}
+.bar.sta i{background:linear-gradient(90deg,#3c6e72,#8fc0b8)}
+.virt{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.virt div{border:1px solid rgba(207,175,99,.35);border-radius:8px;padding:6px 4px;text-align:center}
+.virt b{display:block;font:600 20px var(--serif);color:var(--text)}
+.trait{font:italic 400 14px var(--serif);color:var(--text2)}
+/* --- POI --- */
+.poi{width:56px;height:68px;position:relative}
+.ptip{position:absolute;left:50%;transform:translateX(-50%);top:-48px;white-space:nowrap;text-align:center}
+.ptip .nm{font:600 12px var(--display);letter-spacing:.14em;color:#2b1d10;background:linear-gradient(180deg,#f0e1bb,#d9c08a);border:1px solid #8a6a32;padding:3px 10px;border-radius:4px;box-shadow:0 4px 10px rgba(0,0,0,.35)}
+.ptip .rk{display:block;font:500 10px var(--display);letter-spacing:.12em;color:#f2e6c8;text-shadow:0 1px 2px #000;margin-top:3px}
+/* --- INV --- */
+.icard{width:100%;max-width:300px;display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;border:1px solid rgba(207,175,99,.45);background:linear-gradient(180deg,#132f37,#0a1a20)}
+.icard .ic{width:44px;height:44px;border-radius:8px;border:1px solid var(--hi);display:grid;place-items:center;color:var(--crest);flex:0 0 auto;position:relative}
+.icard .ic svg{width:24px;height:24px}
+.icard .qty{position:absolute;right:-6px;bottom:-6px;font:600 11px var(--display);color:var(--ink);background:var(--crest);border-radius:4px;padding:0 4px}
+.ctx{font:500 10px var(--display);letter-spacing:.14em;color:var(--label);margin-bottom:-4px;align-self:flex-start}
+.price{margin-left:auto;font:600 13px var(--display);color:var(--title);white-space:nowrap}
+.irow{display:flex;align-items:center;gap:8px;width:100%;max-width:300px;padding:6px 8px;border-bottom:1px solid rgba(207,175,99,.2)}
+.irow .ic2{width:28px;height:28px;border-radius:6px;border:1px solid rgba(207,175,99,.5);display:grid;place-items:center;color:var(--crest)}
+.irow .ic2 svg{width:16px;height:16px}
+/* --- DEATH --- */
+.rcard.dead{filter:grayscale(1);opacity:.85;border-style:dashed}
+.rcard.dead .nm{color:#c9cfd0}
+.epi{font:italic 400 12px var(--serif);color:#b9c1c3}
+.hall{width:100%;max-width:320px}
+.hall .ent{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(43,29,16,.25)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+footer{color:var(--dim);font-size:14px;padding-bottom:40px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Fork visivi /game · v3 — il ciclo e le schede</h1>
+  <p>Otto decisioni estetiche: i tre momenti del ciclo (<b>crescita</b>, <b>sconfitta</b>, <b>caduta</b>), l'<b>eredità</b> per la prossima run, e i quattro fork aperti dal secondo giro (F5). Ogni riga mette la <b>baseline reale</b> (ritaglio dall'harness) accanto a due direzioni materialmente diverse, nessuna raccomandata. Token della skin base; niente cerchi con simbolo, niente semaforo verde/rosso (guida HUD 6b): il pericolo è <b>brace</b>, il chiuso è <b>ferro</b>, il valore è <b>ottone</b>.</p>
+  <p class="note">Ricerca: le fonti trovate su meta-progressione e schermate di fine run sono generiche (nessuna analisi UI di Rogue Legacy, Darkest Dungeon, Against the Storm, Frostpunk). Unico principio solido: la meta-progressione deve sostenere il gioco senza banalizzarlo, e il giocatore deve capire se è migliorato lui o se ha solo sbloccato potere. Le opzioni sotto rendono visibile la differenza.</p>
+  <nav class="toc"><a href="#lvl">LVL level-up</a><a href="#exp">EXP sconfitta</a><a href="#set">SET caduta</a><a href="#leg">LEG eredità</a><a href="#fam">FAM-1 schede</a><a href="#poi">POI-T</a><a href="#inv">INV-1</a><a href="#death">DEATH-1</a></nav>
+</header>
+<main>
+
+<!-- ================= LVL ================= -->
+<section class="fork" id="lvl">
+  <h2>LVL · Level-up dell'eroe (mock dal Director)</h2>
+  <p class="why">Oggi: senza roster aperto non succede nulla; con il roster una scritta fantasma «LEVEL 4» per 0,4 s, e il livello non cambia. Entrambe le opzioni fanno salire davvero il numero (4 → 5) e aprono il roster da sole.</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/v3-levelup.png" alt="Roster attuale durante il level-up: scritta fantasma"><div class="note">Sinistra 400 ms, destra 4 s: badge invariato.</div></div>
+    <div class="col"><h3>A · Sigillo sulla scheda</h3>
+      <div class="stage" id="lvlA">
+        <div class="rcard glow"><div class="portrait" style="background-image:url(assets/hero-mage.jpg)"></div><div style="flex:1"><div class="nm">Giggiolillo</div><div class="t-small">Hero assassin</div></div>
+          <div class="lv flip"><svg viewBox="0 0 34 40"><path d="M17 1l14 6v12c0 9-6 15-14 20C9 34 3 28 3 19V7z" fill="#d8bd78" stroke="#5f3f16" stroke-width="1.2"/></svg><span id="lvA">5</span></div>
+          <div class="floater">+1 Agility · +12 HP</div></div>
+        <div class="rcard"><div class="portrait" style="background-image:url(assets/hero-warrior.jpg)"></div><div style="flex:1"><div class="nm">Sir Spaccaculi</div><div class="t-small">Hero warrior</div></div><div class="lv"><svg viewBox="0 0 34 40"><path d="M17 1l14 6v12c0 9-6 15-14 20C9 34 3 28 3 19V7z" fill="#c2a355" stroke="#5f3f16" stroke-width="1.2"/></svg><span>3</span></div></div>
+        <button class="replay" data-replay="lvlA">Rivedi</button>
+      </div>
+      <div class="note">Tutto nel roster: la scheda si accende d'oro, lo scudo del livello gira e mostra il numero nuovo, un'iscrizione sale con i guadagni. 2,5 s, non interrompe il gioco.</div></div>
+    <div class="col"><h3>B · Cerimonia</h3>
+      <div class="stage">
+        <div class="plaque cer" style="margin-top:44px">
+          <svg class="seal stamp" viewBox="0 0 86 86"><path d="M43 3l9 9h12v12l9 9-9 9v12H52l-9 9-9-9H22V42l-9-9 9-9V12h12z" fill="#c2a355" stroke="#5f3f16" stroke-width="1.4"/><text x="43" y="52" text-anchor="middle" font-family="Cinzel" font-weight="700" font-size="26" fill="#2b1d10">V</text></svg>
+          <div class="t-disp">Giggiolillo sale al livello V</div>
+          <div class="rule"></div>
+          <div class="gain"><span>Agilità</span><b>72 → 78</b></div>
+          <div class="gain"><span>Punti vita</span><b>195 → 207</b></div>
+          <div class="gain" style="border:none"><span class="trait">«Il bosco ora le parla prima che ai goblin.»</span></div>
+          <div style="margin-top:10px"><span class="btn">Prosegui</span></div>
+        </div>
+      </div>
+      <div class="note">Una lastra al centro con un sigillo che si imprime col numero romano, i guadagni veri e una riga di carattere. Interrompe per un momento: è una ricompensa, non una notifica.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Sigillo</th><th>B Cerimonia</th></tr>
+    <tr><td>Peso della ricompensa</td><td>leggero</td><td class="win">alto</td></tr>
+    <tr><td>Interruzione del gioco</td><td class="win">nessuna</td><td>un clic</td></tr>
+    <tr><td>Più level-up insieme (fine spedizione)</td><td class="win">in parallelo sulle schede</td><td>una lastra per eroe</td></tr>
+    <tr><td>Costo</td><td class="win">basso (estende SP-5)</td><td>medio</td></tr></table>
+</section>
+
+<!-- ================= EXP ================= -->
+<section class="fork" id="exp">
+  <h2>EXP · Sconfitta della spedizione (rapporto «WIPE»)</h2>
+  <p class="why">Oggi: lastra trasparente (si legge il testo dietro), due titoli «EXPEDITION REPORT», chip rosso su rosso, lapide viola. In più serve un pulsante Director «Expedition lost» per metterla in scena senza perdere davvero.</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/v3-expedition-lost.png" alt="Rapporto attuale di sconfitta"><div class="note">Testo della finestra visibile attraverso la lastra.</div></div>
+    <div class="col"><h3>A · Lapidi sulla scena spenta</h3>
+      <div class="stage">
+        <div class="plaque" style="width:100%;max-width:320px">
+          <div class="t-disp" style="text-align:center">Nessuno è tornato</div>
+          <div class="scene" style="background-image:url(assets/scene-assault.jpg);margin-top:8px"></div>
+          <div class="tomb"><div class="stone"><svg width="22" height="22" viewBox="0 0 22 22" style="margin-bottom:auto;margin-top:14px"><path d="M11 2v18M5 8h12" stroke="#c9d2d4" stroke-width="2"/></svg><small>SIR<br>SPACCACULI</small><small style="font-weight:400;opacity:.8">† giorno 41</small></div></div>
+          <div class="rule"></div>
+          <div class="t-label">Perduto con loro</div>
+          <div style="display:flex;gap:8px;margin-top:6px"><div class="cracked">✦</div><div class="cracked">≋</div></div>
+          <div style="text-align:center;margin-top:12px"><span class="btn">Torna al villaggio</span></div>
+        </div>
+      </div>
+      <div class="note">Lastra opaca. La scena dell'ultimo scontro desaturata, una lapide di pietra incisa per ogni caduto, gli oggetti persi come tessere incrinate a brace. Un titolo, un'azione.</div></div>
+    <div class="col"><h3>B · Cronaca bruciata</h3>
+      <div class="stage">
+        <div class="parch burnt" style="width:100%;max-width:320px;padding:22px 20px">
+          <div class="t-disp" style="text-align:center">Cronaca della spedizione</div>
+          <div class="rule" style="background:linear-gradient(90deg,transparent,#7a5a2a,transparent)"></div>
+          <div class="t-small">Giorno 3 — le tracce portano a nord.</div>
+          <div class="t-small">Giorno 9 — l'accampamento è più grande del previsto.</div>
+          <div class="t-small">Giorno 14 — ferro e cenere.</div>
+          <div class="t-body" style="margin-top:6px"><span class="strike">Sir Spaccaculi</span> non è tornato.</div>
+          <div style="text-align:center;margin-top:12px"><span class="btn">Chiudi la cronaca</span></div>
+        </div>
+      </div>
+      <div class="note">Una pagina di pergamena con i bordi bruciati: la run raccontata in poche righe, una per fase importante, e i nomi dei caduti barrati a inchiostro. Il rapporto diventa memoria.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Lapidi</th><th>B Cronaca</th></tr>
+    <tr><td>Leggibilità a colpo d'occhio</td><td class="win">alta</td><td>media (si legge)</td></tr>
+    <tr><td>Racconto della run</td><td>minimo</td><td class="win">alto</td></tr>
+    <tr><td>Coerenza con la HUD</td><td class="win">lastra di famiglia</td><td>nuova superficie (pergamena)</td></tr>
+    <tr><td>Vittoria con lo stesso schema</td><td>sì (stendardi al posto delle lapidi)</td><td class="win">sì (stessa pagina, inchiostro d'oro)</td></tr></table>
+</section>
+
+<!-- ================= SET ================= -->
+<section class="fork" id="set">
+  <h2>SET · Caduta dell'insediamento (fine run)</h2>
+  <p class="why">Oggi la card esiste ma: invisibile con la finestra quest aperta, «0 giorni» al giorno 3, perdite scritte fisse in config. Entrambe le opzioni usano dati veri e finiscono nell'eredità (LEG).</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/v3-settlement-lost.png" alt="Card Settlement lost attuale"><div class="note">Card su iride scura; pannello Director sopra.</div></div>
+    <div class="col"><h3>A · Epitaffio sull'iride</h3>
+      <div class="stage map">
+        <div class="ox"></div>
+        <div class="plaque" style="position:relative;width:100%;max-width:300px;text-align:center">
+          <div class="t-disp" style="font-size:16px">L'insediamento è caduto</div>
+          <div class="t-small" style="margin-top:4px">Giorno 41 · le Marche dell'Est</div>
+          <div class="stat3"><div><b>41</b><span class="t-label">giorni</span></div><div><b>2</b><span class="t-label">caduti</span></div><div><b>132</b><span class="t-label">oro</span></div></div>
+          <div class="rule"></div>
+          <div class="t-small" style="text-align:left">Le mura hanno ceduto al giorno 41.<br>Sir Spaccaculi cadde a Ferro e Cenere.</div>
+          <div style="margin-top:10px"><span class="btn">Ciò che resta →</span></div>
+        </div>
+      </div>
+      <div class="note">La direzione attuale portata nella famiglia: stessa iride ossidata sulla mappa, numeri veri, perdite che citano ciò che è successo davvero, e l'azione porta all'eredità invece di ricominciare subito.</div></div>
+    <div class="col"><h3>B · La mappa si spegne</h3>
+      <div class="stage map">
+        <div class="ox" style="background:radial-gradient(30% 30% at 50% 45%,rgba(0,0,0,0) 0,rgba(6,12,14,.85) 60%,rgba(2,5,6,.97) 100%)"></div>
+        <div class="ash-fall" style="position:absolute;inset:0"><i style="left:20%;animation-delay:-1s"></i><i style="left:45%;animation-delay:-3s"></i><i style="left:62%;animation-delay:-2s"></i><i style="left:80%;animation-delay:-4s"></i><i style="left:33%;animation-delay:-.5s"></i></div>
+        <svg class="village-crack" viewBox="0 0 160 90" style="width:180px;height:100px"><g fill="#2a211b" stroke="#8a6a32" stroke-width="1.2"><path d="M18 70V48l14-12 14 12v22z"/><path d="M50 70V40l18-16 18 16v30z"/><path d="M92 70V50l12-10 12 10v20z"/><path d="M120 70V44l14-12 14 12v26z"/><path d="M64 24v-8h8v14"/></g><g stroke="#8a6a32" stroke-width="3"><path d="M6 82V66M16 82V64M26 82V66M36 82V63M46 82V66M56 82V64"/><path d="M104 82V66M114 82V64M124 82V66M134 82V63M144 82V66M154 82V64"/></g><path d="M66 82l8-14-6-6 10-12" stroke="#c9663a" stroke-width="2.6" fill="none"/><path d="M76 82l-4-12 6-6" stroke="#f2b38f" stroke-width="1.4" fill="none"/><g fill="#c9663a" opacity=".85"><path d="M60 40c2-6 6-7 4-12 5 3 6 8 3 12z"/><path d="M128 44c2-5 5-6 3-10 4 3 5 7 2 10z"/></g></svg>
+        <div class="parch" style="position:relative;width:100%;max-width:300px;padding:10px 14px;text-align:center">
+          <div class="t-disp" style="font-size:12px">Giorno 41 — le mura cedono</div>
+          <div class="t-small">41 giorni · 2 caduti · 132 oro</div>
+        </div>
+        <span class="btn" style="position:relative">Ciò che resta →</span>
+      </div>
+      <div class="note">Nessuna card: la mappa intera si spegne verso il villaggio, che si incrina a brace mentre cade cenere; una sola striscia di pergamena dice giorno e numeri. Più cinema, meno lettura.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Epitaffio</th><th>B Mappa</th></tr>
+    <tr><td>Peso emotivo</td><td>medio</td><td class="win">alto</td></tr>
+    <tr><td>Informazioni leggibili</td><td class="win">numeri + perdite</td><td>solo numeri</td></tr>
+    <tr><td>Riuso del codice esistente</td><td class="win">alto (SettlementLostOverlay)</td><td>basso (nuova regia)</td></tr>
+    <tr><td>Rischio di sembrare il trailer</td><td class="win">basso</td><td>alto (va bene per il teaser)</td></tr></table>
+</section>
+
+<!-- ================= LEG ================= -->
+<section class="fork" id="leg">
+  <h2>LEG · Eredità: ciò che porti nella prossima run</h2>
+  <p class="why">Oggi esiste solo nel trailer (<code>TrailerLegacy</code>: tre carte con spunta verde) e in una V2 mai montata (<code>TrailerLegacyV2</code>, «The Preservation Table»). Va portata su /game come mock, raggiungibile dalla caduta (SET) e da un pulsante Director.</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline (trailer)</h3><img src="baseline/v3-legacy.png" alt="Scena trailer Knowledge Preserved"><div class="note">Spunte verdi, icone tipo emoji, nessuna scelta.</div></div>
+    <div class="col"><h3>A · La tavola della preservazione</h3>
+      <div class="stage">
+        <div class="t-disp" style="font-size:14px">Ciò che sopravvive diventa fondamenta</div>
+        <div class="table3">
+          <div class="cell sweep"><svg class="icon" viewBox="0 0 48 48"><path d="M16 6h16l-2 6c6 3 9 9 9 16 0 9-7 14-15 14S9 37 9 28c0-7 3-13 9-16z" fill="#c2a355" stroke="#5f3f16"/><path d="M18 22h12M17 28h14" stroke="#5f3f16"/></svg><span class="t-label">Reliquia</span><span class="t-small">Il totem goblin: +10% bottino</span><svg class="lock" viewBox="0 0 20 20"><path d="M10 1l2.4 4.6 5 .8-3.6 3.6.9 5L10 12.6 5.3 15l.9-5L2.6 6.4l5-.8z" fill="#f0cf6a" stroke="#5f3f16"/></svg></div>
+          <div class="cell sweep" style="animation-delay:.6s"><svg class="icon" viewBox="0 0 48 48"><path d="M10 8h24l4 4v28H10z" fill="#e8d6ae" stroke="#5f3f16"/><path d="M16 18h16M16 24h16M16 30h10" stroke="#5f3f16"/><path d="M28 34l6-6" stroke="#a0762f" stroke-width="2"/></svg><span class="t-label">Progetto</span><span class="t-small">Palizzata di livello II già nota</span><svg class="lock" viewBox="0 0 20 20"><path d="M10 1l2.4 4.6 5 .8-3.6 3.6.9 5L10 12.6 5.3 15l.9-5L2.6 6.4l5-.8z" fill="#f0cf6a" stroke="#5f3f16"/></svg></div>
+          <div class="cell sweep" style="animation-delay:1.2s"><div class="portrait" style="background-image:url(assets/hero-mage.jpg);width:46px;height:46px"></div><span class="t-label">Eroe</span><span class="t-small">Giggiolillo torna, livello V</span><svg class="lock" viewBox="0 0 20 20"><path d="M10 1l2.4 4.6 5 .8-3.6 3.6.9 5L10 12.6 5.3 15l.9-5L2.6 6.4l5-.8z" fill="#f0cf6a" stroke="#5f3f16"/></svg></div>
+        </div>
+        <span class="btn" style="margin-top:12px">Fonda un nuovo insediamento</span>
+      </div>
+      <div class="note">La V2 del trailer portata in gioco: tre forme di eredità (materia, sapere, memoria viva), ognuna fissata da un sigillo d'oro invece della spunta. Nessuna scelta: il gioco ti dice cosa resta.</div></div>
+    <div class="col"><h3>B · Il reliquiario: scegli cosa salvare</h3>
+      <div class="stage">
+        <div class="plaque chest">
+          <div class="t-disp" style="text-align:center">Il reliquiario</div>
+          <div class="t-small" style="text-align:center">Salva 2 di 5. Il resto si perde con le mura.</div>
+          <div class="slots5">
+            <div class="s5 on"><div class="pv" style="background-image:url(assets/hero-mage.jpg)"></div></div>
+            <div class="s5 on"><svg viewBox="0 0 24 24"><path d="M8 3h8l-1 3c3 2 4 5 4 8 0 4-3 7-7 7s-7-3-7-7c0-3 1-6 4-8z" fill="currentColor"/></svg></div>
+            <div class="s5 off"><div class="pv" style="background-image:url(assets/hero-warrior.jpg)"></div></div>
+            <div class="s5 off"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z" fill="currentColor"/></svg></div>
+            <div class="s5 off"><svg viewBox="0 0 24 24"><path d="M12 3l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6L3 10l6-1z" fill="currentColor"/></svg></div>
+          </div>
+          <div class="t-small" style="margin-top:8px">Scelti: <b style="color:var(--title)">Giggiolillo</b>, <b style="color:var(--title)">Totem goblin</b></div>
+          <div style="text-align:center;margin-top:10px"><span class="btn">Sigilla e ricomincia</span></div>
+        </div>
+      </div>
+      <div class="note">Una scelta: tra eroi sopravvissuti, reliquie e progetti ne salvi pochi. La caduta diventa una decisione, e la prossima run comincia da quella decisione.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Tavola</th><th>B Reliquiario</th></tr>
+    <tr><td>Agency del giocatore</td><td>nessuna</td><td class="win">una scelta vera</td></tr>
+    <tr><td>Fedeltà al trailer (teaser)</td><td class="win">alta (V2)</td><td>nuova</td></tr>
+    <tr><td>Rischio di design (meta-progressione)</td><td class="win">basso: mock narrativo</td><td>tocca il bilanciamento (va deciso col game design)</td></tr>
+    <tr><td>Costo come mock</td><td class="win">basso</td><td>medio</td></tr></table>
+</section>
+
+<!-- ================= FAM ================= -->
+<section class="fork" id="fam">
+  <h2>FAM-1 · Le quattro schede teaser fuori famiglia (scheda eroe, stash, mercante, tooltip edifici)</h2>
+  <p class="why">Oggi usano il font di sistema, il ciano e il semaforo (F5 §1). L'esempio è la scheda eroe; la stessa scelta vale per le altre tre.</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/v3-herosheet.png" alt="Scheda eroe attuale"><div class="note">Sans, tre colori di categoria, pallini, 9 righe a zero.</div></div>
+    <div class="col"><h3>A · Famiglia Roster</h3>
+      <div class="stage">
+        <div class="plaque sheet">
+          <div class="top"><div class="portrait" style="background-image:url(assets/hero-mage.jpg)"></div><div class="bars"><div class="t-disp" style="font-size:12px">Giggiolillo</div><div class="t-label">Eroe · assassina · livello IV</div><div class="bar"><i style="width:100%"></i></div><div class="bar sta"><i style="width:100%"></i></div></div></div>
+          <div class="virt"><div><b>34</b><span class="t-label">Forza</span></div><div><b>72</b><span class="t-label">Agilità</span></div><div><b>12%</b><span class="t-label">Schivata</span></div></div>
+          <div class="rule"></div>
+          <div class="t-small">Attacco 34 · Precisione 30 · Critico 12% ×2,1<br>Movimento 125%</div>
+          <div class="t-label" style="margin-top:6px;opacity:.7">Mostra tutte le statistiche</div>
+        </div>
+      </div>
+      <div class="note">Cinzel + EB Garamond, ottone. Tre virtù che contano per le quest in grande, il resto in una riga; gli zeri non si mostrano. Il colore di categoria sparisce.</div></div>
+    <div class="col"><h3>B · Schede di carta</h3>
+      <div class="stage">
+        <div class="parch sheet" style="padding:14px 16px">
+          <div class="top"><div class="portrait" style="background-image:url(assets/hero-mage.jpg);border-color:#7a5a2a;filter:sepia(.25)"></div><div><div class="t-disp" style="font-size:13px">Giggiolillo</div><div class="t-small">Assassina, livello IV · 3 spedizioni, 1 cicatrice</div></div></div>
+          <div class="rule" style="background:linear-gradient(90deg,transparent,#7a5a2a,transparent)"></div>
+          <div class="t-body" style="font-size:14px">Agile <b>72</b> · Forte <b>34</b> · Sfuggente <b>12%</b></div>
+          <div class="t-small" style="margin-top:6px"><i>«Tornò dal bosco di Hollow Wood con la lama pulita e la voce rotta.»</i></div>
+        </div>
+      </div>
+      <div class="note">Le quattro superfici teaser diventano «carte»: pergamena e inchiostro, un'identità propria e coerente (dossier, registro, listino, scheda edificio). Si distinguono dalla HUD perché sono documenti, non strumenti.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Famiglia Roster</th><th>B Carta</th></tr>
+    <tr><td>Coerenza con la guida HUD §1</td><td class="win">piena</td><td>eccezione dichiarata</td></tr>
+    <tr><td>Personalità degli eroi</td><td>media</td><td class="win">alta</td></tr>
+    <tr><td>Densità di informazione</td><td class="win">alta</td><td>bassa</td></tr>
+    <tr><td>Costo (4 superfici)</td><td class="win">basso: token esistenti</td><td>medio: nuova materia</td></tr></table>
+</section>
+
+<!-- ================= POI ================= -->
+<section class="fork" id="poi">
+  <h2>POI-T · Il POI dice cosa è</h2>
+  <p class="why">Oggi il marker è muto (in hover cambia appena). La guida vieta il testo <i>sul</i> marker, non un'etichetta al passaggio. Il tooltip delle regioni («Whispering Woods») mostra che la mappa sa già parlare.</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/v3-poi.png" alt="POI a riposo e in hover"><div class="note">Riposo / hover: nessuna differenza utile.</div></div>
+    <div class="col"><h3>A · Cartiglio inciso al passaggio</h3>
+      <div class="stage map">
+        <div class="poi" style="margin-top:40px"><div class="ptip"><span class="nm">STERMINIO DEI GOBLIN</span><span class="rk">PERICOLO ALTO · 22 GIORNI</span></div>
+          <svg viewBox="0 0 56 68"><path d="M28 66C16 50 4 40 4 26a24 24 0 0 1 48 0c0 14-12 24-24 40z" fill="#0f2a35" stroke="#cfaf63" stroke-width="2.4"/><path d="M18 34l10-14 10 14z" fill="#d8bd78"/></svg></div>
+      </div>
+      <div class="note">Al passaggio del mouse un cartiglio di pergamena come quello delle regioni: nome e rischio in due parole. Sul marker resta solo il sigillo.</div></div>
+    <div class="col"><h3>B · La sagoma dice il rischio</h3>
+      <div class="stage map" style="flex-direction:row;gap:26px">
+        <div style="text-align:center"><svg viewBox="0 0 56 68" width="48"><path d="M28 66C16 50 4 40 4 26a24 24 0 0 1 48 0c0 14-12 24-24 40z" fill="#0f2a35" stroke="#cfaf63" stroke-width="2.4"/><path d="M18 34l10-14 10 14z" fill="#d8bd78"/></svg><div class="t-label" style="color:#f2e6c8;text-shadow:0 1px 2px #000">basso</div></div>
+        <div style="text-align:center"><svg viewBox="0 0 56 68" width="48"><path d="M28 66C16 50 4 40 4 26a24 24 0 0 1 48 0c0 14-12 24-24 40z" fill="#0f2a35" stroke="#cfaf63" stroke-width="2.4"/><path d="M6 20l6-10 6 6M50 20l-6-10-6 6" stroke="#cfaf63" stroke-width="2.2" fill="none"/><path d="M18 34l10-14 10 14z" fill="#d8bd78"/></svg><div class="t-label" style="color:#f2e6c8;text-shadow:0 1px 2px #000">alto</div></div>
+        <div style="text-align:center"><svg viewBox="0 0 56 68" width="48"><path d="M28 66C16 50 4 40 4 26a24 24 0 0 1 48 0c0 14-12 24-24 40z" fill="#1a0f0a" stroke="#c9663a" stroke-width="2.6"/><path d="M6 20l6-10 6 6M50 20l-6-10-6 6M28 0v8" stroke="#c9663a" stroke-width="2.2" fill="none"/><path d="M18 34l10-14 10 14z" fill="#f2b38f"/></svg><div class="t-label" style="color:#f2e6c8;text-shadow:0 1px 2px #000">letale</div></div>
+      </div>
+      <div class="note">Niente testo: il sigillo cresce di corna e passa dall'ottone alla brace col pericolo (le etichette qui sotto servono solo al mockup). Si legge da lontano, ma va imparato.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Cartiglio</th><th>B Sagoma</th></tr>
+    <tr><td>Chiarezza al primo sguardo</td><td class="win">nome + rischio</td><td>solo rischio</td></tr>
+    <tr><td>Mappa pulita a riposo</td><td>sì</td><td>sì</td></tr>
+    <tr><td>Leggibilità da lontano / molti POI</td><td>uno per volta</td><td class="win">tutti insieme</td></tr>
+    <tr><td>Tocca il Sigillo approvato (PLAN-058)</td><td class="win">no</td><td>sì (serve ruling S11)</td></tr></table>
+</section>
+
+<!-- ================= INV ================= -->
+<section class="fork" id="inv">
+  <h2>INV-1 · Un oggetto, tre posti (bisaccia, magazzino, mercante)</h2>
+  <p class="why">Oggi lo stesso oggetto ha tre aspetti: tessera icona nel tray, riga sans ciano nello stash, riga col prezzo nel mercante.</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/v3-stash.png" alt="Village stash attuale"><div class="note">Stash: sans, ciano, «×2» accanto al nome.</div></div>
+    <div class="col"><h3>A · La carta oggetto, uguale ovunque</h3>
+      <div class="stage">
+        <div class="ctx">Bisaccia</div>
+        <div class="icard"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3c3 0 6 3 6 6l-4 1-2-2 1-3zM13 7l2 2-9 11-2-2z" fill="currentColor"/></svg><span class="qty">×2</span></div><div><div class="t-disp" style="font-size:11px">Elisir di forza</div><div class="t-small">+15 a una prova di Forza</div></div></div>
+        <div class="ctx">Mercante</div>
+        <div class="icard"><div class="ic"><svg viewBox="0 0 24 24"><path d="M9 3h6v4l3 3v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-9l3-3z" fill="currentColor"/></svg><span class="qty">×3</span></div><div><div class="t-disp" style="font-size:11px">Pozioni curative</div><div class="t-small">Una ferita si chiude prima della curva</div></div><div class="price">9 ◈</div></div>
+      </div>
+      <div class="note">Una sola carta: icona incisa, nome in Cinzel, effetto in Garamond, quantità sul bordo; il mercante aggiunge solo il prezzo. Si impara una volta.</div></div>
+    <div class="col"><h3>B · Riga comune, tre vesti</h3>
+      <div class="stage" style="align-items:stretch">
+        <div class="ctx">Bisaccia (tessera)</div>
+        <div style="display:flex;gap:6px"><div class="s5" style="width:40px;border-color:var(--hi)"><svg viewBox="0 0 24 24"><path d="M14 3c3 0 6 3 6 6l-4 1-2-2 1-3zM13 7l2 2-9 11-2-2z" fill="currentColor"/></svg></div><div class="s5" style="width:40px;border-color:var(--hi)"><svg viewBox="0 0 24 24"><path d="M9 3h6v4l3 3v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-9l3-3z" fill="currentColor"/></svg></div></div>
+        <div class="ctx">Magazzino (riga)</div>
+        <div class="irow"><span class="ic2"><svg viewBox="0 0 24 24"><path d="M14 3c3 0 6 3 6 6l-4 1-2-2 1-3zM13 7l2 2-9 11-2-2z" fill="currentColor"/></svg></span><span class="t-body" style="font-size:14px;flex:1">Elisir di forza</span><span class="t-label">×2</span></div>
+        <div class="ctx">Mercante (riga + prezzo)</div>
+        <div class="irow"><span class="ic2"><svg viewBox="0 0 24 24"><path d="M9 3h6v4l3 3v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-9l3-3z" fill="currentColor"/></svg></span><span class="t-body" style="font-size:14px;flex:1">Pozioni curative</span><span class="price">9 ◈</span></div>
+      </div>
+      <div class="note">Tre vesti per tre usi (tessera compatta da trascinare, riga d'inventario, riga di listino) ma la stessa icona incisa, lo stesso font e lo stesso ottone. Più denso, meno ripetitivo.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Carta</th><th>B Riga comune</th></tr>
+    <tr><td>Riconoscibilità tra superfici</td><td class="win">massima</td><td>alta</td></tr>
+    <tr><td>Densità (stash lungo, bisaccia stretta)</td><td>bassa</td><td class="win">alta</td></tr>
+    <tr><td>Descrizione dell'effetto sempre visibile</td><td class="win">sì</td><td>in tooltip</td></tr>
+    <tr><td>Costo</td><td>medio</td><td class="win">basso</td></tr></table>
+</section>
+
+<!-- ================= DEATH ================= -->
+<section class="fork" id="death">
+  <h2>DEATH-1 · L'eroe caduto</h2>
+  <p class="why">Oggi, dopo il «WIPE», Sir Spaccaculi sparisce dal roster («5/6») senza traccia, mentre il rapporto lo chiama «FALLEN».</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/v3-roster-dead.png" alt="Roster dopo la morte"><div class="note">Il caduto non c'è più; Lisetta è grigia senza spiegazione.</div></div>
+    <div class="col"><h3>A · La lapide resta nel roster</h3>
+      <div class="stage">
+        <div class="rcard"><div class="portrait" style="background-image:url(assets/hero-mage.jpg)"></div><div style="flex:1"><div class="nm">Giggiolillo</div><div class="t-small">Disponibile</div></div></div>
+        <div class="rcard dead"><div class="portrait" style="background-image:url(assets/hero-warrior.jpg)"></div><div style="flex:1"><div class="nm">Sir Spaccaculi</div><div class="epi">Cadde a Ferro e Cenere, giorno 41</div></div><svg width="22" height="26" viewBox="0 0 22 26"><path d="M3 25V10a8 8 0 0 1 16 0v15z" fill="#59656a" stroke="#c9cfd0"/><path d="M11 9v9M7 13h8" stroke="#c9cfd0" stroke-width="1.6"/></svg></div>
+      </div>
+      <div class="note">Il caduto resta in fondo al roster per il resto della run: ritratto in grigio, bordo tratteggiato, l'epitaffio con luogo e giorno. Non si può trascinare.</div></div>
+    <div class="col"><h3>B · La sala dei caduti</h3>
+      <div class="stage">
+        <div class="parch hall" style="padding:14px 16px">
+          <div class="t-disp" style="text-align:center;font-size:12px">Sala dei caduti</div>
+          <div class="ent"><div class="portrait" style="background-image:url(assets/hero-warrior.jpg);width:44px;height:44px;filter:grayscale(1);border-color:#7a5a2a"></div><div><div class="t-body" style="font-size:14px">Sir Spaccaculi, livello III</div><div class="t-small">Ferro e Cenere · giorno 41 · 4 spedizioni</div></div></div>
+          <div class="t-small" style="text-align:center;margin-top:8px">dal menu · «Memoriale»</div>
+        </div>
+      </div>
+      <div class="note">Il roster resta pulito; i caduti vanno in un memoriale (voce del menu), una pagina per ogni eroe con la sua storia. È lì che l'eredità (LEG) può pescare «chi ricordare».</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Lapide nel roster</th><th>B Memoriale</th></tr>
+    <tr><td>La morte si sente nel gioco quotidiano</td><td class="win">sempre visibile</td><td>solo se cerchi</td></tr>
+    <tr><td>Roster utilizzabile (spazio, filtri)</td><td>una riga in più per caduto</td><td class="win">pulito</td></tr>
+    <tr><td>Legame con l'eredità (LEG)</td><td>indiretto</td><td class="win">diretto</td></tr>
+    <tr><td>Costo</td><td class="win">basso</td><td>medio (nuova superficie)</td></tr></table>
+</section>
+</main>
+<footer>Token copiati da <code>skinCssVariables.ts</code> (skin base). Ritratti e scene dagli asset del progetto (<code>public/assets/portraits</code>, <code>scene-library</code>), ridotti. Animazioni solo CSS; con <code>prefers-reduced-motion</code> tutto è fermo. Testi di esempio in italiano: le stringhe vere passeranno da i18n (en + it-IT).</footer>
+<script>
+document.querySelectorAll('[data-replay]').forEach((b) => b.addEventListener('click', () => {
+  const st = document.getElementById(b.dataset.replay);
+  st.querySelectorAll('.glow,.flip,.floater').forEach((el) => { const c = el.className; el.className = ''; void el.offsetWidth; el.className = c; });
+}));
+</script>
+</body>
+</html>

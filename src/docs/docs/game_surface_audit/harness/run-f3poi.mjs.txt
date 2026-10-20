@@ -1,0 +1,85 @@
+import fs from 'node:fs';
+import { openGame, POI, snap, close, measure, contrastFromPixels } from './harness.mjs';
+const W = Number(process.env.W || 1440), H = Number(process.env.H || 900), FULL = process.env.FULL !== '0';
+const outDir = new URL(`./out/f3poi-${W}x${H}/`, import.meta.url).pathname;
+const ctx = await openGame({ outDir, viewport: { width: W, height: H } });
+const { page } = ctx; const notes = {};
+const S = (k) => `${POI}:goblin-slot-${k}`;
+const HERO = 'hero-sir-spaccaculi', BEPPE = 'villager-mastro-beppe', LISETTA = 'villager-lisetta', BALDA = 'villager-baldassarre';
+const assignments = () => page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].getAssignments(), POI);
+const PLANNER = `[data-testid="floating-panel-quest-expedition-${POI}"]`;
+const save = (n, o) => fs.writeFileSync(outDir + n, JSON.stringify(o, null, 1));
+// boot veil via
+await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), null, { timeout: 60000 }).catch(() => { notes.bootVeil = 'still present after 60s'; });
+await page.locator(`[data-quest-poi-id="${POI}"]`).waitFor({ state: 'visible', timeout: 20000 });
+await page.waitForTimeout(1500);
+await snap(ctx, '01-map-boot-pois');
+notes.pois = await page.evaluate(() => [...document.querySelectorAll('[data-quest-poi-id], [data-testid="map-quest-poi"], [data-poi-id]')].map((e) => { const r = e.getBoundingClientRect(); return { id: e.getAttribute('data-quest-poi-id') || e.getAttribute('data-poi-id') || e.getAttribute('data-testid'), status: e.getAttribute('data-quest-status'), x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) }; }));
+const m = page.locator(`[data-quest-poi-id="${POI}"]`).first();
+await snap(ctx, '02-poi-goblin-crop', m);
+await m.hover(); await page.waitForTimeout(700); await snap(ctx, '03-poi-hover');
+await m.click(); await page.locator(PLANNER).waitFor({ state: 'visible', timeout: 15000 }); await page.waitForTimeout(900);
+await snap(ctx, '10-planner-empty');
+if (FULL) { save('11-measure-planner.json', await measure(ctx, PLANNER)); save('12-contrast-planner.json', await contrastFromPixels(ctx, PLANNER)); }
+// roster
+await page.keyboard.press('r'); await page.locator(`[data-worker-id="${HERO}"]`).first().waitFor({ state: 'visible', timeout: 15000 }); await page.waitForTimeout(700);
+await snap(ctx, '20-planner-plus-roster');
+if (FULL) { save('21-measure-full.json', await measure(ctx, 'body')); }
+// drag SOLO MOUSE (nessun hook), con frame a metà percorso
+async function mouseDrag(rid, slotId, name) {
+  const card = page.locator(`[data-worker-id="${rid}"]`).first();
+  const slot = page.getByTestId(`slot-button-${slotId}`).first().or(page.locator(`[data-slot-id="${slotId}"]`).first());
+  await card.scrollIntoViewIfNeeded(); const a = await card.boundingBox(); const b = await slot.first().boundingBox();
+  if (!a || !b) return { ok: false, why: 'no box' };
+  const from = { x: a.x + a.width / 2, y: a.y + a.height / 2 }, to = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+  await page.mouse.move(from.x, from.y); await page.mouse.down();
+  await page.mouse.move(from.x + 12, from.y + 6, { steps: 3 });
+  const N = 14; for (let i = 1; i <= N; i++) await page.mouse.move(from.x + (to.x - from.x) * i / N, from.y + (to.y - from.y) * i / N, { steps: 2 });
+  await page.mouse.move(to.x + 1, to.y); await page.mouse.move(to.x, to.y); await page.waitForTimeout(250);
+  if (name) await snap(ctx, name);
+  const dropState = await page.locator(`[data-slot-id="${slotId}"][data-drop-state]`).first().getAttribute('data-drop-state').catch(() => null);
+  await page.mouse.up(); await page.waitForTimeout(500);
+  const asg = await assignments();
+  return { ok: asg[slotId] === rid, dropState, assigned: asg[slotId] ?? null };
+}
+notes.drag1 = await mouseDrag(BEPPE, S('leader'), '30-drag-midway-valid');
+notes.drag2 = await mouseDrag(HERO, S('member-1'), null);
+notes.dragInvalid = await mouseDrag(LISETTA, S('leader'), '31-drag-midway-invalid-or-occupied');
+notes.drag3 = await mouseDrag(LISETTA, S('member-2'), null);
+notes.drag4 = await mouseDrag(BALDA, S('bodyguard'), null);
+const asg = await assignments(); notes.assignmentsAfterMouseDrags = asg;
+const need = [[BEPPE, 'leader'], [HERO, 'member-1'], [LISETTA, 'member-2'], [BALDA, 'bodyguard']].filter(([r, k]) => asg[S(k)] !== r);
+if (need.length) { notes.hookFallback = need.map(([r, k]) => `${r}->${k}`); for (const [r, k] of need) await page.evaluate(([pid, s, rid]) => window.__idleVillageTestHooks.expedition[pid].assignToSlot(s, rid), [POI, S(k), r]); ctx.steps.push({ step: 'assign', how: 'hook-assisted:assignToSlot for ' + need.length }); }
+await page.waitForTimeout(1200);
+await snap(ctx, '40-planner-party-full');
+// swap token leader<->member-1 solo mouse
+{ const t = page.getByTestId(`slot-token-${S('leader')}`); const g = page.getByTestId(`slot-button-${S('member-1')}`);
+  const a = await t.boundingBox().catch(() => null), b = await g.boundingBox().catch(() => null);
+  if (a && b) { const f = { x: a.x + a.width / 2, y: a.y + a.height / 2 }, to = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+    await page.mouse.move(f.x, f.y); await page.mouse.down(); await page.mouse.move(f.x + 14, f.y + 6, { steps: 2 });
+    for (let i = 1; i <= 8; i++) await page.mouse.move(f.x + (to.x - f.x) * i / 8, f.y + (to.y - f.y) * i / 8);
+    await page.mouse.move(to.x + 1, to.y); await page.mouse.move(to.x, to.y); await page.waitForTimeout(200); await snap(ctx, '41-swap-midway');
+    await page.mouse.up(); await page.waitForTimeout(600); notes.swap = await assignments(); } else notes.swap = 'token not found'; }
+await snap(ctx, '42-after-swap');
+// bisaccia + tray
+const bag0 = page.getByTestId('bag-slot-0').locator('button');
+if (await bag0.count()) { await bag0.click(); await page.waitForTimeout(700); await snap(ctx, '50-tray-items'); if (FULL) save('51-measure-tray.json', await measure(ctx, '[data-testid="quest-selection-tray"]'));
+  const tiles = page.locator('[data-testid^="picker-item-"]'); const n = await tiles.count(); notes.trayItems = n;
+  for (let i = 0; i < Math.min(3, n); i++) { await tiles.nth(i).click().catch(() => {}); await page.waitForTimeout(200); }
+  await snap(ctx, '52-tray-items-picked');
+  const modeRes = page.locator('[data-testid^="quest-tray-mode-"]'); notes.trayModes = await modeRes.evaluateAll((els) => els.map((e) => e.getAttribute('data-testid')));
+  for (const id of notes.trayModes) if (/resid/i.test(id)) { await page.getByTestId(id).click(); await page.waitForTimeout(600); await snap(ctx, '53-tray-residents'); }
+  await page.keyboard.press('Escape'); await page.waitForTimeout(400); }
+await snap(ctx, '60-planner-ready-send');
+notes.send = { enabled: await page.getByTestId('quest-expedition-send').isEnabled().catch(() => null), forecast: await page.getByTestId('quest-expedition-forecast').getAttribute('data-forecast-state').catch(() => null) };
+if (FULL) { save('61-measure-planner-ready.json', await measure(ctx, PLANNER)); save('62-contrast-ready.json', await contrastFromPixels(ctx)); }
+// slot pieno: hover
+const tok = page.getByTestId(`slot-token-${S('member-2')}`); if (await tok.count()) { await tok.hover(); await page.waitForTimeout(700); await snap(ctx, '63-slot-hover'); }
+// roster da solo
+await page.getByTestId(`floating-panel-close-quest-expedition-${POI}`).click().catch(() => {}); await page.waitForTimeout(700);
+await snap(ctx, '70-roster-alone');
+const roster = page.locator('[data-hud-panel="roster"], [data-stage-panel="roster"]').first();
+if (FULL && await roster.count()) { save('71-measure-roster.json', await measure(ctx, '[data-hud-panel="roster"], [data-stage-panel="roster"]')); save('72-contrast-roster.json', await contrastFromPixels(ctx, '[data-hud-panel="roster"], [data-stage-panel="roster"]')); await snap(ctx, '73-roster-crop', roster); }
+await page.keyboard.press('r'); await page.waitForTimeout(600); await snap(ctx, '80-map-after-planner-closed');
+save('notes.json', notes); console.log(JSON.stringify(notes, null, 0).slice(0, 2500));
+await close(ctx);

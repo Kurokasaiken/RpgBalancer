@@ -1,0 +1,458 @@
+/**
+ * harness.mjs — F1a: harness unico di cattura + misura per /game (headless).
+ *
+ * Principi (dalle ricerche e da T-04):
+ *  - stato raggiunto con segnali dell'app (hook / data-testid), mai con attese a tempo;
+ *  - ogni cattura scrive anche un manifest: viewport, dpr, clock mode, come è stato raggiunto lo stato
+ *    (`input-reale` | `hook-assisted`), così una immagine non pretende di più di ciò che prova;
+ *  - le animazioni si catturano come SEQUENZA (frameSequence), non come un'immagine sola;
+ *  - il congelamento si prova con un contatore (`data-astro-frames`), non a occhio.
+ *
+ * Uso: import { openGame, reachSkillCheck, snap, frameSequence, measure } from './harness.mjs'
+ */
+import { createRequire } from 'node:module';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const require = createRequire('/Users/faustoboni/progetti_personali/RPG/package.json');
+const { chromium } = require('playwright');
+
+export const POI = 'poi-goblin';
+
+/** Apre /game headless e aspetta il segnale di app pronta (hook del POI), non un timeout. */
+export async function openGame({
+  baseURL = process.env.HARNESS_URL ?? 'http://localhost:5197', // porta propria: altre sessioni possono usare 5191 (T-13)
+  viewport = { width: 1440, height: 900 },
+  reducedMotion = 'no-preference',
+  deviceScaleFactor = 1,
+  outDir,
+  fakeClock = false,
+} = {}) {
+  // Chromium headless di default NON ha WebGL: Pixi ripiega su CanvasRenderer e lo screenshot non è ciò che vede il giocatore.
+  // `--use-angle=metal` = WebGL su GPU reale (macOS) restando headless. Su CI senza GPU: swiftshader (renderer diverso, dichiararlo).
+  const gl = process.env.HARNESS_GL ?? 'metal';
+  const glArgs = gl === 'none' ? [] : gl === 'swiftshader' ? ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] : [`--use-angle=${gl}`];
+  const browser = await chromium.launch({ headless: true, args: glArgs });
+  const context = await browser.newContext({ viewport, reducedMotion, deviceScaleFactor });
+  const page = await context.newPage();
+  const consoleErrors = [];
+  page.on('pageerror', (e) => consoleErrors.push(String(e)));
+  page.on('console', (m) => m.type() === 'error' && consoleErrors.push(m.text()));
+  if (fakeClock) await page.clock.install(); // PRIMA di goto: sostituisce rAF/setTimeout/Date/performance
+  await page.goto(`${baseURL}/game`);
+  await page.waitForFunction(
+    (pid) => Boolean(window.__idleVillageTestHooks?.expedition?.[pid]),
+    POI,
+    { timeout: 60_000 },
+  );
+  fs.mkdirSync(outDir, { recursive: true });
+  const ctx = { gl, fakeClock, browser, context, page, outDir, viewport, reducedMotion, deviceScaleFactor, consoleErrors, steps: [] };
+  return ctx;
+}
+
+const note = (ctx, step, how) => ctx.steps.push({ step, how });
+
+/**
+ * Porta la run goblin fino a un beat con skill check armato (`quest-check-board` visibile).
+ * `demoLaunch` = lancio canonico dell'app (stesso del pulsante del Director): lo stato è
+ * `hook-assisted` — dichiarato nel manifest. I click su scelte/beat sono input reali.
+ */
+export async function reachSkillCheck(ctx, { timeoutMs = 240_000 } = {}) {
+  const { page } = ctx;
+  await page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].demoLaunch(), POI);
+  note(ctx, 'launch', 'hook-assisted:demoLaunch');
+  await page.getByTestId('quest-window').waitFor({ state: 'visible', timeout: 30_000 });
+  const board = page.getByTestId('quest-check-board');
+  const deadline = Date.now() + timeoutMs;
+  let guard = 0;
+  while (Date.now() < deadline) {
+    if (await board.first().isVisible().catch(() => false)) {
+      note(ctx, 'skillcheck', `reached after ${guard} driver steps`);
+      return true;
+    }
+    if (await page.getByTestId('quest-window-beat').isVisible().catch(() => false)) {
+      await page.keyboard.press('Enter'); // salta il beat come un giocatore
+    } else {
+      const choice = page.locator('[data-testid="quest-window-choice"]:not([disabled])').first();
+      if (await choice.isVisible().catch(() => false)) {
+        await choice.click(); // input reale
+      } else {
+        // frontiera in viaggio: fa scorrere il clock canonico (hook, dichiarato)
+        await page.evaluate(() => window.__idleVillageTestHooks.advanceTicks?.(3));
+      }
+    }
+    guard++;
+    await page.waitForTimeout(120);
+  }
+  return false;
+}
+
+/** Screenshot + manifest. `target` opzionale (locator) per ritaglio. */
+export async function snap(ctx, name, target) {
+  const file = path.join(ctx.outDir, `${name}.png`);
+  const opts = { path: file, type: 'png', timeout: 120000 };
+  if (target) await target.screenshot(opts);
+  else await ctx.page.screenshot(opts);
+  const entry = {
+    file: path.basename(file),
+    viewport: ctx.viewport,
+    deviceScaleFactor: ctx.deviceScaleFactor,
+    reducedMotion: ctx.reducedMotion,
+    glBackend: ctx.gl,
+    at: new Date().toISOString(),
+    howStateReached: ctx.steps.map((s) => `${s.step}:${s.how}`),
+    limitation: 'Un frame solo: non prova movimento né assenza di movimento (T-04).',
+  };
+  fs.writeFileSync(path.join(ctx.outDir, `${name}.json`), JSON.stringify(entry, null, 2));
+  return file;
+}
+
+/** N frame a intervallo fisso + contatore frame dell'astrolabio per ogni frame (prova del congelamento). */
+export async function frameSequence(ctx, name, { frames = 8, intervalMs = 400, target } = {}) {
+  const rows = [];
+  for (let i = 0; i < frames; i++) {
+    const meta = await ctx.page.evaluate(() => {
+      const s = document.querySelector('[data-astro-frames]');
+      return {
+        astroFrames: s ? Number(s.getAttribute('data-astro-frames')) : null,
+        astroIdle: document.querySelector('[data-astro-idle]')?.getAttribute('data-astro-idle') ?? null,
+        runningAnimations: document.getAnimations().filter((a) => a.playState === 'running').length,
+        pausedAnimations: document.getAnimations().filter((a) => a.playState === 'paused').length,
+        t: performance.now(),
+      };
+    });
+    const file = await snap(ctx, `${name}-${String(i).padStart(2, '0')}`, target);
+    rows.push({ i, file: path.basename(file), ...meta });
+    await ctx.page.waitForTimeout(intervalMs);
+  }
+  fs.writeFileSync(path.join(ctx.outDir, `${name}-sequence.json`), JSON.stringify(rows, null, 2));
+  return rows;
+}
+
+/**
+ * Misura C1–C9 via DOM dentro `rootSelector` (o intera pagina). Restituisce numeri, non giudizi.
+ * Limiti dichiarati nel risultato: contrasto approssimato (sfondi a gradiente/immagine), canvas non misurabile.
+ */
+export async function measure(ctx, rootSelector = 'body') {
+  return ctx.page.evaluate((sel) => {
+    const root = document.querySelector(sel) ?? document.body;
+    const vis = (el) => {
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none';
+    };
+    const box = (el) => {
+      const r = el.getBoundingClientRect();
+      return { x: +r.x.toFixed(1), y: +r.y.toFixed(1), w: +r.width.toFixed(1), h: +r.height.toFixed(1) };
+    };
+    const label = (el) =>
+      el.getAttribute('data-testid') || el.getAttribute('aria-label') || el.getAttribute('data-engraved') ||
+      `${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? '.' + el.className.split(' ')[0] : ''}`;
+
+    // C1 centratura. Due classi: `icon-only` (un glifo, niente testo, niente altro) → scarto glifo↔box;
+    // `icon+indicator` (glifo + figli senza testo, es. barra/pallino di stato) → scarto del GRUPPO di contenuto ↔ box,
+    // e l'indicatore è riportato a parte (regola 6b guida HUD: gli indicatori-pallino sono essi stessi da segnalare).
+    const c1 = [];
+    root.querySelectorAll('button, [role="button"], a').forEach((b) => {
+      if (!vis(b)) return;
+      if ((b.textContent || '').trim().length > 0) return;
+      const glyphs = [...b.querySelectorAll('svg, img')].filter(vis);
+      if (glyphs.length !== 1) return;
+      const bb = b.getBoundingClientRect();
+      const leafs = [...b.querySelectorAll('*')].filter((e) => vis(e) && e.children.length === 0 && !e.closest('svg'));
+      const extras = leafs.filter((e) => e !== glyphs[0]);
+      const parts = [glyphs[0], ...extras].map((e) => e.getBoundingClientRect());
+      const u = { x0: Math.min(...parts.map((r) => r.left)), x1: Math.max(...parts.map((r) => r.right)), y0: Math.min(...parts.map((r) => r.top)), y1: Math.max(...parts.map((r) => r.bottom)) };
+      const dx = (u.x0 + u.x1) / 2 - (bb.x + bb.width / 2);
+      const dy = (u.y0 + u.y1) / 2 - (bb.y + bb.height / 2);
+      c1.push({ el: label(b), kind: extras.length ? 'icon+indicator' : 'icon-only', indicators: extras.map((e) => ({ w: +e.getBoundingClientRect().width.toFixed(1), h: +e.getBoundingClientRect().height.toFixed(1), bg: getComputedStyle(e).backgroundColor })), dx: +dx.toFixed(2), dy: +dy.toFixed(2), box: box(b) });
+    });
+
+    // C2 allineamento: figli diretti di contenitori flex-riga — dispersione dei centri Y e dei bordi alti
+    const c2 = [];
+    root.querySelectorAll('*').forEach((p) => {
+      const cs = getComputedStyle(p);
+      if (!vis(p) || cs.display !== 'flex' || cs.flexDirection.startsWith('column')) return;
+      const kids = [...p.children].filter(vis);
+      if (kids.length < 2) return;
+      const cy = kids.map((k) => { const r = k.getBoundingClientRect(); return r.y + r.height / 2; });
+      const spread = Math.max(...cy) - Math.min(...cy);
+      if (spread > 0.5) c2.push({ container: label(p), kids: kids.length, centerYSpread: +spread.toFixed(2), alignItems: cs.alignItems });
+    });
+
+    // C3 ritmo e tipografia: valori distinti
+    const gaps = new Set(); const fonts = new Set(); const small = [];
+    root.querySelectorAll('*').forEach((el) => {
+      if (!vis(el)) return;
+      const cs = getComputedStyle(el);
+      [cs.rowGap, cs.columnGap, cs.paddingTop, cs.paddingLeft, cs.marginTop, cs.marginLeft].forEach((v) => {
+        const n = parseFloat(v); if (n > 0) gaps.add(+n.toFixed(1));
+      });
+      if (el.childNodes.length && [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) {
+        const fs = parseFloat(cs.fontSize); fonts.add(+fs.toFixed(1));
+        if (fs < 12) small.push({ el: label(el), fontSize: fs, text: el.textContent.trim().slice(0, 30) });
+      }
+    });
+
+    // C4 icone: dimensione renderizzata, peso tratto, set di origine
+    const c4 = [];
+    root.querySelectorAll('svg').forEach((s) => {
+      if (!vis(s)) return;
+      const r = s.getBoundingClientRect();
+      if (r.width > 64 || r.height > 64) return; // decorazioni/sfondi: non sono icone UI
+      const p = s.querySelector('path, circle, rect, line');
+      const cs = p ? getComputedStyle(p) : null;
+      c4.push({
+        set: s.hasAttribute('data-engraved') ? 'engraved' : 'other',
+        id: s.getAttribute('data-engraved') || s.getAttribute('aria-label') || s.closest('[data-testid]')?.getAttribute('data-testid') || '?',
+        w: +r.width.toFixed(1), h: +r.height.toFixed(1),
+        strokeWidth: cs ? cs.strokeWidth : null, fill: cs ? cs.fill : null, stroke: cs ? cs.stroke : null,
+      });
+    });
+
+    // C5 clipping: scroll interno e figli oltre l'antenato overflow:hidden
+    const c5 = [];
+    root.querySelectorAll('*').forEach((el) => {
+      if (!vis(el)) return;
+      const cs = getComputedStyle(el);
+      const clips = cs.overflowX !== 'visible' || cs.overflowY !== 'visible';
+      if (clips && (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1)) {
+        c5.push({ el: label(el), overflow: `${cs.overflowX}/${cs.overflowY}`, scroll: [el.scrollWidth, el.scrollHeight], client: [el.clientWidth, el.clientHeight] });
+      }
+    });
+
+    // C7 target interattivi < 32px
+    const c7 = [];
+    root.querySelectorAll('button, [role="button"], [role="radio"], a, input').forEach((b) => {
+      if (!vis(b)) return;
+      const r = b.getBoundingClientRect();
+      if (Math.min(r.width, r.height) < 32) c7.push({ el: label(b), w: +r.width.toFixed(1), h: +r.height.toFixed(1), disabled: b.disabled === true });
+    });
+
+    // C8 occupazione + collisioni tra pannelli
+    const panels = [...document.querySelectorAll('[data-hud-panel], [data-stage-panel]')].filter(vis);
+    const rects = panels.map((p) => ({ id: p.getAttribute('data-hud-panel') || p.getAttribute('data-stage-panel'), ...box(p) }));
+    const vw = innerWidth, vh = innerHeight;
+    const overlaps = [];
+    for (let i = 0; i < rects.length; i++) for (let j = i + 1; j < rects.length; j++) {
+      const a = rects[i], b = rects[j];
+      const ox = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+      const oy = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+      if (ox > 1 && oy > 1) overlaps.push({ a: a.id, b: b.id, area: Math.round(ox * oy) });
+    }
+    const covered = rects.reduce((s, r) => s + r.w * r.h, 0) / (vw * vh);
+
+    // C9 moto: animazioni vive, durate/easing, rAF astrolabio
+    const anims = document.getAnimations().map((a) => ({
+      state: a.playState, target: a.effect?.target ? label(a.effect.target) : '?',
+      duration: a.effect?.getTiming?.().duration, easing: a.effect?.getTiming?.().easing, iterations: a.effect?.getTiming?.().iterations,
+    }));
+    const astro = document.querySelector('[data-astro-frames]');
+
+    return {
+      root: sel, viewport: { w: vw, h: vh },
+      C1_centering: { count: c1.length, withIndicator: c1.filter((x) => x.kind === 'icon+indicator').map((x) => ({ el: x.el, indicators: x.indicators })), worstAbs: c1.length ? +Math.max(...c1.map((x) => Math.max(Math.abs(x.dx), Math.abs(x.dy)))).toFixed(2) : null, offenders: c1.filter((x) => Math.abs(x.dx) > 1 || Math.abs(x.dy) > 1) },
+      C2_alignment: { rowsWithSpread: c2.length, worst: c2.sort((a, b) => b.centerYSpread - a.centerYSpread).slice(0, 8) },
+      C3_rhythm: { distinctSpacings: [...gaps].sort((a, b) => a - b), distinctFontSizes: [...fonts].sort((a, b) => a - b), below12px: small.slice(0, 10) },
+      C4_icons: { count: c4.length, bySet: c4.reduce((m, i) => ((m[i.set] = (m[i.set] || 0) + 1), m), {}), sizes: [...new Set(c4.map((i) => `${i.w}x${i.h}`))], strokeWidths: [...new Set(c4.map((i) => i.strokeWidth))], items: c4 },
+      C5_clipping: c5.slice(0, 15),
+      C6_contrast: 'NON misurato dal DOM: sfondi a gradiente/immagine; richiede campionamento pixel (F1b).',
+      C7_smallTargets: c7,
+      C8_occupancy: { coveredFractionOfViewport: +covered.toFixed(3), panels: rects, overlaps },
+      C9_motion: { animations: anims.length, running: anims.filter((a) => a.state === 'running').length, paused: anims.filter((a) => a.state === 'paused').length, sample: anims.slice(0, 12), astroFrames: astro ? Number(astro.getAttribute('data-astro-frames')) : null, astroIdle: document.querySelector('[data-astro-idle]')?.getAttribute('data-astro-idle') ?? null },
+      limits: ['canvas Pixi non misurabile dal DOM', 'C6 e C10 non meccanici qui', 'bbox, non centro ottico'],
+    };
+  }, rootSelector);
+}
+
+export async function close(ctx) {
+  fs.writeFileSync(path.join(ctx.outDir, 'manifest.json'), JSON.stringify({ steps: ctx.steps, consoleErrors: ctx.consoleErrors.slice(0, 20) }, null, 2));
+  await ctx.browser.close();
+}
+
+/**
+ * Driver deterministico verso lo stato ARMATO (check montato, pulsante Throw visibile, nessun verdetto).
+ * Dopo ogni Enter attende, perché un secondo Enter su un check appena montato lo salta (skipToResult):
+ * è ciò che farebbe un giocatore impaziente, ma non è lo stato che vogliamo fotografare.
+ * Ritorna { armed: true } oppure lancia: mai uno stato diverso spacciato per armato.
+ */
+export async function driveToArmedCheck(ctx, { timeoutMs = 240_000, afterEnterMs = 800 } = {}) {
+  const { page } = ctx;
+  await page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].demoLaunch(), POI);
+  note(ctx, 'launch', 'hook-assisted:demoLaunch');
+  await page.getByTestId('quest-window').waitFor({ state: 'visible', timeout: 30_000 });
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (await page.getByTestId('quest-check-column').count()) break;
+    if (await page.getByTestId('quest-window-beat').isVisible().catch(() => false)) {
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(afterEnterMs);
+      continue;
+    }
+    const c = page.locator('[data-testid="quest-window-choice"]:not([disabled])').first();
+    if (await c.isVisible().catch(() => false)) await c.click();
+    else await page.evaluate(() => window.__idleVillageTestHooks.advanceTicks?.(3));
+    await page.waitForTimeout(120);
+  }
+  note(ctx, 'to-check', 'input-reale (Enter/click) + advanceTicks hook');
+  const state = await page.evaluate(() => ({ verdict: !!document.querySelector('[data-testid="quest-verdict-card"]'), parked: !!document.querySelector('[data-astro-idle="parked"]') }));
+  if (state.verdict || state.parked) throw new Error('driver ha saltato lo skill check (verdetto già presente al montaggio): ripetere');
+  return { armed: false, mounted: true }; // «armed» vero solo quando .da-tira è visibile (introduzione ~4 s)
+}
+
+/**
+ * C6 contrasto da PIXEL: per ogni elemento con testo proprio, colore del testo (computed, opaco) vs
+ * colore di sfondo = moda dei pixel nel suo box sullo screenshot reale (non il CSS: gradienti/immagini inclusi).
+ * Limiti: sfondi molto variegati danno una moda approssimata; testo con alpha o in canvas non coperto; solo elementi ≥ 6px di altezza.
+ */
+export async function contrastFromPixels(ctx, rootSelector = 'body', { max = 120 } = {}) {
+  const { page } = ctx;
+  const png = (await page.screenshot({ type: 'png' })).toString('base64');
+  return page.evaluate(async ({ sel, png, max }) => {
+    const root = document.querySelector(sel) ?? document.body;
+    const items = [];
+    root.querySelectorAll('*').forEach((el) => {
+      const own = [...el.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim()).map((n) => n.textContent.trim()).join(' ');
+      if (!own) return;
+      const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
+      if (r.width < 4 || r.height < 6 || cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) return;
+      if (r.bottom < 0 || r.right < 0 || r.top > innerHeight || r.left > innerWidth) return;
+      // visibilità EFFETTIVA: opacità cumulata degli antenati, ritaglio overflow, copertura (elementFromPoint)
+      let op = 1, clipped = false;
+      for (let a = el; a && a !== document.documentElement; a = a.parentElement) {
+        const acs = getComputedStyle(a);
+        op *= Number(acs.opacity);
+        if (acs.visibility === 'hidden' || acs.display === 'none') op = 0;
+        if (a !== el && (acs.overflowX !== 'visible' || acs.overflowY !== 'visible')) {
+          const ar = a.getBoundingClientRect(); const cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+          if (cx < ar.left || cx > ar.right || cy < ar.top || cy > ar.bottom) clipped = true;
+        }
+      }
+      if (op < 0.15 || clipped) return;
+      const hit = document.elementFromPoint(Math.min(innerWidth - 1, r.x + r.width / 2), Math.min(innerHeight - 1, r.y + r.height / 2));
+      if (hit && hit !== el && !el.contains(hit) && !hit.contains(el)) return; // coperto da altro
+      const m = cs.color.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?/);
+      if (!m) return;
+      items.push({ el: el.getAttribute('data-testid') || el.className?.toString().split(' ')[0] || el.tagName.toLowerCase(), text: own.slice(0, 28), rect: r, fg: [+m[1], +m[2], +m[3]], alpha: m[4] === undefined ? 1 : +m[4], size: parseFloat(cs.fontSize), weight: parseInt(cs.fontWeight, 10) || 400 });
+    });
+    const img = await createImageBitmap(await (await fetch('data:image/png;base64,' + png)).blob());
+    const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height;
+    const g = cv.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0);
+    const lum = ([r, gg, b]) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(gg) + 0.0722 * f(b); };
+    const ratio = (a, b) => { const la = lum(a), lb = lum(b); return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05); };
+    const out = [];
+    for (const it of items.slice(0, max)) {
+      const x = Math.max(0, Math.floor(it.rect.x)), y = Math.max(0, Math.floor(it.rect.y));
+      const w = Math.min(img.width - x, Math.ceil(it.rect.width)), h = Math.min(img.height - y, Math.ceil(it.rect.height));
+      if (w < 2 || h < 2) continue;
+      const d = g.getImageData(x, y, w, h).data; const bins = new Map();
+      for (let i = 0; i < d.length; i += 4) { const k = (d[i] >> 4) << 8 | (d[i + 1] >> 4) << 4 | (d[i + 2] >> 4); const e = bins.get(k) || [0, 0, 0, 0]; e[0]++; e[1] += d[i]; e[2] += d[i + 1]; e[3] += d[i + 2]; bins.set(k, e); }
+      const top = [...bins.values()].sort((a, b) => b[0] - a[0])[0];
+      const bg = [top[1] / top[0], top[2] / top[0], top[3] / top[0]];
+      const large = it.size >= 24 || (it.size >= 18.66 && it.weight >= 700);
+      const cr = ratio(it.fg, bg);
+      out.push({ el: it.el, text: it.text, size: it.size, fg: it.fg.map(Math.round), bg: bg.map(Math.round), ratio: +cr.toFixed(2), need: large ? 3 : 4.5, fail: cr < (large ? 3 : 4.5), alpha: it.alpha });
+    }
+    return { measured: out.length, failing: out.filter((o) => o.fail).length, worst: [...out].sort((a, b) => a.ratio - b.ratio).slice(0, 12), note: 'bg = moda pixel nel box; esclusi testi con opacità cumulata <0.15, ritagliati o coperti; alpha<1 sottostima il fg; approssimato.' };
+  }, { sel: rootSelector, png, max });
+}
+
+/**
+ * C5b «sbordo»: figli che escono dalla cornice del loro contenitore visivo (HudPlaque) anche quando
+ * l'overflow è visible — il caso che C5 non vedeva (pillola MENU fuori dalla lastra, F3 HUD, R-234).
+ * Per ogni [data-skin="hud-plaque"] misura il box interno al netto di una fascia di cornice e riporta
+ * i discendenti interattivi/testuali che la attraversano, con i px di sbordo per lato.
+ */
+export async function plaqueOverflow(ctx, { bandPx = 6 } = {}) {
+  return ctx.page.evaluate((band) => {
+    const out = [];
+    for (const pl of document.querySelectorAll('[data-skin="hud-plaque"]')) {
+      const p = pl.getBoundingClientRect(); if (p.width < 1) continue;
+      const inner = { l: p.left + band, r: p.right - band, t: p.top + band, b: p.bottom - band };
+      const kids = [...pl.querySelectorAll('button, [role="button"], [role="radio"], a, span, svg')].filter((k) => { const r = k.getBoundingClientRect(); return r.width > 2 && r.height > 2 && !k.closest('svg[aria-hidden="true"][data-plaque-frame]'); });
+      for (const k of kids) {
+        const r = k.getBoundingClientRect();
+        const o = { left: Math.max(0, inner.l - r.left), right: Math.max(0, r.right - inner.r), top: Math.max(0, inner.t - r.top), bottom: Math.max(0, r.bottom - inner.b) };
+        const worst = Math.max(o.left, o.right, o.top, o.bottom);
+        if (worst > 0.5 && (k.matches('button,[role="button"],[role="radio"],a') || (k.textContent || '').trim())) out.push({ plaque: (pl.innerText || '').replace(/\s+/g, ' ').slice(0, 24), el: k.getAttribute('aria-label') || (k.textContent || k.tagName).trim().slice(0, 24), over: Object.fromEntries(Object.entries(o).map(([a, b]) => [a, +b.toFixed(1)])), plaqueBox: [Math.round(p.x), Math.round(p.y), Math.round(p.width), Math.round(p.height)], elBox: [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)] });
+      }
+    }
+    return out.sort((a, b) => Math.max(...Object.values(b.over)) - Math.max(...Object.values(a.over))).slice(0, 25);
+  }, bandPx);
+}
+
+/**
+ * C5c «respiro dalla cornice»: la guida HUD §3 chiede `--skin-hud-plaque-clearance` + `--skin-hud-panel-padding`
+ * (≈22 px) tra il bordo della lastra e il contenuto. Il DOM non vede la cornice disegnata (spalle curve),
+ * quindi si misura la distanza dei controlli dai bordi del box della lastra e la si confronta col token.
+ */
+export async function plaqueClearance(ctx) {
+  return ctx.page.evaluate(() => {
+    const cs = getComputedStyle(document.documentElement);
+    const px = (v) => parseFloat(cs.getPropertyValue(v)) || 0;
+    const need = px('--skin-hud-plaque-clearance') + px('--skin-hud-panel-padding') || 22;
+    const out = [];
+    for (const pl of document.querySelectorAll('[data-skin="hud-plaque"]')) {
+      const p = pl.getBoundingClientRect(); if (p.width < 1) continue;
+      for (const k of pl.querySelectorAll('button, [role="button"], [role="radio"], [role="group"]')) {
+        const r = k.getBoundingClientRect(); if (r.width < 2) continue;
+        const gap = { left: r.left - p.left, right: p.right - r.right, top: r.top - p.top, bottom: p.bottom - r.bottom };
+        const min = Math.min(...Object.values(gap));
+        out.push({ plaque: (pl.innerText || '').replace(/\s+/g, ' ').slice(0, 18), el: (k.getAttribute('aria-label') || k.textContent || '').trim().slice(0, 18), need, minGap: +min.toFixed(1), gap: Object.fromEntries(Object.entries(gap).map(([a, b]) => [a, Math.round(b)])), fail: min < need });
+      }
+    }
+    return out.filter((o) => o.fail).sort((a, b) => a.minGap - b.minGap);
+  });
+}
+
+/**
+ * Lente v2 (R-234): le classi di difetto sfuggite al primo giro, misurate per ogni «superficie» visibile
+ * (pannelli HUD, lastre, tooltip, popover, colonna check). Restituisce numeri e campioni, non giudizi.
+ *  L1 collisioni testo-testo · L2 troncamenti · L3 famiglie di font · L4 colori fuori palette (ciano/verde/rosso saturi)
+ *  L5 grammatiche di bottone · L6 righe a zero · L7 «cerchio con simbolo» (6b) · L8 testo < 12 px · L9 respiro < 22 px
+ */
+export async function lensAudit(ctx) {
+  return ctx.page.evaluate(() => {
+    const vis = (e) => { const r = e.getBoundingClientRect(); const s = getComputedStyle(e); if (r.width < 1 || r.height < 1 || s.visibility === 'hidden' || s.display === 'none') return false; let op = 1; for (let a = e; a && a !== document.documentElement; a = a.parentElement) op *= Number(getComputedStyle(a).opacity); return op > 0.15 && r.bottom > 0 && r.right > 0 && r.top < innerHeight && r.left < innerWidth; };
+    const own = (e) => [...e.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim()).map((n) => n.textContent.trim()).join(' ');
+    const sel = '[data-hud-panel],[data-stage-panel],[data-skin="hud-plaque"],[role="tooltip"],[data-radix-popper-content-wrapper],[role="menu"],[role="dialog"],[data-testid="quest-check-column"],[data-testid="village-registry-list"]';
+    const roots = [...document.querySelectorAll(sel)].filter(vis).filter((r, i, a) => !a.some((o) => o !== r && o.contains(r) && o.matches('[data-hud-panel],[data-stage-panel],[role="dialog"]')));
+    const hue = (c) => { const m = c.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)/); if (!m) return null; let [r, g, b] = [m[1] / 255, m[2] / 255, m[3] / 255]; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (d < 0.25 || mx < 0.35) return null; let h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; return h; };
+    const fam = (h) => h == null ? null : (h >= 165 && h <= 200) ? 'cyan' : (h >= 85 && h < 165) ? 'green' : (h < 15 || h >= 340) ? 'red' : (h >= 270 && h < 340) ? 'purple' : null;
+    const need = 22;
+    return roots.map((root) => {
+      const R = root.getBoundingClientRect();
+      const name = root.getAttribute('data-hud-panel') || root.getAttribute('data-stage-panel') || root.getAttribute('data-testid') || root.getAttribute('role') || (own(root) || root.innerText || '').replace(/\s+/g, ' ').slice(0, 24) || 'plaque';
+      const texts = [...root.querySelectorAll('*')].filter((e) => own(e) && vis(e));
+      // L1
+      const col = []; for (let i = 0; i < texts.length; i++) for (let j = i + 1; j < texts.length; j++) { const a = texts[i], b = texts[j]; if (a.contains(b) || b.contains(a)) continue; const p = a.getBoundingClientRect(), q = b.getBoundingClientRect(); const ox = Math.min(p.right, q.right) - Math.max(p.left, q.left), oy = Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top); if (ox > 3 && oy > 3) col.push([own(a).slice(0, 18), own(b).slice(0, 18), Math.round(ox * oy)]); }
+      // L2
+      const trunc = texts.filter((e) => { const s = getComputedStyle(e); return (s.textOverflow === 'ellipsis' && e.scrollWidth > e.clientWidth + 1) || /…$/.test(own(e)); }).map((e) => own(e).slice(0, 24));
+      // L3
+      const fonts = {}; texts.forEach((e) => { const f = getComputedStyle(e).fontFamily.split(',')[0].replace(/["']/g, '').trim(); fonts[f] = (fonts[f] || 0) + 1; });
+      // L4
+      const off = {}; const offS = []; texts.forEach((e) => { const f = fam(hue(getComputedStyle(e).color)); if (f) { off[f] = (off[f] || 0) + 1; if (offS.length < 6) offS.push([f, own(e).slice(0, 16)]); } });
+      root.querySelectorAll('svg').forEach((s) => { if (!vis(s)) return; const f = fam(hue(getComputedStyle(s).color)) || fam(hue(getComputedStyle(s.querySelector('path,circle,rect') || s).fill)); if (f) off['icon-' + f] = (off['icon-' + f] || 0) + 1; });
+      // L5
+      const gram = new Set(); root.querySelectorAll('button,[role="button"],[role="radio"]').forEach((b) => { if (!vis(b)) return; const s = getComputedStyle(b), r = b.getBoundingClientRect(); const rad = parseFloat(s.borderTopLeftRadius); const shape = rad >= Math.min(r.width, r.height) / 2 - 1 ? (Math.abs(r.width - r.height) < 3 ? 'circle' : 'pill') : rad > 2 ? 'rounded' : 'square'; gram.add(`${shape}/${Math.round(r.height)}`); });
+      // L6
+      const zeros = texts.filter((e) => /^(0|0%|0\.0|×0|\+0)$/.test(own(e))).length;
+      // L7
+      let circSym = 0; root.querySelectorAll('svg,img').forEach((s) => { const p = s.parentElement; if (!p || !vis(s)) return; const ps = getComputedStyle(p), pr = p.getBoundingClientRect(); if (parseFloat(ps.borderTopLeftRadius) >= pr.width / 2 - 1 && Math.abs(pr.width - pr.height) < 3 && (ps.borderTopWidth !== '0px' || ps.backgroundColor !== 'rgba(0, 0, 0, 0)')) circSym++; });
+      // L8
+      const small = texts.filter((e) => parseFloat(getComputedStyle(e).fontSize) < 12).map((e) => `${own(e).slice(0, 14)}@${getComputedStyle(e).fontSize}`);
+      // L9
+      let clr = 0; root.querySelectorAll('button,[role="button"]').forEach((b) => { if (!vis(b)) return; const r = b.getBoundingClientRect(); const g = Math.min(r.left - R.left, R.right - r.right, r.top - R.top, R.bottom - r.bottom); if (g < need && root.matches('[data-skin="hud-plaque"]')) clr++; });
+      return { name, box: [Math.round(R.x), Math.round(R.y), Math.round(R.width), Math.round(R.height)], texts: texts.length,
+        L1_collisions: col.slice(0, 8), L1n: col.length, L2_truncated: trunc.slice(0, 8), L3_fonts: fonts, L4_offPalette: off, L4_samples: offS,
+        L5_buttonGrammars: [...gram], L6_zeroValues: zeros, L7_circleWithSymbol: circSym, L8_small: small.slice(0, 8), L8n: small.length, L9_tightToFrame: clr };
+    });
+  });
+}
+
+/** S-21: con la macchina carica i primi screenshot dopo il boot costano 20-25 s (main thread occupato).
+ *  Aspetta finché uno screenshot di prova non costa meno di `budgetMs`, poi si cattura. */
+export async function warmUp(ctx, { budgetMs = 3000, tries = 12 } = {}) {
+  for (let i = 0; i < tries; i++) { const t = Date.now(); await ctx.page.screenshot({ timeout: 120000 }); const dt = Date.now() - t; ctx.steps.push({ step: 'warmup', how: `${dt}ms` }); if (dt < budgetMs) return dt; await ctx.page.waitForTimeout(1500); }
+  return -1;
+}

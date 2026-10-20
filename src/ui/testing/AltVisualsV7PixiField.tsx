@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import * as PIXI from 'pixi.js';
+import { KEEP_GLOBAL_RESOURCES } from '../idleVillage/pixiSpike/pixiDestroy';
 import { deriveAxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
 
@@ -47,7 +48,7 @@ export function AltVisualsV7PixiField({ stats }: AltVisualsV7PixiFieldProps) {
         resizeTo: container,
       });
       if (disposed) {
-        app?.destroy(true, true);
+        app?.destroy(KEEP_GLOBAL_RESOURCES, true);
         app = null;
         return;
       }
@@ -63,7 +64,7 @@ export function AltVisualsV7PixiField({ stats }: AltVisualsV7PixiFieldProps) {
       teardown();
       initTask.finally(() => {
         if (app) {
-          app.destroy(true, true);
+          app.destroy(KEEP_GLOBAL_RESOURCES, true);
           app = null;
         }
         container.replaceChildren();

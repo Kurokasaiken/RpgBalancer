@@ -1,0 +1,20 @@
+import fs from 'node:fs';
+import { openGame, snap, close, plaqueOverflow, plaqueClearance } from './harness.mjs';
+for (const [W, H] of [[1440, 900], [1280, 800]]) {
+  const outDir = new URL(`./out/hudtop-${W}x${H}/`, import.meta.url).pathname;
+  const ctx = await openGame({ outDir, viewport: { width: W, height: H } });
+  await ctx.page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), null, { timeout: 60000 }).catch(() => {});
+  await ctx.page.waitForTimeout(2000);
+  await ctx.page.waitForSelector('[data-skin="hud-plaque"]', { timeout: 30000 }).catch(() => {}); await ctx.page.waitForTimeout(800);
+  const cl = await plaqueClearance(ctx); fs.writeFileSync(outDir + 'plaque-clearance.json', JSON.stringify(cl, null, 1)); console.log(W, 'clearance fails', cl.length, JSON.stringify(cl.slice(0, 10).map((c) => [c.plaque.slice(0, 8), c.el, c.minGap, c.gap])));
+  const ov = await plaqueOverflow(ctx); fs.writeFileSync(outDir + 'plaque-overflow.json', JSON.stringify(ov, null, 1));
+  const geo = await ctx.page.evaluate(() => [...document.querySelectorAll('[data-skin="hud-plaque"]')].map((p) => { const r = p.getBoundingClientRect(); const b = p.querySelector('button'); const br = b?.getBoundingClientRect(); return { text: p.innerText.replace(/\s+/g, ' ').slice(0, 30), box: [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)], firstButton: br ? [Math.round(br.x), Math.round(br.y), Math.round(br.width), Math.round(br.height)] : null }; }));
+  fs.writeFileSync(outDir + 'plaques.json', JSON.stringify(geo, null, 1));
+  console.log(W, JSON.stringify(geo.slice(0, 4)));
+  console.log(W, 'overflow:', JSON.stringify(ov.slice(0, 8).map((o) => [o.plaque.slice(0, 10), o.el, o.over])));
+  await ctx.page.getByRole('button', { name: /^menu$/i }).first().click(); await ctx.page.waitForTimeout(700);
+  await snap(ctx, 'menu-open');
+  const menu = await ctx.page.evaluate(() => { const m = document.querySelector('[role="menu"]'); if (!m) return null; const r = m.getBoundingClientRect(); return { box: [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)], vh: innerHeight, scroll: [m.scrollHeight, m.clientHeight], items: m.querySelectorAll('[role^="menuitem"]').length }; });
+  console.log(W, 'menu', JSON.stringify(menu));
+  await close(ctx);
+}

@@ -1,0 +1,30 @@
+import fs from 'node:fs';
+import { openGame, POI, snap, close, driveToArmedCheck } from './harness.mjs';
+const outDir = new URL('./out/f1b-clock/', import.meta.url).pathname;
+const ctx = await openGame({ outDir });  // boot in tempo reale; il clock finto si installa DOPO (tardi)
+const { page } = ctx;
+const frames = () => page.evaluate(() => { const s = document.querySelector('[data-astro-frames]'); return { f: s ? Number(s.getAttribute('data-astro-frames')) : null, idle: document.querySelector('[data-astro-idle]')?.getAttribute('data-astro-idle') ?? null, tira: !!document.querySelector('.da-tira'), verdict: !!document.querySelector('[data-testid="quest-verdict-card"]') }; });
+const log = [];
+const step = async (label, ms) => { await page.clock.runFor(ms); const r = await frames(); log.push({ label, ms, ...r }); console.log(label, JSON.stringify(r)); };
+await driveToArmedCheck(ctx);
+await page.locator('.da-tira').waitFor({ state: 'visible', timeout: 30000 });
+console.log('armed (Throw visibile) in tempo reale, ora installo il clock finto');
+await page.clock.install(); // tardi: Pixi ha già caricato le texture
+await page.clock.pauseAt(new Date(Date.now() + 10_000_000)); // congela
+const a = await frames(); await page.waitForTimeout(1000); const b = await frames();
+console.log('PAUSED 1s real: frames', a.f, '->', b.f, '(deterministico se uguali)');
+log.push({ label: 'paused-real-1s', before: a, after: b });
+await step('runFor 1000', 1000);
+await step('runFor 1000', 1000);
+await step('runFor 3000', 3000);
+await step('runFor 3000', 3000);
+await snap(ctx, '20-armed-clock-paused');
+await page.locator('.da-tira').click();
+for (let i = 0; i < 12; i++) { await step(`spin+${(i + 1)}s`, 1000); if ((await frames()).verdict) break; }
+await snap(ctx, '30-verdict-clock');
+await step('after verdict +500', 500); await step('after verdict +500', 500);
+await step('parked? +2000', 2000);
+await step('parked? +2000', 2000);
+await snap(ctx, '40-parked-clock');
+fs.writeFileSync(outDir + 'clock-log.json', JSON.stringify(log, null, 1));
+await close(ctx);

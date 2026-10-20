@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fork visivi /game v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --skin-surface-border:rgba(223,184,87,.50);
+  --skin-font-display:"Cinzel","Trajan Pro",serif; --skin-font-serif:"EB Garamond",Georgia,serif;
+  --skin-title-color:#f0cf6a; --skin-text-primary:#F5F2E8; --skin-text-secondary:rgba(245,242,232,.70); --skin-label-primary:#c9a84e;
+  --skin-hud-lacquer-lift:#0f2a35; --skin-hud-lacquer-deep:#060f16;
+  --skin-hud-brass-crest:#d8bd78; --skin-hud-brass-hi:#cfaf63; --skin-hud-brass-mid:#c2a355; --skin-hud-brass-low:#a0762f; --skin-hud-brass-base:#5f3f16;
+  --skin-hud-parchment:#e8d6ae; --ember:#c9663a; --iron:#7d8a8c;
+  --page:#0b1c22; --ink:#e9dfc6; --ink-dim:#a9b3ad; --rule:rgba(223,184,87,.22);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.5 var(--skin-font-serif)}
+header,main,footer{max-width:1180px;margin:0 auto;padding-left:16px;padding-right:16px}
+header{padding-top:32px}
+h1{font:600 26px var(--skin-font-display);letter-spacing:.06em;color:var(--skin-title-color);margin:0 0 6px}
+header p,.why{color:var(--ink-dim);max-width:900px;margin:0 0 12px}
+code{font:.82em ui-monospace,Menlo,monospace;color:var(--skin-hud-brass-crest)}
+.fork{border-top:1px solid var(--rule);padding:28px 0}
+.fork h2{font:600 18px var(--skin-font-display);letter-spacing:.05em;color:var(--skin-hud-brass-crest);margin:0 0 4px}
+.ruling{display:inline-block;font:500 11px var(--skin-font-display);letter-spacing:.14em;color:var(--skin-hud-brass-crest);border:1px solid var(--rule);border-radius:999px;padding:1px 10px;margin-left:8px;vertical-align:middle}
+.row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.row{grid-template-columns:1fr}}
+.col h3{font:500 13px var(--skin-font-display);letter-spacing:.12em;text-transform:uppercase;color:var(--skin-label-primary);margin:0 0 8px}
+.note{font-size:14px;color:var(--ink-dim);margin-top:8px}
+.base img{width:100%;border-radius:8px;border:1px solid var(--rule);display:block}
+.stage{background:radial-gradient(120% 90% at 50% 0%,#14343a 0%,#0b1f25 60%,#081419 100%);border:1px solid var(--rule);border-radius:8px;padding:16px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative;overflow:hidden}
+.toggle{display:flex;gap:6px;justify-content:center}
+.toggle button{font:500 12px var(--skin-font-display);letter-spacing:.08em;color:var(--skin-hud-brass-crest);background:var(--skin-hud-lacquer-deep);border:1px solid var(--skin-surface-border);border-radius:999px;padding:4px 12px;min-height:32px;cursor:pointer}
+.toggle button[aria-pressed="true"]{background:var(--skin-hud-lacquer-lift);color:var(--skin-title-color)}
+.matrix{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;table-layout:fixed}
+.matrix th,.matrix td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:top}
+.matrix th:first-child,.matrix td:first-child{width:34%}
+.matrix th{font:500 12px var(--skin-font-display);letter-spacing:.1em;color:var(--skin-label-primary);text-transform:uppercase}
+.win{color:var(--skin-title-color)}
+/* ================= SC-2 v2: il quadrante dopo il verdetto ================= */
+.dial{width:240px;height:240px;display:block}
+.dial .spinA{transform-origin:120px 120px;animation:rot 90s linear infinite}
+.dial .spinB{transform-origin:120px 120px;animation:rot 140s linear infinite reverse}
+.dial .spinC{transform-origin:120px 120px;animation:rot 60s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.dial .tw{animation:tw 5s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.15}50%{opacity:.95}}
+.dial .glint{animation:glint 7s ease-in-out infinite}
+@keyframes glint{0%,78%,100%{opacity:0;transform:translateX(-30px)}86%{opacity:.85}94%{opacity:0;transform:translateX(30px)}}
+.dial .breathe{transform-origin:120px 120px;animation:br 6.5s ease-in-out infinite}
+@keyframes br{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.dial .mote{animation:rise 6s linear infinite}
+@keyframes rise{0%{transform:translateY(16px);opacity:0}20%{opacity:.9}100%{transform:translateY(-70px);opacity:0}}
+.dial .ash{animation:fall 7s linear infinite}
+@keyframes fall{0%{transform:translateY(-60px);opacity:0}20%{opacity:.7}100%{transform:translateY(40px);opacity:0}}
+.dial .drift{animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translateX(-14px)}to{transform:translateX(14px)}}
+.verdict{font:600 13px var(--skin-font-display);letter-spacing:.28em}
+.verdict.v{color:var(--skin-title-color)} .verdict.d{color:#a9b8bc}
+/* ================= QW-1 v2: barra B + cronaca fasi ================= */
+.qw{width:100%;max-width:360px}
+.trk{position:relative;height:8px;border-radius:4px;background:var(--skin-hud-lacquer-deep);border:1px solid rgba(223,184,87,.35)}
+.fl{position:absolute;inset:0 auto 0 0;border-radius:3px;background:linear-gradient(90deg,rgba(240,207,106,.45),var(--skin-title-color))}
+.emb{position:absolute;top:0;bottom:0;border-radius:0 3px 3px 0;background:repeating-linear-gradient(135deg,rgba(201,102,58,.9) 0 4px,rgba(110,40,20,.9) 4px 8px)}
+.capr{display:flex;justify-content:space-between;font:500 12px var(--skin-font-display);letter-spacing:.1em;color:var(--skin-label-primary);margin-top:6px}
+.seals{position:relative;height:44px;margin-top:-26px}
+.seal{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2px}
+.seal svg{width:26px;height:26px;display:block}
+.seal span{font:500 10px var(--skin-font-display);letter-spacing:.06em;color:var(--skin-label-primary);white-space:nowrap}
+.seal.now svg{filter:drop-shadow(0 0 5px rgba(240,207,106,.8))}
+.chron{display:flex;gap:8px;margin-top:14px}
+.tile{width:46px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tile .t{width:40px;height:40px;border-radius:8px;background:linear-gradient(180deg,var(--skin-hud-lacquer-lift),var(--skin-hud-lacquer-deep));border:1px solid rgba(223,184,87,.45);display:grid;place-items:center;position:relative;color:var(--skin-hud-brass-crest)}
+.tile .t svg{width:20px;height:20px}
+.tile.hurt .t{border-color:var(--ember);box-shadow:inset 0 -8px 12px -8px rgba(201,102,58,.9)}
+.tile.now .t{border-color:var(--skin-title-color);box-shadow:0 0 8px rgba(240,207,106,.45)}
+.tile.future .t{opacity:.45}
+.tile.hurt .t::after{content:"";position:absolute;right:6px;top:5px;width:9px;height:12px;border-right:2px solid var(--ember);transform:skewX(-18deg)}
+.tile small{font:500 10px var(--skin-font-display);letter-spacing:.06em;color:var(--skin-label-primary)}
+.tile.hurt small{color:#e8a585}
+/* ================= HUD-2: le tre lastre in alto ================= */
+.strip{width:100%;height:96px;position:relative;background:radial-gradient(130% 120% at 50% 120%,#3f8f8d,#2f6f74 70%,#235a60);border-radius:8px;overflow:hidden}
+.hang{position:absolute;top:0;height:64px;white-space:nowrap;background:linear-gradient(180deg,var(--skin-hud-lacquer-lift),var(--skin-hud-lacquer-deep));border:1.5px solid var(--skin-hud-brass-hi);border-top:none;border-radius:0 0 18px 18px;box-shadow:0 8px 16px rgba(3,26,30,.55),inset 0 0 0 3px var(--skin-hud-lacquer-deep),inset 0 0 0 4px rgba(207,175,99,.35);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;font:600 10px var(--skin-font-display);letter-spacing:.12em;color:var(--skin-hud-brass-crest)}
+.hang .num{font:500 15px var(--skin-font-serif);color:var(--skin-text-primary);letter-spacing:0}
+.hang .ic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;border:1px solid rgba(207,175,99,.45)}
+.hang .ic svg{width:14px;height:14px}
+.hang .sep{width:1px;height:22px;background:rgba(207,175,99,.35)}
+.hang .sp{font:600 10px var(--skin-font-display);padding:3px 6px;border-radius:5px;border:1px solid rgba(207,175,99,.35)}
+.hang .sp.on{background:var(--skin-hud-lacquer-lift);color:var(--skin-title-color);border-color:var(--skin-title-color)}
+.hang .res{display:flex;flex-direction:column;align-items:center;line-height:1.1;min-width:52px}
+.hang .res.ember{color:#f2b38f}
+@media (prefers-reduced-motion:reduce){.dial *{animation:none!important}}
+footer{color:var(--ink-dim);font-size:14px;padding-bottom:40px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Fork visivi /game · v2</h1>
+  <p>Seconda tornata dopo i tuoi ruling del 2026-10-20 (R-234): SC-1 A, QW-1 B, PL-3 A, HUD-1 A confermati. Qui ci sono le tre cose che hai chiesto di rifare o di guardare: l'idle dopo il verdetto (SC-2), le icone sotto la barra B e le lastre in alto della HUD. Nessuna opzione è raccomandata.</p>
+</header>
+<main>
+
+<section class="fork" id="sc2">
+  <h2>SC-2 · Idle dopo il verdetto <span class="ruling">A CONFERMATA · FORMA DA SCEGLIERE</span></h2>
+  <p class="why">La versione a «tre raggi» non va. Due direzioni nuove, entrambe ricavate dal vocabolario dell'astrolabio, non da effetti generici. Principi dalla ricerca: il moto dopo l'esito deve essere <b>calmo e lungo</b> (il centro dell'attenzione è la carta dell'esito); loop lunghi e sfasati per non sembrare meccanici; solo trasformazioni e opacità (nessun ridisegno del canvas, BV-04 ridefinito); reduced-motion = fermo. Entrambe hanno una variante per la <b>sconfitta</b>, che oggi non ha messa in scena.</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/board-parked.png" alt="Quadrante attuale congelato"><img src="baseline/board-defeat-parked.png" alt="Quadrante in sconfitta, congelato" style="margin-top:8px"><div class="note">Vittoria e sconfitta parcheggiate: 0 px cambiati; la sconfitta è identica al «prima del tiro».</div></div>
+    <div class="col"><h3>A1 · Orrery: gli anelli continuano a girare</h3>
+      <div class="stage">
+        <svg class="dial" id="dialA" viewBox="0 0 240 240" aria-label="Quadrante con anelli che ruotano"></svg>
+        <div class="verdict v" id="vA">VICTORY</div>
+        <div class="toggle" data-dial="A"><button aria-pressed="true" data-m="v">Vittoria</button><button data-m="d">Sconfitta</button></div>
+      </div>
+      <div class="note">L'astrolabio è uno strumento: dopo il verdetto i suoi tre anelli incisi (zodiaco, gradi, ore) girano lenti e in versi opposti (60/90/140 s), le stelle del vetro brillano sfasate. Vittoria: il nucleo d'oro ha un riflesso ogni 7 s. Sconfitta: gli anelli quasi si fermano e il vetro si raffredda.</div></div>
+    <div class="col"><h3>A2 · Marea d'inchiostro</h3>
+      <div class="stage">
+        <svg class="dial" id="dialB" viewBox="0 0 240 240" aria-label="Quadrante con inchiostro che respira"></svg>
+        <div class="verdict v" id="vB">VICTORY</div>
+        <div class="toggle" data-dial="B"><button aria-pressed="true" data-m="v">Vittoria</button><button data-m="d">Sconfitta</button></div>
+      </div>
+      <div class="note">Riprende l'intro (le gocce, gli aculei): la pozza d'inchiostro sotto la stella respira e la nebbia attraversa il vetro. Vittoria: scintille d'oro salgono dalla stella. Sconfitta: cenere fredda cade e l'inchiostro si allarga sopra la stella.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A1 Orrery</th><th>A2 Marea</th></tr>
+    <tr><td>Coerenza con l'oggetto «astrolabio»</td><td class="win">meccanica, strumentale</td><td>narrativa, magica</td></tr>
+    <tr><td>Continuità con l'intro</td><td>nuova</td><td class="win">stessa materia (inchiostro)</td></tr>
+    <tr><td>Distinzione vittoria/sconfitta</td><td>sottile (velocità, temperatura)</td><td class="win">forte (scintille contro cenere)</td></tr>
+    <tr><td>Rischio di distrarre dalla carta</td><td class="win">basso</td><td>medio (particelle)</td></tr></table>
+</section>
+
+<section class="fork" id="qw1">
+  <h2>QW-1 · Le icone sotto la barra <span class="ruling">BARRA B CONFERMATA</span></h2>
+  <p class="why">La tua nota: «le icone in basso non stanno bene, sono fuori stile». Oggi sono la cronologia delle fasi: tessere con bordo <b>verde</b>, scudi con la <b>spunta</b>, «SAFE» verde, «−600 HP» arancio (cifra sbagliata, vedi F3), tessera tratteggiata «?». È tutto quello che la regola 6b vieta: semaforo, spunte, badge. Due direzioni nella famiglia della HUD (ottone, lacca, inchiostro; il ferro per ciò che è chiuso; la brace per il danno).</p>
+  <div class="row">
+    <div class="col base"><h3>Baseline</h3><img src="baseline/phase-tiles.png" alt="Tessere fase attuali"><div class="note">Verde, spunte, arancio, tratteggio: quattro grammatiche in cinque tessere.</div></div>
+    <div class="col"><h3>I1 · Sigilli sulla barra</h3>
+      <div class="stage"><div class="qw" id="qwI1"></div></div>
+      <div class="note">La cronologia diventa la barra stessa: ogni fase è un sigillo d'ottone sulla sua tacca reale. Pieno = fatta, incrinato con brace = ferito (−HP inciso sotto), bordo d'oro con fiamma = ora, contorno di ferro = futura. Nessun cerchio, nessuna spunta. Una riga in meno nella finestra.</div></div>
+    <div class="col"><h3>I2 · Tessere d'ottone sotto la barra</h3>
+      <div class="stage"><div class="qw" id="qwI2"></div></div>
+      <div class="note">Si tengono le tessere (leggibili al tocco, con tooltip), ma in lacca e ottone: icone incise monocrome, stato detto dal bordo (ottone / brace con tacca / oro acceso / spento), mai dal verde.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>I1 Sigilli</th><th>I2 Tessere</th></tr>
+    <tr><td>Legame fasi ↔ tempo (la tua richiesta R-231 #4)</td><td class="win">diretto: la fase sta dove avviene</td><td>indiretto</td></tr>
+    <tr><td>Target interattivo (≥ 32 px)</td><td>26 px, serve area di tocco estesa</td><td class="win">40 px</td></tr>
+    <tr><td>Altezza della finestra</td><td class="win">−1 riga</td><td>invariata</td></tr>
+    <tr><td>Fasi nascoste / sforo</td><td>il sigillo appare quando la fase si rivela</td><td class="win">nessun problema di posizione</td></tr></table>
+</section>
+
+<section class="fork" id="hud2">
+  <h2>HUD-2 · Le tre lastre in alto <span class="ruling">NUOVO</span></h2>
+  <p class="why">Il problema che non avevo visto (FATTO): la lastra MENU è alta <b>50 px</b> contro <b>84</b> delle altre due; la pillola «MENU» riempie quasi tutta la lastra e <b>passa sopra la cornice dorata e le spalle curve</b>. Il tempo ha spazio vuoto, le risorse hanno tessere di larghezza diversa. Tre oggetti che non sembrano della stessa famiglia.</p>
+  <div class="base" style="margin-bottom:12px"><img src="baseline/top-strip.png" alt="Fascia alta attuale della HUD"></div>
+  <div class="row" style="grid-template-columns:1fr">
+    <div class="col"><h3>H1 · Tre lastre, una famiglia</h3>
+      <div class="strip">
+        <div class="hang" style="left:2%;width:13%"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></span>MENU</div>
+        <div class="hang" style="left:31%;width:38%"><span>DAY</span><span class="num">5</span><span class="sep"></span><span style="font-family:var(--skin-font-serif);font-size:13px;letter-spacing:0;color:var(--skin-text-secondary)">The Eastern Marches</span><span class="sep"></span><span class="sp">II</span><span class="sp on">×1</span><span class="sp">×2</span><span class="sp">×4</span></div>
+        <div class="hang" style="left:73%;width:25%"><span class="res"><span class="num">15</span>GOLD</span><span class="res ember"><span class="num" style="color:#f2b38f">0</span>FOOD</span><span class="res"><span class="num">0</span>WOOD</span></div>
+      </div>
+      <div class="note">Stessa altezza (64 px qui in scala), stessa cornice, stesse spalle; il MENU diventa un'icona incisa più etichetta <i>dentro</i> i margini. Le risorse hanno tre colonne uguali; il cibo usa la brace (HUD-1 A), non una tessera colorata.</div></div>
+    <div class="col"><h3>H2 · Due lastre: il MENU entra nel tempo</h3>
+      <div class="strip">
+        <div class="hang" style="left:22%;width:50%"><span class="ic" title="Menu"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></span><span class="sep"></span><span>DAY</span><span class="num">5</span><span class="sep"></span><span style="font-family:var(--skin-font-serif);font-size:13px;letter-spacing:0;color:var(--skin-text-secondary)">The Eastern Marches</span><span class="sep"></span><span class="sp">II</span><span class="sp on">×1</span><span class="sp">×2</span><span class="sp">×4</span></div>
+        <div class="hang" style="left:75%;width:23%"><span class="res"><span class="num">15</span>GOLD</span><span class="res ember"><span class="num" style="color:#f2b38f">0</span>FOOD</span><span class="res"><span class="num">0</span>WOOD</span></div>
+      </div>
+      <div class="note">La lastra minuscola sparisce: il menu è il primo comando della lastra del tempo («dove sono, quando sono, cosa posso fare»). Angolo sinistro libero per la mappa; meno oggetti appesi.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>H1</th><th>H2</th></tr>
+    <tr><td>Simmetria / equilibrio della fascia</td><td class="win">tre pesi in fila</td><td>due pesi asimmetrici</td></tr>
+    <tr><td>Scoperta del menu</td><td class="win">etichetta «MENU»</td><td>solo icona + tooltip</td></tr>
+    <tr><td>Copertura della mappa</td><td>invariata</td><td class="win">−1 lastra</td></tr>
+    <tr><td>Costo (insets T-01, test geometria)</td><td>basso</td><td>medio</td></tr></table>
+</section>
+</main>
+<footer>Token copiati da <code>skinCssVariables.ts</code> (skin base). Animazioni solo con <code>transform</code>/<code>opacity</code>; con <code>prefers-reduced-motion</code> tutto è fermo. Baseline e sha256 in <code>rulings/</code>.</footer>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+function ticks(g,r,n,len,w,col){for(let i=0;i<n;i++){const a=i/n*Math.PI*2,c=Math.cos(a),s=Math.sin(a),L=i%5===0?len*1.8:len;el('line',{x1:120+c*r,y1:120+s*r,x2:120+c*(r-L),y2:120+s*(r-L),stroke:col,'stroke-width':w},g)}}
+function glyphs(g,r,txt,col){txt.forEach((ch,i,a)=>{const ang=i/a.length*360;const t=el('text',{x:120,y:120-r,fill:col,'font-size':7,'letter-spacing':'.5','text-anchor':'middle','font-family':'Cinzel,serif',transform:`rotate(${ang} 120 120)`},g);t.textContent=ch})}
+function star(p,glow){const s=el('g',{},p);const pts=[];for(let i=0;i<10;i++){const R=i%2?17:42,a=-Math.PI/2+i*Math.PI/5;pts.push(`${120+Math.cos(a)*R},${120+Math.sin(a)*R}`)}
+  el('polygon',{points:pts.join(' '),fill:'url(#starG)',stroke:'#7a5a2a','stroke-width':1},s);el('circle',{cx:120,cy:120,r:10,fill:'url(#core)'},s);
+  if(glow){const gl=el('g',{class:'glint'},s);el('rect',{x:112,y:96,width:4,height:48,fill:'rgba(255,248,220,.85)',transform:'rotate(20 120 120)'},gl)}return s}
+function defs(svg,cold){const d=el('defs',{},svg);
+  const g1=el('radialGradient',{id:'glass'+svg.id},d);[[0,cold?'#5f8c93':'#3fb5b5'],[.55,cold?'#244a52':'#1d7177'],[1,cold?'#0c1d23':'#0b2a31']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},g1));
+  const g2=el('linearGradient',{id:'starG',x1:0,y1:0,x2:0,y2:1},d);[[0,'#f6efd9'],[1,'#c9b78e']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},g2));
+  const g3=el('radialGradient',{id:'core',cx:.35,cy:.35},d);[[0,'#ffe39a'],[1,'#a86f1f']].forEach(([o,c])=>el('stop',{offset:o,'stop-color':c},g3));
+  const f=el('filter',{id:'ink'+svg.id},d);const tb=el('feTurbulence',{type:'fractalNoise',baseFrequency:'0.035',numOctaves:2,seed:3},f);el('animate',{attributeName:'baseFrequency',dur:'12s',values:'0.030;0.042;0.030',repeatCount:'indefinite'},tb);el('feDisplacementMap',{in:'SourceGraphic',scale:10},f);const fb=el('filter',{id:'blur'+svg.id,x:'-50%',y:'-50%',width:'200%',height:'200%'},d);el('feGaussianBlur',{stdDeviation:7},fb);}
+function frame(svg,cold){el('circle',{cx:120,cy:120,r:118,fill:'#0b1a20'},svg);el('circle',{cx:120,cy:120,r:116,fill:'none',stroke:'#a0762f','stroke-width':4},svg);el('circle',{cx:120,cy:120,r:113,fill:'none',stroke:'#cfaf63','stroke-width':1.2},svg);
+  el('circle',{cx:120,cy:120,r:84,fill:`url(#glass${svg.id})`},svg);
+  for(let i=0;i<18;i++){const a=Math.random()*Math.PI*2,r=Math.random()*74;el('circle',{cx:120+Math.cos(a)*r,cy:120+Math.sin(a)*r,r:Math.random()*1.1+.4,fill:cold?'#cfe3e6':'#fff6d8',class:'tw',style:`animation-delay:${(-Math.random()*5).toFixed(2)}s`},svg)}}
+function drawA(mode){const svg=document.getElementById('dialA');svg.innerHTML='';const cold=mode==='d';defs(svg,cold);frame(svg,cold);
+  const r1=el('g',{class:'spinA',style:cold?'animation-duration:600s':''},svg);ticks(r1,111,72,4,1,'#cfaf63');
+  const r2=el('g',{class:'spinB',style:cold?'animation-duration:900s':''},svg);el('circle',{cx:120,cy:120,r:100,fill:'none',stroke:'rgba(207,175,99,.45)','stroke-width':1},r2);glyphs(r2,94,['XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI'],'#d8bd78');
+  const r3=el('g',{class:'spinC',style:cold?'animation-duration:400s':''},svg);el('circle',{cx:120,cy:120,r:88,fill:'none',stroke:'rgba(207,175,99,.35)','stroke-width':.8,'stroke-dasharray':'2 5'},r3);
+  if(cold)el('circle',{cx:120,cy:120,r:84,fill:'rgba(10,25,32,.35)'},svg);
+  el('ellipse',{cx:120,cy:122,rx:44,ry:40,fill:'#05090c',opacity:.9},svg);star(svg,!cold);
+  document.getElementById('vA').textContent=cold?'DEFEAT':'VICTORY';document.getElementById('vA').className='verdict '+(cold?'d':'v');}
+function drawB(mode){const svg=document.getElementById('dialB');svg.innerHTML='';const cold=mode==='d';defs(svg,cold);frame(svg,cold);
+  const fog=el('g',{class:'drift',filter:`url(#blur${svg.id})`},svg);el('ellipse',{cx:90,cy:150,rx:70,ry:16,fill:cold?'rgba(170,190,195,.12)':'rgba(240,230,200,.10)'},fog);el('ellipse',{cx:150,cy:95,rx:60,ry:12,fill:cold?'rgba(170,190,195,.10)':'rgba(240,230,200,.08)'},fog);
+  const pool=el('g',{class:'breathe'},svg);el('ellipse',{cx:120,cy:122,rx:cold?54:46,ry:cold?50:42,fill:'#05090c',filter:`url(#ink${svg.id})`,opacity:.95},pool);
+  const s=star(svg,false);if(cold)s.setAttribute('opacity','.55');
+  for(let i=0;i<7;i++){const x=95+Math.random()*50;if(cold)el('circle',{cx:x,cy:110,r:1.3,fill:'#9fb1b5',class:'ash',style:`animation-delay:${(-i).toFixed(1)}s`},svg);else el('circle',{cx:x,cy:120,r:1.5,fill:'#ffd77a',class:'mote',style:`animation-delay:${(-i*0.85).toFixed(2)}s`},svg)}
+  document.getElementById('vB').textContent=cold?'DEFEAT':'VICTORY';document.getElementById('vB').className='verdict '+(cold?'d':'v');}
+document.querySelectorAll('.toggle').forEach(t=>t.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;t.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));(t.dataset.dial==='A'?drawA:drawB)(b.dataset.m)}));
+drawA('v');drawB('v');
+/* ----- QW-1 icone ----- */
+const IC={scroll:'<path d="M6 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6H4V5a1 1 0 0 1 1-1zm2 4v2h7V8zm0 4v2h7v-2z" fill="currentColor"/>',bag:'<path d="M9 4h6l-1 3h1a5 5 0 0 1 5 5v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4a5 5 0 0 1 5-5h1z" fill="currentColor"/>',axe:'<path d="M14 3c3 0 6 3 6 6l-4 1-2-2 1-3zM13 7l2 2-9 11-2-2z" fill="currentColor"/>',blades:'<path d="M4 4l7 7-2 2-7-7zm16 0l-9 9 2 2 9-9zM6 16l2 2-3 3-2-2zm12 0l3 3-2 2-3-3z" fill="currentColor"/>',boots:'<path d="M7 3h5v10l6 3v4H5v-4l2-1z" fill="currentColor"/>'};
+const phases=[{n:'Exploration',i:'scroll',s:'done',f:.14},{n:'Rules',i:'bag',s:'done',f:.27},{n:'Combat',i:'axe',s:'hurt',hp:'−60',f:.46},{n:'Pursuit',i:'blades',s:'now',f:.63},{n:'Raid',i:'boots',s:'future',f:.80},{n:'Return',i:'scroll',s:'future',f:1}];
+function sealSvg(st){const shape='M13 2l3 3h4v4l3 4-3 4v4h-4l-3 3-3-3H6v-4l-3-4 3-4V5h4z';
+ if(st==='future')return `<svg viewBox="0 0 26 26"><path d="${shape}" fill="none" stroke="#7d8a8c" stroke-width="1.2"/></svg>`;
+ if(st==='now')return `<svg viewBox="0 0 26 26"><path d="${shape}" fill="#0f2a35" stroke="#f0cf6a" stroke-width="1.6"/><path d="M13 7c2 3 3 5 0 12-3-7-2-9 0-12z" fill="#e88a4a"/></svg>`;
+ return `<svg viewBox="0 0 26 26"><path d="${shape}" fill="${st==='hurt'?'#5f3f16':'#c2a355'}" stroke="#d8bd78" stroke-width=".8"/>`+(st==='hurt'?'<path d="M14 6l-3 6 3 2-2 6" stroke="#c9663a" stroke-width="1.8" fill="none"/>':'')+`</svg>`}
+function barB(host,withSeals){const elapsed=.66,over=0;host.innerHTML=`<div class="trk"><div class="fl" style="width:${elapsed*100}%"></div></div>`+(withSeals?`<div class="seals" style="margin-top:6px;height:46px">${phases.map(p=>`<div class="seal ${p.s}" style="left:${p.f*100}%;top:0">${sealSvg(p.s)}<span>${p.s==='hurt'?p.hp+' HP':p.s==='now'?'ORA':''}</span></div>`).join('')}</div>`:'')+`<div class="capr"><span>96 / stima 110</span><span>Fase 4 di 6 · Pursuit</span></div>`;}
+barB(document.getElementById('qwI1'),true);
+const h2=document.getElementById('qwI2');barB(h2,false);
+h2.insertAdjacentHTML('beforeend',`<div class="chron">${phases.map(p=>`<div class="tile ${p.s}"><div class="t"><svg viewBox="0 0 24 24">${IC[p.i]}</svg></div><small>${p.s==='hurt'?p.hp+' HP':p.s==='now'?'ORA':p.s==='done'?'':'·'}</small></div>`).join('')}</div>`);
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+import fs from 'node:fs';
+import { openGame, POI, snap, close, measure, contrastFromPixels } from './harness.mjs';
+const W = Number(process.env.W || 1440), H = Number(process.env.H || 900), FULL = process.env.FULL !== '0';
+const outDir = new URL(`./out/f3stash-${W}x${H}/`, import.meta.url).pathname;
+const ctx = await openGame({ outDir, viewport: { width: W, height: H } });
+const { page } = ctx; const notes = {};
+const P = '[data-hud-panel="villageStash"]';
+const save = (n, o) => fs.writeFileSync(outDir + n, JSON.stringify(o, null, 1));
+const stashRows = () => page.evaluate((sel) => { const p = document.querySelector(sel); if (!p) return null; const r = p.getBoundingClientRect(); return { box: [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)], rows: [...p.querySelectorAll('[role="listitem"]')].map((li) => li.innerText.replace(/\n/g, ' | ')), footer: p.innerText.split('\n').at(-1) }; }, P);
+await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), null, { timeout: 60000 }).catch(() => {});
+await page.waitForTimeout(1500);
+notes.mapBuildingMarkers = await page.evaluate(() => [...document.querySelectorAll('[data-building-poi]')].map((e) => e.getAttribute('data-building-poi')));
+// 1) tasto V
+await page.keyboard.press('v'); await page.waitForTimeout(800);
+notes.viaKeyV = await stashRows(); await snap(ctx, '10-stash-via-v');
+if (notes.viaKeyV) { await snap(ctx, '11-stash-crop', page.locator(P)); if (FULL) { save('12-measure-stash.json', await measure(ctx, P)); save('13-contrast-stash.json', await contrastFromPixels(ctx, P)); } }
+// hover su una riga: deve essere inerte (read-only)
+if (notes.viaKeyV) { await page.locator(`${P} [role="listitem"]`).first().hover(); await page.waitForTimeout(400); await snap(ctx, '14-stash-row-hover', page.locator(P)); }
+await page.keyboard.press('v'); await page.waitForTimeout(500); notes.closedByV = !(await page.locator(P).count());
+// 2) menu Pannelli
+const menuBtns = await page.evaluate(() => [...document.querySelectorAll('button')].filter((b) => /panel|pannell|menu/i.test((b.getAttribute('aria-label') || '') + b.textContent)).map((b) => (b.getAttribute('aria-label') || b.textContent).trim().slice(0, 40)));
+notes.menuButtons = menuBtns;
+const menu = page.getByRole('button', { name: /^menu$/i }).first();
+if (await menu.count()) { await menu.click(); await page.waitForTimeout(600); await snap(ctx, '20-game-menu-open');
+  const item = page.getByRole('menuitem', { name: /stash|warehouse|magazz|scorta/i }).first().or(page.getByRole('menuitemcheckbox', { name: /stash|warehouse|magazz|scorta/i }).first());
+  notes.menuHasStash = await item.count(); if (notes.menuHasStash) { await snap(ctx, '21-menu-stash-entry'); }
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300); }
+// 3) vista Villaggio
+await page.locator('[data-nav-id="village"]').click(); await page.waitForTimeout(1500);
+await snap(ctx, '30-village-view');
+notes.villagePins = await page.evaluate(() => [...document.querySelectorAll('[data-building-pin]')].map((e) => e.getAttribute('data-building-pin')));
+const whPin = notes.villagePins.find((p) => /ware|stash|magaz|store/i.test(p));
+notes.warehousePin = whPin ?? null;
+if (whPin) { const pin = page.locator(`[data-building-pin="${whPin}"]`); await pin.hover(); await page.waitForTimeout(700); await snap(ctx, '31-warehouse-tooltip');
+  let btn = page.getByTestId('village-open-stash'); if (!(await btn.isVisible().catch(() => false))) { await pin.click(); await page.waitForTimeout(700); await snap(ctx, '32-warehouse-clicked'); }
+  btn = page.getByTestId('village-open-stash');
+  if (await btn.isVisible().catch(() => false)) { const bb = await btn.boundingBox(); notes.villageOpenBtn = bb; await btn.click(); await page.waitForTimeout(800); notes.viaVillage = await stashRows(); await snap(ctx, '33-stash-via-village'); }
+}
+await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+if (await page.locator(P).count()) { await page.locator(`${P} button[data-skin="close"]`).click().catch(() => {}); await page.waitForTimeout(400); }
+await page.locator('[data-nav-id="map"]').click(); await page.waitForTimeout(1500);
+// 4) dal planner: prima e dopo aver riempito la bisaccia
+await page.locator(`[data-quest-poi-id="${POI}"]`).first().click(); await page.getByTestId('quest-open-stash').waitFor({ state: 'visible', timeout: 15000 });
+await page.waitForTimeout(600);
+await page.getByTestId('quest-open-stash').click(); await page.waitForTimeout(900);
+notes.viaPlannerBefore = await stashRows(); await snap(ctx, '40-planner-plus-stash');
+if (FULL) save('41-measure-integration.json', await measure(ctx, 'body'));
+// riempi la bisaccia dal tray
+const bag0 = page.getByTestId('bag-slot-0').locator('button'); if (await bag0.count()) { await bag0.click(); await page.waitForTimeout(600);
+  notes.trayItemsText = await page.locator('[data-testid^="picker-item-"]').evaluateAll((els) => els.map((e) => (e.getAttribute('aria-label') || e.innerText).replace(/\n/g, ' ').slice(0, 80)));
+  await snap(ctx, '42-tray-with-stash-open');
+  const tiles = page.locator('[data-testid^="picker-item-"]'); for (let i = 0; i < 3; i++) { await tiles.nth(i).click().catch(() => {}); await page.waitForTimeout(250); }
+  notes.trayAfterPick = await page.locator('[data-testid^="picker-item-"]').evaluateAll((els) => els.map((e) => (e.getAttribute('aria-label') || e.innerText).replace(/\n/g, ' ').slice(0, 80)));
+  await page.keyboard.press('Escape'); await page.waitForTimeout(400); }
+notes.viaPlannerAfterPack = await stashRows(); await snap(ctx, '43-stash-after-pack');
+save('notes.json', notes); console.log(JSON.stringify(notes).slice(0, 4000));
+await close(ctx);
