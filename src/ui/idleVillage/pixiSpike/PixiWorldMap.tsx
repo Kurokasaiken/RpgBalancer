@@ -167,6 +167,12 @@ export interface PixiWorldMapProps {
    * through, so wrap interactive content in an element with `pointer-events: auto`.
    */
   worldLayer?: (canvas: { width: number; height: number }) => ReactNode;
+  /**
+   * World-space visual overlays rendered above the map but below the event
+   * shroud. Use for map-bound progress marks that should be covered by a
+   * world event takeover rather than floating over its curtain.
+   */
+  worldOverlay?: (canvas: { width: number; height: number }) => ReactNode;
 }
 
 export interface PixiMapAnchor {
@@ -423,6 +429,7 @@ export function PixiWorldMap({
   effects,
   stageColor = '#0b1a24',
   worldLayer,
+  worldOverlay,
   cloudShadowOpacity,
   cloudShadowOffset = { x: 0, y: 0 },
   cloudSpeed = 1,
@@ -469,6 +476,8 @@ export function PixiWorldMap({
   const focusRef = useRef<((x: number, y: number) => void) | null>(null);
   const anchorLayerRef = useRef<HTMLDivElement>(null);
   const worldBoxRef = useRef<HTMLDivElement>(null);
+  const worldOverlayBoxRef = useRef<HTMLDivElement>(null);
+  const worldOverlayLayerRef = useRef<HTMLDivElement>(null);
   /** Current camera, readable by the anchor layer between Pixi frames. */
   const camRef = useRef<{ panX: number; panY: number; zoom: number } | null>(null);
   const syncAnchors = useCallback(() => {
@@ -484,6 +493,10 @@ export function PixiWorldMap({
     }
     const box = worldBoxRef.current;
     if (box) box.style.transform = `translate3d(${-cam.panX * cam.zoom}px, ${-cam.panY * cam.zoom}px, 0) scale(${cam.zoom})`;
+    const overlay = worldOverlayBoxRef.current;
+    if (overlay) overlay.style.transform = `translate3d(${-cam.panX * cam.zoom}px, ${-cam.panY * cam.zoom}px, 0) scale(${cam.zoom})`;
+    const overlayLayer = worldOverlayLayerRef.current;
+    if (overlayLayer) overlayLayer.style.visibility = 'visible';
   }, []);
   const [error, setError] = useState<string | null>(null);
   const fx = { ...ALL_EFFECTS, ...effects };
@@ -1862,6 +1875,29 @@ export function PixiWorldMap({
           </div>
         ))}
       </div>
+      {worldOverlay && manifest && (
+        <div
+          ref={worldOverlayLayerRef}
+          data-testid="pixi-world-overlay"
+          style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', visibility: 'hidden', zIndex: 5 }}
+        >
+          <div
+            ref={worldOverlayBoxRef}
+            data-testid="pixi-world-overlay-world-box"
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: manifest.coordinateSystem.canvas.width,
+              height: manifest.coordinateSystem.canvas.height,
+              transformOrigin: '0 0',
+              pointerEvents: 'none',
+            }}
+          >
+            {worldOverlay(manifest.coordinateSystem.canvas)}
+          </div>
+        </div>
+      )}
       {worldLayer && manifest && (
         // Above the map and above an event shroud (z 6) closing over it: the world-space event card appears on the clouds.
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 7 }}>

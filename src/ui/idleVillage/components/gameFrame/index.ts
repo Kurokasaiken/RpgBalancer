@@ -19,6 +19,7 @@ export { TuningPanel, type TuningField, type TuningPanelProps } from './TuningPa
 export { MapDemoPoi } from './MapDemoPoi';
 export { usePoiTypeIcon, poiTypeIconUrl } from './usePoiTypeIcon';
 export { QuestRunWindow, type QuestRunWindowProps } from './QuestRunWindow';
+export { QuestJourneyRoute, type QuestJourneyRouteCanvas, type QuestJourneyRouteProps } from './QuestJourneyRoute';
 export { QuestPartyRosterPanel, type QuestPartyRosterPanelProps } from './QuestPartyRosterPanel';
 export { QuestBeltPlaque, type QuestBeltPlaqueProps } from './QuestBeltPlaque';
 export { QuestLogPanel, type QuestLogPanelProps } from './QuestLogPanel';
