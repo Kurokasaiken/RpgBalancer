@@ -246,7 +246,7 @@ Three kinds of map offer must read apart: **normal quest**, **main quest**, **ev
 | `--skin-poi-border-inner` | `#efe3c6` | inner border |
 | `--skin-poi-border-inner-width` | `1.5px` | |
 | `--skin-poi-halo-deadline` | `#ead9b0` | deadline halo, ivory |
-| `--skin-poi-halo-work` | `#6fc4a4` | work halo, verdigris |
+| `--skin-poi-halo-work` | `#9fb3c4` | work halo, moonlit silver (was verdigris `#6fc4a4`, read as neon cyan; Director 2026-10-20) |
 | `--skin-poi-urgent` | `#e8553a` | vermilion: expiring + decision badge, nothing else |
 | `--skin-poi-veiled-opacity` | `0.45` | veiled |
 | `--skin-poi-pulse-period` | `2s` | done pulse |
