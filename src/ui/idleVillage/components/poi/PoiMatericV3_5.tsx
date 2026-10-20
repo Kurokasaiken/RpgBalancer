@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { POI_FAMILY_METAL } from './poiSigilloFamilies';
 import { useTranslation } from '@/localization/useTranslation';
 import { getDefaultPoiColors } from '@/balancing/config/idleVillage/poiColorConfig';
 import { POI_MATERIC_V4_TOKENS } from '@/balancing/config/idleVillage/poiMatericV4Tokens';
@@ -14,18 +15,50 @@ export interface PoiMatericV3_5Props extends PoiMarkerProps {
   sigillo?: boolean;
   /** Sigillo only: the run has ended and awaits the player — the halo pulses slowly (period `--skin-poi-pulse-period`) until they act. Static light under reduced motion. */
   pulse?: boolean;
+  /** Sigillo only: visual-fork overrides for the B4-map comparison (PLAN-043-S11).
+   *  Inert by default — omit it and the seal renders exactly the production palette and the round halo. */
+  sigilloTheme?: PoiSigilloTheme;
   cursorVelocity?: { x: number; y: number } | null;
   'data-testid'?: string;
 }
 
-/** Sigillo palette: the same bronze and lacquer for every family (the family is read from the silhouette and glyph, not from a hue). */
+/** Optional sigillo overrides (PLAN-043-S11 B4-map visual fork): every field is a
+ *  delta over the canonical sigillo palette — production callers pass nothing and
+ *  get the identical seal. Used by lab/fork surfaces to audition candidates. */
+export interface PoiSigilloTheme {
+  /** Rim gradient stops [light, mid, dark] — overrides the shared brass ramp. */
+  rimColors?: readonly [string, string, string];
+  /** Field gradient stops [light, deep] — overrides the shared stone pair. */
+  stoneColors?: readonly [string, string];
+  /** Inner border colour and width — overrides the ivory inner edge. */
+  borderInner?: string;
+  borderInnerPx?: number;
+  /** Draw the countdown on the silhouette edge (pathLength progress stroke)
+   *  instead of the round magic circle. */
+  haloFollowsSilhouette?: boolean;
+}
+
+/** Sigillo palette (PLAN-043 WS-5): the rim reads the HUD brass ramp and the
+ *  field stone the `--skin-poi-stone-*` tokens — the same bronze and lacquer
+ *  for every family (the family is read from the silhouette and glyph, not
+ *  from a hue). Channels derive from brass-crest so a palette retune follows. */
+const [SIGILLO_BRASS_R, SIGILLO_BRASS_G, SIGILLO_BRASS_B] = (BASE_SKIN_CSS_VARS['--skin-hud-brass-crest'] ?? '#d8bd78')
+  .match(/\w\w/g)!
+  .map((h) => parseInt(h, 16)) as [number, number, number];
 const SIGILLO_COLORS = {
-  coronaCore: { r: 216, g: 189, b: 120 },
+  coronaCore: { r: SIGILLO_BRASS_R, g: SIGILLO_BRASS_G, b: SIGILLO_BRASS_B },
   coronaGlow: { r: 160, g: 118, b: 47 },
-  rimColors: ['#d8bd78', '#a0762f', '#5f3f16'],
-  stoneColors: ['#173436', '#0a1b1c'],
-  stoneAmbient: 'rgba(216,189,120,.16)',
-  pinColor: 'rgba(216,189,120,.72)',
+  rimColors: [
+    BASE_SKIN_CSS_VARS['--skin-hud-brass-crest'] ?? '#d8bd78',
+    BASE_SKIN_CSS_VARS['--skin-hud-brass-low'] ?? '#a0762f',
+    BASE_SKIN_CSS_VARS['--skin-hud-brass-base'] ?? '#5f3f16',
+  ],
+  stoneColors: [
+    BASE_SKIN_CSS_VARS['--skin-poi-stone-light'] ?? '#173436',
+    BASE_SKIN_CSS_VARS['--skin-poi-stone-deep'] ?? '#0a1b1c',
+  ],
+  stoneAmbient: `rgba(${SIGILLO_BRASS_R},${SIGILLO_BRASS_G},${SIGILLO_BRASS_B},.16)`,
+  pinColor: `rgba(${SIGILLO_BRASS_R},${SIGILLO_BRASS_G},${SIGILLO_BRASS_B},.72)`,
 } as const;
 
 const SIGILLO_BORDER_OUTER = BASE_SKIN_CSS_VARS['--skin-poi-border-outer'] ?? '#0b0a08';
@@ -216,6 +249,7 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
   type,
   iconUrl,
   sigillo = false,
+  sigilloTheme,
   pulse = false,
   state = 'available',
   progress = 1,
@@ -231,7 +265,17 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
   'data-testid': dataTestId,
 }) => {
   const { t } = useTranslation('idleVillage');
-  const colors = useMemo(() => (sigillo ? SIGILLO_COLORS : getDefaultPoiColors(type)), [type, sigillo]);
+  /** Explicit theme (lab/fork) wins; otherwise the family metal of the Sigillo. */
+  const theme: PoiSigilloTheme | undefined = useMemo(() => sigilloTheme ?? (sigillo ? POI_FAMILY_METAL[type] : undefined), [sigilloTheme, sigillo, type]);
+  const colors = useMemo(() => {
+    if (!sigillo) return getDefaultPoiColors(type);
+    if (!theme) return SIGILLO_COLORS;
+    return {
+      ...SIGILLO_COLORS,
+      rimColors: (theme.rimColors ?? SIGILLO_COLORS.rimColors) as typeof SIGILLO_COLORS.rimColors,
+      stoneColors: (theme.stoneColors ?? SIGILLO_COLORS.stoneColors) as typeof SIGILLO_COLORS.stoneColors,
+    };
+  }, [type, sigillo, theme]);
   const [ringLight, ringMid, ringDark] = colors.rimColors;
   const [stoneLight, stoneDark] = colors.stoneColors;
   const uid = useId();
@@ -302,6 +346,18 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
     });
   };
 
+  // Sigillo hover = a glitter, not a full lap of light: a few rim letters twinkle one after the other.
+  const SPARKLES = [[3, 0], [14, 0.14], [8, 0.3], [20, 0.44], [11, 0.6]] as const;
+  const SPARKLE_SPAN = 0.3;
+  const sparkleAt = (t: number, i: number) => {
+    let v = 0;
+    for (const [idx, delay] of SPARKLES) {
+      const x = (t - delay) / SPARKLE_SPAN;
+      if (idx === i && x > 0 && x < 1) v = Math.max(v, Math.sin(Math.PI * x));
+    }
+    return v;
+  };
+
   // Medallion rim script — engraved letters that light up on hover.
   const rimBand = useMemo(() => {
     const rimStep = 360 / RIM_LETTER_COUNT;
@@ -315,16 +371,19 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
       const d = LETTERS[letterCursor++ % LETTERS.length];
       const dist = Math.abs(i - t);
       // At rest the sweep has not started: no letter is lit (not even the one at 12).
-      const lit = activeRim <= 0 ? 0 : clamp(1.5 - 2 * dist);
+      const sparkle = sigillo && burst <= 0.001;
+      const star = sparkle && activeRim > 0 ? sparkleAt(activeRim, i) : 0;
+      const lit = sparkle ? star : activeRim <= 0 ? 0 : clamp(1.5 - 2 * dist);
       return {
         d,
         a,
         lit,
+        star,
         x: 43 + rimRadius * Math.cos(rad),
         y: 43 + rimRadius * Math.sin(rad),
       };
     });
-  }, [rimProgress, burst]);
+  }, [rimProgress, burst, sigillo]);
 
   // MAGIC CIRCLE: written by the passage of time.
   const isExpired = state === 'expired';
@@ -572,8 +631,8 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
 
             {/* Field: very dark green borrowed from the astrolabe arena */}
             <radialGradient id={gid('field')} cx="38%" cy="30%" r="78%">
-              <stop offset="0%" stopColor="#08121f" />
-              <stop offset="100%" stopColor="#020405" />
+              <stop offset="0%" stopColor={theme?.stoneColors ? stoneLight : '#08121f'} />
+              <stop offset="100%" stopColor={theme?.stoneColors ? stoneDark : '#020405'} />
             </radialGradient>
 
             {/* Bounce light on the lower inner rim of the field */}
@@ -671,7 +730,7 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
           </defs>
 
           {/* ---------- MAGIC CIRCLE: written by the passage of time ---------- */}
-          {sealProgress > 0.001 && (
+          {sealProgress > 0.001 && !(sigilloTheme?.haloFollowsSilhouette && silhouette) && (
             <>
               <path
                 className="poiv3_5__track"
@@ -807,6 +866,38 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
             </>
           )}
 
+          {/* Fork candidate (B4-map): the countdown is traced on the silhouette edge itself —
+              a progress stroke on the plate outline (halo + ink), direction-mirrored like the seal. */}
+          {sealProgress > 0.001 && sigilloTheme?.haloFollowsSilhouette && silhouette && (
+            <>
+              <g filter={`url(#${gid('bloom')})`} aria-hidden="true">
+                <path
+                  d={silhouette.outer}
+                  fill="none"
+                  stroke={sealLight}
+                  strokeWidth={T4.seal.railWidth * 1.5}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  pathLength={1}
+                  strokeDasharray={`${sealProgress} 1`}
+                  transform={timerDirection === 'counterclockwise' ? 'matrix(-1 0 0 1 86 0)' : undefined}
+                />
+              </g>
+              <path
+                d={silhouette.outer}
+                fill="none"
+                stroke={sealInk}
+                strokeWidth={T4.seal.coreRailWidth}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                pathLength={1}
+                strokeDasharray={`${sealProgress} 1`}
+                transform={timerDirection === 'counterclockwise' ? 'matrix(-1 0 0 1 86 0)' : undefined}
+                data-testid="sigillo-edge-progress"
+              />
+            </>
+          )}
+
           {/* Sigillo plate: the silhouette (tail / tile / diamond) in bronze, behind the round medallion */}
           {silhouette && (
             <path d={silhouette.outer} fill={`url(#${gid('g-b')})`} stroke="none" aria-hidden="true" data-testid="sigillo-plate" />
@@ -890,6 +981,15 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
                       vectorEffect="non-scaling-stroke"
                       filter={g.lit > 0.01 ? 'url(#f-glow)' : undefined}
                     />
+                    {g.star > 0.02 && (
+                      <path
+                        data-testid="sigillo-sparkle"
+                        d="M0 -5 L1 -1 L5 0 L1 1 L0 5 L-1 1 L-5 0 L-1 -1 Z"
+                        fill="#fff6dc"
+                        opacity={0.95}
+                        transform={`scale(${(g.star * 1.6).toFixed(2)})`}
+                      />
+                    )}
                   </g>
                 </g>
               ))}
@@ -969,7 +1069,7 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
             {/* L5b: painted glyph — above the glass (L6) and AO (L8), or it reads dim */}
             {iconUrl && (
               /* Sigillo: the glyph fills ~57% of the field (35 of its 61-unit diameter); elsewhere the original 38 */
-              <image className="poiv3_5__cross" href={iconUrl} x={sigillo ? 25.5 : 24} y={sigillo ? 25.5 : 24} width={sigillo ? 35 : 38} height={sigillo ? 35 : 38} preserveAspectRatio="xMidYMid meet" />
+              <image className="poiv3_5__cross" href={iconUrl} x={sigillo ? 22 : 24} y={sigillo ? 22 : 24} width={sigillo ? 42 : 38} height={sigillo ? 42 : 38} preserveAspectRatio="xMidYMid meet" />
             )}
 
           </g>
@@ -978,7 +1078,7 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
           {silhouette && (
             <g aria-hidden="true" data-testid="sigillo-border" fill="none" strokeLinejoin="round">
               <path d={silhouette.outer} stroke={SIGILLO_BORDER_OUTER} strokeWidth={SIGILLO_BORDER_OUTER_PX} vectorEffect="non-scaling-stroke" />
-              <path d={silhouette.inner} stroke={SIGILLO_BORDER_INNER} strokeWidth={SIGILLO_BORDER_INNER_PX} vectorEffect="non-scaling-stroke" />
+              <path d={silhouette.inner} stroke={theme?.borderInner ?? SIGILLO_BORDER_INNER} strokeWidth={theme?.borderInnerPx ?? SIGILLO_BORDER_INNER_PX} vectorEffect="non-scaling-stroke" />
             </g>
           )}
         </svg>
