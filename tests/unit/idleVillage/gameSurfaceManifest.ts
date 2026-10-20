@@ -312,6 +312,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/questS1Lab/questSimulation.ts',
   'src/ui/idleVillage/questS1Lab/questTheatreSequencer.ts',
   'src/ui/idleVillage/questS1Lab/render/AmbientLayer.tsx',
+  'src/ui/idleVillage/questS1Lab/questTickCounter.ts',
   'src/ui/idleVillage/questS1Lab/render/AtmosphereLayer.tsx',
   'src/ui/idleVillage/questS1Lab/render/DepthScene.tsx',
   'src/ui/idleVillage/questS1Lab/render/atmosphereOverlay.ts',

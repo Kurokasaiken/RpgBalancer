@@ -62,6 +62,9 @@ export interface QuestEpilogueProps {
   /** R-199: staged reveal for `QuestRewardPopup` — only the first N
    *  sections render while the reveal plays; `undefined` = all. */
   visibleSections?: number;
+  /** Paint the section label «Expedition report». Off when the host already
+   *  titles itself with the same words (the reward plaque, R-234). */
+  showTitle?: boolean;
 }
 
 /** One report line — i18n key wins over baked text; wounded lines carry
@@ -90,7 +93,7 @@ const EpilogueRow: React.FC<{ line: EpilogueLine; icon?: EngravedIconId }> = ({ 
   );
 };
 
-export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario, visibleSections }) => {
+export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario, visibleSections, showTitle = true }) => {
   const { t } = useTranslation('idleVillage');
   const allSections = buildQuestEpilogue(run, scenario);
   const sections = visibleSections === undefined ? allSections : allSections.slice(0, visibleSections);
@@ -102,17 +105,19 @@ export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario, vis
       aria-label={t('gameFrame.questEpilogue.title')}
       style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '4px 0' }}
     >
-      <div
-        style={{
-          fontFamily: FONT.display,
-          fontSize: 12,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: TONE.label,
-        }}
-      >
-        {t('gameFrame.questEpilogue.title')}
-      </div>
+      {showTitle && (
+        <div
+          style={{
+            fontFamily: FONT.display,
+            fontSize: 12,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: TONE.label,
+          }}
+        >
+          {t('gameFrame.questEpilogue.title')}
+        </div>
+      )}
       {sections.map((section) => {
         const iconId = SECTION_ICON[section.id];
         const tone = TONE[SECTION_TONE[section.id] ?? 'label'];

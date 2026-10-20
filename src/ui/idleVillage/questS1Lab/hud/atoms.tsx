@@ -68,6 +68,15 @@ export const SCRIM = {
 
 /** Small bordered chip — the cockpit's single atom for tagged values.
  *  Colours derive from tokens via color-mix; height/track from config. */
+/** Share of `--skin-text-primary` mixed into a chip's text where the bare tone does not read on
+ *  its own 12% wash: on the base skin `danger` measured 2.41:1 and `death` 2.57:1 (red on red,
+ *  violet on violet), `muted` 4.40:1 (R-234). The hue stays, the text lifts to ≥ 4.5:1. */
+const CHIP_TEXT_LIFT: Partial<Record<Tone, number>> = { danger: 40, death: 40, muted: 20 };
+const chipText = (tone: Tone): string => {
+  const lift = CHIP_TEXT_LIFT[tone];
+  return lift ? `color-mix(in srgb, ${TONE[tone]} ${100 - lift}%, var(--skin-text-primary))` : TONE[tone];
+};
+
 export const HudChip: React.FC<{
   tone?: Tone;
   title?: string;
@@ -86,7 +95,7 @@ export const HudChip: React.FC<{
       borderRadius: 999,
       border: `1px solid color-mix(in srgb, ${TONE[tone]} 55%, transparent)`,
       background: `color-mix(in srgb, ${TONE[tone]} 12%, var(--skin-hud-lacquer-deep))`,
-      color: TONE[tone],
+      color: chipText(tone),
       fontSize: PRES.type.labelPx,
       fontFamily: 'var(--skin-font-display)',
       letterSpacing: '0.08em',

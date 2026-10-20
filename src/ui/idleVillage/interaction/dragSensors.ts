@@ -26,9 +26,6 @@ import { getCurrentDragConfig } from '@/ui/idleVillage/config/dragConfig';
 /** Drag ids of slotted tokens (`slotTokenDragId` in `ResidentSlotRack`): a token in a slot is moved, never «held up». */
 const SLOT_TOKEN_DRAG_PREFIX = 'slot-token:';
 
-/** A slotted token's swap drag — painted by the rack's own ghost, never by the shared overlay (R-234). */
-export const isSlotTokenDragId = (id: unknown): boolean => String(id).startsWith(SLOT_TOKEN_DRAG_PREFIX);
-
 class HoldOrMovePointerSensor extends PointerSensor {
   /**
    * On a slotted token, holding means EXTRACT (press-and-hold takes the resident out of the slot, ~0.75 s):

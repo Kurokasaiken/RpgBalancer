@@ -198,6 +198,8 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   /** Where the card folds to (offsets from the anchor + the scales that give the row's size); null = just fade. */
   const [morph, setMorph] = useState<{ x: number; y: number; sx: number; sy: number } | null>(null);
   const [cardGone, setCardGone] = useState(false);
+  /** The action arms when the card has finished appearing (R-234): never confirm a card the player has not seen. */
+  const [armed, setArmed] = useState(false);
   // The host passes inline callbacks that change every render; the stage timers must not restart because of them.
   const onCloseRef = useRef(onClose);
   const onLandRef = useRef(onLand);
@@ -236,6 +238,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
     setStage(visible ? 'modal' : 'idle');
     setMorph(null);
     setCardGone(false);
+    setArmed(false);
   }, [visible]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -319,8 +322,15 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
     return undefined;
   }, [stage, screenMode, landingSelector, rowSelector, cardScale]);
 
+  /* The design-system card has no `disabled` seam (and is not ours to extend here): until the card has fully
+   * appeared its own action button is disabled from outside, so it neither looks nor acts armed (R-234). */
+  useEffect(() => {
+    const button = rootRef.current?.querySelector<HTMLButtonElement>('[data-testid="world-event-card-body"] button');
+    if (button) button.disabled = !armed;
+  });
+
   const handleAction = useCallback(() => {
-    if (stage !== 'modal') return;
+    if (stage !== 'modal' || !armed) return;
     trackTelemetryEvent('world_surface_event_ack', {
       eventType: 'world_surface_event_ack',
       data: { event: 'goblin_invasion', daysLeft },
@@ -337,7 +347,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
     startPose.current = source && anchor ? poseOf(source, anchor, true) : null;
     onComplete?.();
     setStage('peeling');
-  }, [stage, onComplete, daysLeft, screenMode]);
+  }, [stage, armed, onComplete, daysLeft, screenMode]);
 
   /* The sticker takes over the goblin the moment the peel starts: it is mounted at its card position and the window
    * hides its own goblin, so the two never show together (the old mount at `falling` drew both for ~0.5 s). */
@@ -353,6 +363,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
+      onAnimationComplete={(def) => { if (typeof def === 'object' && (def as { opacity?: number }).opacity === 1) setArmed(true); }}
       style={{
         position: 'absolute',
         left: 0,

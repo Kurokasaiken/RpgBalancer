@@ -504,11 +504,15 @@ Ogni pannello flottante che il giocatore può chiudere si registra in `component
 
 ## Pulsanti
 
-Solo tre ruoli, tutti dai token (nessun colore scritto a mano, **mai viola** — il vecchio CTA azzurro-viola è stato sostituito):
+> **Ruling Director 2026-10-20 (PLAN-067, R-234) — vincolante:**
+> 1. La **placca CTA** (smalto verde acqua, cornice d'ottone, bisello, `clip-path` a placca: `SkinButton variant="cta"` / `data-skin="cta"`) **non deve esistere da nessuna parte** in quella forma: «SEND EXPEDITION», «CLOSE THE REPORT» e ogni altro uso. La forma che la sostituisce è un fork aperto (**BTN-1**, mockup prima del codice). Fino al ruling, nessun nuovo uso.
+> 2. **Mai viola**, in nessun ruolo: pulsanti, chip, icone, testo e **anche lo stato morte** (`--skin-status-death`, oggi `#6d3fb0`, è fuori regola). Il colore che lo sostituisce è un fork aperto (**COL-D**).
+
+Solo tre ruoli, tutti dai token (nessun colore scritto a mano, **mai viola**):
 
 | Ruolo | Come si ottiene | Aspetto |
 |---|---|---|
-| **Azione primaria** (AVVIA, Conferma) | `<SkinButton variant="cta">` (o `data-skin="cta"`) dentro `<SkinScope>` | placca smalto verde acqua con cornice d'ottone, bisello; uno solo per schermata |
+| **Azione primaria** (AVVIA, Conferma) | *in attesa del fork BTN-1* — la placca CTA (`variant="cta"`) è **vietata** (ruling 2026-10-20) | uno solo per schermata |
 | **Comando di testata** (ordina, filtri, chiudi, menu) | un normale `<button>` dentro un contenitore `data-hud-controls` | pillola 26 px nel materiale della placca; `aria-pressed="true"` = attiva (oro) |
 | **Utilità/secondario** (fuori dalle testate) | `<SkinButton>` (`utility` / `secondary`) | placca in bronzo battuto / ardesia incisa |
 
