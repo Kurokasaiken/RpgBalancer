@@ -25,6 +25,7 @@ import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questS
 import { QUEST_EPILOGUE, type EpilogueSectionId } from '@/balancing/config/idleVillage/quests/questEpilogue';
 import { QUEST_FLAG_TO_ITEM, defaultQuestItems } from '@/balancing/config/idleVillage/quests/questItems';
 import { deriveSettlementPlan } from './questSettlement';
+import { engineText } from '@/ui/idleVillage/questS1Lab/questEngineText';
 
 /** One display line of the report — i18n key + params, or baked authored
  *  text (names, loot labels, intel, grant labels). */
@@ -103,7 +104,8 @@ export function buildQuestEpilogue(
     return item ? { key: item.labelKey } : { text: flag };
   });
 
-  for (const l of run.loot ?? []) loot.push({ text: l });
+  /* Loot names are the engine's own ids («goblin trophy»): shown in the content locale (R-234). */
+  for (const l of run.loot ?? []) loot.push({ text: engineText(l) });
 
   const info: EpilogueLine[] = (run.info ?? []).map((i) => ({
     text: scenario?.intelLabels?.[i] ?? i,

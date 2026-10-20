@@ -24,6 +24,7 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { localizeNodes } from '@/balancing/config/idleVillage/quests/questContentLocale';
 import { useSensors, useSensor, PointerSensor } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
@@ -132,10 +133,12 @@ export function useQuestExpeditionSession({
   detailPosition,
   wrapDetail,
 }: QuestExpeditionSessionOptions) {
-  const { t } = useTranslation('idleVillage');
+  const { t, i18n } = useTranslation('idleVillage');
   const { residentsById } = useRosterKitData();
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
-  const scenario = useMemo(() => scenarioForQuest(poi.questId), [poi.questId]);
+  /* The scenario follows the content locale (R-234, T-A13): a language change must rebuild it, or the
+   * planner keeps the English captured at mount. */
+  const scenario = useMemo(() => scenarioForQuest(poi.questId), [poi.questId, i18n.language]);
   const run = questRun.run;
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -464,8 +467,10 @@ export function useQuestExpeditionSession({
   const intelHints = useMemo(() => {
     const nodes = resolved?.instance.nodes;
     if (!nodes) return [];
-    return planningHints(nodes, revealedNodeIds).slice(0, QUEST_PLANNER_INFO.maxPreviewHints);
-  }, [resolved, revealedNodeIds]);
+    /* The instance keeps the authored English (its hash); the hints the player reads follow the content locale. */
+    return planningHints(localizeNodes(nodes, poi.questId), revealedNodeIds).slice(0, QUEST_PLANNER_INFO.maxPreviewHints);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolved, revealedNodeIds, poi.questId, i18n.language]);
 
   /** LOADOUT duration channel (S3 T-3, desiderata v24 #7): items declaring
    *  `durationMult`/`durationDelta` reshape the run's real pace — the
