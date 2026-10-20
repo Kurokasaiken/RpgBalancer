@@ -31,6 +31,8 @@ export const QuestJourneyRouteConfigSchema = z
     markerBadgeRadiusWorldPx: z.number().positive(),
     markerBadgeOffsetWorldPx: z.number().positive(),
     markerBadgeGlyphWorldPx: z.number().positive(),
+    /** Length of the travelling glint on the traveled stretch. */
+    glintLengthWorldPx: z.number().positive(),
   })
   .strict()
   .superRefine((config, ctx) => {
@@ -74,9 +76,9 @@ export const QuestJourneyRouteConfigSchema = z
 /** Runtime-validated default dimensions for the selected continuous route style. */
 export const QUEST_JOURNEY_ROUTE_CONFIG = QuestJourneyRouteConfigSchema.parse({
   casingWidthWorldPx: 36,
-  guideWidthWorldPx: 5,
-  guideDashWorldPx: 7,
-  guideGapWorldPx: 22,
+  guideWidthWorldPx: 7,
+  guideDashWorldPx: 10,
+  guideGapWorldPx: 20,
   progressWidthWorldPx: 20,
   highlightWidthWorldPx: 4,
   endpointRadiusWorldPx: 33,
@@ -89,4 +91,5 @@ export const QUEST_JOURNEY_ROUTE_CONFIG = QuestJourneyRouteConfigSchema.parse({
   markerBadgeRadiusWorldPx: 24,
   markerBadgeOffsetWorldPx: 74,
   markerBadgeGlyphWorldPx: 30,
+  glintLengthWorldPx: 46,
 });
