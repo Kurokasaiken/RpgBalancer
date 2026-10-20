@@ -187,7 +187,7 @@ export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenari
 
               {/* Stages 1..N — the settlement's own sections, cost first:
                   stage s reveals the first s sections (stage 0 is banner-only). */}
-              <QuestEpilogue run={run} scenario={scenario} visibleSections={stage} />
+              <QuestEpilogue run={run} scenario={scenario} visibleSections={stage} showTitle={false} />
 
               {!done && (
                 <span style={{ fontFamily: 'var(--skin-font-serif)', fontStyle: 'italic', fontSize: 12, color: TONE.muted }}>

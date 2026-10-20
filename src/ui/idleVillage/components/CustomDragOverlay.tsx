@@ -9,7 +9,6 @@ import WorkerCard from './WorkerCard';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { getEventCoordinates, CSS } from '@dnd-kit/utilities';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
-import { isSlotTokenDragId } from '@/ui/idleVillage/interaction/dragSensors';
 
 interface DragOverlayContentProps {
   label: string;
@@ -257,6 +256,9 @@ const dispatchSyntheticDragOver = (pos: { x: number; y: number }) => {
   document.dispatchEvent(mouseEvent);
 };
 
+/** Drag ids of slotted tokens (`slotTokenDragId` in `ResidentSlotRack`, pinned by the slot-token test). */
+const SLOT_TOKEN_DRAG_PREFIX = 'slot-token:';
+
 export function CustomDragOverlay({ 
   residentsById, 
   usePgCardPreview = true,
@@ -276,7 +278,7 @@ export function CustomDragOverlay({
    * ghost (`slot-token-ghost`), so the shared overlay stays empty instead of printing the drag id
    * (R-234, PLAN-067 T-A5). */
   const rawActiveId = (dragVisualState?.mode === 'dragging' ? dragVisualState.residentId : null) ?? forcedResidentId ?? null;
-  const activeId = rawActiveId && !isSlotTokenDragId(rawActiveId) ? rawActiveId : null;
+  const activeId = rawActiveId && !String(rawActiveId).startsWith(SLOT_TOKEN_DRAG_PREFIX) ? rawActiveId : null;
   const activeResident = activeId && residentsById ? residentsById[activeId] : undefined;
   const isForcedOverlay = Boolean(forcedResidentId) && dragVisualState?.mode !== 'dragging';
   
