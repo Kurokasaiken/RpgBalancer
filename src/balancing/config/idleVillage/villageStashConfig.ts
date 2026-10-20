@@ -17,6 +17,7 @@
 
 import { z } from 'zod';
 import { defaultQuestItems } from './quests/questItems';
+import { WAREHOUSE_STORAGE_CAPACITY } from './villageBuildingsConfig';
 
 /** Keys of the building-icon map (`BUILDING_ICON_URLS` in MapBuildingPoi). */
 export type VillageBuildingIconKey = 'warehouse' | 'market';
@@ -76,7 +77,9 @@ const RAW_VILLAGE_STASH_CONFIG = {
     { itemId: 'quest_consumable_cura', qty: 1 },
     { itemId: 'quest_consumable_pozione', qty: 1 },
   ],
-  capacityMax: 12,
+  /* One source (R-234, DN-1): the Warehouse's storage capacity at its current level — the panel
+   * said 12 while the Warehouse tooltip said 24. */
+  capacityMax: WAREHOUSE_STORAGE_CAPACITY,
   panel: { widthPx: 320 },
 };
 

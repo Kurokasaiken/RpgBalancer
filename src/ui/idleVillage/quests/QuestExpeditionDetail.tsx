@@ -101,15 +101,26 @@ const SECTION_LABEL: CSSProperties = {
  * here. `labelKey`/`descKey` may carry the `idleVillage.` prefix (stripped)
  * or be `questS1Lab.*` (verbatim).
  */
-const BagItemTooltip: React.FC<{ entry: BagStockEntry }> = ({ entry }) => {
+/** The planner shell: item tooltips flip/shift inside it instead of spilling over the roster
+ *  or other panels (R-234, T-03 — a portalled surface does not know its host's edges). */
+export const PlannerBoundaryContext = React.createContext<React.RefObject<HTMLElement | null> | null>(null);
+
+export const BagItemTooltip: React.FC<{ entry: BagStockEntry }> = ({ entry }) => (
+  <Tooltip.Portal>
+    <BagItemTooltipContent entry={entry} />
+  </Tooltip.Portal>
+);
+
+/** Mounted only while the tooltip is open, so the boundary is read once the shell exists. */
+const BagItemTooltipContent: React.FC<{ entry: BagStockEntry }> = ({ entry }) => {
   const { t } = useTranslation('idleVillage');
+  const boundary = React.useContext(PlannerBoundaryContext)?.current ?? undefined;
   const { item, qty } = entry;
   const stash = item.engineFlag ? STASH_BY_FLAG.get(item.engineFlag) : undefined;
   const descKey = item.descKey ?? stash?.descKey;
   const line: CSSProperties = { fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.35, color: TONE.text };
   return (
-    <Tooltip.Portal>
-      <Tooltip.Content side="top" sideOffset={6} style={TOOLTIP_STYLE}>
+      <Tooltip.Content side="top" sideOffset={6} collisionBoundary={boundary} collisionPadding={8} style={TOOLTIP_STYLE}>
         <div style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--skin-title-color)', marginBottom: 4 }}>
           {t(stripNs(item.labelKey))}
         </div>
@@ -121,7 +132,6 @@ const BagItemTooltip: React.FC<{ entry: BagStockEntry }> = ({ entry }) => {
         )}
         <div style={{ ...line, color: TONE.secondary }}>{t('questExpedition.bag.stock', { qty })}</div>
       </Tooltip.Content>
-    </Tooltip.Portal>
   );
 };
 
@@ -665,6 +675,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   }
 
   return (
+    <PlannerBoundaryContext.Provider value={shellRef}>
     <SkinScope>
       {!reducedMotion && <style>{MOTION_CSS}</style>}
       {/* ── CENTER STAGE · the planner unit (draggable; the shared drag
@@ -1246,6 +1257,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
         </div>
       </HudPlaque>
     </SkinScope>
+    </PlannerBoundaryContext.Provider>
   );
 };
 

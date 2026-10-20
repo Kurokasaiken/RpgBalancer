@@ -51,6 +51,37 @@ const CLICK_DRAG_TOLERANCE_PX = 4;
  *  clamps; the column's chip and the board's paint share the constant. */
 const ASTROLABE_DIFFICULTY_BASELINE = 50;
 
+/** Dial = the board's side, nothing clipped (PLAN-067 T-A3, SC-1 A). The frozen
+ *  V6 kit draws its gold bezel at a FIXED `inset:-80px` around `.stage`
+ *  (`width: min(63.75vh, 69.7%)`) and paints an obsidian square behind it — in
+ *  the square, `overflow:hidden` board that cut the ring on four sides. Host
+ *  override, kit untouched: the bezel inset becomes proportional (80/313 — the
+ *  ratio the kit had at its usual size, so the ring keeps its proportions), and
+ *  `.stage` is sized so ring + drop shadow fit the side. `filter: none` on
+ *  `.stage` restores V6's own rule: the V1 sheet (`destinyAstrolabe/astrolabe.css`,
+ *  same `.destiny-astrolabe .stage` selector, loaded on /game) leaks a
+ *  `drop-shadow(0 32px 70px)` that the board clips into a visible square.
+ *  The obsidian ground the kit paints as a square becomes a disc under the
+ *  stage that reaches just inside the ring's outer edge (the bezel's inner
+ *  bands are translucent): same colour, no corners.
+ *  Bezel geometry: SVG
+ *  viewBox 1200, outermost ring r≈449 → ring diameter = 898/1200 of the bezel
+ *  box = 0.748 × (1 + 2·0.2555) ≈ 1.131 × stage. */
+const BEZEL_INSET_RATIO = 0.2555;
+const BEZEL_RING_PER_STAGE = 1.131;
+/** Ground disc overhang per side, as a fraction of the stage — just under the
+ *  ring's outer edge ((1.131 − 1) / 2 ≈ 0.065). */
+const BEZEL_GROUND_RATIO = 0.06;
+/** `.astro-bezel` drop-shadow (0 6px 14px) reach, per side. */
+const BEZEL_SHADOW_PX = 20;
+const BOARD = '[data-testid="quest-check-board"]';
+const BOARD_FIT_CSS = `
+${BOARD} .destiny-astrolabe { background: transparent; }
+${BOARD} .destiny-astrolabe .scene-col { background: transparent; }
+${BOARD} .destiny-astrolabe .stage { width: calc((100% - ${2 * BEZEL_SHADOW_PX}px) / ${BEZEL_RING_PER_STAGE}); filter: none; }
+${BOARD} .destiny-astrolabe .stage::before { content: ''; position: absolute; inset: ${-BEZEL_GROUND_RATIO * 100}%; border-radius: 50%; background: var(--obsidian); }
+${BOARD} .destiny-astrolabe .astro-bezel { inset: ${-BEZEL_INSET_RATIO * 100}%; }`;
+
 /** The verdict card's entrance — one fade/rise, disabled under reduced motion.
  *  `data-astro-idle="parked"` freezes the frozen-kit ambient loops (fog, rays,
  *  fate pulses) so the held verdict is a real still frame, not a wallpaper of
@@ -58,7 +89,8 @@ const ASTROLABE_DIFFICULTY_BASELINE = 50;
 const COLUMN_CSS = `
 @keyframes questCheckColumnIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
 @keyframes questVerdictCardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-[data-astro-idle="parked"] * { animation-play-state: paused !important; }`;
+[data-astro-idle="parked"] * { animation-play-state: paused !important; }
+${BOARD_FIT_CSS}`;
 
 export interface QuestSkillCheckColumnProps {
   bridge: QuestCheckBridge;
@@ -275,11 +307,9 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
                 {check.flavor}
               </p>
             )}
-            {check.outcomeText && (
-              <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.4, color: 'var(--skin-text-muted)' }}>
-                {check.outcomeText}
-              </p>
-            )}
+            {/* `outcomeText` (harm lines + authored lines) is the toast/chronicle
+                summary: here it doubled every authored line and put HP in prose.
+                Harm reaches the card only as chips (R-234, guide §4). */}
             {check.authoredText && (
               <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.4, color: 'var(--skin-text-secondary)' }}>
                 {check.authoredText}

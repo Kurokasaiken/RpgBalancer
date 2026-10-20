@@ -72,11 +72,21 @@ export function recordAction(
   bagFlags: ReadonlySet<string>,
 ): PhaseRecord {
   const fresh = after.log.slice(before.logLength);
+  /* The engine only clears `checkQueue`/`recentHarms` on a new player action, while the
+   * window also records clock maturing (`act(matureReady)` every tick): the same harm
+   * window is read again and again. `seq` is monotonic per run, so a harm already folded
+   * into this phase is skipped (R-234: «−600 HP» on a 93 HP hero). */
+  const seen = new Set(phase.harms.map((h) => h.seq));
+  const newHarms = [...after.checkQueue.flatMap((c) => c.harms), ...after.recentHarms].filter((h) => {
+    if (seen.has(h.seq)) return false;
+    seen.add(h.seq);
+    return true;
+  });
   return {
     ...phase,
     choices: choiceLabel ? [...phase.choices, choiceLabel] : phase.choices,
     verdicts: [...phase.verdicts, ...after.checkQueue.map((c) => c.verdict)],
-    harms: [...phase.harms, ...after.checkQueue.flatMap((c) => c.harms), ...after.recentHarms],
+    harms: [...phase.harms, ...newHarms],
     lootGained: [...phase.lootGained, ...after.loot.filter((item) => !before.loot.includes(item))],
     itemsSpent: [...phase.itemsSpent, ...before.flags.filter((f) => bagFlags.has(f) && !after.flags.includes(f))],
     lines: [...phase.lines, ...fresh.filter((e) => PERTINENT_LOG_KINDS.has(e.kind))],

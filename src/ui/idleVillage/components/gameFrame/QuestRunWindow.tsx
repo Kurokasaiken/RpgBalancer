@@ -929,6 +929,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             remaining={beatCursor.remaining}
             onAdvance={advancePresentation}
             checkSpinning={astroActive && !astroSettled}
+            verdictInColumn={inCluster && astroActive}
             fx={beatFx}
             fxConfig={DEFAULT_QUEST_THEATRE_FX}
             reducedMotion={reducedMotion}
@@ -1093,12 +1094,15 @@ const BeatStage: React.FC<{
   onAdvance: () => void;
   /** A docked astrolabe is still presenting this check — hide the verdict. */
   checkSpinning?: boolean;
+  /** PLAN-067 T-A4 (guide §1): the cluster's right-wing Verdict Card says the
+   *  verdict — the check beat keeps only the attempt, never a second copy. */
+  verdictInColumn?: boolean;
   fx: BeatFx;
   fxConfig: QuestTheatreFxConfig;
   reducedMotion: boolean;
   /** Cap on the narrative column's height (config `stageMaxHeightPx`). */
   maxHeightPx?: number;
-}> = ({ beat, hidden, remaining, onAdvance, checkSpinning, fx, fxConfig, reducedMotion, maxHeightPx }) => {
+}> = ({ beat, hidden, remaining, onAdvance, checkSpinning, verdictInColumn = false, fx, fxConfig, reducedMotion, maxHeightPx }) => {
   const { t } = useTranslation('idleVillage');
   return (
     <div
@@ -1134,7 +1138,7 @@ const BeatStage: React.FC<{
           )}
         </>
       )}
-      {beat.kind === 'check' && checkSpinning && (
+      {beat.kind === 'check' && (checkSpinning || verdictInColumn) && (
         <>
           <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
             {beat.check.title}
@@ -1144,7 +1148,7 @@ const BeatStage: React.FC<{
           )}
         </>
       )}
-      {beat.kind === 'check' && !checkSpinning && (
+      {beat.kind === 'check' && !checkSpinning && !verdictInColumn && (
         <>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
             <HudChip tone={VERDICT_TONE[beat.check.verdict]}>{t(`questS1Lab.verdict.${beat.check.verdict}`)}</HudChip>

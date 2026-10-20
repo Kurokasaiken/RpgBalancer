@@ -40,6 +40,21 @@ describe('questPhaseRecord', () => {
     }
   });
 
+  // INV:R-234-phase-hp-once — a harm is folded into its phase once, however many
+  // times the window records actions on a run whose harm window was not reset (clock maturing:
+  // `act(matureReady)` re-reads the same `checkQueue`/`recentHarms`). Audit F3: «−600 HP» on a 93 HP hero.
+  it('counts each engine harm once when the same harm window is recorded repeatedly (R-234)', () => {
+    const { run } = playthrough(7);
+    const harm = { seq: 41, memberId: 'hero', amount: 12, kind: 'harm' as const, hpBefore: 83, hpAfter: 71 };
+    const state = { ...run, ended: false, checkQueue: [], recentHarms: [harm] } as typeof run;
+    let phase = emptyPhase(3);
+    for (let tick = 0; tick < 50; tick += 1) {
+      phase = recordAction(phase, snapshotRun(state), state, undefined, BAG);
+    }
+    expect(phase.harms).toHaveLength(1);
+    expect(hpLostByMember(phase)).toEqual([{ memberId: 'hero', amount: 12, died: false }]);
+  });
+
   it('marks a phase with a death as the worst outcome', () => {
     const phase = { ...emptyPhase(4), harms: [{ seq: 1, memberId: 'a', amount: 30, kind: 'death' as const, hpBefore: 20, hpAfter: 0 }] };
     expect(phaseOutcome(phase)).toBe('death');

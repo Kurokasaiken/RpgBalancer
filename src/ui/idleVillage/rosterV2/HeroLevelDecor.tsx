@@ -72,6 +72,11 @@ const IgnitionRing: React.FC<{ rect: Rect; eventId: string; reducedMotion: boole
   );
 };
 
+/** How far the badge may hang past the portrait's right edge. */
+const BADGE_OVERHANG_PX = 6;
+/** Minimum air between the badge and the first letter of the name. */
+const BADGE_NAME_GAP_PX = 2;
+
 export interface HeroLevelDecorProps {
   /** The canonical resident this card renders. */
   resident: ResidentState;
@@ -82,6 +87,8 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
   const { t } = useTranslation('idleVillage');
   const slotRef = useRef<HTMLSpanElement>(null);
   const [portraitRect, setPortraitRect] = useState<Rect | null>(null);
+  /** Badge right edge (wrapper-relative) and the wrapper width it is measured against. */
+  const [badgeAnchor, setBadgeAnchor] = useState<{ right: number; wrapperWidth: number } | null>(null);
   const [flare, setFlare] = useState<HeroLevelUpEvent | null>(null);
   const [floater, setFloater] = useState<{ eventId: string; text: string; rect: Rect } | null>(null);
   const reducedMotion = useRef(prefersReducedMotion()).current;
@@ -92,8 +99,11 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
   // The card layer owns the "mounted" predicate: register on mount.
   useEffect(() => registerMountedCard(resident.id), [resident.id]);
 
-  // Anchor rule: badge top-right of the portrait bounds — measured against the
-  // stable `data-wanderlust-portrait` anchor, relative to the card wrapper.
+  // Anchor rule: badge at the top-right corner of the portrait bounds — measured
+  // against the stable `data-wanderlust-portrait` anchor, relative to the card
+  // wrapper. It grows LEFTWARDS over the portrait and its right edge stops 2 px
+  // before the name (`data-roster-name`): in the dense strip «Lv 3» covered the
+  // first letters of the name (R-234, PLAN-067 T-A6).
   useLayoutEffect(() => {
     const wrapper = slotRef.current?.parentElement;
     const portrait = wrapper?.querySelector<HTMLElement>('[data-wanderlust-portrait]');
@@ -102,6 +112,10 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
       const wr = wrapper.getBoundingClientRect();
       const pr = portrait.getBoundingClientRect();
       setPortraitRect({ left: pr.left - wr.left, top: pr.top - wr.top, width: pr.width, height: pr.height });
+      const corner = pr.right - wr.left + BADGE_OVERHANG_PX;
+      const name = wrapper.querySelector<HTMLElement>('[data-roster-name]');
+      const right = name ? Math.min(corner, name.getBoundingClientRect().left - wr.left - BADGE_NAME_GAP_PX) : corner;
+      setBadgeAnchor({ right, wrapperWidth: wr.width });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -171,15 +185,16 @@ export const HeroLevelDecor: React.FC<HeroLevelDecorProps> = ({ resident }) => {
               }}
             />
             {flare && <IgnitionRing rect={{ left: portraitRect.left - 2, top: portraitRect.top - 2, width: portraitRect.width + 4, height: portraitRect.height + 4 }} eventId={flare.eventId} reducedMotion={reducedMotion} />}
-            {/* Badge: top-right of the portrait bounds. */}
+            {/* Badge: top-right corner of the portrait, growing leftwards, clear of the name. */}
             <span
               data-hero-level={resident.id}
               role="img"
               aria-label={t('gameFrame.heroLevel.a11y', { n: level })}
               style={{
                 position: 'absolute',
-                left: portraitRect.left + portraitRect.width - 6,
+                right: badgeAnchor ? badgeAnchor.wrapperWidth - badgeAnchor.right : undefined,
                 top: portraitRect.top - 7,
+                whiteSpace: 'nowrap',
                 fontFamily: 'var(--skin-font-display)',
                 fontSize: 12,
                 fontWeight: 700,

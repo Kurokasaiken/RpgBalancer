@@ -9,6 +9,7 @@ import WorkerCard from './WorkerCard';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { getEventCoordinates, CSS } from '@dnd-kit/utilities';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
+import { isSlotTokenDragId } from '@/ui/idleVillage/interaction/dragSensors';
 
 interface DragOverlayContentProps {
   label: string;
@@ -271,7 +272,11 @@ export function CustomDragOverlay({
   const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
   
   // REGOLA 2: Solo il proxy durante il drag
-  const activeId = (dragVisualState?.mode === 'dragging' ? dragVisualState.residentId : null) ?? forcedResidentId ?? null;
+  /* A slot-token swap (`slot-token:<slotId>`) has no resident to show: the rack paints its own
+   * ghost (`slot-token-ghost`), so the shared overlay stays empty instead of printing the drag id
+   * (R-234, PLAN-067 T-A5). */
+  const rawActiveId = (dragVisualState?.mode === 'dragging' ? dragVisualState.residentId : null) ?? forcedResidentId ?? null;
+  const activeId = rawActiveId && !isSlotTokenDragId(rawActiveId) ? rawActiveId : null;
   const activeResident = activeId && residentsById ? residentsById[activeId] : undefined;
   const isForcedOverlay = Boolean(forcedResidentId) && dragVisualState?.mode !== 'dragging';
   

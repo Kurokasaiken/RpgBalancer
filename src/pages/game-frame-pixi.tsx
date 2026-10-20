@@ -1425,6 +1425,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                         left={res.rect?.x ?? 0}
                         top={res.rect?.y ?? 0}
                         widthPx={res.rect?.w ?? VILLAGE_STASH_CONFIG.panel.widthPx}
+                        maxHeightPx={res.rect?.h}
                         zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
                         onClose={closeVillageStash}
                       />
