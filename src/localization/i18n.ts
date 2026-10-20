@@ -4,8 +4,12 @@ import ICU from 'i18next-icu';
 import HttpBackend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { setQuestContentLocale } from '@/balancing/config/idleVillage/quests/questContentLocale';
 
 export const i18n = i18next;
+
+/* Authored quest prose has its own overlay (R-234, PLAN-067 T-A13): it follows the UI language. */
+i18next.on('languageChanged', (lng: string) => setQuestContentLocale(lng));
 
 export const i18nReady = i18next
   .use(initReactI18next)
