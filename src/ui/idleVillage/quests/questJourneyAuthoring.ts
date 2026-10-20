@@ -29,7 +29,7 @@
  * itself is pure graph work — no engine import, testable on literals.
  */
 import type { QuestJourneyFasi, QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
-import { journeyFasiOf } from './questJourney';
+import { journeyFasiOf, meanderWaypoints } from './questJourney';
 import type { QuestFase, WorldPoint } from './questJourney';
 import type { QuestNode } from '../questS1Lab/questScenario';
 import type { JourneyBeatPlan, QuestJourneyLaunchSpec } from './questJourneyEngine';
@@ -311,7 +311,8 @@ export function resolveQuestJourneyLaunchSpec(input: {
     ticksPerDay: input.ticksPerDay,
     origin: input.origin,
     destination: { x: input.poi.x, y: input.poi.y },
-    ...(fasi.waypoints ? { waypoints: fasi.waypoints } : {}),
+    /* Authored waypoints win; otherwise the path winds (seeded by the run, frozen with the snapshot). */
+    waypoints: fasi.waypoints ?? meanderWaypoints(input.origin, { x: input.poi.x, y: input.poi.y }, input.runSeed),
     fasePlans: plans,
     /* startNode attributed to andata needs the authored POI entry; the
      *  validator guarantees it exists — the fallback keeps a malformed

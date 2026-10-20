@@ -147,7 +147,7 @@ const QUEST_GLYPH_URLS: Readonly<Record<string, string>> = {
 };
 
 export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseSizePx, availability, poiType = 'quest', tier: tierProp, exiting = false }) => {
-  const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId, decisionWaiting } = session;
+  const { activity, questStatus, activityProgress, poiDropId, canAcceptPoiDrop, handlePoiClick, draggingResidentId } = session;
   const { t } = useTranslation('idleVillage');
   const tier = tierProp ?? questPoiById(activity.id)?.tier ?? 'normal';
   /* Size = weight of the stake: a main quest is drawn one size up (L), every other quest at M. */
@@ -227,28 +227,7 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseS
     >
       <style>{poiMatericV3_5Styles}</style>
       <div style={{ position: 'relative', width: sizePx, height: sizePx }}>
-        {decisionWaiting && (
-          <span
-            data-decision-waiting="true"
-            role="status"
-            aria-label={t('gameFrame.questPoi.decisionWaiting')}
-            style={{
-              position: 'absolute',
-              top: -4,
-              right: -4,
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              background: 'var(--skin-poi-urgent)',
-              border: '2px solid var(--skin-surface-base)',
-              boxShadow: '0 0 8px var(--skin-poi-urgent)',
-              animation: 'mqp-decision-pulse 1.6s ease-in-out infinite',
-              pointerEvents: 'none',
-              zIndex: 2,
-            }}
-          />
-        )}
-        <style>{`@keyframes mqp-decision-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }`}</style>
+        {/* The red «decision waiting» dot was removed (Director 2026-10-20: a small circle in the corner must not exist). */}
         <PoiMatericV3_5
           sigillo
           type={poiType}

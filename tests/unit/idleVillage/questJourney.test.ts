@@ -240,3 +240,25 @@ describe('beatSeed / beatDraw', () => {
     }
   });
 });
+
+describe('meanderWaypoints (winding route, Director 2026-10-20)', () => {
+  const from = { x: 700, y: 1200 };
+  const to = { x: 1500, y: 700 };
+
+  it('is deterministic per seed and differs between seeds', async () => {
+    const { meanderWaypoints } = await import('@/ui/idleVillage/quests/questJourney');
+    expect(meanderWaypoints(from, to, 42)).toEqual(meanderWaypoints(from, to, 42));
+    expect(meanderWaypoints(from, to, 42)).not.toEqual(meanderWaypoints(from, to, 43));
+  });
+
+  it('builds a valid polyline that is longer than the straight line and stays near it', async () => {
+    const { meanderWaypoints, buildJourneyPolyline } = await import('@/ui/idleVillage/quests/questJourney');
+    const wps = meanderWaypoints(from, to, 7);
+    const route = buildJourneyPolyline(from, to, wps);
+    const straight = Math.hypot(to.x - from.x, to.y - from.y);
+    expect(route.totalLength).toBeGreaterThan(straight);
+    expect(route.totalLength).toBeLessThan(straight * 1.4);
+    expect(route.points[0]).toEqual(from);
+    expect(route.points[route.points.length - 1]).toEqual(to);
+  });
+});

@@ -35,14 +35,14 @@ function PartyGlyph({ point }: { point: WorldPoint }) {
     <g transform={`translate(${point.x} ${point.y})`}>
       <circle
         r={QUEST_JOURNEY_ROUTE_CONFIG.partyHaloRadiusWorldPx}
-        fill="var(--skin-glow-primary)"
-        stroke="var(--skin-title-color)"
+        fill="var(--skin-hud-lacquer-deep)"
+        stroke="var(--skin-hud-brass-crest)"
         strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.partyStrokeWidthWorldPx}
       />
       <circle
         r={QUEST_JOURNEY_ROUTE_CONFIG.partyCoreRadiusWorldPx}
-        fill="var(--skin-astro-shadow-teal)"
-        stroke="var(--skin-title-color)"
+        fill="var(--skin-hud-lacquer-deep)"
+        stroke="var(--skin-hud-brass-low)"
         strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.partyStrokeWidthWorldPx}
       />
       <g fill="var(--skin-text-primary)" transform={`scale(${partyGlyphScale})`}>
@@ -115,7 +115,6 @@ export function QuestJourneyRoute({ run, canvas }: QuestJourneyRouteProps) {
   const progress = phase === 'svolgimento' ? 1 : view.routeProgress;
   const frontier = pointAt(route, progress);
   const start = route.points[0];
-  const destination = route.points[route.points.length - 1];
   const path = journeyRoutePathData(route);
   const filledLength = route.totalLength * progress;
   const phaseLabel = t(`gameFrame.questJourney.phase.${phase}`);
@@ -141,10 +140,25 @@ export function QuestJourneyRoute({ run, canvas }: QuestJourneyRouteProps) {
       width={canvas.width}
       xmlns="http://www.w3.org/2000/svg"
     >
+      <style>{`@keyframes qjr-glint { from { stroke-dashoffset: 0; } to { stroke-dashoffset: var(--qjr-glint-end); } }
+.qjr-glint { animation: qjr-glint 3.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .qjr-glint { animation: none; display: none; } }`}</style>
       <path
         d={path}
         fill="none"
-        stroke="var(--skin-astro-shadow-teal)"
+        stroke="var(--skin-poi-border-outer)"
+        strokeOpacity={0.3}
+        strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.guideWidthWorldPx + 8}
+        strokeLinejoin="round"
+        strokeLinecap="butt"
+      />
+      {/* Heavy casing only along the stretch already travelled: ahead of the party the route is a light dotted trail. */}
+      <path
+        d={path}
+        fill="none"
+        stroke="var(--skin-poi-border-outer)"
+        strokeOpacity={0.9}
+        strokeDasharray={`${filledLength} ${route.totalLength}`}
         strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.casingWidthWorldPx}
         strokeLinejoin="round"
         strokeLinecap="butt"
@@ -152,10 +166,20 @@ export function QuestJourneyRoute({ run, canvas }: QuestJourneyRouteProps) {
       <path
         d={path}
         fill="none"
-        opacity="0.58"
-        stroke="var(--skin-text-primary)"
+        opacity="0.95"
+        stroke="var(--skin-poi-border-inner)"
         strokeDasharray={`${QUEST_JOURNEY_ROUTE_CONFIG.guideDashWorldPx} ${QUEST_JOURNEY_ROUTE_CONFIG.guideGapWorldPx}`}
         strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.guideWidthWorldPx}
+        strokeLinejoin="round"
+        strokeLinecap="butt"
+      />
+      <path
+        d={path}
+        fill="none"
+        stroke="var(--skin-hud-brass-crest)"
+        strokeOpacity={0.2}
+        strokeDasharray={`${filledLength} ${route.totalLength}`}
+        strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.progressWidthWorldPx + 14}
         strokeLinejoin="round"
         strokeLinecap="butt"
       />
@@ -163,7 +187,7 @@ export function QuestJourneyRoute({ run, canvas }: QuestJourneyRouteProps) {
         data-testid="quest-journey-route-progress"
         d={path}
         fill="none"
-        stroke="var(--skin-title-color)"
+        stroke="var(--skin-hud-brass-low)"
         strokeDasharray={`${filledLength} ${route.totalLength}`}
         strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.progressWidthWorldPx}
         strokeLinejoin="round"
@@ -172,37 +196,40 @@ export function QuestJourneyRoute({ run, canvas }: QuestJourneyRouteProps) {
       <path
         d={path}
         fill="none"
-        opacity="0.86"
-        stroke="var(--skin-text-primary)"
+        opacity="0.9"
+        stroke="var(--skin-hud-brass-crest)"
         strokeDasharray={`${filledLength} ${route.totalLength}`}
         strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.highlightWidthWorldPx}
         strokeLinejoin="round"
         strokeLinecap="butt"
       />
+      {/* A glint of light runs along the traveled stretch (decoration: off with reduced motion). */}
+      {filledLength > 0 && (
+        <path
+          className="qjr-glint"
+          data-testid="quest-journey-route-glint"
+          d={path}
+          fill="none"
+          stroke="#fff6dc"
+          strokeDasharray={`${QUEST_JOURNEY_ROUTE_CONFIG.glintLengthWorldPx} ${filledLength}`}
+          strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.highlightWidthWorldPx * 1.8}
+          strokeLinecap="round"
+          style={{ ['--qjr-glint-end' as string]: `${-filledLength}` }}
+        />
+      )}
       <g transform={`translate(${start.x} ${start.y})`}>
         <circle
           r={QUEST_JOURNEY_ROUTE_CONFIG.endpointRadiusWorldPx}
-          fill="var(--skin-astro-shadow-teal)"
-          stroke="var(--skin-title-color)"
+          fill="var(--skin-hud-lacquer-deep)"
+          stroke="var(--skin-hud-brass-crest)"
           strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.endpointStrokeWidthWorldPx}
         />
         <circle
           r={QUEST_JOURNEY_ROUTE_CONFIG.endpointCoreRadiusWorldPx}
-          fill="var(--skin-title-color)"
+          fill="var(--skin-hud-brass-low)"
         />
       </g>
-      <g transform={`translate(${destination.x} ${destination.y})`}>
-        <circle
-          r={QUEST_JOURNEY_ROUTE_CONFIG.endpointRadiusWorldPx}
-          fill="var(--skin-astro-shadow-teal)"
-          stroke="var(--skin-title-color)"
-          strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.endpointStrokeWidthWorldPx}
-        />
-        <circle
-          r={QUEST_JOURNEY_ROUTE_CONFIG.endpointCoreRadiusWorldPx}
-          fill="var(--skin-title-color)"
-        />
-      </g>
+      {/* No seal at the destination: the line runs to the POI and passes under its marker. */}
       <PartyGlyph point={frontier} />
       {view.parked && (
         <MarkerBadge

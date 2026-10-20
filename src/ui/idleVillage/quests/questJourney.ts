@@ -205,6 +205,44 @@ export function buildJourneyPolyline(
   return { points, cumulativeLengths, totalLength: cumulativeLengths[cumulativeLengths.length - 1] };
 }
 
+/** Deterministic unit hash in [0, 1) for the route meander (no `Math.random`: a frozen route must replay). */
+function unit(seed: number, salt: number): number {
+  let h = Math.imul((seed ^ Math.imul(salt + 1, 0x9e3779b1)) >>> 0, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+
+/**
+ * Intermediate points that make a journey wind like a path on foot instead of a ruler line:
+ * a lateral offset (sum of two slow waves, zero at both ends) sampled densely so the
+ * polyline reads as a smooth curve. Pure and seeded, so the frozen route replays identically.
+ * Amplitude is a fraction of the straight distance (capped), never touching the endpoints.
+ */
+export function meanderWaypoints(from: WorldPoint, to: WorldPoint, seed: number, samples = 72): WorldPoint[] {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy);
+  if (length <= 0 || samples < 1) return [];
+  const nx = -dy / length;
+  const ny = dx / length;
+  const amp = Math.min(length * 0.085, 70);
+  const side = unit(seed, 1) < 0.5 ? -1 : 1;
+  const phase1 = unit(seed, 2) * Math.PI * 2;
+  const phase2 = unit(seed, 3) * Math.PI * 2;
+  const bends = 1.1 + unit(seed, 4) * 0.5; // between ~1.1 and ~1.6 full waves
+  const points: WorldPoint[] = [];
+  for (let i = 1; i <= samples; i += 1) {
+    const t = i / (samples + 1);
+    const envelope = Math.sin(Math.PI * t) ** 0.8;
+    const wave = 0.8 * Math.sin(bends * Math.PI * 2 * t + phase1) + 0.3 * Math.sin(bends * 1.7 * Math.PI * 2 * t + phase2);
+    const off = side * amp * envelope * wave;
+    points.push({ x: from.x + dx * t + nx * off, y: from.y + dy * t + ny * off });
+  }
+  return points;
+}
+
 /**
  * Interpolates the world-px point at arc-length fraction `progress`
  * (clamped to [0,1]) along the route — monotone non-decreasing in
