@@ -1859,23 +1859,6 @@ export function PixiWorldMap({
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
       <div ref={hostRef} className="cursor-grab" style={{ position: 'absolute', inset: 0 }} />
-      <div
-        ref={anchorLayerRef}
-        data-testid="pixi-world-anchors"
-        style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', visibility: 'hidden' }}
-      >
-        {anchors.map((anchor) => (
-          <div
-            key={anchor.id}
-            data-anchor-id={anchor.id}
-            data-world-x={anchor.x}
-            data-world-y={anchor.y}
-            style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'auto' }}
-          >
-            {anchor.node}
-          </div>
-        ))}
-      </div>
       {worldOverlay && manifest && (
         <div
           ref={worldOverlayLayerRef}
@@ -1917,3 +1900,21 @@ export function PixiWorldMap({
 }
 
 export default PixiWorldMap;
+      {/* Anchors (POI markers) sit after the route overlay at the same z-index: the journey line and the party token pass UNDER the markers. */}
+      <div
+        ref={anchorLayerRef}
+        data-testid="pixi-world-anchors"
+        style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', visibility: 'hidden', zIndex: 5 }}
+      >
+        {anchors.map((anchor) => (
+          <div
+            key={anchor.id}
+            data-anchor-id={anchor.id}
+            data-world-x={anchor.x}
+            data-world-y={anchor.y}
+            style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'auto' }}
+          >
+            {anchor.node}
+          </div>
+        ))}
+      </div>
