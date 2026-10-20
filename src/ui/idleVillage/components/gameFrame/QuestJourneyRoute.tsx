@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { faseAt, pointAt, reversedRoute, type JourneyPolyline, type WorldPoint } from '@/ui/idleVillage/quests/questJourney';
 import { QUEST_JOURNEY_ROUTE_CONFIG } from '@/ui/idleVillage/config/questJourneyRouteConfig';
+import { EngravedIcon } from './engravedIcons';
 
 /** World-space canvas dimensions matching the active Pixi map manifest. */
 export interface QuestJourneyRouteCanvas {
@@ -50,6 +52,49 @@ function PartyGlyph({ point }: { point: WorldPoint }) {
         <path d="M-6 5 Q-5 1 -2 2 L0 4 L2 2 Q5 1 6 5 Z" />
       </g>
     </g>
+  );
+}
+
+/** Small seal anchored to the party marker: a disc plus a centered glyph
+ *  child. Colours follow the skin tokens exactly like the route stroke. */
+function MarkerBadge({
+  point,
+  dy,
+  label,
+  testId,
+  children,
+}: {
+  point: WorldPoint;
+  dy: number;
+  label: string;
+  testId: string;
+  children: ReactNode;
+}) {
+  const { markerBadgeRadiusWorldPx: r, partyStrokeWidthWorldPx: sw } = QUEST_JOURNEY_ROUTE_CONFIG;
+  return (
+    <g
+      aria-label={label}
+      data-testid={testId}
+      role="img"
+      transform={`translate(${point.x} ${point.y + dy})`}
+    >
+      <circle r={r} fill="var(--skin-hud-lacquer-deep)" stroke="var(--skin-title-color)" strokeWidth={sw * 0.7} />
+      {children}
+    </g>
+  );
+}
+
+/** Crossroads glyph for a parked frontier — two roads meeting. */
+function CrossroadsGlyph() {
+  const g = QUEST_JOURNEY_ROUTE_CONFIG.markerBadgeGlyphWorldPx / 2;
+  return (
+    <path
+      d={`M${-g} ${-g} L${g} ${g} M${-g} ${g} L${g} ${-g} M${-g} 0 L${g} 0`}
+      stroke="var(--skin-status-unmet)"
+      strokeWidth={g * 0.45}
+      strokeLinecap="round"
+      fill="none"
+    />
   );
 }
 
@@ -159,6 +204,33 @@ export function QuestJourneyRoute({ run, canvas }: QuestJourneyRouteProps) {
         />
       </g>
       <PartyGlyph point={frontier} />
+      {view.parked && (
+        <MarkerBadge
+          point={frontier}
+          dy={-QUEST_JOURNEY_ROUTE_CONFIG.markerBadgeOffsetWorldPx}
+          label={t('gameFrame.questJourney.parkedBadge')}
+          testId="quest-journey-route-badge-parked"
+        >
+          <CrossroadsGlyph />
+        </MarkerBadge>
+      )}
+      {phase === 'ritorno' && (run.loot?.length ?? 0) > 0 && (
+        <MarkerBadge
+          point={frontier}
+          dy={QUEST_JOURNEY_ROUTE_CONFIG.markerBadgeOffsetWorldPx}
+          label={t('gameFrame.questJourney.lootBadge', { count: run.loot.length })}
+          testId="quest-journey-route-badge-loot"
+        >
+          <EngravedIcon
+            id="ico-pouch"
+            size={QUEST_JOURNEY_ROUTE_CONFIG.markerBadgeGlyphWorldPx}
+            x={-QUEST_JOURNEY_ROUTE_CONFIG.markerBadgeGlyphWorldPx / 2}
+            y={-QUEST_JOURNEY_ROUTE_CONFIG.markerBadgeGlyphWorldPx / 2}
+            color="var(--skin-label-primary)"
+            aria-hidden
+          />
+        </MarkerBadge>
+      )}
     </svg>
   );
 }

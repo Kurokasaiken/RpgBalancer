@@ -1086,7 +1086,13 @@
         "andata": "andata",
         "svolgimento": "sul luogo della quest",
         "ritorno": "ritorno"
-      }
+      },
+      "days": "{days}g",
+      "daysEstimate": "~{days}g",
+      "awaitingDecision": "Attende una decisione",
+      "lootChip": "Bottino ×{count}",
+      "parkedBadge": "La spedizione attende a un bivio",
+      "lootBadge": "La spedizione porta a casa bottino: {count}"
     },
     "tuning": {
       "reset": "Ripristina valori",

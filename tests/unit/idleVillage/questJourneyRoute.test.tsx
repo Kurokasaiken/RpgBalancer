@@ -96,6 +96,25 @@ describe('QuestJourneyRoute', () => {
     expect(renderToStaticMarkup(<QuestJourneyRoute run={{ questId: 'goblin', ended: false } as QuestRunState} canvas={CANVAS} />)).toBe('');
   });
 
+  it('marks the parked frontier with a crossroads badge and no badge when free', () => {
+    const parked = markup(makeRun('andata', 10, 4));
+    const free = markup(makeRun('andata', 10));
+
+    expect(parked).toContain('data-testid="quest-journey-route-badge-parked"');
+    expect(free).not.toContain('quest-journey-route-badge-parked');
+  });
+
+  it('shows the encumbered-loot pouch badge only on the return leg', () => {
+    const returning = markup({ ...makeRun('ritorno', 5), loot: ['goblin chest'] });
+    const outbound = markup({ ...makeRun('andata', 5), loot: ['goblin chest'] });
+    const emptyReturn = markup(makeRun('ritorno', 5));
+
+    expect(returning).toContain('data-testid="quest-journey-route-badge-loot"');
+    expect(returning).toContain('data-engraved="ico-pouch"');
+    expect(outbound).not.toContain('quest-journey-route-badge-loot');
+    expect(emptyReturn).not.toContain('quest-journey-route-badge-loot');
+  });
+
   it('validates the route visual dimensions and rejects a casing narrower than its fill', () => {
     expect(() =>
       QuestJourneyRouteConfigSchema.parse({
@@ -112,6 +131,9 @@ describe('QuestJourneyRoute', () => {
         partyCoreRadiusWorldPx: 4,
         partyStrokeWidthWorldPx: 1,
         partyGlyphScale: 1,
+        markerBadgeRadiusWorldPx: 3,
+        markerBadgeOffsetWorldPx: 9,
+        markerBadgeGlyphWorldPx: 4,
       }),
     ).toThrow();
   });
