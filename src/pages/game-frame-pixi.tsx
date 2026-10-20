@@ -28,6 +28,7 @@ import { DEFAULT_COAST_FOAM_CONFIG } from '@/ui/idleVillage/components/WorldSurf
 import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/resolveWorldManifest';
 import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
+import { tickCounterParams } from '@/ui/idleVillage/questS1Lab/questTickCounter';
 import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
 import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLostOverlay';
@@ -883,7 +884,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
       const halo = questHaloProgress(run, activePoi, currentTick);
       const label = run.ended
         ? t(run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
-        : t('gameFrame.questWindow.ticks', { elapsed: halo.elapsedTicks, total: halo.durationTicks });
+        : t('gameFrame.questWindow.ticks', tickCounterParams(halo));
       return { progress: halo.fraction, label };
     }
     const span = questWindow.durationDays * dayLengthTicks;

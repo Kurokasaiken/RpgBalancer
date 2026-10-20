@@ -90,9 +90,24 @@ Mockup di riferimento: `mockups/fork-mockups{,-v2,-v3}.html` (sha in `rulings/`)
 - ⏸ **T-A8** — sostituito dal ruling Director 2026-10-20 (sotto): le scritte escono dall'immagine, quindi i sigilli non vanno più fatti stare nell'eroe compresso. Diventa **T-B10**.
 - ✅ **T-A9** (testimone: 4/4 tooltip dentro il planner a 1440 e 1280, `.mw/runs/plan067-t-a9/`) — i tooltip oggetti del planner (vassoio e borsa) collidono con il guscio del planner (`collisionBoundary`, `PlannerBoundaryContext`; `INV:R-234-planner-tooltip-inside`, contratto `quest-expedition-detail`).
 - ✅ **T-A10** — il registro non eredita più la regola-pillola dello scope `data-hud-controls` (T-03): righe con geometria propria (`INV:R-234-registry-rows-own-geometry`). L1/L2 da 10/8 a **0/0** a 1440 e 1280. Evidenza `.mw/runs/plan067-t-a10/`.
+- ◐ **T-A11** — un solo titolo (`INV:R-234-report-one-title`); chip a ≥ 4.5:1 in ogni tono (`INV:R-234-chip-text-contrast`, testimone dal vivo mancante); lastra misurata opaca, trasparenza non riprodotta. Il resto del rapporto (forma, proporzioni, CTA, viola) va a T-C2 / T-B11 / T-B12 per ruling. Evidenza `.mw/runs/plan067-t-a11/`.
+- ◐ **T-A12** — fatto: pulsante d'invasione armato solo a card apparsa (`INV:R-234-invasion-action-armed`). **Aperti:** «Maximum update depth» non riprodotto; voci menu disabilitate e tema bocciato attendono DN-6/DN-7. Evidenza `.mw/runs/plan067-t-a12/`.
 
 **Ruling Director 2026-10-20 sul POI detail (planner):**
-1. «Il pulsante nel POI detail non va bene, non deve mai essere usato in quello stile.» Da confermare quale: si presume il pulsante tondo «OPEN WAREHOUSE» (`quest-open-stash`, 26 px con etichetta che trabocca sulla riga borsa). Quello stile è vietato in tutta l'interfaccia.
+1. «Il pulsante nel POI detail non va bene, non deve mai essere usato in quello stile.» Si tratta quasi certamente della **placca CTA** «SEND EXPEDITION» (vedi ruling sul rapporto qui sotto), non di «OPEN WAREHOUSE» come avevo presunto.
+**Ruling Director 2026-10-20 (sera), dopo il mockup v5:**
+- **COL-D = B «Ferro freddo» `#93a4ad`** per la morte (decisa). Resta da sostituire in `--skin-status-death` di tutte le skin e nell'anello notte (da decidere a parte).
+- **T-C2:** il componente che mostra **chi è tornato** e la **lastra** del rapporto «devono essere fatti meglio, più interessanti e belli» (v5 = base insufficiente). Requisiti nuovi:
+  1. chi è tornato mostra se è **ferito** (a colpo d'occhio, non solo in una parola);
+  2. al **mouse over** compaiono altre informazioni della run prese dai log: **malattia**, **modifica caratteriale**, **titolo**. Dati disponibili oggi: ferito/morto e PV persi per fase per membro, XP per membro, consumabili usati; **titoli/malattie/lore** esistono come seam autorata (`scenario.epilogue`) ma **a livello di gruppo**, e per il goblin nessuna malattia è autorata. **Le modifiche caratteriali non esistono nel motore**: richiedono una decisione di gameplay (nuovo dato per residente) prima di essere mostrate — il mockup le segna come «da decidere», non le inventa.
+  3. BTN-1 ancora aperto; T-C2 non parte prima del suo ruling.
+  4. Mockup v6 (`mockups/fork-mockups-v6.html`, sha256 7a459e4f1ea68c42…): nicchie ad arco con ritratto per tornati e caduti, stato scritto sul ritratto + benda + filo rosso + barra PV a righe, striscia «la spedizione in sette tappe», tooltip con ferite / malattia / carattere / titolo / XP / oggetti. Due scelte del Director: titoli e malattie **per persona** (oggi di gruppo) e il dato «carattere» (non esiste).
+
+**Ruling Director 2026-10-20 sul rapporto di fine quest:**
+- «Il pulsante di expedition report non deve esistere da nessuna parte con quella forma.» → la **placca CTA** (`SkinButton variant="cta"`, `data-skin="cta"`) è vietata ovunque, circa 20 componenti (SEND EXPEDITION, CLOSE THE REPORT, …). La guida HUD è aggiornata (§Pulsanti). La forma sostitutiva è il fork **BTN-1** (mockup prima del codice) → task **T-B11**.
+- «Piantala di usare il viola; se fa parte delle regole o degli esempi va rimosso.» → vietato in ogni ruolo, **compreso lo stato morte** (`--skin-status-death` `#6d3fb0`, ~54 file) e l'anello notturno del POI giorno/notte (spec marcata). Il colore sostitutivo è il fork **COL-D** → task **T-B12**.
+- «Quello che c'è dentro il report è sproporzionato.» → il contenuto del rapporto va ridisegnato con ricerca e cappello giusto: confluisce in **T-C2** (EXP A «Lapidi»), con ricerca AAA (riferimenti reali di schermate di fine spedizione) e mockup a proporzioni reali prima del codice. Mockup a 1:1 con gerarchia e scala dichiarate: `mockups/fork-mockups-v5.html#rep` (ricerca con fonti in testa al file).
+
 2. «Le scritte sull'immagine del POI detail non ci devono essere: tutte quelle info vanno nel componente preview a destra, che deve avere un design migliore.» Escono dall'immagine sigilli (Pericolo / Ricompensa / Durata), titolo e riga d'invio. La colonna di previsione a destra le ospita e va ridisegnata.
 
 
@@ -113,6 +128,8 @@ Mockup di riferimento: `mockups/fork-mockups{,-v2,-v3}.html` (sha in `rulings/`)
 | **T-B8** | INV-1 B | tray (`picker-item-*`), stash, mercante | stessa icona incisa, font e ottone nelle tre vesti; quantità/prezzo nella posizione fissata dalla baseline |
 | **T-B9** | (parte HUD restante) | `HudPanelsMenu`, `ObjectiveCartouche` | **badge rimosso** (DN-2): pulsante Pannelli senza numero, L7 = 0; **obiettivo bloccato da DN-3** (resta `open`) |
 | **T-B10** | ruling 2026-10-20 (POI detail) | `QuestExpeditionDetail.tsx` (eroe = sola immagine), colonna di previsione a destra, pulsante «OPEN WAREHOUSE» | `visual-fork: POI-D — baseline da produrre (mockup prima del codice)`; 0 testo sopra l'immagine; tutte le info del POI nella preview destra ridisegnata; nessun pulsante nello stile vietato; L1 = 0 a 1440 e 1280 con vassoio aperto e chiuso |
+| **T-B11** | ruling 2026-10-20: placca CTA vietata ovunque | `skinScope.css` (`[data-skin="cta"]`), `SkinButton` variant `cta`, ~20 chiamanti (`grep variant="cta"`) | `visual-fork: BTN-1 — card mockups/fork-mockups-v5.html#btn (sha256 f8d6927792686b77…), baseline baseline/v4-planner-cta-now.png`; 0 usi della placca CTA su /game (grep + harness); un'unica grammatica per l'azione primaria, presa dal fork |
+| **T-B12** | ruling 2026-10-20: mai viola | token `--skin-status-death` (tutte le skin), `TONE.death`, anello notte `DayNightPoi` (spec + test, Mode B-amend) | `visual-fork: COL-D = B Ferro (ruling 2026-10-20) — card mockups/fork-mockups-v5.html#col (sha256 f8d6927792686b77…), baseline baseline/v4-report-now.png`; 0 colori con tinta viola (hue 255–300°) sulle superfici di /game (lente L4); contrasto chip ≥ 4.5 (`INV:R-234-chip-text-contrast`) |
 
 ### Onda C — Director e mock del ciclo (tutto dichiaratamente mock: nessuna persistenza reale salvo ruling)
 
