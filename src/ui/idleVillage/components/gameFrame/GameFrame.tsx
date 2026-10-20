@@ -492,11 +492,6 @@ export const GameFrame: React.FC<GameFrameProps> = ({
       )}
 
 
-      {/* ── Bottom-right: utility controls, and the pearl that stays when the rest is hidden ── */}
-      <div style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8 }}>
-        {utilitySlot != null && <div style={slideChrome('down')}>{utilitySlot}</div>}
-        <HudHideToggle hidden={hudHidden} onToggle={toggleHud} />
-      </div>
 
       {rosterSlot != null && (
         stageMode ? (
@@ -558,6 +553,13 @@ export const GameFrame: React.FC<GameFrameProps> = ({
           {navContent}
         </HudRibbon>
       )}
+
+      {/* ── Bottom-right: utility controls, and the pearl that stays when the rest is hidden ── */}
+      {/* Last in the DOM on purpose: Tab reaches the corner utilities after the top bar and the nav (R-234, T-A14). */}
+      <div style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+        {utilitySlot != null && <div style={slideChrome('down')}>{utilitySlot}</div>}
+        <HudHideToggle hidden={hudHidden} onToggle={toggleHud} />
+      </div>
     </SkinScope>
   );
 };
