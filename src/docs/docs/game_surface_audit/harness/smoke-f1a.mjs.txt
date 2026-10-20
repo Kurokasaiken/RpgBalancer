@@ -1,0 +1,26 @@
+import { openGame, reachSkillCheck, snap, frameSequence, measure, close } from './harness.mjs';
+const outDir = new URL('./out/f1a-smoke/', import.meta.url).pathname;
+const ctx = await openGame({ outDir });
+const t0 = Date.now();
+const reached = await reachSkillCheck(ctx);
+console.log('reached skillcheck:', reached, 'in', Date.now() - t0, 'ms');
+const info = await ctx.page.evaluate(() => ({
+  column: !!document.querySelector('[data-testid="quest-check-column"]'),
+  overlay: !!document.querySelector('[data-testid="quest-check-overlay"]'),
+  tira: !!document.querySelector('.da-tira'),
+  tiraVisible: (() => { const e = document.querySelector('.da-tira'); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; })(),
+  astroFrames: document.querySelector('[data-astro-frames]')?.getAttribute('data-astro-frames') ?? null,
+}));
+console.log('which path / throw button:', info);
+await snap(ctx, '01-armed');
+const m = await measure(ctx, 'body');
+import fs from 'node:fs';
+fs.writeFileSync(outDir + '02-measure-armed.json', JSON.stringify(m, null, 2));
+console.log('C1 worst', m.C1_centering.worstAbs, 'icons', JSON.stringify(m.C4_icons.bySet), 'overlaps', m.C8_occupancy.overlaps.length, 'clip', m.C5_clipping.length);
+if (info.tiraVisible) {
+  await ctx.page.locator('.da-tira').click();
+  await ctx.page.waitForFunction(() => document.querySelector('[data-testid="quest-verdict-card"], [data-astro-idle="parked"]'), null, { timeout: 30000 }).catch(() => console.log('no verdict signal in 30s'));
+}
+const rows = await frameSequence(ctx, '03-post-throw', { frames: 6, intervalMs: 500 });
+console.log(rows.map((r) => `${r.i}: frames=${r.astroFrames} idle=${r.astroIdle} run=${r.runningAnimations} paused=${r.pausedAnimations}`).join('\n'));
+await close(ctx);

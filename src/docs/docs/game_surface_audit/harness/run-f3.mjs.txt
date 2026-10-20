@@ -1,0 +1,99 @@
+import fs from 'node:fs';
+import { openGame, POI, snap, close, measure, contrastFromPixels } from './harness.mjs';
+const W = Number(process.env.W || 1440), H = Number(process.env.H || 900), RM = process.env.RM === '1';
+const FULL = process.env.FULL !== '0';
+const tag = `f3-${W}x${H}${RM ? '-rm' : ''}`;
+const outDir = new URL(`./out/${tag}/`, import.meta.url).pathname;
+const ctx = await openGame({ outDir, viewport: { width: W, height: H }, reducedMotion: RM ? 'reduce' : 'no-preference' });
+const { page } = ctx;
+const Q = '[data-testid="quest-window"]';
+const has = (s) => page.locator(s).count();
+const sample = () => page.evaluate((pid) => {
+  const r = window.__idleVillageTestHooks.expedition[pid].getRun(); const clk = window.__idleVillageTestHooks.getClock?.();
+  const w = document.querySelector('[data-testid="quest-window"]');
+  const pb = w?.querySelector('[role="progressbar"]');
+  const cps = [...(w?.querySelectorAll('[data-testid="quest-timebar-checkpoint"]') ?? [])].map((c) => ({ left: c.style.left, reached: c.dataset.reached, current: c.dataset.current, label: c.getAttribute('aria-label') }));
+  const txt = (w?.innerText ?? '').split('\n');
+  return { t: Math.round(performance.now()), tick: clk?.currentTick, node: r?.nodeId, status: r?.frontier?.status, readyAt: r?.frontier?.readyAt, ended: r?.ended, outcome: r?.outcome,
+    bar: pb ? Number(pb.getAttribute('aria-valuenow')) : null, barLabel: pb?.getAttribute('aria-label') ?? null,
+    ticksText: txt.find((l) => /ticks/i.test(l)) ?? null, phaseText: txt.find((l) => /phase \d+ of \d+/i.test(l)) ?? null, legs: txt.filter((l) => /outbound|quest site|returning|andata|ritorno/i.test(l)).join(' | '), cps };
+}, POI);
+const theatreMotion = async (label) => { // px cambiati nel teatro su 3 s, in 4 campioni
+  const box = await page.getByTestId('quest-theatre-frame').boundingBox().catch(() => null); if (!box) return null;
+  const shots = []; for (let i = 0; i < 4; i++) { shots.push((await page.screenshot({ clip: box })).toString('base64')); await page.waitForTimeout(1000); }
+  const res = await page.evaluate(async (arr) => {
+    const load = async (b) => { const im = await createImageBitmap(await (await fetch('data:image/png;base64,' + b)).blob()); const c = new OffscreenCanvas(im.width, im.height); const g = c.getContext('2d'); g.drawImage(im, 0, 0); return g.getImageData(0, 0, im.width, im.height).data; };
+    const ds = await Promise.all(arr.map(load)); const out = [];
+    for (let k = 1; k < ds.length; k++) { let n = 0; const a = ds[k - 1], b = ds[k]; for (let i = 0; i < a.length; i += 4) if (Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]) > 24) n++; out.push(+(100 * n / (a.length / 4)).toFixed(2)); }
+    return out;
+  }, shots);
+  return { label, pctChangedPerSecond: res };
+};
+const series = []; const notes = {}; const seen = new Set();
+await page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].demoLaunch(), POI);
+ctx.steps.push({ step: 'launch', how: 'hook-assisted:demoLaunch' });
+await page.getByTestId('quest-window').waitFor({ state: 'visible', timeout: 30000 });
+await page.waitForTimeout(1200);
+await snap(ctx, '00-window-open');
+series.push(await sample());
+let did = { header: false, mini: false, abandon: false, footer: false, motion: false };
+let lastChoice = '', repeats = 0; const deadline = Date.now() + 480000;
+while (Date.now() < deadline) {
+  const s = await sample(); series.push(s);
+  if (s.ended && (await has('[data-testid="quest-reward-popup"]') || await has('[data-testid="quest-window-close-report"]'))) {
+    await page.waitForTimeout(800); await snap(ctx, '90-end-reward'); await page.waitForTimeout(2500); await snap(ctx, '91-end-reward-2500');
+    fs.writeFileSync(outDir + '92-contrast-end.json', JSON.stringify(await contrastFromPixels(ctx), null, 1));
+    series.push(await sample()); break;
+  }
+  if (await has('[data-testid="quest-check-column"], [data-testid="quest-check-overlay"]')) {
+    if (await has('[data-testid="quest-verdict-card"]')) { await page.waitForTimeout(500); await page.getByTestId('quest-verdict-card').click({ position: { x: 20, y: 10 } }).catch(() => {}); await page.waitForTimeout(500); continue; }
+    if (await page.locator('.da-tira').isVisible().catch(() => false)) { await page.locator('.da-tira').click(); }
+    await page.waitForTimeout(400); continue;
+  }
+  if (await page.getByTestId('quest-window-beat').isVisible().catch(() => false)) {
+    if (!seen.has('b' + s.node)) { seen.add('b' + s.node); await snap(ctx, `n-${s.node}-beat`); }
+    await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue;
+  }
+  const choices = page.locator('[data-testid="quest-window-choice"]:not([disabled])'); const n = await choices.count();
+  if (n > 0 && s.status === 'waiting') {
+    if (!seen.has('c' + s.node)) { seen.add('c' + s.node); await snap(ctx, `n-${s.node}-choice`);
+      if (!did.motion) { did.motion = true; notes.theatreMotionAtChoice = await theatreMotion(s.node); }
+      if (!did.header && FULL) { did.header = true;
+        fs.writeFileSync(outDir + '20-measure-window.json', JSON.stringify(await measure(ctx, Q), null, 1));
+        fs.writeFileSync(outDir + '21-contrast-window.json', JSON.stringify(await contrastFromPixels(ctx, Q), null, 1));
+        for (const id of ['quest-party-toggle', 'quest-belt-toggle', 'quest-log-toggle', 'quest-check-options-toggle']) {
+          const b = page.getByTestId(id); if (!(await b.count())) continue;
+          await b.hover(); await page.waitForTimeout(500); await snap(ctx, `30-hover-${id}`);
+          await b.click(); await page.waitForTimeout(700); await snap(ctx, `31-open-${id}`);
+          await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+          if (await page.getByTestId(id).getAttribute('aria-pressed') === 'true' || await page.getByTestId(id).getAttribute('aria-expanded') === 'true') { await page.getByTestId(id).click(); await page.waitForTimeout(300); }
+        }
+      }
+      if (!did.abandon && FULL) { did.abandon = true;
+        const a = page.getByTestId('quest-abandon-toggle');
+        if (await a.count()) { await a.hover(); await page.waitForTimeout(600); await snap(ctx, '40-abandon-tooltip'); await a.click(); await page.waitForTimeout(400); await snap(ctx, '41-abandon-confirm'); await page.getByTestId('quest-abandon-stay').click().catch(() => {}); await page.waitForTimeout(300); }
+      }
+      if (!did.footer && FULL) { did.footer = true;
+        const f = page.getByTestId('quest-footer-toggle'); if (await f.count()) { await f.click(); await page.waitForTimeout(500); await snap(ctx, '50-footer-collapsed'); await f.click(); await page.waitForTimeout(400); }
+      }
+      if (!did.mini) { did.mini = true;
+        const m = page.locator('[data-testid="quest-window"] button[aria-label="Minimise"], [data-testid="quest-window"] button[title="Minimise"]').first();
+        if (await m.count()) { await m.click(); await page.waitForTimeout(700); await snap(ctx, '60-minimised');
+          const mini = page.getByTestId('quest-window-minimised'); if (await mini.count()) { await snap(ctx, '61-minimised-crop', mini); fs.writeFileSync(outDir + '62-measure-minimised.json', JSON.stringify(await measure(ctx, '[data-testid="quest-window-minimised"]'), null, 1)); }
+          const restore = page.locator('[data-testid="quest-window-minimised"] button').last(); await restore.click().catch(() => {}); await page.waitForTimeout(700);
+        }
+      }
+    }
+    repeats = s.node === lastChoice ? repeats + 1 : 0; lastChoice = s.node;
+    await choices.nth(repeats % n).click(); await page.waitForTimeout(500); continue;
+  }
+  if (s.status === 'pending' && !seen.has('p' + s.node)) { seen.add('p' + s.node); await snap(ctx, `n-${s.node}-pending`); }
+  await page.evaluate(() => window.__idleVillageTestHooks.advanceTicks?.(2));
+  await page.waitForTimeout(150);
+}
+fs.writeFileSync(outDir + 'series.json', JSON.stringify(series));
+fs.writeFileSync(outDir + 'notes.json', JSON.stringify(notes, null, 1));
+const bars = series.filter((x) => x.bar !== null);
+let drops = 0; for (let i = 1; i < bars.length; i++) if (bars[i].bar < bars[i - 1].bar) drops++;
+console.log(JSON.stringify({ tag, samples: series.length, firstBar: bars[0]?.bar, lastBar: bars.at(-1)?.bar, maxBar: Math.max(...bars.map((b) => b.bar)), drops, lastTicks: bars.at(-1)?.ticksText, ended: series.at(-1)?.ended, outcome: series.at(-1)?.outcome, motion: notes.theatreMotionAtChoice }));
+await close(ctx);

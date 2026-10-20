@@ -1,0 +1,34 @@
+import fs from 'node:fs';
+import { openGame, snap, close, warmUp } from './harness.mjs';
+const outDir = new URL('./out/director/', import.meta.url).pathname;
+const ctx = await openGame({ outDir });
+const { page } = ctx; const report = [];
+await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), null, { timeout: 60000 }).catch(() => {});
+await warmUp(ctx);
+const openDir = async () => { if (!(await page.getByTestId('director-panel').isVisible().catch(() => false))) { await page.keyboard.press('F10'); await page.getByTestId('director-panel').waitFor({ timeout: 10000 }).catch(() => {}); } };
+await openDir(); await page.waitForTimeout(600); await snap(ctx, '00-director');
+const actions = await page.evaluate(() => [...document.querySelectorAll('[data-testid="director-panel"] [data-action-id]')].map((b) => ({ id: b.getAttribute('data-action-id'), label: b.textContent.trim(), pressed: b.getAttribute('aria-pressed'), disabled: b.disabled })));
+const extra = await page.evaluate(() => [...document.querySelectorAll('[data-testid="director-panel"] button')].filter((b) => !b.hasAttribute('data-action-id')).map((b) => b.getAttribute('aria-label') || b.textContent.trim()));
+fs.writeFileSync(outDir + 'actions.json', JSON.stringify({ actions, extra }, null, 1)); console.log('ACTIONS', JSON.stringify(actions), 'EXTRA', JSON.stringify(extra));
+const sig = () => page.evaluate(() => ({ text: document.body.innerText.length, overlays: [...document.querySelectorAll('[role="dialog"],[aria-modal="true"],[data-testid*="overlay"],[data-testid*="lost"],[data-testid*="levelup"],[data-testid*="level-up"],[data-testid="ws-event-shroud"]')].filter((e) => e.getBoundingClientRect().width > 0).map((e) => e.getAttribute('data-testid') || e.getAttribute('role')), pois: document.querySelectorAll('[data-quest-poi-id],[data-poi-id]').length, questWin: !!document.querySelector('[data-testid="quest-window"]'), skin: document.documentElement.getAttribute('data-skin') || document.body.getAttribute('data-skin') }));
+const order = ['quest', 'poitypes', 'wonder', 'levelup', 'questRun', 'settlementLost', 'invasion', 'skin'];
+for (const id of order) {
+  if (!actions.find((a) => a.id === id)) { report.push({ id, result: 'NOT IN PANEL' }); continue; }
+  await openDir();
+  if (id === 'levelup') { await page.keyboard.press('r'); await page.waitForTimeout(800); }
+  const before = await sig(); const errN = ctx.consoleErrors.length;
+  await page.locator(`[data-testid="director-panel"] [data-action-id="${id}"]`).click().catch((e) => report.push({ id, clickError: String(e).slice(0, 120) }));
+  const shots = [];
+  for (const t of [400, 1500, 4000]) { await page.waitForTimeout(t === 400 ? 400 : t === 1500 ? 1100 : 2500); const n = `a-${id}-${t}ms`; await snap(ctx, n); shots.push(n); }
+  const after = await sig();
+  report.push({ id, label: actions.find((a) => a.id === id)?.label, before, after, newErrors: ctx.consoleErrors.slice(errN).map((e) => e.slice(0, 140)), shots });
+  // ripulisci
+  if (id === 'settlementLost') { const cta = page.getByRole('button', { name: /begin a new settlement|nuovo insediamento/i }); await page.waitForTimeout(1500); await snap(ctx, `a-${id}-verdict`); if (await cta.count()) { await cta.click().catch(() => {}); await page.waitForTimeout(3000); await snap(ctx, `a-${id}-after-cta`); } }
+  if (id === 'invasion') { const b = page.getByTestId('world-event-card-body').locator('button').last(); await page.waitForTimeout(2500); if (await b.count()) await b.click().catch(() => {}); await page.waitForTimeout(4000); }
+  if (id === 'questRun') { await page.keyboard.press('Escape'); }
+  if (id === 'levelup') { await page.keyboard.press('r'); }
+  await page.waitForTimeout(500);
+}
+fs.writeFileSync(outDir + 'report.json', JSON.stringify(report, null, 1));
+for (const r of report) console.log(r.id, '|', r.label, '| before', JSON.stringify(r.before), '| after', JSON.stringify(r.after), '| err', JSON.stringify(r.newErrors));
+await close(ctx);

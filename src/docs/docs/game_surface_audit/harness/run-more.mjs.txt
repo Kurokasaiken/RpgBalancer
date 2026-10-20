@@ -1,0 +1,43 @@
+import fs from 'node:fs';
+import { openGame, snap, close, measure, contrastFromPixels, plaqueClearance } from './harness.mjs';
+const W = Number(process.env.W || 1440), H = Number(process.env.H || 900), FULL = process.env.FULL !== '0';
+const outDir = new URL(`./out/more-${W}x${H}/`, import.meta.url).pathname;
+const ctx = await openGame({ outDir, viewport: { width: W, height: H } });
+const { page } = ctx; const notes = {}; const save = (n, o) => fs.writeFileSync(outDir + n, JSON.stringify(o, null, 1));
+const crop = async (name, box) => { if (!box) return; const [x, y, w, h] = box; const X = Math.max(0, x - 8), Y = Math.max(0, y - 8); await page.screenshot({ path: outDir + name + '.png', clip: { x: X, y: Y, width: Math.min(W - X, w + 16), height: Math.min(H - Y, h + 16) } }).catch(() => {}); };
+const panels = () => page.evaluate(() => [...document.querySelectorAll('[data-hud-panel], [data-stage-panel]')].map((p) => { const r = p.getBoundingClientRect(); return { id: p.getAttribute('data-hud-panel') || p.getAttribute('data-stage-panel'), box: [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)], bottomOut: Math.round(Math.max(0, r.bottom - innerHeight)), rightOut: Math.round(Math.max(0, r.right - innerWidth)) }; }));
+await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), null, { timeout: 60000 }).catch(() => {});
+await page.waitForTimeout(1500);
+// ---- HERO SHEET ----
+await page.keyboard.press('r'); await page.locator('[data-worker-id="hero-sir-spaccaculi"]').first().waitFor({ state: 'visible', timeout: 15000 }); await page.waitForTimeout(600);
+const card = page.locator('[data-worker-id="hero-giggiolillo"]').first();
+await card.hover(); await page.waitForTimeout(1200); await snap(ctx, '10-herosheet-hover');
+notes.afterHover = await panels();
+await page.mouse.move(W / 2, H - 40); await page.waitForTimeout(800); notes.afterLeave = await panels();
+await page.keyboard.press('p'); await page.waitForTimeout(1000); await snap(ctx, '11-herosheet-sticky-p');
+notes.afterP = await panels();
+const hs = notes.afterP.find((p) => /hero/i.test(p.id));
+if (hs) { const sel = `[data-hud-panel="${hs.id}"], [data-stage-panel="${hs.id}"]`; await crop('12-herosheet-crop', hs.box);
+  if (FULL) { save('13-measure-herosheet.json', await measure(ctx, sel)); save('14-contrast-herosheet.json', await contrastFromPixels(ctx, sel)); }
+  notes.heroText = await page.locator(sel).first().innerText({ timeout: 3000 }).catch(() => '').then((t) => (t || '').replace(/\n+/g, ' | ').slice(0, 900));
+  const nextBtn = page.locator(`${sel} button[aria-label*="ext" i], ${sel} button[aria-label*="ucc" i]`).first(); if (await nextBtn.count()) { await nextBtn.click(); await page.waitForTimeout(600); await snap(ctx, '15-herosheet-next'); } }
+await page.keyboard.press('Escape'); await page.waitForTimeout(400); await page.keyboard.press('p'); await page.waitForTimeout(400);
+await page.keyboard.press('r'); await page.waitForTimeout(500);
+// ---- MERCANTE ----
+await page.keyboard.press('m'); await page.waitForTimeout(900); await snap(ctx, '20-merchant');
+notes.afterM = await panels(); const mp = notes.afterM.find((p) => /merchant/i.test(p.id));
+if (mp) { const sel = `[data-hud-panel="${mp.id}"], [data-stage-panel="${mp.id}"]`; await crop('21-merchant-crop', mp.box); notes.merchantText = await page.locator(sel).first().innerText({ timeout: 3000 }).catch(() => '').then((t) => (t || '').replace(/\n+/g, ' | ').slice(0, 900));
+  if (FULL) { save('22-measure-merchant.json', await measure(ctx, sel)); save('23-contrast-merchant.json', await contrastFromPixels(ctx, sel)); }
+  const buy = page.locator(`${sel} button`).filter({ hasText: /buy|compra|acquista/i }).first(); if (await buy.count()) { await buy.click().catch(() => {}); await page.waitForTimeout(700); await snap(ctx, '24-merchant-after-buy'); } }
+await page.keyboard.press('m'); await page.waitForTimeout(400);
+// ---- VISTA VILLAGE ----
+await page.locator('[data-nav-id="village"]').click(); await page.waitForTimeout(1800); await snap(ctx, '30-village');
+notes.villageClearance = await plaqueClearance(ctx);
+const reg = page.getByTestId('village-registry-chip'); if (await reg.count()) { await reg.click(); await page.waitForTimeout(900); await snap(ctx, '31-registry'); notes.registry = await panels(); if (FULL) save('32-measure-registry.json', await measure(ctx, '[data-testid="village-registry-list"]')); await page.keyboard.press('Escape'); await page.waitForTimeout(400); }
+for (const pin of ['farm', 'smithy', 'barracks', 'inn']) { const p = page.locator(`[data-building-pin="${pin}"]`); if (await p.count()) { await p.hover(); await page.waitForTimeout(700); await snap(ctx, `33-pin-${pin}`); } }
+await page.mouse.move(10, H / 2); await page.waitForTimeout(400);
+if (FULL) { save('34-contrast-village.json', await contrastFromPixels(ctx)); save('35-measure-village.json', await measure(ctx, '[data-testid="village-screen-view"]')); }
+// ---- Workshop / Tavern bloccati ----
+await page.locator('[data-nav-id="workshop"]').click().catch(() => {}); await page.waitForTimeout(800); await snap(ctx, '40-workshop-click');
+save('notes.json', notes); console.log(JSON.stringify({ afterHover: notes.afterHover, afterP: notes.afterP, afterM: notes.afterM, heroText: (notes.heroText || '').slice(0, 300), merchantText: (notes.merchantText || '').slice(0, 300), vc: notes.villageClearance?.length }).slice(0, 3000));
+await close(ctx);

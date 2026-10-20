@@ -14,6 +14,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Application, Assets, Mesh, MeshGeometry, Shader, Texture } from 'pixi.js';
 import 'pixi.js/mesh';
+import { KEEP_GLOBAL_RESOURCES } from '../../pixiSpike/pixiDestroy';
 import { DEPTH_FRAG, DEPTH_VERT } from '@/ui/idleVillage/questS1Lab/render/depthShader';
 import {
   cameraAt,
@@ -138,7 +139,7 @@ export const DepthScene: React.FC<DepthSceneProps> = ({
         backgroundAlpha: 0,
       });
       if (cancelled) {
-        app.destroy(true);
+        app.destroy(KEEP_GLOBAL_RESOURCES);
         return;
       }
       /* A non-GL fallback (canvas renderer) has no `mesh` pipe — the Mesh
@@ -146,7 +147,7 @@ export const DepthScene: React.FC<DepthSceneProps> = ({
        * image underneath. Treat it exactly like a failed init. */
       const renderer = app.renderer as unknown as Record<string, unknown>;
       if (!('gl' in renderer) || !('mesh' in (renderer.renderPipes as Record<string, unknown>))) {
-        app.destroy(true);
+        app.destroy(KEEP_GLOBAL_RESOURCES);
         app = null;
         if (!cancelled) {
           setGpuReady(false);
@@ -212,7 +213,7 @@ export const DepthScene: React.FC<DepthSceneProps> = ({
       cancelled = true;
       if (app) {
         app.canvas.removeEventListener('webglcontextlost', onLost);
-        app.destroy(true);
+        app.destroy(KEEP_GLOBAL_RESOURCES);
         app = null;
       }
     };

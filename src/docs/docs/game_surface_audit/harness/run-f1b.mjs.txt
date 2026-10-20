@@ -1,0 +1,44 @@
+import fs from 'node:fs';
+import { openGame, POI, snap, close, measure, contrastFromPixels, driveToArmedCheck } from './harness.mjs';
+const W = Number(process.env.W || 1440), H = Number(process.env.H || 900);
+const tag = `f1b-${W}x${H}`;
+const outDir = new URL(`./out/${tag}/`, import.meta.url).pathname;
+const ctx = await openGame({ outDir, viewport: { width: W, height: H } });
+const { page } = ctx;
+await page.evaluate(() => {
+  window.__ck = []; const t0 = performance.now(); window.__t0 = t0;
+  setInterval(() => {
+    const s = document.querySelector('[data-astro-frames]');
+    window.__ck.push({ t: Math.round(performance.now() - t0), col: !!document.querySelector('[data-testid="quest-check-column"]'),
+      frames: s ? Number(s.getAttribute('data-astro-frames')) : null, idle: document.querySelector('[data-astro-idle]')?.getAttribute('data-astro-idle') ?? null,
+      tira: !!document.querySelector('.da-tira'), verdict: !!document.querySelector('[data-testid="quest-verdict-card"]'),
+      paused: document.getAnimations().filter((a) => a.playState === 'paused').length, running: document.getAnimations().filter((a) => a.playState === 'running').length });
+  }, 40);
+});
+await driveToArmedCheck(ctx);
+await snap(ctx, '10-intro-t0');
+await page.waitForTimeout(1500); await snap(ctx, '11-intro-t1500');
+await page.locator('.da-tira').waitFor({ state: 'visible', timeout: 30000 });
+await page.waitForTimeout(300);
+await snap(ctx, '20-armed-throw-visible');
+fs.writeFileSync(outDir + '21-measure-armed.json', JSON.stringify(await measure(ctx, 'body'), null, 2));
+fs.writeFileSync(outDir + '22-contrast-armed.json', JSON.stringify(await contrastFromPixels(ctx), null, 1));
+const tThrow = await page.evaluate(() => Math.round(performance.now() - window.__t0));
+await page.locator('.da-tira').click();
+await page.waitForTimeout(700); await snap(ctx, '30-spin-t700');
+await page.waitForTimeout(1500); await snap(ctx, '31-spin-t2200');
+await page.waitForFunction(() => document.querySelector('[data-testid="quest-verdict-card"]'), null, { timeout: 40000 });
+await snap(ctx, '40-verdict-t0');
+await page.waitForFunction(() => document.querySelector('[data-astro-idle="parked"]'), null, { timeout: 10000 });
+await snap(ctx, '41-parked-t0');
+await page.waitForTimeout(3000); await snap(ctx, '42-parked-t3000');
+fs.writeFileSync(outDir + '44-contrast-parked.json', JSON.stringify(await contrastFromPixels(ctx), null, 1));
+fs.writeFileSync(outDir + '43-measure-parked.json', JSON.stringify(await measure(ctx, 'body'), null, 2));
+const tl = await page.evaluate(() => window.__ck);
+fs.writeFileSync(outDir + 'timeline.json', JSON.stringify(tl));
+const mount = tl.find((r) => r.col)?.t, arm = tl.find((r) => r.tira)?.t, ver = tl.find((r) => r.verdict)?.t, park = tl.find((r) => r.idle === 'parked')?.t;
+const park0 = tl.findIndex((r) => r.idle === 'parked');
+console.log(JSON.stringify({ viewport: `${W}x${H}`, mountMs: mount, armedMs: arm, introToArmMs: arm - mount, throwClickedAtMs: tThrow, verdictMs: ver, throwToVerdictMs: ver - tThrow, parkedMs: park, verdictToParkMs: park - ver,
+  framesAtVerdict: tl.find((r) => r.verdict)?.frames, framesAfterParkStart: tl[park0]?.frames, framesAtEnd: tl.at(-1).frames, pausedAnimsAtEnd: tl.at(-1).paused, runningAnimsAtEnd: tl.at(-1).running,
+  avgFpsOverIntro: +((tl.find((r) => r.tira).frames - tl.find((r) => r.col).frames) / ((arm - mount) / 1000)).toFixed(1) }, null, 1));
+await close(ctx);
