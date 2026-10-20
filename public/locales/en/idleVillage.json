@@ -1080,7 +1080,13 @@
         "andata": "outbound",
         "svolgimento": "at the quest site",
         "ritorno": "returning"
-      }
+      },
+      "days": "{days}d",
+      "daysEstimate": "~{days}d",
+      "awaitingDecision": "Waiting for a decision",
+      "lootChip": "Loot ×{count}",
+      "parkedBadge": "Party waiting at a crossroads",
+      "lootBadge": "Party carrying loot home: {count}"
     },
     "tuning": {
       "reset": "Reset values",

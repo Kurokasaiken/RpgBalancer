@@ -26,6 +26,11 @@ export const QuestJourneyRouteConfigSchema = z
     partyCoreRadiusWorldPx: z.number().positive(),
     partyStrokeWidthWorldPx: z.number().positive(),
     partyGlyphScale: z.number().positive(),
+    /** Small status badges anchored to the party marker (parked crossroads
+     *  above, encumbered-loot pouch below). */
+    markerBadgeRadiusWorldPx: z.number().positive(),
+    markerBadgeOffsetWorldPx: z.number().positive(),
+    markerBadgeGlyphWorldPx: z.number().positive(),
   })
   .strict()
   .superRefine((config, ctx) => {
@@ -50,6 +55,20 @@ export const QuestJourneyRouteConfigSchema = z
         message: 'Party core must be smaller than its halo.',
       });
     }
+    if (config.markerBadgeOffsetWorldPx <= config.partyHaloRadiusWorldPx) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['markerBadgeOffsetWorldPx'],
+        message: 'Badge offset must clear the party halo.',
+      });
+    }
+    if (config.markerBadgeGlyphWorldPx >= config.markerBadgeRadiusWorldPx * 2) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['markerBadgeGlyphWorldPx'],
+        message: 'Badge glyph must fit inside its seal.',
+      });
+    }
   });
 
 /** Runtime-validated default dimensions for the selected continuous route style. */
@@ -67,4 +86,7 @@ export const QUEST_JOURNEY_ROUTE_CONFIG = QuestJourneyRouteConfigSchema.parse({
   partyCoreRadiusWorldPx: 33,
   partyStrokeWidthWorldPx: 6,
   partyGlyphScale: 3.25,
+  markerBadgeRadiusWorldPx: 24,
+  markerBadgeOffsetWorldPx: 74,
+  markerBadgeGlyphWorldPx: 30,
 });

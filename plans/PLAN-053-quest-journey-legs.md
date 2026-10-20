@@ -65,8 +65,10 @@ La scena cinematica `ritorno` esce dal flusso fasi (sorte a OB-7).
 - **XP su wipe-in-ritorno dopo success-al-POI** — **DECISO 2026-10-19
   (Director): no XP.** Coerente con DQ-1 (bloccati fino all'arrivo): il
   default pinnato dal test T-003 è definitivo, nessun update al PR.
-- **Rappresentazione loot badge** (icone item vs count chip) — fissata in T-006
-  prima della card di visual-fork.
+- **Rappresentazione loot badge** — **FISSATA in T-006: count chip.**
+  `Bottino ×N`/`Loot ×N` con glifo pouch inciso nel dettaglio + badge pouch
+  sul marker in ritorno. Le icone item non esistono come mappa (loot =
+  stringhe libere) — count chip è la sola repr onesta.
 - **Sorte scena `ritorno`** — epilogo d'arrivo o dismissione: eye-check OB-7.
 
 ## 4. Runtime model (artifact r011)
@@ -274,7 +276,7 @@ in ritorno = warn. Copertura esplicita: `viaggio`, `gob-ritorno`, `gob-agguato`,
 | T-003 ✅ 2026-10-19 | **Motore** — split outcome/settlement, `settleIfArrived` idempotente, `runPhaseStatus`, advance loop + watermark + drain-at-T, beat journal, parked/endpointResolving, terminali tipizzati, wipe settle | FATTO — `questJourneyEngine.ts` (DES + watermark + drain) + patch `questRun.ts`/`useQuestRun.ts`/`questJourney.ts`; seam `CreateRunInput.journey`; 19 test §11 verdi + golden legacy invariati; bundle `plan053-t003-journey-engine` PASS 5/5; evidence `test-results/PLAN-053-T-003-evidence.md`; ruling rollback+XP Director **ancora dovuti al merge** |
 | T-004 ✅ 2026-10-19 | **Migrazione nodi + validatore DAG + re-authoring scenari** (DQ-2-B): `QuestNode.fase` (type+schema parity), `fasi` authored su poi-goblin/poi-rovine, `questJourneyAuthoring.ts` (DAG §7 + resolver launch-spec), gate `quest:journey:lint`, wiring `send` | FATTO — `QuestNode.fase?: 'andata'/'svolgimento'/'ritorno'` (assente = svolgimento) su `questScenario.ts` + `QuestNodeSchema`; `QuestJourneyFasiSchema.svolgimentoEntryNodeId`; 5 nodi ritorno goblin + 2 rovine (+2 miniera, POI legacy inerte); `questJourneyAuthoring.ts` validatore DAG §7 (pin↔fasi, forward-only, reachability con seed da pin/boundary, non-decreasing pins, waiting/pending warnings) + `resolveQuestJourneyLaunchSpec`; probe routing reale `probeQuestJourneyEdges` (check verdicts + extras `gob-ritorno→gob-fine`); runtime: boundary svolgimento→ritorno con freeze verdetto, chain-protection dei beat pinnati, end-in-ritorno ripristina sentinel; session `send` costruisce e passa lo spec; CI gate = `npm run quest:journey:lint` (vitest, alias npm); test: 19 validator + 2 E2E authored verdi; golden legacy byte-identici (fasi inerti senza spec); bundle `plan053-t004-journey-authoring` OB-1..6 PASS, verdict BLOCKED solo su trust-set drift parallelo `scripts/verification/*` (T-13, non scope); evidence `test-results/PLAN-053-T-004-evidence.md` |
 | T-005 · in corso | **Rotta sulla mappa** — `QuestJourneyRoute`: polyline + fill + marker; visual fork A ratificato prima del layer | Implementato + bundle `plan053-t005-route-fill`: OB-1..6 PASS (unit 5/5, E2E reale 1/1 con fill 0→1 + camera-follow + shroud, lint 0, contratti/inventario/index-sync, build:check, closure:lint); unico blocco = OB-7 human-eye (director-signoff.json pendente). Evidence `test-results/PLAN-053-T-005-evidence.md` |
-| T-006 | **UI dettaglio** — 3 sub-barre (Nd/~Nd/Nd), chip parked, loot badge (repr fissata qui, prima della visual-fork card) | vitest render; i18n:validate; nessuna stringa hardcoded |
+| T-006 · in corso | **UI dettaglio** — `QuestJourneyPhaseStrip` nel footer della quest window: 3 sub-barre (andata `Nd` authored, svolgimento `~Nd` da `estimatedDurationTicks` live, ritorno `Nd`=andata), chip parked «attende una decisione», loot **count chip** `×N` (repr fissata qui) + badge marker crossroads/pouch | Implementato + bundle `plan053-t006-journey-detail`: OB-1..5 PASS (unit 13/13, E2E reale 1/1 mount+fill andata→svolgimento, lint 0, i18n keys, contratti/inventario, build/closure); OB-6 flaky sotto carico parallelo, OB-7 human-eye pendente; contracts:check bloccato da `PoiMarkerLabPage.tsx` parallelo non mappato (T-13). Evidence `test-results/PLAN-053-T-006-evidence.md` |
 | T-007 | **Closure** — docs trusted, R-226, evidence, edge cases residui, scena `ritorno` ruling applicato | safeguards verdi + `verify:bundle` |
 
 ## 11. Contratto (obbligazioni verificabili)

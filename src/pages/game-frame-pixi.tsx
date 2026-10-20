@@ -1140,6 +1140,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           scenario={scenarioForQuest(activeQuestId)}
           artFor={(nodeId) => NODE_ART[nodeId]?.src}
           time={questRunTimeView}
+          journeySvolgimentoTicks={activePoi?.estimatedDurationTicks}
           onChoose={(optionId) => activeQuestRun.choose(optionId)}
           nowTick={currentTick}
           onAbandon={activeQuestRun.abandon}
@@ -1156,7 +1157,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           zIndex={DEFAULT_GAME_FRAME_CONFIG.zLayers.panels}
         />
       ) : null,
-    [activeQuestRun, activeQuestId, panelsForScreen, currentTick, questRunTimeView, questAnchor, questWindow],
+    [activeQuestRun, activeQuestId, activePoi, panelsForScreen, currentTick, questRunTimeView, questAnchor, questWindow],
   );
 
   const directorActions = useMemo<DirectorAction[]>(
