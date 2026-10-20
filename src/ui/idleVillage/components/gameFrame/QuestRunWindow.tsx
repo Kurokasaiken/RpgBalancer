@@ -68,6 +68,7 @@ import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questS
 import { useBeatCursor, type BeatTiming, type HarmBeat, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
 import { publishCheckBridge, type QuestCheckOverlayHandle } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { QuestCheckOptionsPanel, type QuestCheckOptions } from './QuestCheckOptionsPanel';
+import { QuestJourneyPhaseStrip } from './QuestJourneyPhaseStrip';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
 import { HudChip, LOG_TONE, SCRIM, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
@@ -171,6 +172,9 @@ export interface QuestRunWindowProps {
    *  defaults to the canonical config so lab/test harnesses can omit it. */
   companions?: { widthPx: number; gapPx: number; minWidthPx: number; edgeInsetPx: number };
   zIndex?: number;
+  /** PLAN-053 T-006: POI `estimatedDurationTicks` for the `~Nd` svolgimento
+   *  bar of the journey strip — journeys only; legacy runs never read it. */
+  journeySvolgimentoTicks?: number;
 }
 
 export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
@@ -203,6 +207,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   stageMaxHeightPx = DEFAULT_GAME_FRAME_CONFIG.questWindow.stageMaxHeightPx,
   companions = DEFAULT_COMPANIONS,
   zIndex,
+  journeySvolgimentoTicks,
 }) => {
   const { t } = useTranslation('idleVillage');
   const shellRef = useRef<HTMLDivElement | null>(null);
@@ -1034,6 +1039,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           beats={beats}
           currentBeat={currentBeat}
           time={time}
+          journeySvolgimentoTicks={journeySvolgimentoTicks}
           tooltipLines={tooltipLines}
           open={footerOpen}
           onToggle={() => setFooterOpen((v) => !v)}
@@ -1572,6 +1578,8 @@ const QuestWindowFooter: React.FC<{
   beats: readonly string[];
   currentBeat: number;
   time: { progress: number; label: string };
+  /** POI `estimatedDurationTicks` for the journey `~Nd` svolgimento bar. */
+  journeySvolgimentoTicks?: number;
   tooltipLines: number;
   open: boolean;
   onToggle: () => void;
@@ -1579,7 +1587,7 @@ const QuestWindowFooter: React.FC<{
   abandonAsked: boolean;
   onAbandonAsk: (asked: boolean) => void;
   abandonPanelId: string;
-}> = ({ run, phases, beats, currentBeat, time, tooltipLines, open, onToggle, onAbandon, abandonAsked, onAbandonAsk, abandonPanelId }) => {
+}> = ({ run, phases, beats, currentBeat, time, journeySvolgimentoTicks, tooltipLines, open, onToggle, onAbandon, abandonAsked, onAbandonAsk, abandonPanelId }) => {
   const { t } = useTranslation('idleVillage');
   return (
     <div data-testid="quest-window-footer" style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
@@ -1605,6 +1613,10 @@ const QuestWindowFooter: React.FC<{
       {open && (
         <>
           <TimeBar progress={time.progress} label={time.label} phase={t('gameFrame.questWindow.phaseOf', { n: Math.min(currentBeat + 1, beats.length), total: beats.length })} />
+          {/* PLAN-053 T-006: journey legs — andata/svolgimento/ritorno
+              sub-bars, parked chip, return-loot count chip. Renders nothing
+              on legacy or settled runs. */}
+          <QuestJourneyPhaseStrip run={run} svolgimentoEstimateTicks={journeySvolgimentoTicks} />
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
             <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', gap: 6, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
               {phases.map((phase, i) => (

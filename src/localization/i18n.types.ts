@@ -619,6 +619,12 @@ export default interface Resources {
         "xpAmount": "+{amount} XP"
       },
       "questJourney": {
+        "awaitingDecision": "Waiting for a decision",
+        "days": "{days}d",
+        "daysEstimate": "~{days}d",
+        "lootBadge": "Party carrying loot home: {count}",
+        "lootChip": "Loot ×{count}",
+        "parkedBadge": "Party waiting at a crossroads",
         "phase": {
           "andata": "outbound",
           "ritorno": "returning",
