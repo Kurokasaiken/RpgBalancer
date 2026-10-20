@@ -211,6 +211,14 @@
   background: color-mix(in srgb, var(--skin-icon-accent) 30%, var(--skin-surface-base));
   color: var(--skin-title-color);
 }
+/* Scope-wide keyboard ring (R-234, PLAN-067 T-A14). `:where()` keeps it at zero specificity: the
+   specific rings below (HUD controls, choices) still win. Without it the POI markers, the time
+   controls and the nav showed the browser's blue system ring. An outline (not a box-shadow): several of
+   these controls set their own inline box-shadow, which would hide a shadow ring. Tokens only. */
+.skin-scope :where(button, [role="button"], [role="radio"], a, [tabindex]):focus-visible {
+  outline: 2px solid var(--skin-icon-accent);
+  outline-offset: 2px;
+}
 .skin-scope [data-hud-controls] button:focus-visible,
 .skin-scope [data-hud-controls] label:focus-within {
   outline: none;
