@@ -57,15 +57,14 @@ La scena cinematica `ritorno` esce dal flusso fasi (sorte a OB-7).
 
 ## 3. Decisioni ancora dovute al Director (marcate, non decise in silenzio)
 
-- **Rollback policy** — al PR di T-003: `questJourneyEnabled` off + i run journey
-  in volo completano su codice shippato per una release, **oppure** shim
-  hydrate-time `returning → ended, settle now` keyed su `engineSchemaVersion <
-  N_journey` (`N_journey` = costante in codice = engineSchemaVersion corrente
-  + 1). Lo shim **non** è downgrade support per un vecchio binario su save nuovo.
-- **XP su wipe-in-ritorno dopo success-al-POI** — DQ-3-α copre il loot, non l'XP.
-  Default provvisorio "no XP" pinnato da **test nuovo in T-003**: il PR del
-  ruling aggiorna il test nello stesso commit (caso nuovo, non regola esistente —
-  la characterization T-002 non lo può coprire).
+- **Rollback policy** — **DECISO 2026-10-19 (Director): solo feature flag.**
+  `questJourneyEnabled` off + i run journey in volo completano su codice
+  shippato per una release. Shim hydrate-time (`returning → ended, settle now`
+  keyed su `engineSchemaVersion < N_journey`) **scartato** — se serve una
+  rete di emergenza si rivaluta, non è nel contratto di T-003.
+- **XP su wipe-in-ritorno dopo success-al-POI** — **DECISO 2026-10-19
+  (Director): no XP.** Coerente con DQ-1 (bloccati fino all'arrivo): il
+  default pinnato dal test T-003 è definitivo, nessun update al PR.
 - **Rappresentazione loot badge** (icone item vs count chip) — fissata in T-006
   prima della card di visual-fork.
 - **Sorte scena `ritorno`** — epilogo d'arrivo o dismissione: eye-check OB-7.
@@ -257,8 +256,12 @@ in ritorno = warn. Copertura esplicita: `viaggio`, `gob-ritorno`, `gob-agguato`,
 
 - **Rotta sulla mappa (T-005)**: `visual-fork: REQUIRED` — card + preview su
   localhost + ruling Director **prima** di scrivere il layer (stile linea,
-  marker party, badge). Il precedente marcia-invasione è input, non baseline
-  ratificata. Loot badge: rappresentazione fissata in T-006 prima della card.
+  marker party, badge). Ruling Director 2026-10-19: **A — Filo di rotta**
+  (stroke continuo, tratto percorso in oro, marker party sul fronte);
+  baseline e provenance in
+  `.mw/runs/plan053-t005-route-visual-fork/visual-fork-quest-route.md`.
+  Il precedente marcia-invasione è input, non baseline ratificata. Loot badge:
+  rappresentazione fissata in T-006 prima della card.
 - Layout fasi nel dettaglio: `visual-fork: skipped` — riuso primitives
   HudChip/seal esistenti (puntatore: ResidentSlotRack marching rows).
 
@@ -270,7 +273,7 @@ in ritorno = warn. Copertura esplicita: `viaggio`, `gob-ritorno`, `gob-agguato`,
 | T-002 ✅ 2026-10-19 | **Characterization suite legacy** — golden snapshot poiView/halo/journal/settlement per run `fasi === null`, catturata **prima** di ogni cambio comportamentale | FATTO — `questJourneyCharacterization.test.ts` (5 test, golden su journal/poiView/terminal/settlement + revive D-6); bundle `plan053-t002-legacy-characterization` PASS 4/4; evidence `test-results/PLAN-053-T-002-evidence.md` |
 | T-003 ✅ 2026-10-19 | **Motore** — split outcome/settlement, `settleIfArrived` idempotente, `runPhaseStatus`, advance loop + watermark + drain-at-T, beat journal, parked/endpointResolving, terminali tipizzati, wipe settle | FATTO — `questJourneyEngine.ts` (DES + watermark + drain) + patch `questRun.ts`/`useQuestRun.ts`/`questJourney.ts`; seam `CreateRunInput.journey`; 19 test §11 verdi + golden legacy invariati; bundle `plan053-t003-journey-engine` PASS 5/5; evidence `test-results/PLAN-053-T-003-evidence.md`; ruling rollback+XP Director **ancora dovuti al merge** |
 | T-004 ✅ 2026-10-19 | **Migrazione nodi + validatore DAG + re-authoring scenari** (DQ-2-B): `QuestNode.fase` (type+schema parity), `fasi` authored su poi-goblin/poi-rovine, `questJourneyAuthoring.ts` (DAG §7 + resolver launch-spec), gate `quest:journey:lint`, wiring `send` | FATTO — `QuestNode.fase?: 'andata'/'svolgimento'/'ritorno'` (assente = svolgimento) su `questScenario.ts` + `QuestNodeSchema`; `QuestJourneyFasiSchema.svolgimentoEntryNodeId`; 5 nodi ritorno goblin + 2 rovine (+2 miniera, POI legacy inerte); `questJourneyAuthoring.ts` validatore DAG §7 (pin↔fasi, forward-only, reachability con seed da pin/boundary, non-decreasing pins, waiting/pending warnings) + `resolveQuestJourneyLaunchSpec`; probe routing reale `probeQuestJourneyEdges` (check verdicts + extras `gob-ritorno→gob-fine`); runtime: boundary svolgimento→ritorno con freeze verdetto, chain-protection dei beat pinnati, end-in-ritorno ripristina sentinel; session `send` costruisce e passa lo spec; CI gate = `npm run quest:journey:lint` (vitest, alias npm); test: 19 validator + 2 E2E authored verdi; golden legacy byte-identici (fasi inerti senza spec); bundle `plan053-t004-journey-authoring` OB-1..6 PASS, verdict BLOCKED solo su trust-set drift parallelo `scripts/verification/*` (T-13, non scope); evidence `test-results/PLAN-053-T-004-evidence.md` |
-| T-005 | **Rotta sulla mappa** — `QuestRouteFill`: polyline + fill + marker + badge; **visual-fork card + preview + ruling PRIMA del codice layer** | OB-3; e2e headless fill 0→1 su clock finto; eye-check Director |
+| T-005 · in corso | **Rotta sulla mappa** — `QuestJourneyRoute`: polyline + fill + marker; visual fork A ratificato prima del layer | Implementato + bundle `plan053-t005-route-fill`: OB-1..6 PASS (unit 5/5, E2E reale 1/1 con fill 0→1 + camera-follow + shroud, lint 0, contratti/inventario/index-sync, build:check, closure:lint); unico blocco = OB-7 human-eye (director-signoff.json pendente). Evidence `test-results/PLAN-053-T-005-evidence.md` |
 | T-006 | **UI dettaglio** — 3 sub-barre (Nd/~Nd/Nd), chip parked, loot badge (repr fissata qui, prima della visual-fork card) | vitest render; i18n:validate; nessuna stringa hardcoded |
 | T-007 | **Closure** — docs trusted, R-226, evidence, edge cases residui, scena `ritorno` ruling applicato | safeguards verdi + `verify:bundle` |
 

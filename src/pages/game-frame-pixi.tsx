@@ -33,7 +33,7 @@ import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceE
 import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLostOverlay';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
-import { type QuestId } from '@/ui/idleVillage/questS1Lab/questRun';
+import { type QuestId, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import { isPoiConsumed, poiConsumesOnReportClose, QUEST_HALO_RENDER_MS, QUEST_HALO_STEPS, QUEST_POIS, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
@@ -51,7 +51,7 @@ import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente
 import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { useHudScale } from '@/ui/idleVillage/components/gameFrame/useHudScale';
-import { MapDemoPoi, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, VillageScreenView, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
+import { MapDemoPoi, QuestJourneyRoute, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, VillageScreenView, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
 import { resolveQuestShellLayout, solveQuestClusterGeometry } from '@/ui/idleVillage/components/gameFrame/questShellLayout';
 import { QuestStageCluster } from '@/ui/idleVillage/components/gameFrame/QuestStageCluster';
 import { QuestSkillCheckColumn } from '@/ui/idleVillage/components/gameFrame/QuestSkillCheckColumn';
@@ -472,6 +472,13 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   const questRun = useQuestRun('goblin');
   const questRunRovine = useQuestRun('rovine');
   const questRuns = useMemo(() => ({ goblin: questRun, rovine: questRunRovine }), [questRun, questRunRovine]);
+  const journeyRouteRuns = useMemo(
+    () =>
+      [questRun.run, questRunRovine.run].filter(
+        (run): run is QuestRunState => Boolean(run?.journey && !run.ended),
+      ),
+    [questRun.run, questRunRovine.run],
+  );
   const [activeQuestId, setActiveQuestId] = useState<QuestId>('goblin');
   const activeQuestRun = questRuns[activeQuestId];
   // The game clock matures timed nodes (v27): paused game = paused quest;
@@ -1582,6 +1589,14 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                     recenterSignal={recenterSignal}
                     focusRequest={focusRequest}
                     anchors={anchorsWithGhosts}
+                    worldOverlay={
+                      journeyRouteRuns.length
+                        ? (canvas) =>
+                            journeyRouteRuns.map((run) => (
+                              <QuestJourneyRoute key={runIdOf(run)} run={run} canvas={canvas} />
+                            ))
+                        : undefined
+                    }
                     stageColor={worldDressing.stageColor}
                     seaPatternConfig={seaPatternConfig}
                     coastFoamConfig={coastFoamConfig}

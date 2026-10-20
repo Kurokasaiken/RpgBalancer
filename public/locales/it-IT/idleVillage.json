@@ -1080,6 +1080,14 @@
       "village": "Il Villaggio",
       "meadows": "I Prati"
     },
+    "questJourney": {
+      "routeProgress": "Percorso della spedizione: {phase}, {progress}% completato.",
+      "phase": {
+        "andata": "andata",
+        "svolgimento": "sul luogo della quest",
+        "ritorno": "ritorno"
+      }
+    },
     "tuning": {
       "reset": "Ripristina valori",
       "save": "Salva",
