@@ -1074,6 +1074,14 @@
       "village": "The Village",
       "meadows": "The Meadows"
     },
+    "questJourney": {
+      "routeProgress": "Expedition route: {phase}, {progress}% traveled.",
+      "phase": {
+        "andata": "outbound",
+        "svolgimento": "at the quest site",
+        "ritorno": "returning"
+      }
+    },
     "tuning": {
       "reset": "Reset values",
       "save": "Save",

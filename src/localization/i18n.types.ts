@@ -618,6 +618,14 @@ export default interface Resources {
         "xp": "Experience",
         "xpAmount": "+{amount} XP"
       },
+      "questJourney": {
+        "phase": {
+          "andata": "outbound",
+          "ritorno": "returning",
+          "svolgimento": "at the quest site"
+        },
+        "routeProgress": "Expedition route: {phase}, {progress}% traveled."
+      },
       "questLog": {
         "goldLoot": "Loot: +{amount} gold ({quest}).",
         "goldReward": "Quest reward: +{amount} gold ({quest}).",
