@@ -407,6 +407,7 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
         />
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--skin-hud-inline-gap)', minWidth: 0 }}>
           <span
+            data-roster-name
             title={nameTitle}
             style={{
               fontFamily: FONT.display,
@@ -418,6 +419,10 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              /* The name is who: when the row narrows the status gives way first and the
+               * name keeps at least a few letters (R-234: at 1280 only «ASSIGNED» was left). */
+              flex: '0 1 auto',
+              minWidth: '6ch',
             }}
           >
             {label}
@@ -432,7 +437,10 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
                 textTransform: 'uppercase',
                 color: statusTone,
                 whiteSpace: 'nowrap',
-                flexShrink: 0,
+                flex: '0 100 auto',
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
               {statusText}
@@ -490,7 +498,7 @@ const WanderlustRosterCardV2 = memo<WanderlustRosterCardV2Props>(({
 
       {/* Identity section */}
       <div style={identityStyle}>
-        <div style={nameStyle} title={nameTitle}>{label}</div>
+        <div style={nameStyle} title={nameTitle} data-roster-name>{label}</div>
         {subtitle && (
           <div style={roleStyle}>
             <span style={dotStyle} />

@@ -696,6 +696,16 @@ const RAW_VILLAGE_BUILDINGS = {
 /** Validated, deep-frozen village buildings configuration. */
 export const VILLAGE_BUILDINGS_CONFIG = deepFreeze(villageBuildingsSchema.parse(RAW_VILLAGE_BUILDINGS));
 
+/** A building's effect at the level the village shows today (`initialLevel`; 0 = not built). */
+export const currentEffectValue = (b: VillageBuildingDefinition): number =>
+  b.initialLevel > 0 ? b.tiers[b.initialLevel - 1].effectValue : 0;
+
+/** DN-1 (R-234): the Warehouse holds the village's items and its level sets the room — the
+ *  stash panel's capacity reads this, the same number the Warehouse tooltip shows. */
+export const WAREHOUSE_STORAGE_CAPACITY = currentEffectValue(
+  VILLAGE_BUILDINGS_CONFIG.buildings.find((b) => b.id === 'warehouse') as VillageBuildingDefinition,
+);
+
 /** Precomputed occlusion matrix for the three supported viewports — data for
  *  tests/witnesses, never mutated. */
 export const OCCLUSION_REPORT: Record<PaintedBuildingId, Record<OcclusionViewportKey, OcclusionReport>> = deepFreeze(

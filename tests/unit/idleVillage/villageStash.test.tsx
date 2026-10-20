@@ -98,7 +98,8 @@ describe('VillageStashPanel', () => {
 
   it('shows the derived capacity in the footer and no interactive controls in rows', () => {
     renderPanel();
-    expect(screen.getByText('7 of 12')).toBeInTheDocument();
+    // R-234: the capacity is the Warehouse's (24 at level II), not a second literal.
+    expect(screen.getByText(`${CFG.items.reduce((sum, i) => sum + i.qty, 0)} of ${CFG.capacityMax}`)).toBeInTheDocument();
     const list = screen.getByRole('list');
     expect(within(list).queryAllByRole('button')).toHaveLength(0);
     expect(within(list).queryAllByRole('checkbox')).toHaveLength(0);

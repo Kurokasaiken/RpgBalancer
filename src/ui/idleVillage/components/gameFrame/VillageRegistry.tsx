@@ -76,6 +76,24 @@ export interface VillageRegistryHandle {
   focusRow: (id: VillageBuildingCatalogId) => void;
 }
 
+/** The registry is a LIST mounted inside the village toolbar's `data-hud-controls` scope
+ *  (`VillageScreenView`): the control-pill rule (`.skin-scope [data-hud-controls] button`)
+ *  reached its row buttons — 26 px fixed height, `line-height: 1`, caps — and each two-line
+ *  row was squeezed into a pill (R-234, T-03). Rows and section headers state their own
+ *  geometry; inline styles outrank the scope rule. */
+const LIST_BUTTON_RESET: CSSProperties = {
+  height: 'auto',
+  minHeight: 0,
+  lineHeight: 1.3,
+  justifyContent: 'flex-start',
+  textTransform: 'none',
+  letterSpacing: 'normal',
+  fontFamily: 'var(--skin-font-serif)',
+  fontSize: 12,
+  fontWeight: 'normal',
+  flexShrink: 0,
+};
+
 export interface VillageRegistryProps {
   /** Drawer visibility — owned by `VillageScreenView` (chip + `r` hotkey). */
   open: boolean;
@@ -188,6 +206,7 @@ const RegistryRow: React.FC<{
       onClick={() => onActivate(b)}
       onKeyDown={onKeyDown}
       style={{
+        ...LIST_BUTTON_RESET,
         display: 'flex',
         alignItems: 'center',
         gap: 'var(--skin-hud-inline-gap)',
@@ -477,6 +496,7 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
                     aria-expanded={!isCollapsed}
                     onClick={() => toggleSection(cat)}
                     style={{
+                      ...LIST_BUTTON_RESET,
                       position: 'sticky',
                       top: 0,
                       zIndex: 1,
