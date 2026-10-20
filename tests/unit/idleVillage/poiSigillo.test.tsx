@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import PoiMatericV3_5 from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import type { PoiState, PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
 import { BASE_SKIN_CSS_VARS } from '@/ui/idleVillage/skins/skinCssVariables';
+import { POI_FAMILY_METAL } from '@/ui/idleVillage/components/poi/poiSigilloFamilies';
 import { poiSizePx } from '@/ui/idleVillage/components/gameFrame/poiSigillo';
 
 const IVORY = BASE_SKIN_CSS_VARS['--skin-poi-halo-deadline'];
@@ -61,7 +62,10 @@ describe('PoiMatericV3_5 sigillo — silhouette = family', () => {
     expect(outer.getAttribute('stroke')).toBe(BASE_SKIN_CSS_VARS['--skin-poi-border-outer']);
     expect(outer.getAttribute('stroke-width')).toBe('2');
     expect(outer.getAttribute('vector-effect')).toBe('non-scaling-stroke');
-    expect(inner.getAttribute('stroke')).toBe(BASE_SKIN_CSS_VARS['--skin-poi-border-inner']);
+    // Director 2026-10-20: no white line — the inner line takes the family metal (quest = the token = bronze)
+    expect(inner.getAttribute('stroke')).toBe(POI_FAMILY_METAL[type].borderInner);
+    expect(inner.getAttribute('stroke')).not.toBe('#efe3c6');
+    if (type === 'quest') expect(inner.getAttribute('stroke')).toBe(BASE_SKIN_CSS_VARS['--skin-poi-border-inner']);
     expect(inner.getAttribute('stroke-width')).toBe('1.5');
     expect(c.querySelector('[data-testid="sigillo-plate"]')).not.toBeNull();
   });

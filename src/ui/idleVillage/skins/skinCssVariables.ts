@@ -308,10 +308,14 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
    * Vermilion is urgency only: the expiring deadline and the decision badge. */
   '--skin-poi-border-outer': '#0b0a08',
   '--skin-poi-border-outer-width': '2px',
-  '--skin-poi-border-inner': '#efe3c6',
+  '--skin-poi-border-inner': '#d8bd78',
   '--skin-poi-border-inner-width': '1.5px',
+  /* Field stone under the glyph (PLAN-043 WS-5): the seal's dark enamel —
+   * a teal pair, one step off the HUD lacquer range. */
+  '--skin-poi-stone-light': '#173436',
+  '--skin-poi-stone-deep': '#0a1b1c',
   '--skin-poi-halo-deadline': '#ead9b0',
-  '--skin-poi-halo-work': '#6fc4a4',
+  '--skin-poi-halo-work': '#9fb3c4',
   '--skin-poi-urgent': '#e8553a',
   '--skin-poi-veiled-opacity': '0.45',
   '--skin-poi-pulse-period': '2s',
