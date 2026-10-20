@@ -1,0 +1,66 @@
+import fs from 'node:fs';
+import { openGame, POI, snap, close, measure, contrastFromPixels } from './harness.mjs';
+const RUN = process.env.RUN || '1';
+const outDir = new URL(`./out/fullrun-${RUN}/`, import.meta.url).pathname;
+const ctx = await openGame({ outDir });
+const { page } = ctx;
+const getRun = () => page.evaluate((pid) => { const r = window.__idleVillageTestHooks.expedition[pid].getRun(); return r && { nodeId: r.nodeId, ended: r.ended, outcome: r.outcome, frontier: r.frontier, party: r.party.map((m) => ({ id: m.id, hp: m.hp, maxHp: m.maxHp, dead: !!m.dead, wounded: !!m.wounded })) }; }, POI);
+const has = (sel) => page.locator(sel).count();
+await page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].demoLaunch(), POI);
+ctx.steps.push({ step: 'launch', how: 'hook-assisted:demoLaunch' });
+await page.getByTestId('quest-window').waitFor({ state: 'visible', timeout: 30000 });
+const log = []; const seenNodes = new Set(); let checkN = 0; let lastChoice = ''; let repeats = 0;
+const deadline = Date.now() + 420000;
+while (Date.now() < deadline) {
+  const run = await getRun();
+  if (!run) break;
+  const reward = await has('[data-testid="quest-reward-popup"]');
+  if (run.ended && (reward || await has('[data-testid="quest-window-close-report"]'))) { await snap(ctx, `90-report`); log.push({ end: run.outcome }); break; }
+  // CHECK: mai premere Enter mentre la colonna è montata
+  if (await has('[data-testid="quest-check-column"], [data-testid="quest-check-overlay"]')) {
+    if (await has('[data-testid="quest-verdict-card"]')) { // già risolto (resume): chiudi
+      await page.waitForTimeout(500); await page.getByTestId('quest-verdict-card').click().catch(() => {}); await page.waitForTimeout(400); continue;
+    }
+    checkN++; const k = String(checkN).padStart(2, '0');
+    const title = await page.locator('[data-testid="quest-check-column"], [data-testid="quest-check-overlay"]').first().innerText().catch(() => '');
+    await page.locator('.da-tira').waitFor({ state: 'visible', timeout: 30000 });
+    await page.waitForTimeout(250);
+    await snap(ctx, `c${k}-a-armed`);
+    if (checkN === 1 || process.env.MEASURE_ALL) {
+      fs.writeFileSync(outDir + `c${k}-measure-armed.json`, JSON.stringify(await measure(ctx), null, 1));
+      fs.writeFileSync(outDir + `c${k}-contrast-armed.json`, JSON.stringify(await contrastFromPixels(ctx), null, 1));
+    }
+    await page.locator('.da-tira').click();
+    await page.waitForTimeout(1500); await snap(ctx, `c${k}-b-spin`);
+    await page.waitForFunction(() => document.querySelector('[data-testid="quest-verdict-card"]'), null, { timeout: 40000 });
+    await page.waitForTimeout(150); await snap(ctx, `c${k}-c-verdict`);
+    const verdictText = await page.getByTestId('quest-verdict-card').innerText().catch(() => '');
+    await page.waitForFunction(() => document.querySelector('[data-astro-idle="parked"]'), null, { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(3000); await snap(ctx, `c${k}-d-parked3s`);
+    fs.writeFileSync(outDir + `c${k}-contrast-parked.json`, JSON.stringify(await contrastFromPixels(ctx), null, 1));
+    const after = await getRun();
+    log.push({ check: k, node: run.nodeId, title: title.split('\n')[0], verdict: verdictText.split('\n')[0], party: after?.party });
+    console.log('CHECK', k, run.nodeId, '|', title.split('\n')[0], '|', verdictText.split('\n')[0]);
+    await page.getByTestId('quest-verdict-card').click({ position: { x: 20, y: 10 } }).catch(() => {});
+    await page.waitForTimeout(600);
+    continue;
+  }
+  if (await page.getByTestId('quest-window-beat').isVisible().catch(() => false)) {
+    if (!seenNodes.has('beat:' + run.nodeId)) { seenNodes.add('beat:' + run.nodeId); await snap(ctx, `n-${run.nodeId}-beat`); }
+    await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue;
+  }
+  const choices = page.locator('[data-testid="quest-window-choice"]:not([disabled])');
+  const n = await choices.count();
+  if (n > 0 && run.frontier.status === 'waiting') {
+    if (!seenNodes.has('choice:' + run.nodeId)) { seenNodes.add('choice:' + run.nodeId); await snap(ctx, `n-${run.nodeId}-choice`); }
+    repeats = run.nodeId === lastChoice ? repeats + 1 : 0; lastChoice = run.nodeId;
+    const pick = choices.nth((Number(RUN) + repeats) % n); // run 2 sceglie opzioni diverse
+    log.push({ choice: run.nodeId, option: await pick.getAttribute('data-option-id') });
+    await pick.click(); await page.waitForTimeout(500); continue;
+  }
+  await page.evaluate(() => window.__idleVillageTestHooks.advanceTicks?.(3));
+  await page.waitForTimeout(150);
+}
+fs.writeFileSync(outDir + 'run-log.json', JSON.stringify(log, null, 1));
+console.log('END', JSON.stringify(log.at(-1)), 'checks', checkN);
+await close(ctx);

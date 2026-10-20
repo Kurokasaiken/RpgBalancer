@@ -19,6 +19,7 @@ import {
 // Registers MeshPipe — without this subpath init every Mesh/MeshPlane is silently
 // skipped by the render pipe lookup and crashes validateRenderables (renderPipes['mesh']).
 import 'pixi.js/mesh';
+import { KEEP_GLOBAL_RESOURCES } from './pixiDestroy';
 import { createRefractionNoise, createSeabedArt } from './seabedTexture';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
@@ -542,7 +543,7 @@ export function PixiWorldMap({
         preference: 'webgl',
       });
       if (disposed) {
-        app.destroy(true);
+        app.destroy(KEEP_GLOBAL_RESOURCES);
         return;
       }
       host.appendChild(app.canvas);
@@ -1828,7 +1829,7 @@ export function PixiWorldMap({
       disposed = true;
       cleanupInput();
       try {
-        app.destroy(true, { children: true, texture: false });
+        app.destroy(KEEP_GLOBAL_RESOURCES, { children: true, texture: false });
       } catch {
         /* init may not have finished */
       }

@@ -1,0 +1,15 @@
+import base from '/Users/faustoboni/progetti_personali/RPG/vite.config';
+
+/** Config SOLO per l'audit: stessa app, ma niente page-reload quando altre sessioni toccano doc/piani/ledger
+ *  (`assetsInclude: ['**\/*.md']` li rende moduli → ogni edit ricarica la pagina sotto la cattura). */
+export default async (env: unknown) => {
+  const b: any = typeof base === 'function' ? await (base as any)(env) : base;
+  return {
+    ...b,
+    root: '/Users/faustoboni/progetti_personali/RPG',
+    server: {
+      ...(b.server ?? {}),
+      watch: { ...(b.server?.watch ?? {}), ignored: ['**/*.md', '**/*.jsonl', '**/plans/**', '**/context/**', '**/.mw/**', '**/test-results/**', '**/src/docs/**', '**/dist/**', '**/dist-playwright/**', '**/playwright-report/**', '**/coverage/**'] },
+    },
+  };
+};

@@ -1,0 +1,60 @@
+import fs from 'node:fs';
+import { openGame, snap, close, measure, contrastFromPixels } from './harness.mjs';
+const W = Number(process.env.W || 1440), H = Number(process.env.H || 900), FULL = process.env.FULL !== '0';
+const outDir = new URL(`./out/f3hud-${W}x${H}/`, import.meta.url).pathname;
+const ctx = await openGame({ outDir, viewport: { width: W, height: H } });
+const { page } = ctx; const notes = {}; const save = (n, o) => fs.writeFileSync(outDir + n, JSON.stringify(o, null, 1));
+await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), null, { timeout: 60000 }).catch(() => {});
+await page.waitForTimeout(2500);
+await snap(ctx, '00-hud-at-rest');
+// occupazione: unione dei plaque + bottoni fissi, campionata a griglia 4px
+notes.coverage = await page.evaluate(() => {
+  const els = [...document.querySelectorAll('[data-skin="hud-plaque"]')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; });
+  const extra = [...document.querySelectorAll('[data-testid="hud-hide-toggle"], [data-hud-controls] button')].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 0 && r.bottom > innerHeight - 120 && r.right > innerWidth - 200; });
+  const rects = [...els, ...extra].map((e) => e.getBoundingClientRect());
+  let hit = 0, tot = 0; for (let y = 0; y < innerHeight; y += 4) for (let x = 0; x < innerWidth; x += 4) { tot++; if (rects.some((r) => x >= r.left && x < r.right && y >= r.top && y < r.bottom)) hit++; }
+  return { fraction: +(hit / tot).toFixed(3), plaques: els.map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height), (e.innerText || '').replace(/\s+/g, ' ').slice(0, 50)]; }) };
+});
+if (FULL) { save('01-measure-body.json', await measure(ctx, 'body')); save('02-contrast-body.json', await contrastFromPixels(ctx)); }
+// ritagli dei pezzi
+for (const [i, p] of notes.coverage.plaques.entries()) { const [x, y, w, h] = p; if (w > 20 && h > 20) await page.screenshot({ path: `${outDir}crop-plaque-${i}.png`, clip: { x: Math.max(0, x - 6), y: Math.max(0, y - 6), width: Math.min(W - Math.max(0, x - 6), w + 12), height: Math.min(H - Math.max(0, y - 6), h + 12) } }); }
+await page.screenshot({ path: `${outDir}crop-bottom-right.png`, clip: { x: W - 220, y: H - 110, width: 220, height: 110 } });
+// tooltip su controlli del tempo, risorse, nav
+const hovers = [['speed-x2', page.locator('[role="radiogroup"]').getByRole('radio', { name: /×2/ })], ['pause', page.locator('[role="radiogroup"] ~ *, [aria-label*="ause" i]').first()], ['gold', page.getByRole('group', { name: /gold|oro/i }).first()], ['food', page.getByRole('group', { name: /food|cibo/i }).first()], ['nav-workshop', page.locator('[data-nav-id="workshop"]')], ['nav-village', page.locator('[data-nav-id="village"]')], ['recenter', page.locator('[aria-label*="ecenter" i], [aria-label*="entra" i]').first()]];
+notes.hover = {};
+for (const [name, loc] of hovers) { if (!(await loc.count())) { notes.hover[name] = 'not found'; continue; } await loc.hover().catch(() => {}); await page.waitForTimeout(700);
+  notes.hover[name] = await page.evaluate(() => [...document.querySelectorAll('[role="tooltip"], [data-radix-popper-content-wrapper]')].map((t) => t.innerText.replace(/\s+/g, ' ').slice(0, 120)));
+  await snap(ctx, `10-hover-${name}`); }
+await page.mouse.move(W / 2, H / 2);
+// velocità
+for (const s of ['×2', '×4']) { const r = page.locator('[role="radiogroup"]').getByRole('radio', { name: s }); if (await r.count()) { await r.click(); await page.waitForTimeout(500); } }
+await page.screenshot({ path: `${outDir}20-time-x4.png`, clip: notes.coverage.plaques.find((p) => /day|giorno/i.test(p[4])) ? (([x, y, w, h]) => ({ x, y, width: w, height: h }))(notes.coverage.plaques.find((p) => /day|giorno/i.test(p[4]))) : undefined });
+await page.locator('[role="radiogroup"]').getByRole('radio', { name: '×1' }).click().catch(() => {});
+// menu di gioco
+await page.getByRole('button', { name: /^menu$/i }).first().click().catch(() => {}); await page.waitForTimeout(600); await snap(ctx, '30-game-menu');
+notes.gameMenuText = await page.evaluate(() => document.querySelector('[role="menu"]')?.innerText.replace(/\n+/g, ' | ').slice(0, 600) ?? null);
+await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+// menu pannelli (in basso a destra)
+const pm = page.getByRole('button', { name: /^panels$|pannelli/i }).first(); if (await pm.count()) { await pm.click(); await page.waitForTimeout(600); await snap(ctx, '31-panels-menu'); notes.panelsMenuText = await page.evaluate(() => [...document.querySelectorAll('[role="menu"], [role="dialog"]')].map((m) => m.innerText.replace(/\n+/g, ' | ')).join(' || ').slice(0, 500)); await page.keyboard.press('Escape'); await page.waitForTimeout(300); }
+// registro eventi
+await page.keyboard.press('e'); await page.waitForTimeout(800); await snap(ctx, '40-events-ledger');
+const ledger = () => page.evaluate(() => { const s = document.querySelector('section[aria-label]'); const all = [...document.querySelectorAll('section[aria-label]')].find((x) => /event/i.test(x.getAttribute('aria-label') || '')); return all ? all.innerText.replace(/\n+/g, ' | ').slice(0, 700) : null; });
+notes.ledgerT0 = await ledger(); notes.dayT0 = await page.evaluate(() => window.__idleVillageTestHooks?.getClock?.());
+if (FULL) { const sel = 'section[aria-label="Events"], section[aria-label="Eventi"]'; if (await page.locator(sel).count()) { save('41-measure-ledger.json', await measure(ctx, sel)); save('42-contrast-ledger.json', await contrastFromPixels(ctx, sel)); await snap(ctx, '43-ledger-crop', page.locator(sel)); } }
+await page.locator('[role="radiogroup"]').getByRole('radio', { name: '×4' }).click().catch(() => {}); await page.waitForTimeout(15000);
+notes.ledgerT15 = await ledger(); notes.dayT15 = await page.evaluate(() => window.__idleVillageTestHooks?.getClock?.());
+await snap(ctx, '44-events-after-15s-x4');
+await page.locator('[role="radiogroup"]').getByRole('radio', { name: '×1' }).click().catch(() => {});
+await page.keyboard.press('e'); await page.waitForTimeout(400);
+// nascondi HUD
+await page.keyboard.press('h'); await page.waitForTimeout(900); await snap(ctx, '50-hud-hidden'); notes.hiddenCoverage = await page.evaluate(() => [...document.querySelectorAll('[data-skin="hud-plaque"]')].filter((e) => { const r = e.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && r.width > 0; }).length);
+await page.keyboard.press('h'); await page.waitForTimeout(900);
+// pan + ricentra
+await page.mouse.move(W * 0.3, H * 0.5); await page.mouse.down(); await page.mouse.move(W * 0.6, H * 0.35, { steps: 12 }); await page.mouse.up(); await page.waitForTimeout(700); await snap(ctx, '60-map-panned');
+const rc = page.locator('[aria-label*="ecenter" i], [aria-label*="entra" i]').first(); if (await rc.count()) { await rc.click(); await page.waitForTimeout(1200); await snap(ctx, '61-after-recenter'); }
+// ordine di Tab
+await page.mouse.click(5, H / 2); const tabs = [];
+for (let i = 0; i < 18; i++) { await page.keyboard.press('Tab'); await page.waitForTimeout(80); tabs.push(await page.evaluate(() => { const a = document.activeElement; if (!a) return null; const r = a.getBoundingClientRect(); const cs = getComputedStyle(a); return { label: (a.getAttribute('aria-label') || a.innerText || a.tagName).replace(/\s+/g, ' ').slice(0, 30), x: Math.round(r.x), y: Math.round(r.y), outline: cs.outlineStyle !== 'none' ? cs.outlineWidth + ' ' + cs.outlineColor : 'none', shadow: cs.boxShadow.slice(0, 40) }; })); if (i === 3) await snap(ctx, '70-focus-visible-tab4'); }
+notes.tabOrder = tabs;
+save('notes.json', notes); console.log(JSON.stringify(notes).slice(0, 5000));
+await close(ctx);

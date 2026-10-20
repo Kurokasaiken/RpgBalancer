@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
+import { KEEP_GLOBAL_RESOURCES } from '../pixiSpike/pixiDestroy';
 import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
 import type { WorldSurfaceAnchor, WorldSurfaceManifest } from '../config/worldSurfaceConfig';
 
@@ -191,7 +192,7 @@ export const WorldSurfacePixiOverlay: React.FC<WorldSurfacePixiOverlayProps> = (
       });
 
       if (disposed) {
-        app?.destroy(true, true);
+        app?.destroy(KEEP_GLOBAL_RESOURCES, true);
         app = null;
         return;
       }
@@ -237,7 +238,7 @@ export const WorldSurfacePixiOverlay: React.FC<WorldSurfacePixiOverlayProps> = (
         worldRef.current = null;
         objectsRef.current = null;
         if (app) {
-          app.destroy(true, true);
+          app.destroy(KEEP_GLOBAL_RESOURCES, true);
           app = null;
           appRef.current = null;
         }

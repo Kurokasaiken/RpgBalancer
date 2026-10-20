@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POI Sigillo fork</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Mockup di fork, non codice di gioco. Token presi da --skin-* base e da poi_family_spec §Sigillo (copiati a mano). */
+:root{
+  --border:rgba(223,184,87,.50);
+  --display:"Cinzel","Trajan Pro",serif; --serif:"EB Garamond",Georgia,serif;
+  --title:#f0cf6a; --text:#F5F2E8; --text2:rgba(245,242,232,.72); --label:#c9a84e;
+  --lift:#0f2a35; --deep:#060f16; --crest:#d8bd78; --hi:#cfaf63;
+  --page:#0b1c22; --body:#e9dfc6; --dim:#a9b3ad; --rule:rgba(223,184,87,.22);
+  --poi-dark:#0b0a08; --poi-ivory:#efe3c6; --poi-deadline:#ead9b0; --poi-work:#6fc4a4; --poi-urgent:#e8553a;
+  --ember:#c9663a; --iron:#7d8a8c;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--body);font:16px/1.5 var(--serif);padding:0 16px 80px}
+.wrap{max-width:1240px;margin:0 auto}
+header{padding:36px 0 8px}
+h1{font:600 26px var(--display);letter-spacing:.06em;color:var(--title);margin:0 0 6px}
+h2{font:600 18px var(--display);letter-spacing:.05em;color:var(--crest);margin:0 0 4px}
+h3{font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:18px 0 8px}
+p{max-width:920px;margin:0 0 10px}
+.dim{color:var(--dim)}
+code{font:.82em ui-monospace,Menlo,monospace;color:var(--crest)}
+a{color:var(--crest)}
+section{border-top:1px solid var(--rule);padding:26px 0}
+.bar{position:sticky;top:0;z-index:5;background:rgba(11,28,34,.94);backdrop-filter:blur(4px);display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule)}
+.bar button,.bar a.btn{font:500 12px var(--display);letter-spacing:.08em;color:var(--crest);background:var(--deep);border:1px solid var(--border);border-radius:999px;padding:6px 14px;min-height:34px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.bar button[aria-pressed="true"]{background:var(--hi);color:var(--deep)}
+.bar button:focus-visible,.bar a.btn:focus-visible{outline:2px solid var(--poi-ivory);outline-offset:2px}
+.scroll{overflow-x:auto;padding-bottom:6px}
+.grid{display:grid;gap:6px;width:max-content}
+.rowlab{font:500 11px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;width:86px;text-align:right}
+.collab{font:500 10px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-align:center}
+.tile{width:140px;height:140px;border-radius:6px;background-size:cover;background-position:center;position:relative;overflow:hidden;border:1px solid var(--rule)}
+.tile svg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);overflow:visible}
+.tile .cap{position:absolute;left:6px;bottom:4px;right:6px;font:500 10px var(--display);letter-spacing:.08em;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000;text-transform:uppercase}
+body.gray .stage{filter:grayscale(1)}
+.opt{display:none}
+body[data-opt="all"] .opt, body[data-opt="A"] .opt-A, body[data-opt="B"] .opt-B, body[data-opt="C"] .opt-C{display:block}
+.optbox{border:1px solid var(--rule);border-radius:10px;padding:16px;margin:18px 0;background:rgba(6,15,22,.35)}
+.optbox h2 small{font:400 14px var(--serif);color:var(--dim);letter-spacing:0;margin-left:8px}
+.prov{font-size:14px;color:var(--dim)}
+.map{position:relative;width:650px;height:380px;border-radius:8px;overflow:hidden;background:url(assets/map-center.jpg) center/cover;border:1px solid var(--rule)}
+.map svg.m{position:absolute;transform:translate(-50%,-50%);overflow:visible}
+.map svg.route{position:absolute;inset:0;width:100%;height:100%}
+.detail{display:flex;gap:0;flex-wrap:wrap;background:#14262b;border-radius:8px;padding:16px;border:1px solid var(--rule);width:max-content}
+.detail figure{margin:0;text-align:center}
+.detail figcaption{font:500 10px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.base img{display:block;max-width:100%;border-radius:8px;border:1px solid var(--rule)}
+.basegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.basegrid figure{margin:0}
+.basegrid figcaption{font-size:14px;color:var(--dim);margin-top:6px}
+table.matrix{border-collapse:collapse;width:100%;font-size:15px;margin-top:10px}
+.matrix th,.matrix td{border-bottom:1px solid var(--rule);padding:7px 8px;text-align:left;vertical-align:top}
+.matrix th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label);text-transform:uppercase}
+.win{color:var(--title)}
+.req{columns:2;column-gap:28px;font-size:15px}
+.req li{break-inside:avoid;margin-bottom:6px}
+.tension{border:1px solid #8a6a32;border-radius:8px;padding:10px 14px;background:rgba(201,102,58,.08);margin:10px 0}
+.halo-anim{transition:stroke-dasharray .8s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion:reduce){.halo-anim{transition:none}}
+@media (max-width:760px){.req{columns:1}.rowlab{width:64px;font-size:10px}}
+</style>
+</head>
+<body data-opt="all">
+<div class="wrap">
+<header>
+  <h1>POI Sigillo · dove sta il rischio</h1>
+  <p>Fork v35 dopo il ruling <b>POI-T = B «la sagoma dice il rischio»</b>. La sagoma porta già la famiglia (PLAN-058) e la B4-map C propone di metterci anche il tempo: tre modi di farci stare il rischio senza perdere il resto. <b>Nessuna opzione è consigliata.</b></p>
+  <p class="dim">Condizioni: marker a 55 px (taglia M) su ritagli reali della mappa a 2× (cattura `/game` 1440×900, skin base); stati forzati a mano nel mockup, non dal gioco. Palette, campo e comparsa = baseline (sono la fork B4-map, non questa). Brief: <a href="../POI_brief_sigillo.md">POI_brief_sigillo.md</a>.</p>
+</header>
+
+<div class="bar" role="toolbar" aria-label="Controlli">
+  <button type="button" data-opt="all" aria-pressed="true">Tutte</button>
+  <button type="button" data-opt="A" aria-pressed="false">A · Corona</button>
+  <button type="button" data-opt="B" aria-pressed="false">B · Orlo dentato</button>
+  <button type="button" data-opt="C" aria-pressed="false">C · Sagoma-orologio</button>
+  <button type="button" id="gray" aria-pressed="false">Scala di grigi</button>
+  <button type="button" id="replay">Riscrivi gli aloni</button>
+</div>
+
+<section class="base">
+  <h2>Baseline · il Sigillo di oggi</h2>
+  <div class="basegrid">
+    <figure><img src="baseline/poi-rest-hover-focus.png" alt="POI goblin a riposo, in hover, con focus da tastiera, e POI rovine"><figcaption>Riposo · hover · focus (contorno blu del browser) · rovine (le colonne leggono «stivale»). Nessun tooltip, nessun rischio sul marker.</figcaption></figure>
+    <figure><img src="baseline/poi-run-andata-svolgimento.png" alt="POI durante la run: andata e sul posto"><figcaption>Run in corso: all'andata il disco del percorso copre il glifo; sul posto lo copre il gettone del party. Alone di lavoro ciano, pallino rosso di decisione.</figcaption></figure>
+    <figure><img src="baseline/poi-b4map-ref.png" alt="Fork B4-map: baseline, metalli, campo, alone a sagoma"><figcaption>Riferimento: fork B4-map (altra sessione, in attesa di ruling). La sua C è l'origine dell'opzione C qui.</figcaption></figure>
+  </div>
+</section>
+
+<div id="options"></div>
+
+<section>
+  <h2>Matrice</h2>
+  <div class="scroll"><table class="matrix">
+    <tr><th>Asse</th><th>A · Corona</th><th>B · Orlo dentato</th><th>C · Sagoma-orologio + corona</th></tr>
+    <tr><td>Rischio leggibile da lontano, anche in grigio</td><td class="win">sì: si contano le corna</td><td>«bassa/media» sì, «media/alta» deboli a 55 px</td><td class="win">sì: come A</td></tr>
+    <tr><td>Aderenza al mockup scelto in POI-T</td><td class="win">piena (corna + brace)</td><td>stessa idea, altro gesto</td><td>piena sul rischio</td></tr>
+    <tr><td>Ingombro e collisione con l'alone alle ore 12</td><td>le corna entrano nell'alone tra le 10 e le 2; marker ~+20% in altezza</td><td class="win">nessuna: stesso ingombro di oggi</td><td>nessun alone esterno; le corna incrociano il tempo sul bordo</td></tr>
+    <tr><td>Tanti POI vicini</td><td>più alti, si toccano prima</td><td class="win">i più compatti con alone</td><td class="win">i più compatti in assoluto</td></tr>
+    <tr><td>Desiderata v3 FROZEN (cerchio magico attorno)</td><td class="win">rispettata</td><td class="win">rispettata</td><td><b>da rivedere</b> (e D7 «lettere invariate»)</td></tr>
+    <tr><td>Bordo doppio (cancello dei biomi)</td><td class="win">intatto</td><td>segue i denti: va ri-misurato</td><td class="win">intatto</td></tr>
+    <tr><td>Costo DOM</td><td>+~10 nodi</td><td>+0 (cambia un path)</td><td class="win">−~1 200 nodi (via le due bande di lettere)</td></tr>
+    <tr><td>Costo implementativo</td><td>medio</td><td class="win">basso-medio</td><td>alto: desiderata + kit `MagicCircleHalo` divergente</td></tr>
+    <tr><td>Reduced-motion / a11y</td><td colspan="3">uguale per le tre: nessun moto legato al rischio; etichetta «rischio {fascia}»; emblemi fissi</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Cosa richiede in codice</h2>
+  <h3>Comune a tutte (anche senza scegliere)</h3>
+  <ul class="req">
+    <li><b>Rischio al marker</b>: fascia d'offerta (<code>deriveOfferBand</code>) calcolata alla comparsa e messa in <code>MapQuestPoiSessionShape</code> → <code>mapQuestPoiView</code> → prop <code>risk</code> di <code>PoiMatericV3_5</code> (T-07). Oggi si calcola solo aprendo il planner.</li>
+    <li><b>Stati mancanti</b>: esito (<code>reward/survived/fled/wipe</code>) e <code>pieno-in-attesa</code> fino al marker; vinto ≠ perso; emblemi-oggetto al posto del pallino rosso (<code>MapQuestPoi.tsx:230-250</code>).</li>
+    <li><b>Percorso e party mai sul glifo</b>: <code>QuestJourneyRoute</code> finisce sul bordo/coda; gettone del party accanto (<code>questJourneyRouteConfig.ts</code>).</li>
+    <li><b>A11y</b>: etichetta con famiglia/rischio/stato/progresso (en + it-IT, <code>gameFrame.questPoi.*</code>); interno <code>role="img"</code> «Resident medal» → <code>aria-hidden</code>; focus nella materia (token nuovo <code>--skin-poi-focus</code>); roving tabindex per lo strato POI, dopo la HUD.</li>
+    <li><b>Reduced-motion</b>: comparsa solo dissolvenza (<code>MapQuestPoi.tsx:165-169, 221-224</code>); oggi scala ancora.</li>
+    <li><b>Peso</b>: id dei filtri con <code>useId</code> o defs condivisi (V35:634-663); fermare il rAF <code>animRim</code> a riposo (V35:491-509); seme al posto di <code>Math.random</code> (V35:218-240).</li>
+    <li><b>Tanti POI</b>: ordine per urgenza e distanza minima nello strato POI (<code>PixiWorldMap.tsx:1934-1949</code>).</li>
+    <li><b>Cancello</b>: <code>poi-terrain-gate.py</code> esteso alle 4 fasce di rischio in grigio a 55 px.</li>
+    <li><b>Testimone</b> (T-04): una finestra d'offerta autorata o un hook Director per vedere <i>in scadenza</i> e <i>main</i> dal vivo; oggi non compaiono mai.</li>
+  </ul>
+  <h3>A · Corona di corna</h3>
+  <ul class="req">
+    <li>Geometria delle corna per fascia (0 / 1 / 2 coppie / 2 + punta) in <code>poiSigillo.ts</code>, strato nuovo nel ramo <code>sigillo</code> di V35, su quest e rombo.</li>
+    <li>Brace a «letale»: token <code>--skin-poi-risk-ember</code> per placca e corna.</li>
+    <li>Collisione con l'alone: o raggio delle rotaie più largo, o le corna sotto la scrittura (scelta di resa, da vedere a occhio).</li>
+    <li>Hit box alzata di ~20% per contenere le corna.</li>
+  </ul>
+  <h3>B · Orlo dentato</h3>
+  <ul class="req">
+    <li>Generatore puro del contorno con profilo per fascia (liscio / tacche / denti / denti spezzati), testato a unità; il bordo doppio lo segue in px di schermo.</li>
+    <li>Crepe con brace a «letale» (solo dentro la placca).</li>
+    <li>Ri-misura del cancello dei biomi: il filo avorio deve restare continuo sui denti.</li>
+    <li>Verifica a occhio di «media» contro «alta» a 55 px e a 44 px (taglia S).</li>
+  </ul>
+  <h3>C · Sagoma-orologio + corona</h3>
+  <ul class="req">
+    <li><b>Prima del codice:</b> revisione esplicita della desiderata v3 («cerchio magico attorno al POI») e di D7 («lettere invariate»).</li>
+    <li>Promuovere <code>haloFollowsSilhouette</code> dalla lab (V35:853-881): oggi usa <b>cappucci tondi</b> su un arco che può valere 0 (trappola T-02).</li>
+    <li>Togliere le due bande di lettere dal ramo Sigillo; decidere cosa resta dell'iscrizione sul bordo.</li>
+    <li>Allineare il kit congelato <code>MagicCircleHalo</code>/<code>questPoiKit</code> o dichiarare la divergenza (Medaglione F-06).</li>
+    <li>Corna come A.</li>
+  </ul>
+</section>
+
+<section class="dim">
+  <p>Limiti del mockup: le lettere dell'alone sono un tratteggio, non i glifi veri (100 per banda, D7); gli emblemi (occhio, scintilla, lame, lucchetto) sono schizzi; il gettone del party è quello di PLAN-053 ridisegnato a mano. Gli stati sono forzati: <i>in scadenza</i> e <i>main</i> oggi non compaiono su <code>/game</code>.</p>
+</section>
+</div>
+
+<script>
+(() => {
+const R = 27.5;
+const BIOMES = ['mare','foresta','prato','sabbia','ocra','terra','neve','brughiera'];
+const RISKS = ['bassa','media','alta','letale'];
+const GLYPH = { goblin:'assets/poi-goblin-camp-128.webp', ruins:'assets/poi-ruins-128.webp', invasion:'assets/threat-invasion-128.webp' };
+const SIZE = { S:.8, M:1, L:1.25 };
+let uid = 0;
+const f = (n) => +n.toFixed(2);
+
+/* ---------- silhouette sampling: points from 12 o'clock, clockwise, with outward normals ---------- */
+function questSil(r){
+  const pts = []; const deg = Math.PI/180; const tip = {x:0, y:r*1.45};
+  const arc = (a0, a1, tooth) => { for (let a=a0; a<=a1+1e-6; a+=2){ const t=a*deg; pts.push({x:r*Math.cos(t), y:r*Math.sin(t), nx:Math.cos(t), ny:Math.sin(t), tooth, a}); } };
+  arc(270, 418, true);
+  const j1 = {x:r*Math.cos(58*deg), y:r*Math.sin(58*deg)}, j2 = {x:r*Math.cos(122*deg), y:r*Math.sin(122*deg)};
+  const seg = (p,q) => { const dx=q.x-p.x, dy=q.y-p.y, L=Math.hypot(dx,dy); const nx=dy/L, ny=-dx/L; for (let i=1;i<=10;i++){ pts.push({x:p.x+dx*i/10, y:p.y+dy*i/10, nx, ny, tooth:false}); } };
+  seg(j1, tip); seg(tip, j2);
+  arc(122, 268, true);
+  for (const p of pts) if (p.a !== undefined && (Math.abs(p.a-418)<14 || Math.abs(p.a-122)<14)) p.tooth = false;
+  return pts;
+}
+function diamondSil(r){
+  const D = r*1.08, V = [{x:0,y:-D},{x:D,y:0},{x:0,y:D},{x:-D,y:0},{x:0,y:-D}], pts = [];
+  for (let k=0;k<4;k++){ const p=V[k], q=V[k+1]; const dx=q.x-p.x, dy=q.y-p.y, L=Math.hypot(dx,dy), nx=dy/L, ny=-dx/L;
+    for (let i=0;i<40;i++){ const s=i/40; const nearBottom = (k===1 && s>0.8) || (k===2 && s<0.2); pts.push({x:p.x+dx*s, y:p.y+dy*s, nx, ny, tooth:!nearBottom, s:k+s}); } }
+  return pts;
+}
+function seeded(i){ const x = Math.sin(i*12.9898)*43758.5453; return x - Math.floor(x); }
+function teeth(pts, risk){
+  if (risk === 0) return pts;
+  const cfg = [null, {n:12, depth:2.2, kind:'crenel'}, {n:15, depth:3.6, kind:'tri'}, {n:17, depth:4.8, kind:'jag'}][risk];
+  let acc = 0, tot = 0; for (let i=1;i<pts.length;i++) tot += Math.hypot(pts[i].x-pts[i-1].x, pts[i].y-pts[i-1].y);
+  return pts.map((p,i) => { if (i) acc += Math.hypot(p.x-pts[i-1].x, p.y-pts[i-1].y); if (!p.tooth) return p;
+    const u = acc/tot*cfg.n, fr = u-Math.floor(u), idx = Math.floor(u);
+    let d; if (cfg.kind==='crenel') d = fr<.5 ? cfg.depth : 0; else if (cfg.kind==='tri') d = cfg.depth*(1-Math.abs(2*fr-1)); else d = (cfg.depth*(0.7+0.6*seeded(idx)))*(fr<.55 ? fr/.55 : (1-fr)/.45);
+    return {...p, x:p.x+p.nx*d, y:p.y+p.ny*d}; });
+}
+const toPath = (pts) => 'M' + pts.map(p => `${f(p.x)} ${f(p.y)}`).join('L') + 'Z';
+const scalePts = (pts, k) => pts.map(p => ({...p, x:p.x*k, y:p.y*k}));
+
+/* ---------- horns (A, C) ---------- */
+function hornsSvg(risk, r, family, ember){
+  if (risk === 0) return '';
+  const set = [];
+  if (risk >= 1) set.push([236, 17], [304, 17]);
+  if (risk >= 2) set.push([206, 13], [334, 13]);
+  if (risk >= 3) set.push([270, 15]);
+  const fill = ember ? 'url(#gEmber)' : 'url(#gBrass)';
+  return set.map(([a, L]) => {
+    const t = a*Math.PI/180; const rr = family==='threat' ? (r*1.08)/(Math.abs(Math.cos(t))+Math.abs(Math.sin(t))) : r;
+    const bx = (rr-4)*Math.cos(t), by = (rr-4)*Math.sin(t); const mirror = a < 270 ? -1 : 1; const curl = a === 270 ? 0 : 1;
+    const d = `M-4.8 0C-4.4 ${f(-L*.5)} ${f(-1.4-curl*1.8)} ${f(-L*.82)} ${f(curl*3)} ${f(-L)}C${f(.8+curl*.6)} ${f(-L*.6)} 3.4 ${f(-L*.3)} 4.8 0Z`;
+    return `<path d="${d}" transform="translate(${f(bx)} ${f(by)}) rotate(${a+90}) scale(${mirror} 1)" fill="${fill}" stroke="var(--poi-dark)" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
+  }).join('');
+}
+
+/* ---------- emblems (6b: object silhouettes, not dots) ---------- */
+function emblem(kind, r){
+  const x = (r+9)*Math.cos(-28*Math.PI/180), y = (r+9)*Math.sin(-28*Math.PI/180);
+  const S = 'stroke="var(--poi-dark)" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"';
+  const g = {
+    eye:`<path d="M-8 0Q0 -7 8 0Q0 7 -8 0Z" fill="url(#gBrass)" ${S}/><path d="M-2.4 0a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0 -4.8 0" fill="var(--poi-dark)"/><path d="M.6 -1.4l1 .6" stroke="var(--poi-ivory)" stroke-width="1"/>`,
+    spark:`<path d="M0 -9L2.2 -2.2L9 0L2.2 2.2L0 9L-2.2 2.2L-9 0L-2.2 -2.2Z" fill="var(--poi-ivory)" ${S}/>`,
+    blades:`<path d="M-7 -7L6 6M7 -7L-6 6" stroke="var(--poi-dark)" stroke-width="4.2" stroke-linecap="butt"/><path d="M-7 -7L6 6M7 -7L-6 6" stroke="var(--iron)" stroke-width="2"/><path d="M3 7.5l4 -4M-3 7.5l-4 -4" stroke="var(--iron)" stroke-width="2.2"/>`,
+    lock:`<path d="M-4 -2V-5a4 4 0 0 1 8 0V-2" fill="none" stroke="var(--poi-dark)" stroke-width="4"/><path d="M-4 -2V-5a4 4 0 0 1 8 0V-2" fill="none" stroke="var(--iron)" stroke-width="2"/><rect x="-6" y="-2.5" width="12" height="9.5" rx="1.5" fill="var(--iron)" ${S}/>`,
+  }[kind];
+  return g ? `<g transform="translate(${f(x)} ${f(y)}) scale(1.3)">${g}</g>` : '';
+}
+
+/* ---------- one marker ---------- */
+function marker(opt, c){
+  const id = 'm' + (++uid);
+  const family = c.family || 'quest', risk = c.risk ?? 0, state = c.state || 'available', k = SIZE[c.size || 'M'];
+  const ember = (opt==='A'||opt==='C') && risk === 3;
+  let base = family === 'threat' ? diamondSil(R) : questSil(R);
+  let sil = opt === 'B' ? teeth(base, risk) : base;
+  const silD = toPath(sil);
+  const inner = family === 'threat' ? R*0.66 : R-4.2, field = inner - 3.6;
+  // halo mode
+  const mode = { andata:['work',.35,1], onsite:['work',.62,1], decision:['work',.62,1], expiring:['urgent',.15,-1], main:['deadline',.9,-1], won:['work',1,1], lost:['iron',1,1] }[state];
+  const col = mode && { work:'var(--poi-work)', urgent:'var(--poi-urgent)', deadline:'var(--poi-deadline)', iron:'var(--iron)' }[mode[0]];
+  let halo = '';
+  if (mode){
+    const p = mode[1], dir = mode[2];
+    if (opt === 'C'){
+      const ring = toPath(scalePts(base, (R+4.6)/R));
+      halo = `<mask id="${id}mk" maskUnits="userSpaceOnUse" x="-80" y="-80" width="160" height="170"><path class="halo-anim" data-p="${p}" d="${ring}" pathLength="1" fill="none" stroke="#fff" stroke-width="9" stroke-dasharray="0 1" transform="scale(${dir} 1)"/></mask>
+        <g mask="url(#${id}mk)"><path d="${ring}" fill="none" stroke="rgba(16,20,32,.78)" stroke-width="6"/><path d="${ring}" fill="none" stroke="${col}" stroke-width="3.4" stroke-dasharray="1.1 1"/></g>`;
+    } else {
+      const rr = R + 6.2;
+      const ringD = `M0 ${-rr}A${rr} ${rr} 0 1 1 0 ${rr}A${rr} ${rr} 0 1 1 0 ${-rr}`;
+      const stars = [0,90,180,270].map(a => { const t=(a-90)*Math.PI/180; return `<path d="M0 -3L.8 -.8L3 0L.8 .8L0 3L-.8 .8L-3 0L-.8 -.8Z" transform="translate(${f(rr*Math.cos(t))} ${f(rr*Math.sin(t))})" fill="var(--poi-ivory)"/>`; }).join('');
+      halo = `<mask id="${id}mk" maskUnits="userSpaceOnUse" x="-80" y="-80" width="160" height="170"><path class="halo-anim" data-p="${p}" d="${ringD}" pathLength="1" fill="none" stroke="#fff" stroke-width="12" stroke-dasharray="0 1" transform="scale(${dir} 1)"/></mask>
+        <g mask="url(#${id}mk)"><circle r="${rr}" fill="none" stroke="rgba(16,20,32,.78)" stroke-width="7"/><circle r="${rr-2.6}" fill="none" stroke="${col}" stroke-width=".8"/><circle r="${rr+2.6}" fill="none" stroke="${col}" stroke-width=".8"/><circle r="${rr}" fill="none" stroke="${col}" stroke-width="2.6" stroke-dasharray="1 .9"/>${stars}</g>`;
+    }
+  }
+  const plate = ember ? 'url(#gEmber)' : 'url(#gBrass)';
+  const cracks = (opt === 'B' && risk === 3) ? `<path d="M-14 -20l5 7-2 5 6 4M17 -15l-5 6 3 4M-20 6l6 -1 3 5" fill="none" stroke="var(--ember)" stroke-width="1.6" opacity=".95"/><path d="M-14 -20l5 7-2 5 6 4M17 -15l-5 6 3 4M-20 6l6 -1 3 5" fill="none" stroke="#ffc08a" stroke-width=".6"/>` : '';
+  const glyph = GLYPH[c.glyph || (family==='threat' ? 'invasion' : 'goblin')];
+  const gs = field*1.8;
+  const locked = state === 'locked';
+  const route = state === 'andata' || state === 'onsite' || state === 'decision';
+  const anchorPt = family === 'threat' ? {x:-R*.62, y:R*.5} : {x:R*Math.cos(140*Math.PI/180), y:R*Math.sin(140*Math.PI/180)};
+  const routeSvg = route ? `<path d="M-70 64L${f(anchorPt.x-3)} ${f(anchorPt.y+3)}" stroke="rgba(16,20,32,.8)" stroke-width="6"/><path d="M-70 64L${f(anchorPt.x-3)} ${f(anchorPt.y+3)}" stroke="var(--crest)" stroke-width="2.6" ${state==='andata' ? 'stroke-dasharray="40 200"' : ''}/>` : '';
+  const party = route ? (() => { const px = state==='andata' ? -52 : anchorPt.x-13, py = state==='andata' ? 50 : anchorPt.y+12; return `<g transform="translate(${f(px)} ${f(py)})"><circle r="7.5" fill="var(--deep)" stroke="var(--crest)" stroke-width="1.8"/><path d="M-3.4 2.6a3.4 2.6 0 0 1 6.8 0M0 -.6a1.8 1.8 0 1 0 0 -3.6a1.8 1.8 0 1 0 0 3.6" fill="var(--poi-ivory)"/></g>`; })() : '';
+  const em = { decision:'eye', won:'spark', lost:'blades', locked:'lock' }[state];
+  const w = 132*k, h = 140*k;
+  return `<svg width="${f(w)}" height="${f(h)}" viewBox="-66 -66 132 140" aria-hidden="true" style="${locked ? 'filter:saturate(.25);opacity:.62' : ''}">
+    ${routeSvg}${halo}
+    <g>${hornsSvg((opt==='A'||opt==='C') ? risk : 0, R, family, ember)}</g>
+    <path d="${silD}" fill="${plate}" stroke="var(--poi-dark)" stroke-width="5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+    <path d="${silD}" fill="none" stroke="var(--poi-ivory)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+    ${cracks}
+    <circle r="${f(inner)}" fill="url(#gBrassRim)" stroke="var(--poi-dark)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <circle r="${f(inner-1.8)}" fill="none" stroke="rgba(239,227,198,.35)" stroke-width="1.2" stroke-dasharray=".8 1.6"/>
+    <circle r="${f(field)}" fill="url(#gLac)"/>
+    <image href="${glyph}" x="${f(-gs/2)}" y="${f(-gs/2)}" width="${f(gs)}" height="${f(gs)}" clip-path="circle(${f(field*.98)}px at 50% 50%) fill-box"/>
+    ${em ? emblem(em, family==='threat' ? R*1.02 : R) : ''}${party}
+  </svg>`;
+}
+
+/* ---------- page assembly ---------- */
+const OPTS = [
+  { id:'A', name:'A · Corona di corna', sub:'il rischio cresce sopra la sagoma', prov:'famiglia «aggiunta»: un elemento nuovo sopra la placca (corna/punta), materia ottone → brace a letale. È il gesto del mockup POI-T B portato sul Sigillo vero. Tempo: cerchio magico (desiderata v3).', strong:'si contano le corna da lontano, anche in grigio e tutti insieme', cost:'le corna entrano nell\'alone tra le ore 10 e le 2; il marker cresce in altezza' },
+  { id:'B', name:'B · Orlo dentato', sub:'il rischio cambia il contorno stesso', prov:'famiglia «sottrattiva»: nessun pezzo nuovo, il contorno della placca passa da liscio a tacche, denti, denti spezzati con brace nelle crepe. Tempo: cerchio magico (desiderata v3).', strong:'stesso ingombro di oggi, nessuna collisione con l\'alone, la mappa più ordinata', cost:'a 55 px «media» e «alta» si separano poco; i denti mettono alla prova il bordo doppio' },
+  { id:'C', name:'C · Sagoma-orologio + corona', sub:'B4-map C riconciliata con POI-T B', prov:'famiglia «compatta»: il tempo corre sul bordo della sagoma (B4-map C), quindi niente cerchio intorno; il rischio è la corona di A. Un solo oggetto porta famiglia, tempo e rischio.', strong:'il marker più compatto e leggero (via ~1 200 nodi di lettere); riconcilia le due fork', cost:'tocca la desiderata v3 FROZEN e D7: serve una revisione esplicita prima di qualsiasi codice' },
+];
+const STATES = [
+  ['available','disponibile','prato'],['andata','in corso · andata','prato'],['onsite','in corso · sul posto','prato'],['decision','decisione in attesa','prato'],
+  ['expiring','in scadenza*','prato'],['won','esito · vinto','prato'],['lost','esito · perso','prato'],['locked','bloccato*','prato'],
+];
+const DENSITY = [
+  {x:270,y:118,c:{risk:2,state:'onsite'}}, {x:330,y:160,c:{risk:0,glyph:'ruins'}}, {x:565,y:250,c:{family:'threat',risk:3,size:'L'}},
+  {x:118,y:96,c:{risk:1,state:'main',size:'L',glyph:'ruins'}}, {x:180,y:255,c:{risk:1,state:'expiring'}}, {x:470,y:140,c:{risk:2,state:'decision'}}, {x:70,y:318,c:{risk:3}},
+];
+const tile = (bg, svg, cap) => `<div class="tile stage" style="background-image:url(assets/biome-${bg}.jpg)">${svg}${cap ? `<span class="cap">${cap}</span>` : ''}</div>`;
+let html = '';
+for (const o of OPTS){
+  html += `<section class="opt opt-${o.id}"><div class="optbox"><h2>${o.name}<small>${o.sub}</small></h2>
+  <p class="prov"><b>Provenienza:</b> ${o.prov}</p><p><b>Argomento più forte:</b> ${o.strong}. <b>Costo:</b> ${o.cost}.</p>
+  ${o.id==='C' ? '<div class="tension"><b>Tensione con la desiderata v3 FROZEN</b> (<code>.mw/desiderata.md:91</code>): «attorno al POI si scrive progressivamente un cerchio magico… senza binari né cerchio preesistente». C la sostituisce. Non la risolvo io: se C piace, va prima rivista la desiderata (e D7, «lettere invariate»).</div>' : ''}
+  <h3>Rischio × bioma · impresa, disponibile, 55 px</h3>
+  <div class="scroll"><div class="grid" style="grid-template-columns:86px repeat(8,140px)"><div></div>${BIOMES.map(b=>`<div class="collab">${b}</div>`).join('')}
+  ${RISKS.map((rk,ri)=>`<div class="rowlab">${rk}</div>` + BIOMES.map(b=>tile(b, marker(o.id,{risk:ri}))).join('')).join('')}</div></div>
+  <h3>Stati · rischio alto</h3>
+  <div class="scroll"><div class="grid" style="grid-template-columns:repeat(8,140px)">${STATES.map(([s,lab,bg])=>tile(bg, marker(o.id,{risk:2,state:s}), lab)).join('')}</div></div>
+  <h3>Famiglie e taglie</h3>
+  <div class="scroll"><div class="grid" style="grid-template-columns:repeat(6,140px)">
+    ${tile('brughiera', marker(o.id,{risk:1}), 'impresa M · tenda')}${tile('ocra', marker(o.id,{risk:1,glyph:'ruins'}), 'impresa M · rovine')}${tile('foresta', marker(o.id,{risk:1,size:'L',state:'main',glyph:'ruins'}), 'main quest L*')}
+    ${tile('terra', marker(o.id,{family:'threat',risk:1,size:'S'}), 'minaccia S')}${tile('sabbia', marker(o.id,{family:'threat',risk:2,size:'M'}), 'minaccia M')}${tile('neve', marker(o.id,{family:'threat',risk:3,size:'L'}), 'minaccia L')}
+  </div></div>
+  <h3>Tanti POI insieme · ritaglio reale 650×380</h3>
+  <div class="scroll"><div class="map stage">${DENSITY.map(d=>{ const s = marker(o.id,d.c).replace('<svg ','<svg class="m" style="left:'+d.x+'px;top:'+d.y+'px" '); return s; }).join('')}</div></div>
+  <h3>Dettaglio 2× · fasce di rischio</h3>
+  <div class="scroll"><div class="detail stage">${RISKS.map((rk,ri)=>`<figure>${marker(o.id,{risk:ri,size:'M'}).replace(/width="([\d.]+)" height="([\d.]+)"/, (m,w,h)=>`width="${w*2}" height="${h*2}"`)}<figcaption>${rk}</figcaption></figure>`).join('')}${RISKS.map((rk,ri)=>`<figure>${marker(o.id,{family:'threat',risk:ri}).replace(/width="([\d.]+)" height="([\d.]+)"/, (m,w,h)=>`width="${w*2}" height="${h*2}"`)}<figcaption>minaccia · ${rk}</figcaption></figure>`).join('')}</div></div>
+  </div></section>`;
+}
+document.getElementById('options').innerHTML = html + `<p class="dim" style="font-size:14px">* stato forzato nel mockup: oggi non compare su /game (nessuna finestra d'offerta, nessuna main quest, nessuna fonte per «bloccato»).</p>`;
+
+/* shared defs, mounted once (Medaglione #4) */
+document.body.insertAdjacentHTML('afterbegin', `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gBrass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2c77e"/><stop offset=".45" stop-color="#b38a3c"/><stop offset="1" stop-color="#6e4c1c"/></linearGradient>
+  <linearGradient id="gBrassRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8bd78"/><stop offset=".5" stop-color="#9c7432"/><stop offset="1" stop-color="#5f3f16"/></linearGradient>
+  <linearGradient id="gEmber" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2b38f"/><stop offset=".5" stop-color="#c9663a"/><stop offset="1" stop-color="#5a2412"/></linearGradient>
+  <radialGradient id="gLac" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#173436"/><stop offset="1" stop-color="#0a1b1c"/></radialGradient>
+</defs></svg>`);
+
+/* halo write-in (reduced-motion: transition disabled in CSS) */
+function writeHalos(){
+  const els = [...document.querySelectorAll('.halo-anim')];
+  els.forEach(e => { e.style.transition = 'none'; e.setAttribute('stroke-dasharray', '0 1'); });
+  void document.body.offsetWidth;
+  requestAnimationFrame(() => els.forEach(e => { e.style.transition = ''; e.setAttribute('stroke-dasharray', `${e.dataset.p} 1`); }));
+}
+writeHalos();
+document.getElementById('replay').addEventListener('click', writeHalos);
+document.getElementById('gray').addEventListener('click', (ev) => { const on = document.body.classList.toggle('gray'); ev.currentTarget.setAttribute('aria-pressed', String(on)); });
+document.querySelectorAll('.bar [data-opt]').forEach(b => b.addEventListener('click', () => {
+  document.body.dataset.opt = b.dataset.opt;
+  document.querySelectorAll('.bar [data-opt]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+}));
+})();
+</script>
+</body>
+</html>

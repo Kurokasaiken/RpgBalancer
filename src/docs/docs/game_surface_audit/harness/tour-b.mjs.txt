@@ -1,0 +1,42 @@
+import fs from 'node:fs';
+import { openGame, POI, snap, close, lensAudit, warmUp } from './harness.mjs';
+const W = Number(process.env.W || 1440), H = Number(process.env.H || 900);
+const outDir = new URL(`./out/tourB-${W}x${H}/`, import.meta.url).pathname;
+const ctx = await openGame({ outDir, viewport: { width: W, height: H } });
+const { page } = ctx; const index = []; let k = 0;
+const state = async (name) => { const n = `B${String(++k).padStart(2, '0')}-${name}`; await snap(ctx, n); const lens = await lensAudit(ctx).catch((e) => [{ error: String(e) }]); fs.writeFileSync(`${outDir}${n}.lens.json`, JSON.stringify(lens, null, 1)); index.push({ n, issues: lens.reduce((a, l) => a + (l.L1n || 0) + (l.L2_truncated?.length || 0) + (l.L7_circleWithSymbol || 0) + (l.L8n || 0), 0) }); };
+const getRun = () => page.evaluate((pid) => { const r = window.__idleVillageTestHooks.expedition[pid].getRun(); return r && { node: r.nodeId, ended: r.ended, status: r.frontier?.status }; }, POI);
+await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), null, { timeout: 60000 }).catch(() => {});
+await warmUp(ctx);
+await page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].demoLaunch(), POI); ctx.steps.push({ step: 'launch', how: 'hook-assisted:demoLaunch' });
+await page.getByTestId('quest-window').waitFor({ timeout: 30000 }); await page.waitForTimeout(1500);
+await state('window-open');
+const seen = new Set(); const deadline = Date.now() + 420000; let checks = 0;
+while (Date.now() < deadline) {
+  const r = await getRun(); if (!r) break;
+  if (r.ended && (await page.locator('[data-testid="quest-reward-popup"], [data-testid="quest-window-close-report"]').count())) {
+    await page.waitForTimeout(600); await state('report-t0'); await page.waitForTimeout(3000); await state('report-t3s');
+    const stages = page.locator('[data-testid="quest-reward-popup"]'); if (await stages.count()) { await stages.click({ position: { x: 30, y: 30 } }).catch(() => {}); await page.waitForTimeout(800); await state('report-advanced'); }
+    break;
+  }
+  if (await page.locator('[data-testid="quest-check-column"], [data-testid="quest-check-overlay"]').count()) {
+    if (await page.locator('[data-testid="quest-verdict-card"]').count()) { await page.waitForTimeout(400); if (checks <= 2) await state(`check${checks}-verdict`); await page.getByTestId('quest-verdict-card').click({ position: { x: 20, y: 10 } }).catch(() => {}); await page.waitForTimeout(500); continue; }
+    const tira = page.locator('.da-tira'); if (await tira.isVisible().catch(() => false)) { checks++; if (checks <= 2) await state(`check${checks}-armed`); await tira.click(); }
+    await page.waitForTimeout(500); continue;
+  }
+  const toast = page.locator('[data-testid*="outcome-toast"], [data-testid*="quest-toast"]'); if ((await toast.count()) && !seen.has('toast')) { seen.add('toast'); await state('toast'); }
+  if (await page.getByTestId('quest-window-beat').isVisible().catch(() => false)) { if (!seen.has('b' + r.node)) { seen.add('b' + r.node); await state(`beat-${r.node}`); } await page.keyboard.press('Enter'); await page.waitForTimeout(800); continue; }
+  const ch = page.locator('[data-testid="quest-window-choice"]:not([disabled])'); const n = await ch.count();
+  if (n > 0 && r.status === 'waiting') { if (!seen.has('c' + r.node)) { seen.add('c' + r.node); await state(`choice-${r.node}`); await ch.first().hover(); await page.waitForTimeout(900); await state(`choice-hover-${r.node}`); if (!seen.has('belt')) { seen.add('belt'); const arm = page.locator('[data-testid^="belt-arm-"]').first(); if (await arm.count()) { await arm.hover(); await page.waitForTimeout(800); await state('belt-hover'); await arm.click(); await page.waitForTimeout(400); await state('belt-armed'); } } }
+    await ch.first().click(); await page.waitForTimeout(500); continue; }
+  if (r.status === 'pending' && !seen.has('p' + r.node)) { seen.add('p' + r.node); await state(`travel-${r.node}`); }
+  await page.evaluate(() => window.__idleVillageTestHooks.advanceTicks?.(3)); await page.waitForTimeout(200);
+}
+// chiusura rapporto, level-up, cronaca, POI tornato
+const close1 = page.getByTestId('quest-reward-close'); if (await close1.isVisible().catch(() => false)) { await close1.click(); await page.waitForTimeout(1200); }
+else { const b = page.locator('[data-testid="quest-reward-popup"] button').last(); if (await b.count()) { await b.click(); await page.waitForTimeout(1200); } }
+await state('after-report');
+await page.keyboard.press('r'); await page.waitForTimeout(900); await state('roster-after-run');
+fs.writeFileSync(outDir + 'index.json', JSON.stringify({ index, errors: ctx.consoleErrors.slice(0, 6) }, null, 1));
+console.log(JSON.stringify(index.map((i) => [i.n, i.issues])), 'errors', ctx.consoleErrors.length, JSON.stringify(ctx.consoleErrors.slice(0, 3).map((e) => e.slice(0, 100))));
+await close(ctx);

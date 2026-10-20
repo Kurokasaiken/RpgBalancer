@@ -1,0 +1,32 @@
+import fs from 'node:fs';
+import { openGame, POI, close } from './harness.mjs';
+const W = 1440, H = 900;
+const outDir = new URL('./out/cine-1440x900/', import.meta.url).pathname;
+const ctx = await openGame({ outDir, viewport: { width: W, height: H } });
+const { page } = ctx; const log = []; let pixiErrors = 0;
+const run = async (ms) => { try { await page.clock.runFor(ms); } catch (e) { pixiErrors++; } };
+await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), null, { timeout: 60000 }).catch(() => {});
+await page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].demoLaunch(), POI);
+await page.getByTestId('quest-window').waitFor({ state: 'visible', timeout: 30000 });
+await page.waitForTimeout(600);
+await page.clock.install(); await page.clock.pauseAt(new Date(Date.now() + 1e7));
+const theatre = async () => page.getByTestId('quest-theatre-frame').boundingBox().catch(() => null);
+const nodeId = () => page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].getRun()?.nodeId, POI);
+async function entrySequence(tag) { // 14 frame ogni 150 ms finti dall'ingresso della scena
+  const b = await theatre(); if (!b) return;
+  for (let i = 0; i < 14; i++) { await page.screenshot({ path: `${outDir}${tag}-f${String(i).padStart(2, '0')}.png`, clip: { x: b.x, y: b.y, width: b.width, height: b.height } }); await run(150); }
+  await page.screenshot({ path: `${outDir}${tag}-window.png`, clip: { x: b.x - 16, y: b.y - 100, width: b.width + 32, height: Math.min(H - (b.y - 100), b.height + 520) } }).catch(() => {});
+}
+const seen = new Set(); let steps = 0;
+while (steps++ < 600 && seen.size < 6) {
+  const n = await nodeId(); if (!n) break;
+  const ended = await page.evaluate((pid) => window.__idleVillageTestHooks.expedition[pid].getRun()?.ended, POI); if (ended) break;
+  if (!seen.has(n)) { seen.add(n); log.push({ node: n, at: steps }); await entrySequence(`s${seen.size}-${n}`); continue; }
+  if (await page.locator('[data-testid="quest-check-column"]').count()) { if (await page.locator('[data-testid="quest-verdict-card"]').count()) { await run(500); await page.getByTestId('quest-verdict-card').click({ position: { x: 20, y: 10 } }).catch(() => {}); } else if (await page.locator('.da-tira').isVisible().catch(() => false)) await page.locator('.da-tira').click(); await run(1000); continue; }
+  if (await page.getByTestId('quest-window-beat').isVisible().catch(() => false)) { await page.keyboard.press('Enter'); await run(800); continue; }
+  const c = page.locator('[data-testid="quest-window-choice"]:not([disabled])').first();
+  if (await c.isVisible().catch(() => false)) { await c.click(); await run(400); continue; }
+  await page.evaluate(() => window.__idleVillageTestHooks.advanceTicks?.(3)); await run(300);
+}
+fs.writeFileSync(outDir + 'log.json', JSON.stringify(log, null, 1)); console.log(JSON.stringify(log), 'pixiErrorsDuringRunFor', pixiErrors, 'errors', ctx.consoleErrors.length, ctx.consoleErrors.slice(0, 2).map((e) => e.slice(0, 120)));
+await close(ctx);
