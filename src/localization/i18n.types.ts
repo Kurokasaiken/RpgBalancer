@@ -450,6 +450,7 @@ export default interface Resources {
         "quest": "Show quest",
         "questRun": "Start goblin quest",
         "reset": "Reset scene",
+        "resetInitial": "Initial state",
         "settlementLost": "Settlement lost",
         "skin": "Skin: {name}",
         "title": "Director",
