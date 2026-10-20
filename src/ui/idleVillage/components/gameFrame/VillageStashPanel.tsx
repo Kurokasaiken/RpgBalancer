@@ -25,6 +25,9 @@ export interface VillageStashPanelProps {
   left: number;
   top: number;
   widthPx: number;
+  /** Height of the zone the stage solver gives the panel: it never grows past it — the list
+   *  scrolls inside, title and capacity footer stay on screen (R-234: 17 px off-screen at 1280×800). */
+  maxHeightPx?: number;
   zIndex: number;
   onClose: () => void;
 }
@@ -40,7 +43,7 @@ const controlButton: CSSProperties = {
   padding: 0,
 };
 
-export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, left, top, widthPx, zIndex, onClose }) => {
+export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, left, top, widthPx, maxHeightPx, zIndex, onClose }) => {
   const { t } = useTranslation('idleVillage');
   const { panelStyle, handleProps } = useHudPanelDrag();
   const vm = villageStashViewModel(config);
@@ -54,6 +57,9 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
         left,
         top,
         width: widthPx,
+        maxHeight: maxHeightPx,
+        display: 'flex',
+        flexDirection: 'column',
         zIndex: panelStyle.zIndex ?? zIndex,
         pointerEvents: 'auto',
         outline: 'none',
@@ -65,7 +71,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
           shape="panel"
           as="section"
           aria-labelledby={titleId}
-          style={{ display: 'flex', flexDirection: 'column', padding: 'var(--skin-hud-panel-padding)', gap: 'var(--skin-hud-stack-gap)' }}
+          style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: '0 1 auto', padding: 'var(--skin-hud-panel-padding)', gap: 'var(--skin-hud-stack-gap)' }}
         >
           {/* Title row: building name left, X right. Drag handle. */}
           <div {...handleProps} style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', ...handleProps.style }}>
@@ -88,7 +94,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
           </div>
 
           {/* Stock: a plain list — rows never carry controls. */}
-          <div role="list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-stack-gap)' }}>
+          <div role="list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-stack-gap)', minHeight: 0, overflowY: 'auto' }}>
             {vm.rows.map((row) => (
               <div key={row.itemId} role="listitem" style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--skin-hud-inline-gap)', minWidth: 0 }}>
                 <span aria-hidden="true" style={{ color: 'var(--skin-icon-accent)', display: 'inline-flex', alignItems: 'center', paddingTop: 1 }}>

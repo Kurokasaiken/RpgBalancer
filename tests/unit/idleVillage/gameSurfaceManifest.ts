@@ -281,6 +281,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/map/validators/locationDropValidators.ts',
   'src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx',
   'src/ui/idleVillage/pixiSpike/mapFitRuntime.ts',
+  'src/ui/idleVillage/pixiSpike/pixiDestroy.ts',
   'src/ui/idleVillage/pixiSpike/regionOutline.ts',
   'src/ui/idleVillage/pixiSpike/seabedTexture.ts',
   'src/ui/idleVillage/questS1Lab/beatSequencer.ts',
