@@ -982,7 +982,8 @@
       "wonder": "Mostro marino",
       "settlementLost": "Insediamento perduto",
       "merchantMarker": "Marcatore mercante",
-      "levelUp": "Level-up eroe"
+      "levelUp": "Level-up eroe",
+      "resetInitial": "Stato iniziale"
     },
     "roster": {
       "title": "Roster",
