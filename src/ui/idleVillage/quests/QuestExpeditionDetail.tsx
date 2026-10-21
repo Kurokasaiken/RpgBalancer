@@ -55,7 +55,8 @@ import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import type { LabStat } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { residentToQuestMember } from '@/ui/idleVillage/questS1Lab/residentToQuestMember';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
-import { deriveKeyStats, formatExpeditionSpan, type BagStockEntry, type LoadoutDuration } from './questExpedition';
+import { deriveKeyStats, formatExpeditionSpan, expeditionTotalDays, type BagStockEntry, type LoadoutDuration } from './questExpedition';
+import { journeyFasiOf } from './questJourney';
 import { STAT_SHORT } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { getStatIconComponent, lucideStatIcons } from '@/ui/shared/statIconUtils';
 
@@ -227,12 +228,12 @@ const TrayResidentTile: React.FC<{ resident: ResidentState }> = ({ resident }) =
  * WS-3: the offer's frozen facts are shown as immutable stamps, never as
  * editable controls.
  */
-const EngravedSeal: React.FC<{ testId: string; label: string; value: string; delta?: string | null; icon: EngravedIconId; tone?: 'ok' | 'warn' | 'danger' }> = ({ testId, label, value, delta, icon, tone }) => {
+const EngravedSeal: React.FC<{ testId: string; label: string; value: string; delta?: string | null; icon: EngravedIconId; tone?: 'ok' | 'warn' | 'danger'; hint?: string }> = ({ testId, label, value, delta, icon, tone, hint }) => {
   const color = tone === 'ok' ? TONE.ok : tone === 'warn' ? TONE.warn : tone === 'danger' ? TONE.danger : TONE.text;
   return (
     <span
       data-testid={testId}
-      title={`${label}: ${value}`}
+      title={hint ?? `${label}: ${value}`}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 6,
         border: '1px solid color-mix(in srgb, var(--skin-surface-border) 55%, transparent)',
@@ -562,9 +563,24 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
    *  else the objective — never the raw tick span. */
   const dispatchLine = scenario?.offer.dispatch ?? scenario?.offer.objective ?? '';
 
-  /* Duration seal: whole days, `1 day`/`N days` (D-c) — the loadout's
-   *  pace factor is folded in via `estimatedTicks`. */
-  const durationDays = expeditionDuration.estimatedTicks / Math.max(1, DAY_TICKS);
+  /* Duration seal (PLAN-071 T-B2): whole days, `1 day`/`N days` (D-c) — and
+   *  the ROUND TRIP, not the site phase alone: `estimatedDurationTicks` is the
+   *  authored on-site estimate (loadout-scaled), `fasi.travelDays` covers
+   *  out+back. The planner's seal and the run's per-leg journey strip now
+   *  project the same total. */
+  const journeyFasi = journeyFasiOf(poi);
+  const { site: siteDaysWhole, total: durationDays } = expeditionTotalDays(
+    expeditionDuration.estimatedTicks,
+    journeyFasi?.travelDays ?? 0,
+    DAY_TICKS,
+  );
+  const durationHint = journeyFasi
+    ? t('questExpedition.seals.durationBreakdown', {
+        out: journeyFasi.travelDays,
+        site: siteDaysWhole,
+        back: journeyFasi.travelDays,
+      })
+    : undefined;
   const durationDelta = forecastDelta ? Math.round(forecastDelta.days) : 0;
 
   /* PLAN-036: authored key-stat tiers (verbatim, never derived by set
@@ -929,6 +945,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                   testId="quest-expedition-duration"
                   label={t('questExpedition.seals.duration')}
                   value={formatExpeditionSpan(durationDays, t)}
+                  hint={durationHint ? `${t('questExpedition.seals.duration')}: ${formatExpeditionSpan(durationDays, t)} — ${durationHint}` : undefined}
                   delta={durationDelta !== 0 ? `${durationDelta > 0 ? '+' : ''}${durationDelta}d` : null}
                   icon="ico-gust"
                   tone={expeditionDuration.factor < 1 ? 'ok' : expeditionDuration.factor > 1 ? 'warn' : undefined}
@@ -1005,7 +1022,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                   data-hud-controls=""
                   style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', columnGap: 8, rowGap: 4 }}
                 >
-                  <span style={{ ...SECTION_LABEL, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span data-testid="quest-expedition-bag-count" style={{ ...SECTION_LABEL, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
                   </span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, whiteSpace: 'nowrap' }}>
@@ -1306,7 +1323,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                         </span>
                         {m.downtimeDays >= 0.5 && (
                           <span style={{ color: TONE.secondary, whiteSpace: 'nowrap' }}>
-                            {t('questExpedition.members.downtime', { days: m.downtimeDays.toFixed(1) })}
+                            {t('questExpedition.members.downtime', { days: Math.max(1, Math.round(m.downtimeDays)) })}
                           </span>
                         )}
                       </div>
