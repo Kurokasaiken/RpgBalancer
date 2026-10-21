@@ -334,3 +334,119 @@ helper condivisi come `scripts/verification/attestEnv.ts`).
      `env: null` che scorre fino al gate.
   3. In pre-flight su uno script evaluate: grep `page.evaluate(` con
      argomento funzione → convertire a stringa prima di fidarsi.
+
+## T-16 — `z-index` non esce da uno stacking context antenato: gli overlay vanno portaled a `document.body`
+
+**Surface:** overlay/ghost di drag, tooltip, layer "sopra tutto" dentro
+pannelli `fixed`/`absolute` con `z-index` proprio (`/game` Game Frame,
+planner quest, HudPlaque).
+
+- **Cosa succede:** un overlay con `z-index: 10000` viene dipinto **sotto**
+  un pannello a `z-index: 12` perché un antenato dell'overlay ha
+  `position` + `z-index` non-auto → forma uno stacking context e lo
+  z-index locale vale solo al suo interno. Aumentare il valore non serve.
+- **Istanza:** `CustomDragOverlay` (run
+  `.mw/runs/20261018-quest-planner-drag-feedback/`) — ghost del medaglione
+  spariva sotto la colonna Forecast malgrado `z-index: 10000`.
+- **Regola:**
+  1. Diagnosi prima del fix: walk `parentElement` cercando il primo
+     antenato con `position !== static` + `z-index !== auto` —
+     quello è il soffitto, non il valore dell'overlay.
+  2. Fix = `createPortal(..., document.body)`, mai alzare lo z-index.
+  3. Assert unit: l'antenato del nodo overlay deve essere `document.body`.
+
+## T-17 — Dev server Vite serve transform cache stale: il disco è corretto, il modulo servito no
+
+**Surface:** dev server Vite (`localhost:5173`) dopo edit ravvicinati o
+edit concorrenti di altri agenti sullo stesso file (T-13).
+
+- **Cosa succede:** il file su disco contiene la modifica, ma
+  `curl http://localhost:5173/src/<file>` restituisce il modulo
+  **precedente**: route nuove assenti, schemi/default vecchi, boot rotti
+  su file ormai coerenti. La transform cache invalida sul save parziale
+  e non riprende il secondo.
+- **Istanze:** `App.tsx` senza il blocco route `/bezel-variants` nel
+  modulo servito · `gameFrameConfig.ts` stale dopo mid-edit altrui
+  (run `20261018-quest-planner-drag-feedback`). Correlato:
+  `stale-preview-bundle` in observation (variante dist-playwright).
+- **Regola:**
+  1. Prima di diagnosticare "la modifica non ha effetto": `curl` il
+     modulo servito e grep del literal atteso — confrontare modulo
+     servito vs sorgente, non fidarsi del disco.
+  2. Fix = `touch <file>` (o restart dev server); poi ri-testare.
+  3. Mai cercare il bug nel proprio codice quando disco e servito
+     divergono: è cache, non logica.
+
+## T-18 — `cmd | tail` in un manifest/command: l'exit code è quello di tail, non di cmd
+
+**Surface:** `verification.json` obligations, produceBundle, qualsiasi command
+in evidenza che viene valutato dal suo exit code.
+
+- **Cosa succede:** `npm run closure:lint 2>&1 | tail -15` esce 0 anche quando
+  closure:lint esce 1 — la pipeline ritorna l'exit code dell'ULTIMO comando
+  (`tail`, sempre 0). Il command log mostra il FAIL nel testo, il bundle
+  valuta PASS: **falso verde silenzioso**, la classe di bug peggiore per un
+  sistema di evidence.
+- **Istanza:** PLAN-047 run `20261018-plan-047-visual-fork-gate` — primo
+  bundle PASS spurio su OB-6b (closure:lint rosso su visual-fork) per la pipe
+  nel command; scoperto leggendo il command-log a mano.
+- **Regola:**
+  1. In un command valutato per exit code: mai terminare con `| tail`/`| head`
+    /`| grep` nudi — chiudi con `; exit ${PIPESTATUS[0]}` (bash) o `set -o pipefail`.
+  2. In generale: leggi il command-log, non solo il verdetto — il bundle lega
+     l'exit code, il log contiene la verità.
+  3. Se scrivi un produttore di bundle: preferisci ridirigere su file
+     (`> log 2>&1`) invece di pipe — niente mascheramento.
+
+## T-19 — Devin `browser_preview` va registrato sulla ROOT: il proxy path-scoped serve index.html per ogni asset
+
+**Surface:** `browser_preview` / scheda Preview Devin Desktop, visual-fork
+preview, qualsiasi app servita via dev server con asset sub-path (Vite ESM).
+
+- **Cosa succede:** `browser_preview(http://localhost:5173/mia-route)` crea
+  un proxy che inoltra correttamente solo il documento registrato. Le
+  richieste a `/src/*.tsx`, `/@vite/client`, `/assets/*` ricevono la shell
+  `index.html` (`content-type: text/html`) → `<script type="module">` fallisce
+  → **pagina bianca**, anche in headless. Sintomo ingannevole: la pagina
+  renderizza diretta su :5173 ma è bianca nel proxy.
+- **Istanza:** bug `.mw/bugs/20261018-devin-preview-white/` (PLAN-047 dry-run).
+- **Regola:**
+  1. Registra la preview sulla **ROOT del dev server** (`http://localhost:5173`,
+     senza path — come dice anche la doc del tool).
+  2. Per aprire direttamente una sub-route: redirect-stub (mini-server che
+     inoltra tutto all'upstream e risponde `/` con `302 → <route>`); registra
+     la preview sullo stub. Implementazione in
+     `.mw/bugs/20261018-devin-preview-white/preview-redirect.mjs`.
+  3. Verifica: `#root` popolato attraverso il proxy, non solo l'HTTP 200.
+
+## T-20 — `button:has(> svg:only-child)` colpisce anche i pulsanti icona+testo: i nodi testo non contano
+
+**Surface:** qualsiasi `<button>` con icona (`<svg>`/icon component) **e** label testuale
+sotto un selettore `:only-child` — in concreto `skinScope.css`
+(`[data-hud-controls] button:has(> svg:only-child) { width: var(--skin-hud-control-height) }`).
+
+- **Cosa succede:** `:only-child` considera solo i nodi *elemento* — un `#text`
+  non conta. Un pulsante `<EngravedIcon/>{t('label')}` matcha comunque
+  `svg:only-child` → viene forzato a quadrato (es. 26px) mentre il testo,
+  centrato e `nowrap`, straborda simmetricamente sopra i pulsanti vicini.
+  Sintomo: **overlap visivo + hit-region** — `getBoundingClientRect` mostra
+  box adiacenti non sovrapposti (26px+26px) ma i click reali a coordinate del
+  pulsante di sinistra dispatchano sul pulsante di destra (il testo overflow
+  è hittable). `elementsFromPoint` e il hit-test reale di Chrome possono
+  divergere: fidarsi del dispatch reale, non del bounding box.
+- **Istanza:** PLAN-073/R-240 (2026-10-21) — «il pulsante apri warehouse si
+  sovrappone»: `quest-open-stash` e `quest-bag-release-all` erano entrambi
+  26px con testo debordante; click su release-all → retarget a open-stash.
+  Scambiato inizialmente per race col boot overlay (`game-boot-screen`
+  intercettava DAVVERO gli eventi finché `pointer-events` non passa a
+  `none` — doppia trappola sovrapposta).
+- **Regola:**
+  1. Fix a monte preferito: wrappare icona+testo in uno `<span>` dentro il
+     button → `svg` non è più `:only-child`, la pill si dimensiona al contenuto.
+  2. Non progettare selettori `*:only-child` per discriminare "icona sola":
+     in React il testo accanto a un svg è quasi sempre `#text`, invisibile
+     al selettore.
+  3. Debug: prima escludi gli overlay intercettanti (`elementsFromPoint` al
+     punto), poi confronta `getBoundingClientRect` con il **dispatch reale**
+     (listener capture su `document`) — se divergono, è overflow centrato
+     di un elemento vicino, non il tuo handler.

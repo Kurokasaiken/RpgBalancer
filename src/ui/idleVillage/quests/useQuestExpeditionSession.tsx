@@ -48,7 +48,7 @@ import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFligh
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { questResidentEligibility, residentInExpedition } from '@/ui/idleVillage/questS1Lab/questEligibility';
 import { resolveQuestOffer, estimateForPartyAsync, scenarioForQuest, type PartyEstimate, type ResolvedQuestOffer } from '@/ui/idleVillage/questS1Lab/questOffer';
-import { computeForecastDelta, type ForecastDelta } from '@/ui/idleVillage/questS1Lab/questSimulation';
+import { computeForecastDelta, type ForecastDelta, type QuestSimulationChunkTiming } from '@/ui/idleVillage/questS1Lab/questSimulation';
 import { memberReveals, planningHints } from '@/ui/idleVillage/questS1Lab/questCertainty';
 import { QUEST_PLANNER_INFO } from '@/balancing/config/idleVillage/quests/questPlannerInfo';
 import { residentToQuestMember } from '@/ui/idleVillage/questS1Lab/residentToQuestMember';
@@ -64,7 +64,7 @@ import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStas
 import { buildExpeditionParty, loadoutDuration, planSlotSwap, type BagStockEntry } from './questExpedition';
 import type { SlotTokenDragData } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { settleRun, runIdOf } from './questSettlement';
-import { releaseLoadout, reserveLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
+import { emptyStashBag, remainingFor, useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { QuestExpeditionDetail } from './QuestExpeditionDetail';
 
 /** Loadout candidates (PLAN-036, R-195): the bag sells EXACTLY what the
@@ -106,6 +106,8 @@ export interface QuestExpeditionSessionOptions {
   currentTick: number;
   /** Routes an active run to the canonical `QuestRunWindow`. */
   onOpenRun?: (questId: QuestId) => void;
+  /** Opens the village-owned stash from the planner bag control. */
+  onOpenStash: (trigger: HTMLElement) => void;
   /** Where the planning panel first appears (viewport px). */
   detailPosition?: { x: number; y: number };
   /**
@@ -130,6 +132,7 @@ export function useQuestExpeditionSession({
   activeRuns,
   currentTick,
   onOpenRun,
+  onOpenStash,
   detailPosition,
   wrapDetail,
 }: QuestExpeditionSessionOptions) {
@@ -143,9 +146,28 @@ export function useQuestExpeditionSession({
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [resolved, setResolved] = useState<ResolvedQuestOffer | null>(null);
+  const resolvedRef = useRef(resolved);
+  resolvedRef.current = resolved;
   const [resolvePending, setResolvePending] = useState(false);
   const [assignments, setAssignments] = useState<Record<string, string | null>>({});
-  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+  /* PLAN-073: the bag is ledger-derived, never local state — the warehouse
+   *  shelf and every competing planner read the same `bags[poi.id]` slice,
+   *  and draft reservations survive closing the panel by design. */
+  const stashBag = useVillageStashStore((s) => s.bags[poi.id]);
+  const stashBags = useVillageStashStore((s) => s.bags);
+  const stashCommitted = useVillageStashStore((s) => s.committed);
+  const selectedItemIds = useMemo(() => (stashBag ?? emptyStashBag()).filter((id): id is string => Boolean(id)), [stashBag]);
+  /* The picker's stock badge reads the real pool: remaining copies worldwide,
+   *  plus any copy already packed in THIS bag (it is returnable, so it still
+   *  counts as available to its owner). */
+  const expeditionItems = useMemo<BagStockEntry[]>(
+    () =>
+      EXPEDITION_ITEMS.map((entry) => ({
+        ...entry,
+        qty: remainingFor(entry.item.id, stashBags, stashCommitted) + ((stashBag ?? []).includes(entry.item.id) ? 1 : 0),
+      })),
+    [stashBags, stashCommitted, stashBag],
+  );
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   /** R-183: the slot whose token is being dragged onto another slot. */
   const [swapFromSlotId, setSwapFromSlotId] = useState<string | null>(null);
@@ -171,6 +193,25 @@ export function useQuestExpeditionSession({
    *  never does); reverting the party restores an identical sim because
    *  the seed derives from the inputs. */
   const prevEstimateRef = useRef<{ key: string; value: PartyEstimate } | null>(null);
+  /** Last Monte-Carlo compute duration, exposed only through the existing E2E seam. */
+  const forecastRequestIdRef = useRef(0);
+  const forecastTimingRef = useRef<{
+    key: string | null;
+    startedAtMs: number | null;
+    durationMs: number | null;
+    attempts: number;
+    aborted: number;
+    requestId: number;
+    chunks: QuestSimulationChunkTiming[];
+  }>({
+    key: null,
+    startedAtMs: null,
+    durationMs: null,
+    attempts: 0,
+    aborted: 0,
+    requestId: 0,
+    chunks: [],
+  });
   const sendingRef = useRef(false);
   const { state: pageFlight, startFlight, settle: settleFlight } = useDragOutcome();
 
@@ -366,7 +407,7 @@ export function useQuestExpeditionSession({
   }, [assignedIds, flyingResidentId, activeRuns]);
 
   /* ------------------------------------------------------------------ */
-  /* Party + forecast (debounced, chunked, abortable).                    */
+  /* Party + forecast (immediate, chunked, abortable).                    */
   /* ------------------------------------------------------------------ */
   const partyMembers = useMemo<LabMember[]>(() => {
     const members: LabMember[] = [];
@@ -379,24 +420,29 @@ export function useQuestExpeditionSession({
     }
     return members;
   }, [slotBlueprints, assignments, residentsById]);
+  const partyMembersRef = useRef(partyMembers);
+  partyMembersRef.current = partyMembers;
 
   const requiredFilled = useMemo(
     () => controller.slots.filter((s) => s.required).every((s) => s.assignedResidentId),
     [controller.slots],
   );
 
-  /** Stable estimate key: same instance + same ordered party = the sim the
-   *  cache answers; any change recomputes. */
+  /** Stable key over simulation inputs; image URL/object identity changes do
+   *  not restart the same estimate, while stat/HP/trait changes do. */
   const estimateKey = useMemo(
     () =>
       resolved
-        ? `${resolved.instance.instanceId}|${partyMembers.map((m) => `${m.id}:${m.role}`).join(',')}`
+        ? `${resolved.instance.instanceId}|${JSON.stringify(resolved.resolvedOffer)}|${JSON.stringify(
+            partyMembers.map(({ id, name, role, stats, hp, traits }) => [id, name, role, stats, hp, traits ?? []]),
+          )}`
         : null,
     [resolved, partyMembers],
   );
 
   useEffect(() => {
-    if (!isDetailOpen || !resolved || !estimateKey) {
+    const currentResolved = resolvedRef.current;
+    if (!isDetailOpen || !currentResolved || !estimateKey) {
       setEstimate(null);
       prevEstimateRef.current = null;
       return;
@@ -406,29 +452,60 @@ export function useQuestExpeditionSession({
       return;
     }
     const controllerAbort = new AbortController();
-    const timer = window.setTimeout(() => {
-      estimateForPartyAsync(resolved.resolvedOffer, partyMembers, {
-        runs: QUEST_PLANNING.forecastRuns,
-        chunkRuns: QUEST_PLANNING.forecastChunkRuns,
-        signal: controllerAbort.signal,
-      })
-        .then((value) =>
-          setEstimate((prev) => {
-            if (prev && prev.key !== estimateKey && typeof prev.value === 'object') {
-              prevEstimateRef.current = prev;
+    const startedAtMs = performance.now();
+    const previousTiming = forecastTimingRef.current;
+    const requestId = ++forecastRequestIdRef.current;
+    const attempts = previousTiming.key === estimateKey ? previousTiming.attempts + 1 : 1;
+    const aborted = previousTiming.key === estimateKey ? previousTiming.aborted : 0;
+    forecastTimingRef.current = { key: estimateKey, startedAtMs, durationMs: null, attempts, aborted, requestId, chunks: [] };
+    let completed = false;
+    estimateForPartyAsync(currentResolved.resolvedOffer, partyMembersRef.current, {
+      runs: QUEST_PLANNING.forecastRuns,
+      chunkRuns: QUEST_PLANNING.forecastChunkRuns,
+      signal: controllerAbort.signal,
+      onChunkTiming: import.meta.env.MODE === 'playwright'
+        ? (timing) => {
+            if (forecastTimingRef.current.requestId === requestId) {
+              forecastTimingRef.current = {
+                ...forecastTimingRef.current,
+                chunks: [...forecastTimingRef.current.chunks, timing],
+              };
             }
-            return { key: estimateKey, value };
-          }),
-        )
-        .catch(() => {
-          /* Aborted = superseded by a newer estimate; swallow. */
+          }
+        : undefined,
+    })
+      .then((value) => {
+        completed = true;
+        const chunkTimings = forecastTimingRef.current.requestId === requestId ? forecastTimingRef.current.chunks : [];
+        forecastTimingRef.current = {
+          key: estimateKey,
+          startedAtMs,
+          durationMs: performance.now() - startedAtMs,
+          attempts,
+          aborted,
+          requestId,
+          chunks: chunkTimings,
+        };
+        setEstimate((prev) => {
+          if (prev && prev.key !== estimateKey && typeof prev.value === 'object') {
+            prevEstimateRef.current = prev;
+          }
+          return { key: estimateKey, value };
         });
-    }, QUEST_PLANNING.forecastDebounceMs);
+      })
+      .catch(() => {
+        /* Aborted = superseded by a newer estimate; swallow. */
+      });
     return () => {
-      window.clearTimeout(timer);
       controllerAbort.abort();
+      if (!completed && forecastTimingRef.current.requestId === requestId) {
+        forecastTimingRef.current = {
+          ...forecastTimingRef.current,
+          aborted: forecastTimingRef.current.aborted + 1,
+        };
+      }
     };
-  }, [isDetailOpen, resolved, estimateKey, requiredFilled, partyMembers]);
+  }, [isDetailOpen, estimateKey, requiredFilled]);
 
   /** Signed pp shift vs the previous party configuration (S3 T-2) — only
    *  when a real previous sim exists and the current one has landed. */
@@ -475,16 +552,11 @@ export function useQuestExpeditionSession({
   /** LOADOUT duration channel (S3 T-3, desiderata v24 #7): items declaring
    *  `durationMult`/`durationDelta` reshape the run's real pace — the
    *  launch clock AND the estimate chip share this one derivation.
-   *  R-199: the expedition's span is the configured `questWindow.durationDays`
-   *  on the game clock — the phase bar fills over it, and per-node pacing
-   *  (`nodeTicks` ≈ span / expectedPathNodes) makes each frontier feasible
-   *  only when its own slice of that span has passed. */
-  const dayLengthTicks = gameplay.config.globalRules?.dayLengthInTimeUnits ?? 60;
-  const expeditionSpanTicks = Math.max(
-    1,
-    Math.round(DEFAULT_GAME_FRAME_CONFIG.questWindow.durationDays * dayLengthTicks),
-  );
-  const baseNodeTicks = Math.max(1, Math.round(expeditionSpanTicks / poi.expectedPathNodes));
+   *  R-231: `poi.ticksPerNode` and `poi.estimatedDurationTicks` are the
+   *  normative authority (e.g. 10 ticks/node × 11 nodes = 110 ticks ≈ 2m
+   *  for `poi-goblin`, instead of multiplying `durationDays × dayLengthInTimeUnits`). */
+  const baseNodeTicks = poi.ticksPerNode;
+  const expeditionSpanTicks = poi.estimatedDurationTicks;
   const expeditionDuration = useMemo(
     () => loadoutDuration(selectedItemIds, baseNodeTicks, expeditionSpanTicks),
     [selectedItemIds, baseNodeTicks, expeditionSpanTicks],
@@ -522,7 +594,17 @@ export function useQuestExpeditionSession({
           }
         }
         setAssignments(restored);
-        setSelectedItemIds((draft.items ?? []).filter((id) => itemIds.has(id)).slice(0, QUEST_STASH.bagSlots));
+        /* PLAN-073: bag contents are the ledger's, not the draft's — a
+         *  legacy draft's `items` field is a hint applied only when this
+         *  POI owns no reservations yet (and only while availability
+         *  still holds: `assign` re-validates at mutation time). */
+        const stash = useVillageStashStore.getState();
+        if (stash.hydration === 'ready' && !(stash.bags[poi.id] ?? []).some(Boolean)) {
+          (draft.items ?? [])
+            .filter((id) => itemIds.has(id))
+            .slice(0, QUEST_STASH.bagSlots)
+            .forEach((id) => stash.assign(poi.id, id));
+        }
       }
       setDraftReady(true);
     });
@@ -564,7 +646,11 @@ export function useQuestExpeditionSession({
       applyToStore: (plan) => {
         useMinimalGameplayStore.getState().applyQuestSettlement(plan);
       },
-      releaseLoadout,
+      releaseLoadout: (runId) => {
+        /* PLAN-073: terminal transitions free the run's committed slots —
+         *  the copies return to the shared pool (derived availability). */
+        useVillageStashStore.getState().releaseCommit(runId);
+      },
       nowTick: () => useMinimalGameplayStore.getState().state.currentTick,
       questTitle: scenario?.title,
     })
@@ -638,6 +724,18 @@ export function useQuestExpeditionSession({
           launchedAtTick: currentTick,
         })
       : null;
+    /* PLAN-073 commit boundary: the draft bag freezes under the run's
+     *  identity BEFORE the run starts; a launch failure rolls the bag back
+     *  untouched (`rollbackCommit` restores the exact slot layout). */
+    const runId = resolved.instance.instanceId;
+    const stash = useVillageStashStore.getState();
+    if (!stash.commitRun(runId, poi.id)) {
+      /* Ledger not hydrated or degraded — refuse the launch rather than
+       *  start a run whose loadout the shelf never saw. */
+      sendingRef.current = false;
+      return;
+    }
+    try {
     questRun.start({
       party: { members },
       seed,
@@ -648,21 +746,20 @@ export function useQuestExpeditionSession({
       resolvedOffer: resolved.resolvedOffer,
       ...(journey ? { journey } : {}),
     });
+    } catch (error) {
+      stash.rollbackCommit(runId);
+      sendingRef.current = false;
+      throw error;
+    }
     /* R-139: the party is «away» for the village store too — wounds do not
      *  heal while assigned. Released by `applyPlanToState` at settlement. */
     useMinimalGameplayStore.getState().setResidentsOnExpedition(
       members.map((m) => m.id),
       true,
     );
-    /* The bag reservation rides the run's identity (scenarioInstanceId —
-     * the same key `runIdOf` uses at settlement). Fire-and-forget: the
-     * run exists now, and release on terminal transition is guaranteed by
-     * the settlement journal regardless of when this write lands. */
-    void reserveLoadout(resolved.instance.instanceId, selectedItemIds);
     clearDraft();
     setIsDetailOpen(false);
     setAssignments({});
-    setSelectedItemIds([]);
     setEstimate(null);
     onOpenRun?.(poi.questId);
   }, [
@@ -732,7 +829,9 @@ export function useQuestExpeditionSession({
         .filter((id): id is string => Boolean(id))
         .slice(0, QUEST_STASH.bagSlots);
       if (pack.length > 0) {
-        setSelectedItemIds(pack);
+        /* Ledger assign — availability-gated like a real pack (PLAN-073). */
+        const stash = useVillageStashStore.getState();
+        pack.forEach((id) => stash.assign(poi.id, id));
         return;
       }
     }
@@ -983,15 +1082,33 @@ export function useQuestExpeditionSession({
     pendingSwapRef.current = null;
   }, []);
 
-  const toggleItem = useCallback((itemId: string) => {
-    setSelectedItemIds((current) =>
-      current.includes(itemId)
-        ? current.filter((id) => id !== itemId)
-        : current.length < QUEST_STASH.bagSlots
-          ? [...current, itemId]
-          : current,
-    );
-  }, []);
+  /* PLAN-073: the picker's toggle delegates to the ledger — in-bag ⇒ release
+   *  at its slot, out-of-bag ⇒ assign first-free (full bag and stock-out are
+   *  announced rejects, never silent no-ops). */
+  const toggleItem = useCallback(
+    (itemId: string) => {
+      const stash = useVillageStashStore.getState();
+      const slot = (stash.bags[poi.id] ?? []).indexOf(itemId);
+      if (slot >= 0) stash.release(poi.id, slot);
+      else stash.assign(poi.id, itemId);
+    },
+    [poi.id],
+  );
+
+  /* PLAN-073 D-2: per-owner release-all — the bag's «reset party» twin. */
+  const releaseAllItems = useCallback(() => {
+    useVillageStashStore.getState().releaseAll(poi.id);
+  }, [poi.id]);
+
+  /* Binding: opening the shelf from THIS planner claims it for this owner —
+   *  the page opens the panel and restores focus as before. */
+  const handleOpenStash = useCallback(
+    (trigger: HTMLButtonElement) => {
+      useVillageStashStore.getState().bindStash(poi.id);
+      onOpenStash(trigger);
+    },
+    [poi.id, onOpenStash],
+  );
 
   const overlays = (
     <>
@@ -1008,9 +1125,11 @@ export function useQuestExpeditionSession({
           intelHints={intelHints}
           expeditionDuration={expeditionDuration}
           requiredFilled={requiredFilled}
-          items={EXPEDITION_ITEMS}
+          items={expeditionItems}
           selectedItemIds={selectedItemIds}
           onToggleItem={toggleItem}
+          onReleaseAllItems={releaseAllItems}
+          onOpenStash={handleOpenStash}
           canSend={canSend}
           onSend={send}
           onClose={closeDetail}
@@ -1020,13 +1139,6 @@ export function useQuestExpeditionSession({
         />
       )}
       <DragOutcomeFlight state={pageFlight} residentsById={residentsById} onComplete={handlePageFlightComplete} />
-      {draggingResidentId && (
-        <div
-          data-drag-preview="true"
-          data-dnd-overlay="true"
-          style={{ position: 'fixed', top: '50%', left: '50%', zIndex: 9999, transform: 'translate(-50%, -50%)' }}
-        />
-      )}
     </>
   );
 
@@ -1085,6 +1197,8 @@ export function useQuestExpeditionSession({
       /* Serialized estimate — lets a test detect a recomputed forecast
        * without shipping object identity across the evaluate boundary. */
       getEstimateJson: () => JSON.stringify(estimate?.value ?? null),
+      /** Last actual chunked-simulation time, excluding React scheduling. */
+      getForecastTiming: () => forecastTimingRef.current,
       getResolvedOffer: () => resolved?.resolvedOffer ?? null,
       getRun: () => questRun.run,
       getSettlement: () => questRun.run?.settlement ?? null,

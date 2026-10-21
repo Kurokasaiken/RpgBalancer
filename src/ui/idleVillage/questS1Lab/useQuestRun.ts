@@ -39,7 +39,7 @@ import {
 import { emptyPhase, recordAction, snapshotRun, type PhaseRecord } from './questPhaseRecord';
 import type { SettlementMarker } from '@/ui/idleVillage/quests/questSettlement';
 import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
-import { releaseLoadout } from '@/ui/idleVillage/questS1Lab/expeditionLoadout';
+import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { beatMark, projectBeats, type BeatMark, type QuestBeat } from './beatSequencer';
 import { publishQuestRun } from './questRunStore';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
@@ -399,7 +399,11 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
     /* Terminal transition (S2.5): clearing releases the bag reservation on
      * the run's own identity — same key the settlement journal uses. */
     const current = runRef.current;
-    if (current) void releaseLoadout(runIdOf(current));
+    if (current) {
+      /* PLAN-073: terminal transitions free the committed bag on the ledger —
+       *  same run identity the settlement journal uses. */
+      useVillageStashStore.getState().releaseCommit(runIdOf(current));
+    }
     setRun(null);
     setPhases([]);
     setBeats([]);

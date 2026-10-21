@@ -15,9 +15,7 @@ import { warmGameAssets } from '@/ui/idleVillage/utils/gameAssetWarmup';
 import { isSkillCheckWarmEnabled, prewarmQuestSkillCheck } from '@/ui/idleVillage/components/gameFrame/questSkillCheckWarm';
 import { CONSUMED_POIS_KEY, INVASION_KEY, clearGameProgress } from '@/ui/idleVillage/components/gameFrame/questInitialState';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
-import { MatericRosterComponent } from '@/ui/idleVillage/roster';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
-import { useHudMaterial } from '@/ui/idleVillage/components/gameFrame/useHudMaterial';
 import { applySkinCssVariables } from '@/ui/idleVillage/skins/skinCssVariables';
 import { getSkinPresetConfig, type SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { COMPARABLE_SKIN_IDS, resolveInitialSkinPresetId } from '@/ui/idleVillage/skins/resolveInitialSkin';
@@ -28,9 +26,9 @@ import { DEFAULT_COAST_FOAM_CONFIG } from '@/ui/idleVillage/components/WorldSurf
 import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/resolveWorldManifest';
 import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
-import { tickCounterParams } from '@/ui/idleVillage/questS1Lab/questTickCounter';
 import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
+import { questRunTimeLabel } from '@/ui/idleVillage/questS1Lab/questTickCounter';
 import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLostOverlay';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
@@ -58,6 +56,8 @@ import { QuestStageCluster } from '@/ui/idleVillage/components/gameFrame/QuestSt
 import { QuestSkillCheckColumn } from '@/ui/idleVillage/components/gameFrame/QuestSkillCheckColumn';
 import { checkEventOf, isStaleCheckEvent, useCheckBridge } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
+import { readStashDragPayload, readStashDropPayload, routeStashDragEnd } from '@/ui/idleVillage/components/gameFrame/stashDnd';
+import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
 import {
   GameStageProvider,
@@ -195,7 +195,9 @@ export default function GameFramePixiPage() {
   );
   const poi = questPois[0];
   const { t, ready: i18nReady } = useTranslation('idleVillage');
-  const Roster = useHudMaterial() === 'lacquer' ? MatericRosterComponentV2 : MatericRosterComponent;
+  /* PLAN-043 WS-5 D9: V2 (Lacquer Atlas) is the only roster — the V1
+   *  Materic fallback was retired (Director ruling). */
+  const Roster = MatericRosterComponentV2;
   /* R-200 (PLAN-037): «Show quest» is a one-way Director trigger — it jumps
    *  the reveal queue, never hides a POI back. The offers also reveal
    *  themselves: `autoRevealedIds` is the stagger's own memory, one entry per
@@ -220,17 +222,18 @@ export default function GameFramePixiPage() {
   const [wonderRequest, setWonderRequest] = useState(0);
   const [regionHover, setRegionHover] = useState<PixiRegionHover | null>(null);
   const [invasion, setInvasion] = useState<{ dueDay: number; startDay: number } | null>(null);
-  // The march is a function of the game day, and the clock does not hydrate on reload (R-119): a restored invasion
-  // would put a goblin on the map with a position that matches nothing. The page therefore opens with a clean map
-  // (Director, 2026-10-14) and an invasion exists only from the moment it is triggered. The last one is erased on open.
-  const invasionLoadedRef = useRef(true);
+  /* BV-4/R-119 (Director, 2026-10-19, option A): the clock DOES hydrate — `initializeMinimalGameplayStore`
+   * restores `currentDay`/`currentTick` at save-time — so a confirmed invasion is restored on reload: marker
+   * at `(currentDay - startDay)/30` and ledger row present. The announcement theatre (shroud, card, sticker
+   * peel) is transient and is never replayed; a reload mid-sequence resumes post-confirmation. The key is
+   * read only after clock hydration resolves, so the marker mounts at the right position with no jump.
+   * `invasionLoadedRef` gates the save below until that read settles — otherwise the mount render would
+   * write `null` and erase the record before it is read. */
+  const invasionLoadedRef = useRef(false);
   // False only between the player's confirmation and the sticker landing.
   const [goblinLanded, setGoblinLanded] = useState(true);
   // The invasion's ledger row exists from the confirmation but stays hidden until the announcement card has folded into it.
   const [rowArriving, setRowArriving] = useState(false);
-  useEffect(() => {
-    void saveData(INVASION_KEY, null);
-  }, []);
   useEffect(() => {
     if (!invasionLoadedRef.current) return;
     void saveData(INVASION_KEY, invasion);
@@ -302,7 +305,7 @@ export default function GameFramePixiPage() {
    * `interceptToggle` routes every registry call for it (menu, game menu, the
    * `p` shortcut) into `useHeroSheet`; the registry flag only reflects. */
   const heroSheetApiRef = useRef<HeroSheetApi>(null);
-  /* Zone-managed ids (roster/events/villageStash/merchant/questForecast/quest)
+  /* Zone-managed ids (roster/events/villageStash/merchant/quest)
    *  never enter `panels.visible` — `panelsForScreen.visible` below merges the
    *  reducer's derived occupancy over it, so the legacy `visible` surface and
    *  the stage can't drift apart. */
@@ -324,7 +327,22 @@ export default function GameFramePixiPage() {
   });
   // The map never moves for a panel (Director, 2026-10-14): Roster, ledger, quest detail and every other panel the
   // player can move or close may cover the land. Only the fixed chrome reserves space (`baseSafeFit` insets top/bottom).
-  const safeFit = baseSafeFit;
+  const safeFit = useMemo(() => {
+    if (!baseSafeFit) return undefined;
+    /* Map-fit consumes device px, while `baseSafeFit.insets` declares the
+     * chrome bands in HUD layout px. Browser interface-size zoom scales the
+     * fixed chrome by `hudScale.cssZoom` (1 under native Tauri zoom), so the
+     * protected area must reserve the same scaled bands. */
+    const chromeZoom = hudScale.cssZoom;
+    return {
+      ...baseSafeFit,
+      insets: {
+        ...baseSafeFit.insets,
+        top: baseSafeFit.insets.top * chromeZoom,
+        bottom: baseSafeFit.insets.bottom * chromeZoom,
+      },
+    };
+  }, [baseSafeFit, hudScale.cssZoom]);
   useEffect(() => {
     if (!directorEnabled) return undefined;
     const onKey = (event: KeyboardEvent) => {
@@ -374,11 +392,22 @@ export default function GameFramePixiPage() {
     let cancelled = false;
     initializeMinimalGameplayStore()
       .then(() => {
-        if (cancelled) return;
+        if (cancelled) return undefined;
         const gameplay = useMinimalGameplayStore.getState();
         if (gameplay.state.isPaused) gameplay.resumeGame('auto');
+        /* R-119: read the invasion only now — the clock is hydrated, so the
+         * marker mounts directly at the saved march progress, no jump. */
+        return loadData<{ dueDay: number; startDay: number } | null>(INVASION_KEY, null);
       })
-      .catch((err) => console.error('[GameFrame] minimal gameplay init failed:', err));
+      .then((stored) => {
+        if (cancelled || stored === undefined) return;
+        invasionLoadedRef.current = true;
+        if (stored) setInvasion(stored);
+      })
+      .catch((err) => {
+        console.error('[GameFrame] minimal gameplay init failed:', err);
+        invasionLoadedRef.current = true;
+      });
     return () => {
       cancelled = true;
     };
@@ -518,12 +547,20 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     ),
     [],
   );
+  const buildingOpenerRef = useRef<HTMLElement | null>(null);
+  /** Open the canonical Village Stash from the planner and restore focus to its trigger on close. */
+  const openQuestStash = useCallback((trigger: HTMLElement) => {
+    buildingOpenerRef.current = trigger;
+    if (!stage.isOpen('villageStash')) stage.api.open('villageStash');
+    else document.querySelector<HTMLElement>('[data-hud-panel="villageStash"]')?.focus();
+  }, [stage.api, stage.isOpen]);
   const expeditionGoblin = useQuestExpeditionSession({
     poi: poiGoblin!,
     questRun,
     activeRuns,
     currentTick,
     onOpenRun: openRunWindow,
+    onOpenStash: openQuestStash,
     detailPosition: questDetailPosition,
     wrapDetail: wrapQuestDetail,
   });
@@ -533,11 +570,41 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     activeRuns,
     currentTick,
     onOpenRun: openRunWindow,
+    onOpenStash: openQuestStash,
     detailPosition: questDetailPosition,
     wrapDetail: wrapQuestDetail,
   });
   const expeditions = [expeditionGoblin, expeditionRovine];
   const anyExpeditionDetailOpen = expeditions.some((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended));
+  /* PLAN-073 warehouse ledger: hydrate once at page level — the UI gates
+   *  mutations on `hydration === 'ready'` so nothing writes before load. */
+  useEffect(() => {
+    void useVillageStashStore.getState().hydrate();
+  }, []);
+  /* Binding lifecycle (D-1): the planner that opens the shelf claims it
+   *  (session-side `bindStash`); a shelf opened via `v`/menu while exactly
+   *  ONE planner is open auto-binds to it; a shelf with no/ambiguous
+   *  planner stays read-only. The binding dies with the shelf or with its
+   *  planner — a stale owner could mutate the wrong bag. */
+  const openPlannerKey = expeditions
+    .filter((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended))
+    .map((exp) => exp.poi.id)
+    .join(',');
+  const activeStashOwner = useVillageStashStore((s) => s.activeStashOwner);
+  const stashPanelOpen = stage.isOpen('villageStash');
+  useEffect(() => {
+    const stash = useVillageStashStore.getState();
+    const openPlannerIds = openPlannerKey ? openPlannerKey.split(',') : [];
+    if (!stashPanelOpen) {
+      if (stash.activeStashOwner) stash.bindStash(null);
+      return;
+    }
+    if (stash.activeStashOwner && !openPlannerIds.includes(stash.activeStashOwner)) {
+      stash.bindStash(null);
+      return;
+    }
+    if (!stash.activeStashOwner && openPlannerIds.length === 1) stash.bindStash(openPlannerIds[0]);
+  }, [stashPanelOpen, activeStashOwner, openPlannerKey]);
   /* WS-2: the planner is a stage occupant — `isDetailOpen` (which any POI may
    *  flip via a medallion click) is the session truth; the stage mirrors it.
    *  During `run` the detail retires per its runPolicy via REGIME_CHANGED. */
@@ -624,6 +691,12 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
    *  never recomputes the outcome). */
   const [questPill, setQuestPill] = useState<'party' | 'bag' | 'log' | null>(null);
   const [questExpandedStage, setQuestExpandedStage] = useState(false);
+  /* R-239: the window reports its strip state — while minimised the wings
+   *  have no window to dock to (the check column would orphan on the map at
+   *  its last wing geometry), so the check falls back to the centered
+   *  `QuestSkillCheckOverlay` (the bridge stays live — the window is still
+   *  mounted, only collapsed). */
+  const [questMinimised, setQuestMinimised] = useState(false);
   const checkBridge = useCheckBridge(activeQuestId);
   const liveCheckEvent = activeQuestRun.run && checkBridge ? checkEventOf(activeQuestRun.run, checkBridge.check) : null;
   const checkLive = !!liveCheckEvent && !isStaleCheckEvent(liveCheckEvent, activeQuestRun.run);
@@ -634,9 +707,9 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
       stage.state.viewport,
       clusterEnvelope,
       { userCenterX: stage.state.userCenterX, userTopY: stage.state.userTopY },
-      { leftOpen: questPill !== null, rightOpen: checkLive, expanded: questExpandedStage },
+      { leftOpen: questPill !== null && !questMinimised, rightOpen: checkLive && !questMinimised, expanded: questExpandedStage },
     );
-  }, [clusterEnvelope, activeQuestRun.run, panelsForScreen.visible.quest, stage.state.viewport, stage.state.userCenterX, stage.state.userTopY, questPill, checkLive, questExpandedStage]);
+  }, [clusterEnvelope, activeQuestRun.run, panelsForScreen.visible.quest, stage.state.viewport, stage.state.userCenterX, stage.state.userTopY, questPill, checkLive, questExpandedStage, questMinimised]);
 
   const questWindowBounds = useMemo(
     () => {
@@ -689,7 +762,6 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
    *  itself is unstable across renders, so callbacks read it through a ref. */
   const panelsApiRef = useRef(panelsForScreen);
   panelsApiRef.current = panelsForScreen;
-  const buildingOpenerRef = useRef<HTMLElement | null>(null);
   const openVillagePanel = useCallback((panelId: 'villageStash' | 'merchant', trigger: HTMLElement) => {
     buildingOpenerRef.current = trigger;
     const p = panelsApiRef.current;
@@ -710,7 +782,12 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
       (opener && opener.isConnected && !opener.hasAttribute('data-exiting') ? opener : fallback)?.focus();
     });
   }, []);
-  const closeVillageStash = useCallback(() => closeBuildingPanel('villageStash'), [closeBuildingPanel]);
+  const closeVillageStash = useCallback(() => {
+    closeBuildingPanel('villageStash');
+    /* PLAN-073: closing the shelf drops the planner binding — the next
+     *  open re-derives it (planner click or D-1 auto-bind). */
+    useVillageStashStore.getState().bindStash(null);
+  }, [closeBuildingPanel]);
   const closeMerchant = useCallback(() => closeBuildingPanel('merchant'), [closeBuildingPanel]);
 
   /* PLAN-035 (Desiderata v30, artifact r005): the Village view — a full-area
@@ -882,10 +959,11 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     const run = activeQuestRun.run;
     if (run && activePoi) {
       const halo = questHaloProgress(run, activePoi, currentTick);
-      const label = run.ended
-        ? t(run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')
-        : t('gameFrame.questWindow.ticks', tickCounterParams(halo));
-      return { progress: halo.fraction, label };
+      /* R-239: `pieno-in-attesa` (bar full, run not landed) read as
+       *  "110/110 TICKS" — saturated and ambiguous. Days while marching,
+       *  a named awaiting state at saturation, outcome when resolved. */
+      const { key, params } = questRunTimeLabel(halo, run, dayLengthTicks);
+      return { progress: halo.fraction, label: t(key, params) };
     }
     const span = questWindow.durationDays * dayLengthTicks;
     const elapsed = Math.max(0, currentTick - (run?.launchedAtTick ?? 0));
@@ -1147,6 +1225,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           onAbandon={activeQuestRun.abandon}
           onPresentingChange={setQuestPresenting}
           onExpandedStageChange={setQuestExpandedStage}
+          onMinimisedChange={setQuestMinimised}
           armedFlags={activeQuestRun.armedFlags}
           onToggleArmedFlag={activeQuestRun.toggleArmedFlag}
           onClose={() => panelsForScreen.set('quest', false)}
@@ -1282,16 +1361,31 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
               expeditions.forEach((exp) => exp.handleDragStart(event));
               return;
             }
+            /* PLAN-073: stash drags carry their own payloads — they must
+             *  never mark a resident as dragging. */
+            if (readStashDragPayload(event.active.data.current)) return;
             startTransition(() => {
               session.handleDragStart(event);
               expeditions.forEach((exp) => exp.handleDragStart(event));
             });
           }}
           onDragCancel={() => {
-            startTransition(() => {
-              session.setDraggingResidentId(null);
-              expeditions.forEach((exp) => exp.setDraggingResidentId(null));
-            });
+            session.setDraggingResidentId(null);
+            expeditions.forEach((exp) => exp.setDraggingResidentId(null));
+          }}
+          /* PLAN-073 central router (artifact-r003 A2): stash exchanges
+           *  commit through the ledger — shelf→own bag slot assigns/swaps,
+           *  bag→shelf releases, every other combination cancels without
+           *  mutation. Resident/slot-token drags return early and keep
+           *  their existing monitor chain (roster `onDragEnd` prop). */
+          onDragEnd={(event: DragEndEvent) => {
+            const drag = readStashDragPayload(event.active.data.current);
+            if (!drag) return;
+            const drop = readStashDropPayload(event.over?.data.current);
+            const stash = useVillageStashStore.getState();
+            const verdict = routeStashDragEnd(drag, drop, stash.activeStashOwner);
+            if (verdict.action === 'assign') stash.assignToSlot(verdict.poiId, verdict.itemId, verdict.slotIndex);
+            else if (verdict.action === 'release') stash.release(verdict.poiId, verdict.slotIndex);
           }}
         >
           <GameFrameDragCursor />
@@ -1300,7 +1394,6 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
             panels={panelsForScreen}
             stageMode
             devPanels={directorEnabled}
-            skinControl={{ id: skinId, onChange: setSkinId }}
             scaleControl={hudScale}
             hudWakeSignal={hudWakeSignal}
             timeInputLocked={timeFrozen}
@@ -1329,6 +1422,14 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                    * `startTransition` runs its scope synchronously, so the
                    * verdict is still captured in time. */
                   let verdict: RosterDropVerdict;
+                  /* Every drag-start marks every session, but only the owner
+                   * receives drag-end when a verdict stops the chain. Clear all
+                   * of them synchronously before scheduling the drop commit:
+                   * in the transition the roster would keep rendering the
+                   * stale forced overlay at viewport center after release. */
+                  session.setDraggingResidentId(null);
+                  expeditionGoblin.setDraggingResidentId(null);
+                  expeditionRovine.setDraggingResidentId(null);
                   startTransition(() => {
                     verdict =
                       expeditionGoblin.handleDragEnd(event) ??
@@ -1409,6 +1510,12 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                     }}
                   />
                 </div>
+                {/* PLAN-043 WS-5 DEF-06: browser interface-size zoom — the
+                 *  chrome/overlays layer carries the CSS `zoom` factor
+                 *  (`hudScale.cssZoom`, 1 in the desktop app where the native
+                 *  webview zoom covers it). `pointerEvents: none` on the
+                 *  layer itself; every panel root re-arms it explicitly. */}
+                <div data-hud-zoom-layer="" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zoom: hudScale.cssZoom }}>
                 {session.overlays}
                 {expeditionGoblin.overlays}
                 {expeditionRovine.overlays}
@@ -1466,7 +1573,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                       envelope={clusterEnvelope}
                       intent={{ userCenterX: stage.state.userCenterX, userTopY: stage.state.userTopY }}
                       onCommitIntent={(userCenterX, userTopY) => stage.api.stageDrag(userCenterX, userTopY)}
-                      wings={{ leftOpen: questPill !== null, rightOpen: checkLive, expanded: questExpandedStage }}
+                      wings={{ leftOpen: questPill !== null && !questMinimised, rightOpen: checkLive && !questMinimised, expanded: questExpandedStage }}
                       renderWindow={() =>
                         cloneElement(questWindowNode, {
                           inCluster: true,
@@ -1477,7 +1584,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                         })
                       }
                       renderRightWing={
-                        checkLive && checkBridge && activeQuestRun.run
+                        checkLive && checkBridge && activeQuestRun.run && !questMinimised
                           ? () => <QuestSkillCheckColumn bridge={checkBridge} run={activeQuestRun.run} />
                           : undefined
                       }
@@ -1492,7 +1599,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                     only the `skipCheck` fallback — the normal flow paints the
                     check in the cluster's right wing. The outcome toast still
                     portals into `#game-modal-root`. */}
-                <QuestOverlays questId={activeQuestId} onDismissOutcome={activeQuestRun.dismissOutcome} checkInColumn={!!clusterGeometry} />
+                <QuestOverlays questId={activeQuestId} onDismissOutcome={activeQuestRun.dismissOutcome} checkInColumn={!!clusterGeometry && !questMinimised} />
                 {/* R-199 pt.14: the end-of-run report is its own floating
                     plaque OUTSIDE the quest window's DOM — staged reveal,
                     skippable, draggable, non-modal. */}
@@ -1502,6 +1609,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                     scenario={scenarioForQuest(activeQuestId)}
                     widthPx={questWindow.rewardPopup.widthPx}
                     stageMs={questWindow.rewardPopup.stageMs}
+                    edgeInsetPx={questWindow.rewardPopup.edgeInsetPx}
                     onClose={closeReward}
                   />
                 )}
@@ -1561,10 +1669,10 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                 <StagePanelEscape panelId="events" onEscape={() => panelsForScreen.set('events', false)} />
                 <StagePanelEscape panelId="villageStash" onEscape={closeVillageStash} />
                 <StagePanelEscape panelId="merchant" onEscape={closeMerchant} />
-                <StagePanelEscape panelId="questForecast" onEscape={() => stage.api.close('questForecast')} />
                 <StagePanelEscape panelId="questDetail" onEscape={closeAnyExpeditionDetail} />
                 <StageStripsLayer />
                 <StageRejectedToast />
+                </div>
               </>
             }
             renderMap={({ recenterSignal, focusRequest }) => (

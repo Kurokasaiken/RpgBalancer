@@ -20,13 +20,17 @@ import React, { useCallback, useEffect, useMemo, useRef, useState, type CSSPrope
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { useDraggable } from '@dnd-kit/core';
+import { DragOverlay, useDndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import { Maximize2, Minus, Swords, X } from 'lucide-react';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { HudChip, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { useHudPanelDrag } from '@/ui/idleVillage/components/gameFrame/useHudPanelDrag';
+import { getHudZoomFactor } from '@/ui/idleVillage/components/gameFrame/hudScale';
 import { VillageStashItemIcon } from '@/ui/idleVillage/components/gameFrame/villageStashItemIcons';
+import { stashAnnouncement } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
+import { bagItemDragId, bagSlotDropId } from '@/ui/idleVillage/components/gameFrame/stashDnd';
+import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { EngravedIcon, type EngravedIconId } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { useReducedMotion } from '@/ui/idleVillage/hooks/useReducedMotion';
 import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
@@ -85,6 +89,14 @@ const MOTION_CSS = `
 @keyframes qed-hero-scale { from { transform: scale(1.08); } to { transform: scale(1); } }
 @keyframes qed-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes qed-seal-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+`;
+
+/** The frozen rack fades its medal during hold, but the planner flight starts only after extraction completes. */
+const EXTRACTION_VISIBILITY_CSS = `
+[data-testid="quest-expedition-detail"] [data-extracting="true"] [data-testid^="slot-medal-"] {
+  opacity: 1 !important;
+  transform: none !important;
+}
 `;
 
 const SECTION_LABEL: CSSProperties = {
@@ -239,6 +251,95 @@ const EngravedSeal: React.FC<{ testId: string; label: string; value: string; del
   );
 };
 
+/**
+ * A packed bag item: `bag-item:{poi}:{slot}` draggable toward the warehouse
+ * shelf (release) — pointer listeners only. `onKeyDown` is deliberately NOT
+ * spread: Enter/Space must keep native button parity (click ⇒ release,
+ * PLAN-073 A2) instead of arming a keyboard drag.
+ */
+const PackedBagItem: React.FC<{
+  poiId: string;
+  slotIndex: number;
+  entry: BagStockEntry;
+  onRelease: (itemId: string) => void;
+}> = ({ poiId, slotIndex, entry, onRelease }) => {
+  const { t } = useTranslation('idleVillage');
+  const drag = useDraggable({
+    id: bagItemDragId(poiId, slotIndex),
+    data: { kind: 'bag-item', poiId, slotIndex, itemId: entry.item.id },
+  });
+  const { onKeyDown: _kbd, ...pointerListeners } = drag.listeners ?? {};
+  return (
+    <button
+      type="button"
+      ref={drag.setNodeRef}
+      {...pointerListeners}
+      {...drag.attributes}
+      data-testid={`loadout-item-${entry.item.id}`}
+      data-bag-slot-index={slotIndex}
+      aria-label={t('questExpedition.bag.removeSlot', { item: t(stripNs(entry.item.labelKey)) })}
+      onClick={() => onRelease(entry.item.id)}
+      style={{
+        width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        background: 'none', border: 'none', color: 'var(--skin-title-color)', cursor: 'grab', padding: 0,
+        opacity: drag.isDragging ? 0.35 : 1,
+      }}
+    >
+      <VillageStashItemIcon icon={entry.item.icon} size={22} />
+    </button>
+  );
+};
+
+/**
+ * One quest bag slot — `bag-slot:{poi}:{index}` droppable for warehouse
+ * items (assign on empty, atomic swap on occupied). Empty slots keep the
+ * tray-opening affordance; occupied slots release on click.
+ */
+const QuestBagSlot: React.FC<{
+  poiId: string;
+  slotIndex: number;
+  entry: BagStockEntry | undefined;
+  onRelease: (itemId: string) => void;
+  onOpenItems: (trigger: HTMLElement) => void;
+}> = ({ poiId, slotIndex, entry, onRelease, onOpenItems }) => {
+  const { t } = useTranslation('idleVillage');
+  const drop = useDroppable({
+    id: bagSlotDropId(poiId, slotIndex),
+    data: { kind: 'bag-slot', poiId, slotIndex },
+  });
+  return (
+    <span
+      ref={drop.setNodeRef}
+      data-testid={`bag-slot-${slotIndex}`}
+      style={{
+        width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        border: `1px solid color-mix(in srgb, ${drop.isOver ? 'var(--skin-icon-accent)' : 'var(--skin-surface-border)'} ${drop.isOver ? 90 : 60}%, transparent)`,
+        background: drop.isOver
+          ? 'color-mix(in srgb, var(--skin-icon-accent) 18%, transparent)'
+          : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
+      }}
+    >
+      {entry ? (
+        <Tooltip.Root delayDuration={120}>
+          <Tooltip.Trigger asChild>
+            <PackedBagItem poiId={poiId} slotIndex={slotIndex} entry={entry} onRelease={onRelease} />
+          </Tooltip.Trigger>
+          <BagItemTooltip entry={entry} />
+        </Tooltip.Root>
+      ) : (
+        <button
+          type="button"
+          aria-label={t('questExpedition.bag.emptySlot', { index: slotIndex + 1 })}
+          onClick={(e) => onOpenItems(e.currentTarget)}
+          style={{ width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: TONE.secondary, cursor: 'pointer', padding: 0 }}
+        >
+          <EngravedIcon id="ico-pouch" size={16} style={{ opacity: 0.4 }} aria-hidden />
+        </button>
+      )}
+    </span>
+  );
+};
+
 export interface QuestExpeditionDetailProps {
   poi: QuestPoi;
   scenario: QuestScenario | undefined;
@@ -264,6 +365,11 @@ export interface QuestExpeditionDetailProps {
   items: BagStockEntry[];
   selectedItemIds: string[];
   onToggleItem: (itemId: string) => void;
+  /** PLAN-073 D-2: empties this planner's bag back into the shared pool — same
+   *  per-owner affordance as the party reset. Rendered only when provided. */
+  onReleaseAllItems?: () => void;
+  /** Opens the page-owned Village Stash and records this control for focus return. */
+  onOpenStash: (trigger: HTMLButtonElement) => void;
   canSend: boolean;
   onSend: () => void;
   onClose: () => void;
@@ -288,6 +394,8 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   items,
   selectedItemIds,
   onToggleItem,
+  onReleaseAllItems,
+  onOpenStash,
   canSend,
   onSend,
   onClose,
@@ -309,12 +417,23 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
    *  item chip): keep its nearest testid ancestor as a re-query fallback so
    *  focus return still lands inside the same slot (AC-20). */
   const trayReturnHostRef = useRef<string | null>(null);
-  const trayToggleRef = useRef<HTMLButtonElement | null>(null);
-  const companionsToggleRef = useRef<HTMLButtonElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const [bodyOverflows, setBodyOverflows] = useState(false);
   const [hoveredSlotId, setHoveredSlotId] = useState<string | null>(null);
+  /* PLAN-073: bag outcomes for THIS planner announce through its own live
+   *  region — the shelf's region narrates only global (ownerless) events,
+   *  so a mutation is never announced twice. */
+  const lastStashEvent = useVillageStashStore((s) => s.lastEvent);
+  const bagAnnouncement = lastStashEvent && lastStashEvent.poiId === poi.id ? stashAnnouncement(t, lastStashEvent) : null;
+  /* Bag-item drag ghost — `useDndContext` degrades to defaults outside a
+   *  provider (unlike useDndMonitor, which throws standalone). */
+  const { active: dndActive } = useDndContext();
+  const dndActiveData = dndActive?.data.current as { kind?: string; itemId?: string; poiId?: string } | undefined;
+  const draggingBagEntry =
+    dndActiveData?.kind === 'bag-item' && dndActiveData.poiId === poi.id && dndActiveData.itemId
+      ? items.find((e) => e.item.id === dndActiveData.itemId)
+      : undefined;
   const [viewport, setViewport] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
 
   const LAYOUT = QUEST_PLANNER_INFO.layout;
@@ -328,7 +447,13 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
    *  the corridor start — mirror the same arithmetic for the width). The
    *  drag bound below needs this, so it is computed before the hook. */
   const rosterRight = DEFAULT_GAME_FRAME_CONFIG.roster.leftPx + DEFAULT_GAME_FRAME_CONFIG.roster.widthPx;
-  const corridorW = Math.max(0, viewport.w - (EDGE_INSET + 8) - QD.ledgerWidthPx - QD.gapPx - (rosterRight + QD.gapPx));
+  /* PLAN-043 WS-5 DEF-06: inside the CSS-zoomed chrome layer all layout
+   *  math is in chrome units — `viewport` stores device px (resize listener),
+   *  `vpw`/`vph` are the unit-space size everything here is laid out in. */
+  const hudZoom = getHudZoomFactor();
+  const vpw = viewport.w / hudZoom;
+  const vph = viewport.h / hudZoom;
+  const corridorW = Math.max(0, vpw - (EDGE_INSET + 8) - QD.ledgerWidthPx - QD.gapPx - (rosterRight + QD.gapPx));
   const plannerWidth = Math.min(LAYOUT.plannerNaturalWidthPx, Math.max(LAYOUT.plannerMinWidthPx, corridorW));
 
   const anchor = position ?? { x: 120, y: 96 };
@@ -341,7 +466,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
    *  the unit off-screen left) — floor the bound at edgeInset + width so a
    *  feasible placement always exists; wing overlap beats off-viewport. */
   const dragBoundsRight = Math.max(
-    viewport.w - (EDGE_INSET + QD.gapPx) - LAYOUT.forecastWidthPx - QD.gapPx,
+    vpw - (EDGE_INSET + QD.gapPx) - LAYOUT.forecastWidthPx - QD.gapPx,
     EDGE_INSET + plannerWidth,
   );
   const { panelStyle, handleProps } = useHudPanelDrag({
@@ -350,7 +475,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     boundsRightPx: dragBoundsRight,
     /* anchor deps: when the solver re-anchors the unit the committed offset
      *  must re-clamp against the NEW base rect, not the stale one. */
-    reclampDeps: [trayOpen, viewport.w, viewport.h, anchor.x, anchor.y],
+    reclampDeps: [trayOpen, vpw, vph, anchor.x, anchor.y],
   });
 
   useEffect(() => {
@@ -388,13 +513,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     const onPointerDown = (e: PointerEvent) => {
       const target = e.target as Element | null;
       if (!target) return;
-      if (
-        trayRef.current?.contains(target) ||
-        trayToggleRef.current?.contains(target) ||
-        companionsToggleRef.current?.contains(target)
-      ) {
-        return;
-      }
+      if (trayRef.current?.contains(target)) return;
       if (
         target.closest('[data-testid="resident-roster-panel"]') ||
         target.closest('[data-testid="quest-expedition-forecast-column"]') ||
@@ -413,7 +532,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     };
   }, [trayOpen, closeTray]);
 
-  const compact = viewport.h < LAYOUT.minZeroScrollViewportHeightPx;
+  const compact = vph < LAYOUT.minZeroScrollViewportHeightPx;
   /* WITNESS-WS3-02: the hero resize is a DISCRETE one-frame swap (150→56),
    *  never a layout-property animation — `transition` touches opacity and
    *  transform only. */
@@ -554,21 +673,29 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     return slots.find((s) => s.id === hoveredSlotId)?.assignedResidentId ?? null;
   }, [hoveredSlotId, slots]);
 
-  /** Exposure-strip cell under one castone (AC-08/AC-18/AC-21): the TESTA
-   *  tag marks slot 1, the leader crown follows the authored `role:'leader'`
-   *  castone, CODA tracks the last occupied slot, and an empty castone
-   *  shows a bare dash — the profile weight is the member's ordinal in
-   *  marching order. */
+  /** Damage exposure under each castone; positional labels remain available
+   *  to assistive technology while the percentage is the visible indicator. */
   const renderSlotFooter = useCallback(
     (slot: ResidentSlotViewModel, index: number) => {
       const occupied = Boolean(slot.assignedResidentId);
       const ordinal = slots.slice(0, index + 1).filter((s) => s.assignedResidentId).length - 1;
-      const isTesta = index === 0;
+      const isTesta = occupied && ordinal === 0;
       const isCoda = occupied && index === lastOccupiedIndex;
       const isLeader = slot.role === 'leader';
-      const tags: string[] = [];
-      if (isTesta) tags.push(t('questExpedition.marching.testa'));
-      if (isCoda) tags.push(t('questExpedition.marching.coda'));
+      const exposurePct = occupied ? Math.round(exposureWeights[Math.max(0, ordinal)] ?? 0) : null;
+      const positionLabel = isTesta && isCoda
+        ? `${t('questExpedition.marching.testa')} / ${t('questExpedition.marching.coda')}`
+        : isTesta
+          ? t('questExpedition.marching.testa')
+          : isCoda
+            ? t('questExpedition.marching.coda')
+            : undefined;
+      const exposurePosition = positionLabel ?? t('questExpedition.marching.slot', { index: index + 1 });
+      const exposureLabel = exposurePct === null
+        ? undefined
+        : exposurePct === 0
+          ? t('questExpedition.marching.exposureNone', { position: exposurePosition })
+          : t('questExpedition.marching.exposurePercent', { position: exposurePosition, pct: exposurePct });
       return (
         <div
           data-testid={`exposure-cell-${index}`}
@@ -579,26 +706,21 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
               <EngravedIcon id="role-leader" size={11} aria-hidden />
             </span>
           )}
-          {tags.length > 0 && (
-            <span style={{ display: 'inline-flex', gap: 3 }}>
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  data-testid={`exposure-tag-${index}`}
-                  style={{
-                    fontFamily: FONT.display, fontSize: 8, letterSpacing: '0.12em',
-                    color: isCoda && !isTesta ? TONE.danger : TONE.secondary,
-                    border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)',
-                    borderRadius: 3, padding: '0 3px',
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </span>
-          )}
-          <span style={{ fontFamily: FONT.display, fontSize: 9, color: TONE.secondary }}>
-            {occupied ? `${Math.round(exposureWeights[Math.max(0, ordinal)] ?? 0)}%` : '—'}
+          <span
+            data-testid={`exposure-risk-${index}`}
+            data-risk-position={isTesta && isCoda ? 'both' : isTesta ? 'testa' : isCoda ? 'coda' : occupied ? 'middle' : 'empty'}
+            aria-label={exposureLabel}
+            title={exposureLabel}
+            style={{
+              fontFamily: FONT.display,
+              fontSize: 'var(--skin-hud-caps-size)',
+              fontWeight: 'var(--skin-hud-caps-weight)',
+              letterSpacing: 'var(--skin-hud-caps-tracking)',
+              fontVariantNumeric: 'tabular-nums',
+              color: TONE.secondary,
+            }}
+          >
+            {exposurePct === null ? '—' : `${exposurePct}%`}
           </span>
         </div>
       );
@@ -614,6 +736,14 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     pointerEvents: 'auto',
     ...panelStyle,
     zIndex: panelStyle.zIndex ?? panelZ,
+  };
+
+  const minimisedWidth = Math.min(plannerWidth, Math.max(0, vpw - EDGE_INSET * 2));
+  const minimisedShell: CSSProperties = {
+    ...shell,
+    left: (vpw - minimisedWidth) / 2,
+    width: minimisedWidth,
+    transform: 'none',
   };
 
   const plaqueStyle: CSSProperties = {
@@ -643,20 +773,32 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   if (minimised) {
     return (
       <SkinScope>
-        <div ref={shellRef} data-hud-panel={panelId} style={shell}>
+        <div ref={shellRef} data-hud-panel={panelId} style={minimisedShell}>
           <HudPlaque
             shape="hang"
             as="section"
             aria-label={title}
             data-testid={`floating-panel-${panelId}`}
-            style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', padding: 'var(--skin-hud-panel-padding)' }}
           >
-            <div {...handleProps} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              {...handleProps}
+              style={{ ...handleProps.style, width: '100%', minWidth: 0, display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)' }}
+            >
               <Swords aria-hidden style={{ width: 18, height: 18, color: TONE.accent }} />
-              <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
+              <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: FONT.display, fontSize: 'var(--skin-hud-name-size)', fontWeight: 'var(--skin-hud-name-weight)', letterSpacing: 'var(--skin-hud-name-tracking)', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
                 {title}
               </span>
-              <span data-hud-controls="" style={{ display: 'inline-flex' }}>
+              <span data-hud-controls="" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', flexShrink: 0 }}>
+                <button
+                  type="button"
+                  data-testid={`floating-panel-close-${panelId}`}
+                  aria-label={t('floatingPanel.close')}
+                  title={t('floatingPanel.close')}
+                  onClick={onClose}
+                >
+                  <X aria-hidden />
+                </button>
                 <button
                   type="button"
                   data-testid={`floating-panel-minimize-${panelId}`}
@@ -677,7 +819,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   return (
     <PlannerBoundaryContext.Provider value={shellRef}>
     <SkinScope>
-      {!reducedMotion && <style>{MOTION_CSS}</style>}
+      <style>{`${reducedMotion ? '' : MOTION_CSS}${EXTRACTION_VISIBILITY_CSS}`}</style>
       {/* ── CENTER STAGE · the planner unit (draggable; the shared drag
            grammar persists only the user's anchor offset) ────────────── */}
       <div ref={shellRef} data-hud-panel={panelId} style={shell}>
@@ -819,7 +961,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
               style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', scrollbarGutter: 'stable', display: 'flex', flexDirection: 'column', gap: 10 }}
             >
               {/* MARCHING ORDER — TESTA→CODA rack (64px castones) with the
-               *  static exposure strip under each slot. When the CTA is
+               *  damage-exposure percentage under each occupied slot. When the CTA is
                *  gated by a missing required member this zone carries the
                *  contract's subtle pulse (killed under reduced motion). */}
               <section
@@ -829,20 +971,12 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                   <span style={SECTION_LABEL}>{t('questExpedition.marching.title')}</span>
-                  <button
-                    ref={companionsToggleRef}
-                    type="button"
-                    data-testid="quest-tray-companions-toggle"
-                    aria-expanded={trayOpen && trayMode === 'residents'}
-                    aria-pressed={trayOpen && trayMode === 'residents'}
-                    title={t('questExpedition.tray.modeResidents')}
-                    onClick={(e) =>
-                      trayOpen && trayMode === 'residents' ? closeTray() : openTray('residents', e.currentTarget)
-                    }
-                    style={{ ...SECTION_LABEL, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)', borderRadius: 4, padding: '1px 8px', cursor: 'pointer', background: 'none' }}
+                  <span
+                    data-testid="exposure-legend"
+                    style={{ minWidth: 0, fontFamily: FONT.serif, fontSize: 'var(--skin-hud-caps-size)', color: TONE.secondary }}
                   >
-                    {t('questExpedition.tray.modeResidents')}
-                  </button>
+                    {t('questExpedition.marching.exposureLegend')}
+                  </span>
                 </div>
                 <ResidentSlotRack
                   slots={slots}
@@ -861,14 +995,55 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                 />
               </section>
 
-              {/* LOADOUT — bag slots + coverage marks + tray toggle. */}
+              {/* LOADOUT — bag slots + coverage marks + Village Stash action.
+               *  PLAN-073: the header is an explicit grid, not a wrapping flex
+               *  row — label/actions on row 1, coverage on row 2 — so the
+               *  «open warehouse» button can never overlap the count label
+               *  under locale expansion (PLAN-068 overlap at 1280/1440). */}
               <section data-testid="quest-expedition-loadout" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={SECTION_LABEL}>
+                <div
+                  data-hud-controls=""
+                  style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', columnGap: 8, rowGap: 4 }}
+                >
+                  <span style={{ ...SECTION_LABEL, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
                   </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                    {onReleaseAllItems && selectedItemIds.length > 0 && (
+                      <button
+                        type="button"
+                        data-testid="quest-bag-release-all"
+                        aria-label={t('questExpedition.bag.releaseAll')}
+                        title={t('questExpedition.bag.releaseAll')}
+                        onClick={onReleaseAllItems}
+                        style={{ ...SECTION_LABEL, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)', borderRadius: 4, padding: '1px 8px', cursor: 'pointer', background: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                      >
+                        {/* PLAN-073/R-240: icon+label wrapped in a span — a bare svg
+                         *  counts as `:only-child` (text nodes don't), and the
+                         *  hud-controls CSS would pin the button to a 26px square
+                         *  with the label overflowing onto the sibling pill. */}
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <EngravedIcon id="cmd-close" size={12} aria-hidden />
+                          {t('questExpedition.bag.releaseAll')}
+                        </span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      data-testid="quest-open-stash"
+                      aria-label={t('gameFrame.village.openStash')}
+                      title={t('gameFrame.village.openStash')}
+                      onClick={(event) => onOpenStash(event.currentTarget)}
+                      style={{ ...SECTION_LABEL, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)', borderRadius: 4, padding: '1px 8px', cursor: 'pointer', background: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                    >
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <EngravedIcon id="ico-pouch" size={12} aria-hidden />
+                        {t('gameFrame.village.openStash')}
+                      </span>
+                    </button>
+                  </span>
                   {!compact && (scenario?.primaryStats?.length ?? 0) > 0 && (
-                    <span data-testid="loadout-coverage" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span data-testid="loadout-coverage" style={{ gridColumn: '1 / -1', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       <span style={{ ...SECTION_LABEL, fontSize: 10 }}>{t('questExpedition.coverage')}</span>
                       {scenario!.primaryStats!.map((s) => {
                         const covered = bagCoveredStats.includes(s);
@@ -886,62 +1061,26 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                       })}
                     </span>
                   )}
-                  <button
-                    ref={trayToggleRef}
-                    type="button"
-                    data-testid="quest-tray-toggle"
-                    aria-expanded={trayOpen && trayMode === 'items'}
-                    aria-pressed={trayOpen && trayMode === 'items'}
-                    title={t('questExpedition.bag.openPicker')}
-                    onClick={() =>
-                      trayOpen && trayMode === 'items' ? closeTray() : openTray('items', trayToggleRef.current)
-                    }
-                    style={{ ...SECTION_LABEL, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)', borderRadius: 4, padding: '1px 8px', cursor: 'pointer', background: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                  >
-                    <EngravedIcon id="ico-pouch" size={12} aria-hidden />
-                    {t('questExpedition.tray.open')}
-                  </button>
                 </div>
                 <div data-hud-controls="" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   {Array.from({ length: QUEST_STASH.bagSlots }, (_, i) => {
                     const id = selectedItemIds[i];
                     const entry = id ? items.find((e) => e.item.id === id) : undefined;
-                    const slotChrome: CSSProperties = {
-                      width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
-                      background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
-                    };
                     return (
-                      <span key={i} data-testid={`bag-slot-${i}`} style={slotChrome}>
-                        {entry ? (
-                          <Tooltip.Root delayDuration={120}>
-                            <Tooltip.Trigger asChild>
-                              <button
-                                type="button"
-                                data-testid={`loadout-item-${entry.item.id}`}
-                                aria-label={t('questExpedition.bag.removeSlot', { item: t(stripNs(entry.item.labelKey)) })}
-                                onClick={() => onToggleItem(entry.item.id)}
-                                style={{ width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: 'var(--skin-title-color)', cursor: 'pointer', padding: 0 }}
-                              >
-                                <VillageStashItemIcon icon={entry.item.icon} size={22} />
-                              </button>
-                            </Tooltip.Trigger>
-                            <BagItemTooltip entry={entry} />
-                          </Tooltip.Root>
-                        ) : (
-                          <button
-                            type="button"
-                            aria-label={t('questExpedition.bag.emptySlot', { index: i + 1 })}
-                            onClick={(e) => openTray('items', e.currentTarget)}
-                            style={{ width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', color: TONE.secondary, cursor: 'pointer', padding: 0 }}
-                          >
-                            <EngravedIcon id="ico-pouch" size={16} style={{ opacity: 0.4 }} aria-hidden />
-                          </button>
-                        )}
-                      </span>
+                      <QuestBagSlot
+                        key={i}
+                        poiId={poi.id}
+                        slotIndex={i}
+                        entry={entry}
+                        onRelease={onToggleItem}
+                        onOpenItems={(trigger) => openTray('items', trigger)}
+                      />
                     );
                   })}
                 </div>
+                <span aria-live="polite" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>
+                  {bagAnnouncement}
+                </span>
               </section>
 
               {/* SELECTION TRAY — on-demand ~88px strip, residents|items. */}
@@ -1256,6 +1395,28 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           )}
         </div>
       </HudPlaque>
+      {/* PLAN-073: bag-item drag ghost — a fixed portal ghost (DragOverlay
+       *  portals to body, T-16) so the icon never clips under the wings. */}
+      <DragOverlay dropAnimation={null}>
+        {draggingBagEntry ? (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 40,
+              height: 40,
+              borderRadius: 8,
+              border: '1px solid var(--skin-icon-accent)',
+              background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 88%, transparent)',
+              color: 'var(--skin-title-color)',
+              pointerEvents: 'none',
+            }}
+          >
+            <VillageStashItemIcon icon={draggingBagEntry.item.icon} size={22} />
+          </span>
+        ) : null}
+      </DragOverlay>
     </SkinScope>
     </PlannerBoundaryContext.Provider>
   );
