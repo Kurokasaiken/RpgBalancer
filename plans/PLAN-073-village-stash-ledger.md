@@ -1,8 +1,9 @@
 # PLAN-073: Village Stash ledger — warehouse interattivo ↔ bisaccia quest (R-240)
 
-**Status:** `open` — implementato e committato `bc63a70e` (2026-10-21); follow-up test:
-fix `dragActions.settleDelay` + locator/testid spec in worktree. D-1/D-2 risolti per default
-(auto-bind con 1 planner aperto; release-all per-owner). In attesa di verify:bundle.
+**Status:** `open` — implementato e committato `bc63a70e` + `5c9080ce` (2026-10-21).
+D-1/D-2 risolti per default (auto-bind con 1 planner aperto; release-all per-owner).
+**verify:bundle** eseguito — `bundle: .mw/runs/r240-village-stash-ledger/bundle.json`
+(verdict BLOCKED solo su governance condivisa, vedi §Safeguards).
 **Richiesta:** `R-240` (2026-10-21). Assorbe R-239(e) «toggle BAG che si sovrappone a OPEN WAREHOUSE»
 e il fork F-ST-1 di PLAN-068 (magazzino mock → registro vero), risolto in direzione «ledger reale».
 **Artifact dibattito:** `mind-weaver/.mw/runs/20261021-warehouse-bag/artifact-r003.md` —
@@ -218,6 +219,16 @@ sintomo «il click non fa nulla».
   porta 5179 a metà suite (~test 127) → ~40 fail `ERR_CONNECTION_REFUSED` a cascata,
   poi rieseguiti verdi su preview parallela :5181 (`playwright.pw5181.config.ts`,
   rimossa dopo il run).
+- **verify:bundle** (2026-10-21, `.mw/runs/r240-village-stash-ledger/`): **verdict BLOCKED**.
+  PASS: OB-1..OB-5 (ledger, dnd router, panel, bag, **Playwright 11/11**), OB-6a lint,
+  OB-6b build:check+index-sync, OB-7 i18n (zero missing `stash.*`), OB-9 doc.
+  FAIL bloccanti **solo governance condivisa** (identici a R-241): OB-6c contracts:check
+  (source_ref post-BASE R-234/R-238/R-239/R-241 in attesa di proposta sha256 Director;
+  file unmappati `.mw/review`, mood/creature assets; trusted-lock su `produceBundle.ts`
+  + `pgcard_trusted.md` — nessuna istanza PLAN-073), OB-6d closure:lint (visual-fork
+  gate su file PLAN-071/R-239/R-241 non committati). FAIL non-bloccante OB-8 (suite
+  unitaria intera, OOM/700 fail sul diff PLAN-071 condiviso — T-13). NOT_RUN OB-10
+  (eye-check Director, gate umano).
 
 ### Note di scope/commit
 
