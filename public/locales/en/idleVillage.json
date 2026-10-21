@@ -193,6 +193,24 @@
       "runicV3": "Runic V3",
       "runicV1": "Runic V1",
       "runicV5": "Runic V5"
+    },
+    "fork": {
+      "title": "Sigillo fork — B4-map",
+      "subtitle": "Baseline vs candidates on the painted surface at use size (55 px): silhouette, rim/halo, field, reveal. Toggle grayscale to judge value separation.",
+      "grayscale": "Grayscale",
+      "replay": "Replay reveal",
+      "candidates": {
+        "baseline": "Baseline",
+        "metals": "A · Family metals",
+        "field": "B · Field + border",
+        "shape": "C · Silhouette halo"
+      },
+      "captions": {
+        "baseline": "Brass rim, teal field, round halo — production today",
+        "metals": "Rim = family: brass / iron / copper",
+        "field": "Warm field, muted bone inner border",
+        "shape": "Countdown on the silhouette edge"
+      }
     }
   },
   "presentation": {
@@ -1023,8 +1041,7 @@
         "questDetail": "Quest planner",
         "heroSheet": "Character sheet",
         "villageStash": "Village stash",
-        "merchant": "Merchant",
-        "questForecast": "Expedition forecast"
+        "merchant": "Merchant"
       },
       "pin": "Pin panel",
       "unpin": "Unpin panel"
@@ -1036,7 +1053,21 @@
     "stash": {
       "title": "Village stash",
       "capacity": "{count} of {max} goods in store",
-      "qty": "{qty} in store"
+      "qty": "{qty} in store",
+      "openHint": "Open a quest planner to pack items into its bag",
+      "notReady": "Store unavailable — ledger could not load",
+      "elsewhere": "{count} packed or committed elsewhere",
+      "empty": "The shelf is empty — every copy is packed or away",
+      "addToBag": "Pack {item} into the expedition bag",
+      "bagFull": "The expedition bag is full",
+      "unavailable": "No copies left in the store",
+      "alreadyInBag": "Already packed in the bag",
+      "announce": {
+        "assigned": "{item} packed into the bag",
+        "released": "{item} returned to the store",
+        "swapped": "{item} packed — the displaced item returned to the store",
+        "releasedAll": "Bag emptied — every item returned to the store"
+      }
     },
     "buildings": {
       "stash": {
@@ -1102,14 +1133,9 @@
       "minimise": "Minimise",
       "restore": "Reopen",
       "waiting": "A decision is waiting",
+      "checkInProgress": "The check is resolving — finish it first",
       "phaseLocked": "The phase is still on the road — its choices unlock when its time comes.",
       "bagEmpty": "Bag is empty",
-      "bagStrip": {
-        "label": "Packed bag",
-        "chipName": "{label} ({qualifier})",
-        "armed": "armed",
-        "held": "carried"
-      },
       "belt": {
         "armed": "armed for the next check",
         "shadowed": "covered by another armed item",
@@ -1127,6 +1153,8 @@
       "inProgress": "Phase in progress",
       "nextPhase": "Next phase",
       "day": "Day {day} of {total}",
+      "dayEstimate": "Day {day} of ~{total}",
+      "awaiting": "Awaiting orders",
       "returned": "Back home",
       "noneReturned": "Nobody came back",
       "phaseOf": "Phase {n} of {total}",
@@ -1158,6 +1186,7 @@
         "titleSuffix": "skill check",
         "dismiss": "Dismiss",
         "dismissHint": "Click anywhere to continue — the details stay in the log.",
+        "scoreVs": "{score} vs {difficulty}",
         "scoreTitle": "Skill {score} vs difficulty {difficulty}"
       },
       "outcomeToast": {
@@ -1870,7 +1899,8 @@
       "covers": "Covers:",
       "stock": "In store: ×{qty}",
       "emptySlot": "Empty bag slot {index}",
-      "removeSlot": "Remove {item}"
+      "removeSlot": "Remove {item}",
+      "releaseAll": "Empty bag"
     },
     "keyStats": {
       "title": "Key stats",
@@ -1893,6 +1923,10 @@
       "testa": "TESTA",
       "coda": "CODA",
       "exposure": "Exposure",
+      "exposureLegend": "Share of incoming impacts assigned by position.",
+      "exposurePercent": "{position}: {pct}% of incoming impacts.",
+      "exposureNone": "{position}: absorbs no incoming impacts.",
+      "slot": "Slot {index}",
       "leader": "Leader"
     },
     "seals": {

@@ -43,11 +43,19 @@ export function resolveStashItemDescKey(itemId: string): string {
  * Derives the panel rows from the validated stash config: item identity comes
  * from the canonical `questItems` catalog (config `superRefine` already proved
  * every `itemId` is an offerable consumable).
+ *
+ * `reserved` is the reservation ledger's itemId → reserved-copies map
+ * (PLAN-073): each row shows the *remaining* stock (`qty − reserved`) and a
+ * fully-reserved row leaves the shelf until its copies come back. With no
+ * ledger attached the model degrades to the plain configured shelf.
  */
-export function villageStashViewModel(config: VillageStashConfig): VillageStashViewModel {
-  const rows = config.items.map(({ itemId, qty }) => {
-    const item = defaultQuestItems[itemId];
-    return { itemId, icon: item?.icon, nameKey: item?.labelKey ?? itemId, descKey: resolveStashItemDescKey(itemId), qty };
-  });
+export function villageStashViewModel(config: VillageStashConfig, reserved?: ReadonlyMap<string, number>): VillageStashViewModel {
+  const rows = config.items
+    .map(({ itemId, qty }) => {
+      const item = defaultQuestItems[itemId];
+      const remaining = qty - (reserved?.get(itemId) ?? 0);
+      return { itemId, icon: item?.icon, nameKey: item?.labelKey ?? itemId, descKey: resolveStashItemDescKey(itemId), qty: Math.max(0, remaining) };
+    })
+    .filter((row) => row.qty > 0);
   return { rows, storedCount: rows.reduce((sum, row) => sum + row.qty, 0), capacityMax: config.capacityMax };
 }
