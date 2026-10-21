@@ -377,6 +377,24 @@
       "runicV3": "Runica V3",
       "runicV1": "Runica V1",
       "runicV5": "Runica V5"
+    },
+    "fork": {
+      "title": "Fork Sigillo — B4-map",
+      "subtitle": "Baseline vs candidate sulla mappa dipinta a taglia d'uso (55 px): silhouette, bordo/halo, campo, comparsa. Scala di grigi per giudicare la separazione di valore.",
+      "grayscale": "Scala di grigi",
+      "replay": "Rivedi comparsa",
+      "candidates": {
+        "baseline": "Baseline",
+        "metals": "A · Metalli per famiglia",
+        "field": "B · Campo + bordo",
+        "shape": "C · Halo a sagoma"
+      },
+      "captions": {
+        "baseline": "Bordo ottone, campo teal, halo tondo — produzione oggi",
+        "metals": "Bordo = famiglia: ottone / ferro / rame",
+        "field": "Campo caldo, bordo interno osso attenuato",
+        "shape": "Countdown sul bordo della sagoma"
+      }
     }
   },
   "questChronicle": {
@@ -1029,8 +1047,7 @@
         "questDetail": "Pianificazione quest",
         "heroSheet": "Scheda personaggio",
         "villageStash": "Magazzino",
-        "merchant": "Mercante",
-        "questForecast": "Previsione spedizione"
+        "merchant": "Mercante"
       },
       "pin": "Fissa pannello",
       "unpin": "Sblocca pannello"
@@ -1042,7 +1059,21 @@
     "stash": {
       "title": "Magazzino del villaggio",
       "capacity": "{count} di {max} beni in deposito",
-      "qty": "{qty} in deposito"
+      "qty": "{qty} in deposito",
+      "openHint": "Apri il planner di una quest per preparare gli oggetti nella sacca",
+      "notReady": "Magazzino non disponibile — il registro non si è caricato",
+      "elsewhere": "{count} in sacca o in missione altrove",
+      "empty": "Lo scaffale è vuoto — ogni copia è in sacca o in viaggio",
+      "addToBag": "Metti {item} nella sacca della spedizione",
+      "bagFull": "La sacca della spedizione è piena",
+      "unavailable": "Nessuna copia rimasta in magazzino",
+      "alreadyInBag": "Già nella sacca",
+      "announce": {
+        "assigned": "{item} nella sacca",
+        "released": "{item} tornato in magazzino",
+        "swapped": "{item} nella sacca — l’oggetto spostato è tornato in magazzino",
+        "releasedAll": "Sacca svuotata — ogni oggetto è tornato in magazzino"
+      }
     },
     "buildings": {
       "stash": {
@@ -1108,14 +1139,9 @@
       "minimise": "Riduci a icona",
       "restore": "Riapri",
       "waiting": "Decisione in attesa",
+      "checkInProgress": "La prova è in corso — concludila prima di chiudere",
       "phaseLocked": "La fase è ancora in cammino — le sue scelte si aprono quando arriva il suo momento.",
       "bagEmpty": "Sacca vuota",
-      "bagStrip": {
-        "label": "Borsa preparata",
-        "chipName": "{label} ({qualifier})",
-        "armed": "armato",
-        "held": "portato"
-      },
       "belt": {
         "armed": "armato per la prossima prova",
         "shadowed": "coperto da un altro oggetto armato",
@@ -1133,6 +1159,8 @@
       "inProgress": "Fase in corso",
       "nextPhase": "Prossima fase",
       "day": "Giorno {day} di {total}",
+      "dayEstimate": "Giorno {day} di ~{total}",
+      "awaiting": "In attesa di ordini",
       "returned": "Rientrati",
       "noneReturned": "Nessuno è tornato",
       "phaseOf": "Fase {n} di {total}",
@@ -1164,6 +1192,7 @@
         "titleSuffix": "prova di abilità",
         "dismiss": "Chiudi",
         "dismissHint": "Clicca ovunque per continuare — i dettagli restano nel log.",
+        "scoreVs": "{score} contro {difficulty}",
         "scoreTitle": "Abilità {score} contro difficoltà {difficulty}"
       },
       "outcomeToast": {
@@ -1891,7 +1920,8 @@
       "covers": "Copre:",
       "stock": "In magazzino: ×{qty}",
       "emptySlot": "Slot bisaccia vuoto {index}",
-      "removeSlot": "Rimuovi {item}"
+      "removeSlot": "Rimuovi {item}",
+      "releaseAll": "Svuota sacca"
     },
     "keyStats": {
       "title": "Stat chiave",
@@ -1914,6 +1944,10 @@
       "testa": "TESTA",
       "coda": "CODA",
       "exposure": "Esposizione",
+      "exposureLegend": "Quota di impatti in arrivo assegnata dalla posizione.",
+      "exposurePercent": "{position}: {pct}% degli impatti in arrivo.",
+      "exposureNone": "{position}: non assorbe impatti in arrivo.",
+      "slot": "Slot {index}",
       "leader": "Capo"
     },
     "seals": {

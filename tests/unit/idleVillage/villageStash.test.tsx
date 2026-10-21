@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { VILLAGE_STASH_CONFIG, villageStashSchema } from '@/balancing/config/idleVillage/villageStashConfig';
@@ -7,6 +7,28 @@ import { HUD_PANELS } from '@/ui/idleVillage/components/gameFrame/hudPanelRegist
 import { resolveStashItemDescKey, villageStashViewModel } from '@/ui/idleVillage/components/gameFrame/villageStashViewModel';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { MapBuildingPoi } from '@/ui/idleVillage/components/gameFrame/MapBuildingPoi';
+import { useVillageStashStore, type VillageStashState } from '@/ui/idleVillage/store/useVillageStashStore';
+import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
+import { DndContext } from '@dnd-kit/core';
+
+vi.mock('@/shared/persistence/PersistenceService', () => ({
+  loadData: vi.fn(async (_key: string, fallback: unknown) => fallback),
+  saveData: vi.fn(async () => undefined),
+  clearData: vi.fn(async () => undefined),
+}));
+
+/* The panel is ledger-driven (PLAN-073): tests set the store directly —
+ *  `hydration: 'ready'` is the only state that enables interactions. */
+const setLedger = (patch: Partial<VillageStashState>) =>
+  useVillageStashStore.setState({
+    hydration: 'ready',
+    bags: {},
+    committed: {},
+    activeStashOwner: null,
+    lastEvent: null,
+    ...patch,
+  });
+beforeEach(() => setLedger({ hydration: 'pending' }));
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -112,6 +134,69 @@ describe('VillageStashPanel', () => {
     renderPanel();
     const panel = screen.getByRole('region', { name: 'gameFrame.stash.title' });
     expect(panel).toBeInTheDocument();
+  });
+});
+
+/* PLAN-073 dual-mode: bound planner ⇒ interactive shelf; anything else ⇒
+ * the read-only surface the contract used to promise unconditionally. */
+// INV:PLAN-073-stash-dual-mode
+describe('VillageStashPanel — PLAN-073 dual mode', () => {
+  const POI = 'poi-goblin';
+  const renderPanel = () =>
+    render(
+      <DndContext>
+        <VillageStashPanel config={CFG} left={0} top={0} widthPx={320} zIndex={12} onClose={() => {}} />
+      </DndContext>,
+    );
+
+  it('read-only when the ledger is still pending — hint shown, no affordances', () => {
+    renderPanel(); // beforeEach left hydration 'pending'
+    const shelf = screen.getByTestId('stash-shelf');
+    expect(shelf).toHaveAttribute('data-stash-mode', 'readonly');
+    expect(within(shelf).queryAllByRole('button')).toHaveLength(0);
+    expect(screen.getByTestId('stash-mode-hint')).toHaveTextContent('gameFrame.stash.notReady');
+  });
+
+  it('read-only without a bound planner even when ready — openHint shown', () => {
+    setLedger({ hydration: 'ready' });
+    renderPanel();
+    const shelf = screen.getByTestId('stash-shelf');
+    expect(shelf).toHaveAttribute('data-stash-mode', 'readonly');
+    expect(screen.getByTestId('stash-mode-hint')).toHaveTextContent('gameFrame.stash.openHint');
+  });
+
+  it('bound to a planner: rows are buttons and a click assigns to the first free slot', () => {
+    setLedger({ hydration: 'ready', activeStashOwner: POI });
+    renderPanel();
+    const shelf = screen.getByTestId('stash-shelf');
+    expect(shelf).toHaveAttribute('data-stash-mode', 'interactive');
+    const first = CFG.items[0].itemId;
+    fireEvent.click(screen.getByTestId(`stash-item-${first}`));
+    /* One copy configured — the assignment consumes the row entirely. */
+    expect(useVillageStashStore.getState().bags[POI]?.[0]).toBe(first);
+    expect(screen.queryByTestId(`stash-item-${first}`)).toBeNull();
+    /* And the ledger event was emitted for the live regions. */
+    expect(useVillageStashStore.getState().lastEvent).toMatchObject({ kind: 'assign', poiId: POI, itemId: first });
+  });
+
+  it('a second planner\'s reservation shows the elsewhere counter, never the row affordance', () => {
+    const reserved = CFG.items[1].itemId;
+    setLedger({ hydration: 'ready', activeStashOwner: POI, bags: { 'poi-rovine': [reserved, ...Array(QUEST_STASH.bagSlots - 1).fill(null)] } });
+    renderPanel();
+    expect(screen.getByTestId('stash-elsewhere')).toHaveTextContent('gameFrame.stash.elsewhere');
+    /* The reserved row vanished from the shelf (qty 1 − 1 elsewhere = 0). */
+    expect(screen.queryByTestId(`stash-item-${reserved}`)).toBeNull();
+  });
+
+  it('empty shelf shows the empty-state line', () => {
+    setLedger({
+      hydration: 'ready',
+      activeStashOwner: POI,
+      bags: { [POI]: CFG.items.map((i) => i.itemId).slice(0, QUEST_STASH.bagSlots).concat(Array(Math.max(0, QUEST_STASH.bagSlots - CFG.items.length)).fill(null)) },
+      committed: { 'run-x': { poiId: 'poi-rovine', slots: CFG.items.map((i) => i.itemId).slice(QUEST_STASH.bagSlots) } },
+    });
+    renderPanel();
+    expect(screen.getByText('gameFrame.stash.empty')).toBeInTheDocument();
   });
 });
 

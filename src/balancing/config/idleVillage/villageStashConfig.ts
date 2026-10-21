@@ -7,8 +7,13 @@
  * and the `v` shortcut). PLAN-036 (R-195) promoted the shelf to the planner
  * bag picker's source of truth — every shelf row must be a REAL packable
  * consumable (an `engineFlag` channel, per `isExpeditionItem`'s contract),
- * so what the village stocks is exactly what the bag can hold. Still not a
- * spent/persisted inventory: `qty` is a display badge, not a ledger.
+ * so what the village stocks is exactly what the bag can hold.
+ *
+ * PLAN-073: `qty` is now the reservation ledger's stock line — the shared
+ * pool `useVillageStashStore` derives remaining availability from
+ * `qty − (draft bags + committed runs)`. The Director's phase-one stock is
+ * one copy of each consumable; raising a `qty` here is the ONLY way to stock
+ * multiples — never hardcode quantities in UI code.
  *
  * Validation is binding: a curated `itemId` that is not an offerable quest
  * consumable or lacks an `engineFlag` channel, a duplicate row, or a total
@@ -70,7 +75,9 @@ const RAW_VILLAGE_STASH_CONFIG = {
    * `healing_draught`/`lucky_coin` (no engineFlag — decorative) were
    * retired in favour of `corda`/`pozione`. */
   items: [
-    { itemId: 'quest_consumable_forza', qty: 2 },
+    /* PLAN-073 phase-one stock (Director): exactly ONE copy of each
+     * consumable — claiming a row empties it until released. */
+    { itemId: 'quest_consumable_forza', qty: 1 },
     { itemId: 'quest_consumable_percezione', qty: 1 },
     { itemId: 'quest_consumable_fumogeno', qty: 1 },
     { itemId: 'quest_consumable_corda', qty: 1 },
