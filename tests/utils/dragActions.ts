@@ -12,6 +12,10 @@ export interface DragOptions {
   steps?: number;
   /** Delay between steps in milliseconds */
   stepDelay?: number;
+  /** Settle delay after the last move, before mouse.up — dnd-kit recomputes
+   *  `over` asynchronously on pointermove, so dropping instantly reads the
+   *  previous step's collision (or none). A real hand pauses before release. */
+  settleDelay?: number;
   /** Callback called during intermediate moves */
   onIntermediateMove?: (context: { page: Page; current: { x: number; y: number } }) => Promise<void> | void;
 }
@@ -25,7 +29,7 @@ export async function dragElement(
   target: Locator | { x: number; y: number },
   options: DragOptions = {}
 ): Promise<void> {
-  const { steps = 10, stepDelay = 50, onIntermediateMove } = options;
+  const { steps = 10, stepDelay = 50, settleDelay = 120, onIntermediateMove } = options;
 
   // Get bounding boxes
   const sourceBox = await source.boundingBox();
@@ -78,6 +82,9 @@ export async function dragElement(
       await page.waitForTimeout(stepDelay);
     }
   }
+
+  // Let the final pointermove's collision resolve before the drop.
+  if (settleDelay > 0) await page.waitForTimeout(settleDelay);
 
   // Release mouse button
   await page.mouse.up();
