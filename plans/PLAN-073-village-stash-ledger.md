@@ -1,7 +1,8 @@
 # PLAN-073: Village Stash ledger — warehouse interattivo ↔ bisaccia quest (R-240)
 
-**Status:** `open` — implementato in working tree (2026-10-21). D-1/D-2 risolti per default
-(auto-bind con 1 planner aperto; release-all per-owner). In attesa di commit + verify:bundle.
+**Status:** `open` — implementato e committato `bc63a70e` (2026-10-21); follow-up test:
+fix `dragActions.settleDelay` + locator/testid spec in worktree. D-1/D-2 risolti per default
+(auto-bind con 1 planner aperto; release-all per-owner). In attesa di verify:bundle.
 **Richiesta:** `R-240` (2026-10-21). Assorbe R-239(e) «toggle BAG che si sovrappone a OPEN WAREHOUSE»
 e il fork F-ST-1 di PLAN-068 (magazzino mock → registro vero), risolto in direzione «ledger reale».
 **Artifact dibattito:** `mind-weaver/.mw/runs/20261021-warehouse-bag/artifact-r003.md` —
@@ -193,6 +194,30 @@ sintomo «il click non fa nulla».
   1280×800 e 1440×900 (bbox disjoint), read-only senza planner, click-assign (riga sparisce
   dallo scaffale), click-release, release-all (click reale → `bags:{}` persistito),
   draft-persists-reload. Evidenza: `test-results/plan073-smoke/`.
+- **Playwright dedicata** (`tests/e2e/idleVillage/villageStash.spec.ts`, preview :5179):
+  **11/11 verdi** (2026-10-21) — read-only, click-assign, click-release, release-all,
+  drag→slot libero, drag→slot occupato (swap atomico), drag bag→shelf, pool condivisa
+  2 planner, draft-persistence su reload, header bbox disjoint 1280×800 e 1440×900.
+  Durante il debug è emerso un race nel helper condiviso `tests/utils/dragActions.ts`:
+  `mouse.up()` immediatamente dopo l'ultimo `pointermove` leggeva `over` prima che
+  dnd-kit committasse la collisione finale (`over:null` intermittente — artefatto del
+  test, non dell'app). Fix: `settleDelay` di default 120ms prima del mouse.up.
+- **Suite /game correlata** (stesso run, Desktop Chrome): `gameQuestDragFeedback`,
+  `gameQuestFullFlow`, `gameQuestInputCoordination`, `gameQuestLifecycle`,
+  `gameQuestPlannerLayout`, `gameVillageView` (20/20), `missionPlanner` (3/3) —
+  tutte verdi, incluso «party/loadout draft survives reload» e «real drag assigns a
+  valid resident» (resident drag invariato, contratto 11).
+- **Fallimenti baseline/non-PLAN-073** (riprodotti identici su run indipendente):
+  `04_drag_interactions` 4 fail (testid `pg-card`/`slot` assenti su `/minimal-drag`),
+  `minimal-gameplay` 7 fail (pagina `/minimal-gameplay` senza testid),
+  `ResidentDragAccessibility` 16 fail (attende `drag-test-container` su `/idle-village`),
+  `gameQuestExpedition` 2 fail (frontier `waiting`/`pending` + badge decisione —
+  blast radius del lavoro concorrente `questS1Lab` R-231/R-241, PLAN-073 non tocca
+  frontier status). Nessuno tocca lo stash.
+- Collisione T-13 registrata: un run parallelo di un'altra sessione ha liberato la
+  porta 5179 a metà suite (~test 127) → ~40 fail `ERR_CONNECTION_REFUSED` a cascata,
+  poi rieseguiti verdi su preview parallela :5181 (`playwright.pw5181.config.ts`,
+  rimossa dopo il run).
 
 ### Note di scope/commit
 
