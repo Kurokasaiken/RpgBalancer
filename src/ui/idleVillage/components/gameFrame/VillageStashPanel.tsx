@@ -60,17 +60,17 @@ const StashRowFace: React.FC<{ row: VillageStashRowView }> = ({ row }) => {
   const { t } = useTranslation('idleVillage');
   return (
     <>
-      <span aria-hidden="true" style={{ color: 'var(--skin-icon-accent)', display: 'inline-flex', alignItems: 'center', paddingTop: 1 }}>
+      <span aria-hidden="true" style={{ color: 'var(--skin-title-color)', display: 'inline-flex', alignItems: 'center', paddingTop: 1 }}>
         <VillageStashItemIcon icon={row.icon} size={18} />
       </span>
       <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left' }}>
-        <span style={{ font: '600 12px var(--skin-font-sans)', color: 'var(--skin-text-primary)' }}>
+        <span style={{ font: '600 12px var(--skin-font-serif)', color: 'var(--skin-text-primary)' }}>
           {t(row.nameKey)}
-          <span style={{ color: 'var(--skin-icon-accent)', fontVariantNumeric: 'tabular-nums' }} aria-label={t('gameFrame.stash.qty', { qty: row.qty })}>
+          <span style={{ color: 'var(--skin-title-color)', fontVariantNumeric: 'tabular-nums' }} aria-label={t('gameFrame.stash.qty', { qty: row.qty })}>
             {' '}×{row.qty}
           </span>
         </span>
-        <span style={{ font: '12px var(--skin-font-sans)', color: 'var(--skin-text-secondary)', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
+        <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
           {t(row.descKey)}
         </span>
       </span>
@@ -217,7 +217,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', padding: '10px 18px' }}
           >
             <div {...handleProps} style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', flex: 1, minWidth: 0, paddingLeft: 4, ...handleProps.style }}>
-              <EngravedIcon id="ico-chest" size={14} aria-hidden style={{ color: 'var(--skin-icon-accent)', flexShrink: 0 }} />
+              <EngravedIcon id="ico-chest" size={14} aria-hidden style={{ color: 'var(--skin-title-color)', flexShrink: 0 }} />
               <span
                 style={{
                   minWidth: 0,
@@ -293,7 +293,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
            *  collapsed strip (plaque padding 10 + this 12/8 = the strip's
            *  22/18) — collapsing changes the glyph, never the geometry. */}
           <div {...handleProps} style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', paddingInline: '12px 8px', ...handleProps.style }}>
-            <EngravedIcon id="ico-chest" size={14} aria-hidden style={{ color: 'var(--skin-icon-accent)', flexShrink: 0 }} />
+            <EngravedIcon id="ico-chest" size={14} aria-hidden style={{ color: 'var(--skin-title-color)', flexShrink: 0 }} />
             <span
               id={titleId}
               style={{
@@ -351,7 +351,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             }}
           >
             {vm.rows.length === 0 && (
-              <span style={{ font: '12px var(--skin-font-sans)', color: 'var(--skin-text-secondary)' }}>
+              <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
                 {t('gameFrame.stash.empty')}
               </span>
             )}
@@ -370,7 +370,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
           {!interactive && (
             <span
               data-testid="stash-mode-hint"
-              style={{ font: '12px var(--skin-font-sans)', color: 'var(--skin-text-secondary)' }}
+              style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}
             >
               {hydration !== 'ready' ? t('gameFrame.stash.notReady') : t('gameFrame.stash.openHint')}
             </span>

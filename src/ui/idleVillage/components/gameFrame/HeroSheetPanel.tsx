@@ -35,17 +35,18 @@ export interface HeroSheetPanelProps {
   panelRef: Ref<HTMLDivElement>;
 }
 
-/** One accent per stat category — the only place color carries meaning on this card. */
+/** FAM-1 = A (R-234): the family has no cyan/green/red as MEANING — a category reads from its glyph
+ *  and its label, all in brass. (It used to paint offense red, defense cyan, utility green.) */
 const CATEGORY_TONE: Record<string, string> = {
-  offense: 'var(--skin-status-wound)',
-  defense: 'var(--skin-icon-accent)',
-  utility: 'var(--skin-status-met)',
+  offense: 'var(--skin-label-primary)',
+  defense: 'var(--skin-label-primary)',
+  utility: 'var(--skin-label-primary)',
 };
 
 const STATUS_TONE: Record<HeroSheetViewModel['status'], string> = {
-  alive: 'var(--skin-status-met)',
-  injured: 'var(--skin-status-wound)',
-  dead: 'var(--skin-status-death)',
+  alive: 'var(--skin-title-color)',
+  injured: 'var(--skin-event-danger)',
+  dead: 'var(--skin-state-fallen)',
 };
 
 const controlButton: CSSProperties = {
@@ -160,7 +161,7 @@ export const HeroSheetPanel: React.FC<HeroSheetPanelProps> = ({
             </div>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-row-gap)' }}>
               {vm.archetypeLabel && (
-                <span style={{ font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)', letterSpacing: 'var(--skin-hud-caps-tracking)', textTransform: 'uppercase', color: 'var(--skin-icon-accent)' }}>
+                <span style={{ font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)', letterSpacing: 'var(--skin-hud-caps-tracking)', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
                   {vm.archetypeLabel}
                   {vm.archetypeCategory ? ` · ${vm.archetypeCategory}` : ''}
                 </span>
@@ -183,12 +184,12 @@ export const HeroSheetPanel: React.FC<HeroSheetPanelProps> = ({
                         display: 'block',
                         height: '100%',
                         width: `${Math.round(vital.ratio * 100)}%`,
-                        background: vital.key === 'hp' ? STATUS_TONE[vm.status] : 'var(--skin-icon-accent)',
+                        background: vital.key === 'hp' ? STATUS_TONE[vm.status] : 'var(--skin-label-primary)',
                         transition: 'width 240ms ease-out',
                       }}
                     />
                   </span>
-                  <span style={{ minWidth: 44, textAlign: 'right', font: '600 12px var(--skin-font-sans)', color: 'var(--skin-text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ minWidth: 44, textAlign: 'right', font: '600 12px var(--skin-font-serif)', color: 'var(--skin-text-primary)', fontVariantNumeric: 'tabular-nums' }}>
                     {Math.round(vital.value)}/{vital.max}
                   </span>
                 </div>
@@ -218,10 +219,10 @@ export const HeroSheetPanel: React.FC<HeroSheetPanelProps> = ({
                     {entries.map((entry) => (
                       <div key={entry.label} style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
                         {entry.iconType && <StatIcon type={entry.iconType} size={12} filled style={{ color: CATEGORY_TONE[category] ?? 'var(--skin-label-primary)', flexShrink: 0 }} />}
-                        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: '12px var(--skin-font-sans)', color: 'var(--skin-text-secondary)' }}>
+                        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
                           {entry.label}
                         </span>
-                        <span style={{ font: '600 12px var(--skin-font-sans)', color: CATEGORY_TONE[category] ?? 'var(--skin-text-primary)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                        <span style={{ font: '600 12px var(--skin-font-serif)', color: CATEGORY_TONE[category] ?? 'var(--skin-text-primary)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
                           {entry.display}
                         </span>
                       </div>
@@ -240,7 +241,7 @@ export const HeroSheetPanel: React.FC<HeroSheetPanelProps> = ({
                   {t('gameFrame.heroSheet.loadout')}
                 </span>
                 {vm.equipment.filter((slot) => slot.value).map((slot) => (
-                  <div key={slot.id} style={{ display: 'flex', gap: 6, font: '12px var(--skin-font-sans)', minWidth: 0 }}>
+                  <div key={slot.id} style={{ display: 'flex', gap: 6, font: '12px var(--skin-font-serif)', minWidth: 0 }}>
                     <span style={{ color: 'var(--skin-text-muted)', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>{slot.label}</span>
                     <span style={{ color: 'var(--skin-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{slot.value}</span>
                   </div>
@@ -252,12 +253,12 @@ export const HeroSheetPanel: React.FC<HeroSheetPanelProps> = ({
                 </span>
                 {vm.inventory.length > 0 ? (
                   vm.inventory.map((token) => (
-                    <span key={token} style={{ font: '12px var(--skin-font-sans)', color: 'var(--skin-body-color)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span key={token} style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-body-color)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {token}
                     </span>
                   ))
                 ) : (
-                  <span style={{ font: '12px var(--skin-font-sans)', color: 'var(--skin-text-muted)' }}>{t('gameFrame.heroSheet.inventoryEmpty')}</span>
+                  <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-muted)' }}>{t('gameFrame.heroSheet.inventoryEmpty')}</span>
                 )}
               </div>
             </div>

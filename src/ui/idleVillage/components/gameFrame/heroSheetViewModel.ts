@@ -112,7 +112,8 @@ export function heroSheetViewModel(
   const groups: Record<StatCategory, HeroSheetStatEntry[]> = { offense: [], defense: [], utility: [] };
   for (const [key, descriptor] of Object.entries(STAT_DESCRIPTORS)) {
     const value = snapshot[key];
-    if (typeof value !== 'number' || !Number.isFinite(value) || !descriptor) continue;
+    /* FAM-1 = A (R-234): a zero says nothing on the card — only what the hero actually has. */
+    if (typeof value !== 'number' || !Number.isFinite(value) || value === 0 || !descriptor) continue;
     groups[descriptor.category].push({
       label: t(descriptor.labelKey),
       display: formatStatDisplayValue(descriptor.format, value),

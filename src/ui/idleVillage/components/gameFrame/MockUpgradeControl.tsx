@@ -35,7 +35,7 @@ export const MockUpgradeControl: React.FC<MockUpgradeControlProps> = ({ building
           font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
           letterSpacing: 'var(--skin-hud-caps-tracking)',
           textTransform: 'uppercase',
-          color: 'var(--skin-icon-accent)',
+          color: 'var(--skin-title-color)',
         }}
       >
         {label}
@@ -67,7 +67,7 @@ export const MockUpgradeControl: React.FC<MockUpgradeControlProps> = ({ building
       <span
         id={captionId}
         style={{
-          font: 'italic 12px var(--skin-font-sans)',
+          font: 'italic 12px var(--skin-font-serif)',
           color: 'var(--skin-text-secondary)',
         }}
       >
