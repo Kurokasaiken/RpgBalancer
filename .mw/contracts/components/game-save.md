@@ -6,8 +6,12 @@ tier: 2
 root_file: src/ui/idleVillage/state/gameSave.ts
 scope_files:
   - src/ui/idleVillage/state/gameSave.ts
+  - src/ui/idleVillage/state/gameSaveService.ts
+  - src/ui/idleVillage/state/useGameAutosave.ts
 fast_checks:
   - tests/unit/idleVillage/gameSave.test.ts
+  - tests/unit/idleVillage/gameSaveService.test.ts
+  - tests/unit/idleVillage/useGameAutosave.test.ts
 e2e_checks: []
 e2e_trigger_globs: []
 invariants:
@@ -45,6 +49,34 @@ invariants:
     statement: Lo slot autosalvataggio è separato dai tre manuali; l'elenco distingue vuoto, valido, corrotto
     test_refs:
       - tests/unit/idleVillage/gameSave.test.ts
+  - id: INV-6
+    source: director-bug
+    source_ref: PLAN-076
+    statement: >-
+      «Salva ora» salva l'intera partita (run di quest, invasione, dispensa) dopo aver scritto lo stato vivo, non il
+      solo store gameplay
+    test_refs:
+      - tests/unit/idleVillage/gameSaveService.test.ts
+  - id: INV-7
+    source: director-bug
+    source_ref: PLAN-076
+    statement: >-
+      «Salva ora» scrive nello slot in uso, altrimenti nel primo vuoto, altrimenti nel più vecchio; mai nello slot
+      autosalvataggio
+    test_refs:
+      - tests/unit/idleVillage/gameSaveService.test.ts
+  - id: INV-8
+    source: director-bug
+    source_ref: PLAN-076
+    statement: Caricare uno slot ripristina il mondo salvato e diventa la base di confronto per il progresso non salvato
+    test_refs:
+      - tests/unit/idleVillage/gameSaveService.test.ts
+  - id: INV-9
+    source: director-bug
+    source_ref: PLAN-076
+    statement: L'autosalvataggio aggiorna solo lo slot auto, a intervallo, e solo se il clock è avanzato; mai uno slot manuale
+    test_refs:
+      - tests/unit/idleVillage/useGameAutosave.test.ts
 ---
 # game-save
 
@@ -63,6 +95,8 @@ Cattura e ripristina in modo atomico e versionato tutte le chiavi di progresso (
 ## Scope
 
 - `src/ui/idleVillage/state/gameSave.ts`
+- `src/ui/idleVillage/state/gameSaveService.ts`
+- `src/ui/idleVillage/state/useGameAutosave.ts`
 
 ## Decision history
 

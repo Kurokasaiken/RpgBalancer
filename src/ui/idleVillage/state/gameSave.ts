@@ -50,6 +50,8 @@ export interface GameSaveMeta {
   heroes: string[];
   /** Quest runs started and not yet ended. */
   activeExpeditions: number;
+  /** Game-clock tick of the gameplay snapshot: what "progress since the last save" is measured against. */
+  tick: number;
 }
 
 export interface GameSave {
@@ -112,6 +114,7 @@ function deriveMeta(entries: Record<string, unknown>): GameSaveMeta {
     gold: typeof summary.gold === 'number' ? summary.gold : 0,
     heroes,
     activeExpeditions,
+    tick: typeof data.currentTime === 'number' ? data.currentTime : 0,
   };
 }
 
