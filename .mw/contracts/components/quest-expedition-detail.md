@@ -83,6 +83,12 @@ invariants:
     statement: Primary then secondary key stats under the dispatch line as icons only (POI-D)
     test_refs:
       - tests/unit/idleVillage/questPlanner.heroNoText.test.tsx
+  - id: R-234-planner-stash-icon
+    source: director-bug
+    source_ref: R-234
+    statement: The planner warehouse trigger is a 36px icon with the HUD tooltip (name + shortcut V), no native title (PL-3 = A)
+    test_refs:
+      - tests/unit/idleVillage/questPlanner.stashButton.test.tsx
 ---
 # quest-expedition-detail
 
