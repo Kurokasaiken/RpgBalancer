@@ -47,6 +47,32 @@ invariants:
       lists no longer repeat per-person lines (T-C2)
     test_refs:
       - tests/unit/idleVillage/questReturnedCrew.test.tsx
+  - id: R-234-expedition-lost-tombs
+    source: director-bug
+    source_ref: R-234
+    statement: The defeat report carries one tombstone per fallen resident and none without a death (EXP = A)
+    test_refs:
+      - tests/unit/idleVillage/expeditionLostReport.test.tsx
+  - id: R-234-expedition-lost-opaque
+    source: director-bug
+    source_ref: R-234
+    statement: The defeat report is an opaque plaque with one headline and no violet tombstone colour (EXP = A)
+    test_refs:
+      - tests/unit/idleVillage/expeditionLostReport.test.tsx
+  - id: R-234-expedition-lost-staging
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      The Director Expedition lost stages a defeat copy of the run for the report and never mutates the live run or
+      settles (EXP = A)
+    test_refs:
+      - tests/unit/idleVillage/expeditionLostStaging.test.ts
+  - id: R-234-expedition-lost-day
+    source: director-bug
+    source_ref: R-234
+    statement: The defeat report dates each fallen resident from the death tick the run recorded; no tick, no date (T-C2)
+    test_refs:
+      - tests/unit/idleVillage/expeditionLostDay.test.ts
 ---
 # quest-reward-popup
 

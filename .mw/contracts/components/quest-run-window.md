@@ -259,6 +259,15 @@ invariants:
       Il frame del teatro non contiene nodi testo — mai testo sopra l'artwork (R-245).
     test_refs:
       - tests/unit/idleVillage/questRunWindow.stageNode.test.tsx
+  - id: quest-run-window.INV-6
+    source: director-bug
+    source_ref: R-263
+    statement: >-
+      Una fase di viaggio non possiede nodi scenario — con coda drenata il teatro mostra l'art di gamba
+      (JOURNEY_LEG_ART: andata=cancello, ritorno=valle) invece del nodo latched; una scene beat montata vince
+      sempre e un run ended mantiene l'art di arrivo
+    test_refs:
+      - tests/unit/idleVillage/questRunWindow.journeyLegArt.test.tsx
 ---
 # quest-run-window
 

@@ -76,7 +76,7 @@ Restano fissi:
 - **stile:** thick oil impasto, pennellate larghe visibili (tradizione
   Jaime Jones / Jeff Easley); split-rendering pulito solo sul punto focale;
 - **kill list non cromatica:** no grim, no gore, no symmetry, no flat digital
-  surfaces, no sci-fi, no text/UI/frames/watermarks.
+  surfaces, no sci-fi, no text/UI/frames/watermarks/**signatures/logos**.
 
 ## R5 — Struttura del prompt esterno (Gemini / Grok / GPT)
 
@@ -97,6 +97,14 @@ alla kill list finale. I blocchi **in quest'ordine fisso**:
 3. **Mood** — due emozioni specifiche («X + Y»), mai "epic/dark/mysterious".
 4. **Technique/Style** — il blocco impasto/split-rendering (bibbia §2);
    contrasto di tecnica dichiarato ("dirty impasto X, clean polish Y").
+   **Lo stile domina anche l'apertura del prompt**: il medium va dichiarato
+   prima del soggetto («A masterful cinematic oil painting in heavy textured
+   impasto: …») e il vocabolario resta aggressivo («thick, violent
+   brushstrokes, visible layers of paint adding physical depth»), mai
+   attenuato («in the … tradition» diluisce il token). I nomi degli artisti
+   restano come ancora di stile (Jones, Easley, Sparth, Gerard, Ruan Jia);
+   se un generatore li ammorbidisce (policy "no living artists") il fallback
+   è tenere il blocco tecnico descrittivo e togliere i nomi.
    Wide shot con scala monumentale → "Sparth-like monumental scale" (§3).
    Scene con creature → "Justin Gerard whimsy — grotesque but vibrant,
    never horror" (§3: le creature Wanderlust sono grottesche *e* vibranti,
@@ -113,7 +121,9 @@ alla kill list finale. I blocchi **in quest'ordine fisso**:
    even the deepest shadow is saturated color, never black murk.»
 7. **Kill list finale** — integrale e in CAPS (NO grim, NO gore, NO decay,
    NO mud, NO symmetry, NO flat digital, NO airbrushed smoothness,
-   NO sci-fi, NO text/UI/watermarks/frames) + ban specifici di scena;
+   NO sci-fi, NO text/UI/watermarks/frames/signatures/logos) + ban specifici
+   di scena — `NO signature` è obbligatorio: i generatori tendono ad apporre
+   firme fake d'autore («JONES») quando il prompt cita nomi di artisti;
    inoltre i divieti cardine vanno ripetuti inline in CAPS nel Subject
    (`NO TRAVELERS`, `NO BLADE HAS MET YET`) dove contano di più.
 8. **Aspect** — **dettato dal componente di destinazione**, mai scelto a
@@ -200,6 +210,8 @@ python scripts/lint-scene-prompts.py .mw/specs/<spec>/scenes/
 | Prosa "sottile" | elementi nominati senza materia/luce | Q1 + gate umano |
 | Goblin horror | mancava Gerard | Q8 |
 | Party disegnato | ban non inline | Q9: `NO TRAVELERS` nel Subject |
+| Impasto diluito / stile piatto | stile in coda o hedged («in the … tradition»), prompt lungo di logistica pipeline (parallasse, cutout, ancore FX) | lo stile apre il prompt («A masterful cinematic oil painting in heavy textured impasto» prima del soggetto) + «thick, violent … brushstrokes, visible layers … physical depth»; la logistica di pipeline vive in header/generation notes del file, MAI nel prompt — rif. §«Viaggio» in prompt_library (R-263) |
+| Firma fake in frame («JONES») | nomi di artisti senza ban firme | `NO signature, NO watermark, NO logo` nella kill list (R-267/R-263) |
 | Spoils = cianfrusaglia | descritti oggetti domestici (pettine, paiolo) | il premio deve leggere come **valore** a colpo d'occhio: monete, metallo prezioso, gemme/ambra — mai inventario casalingo |
 | Spoils già tutte visibili | tutto il valore esposto → niente da cercare | scena "keep looting" = **saggio + promessa + costo**: refurtiva visibile (il saggio), nascondigli non perquisiti (la promessa), trappole/pericolo visibile (il costo) |
 

@@ -1,0 +1,158 @@
+OPEN TABS: 16
+ - https://gemini.google.com/app/5018710295b36b65
+ - https://chatgpt.com/
+ - https://gemini.google.com/app/aaab587defad80b5
+ - https://gemini.google.com/app
+ - https://grok.com/c/32343277-1c3d-4cb3-96be-f361de9e9447?rid=2221630c-2b19-4255-92f8-ee9225c6861e
+ - https://chat.deepseek.com/a/chat/s/697febe9-cc6b-4242-9dff-162ee5c68bd5
+ - https://claude.ai/chat/8f906363-ef07-4773-a9b8-e3c009b4662e
+ - https://gemini.google.com/app/4b40f1c2147cc825
+ - https://chatgpt.com/c/6ada305b-e05c-83ed-8b94-8f951057d880
+ - https://chat.deepseek.com/a/chat/s/1270165f-8558-4b0d-8816-61d7f21030dc
+ - https://grok.com/c/b2698513-9e6b-4dcc-8a12-52ee7ae4234f?rid=1c41b0c1-61dd-4942-93f5-d7970a9b30dd
+ - https://claude.ai/chat/b83ecac6-e6f6-4e98-a71f-cc406e5ece2d
+ - https://chatgpt.com/c/6ada3722-5dbc-83ed-b9a2-ad09cef31e73
+ - https://chatgpt.com/
+ - chrome://new-tab-page/
+ - https://chatgpt.com/c/6ada1cbe-6438-83eb-9ec8-414bf1456edc
+
+######################### claude #########################
+ modes of image models on compositional/spatial instructions and how to phrase them robustly (what image models actually "understand" about depth/layering requests);
+(d) a practical evaluation checklist: how to tell, before generating, whether a prompt will yield an image that is easy to animate with cheap high-impact techniques.
+Constraints the prompt must encode: fixed painterly oil-impasto style; no people/player party in frame; no text/signatures/watermarks; scenes are 21:9 cinematic; we need operational prompt clauses and checklist items, not pure theory.
+
+Output ONLY the deep-research prompt text — self-contained, in English, ready to paste — max ~400 words. If anything is ambiguous, make a reasonable assumption and state it inside the prompt itself.
+
+Messaggio compresso
+Mostra altro
+20 minuti fa
+
+
+
+Claude ha risposto: Role and goal.
+
+Role and goal. You are a research lead for a 2D fantasy RPG team. Produce a practitioner-grade report on how to write image-generation prompts (“scene briefs”) that yield single, coherent painted images which are deliberately easy to animate with cheap 2.5D techniques. Prioritize operational, copy-pasteable guidance over theory. Cite primary sources (official prompt guides, papers, benchmarks, animator/VFX write-ups, community tests) and mark which claims are verified and which are anecdotal.
+
+Context (fixed constraints). Each quest phase shows ONE AI-generated image: 21:9 cinematic (~3168×1320 px), heavy oil-impasto painterly style, no people or player party, no text/signatures/watermarks. The image is never sliced into layers and the generator is never asked for layers. Runtime animation: (1) depth-map parallax (Depth Anything V2) with in-place pixel deformation, so thin tall elements crossing depth boundaries tear and smear; (2) procedural FX (fire glow, embers, smoke, dust, fog) that must sit on a painted source such as a lantern, campfire or chimney; (3) overlay bands (fog veils, cloud sprites, cloud shadows, bird strips) that need open sky or low terrain; (4) one hand-cut, edge-anchored foreground occluder (gate, branches, rock ledge) as a fast parallax layer.
+
+Research questions.
+(a) Prompt techniques for Gemini/Nano Banana, Imagen, GPT-image, Midjourney and SDXL (plus ControlNet/regional prompting where relevant) that reliably produce separable edge-anchored foreground occluders, ~3 readable depth planes (near/focal/far), small anchorable light sources, and reserved negative space (open sky band, low ground band). Give concrete clause examples per model, including negative-prompt or exclusion phrasing and aspect-ratio handling.
+(b) Lessons from limited animation, the Disney multiplane camera, and 2.5D photo-animation/depth-parallax pipelines: which compositional features survive deformation (silhouette shapes, soft edges, atmospheric perspective, large masses) and which fail (thin spires, fences, rigging, foliage lattices, hard edges across depth jumps). Translate each into a prompt clause.
+(c) Documented failure modes of image models on spatial and compositional instructions (layout, counting, “empty space”, left/right, foreground/background, negation) and how to phrase requests robustly. Explain what models actually respond to for depth and layering (photographic and painting vocabulary, atmospheric perspective, scale cues, lens language) versus what they ignore.
+(d) A practical pre-generation checklist: scored criteria for judging whether a prompt will yield an easy-to-animate image, plus a post-generation triage list (including depth-map sanity checks).
+
+Deliverables.
+
+A reusable scene-brief template with fillable slots (near/focal/far planes, edge occluder, light sources, reserved bands, mood, palette, style lock, exclusions).
+A clause library grouped by purpose, with per-model variants.
+A table of failure modes, causes and fixes.
+The evaluation checklist with pass/fail criteria.
+Three worked example briefs (forest camp, ruined gate, coastal village) with their full prompts.
+
+Assumptions (state any additional ones you make): prompts are English; generation is one-shot with optional re-rolls; the style lock is a fixed prefix; we can afford 4–8 candidate images per brief.
+
+Format. Structured headings, concise bullets, tables where useful, a final one-page summary of the ten highest-impact rules.
+
+
+
+
+
+
+20 minuti fa
+
+Scrivi un messaggio…
+
+
+
+
+
+
+
+Claude è un'IA e può commettere errori. Verifica sempre le risposte.
+Sonnet 5.5 Medio
+Claude ha terminato la risposta
+
+######################### grok #########################
+onal features survive parallax deformation and which fail;
+(c) documented failure modes of image models on compositional/spatial instructions and how to phrase them robustly (what image models actually "understand" about depth/layering requests);
+(d) a practical evaluation checklist: how to tell, before generating, whether a prompt will yield an image that is easy to animate with cheap high-impact techniques.
+Constraints the prompt must encode: fixed painterly oil-impasto style; no people/player party in frame; no text/signatures/watermarks; scenes are 21:9 cinematic; we need operational prompt clauses and checklist items, not pure theory.
+
+Output ONLY the deep-research prompt text — self-contained, in English, ready to paste — max ~400 words. If anything is ambiguous, make a reasonable assumption and state it inside the prompt itself.
+
+Grok
+
+Deep Research Prompt:
+
+You are an expert prompt engineer and AI image composition specialist with deep knowledge of Gemini, Nano Banana, Imagen, GPT-image, Midjourney v6+, and SDXL (1.0 and Turbo). Perform exhaustive deep research (via your knowledge + any tools) on the following interconnected topics for creating 2D fantasy RPG quest-theatre scenes in fixed heavy oil-impasto painterly style. Output ONLY a complete, ready-to-paste master prompt (max 400 words) that a user can copy-paste into any of the above generators. The master prompt must contain:
+
+(a) Concrete, battle-tested operational clauses and phrases that reliably produce: strong, hand-authored-style separable foreground occluders (open gate, overhanging branches, rock ledge, etc.) anchored at one frame edge; clean ~3 readable depth planes (near/focal/far) with built-in parallax support; small, isolated anchorable light sources (lanterns, campfires, chimneys) that act as natural FX anchors; and clean reserved negative-space bands (wide open sky + low foreground ground strip) for scrolling overlays. Provide exact clause templates with success examples for each generator.
+
+(b) Transferable lessons from limited animation, Disney multiplane camera, and 2.5D photo-animation pipelines: what compositional features survive parallax deformation (e.g., edge-anchored occluders, simple multi-plane separation) and which fail (e.g., layered brushwork, intricate thin tall elements across depth boundaries, busy foregrounds). Include specific 2.5D camera moves (push-in, pan, sweep, settle, hold) and how to phrase them so the baked image supports cheap pixel-deformation parallax.
+
+(c) Documented failure modes of every listed model when given compositional/spatial instructions (depth layering, occlusion, negative space, parallax compatibility). Explain exactly what each model actually “understands” about depth/layering and provide robust, phrasing-resistant work-arounds (e.g., “strong edge separation”, “clean depth planes”, “reserved open bands”).
+
+(d) A practical, pre-generation evaluation checklist (10–12 binary or 1–5 rating items) the user can apply to any draft prompt. Checklist must explicitly flag: presence of edge-anchored occluders, ~3 clean depth planes, small anchorable light sources, reserved sky/ground bands, overall parallax survivability, and oil-impasto compatibility. Include sample “good” vs “bad” prompt snippets for each item.
+
+Constraints that MUST be hardcoded into the master prompt and every example:
+
+Fixed heavy oil-impasto painterly style, no photorealism, no digital artifacts.
+21:9 cinematic aspect ratio.
+No people, no player party, no text, no signatures, no watermarks.
+Scenes must be deliberately simple and repeatable for runtime parallax (Depth Anything V2 baked map driving in-place pixel deformation only; no layers), procedural FX (fire glow, embers, smoke, dust, fog, clouds) anchored to small painted sources, and asset-backed overlays (scrolling on reserved bands only).
+Scenes must contain exactly one coherent painted image per quest phase (no slicing, no layer requests).
+
+State all assumptions explicitly (e.g., “assumption: users will run Depth Anything V2 locally and want the prompt to produce images whose depth planes align with its natural 3-plane bias”). Prioritise high-impact, low-tech techniques. End with a short “Prompt Template” section the user can reuse as a base.
+
+Start research now and output only the finished master prompt.
+
+Write a prompt to generate a scene based on this brief
+Give me the 10-12 item evaluation checklist
+Rewrite the prompt to be more concise
+
+
+
+
+Veloce
+Grok finished responding
+
+######################### deepseek #########################
+ hand becomes a real fast parallax layer — our most effective trick, straight out of limited animation / multiplane tradition.
+
+WHAT WE WANT: a repeatable "scene brief" discipline for image-generation prompts, so every generated scene is deliberately easy to animate with the techniques above: strong separable foreground occluders at frame edges, ~3 readable depth planes (near/focal/far), small anchorable light sources, and clean reserved bands (open sky, low ground) where overlays will live.
+
+YOUR TASK: write the best possible Deep Research prompt we can paste into a research agent (ChatGPT Deep Research / Gemini Deep Research). The research we need must cover:
+(a) prompt-engineering techniques for image generators (Gemini/Nano Banana, Imagen, GPT-image, Midjourney, SDXL) that reliably produce separable foreground occluders, clean depth planes, and reserved negative space — with concrete clause examples;
+(b) transferable lessons from limited animation, the Disney multiplane camera, and 2.5D photo-animation pipelines about which compositional features survive parallax deformation and which fail;
+(c) documented failure modes of image models on compositional/spatial instructions and how to phrase them robustly (what image models actually "understand" about depth/layering requests);
+(d) a practical evaluation checklist: how to tell, before generating, whether a prompt will yield an image that is easy to animate with cheap high-impact techniques.
+Constraints the prompt must encode: fixed painterly oil-impasto style; no people/player party in frame; no text/signatures/watermarks; scenes are 21:9 cinematic; we need operational prompt clauses and checklist items, not pure theory.
+
+Output ONLY the deep-research prompt text — self-contained, in English, ready to paste — max ~400 words. If anything is ambiguous, make a reasonable assumption and state it inside the prompt itself.
+
+Role: Deep Research analyst for a 2D RPG "quest theatre" pipeline.
+
+Ambiguity resolved: Assume "foreground occluder" means an edge-anchored element (gate, branch, rock ledge) that can be hand-cut and parallaxed faster than the base plate. Assume image models respond to spatial negation and named placement better than to abstract "depth" requests.
+
+Research objectives (deliver operational clauses + checklists, not theory):
+
+(a) Prompt engineering for separable composition. Gather concrete clause patterns from Gemini/Nano Banana, Imagen, GPT-image, Midjourney, SDXL documentation and practitioner reports that reliably yield: (1) a distinct edge-anchored foreground element; (2) ~3 readable depth planes; (3) reserved negative space bands (open sky, low ground). Extract exact phrasings, e.g. "bottom-left corner frames the view with [object]," "middle distance cleared of clutter," "negative space reserved for sky."
+
+(b) Multiplane and 2.5D transferable lessons. Identify which compositional features survive depth-map deformation and which tear/smear. Focus on: thin verticals crossing depth boundaries, silhouetted foregrounds, atmospheric perspective, flat color bands vs. high-frequency detail. Source from Disney multiplane camera documentation, limited-animation layout practices, and photo-animation (Parallax/2.5D) postmortems.
+
+(c) Documented failure modes. What image models actually "understand" about depth/layering instructions. Collect known failures: ignored layering requests, merged depth planes, cluttered skies, foreground elements that touch frame center, light sources too large to anchor FX. Provide robust re-phrasings.
+
+(d) Pre-generation evaluation checklist. Produce a yes/no checklist a prompt author can run before generating: Does the prompt specify an edge-anchored occluder with a clean silhouette? Are sky/ground bands reserved? Is there one small anchorable light source? Are depth planes separated by value/contrast? Will a depth map likely produce clean separation here?
+
+Constraints to encode: Fixed oil-impasto painterly style. No people/player party. No text/signatures/watermarks. 21:9 cinematic. Output must be operational clauses and checklist items.
+
+Output format: Structured brief with clause examples and a 5–7 item checklist. Max 400 words.
+
+DeepThink
+Search
+AI-generated, for reference only
+Cookie Settings
+We use cookies to provide and improve services and ensure security. Click to view our 
+cookie policy. You can choose to accept all or only necessary cookies, which may affect some functionalities.
+Necessary cookies only
+Accept all cookies

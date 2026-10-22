@@ -32,7 +32,7 @@ import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import type { QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
 import { QUEST_HALO_RENDER_MS, QUEST_HALO_STEPS } from '@/balancing/config/idleVillage/quests/questPois';
-import { useThrottledValue } from '@/ui/idleVillage/hooks/useThrottledValue';
+import { useStableValue, useThrottledValue } from '@/ui/idleVillage/hooks/useThrottledValue';
 import { QUEST_PLANNING } from '@/balancing/config/idleVillage/quests/questPlanning';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
@@ -52,7 +52,7 @@ import { computeForecastDelta, type ForecastDelta, type QuestSimulationChunkTimi
 import { memberReveals, planningHints } from '@/ui/idleVillage/questS1Lab/questCertainty';
 import { QUEST_PLANNER_INFO } from '@/balancing/config/idleVillage/quests/questPlannerInfo';
 import { residentToQuestMember } from '@/ui/idleVillage/questS1Lab/residentToQuestMember';
-import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
+import { questHaloProgress, type QuestHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
 import type { LabMember } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { availableOptions, ENGINE_SCHEMA_VERSION } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestId, QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
@@ -118,6 +118,23 @@ export interface QuestExpeditionSessionOptions {
    * the session keeps owning `isDetailOpen`. Identity `node => node` default.
    */
   wrapDetail?: (node: React.ReactNode) => React.ReactNode;
+}
+
+/** Field-wise equality for `QuestHaloProgress` (R-265): lets `useStableValue`
+ *  keep the previous reference once the per-tick re-mint stops changing
+ *  (settled runs), so the halo sampler stops republishing renders. */
+function questHaloEqual(
+  a: QuestHaloProgress | null,
+  b: QuestHaloProgress | null,
+): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return (
+    a.elapsedTicks === b.elapsedTicks &&
+    a.durationTicks === b.durationTicks &&
+    a.fraction === b.fraction &&
+    a.status === b.status
+  );
 }
 
 /** Whether `residentId` rides in ANY non-terminal run's party — the union
@@ -332,9 +349,12 @@ export function useQuestExpeditionSession({
       /* R-257: assigning the mid-exit resident consumes the return intent —
        * the clear can be coalesced with this assign into one commit (the
        * never-empty `assignments` keeps the watcher from releasing), so the
-       * suppression must be lifted here or the seat medal stays hidden. */
-      setReturningResidentId((current) => (current === residentId ? null : current));
+       * suppression must be lifted here or the seat medal stays hidden.
+       * R-269: the lift lands in the same commit as the fill — the seat
+       * passes from suppressed to occupied atomically, never showing its
+       * own copy while a proxy still carries one. */
       startTransition(() => {
+        setReturningResidentId((current) => (current === residentId ? null : current));
         setAssignments((a) => ({ ...a, [slotBlueprintId]: residentId }));
       });
       trackTelemetryEvent('quest_expedition_assign', { poiId: poi.id, slotId: slotBlueprintId, residentId });
@@ -352,20 +372,34 @@ export function useQuestExpeditionSession({
     [poi.id],
   );
 
+  /* R-265: these resolvers feed `useResidentSlotController`'s view-model
+   *  memo deps — inline arrows rebuilt `controller.slots` on EVERY page
+   *  render (each clock tick), cascading into `rackSlots` and defeating any
+   *  memo on the detail subtree. Stable identities keep the slots
+   *  referentially identical between ticks. */
+  const customValidator = useCallback(
+    (residentId: string, slotBlueprintId: string) => {
+      const check = eligibilityFor(residentId, slotBlueprintId);
+      return check.eligible
+        ? null
+        : { success: false as const, reason: 'VALIDATION_FAILED' as const, details: check.reason ?? 'ineligible', slotId: slotBlueprintId };
+    },
+    [eligibilityFor],
+  );
+  const dropStateResolver = useCallback(
+    (residentId: string, slotBlueprint: ResidentSlotBlueprint): DropState | undefined =>
+      eligibilityFor(residentId, slotBlueprint.id).eligible ? 'valid' : 'invalid',
+    [eligibilityFor],
+  );
+
   const controller = useResidentSlotController({
     activity,
     assignments,
     residents: residentsById,
     hoveredResidentId: draggingResidentId,
     slotBlueprints,
-    customValidator: (residentId, slotBlueprintId) => {
-      const check = eligibilityFor(residentId, slotBlueprintId);
-      return check.eligible
-        ? null
-        : { success: false as const, reason: 'VALIDATION_FAILED' as const, details: check.reason ?? 'ineligible', slotId: slotBlueprintId };
-    },
-    dropStateResolver: (residentId, slotBlueprint): DropState | undefined =>
-      eligibilityFor(residentId, slotBlueprint.id).eligible ? 'valid' : 'invalid',
+    customValidator,
+    dropStateResolver,
     onAssign: handleAssign,
     onClear: handleClear,
   });
@@ -788,12 +822,17 @@ export function useQuestExpeditionSession({
     if (!members) return;
 
     sendingRef.current = true;
+    /* R-265: the launch tick is read live at the write boundary — keeping
+     * `currentTick` in this callback's deps rebuilt `send` (and everything
+     * memo'd on it, e.g. `fillRequired`) on every clock tick even while the
+     * planner sat idle. */
+    const launchTick = useMinimalGameplayStore.getState().state.currentTick;
     trackTelemetryEvent('quest_expedition_launch', {
       poiId: poi.id,
       questId: poi.questId,
       partyIds: members.map((m) => m.id),
       loadout: selectedItemIds,
-      launchTick: currentTick,
+      launchTick,
     });
     const seed = (Date.now() ^ (Math.random() * 0xffffffff)) >>> 0;
     /* PLAN-053 T-004: a journey-enabled POI (authored `fasi`) freezes its
@@ -812,7 +851,7 @@ export function useQuestExpeditionSession({
           runSeed: seed,
           engineSchemaVersion: ENGINE_SCHEMA_VERSION,
           scenarioHash: resolved.instance.scenarioHash,
-          launchedAtTick: currentTick,
+          launchedAtTick: launchTick,
         })
       : null;
     /* PLAN-073 commit boundary: the draft bag freezes under the run's
@@ -832,7 +871,7 @@ export function useQuestExpeditionSession({
       seed,
       questId: poi.questId,
       loadout: selectedItemIds,
-      clock: { nodeTicks: expeditionDuration.nodeTicks, startTick: currentTick },
+      clock: { nodeTicks: expeditionDuration.nodeTicks, startTick: launchTick },
       scenarioInstance: resolved.instance,
       resolvedOffer: resolved.resolvedOffer,
       ...(journey ? { journey } : {}),
@@ -864,7 +903,6 @@ export function useQuestExpeditionSession({
     poi,
     selectedItemIds,
     expeditionDuration,
-    currentTick,
     questRun,
     onOpenRun,
     clearDraft,
@@ -1072,7 +1110,9 @@ export function useQuestExpeditionSession({
           setFlying(null);
           return;
         }
-        startFlight({ residentId, slotId: slot.id, isInset: true, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y });
+        startTransition(() =>
+          startFlight({ residentId, slotId: slot.id, isInset: true, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y }),
+        );
       }, 50);
       return true;
     },
@@ -1087,32 +1127,45 @@ export function useQuestExpeditionSession({
   const handleSlotClear = useCallback(
     (slotBlueprintId: string) => {
       const residentId = assignments[slotBlueprintId];
-      controller.clearSlot(slotBlueprintId);
-      if (!residentId || flyingResidentRef.current) return;
-      const from = elementCenter(getSlotComponentElement(slotBlueprintId));
-      /* R-257: under a roster filter ('available' and friends) the slotted
-       *  card is filtered OUT of the DOM — without a fallback the return
-       *  flight silently never ran. Land on the roster list itself (then the
-       *  container): the card pops back in exactly where the proxy lands. */
-      const to =
-        elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`))
-        ?? elementCenter(document.querySelector('[data-resident-count]'))
-        ?? elementCenter(document.querySelector('[data-testid="drag-test-container"]'));
-      if (from && to) {
-        setReturningResidentId(residentId);
-        setFlying(residentId);
-        startFlight({
-          residentId,
-          slotId: slotBlueprintId,
-          isInset: false,
-          fromX: from.x,
-          fromY: from.y,
-          toX: to.x,
-          toY: to.y,
-        });
+      if (residentId && !flyingResidentRef.current) {
+        const from = elementCenter(getSlotComponentElement(slotBlueprintId));
+        /* R-257: under a roster filter ('available' and friends) the slotted
+         *  card is filtered OUT of the DOM — without a fallback the return
+         *  flight silently never ran. Land on the roster list itself (then the
+         *  container): the card pops back in exactly where the proxy lands. */
+        const to =
+          elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`))
+          ?? elementCenter(document.querySelector('[data-resident-count]'))
+          ?? elementCenter(document.querySelector('[data-testid="drag-test-container"]'));
+        if (from && to) {
+          /* R-269: the medallion sits on exactly one carrier per painted
+           * frame — seat → proxy → roster card. Clear, seat suppression and
+           * flight therefore land in ONE transition (one commit): the urgent
+           * suppression used to paint ahead of the deferred proxy — an empty
+           * cavity with nothing airborne, then the medallion popping back at
+           * the seat when the flight committed («sparisce e riappare»). */
+          flyingResidentRef.current = residentId;
+          trackTelemetryEvent('quest_expedition_detach', { poiId: poi.id, slotId: slotBlueprintId });
+          startTransition(() => {
+            setAssignments((a) => ({ ...a, [slotBlueprintId]: null }));
+            setReturningResidentId(residentId);
+            setFlyingResidentId(residentId);
+            startFlight({
+              residentId,
+              slotId: slotBlueprintId,
+              isInset: false,
+              fromX: from.x,
+              fromY: from.y,
+              toX: to.x,
+              toY: to.y,
+            });
+          });
+          return;
+        }
       }
+      controller.clearSlot(slotBlueprintId);
     },
-    [assignments, controller.clearSlot, startFlight, setFlying],
+    [assignments, controller.clearSlot, startFlight, poi.id],
   );
 
   const handlePageFlightComplete = useCallback(
@@ -1122,15 +1175,21 @@ export function useQuestExpeditionSession({
        * roster flight that happens to land on the same seat. */
       const swap = pendingSwapRef.current;
       pendingSwapRef.current = null;
-      if (swap && isInset && slotId === swap.toSlotId && residentId === swap.residentId) {
-        commitSwap(swap.fromSlotId, swap.toSlotId, residentId);
-      } else if (isInset && slotId) {
-        handleAssign(slotId, residentId);
-      }
-      setFlying(null);
-      settleFlight();
+      /* R-269: the landing is one commit too — the proxy unmounts in the
+       * same paint the carrier (seat fill or roster card unlock) takes the
+       * medallion back, so nothing blinks at touchdown either. */
+      flyingResidentRef.current = null;
+      startTransition(() => {
+        if (swap && isInset && slotId === swap.toSlotId && residentId === swap.residentId) {
+          commitSwap(swap.fromSlotId, swap.toSlotId, residentId);
+        } else if (isInset && slotId) {
+          handleAssign(slotId, residentId);
+        }
+        settleFlight();
+        setFlyingResidentId(null);
+      });
     },
-    [handleAssign, settleFlight, commitSwap, setFlying],
+    [handleAssign, settleFlight, commitSwap],
   );
 
   /* R-257: the seat suppression outlives the proxy: it lifts only once the
@@ -1174,7 +1233,11 @@ export function useQuestExpeditionSession({
    * render — the `map-quest-poi` storm of the T-002 trace), so `poiView` samples
    * the halo at QUEST_HALO_RENDER_MS: the marker subtree stays referentially
    * stable between samples and React bails out of it on the in-between ticks. */
-  const haloView = useThrottledValue(halo, QUEST_HALO_RENDER_MS);
+  /* R-265: structural sharing before the sampler — a settled run re-mints an
+   *  identical halo every tick; holding the old reference stops the throttle
+   *  from republishing renders for a value that did not change. */
+  const haloStable = useStableValue(halo, questHaloEqual);
+  const haloView = useThrottledValue(haloStable, QUEST_HALO_RENDER_MS);
   /* …and quantised to the seal's own letter grid (QUEST_HALO_STEPS): steps the
    * rim cannot show are never rendered. */
   const haloFraction = Math.round((haloView?.fraction ?? 0) * QUEST_HALO_STEPS) / QUEST_HALO_STEPS;

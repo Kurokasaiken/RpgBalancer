@@ -364,7 +364,7 @@ export interface QuestExpeditionDetailProps {
   position?: { x: number; y: number };
 }
 
-export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
+const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
   poi,
   scenario,
   resolved,
@@ -1459,5 +1459,10 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     </PlannerBoundaryContext.Provider>
   );
 };
+
+/* R-265: the /game page re-renders on every clock tick while a planner is
+ *  open; with the session's props now referentially stable between ticks,
+ *  memo lets this whole subtree bail out instead of repainting ~1s of DOM. */
+export const QuestExpeditionDetail = React.memo(QuestExpeditionDetailComponent);
 
 export default QuestExpeditionDetail;

@@ -124,6 +124,64 @@ const STATIC_VISUAL_PROFILES: ResidentVisualProfileDefinition[] = [
     appliesToStatProfiles: ['hero-support'],
     notes: 'Hero support profile for support characters.',
   },
+  /* R-268: villager trade portraits (Director-approved generations —
+   *  carpentiere/sarta/macellaio, «vita quotidiana del mestiere» ruling).
+   *  Same asset serves the bust and the character-sheet full figure; the
+   *  medallion square is derived by file stem (`build-medal-portraits.py`). */
+  {
+    id: 'villager-bertoldo',
+    label: 'Bertoldo',
+    portrait: {
+      id: 'villager-bertoldo-portrait',
+      src: AUTO_PORTRAIT_SOURCES.find(s => s.id.includes('villager bertoldo'))?.src ?? placeholderPortrait,
+      alt: 'Bertoldo Portrait',
+      crop: 'bust',
+      defaultCrop: DEFAULT_PORTRAIT_CROP,
+    },
+    fullFigure: {
+      id: 'villager-bertoldo-figure',
+      src: AUTO_PORTRAIT_SOURCES.find(s => s.id.includes('villager bertoldo'))?.src ?? placeholderPortrait,
+      alt: 'Bertoldo at his workbench',
+    },
+    appliesToResidentIds: ['villager-mastro-beppe'],
+    notes: 'Village master carpenter (seed id villager-mastro-beppe, display name Bertoldo).',
+  },
+  {
+    id: 'villager-lisetta',
+    label: 'Lisetta',
+    portrait: {
+      id: 'villager-lisetta-portrait',
+      src: AUTO_PORTRAIT_SOURCES.find(s => s.id.includes('villager lisetta'))?.src ?? placeholderPortrait,
+      alt: 'Lisetta Portrait',
+      crop: 'bust',
+      defaultCrop: DEFAULT_PORTRAIT_CROP,
+    },
+    fullFigure: {
+      id: 'villager-lisetta-figure',
+      src: AUTO_PORTRAIT_SOURCES.find(s => s.id.includes('villager lisetta'))?.src ?? placeholderPortrait,
+      alt: 'Lisetta at her worktable',
+    },
+    appliesToResidentIds: ['villager-lisetta'],
+    notes: 'Village seamstress.',
+  },
+  {
+    id: 'villager-manno',
+    label: 'Manno',
+    portrait: {
+      id: 'villager-manno-portrait',
+      src: AUTO_PORTRAIT_SOURCES.find(s => s.id.includes('villager manno'))?.src ?? placeholderPortrait,
+      alt: 'Manno Portrait',
+      crop: 'bust',
+      defaultCrop: DEFAULT_PORTRAIT_CROP,
+    },
+    fullFigure: {
+      id: 'villager-manno-figure',
+      src: AUTO_PORTRAIT_SOURCES.find(s => s.id.includes('villager manno'))?.src ?? placeholderPortrait,
+      alt: 'Manno at the block',
+    },
+    appliesToResidentIds: ['villager-baldassarre'],
+    notes: 'Village butcher (seed id villager-baldassarre, display name Manno).',
+  },
   {
     id: 'fallback_placeholder_profile',
     label: 'Placeholder',

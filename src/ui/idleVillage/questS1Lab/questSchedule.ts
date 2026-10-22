@@ -32,7 +32,13 @@ import { nodesFor, type QuestRunState } from './questRun';
  *  `startedAt` — elapsed under-reports on those runs only (declared). */
 export function questElapsedTicks(state: QuestRunState, nowTick: number): number {
   const start = state.launchedAtTick ?? state.frontier.startedAt;
-  return Math.max(0, Math.floor(nowTick - start));
+  /* R-265: a settled run's duration is fixed — freezing `end` keeps the halo
+   *  (and every value derived from it) referentially stable after the outcome,
+   *  instead of re-minting a larger number every tick for a run that is over. */
+  const end = state.ended
+    ? (state.settledAtTick ?? state.outcomeResolvedAtTick ?? nowTick)
+    : nowTick;
+  return Math.max(0, Math.floor(end - start));
 }
 
 /**

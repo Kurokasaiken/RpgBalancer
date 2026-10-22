@@ -50,6 +50,10 @@ export interface JournalRecord<P = unknown> {
   payload: P;
   prev_checksum: string | null;
   checksum: string;
+  /** Wall-clock append time (ISO). Optional on records written before the
+   *  field existed — the checksum is over the stored shape, so old records
+   *  verify unchanged. */
+  at?: string;
 }
 
 export interface JournalValidation {
@@ -163,6 +167,7 @@ function genesisRecord(): JournalRecord {
     type: GENESIS_TYPE,
     payload: { schema: SCHEMA, history_complete: true },
     prev_checksum: null,
+    at: new Date().toISOString(),
   };
   return { ...rec, checksum: recordChecksum(rec) };
 }
@@ -207,6 +212,7 @@ export function appendRecord(
       type,
       payload,
       prev_checksum: tail.checksum,
+      at: new Date().toISOString(),
     };
     const full: JournalRecord = { ...rec, checksum: recordChecksum(rec) };
     const jp = journalPath(ledgerDir);

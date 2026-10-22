@@ -100,7 +100,15 @@ export const ShutdownPolicySchema = z.object({
   requireRepoClean: z.boolean().default(false),
   /** Run the pre-shutdown commit+push backup step. */
   autoCommitAndPush: z.boolean().default(true),
-  quietWindow: QuietWindowSchema.default({ enabled: false, startHour: 23, endHour: 7 }),
+  quietWindow: QuietWindowSchema.default({
+    enabled: false,
+    startHour: 23,
+    endHour: 7,
+    /* zod v4 `.default()` requires the full inferred shape — omitting
+     * restrictedDaysOfWeek was a type error; runtime semantics unchanged
+     * (inner default already resolved to Mon–Fri, per Rule 50). */
+    restrictedDaysOfWeek: [...DEFAULT_RESTRICTED_DAYS_OF_WEEK],
+  }),
 });
 
 /** @typedef {z.infer<typeof ShutdownPolicySchema>} ShutdownPolicy */

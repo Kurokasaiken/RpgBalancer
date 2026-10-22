@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import { CameraShotIdSchema } from '@/balancing/config/idleVillage/quests/questTheatreFx';
 import { ATMOSPHERE_KITS } from '@/balancing/config/idleVillage/quests/questAtmosphereFx';
-import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
+import { JOURNEY_LEG_ART, NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 
 /**
  * Ambient FX descriptor — the "life after the shot lands" layer
@@ -218,24 +218,48 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'smoke', at: [0.72, 0.35], count: 2, lean: 0.08 },
     ],
   },
-  ritorno: {
-    /* Baked --full-res: the 960px source halves below the depth-quality
-     *  floor (≥512 wide) used by the manifest tests. */
-    depth: '/assets/depth/ritorno.webp',
-    depthWidth: 960,
-    depthHeight: 504,
-    imgAspect: 960 / 504,
-    /* journey home — wide classical landscape, the carriage right of frame. */
+  'viaggio-andata': {
+    /* Journey legs (PLAN-053/R-263, prompts .mw/specs/quest-journey-legs):
+     * 3168×1320 theatre art — replaces the public-domain `ritorno.jpg`
+     * placeholder entry and the contain-fit mountain layer. */
+    depth: '/assets/depth/viaggio-andata.webp',
+    depthWidth: 1584,
+    depthHeight: 660,
+    imgAspect: 3168 / 1320,
+    /* outbound — the open gate at dawn; the road unspools into the
+     * wilderness, so the entrance sweeps along it. */
     entrance: 'enter-sweep',
     pose: 'pose-rest',
-    focusAnchor: [0.68, 0.72],
-    /* OB-8 pass 1 (Director): il ritorno non va raccontato come scena —
-     * sarà un tragitto riempito POI→villaggio (plan dedicato). Nessun
-     * overlay finché la fase non cambia forma. */
+    /* Narrative focal: the trail vanishing into the forest wall —
+     * the direction of the whole leg. */
+    focusAnchor: [0.55, 0.55],
     atmosphere: [],
     ambient: [
+      /* Ember lantern still burning on the left gate post. */
+      { type: 'glow', at: [0.185, 0.46], r: 0.05, color: '#ffb050', a: 0.4, flicker: 0.45 },
+      { type: 'embers', at: [0.185, 0.46], count: 3 },
+      { type: 'dust', count: 12 },
+      /* High cloud drift over the peaks. */
+      { type: 'drift', band: [0.02, 0.28], count: 3, speed: 0.01, a: 0.07, color: '#e8e2d0' },
+    ],
+  },
+  'viaggio-ritorno': {
+    depth: '/assets/depth/viaggio-ritorno.webp',
+    depthWidth: 1584,
+    depthHeight: 660,
+    imgAspect: 3168 / 1320,
+    /* journey home — the village valley at sunset; same sweep, mirrored. */
+    entrance: 'enter-sweep',
+    pose: 'pose-rest',
+    /* Narrative focal: the village below — home, the end of the road. */
+    focusAnchor: [0.6, 0.62],
+    atmosphere: [],
+    ambient: [
+      /* Shrine ember on the right frame edge + village chimney smoke. */
+      { type: 'glow', at: [0.865, 0.365], r: 0.05, color: '#ffb050', a: 0.4, flicker: 0.3 },
+      { type: 'smoke', at: [0.55, 0.42], count: 3, lean: 0.1 },
+      { type: 'smoke', at: [0.6, 0.44], count: 2, lean: 0.12 },
       { type: 'dust', count: 10 },
-      { type: 'drift', band: [0.03, 0.3], count: 3, speed: 0.01, a: 0.06, color: '#e8e2d0' },
     ],
   },
   'agguato-foresta': {
@@ -271,7 +295,7 @@ export function artIdFromSrc(src: string): string {
  */
 export function cinematicEntryForSrc(src: string | undefined): SceneCinematicEntry | null {
   if (!src) return null;
-  const art = Object.values(NODE_ART).find((a) => a.src === src);
+  const art = [...Object.values(NODE_ART), ...Object.values(JOURNEY_LEG_ART)].find((a) => a.src === src);
   if (!art || art.fit !== 'cover') return null;
   return SCENE_CINEMATICS[artIdFromSrc(src)] ?? null;
 }

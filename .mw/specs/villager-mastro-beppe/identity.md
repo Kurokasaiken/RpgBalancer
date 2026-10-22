@@ -1,4 +1,7 @@
-# Identity — Mastro Beppe (villager, fortitude)
+# Identity — Bertoldo (villager, fortitude) — ex «Mastro Beppe»
+
+> R-268 (Director 2026-10-22): il display name in game è **Bertoldo**;
+> resident id invariato `villager-mastro-beppe`.
 
 Motore di Unicità (V2 §10.1, compilato prima del prompt).
 **Ruling Director 2026-10-22:** vita quotidiana, NON in missione né pronto a

@@ -10,7 +10,7 @@ import {
   artIdFromSrc,
   cinematicEntryForSrc,
 } from '@/ui/idleVillage/questS1Lab/render/sceneManifest';
-import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
+import { JOURNEY_LEG_ART, NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import { ATMOSPHERE_KITS } from '@/balancing/config/idleVillage/quests/questAtmosphereFx';
 import { fogMaskForDepth } from '@/ui/idleVillage/questS1Lab/render/atmosphereOverlay';
 import { DEFAULT_QUEST_THEATRE_FX } from '@/balancing/config/idleVillage/quests/questTheatreFx';
@@ -51,8 +51,10 @@ describe('shipped manifest entries', () => {
       expect(bytes).toBeLessThanOrEqual(DEFAULT_QUEST_THEATRE_FX.depth.bake.maxBytes);
     });
     it(`${id}: the source scene art exists`, () => {
-      const art = Object.values(NODE_ART).find((a) => artIdFromSrc(a.src) === id);
-      expect(art, `NODE_ART contains ${id}`).toBeTruthy();
+      const art = [...Object.values(NODE_ART), ...Object.values(JOURNEY_LEG_ART)].find(
+        (a) => artIdFromSrc(a.src) === id,
+      );
+      expect(art, `NODE_ART/JOURNEY_LEG_ART contains ${id}`).toBeTruthy();
       expect(existsSync(join(PUBLIC, art!.src))).toBe(true);
     });
     it(`${id}: baked depth aspect matches the source aspect`, () => {
@@ -100,7 +102,8 @@ describe('atmosphere authoring — conservative scene ownership', () => {
     expect(SCENE_CINEMATICS['accampamento-raider'].atmosphere).toEqual([]);
     expect(SCENE_CINEMATICS.saccheggio.atmosphere).toEqual([]);
     expect(SCENE_CINEMATICS['assalto-goblin'].atmosphere).toEqual([]);
-    expect(SCENE_CINEMATICS.ritorno.atmosphere).toEqual([]);
+    expect(SCENE_CINEMATICS['viaggio-ritorno'].atmosphere).toEqual([]);
+    expect(SCENE_CINEMATICS['viaggio-andata'].atmosphere).toEqual([]);
   });
 
   it('every scene with a fog kit has its baked depth-pool mask on disk', () => {

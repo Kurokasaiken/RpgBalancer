@@ -698,6 +698,9 @@ test.describe('PLAN-019-S2.5 — settlement + sequential POIs', () => {
     expect(terminal.ended).toBe(true);
     expect(['reward', 'survived', 'fled', 'wipe']).toContain(terminal.outcome);
 
+    /* R-260: `settled` lands at the report's dismissal — the hook invokes
+     *  the same commit callback the popup's «Collect» CTA calls. */
+    await expedition<void>(page, 'commitSettlement');
     await page.waitForFunction(
       (pid) => {
         const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid] as

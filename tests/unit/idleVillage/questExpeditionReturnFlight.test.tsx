@@ -90,7 +90,42 @@ interface Probe {
   residentsById: Record<string, ResidentState>;
 }
 
-const Harness: React.FC<{ probe: Probe; withRack?: boolean }> = ({ probe, withRack }) => {
+/** One painted commit, as the Director's eye would see it. */
+interface CommitFrame {
+  /** The seat still holds the resident — the seat would paint its medallion. */
+  seatHasMedal: boolean;
+  /** The seat copy is suppressed (empty cavity painted instead). */
+  seatSuppressed: boolean;
+  /** A flight proxy is in the DOM (the medallion is airborne). */
+  proxyAirborne: boolean;
+}
+
+/**
+ * Records every committed render after the fact — `useEffect` runs post-commit,
+ * so the DOM query sees exactly what was painted on that frame.
+ */
+const CommitSpy: React.FC<{
+  session: QuestExpeditionSession;
+  target: { slotId: string | null; rid: string | null };
+  frames: CommitFrame[];
+}> = ({ session, target, frames }) => {
+  React.useEffect(() => {
+    if (!target.slotId || !target.rid) return;
+    const seat = session.controller.slots.find((s) => s.id === target.slotId);
+    frames.push({
+      seatHasMedal: seat?.assignedResidentId === target.rid || seat?.assignedResident?.id === target.rid,
+      seatSuppressed: session.suppressedResidentIds?.includes(target.rid) ?? false,
+      proxyAirborne: Boolean(document.querySelector('[data-testid="flight-proxy"]')),
+    });
+  });
+  return null;
+};
+
+const Harness: React.FC<{
+  probe: Probe;
+  withRack?: boolean;
+  spy?: { target: { slotId: string | null; rid: string | null }; frames: CommitFrame[] };
+}> = ({ probe, withRack, spy }) => {
   const session = useQuestExpeditionSession({
     poi: questPoiById('poi-goblin')!,
     questRun: questRunStub(),
@@ -104,6 +139,7 @@ const Harness: React.FC<{ probe: Probe; withRack?: boolean }> = ({ probe, withRa
   /* The page mounts the overlays inside its shared DndContext. */
   return (
     <DndContext>
+      {spy ? <CommitSpy session={session} target={spy.target} frames={spy.frames} /> : null}
       {withRack ? (
         <ResidentSlotRack
           slots={session.controller.slots}
@@ -273,6 +309,52 @@ describe('quest expedition — extraction return flight (R-248)', () => {
         () => {
           expect(screen.queryByTestId('flight-proxy')).toBeNull();
           expect(probe.session!.flyingResidentId).toBeNull();
+        },
+        { timeout: 2000 },
+      );
+    } finally {
+      unmountAnchors();
+    }
+  });
+
+  // INV:use-quest-expedition-session.INV-4 — R-269: the medallion must be on
+  // exactly one carrier on EVERY painted frame. The clear, the seat
+  // suppression and the return flight are one transition → they land in the
+  // same commit, so a frame where the seat still holds the resident but its
+  // medallion is already hidden while no proxy is airborne (the «sparisce e
+  // riappare» the Director saw) can never paint.
+  it('never paints a frame where the seat medallion is suppressed before the proxy is airborne', async () => {
+    const target = { slotId: null as string | null, rid: null as string | null };
+    const frames: CommitFrame[] = [];
+    render(<Harness probe={probe} withRack spy={{ target, frames }} />);
+    const { slotId, rid } = eligiblePair(probe);
+    target.slotId = slotId;
+    target.rid = rid;
+    act(() => {
+      expect(expeditionHooks().assignToSlot(slotId, rid)).toBe(true);
+    });
+
+    const unmountAnchors = mountAnchors(slotId, rid);
+    try {
+      /* Outside `act`: the click must schedule with real React lanes — the
+       * bug only exists in the gap between the urgent suppression commit
+       * and the deferred flight commit, and `act` may merge them. */
+      expeditionHooks().clearSlot(slotId);
+      await waitFor(
+        () => expect(screen.queryByTestId('flight-proxy')).not.toBeNull(),
+        { timeout: 2000 },
+      );
+
+      /* The illegal frame: seat still assigned (its medallion would render)
+       * + suppressed (it doesn't) + no proxy airborne (nothing else carries
+       * it) → the medallion is invisible on that painted frame. */
+      const blinked = frames.filter((f) => f.seatHasMedal && f.seatSuppressed && !f.proxyAirborne);
+      expect(blinked).toEqual([]);
+
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId('flight-proxy')).toBeNull();
+          expect(probe.session!.lockedResidentIds).not.toContain(rid);
         },
         { timeout: 2000 },
       );

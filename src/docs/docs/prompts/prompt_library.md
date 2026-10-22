@@ -415,6 +415,7 @@ Villaggio — A majestic, wide-angle (21:9) landscape of a frontier village nest
 ### Output Reference – Villaggio
 
 - **Image:** [Villaggio Concept](../../src/assets/mood/villaggio.png)
+- **Image:** [Villaggio Montagne Concept](../../src/assets/mood/villaggio%20montagne.jpeg) — variante: passo montano, insediamento su cresta, cavaliere; impasto Jones più scuro/tempestoso (attenzione: firma «JONES» nel frame, da escludere in riuso come asset)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -470,6 +471,101 @@ Verso Mordor — An epic high-fantasy landscape of jagged obsidian cliffs and sh
 
 - **Image:** [Verso Mordor Concept](../../src/assets/mood/verso%20mordor.png)
 - **Note:** Folder: src/assets/mood
+
+---
+
+## Viaggio — Andata / Ritorno (gambe della quest)
+
+- **Intent:** Scene generiche 2.4:1 per le gambe di viaggio journey (PLAN-053/R-263): la partenza come attraversamento di soglia (villaggio dietro lo spettatore, MAI in frame) e il ritorno come valle dorata all'arrivo. Party mai disegnato; 3 piani di profondità per il parallasse da depth map; una lanterna/brace come ancora `glow`.
+- **Art Stack:** Jaime Jones + Jeff Easley impasto violento, palette Wilderness Solar Triumph (ultramarine/Veronese/amber/azure/cinnabar, ombre teal), composizione specchiata andata↔ritorno.
+- **Note:** spec completa + generation notes parallasse in `.mw/specs/quest-journey-legs/scenes/<scena>/prompt.md`. Se il generatore rifiuta nomi di artisti viventi, tenere il blocco tecnico descrittivo e togliere i nomi.
+
+### Prompt (copia/incolla – Andata)
+
+```text
+ANDATA — A masterful cinematic oil painting in heavy textured impasto: the moment of departure, seen from just outside the known world at first light. The camera stands a few steps past the village boundary — the village itself is behind the viewer, NEVER IN FRAME, not a single roof. SUBJECT: in sharp dark silhouette against a luminous sky, the open timber gate of the palisade spilling in from the left frame edge, one heavy leaf swung wide, a small ember-lantern still burning on the nearest post; below the gate line, deep cart ruts in pale dust thin into a wild trail that falls away toward a sun-drenched ancient forest wall and jagged Dolomites peaks under a vibrant azure sky. NO TRAVELERS — the party has already stepped through; the departure lives in the open gate and the empty road beyond. COMPOSITION: three clean depth planes — dark foreground occluders at the left edge, the road as a single leading line running away from the viewer, monumental peaks behind — asymmetric, wide open sky. LIGHTING: brilliant morning sun low behind the viewer, long saturated shadows thrown forward toward the wilderness, golden dust motes in the air. PALETTE: ultramarine distance, Veronese green forest, amber light, vibrant azure sky, one cinnabar prayer-ribbon tied to the gatepost; shadows deep teal-emerald — NO grey, NO brown, NO mud, NO black. STYLE & TECHNIQUE: thick, violent palette-knife brushstrokes, visible layers of paint adding physical depth (Jaime Jones, Jeff Easley), loose painterly edges, Sparth-like monumental scale in the peaks; the world rendered as rude beauty — weathered and tactile, never squalid. MOOD: the threshold crossed, the world opening with risk — luminous and high-chroma, light wins over darkness, even the deepest shadow is saturated color, never black murk. NO grim, NO gore, NO flat digital surfaces, NO airbrushed smoothness, NO text, NO signature, NO watermark, NO logo, NO people, NO humanoid figures, NO village, NO houses, NO roofs. Ultra-wide cinematic 21:9.
+```
+
+### Prompt (copia/incolla – Ritorno)
+
+```text
+RITORNO — A masterful cinematic oil painting in heavy textured impasto: an empty dirt road descending from a dark forest edge into a golden valley at sunset. SUBJECT: in sharp dark silhouette against the luminous sky, wind-bent pine boughs and a weathered roadside shrine bearing a faint ember-lantern hugging the right frame edge; mid-ground, the road unspooling downward in pale cart ruts; far below, a frontier village of timber and golden thatch roofs, chimney smoke promising safety. NO TRAVELERS — the road stays empty: the return is implied, the relief belongs to the player. COMPOSITION: three clean depth planes — dark foreground occluders at the right edge, the descending road, the distant village and valley — asymmetric, wide warm and open, visual weight right-of-center. LIGHTING: low golden late sun raking across the valley, long soft shadows, warm dust in the air, the shrine ember a tiny second light. PALETTE: amber-golden valley, Veronese meadows, ultramarine haze, cinnabar-gold sunset sky; deep teal-emerald shadows under the forest edge — NO grey, NO brown, NO mud. STYLE & TECHNIQUE: thick, violent palette-knife brushstrokes, visible layers of paint adding physical depth (Jaime Jones, Jeff Easley), loose painterly edges, Sparth-like monumental scale in the valley; the world rendered as rude beauty — weathered and tactile, never squalid. MOOD: relief, the fragile joy of having survived — luminous and high-chroma, light wins over darkness, even the deepest shadow is saturated color, never black murk. NO grim, NO gore, NO flat digital, NO airbrushed smoothness, NO text, NO signature, NO watermark, NO logo, NO people, NO humanoid figures, NO sign of threat. Ultra-wide cinematic 21:9.
+```
+
+### Output Reference – Viaggio
+
+- **Image:** `public/assets/scene-library/viaggio-andata.jpg` / `viaggio-ritorno.jpg` (3168×1320, catalogo riuso in `CATALOG.md`)
+- **Note:** le stesse immagini servono tutte le quest (tag `generic`); il manifest cinematico vive in `SCENE_CINEMATICS` (`viaggio-andata` / `viaggio-ritorno`).
+
+---
+
+## Ritratti Popolani — Bertoldo / Lisetta / Manno (villager)
+
+- **Intent:** Ritratti «vita quotidiana del mestiere» per i tre popolani del roster (ruling Director: niente battaglia né strumenti impugnati come armi — il personaggio vive nel suo lavoro, l'unicità sta nella contraddizione interna al mestiere). Formato portrait canonico 512×279 landscape, split-rendering §10.2: volto Ruan Jia pulito, corpo/mondo in impasto violento.
+- **Art Stack:** Split-rendering (volto hyper-real Ruan Jia senza pennellate; abiti/attrezzi/ambiente in heavy textured impasto Jaime Jones / Jeff Easley), Solar Triumph, palette per-personaggio centrata su cinnabar/honey-gold.
+- **Note:** Motore di Unicità compilato in `.mw/specs/villager-{mastro-beppe,lisetta,baldassarre}/identity.md`, prompt + negativo + compressa SDXL in `prompt.md` della stessa spec. Naming R-268: display name Bertoldo (id residente `villager-mastro-beppe`), Lisetta (`villager-lisetta`), Manno (`villager-baldassarre`).
+
+### Prompt (copia/incolla – Bertoldo, carpentiere)
+
+```text
+SUBJECT TYPE: Human character — medieval fantasy village portrait.
+IDENTITY SENTENCE: A village master carpenter mid-strike on a timber joint in his workshop — a big blunt man doing the most exact work in the village.
+CULTURAL ANCHOR: The carpenters' workshop of a frontier alpine village — timber-and-thatch builders' guild.
+SIGNATURE HOOK: A heavy carpenter's mallet raised over a mortise joint, its handle still wrapped in the string he uses to measure timber.
+CONTRADICTION: The largest hands in the village, trained to measure twice and cut once — and they still do.
+FACE: Ruan Jia sculptural rendering — clean, luminous subsurface scattering — sawdust clinging to a greying beard, calm concentrated eyes.
+THE HANDS: Big plane-calloused palms, knuckles swollen from a lifetime at the bench.
+GEAR & PROVENANCE: Scorched leather work apron, chisels riding in its pockets; the mallet's head worn smooth at the edges from years of true strikes.
+GESTURE: Halfway through a blow at the workbench, mallet up, eyes on the joint — work paused mid-breath, as if he just noticed someone watching.
+PALETTE: Honey-gold timber and sunlight, cinnabar details, worn iron; deep teal shadows. NO grey, NO brown, NO mud.
+LIGHTING: Solar Triumph — blinding white light from above, deep cool teal shadows, prismatic dust motes.
+STYLE: Split-rendering — a masterful oil painting; the face rendered hyper-realistic and sculptural (Ruan Jia), no visible brushstrokes on the skin; body, apron, mallet and workshop in heavy textured oil impasto — thick, violent visible brushstrokes, layers of paint with physical depth (Jaime Jones / Jeff Easley).
+MOOD: Quiet pride + the patience of craft.
+NO LIST: battle, weapon brandishing, armor, helmet, sword, soldier gear, T-pose, symmetry, modern clothing, sci-fi, grim, mud, brown, multiple people, text, watermark, signature, logo.
+```
+
+### Prompt (copia/incolla – Lisetta, sarta)
+
+```text
+SUBJECT TYPE: Human character — medieval fantasy village portrait.
+IDENTITY SENTENCE: A village seamstress mid-cut through a bolt of linen at her worktable — she could cut a straight line blindfolded, and watches it anyway.
+CULTURAL ANCHOR: The weavers' attic of a frontier alpine village — guild of thread and linen.
+SIGNATURE HOOK: A pair of oversized tailor's shears open mid-snip along a chalked line on the cloth, a faded ribbon still knotted on one handle.
+CONTRADICTION: The sharpest eyes in the village, trained on cloth — nothing about her is soft except the linen.
+FACE: Ruan Jia sculptural rendering — clean, luminous subsurface scattering — sharp, faintly amused eyes of someone who threads a needle first try and judges everyone's hems.
+THE HANDS: Slim fingers marked by needle pricks and thimble calluses.
+GEAR & PROVENANCE: Measuring tape worn as a sash, pincushion bracelet on the wrist with the pins still in it.
+GESTURE: Bent over the worktable, shears mid-cut, chin down, sighting the chalk line along the open blades.
+PALETTE: Cinnabar thread and ribbon, alabaster linen, iron blades; deep teal shadows. NO grey, NO brown, NO mud.
+LIGHTING: Solar Triumph — blinding white light, deep cool teal shadows, prismatic dust motes.
+STYLE: Split-rendering — a masterful oil painting; the face rendered hyper-realistic and sculptural (Ruan Jia), no visible brushstrokes on the skin; dress, shears and attic in heavy textured oil impasto — thick, violent visible brushstrokes, layers of paint with physical depth (Jaime Jones / Jeff Easley).
+MOOD: Precise, wry, quietly exacting.
+NO LIST: battle, weapon brandishing, armor, dagger, assassin look, catalog beauty, T-pose, symmetry, modern clothing, sci-fi, grim, mud, brown, multiple people, text, watermark, signature, logo.
+```
+
+### Prompt (copia/incolla – Manno, macellaio)
+
+```text
+SUBJECT TYPE: Human character — medieval fantasy village portrait.
+IDENTITY SENTENCE: A village butcher at his block — the biggest man in the village, gentle with everything he touches.
+CULTURAL ANCHOR: The butcher's shop and tavern of a frontier alpine village.
+SIGNATURE HOOK: A cleaver worn thin at the heel from decades of sharpening, coming down on a cut with the care of a man who knows exactly how heavy he is.
+CONTRADICTION: Hands that break bones for a living — moving like they're afraid of cracking an egg.
+FACE: Ruan Jia sculptural rendering — clean, luminous subsurface scattering — wide flushed face, warm slightly bashful eyes under a heavy brow.
+THE HANDS: Butcher's hands: huge, stained, knuckles that break bones for a living.
+GEAR & PROVENANCE: Grease-stained work apron, meat cleaver, a boar-tusk necklace — the only dangerous thing he ever faced.
+GESTURE: At the block, cleaver mid-cut, shoulders rolled forward, one cheek almost smiling at a customer off-frame.
+PALETTE: Basalt-iron cleaver, cinnabar apron, sun-bleached wood gold; deep teal shadows. NO grey, NO brown, NO mud.
+LIGHTING: Solar Triumph — blinding white light, deep cool teal shadows, prismatic dust motes.
+STYLE: Split-rendering — a masterful oil painting; the face rendered hyper-realistic and sculptural (Ruan Jia), no visible brushstrokes on the skin; body, cleaver and shop in heavy textured oil impasto — thick, violent visible brushstrokes, layers of paint with physical depth (Jaime Jones / Jeff Easley).
+MOOD: Warm solidity + gentle strength.
+NO LIST: battle, weapon brandishing, shield, tavern door, armor, helmet, T-pose, symmetry, modern clothing, sci-fi, grim, mud, brown, multiple people, text, watermark, signature, logo.
+```
+
+### Output Reference – Popolani
+
+- **Image:** `src/assets/portraits/villager bertoldo.jpeg` (1584×672) / `villager lisetta.jpeg` (1376×768) / `villager manno.jpeg` (1408×768) — tavole full-res: lo stesso asset serve bust (CSS `portraitCrop`), character sheet (`fullFigure`) e medaglione (`src/assets/portraits/medal/*.webp` via `scripts/build-medal-portraits.py`, quadrato centrato-top per stem)
+- **Note:** profili `villager-bertoldo` / `villager-lisetta` / `villager-manno` in `residentVisuals.ts` (`appliesToResidentIds` → seed id roster); risoluzione via `resolveResidentPortrait`; framing contract: volto in fascia alto-centro (crop `xMidYMin` del medaglione) — guida end-to-end in `src/assets/portraits/README.md` (R-268).
 
 ---
 

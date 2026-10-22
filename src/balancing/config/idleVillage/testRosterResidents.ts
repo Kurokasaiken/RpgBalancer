@@ -106,16 +106,21 @@ export const TEST_ROSTER_HEROES: SavedCharacter[] = [
  * (character_resident_trusted.md). Popolani, non eroi: hp 50 base e ogni
  * stat al massimo DEFAULT+10 (R-139). Tagged to cover the goblin OPTIONAL
  * slots:
- *   member-1  (edge | fortitude | warden)  → mastro-beppe  'fortitude'
- *   member-2  (precision | clarity)        → lisetta       'precision'
- *   bodyguard (warden | fortitude)         → baldassarre   'warden'
- * `aiBehavior: 'random'` keeps them out of the hero visual profiles — the
- * placeholder profile yields the deterministic badge portrait.
+ *   member-1  (edge | fortitude | warden)  → villager-mastro-beppe 'fortitude'
+ *   member-2  (precision | clarity)        → villager-lisetta      'precision'
+ *   bodyguard (warden | fortitude)         → villager-baldassarre  'warden'
+ * `aiBehavior: 'random'` keeps them out of the hero stat profiles.
+ *
+ * R-268 (Director): display names are medieval-Italian popolani names —
+ * Bertoldo (carpenter), Lisetta (seamstress), Manno (butcher). The resident
+ * ids keep the historical slugs so persisted consequences merge by id;
+ * `visualProfileId` points at the trade-portrait profiles in
+ * `residentVisuals.ts` (full art + generated medal square).
  */
 export const TEST_ROSTER_VILLAGERS: SavedCharacter[] = [
   {
     id: 'villager-mastro-beppe',
-    name: 'Mastro Beppe',
+    name: 'Bertoldo',
     aiBehavior: 'random',
     statBlock: createStatBlock({
       hp: 50,
@@ -125,7 +130,7 @@ export const TEST_ROSTER_VILLAGERS: SavedCharacter[] = [
       armor: 10,
     }),
     equippedSpellIds: [],
-    visualProfileId: 'fallback_placeholder_profile',
+    visualProfileId: 'villager-bertoldo',
     status: 'available',
     fatigue: 0,
     currentHp: 50,
@@ -150,7 +155,7 @@ export const TEST_ROSTER_VILLAGERS: SavedCharacter[] = [
       critChance: 10,
     }),
     equippedSpellIds: [],
-    visualProfileId: 'fallback_placeholder_profile',
+    visualProfileId: 'villager-lisetta',
     status: 'available',
     fatigue: 0,
     currentHp: 50,
@@ -165,7 +170,7 @@ export const TEST_ROSTER_VILLAGERS: SavedCharacter[] = [
   },
   {
     id: 'villager-baldassarre',
-    name: 'Baldassarre',
+    name: 'Manno',
     aiBehavior: 'random',
     statBlock: createStatBlock({
       hp: 50,
@@ -175,7 +180,7 @@ export const TEST_ROSTER_VILLAGERS: SavedCharacter[] = [
       block: 10,
     }),
     equippedSpellIds: [],
-    visualProfileId: 'fallback_placeholder_profile',
+    visualProfileId: 'villager-manno',
     status: 'available',
     fatigue: 0,
     currentHp: 50,

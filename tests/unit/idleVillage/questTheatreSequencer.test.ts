@@ -63,7 +63,7 @@ const harmBeat = (kind: HarmEvent['kind']): QuestBeat => ({
   id: `harm-${kind}`,
   kind: 'harm',
   harm: { seq: 1, kind, memberId: 'm1', amount: 3 } as HarmEvent,
-  memberName: 'Mastro Beppe',
+  memberName: 'Bertoldo',
   line: 'ferita',
 });
 

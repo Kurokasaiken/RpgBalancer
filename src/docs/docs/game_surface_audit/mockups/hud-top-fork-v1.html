@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HUD alto HUD-3</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--display:"Cinzel",serif;--serif:"EB Garamond",Georgia,serif;--title:#f0cf6a;--text:#F5F2E8;--text2:rgba(245,242,232,.74);--label:#c9a84e;--lift:#0f2a35;--deep:#060f16;--brass-hi:#cfaf63;--page:#0b1c22;--dim:#a9b3ad;--rule:rgba(223,184,87,.22);--ember:#e07a5f}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:#e9dfc6;font:16px/1.5 var(--serif)}
+header,main{max-width:1500px;margin:0 auto;padding:0 16px}header{padding-top:24px}
+h1{font:600 24px var(--display);letter-spacing:.06em;color:var(--title);margin:0 0 6px}
+h2{font:600 17px var(--display);color:var(--label);margin:22px 0 6px;border-top:1px solid var(--rule);padding-top:18px}
+.note{color:var(--dim);max-width:1100px;font-size:14px}
+.sea{position:relative;height:120px;background:linear-gradient(180deg,#1b4a58,#14333f);overflow:hidden}
+.top{position:absolute;inset:0;display:grid;column-gap:12px;padding:0 20px;align-items:stretch}
+.plate{background:linear-gradient(180deg,var(--lift),var(--deep));border:1.5px solid var(--brass-hi);border-top:0;border-radius:0 0 22px 22px;box-shadow:inset 0 0 0 3px var(--deep),inset 0 0 0 4px rgba(207,175,99,.3);color:var(--text);display:flex;align-items:center;height:84px;min-width:0}
+.menu{font:600 12px var(--display);letter-spacing:.14em;padding:5px 16px;border-radius:999px;background:#0a1d26;border:1px solid rgba(207,175,99,.5);white-space:nowrap}
+.sep{width:1px;align-self:stretch;margin:16px 0;background:rgba(207,175,99,.3)}
+.when{font:600 15px var(--display);letter-spacing:.14em;color:var(--label);white-space:nowrap}.when i{font:normal 15px var(--serif);color:var(--text);letter-spacing:.02em;margin-left:10px}
+.spd{display:flex;gap:4px}.spd b{font:600 12px var(--display);border:1px solid rgba(207,175,99,.4);border-radius:6px;padding:5px 9px;background:#0a1d26;color:var(--label)}.spd b.on{background:#14434f;color:var(--title);border-color:var(--title)}
+.tile{border:1px solid rgba(207,175,99,.35);border-radius:8px;padding:6px 12px;background:#0a1d26;font:600 18px var(--display);white-space:nowrap}.tile small{display:block;font:500 11px var(--display);letter-spacing:.12em;color:var(--label)}.tile em{font:normal 12px var(--serif);color:var(--text2);margin-left:6px}
+.tile.ember{border:1.5px solid var(--ember);box-shadow:0 0 10px var(--ember)}
+.next{justify-content:center;gap:14px;padding:0 20px}
+.hd{display:flex;align-items:center;gap:10px}.hd .g{width:30px;height:30px;border-radius:8px;border:1px solid rgba(207,175,99,.5);background:#0a1d26;display:grid;place-items:center;color:var(--title);font:700 15px var(--display)}
+.hd .t{font:500 16px/1.2 var(--serif);color:var(--text)}.hd .d{white-space:nowrap;flex-shrink:0;font:600 13px var(--display);letter-spacing:.08em;color:var(--title);border:1px solid rgba(240,207,106,.5);border-radius:999px;padding:2px 10px}
+.mini{display:flex;align-items:center;gap:6px;font:600 12px var(--display);color:var(--label);opacity:.9}.mini .g{width:22px;height:22px;border-radius:6px;border:1px solid rgba(207,175,99,.4);display:grid;place-items:center;font-size:11px}
+.lbl{position:absolute;top:92px;left:20px;font:12px var(--display);letter-spacing:.1em;color:#cfe}
+table{border-collapse:collapse;font-size:14px;margin:8px 0}th,td{border-bottom:1px solid var(--rule);padding:4px 10px;text-align:right}th:first-child,td:first-child{text-align:left}th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label)}
+</style></head><body>
+<header><h1>HUD alto — HUD-3 · proposta A</h1>
+<p class="note">Tre proposte: <b>A</b> due ali e un centro vivo (raccomandata), <b>B</b> barra unica con filetti, <b>C</b> due lastre simmetriche senza centro. In A: Sinistra = il quando (MENU · giorno e regione · velocità), destra = cosa ho (risorse), centro = cosa sta arrivando: il registro eventi ridotto a una striscia, il primo evento fa da obiettivo e si clicca per portare la camera. Tre lastre alte uguali, nessun buco largo. Nei fotogrammi «Oggi» la barra com'è adesso.</p></header>
+<main>
+<h2>1440 × 900 — oggi</h2>
+<div class="sea" id="now1440" style="width:1440px"><div class="top" style="grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)">
+ <div class="plate" style="justify-self:start;padding:0 16px"><span class="menu">≡ MENU</span></div>
+ <div class="plate" style="padding:0 34px;gap:18px"><span class="when">DAY 3<i>The Eastern Marches</i></span><span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span></div>
+ <div class="plate" style="justify-self:end;padding:0 40px;gap:12px"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<em>−6/d · 0 d left</em><small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div></div></div>
+<h2>1440 × 900 — proposta A</h2>
+<div class="sea" id="a1440" style="width:1440px"><div class="top" style="grid-template-columns:auto minmax(0,1fr) auto">
+ <div class="plate" style="padding:0 22px;gap:16px"><span class="menu">≡ MENU</span><span class="sep"></span><span class="when">DAY 3<i>The Eastern Marches</i></span><span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span></div>
+ <div class="plate next"><div class="hd"><span class="g">⚔</span><span class="t">I goblin sbarcano — prepara una spedizione</span><span class="d">3 g</span></div><span class="sep"></span><span class="mini"><span class="g">🌾</span>cibo 5 g</span><span class="mini"><span class="g">✦</span>mercante 7 g</span></div>
+ <div class="plate" style="padding:0 26px;gap:12px"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<em>−6/d · 0 d left</em><small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div></div></div>
+<h2>1280 × 720 — oggi</h2>
+<div class="sea" id="now1280" style="width:1280px"><div class="top" style="grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)">
+ <div class="plate" style="justify-self:start;padding:0 16px"><span class="menu">≡ MENU</span></div>
+ <div class="plate" style="padding:0 28px;gap:14px"><span class="when">DAY 3</span><span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span></div>
+ <div class="plate" style="justify-self:end;padding:0 24px;gap:10px"><div class="tile">15<small>GOLD</small></div><div class="tile ember">2 /20<small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div></div></div>
+<h2>1280 × 720 — proposta A</h2>
+<div class="sea" id="a1280" style="width:1280px"><div class="top" style="grid-template-columns:auto minmax(0,1fr) auto">
+ <div class="plate" style="padding:0 18px;gap:12px"><span class="menu">≡ MENU</span><span class="sep"></span><span class="when">DAY 3</span><span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span></div>
+ <div class="plate next" style="padding:0 14px"><div class="hd"><span class="g">⚔</span><span class="t">Goblin: prepara una spedizione</span><span class="d">3 g</span></div></div>
+ <div class="plate" style="padding:0 20px;gap:10px"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<em>−6/d · 0 d</em><small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div></div></div>
+<h2>1440 — B · barra unica</h2><div class="sea" id="b1440" style="width:1440px"><div class="top" style="grid-template-columns:1fr;padding:0 20px">
+ <div class="plate rail" style="width:100%;padding:0 22px;gap:22px;display:grid;grid-template-columns:auto auto 1fr auto;align-items:center">
+  <span class="menu">≡ MENU</span><span style="display:flex;gap:14px;align-items:center;padding-left:22px;border-left:1px solid rgba(207,175,99,.3)"><span class="when">DAY 3<i>The Eastern Marches</i></span><span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span></span>
+  <span class="next" style="display:flex;justify-content:center;gap:14px;border-left:1px solid rgba(207,175,99,.3);border-right:1px solid rgba(207,175,99,.3);padding:0 22px;margin:14px 0;height:56px;align-items:center"><div class="hd"><span class="g">⚔</span><span class="t">I goblin sbarcano — prepara una spedizione</span><span class="d">3 g</span></div><span class="sep"></span><span class="mini"><span class="g">🌾</span>cibo 5 g</span><span class="mini"><span class="g">✦</span>mercante 7 g</span></span>
+  <span style="display:flex;gap:12px"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<em>−6/d · 0 d left</em><small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></span></div></div></div><h2>1440 — C · due lastre simmetriche (MENU nel tempo)</h2><div class="sea" id="c1440" style="width:1440px"><div class="top" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+ <div class="plate" style="justify-self:stretch;padding:0 22px;gap:18px;justify-content:flex-start"><span class="menu">≡ MENU</span><span class="sep"></span><span class="when">DAY 3<i>The Eastern Marches</i></span><span style="flex:1"></span><span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span></div>
+ <div class="plate" style="justify-self:stretch;padding:0 26px;gap:12px;justify-content:flex-end"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<em>−6/d · 0 d left</em><small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div></div></div><h2>1280 — B · barra unica</h2><div class="sea" id="b1280" style="width:1280px"><div class="top" style="grid-template-columns:1fr;padding:0 20px">
+ <div class="plate rail" style="width:100%;padding:0 16px;gap:16px;display:grid;grid-template-columns:auto auto 1fr auto;align-items:center">
+  <span class="menu">≡ MENU</span><span style="display:flex;gap:14px;align-items:center;padding-left:16px;border-left:1px solid rgba(207,175,99,.3)"><span class="when">DAY 3</span><span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span></span>
+  <span class="next" style="display:flex;justify-content:center;gap:14px;border-left:1px solid rgba(207,175,99,.3);border-right:1px solid rgba(207,175,99,.3);padding:0 16px;margin:14px 0;height:56px;align-items:center"><div class="hd"><span class="g">⚔</span><span class="t">Goblin: prepara una spedizione</span><span class="d">3 g</span></div></span>
+  <span style="display:flex;gap:12px"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<em>−6/d · 0 d</em><small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></span></div></div></div><h2>1280 — C · due lastre simmetriche (MENU nel tempo)</h2><div class="sea" id="c1280" style="width:1280px"><div class="top" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+ <div class="plate" style="justify-self:stretch;padding:0 16px;gap:12px;justify-content:flex-start"><span class="menu">≡ MENU</span><span class="sep"></span><span class="when">DAY 3</span><span style="flex:1"></span><span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span></div>
+ <div class="plate" style="justify-self:stretch;padding:0 20px;gap:12px;justify-content:flex-end"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<em>−6/d · 0 d</em><small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div></div></div><h2>Misure</h2><div id="meas"></div>
+<p class="note">Regole: il centro mostra al massimo tre eventi (il primo per esteso, gli altri come glifo + giorni); a 1280 resta solo il primo con testo corto, e la regione passa nel tooltip di «DAY». Il cibo mantiene «−6/d · N d» anche a 1280 (accorciato), perché è il numero che decide la partita. Se non c'è nessun evento la lastra centrale non compare e le due ali si avvicinano (sempre uno spazio massimo di 24 px). Il testo dell'obiettivo segue la regola a priorità di DN-3 (minaccia, cibo, quest).</p>
+</main>
+<script>
+document.fonts.ready.then(()=>{const rows=[];for(const id of ['now1440','a1440','b1440','c1440','now1280','a1280','b1280','c1280']){const root=document.getElementById(id);const rr=root.getBoundingClientRect();const pl=[...root.querySelectorAll('.top > .plate')].map(p=>p.getBoundingClientRect());const gaps=[];for(let i=1;i<pl.length;i++)gaps.push(Math.round(pl[i].left-pl[i-1].right));const edge=[Math.round(pl[0].left-rr.left),Math.round(rr.right-pl[pl.length-1].right)];const w=pl.map(p=>Math.round(p.width));const bal=Math.round(Math.abs(w[0]-w[w.length-1])/(w[0]+w[w.length-1])*100);rows.push(`<tr><td>${id}</td><td>${w.join(' / ')}</td><td>${gaps.join(' / ')}</td><td>${bal}%</td></tr>`);}
+document.getElementById('meas').innerHTML='<table><tr><th>Frame</th><th>Larghezze lastre (px)</th><th>Vuoti tra lastre (px)</th><th>Sbilanciamento ali</th></tr>'+rows.join('')+'</table>';document.body.dataset.ready='1';});
+</script></body></html>

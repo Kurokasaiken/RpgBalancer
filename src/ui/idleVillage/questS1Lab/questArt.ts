@@ -14,7 +14,9 @@ export const ART = {
 
 /** Scene art per quest node — the Passo, the goblin camp, the village. */
 export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }> = {
-  viaggio: { src: ART.mountains, fit: 'contain' },
+  /* Transit art (PLAN-053/R-263): `viaggio`/`ritorno` now carry the painted
+   * journey legs — threshold gate outbound, valley home inbound. */
+  viaggio: { src: '/assets/scene-library/viaggio-andata.jpg', fit: 'cover' },
   incidente: { src: ART.mountains, fit: 'contain' },
   avvistamento: { src: ART.mountains, fit: 'contain' },
   approccio: { src: ART.goblinTotem, fit: 'contain' },
@@ -29,7 +31,7 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'rientra-o-rischi': { src: ART.goblinTotem, fit: 'contain' },
   'check-forziere': { src: ART.goblinTotem, fit: 'contain' },
   risveglio: { src: ART.goblinMarch, fit: 'contain' },
-  ritorno: { src: ART.village, fit: 'contain' },
+  ritorno: { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
   /* ---- Le Rovine sotto il Fiume — downloaded scene art (public domain,
    *  one image per phase, per Director request 2026-10-04) --------------- */
   'rv-mercante': { src: '/assets/quest-robine/mercante.jpg', fit: 'cover' },
@@ -53,10 +55,8 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
    *  2026-10-13; prompts .mw/specs/quest-goblin-scenes/, catalog + reuse
    *  tags in public/assets/scene-library/CATALOG.md). The scene-library
    *  files are named by subject, not by quest phase, so other quests can
-   *  reuse them. `gob-ritorno` still uses the public-domain
-   *  placeholders (transit art viaggio/ritorno not yet generated); the
-   *  optional merchant event node is not authored yet — its art is
-   *  cataloged as mercante-strada.jpg. */
+   *  reuse them. The optional merchant event node is not authored yet —
+   *  its art is cataloged as mercante-strada.jpg. */
   'gob-esplora': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
@@ -69,9 +69,21 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-incalza-check': { src: '/assets/scene-library/fuga-goblin.jpg', fit: 'cover' },
   'gob-esplora-extra': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
   'gob-cerca': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
-  'gob-ritorno': { src: '/assets/quest-goblin/ritorno.jpg', fit: 'cover' },
+  'gob-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
   'gob-agguato': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
   'gob-agguato-scelta': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
   'gob-ultimo-scontro': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
   'gob-fine': { src: ART.village, fit: 'contain' },
+};
+
+/**
+ * Travel-leg paintings (PLAN-053/R-263, .mw/specs/quest-journey-legs):
+ * a journey fase owns no scenario node — while the beat queue is drained
+ * the theatre shows the leg art instead of the last arrived node's
+ * painting. `andata` = the open gate threshold; `ritorno` = the village
+ * valley at sunset. Generic by design: every quest reuses them.
+ */
+export const JOURNEY_LEG_ART: Record<'andata' | 'ritorno', { src: string; fit: 'cover' }> = {
+  andata: { src: '/assets/scene-library/viaggio-andata.jpg', fit: 'cover' },
+  ritorno: { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
 };

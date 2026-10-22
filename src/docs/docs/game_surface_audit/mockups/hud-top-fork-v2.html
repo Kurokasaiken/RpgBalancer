@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HUD alto HUD-3 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--display:"Cinzel",serif;--serif:"EB Garamond",Georgia,serif;--title:#f0cf6a;--text:#F5F2E8;--text2:rgba(245,242,232,.74);--label:#c9a84e;--lift:#0f2a35;--deep:#060f16;--brass-hi:#cfaf63;--page:#0b1c22;--dim:#a9b3ad;--rule:rgba(223,184,87,.22);--ember:#e07a5f;--iron:#93a4ad}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:#e9dfc6;font:16px/1.5 var(--serif)}
+header,main{max-width:1480px;margin:0 auto;padding:0 16px}header{padding-top:24px}
+h1{font:600 24px var(--display);letter-spacing:.06em;color:var(--title);margin:0 0 6px}
+h2{font:600 17px var(--display);color:var(--label);margin:26px 0 6px;border-top:1px solid var(--rule);padding-top:18px}
+.note{color:var(--dim);max-width:1100px;font-size:14px;margin:6px 0}
+.f{position:relative;overflow:hidden;background-position:top left;background-repeat:no-repeat}
+.f.w1440{width:1440px;height:900px;background-image:url(assets/map-bare-1440.jpg);background-size:1440px 900px}
+.f.w1280{width:1280px;height:720px;background-image:url(assets/map-bare-1280.jpg);background-size:1280px 720px}
+.f.crop{height:300px}
+/* tab (linguetta) */
+.tab{position:absolute;top:0;height:62px;display:flex;align-items:center;gap:12px;padding:0 18px;background:linear-gradient(180deg,var(--lift),var(--deep));border:1.5px solid var(--brass-hi);border-top:0;border-radius:0 0 18px 18px;box-shadow:inset 0 0 0 3px var(--deep),inset 0 0 0 4px rgba(207,175,99,.28),0 8px 18px rgba(3,20,26,.55);color:var(--text)}
+.med{width:40px;height:40px;border-radius:50%;flex:0 0 auto;position:relative;background:conic-gradient(var(--title) 0 62%,rgba(207,175,99,.18) 62% 100%);display:grid;place-items:center}
+.med::before{content:"";position:absolute;inset:3px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#173d4a,#071820)}
+.med i{position:relative;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ffe7a1,#e0a83a);box-shadow:0 0 8px rgba(240,207,106,.8)}
+.med.big{width:68px;height:68px}.med.big i{width:26px;height:26px}
+.day{font:600 14px var(--display);letter-spacing:.16em;color:var(--label);white-space:nowrap}.day b{color:var(--text);font-weight:600;margin-left:6px}
+.spd{display:flex;gap:3px}.spd b{font:600 11px var(--display);border:1px solid rgba(207,175,99,.4);border-radius:6px;padding:4px 8px;background:#0a1d26;color:var(--label)}.spd b.on{background:#14434f;color:var(--title);border-color:var(--title)}
+.tile{display:flex;align-items:baseline;gap:6px;font:600 17px var(--display);white-space:nowrap;padding:4px 10px;border-radius:8px;border:1px solid rgba(207,175,99,.3);background:#0a1d26}.tile small{font:500 10px var(--display);letter-spacing:.12em;color:var(--label)}.tile em{font:normal 12px var(--serif);color:#f0b39f}
+.tile.ember{border:1.5px solid var(--ember);box-shadow:0 0 9px var(--ember)}
+.ic{font-size:15px;color:var(--title);font-family:'Apple Symbols','Segoe UI Symbol',serif}
+.alert{gap:10px;cursor:pointer}.alert .glyph{width:30px;height:30px;border-radius:8px;border:1px solid var(--ember);color:#f2b38f;display:grid;place-items:center;font:700 16px 'Apple Symbols','Segoe UI Symbol',serif;background:#1e1210}
+.alert .t{font:500 16px var(--serif);white-space:nowrap}.alert .d{font:600 13px var(--display);letter-spacing:.06em;color:#f2b38f;border:1px solid rgba(224,122,95,.6);border-radius:999px;padding:1px 10px;white-space:nowrap}
+.quiet .glyph{border-color:rgba(207,175,99,.45);color:var(--label);background:#0a1d26}.quiet .t{color:var(--text2);font-style:italic}.quiet .d{color:var(--label);border-color:rgba(207,175,99,.4)}
+.tip{position:absolute;width:300px;background:linear-gradient(180deg,var(--lift),var(--deep));border:1px solid var(--brass-hi);border-radius:8px;padding:10px 12px;box-shadow:0 14px 28px rgba(0,0,0,.6);font:15px/1.35 var(--serif);color:var(--text)}
+.tip .l{font:600 11px var(--display);letter-spacing:.16em;color:var(--label)}.tip .go{display:inline-block;margin-top:8px;font:600 11px var(--display);letter-spacing:.14em;color:var(--title);border:1px solid var(--brass-hi);border-radius:6px;padding:4px 12px;background:linear-gradient(180deg,#123341,#081b24)}
+kbd{font:600 11px var(--display);border:1px solid rgba(207,175,99,.5);border-radius:4px;padding:0 5px;color:var(--text);background:#0a1d26}
+.util{position:absolute;right:28px;bottom:26px;display:flex;gap:8px}.util span{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 40% 35%,#173d4a,#071820);border:1.5px solid var(--brass-hi);color:var(--title);font:700 15px var(--display)}
+.util span.hl{box-shadow:0 0 0 3px rgba(240,207,106,.35)}
+.pennant{position:absolute;top:62px;display:flex;align-items:center;gap:8px;padding:5px 14px 7px;background:linear-gradient(180deg,#24120d,#120806);border:1px solid var(--ember);border-top:0;border-radius:0 0 10px 10px;box-shadow:0 6px 14px rgba(0,0,0,.5);font:500 14px var(--serif);color:var(--text);white-space:nowrap}
+.pennant b{font:600 12px var(--display);color:#f2b38f;letter-spacing:.06em}
+.ring{position:absolute;inset:-9px;border-radius:50%;border:1px dashed rgba(207,175,99,.35)}
+.notch{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--ember);box-shadow:0 0 6px var(--ember);border:1.5px solid #1e1210}
+.notch.q{background:var(--label);box-shadow:none}
+table{border-collapse:collapse;font-size:14px;margin:8px 0}th,td{border-bottom:1px solid var(--rule);padding:4px 10px;text-align:right}th:first-child,td:first-child{text-align:left}th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label)}
+</style></head><body>
+<header><h1>HUD alto — HUD-3 v2</h1>
+<p class="note">Fotogrammi sulla <b>mappa vera</b> (1440×900 e 1280×720). In tutte: a sinistra il <b>medaglione giorno/notte</b> al posto di MENU, linguette più basse (62 px invece di 84) e staccate fra loro; il menu è <b>Esc</b> più un'icona ☰ nell'angolo delle utilità in basso a destra (per chi non raggiunge Esc). Il cibo tiene sempre «−6/d · N g». Ogni proposta mostra tre stati del centro: <b>allarme</b>, <b>quiete</b> (il prossimo evento è lontano), <b>niente</b>.</p></header>
+<main id="m"></main>
+<script>
+const SPD='<span class="spd"><b>❚❚</b><b class="on">×1</b><b>×2</b><b>×4</b></span>';
+const RES=(w)=>`<div class="tile">15<small>ORO</small></div><div class="tile ember">0/20 <em>${w===1440?'−6/g · 0 g':'−6/g'}</em><small>CIBO</small></div><div class="tile">0<small>LEGNO</small></div>`;
+const LEFT=(w,extra='')=>`<div class="tab" id="L" style="left:20px"><span class="med"><i></i></span><span class="day">GIORNO<b>3</b></span>${SPD}${extra}</div>`;
+const RIGHT=(w)=>`<div class="tab" id="R" style="right:20px">${RES(w)}</div>`;
+const UTIL=(hl)=>`<div class="util"><span class="${hl?'hl':''}" title="Menu">☰</span><span>▤</span><span>◉</span></div>`;
+const CENTER={
+ alarm:(w)=>`<div class="tab alert" id="C" style="left:50%;transform:translateX(-50%)"><span class="glyph">⚔</span><span class="t">${w===1440?'Sbarco goblin':'Goblin'}</span><span class="d">3 g</span></div>`,
+ quiet:(w)=>`<div class="tab alert quiet" id="C" style="left:50%;transform:translateX(-50%);height:48px"><span class="glyph">✦</span><span class="t">Mercante</span><span class="d">7 g</span></div>`,
+ none:()=>``,
+};
+const frames=[];
+function frame(id,w,title,inner,note,crop=true){frames.push({id,w,title,html:`<h2>${title}</h2><div class="f w${w}${crop?' crop':''}" id="${id}">${inner}</div><p class="note">${note}</p>`});}
+// P1
+frame('p1a1440',1440,'P1 · Tre linguette staccate — allarme (1440)',LEFT(1440)+CENTER.alarm(1440)+RIGHT(1440)+`<div class="tip" style="left:570px;top:74px"><div class="l">TRA 3 GIORNI</div>I goblin sbarcano sulla costa est. Prepara una spedizione prima che arrivino al villaggio.<br><span class="go">PORTAMI LÌ</span></div>`,'Il centro dice solo <b>cosa</b> e <b>quando</b> (icona, due parole, giorni). Il perché e l\'azione stanno nel tooltip, con «Portami lì» (come le notifiche ripensate di Civilization VII). Fra le linguette restano due varchi larghi e uguali.');
+frame('p1q1440',1440,'P1 — quiete (1440)',LEFT(1440)+CENTER.quiet(1440)+RIGHT(1440),'Niente di urgente: la linguetta si accorcia (48 px), testo in corsivo tenue, glifo d\'ottone. Mostra il prossimo evento noto entro 10 giorni.');
+frame('p1n1440',1440,'P1 — niente (1440)',LEFT(1440)+RIGHT(1440)+UTIL(true),'Nessun evento entro 10 giorni: la linguetta centrale <b>sale e sparisce</b>, la cresta delle montagne resta libera. Nessuno spazio vuoto incorniciato. In basso a destra: ☰ menu (anche Esc), pannelli, nascondi HUD.',false);
+frame('p1a1280',1280,'P1 — allarme (1280)',LEFT(1280)+CENTER.alarm(1280)+RIGHT(1280),'A 1280 il centro usa la parola corta; le linguette restano staccate.');
+// P2
+frame('p2a1440',1440,'P2 · Il conto alla rovescia pende dal tempo — allarme (1440)',LEFT(1440)+`<div class="pennant" style="left:44px"><span class="ic" style="color:#f2b38f">⚔</span>Sbarco goblin <b>3 G</b></div>`+RIGHT(1440),'Solo due linguette, agli angoli. L\'allarme è un <b>nastro che pende dalla linguetta del tempo</b>: la minaccia è una scadenza, quindi sta col calendario (come l\'avviso di siccità vicino al contatore dei giorni in Timberborn e le promesse con countdown a sinistra in Frostpunk 2). Il centro alto è sempre mappa.');
+frame('p2n1440',1440,'P2 — quiete / niente (1440)',LEFT(1440)+`<div class="pennant" style="left:44px;border-color:rgba(207,175,99,.45);background:linear-gradient(180deg,#0f2a35,#060f16)"><span class="ic">✦</span><i style="color:var(--text2)">Mercante</i> <b style="color:var(--label)">7 G</b></div>`+RIGHT(1440),'Quiete: il nastro diventa d\'ottone e tenue. Niente: il nastro non c\'è, restano le due linguette.');
+frame('p2a1280',1280,'P2 — allarme (1280)',LEFT(1280)+`<div class="pennant" style="left:44px"><span class="ic" style="color:#f2b38f">⚔</span>Goblin <b>3 G</b></div>`+RIGHT(1280),'');
+// P3
+const P3L=`<div class="tab" style="left:20px;height:52px">${SPD}</div>`;
+const MED=(alarm,label)=>`<div style="position:absolute;left:50%;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center">
+ <div class="tab" style="position:relative;height:86px;width:120px;justify-content:center;border-radius:0 0 60px 60px;padding:0"><span class="med big" style="position:relative;margin-top:6px"><i></i><span class="ring"></span>${alarm?'<span class="notch" style="left:62px;top:2px"></span><span class="notch q" style="left:-8px;top:40px"></span>':''}</span></div>
+ <div class="day" style="margin-top:4px;background:rgba(6,15,22,.75);border:1px solid rgba(207,175,99,.4);border-radius:999px;padding:1px 12px">GIORNO<b>3</b></div>
+ ${label?`<div style="margin-top:4px;font:500 14px var(--serif);color:var(--text);background:rgba(30,18,16,.85);border:1px solid var(--ember);border-radius:999px;padding:1px 12px;white-space:nowrap">⚔ Sbarco goblin · <b style="font:600 12px var(--display);color:#f2b38f">3 G</b></div>`:''}</div>`;
+frame('p3a1440',1440,'P3 · Il medaglione al centro — allarme (1440)',P3L+MED(true,true)+RIGHT(1440),'Il medaglione giorno/notte diventa l\'orologio del gioco, appeso al centro: l\'anello mostra il giorno che passa e porta <b>tacche</b> sugli eventi in arrivo (brace = minaccia, ottone = evento quieto); sotto, giorno e la sola minaccia più vicina. A sinistra solo la velocità, a destra le risorse.');
+frame('p3n1440',1440,'P3 — niente (1440)',P3L+MED(false,false)+RIGHT(1440),'Niente in arrivo: restano medaglione e giorno, nessuna etichetta. È il centro più «oggetto di gioco» dei tre, ma copre la cresta delle montagne.');
+frame('p3a1280',1280,'P3 — allarme (1280)',P3L+MED(true,true)+RIGHT(1280),'');
+document.getElementById('m').innerHTML=frames.map(f=>f.html).join('')+'<h2>Misure (fascia alta 0–100 px)</h2><div id="meas"></div>';
+document.fonts.ready.then(()=>{for(const f of frames){const r=document.querySelector('#'+f.id+' #R'),l=document.querySelector('#'+f.id+' #L');if(r&&l){const w=Math.max(r.offsetWidth,l.offsetWidth);r.style.width=l.style.width=w+'px';r.style.justifyContent='flex-end';}}const rows=[];for(const f of frames){const root=document.getElementById(f.id);const rr=root.getBoundingClientRect();const tabs=[...root.querySelectorAll('.tab,.pennant')].map(e=>e.getBoundingClientRect()).filter(r=>r.top-rr.top<100);
+ // coverage of band 0..100 on a 4px grid
+ let cov=0,tot=0;for(let x=0;x<f.w;x+=4)for(let y=0;y<100;y+=4){tot++;const X=rr.left+x,Y=rr.top+y;if(tabs.some(r=>X>=r.left&&X<=r.right&&Y>=r.top&&Y<=r.bottom))cov++;}
+ const top=[...root.querySelectorAll(':scope > .tab')].map(e=>e.getBoundingClientRect()).sort((a,b)=>a.left-b.left);const gaps=[];for(let i=1;i<top.length;i++)gaps.push(Math.round(top[i].left-top[i-1].right));
+ rows.push(`<tr><td>${f.id}</td><td>${Math.round(cov/tot*100)}%</td><td>${gaps.join(' / ')||'—'}</td></tr>`);}
+ document.getElementById('meas').innerHTML='<table><tr><th>Fotogramma</th><th>Fascia alta coperta</th><th>Varchi fra linguette (px)</th></tr>'+rows.join('')+'</table>';document.body.dataset.ready='1';});
+</script></body></html>

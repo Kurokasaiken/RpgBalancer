@@ -47,12 +47,21 @@ invariants:
     source: director-bug
     source_ref: R-260
     statement: >-
-      Il commit del settlement appartiene al ciclo del report, non a `ended`: l'arrivo non muove risorse; il primo
-      frame dipinto del report (rewardAck) persiste `settling`; il dismiss (ogni path, convogliato su onClose) chiama
-      `commitSettlement` che applica gli effetti una volta, marca `settled` e pubblica il delta transiente per la
-      HUD; un run idratato con `settling` auto-committa al mount senza cerimonia.
+      Il commit del settlement appartiene al ciclo del report, non a `ended`: l'arrivo non muove risorse; il primo frame
+      dipinto del report (rewardAck) persiste `settling`; il dismiss (ogni path, convogliato su onClose) chiama
+      `commitSettlement` che applica gli effetti una volta, marca `settled` e pubblica il delta transiente per la HUD;
+      un run idratato con `settling` auto-committa al mount senza cerimonia.
     test_refs:
       - tests/unit/idleVillage/questCollectCommit.test.tsx
+  - id: use-quest-expedition-session.INV-4
+    source: director-bug
+    source_ref: R-269
+    statement: >-
+      Extraction medallion never vanishes: seat suppression and the return-flight proxy mount in one commit
+      (clear+suppression+flight are one transition; landing unmounts the proxy and unlocks the roster card in one
+      commit)
+    test_refs:
+      - tests/unit/idleVillage/questExpeditionReturnFlight.test.tsx
 ---
 # use-quest-expedition-session
 
