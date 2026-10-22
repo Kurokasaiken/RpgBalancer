@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MatericField } from '@/ui/designSystem/primitives';
 import { useCompactTop } from './useCompactTop';
+import { HudTooltip } from './HudTooltip';
 import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
 
 export interface WhenWhereClusterProps {
@@ -131,12 +132,12 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
             aria-label={t('gameFrame.speed.ariaLabel')}
             style={{ display: 'flex', gap: 0, alignItems: 'center' }}
           >
+            <HudTooltip label={isPaused ? t('gameFrame.speed.resume') : t('gameFrame.speed.pause')} shortcut={t('gameFrame.speed.spaceKey')}>
             <button
               type="button"
               role="radio"
               aria-checked={isPaused}
               aria-label={isPaused ? t('gameFrame.speed.resume') : t('gameFrame.speed.pause')}
-              title={`${isPaused ? t('gameFrame.speed.resume') : t('gameFrame.speed.pause')} [${t('gameFrame.speed.spaceKey')}]`}
               onClick={speed.onTogglePause}
               style={stripButtonStyle}
             >
@@ -146,19 +147,20 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
                 </svg>
               </span>
             </button>
+            </HudTooltip>
             {speed.available.map((value, index) => (
+              <HudTooltip key={value} label={`×${value}`} shortcut={String(index + 1)}>
               <button
-                key={value}
                 type="button"
                 role="radio"
                 aria-checked={!isPaused && value === speed.multiplier}
                 aria-label={`×${value}`}
-                title={`×${value} [${index + 1}]`}
                 onClick={() => speed.onChange(value)}
                 style={stripButtonStyle}
               >
                 <span style={stripPillStyle(!isPaused && value === speed.multiplier, isPaused && value === speed.multiplier)}>{`×${value}`}</span>
               </button>
+              </HudTooltip>
             ))}
           </div>
         </>
