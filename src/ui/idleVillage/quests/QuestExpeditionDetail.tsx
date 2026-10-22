@@ -512,7 +512,11 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   /* WITNESS-WS3-02: the hero resize is a DISCRETE one-frame swap (150→56),
    *  never a layout-property animation — `transition` touches opacity and
    *  transform only. */
-  const heroPx = trayOpen ? LAYOUT.heroTrayPx : compact ? LAYOUT.heroCompactPx : LAYOUT.heroRestPx;
+  /* POI-D: title above, dispatch + key-stat icons below the picture cost ~100px, so the
+   *  picture gives way first — it keeps `heroRestPx` from 768px up and shrinks to 72px at 720 so
+   *  the bag slots stay inside the plaque. */
+  const heroRestFit = Math.max(72, Math.min(LAYOUT.heroRestPx, vph - 648));
+  const heroPx = trayOpen ? LAYOUT.heroTrayPx : compact ? LAYOUT.heroCompactPx : heroRestFit;
 
   /* Terminal fallback probe (artifact-r005): when the rack/loadout body
    *  needs an internal scroll to stay inside the stage, flag it — hero and

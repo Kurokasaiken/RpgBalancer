@@ -145,7 +145,7 @@ export const QUEST_PLANNER_INFO: QuestPlannerInfoConfig = QuestPlannerInfoConfig
     plannerMinWidthPx: 460,
     forecastWidthPx: 340,
     gapPx: 8,
-    heroRestPx: 150,
+    heroRestPx: 120,
     heroTrayPx: 56,
     heroCompactPx: 56,
     rackPx: 120,
