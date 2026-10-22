@@ -21,8 +21,8 @@ const ratio = (a: string, b: string) => { const [hi, lo] = [lum(a), lum(b)].sort
 
 describe('teaser sheets — one family (R-234, FAM-1)', () => {
   // INV:R-234-fam-roster — display + serif only, no meaning-colours, no zero rows, readable BUY.
-  it.each(SHEETS)('%s uses no system sans', (f) => {
-    expect(read(G + f)).not.toContain('--skin-font-sans');
+  it('no teaser sheet uses the system sans', () => {
+    for (const f of SHEETS) expect(read(G + f), f).not.toContain('--skin-font-sans');
   });
 
   it('the hero sheet carries no cyan / green / red as meaning', () => {
@@ -33,8 +33,8 @@ describe('teaser sheets — one family (R-234, FAM-1)', () => {
     expect(src).not.toMatch(/vital\.key === 'hp' \? STATUS_TONE\[vm\.status\] : 'var\(--skin-icon-accent\)'/);
   });
 
-  it.each(SHEETS)('%s paints no cyan accent', (f) => {
-    expect(read(G + f)).not.toContain('--skin-icon-accent');
+  it('no teaser sheet paints the cyan accent', () => {
+    for (const f of SHEETS) expect(read(G + f), f).not.toContain('--skin-icon-accent');
   });
 
   it('hides stats whose value is zero', () => {
