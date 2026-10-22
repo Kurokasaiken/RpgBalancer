@@ -1141,7 +1141,7 @@
         "reset": "Ripristina",
         "appliesNow": "Le modifiche valgono subito."
       },
-      "quit": {
+      "quitConfirm": {
         "title": "Tornare al titolo?",
         "lastSaved": "Ultimo salvataggio: {when}.",
         "neverSaved": "Questa partita non è ancora stata salvata.",

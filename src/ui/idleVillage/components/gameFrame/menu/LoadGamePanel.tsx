@@ -132,7 +132,11 @@ export function LoadGamePanel({ inGame, unsaved, currentDay, onClose, onLoaded, 
               onKeyDown={(event) => onRowKey(event, index)}
               style={{ ...ROW_STYLE, ...(isSel ? ROW_SELECTED : null) }}
             >
-              <img src={row.thumbnail ?? mapUrl} alt="" style={{ ...THUMB_STYLE, opacity: row.state === 'ok' ? 1 : 0.35 }} />
+              {row.state === 'empty' ? (
+                <div aria-hidden="true" style={{ ...THUMB_STYLE, border: '1px dashed var(--skin-surface-border)', background: 'repeating-linear-gradient(135deg, var(--skin-hud-lacquer-deep) 0 8px, var(--skin-hud-lacquer-base) 8px 16px)' }} />
+              ) : (
+                <img src={row.thumbnail ?? mapUrl} alt="" style={{ ...THUMB_STYLE, opacity: row.state === 'ok' ? 1 : 0.35 }} />
+              )}
               <div>
                 {row.state === 'empty' ? (
                   <span style={MUTED}>{t('gameFrame.menu.load.slotEmpty', { name: slotName(row.slot) })}</span>
@@ -175,7 +179,7 @@ export function LoadGamePanel({ inGame, unsaved, currentDay, onClose, onLoaded, 
           <button type="button" onClick={() => setConfirm(null)}>
             <span>{t('gameFrame.menu.cancel')}</span>
           </button>
-          <button type="button" aria-pressed="true" disabled={busy} onClick={() => void (confirm.kind === 'replace' ? doLoad() : doDelete())}>
+          <button type="button" disabled={busy} onClick={() => void (confirm.kind === 'replace' ? doLoad() : doDelete())}>
             <span>{confirm.kind === 'replace' ? t('gameFrame.menu.load.replaceConfirm') : t('gameFrame.menu.load.deleteConfirm')}</span>
           </button>
         </div>
@@ -185,7 +189,7 @@ export function LoadGamePanel({ inGame, unsaved, currentDay, onClose, onLoaded, 
           <button type="button" disabled={!current || current.state === 'empty'} onClick={() => setConfirm({ kind: 'delete' })}>
             <span>{t('gameFrame.menu.load.deleteAction')}</span>
           </button>
-          <button type="button" aria-pressed="true" disabled={!loadable || busy} onClick={onLoadClick}>
+          <button type="button" disabled={!loadable || busy} onClick={onLoadClick}>
             <span>{t('gameFrame.menu.load.loadAction')}</span>
           </button>
         </div>

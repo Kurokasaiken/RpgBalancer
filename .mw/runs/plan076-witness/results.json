@@ -1,0 +1,90 @@
+{
+  "steps": [
+    {
+      "name": "title shows with ?title=1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "nothing of the game is mounted behind the title",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no Continua on an empty profile",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no «Esci dal gioco» in a browser",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "game mounts after Nuova partita",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "audio bus is a master gain following the slider (0.8)",
+      "pass": true,
+      "detail": "{\"isGain\":true,\"gain\":0.800000011920929,\"contexts\":1}"
+    },
+    {
+      "name": "reduced motion marks <html>",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Escape closes settings",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Salva ora wrote slot-1",
+      "pass": true,
+      "detail": "keys: minimal-gameplay-state"
+    },
+    {
+      "name": "slot-1 holds more than the gameplay key",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "load lists 4 slots",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "quit asks when the game moved since the last save (or leaves at once if paused)",
+      "pass": true,
+      "detail": "confirm shown"
+    },
+    {
+      "name": "title offers Continua after a save",
+      "pass": true,
+      "detail": "Continue · Day 3"
+    },
+    {
+      "name": "Continua mounts the game again",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "loading over unsaved progress asks first",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "after the load the game is back (reload, no title)",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "errors": [],
+  "viewport": "1280x720",
+  "gl": "angle-metal",
+  "startedAt": "2026-10-22T13:25:00.380Z",
+  "mainFrameNavigations": 3,
+  "finishedAt": "2026-10-22T13:26:03.420Z"
+}
