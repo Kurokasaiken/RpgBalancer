@@ -1,0 +1,72 @@
+{
+  "task": "PLAN-076 — Menu di gioco: Carica partita, Impostazioni, Esci al titolo, schermata titolo (DN-7)",
+  "run_id": "plan076-closure",
+  "created_at": "2026-10-22T13:40:00.000Z",
+  "verifier_required": false,
+  "obligations": [
+    {
+      "id": "OB-1",
+      "requirement": "Le suite permanenti delle nuove invarianti (pacchetto di salvataggio, slot, autosalvataggio, impostazioni e bus audio, schermate, flussi, chiavi i18n, voci del menu) passano.",
+      "source": "PLAN-076 §5 OB-1/OB-4 (R-247)",
+      "type": "state",
+      "environment": "headless-ok",
+      "command": "cd /Users/faustoboni/progetti_personali/RPG && source ~/.nvm/nvm.sh >/dev/null 2>&1 && nvm use 22 >/dev/null 2>&1 && npx vitest run tests/unit/idleVillage/gameSave.test.ts tests/unit/idleVillage/gameSaveService.test.ts tests/unit/idleVillage/useGameAutosave.test.ts tests/unit/idleVillage/gameSettings.test.ts tests/unit/idleVillage/loadGamePanel.test.tsx tests/unit/idleVillage/menuFlow.test.ts tests/unit/idleVillage/menuScreens.test.tsx tests/unit/idleVillage/menuI18n.test.ts tests/unit/idleVillage/hudGameMenu.test.tsx",
+      "timeout_s": 300,
+      "artifacts": [
+        {
+          "path": "command-logs/OB-1.log",
+          "kind": "log"
+        }
+      ],
+      "blocking": true
+    },
+    {
+      "id": "OB-2",
+      "requirement": "Il witness headless 1280×720 (WebGL Metal) percorre titolo → nuova partita → impostazioni → salva → carica → esci → continua → carica in partita con input reali: tutti i passi PASS, 0 errori in console.",
+      "source": "PLAN-076 §5 OB-2 + T-04",
+      "type": "state",
+      "environment": "headless-ok",
+      "command": "node .mw/runs/plan076-closure/check-witness.cjs",
+      "timeout_s": 60,
+      "artifacts": [
+        {
+          "path": "command-logs/OB-2.log",
+          "kind": "log"
+        }
+      ],
+      "blocking": true
+    },
+    {
+      "id": "OB-3",
+      "requirement": "Typecheck dell'app senza errori nei file toccati.",
+      "source": "PLAN-076 §5 OB-5",
+      "type": "state",
+      "environment": "headless-ok",
+      "command": "cd /Users/faustoboni/progetti_personali/RPG && source ~/.nvm/nvm.sh >/dev/null 2>&1 && nvm use 22 >/dev/null 2>&1 && npx tsc --noEmit -p tsconfig.app.json 2>&1 | (! grep -E 'menu/|state/game|state/useGame|state/audioBus|HudGameMenu|pages/game-frame.tsx|src/App.tsx')",
+      "timeout_s": 600,
+      "artifacts": [
+        {
+          "path": "command-logs/OB-3.log",
+          "kind": "log"
+        }
+      ],
+      "blocking": true
+    },
+    {
+      "id": "OB-4",
+      "requirement": "Eye-check del Director a 1280×720: side-by-side baseline dei fork scelti (LOAD-1 A, SET-1 A, QUIT-1 B, TITLE-1 A) vs implementazione. Non è una metrica verificabile dall'agente.",
+      "source": "PLAN-047 v35 + PLAN-076 §5 OB-6",
+      "type": "human-eye",
+      "environment": "headless-ok",
+      "command": "test -f /Users/faustoboni/progetti_personali/RPG/.mw/runs/plan076-witness/side-by-side.png",
+      "timeout_s": 10,
+      "artifacts": [
+        {
+          "path": "director-signoff.json",
+          "kind": "signoff"
+        }
+      ],
+      "blocking": true
+    }
+  ]
+}
