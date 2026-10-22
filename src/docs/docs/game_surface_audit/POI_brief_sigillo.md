@@ -1,8 +1,36 @@
 # POI Sigillo — brief di design unico (explorer, 2026-10-20, R-234)
 
 > Richiesta: un solo brief per il marker POI quest («Sigillo») su `/game` e per ogni interazione intorno: stati, rischio, famiglia, tempo, comparsa, hover/focus, click → planner, tastiera, tanti POI insieme, tutti i biomi, reduced-motion. Poi una visual fork e lo stop per il ruling.
-> **Nessun codice di gioco toccato.** Fork: [mockups/poi-fork-v1.html](mockups/poi-fork-v1.html) · card: `.mw/runs/20261020-poi-explorer/visual-fork-poi-sigillo.md` · catture: `shots/poi-brief/`.
+> **Aggiornato 2026-10-22.** Dopo il brief il Director ha rigettato la fork sul rischio e ha guidato il lavoro sul marker reale: vedi «Stato delle decisioni» qui sotto. Le sezioni 1–8 sono la fotografia misurata del 2026-10-20 (prima delle modifiche).
+> Catture: `shots/poi-brief/` (`applied/` = marker dopo le modifiche) · card della fork rigettata: `.mw/runs/20261020-poi-explorer/visual-fork-poi-sigillo.md`.
 > Legenda: **FATTO** (visto o misurato in questa sessione) · **CODICE** (letto nel sorgente, non visto) · **NON VERIFICATO**.
+
+## Stato delle decisioni (2026-10-20 → 2026-10-22)
+
+**Decise dal Director e già nel codice** (commit `fe915c6c`, `96316c07`):
+
+| Cosa | Decisione | Dove |
+|---|---|---|
+| Rischio sulla sagoma (corna, orlo dentato) | **bocciato**: «non è nelle richieste» | fork rigettata, §9 |
+| Filo bianco del bordo | tolto: la linea interna prende il metallo della famiglia | `poiSigilloFamilies.ts`, token `--skin-poi-border-inner` |
+| Metallo della ghiera per famiglia | quest **bronzo**, lavoro **avorio**, attività **acciaio** (il teal fu provato e sostituito dall'avorio) | `poiSigilloFamilies.ts` |
+| Campo dietro il glifo | pergamena, poi virato **sabbia/beige** `#d3be91 → #b09866`; il campo scuro e il colore diverso per famiglia sono stati scartati | tema `stoneColors` |
+| Glifo | leggermente più grande (42 su 86) | `PoiMatericV3_5.tsx` |
+| Halo di lavoro | da menta neon a **argento lunare** `#9fb3c4`, stesso bagliore | token `--skin-poi-halo-work` |
+| Pallino rosso «decisione in attesa» | **eliminato**; la segnalazione sul POI non esiste più | `MapQuestPoi.tsx` |
+| Hover | **scintillio** di 5 lettere dell'orlo, non un giro completo | `PoiMatericV3_5.tsx` |
+| Percorso del party | arriva al POI e **passa sotto** il marker; bronzo; **puntinato** davanti al party, **pieno** dietro con un luccichio; **serpentina** (curva con seme per run) invece della retta; niente sigillo di destinazione | `QuestJourneyRoute.tsx`, `questJourney.ts` (`meanderWaypoints`), `PixiWorldMap.tsx` |
+
+**Verificato:** test Sigillo 11/11, route/journey 116/116 (working tree), tsc pulito sui file toccati; catture reali 1440×900 in `shots/poi-brief/applied/`; dalla misura DOM in movimento: lo scintillio compare per ~1 s con al massimo 2 punti contemporanei, il luccichio scorre sul tratto percorso in ~3 s e riparte.
+**Non verificato:** Tauri; il luccichio e lo scintillio *a occhio in movimento* (solo misura del DOM e fotogrammi); più di 4 POI contemporanei; la serpentina con altri semi e altre posizioni di POI; il marker a 1280×800 dopo le modifiche.
+
+**Ancora aperto:**
+1. Segnale per una **decisione in attesa** (dopo la rimozione del pallino): occhio d'ottone (6b) o solo pannello. Il Director ha risposto «va bene così» (2026-10-22): per ora nessun segnale sul marker.
+2. **Glifi dipinti di lavoro e attività:** mancano; sul marker c'è ancora la croce dorata. Brief per generarli: [POI_glifi_mancanti_brief.md](POI_glifi_mancanti_brief.md).
+3. **Interazioni del brief non fatte:** focus da tastiera nella materia (oggi il quadrato blu del browser), etichetta accessibile con lo stato della spedizione, comparsa che ignora `prefers-reduced-motion` (scala 0,7→1 ancora attiva), costo DOM con tanti POI (~227 nodi a riposo, fino a ~1 400 con l'halo; ~10 filtri con id fissi duplicati per istanza).
+4. **Forme per famiglia (tessera, rombo):** su `/game` esiste solo la quest; il Director ha chiesto «a cosa servono?» e non ha deciso se tenerle.
+5. **Contrasto del glifo sul campo sabbia:** la croce dorata si legge male (placeholder in attesa dei glifi veri); tenda e rovine reggono.
+6. **La fork B4-map** (palette per famiglia, campo, comparsa) resta di un'altra sessione; le sue conclusioni su campo e metalli sono state in parte assorbite dalle decisioni sopra, ma non c'è un suo ruling.
 
 ## 0. Cosa decide il Director e cosa è già deciso
 
@@ -97,7 +125,7 @@ Due regole trasversali:
 | **scaduto** | `expired` | sparisce senza pulsare (Q2) | dissolvenza | dissolvenza |
 | **bloccato / velato** | **nessuna fonte** | ferro, opacità 0,45, emblema **lucchetto di ferro**; il click apre il planner con il motivo | nessuno | — |
 
-## 5. Rischio
+## 5. Rischio — *superata: il Director non vuole il rischio sul marker (2026-10-20)*
 
 - **Fonte:** la fascia d'offerta già esistente (`dangerBandFor`, 4 fasce). Va calcolata **alla comparsa** (o in cache per seme), non solo all'apertura del planner, e passata a `mapQuestPoiView` (T-07: un'unica fonte).
 - **Che cosa dice:** il rischio **dell'offerta** con il party di riferimento della simulazione, non quello del party che il giocatore comporrà (quello resta nel planner). Il planner deve usare la stessa parola della sagoma (oggi «Danger High» in rosso: semaforo, F3).
@@ -129,7 +157,9 @@ Due regole trasversali:
 - Il bordo doppio regge già su 8 ritagli (`poi-terrain-gate`, min 4,12:1). Il canale del rischio scelto deve passare lo **stesso cancello**: in grigio, le quattro fasce distinguibili a 55 px su tutti i biomi.
 - Nel mockup ogni opzione è composta su **8 ritagli reali** della mappa a 2× (mare, foresta, prato, sabbia, ocra, terra bruna, neve, brughiera), con interruttore scala di grigi.
 
-## 9. La fork (card + mockup)
+## 9. La fork (card + mockup) — **RIGETTATA 2026-10-20**
+
+> Il Director: «Corna e orlo sn bocciati in ogni caso» e il rischio sulla sagoma «nn è nelle richieste». I problemi da risolvere sono quelli di R-177: bordo/filo bianco, halo neon che si riempie, ghiera solo bronzo; più la domanda sulle sagome per famiglia. Le §1–§8 (misure, stati, interazione) restano valide; questa sezione resta solo come storia.
 
 Tre opzioni sullo stesso asse: *dove sta il rischio sulla sagoma*. Tutte tengono famiglia, glifo, taglia e bordo di PLAN-058 e la palette baseline (la palette è la fork B4-map).
 
@@ -142,7 +172,7 @@ Tre opzioni sullo stesso asse: *dove sta il rischio sulla sagoma*. Tutte tengono
 
 Matrice completa, opzioni dal vivo e requisiti di codice: [mockups/poi-fork-v1.html](mockups/poi-fork-v1.html) e la card.
 
-## 10. Domande aperte per il Director (nessuna scelta presa qui)
+## 10. Domande aperte per il Director — *Q2 (verderame) e Q3 (campo) risolte: vedi «Stato delle decisioni»; Q1, Q4, Q5 restano*
 
 1. **Nome al passaggio.** POI-T B = «niente testo». Vale anche per una targhetta incisa al passaggio del mouse (come le regioni) o solo per il testo **fisso** sul marker? Revisione HUD (R2.1) la prevedeva.
 2. **Verderame dell'alone di lavoro.** Sulla mappa legge ciano e, accanto al vermiglio, fa semaforo (6b elenca ottone/inchiostro/ferro/brace). Resta, o il lavoro si scrive in ottone («si riempie di luce», desiderata v3)?
