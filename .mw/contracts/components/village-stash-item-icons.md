@@ -9,9 +9,16 @@ scope_files:
 fast_checks: []
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: R-234-item-three-kits
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      One item, three dresses, one engraved icon family: catalog emoji render as engraved glyphs, the tray selected tile
+      is brass (INV-1 = B)
+    test_refs:
+      - tests/unit/idleVillage/itemThreeKits.test.tsx
 ---
-
 # village-stash-item-icons
 
 Unità `ui-component` (tier 2, default) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/components/gameFrame/villageStashItemIcons.tsx`.

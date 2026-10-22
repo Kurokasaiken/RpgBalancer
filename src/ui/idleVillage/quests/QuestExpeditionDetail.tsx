@@ -1172,9 +1172,9 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                                 style={{
                                   position: 'relative', width: 44, height: 44, borderRadius: 8, padding: 0, flexShrink: 0,
                                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                  border: `1px solid color-mix(in srgb, ${selected ? TONE.accent : 'var(--skin-surface-border)'} ${selected ? 85 : 50}%, transparent)`,
-                                  background: selected ? `color-mix(in srgb, ${TONE.accent} 22%, transparent)` : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
-                                  color: selected ? TONE.accent : 'var(--skin-title-color)',
+                                  border: `1px solid color-mix(in srgb, ${selected ? 'var(--skin-title-color)' : 'var(--skin-surface-border)'} ${selected ? 85 : 50}%, transparent)`,
+                                  background: selected ? `color-mix(in srgb, var(--skin-title-color) 22%, transparent)` : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
+                                  color: 'var(--skin-title-color)',
                                   opacity: full ? 0.65 : 1,
                                   cursor: full ? 'default' : 'pointer',
                                 }}
