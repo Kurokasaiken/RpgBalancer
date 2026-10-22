@@ -5,16 +5,8 @@ import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { useLocalization } from '@/hooks/useLocalization';
 import type { SupportedLocale } from '@/localization/LocaleConfig';
-import { COMPARABLE_SKIN_IDS } from '@/ui/idleVillage/skins/resolveInitialSkin';
-import { getSkinPresetConfig, type SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { HUD_SCALE_MODES, type HudScaleControl } from './hudScale';
 import { HUD_PANELS, HUD_PANEL_DEV_ONLY, HUD_PANEL_SHORTCUTS, isHudPanelListed, type HudPanelId } from './hudPanelRegistry';
-
-/** Live skin switch surfaced inside the menu (the page owns the preset state). */
-export interface HudSkinControl {
-  id: SkinPresetId;
-  onChange: (id: SkinPresetId) => void;
-}
 
 export interface HudGameMenuProps {
   /** Panel visibility map shared with the bottom-right Panels menu. */
@@ -22,8 +14,6 @@ export interface HudGameMenuProps {
   onTogglePanel: (id: HudPanelId) => void;
   /** Manual save; may resolve `true` on success for the "saved" flash. Omitted = row disabled. */
   onSaveNow?: () => Promise<boolean> | boolean;
-  /** Live skin selector; the Options section is omitted without it. */
-  skin?: HudSkinControl;
   /** Interface size (desktop app only); the row is omitted without it. */
   scale?: HudScaleControl;
   /** Offer the dev-only panels (Director, Tuning). Off in a production build. */
@@ -46,7 +36,7 @@ const MENU_LOCALES: readonly SupportedLocale[] = ['en', 'it-IT'];
  * today (panel toggles, manual save, language and skin choice) plus the disabled
  * entries (Load, Options, Quit) reserved for their future screens.
  */
-export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, scale, includeDev = false }: HudGameMenuProps) {
+export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, includeDev = false }: HudGameMenuProps) {
   const { t } = useTranslation('idleVillage');
   const { locale, setLocale } = useLocalization();
   const [open, setOpen] = useState(false);
@@ -178,28 +168,6 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, skin, scale, in
               </button>
             ))}
           </div>
-          {skin && (
-            <>
-              <span style={SECTION_LABEL_STYLE}>{t('gameFrame.menu.theme')}</span>
-              <div role="radiogroup" aria-label={t('gameFrame.menu.theme')} style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-              {COMPARABLE_SKIN_IDS.map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={skin.id === id}
-                  aria-pressed={skin.id === id}
-                  onClick={() => {
-                    skin.onChange(id);
-                    trackTelemetryEvent('game_menu_skin_select', { skinId: id });
-                  }}
-                >
-                  <span>{getSkinPresetConfig(id).label}</span>
-                </button>
-              ))}
-              </div>
-            </>
-          )}
           {scale && (
             <>
               <span style={SECTION_LABEL_STYLE}>{t('gameFrame.menu.interfaceSize')}</span>
