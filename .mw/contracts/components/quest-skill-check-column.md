@@ -57,6 +57,14 @@ invariants:
       (verdictAutoDismissMs=1000)
     test_refs:
       - tests/unit/idleVillage/questSkillCheckColumn.autoDismiss.test.tsx
+  - id: R-234-launch-command
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      The launch command: kit button pinned over the star as a >=32px target, breathing ring (static under reduced
+      motion), engraved label under the dial only while armed (SC-1 = A)
+    test_refs:
+      - tests/unit/idleVillage/questSkillCheckColumn.launchCommand.test.tsx
 ---
 # quest-skill-check-column
 
