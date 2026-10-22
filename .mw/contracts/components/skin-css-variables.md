@@ -20,8 +20,15 @@ invariants:
       costruiti sul materiale; nessun testo sotto 12px.
     test_refs:
       - tests/unit/idleVillage/hudGuards.test.ts
+  - id: R-234-no-violet
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      Never violet: the fallen state is cold iron #93a4ad in every skin and the colour sources hold no violet hex (COL-D
+      = B)
+    test_refs:
+      - tests/unit/idleVillage/noViolet.test.ts
 ---
-
 # skin-css-variables
 
 Unità `shared-kernel` (tier 1, kernel) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/skins/skinCssVariables.ts`.
