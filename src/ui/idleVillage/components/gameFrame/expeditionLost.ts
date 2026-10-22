@@ -16,9 +16,20 @@ export interface LostReportModel {
  * `day` is `null` until the run records the tick of each death: the run keeps only `launchedAtTick`, so the
  * report shows the fallen without a date rather than inventing one. (Open point, see T-C2 notes.)
  */
-export function lostReportModel(run: QuestRunState): LostReportModel {
+export interface LostDayClock { ticksPerDay: number; startDay: number }
+
+/** The game day of a quest tick: whole days since the clock's start, counted from `startDay`. */
+export function dayOfTick(tick: number, clock: LostDayClock): number {
+  return clock.startDay + Math.floor(Math.max(0, tick) / Math.max(1, clock.ticksPerDay));
+}
+
+export function lostReportModel(run: QuestRunState, clock?: LostDayClock): LostReportModel {
   const tombs = run.party
     .filter((m) => m.dead)
-    .map((m) => ({ id: m.id, name: m.name, day: null as number | null }));
+    .map((m) => ({
+      id: m.id,
+      name: m.name,
+      day: clock && typeof m.deadAtTick === 'number' ? dayOfTick(m.deadAtTick, clock) : null,
+    }));
   return { tombs };
 }
