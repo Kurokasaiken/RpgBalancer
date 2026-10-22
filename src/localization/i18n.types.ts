@@ -421,6 +421,15 @@ export default interface Resources {
       "unpin": "Unpin panel"
     },
     "gameFrame": {
+      "legacy": {
+        "title": "Legacy",
+        "noSlots": "No building yet",
+        "category": {
+          "items": "Items",
+          "heroes": "Heroes",
+          "blueprints": "Blueprints"
+        }
+      },
       "boot": {
         "error": "The world could not be prepared",
         "logoAlt": "Wanderlust: Triumph",
@@ -445,6 +454,7 @@ export default interface Resources {
         "invasion": "Goblin invasion",
         "levelUp": "Hero level-up",
         "expeditionLost": "Expedition lost",
+        "legacy": "Legacy",
         "merchantMarker": "Merchant marker",
         "move": "Move",
         "poiTypes": "POI types",

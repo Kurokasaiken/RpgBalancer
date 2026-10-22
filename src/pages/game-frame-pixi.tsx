@@ -1,5 +1,6 @@
 import { cloneElement, isValidElement, startTransition, useCallback, useEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LegacyReliquaryPanel } from '@/ui/idleVillage/legacy/LegacyReliquaryPanel';
 import { stageExpeditionLost } from '@/ui/idleVillage/components/gameFrame/expeditionLostStaging';
 import { DndContext, MeasuringStrategy } from '@dnd-kit/core';
 import { getCurrentDragConfig } from '@/ui/idleVillage/config/dragConfig';
@@ -225,6 +226,8 @@ export default function GameFramePixiPage() {
   const [wonderRequest, setWonderRequest] = useState(0);
   /* PLAN-067 T-C2 (R-234): the Director «Expedition lost» beat — a defeat COPY shown in the report; the live run is never touched. */
   const [expeditionLostRun, setExpeditionLostRun] = useState<QuestRunState | null>(null);
+  /* PLAN-067 T-C4 (R-234): the legacy reliquary on /game (mock; choices stay in memory). */
+  const [legacyOpen, setLegacyOpen] = useState(false);
   const [regionHover, setRegionHover] = useState<PixiRegionHover | null>(null);
   const [invasion, setInvasion] = useState<{ dueDay: number; startDay: number } | null>(null);
   /* BV-4/R-119 (Director, 2026-10-19, option A): the clock DOES hydrate — `initializeMinimalGameplayStore`
@@ -1343,6 +1346,12 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         onTrigger: () => setWonderRequest((n) => n + 1),
       },
       {
+        /* PLAN-067 T-C4 (R-234, LEG = B): the legacy reliquary, slots from the village buildings. */
+        id: 'legacy',
+        label: t('gameFrame.director.legacy'),
+        onTrigger: () => setLegacyOpen((v) => !v),
+      },
+      {
         /* PLAN-032 SP-5: the level-up staging beat — mock presentation only.
          *  The command itself decides accept/reject (invalid config, non-hero
          *  targets, or no mounted hero card all reject with no telemetry/cue). */
@@ -1527,6 +1536,8 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                   <WorldSurfaceEventCard
                     visible={cardOpen}
                     zIndex={1}
+                {/* T-C4 (R-234): the legacy reliquary, opened by the Director. */}
+                {legacyOpen && <LegacyReliquaryPanel onClose={() => setLegacyOpen(false)} />}
                 {/* T-C1 (R-234): the level-up ceremony plates (one per hero). */}
                 <HeroLevelCeremony residentsById={residentsById} />
                     screenAnchor={{

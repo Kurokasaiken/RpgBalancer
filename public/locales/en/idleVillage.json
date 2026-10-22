@@ -863,6 +863,15 @@
     "castSpeed": "Cast Speed"
   },
   "gameFrame": {
+    "legacy": {
+      "title": "Legacy",
+      "noSlots": "No building yet",
+      "category": {
+        "items": "Items",
+        "heroes": "Heroes",
+        "blueprints": "Blueprints"
+      }
+    },
     "title": "Wanderlust",
     "boot": {
       "progress": "Loading progress",
@@ -1014,6 +1023,7 @@
       "merchantMarker": "Merchant marker",
       "levelUp": "Hero level-up",
       "expeditionLost": "Expedition lost",
+      "legacy": "Legacy",
       "resetInitial": "Initial state",
       "reviveFallen": "Revive fallen"
     },
