@@ -137,6 +137,8 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-icon-size': '18px',
   '--skin-icon-color': '#dfb857',
   '--skin-icon-accent': '#00e5ff',
+  /* Fallen (Director COL-D = B, 2026-10-22): cold iron, never violet. */
+  '--skin-state-fallen': '#93a4ad',
   '--skin-icon-opacity': '0.9',
 
   /* Close button — gold radial coin, sits in the top-right corner */
