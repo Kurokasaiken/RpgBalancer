@@ -12,7 +12,7 @@
  * Behaviour is unchanged from the page; see questPoiKit.md for the state machine.
  */
 
-import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import { startTransition, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import type { FC } from 'react';
 import {
   DndContext,
@@ -301,6 +301,15 @@ export function useQuestPoiSession({
     defaultAssignments,
   );
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
+  /* R-265: rapid click-assign serialisation reads the REF (synchronous), while
+   *  the STATE lands as a transition — the click's page-wide render becomes
+   *  interruptible instead of one contiguous task inside the handler (same
+   *  contract as useQuestExpeditionSession). */
+  const flyingResidentRef = useRef<string | null>(null);
+  const setFlying = useCallback((id: string | null) => {
+    flyingResidentRef.current = id;
+    startTransition(() => setFlyingResidentId(id));
+  }, []);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [questStartRequested, setQuestStartRequested] = useState(false);
   const [telemetry, setTelemetry] = useState<TelemetryEntry[]>(mockTelemetry);
@@ -599,13 +608,13 @@ export function useQuestPoiSession({
       // Click-to-assign only fills a quest already open on screen and still in
       // planning (same rule as useQuestExpeditionSession): a roster click must
       // never open a quest by itself.
-      if (flyingResidentId || !isDetailOpen || isQuestRunning || embarkResult) return;
+      if (flyingResidentRef.current || !isDetailOpen || isQuestRunning || embarkResult) return;
       const slot = findAcceptingSlot(residentId);
       if (!slot) return;
       const from = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
       if (!from) return;
 
-      setFlyingResidentId(residentId);
+      setFlying(residentId);
       setTimeout(() => {
         const to = elementCenter(getSlotComponentElement(slot.id));
         if (!to) return;
@@ -620,7 +629,7 @@ export function useQuestPoiSession({
         });
       }, 50);
     },
-    [flyingResidentId, isDetailOpen, isQuestRunning, embarkResult, findAcceptingSlot, startFlight],
+    [isDetailOpen, isQuestRunning, embarkResult, findAcceptingSlot, startFlight, setFlying],
   );
 
   const handleSlotClear = useCallback(
@@ -631,7 +640,7 @@ export function useQuestPoiSession({
       const from = elementCenter(getSlotComponentElement(slotId));
       const to = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
       if (from && to) {
-        setFlyingResidentId(residentId);
+        setFlying(residentId);
         startFlight({
           residentId,
           slotId,
@@ -643,16 +652,16 @@ export function useQuestPoiSession({
         });
       }
     },
-    [assignments, handleClear, startFlight],
+    [assignments, handleClear, startFlight, setFlying],
   );
 
   const handlePageFlightComplete = useCallback(
     (residentId: string, slotId?: string, isInset?: boolean) => {
       if (isInset && slotId) handleAssign(slotId, residentId);
-      setFlyingResidentId(null);
+      setFlying(null);
       settleFlight();
     },
-    [handleAssign, settleFlight],
+    [handleAssign, settleFlight, setFlying],
   );
 
   const status: 'idle' | 'in-progress' | 'completed' | 'blocked' = isQuestRunning

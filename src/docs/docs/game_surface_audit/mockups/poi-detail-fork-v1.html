@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POI detail POI-D</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--display:"Cinzel",serif;--serif:"EB Garamond",Georgia,serif;--title:#f0cf6a;--text:#F5F2E8;--text2:rgba(245,242,232,.74);--label:#c9a84e;--lift:#0f2a35;--deep:#060f16;--brass-hi:#cfaf63;--danger:#e0908a;--page:#0b1c22;--dim:#a9b3ad;--rule:rgba(223,184,87,.22)}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:#e9dfc6;font:16px/1.5 var(--serif)}
+header,main{max-width:1240px;margin:0 auto;padding:0 16px}header{padding-top:28px}
+h1{font:600 26px var(--display);letter-spacing:.06em;color:var(--title);margin:0 0 6px}
+h2{font:600 18px var(--display);color:var(--label);margin:26px 0 6px;border-top:1px solid var(--rule);padding-top:22px}
+p.lead{color:var(--dim);max-width:980px}
+.frame{display:flex;gap:10px;align-items:flex-start;width:1100px;padding:14px;background:#14333f;border-radius:10px}
+.plate{background:linear-gradient(180deg,var(--lift),var(--deep));border:1.5px solid var(--brass-hi);border-radius:12px;box-shadow:inset 0 0 0 3px var(--deep),inset 0 0 0 4px rgba(207,175,99,.3);color:var(--text);padding:12px}
+.plan{width:610px}.side{width:340px}
+.paint{height:128px;border-radius:6px;background:url(assets/totem-goblin.jpg) center 30%/cover;box-shadow:inset 0 0 0 1px rgba(207,175,99,.55),inset 0 0 0 4px var(--deep),inset 0 0 0 5px rgba(207,175,99,.28)}
+.lbl{font:500 11px var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--label)}
+.row{display:flex;gap:8px;align-items:center}
+.seats{display:flex;gap:14px;margin:10px 0}.seat{width:54px;height:54px;border-radius:50%;border:2px solid rgba(207,175,99,.6);background:#0a1d26}
+.bag{display:flex;gap:6px;margin:6px 0 10px}.bag i{width:38px;height:38px;border:1px solid rgba(207,175,99,.4);border-radius:6px;background:#0a1d26}
+.btn{height:36px;padding:0 20px;display:inline-flex;align-items:center;font:600 12px var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--title);background:linear-gradient(180deg,#123341,#081b24);border:1px solid var(--brass-hi);border-radius:6px}
+.btn.d{opacity:.45}
+.t{font:600 22px/1.15 var(--display);letter-spacing:.04em;color:var(--title);margin:0 0 4px}
+.fic{font:italic 400 15px/1.4 var(--serif);color:var(--text2);margin:0 0 10px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.stat{border:1px solid rgba(207,175,99,.35);border-radius:6px;padding:6px 8px;background:#0a1d26}
+.stat b{display:block;font:600 15px var(--display);color:var(--text)}.stat.dg b{color:var(--danger)}
+.sec{font:500 11px var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--label);display:flex;gap:8px;align-items:center;margin:12px 0 6px}
+.sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(207,175,99,.5),transparent)}
+.chip{display:inline-block;border:1px solid rgba(207,175,99,.4);border-radius:999px;padding:1px 10px;font:500 12px var(--display);margin:0 4px 4px 0}
+.intel{font-size:14px;line-height:1.4;color:var(--text2);margin:0 0 6px;padding-left:10px;border-left:2px solid rgba(207,175,99,.35)}
+.fore{border:1px dashed rgba(207,175,99,.45);border-radius:8px;padding:10px;color:var(--text2);font-size:14px}
+.tabs{display:flex;gap:4px;margin:8px 0}.tabs span{flex:1;text-align:center;padding:5px 0;border:1px solid rgba(207,175,99,.35);border-radius:6px;font:500 11px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label)}
+.tabs .on{color:var(--title);border-color:var(--brass-hi);background:#0e2a36}
+.fold{display:flex;justify-content:space-between;border-top:1px solid rgba(207,175,99,.25);padding:8px 2px;font:500 12px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label)}
+.note{font-size:14px;color:var(--dim);max-width:1100px;margin:6px 0 0}
+</style></head><body>
+<header><h1>POI detail — POI-D</h1>
+<p class="lead">Dal tuo ruling: l'immagine dell'eroe è <b>solo immagine</b> (nessun testo sopra), il pulsante «Open warehouse» non ha la forma vietata e <b>tutte le info del POI vivono nella preview a destra</b>, ridisegnata. Tre modi di ordinarla. Stessi dati in tutte: titolo, frase narrativa, pericolo, ricompensa, durata, statistiche chiave, intel, previsione. Pulsanti BTN-1 = A. Nessun viola.</p></header>
+<main>
+<h2>A · Dossier in colonna</h2>
+<div class="frame">
+ <div class="plate plan"><div class="paint"></div>
+  <div class="lbl" style="margin-top:10px">Ordine di marcia</div><div class="seats"><div class="seat"></div><div class="seat"></div><div class="seat"></div><div class="seat"></div></div>
+  <div class="lbl">Bisaccia 0/3</div><div class="bag"><i></i><i></i><i></i></div>
+  <div class="row"><span class="btn d" style="flex:1;justify-content:center">Invia spedizione</span><span class="btn">Torna alla mappa</span></div></div>
+ <div class="plate side">
+  <h3 class="t">Sterminio dei goblin</h3><p class="fic">Segui le tracce fino all'accampamento. Nessuno di loro deve tornare a minacciare il villaggio.</p>
+  <div class="trio"><div class="stat dg"><span class="lbl">Pericolo</span><b>Alto</b></div><div class="stat"><span class="lbl">Ricompensa</span><b>Decente</b></div><div class="stat"><span class="lbl">Durata</span><b>26 giorni</b></div></div>
+  <div class="sec">Statistiche chiave</div><span class="chip">Forza</span><span class="chip">Percezione</span>
+  <div class="sec">Intel</div><p class="intel">Fumo e fiamme: perfino le ombre sembrano avere i denti.</p><p class="intel">Tra le rocce, ogni turno cancella ciò che aspettava oltre.</p>
+  <div class="sec">Previsione</div><div class="fore">Riempi gli slot richiesti per una stima.</div></div>
+</div>
+<p class="note">Un solo flusso dall'alto in basso: chi è la missione → quanto pesa → cosa serve → cosa si sa → cosa succederà. Semplice da leggere; la previsione, che è la parte che decide, sta in fondo e può finire sotto la piega a 1280×720.</p>
+
+<h2>B · Previsione in testa</h2>
+<div class="frame">
+ <div class="plate plan"><div class="paint"></div>
+  <div class="lbl" style="margin-top:10px">Ordine di marcia</div><div class="seats"><div class="seat"></div><div class="seat"></div><div class="seat"></div><div class="seat"></div></div>
+  <div class="lbl">Bisaccia 0/3</div><div class="bag"><i></i><i></i><i></i></div>
+  <div class="row"><span class="btn d" style="flex:1;justify-content:center">Invia spedizione</span><span class="btn">Torna alla mappa</span></div></div>
+ <div class="plate side">
+  <div class="lbl">Previsione</div><div class="fore" style="margin:6px 0 10px">Riempi gli slot richiesti per una stima.</div>
+  <h3 class="t" style="font-size:18px">Sterminio dei goblin</h3>
+  <div class="row" style="margin-bottom:6px"><span class="chip" style="color:var(--danger)">Pericolo alto</span><span class="chip">Ricompensa decente</span><span class="chip">26 giorni</span></div>
+  <div class="fold"><span>Missione</span><span>＋</span></div><div class="fold"><span>Statistiche chiave</span><span>＋</span></div><div class="fold"><span>Intel · 4</span><span>＋</span></div></div>
+</div>
+<p class="note">La previsione sale in cima perché è ciò che cambia mentre componi la squadra; il resto del dossier si ripiega in tre righe che si aprono a richiesta. Più compatta, ma nasconde frase narrativa e intel finché non le apri.</p>
+
+<h2>C · Schede</h2>
+<div class="frame">
+ <div class="plate plan"><div class="paint"></div>
+  <div class="lbl" style="margin-top:10px">Ordine di marcia</div><div class="seats"><div class="seat"></div><div class="seat"></div><div class="seat"></div><div class="seat"></div></div>
+  <div class="lbl">Bisaccia 0/3</div><div class="bag"><i></i><i></i><i></i></div>
+  <div class="row"><span class="btn d" style="flex:1;justify-content:center">Invia spedizione</span><span class="btn">Torna alla mappa</span></div></div>
+ <div class="plate side">
+  <h3 class="t" style="font-size:18px;margin:0">Sterminio dei goblin</h3>
+  <div class="row" style="margin:6px 0"><span class="chip" style="color:var(--danger)">Alto</span><span class="chip">Decente</span><span class="chip">26 g</span></div>
+  <div class="tabs"><span class="on">Missione</span><span>Intel</span><span>Previsione</span></div>
+  <p class="fic">Segui le tracce fino all'accampamento. Nessuno di loro deve tornare a minacciare il villaggio.</p>
+  <div class="sec">Statistiche chiave</div><span class="chip">Forza</span><span class="chip">Percezione</span>
+  <div class="sec">Previsione</div><div class="fore">Riempi gli slot richiesti per una stima.</div></div>
+</div>
+<p class="note">Intestazione fissa (titolo + tre chip) e schede sotto; la scheda attiva mostra una cosa per volta. Più ordinata, ma costa un click per leggere intel e previsione completa.</p>
+</main></body></html>

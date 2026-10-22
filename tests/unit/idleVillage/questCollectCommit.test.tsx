@@ -178,6 +178,8 @@ describe('quest expedition — collect-commit (R-260)', () => {
   // INV:use-quest-expedition-session.INV-3 — an ended run without a painted
   // report must NOT commit: the arrival is presentation, the dismissal is
   // the mutation.
+  // INV:CTR-game-008.INV-5 — the settlement commit is bound to the report's
+  // dismissal, never to `ended`.
   it('arrival alone commits nothing — no marker, no grant, no delta', async () => {
     const run = terminalRun({ scenarioInstanceId: 'qsi-cc-arrive' });
     const { api } = makeQuestRun(run);
@@ -249,6 +251,7 @@ describe('quest expedition — collect-commit (R-260)', () => {
   // INV:use-quest-expedition-session.INV-3 — a `settling` marker at mount
   // means "report shown, dismissal lost" (reload mid-ceremony): auto-commit
   // through the same idempotent kernel, no ceremony.
+  // INV:CTR-game-008.INV-5 — a hydrated `settling` run auto-commits at mount.
   it('hydrating a `settling` run auto-commits on mount', async () => {
     const base = terminalRun({ scenarioInstanceId: 'qsi-cc-replay' });
     const run = { ...base, settlement: { status: 'settling', plan: deriveSettlementPlan(base), atTick: 150 } } as QuestRunState;

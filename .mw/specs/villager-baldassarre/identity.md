@@ -1,29 +1,32 @@
 # Identity — Baldassarre (villager, warden)
 
-Motore di Unicità (V2 §10.1, compilato prima del prompt):
+Motore di Unicità (V2 §10.1, compilato prima del prompt).
+**Ruling Director 2026-10-22:** vita quotidiana, NON in missione — niente
+porta-scudo, il banco è il suo posto.
 
-- **IDENTITY SENTENCE:** A village butcher who holds the line with a tavern
-  door because nobody gave him a shield.
+- **IDENTITY SENTENCE:** A village butcher at his block — the biggest man in
+  the village, gentle with everything he touches.
 - **CULTURAL ANCHOR:** La macelleria/taverna del villaggio di frontiera
   (Wilderness, la casa dove si mangia e si beve).
-- **SIGNATURE HOOK:** Una porta di taverna portata come scudo torre, cardini
-  e maniglia ancora montati.
-- **CONTRADICTION:** Il più grosso del villaggio, terrorizzato nel rimanere —
-  coraggio da paura, non da sangue.
+- **SIGNATURE HOOK:** Una mannaia consumata sottile al tallone da decenni di
+  affilatura, che scende sul taglio con la cura di chi sa esattamente quanto
+  pesa.
+- **CONTRADICTION:** Mani che rompono ossa da una vita — si muovono come se
+  temessero di rompere un uovo.
 - **FACE:** Ruan Jia sul volto (split-rendering pulito ammesso), faccia larga
-  arrossata, occhi spalancati che sbucano oltre il bordo della porta.
+  arrossata, occhi caldi e un po' schivi sotto un sopracciglio pesante.
 - **THE HANDS:** Mani da macellaio: grosse, macchiate, nocche da chi rompe
   ossa da una vita.
-- **GEAR & PROVENANCE:** Divaricata una porta della sua taverna (si vede il
-  legno stagionato e i cardini in ferro battuto) + mannaia da banco nell'altra
-  mano. Grembiule da lavoro.
-- **GESTURE:** Si sbilancia in avanti reggendo la porta, in medias res, sbirciando
-  oltre il bordo.
-- **STORY TRACE:** Zanna di cinghiale al collo — il trofeo dell'unica cosa
-  «pericolosa» che abbia mai affrontato prima (survivalCount 1).
-- **RECOGNITION TEST:** Silhouette leggibile: massa enorme + rettangolo-porta +
-  occhi sopra il bordo. Riconoscibile a 64px.
-- **PALETTE:** basalt-iron (cardini/mannaia), cinnabar (grembiule), sun-bronze
+- **GEAR & PROVENANCE:** Grembiule da lavoro macchiato di grasso, mannaia da
+  banco, zanna di cinghiale al collo — la sola cosa pericolosa che abbia mai
+  affrontato.
+- **GESTURE:** Al ceppo, mannaia a metà taglio, spalle avvolte in avanti,
+  una guancia che quasi sorride al cliente fuori campo.
+- **STORY TRACE:** La zanna di cinghiale — il trofeo appeso al collo, non
+  portato come prova ma come abitudine.
+- **RECOGNITION TEST:** Silhouette leggibile: massa enorme + grembiule +
+  mannaia sul ceppo. Riconoscibile a 64px.
+- **PALETTE:** basalt-iron (mannaia), cinnabar (grembiule), sun-bronze
   (dettagli); deep teal shadows. NO grey, NO brown (il legno resta dorato).
-- **NO LIST:** armatura vera, scudo da soldato, elmo, simmetria, grim, mud,
-  sci-fi, catalog beauty.
+- **NO LIST:** battaglia, arma impugnata, scudo, porta di taverna, armatura,
+  elmo, simmetria, grim, mud, sci-fi, catalog beauty.
