@@ -328,9 +328,15 @@ async function driveToPending(page: Page, maxSteps = 20): Promise<RunShape> {
   throw new Error(`no pending frontier reached in ${maxSteps} steps`);
 }
 
-/** Wait until the settlement marker lands `settled` on the run. */
-const waitForSettled = (page: Page) =>
-  page.waitForFunction(
+/** Wait until the settlement marker lands `settled` on the run. R-260:
+ *  `settled` is gated on the report's dismissal — this drives the real
+ *  commit boundary first (`expedition.commitSettlement`, the same callback
+ *  the popup's «Collect» calls) so the run settles while staying mounted
+ *  for post-settle reads; the UI dismissal itself is exercised separately
+ *  by `dismissQuestReport`. */
+const waitForSettled = async (page: Page) => {
+  await expedition<void>(page, 'commitSettlement');
+  await page.waitForFunction(
     (pid) => {
       const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
         | { getSettlement?: () => SettlementShape | null }
@@ -340,6 +346,7 @@ const waitForSettled = (page: Page) =>
     POI,
     { timeout: 15_000 },
   );
+};
 
 /**
  * Flush the beat theatre: committed beats replay in the window (click /

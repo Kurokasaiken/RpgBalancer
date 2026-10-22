@@ -12,11 +12,18 @@ import { useEffect, useRef, useState } from 'react';
  */
 export function useThrottledValue<T>(value: T, ms: number): T {
   const [shown, setShown] = useState(value);
+  const shownRef = useRef(value);
   const latest = useRef(value);
   latest.current = value;
   useEffect(() => {
     const id = window.setInterval(() => {
-      setShown((prev) => (Object.is(prev, latest.current) ? prev : latest.current));
+      /* R-265: skip the dispatch itself when nothing changed — an updater
+       *  that returns `prev` still schedules a render pass (the eager bail
+       *  is defeated whenever another lane is pending), which made every
+       *  sampler instance re-render its host page ~2×/s while idle. */
+      if (Object.is(shownRef.current, latest.current)) return;
+      shownRef.current = latest.current;
+      setShown(latest.current);
     }, ms);
     return () => window.clearInterval(id);
   }, [ms]);

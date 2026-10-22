@@ -63,24 +63,62 @@ DIRECTOR_CONFIRMED → CLOSED` + laterali `NEEDS_PLAN`, `RETRY_PENDING`,
 
 ## 5. Task
 
-- **T-001** Ledger+journal: `.mw/ledger/` NDJSON, checksum, snapshot
-  atomico, replay, repair, genesis/`history_complete`.
-- **T-002** Modello item + FSM: stati, eventi (confirmation,
-  confirmation_invalidated, contract_amended, journal_repair,
-  stale_attempt_output), `active_confirmation`, `surface_manifest`
-  completo (absent, non-vuotezza, verginità/storia).
-- **T-003** Lock di superficie: risoluzione surface-map+file-set,
-  normalizzazione, fencing token, rebuild da journal.
-- **T-004** Verifica: ricevute su snapshot, classificazione
-  infra/defect-persisted, gate finale, vocabolari blocked, archivio blobs.
-- **T-005** Coda+tick: watermark, ordine release→recompute→dedup→select,
-  assegnazione atomica, slot verifica, load-controller statico (cap config).
-- **T-006** Comandi+report: `item-ingest`, `item-confirm`, `item-withdraw`,
-  `surface-release --force`; report chiuso/bloccato/awaiting/da correggere/
-  awaiting-stale/suspect_regression.
+- **T-001** ✅ Ledger+journal: `.mw/ledger/` NDJSON, checksum, snapshot
+  atomico, replay, repair, genesis/`history_complete`, writer fencing
+  — `scripts/ledger/{ledgerCore,cli}.ts`; bundle
+  `.mw/runs/plan077-t001-ledger/bundle.json`: OB-1..3 PASS (13 test,
+  scenario crash/repair, typecheck), OB-4 closure:lint exit 124 (hang
+  ambientale worktree condiviso, T-13); gate globali BLOCKED su file di
+  sessioni parallele — scope pulito.
+- **T-002** ✅ Modello item + FSM + dispatcher single-writer:
+  `scripts/ledger/{workItem,surfaceManifest,dispatcher}.ts` — stati,
+  conferme idempotenti (dedup + stale + revision-binding),
+  `contract_amended` invalidante, retry/block budgets, manifest
+  absent/zero-glob/verginità, validate-before-journal; bundle
+  `.mw/runs/plan077-t002-fsm/`: OB-1..3 PASS (24 test + scenario +
+  typecheck), gate globali come T-001.
+- **T-003** ✅ Lock di superficie: `scripts/ledger/surfaceLock.ts` —
+  nessun file separato, lock = fold deterministico del journal
+  (`lock_acquired`/`lock_released` + rilascio implicito su supersede +
+  rilascio terminale su CLOSED/WITHDRAWN/BLOCKED_VERIFY_TERMINAL);
+  chiavi normalizzate `surf:<id>`/`file:<path>`; fencing: acquire con
+  token estraneo inerte, release con token errato inerte; AWAITING e
+  BLOCKED_VERIFY tengono il lock. 9/9 test verdi + typecheck strict; bundle
+  `.mw/runs/plan077-t003-locks/` in produzione.
+- **T-004** ✅ Verifica: `scripts/ledger/verification.ts` — vocabolari
+  chiusi (check kinds/results, classification, INFRA_REASONS, gate
+  failures) validati dal dispatcher pre-journal; `classifyChecks`
+  (not_run/unreliable → infra, infra-scoped → infra, target fail →
+  defect_persisted); `finalGateCheck` anti-TOCTOU (ricalcolo manifest su
+  disco vs revisione confermata + archivio blob); archivio
+  content-addressed `blobs/<manifest_hash>/<sha256>` +
+  `verifyArchive`. Fix FSM incluso: `final_gate_passed` chiude anche con
+  `requires_director_confirmation:false`. 9/9 test; bundle
+  `.mw/runs/plan077-t004-verification/`: OB-1..3 exit 0.
+- **T-005** ✅ Coda+tick: `scripts/ledger/queue.ts` — `computeTick` puro
+  sullo snapshot al watermark (ingest durante il tick invisibile), ordine
+  release→recompute→dedup(`suspect_fixed_by` conservativo)→select
+  (priorità Director poi FIFO ingest), `depends_on` nel contratto, cap
+  esecuzione statico (pilota 1) + slot verifica separati, assegnazione
+  atomica journaled `tick_assignment`+`attempt_started`+`lock_acquired`
+  con `assignment_id` univoco. 11/11 test; bundle
+  `.mw/runs/plan077-t005-queue/` in produzione.
+- **T-006** ✅ Comandi+report in `scripts/ledger/cli.ts` (tutti via
+  dispatcher): `item-ingest`/`item-confirm`/`item-withdraw`/
+  `surface-release --force`/`tick`/`report`; scenario CLI end-to-end PASS
+  (ingest→tick→finish→receipt→confirm→release→withdraw, chain intatta).
+  `AWAIT_TTL_MS`=48h wall-clock: `JournalRecord.at` + `awaiting.since_at`.
 - **T-007** Pilota + test di accettazione (§10 artifact: crash/replay,
   TOCTOU, doppia assegnazione, conferma stale, esaurimento budget,
   starvation, ingest durante tick, crash launch, gate tassonomia).
+- **T-007** ✅ Pilota isolato: `tests/unit/scripts/pilot.test.ts` — ciclo
+  completo close+advance, crash tra `tick_assignment` e `attempt_started`
+  (riassegnazione idempotente, nessun attempt fantasma), torn-write
+  journal → repair → replay, gate tassonomia (feature mai RUNNING).
+  4/4 verdi; bundle `.mw/runs/plan077-t007-pilot/` in produzione.
+  Copertura scenari §10 già nelle suite: TOCTOU (verification.test),
+  doppia assegnazione + starvation + ingest durante tick (queueTick.test),
+  conferma stale + budget (workItemFsm.test), crash/replay (pilot+ledger).
 
 ## 5bis. Ampliamenti approvati dal Director (2026-10-22)
 
@@ -118,9 +156,18 @@ DIRECTOR_CONFIRMED → CLOSED` + laterali `NEEDS_PLAN`, `RETRY_PENDING`,
 **Adottati al battesimo (Director «procedi», 2026-10-22):**
 
 - `await_ttl` = **48h**; cap tentativi fix = **3**; retry infra = **3**.
-- Cap concorrenza pilota = **1** (load-controller statico da config; il
-  dispatch resta in pausa R-208, il pilota è in isolamento — si alza a
-  runtime dopo il benchmark PLAN-039).
+- Cap concorrenza pilota = **4** (ruling Director 2026-10-22, rivisto da 1:
+  il dispatcher NON si ferma in `AWAITING_DIRECTOR` — mentre attende la
+  conferma del Director su un item continua a lanciare altri subagent,
+  in parallelo finché lock di superficie e dipendenze lo permettono;
+  `verify-cap` = 2. Il dispatch resta in pausa R-208: i subagent sono
+  lanciati dalla sessione Devin locale come esecutori del ledger).
+- Modello operativo (ruling Director 2026-10-22): il Director consegna
+  N bug in linguaggio naturale alla sessione locale; l'agente smista
+  (parallelo su superfici disgiunte, sequenziale via `depends_on` o per
+  conflitto di superficie) e lancia i subagent. A fine lavoro l'agente
+  sottopone l'item; su richiesta del Director il `report` produce il
+  digest di tutti i lavori finiti con spiegazioni distinte.
 - Preemption di `item-prioritize` = **checkpoint-park** (l'item RUNNING si
   parcheggia su checkpoint recuperabile nel journal).
 - Acceptance chatgpt non cercata in run nuovo: battesimo su decision_memo

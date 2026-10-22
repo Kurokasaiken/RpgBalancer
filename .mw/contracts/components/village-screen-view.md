@@ -10,9 +10,16 @@ fast_checks:
   - tests/unit/idleVillage/villageBuildings.test.tsx
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: R-234-legacy-slots-from-buildings
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      Legacy reliquary slots follow the village buildings: warehouse to items, sanctuary to heroes, mage tower to
+      blueprints; slots equal the building level, zero when absent or not built (LEG = B)
+    test_refs:
+      - tests/unit/idleVillage/legacyReliquary.test.ts
 ---
-
 # village-screen-view
 
 Unità `ui-component` (tier 2, default) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/components/gameFrame/VillageScreenView.tsx`.

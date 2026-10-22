@@ -15,18 +15,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { DEFAULT_GAME_FRAME_CONFIG } from '../src/balancing/config/idleVillage/gameFrameConfig';
-import { NODE_ART } from '../src/ui/idleVillage/questS1Lab/questArt';
+import { JOURNEY_LEG_ART, NODE_ART } from '../src/ui/idleVillage/questS1Lab/questArt';
 
 const PUBLIC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
 
 /** Assets allowed to deviate — each carries its reason + removal pointer. */
 const WARN: ReadonlyArray<{ match: (src: string) => boolean; reason: string }> = [
-  {
-    match: (src) => src === '/assets/quest-goblin/ritorno.jpg',
-    reason:
-      'public-domain placeholder — transit art `ritorno` pending external ' +
-      'regeneration (scene-library CATALOG "Mancanti/pending"); remove on drop-in',
-  },
   {
     match: (src) => src.startsWith('/assets/quest-robine/'),
     reason:
@@ -49,7 +43,10 @@ async function main() {
 
   /* Unique cover-fit srcs → the nodes that render them in the theatre. */
   const coverSrcs = new Map<string, string[]>();
-  for (const [nodeId, art] of Object.entries(NODE_ART)) {
+  for (const [nodeId, art] of [
+    ...Object.entries(NODE_ART),
+    ...Object.entries(JOURNEY_LEG_ART).map(([fase, art]) => [`journey:${fase}`, art] as const),
+  ]) {
     if (art.fit !== 'cover') continue;
     const nodes = coverSrcs.get(art.src) ?? [];
     nodes.push(nodeId);

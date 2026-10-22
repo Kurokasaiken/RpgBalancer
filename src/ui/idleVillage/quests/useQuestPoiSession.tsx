@@ -618,15 +618,17 @@ export function useQuestPoiSession({
       setTimeout(() => {
         const to = elementCenter(getSlotComponentElement(slot.id));
         if (!to) return;
-        startFlight({
-          residentId,
-          slotId: slot.id,
-          isInset: true,
-          fromX: from.x,
-          fromY: from.y,
-          toX: to.x,
-          toY: to.y,
-        });
+        startTransition(() =>
+          startFlight({
+            residentId,
+            slotId: slot.id,
+            isInset: true,
+            fromX: from.x,
+            fromY: from.y,
+            toX: to.x,
+            toY: to.y,
+          }),
+        );
       }, 50);
     },
     [isDetailOpen, isQuestRunning, embarkResult, findAcceptingSlot, startFlight, setFlying],
@@ -635,33 +637,49 @@ export function useQuestPoiSession({
   const handleSlotClear = useCallback(
     (slotId: string) => {
       const residentId = assignments[slotId];
-      handleClear(slotId);
-      if (!residentId) return;
-      const from = elementCenter(getSlotComponentElement(slotId));
-      const to = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
-      if (from && to) {
-        setFlying(residentId);
-        startFlight({
-          residentId,
-          slotId,
-          isInset: false,
-          fromX: from.x,
-          fromY: from.y,
-          toX: to.x,
-          toY: to.y,
-        });
+      if (residentId && !flyingResidentRef.current) {
+        const from = elementCenter(getSlotComponentElement(slotId));
+        const to = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
+        if (from && to) {
+          /* R-269: same atomic handoff as the expedition session — the clear
+           * and the return flight land in ONE commit, so the seat medallion
+           * morphs into the proxy instead of vanishing first. (`handleClear`
+           * runs inside the transition: its plain setStates take the same
+           * lane and paint with the flight mount.) */
+          flyingResidentRef.current = residentId;
+          startTransition(() => {
+            handleClear(slotId);
+            setFlyingResidentId(residentId);
+            startFlight({
+              residentId,
+              slotId,
+              isInset: false,
+              fromX: from.x,
+              fromY: from.y,
+              toX: to.x,
+              toY: to.y,
+            });
+          });
+          return;
+        }
       }
+      handleClear(slotId);
     },
-    [assignments, handleClear, startFlight, setFlying],
+    [assignments, handleClear, startFlight],
   );
 
   const handlePageFlightComplete = useCallback(
     (residentId: string, slotId?: string, isInset?: boolean) => {
-      if (isInset && slotId) handleAssign(slotId, residentId);
-      setFlying(null);
-      settleFlight();
+      /* R-269: landing is one commit — the proxy unmounts in the same paint
+       * the carrier takes the medallion back. */
+      flyingResidentRef.current = null;
+      startTransition(() => {
+        if (isInset && slotId) handleAssign(slotId, residentId);
+        settleFlight();
+        setFlyingResidentId(null);
+      });
     },
-    [handleAssign, settleFlight, setFlying],
+    [handleAssign, settleFlight],
   );
 
   const status: 'idle' | 'in-progress' | 'completed' | 'blocked' = isQuestRunning

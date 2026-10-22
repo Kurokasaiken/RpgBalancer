@@ -1,18 +1,28 @@
 ---
-title: 'PLAN-078 — Quality Sentinel: esplorazione visuale autonoma, bug hunting e audit notturno'
-status: draft
+title: 'PLAN-078 — Quality Sentinel: State-Graph Perturbation, Three-Pass Non-Intrusive Oracles, and PLAN-077 Ledger Integration'
+status: baptized
+version: r004
 created: 2026-10-22
-request: Director request 2026-10-22 — plan after repository audit and online research; RICHIESTE reference to be assigned
-related: PLAN-047, PLAN-051, PLAN-067, PLAN-071, PLAN-077, PLAN-049; scripts/visual/minimalGameplayBaselineRunner.ts; scripts/harness/dispatch.ts; scripts/benchmark/nightrun.ts; scripts/shutdownManager/
+request: R-266 (Director 2026-10-22)
+related: PLAN-041, PLAN-047, PLAN-051, PLAN-054, PLAN-067, PLAN-071, PLAN-077
+visual-fork: skipped — ops/QA runner and CLI tooling only; zero changes to src/ui/** or visual tokens — §5 vincoli (files_touched: scripts/sentinel/**, tests/unit/sentinel/**)
 documentation_impact: REQUIRED
 documentation_targets:
   - plans/INDEX.md
-  - context/OPEN.md (only if implementation discovers unresolved policy decisions)
 ---
 
-# PLAN-078 — Quality Sentinel
+# PLAN-078 — Quality Sentinel (converged artifact r004)
 
-## 0. Intent
+> **Revision history.** The v1 draft (commit `acb40de3`, "esplorazione visuale autonoma")
+> was critiqued in an explorer session and then adversarially debated in a multi-AI web
+> debate (`mw-web-debate`, electorate chatgpt/claude/deepseek/gemini/grok):
+> run `mind-weaver/.mw/runs/20261022-plan078-quality-sentinel/`, **CONVERGED 5/5 ACCEPT**
+> on `artifact-r004` sha256 `a885496d65a94bd0292c12b2afcd29b6694a1087d527255e7967aaa8bbe2092c`.
+> 23 objections raised and dispositioned across 4 artifact revisions (r001→r004).
+> This file materializes the converged artifact; §0 preserves the original v1 intent verbatim.
+> **Baptized by the Director 2026-10-22 («procedi»).**
+
+## 0. Intent (v1, preserved verbatim)
 
 Create a governed quality-inspection service that opens RPG Balancer in a real browser, explores meaningful player flows, captures screenshots and diagnostic evidence, and finds issues that existing scripted tests may not cover: functional defects, layout failures, visual inconsistency, interaction friction, runtime errors, regressions, and measurable performance degradation.
 
@@ -22,237 +32,141 @@ The goal is not another agent that merely reads source code or runs the entire t
 
 **Operating principle:** observe and report first. No autonomous code fixes, snapshot promotion, design decisions, auto-commit, auto-push, or machine shutdown outside the existing governance.
 
-## 1. Repository reconnaissance (verified starting points)
+### 0.1 Why v1 was rewritten (critique summary)
 
-- Playwright is already configured in playwright.config.ts; package scripts include test:e2e, test:visual, visual:minimal-gameplay, minimal:e2e, preview:playwright, and mobile/reporting commands.
-- scripts/visual/minimalGameplayBaselineRunner.ts captures Minimal Gameplay across three viewports and five game states.
-- Existing E2E, visual-regression, surface-coverage, audit, stress, and benchmark scripts must be catalogued and reused where appropriate.
-- scripts/benchmark/nightrun.ts is the reference for bounded night-run lifecycle/session registration.
-- scripts/shutdownManager/ and .windsurf/rules/50-shutdown-governance.md are the sole shutdown authority. The real shutdown policy defaults disabled and must remain so unless separately authorized.
-- scripts/harness/dispatch.ts exists, but the legacy automatic dispatch workflow is documented as paused. This plan does not reactivate R-208 or introduce an independent dispatcher.
-- PLAN-047 requires visual choices/baselines to remain governed and preserves the Director's human-eye gate for representation/material/identity. Automated metrics cannot approve taste.
-- PLAN-051's evidence/trust rules and PLAN-077's work-item lifecycle must be inspected before defining report and closure integration. Do not create a parallel ticket ledger if the existing contract can represent findings.
-- PLAN-067 and PLAN-071 provide examples of surface maps, headless evidence capture, diagnosis-first waves, and human review boundaries.
+- **Repository amnesia:** v1 cited deprecated `/minimal-gameplay` and proposed a parallel finding FSM, ignoring the canonical `/game` surface, the PLAN-067/071 harness (`src/docs/docs/game_surface_audit/harness/harness.mjs.txt`, `lensAudit` L1–L9), PLAN-054 living contracts (`discoverGameSurface.ts`, `.mw/surface-map.json`, `.mw/contracts/`), and the baptized PLAN-077 ledger (`scripts/ledger/`).
+- **Blind to real bugs:** a settle-then-screenshot inspector cannot see the temporal/kinetic/state-perturbation defects that dominate the real defect log (PLAN-071 video audit, R-257..R-265): cold-decode black frames, 1-frame drag snap, proxy+source overlap, heading/art desync, orphan wings on minimize, `currentTick` long-task churn, `parked`-state animation leaks.
+- **VLM in the critical loop:** empirical research (ACM 2026, 19,738 keyframes / 41h gameplay) puts off-the-shelf VLM precision at ~0.50; PLAN-041 proved free-tier providers hit 429/503 in unattended night runs; T-04/PLAN-047 reserve taste judgment to the Director's eye.
+- **Contradictory exploration model:** a fixed deterministic itinerary is a slower E2E spec, not an explorer.
 
-These are starting facts, not proof that every existing script is currently healthy. T-001 must execute or inspect them and record current state.
+## 0bis. Debate delta (what the artifact revisions changed)
 
-## 2. Scope and non-goals
+- **r001 → r002 (19 objections):** Three-Pass Oracle separation (clean perf pass / isolated pixel replay / quiescence-gated at-rest pass); `normalizeSelector()` + `fingerprint` formula + `affected_matrix` (viewport/DPR/locale excluded → 1 ledger item per bug); per-run ingest cap 10; scoped content-hash T-13 guard; per-node PLAN-077 surface-lock skip; guarded `CLOSED→OPEN`; calibration expanded to seeded faults + 5 negative controls; `DomainTextOracle` allowlist.
+- **r002 → r003 (3 objections, Claude):** `never_quiesced` finding on quiescence timeout + degraded `L1/L3/L4` audit (10th seeded fault); `signature_family` introduced for Temporal/Pixel oracles; host-conditional ANGLE backend (`darwin→metal`, `win32→d3d11`), `renderer_class` in baseline key.
+- **r003 → r004 (1 objection, DeepSeek):** `signature_family` narrowed to a flakiness classifier only — same-family + same-exact-signature ingests; same-family + divergent signatures emits one `SENTINEL-<hash>` observation candidate (both `candidate_component_ids`, `observed_signatures[]`) for Director adjudication, never auto-ingested; cross-family → `flaky_candidate`. `T-003` rewritten to assert both branches. `degraded: true` propagates into ledger evidence.
 
-### In scope
+## 1. Goal
 
-1. Open the application in a real browser using the existing Playwright setup and test-mode build.
-2. Navigate and interact with selected player-facing screens and flows, including routes, dialogs, overlays, drag/drop and meaningful game-state transitions.
-3. Capture screenshots at known viewports/states; on failure retain trace, console/network diagnostics, and relevant DOM/geometry evidence.
-4. Compare with approved visual baselines and existing design-system/skin contracts.
-5. Find issues in:
-   - functional behavior and invalid state transitions;
-   - clipping, overlap, overflow, inaccessible or unreachable controls;
-   - inconsistent typography, spacing, tokens, icons, terminology, or component grammar;
-   - console errors, failed requests, unhandled runtime errors;
-   - repeated rendering/work, obvious expensive operations, and measured interaction/load regressions;
-   - missing coverage on important player-facing surfaces.
-6. Verify candidate findings with a repeat attempt or a deterministic assertion before filing.
-7. Produce deduplicated, severity-ranked work items with reproduction steps, screenshots, logs, measurements, confidence, and acceptance criteria.
-8. Run bounded during-day or overnight cycles, with adaptive resource limits and safe cancellation.
-9. Re-check findings after fixes when an explicit verification trigger is available.
+1. Build a deterministic, headless **Quality Sentinel** for `/game` (`src/pages/game-frame-pixi.tsx`) that explores a typed **State-Transition Graph (`S0..S15`)** under systematic **Perturbation Operators** (viewports including ultrawide `3440×1440`, locales `en`/`it-IT`, mid-state lifecycle interrupts `minimize/close/Escape/drag-cancel/reload`, and 5× WebGL mount/unmount soak cycles).
+2. Detect functional, temporal/kinetic, geometric, domain/i18n, and WebGL/runtime regressions at **zero LLM token cost** using a **Three-Pass Non-Intrusive Oracle Pipeline** calibrated against all 10 witness bug classes and 5 negative controls with **`0%` false positives on auto-ingested defects (`FP <= 5%` overall)**.
+3. Connect verified findings directly to **PLAN-054** (`discoverGameSurface.ts` / `.mw/surface-map.json`) and **PLAN-077** (`.mw/ledger/journal.ndjson`) under an exclusive ledger lock with normalized selector fingerprinting, exact-`failure_signature` reproduction matching (`signature_family` as flakiness classifier only), `affected_matrix` aggregation, guarded `CLOSED → OPEN` reopen, and `.spec.ts` reproducer generation.
 
-### Out of scope
+### 1.1 State graph & perturbations
 
-- Automatically fixing code in the initial version.
-- Updating or accepting visual baselines automatically.
-- Deciding whether a new aesthetic direction is beautiful or canonically correct.
-- Treating an AI visual opinion as a confirmed defect without corroborating evidence or a Director judgment.
-- Replacing Playwright, the existing visual baseline runner, the dispatcher, the work-item ledger, or shutdown manager.
-- Reactivating paused dispatch workflows.
-- Unrestricted random exploration of destructive, irreversible, account, filesystem, or production actions.
-- Claiming that a game is fun based solely on automated UI checks.
+- **Nodes:** `S0_BootVeil` → `S1_WorldMapIdle` ↔ `S2_VillageView` ↔ `S3_VillageRegistry` / `S4_VillageStash` / `S5_Merchant`; `S6_QuestPlanner` (± Bag Picker, ± Forecast Wing) → `S7_QuestJourneyOutbound` → `S8_QuestStageNarrative` → `S9_QuestStageChoice` → `S10_QuestSkillCheckArmed` → `S11_QuestSkillCheckParked` → `S12_QuestJourneyReturn` → `S13_QuestRewardPopup` → `S14_GameMenuSettingsSaveLoad` → `S15_GoblinInvasionEvent`.
+- **Perturbation operators:** `VP_SWEEP` (`1280×720`, `1280×800`, `1440×900`, `1920×1080`, `3440×1440` × DPR `1/2`), `LOCALE_SWEEP` (`en`/`it-IT`), `LIFECYCLE_INTERRUPT` (`minimize→restore`, `close→reopen`, `Escape`, `drag-start→cancel`, `drag-start→clamped release`, `reload mid-state` with PersistenceService hydration check), `SOAK_CYCLE` (5× WebGL mount/unmount `PixiWorldMap` ↔ `DepthScene` ↔ `DestinyAstrolabeV62` for `T-000` texture-pool leaks).
 
-## 3. Design and runtime model
+### 1.2 Three-Pass Non-Intrusive Oracle Pipeline
 
-### 3.1 Two complementary inspection layers
+- **Pass 1 — `TemporalPerfOracle` (clean kinetic/perf pass):** explicit warm-up drain before the gesture start timestamp; `PerformanceObserver('longtask')`, `__gamePerf` (`p95 <= 33ms`), pure DOM rAF invariants: drag-release 1-frame snap `T-A6`, source+proxy bbox overlap `R-257`, `data-astro-frames`/`data-astro-idle` quiescence `BV-04`, `processedUpToTick` stillness. **Zero pixel readback** (`toDataURL`/`readPixels` forbidden here); observer overhead self-measured (`<= 1.5ms/frame` validity gate); emits `never_quiesced` when the Pass-2 gate times out.
+- **Pass 1b — `TemporalPixelOracle` (isolated luminance/visual replay):** replays only scene/node transitions (`S0→S1`, `S6→S8`, `S8→S9`, `S10→S11`) at the canonical `1440×900` viewport (cold-decode and node-art desync are asset/state-machine properties, not viewport properties) with perf assertions disabled, under a pinned CDP network/CPU throttle profile; samples 16×9 downscaled luminance and `(headingText, canvas/img hash)` — catches `>300ms` black entry frames (`T-A4`, incl. opacity/shader occlusion) and heading/art desync (`T-A3`).
+- **Pass 2 — quiescence-gated at-rest pass:** **Visual Quiescence Gate** (`Math.abs(currentRect - prevRect) < 0.5px` across 2 consecutive `rAF` ticks + `150ms` post-gesture settle debounce, `quiescenceTimeoutMs = 2000`) before `GeometryOracle` L1–L6 (collision, truncation+fold-straddle, plaque/viewport containment, orphan wings, `CTR-game-005` map fit, hit-area/portal scope), `DomainTextOracle` (allowlist `.mw/sentinel/domain-text-allow.json`, `matched_rule` + `surrounding_text_snippet`; forbidden tokens `slot-token:`, `\d+\s*pp\b`, `TICKS`, `NaN`, `undefined`, `translation_missing`), and `RuntimeOracle` (`pageerror`, `console.error`, React update-depth, failed assets, WebGL context loss). On timeout: `never_quiesced` + degraded audit — `L1/L3/L4` on last frame (`degraded: true`, propagated to ledger evidence), `L2/L5/L6` `skipped_degraded`.
 
-**Layer A — deterministic checks**
-- Existing unit/E2E/visual tests, Playwright assertions, console/page errors, failed requests, DOM geometry, accessibility signals, screenshot diffs, and repeatable timings.
-- Cheap checks run before model-based inspection.
-- Performance findings require measured evidence and a reproducible comparison; source-code suspicions alone are not performance defects.
+### 1.3 Reproduction gates & fingerprinting
 
-**Layer B — AI-assisted visual exploration**
-- The agent receives a bounded route/surface itinerary, approved references, and the current state/viewport.
-- It opens the browser, inspects screenshots, and performs only allowlisted interactions.
-- It may suggest additional steps, but must log the action and observed result; every suspected issue gets a screenshot or equivalent evidence and a reproduction path.
-- Use an available multimodal model/provider already approved in the project environment. T-001 must identify the actual supported integration and cost before choosing a provider; do not hard-code a speculative API.
-- The model is a detector/triager, not the authority on aesthetic taste.
+- `fingerprint = sha256(oracle_id | component_id | state_node | perturbation_kind | normalizeSelector(target))`; `normalizeSelector` strips `:nth-child`, array indices, `/^data-react/`, `slot-token:*`, CSS-module hashes; `viewport`/`DPR`/`locale` excluded → `affected_matrix[]` on `evidence_attached`.
+- Deterministic oracles (`Geometry`, `DomainText`, `Runtime`): **2× Determinism Gate** with exact `failure_signature` match (`oracle_id + assertion_kind + state_transition`).
+- Temporal/Pixel oracles: **2× / 3-of-5 Pinned-Profile Gate** requiring same `signature_family` **and** same exact `failure_signature`; `oracle_family` is a closed enum `{cold_decode_visual, heading_art_atomicity, drag_kinetic, proxy_overlap, idle_quiescence}`.
+- Same-family + divergent signatures → one `SENTINEL-<hash>` observation candidate (both `candidate_component_ids`, `observed_signatures[]`) → Morning Digest, Director adjudication. Cross-family divergence → `flaky_candidate`. No auto-ingest in either case.
+- `renderer_class` (from `WEBGL_debug_renderer_info`) is part of the perf baseline key; `software` downgrades all timing findings to `advisory`.
 
-### 3.2 Inspection targets and prioritization
+### 1.4 PLAN-077 bridge & worktree safety
 
-Build the target queue from existing surface-coverage registries, routes, E2E specs, recent diffs, open defects, and surfaces with weak/no recent evidence.
+- Exclusive `.mw/ledger/.ingest.lock`; content-hash recheck of monitored paths (`src/**`, `scripts/**`, `.mw/contracts/**`, `.mw/surface-map.json`, `public/**`, `package.json`; excludes `.mw/runs/**`, `.mw/ledger/**`, `~/.rpg-shutdown/**`) immediately before each write.
+- `dirty_worktree_advisory` at start (digest allowed, `item_reopened` prohibited); per-node `RUNNING` surface-lock check → `skipped_surface_locked`.
+- Guarded `CLOSED → OPEN`: automated `item_reopened` requires clean `HEAD` AND changed `surface_manifest_hash` (or `--force-reopen`); otherwise `evidence_attached` + `regression_review_needed` in the digest.
+- Per-run cap `<= 10` new `item_ingested`; overflow → `capped_pending_ingest`. Every ingested defect ships a generated `.spec.ts` reproducer.
+- Layer C (optional VLM triage) is post-run only, may emit only `kind: 'observation'` (structural guard), never gates navigation, never confirms defects (`T-04`/`PLAN-047`).
+- Rule 16 (headless/background only, dedicated ephemeral port) and Rule 50 (register + heartbeat + release in `~/.rpg-shutdown/session-registry.json`; never invokes shutdown) are binding.
 
-Prioritize:
-1. player-critical paths and recently changed surfaces;
-2. surfaces with known defects or recurring regressions;
-3. important uncovered screens and responsive breakpoints;
-4. broader exploratory checks when budget remains.
+## 2. Out of Scope
 
-Every run records surfaces attempted, surfaces completed, skipped targets and reasons. Do not claim full application coverage from a partial run.
+- Runtime mutation of any `src/**` file (`PLAN-054` compliance) — the Sentinel is instrumentation/probe-only.
+- Synchronous LLM/VLM calls in the browser loop; promoting Layer C above `observation`.
+- Autonomous code edits, baseline updates, `git commit`/`push`, OS shutdown calls.
+- Reactivating paused dispatch workflows (`R-208`).
 
-### 3.3 Evidence package
+## 3. Tasks
 
-Each run produces a stable directory under the repository's existing run/evidence conventions, containing:
-- run manifest: commit SHA, build/config, viewport, browser, timestamps, budget and model/tool version;
-- route/interaction log and test outcome;
-- screenshots with deterministic names and state/viewport metadata;
-- Playwright trace and console/network errors when applicable;
-- measured timing and baseline comparison where available;
-- findings JSON plus concise Markdown report;
-- hashes or equivalent stable references for artifacts.
+- **T-001 — Config Schema, `normalizeSelector()`, Renderer Backend & State-Graph Harness Promotion**
+  - *Files:* `scripts/sentinel/sentinelConfig.ts`, `scripts/sentinel/selectorNormalizer.ts`, `scripts/sentinel/rendererBackend.ts`, `scripts/sentinel/gameSurfaceHarness.ts`, `.mw/sentinel/domain-text-allow.json`, `tests/unit/sentinel/sentinelConfig.test.ts`
+  - *Depends on:* —
+  - *Output:* Zod-validated `SentinelConfigSchema` (`S0..S15`, perturbations, thresholds incl. `quiescenceTimeoutMs = 2000`, `signature_families` closed enum, `angleBackend` host map, per-run cap 10), `normalizeSelector()` golden tests, host-conditional renderer selection with host-detection fallback unit test (`darwin`/`win32`/`linux` × hardware/software), Playwright harness promoted from `harness.mjs.txt` (isolated port, guaranteed cleanup, `renderer_class` in `run-manifest.json`).
 
-Avoid committing large raw artifacts by default. Follow the existing evidence/bundle conventions and define retention/size limits in T-001.
+- **T-002 — Three-Pass Non-Intrusive Oracles**
+  - *Files:* `scripts/sentinel/oracles/{temporalPerfOracle,temporalPixelOracle,geometryOracle,domainTextOracle,runtimeOracle,quiescenceGate,index}.ts`
+  - *Depends on:* T-001
+  - *Output:* the pipeline of §1.2 — Pass 1 (warm-up drain, `longtask`, `__gamePerf`, drag-snap `T-A6`, proxy-overlap `R-257`, idle quiescence `BV-04`, `never_quiesced`), Pass 1b (transition-edge luminance + heading/art replay `T-A4`/`T-A3`, pinned CDP profile), Pass 2 (quiescence gate + degraded `L1/L3/L4`; `DomainTextOracle` allowlist; `RuntimeOracle`).
 
-### 3.4 Finding contract and severity
+- **T-003 — Seeded-Fault (`10/10`) & Negative-Control (`5/5`) Calibration Suite (`PLAN-051`)**
+  - *Files:* `tests/unit/sentinel/sentinelOracles.test.ts`, `scripts/sentinel/fixtures/seededFaults.ts`
+  - *Depends on:* T-002
+  - *Output:*
+    - **10 seeded faults:** (1) `QuestRewardPopup` viewport overflow `T-A1`, (2) `>300ms` black entry `T-A4`, (3) choice row fold straddle `T-A5`, (4) 1-frame drag snap `T-A6`, (5) source+proxy overlap `R-257`, (6) heading/art desync `T-A3`, (7) orphan `quest-check-column` wing `C1`, (8) active CSS/rAF in `parked` `BV-04`, (9) `slot-token:`/`+15pp`/untranslated `it-IT` `T-A5`/`R-258`/`T-A13`, (10) perpetual jitter container → `never_quiesced` + degraded `L1/L3/L4`.
+    - **Reproduction-gate tests:** same-family same-signature → 1 defect, correct owner; same-family divergent → 0 defects + 1 observation candidate.
+    - **5 negative controls:** valid scroll fold, hidden wing, allowed `it-IT` proper nouns, `<150ms` settle, valid `+15%` chip.
+    - Structural test: Layer C emits only `kind: 'observation'`.
 
-Each finding should contain:
-- stable fingerprint and affected surface/component;
-- category: functional, layout, visual-consistency, performance, accessibility/interaction, coverage, or infrastructure;
-- severity: critical / high / medium / low / observation;
-- status: candidate / reproduced / needs-human-review / duplicate / dismissed / fixed-awaiting-verification / verified-fixed;
-- confidence with explicit rationale;
-- reproduction steps and expected vs actual behavior;
-- evidence links, viewport, commit SHA and relevant logs/measurements;
-- suggested next action and testable acceptance criteria.
+- **T-004 — PLAN-054 Component Resolver, Reproducer Generator & Concurrency-Safe PLAN-077 Ledger Bridge**
+  - *Files:* `scripts/sentinel/componentResolver.ts`, `scripts/sentinel/reproducerGenerator.ts`, `scripts/sentinel/ledgerBridge.ts`, `scripts/ledger/workItem.ts` (`evidence_attached` reducer support), `tests/unit/sentinel/ledgerBridge.test.ts`
+  - *Depends on:* T-002, T-003
+  - *Output:* reproduction gates of §1.3, `affected_matrix` aggregation, `.mw/ledger/.ingest.lock`, pre-ingest content-hash recheck, guarded `CLOSED→OPEN`, `observed_signatures[]`/`degraded` evidence propagation, per-run cap, `.spec.ts` reproducer output.
 
-A visual difference alone is not necessarily a defect: intentional approved changes, animation, nondeterministic content, and environment noise must be distinguished. Findings with weak evidence remain observations or human-review items rather than entering the implementation queue as confirmed bugs.
+- **T-005 — Night-Run Controller, Scoped Taint/Lock Guards, Shutdown Heartbeat & Morning Digest**
+  - *Files:* `scripts/sentinel/runSentinel.ts`, `scripts/sentinel/worktreeTaintGuard.ts`, `scripts/sentinel/morningDigest.ts`, `tests/unit/sentinel/runSentinelLifecycle.test.ts`, `package.json`, `plans/INDEX.md`
+  - *Depends on:* T-001, T-004
+  - *Output:* CLI `npm run sentinel:run`, scoped taint guard, per-node lock skip, Rule 50 registry/heartbeat/release, Rule 16 focus-safety, `.mw/runs/sentinel-<ts>/morning-digest.md` sections: `Confirmed Defects` / `Flaky/Race Candidates` / `Observation Candidates` (incl. `SENTINEL-<hash>` divergent-signature items) / `Visual Observations`.
 
-Integrate with PLAN-077's existing work-item lifecycle after inspecting its contract. Do not create a second authoritative ledger. Human confirmation remains mandatory for aesthetic judgments and any state transition that the existing governance reserves to the Director.
+## 4. Post-convergence advisory notes (non-blocking, for T-004/T-005)
 
-## 4. Resource and safety governance
+Recorded verbatim from the Round-4 acceptance (Claude) — adopt during implementation, no re-vote required:
 
-- Default to one browser exploration worker and one heavy browser session at a time. Parallelize cheap independent checks only when the machine budget permits.
-- Use a configurable time budget, per-step timeout, total-run timeout, retry budget, and cancellation path.
-- Before each heavy stage, sample current load and active registered sessions. Reduce scope or defer if the machine is busy; do not spawn more agents merely to finish sooner.
-- Reuse one browser/context where safe; isolate/reset test state between flows. Never share a mutable game state with a developer/test session.
-- Run against the test-mode build and isolated test data, never production.
-- Allowlist routes and interactions; block destructive or irreversible actions unless explicitly seeded and safe.
-- Register the run with the existing shutdown session registry and send heartbeats. Release the session in a guaranteed cleanup/finally path, including failures and cancellation.
-- The Sentinel may request a shutdown evaluation only through the existing manager. It must never execute shutdown commands itself.
-- Keep actual shutdown disabled unless the existing policy has been explicitly configured and dry-run evidence reviewed. A completed Sentinel run is not by itself authorization to shut down the machine.
-- No auto-commit or auto-push. Preserve dirty work and follow existing repository safety rules.
-- If the app fails to start, the browser crashes, evidence storage fails, or session state is unreadable, report infrastructure failure and fail closed rather than filing speculative gameplay bugs.
+1. **Promotion path:** define a Director-side action that promotes an observation candidate to `defect` with Director-chosen owner; the promoted item carries the original `SENTINEL-<hash>` as `source_ref` — otherwise an always-signature-flipping bug stays in the digest forever.
+2. **Recurrence escalation:** count consecutive runs re-emitting the same divergent candidate; past a configurable threshold (suggested 3), flag `persistent_divergent_candidate` in the digest — visibility only, never auto-ingests.
 
-## 5. Tasks and acceptance criteria
+## 5. Acceptance Criteria & Closure Contract (`verification.json`)
 
-### T-001 — Existing capability and gap audit (prerequisite)
+- **OB-1** (10/10 seeded faults + 5/5 negative controls + normalization + reproduction-gate semantics + renderer fallback): `npm run test -- tests/unit/sentinel/sentinelConfig.test.ts tests/unit/sentinel/sentinelOracles.test.ts` passes.
+- **OB-2** (concurrency-safe ledger bridge, matrix dedup, guarded reopen): `npm run test -- tests/unit/sentinel/ledgerBridge.test.ts tests/unit/scripts/workItemFsm.test.ts` passes.
+- **OB-3** (lifecycle, scoped T-13 taint, per-node lock skip, Rule 50): `npm run test -- tests/unit/sentinel/runSentinelLifecycle.test.ts` + `npm run shutdown:lint-capability` + `npm run foreground:lint` pass.
+- **OB-4** (headless pilot on `/game`): `npx tsx scripts/sentinel/runSentinel.ts --tier=1 --dry-run` completes with 0 orphan processes; writes `.mw/runs/sentinel-pilot/morning-digest.md` + `run-manifest.json` (incl. `renderer_class`).
+- **OB-5** (repo safeguards): `npm run lint -- scripts/sentinel tests/unit/sentinel` + `npm run build:check` + `npm run closure:lint` pass.
 
-Inventory Playwright configuration/projects, routes and surface registries, visual baselines, screenshots, test reporters, performance/stress scripts, evidence bundles, existing model integrations, issue/work-item contracts, dispatcher limits, and shutdown lifecycle.
+*Visual/perceptual claims (T-04):* the Sentinel's own Morning Digest output and any `observation` candidates are advisory artifacts for Director eye-review; no metric closes a visual claim by itself.
 
-Run safe, representative commands where practical and record actual pass/fail/currentness, execution cost, artifact location, and known gaps. Check for existing screenshot/image-analysis integrations before adding dependencies.
+## 6. Implementation status (2026-10-22/23)
 
-**Acceptance**
-- An evidence-backed capability matrix marks each capability as reusable / incomplete / missing / stale.
-- Each proposed new dependency or service has a demonstrated gap and cost rationale.
-- The chosen first pilot surface is important, reproducible, and safe to reset.
-- No runtime behavior or shutdown policy is changed.
+All five tasks implemented and verified in the working tree (not committed — shared dirty worktree, T-13):
 
-### T-002 — Inspection contract and pilot itinerary
+- **T-001 ✅** — `sentinelConfig.ts` (Zod schema, closed `signature_families`, thresholds), `selectorNormalizer.ts`, `rendererBackend.ts` (darwin→Metal / win32→D3D11 / linux+CI→SwiftShader), `gameSurfaceHarness.ts` (S0–S15 graph, hook-assisted reach with `howStateReached` provenance, per-capture manifest). 21/21 unit tests green.
+- **T-002 ✅** — `oracles/{temporalPerf,temporalPixel,geometryOracle,domainTextOracle,runtimeOracle,quiescenceGate,index}.ts`; Pass-1 rAF/perf sampling with zero pixel readback, Pass-1b isolated pixel replay, Pass-2 quiescence-gated structural oracles, repeat gate per r004 (exact `signature` = ingest key; `signature_family` = flakiness classifier only).
+- **T-003 ✅** — `tests/unit/sentinel/sentinelCalibration.test.ts` + `fixtures/seededFaults.ts`: **10/10 seeded faults detected, 5/5 negative controls pass**. Live run evidence: `.mw/runs/sentinel-calibration/` (≈330s full suite; quest-journey test shares ONE drive S8→S9→S11→S13, doubling S9/S11 as clean controls).
+- **T-004 ✅** — `componentResolver.ts` (PLAN-054 contracts, root-file outranks scope-file), `reproducerGenerator.ts`, `ledgerBridge.ts` (unresolved ownership never ingests; `surface_id` required; dedup/cap/lock), `workItem.ts` `evidence_attached` reducer scope.
+- **T-005 ✅** — `runSentinel.ts` controller (Rule-50 registry/heartbeat/release, fail-closed), `worktreeTaintGuard.ts` (T-13 drift detection), `morningDigest.ts`, `perturbationApplier.ts`, lifecycle/bridge unit suites.
 
-Define a versioned configuration for surface, routes, states, viewports, allowed interactions, expected assertions, approved visual references, time budget, and exclusion rules. Use the existing route/surface registry as the source where possible.
+**Real oracle defects found by calibration (fixed):**
 
-**Acceptance**
-- The itinerary is deterministic and can be replayed on the same commit.
-- Every action is allowlisted and logged.
-- The pilot covers at least one complete player-facing flow and more than one viewport.
-- No open-ended click-everything behavior.
+1. `quiescenceGate` keyed surface rects by raw attribute value — every `[data-skin="hud-plaque"]` collapsed into one Map entry, hiding movement on all but the last sibling → keyed by `(label, DOM index)`.
+2. `geometryOracle` claimed R-205 viewport-leak coverage but no check compared surface rects to the viewport → added `viewportLeaks()` (family `containment`, signature `vleak|<el>`).
+3. `temporalPerf` longtask observer re-counted page-load buffered entries → sampling window + non-buffered start/stop.
+4. `runtimeOracle` flooded on dev-server noise → Vite/ERR_ABORTED noise filter, `?t=` query normalization, per-signature dedup.
+5. Geometry signatures embedded live text (clock/counters) → `sigKey()` digit normalization so one defect yields one signature.
+6. T-13 harness resilience: `expedition`/`advanceTicks`/`auditState` tolerate HMR execution-context destruction and hook-remount gaps on a shared worktree.
 
-### T-003 — Browser Explorer and evidence capture
+**Verification:** `npx vitest run tests/unit/sentinel` → 61 tests, calibration 3/3 live; `npm run build:check` ✅; `npm run closure:lint` exit 0 (pre-existing fail-closed invariant notes unrelated to this diff). `npm run lint -- <scope>` N/A — `scripts/`+`tests/` are outside the ESLint scope (eslintignore); typecheck is the gate for these files. Pre-existing zod type error in `scripts/shutdownManager/sessionRegistry.ts` (quietWindow default missing `restrictedDaysOfWeek`) fixed in this diff — semantically identical (Mon–Fri default per Rule 50), required because `runSentinel` imports the registry.
 
-Implement the smallest runner that starts/attaches to the test build, navigates the pilot, captures screenshots, records browser console and failed network requests, and stores traces on failure. Reuse Playwright and existing baseline runner helpers where compatible.
+## 7. verify:bundle — `.mw/runs/plan078-quality-sentinel/` (2026-10-23)
 
-**Acceptance**
-- A clean run creates a complete manifest and expected artifacts.
-- An injected browser/runtime failure produces a traceable report with screenshot and diagnostics.
-- Cleanup always closes owned browser processes and releases registered session state.
-- Existing tests and visual baselines are not silently changed.
+Obligations evaluated on real evidence:
 
-### T-004 — Candidate detection and triage
+| OB | Result | Evidence |
+|---|---|---|
+| OB-1 | PASS | `command-logs/OB-1.log` — config+oracles suites green |
+| OB-2 | PASS | `command-logs/OB-2.log` — ledger bridge + workItem FSM green |
+| OB-3 | PASS | `command-logs/OB-3.log` — lifecycle + shutdown/foreground lints green |
+| OB-4 | PASS | `command-logs/OB-4.log` — tier-1 headless pilot executed by the bundler (13 findings, dry-run, 0 orphan processes, `renderer_class: metal`) |
+| OB-5 | PASS | `command-logs/OB-5.log` — `build:check` ✅ + scoped typecheck ✅ |
 
-Add deterministic detection first: uncaught errors, failed critical requests, visible/DOM overflow, off-viewport interactive controls, screenshot differences, failed assertions, and measurable timing thresholds where reliable. Add multimodal screenshot inspection only after the provider, cost and privacy boundary are confirmed in T-001.
+`bundle.json` → `verifier ok`, `red_first ok`, `decision_report ok` (schema-check), `trusted_lock ok`. **Verdict: BLOCKED — not by this diff:** the `contracts` gate reports ~370 baseline reasons (INV declared without `// INV:` blocks, Mode B-amend attestations, STRICT_FILES/inventory drift, executedCount unknown) generated by a parallel session's in-flight PLAN-067/054 contract work on the shared worktree (T-13). Every bundle produced today by the PLAN-077 stream (t001–t007) is identically BLOCKED on the same baseline; no PLAN-078 file is implicated. PLAN-078 files are dispositioned via auditabile `coverage_exception` records (`scripts/sentinel/**`, `tests/unit/sentinel/**`, `.mw/sentinel/**`, `scripts/ledger/workItem.ts`) and `parallel-session-unblock` records for the other session's files — the living-sync Mode B/C attestations belong to that session's closure.
 
-**Acceptance**
-- Seeded defects in a test fixture are detected and classified.
-- At least one layout defect and one interaction/runtime defect are found in a controlled pilot.
-- A seeded intentional visual change does not automatically become a confirmed bug without classification.
-- Performance findings cite measurements and comparison context, not guesses.
-
-### T-005 — Finding deduplication and work-item integration
-
-Map findings to PLAN-077's item schema and lifecycle, including existing open defects and component/surface contracts. Use stable fingerprints plus evidence/commit context; retain history when a recurring defect reappears.
-
-**Acceptance**
-- The same seeded defect across repeat runs creates no duplicate active work item.
-- A recurring defect on a new commit updates/links the existing history instead of erasing prior evidence.
-- Uncertain aesthetic observations route to human review.
-- No work item is marked fixed without the established verification and confirmation gates.
-
-### T-006 — Performance and adaptive budget
-
-Implement a conservative budget controller using current machine load, active sessions, recent run duration and failure rate. Start sequentially; do not implement speculative multi-agent parallelism.
-
-**Acceptance**
-- Configurable max duration, step timeout, retry budget and cancellation are enforced.
-- Simulated high load defers or reduces work rather than increasing concurrency.
-- An interrupted run records partial results and releases its session.
-- Baseline/performance comparisons use equivalent build, browser, viewport and scenario conditions.
-
-### T-007 — Night-run wrapper and shutdown integration
-
-Adapt the lifecycle pattern in scripts/benchmark/nightrun.ts; register/heartbeat/release through the existing shutdown manager. Provide explicit dry-run/status diagnostics and a bounded scheduled/manual invocation. Do not add a competing LaunchAgent or direct power command.
-
-**Acceptance**
-- Success, test failure, timeout, cancellation, browser crash and process interruption paths have lifecycle tests.
-- The run never invokes a machine shutdown API directly.
-- npm run shutdown:status and npm run shutdown:lint-capability pass with evidence in test-results/.
-- Real shutdown remains disabled unless independently authorized under the existing policy.
-- The report clearly distinguishes “inspection completed” from “machine shutdown permitted”.
-
-### T-008 — Seeded-defect acceptance round
-
-Create isolated fixtures or controlled test-only faults covering clipping/overflow, broken interaction/state, console error, visual mismatch, and a measurable slowdown or an explicitly documented limitation if a reliable performance fixture is unavailable.
-
-**Acceptance**
-- Each supported seeded fault is detected with reproducible evidence.
-- False positives are recorded; tune the detector until the agreed pilot threshold is met.
-- Run at least two clean repetitions to measure determinism and deduplication.
-- No seeded fault or test data leaks into production code/state.
-
-### T-009 — Pilot report, operating guide and decision gate
-
-Produce a sample report and a Director-readable morning summary: critical/high findings, new/recurring findings, surfaces inspected/skipped, screenshots/evidence links, resource cost, duration, false positives, and recommended next actions.
-
-**Acceptance**
-- Pilot results are reviewed before enabling unattended nightly operation.
-- Document how to start, stop, inspect artifacts, configure budgets and disable the run.
-- Update this plan and plans/INDEX.md with actual evidence; update context/OPEN.md only for unresolved decisions that genuinely need tracking.
-- No claim of full coverage or unattended readiness without the acceptance evidence above.
-
-## 6. Rollout gates
-
-1. **Gate A — Audit:** T-001 complete; scope/provider/cost grounded in actual repo.
-2. **Gate B — Browser pilot:** T-002/T-003 replay reliably on a safe flow.
-3. **Gate C — Detection:** T-004/T-005 pass seeded-defect and dedup tests.
-4. **Gate D — Bounded unattended run:** T-006/T-007 lifecycle and safety tests pass.
-5. **Gate E — Nightly opt-in:** T-008/T-009 reviewed; Director explicitly authorizes enabling schedule. Shutdown remains a separate policy decision.
-
-Do not skip a gate because the ordinary E2E suite is green.
-
-## 7. Online technical references
-
-- Playwright visual comparisons: https://playwright.dev/docs/test-snapshots
-- Playwright Trace Viewer: https://playwright.dev/docs/trace-viewer
-- Playwright screenshots: https://playwright.dev/docs/screenshots
-- Lighthouse CI: https://github.com/GoogleChrome/lighthouse-ci
-- GitHub Actions scheduled workflows: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
-
-These references inform tool choice; repository contracts and local evidence remain authoritative for implementation.
-
-## 8. Documentation Impact
-
-**REQUIRED** — add this plan to plans/INDEX.md. Update context/OPEN.md only if T-001 reveals unresolved policy decisions that cannot be resolved under existing contracts. Do not introduce new canonical rules before Director review.
+**Director adjudication required for:** ledger ingestion of pilot findings (deferred until a clean-worktree run) and the `SENTINEL-<hash>` observation candidates in the digests.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sealed_at": "2026-10-22T13:12:26.031Z",
+  "sealed_at": "2026-10-22T13:57:28.324Z",
   "sealed_by": "director",
   "entries": {
     ".mw/surface-map.json": "997f35e26b95abffc58d351f5e0ae96be61b52e46ddc983c558f020dbcc0e4b2",
@@ -146,7 +146,7 @@
     "src/ui/idleVillage/frozen/mockData/residents.ts": "6b5e48ce5794ac2bd1bf1a37666d3af9d28967cf8aa747473e082d064fcb36aa",
     "src/ui/idleVillage/frozen/registry.ts": "c7c6faeaed6367a5f53ca06f7d809a9902ed104dbbb5e5b7a2d3f56360963648"
   },
-  "sealed_base_sha": "c78c9d6aa2389c627e12c93258260dcd9d7eb38b",
+  "sealed_base_sha": "fe11533b36afbc8cc9cea30559656ff014a67900",
   "executed_counts": {
     "CTR-game-001.INV-1": "unknown",
     "CTR-game-001.INV-2": "unknown",
@@ -244,6 +244,7 @@
     "game-menu-screens.INV-4": "unknown",
     "game-menu-screens.INV-5": "unknown",
     "game-menu-screens.INV-6": "unknown",
+    "game-menu-screens.INV-12": "unknown",
     "game-menu-screens.INV-7": "unknown",
     "game-menu-screens.INV-8": "unknown",
     "game-menu-screens.INV-9": "unknown",
@@ -253,6 +254,7 @@
     "R-241-atmosphere-composited": "unknown",
     "depth-scene.INV-1": "unknown",
     "use-quest-expedition-session.INV-3": "unknown",
+    "CTR-game-008.INV-5": "unknown",
     "R-239-combat-legend": "unknown",
     "R-234-quest-content-translated": "unknown",
     "R-239-contrast": "unknown",
@@ -331,6 +333,7 @@
     "roster-sort-config.INV-1": "unknown",
     "drag-test-container-v2.INV-2": "unknown",
     "R-234-focus-ring-skinned": "unknown",
+    "R-234-primary-action-plate": "unknown",
     "skin-manager.INV-1": "unknown",
     "skin-schema.INV-1": "unknown",
     "temporary-skin-config.INV-1": "unknown",

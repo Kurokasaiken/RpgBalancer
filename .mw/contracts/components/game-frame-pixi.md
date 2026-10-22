@@ -39,6 +39,7 @@ scope_files:
   - src/ui/idleVillage/interaction/useDragOutcome.ts
   - src/ui/idleVillage/pixiSpike/pixiDestroy.ts
   - src/ui/idleVillage/questS1Lab/questArt.ts
+  - src/ui/idleVillage/questS1Lab/questForecast.worker.ts
   - src/ui/idleVillage/questS1Lab/questOffer.ts
   - src/ui/idleVillage/questS1Lab/questPhaseRecord.ts
   - src/ui/idleVillage/questS1Lab/questSchedule.ts
@@ -145,6 +146,7 @@ e2e_trigger_globs:
   - src/ui/idleVillage/interaction/useDragOutcome.ts
   - src/ui/idleVillage/pixiSpike/pixiDestroy.ts
   - src/ui/idleVillage/questS1Lab/questArt.ts
+  - src/ui/idleVillage/questS1Lab/questForecast.worker.ts
   - src/ui/idleVillage/questS1Lab/questOffer.ts
   - src/ui/idleVillage/questS1Lab/questPhaseRecord.ts
   - src/ui/idleVillage/questS1Lab/questSchedule.ts

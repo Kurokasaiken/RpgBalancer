@@ -1,0 +1,15 @@
+{
+  "$comment": "DomainTextOracle allowlist (PLAN-078 T-001): legitimate English tokens and proper nouns that may appear in the it-IT player-facing surface (R-258, T-A13). The oracle ignores these tokens when scanning for untranslated English. Keep this list short and principled: game-name tokens, established proper nouns, universally-used abbreviations. Anything else is a finding.",
+  "schema": "sentinel-domain-allow/1",
+  "allowed": [
+    "Punch Club",
+    "Idle Village",
+    "Goblin",
+    "Wanderlust",
+    "Astrolabe",
+    "HUD",
+    "HP",
+    "XP",
+    "NPC"
+  ]
+}

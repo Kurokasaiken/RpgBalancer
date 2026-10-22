@@ -128,3 +128,49 @@ Nessun'altra decisione estetica nel plan.
   `state`/partialize (D-3); test AC-6 copre il clear.
 - **T-13 worktree condiviso** → nessun commit scoped su file altrui; bundle
   evidence namespaced `r260`.
+
+## 8. Stato esecuzione (2026-10-22)
+
+Implementato tutto T-001..T-005:
+
+- **Kernel** `questSettlement.ts`: `beginSettlement` (persist `settling` +
+  piano congelato, no mutazione aggregato), `commitSettlement` (applica piano
+  + release loadout + `settled`, idempotente via effect key, begin implicito
+  senza marker, no-op su `settled`), `settlementResourceDelta` (gold/xp dal
+  piano congelato), `settleRun` compat one-shot. Guard monotone in
+  `useQuestRun.applySettlement`: `settling` non regredisce mai `settled`.
+- **Session** `useQuestExpeditionSession`: `rewardAck`/paint → begin; dismiss
+  → `commitSettlement` + `publishResourceDelta`; replay mount: primo run
+  idratato con `settling` auto-committa (`replayedRef`); `commitInFlightRef`
+  anti-doppio; hook e2e `getSettlement`/`getVillage`/`commitSettlement`.
+- **Pagina** `game-frame-pixi`: `closeReward` marca `rewardDismissed`, chiude
+  il pannello, committa via session, active run si libera reattivamente dopo
+  il render `settled`. Seam e2e `__idleVillageTestHooks.debugResourceDelta`.
+- **HUD**: `resourceDelta {gold,xp,at}` top-level transiente (mai persistito);
+  `ResourceReadout` chip «+N» su tile oro + tray XP sotto il readout;
+  `useCountUp` ease-out cubic su `hud.resourceDelta.countUpMs`
+  (reduced-motion istantaneo); clear dopo `hud.resourceDelta.durationMs`;
+  config Zod + i18n en/it-IT/pseudo + mirror types.
+- **E2E specs**: `waitForSettled`/assunti auto-settle riallineati al nuovo
+  boundary — commit guidato via `expedition.commitSettlement` (stesso
+  callback del CTA) prima dell'attesa `settled`.
+- **Contratti**: INV-2 `quest-settlement`, INV-3 `use-quest-expedition-
+  session`, INV-3 `quest-reward-popup`, INV-1 `resource-readout`, INV-5
+  `CTR-game-008` + tag `// INV:` nei test; `useCountUp.ts` nello scope del
+  contratto resource-readout (owner inventory).
+
+**Verifiche:** suite unit scope **48/48 verdi** · lint scope 0 errori ·
+`npm run build` exit 0 · bundle `.mw/runs/r260-collect-commit-reward/
+bundle.json`: **OB-1..OB-6 PASS** — incluso OB-6/T-04 con witness pixel
+reale (`artifacts/hud-delta-chip.png`: «15 +60» su tile GOLD + tray «+12»
+XP, signoff bound a commit+frame sha). Nota onesta: sotto load ~171 il
+count-up è collassato a un frame — la curva è unit-testata (`countUpValue`),
+l'animazione su macchina scarica resta all'eye-check Director.
+**Verdict BLOCKED** solo su governance condivisa (T-13): `executedCount(BASE)
+unknown` sistemico, file non mappati e Mode B-amend di sessioni parallele
+(R-263/R-264/PLAN-076/R-234…), sync-gate cap>3 che richiede
+`sync-amend-override` Director. Retires registrati per gli INV R-260
+flaggati da helper altrui (`CTR-game-008.INV-5`, `quest-settlement.INV-2`,
+`use-quest-expedition-session.INV-3`, `quest-reward-popup.INV-3`); gli altri
+flag sono fuori scope. Chiusura `fatta` sospesa in attesa di pulizia
+worktree/baseline + override Director — precedente R-258.

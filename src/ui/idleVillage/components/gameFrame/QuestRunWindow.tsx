@@ -57,6 +57,7 @@ import {
 import { cueHasTag, theatreCueForBeat } from '@/ui/idleVillage/questS1Lab/questTheatreSequencer';
 import { DepthScene } from '@/ui/idleVillage/questS1Lab/render/DepthScene';
 import { cinematicEntryForSrc } from '@/ui/idleVillage/questS1Lab/render/sceneManifest';
+import { JOURNEY_LEG_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import { documentClock, resolveShot } from '@/ui/idleVillage/questS1Lab/render/cameraEval';
 import type { CameraShot } from '@/balancing/config/idleVillage/quests/questTheatreFx';
 import { getQuestTheatreAudio } from '@/ui/idleVillage/audio/questTheatreAudio';
@@ -470,7 +471,19 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
    *  still replays the previous node's beats. R-245 (Director): NOTHING is
    *  painted over the artwork — the diegetic caption is gone, so the latch
    *  below only feeds `artFor`. */
-  const theaterArtSrc = artFor(activeSceneNodeId);
+  /* PLAN-053/R-263 journey legs: a travel fase owns no scenario node —
+   *  `run.nodeId` still points at the last arrived node, so without an
+   *  override the theatre would sit on stale art for the whole leg
+   *  (goblin andata = 2 days on sentiero-tracce). While the beat queue is
+   *  drained (frontier travel or a parked road beat) the stage shows the
+   *  leg painting — andata → the open gate, ritorno → the valley home.
+   *  A mounted scene beat always wins (authored art), and once the run
+   *  ends (`gob-fine` village) the leg override disengages. */
+  const journeyLegArt =
+    heldBeat === null && run.journey && !run.ended && run.journey.journal.currentFase !== 'svolgimento'
+      ? JOURNEY_LEG_ART[run.journey.journal.currentFase]
+      : undefined;
+  const theaterArtSrc = journeyLegArt?.src ?? artFor(activeSceneNodeId);
   const cineForBeat = useMemo(() => cinematicEntryForSrc(theaterArtSrc), [theaterArtSrc]);
   const lastArtRef = useRef<string | undefined>(undefined);
   const sceneVisitKey = `scene:${activeSceneNodeId}:${theaterArtSrc ?? ''}`;
@@ -1683,6 +1696,7 @@ export const TimeBar: React.FC<{ progress: number; label: string; phase: string;
   label,
   phase,
   checkpoints = [],
+  overrunFrom,
 }) => {
   /* QW-1 = B (R-234): the bar never goes backwards. The scale can stretch under it, but what is
    * already shown stays shown — only a finished run (1) or a new run resets it. */
@@ -1701,10 +1715,9 @@ export const TimeBar: React.FC<{ progress: number; label: string; phase: string;
         aria-valuemax={100}
         aria-valuenow={pct}
         aria-label={label}
-        style={{ position: 'relative', height: 6, borderRadius: 3, overflow: 'visible', background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 85%, transparent)', border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)' }}
+        style={{ position: 'relative', height: 6, borderRadius: 3, overflow: 'visible', background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 85%, transparent)', border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)' }}
       >
         <div style={{ position: 'absolute', inset: 0, borderRadius: 2, overflow: 'hidden' }}>
-  overrunFrom,
           <div
             style={{
               position: 'absolute',
@@ -1715,19 +1728,6 @@ export const TimeBar: React.FC<{ progress: number; label: string; phase: string;
               background: 'linear-gradient(90deg, color-mix(in srgb, var(--skin-title-color) 55%, transparent), var(--skin-title-color))',
             }}
           />
-        </div>
-        {checkpoints.map((cp) => (
-          <span
-            key={cp.beat}
-            data-testid="quest-timebar-checkpoint"
-            data-reached={cp.reached}
-            data-current={cp.current}
-            title={cp.label}
-            aria-label={cp.label}
-            style={{
-              position: 'absolute',
-              left: `${Math.min(100, Math.max(0, cp.fraction * spread * 100))}%`,
-              top: -2,
           {overrunFrom !== undefined && (
             <div
               data-testid="quest-timebar-overrun"
@@ -1742,6 +1742,19 @@ export const TimeBar: React.FC<{ progress: number; label: string; phase: string;
               }}
             />
           )}
+        </div>
+        {checkpoints.map((cp) => (
+          <span
+            key={cp.beat}
+            data-testid="quest-timebar-checkpoint"
+            data-reached={cp.reached}
+            data-current={cp.current}
+            title={cp.label}
+            aria-label={cp.label}
+            style={{
+              position: 'absolute',
+              left: `${Math.min(100, Math.max(0, cp.fraction * spread * 100))}%`,
+              top: -2,
               bottom: -2,
               width: 2,
               transform: 'translateX(-50%)',
@@ -1957,6 +1970,7 @@ const QuestWindowFooter: React.FC<{
         <>
           <TimeBar
             progress={time.progress}
+            overrunFrom={time.overrunFrom}
             label={time.label}
             /* R-253 #4: the total adapts — a phase authored beyond
              * `beats.length` grows the denominator the moment the path
@@ -1970,7 +1984,6 @@ const QuestWindowFooter: React.FC<{
           <QuestJourneyPhaseStrip run={run} svolgimentoEstimateTicks={journeySvolgimentoTicks} />
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
             <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', gap: 6, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-            overrunFrom={time.overrunFrom}
               {phases.map((phase, i) => (
                 <PhaseTile
                   key={`${phase.beat}-${i}`}
