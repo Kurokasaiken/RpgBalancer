@@ -31,6 +31,7 @@ import { VillageStashItemIcon } from '@/ui/idleVillage/components/gameFrame/vill
 import { stashAnnouncement } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { EngravedIcon, type EngravedIconId } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
+import { HudTooltip } from '@/ui/idleVillage/components/gameFrame/HudTooltip';
 import { useReducedMotion } from '@/ui/idleVillage/hooks/useReducedMotion';
 import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { useCanonicalRosterBundle } from '@/ui/idleVillage/roster';
@@ -513,9 +514,9 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
    *  never a layout-property animation — `transition` touches opacity and
    *  transform only. */
   /* POI-D: title above, dispatch + key-stat icons below the picture cost ~100px, so the
-   *  picture gives way first — it keeps `heroRestPx` from 768px up and shrinks to 72px at 720 so
+   *  picture gives way first — it keeps `heroRestPx` from 768px up and shrinks to 62px at 720 so
    *  the bag slots stay inside the plaque. */
-  const heroRestFit = Math.max(72, Math.min(LAYOUT.heroRestPx, vph - 648));
+  const heroRestFit = Math.max(60, Math.min(LAYOUT.heroRestPx, vph - 658));
   const heroPx = trayOpen ? LAYOUT.heroTrayPx : compact ? LAYOUT.heroCompactPx : heroRestFit;
 
   /* Terminal fallback probe (artifact-r005): when the rack/loadout body
@@ -1032,15 +1033,19 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                   {/* R-246 bis: warehouse trigger is an icon-only square pill
                    *  (svg:only-child → 26px, T-20-safe) left of the BAG label —
                    *  no text, aria-label/title carry the accessible name. */}
-                  <button
-                    type="button"
-                    data-testid="quest-open-stash"
-                    aria-label={t('gameFrame.village.openStash')}
-                    title={t('gameFrame.village.openStash')}
-                    onClick={(event) => onOpenStash(event.currentTarget)}
-                  >
-                    <EngravedIcon id="ico-chest" size={13} aria-hidden />
-                  </button>
+                  {/* PL-3 = A (R-234): a 36px icon with the HUD tooltip «Warehouse · V» — the same grammar
+                   *  as the abandon control (R-231); the native `title` is gone. */}
+                  <HudTooltip label={t('gameFrame.village.openStash')} shortcut="V">
+                    <button
+                      type="button"
+                      data-testid="quest-open-stash"
+                      aria-label={t('gameFrame.village.openStash')}
+                      onClick={(event) => onOpenStash(event.currentTarget)}
+                      style={{ width: 36, height: 36 }}
+                    >
+                      <EngravedIcon id="ico-chest" size={18} aria-hidden />
+                    </button>
+                  </HudTooltip>
                   <span data-testid="quest-expedition-bag-count" style={{ ...SECTION_LABEL, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
                   </span>
