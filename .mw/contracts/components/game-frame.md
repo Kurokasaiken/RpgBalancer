@@ -22,6 +22,22 @@ invariants:
     statement: 'L''ordine di Tab segue lo schermo: la navigazione in basso precede le utilità nell''angolo (PLAN-067 T-A14)'
     test_refs:
       - tests/unit/idleVillage/gameFrame.tabOrder.test.tsx
+  - id: R-234-hud-next-states
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      The centre tab is alarm / quiet / none from the nearest event: threat within 5 days = alarm,
+      within 10 = quiet, else it disappears (HUD-3 = P1)
+    test_refs:
+      - tests/unit/idleVillage/hudTopP1.test.tsx
+  - id: R-234-hud-top-p1
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      Top HUD: time, next and resources left to right as detached tabs; the menu lives in the bottom-right corner
+      cluster (HUD-3 = P1)
+    test_refs:
+      - tests/unit/idleVillage/hudTopP1.test.tsx
 ---
 # game-frame
 

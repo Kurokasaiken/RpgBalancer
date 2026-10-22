@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MatericField } from '@/ui/designSystem/primitives';
-import { useCompactTop } from './useCompactTop';
 import { HudTooltip } from './HudTooltip';
 import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
 
@@ -79,8 +78,6 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
   speed,
 }) => {
   const { t } = useTranslation('idleVillage');
-  const compact = useCompactTop();
-
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-plaque-clearance)' }}>
       <div
@@ -98,32 +95,18 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
         </div>
       </div>
 
-      <MatericField
-        tier="tertiary"
-        orientation="horizontal"
-        label={t('gameFrame.status.dayLabel')}
-        // The clock starts at day 0; players count from "Day 1".
-        value={currentDay + 1}
-        style={{ gap: 7 }}
-        labelStyle={{ fontSize: 'var(--skin-hud-caps-size)' }}
-      />
-
-      {!compact && (
-        <>
-      <span aria-hidden="true" style={{ width: 1, height: 18, background: 'var(--skin-separator)' }} />
-
-      <span
-        style={{
-          fontFamily: 'var(--skin-font-serif)',
-          fontSize: 'var(--skin-hud-name-size)',
-          color: 'var(--skin-body-color)',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {placeName}
-      </span>
-        </>
-      )}
+      {/* HUD-3 = P1 (R-234): the region name no longer takes a slot of the tab — it is the day's tooltip. */}
+      <HudTooltip label={placeName} wrap>
+        <MatericField
+          tier="tertiary"
+          orientation="horizontal"
+          label={t('gameFrame.status.dayLabel')}
+          // The clock starts at day 0; players count from "Day 1".
+          value={currentDay + 1}
+          style={{ gap: 7 }}
+          labelStyle={{ fontSize: 'var(--skin-hud-caps-size)' }}
+        />
+      </HudTooltip>
 
       {speed && (
         <>

@@ -574,6 +574,12 @@ export default interface Resources {
         "village": "Village",
         "workshop": "Workshop"
       },
+      "next": {
+        "days": "{days} d",
+        "hintAlarm": "In {days} d — click to bring the camera there.",
+        "hintQuiet": "Nothing urgent. In {days} d.",
+        "today": "today"
+      },
       "objective": {
         "available": "Send a party on “{name}”",
         "done": "Collect the rewards of “{name}”",

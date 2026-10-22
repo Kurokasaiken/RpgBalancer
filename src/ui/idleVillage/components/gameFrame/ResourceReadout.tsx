@@ -149,7 +149,7 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items, delta }
                     </span>
                   )}
                 </span>
-                {item.detail && !compact && (
+                {item.detail && (!compact || critical) && (
                   <span
                     aria-hidden="true"
                     style={{

@@ -1,6 +1,8 @@
 export { GameFrame, type GameFrameProps } from './GameFrame';
 export { HudRibbon, type HudRibbonProps, type HudRibbonAnchor } from './HudRibbon';
 export { HudEventLedger, type HudEventLedgerProps, type HudEvent, type HudEventSort } from './HudEventLedger';
+export { NextEventTab, type NextEventTabProps } from './NextEventTab';
+export { nextEventModel, type NextEventModel, type NextEventState } from './nextEvent';
 export { ResourceReadout, type ResourceReadoutProps, type ResourceReadoutItem, type ResourceReadoutDelta } from './ResourceReadout';
 export { buildResourceReadoutItems } from './resourceReadoutItems';
 export { HUD_TONE_COLOR, type HudTone } from './hudTones';

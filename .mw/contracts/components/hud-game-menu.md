@@ -27,12 +27,12 @@ invariants:
       chiama il suo gestore; senza gestore restano disabilitate
     test_refs:
       - tests/unit/idleVillage/hudGameMenu.test.tsx
-  - id: R-234-hud-menu-centered
+  - id: R-234-hud-menu-icon
     source: director-bug
     source_ref: R-234
-    statement: The MENU plaque fills the top row height and centres its button (HUD-2 = H1)
+    statement: The menu trigger is an icon without visible text and Esc opens it (HUD-3 = P1)
     test_refs:
-      - tests/unit/idleVillage/hudGameMenu.centered.test.tsx
+      - tests/unit/idleVillage/hudTopP1.test.tsx
 ---
 # hud-game-menu
 
