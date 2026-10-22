@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { LoadGamePanel } from './LoadGamePanel';
 import { SettingsPanel } from './SettingsPanel';
 import { GameMenuConfirm } from './GameMenuConfirm';
-import { decideQuit, quitToTitle } from './menuFlow';
+import { decideQuit, markSkipTitle, quitToTitle } from './menuFlow';
 import type { HudScaleControl } from '../hudScale';
 import { getLastSaved, hasUnsavedProgress, saveNowToManualSlot } from '../../../state/gameSaveService';
 
@@ -54,22 +54,25 @@ export function useGameMenuFlow({ currentTick, currentDay, flush, scale }: UseGa
 
   const screens = (
     <>
-      {screen === 'load' && <LoadGamePanel inGame unsaved={unsaved} currentDay={currentDay} onClose={close} onLoaded={() => window.location.reload()} />}
+      {screen === 'load' && <LoadGamePanel inGame unsaved={unsaved} currentDay={currentDay} onClose={close} onLoaded={() => {
+        markSkipTitle();
+        window.location.reload();
+      }} />}
       {screen === 'settings' && <SettingsPanel onClose={close} scale={scale} />}
       {screen === 'quit' && (
         <GameMenuConfirm
-          title={t('gameFrame.menu.quit.title')}
+          title={t('gameFrame.menu.quitConfirm.title')}
           cancelLabel={t('gameFrame.menu.cancel')}
           onCancel={close}
           actions={[
-            { label: t('gameFrame.menu.quit.quitNoSave'), onClick: quitToTitle, disabled: saving },
-            { label: saving ? t('gameFrame.menu.quit.saving') : t('gameFrame.menu.quit.saveAndQuit'), onClick: () => void saveAndQuit(), primary: true, disabled: saving },
+            { label: t('gameFrame.menu.quitConfirm.quitNoSave'), onClick: quitToTitle, disabled: saving },
+            { label: saving ? t('gameFrame.menu.quitConfirm.saving') : t('gameFrame.menu.quitConfirm.saveAndQuit'), onClick: () => void saveAndQuit(), primary: true, disabled: saving },
           ]}
           data-testid="quit-confirm"
         >
-          <span>{when ? t('gameFrame.menu.quit.lastSaved', { when }) : t('gameFrame.menu.quit.neverSaved')}</span>
-          <span>{t('gameFrame.menu.quit.unsavedWarn')}</span>
-          {failed && <span role="alert">{t('gameFrame.menu.quit.saveFailed')}</span>}
+          <span>{when ? t('gameFrame.menu.quitConfirm.lastSaved', { when }) : t('gameFrame.menu.quitConfirm.neverSaved')}</span>
+          <span>{t('gameFrame.menu.quitConfirm.unsavedWarn')}</span>
+          {failed && <span role="alert">{t('gameFrame.menu.quitConfirm.saveFailed')}</span>}
         </GameMenuConfirm>
       )}
     </>

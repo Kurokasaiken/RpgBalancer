@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { SaveSlotInfo } from '@/ui/idleVillage/state/gameSave';
-import { consumeShowTitle, decideQuit, markShowTitle, pickContinueSlot, shouldShowTitle } from '@/ui/idleVillage/components/gameFrame/menu/menuFlow';
+import { consumeShowTitle, decideQuit, markShowTitle, markSkipTitle, pickContinueSlot, shouldShowTitle } from '@/ui/idleVillage/components/gameFrame/menu/menuFlow';
 
 const row = (slot: SaveSlotInfo['slot'], state: SaveSlotInfo['state'], savedAt?: number): SaveSlotInfo => ({ slot, state, savedAt });
 
@@ -30,5 +30,13 @@ describe('menuFlow', () => {
     expect(shouldShowTitle({ search: '', tauri: false })).toBe(true);
     expect(consumeShowTitle()).toBe(true);
     expect(shouldShowTitle({ search: '', tauri: false })).toBe(false);
+  });
+
+  // A reload the game asks for itself (loading a slot from the menu) must not bounce through the title, even in the desktop app
+  it('skips the title once for a reload the game asked for', () => {
+    markSkipTitle();
+    expect(shouldShowTitle({ search: '?title=1', tauri: true })).toBe(false);
+    consumeShowTitle();
+    expect(shouldShowTitle({ search: '', tauri: true })).toBe(true);
   });
 });

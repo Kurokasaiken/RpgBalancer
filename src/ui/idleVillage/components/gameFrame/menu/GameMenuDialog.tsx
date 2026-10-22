@@ -38,13 +38,13 @@ const VEIL_STYLE: CSSProperties = {
 export function GameMenuDialog({ title, onClose, width = 700, hideClose = false, children, 'data-testid': testId }: GameMenuDialogProps) {
   const { t } = useTranslation('idleVillage');
   const id = useId();
-  const plaqueRef = useRef<HTMLElement>(null);
+  const focusRef = useRef<HTMLDivElement>(null);
   useOverlayEscape(`game-menu-${id}`, onClose);
 
   /* Focus contract: the dialog takes focus on open, the previous element gets it back on close. */
   useEffect(() => {
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    plaqueRef.current?.focus({ preventScroll: true });
+    focusRef.current?.focus({ preventScroll: true });
     return () => previous?.focus?.({ preventScroll: true });
   }, []);
 
@@ -53,16 +53,16 @@ export function GameMenuDialog({ title, onClose, width = 700, hideClose = false,
   return createPortal(
     <SkinScope>
       <div style={VEIL_STYLE} data-testid="game-menu-veil">
+        {/* The focus target is a wrapper: HudPlaque owns its own ref (it measures itself to draw the frame). */}
+        <div ref={focusRef} tabIndex={-1} style={{ outline: 'none', display: 'flex', maxHeight: 'calc(100vh - 48px)' }}>
         <HudPlaque
           shape="panel"
           as="section"
           role="dialog"
           aria-modal="true"
           aria-label={title}
-          tabIndex={-1}
           data-testid={testId}
-          ref={plaqueRef as never}
-          style={{ width, maxWidth: 'calc(100vw - 48px)', maxHeight: 'calc(100vh - 48px)', display: 'flex', flexDirection: 'column', gap: 10, padding: '18px 20px', outline: 'none' }}
+          style={{ width, maxWidth: 'calc(100vw - 48px)', maxHeight: 'calc(100vh - 48px)', display: 'flex', flexDirection: 'column', gap: 10, padding: '18px 20px' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <h2 style={{ flex: 1, margin: 0, font: '600 16px var(--skin-font-display)', letterSpacing: '0.08em', color: 'var(--skin-title-color)' }}>{title}</h2>
@@ -77,6 +77,7 @@ export function GameMenuDialog({ title, onClose, width = 700, hideClose = false,
           <div aria-hidden="true" style={{ height: 1, background: 'var(--skin-surface-border)', flexShrink: 0 }} />
           {children}
         </HudPlaque>
+        </div>
       </div>
     </SkinScope>,
     root,

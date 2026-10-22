@@ -1,5 +1,6 @@
 # PLAN-076: Menu di gioco — Carica partita, Impostazioni, Esci al titolo, schermata titolo (DN-7 di PLAN-067)
 
+**Stato esecuzione (2026-10-22):** T-0…T-6 realizzati in codice con test rosso→verde e witness headless (vedi `.mw/runs/plan076-witness/`); T-7 (chiusura: `contracts:check`, `verify:bundle`, `closure:lint`, eye-check Director) **aperto**. Non verificato: ascolto reale, miniatura dello slot (non catturata: lo slot mostra la mappa generica), Tauri, viewport diverse da 1280×720.
 **Status:** `baptized` — Director 2026-10-22 («PLAN-076 approvato, procedi (battesimo + check P8 + esecuzione)», via sessione madre). Check P8: vedi `.mw/plan-dispositions/PLAN-076-dn7-game-menu-save-load-settings-title.jsonl`.
 **Richiesta:** DN-7 (PLAN-067, Director 2026-10-21: «implementare»). Scelte fork e risposte O-1…O-5 ricevute dal Director via sessione madre il 2026-10-22.
 **Desiderata:** v36 FROZEN (contratti vivi `/game`), v35 FROZEN (visual fork gate). Nessun drift: realizza fork già decisi.
@@ -80,7 +81,13 @@ Slot multi-chiave: atomicità e versioni; miniatura WebGL; sessioni parallele su
 
 ## 6. Mappatura audio (O-3)
 
-Da compilare a T-4 dopo lettura di `questTheatreAudio`.
+Decisione O-3 (criterio più semplice, nessun nuovo AudioContext): **non esiste un contesto audio condiviso** — il teatro di quest, l'astrolabio, il cue di level-up, il tonfo della card d'invasione e i suoni slot/medaglia creano ciascuno il proprio. `installAudioBus()` (`src/ui/idleVillage/state/audioBus.ts`) sostituisce `window.AudioContext` con una sottoclasse il cui `destination` è un nodo gain master per contesto: ogni sorgente che si collega «alla destinazione» passa dal bus senza modificare i suoi file.
+
+| Canale | Sorgenti oggi | Livello del bus |
+|---|---|---|
+| Principale | tutte | × tutti |
+| Effetti | tutte le sorgenti di `/game` (nessuna è musica) | principale × effetti |
+| Musica | nessuna | salvata nel record, **senza riga in Impostazioni** finché non esiste una sorgente |
 
 ## 7. Verifiche pre-battesimo (storico)
 1. Il Director conferma in chat le scelte LOAD-1 A / SET-1 A / QUIT-1 B / TITLE-1 A (oggi note solo via messaggio dalla sessione madre).

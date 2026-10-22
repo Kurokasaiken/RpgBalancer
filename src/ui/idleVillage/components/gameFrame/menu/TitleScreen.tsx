@@ -45,7 +45,7 @@ export function TitleScreen({ continueDay, onContinue, onNewGame, onLoadGame, on
         <div aria-hidden="true" style={{ width: BOOT.barWidthPx * 0.72, height: 1, margin: '18px 0 22px', background: `linear-gradient(90deg, transparent, ${BOOT.colors.rule}, transparent)` }} />
         <nav data-hud-controls="" aria-label={t('gameFrame.menu.title')} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {continueDay !== null && (
-            <button type="button" aria-pressed="true" style={pill} disabled={busy} onClick={onContinue}>
+            <button type="button" style={pill} disabled={busy} onClick={onContinue}>
               <span>{continueDay > 0 ? t('gameFrame.menu.titleScreen.continue', { day: continueDay }) : t('gameFrame.menu.titleScreen.continuePlain')}</span>
             </button>
           )}

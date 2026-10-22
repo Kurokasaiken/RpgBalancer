@@ -21,7 +21,8 @@ export function pickContinueSlot(rows: readonly SaveSlotInfo[]): SaveSlotId | nu
   return [...valid].sort((a, b) => (b.savedAt ?? 0) - (a.savedAt ?? 0))[0].slot;
 }
 
-const SHOW_TITLE_KEY = 'wanderlust_show_title';
+/** One-shot session flag: 'show' = the next load shows the title; 'skip' = the next load does not (a reload the game asked for). */
+const TITLE_FLAG_KEY = 'wanderlust_title_flag';
 
 const storage = (): Storage | null => {
   try {
@@ -33,26 +34,33 @@ const storage = (): Storage | null => {
 
 /** Set just before leaving to the title: the next load shows the title screen, once. */
 export function markShowTitle(): void {
-  storage()?.setItem(SHOW_TITLE_KEY, '1');
+  storage()?.setItem(TITLE_FLAG_KEY, 'show');
 }
 
-/** Reads and clears the flag. */
+/** Set just before a reload the game asks for itself (loading a slot): the next load goes straight to the game, once. */
+export function markSkipTitle(): void {
+  storage()?.setItem(TITLE_FLAG_KEY, 'skip');
+}
+
+/** Reads and clears the flag; true when it asked for the title. */
 export function consumeShowTitle(): boolean {
   const s = storage();
-  const set = s?.getItem(SHOW_TITLE_KEY) === '1';
-  if (set) s?.removeItem(SHOW_TITLE_KEY);
-  return set;
+  const flag = s?.getItem(TITLE_FLAG_KEY);
+  if (flag) s?.removeItem(TITLE_FLAG_KEY);
+  return flag === 'show';
 }
 
 /**
  * The title shows after a quit, on every launch of the desktop app, and on
  * request (`?title=1`); a plain browser visit (dev, e2e, harness) goes
- * straight to the game. Pure read — `consumeShowTitle` clears the flag.
+ * straight to the game; a reload the game asked for skips it once. Pure read —
+ * `consumeShowTitle` clears the flag.
  */
 export function shouldShowTitle({ search, tauri }: { search: string; tauri: boolean }): boolean {
-  if (tauri) return true;
-  if (new URLSearchParams(search).get('title') === '1') return true;
-  return storage()?.getItem(SHOW_TITLE_KEY) === '1';
+  const flag = storage()?.getItem(TITLE_FLAG_KEY);
+  if (flag === 'skip') return false;
+  if (flag === 'show' || tauri) return true;
+  return new URLSearchParams(search).get('title') === '1';
 }
 
 /** Leaves to the title: the page reloads so no game state stays in memory. */

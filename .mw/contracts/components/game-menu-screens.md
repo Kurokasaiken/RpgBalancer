@@ -96,6 +96,14 @@ invariants:
     statement: Uscire senza nulla da perdere esce subito; con progresso non salvato chiede, e ogni risposta fa ciò che dice
     test_refs:
       - tests/unit/idleVillage/menuScreens.test.tsx
+  - id: INV-12
+    source: director-bug
+    source_ref: PLAN-076
+    statement: >-
+      Ogni chiave di testo usata dalle schermate del menu è una stringa in en e it-IT e il namespace del menu non ha
+      chiavi duplicate (un duplicato trasforma in silenzio un'etichetta in un oggetto e manda in crash la pagina)
+    test_refs:
+      - tests/unit/idleVillage/menuI18n.test.ts
 ---
 # game-menu-screens
 

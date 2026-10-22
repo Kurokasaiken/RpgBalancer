@@ -10,7 +10,7 @@ import { GameMenuDialog } from './GameMenuDialog';
 export interface GameMenuConfirmAction {
   label: string;
   onClick: () => void;
-  /** The action the player most likely wants; drawn pressed (gold). */
+  /** The action the player most likely wants (a marker only: BTN-1, the primary-button form, is still open, so it draws like the others). */
   primary?: boolean;
   disabled?: boolean;
 }
@@ -36,7 +36,7 @@ export function GameMenuConfirm({ title, onCancel, children, actions, cancelLabe
         </button>
         <span style={{ flex: 1 }} />
         {actions.map((action) => (
-          <button key={action.label} type="button" aria-pressed={action.primary ? 'true' : undefined} disabled={action.disabled} onClick={action.onClick}>
+          <button key={action.label} type="button" data-primary={action.primary ? '' : undefined} disabled={action.disabled} onClick={action.onClick}>
             <span>{action.label}</span>
           </button>
         ))}
