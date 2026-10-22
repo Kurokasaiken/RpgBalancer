@@ -994,7 +994,17 @@
       "goldAmount": "+{amount} oro",
       "xpAmount": "+{amount} PE",
       "recovery": "recupero ~{days} g",
-      "memberXp": "{name} +{amount} PE"
+      "memberXp": "{name} +{amount} PE",
+      "crewTitle": "Chi è tornato",
+      "crewReturned": "Tornato",
+      "crewWounded": "Ferito",
+      "crewFallen": "Caduto",
+      "tipTitles": "Titolo",
+      "tipDiseases": "Malattia",
+      "tipCharacter": "Carattere",
+      "tipCharacterTbd": "Non ancora registrato",
+      "tipNone": "Nessuno",
+      "tipCause": "Cosa è successo"
     },
     "director": {
       "title": "Regia",

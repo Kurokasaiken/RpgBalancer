@@ -14,7 +14,7 @@ import { EngravedIcon, type EngravedIconId } from './engravedIcons';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import type { EpilogueSectionId } from '@/balancing/config/idleVillage/quests/questEpilogue';
-import { buildQuestEpilogue, type EpilogueLine } from '@/ui/idleVillage/quests/questEpilogue';
+import { buildQuestEpilogue, withoutCrewLines, type EpilogueLine } from '@/ui/idleVillage/quests/questEpilogue';
 import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 
@@ -65,6 +65,8 @@ export interface QuestEpilogueProps {
   /** Paint the section label «Expedition report». Off when the host already
    *  titles itself with the same words (the reward plaque, R-234). */
   showTitle?: boolean;
+  /** «Who came back» is painted by `QuestReturnedCrew` above: drop what it already says. */
+  crewShown?: boolean;
 }
 
 /** One report line — i18n key wins over baked text; wounded lines carry
@@ -93,9 +95,10 @@ const EpilogueRow: React.FC<{ line: EpilogueLine; icon?: EngravedIconId }> = ({ 
   );
 };
 
-export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario, visibleSections, showTitle = true }) => {
+export const QuestEpilogue: React.FC<QuestEpilogueProps> = ({ run, scenario, visibleSections, showTitle = true, crewShown = false }) => {
   const { t } = useTranslation('idleVillage');
-  const allSections = buildQuestEpilogue(run, scenario);
+  const built = buildQuestEpilogue(run, scenario);
+  const allSections = crewShown ? withoutCrewLines(built) : built;
   const sections = visibleSections === undefined ? allSections : allSections.slice(0, visibleSections);
   if (sections.length === 0) return null;
   return (

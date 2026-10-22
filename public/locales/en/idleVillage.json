@@ -988,7 +988,17 @@
       "goldAmount": "+{amount} gold",
       "xpAmount": "+{amount} XP",
       "recovery": "recovers in ~{days} d",
-      "memberXp": "{name} +{amount} XP"
+      "memberXp": "{name} +{amount} XP",
+      "crewTitle": "Who came back",
+      "crewReturned": "Returned",
+      "crewWounded": "Wounded",
+      "crewFallen": "Fallen",
+      "tipTitles": "Title",
+      "tipDiseases": "Illness",
+      "tipCharacter": "Character",
+      "tipCharacterTbd": "Not yet recorded",
+      "tipNone": "None",
+      "tipCause": "What happened"
     },
     "director": {
       "title": "Director",

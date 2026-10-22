@@ -27,13 +27,14 @@ import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primiti
 import { HudChip, TONE, toneText } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import type { QuestOutcome, QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
-import { buildQuestEpilogue } from '@/ui/idleVillage/quests/questEpilogue';
+import { buildQuestEpilogue, withoutCrewLines } from '@/ui/idleVillage/quests/questEpilogue';
 import { markRewardShown } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { useHudPanelDrag } from './useHudPanelDrag';
 import { getHudZoomFactor } from './hudScale';
 import { QuestEpilogue } from './QuestEpilogue';
+import { QuestReturnedCrew } from './QuestReturnedCrew';
 
 /** Outcome chip tone — wipe/fled read differently from a clean return. */
 const OUTCOME_TONE: Record<QuestOutcome, 'ok' | 'warn' | 'danger'> = {
@@ -99,7 +100,7 @@ export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenari
    * sections one at a time, the last stage only unlatches the close row.
    * Click/any-key hurries the reveal by one stage — the same progressive
    * skip contract as the theatre's beats. */
-  const sectionCount = useMemo(() => buildQuestEpilogue(run, scenario).length, [run, scenario]);
+  const sectionCount = useMemo(() => withoutCrewLines(buildQuestEpilogue(run, scenario)).length, [run, scenario]);
   const lastStage = sectionCount + 1;
   const [stage, setStage] = useState(0);
   const done = stage >= lastStage;
@@ -220,7 +221,8 @@ export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenari
 
               {/* Stages 1..N — the settlement's own sections, cost first:
                   stage s reveals the first s sections (stage 0 is banner-only). */}
-              <QuestEpilogue run={run} scenario={scenario} visibleSections={stage} showTitle={false} />
+              <QuestReturnedCrew run={run} scenario={scenario} />
+              <QuestEpilogue run={run} scenario={scenario} visibleSections={stage} showTitle={false} crewShown />
 
               {!done && (
                 <span style={{ fontFamily: 'var(--skin-font-serif)', fontStyle: 'italic', fontSize: 12, color: TONE.muted }}>

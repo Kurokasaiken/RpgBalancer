@@ -34,11 +34,19 @@ invariants:
     source: plan
     source_ref: R-260
     statement: >-
-      Il report mostra il piano pendente: il primo frame dipinto marca `settling` (via rewardAck) e OGNI via di
-      chiusura — Collect, Escape, X — convoglia su `onClose`, il boundary di commit che applica il settlement; il
-      popup non applica mai effetti di per sé.
+      Il report mostra il piano pendente: il primo frame dipinto marca `settling` (via rewardAck) e OGNI via di chiusura
+      — Collect, Escape, X — convoglia su `onClose`, il boundary di commit che applica il settlement; il popup non
+      applica mai effetti di per sé.
     test_refs:
       - tests/unit/idleVillage/questRewardPopup.test.tsx
+  - id: R-234-returned-crew
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      Who came back: one niche per person with its state written, per-person tooltip with title/illness/character; group
+      lists no longer repeat per-person lines (T-C2)
+    test_refs:
+      - tests/unit/idleVillage/questReturnedCrew.test.tsx
 ---
 # quest-reward-popup
 

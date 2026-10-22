@@ -146,3 +146,15 @@ export function buildQuestEpilogue(
     .map((id) => ({ id, lines: sections[id] }))
     .filter((s) => s.lines.length > 0);
 }
+
+/**
+ * The report once «who came back» is painted (PLAN-067 T-C2): the fallen/wounded lists and every
+ * per-person title/disease line already live on that person's niche and tooltip, so they leave the
+ * generic list. Party-level lines (no `memberId`) stay.
+ */
+export function withoutCrewLines(sections: EpilogueSection[]): EpilogueSection[] {
+  return sections
+    .filter((s) => s.id !== 'dead' && s.id !== 'wounded')
+    .map((s) => (s.id === 'titles' || s.id === 'diseases' ? { ...s, lines: s.lines.filter((l) => !l.memberId) } : s))
+    .filter((s) => s.lines.length > 0);
+}
