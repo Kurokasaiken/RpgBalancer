@@ -92,16 +92,15 @@ describe('HudGameMenu', () => {
     expect(trackTelemetryEvent).toHaveBeenCalledWith('game_menu_language_select', { locale: 'it-IT' });
   });
 
-  it('offers the comparable skins as radios wired to onChange', async () => {
+  // INV:R-234-menu-no-theme — the player's menu has no Theme section: the rejected Lacquer Atlas skin is
+  // not offered in any build (Director 2026-10-21, DN-6). `?skin=` and the Director panel keep the comparison for dev.
+  it('has no Theme section, even if a caller still passes a skin control', async () => {
     const onChange = vi.fn();
-    renderMenu({ skin: { id: 'base', onChange } });
+    renderMenu({ skin: { id: 'base', onChange } } as never);
     await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.title' }));
-    const group = screen.getByRole('radiogroup', { name: 'gameFrame.menu.theme' });
-    const radios = screen.getAllByRole('menuitemradio').filter((r) => group.contains(r));
-    expect(radios).toHaveLength(2);
-    expect(radios[0]).toHaveAttribute('aria-checked', 'true');
-    await userEvent.click(radios[1]);
-    expect(onChange).toHaveBeenCalledWith('lacquer_atlas');
+    expect(screen.queryByRole('radiogroup', { name: 'gameFrame.menu.theme' })).toBeNull();
+    expect(screen.queryByText('gameFrame.menu.theme')).toBeNull();
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('renders the future entries (load, quit, settings) disabled', async () => {
