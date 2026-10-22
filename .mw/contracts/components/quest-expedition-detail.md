@@ -59,18 +59,30 @@ invariants:
     source_ref: R-258
     statement: >-
       La sezione WHY della forecast wing è rimossa del tutto dalla superficie giocatore (né nomi delle fonti né
-      statistiche Monte Carlo — i campi restano sul risultato sim, non renderizzati); il testo player-facing usa %
-      mai pp.
+      statistiche Monte Carlo — i campi restano sul risultato sim, non renderizzati); il testo player-facing usa % mai
+      pp.
     test_refs:
       - tests/unit/idleVillage/questPlannerWhyNames.test.tsx
   - id: R-239-forecast-copy
     source: director-bug
     source_ref: R-239
     statement: >-
-      La copy del forecast planner non usa simboli criptici — «≈2.6d down» è prosa localizzata leggibile (en «days»,
-      it «giorni»).
+      La copy del forecast planner non usa simboli criptici — «≈2.6d down» è prosa localizzata leggibile (en «days», it
+      «giorni»).
     test_refs:
       - tests/unit/idleVillage/questCopyLabels.test.tsx
+  - id: R-234-planner-hero-no-text
+    source: director-bug
+    source_ref: R-234
+    statement: 'The planner hero image carries no text: title above, dispatch below, seals in the right preview wing (POI-D = A)'
+    test_refs:
+      - tests/unit/idleVillage/questPlanner.heroNoText.test.tsx
+  - id: R-234-planner-key-stats-icons
+    source: director-bug
+    source_ref: R-234
+    statement: Primary then secondary key stats under the dispatch line as icons only (POI-D)
+    test_refs:
+      - tests/unit/idleVillage/questPlanner.heroNoText.test.tsx
 ---
 # quest-expedition-detail
 
