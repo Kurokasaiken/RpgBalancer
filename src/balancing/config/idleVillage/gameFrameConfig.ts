@@ -506,6 +506,8 @@ const gameFrameZLayersSchema = z.object({
   /** PLAN-040 T-003: the external skill-check overlay — in front of the
    *  quest window and the report, under the boot veil. */
   questCheck: z.number().int(),
+  /** PLAN-067 T-C3 (R-234): the settlement-lost takeover — above the quest window and its check, under the boot veil. */
+  settlementLost: z.number().int(),
   /** Title veil over everything while /game boots (PLAN-031): nothing may peek through before the reveal. */
   boot: z.number().int(),
 });
@@ -943,7 +945,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     outcomeToast: { widthPx: 320, autoDismissMs: 0, rewardAckTimeoutMs: 4000, anchor: 'right', offsetXPx: 24, offsetYPx: 24 },
     beats: { sceneMs: 1600, checkMs: 1800, checkHoldMs: 45000, checkVerdictMs: 2400, harmMs: 1200, endMs: 1600, recapMs: 1800, maxQueue: 24 },
   },
-  zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12, questToast: 20, reward: 25, questCheck: 30, boot: 40 },
+  zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12, questToast: 20, reward: 25, questCheck: 30, settlementLost: 35, boot: 40 },
   bootVeil: {
     fadeMs: 550,
     minDisplayMs: 400,
