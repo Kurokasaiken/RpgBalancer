@@ -444,6 +444,7 @@ export default interface Resources {
       "director": {
         "invasion": "Goblin invasion",
         "levelUp": "Hero level-up",
+        "expeditionLost": "Expedition lost",
         "merchantMarker": "Merchant marker",
         "move": "Move",
         "poiTypes": "POI types",
@@ -682,6 +683,7 @@ export default interface Resources {
         "withState": "{name} — {state}"
       },
       "questWindow": {
+        "fellOnDay": "fell on day {day}",
         "abandon": "Abandon quest",
         "abandonConfirm": "Are you sure you want to abandon the quest?",
         "abandonStay": "Keep going",
