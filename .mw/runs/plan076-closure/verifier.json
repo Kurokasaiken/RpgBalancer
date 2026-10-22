@@ -1,0 +1,43 @@
+{
+  "verifier": "mechanical-receipt",
+  "generated_by": "scripts/verification/produceBundle.ts (receipt meccanico)",
+  "evaluated_at": "2026-10-22T13:58:22.246Z",
+  "tree_sha256": "78fb2b7965cb23d891675f16e5144ffeda5e824b317c991fef257150d66679b9",
+  "tree_files": 5,
+  "evaluations": [
+    {
+      "id": "OB-1",
+      "verdict": "CONFIRMED",
+      "criteria_sha256": "435d5e86b7d13157bf4fd7b9fd019f834eff1860da8c57172944e86df9bc5c43",
+      "evidence_sha256": [
+        "7bc13967eeecf1eb69056229502fd00cd4b3ea249aaffbfcac473a5398e485e0"
+      ],
+      "exit_code": 0
+    },
+    {
+      "id": "OB-2",
+      "verdict": "CONFIRMED",
+      "criteria_sha256": "7f0c6a53e430b8a2db92936527ebcbd4370f24d582d9576aa51c1f46fa41ecfb",
+      "evidence_sha256": [
+        "221c873acd2757bc8eda956bf1622090a2060ea69d2f16a5e01a1e6469f5531f"
+      ],
+      "exit_code": 0
+    },
+    {
+      "id": "OB-3",
+      "verdict": "CONFIRMED",
+      "criteria_sha256": "43fc765a985db4f21e48b3623f2035d606662ad7012b541a2df8abe5a0d6c4c1",
+      "evidence_sha256": [
+        "c8fb2f6c30d05a18d99d8cf853e0fed3da9da3bc9078501d7431d8076935e04a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "id": "OB-4",
+      "verdict": "UNVERIFIABLE",
+      "criteria_sha256": "fa2b47a419c9e1d2946729fba76f9b52a593540550df12772032c6ec74aee1bf",
+      "evidence_sha256": [],
+      "exit_code": 0
+    }
+  ]
+}

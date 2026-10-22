@@ -1,0 +1,35 @@
+exit_code: 0
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/faustoboni/progetti_personali/RPG[39m
+
+ [32m✓[39m tests/unit/idleVillage/menuI18n.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 239[2mms[22m[39m
+ [32m✓[39m tests/unit/idleVillage/menuFlow.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 168[2mms[22m[39m
+ [32m✓[39m tests/unit/idleVillage/gameSettings.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 78[2mms[22m[39m
+ [32m✓[39m tests/unit/idleVillage/gameSave.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 242[2mms[22m[39m
+ [32m✓[39m tests/unit/idleVillage/useGameAutosave.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 153[2mms[22m[39m
+ [32m✓[39m tests/unit/idleVillage/gameSaveService.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 157[2mms[22m[39m
+ [32m✓[39m tests/unit/idleVillage/hudGameMenu.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[33m 4696[2mms[22m[39m
+     [33m[2m✓[22m[39m opens the dropdown from the Menu button and closes it on Escape [33m 674[2mms[22m[39m
+     [33m[2m✓[22m[39m lists non-dev panels as checkboxes wired to onTogglePanel [33m 492[2mms[22m[39m
+     [33m[2m✓[22m[39m runs the manual save and flashes the saved state [33m 937[2mms[22m[39m
+     [33m[2m✓[22m[39m disables Save now when no save handler is provided [33m 302[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the dropdown items inside the data-hud-controls scope (pill controls, R-138) [33m 489[2mms[22m[39m
+     [33m[2m✓[22m[39m has no Theme section, even if a caller still passes a skin control [33m 363[2mms[22m[39m
+     [33m[2m✓[22m[39m wires Load game, All settings and Quit to title to their handlers and closes the menu [33m 732[2mms[22m[39m
+ [32m✓[39m tests/unit/idleVillage/loadGamePanel.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 3642[2mms[22m[39m
+     [33m[2m✓[22m[39m lists every slot and only lets a valid one be loaded [33m 1748[2mms[22m[39m
+     [33m[2m✓[22m[39m asks before replacing unsaved progress and does nothing on cancel [33m 940[2mms[22m[39m
+     [33m[2m✓[22m[39m asks before deleting a save [33m 462[2mms[22m[39m
+ [32m✓[39m tests/unit/idleVillage/menuScreens.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 3998[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the game unmounted until a way in is picked, and Continua restores the newest save [33m 1484[2mms[22m[39m
+     [33m[2m✓[22m[39m hides Continua when there is nothing to continue and starts a new game without asking [33m 420[2mms[22m[39m
+     [33m[2m✓[22m[39m asks before a new game over progress, then clears the world and the autosave only [33m 767[2mms[22m[39m
+     [33m[2m✓[22m[39m changes audio and motion immediately, offers no music row, and restores defaults [33m 593[2mms[22m[39m
+     [33m[2m✓[22m[39m «Salva ed esci» saves into a manual slot and then leaves; «Annulla» stays [33m 410[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m      Tests [22m [1m[32m51 passed[39m[22m[90m (51)[39m
+[2m   Start at [22m 15:45:55
+[2m   Duration [22m 71.41s[2m (transform 55.55s, setup 225.49s, import 41.79s, tests 13.37s, environment 219.94s)[22m
+
