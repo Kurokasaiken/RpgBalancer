@@ -6,6 +6,7 @@
  */
 
 import { create, type StateCreator } from 'zustand';
+import { appendMemorial, memorialEntriesFromPlan, type MemorialContext, type MemorialEntry } from '@/ui/idleVillage/memorial/memorialHall';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { useMemo } from 'react';
 import {
@@ -318,6 +319,8 @@ export interface MinimalGameplayState {
    * through this stamp); the HUD clears it when the animation ends.
    */
   resourceDelta: { gold: number; xp: number; /** Wall-clock ms of the commit — the animation keys on it. */ at: number } | null;
+  /** PLAN-067 T-C5 (R-234): the Memoriale — one entry per fallen resident, appended by the settlement. */
+  memorial: MemorialEntry[];
   /** Publishes the settlement grant as the HUD delta stamp (R-260). */
   publishResourceDelta: (delta: { gold: number; xp: number }) => void;
   /** Clears the delta stamp after the readout's animation finished. */
@@ -605,6 +608,7 @@ const INITIAL_STATE: MinimalGameplayState = {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setResidentsOnExpedition: () => {},
   resourceDelta: null,
+  memorial: [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   publishResourceDelta: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -1059,6 +1063,9 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
     if (appliedNow.length > 0 || next.eventLog !== state.eventLog) {
       set({ state: next });
     }
+    /* T-C5 (R-234): every death of the run lands in the Memoriale once (idempotent by run:effect key). */
+    const fresh = memorialEntriesFromPlan(plan, memorialContextFor(state));
+    if (fresh.length > 0) set({ memorial: appendMemorial(get().memorial, fresh) });
     trackTelemetryEvent('quest_settlement_effects', {
       runId: plan.runId,
       outcome: plan.outcome,
@@ -1862,4 +1869,14 @@ export function selectResidentRosterStatesForLab(
   config: MinimalConfig
 ): TimeEngineResidentState[] {
   return selectResidentRosterStates(state, config);
+}
+
+/* T-C5 (R-234): names, levels, place and day for the memorial, read from the settled state. */
+function memorialContextFor(state: MinimalGameState): MemorialContext {
+  return {
+    nameOf: (id) => state.residents.find((r) => r.id === id)?.name ?? id,
+    levelOf: (id) => state.residents.find((r) => r.id === id)?.level ?? 1,
+    placeOf: (questId) => questId,
+    dayOf: () => state.currentDay + 1,
+  };
 }
