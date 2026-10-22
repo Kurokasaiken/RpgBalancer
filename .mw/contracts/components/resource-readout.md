@@ -16,14 +16,18 @@ invariants:
     source: plan
     source_ref: R-260
     statement: >-
-      Il readout reagisce al commit del settlement: per ogni risorsa con tessera un chip «+N» nella tile (oro), per
-      i grant senza tessera un chip «+N» ancorato sotto il readout (XP); ogni chip fa count-up su
-      `hud.resourceDelta.countUpMs` e sotto reduced-motion mostra subito l'importo finale; nessuno stamp → nessun
-      chip.
+      Il readout reagisce al commit del settlement: per ogni risorsa con tessera un chip «+N» nella tile (oro), per i
+      grant senza tessera un chip «+N» ancorato sotto il readout (XP); ogni chip fa count-up su
+      `hud.resourceDelta.countUpMs` e sotto reduced-motion mostra subito l'importo finale; nessuno stamp → nessun chip.
     test_refs:
       - tests/unit/idleVillage/resourceDeltaChip.test.tsx
+  - id: R-234-hud-food-ember
+    source: director-bug
+    source_ref: R-234
+    statement: A critical stock tile is an ember border on a dark tile, never a solid danger fill (HUD-1 = A)
+    test_refs:
+      - tests/unit/idleVillage/resourceReadout.ember.test.tsx
 ---
-
 # resource-readout
 
 Unità `ui-component` (tier 2, default) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx`.

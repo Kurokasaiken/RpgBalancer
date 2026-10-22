@@ -95,12 +95,12 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
       : ({ disabled: true, title: t('gameFrame.menu.comingSoon'), style: { width: '100%', opacity: 0.45 } } as const);
 
   return (
-    <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>
+    <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto', display: 'flex' }}>
       <HudPlaque
         shape="hang"
         as="section"
         aria-label={t('gameFrame.menu.title')}
-        style={{ display: 'flex', alignItems: 'center', padding: '13px 16px 11px' }}
+        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '13px 16px 11px' }}
       >
         <button
           type="button"

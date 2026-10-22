@@ -82,9 +82,8 @@ const DeltaChip: React.FC<{ id: string; label: string; amount: number; at: numbe
  * Resource readout — content for the top-right plaque.
  *
  * Each resource is one tile cut like a Roster row: icon attached to the number, trend
- * beside it, caps label underneath. A critical stock turns the whole tile vermilion with
- * dark ink, not just its text: it has to read at a glance and without relying on colour of
- * text alone. The plaque is `HudPlaque`; this carries no surface of its own beyond the tiles.
+ * beside it, caps label underneath. A critical stock lights an ember border and glow on the dark
+ * tile and tints its label: it reads at a glance without turning the tile into a solid block. The plaque is `HudPlaque`; this carries no surface of its own beyond the tiles.
  *
  * `icon` is expected to already be a self-labelling node (e.g. `HudGlyph`); it is sized to
  * fill `ICON_BOX`.
@@ -111,9 +110,12 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items, delta }
                 minWidth: 0,
                 padding: 'var(--skin-hud-row-padding)',
                 borderRadius: 'var(--skin-hud-row-radius)',
-                border: `1px solid ${critical ? HUD_TONE_COLOR.danger : 'var(--skin-hud-row-filet)'}`,
-                background: critical ? HUD_TONE_COLOR.danger : 'var(--skin-surface-bg)',
-                color: critical ? 'var(--skin-hud-seat)' : 'var(--skin-text-primary)',
+                /* HUD-1 = A (R-234): a critical stock is an EMBER on the dark tile — danger on the
+                 *  border and a glow, ink untouched — not a solid vermilion block. */
+                border: `${critical ? 1.5 : 1}px solid ${critical ? HUD_TONE_COLOR.danger : 'var(--skin-hud-row-filet)'}`,
+                background: 'var(--skin-surface-bg)',
+                color: 'var(--skin-text-primary)',
+                boxShadow: critical ? `inset 0 0 0 1px ${HUD_TONE_COLOR.danger}, 0 0 10px ${HUD_TONE_COLOR.danger}` : undefined,
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)' }}>
@@ -131,7 +133,7 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items, delta }
                     lineHeight: 1,
                     fontVariantNumeric: 'tabular-nums',
                     whiteSpace: 'nowrap',
-                    textShadow: critical ? 'none' : 'var(--skin-hud-engrave)',
+                    textShadow: 'var(--skin-hud-engrave)',
                   }}
                 >
                   {item.value}
@@ -157,7 +159,7 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items, delta }
                       letterSpacing: 'var(--skin-hud-caps-tracking)',
                       whiteSpace: 'nowrap',
                       fontVariantNumeric: 'tabular-nums',
-                      color: critical ? 'inherit' : item.tone ? HUD_TONE_COLOR[item.tone] : 'var(--skin-label-tertiary)',
+                      color: item.tone ? HUD_TONE_COLOR[item.tone] : 'var(--skin-label-tertiary)',
                     }}
                   >
                     {item.detail}
@@ -178,7 +180,7 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items, delta }
                   letterSpacing: 'var(--skin-hud-caps-tracking)',
                   textTransform: 'uppercase',
                   lineHeight: 1,
-                  color: critical ? 'inherit' : 'var(--skin-label-primary)',
+                  color: critical ? HUD_TONE_COLOR.danger : 'var(--skin-label-primary)',
                 }}
               >
                 {item.label}

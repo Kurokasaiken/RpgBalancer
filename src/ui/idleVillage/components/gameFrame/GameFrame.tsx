@@ -454,9 +454,10 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             ...slideChrome('up'),
           }}
         >
-          <div style={{ justifySelf: 'start', minWidth: 0, pointerEvents: 'auto', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+          {/* HUD-2 = H1: the MENU plaque stretches to the row height like its two neighbours. */}
+          <div style={{ justifySelf: 'start', minWidth: 0, pointerEvents: 'auto', display: 'flex', alignItems: 'stretch', gap: 10 }}>
             {menuSlot}
-            {objectiveSlot}
+            {objectiveSlot != null && <div style={{ alignSelf: 'flex-start' }}>{objectiveSlot}</div>}
           </div>
           <HudPlaque shape="hang" as="section" style={{ padding: '16px 34px 15px', pointerEvents: 'auto', display: 'flex', alignItems: 'center' }}>
             {whenWhereSlot}
