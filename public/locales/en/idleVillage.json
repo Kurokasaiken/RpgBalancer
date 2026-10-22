@@ -1013,6 +1013,7 @@
       "settlementLost": "Settlement lost",
       "merchantMarker": "Merchant marker",
       "levelUp": "Hero level-up",
+      "expeditionLost": "Expedition lost",
       "resetInitial": "Initial state",
       "reviveFallen": "Revive fallen"
     },
@@ -1213,6 +1214,7 @@
       "bakeFailed": "Saved for this browser — the new defaults could not be written to the config (dev server only)."
     },
     "questWindow": {
+      "fellOnDay": "fell on day {day}",
       "roster": "Assigned party",
       "bag": "Bag",
       "chronicle": "Chronicle",
