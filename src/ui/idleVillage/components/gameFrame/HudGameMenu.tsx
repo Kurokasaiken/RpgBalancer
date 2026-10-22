@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EngravedIcon } from './engravedIcons';
+import { HudTooltip } from './HudTooltip';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { useLocalization } from '@/hooks/useLocalization';
@@ -37,8 +38,7 @@ const SECTION_LABEL_STYLE = {
 const MENU_LOCALES: readonly SupportedLocale[] = ['en', 'it-IT'];
 
 /**
- * Game menu — the top-left cartouche (R-132). A `hang` plaque like the other two
- * top ribbons; its Menu button opens a dropdown with the real controls that exist
+ * Game menu — an icon in the bottom-right corner cluster (HUD-3 = P1; Esc opens it too). It opens a dropdown with the real controls that exist
  * today (panel toggles, manual save, language and skin choice) plus the disabled
  * entries (Load, Settings, Quit) that open their screens (PLAN-076).
  */
@@ -57,15 +57,24 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
     const onDown = (event: PointerEvent) => {
       if (!root.current?.contains(event.target as Node)) setOpen(false);
     };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
     window.addEventListener('pointerdown', onDown);
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('pointerdown', onDown);
-      window.removeEventListener('keydown', onKey);
+    return () => window.removeEventListener('pointerdown', onDown);
+  }, [open]);
+
+  /* HUD-3 = P1 (R-234): Esc opens and closes the menu. It only opens when nothing else claims the key —
+   * a handler that already consumed it, a text field, or an open dialog keep Esc for themselves. */
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      if (open) { setOpen(false); return; }
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName))) return;
+      if (document.querySelector('[role="dialog"]')) return;
+      trackTelemetryEvent('game_menu_toggle', { open: true, via: 'escape' });
+      setOpen(true);
     };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
   const panelIds = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => isHudPanelListed(id) && (includeDev || !HUD_PANEL_DEV_ONLY.has(id)));
@@ -95,23 +104,20 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
       : ({ disabled: true, title: t('gameFrame.menu.comingSoon'), style: { width: '100%', opacity: 0.45 } } as const);
 
   return (
-    <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto', display: 'flex' }}>
-      <HudPlaque
-        shape="hang"
-        as="section"
-        aria-label={t('gameFrame.menu.title')}
-        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '13px 16px 11px' }}
-      >
+    <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>
+      <HudTooltip label={t('gameFrame.menu.title')} shortcut="Esc" side="top">
         <button
           type="button"
           aria-haspopup="menu"
           aria-expanded={open}
+          aria-label={t('gameFrame.menu.title')}
+          data-testid="hud-menu-trigger"
           onClick={toggleMenu}
+          style={{ width: 40, height: 40 }}
         >
-          <EngravedIcon id="cmd-menu" size={14} />
-          <span>{t('gameFrame.menu.title')}</span>
+          <EngravedIcon id="cmd-menu" />
         </button>
-      </HudPlaque>
+      </HudTooltip>
 
       {open && (
         <HudPlaque
@@ -119,7 +125,7 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
           as="div"
           role="menu"
           aria-label={t('gameFrame.menu.title')}
-          style={{ position: 'absolute', top: 'calc(100% - 8px)', left: 0, zIndex: 1100, display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 14px', minWidth: 230 }}
+          style={{ position: 'absolute', bottom: 'calc(100% + 10px)', right: 0, zIndex: 1100, display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 14px', minWidth: 230 }}
         >
           <span style={SECTION_LABEL_STYLE}>{t('gameFrame.panels.title')}</span>
           {panelIds.map((id) => (
