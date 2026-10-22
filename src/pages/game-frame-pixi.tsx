@@ -479,6 +479,9 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   // Time of day on the map, only at normal speed: at x2/x4 the light holds still (a day lasts seconds there, and the map
   // would flicker), while paused it keeps whatever light it had.
   const { isDayPhase, cycleProgress, speedMultiplier, isPaused: clockPaused } = session.gameplay.state;
+  /* R-264: live dead-resident count — lights the Director «revive» action only
+   *  while the settlement's terminal consequence is actually on the roster. */
+  const deadResidentCount = session.gameplay.state.residents.reduce((n, r) => n + (r.isDead ? 1 : 0), 0);
   const lastAmbient = useRef({ light: 1, warm: 0 });
   // `?tod=night|dusk|day` previews a time of day (dev), whatever the clock says.
   const todPreview = useMemo(() => new URLSearchParams(window.location.search).get('tod'), []);
@@ -1350,13 +1353,24 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         onTrigger: () => useMinimalGameplayStore.getState().triggerSettlementLost(),
       },
       {
+        /* R-264: Director-only revive — clears `isDead` on store residents so
+         *  the canonical roster shows them again. Permanent death is a player
+         *  rule (desiderata); this is playtest tooling on the Director surface.
+         *  The settlement ledger keeps its `dead:` keys, so a replay can never
+         *  re-kill a revived resident. Lit up only while someone is dead. */
+        id: 'reviveFallen',
+        label: t('gameFrame.director.reviveFallen'),
+        active: deadResidentCount > 0,
+        onTrigger: () => useMinimalGameplayStore.getState().reviveDeadResidents(),
+      },
+      {
         id: 'skin',
         label: t('gameFrame.director.skin', { name: getSkinPresetConfig(skinId).label }),
         onTrigger: () =>
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, questShown, autoRevealedIds, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin, settlementLostActive, openRunWindow, residentsById],
+    [invasion, questShown, autoRevealedIds, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin, settlementLostActive, openRunWindow, residentsById, deadResidentCount],
   );
 
   return (
