@@ -869,6 +869,15 @@
     "castSpeed": "Vel. Lancio"
   },
   "gameFrame": {
+    "legacy": {
+      "title": "Eredità",
+      "noSlots": "Nessun edificio ancora",
+      "category": {
+        "items": "Oggetti",
+        "heroes": "Eroi",
+        "blueprints": "Progetti"
+      }
+    },
     "title": "Wanderlust",
     "boot": {
       "progress": "Avanzamento del caricamento",
@@ -1020,6 +1029,7 @@
       "merchantMarker": "Marcatore mercante",
       "levelUp": "Level-up eroe",
       "expeditionLost": "Spedizione persa",
+      "legacy": "Eredità",
       "resetInitial": "Stato iniziale",
       "reviveFallen": "Rianima i caduti"
     },
