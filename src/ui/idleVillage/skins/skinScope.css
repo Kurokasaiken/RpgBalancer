@@ -240,6 +240,27 @@
 }
 .skin-scope [data-hud-controls] button:not([data-skin="cta"]):has(> svg:only-child) { width: var(--skin-hud-control-height); padding: 0; flex-shrink: 0; }
 .skin-scope [data-hud-controls] button svg { width: var(--skin-hud-control-icon-size); height: var(--skin-hud-control-icon-size); }
+
+/* ── Corner buttons — bronze (PLAN-067 HUD-3 = P1, R-234) ──────────────────────────────────────
+   Menu, panels and hide-HUD: a brass ring around a lit lacquer disc and a gold glyph. The generic HUD
+   control pill is near-black; these three have to read as objects in the corner of the map. */
+.skin-scope [data-hud-corner] button[data-testid="hud-menu-trigger"],
+.skin-scope [data-hud-corner] button[data-hud-panels-trigger],
+.skin-scope [data-hud-corner] [data-hud-hide-toggle] button {
+  border: 1.5px solid var(--skin-hud-brass-hi);
+  background: radial-gradient(circle at 40% 35%, var(--skin-hud-lacquer-base), var(--skin-hud-lacquer-deep));
+  box-shadow:
+    inset 0 0 0 2px var(--skin-hud-lacquer-deep),
+    inset 0 0 0 3px color-mix(in srgb, var(--skin-hud-brass-hi) 28%, transparent),
+    0 4px 10px rgba(3, 20, 26, 0.55);
+  color: var(--skin-title-color);
+}
+.skin-scope [data-hud-corner] button[data-testid="hud-menu-trigger"]:hover:not(:disabled),
+.skin-scope [data-hud-corner] button[data-hud-panels-trigger]:hover:not(:disabled),
+.skin-scope [data-hud-corner] [data-hud-hide-toggle] button:hover:not(:disabled) {
+  border-color: var(--skin-title-color);
+  background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--skin-title-color) 22%, var(--skin-hud-lacquer-base)), var(--skin-hud-lacquer-deep));
+}
 .skin-scope [data-hud-controls] button:not([data-skin="cta"]):hover:not(:disabled),
 .skin-scope [data-hud-controls] label:hover {
   border-color: var(--skin-surface-border);
