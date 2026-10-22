@@ -4,7 +4,7 @@
  * Measured live (probe16/17, .mw/runs/plan071-t001/contrast-report*.json):
  * every text leaf on the lacquer chrome passed EXCEPT the semantic status
  * tones used as bare text — `--skin-status-wound` (#a11d33) is 2.52:1 and
- * `--skin-status-death` (#6d3fb0) is 2.75:1 on `--skin-hud-lacquer-deep`
+ * `--skin-status-death` (was #6d3fb0, now cold iron #93a4ad per COL-D) was 2.75:1 on `--skin-hud-lacquer-deep`
  * (#060f16). R-234 had already fixed this inside `HudChip` (CHIP_TEXT_LIFT);
  * the bare `color:` call sites were never lifted.
  *
@@ -43,7 +43,7 @@ const ratio = (fg: number[], bg: number[]) => {
 const LACQUER: [number, number, number, number] = [6, 15, 22, 1]; // --skin-hud-lacquer-deep
 const TOKEN: Record<string, string> = {
   danger: '#a11d33', // --skin-status-wound
-  death: '#6d3fb0', // --skin-status-death
+  death: '#93a4ad', // --skin-status-death
   muted: 'rgba(245,242,232,0.50)', // --skin-text-muted
 };
 const TEXT_PRIMARY = [245, 242, 232, 1];
@@ -59,9 +59,11 @@ const QUEST_CHROME = readdirSync(DIR)
 
 describe('contrast — status tones as text (R-239)', () => {
   // INV:R-239-contrast — the raw tokens fail; the lifted mixes must clear 4.5.
-  it('bare wound/death fail on lacquer; toneText lifts clear 4.5:1', () => {
+  it('bare wound fails on lacquer (death is iron now); toneText lifts clear 4.5:1', () => {
     expect(ratio(parseCss(TOKEN.danger).slice(0, 3), LACQUER.slice(0, 3))).toBeLessThan(4.5);
-    expect(ratio(parseCss(TOKEN.death).slice(0, 3), LACQUER.slice(0, 3))).toBeLessThan(4.5);
+    // R-234 T-B12 (COL-D = B): the fallen tone is cold iron now (7.5:1) — it clears 4.5 even bare;
+    // the lift stays so every call site reads the same.
+    expect(ratio(parseCss(TOKEN.death).slice(0, 3), LACQUER.slice(0, 3))).toBeGreaterThanOrEqual(4.5);
     // CHIP_TEXT_LIFT: danger/death → 40% text-primary.
     for (const tone of ['danger', 'death'] as const) {
       expect(ratio(liftMix(tone, 40), LACQUER.slice(0, 3)), tone).toBeGreaterThanOrEqual(4.5);
