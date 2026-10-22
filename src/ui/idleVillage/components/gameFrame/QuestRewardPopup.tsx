@@ -21,6 +21,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lostReportModel } from './expeditionLost';
 import { useTranslation } from 'react-i18next';
 import { EngravedIcon, type EngravedIconId } from './engravedIcons';
 import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
@@ -201,6 +202,27 @@ export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenari
                     backgroundPosition: 'center 30%',
                   }}
                 />
+              )}
+
+              {/* PLAN-067 T-C2 (R-234, EXP = A): a defeat shows one tombstone per fallen resident — no violet, the
+                  fallen read in cold iron — instead of a generic line. The day is shown only when the run recorded it. */}
+              {run.outcome === 'wipe' && lostReportModel(run).tombs.length > 0 && (
+                <div data-testid="quest-reward-tombs" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {lostReportModel(run).tombs.map((tomb) => (
+                    <div
+                      key={tomb.id}
+                      data-testid="quest-reward-tomb"
+                      style={{
+                        width: 92, padding: '8px 6px 6px', textAlign: 'center', borderRadius: '46px 46px 6px 6px',
+                        border: '1px solid var(--skin-state-fallen)', background: 'var(--skin-hud-lacquer-deep)',
+                      }}
+                    >
+                      <EngravedIcon id="status-fallen" size={16} aria-hidden style={{ color: 'var(--skin-state-fallen)' }} />
+                      <div style={{ font: '600 12px var(--skin-font-display)', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--skin-state-fallen)', marginTop: 4 }}>{tomb.name}</div>
+                      {tomb.day !== null && <div style={{ font: 'italic 12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>{t('gameFrame.questWindow.fellOnDay', { day: tomb.day })}</div>}
+                    </div>
+                  ))}
+                </div>
               )}
 
               {/* Stage 0 — the outcome banner lands first: the large glyph

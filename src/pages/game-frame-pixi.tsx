@@ -1,5 +1,6 @@
 import { cloneElement, isValidElement, startTransition, useCallback, useEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { stageExpeditionLost } from '@/ui/idleVillage/components/gameFrame/expeditionLostStaging';
 import { DndContext, MeasuringStrategy } from '@dnd-kit/core';
 import { getCurrentDragConfig } from '@/ui/idleVillage/config/dragConfig';
 import { createMagneticSlotCollision } from '@/ui/idleVillage/interaction/magneticCollision';
@@ -222,6 +223,8 @@ export default function GameFramePixiPage() {
    *  the quest-only gate. */
   const questRevealed = questShown || poiDemo;
   const [wonderRequest, setWonderRequest] = useState(0);
+  /* PLAN-067 T-C2 (R-234): the Director «Expedition lost» beat — a defeat COPY shown in the report; the live run is never touched. */
+  const [expeditionLostRun, setExpeditionLostRun] = useState<QuestRunState | null>(null);
   const [regionHover, setRegionHover] = useState<PixiRegionHover | null>(null);
   const [invasion, setInvasion] = useState<{ dueDay: number; startDay: number } | null>(null);
   /* BV-4/R-119 (Director, 2026-10-19, option A): the clock DOES hydrate — `initializeMinimalGameplayStore`
@@ -1345,6 +1348,15 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
          *  targets, or no mounted hero card all reject with no telemetry/cue). */
         id: 'levelup',
         label: t('gameFrame.director.levelUp'),
+      {
+        /* PLAN-067 T-C2 (R-234, EXP = A): the defeat report staged on a COPY of the run — nothing settles. */
+        id: 'expeditionLost',
+        label: t('gameFrame.director.expeditionLost'),
+        onTrigger: () => {
+          const current = activeQuestRun.run;
+          if (current) setExpeditionLostRun(stageExpeditionLost(current));
+        },
+      },
         /* T-C1 (R-234): never silent — a closed roster is opened and the command retried until a card mounts. */
         onTrigger: () => runStagingOpeningRoster({
           run: () => runHeroLevelUpStaging({ residentsById, playCue: playLevelUpCue }),
@@ -1644,14 +1656,17 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                 {/* R-199 pt.14: the end-of-run report is its own floating
                     plaque OUTSIDE the quest window's DOM — staged reveal,
                     skippable, draggable, non-modal. */}
-                {rewardVisible && activeQuestRun.run && (
+                {(expeditionLostRun || (rewardVisible && activeQuestRun.run)) && (
                   <QuestRewardPopup
-                    run={activeQuestRun.run}
+                    run={(expeditionLostRun ?? activeQuestRun.run)!}
                     scenario={scenarioForQuest(activeQuestId)}
                     widthPx={questWindow.rewardPopup.widthPx}
                     stageMs={questWindow.rewardPopup.stageMs}
                     edgeInsetPx={questWindow.rewardPopup.edgeInsetPx}
-                    onClose={closeReward}
+                    onClose={() => {
+                      if (expeditionLostRun) setExpeditionLostRun(null);
+                      else closeReward();
+                    }}
                   />
                 )}
                 {directorEnabled && panels.visible.tuning && (

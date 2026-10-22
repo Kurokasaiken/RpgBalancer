@@ -1019,6 +1019,7 @@
       "settlementLost": "Insediamento perduto",
       "merchantMarker": "Marcatore mercante",
       "levelUp": "Level-up eroe",
+      "expeditionLost": "Spedizione persa",
       "resetInitial": "Stato iniziale",
       "reviveFallen": "Rianima i caduti"
     },
@@ -1219,6 +1220,7 @@
       "bakeFailed": "Salvato per questo browser — i nuovi default non sono stati scritti nel config (solo dev server)."
     },
     "questWindow": {
+      "fellOnDay": "caduto il giorno {day}",
       "roster": "Squadra assegnata",
       "bag": "Sacca",
       "chronicle": "Cronaca",
