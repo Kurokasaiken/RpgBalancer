@@ -32,7 +32,12 @@ export const MockBuyControl: React.FC = () => {
           letterSpacing: 'var(--skin-hud-caps-tracking)',
           textTransform: 'uppercase',
           color: 'var(--skin-label-primary)',
-          opacity: 0.55,
+          /* the skin dims every :disabled button to 0.4 — this one stays legible (>= 4.5:1) and says
+             «inert» with a dashed edge instead of by fading its text away. */
+          opacity: 1,
+          borderStyle: 'dashed',
+          background: 'var(--skin-hud-lacquer-deep)',
+          borderColor: 'color-mix(in srgb, var(--skin-label-primary) 60%, transparent)',
         }}
       >
         {label}
@@ -40,7 +45,7 @@ export const MockBuyControl: React.FC = () => {
       <span
         id={captionId}
         style={{
-          font: 'italic 12px var(--skin-font-sans)',
+          font: 'italic 12px var(--skin-font-serif)',
           color: 'var(--skin-text-secondary)',
         }}
       >

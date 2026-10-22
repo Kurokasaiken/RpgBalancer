@@ -9,9 +9,16 @@ scope_files:
 fast_checks: []
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: R-234-fam-roster
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      Teaser sheets speak the Roster family: display + serif only, no cyan/green/red as meaning, no zero rows on the
+      hero sheet, readable disabled BUY (FAM-1 = A)
+    test_refs:
+      - tests/unit/idleVillage/famRoster.test.ts
 ---
-
 # hero-sheet-panel
 
 Unità `ui-component` (tier 2, default) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/components/gameFrame/HeroSheetPanel.tsx`.
