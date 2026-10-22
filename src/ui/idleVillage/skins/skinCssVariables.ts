@@ -316,6 +316,8 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-poi-stone-deep': '#0a1b1c',
   '--skin-poi-halo-deadline': '#ead9b0',
   '--skin-poi-halo-work': '#9fb3c4',
+  /* Cream-white glint: the sparkle on the rim letters and the light running along the journey route. */
+  '--skin-poi-glint': '#fff6dc',
   '--skin-poi-urgent': '#e8553a',
   '--skin-poi-veiled-opacity': '0.45',
   '--skin-poi-pulse-period': '2s',

@@ -649,7 +649,13 @@ export default interface Resources {
       },
       "questPoi": {
         "decisionWaiting": "The expedition awaits your decision",
-        "open": "{name} — open the quest"
+        "open": "{name} — open the quest",
+        "state": {
+          "completed": "expedition over, outcome to collect",
+          "failed": "expedition failed, outcome to collect",
+          "in_progress": "expedition under way"
+        },
+        "withState": "{name} — {state}"
       },
       "questWindow": {
         "abandon": "Abandon quest",

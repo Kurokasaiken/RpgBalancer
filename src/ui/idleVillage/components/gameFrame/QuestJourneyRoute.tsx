@@ -210,7 +210,7 @@ export function QuestJourneyRoute({ run, canvas }: QuestJourneyRouteProps) {
           data-testid="quest-journey-route-glint"
           d={path}
           fill="none"
-          stroke="#fff6dc"
+          stroke="var(--skin-poi-glint)"
           strokeDasharray={`${QUEST_JOURNEY_ROUTE_CONFIG.glintLengthWorldPx} ${filledLength}`}
           strokeWidth={QUEST_JOURNEY_ROUTE_CONFIG.highlightWidthWorldPx * 1.8}
           strokeLinecap="round"

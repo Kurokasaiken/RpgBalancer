@@ -955,6 +955,12 @@
     },
     "questPoi": {
       "open": "{name} — apri la quest",
+      "withState": "{name} — {state}",
+      "state": {
+        "in_progress": "spedizione in corso",
+        "completed": "spedizione finita, esito da raccogliere",
+        "failed": "spedizione fallita, esito da raccogliere"
+      },
       "decisionWaiting": "La spedizione attende una tua decisione"
     },
     "questLog": {
