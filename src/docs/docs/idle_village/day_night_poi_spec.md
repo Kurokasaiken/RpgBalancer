@@ -30,10 +30,10 @@ type: component-spec
 
 **Given:** `useMinimalGameplay` reports `isDayPhase = false` and `cycleProgress = 0.7`
 **When:** `DayNightPOI` renders
-**Then:** it displays the moon icon, purple/indigo ring, and a halo filled to 70%
-**Visual contract:** `aria-label` contains "Night" and ring color is purple
+**Then:** it displays the moon icon, cold-iron ring, and a halo filled to 70%
+**Visual contract:** `aria-label` contains "Night" and ring color is cold iron (#93a4ad)
 
-> ⚠️ **Fuori regola (ruling Director 2026-10-20, PLAN-067): «mai viola», in nessun ruolo.** L'anello notturno viola va sostituito: il colore nuovo dipende dal fork **COL-D**; il contratto visivo e il suo test vanno aggiornati insieme (Mode B-amend).
+> ⚠️ **Fuori regola (ruling Director 2026-10-20, PLAN-067): «mai viola», in nessun ruolo.** L'anello notturno viola è stato sostituito (2026-10-22, T-B12) con il ferro freddo **COL-D = B**; il contratto visivo e il suo test vanno aggiornati insieme (Mode B-amend).
 
 ### Scenario 3: Pause / resume
 

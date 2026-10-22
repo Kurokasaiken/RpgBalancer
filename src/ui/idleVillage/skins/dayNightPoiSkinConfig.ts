@@ -80,10 +80,10 @@ export const defaultDayNightPoiConfig: DayNightPoiConfig = {
   },
 
   nightRunning: {
-    ringColor: '#7C5CFF',
-    glowColor: '#8B5CF6',
+    ringColor: '#93a4ad',
+    glowColor: '#93a4ad',
     glowOpacity: [0.34, 0.48],
-    coreColor: '#1A1730',
+    coreColor: '#131b20',
     bloomRadius: 0.44,
     bloomIntensity: 0.95,
   },

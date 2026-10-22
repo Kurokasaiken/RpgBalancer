@@ -89,7 +89,7 @@ function readPalette(el: HTMLElement): Palette {
     warmGold: g('--skin-close-color', '#f7dd80'),
     ivory: g('--skin-text-primary', '#F5F2E8'),
     wound: g('--skin-status-wound', '#a11d33'),
-    death: g('--skin-status-death', '#6d3fb0'),
+    death: g('--skin-status-death', '#93a4ad'),
   };
 }
 

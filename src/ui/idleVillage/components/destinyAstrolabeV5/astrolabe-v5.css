@@ -139,7 +139,7 @@
 
 .dav5-plate-value[data-kind='success'] { color: var(--skin-close-color, #f7dd80); }
 .dav5-plate-value[data-kind='wound']   { color: var(--skin-status-wound, #a11d33); }
-.dav5-plate-value[data-kind='dead']    { color: var(--skin-status-death, #6d3fb0); }
+.dav5-plate-value[data-kind='dead']    { color: var(--skin-status-death, #93a4ad); }
 
 .dav5-cta-row {
   display: flex;
