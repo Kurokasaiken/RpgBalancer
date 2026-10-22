@@ -102,6 +102,19 @@ const INVASION_MARCH_DAYS = 30;
 const INVASION_LAND = { x: 0.239, y: 0.417 } as const;
 const INVASION_VILLAGE = { x: 0.486, y: 0.554 } as const;
 const TUNING_KEY = 'hud_tuning_v1';
+/** R-265: stable `questRunTime` when no run exists — without it the memo below
+ *  minted a fresh object every game tick, so `useThrottledValue` republished
+ *  ~1×/s and re-rendered the whole page for a window that is not mounted. */
+const EMPTY_QUEST_RUN_TIME: { progress: number; label: string; overrunFrom?: number } = { progress: 0, label: '' };
+/** Field-wise equality for the quest-window time model (R-265): lets
+ *  `useStableValue` collapse the per-tick re-mint into a stable reference
+ *  once the values stop changing (ended/unmounted runs). */
+function questRunTimeEqual(
+  a: { progress: number; label: string; overrunFrom?: number },
+  b: { progress: number; label: string; overrunFrom?: number },
+): boolean {
+  return a.progress === b.progress && a.label === b.label && a.overrunFrom === b.overrunFrom;
+}
 /** POIs whose quest has run to completion: once the expedition report is
  *  dismissed the marker leaves the map for good (PLAN-019-S2.5 terminal
  *  table: every outcome ⇒ «POI chiude»). */
@@ -368,9 +381,15 @@ export default function GameFramePixiPage() {
     hooks.revealQuestPois = () => setQuestShown(true);
     // E2E seam: close the shroud and let the announcement card open at its peak, as the Director's invasion does.
     hooks.startInvasion = () => setShroudCovered(true);
+    /* R-260 T-04 seam: publish a transient resource delta through the same
+     *  store action the settlement commit uses, so a real-viewport witness
+     *  can see the HUD «+N» chip + count-up without driving an expedition. */
+    hooks.debugResourceDelta = (delta: { gold?: number; xp?: number }) =>
+      useMinimalGameplayStore.getState().publishResourceDelta({ gold: delta.gold ?? 0, xp: delta.xp ?? 0 });
     return () => {
       delete hooks.revealQuestPois;
       delete hooks.startInvasion;
+      delete hooks.debugResourceDelta;
     };
   }, []);
 
@@ -1000,6 +1019,9 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
   );
   const questRunTime = useMemo(() => {
     const run = activeQuestRun.run;
+    /* R-265: no run ⇒ the quest window is not mounted — a stable value keeps
+     *  `questRunTimeView` from republishing a page-wide render every tick. */
+    if (!run) return EMPTY_QUEST_RUN_TIME;
     if (run && activePoi) {
       const halo = questHaloProgress(run, activePoi, currentTick);
       /* R-239: `pieno-in-attesa` (bar full, run not landed) read as
@@ -1018,10 +1040,15 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
       : t('gameFrame.questWindow.day', { day: Math.min(questWindow.durationDays, Math.floor(elapsed / dayLengthTicks) + 1), total: questWindow.durationDays });
     return { progress, label };
   }, [activeQuestRun.run, activePoi, currentTick, questWindow.durationDays, dayLengthTicks, t]);
+  /* R-265: structural sharing before the sampler — a settled run mints an
+   *  identical `{progress, label}` every tick; keeping the old reference stops
+   *  `useThrottledValue` from republishing page renders for a value that did
+   *  not change. Live runs still republish at halo cadence (progress moves). */
+  const questRunTimeStable = useStableValue(questRunTime, questRunTimeEqual);
   /* Halo cadence for the window's time bar too: without it every game tick
    * rebuilds the element and the whole 900-line window re-renders (PLAN-034
    * T-005). At ≤500ms cadence the countdown still reads as alive. */
-  const questRunTimeView = useThrottledValue(questRunTime, QUEST_HALO_RENDER_MS);
+  const questRunTimeView = useThrottledValue(questRunTimeStable, QUEST_HALO_RENDER_MS);
 
   const anchors = useMemo<PixiMapAnchor[]>(() => {
     const list: PixiMapAnchor[] = [];
@@ -1352,12 +1379,6 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
         onTrigger: () => setLegacyOpen((v) => !v),
       },
       {
-        /* PLAN-032 SP-5: the level-up staging beat — mock presentation only.
-         *  The command itself decides accept/reject (invalid config, non-hero
-         *  targets, or no mounted hero card all reject with no telemetry/cue). */
-        id: 'levelup',
-        label: t('gameFrame.director.levelUp'),
-      {
         /* PLAN-067 T-C2 (R-234, EXP = A): the defeat report staged on a COPY of the run — nothing settles. */
         id: 'expeditionLost',
         label: t('gameFrame.director.expeditionLost'),
@@ -1366,6 +1387,12 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           if (current) setExpeditionLostRun(stageExpeditionLost(current));
         },
       },
+      {
+        /* PLAN-032 SP-5: the level-up staging beat — mock presentation only.
+         *  The command itself decides accept/reject (invalid config, non-hero
+         *  targets, or no mounted hero card all reject with no telemetry/cue). */
+        id: 'levelup',
+        label: t('gameFrame.director.levelUp'),
         /* T-C1 (R-234): never silent — a closed roster is opened and the command retried until a card mounts. */
         onTrigger: () => runStagingOpeningRoster({
           run: () => runHeroLevelUpStaging({ residentsById, playCue: playLevelUpCue }),
@@ -1530,16 +1557,16 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
             fixtureEvents={false}
             overlaySlot={
               <>
+                {/* T-C4 (R-234): the legacy reliquary, opened by the Director. */}
+                {legacyOpen && <LegacyReliquaryPanel onClose={() => setLegacyOpen(false)} />}
+                {/* T-C1 (R-234): the level-up ceremony plates (one per hero). */}
+                <HeroLevelCeremony residentsById={residentsById} />
                 {/* The announcement lives in the viewport, centred on the free area the HUD leaves (not on the world canvas,
                  *  which sits under the chrome). `safeFit` is the same inset set that frames the land. */}
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 13 }}>
                   <WorldSurfaceEventCard
                     visible={cardOpen}
                     zIndex={1}
-                {/* T-C4 (R-234): the legacy reliquary, opened by the Director. */}
-                {legacyOpen && <LegacyReliquaryPanel onClose={() => setLegacyOpen(false)} />}
-                {/* T-C1 (R-234): the level-up ceremony plates (one per hero). */}
-                <HeroLevelCeremony residentsById={residentsById} />
                     screenAnchor={{
                       left: `calc(${safeFit?.insets.left ?? 0}px + (100% - ${(safeFit?.insets.left ?? 0) + (safeFit?.insets.right ?? 0)}px) / 2)`,
                       top: `calc(${safeFit?.insets.top ?? 0}px + (100% - ${(safeFit?.insets.top ?? 0) + (safeFit?.insets.bottom ?? 0)}px) / 2)`,

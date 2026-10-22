@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Obiettivo DN-3</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--display:"Cinzel",serif;--serif:"EB Garamond",Georgia,serif;--title:#f0cf6a;--text:#F5F2E8;--text2:rgba(245,242,232,.74);--label:#c9a84e;--lift:#0f2a35;--deep:#060f16;--brass-hi:#cfaf63;--page:#0b1c22;--dim:#a9b3ad;--rule:rgba(223,184,87,.22);--ink:#2b2110;--parch:#e9dfc6}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:#e9dfc6;font:16px/1.5 var(--serif)}
+header,main{max-width:1240px;margin:0 auto;padding:0 16px}header{padding-top:28px}
+h1{font:600 26px var(--display);letter-spacing:.06em;color:var(--title);margin:0 0 6px}
+h2{font:600 18px var(--display);color:var(--label);margin:26px 0 6px;border-top:1px solid var(--rule);padding-top:22px}
+p.lead,.note{color:var(--dim);max-width:1100px}
+.sea{position:relative;width:1180px;height:170px;border-radius:10px;background:linear-gradient(180deg,#1b4a58,#14333f 60%,#1b4a58);padding:0 20px;display:grid;grid-template-columns:auto 1fr auto auto 1fr;column-gap:12px;align-items:stretch;overflow:hidden}
+.plate{background:linear-gradient(180deg,var(--lift),var(--deep));border:1.5px solid var(--brass-hi);border-top:0;border-radius:0 0 22px 22px;box-shadow:inset 0 0 0 3px var(--deep),inset 0 0 0 4px rgba(207,175,99,.3);color:var(--text);display:flex;align-items:center;justify-content:center;height:84px}
+.menu{width:116px}.menu b{font:600 12px var(--display);letter-spacing:.14em;padding:5px 16px;border-radius:999px;background:#0a1d26;border:1px solid rgba(207,175,99,.5)}
+.time{padding:0 34px;gap:18px;font:600 15px var(--display);letter-spacing:.14em;color:var(--label)}.time span{color:var(--text);letter-spacing:.02em;font:15px var(--serif)}
+.res{padding:0 30px;gap:12px}.tile{border:1px solid rgba(207,175,99,.35);border-radius:8px;padding:6px 12px;background:#0a1d26;font:600 18px var(--display)}.tile small{display:block;font:500 11px var(--display);letter-spacing:.12em;color:var(--label)}
+.tile.ember{border:1.5px solid #e07a5f;box-shadow:0 0 10px #e07a5f}
+.cart{align-self:start;margin-top:0}
+/* A: cartiglio appeso */
+.hang{background:linear-gradient(180deg,var(--lift),var(--deep));border:1.5px solid var(--brass-hi);border-top:0;border-radius:0 0 18px 18px;padding:12px 18px 14px;max-width:290px;box-shadow:inset 0 0 0 3px var(--deep)}
+.hang .l{font:600 11px var(--display);letter-spacing:.16em;color:var(--label)}.hang .t{margin-top:4px;background:var(--parch);color:var(--ink);border-radius:6px;padding:4px 10px;font:500 15px/1.3 var(--serif)}
+/* B: dentro la lastra del tempo */
+.time2{flex-direction:column;gap:2px;padding:0 34px}.time2 .row1{display:flex;gap:18px;align-items:center;font:600 15px var(--display);letter-spacing:.14em;color:var(--label)}.time2 .row1 span{color:var(--text);font:15px var(--serif);letter-spacing:.02em}
+.time2 .obj{font:italic 500 14px var(--serif);color:var(--title);border-top:1px solid rgba(207,175,99,.3);padding-top:3px;margin-top:2px;text-align:center}
+/* C: sigillo che si apre */
+.seal{width:44px;height:44px;border-radius:50%;background:#0a1d26;border:1.5px solid var(--brass-hi);display:grid;place-items:center;color:var(--title);font:700 20px var(--display);box-shadow:0 0 0 3px var(--deep),0 0 14px rgba(240,207,106,.35);position:relative}
+.seal::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(240,207,106,.5)}
+.tip{position:absolute;top:96px;left:150px;width:300px;background:linear-gradient(180deg,var(--lift),var(--deep));border:1px solid var(--brass-hi);border-radius:8px;padding:10px 12px;box-shadow:0 14px 28px rgba(0,0,0,.65)}
+.tip .l{font:600 11px var(--display);letter-spacing:.16em;color:var(--label)}.tip .t{font:500 15px/1.35 var(--serif);margin-top:4px}
+table{border-collapse:collapse;width:100%;max-width:1100px;font-size:14px}th,td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:top}th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label);text-transform:uppercase}
+</style></head><body>
+<header><h1>Obiettivo — DN-3</h1>
+<p class="lead">Il cartiglio dell'obiettivo esiste ma <b>non compare mai</b> su /game: nessuno gli passa un testo. Servono due decisioni: <b>dove sta</b> e <b>che cosa dice</b>. Qui sotto le tre posizioni (stessa frase d'esempio) e, in fondo, le regole del testo. Le frasi sono esempi, non copy finale.</p></header>
+<main>
+<h2>A · Cartiglio appeso accanto a MENU</h2>
+<div class="sea"><div class="plate menu"><b>MENU</b></div><div class="cart"><div class="hang"><div class="l">OBIETTIVO</div><div class="t">I goblin sbarcano tra 3 giorni: prepara una spedizione.</div></div></div><div class="plate time">DAY 3 <span>The Eastern Marches</span></div><div></div><div class="plate res"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div></div>
+<p class="note">È il pezzo che già esiste (pergamena su lastra appesa). Sempre visibile quando c'è un'azione, cliccabile (apre la quest). Occupa il quarto sinistro in alto: a 1280 sta stretto accanto a MENU.</p>
+
+<h2>B · Una riga dentro la lastra del tempo</h2>
+<div class="sea"><div class="plate menu"><b>MENU</b></div><div></div><div class="plate time2"><div class="row1">DAY 3 <span>The Eastern Marches</span></div><div class="obj">Prepara una spedizione contro i goblin</div></div><div></div><div class="plate res"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div></div>
+<p class="note">Nessun pezzo nuovo: sotto data e regione, una riga in corsivo. Costa altezza alla lastra del tempo (le tre lastre devono restare alte uguali, H1) e la frase deve stare in una riga: massimo ~40 caratteri. Non cliccabile.</p>
+
+<h2>C · Un sigillo che si apre quando serve</h2>
+<div class="sea"><div class="plate menu"><b>MENU</b></div><div style="display:flex;align-items:flex-start;padding:20px 0 0 14px"><div class="seal">!</div></div><div class="plate time">DAY 3 <span>The Eastern Marches</span></div><div></div><div class="plate res"><div class="tile">15<small>GOLD</small></div><div class="tile ember">0 /20<small>FOOD</small></div><div class="tile">0<small>WOOD</small></div></div>
+<div class="tip"><div class="l">OBIETTIVO</div><div class="t">I goblin sbarcano tra 3 giorni: prepara una spedizione.</div></div></div>
+<p class="note">Un sigillo d'ottone accanto a MENU con l'anello che respira; il testo si apre al passaggio o al focus (tooltip HUD) e per 6 secondi quando cambia l'obiettivo. Quasi niente spazio, ma il testo non è sempre sotto gli occhi.</p>
+
+<h2>Che cosa dice (vale per tutte e tre)</h2>
+<table><tr><th>Ordine</th><th>Quando</th><th>Esempio</th></tr>
+<tr><td>1</td><td>Minaccia imminente (sbarco goblin entro N giorni)</td><td>«I goblin sbarcano tra 3 giorni: prepara una spedizione.»</td></tr>
+<tr><td>2</td><td>Cibo che finisce entro 5 giorni</td><td>«Il cibo basta per 4 giorni.»</td></tr>
+<tr><td>3</td><td>Una quest disponibile e non avviata</td><td>«Apri la quest: Sterminio dei goblin.»</td></tr>
+<tr><td>4</td><td>Nient'altro</td><td>il cartiglio non compare</td></tr></table>
+<p class="note">Una frase sola, al massimo ~50 caratteri, nessun conteggio che cambi a ogni tick (solo giorni interi). Si ricava dallo stato che c'è già: nessun nuovo dato da salvare.</p>
+</main></body></html>

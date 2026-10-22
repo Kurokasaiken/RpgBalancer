@@ -48,3 +48,18 @@ dietro») generava immagini che leggevano come arrivo.
   `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%);
   cover-fit, soggetto focale nella fascia verticale centrale.
 - Lint: `python scripts/lint-scene-prompts.py .mw/specs/quest-journey-legs/scenes/`
+
+## Stato integrazione (2026-10-23)
+
+Generazioni approvate dal Director e integrate nel runtime:
+
+- Asset: `public/assets/scene-library/viaggio-{andata,ritorno}.jpg`
+  (3168×1320, 2.4:1) + depth map `public/assets/depth/viaggio-{andata,ritorno}.webp`.
+- Manifest: `SCENE_CINEMATICS['viaggio-andata'|'viaggio-ritorno']` —
+  `enter-sweep`/`pose-rest`, focusAnchor, ambient FX (glow lanterna, embers,
+  fumi comignoli, dust, drift).
+- Wiring: `JOURNEY_LEG_ART` in `questArt.ts`; override in `QuestRunWindow` —
+  con coda beat drenata durante una fase di viaggio il teatro mostra l'art
+  di gamba (`quest-run-window.INV-6`, test `questRunWindow.journeyLegArt`).
+- La kill list ora include `NO signature/watermark/logo` (firma AI osservata
+  in basso nella prima generazione).

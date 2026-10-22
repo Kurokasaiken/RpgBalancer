@@ -1,0 +1,18 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import '../src/index.css';
+import '../src/ui/idleVillage/skins/skinScope.css';
+import { applySkinCssVariables } from '../src/ui/idleVillage/skins/skinCssVariables';
+import { resolveInitialSkinPresetId } from '../src/ui/idleVillage/skins/resolveInitialSkin';
+import { I18nProvider } from '../src/localization/I18nProvider';
+import { createRun } from '../src/ui/idleVillage/questS1Lab/questRun';
+import { GOBLIN_PRESETS } from '../src/ui/idleVillage/questS1Lab/questLabPresets';
+import { GOBLIN_SCENARIO } from '../src/balancing/config/idleVillage/quests/scenarios/goblin';
+import { QuestRewardPopup } from '../src/ui/idleVillage/components/gameFrame/QuestRewardPopup';
+import { stageExpeditionLost } from '../src/ui/idleVillage/components/gameFrame/expeditionLostStaging';
+applySkinCssVariables(resolveInitialSkinPresetId());
+const base = createRun(GOBLIN_PRESETS[0].id, 7, 'goblin');
+base.nowTick = 2 * 60 * 3 + 30;
+const run = stageExpeditionLost(base);
+run.party[1].dead = true; run.party[1].deadAtTick = 2 * 60 * 3 + 30;
+createRoot(document.getElementById('root')!).render(<I18nProvider><QuestRewardPopup run={run} scenario={GOBLIN_SCENARIO} widthPx={440} stageMs={50} onClose={() => {}} /></I18nProvider>);

@@ -1,4 +1,7 @@
-# Identity — Baldassarre (villager, warden)
+# Identity — Manno (villager, warden) — ex «Baldassarre»
+
+> R-268 (Director 2026-10-22): il display name in game è **Manno**;
+> resident id invariato `villager-baldassarre`.
 
 Motore di Unicità (V2 §10.1, compilato prima del prompt).
 **Ruling Director 2026-10-22:** vita quotidiana, NON in missione — niente

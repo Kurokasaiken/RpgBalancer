@@ -34,6 +34,8 @@ che possiamo riutilizzare è meglio riutilizzarlo»).
 | `saccheggio.jpg` | campo conquistato all'alba: forziere spaccato, monete, ambra + tende non perquisite + corde con campanelli | no | nessuna | camp-ruined, morning, loot, treasure, coins, gold, traps, unsearched-tents, no-people, no-goblins, aftermath-lite, generic | gob-esplora-extra, gob-cerca |
 | `agguato-foresta.jpg` | strada assolata nel bosco; arcieri goblin mezzi nascosti nella treeline | **sì — nascosti** | goblin (mezzi nascosti) | forest-road, sunlit, ambush, goblin-hidden, bows-drawn, trap-loaded | gob-agguato, gob-agguato-scelta, gob-ultimo-scontro |
 | `totem-goblin.jpg` | totem da guerra: maschera lignea verde, strisce ocra-cremisi, stracci cinabro | no (oggetto) | nessuna | totem, object, goblin-craft, card-cover, wide, no-people | QuestSelectScreen card «Sterminio dei goblin» |
+| `viaggio-andata.jpg` | cancello aperto del palisade all'alba visto da fuori: lanterna su palo, solchi che diventano sentiero verso foresta e vette; villaggio MAI in frame | no | nessuna | threshold, gate, palisade, dawn, departure, trail, peaks, no-people, no-goblins, generic | gamba andata journey (`JOURNEY_LEG_ART.andata`), viaggio (S1) |
+| `viaggio-ritorno.jpg` | strada che scende verso il villaggio in valle dorata al tramonto: sacello con lanterna e pini a destra, fumi dai camini | no | nessuna | return, valley, village-distant, sunset, shrine, road, golden-hour, no-people, no-goblins, generic | gamba ritorno journey (`JOURNEY_LEG_ART.ritorno`), ritorno (S1), gob-ritorno |
 
 ## Provenance
 
@@ -43,6 +45,13 @@ moodboard-library gate R8). Sorgenti: `~/Downloads/<nome>.jpeg`
 (`esplorazione`, `bottino`, `accampamento`, `combattimento`, `incalzare`,
 `spoglie`, `agguato`, `mercante`, `quest card`), ricodificati JPEG q85
 progressive a risoluzione piena 3168×1344.
+
+`viaggio-andata.jpg` / `viaggio-ritorno.jpg` derivano da generazioni AI del
+2026-10-23 (prompt in `.mw/specs/quest-journey-legs/scenes/<scena>/prompt.md`,
+formato scene-authoring R1–R7, anche in `prompt_library.md` §«Viaggio»).
+Sorgenti: `~/Downloads/andata.jpeg` (1408×768 → crop 2.4:1 + upscale
+3168×1320) e `~/Downloads/ritorno.jpeg` (1584×672 → crop 2.4:1 + upscale
+3168×1320), ricodificati JPEG q85 progressive.
 
 **Lavorazioni applicate**
 - `mercante-strada.jpg` ← `mercante.jpeg`: rimosso il testo «HAND
@@ -54,10 +63,6 @@ progressive a risoluzione piena 3168×1344.
   `object-position 50% 40%`) senza crop manuale.
 
 **Mancanti / pending**
-- `viaggio` (transito andata, copre `gob-inizio`) — non ancora generato;
-  `gob-inizio` resta sul placeholder public-domain `assegnazione.jpg`.
-- `ritorno` (transito ritorno, copre `gob-ritorno`/`gob-fine`) — non
-  ancora generato; `gob-ritorno` resta su `ritorno.jpg` public-domain.
 - Evento mercante: asset pronto (`mercante-strada.jpg`), nodo quest non
   ancora authored nello scenario.
 - **Stale rispetto al manoscritto v3 (Director 2026-10-18):** `carro-nascosto.jpg`

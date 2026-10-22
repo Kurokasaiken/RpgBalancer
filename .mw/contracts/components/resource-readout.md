@@ -6,6 +6,7 @@ tier: 2
 root_file: src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx
 scope_files:
   - src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx
+  - src/ui/idleVillage/components/gameFrame/useCountUp.ts
 fast_checks:
   - tests/unit/idleVillage/ResourceOutlook.test.tsx
   - tests/unit/idleVillage/resourceDeltaChip.test.tsx
@@ -45,6 +46,7 @@ Lastra top-right: gold/food/wood con icone incise e valori.
 ## Scope
 
 - `src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx`
+- `src/ui/idleVillage/components/gameFrame/useCountUp.ts`
 
 ## Decision history
 

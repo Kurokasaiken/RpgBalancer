@@ -22,7 +22,7 @@ import type { ResidentState } from '@/ui/idleVillage/types/gameplayTypes';
 
 const VILLAGERS = [
   { id: 'villager-lisetta', name: 'Lisetta' },
-  { id: 'villager-baldassarre', name: 'Baldassarre' },
+  { id: 'villager-baldassarre', name: 'Manno' },
 ];
 
 function seedDeadResidents() {

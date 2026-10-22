@@ -486,6 +486,14 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     });
 
     /* ── 9. Settlement → rapporto ───────────────────────────────────── */
+    /* R-260: `settled` lands at the report's dismissal — the hook invokes
+     *  the same commit callback the popup's «Collect» CTA calls. */
+    await page.evaluate((pid) => {
+      const exp = (window as HooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
+        | { commitSettlement?: () => Promise<unknown> }
+        | undefined;
+      return exp?.commitSettlement?.();
+    }, POI);
     await page.waitForFunction(
       (pid) => {
         const exp = (window as HooksWindow).__idleVillageTestHooks?.expedition?.[pid] as

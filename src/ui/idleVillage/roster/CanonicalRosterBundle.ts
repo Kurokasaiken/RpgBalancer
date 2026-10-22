@@ -23,9 +23,15 @@ import { deriveHpValues, useMinimalGameplayStore } from '@/store/useMinimalGamep
  * @param defaultFatigue - Default fatigue value for residents
  * @returns Array of ResidentState with full data integrity
  */
+/* R-265: the canonical dataset is static config — compute it once per
+ *  `defaultFatigue` instead of per render/caller (the conversion ran on every
+ *  consumer's store subscription and logged whole objects to the console —
+ *  measurable churn on the ticking /game surface). */
+const canonicalResidentCache = new Map<number, ResidentState[]>();
+
 export const canonicalResidentData = (defaultFatigue: number = 0): ResidentState[] => {
-  console.log('DEBUG: TEST_ROSTER_RESIDENTS.length:', TEST_ROSTER_RESIDENTS.length);
-  console.log('DEBUG: TEST_ROSTER_RESIDENTS:', TEST_ROSTER_RESIDENTS);
+  const cached = canonicalResidentCache.get(defaultFatigue);
+  if (cached) return cached;
 
   // Prefer seeded residents with full SavedCharacter schema (config-first)
   if (TEST_ROSTER_RESIDENTS.length > 0) {
@@ -64,13 +70,12 @@ export const canonicalResidentData = (defaultFatigue: number = 0): ResidentState
       }
     });
 
-    console.log(`Converted ${converted.length}/${TEST_ROSTER_RESIDENTS.length} residents successfully`, converted);
-    console.log('Available residents:', TEST_ROSTER_RESIDENTS.map(h => ({ id: h.id, name: h.name, status: h.status })));
+    canonicalResidentCache.set(defaultFatigue, converted);
     return converted;
   }
   
   // Legacy fallback from MINIMAL_GAMEPLAY_RESIDENTS
-  return MINIMAL_GAMEPLAY_RESIDENTS.map((definition, index) => {
+  const fallback = MINIMAL_GAMEPLAY_RESIDENTS.map((definition, index) => {
     const statSnapshot = { ...definition.stats };
     const fallbackHp = index === 0 ? 250 : 50;
     const fallbackResident = {
@@ -96,6 +101,8 @@ export const canonicalResidentData = (defaultFatigue: number = 0): ResidentState
       portraitUrl: getResidentPortraitUrl(fallbackResident),
     };
   });
+  canonicalResidentCache.set(defaultFatigue, fallback);
+  return fallback;
 };
 
 /**

@@ -120,6 +120,8 @@
     "harness:dispatch": "tsx scripts/harness/dispatch.ts",
     "bench:replay": "tsx scripts/benchmark/replay.ts",
     "bench:night": "tsx scripts/benchmark/nightrun.ts",
+    "sentinel:run": "tsx scripts/sentinel/runSentinel.ts",
+    "sentinel:run:live": "tsx scripts/sentinel/runSentinel.ts --live",
     "docs:impact": "tsx scripts/docsImpactCheck.ts",
     "buffer:refresh": "tsx scripts/coordinator/promptQuickBuffer.ts",
     "guardian:test": "NODE_OPTIONS=--require=./polyfill-crypto.cjs vitest run -c vitest.guardian.config.ts",
