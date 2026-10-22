@@ -846,6 +846,14 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
             data-layout-fallback={bodyOverflows ? 'body-scroll' : undefined}
             style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto', minHeight: 0 }}
           >
+            {/* POI-D (Director 2026-10-22): the image carries NO text. Title above it,
+             *  dispatch line below it; the three seals live in the right preview wing. */}
+            <h2
+              data-testid="quest-planner-title"
+              style={{ margin: 0, flexShrink: 0, fontFamily: FONT.display, fontSize: 17, lineHeight: 1.15, letterSpacing: '0.06em', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {title}
+            </h2>
             {/* HERO — the letterbox: art behind a scrim, title + dispatch
              *  on the lower edge, the three engraved seals, and the window
              *  controls. It is also the drag handle. */}
@@ -911,56 +919,56 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                   <X aria-hidden />
                 </button>
               </div>
-              {/* engraved seals — Danger / Reward / Duration (read-only) */}
-              <div
-                data-testid="quest-planner-seals"
-                style={{ position: 'absolute', top: 6, left: 8, right: 80, display: 'flex', flexWrap: 'wrap', gap: 6, animation: reducedMotion ? undefined : 'qed-seal-in 300ms ease-out 180ms both' }}
-              >
-                {dangerBand && (
-                  <EngravedSeal
-                    testId="quest-expedition-band"
-                    label={t('questExpedition.seals.danger')}
-                    value={t(stripNs(dangerBand.i18nKey))}
-                    icon="ico-target"
-                    tone="danger"
-                  />
-                )}
-                {rewardTier && resolved && (
-                  <EngravedSeal
-                    testId="quest-expedition-reward"
-                    label={t('questExpedition.seals.reward')}
-                    value={`${t(stripNs(rewardTier.i18nKey))} · ${resolved.resolvedOffer.rewardResolved}`}
-                    icon="ico-chest"
-                    tone="ok"
-                  />
-                )}
-                <EngravedSeal
-                  testId="quest-expedition-duration"
-                  label={t('questExpedition.seals.duration')}
-                  value={formatExpeditionSpan(durationDays, t)}
-                  hint={durationHint ? `${t('questExpedition.seals.duration')}: ${formatExpeditionSpan(durationDays, t)} — ${durationHint}` : undefined}
-                  delta={durationDelta !== 0 ? `${durationDelta > 0 ? '+' : ''}${durationDelta}d` : null}
-                  icon="ico-gust"
-                  tone={expeditionDuration.factor < 1 ? 'ok' : expeditionDuration.factor > 1 ? 'warn' : undefined}
-                />
-              </div>
-              {/* title + dispatch — lower edge of the letterbox */}
-              <div style={{ position: 'absolute', left: 10, right: 10, bottom: 6, minWidth: 0, animation: reducedMotion ? undefined : 'qed-fade-up 420ms ease-out 120ms both' }}>
-                <h2
-                  style={{ margin: 0, fontFamily: FONT.display, fontSize: 17, lineHeight: 1.15, letterSpacing: '0.06em', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                >
-                  {title}
-                </h2>
-                {dispatchLine && heroPx > LAYOUT.heroCompactPx && (
-                  <p
-                    data-testid="quest-planner-dispatch"
-                    style={{ margin: '2px 0 0', fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.3, color: TONE.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                  >
-                    {dispatchLine}
-                  </p>
-                )}
-              </div>
             </section>
+            {dispatchLine && heroPx > LAYOUT.heroCompactPx && (
+              <p
+                data-testid="quest-planner-dispatch"
+                style={{ margin: 0, flexShrink: 0, fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.3, color: TONE.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              >
+                {dispatchLine}
+              </p>
+            )}
+            {/* POI-D: the quest's primary then secondary key stats under the dispatch line —
+             *  icons only (the shared stat glyphs), the name is the accessible label, never text. */}
+            {!compact && keyTiers.primary.length > 0 && (
+              <div data-testid="quest-planner-key-stats" style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                {(
+                  [
+                    { tier: 'primary', stats: keyTiers.primary, size: 16 },
+                    { tier: 'secondary', stats: keyTiers.secondary, size: 13 },
+                  ] as const
+                ).map((group, gi) =>
+                  group.stats.length === 0 ? null : (
+                    <React.Fragment key={group.tier}>
+                      {gi > 0 && <span aria-hidden style={{ width: 1, height: 16, background: 'color-mix(in srgb, var(--skin-surface-border) 60%, transparent)' }} />}
+                      <span data-testid={`quest-planner-key-stats-${group.tier}`} style={{ display: 'inline-flex', gap: 5 }}>
+                        {group.stats.map((st) => {
+                          const covered = keyStatCovered(st);
+                          const Icon = getStatIconComponent(STAT_ICONS[st]) ?? lucideStatIcons.star;
+                          const name = t(`questExpedition.statName.${st}`);
+                          return (
+                            <span
+                              key={st}
+                              role="img"
+                              aria-label={`${t(`questExpedition.keyStats.${group.tier}`)}: ${name}`}
+                              title={name}
+                              data-covered={covered ? 'true' : 'false'}
+                              style={{
+                                display: 'inline-grid', placeItems: 'center', width: group.size + 12, height: group.size + 12, borderRadius: 999,
+                                border: `1px solid color-mix(in srgb, ${covered ? TONE.ok : 'var(--skin-surface-border)'} ${group.tier === 'primary' ? 75 : 45}%, transparent)`,
+                                color: covered ? TONE.ok : group.tier === 'primary' ? TONE.text : TONE.secondary,
+                              }}
+                            >
+                              {Icon && <Icon style={{ width: group.size, height: group.size }} aria-hidden />}
+                            </span>
+                          );
+                        })}
+                      </span>
+                    </React.Fragment>
+                  ),
+                )}
+              </div>
+            )}
 
             {/* BODY — rack + loadout + tray in ONE scroll region (compact /
              *  terminal fallback only; ≥720px renders fully inside). */}
@@ -1240,6 +1248,39 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
       >
         {/* Pinned head — title + aggregate + BY MEMBER (adjacent, TESTA→CODA). */}
         <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {/* engraved seals — Danger / Reward / Duration (read-only), now in the preview wing */}
+            <div
+              data-testid="quest-planner-seals"
+              style={{ display: 'flex', flexWrap: 'wrap', gap: 6, animation: reducedMotion ? undefined : 'qed-seal-in 300ms ease-out 180ms both' }}
+            >
+              {dangerBand && (
+                <EngravedSeal
+                  testId="quest-expedition-band"
+                  label={t('questExpedition.seals.danger')}
+                  value={t(stripNs(dangerBand.i18nKey))}
+                  icon="ico-target"
+                  tone="danger"
+                />
+              )}
+              {rewardTier && resolved && (
+                <EngravedSeal
+                  testId="quest-expedition-reward"
+                  label={t('questExpedition.seals.reward')}
+                  value={`${t(stripNs(rewardTier.i18nKey))} · ${resolved.resolvedOffer.rewardResolved}`}
+                  icon="ico-chest"
+                  tone="ok"
+                />
+              )}
+              <EngravedSeal
+                testId="quest-expedition-duration"
+                label={t('questExpedition.seals.duration')}
+                value={formatExpeditionSpan(durationDays, t)}
+                hint={durationHint ? `${t('questExpedition.seals.duration')}: ${formatExpeditionSpan(durationDays, t)} — ${durationHint}` : undefined}
+                delta={durationDelta !== 0 ? `${durationDelta > 0 ? '+' : ''}${durationDelta}d` : null}
+                icon="ico-gust"
+                tone={expeditionDuration.factor < 1 ? 'ok' : expeditionDuration.factor > 1 ? 'warn' : undefined}
+              />
+            </div>
           <span style={SECTION_LABEL}>{t('questExpedition.forecast.title')}</span>
           <div
             data-testid="quest-expedition-forecast"
