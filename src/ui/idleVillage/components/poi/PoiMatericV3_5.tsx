@@ -520,7 +520,12 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
         canvas.style.opacity = currentOp.toString();
       }
       drawRim(rimAngleCurrent, currentOp);
-      
+
+      /* Idle (no drag) and faded out: stop the loop instead of burning a frame per marker for ever. */
+      if (!isDragging && currentOp < 0.003) {
+        if (canvas) canvas.style.opacity = '0';
+        return;
+      }
       animationFrameId = requestAnimationFrame(animRim);
     };
 
@@ -985,7 +990,7 @@ const PoiMatericV3_5Inner: React.FC<PoiMatericV3_5Props> = ({
                       <path
                         data-testid="sigillo-sparkle"
                         d="M0 -5 L1 -1 L5 0 L1 1 L0 5 L-1 1 L-5 0 L-1 -1 Z"
-                        fill="#fff6dc"
+                        fill="var(--skin-poi-glint)"
                         opacity={0.95}
                         transform={`scale(${(g.star * 1.6).toFixed(2)})`}
                       />

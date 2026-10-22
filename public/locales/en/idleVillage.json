@@ -949,6 +949,12 @@
     },
     "questPoi": {
       "open": "{name} — open the quest",
+      "withState": "{name} — {state}",
+      "state": {
+        "in_progress": "expedition under way",
+        "completed": "expedition over, outcome to collect",
+        "failed": "expedition failed, outcome to collect"
+      },
       "decisionWaiting": "The expedition awaits your decision"
     },
     "questLog": {
