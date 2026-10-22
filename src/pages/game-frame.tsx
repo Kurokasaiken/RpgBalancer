@@ -31,6 +31,8 @@ import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { HudRecenterButton } from '@/ui/idleVillage/components/gameFrame/HudRecenterButton';
 import type { HudScaleControl } from '@/ui/idleVillage/components/gameFrame/hudScale';
+import { saveNowToManualSlot } from '@/ui/idleVillage/state/gameSaveService';
+import { useGameAutosave } from '@/ui/idleVillage/state/useGameAutosave';
 import { useTimeEngineLoop } from '@/ui/idleVillage/hooks/useTimeEngineLoop';
 
 /**
@@ -127,6 +129,10 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
   const availableSpeeds = [1, 2, 4, 8].filter((s) => s <= config.loop.maxSpeedMultiplier);
 
   // Time shortcuts: Space pauses or resumes, 1-4 pick the speed in order. The ref keeps one listener on the latest handlers.
+  /* PLAN-076: the autosave slot is refreshed on the config interval; «Salva ora» writes the whole game into a manual slot. */
+  const flushGameplay = () => gameplay.saveNow();
+  useGameAutosave({ intervalMs: config.loop.autosaveIntervalMs, getTick: () => state.currentTick, flush: flushGameplay, enabled: !captureMode && import.meta.env.MODE !== 'test' });
+
   const timeKeys = useRef({ onTogglePause, onSpeedChange, availableSpeeds, locked: timeInputLocked });
   useEffect(() => {
     timeKeys.current = { onTogglePause, onSpeedChange, availableSpeeds, locked: timeInputLocked };
@@ -160,7 +166,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
           <HudGameMenu
             visible={panels.visible}
             onTogglePanel={panels.toggle}
-            onSaveNow={() => gameplay.saveNow()}
+            onSaveNow={() => saveNowToManualSlot({ flush: flushGameplay })}
             scale={scaleControl}
             includeDev={devPanels}
           />
