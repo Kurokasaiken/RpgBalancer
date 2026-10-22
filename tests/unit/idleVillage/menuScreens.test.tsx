@@ -138,7 +138,7 @@ describe('useGameMenuFlow — Esci al titolo', () => {
     act(() => hook.result.current.menuProps.onQuit());
     expect(quitToTitle).not.toHaveBeenCalled();
     const { unmount } = render(<>{hook.result.current.screens}</>);
-    await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.quit.quitNoSave' }));
+    await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.quitConfirm.quitNoSave' }));
     expect(quitToTitle).toHaveBeenCalledOnce();
     expect((await listSaves(localIO)).every((r) => r.state === 'empty')).toBe(true);
     unmount();
@@ -154,7 +154,7 @@ describe('useGameMenuFlow — Esci al titolo', () => {
     expect(quitToTitle).not.toHaveBeenCalled();
     act(() => hook.result.current.menuProps.onQuit());
     render(<>{hook.result.current.screens}</>);
-    await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.quit.saveAndQuit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.quitConfirm.saveAndQuit' }));
     await waitFor(() => expect(quitToTitle).toHaveBeenCalledOnce());
     expect(flush).toHaveBeenCalled();
     expect((await listSaves(localIO)).find((r) => r.slot === 'slot-1')?.state).toBe('ok');

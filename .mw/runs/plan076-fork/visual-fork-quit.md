@@ -37,4 +37,5 @@ Matrice completa: `src/docs/docs/game_surface_audit/F8_menu_carica_impostazioni_
 
 ## Ledger
 - amendments: nessuno
-- incidental_deviations: (compilare a chiusura)
+- incidental_deviations (dichiarate a chiusura, nessuna tocca un asse compilato come materiale): Il caso «salvato» non mostra dialogo (esce subito, come da QUIT-1 B); solo il dialogo del caso «modificato» ha una lastra, centrata anziché accanto alla voce.
+- evidenza: `.mw/runs/plan076-witness/side-by-side.png`

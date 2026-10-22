@@ -1135,7 +1135,7 @@
         "reset": "Restore defaults",
         "appliesNow": "Changes apply immediately."
       },
-      "quit": {
+      "quitConfirm": {
         "title": "Return to the title screen?",
         "lastSaved": "Last save: {when}.",
         "neverSaved": "This game has not been saved yet.",
