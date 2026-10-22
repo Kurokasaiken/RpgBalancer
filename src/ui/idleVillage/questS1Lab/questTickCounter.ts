@@ -38,3 +38,32 @@ export function questRunTimeLabel(
     },
   };
 }
+
+/**
+ * PLAN-067 T-B3 (R-234, QW-1 = B) — the quest bar is REAL time on a scale that stretches.
+ *
+ *   progress = elapsed / max(declared, elapsed + remaining)
+ *
+ * The bar is never full before the run ends (capped just under 1 until `ended`), and a run that
+ * outlives its estimate does not jump back: the scale grows with the time still to play. Once the
+ * declared estimate is passed, `overrunFrom` is where it sits on the bar — the part beyond it is the
+ * overrun, drawn in ember.
+ */
+export interface TimeBarModel {
+  progress: number;
+  /** Position (0..1) of the declared estimate on the bar, only once the run has outlived it. */
+  overrunFrom?: number;
+}
+export const TIMEBAR_NOT_FULL = 0.99;
+export function timeBarModel(
+  halo: Pick<QuestHaloProgress, 'elapsedTicks' | 'durationTicks'>,
+  run: { ended: boolean },
+  remainingTicks: number,
+): TimeBarModel {
+  const elapsed = Math.max(0, halo.elapsedTicks);
+  const declared = Math.max(1, halo.durationTicks);
+  const scale = Math.max(declared, elapsed + Math.max(1, remainingTicks));
+  const overrun = elapsed > declared ? { overrunFrom: declared / scale } : {};
+  if (run.ended) return { progress: 1, ...overrun };
+  return { progress: Math.min(TIMEBAR_NOT_FULL, elapsed / scale), ...overrun };
+}

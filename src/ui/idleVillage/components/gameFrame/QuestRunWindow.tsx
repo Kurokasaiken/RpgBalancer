@@ -87,7 +87,7 @@ const VERDICT_TONE: Record<Verdict, 'ok' | 'warn' | 'danger'> = { bigwin: 'ok', 
 /** One glyph per authored phase (index = node `beat`). */
 const PHASE_ICONS: EngravedIconId[] = ['ico-scroll', 'evt-expedition', 'ico-pouch', 'ico-axe', 'evt-combat', 'ico-gust', 'ico-chest', 'nav-village'];
 
-const OUTCOME_TONE: Record<PhaseOutcome, keyof typeof TONE> = { death: 'death', hurt: 'warn', loot: 'label', clean: 'ok' };
+const OUTCOME_TONE: Record<PhaseOutcome, keyof typeof TONE> = { death: 'death', hurt: 'warn', loot: 'label', clean: 'label' };
 
 /** Shared "no items armed" set — the previews' consumable-free baseline. */
 const NO_ARMED: ReadonlySet<string> = new Set();
@@ -129,7 +129,7 @@ export interface QuestRunWindowProps {
   /** Scene art for a node id. */
   artFor: (nodeId: string) => string | undefined;
   /** 0..1 of the expedition's time on the game clock, plus its readout. */
-  time: { progress: number; label: string };
+  time: { progress: number; label: string; overrunFrom?: number };
   onChoose: (optionId: string) => void;
   /** R-199: current game-clock tick — gates options on the frontier's
    *  `readyAt` (a phase is visible the whole time but committable only once
@@ -1678,13 +1678,21 @@ const Theater: React.FC<{
   );
 };
 
-const TimeBar: React.FC<{ progress: number; label: string; phase: string; checkpoints?: TimeBarCheckpoint[] }> = ({
+export const TimeBar: React.FC<{ progress: number; label: string; phase: string; checkpoints?: TimeBarCheckpoint[]; overrunFrom?: number }> = ({
   progress,
   label,
   phase,
   checkpoints = [],
 }) => {
-  const pct = Math.round(Math.min(1, Math.max(0, progress)) * 100);
+  /* QW-1 = B (R-234): the bar never goes backwards. The scale can stretch under it, but what is
+   * already shown stays shown — only a finished run (1) or a new run resets it. */
+  const shown = useRef(0);
+  const next = Math.min(1, Math.max(0, progress));
+  shown.current = next >= 1 ? 1 : Math.max(shown.current, next);
+  const pct = Math.round(shown.current * 100);
+  /* Checkpoints sit on the real phase boundaries of the DECLARED estimate; once the run outlives it
+   * they compress to the left of the ember overrun. */
+  const spread = overrunFrom !== undefined ? overrunFrom : 1;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <div
@@ -1696,6 +1704,7 @@ const TimeBar: React.FC<{ progress: number; label: string; phase: string; checkp
         style={{ position: 'relative', height: 6, borderRadius: 3, overflow: 'visible', background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 85%, transparent)', border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)' }}
       >
         <div style={{ position: 'absolute', inset: 0, borderRadius: 2, overflow: 'hidden' }}>
+  overrunFrom,
           <div
             style={{
               position: 'absolute',
@@ -1717,8 +1726,22 @@ const TimeBar: React.FC<{ progress: number; label: string; phase: string; checkp
             aria-label={cp.label}
             style={{
               position: 'absolute',
-              left: `${Math.min(100, Math.max(0, cp.fraction * 100))}%`,
+              left: `${Math.min(100, Math.max(0, cp.fraction * spread * 100))}%`,
               top: -2,
+          {overrunFrom !== undefined && (
+            <div
+              data-testid="quest-timebar-overrun"
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: `${overrunFrom * 100}%`,
+                right: 0,
+                background: 'repeating-linear-gradient(135deg, color-mix(in srgb, var(--skin-event-danger) 85%, transparent) 0 4px, color-mix(in srgb, var(--skin-event-danger) 45%, var(--skin-hud-lacquer-deep)) 4px 8px)',
+              }}
+            />
+          )}
               bottom: -2,
               width: 2,
               transform: 'translateX(-50%)',
@@ -1749,7 +1772,7 @@ const tileBox = (borderTone: string, current: boolean): CSSProperties => ({
   boxShadow: current ? '0 0 10px color-mix(in srgb, var(--skin-title-color) 45%, transparent)' : undefined,
 });
 
-const PhaseTile: React.FC<{ phase: PhaseRecord; name: string; current: boolean; run: QuestRunState; tooltipLines: number }> = ({ phase, name, current, run, tooltipLines }) => {
+export const PhaseTile: React.FC<{ phase: PhaseRecord; name: string; current: boolean; run: QuestRunState; tooltipLines: number }> = ({ phase, name, current, run, tooltipLines }) => {
   const { t } = useTranslation('idleVillage');
   const iconId = PHASE_ICONS[phase.beat] ?? 'cmd-help';
   const outcome = phaseOutcome(phase);
@@ -1782,7 +1805,6 @@ const PhaseTile: React.FC<{ phase: PhaseRecord; name: string; current: boolean; 
             style={{ ...tileBox(current ? 'var(--skin-title-color)' : `color-mix(in srgb, ${tone} 60%, transparent)`, current), position: 'relative', padding: 0, cursor: 'help', color: current ? 'var(--skin-title-color)' : tone }}
           >
             <EngravedIcon id={iconId} size={18} />
-            {played && outcome === 'clean' && <EngravedIcon id="role-bodyguard" size={12} style={{ position: 'absolute', right: 2, bottom: 2, color: TONE.ok }} />}
             {outcome === 'death' && <EngravedIcon id="status-fallen" size={12} style={{ position: 'absolute', right: 2, bottom: 2, color: toneText('death') }} />}
           </button>
         </Tooltip.Trigger>
@@ -1898,7 +1920,7 @@ const QuestWindowFooter: React.FC<{
   phases: PhaseRecord[];
   beats: readonly string[];
   currentBeat: number;
-  time: { progress: number; label: string };
+  time: { progress: number; label: string; overrunFrom?: number };
   /** POI `estimatedDurationTicks` for the journey `~Nd` svolgimento bar. */
   journeySvolgimentoTicks?: number;
   tooltipLines: number;
@@ -1948,6 +1970,7 @@ const QuestWindowFooter: React.FC<{
           <QuestJourneyPhaseStrip run={run} svolgimentoEstimateTicks={journeySvolgimentoTicks} />
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
             <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', gap: 6, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
+            overrunFrom={time.overrunFrom}
               {phases.map((phase, i) => (
                 <PhaseTile
                   key={`${phase.beat}-${i}`}
