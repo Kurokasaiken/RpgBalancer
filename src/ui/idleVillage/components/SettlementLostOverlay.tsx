@@ -15,6 +15,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
@@ -117,7 +118,7 @@ export const SettlementLostOverlay: React.FC = () => {
 
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 90, pointerEvents: 'auto' }}
+      style={{ position: 'fixed', inset: 0, zIndex: DEFAULT_GAME_FRAME_CONFIG.zLayers.settlementLost, pointerEvents: 'auto' }}
       data-testid="settlement-lost-overlay"
     >
       <OxidizedGradeFilter />
