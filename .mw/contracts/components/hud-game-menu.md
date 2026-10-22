@@ -27,6 +27,12 @@ invariants:
       chiama il suo gestore; senza gestore restano disabilitate
     test_refs:
       - tests/unit/idleVillage/hudGameMenu.test.tsx
+  - id: R-234-hud-menu-centered
+    source: director-bug
+    source_ref: R-234
+    statement: The MENU plaque fills the top row height and centres its button (HUD-2 = H1)
+    test_refs:
+      - tests/unit/idleVillage/hudGameMenu.centered.test.tsx
 ---
 # hud-game-menu
 
