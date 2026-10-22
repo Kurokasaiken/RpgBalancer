@@ -18,25 +18,22 @@ const ITEM_ICON_TO_ENGRAVED: Record<string, EngravedIconId> = {
   flag: 'ico-banner',
 };
 
-/** The emoji fallback keeps the catalog's own face when no engraved glyph exists. */
-const isEmoji = (icon: string): boolean => /\p{Extended_Pictographic}/u.test(icon);
+/** The catalog's emoji literals → the same engraved set (INV-1 = B, R-234): one item wears one engraved
+ *  glyph in the tray tile, the stash row and the merchant row — never a coloured emoji. */
+const EMOJI_TO_ENGRAVED: Record<string, EngravedIconId> = {
+  '🐎': 'ico-banner',
+  '🗡️': 'ico-axe',
+  '🛡️': 'ico-grapnel',
+  '🚩': 'ico-banner',
+  '🧪': 'ico-vial',
+  '🪙': 'ico-chest',
+};
 
 /**
  * One item icon for a stash row — decorative (the row's name carries the
  * meaning), tinted by the container's `currentColor` like every HUD glyph.
  */
 export const VillageStashItemIcon: React.FC<{ icon?: string; size?: number }> = ({ icon, size = 18 }) => {
-  if (!icon) return <EngravedIcon id="ico-pouch" size={size} />;
-  const engraved = ITEM_ICON_TO_ENGRAVED[icon];
-  if (engraved) return <EngravedIcon id={engraved} size={size} />;
-  if (isEmoji(icon)) {
-    return (
-      <span aria-hidden="true" style={{ fontSize: size, lineHeight: 1, width: size, textAlign: 'center' }}>
-        {icon}
-      </span>
-    );
-  }
-  return <EngravedIcon id="ico-pouch" size={size} />;
+  const id = (icon && (ITEM_ICON_TO_ENGRAVED[icon] ?? EMOJI_TO_ENGRAVED[icon])) || 'ico-pouch';
+  return <EngravedIcon id={id} size={size} />;
 };
-
-export default VillageStashItemIcon;
