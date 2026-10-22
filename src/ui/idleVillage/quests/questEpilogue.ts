@@ -114,8 +114,20 @@ export function buildQuestEpilogue(
   const grantOk = (g: { requiresFlag?: string; requiresOutcome?: readonly string[] }) =>
     (!g.requiresOutcome || g.requiresOutcome.includes(run.outcome)) &&
     (!g.requiresFlag || run.flags.includes(g.requiresFlag));
-  const grants = (list?: { label: string; requiresFlag?: string; requiresOutcome?: readonly ('reward' | 'survived' | 'fled' | 'wipe')[] }[]) =>
-    (list ?? []).filter(grantOk).map((g) => ({ text: g.label }));
+  const alive = run.party.filter((m) => !m.dead);
+  const recipientsOf = (r?: 'leader' | 'survivors' | 'wounded') => {
+    if (r === 'leader') return run.party.filter((m) => m.role === 'leader' && !m.dead);
+    if (r === 'survivors') return alive;
+    if (r === 'wounded') return alive.filter((m) => m.wounded);
+    return undefined;
+  };
+  /* T-C6: a grant with a recipient becomes one line per person (carrying `memberId`); without
+   * one it stays a party line. */
+  const grants = (list?: { label: string; recipient?: 'leader' | 'survivors' | 'wounded'; requiresFlag?: string; requiresOutcome?: readonly ('reward' | 'survived' | 'fled' | 'wipe')[] }[]): EpilogueLine[] =>
+    (list ?? []).filter(grantOk).flatMap((g) => {
+      const people = recipientsOf(g.recipient);
+      return people ? people.map((m) => ({ text: g.label, memberId: m.id })) : [{ text: g.label }];
+    });
 
   const sections: Record<EpilogueSectionId, EpilogueLine[]> = {
     dead,
