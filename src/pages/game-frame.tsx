@@ -15,7 +15,6 @@ import {
   HudPanelsMenu,
   useHudPanels,
   type HudPanelsApi,
-  type HudSkinControl,
   ResourceReadout,
   WhenWhereCluster,
 } from '@/ui/idleVillage/components/gameFrame';
@@ -58,8 +57,6 @@ export interface GameFrameScreenProps {
   panels?: HudPanelsApi;
   /** Offer the dev-only panels in the Panels menu. */
   devPanels?: boolean;
-  /** Live skin selector inside the game menu (the page owns the preset state). Omit to hide the row. */
-  skinControl?: HudSkinControl;
   /** Interface size (desktop app only). */
   scaleControl?: HudScaleControl;
   /** Bump to call the HUD chrome back on the game's behalf (event wake). */
@@ -81,7 +78,7 @@ export interface GameFrameScreenProps {
   stageMode?: boolean;
 }
 
-export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, fixtureEvents: withFixtures = true, objective, panels: panelsProp, devPanels = false, skinControl, scaleControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange, activeNavId: activeNavIdProp, onNavSelect: onNavSelectProp, stageMode = false }: GameFrameScreenProps) {
+export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvents, fixtureEvents: withFixtures = true, objective, panels: panelsProp, devPanels = false, scaleControl, hudWakeSignal, timeInputLocked = false, onHudHiddenChange, activeNavId: activeNavIdProp, onNavSelect: onNavSelectProp, stageMode = false }: GameFrameScreenProps) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
@@ -164,7 +161,6 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
             visible={panels.visible}
             onTogglePanel={panels.toggle}
             onSaveNow={() => gameplay.saveNow()}
-            skin={skinControl}
             scale={scaleControl}
             includeDev={devPanels}
           />

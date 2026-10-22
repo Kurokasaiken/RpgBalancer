@@ -9,7 +9,7 @@ export { HudGlyph, HUD_ICONS, type HudGlyphProps, type HudIconId } from './hudIc
 export { DirectorPanel, type DirectorPanelProps, type DirectorAction } from './DirectorPanel';
 export { HudPanelsMenu, type HudPanelsMenuProps } from './HudPanelsMenu';
 export { HudHideToggle, type HudHideToggleProps } from './HudHideToggle';
-export { HudGameMenu, type HudGameMenuProps, type HudSkinControl } from './HudGameMenu';
+export { HudGameMenu, type HudGameMenuProps } from './HudGameMenu';
 export { useHudPanels, type HudPanelId, type HudPanelsApi } from './useHudPanels';
 export { usePanelWhileOpen } from './usePanelWhileOpen';
 export { HUD_PANELS } from './hudPanelRegistry';
