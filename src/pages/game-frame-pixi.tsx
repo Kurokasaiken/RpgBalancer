@@ -28,7 +28,7 @@ import { RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/i
 import { useQuestPoiSession } from '@/ui/idleVillage/quests/useQuestPoiSession';
 import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfaceEventShroud';
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
-import { questRunTimeLabel } from '@/ui/idleVillage/questS1Lab/questTickCounter';
+import { questRunTimeLabel, timeBarModel } from '@/ui/idleVillage/questS1Lab/questTickCounter';
 import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLostOverlay';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
@@ -39,7 +39,7 @@ import { isPoiConsumed, poiConsumesOnReportClose, QUEST_HALO_RENDER_MS, QUEST_HA
 import { useQuestExpeditionSession } from '@/ui/idleVillage/quests/useQuestExpeditionSession';
 import { composeRosterCompatibility } from '@/ui/idleVillage/quests/rosterCompatibility';
 import { scenarioForQuest } from '@/ui/idleVillage/questS1Lab/questOffer';
-import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
+import { questHaloProgress, questRemainingTicks } from '@/ui/idleVillage/questS1Lab/questSchedule';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 // GameFrame is a fresh, not-yet-kitted composition (R-075).
 // eslint-disable-next-line no-restricted-imports
@@ -998,7 +998,9 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
        *  "110/110 TICKS" — saturated and ambiguous. Days while marching,
        *  a named awaiting state at saturation, outcome when resolved. */
       const { key, params } = questRunTimeLabel(halo, run, dayLengthTicks);
-      return { progress: halo.fraction, label: t(key, params) };
+      /* QW-1 = B (R-234): real time on a stretching scale — never full before the end. */
+      const model = timeBarModel(halo, run, questRemainingTicks(run, activePoi));
+      return { progress: model.progress, overrunFrom: model.overrunFrom, label: t(key, params) };
     }
     const span = questWindow.durationDays * dayLengthTicks;
     const elapsed = Math.max(0, currentTick - (run?.launchedAtTick ?? 0));

@@ -66,8 +66,16 @@ invariants:
     statement: >-
       R-241 B1a: il percorso CHECK:<id> spingeva il check node in visitedNodes senza log NODE — invariante visita↔NODE
       violata
-    test_refs: 
+    test_refs:
       - tests/unit/idleVillage/questS1Lab/beatSequencer.test.ts
+  - id: R-234-timebar-real-time
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      Quest bar = real time on a stretching scale: never full before the end, monotone, ember from the declared
+      estimate, seals without tick or green (QW-1 = B, I1)
+    test_refs:
+      - tests/unit/idleVillage/questTimeBar.test.tsx
 ---
 # quest-run
 

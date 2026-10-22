@@ -57,6 +57,22 @@ export function questDurationTicks(state: QuestRunState, poi: QuestPoi): number 
   return Math.max(poi.estimatedDurationTicks * paceFactor, timedVisited * nodeTicks);
 }
 
+/**
+ * Ticks still to play, for the quest bar's stretching scale (PLAN-067 T-B3): the nodes the
+ * authored path expects (`estimatedDurationTicks / ticksPerNode`) minus the timed nodes already
+ * visited, at the run's own pace; always at least one node (the run is not over until it lands).
+ */
+export function questRemainingTicks(state: QuestRunState, poi: QuestPoi): number {
+  const nodeTicks = state.nodeTicks || poi.ticksPerNode;
+  const nodes = nodesFor(state);
+  const timedVisited = state.visitedNodes.filter((id) => {
+    const n = nodes[id];
+    return !(n?.kind === 'choice' && n.immediate);
+  }).length;
+  const expected = Math.max(1, Math.round(poi.estimatedDurationTicks / Math.max(1, poi.ticksPerNode)));
+  return nodeTicks * Math.max(1, expected - timedVisited);
+}
+
 /** Declared halo states (critica r1): `filling` while elapsed < duration;
  *  `pieno-in-attesa` when the bar is full but the run has not landed on an
  *  `end` node yet — a full halo is NOT a concluded quest; `concluso` only
