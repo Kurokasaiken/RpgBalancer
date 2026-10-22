@@ -4,6 +4,7 @@
  * callbacks plus the screens to render.
  */
 import { useState, type ReactNode } from 'react';
+import { MemorialPanel } from './MemorialPanel';
 import { useTranslation } from 'react-i18next';
 import { LoadGamePanel } from './LoadGamePanel';
 import { SettingsPanel } from './SettingsPanel';
@@ -21,13 +22,13 @@ export interface UseGameMenuFlowOptions {
 }
 
 export interface GameMenuFlow {
-  menuProps: { onLoadGame: () => void; onOpenSettings: () => void; onQuit: () => void };
+  menuProps: { onLoadGame: () => void; onOpenSettings: () => void; onOpenMemorial: () => void; onQuit: () => void };
   screens: ReactNode;
 }
 
 export function useGameMenuFlow({ currentTick, currentDay, flush, scale }: UseGameMenuFlowOptions): GameMenuFlow {
   const { t, i18n } = useTranslation('idleVillage');
-  const [screen, setScreen] = useState<'load' | 'settings' | 'quit' | null>(null);
+  const [screen, setScreen] = useState<'load' | 'settings' | 'quit' | 'memorial' | null>(null);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
   const unsaved = hasUnsavedProgress(currentTick);
@@ -59,6 +60,7 @@ export function useGameMenuFlow({ currentTick, currentDay, flush, scale }: UseGa
         window.location.reload();
       }} />}
       {screen === 'settings' && <SettingsPanel onClose={close} scale={scale} />}
+      {screen === 'memorial' && <MemorialPanel onClose={close} />}
       {screen === 'quit' && (
         <GameMenuConfirm
           title={t('gameFrame.menu.quitConfirm.title')}
@@ -78,5 +80,5 @@ export function useGameMenuFlow({ currentTick, currentDay, flush, scale }: UseGa
     </>
   );
 
-  return { menuProps: { onLoadGame: () => setScreen('load'), onOpenSettings: () => setScreen('settings'), onQuit }, screens };
+  return { menuProps: { onLoadGame: () => setScreen('load'), onOpenSettings: () => setScreen('settings'), onOpenMemorial: () => setScreen('memorial'), onQuit }, screens };
 }

@@ -1106,6 +1106,11 @@
       }
     },
     "menu": {
+      "memorial": "Memoriale…",
+      "memorialTitle": "Memoriale",
+      "memorialEmpty": "Nessun caduto finora.",
+      "memorialLevel": "livello {level}",
+      "memorialDay": "giorno {day}",
       "title": "Menu",
       "session": "Partita",
       "options": "Opzioni",

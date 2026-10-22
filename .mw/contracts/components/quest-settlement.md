@@ -35,8 +35,15 @@ invariants:
       gold/xp dal piano congelato.
     test_refs:
       - tests/unit/idleVillage/quests/questSettlement.test.ts
+  - id: R-234-memorial-per-death
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      Every death of a run writes one entry to the memorial (name, level, place, day), idempotent per run:effect key;
+      the fallen do not vanish without a trace (DEATH-1 = B)
+    test_refs:
+      - tests/unit/idleVillage/memorialHall.test.ts
 ---
-
 # quest-settlement
 
 Unità `shared-kernel` (tier 1, kernel) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/quests/questSettlement.ts`.

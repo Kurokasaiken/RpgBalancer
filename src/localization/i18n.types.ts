@@ -513,6 +513,11 @@ export default interface Resources {
         "body": "A goblin host arrives in {count} days."
       },
       "menu": {
+        "memorial": "Memorial…",
+        "memorialTitle": "Memorial",
+        "memorialEmpty": "No one has fallen yet.",
+        "memorialLevel": "level {level}",
+        "memorialDay": "day {day}",
         "comingSoon": "Not available yet",
         "interfaceSize": "Interface size",
         "interfaceSizeAuto": "Auto",

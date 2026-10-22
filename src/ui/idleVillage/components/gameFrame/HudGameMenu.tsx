@@ -21,6 +21,8 @@ export interface HudGameMenuProps {
   onLoadGame?: () => void;
   /** Open the full settings screen. Omitted = row disabled. */
   onOpenSettings?: () => void;
+  /** Open the Memoriale — the log of the fallen (PLAN-067 T-C5). Omitted = row disabled. */
+  onOpenMemorial?: () => void;
   /** Leave to the title screen. Omitted = row disabled. */
   onQuit?: () => void;
   /** Offer the dev-only panels (Director, Tuning). Off in a production build. */
@@ -42,7 +44,7 @@ const MENU_LOCALES: readonly SupportedLocale[] = ['en', 'it-IT'];
  * today (panel toggles, manual save, language and skin choice) plus the disabled
  * entries (Load, Settings, Quit) that open their screens (PLAN-076).
  */
-export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGame, onOpenSettings, onQuit, includeDev = false }: HudGameMenuProps) {
+export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGame, onOpenSettings, onOpenMemorial, onQuit, includeDev = false }: HudGameMenuProps) {
   const { t } = useTranslation('idleVillage');
   const { locale, setLocale } = useLocalization();
   const [open, setOpen] = useState(false);
@@ -159,6 +161,9 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
           </button>
           <button type="button" role="menuitem" {...entryProps(onLoadGame)}>
             <span>{t('gameFrame.menu.loadGame')}</span>
+          </button>
+          <button type="button" role="menuitem" {...entryProps(onOpenMemorial)}>
+            <span>{t('gameFrame.menu.memorial')}</span>
           </button>
           <button type="button" role="menuitem" {...entryProps(onQuit)}>
             <span>{t('gameFrame.menu.quit')}</span>

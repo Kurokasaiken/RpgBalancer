@@ -1100,6 +1100,11 @@
       }
     },
     "menu": {
+      "memorial": "Memorial…",
+      "memorialTitle": "Memorial",
+      "memorialEmpty": "No one has fallen yet.",
+      "memorialLevel": "level {level}",
+      "memorialDay": "day {day}",
       "title": "Menu",
       "session": "Session",
       "options": "Options",
