@@ -9,9 +9,14 @@ scope_files:
 fast_checks: []
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: R-234-panels-no-badge
+    source: director-bug
+    source_ref: R-234
+    statement: The Panels button carries no hidden-panels badge (DN-2)
+    test_refs:
+      - tests/unit/idleVillage/hudPanelsMenu.noBadge.test.tsx
 ---
-
 # hud-panels-menu
 
 Unità `ui-component` (tier 2, default) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/components/gameFrame/HudPanelsMenu.tsx`.

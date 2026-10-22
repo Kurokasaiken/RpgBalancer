@@ -38,7 +38,6 @@ export function HudPanelsMenu({ visible, onToggle, includeDev = false }: HudPane
   }, [open]);
 
   const ids = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => isHudPanelListed(id) && (includeDev || !HUD_PANEL_DEV_ONLY.has(id)));
-  const hiddenCount = ids.filter((id) => !visible[id]).length;
   return (
     <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>
       {open && (
@@ -76,14 +75,9 @@ export function HudPanelsMenu({ visible, onToggle, includeDev = false }: HudPane
           aria-label={t('gameFrame.panels.title')}
           data-hud-panels-trigger=""
           onClick={() => setOpen((v) => !v)}
-          style={{ width: 40, height: 40, position: 'relative' }}
+          style={{ width: 40, height: 40 }}
         >
           <EngravedIcon id="cmd-panels" />
-          {hiddenCount > 0 && (
-            <span aria-hidden="true" data-badge="" style={{ position: 'absolute', top: -4, right: -4, minWidth: 16, height: 16, padding: '0 4px', borderRadius: 8, font: '700 12px/16px var(--skin-font-display)', textAlign: 'center', background: 'var(--skin-label-primary)', color: 'var(--skin-surface-base)' }}>
-              {hiddenCount}
-            </span>
-          )}
         </button>
       </HudTooltip>
     </div>
