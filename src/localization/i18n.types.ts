@@ -488,7 +488,11 @@ export default interface Resources {
         }
       },
       "heroLevel": {
-        "a11y": "Level {n} hero",
+        "a11y": "Level {n,
+        "ceremonyTitle": "{name} reaches level {level}",
+        "continue": "Continue",
+        "hp": "Hit points"
+      } hero",
         "badge": "Lv {n}",
         "floater": "Level {n}"
       },

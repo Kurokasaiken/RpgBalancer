@@ -189,7 +189,7 @@ describe('runHeroLevelUpStaging', () => {
     expect(res.dispatchedTargets).toEqual(['hero-a', 'hero-b']);
     expect(events.map((e) => e.residentId)).toEqual(['hero-a', 'hero-b']);
     expect(events.map((e) => e.eventId)).toEqual(['1:0', '1:1']);
-    expect(events[0].level).toBe(3);
+    expect(events[0].level).toBe(4); // T-C1 (R-234): the event carries the NEW level (authored 3 + 1)
     expect(telemetrySpy).toHaveBeenCalledTimes(1);
     expect(telemetrySpy).toHaveBeenCalledWith('feature_action', {
       action: 'hero_levelup_mock',

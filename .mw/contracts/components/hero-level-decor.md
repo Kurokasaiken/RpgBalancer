@@ -19,6 +19,24 @@ invariants:
       ritratto (PLAN-067 T-A6)
     test_refs:
       - tests/unit/idleVillage/heroLevelDecor.nameClear.test.tsx
+  - id: R-234-levelup-rises
+    source: director-bug
+    source_ref: R-234
+    statement: The Director level-up raises the shown hero level by one (mock, in memory), 4 to 5
+    test_refs:
+      - tests/unit/idleVillage/heroLevelCeremony.test.tsx
+  - id: R-234-levelup-ceremony
+    source: director-bug
+    source_ref: R-234
+    statement: One plate per hero with the roman numeral seal and the real gains from config; continue closes it (LVL = B)
+    test_refs:
+      - tests/unit/idleVillage/heroLevelCeremony.test.tsx
+  - id: R-234-levelup-opens-roster
+    source: director-bug
+    source_ref: R-234
+    statement: 'A rejected first try opens the roster and retries until a card mounts: the Director level-up never fails silently'
+    test_refs:
+      - tests/unit/idleVillage/heroLevelCeremony.test.tsx
 ---
 # hero-level-decor
 

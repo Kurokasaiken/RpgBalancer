@@ -1346,7 +1346,10 @@
     "heroLevel": {
       "badge": "Lv {n}",
       "floater": "Livello {n}",
-      "a11y": "Eroe livello {n}"
+      "a11y": "Eroe livello {n}",
+      "ceremonyTitle": "{name} sale al livello {level}",
+      "hp": "Punti vita",
+      "continue": "Prosegui"
     },
     "village": {
       "ariaLabel": "Villaggio — edifici",

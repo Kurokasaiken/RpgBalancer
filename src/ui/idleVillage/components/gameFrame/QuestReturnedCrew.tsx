@@ -22,7 +22,7 @@ const stateOf = (m: RuntimeMember): CrewState => (m.dead ? 'fallen' : m.wounded 
 const FONT = { display: 'var(--skin-font-display)', serif: 'var(--skin-font-serif)' } as const;
 const BORDER: Record<CrewState, string> = {
   returned: 'var(--skin-hud-brass-hi)',
-  wounded: 'color-mix(in srgb, #a11d33 80%, var(--skin-hud-brass-hi))',
+  wounded: 'color-mix(in srgb, var(--skin-status-wound) 80%, var(--skin-hud-brass-hi))',
   fallen: 'var(--skin-state-fallen)',
 };
 
@@ -53,7 +53,7 @@ const Niche: React.FC<{ member: RuntimeMember; titles: string[]; diseases: strin
               position: 'relative', width: '100%', height: 96, borderRadius: '44px 44px 8px 8px', overflow: 'hidden',
               border: `1.5px solid ${BORDER[state]}`,
               background: 'linear-gradient(180deg, var(--skin-hud-lacquer-base), var(--skin-hud-lacquer-deep))',
-              boxShadow: 'inset 0 0 0 3px var(--skin-hud-lacquer-deep), 0 6px 14px rgba(0,0,0,.5)',
+              boxShadow: 'inset 0 0 0 3px var(--skin-hud-lacquer-deep), 0 6px 14px var(--skin-hud-lacquer-deep)',
             }}
           >
             <span
@@ -82,7 +82,7 @@ const Niche: React.FC<{ member: RuntimeMember; titles: string[]; diseases: strin
           <span style={{ font: `600 13px/1.15 ${FONT.display}`, letterSpacing: '0.04em', color: state === 'fallen' ? 'var(--skin-state-fallen)' : TONE.text, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {member.name}
           </span>
-          <span aria-hidden style={{ width: 'calc(100% - 12px)', height: 5, borderRadius: 3, background: 'rgba(255,255,255,.1)', overflow: 'hidden' }}>
+          <span aria-hidden style={{ width: 'calc(100% - 12px)', height: 5, borderRadius: 3, background: 'color-mix(in srgb, var(--skin-text-primary) 12%, transparent)', overflow: 'hidden' }}>
             <i style={{ display: 'block', width: `${hpPct}%`, height: '100%', background: state === 'fallen' ? 'var(--skin-state-fallen)' : TONE.ok }} />
           </span>
         </button>
@@ -97,7 +97,7 @@ const Niche: React.FC<{ member: RuntimeMember; titles: string[]; diseases: strin
             zIndex: 2600, width: 262, padding: '10px 12px', borderRadius: 8, pointerEvents: 'none',
             border: '1px solid var(--skin-hud-brass-hi)',
             background: 'linear-gradient(180deg, var(--skin-hud-lacquer-base), var(--skin-hud-lacquer-deep))',
-            boxShadow: '0 14px 28px rgba(0,0,0,.65)',
+            boxShadow: '0 14px 28px var(--skin-hud-lacquer-deep)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, font: `600 13px ${FONT.display}`, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>

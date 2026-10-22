@@ -384,7 +384,7 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
             aria-hidden
             style={{
               alignSelf: 'center', marginTop: -2, fontFamily: FONT.display, fontSize: 13, fontWeight: 600, letterSpacing: '0.32em',
-              textTransform: 'uppercase', color: 'var(--skin-title-color)', textShadow: '0 1px 0 #000', pointerEvents: 'none',
+              textTransform: 'uppercase', color: 'var(--skin-title-color)', textShadow: '0 1px 0 var(--skin-hud-lacquer-deep)', pointerEvents: 'none',
             }}
           >
             {t('gameFrame.questWindow.checkOverlay.throwLabel')}

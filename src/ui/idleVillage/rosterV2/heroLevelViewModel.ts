@@ -16,6 +16,7 @@
 
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { HERO_LEVEL_CONFIG, HERO_LEVEL_CONFIG_INVALID } from '@/balancing/config/idleVillage/heroLevelConfig';
+import { getMockLevelBoost } from './heroLevelMock';
 
 /** What the decorative layer needs from a resident: the mock display level, or `null`. */
 export interface HeroLevelView {
@@ -31,5 +32,6 @@ export const heroLevelView = (resident: ResidentState | null | undefined): HeroL
   if (HERO_LEVEL_CONFIG_INVALID || HERO_LEVEL_CONFIG === null) return { level: null };
   if (resident == null || resident.isHero !== true) return { level: null };
   const level = HERO_LEVEL_CONFIG.levels[resident.id];
-  return { level: typeof level === 'number' ? level : null };
+  /* T-C1 (R-234): the Director level-up raises the shown level (mock boost, in memory). */
+  return { level: typeof level === 'number' ? level + getMockLevelBoost(resident.id) : null };
 };
