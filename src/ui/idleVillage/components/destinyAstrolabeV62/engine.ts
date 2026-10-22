@@ -10,6 +10,7 @@
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
 import { stepGuidedBall, findZonePoint } from './ballGuidance';
 import { createTarGooRenderer } from './tarGooRenderer';
+import { valleyProfiles } from './starProfile';
 import { createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
 
@@ -187,23 +188,14 @@ function recomputeGeometry(skillIndex=0){
      parita': fianco a 18 gradi fuori di 24.45px e punta larga 8.5 gradi.
      La regola dice `< 1.00 fiore`, `1.00..1.83 stella`: la transizione deve
      essere FINITA a 1.00, quindi la finestra si chiude li'. */
-  const fam=smoothstep(elong,0.90,1.00);
-  /* LA FAMIGLIA NON ERA MAI STATA COLLEGATA AL DISEGNO.
-     `fam` finiva in una `eS` che nessuno leggeva e `geo.starMix` restava
-     undefined: sia `rStarAt` sia `starPath` prendono il ramo del fiore quando
-     starMix vale 0, quindi il profilo a corda e i dieci vertici erano codice
-     irraggiungibile. La stella "non arrivava" perche' non veniva mai chiesta.
-     Misurato sui PIXEL DIPINTI, prima di collegarla: a 18 gradi dalla punta il
-     bordo stava a 206px invece dei 155px della corda (+52px di fianco convesso)
-     e la punta era larga 16.75 gradi invece di 4. */
-  geo.starMix=fam;
-  /* VALLE: 0.3675 (fiore) e 0.382 (stella) sono quasi lo stesso numero, quindi
-     il passaggio fiore->stella e' TUTTO nella famiglia e non si vede un salto di
-     profondita'. La valle si scava solo avvicinandosi a phi^2, dove la stella
-     normale coprirebbe il goo per intero. */
-  const blade=smoothstep(elong,V62_COVER_ALL*0.70,V62_COVER_ALL);
-  const vStar=V62_VALLEY_FLOWER+(V62_VALLEY_STAR-V62_VALLEY_FLOWER)*fam;
-  geo.valleyF=vStar+(V62_VALLEY_BLADE-vStar)*blade;
+  /* PLAN-067 T-B1b (R-234): famiglia e profondita' si decidono VALLE PER VALLE
+     (`valleyProfiles`): ogni valle legge le due punte fra cui sta. Prima c'era UN
+     solo numero — l'allungamento minimo di tutti gli assi — e con assi diversi
+     l'asse piu' debole decideva ogni valle: un petalo lungo accanto a uno corto
+     si assottigliava in una lama e la figura non era ne' fiore ne' stella. */
+  geo.valleyProf=valleyProfiles(geo.starTip,geo.axisCheck);
+  geo.starMix=geo.valleyProf.reduce((m,v)=>m+v.mix,0)/AXES;      // aggregato, solo cosmetico
+  geo.valleyF=geo.valleyProf.reduce((m,v)=>m+v.depth,0)/AXES;    // aggregato, solo cosmetico
   geo.starTip=geo.obeliskTip.slice();   // la punta È l'obelisco bianco
   /* probabilità reale, misurata sulla geometria che il giocatore vede.
      Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
@@ -279,12 +271,15 @@ function recomputeGeometry(skillIndex=0){
 }
 /* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
 /* il fianco DRITTO: intersezione del raggio con la corda fra due vertici */
+/* la valle che chiude il tratto `k` (0..9): fra punta i e i+1, i = floor(k/2) */
+const valleyAt=k=>{ const i=((Math.floor(k/2)%AXES)+AXES)%AXES; return (geo.valleyProf&&geo.valleyProf[i])||{mix:0,depth:0.3675}; };
+const valleyDepthAt=k=>valleyAt(k).depth;
 function chordFromAxes(theta,arr,scale){
   const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;
   const seg=TAU/(AXES*2);
   const k=Math.floor(t/seg), u=t-k*seg;
   const tipR=i=>arr[((i%AXES)+AXES)%AXES]*scale;
-  const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);
+  const vF=valleyDepthAt(k);
   const rA=(k%2===0)?tipR(k/2):Math.min(tipR((k-1)/2),tipR((k+1)/2))*vF;
   const rB=(k%2===0)?Math.min(tipR(k/2),tipR(k/2+1))*vF:tipR((k+1)/2);
   const den=rA*Math.sin(u)+rB*Math.sin(seg-u);
@@ -296,7 +291,7 @@ function radialFromAxes(theta,arr,scale){
   const seg=TAU/(AXES*2);                             // 36°
   const k=Math.floor(t/seg), f=(t-k*seg)/seg;
   const tipR=i=>arr[((i%AXES)+AXES)%AXES]*scale;      // radius at star point i
-  const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);   // profondità delle valli
+  const vF=valleyDepthAt(k);                          // profondità della valle di questo tratto
   const ease=(1-Math.cos(f*Math.PI))/2;               // rounded petals / sharp tips
   if(k%2===0){                                        // tip → valley
     const a=tipR(k/2), b=Math.min(tipR(k/2),tipR(k/2+1))*vF;
@@ -329,7 +324,8 @@ function tideLiftAt(theta,amount){
 }
 /* star radius (success boundary) — per-axis flower, reaches the white obelisk (stat) */
 function rStarAt(theta,scale=1){
-  const m=geo.starMix||0;
+  const tt=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;
+  const m=valleyAt(Math.floor(tt/(TAU/(AXES*2)))).mix;      // famiglia della valle di questo tratto
   if(m<=0.001) return radialFromAxes(theta,geo.starTip,scale);
   if(m>=0.999) return chordFromAxes(theta,geo.starTip,scale);
   return radialFromAxes(theta,geo.starTip,scale)*(1-m)+chordFromAxes(theta,geo.starTip,scale)*m;
@@ -1357,27 +1353,30 @@ function drawAxisRig(now){
    Il FIORE resta campionato, perche' i petali tondi sono curve e non corde. */
 function starPath(scale){
   const p=new Path2D();
-  const fam=geo.starMix||0;
-  if(fam>=0.5){
-    const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);
-    for(let i=0;i<AXES*2;i+=1){
-      const a=-Math.PI/2+i*(Math.PI/AXES);
-      const k=i>>1;
-      const r=(i%2===0)
-        ? geo.starTip[k%AXES]*scale
-        : Math.min(geo.starTip[k%AXES],geo.starTip[(k+1)%AXES])*vF*scale;
-      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
-      if(i===0) p.moveTo(x,y); else p.lineTo(x,y);
+  /* Per valle: una valle STELLA (mix>=0.5) e' un lato dritto fra vertici; una valle
+     FIORE e' un arco campionato da `rStarAt`. I dieci vertici restano gli stessi. */
+  const vert=i=>{
+    const a=-Math.PI/2+i*(Math.PI/AXES);
+    const k=i>>1;
+    const vp=valleyAt(i);
+    const r=(i%2===0)
+      ? geo.starTip[k%AXES]*scale
+      : Math.min(geo.starTip[k%AXES],geo.starTip[(k+1)%AXES])*vp.depth*scale;
+    return [CX+Math.cos(a)*r, CY+Math.sin(a)*r];
+  };
+  const [x0,y0]=vert(0); p.moveTo(x0,y0);
+  for(let i=0;i<AXES*2;i+=1){
+    const next=(i+1)%(AXES*2);
+    if(valleyAt(i).mix>=0.5){
+      const [x,y]=vert(next); p.lineTo(x,y);
+    } else {
+      const SUB=8;
+      for(let j=1;j<=SUB;j+=1){
+        const a=-Math.PI/2+(i+j/SUB)*(Math.PI/AXES);
+        const r=rStarAt(a,scale);
+        p.lineTo(CX+Math.cos(a)*r, CY+Math.sin(a)*r);
+      }
     }
-    p.closePath();
-    return p;
-  }
-  const SEG=80;
-  for(let i=0;i<=SEG;i+=1){
-    const a=-Math.PI/2+i/SEG*TAU;
-    const r=rStarAt(a,scale);
-    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
-    if(i===0) p.moveTo(x,y); else p.lineTo(x,y);
   }
   p.closePath();
   return p;
@@ -1431,7 +1430,9 @@ function drawStar(now){
   ap.closePath();
   for(let i=0;i<=SEG;i+=1){
     const a=-Math.PI/2+i/SEG*TAU;
-    const r=wallR[i]+(tideCrestAt(a,s)-wallR[i])*tide;
+    /* La maschera mangia fino a 1.1x la stella (la banda di almost sta a 1.085x): con la cresta
+       della marea a 1.04x restava fuori una scheggia di banda — un petalo-fantasma (T-B1b). */
+    const r=wallR[i]+(Math.max(wallR[i],rStarAt(a,s)*1.1)-wallR[i])*tide;
     const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
     if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
   }
@@ -1443,17 +1444,19 @@ function drawStar(now){
   }
   ap.closePath();
 
-  /* fuori dall'arena: contorno tratteggiato luminoso (non clippato). */
+  /* Tutti i livelli interni sono clippati alla maschera del catrame. */
+  ctx.save();
+  ctx.clip(ap,'evenodd');
+
+  /* PLAN-067 T-B1b (R-234): il contorno tratteggiato sta DENTRO la maschera, come la faccia.
+     Fuori dalla maschera restava il solo contorno — un petalo-fantasma vuoto — dove il
+     catrame aveva mangiato la stella. */
   ctx.save();
   ctx.setLineDash([9,7]);
   ctx.lineWidth=2.0;
   ctx.strokeStyle='rgba(255,226,150,0.55)';
   ctx.stroke(p);
   ctx.restore();
-
-  /* Tutti i livelli interni sono clippati alla maschera del catrame. */
-  ctx.save();
-  ctx.clip(ap,'evenodd');
 
   /* L1 radiant white-gold ivory face with strong inner glow */
   ctx.fillStyle=face;
