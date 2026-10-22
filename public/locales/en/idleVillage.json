@@ -1262,6 +1262,7 @@
         "dismiss": "Dismiss",
         "dismissHint": "Click anywhere to continue — the details stay in the log.",
         "scoreVs": "{score} vs {difficulty}",
+        "throwLabel": "Throw",
         "scoreTitle": "Skill {score} vs difficulty {difficulty}"
       },
       "outcomeToast": {

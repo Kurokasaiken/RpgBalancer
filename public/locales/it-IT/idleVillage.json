@@ -1268,6 +1268,7 @@
         "dismiss": "Chiudi",
         "dismissHint": "Clicca ovunque per continuare — i dettagli restano nel log.",
         "scoreVs": "{score} contro {difficulty}",
+        "throwLabel": "Lancia",
         "scoreTitle": "Abilità {score} contro difficoltà {difficulty}"
       },
       "outcomeToast": {

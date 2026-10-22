@@ -109,7 +109,18 @@ ${BOARD} .destiny-astrolabe { background: transparent; }
 ${BOARD} .destiny-astrolabe .scene-col { background: transparent; }
 ${BOARD} .destiny-astrolabe .stage { width: calc((100% - ${2 * BEZEL_SHADOW_PX}px) / ${BEZEL_RING_PER_STAGE}); filter: none; }
 ${BOARD} .destiny-astrolabe .stage::before { content: ''; position: absolute; inset: ${-BEZEL_GROUND_RATIO * 100}%; border-radius: 50%; background: var(--obsidian); }
-${BOARD} .destiny-astrolabe .astro-bezel { inset: ${-BEZEL_INSET_RATIO * 100}%; }`;
+${BOARD} .destiny-astrolabe .astro-bezel { inset: ${-BEZEL_INSET_RATIO * 100}%; }
+/* SC-1 = A (PLAN-067 T-B1, R-234): the kit's THROW button as the command ON the star. The global
+   \`.wanderlust-artifact { position: relative }\` beat the kit's \`absolute\` and dropped it 170px below
+   the dial, behind the board edge; the host pins it back as a transparent target over the star
+   (96px, well over 32), draws a breathing ring around it, and the word lives in the engraved label
+   under the dial (\`quest-check-throw-label\`). The kit's own markup and rules stay untouched. */
+${BOARD} .da-tira.wanderlust-artifact { position: absolute; left: 50%; top: 50%; width: 96px; height: 96px; transform: translate(-50%, -50%); border: 0; border-radius: 50%; background: transparent; box-shadow: none; color: transparent; font-size: 0; text-shadow: none; overflow: visible; animation: none; cursor: pointer; }
+${BOARD} .da-tira.wanderlust-artifact:active { transform: translate(-50%, -50%) scale(0.96); }
+${BOARD} .da-tira.wanderlust-artifact:focus-visible { outline: 2px solid var(--skin-icon-accent); outline-offset: 6px; }
+${BOARD} .da-tira::before { content: ''; position: absolute; inset: -18px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--skin-title-color) 60%, transparent); animation: questThrowBreath 2.4s ease-in-out infinite; pointer-events: none; }
+@keyframes questThrowBreath { 0%, 100% { transform: scale(0.92); opacity: 0.3; } 50% { transform: scale(1.05); opacity: 0.95; } }
+@media (prefers-reduced-motion: reduce) { ${BOARD} .da-tira::before { animation: none; opacity: 0.7; } }`;
 
 /** The verdict card's entrance — one fade/rise, disabled under reduced motion.
  *  `data-astro-idle="parked"` freezes the frozen-kit ambient loops (fog, fate
@@ -146,8 +157,19 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
    * dismiss accepts input (arm delay elapsed). */
   const [resolved, setResolved] = useState(() => seenCheckKeys.has(checkKey));
   const [armed, setArmed] = useState(false);
+  /* SC-1 = A: the engraved «throw» label shows while the kit's throw button exists (armed). */
+  const [throwReady, setThrowReady] = useState(false);
   const columnRef = useRef<HTMLDivElement | null>(null);
   const boardRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board) return undefined;
+    const sync = () => setThrowReady(Boolean(board.querySelector('.da-tira')));
+    sync();
+    const mo = new MutationObserver(sync);
+    mo.observe(board, { childList: true, subtree: true });
+    return () => mo.disconnect();
+  }, [beatId]);
   const astroRef = useRef<DestinyAstrolabeV62Handle | null>(null);
   /* R-241 B3: the check whose ball THIS host already launched — a second
    *  progress while `data-state` has not flipped yet still skips, and the
@@ -355,6 +377,19 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
             settledIdle
           />
         </div>
+        {/* SC-1 = A: the engraved word for the gesture, under the dial, only while the throw is armed. */}
+        {throwReady && !resolved && (
+          <span
+            data-testid="quest-check-throw-label"
+            aria-hidden
+            style={{
+              alignSelf: 'center', marginTop: -2, fontFamily: FONT.display, fontSize: 13, fontWeight: 600, letterSpacing: '0.32em',
+              textTransform: 'uppercase', color: 'var(--skin-title-color)', textShadow: '0 1px 0 #000', pointerEvents: 'none',
+            }}
+          >
+            {t('gameFrame.questWindow.checkOverlay.throwLabel')}
+          </span>
+        )}
         {/* The external Verdict Card — informational only (artifact-r003
             §4.2: NO continue/advance control). Click anywhere on the column
             dismisses once armed. */}
