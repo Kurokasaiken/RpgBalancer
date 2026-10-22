@@ -496,11 +496,17 @@ export function useQuestPoiSession({
 
   const getResidentCompatibility: GetResidentCompatibility = useCallback(
     (residentId: string) => {
+      /* R-241 B5 (INV-1): slot compatibility is planner-only — while the
+       *  quest is running (or its result is still uncollected) the roster
+       *  must paint resident statuses (ferito, morto in grigio, …), never
+       *  «Nessuno slot compatibile». Same abstention the expedition
+       *  sessions apply on `run`. */
+      if (isQuestRunning || embarkResult) return undefined;
       const slot = findAcceptingSlot(residentId);
       if (slot) return { state: 'valid', slotId: slot.id, slotLabel: slot.label };
       return { state: 'invalid', reason: 'Nessuno slot compatibile' };
     },
-    [findAcceptingSlot],
+    [findAcceptingSlot, isQuestRunning, embarkResult],
   );
 
   const assignAnyResident = useCallback(() => {
@@ -2020,14 +2026,6 @@ export function useQuestPoiSession({
       residentsById={residentsById}
       onComplete={handlePageFlightComplete}
     />
-    {draggingResidentId && (
-      <div
-        data-drag-preview="true"
-        data-dnd-overlay="true"
-        data-page-forced-id={draggingResidentId}
-        style={{ position: 'fixed', top: '50%', left: '50%', zIndex: 9999, transform: 'translate(-50%, -50%)' }}
-      />
-    )}
     </>
   );
 

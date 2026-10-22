@@ -147,6 +147,7 @@
   padding: 2px 4px;
   min-width: 0;
   min-height: 0;
+  flex-shrink: 0;
   height: auto;
   line-height: 1;
   font-size: 9px;
@@ -170,6 +171,45 @@
 /* Keeps the whole compact header on the title's line: the two menus shrink to fit. */
 .skin-scope [data-roster-controls="compact"] label { min-width: 0; max-width: 78px; }
 .skin-scope [data-roster-controls="compact"] select { min-width: 0; width: 100%; text-overflow: ellipsis; }
+
+/* Quest belt item rows (R-244): the plaque's rich rows (icon + name + effect +
+   qualifier) own their surface inline; the struck-bronze specular streak and
+   the hover/active lift would fight the wrapped description text. Same
+   opt-out pattern as [data-roster-controls="compact"]; tokens only. */
+.skin-scope [data-belt-rows] button:not([data-skin="cta"])::before { display: none; }
+.skin-scope [data-belt-rows] button:not([data-skin="cta"]):hover:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+  filter: brightness(1.14);
+}
+.skin-scope [data-belt-rows] button:not([data-skin="cta"]):active:not(:disabled) {
+  transform: none;
+  filter: brightness(1.2);
+}
+
+/* ── Themed scrollbar (R-246): scroll regions inside HUD panels opt in with
+   `data-hud-scroll` — the OS-default bar clashed with the bronze lacquer.
+   Standard props first (Baseline: scrollbar-width/color), WebKit fallback after
+   for older engines; browsers that honour scrollbar-color ignore the
+   ::-webkit-scrollbar-* family, so the two never fight. Tokens only. */
+.skin-scope [data-hud-scroll] {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--skin-icon-accent) 55%, var(--skin-surface-base))
+    color-mix(in srgb, var(--skin-hud-lacquer-deep) 65%, transparent);
+}
+.skin-scope [data-hud-scroll]::-webkit-scrollbar { width: 8px; height: 8px; }
+.skin-scope [data-hud-scroll]::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--skin-hud-lacquer-deep) 65%, transparent);
+  border-radius: 999px;
+}
+.skin-scope [data-hud-scroll]::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--skin-icon-accent) 55%, var(--skin-surface-base));
+  border-radius: 999px;
+  box-shadow: inset 0 0 2px color-mix(in srgb, var(--skin-hud-lacquer-deep) 80%, black);
+}
+.skin-scope [data-hud-scroll]::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--skin-icon-accent) 80%, var(--skin-surface-base));
+}
 
 /* ── HUD controls: pills in the plaque's own material (tokens only, no brown) ───────────
    Used by the HUD roster and ledger headers: sort chips, status menu, icon buttons. */
@@ -198,7 +238,7 @@
   cursor: pointer;
   transition: background 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
 }
-.skin-scope [data-hud-controls] button:not([data-skin="cta"]):has(> svg:only-child) { width: var(--skin-hud-control-height); padding: 0; }
+.skin-scope [data-hud-controls] button:not([data-skin="cta"]):has(> svg:only-child) { width: var(--skin-hud-control-height); padding: 0; flex-shrink: 0; }
 .skin-scope [data-hud-controls] button svg { width: var(--skin-hud-control-icon-size); height: var(--skin-hud-control-icon-size); }
 .skin-scope [data-hud-controls] button:not([data-skin="cta"]):hover:not(:disabled),
 .skin-scope [data-hud-controls] label:hover {
@@ -253,9 +293,30 @@
   text-overflow: ellipsis;
   cursor: pointer;
 }
+/* INV:drag-test-container-v2.INV-1 (R-238) — the native select covers the whole
+   pill (hit-test + activation land on it, so the picker opens on the first
+   gesture anywhere on the visible control); the visible value text is painted
+   by the [data-roster-pill-value] replica. */
+.skin-scope [data-hud-controls] label select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.skin-scope [data-hud-controls] label [data-roster-pill-value] {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .skin-scope [data-hud-controls] select option { color: var(--skin-text-primary); background: var(--skin-surface-base); text-transform: none; }
 /* Collapsed header = the title and the controls marked data-keep (show/hide toggle, close). */
 .skin-scope [data-hud-controls][data-collapsed] > :not([data-keep]) { display: none; }
+/* Collapsed strip = chrome, not a scroll region: the stage frame keeps
+   overflow:auto for expanded panels; while it hosts a collapsed strip it must
+   clip, otherwise both scrollbars paint on the strip's edge. */
+.skin-scope [data-stage-panel]:has([data-collapsed]) { overflow: hidden !important; }
 
 /* ── Primary CTA plaque (the "AVVIA" look) ────────────────────────────── */
 .skin-scope :where([data-skin="cta"]) {

@@ -94,6 +94,7 @@ describe('LocationDeck', () => {
     expect(marketCard).toHaveTextContent('Drop Bloccato');
   });
 
+  // INV:location-drop-validators.INV-1
   it('handles locked state when locationStates has locked', () => {
     const lockedLocationStates = {
       'gold_mine_slot': 'locked',
@@ -143,6 +144,7 @@ describe('LocationDeck', () => {
     );
   });
 
+  // INV:sandbox-diagnostics.INV-1
   it('logs diagnostics for each location card render', () => {
     const mockDiagnostics = { info: vi.fn() };
     createSandboxDiagnostics.mockReturnValue(mockDiagnostics);

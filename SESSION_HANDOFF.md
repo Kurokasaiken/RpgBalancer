@@ -1,5 +1,175 @@
 # Session Handoff — 2026-10-14
 
+## 2026-10-19 — PLAN-066 authorization checkpoint
+
+- Director: «procedi con il plan» — execution authorized for
+  `plans/PLAN-066-autonomous-workflow-no-director-queues.md`.
+- **Implementation not started in this checkpoint.** The session guard is
+  over its 60-tool red threshold; stop here rather than continue code edits.
+- Before execution resumes, reread RPG `AGENTS.md`, the plan, v31/v32/v35,
+  `context/recurring-traps.md` T-13, and the current dirty worktree. The
+  plan is still `draft`; no status or frozen desiderata was changed by this
+  checkpoint.
+- The plan's §6 trust-self-sealing scope and v32 dependency-scope ruling
+  remain unrecorded; do not silently choose a new trust policy. Carry these
+  into one batch, then execute T-001..T-007 serially under the approved
+  ruling. No code changes have been made for PLAN-066.
+
+## 2026-10-19 — R-230: PLAN-066 draft da multi-AI web (non battezzato)
+
+- **Run converged:** `mind-weaver/.mw/runs/20261019-r230-autonomous-workflow/`
+  — artifact-r006, SHA-256
+  `e1c03688289cd7f0c6ecb9900855fad7a7c5930edee40f768674864f8f38c038`;
+  ChatGPT/Claude/DeepSeek 3/3 ACCEPT. Gemini non ha postato risposta dopo
+  due retry safe; Grok non ha prodotto una risposta correlabile.
+- **Piano candidato:** `plans/PLAN-066-autonomous-workflow-no-director-queues.md`;
+  indicizzato `draft`, non battezzato e non implementato.
+- **Direzione:** zero code su azioni routine/meccaniche; `actor` self-reported,
+  non autenticato; journal bundle con limiti dichiarati; contare eventi/file,
+  non dedurre tempo dal churn.
+- **Human-only:** non diventa PASS per silenzio. Gli altri task elencati e
+  dimostrabilmente indipendenti continuano; il task completo resta non
+  chiuso se l'obbligo umano è richiesto. v35 invariato.
+- **Unico batch policy prima dell'esecuzione:** (1) self-sealing agente su
+  gate/bundler/trusted/frozen, incluso bootstrap `produceBundle.ts`;
+  (2) amendment v32 circoscritto sul blocco del solo lavoro che consuma la
+  decisione umana. Default del draft: self-seal same-run su gate rifiutato
+  se non autorizzato.
+- **Rischio esplicito:** hash chain e ledger nello stesso account non sono
+  autenticazione; un agente può coordinare la riscrittura di gate, bundle e
+  journal. Nessun claim tamper-proof.
+
+## 2026-10-19 — R-225/PLAN-054: fix map-fit ultrawide 3440×1440 (bundle PASS)
+
+- **Fatto:** corretto il caso `/game` `3440×1440`: a HUD auto-zoom
+  (`cssZoom=1.3`) gli inset `safeFit` restavano in pixel layout e riservavano
+  meno spazio del chrome fisso reale. `src/pages/game-frame-pixi.tsx` ora
+  scala `insets.top/bottom` per `hudScale.cssZoom`; nessun sea margin o
+  workaround 3440-specifico (T-01 rispettata).
+- **Evidenza:** `verify:bundle` PASS OB-1..4 —
+  `.mw/runs/r225-ultrawide-map-fit/bundle.json`; spec completa
+  `gameGeometryT01.spec.ts` 12/12, probe `CTR-game-005 GREEN`,
+  `contracts:check`, `trusted:check`, `build:check`, `closure:lint` verdi.
+- **Witness T-04:** screenshot headless `test-results/probe-game-map-fit/game-3440x1440.png`
+  ispezionato: la terra resta sotto le placche top e sopra il plinto nav;
+  `landScreen.y0/y1 ≈113/1310` contro chrome ~108.55/1338.64.
+- **Ledger:** bug `.mw/bugs/20261019-game-ultrawide-safe-fit/bug.md`,
+  regressione `.mw/regression/REG-002.md`, contratto `CTR-game-005`
+  aggiornato col caso dedicato INV-1.
+- **Aperto:** R-225 resta `in corso` (PLAN-054 T-003+); il probe segnala
+  ancora un warning non contrattuale `1512×982` stage-leak extra-viewport.
+- **Contabilità:** `plans/INDEX.md` allineato — T-001/T-002 `fatta`,
+  T-003+ in corso, bundle ultrawide citato.
+- **Commit:** non eseguito — worktree condiviso con drift parallelo esteso
+  (T-13); file scoped lasciati non committati.
+
+## 2026-10-19 — R-219: manoscritto r008 applicato al runtime (EN, R-135)
+
+- **Fatto:** «applica al runtime» eseguito — tutti i 17 nodi di
+  `scenarios/goblin.ts` al render EN r008 (check titles = gesto, F2
+  «What was hidden» choice a opzione unica `grantsGold` — convenzione v3
+  confermata, nessun kind nuovo; F4/F7 con `combat.attackLines` authored;
+  `gob-fine` «Cold ash» + closingLine fusa nel body). `questRun.ts`: log
+  riallineati (epicfail tracce-per −10 HP = «dead branches», tracce-perfor
+  climb/fall distinti, «road teaches»→«hunt teaches»). Spec
+  `quest_sterminio_goblin_spec.md` riscritta IT+EN con Delta aggiornato.
+- **Verifica:** oracle/coverage/checks rigenerate (re-baseline
+  intenzionale), questScenarioConfig **20/20**, suite mirata
+  quests+questS1Lab+toast **425/425**, tsc pulito, build:check ✓.
+- **Fix collaterali:** `questFrontier.test.ts` ancora 'whistle'→'branch
+  snaps'; `pageCrash.repro.test.tsx` regex label stale (era rotto dal
+  sync v3 del 18/10, non da r008) + iterazioni 150→40 (timeout).
+- **Non verificato (T-04):** rendering visivo/cinematico in `/game` —
+  serve witness UI reale. Arte F1/F2 stale resta aperta.
+- **Ancora Director:** bundle `plan027-r008-impl` BLOCKED su
+  `mapping:approve` (proposal-2026-10-19T07-57-41-929Z) + `trusted:seal`.
+
+## 2026-10-19 — PLAN-059 (R-230): rework metrics + `task:close` landed
+
+- **Fatto:** `npm run task:close -- <R|PLAN>` (`scripts/taskClose.ts`) — chiusura
+  meccanica della contabilità (RICHIESTE→fatta, plans/INDEX→completato,
+  HANDOFF prepend, `plan:stamp close`, bozza context/INDEX). **Fail-closed**:
+  senza `bundle.json` PASS del run esce 1 e non scrive nulla.
+- **planForensics**: nuova sezione "Plan features → smoothness" — rework
+  (churn out-of-plan splittato `books` contabilità vs `scope` scoperta,
+  commit post-bundle, retry gate) al posto di richness→velocità.
+  Primo dato: ρ(files_named vs −oop scope) = 0.06 → più path nominati
+  NON riducono il churn fuori-plan (direzionale, n=16).
+- Plan rinominato PLAN-052→**PLAN-059** (collisione con
+  quest-scene-depth-staging della sessione parallela).
+- Test 31/31, build:check PASS. `closure:lint` FAIL su file sessione
+  parallela (contractsCheck post-approval + 2 playtest scripts non mappati) —
+  T-13, nessuno mio.
+
+## 2026-10-19 — PLAN-027 iterazione r008: architettura epistemica implementata (44/44 test; bundle BLOCKED su governance Director)
+
+- **Current state:** implementazione r008 completa e verificata —
+  `EpistemicBlock`/`attachEpistemic` (sceneBrief), `world`+`nodeContracts`+lint
+  (arcContract), `REGISTER_BY_KIND`/`promptForNodeR8`/`promptForFieldRevise`
+  (narrationPrompt), `copySchemaFor`/`validateNodeCopyR8`/tokenizer+stemmer
+  (validateCopy), `--copy-file`+gate combinato (questRefine), contratto goblin
+  sui 17 node id, fixture accettato+rifiutato. **Test:** narrationQuality 44/44,
+  quest dir 204/204, tsc pulito sui toccati, build:check ✓.
+- **Bundle** `.mw/runs/plan027-r008-impl/bundle.json` = **BLOCKED** — le 4
+  obbligazioni sono PASS tranne BV-03 che fallisce SOLO su `closure:lint`:
+  serve `npm run mapping:approve -- .mw/mapping-proposals/proposal-2026-10-19T07-57-41-929Z.json`
+  (game-quests con i 2 fixture r008 + workflow-forensics parallela) e
+  `npm run trusted:seal` + approve ledger (drift pgcard/slotRack/surface-map —
+  sessione parallela). Entrambi azioni Director per design (trust anchor).
+- **Pendente Director:** review manoscritto r008 (fixture = proposta, non
+  applicata a runtime); ruling su F2 `recovery:'direct'` (richiede modifica
+  grafo `goblin.ts` — oggi F2 = choice a opzione unica «Recover the loot»);
+  regen arte F1/F2 stale (da R-219).
+- **Note:** lo scenario goblin NON ha `verdictTable` — le bande vengono dal
+  contratto (`verdictEffects`); `attachEpistemic` le unisce. Il tokenizer
+  normalizza i diacritici: STOPWORDS deve vivere nello stesso spazio
+  normalizzato (bug trovato e fissato — `più`≠`piu`).
+
+## 2026-10-18 — PLAN-047 CHIUSO: Visual Fork Gate v35 live (bundle PASS 8/8, R-216 fatta)
+
+- **Current state:** **PLAN-047 `completed`, R-216 `fatta`** — gate operativo:
+  fork visivo in `mw-explorer` (2 opzioni/max 3, card + preview auto-open
+  Devin Desktop), `INTENT_GATE_VISUAL_FORK` in `mw-planner`, baseline
+  congelata golden ref in painter/mockup-generator, `visualForkGate` in
+  `closure:lint` (diff reale → copertura card/skip; regime v2 "scope per
+  plan": non-dichiarato=errore, ≥v35=errore, pre-v35=warning).
+- **Ruling Director registrati:** preview **auto-open** nella scheda Preview
+  Devin Desktop (≠ finestra foreground, regola 16 solo esterne); gate
+  scope-per-plan per il WIP pre-v35 altrui.
+- **Bugfix collaterali:** `runCommittedGate` non ri-delega più
+  (`GATE_FILES` svuotato nel runner figlio — era hang infinito);
+  proxy `browser_preview` path-scoped → pagina bianca, fix = ROOT +
+  redirect-stub (`:5199`, `.mw/bugs/20261018-devin-preview-white/`).
+- **Docs:** T-18 (pipe maschera exit code) + T-19 (preview ROOT/stub) in
+  `recurring-traps.md`; learn `.mw/runs/learn-plan047-preview-20261018/`;
+  DECISION_LOG aggiornato; `.mw/bugs/` ora in `.gitignore` (exc
+  EXC-20261018154019-1875 su `.gitignore`).
+- **Pendente:** primo pilot reale del fork visivo (criterio di fallimento
+  in PLAN-047 §8); warning transitori `closure:lint` sui file pre-v35
+  si chiudono con i rispettivi plan.
+
+## 2026-10-18 — PLAN-051 T-001..T-005: verify-slim trust anchor + tiering (test 17/17, safeguards verdi)
+
+- **Current state:** **T-001..T-004 fatti, T-005 parziale** — `npm run bundle`
+  (wrapper: scopre run dir, `--init` scheletro, exit code reali);
+  `trusted.lock.json` su GATE_FILES+bundler+`verify-tiers.json`+
+  `surface-map.json`+frozen/trusted dirs; `npm run approve` scrive ledger
+  fuori-repo `~/.rpg-approvals/ledger.jsonl` (**strict-once-established**:
+  con ≥1 record il ledger è l'ancora — lock riforgiato non passa, test
+  dedicato); tiering `.mw/verify-tiers.json` (percettivo→SKIPPED fuori
+  reach, core touches-all, `verify:sweep` = full); signoff human-eye bound
+  a `commit_sha`/`frames_sha256`.
+- **Pendente Director:** `npm run trusted:seal` + `npm run approve --
+  --kind=trust-set` attivano il modo strict; `mapping:approve`
+  proposal-2026-10-18T12-12-15-573Z (PLAN-048).
+- **Aperti:** T-006 (fixture lying-agent e2e + FP-rate in
+  WORKFLOW_METRICS), T-007 (dogfood misurato pre/post — la misura decide
+  se il 32% burst è sparito o solo spostato su latenza approve).
+- **Lezioni:** `.mw/runs/learn-plan051-20261018-1715/` — hash nel repo ≠
+  anchor (ledger fuori-repo), SKIPPED come quarto esito, config-gate nel
+  trust-set. `closure:lint` ora PASSA (visual-fork v2 = warning su file
+  pre-v35, ruling Director).
+
 ## 2026-10-18 — PLAN-044 T-004 (S2): red-first lockato + geometria T-01 (bundle PASS 7/7)
 
 - **Current state:** **PLAN-044 T-004 `fatta`** — riproduzione rossa lockata
@@ -668,3 +838,37 @@ con `config.mode`=verdetto forzato; bottone «continua» appare solo dopo `onRes
 - **Safeguard:** lint 0 err (script eslint-ignored per config), test
   `tests/unit/verification` 18/18, build:check OK, kanban:lint OK,
   foreground:lint OK.
+
+## 2026-10-18 — Stato cinematiche quest Goblin
+
+- Il Director ha confermato che la grammatica visiva che intendeva sulla
+  quest Goblin è già implementata: le otto art sono associate alle fasi;
+  `sceneManifest` assegna depth map, ingresso e posa; `QuestRunWindow` usa il
+  manifest nel cambio reale d'immagine. R-224 è registrata come superata,
+  senza ulteriori modifiche alle illustrazioni.
+- PLAN-050 resta **in corso**, non chiuso. T-011/T-012/T-013 e OB-8 sono
+  acceptance residue: prove runtime/layout/ticker, profiling WKWebView reale,
+  kit atmosfera asset-backed e eye-check esplicito del Director.
+- L'ultimo bundle disponibile `.mw/runs/plan-050-cinematic-showcase/bundle.json`
+  è `BLOCKED`: OB-7 riporta build-check stale/comando fallito e trusted-lock
+  segnala drift dei gate file senza approvazione Director. Il signoff visuale
+  attuale è provvisorio; l'autorizzazione R-213 «proseguire su OB-4» non è
+  approvazione percettiva.
+- Il bundle isolato R-213 è stato rigenerato `PASS 5/5` il 2026-10-18T18:16Z,
+  ma il signoff OB-4 registra solo l'autorizzazione a proseguire, esplicitando
+  che non approva PLAN-050 nel suo complesso.
+- Esiste `.mw/runs/r213-cinematic-effects-regression/pattern-candidate.md`
+  sulla discrepanza clock/epoch, ma la fase `learn` post-task non è stata
+  eseguita: resta da fare alla chiusura effettiva, non prima.
+
+## 2026-10-19 — R-231 QuestRunWindow: implementazione consolidata dei 9 punti
+
+- Applicato il manoscritto r008 (narrazione) al runtime EN in `scenarios/goblin.ts` + oracle rigenerato (già consegne precedenti in giornata); questa passata copre i restanti 5 punti UI/runtime oltre a PLAN-060/061 (già `fatta`).
+- **Keyboard (#2):** `useTimeEngineLoop` ora onora `e.defaultPrevented` (root cause del blocco `15/22`: Space durante `presenting` metteva in pausa il clock); `game-frame` Space filtra i target interattivi.
+- **Layout (#5/#8):** `PreVerdictBreath` nella catena flex (`flex:1 1 auto; minHeight:0`) — fine della ghigliottina a 330px→195px; `quest-window-stage` `flexShrink:0`; `phaseLocked` deduplicato sopra le scelte.
+- **Post-entrata (#9):** camera latched per scena (`sceneVisitKey`) — nessuno snap a `idleDrift` quando `presenting` finisce; `QuestDepthFx.postSettle` config + `cameraAtWithPostSettle` C¹-continuo (camVec cosinusoidale certificato, breathZoom one-sided); ticker/rAF vivi su scene ambient; ambient drift alpha raddoppiata.
+- **Chrome (#3/#6/#7):** `HeaderPill` icon-only; abandon = `ico-banner` + Tooltip + conferma inline; minimizzato `space-between` con restore a destra.
+- **TimeBar (#4):** `questPhaseCheckpoints` reso come tacche incise per fase.
+- **Verifica:** questRunWindow 23/23 (6 nuovi INV); suite mirata 855/855; build:check PASS; closure:lint PASS (~90s, sopra il max nominale 30s ma completato); eslint 0 errori. `COMPONENT_MASTER_INDEX.md` + `RICHIESTE.md` aggiornati.
+- **Non verificato (T-04):** resa visiva e animazione live — serve eye-check Director su `/game`; rigenerazione asset a 2.4 = step esterno (PLAN-061); visual-fork card in `.mw/runs/r231-quest-run-window/` restano in attesa di ruling su VF-1..VF-4 solo se il Director vorrà varianti (i fix applicati seguono le opzioni più conservative).
+- Worktree molto sporco da sessioni parallele: non committare in blocco.

@@ -40,6 +40,7 @@ import { DestinyAstrolabeV62Standalone, type DestinyAstrolabeV62Handle } from '@
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
+import { getHudZoomFactor } from './hudScale';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestCheckBridge } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { useHudPanelDrag } from './useHudPanelDrag';
@@ -93,7 +94,12 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
   const [resolved, setResolved] = useState(() => seenCheckKeys.has(checkKey));
   const [armed, setArmed] = useState(false);
   const plaqueRef = useRef<HTMLDivElement | null>(null);
+  const boardRef = useRef<HTMLDivElement | null>(null);
   const astroRef = useRef<DestinyAstrolabeV62Handle | null>(null);
+  /* R-241 B3: the check whose ball THIS host already launched — a second
+   *  progress while `data-state` has not flipped yet still skips, and the
+   *  flag re-arms on the next check. */
+  const thrownFor = useRef<string | null>(null);
   const armTimer = useRef<number | null>(null);
   const autoDismissTimer = useRef<number | null>(null);
   const pointerDownAt = useRef<{ x: number; y: number } | null>(null);
@@ -110,7 +116,9 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
-  const compact = vw < cfg.compactBelowPx;
+  /* PLAN-043 WS-5 DEF-06: inside the CSS-zoomed chrome layer the usable
+   *  width is `innerWidth / zoom` — the compact rule keys on chrome units. */
+  const compact = vw / getHudZoomFactor() < cfg.compactBelowPx;
 
   const { panelStyle, handleProps } = useHudPanelDrag({
     shellRef: plaqueRef,
@@ -136,18 +144,40 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
   /* Escape reaches only the topmost overlay; mid-spin it is a no-op. */
   useOverlayEscape(overlayId, dismiss);
 
+  /* R-241 B3 — one PROGRESS step on the board: read the suite's live
+   *  `data-state` and advance the choreography. Pre-spin states throw the
+   *  ball (`throw()` warps the reveal and fires immediately); only while
+   *  the ball is already flying does a click skip to the verdict. User
+   *  input NEVER re-rolls (engine discipline): `resolution`/`idle` are
+   *  engine-guarded no-ops. A second progress before `data-state` catches
+   *  up still skips (`thrownFor`), so rapid taps cannot double-fire the
+   *  throw. */
+  const progressAstro = useCallback(() => {
+    const astro = astroRef.current;
+    if (!astro) return;
+    const state = boardRef.current?.querySelector<HTMLElement>('[data-suite]')?.getAttribute('data-state') ?? '';
+    if (state === 'resolution') return;
+    if (state === 'the-spin' || state === 'magnetic-snap' || thrownFor.current === checkKey) {
+      astro.skipToResult();
+      return;
+    }
+    thrownFor.current = checkKey;
+    astro.throw();
+  }, [checkKey]);
+
   /* Fill the imperative slot: the owner's click-to-skip reaches the astrolabe
-   * through `bridge.handle` (skipToResult / throwNow). */
+   * through `bridge.handle` (skipToResult / throwNow / progress). */
   useEffect(() => {
     bridge.handle.current = {
       skipToResult: () => astroRef.current?.skipToResult(),
       throwNow: () => astroRef.current?.throw(),
+      progress: progressAstro,
     };
     return () => {
       if (bridge.handle.current) bridge.handle.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bridge.handle]);
+  }, [bridge.handle, progressAstro]);
 
   /* Focus choreography: remember who had focus, hand it back on unmount —
    * opener if still connected, else the quest window, else the body. */
@@ -248,7 +278,7 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
   const onBoardClick = (event: React.MouseEvent<HTMLElement>) => {
     if (resolved) return;
     if ((event.target as HTMLElement).closest('button')) return;
-    astroRef.current?.skipToResult();
+    progressAstro();
     event.stopPropagation();
   };
 
@@ -327,7 +357,7 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
             </div>
             {/* Stat/difficulty chip — the same pair the board paints. */}
             <HudChip tone="label" title={t('gameFrame.questWindow.checkOverlay.scoreTitle', { score: check.score, difficulty: ASTROLABE_DIFFICULTY_BASELINE })}>
-              {check.score}/{ASTROLABE_DIFFICULTY_BASELINE}
+              {t('gameFrame.questWindow.checkOverlay.scoreVs', { score: check.score, difficulty: ASTROLABE_DIFFICULTY_BASELINE })}
             </HudChip>
             {resolved && (
               <HudChip tone={mode.startsWith('fail') || mode === 'epicfail' ? 'danger' : mode === 'almost' ? 'warn' : 'ok'}>
@@ -343,6 +373,7 @@ export const QuestSkillCheckOverlay: React.FC<QuestSkillCheckOverlayProps> = ({ 
           {/* The board square: flex item, aspect-ratio keeps it square while
               the column's leftover height decides its size (layout-driven). */}
           <div
+            ref={boardRef}
             data-testid="quest-check-board"
             onClick={onBoardClick}
             style={{

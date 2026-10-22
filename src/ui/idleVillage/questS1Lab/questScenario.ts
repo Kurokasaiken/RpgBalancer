@@ -159,6 +159,8 @@ export interface QuestNode {
    *  (Director 2026-10-10): the player should recognise they found something
    *  they could have missed. */
   hidden?: boolean;
+  /** Intra-phase immediate discovery (R-231): unlocks at arrival (`readyAt = tick`, 0 wait ticks). */
+  immediate?: boolean;
   /** Deterministic positional HP toll paid BEFORE the verdict is read — the
    *  authored price of attempting this check (e.g. goblin pursuit: the chase
    *  costs blood whatever the die says). `epicfailAmount` overrides `amount`
@@ -313,6 +315,8 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
   viaggio: {
     id: 'viaggio',
     kind: 'choice',
+    /* PLAN-053 T-004: the merchant is a road beat of the outbound leg —
+     *  pinned by the journey launch spec; on legacy runs `fase` is inert. */
     fase: 'andata',
     title: 'Viaggio — il Passo del Corvo',
     body: 'La carovana è stata assalita sul Passo. Un ambulante in fuga offre tre oggetti — ma la borsa non basta per tutto.',
@@ -356,6 +360,8 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
   incidente: {
     id: 'incidente',
     kind: 'harm',
+    /* PLAN-053 T-004: the landslide is road content — it chains off the
+     *  merchant's pin while the marker keeps walking. */
     fase: 'andata',
     title: 'Incidente sul Passo',
     body: 'Una frana improvvisa coglie la spedizione. Non è una prova: è un pericolo diretto — il bodyguard non può intercettarlo.',
@@ -611,6 +617,8 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
   ritorno: {
     id: 'ritorno',
     kind: 'end',
+    /* PLAN-053 T-004: the legacy «ritorno» magic id becomes a real return
+     *  beat — under a journey it opens at pin 1.0 on the reversed route. */
     fase: 'ritorno',
     title: 'Ritorno al villaggio',
     body: 'La spedizione è finita.',

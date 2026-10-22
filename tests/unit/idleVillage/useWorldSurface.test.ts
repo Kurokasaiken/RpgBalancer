@@ -108,6 +108,7 @@ describe('useWorldSurface', () => {
     vi.restoreAllMocks();
   });
 
+  // INV:pixi-world-map.INV-1
   it('loads and validates the manifest', async () => {
     vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: true,

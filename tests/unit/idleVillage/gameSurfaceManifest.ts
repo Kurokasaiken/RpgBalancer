@@ -133,6 +133,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/components/gameFrame/QuestBeltPlaque.tsx',
   'src/ui/idleVillage/components/gameFrame/QuestCheckOptionsPanel.tsx',
   'src/ui/idleVillage/components/gameFrame/QuestEpilogue.tsx',
+  'src/ui/idleVillage/components/gameFrame/QuestJourneyRoute.tsx',
   'src/ui/idleVillage/components/gameFrame/QuestLogPanel.tsx',
   'src/ui/idleVillage/components/gameFrame/QuestOutcomeToast.tsx',
   'src/ui/idleVillage/components/gameFrame/QuestPartyRosterPanel.tsx',
@@ -210,6 +211,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/config/minimalFeedbackConfig.ts',
   'src/ui/idleVillage/config/pgCardFrameConfig.ts',
   'src/ui/idleVillage/config/presentationConfig.ts',
+  'src/ui/idleVillage/config/questJourneyRouteConfig.ts',
   'src/ui/idleVillage/config/residentDropRules.ts',
   'src/ui/idleVillage/config/rosterFilterConfig.ts',
   'src/ui/idleVillage/config/rosterSortConfig.ts',
@@ -310,9 +312,9 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/questS1Lab/questScenario.ts',
   'src/ui/idleVillage/questS1Lab/questSchedule.ts',
   'src/ui/idleVillage/questS1Lab/questSimulation.ts',
+  'src/ui/idleVillage/questS1Lab/questTickCounter.ts',
   'src/ui/idleVillage/questS1Lab/questTheatreSequencer.ts',
   'src/ui/idleVillage/questS1Lab/render/AmbientLayer.tsx',
-  'src/ui/idleVillage/questS1Lab/questTickCounter.ts',
   'src/ui/idleVillage/questS1Lab/render/AtmosphereLayer.tsx',
   'src/ui/idleVillage/questS1Lab/render/DepthScene.tsx',
   'src/ui/idleVillage/questS1Lab/render/atmosphereOverlay.ts',
@@ -467,7 +469,7 @@ export const GAME_SURFACE_LUCIDE_FILES: readonly string[] = [
 
 /**
  * Pre-existing guard debt on the discovered surface — recorded at baseline
- * (2026-10-19T18:09:19.485Z). The ratchet rule: entries here pass once; any NEW
+ * (2026-10-19T19:32:48.027Z). The ratchet rule: entries here pass once; any NEW
  * violation (new file in the list, or a new offense inside a listed file)
  * fails the hudGuards surface checks. Debt entries are tracked as WS-5
  * defect records and burn down during implementation.

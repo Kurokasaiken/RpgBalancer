@@ -41,6 +41,7 @@ describe('PgCard interactions', () => {
   });
 
   describe('drag start', () => {
+    // INV:resident-roster-types.INV-1
     it('calls playCue(pickup) and triggers drag start', async () => {
       const baseProps = createBaseProps();
       render(<DragProvider><PgCard {...baseProps} /></DragProvider>);
@@ -73,6 +74,7 @@ describe('PgCard interactions', () => {
   });
 
   describe('drag end', () => {
+    // INV:use-sensory-audio.INV-1
     it('plays drop_invalid when dragFeedbackState is returning', () => {
       const baseProps = createBaseProps();
       render(<DragProvider><PgCard {...baseProps} dragFeedbackState="returning" /></DragProvider>);

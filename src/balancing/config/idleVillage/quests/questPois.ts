@@ -253,11 +253,11 @@ export const QUEST_POIS: readonly QuestPoi[] = z.array(QuestPoiSchema).parse([
     repeatable: true,
     /* PLAN-053 T-004: journey-enabled — 2 game days each leg (placeholder
      *  balanced with the POI's 110-tick scenario span). Pins: the ambush
-     *  router opens a fifth of the way home (its chain inherits), the end
-     *  node lands at the village. */
+     *  router opens mid-way home (its chain inherits), the end node lands
+     *  at the village. R-253 #5: mid-leg pins live in [0.25, 0.75]. */
     fasi: {
       travelDays: 2,
-      pins: { 'gob-ritorno': 0.2, 'gob-fine': 1 },
+      pins: { 'gob-ritorno': 0.4, 'gob-fine': 1 },
     },
   },
   {

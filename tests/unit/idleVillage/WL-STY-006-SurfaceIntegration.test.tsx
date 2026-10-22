@@ -189,6 +189,7 @@ describe('WL-STY-006 Surface Integration', () => {
       expect(screen.getByTestId('empire-button')).toBeInTheDocument();
     });
 
+    // INV:use-style-lab-tokens.INV-1
     it('should switch between wilderness and empire pillars', async () => {
       renderTestComponent();
       

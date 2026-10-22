@@ -22,7 +22,7 @@
  * - While the run lives the POI halo is `questHaloProgress` (elapsed /
  *   live-duration); clicking it routes to the canonical `QuestRunWindow`.
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizeNodes } from '@/balancing/config/idleVillage/quests/questContentLocale';
 import { useSensors, useSensor, PointerSensor } from '@dnd-kit/core';
@@ -63,7 +63,8 @@ import type { QuestRunApi } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { buildExpeditionParty, loadoutDuration, planSlotSwap, type BagStockEntry } from './questExpedition';
 import type { SlotTokenDragData } from '@/ui/idleVillage/components/ResidentSlotRack';
-import { settleRun, runIdOf } from './questSettlement';
+import { runIdOf, beginSettlement as beginRunSettlement, commitSettlement as commitRunSettlement, settlementResourceDelta, type SettlementDeps, type SettlementMarker } from './questSettlement';
+import { useRewardAck } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { emptyStashBag, remainingFor, useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { QuestExpeditionDetail } from './QuestExpeditionDetail';
 
@@ -187,6 +188,12 @@ export function useQuestExpeditionSession({
    * pointer release. */
   const pendingSwapRef = useRef<{ fromSlotId: string; toSlotId: string; residentId: string } | null>(null);
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
+  /* R-257: resident mid slot→roster return — set urgently with the flight and
+   *  released only when the deferred `assignments` clear commits, so the
+   *  seat's medallion copy stays suppressed for the whole handoff (the proxy
+   *  can land before the transition commits: without this the medal pops
+   *  back into the seat for the gap). */
+  const [returningResidentId, setReturningResidentId] = useState<string | null>(null);
   const [estimate, setEstimate] = useState<{ key: string; value: PartyEstimate } | null>(null);
   /** Last completed estimate of a DIFFERENT configuration — the delta
    *  baseline (S3 T-2). Only real sims count as baseline ('incomplete'
@@ -305,7 +312,21 @@ export function useQuestExpeditionSession({
 
   const handleAssign = useCallback(
     (slotBlueprintId: string, residentId: string) => {
-      setAssignments((a) => ({ ...a, [slotBlueprintId]: residentId }));
+      /* R-248: party edits land as a TRANSITION — this hook lives in the
+       * page, so an urgent setState renders the whole /game chrome in one
+       * contiguous task (the ~200ms blocks the Director's probe measured).
+       * A transition lets React split it; the seat fills a frame later.
+       * Guards stay safe: rapid click-assigns are serialised by
+       * `flyingResidentId` (kept urgent), and the updater form reads the
+       * freshest state. */
+      /* R-257: assigning the mid-exit resident consumes the return intent —
+       * the clear can be coalesced with this assign into one commit (the
+       * never-empty `assignments` keeps the watcher from releasing), so the
+       * suppression must be lifted here or the seat medal stays hidden. */
+      setReturningResidentId((current) => (current === residentId ? null : current));
+      startTransition(() => {
+        setAssignments((a) => ({ ...a, [slotBlueprintId]: residentId }));
+      });
       trackTelemetryEvent('quest_expedition_assign', { poiId: poi.id, slotId: slotBlueprintId, residentId });
     },
     [poi.id],
@@ -313,7 +334,9 @@ export function useQuestExpeditionSession({
 
   const handleClear = useCallback(
     (slotBlueprintId: string) => {
-      setAssignments((a) => ({ ...a, [slotBlueprintId]: null }));
+      startTransition(() => {
+        setAssignments((a) => ({ ...a, [slotBlueprintId]: null }));
+      });
       trackTelemetryEvent('quest_expedition_detach', { poiId: poi.id, slotId: slotBlueprintId });
     },
     [poi.id],
@@ -443,12 +466,12 @@ export function useQuestExpeditionSession({
   useEffect(() => {
     const currentResolved = resolvedRef.current;
     if (!isDetailOpen || !currentResolved || !estimateKey) {
-      setEstimate(null);
+      startTransition(() => setEstimate(null));
       prevEstimateRef.current = null;
       return;
     }
     if (!requiredFilled) {
-      setEstimate({ key: estimateKey, value: 'incomplete' });
+      startTransition(() => setEstimate({ key: estimateKey, value: 'incomplete' }));
       return;
     }
     const controllerAbort = new AbortController();
@@ -486,11 +509,15 @@ export function useQuestExpeditionSession({
           requestId,
           chunks: chunkTimings,
         };
-        setEstimate((prev) => {
-          if (prev && prev.key !== estimateKey && typeof prev.value === 'object') {
-            prevEstimateRef.current = prev;
-          }
-          return { key: estimateKey, value };
+        /* R-248: the estimate landing repaints the wing — presentational,
+         *  so it lands as a transition instead of a contiguous urgent task. */
+        startTransition(() => {
+          setEstimate((prev) => {
+            if (prev && prev.key !== estimateKey && typeof prev.value === 'object') {
+              prevEstimateRef.current = prev;
+            }
+            return { key: estimateKey, value };
+          });
         });
       })
       .catch(() => {
@@ -627,22 +654,19 @@ export function useQuestExpeditionSession({
   }, [draftKey]);
 
   /* ------------------------------------------------------------------ */
-  /* Settlement (S2.5) — a terminal run settles once, idempotently.       */
-  /*  Journal: persist `settling` → apply effects (ledger-keyed, co-       */
-  /*  located in the gameplay aggregate) → release loadout → persist       */
-  /*  `settled`. A run stuck at `settling` after a crash replays on the    */
-  /*  next render; dedup keys make the replay free.                        */
+  /* Settlement (S2.5 → R-260): the report's lifecycle drives the journal.  */
+  /*  begin — the report's first painted frame persists `settling`         */
+  /*  (frozen plan + durable "shown" bit); NO aggregate mutation —         */
+  /*  resources stay unchanged at arrival until the player dismisses       */
+  /*  the report. commit — the report's dismissal applies the effects,     */
+  /*  releases the loadout and stamps `settled`, then publishes the        */
+  /*  transient resource delta for the HUD chip. replay — a `settling`     */
+  /*  marker on the first hydrated run = the report was shown but never    */
+  /*  dismissed (reload mid-ceremony) → auto-commit once, no ceremony.     */
   /* ------------------------------------------------------------------ */
-  const settlingRef = useRef(false);
-  const runEnded = Boolean(run?.ended);
-  const runSettled = run?.settlement?.status === 'settled';
-  useEffect(() => {
-    if (!run?.ended || runSettled || settlingRef.current) return;
-    settlingRef.current = true;
-    const runId = runIdOf(run);
-    trackTelemetryEvent('quest_settlement_begin', { poiId: poi.id, runId, outcome: run.outcome });
-    void settleRun(run, {
-      persistRun: (marker) => questRun.applySettlement(marker),
+  const settleDeps = useMemo<SettlementDeps>(
+    () => ({
+      persistRun: (marker: SettlementMarker) => questRun.applySettlement(marker),
       applyToStore: (plan) => {
         useMinimalGameplayStore.getState().applyQuestSettlement(plan);
       },
@@ -653,19 +677,76 @@ export function useQuestExpeditionSession({
       },
       nowTick: () => useMinimalGameplayStore.getState().state.currentTick,
       questTitle: scenario?.title,
-    })
-      .then(() => trackTelemetryEvent('quest_settlement_done', { poiId: poi.id, runId, outcome: run.outcome }))
-      .catch((error) =>
-        trackTelemetryEvent('quest_settlement_error', {
-          poiId: poi.id,
-          runId,
-          message: error instanceof Error ? error.message : String(error),
-        }),
-      )
-      .finally(() => {
-        settlingRef.current = false;
+    }),
+    [questRun, scenario?.title],
+  );
+
+  /** R-260 begin: persist `settling` (frozen plan) — the report's painted
+   *  frame is the trigger; this call alone moves no resources. */
+  const beginSettlement = useCallback(async () => {
+    const current = questRun.run;
+    if (!current?.ended || current.settlement) return;
+    trackTelemetryEvent('quest_settlement_begin', { poiId: poi.id, runId: runIdOf(current), outcome: current.outcome });
+    await beginRunSettlement(current, settleDeps).catch((error) =>
+      trackTelemetryEvent('quest_settlement_error', {
+        poiId: poi.id,
+        runId: runIdOf(current),
+        message: error instanceof Error ? error.message : String(error),
+      }),
+    );
+  }, [questRun, settleDeps, poi.id]);
+
+  /* The report paints → begin. The popup's own first-frame stamp
+   *  (`markRewardShown` → rewardAck) is the shown signal; the durable side
+   *  of the boundary is the persisted `settling` marker. */
+  const rewardAck = useRewardAck(poi.questId);
+  const reportShown = Boolean(run?.ended && rewardAck && rewardAck === runIdOf(run));
+  useEffect(() => {
+    if (!reportShown) return;
+    void beginSettlement();
+  }, [reportShown, beginSettlement]);
+
+  /** R-260 commit: the report's dismissal applies the plan → `settled`,
+   *  then stamps the granted delta for the HUD readout chip. Returns the
+   *  marker so callers can await the write; null when nothing committed. */
+  const commitInFlightRef = useRef(false);
+  const commitSettlement = useCallback(async (): Promise<SettlementMarker | null> => {
+    const current = questRun.run;
+    if (!current?.ended || current.settlement?.status === 'settled' || commitInFlightRef.current) return null;
+    commitInFlightRef.current = true;
+    const runId = runIdOf(current);
+    trackTelemetryEvent('quest_settlement_commit', { poiId: poi.id, runId, outcome: current.outcome });
+    try {
+      const done = await commitRunSettlement(current, settleDeps);
+      trackTelemetryEvent('quest_settlement_done', { poiId: poi.id, runId, outcome: current.outcome });
+      const delta = settlementResourceDelta(done.plan);
+      if (delta.gold > 0 || delta.xp > 0) {
+        useMinimalGameplayStore.getState().publishResourceDelta(delta);
+      }
+      return done;
+    } catch (error) {
+      trackTelemetryEvent('quest_settlement_error', {
+        poiId: poi.id,
+        runId,
+        message: error instanceof Error ? error.message : String(error),
       });
-  }, [run, runEnded, runSettled, questRun, poi.id]);
+      return null;
+    } finally {
+      commitInFlightRef.current = false;
+    }
+  }, [questRun, settleDeps, poi.id]);
+
+  /* R-260 replay: the FIRST hydrated run is authoritative — a persisted
+   *  `settling` means the report showed and the dismissal never landed
+   *  (reload mid-ceremony, or a legacy crash mid-settle). Auto-commit once
+   *  through the same idempotent kernel; `replayedRef` latches on the first
+   *  non-null run so a fresh in-session `settling` never self-commits. */
+  const replayedRef = useRef(false);
+  useEffect(() => {
+    if (replayedRef.current || !run) return;
+    replayedRef.current = true;
+    if (run.ended && run.settlement?.status === 'settling') void commitSettlement();
+  }, [run, commitSettlement]);
 
   /* ------------------------------------------------------------------ */
   /* Launch — preconditions re-checked at the write boundary.             */
@@ -934,12 +1015,16 @@ export function useQuestExpeditionSession({
       if (slotPhaseRef.current[toSlotId] !== 'idle') return false;
       const next = planSlotSwap(assignments, fromSlotId, toSlotId, (rid, sid) => eligibilityFor(rid, sid).eligible);
       if (!next) return false;
-      setAssignments(next);
-      setSeatNonces((prev) => ({
-        ...prev,
-        [fromSlotId]: (prev[fromSlotId] ?? 0) + 1,
-        [toSlotId]: (prev[toSlotId] ?? 0) + 1,
-      }));
+      /* R-248: same transition treatment as assign/clear — the swap commit
+       *  lands at the flight's end, so the page render is interruptible. */
+      startTransition(() => {
+        setAssignments(next);
+        setSeatNonces((prev) => ({
+          ...prev,
+          [fromSlotId]: (prev[fromSlotId] ?? 0) + 1,
+          [toSlotId]: (prev[toSlotId] ?? 0) + 1,
+        }));
+      });
       trackTelemetryEvent('quest_expedition_swap', {
         poiId: poi.id,
         fromSlotId,
@@ -984,6 +1069,42 @@ export function useQuestExpeditionSession({
     [flyingResidentId, isDetailOpen, run, findAcceptingSlot, startFlight],
   );
 
+  /** Extraction → spring-back (R-248): the seat clears AND the extracted
+   *  token flies back to its roster card — the same contract
+   *  `useQuestPoiSession.handleSlotClear` already honours. A clear issued
+   *  while another flight is airborne keeps the clear but skips the return
+   *  flight (the page-flight machine carries one token at a time). */
+  const handleSlotClear = useCallback(
+    (slotBlueprintId: string) => {
+      const residentId = assignments[slotBlueprintId];
+      controller.clearSlot(slotBlueprintId);
+      if (!residentId || flyingResidentId) return;
+      const from = elementCenter(getSlotComponentElement(slotBlueprintId));
+      /* R-257: under a roster filter ('available' and friends) the slotted
+       *  card is filtered OUT of the DOM — without a fallback the return
+       *  flight silently never ran. Land on the roster list itself (then the
+       *  container): the card pops back in exactly where the proxy lands. */
+      const to =
+        elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`))
+        ?? elementCenter(document.querySelector('[data-resident-count]'))
+        ?? elementCenter(document.querySelector('[data-testid="drag-test-container"]'));
+      if (from && to) {
+        setReturningResidentId(residentId);
+        setFlyingResidentId(residentId);
+        startFlight({
+          residentId,
+          slotId: slotBlueprintId,
+          isInset: false,
+          fromX: from.x,
+          fromY: from.y,
+          toX: to.x,
+          toY: to.y,
+        });
+      }
+    },
+    [assignments, controller.clearSlot, flyingResidentId, startFlight],
+  );
+
   const handlePageFlightComplete = useCallback(
     (residentId: string, slotId?: string, isInset?: boolean) => {
       /* A swap that passed the drag-end gate commits HERE, at landing — the
@@ -1000,6 +1121,24 @@ export function useQuestExpeditionSession({
       settleFlight();
     },
     [handleAssign, settleFlight, commitSwap],
+  );
+
+  /* R-257: the seat suppression outlives the proxy: it lifts only once the
+   *  deferred `assignments` clear commits — the roster card pops back in
+   *  exactly as the seat's copy would re-render, so a medallion never
+   *  flashes back into the seat between landing and commit. */
+  useEffect(() => {
+    if (!returningResidentId || Object.values(assignments).includes(returningResidentId)) return;
+    setReturningResidentId(null);
+  }, [assignments, returningResidentId]);
+
+  /* R-257: every resident whose seat medallion is rendered elsewhere —
+   *  the airborne flight AND the mid-exit resident whose deferred clear is
+   *  still uncommitted (they can differ when a new flight starts before an
+   *  earlier return's clear lands). */
+  const suppressedResidentIds = useMemo(
+    () => [flyingResidentId, returningResidentId].filter((id): id is string => Boolean(id)),
+    [flyingResidentId, returningResidentId],
   );
 
   /* ------------------------------------------------------------------ */
@@ -1133,7 +1272,8 @@ export function useQuestExpeditionSession({
           canSend={canSend}
           onSend={send}
           onClose={closeDetail}
-          onSlotClear={controller.clearSlot}
+          onSlotClear={handleSlotClear}
+          suppressedResidentIds={suppressedResidentIds}
           onSlotPhaseChange={handleSlotPhaseChange}
           position={detailPosition}
         />
@@ -1183,8 +1323,10 @@ export function useQuestExpeditionSession({
       },
       checkEligibility: (slotBlueprintId: string, residentId: string) => eligibilityFor(residentId, slotBlueprintId),
       /* The slot rack's «Clear» affordance — same path the UI takes, so a
-       *  revert exercises the real recompute chain (S3 T-2 reversibility). */
-      clearSlot: (slotBlueprintId: string) => controller.clearSlot(slotBlueprintId),
+       *  revert exercises the real recompute chain (S3 T-2 reversibility).
+       *  R-248: routed through `handleSlotClear` so the seam also replays
+       *  the extraction's return flight, like the rack does. */
+      clearSlot: (slotBlueprintId: string) => handleSlotClear(slotBlueprintId),
       /* PLAN-043 WS-1 witnesses: the swap commit itself (phase guard included)
        *  and the seat observables BV-04/BV-05 assert on. */
       commitSwap: (fromSlotId: string, toSlotId: string) =>
@@ -1202,6 +1344,9 @@ export function useQuestExpeditionSession({
       getResolvedOffer: () => resolved?.resolvedOffer ?? null,
       getRun: () => questRun.run,
       getSettlement: () => questRun.run?.settlement ?? null,
+      /* R-260: the report-dismissal commit — same boundary `onClose` lands
+       *  on, so a test exercises the real collect path. */
+      commitSettlement: () => commitSettlement(),
       /* The village journal entries settlement narrated (PLAN-019-S4 T-1)
        *  — the loop test asserts the village HEARD what happened, not just
        *  that the numbers moved. Read-only tail of `state.eventLog`. */
@@ -1262,9 +1407,16 @@ export function useQuestExpeditionSession({
     questStatus,
     halo,
     poiView,
+    /* R-260: the report-dismissal boundary — the page's reward popup
+     *  `onClose` calls it; all close paths converge here. */
+    commitSettlement,
     overlays,
     gameplay,
     draggingResidentId,
+    /* R-257: the rack suppresses the seat medallion while this resident's
+     *  flight proxy is airborne — never two identical medallions at once. */
+    flyingResidentId,
+    suppressedResidentIds,
     /** Drag cancel resets both drag kinds (roster card and slot token). */
     setDraggingResidentId: (id: string | null) => {
       setDraggingResidentId(id);

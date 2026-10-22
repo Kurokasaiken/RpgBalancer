@@ -26,7 +26,10 @@ export type ObligationResult =
   | 'INCONCLUSIVE'
   | 'INVALID_ENV'
   | 'WAIVED_DIRECTOR'
-  | 'MISSING_ARTIFACT';
+  | 'MISSING_ARTIFACT'
+  /** PLAN-051 T-004: tier percettivo non raggiunto dal diff — saltato,
+   *  non valutato né bloccante. */
+  | 'SKIPPED';
 export type ArtifactKind =
   | 'junit'
   | 'json'
@@ -59,6 +62,11 @@ export interface Obligation {
   artifacts: ManifestArtifact[];
   blocking: boolean;
   waived?: { by: 'director'; reason: string };
+  /** PLAN-051 T-004: tier di reach. 'perceptual' salta se il diff non
+   *  tocca superfici percettive né moduli core; 'always' non salta mai
+   *  (invarianti save/economy). Default derivato dal `type`:
+   *  pixel-temporal/fps/human-eye → perceptual, altrimenti deterministic. */
+  tier?: 'deterministic' | 'perceptual' | 'always';
 }
 
 export interface Manifest {
@@ -68,6 +76,11 @@ export interface Manifest {
   verifier_required?: boolean;
   /** PLAN-044 T-004: file test la cui riproduzione rossa deve risultare registrata e immutata. */
   red_first?: string[];
+  /** PLAN-045 T-005b: il task è sotto regime intent — verify:bundle e
+   *  closure:lint richiedono intent.json con status PASS|WAIVED|SKIPPED_TRIVIAL. */
+  intent_gate?: boolean;
+  /** PLAN-044 T-006: decision-report.json nella run dir è obbligatorio e schema-checkato. */
+  decision_report?: boolean;
   obligations: Obligation[];
 }
 
@@ -99,12 +112,25 @@ export interface VerifierEvaluation {
   verdict: 'CONFIRMED' | 'CONTESTED' | 'UNVERIFIABLE';
   criteria_sha256: string;
   evidence_sha256: string[];
+  /** PLAN-044 T-005: exit code del comando, registrato dal receipt meccanico. */
+  exit_code?: number | null;
+  /** Nota meccanica (es. deroga Director). */
+  note?: string;
 }
 
 export interface VerifierFile {
   verifier: string;
   evaluated_at: string;
   evaluations: VerifierEvaluation[];
+  /**
+   * PLAN-044 T-005: presente solo sui receipt generati da script —
+   * un verifier.json senza `generated_by` non è un receipt meccanico e
+   * non soddisfa il gate (il giudizio LLM è demosso a advisory, v32 pt.7).
+   */
+  generated_by?: string;
+  /** Hash dell'albero sorgente+test (changed non-exempt) al momento del receipt. */
+  tree_sha256?: string;
+  tree_files?: number;
 }
 
 export function sha256Text(text: string): string {
@@ -189,6 +215,20 @@ export function parseJunit(xml: string): JunitSummary {
     if (/<error[\s/>]/.test(el)) summary.failedTests.push(`${name} (error)`);
   }
   return summary;
+}
+
+const PERCEPTUAL_TYPES: ReadonlySet<ObligationType> = new Set<ObligationType>([
+  'pixel-temporal',
+  'fps',
+  'human-eye',
+]);
+
+/** PLAN-051 T-004: tier effettivo di un'obbligazione (default dal tipo). */
+export function obligationTier(
+  obl: Pick<Obligation, 'type' | 'tier'>,
+): 'deterministic' | 'perceptual' | 'always' {
+  if (obl.tier) return obl.tier;
+  return PERCEPTUAL_TYPES.has(obl.type) ? 'perceptual' : 'deterministic';
 }
 
 const TEMPORAL_TYPES: ReadonlySet<ObligationType> = new Set<ObligationType>([
@@ -401,10 +441,22 @@ export function evaluateObligation(
     }
   }
   if (obl.type === 'human-eye') {
+    // PLAN-051 T-005: il signoff è un *witness record* meccanicamente
+    // bound: reviewer + note + binding al commit (commit_sha o
+    // frames_sha256). Un "witness esiste" free-standing non basta —
+    // il meccanismo verifica la forma e il vincolo, la semantica resta umana.
     const signoff = obl.artifacts.find((a) => a.kind === 'signoff');
     const data = signoff ? readJsonSafe(path.join(runDir, signoff.path)) : null;
     if (!data || typeof data.reviewer !== 'string' || typeof data.note !== 'string') {
       tag('NOT_RUN', 'human-eye senza signoff leggibile (reviewer + note richiesti)');
+    } else if (
+      typeof data.commit_sha !== 'string' &&
+      !(Array.isArray(data.frames_sha256) && data.frames_sha256.length > 0)
+    ) {
+      tag(
+        'NOT_RUN',
+        'signoff senza binding: serve commit_sha o frames_sha256 — il witness deve legarsi a CIÒ che ha visto',
+      );
     }
   }
 
@@ -464,6 +516,13 @@ export function checkVerifier(
       reasons: ['verifier.json assente o malformato (verificatore indipendente richiesto)'],
     };
   }
+  // PLAN-044 T-005: il gate accetta solo receipt meccanici (generated_by).
+  // Un verifier.json scritto a mano/da LLM è advisory, non prova di chiusura.
+  if (typeof vf.generated_by !== 'string' || vf.generated_by.length === 0) {
+    reasons.push(
+      'verifier.json senza generated_by — non è un receipt meccanico: rigenerare con produceBundle (il giudizio LLM è advisory nel decision report)',
+    );
+  }
   // Se verifier_required, il verificatore giudica TUTTE le obbligazioni
   // blocking (un test verde sul criterio sbagliato è esattamente l'incidente);
   // altrimenti solo quelle percettive (type !== 'state').
@@ -517,6 +576,48 @@ export interface Bundle {
   contracts?: { ok: boolean; reasons: string[] };
   /** Gate red-first lockato (PLAN-044 T-004): assente = non valutato. */
   red_first?: { ok: boolean; reasons: string[] };
+  /** Schema-check decision report (PLAN-044 T-006): assente = non valutato. */
+  decision_report?: { ok: boolean; reasons: string[] };
+  /** PLAN-051 T-002: hash-lock del trust-set (frozen/gate/bundler).
+   *  `lock_present=false` → nota, non bloccante; drift → bloccante. */
+  trusted_lock?: { ok: boolean; lock_present: boolean; reasons: string[]; notes: string[] };
+  /** PLAN-051 T-002: self-hash dei file che producono il bundle. */
+  integrity?: { bundler_sha256: Record<string, string | null> };
+  /** PLAN-045 T-005b: gate regime intent — assente = task fuori regime. */
+  intent_gate?: { ok: boolean; status: string; reasons: string[] };
+}
+
+export const DECISION_REPORT_FILE = 'decision-report.json';
+
+const DECISION_REPORT_FIELDS = ['resolved', 'open', 'escalated'] as const;
+
+/**
+ * Schema-check del decision report (PLAN-044 T-006 / S4): il file
+ * `decision-report.json` nella run dir deve avere i tre campi
+ * `resolved`/`open`/`escalated` come array. Il contenuto è advisory —
+ * il gate non giudica le voci, solo la forma.
+ */
+export function checkDecisionReport(
+  runDir: string,
+  required: boolean,
+): { ok: boolean; reasons: string[] } {
+  const p = path.join(runDir, DECISION_REPORT_FILE);
+  if (!existsSync(p)) {
+    return {
+      ok: !required,
+      reasons: required
+        ? [`${DECISION_REPORT_FILE} assente (manifest dichiara decision_report: true)`]
+        : [],
+    };
+  }
+  const data = readJsonSafe<Record<string, unknown>>(p);
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return { ok: false, reasons: [`${DECISION_REPORT_FILE} non parsabile (atteso oggetto JSON)`] };
+  }
+  const reasons = DECISION_REPORT_FIELDS.filter((f) => !Array.isArray(data[f])).map(
+    (f) => `decision report: campo "${f}" mancante o non array (schema-check)`,
+  );
+  return { ok: reasons.length === 0, reasons };
 }
 
 export function evaluateManifest(
@@ -525,17 +626,43 @@ export function evaluateManifest(
   commandResults: Record<string, CommandResult | null>,
   contracts?: { ok: boolean; reasons: string[] },
   redFirst?: { ok: boolean; reasons: string[] },
+  trustedLock?: { ok: boolean; lock_present: boolean; reasons: string[]; notes: string[] },
+  integrity?: { bundler_sha256: Record<string, string | null> },
+  skipPerceptual?: boolean,
+  intentGate?: { ok: boolean; status: string; reasons: string[] },
 ): Bundle {
   const manifestPath = path.join(runDir, 'verification.json');
   const evaluations = manifest.obligations.map((obl) =>
-    evaluateObligation(obl, runDir, commandResults[obl.id] ?? null, manifest.created_at),
+    skipPerceptual && obligationTier(obl) === 'perceptual'
+      ? {
+          id: obl.id,
+          result: 'SKIPPED' as const,
+          reasons: ['tier percettivo non raggiunto dal diff (verify:sweep per il run completo)'],
+          artifacts: obl.artifacts.map((a) => ({ path: a.path, sha256: null, exists: false })),
+        }
+      : evaluateObligation(obl, runDir, commandResults[obl.id] ?? null, manifest.created_at),
   );
   const verifier = checkVerifier(manifest, runDir, evaluations);
+  // T-006: il decision report è schema-checkato quando il manifest lo
+  // richiede, e comunque verificato se il file esiste.
+  const decisionReport =
+    manifest.decision_report === true || existsSync(path.join(runDir, DECISION_REPORT_FILE))
+      ? checkDecisionReport(runDir, manifest.decision_report === true)
+      : undefined;
   const blocked =
-    evaluations.some((e) => e.result !== 'PASS' && e.result !== 'WAIVED_DIRECTOR' && isBlocking(manifest, e.id)) ||
+    evaluations.some(
+      (e) =>
+        e.result !== 'PASS' &&
+        e.result !== 'WAIVED_DIRECTOR' &&
+        e.result !== 'SKIPPED' &&
+        isBlocking(manifest, e.id),
+    ) ||
     !verifier.ok ||
     contracts?.ok === false ||
-    redFirst?.ok === false;
+    redFirst?.ok === false ||
+    decisionReport?.ok === false ||
+    trustedLock?.ok === false ||
+    intentGate?.ok === false;
   return {
     task: manifest.task,
     run_id: manifest.run_id,
@@ -546,6 +673,10 @@ export function evaluateManifest(
     verifier,
     contracts,
     red_first: redFirst,
+    decision_report: decisionReport,
+    trusted_lock: trustedLock,
+    integrity,
+    intent_gate: intentGate,
   };
 }
 
@@ -584,8 +715,13 @@ export function validateBundleFile(bundlePath: string): { ok: boolean; reasons: 
     }
   }
   const vfPath = path.join(runDir, 'verifier.json');
-  if (bundle.verifier?.required && bundle.verifier.ok && !existsSync(vfPath)) {
-    reasons.push('verifier.json rimosso dopo la produzione del bundle');
+  if (bundle.verifier?.required && bundle.verifier.ok) {
+    const vf = readJsonSafe<VerifierFile>(vfPath);
+    if (!vf) {
+      reasons.push('verifier.json rimosso dopo la produzione del bundle');
+    } else if (typeof vf.generated_by !== 'string' || vf.generated_by.length === 0) {
+      reasons.push('verifier.json sostituito con un file non meccanico (generated_by assente)');
+    }
   }
   if (bundle.verdict !== 'PASS') {
     reasons.push(`verdict=${bundle.verdict} — non è un PASS valido`);

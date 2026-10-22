@@ -1,0 +1,44 @@
+{
+  "created_at": "2026-10-18T21:26:24.479Z",
+  "created_by": "agent",
+  "entries": [
+    {
+      "id": "workflow-forensics",
+      "globs": [
+        "scripts/planForensics.ts",
+        "scripts/planTime.ts",
+        "tests/unit/scripts/**",
+        "context/workflow-timing.jsonl",
+        "context/WORKFLOW_METRICS.md"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/scripts",
+        "npm run metrics:report"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan048-t006",
+      "source": "R-217 forensic ledger: miner, plan stamps, timing jsonl, generated report",
+      "approved_at": "2026-10-18T15:25:32.645Z"
+    },
+    {
+      "id": "game-quests",
+      "globs": [
+        "src/ui/idleVillage/quests/**",
+        "src/ui/idleVillage/questS1Lab/**",
+        "src/balancing/config/idleVillage/quests/**",
+        "public/assets/atmosphere/fog/**",
+        "scripts/bake-fog-noise.py",
+        "scripts/bake-fog-mask.py"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/idleVillage",
+        "e2e idleVillage quest specs"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "quest runtime/planner/scenarios",
+      "approved_at": "2026-10-17T22:25:45.465Z"
+    }
+  ],
+  "removed_ids": []
+}

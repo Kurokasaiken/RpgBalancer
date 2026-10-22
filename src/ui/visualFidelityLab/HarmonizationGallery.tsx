@@ -11,8 +11,8 @@ import { FIELD_BACKGROUND, FIELD_VIGNETTE } from './foundationRecipe';
 // NB: the pgCard is NEVER shown solo in the product — the real context is the
 // ROSTER (a list of embedded cards). The standalone card + its "no compatible
 // slot" banner are testing-only artifacts, so we mount the real roster surface
-// instead: `MatericRosterComponent` is exactly what `/minimal-roster` renders.
-import { MatericRosterComponent } from '@/ui/idleVillage/components/MatericRosterComponent';
+// instead: `MatericRosterComponentV2` is exactly what `/minimal-roster` renders.
+import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 // The REAL Clock strip is `TimeEngineStrip` + `DayNightPoiSkin` (same as
 // /minimal-clock) — NOT the bare `ClockWidgetStandalone` QA speed-control
 // panel, which never had the Day/Night medallion. Same mistake pattern as
@@ -172,8 +172,8 @@ const TABS: GalleryTab[] = [
   {
     id: 'roster',
     label: 'Roster',
-    note: 'contesto reale del pgCard: MatericRosterComponent, come /minimal-roster — differenza = colore barre + card rialzata',
-    render: (k, materic) => <MatericRosterComponent componentId={`gallery-roster-${k}`} />,
+    note: 'contesto reale del pgCard: MatericRosterComponentV2, come /minimal-roster — differenza = colore barre + card rialzata',
+    render: (k, materic) => <MatericRosterComponentV2 componentId={`gallery-roster-${k}`} />,
   },
   {
     id: 'clock',

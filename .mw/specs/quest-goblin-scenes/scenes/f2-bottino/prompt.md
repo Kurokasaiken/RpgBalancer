@@ -1,9 +1,15 @@
-# F2 — Il bottino (`gob-bottino-scelta`, `gob-bottino`) → `bottino.png`
+# F2 — Il bottino (`gob-bottino`) → `bottino.png`
 
-Nodi: `gob-bottino-scelta`, `gob-bottino`. Beat: pre-scelta — il terzo carro
-mercantile mai tornato (design B, da ratificare), trascinato fuori sentiero;
-la cassa ancora chiusa con la sua trappola a campanelli. Nessuna persona —
-il premio aspetta dove i morti l'hanno lasciato.
+Nodi: `gob-bottino`. Beat: pre-gesto — il fagotto di oggetti sottratti e
+provviste avvolti in stracci, nascosto sotto una tela cerata tra fronde
+troppo regolari, avvistato solo dall'alto. Nessuna persona — il premio
+aspetta dove i predoni l'hanno celato.
+
+> ⚠ **STALE rispetto al manoscritto v3 (Director 2026-10-18):** il carro
+> mercantile e la cassa con trappola a campanelli sono fiction revocata
+> (niente carri, niente strada, niente trappola sul bottino — F2 non ha
+> più check). Il prompt sotto resta come riferimento storico; la
+> rigenerazione richiede un prompt nuovo e ruling Director.
 
 ## Full prompt — generatori esterni (Gemini / Grok / GPT)
 
@@ -18,4 +24,4 @@ BOTTINO — A merchant wagon dragged off the forest path and half-hidden under c
 - La cassa resta chiusa: il contenuto è l'esito del check, non l'immagine.
 - La trappola a campanelli è authored («catene, campanelli, un nodo da
   sciogliere») e anticipa il tema «Intrusi» di F3.
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

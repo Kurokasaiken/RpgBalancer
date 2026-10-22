@@ -1,8 +1,9 @@
 ---
 title: Mission Planner Spec
 status: candidate
-updated: 2026-10-01
+updated: 2026-10-19
 type: component-spec
+superseded-by: parziale — PLAN-054 T-003 triage: gli scenari `/game` (planner→slot→expedition) sono coperti da `CTR-game-007.INV-1/INV-2` e `CTR-game-008.INV-1`; il riferimento al vecchio harness `/poi-quest-detail-roster-time-clock` è `deprecated`
 ---
 
 # Mission Planner Spec (v7)

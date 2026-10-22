@@ -245,4 +245,75 @@ describe('useSlotSounds', () => {
       }).not.toThrow();
     });
   });
+
+  describe('AudioContext lifecycle (R-248)', () => {
+    afterEach(() => {
+      /* Restore the plain mock for any suite running after this one. */
+      (global as any).AudioContext = MockAudioContext;
+      (global as any).webkitAudioContext = MockAudioContext;
+    });
+
+    // INV:resident-slot-rack.INV-1 — a fresh AudioContext per cue blocks the
+    // main thread on every assign/extract (each DetailSlot mounts the hook):
+    // one shared context must serve every cue of every hook instance.
+    it('builds one AudioContext shared across plays AND hook instances', async () => {
+      let constructed = 0;
+      class CountingAudioContext extends MockAudioContext {
+        constructor() {
+          super();
+          constructed += 1;
+        }
+      }
+      (global as any).AudioContext = CountingAudioContext;
+
+      /* The shared context is module-level — a fresh module graph is needed
+       * to count its first construction deterministically. */
+      vi.resetModules();
+      const { useSlotSounds: useSlotSoundsFresh } = await import('@/ui/idleVillage/hooks/useSlotSounds');
+      const first = renderHook(() => useSlotSoundsFresh());
+      act(() => {
+        first.result.current.clank();
+        first.result.current.reject();
+        first.result.current.detach();
+        first.result.current.complete();
+      });
+      expect(constructed).toBe(1);
+
+      /* A second mounted slot plays through the SAME context — the per-slot
+       * construction the Director's probe measured is gone. */
+      const second = renderHook(() => useSlotSoundsFresh());
+      act(() => {
+        second.result.current.clank();
+      });
+      expect(constructed).toBe(1);
+    });
+
+    it('resumes a suspended context instead of building a new one', async () => {
+      let constructed = 0;
+      let resumed = 0;
+      class SuspendedAudioContext extends MockAudioContext {
+        state = 'suspended';
+        constructor() {
+          super();
+          constructed += 1;
+        }
+        resume() {
+          resumed += 1;
+          return Promise.resolve();
+        }
+      }
+      (global as any).AudioContext = SuspendedAudioContext;
+
+      vi.resetModules();
+      const { useSlotSounds: useSlotSoundsFresh } = await import('@/ui/idleVillage/hooks/useSlotSounds');
+      const { result } = renderHook(() => useSlotSoundsFresh());
+      act(() => {
+        result.current.clank();
+        result.current.detach();
+      });
+
+      expect(constructed).toBe(1);
+      expect(resumed).toBeGreaterThan(0);
+    });
+  });
 });

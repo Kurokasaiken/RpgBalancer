@@ -14,7 +14,7 @@ function pick(state: QuestRunState, policy: Policy): string {
   const has = (id: string) => (opts.some((o) => o.id === id) ? id : (opts[0]?.id ?? 'advance'));
   switch (state.nodeId) {
     case 'gob-esplora': return policy === 'greedy' ? has('gob-forza-tracce') : has('gob-cerca-tracce');
-    case 'gob-bottino-scelta': return policy === 'cautious' ? has('gob-lascia-bottino') : has('gob-prendi');
+    case 'gob-bottino': return has('gob-prendi'); // v3: take-it-all, no leave option
     case 'gob-accampamento':
       if (policy !== 'optimal') return has('gob-via-assalto');
       return state.flags.includes('bonusStealth') || state.flags.includes('bonusStealthPiccolo') ? has('gob-via-stealth') : has('gob-via-assalto');

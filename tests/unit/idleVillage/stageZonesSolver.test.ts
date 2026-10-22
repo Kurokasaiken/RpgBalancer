@@ -95,6 +95,7 @@ const ZONE_PANELS: Record<StageZoneId, StagePanelId[]> = {
 };
 
 describe('solveStageLayout — generic regime', () => {
+  // INV:CTR-game-006.INV-1
   it('BV-01/BV-10: zero overlap & chrome-clear across contracted viewports', () => {
     for (const vp of [
       { w: 1280, h: 720 },
@@ -107,6 +108,10 @@ describe('solveStageLayout — generic regime', () => {
         s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: id });
       }
       const layout = solve(s);
+      /* Direct assertion guards vacuous passes: all five panels must resolve a rect. */
+      expect(
+        Object.values(layout.panels).filter((p) => p.rect !== null || p.stripRect !== null).length,
+      ).toBeGreaterThan(0);
       expectNoOverlap(layout);
       expectChromeClear(layout, vp.h);
     }
@@ -125,6 +130,7 @@ describe('solveStageLayout — generic regime', () => {
     expect(lay2.panels.roster.rect).toBeNull();
   });
 
+  // INV:CTR-game-006.INV-1
   it('open suspends a competing expanded occupant in the same zone (top-of-stack wins)', () => {
     let s = initStageZones(cfg, VP, 'generic');
     s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'events' });
@@ -202,6 +208,7 @@ describe('BV-02 — determinism over random intent streams', () => {
   const ACTIONS = ['OPEN', 'CLOSE', 'MINIMIZE', 'EXPAND', 'PIN', 'UNPIN'] as const;
   const PANELS: StagePanelId[] = ['roster', 'villageStash', 'events', 'merchant', 'questDetail'];
 
+  // INV:CTR-game-006.INV-1
   it('identical replay is bit-identical (1000 random intents)', () => {
     const signaturesA: string[] = [];
     const signaturesB: string[] = [];
@@ -365,6 +372,7 @@ describe('DROP semantics (§D.1)', () => {
 });
 
 describe('run regime (§D.2/§D.3)', () => {
+  // INV:CTR-game-006.INV-1
   it('regime flip retires session/retire occupants, keeps suspend occupants, cancels drag in one commit', () => {
     let s = initStageZones(cfg, VP, 'generic');
     s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'roster' });
@@ -381,8 +389,19 @@ describe('run regime (§D.2/§D.3)', () => {
     expect(s.occupancy.leftWing.some((o) => o.panelId === 'roster')).toBe(true);
     s = stageZonesReducer(cfg, s, { type: 'OPEN', panelId: 'quest' });
     const layout = solve(s);
-    expect(layout.clusterEnvelope).toEqual(layout.envelope);
-    expect(layout.panels.quest.rect).toEqual(layout.envelope);
+    // INV:R-253-chrome-overlap — in `run` regime the quest cluster paints
+    // OVER the chrome bands by `questChromeOverlap` (Director ruling:
+    // art+copy+choices simultaneously visible). The horizontal span and the
+    // zone rects still follow the chrome-confined envelope.
+    const ovl = cfg.questChromeOverlap;
+    const expected = {
+      x: layout.envelope.x,
+      y: Math.max(0, cfg.chrome.topPx - ovl.topPx),
+      w: layout.envelope.w,
+      h: Math.max(0, s.viewport.h - Math.max(0, cfg.chrome.topPx - ovl.topPx) - Math.max(0, cfg.chrome.bottomPx - ovl.bottomPx)),
+    };
+    expect(layout.clusterEnvelope).toEqual(expected);
+    expect(layout.panels.quest.rect).toEqual(expected);
     expect(layout.panels.roster.suspended).toBe(true);
     expectNoOverlap(layout);
   });
@@ -416,6 +435,7 @@ function findOccupantForTest(state: StageZonesState, panelId: StagePanelId) {
 
 /** Helper sanity: occupancy arrays stay ascending-openSeq after churn. */
 describe('invariants', () => {
+  // INV:CTR-game-006.INV-1
   it('occupancy lists stay ordered by openSeq and unique across zones', () => {
     let s = initStageZones(cfg, VP, 'generic');
     const rand = rng(42);

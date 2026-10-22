@@ -35,6 +35,10 @@ export interface DestinyAstrolabeV62Handle {
 
 export interface DestinyAstrolabeV62Props {
   skills: AstrolabeSkill[];
+  /** R-253: display-only per-axis silhouette override (`{stat, difficulty}`
+   *  per astrolabe axis) — paints the board's shape from real check/party
+   *  data while `skills` still owns the verdict's skill-pick semantics. */
+  axisProfile?: { stat: number; difficulty: number }[];
   config?: AstrolabeConfig & { mode?: string };
   onResolve?: (result: AstrolabeResult) => void;
   autoStart?: boolean;
@@ -74,6 +78,7 @@ export const DestinyAstrolabeV62 = memo(
   forwardRef<DestinyAstrolabeV62Handle, DestinyAstrolabeV62Props>(function DestinyAstrolabeV62(
     {
       skills,
+      axisProfile,
       config,
       onResolve,
       autoStart = true,
@@ -112,6 +117,7 @@ export const DestinyAstrolabeV62 = memo(
 
       const engine = createDestinyAstrolabeV62Engine(root, {
         skills,
+        axisProfile,
         config: { ...config, ...(speed ? { speed } : null), ...(hideInternalCard ? { hideInternalCard } : null), ...(settledIdle ? { settledIdle } : null) },
         onResolve: (r) => {
           onResolveRef.current?.(r);

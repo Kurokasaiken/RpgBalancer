@@ -22,6 +22,7 @@ import {
 
 describe('Skin Schema Types', () => {
   describe('Basic Types', () => {
+    // INV:skin-schema.INV-1
     it('should have valid preset IDs', () => {
       const validPresets: SkinPresetId[] = [
         'minimal-frontier',

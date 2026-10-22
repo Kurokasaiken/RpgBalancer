@@ -13,8 +13,71 @@
 import type {
   QuestNodeSchemaType as QuestNode,
   QuestScenario,
+  VerdictSchemaType,
 } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import type { DomainVocab } from '../domainVocabs';
+import type { QuestArcContract } from './arcContract';
+
+/* ------------------------------------------------------------------ */
+/* r008 — epistemic partition: facts observable BEFORE choosing/rolling */
+/* vs facts authorized for a specific outcome band.                    */
+/* ------------------------------------------------------------------ */
+
+/** One canonical physical event an outcome band may assert. */
+export interface CanonicalEffect {
+  id: string;
+  text: string;
+}
+
+/** The information one verdict band is allowed to reveal — passed ONLY
+ *  to the corresponding verdict/attack line, never to framing fields. */
+export interface VerdictFacts {
+  /** Facts this band may assert (post-resolution only). */
+  facts: { id: string; text: string }[];
+  /** Terms that THIS band's reveal unlocks — banned pre-roll. */
+  revealTerms: string[];
+  /** Canonical physical events of THIS band — the only concrete event
+   *  assertions allowed, bound via effectBindings. */
+  canonicalEffects: CanonicalEffect[];
+  /** Somatic anchors for a mechanically-paid epicfail (at least one
+   *  must appear when the band pays damage). */
+  injuryAnchors?: string[];
+}
+
+/** r008 — the closed-world + information-partition contract attached
+ *  to a brief. `framingFacts` go to title/body/transit/option.label;
+ *  `verdictFacts` go only to the matching outcome band. */
+export interface EpistemicBlock {
+  /** Facts observable before choosing or rolling. */
+  framingFacts: { id: string; text: string }[];
+  /** Outcome-partitioned facts — one entry per verdict band. */
+  verdictFacts?: Partial<Record<VerdictSchemaType, VerdictFacts>>;
+  /** Closed-world description (one line) + content inventories. */
+  world?: {
+    closedWorld: string;
+    allowedEntities: string[];
+    canonicalTerms: Record<string, string>;
+    endSeeds: string[];
+    texture?: Partial<Record<'sound' | 'smell' | 'light' | 'touch', string[]>>;
+  };
+  /** Proper/entity names allowed in prose (case-insensitive). */
+  allowedEntities: string[];
+  /** Terms banned in framing fields until a band reveals them. */
+  forbiddenPreRevealTerms: string[];
+  /** Setting terms banned everywhere (closed world). */
+  bannedSettingTerms: string[];
+  /** Motif seeds reserved for the closing line. */
+  endSeeds: string[];
+  /** Enemy nouns the UI-tally detector scans for. */
+  enemyNouns?: string[];
+  /** A contract-locked title — injected, never generated. */
+  titleLock?: string;
+  /** `direct` recovery: no choice, no check — option/check copy
+   *  generation is forbidden on this node. */
+  recovery?: 'direct';
+  /** Whether the brief expects a `transit` field. */
+  transitExpected?: boolean;
+}
 
 /** One node's narration contract — what the provider sees and must obey. */
 export interface SceneBrief {
@@ -36,6 +99,10 @@ export interface SceneBrief {
   /** Loot granted on EVERY verdict row — a reward the check cannot
    *  take away. Copy must never present it as check-dependent. */
   guaranteedRewards?: string[];
+  /** r008 — epistemic partition + closed-world contract. When present,
+   *  prompts must partition facts by field and the validator runs the
+   *  r008 hard checks (validateNodeCopyR8). */
+  epistemic?: EpistemicBlock;
 }
 
 const RISK_LABEL = (w?: number, d?: number) => {
@@ -113,6 +180,11 @@ export function briefsForScenario(
 
     facts.push(`nodo ${node.kind}${node.kind === 'check' ? ` — check su ${node.stats?.join('+') ?? '?'}` : ''}`);
     if (node.risk) facts.push(`rischio dichiarato: ${RISK_LABEL(node.risk.wound, node.risk.death)}`);
+    if (node.upfrontDamage) {
+      facts.push(
+        `pedaggio deterministico a prescindere dal dado: danno ${node.upfrontDamage.amount}${node.upfrontDamage.epicfailAmount ? ` (${node.upfrontDamage.epicfailAmount} su epicfail)` : ''} — la scena PUÒ nominare sangue/fatica certi, non sono unsupported-cost`,
+      );
+    }
     if (node.risky) facts.push('marcato RISKY (scelta apertamente pericolosa)');
     if (node.transit) facts.push('è un nodo di passaggio/hub — il testo deve reggere visite ripetute');
 
@@ -149,7 +221,9 @@ export function briefsForScenario(
       mustConvey.push('le opzioni condizionali NON devono essere anticipate/spoilerate nel testo dei nodi precedenti');
     }
     if (node.kind === 'end') {
-      mustConvey.push('tono di chiusura: il bilancio di chi è sceso — costo e bottino, non morale');
+      /* r008/Director 2026-10-18: la chiusa è poetica e tagliente, non
+       * un bilancio — la UI già mostra costo e bottino. */
+      mustConvey.push('tono di chiusura: una frase densa e poetica che tiene aperto il mondo — MAI un bilancio di costi, bottino o morale');
     }
 
     briefs.push({
@@ -184,4 +258,137 @@ function outputShapeFor(node: QuestNode): string[] {
     }
   }
   return shape;
+}
+
+/* ------------------------------------------------------------------ */
+/* r008 — attachEpistemic: project the arc contract's closed world +    */
+/* per-node contracts onto the briefs, then promote path-unlocked      */
+/* facts into successors' framingFacts.                                */
+/* ------------------------------------------------------------------ */
+
+/** Node ids that flow INTO `targetId` — direct routing only
+ *  (`option.next`, `verdictTable.*.goto`, plain `next` on info/harm). */
+function inboundSources(scenario: QuestScenario, targetId: string): { nodeId: string; band?: VerdictSchemaType }[] {
+  const out: { nodeId: string; band?: VerdictSchemaType }[] = [];
+  for (const node of Object.values(scenario.nodes)) {
+    for (const opt of node.options ?? []) {
+      const next = opt.next.startsWith('CHECK:') ? opt.next.slice(6) : opt.next;
+      if (next === targetId) out.push({ nodeId: node.id });
+    }
+    for (const [band, row] of Object.entries(node.verdictTable ?? {})) {
+      if (row?.goto === targetId) out.push({ nodeId: node.id, band: band as VerdictSchemaType });
+    }
+    if (node.next === targetId) out.push({ nodeId: node.id });
+  }
+  return out;
+}
+
+/** Facts a verdict row unlocks (`setInfo`) — promotable to successors
+ *  only when EVERY inbound route grants them. */
+function promotedFacts(scenario: QuestScenario, targetId: string): { id: string; text: string }[] {
+  const inbound = inboundSources(scenario, targetId);
+  if (!inbound.length) return [];
+  /* Facts granted by every parent check on every band that reaches the
+   * target — plus every plain routing edge counts as 'no unlock'. */
+  const granted = new Map<string, number>();
+  let routes = 0;
+  for (const src of inbound) {
+    const node = scenario.nodes[src.nodeId];
+    const table = node?.verdictTable ?? {};
+    const relevantRows = src.band
+      ? [table[src.band]].filter(Boolean)
+      : Object.values(table).filter(Boolean);
+    if (!relevantRows.length) {
+      routes += 1; /* plain option edge — no facts */
+      continue;
+    }
+    for (const row of relevantRows) {
+      routes += 1;
+      for (const info of row!.setInfo ?? []) {
+        granted.set(info, (granted.get(info) ?? 0) + 1);
+      }
+    }
+  }
+  return [...granted.entries()]
+    .filter(([, n]) => n === routes && routes > 0)
+    .map(([id]) => ({ id, text: `sbloccato su ogni percorso entrante: '${id}'` }));
+}
+
+/** r008 — attach the epistemic partition to a compiled brief set.
+ *  The contract's `world` block becomes the closed world; each
+ *  `nodeContracts[]` entry contributes revealTerms / canonicalEffects /
+ *  injuryAnchors / titleLock / recovery. Facts unlocked on EVERY
+ *  inbound route are promoted into framingFacts. */
+export function attachEpistemic(
+  briefs: SceneBrief[],
+  contract: QuestArcContract,
+  scenario: QuestScenario,
+): SceneBrief[] {
+  const world = contract.world;
+  const byNode = new Map((contract.nodeContracts ?? []).map((n) => [n.node, n]));
+  return briefs.map((b) => {
+    const nc = byNode.get(b.nodeKey);
+    const node = scenario.nodes[b.nodeId];
+
+    /* Per-band verdict facts: the band SET comes from the contract's
+     * `verdictEffects` keys UNION the scenario's own verdictTable —
+     * authored scenarios may carry no table at all (verdictFlavor only,
+     * engine-side routing), and the contract is then the only source
+     * of which bands exist. */
+    const verdictFacts: EpistemicBlock['verdictFacts'] = {};
+    const bands = [
+      ...new Set([
+        ...(Object.keys(node?.verdictTable ?? {}).filter((k) => k !== 'else') as VerdictSchemaType[]),
+        ...(Object.keys(nc?.verdictEffects ?? {}) as VerdictSchemaType[]),
+      ]),
+    ];
+    for (const band of bands) {
+      const declared = nc?.verdictEffects?.[band];
+      const row = node?.verdictTable?.[band];
+      verdictFacts[band] = {
+        facts: declared?.facts ?? [],
+        revealTerms: declared?.revealTerms ?? [],
+        canonicalEffects: declared?.canonicalEffects ?? [],
+        injuryAnchors:
+          declared?.injuryAnchors ??
+          (band === 'epicfail' && (row?.damage || node?.upfrontDamage?.epicfailAmount)
+            ? ['ferit*', 'sangu*', 'dolore', 'cadut*']
+            : undefined),
+      };
+    }
+
+    const forbiddenPreReveal = [
+      ...new Set(
+        Object.values(verdictFacts).flatMap((v) => v?.revealTerms ?? []),
+      ),
+    ];
+
+    const framingFacts: { id: string; text: string }[] = [
+      ...(nc?.framingFacts ?? []),
+      ...promotedFacts(scenario, b.nodeId),
+    ];
+
+    const epistemic: EpistemicBlock = {
+      framingFacts,
+      verdictFacts: bands.length ? verdictFacts : undefined,
+      world: world
+        ? {
+            closedWorld: world.closedWorld,
+            allowedEntities: world.allowedEntities,
+            canonicalTerms: world.canonicalTerms,
+            endSeeds: world.endSeeds,
+            texture: world.texture,
+          }
+        : undefined,
+      allowedEntities: world?.allowedEntities ?? [],
+      forbiddenPreRevealTerms: forbiddenPreReveal,
+      bannedSettingTerms: world?.bannedSettingTerms ?? [],
+      endSeeds: world?.endSeeds ?? [],
+      enemyNouns: world?.enemyNouns,
+      titleLock: nc?.titleLock,
+      recovery: nc?.recovery,
+      transitExpected: node?.transit !== undefined,
+    };
+    return { ...b, epistemic };
+  });
 }

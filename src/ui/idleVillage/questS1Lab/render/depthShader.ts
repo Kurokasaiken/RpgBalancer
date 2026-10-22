@@ -26,7 +26,7 @@ void main() {
 }
 `;
 
-/** Backward-UV depth warp: one texture + one depth tap per fragment. */
+/** Backward-UV depth warp with a transient spatial focus-rack kernel. */
 export const DEPTH_FRAG = `#version 300 es
 precision highp float;
 in vec2 vUV;
@@ -39,11 +39,45 @@ uniform vec2 uCamVec;
 uniform float uAmpEff;
 uniform float uFocal;
 uniform float uEps;
+uniform float uBlurPx;
+uniform vec2 uViewSize;
+/* PLAN-050 §4 — trauma shake: uTrauma = (x, y, rollRad); uTraumaW =
+ * (bgWeight, fgWeight). The bg share already lives in uWinCenter (composed
+ * into state.pan); the shader adds only the depth-weighted residual, plus
+ * a rotation around the sampled-window center — FG wobbles ~4× BG. */
+uniform vec3 uTrauma;
+uniform vec2 uTraumaW;
+
+vec4 sceneSample(vec2 uv) {
+  if (uBlurPx <= 0.05) return texture(uScene, uv);
+
+  /* Sample around the warped source point in view-pixel units. A mip-only
+   * LOD made the entrance look like enlarged coarse pixels, not lens blur. */
+  vec2 radius = (2.0 * uWinHalf / uViewSize) * uBlurPx;
+  vec4 color = texture(uScene, uv) * 0.25;
+  color += texture(uScene, uv + vec2( radius.x, 0.0)) * 0.125;
+  color += texture(uScene, uv + vec2(-radius.x, 0.0)) * 0.125;
+  color += texture(uScene, uv + vec2(0.0,  radius.y)) * 0.125;
+  color += texture(uScene, uv + vec2(0.0, -radius.y)) * 0.125;
+  color += texture(uScene, uv + vec2( radius.x,  radius.y)) * 0.0625;
+  color += texture(uScene, uv + vec2(-radius.x,  radius.y)) * 0.0625;
+  color += texture(uScene, uv + vec2( radius.x, -radius.y)) * 0.0625;
+  color += texture(uScene, uv + vec2(-radius.x, -radius.y)) * 0.0625;
+  return color;
+}
+
 void main() {
   vec2 base = uWinCenter + (vUV - 0.5) * 2.0 * uWinHalf;
   float d = texture(uDepth, base).r;
   vec2 uv = base + (d - uFocal) * uAmpEff * uCamVec;
+  /* trauma — depth-weighted residual + rotation, post-displacement. */
+  float w = mix(uTraumaW.x, uTraumaW.y, smoothstep(uFocal, 1.0, d));
+  vec2 c = uv - uWinCenter;
+  float ca = cos(uTrauma.z * w);
+  float sa = sin(uTrauma.z * w);
+  c = mat2(ca, -sa, sa, ca) * c;
+  uv = uWinCenter + c + uTrauma.xy * (w - uTraumaW.x);
   uv = clamp(uv, uEps, 1.0 - uEps);
-  outColor = texture(uScene, uv);
+  outColor = sceneSample(uv);
 }
 `;

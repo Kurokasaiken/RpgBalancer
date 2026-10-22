@@ -34,6 +34,12 @@ export interface AstrolabeResult { verdict: string; roll: number; riskRoll: numb
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
 export interface AstrolabeEngineOpts {
   skills: AstrolabeSkill[];
+  /** R-253: display-only per-axis `{stat, difficulty}` override. When provided,
+   *  `axisTip`/`axisCheck` (star silhouette + obelisks) read THESE values
+   *  instead of `skills[axisSkill[i]]` — verdict semantics are untouched:
+   *  `skills`, `skillAxes`, `geo.axisSkill` and the landing-angle skill pick
+   *  all stay on the real skill array. */
+  axisProfile?: { stat: number; difficulty: number }[];
   config?: AstrolabeConfig;
   onResolve?: (r: AstrolabeResult) => void;
   /** raw state-machine state on every transition */
@@ -125,9 +131,10 @@ function recomputeGeometry(skillIndex=0){
   /* per-axis radii: white obelisk = stat, black obelisk = check */
   geo.axisTip=[]; geo.axisCheck=[];
   for(let i=0;i<AXES;i+=1){
+    const prof=opts.axisProfile?.[i];
     const sk=skills[geo.axisSkill[i]]||{stat:60,difficulty:50};
-    geo.axisTip[i]=rOf(sk.stat);        // success star reaches the white obelisk (stat)
-    geo.axisCheck[i]=rOf(sk.difficulty);// failure goo reaches the black obelisk (check)
+    geo.axisTip[i]=rOf(prof? prof.stat : sk.stat);        // success star reaches the white obelisk (stat)
+    geo.axisCheck[i]=rOf(prof? prof.difficulty : sk.difficulty);// failure goo reaches the black obelisk (check)
   }
   /* save the original stat/difficulty radii for obelisk display (before area solve) */
   geo.obeliskTip=geo.axisTip.slice();   // white obelisks stay on the stat
@@ -940,7 +947,14 @@ const ctx=cv.getContext('2d',{alpha:true});
    damping: the mass surges, lags and settles like tar, never like water.
    Crawling droplets merge into the rim through smooth-min bridges.
    ========================================================================= */
-const gooRenderer=createTarGooRenderer(W,tarGooConfig);
+/* R-241 jank: the goo raster renders at `rendering.gooScale` of the board —
+   the SDF shader cost drops with the pixel count and the WebGL→Canvas2D
+   composite sync stops stalling the frame (p95 gaps 66–116ms measured live).
+   The shader keeps working in board px (fieldSize): only gl_FragCoord is
+   raster space, so material/rim/blob math is untouched — pure raster
+   downscale, drawImage upscales the soft tar edges imperceptibly. */
+const GOO_SCALE=tarGooConfig.rendering?.gooScale ?? 1;
+const gooRenderer=createTarGooRenderer(Math.max(64,Math.round(W*GOO_SCALE)),tarGooConfig,W);
 /* I TENTACOLI vivono in un modulo a parte: il loro modello geometrico non e'
    r(theta) ma una centerline per braccio, e mescolarli qui li avrebbe riportati
    a essere lobi angolari. */
@@ -1261,7 +1275,7 @@ function drawChallengeSurface(now){
       reveal:clamp(rev,0,1),
       ripple:clamp(scene.gooRipple||0,0,1),
     });
-    ctx.drawImage(layer,0,0);
+    ctx.drawImage(layer,0,0,W,W);
     return;
   }
   /* Fallback (no WebGL2): V6 flat drawing — deep void fill + single border. */

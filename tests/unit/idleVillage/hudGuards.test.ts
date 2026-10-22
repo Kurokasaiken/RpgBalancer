@@ -39,6 +39,8 @@ const LEGACY_STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/HudEventLedger.tsx',
   'src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx',
   'src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx',
+  // PLAN-053 T-005 — the world-map route uses the active skin's map-safe metals.
+  'src/ui/idleVillage/components/gameFrame/QuestJourneyRoute.tsx',
   // PLAN-032 SP-1 — the hero sheet plaque.
   'src/ui/idleVillage/components/gameFrame/HeroSheetPanel.tsx',
   // PLAN-032 SP-2 — the village stash plaque and its reusable building POI marker.
@@ -49,8 +51,6 @@ const LEGACY_STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/MerchantPanel.tsx',
   'src/ui/idleVillage/components/gameFrame/MockBuyControl.tsx',
   'src/ui/idleVillage/components/gameFrame/merchantOfferIcons.tsx',
-  // PLAN-032 SP-4 — the read-only bag strip inside QuestRunWindow.
-  'src/ui/idleVillage/components/gameFrame/BagStrip.tsx',
   // PLAN-032 SP-5 — the hero level-up decorative layer (rosterV2, same material).
   'src/ui/idleVillage/rosterV2/HeroLevelDecor.tsx',
   // R-196 — the quest shell's companion plaques and shared layout predicate.
@@ -59,8 +59,8 @@ const LEGACY_STRICT_FILES = [
   'src/ui/idleVillage/components/gameFrame/QuestLogPanel.tsx',
   'src/ui/idleVillage/components/gameFrame/questShellLayout.ts',
   'src/ui/idleVillage/components/gameFrame/useHudPanelDrag.ts',
-  // PLAN-032 SP-4 — the read-only consumables strip in the quest window.
-  'src/ui/idleVillage/components/gameFrame/BagStrip.tsx',
+  // PLAN-032 SP-4 — the packed-bag derivation shared by the quest window's
+  // bag popover and consumable belt (BagStrip removed in PLAN-043 WS-5).
   'src/ui/idleVillage/components/gameFrame/questBag.ts',
   'src/ui/idleVillage/quests/QuestExpeditionDetail.tsx',
   // PLAN-024 — Quest S1 Lab HUD (full-page action screens, same material).
@@ -110,6 +110,7 @@ const TOKEN_FILES = [
 ];
 
 describe('HUD guards', () => {
+  // INV:skin-css-variables.INV-1
   it('defines every --skin-hud-* token that the HUD files read', () => {
     const missing: string[] = [];
     for (const file of TOKEN_FILES) {

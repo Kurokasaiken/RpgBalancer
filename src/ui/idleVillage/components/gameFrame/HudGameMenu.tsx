@@ -16,6 +16,12 @@ export interface HudGameMenuProps {
   onSaveNow?: () => Promise<boolean> | boolean;
   /** Interface size (desktop app only); the row is omitted without it. */
   scale?: HudScaleControl;
+  /** Open the Load game screen. Omitted = row disabled. */
+  onLoadGame?: () => void;
+  /** Open the full settings screen. Omitted = row disabled. */
+  onOpenSettings?: () => void;
+  /** Leave to the title screen. Omitted = row disabled. */
+  onQuit?: () => void;
   /** Offer the dev-only panels (Director, Tuning). Off in a production build. */
   includeDev?: boolean;
 }
@@ -34,9 +40,9 @@ const MENU_LOCALES: readonly SupportedLocale[] = ['en', 'it-IT'];
  * Game menu — the top-left cartouche (R-132). A `hang` plaque like the other two
  * top ribbons; its Menu button opens a dropdown with the real controls that exist
  * today (panel toggles, manual save, language and skin choice) plus the disabled
- * entries (Load, Options, Quit) reserved for their future screens.
+ * entries (Load, Settings, Quit) that open their screens (PLAN-076).
  */
-export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, includeDev = false }: HudGameMenuProps) {
+export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGame, onOpenSettings, onQuit, includeDev = false }: HudGameMenuProps) {
   const { t } = useTranslation('idleVillage');
   const { locale, setLocale } = useLocalization();
   const [open, setOpen] = useState(false);
@@ -82,7 +88,11 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, includeD
     }
   };
 
-  const stubProps = { disabled: true, title: t('gameFrame.menu.comingSoon'), style: { width: '100%', opacity: 0.45 } } as const;
+  /** A screen-opening entry: closes the menu, then hands over to its screen. Without a handler it stays disabled. */
+  const entryProps = (handler: (() => void) | undefined) =>
+    handler
+      ? ({ onClick: () => { setOpen(false); handler(); }, style: { width: '100%' } } as const)
+      : ({ disabled: true, title: t('gameFrame.menu.comingSoon'), style: { width: '100%', opacity: 0.45 } } as const);
 
   return (
     <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>
@@ -141,10 +151,10 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, includeD
           >
             <span>{saveState === 'saved' ? t('gameFrame.menu.saved') : saveState === 'saving' ? t('gameFrame.menu.saving') : t('gameFrame.menu.saveNow')}</span>
           </button>
-          <button type="button" role="menuitem" {...stubProps}>
+          <button type="button" role="menuitem" {...entryProps(onLoadGame)}>
             <span>{t('gameFrame.menu.loadGame')}</span>
           </button>
-          <button type="button" role="menuitem" {...stubProps}>
+          <button type="button" role="menuitem" {...entryProps(onQuit)}>
             <span>{t('gameFrame.menu.quit')}</span>
           </button>
 
@@ -191,7 +201,7 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, includeD
               </div>
             </>
           )}
-          <button type="button" role="menuitem" {...stubProps}>
+          <button type="button" role="menuitem" {...entryProps(onOpenSettings)}>
             <span>{t('gameFrame.menu.settings')}</span>
           </button>
         </HudPlaque>

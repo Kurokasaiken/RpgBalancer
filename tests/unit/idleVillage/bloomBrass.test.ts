@@ -3,6 +3,7 @@ import { getBloomStyle } from '@/ui/idleVillage/interaction/bloomEffect';
 import { SLOT_HUD_GOLD_TOKENS } from '@/ui/idleVillage/components/SlotV12Renderer';
 
 describe('bloom — look «ottone» degli slot dei planner (PLAN-043)', () => {
+  // INV:bloom-effect.INV-1
   it('di default il bloom resta quello condiviso (POI e demo non cambiano)', () => {
     const style = getBloomStyle('valid', 83);
     expect(style.animation).toContain('aaa-bloom-pulse');

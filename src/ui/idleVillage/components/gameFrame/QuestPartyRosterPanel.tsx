@@ -55,10 +55,10 @@ export const QuestPartyRosterPanel: React.FC<QuestPartyRosterPanelProps> = ({ pa
       {/* Header per the component guide: title + count left, X on the right. */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <EngravedIcon id="nav-company" size={14} style={{ color: 'var(--skin-title-color)' }} />
-        <span style={{ flex: 1, minWidth: 0, fontFamily: 'var(--skin-font-display)', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <span title={t('gameFrame.questWindow.roster')} style={{ flex: 1, minWidth: 0, fontFamily: 'var(--skin-font-display)', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {t('gameFrame.questWindow.roster')}
         </span>
-        <span style={{ fontFamily: 'var(--skin-font-display)', fontSize: 12, fontVariantNumeric: 'tabular-nums', color: TONE.secondary }} aria-label={t('gameFrame.questWindow.partyStatus', { alive, total: run.party.length })}>
+        <span style={{ fontFamily: 'var(--skin-font-display)', fontSize: 12, fontVariantNumeric: 'tabular-nums', color: TONE.secondary }} title={t('gameFrame.questWindow.partyStatus', { alive, total: run.party.length })} aria-label={t('gameFrame.questWindow.partyStatus', { alive, total: run.party.length })}>
           {alive}/{run.party.length}
         </span>
         <span data-hud-controls="" style={{ display: 'inline-flex' }}>
@@ -87,6 +87,12 @@ export const QuestPartyRosterPanel: React.FC<QuestPartyRosterPanelProps> = ({ pa
                 portraitUrl={getResidentPortraitUrl(resident)}
                 statusLabel={t(`roster.status.${statusKey}`)}
                 disabled={m.dead}
+                /* R-241 B5 (INV:R-241-roster-status-only): a member already
+                   committed to the run has no «slot compatibility» to judge —
+                   `idle` keeps the card status-only, otherwise `undefined`
+                   would paint «Nessuno slot compatibile» on every row. */
+                compatibilityState="idle"
+                frameType="bronze"
                 horizontal
               />
               {heal && heal.hpDelta > 0 && (

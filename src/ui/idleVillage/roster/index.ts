@@ -21,7 +21,9 @@ export { default as VillageRosterSection } from '@/ui/idleVillage/components/Vil
 export { ResidentRosterPanel } from '@/ui/idleVillage/components/ResidentRosterPanel';
 export { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 export { default as WanderlustRosterCard } from '@/ui/idleVillage/components/WanderlustRosterCard';
-export { MatericRosterComponent } from '@/ui/idleVillage/components/MatericRosterComponent';
+/* PLAN-043 WS-5 D9: the V1 Materic roster was retired (Director ruling —
+ *  V2/Lacquer Atlas is the only roster). Import `MatericRosterComponentV2`
+ *  from '@/ui/idleVillage/rosterV2'. */
 
 // Drag & drop components
 export { DragProvider } from '@/ui/idleVillage/components/DragContext';
@@ -34,4 +36,3 @@ export type { VillageRosterSectionProps } from '@/ui/idleVillage/components/Vill
 export type { ResidentRosterPanelProps } from '@/ui/idleVillage/components/ResidentRosterPanel';
 export type { ResidentSlotRackProps } from '@/ui/idleVillage/components/ResidentSlotRack';
 export type { WanderlustRosterCardProps } from '@/ui/idleVillage/components/WanderlustRosterCard';
-export type { MatericRosterComponentProps } from '@/ui/idleVillage/components/MatericRosterComponent';

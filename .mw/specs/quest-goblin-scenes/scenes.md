@@ -8,7 +8,13 @@ i nodi check riusano l'immagine della fase. I prompt dei pulsanti restano
 su disco come riserva (marcati NON GENERARE).
 
 **Ruoli runtime (chiarimento Director 2026-10-13):**
-- **Fasi** = nodi choice/check/combat con schermata piena → art 21:9.
+- **Fasi** = nodi choice/check/combat con schermata piena → art wide.
+  **Contratto formato (PLAN-061, R-231 #8):** il theatre stage renderizza a
+  `theaterAspect` dichiarato in `gameFrameConfig.questWindow` (oggi **2.4:1**),
+  cover-fit — il formato entra nel prompt, non nel runtime. Generare ≥ 21:9
+  (2.357, dentro la tolleranza ±5% di `theaterAssetAspectTolerance`); la
+  ricodifica target è **3168×1320** per 2.4:1 esatto. Soggetto focale nella
+  fascia verticale centrale. Gate meccanico: `npm run check:quest-art`.
 - **Viaggio/Ritorno NON sono fasi**: sono tempo non skippabile
   (`TransitView`, banda `h-44` a opacità ridotta) con eventuali eventi
   minori. `viaggio.png`/`ritorno.png` sono **art di transito** — coprono
@@ -29,9 +35,9 @@ giocatore mai disegnato, NPC/party esterni ok; goblin da scheda
 | # | Ruolo | Dir | Nodi coperti | File output | Goblin | Soggetto |
 |---|-------|-----|--------------|-------------|--------|----------|
 | 1 | *transito* andata + `gob-inizio` | `f0-viaggio` | `gob-inizio`, transit out | `viaggio.png` | no | strada fuori dal villaggio, vuota |
-| — | *evento* Mercante (opt., mid-quest) | `f0-mercante` | nodo evento viaggio | `mercante.png` | no (NPC mercante) | mercante fermo al bivio, pre-incontro |
-| 2 | **fase** Esplorazione | `f1-esplorazione` | `gob-esplora`, `gob-tracce-per`¹, `gob-tracce-perfor`¹ | `esplorazione.png` | no | sentiero che muore, solchi di ruota, straccio al rovo |
-| 3 | **fase** Il bottino | `f2-bottino` | `gob-bottino-scelta`, `gob-bottino` | `bottino.png` | no | il terzo carro nascosto, cassa con trappola a campanelli |
+| — | *evento* Mercante (opt., mid-quest) | `f0-mercante` | nodo evento viaggio | `mercante.png` | no (NPC mercante) | ⚠ v3 revoca mercanti/strada nella fiction — nodo mai authored, spec da rivedere |
+| 2 | **fase** Esplorazione | `f1-esplorazione` | `gob-esplora`, `gob-tracce-per`¹, `gob-tracce-perfor`¹ | `esplorazione.png` | no | ⚠ v3: segni sottili nel sottobosco (solchi di ruota revocati — regen pendente) |
+| 3 | **fase** Il bottino | `f2-bottino` | `gob-bottino` | `bottino.png` | no | ⚠ v3: fagotto sotto tela cerata tra le fronde (carro revocato — regen pendente) |
 | 4 | **fase** L'accampamento | `f3-accampamento` | `gob-accampamento`, `gob-stealth`¹, `gob-assalto`¹ | `accampamento.png` | no | il campo dalle fronde, vuoto |
 | 5 | **fase** Combattimento | `f4-combattimento` | `gob-combattimento` | `combattimento.png` | **sì — sciame** | eruzione pre-contatto: goblin che escono dalle tende |
 | 6 | **fase** Incalzare | `f5-incalzare` | `gob-incalzare`, `gob-incalza-check` | `incalzare.png` | **sì — fuga lontana** | gola tra le rocce, fuga aperta |
@@ -78,7 +84,7 @@ reale in `src/ui/idleVillage/questS1Lab/questArt.ts`:
 |---|---|---|
 | Viaggio (transito) | — non generato | `gob-inizio` → placeholder PD `assegnazione.jpg` |
 | Esplorazione | `sentiero-tracce.jpg` | `gob-esplora`, `gob-tracce-per`, `gob-tracce-perfor` |
-| Bottino | `carro-nascosto.jpg` | `gob-bottino-scelta`, `gob-bottino` |
+| Bottino | `carro-nascosto.jpg` ⚠ stale v3 (carro) | `gob-bottino` |
 | Accampamento | `accampamento-raider.jpg` | `gob-accampamento`, `gob-stealth`, `gob-assalto` |
 | Combattimento | `assalto-goblin.jpg` | `gob-combattimento` |
 | Incalzare | `fuga-goblin.jpg` | `gob-incalzare`, `gob-incalza-check` |
@@ -93,6 +99,11 @@ post-produzione (dettagli in CATALOG.md).
 
 ## Delta necessari alla spec (manoscritto) — da ratificare
 
+> **Nota 2026-10-18:** il manoscritto v3 (Director) ha superato questa
+> lista — carri, solchi di ruota e guado sono fiction revocata. Le voci
+> sotto restano come storia della ratifica 2026-10-13; la direzione
+> corrente è nella spec §«Delta rimasti».
+
 1. **F0:** titolo «Assegnazione» → «Viaggio»; il body del consiglio
    resta come briefing, ma il nodo diventa la marcia (allinea la quest al
    pattern S1 viaggio→…→ritorno e abilita eventi casuali tipo mercante).
@@ -104,6 +115,9 @@ post-produzione (dettagli in CATALOG.md).
 4. **F2 body:** «Sotto il masso, un bottino avvolto in stracci» → il carro
    trascinato nella boscaglia, cassa ancora chiusa con trappola a campanelli
    (conserva il flavor «catene, campanelli, un nodo da sciogliere»).
+   **SUPERSEDED v3 (2026-10-18):** niente carro né trappola — il
+   nascondiglio è un fagotto sotto tela cerata avvistato solo dall'alto;
+   `gob-bottino-scelta` non esiste più (nodo singolo a gesto unico).
 5. **F3 stealth:** titolo check «Passare il filo dei campanelli» → **«Intrusi»**
    (ratificato Director 2026-10-12).
 6. **F6:** titolo «Razzia / il campo conquistato» → **«Spoglie di guerra»**.

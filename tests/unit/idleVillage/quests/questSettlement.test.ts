@@ -14,9 +14,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   applyPlanToState,
+  beginSettlement,
+  commitSettlement,
   deriveSettlementPlan,
   runIdOf,
   settleRun,
+  settlementResourceDelta,
   type SettlementMarker,
   type SettlementPlan,
 } from '@/ui/idleVillage/quests/questSettlement';
@@ -120,6 +123,8 @@ beforeEach(async () => {
 /* ------------------------------------------------------------------ */
 
 describe('deriveSettlementPlan', () => {
+  // INV:CTR-game-009.INV-3
+  // INV:quest-settlement.INV-1
   it('reward: rewardResolved + run gold + xp, member effects by fate', () => {
     const plan = deriveSettlementPlan(terminalRun({}));
     expect(plan.outcome).toBe('reward');
@@ -133,6 +138,7 @@ describe('deriveSettlementPlan', () => {
     expect(plan.effects.some((e) => e.kind === 'loadout-release')).toBe(true);
   });
 
+  // INV:CTR-game-009.INV-3
   it('wipe: tutto perso — no gold, no xp, dead residents still recorded', () => {
     const plan = deriveSettlementPlan(
       terminalRun({
@@ -151,6 +157,7 @@ describe('deriveSettlementPlan', () => {
     expect(plan.effects.some((e) => e.kind === 'loadout-release')).toBe(true);
   });
 
+  // INV:CTR-game-009.INV-3
   it('fled: obiettivo perso in fuga → no reward, bottino in mano conservato', () => {
     const plan = deriveSettlementPlan(terminalRun({ outcome: 'fled', objectiveDone: false }));
     expect(plan.effects.some((e) => e.key === 'reward:village-gold')).toBe(false);
@@ -158,6 +165,7 @@ describe('deriveSettlementPlan', () => {
     expect(gold).toBe(15); // solo run.gold — il trofeo/rewardResolved non paga
   });
 
+  // INV:CTR-game-009.INV-3
   it('survived con leader morto: nessun reward anche se obiettivo preso', () => {
     const plan = deriveSettlementPlan(
       terminalRun({
@@ -181,6 +189,7 @@ describe('deriveSettlementPlan', () => {
 /* ------------------------------------------------------------------ */
 
 describe('applyPlanToState', () => {
+  // INV:CTR-game-009.INV-3
   it('applies effects and keys them inside the same aggregate', () => {
     const plan = deriveSettlementPlan(terminalRun({}));
     const { next, appliedNow } = applyPlanToState(minimalState({}), plan, 200);
@@ -192,6 +201,7 @@ describe('applyPlanToState', () => {
     expect(appliedNow.length).toBe(plan.effects.length); // every effect keyed, loadout-release included
   });
 
+  // INV:CTR-game-009.INV-3
   it('second call is a no-op — nothing applied twice', () => {
     const plan = deriveSettlementPlan(terminalRun({}));
     const first = applyPlanToState(minimalState({}), plan, 200).next;
@@ -484,5 +494,87 @@ describe('settleRun journal', () => {
     expect(out).toBe(settled);
     expect(markers).toHaveLength(0);
     expect(store.state.gold).toBe(10);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* R-260 collect-commit — begin persists the intent, the report's        */
+/* dismissal owns the mutation.                                          */
+/* ------------------------------------------------------------------ */
+
+describe('R-260 begin/commit split', () => {
+  // INV:quest-settlement.INV-2
+  it('begin persists `settling` and freezes the plan WITHOUT touching the aggregate', async () => {
+    const run = terminalRun({});
+    const { deps, markers, store } = makeDeps();
+    const released: string[] = [];
+    deps.releaseLoadout = (runId) => void released.push(runId);
+
+    const marker = await beginSettlement(run, deps);
+    expect(marker.status).toBe('settling');
+    expect(marker.plan.runId).toBe(runIdOf(run));
+    expect(markers.map((m) => m.status)).toEqual(['settling']);
+    /* The collect-commit boundary: arrival/acknowledgement moves nothing —
+     *  gold, xp and the loadout release all wait for the dismissal. */
+    expect(store.state.gold).toBe(10);
+    expect(store.state.xp).toBe(0);
+    expect(store.state.appliedQuestEffectIds ?? []).toHaveLength(0);
+    expect(released).toHaveLength(0);
+  });
+
+  // INV:quest-settlement.INV-2
+  it('commit on a `settling` run applies the frozen plan and lands `settled`', async () => {
+    const run = terminalRun({});
+    const { deps, markers, store } = makeDeps();
+    const intent = await beginSettlement(run, deps);
+    const settlingRun = terminalRun({ settlement: intent });
+
+    const done = await commitSettlement(settlingRun, deps);
+    expect(done.status).toBe('settled');
+    expect(done.plan).toBe(intent.plan); // the frozen plan commits, not a re-derived one
+    expect(store.state.gold).toBe(10 + 42 + 15);
+    expect(store.state.xp).toBe(3);
+    expect(markers.map((m) => m.status)).toEqual(['settling', 'settled']);
+  });
+
+  // INV:quest-settlement.INV-2
+  it('commit on an unmarked run still pays out — begin is implicit, never required', async () => {
+    const run = terminalRun({});
+    const { deps, markers, store } = makeDeps();
+    const done = await commitSettlement(run, deps);
+    expect(done.status).toBe('settled');
+    expect(markers.map((m) => m.status)).toEqual(['settling', 'settled']);
+    expect(store.state.gold).toBe(10 + 42 + 15);
+  });
+
+  // INV:quest-settlement.INV-2
+  it('begin then commit then commit again — the grant lands once', async () => {
+    const run = terminalRun({});
+    const { deps, store } = makeDeps();
+    const intent = await beginSettlement(run, deps);
+    const settlingRun = terminalRun({ settlement: intent });
+    const done = await commitSettlement(settlingRun, deps);
+    const again = await commitSettlement(terminalRun({ settlement: done }), deps);
+    expect(again).toBe(done);
+    expect(store.state.gold).toBe(10 + 42 + 15); // not doubled
+  });
+
+  // INV:quest-settlement.INV-2
+  it('settlementResourceDelta derives the village grant from the frozen plan', () => {
+    const plan = deriveSettlementPlan(terminalRun({}));
+    expect(settlementResourceDelta(plan)).toEqual({ gold: 42 + 15, xp: 3 });
+    /* Wipe pays nothing — the delta reports zero, no chip. */
+    const wipe = deriveSettlementPlan(
+      terminalRun({
+        outcome: 'wipe',
+        objectiveDone: false,
+        gold: 0,
+        xp: 0,
+        party: [
+          { id: 'hero-leader', name: 'L', stats: {}, role: 'leader', hp: 0, maxHp: 100, wounded: false, dead: true },
+        ],
+      }),
+    );
+    expect(settlementResourceDelta(wipe)).toEqual({ gold: 0, xp: 0 });
   });
 });

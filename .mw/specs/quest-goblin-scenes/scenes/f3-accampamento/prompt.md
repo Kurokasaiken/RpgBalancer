@@ -15,4 +15,4 @@ ACCAMPAMENTO — A raider camp spied through dark foliage from a hillside, the w
 
 - La palizzata «di rifiuti e fango» resta materica (legno di scarto, corda),
   non putrida — kill list: no decay, no grime.
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

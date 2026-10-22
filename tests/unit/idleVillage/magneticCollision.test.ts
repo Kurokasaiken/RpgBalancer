@@ -18,6 +18,7 @@ describe('magnetic slot targeting (PLAN-043 T1.2)', () => {
     expect(nearestWithin({ x: 196, y: 128 }, slot, 120)?.id).toBe('a');
   });
 
+  // INV:drag-config.INV-1
   it('nothing is attracted beyond the radius', () => {
     const slot = [{ id: 'a', rect: rect(100, 100) }];
     expect(nearestWithin({ x: 400, y: 128 }, slot, 120)).toBeNull();

@@ -1,6 +1,6 @@
 # Current State — RpgBalancer
 
-**Ultimo aggiornamento:** 2026-10-05
+**Ultimo aggiornamento:** 2026-10-19
 **Superficie canonica:** `/game` (Game Frame Pixi — raggiungibile dal link «Game» in `/test hub`; R-075 v2)
 **Repo remoto:** `https://github.com/Kurokasaiken/RpgBalancer`
 
@@ -30,6 +30,7 @@ Questa è una fotografia; per lo stato più aggiornato verificare `SESSION_HANDO
 - Sistema di skin/config-first, `IdleVillageConfig` editor, `dynamicConfig.json`.
 - Playwright E2E per drag, POI quest, component hub.
 - **Boot/preload + perf gate su `/game`** (PLAN-031, 2026-10-12): `GameBootScreen` veil con il logo authored su lacca teal HUD, progresso reale e reveal automatico (copre `/game`, `/`, `/game-frame-pixi`); all'apertura della mappa nessun pannello è visibile (registry `defaultVisible:false`, `useHudPanels` senza persistenza); `HudHideToggle` (tasto `h`, cluster bottom-right) fa scorrere i cluster top verso l'alto e quelli bottom verso il basso lasciando solo la perla di richiamo; `PixiWorldMap` con contratto `onBootProgress`/`onReady`, prefetch parallelo a tier, `refit` pre-reveal, `renderer.prepare.upload` (warmup GPU); toggle pannelli fa `refit()` in place invece di ricostruire l'app (fix `safeFitRef`); `__gamePerf` probe + `gamePerfBudgets` (Zod, p95≤33ms / 0 long-frame / boot ≤4s) + `tests/e2e/idleVillage/gamePerf.spec.ts`; drag medaglione fixato con `startTransition` sui handler + `MeasuringStrategy.BeforeDragging` su `DndContext` (0 long frame al floor; `gameQuestExpedition` 14/14 passa).
+- **Map fit `/game` CTR-game-005** (PLAN-054/R-225, 2026-10-19): `safeFit` protegge la terra dal chrome fisso reale; quando `autoHudScale` ingrandisce la HUD via `cssZoom`, gli inset configurati vengono scalati prima di arrivare al renderer. Copertura: matrice viewport contrattuale + caso dedicato `3440×1440`, DPR 2 e probe CLI; bundle `.mw/runs/r225-ultrawide-map-fit/bundle.json` PASS.
 - **Mission Planner** (PLAN-018, R-078): draft PARTY/LOADOUT → preview deterministica (DP esatta, rng-free) → resolver che campiona lo stesso modello; checkpoint continua/ritirati; docs `mission_planner_spec.md` + `mission_planner_math_spec.md`; E2E `missionPlanner.spec.ts`. Sarà rimappato in PLAN-019 S2/S3.
 - Sistema `Mind Weaver`: `AGENTS.md`, `.mw/desiderata.md`, `RICHIESTE.md`, `context/DECISION_LOG.md`, skill cross-IDE.
 - **Knowledge pipeline** (2026-10-05, R-084/v25): `QUEST_RULES.md` canonico (PLAN-020), registry `context/REJECTED.md` + `context/OPEN.md`, report di ingestion tracciati in `context/ingestions/`, router L0–L4 in `context/INDEX.md`.

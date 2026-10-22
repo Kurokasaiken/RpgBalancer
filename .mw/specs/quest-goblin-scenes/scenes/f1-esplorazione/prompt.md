@@ -16,4 +16,4 @@ ESPLORAZIONE — A forest path dying into unnaturally still woods, painted as a 
 ## Generation notes
 
 - Il fumo basso resta (era già visibile dal sentiero nel manoscritto).
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

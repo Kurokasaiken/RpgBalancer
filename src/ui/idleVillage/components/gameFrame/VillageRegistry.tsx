@@ -123,7 +123,7 @@ const StateBadge: React.FC<{ b: VillageBuildingDefinition }> = ({ b }) => {
     justifyContent: 'center',
     background: 'var(--skin-hud-lacquer-deep)',
     border: '1px solid var(--skin-hud-brass-base)',
-    font: '600 10px/1 var(--skin-font-display)',
+    font: '600 12px/1 var(--skin-font-display)',
     letterSpacing: '0.04em',
     flexShrink: 0,
   };
@@ -165,7 +165,7 @@ const StateGlyph: React.FC<{ state: VillageBuildingState }> = ({ state }) => {
     );
   }
   return (
-    <span aria-hidden="true" style={{ color: 'var(--skin-icon-accent)', font: '9px var(--skin-font-display)' }}>◆</span>
+    <span aria-hidden="true" style={{ color: 'var(--skin-icon-accent)', font: '12px var(--skin-font-display)' }}>◆</span>
   );
 };
 
@@ -235,7 +235,7 @@ const RegistryRow: React.FC<{
         <span style={{ font: 'var(--skin-hud-name-weight) var(--skin-hud-name-size) var(--skin-font-display)', letterSpacing: 'var(--skin-hud-name-tracking)', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {t(b.nameKey)}
         </span>
-        <span style={{ font: '10px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {t(b.descKey)}
         </span>
       </span>
@@ -247,7 +247,7 @@ const RegistryRow: React.FC<{
         title={painted ? t('gameFrame.village.registry.onMap') : t('gameFrame.village.registry.offMap')}
         style={{ color: painted ? 'var(--skin-icon-accent)' : 'var(--skin-text-secondary)', display: 'inline-flex', opacity: painted ? 1 : 0.6 }}
       >
-        {painted ? <EngravedIcon id="nav-village" size={12} /> : <span style={{ font: '600 10px var(--skin-font-display)' }}>·</span>}
+        {painted ? <EngravedIcon id="nav-village" size={12} /> : <span style={{ font: '600 12px var(--skin-font-display)' }}>·</span>}
       </span>
       <StateGlyph state={b.initialState} />
     </button>
@@ -447,7 +447,7 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
           >
             {t('gameFrame.village.registry.title')}
           </span>
-          <span style={{ font: '10px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+          <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
             {t('gameFrame.village.registry.hint')}
           </span>
         </div>
@@ -474,7 +474,7 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
                   border: `1px solid ${filter === f ? 'var(--skin-hud-brass-hi)' : 'var(--skin-surface-border)'}`,
                   background: filter === f ? 'color-mix(in srgb, var(--skin-hud-brass-base) 28%, var(--skin-hud-lacquer-deep))' : 'var(--skin-hud-lacquer-deep)',
                   color: filter === f ? 'var(--skin-title-color)' : 'var(--skin-text-secondary)',
-                  font: '10px var(--skin-font-display)',
+                  font: '12px var(--skin-font-display)',
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                   cursor: 'pointer',
@@ -509,7 +509,7 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
                       border: 'none',
                       background: 'var(--skin-hud-lacquer-deep)',
                       color: 'var(--skin-text-secondary)',
-                      font: 'var(--skin-hud-caps-weight) 10px var(--skin-font-display)',
+                      font: 'var(--skin-hud-caps-weight) 12px var(--skin-font-display)',
                       letterSpacing: 'var(--skin-hud-caps-tracking)',
                       textTransform: 'uppercase',
                       cursor: 'pointer',
@@ -562,7 +562,7 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
                 data-registry-back=""
                 aria-label={t('gameFrame.village.registry.back')}
                 onClick={closeCard}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--skin-icon-color)', cursor: 'pointer', padding: '2px 0', font: '11px var(--skin-font-display)', letterSpacing: '0.05em' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--skin-icon-color)', cursor: 'pointer', padding: '2px 0', font: '12px var(--skin-font-display)', letterSpacing: '0.05em' }}
               >
                 <EngravedIcon id="cmd-chevron-left" size={14} />
                 {t('gameFrame.village.registry.back')}
@@ -651,12 +651,12 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
                     borderRadius: 'var(--skin-hud-row-radius)',
                     border: `1px solid ${detailBuilding.initialLevel === tier.level ? 'var(--skin-hud-brass-hi)' : 'var(--skin-surface-border)'}`,
                     background: detailBuilding.initialLevel === tier.level ? 'color-mix(in srgb, var(--skin-hud-brass-base) 20%, transparent)' : 'transparent',
-                    font: '11px var(--skin-font-sans)',
+                    font: '12px var(--skin-font-sans)',
                     color: 'var(--skin-text-primary)',
                     fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  <span style={{ minWidth: 22, font: '600 10px var(--skin-font-display)', color: 'var(--skin-icon-accent)' }}>{toRomanLevel(tier.level)}</span>
+                  <span style={{ minWidth: 22, font: '600 12px var(--skin-font-display)', color: 'var(--skin-icon-accent)' }}>{toRomanLevel(tier.level)}</span>
                   <span style={{ flex: 1 }}>
                     {t(detailBuilding.effectKey, {
                       value: tier.effectValue,

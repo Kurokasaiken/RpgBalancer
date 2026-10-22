@@ -237,7 +237,14 @@ export function solveStageLayout(config: StageZonesConfig, inputs: SolverInputs)
     const zoneRect = { x: 0, y: stageTop, w: 0, h: stageH };
     const zones = { leftWing: { ...zoneRect }, centerStage: { ...zoneRect }, rightWing: { ...zoneRect } };
     const nominalZones = { leftWing: { ...zoneRect }, centerStage: { ...zoneRect }, rightWing: { ...zoneRect } };
-    const clusterEnvelope = { ...envelope };
+    /* R-253: the run cluster is modal-grade — it may paint over the fixed
+     * chrome bands by `questChromeOverlap` so art + copy + choices all fit
+     * inside one window (Director ruling: «il componente quest può andare
+     * sopra l'HUD»). `panels` z-layer (12) already sits above `chrome` (10). */
+    const ovl = config.questChromeOverlap;
+    const clusterTop = Math.max(0, config.chrome.topPx - ovl.topPx);
+    const clusterH = Math.max(0, viewport.h - clusterTop - Math.max(0, config.chrome.bottomPx - ovl.bottomPx));
+    const clusterEnvelope = { x: envelope.x, y: clusterTop, w: envelope.w, h: clusterH };
     for (const zone of ZONE_IDS) {
       for (const o of occupancy[zone]) {
         if (o.panelId === 'quest') {

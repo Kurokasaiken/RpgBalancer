@@ -38,6 +38,7 @@ describe('RosterStatFilter', () => {
       expect(screen.getByTestId('filter-count')).toHaveTextContent('0');
     });
 
+    // INV:roster-filter-config.INV-1
     it('should initialize with empty filter criteria', () => {
       const TestComponent = () => {
         const { criteria } = useRosterFilter();

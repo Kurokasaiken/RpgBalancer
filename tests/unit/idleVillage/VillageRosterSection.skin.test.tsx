@@ -81,6 +81,7 @@ describe('VillageRosterSectionSkin', () => {
     vi.clearAllMocks();
   });
 
+  // INV:demo-config.INV-1
   it('renders with default skin preset', () => {
     render(<VillageRosterSectionSkin {...defaultProps} />);
     

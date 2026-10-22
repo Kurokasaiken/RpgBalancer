@@ -142,6 +142,7 @@ describe('useDropFeedback Hook', () => {
     expect(result.message).toContain('exhausted');
   });
 
+  // INV:drop-feedback-config.INV-1
   it('should get visual feedback for different types', () => {
     const TestHook = () => {
       const { getVisualFeedback } = useDropFeedback();

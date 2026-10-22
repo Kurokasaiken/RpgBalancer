@@ -17,4 +17,4 @@ ALBERO — A shot looking straight up the trunk of a colossal old pine standing 
 ## Generation notes
 
 - Il divieto chiave: «any view of a camp or hidden place» — niente reveal.
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

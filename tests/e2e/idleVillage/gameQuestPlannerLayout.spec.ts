@@ -181,11 +181,11 @@ test.describe('PLAN-043 WS-3 — Dispatch Table geometry (AC-01/AC-02/AC-17)', (
       if (rosterBox) expect(overlaps(mainBox as Box, rosterBox as Box)).toBe(false);
 
       /* AC-02 second regime: tray OPEN still zero-overflow on the stage. */
-      await page.getByTestId('quest-tray-toggle').click();
+      await page.getByTestId('bag-slot-0').locator('button').click();
       await expect(page.getByTestId('quest-selection-tray')).toBeVisible();
       const openOverflow = await scrollRegion(page).evaluate((el) => el.scrollHeight - el.clientHeight);
       expect(openOverflow).toBeLessThanOrEqual(1);
-      await page.getByTestId('quest-tray-toggle').click();
+      await page.getByTestId('quest-tray-close').click();
       await expect(page.getByTestId('quest-selection-tray')).toHaveCount(0);
 
       /* WS-3 hero letterbox: the drag-handle banner under the seals,
@@ -201,6 +201,7 @@ test.describe('PLAN-043 WS-3 — Dispatch Table geometry (AC-01/AC-02/AC-17)', (
     });
   }
 
+  // INV:CTR-game-006.INV-3
   test('viewport 800×600 (<720): internal scroll allowed, CTA still on screen, resize re-clamps the assembly', async ({
     page,
   }) => {
@@ -225,6 +226,7 @@ test.describe('PLAN-043 WS-3 — Dispatch Table geometry (AC-01/AC-02/AC-17)', (
     expect(errors).toEqual([]);
   });
 
+  // INV:CTR-game-006.INV-3
   test('drag to the far corner clamps the planner inside the viewport; the pinned wing never moves', async ({ page }) => {
     const errors = collectErrors(page);
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -285,6 +287,7 @@ test.describe('PLAN-043 WS-3 — Dispatch Table geometry (AC-01/AC-02/AC-17)', (
     expect(errors).toEqual([]);
   });
 
+  // INV:CTR-game-006.INV-3
   test('keyboard parity (AC-15): tray pick, token reorder, bag pick, CTA reason — pointer never used', async ({
     page,
   }) => {

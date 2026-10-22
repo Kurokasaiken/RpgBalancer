@@ -1,0 +1,45 @@
+{
+  "collectedAt": "2026-10-18T15:52:41.077Z",
+  "build": "vite preview (dist-playwright, production mode)",
+  "renderer": "SwiftShader software WebGL — UPPER BOUND vs a real GPU/WebView",
+  "env": {
+    "visibilityState": "visible",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "headed": false,
+    "webgl2": true,
+    "rafTicks": 531,
+    "frameDiff": 0.49705429437186427
+  },
+  "samples": [
+    {
+      "scene": "assalto-goblin",
+      "variant": "entrance-loop+ambient",
+      "frames": 233,
+      "p50": 16.699999999999818,
+      "p95": 17.699999999999818,
+      "p99": 33.399999999999636,
+      "fpsP95": 56
+    },
+    {
+      "scene": "assalto-goblin",
+      "variant": "hold+trauma",
+      "frames": 78,
+      "p50": 16.700000000000273,
+      "p95": 33.30000000000018,
+      "p99": 66.69999999999982,
+      "fpsP95": 30
+    },
+    {
+      "scene": "accampamento-raider",
+      "variant": "pose+ambient",
+      "frames": 220,
+      "p50": 16.699999999999818,
+      "p95": 33.30000000000018,
+      "p99": 34.20000000000027,
+      "fpsP95": 30
+    }
+  ]
+}

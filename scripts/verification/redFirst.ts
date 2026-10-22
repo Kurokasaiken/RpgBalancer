@@ -20,7 +20,14 @@ export const RED_FIRST_REL = '.mw/red-first.jsonl';
 export const RED_LOGS_REL = '.mw/red-first';
 
 export interface RedFirstRecord {
-  kind: 'record' | 'retire';
+  /**
+   * `record`: run rossa lockata. `retire`: test/INV scartato con motivo.
+   * `sync-bug` (PLAN-054 T-005): dichiarazione di bug emessa da
+   * `sync:bug` — lega componente+INV+source_ref ma non è una run rossa:
+   * non soddisfa da sola il red-first gate né Mode A (che richiede un
+   * `record` con exit_code ≠ 0).
+   */
+  kind: 'record' | 'retire' | 'sync-bug';
   test_file: string;
   /** Canonical hash del file test al record — identità. */
   test_sha256?: string;
@@ -32,6 +39,12 @@ export interface RedFirstRecord {
   exit_code?: number;
   /** Per retire: perché il test è scartato. */
   reason?: string;
+  /** PLAN-054: componente contrattuale legato (Mode A / sync:bug). */
+  component?: string;
+  /** PLAN-054: `// INV:<id>` legato — per retire autorizza l'amend. */
+  invariant?: string;
+  /** PLAN-054: `R-NNN`/`intent-id` di provenance — verificato a BASE. */
+  source_ref?: string;
   recorded_at: string;
   recorded_by?: string;
 }
@@ -43,6 +56,39 @@ export function loadRedFirst(repoRoot: string): RedFirstRecord[] {
     .split('\n')
     .filter((l) => l.trim().startsWith('{'))
     .map((l) => JSON.parse(l) as RedFirstRecord);
+}
+
+const REASON_R = /R-(\d+)/;
+
+/**
+ * Un `redfirst:retire` autorizza la rimozione/amend dell'INV `id` se il
+ * record è legato all'id (campo `invariant` o menzione nella reason sullo
+ * stesso file) e cita un `R-NNN` risolvibile a BASE (un riferimento creato
+ * nello stesso diff non è citabile — fail closed).
+ */
+export function retireAuthorizesInv(
+  records: RedFirstRecord[],
+  id: string,
+  hostFile: string | undefined,
+  sourceRefAtBase: (ref: string) => boolean,
+): { ok: boolean; reason: string } {
+  const rec = [...records]
+    .reverse()
+    .find(
+      (r) =>
+        r.kind === 'retire' &&
+        (r.invariant === id || (hostFile && r.test_file === hostFile && r.reason?.includes(id))),
+    );
+  if (!rec) return { ok: false, reason: 'nessun redfirst:retire per questo INV' };
+  const m = (rec.reason ?? '').match(REASON_R);
+  if (!m) return { ok: false, reason: `retire senza R-NNN nella reason ("${(rec.reason ?? '').slice(0, 60)}…")` };
+  if (!sourceRefAtBase(`R-${m[1]}`)) {
+    return {
+      ok: false,
+      reason: `R-${m[1]} citato dal retire non esiste a BASE — un R-NNN creato nello stesso diff non è citabile`,
+    };
+  }
+  return { ok: true, reason: `retire autorizzato da R-${m[1]}` };
 }
 
 /** Ultimo evento del journal per un file test (append-only: vince l'ultimo). */
@@ -81,7 +127,7 @@ export function checkRedFirstGate(
 
   const verify = (file: string, ctx: string): void => {
     const rec = latestForFile(records, file);
-    if (!rec) {
+    if (!rec || rec.kind === 'sync-bug') {
       report.errors.push(
         `${ctx}${file}: red-first richiesto ma nessun record — registra la run rossa con npm run redfirst:record`,
       );
@@ -130,7 +176,7 @@ export function checkRedFirstGate(
       if (seen.has(rec.test_file) || !inDiff.has(rec.test_file)) continue;
       seen.add(rec.test_file);
       const latest = latestForFile(records, rec.test_file);
-      if (!latest || latest.kind === 'retire') continue;
+      if (!latest || latest.kind === 'retire' || latest.kind === 'sync-bug') continue;
       if (required.includes(rec.test_file)) continue; // già verificato sopra
       verify(rec.test_file, '');
     }

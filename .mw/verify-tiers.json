@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "comment": "PLAN-051 T-004 — tiering per reach. perceptual_globs: un diff che li tocca attiva il tier percettivo (pixel/fps/human-eye). core_globs: moduli condivisi che toccano TUTTE le superfici — un match attiva il tier pieno. Il match visivo usa anche isVisualFile di visualForkGate.",
+  "perceptual_globs": [
+    "src/ui/**",
+    "src/skins/**"
+  ],
+  "core_globs": [
+    "src/shared/persistence/**",
+    "src/engine/game/idleVillage/EconomyEngine.ts",
+    "src/balancing/config/idleVillage/economyConfig.ts",
+    "src/balancing/config/idleVillage/types/economyTypes.ts"
+  ]
+}

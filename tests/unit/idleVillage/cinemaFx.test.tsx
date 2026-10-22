@@ -90,6 +90,7 @@ describe('fxForBeat — the configured beat→fx mapping', () => {
 });
 
 describe('Letterbox — bars over the theater', () => {
+  // INV:index-primitives.INV-1
   it('renders two bars, open when active', () => {
     const { container } = render(<Letterbox active heightPct={12} inMs={400} outMs={350} color="black" />);
     const bars = container.querySelectorAll('[aria-hidden] > div');

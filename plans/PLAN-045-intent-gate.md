@@ -1,6 +1,7 @@
 # PLAN-045: Gate d'intento — plan e risultato contro desiderata + chiarimenti Director
 
-**Status:** `baptized (2026-10-17)` — approvato dal Director dopo dibattito
+**Status:** `completed` (2026-10-18) — tutti i task T-001..T-008 con
+bundle PASS; Q2 di PLAN-049 chiusa. Battezzato 2026-10-17 dopo dibattito
 multi-AI (`mind-weaver/.mw/runs/20261017-plan045-intent-gate/`,
 decision_memo; ~96 obiezioni disposizionate su 12 revisioni;
 ACCEPTED: gemini web ×7 + gemini API, nemotron API; chatgpt+grok
@@ -761,7 +762,101 @@ tabella (`params_sha256` in `intent.json`).
   `applicability`), origin discriminator meccanico. 36 test.
 - Test totali: 49/49 verdi (`pytest tests/unit/test_desiderata_slice.py
   tests/unit/test_intent_panel.py`).
-- Restano: T-003 (ledger — dipende T-006+T-002 ✓), T-004b (intent.json
-  assembly), T-005a/b, T-006, T-007, T-008 — bloccati su PLAN-044
-  (state machine T-003, mappa file→surface T-002) per dipendenze
-  dichiarate.
+
+## Avanzamento (2026-10-18, Q2)
+
+- **T-005a ✓** — `scripts/verification/intentRegistry.ts` +
+  `mwDirectorAnswer.ts` (RPG, estende `directorAnswer.ts` di PLAN-044
+  T-003). Registro unico 16 tipi record (legacy coverage_exception /
+  gate-diff + chiusura intent + righe pre-battesimo) con matrice parser
+  totale `ANSWER_MATRIX` record→risposte; fuori tabella → rifiuto
+  (OB-32/OB-20). Record indicizzato `(gate,item_id)` con precondition
+  `{bundle,quorum,panel}` + `clarify_budget_used`. Comando interattivo
+  `npm run director:answer:typed`: TTY reale obbligatorio (stdin
+  piped/`DIRECTOR_NONINTERACTIVE=1` → nessun token, exit≠0), firma
+  HMAC-SHA256 su record strutturato (gate,item_id,response,target,
+  verbatim,epoch), chiave fuori worktree
+  (Keychain→`~/.mw/director-key`→`MW_DIRECTOR_HMAC_KEY_FILE`; file nel
+  repo mai accettato), journal append-only
+  `.mw/director-invocations.jsonl` con nonce+`tty_attested` (OB-47),
+  `clarify` con `refines: item_id` tipizzato (OB-33).
+  19 test unitari verdi. Bundle:
+  `.mw/runs/plan045-t005a-registry/bundle.json` **PASS 5/5** (test,
+  dogfood firma/tamper/provenance, CLI non-TTY, contracts:check,
+  closure:lint). Entrambi i file registrati in `GATE_FILES`; journal
+  invocazioni coperto da `coverage_exception` (append-only).
+  Aperto per T-005b: wiring di `verifyAnswerSignature`/
+  `hasValidProvenance` in closure:lint (record senza firma valida →
+  `unconfirmed` → blocco).
+- **T-006 ✓** — `mind-weaver/scripts/verification/plan_disposition.py`
+  + CLI `mw-plan-disposition.py` (symlink RPG `scripts/`): check
+  pre-battesimo P8 — schema per classe (task|gate con
+  obligation_ref∈plan+criterio osservabile, open senza obbligazione
+  OB-43, human-eye con motivazione estetica, not-applicable con
+  scope_surfaces ⊆ allowlist PLAN-044 + maggioranza pannello,
+  rebattesimo senza rivalutazione → OB-45b), record indicizzato
+  `(plan_id, plan_hash_semantico, item_id)`, hash insensibile a
+  cosmesi, matrice risposte (gap/ambiguous →
+  revise-plan|waive-plan-gap|amend-desiderata; infra → retry-panel),
+  REVISION_LOOP_CAP=3, gate battezzabilità (gap non disposizionato →
+  exit 2). Record append-only in `.mw/plan-dispositions/<plan>.jsonl`.
+  21 test verdi. Bundle: `.mw/runs/plan045-t006-prebaptism/bundle.json`
+  **PASS 4/4**. Wiring in checklist mw-planner → T-007.
+- **T-003 ✓** — `mind-weaver/scripts/verification/intent_ledger.py` +
+  CLI `mw-intent-ledger.py` (symlink RPG): ledger append-only a epoch
+  `.mw/runs/<task>/intent.md`, seed epoch-1 da `plan_disposition`,
+  tabella transizioni totale 6 coppie, supersessione log-model
+  (riga restated append-last-wins — mai edit in-place, append-only
+  preservato strutturalmente), partial=split con residual_text,
+  multi-foglia senza kind:partial → ambiguous, epoch N+1 solo con
+  rebaptism, lineage coverage tra epoch, supersessione senza
+  conferma → item resta leaf attivo (OB-10), multi-slice pair.
+  14 test verdi. Bundle:
+  `.mw/runs/plan045-t003-ledger/bundle.json` **PASS 4/4**.
+  Hook executor → T-007; binding in intent.json → T-004b.
+- **T-004b ✓** — `mind-weaver/scripts/verification/intent_json.py`:
+  `assemble_intent_json` (tutti i campi di catena P5),
+  `input_vector_hash` per verdetto (item/refines/evidence-norm/
+  config/plan/epoch/verification.json/params), `reseal` meccanico
+  (copia solo vettori identici, verdict non copiato → pending,
+  signoff null-evidence → `signoff-invalidated` su changed_files),
+  `item_state` table totale default-deny + `closure_status`.
+  7 test verdi; suite intent-gate completa: **91 test** su 5 moduli.
+  Bundle: `.mw/runs/plan045-t004b-intent-json/bundle.json` **PASS 4/4**.
+- **T-005b ✓** — `scripts/verification/intentGate.ts` (RPG) wired in
+  `produceBundle` (flag manifest `intent_gate: true`) e `closure:lint`:
+  preflight integrità (`intent.json` assente → rosso), item_state table
+  totale default-deny, riattivazione `not-applicable` via
+  scope_surfaces ∩ diff→surface map (OB-39/OB-45), signoff bound a
+  item/epoch/hash, RICHIESTE append-only vs `richieste_baseline_commit`
+  di battesimo (warning se il campo manca — retro-compat), provenance
+  journal per director_answer. 28 test verdi (122/122 suite
+  verification). Fixture dogfood red/green:
+  `.mw/runs/plan045-t005b-dogfood-{red,green}/` — gap+riattivazione →
+  BLOCKED, covered+na-non-riattivato → PASS. Bundle:
+  `.mw/runs/plan045-t005b-closure-gate/bundle.json` **PASS 5/5**.
+  Nota T-13: fixture green `scope_surfaces` inizialmente `game-map-pixi`
+  → riattivata legittimamente dal churn parallelo su quel surface;
+  corretta a `shutdown-manager` (surface realmente non toccata dalla
+  diff corrente). Trust-set PLAN-051: sigillo Director `6bf8e63e…`
+  (approve+seal 16:07Z) copre i gate-file di questo task.
+- **T-007 ✓** — `coordinator/skills/mw-planner/SKILL.md`: checklist
+  «Check pre-battesimo» (slice → `mw-plan-disposition.py` → gate
+  battezzabilità → seed ledger `mw-intent-ledger.py seed`,
+  `waive-plan-gap`, matrice risposte), superfici+recurring-traps negli
+  acceptance criteria, visual-fork preservato.
+  `coordinator/skills/mw-executor/SKILL.md`: manifest requirements,
+  intent ledger/epoch (append-only, SESSION-GUARD),
+  `amend-desiderata`, `director:answer:typed`, chiusura solo via
+  `verify:bundle`+`closure:lint`, plan stamp + decision-report.
+  Land sequenziato post-PLAN-044 T-006 come da contratto di sezione.
+  Bundle: `.mw/runs/plan045-t007-skills/bundle.json` **PASS 4/4**.
+- **T-008 ✓** — dogfood end-to-end: fixture
+  `.mw/runs/plan045-t008-dogfood-{red,green}/` con `intent.md` reale —
+  seeded misalignment (`not-applicable` con `scope_surfaces=['bv-gate']`
+  su diff che tocca `scripts/**`) → riattivazione forzata → verdict
+  BLOCKED con reason esplicita; correzione (scope fuori diff) → PASS.
+  Seed registrato in `.mw/bv-seeds.jsonl` con `found-by: intent-panel`.
+  Bundle: `.mw/runs/plan045-t008-dogfood/bundle.json` **PASS 3/3**.
+- **PLAN-045 completo**: T-001..T-008 fatti, 8 bundle PASS. Status
+  `completed` 2026-10-18 — chiusura Q2 in PLAN-049.

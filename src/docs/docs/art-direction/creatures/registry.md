@@ -21,6 +21,7 @@ All entries follow the Creature IP Development System lifecycle:
 | [Ancient Constructs](families/ancient-constructs/family-dna.md) | empire | canonical | 1.0.0 | family |
 | [Mythic Beasts](families/mythic-beasts/family-dna.md) | wilderness | canonical | 1.0.0 | family |
 | [Beasts](families/beasts/family-dna.md) | empire | canonical | 1.0.0 | family |
+| [Nm Mutants](families/nm-mutants/family-dna.md) | third-pole | draft | 0.4.0 | family |
 
 ## Creatures
 
@@ -32,6 +33,11 @@ All entries follow the Creature IP Development System lifecycle:
 | [Momentum Bruiser](creatures/momentum-bruiser/identity.md) | Beasts | Bruiser | Early/Mid — Common | canonical | 1.0.0 | creature |
 | [Uomini-Rana](creatures/uomini-rana/identity.md) | — (unassigned) | Sapient Race | — | draft | 0.1.0 | creature |
 | [Goblin](creatures/goblin/identity.md) | — (unassigned) | Swarm Raiders | Early — Common | candidate | 0.1.0 | creature |
+| [Regina degli Ibridi](creatures/regina-ibridi/identity.md) | Nm Mutants | Sapient Nm-Mutant Vampire — NPC, faction leader | — | draft | 0.2.0 | creature |
+| [Il Pathfinder della Regina](creatures/regina-pathfinder/identity.md) | Nm Mutants | Sapient Nm-Mutant (goblin host) — servant NPC, scout/predator | — | draft | 0.1.0 | creature |
+| [Guardia Reale](creatures/guardia-reale/identity.md) | Nm Mutants | Nm-Mutant Vampire (human+vampire base) — royal guard | — | draft | 0.1.0 | creature |
+| [Gohul Esploratore](creatures/gohul-esploratore/identity.md) | Nm Mutants | Gohul-class servant — explorer | — | draft | 0.1.0 | creature |
+| [Gohul Combattente](creatures/gohul-combattente/identity.md) | Nm Mutants | Gohul-class servant — combat thrall | — | draft | 0.1.0 | creature |
 
 ## Versioning Rules
 

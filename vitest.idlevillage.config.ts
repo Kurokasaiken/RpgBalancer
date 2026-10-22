@@ -22,7 +22,7 @@ export default defineConfig(() => ({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['src/setupTests.ts', './vitest.setup.ts'],
+    setupFiles: ['src/setupTests.ts', './vitest.setup.ts', './tests/setup/invAssertionCounts.ts'],
     include: targetedSuites,
     exclude: [
       'tests/legacy/**',

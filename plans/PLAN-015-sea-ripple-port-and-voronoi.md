@@ -1,7 +1,7 @@
 ---
 title: PLAN-015 — Port del coastal ripple e retino cellulare (Voronoi) per il mare
 type: plan
-status: proposto
+status: completed
 updated: 2026-09-09
 richiesta: R-066
 desiderata: v19 (FROZEN)

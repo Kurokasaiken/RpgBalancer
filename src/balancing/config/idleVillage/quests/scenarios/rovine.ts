@@ -237,7 +237,9 @@ const ROVINE_NODES: Record<string, QuestNode> = {
     beat: 5,
     failHint: '+1–2 days for little: the vault had already been almost emptied.',
   },
-  /* ---- PHASE VII — return: the wounded man on the road ------------------- */
+  /* ---- PHASE VII — return: the wounded man on the road -------------------
+   * PLAN-053 T-004: both nodes are `fase:'ritorno'` — the wounded man is a
+   * pinned waiting beat on the way home, 'rv-fine' the pinned end. */
   'rv-ritorno-evento': {
     id: 'rv-ritorno-evento',
     kind: 'choice',

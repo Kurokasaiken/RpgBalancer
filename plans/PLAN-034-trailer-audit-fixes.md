@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-034 — Fix dei 7 problemi dell’audit trailer (R-187/R-188)'
-status: active
+status: completed
 created: 2026-10-14
 source_request: R-188 (evidenza: R-187, test-results/trailer-report-2026-10-14/)
 desiderata: .mw/desiderata.md v2 FROZEN (world surface, tier eventi, invasione goblin)

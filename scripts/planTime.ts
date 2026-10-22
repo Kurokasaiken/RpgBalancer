@@ -21,6 +21,7 @@
  */
 
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
 const LEDGER = path.join(process.cwd(), 'context', 'plan-timing.jsonl');
@@ -81,10 +82,25 @@ function report(): void {
   }
 }
 
+/** Regenerate the forensics report after any stamp — auto-delivery (PLAN-048).
+ *  Never fails the stamp: forensics errors are warned, not fatal. */
+function regenerateForensics(): void {
+  const r = spawnSync('npx', ['tsx', 'scripts/planForensics.ts'], {
+    cwd: process.cwd(),
+    stdio: 'pipe',
+    timeout: 120_000,
+  });
+  if (r.status !== 0) {
+    console.warn(`[planTime] forensics regen skipped (${r.status}): ${String(r.stderr).slice(0, 200)}`);
+  }
+}
+
 function main(): void {
-  const [cmd, plan, ...rest] = process.argv.slice(2);
+  const argv = process.argv.slice(2).filter((a) => a !== '--no-forensics');
+  const [cmd, plan, ...rest] = argv;
   if (cmd === 'report') {
     report();
+    regenerateForensics();
     return;
   }
   if (!plan || !/^PLAN-\d+/i.test(plan)) {
@@ -104,6 +120,7 @@ function main(): void {
   if (text) event.text = text;
   appendFileSync(LEDGER, JSON.stringify(event) + '\n');
   console.log(`[planTime] ${event.plan} ${event.event} @ ${event.at}`);
+  regenerateForensics();
 }
 
 main();

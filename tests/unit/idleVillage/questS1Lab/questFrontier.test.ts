@@ -59,8 +59,8 @@ describe('quest frontier (v27)', () => {
     submitCommand(run, 'gob-cerca-tracce', { tick: run.frontier.readyAt });
     expect(run.checkQueue).toHaveLength(1);
     // The check is a consequence, not a frontier: the run stops at the choice
-    // the verdict routed to (gob-accampamento or gob-bottino-scelta).
-    expect(['gob-accampamento', 'gob-bottino-scelta']).toContain(run.nodeId);
+    // the verdict routed to (gob-accampamento or the hidden loot node).
+    expect(['gob-accampamento', 'gob-bottino']).toContain(run.nodeId);
     expect(run.frontier.status).toBe('waiting');
   });
 
@@ -83,7 +83,8 @@ describe('quest frontier (v27)', () => {
     atChoice(run, 'gob-esplora-extra');
     submitCommand(run, 'gob-fermati', { tick: 0 });
     // The relief beat exists now: before, the ambush overwrote it in the same click.
-    expect(run.lastEvent).toContain('whistling');
+    // (r008 ritorno text: 'a branch snaps where the wind does not blow')
+    expect(run.lastEvent).toContain('branch snaps');
     expect(run.party.every((m) => m.hp === m.maxHp)).toBe(true);
   });
 

@@ -1,6 +1,6 @@
 ---
 title: PLAN-005 — POI Family AI-friendly docs and regression test suite
-status: active
+status: completed
 owner: Agent
 project: RPG
 ---

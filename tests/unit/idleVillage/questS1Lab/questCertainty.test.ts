@@ -163,7 +163,7 @@ describe('certainChecks — scenari authored reali', () => {
     expect(r.statesExplored).toBeGreaterThan(10);
     // Whatever the graph yields, every claimed check must be a real goblin
     // check node — and the analysis must terminate within budget.
-    const goblinChecks = ['gob-tracce-per', 'gob-tracce-perfor', 'gob-bottino-scelta',
+    const goblinChecks = ['gob-tracce-per', 'gob-tracce-perfor', 'gob-bottino',
       'gob-accampamento', 'gob-assalto', 'gob-incalzare', 'gob-esplora-extra'];
     for (const c of r.certain) expect(goblinChecks).toContain(c.nodeId);
     console.log('goblin certain:', r.certain.map((c) => c.nodeId), '| states:', r.statesExplored, '| edges:', r.edgesExplored);

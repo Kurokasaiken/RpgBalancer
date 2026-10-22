@@ -3,13 +3,13 @@
  *
  * The POI detail recomputes a Monte Carlo forecast on every assignment
  * change. These values make the r2 compute contract config-first: fixed N,
- * deterministic seed derived from the assignment, debounce, and the declared
- * budget the acceptance test measures against.
+ * deterministic seed derived from the assignment, chunk size, and the
+ * declared budget the acceptance test measures against.
  *
  * Budget note (r2): p95 ≤ `forecastBudgetMs` total, no single task > 50 ms on
  * the main thread — the forecast runs chunked (`forecastChunkRuns` per slice,
- * ≈6–8 ms each measured on goblin) inside a debounced macrotask, never
- * during render. `forecastRuns` is fixed, so «stima su N simulazioni» is
+ * ≈6–8 ms each measured on goblin), starting as soon as the committed party
+ * changes and never during render. `forecastRuns` is fixed, so «stima su N simulazioni» is
  * honest and the cost bounded.
  */
 import { z } from 'zod';
@@ -21,24 +21,21 @@ export const QuestPlanningConfigSchema = z
      *  simulazioni» is honest and the cost is bounded. */
     forecastRuns: z.number().int().min(50).max(5000),
     /** Runs per synchronous slice of the chunked forecast — sized under the
-     *  50 ms task bound (≈6–8 ms per 100 runs measured on goblin). */
+     *  50 ms task bound (≈6–8 ms per 100 runs measured on goblin — that was
+     *  the r2 figure; R-248's probe measured ~140 ms per 100-run slice on
+     *  the goblin scenario today, so 30 runs/slice restores the bound). */
     forecastChunkRuns: z.number().int().min(10).max(1000),
-    /** Quiet period after the last assignment change before recomputing —
-     *  dragging across slots never spams sims. */
-    forecastDebounceMs: z.number().int().min(50).max(2000),
-    /** Declared p95 budget (ms) for one forecast recompute, debounce excluded.
-     *  Evidence + E2E assert against this; exceeded = finding, not silent
-     *  slowdown. */
+    /** Declared p95 budget (ms) for one chunked estimate from its start to
+     *  result; evidence + E2E assert against this. */
     forecastBudgetMs: z.number().positive(),
   })
   .strict();
 export type QuestPlanningConfig = z.infer<typeof QuestPlanningConfigSchema>;
 
-/** Authored v0. */
+/** Authored v2: no debounce between a committed party change and its estimate. */
 export const QUEST_PLANNING: QuestPlanningConfig = QuestPlanningConfigSchema.parse({
-  schemaVersion: 1,
+  schemaVersion: 2,
   forecastRuns: 400,
-  forecastChunkRuns: 100,
-  forecastDebounceMs: 150,
+  forecastChunkRuns: 30,
   forecastBudgetMs: 300,
 });

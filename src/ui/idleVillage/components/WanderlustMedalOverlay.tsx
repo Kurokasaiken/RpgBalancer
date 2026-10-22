@@ -36,10 +36,8 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   const rimIntensityRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Gate: don't show the medallion until the portrait is actually decoded —
-  // better a one-frame delay than a medal with a black hole in the middle.
-  // If the portrait is already in cache (preloaded by the roster) this is instant.
-  // The medallion only shows a square crop: load the small medal asset, not the full portrait.
+  // Keep the medal visible with its fallback portrait while the square crop decodes.
+  // The medallion only loads the small crop, never the full portrait asset.
   const medalUrl = portraitUrl ? getMedalPortraitUrl(portraitUrl) : undefined;
   const [portraitReady, setPortraitReady] = useState(() => !medalUrl || isPortraitDecoded(medalUrl));
   useEffect(() => {
@@ -52,7 +50,9 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
     const img = preloadPortrait(medalUrl);
     // decode() resolves once the shared cached image is painted-ready; a failed
     // load also resolves the gate so the fallback portrait shows.
-    const reveal = () => { if (alive) setPortraitReady(true); };
+    const reveal = () => {
+      if (alive) setPortraitReady(Boolean(img?.complete && img.naturalWidth > 0));
+    };
     if (img) img.decode().then(reveal, reveal);
     else reveal();
     return () => { alive = false; };
@@ -73,6 +73,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   }, [cursorVelocity]);
 
   useEffect(() => {
+    if (!isDragging) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -142,8 +143,6 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
         position: 'relative',
         width: `${sizePx}px`,
         height: `${sizePx}px`,
-        // Medal appears only when the portrait is decoded (never a black center)
-        visibility: portraitReady ? 'visible' : 'hidden',
         ...style,
       }}
     >
@@ -327,7 +326,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
 
             {/* L5: Portrait - real image */}
             <image 
-              href={medalUrl || fallbackPortrait}
+              href={portraitReady && medalUrl ? medalUrl : fallbackPortrait}
               x="15.5" y="15.5" width="55" height="55"
               clipPath="url(#c-port)" 
               preserveAspectRatio="xMidYMin slice"

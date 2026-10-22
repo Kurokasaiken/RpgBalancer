@@ -154,6 +154,7 @@ function verifierFor(oblId: string, dir: string, artifacts: string[], override?:
   });
   return {
     verifier: 'independent-clean-context',
+    generated_by: 'selftest-fixture (receipt meccanico simulato)',
     evaluated_at: new Date().toISOString(),
     evaluations: [
       {
@@ -324,6 +325,28 @@ const cases: Case[] = [
       dirs: { frames: 8 },
       commandResults: { 'OB-V': { exit_code: 1 } },
       verifier: (dir) => verifierFor('OB-V', dir, ['junit.xml', 'metrics.json']),
+    }),
+  },
+  {
+    name: '11. verifier.json scritto a mano (LLM) — senza generated_by il receipt non è meccanico',
+    oblResult: 'PASS',
+    verdict: 'BLOCKED',
+    fixture: () => ({
+      manifest: {
+        task: 'T11',
+        run_id: 'r',
+        created_at: '',
+        obligations: [visualObl],
+        verifier_required: true,
+      },
+      files: { 'junit.xml': GOOD_JUNIT, 'metrics.json': goodMetrics() },
+      dirs: { frames: 8 },
+      commandResults: { 'OB-V': { exit_code: 0 } },
+      verifier: (dir) => {
+        const v = verifierFor('OB-V', dir, ['junit.xml', 'metrics.json', 'frames']) as Record<string, unknown>;
+        delete v.generated_by; // receipt scritto a mano — il giudizio LLM è advisory, non prova
+        return v;
+      },
     }),
   },
   {

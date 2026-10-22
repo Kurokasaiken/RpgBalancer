@@ -137,6 +137,28 @@ export function expeditionDays(durationDays: number): number {
 }
 
 /**
+ * The planner's duration seal in whole days — the ROUND TRIP total, not the
+ * site phase alone (PLAN-071 T-B2): the authored `estimatedDurationTicks` is
+ * the on-site projection (loadout-scaled), `travelDays` is the authored
+ * out-AND-back leg. The run's journey strip narrates the same parts, so both
+ * surfaces project one total.
+ * @param estimatedTicks loadout-scaled on-site estimate (`LoadoutDuration.estimatedTicks`)
+ * @param travelDays authored outbound/return leg in days (`fasi.travelDays`; 0 when the POI has no journey contract)
+ * @param dayLengthTicks ticks per game day (`globalRules.dayLengthInTimeUnits`)
+ * @returns `{ site, total }` in whole days — `site` is the ~N the strip shows mid-leg
+ */
+export function expeditionTotalDays(
+  estimatedTicks: number,
+  travelDays: number,
+  dayLengthTicks: number,
+): { site: number; total: number } {
+  const dayTicks = Math.max(1, dayLengthTicks);
+  const site = expeditionDays(estimatedTicks / dayTicks);
+  const travel = Math.max(0, travelDays) * 2;
+  return { site, total: expeditionDays(site + travel) };
+}
+
+/**
  * Renders the expedition span via the ICU-plural key
  * `questExpedition.durationDays` (`{count, plural, one {# day} other {# days}}`).
  * @param durationDays fractional span (see {@link expeditionDays})

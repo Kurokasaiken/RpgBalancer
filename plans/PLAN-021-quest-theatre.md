@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-021 — QuestTheatre: la quest nel gioco reale come storia a nodi che aspetta ai bivi'
-status: active
+status: superseded
 impl_status: "Phase 1 parziale — T-001..T-004 eseguiti (2026-10-06), stage renderer core incluso. Route dev live: /game-frame-theatre. Tesi 'aspetta ai bivi nel gioco reale' NON verificata: adapter finto. Integration Gate (T-008) aperta."
 created: 2026-10-06
 revised: 2026-10-06 (v2..v8 — cold read multi-AI web ×7: chatgpt + claude; gemini-web failed ogni round. v8: read-model = informazioni richieste dalla UI, intent semantici, probe A/B su T-002, test Pillar 1 misurabile, expanded opt-in, divergenza nextKnown dichiarata; disaccordo residuo ChatGPT registrato)

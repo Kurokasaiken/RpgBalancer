@@ -4,8 +4,12 @@
  *
  * Contract:
  * - `deriveSettlementPlan(run)` — pure: terminal state → frozen effect list.
- * - `settleRun(run, deps)` — journal: mark `settling` → apply effects →
- *   mark `settled`, each step persisted before the next begins.
+ * - `beginSettlement(run, deps)` — persists `settling` (frozen plan, the
+ *   durable "report shown" bit) with no aggregate mutation.
+ * - `commitSettlement(run, deps)` — applies the plan's effects, releases the
+ *   loadout, persists `settled` (R-260: the report's dismissal boundary).
+ * - `settleRun(run, deps)` — the composed begin+commit driver for tests and
+ *   non-UI callers.
  * - Effects are idempotent by `(runId, effectKey)` — the applied-key ledger
  *   lives INSIDE the mutated aggregate (the gameplay snapshot), so mutation
  *   + dedup key share one durable write (r2: no separate ledger table).
@@ -448,29 +452,72 @@ export interface SettlementDeps {
 }
 
 /**
- * Drive one settlement step to completion. Idempotent and replayable: if the
- * run is already `settled` this is a no-op; a `settling` run re-derives its
- * plan and re-applies it (dedup keys make re-application free).
+ * The village-resource delta a committed plan grants (R-260) — the HUD's
+ * transient «+N» feedback. Derived FROM the frozen plan, not recomputed
+ * elsewhere, so the chip can never tell a different story than the ledger.
+ */
+export function settlementResourceDelta(plan: SettlementPlan): { gold: number; xp: number } {
+  let gold = 0;
+  let xp = 0;
+  for (const effect of plan.effects) {
+    if (effect.kind === 'village-gold') gold += effect.amount ?? 0;
+    else if (effect.kind === 'village-xp') xp += effect.amount ?? 0;
+  }
+  return { gold, xp };
+}
+
+/**
+ * Journal step 1 (R-260): stamp `settling` — the frozen plan + the durable
+ * "report shown" bit. Persists WITHOUT touching the gameplay aggregate:
+ * resources must not move until the report is dismissed. Idempotent — a run
+ * already carrying a marker returns it unchanged (never regresses `settled`).
+ */
+export async function beginSettlement(run: QuestRunState, deps: SettlementDeps): Promise<SettlementMarker> {
+  const existing = run.settlement;
+  if (existing) return existing;
+  const plan = deriveSettlementPlan(run, { questTitle: deps.questTitle });
+  const intent: SettlementMarker = { status: 'settling', plan, atTick: deps.nowTick() };
+  await deps.persistRun(intent);
+  return intent;
+}
+
+/**
+ * Journal step 2 (R-260): commit — apply the frozen plan's effects, release
+ * the loadout, persist `settled`. Idempotent and replayable: a `settled` run
+ * is a no-op; a `settling` run re-applies its own plan (dedup keys make
+ * re-application free); an unmarked run begins implicitly so a dismissal
+ * never needs a prior begin to land its grant.
+ */
+export async function commitSettlement(run: QuestRunState, deps: SettlementDeps): Promise<SettlementMarker> {
+  const existing = run.settlement;
+  if (existing?.status === 'settled') return existing;
+  const marker = existing ?? (await beginSettlement(run, deps));
+
+  deps.applyToStore(marker.plan);
+  if (deps.releaseLoadout) await deps.releaseLoadout(marker.plan.runId);
+  deps.fault?.crashAfter === 'effects' && raiseCrash('effects');
+
+  const done: SettlementMarker = { status: 'settled', plan: marker.plan, atTick: deps.nowTick() };
+  await deps.persistRun(done);
+  return done;
+}
+
+/**
+ * The one-shot driver: begin + commit in the same call. Kept for tests and
+ * non-UI callers — the UI path drives the two steps separately so the
+ * report's show/dismiss boundary owns the commit (R-260).
  */
 export async function settleRun(run: QuestRunState, deps: SettlementDeps): Promise<SettlementMarker> {
   const existing = run.settlement;
   if (existing?.status === 'settled') return existing;
 
-  const plan = existing?.plan ?? deriveSettlementPlan(run, { questTitle: deps.questTitle });
-
-  if (!existing || existing.status !== 'settling') {
-    const intent: SettlementMarker = { status: 'settling', plan, atTick: deps.nowTick() };
-    await deps.persistRun(intent);
+  let marker = existing;
+  if (!marker) {
+    marker = await beginSettlement(run, deps);
+    deps.fault?.crashAfter === 'intent' && raiseCrash('intent');
   }
-  deps.fault?.crashAfter === 'intent' && raiseCrash('intent');
 
-  deps.applyToStore(plan);
-  if (deps.releaseLoadout) await deps.releaseLoadout(plan.runId);
-  deps.fault?.crashAfter === 'effects' && raiseCrash('effects');
-
-  const done: SettlementMarker = { status: 'settled', plan, atTick: deps.nowTick() };
-  await deps.persistRun(done);
-  return done;
+  return commitSettlement({ ...run, settlement: marker }, deps);
 }
 
 function raiseCrash(step: string): never {

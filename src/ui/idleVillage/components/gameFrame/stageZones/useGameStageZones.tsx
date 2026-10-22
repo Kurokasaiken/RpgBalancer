@@ -39,6 +39,7 @@ import { useTranslation } from 'react-i18next';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { registerOverlay, unregisterOverlay } from '../overlayStack';
+import { getHudZoomFactor } from '../hudScale';
 import {
   solveStageLayout,
   type PanelResolution,
@@ -101,7 +102,18 @@ export const isStageManagedPanel = (config: StageZonesConfig, id: string): id is
 const occupantZones = (state: StageZonesState, panelId: StagePanelId): boolean =>
   (['leftWing', 'centerStage', 'rightWing'] as const).some((z) => state.occupancy[z].some((o) => o.panelId === panelId));
 
-const viewportNow = () => ({ w: window.innerWidth, h: window.innerHeight });
+/* PLAN-043 WS-5 DEF-06: the stage solver works in chrome-layer units —
+ *  under the browser CSS `zoom` path the layer's usable size is
+ *  `innerWidth / getHudZoomFactor()` (1 when unzoomed or natively zoomed). */
+const viewportNow = () => {
+  const z = getHudZoomFactor();
+  return { w: window.innerWidth / z, h: window.innerHeight / z };
+};
+/** Pointer coords are device px; solver geometry is in chrome units. */
+const clientToUnits = (x: number, y: number) => {
+  const z = getHudZoomFactor();
+  return { x: x / z, y: y / z };
+};
 
 /**
  * The stage state owner — run once per screen (the page calls it, then
@@ -347,8 +359,8 @@ function useStagePanelDragClaim(
       d.move = (ev: globalThis.PointerEvent) => {
         if (live.current !== d || ev.pointerId !== d.pointerId) return;
         const env = stage.layout.envelope;
-        const dx = ev.clientX - d.startClient.x;
-        const dy = ev.clientY - d.startClient.y;
+        const dx = (ev.clientX - d.startClient.x) / getHudZoomFactor();
+        const dy = (ev.clientY - d.startClient.y) / getHudZoomFactor();
         /* BV-10: the dragged shell never crosses the chrome bands — clamp the
          *  delta so `base + delta` stays inside the stage envelope. */
         const nextX = Math.min(Math.max(d.baseRect.x + dx, env.x), Math.max(env.x, env.x + env.w - d.baseRect.w));
@@ -359,7 +371,7 @@ function useStagePanelDragClaim(
       d.up = (ev: globalThis.PointerEvent) => {
         if (live.current !== d || ev.pointerId !== d.pointerId) return;
         const point = { x: d.baseRect.x + d.lastDelta.x, y: d.baseRect.y + d.lastDelta.y };
-        endLiveRef.current({ pointer: { x: ev.clientX, y: ev.clientY }, point });
+        endLiveRef.current({ pointer: clientToUnits(ev.clientX, ev.clientY), point });
       };
       d.cancel = (ev: globalThis.PointerEvent) => {
         if (live.current !== d || ev.pointerId !== d.pointerId) return;
@@ -506,8 +518,8 @@ export function StageStripsLayer({ zIndex }: { zIndex?: number }) {
     const move = (event: globalThis.PointerEvent) => {
       const d = dragRef.current;
       if (!d || event.pointerId !== d.pointerId) return;
-      const dx = event.clientX - d.startClient.x;
-      const dy = event.clientY - d.startClient.y;
+      const dx = (event.clientX - d.startClient.x) / getHudZoomFactor();
+      const dy = (event.clientY - d.startClient.y) / getHudZoomFactor();
       if (!d.moved && Math.abs(dx) + Math.abs(dy) < 6) return;
       d.moved = true;
       d.el.style.transform = `translate(${dx}px, ${dy}px)`;
@@ -519,9 +531,9 @@ export function StageStripsLayer({ zIndex }: { zIndex?: number }) {
         endTabDrag(null, d.panelId);
         return;
       }
-      const dx = event.clientX - d.startClient.x;
-      const dy = event.clientY - d.startClient.y;
-      endTabDrag({ pointer: { x: event.clientX, y: event.clientY }, point: { x: d.rect.x + dx, y: d.rect.y + dy } }, null);
+      const dx = (event.clientX - d.startClient.x) / getHudZoomFactor();
+      const dy = (event.clientY - d.startClient.y) / getHudZoomFactor();
+      endTabDrag({ pointer: clientToUnits(event.clientX, event.clientY), point: { x: d.rect.x + dx, y: d.rect.y + dy } }, null);
     };
     const cancel = (event: globalThis.PointerEvent) => {
       const d = dragRef.current;

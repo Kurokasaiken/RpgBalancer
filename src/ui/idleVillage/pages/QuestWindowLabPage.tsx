@@ -32,6 +32,12 @@ export const QuestWindowLabPage: React.FC = () => {
   /* PLAN-040 T-000: `?reward=1` mounts the page-level report plaque so the
    * playtest harness can witness the reward phase without /game. */
   const rewardParam = useMemo(() => new URLSearchParams(window.location.search).get('reward') === '1', []);
+  /* R-244: `?loadout=flag,flag` packs the bag for the visual check of the
+   * belt rows (e.g. `?loadout=hasBonusPerc,hasHealing,hasGuardianBanner`). */
+  const loadoutParam = useMemo(() => {
+    const raw = new URLSearchParams(window.location.search).get('loadout');
+    return raw ? raw.split(',').map((s) => s.trim()).filter(Boolean) : undefined;
+  }, []);
   const [rewardDismissed, setRewardDismissed] = useState(false);
   // No game clock here: a local tick every second drives the v27 frontier —
   // a maturable node breathes for LAB_NODE_TICKS seconds before resolving.
@@ -66,7 +72,7 @@ export const QuestWindowLabPage: React.FC = () => {
         {!questRun.run && (
         <button
           type="button"
-          onClick={() => questRun.start(GOBLIN_PRESETS[0].id, { seed: seedParam, nodeTicks: LAB_NODE_TICKS, startTick: tick })}
+          onClick={() => questRun.start(GOBLIN_PRESETS[0].id, { loadout: loadoutParam, seed: seedParam, nodeTicks: LAB_NODE_TICKS, startTick: tick })}
           style={{ fontFamily: 'var(--skin-font-display, serif)', fontSize: 15, color: TONE.text, border: `1px solid ${TONE.muted}`, borderRadius: 6, padding: '8px 16px', background: 'transparent', cursor: 'pointer' }}
         >
           {t('gameFrame.director.questRun')}

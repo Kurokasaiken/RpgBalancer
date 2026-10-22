@@ -1,6 +1,6 @@
 ---
 title: "Astrolabe V6.3 — il modello di V16 nell'astrolabio, pilotato dall'area"
-status: active
+status: superseded
 created: 2026-08-30
 ---
 

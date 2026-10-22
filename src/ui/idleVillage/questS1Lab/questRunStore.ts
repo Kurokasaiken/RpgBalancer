@@ -85,6 +85,12 @@ export function isStaleCheckEvent(evt: QuestCheckEvent, run: QuestRunState | nul
 export interface QuestCheckOverlayHandle {
   skipToResult: () => void;
   throwNow: () => void;
+  /** R-241 B3: one "advance" step — throw the ball while the engine is not
+   *  spinning (idle → roll, reveal/armed → throw), skip to the verdict only
+   *  while the ball is already flying (`the-spin`/`magnetic-snap`). The
+   *  owner's click-through calls this; a bare `skipToResult` would kill the
+   *  ball animation before it ever played. */
+  progress: () => void;
 }
 
 /**

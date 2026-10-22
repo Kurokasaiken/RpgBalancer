@@ -27,6 +27,7 @@ describe('useSkinPreferences', () => {
     vi.restoreAllMocks();
   });
 
+  // INV:use-skin-preferences.INV-1
   it('loads and validates preferences on mount', async () => {
     const { result } = renderHook(() => useSkinPreferences());
 

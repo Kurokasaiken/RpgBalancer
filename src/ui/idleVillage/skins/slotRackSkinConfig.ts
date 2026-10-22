@@ -1008,7 +1008,7 @@ export const SLOT_RACK_BASE_CONFIG: SlotRackSkinConfig = {
 
 /**
  * Materic slot rack skin configuration
- * Matches the MatericRosterComponent / DragTestContainer shell: teal
+ * Matches the MatericRosterComponentV2 / DragTestContainer shell: teal
  * (#060f16) surface with a subtle cyan top-left glow, a solid gold border,
  * and a soft outer shadow.
  */

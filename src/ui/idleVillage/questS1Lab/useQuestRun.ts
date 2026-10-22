@@ -93,6 +93,10 @@ export interface QuestRunApi {
    *  (PLAN-025 T-008). Append-only per commit; the window's beat cursor
    *  replays them one at a time and the queue resets on start/clear. */
   beats: QuestBeat[];
+  /** R-242: presentation position inside `beats`, held by the queue's owner
+   *  so a window remount (close→reopen) resumes at the held beat instead of
+   *  replaying consumed beats. Reset alongside `beats` on start/clear. */
+  beatCursorRef: { current: number };
   /** Settlement journal transitions (S2.5): stamps `settling`/`settled` on
    *  the run record and persists — bypasses `act` (no engine mutation, no
    *  beats; the frontier is terminal). No-op unless the run has ended. */
@@ -115,6 +119,10 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
   const [armedFlags, setArmedFlags] = useState<ReadonlySet<string>>(() => new Set());
   /** Position in the run's commit history the last projection consumed. */
   const markRef = useRef<BeatMark | null>(null);
+  /** R-242: presentation position inside `beats` — lives here (not in the
+   *  window) so close→reopen resumes at the held beat instead of replaying
+   *  beats the player already watched. */
+  const beatCursorRef = useRef(0);
   /** Last tick the caller synced — commands resolve at this tick. */
   const tickRef = useRef(0);
   const saveKey = `idleVillage.questRun.${questId}`;
@@ -196,6 +204,7 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       setRun(fresh);
       setPhases(first);
       setBeats([]);
+      beatCursorRef.current = 0;
       /* R-196: the belt's armed selection starts from the config default —
        * `false` keeps the "nothing spent unasked" contract (R-106 playtest). */
       const held = new Set(fresh.flags);
@@ -376,6 +385,11 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
     (marker: SettlementMarker) => {
       const current = runRef.current;
       if (!current?.ended) return;
+      /* R-260: the journal is monotone — `settling` only lands on an
+       *  unmarked run (a late begin racing an already-committed collect
+       *  must not unstitch `settled` and re-arm the one-expedition gate);
+       *  `settled` always lands, so a replayed commit still converges. */
+      if (marker.status === 'settling' && current.settlement) return;
       const next = { ...current, settlement: marker };
       setRun(next);
       persist(next, phasesRef.current);
@@ -407,6 +421,7 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
     setRun(null);
     setPhases([]);
     setBeats([]);
+    beatCursorRef.current = 0;
     setArmedFlags(new Set());
     markRef.current = null;
     persist(null, []);
@@ -426,6 +441,7 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       drinkPotion: potion,
       clear,
       beats,
+      beatCursorRef,
       applySettlement,
       dismissOutcome,
     }),

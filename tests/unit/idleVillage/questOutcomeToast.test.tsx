@@ -25,7 +25,7 @@ import type { ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (_ns: string, key: string) => key }),
+  useTranslation: () => ({ t: (a: string, b?: string) => b ?? a }),
 }));
 
 const QUEST_ID = 'goblin';
@@ -88,14 +88,19 @@ describe('QuestOutcomeToast — PLAN-040 T-005', () => {
     useQuestRunStore.setState({ runs: {}, bridges: {}, rewardAck: {} });
   });
 
-  it('renders the latest eligible check with title, flavor and harm lines — everything at once', () => {
-    publishWithCheck({});
+  // INV:R-259-toast-identical — R-259 «il msg popup deve essere identico
+  // all'esito d quello dello skill check»: the toast shares the verdict
+  // card body (QuestVerdictCardBody) — verdict + harm as CHIPS, flavor,
+  // authored text; harmLines never reach the prose (R-234 rule).
+  it('renders the latest eligible check identical to the skill-check result card', () => {
+    publishWithCheck({ harm: 'wound' });
     render(<QuestOutcomeToastHost questId={QUEST_ID} />);
     expect(toast()).not.toBeNull();
     expect(toast()!.getAttribute('role')).toBe('status');
     expect(toast()!.textContent).toContain('The bell wire');
     expect(toast()!.textContent).toContain('One wrong breath and the grove answers.');
-    expect(toast()!.textContent).toContain('Milo takes the thorn in the shoulder.');
+    expect(toast()!.textContent).toContain('questS1Lab.harmChip.wound');
+    expect(toast()!.textContent).not.toContain('Milo takes the thorn in the shoulder.');
   });
 
   it('a live bridge on the same checkSeq hides the toast (overlay owns the truth)', () => {

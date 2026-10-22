@@ -77,6 +77,9 @@ if (cmd === 'record') {
     red_log_sha256: sha256File(path.join(root, logRel))!,
     command,
     exit_code: exitCode,
+    ...(arg('component') ? { component: arg('component') } : {}),
+    ...(arg('invariant') ? { invariant: arg('invariant') } : {}),
+    ...(arg('source-ref') ? { source_ref: arg('source-ref') } : {}),
     recorded_at: new Date().toISOString(),
     recorded_by: process.env.USER,
   };
@@ -95,6 +98,7 @@ if (cmd === 'record') {
     kind: 'retire',
     test_file: testFile,
     reason,
+    ...(arg('invariant') ? { invariant: arg('invariant') } : {}),
     recorded_at: new Date().toISOString(),
     recorded_by: process.env.USER,
   };

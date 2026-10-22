@@ -28,8 +28,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EngravedIcon } from './engravedIcons';
-import { HudPlaque, SkinCloseButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
-import { HudChip, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import { HudPlaque, SkinCloseButton, SkinScope, prefersReducedMotion } from '@/ui/idleVillage/skins/primitives';
+import { TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import { QuestVerdictCardBody } from './QuestVerdictCard';
 import { checkHistory, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
 import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
 import { useCheckBridge, useQuestRunFromStore, useRewardAck } from '@/ui/idleVillage/questS1Lab/questRunStore';
@@ -82,6 +83,14 @@ export const QuestOutcomeToast: React.FC<QuestOutcomeToastProps> = ({ run, check
     return () => window.clearTimeout(id);
   }, [cfg.autoDismissMs, check.checkSeq, onDismiss]);
 
+  /* R-259: the toast anchors on the right and slides IN from that edge —
+   * it must read as «born from the skill check», which lives in the
+   * cluster's right wing. The keyframes carry the base transform so the
+   * bottom-centre variant keeps its -50% centring through the entrance. */
+  const entrance =
+    cfg.anchor === 'right'
+      ? 'questToastInRight 220ms ease-out both'
+      : 'questToastInBottom 220ms ease-out both';
   const anchorStyle =
     cfg.anchor === 'right'
       ? { right: cfg.offsetXPx, bottom: cfg.offsetYPx }
@@ -89,20 +98,23 @@ export const QuestOutcomeToast: React.FC<QuestOutcomeToastProps> = ({ run, check
 
   return (
     <SkinScope>
+      <style>{`
+        @keyframes questToastInRight { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes questToastInBottom { from { transform: translate(-50%, 14px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+      `}</style>
       <div
         data-quest-owned
         data-testid="quest-outcome-toast"
         role="status"
         aria-live="polite"
         onClick={() => onDismiss(check.checkSeq)}
-        style={{ position: 'fixed', zIndex, width: cfg.widthPx, maxWidth: `calc(100vw - ${cfg.offsetXPx * 2}px)`, cursor: 'pointer', ...anchorStyle }}
+        style={{ position: 'fixed', zIndex, width: cfg.widthPx, maxWidth: `calc(100vw - ${cfg.offsetXPx * 2}px)`, cursor: 'pointer', animation: prefersReducedMotion() ? undefined : entrance, ...anchorStyle }}
       >
         <HudPlaque
           shape="panel"
           style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '10px 12px' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <HudChip tone={VERDICT_TONE[check.verdict] ?? 'warn'}>{t(`questS1Lab.verdict.${check.verdict}`)}</HudChip>
             <span style={{ flex: 1, minWidth: 0, fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.06em', color: 'var(--skin-title-color)', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {check.title}
             </span>
@@ -114,22 +126,14 @@ export const QuestOutcomeToast: React.FC<QuestOutcomeToastProps> = ({ run, check
               }}
             />
           </div>
-          {(check.flavor ?? check.outcomeText) && (
-            <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 13, lineHeight: 1.45, color: TONE.label }}>
-              {check.flavor ?? check.outcomeText}
-            </p>
-          )}
-          {check.harmLines.map((line, i) => (
-            <p
-              key={i}
-              style={{ margin: 0, fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.4, color: check.deathLines?.includes(line) ? TONE.death : TONE.warn }}
-            >
-              {line}
-            </p>
-          ))}
-          {check.authoredText && (
-            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.4, color: TONE.secondary }}>{check.authoredText}</p>
-          )}
+          {/* R-259: shared verdict body — the popup is identical to the
+              skill-check result card (chips + flavor + authored; harm as
+              chips only, R-234). */}
+          <QuestVerdictCardBody
+            check={check}
+            verdictLabel={t(`questS1Lab.verdict.${check.verdict}`)}
+            verdictTone={VERDICT_TONE[check.verdict] ?? 'warn'}
+          />
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 11, color: TONE.muted }}>
             <EngravedIcon id="ico-scroll" size={11} />
             {t('gameFrame.questWindow.outcomeToast.logHint')}

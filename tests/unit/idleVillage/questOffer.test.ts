@@ -98,6 +98,7 @@ function medianPathLength(questId: 'goblin' | 'rovine'): number {
 /* ------------------------------------------------------------------ */
 
 describe('questPois config', () => {
+  // INV:quest-scenario.INV-1
   it('parses and covers the two slice POIs', () => {
     expect(QUEST_POIS.map((p) => p.questId).sort()).toEqual(['goblin', 'rovine']);
     for (const poi of QUEST_POIS) {

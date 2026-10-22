@@ -1,7 +1,7 @@
 ---
 title: "PLAN-043-S10 — Oro e bloom nel resto del HUD"
 parent: PLAN-043
-status: candidate
+status: superseded
 created: 2026-10-17 (scorporato dal master PLAN-043; lavoro del 2026-10-16)
 source_request: R-207
 documentation_impact: OPTIONAL

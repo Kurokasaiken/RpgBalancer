@@ -1,7 +1,7 @@
 ---
 title: "PLAN-043-S8 — Preview quest riscritta"
 parent: PLAN-043
-status: proposed
+status: completed
 created: 2026-10-17 (scorporato dal master PLAN-043; lavoro del 2026-10-16)
 source_request: R-207
 documentation_impact: REQUIRED
@@ -59,3 +59,19 @@ documentato. Matrice bloccante **AC-01..AC-23**; task TS-0..TS-7.
 - D1 decisa dal Director.
 - E2E `gameQuestPlannerLayout`, `gameQuestExpedition`, `gameQuestFullFlow` verdi; catture a 1280/1920/2560.
 - Bundle di chiusura non ancora prodotto (`.mw/runs/plan043-{sid}/verification.json` → `verify:bundle`).
+
+### Director amendment — R-223 (2026-10-18)
+
+Replace the visible TESTA/CODA tags under marching-order slots with the
+numerical damage-exposure percentage from `QUEST_RULES.md` §3. Preserve the
+positional values (solo 100%; two members 20%/80%) and convey TESTA/CODA in the
+accessible name/title rather than as the primary visual. Add a persistent
+legend distinguishing exposure share from forecasted wound/death percentages;
+keep the indicator neutral (no red/green valence). This supersedes AC-08's
+tag presentation only; the risk formula and Forecast layout remain unchanged.
+
+`visual-fork: skipped — R-223 specifies the numeric exposure representation inside the existing footer, not an alternative layout — pointer: R-223 verbatim + v23 FROZEN + PLAN-043 WS-3 artifact-r005`
+
+`visual-fork: skipped — HarmonizationGallery only swaps a deleted roster consumer to MatericRosterComponentV2 to keep the lab compiling, preserving the gallery layout — pointer: R-223 roster unification compile fix`
+
+Living-doc coverage for the same amendment: `src/ui/idleVillage/frozen/kits/pgcardKit.md`, `src/ui/idleVillage/frozen/kits/rosterKit.md`, `src/ui/idleVillage/frozen/kits/slotRackKit.md`, and `src/docs/docs/idle_village/quest_ui_component_guide.md`. Mechanical consumer coverage: `src/ui/visualFidelityLab/HarmonizationGallery.tsx`.

@@ -16,6 +16,7 @@ import {
   useHudPanels,
   type HudPanelsApi,
   ResourceReadout,
+  type ResourceReadoutDelta,
   WhenWhereCluster,
 } from '@/ui/idleVillage/components/gameFrame';
 import {
@@ -23,17 +24,17 @@ import {
   type WorldSurfaceVisualStateOverride,
 } from '@/ui/idleVillage/frozen/kits/worldSurfaceKit';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
-import { MatericRosterComponent } from '@/ui/idleVillage/roster';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
-import { useHudMaterial } from '@/ui/idleVillage/components/gameFrame/useHudMaterial';
 import { resolveWorldManifestPath } from '@/ui/idleVillage/components/gameFrame/resolveWorldManifest';
-import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
+import { selectResourceOutlook, useMinimalGameplayStore, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { HudRecenterButton } from '@/ui/idleVillage/components/gameFrame/HudRecenterButton';
 import type { HudScaleControl } from '@/ui/idleVillage/components/gameFrame/hudScale';
+import { useHudScale } from '@/ui/idleVillage/components/gameFrame/useHudScale';
+import { useTimeEngineLoop } from '@/ui/idleVillage/hooks/useTimeEngineLoop';
 import { saveNowToManualSlot } from '@/ui/idleVillage/state/gameSaveService';
 import { useGameAutosave } from '@/ui/idleVillage/state/useGameAutosave';
-import { useTimeEngineLoop } from '@/ui/idleVillage/hooks/useTimeEngineLoop';
+import { useGameMenuFlow } from '@/ui/idleVillage/components/gameFrame/menu/useGameMenuFlow';
 
 /**
  * The whole /game-frame screen — HUD ribbons, event ledger, roster, instruments —
@@ -85,7 +86,9 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
   useTimeEngineLoop(gameplay, { inputLocked: timeInputLocked });
-  const Roster = useHudMaterial() === 'lacquer' ? MatericRosterComponentV2 : MatericRosterComponent;
+  /* PLAN-043 WS-5 D9: V2 (Lacquer Atlas) is the only roster — the V1
+   *  Materic fallback was retired (Director ruling). */
+  const Roster = MatericRosterComponentV2;
 
   /* Controlled or internal nav (PLAN-035): the page may own the selection so
    * a click on the painted village region can switch the view too. */
@@ -115,6 +118,30 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
   const focusEvent = (event: HudEvent) => {
     if (event.at) setFocusRequest((prev) => ({ ...event.at!, n: (prev?.n ?? 0) + 1 }));
   };
+  /* R-260: the settlement-commit stamp — the readout animates the granted
+   *  «+N» (gold chip on its tile, XP tray under the readout), then the
+   *  stamp clears after the config window. */
+  const resourceDelta = useMinimalGameplayStore((s) => s.resourceDelta);
+  useEffect(() => {
+    if (!resourceDelta) return;
+    const timer = window.setTimeout(
+      () => useMinimalGameplayStore.getState().clearResourceDelta(),
+      DEFAULT_GAME_FRAME_CONFIG.hud.resourceDelta.durationMs,
+    );
+    return () => window.clearTimeout(timer);
+  }, [resourceDelta]);
+  const readoutDelta = useMemo<ResourceReadoutDelta | null>(
+    () =>
+      resourceDelta
+        ? {
+            chips: resourceDelta.gold > 0 ? { gold: resourceDelta.gold } : undefined,
+            tray: resourceDelta.xp > 0 ? { id: 'xp', label: t('gameFrame.resources.xp'), amount: resourceDelta.xp } : undefined,
+            at: resourceDelta.at,
+          }
+        : null,
+    [resourceDelta, t],
+  );
+
   const onSpeedChange = (speed: number) => {
     if (timeInputLocked) return;
     gameplay.setSpeedMultiplier(speed);
@@ -128,11 +155,12 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
 
   const availableSpeeds = [1, 2, 4, 8].filter((s) => s <= config.loop.maxSpeedMultiplier);
 
-  // Time shortcuts: Space pauses or resumes, 1-4 pick the speed in order. The ref keeps one listener on the latest handlers.
   /* PLAN-076: the autosave slot is refreshed on the config interval; «Salva ora» writes the whole game into a manual slot. */
   const flushGameplay = () => gameplay.saveNow();
+  const menuFlow = useGameMenuFlow({ currentTick: state.currentTick, currentDay: state.currentDay, flush: flushGameplay, scale: scaleControl });
   useGameAutosave({ intervalMs: config.loop.autosaveIntervalMs, getTick: () => state.currentTick, flush: flushGameplay, enabled: !captureMode && import.meta.env.MODE !== 'test' });
 
+  // Time shortcuts: Space pauses or resumes, 1-4 pick the speed in order. The ref keeps one listener on the latest handlers.
   const timeKeys = useRef({ onTogglePause, onSpeedChange, availableSpeeds, locked: timeInputLocked });
   useEffect(() => {
     timeKeys.current = { onTogglePause, onSpeedChange, availableSpeeds, locked: timeInputLocked };
@@ -140,11 +168,16 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey || event.repeat) return;
+      /* The quest window binds keys in CAPTURE phase and preventDefaults the
+       * presses it owns (option selection / beat advance). Honor that claim:
+       * speed and pause keys fire only when no selection is pending (R-231). */
+      if (event.defaultPrevented) return;
       const target = event.target as HTMLElement | null;
-      if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(target.tagName))) return;
+      if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName))) return;
       const keys = timeKeys.current;
       if (keys.locked) return;
       if (event.code === 'Space') {
+        if (target?.closest('button, a[href], [role="button"]')) return;
         event.preventDefault();
         keys.onTogglePause();
       } else if (/^[1-9]$/.test(event.key)) {
@@ -163,13 +196,17 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
         subtitle={t('gameFrame.subtitle')}
         objectiveSlot={<ObjectiveCartouche objective={objective} />}
         menuSlot={
-          <HudGameMenu
-            visible={panels.visible}
-            onTogglePanel={panels.toggle}
-            onSaveNow={() => saveNowToManualSlot({ flush: flushGameplay })}
-            scale={scaleControl}
-            includeDev={devPanels}
-          />
+          <>
+            <HudGameMenu
+              visible={panels.visible}
+              onTogglePanel={panels.toggle}
+              onSaveNow={() => saveNowToManualSlot({ flush: flushGameplay })}
+              scale={scaleControl}
+              includeDev={devPanels}
+              {...menuFlow.menuProps}
+            />
+            {menuFlow.screens}
+          </>
         }
         navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
         activeNavId={activeNavId}
@@ -184,7 +221,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
             speed={{ multiplier: state.speedMultiplier, available: availableSpeeds, onChange: onSpeedChange, onTogglePause }}
           />
         }
-        resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />}
+        resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} delta={readoutDelta} />}
         hangingSlot={
           panels.visible.events ? (
             /* WS-2: under stageMode the frame supplies the rightWing rect and
@@ -212,6 +249,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
         hudWakeSignal={(hudWakeSignal ?? 0) + events.length}
         onHudHiddenChange={onHudHiddenChange}
         stageMode={stageMode}
+        hudZoom={scaleControl?.cssZoom ?? 1}
       >
         {renderMap({ recenterSignal, focusRequest })}
       </GameFrame>
@@ -281,5 +319,8 @@ function DomWorldMap({ recenterSignal }: { recenterSignal: number }) {
  * shell is the only frame. `/game-frame-pixi` is the same screen on the Pixi map.
  */
 export default function GameFramePage() {
-  return <GameFrameScreen renderMap={({ recenterSignal }) => <DomWorldMap recenterSignal={recenterSignal} />} />;
+  /* The lab page owns its own interface-size control (the pixi page passes
+   *  `scaleControl` from its single `useHudScale` instance). */
+  const hudScale = useHudScale();
+  return <GameFrameScreen scaleControl={hudScale} renderMap={({ recenterSignal }) => <DomWorldMap recenterSignal={recenterSignal} />} />;
 }

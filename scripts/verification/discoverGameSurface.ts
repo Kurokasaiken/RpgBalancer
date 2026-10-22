@@ -95,7 +95,7 @@ function walkDir(dir: string, out: string[] = []): string[] {
 }
 
 /** Module specifiers in a source file — static/type/re-export/dynamic imports. */
-function specifiersOf(text: string): string[] {
+export function specifiersOf(text: string): string[] {
   const clean = text.replace(/\/\*[\s\S]*?\*\//g, '');
   const out: string[] = [];
   const re = /(?:import|export)\s+(?:[^'";]*?\sfrom\s*)?['"]([^'"]+)['"]|\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
@@ -110,7 +110,7 @@ const RESOLVE_EXTS = ['.ts', '.tsx', '.css', '.json'];
  * `@docs/` → src/docs/, `@/scripts/` → scripts/ and relative paths.
  * Package imports return null (outside the audited surface).
  */
-function resolveSpec(root: string, spec: string, fromAbs: string): string | null {
+export function resolveSpec(root: string, spec: string, fromAbs: string): string | null {
   let p: string;
   if (spec.startsWith('@/scripts/')) p = join(root, 'scripts', spec.slice('@/scripts/'.length));
   else if (spec.startsWith('@docs/')) p = join(root, 'src/docs', spec.slice('@docs/'.length));
@@ -401,6 +401,47 @@ function findDeclaration(sf: ts.SourceFile, name: string): ts.VariableDeclaratio
 /* Main discovery                                                      */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Raw import graph over the guarded /game surface (PLAN-054 T-002):
+ * crawls src/ from the two page roots plus every B/Dq file so every file
+ * in `D` carries its outgoing edges — required by the dominator-based
+ * partition in `componentInventory.ts`. `files` ⊆ `src/**`.
+ */
+export function surfaceImportGraph(rootDir: string): {
+  files: string[];
+  edges: Record<string, string[]>;
+  sources: Record<string, string>;
+  strict_files: string[];
+} {
+  const root = resolve(rootDir);
+  const d = discoverGameSurface(root);
+  const extraEntries = [...d.sets.B, ...d.sets.Dq].filter((f) => /\.(ts|tsx)$/.test(f));
+  const graph = buildGraph(root, [GAME_PAGE, LAB_PAGE, ...extraEntries]);
+  const strict = new Set(d.sets.D);
+  const edges: Record<string, string[]> = {};
+  const sources: Record<string, string> = {};
+  const files: string[] = [];
+  for (const f of [...strict].sort()) {
+    const rel = f;
+    if (!graph.edges[rel] && !graph.sources[rel]) continue;
+    files.push(rel);
+    edges[rel] = (graph.edges[rel] ?? []).filter((e) => strict.has(e));
+    sources[rel] = graph.sources[rel] ?? '';
+  }
+  /* Files in D never crawled (e.g. .css in Dq) keep their slot with
+   * empty edge sets — the partition handles them as isolated nodes. */
+  for (const f of d.sets.D) {
+    if (!files.includes(f)) {
+      files.push(f);
+      edges[f] = [];
+      const abs = join(root, f);
+      sources[f] = existsSync(abs) ? readFileSync(abs, 'utf8') : '';
+    }
+  }
+  files.sort();
+  return { files, edges, sources, strict_files: [...strict].sort() };
+}
+
 /** Full mechanical discovery — exported for the anti-drift test. */
 export function discoverGameSurface(rootDir: string): GameSurfaceDiscovery {
   const root = resolve(rootDir);
@@ -496,10 +537,13 @@ export function discoverGameSurface(rootDir: string): GameSurfaceDiscovery {
       mounts.push({ file: GAME_PAGE, via: 'useHeroSheet.panelNode' });
     }
 
+    /* mountedOn is about REACHABILITY, not file location: a mount inside a
+     * component shared by both pages (GameFrameScreen lives in game-frame.tsx
+     * and is rendered by /game too) counts for whichever page reaches it. */
+    const mountOnGame = mounts.some((m) => Cgame.has(m.file));
+    const mountOnLab = mounts.some((m) => Clab.has(m.file));
     const mountedOn: PanelBinding['mountedOn'] =
-      mounts.some((m) => m.file === GAME_PAGE) && mounts.some((m) => m.file === LAB_PAGE) ? 'both'
-      : mounts.some((m) => m.file === GAME_PAGE) ? 'game'
-      : mounts.some((m) => m.file === LAB_PAGE) ? 'lab' : 'nowhere';
+      mountOnGame && mountOnLab ? 'both' : mountOnGame ? 'game' : mountOnLab ? 'lab' : 'nowhere';
 
     const resolution: PanelBinding['resolution'] =
       (hudPanelOwners.get(id) ?? []).length ? 'data-hud-panel'

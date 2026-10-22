@@ -1,0 +1,111 @@
+{
+  "created_at": "2026-10-19T11:36:35.942Z",
+  "created_by": "agent",
+  "entries": [
+    {
+      "id": "workflow-forensics",
+      "globs": [
+        "scripts/planForensics.ts",
+        "scripts/planTime.ts",
+        "tests/unit/scripts/**",
+        "context/workflow-timing.jsonl",
+        "context/WORKFLOW_METRICS.md"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/scripts",
+        "npm run metrics:report"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan048-t006",
+      "source": "R-217 forensic ledger: miner, plan stamps, timing jsonl, generated report",
+      "approved_at": "2026-10-19T10:29:08.145Z"
+    },
+    {
+      "id": "game-map-pixi",
+      "globs": [
+        "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+        "src/ui/idleVillage/pixiSpike/mapFitRuntime.ts",
+        "src/pages/game-frame-pixi.tsx",
+        "src/pages/game-frame.tsx",
+        "scripts/probe-game-map-fit.cjs",
+        "src/ui/idleVillage/components/WorldSurfaceEventCard.tsx"
+      ],
+      "expected_checks": [
+        "CTR-game-001",
+        "CTR-game-002",
+        "CTR-game-005",
+        "CTR-game-008"
+      ],
+      "proposed_by": "plan044-t002-seed + plan054-t001 (CTR-game-005, mapFitRuntime) + plan033-q7 (WorldSurfaceEventCard, BV-3 seam) + plan054-t003 (CTR-game-006..009)",
+      "source": "CTR-game-001/002/005 components",
+      "approved_at": "2026-10-19T10:29:08.145Z",
+      "anti_glob_confirmed": true
+    },
+    {
+      "id": "game-hud",
+      "globs": [
+        "src/ui/idleVillage/components/gameFrame/**",
+        "src/ui/idleVillage/hooks/**",
+        "src/balancing/config/idleVillage/gameFrameConfig.ts"
+      ],
+      "expected_checks": [
+        "CTR-game-002",
+        "CTR-game-003",
+        "CTR-game-004",
+        "CTR-game-005",
+        "CTR-game-006",
+        "CTR-game-007",
+        "CTR-game-009"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed + plan054-t001 (CTR-game-005) + plan054-t003 (CTR-game-006..009)",
+      "source": "CTR-game-002/003/004/005 components + HUD subtree",
+      "approved_at": "2026-10-19T10:29:08.145Z"
+    },
+    {
+      "id": "game-quests",
+      "globs": [
+        "src/ui/idleVillage/quests/**",
+        "src/ui/idleVillage/questS1Lab/**",
+        "src/balancing/config/idleVillage/quests/**",
+        "public/assets/atmosphere/fog/**",
+        "scripts/bake-fog-noise.py",
+        "scripts/bake-fog-mask.py",
+        "tests/fixtures/goblin-accepted-r008.ts",
+        "tests/fixtures/goblin-rejected-v2.ts"
+      ],
+      "expected_checks": [
+        "npm run test -- tests/unit/idleVillage",
+        "e2e idleVillage quest specs",
+        "CTR-game-007",
+        "CTR-game-008",
+        "CTR-game-009"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed + plan054-t003 (CTR-game-006..009)",
+      "source": "quest runtime/planner/scenarios",
+      "approved_at": "2026-10-19T10:29:08.145Z"
+    },
+    {
+      "id": "repo-tooling",
+      "globs": [
+        "package.json",
+        "package-lock.json",
+        "playwright*.ts",
+        "*.config.ts",
+        "*.config.js",
+        "tsconfig*.json",
+        ".nvmrc",
+        "stageprobe.mjs"
+      ],
+      "expected_checks": [
+        "npm run build:check"
+      ],
+      "anti_glob_confirmed": true,
+      "proposed_by": "plan044-t002-seed",
+      "source": "build/test tooling root-level",
+      "approved_at": "2026-10-19T10:29:08.145Z"
+    }
+  ],
+  "removed_ids": []
+}

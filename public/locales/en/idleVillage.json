@@ -891,6 +891,8 @@
       "incoming": "+{count} incoming",
       "perDay": "−{count}/d",
       "autonomy": "{count} d left",
+      "xp": "XP",
+      "delta": "{label} +{amount}",
       "tooltip": {
         "amount": "{label} {value}.",
         "incoming": "Incoming from activities in progress: +{count}.",
@@ -1099,7 +1101,63 @@
         "it-IT": "Italiano"
       },
       "settings": "All settings…",
-      "comingSoon": "Not available yet"
+      "comingSoon": "Not available yet",
+      "close": "Close",
+      "cancel": "Cancel",
+      "load": {
+        "title": "Load game",
+        "slotAuto": "Autosave",
+        "slotManual": "Save {n}",
+        "slotEmpty": "{name} — empty",
+        "slotDay": "{place} · Day {day}",
+        "summary": "{heroes, plural, one {# hero} other {# heroes}} · {expeditions, plural, =0 {no expedition under way} one {# expedition under way} other {# expeditions under way}}",
+        "slotNewer": "Saved by a newer version of the game",
+        "slotCorrupt": "Damaged save — it cannot be loaded",
+        "loadAction": "Load",
+        "deleteAction": "Delete",
+        "deleteAsk": "Delete this save? This cannot be undone.",
+        "deleteConfirm": "Delete",
+        "replaceNote": "The game in progress (Day {day}) has unsaved progress and will be replaced.",
+        "replaceAsk": "Replace the game in progress (Day {day})? Progress since its last save will be lost.",
+        "replaceConfirm": "Replace and load",
+        "failed": "The save could not be loaded. The game in progress was not changed."
+      },
+      "settingsPanel": {
+        "title": "Settings",
+        "general": "General",
+        "audio": "Audio",
+        "master": "Master",
+        "effects": "Effects",
+        "music": "Music",
+        "interface": "Interface",
+        "reducedMotion": "Reduced motion",
+        "reducedMotionHint": "Fewer animations and fades",
+        "reset": "Restore defaults",
+        "appliesNow": "Changes apply immediately."
+      },
+      "quit": {
+        "title": "Return to the title screen?",
+        "lastSaved": "Last save: {when}.",
+        "neverSaved": "This game has not been saved yet.",
+        "unsavedWarn": "If you leave without saving, you lose what happened since then.",
+        "saveAndQuit": "Save and quit",
+        "quitNoSave": "Quit without saving",
+        "saving": "Saving…",
+        "saveFailed": "The save failed. You are still in the game."
+      },
+      "newGame": {
+        "title": "Start a new game?",
+        "body": "The current game (Day {day}) and its autosave will be replaced. Your manual saves stay as they are.",
+        "confirm": "Start new game"
+      },
+      "titleScreen": {
+        "continue": "Continue · Day {day}",
+        "continuePlain": "Continue",
+        "newGame": "New game",
+        "loadGame": "Load game",
+        "settings": "Settings",
+        "exit": "Quit game"
+      }
     },
     "regions": {
       "northern_forest": "Whispering Woods",
@@ -1879,16 +1937,12 @@
     "members": {
       "title": "By member",
       "row": "wounds {wound}% · deaths {death}%",
-      "downtime": "≈{days}d down",
+      "downtime": "down ~{days} days",
       "role": {
         "leader": "leader",
         "bodyguard": "guard",
         "member": "member"
       }
-    },
-    "why": {
-      "title": "Where the risk comes from",
-      "row": "— in {runs}% of runs · {death}% of deaths · {wound}% of wounds"
     },
     "intel": {
       "title": "Intel",
@@ -1936,6 +1990,7 @@
       "leader": "Leader"
     },
     "seals": {
+      "durationBreakdown": "{out}d out · ~{site}d on site · {back}d back",
       "danger": "Danger",
       "reward": "Reward",
       "duration": "Duration"

@@ -1,0 +1,109 @@
+{
+  "env": {
+    "visibilityState": "visible",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "rafTicks": 24,
+    "headed": false,
+    "webgl2": true,
+    "collectedAt": "2026-10-18T11:02:56.483Z",
+    "frameDiff": 0.1921628221113882
+  },
+  "samples": [
+    {
+      "capture": "push-t0",
+      "params": "scene=agguato-foresta&shot=push-in&t=0",
+      "hasCanvas": true,
+      "bytes": 617567
+    },
+    {
+      "capture": "push-t800",
+      "params": "scene=agguato-foresta&shot=push-in&t=800",
+      "hasCanvas": true,
+      "bytes": 618278
+    },
+    {
+      "capture": "push-end",
+      "params": "scene=agguato-foresta&shot=push-in&t=1600",
+      "hasCanvas": true,
+      "bytes": 617854
+    },
+    {
+      "capture": "pan-mid",
+      "params": "scene=agguato-foresta&shot=pan-lateral&t=3000",
+      "hasCanvas": true,
+      "bytes": 618481
+    },
+    {
+      "capture": "verdict-end",
+      "params": "scene=agguato-foresta&shot=verdict-zoom&t=900",
+      "hasCanvas": true,
+      "bytes": 614493
+    },
+    {
+      "capture": "idle-mid",
+      "params": "scene=agguato-foresta&shot=idle&t=8000",
+      "hasCanvas": true,
+      "bytes": 618294
+    },
+    {
+      "capture": "push-t800-ampx3",
+      "params": "scene=agguato-foresta&shot=push-in&t=800&amp=3",
+      "hasCanvas": true,
+      "bytes": 618718
+    },
+    {
+      "capture": "push-t800-dom",
+      "params": "scene=agguato-foresta&shot=push-in&t=800&dom=1",
+      "hasCanvas": false,
+      "bytes": 678387
+    },
+    {
+      "capture": "push-rest-dom",
+      "params": "scene=agguato-foresta&shot=push-in&t=0&dom=1",
+      "hasCanvas": false,
+      "bytes": 680381
+    },
+    {
+      "capture": "parity-gpu-rest",
+      "params": "scene=agguato-foresta&shot=hold&t=0&amp=0",
+      "hasCanvas": true,
+      "bytes": 617753
+    },
+    {
+      "capture": "parity-dom-rest",
+      "params": "scene=agguato-foresta&shot=hold&t=0&dom=1",
+      "hasCanvas": false,
+      "bytes": 680381
+    },
+    {
+      "test": "rest-parity",
+      "diffRatio": 0.00396404821280133
+    },
+    {
+      "capture": "proof-rest",
+      "params": "scene=agguato-foresta&shot=push-in&t=0",
+      "hasCanvas": true,
+      "bytes": 617567
+    },
+    {
+      "capture": "proof-mid",
+      "params": "scene=agguato-foresta&shot=push-in&t=800",
+      "hasCanvas": true,
+      "bytes": 618278
+    },
+    {
+      "capture": "proof-mid-flat",
+      "params": "scene=agguato-foresta&shot=push-in&t=800&amp=0",
+      "hasCanvas": true,
+      "bytes": 618650
+    },
+    {
+      "test": "deformation-proof",
+      "dMotion": 0.19150041562759768,
+      "dDepth": 0.020929447215295095
+    }
+  ]
+}

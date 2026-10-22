@@ -205,4 +205,20 @@ describe('DragTestContainerV2 header controls', () => {
     expect(renderedOrder(container)).toEqual([]);
     expect(container.querySelector('[data-resident-count]')?.getAttribute('data-resident-count')).toBe('0');
   });
+
+  // INV:drag-test-container-v2.INV-2 — R-257: filtering re-sizes the filtered
+  // set on every assign/remove —
+  // under classic (non-overlay) scrollbars the vertical bar steals inner
+  // width, pushing rows into an h-overflow band, and its appear/disappear
+  // reflows the whole list = the «resize con le bande» the Director saw.
+  // The list must pin its geometry: no horizontal overflow ever, and a
+  // reserved scrollbar gutter so inner width never toggles.
+  it('the card list pins its scroll geometry: x-overflow hidden + reserved scrollbar gutter', () => {
+    const { container } = render(<DragTestContainerV2 residents={RESIDENTS} />, {
+      wrapper: WRAPPER,
+    });
+    const list = container.querySelector('[data-resident-count]') as HTMLElement;
+    expect(list.style.overflowX).toBe('hidden');
+    expect(list.className).toContain('scrollbar-gutter');
+  });
 });

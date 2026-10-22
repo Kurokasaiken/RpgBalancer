@@ -37,6 +37,61 @@ export const PropGlossSchema = z
   })
   .strict();
 
+/** r008 — a fact with a stable id (framing or verdict-partitioned). */
+export const ContractFactSchema = z
+  .object({ id: z.string().min(1).max(60), text: z.string().min(1).max(240) })
+  .strict();
+
+/** r008 — what ONE verdict band may reveal and assert. These facts and
+ *  terms are passed ONLY to the matching band's line — never to
+ *  framing fields. */
+export const VerdictEffectsSchema = z
+  .object({
+    /** Facts this band may assert. */
+    facts: z.array(ContractFactSchema).default([]),
+    /** Terms this band's reveal unlocks — banned in framing fields. */
+    revealTerms: z.array(z.string().min(1).max(60)).default([]),
+    /** The ONLY concrete physical events this band's line may assert —
+     *  every such assertion must bind one of these ids. */
+    canonicalEffects: z
+      .array(z.object({ id: z.string().min(1).max(60), text: z.string().min(1).max(200) }).strict())
+      .default([]),
+    /** Somatic anchors for a mechanically-paid epicfail. */
+    injuryAnchors: z.array(z.string().min(1).max(40)).optional(),
+  })
+  .strict();
+
+/** r008 — the closed world: every noun the prose may use lives here,
+ *  nothing else exists. */
+export const WorldContractSchema = z
+  .object({
+    /** One line: what the world IS (used verbatim in prompts). */
+    closedWorld: z.string().min(1).max(400),
+    /** Every entity/proper noun the prose may name. */
+    allowedEntities: z.array(z.string().min(1).max(60)).min(1),
+    /** Canonical surface term for each contract noun — the ONLY allowed
+     *  rendering of that referent. */
+    canonicalTerms: z.record(z.string(), z.string().min(1).max(60)),
+    /** Motif seeds reserved for the closing line. */
+    endSeeds: z.array(z.string().min(1).max(40)).default([]),
+    /** Setting terms banned everywhere — revocations (guado, strada…). */
+    bannedSettingTerms: z.array(z.string().min(1).max(60)).default([]),
+    /** Sensory texture pools — the only permitted imagery channels. */
+    texture: z
+      .object({
+        sound: z.array(z.string().min(1).max(60)).optional(),
+        smell: z.array(z.string().min(1).max(60)).optional(),
+        light: z.array(z.string().min(1).max(60)).optional(),
+        touch: z.array(z.string().min(1).max(60)).optional(),
+      })
+      .strict()
+      .optional(),
+    /** Enemy nouns the UI-tally detector scans for. */
+    enemyNouns: z.array(z.string().min(1).max(40)).optional(),
+  })
+  .strict();
+export type WorldContract = z.infer<typeof WorldContractSchema>;
+
 /** Per-node contract v2 (PLAN-027, ChatGPT critique 2026-10-11): what
  *  THIS node must change/say — stated against any possible entry state,
  *  never presuming a single previous node (routes are alternative). */
@@ -61,6 +116,15 @@ export const NodeContractSchema = z
     /** Ending facts this node may anticipate — a subset of endingFacts.
      *  Empty for mid-arc nodes: they must not foreshadow the ending. */
     endingClaimsAllowed: z.array(z.string().min(1).max(140)).max(4),
+    /* ---- r008 extensions (optional — legacy contracts keep working) ---- */
+    /** Facts observable before choosing/rolling — framing fields only. */
+    framingFacts: z.array(ContractFactSchema).optional(),
+    /** Per-band reveal/effects partition (epicfail/fail/almost/win/bigwin). */
+    verdictEffects: z.record(z.string(), VerdictEffectsSchema).optional(),
+    /** A contract-locked title — injected into copy, never generated. */
+    titleLock: z.string().min(1).max(60).optional(),
+    /** `direct` recovery: no choice, no check — the node IS the reward. */
+    recovery: z.literal('direct').optional(),
   })
   .strict();
 export type NodeContract = z.infer<typeof NodeContractSchema>;
@@ -98,6 +162,10 @@ export const QuestArcContractSchema = z
      *  backward compat with r001 artifacts; when present every brief
      *  nodeKey must be covered exactly once. */
     nodeContracts: z.array(NodeContractSchema).optional(),
+    /** r008 — the closed world. Optional for legacy contracts; when
+     *  present it activates the epistemic brief partition + the r008
+     *  gate checks (attachEpistemic / validateNodeCopyR8). */
+    world: WorldContractSchema.optional(),
   })
   .strict();
 export type QuestArcContract = z.infer<typeof QuestArcContractSchema>;
@@ -225,5 +293,95 @@ export function promptForArcContract(
     `}`,
     ``,
     `Rules: endingFacts must be facts a run can actually produce — never 'you lost a hand' unless a mechanism causes it. Prop meanings must be mundane and concrete. nodeContracts: exactly one entry per nodeKey; narrativeDelta must describe a change relative to ANY possible entry state (routes are alternative — never assume a specific previous node); rival actions must differ across nodes (gain / misdirection / limitation — not 'listens to the bell' every time); a reward the player is guaranteed must NEVER appear in mechanicalClaims as check-dependent.`,
+  ].join('\n');
+}
+
+/* ------------------------------------------------------------------ */
+/* r008 — contract lint: the contract's own vocabularies must be       */
+/* internally disjoint before any copy is generated.                   */
+/* ------------------------------------------------------------------ */
+
+/** Mechanical lexemes that must never appear as allowedEntities — an
+ *  entity named 'bottino' would defeat the option-mechanical-leak ban. */
+const LINT_MECHANICAL_LEXEMES = [
+  'bonus', 'malus', 'rischio', 'costo', 'penalità', 'vantaggio', 'gratis', 'allerta', 'allarme',
+  'probabilità', 'turno', 'check', 'tiro', 'carico', 'bottino', 'trofeo', 'sicuro', 'facile',
+  'difficile', 'migliore', 'peggiore', 'premio', 'ricompensa',
+];
+/** Closer lexicon — an entity that reads as the quest tally must not be
+ *  a naming primitive either. */
+const LINT_CLOSER_LEXEMES = ['spedizione', 'ricompensa', 'bilancio', 'conto', 'morale', 'lezione', 'vedette'];
+
+const norm = (s: string) => s.trim().toLowerCase().replace(/\*$/, '');
+const stemOverlap = (a: string, b: string) => {
+  const x = norm(a);
+  const y = norm(b);
+  return x === y || x.startsWith(`${y}`) || y.startsWith(`${x}`);
+};
+
+/** Deterministic contract lint — hard failures BEFORE generation:
+ *  allowedEntities must not intersect bannedSettingTerms, the option-
+ *  mechanical lexicon, or the closer lexicon (r008 WITNESS fixes:
+ *  'bottino'/'vedette' in the inventory silently defeat the bans). */
+export function contractLintIssues(contract: QuestArcContract): string[] {
+  const issues: string[] = [];
+  const world = contract.world;
+  if (!world) return issues;
+  for (const entity of world.allowedEntities) {
+    const banned = world.bannedSettingTerms.find((t) => stemOverlap(entity, t));
+    if (banned) {
+      issues.push(`allowedEntities '${entity}' collide col bannedSettingTerms '${banned}'`);
+    }
+    const mech = LINT_MECHANICAL_LEXEMES.find((t) => stemOverlap(entity, t));
+    if (mech) {
+      issues.push(`allowedEntities '${entity}' collide col lessico meccanico '${mech}' — la label ban perderebbe il senso`);
+    }
+    const closer = LINT_CLOSER_LEXEMES.find((t) => stemOverlap(entity, t));
+    if (closer) {
+      issues.push(`allowedEntities '${entity}' collide col lessico di chiusura '${closer}'`);
+    }
+  }
+  /* Canonical terms must map to allowed entities — a term for nothing
+   * is an invention vector. */
+  for (const [key, term] of Object.entries(world.canonicalTerms)) {
+    if (!world.allowedEntities.some((e) => stemOverlap(e, key) || stemOverlap(e, term))) {
+      issues.push(`canonicalTerms '${key}'→'${term}' non copre alcun allowedEntity`);
+    }
+    const banned = world.bannedSettingTerms.find((t) => stemOverlap(term, t));
+    if (banned) {
+      issues.push(`canonicalTerms '${term}' coincide col termine vietato '${banned}'`);
+    }
+  }
+  /* endSeeds must not be banned either — the closer needs them legal. */
+  for (const seed of world.endSeeds) {
+    const banned = world.bannedSettingTerms.find((t) => stemOverlap(seed, t));
+    if (banned) issues.push(`endSeeds '${seed}' coincide col termine vietato '${banned}'`);
+  }
+  return issues;
+}
+
+/** r008 — closed-world prompt section: every noun the prose may use
+ *  lives in this inventory, nothing else exists. */
+export function worldPromptSection(contract: QuestArcContract): string {
+  const w = contract.world;
+  if (!w) return '';
+  return [
+    `CLOSED WORLD — ${w.closedWorld}`,
+    `ALLOWED ENTITIES (the ONLY nouns/proper names the prose may use — anything else is an invention):`,
+    ...w.allowedEntities.map((e) => `- ${e}`),
+    `CANONICAL TERMS — the ONLY permitted rendering of each referent:`,
+    ...Object.entries(w.canonicalTerms).map(([k, v]) => `- ${k} → «${v}»`),
+    ...(w.endSeeds.length ? [`MOTIF SEEDS (reserved for the closing line): ${w.endSeeds.join(', ')}`] : []),
+    ...(w.bannedSettingTerms.length
+      ? [`BANNED SETTING TERMS (never appear anywhere — revoked by the Director): ${w.bannedSettingTerms.join(', ')}`]
+      : []),
+    ...(w.texture
+      ? [
+          `TEXTURE POOLS (the only sensory imagery channels):`,
+          ...(Object.entries(w.texture) as [string, string[]][]).map(
+            ([ch, items]) => `- ${ch}: ${items.join(', ')}`,
+          ),
+        ]
+      : []),
   ].join('\n');
 }

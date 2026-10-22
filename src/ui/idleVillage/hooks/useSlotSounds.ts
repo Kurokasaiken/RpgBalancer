@@ -36,6 +36,34 @@ const DEFAULT_CONFIG: Required<SlotSoundsConfig> = {
   audioContext: undefined,
 };
 
+/* R-248 (T-10): ONE context for the whole app — `new AudioContext()` is a
+ * synchronous main-thread cost, and building one per cue (or even one per
+ * mounted slot, since every slot owns this hook) stalls assign/extract.
+ * The shared instance is built lazily on the first cue — itself a
+ * user-gesture path — and reused for the page's lifetime. */
+let sharedAudioContext: AudioContext | null = null;
+
+/**
+ * Returns the app-shared AudioContext, building it on first use.
+ * A suspended context (autoplay policy before the first user gesture) is
+ * woken with an async `resume()` — never a second construction.
+ */
+const getSharedAudioContext = (): AudioContext | null => {
+  if (sharedAudioContext) {
+    if (sharedAudioContext.state === 'suspended') {
+      void sharedAudioContext.resume().catch(() => undefined);
+    }
+    return sharedAudioContext;
+  }
+  try {
+    sharedAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    return sharedAudioContext;
+  } catch (error) {
+    console.warn('AudioContext not available:', error);
+    return null;
+  }
+};
+
 /**
  * Create synthetic sound effects using Web Audio API oscillators
  */
@@ -90,13 +118,7 @@ export const useSlotSounds = (config: SlotSoundsConfig = {}): SlotSoundsControls
     if (mergedConfig.audioContext) {
       return mergedConfig.audioContext;
     }
-    
-    try {
-      return new (window.AudioContext || (window as any).webkitAudioContext)();
-    } catch (error) {
-      console.warn('AudioContext not available:', error);
-      return null;
-    }
+    return getSharedAudioContext();
   }, [mergedConfig.audioContext]);
 
   const clank = useCallback(() => {

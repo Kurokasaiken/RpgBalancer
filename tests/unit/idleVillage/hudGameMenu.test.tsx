@@ -103,7 +103,22 @@ describe('HudGameMenu', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('renders the future entries (load, quit, settings) disabled', async () => {
+  // INV:PLAN-076-menu-entries — Load game, All settings and Quit to title are live entries (DN-7, Director 2026-10-21):
+  // each closes the menu and calls its handler; an entry with no handler stays disabled
+  it('wires Load game, All settings and Quit to title to their handlers and closes the menu', async () => {
+    const handlers = { onLoadGame: vi.fn(), onOpenSettings: vi.fn(), onQuit: vi.fn() };
+    renderMenu(handlers);
+    for (const [key, handler] of [['loadGame', handlers.onLoadGame], ['settings', handlers.onOpenSettings], ['quit', handlers.onQuit]] as const) {
+      await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.title' }));
+      const item = screen.getByRole('menuitem', { name: `gameFrame.menu.${key}` });
+      expect(item).toBeEnabled();
+      await userEvent.click(item);
+      expect(handler).toHaveBeenCalledOnce();
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    }
+  });
+
+  it('keeps Load game, All settings and Quit disabled when no handler is wired', async () => {
     renderMenu();
     await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.title' }));
     for (const key of ['loadGame', 'quit', 'settings']) {

@@ -172,6 +172,7 @@ const ZONE_TARGETS: Record<string, { x: number; y: number }> = {
 const SEEDS = Array.from({ length: 30 }, (_, i) => 1000 + i * 37);
 
 describe('ballGuidance — seamless arrival trajectory', () => {
+  // INV:CTR-game-009.INV-2
   it('parks on the target with ~zero speed, for every verdict zone', () => {
     for (const [zone, target] of Object.entries(ZONE_TARGETS)) {
       const fails = SEEDS.filter((s) => {
@@ -182,6 +183,7 @@ describe('ballGuidance — seamless arrival trajectory', () => {
     }
   });
 
+  // INV:CTR-game-009.INV-2
   it('no teleport: per-frame displacement stays within ballistic bounds', () => {
     for (const target of Object.values(ZONE_TARGETS)) {
       for (const s of SEEDS.slice(0, 12)) {
@@ -192,6 +194,7 @@ describe('ballGuidance — seamless arrival trajectory', () => {
     }
   });
 
+  // INV:CTR-game-009.INV-2
   it('no fling: once it reaches the target zone it stays there', () => {
     for (const [zone, target] of Object.entries(ZONE_TARGETS)) {
       for (const s of SEEDS.slice(0, 10)) {
@@ -227,6 +230,7 @@ describe('ballGuidance — seamless arrival trajectory', () => {
     }
   });
 
+  // INV:CTR-game-009.INV-2
   it('reaches the target before the spin ends (no endless wandering)', () => {
     for (const target of Object.values(ZONE_TARGETS)) {
       const misses = SEEDS.filter((s) => simulateSpin(target, s).firstContactP < 0);
@@ -332,6 +336,7 @@ describe('findZonePoint', () => {
     expect(p).toBeNull();
   });
 
+  // INV:CTR-game-009.INV-2
   it('reproduces the V62 valley bug: a shrunken star is still findable', () => {
     /* star squeezed to a sliver — only r in (40, 55) is 'win' */
     const tinyZone = (x: number, y: number) => {

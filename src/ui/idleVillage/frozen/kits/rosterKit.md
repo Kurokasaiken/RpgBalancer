@@ -38,13 +38,13 @@ function MinimalRoster() {
 
 ## Density (1.1.0)
 
-`density?: 'default' | 'compact'` on `VillageRosterSection` / `RosterDraggable` / `MatericRosterComponent`.
+`density?: 'default' | 'compact'` on `VillageRosterSection` / `RosterDraggable` / `MatericRosterComponentV2`.
 
 - `default` (or omitted): the certified 1.0.0 layout, unchanged.
 - `compact`: one ~30px strip per resident (portrait 22px, name + status tag, HP and Stamina as 4px bars with values), tight padding, no grain texture or decorative animations (fireflies, border pulse, glow breath). The header keeps the drag handle, filter, stat sort and collapse controls, kept icon-sized by `[data-roster-controls="compact"]` in `skinScope.css`. Drag and drop is unchanged: strips use the same `useDraggable` wiring as the full card. Used by `/game-frame`.
 
 ```tsx
-<MatericRosterComponent componentId="game-frame-roster" density="compact" />
+<MatericRosterComponentV2 componentId="game-frame-roster" density="compact" />
 ```
 
 ## Contract

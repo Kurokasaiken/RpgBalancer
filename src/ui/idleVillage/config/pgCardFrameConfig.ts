@@ -14,7 +14,8 @@ export type PgCardFrameType =
   | 'heroic'
   | 'veteran'
   | 'legendary'
-  | 'iron';
+  | 'iron'
+  | 'bronze';
 
 /**
  * Visual tokens for a single frame variant.
@@ -117,6 +118,18 @@ export const PG_CARD_FRAME_CONFIG: Record<PgCardFrameType, PgCardFrameTokens> = 
     hasCornerDecorations: false,
     hasInnerBevel: true,
     classSuffix: 'iron',
+  },
+  bronze: {
+    label: 'Bronze',
+    borderColor: 'var(--skin-icon-color, #dfb857)',
+    backgroundColor: 'var(--skin-surface-base, rgba(12,11,9,0.9))',
+    boxShadow: '0 0 8px rgba(223,184,87,0.28), 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)',
+    accentColor: 'var(--skin-title-color, #f0cf6a)',
+    borderWidth: 2,
+    borderRadius: 'full',
+    hasCornerDecorations: true,
+    hasInnerBevel: true,
+    classSuffix: 'bronze',
   },
 };
 

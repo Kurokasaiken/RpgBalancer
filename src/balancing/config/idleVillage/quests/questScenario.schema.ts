@@ -143,7 +143,17 @@ export const QuestOptionSchema = z
   .object({
     id: z.string(),
     label: z.string(),
-    detail: z.string(),
+    /* R-239 T-B3: `detail` is a stat label, not a sentence — a bare label
+     * ("Strength", "Intelligence or Perception") must not carry a trailing
+     * period. Clause details ("Lower your weapons.", "The trophy hits the
+     * dirt.") stay allowed: the pattern only matches tokens joined by
+     * `+`/`or`/`o`. */
+    detail: z
+      .string()
+      .refine(
+        (s) => !/^[\p{L}]+(?:\s*(?:\+|\bor\b|\bo\b)\s*[\p{L}]+)*\.\s*$/u.test(s.trim()),
+        { message: 'option detail: a bare stat label must not end with a period (write "Strength", not "Strength.")' },
+      ),
     /** Node id, or 'CHECK:<id>' to run check <id> then branch on verdict. */
     next: z.string(),
     costGold: z.number().optional(),
@@ -332,6 +342,8 @@ export const QuestNodeSchema = z
     /** Optional/secret node off the main path — presentation marks it as a
      *  hidden event (icon + tooltip, Director 2026-10-10). */
     hidden: z.boolean().optional(),
+    /** Intra-phase immediate discovery (R-231): unlocks at arrival (`readyAt = tick`, 0 wait ticks). */
+    immediate: z.boolean().optional(),
     combat: CombatSpecSchema.optional(),
     failHint: z.string().optional(),
     upfrontDamage: UpfrontDamageSchema.optional(),

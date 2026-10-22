@@ -263,6 +263,15 @@ All game interactions MUST emit telemetry:
 
 ## Testing Requirements
 
+- **Living contracts (PLAN-054)**: ogni unità `/game` ha un contratto in
+  `.mw/contracts/components/<id>.md` con invarianti `INV` legate a test
+  tramite tag `// INV:<componente>.INV-<n>`. Prima di toccare un file
+  leggi il contratto del suo owner; se cambi comportamento coperto da un
+  `INV`, contratto + test si aggiornano **nello stesso diff** (Mode
+  B-add/amend del sync gate — `contracts:check` su `BASE..WT` è
+  fail-closed; helper di import-closure dei blocchi INV inclusi).
+  Bug dal Director → `npm run sync:bug -- --component <id> --source-ref
+  <R-NNN> --desc "..."` + red-first record + tag (Mode A).
 - **RTL/Vitest**: unit tests deterministici per logica pura e componenti;
   `npm run test -- <scope>` (max 300 s).
 - **Contract**: `tests/contract/minimal-vs-test.spec.ts` per kit certificati;

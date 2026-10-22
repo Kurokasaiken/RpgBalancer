@@ -12,9 +12,7 @@ const SHAPES: Record<HudPlaqueShape, PlaqueGeometry> = {
 };
 const SEAT_PX = 1.25;
 const GRAIN_TILE_PX = 256;
-const WEAR_TILE_PX = 128;
 const GRAIN_SRC = '/assets/ui/bg.webp';
-const WEAR_SRC = '/assets/ui/hud/wear_mask.webp';
 const tokenStop = (name: string): CSSProperties => ({ stopColor: `var(${name})` });
 
 export interface HudPlaqueProps extends React.HTMLAttributes<HTMLElement> {
@@ -89,19 +87,18 @@ export const HudPlaque: React.FC<HudPlaqueProps> = ({ shape = 'panel', as: Tag =
             <pattern id={`gr-${uid}`} patternUnits="userSpaceOnUse" width={GRAIN_TILE_PX} height={GRAIN_TILE_PX}>
               <image href={GRAIN_SRC} width={GRAIN_TILE_PX} height={GRAIN_TILE_PX} />
             </pattern>
-            <pattern id={`wp-${uid}`} patternUnits="userSpaceOnUse" width={WEAR_TILE_PX} height={WEAR_TILE_PX}>
-              <image href={WEAR_SRC} width={WEAR_TILE_PX} height={WEAR_TILE_PX} />
-            </pattern>
-            <mask id={`wr-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={size.w} height={size.h}>
-              <rect width={size.w} height={size.h} fill={`url(#wp-${uid})`} />
-            </mask>
           </defs>
           <path d={d} fill={`url(#lq-${uid})`} style={{ fillOpacity: 'var(--skin-hud-lacquer-alpha)' }} />
           <path d={d} fill={`url(#gr-${uid})`} style={{ opacity: 'var(--skin-hud-grain-alpha)' }} />
           <g clipPath={`url(#in-${uid})`}>
             <path d={d} fill="none" stroke={`url(#hl-${uid})`} strokeWidth={2 * (BAND_PX + 3)} />
             <path d={d} fill="none" style={{ stroke: 'var(--skin-hud-step)' }} strokeWidth={2 * (BAND_PX + 1)} />
-            <path d={d} fill="none" stroke={`url(#br-${uid})`} strokeWidth={2 * BAND_PX} mask={`url(#wr-${uid})`} />
+            {/* R-253: the wear mask cut the band through to the dark step,
+             *  and where the texture landed dark at a corner the plaque read
+             *  as «dark ears» instead of finishing with the rounded gold
+             *  border (Director eye-check). The band now paints solid — the
+             *  brass gradient still carries the material variation. */}
+            <path d={d} fill="none" stroke={`url(#br-${uid})`} strokeWidth={2 * BAND_PX} />
           </g>
           <path d={d} fill="none" style={{ stroke: 'var(--skin-hud-seat)' }} strokeWidth={SEAT_PX} />
         </svg>

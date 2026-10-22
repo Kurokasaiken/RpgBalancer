@@ -16,4 +16,4 @@ MERCANTE — A roadside encounter about to begin where a forest road forks, the 
 
 - Scena opzionale — attivarla quando il nodo evento mercante esiste nel
   grafo della quest.
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

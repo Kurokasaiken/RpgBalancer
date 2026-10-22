@@ -148,6 +148,7 @@ describe('useDragPreviewInstrumentation', () => {
     }
   });
 
+  // INV:use-drag-preview-instrumentation.INV-1
   it('collects drag preview metrics when enabled', async () => {
     const { result } = renderHook(() =>
       useDragPreviewInstrumentation({ residentId: 'resident-1', source: 'pg_card' }),

@@ -118,6 +118,7 @@ describe('ActivitySlotTelemetryMirror', () => {
     });
 
     describe('createSlotTelemetryData', () => {
+      // INV:activity-slot-data.INV-1
       it('should create slot telemetry data with all parameters', () => {
         const result = ActivitySlotTelemetryUtils.createSlotTelemetryData(
           mockSlotData,

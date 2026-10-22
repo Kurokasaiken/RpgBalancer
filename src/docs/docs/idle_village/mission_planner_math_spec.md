@@ -1,6 +1,6 @@
 # Mission Planner — Mathematical Contract
 
-**Status:** candidate
+**Status:** candidate — PLAN-054 T-003 triage: resta la fonte normativa del modello; scenari `/game` mappati su `CTR-game-007.INV-1/INV-2`
 **Version:** 1.1.0 (MP-00 + MP-06 runtime + phase preview)
 **Owner:** Devin
 **Last Updated:** 2026-10-01

@@ -1,6 +1,6 @@
 ---
 title: Land Breath — la terraferma di World Surface respira nella materia
-status: active
+status: completed
 created: 2026-09-08
 desiderata: .mw/desiderata.md v21 FROZEN
 ---

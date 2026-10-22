@@ -1,7 +1,7 @@
 ---
 title: "PLAN-043-S6 — Scheda personaggio che non copre i pannelli"
 parent: PLAN-043
-status: active
+status: completed
 created: 2026-10-17 (scorporato dal master PLAN-043; lavoro del 2026-10-16)
 source_request: R-207
 documentation_impact: OPTIONAL

@@ -12,15 +12,20 @@
  *  - le ancore di chrome top-level (placca, hide-toggle, panels trigger,
  *    strip tab) non si sovrappongono fra loro.
  *
- * Rischio residuo documentato: la posizione dell'isola DENTRO il canvas è
- * pixel-level WebGL, non osservabile via bounding box DOM — quella parte del
- * contratto T-01 resta coperta da visual/canvas-level checks fuori da v1.
+ * Livello contrattuale v2 (PLAN-054 T-001, CTR-game-005): la posizione
+ * dell'isola DENTRO il canvas è ora osservabile via `window.__worldCam`
+ * (test seam dev/playwright in `PixiWorldMap`) e verificata nei blocchi
+ * tag `INV:CTR-game-005.INV-1…INV-3` qui sotto — proiezione land↔chrome fisso,
+ * south-pin dopo user-zoom + resize, copertura quad mare e scanline
+ * stage-leak/seam ai bound di pan. Le costanti arrivano da
+ * `tests/helpers/mapFitContract.ts` (config + renderer, mai hardcoded).
  *
  * Eseguito a tre viewport: il conflitto floor-coverage vs content-fit si
  * manifesta cambiando il rapporto viewport/mappa.
  */
 
 import { test, expect } from '@playwright/test';
+import { PNG } from 'pngjs';
 import {
   expectCoversViewport,
   expectDisjoint,
@@ -28,6 +33,16 @@ import {
   rectOf,
   type Rect,
 } from '../../helpers/geometry';
+import {
+  evaluateMapFit,
+  MAP_FIT_MARGIN_X,
+  MAP_FIT_MEASURE_ARGS,
+  MAP_FIT_STAGE_COLOR,
+  MAP_FIT_VIEWPORTS,
+  measureMapFitInPage,
+  scanlineCheckPng,
+  type MapFitMeasurement,
+} from '../../helpers/mapFitContract';
 
 const CANVAS = '[data-testid="pixi-world-canvas"]';
 const BOOT = '[data-testid="game-boot-screen"]';
@@ -93,4 +108,148 @@ test.describe('contratto geometrico /game — classe T-01', () => {
       }
     });
   }
+});
+
+type WorldCamWindow = Window & {
+  __worldCam?: { panX: number; panY: number; zoom: number; width: number; height: number };
+  __worldCamCtl?: {
+    set: (partial: { panX?: number; panY?: number; zoom?: number }) => void;
+    refit: () => void;
+  };
+};
+
+/** Attende boot completo + primo apply() della camera (test seam dev/playwright). */
+const waitForWorldCam = async (page: import('@playwright/test').Page) => {
+  await page.waitForSelector(CANVAS, { state: 'attached' });
+  await page.waitForSelector(BOOT, { state: 'detached' });
+  await page.waitForFunction(() => (window as WorldCamWindow).__worldCam != null, undefined, { timeout: 60_000 });
+  await page.waitForTimeout(400);
+};
+
+const measure = (page: import('@playwright/test').Page) =>
+  page.evaluate(measureMapFitInPage, MAP_FIT_MEASURE_ARGS) as Promise<MapFitMeasurement>;
+
+const verdictMessage = (v: ReturnType<typeof evaluateMapFit>) =>
+  JSON.stringify({ precheck: v.precheck, fixed: v.fixedChromeViolations, sea: v.seaCoverageViolations, southPin: v.southPinViolation });
+
+test.describe('CTR-game-005 — map fit & sea continuity (plan054 T-001)', () => {
+  // INV:CTR-game-005.INV-1 — protected land is disjoint from the FIXED chrome
+  // at rest and after a recenter refit; pre-checks are fail-closed (the run is
+  // red if __worldCam is missing, uncalibrated, or the chrome anchors vanish).
+  for (const vp of MAP_FIT_VIEWPORTS) {
+    test(`INV-1 land↔fixed-chrome disjoint at rest/refit @${vp.label} (DPR 1)`, async ({ page }) => {
+      await page.setViewportSize({ width: vp.w, height: vp.h });
+      await page.goto('/game');
+      await waitForWorldCam(page);
+
+      const atRest = evaluateMapFit(await measure(page), vp);
+      expect(atRest.ok, `rest ${vp.label}: ${verdictMessage(atRest)}`).toBe(true);
+
+      // Post-recenter: same resting contract must hold after the recenter path.
+      await page.evaluate(() => (window as WorldCamWindow).__worldCamCtl?.refit());
+      await page.waitForTimeout(200);
+      const afterRefit = evaluateMapFit(await measure(page), vp);
+      expect(afterRefit.ok, `post-refit ${vp.label}: ${verdictMessage(afterRefit)}`).toBe(true);
+    });
+  }
+
+  // INV:CTR-game-005.INV-1 — ultrawide regression: browser auto HUD scale
+  // magnifies the fixed chrome, so safe-fit must reserve the zoomed bands
+  // instead of the unscaled layout pixels declared by the config.
+  test('INV-1 land↔fixed-chrome disjoint @3440x1440 (HUD auto zoom)', async ({ page }) => {
+    const vp = { w: 3440, h: 1440, label: '3440x1440' };
+    await page.setViewportSize({ width: vp.w, height: vp.h });
+    await page.goto('/game');
+    await waitForWorldCam(page);
+
+    const atRest = evaluateMapFit(await measure(page), vp);
+    expect(atRest.ok, `rest ${vp.label}: ${verdictMessage(atRest)}`).toBe(true);
+
+    await page.evaluate(() => (window as WorldCamWindow).__worldCamCtl?.refit());
+    await page.waitForTimeout(200);
+    const afterRefit = evaluateMapFit(await measure(page), vp);
+    expect(afterRefit.ok, `post-refit ${vp.label}: ${verdictMessage(afterRefit)}`).toBe(true);
+  });
+
+  // INV:CTR-game-005.INV-1 — same invariant at devicePixelRatio 2 (fractional
+  // screen-space coordinates: the fit maths must not leak rounding into the
+  // chrome band).
+  test('INV-1 land↔fixed-chrome disjoint @1440x900 (DPR 2)', async ({ browser }) => {
+    const vp = { w: 1440, h: 900, label: '1440x900' };
+    const context = await browser.newContext({
+      baseURL: test.info().project.use.baseURL as string,
+      viewport: { width: vp.w, height: vp.h },
+      deviceScaleFactor: 2,
+    });
+    const page = await context.newPage();
+    try {
+      await page.goto('/game');
+      await waitForWorldCam(page);
+      const verdict = evaluateMapFit(await measure(page), vp);
+      expect(verdict.ok, `dpr2 ${vp.label}: ${verdictMessage(verdict)}`).toBe(true);
+    } finally {
+      await context.close();
+    }
+  });
+
+  // INV:CTR-game-005.INV-2 — after a user wheel-zoom (userMoved) a resize must
+  // still keep the south-pin and zero fixed-chrome violations; same with a
+  // floating panel open (insets change → refit must protect the land).
+  test('INV-2 south-pin survives user zoom + resize + floating panel', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 800 });
+    await page.goto('/game');
+    await waitForWorldCam(page);
+
+    await page.mouse.move(960, 400);
+    await page.mouse.wheel(0, 240);
+    await page.waitForTimeout(300);
+    await page.setViewportSize({ width: 1440, height: 700 });
+    await page.waitForTimeout(1200);
+
+    const afterResize = evaluateMapFit(await measure(page), { w: 1440, h: 700 });
+    expect(afterResize.ok, `after zoom+resize: ${verdictMessage(afterResize)}`).toBe(true);
+    expect(afterResize.southPinViolation, 'south-pin broken after user zoom + resize').toBeNull();
+
+    // Floating panel open → live insets change → refit must re-protect the land.
+    await page.locator('[data-hud-panels-trigger]').click();
+    await page.getByRole('menuitemcheckbox', { name: 'Roster' }).click();
+    await expect(page.locator('[data-testid="resident-roster-panel"]')).toBeVisible({ timeout: 10_000 });
+    await page.waitForTimeout(600);
+
+    const withPanel = evaluateMapFit(await measure(page), { w: 1440, h: 700 });
+    expect(withPanel.ok, `with roster panel: ${verdictMessage(withPanel)}`).toBe(true);
+    expect(withPanel.southPinViolation, 'south-pin broken with floating panel open').toBeNull();
+    // Floating panels MAY cover land — reported only, not a violation.
+    expect(withPanel.fixedChromeViolations).toEqual([]);
+  });
+
+  // INV:CTR-game-005.INV-3 — at the sea-margin pan bounds and a fractional
+  // zoom the deep-sea quads must still cover the whole viewport (geometry)
+  // and the scanline must find zero stage-leak pixels and no hard seam step
+  // on the projected canvas edge (R-148 "line between old and new sea").
+  test('INV-3 sea quad coverage + scanline at pan bounds', async ({ page }) => {
+    const vp = { w: 1440, h: 900 };
+    await page.setViewportSize({ width: vp.w, height: vp.h });
+    await page.goto('/game');
+    await waitForWorldCam(page);
+
+    // Jump deterministically to the left pan bound and the bottom pan bound
+    // (apply() clamps to the real bound) at a fractional zoom.
+    await page.evaluate(
+      ([marginX]) =>
+        (window as WorldCamWindow).__worldCamCtl?.set({ panX: -marginX, panY: Number.MAX_SAFE_INTEGER, zoom: 0.3733 }),
+      [MAP_FIT_MARGIN_X] as const,
+    );
+    await page.waitForTimeout(300);
+    const m = await measure(page);
+    const verdict = evaluateMapFit(m, vp);
+    expect(verdict.seaCoverageViolations, `sea coverage: ${verdict.seaCoverageViolations.join(', ')}`).toEqual([]);
+
+    const shot = await page.screenshot({ scale: 'css' });
+    const scan = scanlineCheckPng(PNG.sync.read(shot), m, MAP_FIT_STAGE_COLOR);
+    expect(
+      scan.ok,
+      `scanline: ${scan.findings.map((f) => `${f.kind}: ${f.detail}`).join(' | ')} (metrics ${JSON.stringify(scan.metrics)})`,
+    ).toBe(true);
+  });
 });

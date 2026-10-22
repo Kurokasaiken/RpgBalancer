@@ -3,7 +3,7 @@
 **Status:** trusted
 **Version:** 1.0.0
 **Owner:** Devin
-**Last Updated:** 2026-08-15
+**Last Updated:** 2026-10-18
 **Component:** `PgCard` (`src/ui/idleVillage/components/PgCard.tsx`)
 **Related:** `CustomDragOverlay` (`src/ui/idleVillage/components/CustomDragOverlay.tsx`), `useDragOutcome` (`src/ui/idleVillage/interaction/useDragOutcome.ts`)
 
@@ -39,10 +39,10 @@ CustomDragOverlay / FlightProxy
 - The portrait lives inside a `PgCard` frame (see `pgCardFrameConfig` for `frameType` tokens).
 - **Two versions per portrait.** The full landscape PNG (`src/assets/portraits/<name>.png`) is for PgCard and detail views. The medallion uses the generated square `src/assets/portraits/medal/<name>.webp`, resolved by `getMedalPortraitUrl` (`src/balancing/config/idleVillage/medalPortraitAssets.ts`). Callers pass the full URL; the medallion, drag preview and flight proxy swap it.
 - After adding or replacing a portrait, run `npm run portraits:medal` (`scripts/build-medal-portraits.py`). Details in `src/assets/portraits/README.md`.
-- Medallion and drag preview share one decoded cache (`src/ui/idleVillage/utils/portraitDecodeCache.ts`). The medallion appears on its first render when the drag preview already decoded the square.
+- Medallion and drag preview share one decoded cache (`src/ui/idleVillage/utils/portraitDecodeCache.ts`). On a cold cache, `WanderlustMedalOverlay` keeps the medal visible with its fallback portrait while the square crop decodes, then swaps to the real crop; loading must never hide the whole medallion.
 
 ### Frame / Rarity Ring
-- `frameType` (`heroic`, `minimal`, `wilderness`, `empire`, etc.) is resolved by `getPgCardFrameTokens` / `getPgCardFrameStyle`.
+- `frameType` (`heroic`, `medallion`, `veteran`, `legendary`, `iron`, `bronze`, `none`) is resolved by `getPgCardFrameTokens` / `getPgCardFrameStyle`. `bronze` is the HUD-aligned variant (skin `--skin-icon-color`/`--skin-title-color` tokens) used by the quest party roster panel.
 - Border radius, corner decorations, accent color are all token-driven (`pgCardFrameConfig`).
 - The base card has **no hardcoded outer border**; the frame is provided by `pgCardFrameStyle` and `pgcard-frame-*` classes.
 - Rarity ring is part of the frame; it is not a separate CSS file.

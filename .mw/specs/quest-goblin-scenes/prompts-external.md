@@ -24,11 +24,17 @@ MERCANTE — A roadside encounter about to begin where a forest road forks, the 
 
 ## F1 — Esplorazione (`gob-esplora`) → `esplorazione.png`
 
+> ⚠ **STALE v3 (2026-10-18):** solchi di ruota e straccio al rovo sono fiction
+> revocata (niente carri/strada). Regen pendente ruling Director.
+
 ```text
 ESPLORAZIONE — A forest path dying into unnaturally still woods, painted as a scene that asks to be read. SUBJECT: towering pines over damp earth, and the only wrong notes on the trail — deep wheel ruts leaving the path and vanishing sideways into the undergrowth, plus a small torn scrap of rag snagged on a thorn bush beside them, lit like evidence; low smoke drifting flat between the trunks. NO ONE VISIBLE — the silence itself is the subject; only traces, never their makers. COMPOSITION: the path leading in, the ruts pulling the eye sideways into shadow, the rag small but luminous. LIGHTING: bright shafts of daylight breaking through the canopy — the forest luminous, never murky. PALETTE: deep Veronese greens, cool teal-emerald shadow, a single small amber note on the snagged rag; NO grey, NO brown, NO mud. TECHNIQUE: thick oil impasto, broad palette-knife strokes in the Jaime Jones / Jeff Easley tradition, tactile matter on bark, wet soil and thorn; the lit rag rendered clean at the focal point — split-rendering; rude beauty — weathered and tactile, never squalid. MOOD: watchful calm + a wrongness nobody can name. Luminous, high-chroma — light wins, never black murk. NO grim, NO gore, NO decay, NO mud, NO symmetry, NO flat digital, NO airbrushed smoothness, NO sci-fi, NO text/UI/watermarks/frames, NO people, NO humanoid figures, NO goblins, NO creatures — only their traces. Ultra-wide cinematic 21:9.
 ```
 
-## F2 — Il bottino (`gob-bottino-scelta`, `gob-bottino`) → `bottino.png`
+## F2 — Il bottino (`gob-bottino`) → `bottino.png`
+
+> ⚠ **STALE v3 (2026-10-18):** carro e cassa con trappola revocati — in v3 il
+> nascondiglio è un fagotto sotto tela cerata. Regen pendente ruling Director.
 
 ```text
 BOTTINO — A merchant wagon dragged off the forest path and half-hidden under cut branches in a ravine, painted the moment the prize is spotted. SUBJECT: torn canvas, one wheel sunk in wet earth; still aboard, an iron-bound strongbox whose latch is rigged with a crude alarm of cord and small bronze bells; trade goods lashed where the raiders abandoned them, trampled earth around the wheels — the whole place reeking of haste. NOBODY IN SIGHT — the prize waits where it was dropped, closed. COMPOSITION intimate: the strongbox and its bell-trap as focal point, the ravine walls a frame around it. LIGHTING: bright midday sun above the ravine lip, one shaft finding the brass, the shadowed walls still chromatic. PALETTE: deep teal ravine shadow, Veronese moss, brass and bells struck amber-cinnabar; NO grey, NO brown, NO mud. TECHNIQUE: thick oil impasto, broad palette-knife strokes in the Jaime Jones / Jeff Easley tradition, tactile matter on canvas, iron, cord and moss; the bells and clasp rendered clean where light strikes — split-rendering focal; rude beauty — weathered and tactile, never squalid. MOOD: luck found + the certainty it is guarded. Luminous, high-chroma — never black murk. NO grim, NO gore, NO corpses, NO decay, NO mud, NO symmetry, NO flat digital, NO airbrushed smoothness, NO sci-fi, NO text/UI/watermarks/frames, NO people, NO humanoid figures, NO goblins, NO creatures, NO opened chest, NO scattered coins — the prize stays closed. Ultra-wide cinematic 21:9.

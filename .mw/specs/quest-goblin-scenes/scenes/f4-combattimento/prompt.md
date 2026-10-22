@@ -17,4 +17,4 @@ COMBATTIMENTO — A raider camp at night on the very first heartbeat of eruption
 
 - Regola applicata: l'immagine è l'eruzione pre-contatto, non il combattimento
   in corso (che è esito dell'ingresso nel nodo).
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

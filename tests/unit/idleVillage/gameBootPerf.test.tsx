@@ -50,6 +50,7 @@ describe('createGamePerfProbe', () => {
 describe('GameBootScreen', () => {
   afterEach(() => vi.restoreAllMocks());
 
+  // INV:game-frame-pixi.INV-1
   it('renders the authored logo, a labelled progress bar and the phase caption', () => {
     render(<GameBootScreen phase="assets" fraction={0.5} />);
     expect(screen.getByAltText('Wanderlust: Triumph')).toBeInTheDocument();

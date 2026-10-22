@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-10-21T11:35:57.019Z",
+  "generated_at": "2026-10-22T12:54:09.498Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -119,6 +119,7 @@
     "src/ui/idleVillage/components/gameFrame/HudPanelsMenu.tsx",
     "src/ui/idleVillage/components/gameFrame/HudRecenterButton.tsx",
     "src/ui/idleVillage/components/gameFrame/HudRibbon.tsx",
+    "src/ui/idleVillage/components/gameFrame/HudTooltip.tsx",
     "src/ui/idleVillage/components/gameFrame/MapBuildingPoi.tsx",
     "src/ui/idleVillage/components/gameFrame/MapDemoPoi.tsx",
     "src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx",
@@ -139,6 +140,7 @@
     "src/ui/idleVillage/components/gameFrame/QuestSkillCheckColumn.tsx",
     "src/ui/idleVillage/components/gameFrame/QuestSkillCheckOverlay.tsx",
     "src/ui/idleVillage/components/gameFrame/QuestStageCluster.tsx",
+    "src/ui/idleVillage/components/gameFrame/QuestVerdictCard.tsx",
     "src/ui/idleVillage/components/gameFrame/RegionTooltip.tsx",
     "src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx",
     "src/ui/idleVillage/components/gameFrame/TuningPanel.tsx",
@@ -157,6 +159,14 @@
     "src/ui/idleVillage/components/gameFrame/hudScale.ts",
     "src/ui/idleVillage/components/gameFrame/hudTones.ts",
     "src/ui/idleVillage/components/gameFrame/index.ts",
+    "src/ui/idleVillage/components/gameFrame/menu/GameEntry.tsx",
+    "src/ui/idleVillage/components/gameFrame/menu/GameMenuConfirm.tsx",
+    "src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx",
+    "src/ui/idleVillage/components/gameFrame/menu/LoadGamePanel.tsx",
+    "src/ui/idleVillage/components/gameFrame/menu/SettingsPanel.tsx",
+    "src/ui/idleVillage/components/gameFrame/menu/TitleScreen.tsx",
+    "src/ui/idleVillage/components/gameFrame/menu/menuFlow.ts",
+    "src/ui/idleVillage/components/gameFrame/menu/useGameMenuFlow.tsx",
     "src/ui/idleVillage/components/gameFrame/merchantOfferIcons.tsx",
     "src/ui/idleVillage/components/gameFrame/overlayStack.ts",
     "src/ui/idleVillage/components/gameFrame/poiSigillo.ts",
@@ -172,7 +182,6 @@
     "src/ui/idleVillage/components/gameFrame/stageZones/solveStageLayout.ts",
     "src/ui/idleVillage/components/gameFrame/stageZones/stageZonesReducer.ts",
     "src/ui/idleVillage/components/gameFrame/stageZones/useGameStageZones.tsx",
-    "src/ui/idleVillage/components/gameFrame/stashDnd.ts",
     "src/ui/idleVillage/components/gameFrame/useCompactTop.ts",
     "src/ui/idleVillage/components/gameFrame/useHeroSheet.tsx",
     "src/ui/idleVillage/components/gameFrame/useHudMaterial.ts",
@@ -331,6 +340,7 @@
     "src/ui/idleVillage/quests/questJourneyAuthoring.ts",
     "src/ui/idleVillage/quests/questJourneyEngine.ts",
     "src/ui/idleVillage/quests/questSettlement.ts",
+    "src/ui/idleVillage/quests/rosterCompatibility.ts",
     "src/ui/idleVillage/quests/useQuestExpeditionSession.tsx",
     "src/ui/idleVillage/quests/useQuestPoiSession.tsx",
     "src/ui/idleVillage/residentName.ts",
@@ -741,7 +751,9 @@
       "scope_files": [
         "src/ui/idleVillage/questS1Lab/render/DepthScene.tsx",
         "src/ui/idleVillage/questS1Lab/render/atmosphereOverlay.ts",
-        "src/ui/idleVillage/questS1Lab/render/depthShader.ts"
+        "src/ui/idleVillage/questS1Lab/render/depthShader.ts",
+        "src/ui/idleVillage/questS1Lab/render/depthTransform.ts",
+        "src/ui/idleVillage/questS1Lab/render/trauma.ts"
       ],
       "tier_source": "default"
     },
@@ -777,6 +789,16 @@
         "src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts"
       ],
       "tier_source": "default"
+    },
+    {
+      "id": "destiny-astrolabe-v62-kit",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit.tsx"
+      ],
+      "tier_source": "kernel"
     },
     {
       "id": "director-panel",
@@ -945,6 +967,16 @@
       "tier_source": "default"
     },
     {
+      "id": "game-entry",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/menu/GameEntry.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/menu/GameEntry.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "game-frame",
       "role": "ui-component",
       "tier": 1,
@@ -980,19 +1012,15 @@
         "src/ui/idleVillage/components/gameFrame/hudPanelRegistry.ts",
         "src/ui/idleVillage/components/gameFrame/hudTones.ts",
         "src/ui/idleVillage/components/gameFrame/index.ts",
-        "src/ui/idleVillage/components/gameFrame/overlayStack.ts",
         "src/ui/idleVillage/components/gameFrame/poiSigillo.ts",
         "src/ui/idleVillage/components/gameFrame/questAvailability.ts",
-        "src/ui/idleVillage/components/gameFrame/questInitialState.ts",
         "src/ui/idleVillage/components/gameFrame/questRevealSchedule.ts",
         "src/ui/idleVillage/components/gameFrame/questShellLayout.ts",
         "src/ui/idleVillage/components/gameFrame/questSkillCheckWarm.ts",
         "src/ui/idleVillage/components/gameFrame/resolveWorldManifest.ts",
         "src/ui/idleVillage/components/gameFrame/stageZones/solveStageLayout.ts",
-        "src/ui/idleVillage/components/gameFrame/stashDnd.ts",
         "src/ui/idleVillage/components/gameFrame/useCompactTop.ts",
         "src/ui/idleVillage/components/gameFrame/useHudMaterial.ts",
-        "src/ui/idleVillage/components/gameFrame/useHudPanelDrag.ts",
         "src/ui/idleVillage/components/gameFrame/useHudPanels.ts",
         "src/ui/idleVillage/components/gameFrame/useHudScale.ts",
         "src/ui/idleVillage/components/gameFrame/usePanelWhileOpen.ts",
@@ -1001,8 +1029,6 @@
         "src/ui/idleVillage/config/gamePerfBudgets.ts",
         "src/ui/idleVillage/config/worldSurfaceConfig.ts",
         "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts",
-        "src/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit.tsx",
-        "src/ui/idleVillage/hooks/sandboxTimingContext.ts",
         "src/ui/idleVillage/hooks/useFrameMetrics.ts",
         "src/ui/idleVillage/hooks/useReducedMotion.ts",
         "src/ui/idleVillage/hooks/useThrottledValue.ts",
@@ -1013,11 +1039,11 @@
         "src/ui/idleVillage/questS1Lab/questArt.ts",
         "src/ui/idleVillage/questS1Lab/questOffer.ts",
         "src/ui/idleVillage/questS1Lab/questPhaseRecord.ts",
-        "src/ui/idleVillage/questS1Lab/questRunStore.ts",
         "src/ui/idleVillage/questS1Lab/questSchedule.ts",
         "src/ui/idleVillage/questS1Lab/questSimulation.ts",
         "src/ui/idleVillage/questS1Lab/questTickCounter.ts",
         "src/ui/idleVillage/questS1Lab/useQuestRun.ts",
+        "src/ui/idleVillage/quests/rosterCompatibility.ts",
         "src/ui/idleVillage/rosterV2/heroLevelCue.ts",
         "src/ui/idleVillage/rosterV2/heroLevelUpEvents.ts",
         "src/ui/idleVillage/rosterV2/heroLevelViewModel.ts",
@@ -1027,10 +1053,7 @@
         "src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts",
         "src/ui/idleVillage/skins/resolveInitialSkin.ts",
         "src/ui/idleVillage/slots/useResidentSlotController.ts",
-        "src/ui/idleVillage/store/gameplayStore.ts",
         "src/ui/idleVillage/store/useVillageStashStore.ts",
-        "src/ui/idleVillage/types/gameplayTypes.ts",
-        "src/ui/idleVillage/types/jobTypes.ts",
         "src/ui/idleVillage/utils/gameAssetWarmup.ts",
         "src/ui/idleVillage/utils/gamePerfProbe.ts"
       ],
@@ -1053,6 +1076,38 @@
       "root_file": "src/ui/idleVillage/intent/GameIntent.ts",
       "scope_files": [
         "src/ui/idleVillage/intent/GameIntent.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
+      "id": "game-menu-confirm",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/menu/GameMenuConfirm.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/menu/GameMenuConfirm.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "game-menu-dialog",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "gameplay-store",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/store/gameplayStore.ts",
+      "scope_files": [
+        "src/ui/idleVillage/store/gameplayStore.ts",
+        "src/ui/idleVillage/types/gameplayTypes.ts",
+        "src/ui/idleVillage/types/jobTypes.ts"
       ],
       "tier_source": "kernel"
     },
@@ -1240,6 +1295,16 @@
       "tier_source": "kernel"
     },
     {
+      "id": "hud-tooltip",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/HudTooltip.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/HudTooltip.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "index",
       "role": "shared-kernel",
       "tier": 1,
@@ -1287,6 +1352,16 @@
       "root_file": "src/ui/idleVillage/frozen/_infra/KitShell.tsx",
       "scope_files": [
         "src/ui/idleVillage/frozen/_infra/KitShell.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "load-game-panel",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/menu/LoadGamePanel.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/menu/LoadGamePanel.tsx"
       ],
       "tier_source": "default"
     },
@@ -1632,6 +1707,16 @@
       "tier_source": "default"
     },
     {
+      "id": "menu-flow",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/menu/menuFlow.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/menu/menuFlow.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "merchant-offer-icons",
       "role": "ui-component",
       "tier": 2,
@@ -1711,6 +1796,16 @@
         "src/ui/fantasy/atoms/OrbIcon.tsx"
       ],
       "tier_source": "default"
+    },
+    {
+      "id": "overlay-stack",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/overlayStack.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/overlayStack.ts"
+      ],
+      "tier_source": "kernel"
     },
     {
       "id": "oxidized-grade-filter",
@@ -1901,6 +1996,16 @@
       "tier_source": "default"
     },
     {
+      "id": "quest-initial-state",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/questInitialState.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/questInitialState.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "quest-journey",
       "role": "shared-kernel",
       "tier": 1,
@@ -2034,6 +2139,16 @@
       "tier_source": "kernel"
     },
     {
+      "id": "quest-run-store",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/questS1Lab/questRunStore.ts",
+      "scope_files": [
+        "src/ui/idleVillage/questS1Lab/questRunStore.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
       "id": "quest-run-window",
       "role": "ui-component",
       "tier": 2,
@@ -2044,9 +2159,7 @@
         "src/ui/idleVillage/components/gameFrame/questBag.ts",
         "src/ui/idleVillage/questS1Lab/questTheatreSequencer.ts",
         "src/ui/idleVillage/questS1Lab/render/cameraEval.ts",
-        "src/ui/idleVillage/questS1Lab/render/depthTransform.ts",
-        "src/ui/idleVillage/questS1Lab/render/sceneManifest.ts",
-        "src/ui/idleVillage/questS1Lab/render/trauma.ts"
+        "src/ui/idleVillage/questS1Lab/render/sceneManifest.ts"
       ],
       "tier_source": "default"
     },
@@ -2107,6 +2220,16 @@
       "root_file": "src/ui/idleVillage/components/gameFrame/QuestStageCluster.tsx",
       "scope_files": [
         "src/ui/idleVillage/components/gameFrame/QuestStageCluster.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
+      "id": "quest-verdict-card",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/QuestVerdictCard.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/QuestVerdictCard.tsx"
       ],
       "tier_source": "default"
     },
@@ -2308,6 +2431,26 @@
         "src/ui/idleVillage/utils/sandboxDiagnostics.ts"
       ],
       "tier_source": "kernel"
+    },
+    {
+      "id": "sandbox-timing-context",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/hooks/sandboxTimingContext.ts",
+      "scope_files": [
+        "src/ui/idleVillage/hooks/sandboxTimingContext.ts"
+      ],
+      "tier_source": "kernel"
+    },
+    {
+      "id": "settings-panel",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/menu/SettingsPanel.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/menu/SettingsPanel.tsx"
+      ],
+      "tier_source": "default"
     },
     {
       "id": "settlement-lost-overlay",
@@ -2572,6 +2715,16 @@
       "tier_source": "default"
     },
     {
+      "id": "title-screen",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/menu/TitleScreen.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/menu/TitleScreen.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "transit-view",
       "role": "ui-component",
       "tier": 2,
@@ -2622,6 +2775,16 @@
       "tier_source": "kernel"
     },
     {
+      "id": "use-game-menu-flow",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/menu/useGameMenuFlow.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/menu/useGameMenuFlow.tsx"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "use-game-stage-zones",
       "role": "ui-component",
       "tier": 2,
@@ -2642,6 +2805,16 @@
         "src/ui/idleVillage/components/gameFrame/useHeroSheet.tsx"
       ],
       "tier_source": "default"
+    },
+    {
+      "id": "use-hud-panel-drag",
+      "role": "shared-kernel",
+      "tier": 1,
+      "root_file": "src/ui/idleVillage/components/gameFrame/useHudPanelDrag.ts",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/useHudPanelDrag.ts"
+      ],
+      "tier_source": "kernel"
     },
     {
       "id": "use-quest-expedition-session",
@@ -3182,10 +3355,10 @@
     }
   ],
   "stats": {
-    "files": 436,
-    "units": 256,
-    "ui_components": 199,
-    "shared_kernels": 57
+    "files": 446,
+    "units": 273,
+    "ui_components": 208,
+    "shared_kernels": 65
   },
-  "content_sha256": "678be34200b26a7b1316c3c0865828f8b4daf9e228103fce8565b24c05d97b21"
+  "content_sha256": "d0f9ba34a3bcacc0c0aeabfc2319194ca8b06fcd19618c7caf598d944dfc5e1c"
 }

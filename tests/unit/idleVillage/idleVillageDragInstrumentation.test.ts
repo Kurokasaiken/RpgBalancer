@@ -56,6 +56,7 @@ describe('idleVillage drag preview instrumentation analytics', () => {
   });
 
   describe('resolveDragPreviewMetricSeverity', () => {
+    // INV:drag-preview-instrumentation-config.INV-1
     it('returns ok for nominal measurements', () => {
       const payload = buildPayload();
       expect(resolveDragPreviewMetricSeverity(payload)).toBe('ok');

@@ -52,8 +52,9 @@ Slot rack component for resident assignment and activity management.
 #### `WanderlustRosterCard`
 Card component for individual resident display in Wanderlust style.
 
-#### `MatericRosterComponent`
-Alternative roster component with material design.
+#### `MatericRosterComponent` (removed)
+Retired under PLAN-043 WS-5 (Director ruling): the Lacquer Atlas roster
+`MatericRosterComponentV2` from `@/ui/idleVillage/rosterV2` is the only roster.
 
 ### Drag & Drop Components
 

@@ -99,7 +99,7 @@ async function driveToFirstCheck(): Promise<boolean> {
 
     // F1: the option commits a check; the commit surface exposes the confirm.
     const optBtn = Array.from(view.container.querySelectorAll('button, [role="button"]'))
-      .find((b) => !(b as HTMLButtonElement).disabled && /Climb|tree|tracks/i.test(b.textContent ?? ''));
+      .find((b) => !(b as HTMLButtonElement).disabled && /Climb|tree|tracks|Examine|ground|above/i.test(b.textContent ?? ''));
     if (!optBtn) return false;
     fireEvent.click(optBtn);
     const face = byText(/check|affronta|Face/i);
@@ -115,7 +115,10 @@ async function driveToFirstCheck(): Promise<boolean> {
 describe('questS1Lab page crash repro', () => {
   it('mounts the check cinematic across many fresh page mounts without RangeError', async () => {
     let mountedCount = 0;
-    for (let i = 0; i < 150; i++) {
+    /* 150 mounts no longer fit the 120 s budget now that driveToFirstCheck
+     * actually reaches the astrolabe (~2 s/mount); 40 keeps the repro
+     * meaningful inside the timeout. */
+    for (let i = 0; i < 40; i++) {
       if (await driveToFirstCheck()) mountedCount += 1;
     }
     expect(mountedCount).toBeGreaterThan(0);

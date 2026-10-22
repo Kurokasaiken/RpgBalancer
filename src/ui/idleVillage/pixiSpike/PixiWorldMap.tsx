@@ -21,6 +21,7 @@ import {
 import 'pixi.js/mesh';
 import { KEEP_GLOBAL_RESOURCES } from './pixiDestroy';
 import { createRefractionNoise, createSeabedArt } from './seabedTexture';
+import { isMapFitTestRuntime, SEA_QUAD_PAD } from './mapFitRuntime';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { defaultSeaMarksConfig } from '@/ui/idleVillage/config/seaMarksConfig';
@@ -339,9 +340,8 @@ const DEEP_SEA_COLOR = '#215c70';
 const DEEP_SEA_FOG = '#16394a';
 /** Width (world px) of the fade inside the canvas where the deep sea meets the painted sea. */
 const DEEP_SEA_BAND_PX = 420;
-/** Extra sea the deep-sea and pattern quads draw past the camera's reach (±margin): the quads'
- * far edge stays off-screen in every camera state, so the stage colour can never leak a line. */
-const SEA_QUAD_PAD = 1600;
+/* The sea-quad pad lives in `./mapFitRuntime` — it is the renderer-owned constant the
+ * CTR-game-005 contract (spec + probe) reads, so it can never drift from the guard. */
 /** Cloud layers (far, mid, near): how much further than the ground each slides when the camera pans. */
 const CLOUD_PARALLAX = [0.1, 0.22, 0.4] as const;
 /* Stacking in the world: the cloud bands sit above the land and above the region rings; the rings sit above the land
@@ -549,8 +549,10 @@ export function PixiWorldMap({
       host.appendChild(app.canvas);
       app.canvas.style.display = 'block';
       app.canvas.dataset.testid = 'pixi-world-canvas';
-      // Dev only: lets a test or the console reach the running renderer for diagnostics.
-      if (import.meta.env.DEV) Object.assign(window as object, { __pixiApp: app });
+      // Dev/playwright only: lets a test or the console reach the running renderer for diagnostics.
+      if (import.meta.env.DEV || import.meta.env.MODE === 'playwright') {
+        Object.assign(window as object, { __pixiApp: app });
+      }
 
       const world = new Container();
       world.sortableChildren = true;
@@ -1169,7 +1171,9 @@ export function PixiWorldMap({
           ticks.push(tick);
           return true;
         };
-        if (import.meta.env.DEV) Object.assign(window as object, { __wonders: () => live.length });
+        if (import.meta.env.DEV || import.meta.env.MODE === 'playwright') {
+          Object.assign(window as object, { __wonders: () => live.length });
+        }
         ticks.push((t) => {
           for (let i = live.length - 1; i >= 0; i -= 1) if (live[i].until < t) live.splice(i, 1);
           if (forcedWonderRef.current !== seenForcedWonder) {
@@ -1455,8 +1459,8 @@ export function PixiWorldMap({
         world.position.set(-cam.panX * cam.zoom, -cam.panY * cam.zoom);
         seabedShift(cam.panX, cam.panY, visW, visH);
         camRef.current = cam;
-        // Dev only: lets a test read the camera to find where the painted canvas edges land on screen.
-        if (import.meta.env.DEV) Object.assign(window as object, { __worldCam: { ...cam, width: canvas.width, height: canvas.height }, __canopySway: canopySway });
+        // Test seam only (dev / playwright builds): lets a test read the camera to find where the painted canvas edges land on screen.
+        if (isMapFitTestRuntime) Object.assign(window as object, { __worldCam: { ...cam, width: canvas.width, height: canvas.height }, __canopySway: canopySway });
         syncAnchors();
       };
       const refit = () => {
@@ -1495,6 +1499,24 @@ export function PixiWorldMap({
         userMoved = false;
         refit();
       };
+      /* Test seam (CTR-game-005): lets the spec/probe drive the camera to an exact
+       * pan bound / fractional zoom deterministically instead of simulating long
+       * drags, and restore the resting fit the way the recenter control does.
+       * `userMoved`/`apply` are declared later in this closure — they are only
+       * dereferenced at call time, after mount has initialized them. */
+      if (isMapFitTestRuntime)
+        Object.assign(window as object, {
+          __worldCamCtl: {
+            set: (partial: { panX?: number; panY?: number; zoom?: number }) => {
+              if (partial.panX !== undefined) cam.panX = partial.panX;
+              if (partial.panY !== undefined) cam.panY = partial.panY;
+              if (partial.zoom !== undefined) cam.zoom = partial.zoom;
+              userMoved = true;
+              apply();
+            },
+            refit: () => refitRef.current?.(),
+          },
+        });
       // Glide to a world point, centred in the free area; zooms in a little when the map is at its widest.
       let glide = 0;
       focusRef.current = (wx, wy) => {
@@ -1690,6 +1712,26 @@ export function PixiWorldMap({
           el2.removeEventListener('mousedown', onDownR);
           el2.removeEventListener('mouseup', onUpR);
         };
+        /* Test seam (PLAN-033 BV-6, dev / playwright builds only): audits the live
+         * layer stack so a spec can assert ring sprites stay under the cloud bands,
+         * and reports the camera / canvas rect needed to aim a pointer at a region. */
+        if (isMapFitTestRuntime)
+          Object.assign(window as object, {
+            __worldLayers: () => ({
+              sortable: world.sortableChildren,
+              rings: [...highlights.values()].map((s) => s.zIndex),
+              clouds: bandLayers.map(({ layer }) => layer.zIndex),
+              nightWash: NIGHT_WASH_Z,
+              mapSize: { width: canvas.width, height: canvas.height },
+              cam: { ...cam },
+              canvasRect: (() => {
+                const r = el2.getBoundingClientRect();
+                return { left: r.left, top: r.top, width: r.width, height: r.height };
+              })(),
+              cursor: el2.dataset.cursor ?? null,
+              hoverDelayS: tn.regionHoverDelayS,
+            }),
+          });
       }
 
       const el = app.canvas;
@@ -1765,7 +1807,38 @@ export function PixiWorldMap({
         userMoved = true;
         apply();
       };
-      const onResize = () => (userMoved ? apply() : refit());
+      /* Resize with a user camera must never let the protected land slide under
+       * the fixed chrome (CTR-game-005 INV-2). The user's zoom survives only
+       * while the land still fits the free area: if a shrink made it taller
+       * than the band, the zoom is pulled back to the fit (the fit is allowed
+       * to sit below the user readability floor — userFloor governs wheel, not
+       * protection). panY is then re-pinned like refit does — centred when the
+       * land fits, south edge on the free-area boundary when it doesn't.
+       * Horizontal pan is left to the sea-margin clamp (left/right insets are
+       * floating panels, not fixed chrome). */
+      const onResize = () => {
+        if (!userMoved) {
+          refit();
+          return;
+        }
+        apply();
+        const liveFit = safeFitRef.current;
+        if (!liveFit) return;
+        const W = app.screen.width;
+        const H = app.screen.height;
+        const freeW = W - (liveFit.insets.left ?? 0) - (liveFit.insets.right ?? 0);
+        const freeH = H - liveFit.insets.top - liveFit.insets.bottom;
+        const land = liveFit.landBounds;
+        const fitZoom = Math.max(
+          floorZoom(),
+          Math.min(freeW / (land.x1 - land.x0), freeH / (land.y1 - land.y0)),
+        );
+        if (cam.zoom > fitZoom) cam.zoom = fitZoom;
+        const panYMin = land.y1 - (H - liveFit.insets.bottom) / cam.zoom;
+        const panYMax = land.y0 - liveFit.insets.top / cam.zoom;
+        cam.panY = panYMin > panYMax ? panYMin : Math.min(Math.max(cam.panY, panYMin), panYMax);
+        apply();
+      };
       el.addEventListener('mousedown', onDown);
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onUp);
@@ -1882,24 +1955,6 @@ export function PixiWorldMap({
           </div>
         </div>
       )}
-      {worldLayer && manifest && (
-        // Above the map and above an event shroud (z 6) closing over it: the world-space event card appears on the clouds.
-        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 7 }}>
-          <div
-            ref={worldBoxRef}
-            data-testid="pixi-world-layer"
-            style={{ position: 'absolute', left: 0, top: 0, width: manifest.coordinateSystem.canvas.width, height: manifest.coordinateSystem.canvas.height, transformOrigin: '0 0', pointerEvents: 'none' }}
-          >
-            {worldLayer(manifest.coordinateSystem.canvas)}
-          </div>
-        </div>
-      )}
-      {error && <p style={{ position: 'absolute', top: 8, left: 8, color: '#f87171' }}>{error}</p>}
-    </div>
-  );
-}
-
-export default PixiWorldMap;
       {/* Anchors (POI markers) sit after the route overlay at the same z-index: the journey line and the party token pass UNDER the markers. */}
       <div
         ref={anchorLayerRef}
@@ -1918,3 +1973,21 @@ export default PixiWorldMap;
           </div>
         ))}
       </div>
+      {worldLayer && manifest && (
+        // Above the map and above an event shroud (z 6) closing over it: the world-space event card appears on the clouds.
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 7 }}>
+          <div
+            ref={worldBoxRef}
+            data-testid="pixi-world-layer"
+            style={{ position: 'absolute', left: 0, top: 0, width: manifest.coordinateSystem.canvas.width, height: manifest.coordinateSystem.canvas.height, transformOrigin: '0 0', pointerEvents: 'none' }}
+          >
+            {worldLayer(manifest.coordinateSystem.canvas)}
+          </div>
+        </div>
+      )}
+      {error && <p style={{ position: 'absolute', top: 8, left: 8, color: '#f87171' }}>{error}</p>}
+    </div>
+  );
+}
+
+export default PixiWorldMap;

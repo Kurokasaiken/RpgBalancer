@@ -1,6 +1,6 @@
 ---
 title: Catena di risoluzione esito-prima per lo skill check (V7 → skillCheckWebV1)
-status: active
+status: superseded
 created: 2026-08-21
 authorized_by: Fausto
 reason: avallo esplicito "battezza" in sessione, dopo protocollo multi-AI (chatgpt web + claude web) e nove critiche recepite

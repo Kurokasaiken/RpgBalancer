@@ -253,8 +253,11 @@ al Director, non assorbimento silenzioso.
   minaccia sceglie la vittima credibile, e la vittima scelta vincola
   dove la quest può accadere.
   **STATUS:** `vigente` come principio espresso dal Director.
-  **SOURCE:** Director 2026-10-08 — applicato in F0 goblin (mugnaio →
-  carri al guado, coerente con l'agguato F7 sulla strada).
+  **SOURCE:** Director 2026-10-08 — applicato in F0 goblin (consiglio del
+  villaggio → bosco infestato dai goblin, coerente con l'agguato F7 dei
+  superstiti nel bosco). Nella nota originale comparivano mugnaio/carri
+  al guado — fiction revocata dal Director 2026-10-18 (manoscritto v3:
+  niente guado, niente strada dei mercanti).
 
 ## 8. Conseguenze oltre l'esito immediato
 

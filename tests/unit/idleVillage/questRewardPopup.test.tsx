@@ -41,6 +41,7 @@ const renderPopup = (run: QuestRunState, onClose = vi.fn()) => {
 const sections = () => document.querySelectorAll('[data-epilogue-section]');
 
 describe('QuestRewardPopup — external, non-modal, staged (R-199 pt.8/14)', () => {
+  // INV:CTR-game-009.INV-4
   it('is a floating dialog plaque, never a modal — no backdrop, no aria-modal', () => {
     renderPopup(endedRun(7));
     const popup = screen.getByTestId('quest-reward-popup');
@@ -51,6 +52,7 @@ describe('QuestRewardPopup — external, non-modal, staged (R-199 pt.8/14)', () 
     expect(popup.closest('[data-testid="quest-window"]')).toBeNull();
   });
 
+  // INV:CTR-game-009.INV-4
   it('reveals the report in stages: outcome first, sections one at a time, close last', () => {
     vi.useFakeTimers();
     try {
@@ -76,6 +78,7 @@ describe('QuestRewardPopup — external, non-modal, staged (R-199 pt.8/14)', () 
     }
   });
 
+  // INV:CTR-game-009.INV-4
   it('a click hurries the reveal by one stage — same progressive skip as the theatre', () => {
     vi.useFakeTimers();
     try {
@@ -91,6 +94,7 @@ describe('QuestRewardPopup — external, non-modal, staged (R-199 pt.8/14)', () 
     }
   });
 
+  // INV:CTR-game-009.INV-4
   it('moves focus into the plaque on open; Escape closes and restores it', () => {
     const anchor = document.createElement('button');
     document.body.appendChild(anchor);
@@ -105,6 +109,7 @@ describe('QuestRewardPopup — external, non-modal, staged (R-199 pt.8/14)', () 
     document.body.removeChild(anchor);
   });
 
+  // INV:CTR-game-009.INV-4
   it('the close row appears only once every stage has landed', () => {
     const run = endedRun(7);
     const count = buildQuestEpilogue(run, GOBLIN_SCENARIO).length;
@@ -116,6 +121,24 @@ describe('QuestRewardPopup — external, non-modal, staged (R-199 pt.8/14)', () 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  /* R-260: every dismissal lands on the same `onClose` — the page's single
+   *  commit boundary. Collect, Escape and the title-row X all converge. */
+  // INV:quest-reward-popup.INV-3
+  it('every dismiss path funnels into the same onClose', () => {
+    vi.useFakeTimers();
+    try {
+      const run = endedRun(7);
+      const { onClose, unmount } = renderPopup(run);
+      /* X on the title row — reachable before the reveal finishes. */
+      fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+      expect(onClose).toHaveBeenCalledTimes(1);
+      unmount();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // INV:CTR-game-009.INV-4
   it('a fled run still reports — outcome banner reads fled, not reward', () => {
     const run = createRun(PRESET, 3, 'goblin');
     flee(run);

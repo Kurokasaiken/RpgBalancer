@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
-import { buildExpeditionParty, deriveKeyStats, expeditionDays, formatExpeditionSpan, isExpeditionItem, loadoutDuration, type ExpeditionSlotSpec } from '@/ui/idleVillage/quests/questExpedition';
+import { buildExpeditionParty, deriveKeyStats, expeditionDays, expeditionTotalDays, formatExpeditionSpan, isExpeditionItem, loadoutDuration, type ExpeditionSlotSpec } from '@/ui/idleVillage/quests/questExpedition';
 import { estimateForParty, estimateForPartyAsync, resolveQuestOffer, collectWorldProgressSignals } from '@/ui/idleVillage/questS1Lab/questOffer';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { questPoiById } from '@/balancing/config/idleVillage/quests/questPois';
@@ -225,5 +225,28 @@ describe('expeditionDays / formatExpeditionSpan — WS-3 whole-day vocabulary (A
     expect(formatExpeditionSpan(1.6, t)).toBe('questExpedition.durationDays:2');
     expect(formatExpeditionSpan(2.25, t)).toBe('questExpedition.durationDays:2');
     expect(calls.every((c) => c.key === 'questExpedition.durationDays')).toBe(true);
+  });
+});
+
+describe('expeditionTotalDays — PLAN-071 T-B2 planner/strip reconciliation (R-239)', () => {
+  // INV:R-239-journey-total — the planner's duration seal projects the round
+  // trip (out + site + back), the same total the journey strip narrates.
+  it('goes round-trip: site estimate + 2× travelDays', () => {
+    // poi-goblin authored: estimatedDurationTicks 110, dayLength 5, travelDays 2.
+    expect(expeditionTotalDays(110, 2, 5)).toEqual({ site: 22, total: 26 });
+  });
+
+  it('keeps the site number as the strip\'s ~N mid-leg label', () => {
+    const { site } = expeditionTotalDays(110, 2, 5);
+    expect(site).toBe(22);
+  });
+
+  it('no journey contract (travelDays=0) degrades to the site estimate', () => {
+    expect(expeditionTotalDays(110, 0, 5)).toEqual({ site: 22, total: 22 });
+  });
+
+  it('floors degenerate inputs at 1 day and never goes negative', () => {
+    expect(expeditionTotalDays(0, 0, 5).total).toBe(1);
+    expect(expeditionTotalDays(-50, -3, 5).total).toBe(1);
   });
 });

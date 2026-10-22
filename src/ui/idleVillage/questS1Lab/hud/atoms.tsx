@@ -77,6 +77,12 @@ const chipText = (tone: Tone): string => {
   return lift ? `color-mix(in srgb, ${TONE[tone]} ${100 - lift}%, var(--skin-text-primary))` : TONE[tone];
 };
 
+/** Text-safe tone for ANY text painted on the lacquer chrome — same lift the
+ *  chips already apply (R-234), extended to bare `color:` usages (R-239 T-B5:
+ *  `wound`/`death` measured 2.5–2.8:1 as bare text). Borders, fills, pips and
+ *  icons keep the raw saturated tone. */
+export const toneText = (tone: Tone): string => chipText(tone);
+
 export const HudChip: React.FC<{
   tone?: Tone;
   title?: string;

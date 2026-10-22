@@ -8,9 +8,10 @@
  * without a planner, the shared pool across two open planners, draft
  * persistence across reload, and the LOADOUT header's non-overlap contract
  * at the two audited viewports (1280×800, 1440×900).
+ * R-246 (2026-10-21): drag&drop was removed — the shelf and the bag are
+ * click-only surfaces.
  */
 import { test, expect, type Page } from '@playwright/test';
-import { dragElement } from '../../utils/dragActions';
 import { VILLAGE_STASH_CONFIG } from '../../../src/balancing/config/idleVillage/villageStashConfig';
 
 const POI = 'poi-goblin';
@@ -113,57 +114,6 @@ test.describe('PLAN-073 — village stash ledger on /game', () => {
     await expect(page.getByTestId(`stash-item-${SECOND_ITEM}`)).toBeVisible();
     /* The affordance itself retires once the bag is empty. */
     await expect(releaseAll).toHaveCount(0);
-  });
-
-  test('drag assigns a shelf row onto a free bag slot (dnd-kit route)', async ({ page }) => {
-    await openDetail(page, POI);
-    await page.getByTestId('quest-open-stash').click();
-    await expect(page.getByTestId('stash-shelf')).toHaveAttribute('data-stash-mode', 'interactive');
-    /* Let both panels finish their entrance before the pointer gestures —
-     *  droppable rects are measured BeforeDragging, so a mid-animation rect
-     *  would silently miss the slot. */
-    await page.waitForTimeout(400);
-
-    await dragElement(
-      page,
-      page.getByTestId(`stash-item-${FIRST_ITEM}`),
-      page.getByTestId('bag-slot-0'),
-    );
-    await expect(page.getByTestId('bag-slot-0').getByTestId(`loadout-item-${FIRST_ITEM}`)).toBeVisible();
-    await expect(page.getByTestId(`stash-item-${FIRST_ITEM}`)).toHaveCount(0);
-  });
-
-  test('drag onto an occupied slot swaps atomically — displaced item returns', async ({ page }) => {
-    await openDetail(page, POI);
-    await page.getByTestId('quest-open-stash').click();
-    await page.getByTestId(`stash-item-${FIRST_ITEM}`).click();
-    await expect(page.getByTestId('bag-slot-0').getByTestId(`loadout-item-${FIRST_ITEM}`)).toBeVisible();
-    await page.waitForTimeout(400);
-
-    await dragElement(
-      page,
-      page.getByTestId(`stash-item-${SECOND_ITEM}`),
-      page.getByTestId('bag-slot-0'),
-    );
-    await expect(page.getByTestId('bag-slot-0').getByTestId(`loadout-item-${SECOND_ITEM}`)).toBeVisible();
-    /* The displaced first item re-enters the global pool — visible again. */
-    await expect(page.getByTestId(`stash-item-${FIRST_ITEM}`)).toBeVisible();
-    await expect(page.getByTestId(`stash-item-${SECOND_ITEM}`)).toHaveCount(0);
-  });
-
-  test('dragging a packed item onto the shelf releases it', async ({ page }) => {
-    await openDetail(page, POI);
-    await page.getByTestId('quest-open-stash').click();
-    await page.getByTestId(`stash-item-${FIRST_ITEM}`).click();
-    await expect(page.getByTestId(`loadout-item-${FIRST_ITEM}`)).toBeVisible();
-
-    await dragElement(
-      page,
-      page.getByTestId(`loadout-item-${FIRST_ITEM}`),
-      page.getByTestId('stash-shelf'),
-    );
-    await expect(page.getByTestId(`stash-item-${FIRST_ITEM}`)).toBeVisible();
-    await expect(page.getByTestId(`loadout-item-${FIRST_ITEM}`)).toHaveCount(0);
   });
 
   // INV:PLAN-073-bag-ledger-binding

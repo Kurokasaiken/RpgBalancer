@@ -3,7 +3,7 @@
 **Status:** frozen
 **Version:** 1.0.0
 **Owner:** Devin
-**Last Updated:** 2026-08-15
+**Last Updated:** 2026-10-18
 
 ## Source
 - Canonical component: `PgCard` (`src/ui/idleVillage/components/PgCard.tsx`)
@@ -52,6 +52,13 @@ For the detailed drag/freeze semantics of `PgCard` (frozen during drag, returnin
 
 - `src/docs/docs/idle_village/trusted/pgcard_trusted.md`
 
+## Medal Asset Loading (R-223)
+
+The `CustomDragOverlay` medallion remains visible while its square portrait is
+being decoded. A fallback portrait is painted during cold-cache loading, then
+replaced by the real crop. This changes no `PgCard` props or DOM subtree; the
+drag overlay remains visual-only and `PgCard` keeps the same frozen API.
+
 ## Certification
 - **Status:** frozen (certified 2026-08-15)
 - **Manifest:** `pgcardKit.cert.json`
@@ -59,4 +66,6 @@ For the detailed drag/freeze semantics of `PgCard` (frozen during drag, returnin
   - Contract test: `tests/contract/minimal-vs-test.spec.ts`
   - DOM snapshot: `tests/unit/frozen/pgcardKit.dom.test.tsx` if present
   - E2E: `tests/e2e/idleVillage/testRosterPgCards.spec.ts`, `tests/e2e/idleVillage/testRosterPgCardSkin.spec.ts`
+  - R-223: `tests/unit/idleVillage/WanderlustMedalOverlay.loading.test.tsx`,
+    `tests/e2e/idleVillage/r223QuestUiRegressions.spec.ts`
   - Build: `npm run build:check`

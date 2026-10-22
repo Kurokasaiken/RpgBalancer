@@ -1,6 +1,6 @@
 ---
 title: Piano ridotto — POI Quest UI regressions ERR-028 e ERR-030
-status: active
+status: completed
 created: 2026-08-15
 desiderata: v4 (pannelli flottanti)
 bug: .mw/bugs/2026-08-15-poi-quest-ui-regressions

@@ -1,7 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { HUD_TONE_COLOR, type HudTone } from './hudTones';
 import { useCompactTop } from './useCompactTop';
 import { HudTooltip } from './HudTooltip';
+import { useCountUp } from './useCountUp';
+import { prefersReducedMotion } from '@/ui/idleVillage/skins/primitives';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 
 export interface ResourceReadoutItem {
   id: string;
@@ -18,14 +22,61 @@ export interface ResourceReadoutItem {
   description?: string;
 }
 
+/**
+ * R-260: transient feedback for a settlement-committed grant — published on
+ * `useMinimalGameplayStore.resourceDelta` by the report's dismissal, cleared
+ * after `hud.resourceDelta.durationMs`. Derived from the frozen plan, never
+ * recomputed here.
+ */
+export interface ResourceReadoutDelta {
+  /** Chip rendered inside the tile of the matching item id (e.g. `gold`). */
+  chips?: Record<string, number>;
+  /** One chip row anchored under the readout — for grants with no tile (XP). */
+  tray?: { id: string; label: string; amount: number };
+  /** Commit stamp (wall-clock ms) — re-arms the count-up animation. */
+  at: number;
+}
+
 export interface ResourceReadoutProps {
   items: ResourceReadoutItem[];
+  /** The committed-grant stamp — chips + tray animate in, then clear. */
+  delta?: ResourceReadoutDelta | null;
 }
 
 /** Icon box = twice the control icon token (28 px at the base skin), no new measure. */
 const ICON_BOX = 'calc(var(--skin-hud-control-icon-size) * 2)';
 /** Value size = name size + inline gap (19 px at the base skin): the number leads the tile. */
 const VALUE_SIZE = 'calc(var(--skin-hud-name-size) + var(--skin-hud-inline-gap))';
+
+/**
+ * The «+N» grant chip — counts up over `hud.resourceDelta.countUpMs`
+ * (instant under reduced-motion). `role="status"` announces the FINAL
+ * amount once; the animated digits stay out of the accessibility tree.
+ */
+const DeltaChip: React.FC<{ id: string; label: string; amount: number; at: number }> = ({ id, label, amount, at }) => {
+  const { t } = useTranslation('idleVillage');
+  const shown = useCountUp(amount, DEFAULT_GAME_FRAME_CONFIG.hud.resourceDelta.countUpMs, at);
+  return (
+    <span
+      role="status"
+      aria-label={t('gameFrame.resources.delta', { label, amount })}
+      data-testid={`resource-delta-${id}`}
+      style={{
+        fontFamily: 'var(--skin-font-display)',
+        fontSize: 'var(--skin-hud-caps-size)',
+        fontWeight: 'var(--skin-hud-caps-weight)',
+        letterSpacing: 'var(--skin-hud-caps-tracking)',
+        fontVariantNumeric: 'tabular-nums',
+        whiteSpace: 'nowrap',
+        lineHeight: 1,
+        color: HUD_TONE_COLOR.good,
+        animation: prefersReducedMotion() ? undefined : 'resourceDeltaIn 260ms ease-out both',
+      }}
+    >
+      <span aria-hidden="true">+{shown}</span>
+    </span>
+  );
+};
 
 /**
  * Resource readout — content for the top-right plaque.
@@ -38,10 +89,12 @@ const VALUE_SIZE = 'calc(var(--skin-hud-name-size) + var(--skin-hud-inline-gap))
  * `icon` is expected to already be a self-labelling node (e.g. `HudGlyph`); it is sized to
  * fill `ICON_BOX`.
  */
-export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items }) => {
+export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items, delta }) => {
   const compact = useCompactTop();
   return (
-    <div style={{ display: 'flex', alignItems: 'stretch', gap: 'var(--skin-hud-control-gap)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-bar-gap)' }}>
+      <style>{`@keyframes resourceDeltaIn { from { transform: translateY(4px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }`}</style>
+      <div style={{ display: 'flex', alignItems: 'stretch', gap: 'var(--skin-hud-control-gap)' }}>
       {items.map((item) => {
         const description = item.description ?? `${item.label}: ${item.value}`;
         const critical = item.tone === 'danger';
@@ -110,6 +163,11 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items }) => {
                     {item.detail}
                   </span>
                 )}
+                {/* R-260: the committed grant on this tile — counts up while
+                    the store's stamp lives. */}
+                {delta?.chips?.[item.id] != null && delta.chips[item.id]! > 0 && (
+                  <DeltaChip id={item.id} label={item.label} amount={delta.chips[item.id]!} at={delta.at} />
+                )}
               </span>
               <span
                 aria-hidden="true"
@@ -129,6 +187,14 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items }) => {
           </HudTooltip>
         );
       })}
+      </div>
+      {/* R-260: grants with no tile (village XP) anchor as one chip row
+          under the readout — inside the plaque's flow so nothing clips. */}
+      {delta?.tray && delta.tray.amount > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <DeltaChip id={delta.tray.id} label={delta.tray.label} amount={delta.tray.amount} at={delta.at} />
+        </div>
+      )}
     </div>
   );
 };

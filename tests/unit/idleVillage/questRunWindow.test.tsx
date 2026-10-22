@@ -8,7 +8,10 @@ import { describe, it, expect } from 'vitest';
 import { render, screen, renderHook, act, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { applyChoice, availableOptions, createRun, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
+import { applyChoice, availableOptions, createRun, submitCommand, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
+import { DEFAULT_QUEST_THEATRE_FX } from '@/balancing/config/idleVillage/quests/questTheatreFx';
+import { cameraAt, cameraAtWithPostSettle, certifyShot, THEATER_ANCHOR } from '@/ui/idleVillage/questS1Lab/render/depthTransform';
+import { SCENE_CINEMATICS } from '@/ui/idleVillage/questS1Lab/render/sceneManifest';
 import { GOBLIN_PRESETS } from '@/ui/idleVillage/questS1Lab/questLabPresets';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
@@ -30,7 +33,9 @@ interface WindowOpts {
   queuedBeats?: QuestBeat[];
   nowTick?: number;
   onAbandon?: () => void;
+  onChoose?: (optionId: string) => void;
   artFor?: (nodeId: string) => string | undefined;
+  beatCursorRef?: { current: number };
 }
 
 const renderWindow = (run: QuestRunState, opts: WindowOpts = {}) =>
@@ -41,12 +46,13 @@ const renderWindow = (run: QuestRunState, opts: WindowOpts = {}) =>
         phases={[emptyPhase(0)]}
         beats={GOBLIN_SCENARIO.beats}
         queuedBeats={opts.queuedBeats ?? []}
+        beatCursorRef={opts.beatCursorRef}
         beatTiming={{ sceneMs: 1600, checkMs: 1800, harmMs: 1200, endMs: 1600, recapMs: 1800 }}
         title={GOBLIN_SCENARIO.title}
         flavour={GOBLIN_SCENARIO.flavour}
         artFor={opts.artFor ?? (() => undefined)}
         time={{ progress: 0, label: 'Giorno 1 di 2' }}
-        onChoose={() => undefined}
+        onChoose={opts.onChoose ?? (() => undefined)}
         nowTick={opts.nowTick}
         onAbandon={opts.onAbandon}
         armedFlags={new Set()}
@@ -115,6 +121,46 @@ describe('useQuestRun — bag items are the player\'s call', () => {
     // Not in the bag → never arms.
     act(() => result.current.toggleArmedFlag('hasCorda'));
     expect(result.current.armedFlags.has('hasCorda')).toBe(false);
+  });
+
+  /* R-242: the beat cursor lives in the queue's owner so a window remount
+   * resumes at the held beat. It resets only where the queue itself resets. */
+  it('exposes beatCursorRef — reset with the queue on start/clear', () => {
+    const { result } = renderHook(() => useQuestRun('goblin'));
+    act(() => result.current.start(PRESET));
+    result.current.beatCursorRef.current = 3;
+    act(() => result.current.start(PRESET));
+    expect(result.current.beatCursorRef.current).toBe(0);
+    result.current.beatCursorRef.current = 5;
+    act(() => result.current.clear());
+    expect(result.current.beatCursorRef.current).toBe(0);
+  });
+});
+
+// INV:quest-run-window.INV-4 — R-242 «quando chiudo e riapro»: a remounted
+// window resumes the held beat of the shared queue — consumed beats never
+// replay (no stale scene, no cue re-fire, no cluster geometry flap).
+describe('R-242 — close/reopen resumes the held beat', () => {
+  const REOPEN_QUEUE: QuestBeat[] = [
+    { id: 'scene-0', kind: 'scene', nodeId: 'gob-esplora', title: 'Esplora' },
+    { id: 'scene-1', kind: 'scene', nodeId: 'gob-combattimento', title: 'Combattimento' },
+  ];
+  const artFor = (nodeId: string) => `art/${nodeId}.jpg`;
+
+  it('the reopened window shows the held beat — not a replay of consumed ones', () => {
+    const run = atExploration(7);
+    const cursorRef = { current: 0 };
+    const first = renderWindow(run, { queuedBeats: REOPEN_QUEUE, beatCursorRef: cursorRef, artFor });
+    act(() => {
+      fireEvent.click(document.querySelector('[data-testid="quest-theatre"]')!); // presents 'scene-0'
+    });
+    expect(cursorRef.current).toBe(1);
+    first.unmount(); // the window closed mid-queue
+    renderWindow(run, { queuedBeats: REOPEN_QUEUE, beatCursorRef: cursorRef, artFor });
+    /* cursor seeded at 1 → the stage scene is 'gob-combattimento', not a
+     * replay of the already-presented 'gob-esplora'. */
+    const img = document.querySelector('[data-testid="quest-theatre-frame"] img');
+    expect(img?.getAttribute('src')).toBe('art/gob-combattimento.jpg');
   });
 });
 
@@ -213,6 +259,28 @@ describe('R-199 — no skip button, companions closed, frontier gating', () => {
     for (const c of screen.getAllByTestId('quest-window-choice')) expect(c).not.toBeDisabled();
   });
 
+  it('a choice press commits after the lock: options freeze ~200ms, then onChoose fires once', () => {
+    vi.useFakeTimers();
+    try {
+      const onChoose = vi.fn();
+      const run = createRun(PRESET, 42, 'goblin', undefined, { nodeTicks: 10, startTick: 0 });
+      applyChoice(run, availableOptions(run)[0].id);
+      renderWindow(run, { nowTick: run.frontier.readyAt, onChoose });
+      const first = screen.getAllByTestId('quest-window-choice')[0];
+      const optionId = first.getAttribute('data-option-id');
+      fireEvent.click(first);
+      // PLAN-050 §6: the press registers immediately — every option is
+      // locked while the commit beat plays out, but nothing routes yet.
+      for (const c of screen.getAllByTestId('quest-window-choice')) expect(c).toBeDisabled();
+      expect(onChoose).not.toHaveBeenCalled();
+      act(() => vi.advanceTimersByTime(250));
+      expect(onChoose).toHaveBeenCalledTimes(1);
+      expect(onChoose).toHaveBeenCalledWith(optionId);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('the theatre shows the node art via artFor', () => {
     const { container } = renderWindow(atExploration(42), { artFor: () => '/assets/idle_village/quest-goblin/scene.jpg' });
     const img = container.querySelector('img[src="/assets/idle_village/quest-goblin/scene.jpg"]');
@@ -255,5 +323,99 @@ describe('check summary honesty', () => {
       }
     }
     expect(checked).toBeGreaterThan(0);
+  });
+});
+
+describe('R-231 — QuestRunWindow 9-point overhaul invariants', () => {
+  // INV:quest-window-immediate-hidden-loot
+  it('#1a gob-bottino (immediate: true) unlocks at arrival tick with zero wait while gob-accampamento keeps nodeTicks', () => {
+    const run = createRun(PRESET, 7, 'goblin', undefined, { nodeTicks: 10, startTick: 100 });
+    submitCommand(run, 'gob-forza-tracce', { tick: 100, forceDie: 1 });
+    expect(run.nodeId).toBe('gob-bottino');
+    expect(run.frontier.startedAt).toBe(100);
+    expect(run.frontier.readyAt).toBe(100);
+    renderWindow(run, { nowTick: 100 });
+    expect(screen.queryByTestId('quest-window-locked')).toBeNull();
+    for (const c of screen.getAllByTestId('quest-window-choice')) expect(c).not.toBeDisabled();
+    submitCommand(run, 'gob-prendi', { tick: 100 });
+    expect(run.nodeId).toBe('gob-accampamento');
+    expect(run.frontier.readyAt).toBe(110);
+  });
+
+  // INV:quest-window-header-icon-only
+  // INV:quest-window-abandon-icon-tooltip
+  it('#3 & #6 header pills and abandon toggle are icon-only buttons with accessible names and tooltips', () => {
+    renderWindow(atExploration(42), { onAbandon: () => undefined });
+    for (const id of ['quest-party-toggle', 'quest-belt-toggle', 'quest-log-toggle', 'quest-abandon-toggle']) {
+      const btn = screen.getByTestId(id);
+      expect(btn.querySelector('svg')).toBeTruthy();
+      expect(btn.textContent).toBe('');
+      expect(btn).toHaveAccessibleName();
+      expect(btn.getAttribute('title')).toBeTruthy();
+    }
+  });
+
+  // INV:quest-window-minimised-space-between
+  it('#7 minimised plaque uses full-width space-between layout with right-aligned restore control', () => {
+    renderWindow(atExploration(42));
+    fireEvent.click(screen.getByRole('button', { name: /minim/i }));
+    const minPlaque = screen.getByTestId('quest-window-minimised');
+    expect(minPlaque.style.width).toBe('100%');
+    expect(minPlaque.style.justifyContent).toBe('space-between');
+    const controls = minPlaque.querySelector('[data-hud-controls]') as HTMLElement | null;
+    expect(controls?.style.marginLeft).toBe('auto');
+  });
+
+  // INV:quest-window-timebar-checkpoints-monotone
+  it('#4 TimeBar renders phase checkpoints along the progress bar', () => {
+    renderWindow(atExploration(42));
+    const checkpoints = screen.getAllByTestId('quest-timebar-checkpoint');
+    // 6 visible timed phases when hidden immediate F2 (gob-bottino) has not been visited
+    expect(checkpoints).toHaveLength(6);
+    expect(checkpoints[0].getAttribute('data-current')).toBe('true');
+  });
+
+  // INV:quest-window-1280x720-no-inner-scroll
+  it('#5 locked frontier renders phaseLocked only once (outside quest-window-stage)', () => {
+    const run = createRun(PRESET, 42, 'goblin', undefined, { nodeTicks: 10, startTick: 0 });
+    applyChoice(run, availableOptions(run)[0].id);
+    renderWindow(run, { nowTick: run.frontier.readyAt - 1 });
+    const stage = screen.getByTestId('quest-window-stage');
+    expect(stage.querySelector('[data-testid="quest-window-locked"]')).toBeNull();
+    expect(screen.getAllByTestId('quest-window-locked')).toHaveLength(1);
+  });
+
+  // INV:quest-window-post-settle-certified
+  it('#9 postSettle 2.5D breathing is C1-continuous at durMs, moves camVec/zoom after durMs, and stays within certified UV bounds', () => {
+    const cfg = DEFAULT_QUEST_THEATRE_FX.depth;
+    const shot = DEFAULT_QUEST_THEATRE_FX.camera.shots['enter-creep'];
+    const atEnd = cameraAt(shot, shot.durMs);
+    const atPost0 = cameraAtWithPostSettle(shot, shot.durMs, cfg.postSettle);
+    expect(atPost0.zoom).toBeCloseTo(atEnd.zoom, 6);
+    expect(atPost0.camVec).toEqual(atEnd.camVec);
+
+    // Quarter-period and half-period post-entrance show clear parallax & zoom breathing
+    const quarter = cameraAtWithPostSettle(shot, shot.durMs + cfg.postSettle.periodMs / 4, cfg.postSettle);
+    const half = cameraAtWithPostSettle(shot, shot.durMs + cfg.postSettle.periodMs / 2, cfg.postSettle);
+    expect(quarter.camVec[0]).toBeCloseTo(0, 3);
+    expect(half.camVec[0]).toBeCloseTo(-shot.camVec[0], 3);
+    expect(half.zoom).toBeGreaterThanOrEqual(shot.zoomTo);
+
+    // Every manifest scene remains edge-certified across postSettle extrema
+    for (const entry of Object.values(SCENE_CINEMATICS)) {
+      const enterId = entry.entrance ?? 'enter-settle';
+      const s = DEFAULT_QUEST_THEATRE_FX.camera.shots[enterId];
+      for (const dt of [0, cfg.postSettle.periodMs / 4, cfg.postSettle.periodMs / 2]) {
+        const st = cameraAtWithPostSettle(s, s.durMs + dt, cfg.postSettle);
+        const res = certifyShot(
+          { ...s, zoomFrom: st.zoom, zoomTo: st.zoom, panFrom: [...st.pan], panTo: [...st.pan], camVec: [...st.camVec] },
+          cfg,
+          entry.imgAspect,
+          THEATER_ANCHOR,
+        );
+        expect(res.shader.ok).toBe(true);
+        expect(res.dom.ok).toBe(true);
+      }
+    }
   });
 });

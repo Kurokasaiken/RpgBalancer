@@ -33,6 +33,7 @@ src-tauri/target/
 
 # Mind Weaver runtime: shared with mind-weaver via symlink; do not commit
 .mw/venv
+venv/
 .mw/providers
 .mw/catalog
 .mw/deliberation-config.yaml
@@ -42,6 +43,7 @@ src-tauri/target/
 .mw/prompt-enhancers.md
 .mw/critique-definition.md
 .mw/runs/
+.mw/bugs/
 .mw/prefect/
 .mw/manual-dispatch/
 

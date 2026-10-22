@@ -29,6 +29,11 @@ Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione e
   `src/docs/docs/coordinator/agent_assignments.md`.
 - **Fase esplorativa:** invoca `.windsurf/skills/mw-explorer/SKILL.md`.
 - **Fase di pianificazione:** invoca `.windsurf/skills/mw-planner/SKILL.md`.
+- **Visual fork gate (v35 FROZEN, PLAN-047):** un task che crea/modifica
+  elementi grafici con ≥2 rappresentazioni materialmente diverse non viene
+  deciso dall'agente — fork visivo in explorer (card + preview su localhost),
+  ruling Director, baseline congelata. Se non serve fork: skip con puntatore
+  verificabile. Enforcement meccanico in `closure:lint`.
 - **Fase esecutiva:** invoca `.windsurf/skills/mw-executor/SKILL.md`, che a sua volta carica il
   mandato `.windsurf/skills/agent-execution-mandate/SKILL.md` per i task specifici di RPG.
 - **Prima di toccare codice esistente:** invoca `.windsurf/skills/mw-regression/SKILL.md`.

@@ -254,7 +254,8 @@ dimostrato; delta motore v2 con test e legacy signature invariate.
   6 test nuovi; suite 241/241. Evidence:
   `test-results/plan026-t5-traits-2026-10-10.log`.
 - T6 — integrazione dopo gate PLAN-019 pertinenti.
-- T7 — archi narrativi: gated (OPEN-016 + ratifica).
+- T7 — archi narrativi: gated (OPEN-016 **ratificata 2026-10-19**, macro-piano
+  E-16 = direzione; resta il gate P1–P6 stabili + sequenza operativa da fissare).
 - **T8 — primo imprint narrativo compilato — FATTO** (R-152,
   2026-10-12): il ponte mancante imprint→grafo. `gen-impr002-palude`
   «The Lock-Keeper's Bargemen» — IMPR-002 «Il compagno che ride» × kit

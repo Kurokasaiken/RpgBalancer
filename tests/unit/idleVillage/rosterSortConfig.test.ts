@@ -41,6 +41,7 @@ const mockResidents: ResidentState[] = [
 ] as ResidentState[];
 
 describe('Roster Sort Configuration', () => {
+  // INV:roster-sort-config.INV-1
   it('should sort by name ascending (A -> Z) by default', () => {
     const sorted = sortResidents(mockResidents, DEFAULT_ROSTER_SORT_MODE);
     expect(sorted[0].displayName).toBe('Alice');

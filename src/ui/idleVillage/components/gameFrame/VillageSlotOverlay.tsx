@@ -30,10 +30,13 @@ import {
  *    of non-built buildings. No per-frame JS.
  */
 
-/** CSS vars so SkinScope themes the overlay like every other HUD surface. */
-const UNDERLAY = 'var(--skin-hud-lacquer-deep)';
-const BRASS = 'var(--skin-hud-brass-base)';
-const BRASS_HI = 'var(--skin-hud-brass-hi)';
+/** CSS vars so SkinScope themes the overlay like every other HUD surface.
+ *  Re-plated to the Roster range (PLAN-043 WS-5): the underlay sits on the
+ *  lifted teal lacquer, the ring reads in worn bright brass — the deep
+ *  lacquer/base brass pair was invisible over the painted ground. */
+const UNDERLAY = 'var(--skin-hud-lacquer-base)';
+const BRASS = 'var(--skin-hud-brass-hi)';
+const BRASS_HI = 'var(--skin-hud-brass-crest)';
 
 /** Re-export so existing imports keep resolving — the implementation lives in
  *  the config module (PLAN-042: `occludedAt` shares the math). The config

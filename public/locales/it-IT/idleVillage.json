@@ -897,6 +897,8 @@
       "incoming": "+{count} in arrivo",
       "perDay": "−{count}/g",
       "autonomy": "{count} g",
+      "xp": "XP",
+      "delta": "{label} +{amount}",
       "tooltip": {
         "amount": "{label} {value}.",
         "incoming": "In arrivo dalle attività in corso: +{count}.",
@@ -1105,7 +1107,63 @@
         "it-IT": "Italiano"
       },
       "settings": "Tutte le opzioni…",
-      "comingSoon": "Non ancora disponibile"
+      "comingSoon": "Non ancora disponibile",
+      "close": "Chiudi",
+      "cancel": "Annulla",
+      "load": {
+        "title": "Carica partita",
+        "slotAuto": "Salvataggio automatico",
+        "slotManual": "Salvataggio {n}",
+        "slotEmpty": "{name} — vuoto",
+        "slotDay": "{place} · Giorno {day}",
+        "summary": "{heroes, plural, one {# eroe} other {# eroi}} · {expeditions, plural, =0 {nessuna spedizione in corso} one {# spedizione in corso} other {# spedizioni in corso}}",
+        "slotNewer": "Salvato da una versione più recente del gioco",
+        "slotCorrupt": "Salvataggio danneggiato: non si può caricare",
+        "loadAction": "Carica",
+        "deleteAction": "Elimina",
+        "deleteAsk": "Eliminare questo salvataggio? Non si può annullare.",
+        "deleteConfirm": "Elimina",
+        "replaceNote": "La partita in corso (Giorno {day}) ha progressi non salvati e verrà sostituita.",
+        "replaceAsk": "Sostituire la partita in corso (Giorno {day})? Si perde il progresso dall'ultimo salvataggio.",
+        "replaceConfirm": "Sostituisci e carica",
+        "failed": "Impossibile caricare il salvataggio. La partita in corso non è stata modificata."
+      },
+      "settingsPanel": {
+        "title": "Impostazioni",
+        "general": "Generale",
+        "audio": "Audio",
+        "master": "Principale",
+        "effects": "Effetti",
+        "music": "Musica",
+        "interface": "Interfaccia",
+        "reducedMotion": "Movimento ridotto",
+        "reducedMotionHint": "Meno animazioni e dissolvenze",
+        "reset": "Ripristina",
+        "appliesNow": "Le modifiche valgono subito."
+      },
+      "quit": {
+        "title": "Tornare al titolo?",
+        "lastSaved": "Ultimo salvataggio: {when}.",
+        "neverSaved": "Questa partita non è ancora stata salvata.",
+        "unsavedWarn": "Se esci senza salvare, perdi ciò che è successo da allora.",
+        "saveAndQuit": "Salva ed esci",
+        "quitNoSave": "Esci senza salvare",
+        "saving": "Salvataggio…",
+        "saveFailed": "Salvataggio non riuscito. Sei ancora in partita."
+      },
+      "newGame": {
+        "title": "Iniziare una nuova partita?",
+        "body": "La partita attuale (Giorno {day}) e il suo salvataggio automatico verranno sostituiti. I salvataggi manuali restano dove sono.",
+        "confirm": "Inizia nuova partita"
+      },
+      "titleScreen": {
+        "continue": "Continua · Giorno {day}",
+        "continuePlain": "Continua",
+        "newGame": "Nuova partita",
+        "loadGame": "Carica partita",
+        "settings": "Impostazioni",
+        "exit": "Esci dal gioco"
+      }
     },
     "regions": {
       "northern_forest": "Boschi Sussurranti",
@@ -1900,16 +1958,12 @@
     "members": {
       "title": "Per membro",
       "row": "ferite {wound}% · morti {death}%",
-      "downtime": "≈{days}g fermo",
+      "downtime": "a riposo ~{days} giorni",
       "role": {
         "leader": "leader",
         "bodyguard": "guardia",
         "member": "membro"
       }
-    },
-    "why": {
-      "title": "Da dove viene il rischio",
-      "row": "— nel {runs}% dei run · {death}% delle morti · {wound}% delle ferite"
     },
     "intel": {
       "title": "Informazioni",
@@ -1957,6 +2011,7 @@
       "leader": "Capo"
     },
     "seals": {
+      "durationBreakdown": "{out}g andata · ~{site}g sul posto · {back}g ritorno",
       "danger": "Pericolo",
       "reward": "Ricompensa",
       "duration": "Durata"

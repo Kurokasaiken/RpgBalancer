@@ -1,12 +1,12 @@
 /**
  * questExpeditionBag.test.tsx — PLAN-036 (R-195) bag-zone contract:
- * exactly `QUEST_STASH.bagSlots` visible slots, ONE toggle opening the
- * Selection Tray (PLAN-043 WS-3, replaces the retired
+ * exactly `QUEST_STASH.bagSlots` visible slots, a page-owned Stash action,
+ * and slot-anchored access to the Selection Tray (PLAN-043 WS-3, replaces the retired
  * `quest-bag-external-picker` popover — see ws3 testid migration list):
  * icon-only `picker-item-*` tiles with stock badge + rich tooltip,
  * `loadout-item-*` strictly unique (a filled slot's inner button, never a
  * picker tile), Escape/click-outside close the tray only and focus
- * returns to the toggle.
+ * returns to the originating bag slot.
  */
 import { describe, expect, it, vi } from 'vitest';
 import React, { useState } from 'react';
@@ -35,7 +35,7 @@ const ITEMS: BagStockEntry[] = VILLAGE_STASH_CONFIG.items.map((row) => ({
   qty: row.qty,
 }));
 
-const Harness = () => {
+const Harness: React.FC<{ onOpenStash?: (trigger: HTMLButtonElement) => void }> = ({ onOpenStash = () => undefined }) => {
   const [sel, setSel] = useState<string[]>([]);
   const toggle = (id: string) =>
     setSel((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length < QUEST_STASH.bagSlots ? [...c, id] : c));
@@ -56,6 +56,7 @@ const Harness = () => {
           items={ITEMS}
           selectedItemIds={sel}
           onToggleItem={toggle}
+          onOpenStash={onOpenStash}
           canSend={false}
           onSend={() => {}}
           onClose={() => {}}
@@ -66,20 +67,29 @@ const Harness = () => {
   );
 };
 
-describe('bag zone — 3 slots + WS-3 Selection Tray', () => {
-  it('renders exactly bagSlots slots plus ONE picker toggle, picker closed', () => {
+describe('bag zone — Stash action + slot-anchored WS-3 Selection Tray', () => {
+  it('renders exactly bagSlots slots plus the Village Stash action, picker closed', () => {
     render(<Harness />);
     for (let i = 0; i < QUEST_STASH.bagSlots; i++) {
       expect(screen.getByTestId(`bag-slot-${i}`)).toBeInTheDocument();
     }
     expect(screen.queryByTestId(`bag-slot-${QUEST_STASH.bagSlots}`)).toBeNull();
-    expect(screen.getByTestId('quest-tray-toggle')).toBeInTheDocument();
+    expect(screen.getByTestId('quest-open-stash')).toBeInTheDocument();
+    expect(screen.queryByTestId('quest-tray-toggle')).toBeNull();
     expect(screen.queryByTestId('quest-selection-tray')).toBeNull();
   });
 
-  it('opens the tray on the toggle and shows one icon-only tile per village item', () => {
+  it('bag action opens the page-owned Stash without opening the item picker', () => {
+    const onOpenStash = vi.fn();
+    render(<Harness onOpenStash={onOpenStash} />);
+    fireEvent.click(screen.getByTestId('quest-open-stash'));
+    expect(onOpenStash).toHaveBeenCalledWith(expect.any(HTMLButtonElement));
+    expect(screen.queryByTestId('quest-selection-tray')).toBeNull();
+  });
+
+  it('opens the item tray from an empty bag slot and shows one icon-only tile per village item', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
+    fireEvent.click(screen.getByTestId('bag-slot-0').querySelector('button')!);
     const picker = screen.getByTestId('quest-selection-tray');
     expect(picker).toBeInTheDocument();
     for (const { itemId } of VILLAGE_STASH_CONFIG.items) {
@@ -94,7 +104,7 @@ describe('bag zone — 3 slots + WS-3 Selection Tray', () => {
 
   it('selecting three tiles fills the three bag slots; tray stays open', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
+    fireEvent.click(screen.getByTestId('bag-slot-0').querySelector('button')!);
     const first3 = VILLAGE_STASH_CONFIG.items.slice(0, 3);
     for (const { itemId } of first3) {
       fireEvent.click(screen.getByTestId(`picker-item-${itemId}`));
@@ -117,7 +127,7 @@ describe('bag zone — 3 slots + WS-3 Selection Tray', () => {
 
   it('clicking a filled bag slot removes the item', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
+    fireEvent.click(screen.getByTestId('bag-slot-0').querySelector('button')!);
     const id = VILLAGE_STASH_CONFIG.items[0].itemId;
     fireEvent.click(screen.getByTestId(`picker-item-${id}`));
     expect(screen.getAllByTestId(`loadout-item-${id}`)).toHaveLength(1);
@@ -125,21 +135,21 @@ describe('bag zone — 3 slots + WS-3 Selection Tray', () => {
     expect(screen.queryByTestId(`loadout-item-${id}`)).toBeNull();
   });
 
-  it('Escape closes ONLY the tray and focus returns to the toggle', () => {
+  it('Escape closes ONLY the tray and focus returns to the originating bag slot', () => {
     render(<Harness />);
-    const toggle = screen.getByTestId('quest-tray-toggle');
-    fireEvent.click(toggle);
+    const slotButton = screen.getByTestId('bag-slot-0').querySelector('button')!;
+    fireEvent.click(slotButton);
     expect(screen.getByTestId('quest-selection-tray')).toBeInTheDocument();
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(screen.queryByTestId('quest-selection-tray')).toBeNull();
     /* The panel itself stays mounted (the detail plaque survives). */
     expect(screen.getByTestId('quest-expedition-detail')).toBeInTheDocument();
-    expect(document.activeElement).toBe(toggle);
+    expect(document.activeElement).toBe(slotButton);
   });
 
-  it('a pointer down outside tray and toggle closes it', () => {
+  it('a pointer down outside the tray closes it', () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
+    fireEvent.click(screen.getByTestId('bag-slot-0').querySelector('button')!);
     expect(screen.getByTestId('quest-selection-tray')).toBeInTheDocument();
     fireEvent.pointerDown(document.body);
     expect(screen.queryByTestId('quest-selection-tray')).toBeNull();
@@ -147,7 +157,7 @@ describe('bag zone — 3 slots + WS-3 Selection Tray', () => {
 
   it('focusing a picker tile exposes name + description + stock in a tooltip', async () => {
     render(<Harness />);
-    fireEvent.click(screen.getByTestId('quest-tray-toggle'));
+    fireEvent.click(screen.getByTestId('bag-slot-0').querySelector('button')!);
     const id = VILLAGE_STASH_CONFIG.items[0].itemId;
     const tile = screen.getByTestId(`picker-item-${id}`);
     fireEvent.focus(tile);
