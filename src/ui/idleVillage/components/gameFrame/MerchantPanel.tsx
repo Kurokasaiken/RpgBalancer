@@ -81,7 +81,7 @@ export const MerchantPanel: React.FC<MerchantPanelProps> = ({ config, left, top,
                 {t('gameFrame.merchant.title')}
               </span>
               {/* Static qualitative restock line — never a live countdown. */}
-              <span style={{ font: 'italic 12px var(--skin-font-sans)', color: 'var(--skin-text-secondary)' }}>
+              <span style={{ font: 'italic 12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
                 {t(config.countdownLabelKey)}
               </span>
             </span>
@@ -90,8 +90,8 @@ export const MerchantPanel: React.FC<MerchantPanelProps> = ({ config, left, top,
                 font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
                 letterSpacing: 'var(--skin-hud-caps-tracking)',
                 textTransform: 'uppercase',
-                color: 'var(--skin-icon-accent)',
-                border: '1px solid color-mix(in srgb, var(--skin-icon-accent) 55%, transparent)',
+                color: 'var(--skin-title-color)',
+                border: '1px solid color-mix(in srgb, var(--skin-title-color) 55%, transparent)',
                 borderRadius: 'var(--skin-hud-row-radius)',
                 padding: '2px 8px',
                 whiteSpace: 'nowrap',
@@ -121,21 +121,21 @@ export const MerchantPanel: React.FC<MerchantPanelProps> = ({ config, left, top,
           >
             {config.offers.map((offer) => (
               <li key={offer.offerId} style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--skin-hud-inline-gap)', minWidth: 0 }}>
-                <span aria-hidden="true" style={{ color: 'var(--skin-icon-accent)', display: 'inline-flex', alignItems: 'center', paddingTop: 1 }}>
+                <span aria-hidden="true" style={{ color: 'var(--skin-title-color)', display: 'inline-flex', alignItems: 'center', paddingTop: 1 }}>
                   <MerchantOfferIcon iconKey={offer.iconKey} size={18} />
                 </span>
                 <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <span style={{ font: '600 12px var(--skin-font-sans)', color: 'var(--skin-text-primary)', display: 'flex', justifyContent: 'space-between', gap: 'var(--skin-hud-inline-gap)' }}>
+                  <span style={{ font: '600 12px var(--skin-font-serif)', color: 'var(--skin-text-primary)', display: 'flex', justifyContent: 'space-between', gap: 'var(--skin-hud-inline-gap)' }}>
                     <span>{t(offer.nameKey)}</span>
-                    <span style={{ color: 'var(--skin-icon-accent)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                    <span style={{ color: 'var(--skin-title-color)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
                       {t('gameFrame.merchant.priceLine', { price: offer.price, currency: t(offer.currencyKey) })}
                     </span>
                   </span>
-                  <span style={{ font: '12px var(--skin-font-sans)', color: 'var(--skin-text-secondary)', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
+                  <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
                     {t(offer.descKey)}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--skin-hud-inline-gap)' }}>
-                    <span style={{ font: 'italic 12px var(--skin-font-sans)', color: 'var(--skin-label-primary)' }}>
+                    <span style={{ font: 'italic 12px var(--skin-font-serif)', color: 'var(--skin-label-primary)' }}>
                       {t(offer.stockLabelKey)}
                     </span>
                     <MockBuyControl />

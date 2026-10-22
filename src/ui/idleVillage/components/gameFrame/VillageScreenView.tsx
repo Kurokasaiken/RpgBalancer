@@ -539,7 +539,7 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                         justifyContent: 'center',
                         background: 'var(--skin-hud-lacquer-base)',
                         border: '1px solid var(--skin-hud-brass-hi)',
-                        color: b.initialState === 'locked' ? 'var(--skin-text-secondary)' : b.initialState === 'buildable' ? 'var(--skin-icon-accent)' : 'var(--skin-title-color)',
+                        color: b.initialState === 'locked' ? 'var(--skin-text-secondary)' : b.initialState === 'buildable' ? 'var(--skin-title-color)' : 'var(--skin-title-color)',
                         font: '600 10px/1 var(--skin-font-display)',
                         letterSpacing: '0.04em',
                       }}
@@ -692,9 +692,9 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                 </span>
               ))}
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
-                <span style={{ display: 'inline-flex', minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-hud-brass-base)', color: 'var(--skin-icon-accent)', fontSize: 12, fontWeight: 600 }}>I</span>
+                <span style={{ display: 'inline-flex', minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-hud-brass-base)', color: 'var(--skin-title-color)', fontSize: 12, fontWeight: 600 }}>I</span>
                 {t('gameFrame.village.legend.badgeLevel')}
-                <span style={{ display: 'inline-flex', minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-hud-brass-base)', color: 'var(--skin-icon-accent)', fontSize: 12, fontWeight: 600 }}>+</span>
+                <span style={{ display: 'inline-flex', minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-hud-brass-base)', color: 'var(--skin-title-color)', fontSize: 12, fontWeight: 600 }}>+</span>
                 {t('gameFrame.village.legend.badgeBuild')}
                 <span style={{ display: 'inline-flex', minWidth: 13, height: 13, borderRadius: 7, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-surface-border)', color: 'var(--skin-text-secondary)' }}><EngravedIcon id="cmd-lock" size={8} /></span>
                 {t('gameFrame.village.legend.badgeLocked')}
@@ -748,7 +748,7 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
               >
                 {/* Header: name + category/level + pin + close. */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)' }}>
-                  <span aria-hidden="true" style={{ color: 'var(--skin-icon-accent)', display: 'inline-flex' }}>
+                  <span aria-hidden="true" style={{ color: 'var(--skin-title-color)', display: 'inline-flex' }}>
                     <VillageBuildingIcon iconKey={activeBuilding.iconKey} size={20} />
                   </span>
                   <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -775,7 +775,7 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                       if (tooltip?.pinned) setTooltip({ id: activeBuilding.id, pinned: false });
                       else pinTooltip(activeBuilding.id);
                     }}
-                    style={{ ...controlButton, color: tooltip?.pinned ? 'var(--skin-icon-accent)' : 'var(--skin-icon-color)' }}
+                    style={{ ...controlButton, color: tooltip?.pinned ? 'var(--skin-title-color)' : 'var(--skin-icon-color)' }}
                   >
                     <EngravedIcon id="cmd-pin" size={14} />
                   </button>
@@ -788,14 +788,14 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                 <div style={{ maxHeight: tipBodyMaxPx, overflowY: 'auto', overscrollBehavior: 'contain', display: 'flex', flexDirection: 'column', gap: 'var(--skin-hud-stack-gap)' }}>
                   <span style={{ font: '13px var(--skin-font-serif)', color: 'var(--skin-text-primary)' }}>{t(activeBuilding.descKey)}</span>
                   {activeBuilding.initialState === 'locked' ? (
-                    <span style={{ font: 'italic 12px var(--skin-font-sans)', color: 'var(--skin-text-secondary)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ font: 'italic 12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       <EngravedIcon id="cmd-lock" size={12} />
                       {/* Zod: `locked` ⇒ `unlockHintKey` present (superRefine). */}
                       {activeBuilding.unlockHintKey ? t(activeBuilding.unlockHintKey) : null}
                     </span>
                   ) : (
                     <>
-                      <span style={{ font: '600 12px var(--skin-font-sans)', color: 'var(--skin-icon-accent)', fontVariantNumeric: 'tabular-nums' }}>
+                      <span style={{ font: '600 12px var(--skin-font-serif)', color: 'var(--skin-title-color)', fontVariantNumeric: 'tabular-nums' }}>
                         {t('gameFrame.village.effectLabel')}:{' '}
                         {t(activeBuilding.effectKey, {
                           value: activeBuilding.initialLevel > 0 ? activeBuilding.tiers[activeBuilding.initialLevel - 1].effectValue : 0,
@@ -803,7 +803,7 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                         })}
                       </span>
                       {activeBuilding.initialLevel < activeBuilding.tiers.length && (
-                        <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', font: '12px var(--skin-font-sans)', color: 'var(--skin-text-secondary)' }}>
+                        <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
                           <span>{t('gameFrame.village.costLabel')}:</span>
                           {RESOURCES.map((res) => {
                             const amount = activeBuilding.tiers[activeBuilding.initialLevel].cost[res];
