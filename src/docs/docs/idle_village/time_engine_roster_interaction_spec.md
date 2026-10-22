@@ -1,8 +1,9 @@
 ---
 title: TimeEngine ↔ Roster Interaction
-status: draft
-updated: 2026-08-13
+status: deprecated
+updated: 2026-10-19
 type: interaction-spec
+superseded-by: CTR-game-007 + CTR-game-008 (`.mw/contracts/`) — PLAN-054 T-003 triage: legame roster↔tempo ora su `/game` (`CTR-game-007.INV-3`, `CTR-game-008.INV-3`)
 ---
 
 # TimeEngine ↔ Roster Interaction

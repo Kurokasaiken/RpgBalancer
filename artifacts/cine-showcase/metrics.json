@@ -1,0 +1,15 @@
+{
+  "env": {
+    "visibilityState": "visible",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "rafTicks": 12,
+    "headed": false,
+    "webgl2": true,
+    "collectedAt": "2026-10-18T16:51:12.658Z",
+    "frameDiff": 0.4644006755749839
+  },
+  "samples": []
+}

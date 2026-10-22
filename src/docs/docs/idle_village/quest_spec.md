@@ -1,8 +1,9 @@
 ---
 title: Quest Spec
-status: draft
-updated: 2026-08-13
+status: superseded
+updated: 2026-10-19
 type: component-spec
+superseded-by: CTR-game-008 + CTR-game-009 (`.mw/contracts/`) — PLAN-054 T-003 triage: ciclo POI→planner→run→settle su `/game` coperto da `CTR-game-008.INV-1..4` e `CTR-game-009.INV-1..4`; QuestRunWindow resta il componente canonico
 ---
 
 # Quest Spec

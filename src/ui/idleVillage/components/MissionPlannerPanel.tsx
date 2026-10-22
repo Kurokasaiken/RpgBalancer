@@ -231,7 +231,7 @@ function WhyLine({ line, translate }: { line: PlannerWhyLine; translate: (k: str
     line.unit === 'mult'
       ? `×${Math.abs(line.delta).toFixed(2)}`
       : line.unit === 'pp'
-        ? `${Math.abs(line.delta).toFixed(1)}pp`
+        ? `${Math.abs(line.delta).toFixed(1)}%`
         : `${Math.abs(line.delta).toFixed(0)}`;
   const good = line.metric === 'success' || line.metric === 'reward' ? line.delta > 0 : line.delta < 0;
   const sourceKey = `missionPlanner.stat.${line.sourceLabel}`;

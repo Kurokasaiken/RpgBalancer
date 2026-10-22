@@ -25,7 +25,8 @@
  */
 
 import { EASINGS, type EasingId } from '@/balancing/config/idleVillage/quests/questCameraEasings';
-import type { CameraShot, QuestDepthFx } from '@/balancing/config/idleVillage/quests/questTheatreFx';
+import type { CameraShot, QuestDepthFx, QuestPostSettleFx } from '@/balancing/config/idleVillage/quests/questTheatreFx';
+import { traumaMaxOffset, traumaMaxRollShift, type TraumaState } from '@/ui/idleVillage/questS1Lab/render/trauma';
 
 /**
  * The Theater's crop anchor — `object-position: 50% 40%` in the DOM and
@@ -41,7 +42,9 @@ export interface CameraState {
   readonly zoom: number;
   /** Sampled-window offset, source-UV units. */
   readonly pan: readonly [number, number];
-  /** Depth parallax direction, |v| ≤ 1 per axis. */
+  /** Defocus in view px — 0 = sharp. */
+  readonly blur: number;
+  /** Depth-parallax drive, eased from zero to the shot's authored vector. */
   readonly camVec: readonly [number, number];
   readonly ampMul: number;
 }
@@ -59,18 +62,102 @@ export function cameraAt(shot: CameraShot, tMs: number): CameraState {
   const ease = EASINGS[shot.ease as EasingId];
   const t = shot.durMs <= 0 ? 1 : Math.min(1, Math.max(0, tMs / shot.durMs));
   const e = ease.fn(t);
+  const parallaxProgress = Math.min(1, Math.max(0, e));
   return {
     e,
     zoom: shot.zoomFrom + (shot.zoomTo - shot.zoomFrom) * e,
-    pan: [shot.panTo[0] * e, shot.panTo[1] * e],
-    camVec: shot.camVec,
+    pan: [
+      shot.panFrom[0] + (shot.panTo[0] - shot.panFrom[0]) * e,
+      shot.panFrom[1] + (shot.panTo[1] - shot.panFrom[1]) * e,
+    ],
+    /* Focus resolves on its own compressed window (`blurSettleFrac` of
+     * the shot) so the pull lands early and the frame is sharp while the
+     * camera finishes settling — a blur that lingers the whole shot reads
+     * as misfocus (Director 2026-10-19). */
+    blur: shot.blurFrom +
+      (shot.blurTo - shot.blurFrom) *
+      ease.fn(Math.min(1, t / Math.max(shot.blurSettleFrac ?? 1, 0.001))),
+    camVec: [shot.camVec[0] * parallaxProgress, shot.camVec[1] * parallaxProgress],
     ampMul: shot.ampMul,
+  };
+}
+
+/**
+ * R-231 #9 — post-entrance continuous 2.5D breathing evaluator.
+ * For `tMs <= shot.durMs` (or when `postSettle` is disabled), delegates
+ * verbatim to `cameraAt(shot, tMs)`.
+ * For `τ = tMs - shot.durMs > 0` when `postSettle.enabled`:
+ *   - `camVec_a(τ) = shot.camVec_a · cos(ω_a · τ)` (when `shot.camVec_a ≠ 0`),
+ *     which has `camVec_a(0) = shot.camVec_a` (`C⁰`), derivative `0` at `τ=0`
+ *     (`C¹`), and `|camVec_a(τ)| ≤ |shot.camVec_a|` for all `τ ≥ 0` (provably
+ *     within the certified `disp` envelope of `shot`). When `shot.camVec_a === 0`
+ *      and `shot.zoomTo > 1`, ramps in `minSwayVec_a · r(τ) · sin(ω_a · τ)`.
+ *   - `zoom(τ) = shot.zoomTo + breathZoom · (1 − cos(ω_z · τ)) / 2 ≥ shot.zoomTo`,
+ *     which only shrinks `halfExtent` and increases DOM cover (`C¹` at `τ=0`).
+ */
+export function cameraAtWithPostSettle(
+  shot: CameraShot,
+  tMs: number,
+  postSettle?: QuestPostSettleFx,
+): CameraState {
+  const base = cameraAt(shot, tMs);
+  if (!postSettle?.enabled || shot.durMs <= 0 || tMs <= shot.durMs) {
+    return base;
+  }
+  const tau = tMs - shot.durMs;
+  const omegaX = (2 * Math.PI) / Math.max(500, postSettle.periodMs);
+  const omegaY = omegaX * 0.7;
+  const omegaZ = omegaX * 0.85;
+  const rampU = Math.min(1, tau / 1200);
+  const ramp = rampU * rampU * (3 - 2 * rampU);
+  const breathWave = (1 - Math.cos(omegaZ * tau)) * 0.5;
+  const zoom = shot.zoomTo + postSettle.breathZoom * breathWave;
+  const cx =
+    shot.camVec[0] !== 0
+      ? shot.camVec[0] * Math.cos(omegaX * tau)
+      : shot.zoomTo > 1
+        ? postSettle.minSwayVec[0] * ramp * Math.sin(omegaX * tau)
+        : 0;
+  const cy =
+    shot.camVec[1] !== 0
+      ? shot.camVec[1] * Math.cos(omegaY * tau)
+      : shot.zoomTo > 1
+        ? postSettle.minSwayVec[1] * ramp * Math.sin(omegaY * tau)
+        : 0;
+  return {
+    ...base,
+    zoom,
+    camVec: [cx, cy],
   };
 }
 
 /** Reachable progress range for the shot's easing — overshoot included. */
 export function progressRange(shot: CameraShot): readonly [number, number] {
   return EASINGS[shot.ease as EasingId].valueRange;
+}
+
+/**
+ * Trauma envelope below which the residual wobble is imperceptible
+ * (envelope² ≤ 1e-4 of the certified max) — treated as expired.
+ */
+export const TRAUMA_SETTLED_EPS = 0.01;
+
+/**
+ * PLAN-050 T-011 — the "ticker idle-stopped" predicate. True while the
+ * camera still has temporal work: the shot hasn't landed
+ * (`elapsedMs < durMs`), an injected trauma's envelope is still
+ * perceptible, or `postSettleActive` is enabled on an active ambient scene
+ * (R-231 #9).
+ */
+export function cameraHasTemporalWork(
+  shot: CameraShot,
+  elapsedMs: number,
+  trauma: TraumaState | null,
+  postSettleActive = false,
+): boolean {
+  if (trauma != null && trauma.envelope >= TRAUMA_SETTLED_EPS) return true;
+  if (postSettleActive && shot.durMs > 0) return true;
+  return elapsedMs < shot.durMs;
 }
 
 /** Cover-fit crop for a image of aspect `imgAspect` in a view of `viewAspect`. */
@@ -138,6 +225,27 @@ export function shaderUniforms(
 }
 
 /**
+ * PLAN-050 §6 — map a source-UV point (e.g. the manifest `focusAnchor`) to
+ * view-UV at a camera state: the inverse of the shader's base-window
+ * sample. Focal-plane approximation (depth displacement ignored) — the
+ * right model for pinning diegetic labels to artwork features.
+ */
+export function anchorToView(
+  state: Pick<CameraState, 'zoom' | 'pan'>,
+  cfg: Pick<QuestDepthFx, 'overscan'>,
+  imgAspect: number,
+  viewAspect: number,
+  point: readonly [number, number],
+  anchor: readonly [number, number] = THEATER_ANCHOR,
+): readonly [number, number] {
+  const fit = coverFit(imgAspect, viewAspect);
+  const half = halfExtent(fit.crop, state.zoom, cfg.overscan);
+  const cx = anchor[0] + (0.5 - anchor[0]) * 2 * half[0] + state.pan[0];
+  const cy = anchor[1] + (0.5 - anchor[1]) * 2 * half[1] + state.pan[1];
+  return [0.5 + (point[0] - cx) / (2 * half[0]), 0.5 + (point[1] - cy) / (2 * half[1])];
+}
+
+/**
  * CSS-space transform for the DOM fallback, honoring the same anchor via
  * `transform-origin`. `translate(tx%, ty%) scale(k)` composes as
  * p → k·(p + t): a source-UV pan p shifts content by −p·E_a of the
@@ -196,31 +304,45 @@ export function certifyShaderEdge(
   const fit = coverFit(imgAspect, viewAspect);
   const [e0, e1] = progressRange(shot);
   const disp = maxDisp({ camVec: shot.camVec, ampMul: shot.ampMul }, cfg);
+  /* PLAN-050 §4 — trauma can fire on ANY beat, so its worst case is
+   *  certified per shot-e endpoint alongside the calm case. The trauma
+   *  envelope q scales BOTH the wobble (∝q²) and the zoom punch (∝q);
+   *  cost(q) = half(z/(1+bq)) + q²·T has a single interior MINIMUM
+   *  (cost′ strictly increasing), so q=0 and q=1 cover the worst case. */
+  const tPan = traumaMaxOffset(cfg.trauma);
+  const bump = 1 + cfg.trauma.zoomBump;
   const failures: string[] = [];
   let minMargin = Infinity;
 
   for (const a of AXES) {
     for (const e of [e0, e1]) {
       const z = shot.zoomFrom + (shot.zoomTo - shot.zoomFrom) * e;
-      const p = shot.panTo[a] * e;
-      const half = ((0.5 - fit.crop[a]) * (1 - cfg.overscan)) / z;
-      // Center moves with zoom — the anchor is the pivot (DOM parity).
-      const wcA = anchor[a] + (0.5 - anchor[a]) * 2 * half;
-      // σ = +1 → high edge: center + off + half ≤ 1 − ε
-      // σ = −1 → low edge:  center + off − half ≥ ε
-      for (const sigma of [1, -1] as const) {
-        const off = p + sigma * disp[a];
-        const edge = sigma > 0 ? 1 - cfg.epsilon : cfg.epsilon;
-        const sampledEdge = wcA + off + sigma * half;
-        const margin = sigma > 0 ? edge - sampledEdge : sampledEdge - edge;
-        if (margin < minMargin) minMargin = margin;
-        if (margin < 0) {
-          failures.push(
-            `axis ${a === 0 ? 'x' : 'y'} ${sigma > 0 ? 'high' : 'low'} edge: ` +
-              `sampled ${sampledEdge.toFixed(4)} vs ${edge.toFixed(4)} ` +
-              `(e=${e.toFixed(3)}, z=${z.toFixed(3)}, pan=${p.toFixed(4)}, disp=${disp[a].toFixed(4)}, ` +
-              `half=${half.toFixed(4)} — needs zoom ≥ ${requiredZoom(z, wcA, off, fit.crop[a], cfg, sigma).toFixed(3)})`,
-          );
+      const p = shot.panFrom[a] + (shot.panTo[a] - shot.panFrom[a]) * e;
+      /* q ∈ {0,1}: calm camera, then full-trauma (bumped zoom + wobble). */
+      for (const q of [0, 1] as const) {
+        const zEff = q === 0 ? z : z * bump;
+        const halfA = ((0.5 - fit.crop[a]) * (1 - cfg.overscan)) / zEff;
+        const halfB = ((0.5 - fit.crop[1 - a]) * (1 - cfg.overscan)) / zEff;
+        const dispEff = q === 0 ? disp[a] : disp[a] + tPan + traumaMaxRollShift(cfg.trauma, [halfA, halfB]);
+        const half = halfA;
+        // Center moves with zoom — the anchor is the pivot (DOM parity).
+        const wcA = anchor[a] + (0.5 - anchor[a]) * 2 * half;
+        // σ = +1 → high edge: center + off + half ≤ 1 − ε
+        // σ = −1 → low edge:  center + off − half ≥ ε
+        for (const sigma of [1, -1] as const) {
+          const off = p + sigma * dispEff;
+          const edge = sigma > 0 ? 1 - cfg.epsilon : cfg.epsilon;
+          const sampledEdge = wcA + off + sigma * half;
+          const margin = sigma > 0 ? edge - sampledEdge : sampledEdge - edge;
+          if (margin < minMargin) minMargin = margin;
+          if (margin < 0) {
+            failures.push(
+              `axis ${a === 0 ? 'x' : 'y'} ${sigma > 0 ? 'high' : 'low'} edge: ` +
+                `sampled ${sampledEdge.toFixed(4)} vs ${edge.toFixed(4)} ` +
+                `(e=${e.toFixed(3)}, trauma=${q}, z=${zEff.toFixed(3)}, pan=${p.toFixed(4)}, disp=${dispEff.toFixed(4)}, ` +
+                `half=${half.toFixed(4)} — needs zoom ≥ ${requiredZoom(zEff, wcA, off, fit.crop[a], cfg, sigma).toFixed(3)})`,
+            );
+          }
         }
       }
     }
@@ -273,32 +395,42 @@ export function certifyDomEdge(
 
   for (const a of AXES) {
     const E = fit.extent[a];
-    // p·z quadratic: endpoints + interior vertex if p·z' has a root in range.
+    // s(e) = s_base·E·(panFrom + Δpan·e)·(zoomFrom + Δz·e) — quadratic in e
+    // when both Δpan and Δz are nonzero; vertex in closed form.
     const candidates = new Set<number>([e0, e1]);
-    const pz = shot.panTo[a];
-    if (pz !== 0 && shot.zoomTo !== shot.zoomFrom) {
-      // s(e) = s_base·E·panTo·e·(zoomFrom + Δz·e) → vertex at e* = −zoomFrom/(2Δz)
-      const dz = shot.zoomTo - shot.zoomFrom;
-      const vertex = -shot.zoomFrom / (2 * dz);
+    const dPan = shot.panTo[a] - shot.panFrom[a];
+    const dz = shot.zoomTo - shot.zoomFrom;
+    if (dPan !== 0 && dz !== 0) {
+      const vertex = -(shot.panFrom[a] * dz + dPan * shot.zoomFrom) / (2 * dPan * dz);
       if (vertex > e0 && vertex < e1) candidates.add(vertex);
     }
     for (const e of candidates) {
-      const z = shot.zoomFrom + (shot.zoomTo - shot.zoomFrom) * e;
-      const k = sBase * z;
-      const s = shot.panTo[a] * e * k * E; // signed shift, view fractions
-      const cover = k * E - 1;
-      for (const side of [1, -1] as const) {
-        // side +1: shift toward low edge (s>0 uses (1−anchor) slack on high side)
-        const slack = (side > 0 ? 1 - anchor[a] : anchor[a]) * Math.max(0, cover) - cfg.epsilon;
-        const demand = s * side;
-        const margin = slack - demand;
-        if (margin < minMargin) minMargin = margin;
-        if (margin < 0) {
-          failures.push(
-            `DOM axis ${a === 0 ? 'x' : 'y'} side ${side > 0 ? 'low' : 'high'}: ` +
-              `shift ${demand.toFixed(4)} > slack ${slack.toFixed(4)} ` +
-              `(e=${e.toFixed(3)}, k=${k.toFixed(3)}, E=${E.toFixed(3)})`,
-          );
+      const z = shot.zoomFrom + dz * e;
+      const pan = shot.panFrom[a] + dPan * e;
+      /* PLAN-050 §4 — DOM trauma at q=1: bumped scale + uniform wobble
+       *  (bg-share pan + whole-image roll, domScale). Intermediate q are
+       *  dominated by the endpoints for the same monotonicity reason. */
+      for (const q of [0, 1] as const) {
+        const k = q === 0 ? sBase * z : sBase * z * (1 + cfg.trauma.zoomBump);
+        const s = pan * k * E; // signed shift, view fractions
+        const tDom =
+          q === 0
+            ? 0
+            : cfg.trauma.domScale * (cfg.trauma.maxPan + ((cfg.trauma.maxRollDeg * Math.PI) / 180) * 0.5 * E) * k * E;
+        const cover = k * E - 1;
+        for (const side of [1, -1] as const) {
+          // side +1: shift toward low edge (s>0 uses (1−anchor) slack on high side)
+          const slack = (side > 0 ? 1 - anchor[a] : anchor[a]) * Math.max(0, cover) - cfg.epsilon;
+          const demand = s * side + tDom;
+          const margin = slack - demand;
+          if (margin < minMargin) minMargin = margin;
+          if (margin < 0) {
+            failures.push(
+              `DOM axis ${a === 0 ? 'x' : 'y'} side ${side > 0 ? 'low' : 'high'}: ` +
+                `shift ${demand.toFixed(4)} > slack ${slack.toFixed(4)} ` +
+                `(e=${e.toFixed(3)}, trauma=${q}, k=${k.toFixed(3)}, E=${E.toFixed(3)})`,
+            );
+          }
         }
       }
     }

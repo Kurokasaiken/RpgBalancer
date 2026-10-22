@@ -69,7 +69,7 @@ See [Roster Slot POI Integration](../../../docs/plans/roster_slot_poi_integratio
 Seguendo i passi sopra, qualsiasi nuova superficie può riprodurre **identico** comportamento drag & drop/auto-assign, evitando regressioni come quella risolta al punto 9.
 ### Header & Controls Behavior ✅
 1. ✅ **Select (Filtro)** → Unica interfaccia di filtraggio, opzioni "Tutti", "Eroi", "Feriti", "Disponibili", ecc.
-2. ✅ **Eye Toggle** → Nasconde/mostra il roster mantenendo stato `isRosterCollapsed`
+2. ✅ **Minimise Toggle** → Riduce a striscia/ripristina il roster mantenendo stato `isRosterCollapsed` (icona `−`/restore come gli altri pannelli HUD)
 3. ✅ **Collapse Button** → Solo toggle, nessuna interazione di drag
 4. ✅ **Quick Buttons Rimossi** → Nessun `ALL/HEROES/INJURED` button; usare solo select + toggle
 

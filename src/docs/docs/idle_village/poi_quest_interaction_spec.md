@@ -1,8 +1,9 @@
 ---
 title: POI ↔ Quest Interaction
-status: draft
-updated: 2026-08-14
+status: deprecated
+updated: 2026-10-19
 type: interaction-spec
+superseded-by: CTR-game-008 (`.mw/contracts/CTR-game-008.md`) — PLAN-054 T-003 triage: interazione POI quest↔detail ora coperta su `/game` da `CTR-game-008.INV-1/INV-2`
 ---
 
 # POI ↔ Quest Interaction

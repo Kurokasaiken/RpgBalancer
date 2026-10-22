@@ -11,7 +11,7 @@ mkdirSync(OUT, { recursive: true });
 
 /** Picks which numbered option to press at each step: a "reasonable player". */
 const pick = (labels: string[]): number => {
-  const prefer = [/Climb/i, /Take the loot/i, /Sneak|silent|Slip|Stealth/i, /Pursue/i, /Keep looting|Search again/i, /Fight|Assault/i];
+  const prefer = [/Climb|from above/i, /Take the loot|Recover the loot/i, /Sneak|silent|Slip|Stealth|shadows/i, /Pursue|Run them down/i, /Rummage|Keep looting|Search again/i, /Fight|Assault|Charge/i];
   for (const re of prefer) {
     const i = labels.findIndex((l) => re.test(l));
     if (i >= 0) return i;

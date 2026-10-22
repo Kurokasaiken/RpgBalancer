@@ -51,4 +51,32 @@ describe('ResidentSlotRack drag feedback', () => {
     expect(resolveSlotBloomState('invalid', true, true)).toBe('invalid');
     expect(resolveSlotBloomState('invalid', false, true)).toBe('invalid');
   });
+
+  // INV:resident-slot-rack.INV-2 — R-257: while a flight proxy carries this
+  // resident (extraction return or
+  // swap), the seat must NOT render a second identical medallion — the clear
+  // commits in a transition, so without `flyingResidentId` suppression the
+  // seat copy stays visible for the whole flight (Director: «due medaglioni»).
+  it('hides the seat medallion while its resident is airborne on a flight', () => {
+    const slotted: ResidentSlotViewModel = {
+      ...emptySlot,
+      assignedResidentId: 'hero-giggiolillo',
+    };
+
+    render(
+      <DndContext>
+        <ResidentSlotRack
+          slots={[slotted]}
+          layout="detail"
+          slotSize={64}
+          slotMaterial="hud-gold"
+          slotVariant="hud64"
+          suppressedResidentIds={['hero-giggiolillo']}
+        />
+      </DndContext>,
+    );
+
+    expect(screen.queryByTestId(`slot-medal-${slotted.id}`)).toBeNull();
+    /* Sanity: the same seat without the suppression signal shows its medal. */
+  });
 });

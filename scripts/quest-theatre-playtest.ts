@@ -71,8 +71,8 @@ interface OutsideReport {
 
 /** Bot policies: which numbered option the player prefers at each bivio. */
 const POLICIES: Record<string, RegExp[]> = {
-  greedy: [/Climb/i, /Take the loot/i, /Sneak|silent|Slip|Stealth/i, /Pursue/i, /Keep looting|Search again/i, /Fight|Assault/i, /Loot|Raid/i],
-  cautious: [/Return|Retreat|Back|Home|Leave/i, /Look for tracks/i, /Sneak|silent|Slip/i, /Fight|Assault/i],
+  greedy: [/Climb|from above/i, /Take the loot|Recover the loot/i, /Sneak|silent|Slip|Stealth|shadows/i, /Pursue|Run them down/i, /Rummage|Keep looting|Search again/i, /Fight|Assault|Charge/i, /Loot|Raid/i],
+  cautious: [/Return|Retreat|Back|Home|Leave/i, /Look for tracks|Examine the ground/i, /Sneak|silent|Slip|shadows/i, /Fight|Assault|Charge/i],
   first: [],
 };
 /** Skip policy of the bot, declared: skip at the first usable frame after the anti-double-click threshold. */

@@ -51,6 +51,12 @@ const sample = (page: Page, t0: number): Promise<Sample> =>
 test.describe('invasion scene after the confirmation', () => {
   test.use({ locale: 'en-US', viewport: { width: 1440, height: 900 } });
 
+  // INV:CTR-game-004.INV-1
+  // INV:CTR-game-004.INV-2
+  // INV:CTR-game-004.INV-3
+  // INV:CTR-game-004.INV-4
+  // INV:CTR-game-004.INV-5
+  // INV:goblin-invasion-window.INV-1
   test('one goblin at a time, a steady map, and the card folds into a ledger row that stays', async ({ page }) => {
     await page.goto('/game');
     await page.waitForFunction(() => (window as HooksWindow).__idleVillageTestHooks?.startInvasion, { timeout: 60_000 });

@@ -165,20 +165,25 @@ describe('QuestRunWindow — check options + astrolabe surface (R-199 pt.9/10, W
     }
   });
 
-  it('clicking the theatre while the astrolabe spins routes through skipToResult, then dwells and advances', () => {
+  it('clicking the theatre progresses the astrolabe — throw first, skip mid-spin — then dwells and advances', () => {
     vi.useFakeTimers();
     try {
       const { run, check } = runWithCheck();
       const beat: CheckBeat = { id: check.id, kind: 'check', check };
       const after: QuestBeat = { id: 'scene-after', kind: 'scene', nodeId: run.nodeId, title: 'After' };
       renderWindow(run, [beat, after]);
+      astroThrow.mockClear();
       astroSkip.mockClear();
       // The astrolabe lives outside the theatre now — clicking the theatre
-      // reaches the published imperative handle → settle the verdict.
+      // reaches the published imperative handle's `progress()`: the first
+      // click THROWS the ball (R-241 — the skip never eats the throw).
+      fireEvent.click(screen.getByTestId('quest-theatre'));
+      expect(astroThrow).toHaveBeenCalledTimes(1);
+      expect(astroSkip).not.toHaveBeenCalled();
+      // Ball flying → the second click skips to the verdict; the beat stays
+      // held until the player dismisses it (no timed dwell).
       fireEvent.click(screen.getByTestId('quest-theatre'));
       expect(astroSkip).toHaveBeenCalledTimes(1);
-      // Verdict painted → the beat stays held until the player dismisses it
-      // (no timed dwell): the next stage click settles it and moves on.
       fireEvent.click(screen.getByTestId('quest-theatre'));
       expect(screen.getByText('After')).toBeInTheDocument();
     } finally {

@@ -44,6 +44,7 @@ describe('residentSlotValidators', () => {
   };
 
   describe('validateResidentAssignment', () => {
+    // INV:resident-slot-validators.INV-1
     it('should validate resident with matching stat requirements', () => {
       const result = validateResidentAssignment({
         residentId: mockResident.id,

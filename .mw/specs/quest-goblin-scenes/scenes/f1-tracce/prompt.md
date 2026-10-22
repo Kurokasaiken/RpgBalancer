@@ -17,4 +17,4 @@ TRACCE — A ground-level close view of a forest floor asking to be read, a scou
 ## Generation notes
 
 - «Solo segni sul terreno» — il check non è ancora avvenuto.
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

@@ -27,7 +27,7 @@ function choose(state: QuestRunState, arm: F5Arm): string {
   const pickOpt = (id: string) => (opts.some((o) => o.id === id) ? id : (opts[0]?.id ?? 'advance'));
   switch (state.nodeId) {
     case 'gob-esplora': return pickOpt('gob-cerca-tracce');
-    case 'gob-bottino-scelta': return pickOpt('gob-prendi');
+    case 'gob-bottino': return pickOpt('gob-prendi'); // v3: take-it-all, no leave option
     case 'gob-accampamento':
       return state.flags.includes('bonusStealth') || state.flags.includes('bonusStealthPiccolo')
         ? pickOpt('gob-via-stealth') : pickOpt('gob-via-assalto');

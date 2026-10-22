@@ -386,6 +386,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     await expect(page.locator('[data-testid="drag-test-container"], [data-testid="resident-roster-panel"]').first()).toBeVisible({ timeout: 15_000 });
   });
 
+  // INV:CTR-game-008.INV-1
   test('boot: roster seedato — 3 eroi + 3 popolani — offerta fresca `available` con halo vuota', async ({
     page,
   }) => {
@@ -406,6 +407,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     await expect(poiMarker(page).locator('.poiv3_5__seal-halo path, .poiv3_5__seal-core path')).toHaveCount(0);
   });
 
+  // INV:CTR-game-008.INV-1
   test('planning: click sul marker apre il detail; «Invia» gated sugli slot required; residente non eleggibile rifiutata', async ({
     page,
   }) => {
@@ -446,6 +448,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     expect(await expedition<object | null>(page, 'getEstimate')).not.toBeNull();
   });
 
+  // INV:CTR-game-008.INV-3
   test('clock: pausa ferma il tick, ripresa lo riavvia, un solo driver a ×1', async ({ page }) => {
     const c0 = await getClock(page);
     expect(c0.isPaused).toBe(false);
@@ -469,6 +472,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     expect(after.currentTick - resumed.currentTick).toBeLessThanOrEqual(3);
   });
 
+  // INV:CTR-game-008.INV-3
   test('clock: ×4 accelera il tick rispetto a ×1', async ({ page }) => {
     await speedButton(page, 1).click();
     const t1 = (await getClock(page)).currentTick;
@@ -483,6 +487,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     expect(delta4).toBeGreaterThanOrEqual(delta1 * 2);
   });
 
+  // INV:CTR-game-009.INV-1
   test('lancio: «Invia spedizione» apre la QuestRunWindow; POI in_progress e leader «in-expedition»', async ({ page }) => {
     await launchGoblinQuest(page);
     await expect(detail(page)).toHaveCount(0);
@@ -509,6 +514,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     expect(locked.reason).toBe('in-expedition');
   });
 
+  // INV:CTR-game-008.INV-3
   test('run: la frontiera pending non matura in pausa e matura a ×4 sul clock reale', async ({ page }) => {
     await launchGoblinQuest(page);
 
@@ -537,6 +543,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     ).toBe('matured');
   });
 
+  // INV:CTR-game-008.INV-4
   test('esito: settlement applicato una volta — ricompense e destini come dati, nessun doppio settle', async ({ page }) => {
     const villageBefore = await expedition<VillageShape>(page, 'getVillage');
     const goldReadoutBefore = await goldReadoutValue(page);
@@ -611,6 +618,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     expect(villageLater.xp).toBe(villageAfter.xp);
   });
 
+  // INV:CTR-game-008.INV-4
   test('i PG tornano a casa: dopo il settle il leader è di nuovo assegnabile', async ({ page }) => {
     await launchGoblinQuest(page);
     const terminal = await driveRunToEnd(page);
@@ -653,6 +661,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     }
   });
 
+  // INV:CTR-game-008.INV-4
   test('chiusura del rapporto: il POI goblin RESTA — `repeatable`, run sganciata, riproponibile (R-200)', async ({ page }) => {
     await launchGoblinQuest(page);
     await driveRunToEnd(page);
@@ -747,6 +756,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     await expect.poll(async () => poiStatus(page), { timeout: 10_000 }).toBe('available');
   });
 
+  // INV:CTR-game-008.INV-4
   test('il POI `repeatable` torna dopo reload: run sganciata, marker di nuovo available', async ({ page }) => {
     await launchGoblinQuest(page);
     await driveRunToEnd(page);

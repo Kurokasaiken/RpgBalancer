@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-019-S2 — La quest vera: POI reali → assegnazione → motore a grafo → conseguenze su /game'
-status: active
+status: completed
 created: 2026-10-09
 revised: 2026-10-09 (v2 — cold read multi-AI web r1: 4× MAJOR REVISION → correzioni assorbite; v3 — decomposto in 5 figli S2.1…S2.5 su richiesta Director 2026-10-09 «dividilo in sub plan, linkati a questo plan, poi approfondisci plan by plan con le AI web»; questo file resta il contenitore: decisioni, invarianti, contratti condivisi, disaccordi)
 children: PLAN-019-S2.1-scenario-canonico, PLAN-019-S2.2-party-reale, PLAN-019-S2.3-offerta-scaling, PLAN-019-S2.4-planning-lancio, PLAN-019-S2.5-settlement-e2e

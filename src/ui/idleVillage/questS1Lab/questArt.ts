@@ -60,7 +60,6 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-esplora': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
-  'gob-bottino-scelta': { src: '/assets/scene-library/carro-nascosto.jpg', fit: 'cover' },
   'gob-bottino': { src: '/assets/scene-library/carro-nascosto.jpg', fit: 'cover' },
   'gob-accampamento': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'gob-stealth': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },

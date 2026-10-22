@@ -145,9 +145,109 @@ export const MINIERA_VOCAB: DomainVocab = {
   vietatiEn: ['sea', 'wave', 'tide', 'mud', 'swamp', 'peat', 'horse', 'gallop', 'desert', 'dune', 'open sky'],
 };
 
+/**
+ * BOSCO_GOBLIN_VOCAB — dominio della quest authored «Sterminio dei Goblin»
+ * (scenarios/goblin.ts). Trascritto da `quest_sterminio_goblin_spec.md` v3
+ * (Director 2026-10-18): il bosco apre e chiude l'arco, i campanelli sono
+ * l'allarme del campo, il trofeo si converte in ricompensa al ritorno.
+ * GUADO e MASSO revocati dal Director 2026-10-18 — stanno in `vietati`
+ * così il gate li blocca meccanicamente. Usato dal refine pipeline
+ * (`scripts/questRefine.mts`) per gate e critic sul copy.
+ */
+export const BOSCO_GOBLIN_VOCAB: DomainVocab = {
+  id: 'bosco-goblin',
+  label: 'Bosco dei goblin',
+  contractPitch:
+    'Una banda di goblin ha messo radici nel bosco: si paga in sangue nel campo, e il bosco riscuote ciò che il campo non ha pagato.',
+  creatureAmmissibili: ['goblin del bosco', 'sentinella goblin', 'branco di goblin in fuga'],
+  creatureAmmissibiliEn: ['wood goblin', 'goblin sentry', 'fleeing goblin band'],
+  ruoli: {
+    autoritaContratto: ['il consiglio del villaggio', 'il capo dei cacciatori'],
+    stakeholderEconomico: ['i boscaioli', 'i raccoglitori del villaggio'],
+    testimoneComune: ['il carbonaio', 'il guardaboschi'],
+  },
+  luoghi: [
+    'il sentiero nel bosco',
+    'l’accampamento goblin',
+    'il nascondiglio sotto la tela cerata',
+    'la radura',
+    'il filo dei campanelli',
+    'la vecchia quercia',
+    'la pietraia',
+  ],
+  props: [
+    'la tela cerata',
+    'il filo dei campanelli',
+    'il fagotto di bottino',
+    'la palizzata di pali storti',
+    'il trofeo dei goblin',
+    'il telo semibruciato',
+    'le lance dei goblin',
+  ],
+  cicli: ['le razzie nel bosco', 'il fumo basso del campo', 'la fuga tra gli alberi'],
+  pericoliAmbientali: ['frecce dal sottobosco', 'trappole tra le tende', 'rami che cedono', 'radici e foglie marcite', 'rocce scivolose'],
+  tracceAmmissibili: [
+    'orme nella terra umida',
+    'rami spezzati all’altezza sbagliata',
+    'un filo di fumo tra i tronchi',
+    'un ciuffo d’erba che oscilla senza vento',
+    'un lembo di tela sotto fronde troppo regolari',
+    'campanelli tesi tra i rami',
+  ],
+  coerenza: [
+    'il bosco apre e chiude la quest: la minaccia vive tra gli alberi — niente guado, niente strada dei mercanti',
+    'i goblin sono carne e fango: niente magia, niente portali — allarmi a campanelli e trappole di fortuna',
+    'i goblin superstiti tornano per rabbia e vendetta — aspettano il party, non «si riorganizzano»',
+    'il pericolo differito è reale: ciò che fuggi torna — mai promettere morte dove il modello non uccide',
+    'il rischio sta in coda alla formazione: chi copre paga, chi guida vede',
+    'le opzioni nominano il gesto, mai lo scopo né l’esito — il detail porta la stat, non la spiegazione',
+  ],
+  vietati: [
+    'mare',
+    'onda',
+    'marea',
+    'miniera',
+    'galleria',
+    'deserto',
+    'duna',
+    'cavallo',
+    'galoppo',
+    'magia',
+    'incantesimo',
+    'mago',
+    'portale',
+    'guado',
+    'strada',
+    'carro',
+    'mercante',
+    'masso',
+  ],
+  vietatiEn: [
+    'sea',
+    'wave',
+    'tide',
+    'mine',
+    'gallery',
+    'desert',
+    'dune',
+    'horse',
+    'gallop',
+    'magic',
+    'spell',
+    'wizard',
+    'portal',
+    'ford',
+    'road',
+    'wagon',
+    'merchant',
+    'boulder',
+  ],
+};
+
 export const DOMAIN_VOCABS: Readonly<Record<string, DomainVocab>> = {
   [PASSO_MONTANO_VOCAB.id]: PASSO_MONTANO_VOCAB,
   [PALUDE_VOCAB.id]: PALUDE_VOCAB,
   [MARE_VOCAB.id]: MARE_VOCAB,
   [MINIERA_VOCAB.id]: MINIERA_VOCAB,
+  [BOSCO_GOBLIN_VOCAB.id]: BOSCO_GOBLIN_VOCAB,
 };

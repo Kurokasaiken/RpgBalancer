@@ -1,3 +1,8 @@
+// DEPRECATED (PLAN-054 T-003, 2026-10-19): suite del vecchio harness
+// `/poi-quest-detail-roster-time-clock`, non più superficie canonica.
+// Le famiglie `job`/`training`/`maintenance`/`cooldown` non esistono su `/game`
+// (deprecated); lo scenario "no auto-start mentre in pausa" è coperto da
+// `CTR-game-008.INV-3`. Conservata come riferimento storico finché la route esiste.
 import { test, expect, Page } from '@playwright/test';
 
 async function waitForTestHooks(page: Page) {

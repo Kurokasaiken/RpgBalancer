@@ -1,8 +1,9 @@
 ---
 title: POI Training Spec
-status: draft
-updated: 2026-08-15
+status: deprecated
+updated: 2026-10-19
 type: component-spec
+superseded-by: nessuna — PLAN-054 T-003 triage: famiglia `training` mai rilasciata su `/game`, esclusiva del vecchio harness `/poi-quest-detail-roster-time-clock`
 ---
 
 # POI Training Spec

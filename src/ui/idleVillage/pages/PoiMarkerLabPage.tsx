@@ -29,7 +29,7 @@ import PoiMarkerRunicV5, { poiRunicV5Styles } from '../components/poi/PoiMarkerR
 import PoiMatericV1, { poiMatericV1Styles } from '../components/poi/PoiMatericV1';
 import PoiMatericV2, { poiMatericV2Styles } from '../components/poi/PoiMatericV2';
 import PoiMatericV3, { poiMatericV3Styles } from '../components/poi/PoiMatericV3';
-import PoiMatericV3_5, { poiMatericV3_5Styles } from '../components/poi/PoiMatericV3_5';
+import PoiMatericV3_5, { poiMatericV3_5Styles, type PoiSigilloTheme } from '../components/poi/PoiMatericV3_5';
 import PoiMatericV3_6, { poiMatericV3_6Styles } from '../components/poi/PoiMatericV3_6';
 import PoiMatericV3_7, { poiMatericV3_7Styles } from '../components/poi/PoiMatericV3_7';
 import PoiMatericV3_8, { poiMatericV3_8Styles } from '../components/poi/PoiMatericV3_8';
@@ -72,6 +72,53 @@ const MARKERS: Record<Variant, React.FC<PoiMarkerProps>> = {
   runicV3: PoiMarkerRunicV3,
   runicV5: PoiMarkerRunicV5,
 };
+
+/** Real painted glyphs for the Sigillo fork — one per family, never the cross fallback. */
+const FORK_MARKERS: ReadonlyArray<{ type: PoiType; iconUrl: string }> = [
+  { type: 'quest', iconUrl: '/assets/ui/poi/poi-goblin-camp-128.webp' },
+  { type: 'job', iconUrl: '/assets/ui/poi/offer-forage-128.webp' },
+  { type: 'event', iconUrl: '/assets/ui/poi/threat-invasion-128.webp' },
+];
+
+/**
+ * Sigillo visual-fork candidates (PLAN-043-S11, batch B4-map): baseline plus
+ * three directions auditioned side by side — nothing is chosen in advance and
+ * production keeps the baseline until the Director rules.
+ */
+interface SigilloForkCandidate {
+  id: 'baseline' | 'metals' | 'field' | 'shape';
+  reveal: 'baseline' | 'settle' | 'stamp';
+  theme?: PoiSigilloTheme;
+  themeByType?: Partial<Record<PoiType, PoiSigilloTheme>>;
+}
+
+const SIGILLO_FORK_CANDIDATES: ReadonlyArray<SigilloForkCandidate> = [
+  { id: 'baseline', reveal: 'baseline' },
+  {
+    id: 'metals',
+    reveal: 'baseline',
+    themeByType: {
+      quest: {}, // quest keeps the canonical brass ramp
+      job: { rimColors: ['#aeb9c8', '#6b7684', '#333a44'] }, // steel-blue iron for jobs
+      event: { rimColors: ['#e8a05f', '#b0562e', '#4a2412'] }, // bright copper for events
+    },
+  },
+  {
+    id: 'field',
+    reveal: 'settle',
+    theme: { stoneColors: ['#6b5636', '#2e2213'], borderInner: '#cbb98e', borderInnerPx: 1.2 },
+  },
+  {
+    id: 'shape',
+    reveal: 'stamp',
+    theme: { haloFollowsSilhouette: true, borderInner: '#d8bd78', borderInnerPx: 1.2 },
+  },
+];
+
+/** Use size on the real map: the Sigillo's authored base, class M. */
+const FORK_SIZE_PX = 55;
+/** Progress held for every fork marker so the halo is judged mid-writing. */
+const FORK_PROGRESS = 0.62;
 
 /** Placements over the map, in percentages of the viewport. */
 const MAP_PLACEMENTS: Array<{ id: string; type: PoiType; state: PoiState; top: string; left: string; time?: boolean }> = [
@@ -155,6 +202,15 @@ export const PoiMarkerLabPage: React.FC = () => {
   /** Grounding shadow is opt-in on the marker, so the lab exposes it as a toggle. */
   const [grounded, setGrounded] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  /** B4-map fork: value-separation check and reveal replay.
+   *  Pins stay mounted — remounting them would repaint twelve canvas textures in
+   *  the same frame the reveal runs, which reads as jank, not as choreography. */
+  const [forkGrayscale, setForkGrayscale] = useState(false);
+  const [forkRevealed, setForkRevealed] = useState(true);
+  const replayFork = useCallback(() => {
+    setForkRevealed(false);
+    requestAnimationFrame(() => requestAnimationFrame(() => setForkRevealed(true)));
+  }, []);
 
 
   const timerDirection = counterClockwise ? 'counterclockwise' : 'clockwise';
@@ -324,6 +380,102 @@ export const PoiMarkerLabPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Sigillo visual fork — PLAN-043-S11 B4-map: baseline + candidates on the
+          painted surface at use size, colour and grayscale. Lab only. */}
+      <section className="poi-lab__fork" aria-label={label('fork.title')}>
+        <div className="poi-lab__fork-head">
+          <h2>{label('fork.title')}</h2>
+          <p>{label('fork.subtitle')}</p>
+          <div className="poi-lab__fork-controls">
+            <label className="poi-lab__toggle">
+              <input
+                type="checkbox"
+                checked={forkGrayscale}
+                onChange={(e) => setForkGrayscale(e.target.checked)}
+              />
+              <span>{label('fork.grayscale')}</span>
+            </label>
+            <button
+              type="button"
+              className="poi-lab__fork-replay"
+              onClick={replayFork}
+            >
+              {label('fork.replay')}
+            </button>
+          </div>
+        </div>
+        <div
+          className="poi-lab__fork-stage"
+          data-grayscale={forkGrayscale}
+          data-testid="sigillo-fork-stage"
+        >
+          <img
+            className="poi-lab__map poi-lab__map--static"
+            src={encodeURI('/map orizzontale.png')}
+            alt=""
+            aria-hidden="true"
+          />
+          <div className="poi-lab__fork-row">
+            {SIGILLO_FORK_CANDIDATES.map((candidate) => (
+              <div
+                key={candidate.id}
+                className="poi-lab__fork-col"
+                data-testid={`sigillo-fork-${candidate.id}`}
+              >
+                <div className="poi-lab__fork-markers">
+                  {FORK_MARKERS.map((forkMarker, markerIndex) => (
+                    <div
+                      key={forkMarker.type}
+                      className={`poi-lab__fork-pin poi-lab__fork-pin--${candidate.reveal}${forkRevealed ? ' is-in' : ''}`}
+                      style={{ ['--fork-delay' as string]: `${markerIndex * 120}ms` }}
+                    >
+                      <PoiMatericV3_5
+                        sigillo
+                        type={forkMarker.type}
+                        state="assigned"
+                        progress={FORK_PROGRESS}
+                        size={FORK_SIZE_PX}
+                        iconUrl={forkMarker.iconUrl}
+                        timerDirection={timerDirection}
+                        grounded={grounded}
+                        sigilloTheme={candidate.themeByType?.[forkMarker.type] ?? candidate.theme}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="poi-lab__fork-label">{label(`fork.candidates.${candidate.id}`)}</div>
+                <div className="poi-lab__fork-caption">{label(`fork.captions.${candidate.id}`)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Detail strip: the same candidates enlarged on a neutral field, so the
+            deltas the map size makes subtle stay legible. */}
+        <div className="poi-lab__fork-detail" data-grayscale={forkGrayscale}>
+          {SIGILLO_FORK_CANDIDATES.map((candidate) => (
+            <div key={`detail-${candidate.id}`} className="poi-lab__fork-detail-col">
+              <div className="poi-lab__fork-detail-markers">
+                {FORK_MARKERS.map((forkMarker) => (
+                  <PoiMatericV3_5
+                    key={forkMarker.type}
+                    sigillo
+                    type={forkMarker.type}
+                    state="assigned"
+                    progress={FORK_PROGRESS}
+                    size={130}
+                    iconUrl={forkMarker.iconUrl}
+                    timerDirection={timerDirection}
+                    grounded={grounded}
+                    sigilloTheme={candidate.themeByType?.[forkMarker.type] ?? candidate.theme}
+                  />
+                ))}
+              </div>
+              <div className="poi-lab__fork-label">{label(`fork.candidates.${candidate.id}`)}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="poi-lab__matrix" aria-label={label('matrix')}>
         <h2>{label('matrix')}</h2>
         <div className="poi-lab__grid">
@@ -450,6 +602,69 @@ const labPageStyles = `
 .poi-lab__reference { margin-top: 32px; padding: 16px; border: 1px solid #2b2f27; border-radius: 8px; background: #0f1208; }
 .poi-lab__reference h2 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin: 0 0 12px; }
 .poi-lab__reference-body { padding: 16px; border-radius: 6px; background: radial-gradient(circle at 50% 40%, #2b3327, #151a13); }
+
+/* Sigillo visual fork (B4-map) */
+.poi-lab__fork { margin-top: 32px; }
+.poi-lab__fork-head h2 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin: 0 0 6px; }
+.poi-lab__fork-head p { font-size: 12px; opacity: .55; margin: 0 0 10px; max-width: 72ch; }
+.poi-lab__fork-controls { display: flex; gap: 16px; align-items: center; margin-bottom: 10px; }
+.poi-lab__fork-replay {
+  background: #1c211a; color: #ddd6c2; border: 1px solid #333a2e;
+  border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer;
+}
+.poi-lab__fork-stage {
+  position: relative; height: 340px; border: 1px solid #2b2f27; border-radius: 8px;
+  overflow: hidden; background: #172019;
+}
+.poi-lab__fork-stage[data-grayscale="true"] { filter: grayscale(1); }
+.poi-lab__fork-row {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-evenly;
+}
+.poi-lab__fork-col { display: grid; gap: 10px; justify-items: center; }
+.poi-lab__fork-markers { display: flex; gap: 18px; align-items: center; }
+.poi-lab__fork-label {
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 4px; background: rgba(10, 12, 9, .72); color: #e7e1cf;
+}
+.poi-lab__fork-caption {
+  font-size: 10px; opacity: .7; padding: 2px 10px; border-radius: 4px;
+  background: rgba(10, 12, 9, .6); color: #cfc8b2; max-width: 220px; text-align: center;
+}
+/* Detail strip: enlarged twins on a neutral field so deltas stay legible. */
+.poi-lab__fork-detail {
+  margin-top: 12px; padding: 16px; border: 1px solid #2b2f27; border-radius: 8px;
+  background: radial-gradient(circle at 50% 35%, #232a20, #12160f);
+  display: flex; align-items: flex-end; justify-content: space-evenly; gap: 24px; flex-wrap: wrap;
+}
+.poi-lab__fork-detail[data-grayscale="true"] { filter: grayscale(1); }
+.poi-lab__fork-detail-col { display: grid; gap: 10px; justify-items: center; }
+.poi-lab__fork-detail-markers { display: flex; gap: 22px; align-items: center; }
+.poi-lab__fork-detail .poi-lab__fork-label { background: #1c211a; }
+/* Reveal choreography: transitions on mounted pins (no remount → no canvas repaint jank). */
+.poi-lab__fork-pin { will-change: transform, opacity; }
+.poi-lab__fork-pin--baseline { opacity: 0; transform: scale(.7); }
+.poi-lab__fork-pin--baseline.is-in {
+  opacity: 1; transform: none;
+  transition: opacity .3s ease-out var(--fork-delay, 0ms), transform .45s ease-out var(--fork-delay, 0ms);
+}
+.poi-lab__fork-pin--settle { opacity: 0; transform: translateY(-10px) scale(.92); }
+.poi-lab__fork-pin--settle.is-in {
+  opacity: 1; transform: none;
+  transition: opacity .25s ease-out var(--fork-delay, 0ms), transform .55s cubic-bezier(.25, .9, .3, 1.05) var(--fork-delay, 0ms);
+}
+.poi-lab__fork-pin--stamp { opacity: 0; transform: scale(1.4); }
+.poi-lab__fork-pin--stamp.is-in {
+  opacity: 1; transform: none;
+  transition: opacity .12s ease-in var(--fork-delay, 0ms), transform .35s cubic-bezier(.3, .8, .35, 1) var(--fork-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .poi-lab__fork-pin--baseline,
+  .poi-lab__fork-pin--settle,
+  .poi-lab__fork-pin--stamp,
+  .poi-lab__fork-pin--baseline.is-in,
+  .poi-lab__fork-pin--settle.is-in,
+  .poi-lab__fork-pin--stamp.is-in { opacity: 1; transform: none; transition: none; }
+}
 `;
 
 export default PoiMarkerLabPage;

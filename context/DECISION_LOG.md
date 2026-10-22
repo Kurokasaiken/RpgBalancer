@@ -1397,3 +1397,82 @@ marker dorato delle quest, che al click apre la schermata di preparazione.
 **Motivo:** evidenza E2E — drop annunciato sul target corretto ma sedile sorgente vuoto nello snapshot; la guardia di commit lavorava su stato già corrotto dal gesto stesso. Pattern completo: `.mw/runs/20261017-learn-ws0ws1-slot-drag-evidence/pattern-candidate.md` (cancel-vs-reset, event-ordered evidence, gesture-retry).
 **Nota su `commitSwap`:** la guardia fase al landing si applica al **solo sedile target** — il decay del cancel sulla sorgente tiene `isExtracting` fino a ~300ms post-drop e mangerebbe lo swap che il drag-end gate aveva già validato.
 **Fonte:** `src/ui/idleVillage/components/ResidentSlotRack.tsx`, `useQuestExpeditionSession.tsx`, evidenza `test-results/plan-043/ws0ws1/` (bundle: tutte le obbligazioni automatizzate PASS).
+
+## 2026-10-18 — Drag overlay e geometria volo: lezione stacking context + cell-vs-component
+
+**Da:** due bug "ottici" del planner trattati come problemi di valore (z-index troppo basso, offset da correggere).
+**A:** entrambi erano problemi di **contesto/selettore**, non di valore: (1) lo z-index del DragOverlay non usciva dallo stacking context dell'antenato fixed z=12 → fix = portal a `document.body`, non un valore più alto; (2) il target di volo puntava la cella rack `[data-slot-id]` (caption+footer) invece del wrapper `slot-button-*` → helper condiviso `getSlotComponentElement` per drop/click-assign/return/swap.
+**Motivo:** witness headless: ghost invisibile sopra Forecast malgrado z=10000 (probe: antenato z=12 = soffitto); volo atterrava ~10px sotto il castone (cella 64×84 vs slot 64×64). Dopo i fix: overlay su body, minimumError centro-centro = 0px.
+**Terzo pattern (tooling):** dev server Vite ha servito transform cache stale due volte (route App.tsx assente, gameFrameConfig post mid-edit altrui) → diagnosi sempre sul modulo servito (`curl`), `touch` come fix.
+**Fonte:** `.mw/runs/20261018-quest-planner-drag-feedback/pattern-candidate.md` → traps T-16, T-17 in `context/recurring-traps.md`.
+
+## 2026-10-18 — Trust anchor: il lock nel repo è diagnostico, il ledger fuori-repo è l'ancora
+
+**Da:** PLAN-051 T-002/T-003 originale prevedeva `trusted.lock.json` committato come meccanismo anti-drift su gate-file/bundler/config — "se l'hash cambia, il gate lo vede".
+**A:** un lock scrivibile dall'agente è falsificabile (file protetto + lock riscritti nello stesso commit → drift zero). Il lock resta diagnostico; l'ancora è il ledger append-only fuori-repo (`~/.rpg-approvals/ledger.jsonl`) scritto solo da `npm run approve`. Semantica **strict-once-established**: dal primo record `trust-set`, `checkTrustedLock` confronta l'aggregato dei contenuti protetti col ledger, non il lock col worktree. Prima del primo approve: fail-open documentato (nota, non silenzio).
+**Motivo:** obiezione claude nel dibattito R-220 (artifact-r003→r004) — corretta e incorporata; bound onesto residuo: stesso account può scrivere il ledger (circumvention deliberata), il confine vero arriva con firma GPG/SSH su chiave Director.
+**Fonte:** `mind-weaver/.mw/runs/20261018-verify-roi/artifact-r004.md` + `.mw/runs/learn-plan051-20261018-1715/pattern-candidate.md` (pattern A).
+
+## 2026-10-18 — Preview Devin Desktop: scheda interna ≠ finestra foreground; proxy sulla ROOT
+
+**Da:** semantica regola 16 applicata larga — la preview di un fork visivo andava "aperta manualmente dal Director" perché ogni apertura automatica era considerata finestra foreground; e si assumeva che `browser_preview` accettasse un URL con path.
+**A:** (1) la scheda Preview dentro Devin Desktop è la superficie prevista dal Director — auto-open via `browser_preview` consentito e voluto (ruling Director 2026-10-18); regola 16 copre solo finestre/app esterne. (2) `browser_preview` va registrato sulla ROOT del dev server: il proxy path-scoped inoltra solo il documento registrato e serve `index.html` per gli asset sub-path → pagina bianca. Per aprire una route si usa un redirect-stub (`/` → 302 route).
+**Motivo:** bug reale in dry-run PLAN-047 — preview bianca confermata headless attraverso il proxy (`#root` vuoto); Director ha corretto la semantica chiedendo l'apertura automatica.
+**Fonte:** `.mw/bugs/20261018-devin-preview-white/` + `.mw/runs/learn-plan047-preview-20261018/pattern-candidate.md` → trappola T-19 in `context/recurring-traps.md`.
+
+## 2026-10-18 — Quest goblin v3: guado revocato, detail non-spoiler, epicfail cablato
+
+**Da:** manoscritto v3 (R-219, Director 2026-10-18) — le 11 correzioni hanno richiesto tre ruling che il documento non poteva risolvere da solo.
+**A:** (1) **Guado/strada dei mercanti revocati** dalla fiction della quest (spec, `QUEST_RULES.md` §7b, `contract-v1.json`, `domainVocabs.ts`): il Director ha detto «nn ho mai parlato del guado, nn c deve essere» — la nota 2026-10-08 che lo citava è corretta in loco. `GUADO_VOCAB` → `BOSCO_GOBLIN_VOCAB` (id `bosco-goblin`) con `guado/strada/carro/mercante/masso` in `vietati` → il gate li blocca meccanicamente. (2) **`option.detail` resta obbligatorio ma non-spoiler**: stat + gesto, mai scopo né esito («Perception. You crouch among the roots.»); convenzione scritta in spec (regola 8 + tabella campi), `CRITIC_CONVENTIONS` e nuova classe critic `outcome-spoiler`. (3) **Epicfail di `gob-tracce-per` cabla il danno** (−10 HP, lama nascosta) invece di ammorbidire il flavor. (4) **F2 = choice a opzione unica** («Recover the loot» → next diretto): nessun `kind:'reward'` né campo `action` nello schema.
+**Motivo:** verbatim Director; l'analisi «le tue critiche sono previste dalla pipeline?» ha mostrato che guado/masso erano `lockedFact` del contratto stale — revocarli nel contratto e nei `vietati` impedisce alla pipeline di rigenerarli.
+**Riaprire se:** il Director decide diversamente su arte F1/F2 stale (carro/solchi di ruota — regen pendente) o sulla forma del nodo reward (se mai servirà `kind:'reward'` per nodi senza alcuna opzione).
+**Fonte:** `quest_sterminio_goblin_spec.md` v3 + «Delta rimasti», `.mw/specs/quest-goblin-narration/contract-v1.json`, `.mw/runs/20261018-learn-goblin-v3/pattern-candidate.md`.
+
+## 2026-10-19 — PLAN-053 rollback policy: solo feature flag
+
+**Da:** decisione-due del piano §3 — in caso di ritiro della feature journey, cosa succede ai run salvati in volo (stato `returning`)?
+**A:** **solo `questJourneyEnabled`**: spento → nessun nuovo lancio journey, i run in volo completano sul codice shippato per una release. Lo shim hydrate-time (`returning → ended, settle now` su `engineSchemaVersion < N_journey`) è **scartato** dal contratto di T-003 — rete di emergenza da rivalutare solo se serve davvero.
+**Motivo:** ruling Director 2026-10-19 (opzione «solo interruttore»): il party a metà strada finisce il viaggio, non il teletrasporto a casa.
+**Fonte:** `plans/PLAN-053-quest-journey-legs.md` §3.
+
+## 2026-10-19 — PLAN-053 XP su wipe-in-ritorno: nessun XP
+
+**Da:** decisione-due del piano §3 — DQ-3-α copre il loot (encumbered perso su wipe) ma non l'XP del caso «successo al POI → wipe durante il ritorno».
+**A:** **no XP**. Coerente con DQ-1 (residenti bloccati fino all'arrivo): la quest non è finita finché il party non torna al villaggio. Il default provvisorio pinnato dal test T-003 diventa definitivo — nessun update al test nel PR del ruling.
+**Motivo:** ruling Director 2026-10-19.
+**Fonte:** `plans/PLAN-053-quest-journey-legs.md` §3; alternativa scartata: XP pieno/parziale (il verdetto al POI resta nel report come doppio-verdetto, ma non premia).
+
+## 2026-10-19 — OPEN-016 ratificata: macro-piano E-16 come direzione
+
+**Da:** OPEN-016 `open` dal 2026-10-07 — il macro-piano narrativo del mondo proposto dall'AI (E-16: Foundation → simulazione → storia → legacy cross-run) attendeva ratifica; gate di T7 (archi narrativi) in PLAN-026.
+**A:** **ratifica piena E-16** — il macro-piano diventa autorità di direzione. Registrata la tensione nota (ingestion §11): la sequenza operativa vs v24/PLAN-019 (E-16 propone la simulazione mondo prima della quest vera) si fissa nel piano operativo di T7, non qui — la ratifica è di direzione, non di ordinamento. I numeri della bozza (2–4 ore, 8–10 PG, ~10 pattern) restano non-target.
+**Motivo:** ruling Director 2026-10-19 su presentazione delle opzioni (ridotta / piena / aperta).
+**Fonte:** `context/OPEN.md` OPEN-016, `context/ingestions/2026-10-07-registro-narrativo-del-mondo.md` E-16/E-18, `plans/PLAN-026-quest-generation.md` P7.
+
+## 2026-10-19 — R-119 risolta: invasione ripristinata al reload (opzione A)
+
+**Da:** residuo BV-4 di PLAN-033 — il record affermava «il clock di /game non si reidrata al reload», premessa su cui la wipe-on-open di `invasion_v1` era stata decisa il 2026-10-14.
+**A:** **opzione A — ripristino.** Indagine root-cause: la premessa era stale, `initializeMinimalGameplayStore` reidrata `currentDay`/`currentTick` al save-time. Implementato: `invasion_v1` letto solo dopo hydration (marker alla posizione salvata, niente scatto), rimossa la wipe-on-open, `invasionLoadedRef` copre il write-effect finché il read non chiude; teatro mai replicato (reload a metà sequenza → post-conferma). Spec `gameInvasionMarch.spec.ts` 4/4.
+**Motivo:** ruling Director 2026-10-19 («a») su presentazione opzioni A ripristino / B wipe-come-design / C restore-completo.
+**Fonte:** `context/GAME_INVASION_SEQUENCE.md`, `.mw/runs/PLAN-033/bv/record.md`, `src/pages/game-frame-pixi.tsx`.
+
+## 2026-10-20 — Convenzione review page per ruling Director (R-236) + preview-churn
+
+**Da:** il materiale per i gate Director era sparso in `.md` + directory di screenshot; il Director testava su dev server che HMR ricaricava sotto le scritture di sessioni parallele.
+**A:** (1) gate **decisionali** → review page statica con immagini nella sidebar (`.mw/review/<round>/index.html`, generatore `build-review.mts`, server dedicato); gate **visuali/esperienziali** → accumulati e differiti al giro dedicato. (2) Serving: mai `http.server` sulla repo root (serve la `index.html` di vite → pagina bianca) — sempre directory dedicata + symlink per gli asset esterni. (3) «La pagina si aggiorna di continuo» su worktree condiviso = HMR che lavora, non un bug — verificare `find -newermt` prima di diagnosticare; per test del Director usare snapshot congelato (build + preview su porta dedicata). Sibling di P-005 (superficie nel browser ≠ ciò che credi: churn live vs bundle stantio) — seconda istanza → promuovere a trappola se ricorre.
+**Motivo:** verbatim Director «chiudi tutto quello che aspetta una mia decisione visiva» + «le cose come G05 voglio che siano aperte in un bel file, cn immagini, ecc nella barra laterale, nn un .md»; debug pagina bianca preview.
+**Fonte:** `RICHIESTE.md` R-236, `plans/PLAN-068-director-review-round.md` §convenzione, `.mw/runs/learn-20261020-2115/pattern-candidate.md`.
+
+## 2026-10-21 — La famiglia «la superficie di verifica non è quella dell'utente» si estende al runtime (P-007)
+
+**Da:** la famiglia P-005 copriva superfici *sbagliate* per stato (bundle stantio) o movimento (HMR churn): la verifica mentiva perché guardava un'istanza diversa dal codice atteso.
+**A:** il divario può essere di **ambiente**: il `vite preview` minificato e il dev server differiscono per costo runtime (`jsxDEV`, scheduling) di un fattore 2-3× — una metrica di latenza verde su preview non garantisce nulla su ciò che il Director percepisce in dev. Regola proposta (P-007): misura percettiva sul runtime del sintomo; marker di test = elemento che l'utente vede. Corollario tecnico nuovo: il commit React può essere bypassato per il primo paint (warm-mount + DOM flip + handoff `useLayoutEffect`).
+**Motivo:** R-238 — suite E2E verde (376-431 ms) mentre il Director misurava 510-732 ms in dev; il fix del residuo è stato il flip istantaneo (181-214 ms), non una ricalibratura del test.
+**Fonte:** `.mw/runs/learn-20261021-1404/pattern-candidate.md`, `.mw/bugs/20261021-game-first-interaction/bug.md`, `PROPOSALS.md` P-007.
+
+## 2026-10-22 — Convenzione striscia: lo stato espanso possiede la geometria (R-251 bis)
+
+**Da:** la striscia minimizzata compensava la posizione dei controlli per avvicinarsi a quella dell'header espanso — soluzione rifiutata dal Director («La tua soluzione nn andava bene»).
+**A:** l'invariante geometrica vive nello **stato espanso**: la title row usa gli stessi content-inset della striscia (placca `panel` 10px + riga `paddingInline '12px 8px'` = content box 22/18 della `hang` `10px 18px`). Il collapse cambia il glifo del toggle, mai la geometria — misurato dx=0/dy=0 su chest/toggle/close. Caveat di misura: `-2px` sotto il cursore = `--skin-btn-hover-lift`, non disallineamento. Convenzione cross-pannello in `hud_component_guide` §«Pannello ridotto a striscia», trappola **T-23**.
+**Motivo:** ruling Director 2026-10-21 verbatim.
+**Fonte:** `RICHIESTE.md` R-251, `.mw/runs/learn-20261022-stash-strip/pattern-candidate.md`, `context/recurring-traps.md` T-23.

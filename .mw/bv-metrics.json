@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-10-18T14:47:27.224Z",
+  "baseline_boundary": "2026-10-17T20:27:40.839Z",
+  "closures": {
+    "total": 36,
+    "pre": 27,
+    "post": 9
+  },
+  "dispositions": {
+    "total": 11,
+    "pre": 0,
+    "post": 11
+  },
+  "director_dispositions_per_closure": {
+    "pre": 0,
+    "post": 1.2222222222222223
+  },
+  "awaiting_director_wait_minutes": {
+    "samples": 0,
+    "pending": 0,
+    "median": null,
+    "max": null,
+    "floor_minutes": 5
+  },
+  "found_by": {
+    "agent-bv": 1
+  },
+  "reg_without_found_by": 0,
+  "zero_defect_closures": 33,
+  "seeds": {
+    "total": 2,
+    "by_kind": {
+      "defect": 1,
+      "mismapping": 1
+    },
+    "by_detected_by": {
+      "gate": 1,
+      "none": 1
+    }
+  },
+  "trend": {
+    "volume_ok": false,
+    "dispositions_descending": false,
+    "foundby_director_non_increasing": null,
+    "wait_above_floor": null,
+    "verdict": "INSUFFICIENT_DATA",
+    "notes": [
+      "volume insufficiente: 9 closure post-baseline (<10) e 0.8 giorni (<14)",
+      "found-by:director non misurabile (pochi difetti con found-by — zero_defect_closures alto?)"
+    ]
+  }
+}

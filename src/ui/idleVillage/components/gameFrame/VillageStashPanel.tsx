@@ -1,13 +1,11 @@
-import React, { useMemo, type CSSProperties } from 'react';
+import React, { useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DragOverlay, useDndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives/HudPlaque';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
 import { EngravedIcon } from './engravedIcons';
 import { useHudPanelDrag } from './useHudPanelDrag';
 import { villageStashViewModel, type VillageStashRowView } from './villageStashViewModel';
 import { VillageStashItemIcon } from './villageStashItemIcons';
-import { STASH_DROPZONE_ID, readStashDragPayload, stashItemDragId } from './stashDnd';
 import {
   countReservations,
   reservedElsewhereCount,
@@ -19,14 +17,13 @@ import type { VillageStashConfig } from '@/balancing/config/idleVillage/villageS
 /**
  * VillageStashPanel — the village warehouse shelf (PLAN-032 SP-2, PLAN-073).
  *
- * Dual-mode by contract (Director ruling, artifact-r003):
- * - **Planner-bound** (`activeStashOwner` set): rows are real buttons and
- *   draggables — a click assigns the item to that planner's first free bag
- *   slot, a drag onto a bag slot assigns/swaps, and the whole shelf accepts
- *   bag items dragged back (release). Rows whose stock is fully reserved
- *   leave the shelf and return when released.
+ * Dual-mode by contract (Director ruling, artifact-r003; R-246 click-only):
+ * - **Planner-bound** (`activeStashOwner` set): rows are real buttons —
+ *   a click assigns the item to that planner's first free bag slot.
+ *   Rows whose stock is fully reserved leave the shelf and return when
+ *   released.
  * - **Read-only** (no bound planner): a plain `role="list"` — no buttons,
- *   no drag attributes, no mutation affordances. The shelf still shows real
+ *   no mutation affordances. The shelf still shows real
  *   derived availability, and a «N elsewhere» counter explains the global
  *   pool. `hydration !== 'ready'` degrades to the same read-only surface.
  *
@@ -95,15 +92,15 @@ const rowChrome = (interactive: boolean): CSSProperties => ({
         borderRadius: 6,
         background: 'none',
         color: 'inherit',
-        cursor: 'grab',
+        cursor: 'pointer',
       }
     : {}),
 });
 
 /**
- * A planner-bound shelf row: click assigns to the first free bag slot and the
- * whole row is the `stash-item:*` draggable. After a successful assign the
- * focus lands on the filled bag slot — deterministic, never to body.
+ * A planner-bound shelf row: a click assigns to the first free bag slot.
+ * After a successful assign the focus lands on the filled bag slot —
+ * deterministic, never to body.
  */
 const InteractiveStashRow: React.FC<{
   row: VillageStashRowView;
@@ -111,14 +108,10 @@ const InteractiveStashRow: React.FC<{
   const { t } = useTranslation('idleVillage');
   const owner = useVillageStashStore((s) => s.activeStashOwner);
   const assign = useVillageStashStore((s) => s.assign);
-  const drag = useDraggable({ id: stashItemDragId(row.itemId), data: { kind: 'stash-item', itemId: row.itemId } });
   return (
     <div role="listitem">
       <button
         type="button"
-        ref={drag.setNodeRef}
-        {...drag.listeners}
-        {...drag.attributes}
         data-testid={`stash-item-${row.itemId}`}
         aria-label={t('gameFrame.stash.addToBag', { item: t(row.nameKey) })}
         title={t(row.descKey)}
@@ -131,7 +124,7 @@ const InteractiveStashRow: React.FC<{
             );
           }
         }}
-        style={{ ...rowChrome(true), opacity: drag.isDragging ? 0.35 : 1 }}
+        style={rowChrome(true)}
       >
         <StashRowFace row={row} />
       </button>
@@ -176,24 +169,99 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
   const activeStashOwner = useVillageStashStore((s) => s.activeStashOwner);
   const lastEvent = useVillageStashStore((s) => s.lastEvent);
   const elsewhere = useVillageStashStore((s) => reservedElsewhereCount(s, s.activeStashOwner));
-
-  const drop = useDroppable({ id: STASH_DROPZONE_ID, data: { kind: 'stash-dropzone' } });
-  /* The overlay ghost mirrors the shelf row — portaled to body by DragOverlay
-   * (T-16: a transform painted inside the panel would clip under siblings).
-   * `useDndContext` degrades to defaults outside a provider, so the panel
-   * stays testable standalone (unlike useDndMonitor, which throws). */
-  const { active } = useDndContext();
-  const activeDrag = readStashDragPayload(active?.data.current);
-  const draggingItemId = activeDrag?.kind === 'stash-item' ? activeDrag.itemId : null;
+  /* Folded to a title strip — same affordance as the quest window's minimise
+   *  (R-246 follow-up): icon + name + the live capacity count survive.
+   *  `minimisedAt` guards the restore: the folded pill sits exactly where
+   *  minimise was, so a fast second click must not be a valid restore —
+   *  a deliberate click (≥350ms later) still is. */
+  const [minimised, setMinimised] = useState(false);
+  const minimisedAt = useRef(0);
+  const minimise = () => { minimisedAt.current = Date.now(); setMinimised(true); };
+  const restore = () => { if (Date.now() - minimisedAt.current >= 350) setMinimised(false); };
 
   const reserved = useMemo(() => countReservations(bags, committed), [bags, committed]);
   const vm = useMemo(() => villageStashViewModel(config, reserved), [config, reserved]);
   const interactive = hydration === 'ready' && activeStashOwner !== null;
-  const draggingRow = draggingItemId ? vm.rows.find((r) => r.itemId === draggingItemId) ?? null : null;
   /* Live-region split (no double announce): the bound planner's own region
    * narrates events that carry its poiId; the shelf narrates global events
    * (undefined poiId — commit releases, run-scoped mutations). */
   const announcement = lastEvent && lastEvent.poiId === undefined ? stashAnnouncement(t, lastEvent) : null;
+
+  /* Folded strip: same fixed shell + drag handle, one hairline plaque —
+   *  icon, name and the capacity count stay readable at a glance. */
+  if (minimised) {
+    return (
+      <div
+        data-hud-panel="villageStash"
+        tabIndex={-1}
+        style={{
+          position: 'fixed',
+          left,
+          top,
+          width: widthPx,
+          zIndex: panelStyle.zIndex ?? zIndex,
+          pointerEvents: 'auto',
+          outline: 'none',
+          ...panelStyle,
+        }}
+      >
+        <SkinScope data-hud-controls="">
+          <HudPlaque
+            shape="hang"
+            as="section"
+            aria-label={t('gameFrame.stash.title')}
+            data-testid="stash-minimised"
+            /* R-251: insets must clear the plaque's bronze band (~8px painted
+             *  inside the silhouette) — 10px vertical keeps every control
+             *  visibly off the band; 18px+4 keeps the chest off the end caps. */
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', padding: '10px 18px' }}
+          >
+            <div {...handleProps} style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', flex: 1, minWidth: 0, paddingLeft: 4, ...handleProps.style }}>
+              <EngravedIcon id="ico-chest" size={14} aria-hidden style={{ color: 'var(--skin-icon-accent)', flexShrink: 0 }} />
+              <span
+                style={{
+                  minWidth: 0,
+                  font: 'var(--skin-hud-name-weight) var(--skin-hud-name-size) var(--skin-font-display)',
+                  letterSpacing: 'var(--skin-hud-name-tracking)',
+                  color: 'var(--skin-title-color)',
+                  textShadow: 'var(--skin-hud-engrave)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {t('gameFrame.stash.title')}
+              </span>
+              <span
+                data-testid="stash-minimised-count"
+                style={{ font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)', letterSpacing: 'var(--skin-hud-caps-tracking)', color: 'var(--skin-text-secondary)', flexShrink: 0 }}
+              >
+                {vm.storedCount}/{vm.capacityMax}
+              </span>
+            </div>
+            {/* Same control slots as the expanded header: restore sits where
+             *  minimise was — the icon does not move under the pointer, and it
+             *  no longer rides the plaque's right border. */}
+            <span data-hud-controls="" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', flexShrink: 0 }}>
+              <button
+                type="button"
+                data-testid="stash-restore"
+                aria-label={t('floatingPanel.restore')}
+                title={t('floatingPanel.restore')}
+                onClick={restore}
+                style={controlButton}
+              >
+                <EngravedIcon id="cmd-panels" size={13} />
+              </button>
+              <button type="button" data-skin="close" aria-label={t('gameFrame.panels.close')} onClick={onClose} style={controlButton}>
+                <EngravedIcon id="cmd-close" size={14} />
+              </button>
+            </span>
+          </HudPlaque>
+        </SkinScope>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -220,8 +288,12 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
           aria-labelledby={titleId}
           style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: '0 1 auto', padding: 'var(--skin-hud-panel-padding)', gap: 'var(--skin-hud-stack-gap)' }}
         >
-          {/* Title row: building name left, X right. Drag handle. */}
-          <div {...handleProps} style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', ...handleProps.style }}>
+          {/* Title row: building icon + name left, X right. Drag handle.
+           *  R-251 bis: the expanded row uses the SAME content insets as the
+           *  collapsed strip (plaque padding 10 + this 12/8 = the strip's
+           *  22/18) — collapsing changes the glyph, never the geometry. */}
+          <div {...handleProps} style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', paddingInline: '12px 8px', ...handleProps.style }}>
+            <EngravedIcon id="ico-chest" size={14} aria-hidden style={{ color: 'var(--skin-icon-accent)', flexShrink: 0 }} />
             <span
               id={titleId}
               style={{
@@ -235,9 +307,21 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             >
               {t('gameFrame.stash.title')}
             </span>
-            <button type="button" data-skin="close" aria-label={t('gameFrame.panels.close')} onClick={onClose} style={controlButton}>
-              <EngravedIcon id="cmd-close" size={14} />
-            </button>
+            <span data-hud-controls="" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)', flexShrink: 0 }}>
+              <button
+                type="button"
+                data-testid="stash-minimise"
+                aria-label={t('floatingPanel.minimize')}
+                title={t('floatingPanel.minimize')}
+                onClick={minimise}
+                style={controlButton}
+              >
+                <EngravedIcon id="cmd-minimize" size={13} />
+              </button>
+              <button type="button" data-skin="close" aria-label={t('gameFrame.panels.close')} onClick={onClose} style={controlButton}>
+                <EngravedIcon id="cmd-close" size={14} />
+              </button>
+            </span>
           </div>
 
           {/* Global-pool counters: reservations held by other planners or frozen in a run. */}
@@ -250,21 +334,20 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             </span>
           )}
 
-          {/* Stock: planner-bound rows are buttons + draggables; read-only rows stay a plain list.
-           *  The whole shelf is the dropzone bag items return to. */}
+          {/* Stock: planner-bound rows are buttons; read-only rows stay a plain list.
+           *  `data-hud-scroll` picks up the bronze themed scrollbar (skinScope.css). */}
           <div
-            ref={drop.setNodeRef}
             role="list"
             data-testid="stash-shelf"
             data-stash-mode={interactive ? 'interactive' : 'readonly'}
+            data-hud-scroll=""
             style={{
               display: 'flex',
               flexDirection: 'column',
               gap: 'var(--skin-hud-stack-gap)',
               minHeight: 0,
               overflowY: 'auto',
-              outline: drop.isOver ? '1px dashed color-mix(in srgb, var(--skin-icon-accent) 60%, transparent)' : 'none',
-              outlineOffset: 2,
+              scrollbarGutter: 'stable',
             }}
           >
             {vm.rows.length === 0 && (
@@ -312,27 +395,6 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
           </span>
         </HudPlaque>
       </SkinScope>
-      <DragOverlay dropAnimation={null}>
-        {draggingRow ? (
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '4px 8px',
-              borderRadius: 6,
-              border: '1px solid var(--skin-icon-accent)',
-              background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 88%, transparent)',
-              color: 'var(--skin-title-color)',
-              font: '600 12px var(--skin-font-sans)',
-              pointerEvents: 'none',
-            }}
-          >
-            <VillageStashItemIcon icon={draggingRow.icon} size={16} />
-            {t(draggingRow.nameKey)}
-          </div>
-        ) : null}
-      </DragOverlay>
     </div>
   );
 };

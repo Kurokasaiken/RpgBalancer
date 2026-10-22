@@ -38,7 +38,7 @@ import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
  * 
  * Header Structure (Inline Layout):
  * ┌─────────────────────────────────────────────────┐
- * │ [⋮⋮] Roster 3/3 [Filtro ▼] [👁] [Collapse ▼]      │
+ * │ [⋮⋮] Roster 3/3 [Filtro ▼] [Sort ▼] [−]            │
  * │ Drag Handle   Count   Dropdown   Controls         │
  * └─────────────────────────────────────────────────┘
  * 
@@ -227,6 +227,17 @@ function DragTestContainerV2({
    */
   const [sortSelection, setSortSelection] = useState<'' | RosterSortMode | `stat:${FilterStatKey}`>('');
   const [statSortDirection, setStatSortDirection] = useState<'asc' | 'desc'>('desc');
+  /* INV:drag-test-container-v2.INV-1 — the visible replica of the sort select's
+   * current value (the native control is stretched transparent over the pill). */
+  const sortSelectionLabel = useMemo(() => {
+    if (!sortSelection) return t('gameFrame.roster.sort.placeholder');
+    const mode = getRosterSortModes().find((m) => m.mode === sortSelection);
+    if (mode) return t(mode.labelKey, mode.label);
+    if (sortSelection.startsWith('stat:')) {
+      return getStatDisplayConfig(sortSelection.slice('stat:'.length) as FilterStatKey).label;
+    }
+    return '';
+  }, [sortSelection, t]);
   const [heroFlashIds, setHeroFlashIds] = useState<string[]>([]);
   const [recentlyDraggedResidentId, setRecentlyDraggedResidentId] = useState<string | null>(null);
   const [isRosterCollapsed, setIsRosterCollapsed] = useState(false);
@@ -857,8 +868,14 @@ function DragTestContainerV2({
     .filter(Boolean)
     .join(' ');
 
+  /* R-257: the filtered set changes on every assign/remove — on classic
+   *  (non-overlay) scrollbars a toggling vertical bar steals inner width and
+   *  pushes rows into an h-overflow band = the «resize con le bande» the
+   *  Director saw. `overflow-x-hidden` makes the horizontal band impossible
+   *  and `scrollbar-gutter: stable` reserves the vertical gutter so inner
+   *  width never reflows when the bar appears/disappears. */
   const listWrapperClassName = [
-    isCompact ? 'space-y-(--skin-hud-row-gap) overflow-y-auto scroll-smooth' : 'space-y-2 overflow-y-auto scroll-smooth',
+    isCompact ? 'space-y-(--skin-hud-row-gap) overflow-y-auto overflow-x-hidden scroll-smooth [scrollbar-gutter:stable]' : 'space-y-2 overflow-y-auto overflow-x-hidden scroll-smooth [scrollbar-gutter:stable]',
     styles.scrollArea,
     isInlineLayout ? 'pr-0' : 'pr-1',
     listClassName,
@@ -944,6 +961,10 @@ function DragTestContainerV2({
   // made the window trail the cursor (and blank out) on slower WebViews.
   const livePositionRef = useRef({ x: 0, y: 0 });
   const dragStartRef = useRef({ x: 0, y: 0 });
+  /* T-23/R-251 convention: restore sits in the minimise slot, so the second
+   *  click of a fast double-click would toggle straight back — timestamps in
+   *  ms let the expand ignore tails <350ms (Date.now: vitest fake timers). */
+  const collapsedAtRef = useRef(0);
   const activePointerIdRef = useRef<number | null>(null);
   const FALLBACK_POINTER_ID = -1;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1149,7 +1170,7 @@ function DragTestContainerV2({
       ) : (
         useWanderlustSkin && <WellBronzeBezel band={2} rx={19} flush />
       )}
-      <div className={`relative z-10 ${isCompact ? (isRosterCollapsed ? 'px-(--skin-hud-panel-padding) py-1.5' : 'space-y-(--skin-hud-stack-gap) p-(--skin-hud-panel-padding)') : `space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`}`.trim()}>
+      <div className={`relative z-10 ${isCompact ? (isRosterCollapsed ? 'px-(--skin-hud-panel-padding) py-1.5' : 'space-y-(--skin-hud-stack-gap) p-(--skin-hud-panel-padding)') : `space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`} ${isRosterCollapsed ? 'overflow-hidden' : ''}`.trim()}>
         {useWanderlustSkin && !isCompact && (
           <div 
             className="block h-px mx-2 mb-5"
@@ -1189,8 +1210,15 @@ function DragTestContainerV2({
             </span>
           </div>
           <div className={isCompact ? 'flex min-w-0 items-center gap-(--skin-hud-control-gap)' : 'flex items-center gap-1'} data-hud-controls={isCompact ? '' : undefined} data-collapsed={isCompact && isRosterCollapsed ? '' : undefined}>
+            {/* INV:drag-test-container-v2.INV-1 — the native select is stretched
+                over the whole pill (see skinScope.css) so every point of the
+                visible control opens the picker; the value text is rendered by
+                the replica span since the select itself is transparent. */}
             <label>
               <EngravedIcon id="cmd-filter" className="h-3 w-3 shrink-0" />
+              <span data-roster-pill-value aria-hidden="true">
+                {t(`gameFrame.roster.filter.${filters.status}`)}
+              </span>
               <select
                 value={filters.status}
                 onChange={(e) => handleStatusChange(e.target.value as FilterOptions['status'])}
@@ -1212,6 +1240,7 @@ function DragTestContainerV2({
                 and inside the hero/active/blocked groups. */}
             <label>
               <EngravedIcon id="cmd-menu" className="h-3 w-3 shrink-0" />
+              <span data-roster-pill-value aria-hidden="true">{sortSelectionLabel}</span>
               <select
                 value={sortSelection}
                 onChange={(e) => {
@@ -1251,6 +1280,9 @@ function DragTestContainerV2({
             <button
               type="button"
               onClick={() => {
+                const now = Date.now();
+                if (isRosterCollapsed && now - collapsedAtRef.current < 350) return;
+                if (!isRosterCollapsed) collapsedAtRef.current = now;
                 const newState = !isRosterCollapsed;
                 setIsRosterCollapsed(newState);
 
@@ -1269,7 +1301,7 @@ function DragTestContainerV2({
               aria-pressed={isRosterCollapsed}
               data-keep=""
             >
-              <EngravedIcon id={isRosterCollapsed ? 'cmd-eye' : 'cmd-eye-off'} className="h-3.5 w-3.5" />
+              <EngravedIcon id={isRosterCollapsed ? 'cmd-panels' : 'cmd-minimize'} className="h-3.5 w-3.5" />
             </button>
             {onClose && (
               <button type="button" onClick={onClose} aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} data-keep="">
@@ -1308,20 +1340,29 @@ function DragTestContainerV2({
           `}</style>
         )}
 
-        {!isRosterCollapsed && (
-          <div
-            ref={listRef}
-            className={listWrapperClassName}
-            style={{
-              maxHeight: isRosterCollapsed ? 0 : listMaxHeightPx,
-              opacity: isRosterCollapsed ? 0 : 1,
-              overflow: isRosterCollapsed ? 'hidden' : 'auto',
-              transition: 'max-height 0.35s ease, opacity 0.35s ease',
-            }}
-            onScroll={virtualConfig.onScroll}
-            data-resident-count={sortedResidents.length}
-            data-virtualized={shouldVirtualize}
-          >
+        {/* The list stays mounted when collapsed: remounting the whole card
+         *  set on every toggle is what made close/reopen stutter. Collapse is
+         *  an INSTANT style flip (R-253: the max-height transition reflowed
+         *  the whole card set every frame for 350ms = the residual jank the
+         *  Director still saw), hidden+inert while folded so focus and
+         *  scroll can't reach it. */}
+        <div
+          ref={listRef}
+          className={listWrapperClassName}
+          style={{
+            maxHeight: isRosterCollapsed ? 0 : listMaxHeightPx,
+            opacity: isRosterCollapsed ? 0 : 1,
+            overflowY: isRosterCollapsed ? 'hidden' : 'auto',
+            overflowX: 'hidden',
+            visibility: isRosterCollapsed ? 'hidden' : 'visible',
+            pointerEvents: isRosterCollapsed ? 'none' : 'auto',
+            marginTop: isRosterCollapsed ? 0 : undefined,
+          }}
+          aria-hidden={isRosterCollapsed || undefined}
+          onScroll={virtualConfig.onScroll}
+          data-resident-count={sortedResidents.length}
+          data-virtualized={shouldVirtualize}
+        >
             {filteredResidents.length === 0 ? (
               <div className="py-8 text-center text-sm italic text-slate-400">
                 Nessun residente corrisponde ai filtri selezionati
@@ -1338,8 +1379,7 @@ function DragTestContainerV2({
               // Standard rendering for small rosters
               sortedResidents.map((resident) => renderResidentCard(resident))
             )}
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );
@@ -1367,7 +1407,7 @@ function DragTestContainerV2({
  * - Drag handle: GripVertical icon inline with "Roster" text (mousedown listeners only on the handle)
  * - Title section: "Roster" + filtered count rendered in uppercase micro-type
  * - Dropdown filter: Select con opzioni italiane ("Tutti", "Eroi", "Feriti", "Disponibili", ecc.) con label pill-shaped
- * - Control buttons: Eye toggle e collapse button compatti (rounded-full, border-white/15)
+ * - Control buttons: Minimise/restore toggle compatto (rounded-full, border-white/15)
  * - Layout: flex-wrap assicura l'allineamento anche su schermi piccoli
  * 
  * Removed Elements (Post-Freeze):

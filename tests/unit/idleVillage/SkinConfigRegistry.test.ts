@@ -19,12 +19,14 @@ describe('SkinConfigRegistry', () => {
     expect(config.id).toBe(DEFAULT_SKIN_PRESET_ID);
   });
 
+  // INV:skin-schemas.INV-1
   it('returns explicit config when preset exists', () => {
     const config = getSkinPresetConfig('wanderlust');
     expect(config.id).toBe('wanderlust');
     expect(config.supportedPillars).toContain('wilderness');
   });
 
+  // INV:skin-config-registry.INV-1
   it('exposes supported pillars for preset', () => {
     const pillars = getSupportedPillars('minimal_frontier');
     expect(pillars).toEqual(['frontier']);

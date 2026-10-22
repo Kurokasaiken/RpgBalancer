@@ -205,10 +205,10 @@ export const VillagePinFrame: React.FC<VillagePinFrameProps> = ({ frame, state, 
   >
     <path
       d={FRAME_PATHS[frame]}
-      fill="var(--skin-hud-lacquer-deep)"
+      fill="var(--skin-hud-lacquer-base)"
       fillOpacity={state === 'locked' ? 0.8 : 1}
-      stroke={state === 'buildable' ? 'var(--skin-hud-brass-hi)' : 'var(--skin-hud-brass-base)'}
-      strokeWidth={frame === 'shield' ? 3 : 2}
+      stroke={state === 'buildable' ? 'var(--skin-hud-brass-crest)' : 'var(--skin-hud-brass-hi)'}
+      strokeWidth={frame === 'shield' ? 3 : 2.5}
       strokeDasharray={state === 'buildable' ? '5 4' : undefined}
       strokeLinejoin="round"
     />

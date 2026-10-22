@@ -10,6 +10,7 @@ import { heroSheetViewModel, type HeroSheetViewModel } from './heroSheetViewMode
 import { HeroSheetPanel } from './HeroSheetPanel';
 import type { HudPanelsApi } from './useHudPanels';
 import { chooseSheetPlacement, type PlacementRect } from './heroSheetPlacement';
+import { getHudZoomFactor } from './hudScale';
 
 /**
  * useHeroSheet — the single transition owner behind `HeroSheetPanel` (PLAN-032 SP-1).
@@ -155,7 +156,12 @@ export function useHeroSheet({ config, residentsById, panels, dragActive, questB
        * anything else re-anchors at the next open. */
       sessionOffsetRef.current =
         prev.pinned && lastPanelRectRef.current && anchor
-          ? { x: lastPanelRectRef.current.left - anchor.left - openOffset.x, y: lastPanelRectRef.current.top - anchor.top - openOffset.y }
+          ? (() => {
+              /* anchor/openOffset are chrome units; the measured rect is
+               * device px — divided by the HUD zoom factor (DEF-06). */
+              const z = getHudZoomFactor();
+              return { x: lastPanelRectRef.current!.left / z - anchor.left - openOffset.x, y: lastPanelRectRef.current!.top / z - anchor.top - openOffset.y };
+            })()
           : null;
       /* Focus return: only when the sheet had it (focus source or a control
        * inside it was focused) — a hover-close while the pointer is elsewhere
@@ -369,8 +375,14 @@ export function useHeroSheet({ config, residentsById, panels, dragActive, questB
       const card = rail.querySelector<HTMLElement>(`[data-resident-id="${cssEscape(targetId)}"]`);
       if (!card) return null;
       const rect = card.getBoundingClientRect();
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
+      /* PLAN-043 WS-5 DEF-06: the sheet is `position:fixed` inside the
+       *  CSS-zoomed chrome layer — its `left/top` style and the solver
+       *  config are chrome units. DOM rects/viewport arrive in device px
+       *  and are divided by the HUD zoom factor (1 when unzoomed). */
+      const z = getHudZoomFactor();
+      const u = (v: number) => v / z;
+      const vw = u(window.innerWidth);
+      const vh = u(window.innerHeight);
       const w = config.widthPx;
       const h = panelHeightRef.current ?? Math.min(460, vh - 32);
       const gap = config.railOffsetXPx;
@@ -390,19 +402,19 @@ export function useHeroSheet({ config, residentsById, panels, dragActive, questB
          *  but must not steer the sheet toward a window that isn't there. */
         if (el.closest<HTMLElement>('[data-stage-panel]')?.getAttribute('aria-hidden') === 'true') return;
         const r = el.getBoundingClientRect();
-        if (r.width > 0 && r.height > 0) obstacles.push({ left: r.left, top: r.top, right: r.right, bottom: r.bottom, weight: 4 });
+        if (r.width > 0 && r.height > 0) obstacles.push({ left: u(r.left), top: u(r.top), right: u(r.right), bottom: u(r.bottom), weight: 4 });
       });
       /* The roster itself (header, filters, the neighbouring cards): the sheet describes ONE card and must not sit on
        * the rest of the list. Its box is cut at the right edge of the card column, so the natural spot beside the
        * column — over the panel's padding — stays free. */
-      const columnRight = Math.max(rect.right, ...Array.from(rail.querySelectorAll<HTMLElement>('[data-resident-id]')).map((el) => el.getBoundingClientRect().right));
+      const columnRight = u(Math.max(rect.right, ...Array.from(rail.querySelectorAll<HTMLElement>('[data-resident-id]')).map((el) => el.getBoundingClientRect().right)));
       const rosterPanel = card.closest<HTMLElement>('[data-testid="resident-roster-panel"]');
       if (rosterPanel) {
         const r = rosterPanel.getBoundingClientRect();
-        if (r.width > 0 && r.height > 0) obstacles.push({ left: r.left, top: r.top, right: Math.min(r.right, columnRight), bottom: r.bottom });
+        if (r.width > 0 && r.height > 0) obstacles.push({ left: u(r.left), top: u(r.top), right: Math.min(u(r.right), columnRight), bottom: u(r.bottom) });
       }
       const placed = chooseSheetPlacement({
-        card: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom },
+        card: { left: u(rect.left), top: u(rect.top), right: u(rect.right), bottom: u(rect.bottom) },
         sheet: { width: w, height: h },
         viewport: { width: vw, height: vh },
         obstacles,
@@ -410,7 +422,7 @@ export function useHeroSheet({ config, residentsById, panels, dragActive, questB
         inset,
         chrome: { top: chromeTop, bottom: chromeBottom },
       });
-      return { left: placed.left, top: placed.top, cardTop: rect.top };
+      return { left: placed.left, top: placed.top, cardTop: u(rect.top) };
     },
     [railEl, config.widthPx, config.railOffsetXPx, chromeTop, chromeBottom],
   );

@@ -32,6 +32,7 @@ const rowTitles = () =>
 describe('HudEventLedger', () => {
   beforeEach(() => trackTelemetryEvent.mockClear());
 
+  // INV:hud-event-ledger.INV-1
   it('lists events by due date by default', () => {
     render(<HudEventLedger events={EVENTS} config={ALL_ROWS} />);
     expect(rowTitles()).toEqual(['Granary', 'Wolves', 'Invasion', 'Caravan']);

@@ -144,16 +144,24 @@ export function projectBeats(
       case 'NODE': {
         const nodeId = nodes[vi];
         if (nodeId !== undefined) {
-          const node = nodesFor(after)[nodeId];
-          beats.push({
-            id: `scene-${mark.visitedLen + vi}`,
-            kind: 'scene',
-            nodeId,
-            title: node?.title ?? entry.text,
-            body: node?.body,
-            nodeKind: node?.kind,
-          });
+          /* The pairing is positional log↔visitedNodes: consume the visit
+           * even when no scene beat is emitted. */
           vi += 1;
+          const node = nodesFor(after)[nodeId];
+          /* R-241 INV-2: a check-kind node owns a `check` beat (resolved
+           * inline by the `CHECK:` path), never a scene — presenting it as
+           * a scene would cut the theatre's art/caption under the spinning
+           * astrolabe. */
+          if (node?.kind !== 'check') {
+            beats.push({
+              id: `scene-${mark.visitedLen + vi - 1}`,
+              kind: 'scene',
+              nodeId,
+              title: node?.title ?? entry.text,
+              body: node?.body,
+              nodeKind: node?.kind,
+            });
+          }
         }
         break;
       }
@@ -273,9 +281,14 @@ export interface BeatCursor {
 
 /**
  * Timed cursor over the committed beat queue. The queue is append-only and
- * owned by `useQuestRun` (it lives across window mounts); the cursor is
- * per-window and starts at 0 — a remount replays the pending tail, which is
- * exactly the reopen-compact contract once `projectBeats` has capped it.
+ * owned by `useQuestRun` (it lives across window mounts). The cursor is
+ * per-window by default and starts at 0; when the caller passes
+ * `opts.cursorRef` (the queue owner's stable ref) the position is seeded
+ * from it on mount and every advance is written back — so a window remount
+ * resumes at the held beat and replays only the pending tail, which is
+ * exactly the reopen-compact contract once `projectBeats` has capped it
+ * (R-242: without it a remount replayed every consumed beat — stale scenes,
+ * re-fired reveal cues, cluster geometry flapping).
  *
  * - Auto-advance: each beat schedules the next after `beatMs` (fake-timer
  *   friendly: pure setTimeout).
@@ -289,9 +302,24 @@ export interface BeatCursor {
 export function useBeatCursor(
   beats: QuestBeat[],
   timing: BeatTiming,
-  opts: { reducedMotion?: boolean; hold?: (beat: QuestBeat) => boolean } = {},
+  opts: { reducedMotion?: boolean; hold?: (beat: QuestBeat) => boolean; cursorRef?: { current: number } } = {},
 ): BeatCursor {
-  const [cursor, setCursor] = useState(0);
+  const cursorRef = opts.cursorRef;
+  const [cursor, setCursorState] = useState(() => cursorRef?.current ?? 0);
+  /* Write-through: the owner's ref tracks every advance so a remount of the
+   * window (close→reopen) resumes where the presentation stopped. The ref
+   * write inside the state updater is idempotent — StrictMode's double
+   * dispatch applies the same value twice, never twice-advances. */
+  const setCursor = useCallback(
+    (next: number | ((current: number) => number)) => {
+      setCursorState((current) => {
+        const value = typeof next === 'function' ? next(current) : next;
+        if (cursorRef) cursorRef.current = value;
+        return value;
+      });
+    },
+    [cursorRef],
+  );
   const lenRef = useRef(beats.length);
 
   /* The queue is append-only while a mount lives; if it is cleared or a new
@@ -300,17 +328,17 @@ export function useBeatCursor(
   useEffect(() => {
     if (beats.length < lenRef.current || beats.length === 0) setCursor(beats.length);
     lenRef.current = beats.length;
-  }, [beats.length]);
+  }, [beats.length, setCursor]);
 
   useEffect(() => {
     if (opts.reducedMotion) setCursor(beats.length);
-  }, [opts.reducedMotion, beats.length]);
+  }, [opts.reducedMotion, beats.length, setCursor]);
 
   const drained = cursor >= beats.length;
   const current = drained ? null : (beats[cursor] ?? null);
 
-  const skip = useCallback(() => setCursor((c) => Math.min(c + 1, beats.length)), [beats.length]);
-  const flush = useCallback(() => setCursor(beats.length), [beats.length]);
+  const skip = useCallback(() => setCursor((c) => Math.min(c + 1, beats.length)), [beats.length, setCursor]);
+  const flush = useCallback(() => setCursor(beats.length), [beats.length, setCursor]);
 
   /* Held beats (R-199): an external presenter owns the moment — the docked
    *  astrolabe on a check — and advances it through `skip()` once it has
@@ -325,7 +353,7 @@ export function useBeatCursor(
     const ms = holdRef.current?.(current) ? (timing.checkHoldMs ?? beatMs(current, timing)) : beatMs(current, timing);
     const id = setTimeout(() => setCursor((c) => c + 1), ms);
     return () => clearTimeout(id);
-  }, [current, timing]);
+  }, [current, timing, setCursor]);
 
   return useMemo(
     () => ({ current, remaining: Math.max(0, beats.length - cursor - (current ? 1 : 0)), skip, flush }),

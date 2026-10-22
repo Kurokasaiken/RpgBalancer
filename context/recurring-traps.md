@@ -1,7 +1,7 @@
 ---
 title: Recurring Traps
 type: preflight-checklist
-updated: 2026-10-16
+updated: 2026-10-21
 ---
 
 # Recurring Traps — regole preventive lette in pre-flight
@@ -29,6 +29,8 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
 | `verification.json`, `produceBundle`, `closure:lint`, probe Playwright/`build:check` mentre girano sessioni parallele | T-13 |
 | driver E2E/test unitari dopo un piano che sposta testid, hook, timing o archi del grafo | T-14 |
 | `page.evaluate`, helper Playwright condivisi, script lanciati via tsx | T-15 |
+| `<select>`/`<button>` nativi dentro pill `data-hud-controls`, hit-area, click "che non fa nulla" | T-21 |
+| misura di latenza/percezione, verde E2E con sintomo ancora presente, preview vs dev server | T-22 |
 
 ---
 
@@ -450,3 +452,101 @@ sotto un selettore `:only-child` — in concreto `skinScope.css`
      punto), poi confronta `getBoundingClientRect` con il **dispatch reale**
      (listener capture su `document`) — se divergono, è overflow centrato
      di un elemento vicino, non il tuo handler.
+
+## T-21 — Controlli nativi dentro un pill `data-hud-controls`: la hit region è il rect dell'elemento, non il pill
+
+**Surface:** `<select>`/`<button>` nativi dentro `<label>`/pill visivi sotto
+`data-hud-controls` o qualunque wrapper decorativo — filtro/sort roster,
+controlli header.
+
+- **Cosa succede:** il pill *visibile* (~80px) e la regione interattiva reale
+  divergono. Un `<select>` dentro `<label>` occupa solo il suo rect nativo:
+  cliccare icona/testo forwarda **focus** ma non apre il picker — in Chrome il
+  picker si apre solo sul default-action del `mousedown` diretto sulla select.
+  Sintomo tipico: «la prima volta non fa nulla, la seconda sì» — in realtà il
+  click sull'icona non apre MAI, il secondo capita nella porzione che copre il
+  rect nativo. Il meccanismo è lo stesso di T-20 (geometria nativa ≠ chrome
+  visivo), superficie speculare: lì il testo straborda la hit region, qui la
+  hit region è più piccola del pill.
+- **Istanze:** R-238 Bug B (2026-10-21, `.mw/bugs/20261021-game-first-interaction`)
+  — pill filtro ~82px, select nativa ~24px a destra: click sull'icona →
+  `open:false` in headed; fix = select `position:absolute; inset:0` trasparente
+  su tutta la label + replica `aria-hidden` del valore. Sibling: T-20
+  (PLAN-073, stesso giorno, stessa famiglia).
+- **Regola:**
+  1. Se il chrome avvolge un controllo nativo, **allarga il controllo**
+     (trasparente, `inset:0`) non il contrario — il gesto diretto raggiunge
+     l'elemento reale ovunque sul pill.
+  2. Alternativa: `el.showPicker()` su `pointerdown` del wrapper — attenzione
+     che resta un path diverso dal gesto nativo.
+  3. Headless NON testimonia il picker nativo: `select:open` resta `false`
+     anche su una select vanilla via click sintetici — witness headed oppure
+     `elementFromPoint` campionato sul pill come proxy geometrico.
+
+## T-22 — La misura percettiva va presa sul runtime che esibisce il sintomo
+
+**Surface:** bug di latenza/percezione ("è lento", "appare in ritardo",
+"non si vede"), suite E2E su `vite preview`, probe su dev server — in
+generale: verifica su un layer diverso da quello dell'utente.
+
+- **Cosa succede:** la suite E2E gira sul build minificato `vite preview`
+  (:5179) ma il Director lavora sul dev server (:5173), dove `jsxDEV`
+  (strumentazione React dev, ~5.5 s self-time), source map e `startTransition`
+  a bassa priorità costano un fattore **2-3×** sul gesto misurato. Il test è
+  verde sull'ambiente sbagliato → il fix sembra sufficiente ma il sintomo
+  resta. Stessa famiglia di P-005 (superficie ≠ layer dell'utente: bundle
+  stantio, HMR churn, e ora runtime diverso).
+- **Istanze:** R-238 Bug A (2026-10-21) — preview 376-431 ms verde, dev
+  server 510-732 ms reale; il residuo era il commit React del subtree
+  overlay, invisibile alla metrica su preview. Sibling: P-005 (`[swapdbg]`
+  su bundle stantio), learn-20261020-2115 A (churn HMR sotto il Director).
+- **Regola:**
+  1. Per latenza/percezione: diagnosi e signoff sul runtime che esibisce il
+     sintomo (dev server se il Director vive lì); il preview build resta il
+     runner della suite, non l'ambiente di misura.
+  2. Misura l'elemento che l'utente *vede*, non il marker DOM più precoce —
+     o fai coincidere i due (stesso `data-debug-*` sul nodo realmente
+     visibile, es. il warm-flip).
+  3. «Test verde ma il sintomo resta» non è rumore: è il divario di layer —
+     confronta gli ambienti (instrumentation, scheduling, build) prima di
+     ricalibrare il budget del test.
+  4. Corollario tecnico: se il commit React è il collo, il primo paint può
+     avvenire via DOM diretto sul subtree warm-mounted con handoff
+     `useLayoutEffect` pre-paint (pattern B,
+     `.mw/runs/learn-20261021-1404/pattern-candidate.md`).
+
+## T-23 — Striscia collassata di un `HudPlaque`: controllo che non si sposta, click-tail guard, fascia che dipinge dentro
+
+**Surface:** qualunque pannello HUD con stato «ridotto a striscia»
+(`HudPlaque shape="hang"` + pulsanti header `data-hud-controls`) —
+stash, quest window, roster.
+
+- **Cosa succede:** tre difetti gemelli scoperti insieme (R-251, 2026-10-21):
+  1. Se la striscia mostra *solo* il restore, il flex lo spinge al bordo
+     destro — nello slot del *close*, ~30 px a destra del minimise che il
+     giocatore ha appena premuto. L'icona «si muove»: il secondo click di un
+     doppio-click veloce la becca → chiudi-e-riapri.
+  2. Tenere il controllo fermo *crea* il problema opposto: il secondo click
+     cade sul restore nello stesso punto → toggle accidentale.
+  3. La placca dipinge banda+step+highlight ~6-7 px **dentro** la silhouette
+     (più i cappelli curvi `hang`): con padding da header (6 px) le pill 26 px
+     cavalcano la fascia — «le icone toccano i bordi» anche se sono dentro
+     il rect.
+- **Istanze:** R-251 — stash minimise 694 → restore 724 (slot close) e pill
+  a 6 px dalla fascia; fix misurato restoreX≈minX, inset 8-22 px su tutti i
+  lati, screenshot `test-results/r251-strip-insets.png`.
+- **Regola:**
+  1. La striscia replica il cluster controlli dell'header **negli stessi
+     slot** (`[restore][close]`, non `[restore]` solo) **e** l'header espanso
+     usa gli stessi content-inset della striscia (R-251 bis: placca 10 +
+     riga 12/8 = box 22/18) — il collapse cambia il glifo, mai la geometria
+     (dx=0/dy=0 misurato). Attenzione: uno spostamento ~-2px misurato sul
+     pulsante sotto il cursore è `--skin-btn-hover-lift`, feedback voluto —
+     misura col puntatore fuori dal pannello.
+  2. Guard temporale sul restore (~350 ms): il secondo click del doppio-click
+     è coda, non intento. `Date.now`, non `performance.now` — i fake timers
+     di vitest non fregano il secondo.
+  3. Inset striscia ≥ profondità fascia + margine: riferimento `10px 18px`
+     (+4 px lato icona). Misure sempre su bbox live (T-04), non a occhio.
+  4. Regression test: ordine dei bottoni nel cluster + padding della placca
+     (asserzione di struttura, non di pixel).

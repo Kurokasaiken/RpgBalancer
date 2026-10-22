@@ -177,7 +177,7 @@ export function ResidentRosterPanelV2({
  * - Title: "Roster" text-[8px] uppercase
  * - Count: "3/3" text-amber-100
  * - Filter: Dropdown with "Tutti", "Eroi", "Feriti", etc.
- * - Controls: Eye toggle, collapse button
+ * - Controls: Minimise/restore toggle
  * 
  * Usage Pattern:
  * - Use with layout="inline" for compact roster display

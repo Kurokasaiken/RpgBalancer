@@ -38,6 +38,7 @@ for (const vp of VIEWPORTS) {
       expect(cover!.rightLeft).toBeLessThanOrEqual(mid);
     });
 
+    // INV:world-surface-event-card.INV-1
     test('BV-2: the announcement card sits fully inside the viewport, in the middle band', async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto('/game?capture=1');

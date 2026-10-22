@@ -1,7 +1,7 @@
 export { GameFrame, type GameFrameProps } from './GameFrame';
 export { HudRibbon, type HudRibbonProps, type HudRibbonAnchor } from './HudRibbon';
 export { HudEventLedger, type HudEventLedgerProps, type HudEvent, type HudEventSort } from './HudEventLedger';
-export { ResourceReadout, type ResourceReadoutProps, type ResourceReadoutItem } from './ResourceReadout';
+export { ResourceReadout, type ResourceReadoutProps, type ResourceReadoutItem, type ResourceReadoutDelta } from './ResourceReadout';
 export { buildResourceReadoutItems } from './resourceReadoutItems';
 export { HUD_TONE_COLOR, type HudTone } from './hudTones';
 export { WhenWhereCluster, type WhenWhereClusterProps } from './WhenWhereCluster';

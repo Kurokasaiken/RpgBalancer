@@ -30,6 +30,7 @@ function playToEnd(seed: number, presetId: string, strategy: (nodeId: string, id
 }
 
 describe('quest S1 lab — run engine', () => {
+  // INV:quest-run.INV-1
   it('creates a deterministic run for a preset', () => {
     const a = createRun('ibrido', 42);
     const b = createRun('ibrido', 42);

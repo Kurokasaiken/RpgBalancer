@@ -18,6 +18,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import sharp from 'sharp';
 
 const POI = 'poi-goblin';
 
@@ -87,6 +88,15 @@ type RunShape = {
   ended: boolean;
   nodeId: string;
   frontier: { status: string; readyAt: number };
+  journey?: {
+    snapshot: { travelDays: number; ticksPerDay: number };
+    journal: {
+      processedUpToTick: number;
+      faseStartedAtTick: number;
+      accumulatedParkedTicks: number;
+      beats: Array<{ pin: number; openedAtTick: number | null }>;
+    };
+  };
 };
 
 interface HooksWindow extends Window {
@@ -150,9 +160,27 @@ const reachWaitingFrontier = async (page: Page, maxSteps = 40) => {
     const run = await getRun(page);
     if (!run || run.ended) throw new Error(`run ended/vanished before a waiting frontier (${run?.nodeId})`);
     if (run.frontier.status === 'pending') {
-      const clock = await getClock(page);
-      const lead = Math.max(0, run.frontier.readyAt - (clock?.currentTick ?? 0));
-      await advanceTicks(page, lead + 1);
+      if (run.journey && run.frontier.readyAt === Number.MAX_SAFE_INTEGER) {
+        /* The journey travel sentinel is intentionally pending forever; it
+         * is not a node timer. Advance only to the next authored route pin
+         * (or this leg's endpoint), never to Number.MAX_SAFE_INTEGER. */
+        const { snapshot, journal } = run.journey;
+        const consumed = Math.max(
+          0,
+          journal.processedUpToTick - journal.faseStartedAtTick - journal.accumulatedParkedTicks,
+        );
+        const total = snapshot.travelDays * snapshot.ticksPerDay;
+        const nextPin = Math.min(
+          1,
+          ...journal.beats.filter((beat) => beat.openedAtTick === null).map((beat) => beat.pin),
+        );
+        const ticksToNextEvent = Math.max(0, Math.ceil(nextPin * total - consumed));
+        await advanceTicks(page, Math.max(1, ticksToNextEvent + 1));
+      } else {
+        const clock = await getClock(page);
+        const lead = Math.max(0, run.frontier.readyAt - (clock?.currentTick ?? 0));
+        await advanceTicks(lead + 1);
+      }
     }
     /* Flush any beats still presenting — click until the stage reports the
      *  waiting state (choices visible). A check beat holds on the column:
@@ -810,5 +838,175 @@ test.describe('PLAN-043 WS-4 — QuestStageCluster BV gates', () => {
      *  thrash during the pulse pushes it far past that in software GL. */
     expect(breath).toBeLessThanOrEqual(Math.max(spin * 2, spin + 16));
   });
-});
 
+  test('PLAN-043-S4 — bag consumables armed by default at the first check', async ({ page }) => {
+    /* demoLaunch packs QUEST_STASH.defaultLoadout and crosses the real
+     *  send boundary — the packed engine flags land in run.flags. */
+    await launchQuest(page);
+    await reachWaitingFrontier(page);
+    await expect(microBelt(page)).toBeVisible();
+    /* consumablesArmedByDefault (R-106 contract, S4 ruling): the packed
+     *  check-kind items start armed at the first frontier; the action
+     *  item stays unarmed — spending it is the player's call. */
+    const belt = microBelt(page);
+    await expect(belt.locator('[data-belt-item="hasBonusForza"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(belt.locator('[data-belt-item="hasBonusPerc"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(belt.locator('[data-belt-item="hasHealing"]')).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('PLAN-061 D1-2 — theatre frame honours the declared aspect, art never distorted', async ({ page }) => {
+    await launchQuest(page);
+    await reachWaitingFrontier(page);
+    const frame = page.getByTestId('quest-theatre-frame');
+    await expect(frame).toBeVisible();
+    const probe = await frame.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      const img = el.querySelector('img');
+      return {
+        declared: cs.aspectRatio,
+        ratio: r.width / r.height,
+        fit: img ? getComputedStyle(img).objectFit : null,
+        depthScene: !!el.querySelector('canvas'),
+      };
+    });
+    /* theaterAspect = 2.4 in gameFrameConfig.questWindow — the style must
+     *  carry it verbatim (any other value here means the contract broke). */
+    expect(parseFloat(probe.declared)).toBeCloseTo(2.4, 1);
+    /* Geometry: the frame is the plaque's shrink reservoir — under a
+     *  height cap it legitimately clamps below its aspect (observed 3.85
+     *  at the 190px floor), so the box ratio is only bounded below: the
+     *  theatre must stay a wide cinematic band, never collapse to a
+     *  square/portrait (the #8 defect class). The image itself can never
+     *  distort — cover-fit crops, it never stretches or letterboxes.
+     *  Clamp tuning is PLAN-063 geometry, out of scope here. */
+    expect(probe.ratio).toBeGreaterThan(1.5);
+    /* No distortion: the flat path cover-crops; the depth path cover-crops
+     *  inside the shader (certified in sceneManifest). `contain` would be
+     *  the letterbox defect R-231 #8 ruled out. */
+    if (probe.fit !== null) expect(probe.fit).toBe('cover');
+    /* T-04 witness: the theatre frame at a scene-library node (2.357 art in
+     *  the 2.4 stage) — saved beside the metrics for the bundle. */
+    mkdirSync(RUN_DIR, { recursive: true });
+    await frame.screenshot({ path: path.join(RUN_DIR, 'd1-2-theatre-frame.png') });
+    sample({ theatreAspectDeclared: probe.declared, theatreBoxRatio: probe.ratio, depthScene: probe.depthScene });
+  });
+
+  test('R-231 consolidated visual witness — progress, chrome and post-entry motion', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await launchQuest(page);
+    await reachWaitingFrontier(page);
+
+    const runWindow = window_(page);
+    const outputDir = path.resolve('.mw/runs/r231-visual-verification');
+    mkdirSync(outputDir, { recursive: true });
+    await runWindow.screenshot({ path: path.join(outputDir, 'quest-window-expanded.png') });
+
+    const iconToggles = ['quest-party-toggle', 'quest-belt-toggle', 'quest-log-toggle'];
+    const header = await Promise.all(iconToggles.map(async (id) => {
+      const button = page.getByTestId(id);
+      await expect(button).toBeVisible();
+      return {
+        id,
+        text: (await button.textContent())?.trim() ?? '',
+        accessibleName: await button.getAttribute('aria-label'),
+        title: await button.getAttribute('title'),
+      };
+    }));
+    expect(header.every((item) => item.text === '' && Boolean(item.accessibleName) && Boolean(item.title))).toBe(true);
+
+    const abandon = page.getByTestId('quest-abandon-toggle');
+    await expect(abandon).toBeVisible();
+    expect((await abandon.textContent())?.trim() ?? '').toBe('');
+    expect(await abandon.getAttribute('aria-label')).toBeTruthy();
+    expect(await abandon.getAttribute('title')).toBeTruthy();
+
+    const stage = page.getByTestId('quest-window-stage');
+    const stageGeometry = await stage.evaluate((el) => ({
+      clientHeight: el.clientHeight,
+      scrollHeight: el.scrollHeight,
+      overflowY: getComputedStyle(el).overflowY,
+    }));
+    expect(stageGeometry.scrollHeight).toBeLessThanOrEqual(stageGeometry.clientHeight);
+
+    const progress = page.getByRole('progressbar');
+    await expect(progress).toBeVisible();
+    const beforeProgress = Number(await progress.getAttribute('aria-valuenow'));
+    const checkpoints = page.getByTestId('quest-timebar-checkpoint');
+    const checkpointCount = await checkpoints.count();
+    expect(checkpointCount).toBeGreaterThan(0);
+    expect(beforeProgress).toBeLessThan(100);
+    await advanceTicks(page, 10);
+    await expect.poll(async () => Number(await progress.getAttribute('aria-valuenow'))).toBeGreaterThan(beforeProgress);
+    const afterProgress = Number(await progress.getAttribute('aria-valuenow'));
+
+    const depthScene = page.getByTestId('depth-scene');
+    await expect(depthScene).toBeVisible();
+    const scenePath = path.join(outputDir, 'post-entry-t0.png');
+    await depthScene.screenshot({ path: scenePath });
+    await page.waitForTimeout(1_800);
+    const laterPath = path.join(outputDir, 'post-entry-t1.png');
+    await depthScene.screenshot({ path: laterPath });
+    const [first, later] = await Promise.all([
+      sharp(scenePath).raw().toBuffer({ resolveWithObject: true }),
+      sharp(laterPath).raw().toBuffer({ resolveWithObject: true }),
+    ]);
+    expect(first.info.width).toBe(later.info.width);
+    expect(first.info.height).toBe(later.info.height);
+    let changedPixels = 0;
+    for (let i = 0; i < first.data.length; i += 4) {
+      if (
+        Math.abs(first.data[i] - later.data[i]) > 4 ||
+        Math.abs(first.data[i + 1] - later.data[i + 1]) > 4 ||
+        Math.abs(first.data[i + 2] - later.data[i + 2]) > 4
+      ) changedPixels += 1;
+    }
+    const changedFraction = changedPixels / (first.info.width * first.info.height);
+    expect(changedFraction).toBeGreaterThan(0.001);
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.waitForTimeout(300);
+    const reducedT0 = path.join(outputDir, 'post-entry-reduced-t0.png');
+    await depthScene.screenshot({ path: reducedT0 });
+    await page.waitForTimeout(1_800);
+    const reducedT1 = path.join(outputDir, 'post-entry-reduced-t1.png');
+    await depthScene.screenshot({ path: reducedT1 });
+    const [reducedFirst, reducedLater] = await Promise.all([
+      sharp(reducedT0).raw().toBuffer({ resolveWithObject: true }),
+      sharp(reducedT1).raw().toBuffer({ resolveWithObject: true }),
+    ]);
+    let reducedChangedPixels = 0;
+    for (let i = 0; i < reducedFirst.data.length; i += 4) {
+      if (
+        Math.abs(reducedFirst.data[i] - reducedLater.data[i]) > 4 ||
+        Math.abs(reducedFirst.data[i + 1] - reducedLater.data[i + 1]) > 4 ||
+        Math.abs(reducedFirst.data[i + 2] - reducedLater.data[i + 2]) > 4
+      ) reducedChangedPixels += 1;
+    }
+    const reducedChangedFraction = reducedChangedPixels / (reducedFirst.info.width * reducedFirst.info.height);
+    expect(reducedChangedFraction).toBeLessThan(0.001);
+
+    await page.getByTestId('quest-window').locator('button[data-keep]').first().click();
+    const minimised = page.getByTestId('quest-window-minimised');
+    await expect(minimised).toBeVisible();
+    const restore = minimised.locator('button');
+    const [panelBox, restoreBox] = await Promise.all([minimised.boundingBox(), restore.boundingBox()]);
+    expect(panelBox).not.toBeNull();
+    expect(restoreBox).not.toBeNull();
+    expect(panelBox!.x + panelBox!.width - (restoreBox!.x + restoreBox!.width)).toBeLessThanOrEqual(24);
+    await minimised.screenshot({ path: path.join(outputDir, 'quest-window-minimised.png') });
+
+    writeFileSync(
+      path.join(outputDir, 'visual-witness.json'),
+      JSON.stringify({
+        viewport: { width: 1440, height: 900 },
+        header,
+        stageGeometry,
+        progress: { before: beforeProgress, after: afterProgress, checkpointCount },
+        postEntryMotion: { changedFraction, reducedChangedFraction },
+        minimisedRestoreRightGapPx: panelBox!.x + panelBox!.width - (restoreBox!.x + restoreBox!.width),
+      }, null, 2),
+    );
+  });
+});

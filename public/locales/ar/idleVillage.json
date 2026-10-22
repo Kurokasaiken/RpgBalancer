@@ -102,6 +102,24 @@
       "runicV3": "Runic V3",
       "runicV1": "Runic V1",
       "runicV5": "Runic V5"
+    },
+    "fork": {
+      "title": "Sigillo fork — B4-map",
+      "subtitle": "Baseline vs candidates on the painted surface at use size (55 px): silhouette, rim/halo, field, reveal. Toggle grayscale to judge value separation.",
+      "grayscale": "Grayscale",
+      "replay": "Replay reveal",
+      "candidates": {
+        "baseline": "Baseline",
+        "metals": "A · Family metals",
+        "field": "B · Field + border",
+        "shape": "C · Silhouette halo"
+      },
+      "captions": {
+        "baseline": "Brass rim, teal field, round halo — production today",
+        "metals": "Rim = family: brass / iron / copper",
+        "field": "Warm field, muted bone inner border",
+        "shape": "Countdown on the silhouette edge"
+      }
     }
   }
 }

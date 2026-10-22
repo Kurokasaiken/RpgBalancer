@@ -208,6 +208,33 @@ R-213, `test-results/` evidence log, `CURRENT_STATE.md`/`SESSION_HANDOFF.md`
 a milestone spike, `context/INDEX.md` se emergono fatti durevoli (es.
 viewAspectRange pinning, convenzione depth manifest).
 
+## Stato e aggregazione (audit 2026-10-18)
+
+Il lavoro cinematico osservato appartiene a più contratti, non è sinonimo
+dell'intera slice di questo piano:
+
+- Il regression fix R-213 (clock/epoch, parallax dinamico, blur spaziale,
+  shake e qualità del palo) è incluso in PLAN-050 T-010 e verificato in
+  `.mw/runs/r213-cinematic-effects-regression/`: bundle **PASS 5/5** dopo il
+  signoff Director OB-4 del 2026-10-18, vincolato agli hash dei sette frame.
+  Questo chiude il witness della regressione R-213, non l'OB-8 showcase
+  PLAN-050 su tutte le otto scene.
+- La spike PLAN-046 è documentata in
+  `.mw/runs/r213-quest-cinematics-spike/` (bundle meccanico PASS 7/7), ma il
+  suo `signoff.json` è provvisorio: dichiara sia Director eye-check pending,
+  sia profiling manuale WKWebView non eseguito. Non considerare chiusa OB-6.
+- Il crosswalk delle capability T-001..T-008 e le acceptance non ancora
+  comprese nel contratto di cinematografia sono nella sezione
+  «Aggregazione dell'audit PLAN-046» di PLAN-050. Le residue verifiche di
+  layout/runtime budget, profiling WKWebView e kit asset-backed AtmosphereLayer
+  sono aggregate in PLAN-050 T-011/T-012/T-013; la revisione visiva umana è
+  inclusa in OB-8.
+
+PLAN-046 non è quindi dichiarato completato qui. Q3 del metaplan non è una
+seconda sessione PLAN-046 attiva: la presa in carico separata era
+un'inferenza errata dal churn condiviso. La chiusura della sua acceptance
+residua segue PLAN-050 T-011/T-012 e i gate umani esplicitati sopra.
+
 ## Dipendenze e note implementative
 
 - PixiJS v8 già in uso (WorldSurfaceRenderer) — riusare pattern di lifecycle,

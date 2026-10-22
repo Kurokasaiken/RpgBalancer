@@ -90,6 +90,10 @@ function reachableWithin(edges: Record<string, string[]>, from: string, inSet: (
  * Diagnostics are strings (the CI script prints them verbatim); `errors`
  * block the launch, `warnings` are authoring smells worth a look.
  */
+/** R-253 #5: the authored mid-journey band — travel beats open between
+ *  25% and 75% of their fase's completion (Director ruling). */
+const PIN_BAND = { min: 0.25, max: 0.75 } as const;
+
 export function validateQuestJourneyDag(input: JourneyDagInput): JourneyDagReport {
   const { nodes, startNode, fasi, edges, nodeTicks, ticksPerDay } = input;
   const errors: string[] = [];
@@ -110,6 +114,16 @@ export function validateQuestJourneyDag(input: JourneyDagInput): JourneyDagRepor
     const fase = nodeFase(node);
     if (fase === 'svolgimento') {
       errors.push(`pin '${nodeId}' (${pin}): il nodo non è attribuito a una fase di viaggio (fase: ${node.fase ?? 'assente'})`);
+    }
+    /* R-253 #5 (Director ruling): travel events must open INSIDE the leg —
+     *  the mid-journey band is [0.25, 0.75]; a pin outside it lands the beat
+     *  at the departure (≤25%) or the arrival (≥75%), which reads as «event
+     *  at the fase's end». Boundary pins 0 (departure) and 1 (arrival, e.g.
+     *  `gob-fine`) stay legal — they are structural markers, not events. */
+    if (pin > 0 && pin < 1 && (pin < PIN_BAND.min || pin > PIN_BAND.max)) {
+      errors.push(
+        `pin '${nodeId}' (${pin}): i beat di viaggio devono aprirsi tra il ${PIN_BAND.min * 100}% e il ${PIN_BAND.max * 100}% della fase (pin di confine 0/1 restano leciti)`,
+      );
     }
   }
 

@@ -9,7 +9,7 @@
  *     grammar (`useHudPanelDrag` persists only the user's offset — the
  *     stageZones solver owns the placement once WS-2's provider lands);
  *   RIGHT WING — the forecast plaque, pinned: it never hides while the
- *     party is being edited and keeps the live ±pp deltas (desiderata v23);
+ *     party is being edited and keeps the live ±% deltas (desiderata v23);
  *   LEFT WING — the companions roster: drags and keyboard drops land on
  *     the rack through the shared page DndContext.
  *
@@ -20,7 +20,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState, type CSSPrope
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { DragOverlay, useDndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import { useDraggable } from '@dnd-kit/core';
 import { Maximize2, Minus, Swords, X } from 'lucide-react';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
@@ -29,7 +29,6 @@ import { useHudPanelDrag } from '@/ui/idleVillage/components/gameFrame/useHudPan
 import { getHudZoomFactor } from '@/ui/idleVillage/components/gameFrame/hudScale';
 import { VillageStashItemIcon } from '@/ui/idleVillage/components/gameFrame/villageStashItemIcons';
 import { stashAnnouncement } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
-import { bagItemDragId, bagSlotDropId } from '@/ui/idleVillage/components/gameFrame/stashDnd';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { EngravedIcon, type EngravedIconId } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { useReducedMotion } from '@/ui/idleVillage/hooks/useReducedMotion';
@@ -253,37 +252,25 @@ const EngravedSeal: React.FC<{ testId: string; label: string; value: string; del
 };
 
 /**
- * A packed bag item: `bag-item:{poi}:{slot}` draggable toward the warehouse
- * shelf (release) — pointer listeners only. `onKeyDown` is deliberately NOT
- * spread: Enter/Space must keep native button parity (click ⇒ release,
- * PLAN-073 A2) instead of arming a keyboard drag.
+ * A packed bag item: a click releases it back into the shared warehouse
+ * pool (PLAN-073 A2; R-246: click-only, no drag affordance).
  */
 const PackedBagItem: React.FC<{
-  poiId: string;
   slotIndex: number;
   entry: BagStockEntry;
   onRelease: (itemId: string) => void;
-}> = ({ poiId, slotIndex, entry, onRelease }) => {
+}> = ({ slotIndex, entry, onRelease }) => {
   const { t } = useTranslation('idleVillage');
-  const drag = useDraggable({
-    id: bagItemDragId(poiId, slotIndex),
-    data: { kind: 'bag-item', poiId, slotIndex, itemId: entry.item.id },
-  });
-  const { onKeyDown: _kbd, ...pointerListeners } = drag.listeners ?? {};
   return (
     <button
       type="button"
-      ref={drag.setNodeRef}
-      {...pointerListeners}
-      {...drag.attributes}
       data-testid={`loadout-item-${entry.item.id}`}
       data-bag-slot-index={slotIndex}
       aria-label={t('questExpedition.bag.removeSlot', { item: t(stripNs(entry.item.labelKey)) })}
       onClick={() => onRelease(entry.item.id)}
       style={{
         width: '100%', height: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        background: 'none', border: 'none', color: 'var(--skin-title-color)', cursor: 'grab', padding: 0,
-        opacity: drag.isDragging ? 0.35 : 1,
+        background: 'none', border: 'none', color: 'var(--skin-title-color)', cursor: 'pointer', padding: 0,
       }}
     >
       <VillageStashItemIcon icon={entry.item.icon} size={22} />
@@ -292,9 +279,8 @@ const PackedBagItem: React.FC<{
 };
 
 /**
- * One quest bag slot — `bag-slot:{poi}:{index}` droppable for warehouse
- * items (assign on empty, atomic swap on occupied). Empty slots keep the
- * tray-opening affordance; occupied slots release on click.
+ * One quest bag slot. Empty slots keep the tray-opening affordance;
+ * occupied slots release on click.
  */
 const QuestBagSlot: React.FC<{
   poiId: string;
@@ -302,28 +288,21 @@ const QuestBagSlot: React.FC<{
   entry: BagStockEntry | undefined;
   onRelease: (itemId: string) => void;
   onOpenItems: (trigger: HTMLElement) => void;
-}> = ({ poiId, slotIndex, entry, onRelease, onOpenItems }) => {
+}> = ({ slotIndex, entry, onRelease, onOpenItems }) => {
   const { t } = useTranslation('idleVillage');
-  const drop = useDroppable({
-    id: bagSlotDropId(poiId, slotIndex),
-    data: { kind: 'bag-slot', poiId, slotIndex },
-  });
   return (
     <span
-      ref={drop.setNodeRef}
       data-testid={`bag-slot-${slotIndex}`}
       style={{
         width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        border: `1px solid color-mix(in srgb, ${drop.isOver ? 'var(--skin-icon-accent)' : 'var(--skin-surface-border)'} ${drop.isOver ? 90 : 60}%, transparent)`,
-        background: drop.isOver
-          ? 'color-mix(in srgb, var(--skin-icon-accent) 18%, transparent)'
-          : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
+        border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
+        background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
       }}
     >
       {entry ? (
         <Tooltip.Root delayDuration={120}>
           <Tooltip.Trigger asChild>
-            <PackedBagItem poiId={poiId} slotIndex={slotIndex} entry={entry} onRelease={onRelease} />
+            <PackedBagItem slotIndex={slotIndex} entry={entry} onRelease={onRelease} />
           </Tooltip.Trigger>
           <BagItemTooltip entry={entry} />
         </Tooltip.Root>
@@ -375,6 +354,9 @@ export interface QuestExpeditionDetailProps {
   onSend: () => void;
   onClose: () => void;
   onSlotClear: (slotId: string) => void;
+  /** R-257: residents whose seat medallion must not render — carried by a
+   *  flight proxy, or mid-exit while the deferred clear is uncommitted. */
+  suppressedResidentIds?: readonly string[];
   /** PLAN-043 WS-1 swap guard: the rack reports each seat's extraction phase;
    *  the session's commitSwap refuses a swap while either seat is non-idle. */
   onSlotPhaseChange?: (slotId: string, phase: SlotSeatPhase) => void;
@@ -401,6 +383,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
   onSend,
   onClose,
   onSlotClear,
+  suppressedResidentIds,
   onSlotPhaseChange,
   position,
 }) => {
@@ -427,14 +410,6 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
    *  so a mutation is never announced twice. */
   const lastStashEvent = useVillageStashStore((s) => s.lastEvent);
   const bagAnnouncement = lastStashEvent && lastStashEvent.poiId === poi.id ? stashAnnouncement(t, lastStashEvent) : null;
-  /* Bag-item drag ghost — `useDndContext` degrades to defaults outside a
-   *  provider (unlike useDndMonitor, which throws standalone). */
-  const { active: dndActive } = useDndContext();
-  const dndActiveData = dndActive?.data.current as { kind?: string; itemId?: string; poiId?: string } | undefined;
-  const draggingBagEntry =
-    dndActiveData?.kind === 'bag-item' && dndActiveData.poiId === poi.id && dndActiveData.itemId
-      ? items.find((e) => e.item.id === dndActiveData.itemId)
-      : undefined;
   const [viewport, setViewport] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
 
   const LAYOUT = QUEST_PLANNER_INFO.layout;
@@ -554,7 +529,23 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
 
   const dangerBand = resolved ? bandById(resolved.resolvedOffer.bandIds.danger) : undefined;
   const rewardTier = resolved ? REWARD_TIERS.find((rt) => rt.id === resolved.resolvedOffer.bandIds.rewardTier) : undefined;
-  const ready = !resolvePending && typeof estimate === 'object';
+  /* R-248: the wing's footprint must not collapse and re-expand on every
+   *  party edit — while a fresh sim is in flight (or the party is
+   *  momentarily incomplete) the LAST completed estimate stays mounted
+   *  under the state line, flagged `data-forecast-stale`, instead of the
+   *  plaque swapping to a one-line placeholder (the visible resize the
+   *  Director reported). A fresh mount keeps nothing and shows the plain
+   *  state line, exactly as before. */
+  const lastReadyEstimateRef = useRef<Exclude<PartyEstimate, 'incomplete'> | null>(null);
+  useEffect(() => {
+    if (typeof estimate === 'object') lastReadyEstimateRef.current = estimate;
+  }, [estimate]);
+  const shownEstimate = !resolvePending
+    ? typeof estimate === 'object'
+      ? estimate
+      : lastReadyEstimateRef.current
+    : null;
+  const estimateStale = shownEstimate !== null && typeof estimate !== 'object';
   const title = scenario?.title ?? poi.id;
   const panelId = `quest-expedition-${poi.id}`;
   const panelZ = DEFAULT_GAME_FRAME_CONFIG.zLayers.panels;
@@ -666,7 +657,9 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     [openTray],
   );
 
-  /** Signed pp badge for a delta metric — `0` renders nothing (no noise). */
+  /** Signed delta badge for a metric — `0` renders nothing (no noise).
+   *  R-258: the player reads «%», never «pp» (the deltas are percentage
+   *  points internally, but that unit name is sim jargon). */
   const deltaMark = (pp: number, goodWhenDown: boolean) => {
     const v = Math.round(pp);
     if (v === 0) return null;
@@ -674,7 +667,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
     return (
       <em style={{ fontStyle: 'normal', fontSize: 12, color: improves ? TONE.ok : TONE.danger }}>
         {' '}({v > 0 ? '+' : ''}
-        {v}pp)
+        {v}%)
       </em>
     );
   };
@@ -999,6 +992,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                   slots={slots}
                   layout="detail"
                   onSlotClear={onSlotClear}
+                  suppressedResidentIds={suppressedResidentIds}
                   onSlotClick={handleSlotPick}
                   onSlotHover={setHoveredSlotId}
                   highlightedSlotId={hoveredSlotId}
@@ -1014,14 +1008,27 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
 
               {/* LOADOUT — bag slots + coverage marks + Village Stash action.
                *  PLAN-073: the header is an explicit grid, not a wrapping flex
-               *  row — label/actions on row 1, coverage on row 2 — so the
-               *  «open warehouse» button can never overlap the count label
-               *  under locale expansion (PLAN-068 overlap at 1280/1440). */}
+               *  row — warehouse icon-button / label / actions on row 1,
+               *  coverage on row 2 — so the controls can never overlap the
+               *  count label under locale expansion (PLAN-068 overlap at
+               *  1280/1440). R-246 bis: «open warehouse» is icon-only. */}
               <section data-testid="quest-expedition-loadout" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div
                   data-hud-controls=""
-                  style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', columnGap: 8, rowGap: 4 }}
+                  style={{ display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto', alignItems: 'center', columnGap: 8, rowGap: 4 }}
                 >
+                  {/* R-246 bis: warehouse trigger is an icon-only square pill
+                   *  (svg:only-child → 26px, T-20-safe) left of the BAG label —
+                   *  no text, aria-label/title carry the accessible name. */}
+                  <button
+                    type="button"
+                    data-testid="quest-open-stash"
+                    aria-label={t('gameFrame.village.openStash')}
+                    title={t('gameFrame.village.openStash')}
+                    onClick={(event) => onOpenStash(event.currentTarget)}
+                  >
+                    <EngravedIcon id="ico-chest" size={13} aria-hidden />
+                  </button>
                   <span data-testid="quest-expedition-bag-count" style={{ ...SECTION_LABEL, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {t('questExpedition.loadout', { count: selectedItemIds.length, max: QUEST_STASH.bagSlots })}
                   </span>
@@ -1045,19 +1052,6 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                         </span>
                       </button>
                     )}
-                    <button
-                      type="button"
-                      data-testid="quest-open-stash"
-                      aria-label={t('gameFrame.village.openStash')}
-                      title={t('gameFrame.village.openStash')}
-                      onClick={(event) => onOpenStash(event.currentTarget)}
-                      style={{ ...SECTION_LABEL, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)', borderRadius: 4, padding: '1px 8px', cursor: 'pointer', background: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                    >
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <EngravedIcon id="ico-pouch" size={12} aria-hidden />
-                        {t('gameFrame.village.openStash')}
-                      </span>
-                    </button>
                   </span>
                   {!compact && (scenario?.primaryStats?.length ?? 0) > 0 && (
                     <span data-testid="loadout-coverage" style={{ gridColumn: '1 / -1', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -1235,7 +1229,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
       </div>
 
       {/* ── RIGHT WING · the pinned forecast — it never yields while the
-           party is being edited (live ±pp deltas preserved, v23) ─────── */}
+           party is being edited (live ±% deltas preserved, v23) ─────── */}
       <HudPlaque
         shape="panel"
         as="aside"
@@ -1250,41 +1244,50 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           <div
             data-testid="quest-expedition-forecast"
             data-forecast-state={estimate === 'computing' ? 'computing' : estimate === 'incomplete' ? 'incomplete' : 'ready'}
+            data-forecast-stale={estimateStale || undefined}
+            aria-busy={estimateStale || undefined}
             style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
           >
-            {resolvePending && <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.resolving')}</span>}
-            {!resolvePending && estimate === 'computing' && (
-              <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.computing')}</span>
-            )}
-            {!resolvePending && estimate === 'incomplete' && (
-              <span style={{ fontFamily: FONT.serif, fontSize: 13, color: TONE.secondary }}>{t('questExpedition.forecast.incomplete')}</span>
-            )}
-            {ready && typeof estimate === 'object' && (
+            {/* Fixed-height state seat — the line comes and goes but its
+             *  slot never does, so the wing's footprint is identical in
+             *  ready/computing/incomplete (R-248: no collapse on edit). */}
+            <div style={{ height: 18, overflow: 'hidden' }}>
+              <span style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: '18px', color: TONE.secondary }}>
+                {resolvePending
+                  ? t('questExpedition.forecast.resolving')
+                  : estimate === 'computing'
+                    ? t('questExpedition.forecast.computing')
+                    : estimate === 'incomplete'
+                      ? t('questExpedition.forecast.incomplete')
+                      : null}
+              </span>
+            </div>
+            {shownEstimate && (
               <>
                 {/* Aggregate — headline chips; the mark after each is the
                  *  signed pp shift vs the previous party configuration. */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   <span data-testid="forecast-reward-pct">
                     <HudChip tone="ok">
-                      {t('questExpedition.forecast.reward', { pct: estimate.sim.outcomePct.reward.toFixed(0) })}
+                      {t('questExpedition.forecast.reward', { pct: shownEstimate.sim.outcomePct.reward.toFixed(0) })}
                       {forecastDelta && deltaMark(forecastDelta.rewardPp, false)}
                     </HudChip>
                   </span>
                   <span data-testid="forecast-wound-pct">
                     <HudChip tone="warn">
-                      {t('questExpedition.forecast.wound', { pct: estimate.sim.anyWoundPct.toFixed(0) })}
+                      {t('questExpedition.forecast.wound', { pct: shownEstimate.sim.anyWoundPct.toFixed(0) })}
                       {forecastDelta && deltaMark(forecastDelta.woundPp, true)}
                     </HudChip>
                   </span>
                   <span data-testid="forecast-death-pct">
                     <HudChip tone="danger">
-                      {t('questExpedition.forecast.death', { pct: estimate.sim.anyDeathPct.toFixed(0) })}
+                      {t('questExpedition.forecast.death', { pct: shownEstimate.sim.anyDeathPct.toFixed(0) })}
                       {forecastDelta && deltaMark(forecastDelta.deathPp, true)}
                     </HudChip>
                   </span>
                   <span data-testid="forecast-wipe-pct">
                     <HudChip tone="danger">
-                      {t('questExpedition.forecast.wipe', { pct: estimate.sim.outcomePct.wipe.toFixed(0) })}
+                      {t('questExpedition.forecast.wipe', { pct: shownEstimate.sim.outcomePct.wipe.toFixed(0) })}
                       {forecastDelta && deltaMark(forecastDelta.wipePp, true)}
                     </HudChip>
                   </span>
@@ -1294,7 +1297,7 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
                  *  hovering a row lights its castone (and vice versa). */}
                 <div data-testid="forecast-members" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   <span style={SECTION_LABEL}>{t('questExpedition.members.title')}</span>
-                  {estimate.sim.perMember.map((m) => {
+                  {shownEstimate.sim.perMember.map((m) => {
                     const slotId = slotIdForMember(m.id);
                     const lit = hoveredMemberId === m.id;
                     return (
@@ -1335,27 +1338,17 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           </div>
         </div>
 
-        {/* The ONE scroll region — WHY → Needs → Intel (contract order).
-         *  WHY is sim attribution (needs a ready estimate); Needs and Intel
-         *  are authored scenario info and stay visible even when the
-         *  forecast is incomplete — the player reads them while composing. */}
+        {/* The ONE scroll region — Needs → Intel (contract order). R-258:
+         *  the WHY attribution list is removed entirely — source names AND
+         *  MC stats are sim internals, never player-facing (the fields stay
+         *  on the sim result, unrendered). Needs and Intel are authored
+         *  scenario info and stay visible even when the forecast is
+         *  incomplete — the player reads them while composing. */}
         <div
           data-testid="quest-expedition-forecast-scroll"
           className="quest-s1-scroll"
           style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', borderTop: '1px solid color-mix(in srgb, var(--skin-text-secondary) 25%, transparent)', paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}
         >
-          {ready && typeof estimate === 'object' && estimate.sim.whyBySource.length > 0 && (
-            <div data-testid="forecast-why" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <span style={SECTION_LABEL}>{t('questExpedition.why.title')}</span>
-              {estimate.sim.whyBySource.slice(0, QUEST_PLANNER_INFO.outcome.maxWhySources).map((src) => (
-                <div key={src.source} data-testid="forecast-why-row" style={{ fontFamily: FONT.serif, fontSize: 12, color: TONE.text, lineHeight: 1.35 }}>
-                  <span style={{ color: TONE.secondary }}>«{src.source}» </span>
-                  {t('questExpedition.why.row', { runs: src.runsPct.toFixed(0), death: src.deathSharePct.toFixed(0), wound: src.woundSharePct.toFixed(0) })}
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* NEEDS — the authored key-stat tiers; a tier reads covered when
            *  the bag or a member meets the configured bar. */}
           {keyTiers.primary.length > 0 && (
@@ -1412,28 +1405,6 @@ export const QuestExpeditionDetail: React.FC<QuestExpeditionDetailProps> = ({
           )}
         </div>
       </HudPlaque>
-      {/* PLAN-073: bag-item drag ghost — a fixed portal ghost (DragOverlay
-       *  portals to body, T-16) so the icon never clips under the wings. */}
-      <DragOverlay dropAnimation={null}>
-        {draggingBagEntry ? (
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 40,
-              height: 40,
-              borderRadius: 8,
-              border: '1px solid var(--skin-icon-accent)',
-              background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 88%, transparent)',
-              color: 'var(--skin-title-color)',
-              pointerEvents: 'none',
-            }}
-          >
-            <VillageStashItemIcon icon={draggingBagEntry.item.icon} size={22} />
-          </span>
-        ) : null}
-      </DragOverlay>
     </SkinScope>
     </PlannerBoundaryContext.Provider>
   );

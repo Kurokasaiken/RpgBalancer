@@ -63,6 +63,7 @@ describe('projectBeats — committed deltas become ordered beats', () => {
     expect(beats[beats.length - 1]).toMatchObject({ kind: 'scene', nodeId: 'gob-agguato-scelta' });
   });
 
+  // INV:beat-sequencer.INV-1
   it('a resolved check becomes a check beat carrying the authored verdict', () => {
     const run = timedRun();
     const mark = beatMark(run);
@@ -71,6 +72,40 @@ describe('projectBeats — committed deltas become ordered beats', () => {
     const check = beats.find((b) => b.kind === 'check');
     expect(check).toBeDefined();
     expect(check!.id).toBe('chk-1');
+  });
+
+  /* R-241 B1 — «quando scelgo qualcosa l'immagine cambia e nn dovrebbe»:
+   *  the `CHECK:` commit pushed the check node into `visitedNodes` WITHOUT a
+   *  `NODE` log entry, so the positional zip in `projectBeats` bound the next
+   *  `NODE` entry to the check node — the arrival scene beat then painted the
+   *  check node's title/art (the image swapped to a wrong node). */
+  // INV:quest-run.INV-2 — every `visitedNodes` push is echoed by a `NODE` log
+  // entry, in order; the `CHECK:` route keeps the same invariant `arriveNode`
+  // keeps everywhere else.
+  it('every visited-node push is echoed by a NODE log entry — CHECK: path included', () => {
+    const run = timedRun();
+    const mark = beatMark(run);
+    submitCommand(run, 'gob-cerca-tracce', { tick: run.frontier.readyAt });
+    const newVisited = run.visitedNodes.slice(mark.visitedLen);
+    const newNodeLogs = run.log.slice(mark.logLen).filter((e) => e.kind === 'NODE');
+    expect(newVisited).toEqual(['gob-tracce-per', run.nodeId]);
+    expect(newNodeLogs.length).toBe(newVisited.length);
+  });
+
+  // INV:beat-sequencer.INV-2 — a `check`-kind node owns a check beat, never a
+  // scene beat; the arrival scene binds to ITS node, so the theatre image only
+  // changes when that scene reaches the stage.
+  it('binds the arrival scene beat to its own node — never to the check node', () => {
+    const run = timedRun();
+    const mark = beatMark(run);
+    submitCommand(run, 'gob-cerca-tracce', { tick: run.frontier.readyAt });
+    const beats = projectBeats(mark, run, { maxBeats: MAX });
+    const sceneIds = beats.filter((b) => b.kind === 'scene').map((b) => (b as { nodeId: string }).nodeId);
+    expect(sceneIds).not.toContain('gob-tracce-per');
+    expect(sceneIds).toEqual([run.nodeId]);
+    /* Ordering is presentation-meaningful: the astrolabe (check beat) and the
+     * consequence harm play BEFORE the arrival scene cuts in. */
+    expect(kinds(beats)).toEqual(['check', 'harm', 'scene']);
   });
 
   it('E1: each committed harm is its own beat — a multi-death steps member by member', () => {
@@ -182,5 +217,50 @@ describe('useBeatCursor — timed replay (fake timers)', () => {
     const beats: QuestBeat[] = [{ id: 'a', kind: 'scene', nodeId: 'a', title: 'A' }];
     const { result } = renderHook(() => useBeatCursor(beats, TIMING, { reducedMotion: true }));
     expect(result.current.current).toBeNull();
+  });
+
+  /* R-242 — «quando chiudo e riapro l'immagine al centro si comporta in
+   *  modo strano»: the queue owner (`useQuestRun`, lives across mounts)
+   *  holds the cursor; a window remount must resume at the HELD beat, not
+   *  replay beats the player already watched (scene/cue/geometry flap). */
+  // INV:beat-sequencer.INV-3 — with a shared cursorRef a remount resumes at
+  // the held beat; only the pending tail replays.
+  it('a shared cursorRef makes a remount resume at the held beat — no replay of consumed beats', () => {
+    vi.useFakeTimers();
+    try {
+      const beats: QuestBeat[] = [
+        { id: 'a', kind: 'scene', nodeId: 'a', title: 'A' },
+        { id: 'b', kind: 'scene', nodeId: 'b', title: 'B' },
+        { id: 'c', kind: 'scene', nodeId: 'c', title: 'C' },
+      ];
+      const cursorRef = { current: 0 };
+      const first = renderHook(() => useBeatCursor(beats, TIMING, { cursorRef }));
+      act(() => first.result.current.skip()); // 'a' presented, 'b' on stage
+      expect(first.result.current.current?.id).toBe('b');
+      first.unmount(); // the window closed
+      const second = renderHook(() => useBeatCursor(beats, TIMING, { cursorRef }));
+      expect(second.result.current.current?.id).toBe('b');
+      expect(second.result.current.remaining).toBe(1); // 'c' only — 'a' is not re-counted
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('writes every advance through to cursorRef (skip, flush, auto-advance)', () => {
+    vi.useFakeTimers();
+    try {
+      const beats: QuestBeat[] = [
+        { id: 'a', kind: 'scene', nodeId: 'a', title: 'A' },
+        { id: 'b', kind: 'scene', nodeId: 'b', title: 'B' },
+      ];
+      const cursorRef = { current: 0 };
+      const { result } = renderHook(() => useBeatCursor(beats, TIMING, { cursorRef }));
+      act(() => result.current.skip());
+      expect(cursorRef.current).toBe(1);
+      act(() => vi.advanceTimersByTime(TIMING.sceneMs));
+      expect(cursorRef.current).toBe(2); // drained — reopen lands on the frontier
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

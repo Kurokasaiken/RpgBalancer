@@ -592,7 +592,6 @@ export default interface Resources {
           "merchant": "Merchant",
           "quest": "Quest in progress",
           "questDetail": "Quest planner",
-          "questForecast": "Expedition forecast",
           "roster": "Roster",
           "tuning": "Tuning",
           "villageStash": "Village stash"
@@ -664,12 +663,6 @@ export default interface Resources {
         "abandonYes": "Abandon",
         "bag": "Bag",
         "bagEmpty": "Bag is empty",
-        "bagStrip": {
-          "armed": "armed",
-          "chipName": "{label} ({qualifier})",
-          "held": "carried",
-          "label": "Packed bag"
-        },
         "beats": {
           "clickHint": "Click or press a key to continue",
           "continue": "Continue",
@@ -751,11 +744,13 @@ export default interface Resources {
       },
       "resources": {
         "autonomy": "{count} d left",
+        "delta": "{label} +{amount}",
         "food": "Food",
         "gold": "Gold",
         "incoming": "+{count} incoming",
         "iron": "Iron",
         "perDay": "−{count}/d",
+        "xp": "XP",
         "tooltip": {
           "amount": "{label} {value}.",
           "food": "{label} {value} of {max}. Residents eat {perDay} a day: enough for {days} days.",
@@ -1179,6 +1174,24 @@ export default interface Resources {
     },
     "poiMarkerLab": {
       "counterClockwise": "Counter-clockwise (deadline)",
+      "fork": {
+        "candidates": {
+          "baseline": "Baseline",
+          "field": "B · Field + border",
+          "metals": "A · Family metals",
+          "shape": "C · Silhouette halo"
+        },
+        "captions": {
+          "baseline": "Brass rim, teal field, round halo — production today",
+          "field": "Warm field, muted bone inner border",
+          "metals": "Rim = family: brass / iron / copper",
+          "shape": "Countdown on the silhouette edge"
+        },
+        "grayscale": "Grayscale",
+        "replay": "Replay reveal",
+        "subtitle": "Baseline vs candidates on the painted surface at use size (55 px): silhouette, rim/halo, field, reveal. Toggle grayscale to judge value separation.",
+        "title": "Sigillo fork — B4-map"
+      },
       "grounded": "Contact shadow",
       "importance": "Importance",
       "importances": {
@@ -1340,7 +1353,11 @@ export default interface Resources {
       "marching": {
         "coda": "CODA",
         "exposure": "Exposure",
+        "exposureLegend": "Share of incoming impacts assigned by position.",
+        "exposureNone": "{position}: absorbs no incoming impacts.",
+        "exposurePercent": "{position}: {pct}% of incoming impacts.",
         "leader": "Leader",
+        "slot": "Slot {index}",
         "testa": "TESTA",
         "title": "Marching order"
       },
@@ -1377,10 +1394,6 @@ export default interface Resources {
         "open": "Choose",
         "title": "Selection"
       },
-      "why": {
-        "row": "— in {runs}% of runs · {death}% of deaths · {wound}% of wounds",
-        "title": "Where the risk comes from"
-      }
     },
     "questGenLab": {
       "backToHub": "Test Hub",

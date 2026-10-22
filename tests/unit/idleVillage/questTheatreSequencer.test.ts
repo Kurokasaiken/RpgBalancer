@@ -256,3 +256,93 @@ describe('questTheatreAudio', () => {
     expect(builds).toBe(1);
   });
 });
+
+/* R-254 — real samples replace synthesized timbres: a decoded buffer wins
+ *  over the synth voice; a missing/failed fetch keeps the synth (the cue
+ *  is never lost). The riser loops the decoded bed under the same filter
+ *  sweep. */
+describe('questTheatreAudio — R-254 sample layer', () => {
+  class SampleSource extends FakeSource {}
+  class SampleCtx extends FakeCtx {
+    sources: SampleSource[] = [];
+    decoded = 0;
+    createBufferSource() {
+      this.created.push('buf');
+      const s = new SampleSource();
+      this.sources.push(s);
+      return s as unknown as AudioBufferSourceNode;
+    }
+    async decodeAudioData(ab: ArrayBuffer): Promise<AudioBuffer> {
+      this.decoded += 1;
+      return { __sample: ab.byteLength } as unknown as AudioBuffer;
+    }
+  }
+
+  const harness = () => {
+    const fake = new SampleCtx();
+    const Ctor = function (this: unknown) {
+      return fake;
+    } as unknown as typeof AudioContext;
+    const fetched: string[] = [];
+    const audio = createQuestTheatreAudio({
+      audioContextCtor: Ctor as unknown as new () => AudioContext,
+      fetchAudio: async (url: string) => {
+        fetched.push(url);
+        return new Uint8Array([1, 2, 3, 4]).buffer as ArrayBuffer;
+      },
+    });
+    return { fake, fetched, audio };
+  };
+  const flush = async (n = 8) => {
+    for (let i = 0; i < n; i += 1) await Promise.resolve();
+  };
+
+  // INV:quest-run-window.R-254-sample-wins — decoded buffer plays, synth
+  // only until decode completes or on fetch/decode failure (BV-13 kept).
+  it('plays the decoded sample instead of the synth once loaded', async () => {
+    const { fake, fetched, audio } = harness();
+    audio.play('cut_impact'); // kicks loadSamples — sample not ready yet
+    expect(fetched.length).toBeGreaterThan(0); // fetch kicked for mapped cues
+    const oscAfterFirstPlay = fake.created.filter((n) => n === 'osc').length;
+    expect(oscAfterFirstPlay).toBeGreaterThan(0); // synth voice used now
+    await flush();
+    const oscBefore = fake.created.filter((n) => n === 'osc').length;
+    const sourcesBefore = fake.sources.length;
+    audio.play('cut_impact');
+    expect(fake.created.filter((n) => n === 'osc').length).toBe(oscBefore); // no synth
+    expect(fake.sources.length).toBe(sourcesBefore + 1); // one buffer source
+    expect(fake.sources[fake.sources.length - 1].buffer).toEqual({ __sample: 4 });
+  });
+
+  // INV:quest-run-window.R-254-sample-fallback — a fetch that rejects keeps
+  // the synthesized voice: the cue always sounds.
+  it('keeps the synthesized voice when the sample fetch fails', async () => {
+    const fake = new SampleCtx();
+    const Ctor = function (this: unknown) {
+      return fake;
+    } as unknown as typeof AudioContext;
+    const audio = createQuestTheatreAudio({
+      audioContextCtor: Ctor as unknown as new () => AudioContext,
+      fetchAudio: () => Promise.reject(new Error('404')),
+    });
+    audio.play('cut_impact');
+    await flush();
+    const oscBefore = fake.created.filter((n) => n === 'osc').length;
+    audio.play('cut_impact');
+    expect(fake.created.filter((n) => n === 'osc').length).toBeGreaterThan(oscBefore);
+  });
+
+  // INV:quest-run-window.R-254-riser-bed — the spin loops the decoded
+  // wind bed (not the brown-noise synth) once samples land.
+  it('loops the decoded wind bed under the spin riser', async () => {
+    const { fake, audio } = harness();
+    audio.play('choice_commit'); // kicks loadSamples
+    await flush();
+    audio.startRiser();
+    const riser = fake.sources[fake.sources.length - 1];
+    expect(riser.buffer).toEqual({ __sample: 4 });
+    expect(riser.loop).toBe(true);
+    audio.stopRiser();
+    audio.dispose();
+  });
+});

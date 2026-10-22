@@ -1,7 +1,7 @@
 ---
 title: PLAN-017 — Stylized Sea Pattern Evaluation
 type: plan
-status: active
+status: completed
 created: 2026-09-10
 richiesta: R-068
 desiderata: v19 (FROZEN)

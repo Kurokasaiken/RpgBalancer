@@ -3,6 +3,7 @@ import { POI_AMBER_SKIN_CONFIG, POI_AMBER_SKIN_ID } from '@/ui/idleVillage/skins
 import { TemporarySkinConfigSchema } from '@/ui/idleVillage/skins/temporary/TemporarySkinConfig';
 
 describe('POI Amber Temporary Skin', () => {
+  // INV:temporary-skin-config.INV-1
   it('matches TemporarySkinConfig schema', () => {
     expect(() => TemporarySkinConfigSchema.parse(POI_AMBER_SKIN_CONFIG)).not.toThrow();
   });

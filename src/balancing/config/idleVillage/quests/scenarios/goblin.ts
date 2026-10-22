@@ -1,7 +1,8 @@
 /**
  * QuestScenario «Goblin Extermination» — canonical authored config
  * (PLAN-019-S2.1, T-2: migration 1:1 from `questS1Lab/questScenarioGoblin.ts`;
- * R-135: English re-baseline of all authored prose).
+ * R-135: English re-baseline of all authored prose; R-219: v3 manuscript
+ * sync, Director 2026-10-18).
  *
  * Director-authored spec: `src/docs/docs/idle_village/quest_sterminio_goblin_spec.md`
  * (PLAN-022). Combat quest, Strength-based, positional slot targeting:
@@ -22,35 +23,38 @@ import {
 } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 
 /* ------------------------------------------------------------------ */
-/* Nodes — F0..F7 from the authored spec.                               */
+/* Nodes — F1..F7 from the authored spec (v3 manuscript).              */
 /* ------------------------------------------------------------------ */
 
 const GOBLIN_NODES: Record<string, QuestNode> = {
   /* F0 (ASSIGNMENT) is no longer a node: the consumables the player brings from the village are
-   * armed in the planner, so the run opens straight on the first real decision (Director, 2026-10-16). */
+   * armed in the planner, so the run opens straight on the first real decision (Director, 2026-10-16).
+   * Beats are 0-indexed into `beats` — the 'Assignment' filler entry is gone (v3). */
 
-  /* F1 — EXPLORATION: two alternative checks.
-   * PER "Look for tracks" success → stealth bonus (F3).
-   * STR+PER "Climb the tree" success → opens F2 (from above you spot
-   * the stash by the boulder); fail −10 HP (fall). */
+  /* F1 — EXPLORATION: two alternative checks (v3, Director 2026-10-18).
+   * Options name the gesture only — never the stat's purpose or the
+   * outcome. PER "Examine the ground" success → stealth bonus (F3);
+   * epicfail = a hidden blade, −10 HP wired in the engine. STR+PER
+   * "Examine from above" success → opens F2 (from above you spot the
+   * hidden stash); fail −10 HP (fall). */
   'gob-esplora': {
     id: 'gob-esplora',
     kind: 'choice',
-    title: 'Exploration — at the edge of the wood',
-    body: 'The wood is silent in a way that does not come naturally to woods. On the trail, a boulder blocks the way — and from underneath a flap of rag sticks out, crushed as if by someone in a hurry.',
-    transit: 'The road dies where the wood begins. The smell of resin gives way to damp earth and a low smoke that is no kitchen fire. Whoever leads marches ahead; behind, the others count loads and exits.',
-    beat: 1,
+    title: 'Exploration',
+    body: 'The undergrowth narrows the path into a wall of fallen trunks. The thicket is silent on every side, and tells you nothing of who lives in it.',
+    transit: 'The trees close out the light behind you. Among the damp ferns the air lies still, smelling of wet moss and rotting wood.',
+    beat: 0,
     options: [
       {
         id: 'gob-cerca-tracce',
-        label: 'Look for tracks',
-        detail: 'Perception. The ground tells who passed, and how many they were.',
+        label: 'Examine the ground',
+        detail: 'Perception',
         next: 'CHECK:gob-tracce-per',
       },
       {
         id: 'gob-forza-tracce',
-        label: 'Climb the tree',
-        detail: 'Strength + Perception. From above: the camp, and where they hide what they steal.',
+        label: 'Examine from above',
+        detail: 'Strength + Perception',
         next: 'CHECK:gob-tracce-perfor',
       },
     ],
@@ -58,101 +62,89 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-tracce-per': {
     id: 'gob-tracce-per',
     kind: 'check',
-    title: 'Looking for tracks',
-    body: 'On the ground the wood speaks softly: footprints in the damp earth, branches broken at the wrong height.',
-    transit: 'You spread along the trail reading the ground: prints, churned earth, the sense of a path the others cannot see.',
+    title: 'Examine the ground',
+    body: 'You crouch where the moss gives way to dark earth, searching the wet leaves for a sign.',
+    transit: 'You crouch among the roots. Beneath the leaf litter, the earth still holds marks the wood has not had time to erase.',
     stats: ['perc'],
     risk: { wound: 0, death: 0 },
-    beat: 1,
+    beat: 0,
+    failHint: 'The leaves settle back into place, but your own prints stay pressed in the damp earth.',
     verdictFlavor: {
-      bigwin: 'Fresh tracks, turned earth, a thread of bells strung between the branches: you know where they go, and where they watch from.',
-      win: 'Fresh tracks heading north, and signs of repeated passages. You know how to approach.',
-      almost: 'Confused signs, double prints. A suspicion, not a path.',
-      fail: 'The ground was churned on purpose. The wood tells you nothing.',
-      epicfail: 'You read the tracks backwards — and someone, somewhere, has read yours.',
+      /* r008 (artifact, Director 2026-10-19). epicfail: the crash-down
+       * through dead branches is what pays the wired −10 HP — the wound
+       * narrative lives in the engine log, not the verdict text. */
+      bigwin: 'Beneath the rotting leaves, light prints surface — and further on, in the tall grass, the thin glint of a bell wire strung at shin height.',
+      win: 'Bare heels in the damp earth and low snapped branches draw a slanting trail that points deeper into the wood.',
+      almost: 'Overlapping, muddled prints in the soft ground: someone passed, but the direction dies among the roots.',
+      fail: 'Only bare roots and rain-turned soil. The ground yields you nothing.',
+      epicfail: 'Your foot gives on the sodden moss and you go down through the dry branches with a crash that bounces through the silence of the wood.',
     },
   },
   'gob-tracce-perfor': {
     id: 'gob-tracce-perfor',
     kind: 'check',
-    title: 'You climb the tree',
-    body: 'From below the wood is a wall. From above, something says where it opens — and what it hides.',
-    transit: 'The right tree stands three paces off the trail. The bark is your grip, the top your eye.',
+    title: 'Examine from above',
+    body: 'The oak’s trunk is damp and rough under your palms; higher up, the dome of leaves closes off everything beyond.',
+    transit: 'An old oak rises above the undergrowth. The lowest branches are within reach, but the bark is rough and cracked.',
     stats: ['str', 'perc'],
     risk: { wound: 0, death: 0 },
-    beat: 1,
+    beat: 0,
+    failHint: 'The wood creaks under your weight. A thin branch bends and snaps back with a sharp crack.',
     verdictFlavor: {
-      bigwin: 'From above: low smoke to the east, a line of sharpened stakes, a sentry on a stump — and below, by the boulder, churned earth where someone closed something in a hurry.',
-      win: 'The bark gives but holds. From above: the camp to the east, and by the boulder a flap of rag that should not be there.',
-      almost: 'The branch gives halfway up — but it is enough to glimpse the churned earth under the boulder.',
-      fail: 'The branch holds halfway, then gives: your back finds the ground before your eyes find the camp.',
-      epicfail: 'A rotten branch: down on your back, and the thud runs through the wood. Now even they know you are here.',
+      bigwin: 'From above the wood changes face: a thread of smoke rises straight over the camp’s clearing, the trampling spirals around the fires and, far from the tents, a patch of undergrowth looks put back with too much care, like a stitched wound.',
+      win: 'Through the high branches you spot the camp’s grey smoke and, far from the fires, a patch of undergrowth put back with too much care, like a stitched wound.',
+      almost: 'The wind opens the fronds for an instant: you glimpse a thread of grey smoke among the treetops before the leaves close over the sight.',
+      fail: 'The crown is a green wall and your arms burn from the climb: you come down with bark under your nails, having seen nothing past the trees.',
+      epicfail: 'The rotten branch gives with a crack under your weight: you drop through the lower boughs and slam your shoulder into the ground.',
     },
   },
 
-  /* F2 — HIDDEN EVENT (loot): only if PER+STR succeeded.
-   * AGI: item anyway; fail → 10 dmg + camp awake (alarm −10pp at F4+). */
-  'gob-bottino-scelta': {
-    id: 'gob-bottino-scelta',
+  /* F2 — HIDDEN EVENT (loot): only if "Examine from above" succeeded.
+   * v3 (Director 2026-10-18): no check and no leave option — one click
+   * recovers the stash. Engine shape: a single-option choice (the node
+   * kinds carry no 'reward'); the 'war loot' item lands via the
+   * `gob-prendi` grant in questRun's option application, the gold via
+   * `grantsGold`. */
+  'gob-bottino': {
+    id: 'gob-bottino',
     kind: 'choice',
-    title: 'Hidden treasure',
+    title: 'What was hidden',
     hidden: true,
-    body: 'Under the boulder, loot wrapped in rags. Taking it in silence costs a steady hand — one sound and the camp wakes.',
-    transit: 'Behind the boulder, a niche of rags: someone hid something in a hurry and never came back.',
-    beat: 2,
+    immediate: true,
+    body: 'The leaves come away in a single handful. Beneath, in a hide-lined hollow, lies what the goblins buried in secret: you reach in and pull it out.',
+    transit: 'The patch of undergrowth set back with too much care is still there, apart from the fires.',
+    beat: 1,
     options: [
       {
         id: 'gob-prendi',
-        label: 'Take the loot',
-        detail: 'Agility. If your hand betrays you, the camp wakes.',
-        next: 'CHECK:gob-bottino',
-      },
-      {
-        id: 'gob-lascia-bottino',
-        label: 'Leave it be',
-        detail: 'A sleeping camp is worth more than loot: you move on.',
+        label: 'Recover the loot',
+        detail: 'The bundle goes in the bag.',
         next: 'gob-accampamento',
+        grantsGold: 12,
       },
     ],
   },
-  'gob-bottino': {
-    id: 'gob-bottino',
-    kind: 'check',
-    title: 'Hands on the loot',
-    hidden: true,
-    body: 'Chains, bells, a knot to undo without a sound.',
-    stats: ['agi'],
-    verdictFlavor: {
-      bigwin: 'Not even the bells notice. In the bag, without a sound.',
-      win: 'One knot at a time. The loot is yours.',
-      almost: 'Something jingles. Breath held — nothing moves. Half taken.',
-      fail: 'A bell betrays the hand: the sound runs through the valley.',
-      epicfail: 'The wire stays in your hand: the bells call, and something answers.',
-    },
-    risk: { wound: 0, death: 0 },
-    beat: 2,
-  },
 
-  /* F3 — CAMP: Stealth (AGI) vs Assault (STR).
+  /* F3 — RULES OF ENGAGEMENT: Stealth (AGI) vs Assault (STR).
    * Same lever (+damage at F4), different risk. */
   'gob-accampamento': {
     id: 'gob-accampamento',
     kind: 'choice',
-    title: 'Assault',
-    body: 'Smoke among the tents. From here you strike in one way only — yours.',
-    transit: 'Among the leaves the smoke thickens: the camp is below. From here you strike in one way only — choose it well.',
-    beat: 3,
+    title: 'Rules of engagement',
+    body: 'Low embers burn at the clearing’s heart. Short shapes move between the crooked tents: all that remains is to choose how to get in.',
+    transit: 'Past the last curtain of ferns, the sharp smell of rancid fat hits you in the half-light.',
+    beat: 2,
     options: [
       {
         id: 'gob-via-stealth',
-        label: 'Slip past the bell wire',
-        detail: 'Agility. Bigger bonus — but if they see you, the camp is alerted.',
+        label: 'Move through the shadows',
+        detail: 'Agility',
         next: 'CHECK:gob-stealth',
       },
       {
         id: 'gob-via-assalto',
-        label: 'Assault',
-        detail: 'Strength. Moderate bonus — failure costs nothing.',
+        label: 'Charge with bare steel',
+        detail: 'Strength',
         next: 'CHECK:gob-assalto',
       },
     ],
@@ -160,33 +152,35 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-stealth': {
     id: 'gob-stealth',
     kind: 'check',
-    title: 'The bell wire',
-    body: 'A wire strung at half-shin leads to bells hung like traps. Every step is a possible sound.',
+    title: 'Move through the shadows',
+    body: 'You advance bent low where the undergrowth’s shadow touches the clearing’s edge, measuring every foothold.',
     stats: ['agi'],
     risk: { wound: 0, death: 0 },
-    beat: 3,
+    beat: 2,
+    failHint: 'The wire tightens under your weight. A bell quivers, barely.',
     verdictFlavor: {
-      bigwin: 'You pass like smoke between the stakes. The camp sleeps; the surprise is yours.',
-      win: 'One step, one breath, one step. You are inside.',
-      almost: 'A stifled sneeze. Two heads rise from the fire, then sink back down. Inside — but not invisible.',
-      fail: 'A wire trembles under the palm. A bell decides to live.',
-      epicfail: 'The wire stays in your hand: the bells call, and something answers.',
+      bigwin: 'You slip past a bell wire without stirring a breath: you are already behind them while they still stare at the fire.',
+      win: 'A step, a pause, another step in the dark. You cross the outer perimeter without a single leaf speaking.',
+      almost: 'You brush a bell that sways faintly: near the fire a head turns, then hesitates.',
+      fail: 'A wire bites your boot and a bell rasps in the night: the shapes around the fire spring up.',
+      epicfail: 'You trip full into a taut wire and the bells erupt in a single sound: the whole camp pours out at you.',
     },
   },
   'gob-assalto': {
     id: 'gob-assalto',
     kind: 'check',
-    title: 'The charge',
-    body: 'The palisade is made of refuse and mud. Break through before they organize — or take the hit.',
+    title: 'Charge with bare steel',
+    body: 'You tighten your grip on the hilts and burst out of the scrub, charging straight for the ring of fire.',
     stats: ['str'],
     risk: { wound: 0, death: 0 },
-    beat: 3,
+    beat: 2,
+    failHint: 'The wood groans under the push. On the other side, something thuds against the barrier.',
     verdictFlavor: {
-      bigwin: 'The first stake falls before anyone understands. A tent collapses onto the fire; two goblins roll away blind with smoke.',
-      win: 'You break through where the palisade is lowest. A spear rises — too late.',
-      almost: 'The palisade holds one breath too long. Someone shouts; the camp has time to grab their weapons.',
-      fail: 'The charge plants itself in the mud. They are already waiting, spears leveled.',
-      epicfail: 'You trip on your own charge: in the middle of the camp, in disarray.',
+      bigwin: 'You smash through the entrance barricade on sheer momentum: you are already on top of the fires before the first scream takes shape.',
+      win: 'You break the camp’s edge shoulder-first, carrying your blades inside the circle of light.',
+      almost: 'The soft ground brakes your boots on the last step: you enter the clearing as the first guards are already rising.',
+      fail: 'The mud under your feet snaps the run’s momentum; before the fires the wall of points is already tight.',
+      epicfail: 'Your foot slides in the mire at full run: you fall forward against the barricade, guard wide open.',
     },
   },
 
@@ -195,11 +189,11 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-combattimento': {
     id: 'gob-combattimento',
     kind: 'combat',
-    title: 'Combat — the goblin camp',
-    body: 'You have them. Or they have you.',
-    transit: 'The moment is chosen. The wood holds its breath — then the camp erupts.',
-    previewHint: 'A turn-based fight on the camp: the goblins answer blow for blow — skin pays the price.',
-    beat: 4,
+    title: 'Iron and ash',
+    body: 'Trampled embers, hoarse screams bouncing between the trunks, and the warm taste of copper on your tongue. Every shape around the coals has teeth and a blade.',
+    transit: 'Your breath closes in your throat. Then there is only the sound of iron.',
+    previewHint: 'Amid smoke and flame, even the shadows seem to have teeth.',
+    beat: 3,
     /* PLAN-043 WS-4: the camp fight earns the full cut — aperture reveal,
      * dolly-in on the eruption, impact on each exchange. */
     stageDirection: { cut: ['reveal', 'impact', 'push'] },
@@ -213,6 +207,14 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
       escalateProfile: true,
       nextCleared: 'gob-esplora-extra', // extermination → F5 skipped
       nextSurvivors: 'gob-incalzare',
+      /* r008 attack lines — sensory channels, no tallies (the UI counts). */
+      attackLines: {
+        bigwin: 'The full weight of your body falls into the cleave and breaks through the guard in front of you.',
+        win: 'The dry clash of steel splits the shield-wood, and the noise stays in your ears.',
+        almost: 'The fire turns every blade into a crooked flash: the cut bites, but only in passing.',
+        fail: 'The blow dies on greased leather and warped wood, leaving your wrist humming on empty air.',
+        epicfail: 'The slick ash betrays your heel and a hit from the flank pours the breath back into your throat.',
+      },
     },
   },
 
@@ -222,21 +224,21 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     id: 'gob-incalzare',
     kind: 'choice',
     title: 'Pursuit',
-    body: 'The survivors run toward the wood. Close them here — or let them go.',
-    transit: 'Dust and blood. The remaining goblins break the front and run toward the wood, carrying your faces with them.',
-    beat: 5,
+    body: 'Those still standing throw themselves among the trees without looking back, swallowed piecemeal by the dark: a back, a gasp, a swaying branch.',
+    transit: 'The last embers smoke on the trampled earth. Deeper in the wood you hear the frantic rustle of those fleeing into the night.',
+    beat: 4,
     options: [
       {
         id: 'gob-lascia-fuggire',
         label: 'Let them flee',
-        detail: 'They will come back. You will see them again on the road home.',
+        detail: 'Lower your weapons.',
         next: 'gob-esplora-extra',
         sets: 'agguatoPeggiore', // R-097 v2: letting them go = they regroup → HEAVY ambush at F7
       },
       {
         id: 'gob-insegui',
-        label: 'Pursue them',
-        detail: 'Strength. Close the quest here — or make the bill worse.',
+        label: 'Run them down',
+        detail: 'Strength',
         next: 'CHECK:gob-incalza-check',
       },
     ],
@@ -244,44 +246,44 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-incalza-check': {
     id: 'gob-incalza-check',
     kind: 'check',
-    title: 'The hunt among the rocks',
-    body: 'The hunt through the rocks. Every meter gained is one too many.',
+    title: 'Run them down',
+    body: 'You dash under the low fronds after the sound of fleeing steps, where the ground drops steep between wet stones and roots.',
     stats: ['str'],
     risk: { wound: 0, death: 0 },
-    beat: 5,
+    beat: 4,
+    failHint: 'A slab shifts under the weight of your boots. The scree grants no safe step.',
+    previewHint: 'Among the rocks, every turn erases for an instant what waits beyond.',
     verdictFlavor: {
-      bigwin: 'You close them where the trail narrows. No one will return to tell what happened.',
-      win: 'You close them against the rocks, one at a time. The trail goes silent again.',
-      almost: 'You run until your lungs burn: some of you cut off their escape, some do not. They will return wounded — and warned.',
-      fail: 'The rocks betray you. You watch them vanish, and you know you will see them again.',
-      epicfail: 'The hunt costs blood and closes nothing. They all get back — and they will return organized.',
+      bigwin: 'You reach them where the gorge narrows, and the wood goes suddenly mute.',
+      win: 'Your stride outruns theirs on the stone rise: the rustling ahead dies beneath your blows.',
+      almost: 'Your throat burns at every breath; you catch them down at the gorge’s end, but the thicket closes over the faster backs.',
+      fail: 'The wet stones betray your step and the thicket takes them back before the blades arrive.',
+      epicfail: 'You slide down the escarpment, striking hard against living rock, while the fleeing steps are lost.',
     },
     // R-097 v2: the deterministic price of the chase itself — escaping
     // goblins are bloodied → the ambush is the mild one.
     upfrontDamage: { amount: 10, epicfailAmount: 20 },
-    failHint: 'The hunt costs blood anyway. If they escape, they come back wounded: the ambush will be weaker.',
-    previewHint: 'Pursuing exposes your backs: the hunt has a certain toll, the verdict decides the rest.',
   },
 
   /* F6 — KEEP EXPLORING: push-your-luck, damage grows 5→10→15. */
   'gob-esplora-extra': {
     id: 'gob-esplora-extra',
     kind: 'choice',
-    title: 'The conquered camp',
-    body: 'Ash and overturned tents. Under the tarp of the lowest tent, a corner of leather with a brass clasp.',
-    transit: 'A conquered camp is an open camp: ash, overturned tents, and loot no one claims anymore.',
-    beat: 6,
+    title: 'Among the ashes',
+    body: 'Around the dead embers lie torn tarps and heaps of smouldering straw the flame has not yet fully consumed.',
+    transit: 'Silence falls again over the ruined clearing, broken only by the creak of fire-blackened wood.',
+    beat: 5,
     options: [
       {
         id: 'gob-fruga',
-        label: 'Keep looting',
-        detail: 'The tarp gives slowly. Every extra round costs more — in gold and in skin.',
+        label: 'Rummage through the embers',
+        detail: 'Intelligence or Perception',
         next: 'CHECK:gob-cerca',
       },
       {
         id: 'gob-fermati',
         label: 'Stop here',
-        detail: 'Leave the leather where it is: time to go home.',
+        detail: 'You have seen enough.',
         next: 'gob-ritorno',
       },
     ],
@@ -289,18 +291,19 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
   'gob-cerca': {
     id: 'gob-cerca',
     kind: 'check',
-    title: 'Raiding the tents',
-    body: 'Among burnt tents and traps the goblins left behind — the camp makes you pay even dead.',
-    previewHint: 'Every extra round of looting costs more than the last — the camp does not stay stable.',
+    title: 'Rummage through the embers',
+    body: 'You lift the blackened tarps with the flat of your blade, groping through the acrid warmth rising from the camp’s remains.',
     stats: ['int', 'perc'],
     risk: { wound: 0, death: 0 },
-    beat: 6,
+    beat: 5,
+    failHint: 'A beam creaks above you. A rain of ash falls to the ground.',
+    previewHint: 'The smoke veils the camp again; the burnt wood gives at the slightest knock.',
     verdictFlavor: {
-      bigwin: 'The clasp gives: inside, the best of what was left.',
-      win: 'A tent floor, a fistful of rags — something worth the trouble.',
-      almost: 'Little stuff, and the beam presents its bill.',
-      fail: 'Only ash, thorns — and the trap that closes the round.',
-      epicfail: 'The camp collects its last debt: ash, thorns and blood.',
+      bigwin: 'Under the deepest layer your fingers meet the heavy leather of a chest spared by the flames.',
+      win: 'From the blackened remains you pull out what the fire failed to devour.',
+      almost: 'A short grab in the smoke, while a burnt support gives way a breath from your shoulder.',
+      fail: 'Only warm ash clinging to your palms through the gloves.',
+      epicfail: 'The tent’s blackened beam gives with a crash, pouring a rain of burning embers and split wood over you.',
     },
   },
 
@@ -313,11 +316,11 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     id: 'gob-ritorno',
     kind: 'info',
     fase: 'ritorno',
-    title: 'The road home',
-    body: 'The road descends toward home. Someone has started whistling. Then stops, without anyone saying why.',
+    title: 'The return',
+    body: 'The air turns colder beneath the high crowns. Someone loosens their grip on the hilt — then a branch snaps where the wind does not blow.',
     next: 'gob-agguato',
-    beat: 7,
-    /* PLAN-043 WS-4: the road home is a J-cut — the whistling dies before
+    beat: 6,
+    /* PLAN-043 WS-4: the way home is a J-cut — the whistling dies before
      * the ambush image lands. */
     stageDirection: { cut: ['j-cut', 'reveal'] },
   },
@@ -325,12 +328,14 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     id: 'gob-agguato',
     kind: 'harm',
     fase: 'ritorno',
-    title: 'Ambush on the road',
-    body: 'The whistling cuts off mid-note. An arrow in the post beside you. Then all the others.',
+    title: 'Those who were left',
+    /* r008: the survivors were WAITING — they tracked you, still carrying
+     * the smoke of their camp. Rage and revenge drive the attack. */
+    body: 'The surviving goblins were waiting for you. They still carry the smoke of their camp on them: they tracked you all the way here, and now they step out of the fronds without a cry, teeth already bared.',
     next: 'gob-agguato-scelta',
-    previewHint: 'The road home is not safe: someone is waiting for you.',
-    revealHint: 'A trained eye would read the tracks: the fugitives you spare come back to prepare this ambush.',
-    beat: 7,
+    previewHint: 'Among the trees, the shadows move before you can make out the bodies.',
+    revealHint: 'The fugitives’ tracks criss-cross around the trail. They did not end up here by chance.',
+    beat: 6,
     /* PLAN-043 WS-4: the ambush is a tone change — bars close, the stage
      * jolts, the scene opens through the aperture. */
     stageDirection: { cut: ['bars', 'reveal', 'impact'] },
@@ -339,22 +344,22 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     id: 'gob-agguato-scelta',
     kind: 'choice',
     fase: 'ritorno',
-    title: 'Trophy or blood',
-    body: 'You can drop the trophy and run — or fight the last melee.',
-    transit: 'Around you, the wood closes in again. One choice remains: leave the trophy, or leave someone.',
-    beat: 7,
+    title: 'Encircled',
+    body: 'Low blades close off the path between the trees, and the snarling rises on every side.',
+    transit: 'The arrows still quiver in the trunks around you.',
+    beat: 6,
     options: [
       {
         id: 'gob-molla-trofeo',
-        label: 'Drop the trophy',
-        detail: 'The trophy rolls into the ditch. The road clears — empty-handed.',
+        label: 'Leave the trophy',
+        detail: 'The trophy hits the dirt.',
         next: 'gob-fine',
         abandonsObjective: true,
       },
       {
         id: 'gob-ultima-mischia',
         label: 'Stand and fight',
-        detail: 'One combat turn. Whoever stays to cover pays.',
+        detail: 'Steel drawn.',
         next: 'gob-ultimo-scontro',
       },
     ],
@@ -363,10 +368,10 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
     id: 'gob-ultimo-scontro',
     kind: 'combat',
     fase: 'ritorno',
-    title: 'The last melee',
-    body: 'A fight as dry as a bone snapping. The profile decides who pays.',
-    transit: 'The last melee is not a battle: it is a debt to settle. Whoever stays to cover pays for everyone.',
-    beat: 7,
+    title: 'The last assault',
+    body: 'They throw themselves on your shields heedless of the steel; from their throats comes no word any more, only a long low breath, teeth clenched.',
+    transit: 'Shoulder to shoulder. The impact comes from every side.',
+    beat: 6,
     /* PLAN-043 WS-4: the last melee takes the wide stage (BV-11 fixture) —
      * expanded + breath before the blows land. */
     stageDirection: { cut: ['expanded', 'reveal', 'impact', 'breath'] },
@@ -380,16 +385,26 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
       escalateProfile: false,
       nextCleared: 'gob-fine',
       nextSurvivors: 'gob-fine',
+      /* r008 attack lines — the survivors' last fury, sensory only. */
+      attackLines: {
+        bigwin: 'All the melee’s fury pours into a single cleave, and the circle opens.',
+        win: 'Steel answers steel with a short sound that cuts the snarl.',
+        almost: 'The blades seek each other in the dim light and meet only halfway.',
+        fail: 'Teeth grate on the shield while the line holds by a breath.',
+        epicfail: 'A counterblow out of the dark takes the ground from under your feet for one endless instant.',
+      },
     },
   },
   'gob-fine': {
     id: 'gob-fine',
     kind: 'end',
     fase: 'ritorno',
-    title: 'Return to the village',
-    body: 'The expedition is over.',
-    transit: 'The road opens onto the village. Those who return count the names of those who do not — and those who saw it know what it cost.',
-    beat: 7,
+    title: 'Cold ash',
+    /* r008: poetic closer — 'the smoke calls no one any more'. The ledger
+     * is composeEndingText's job, not the prose's. */
+    body: 'Your hands still bear the mark of the night, while the trees’ shadow closes behind you. Deep in the thicket the smoke still rises straight — but it calls no one any more.',
+    transit: 'The trees thin into the grey of dawn; the smell of smoke and iron stays stitched to you.',
+    beat: 6,
   },
 };
 
@@ -402,19 +417,20 @@ const GOBLIN_NODES: Record<string, QuestNode> = {
 export const GOBLIN_SCENARIO_AUTHORED = {
   id: 'goblin',
   title: 'Goblin Extermination',
-  flavour: 'The ford is closed by fear. Exterminate them.',
-  scenarioVersion: 's2.1-goblin-v1',
+  flavour: 'The wood has gone quiet. The goblins have not.',
+  scenarioVersion: 's2.1-goblin-v3',
   startNode: 'gob-esplora',
   primaryStats: ['str', 'perc'] as LabStat[],
   /* PLAN-036 (R-195): planner key-stat tiers — Forza primary, Percezione
    * secondary (spec §0 verbatim). Display tiers only; `primaryStats` —
    * the frozen simulation input — is untouched. */
   keyStats: { primary: ['str'], secondary: ['perc'] },
+  /* v3 beats — 7 phases, 0-indexed from the first real decision; the
+   * 'Assignment' filler is gone with F0 (Director 2026-10-18). */
   beats: [
-    'Assignment',
     'Exploration',
-    'Treasure',
-    'Assault',
+    'Loot',
+    'Rules of Engagement',
     'Combat',
     'Pursuit',
     'Raid',
@@ -432,15 +448,15 @@ export const GOBLIN_SCENARIO_AUTHORED = {
     ],
     lore: [
       {
-        label: 'The ashes of the camp still smoke beyond the ford — the merchants’ wagons will see them from far away.',
+        label: 'The ashes of the camp still smoke among the trees — seen from the hills, the forest has already closed over them.',
         requiresOutcome: ['reward', 'survived'],
       },
     ],
   },
   offer: {
-    objective: 'Exterminate the goblin camp at the ford.',
+    objective: 'Exterminate the goblin camp.',
     /* WS-3 dispatch line — the terse order under the hero title. */
-    dispatch: 'Strike the ford camp before the smoke spreads to the road.',
+    dispatch: 'Follow their tracks to the camp. None of them must come back to threaten the village.',
     tags: ['quest', 'combat', 'goblin'],
     /* Slot gates use the CANONICAL resident statTags vocabulary (role gates:
      * edge/fortitude/warden/ward/clarity/precision — see

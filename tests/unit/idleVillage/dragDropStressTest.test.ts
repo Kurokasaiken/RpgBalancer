@@ -215,6 +215,7 @@ describe('Drag & Drop Stress Test Suite', () => {
   });
 
   describe('Configuration Validation', () => {
+    // INV:resident-drop-rules.INV-1
     it('should validate correct configuration', () => {
       expect(validateStressTestConfig(DEFAULT_STRESS_TEST_CONFIG)).toBe(true);
     });

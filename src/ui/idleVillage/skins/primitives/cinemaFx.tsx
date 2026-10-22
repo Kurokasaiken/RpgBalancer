@@ -333,6 +333,10 @@ export interface CenterApertureRevealProps {
   fadeMs: number;
   /** The veil colour — caller passes the lacquer-deep token. */
   color: string;
+  /** R-239: symmetric top/bottom inset the aperture starts at (default 34 —
+   *  a readable ~32% slit; ≥45 leaves the frame >90% veiled for most of the
+   *  reveal). Wired to `cinema.revealStartInsetPct`. */
+  startInsetPct?: number;
   reducedMotion?: boolean;
 }
 
@@ -345,6 +349,7 @@ export const CenterApertureReveal: React.FC<CenterApertureRevealProps> = ({
   fadeMs,
   color,
   reducedMotion,
+  startInsetPct = 34,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -358,14 +363,14 @@ export const CenterApertureReveal: React.FC<CenterApertureRevealProps> = ({
         })
       : el.animate(
           [
-            { clipPath: 'inset(46% 0% 46% 0%)', opacity: 1 },
+            { clipPath: `inset(${startInsetPct}% 0% ${startInsetPct}% 0%)`, opacity: 1 },
             { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, offset: 0.55 },
             { clipPath: 'inset(0% 0% 0% 0%)', opacity: 0 },
           ],
           { duration: durationMs, easing: 'cubic-bezier(.22,.61,.36,1)', fill: 'forwards' },
         );
     return () => anim.cancel();
-  }, [cueKey, durationMs, fadeMs, reducedMotion]);
+  }, [cueKey, durationMs, fadeMs, reducedMotion, startInsetPct]);
   return (
     <div
       ref={ref}
@@ -485,7 +490,11 @@ export const PreVerdictBreath: React.FC<PreVerdictBreathProps> = ({
     return () => anim.cancel();
   }, [cueKey, active, durationMs, usesFilter, reducedMotion]);
   return (
-    <div ref={ref} data-fx={active && !reducedMotion ? 'breath' : undefined} style={{ position: 'relative' }}>
+    <div
+      ref={ref}
+      data-fx={active && !reducedMotion ? 'breath' : undefined}
+      style={{ position: 'relative', display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}
+    >
       {children}
       {!usesFilter && active && !reducedMotion && (
         <div

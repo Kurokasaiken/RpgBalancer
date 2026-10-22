@@ -1,0 +1,12 @@
+/* PLAN-076 T-4 — «Movimento ridotto»: animations and transitions collapse to an instant
+   change. CSS only: the Pixi map's own animation is not covered. */
+:root[data-reduced-motion='true'] *,
+:root[data-reduced-motion='true'] *::before,
+:root[data-reduced-motion='true'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}

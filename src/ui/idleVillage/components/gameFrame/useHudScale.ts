@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
-import { HUD_SCALE_KEY, parseHudScaleMode, resolveHudScale, type HudScaleControl, type HudScaleMode } from './hudScale';
+import { HUD_SCALE_KEY, parseHudScaleMode, resolveHudScale, setHudZoomFactor, type HudScaleControl, type HudScaleMode } from './hudScale';
 
 /** Tauri v2 exposes `__TAURI_INTERNALS__` (the older `__TAURI__` only with `withGlobalTauri`). */
 const isDesktopApp = () => typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 /**
- * Interface size for the desktop app: stores the player's choice and applies it as the native webview zoom.
- * Returns `undefined` in a browser (the menu hides the row; the browser's own zoom does the job).
+ * Interface size: stores the player's choice and applies it — natively as the
+ * webview zoom in the desktop app, as a CSS `zoom` factor on the HUD chrome
+ * layer in a browser (`cssZoom`, PLAN-043 WS-5). The browser path never touches
+ * the Pixi canvas (it keeps its own camera scale); coordinate bridges inside
+ * the chrome layer convert device px via `getHudZoomFactor()`.
  *
- * The logical window size is `innerWidth × zoom`, so it does not move when the zoom changes and the automatic
- * mode cannot oscillate.
+ * Desktop: the logical window size is `innerWidth × zoom`, so it does not move
+ * when the zoom changes and the automatic mode cannot oscillate.
+ * Browser: `innerWidth` is not affected by CSS zoom — same stability.
  */
-export function useHudScale(): HudScaleControl | undefined {
+export function useHudScale(): HudScaleControl {
   const desktop = isDesktopApp();
   const [mode, setMode] = useState<HudScaleMode>('auto');
   const [loaded, setLoaded] = useState(false);
@@ -21,7 +25,6 @@ export function useHudScale(): HudScaleControl | undefined {
   const failed = useRef(false);
 
   useEffect(() => {
-    if (!desktop) return undefined;
     let alive = true;
     void loadData<unknown>(HUD_SCALE_KEY, 'auto').then((stored) => {
       if (!alive) return;
@@ -31,10 +34,12 @@ export function useHudScale(): HudScaleControl | undefined {
     return () => {
       alive = false;
     };
-  }, [desktop]);
+  }, []);
 
+  /* Desktop path — native webview zoom; the chrome layer stays at CSS 1. */
   useEffect(() => {
     if (!desktop || !loaded) return undefined;
+    setHudZoomFactor(1);
     const apply = async () => {
       if (failed.current) return;
       const target = resolveHudScale(mode, window.innerWidth * applied.current, window.innerHeight * applied.current);
@@ -54,10 +59,28 @@ export function useHudScale(): HudScaleControl | undefined {
     return () => window.removeEventListener('resize', apply);
   }, [desktop, loaded, mode]);
 
+  /* Browser path — the factor is published to the chrome layer + the
+   *  coordinate bridges; `innerWidth` ignores CSS zoom so `effective` is
+   *  stable. Recomputed on resize and on every mode change. */
+  useEffect(() => {
+    if (desktop || !loaded) return undefined;
+    const apply = () => {
+      const target = resolveHudScale(mode, window.innerWidth, window.innerHeight);
+      setEffective(target);
+      setHudZoomFactor(target);
+    };
+    apply();
+    window.addEventListener('resize', apply);
+    return () => {
+      window.removeEventListener('resize', apply);
+      setHudZoomFactor(1);
+    };
+  }, [desktop, loaded, mode]);
+
   const onChange = useCallback((next: HudScaleMode) => {
     setMode(next);
     void saveData(HUD_SCALE_KEY, next);
   }, []);
 
-  return desktop ? { mode, effective, onChange } : undefined;
+  return { mode, effective, onChange, cssZoom: desktop ? 1 : effective };
 }

@@ -96,7 +96,9 @@ const PARTIES: Record<string, LabMember[]> = {
  * sempre» tenuta come evidenza del muro push-your-luck authored. */
 const CAUTO: SimStrategy = {
   'gob-esplora': 'gob-cerca-tracce',
-  'gob-bottino-scelta': 'gob-lascia-bottino',
+  /* v3 (R-219): the hidden stash is take-it-all — «leave it» no longer
+   * exists; the cautious line avoids F2 entirely via the PER check. */
+  'gob-bottino': 'gob-prendi',
   'gob-accampamento': 'gob-via-assalto',
   'gob-incalzare': 'gob-lascia-fuggire',
   'gob-esplora-extra': 'gob-fermati',
@@ -104,7 +106,7 @@ const CAUTO: SimStrategy = {
 };
 const STANDARD: SimStrategy = {
   'gob-esplora': 'gob-cerca-tracce',
-  'gob-bottino-scelta': 'gob-prendi',
+  'gob-bottino': 'gob-prendi',
   'gob-accampamento': 'gob-via-stealth',
   'gob-incalzare': 'gob-lascia-fuggire',
   'gob-esplora-extra': 'gob-fermati',
@@ -112,7 +114,7 @@ const STANDARD: SimStrategy = {
 };
 const SANGUINARIO: SimStrategy = {
   'gob-esplora': 'gob-forza-tracce',
-  'gob-bottino-scelta': 'gob-prendi',
+  'gob-bottino': 'gob-prendi',
   'gob-accampamento': 'gob-via-assalto',
   'gob-incalzare': 'gob-insegui',
   'gob-esplora-extra': 'gob-fermati',
@@ -120,7 +122,7 @@ const SANGUINARIO: SimStrategy = {
 };
 const RAPACE_INFINITO: SimStrategy = {
   'gob-esplora': 'gob-cerca-tracce',
-  'gob-bottino-scelta': 'gob-prendi',
+  'gob-bottino': 'gob-prendi',
   'gob-accampamento': 'gob-via-stealth',
   'gob-incalzare': 'gob-insegui',
   'gob-esplora-extra': 'gob-fruga',

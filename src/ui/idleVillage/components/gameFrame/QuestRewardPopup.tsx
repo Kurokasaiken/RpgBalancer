@@ -13,16 +13,18 @@
  * - `position: fixed`, centred over the map, draggable by its title row
  *   (`useHudPanelDrag`, same clamp as every HUD panel).
  * - Focus moves into it on open; `Escape` closes and restores focus.
- * - `run` must be an ENDED run — the component renders the already-settled
- *   report; settlement itself happens in `useQuestExpeditionSession`, never
- *   here.
+ * - `run` must be an ENDED run — the component renders the pending report;
+ *   its first painted frame persists `settling` and every close path
+ *   (`onClose`: Collect, Escape, the X) commits the settlement in
+ *   `useQuestExpeditionSession` — the popup itself never applies effects
+ *   (R-260).
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EngravedIcon, type EngravedIconId } from './engravedIcons';
 import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
-import { HudChip, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import { HudChip, TONE, toneText } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import type { QuestOutcome, QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { buildQuestEpilogue } from '@/ui/idleVillage/quests/questEpilogue';
@@ -30,6 +32,7 @@ import { markRewardShown } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { useHudPanelDrag } from './useHudPanelDrag';
+import { getHudZoomFactor } from './hudScale';
 import { QuestEpilogue } from './QuestEpilogue';
 
 /** Outcome chip tone — wipe/fled read differently from a clean return. */
@@ -59,13 +62,38 @@ export interface QuestRewardPopupProps {
   widthPx: number;
   /** Wall-clock between reveal stages (`questWindow.rewardPopup.stageMs`). */
   stageMs: number;
+  /** Min gap (chrome px) kept from every viewport edge — the drag clamp inset
+   *  and the height cap (`questWindow.rewardPopup.edgeInsetPx`, R-239).
+   *  Optional: the config default applies when the caller does not pin it. */
+  edgeInsetPx?: number;
   onClose: () => void;
 }
 
-export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenario, widthPx, stageMs, onClose }) => {
+/** The plaque can never be shorter than this — keeps header + banner alive
+ *  on degenerate viewports. */
+const MIN_PLAQUE_HEIGHT_PX = 160;
+
+/** Viewport height in CHROME units (device px / hud css-zoom factor). */
+const readChromeViewportHeight = (): number => Math.round(window.innerHeight / getHudZoomFactor());
+
+export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenario, widthPx, stageMs, edgeInsetPx = DEFAULT_GAME_FRAME_CONFIG.questWindow.rewardPopup.edgeInsetPx, onClose }) => {
   const { t } = useTranslation('idleVillage');
   const shellRef = useRef<HTMLDivElement | null>(null);
-  const { panelStyle, handleProps } = useHudPanelDrag({ shellRef, edgeInsetPx: 12 });
+  const { panelStyle, handleProps } = useHudPanelDrag({ shellRef, edgeInsetPx });
+
+  /* R-239: the report must never outgrow the viewport — the staged reveal
+   * can add many sections to a plaque anchored at 50%/50%, and without a
+   * cap its top edge (title + close) leaves the screen. The cap is in
+   * CHROME units (chrome = css-zoomed layer): viewport/zoom − 2·inset, so
+   * the symmetric drag clamp stays solvable and the centred resting pose
+   * is fully on-screen. Live: re-caps on resize while the reveal runs. */
+  const [chromeViewportH, setChromeViewportH] = useState(readChromeViewportHeight);
+  useEffect(() => {
+    const onResize = () => setChromeViewportH(readChromeViewportHeight());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const plaqueMaxHeight = Math.max(MIN_PLAQUE_HEIGHT_PX, chromeViewportH - edgeInsetPx * 2);
 
   /* Staged reveal: stage 0 = the outcome banner, stages 1..N = the epilogue
    * sections one at a time, the last stage only unlatches the close row.
@@ -127,10 +155,12 @@ export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenari
             role="dialog"
             aria-label={t('gameFrame.questEpilogue.title')}
             data-testid="quest-reward-popup"
-            style={{ width: widthPx, maxWidth: 'calc(100vw - 48px)', display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 14px 14px' }}
+            style={{ width: widthPx, maxWidth: 'calc(100vw - 48px)', maxHeight: plaqueMaxHeight, display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 14px 14px' }}
           >
-            {/* Title row = drag handle; close icon on its right. */}
-            <div {...handleProps} title={t('gameFrame.panel.dragHint')} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Title row = drag handle; close icon on its right. Pinned:
+                the flex column caps at `maxHeight` so only the body below
+                shrinks — the close affordance never leaves the screen. */}
+            <div {...handleProps} title={t('gameFrame.panel.dragHint')} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               <EngravedIcon id="ico-cup" size={15} style={{ color: 'var(--skin-title-color)' }} />
               <h2 style={{ flex: 1, margin: 0, minWidth: 0, fontFamily: 'var(--skin-font-display)', fontSize: 14, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {t('gameFrame.questEpilogue.title')}
@@ -142,13 +172,16 @@ export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenari
               </span>
             </div>
 
-            {/* Reveal area: click / any key advances the stages. */}
+            {/* Reveal area: click / any key advances the stages. The only
+                scrollable part — under the height cap the report scrolls
+                inside its own body instead of pushing the plaque off the
+                viewport (R-239). */}
             <div
               data-reward-body=""
               tabIndex={-1}
               onKeyDown={onBodyKeyDown}
               onClick={done ? undefined : advance}
-              style={{ display: 'flex', flexDirection: 'column', gap: 8, outline: 'none', cursor: done ? 'default' : 'pointer' }}
+              style={{ display: 'flex', flexDirection: 'column', gap: 8, outline: 'none', cursor: done ? 'default' : 'pointer', flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}
             >
               {/* PLAN-040 T-006: the authored cover leads the report — a
                   strip, not a hero, so the banner still lands first. Only
@@ -175,11 +208,11 @@ export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenari
                 <EngravedIcon
                   id={OUTCOME_ICON[run.outcome]}
                   size={34}
-                  style={{ flexShrink: 0, color: run.outcome === 'wipe' ? TONE.death : OUTCOME_TONE[run.outcome] === 'warn' ? TONE.warn : 'var(--skin-title-color)' }}
+                  style={{ flexShrink: 0, color: run.outcome === 'wipe' ? toneText('death') : OUTCOME_TONE[run.outcome] === 'warn' ? TONE.warn : 'var(--skin-title-color)' }}
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
                   <HudChip tone={OUTCOME_TONE[run.outcome]}>{t(`questS1Lab.outcome.${run.outcome}`)}</HudChip>
-                  <span style={{ fontFamily: 'var(--skin-font-display)', fontSize: 13, letterSpacing: '0.06em', color: run.outcome === 'wipe' ? TONE.death : TONE.label }}>
+                  <span style={{ fontFamily: 'var(--skin-font-display)', fontSize: 13, letterSpacing: '0.06em', color: run.outcome === 'wipe' ? toneText('death') : TONE.label }}>
                     {t(run.outcome === 'wipe' ? 'gameFrame.questWindow.noneReturned' : 'gameFrame.questWindow.returned')}
                   </span>
                 </div>

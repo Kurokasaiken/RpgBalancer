@@ -775,7 +775,9 @@ const IMPR002_MINIERA_NODES: Record<string, QuestNode> = {
     },
   },
 
-  /* ---- B6 — FORK: the deep gives back ------------------------------------ */
+  /* ---- B6 — FORK: the deep gives back ------------------------------------
+   * PLAN-053 T-004: `fase:'ritorno'` — the ascent is a road beat on the
+   * return leg ('mi-ritorno' pinned, 'mi-fine' the pinned end). */
   'mi-ritorno': {
     id: 'mi-ritorno',
     kind: 'info',

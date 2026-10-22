@@ -97,7 +97,7 @@ export const ENGINE_TEXT_IT: readonly EngineTextEntry[] = [
   ['the tracks show how to approach', 'le tracce mostrano come avvicinarsi'],
   ['the tracks give some hints', 'le tracce offrono qualche indizio'],
   ['{0}: {1} → {2} ({3} vs roll {4}).', '{0}: {1|stats} → {2|verdict} ({3} contro tiro {4}).'],
-  ['The {0} spared the party (−{1}pp to wound and death).', '{0|verdict}: il gruppo è stato risparmiato (−{1}pp a ferita e morte).'],
+  ['The {0} spared the party (−{1}% to wound and death).', '{0|verdict}: il gruppo è stato risparmiato (−{1}% a ferita e morte).'],
   ['Bigwin: every death outcome is downgraded to a wound.', 'Trionfo: ogni esito di morte diventa una ferita.'],
   ['Epicfail: every wound becomes a death.', 'Rovina: ogni ferita diventa una morte.'],
   ['Turn {0}: {1} → {2} ({3} vs roll {4}). {5}', 'Turno {0}: {1|stats} → {2|verdict} ({3} contro tiro {4}). {5}'],

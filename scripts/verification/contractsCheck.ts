@@ -17,11 +17,14 @@
  * Mis-mapping = rischio residuo documentato, non gateabile in v1 (seed S5).
  */
 import { execFileSync, execSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { canonicalFileHash, sha256File, sha256Text } from './gateCore';
+import { checkLivingContracts, livingContractsActive } from './contractSchema';
+import { checkOrSyncIndex } from './contractsIndexSync';
+import { checkLivingSync } from './livingSyncGate';
 import {
   APPROVALS_REL,
   DIRECTOR_ANSWERS_REL,
@@ -74,6 +77,20 @@ export const GATE_FILES = [
   'scripts/closureLint.ts',
   'scripts/verification/redFirst.ts',
   'scripts/redFirst.ts',
+  'scripts/verification/verifierReceipt.ts',
+  'scripts/verification/bvMetrics.ts',
+  'scripts/verification/visualForkGate.ts',
+  'scripts/verification/intentRegistry.ts',
+  'scripts/verification/mwDirectorAnswer.ts',
+  'scripts/verification/intentGate.ts',
+  'scripts/verification/contractSchema.ts',
+  'scripts/verification/invBlocks.ts',
+  'scripts/verification/componentInventory.ts',
+  'scripts/verification/contractsIndexSync.ts',
+  'scripts/verification/livingSyncGate.ts',
+  'scripts/verification/invCounts.ts',
+  'scripts/verification/e2eCache.ts',
+  'scripts/verification/syncBug.ts',
 ];
 
 export function isExemptFile(rel: string): boolean {
@@ -154,7 +171,13 @@ export function loadExceptions(repoRoot: string): CoverageException[] {
   return readFileSync(p, 'utf8')
     .split('\n')
     .filter((l) => l.trim().startsWith('{'))
-    .map((l) => JSON.parse(l) as CoverageException);
+    .map((l) => {
+      const e = JSON.parse(l) as CoverageException & { path?: string };
+      // Record scritti a mano o da tool esterni possono usare `path` al posto
+      // di `glob` — normalizzare, un record malformato non deve crashare il gate.
+      if (!e.glob && e.path) e.glob = e.path;
+      return e;
+    });
 }
 
 /** sha256 dei batch approvati dal Director. */
@@ -308,8 +331,14 @@ export function runCommittedGate(repoRoot: string): ContractsReport | null {
     const runner = path.join(tmp, 'headGateRunner.mts');
     writeFileSync(
       runner,
-      "import { checkContractsGate } from './scripts/verification/contractsCheck';\n" +
-        'const rep = checkContractsGate(process.env.REPO_ROOT as string);\n' +
+      "import * as cc from './scripts/verification/contractsCheck';\n" +
+        '// Il runner È il gate committato: svuotare GATE_FILES impedisce la\n' +
+        '// ri-delegazione — il figlio valuta lo stesso diff e vedrebbe gli\n' +
+        '// stessi gate-file → ricorsione infinita di runner tsx (hang).\n' +
+        '// Namespace import + guard: il gate a HEAD può non esportare GATE_FILES.\n' +
+        'const gf = (cc as { GATE_FILES?: string[] }).GATE_FILES;\n' +
+        'if (Array.isArray(gf)) gf.length = 0;\n' +
+        'const rep = cc.checkContractsGate(process.env.REPO_ROOT as string);\n' +
         'process.stdout.write(JSON.stringify(rep));\n',
     );
     // tsx è risolto dalla posizione del gate in esecuzione (questo file /
@@ -318,17 +347,25 @@ export function runCommittedGate(repoRoot: string): ContractsReport | null {
     // (scheme non-file) → fallback: walk-up da cwd cercando node_modules.
     const tsxCli = resolveTsxCli();
     if (!tsxCli) return null;
-    const out = execFileSync(
-      process.execPath,
-      [tsxCli, runner],
-      {
+    // stdio su file, non pipe: al timeout il figlio tsx muore ma un
+    // grandchild (esbuild service) può sopravvivere tenendo la pipe aperta
+    // e bloccare execFileSync su EOF — visto sotto carico sessione parallela
+    // (hang >20min). Con stdio→file la morte del figlio chiude l'attesa.
+    const outPath = path.join(tmp, 'runner-out.json');
+    const errPath = path.join(tmp, 'runner-err.log');
+    const outFd = openSync(outPath, 'w');
+    const errFd = openSync(errPath, 'w');
+    try {
+      execFileSync(process.execPath, [tsxCli, runner], {
         env: { ...process.env, REPO_ROOT: repoRoot },
-        encoding: 'utf8',
-        timeout: 60_000,
-        maxBuffer: 32 * 1024 * 1024,
-      },
-    );
-    const rep = JSON.parse(out) as ContractsReport;
+        stdio: ['ignore', outFd, errFd],
+        timeout: 150_000,
+      });
+    } finally {
+      closeSync(outFd);
+      closeSync(errFd);
+    }
+    const rep = JSON.parse(readFileSync(outPath, 'utf8')) as ContractsReport;
     rep.evaluated_by = 'head-gate';
     return rep;
   } catch (e) {
@@ -353,6 +390,20 @@ export interface ContractsReport {
   required_checks: string[];
   /** Gate-file nella diff valutati dal gate committato o via director_answer. */
   gate_files?: { file: string; via: 'head-gate' | 'director_answer' | 'unanswered' }[];
+  /** Sintesi del sotto-gate PLAN-054 (contratti vivi). */
+  living_contracts?: {
+    contracts_loaded: number;
+    inv_blocks: number;
+    kernels_shared_without_ctr: number;
+    warnings: string[];
+  };
+  /** Sintesi del Living Sync Gate su BASE..WT (PLAN-054 T-005). */
+  living_sync?: {
+    triggered: number;
+    modes: Record<string, string[]>;
+    amended_invs: number;
+    executed_counts_enforced: number;
+  };
   evaluated_by?: 'working-tree' | 'head-gate';
   errors: string[];
 }
@@ -503,7 +554,7 @@ export function checkContractsGate(
       surfaces.forEach((s) => s.expected_checks.forEach((c) => required.add(c)));
       continue;
     }
-    const exc = exceptions.find((e) => globMatch(e.glob, f));
+    const exc = exceptions.find((e) => typeof e.glob === 'string' && globMatch(e.glob, f));
     if (exc) {
       if (exc.unverified_behavior === true) {
         const err = checkAwaitingDirector(exc, f);
@@ -519,6 +570,48 @@ export function checkContractsGate(
       );
     }
   }
+
+  // PLAN-054 T-002 — living contracts: schema, partizione STRICT_FILES,
+  // CTR↔componenti, ratchet strutturale/asserzioni // INV:<id> su BASE.
+  // Eseguito a ogni check, anche su diff di soli test (ratchet globale).
+  try {
+    const lc = checkLivingContracts(repoRoot);
+    errors.push(...lc.errors);
+    report.living_contracts = {
+      contracts_loaded: lc.contracts_loaded,
+      inv_blocks: lc.inv_blocks.total,
+      kernels_shared_without_ctr: lc.kernels_shared_without_ctr.length,
+      warnings: lc.warnings,
+    };
+    /* T-004: la sezione generata del master index deve essere a drift
+     * zero — solo quando il sistema contratti vivi è attivo. */
+    if (livingContractsActive(repoRoot)) {
+      const idx = checkOrSyncIndex(repoRoot, false);
+      errors.push(...idx.errors);
+      if (idx.drift) {
+        errors.push(
+          `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md: sezione PLAN-054 non sincronizzata — esegui npm run contracts:index-sync`,
+        );
+      }
+      /* T-005: Living Sync Gate su BASE..WT — classificazione
+       * Auto-Neutral/Mode A/B/C + cap amend + executedCount su INV
+       * affetti. Statico: i test mirati li esegue il runner del bundle /
+       * la run SYNC_GATE=1; qui si leggono le attestazioni. */
+      const sync = checkLivingSync(repoRoot, { changedFiles: changed });
+      errors.push(...sync.errors);
+      report.living_sync = {
+        triggered: sync.verdicts.filter((v) => v.triggered).length,
+        modes: Object.fromEntries(
+          sync.verdicts.filter((v) => v.modes.length).map((v) => [v.component, v.modes]),
+        ),
+        amended_invs: sync.amended_invs_total,
+        executed_counts_enforced: Object.values(sync.executed_counts).filter((c) => c.status === 'enforced').length,
+      };
+    }
+  } catch (e) {
+    errors.push(`living-contracts check non eseguito: ${(e as Error).message}`);
+  }
+
   report.required_checks = [...required].sort();
   report.evaluated_by = 'working-tree';
   return report;

@@ -129,6 +129,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await expect(marker.locator('.poiv3_5__seal-halo path, .poiv3_5__seal-core path')).toHaveCount(0);
   });
 
+  // INV:CTR-game-007.INV-1
   test('planning surface opens, gates «Invia spedizione» on required slots, rejects an ineligible resident', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expect(page.getByTestId('quest-expedition-detail')).toBeVisible();
@@ -150,6 +151,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await expect(send).toBeDisabled();
   });
 
+  // INV:CTR-game-007.INV-1
   test('real drag assigns a valid resident to the leader slot', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expect(page.getByTestId('quest-expedition-detail')).toBeVisible();
@@ -222,6 +224,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await expect(page.getByTestId('quest-expedition-detail')).toHaveCount(0);
   });
 
+  // INV:CTR-game-008.INV-2
   test('halo tracks elapsed ticks — including while a decision is waiting (D-J)', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
@@ -260,6 +263,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     }
   });
 
+  // INV:CTR-game-008.INV-2
   test('decisions never auto-resolve across a tick jump; the player resolves them in order (D-K)', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);
@@ -313,6 +317,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     expect(await beats.count()).toBeGreaterThanOrEqual(1);
   });
 
+  // INV:CTR-game-007.INV-1
   test('forecast is party-dependent and the roster marks the ineligible card', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expect(page.getByTestId('quest-expedition-detail')).toBeVisible();
@@ -369,13 +374,11 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     const aJson = await expedition<string>(page, 'getEstimateJson');
 
     /* OUTCOME zone renders the T-2 sections on the real forecast: the
-     *  BY MEMBER row per assigned resident and the WHY attribution rows
-     *  (the goblin graph always produces harm sources under the default
-     *  strategy). */
+     *  BY MEMBER row per assigned resident. The WHY attribution is sim
+     *  internals — R-258 removed it from the player surface entirely. */
     await expect(page.getByTestId('forecast-members')).toBeVisible();
     expect(await page.locator('[data-testid^="forecast-member-"]').count()).toBe(1);
-    await expect(page.getByTestId('forecast-why')).toBeVisible();
-    expect(await page.getByTestId('forecast-why-row').count()).toBeGreaterThanOrEqual(1);
+    await expect(page.getByTestId('forecast-why')).toHaveCount(0);
 
     // A + member: a different party → a different forecast.
     await expedition<boolean>(page, 'assignToSlot', SLOT_MEMBER_2, VALID_MEMBER);
@@ -534,6 +537,7 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     expect(assignments[SLOT_LEADER]).toBe(VALID_LEADER);
   });
 
+  // INV:CTR-game-008.INV-2
   test('a long absence fills the halo past the estimate but never concludes a waiting frontier (catch-up + badge)', async ({ page }) => {
     await expedition<void>(page, 'openDetail');
     await expedition<boolean>(page, 'assignToSlot', SLOT_LEADER, VALID_LEADER);

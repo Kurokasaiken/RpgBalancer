@@ -77,6 +77,11 @@ export interface ResidentSlotRackProps {
   selectedSlotId?: string | null;
   highlightedSlotId?: string | null;
   draggingResidentId?: string | null;
+  /** R-257: residents whose seat medallion must not render — carried by a
+   *  flight proxy, or mid-exit while the deferred clear is uncommitted. The
+   *  assignment state can land later in a transition, and without this
+   *  signal the seat and the proxy both paint the same medal. */
+  suppressedResidentIds?: readonly string[];
   shakingSlotIds?: Set<string>;
   className?: string;
   medalStyleConfig?: MedalStyleBridgeConfig;
@@ -271,6 +276,7 @@ interface DetailSlotProps {
   isHighlighted: boolean;
   isSelected: boolean;
   draggingResidentId?: string | null;
+  suppressedResidentIds?: readonly string[];
   isShaking: boolean;
   activityState?: SlotActivityState | null;
   medalStyleConfig?: MedalStyleBridgeConfig;
@@ -306,6 +312,7 @@ const DetailSlot = memo(({
   isHighlighted,
   isSelected,
   draggingResidentId,
+  suppressedResidentIds,
   isShaking,
   activityState,
   medalStyleConfig,
@@ -399,7 +406,16 @@ const DetailSlot = memo(({
     .map((chunk) => chunk[0])
     .join('')
     .toUpperCase();
-  const isAssigned = Boolean(slot.assignedResidentId) || Boolean(slot.assignedResident);
+  /* R-257: while a flight proxy carries this resident (return flight after
+   *  extraction, or a swap), the seat shows the empty cavity — the proxy IS
+   *  the medallion. `flyingResidentId` commits urgently with the proxy, so
+   *  this suppression lands in the same paint even when the assignment clear
+   *  lands later inside a transition: never two identical medallions. */
+  const isFlyingOut = Boolean(suppressedResidentIds)
+    && suppressedResidentIds!.some(
+      (id) => slot.assignedResidentId === id || slot.assignedResident?.id === id,
+    );
+  const isAssigned = (Boolean(slot.assignedResidentId) || Boolean(slot.assignedResident)) && !isFlyingOut;
   const isDropTarget = Boolean(draggingResidentId && dropState === 'valid');
   const _playCue = useSensoryAudio();
   const slotSounds = useSlotSounds({ enabled: true, volume: 0.5 });
@@ -802,6 +818,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
   selectedSlotId,
   highlightedSlotId,
   draggingResidentId,
+  suppressedResidentIds,
   shakingSlotIds,
   className,
   slotDebugVisualization,
@@ -981,6 +998,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
               isHighlighted={isHighlighted}
               isSelected={isSelected}
               draggingResidentId={draggingResidentId}
+              suppressedResidentIds={suppressedResidentIds}
               isShaking={isShaking}
               activityState={getSlotActivityState?.(slot.id)}
               slotDebugVisualization={slotDebugVisualization}

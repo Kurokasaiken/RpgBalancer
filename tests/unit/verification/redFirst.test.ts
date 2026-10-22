@@ -142,8 +142,11 @@ describe('checkRedFirstGate', { timeout: 30000 }, () => {
     g('commit -qm init');
     const tsx = path.join(process.cwd(), 'node_modules/.bin/tsx');
     const cli = path.join(process.cwd(), 'scripts/redFirst.ts');
+    // NODE_OPTIONS eredita --require=./polyfill-crypto.cjs dal runner: il
+    // path relativo non si risolve nel repo temporaneo → rimuoverlo.
+    const childEnv = { ...process.env, NODE_OPTIONS: '' };
     // run rossa → record accettato
-    execSync(`"${tsx}" "${cli}" record --test tests/red.spec.ts --command "exit 7"`, { cwd: root });
+    execSync(`"${tsx}" "${cli}" record --test tests/red.spec.ts --command "exit 7"`, { cwd: root, env: childEnv });
     const recs = loadRedFirst(root);
     expect(recs).toHaveLength(1);
     expect(recs[0].exit_code).toBe(7);
@@ -152,6 +155,7 @@ describe('checkRedFirstGate', { timeout: 30000 }, () => {
     try {
       execSync(`"${tsx}" "${cli}" record --test tests/red.spec.ts --command "exit 0"`, {
         cwd: root,
+        env: childEnv,
         stdio: 'pipe',
       });
     } catch {

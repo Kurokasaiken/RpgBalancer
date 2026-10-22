@@ -720,9 +720,24 @@ export function simulateQuest(
   return finalizeSimResult(acc, state, runs);
 }
 
-/** Yields one macrotask so a chunked sim never blocks a frame longer than
- *  its own chunk (S2.4 T-2 contract: no task >50ms on the main thread). */
-const yieldToEventLoop = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+/**
+ * Yield past the next visible paint so a chunked sim can update the HUD and
+ * animation frame before continuing; use a timer when RAF is unavailable or
+ * the document is hidden.
+ */
+const yieldToEventLoop = () => new Promise<void>((resolve) => {
+  if (typeof requestAnimationFrame === 'function' && (typeof document === 'undefined' || document.visibilityState !== 'hidden')) {
+    requestAnimationFrame(() => setTimeout(resolve, 0));
+  } else {
+    setTimeout(resolve, 0);
+  }
+});
+
+/** One timed slice of the async quest forecast; instrumentation is opt-in. */
+export interface QuestSimulationChunkTiming {
+  workMs: number;
+  yieldMs: number;
+}
 
 /**
  * Async Monte Carlo — identical result to `simulateQuest` with the same
@@ -734,17 +749,38 @@ const yieldToEventLoop = () => new Promise<void>((resolve) => setTimeout(resolve
 export async function simulateQuestAsync(
   state: QuestRunState,
   strategy: SimStrategy = {},
-  opts?: { runs?: number; seed?: number; chunkRuns?: number; signal?: AbortSignal },
+  opts?: {
+    runs?: number;
+    seed?: number;
+    chunkRuns?: number;
+    signal?: AbortSignal;
+    onChunkTiming?: (timing: QuestSimulationChunkTiming) => void;
+  },
 ): Promise<QuestSimResult> {
   const runs = Math.max(1, opts?.runs ?? 10000);
   const seedBase = (opts?.seed ?? 1) >>> 0;
   const chunkRuns = Math.max(1, opts?.chunkRuns ?? 100);
   const nodes = nodesFor(state);
   const acc = beginSimAccumulation();
+  const onChunkTiming = opts?.onChunkTiming;
+  let chunkStartedAt = onChunkTiming ? performance.now() : 0;
   for (let i = 0; i < runs; i++) {
     opts?.signal?.throwIfAborted();
     accumulateSimRun(acc, state, nodes, strategy, seedBase, i);
-    if ((i + 1) % chunkRuns === 0) await yieldToEventLoop();
+    if ((i + 1) % chunkRuns === 0) {
+      const workMs = onChunkTiming ? performance.now() - chunkStartedAt : 0;
+      const hasMoreRuns = i + 1 < runs;
+      const yieldStartedAt = onChunkTiming && hasMoreRuns ? performance.now() : 0;
+      if (hasMoreRuns) await yieldToEventLoop();
+      onChunkTiming?.({
+        workMs,
+        yieldMs: onChunkTiming && hasMoreRuns ? performance.now() - yieldStartedAt : 0,
+      });
+      if (onChunkTiming) chunkStartedAt = performance.now();
+    }
+  }
+  if (onChunkTiming && runs % chunkRuns !== 0) {
+    onChunkTiming({ workMs: performance.now() - chunkStartedAt, yieldMs: 0 });
   }
   opts?.signal?.throwIfAborted();
   return finalizeSimResult(acc, state, runs);

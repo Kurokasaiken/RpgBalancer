@@ -236,3 +236,21 @@ Worktree condiviso: `useQuestExpeditionSession.tsx`, `game-frame-pixi.tsx`, i tr
 `RICHIESTE.md`, `plans/INDEX.md`, `context/recurring-traps.md` contengono anche lavoro
 concorrente (R-231 forecast timing, R-239 fork/asset-warmup) — staging selettivo obbligatorio
 (T-13), mai `git add .`.
+
+## Emendamento R-246 (Director, 2026-10-21) — superficie click-only + refresh presentazione
+
+Richiesta verbatim: *«togliamo il poter trascinare dentro o fuori… l'intestazione è banale, nn c'è una icona, la barra x scorrere è quella di base ed deve essere invece con il color scheme di /game»*.
+
+- **DnD stash rimosso del tutto**: `stashDnd.ts` + `stashDnd.test.ts` eliminati; righe scaffale non più `useDraggable`, scaffale non più dropzone, `bag-item:*` non più draggable, `bag-slot:*` non più droppable, `DragOverlay` rimossi (pannello e Detail), router stash in `onDragEnd`/`onDragStart` della pagina rimosso. Restano i click: assign a primo slot libero, release da slot occupato, release-all. Conseguenza: lo **swap su slot occupato non ha più affordance** (era drag-only) — `putItem` conserva la capacità ma nessuna UI la invoca; borsa piena → reject `bagFull`.
+- **Spec e2e**: i 3 test di drag rimossi da `villageStash.spec.ts` (11→8 test).
+- **Presentazione** (ricerca: liste a righe > griglie per item testuali; click-only = baseline moderna; scrollbar tematizzata, mai OS-default): header del pannello con `EngravedIcon ico-chest` + **minimise a striscia** (`shape="hang"`, icona+titolo+`n/max`+restore, `floatingPanel.minimize/restore`); scaffale opta nel `data-hud-scroll` — scrollbar thin bronzo in `skinScope.css` (tokens-only, `scrollbarGutter: stable`). Fix derivato: i bottoni icona vanno dentro `span[data-hud-controls]` (l'attributo su `SkinScope` cade su `.skin-scope` stesso e il descendant selector non lo copre — stessa trappola di T-20).
+
+## Emendamento R-251 (Director, 2026-10-21) — striscia stabile
+
+Richiesta verbatim: *«l'icona cn cui lo riduci a strisciaa nn si deve muovere: se clicchi velocemente due volte chiudi e riapri. Le altre icone quando è chiuso a striscia si sovrappongono ai bordi e nn dovrebbero»*.
+
+- La striscia replica il cluster controlli dell'header negli stessi slot — `[restore][close]` invece di `[restore]` solo: il restore occupa il posto del minimise (l'icona non si sposta, non cavalca il bordo destro).
+- Guard 350 ms sul restore (`Date.now`, `minimisedAt` ref): il secondo click di un doppio-click veloce è coda, non toggle.
+- Inset `10px 18px` (+4 px handle): la fascia `hang` dipinge ~6.5 px dentro la silhouette — ogni icona libera dai bordi. Convenzione promossa a contratto in `hud_component_guide` §«Pannello ridotto a striscia» e trappola **T-23**.
+- **R-251 bis (ruling Director):** l'invariante geometrica corretta è nell'header *espanso* — title row `paddingInline: '12px 8px'` (placca 10 + riga 12/8 = content box 22/18 della striscia): il collapse cambia il glifo del toggle, mai la geometria — misurato dx=0/dy=0 su chest/toggle/close. `controlButton` condiviso su tutte le pill icona (box model identico); chest 14px in entrambi gli stati. Il `-2px` visto sul restore era `--skin-btn-hover-lift` (feedback hover, non disallineamento).
+- Regression: `villageStash.test.tsx` — il test minimise asserisce inset header (`paddingInline 12px 8px`), cluster `[restore][close]`, padding placca e guard; `redfirst:record` registrato (exit 1, sha `248a499e`).

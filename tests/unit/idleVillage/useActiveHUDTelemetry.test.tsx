@@ -13,7 +13,7 @@ Object.defineProperty(window, '__activeHUDTelemetryEvents', {
 });
 
 Object.defineProperty(window, 'dispatchEvent', {
-  value: jest.fn(),
+  value: vi.fn(),
   writable: true,
 });
 
@@ -23,7 +23,7 @@ describe('useActiveHUDTelemetry', () => {
     if (window.__activeHUDTelemetryEvents) {
       window.__activeHUDTelemetryEvents.length = 0;
     }
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const createMockHUDState = (activityCount: number = 3): ActiveHUDState => ({
@@ -102,6 +102,7 @@ describe('useActiveHUDTelemetry', () => {
   });
 
   describe('HUD rendered events', () => {
+    // INV:use-activity-scheduler.INV-1
     it('should emit hud_rendered when activities are present', () => {
       const props: UseActiveHUDTelemetryProps = {
         hudState: createMockHUDState(2),
@@ -333,7 +334,7 @@ describe('useActiveHUDTelemetry', () => {
 
   describe('Event dispatching', () => {
     it('should dispatch custom events for telemetry', () => {
-      const mockDispatch = jest.fn();
+      const mockDispatch = vi.fn();
       window.dispatchEvent = mockDispatch;
 
       const props: UseActiveHUDTelemetryProps = {

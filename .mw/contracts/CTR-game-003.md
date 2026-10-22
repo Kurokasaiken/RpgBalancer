@@ -1,3 +1,66 @@
+---
+id: CTR-game-003
+kind: integration
+components:
+  - game-frame
+  - game-frame-game-frame
+  - game-frame-pixi
+  - hud-hide-toggle
+external_dependencies:
+  - src/balancing/config/idleVillage/gameFrameConfig.ts
+fast_checks: []
+e2e_checks: []
+e2e_trigger_globs: []
+invariants:
+  - id: CTR-game-003.INV-1
+    source: director-bug
+    source_ref: R-169
+    statement: >-
+      Dopo `idleHideMs` di inattività (`pointerdown/pointermove/keydown/wheel`) il chrome scivola via:
+      `[data-hud-hidden]` presente, `hiddenBy='idle'`, telemetry `game_hud_toggle {reason:'idle'}`.
+    test_refs:
+      - tests/unit/idleVillage/gameHudIdle.test.tsx
+  - id: CTR-game-003.INV-2
+    source: director-bug
+    source_ref: R-169
+    statement: >-
+      Nascosto **da idle**: qualunque input reale lo richiama (`reason:'input'`) — eccetto un hit sulla perla/toggle
+      (`[data-hud-hide-toggle]`), che resta gesto deliberato. L'effetto stesso non conta come wake (niente self-wake al
+      commit dell'hide).
+    test_refs:
+      - tests/unit/idleVillage/gameHudIdle.test.tsx
+  - id: CTR-game-003.INV-3
+    source: director-bug
+    source_ref: R-169
+    statement: >-
+      Nascosto **a mano** (`h` o perla, `hiddenBy='manual'`): nessun input lo risveglia; torna solo col toggle o con
+      `hudWakeSignal`.
+    test_refs:
+      - tests/unit/idleVillage/gameHudIdle.test.tsx
+  - id: CTR-game-003.INV-4
+    source: director-bug
+    source_ref: R-169
+    statement: >-
+      `hudWakeSignal` bump (rising edge `shroudCovered` + `events.length` ledger) richiama il chrome in ogni caso
+      (`reason:'event'`), anche da manuale.
+    test_refs:
+      - tests/unit/idleVillage/gameHudIdle.test.tsx
+  - id: CTR-game-003.INV-5
+    source: director-bug
+    source_ref: R-169
+    statement: >-
+      `onHudHiddenChange(hidden, cause)` riporta ogni transizione con la causa (`'idle'`/`'manual'`); `wonderOnHide`
+      (config) bumpa `wonderRequest` **solo** su `cause === 'idle'` — il wonder è il premio della contemplazione, un
+      hide manuale è una vista pulita deliberata (decisione Director 2026-10-12, BV F-2). CTR-game-001 copre lo spawn.
+    test_refs:
+      - tests/unit/idleVillage/gameHudIdle.test.tsx
+  - id: CTR-game-003.INV-6
+    source: director-bug
+    source_ref: R-169
+    statement: '`idleHideMs <= 0` disabilita l''auto-hide; `prefers-reduced-motion` azzera `slideMs`.'
+    test_refs:
+      - tests/unit/idleVillage/gameHudIdle.test.tsx
+---
 # CTR-game-003 — HUD idle auto-hide / wake-on-input / wake-on-event
 
 **id:** `CTR-game-003`

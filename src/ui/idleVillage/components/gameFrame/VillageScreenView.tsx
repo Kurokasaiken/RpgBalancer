@@ -537,8 +537,8 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                         borderRadius: 8,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: 'var(--skin-hud-lacquer-deep)',
-                        border: '1px solid var(--skin-hud-brass-base)',
+                        background: 'var(--skin-hud-lacquer-base)',
+                        border: '1px solid var(--skin-hud-brass-hi)',
                         color: b.initialState === 'locked' ? 'var(--skin-text-secondary)' : b.initialState === 'buildable' ? 'var(--skin-icon-accent)' : 'var(--skin-title-color)',
                         font: '600 10px/1 var(--skin-font-display)',
                         letterSpacing: '0.04em',
@@ -572,8 +572,8 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                   gap: 8,
                   padding: '4px 10px',
                   borderRadius: 'var(--skin-hud-row-radius)',
-                  background: 'var(--skin-hud-lacquer-deep)',
-                  border: '1px solid var(--skin-hud-brass-base)',
+                  background: 'var(--skin-hud-lacquer-base)',
+                  border: '1px solid var(--skin-hud-brass-hi)',
                   pointerEvents: 'none',
                   opacity: 0.92,
                 }}
@@ -588,7 +588,7 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                 >
                   {t('gameFrame.village.title')}
                 </span>
-                <span style={{ font: '11px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+                <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
                   {t('gameFrame.village.builtCount', { built: BUILDINGS.filter((b) => b.initialState === 'built').length, total: BUILDINGS.length })}
                 </span>
               </div>
@@ -611,8 +611,8 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                   gap: 6,
                   padding: '4px 10px',
                   borderRadius: 'var(--skin-hud-row-radius)',
-                  background: drawerOpen ? 'color-mix(in srgb, var(--skin-hud-brass-base) 30%, var(--skin-hud-lacquer-deep))' : 'var(--skin-hud-lacquer-deep)',
-                  border: '1px solid var(--skin-hud-brass-base)',
+                  background: drawerOpen ? 'color-mix(in srgb, var(--skin-hud-brass-hi) 28%, var(--skin-hud-lacquer-base))' : 'var(--skin-hud-lacquer-base)',
+                  border: '1px solid var(--skin-hud-brass-hi)',
                   color: 'var(--skin-title-color)',
                   font: 'var(--skin-hud-caps-weight) var(--skin-hud-caps-size) var(--skin-font-display)',
                   letterSpacing: 'var(--skin-hud-caps-tracking)',
@@ -638,14 +638,14 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                     borderRadius: 8,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: 'var(--skin-hud-brass-base)',
+                    background: 'var(--skin-hud-brass-hi)',
                     color: 'var(--skin-hud-lacquer-deep)',
-                    font: '700 10px/1 var(--skin-font-display)',
+                    font: '700 11px/1 var(--skin-font-display)',
                   }}
                 >
                   {pendingCount}
                 </span>
-                <kbd style={{ font: '9px var(--skin-font-display)', color: 'var(--skin-text-secondary)', border: '1px solid var(--skin-surface-border)', borderRadius: 3, padding: '0 3px' }}>
+                <kbd style={{ font: '11px var(--skin-font-display)', color: 'var(--skin-text-secondary)', border: '1px solid var(--skin-surface-border)', borderRadius: 3, padding: '0 3px' }}>
                   r
                 </kbd>
               </button>
@@ -675,7 +675,7 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                 gap: 12,
                 padding: '4px 10px',
                 borderRadius: 'var(--skin-hud-row-radius)',
-                background: 'var(--skin-hud-lacquer-deep)',
+                background: 'var(--skin-hud-lacquer-base)',
                 border: '1px solid var(--skin-surface-border)',
                 pointerEvents: 'none',
                 opacity: 0.85,
@@ -686,12 +686,12 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                   <span style={{ position: 'relative', display: 'inline-flex', width: 18, height: 18 }}>
                     <VillagePinFrame frame={PIN_FRAME_FOR_CATEGORY[cat]} state="built" size={18} />
                   </span>
-                  <span style={{ font: '10px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+                  <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
                     {t(`gameFrame.village.category.${cat}`)}
                   </span>
                 </span>
               ))}
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, font: '10px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>
                 <span style={{ display: 'inline-flex', minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-hud-brass-base)', color: 'var(--skin-icon-accent)', fontSize: 12, fontWeight: 600 }}>I</span>
                 {t('gameFrame.village.legend.badgeLevel')}
                 <span style={{ display: 'inline-flex', minWidth: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-hud-brass-base)', color: 'var(--skin-icon-accent)', fontSize: 12, fontWeight: 600 }}>+</span>
@@ -699,7 +699,7 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                 <span style={{ display: 'inline-flex', minWidth: 13, height: 13, borderRadius: 7, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-surface-border)', color: 'var(--skin-text-secondary)' }}><EngravedIcon id="cmd-lock" size={8} /></span>
                 {t('gameFrame.village.legend.badgeLocked')}
               </span>
-              <span style={{ font: '10px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', letterSpacing: '0.02em' }}>
+              <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', letterSpacing: '0.02em' }}>
                 {t('gameFrame.village.legend.keys')}
               </span>
             </div>
