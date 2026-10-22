@@ -7,6 +7,7 @@ import {
   buildResourceReadoutItems,
   GameFrame,
   HudEventLedger,
+  NextEventTab,
   StagePanelFrame,
   type HudEvent,
   type HudObjective,
@@ -221,6 +222,7 @@ export function GameFrameScreen({ renderMap, rosterSlot, overlaySlot, extraEvent
             speed={{ multiplier: state.speedMultiplier, available: availableSpeeds, onChange: onSpeedChange, onTogglePause }}
           />
         }
+        nextSlot={<NextEventTab events={events} onSelect={focusEvent} />}
         resourcesSlot={<ResourceReadout items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} delta={readoutDelta} />}
         hangingSlot={
           panels.visible.events ? (

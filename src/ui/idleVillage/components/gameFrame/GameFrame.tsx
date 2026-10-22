@@ -52,6 +52,8 @@ export interface GameFrameProps {
   onNavSelect?: (id: string) => void;
   /** Top-centre ribbon content — day, place. */
   whenWhereSlot: ReactNode;
+  /** Top-centre tab: the nearest event (HUD-3 = P1). Omit it, or render null, and the middle of the sky stays clear. */
+  nextSlot?: ReactNode;
   /** Top-right ribbon content — the resource readout. */
   resourcesSlot: ReactNode;
   /** Right edge — the hung tag (what is coming). */
@@ -159,6 +161,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   activeNavId,
   onNavSelect,
   whenWhereSlot,
+  nextSlot,
   resourcesSlot,
   hangingSlot,
   utilitySlot,
@@ -447,25 +450,25 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)',
             columnGap: 12,
             padding: '0 20px',
-            // Both top plaques share one height (the resources one carries a second line): same bottom edge.
-            alignItems: 'stretch',
+            alignItems: 'start',
             pointerEvents: 'none',
             ...chromeZoom,
             ...slideChrome('up'),
           }}
         >
-          {/* HUD-2 = H1: the MENU plaque stretches to the row height like its two neighbours. */}
-          <div style={{ justifySelf: 'start', minWidth: 0, pointerEvents: 'auto', display: 'flex', alignItems: 'stretch', gap: 10 }}>
-            {menuSlot}
+          {/* HUD-3 = P1 (R-234): three DETACHED tabs — time · what's next · resources. The menu left this
+           *  row (icon in the bottom-right cluster, Esc opens it); the sky between the tabs stays map. */}
+          <div style={{ justifySelf: 'start', alignSelf: 'stretch', minWidth: 0, pointerEvents: 'auto', display: 'flex', alignItems: 'stretch', gap: 10 }}>
+            <HudPlaque shape="hang" as="section" style={{ padding: '10px 20px 10px', display: 'flex', alignItems: 'center' }}>
+              {whenWhereSlot}
+            </HudPlaque>
             {objectiveSlot != null && <div style={{ alignSelf: 'flex-start' }}>{objectiveSlot}</div>}
           </div>
-          <HudPlaque shape="hang" as="section" style={{ padding: '16px 34px 15px', pointerEvents: 'auto', display: 'flex', alignItems: 'center' }}>
-            {whenWhereSlot}
-          </HudPlaque>
+          <div style={{ justifySelf: 'center', minWidth: 0, maxWidth: '100%', pointerEvents: 'none', display: 'flex', alignItems: 'flex-start' }}>{nextSlot}</div>
           <HudPlaque
             shape="hang"
             as="section"
-            style={{ justifySelf: 'end', maxWidth: '100%', display: 'flex', alignItems: 'center', padding: '16px 40px 15px', pointerEvents: 'auto' }}
+            style={{ justifySelf: 'end', maxWidth: '100%', display: 'flex', alignItems: 'center', padding: '10px 22px 10px', pointerEvents: 'auto', alignSelf: 'stretch' }}
           >
             <div style={{ minWidth: 0, overflow: 'hidden' }}>{resourcesSlot}</div>
           </HudPlaque>
@@ -573,7 +576,8 @@ export const GameFrame: React.FC<GameFrameProps> = ({
 
       {/* ── Bottom-right: utility controls, and the pearl that stays when the rest is hidden ── */}
       {/* Last in the DOM on purpose: Tab reaches the corner utilities after the top bar and the nav (R-234, T-A14). */}
-      <div style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8, ...chromeZoom }}>
+      <div data-hud-corner="" style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8, ...chromeZoom }}>
+        {menuSlot != null && <div style={slideChrome('down')}>{menuSlot}</div>}
         {utilitySlot != null && <div style={slideChrome('down')}>{utilitySlot}</div>}
         <HudHideToggle hidden={hudHidden} onToggle={toggleHud} />
       </div>

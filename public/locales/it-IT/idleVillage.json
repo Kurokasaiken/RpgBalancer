@@ -1045,6 +1045,12 @@
         "desc": "Decrescente"
       }
     },
+    "next": {
+      "today": "oggi",
+      "days": "{days} g",
+      "hintAlarm": "Tra {days} g — clic per portare lì la camera.",
+      "hintQuiet": "Niente di urgente. Tra {days} g."
+    },
     "objective": {
       "label": "Obiettivo",
       "available": "Manda una squadra in “{name}”",
