@@ -186,6 +186,8 @@ export interface RuntimeMember extends LabMember {
   maxHp: number;
   wounded: boolean;
   dead: boolean;
+  /** PLAN-067 T-C2 (R-234): the quest tick the member fell at (from `nowTick`); absent while alive. */
+  deadAtTick?: number;
 }
 
 export interface LogEntry {
@@ -565,6 +567,7 @@ function applyHpDamage(state: QuestRunState, target: RuntimeMember, amount: numb
   if (target.hp <= 0) {
     target.hp = 0;
     target.dead = true;
+    target.deadAtTick = state.nowTick;
     pushLog(state, {
       kind: 'DEATH',
       text: `${target.name} falls, and does not get back up${source ? ` — at «${source}»` : ''}.`,
@@ -796,6 +799,7 @@ function applyHarm(
       }
       const hpBefore = target.hp;
       target.dead = true;
+      target.deadAtTick = state.nowTick;
       target.hp = 0;
       pushLog(state, {
         kind: 'DEATH',

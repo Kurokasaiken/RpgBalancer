@@ -12,6 +12,10 @@ export function stageExpeditionLost(run: QuestRunState): QuestRunState {
   copy.outcome = 'wipe';
   copy.ended = true;
   const fallen = copy.party.find((m) => !m.dead) ?? copy.party[0];
-  if (fallen) fallen.dead = true;
+  if (fallen) {
+    fallen.dead = true;
+    /* T-C2: the staged fall is dated at the run's own clock, so the report shows a day as in a real defeat. */
+    fallen.deadAtTick = copy.nowTick ?? copy.launchedAtTick;
+  }
   return copy;
 }

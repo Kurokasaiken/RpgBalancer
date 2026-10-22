@@ -21,6 +21,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { lostReportModel } from './expeditionLost';
 import { useTranslation } from 'react-i18next';
 import { EngravedIcon, type EngravedIconId } from './engravedIcons';
@@ -80,6 +81,9 @@ const readChromeViewportHeight = (): number => Math.round(window.innerHeight / g
 
 export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenario, widthPx, stageMs, edgeInsetPx = DEFAULT_GAME_FRAME_CONFIG.questWindow.rewardPopup.edgeInsetPx, onClose }) => {
   const { t } = useTranslation('idleVillage');
+  /* T-C2 (R-234): the game clock turns each fallen member's death tick into a day (game days start at 1). */
+  const dayLengthTicks = useMinimalGameplayStore((st) => st.config.globalRules.dayLengthInTimeUnits ?? 60);
+  const lostDayClock = useMemo(() => ({ ticksPerDay: dayLengthTicks, startDay: 1 }), [dayLengthTicks]);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const { panelStyle, handleProps } = useHudPanelDrag({ shellRef, edgeInsetPx });
 
@@ -206,9 +210,9 @@ export const QuestRewardPopup: React.FC<QuestRewardPopupProps> = ({ run, scenari
 
               {/* PLAN-067 T-C2 (R-234, EXP = A): a defeat shows one tombstone per fallen resident — no violet, the
                   fallen read in cold iron — instead of a generic line. The day is shown only when the run recorded it. */}
-              {run.outcome === 'wipe' && lostReportModel(run).tombs.length > 0 && (
+              {run.outcome === 'wipe' && lostReportModel(run, lostDayClock).tombs.length > 0 && (
                 <div data-testid="quest-reward-tombs" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-                  {lostReportModel(run).tombs.map((tomb) => (
+                  {lostReportModel(run, lostDayClock).tombs.map((tomb) => (
                     <div
                       key={tomb.id}
                       data-testid="quest-reward-tomb"
