@@ -124,7 +124,7 @@ Mockup di riferimento: `mockups/fork-mockups{,-v2,-v3}.html` (sha in `rulings/`)
 
 | Task | Fork | Dove | Acceptance |
 |---|---|---|---|
-| **T-B1** | SC-1 A | `QuestSkillCheckColumn` + stella `.da-tira` | `visual-fork: SC-1=A — baseline board-armed.png`; etichetta incisa, anello che respira, probabilità leggibile; target ≥ 32 px; reduced-motion statico |
+| **T-B1** ✅ 2026-10-22 + T-B1b stella per valle | SC-1 A | `QuestSkillCheckColumn` + stella `.da-tira` | `visual-fork: SC-1=A — baseline board-armed.png`; etichetta incisa, anello che respira, probabilità leggibile; target ≥ 32 px; reduced-motion statico |
 
 > Nota T-B1 (misurata in T-A3): il pulsante DOM `.da-tira` porta anche `wanderlust-artifact`. Quella regola globale (`src/ui/styleLab/tokens/v8-wanderlust-artifact.css:51`, `position: relative`) batte il suo `position:absolute`, quindi il pulsante scende nel flusso 170 px sotto il quadrante e la board lo nasconde: è il «nn ha il pulsante x lanciare». Con `absolute` ripristinato diventa una lastra d'oro **sopra la stella** (zona Big Win), contro la baseline SC-1 A. L'etichetta incisa va quindi **sotto** il quadrante (spazio da riservare nella board) e il gesto resta il click sulla stella.
 

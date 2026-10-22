@@ -693,6 +693,7 @@ export default interface Resources {
           "dismiss": "Dismiss",
           "dismissHint": "Click anywhere to continue — the details stay in the log.",
           "scoreTitle": "Skill {score} vs difficulty {difficulty}",
+          "throwLabel": "Throw",
           "titleSuffix": "skill check"
         },
         "chronicle": "Chronicle",
