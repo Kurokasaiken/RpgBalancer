@@ -5,7 +5,7 @@
  * newest save; «Esci dal gioco» exists only in the desktop app.
  */
 import { useTranslation } from 'react-i18next';
-import { SkinScope } from '@/ui/idleVillage/skins/primitives';
+import { SkinButton, SkinScope } from '@/ui/idleVillage/skins/primitives';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import logoUrl from '@/assets/ui/idleVillage/wanderlust-logo.png';
 
@@ -45,9 +45,9 @@ export function TitleScreen({ continueDay, onContinue, onNewGame, onLoadGame, on
         <div aria-hidden="true" style={{ width: BOOT.barWidthPx * 0.72, height: 1, margin: '18px 0 22px', background: `linear-gradient(90deg, transparent, ${BOOT.colors.rule}, transparent)` }} />
         <nav data-hud-controls="" aria-label={t('gameFrame.menu.title')} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {continueDay !== null && (
-            <button type="button" style={pill} disabled={busy} onClick={onContinue}>
-              <span>{continueDay > 0 ? t('gameFrame.menu.titleScreen.continue', { day: continueDay }) : t('gameFrame.menu.titleScreen.continuePlain')}</span>
-            </button>
+            <SkinButton variant="cta" style={{ minWidth: pill.minWidth }} disabled={busy} onClick={onContinue}>
+              {continueDay > 0 ? t('gameFrame.menu.titleScreen.continue', { day: continueDay }) : t('gameFrame.menu.titleScreen.continuePlain')}
+            </SkinButton>
           )}
           <button type="button" style={pill} disabled={busy} onClick={onNewGame}>
             <span>{t('gameFrame.menu.titleScreen.newGame')}</span>

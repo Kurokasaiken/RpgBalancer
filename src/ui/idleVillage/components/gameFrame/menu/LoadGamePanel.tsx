@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GameMenuDialog } from './GameMenuDialog';
+import { SkinButton } from '@/ui/idleVillage/skins/primitives';
 import { defaultSaveIO, deleteSlot, listSaves, type SaveIO, type SaveSlotId, type SaveSlotInfo } from '../../../state/gameSave';
 import { loadGameFromSlot } from '../../../state/gameSaveService';
 import mapUrl from '@/assets/ui/idleVillage/idle-village-map.jpg';
@@ -179,9 +180,15 @@ export function LoadGamePanel({ inGame, unsaved, currentDay, onClose, onLoaded, 
           <button type="button" onClick={() => setConfirm(null)}>
             <span>{t('gameFrame.menu.cancel')}</span>
           </button>
-          <button type="button" disabled={busy} onClick={() => void (confirm.kind === 'replace' ? doLoad() : doDelete())}>
-            <span>{confirm.kind === 'replace' ? t('gameFrame.menu.load.replaceConfirm') : t('gameFrame.menu.load.deleteConfirm')}</span>
-          </button>
+          {confirm.kind === 'replace' ? (
+            <SkinButton variant="cta" disabled={busy} onClick={() => void doLoad()}>
+              {t('gameFrame.menu.load.replaceConfirm')}
+            </SkinButton>
+          ) : (
+            <button type="button" disabled={busy} onClick={() => void doDelete()}>
+              <span>{t('gameFrame.menu.load.deleteConfirm')}</span>
+            </button>
+          )}
         </div>
       ) : (
         <div data-hud-controls="" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -189,9 +196,9 @@ export function LoadGamePanel({ inGame, unsaved, currentDay, onClose, onLoaded, 
           <button type="button" disabled={!current || current.state === 'empty'} onClick={() => setConfirm({ kind: 'delete' })}>
             <span>{t('gameFrame.menu.load.deleteAction')}</span>
           </button>
-          <button type="button" disabled={!loadable || busy} onClick={onLoadClick}>
-            <span>{t('gameFrame.menu.load.loadAction')}</span>
-          </button>
+          <SkinButton variant="cta" disabled={!loadable || busy} onClick={onLoadClick}>
+            {t('gameFrame.menu.load.loadAction')}
+          </SkinButton>
         </div>
       )}
     </GameMenuDialog>

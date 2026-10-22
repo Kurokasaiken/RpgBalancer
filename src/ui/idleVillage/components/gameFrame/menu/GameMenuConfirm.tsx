@@ -6,11 +6,12 @@
  */
 import type { ReactNode } from 'react';
 import { GameMenuDialog } from './GameMenuDialog';
+import { SkinButton } from '@/ui/idleVillage/skins/primitives';
 
 export interface GameMenuConfirmAction {
   label: string;
   onClick: () => void;
-  /** The action the player most likely wants (a marker only: BTN-1, the primary-button form, is still open, so it draws like the others). */
+  /** The one primary action (BTN-1 = A, the family plate). At most one per screen. */
   primary?: boolean;
   disabled?: boolean;
 }
@@ -35,11 +36,17 @@ export function GameMenuConfirm({ title, onCancel, children, actions, cancelLabe
           <span>{cancelLabel}</span>
         </button>
         <span style={{ flex: 1 }} />
-        {actions.map((action) => (
-          <button key={action.label} type="button" data-primary={action.primary ? '' : undefined} disabled={action.disabled} onClick={action.onClick}>
-            <span>{action.label}</span>
-          </button>
-        ))}
+        {actions.map((action) =>
+          action.primary ? (
+            <SkinButton key={action.label} variant="cta" disabled={action.disabled} onClick={action.onClick}>
+              {action.label}
+            </SkinButton>
+          ) : (
+            <button key={action.label} type="button" disabled={action.disabled} onClick={action.onClick}>
+              <span>{action.label}</span>
+            </button>
+          ),
+        )}
       </div>
     </GameMenuDialog>
   );
