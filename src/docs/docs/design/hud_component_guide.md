@@ -520,7 +520,7 @@ Solo tre ruoli, tutti dai token (nessun colore scritto a mano, **mai viola**):
 
 | Ruolo | Come si ottiene | Aspetto |
 |---|---|---|
-| **Azione primaria** (AVVIA, Conferma) | *in attesa del fork BTN-1* — la placca CTA (`variant="cta"`) è **vietata** (ruling 2026-10-20) | uno solo per schermata |
+| **Azione primaria** (AVVIA, Conferma) | **lastra di famiglia (BTN-1 = A, Director 2026-10-22)** — la placca CTA (`variant="cta"`) è **vietata** (ruling 2026-10-20) | uno solo per schermata |
 | **Comando di testata** (ordina, filtri, chiudi, menu) | un normale `<button>` dentro un contenitore `data-hud-controls` | pillola 26 px nel materiale della placca; `aria-pressed="true"` = attiva (oro) |
 | **Utilità/secondario** (fuori dalle testate) | `<SkinButton>` (`utility` / `secondary`) | placca in bronzo battuto / ardesia incisa |
 
