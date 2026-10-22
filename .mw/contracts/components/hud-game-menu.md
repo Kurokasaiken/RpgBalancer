@@ -33,6 +33,14 @@ invariants:
     statement: The menu trigger is an icon without visible text and Esc opens it (HUD-3 = P1)
     test_refs:
       - tests/unit/idleVillage/hudTopP1.test.tsx
+  - id: R-234-memorial-menu
+    source: director-bug
+    source_ref: R-234
+    statement: >-
+      The Memoriale is an enabled game-menu entry that opens a read-only list of the fallen: name, level, place, day
+      (DEATH-1 = B)
+    test_refs:
+      - tests/unit/idleVillage/memorialMenu.test.tsx
 ---
 # hud-game-menu
 
