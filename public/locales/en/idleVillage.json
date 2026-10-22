@@ -1340,7 +1340,10 @@
     "heroLevel": {
       "badge": "Lv {n}",
       "floater": "Level {n}",
-      "a11y": "Level {n} hero"
+      "a11y": "Level {n} hero",
+      "ceremonyTitle": "{name} reaches level {level}",
+      "hp": "Hit points",
+      "continue": "Continue"
     },
     "village": {
       "ariaLabel": "Village — buildings",

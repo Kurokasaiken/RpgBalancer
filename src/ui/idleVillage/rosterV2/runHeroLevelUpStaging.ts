@@ -20,6 +20,7 @@ import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { dispatchHeroLevelUp } from './heroLevelUpEvents';
 import { isCardMounted } from './mountedCardRegistry';
+import { bumpMockLevel } from './heroLevelMock';
 
 /** Command result — `configuredTargets` is always the original `staging.targets` snapshot. */
 export interface HeroLevelUpStagingResult {
@@ -81,7 +82,8 @@ export function runHeroLevelUpStaging({
     dispatchHeroLevelUp({
       type: 'hero_levelup_mock',
       residentId,
-      level: config.levels[residentId],
+      /* T-C1 (R-234): the level really rises — the event carries the NEW level. */
+      level: config.levels[residentId] + bumpMockLevel(residentId),
       eventId: `${commandSeq}:${targetIndex}`,
     });
   });

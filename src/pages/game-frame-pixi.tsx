@@ -71,6 +71,8 @@ import {
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { MERCHANT_CONFIG } from '@/balancing/config/idleVillage/merchantConfig';
 import { runHeroLevelUpStaging } from '@/ui/idleVillage/rosterV2/runHeroLevelUpStaging';
+import { runStagingOpeningRoster } from '@/ui/idleVillage/rosterV2/runStagingOpeningRoster';
+import { HeroLevelCeremony } from '@/ui/idleVillage/rosterV2/HeroLevelCeremony';
 import { playLevelUpCue } from '@/ui/idleVillage/rosterV2/heroLevelCue';
 
 /**
@@ -1343,7 +1345,11 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
          *  targets, or no mounted hero card all reject with no telemetry/cue). */
         id: 'levelup',
         label: t('gameFrame.director.levelUp'),
-        onTrigger: () => runHeroLevelUpStaging({ residentsById, playCue: playLevelUpCue }),
+        /* T-C1 (R-234): never silent — a closed roster is opened and the command retried until a card mounts. */
+        onTrigger: () => runStagingOpeningRoster({
+          run: () => runHeroLevelUpStaging({ residentsById, playCue: playLevelUpCue }),
+          openRoster: () => panelsForScreen.set('roster', true),
+        }),
       },
       {
         /* PLAN-034 T-010: the settlement-lost takeover, staged on demand for
@@ -1372,7 +1378,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           setSkinId((current) => COMPARABLE_SKIN_IDS[(COMPARABLE_SKIN_IDS.indexOf(current) + 1) % COMPARABLE_SKIN_IDS.length]),
       },
     ],
-    [invasion, questShown, autoRevealedIds, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, questWindow.consumablesArmedByDefault, expeditionGoblin, settlementLostActive, openRunWindow, residentsById, deadResidentCount],
+    [invasion, questShown, autoRevealedIds, poiDemo, currentDay, t, skinId, session.gameplay.state.currentTick, questRun, panels, panelsForScreen, residentsById, questWindow.consumablesArmedByDefault, expeditionGoblin, settlementLostActive, openRunWindow, residentsById, deadResidentCount],
   );
 
   return (
@@ -1509,6 +1515,8 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                   <WorldSurfaceEventCard
                     visible={cardOpen}
                     zIndex={1}
+                {/* T-C1 (R-234): the level-up ceremony plates (one per hero). */}
+                <HeroLevelCeremony residentsById={residentsById} />
                     screenAnchor={{
                       left: `calc(${safeFit?.insets.left ?? 0}px + (100% - ${(safeFit?.insets.left ?? 0) + (safeFit?.insets.right ?? 0)}px) / 2)`,
                       top: `calc(${safeFit?.insets.top ?? 0}px + (100% - ${(safeFit?.insets.top ?? 0) + (safeFit?.insets.bottom ?? 0)}px) / 2)`,
