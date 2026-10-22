@@ -24,6 +24,16 @@ const gamePerfBudgetsSchema = z.object({
     firstInteractiveMaxMs: z.number().positive(),
     /** pointerdown on a medal → the drag overlay is mounted. */
     dragOverlayMountMaxMs: z.number().positive(),
+    /**
+     * R-238 / INV:custom-drag-overlay.INV-1 — the FIRST hold on a roster card may
+     * cost at most this much more than an already-warm hold (cold-mount penalty).
+     */
+    dragOverlayColdDeltaMaxMs: z.number().positive(),
+    /**
+     * R-238 — pointerdown → drag preview in the DOM on a warm hold (includes the
+     * holdToDragMs activation delay). Headless slack applies via headless.p95Multiplier.
+     */
+    dragOverlayWarmShowMaxMs: z.number().positive(),
     /** Headless slack: vsync-emulated rAF is noisier; verdict still comes from the headed run. */
     headless: z.object({
       p95Multiplier: z.number().positive(),
@@ -60,6 +70,11 @@ const RAW_GAME_PERF_BUDGETS: GamePerfBudgets = {
     gestureMaxLongFrames: 0,
     firstInteractiveMaxMs: 4000,
     dragOverlayMountMaxMs: 100,
+    /* R-238 measured values (automation): pre-fix delta ≈ 400-490 ms, post
+     * pre-warm residual ≈ 0-200 ms (first-execution noise of the dnd-kit
+     * activation path). 250 catches the regression signature with CI slack. */
+    dragOverlayColdDeltaMaxMs: 250,
+    dragOverlayWarmShowMaxMs: 500,
     headless: { p95Multiplier: 1.5, maxLongFrames: 4 },
   },
   suite: {

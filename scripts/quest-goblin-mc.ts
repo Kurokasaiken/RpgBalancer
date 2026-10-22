@@ -50,8 +50,8 @@ function choose(state: QuestRunState, policy: Policy): string {
   switch (state.nodeId) {
     case 'gob-esplora':
       return policy === 'greedy' ? pickOpt('gob-forza-tracce') : pickOpt('gob-cerca-tracce');
-    case 'gob-bottino-scelta':
-      return policy === 'cautious' ? pickOpt('gob-lascia-bottino') : pickOpt('gob-prendi');
+    case 'gob-bottino':
+      return pickOpt('gob-prendi'); // v3: take-it-all, no leave option
     case 'gob-accampamento':
       if (policy === 'cautious' || policy === 'greedy') return pickOpt('gob-via-assalto');
       return state.flags.includes('bonusStealth') || state.flags.includes('bonusStealthPiccolo')

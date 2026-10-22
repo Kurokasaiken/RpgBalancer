@@ -16,8 +16,9 @@
  * window's live centre/top — `shiftX` stays derived, never stored. A
  * double-click on the drag handle clears the intent (centre + envelope top).
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
+import { getHudZoomFactor } from './hudScale';
 import {
   solveQuestClusterGeometry,
   type QuestClusterGeometry,
@@ -89,6 +90,11 @@ export const QuestStageCluster: React.FC<QuestStageClusterProps> = ({
   geometryRef.current = geometry;
   const groupRef = useRef<HTMLDivElement | null>(null);
   const [dragging, setDragging] = useState(false);
+  /* R-239 release flicker: the element that still carries the gesture
+   *  translate while the committed intent renders. Set at pointerup,
+   *  consumed by the post-commit layout effect (or the rAF fallback when
+   *  the commit produced no re-render). */
+  const pendingReleaseRef = useRef<HTMLDivElement | null>(null);
 
   /** Cluster drag — deltas clamped so the release commit re-derives to the
    *  same pixel the player sees (solver bounds = viewport margins). */
@@ -122,8 +128,12 @@ export const QuestStageCluster: React.FC<QuestStageClusterProps> = ({
       };
       const move = (ev: globalThis.PointerEvent) => {
         if (ev.pointerId !== pointerId) return;
-        delta.x = Math.min(Math.max(ev.clientX - start.x, Math.min(dxLo, dxHi)), Math.max(dxLo, dxHi));
-        delta.y = Math.min(Math.max(ev.clientY - start.y, Math.min(dyLo, dyHi)), Math.max(dyLo, dyHi));
+        /* PLAN-043 WS-5 DEF-06: pointer deltas arrive in device px; the
+         *  cluster lives in chrome-layer units (`viewport`/`geo` are solver
+         *  units) — divide by the HUD zoom factor (1 when unzoomed). */
+        const z = getHudZoomFactor();
+        delta.x = Math.min(Math.max((ev.clientX - start.x) / z, Math.min(dxLo, dxHi)), Math.max(dxLo, dxHi));
+        delta.y = Math.min(Math.max((ev.clientY - start.y) / z, Math.min(dyLo, dyHi)), Math.max(dyLo, dyHi));
         if (frame === null) frame = requestAnimationFrame(paint);
       };
       const end = (ev: globalThis.PointerEvent) => {
@@ -132,12 +142,27 @@ export const QuestStageCluster: React.FC<QuestStageClusterProps> = ({
         window.removeEventListener('pointerup', end);
         window.removeEventListener('pointercancel', end);
         if (frame !== null) cancelAnimationFrame(frame);
-        el.style.transform = '';
-        setDragging(false);
+        /* R-239: commit BEFORE dropping the translate. The previous order
+         *  (clear transform → commit → async re-render) painted at least one
+         *  frame at the stale pre-drag rect — the release "scatto" the
+         *  Director saw. Now the translate survives until the committed
+         *  geometry is in the DOM (layout effect below, pre-paint), and
+         *  `dragging` stays true until then so rect transitions stay off. */
+        pendingReleaseRef.current = el;
         /* Commit only the intent: the window's live centre becomes
          * `userCenterX`; the solver re-derives the group left under whatever
          * wings are open (BV-02: reopening/closing wings drifts 0px). */
         onCommitIntent(geo.window.x + delta.x + geo.window.w / 2, geo.window.y + delta.y);
+        /* Fallback for the no-rerender path (identical intent) — the layout
+         *  effect never fires, so drop the translate after one frame. */
+        requestAnimationFrame(() => {
+          const pending = pendingReleaseRef.current;
+          if (pending) {
+            pendingReleaseRef.current = null;
+            pending.style.transform = '';
+            setDragging(false);
+          }
+        });
       };
       window.addEventListener('pointermove', move);
       window.addEventListener('pointerup', end);
@@ -157,16 +182,35 @@ export const QuestStageCluster: React.FC<QuestStageClusterProps> = ({
     [onCommitIntent],
   );
 
+  /* Post-commit drop: once the committed geometry is committed to the DOM
+   *  (still before paint), remove the gesture translate — the window lands
+   *  where the player dropped it, with no stale-rect frame in between.
+   *  `dragging` (which keeps the rect transitions at 0ms) must survive ONE
+   *  painted frame: if it flipped in the same style recalc that moves the
+   *  rect, the browser would animate `left/top` from the pre-drag rect —
+   *  the visible "scatto" measured by probe10 (~500ms eased re-slide). */
+  useLayoutEffect(() => {
+    const pending = pendingReleaseRef.current;
+    if (!pending) return;
+    pendingReleaseRef.current = null;
+    pending.style.transform = '';
+    requestAnimationFrame(() => requestAnimationFrame(() => setDragging(false)));
+  }, [geometry]);
+
   /* Safety net: if the component unmounts mid-gesture the transform must not
    *  linger (the listeners live on window; the element write is cheap). */
   useEffect(
     () => () => {
+      pendingReleaseRef.current = null;
       if (groupRef.current) groupRef.current.style.transform = '';
     },
     [],
   );
 
-  const t = cfg.wingTransitionMs;
+  /* While a gesture is live — and through the commit paint — rect changes
+   *  land instantly; easing `left/top` while the group translate is still
+   *  applied would paint a double-offset frame. */
+  const t = dragging ? 0 : cfg.wingTransitionMs;
   return (
     <div
       ref={groupRef}

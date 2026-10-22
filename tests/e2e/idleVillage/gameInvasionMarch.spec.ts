@@ -1,6 +1,8 @@
 /**
- * PLAN-033 — BV-4 (the goblin marches from the landing point to the village over the march window, and the
- * page opens with no goblin: the invasion is not restored on reload) and BV-5 (the event ledger opens for a new event and stays open — Director, 2026-10-14: the card folds into its row,
+ * PLAN-033 — BV-4 (the goblin marches from the landing point to the village over the march window, and a
+ * confirmed invasion is restored on reload at the saved march progress — Director, 2026-10-19: the clock
+ * hydrates via `initializeMinimalGameplayStore`, so restore is faithful) and BV-5 (the event ledger opens
+ * for a new event and stays open — Director, 2026-10-14: the card folds into its row,
  * so the ledger can no longer close again after a second).
  */
 import { expect, test, type Page } from '@playwright/test';
@@ -48,6 +50,7 @@ const markerCentre = async (page: Page) => {
 test.describe('invasion march — BV-4', () => {
   test.use({ locale: 'en-US' });
 
+  // INV:CTR-game-002.INV-5
   test('the goblin walks from the landing point toward the village over 30 days', async ({ page }) => {
     await boot(page);
     await landInvasion(page);
@@ -66,26 +69,51 @@ test.describe('invasion march — BV-4', () => {
     const end = await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion?.());
     const at30 = await markerCentre(page);
 
-    expect(mid!.progress).toBeCloseTo(0.5, 2);
+    /* The live clock keeps ticking while `advanceTicks` steps (+5): a live tick landing
+     * mid-loop can overshoot the target day (observed 16/30 instead of 15/30). So assert
+     * the march *at the measured progress* instead of requiring an exact mid-day landing:
+     * the marker must sit at `progress` along the landing→village track. */
+    expect(mid!.progress).toBeGreaterThan(0.3);
+    expect(mid!.progress).toBeLessThan(0.7);
     expect(end!.progress).toBe(1);
-    // Linear walk: the midpoint sits halfway between the two ends (2% of the viewport as tolerance).
+    // Linear walk: at the measured progress the marker sits that far along (2% of viewport as tolerance).
     const tol = 0.02 * 1920;
-    expect(Math.abs(at15.x - (at0.x + at30.x) / 2)).toBeLessThan(tol);
-    expect(Math.abs(at15.y - (at0.y + at30.y) / 2)).toBeLessThan(tol);
+    expect(Math.abs(at15.x - (at0.x + (at30.x - at0.x) * mid!.progress))).toBeLessThan(tol);
+    expect(Math.abs(at15.y - (at0.y + (at30.y - at0.y) * mid!.progress))).toBeLessThan(tol);
     expect(Math.hypot(at30.x - at0.x, at30.y - at0.y)).toBeGreaterThan(tol);
   });
 
-  test('a reload opens a clean map: no goblin until an invasion is triggered', async ({ page }) => {
+  test('a reload restores the confirmed invasion at the saved march progress', async ({ page }) => {
     await boot(page);
     await landInvasion(page);
-    await expect(page.getByTestId('invasion-goblin-marker')).toBeAttached();
+    const startDay = (await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion?.()?.startDay ?? -1));
+    await advanceToDay(page, startDay + MARCH_DAYS / 2);
+    const preReload = await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion?.() ?? null);
+    expect(preReload).not.toBeNull();
+    /* The marker is attached but hidden until the sticker lands on it
+     * (`goblinLanded`): a bounding box on the hidden element is null. */
+    const markerPre = page.getByTestId('invasion-goblin-marker');
+    await expect(markerPre).toBeVisible({ timeout: 5_000 });
+    const boxBefore = await markerPre.boundingBox();
+
     await page.reload();
     await page.waitForFunction(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion, { timeout: 30_000 });
-    // Director, 2026-10-14: the goblin sticker must not be on the map when the page opens. (It used to be restored from
-    // `invasion_v1` with a position derived from a clock that does not hydrate, R-119.)
-    await page.waitForTimeout(3_000);
-    await expect(page.getByTestId('invasion-goblin-marker')).toHaveCount(0);
-    expect(await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion?.() ?? null)).toBeNull();
+
+    /* R-119 option A (Director, 2026-10-19): a confirmed invasion survives reload — the clock hydrates at
+     * save-time, the key is read only after hydration, so the marker mounts already landed at the saved
+     * march progress (the announcement theatre is transient and is not replayed). */
+    const marker = page.getByTestId('invasion-goblin-marker');
+    await expect(marker).toBeVisible({ timeout: 15_000 });
+    const restored = await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion?.() ?? null);
+    expect(restored).not.toBeNull();
+    expect(restored!.startDay).toBe(preReload!.startDay);
+    expect(restored!.dueDay).toBe(preReload!.dueDay);
+    expect(Math.abs(restored!.progress - preReload!.progress)).toBeLessThan(0.05);
+    // The marker eases to position on mount; measure once the transition has settled.
+    await page.waitForTimeout(1_000);
+    const boxAfter = await marker.boundingBox();
+    expect(Math.abs(boxAfter!.x - boxBefore!.x)).toBeLessThan(0.02 * 1920);
+    expect(Math.abs(boxAfter!.y - boxBefore!.y)).toBeLessThan(0.02 * 1920);
   });
 });
 
@@ -96,6 +124,7 @@ test.describe('event ledger — BV-5', () => {
   test.use({ locale: 'en-US' });
   const TITLE = 'Goblin host reaches the village';
 
+  // INV:CTR-game-004.INV-6
   test('a closed ledger opens for the new event and stays open', async ({ page }) => {
     await boot(page);
     // The ledger is on by default; the `e` shortcut toggles it. Close it first if it is open.

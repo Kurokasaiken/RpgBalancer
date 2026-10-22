@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fork visivi /game v5</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --display:"Cinzel","Trajan Pro",serif; --serif:"EB Garamond",Georgia,serif;
+  /* token reali della skin base (skinCssVariables.ts) */
+  --title:#f0cf6a; --text:#F5F2E8; --text2:rgba(245,242,232,.72); --text3:rgba(245,242,232,.55); --label:#c9a84e;
+  --lacq:#09202a; --lift:#0f2a35; --deep:#060f16; --brass-hi:#cfaf63; --brass:#a0762f; --brass-lo:#5f3f16;
+  --wound:#a11d33; --ember:#c9663a; --ok:#7bc96f;
+  --page:#0b1c22; --body:#e9dfc6; --dim:#a9b3ad; --rule:rgba(223,184,87,.22);
+  /* COL-D: colore della morte, cambiato dai selettori in alto */
+  --death:#cdbfa3;
+}
+body.col-b{--death:#93a4ad}
+body.col-c{--death:#a9a49a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--body);font:16px/1.5 var(--serif)}
+header,main{max-width:1240px;margin:0 auto;padding-left:16px;padding-right:16px}
+header{padding-top:32px}
+h1{font:600 26px var(--display);letter-spacing:.06em;color:var(--title);margin:0 0 6px}
+header p,.why{color:var(--dim);max-width:960px;margin:0 0 12px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+nav.toc a{font:500 12px var(--display);letter-spacing:.08em;color:var(--label);text-decoration:none;border:1px solid var(--rule);border-radius:999px;padding:3px 10px}
+code{font:.82em ui-monospace,Menlo,monospace;color:var(--label)}
+.fork{border-top:1px solid var(--rule);padding:28px 0}
+.fork h2{font:600 18px var(--display);letter-spacing:.05em;color:var(--label);margin:0 0 4px}
+.row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.row.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:1000px){.row,.row.three{grid-template-columns:1fr}}
+.col h3{font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:0 0 8px}
+.note{font-size:14px;color:var(--dim);margin-top:8px}
+.base img{width:100%;border-radius:8px;border:1px solid var(--rule);display:block}
+.stage{background:radial-gradient(120% 90% at 50% 0%,#14343a 0%,#0b1f25 60%,#081419 100%);border:1px solid var(--rule);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.matrix{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;table-layout:fixed}
+.matrix th,.matrix td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:top}
+.matrix th:first-child,.matrix td:first-child{width:28%}
+.matrix th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label);text-transform:uppercase}
+.win{color:var(--title)}
+.research{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 24px;font-size:15px;color:var(--dim);margin:14px 0 0;max-width:1100px}
+@media (max-width:800px){.research{grid-template-columns:1fr}}
+.research b{color:var(--body);font-weight:600}
+.research a{color:var(--label)}
+.ctrl{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:10px 0 16px;font:500 12px var(--display);letter-spacing:.08em;color:var(--label)}
+.ctrl label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.ctrl fieldset{border:1px solid var(--rule);border-radius:8px;padding:6px 12px;display:flex;gap:12px;align-items:center}
+.ctrl legend{padding:0 6px}
+
+/* ---------- famiglia: lastra pannello ---------- */
+.plaque{background:linear-gradient(180deg,var(--lift),var(--deep));border:1.5px solid var(--brass-hi);border-radius:12px;
+  box-shadow:0 10px 24px rgba(3,26,30,.6),inset 0 0 0 3px var(--deep),inset 0 0 0 4px rgba(207,175,99,.3);color:var(--text)}
+.ctx{display:flex;gap:10px;align-items:center;justify-content:flex-end;padding:10px 12px;border-top:1px solid rgba(207,175,99,.25)}
+
+/* ---------- BTN-1 · A · lastra di famiglia ---------- */
+.ba{font:600 12px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--title);
+  background:linear-gradient(180deg,#123341,#081b24);border:1px solid var(--brass-hi);border-radius:6px;
+  box-shadow:inset 0 1px 0 rgba(240,207,106,.28),inset 0 0 0 2px rgba(6,15,22,.9),inset 0 0 0 3px rgba(207,175,99,.22);
+  padding:0 20px;height:36px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.ba.sec{color:var(--label);border-color:rgba(207,175,99,.45);box-shadow:inset 0 0 0 2px rgba(6,15,22,.9)}
+.ba:hover,.ba.is-hover{border-color:var(--title);box-shadow:inset 0 1px 0 rgba(240,207,106,.4),inset 0 0 0 2px rgba(6,15,22,.9),inset 0 0 14px rgba(240,207,106,.18)}
+.ba:focus-visible,.ba.is-focus{outline:2px solid var(--title);outline-offset:3px}
+.ba[disabled],.ba.is-disabled{color:rgba(240,207,106,.38);border-color:rgba(207,175,99,.25);box-shadow:none;cursor:not-allowed}
+
+/* ---------- BTN-1 · B · riga incisa ---------- */
+.bb{font:600 12px/1 var(--display);letter-spacing:.18em;text-transform:uppercase;color:var(--title);background:none;border:0;
+  padding:10px 8px;height:36px;display:inline-flex;align-items:center;gap:8px;position:relative;cursor:pointer}
+.bb::before,.bb::after{content:"";position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--brass-hi) 18%,var(--brass-hi) 82%,transparent)}
+.bb::before{top:2px}.bb::after{bottom:2px}
+.bb .chev{width:9px;height:9px;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:rotate(-45deg);margin-left:2px}
+.bb.sec{color:var(--label)} .bb.sec::before,.bb.sec::after{display:none}
+.bb:hover,.bb.is-hover{color:#fff1c2;text-shadow:0 0 10px rgba(240,207,106,.45)}
+.bb:hover::before,.bb:hover::after,.bb.is-hover::before,.bb.is-hover::after{left:-8px;right:-8px;background:linear-gradient(90deg,transparent,var(--title) 15%,var(--title) 85%,transparent)}
+.bb:focus-visible,.bb.is-focus{outline:2px solid var(--title);outline-offset:4px;border-radius:2px}
+.bb[disabled],.bb.is-disabled{color:rgba(240,207,106,.35);cursor:not-allowed}
+.bb.is-disabled::before,.bb.is-disabled::after{opacity:.35}
+
+/* ---------- BTN-1 · C · stendardo ---------- */
+.bc{font:600 12px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--title);border:0;background:none;
+  height:38px;padding:0 26px 0 18px;display:inline-flex;align-items:center;gap:8px;position:relative;cursor:pointer;isolation:isolate}
+.bc::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#14303b,#091a22);
+  clip-path:polygon(0 0,100% 0,calc(100% - 12px) 50%,100% 100%,0 100%);
+  box-shadow:none}
+.bc::after{content:"";position:absolute;inset:3px 6px 3px 3px;z-index:-1;border:1px dashed rgba(207,175,99,.55);border-right:0;
+  clip-path:polygon(0 0,100% 0,calc(100% - 10px) 50%,100% 100%,0 100%)}
+.bc .pole{position:absolute;left:-5px;top:-4px;bottom:-4px;width:3px;border-radius:2px;background:linear-gradient(180deg,#e2c477,#7a5520)}
+.bc.sec{color:var(--label);padding:0 16px}
+.bc.sec::before{clip-path:none;border-radius:4px;background:linear-gradient(180deg,#0f2630,#08161d)}
+.bc.sec::after{clip-path:none;border-right:1px dashed rgba(207,175,99,.35);border-color:rgba(207,175,99,.35);border-radius:3px;inset:3px}
+.bc:hover,.bc.is-hover{color:#fff1c2}
+.bc:hover::after,.bc.is-hover::after{border-color:var(--title);border-style:solid}
+.bc:focus-visible,.bc.is-focus{outline:2px solid var(--title);outline-offset:4px}
+.bc.is-disabled{color:rgba(240,207,106,.35);cursor:not-allowed}
+.bc.is-disabled::after{opacity:.35}
+
+.ba,.bb,.bc{white-space:nowrap}
+.foot-cmp{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.foot-cmp .r{display:grid;grid-template-columns:150px 634px;gap:12px;align-items:center}
+@media (max-width:860px){.foot-cmp .r{grid-template-columns:1fr}}
+.foot-cmp .r>span{font:500 12px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--label)}
+.foot-cmp .bar{width:634px;max-width:100%;height:70px;border-radius:0 0 10px 10px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:linear-gradient(180deg,#0d2530,#071820);border:1px solid rgba(207,175,99,.35)}
+.row.three.ctxrow{grid-template-columns:634px;max-width:100%}
+.ctxcap{font:500 12px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin-bottom:6px}
+.pl img{width:100%;display:block;border-radius:12px 12px 0 0;border:1.5px solid var(--brass-hi);border-bottom:0}
+.pl .bar2{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(180deg,#0b1f29,#071820);border:1.5px solid var(--brass-hi);border-top:1px solid rgba(207,175,99,.25);border-radius:0 0 12px 12px}
+.states{display:grid;grid-template-columns:repeat(2,auto);gap:10px 14px;justify-content:start;align-items:center;font-size:13px;color:var(--dim)}
+
+/* ---------- COL-D ---------- */
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font:500 12px var(--display);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.chip.death{color:var(--death);border:1px solid color-mix(in srgb,var(--death) 55%,transparent);background:color-mix(in srgb,var(--death) 12%,var(--deep))}
+.chip.wound{color:color-mix(in srgb,var(--wound) 60%,var(--text));border:1px solid color-mix(in srgb,var(--wound) 55%,transparent);background:color-mix(in srgb,var(--wound) 12%,var(--deep))}
+.dagger{display:inline-block;width:10px;height:14px;position:relative}
+.dagger::before{content:"";position:absolute;left:4px;top:0;width:2px;height:14px;background:currentColor}
+.dagger::after{content:"";position:absolute;left:0;top:4px;width:10px;height:2px;background:currentColor}
+.fallen-line{display:flex;align-items:center;gap:8px;font:400 15px var(--serif);color:var(--text)}
+.fallen-line .lbl{font:500 12px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--death)}
+.tile{width:56px;text-align:center;font:500 12px var(--display);letter-spacing:.04em}
+.tile .sq{width:40px;height:40px;margin:0 auto 4px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(180deg,#14303b,#091a22);border:1px solid rgba(207,175,99,.45);color:var(--label)}
+.tile.dead .sq{border-color:color-mix(in srgb,var(--death) 70%,transparent);color:var(--death);background:linear-gradient(180deg,#1b2224,#0b1013)}
+.tile.dead{color:var(--death)} .tile.hurt{color:color-mix(in srgb,var(--wound) 60%,var(--text))}
+.tile.hurt .sq{border-color:color-mix(in srgb,var(--wound) 70%,transparent);color:color-mix(in srgb,var(--wound) 60%,var(--text))}
+.swatch{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--dim)}
+.swatch i{width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,.15);display:inline-block}
+
+/* ---------- T-C2 rapporto (scala 1:1, 400 px come in config) ---------- */
+.rep-wrap{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.rep{width:400px;max-width:100%;padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px}
+.rep .head{display:flex;align-items:center;gap:8px}
+.rep .head .q{flex:1;font:500 12px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--label)}
+.rep .x{width:26px;height:26px;border-radius:999px;border:1px solid rgba(207,175,99,.45);display:grid;place-items:center;color:var(--label);font-size:13px}
+.rep .scene{height:150px;border-radius:8px;background-size:cover;background-position:center 35%;border:1px solid rgba(207,175,99,.35)}
+.rep.lost .scene{filter:grayscale(.85) brightness(.6) sepia(.15)}
+.rep .outcome{font:600 22px/1.15 var(--display);letter-spacing:.04em;color:var(--title);margin:2px 0 0}
+.rep.lost .outcome{color:var(--text)}
+.rep .fiction{text-wrap:balance;font:italic 400 15px/1.4 var(--serif);color:var(--text2);margin:0}
+.rep .sect{font:500 12px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--label);display:flex;align-items:center;gap:8px}
+.rep .sect::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(207,175,99,.45),transparent)}
+.stones{display:flex;gap:14px;align-items:center}
+.fallen-note{font:italic 400 14px/1.4 var(--serif);color:var(--text2);text-wrap:balance}
+.pt{width:44px;height:44px;border-radius:50%;background-size:cover;background-position:center 20%;border:1.5px solid currentColor;flex:0 0 auto}
+.stone .pt{filter:grayscale(1) contrast(.9) brightness(.8);margin-bottom:2px}
+.stone{width:104px;height:132px;border-radius:34px 34px 4px 4px;background:linear-gradient(180deg,#59656a,#2b3539);border:1px solid #7b878b;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.12),0 6px 12px rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:10px;gap:3px;color:var(--death)}
+.stone .nm{font:600 12px/1.15 var(--display);letter-spacing:.04em;color:#e6e9e9;text-align:center;text-shadow:0 1px 0 #151b1d}
+.stone .d{font:400 12px var(--serif);color:#c9d0d2}
+.banners{display:flex;gap:10px}
+.banner{width:104px;height:132px;background:linear-gradient(180deg,#14303b,#0a1c24);border:1px solid var(--brass-hi);clip-path:polygon(0 0,100% 0,100% 82%,50% 100%,0 82%);
+  display:flex;flex-direction:column;align-items:center;padding-top:10px;gap:3px}
+.banner .pt{color:var(--brass-hi)}
+.banner .nm{font:600 12px/1.15 var(--display);letter-spacing:.04em;color:var(--title);text-align:center}
+.banner .d{font:400 12px var(--serif);color:var(--text2)}
+.items{display:flex;flex-direction:column;gap:6px}
+.item{display:flex;align-items:center;gap:10px;font:400 15px var(--serif);color:var(--text)}
+.item .ic{width:36px;height:36px;border-radius:6px;display:grid;place-items:center;flex:0 0 auto;border:1px solid rgba(207,175,99,.45);color:var(--label);background:linear-gradient(180deg,#14303b,#091a22);font-size:14px}
+.item.lost .ic{border-color:var(--ember);color:#f2b38f;background:linear-gradient(180deg,#2a1a12,#120a07);position:relative}
+.item.lost .ic::after{content:"";position:absolute;inset:5px 12px 5px 11px;border-right:1.5px solid var(--ember);transform:skewX(-18deg)}
+.item.lost .what{text-decoration:line-through;text-decoration-color:rgba(201,102,58,.8)}
+.item .qty{position:absolute;right:-6px;bottom:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--deep);border:1px solid var(--brass-hi);font:600 12px/16px var(--display);color:var(--title);text-align:center;padding:0 3px}
+.item .ic{position:relative}
+.item .sub{font:400 13px var(--serif);color:var(--text2)}
+.fiction{text-wrap:balance}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.foot .link{font:400 14px var(--serif);color:var(--text3);text-decoration:underline;text-decoration-color:rgba(245,242,232,.25);text-underline-offset:3px}
+.spec{font-size:14px;color:var(--dim);max-width:520px}
+.spec table{border-collapse:collapse;width:100%}
+.spec td,.spec th{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:left}
+.spec th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label);text-transform:uppercase}
+.hide{display:none!important}
+</style>
+</head>
+<body class="btn-a col-a">
+<header>
+  <h1>Fork visivi /game · v5</h1>
+  <p>Tre bivi aperti dai tuoi ruling del 20 ottobre: <b>BTN-1</b> forma del pulsante principale (la placca CTA è vietata ovunque), <b>COL-D</b> colore della morte senza viola, <b>T-C2</b> rapporto di fine quest ridisegnato (EXP A «Lapidi», già scelto in v3) a proporzioni reali. Tutti i colori sono token della skin base; il rapporto è a scala 1:1, largo 400 px come in config.</p>
+  <nav class="toc"><a href="#research">Ricerca</a><a href="#btn">BTN-1 pulsante</a><a href="#col">COL-D morte</a><a href="#rep">T-C2 rapporto</a></nav>
+  <div class="research" id="research">
+    <div><b>Leggibile a colpo d'occhio, i pulsanti si distinguono dai display.</b> Jon Ingold (inkle, <i>80 Days</i>): l'obiettivo è «beauty, clarity, and function»; la coerenza riduce il carico, il contrasto decide cosa emerge. → <a href="https://www.vice.com/en/article/the-makers-of-mobile-hit-80-days-on-the-importance-of-amazing-ui-852/">Vice</a></div>
+    <div><b>L'interfaccia lascia spazio all'illustrazione.</b> <i>The Banner Saga</i>: UI minima in basso, lo stendardo come unico elemento tematico, il dipinto domina. → <a href="https://iuliana-urechi.medium.com/learning-from-and-improving-banner-saga-trilogy-a-ux-ui-analysis-b2b4e46ff660">analisi UX</a></div>
+    <div><b>Malinconia e manoscritto, non effetti.</b> Chris Bourassa (<i>Darkest Dungeon</i>): pagine di un vecchio manoscritto a lume di candela; il tono viene dalla sottrazione. → <a href="https://www.gamespot.com/articles/the-gothic-sensibilities-of-darkest-dungeon/1100-6424880/">GameSpot</a>, <a href="https://media.gdcvault.com/gdc2016/Presentations/Bourassa_Chris_a%20torch%20in.pdf">GDC 2016</a></div>
+    <div><b>La sconfitta sta dentro la finzione e dice la posta.</b> Le schermate di fine partita ricordate mettono la morte nel racconto, mostrano cosa si è perso e danno un motivo per riprovare. → <a href="https://www.gamedeveloper.com/design/alternatives-to-the-game-over-screen">Game Developer</a></div>
+    <div><b>Mai solo il colore.</b> Uno stato si legge per forma + parola + colore (≈ 8% degli uomini ha un deficit cromatico): la morte porta sempre il pugnale † e la parola. → <a href="https://abratabia.com/game-accessibility/colorblind-modes.php">guida color-blind</a></div>
+    <div><b>Tipografia come voce.</b> <i>Pentiment</i>: la scrittura è la scenografia; poche famiglie usate con coerenza valgono più di molti ornamenti. → <a href="https://www.gamedeveloper.com/design/pentiment-director-explains-how-going-all-in-on-fonts-helped-elevate-the-medieval-detective-rpg-">Game Developer</a></div>
+  </div>
+</header>
+<main>
+
+<!-- ================= BTN-1 ================= -->
+<section class="fork" id="btn">
+  <h2>BTN-1 · Forma del pulsante principale</h2>
+  <p class="why">Vietata: la placca smalto verde acqua con cornice d'ottone e angoli tagliati (<code>SkinButton variant="cta"</code>), oggi su «SEND EXPEDITION», «CLOSE THE REPORT» e circa 20 componenti. Ogni opzione è mostrata nei quattro stati e, sotto, nel piè del planner a larghezza reale con «Torna alla mappa» come secondario. Una sola grammatica per tutta /game.</p>
+  <div class="row">
+    <div class="col base"><h3>Oggi (vietato)</h3><img src="baseline/v4-planner-cta-now.png" alt="Piè del planner con la placca CTA attuale"><div class="note">Placca teal larga metà pannello, pesa più del contenuto: è il primo oggetto che l'occhio vede, prima della scelta della squadra.</div></div>
+    <div class="col"><h3>A · Lastra di famiglia</h3>
+      <div class="stage">
+        <div class="states"><button class="ba">Invia</button><span>riposo</span><button class="ba is-hover">Invia</button><span>hover</span><button class="ba is-focus">Invia</button><span>focus</span><button class="ba is-disabled">Invia</button><span>disabilitato</span></div>
+      </div>
+      <div class="note">Stessa materia delle lastre (lacca + filo d'ottone), alta 36 px, larga quanto la parola. Il primario si distingue per l'oro del testo e del bordo, non per il colore di fondo. La più sobria e la più coerente.</div></div>
+    <div class="col"><h3>B · Riga incisa</h3>
+      <div class="stage">
+        <div class="states"><button class="bb">Invia<span class="chev"></span></button><span>riposo</span><button class="bb is-hover">Invia<span class="chev"></span></button><span>hover</span><button class="bb is-focus">Invia<span class="chev"></span></button><span>focus</span><button class="bb is-disabled">Invia<span class="chev"></span></button><span>disabilitato</span></div>
+      </div>
+      <div class="note">Nessuna scatola: parola in oro tra due filetti d'ottone, freccia incisa. In hover i filetti si allungano e si accendono. Lascia tutto lo spazio al pannello (Banner Saga). Rischio: su sfondi chiari si legge meno come pulsante.</div></div>
+    <div class="col"><h3>C · Stendardo</h3>
+      <div class="stage">
+        <div class="states"><button class="bc"><span class="pole"></span>Invia</button><span>riposo</span><button class="bc is-hover"><span class="pole"></span>Invia</button><span>hover</span><button class="bc is-focus"><span class="pole"></span>Invia</button><span>focus</span><button class="bc is-disabled"><span class="pole"></span>Invia</button><span>disabilitato</span></div>
+      </div>
+      <div class="note">Un piccolo stendardo di stoffa laccata con cucitura d'ottone e coda a rondine, appeso a un'asta: «parti», «chiudi», «torna». È l'unico oggetto tematico della HUD. Rischio: è una forma nuova da mantenere coerente ovunque.</div></div>
+  </div>
+  <h3 style="font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:20px 0 8px">Nel planner reale (screenshot 1440×900, stesso punto del pulsante attuale)</h3>
+  <div class="row three ctxrow">
+    <div><div class="ctxcap">A · Lastra</div><div class="pl"><img src="baseline/v4-planner-top-now.png" alt=""><div class="bar2"><button class="ba">Invia la spedizione</button><button class="ba sec">Torna alla mappa</button></div></div></div>
+    <div><div class="ctxcap">B · Riga incisa</div><div class="pl"><img src="baseline/v4-planner-top-now.png" alt=""><div class="bar2"><button class="bb">Invia la spedizione<span class="chev"></span></button><button class="bb sec">Torna alla mappa</button></div></div></div>
+    <div><div class="ctxcap">C · Stendardo</div><div class="pl"><img src="baseline/v4-planner-top-now.png" alt=""><div class="bar2"><button class="bc"><span class="pole"></span>Invia la spedizione</button><button class="bc sec">Torna alla mappa</button></div></div></div>
+  </div>
+  <div class="foot-cmp">
+    <div class="r"><span>Oggi</span><img src="baseline/v4-planner-cta-now.png" alt="" style="width:634px;max-width:100%;display:block;border-radius:6px"></div>
+    <div class="r"><span>A · Lastra</span><div class="bar"><button class="ba">Invia la spedizione</button><button class="ba sec">Torna alla mappa</button></div></div>
+    <div class="r"><span>B · Riga incisa</span><div class="bar"><button class="bb">Invia la spedizione<span class="chev"></span></button><button class="bb sec">Torna alla mappa</button></div></div>
+    <div class="r"><span>C · Stendardo</span><div class="bar"><button class="bc"><span class="pole"></span>Invia la spedizione</button><button class="bc sec">Torna alla mappa</button></div></div>
+    <p class="note">Piè del planner a larghezza reale (634 px a 1440×900). Il primario resta a sinistra dove il giocatore lo cerca oggi; la larghezza segue la parola, non il pannello.</p>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Lastra</th><th>B Riga incisa</th><th>C Stendardo</th></tr>
+    <tr><td>Si capisce che è un pulsante</td><td class="win">subito</td><td>sì, con la freccia</td><td class="win">subito</td></tr>
+    <tr><td>Peso visivo nel pannello</td><td>medio</td><td class="win">minimo</td><td>medio</td></tr>
+    <tr><td>Coerenza con lastre e pillole</td><td class="win">stessa materia</td><td>nuova (ma senza materia)</td><td>nuova forma tematica</td></tr>
+    <tr><td>Carattere / tema</td><td>sobrio</td><td>manoscritto</td><td class="win">racconto (stendardo)</td></tr>
+    <tr><td>Rischio di ritorno alla «placca CTA»</td><td>basso (niente teal, niente angoli tagliati)</td><td class="win">nullo</td><td>basso</td></tr></table>
+</section>
+
+<!-- ================= COL-D ================= -->
+<section class="fork" id="col">
+  <h2>COL-D · Colore della morte senza viola</h2>
+  <p class="why">Oggi la morte è <code>--skin-status-death #6d3fb0</code>, viola: contrasto 2.57:1 sul proprio chip, ~54 file, fuori regola. La morte deve distinguersi dalla <b>ferita</b> (rosso <code>#a11d33</code>), anche per chi non distingue i colori: per luminosità, per forma (†) e per parola. Contrasti misurati sui token reali.</p>
+  <div class="row">
+    <div class="col base"><h3>Oggi (vietato)</h3><img src="baseline/v4-report-now.png" alt="Rapporto attuale con lapide e caduti viola"><div class="note">Lapide e «FALLEN» viola, chip rosso su rosso, placca CTA.</div></div>
+    <div class="col"><h3>A · Osso e cenere <span style="font-family:var(--serif);text-transform:none;letter-spacing:0;color:var(--dim)">#cdbfa3</span></h3>
+      <div class="stage col-demo" data-col="a"></div>
+      <div class="note">La morte come assenza di colore: un bianco d'osso caldo. Contrasto 8.65:1 sul chip, 9.25:1 sul pannello; 4.2× più chiaro della ferita, quindi distinto anche in scala di grigi. Tono Darkest Dungeon.</div></div>
+    <div class="col"><h3>B · Ferro freddo <span style="font-family:var(--serif);text-transform:none;letter-spacing:0;color:var(--dim)">#93a4ad</span></h3>
+      <div class="stage col-demo" data-col="b"></div>
+      <div class="note">Grigio d'acciaio freddo: «finito, spento». 6.35:1 sul chip. Rischio: vicino al testo attenuato, può leggersi come «disabilitato».</div></div>
+    <div class="col"><h3>C · Pietra <span style="font-family:var(--serif);text-transform:none;letter-spacing:0;color:var(--dim)">#a9a49a</span></h3>
+      <div class="stage col-demo" data-col="c"></div>
+      <div class="note">Il grigio della lapide: lega il colore all'oggetto (la pietra incisa del rapporto). 6.58:1 sul chip. Più spento di A.</div></div>
+  </div>
+  <table class="matrix"><tr><th>Asse</th><th>A Osso</th><th>B Ferro</th><th>C Pietra</th></tr>
+    <tr><td>Contrasto chip / pannello</td><td class="win">8.65 / 9.25</td><td>6.35 / 6.51</td><td>6.58 / 6.76</td></tr>
+    <tr><td>Distinto dalla ferita in grigio</td><td class="win">4.2×</td><td>3.0×</td><td>3.1×</td></tr>
+    <tr><td>Confusione con «disabilitato»</td><td>bassa</td><td>alta</td><td>media</td></tr>
+    <tr><td>Legame con l'oggetto (lapide)</td><td>medio</td><td>basso</td><td class="win">alto</td></tr></table>
+  <p class="note">Scartato: ruggine <code>#a8553a</code> (3.4:1 e troppo vicino alla ferita, 1.5×). L'anello notturno viola del POI giorno/notte segue lo stesso ruling ma è un altro colore (notte, non morte): va deciso a parte.</p>
+</section>
+
+<!-- ================= T-C2 ================= -->
+<section class="fork" id="rep">
+  <h2>T-C2 · Rapporto di fine quest, a proporzioni reali</h2>
+  <p class="why"><b>v5 rispetto a v4:</b> ritratti sulle lapidi e sugli stendardi (le persone avevano solo il nome), nessun testo sotto i 12 px, quantità a badge sull'icona invece che staccata a destra, righe di finzione bilanciate (niente parola orfana), una nota di racconto accanto alla lapide per non lasciare il vuoto. <br><br>Il rapporto di oggi è «sproporzionato»: icona-lapide di 34 px accanto a testo di 13 px, striscia d'immagine di 64 px che taglia il volto, titoli di sezione minuscoli, e un pulsante che pesa più di tutto il resto. La proposta segue EXP A «Lapidi», con una gerarchia fissa e una scala di misure dichiarata. Nessun testo sopra l'immagine (stesso ruling del POI detail). I selettori qui sotto applicano al rapporto il pulsante (BTN-1) e il colore della morte (COL-D) che scegli.</p>
+  <div class="ctrl">
+    <fieldset><legend>BTN-1</legend><label><input type="radio" name="btn" value="a" checked> A lastra</label><label><input type="radio" name="btn" value="b"> B riga</label><label><input type="radio" name="btn" value="c"> C stendardo</label></fieldset>
+    <fieldset><legend>COL-D</legend><label><input type="radio" name="col" value="a" checked> A osso</label><label><input type="radio" name="col" value="b"> B ferro</label><label><input type="radio" name="col" value="c"> C pietra</label></fieldset>
+  </div>
+  <div class="rep-wrap">
+    <div><h3 style="font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:0 0 8px">Oggi · 1:1</h3><img src="baseline/v4-report-now.png" alt="Rapporto attuale" style="width:400px;max-width:100%;border-radius:8px;border:1px solid var(--rule);display:block"></div>
+
+    <div><h3 style="font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:0 0 8px">Sconfitta · proposta 1:1</h3>
+      <div class="plaque rep lost">
+        <div class="head"><span class="q">Sterminio dei goblin · giorno 46</span><span class="x">✕</span></div>
+        <div class="scene" style="background-image:url(assets/totem-goblin.jpg)"></div>
+        <p class="outcome">Nessuno è tornato</p>
+        <p class="fiction">Il fumo dell'accampamento copre il bosco. Le tende restano in piedi.</p>
+        <div class="sect">Caduti</div>
+        <div class="stones"><div class="stone"><span class="pt" style="background-image:url(assets/hero-warrior.jpg)"></span><span class="nm">Sir Spaccaculi</span><span class="d"><span class="dagger" style="width:8px;height:11px;vertical-align:-1px"></span> giorno 41</span></div>
+          <div class="fallen-note">Era il comandante della spedizione.<br>Il suo posto nel Santuario resta vuoto.</div></div>
+        <div class="sect">Perduto con loro</div>
+        <div class="items">
+          <div class="item lost"><span class="ic">⚔<span class="qty">1</span></span><span><span class="what">Bonus di forza</span><br><span class="sub">+15 a una prova · consumato</span></span></div>
+        </div>
+        <div class="foot"><span class="link">Leggi la cronaca</span><span class="act"></span></div>
+      </div>
+    </div>
+
+    <div><h3 style="font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:0 0 8px">Vittoria · stesso schema 1:1</h3>
+      <div class="plaque rep">
+        <div class="head"><span class="q">Sterminio dei goblin · giorno 31</span><span class="x">✕</span></div>
+        <div class="scene" style="background-image:url(assets/scene-camp.jpg)"></div>
+        <p class="outcome">L'accampamento è caduto</p>
+        <p class="fiction">Non ne resta uno. La strada per il villaggio è di nuovo sicura.</p>
+        <div class="sect">Tornati</div>
+        <div class="banners"><div class="banner"><span class="pt" style="background-image:url(assets/hero-warrior.jpg)"></span><span class="nm">Sir Spaccaculi</span><span class="d">ferito</span></div><div class="banner"><span class="pt" style="background-image:url(assets/hero-mage.jpg)"></span><span class="nm">Lisetta</span><span class="d">illesa</span></div><div class="banner"><span class="pt" style="background-image:url(assets/hero-warrior.jpg);filter:hue-rotate(40deg)"></span><span class="nm">Mastro Beppe</span><span class="d">illeso</span></div></div>
+        <div class="sect">Bottino</div>
+        <div class="items">
+          <div class="item"><span class="ic">◈</span><span>Oro<br><span class="sub">+61 al tesoro del villaggio</span></span></div>
+          <div class="item"><span class="ic">⚑<span class="qty">1</span></span><span>Totem goblin<br><span class="sub">trofeo, va al Magazzino</span></span></div>
+        </div>
+        <div class="foot"><span class="link">Leggi la cronaca</span><span class="act"></span></div>
+      </div>
+    </div>
+
+    <div class="spec">
+      <h3 style="font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:0 0 8px">Proporzioni dichiarate</h3>
+      <table>
+        <tr><th>Livello</th><th>Oggetto</th><th>Misura</th></tr>
+        <tr><td>1</td><td>esito (una frase)</td><td>Cinzel 22 px</td></tr>
+        <tr><td>2</td><td>finzione (una riga)</td><td>Garamond corsivo 15 px</td></tr>
+        <tr><td>3</td><td>persone (lapidi / stendardi)</td><td>104×132, ritratto 44, nome 12 px</td></tr>
+        <tr><td>4</td><td>oggetti persi / bottino</td><td>icona 36, quantità a badge, testo 15 px + riga 13 px</td></tr>
+        <tr><td>—</td><td>etichette di sezione</td><td>Cinzel 12 px + filetto</td></tr>
+        <tr><td>—</td><td>azione</td><td>una, 36 px, a destra</td></tr>
+        <tr><td>—</td><td>immagine</td><td>400×150, senza testo sopra</td></tr>
+      </table>
+      <p>Ordine fisso: <b>chi</b> (testata), <b>cosa è successo</b> (immagine + esito + finzione), <b>cosa è costato</b>, <b>cosa resta</b>, <b>un'azione</b>. Le sezioni si rivelano una alla volta come oggi (clic o tasto). Il titolo «Expedition report» sparisce: il titolo è la quest stessa. La cronaca completa resta un collegamento, non un secondo pulsante.</p>
+      <p>Non deciso qui: suono e animazione d'entrata (fuori scope), testo localizzato reale (le frasi di finzione arrivano dal manoscritto della quest).</p>
+    </div>
+  </div>
+</section>
+</main>
+<script>
+const btnHtml = {
+  a: '<button class="ba">Torna al villaggio</button>',
+  b: '<button class="bb">Torna al villaggio<span class="chev"></span></button>',
+  c: '<button class="bc"><span class="pole"></span>Torna al villaggio</button>',
+};
+const winBtn = {
+  a: '<button class="ba">Raccogli il bottino</button>',
+  b: '<button class="bb">Raccogli il bottino<span class="chev"></span></button>',
+  c: '<button class="bc"><span class="pole"></span>Raccogli il bottino</button>',
+};
+function apply() {
+  const b = document.querySelector('input[name=btn]:checked').value;
+  const c = document.querySelector('input[name=col]:checked').value;
+  document.body.className = `btn-${b} col-${c}`;
+  const acts = document.querySelectorAll('.rep .act');
+  acts[0].innerHTML = btnHtml[b];
+  acts[1].innerHTML = winBtn[b];
+}
+document.querySelectorAll('input[name=btn],input[name=col]').forEach((i) => i.addEventListener('change', apply));
+const DEATH = { a: '#cdbfa3', b: '#93a4ad', c: '#a9a49a' };
+document.querySelectorAll('.col-demo').forEach((el) => {
+  el.style.setProperty('--death', DEATH[el.dataset.col]);
+  el.innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip death"><span class="dagger"></span>Nessuno è tornato</span><span class="chip wound">Ferito</span></div>
+    <div class="fallen-line"><span class="lbl">† Caduto</span><span>Sir Spaccaculi</span></div>
+    <div style="display:flex;gap:8px"><div class="tile hurt"><div class="sq">⚔</div>−12 PV</div><div class="tile dead"><div class="sq"><span class="dagger"></span></div>Sir Spa…</div></div>
+    <div class="stones"><div class="stone" style="width:96px;height:120px"><span class="pt" style="background-image:url(assets/hero-warrior.jpg)"></span><span class="nm">Sir Spaccaculi</span></div></div>
+    <div class="swatch"><i style="background:${DEATH[el.dataset.col]}"></i>morte <i style="background:#a11d33;margin-left:8px"></i>ferita</div>`;
+});
+apply();
+</script>
+</body>
+</html>

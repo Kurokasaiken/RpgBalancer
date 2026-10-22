@@ -18,6 +18,7 @@ describe('interface size (PLAN-058)', () => {
     expect(autoHudScale(3440, 1440)).toBe(1.3); // height decides
   });
 
+  // INV:hud-scale.INV-1
   it('never leaves the allowed range and survives bad input', () => {
     expect(autoHudScale(7680, 4320)).toBe(HUD_SCALE_MAX);
     expect(autoHudScale(0, 0)).toBe(HUD_SCALE_MIN);

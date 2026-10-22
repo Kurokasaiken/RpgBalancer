@@ -9,7 +9,6 @@ import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/Village
 import { MapBuildingPoi } from '@/ui/idleVillage/components/gameFrame/MapBuildingPoi';
 import { useVillageStashStore, type VillageStashState } from '@/ui/idleVillage/store/useVillageStashStore';
 import { QUEST_STASH } from '@/balancing/config/idleVillage/quests/questStash';
-import { DndContext } from '@dnd-kit/core';
 
 vi.mock('@/shared/persistence/PersistenceService', () => ({
   loadData: vi.fn(async (_key: string, fallback: unknown) => fallback),
@@ -126,8 +125,9 @@ describe('VillageStashPanel', () => {
     expect(within(list).queryAllByRole('button')).toHaveLength(0);
     expect(within(list).queryAllByRole('checkbox')).toHaveLength(0);
     expect(within(list).queryAllByRole('textbox')).toHaveLength(0);
-    // The only button in the whole panel is the title-row close control.
-    expect(screen.getAllByRole('button')).toHaveLength(1);
+    // The only buttons in the whole panel are the title-row minimise+close
+    // controls (R-246 minimise).
+    expect(screen.getAllByRole('button')).toHaveLength(2);
   });
 
   it('titles the panel via aria-labelledby', () => {
@@ -143,11 +143,7 @@ describe('VillageStashPanel', () => {
 describe('VillageStashPanel — PLAN-073 dual mode', () => {
   const POI = 'poi-goblin';
   const renderPanel = () =>
-    render(
-      <DndContext>
-        <VillageStashPanel config={CFG} left={0} top={0} widthPx={320} zIndex={12} onClose={() => {}} />
-      </DndContext>,
-    );
+    render(<VillageStashPanel config={CFG} left={0} top={0} widthPx={320} zIndex={12} onClose={() => {}} />);
 
   it('read-only when the ledger is still pending — hint shown, no affordances', () => {
     renderPanel(); // beforeEach left hydration 'pending'
@@ -186,6 +182,45 @@ describe('VillageStashPanel — PLAN-073 dual mode', () => {
     expect(screen.getByTestId('stash-elsewhere')).toHaveTextContent('gameFrame.stash.elsewhere');
     /* The reserved row vanished from the shelf (qty 1 − 1 elsewhere = 0). */
     expect(screen.queryByTestId(`stash-item-${reserved}`)).toBeNull();
+  });
+
+  it('minimises to a title strip (icon + live capacity) and restores', () => {
+    setLedger({ hydration: 'ready' });
+    renderPanel();
+    /* R-251 bis: the expanded title row already uses the strip's content
+     *  insets (plaque 10 + row 12/8 = strip 22/18) — collapsing swaps the
+     *  toggle glyph, never the geometry. */
+    const titleRow = screen.getByTestId('stash-minimise').closest('[data-hud-drag-handle]') as HTMLElement;
+    expect(titleRow.style.paddingInline).toBe('12px 8px');
+    fireEvent.click(screen.getByTestId('stash-minimise'));
+    const strip = screen.getByTestId('stash-minimised');
+    expect(strip).toBeInTheDocument();
+    /* The shelf is folded away; the capacity count survives on the strip. */
+    expect(screen.queryByTestId('stash-shelf')).toBeNull();
+    expect(screen.getByTestId('stash-minimised-count')).toHaveTextContent(
+      `${CFG.items.reduce((s, i) => s + i.qty, 0)}/${CFG.capacityMax}`,
+    );
+    /* R-251: the strip keeps the expanded control slots — restore sits where
+     * minimise was and close keeps the edge, so no icon rides the hang
+     * plaque's bronze band; insets must stay deeper than the band (~6.5px). */
+    const controls = within(strip).getByTestId('stash-restore').closest('[data-hud-controls]') as HTMLElement;
+    expect(within(controls).getAllByRole('button').map((b) => b.dataset.testid ?? b.dataset.skin)).toEqual([
+      'stash-restore',
+      'close',
+    ]);
+    expect(strip.style.padding).toBe('10px 18px');
+    /* The restore pill sits exactly where minimise was — a fast second click
+     * is the double-click tail and must be swallowed, not a toggle back. */
+    vi.useFakeTimers();
+    try {
+      fireEvent.click(screen.getByTestId('stash-restore'));
+      expect(screen.getByTestId('stash-minimised')).toBeInTheDocument();
+      vi.advanceTimersByTime(400);
+      fireEvent.click(screen.getByTestId('stash-restore'));
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(screen.getByTestId('stash-shelf')).toBeInTheDocument();
   });
 
   it('empty shelf shows the empty-state line', () => {

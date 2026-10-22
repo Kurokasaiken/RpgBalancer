@@ -57,6 +57,45 @@ type: error-registry
 | ERR-032 | Quest start gating | La quest non parte anche se tutti i residenti obbligatori sono assegnati correttamente | confermato | `poiQuestRegressions.spec.ts` — `should start the quest after manually filling all required slots` |
 | ERR-033 | Day/Night ring alpha | Il componente tone con i ring mostra un quadrato attorno in alfa che diventa più visibile quando l'halo si colora | confermato | `poiQuestRegressions.spec.ts` — `should render day/night ring tone without visible alpha square artifact` |
 
+## Triage legacy — PLAN-054 T-003 (2026-10-19)
+
+L'harness `/poi-quest-detail-roster-time-clock` non è più superficie canonica: il ciclo
+POI quest → planner → run → settlement vive su `/game` ed è coperto dai contratti
+`CTR-game-006..009` (`.mw/contracts/`). Classificazione delle spec legacy e delle suite E2E
+legate all'harness:
+
+### Spec legacy (13)
+
+| File | Esito | Mappatura `/game` |
+|---|---|---|
+| `detail_spec.md` | deprecated | harness `/poi-quest-detail-roster-integration`; apertura POI→detail ora `CTR-game-008.INV-1` |
+| `poi_detail_interaction_spec.md` | deprecated | superseded da `CTR-game-008` |
+| `poi_quest_interaction_spec.md` | deprecated | superseded da `CTR-game-008.INV-1/INV-2` |
+| `poi_family_spec.md` | superseded | su `/game` solo famiglia `quest` → `CTR-game-008` |
+| `poi_job_spec.md` | deprecated | famiglia `job` mai su `/game` |
+| `poi_training_spec.md` | deprecated | famiglia `training` mai su `/game` |
+| `poi_maintenance_spec.md` | deprecated | famiglia `maintenance` mai su `/game` |
+| `poi_cooldown_spec.md` | deprecated | famiglia `cooldown` mai su `/game` |
+| `quest_spec.md` | superseded | `CTR-game-008.INV-1..4`, `CTR-game-009.INV-1..4` |
+| `mission_planner_spec.md` | mapped (resta `candidate`) | planner→slot→expedition: `CTR-game-007.INV-1/INV-2`, `CTR-game-008.INV-1` |
+| `mission_planner_math_spec.md` | mapped (resta `candidate`) | modello normativo condiviso planner/resolver: `CTR-game-007.INV-1/INV-2` |
+| `time_engine_day_night_poi_interaction_spec.md` | deprecated | DayNightPOI harness-only; clock `/game` → `CTR-game-008.INV-3` |
+| `time_engine_roster_interaction_spec.md` | deprecated | roster↔tempo → `CTR-game-007.INV-3`, `CTR-game-008.INV-3` |
+| `time_engine_quest_interaction_spec.md` | deprecated | maturazione/settle su clock → `CTR-game-008.INV-3/INV-4` |
+
+*Il piano nomina 13 spec; la tabella classifica tutte le 14 spec effettivamente legate
+all'harness (`time_engine_quest_interaction_spec.md` inclusa per completezza). Esiti:
+10 deprecated, 2 superseded, 2 mapped (`candidate` mantenuto).*
+
+### Suite E2E legacy
+
+| Suite | Esito | Mappatura scenari |
+|---|---|---|
+| `poiQuestRegressions.spec.ts` | deprecated (header marcato) | magnetic-snap→`CTR-007.INV-2`; pause-state→`CTR-008.INV-1/3`; drag-preview→`CTR-007.INV-3`; slot-row→`CTR-007.INV-2`; start-after-fill→`CTR-008.INV-1`+`CTR-009.INV-1`; ring-alpha→harness-only deprecated; space-toggle→`CTR-008.INV-3` |
+| `poiFamilyRegressions.spec.ts` | deprecated (header marcato) | selector job/training→deprecated; no-autostart-in-pausa→`CTR-008.INV-3` |
+
+Nessun contratto attivo di `/game` dipende dall'harness deprecato (AC-6).
+
 ## Note
 
 - Il registro è vivo: ogni fix dovrà aggiornare lo stato in questo file e produrre evidenza.

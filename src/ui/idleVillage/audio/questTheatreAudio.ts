@@ -24,7 +24,16 @@
  *   - context `suspended` (autoplay gate, muted tab) → resume() is attempted
  *     inside the user's commit gesture; if it stays suspended the cues are
  *     scheduled and silently dropped — the cue intent is never lost.
+ *
+ * R-254 — real samples replace the synthesized timbres:
+ * `QUEST_THEATRE_AUDIO_MAP` (config) binds each cue to a CC0 asset under
+ * `public/assets/audio/questTheatre/`. Buffers are fetched+decoded lazily
+ * (prewarm/first cue); a cue whose sample isn't decoded yet (or fails to
+ * load) falls back to the original synthesized voice — the cue is never
+ * lost and the two paths share the same master/route/cancel machinery.
  */
+
+import { QUEST_THEATRE_AUDIO_MAP } from '@/balancing/config/idleVillage/quests/questTheatreAudioMap';
 
 /** Beat-typed cue ids — the sequencer maps one onto each beat via `audioCueForBeat`. */
 export type TheatreAudioCue =
@@ -34,6 +43,7 @@ export type TheatreAudioCue =
   | 'cut_breath'
   | 'cut_j'
   | 'cut_bars'
+  | 'shot_settle'
   | 'tension_riser'
   | 'verdict_bigwin'
   | 'verdict_win'
@@ -49,6 +59,7 @@ export const THEATRE_CUE_MS: Record<TheatreAudioCue, number> = {
   cut_breath: 360,
   cut_j: 520,
   cut_bars: 1000,
+  shot_settle: 260,
   tension_riser: 0, // continuous — governed by stopRiser()
   verdict_bigwin: 1100,
   verdict_win: 900,
@@ -75,6 +86,9 @@ interface TheatreAudioContext {
   createBiquadFilter: () => BiquadFilterNode;
   createBuffer: (ch: number, frames: number, sr: number) => AudioBuffer;
   createBufferSource: () => AudioBufferSourceNode;
+  /* Optional — absent on the fake contexts unit tests inject; when
+   *  missing the sample layer stays dormant and every cue synthesizes. */
+  decodeAudioData?: (data: ArrayBuffer) => Promise<AudioBuffer>;
 }
 
 const defaultCtxCtor = (): (new () => TheatreAudioContext) | undefined => {
@@ -89,6 +103,11 @@ const defaultCtxCtor = (): (new () => TheatreAudioContext) | undefined => {
 interface LiveVoice {
   source: { stop: (when?: number) => void; onended: (() => void) | null; disconnect: () => void };
   gain: { gain: AudioParam; disconnect: () => void };
+  /** Audio-clock time the voice starts sounding (`ctx.currentTime` basis).
+   *  Cues scheduled in the future (`play` with `delayMs`) are pending
+   *  intent, not orphans — `activeNodes` counts only voices already
+   *  sounding so the BV-08 drain measures silence, not the scheduler. */
+  startAt?: number;
 }
 
 /** The per-surface audio handle — cue scheduling + lifecycle. */
@@ -122,6 +141,8 @@ export interface QuestTheatreAudio {
 export interface QuestTheatreAudioDeps {
   /** Ctor override for tests — defaults to window.AudioContext/webkitAudioContext. */
   audioContextCtor?: (new () => TheatreAudioContext) | undefined;
+  /** Fetch override for tests — defaults to window.fetch → arrayBuffer. */
+  fetchAudio?: (url: string) => Promise<ArrayBuffer>;
 }
 
 /**
@@ -175,13 +196,48 @@ export function createQuestTheatreAudio(deps: QuestTheatreAudioDeps = {}): Quest
     return noiseBuffer;
   };
 
+  /* R-254 — sample layer. Buffers are fetched+decoded once and cached; a
+   *  cue whose sample isn't ready plays the synthesized voice instead
+   *  (the map is keyed on every cue, so "no buffer" always means "not
+   *  loaded yet" or "asset missing" — both degrade to synth). */
+  const buffers = new Map<TheatreAudioCue, AudioBuffer>();
+  let sampleLoad: Promise<void> | undefined;
+
+  /** Kick the fetch+decode of every mapped cue — fire-and-forget. */
+  const loadSamples = (): void => {
+    if (sampleLoad) return;
+    const c = ctx;
+    const fetcher = deps.fetchAudio ??
+      (typeof fetch === 'function' ? (url: string) => fetch(url).then((r) => r.arrayBuffer()) : undefined);
+    if (!c || typeof c.decodeAudioData !== 'function' || !fetcher) return;
+    sampleLoad = (async () => {
+      await Promise.all(
+        (Object.entries(QUEST_THEATRE_AUDIO_MAP) as [TheatreAudioCue, { src: string }][]).map(
+          async ([cue, spec]) => {
+            try {
+              const ab = await fetcher(spec.src);
+              buffers.set(cue, await c.decodeAudioData!(ab));
+            } catch {
+              /* missing asset / decode failure → synth fallback stays */
+            }
+          },
+        ),
+      );
+    })();
+  };
+
+  /* Audio-clock start of the cue currently under construction in `play` —
+   *  `route` stamps it on each voice it tracks so a delayed cue is pending
+   *  intent, not counted silence. */
+  let pendingStartAt: number | undefined;
+
   /** Connect `gain → master` and track the voice for cancellation. */
   const route = (
     source: AudioScheduledSourceNode,
     gain: GainNode,
     tail?: AudioNode,
   ): LiveVoice => {
-    const voice: LiveVoice = { source, gain };
+    const voice: LiveVoice = { source, gain, startAt: pendingStartAt };
     if (tail) {
       source.connect(tail);
       tail.connect(gain);
@@ -229,9 +285,28 @@ export function createQuestTheatreAudio(deps: QuestTheatreAudioDeps = {}): Quest
     const c = ensureCtx();
     if (!c || !master) return nominal;
     if (c.state === 'suspended') void c.resume();
+    loadSamples();
     const t0 = c.currentTime + Math.max(0, opts.delayMs ?? 0) / 1000;
+    pendingStartAt = t0;
     const gain = c.createGain();
     gain.gain.value = 0;
+
+    /* R-254 — decoded sample wins; loop-flagged cues (the riser) keep the
+     *  dedicated start/stop path, a one-shot `play` must never start a
+     *  loop nobody can stop. Tails carry their own fade; BV-08 cancel
+     *  still ramps this voice like any other. */
+    const spec = QUEST_THEATRE_AUDIO_MAP[cue];
+    const buf = spec && !spec.loop ? buffers.get(cue) : undefined;
+    if (buf && spec) {
+      const src = c.createBufferSource();
+      src.buffer = buf;
+      gain.gain.setValueAtTime(0.001, t0);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.001, spec.gain), t0 + 0.015);
+      route(src, gain);
+      src.start(t0);
+      pendingStartAt = undefined;
+      return nominal;
+    }
 
     switch (cue) {
       case 'choice_commit': {
@@ -327,6 +402,34 @@ export function createQuestTheatreAudio(deps: QuestTheatreAudioDeps = {}): Quest
         src.stop(t0 + nominal / 1000 + 0.05);
         break;
       }
+      case 'shot_settle': {
+        /* PLAN-050 §6 — the entrance landing: a soft low thump (the frame
+         *  "seats") with a short noise tick on top. Scheduled at
+         *  `settleAt × durMs` by the caller. */
+        const osc = c.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(120, t0);
+        osc.frequency.exponentialRampToValueAtTime(52, t0 + 0.14);
+        gain.gain.setValueAtTime(0.001, t0);
+        gain.gain.exponentialRampToValueAtTime(0.28, t0 + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + nominal / 1000);
+        route(osc, gain);
+        osc.start(t0);
+        osc.stop(t0 + nominal / 1000 + 0.05);
+        const tick = c.createBufferSource();
+        tick.buffer = getNoiseBuffer(c);
+        const tickGain = c.createGain();
+        const filt = c.createBiquadFilter();
+        filt.type = 'lowpass';
+        filt.frequency.value = 900;
+        tickGain.gain.setValueAtTime(0.001, t0);
+        tickGain.gain.exponentialRampToValueAtTime(0.08, t0 + 0.006);
+        tickGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.07);
+        route(tick, tickGain, filt as unknown as AudioNode);
+        tick.start(t0);
+        tick.stop(t0 + 0.09);
+        break;
+      }
       case 'tension_riser': {
         // continuous — handled by startRiser()/stopRiser()
         break;
@@ -358,6 +461,7 @@ export function createQuestTheatreAudio(deps: QuestTheatreAudioDeps = {}): Quest
         break;
       }
     }
+    pendingStartAt = undefined;
     return nominal;
   };
 
@@ -365,12 +469,19 @@ export function createQuestTheatreAudio(deps: QuestTheatreAudioDeps = {}): Quest
     stopRiser();
     const c = ensureCtx();
     if (!c || !master) return;
+    loadSamples();
     const t0 = c.currentTime;
     const gain = c.createGain();
+    /* R-254 — real wind loop under the same bandpass swell; the
+     *  synthesized brown noise stays as the pre-load/failure fallback
+     *  (its quiet 0.16 peak kept; the field recording sits at the
+     *  configured gain). */
+    const riserBuf = buffers.get('tension_riser');
+    const riserPeak = riserBuf ? QUEST_THEATRE_AUDIO_MAP.tension_riser.gain : 0.16;
     gain.gain.setValueAtTime(0.001, t0);
-    gain.gain.exponentialRampToValueAtTime(0.16, t0 + 1.6);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.001, riserPeak), t0 + 1.6);
     const src = c.createBufferSource();
-    src.buffer = getNoiseBuffer(c);
+    src.buffer = riserBuf ?? getNoiseBuffer(c);
     src.loop = true;
     const filt = c.createBiquadFilter();
     filt.type = 'bandpass';
@@ -411,6 +522,7 @@ export function createQuestTheatreAudio(deps: QuestTheatreAudioDeps = {}): Quest
     resume: () => {
       const c = ensureCtx();
       if (c && c.state === 'suspended') void c.resume();
+      loadSamples();
     },
     prewarm: () => {
       if (prewarmTimer !== undefined || ctx || ctxFailed) return;
@@ -418,13 +530,24 @@ export function createQuestTheatreAudio(deps: QuestTheatreAudioDeps = {}): Quest
         prewarmTimer = undefined;
         const c = ensureCtx();
         if (c && c.state === 'suspended') void c.resume();
+        loadSamples();
       }, PREWARM_MS);
     },
     play,
     startRiser,
     stopRiser,
     cancelCurrentBeatAudio,
-    activeNodes: () => live.size,
+    /* BV-08 semantics: count voices actually SOUNDING. A cue scheduled in
+     *  the future (play `delayMs` — e.g. the entrance `shot_settle` landing)
+     *  is pending intent owned by the beat on stage, not orphaned audio. */
+    activeNodes: () => {
+      const now = ctx?.currentTime ?? Number.POSITIVE_INFINITY;
+      let n = 0;
+      live.forEach((v) => {
+        if (v.startAt === undefined || v.startAt <= now) n += 1;
+      });
+      return n;
+    },
     degraded: () => {
       ensureCtx();
       return ctxFailed;

@@ -52,6 +52,13 @@ planner measures flight geometry from the actual `slot-button-<slotId>`
 wrapper; the rack cell (which also contains the caption/footer) is not a
 flight target.
 
+## Medal Asset Loading (R-223)
+
+`WanderlustMedalOverlay` stays visible with a fallback portrait while the
+square asset decodes, then swaps to the real crop. The rack API and DOM tree
+are unchanged; the `/game` planner's extraction visibility handoff is a
+consumer-specific rule documented in `quest_ui_component_guide.md` §12.
+
 ## Fixture
 Fixture sources are re-exports of the canonical config files:
 - `SLOT_LAB_CONFIG` (`@/ui/idleVillage/frozen/_infra/CanonicalDataBridge`)

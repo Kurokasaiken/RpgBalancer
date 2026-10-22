@@ -245,6 +245,16 @@ const gameFrameIdentitySchema = z.object({
 /** Which frame construction the HUD pieces use; `legacy` keeps the pre-redesign look for side-by-side checks. */
 const gameFrameHudSchema = z.object({
   material: z.enum(['legacy', 'lacquer']),
+  /** R-260: the transient resource-delta feedback the resource readout
+   *  plays when a quest settlement commits (a «+N» chip on the gold tile,
+   *  an «+N XP» chip anchored under the readout; each count-up eased over
+   *  `countUpMs`). Reduced-motion renders the final amount instantly. */
+  resourceDelta: z.object({
+    /** How long the chips stay visible before the stamp clears, ms. */
+    durationMs: z.number().int().positive(),
+    /** Count-up sweep duration, ms (0 = the chip shows the amount at once). */
+    countUpMs: z.number().int().nonnegative(),
+  }),
 });
 
 /**
@@ -272,6 +282,11 @@ const gameFrameQuestWindowSchema = z.object({
   topPx: z.number().nonnegative(),
   /** Theater aspect ratio, width / height (cinema scope ≈ 2.39). */
   theaterAspect: z.number().positive(),
+  /** PLAN-061 (R-231 #8): accepted relative deviation between a cover-fit
+   *  theatre asset's on-disk aspect and `theaterAspect`. 0.05 lets 21:9
+   *  generator output (2.357) pass while rejecting real mismatches
+   *  (≤1.9 or portrait). Enforced by `npm run check:quest-art`. */
+  theaterAssetAspectTolerance: z.number().positive().max(0.5),
   /** How long the expedition lasts on the game clock, in days: the time bar fills over this span. */
   durationDays: z.number().positive(),
   /** R-199: narrative stage max height — the "what is happening" area reads
@@ -435,6 +450,11 @@ const gameFrameQuestWindowSchema = z.object({
      *  paired-delta p25 clears `warmMinGainMs`; `?warmcheck=1` force-enables
      *  it for the probe regardless. */
     warmEnabled: z.boolean(),
+    /** R-241 B4: while `data-astro-idle="parked"` freezes the verdict frame,
+     *  the ambient `.rays` (the astrolabe's lights) keep turning — at this
+     *  slowed duration (ms/revolution, normal is 26s). Reduced motion still
+     *  pauses them via media query. */
+    parkedRaysDurationMs: z.number().int().positive(),
   }),
   /** R-199: the end-of-run report is its own floating, non-modal plaque —
    *  staged reveal, skippable — outside the theatre's DOM. */
@@ -443,6 +463,10 @@ const gameFrameQuestWindowSchema = z.object({
     widthPx: z.number().positive(),
     /** Wall-clock between reveal stages (banner → sections → loot). */
     stageMs: z.number().int().positive(),
+    /** R-239: min gap (chrome px) the report keeps from every viewport edge —
+     *  drag clamp inset AND the cap `viewportH/zoom − 2·edgeInsetPx` that stops
+     *  a long staged reveal from growing the plaque off-screen. */
+    edgeInsetPx: z.number().int().nonnegative(),
   }),
   /** PLAN-040 T-005: the post-check outcome toast — small fixed plaque under
    *  `zLayers.questToast`, all text painted at once, dismissed by click. */
@@ -628,6 +652,12 @@ const gameFrameStagePanelRoleSchema = z.enum(['home', 'session', 'persistent-tra
 const gameFrameStageZonesSchema = z.object({
   /** Fixed chrome bands the stage never enters (existing top bar / bottom nav). */
   chrome: z.object({ topPx: z.number().nonnegative(), bottomPx: z.number().nonnegative() }),
+  /** R-253: in `run` regime the quest cluster may paint OVER the chrome bands
+   *  by these margins — the run surface is modal-grade and needs image+text+
+   *  choices simultaneously visible (Director ruling: «il componente quest
+   *  può andare sopra l'HUD»). `0` = legacy behavior, cluster confined
+   *  between the bands. */
+  questChromeOverlap: z.object({ topPx: z.number().nonnegative(), bottomPx: z.number().nonnegative() }),
   /** Outer edge inset E and inter-zone gutter G (DIRECTOR G.5: E frozen at 24). */
   outer: z.object({ edgePx: z.number().nonnegative(), gutterPx: z.number().nonnegative() }),
   /** Contract width budget: contractViewportPx − (2E + 2G). */
@@ -843,7 +873,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
   },
   // Director, 2026-10-07: no game title on the HUD.
   identity: { showTitle: false },
-  hud: { material: 'lacquer' },
+  hud: { material: 'lacquer', resourceDelta: { durationMs: 2600, countUpMs: 900 } },
   /* WS-3 Dispatch Table: `ledgerWidthPx` is the RIGHT WING reservation the
    *  pinned forecast occupies (stageZones `rightWing` = 340). */
   questDetail: { widthPx: 680, gapPx: 8, topPx: 100, ledgerWidthPx: 340 },
@@ -854,6 +884,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
     widthPx: 820,
     topPx: 72,
     theaterAspect: 2.4,
+    theaterAssetAspectTolerance: 0.05,
     /* R-199: the expedition lasts ~5 days on the game clock — the phase bar
      * fills over this span and later frontiers stay locked until due. */
     durationDays: 5,
@@ -898,13 +929,18 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
       boardMaxPx: 680,
       compactBelowPx: 1300,
       dismissArmDelayMs: 350,
-      verdictAutoDismissMs: 0,
+      /* R-259: the player gets ~1s of click window after the verdict is
+         dismissible; with no input the beat auto-advances as if clicked. */
+      verdictAutoDismissMs: 1000,
       warmMinGainMs: 150,
       warmSlackMinMs: 300,
       warmEnabled: false,
+      parkedRaysDurationMs: 90000,
     },
-    rewardPopup: { widthPx: 400, stageMs: 280 },
-    outcomeToast: { widthPx: 320, autoDismissMs: 0, rewardAckTimeoutMs: 4000, anchor: 'bottom-center', offsetXPx: 24, offsetYPx: 24 },
+    rewardPopup: { widthPx: 400, stageMs: 280, edgeInsetPx: 12 },
+    /* R-259: the outcome popup anchors on the RIGHT — it must read as
+       «born from the skill check», which lives in the right wing. */
+    outcomeToast: { widthPx: 320, autoDismissMs: 0, rewardAckTimeoutMs: 4000, anchor: 'right', offsetXPx: 24, offsetYPx: 24 },
     beats: { sceneMs: 1600, checkMs: 1800, checkHoldMs: 45000, checkVerdictMs: 2400, harmMs: 1200, endMs: 1600, recapMs: 1800, maxQueue: 24 },
   },
   zLayers: { wash: 7, floating: 8, chrome: 10, dressing: 11, panels: 12, questToast: 20, reward: 25, questCheck: 30, boot: 40 },
@@ -951,6 +987,7 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
    *  236 floor → `floorB` committed (260/616/340, still 1280-exact). */
   stageZones: {
     chrome: { topPx: 92, bottomPx: 100 },
+    questChromeOverlap: { topPx: 84, bottomPx: 88 },
     outer: { edgePx: 24, gutterPx: 8 },
     budgetPx: 1216,
     contractViewportPx: 1280,
@@ -1023,20 +1060,10 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
         minHeightPx: 300,
         naturalHeightPx: 520,
       },
-      /* WS-3 Dispatch Table: the expedition forecast is a pinned RIGHT WING
-       *  tenant while the planner is open — it never yields to other wings
-       *  (the provider pins its occupant) and retires with the detail. */
-      questForecast: {
-        zone: 'rightWing',
-        role: 'session',
-        priority: 0,
-        runPolicy: 'retire',
-        minWidthPx: 300,
-        widthMode: 'zone-fill',
-        naturalWidthPx: 340,
-        minHeightPx: 240,
-        naturalHeightPx: 520,
-      },
+      /* PLAN-043 WS-5: the expedition forecast lives INSIDE the planner —
+       *  the pinned right column of `questDetail` (QuestExpeditionDetail
+       *  `quest-expedition-forecast-column`). The separate `questForecast`
+       *  stage tenant was declared but never mounted (DEF-02) — removed. */
       /* The run window/cluster claims the whole stage envelope in `run`
        *  regime — WS-2 sees it as ONE occupant; F5 internals own its columns.
        *  `suspend` keeps it in occupancy (the solver hands it the envelope);

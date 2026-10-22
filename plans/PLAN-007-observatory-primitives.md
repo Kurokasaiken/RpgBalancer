@@ -1,6 +1,6 @@
 ---
 title: The New Observatory → Canonical Design-System Primitives (Dual-track)
-status: active
+status: superseded
 created: 2026-08-18
 authorized_by: Fausto
 reason: avallo via "confermo" in sessione

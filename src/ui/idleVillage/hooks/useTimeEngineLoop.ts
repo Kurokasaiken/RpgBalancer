@@ -35,7 +35,7 @@ export function useTimeEngineLoop(gameplay: Gameplay, opts?: { inputLocked?: boo
   const inputLocked = opts?.inputLocked ?? false;
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (inputLocked) return;
+      if (inputLocked || e.defaultPrevented) return;
       if (e.code !== 'Space' || e.repeat) return;
       const el = e.target as HTMLElement | null;
       if (el?.closest('input, textarea, select, button, a, [contenteditable="true"], [role="button"]')) return;

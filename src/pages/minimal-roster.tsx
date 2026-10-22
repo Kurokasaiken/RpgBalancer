@@ -1,4 +1,4 @@
-import { MatericRosterComponent } from '@/ui/idleVillage/roster';
+import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 
 export default function MinimalRosterPage() {
   return (
@@ -10,7 +10,7 @@ export default function MinimalRosterPage() {
           <p className="mt-1 text-sm text-slate-400">Route: /minimal-roster</p>
         </header>
 
-        <MatericRosterComponent componentId="minimal-roster-materic" />
+        <MatericRosterComponentV2 componentId="minimal-roster-materic" />
       </div>
     </div>
   );

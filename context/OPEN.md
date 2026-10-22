@@ -218,10 +218,10 @@ Formato voce:
 ## OPEN-016 — Registro mondo, memoria narrativa e sequenza del macro-piano
 
 - **Question:** quale porzione del mondo persistente serve per rendere leggibili le conseguenze delle quest e quando introdurre evoluzione di personaggi, fazioni/regioni, pattern narrativi e legacy cross-run rispetto a PLAN-019 S1–S5?
-- **Status:** `open` — il Director ha chiesto di acquisire e discutere lo share, non ha approvato il macro-piano finale di ChatGPT.
+- **Status:** `risolta` 2026-10-19 — **ratifica piena E-16** (Director): il macro-piano Foundation → simulazione → storia → legacy diventa autorità di direzione. La sequenza operativa vs v24/PLAN-019 si fissa nel piano operativo di T7 (PLAN-026); i numeri della bozza non sono target decisi. Decisione registrata in `context/DECISION_LOG.md` (2026-10-19).
 - **Context:** tratti che generano scene e hook che generano quest, NPC ricorrenti, world pressures, provenance/riconoscimento e mondi attraverso più run sono intenti o proposte con livelli diversi di certezza. Il programma AI «Foundation → simulazione → storia → legacy» potrebbe anticipare S5, che la desiderata v24 colloca dopo S4; evitare sostituzione silenziosa.
 - **Source:** `context/ingestions/2026-10-07-registro-narrativo-del-mondo.md` E-02..E-18; `NARRATIVE.md` §4; `RICHIESTE.md` R-093.
-- **Blocking:** ratifica di un eventuale nuovo macro-piano e design di simulazione mondiale; non blocca S1. Il trigger delle quest non risolte resta OPEN-015.
+- **Blocking:** risolta — il macro-piano E-16 è ratificato come direzione. Resta da fissare nel piano operativo di T7 (PLAN-026) la sequenza vs v24. Il trigger delle quest non risolte resta OPEN-015.
 - **Narrowing Director (2026-10-07):** la fetta di registro mondo in S2 è minima — basta a rendere persistenti e leggibili le conseguenze della *singola* quest di riferimento; personaggi/fazioni che ritornano tra quest diverse non sono requisito di S2.
 - **Related:** `.mw/desiderata.md` v24, PLAN-019 (S2/S4/S5), OPEN-014/015, `VILLAGE_ECONOMY.md`.
 

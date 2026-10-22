@@ -33,6 +33,28 @@ import {
   type NarratedNodeCopy,
 } from '@/balancing/config/idleVillage/quests/generation/narrative/validateCopy';
 import { MINIERA_RACE_KIT as REJECTED_KIT } from '../../../fixtures/race-miniera-rejected.kit';
+import {
+  attachEpistemic,
+  briefsForScenario as goblinBriefs,
+} from '@/balancing/config/idleVillage/quests/generation/narrative/sceneBrief';
+import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
+import { BOSCO_GOBLIN_VOCAB } from '@/balancing/config/idleVillage/quests/generation/domainVocabs';
+import {
+  contractLintIssues,
+  QuestArcContractSchema as ArcSchema,
+} from '@/balancing/config/idleVillage/quests/generation/narrative/arcContract';
+import {
+  copySchemaFor,
+  contentStems,
+  kitSoftFlagsR8,
+  matchTerm,
+  stemOf,
+  tokenize,
+  validateNodeCopyR8,
+} from '@/balancing/config/idleVillage/quests/generation/narrative/validateCopy';
+import { GOBLIN_ACCEPTED_R008, GOBLIN_R008_REVIEWED_SOFT_FLAGS } from '../../../fixtures/goblin-accepted-r008';
+import { GOBLIN_REJECTED_V2, GOBLIN_REJECTED_V2_EXPECTED } from '../../../fixtures/goblin-rejected-v2';
+import CONTRACT_R008_JSON from '../../../../.mw/specs/quest-goblin-narration/contract-v1.json';
 
 const SCENARIO = generateRaceScenario(PASSO_MONTANO_KIT);
 const PREFIX = PASSO_MONTANO_KIT.prefix;
@@ -359,4 +381,116 @@ describe('gate v2 — premio garantito e meccaniche inesistenti', () => {
       }
     }
   });
+});
+
+/* ------------------------------------------------------------------ */
+/* r008 — epistemic partition, closed world, effectBindings (debate    */
+/* artifact-r008, sha256 eb25ec30…). The fixtures are validated by     */
+/* running the REAL gate — claims verified, never asserted.            */
+/* ------------------------------------------------------------------ */
+
+const CONTRACT_R008 = ArcSchema.parse(CONTRACT_R008_JSON);
+const G_BRIEFS_PLAIN = goblinBriefs(GOBLIN_SCENARIO, BOSCO_GOBLIN_VOCAB, 'gob');
+const G_BRIEFS = attachEpistemic(G_BRIEFS_PLAIN, CONTRACT_R008, GOBLIN_SCENARIO);
+const gBrief = (key: string) => {
+  const b = G_BRIEFS.find((x) => x.nodeKey === key);
+  if (!b) throw new Error(`goblin brief mancante per ${key}`);
+  return b;
+};
+
+describe('r008 — tokenizer + matcher deterministici', () => {
+  it('tokenize: diacritics off, elisioni spezzate, token <3 scartati', () => {
+    expect(tokenize('L’albero cade! «Sì».')).toEqual(['albero', 'cade']);
+    expect(tokenize('dall’alto e l’urto')).toEqual(['dall', 'alto', 'urto']);
+  });
+  it('stemOf: longest-suffix deterministic, min 3 char', () => {
+    expect(stemOf('campanelli')).toBe('campan');
+    expect(stemOf('foglie')).toBe('fogli');
+    expect(stemOf('marce')).toBe('marc');
+    expect(stemOf('scivolosa')).toBe('scivolos');
+  });
+  it('contentStems esclude stopword e domain stoplist', () => {
+    const stems = contentStems('il passo dei goblin nella notte');
+    expect(stems).not.toContain('il');
+    expect(stems).not.toContain('passo');
+    expect(stems).toContain('goblin');
+    expect(stems).toContain('nott');
+  });
+  it('matchTerm: bare = confini interi, trailing * = prefisso', () => {
+    expect(matchTerm('un filo di campanelli teso', 'campanell*')).toBe(true);
+    expect(matchTerm('guadagnate terreno', 'guado')).toBe(false);
+    expect(matchTerm('verso il guado', 'guado')).toBe(true);
+    expect(matchTerm('la strada', 'strada')).toBe(true);
+    expect(matchTerm('stradina', 'strada')).toBe(false);
+  });
+});
+
+describe('r008 — contratto goblin: lint + epistemic projection', () => {
+  it('il contratto spedito passa il proprio lint (allowedEntities ∩ bans = ∅)', () => {
+    expect(contractLintIssues(CONTRACT_R008)).toEqual([]);
+    expect(contractIssues(CONTRACT_R008, G_BRIEFS_PLAIN)).toEqual([]);
+  });
+  it('attachEpistemic proietta world + nodeContracts sui brief', () => {
+    expect(G_BRIEFS.every((b) => b.epistemic)).toBe(true);
+    const p = gBrief('tracce-perfor');
+    expect(p.epistemic!.forbiddenPreRevealTerms).toContain('accampament*');
+    expect(p.epistemic!.verdictFacts!.bigwin!.canonicalEffects.map((e) => e.id)).toContain('lembo-ricomposto');
+    expect(p.epistemic!.verdictFacts!.epicfail!.injuryAnchors).toContain('ramo');
+    expect(gBrief('bottino').epistemic!.recovery).toBe('direct');
+    expect(gBrief('bottino').epistemic!.titleLock).toBe('Ciò che era nascosto');
+    expect(gBrief('accampamento').epistemic!.titleLock).toBe('Regole d’ingaggio');
+  });
+});
+
+describe('r008 — copySchemaFor: shape strette per kind', () => {
+  it('check: option label-only (detail rifiutato in strict)', () => {
+    const s = copySchemaFor(gBrief('tracce-per'));
+    expect(s.safeParse({ title: 'T', body: 'B', option: { label: 'Esamina' } }).success).toBe(true);
+    expect(s.safeParse({ title: 'T', body: 'B', option: { label: 'Esamina', detail: 'PER' } }).success).toBe(false);
+  });
+  it('combat: attackLines obbligatorie sulle 5 bande', () => {
+    const s = copySchemaFor(gBrief('combattimento'));
+    expect(s.safeParse({ title: 'T', body: 'B' }).success).toBe(false);
+    const lines = { epicfail: 'x'.repeat(12), fail: 'y'.repeat(12), almost: 'z'.repeat(12), win: 'w'.repeat(12), bigwin: 'v'.repeat(12) };
+    expect(s.safeParse({ title: 'T', body: 'B', attackLines: lines }).success).toBe(true);
+  });
+  it('end: closingLine obbligatoria', () => {
+    const s = copySchemaFor(gBrief('fine'));
+    expect(s.safeParse({ title: 'T', body: 'B' }).success).toBe(false);
+    expect(s.safeParse({ title: 'T', body: 'B', closingLine: 'Il fumo sale dritto.' }).success).toBe(true);
+  });
+});
+
+describe('r008 — fixture ACCETTATO: il manoscritto convergente passa il gate', () => {
+  it('ogni nodo produce 0 hard issue sotto il gate epistemico', () => {
+    const failures: string[] = [];
+    for (const [key, copy] of Object.entries(GOBLIN_ACCEPTED_R008)) {
+      const v = validateNodeCopyR8(copy, gBrief(key), BOSCO_GOBLIN_VOCAB, 'it');
+      if (!v.ok) failures.push(`${key}: ${v.issues.map((i) => `${i.rule}(${i.detail.slice(0, 60)})`).join(' | ')}`);
+    }
+    expect(failures).toEqual([]);
+  });
+  it('i soft flag del kit sono esattamente quelli reviewati', () => {
+    const flags = kitSoftFlagsR8(GOBLIN_ACCEPTED_R008, G_BRIEFS);
+    const reviewed = new Set(GOBLIN_R008_REVIEWED_SOFT_FLAGS.map((f) => `${f.code}:${f.stem}`));
+    const actual = new Set(flags.map((f) => `${f.code}:${f.stem}`));
+    for (const f of actual) {
+      expect(reviewed.has(f), `soft flag non reviewato: ${f}`).toBe(true);
+    }
+  });
+});
+
+describe('r008 — fixture RIFIUTATO: ogni difetto è un hard check nominato', () => {
+  for (const [key, expected] of Object.entries(GOBLIN_REJECTED_V2_EXPECTED)) {
+    it(`${key}: ${expected.join(', ')}`, () => {
+      const v = validateNodeCopyR8(GOBLIN_REJECTED_V2[key], gBrief(key), BOSCO_GOBLIN_VOCAB, 'it');
+      expect(v.ok).toBe(false);
+      if (!v.ok) {
+        const rules = new Set(v.issues.map((i) => i.rule));
+        for (const r of expected) {
+          expect(rules.has(r), `${key}: attesa regola '${r}', ottenute: ${[...rules].join(', ')}`).toBe(true);
+        }
+      }
+    });
+  }
 });

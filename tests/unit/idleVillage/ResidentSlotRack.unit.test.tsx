@@ -64,6 +64,7 @@ const WRAPPER_WITH_DND = ({ children }: { children: React.ReactNode }) => (
 
 describe('ResidentSlotRack Component (Fase 3 - Isolato)', () => {
   describe('✅ TEST-032 to TEST-037: Rendering & Layout', () => {
+    // INV:index.INV-1
     it('TEST-032: ResidentSlotRack renders all slots', () => {
       const { container } = render(
         <ResidentSlotRack slots={MOCK_SLOTS} layout="board" />,
@@ -73,6 +74,7 @@ describe('ResidentSlotRack Component (Fase 3 - Isolato)', () => {
       expect(container).toBeTruthy();
     });
 
+    // INV:types.INV-1
     it('TEST-033: Each slot has correct id attribute', () => {
       const { container } = render(
         <ResidentSlotRack slots={MOCK_SLOTS} layout="board" />,

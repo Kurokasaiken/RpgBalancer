@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1200, height: 900 } });
+const errors = [];
+p.on('console', m => m.type() === 'error' && errors.push(m.text()));
+p.on('pageerror', e => errors.push(String(e)));
+const r = await p.goto('http://127.0.0.1:5199/', { waitUntil: 'networkidle', timeout: 20000 });
+console.log('status:', r.status(), 'finalURL:', p.url());
+await p.screenshot({ path: '/tmp/review-5199.png', fullPage: false });
+console.log('errors:', errors.slice(0,5));
+const text = await p.evaluate(() => document.body?.innerText?.slice(0, 200));
+console.log('bodyText:', JSON.stringify(text));
+await b.close();

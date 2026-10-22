@@ -26,11 +26,14 @@ import { useTranslation } from 'react-i18next';
 import { EngravedIcon } from './engravedIcons';
 import { SkinScope, prefersReducedMotion } from '@/ui/idleVillage/skins/primitives';
 import { HudChip } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import { QuestVerdictCardBody } from './QuestVerdictCard';
 import { DestinyAstrolabeV62Standalone, type DestinyAstrolabeV62Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
-import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
+import type { LabStat, QuestRunState, ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
+import { STAT_ICONS } from '@/ui/idleVillage/questS1Lab/questRun';
+import { getStatIconComponent, lucideStatIcons } from '@/ui/shared/statIconUtils';
 import type { QuestCheckBridge } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { useOverlayEscape } from './overlayStack';
 
@@ -50,6 +53,32 @@ const CLICK_DRAG_TOLERANCE_PX = 4;
  *  `{stat:60, difficulty:50}`) — `check.score` is the success bound after
  *  clamps; the column's chip and the board's paint share the constant. */
 const ASTROLABE_DIFFICULTY_BASELINE = 50;
+
+/** Every authored stat id — the profile fills the axes not covered by the
+ *  check's tested stats with the party's NEXT best stats (descending), so a
+ *  strong party still reads as a broad star even on a single-stat check. */
+const ALL_STATS: LabStat[] = ['perc', 'int', 'str', 'con', 'agi', 'cha'];
+
+/** R-253: the astrolabe silhouette from the REAL check data — every tested
+ *  stat becomes an axis at the party's best living value (best-member rule,
+ *  same as `groupScore`); the remaining axes take the party's next best
+ *  stats descending, then pad with the check's own score. Black obelisks
+ *  sit on the authored check baseline. Display-only: the engine's `skills`
+ *  array — which the landing angle picks the verdict from — is untouched. */
+export function checkAxisProfile(
+  check: ResolvedCheck,
+  run: QuestRunState,
+  axes = 5,
+): { stat: number; difficulty: number }[] {
+  const alive = run.party.filter((m) => !m.dead);
+  const best = (s: LabStat) => (alive.length === 0 ? 0 : Math.max(...alive.map((m) => m.stats[s] ?? 0)));
+  const tested = check.stats ?? [];
+  const profile = tested.map((s) => best(s));
+  const rest = ALL_STATS.filter((s) => !tested.includes(s)).map(best).sort((a, b) => b - a);
+  const values = [...profile, ...rest].slice(0, axes);
+  while (values.length < axes) values.push(check.score);
+  return values.map((stat) => ({ stat, difficulty: ASTROLABE_DIFFICULTY_BASELINE }));
+}
 
 /** Dial = the board's side, nothing clipped (PLAN-067 T-A3, SC-1 A). The frozen
  *  V6 kit draws its gold bezel at a FIXED `inset:-80px` around `.stage`
@@ -83,13 +112,17 @@ ${BOARD} .destiny-astrolabe .stage::before { content: ''; position: absolute; in
 ${BOARD} .destiny-astrolabe .astro-bezel { inset: ${-BEZEL_INSET_RATIO * 100}%; }`;
 
 /** The verdict card's entrance — one fade/rise, disabled under reduced motion.
- *  `data-astro-idle="parked"` freezes the frozen-kit ambient loops (fog, rays,
- *  fate pulses) so the held verdict is a real still frame, not a wallpaper of
- *  composited infinite animations (BV-04). */
+ *  `data-astro-idle="parked"` freezes the frozen-kit ambient loops (fog, fate
+ *  pulses) so the held verdict is a real still frame (BV-04). R-241 B4: the
+ *  `.rays` — the astrolabe's lights — are the ONE loop that keeps turning,
+ *  slowed to `skillCheck.parkedRaysDurationMs`; reduced motion still stops
+ *  them via the media query. */
 const COLUMN_CSS = `
 @keyframes questCheckColumnIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
 @keyframes questVerdictCardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 [data-astro-idle="parked"] * { animation-play-state: paused !important; }
+[data-astro-idle="parked"] .rays { animation-play-state: running !important; animation-duration: ${DEFAULT_GAME_FRAME_CONFIG.questWindow.skillCheck.parkedRaysDurationMs}ms !important; }
+@media (prefers-reduced-motion: reduce) { [data-astro-idle="parked"] .rays { animation-play-state: paused !important; } }
 ${BOARD_FIT_CSS}`;
 
 export interface QuestSkillCheckColumnProps {
@@ -103,13 +136,23 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
   const clusterCfg = DEFAULT_GAME_FRAME_CONFIG.questWindow.cluster;
   const { beatId, check, mode } = bridge;
   const checkKey = `${runIdOf(run)}#${check.checkSeq}`;
+  /* R-253: real party stats paint the silhouette — the tested stats lead,
+   *  then the party's next best values; the engine key (`beatId`) remounts
+   *  per check so the profile is captured once per board. */
+  const axisProfile = checkAxisProfile(check, run);
+  const testedStats = check.stats ?? [];
 
   /* `resolved` = the astrolabe painted the verdict; `armed` = the post-verdict
    * dismiss accepts input (arm delay elapsed). */
   const [resolved, setResolved] = useState(() => seenCheckKeys.has(checkKey));
   const [armed, setArmed] = useState(false);
   const columnRef = useRef<HTMLDivElement | null>(null);
+  const boardRef = useRef<HTMLDivElement | null>(null);
   const astroRef = useRef<DestinyAstrolabeV62Handle | null>(null);
+  /* R-241 B3: the check whose ball THIS host already launched — a second
+   *  progress while `data-state` has not flipped yet still skips, and the
+   *  flag re-arms on the next check. */
+  const thrownFor = useRef<string | null>(null);
   const armTimer = useRef<number | null>(null);
   const autoDismissTimer = useRef<number | null>(null);
   const pointerDownAt = useRef<{ x: number; y: number } | null>(null);
@@ -135,18 +178,40 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
   /* Escape reaches only the topmost overlay; mid-spin it is a no-op. */
   useOverlayEscape(overlayId, dismiss);
 
+  /* R-241 B3 — one PROGRESS step on the board: read the suite's live
+   *  `data-state` and advance the choreography. Pre-spin states throw the
+   *  ball (`throw()` warps the reveal if needed and fires immediately —
+   *  THE animation the Director was missing); only while the ball is
+   *  already flying does a click skip to the verdict. User input NEVER
+   *  re-rolls (engine discipline): `resolution`/`idle` are engine-guarded
+   *  no-ops. A second progress before `data-state` catches up still skips
+   *  (`thrownFor`), so rapid taps cannot double-fire the throw. */
+  const progressAstro = useCallback(() => {
+    const astro = astroRef.current;
+    if (!astro) return;
+    const state = boardRef.current?.querySelector<HTMLElement>('[data-suite]')?.getAttribute('data-state') ?? '';
+    if (state === 'resolution') return;
+    if (state === 'the-spin' || state === 'magnetic-snap' || thrownFor.current === checkKey) {
+      astro.skipToResult();
+      return;
+    }
+    thrownFor.current = checkKey;
+    astro.throw();
+  }, [checkKey]);
+
   /* Fill the imperative slot: the owner's click-to-skip reaches the astrolabe
-   * through `bridge.handle` (skipToResult / throwNow). */
+   * through `bridge.handle` (skipToResult / throwNow / progress). */
   useEffect(() => {
     bridge.handle.current = {
       skipToResult: () => astroRef.current?.skipToResult(),
       throwNow: () => astroRef.current?.throw(),
+      progress: progressAstro,
     };
     return () => {
       if (bridge.handle.current) bridge.handle.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bridge.handle]);
+  }, [bridge.handle, progressAstro]);
 
   /* skipIntro: throw right after the mount has confirmed (debate W-08).
    * Resolved-held hydration skips the spin via skipToResult on the same
@@ -208,7 +273,7 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
   const onBoardClick = (event: React.MouseEvent<HTMLElement>) => {
     if (resolved) return;
     if ((event.target as HTMLElement).closest('button')) return;
-    astroRef.current?.skipToResult();
+    progressAstro();
     event.stopPropagation();
   };
 
@@ -247,13 +312,24 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
           <span style={{ flex: 1, minWidth: 0, fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', color: 'var(--skin-title-color)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {check.title}
           </span>
+          {/* R-253: the stats the check tests — one Lucide icon each,
+              i18n tooltip via `questExpedition.statName.*`. */}
+          {testedStats.map((s) => {
+            const Icon = getStatIconComponent(STAT_ICONS[s]) ?? lucideStatIcons.star;
+            return (
+              <span key={s} data-testid={`quest-check-stat-${s}`} title={t(`questExpedition.statName.${s}`)} style={{ display: 'inline-flex', color: 'var(--skin-title-color)', opacity: 0.85 }}>
+                <Icon size={13} />
+              </span>
+            );
+          })}
           <HudChip tone="label" title={t('gameFrame.questWindow.checkOverlay.scoreTitle', { score: check.score, difficulty: ASTROLABE_DIFFICULTY_BASELINE })}>
-            {check.score}/{ASTROLABE_DIFFICULTY_BASELINE}
+            {t('gameFrame.questWindow.checkOverlay.scoreVs', { score: check.score, difficulty: ASTROLABE_DIFFICULTY_BASELINE })}
           </HudChip>
         </div>
         {/* The board square — naked (no plaque), capped at the column's
             astrolabe budget, never under `boardMinPx`. */}
         <div
+          ref={boardRef}
           data-testid="quest-check-board"
           onClick={onBoardClick}
           style={{
@@ -270,6 +346,7 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
             key={beatId}
             ref={astroRef}
             skills={[{ name: check.title, stat: check.score, difficulty: ASTROLABE_DIFFICULTY_BASELINE }]}
+            axisProfile={axisProfile}
             config={{ mode, wound: check.woundPct, dead: check.deathPct, harm: check.harm }}
             onResolve={handleAstroResolve}
             autoStart
@@ -297,24 +374,10 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
               animation: prefersReducedMotion() ? undefined : 'questVerdictCardIn 220ms ease-out both',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <HudChip tone={verdictTone}>{verdictLabel}</HudChip>
-              {harm === 'wound' && <HudChip tone="warn">{t('questS1Lab.harmChip.wound')}</HudChip>}
-              {harm === 'death' && <HudChip tone="danger">{t('questS1Lab.harmChip.death')}</HudChip>}
-            </div>
-            {check.flavor && (
-              <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 13, lineHeight: 1.45, color: 'var(--skin-text-primary)' }}>
-                {check.flavor}
-              </p>
-            )}
-            {/* `outcomeText` (harm lines + authored lines) is the toast/chronicle
-                summary: here it doubled every authored line and put HP in prose.
-                Harm reaches the card only as chips (R-234, guide §4). */}
-            {check.authoredText && (
-              <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.4, color: 'var(--skin-text-secondary)' }}>
-                {check.authoredText}
-              </p>
-            )}
+            {/* R-259: the body is shared with QuestOutcomeToast so the popup
+                is identical to the skill-check result. Harm reaches the card
+                only as chips (R-234, guide §4). */}
+            <QuestVerdictCardBody check={check} verdictLabel={verdictLabel} verdictTone={verdictTone} />
             <span style={{ fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: 'var(--skin-text-muted)' }}>
               {t('gameFrame.questWindow.checkOverlay.dismissHint')}
             </span>

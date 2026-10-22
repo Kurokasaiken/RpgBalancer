@@ -1,6 +1,6 @@
 ---
 title: 'Event Reminder AAA v2 — polish round 3'
-status: active
+status: superseded
 created: 2026-08-31
 ---
 

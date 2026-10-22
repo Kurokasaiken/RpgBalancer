@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { GameBootScreen } from '@/ui/idleVillage/components/gameFrame/GameBootScreen';
+import { GameEntry } from '@/ui/idleVillage/components/gameFrame/menu/GameEntry';
 import { FantasyLayout } from './ui/fantasy/FantasyLayout';
 import { ErrorBoundary } from './ui/organisms/ErrorBoundary';
 import { SpellCreatorNew } from './ui/spells/SpellCreatorNew';
@@ -1054,7 +1055,9 @@ function App() {
     return (
       <ErrorBoundary componentName="Game Frame Pixi Page">
         <Suspense fallback={<GameBootScreen phase="manifest" indeterminate />}>
-          <GameFramePixiPage />
+          <GameEntry>
+            <GameFramePixiPage />
+          </GameEntry>
         </Suspense>
       </ErrorBoundary>
     );

@@ -90,7 +90,8 @@ function edgesOf(nodes: Record<string, QuestNode>): Record<string, string[]> {
 const FASI: QuestJourneyFasi = {
   travelDays: 2,
   svolgimentoEntryNodeId: 's-poi',
-  pins: { 'a-merchant': 0.2, 'r-road': 0.4, 'r-end': 1 },
+  /* R-253 #5: mid-leg pins live in [0.25, 0.75] — 'a-merchant' moved 0.2→0.4. */
+  pins: { 'a-merchant': 0.4, 'r-road': 0.4, 'r-end': 1 },
 };
 
 function dag(nodes: Record<string, QuestNode>, fasi: QuestJourneyFasi = FASI) {
@@ -179,7 +180,7 @@ describe('journey DAG validator — §7 rules', () => {
     nodes2['r-choice'] = choice('r-choice', 'r-choice2', { fase: 'ritorno' });
     nodes2['r-choice2'] = choice('r-choice2', 'r-end', { fase: 'ritorno' });
     nodes2['r-road'].next = 'r-choice';
-    const fasi2 = { ...FASI, pins: { ...FASI.pins, 'r-choice': 0.6, 'r-choice2': 0.8 } };
+    const fasi2 = { ...FASI, pins: { ...FASI.pins, 'r-choice': 0.6, 'r-choice2': 0.7 } };
     const r2 = dag(nodes2, fasi2);
     expect(r2.errors).toEqual([]);
     expect(r2.warnings.some((w) => w.includes('waiting beat'))).toBe(true);
@@ -205,6 +206,24 @@ describe('journey DAG validator — §7 rules', () => {
   it('warns when a pending beat outlives the remaining leg', () => {
     const r = dag(validNodes(), { travelDays: 1, svolgimentoEntryNodeId: 's-poi', pins: { 'a-merchant': 0.2, 'r-road': 0.9, 'r-end': 1 } });
     expect(r.warnings.some((w) => w.includes("'r-road'") && w.includes('rimasti'))).toBe(true);
+  });
+
+  /* R-253 #5 (Director ruling 2026-10-22): travel events open INSIDE the
+   * leg — mid-leg pins must sit in the [0.25, 0.75] band; only the
+   * structural boundary pins 0 and 1 are exempt. */
+  // INV:R-253-pin-band
+  it('rejects mid-leg pins outside the 25%–75% band; boundary pins stay legal', () => {
+    /* <25% — the beat would land at the leg's departure */
+    const r1 = dag(validNodes(), { ...FASI, pins: { ...FASI.pins, 'a-merchant': 0.2 } });
+    expect(r1.errors.some((e) => e.includes("'a-merchant'") && e.includes('25%'))).toBe(true);
+    /* >75% — the beat would land at the leg's arrival */
+    const r2 = dag(validNodes(), { ...FASI, pins: { ...FASI.pins, 'r-road': 0.9 } });
+    expect(r2.errors.some((e) => e.includes("'r-road'") && e.includes('75%'))).toBe(true);
+    /* boundary 0/1 — structural markers (departure / arrival), not events */
+    const nodes = validNodes();
+    nodes['r-arrive'] = info('r-arrive', 'r-end', { fase: 'ritorno' });
+    const r3 = dag(nodes, { ...FASI, pins: { 'a-merchant': 0, 'r-road': 0.5, 'r-arrive': 1, 'r-end': 1 } });
+    expect(r3.errors.filter((e) => e.includes('%'))).toEqual([]);
   });
 });
 
@@ -293,7 +312,7 @@ describe('resolveQuestJourneyLaunchSpec', () => {
     expect(spec.fasePlans.andata).toEqual([]);
     expect(spec.fasePlans.ritorno).toEqual(
       expect.arrayContaining([
-        { nodeId: 'gob-ritorno', pin: 0.2, kind: 'pending', durationTicks: NODE_TICKS },
+        { nodeId: 'gob-ritorno', pin: 0.4, kind: 'pending', durationTicks: NODE_TICKS },
         { nodeId: 'gob-fine', pin: 1, kind: 'pending', durationTicks: NODE_TICKS },
       ]),
     );

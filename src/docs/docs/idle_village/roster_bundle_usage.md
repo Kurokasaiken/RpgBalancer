@@ -28,9 +28,8 @@ export type { ResidentSlotRackProps } from '@/ui/idleVillage/components/Resident
 export { default as WanderlustRosterCard } from '@/ui/idleVillage/components/WanderlustRosterCard';
 export type { WanderlustRosterCardProps } from '@/ui/idleVillage/components/WanderlustRosterCard';
 
-// Materic roster component
-export { MatericRosterComponent } from '@/ui/idleVillage/components/MatericRosterComponent';
-export type { MatericRosterComponentProps } from '@/ui/idleVillage/components/MatericRosterComponent';
+// Lacquer Atlas roster (V2) — the only roster; V1 retired under PLAN-043 WS-5
+export { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 ```
 
 ## Usage Patterns

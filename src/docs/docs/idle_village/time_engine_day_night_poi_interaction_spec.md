@@ -1,8 +1,9 @@
 ---
 title: TimeEngine ↔ DayNightPOI Interaction
-status: draft
-updated: 2026-08-13
+status: deprecated
+updated: 2026-10-19
 type: interaction-spec
+superseded-by: nessuna — PLAN-054 T-003 triage: `DayNightPOI` esclusiva del vecchio harness; su `/game` il clock vive nel TimeEngine/HUD (`CTR-game-008.INV-3` per pause/resume/tick)
 ---
 
 # TimeEngine ↔ DayNightPOI Interaction

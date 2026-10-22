@@ -7,7 +7,7 @@
  *   → drag reali roster→slot → SWAP slot↔slot (drag del token, senza
  *     estrarlo) + swap rifiutato dal gate di eleggibilità
  *   → consumabili scelti dalle tessere del picker esterno della bisaccia
- *     (WS-3: 3 slot icona + UN toggle «quest-tray-toggle» → Selection Tray)
+ *     (WS-3: 3 slot icona + picker ancorato agli slot; azione pouch → Village Stash)
  *   → «Invia spedizione» → controlli tempo HUD (×4)
  *   → la run risolta fase per fase: beat saltati con Enter, scelte
  *     cliccate nella QuestRunWindow, consumabili armati/usati dalla cintura
@@ -429,9 +429,9 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
 
     /* ── 6. Consumabili: bisaccia a 3 slot + Selection Tray (WS-3) ── */
     await expect(page.locator('[data-testid^="bag-slot-"]')).toHaveCount(3);
-    const pickerToggle = page.getByTestId('quest-tray-toggle');
-    await expect(pickerToggle).toBeVisible();
-    await pickerToggle.click();
+    const emptyBagSlot = page.getByTestId('bag-slot-0').locator('button');
+    await expect(emptyBagSlot).toBeVisible();
+    await emptyBagSlot.click();
     const picker = page.getByTestId('quest-selection-tray');
     await expect(picker).toBeVisible();
     for (const itemId of LOADOUT) {
@@ -448,10 +448,10 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     for (const itemId of LOADOUT) {
       await expect(page.getByTestId(`loadout-item-${itemId}`)).toHaveCount(1);
     }
-    /* Escape chiude SOLO il tray e riporta il focus sul toggle. */
+    /* Escape chiude SOLO il tray e riporta il focus allo slot originario. */
     await page.keyboard.press('Escape');
     await expect(picker).toHaveCount(0);
-    await expect(pickerToggle).toBeFocused();
+    await expect(emptyBagSlot).toBeFocused();
     await expect(page.getByTestId('loadout-coverage')).toBeVisible();
     await shot(page, info, '08-loadout-consumabili', planner(page));
 
@@ -589,6 +589,7 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     }
   });
 
+  // INV:CTR-game-007.INV-3
   test('il roster segue il POI detail: si apre se era chiuso e si richiude col detail; se era aperto resta aperto', async ({ page }, info) => {
     await page.goto('/game');
     await page.waitForFunction(

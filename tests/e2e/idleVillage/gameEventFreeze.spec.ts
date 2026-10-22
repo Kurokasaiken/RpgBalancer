@@ -32,6 +32,9 @@ test.describe('event theatre', () => {
     );
   });
 
+  // INV:CTR-game-002.INV-1
+  // INV:CTR-game-002.INV-2
+  // INV:CTR-game-002.INV-3
   test('freezes the clock while the curtains play, restores running at the same speed', async ({ page }) => {
     await page.keyboard.press('2');
     await expect.poll(async () => (await clock(page))?.speedMultiplier).toBe(2);
@@ -70,6 +73,7 @@ test.describe('event theatre', () => {
     expect((await clock(page))!.isPaused).toBe(true);
   });
 
+  // INV:CTR-game-002.INV-4
   test('the theatre calls a hidden HUD back', async ({ page }) => {
     await page.keyboard.press('h');
     await expect(page.locator('.game-frame[data-hud-hidden]')).toHaveCount(1);

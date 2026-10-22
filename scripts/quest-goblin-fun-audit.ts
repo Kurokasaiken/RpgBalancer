@@ -104,8 +104,8 @@ function fixedChoice(state: QuestRunState, policy: Policy): string {
   switch (state.nodeId) {
     case 'gob-esplora':
       return policy === 'greedy' ? pickOpt('gob-forza-tracce') : pickOpt('gob-cerca-tracce');
-    case 'gob-bottino-scelta':
-      return policy === 'cautious' ? pickOpt('gob-lascia-bottino') : pickOpt('gob-prendi');
+    case 'gob-bottino':
+      return pickOpt('gob-prendi'); // v3: take-it-all, no leave option
     case 'gob-accampamento':
       if (policy === 'cautious' || policy === 'greedy') return pickOpt('gob-via-assalto');
       return state.flags.includes('bonusStealth') || state.flags.includes('bonusStealthPiccolo')
@@ -215,16 +215,16 @@ const pct = (x: number, n: number) => (n ? `${((x / n) * 100).toFixed(1)}%` : 'â
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
 
 const NODE_LABEL: Record<string, string> = {
-  'gob-esplora': 'F1 Exploration', 'gob-bottino-scelta': 'F2 Loot', 'gob-accampamento': 'F3 Approach',
+  'gob-esplora': 'F1 Exploration', 'gob-bottino': 'F2 Loot', 'gob-accampamento': 'F3 Rules of engagement',
   'gob-combattimento': 'F4 Combat', 'gob-incalzare': 'F5 Pursuit', 'gob-esplora-extra': 'F6 Raid',
   'gob-agguato-scelta': 'F7 Trophy-or-blood', 'gob-ultimo-scontro': 'F7 Last stand',
 };
 const OPT_LABEL: Record<string, string> = {
-  'gob-cerca-tracce': 'Look for tracks (PER)', 'gob-forza-tracce': 'Force the trail (PER+STR)',
-  'gob-prendi': 'Take the loot (AGI)', 'gob-lascia-bottino': 'Leave it be',
+  'gob-cerca-tracce': 'Examine the ground (PER)', 'gob-forza-tracce': 'Examine from above (STR+PER)',
+  'gob-prendi': 'Recover the loot',
   'gob-via-stealth': 'Stealth (AGI)', 'gob-via-assalto': 'Assault (STR)',
   'gob-lascia-fuggire': 'Let them flee', 'gob-insegui': 'Pursue them (STR)',
-  'gob-fruga': 'Keep looting', 'gob-fermati': 'Stop here',
+  'gob-fruga': 'Rummage through the embers', 'gob-fermati': 'Stop here',
   'gob-molla-trofeo': 'Drop the trophy', 'gob-ultima-mischia': 'Stand and fight',
   'fight-turn': 'Fight (turn)', 'gob-partenza': 'Depart', 'RETREAT': 'Retreat',
 };

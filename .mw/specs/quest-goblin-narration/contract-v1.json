@@ -1,0 +1,584 @@
+{
+  "arcSummary": "Una banda di mercenari è pagata per sterminare i goblin annidati nel bosco: il lavoro è finito solo quando il bosco smette di rispondere — ciò che il party risparmia sul campo torna ad aspettarlo tra gli alberi.",
+  "competition": "",
+  "opposition": {
+    "name": "i goblin del bosco",
+    "role": "banda di predoni annidata nel bosco: vigilata da allarmi primitivi, fuggono quando perdono e tornano per rabbia e vendetta"
+  },
+  "world": {
+    "closedWorld": "Un accampamento goblin nel folto del bosco, di notte. Nessun altro luogo esiste.",
+    "allowedEntities": [
+      "bosco", "sottobosco", "macchia", "radura", "alberi", "quercia", "tronchi", "rami", "fronde",
+      "foglie", "radici", "felci", "muschio", "terra", "fango", "pietre", "roccia", "scarpata",
+      "forra", "buca", "pelli", "sagome", "tende", "teli", "strame", "legni", "trave", "pali",
+      "barricata", "muro di punte", "fuoco", "fuochi", "braci", "tizzoni", "cenere", "fumo",
+      "filo", "campanelli", "lame", "ferro", "frecce", "scudi", "cuoio", "cassa", "stivali",
+      "impugnature", "elsa", "guardia", "denti", "testa", "spalle", "schiena", "tallone", "polso",
+      "palmi", "dita", "unghie", "braccia", "respiro", "fiato", "sangue", "notte", "alba",
+      "ombra", "penombra", "buio", "luce", "goblin"
+    ],
+    "canonicalTerms": {
+      "trappola d'allarme": "filo di campanelli"
+    },
+    "endSeeds": ["fumo"],
+    "bannedSettingTerms": [
+      "guado", "strada", "strade", "carri", "carovana", "masso", "massi", "mercanti",
+      "debito", "sonagli", "corda d'allarme", "acropole", "villaggio", "città", "viale"
+    ],
+    "texture": {
+      "sound": ["rami secchi che schioccano", "foglie che frusciano", "campanelli che oscillano", "urla rauche"],
+      "smell": ["muschio bagnato", "legna marcia", "grasso rancido", "fumo basso", "rame caldo"],
+      "light": ["braci basse", "penombra sotto le chiome", "lame come lampi storti", "grigio dell'alba"],
+      "touch": ["corteccia ruvida", "fango sotto i piedi", "cenere scivolosa", "terreno molle"]
+    },
+    "enemyNouns": ["goblin", "sagome", "fuggiaschi"]
+  },
+  "phases": [
+    {
+      "nodes": ["esplora", "tracce-per", "tracce-perfor"],
+      "role": "leggere il bosco prima che il bosco legga loro — informazione comprata prima del contatto"
+    },
+    {
+      "nodes": ["bottino"],
+      "role": "il nascondiglio avvistato dall'alto — un premio a portata di click, nessuna prova"
+    },
+    {
+      "nodes": ["accampamento", "stealth", "assalto"],
+      "role": "l'approccio decide il primo colpo"
+    },
+    {
+      "nodes": ["combattimento"],
+      "role": "il conto arriva — lo scontro che ogni fase precedente stava comprando"
+    },
+    {
+      "nodes": ["incalzare", "incalza-check"],
+      "role": "dolore ora contro dolore dopo — i superstiti portano la faccia del party con sé"
+    },
+    {
+      "nodes": ["esplora-extra", "cerca"],
+      "role": "push-your-luck sul campo conquistato — il bottino chiede interessi in pelle"
+    },
+    {
+      "nodes": ["ritorno", "agguato", "agguato-scelta", "ultimo-scontro", "fine"],
+      "role": "il bosco riscuote ciò che il campo non ha pagato"
+    }
+  ],
+  "propGlossary": [
+    { "term": "il filo di campanelli", "meaning": "filo teso a mezza gamba con campanelli appesi — l'allarme primitivo del campo: suonare sveglia i goblin" },
+    { "term": "il lembo rimesso a posto", "meaning": "un lembo di sottobosco ricomposto con troppa cura — il nascondiglio si avvista solo dall'alto: sorpresa, non conferma" },
+    { "term": "la buca di pelli", "meaning": "una buca foderata di pelli sotto il lembo — ciò che i goblin hanno sepolto: si prende a ogni esito, senza prova e senza scelta" },
+    { "term": "la barricata", "meaning": "barriera di pali storti e fango attorno al campo — si sfonda o si aggira, decide il primo colpo del combattimento" },
+    { "term": "la prova dello sterminio", "meaning": "ciò che si converte in ricompensa al ritorno; mollarla sull'agguato significa quest fallita" },
+    { "term": "il telo semibruciato", "meaning": "il telo della tenda più bassa col fermaglio d'ottone — la tentazione visibile della razzia" },
+    { "term": "la vecchia quercia", "meaning": "l'albero che porta sopra il sottobosco — il punto di vista che rivela il campo e il nascondiglio" },
+    { "term": "la forra", "meaning": "il sentiero che si stringe tra rocce taglienti dove i fuggitivi conoscono i passaggi" }
+  ],
+  "endingFacts": {
+    "win": ["il campo è distrutto", "la prova dello sterminio si converte in ricompensa", "il bosco torna silenzioso"],
+    "lose": ["la prova resta nel fossato", "i goblin tengono il bosco", "si torna a mani vuote"]
+  },
+  "lockedFacts": [
+    "il bosco (mai il guado, mai la strada dei mercanti — revocati dal Director 2026-10-18)",
+    "i goblin del bosco",
+    "la prova dello sterminio si converte in ricompensa al ritorno",
+    "i goblin sono mortali: carne, trappole e fango — niente magia",
+    "i goblin superstiti attaccano per rabbia e vendetta: aspettano il party, non «si riorganizzano»"
+  ],
+  "nodeContracts": [
+    {
+      "node": "esplora",
+      "narrativeDelta": "dal mandato del consiglio a dentro il bosco — la minaccia smette di essere una voce e diventa una domanda",
+      "rivalAction": "i goblin hanno rimestato il suolo: il bosco è già preparato contro i lettori",
+      "motifFunction": "segni sottili (foglia staccata, erba che oscilla senza vento) — il bosco non rivela ancora tracce né trappole: è l'esplorazione a pagarle",
+      "mechanicalClaims": ["due soli modi di leggere il luogo: il suolo o l'albero", "le opzioni nominano il gesto, mai lo scopo né l'esito"],
+      "endingClaimsAllowed": [],
+      "framingFacts": [
+        { "id": "parete-vegetale", "text": "il sottobosco stringe il passo in una parete di tronchi caduti" },
+        { "id": "silenzio-innaturale", "text": "il folto tace da ogni lato e non dice nulla di chi lo abita" }
+      ]
+    },
+    {
+      "node": "tracce-per",
+      "narrativeDelta": "il suolo restituisce o nega la via di approccio silenziosa",
+      "rivalAction": "le tracce rimestate apposta dicono che il campo sa di essere cercato",
+      "motifFunction": "il filo di campanelli intravisto al successo pieno preannuncia la meccanica dell'accampamento",
+      "mechanicalClaims": ["il successo alimenta solo l'approccio furtivo — niente bottino, niente evento nuovo", "l'epicfail è il piede che cede e lo schianto che si sente nel bosco"],
+      "endingClaimsAllowed": [],
+      "framingFacts": [
+        { "id": "terra-lettura", "text": "vi piegate dove il muschio cede alla terra scura, cercando tra le foglie bagnate un segno" }
+      ],
+      "verdictEffects": {
+        "bigwin": {
+          "facts": [{ "id": "lettura-piena", "text": "impronte leggere affiorano sotto le foglie marce e più avanti nell'erba alta si intravede un filo di campanelli teso a mezza gamba" }],
+          "revealTerms": ["campanell*"],
+          "canonicalEffects": [
+            { "id": "impronte-affiorano", "text": "le impronte affiorano sotto le foglie marce" },
+            { "id": "filo-avvistato", "text": "un filo di campanelli teso a mezza gamba si intravede nell'erba alta" }
+          ]
+        },
+        "win": {
+          "facts": [{ "id": "traccia-obliqua", "text": "talloni nudi e rami spezzati bassi disegnano una traccia obliqua verso l'interno del bosco" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "traccia-disegnata", "text": "una traccia obliqua punta verso l'interno del bosco" }]
+        },
+        "almost": {
+          "facts": [{ "id": "segni-confusi", "text": "impronte sovrapposte e confuse: qualcuno è passato, il verso si perde" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "verso-perso", "text": "le impronte confuse perdono il verso tra le radici" }]
+        },
+        "fail": {
+          "facts": [{ "id": "suolo-muto", "text": "solo radici scoperte e terra smossa: il suolo non concede nulla" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "suolo-nega", "text": "il suolo non restituisce tracce" }]
+        },
+        "epicfail": {
+          "facts": [{ "id": "schianto", "text": "il piede cede sul muschio fradicio e uno schianto di rami secchi rimbalza nel silenzio" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "piede-cede", "text": "il piede cede sul muschio fradicio" },
+            { "id": "schianto-rimbalza", "text": "uno schianto di rami secchi rimbalza nel silenzio del bosco" }
+          ]
+        }
+      }
+    },
+    {
+      "node": "tracce-perfor",
+      "narrativeDelta": "dall'alto il campo diventa un fatto e il nascondiglio si apre — oppure la caduta costa pelle",
+      "rivalAction": "le sentinelle ai margini della radura provano che il campo è sorvegliato anche quando dorme",
+      "motifFunction": "il lembo di sottobosco rimesso a posto con troppa cura è la sorpresa rivelata dall'alto — il party non sapeva che esistesse",
+      "mechanicalClaims": ["il successo apre l'evento nascosto del bottino; il fallimento è la mancata vista; l'epicfail è il ramo che si spezza e la caduta che ferisce"],
+      "endingClaimsAllowed": [],
+      "framingFacts": [
+        { "id": "quercia-salita", "text": "il tronco della quercia è umido e ruvido sotto i palmi; più in alto la cupola di foglie chiude la vista su tutto ciò che sta oltre" }
+      ],
+      "verdictEffects": {
+        "bigwin": {
+          "facts": [
+            { "id": "campo-rivelato", "text": "un filo di fumo sale dritto sopra la radura dell'accampamento e il calpestio gira a spirale attorno ai fuochi" },
+            { "id": "anomalia", "text": "lontano dalle tende un lembo di sottobosco appare rimesso a posto con troppa cura, come una ferita ricucita" }
+          ],
+          "revealTerms": ["accampament*", "radura", "fumo", "fuoch*"],
+          "canonicalEffects": [
+            { "id": "fumo-sulla-radura", "text": "un filo di fumo sale dritto sopra la radura dell'accampamento" },
+            { "id": "calpestio-spirale", "text": "il calpestio gira a spirale attorno ai fuochi" },
+            { "id": "lembo-ricomposto", "text": "un lembo di sottobosco rimesso a posto con troppa cura si scorge lontano dalle tende" }
+          ]
+        },
+        "win": {
+          "facts": [
+            { "id": "campo-visto", "text": "tra i rami alti si scorge il fumo grigio dell'accampamento" },
+            { "id": "anomalia-vista", "text": "lontano dai fuochi un lembo di sottobosco rimesso a posto con troppa cura" }
+          ],
+          "revealTerms": ["accampament*", "fumo"],
+          "canonicalEffects": [
+            { "id": "fumo-tra-i-rami", "text": "il fumo grigio dell'accampamento si scorge tra i rami alti" },
+            { "id": "lembo-ricomposto", "text": "un lembo di sottobosco rimesso a posto con troppa cura si scorge lontano dai fuochi" }
+          ]
+        },
+        "almost": {
+          "facts": [{ "id": "spiraglio", "text": "il vento apre le fronde per un istante e lascia scorgere un filo di fumo grigio tra le cime" }],
+          "revealTerms": ["fumo"],
+          "canonicalEffects": [{ "id": "fumo-spiraglio", "text": "un filo di fumo grigio si scorge tra le cime per un istante" }]
+        },
+        "fail": {
+          "facts": [{ "id": "chioma-muro", "text": "la chioma è un muro verde: si scende senza aver visto oltre gli alberi" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "discesa-cieca", "text": "si ridiscende senza aver visto oltre gli alberi" }]
+        },
+        "epicfail": {
+          "facts": [{ "id": "ramo-cede", "text": "il ramo marcio cede di schianto sotto il peso e la caduta batte duro la spalla a terra" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "ramo-cede", "text": "il ramo marcio cede di schianto sotto il peso" },
+            { "id": "caduta-spalla", "text": "la caduta batte duro la spalla a terra" }
+          ],
+          "injuryAnchors": ["ramo", "cadut*", "spalla", "schianto", "batt*"]
+        }
+      }
+    },
+    {
+      "node": "bottino",
+      "narrativeDelta": "il nascondiglio trovato dall'alto si apre: un premio preso, non giocato",
+      "rivalAction": "la buca foderata con cura dice che qualcuno depreda e poi cela",
+      "motifFunction": "il lembo rimesso a posto intravisto dall'alto diventa la buca fra le mani",
+      "mechanicalClaims": ["nessuna prova e nessuna scelta: un solo gesto recupera il contenuto e prosegue"],
+      "endingClaimsAllowed": [],
+      "recovery": "direct",
+      "titleLock": "Ciò che era nascosto",
+      "framingFacts": [
+        { "id": "lembo-confermato", "text": "il lembo di sottobosco rimesso a posto con troppa cura è ancora là, in disparte dai fuochi" },
+        { "id": "buca-aperta", "text": "sotto il lembo, in una buca foderata di pelli, giace ciò che i goblin avevano sepolto" }
+      ]
+    },
+    {
+      "node": "accampamento",
+      "narrativeDelta": "da osservatori a esecutori: resta solo da scegliere come entrare",
+      "rivalAction": "il campo fuma e dorme — impreparato ma circondato dai propri allarmi",
+      "motifFunction": "i campanelli ritornano come meccanica d'ingresso, non più come indizio",
+      "mechanicalClaims": ["la via furtiva paga di più ma il fallimento allerta; la carica paga meno e il fallimento è gratis", "le opzioni nominano il gesto, mai lo scopo né l'esito"],
+      "endingClaimsAllowed": [],
+      "titleLock": "Regole d’ingaggio",
+      "framingFacts": [
+        { "id": "odore-campo", "text": "oltre l'ultima cortina di felci l'odore acre di grasso rancido investe nella penombra" },
+        { "id": "sagome-radura", "text": "le braci basse ardono al centro della radura e tra le tende storte si muovono sagome corte" }
+      ]
+    },
+    {
+      "node": "stealth",
+      "narrativeDelta": "dentro invisibili o dentro scoperti — il campo non ha una terza opzione",
+      "rivalAction": "le teste che si alzano dal fuoco mostrano che il campo è pronto a svegliarsi",
+      "motifFunction": "il filo dei campanelli è la scena stessa",
+      "mechanicalClaims": ["successo = danno maggiore al combattimento; fallimento = campo allertato"],
+      "endingClaimsAllowed": [],
+      "framingFacts": [
+        { "id": "margine-ombra", "text": "si avanza piegati dove la penombra del sottobosco tocca il margine della radura, misurando ogni appoggio" }
+      ],
+      "verdictEffects": {
+        "bigwin": {
+          "facts": [{ "id": "invisibili", "text": "si scivola oltre un filo di campanelli senza muovere un soffio: già alle loro spalle mentre fissano il fuoco" }],
+          "revealTerms": ["campanell*"],
+          "canonicalEffects": [{ "id": "filo-superato", "text": "un filo di campanelli viene superato senza muovere un soffio" }]
+        },
+        "win": {
+          "facts": [{ "id": "perimetro", "text": "il perimetro esterno è superato senza che una foglia parli" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "perimetro-superato", "text": "il perimetro esterno viene superato in silenzio" }]
+        },
+        "almost": {
+          "facts": [{ "id": "campanello-sfiorato", "text": "un campanello sfiorato oscilla piano e una testa vicino al fuoco si volta, poi esita" }],
+          "revealTerms": ["campanell*"],
+          "canonicalEffects": [
+            { "id": "campanello-oscilla", "text": "un campanello sfiorato oscilla piano" },
+            { "id": "testa-si-volta", "text": "una testa vicino al fuoco si volta, poi esita" }
+          ]
+        },
+        "fail": {
+          "facts": [{ "id": "filo-stride", "text": "un filo morde lo stivale, un campanello stride e le sagome attorno al fuoco scattano in piedi" }],
+          "revealTerms": ["campanell*"],
+          "canonicalEffects": [
+            { "id": "filo-morde", "text": "un filo morde lo stivale" },
+            { "id": "sagome-scattano", "text": "le sagome attorno al fuoco scattano in piedi" }
+          ]
+        },
+        "epicfail": {
+          "facts": [{ "id": "allarme-pieno", "text": "si inciampa in un filo teso, i campanelli si scatenano e il campo intero si rovescia contro" }],
+          "revealTerms": ["campanell*"],
+          "canonicalEffects": [
+            { "id": "inciampo-filo", "text": "si inciampa in pieno in un filo teso" },
+            { "id": "campo-rovescia", "text": "i campanelli si scatenano e il campo intero si rovescia contro" }
+          ]
+        }
+      }
+    },
+    {
+      "node": "assalto",
+      "narrativeDelta": "la barricata tiene o cede — il primo colpo è già un risultato",
+      "rivalAction": "i goblin afferrano le armi se il muro regge un respiro di troppo",
+      "motifFunction": "la barricata di pali storti è la soglia fisica del campo",
+      "mechanicalClaims": ["successo = danno moderato al combattimento; il fallimento non costa nulla"],
+      "endingClaimsAllowed": [],
+      "framingFacts": [
+        { "id": "carica-lancio", "text": "si stringono le impugnature e ci si lancia fuori dalla macchia, puntando dritto verso il cerchio del fuoco" }
+      ],
+      "verdictEffects": {
+        "bigwin": {
+          "facts": [{ "id": "breccia-pre-reazione", "text": "la carica supera la barricata e raggiunge i fuochi prima che il campo reagisca" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "breccia-pre-reazione", "text": "la barricata viene travolta all'ingresso di puro slancio" },
+            { "id": "sopra-i-fuochi", "text": "si è sopra i fuochi prima che il primo grido prenda forma" }
+          ]
+        },
+        "win": {
+          "facts": [{ "id": "margine-sfondato", "text": "il margine del campo viene sfondato a spallate e le lame entrano nel cerchio di luce" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "margine-sfondato", "text": "il margine del campo viene sfondato a spallate" }]
+        },
+        "almost": {
+          "facts": [{ "id": "entrata-rallentata", "text": "la terra molle frena gli stivali: si entra mentre le prime guardie si alzano" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "terra-frena", "text": "la terra molle frena gli stivali all'ultimo passo" },
+            { "id": "guardie-alzate", "text": "le prime guardie si alzano mentre si entra" }
+          ]
+        },
+        "fail": {
+          "facts": [{ "id": "carica-arrestata", "text": "il fango spezza lo slancio e davanti ai fuochi il muro di punte è già serrato" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "slancio-spezzato", "text": "il fango sotto i piedi spezza lo slancio della corsa" },
+            { "id": "muro-serrato", "text": "il muro di punte davanti ai fuochi è già serrato" }
+          ]
+        },
+        "epicfail": {
+          "facts": [{ "id": "caduta-barricata", "text": "il piede scivola nella melma in piena corsa e si cade contro la barricata con la guardia aperta" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "piede-melma", "text": "il piede scivola nella melma in piena corsa" },
+            { "id": "caduta-barricata", "text": "si cade in avanti contro la barricata con la guardia aperta" }
+          ],
+          "injuryAnchors": ["cadut*", "melma", "scivol*", "guardia aperta"]
+        }
+      }
+    },
+    {
+      "node": "combattimento",
+      "narrativeDelta": "il campo smette di essere un luogo e diventa un conto di sangue — la scena si legge per sensi (fuoco, fumo, ferro), non per verbale di scontro",
+      "rivalAction": "i goblin rispondono colpo per colpo e concentrano il rischio su chi sta dietro",
+      "motifFunction": "",
+      "mechanicalClaims": ["danno mutuo a turni; nessuna morte istantanea in questa scena", "gli esiti narrano ciò che si vede e si sente — mai conteggi di morti né risultati meccanici che spettano alla UI"],
+      "endingClaimsAllowed": [],
+      "titleLock": "Ferro e cenere",
+      "framingFacts": [
+        { "id": "sensi-scontro", "text": "tizzoni calpestati, urla rauche che rimbalzano tra i tronchi, il sapore caldo del rame sulla lingua" },
+        { "id": "denti-e-lama", "text": "ogni sagoma intorno alle braci ha denti e lama" }
+      ],
+      "verdictEffects": {
+        "bigwin": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "colpo-supera-guardia", "text": "un colpo supera la guardia" }]
+        },
+        "win": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "impatto-legno-scudi", "text": "impatto su legno e scudi" }]
+        },
+        "almost": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "taglio-di-striscio", "text": "taglio di striscio" }]
+        },
+        "fail": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "colpo-arrestato", "text": "colpo arrestato su cuoio e legno" }]
+        },
+        "epicfail": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "appoggio-perso", "text": "perdita d'appoggio" },
+            { "id": "contraccolpo", "text": "contraccolpo" }
+          ]
+        }
+      }
+    },
+    {
+      "node": "incalzare",
+      "narrativeDelta": "i superstiti fuggono: il prezzo della caccia contro il prezzo del ritorno",
+      "rivalAction": "i fuggitivi portano con sé le facce del party — la conoscenza è ciò che torna",
+      "motifFunction": "",
+      "mechanicalClaims": ["lasciar fuggire = agguato più pesante più tardi; inseguire = pedaggio certo più un check", "le opzioni nominano il gesto, mai lo scopo né l'esito"],
+      "endingClaimsAllowed": [],
+      "titleLock": "Inseguimento",
+      "framingFacts": [
+        { "id": "braci-fumano", "text": "le ultime braci fumano sulla terra calpestata" },
+        { "id": "fuga-nel-folto", "text": "chi è rimasto in piedi si butta tra gli alberi senza voltarsi, inghiottito a pezzi dall'oscurità" }
+      ]
+    },
+    {
+      "node": "incalza-check",
+      "narrativeDelta": "la caccia decide se la quest si chiude qui o se l'agguato sarà più mite",
+      "rivalAction": "i goblin conoscono le rocce meglio dei mercenari — il terreno gioca per loro",
+      "motifFunction": "",
+      "mechanicalClaims": ["il pedaggio si paga sempre (10 HP, 20 su epicfail); chiudere la fuga = sterminio; fallire = tornano feriti"],
+      "endingClaimsAllowed": [],
+      "titleLock": "Incalza i fuggiaschi",
+      "framingFacts": [
+        { "id": "corsa-sotto-fronde", "text": "ci si lancia sotto le fronde basse dietro il rumore dei passi in fuga, dove il terreno scende ripido tra pietre umide e radici" }
+      ],
+      "verdictEffects": {
+        "bigwin": {
+          "facts": [{ "id": "chiusi-alla-forra", "text": "i fuggiaschi vengono raggiunti dove la forra stringe il passo e il bosco si fa muto" }],
+          "revealTerms": ["forra"],
+          "canonicalEffects": [
+            { "id": "raggiunti-forra", "text": "i fuggiaschi vengono raggiunti dove la forra stringe il passo" },
+            { "id": "bosco-muto", "text": "il bosco si fa muto di colpo" }
+          ]
+        },
+        "win": {
+          "facts": [{ "id": "fruscio-spegne", "text": "il passo più lungo sulla salita di pietra spegne il fruscio davanti" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "fruscio-si-spegne", "text": "il fruscio davanti si spegne sotto i colpi" }]
+        },
+        "almost": {
+          "facts": [{ "id": "caccia-incompleta", "text": "la gola brucia, li si urta in fondo alla forra, ma la macchia si richiude sulle schiene più rapide" }],
+          "revealTerms": ["forra"],
+          "canonicalEffects": [
+            { "id": "urtati-in-fondo", "text": "i fuggiaschi vengono urtati in fondo alla forra" },
+            { "id": "macchia-richiude", "text": "la macchia si richiude sulle schiene più rapide" }
+          ]
+        },
+        "fail": {
+          "facts": [{ "id": "pietre-tradiscono", "text": "le pietre bagnate tradiscono il passo e la macchia se li riprende" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "pietre-tradiscono", "text": "le pietre bagnate tradiscono il passo" },
+            { "id": "macchia-riprende", "text": "la macchia se li riprende prima che le lame arrivino" }
+          ]
+        },
+        "epicfail": {
+          "facts": [{ "id": "scivolata-scarpata", "text": "si scivola lungo la scarpata battendo duro contro la roccia viva mentre i passi in fuga si perdono" }],
+          "revealTerms": ["scarpata"],
+          "canonicalEffects": [
+            { "id": "scivolata-scarpata", "text": "si scivola lungo la scarpata" },
+            { "id": "battuta-roccia", "text": "si batte duro contro la roccia viva" }
+          ],
+          "injuryAnchors": ["scivol*", "batt*", "roccia", "sangu*", "fiato"]
+        }
+      }
+    },
+    {
+      "node": "esplora-extra",
+      "narrativeDelta": "il campo conquistato è un campo aperto: resta solo quanta pelle spendere",
+      "rivalAction": "",
+      "motifFunction": "la cassa di cuoio pesante è la tentazione resa visibile",
+      "mechanicalClaims": ["ogni giro in più costa più del precedente"],
+      "endingClaimsAllowed": [],
+      "titleLock": "Tra le ceneri",
+      "framingFacts": [
+        { "id": "radura-devastata", "text": "il silenzio ricade sulla radura devastata, rotto solo dallo scricchiolio dei legni anneriti" },
+        { "id": "resti-fumanti", "text": "attorno ai tizzoni spenti restano teli squarciati e cumuli di strame fumante" }
+      ]
+    },
+    {
+      "node": "cerca",
+      "narrativeDelta": "il contenuto cresce e il campo morto continua a riscuotere",
+      "rivalAction": "le trappole lasciate agiscono al posto dei goblin morti",
+      "motifFunction": "la struttura che cede — palo, telo, trave — è il contatore del rischio",
+      "mechanicalClaims": ["danno crescente a ogni turno di frugamento"],
+      "endingClaimsAllowed": [],
+      "titleLock": "Fruga tra le braci",
+      "framingFacts": [
+        { "id": "teli-sollevati", "text": "si sollevano i teli anneriti col piatto della lama, cercando a tentoni nel tepore acre che sale dai resti del campo" }
+      ],
+      "verdictEffects": {
+        "bigwin": {
+          "facts": [{ "id": "cassa-trovata", "text": "sotto lo strato più fondo le dita incontrano il cuoio pesante di una cassa risparmiata dalle fiamme" }],
+          "revealTerms": ["cassa"],
+          "canonicalEffects": [{ "id": "cassa-sotto-lo-strato", "text": "le dita incontrano il cuoio pesante di una cassa sotto lo strato più fondo" }]
+        },
+        "win": {
+          "facts": [{ "id": "resti-recuperati", "text": "tra i resti anneriti si tira fuori ciò che il fuoco non ha divorato" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "resti-tirati-fuori", "text": "ciò che il fuoco non ha divorato viene tirato fuori" }]
+        },
+        "almost": {
+          "facts": [{ "id": "presa-corta", "text": "una presa corta nel fumo mentre un sostegno bruciato cede a un soffio dalla spalla" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "presa-corta", "text": "una presa corta nel fumo" },
+            { "id": "sostegno-cede", "text": "un sostegno bruciato cede a un soffio dalla spalla" }
+          ]
+        },
+        "fail": {
+          "facts": [{ "id": "solo-cenere", "text": "solo cenere calda che si attacca ai palmi attraverso i guanti" }],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "cenere-ai-palmi", "text": "la cenere calda si attacca ai palmi" }]
+        },
+        "epicfail": {
+          "facts": [{ "id": "trave-cede", "text": "la trave annerita della tenda cede di schianto rovesciando braci ardenti e legno spaccato" }],
+          "revealTerms": [],
+          "canonicalEffects": [
+            { "id": "trave-cede", "text": "la trave annerita della tenda cede di schianto" },
+            { "id": "pioggia-braci", "text": "una pioggia di braci ardenti e legno spaccato si rovescia addosso" }
+          ],
+          "injuryAnchors": ["trave", "braci", "scott*", "schianto", "cadut*"]
+        }
+      }
+    },
+    {
+      "node": "ritorno",
+      "narrativeDelta": "il sollievo prima dell'interruzione — il bosco sembra finito e non lo è",
+      "rivalAction": "",
+      "motifFunction": "il ramo che schiocca dove il vento non soffia è la vita normale che sta per spezzarsi",
+      "mechanicalClaims": [],
+      "endingClaimsAllowed": [],
+      "titleLock": "Il ritorno",
+      "framingFacts": [
+        { "id": "aria-fredda", "text": "l'aria si fa più fredda sotto le chiome alte" },
+        { "id": "ramo-schiocta", "text": "un ramo schiocca dove il vento non soffia" }
+      ]
+    },
+    {
+      "node": "agguato",
+      "narrativeDelta": "la fuga risparmiata torna come freccia — i superstiti stavano aspettando il party",
+      "rivalAction": "i goblin superstiti attaccano per rabbia e vendetta: portano ancora addosso il fumo del loro campo — niente accordi, niente strategia più alta",
+      "motifFunction": "il sollievo si spezza a metà: il motivo del ritorno diventa il segnale dell'attacco",
+      "mechanicalClaims": ["tutto il party prende il colpo d'ingresso"],
+      "endingClaimsAllowed": [],
+      "titleLock": "Quelli che erano rimasti",
+      "framingFacts": [
+        { "id": "superstiti-attendono", "text": "i goblin superstiti stavano aspettando: portano ancora addosso il fumo del loro campo" },
+        { "id": "escono-fronde", "text": "vi hanno seguito fin qui e ora escono dalle fronde senza un grido, con i denti già scoperti" }
+      ]
+    },
+    {
+      "node": "agguato-scelta",
+      "narrativeDelta": "accerchiati — l'unica scelta rimasta",
+      "rivalAction": "il bosco si richiude attorno: i goblin hanno scelto il luogo",
+      "motifFunction": "le frecce nei tronchi sono la posta letterale della scena",
+      "mechanicalClaims": ["mollare la posta = quest fallita e via libera; affrontare = un turno secco"],
+      "endingClaimsAllowed": [],
+      "titleLock": "Accerchiati",
+      "framingFacts": [
+        { "id": "frecce-tronchi", "text": "le frecce vibrano ancora nei tronchi attorno" },
+        { "id": "lame-chiudono", "text": "lame basse chiudono il passo tra gli alberi e il ringhio sale da ogni lato" }
+      ]
+    },
+    {
+      "node": "ultimo-scontro",
+      "narrativeDelta": "il conto finale: chi resta a coprire paga per tutti",
+      "rivalAction": "gli ultimi goblin combattono come chi non ha più dove fuggire — negli occhi solo odio",
+      "motifFunction": "",
+      "mechanicalClaims": ["un solo turno secco; il profilo posizionale decide chi paga"],
+      "endingClaimsAllowed": ["la prova dello sterminio arriva al villaggio e paga", "i morti restano nel bosco"],
+      "titleLock": "L’ultimo assalto",
+      "framingFacts": [
+        { "id": "senza-terra", "text": "si gettano sugli scudi senza badare al ferro; dalle loro gole non esce più nessuna parola" },
+        { "id": "respiro-basso", "text": "solo un respiro lungo e basso, a denti stretti" }
+      ],
+      "verdictEffects": {
+        "bigwin": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "fendente-apre", "text": "un fendente apre il cerchio" }]
+        },
+        "win": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "acciaio-su-acciaio", "text": "impatto acciaio su acciaio" }]
+        },
+        "almost": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "lame-a-meta", "text": "le lame si trovano a metà" }]
+        },
+        "fail": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "linea-tiene", "text": "la linea tiene a denti stretti" }]
+        },
+        "epicfail": {
+          "facts": [],
+          "revealTerms": [],
+          "canonicalEffects": [{ "id": "contraccolpo-appoggio", "text": "il contraccolpo toglie l'appoggio" }]
+        }
+      }
+    },
+    {
+      "node": "fine",
+      "narrativeDelta": "la quest diventa eco: ciò che è stato portato a casa non si depone a terra",
+      "rivalAction": "",
+      "motifFunction": "il fumo dell'alba è il seme del motivo che chiude — sale dritto e non chiama più nessuno",
+      "mechanicalClaims": [],
+      "endingClaimsAllowed": ["la prova dello sterminio si converte in ricompensa", "il bosco torna silenzioso", "i morti non tornano"],
+      "titleLock": "Cenere fredda",
+      "framingFacts": [
+        { "id": "alba-dirada", "text": "gli alberi si diradano nel grigio dell'alba" },
+        { "id": "odore-cucito", "text": "l'odore di fumo e ferro resta cucito addosso" }
+      ]
+    }
+  ]
+}

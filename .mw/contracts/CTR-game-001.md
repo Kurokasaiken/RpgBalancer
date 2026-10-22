@@ -1,3 +1,45 @@
+---
+id: CTR-game-001
+kind: integration
+components:
+- game-frame-pixi
+- pixi-world-map
+external_dependencies: []
+fast_checks: []
+e2e_checks:
+- tests/e2e/idleVillage/gameBootHealth.spec.ts
+e2e_trigger_globs:
+- src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx
+- src/pages/game-frame-pixi.tsx
+invariants:
+- id: CTR-game-001.INV-1
+  source: director-bug
+  source_ref: R-169
+  statement: '`app.ticker.lastTime` avanza ancora oltre 10s dopo il boot (ticker vivo: il RAF è ri-schedulato;
+    un throw dentro `Ticker.update` lo uccide per sempre).'
+  test_refs:
+  - tests/e2e/idleVillage/gameBootHealth.spec.ts
+- id: CTR-game-001.INV-2
+  source: director-bug
+  source_ref: R-169
+  statement: Zero `pageerror` nella finestra osservata.
+  test_refs:
+  - tests/e2e/idleVillage/gameBootHealth.spec.ts
+- id: CTR-game-001.INV-3
+  source: director-bug
+  source_ref: R-169
+  statement: '`setWonderRequest` bump (bottone Director `data-action-id="wonder"`, F10) produce `__wonders()
+    === 1` entro ~2s su qualunque renderer.'
+  test_refs:
+  - tests/e2e/idleVillage/gameBootHealth.spec.ts
+- id: CTR-game-001.INV-4
+  source: director-bug
+  source_ref: R-169
+  statement: 'Nessun renderable con `renderPipeId` assente nel renderer attivo viene montato: ogni blocco
+    mesh (`Mesh`/`MeshPlane`/shader-mesh) sta dietro `meshOk` o equivalente capability-guard (REG-001).'
+  test_refs:
+  - tests/e2e/idleVillage/gameBootHealth.spec.ts
+---
 # CTR-game-001 — Ticker Pixi vivo >10s dopo boot e wonder spawnabile via bump su `/game`
 
 **id:** `CTR-game-001`

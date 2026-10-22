@@ -1,6 +1,6 @@
 ---
 title: 'World Surface Sea Marks — quiet painted sea motion'
-status: active
+status: completed
 created: 2026-09-08
 reviewed: 2026-09-08
 ---
@@ -51,14 +51,14 @@ Rendere il mare della mappa World Surface leggermente vivo a zoom mappa (~0.33) 
 
 ### Tasks
 
-1. **T1 — Contratto di misura** — scrivere `sea_motion_measurement_contract.md` con metodo 100 ms + `sea_mask` e target minimo accettabile.
-2. **T2 — Art kit** — produrre `sea-marks.webp` (atlas o sprite separati) e `sea-marks.json` di placement; riusare `onda1/onda2/ondine1/schiuma1` come baseline.
-3. **T3 — Componente `WorldSurfaceSeaMarks`** — DOM overlay, CSS keyframes/SMIL, `prefers-reduced-motion`, i18n, Zod config.
-4. **T4 — Lab A/B** — aggiungere tile statico/coste/coste+aperto in `SeaEffectLabPage`.
-5. **T5 — Tuning percettivo** — regolare count, opacità, durata, drift, distribuzione in skin config.
-6. **T6 — Profilazione Tauri** — generare `test-results/r066-sea-motion-<data>.log`.
-7. **T7 — Director gate** — decisione registrata in `context/DECISION_LOG.md`.
-8. **T8 — Safeguards** — lint, test, build:check, kanban:lint.
+1. **T1 — Contratto di misura** — scrivere `sea_motion_measurement_contract.md` con metodo 100 ms + `sea_mask` e target minimo accettabile. **`fatta` 2026-10-19** — `src/docs/docs/sea_motion_measurement_contract.md` (retro-doc: metodo, target minimo, gate E2E).
+2. **T2 — Art kit** — produrre `sea-marks.webp` (atlas o sprite separati) e `sea-marks.json` di placement; riusare `onda1/onda2/ondine1/schiuma1` come baseline. **`fatta`** — kit in `seaMarksConfig.marks` (famiglie onda1/onda2/ondine1/schiuma1), placement deterministico da `points.json`+seed.
+3. **T3 — Componente `WorldSurfaceSeaMarks`** — DOM overlay, CSS keyframes/SMIL, `prefers-reduced-motion`, i18n, Zod config. **`fatta`** — componente + port Pixi in `PixiWorldMap` (produzione `/game`, stesso config; divergenza dalla NOT-In-Scope post-datata — il piano è pre-pivot Pixi).
+4. **T4 — Lab A/B** — aggiungere tile statico/coste/coste+aperto in `SeaEffectLabPage`. **`fatta`** — tile `01a/01b/01c` montano coast/open/both config.
+5. **T5 — Tuning percettivo** — regolare count, opacità, durata, drift, distribuzione in skin config. **`fatta`** — valori config-first (`cycleSeconds 24`, `visibleFraction 0.45`, `opacity 0.75`, drift ±4/±3 world px).
+6. **T6 — Profilazione Tauri** — generare `test-results/r066-sea-motion-<data>.log`. **Pendente — non eseguibile da questo ambiente** (richiede l'app desktop su hardware reale; stessa classe di T-012 PLAN-050). Resta step Director.
+7. **T7 — Director gate** — decisione registrata in `context/DECISION_LOG.md`. **`fatta`** — Decision 011 (adoption del piano).
+8. **T8 — Safeguards** — lint, test, build:check, kanban:lint. **`fatta` 2026-10-19** — spec `tests/e2e/idleVillage/seaMarks.spec.ts` 2/2, lint 0 errori, build:check PASS, bundle `.mw/runs/plan013-sea-marks/`.
 
 ### Acceptance
 

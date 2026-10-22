@@ -4,6 +4,9 @@ import path from 'node:path';
 import { checkKanbanGate, checkNestedAgentsGate, checkRichiesteGate } from './verification/gateCore';
 import { checkContractsGate, gitChangedFiles } from './verification/contractsCheck';
 import { checkRedFirstGate } from './verification/redFirst';
+import { checkManifestBaseSha, readSyncSeal } from './verification/livingSyncGate';
+import { checkVisualForkGate } from './verification/visualForkGate';
+import { checkIntentGate } from './verification/intentGate';
 
 /**
  * closure:lint — gate di chiusura (R-189), ridotto all'essenziale (R-208).
@@ -67,6 +70,49 @@ async function main() {
     const baselineRichieste = await readBaseline(RICHIESTE_REL_PATH);
     const currentRichieste = await readFile(path.resolve(RICHIESTE_REL_PATH), 'utf8');
     errors.push(...checkRichiesteGate(baselineRichieste, currentRichieste, repoRoot));
+
+    // Gate regime intent (PLAN-045 T-005b): i bundle citati da righe di
+    // chiusura NUOVE nel diff il cui manifest dichiara intent_gate devono
+    // avere intent.json con status PASS|WAIVED|SKIPPED_TRIVIAL.
+    const addedLines = [currentKanban, currentRichieste]
+      .map((cur, i) => {
+        const base = i === 0 ? baselineKanban : baselineRichieste;
+        const baseSet = new Set(base.split('\n'));
+        return cur.split('\n').filter((ln) => !baseSet.has(ln));
+      })
+      .flat();
+    const bundleRe = /bundle:\s*(\S+)/g;
+    const seenRunDirs = new Set<string>();
+    for (const ln of addedLines) {
+      for (const m of ln.matchAll(bundleRe)) {
+        const bundlePath = path.resolve(repoRoot, m[1]);
+        const runDir = path.dirname(bundlePath);
+        if (seenRunDirs.has(runDir)) continue;
+        seenRunDirs.add(runDir);
+        const manifestPath = path.join(runDir, 'verification.json');
+        try {
+          const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
+            intent_gate?: boolean;
+            base_sha?: string;
+          };
+          /* PLAN-054 T-005: manifest.base_sha deve coincidere col
+           * sealed_base_sha del trusted.lock (una riscrittura del
+           * baseline del manifest fallisce qui — Pass Globale). */
+          const baseErr = checkManifestBaseSha(manifest.base_sha, readSyncSeal(repoRoot).sealed_base_sha, manifestPath);
+          if (baseErr) errors.push(baseErr);
+          if (manifest.intent_gate === true) {
+            const report = checkIntentGate(runDir, repoRoot, {
+              changedFiles: gitChangedFiles(repoRoot),
+            });
+            for (const err of report.errors) {
+              errors.push(`intent-gate ${runDir}: ${err}`);
+            }
+          }
+        } catch {
+          errors.push(`intent-gate: manifest non leggibile per bundle ${m[1]}`);
+        }
+      }
+    }
   } catch (gateError) {
     errors.push(
       `Gate di chiusura non valutabile (baseline git assente?): ${(gateError as Error).message}`,
@@ -89,6 +135,18 @@ async function main() {
     ...checkRedFirstGate(process.cwd(), { changedFiles: gitChangedFiles(process.cwd()) })
       .errors,
   );
+
+  // Gate visual-fork (PLAN-047 T-006, v35 FROZEN): file visivi nel diff reale
+  // devono essere coperti da una visual-fork card o da uno skip puntato —
+  // l'omissione silenziosa fallisce qui (fail-closed). File attribuiti a plan
+  // pre-v35: warning transitorio (copertura dovuta alla loro chiusura).
+  const visualFork = checkVisualForkGate(process.cwd(), {
+    changedFiles: gitChangedFiles(process.cwd()),
+  });
+  errors.push(...visualFork.errors);
+  for (const w of visualFork.warnings) {
+    console.error(` ⚠ ${w}`);
+  }
 
   if (errors.length > 0) {
     console.error('Closure lint fallito. Risolvi i seguenti problemi:');

@@ -112,6 +112,14 @@ export interface GameFrameProps {
    * the hung-tag wrapper would double-position them.
    */
   stageMode?: boolean;
+  /**
+   * PLAN-043 WS-5 / DEF-06: CSS `zoom` applied to the HUD chrome clusters
+   * (browser interface-size path — the desktop app zooms the whole webview
+   * natively instead). The world map and its dressing keep their own scale;
+   * pointer/rect code inside the chrome layer converts device px via
+   * `getHudZoomFactor()`.
+   */
+  hudZoom?: number;
 }
 
 /**
@@ -168,8 +176,10 @@ export const GameFrame: React.FC<GameFrameProps> = ({
   onHudHiddenChange,
   variant = 'atlas',
   stageMode = false,
+  hudZoom = 1,
 }) => {
   const { t } = useTranslation('idleVillage');
+  const chromeZoom: CSSProperties = hudZoom !== 1 ? { zoom: hudZoom } : {};
   const inset = config.insets.edgeInsetPx;
   const bevel = variant === 'cartographer';
   const lacquer = useHudMaterial() === 'lacquer';
@@ -400,6 +410,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             flexDirection: 'column',
             alignItems: 'flex-start',
             padding: '8px 40px 12px 22px',
+            ...chromeZoom,
             ...slideChrome('up'),
           }}
         >
@@ -439,6 +450,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             // Both top plaques share one height (the resources one carries a second line): same bottom edge.
             alignItems: 'stretch',
             pointerEvents: 'none',
+            ...chromeZoom,
             ...slideChrome('up'),
           }}
         >
@@ -466,7 +478,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             bevel={bevel}
             anchor="top"
             ornament
-            style={{ position: 'absolute', top: 0, left: '50%', zIndex: z.chrome, ...slideChrome('up', 'translateX(-50%)') }}
+            style={{ position: 'absolute', top: 0, left: '50%', zIndex: z.chrome, ...chromeZoom, ...slideChrome('up', 'translateX(-50%)') }}
           >
             {whenWhereSlot}
           </HudRibbon>
@@ -474,7 +486,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             bevel={bevel}
             anchor="top"
             cutPx={22}
-            style={{ position: 'absolute', top: 0, right: 0, zIndex: z.chrome, padding: '8px 22px 12px 40px', maxWidth: 'calc(50% - 130px)', ...slideChrome('up') }}
+            style={{ position: 'absolute', top: 0, right: 0, zIndex: z.chrome, padding: '8px 22px 12px 40px', maxWidth: 'calc(50% - 130px)', ...chromeZoom, ...slideChrome('up') }}
           >
             {/* The clip lives on an inner box: overflow on the ribbon root would cut its shadow. */}
             <div style={{ minWidth: 0, overflow: 'hidden' }}>{resourcesSlot}</div>
@@ -487,9 +499,9 @@ export const GameFrame: React.FC<GameFrameProps> = ({
         stageMode ? (
           /* WS-2: the stage layer — the frame inside the slot positions itself
            *  from the rightWing rect; `pointerEvents` is re-armed per frame. */
-          <div style={{ position: 'absolute', inset: 0, zIndex: z.panels, pointerEvents: 'none' }}>{hangingSlot}</div>
+          <div style={{ position: 'absolute', inset: 0, zIndex: z.panels, pointerEvents: 'none', ...chromeZoom }}>{hangingSlot}</div>
         ) : (
-          <div style={{ position: 'absolute', top: config.insets.hangingTopPx, right: inset + 8, zIndex: z.panels, ...slideChrome('up') }}>{hangingSlot}</div>
+          <div style={{ position: 'absolute', top: config.insets.hangingTopPx, right: inset + 8, zIndex: z.panels, ...chromeZoom, ...slideChrome('up') }}>{hangingSlot}</div>
         )
       )}
 
@@ -499,7 +511,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
         stageMode ? (
           /* WS-2: the stage owns the roster rect (leftWing) — the anchor's
            *  fixed corner placement and held-height trick are superseded. */
-          <div style={{ position: 'absolute', inset: 0, zIndex: z.panels, pointerEvents: 'none' }}>{rosterSlot}</div>
+          <div style={{ position: 'absolute', inset: 0, zIndex: z.panels, pointerEvents: 'none', ...chromeZoom }}>{rosterSlot}</div>
         ) : (
           <RosterAnchor
             style={{
@@ -508,6 +520,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
               bottom: config.roster.bottomPx,
               width: config.roster.widthPx,
               zIndex: z.panels,
+              ...chromeZoom,
               transformOrigin: 'bottom left',
               // No transform unless one is configured: any transform here becomes the
               // containing block for the roster's position:fixed drag overlay, which then
@@ -524,7 +537,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
       )}
 
       {dressingSlot != null && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: z.dressing, pointerEvents: 'none' }}>{dressingSlot}</div>
+        <div style={{ position: 'absolute', inset: 0, zIndex: z.dressing, pointerEvents: 'none', ...chromeZoom }}>{dressingSlot}</div>
       )}
 
       {/* ── Bottom-centre: where I can go ───────────────────────── */}
@@ -532,7 +545,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
         <HudPlaque
           shape="plinth"
           as="div"
-          style={{ position: 'absolute', bottom: 0, left: '50%', zIndex: z.chrome, padding: '20px 40px 8px', ...slideChrome('down', 'translateX(-50%)') }}
+          style={{ position: 'absolute', bottom: 0, left: '50%', zIndex: z.chrome, padding: '20px 40px 8px', ...chromeZoom, ...slideChrome('down', 'translateX(-50%)') }}
         >
           {navContent}
         </HudPlaque>
@@ -549,6 +562,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             zIndex: z.chrome,
             gap: 2,
             padding: '10px 30px 8px',
+            ...chromeZoom,
             ...slideChrome('down', 'translateX(-50%)'),
           }}
         >
@@ -558,7 +572,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
 
       {/* ── Bottom-right: utility controls, and the pearl that stays when the rest is hidden ── */}
       {/* Last in the DOM on purpose: Tab reaches the corner utilities after the top bar and the nav (R-234, T-A14). */}
-      <div style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+      <div style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8, ...chromeZoom }}>
         {utilitySlot != null && <div style={slideChrome('down')}>{utilitySlot}</div>}
         <HudHideToggle hidden={hudHidden} onToggle={toggleHud} />
       </div>

@@ -48,7 +48,13 @@ export default defineConfig(() => ({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['src/setupTests.ts', './vitest.setup.ts', './tests/setup/testRosterSlotLabConfigMock.ts'],
+    setupFiles: [
+      'src/setupTests.ts',
+      './vitest.setup.ts',
+      './tests/setup/testRosterSlotLabConfigMock.ts',
+      /* PLAN-054 T-005: no-op fuori da SYNC_GATE=1. */
+      './tests/setup/invAssertionCounts.ts',
+    ],
     // Legacy suites under tests/** generate blocking errors after recent refactors.
     // Use VITEST_INCLUDE env var (comma-separated globs) for targeted runs until the backlog clears.
     include: includePatterns.length > 0 ? includePatterns : defaultIncludes,

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WanderlustMedalOverlay } from './WanderlustMedalOverlay';
 import { getDragConfig } from '../config/dragConfig';
+import { getHudZoomFactor } from './gameFrame/hudScale';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 
 /** Flight duration — long enough for the slow-in/fast-out magnetic feel to read. */
@@ -58,6 +59,13 @@ export function FlightProxy({
     };
   }, []); // Empty dependency array - run once on mount
 
+  /* PLAN-043 WS-5 DEF-06: the proxy mounts inside the CSS-zoomed chrome
+   *  layer — `left/top` and motion deltas are chrome units, while the
+   *  from/to coords arrive as device px (pointer release, slot rects).
+   *  `getHudZoomFactor()` is 1 where no chrome zoom applies. */
+  const z = getHudZoomFactor();
+  const medalPx = getDragConfig().overlay.medalSizePx;
+
   return (
     <AnimatePresence>
       {isAnimating && (
@@ -66,10 +74,10 @@ export function FlightProxy({
           ref={proxyRef}
           className="fixed pointer-events-none z-9999"
           style={{
-            left: fromX - getDragConfig().overlay.medalSizePx / 2,
-            top: fromY - getDragConfig().overlay.medalSizePx / 2,
-            width: getDragConfig().overlay.medalSizePx,
-            height: getDragConfig().overlay.medalSizePx,
+            left: fromX / z - medalPx / 2,
+            top: fromY / z - medalPx / 2,
+            width: medalPx,
+            height: medalPx,
           }}
           initial={{
             x: 0,
@@ -78,8 +86,8 @@ export function FlightProxy({
             opacity: 1,
           }}
           animate={{
-            x: toX - fromX,
-            y: toY - fromY,
+            x: (toX - fromX) / z,
+            y: (toY - fromY) / z,
             scale: 1, // No scale changes - linear flight
             opacity: 1,
           }}

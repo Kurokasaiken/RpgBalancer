@@ -62,8 +62,9 @@ function fragSource(samples: number): string {
 precision highp float;
 out vec4 outColor;
 
-uniform vec2 uSize;          // canvas size in px
-uniform vec2 uCenter;        // goo center in px
+uniform vec2 uSize;          // raster canvas size in px
+uniform vec2 uCenter;        // raster center in px
+uniform float uFieldScale;   // raster→field px scale (R-241: goo renders under full canvas res)
 uniform float uRadii[${samples}];
 uniform vec3 uBlobs[${MAX_BLOBS}];
 uniform int uBlobCount;
@@ -121,7 +122,7 @@ float field(vec2 p){
   for (int i = 0; i < ${MAX_BLOBS}; i++){
     if (i >= uBlobCount) break;
     vec3 b = uBlobs[i];
-    float db = length(p - (b.xy - uCenter)) - b.z;
+    float db = length(p - (b.xy - uCenter * uFieldScale)) - b.z;
     d = smin(d, db, uSminK);
   }
   return d;
@@ -129,14 +130,18 @@ float field(vec2 p){
 
 void main(){
   vec2 px = vec2(gl_FragCoord.x, uSize.y - gl_FragCoord.y);
-  vec2 p = px - uCenter;
+  /* Raster px → field px: the sim/material stay in board coordinates even
+     when the raster canvas is smaller than the board (R-241 gooScale). */
+  vec2 p = (px - uCenter) * uFieldScale;
   float d = field(p);
 
   /* Rounded shoulder height profile: flat body, domed edge. */
   float h = clamp(-d / uEdgeFalloff, 0.0, 1.0);
   float hp = 1.0 - (1.0 - h) * (1.0 - h);
 
-  vec3 n = normalize(vec3(-dFdx(hp) * 34.0, -dFdy(hp) * 34.0, 1.0));
+  /* dFdx is per-raster-px; dividing by uFieldScale recovers the field-space
+     derivative, so normals/specular match a native full-res render. */
+  vec3 n = normalize(vec3(-dFdx(hp) * 34.0 / uFieldScale, -dFdy(hp) * 34.0 / uFieldScale, 1.0));
   vec3 L = normalize(uLightDir);
 
   float diff = max(dot(n, L), 0.0);
@@ -163,10 +168,18 @@ void main(){
  * Creates the WebGL2 tar-goo layer, or returns null when WebGL2 is
  * unavailable (the engine then keeps its Canvas-2D fallback).
  */
-export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRenderer | null {
+/**
+ * `size` is the raster canvas edge in px; `fieldSize` is the coordinate space
+ * the sim's radii/blobs are authored in (the board). R-241: when
+ * `size < fieldSize` the SDF renders at reduced resolution — the shader maps
+ * raster px back into field space so every px-space parameter keeps its
+ * meaning; the board's drawImage upscales the layer.
+ */
+export function createTarGooRenderer(size: number, cfg: TarGooConfig, fieldSize: number = size): TarGooRenderer | null {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
+  const fieldScale = fieldSize / size;
   const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: false, antialias: false });
   if (!gl) return null;
 
@@ -207,7 +220,7 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
 
   const u = (name: string) => gl.getUniformLocation(prog, name);
   const loc = {
-    size: u('uSize'), center: u('uCenter'), radii: u('uRadii'), blobs: u('uBlobs'),
+    size: u('uSize'), center: u('uCenter'), fieldScale: u('uFieldScale'), radii: u('uRadii'), blobs: u('uBlobs'),
     blobCount: u('uBlobCount'), time: u('uTime'), reveal: u('uReveal'), ripple: u('uRipple'),
   };
 
@@ -215,6 +228,7 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
   const m = cfg.material;
   gl.uniform2f(loc.size, size, size);
   gl.uniform2f(loc.center, size / 2, size / 2);
+  gl.uniform1f(loc.fieldScale, fieldScale);
   gl.uniform1f(u('uSminK'), cfg.field.smoothMinK);
   gl.uniform1f(u('uUndAmp'), cfg.field.undulationAmp);
   gl.uniform1f(u('uUndSpeed'), cfg.field.undulationSpeed);

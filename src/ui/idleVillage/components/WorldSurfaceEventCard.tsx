@@ -521,6 +521,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
       {/* The bordered goblin sticker, once torn off the card. */}
       {stickerDetached && (
         <motion.div
+          data-testid="goblin-flight-sticker"
           initial={{ x: stickerStartX, y: stickerStartY, scale: stickerStartScale }}
           animate={stickerAnimate}
           transition={stickerTransition}

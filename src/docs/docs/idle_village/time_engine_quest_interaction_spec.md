@@ -1,8 +1,9 @@
 ---
 title: TimeEngine ↔ Quest Interaction
-status: draft
-updated: 2026-08-14
+status: deprecated
+updated: 2026-10-19
 type: interaction-spec
+superseded-by: CTR-game-008 + CTR-game-009 (`.mw/contracts/`) — PLAN-054 T-003 triage: maturazione/settle quest su clock canonico ora su `/game` (`CTR-game-008.INV-3/INV-4`)
 ---
 
 # TimeEngine ↔ Quest Interaction

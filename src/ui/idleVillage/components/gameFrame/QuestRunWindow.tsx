@@ -35,7 +35,7 @@
  * while a decision is waiting; closing keeps the run (the Panels menu reopens it).
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { EngravedIcon, type EngravedIconId } from './engravedIcons';
@@ -71,9 +71,11 @@ import { QuestCheckOptionsPanel, type QuestCheckOptions } from './QuestCheckOpti
 import { QuestJourneyPhaseStrip } from './QuestJourneyPhaseStrip';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { hpLostByMember, phaseOutcome, type PhaseOutcome, type PhaseRecord } from '@/ui/idleVillage/questS1Lab/questPhaseRecord';
-import { HudChip, LOG_TONE, SCRIM, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
+import { questPhaseCheckpoints, type TimeBarCheckpoint } from '@/ui/idleVillage/questS1Lab/questSchedule';
+import { HudChip, LOG_TONE, SCRIM, TONE, toneText } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { questBagItems } from './questBag';
 import { useHudPanelDrag } from './useHudPanelDrag';
+import { getHudZoomFactor } from './hudScale';
 import { resolveQuestShellLayout } from './questShellLayout';
 import { BeltItemChips, QuestBeltPlaque } from './QuestBeltPlaque';
 import { QuestPartyRosterPanel } from './QuestPartyRosterPanel';
@@ -111,6 +113,11 @@ export interface QuestRunWindowProps {
   /** Committed-but-unpresented moments (PLAN-025 T-008): the window replays
    *  them one at a time — click anywhere on the beat to continue. */
   queuedBeats: QuestBeat[];
+  /** R-242: the queue owner's cursor ref (`useQuestRun.beatCursorRef`) — the
+   *  presentation position survives a close→reopen remount, so the window
+   *  resumes at the held beat instead of replaying consumed beats. Omit for
+   *  harnesses that want the legacy per-mount cursor. */
+  beatCursorRef?: { current: number };
   /** Per-beat on-stage durations, from `gameFrameConfig.questWindow.beats`. */
   beatTiming: BeatTiming;
   title: string;
@@ -133,6 +140,11 @@ export interface QuestRunWindowProps {
   /** R-199: the page learns when the beat queue is still presenting — the
    *  external `QuestRewardPopup` opens only after the last beat lands. */
   onPresentingChange?: (presenting: boolean) => void;
+  /** R-239: the page learns the strip state — while minimised the cluster's
+   *  wings have no window to dock to (the check column would orphan on the
+   *  map at its last wing geometry) and the check falls back to the
+   *  `QuestSkillCheckOverlay` surface. */
+  onMinimisedChange?: (minimised: boolean) => void;
   /** R-196: the per-item armed selection of the belt (`useQuestRun`). Optional
    *  for harnesses that render the window without a live run — defaults to
    *  "nothing armed" (the R-106 contract). */
@@ -182,6 +194,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   phases,
   beats,
   queuedBeats,
+  beatCursorRef,
   beatTiming,
   title,
   flavour,
@@ -191,6 +204,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   nowTick,
   onAbandon,
   onPresentingChange,
+  onMinimisedChange,
   armedFlags = NO_ARMED,
   onToggleArmedFlag,
   onClose,
@@ -249,6 +263,12 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
    * clamp). */
   const [vw, setVw] = useState(() => (typeof window === 'undefined' ? 1280 : window.innerWidth));
   const [vh, setVh] = useState(() => (typeof window === 'undefined' ? 800 : window.innerHeight));
+  /* PLAN-043 WS-5 DEF-06: `vw`/`vh` hold device px (resize listener); every
+   *  layout consumer below works in chrome-layer units — `vwU`/`vhU` are the
+   *  unit-space size (factor 1 when unzoomed or natively zoomed). */
+  const hudZoom = getHudZoomFactor();
+  const vwU = vw / hudZoom;
+  const vhU = vh / hudZoom;
   useEffect(() => {
     const onResize = () => {
       setVw(window.innerWidth);
@@ -259,7 +279,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   }, []);
   const layout = useMemo(
     () =>
-      resolveQuestShellLayout(vw, {
+      resolveQuestShellLayout(vwU, {
         widthPx,
         sidePanelWidthPx: companions.widthPx,
         sidePanelGapPx: companions.gapPx,
@@ -274,7 +294,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
    * effective state). Standalone keeps the R-196 fit predicate. */
   const companionsFit = inCluster ? true : layout.companionsFit;
   const sideWidth = inCluster
-    ? vw >= clusterCfg.companionLeft.wideAtPx
+    ? vwU >= clusterCfg.companionLeft.wideAtPx
       ? clusterCfg.companionLeft.wideWidthPx
       : clusterCfg.companionLeft.widthPx
     : layout.effectiveSideWidth;
@@ -293,6 +313,14 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     ? ({ 'data-hud-drag-handle': '', style: { cursor: 'grab' } } as typeof dragHandleProps)
     : dragHandleProps;
   const [minimised, setMinimised] = useState(false);
+  /* R-239: report the strip state upward — while minimised the cluster's
+   *  wings must unmount (no window to dock to) and the check falls back to
+   *  the overlay surface. Ref-held so a caller identity change never
+   *  re-reports; unmount reports `false`. */
+  const onMinimisedChangeRef = useRef(onMinimisedChange);
+  onMinimisedChangeRef.current = onMinimisedChange;
+  useEffect(() => { onMinimisedChangeRef.current?.(minimised); }, [minimised]);
+  useEffect(() => () => onMinimisedChangeRef.current?.(false), []);
   const allNodes = nodesFor(run);
   const node = allNodes[run.nodeId];
   /* R-199 pt.11: `nowTick` marks options locked while their frontier's slot
@@ -320,7 +348,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     (b: QuestBeat | null | undefined) => b?.kind === 'check' && !checkOpts.skipCheck,
     [checkOpts.skipCheck],
   );
-  const beatCursor = useBeatCursor(queuedBeats, beatTiming, { reducedMotion, hold: astroShownFor });
+  const beatCursor = useBeatCursor(queuedBeats, beatTiming, { reducedMotion, hold: astroShownFor, cursorRef: beatCursorRef });
   const presenting = beatCursor.current !== null;
   const currentBeat_ = beatCursor.current;
   const astroActive = astroShownFor(currentBeat_);
@@ -382,7 +410,12 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
      *  moves — no orphaned oscillators across rapid skips. */
     getQuestTheatreAudio().cancelCurrentBeatAudio();
     if (beat && astroShownFor(beat) && !astroSettledRef.current.has(beat.id)) {
-      checkHandleRef.current?.skipToResult();
+      /* R-241 B3 (INV-3): the click PROGRESSES the astrolabe — the
+       *  presenter's `progress()` throws the ball while the spin has not
+       *  started and only skips to the verdict once the ball is flying.
+       *  A bare `skipToResult()` killed the throw animation on the first
+       *  click. */
+      checkHandleRef.current?.progress();
       return;
     }
     c.skip();
@@ -400,17 +433,97 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     () => theatreCueForBeat(beatCursor.current, nodeForBeat, DEFAULT_QUEST_THEATRE_FX),
     [beatCursor.current, nodeForBeat],
   );
-  /* PLAN-046: the same resolved shot drives DOM FX and GPU uniforms on one
-   *  clock — keyed on the cue's per-beat key like the rest of the stage. */
+  /* PLAN-050 §7 + R-231 #9 — ingresso × posa + post-entrance continuity:
+   *  the scene's resolved camera shot and its epoch key are LATCHED per
+   *  scene arrival (`sceneVisitKey`) so that when `presenting` flips from
+   *  `true` to `false` (or the player clicks/presses a key to skip the
+   *  typewriter mid-entrance), the camera NEVER snaps back to `idleDrift`
+   *  or resets `shotEpoch`. Instead it continues its entrance glide through
+   *  `shot.durMs` and smoothly enters `postSettle` 2.5D breathing. */
+  /* R-241 B1 (quest-run-window.INV-1): the stage scene is LATCHED. While a
+   *  non-scene beat (check, harm, end) is on stage `run.nodeId` has already
+   *  committed the ARRIVAL node — reading it would cut the theatre's art
+   *  under the spinning astrolabe. The shown scene only moves when
+   *  a scene beat mounts or the queue drains to the frontier; for a window
+   *  remounted mid-queue (ref empty) the last scene beat still pending
+   *  behind the cursor is the fallback, then the frontier. */
+  const stageSceneNodeRef = useRef<string | null>(null);
+  const heldBeat = beatCursor.current;
+  let heldSceneNodeId: string | null = null;
+  if (heldBeat && heldBeat.kind !== 'scene') {
+    const idx = queuedBeats.indexOf(heldBeat);
+    for (let i = idx - 1; i >= 0 && heldSceneNodeId === null; i -= 1) {
+      const b = queuedBeats[i];
+      if (b?.kind === 'scene') heldSceneNodeId = b.nodeId;
+    }
+    heldSceneNodeId ??= stageSceneNodeRef.current;
+  }
+  const activeSceneNodeId =
+    heldBeat?.kind === 'scene'
+      ? heldBeat.nodeId
+      : heldBeat === null
+        ? run.nodeId
+        : (heldSceneNodeId ?? run.nodeId);
+  stageSceneNodeRef.current = activeSceneNodeId;
+  /* T-A3 (R-239): the art must show the node whose scene beat is on stage —
+   *  `run.nodeId` moves the moment a choice commits while the beat queue
+   *  still replays the previous node's beats. R-245 (Director): NOTHING is
+   *  painted over the artwork — the diegetic caption is gone, so the latch
+   *  below only feeds `artFor`. */
+  const theaterArtSrc = artFor(activeSceneNodeId);
+  const cineForBeat = useMemo(() => cinematicEntryForSrc(theaterArtSrc), [theaterArtSrc]);
+  const lastArtRef = useRef<string | undefined>(undefined);
+  const sceneVisitKey = `scene:${activeSceneNodeId}:${theaterArtSrc ?? ''}`;
+  const sceneCameraLatchRef = useRef<{ key: string; changed: boolean; shot: CameraShot | null }>({
+    key: '',
+    changed: false,
+    shot: null,
+  });
+  if (sceneCameraLatchRef.current.key !== sceneVisitKey) {
+    const changed = theaterArtSrc !== lastArtRef.current;
+    const activeNode = allNodes[activeSceneNodeId];
+    const resolvedSceneShot = resolveShot(
+      { kind: 'scene' },
+      activeNode,
+      theatreCue?.tags ?? DEFAULT_QUEST_THEATRE_FX.cinema.cutOn.scene,
+      DEFAULT_QUEST_THEATRE_FX.camera,
+      {
+        artChanged: changed,
+        entrance: cineForBeat?.entrance,
+        pose: cineForBeat?.pose,
+      },
+    );
+    sceneCameraLatchRef.current = {
+      key: sceneVisitKey,
+      changed,
+      shot: resolvedSceneShot,
+    };
+  }
+  const artChanged = sceneCameraLatchRef.current.changed;
+  useEffect(() => {
+    lastArtRef.current = theaterArtSrc;
+  }, [sceneVisitKey, theaterArtSrc]);
+  /* PLAN-046 + R-231 #9: non-scene beats (`check`/`harm`/`end`) resolve
+   *  their own shot; scene beats AND the post-presentation waiting state keep
+   *  the latched scene shot + key so the timeline is continuous. */
+  const isNonSceneBeat = Boolean(beatCursor.current && beatCursor.current.kind !== 'scene');
+  const activeShotKey = isNonSceneBeat ? (theatreCue?.key ?? sceneVisitKey) : sceneVisitKey;
   const cameraShot = useMemo(
     () =>
-      resolveShot(
-        beatCursor.current,
-        beatCursor.current ? nodeForBeat(beatCursor.current) : null,
-        theatreCue?.tags ?? [],
-        DEFAULT_QUEST_THEATRE_FX.camera,
-      ),
-    [beatCursor.current, nodeForBeat, theatreCue],
+      isNonSceneBeat
+        ? resolveShot(
+            beatCursor.current,
+            beatCursor.current ? nodeForBeat(beatCursor.current) : null,
+            theatreCue?.tags ?? [],
+            DEFAULT_QUEST_THEATRE_FX.camera,
+            {
+              artChanged,
+              entrance: cineForBeat?.entrance,
+              pose: cineForBeat?.pose,
+            },
+          )
+        : (sceneCameraLatchRef.current.shot ?? DEFAULT_QUEST_THEATRE_FX.camera.idleDrift),
+    [isNonSceneBeat, beatCursor.current, nodeForBeat, theatreCue, artChanged, cineForBeat, sceneVisitKey],
   );
   /* WS-4 audio choreography: one cue per beat, scheduled against the shared
    *  AudioContext — `j-cut` beats fire through JCutStage's lead hook instead
@@ -427,6 +540,11 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
       return () => audio.stopRiser();
     }
     audio.play(cue.audio);
+    /* PLAN-050 §6 — entrance shots get the landing hit at `settleAt` of
+     *  their duration (the whoosh is the beat's own `cut_*` cue). */
+    if (cameraShot.durMs > 0 && (cameraShot.blurFrom > 0 || cameraShot.zoomFrom > cameraShot.zoomTo)) {
+      audio.play('shot_settle', { delayMs: Math.round(DEFAULT_QUEST_THEATRE_FX.cinema.settleAt * cameraShot.durMs) });
+    }
     return undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theatreCue?.key]);
@@ -444,19 +562,33 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     onExpandedStageChange?.(cueExpanded);
   }, [cueExpanded, onExpandedStageChange]);
   /** Choice commit — the gesture unlocks WebAudio (`resume()` inside the
-   *  click, autoplay gate) and the brass click lands the commit. Under
-   *  reduced motion the whole audio path stays dormant (BV-09): no context
-   *  is instantiated for a cue that would never play. */
+   *  click, autoplay gate) and the brass click lands the commit. PLAN-050
+   *  §6: the press locks the row for `choiceCommitLockMs` before the
+   *  consequence — the tactile "committed" beat (camera stays still;
+   *  agency is UI-side). Under reduced motion the whole audio path stays
+   *  dormant (BV-09): no context is instantiated for a cue that would
+   *  never play. */
+  const [commitLock, setCommitLock] = useState<string | null>(null);
   const handleChoose = useCallback(
     (optionId: string) => {
+      if (commitLock) return;
       if (!reducedMotion) {
         const audio = getQuestTheatreAudio();
         audio.resume();
         audio.play('choice_commit');
+        const lockMs = DEFAULT_QUEST_THEATRE_FX.cinema.choiceCommitLockMs;
+        if (lockMs > 0) {
+          setCommitLock(optionId);
+          window.setTimeout(() => {
+            onChoose(optionId);
+            setCommitLock(null);
+          }, lockMs);
+          return;
+        }
       }
       onChoose(optionId);
     },
-    [onChoose, reducedMotion],
+    [onChoose, reducedMotion, commitLock],
   );
   /* R-196 previews: the armed per-item set is the source of truth — check
    *  items light their winner, action items pre-mutate a clone. `base` is the
@@ -491,6 +623,33 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
    * roster's +HP chips read `memberDeltas`, the log stays clean. */
   const actionPreview = useMemo(() => previewArmedActionItems(run, armedFlags), [run, armedFlags]);
   const waiting = !run.ended && options.length > 0;
+  /* T-A5 (R-239): the fold must land on a row boundary. A fixed pixel cap
+   *  cuts the straddling row in half — round `choicesMaxHeightPx` DOWN to a
+   *  multiple of the measured row pitch (`offsetTop` delta covers margins
+   *  and gaps). Re-measures when the row set changes; never clips a row. */
+  const choicesListRef = useRef<HTMLDivElement>(null);
+  const [choicesCapPx, setChoicesCapPx] = useState(questWindow.choicesMaxHeightPx);
+  useLayoutEffect(() => {
+    const list = choicesListRef.current;
+    if (!list) return undefined;
+    const measure = () => {
+      const rows = list.querySelectorAll<HTMLElement>(
+        '[data-testid="quest-window-choice"], [data-testid="quest-window-close-report"]',
+      );
+      const r0 = rows[0];
+      const r1 = rows[1];
+      const pitch = r0 ? (r1 ? r1.offsetTop - r0.offsetTop : r0.offsetHeight) : 0;
+      const cap = pitch > 0
+        ? Math.max(pitch, Math.floor(questWindow.choicesMaxHeightPx / pitch) * pitch)
+        : questWindow.choicesMaxHeightPx;
+      setChoicesCapPx((prev) => (prev === cap ? prev : cap));
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(list);
+    return () => ro.disconnect();
+  }, [questWindow.choicesMaxHeightPx, options.length, waiting, run.ended, presenting]);
   // What just happened: this action's checks speak through their authored verdict
   // lines; `lastEvent` only when it adds something (not the check summary, the
   // scene body or the quest's own flavour line again).
@@ -503,12 +662,11 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     run.lastEvent !== flavour &&
     !(lastTitle && run.lastEvent.startsWith(`${lastTitle} —`));
   const currentBeat = phases[phases.length - 1]?.beat ?? 0;
-  // The scene's own title, unless it only repeats the quest's: then the phase name.
-  const caption = node && !node.title.toLowerCase().includes(title.toLowerCase()) ? node.title : beats[currentBeat] ?? '';
-  const captionHidden = !!node?.hidden && caption === node.title;
 
   // 1–9 pick a choice, as in a dialogue list; never while typing, minimised,
-  // or while a beat is still on stage.
+  // or while a beat is still on stage. CAPTURE phase: this listener must run
+  // before the frame-level speed keys (bubble), which honor defaultPrevented —
+  // speed changes only when no selection is pending (R-231 ruling).
   useEffect(() => {
     if (minimised || !waiting || presenting) return undefined;
     const onKey = (event: KeyboardEvent) => {
@@ -522,8 +680,8 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         handleChoose(option.id);
       }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
   }, [minimised, waiting, presenting, options, handleChoose]);
 
   // R-199 pt.1: while a beat plays, ANY key advances it — same as clicking
@@ -545,8 +703,8 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
       event.preventDefault();
       advancePresentation();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
   }, [presenting, minimised, advancePresentation]);
 
   // The page learns when beats are on stage — the external reward popup
@@ -563,12 +721,14 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
        * plaque from the solver's vertical budget). */
       { position: 'absolute', inset: 0, pointerEvents: 'auto' }
     : { position: 'fixed', left: anchor?.left ?? 0, top: anchorTop, pointerEvents: 'auto', ...panelStyle, zIndex: panelStyle.zIndex ?? zIndex };
-  const plaqueMaxH = inCluster ? '100%' : `calc(100vh - ${anchorTop}px - ${companions.edgeInsetPx}px)`;
+  /* `vhU` is chrome units: inside the CSS-zoomed layer `100vh` would resolve
+   *  to viewport×zoom — the unit-space height is `vhU` (DEF-06). */
+  const plaqueMaxH = inCluster ? '100%' : `${Math.max(0, vhU - anchorTop - companions.edgeInsetPx)}px`;
   /* PLAN-040 T-001: on short viewports the theatre floor lowers so a choice
    * row + the phase tiles stay reachable above the scroll fold —
    * `min(theaterMinHeightPx, max(theaterMinHeightShortPx, cap*share))`. The
    * cap mirrors `plaqueMaxH` numerically (same anchor + edge inset). */
-  const plaqueCapPx = Math.max(0, vh - anchorTop - companions.edgeInsetPx);
+  const plaqueCapPx = Math.max(0, vhU - anchorTop - companions.edgeInsetPx);
   const theatreMinH = Math.min(
     questWindow.theaterMinHeightPx,
     Math.max(questWindow.theaterMinHeightShortPx, Math.floor(plaqueCapPx * questWindow.theaterMaxShareOfPlaque)),
@@ -622,18 +782,20 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             as="section"
             aria-label={title}
             data-testid="quest-window-minimised"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '8px 18px' }}
           >
-            <div {...handleProps} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <EngravedIcon id="evt-combat" size={18} style={{ color: TONE.accent }} />
-              <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>
-                {title}
+            <div {...handleProps} style={{ ...handleProps.style, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, paddingLeft: 4, minWidth: 0 }}>
+                <EngravedIcon id="evt-combat" size={18} style={{ color: TONE.accent, flexShrink: 0 }} />
+                <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {title}
+                </span>
+                <span style={{ fontFamily: FONT.display, fontSize: 12, color: TONE.secondary, flexShrink: 0 }}>
+                  {Math.min(currentBeat + 1, beats.length)}/{beats.length}
+                </span>
+                {waiting && <span aria-label={t('gameFrame.questWindow.waiting')} title={t('gameFrame.questWindow.waiting')} style={{ width: 8, height: 8, borderRadius: 999, background: 'var(--skin-title-color)', boxShadow: '0 0 8px var(--skin-title-color)', flexShrink: 0 }} />}
               </span>
-              <span style={{ fontFamily: FONT.display, fontSize: 12, color: TONE.secondary }}>
-                {Math.min(currentBeat + 1, beats.length)}/{beats.length}
-              </span>
-              {waiting && <span aria-label={t('gameFrame.questWindow.waiting')} title={t('gameFrame.questWindow.waiting')} style={{ width: 8, height: 8, borderRadius: 999, background: 'var(--skin-title-color)', boxShadow: '0 0 8px var(--skin-title-color)' }} />}
-              <span data-hud-controls="" style={{ display: 'inline-flex' }}>
+              <span data-hud-controls="" style={{ display: 'inline-flex', marginLeft: 'auto', flexShrink: 0 }}>
                 <button type="button" aria-label={t('gameFrame.questWindow.restore')} title={t('gameFrame.questWindow.restore')} onClick={() => setMinimised(false)}>
                   <EngravedIcon id="ico-scroll" />
                 </button>
@@ -676,7 +838,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             data-testid="quest-companion-tab"
             aria-expanded={false}
             aria-controls={partyPanelId}
-            title={t('gameFrame.questWindow.roster')}
+            title={t('gameFrame.questWindow.partyStatus', { alive: run.party.filter((m) => !m.dead).length, total: run.party.length })}
             onClick={() => setPill('party')}
             style={{
               position: 'absolute',
@@ -712,7 +874,9 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           /* Cluster mode: the solver's slot owns the width — a self-sized
            * plaque would overflow into the right wing's reserved column
            * (BV-01 measured this: plaque 820 in a 760 slot). */
-          style={{ width: inCluster ? '100%' : widthPx, maxHeight: plaqueMaxH, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px' }}
+          /* R-239 T-B3(d): the plaque is game chrome — text must never become
+           * selectable while dragging or clicking through the theatre. */
+          style={{ width: inCluster ? '100%' : widthPx, maxHeight: plaqueMaxH, display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 14px 14px', userSelect: 'none' }}
         >
         {/* ── Title row = drag handle; every icon lives on its right ── */}
         <div {...handleProps} title={t('gameFrame.panel.dragHint')} style={{ ...handleProps.style, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -760,25 +924,43 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               onClick={() => setPill(logOpen ? null : 'log')}
             />
             {checkCfg.optionsPanel && !run.ended && (
+              <HudTooltip label={t('gameFrame.questWindow.checkOptions')}>
+                <button
+                  type="button"
+                  ref={checkOptsToggleRef}
+                  aria-label={t('gameFrame.questWindow.checkOptions')}
+                  aria-expanded={checkOptsOpen}
+                  aria-controls={checkOptsPanelId}
+                  data-testid="quest-check-options-toggle"
+                  onClick={() => setCheckOptsOpen((v) => !v)}
+                >
+                  <EngravedIcon id="ico-spark" />
+                </button>
+              </HudTooltip>
+            )}
+            <HudTooltip label={t('gameFrame.questWindow.minimise')}>
+              <button type="button" data-keep="" aria-label={t('gameFrame.questWindow.minimise')} onClick={() => setMinimised(true)}>
+                <EngravedIcon id="cmd-minimize" />
+              </button>
+            </HudTooltip>
+            {/* R-239: while a check beat is held the check owns this window —
+                closing would evaporate the presentation (the bridge dies with
+                the window and no fallback can mount). The button stays put,
+                disabled, and its tooltip says why. */}
+            <HudTooltip label={astroActive ? t('gameFrame.questWindow.checkInProgress') : t('gameFrame.panels.close')} disabled={astroActive}>
               <button
                 type="button"
-                ref={checkOptsToggleRef}
-                aria-label={t('gameFrame.questWindow.checkOptions')}
-                title={t('gameFrame.questWindow.checkOptions')}
-                aria-expanded={checkOptsOpen}
-                aria-controls={checkOptsPanelId}
-                data-testid="quest-check-options-toggle"
-                onClick={() => setCheckOptsOpen((v) => !v)}
+                data-keep=""
+                aria-label={t('gameFrame.panels.close')}
+                /* While disabled the Radix trigger wraps a span — keep the
+                 * reason on the button itself for SR users (INV:R-239-check-held-window). */
+                title={astroActive ? t('gameFrame.questWindow.checkInProgress') : undefined}
+                disabled={astroActive}
+                onClick={onClose}
               >
-                <EngravedIcon id="ico-spark" />
+                <EngravedIcon id="cmd-close" />
               </button>
-            )}
-            <button type="button" data-keep="" aria-label={t('gameFrame.questWindow.minimise')} title={t('gameFrame.questWindow.minimise')} onClick={() => setMinimised(true)}>
-              <EngravedIcon id="cmd-minimize" />
-            </button>
-            <button type="button" data-keep="" aria-label={t('gameFrame.panels.close')} title={t('gameFrame.panels.close')} onClick={onClose}>
-              <EngravedIcon id="cmd-close" />
-            </button>
+            </HudTooltip>
           </div>
         </div>
 
@@ -801,12 +983,18 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           </div>
         )}
         {/* ── Content column: everything under the pinned title row lives in
-            ONE internally-scrolling region. On a height-capped plaque (short
-            viewports) the theatre still yields first via its min-height
-            floor, and whatever remains scrolls inside the plaque — content
-            never paints past the frame (the plaque itself keeps
-            `overflow:visible`: its SVG drop-shadow must not clip). ── */}
-        <div className="quest-s1-scroll" style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
+            ONE region that NEVER scrolls (R-259 — no component scrollbar:
+            only the narrative text box may scroll internally). On a
+            height-capped plaque the theatre yields first via its min-height
+            floor, then the text box shrinks and scrolls inside. ── */}
+        <div className="quest-s1-scroll" style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }}>
+
+        {/* ── R-259: art + text + choices form ONE vertically-centred stack —
+            the choices glue to the end of the text and the slack splits
+            above/below the block instead of pooling between text and
+            buttons («allinea i pulsanti alla fine del testo … tutto il più
+            centrato possibile»). The footer stays pinned outside. ── */}
+        <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
 
         {/* ── Flavour: the quest's one line, above the picture ── */}
         <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 14, lineHeight: 1.4, color: TONE.secondary }}>{flavour}</p>
@@ -831,6 +1019,9 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
                 }
               : undefined
           }
+          /* R-259: NO `flexGrow` — the art keeps its authored aspect and the
+             centred stack distributes the slack above/below the whole block.
+             `theatreMinH` still floors the shrink on short viewports. */
           style={{ display: 'flex', flexDirection: 'column', minHeight: theatreMinH, flexShrink: 1, overflow: 'hidden', ...(presenting ? { cursor: 'pointer' } : {}) }}
         >
         {/* WS-4 cinema layers (artifact-r003 §4): the cue's tags each mount
@@ -847,7 +1038,9 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         >
         <StageImpactShake
           cueKey={theatreCue?.key ?? ''}
-          active={cueHasTag(theatreCue, 'impact') && DEFAULT_QUEST_THEATRE_FX.cinema.impact.enabled}
+          /* PLAN-050 §4: depth scenes shake through the trauma channel
+           *  (depth-weighted, FG>BG) — the flat DOM shake would double. */
+          active={cueHasTag(theatreCue, 'impact') && DEFAULT_QUEST_THEATRE_FX.cinema.impact.enabled && !cineForBeat}
           ampPx={DEFAULT_QUEST_THEATRE_FX.cinema.impact.ampPx}
           durationMs={DEFAULT_QUEST_THEATRE_FX.cinema.impact.durationMs}
           reducedMotion={reducedMotion}
@@ -867,12 +1060,21 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           reducedMotion={reducedMotion}
         >
         <Theater
-          src={artFor(beatCursor.current?.kind === 'scene' ? beatCursor.current.nodeId : run.nodeId)}
-          caption={caption}
-          hidden={captionHidden}
+          src={theaterArtSrc}
           aspect={expandedStage || cueHasTag(theatreCue, 'expanded') ? clusterCfg.expandedTheaterAspect : theaterAspect}
           shot={cameraShot}
-          shotKey={theatreCue?.key ?? 'idle'}
+          shotKey={activeShotKey}
+          traumaStrength={
+            reducedMotion
+              ? 0
+              : beatCursor.current?.kind === 'harm'
+                ? beatCursor.current.harm.kind === 'death'
+                  ? 1
+                  : 0.75
+                : cueHasTag(theatreCue, 'impact')
+                  ? 0.6
+                  : 0
+          }
           reducedMotion={reducedMotion}
         >
           {/* WS-4: a `reveal` cut opens the frame through the aperture —
@@ -882,6 +1084,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               cueKey={theatreCue?.key ?? ''}
               durationMs={DEFAULT_QUEST_THEATRE_FX.cinema.revealMs}
               fadeMs={DEFAULT_QUEST_THEATRE_FX.cinema.reducedMotionFadeMs}
+              startInsetPct={DEFAULT_QUEST_THEATRE_FX.cinema.revealStartInsetPct}
               color="var(--skin-hud-lacquer-deep)"
               reducedMotion={reducedMotion}
             />
@@ -937,11 +1140,22 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           />
         ) : (
         <div
-          className="quest-s1-scroll"
           data-testid="quest-window-stage"
           aria-live="polite"
           tabIndex={-1}
-          style={{ maxHeight: stageMaxHeightPx, minHeight: questWindow.stageMinHeightPx, flexShrink: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6, outline: 'none' }}
+          /* R-259 (Director ruling — supersedes R-241 B2 fixed height and
+             R-253 top-flow): the text box hugs its copy so the choices glue
+             to the end of the text («allinea i pulsanti alla fine del
+             testo»). `maxHeight: stageMaxHeightPx` is the only cap; long
+             copy scrolls INSIDE this box — the only scrollable surface in
+             the component (`overflowX` always hidden). `flexShrink: 1` lets
+             the box yield under short-viewport pressure instead of pushing
+             siblings around. */
+          style={{ maxHeight: stageMaxHeightPx, flexShrink: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden', outline: 'none' }}
+        >
+        <div
+          className="quest-s1-scroll"
+          style={{ display: 'flex', flexDirection: 'column', gap: 6 }}
         >
           {/* PLAN-040 T-005: the resolved-check verdict block left the stage —
               the outcome surfaces in the external `QuestOutcomeToast` (all
@@ -957,18 +1171,12 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           {!run.ended && run.frontier.status === 'pending' && node?.transit && (
             <p style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 13, lineHeight: 1.45, color: TONE.secondary }}>{node.transit}</p>
           )}
-          {/* R-199 pt.11: a waiting frontier whose slot has not come yet says
-              so — the choices below stay visible but locked. */}
-          {frontierLocked && (
-            <p data-testid="quest-window-locked" style={{ margin: 0, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 13, lineHeight: 1.45, color: TONE.secondary }}>
-              {t('gameFrame.questWindow.phaseLocked')}
-            </p>
-          )}
           {run.ended && (
-            <p style={{ margin: 0, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: run.outcome === 'wipe' ? TONE.death : TONE.label }}>
+            <p style={{ margin: 0, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: run.outcome === 'wipe' ? toneText('death') : TONE.label }}>
               {t(`questS1Lab.outcome.${run.outcome}`)}
             </p>
           )}
+        </div>
         </div>
         )}
 
@@ -989,20 +1197,35 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
               <BeltItemChips items={bag} statuses={beltStatuses} armedFlags={armedFlags} onToggleFlag={onToggleArmedFlag ?? (() => undefined)} size={24} />
             </div>
           )}
-          <div data-hud-choices className="quest-s1-scroll" style={{ display: 'flex', flexDirection: 'column', margin: '0 -4px', padding: '0 4px', maxHeight: questWindow.choicesMaxHeightPx, minHeight: 0, overflowY: 'auto' }}>
-            {waiting && frontierLocked && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 4px 2px' }} data-testid="quest-phase-locked">
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.muted }}>
-                  <EngravedIcon id="cmd-lock" size={12} />
-                  {t('gameFrame.questWindow.phaseLocked')}
-                </span>
-              </div>
-            )}
+          {/* T-A5: the lock strip is NOT a choice row — pinned above the
+              scrollable so the rounded cap lands on a row boundary. */}
+          {waiting && frontierLocked && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 4px 2px' }} data-testid="quest-window-locked">
+              <span data-testid="quest-phase-locked" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.muted }}>
+                <EngravedIcon id="cmd-lock" size={12} />
+                {t('gameFrame.questWindow.phaseLocked')}
+              </span>
+            </div>
+          )}
+          <div ref={choicesListRef} data-hud-choices className="quest-s1-scroll" style={{ display: 'flex', flexDirection: 'column', margin: '0 -4px', padding: '0 4px', maxHeight: choicesCapPx, minHeight: 0, overflowY: 'auto' }}>
             {waiting &&
               options.map((o, i) => {
                 const { pv, base } = previews[o.id] ?? { pv: null, base: null };
                 return (
-                  <button key={o.id} type="button" data-skin="choice" data-testid="quest-window-choice" data-option-id={o.id} disabled={o.disabled} onClick={() => handleChoose(o.id)}>
+                  <button
+                    key={o.id}
+                    type="button"
+                    data-skin="choice"
+                    data-testid="quest-window-choice"
+                    data-option-id={o.id}
+                    disabled={o.disabled || !!commitLock}
+                    onClick={() => handleChoose(o.id)}
+                    style={
+                      commitLock === o.id
+                        ? { transform: 'scale(0.975)', filter: 'brightness(0.85)', transition: 'transform 90ms ease-out, filter 90ms ease-out' }
+                        : undefined
+                    }
+                  >
                     <span data-choice-index style={{ fontFamily: FONT.display, fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>{i + 1}.</span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
                       <span style={{ fontFamily: FONT.display, fontSize: 15, color: 'var(--skin-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flexShrink: 0, maxWidth: '55%' }}>{o.label}</span>
@@ -1029,6 +1252,9 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
           </div>
           </div>
         )}
+
+        </div>
+        {/* ── end of the centred stack (R-259) ── */}
 
         {/* ── Footer C1 (WS-4): collapsible strip — TimeBar on top, then the
             engraved phase track (visited + current + the next as a question
@@ -1100,18 +1326,42 @@ const BeatStage: React.FC<{
   fx: BeatFx;
   fxConfig: QuestTheatreFxConfig;
   reducedMotion: boolean;
-  /** Cap on the narrative column's height (config `stageMaxHeightPx`). */
+  /** Height cap for the narrative box (config `stageMaxHeightPx`) —
+   *  R-259: the box hugs its copy (`maxHeight`, never a fixed `height`) so
+   *  the choices glue to the end of the text; long copy scrolls inside. */
   maxHeightPx?: number;
 }> = ({ beat, hidden, remaining, onAdvance, checkSpinning, verdictInColumn = false, fx, fxConfig, reducedMotion, maxHeightPx }) => {
   const { t } = useTranslation('idleVillage');
+  /* PLAN-050 §6 — verdict slam: the verdict row mounts the moment the roll
+   *  resolves (checkSpinning flips) — it lands WITH the stinger, a quick
+   *  scale-punch rather than a fade. Reduced motion keeps the plain swap. */
+  const verdictRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = verdictRef.current;
+    if (!el?.animate || reducedMotion || beat.kind !== 'check' || checkSpinning) return undefined;
+    const anim = el.animate(
+      [
+        { transform: 'scale(1.22) translateY(-4px)', opacity: 0 },
+        { transform: 'scale(1) translateY(0)', opacity: 1, offset: 0.55 },
+        { transform: 'scale(0.97)', offset: 0.75 },
+        { transform: 'scale(1)' },
+      ],
+      { duration: 240, easing: 'ease-out' },
+    );
+    return () => anim.cancel();
+  }, [beat.id, beat.kind, checkSpinning, reducedMotion]);
   return (
     <div
       data-testid="quest-window-beat"
       aria-live="polite"
       tabIndex={-1}
       onClick={onAdvance}
-      className="quest-s1-scroll"
-      style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 6, minHeight: 96, maxHeight: maxHeightPx, overflowY: 'auto', outline: 'none', cursor: 'pointer' }}
+      /* R-259 (Director ruling — supersedes R-241 B2 and R-253 top-flow):
+         `maxHeight` cap, never a fixed height — the box hugs its copy so
+         the choices glue to the end of the text; long copy scrolls inside
+         (`overflowX` always hidden). `flexShrink: 1` yields under
+         short-viewport pressure instead of pushing siblings. */
+      style={{ position: 'relative', display: 'flex', flexDirection: 'column', maxHeight: maxHeightPx, overflowY: 'auto', overflowX: 'hidden', flexShrink: 1, minHeight: 0, outline: 'none', cursor: 'pointer' }}
     >
       {fx.flashTone && (
         <EdgeFlash
@@ -1121,6 +1371,10 @@ const BeatStage: React.FC<{
           reducedMotion={reducedMotion}
         />
       )}
+      <div
+        className="quest-s1-scroll"
+        style={{ display: 'flex', flexDirection: 'column', gap: 6 }}
+      >
       {beat.kind === 'scene' && (
         <>
           <span style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: TONE.secondary }}>
@@ -1150,7 +1404,7 @@ const BeatStage: React.FC<{
       )}
       {beat.kind === 'check' && !checkSpinning && !verdictInColumn && (
         <>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <div ref={verdictRef} style={{ display: 'flex', alignItems: 'baseline', gap: 6, transformOrigin: 'left center' }}>
             <HudChip tone={VERDICT_TONE[beat.check.verdict]}>{t(`questS1Lab.verdict.${beat.check.verdict}`)}</HudChip>
             <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.06em', color: TONE.secondary }}>{beat.check.title}</span>
           </div>
@@ -1178,16 +1432,16 @@ const BeatStage: React.FC<{
             borderLeft: beat.harm.kind === 'death' ? `2px solid ${TONE.death}` : `2px solid ${TONE.warn}`,
           }}
         >
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.06em', color: beat.harm.kind === 'death' ? TONE.death : TONE.warn }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.06em', color: beat.harm.kind === 'death' ? toneText('death') : TONE.warn }}>
             {beat.harm.kind === 'death' && <EngravedIcon id="status-fallen" size={13} />}
             {beat.memberName}
           </span>
-          {beat.line && <span style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: beat.harm.kind === 'death' ? TONE.death : TONE.label }}>{beat.line}</span>}
+          {beat.line && <span style={{ fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.4, color: beat.harm.kind === 'death' ? toneText('death') : TONE.label }}>{beat.line}</span>}
         </div>
       )}
       {beat.kind === 'end' && (
         <>
-          <p style={{ margin: 0, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: beat.outcome === 'wipe' ? TONE.death : TONE.label }}>
+          <p style={{ margin: 0, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: beat.outcome === 'wipe' ? toneText('death') : TONE.label }}>
             {t(`questS1Lab.outcome.${beat.outcome}`)}
           </p>
           <Line tone="secondary">{beat.text}</Line>
@@ -1198,6 +1452,7 @@ const BeatStage: React.FC<{
           {t('gameFrame.questWindow.beats.recap', { scenes: beat.scenes, checks: beat.checks, deaths: beat.deaths, wounds: beat.wounds })}
         </Line>
       )}
+      </div>
       {/* No control here — R-199 pt.1: the whole card is the affordance,
           the hint says so (click or any key). */}
       <span style={{ fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.muted, marginTop: 'auto' }}>
@@ -1240,21 +1495,31 @@ const CombatStrip: React.FC<{
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <EngravedIcon id="evt-combat" size={13} style={{ color: TONE.danger }} />
-        <span data-testid="combat-enemy-pips" aria-label={t('gameFrame.questWindow.combat.enemiesLeft', { count: run.goblinLeft })} style={{ display: 'inline-flex', gap: 3 }}>
+        <EngravedIcon id="evt-combat" size={13} style={{ color: toneText('danger') }} />
+        <span data-testid="combat-enemy-pips" title={t('gameFrame.questWindow.combat.enemiesLeft', { count: run.goblinLeft })} aria-label={t('gameFrame.questWindow.combat.enemiesLeft', { count: run.goblinLeft })} style={{ display: 'inline-flex', gap: 3 }}>
           {Array.from({ length: spec.enemies }, (_, i) => (
+            /* ● standing · ✕ downed — the mark contrast is the legend. */
             <span
               key={i}
               aria-hidden
               data-filled={i < run.goblinLeft}
               style={{
-                width: 7,
-                height: 7,
+                width: 9,
+                height: 9,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 borderRadius: 999,
+                fontFamily: FONT.display,
+                fontSize: 8,
+                lineHeight: 1,
                 background: i < run.goblinLeft ? TONE.danger : 'transparent',
                 border: `1px solid ${i < run.goblinLeft ? TONE.danger : 'color-mix(in srgb, var(--skin-text-muted) 55%, transparent)'}`,
+                color: 'color-mix(in srgb, var(--skin-text-muted) 70%, transparent)',
               }}
-            />
+            >
+              {i < run.goblinLeft ? '' : '✕'}
+            </span>
           ))}
         </span>
         <span style={{ marginLeft: 'auto', fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.04em', color: TONE.secondary }}>
@@ -1293,7 +1558,7 @@ const CombatStrip: React.FC<{
                     fontFamily: FONT.display,
                     fontSize: 12,
                     fontVariantNumeric: 'tabular-nums',
-                    color: ex >= maxExposure ? TONE.danger : TONE.muted,
+                    color: ex >= maxExposure ? toneText('danger') : TONE.muted,
                   }}
                 >
                   {Math.round(ex)}%
@@ -1306,7 +1571,7 @@ const CombatStrip: React.FC<{
                 <DamageFloater
                   floatKey={hitBeat.id}
                   amount={hitBeat.harm.amount}
-                  color={hitBeat.harm.kind === 'death' ? TONE.death : TONE.danger}
+                  color={hitBeat.harm.kind === 'death' ? toneText('death') : toneText('danger')}
                   durationMs={fxConfig.damageFloater.durationMs}
                   risePx={fxConfig.damageFloater.risePx}
                   reducedMotion={reducedMotion || !fxConfig.damageFloater.enabled}
@@ -1336,22 +1601,29 @@ const HiddenMark: React.FC = () => {
  *  the always-mounted fallback. Scenes without depth keep the legacy path. */
 const Theater: React.FC<{
   src?: string;
-  caption: string;
-  hidden?: boolean;
   aspect: number;
   children?: React.ReactNode;
   shot?: CameraShot;
   shotKey?: string;
+  /** PLAN-050 §4 — trauma shake amplitude at this beat's epoch (0 = off). */
+  traumaStrength?: number;
   reducedMotion?: boolean;
-}> = ({ src, caption, hidden, aspect, children, shot, shotKey = 'idle', reducedMotion = false }) => {
+}> = ({ src, aspect, children, shot, shotKey = 'idle', traumaStrength = 0, reducedMotion = false }) => {
   const img = useRef<HTMLImageElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const cine = useMemo(() => cinematicEntryForSrc(src), [src]);
-  /* Shot epoch on the shared clock — resets when a new beat lands on stage. */
-  const epochRef = useRef<{ key: string; t: number }>({ key: shotKey, t: 0 });
+  /* Shot epoch on the shared clock — resets when a new beat lands on stage.
+   *  R-242: on a REMOUNT the epoch seeds at now (not 0) — the aperture/push
+   *  layers always re-fire on mount, so a `t:0` epoch would leave the GPU
+   *  camera already landed under a replaying cut (the frame sits still while
+   *  the veil opens over it). Seeding now replays the shot coherently. */
+  const epochRef = useRef<{ key: string; t: number }>({ key: shotKey, t: documentClock() });
   if (epochRef.current.key !== shotKey) {
     epochRef.current = { key: shotKey, t: documentClock() };
   }
+  /* R-245 (Director, 2026-10-21): NO text is ever painted over the artwork —
+   *  the PLAN-050 §6 diegetic caption is removed; the frame renders art and
+   *  fx layers only. Node identity lives in the scene text below. */
   /* Dev-only manifest warning — production falls back silently (OB-3). */
   useEffect(() => {
     if (import.meta.env.DEV && src && !cine && DEFAULT_QUEST_THEATRE_FX.depth.enabled) {
@@ -1376,7 +1648,7 @@ const Theater: React.FC<{
     };
   }, [src, cine]);
   return (
-    <div style={{ position: 'relative', aspectRatio: String(aspect), flexShrink: 1, minHeight: 0, overflow: 'hidden', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)', background: 'var(--skin-hud-lacquer-deep)' }}>
+    <div data-testid="quest-theatre-frame" style={{ position: 'relative', aspectRatio: String(aspect), flexShrink: 1, minHeight: 0, overflow: 'hidden', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)', background: 'var(--skin-hud-lacquer-deep)' }}>
       {src && cine && shot ? (
         <div ref={wrap} key={src} style={{ position: 'absolute', inset: 0 }}>
           <DepthScene
@@ -1389,6 +1661,11 @@ const Theater: React.FC<{
             shotEpoch={epochRef.current.t}
             cfg={DEFAULT_QUEST_THEATRE_FX.depth}
             reducedMotion={reducedMotion}
+            ambient
+            ambientFx={cine.ambient}
+            atmosphere={cine.atmosphere}
+            traumaEpoch={epochRef.current.t}
+            traumaStrength={traumaStrength}
           />
         </div>
       ) : (
@@ -1397,15 +1674,16 @@ const Theater: React.FC<{
       <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 95% at 50% 40%, transparent 55%, color-mix(in srgb, var(--skin-hud-lacquer-deep) 70%, transparent))' }} />
       <div aria-hidden style={{ position: 'absolute', insetInline: 0, bottom: 0, height: '55%', background: SCRIM.bottom }} />
       {children}
-      <div style={{ position: 'absolute', left: 12, right: 12, bottom: 8, fontFamily: FONT.display, fontSize: 14, letterSpacing: '0.06em', color: 'var(--skin-title-color)', textShadow: 'var(--skin-incision-label)' }}>
-        {hidden && <HiddenMark />}
-        {caption}
-      </div>
     </div>
   );
 };
 
-const TimeBar: React.FC<{ progress: number; label: string; phase: string }> = ({ progress, label, phase }) => {
+const TimeBar: React.FC<{ progress: number; label: string; phase: string; checkpoints?: TimeBarCheckpoint[] }> = ({
+  progress,
+  label,
+  phase,
+  checkpoints = [],
+}) => {
   const pct = Math.round(Math.min(1, Math.max(0, progress)) * 100);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -1415,18 +1693,42 @@ const TimeBar: React.FC<{ progress: number; label: string; phase: string }> = ({
         aria-valuemax={100}
         aria-valuenow={pct}
         aria-label={label}
-        style={{ position: 'relative', height: 4, borderRadius: 2, overflow: 'hidden', background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 85%, transparent)', border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)' }}
+        style={{ position: 'relative', height: 6, borderRadius: 3, overflow: 'visible', background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 85%, transparent)', border: '1px solid color-mix(in srgb, var(--skin-surface-border) 45%, transparent)' }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            transformOrigin: 'left center',
-            transform: `scaleX(${pct / 100})`,
-            transition: 'transform 600ms linear',
-            background: 'linear-gradient(90deg, color-mix(in srgb, var(--skin-title-color) 55%, transparent), var(--skin-title-color))',
-          }}
-        />
+        <div style={{ position: 'absolute', inset: 0, borderRadius: 2, overflow: 'hidden' }}>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              transformOrigin: 'left center',
+              transform: `scaleX(${pct / 100})`,
+              transition: 'transform 600ms linear',
+              background: 'linear-gradient(90deg, color-mix(in srgb, var(--skin-title-color) 55%, transparent), var(--skin-title-color))',
+            }}
+          />
+        </div>
+        {checkpoints.map((cp) => (
+          <span
+            key={cp.beat}
+            data-testid="quest-timebar-checkpoint"
+            data-reached={cp.reached}
+            data-current={cp.current}
+            title={cp.label}
+            aria-label={cp.label}
+            style={{
+              position: 'absolute',
+              left: `${Math.min(100, Math.max(0, cp.fraction * 100))}%`,
+              top: -2,
+              bottom: -2,
+              width: 2,
+              transform: 'translateX(-50%)',
+              borderRadius: 1,
+              background: cp.reached || cp.current ? 'var(--skin-title-color)' : 'color-mix(in srgb, var(--skin-surface-border) 85%, transparent)',
+              boxShadow: cp.current ? '0 0 6px var(--skin-title-color)' : undefined,
+              pointerEvents: 'auto',
+            }}
+          />
+        ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.06em', color: TONE.secondary }}>
         <span>{label}</span>
@@ -1481,7 +1783,7 @@ const PhaseTile: React.FC<{ phase: PhaseRecord; name: string; current: boolean; 
           >
             <EngravedIcon id={iconId} size={18} />
             {played && outcome === 'clean' && <EngravedIcon id="role-bodyguard" size={12} style={{ position: 'absolute', right: 2, bottom: 2, color: TONE.ok }} />}
-            {outcome === 'death' && <EngravedIcon id="status-fallen" size={12} style={{ position: 'absolute', right: 2, bottom: 2, color: TONE.death }} />}
+            {outcome === 'death' && <EngravedIcon id="status-fallen" size={12} style={{ position: 'absolute', right: 2, bottom: 2, color: toneText('death') }} />}
           </button>
         </Tooltip.Trigger>
         <Tooltip.Portal>
@@ -1526,10 +1828,29 @@ const NextTile: React.FC<{ label: string }> = ({ label }) => (
   </li>
 );
 
-/** WS-4 header pill — a LABELED toggle (icon + text) opening the left
- *  companion column on its tab. Replaces the R-196 icon-only row: the pills
- *  read at a glance and hit a real click target (Director's "pulsanti poco
- *  visibili" feedback). */
+/** R-239 T-B4 — one Radix tooltip skin shared by every header control, same
+ *  chrome as the timeline tiles. `disabled`: a disabled button swallows
+ *  pointer events, so the hint wraps it in a span to stay reachable — the
+ *  player still learns why the control is off (e.g. close during a check). */
+const HudTooltip: React.FC<{ label: string; disabled?: boolean; children: React.ReactNode }> = ({ label, disabled, children }) => (
+  <Tooltip.Root delayDuration={120}>
+    <Tooltip.Trigger asChild>
+      {disabled ? (
+        <span tabIndex={0} aria-label={label} style={{ display: 'inline-flex', cursor: 'not-allowed' }}>{children}</span>
+      ) : (
+        children
+      )}
+    </Tooltip.Trigger>
+    <Tooltip.Portal>
+      <Tooltip.Content side="bottom" sideOffset={6} style={{ zIndex: 2000, maxWidth: 260, padding: '6px 9px', borderRadius: 8, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)', background: 'var(--skin-hud-lacquer-deep)', boxShadow: '0 10px 24px color-mix(in srgb, var(--skin-hud-lacquer-deep) 80%, transparent)' }}>
+        <span style={{ fontFamily: FONT.display, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>{label}</span>
+      </Tooltip.Content>
+    </Tooltip.Portal>
+  </Tooltip.Root>
+);
+
+/** R-231 #3 header pill — icon-only toggle (with status pips/dot + tooltip)
+ *  opening the left companion column on its tab. */
 const HeaderPill: React.FC<{
   refEl: React.RefObject<HTMLButtonElement | null>;
   icon: EngravedIconId;
@@ -1540,36 +1861,32 @@ const HeaderPill: React.FC<{
   testId?: string;
   children?: React.ReactNode;
 }> = ({ refEl, icon, label, active, ariaControls, onClick, testId, children }) => (
-  <button
-    type="button"
-    ref={refEl}
-    aria-label={label}
-    title={label}
-    aria-expanded={active}
-    aria-controls={ariaControls}
-    data-testid={testId}
-    onClick={onClick}
-    style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 5,
-      padding: '3px 9px',
-      borderRadius: 999,
-      border: `1px solid ${active ? 'var(--skin-title-color)' : 'color-mix(in srgb, var(--skin-surface-border) 60%, transparent)'}`,
-      background: active ? 'color-mix(in srgb, var(--skin-title-color) 14%, transparent)' : 'transparent',
-      color: active ? 'var(--skin-title-color)' : TONE.label,
-      fontFamily: FONT.display,
-      fontSize: 12,
-      letterSpacing: '0.08em',
-      textTransform: 'uppercase',
-      cursor: 'pointer',
-      whiteSpace: 'nowrap',
-    }}
-  >
-    <EngravedIcon id={icon} size={13} />
-    <span>{label}</span>
-    {children}
-  </button>
+  <HudTooltip label={label}>
+    <button
+      type="button"
+      ref={refEl}
+      aria-label={label}
+      aria-expanded={active}
+      aria-controls={ariaControls}
+      data-testid={testId}
+      onClick={onClick}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        padding: '4px 8px',
+        borderRadius: 999,
+        border: `1px solid ${active ? 'var(--skin-title-color)' : 'color-mix(in srgb, var(--skin-surface-border) 60%, transparent)'}`,
+        background: active ? 'color-mix(in srgb, var(--skin-title-color) 14%, transparent)' : 'transparent',
+        color: active ? 'var(--skin-title-color)' : TONE.label,
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <EngravedIcon id={icon} size={15} />
+      {children}
+    </button>
+  </HudTooltip>
 );
 
 /** WS-4 footer C1 — the collapsible time/phase strip. Open: TimeBar on top,
@@ -1616,7 +1933,15 @@ const QuestWindowFooter: React.FC<{
       />
       {open && (
         <>
-          <TimeBar progress={time.progress} label={time.label} phase={t('gameFrame.questWindow.phaseOf', { n: Math.min(currentBeat + 1, beats.length), total: beats.length })} />
+          <TimeBar
+            progress={time.progress}
+            label={time.label}
+            /* R-253 #4: the total adapts — a phase authored beyond
+             * `beats.length` grows the denominator the moment the path
+             * reaches it (same rule as the checkpoint markers). */
+            phase={t('gameFrame.questWindow.phaseOf', { n: currentBeat + 1, total: Math.max(beats.length, currentBeat + 1) })}
+            checkpoints={questPhaseCheckpoints(run, beats, currentBeat, time.progress)}
+          />
           {/* PLAN-053 T-006: journey legs — andata/svolgimento/ritorno
               sub-bars, parked chip, return-loot count chip. Renders nothing
               on legacy or settled runs. */}
@@ -1638,28 +1963,51 @@ const QuestWindowFooter: React.FC<{
             {onAbandon && !run.ended && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
                 {!abandonAsked ? (
-                  <button
-                    type="button"
-                    aria-expanded={false}
-                    aria-controls={abandonPanelId}
-                    data-testid="quest-abandon-toggle"
-                    onClick={() => onAbandonAsk(true)}
-                    style={{
-                      padding: '3px 8px',
-                      borderRadius: 6,
-                      border: `1px solid color-mix(in srgb, ${TONE.death} 55%, transparent)`,
-                      background: 'transparent',
-                      color: TONE.death,
-                      fontFamily: FONT.display,
-                      fontSize: 12,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {t('gameFrame.questWindow.abandon')}
-                  </button>
+                  <Tooltip.Root delayDuration={180}>
+                    <Tooltip.Trigger asChild>
+                      <button
+                        type="button"
+                        aria-label={t('gameFrame.questWindow.abandon')}
+                        title={t('gameFrame.questWindow.abandon')}
+                        aria-expanded={false}
+                        aria-controls={abandonPanelId}
+                        data-testid="quest-abandon-toggle"
+                        onClick={() => onAbandonAsk(true)}
+                        style={{
+                          width: 34,
+                          height: 34,
+                          display: 'inline-grid',
+                          placeItems: 'center',
+                          padding: 0,
+                          borderRadius: 8,
+                          border: '1px solid color-mix(in srgb, var(--skin-surface-border) 65%, transparent)',
+                          background: 'var(--skin-hud-lacquer-deep)',
+                          color: TONE.secondary,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <EngravedIcon id="ico-banner" size={16} />
+                      </button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        side="top"
+                        sideOffset={6}
+                        style={{
+                          padding: '6px 10px',
+                          borderRadius: 6,
+                          border: '1px solid var(--skin-surface-border)',
+                          background: 'var(--skin-hud-lacquer-deep)',
+                          color: TONE.text,
+                          fontFamily: FONT.serif,
+                          fontSize: 12,
+                          zIndex: 9999,
+                        }}
+                      >
+                        {t('gameFrame.questWindow.abandon')}
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
                 ) : (
                   <div id={abandonPanelId} role="alertdialog" aria-label={t('gameFrame.questWindow.abandon')} data-testid="quest-abandon-confirm" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
                     <span style={{ fontFamily: FONT.serif, fontStyle: 'italic', fontSize: 12, color: TONE.label, textAlign: 'right', maxWidth: 220 }}>
@@ -1669,7 +2017,7 @@ const QuestWindowFooter: React.FC<{
                       <button type="button" data-testid="quest-abandon-stay" onClick={() => onAbandonAsk(false)} style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)', background: 'transparent', color: TONE.label, fontFamily: FONT.display, fontSize: 12, cursor: 'pointer' }}>
                         {t('gameFrame.questWindow.abandonStay')}
                       </button>
-                      <button type="button" data-testid="quest-abandon-yes" onClick={() => { onAbandonAsk(false); onAbandon(); }} style={{ padding: '4px 8px', borderRadius: 6, border: `1px solid ${TONE.danger}`, background: 'color-mix(in srgb, var(--skin-status-death) 16%, transparent)', color: TONE.death, fontFamily: FONT.display, fontSize: 12, cursor: 'pointer' }}>
+                      <button type="button" data-testid="quest-abandon-yes" onClick={() => { onAbandonAsk(false); onAbandon(); }} style={{ padding: '4px 8px', borderRadius: 6, border: `1px solid ${TONE.danger}`, background: 'color-mix(in srgb, var(--skin-status-death) 16%, transparent)', color: toneText('death'), fontFamily: FONT.display, fontSize: 12, cursor: 'pointer' }}>
                         {t('gameFrame.questWindow.abandonYes')}
                       </button>
                     </div>

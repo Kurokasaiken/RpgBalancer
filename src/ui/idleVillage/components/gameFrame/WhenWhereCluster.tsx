@@ -105,6 +105,7 @@ export const WhenWhereCluster: React.FC<WhenWhereClusterProps> = ({
         // The clock starts at day 0; players count from "Day 1".
         value={currentDay + 1}
         style={{ gap: 7 }}
+        labelStyle={{ fontSize: 'var(--skin-hud-caps-size)' }}
       />
 
       {!compact && (

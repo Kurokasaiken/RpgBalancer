@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DragOverlay, type Modifier, type DropAnimation, type DropAnimationFunctionArguments } from '@dnd-kit/core';
 import { useDragContext } from './DragContextStore';
@@ -9,6 +9,8 @@ import WorkerCard from './WorkerCard';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { getEventCoordinates, CSS } from '@dnd-kit/utilities';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
+import { getMedalPortraitUrl } from '@/balancing/config/idleVillage/medalPortraitAssets';
+import { getHudZoomFactor } from './gameFrame/hudScale';
 
 interface DragOverlayContentProps {
   label: string;
@@ -126,8 +128,11 @@ const centerReturnDropAnimation: DropAnimation = ({
     return Promise.resolve();
   }
 
+  /* DEF-06: the overlay content carries CSS `zoom` matching the chrome layer,
+   *  so the medal's ON-SCREEN radius is `medalSize/2 × factor`. Viewport
+   *  centers (cursor, card rect) are device px — scale the half-medal. */
   const medalSize = getDragConfig().overlay.medalSizePx;
-  const halfMedal = medalSize / 2;
+  const halfMedal = (medalSize / 2) * getHudZoomFactor();
 
   // Base CSS position of the clone (initialRect stored as inline style by dnd-kit).
   const baseLeft = parseFloat((dragOverlay.node as HTMLElement).style.left || '0');
@@ -204,7 +209,9 @@ const snapOverlayCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect,
   // Use true pointer pickup offset captured by PgCard handlePointerDown.
   // This ensures overlay center aligns exactly where the user clicked.
   const dragCursorOffset = (window as any).__dragCursorOffset;
-  const overlaySize = getDragConfig().overlay.medalSizePx ?? draggingNodeRect.width;
+  /* DEF-06: the overlay content is CSS-zoomed with the chrome layer, so its
+   *  on-screen size is `medalSizePx × factor` (factor 1 when unzoomed). */
+  const overlaySize = (getDragConfig().overlay.medalSizePx ?? draggingNodeRect.width) * getHudZoomFactor();
 
   if (dragCursorOffset) {
     // dnd-kit places overlay top-left where the original node top-left was,
@@ -281,6 +288,142 @@ export function CustomDragOverlay({
   const activeId = rawActiveId && !String(rawActiveId).startsWith(SLOT_TOKEN_DRAG_PREFIX) ? rawActiveId : null;
   const activeResident = activeId && residentsById ? residentsById[activeId] : undefined;
   const isForcedOverlay = Boolean(forcedResidentId) && dragVisualState?.mode !== 'dragging';
+
+  /* R-238 / INV:custom-drag-overlay.INV-1 — pre-warm resident: the medallion
+   * subtree is mounted once (hidden, below) at roster mount so the FIRST real
+   * drag doesn't pay its cold-mount cost. */
+  const warmResident = useMemo(
+    () => (usePgCardPreview && residentsById ? Object.values(residentsById)[0] : undefined),
+    [usePgCardPreview, residentsById],
+  );
+
+  /* R-238 follow-up — instant medallion: the React path (dnd-kit activation →
+   * kit state → roster subtree re-render → portal commit) costs ~150-500 ms
+   * after the sensor fires (dev `jsxDEV` worst case). The warm-mounted subtree
+   * is already in the DOM, so on hold/move activation it is flipped visible via
+   * direct DOM writes — painted on the next frame regardless of React — and the
+   * real DragOverlay takes it over when the commit lands (handoff below). */
+  const warmNodeRef = useRef<HTMLDivElement | null>(null);
+  const warmHideRef = useRef<(() => void) | null>(null);
+  const warmFlipRef = useRef<{
+    down: { x: number; y: number; residentId: string } | null;
+    timer: ReturnType<typeof setTimeout> | null;
+    visible: boolean;
+  }>({ down: null, timer: null, visible: false });
+
+  useEffect(() => {
+    const node = warmNodeRef.current;
+    if (!node || !usePgCardPreview || !residentsById) return undefined;
+    const cfg = getDragConfig();
+    const holdMs = cfg.timing.holdToDragMs;
+    const minDist = cfg.thresholds.minDragDistance;
+    const st = warmFlipRef.current;
+    st.down = null;
+    st.visible = false;
+
+    const hideWarm = () => {
+      st.down = null;
+      if (st.timer !== null) {
+        clearTimeout(st.timer);
+        st.timer = null;
+      }
+      if (!st.visible) return;
+      st.visible = false;
+      node.style.visibility = 'hidden';
+      node.style.width = '0';
+      node.style.height = '0';
+      node.style.overflow = 'hidden';
+      node.removeAttribute('data-drag-preview');
+      node.removeAttribute('data-debug-active-id');
+    };
+    warmHideRef.current = hideWarm;
+
+    const placeAt = (clientX: number, clientY: number) => {
+      const half = (cfg.overlay.medalSizePx * getHudZoomFactor()) / 2;
+      node.style.left = `${clientX - half}px`;
+      node.style.top = `${clientY - half}px`;
+    };
+
+    const showWarm = (clientX: number, clientY: number) => {
+      if (st.visible || !st.down) return;
+      const resident = residentsById[st.down.residentId];
+      if (!resident) return;
+      const portraitUrl = getResidentPortraitUrl(resident);
+      const medalUrl = portraitUrl ? getMedalPortraitUrl(portraitUrl) : undefined;
+      const img = node.querySelector('image');
+      if (img && medalUrl) {
+        img.setAttribute('href', medalUrl);
+        img.setAttribute('xlink:href', medalUrl);
+      }
+      const sizePx = cfg.overlay.medalSizePx * getHudZoomFactor();
+      node.style.width = `${sizePx}px`;
+      node.style.height = `${sizePx}px`;
+      node.style.overflow = 'visible';
+      node.style.visibility = 'visible';
+      node.style.zIndex = '10000';
+      node.style.zoom = String(getHudZoomFactor());
+      node.style.cursor = 'grabbing';
+      node.setAttribute('data-drag-preview', 'true');
+      node.setAttribute('data-debug-active-id', st.down.residentId);
+      placeAt(clientX, clientY);
+      st.visible = true;
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
+      const card = (e.target as Element | null)?.closest?.('[data-resident-id]');
+      const residentId = card?.getAttribute('data-resident-id');
+      if (!residentId || !residentsById[residentId]) return;
+      st.down = { x: e.clientX, y: e.clientY, residentId };
+      st.timer = setTimeout(() => {
+        if (st.down) showWarm(st.down.x, st.down.y);
+      }, holdMs);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (st.visible) {
+        placeAt(e.clientX, e.clientY);
+        return;
+      }
+      if (!st.down) return;
+      const dx = e.clientX - st.down.x;
+      const dy = e.clientY - st.down.y;
+      if (dx * dx + dy * dy >= minDist * minDist) showWarm(e.clientX, e.clientY);
+    };
+
+    const onPointerRelease = () => {
+      st.down = null;
+      if (st.timer !== null) {
+        clearTimeout(st.timer);
+        st.timer = null;
+      }
+      /* If the warm node flipped on but the real DragOverlay never committed
+       * (drag released before the render landed, or activation cancelled), the
+       * layout-effect handoff never runs — drop it shortly after release. */
+      if (st.visible) setTimeout(hideWarm, 500);
+    };
+
+    window.addEventListener('pointerdown', onPointerDown, true);
+    window.addEventListener('pointermove', onPointerMove, true);
+    window.addEventListener('pointerup', onPointerRelease, true);
+    window.addEventListener('pointercancel', onPointerRelease, true);
+    window.addEventListener('blur', onPointerRelease);
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown, true);
+      window.removeEventListener('pointermove', onPointerMove, true);
+      window.removeEventListener('pointerup', onPointerRelease, true);
+      window.removeEventListener('pointercancel', onPointerRelease, true);
+      window.removeEventListener('blur', onPointerRelease);
+      warmHideRef.current = null;
+    };
+  }, [usePgCardPreview, residentsById]);
+
+  /* Handoff: when React commits the real DragOverlay (`activeId` flips), the
+   * DOM-flipped warm node is hidden in the same commit — pre-paint — so the
+   * takeover is seamless. The same run covers drag end (`activeId` → null) if
+   * the real overlay was never mounted. */
+  useLayoutEffect(() => {
+    warmHideRef.current?.();
+  }, [activeId]);
   
   // Calculate magnetic tilt based on distance to nearest slot
   const magneticTilt = useMemo(() => {
@@ -466,9 +609,36 @@ export function CustomDragOverlay({
             zIndex: 9999,
             transform: `translate(-50%, -50%) rotate(${magneticTilt.rotate}deg) scale(${magneticTilt.scale})`,
             pointerEvents: 'none',
+            zoom: getHudZoomFactor(),
           }}
         >
           {overlayContent}
+        </div>
+      ) : null}
+      {/* INV:custom-drag-overlay.INV-1 — hidden warm mount of the same subtree
+          the DragOverlay mounts during a drag: component code paths, hooks and
+          the portrait decode gate are already exercised when the first real
+          drag starts. */}
+      {warmResident ? (
+        <div
+          ref={warmNodeRef}
+          data-drag-warm-mount="true"
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0,
+            overflow: 'hidden',
+            visibility: 'hidden',
+            pointerEvents: 'none',
+          }}
+        >
+          <WanderlustMedalOverlay
+            portraitUrl={getResidentPortraitUrl(warmResident)}
+            sizePx={getDragConfig().overlay.medalSizePx}
+          />
         </div>
       ) : null}
       <DragOverlay
@@ -496,6 +666,9 @@ export function CustomDragOverlay({
               lineHeight: 0,
               fontSize: 0,
               cursor: 'grabbing',
+              /* DEF-06: the ghost magnifies with the HUD chrome (the portal
+               *  lives on `document.body`, outside the zoomed layer). */
+              zoom: getHudZoomFactor(),
             }}
           >
             {overlayContent}

@@ -132,6 +132,8 @@ export interface WanderlustFieldProps {
   tier?: Tier;
   className?: string;
   style?: CSSProperties;
+  /** Optional overrides for the label span (e.g. a skin-token font size). */
+  labelStyle?: CSSProperties;
 }
 
 const labelBase = (tier: Tier): CSSProperties => ({
@@ -151,7 +153,7 @@ const valueBase = (tier: Tier): CSSProperties => ({
 });
 
 export const WanderlustField: React.FC<WanderlustFieldProps> = ({
-  label, value, orientation = 'vertical', tier = 'secondary', className, style,
+  label, value, orientation = 'vertical', tier = 'secondary', className, style, labelStyle,
 }) => {
   if (orientation === 'horizontal') {
     return (
@@ -159,7 +161,7 @@ export const WanderlustField: React.FC<WanderlustFieldProps> = ({
         display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
         gap: sp('lg'), ...style,
       }}>
-        <span style={labelBase(tier)}>{label}</span>
+        <span style={{ ...labelBase(tier), ...labelStyle }}>{label}</span>
         <span style={{ ...valueBase(tier), textAlign: 'right' }}>{value}</span>
       </div>
     );
@@ -168,7 +170,7 @@ export const WanderlustField: React.FC<WanderlustFieldProps> = ({
     <div className={className} style={{
       display: 'flex', flexDirection: 'column', gap: sp('md'), ...style,
     }}>
-      <span style={labelBase(tier)}>{label}</span>
+      <span style={{ ...labelBase(tier), ...labelStyle }}>{label}</span>
       <span style={valueBase(tier)}>{value}</span>
     </div>
   );

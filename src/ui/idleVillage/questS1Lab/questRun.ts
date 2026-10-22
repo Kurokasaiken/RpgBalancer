@@ -351,6 +351,11 @@ export interface ResolvedCheck {
   verdict: Verdict;
   /** Success bound after clamps — the canonical `s` the roll is tested against. */
   score: number;
+  /** The authored stats this check tested (`node.stats`) — R-253: the
+   *  astrolabe silhouette and the stat icons read the REAL check data
+   *  instead of a generic single-skill placeholder. Optional: legacy/test
+   *  literals may omit it — consumers treat `undefined` as `[]`. */
+  stats?: LabStat[];
   /** The D100 result (1-100). */
   rollPct: number;
   /** Worst harm the check inflicted — the astrolabe paints it in the fail zones. */
@@ -1568,6 +1573,7 @@ function resolveCheck(
     title: node.title,
     verdict,
     score: Math.round(successBound),
+    stats,
     rollPct: die,
     harm: 'none',
     woundPct: node.risk?.wound ?? 0,
@@ -1592,7 +1598,7 @@ function resolveCheck(
   if (verdict === 'win' || verdict === 'bigwin') {
     pushLog(state, {
       kind: 'INFO',
-      text: `The ${verdict.toUpperCase()} spared the party (−${-TUNE.winRiskMod}pp to wound and death).`,
+      text: `The ${verdict.toUpperCase()} spared the party (−${-TUNE.winRiskMod}% to wound and death).`,
     });
   }
   if (verdict === 'bigwin') {
@@ -2847,6 +2853,13 @@ export function submitCommand(
     state.frontierVersion += 1;
     state.visitedNodes.push(checkNode.id);
     state.cursorVisitSeq += 1;
+    /* R-241: the visit/log correspondence is a hard invariant — every
+     * `visitedNodes` push must echo a NODE entry, or the positional pairing
+     * in `projectBeats` shifts and later scene beats bind to the wrong node
+     * (the theatre's art/caption cut one node early). The entry goes BEFORE
+     * `preMark`: it is bookkeeping, not check text, so the summary slices
+     * stay clean. */
+    pushLog(state, { kind: 'NODE', text: checkNode.title });
     const preMark = state.log.length;
     const result = resolveCheck(state, checkNode, opts?.useConsumable !== false, opts?.forceDie, opts?.armedFlags);
     // Only this check's lines, HARM included, and written again once the outcome

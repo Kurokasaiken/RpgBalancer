@@ -1,8 +1,9 @@
 ---
 title: POI Family Spec
-status: draft
-updated: 2026-10-13
+status: superseded
+updated: 2026-10-19
 type: component-spec
+superseded-by: CTR-game-008 (`.mw/contracts/CTR-game-008.md`) — PLAN-054 T-003 triage: su `/game` esiste solo la famiglia `quest` (MapQuestPoi Sigillo); i figli `job`/`training`/`maintenance`/`cooldown` sono `deprecated` (mai rilasciati fuori dal vecchio harness)
 ---
 
 # POI Family Spec

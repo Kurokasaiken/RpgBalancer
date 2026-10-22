@@ -21,7 +21,7 @@ const rgbSchema = z.tuple([z.number().min(0).max(1), z.number().min(0).max(1), z
 /**
  * Zod schema for the tar-goo rendering/simulation contract.
  */
-const tarGooConfigSchema = z.object({
+export const tarGooConfigSchema = z.object({
   timing: z.object({
     /** Black obelisks slam and the tar nucleus seeds (fast, percussive). */
     seedMs: z.number().int().min(200).max(1200),
@@ -125,6 +125,18 @@ const tarGooConfigSchema = z.object({
     leakCore: z.string(),
     leakMid: z.string(),
     leakEdge: z.string(),
+  }),
+  /**
+   * R-241 jank — goo raster scale: the SDF fragment shader runs per pixel of
+   * the goo canvas and `ctx.drawImage(webglCanvas)` syncs the WebGL frame
+   * into the 2D board every rAF — on real GPUs those syncs stalled frames
+   * (p95 rAF gaps 66–116ms measured during goo-expand/risk-pour). The tar is
+   * all soft edges (SDF smoothstep, specular, fresnel), so half-resolution
+   * raster upscaled by drawImage is visually identical while the shader cost
+   * drops with the pixel count. 1.0 keeps the original full-res path.
+   */
+  rendering: z.object({
+    gooScale: z.number().min(0.25).max(1),
   }),
   /** Star/flower shape. The silhouette morphs from rounded petals to a sharp star
       as the player stat reaches and exceeds the skill check. */
@@ -317,6 +329,9 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     leakCore: 'rgba(0,229,255,.50)',
     leakMid: 'rgba(0,229,255,.22)',
     leakEdge: 'rgba(0,0,0,0)',
+  },
+  rendering: {
+    gooScale: 0.5,
   },
   star: {
     /** Very rounded when the player is below the check — reads as a 5-petal flower. */

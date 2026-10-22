@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from 'react';
+import { getHudZoomFactor } from './hudScale';
 
 /**
  * Lets the player move a HUD panel by its title bar: spread `handleProps` on the header
@@ -102,7 +103,11 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
       if ((event.target as HTMLElement).closest('button, select, input, label, a')) return;
       event.preventDefault();
       event.stopPropagation();
-      start.current = { x: event.clientX - liveOffset.current.x, y: event.clientY - liveOffset.current.y };
+      /* PLAN-043 WS-5 DEF-06: `liveOffset` lives in chrome-layer units;
+       *  pointer coords and rects arrive in device px — converted via the
+       *  HUD zoom factor (1 when unzoomed or natively zoomed). */
+      const z = getHudZoomFactor();
+      start.current = { x: event.clientX - liveOffset.current.x * z, y: event.clientY - liveOffset.current.y * z };
       pointerId.current = event.pointerId;
       const el = findHudPanelElement(event.currentTarget as HTMLElement);
       panelEl.current = el;
@@ -110,12 +115,18 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
        * mounted companion columns; the current translate is subtracted so the
        * base is expressed at offset (0,0). */
       const shell = shellRef?.current;
+      const toUnits = (r: { left: number; top: number; width: number; height: number }) => ({
+        left: r.left / z,
+        top: r.top / z,
+        width: r.width / z,
+        height: r.height / z,
+      });
       baseRect.current = shell
-        ? untransformedUnionRect(shell, liveOffset.current)
+        ? toUnits(untransformedUnionRect(shell, { x: liveOffset.current.x * z, y: liveOffset.current.y * z }))
         : (() => {
             const rect = el?.getBoundingClientRect();
             return rect
-              ? { left: rect.left - liveOffset.current.x, top: rect.top - liveOffset.current.y, width: rect.width, height: rect.height }
+              ? toUnits({ left: rect.left - liveOffset.current.x * z, top: rect.top - liveOffset.current.y * z, width: rect.width, height: rect.height })
               : null;
           })();
       setDragging(true);
@@ -139,14 +150,15 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
     };
     const move = (event: globalThis.PointerEvent) => {
       if (event.pointerId !== pointerId.current) return;
-      let nextX = event.clientX - start.current.x;
-      let nextY = event.clientY - start.current.y;
+      const z = getHudZoomFactor();
+      let nextX = (event.clientX - start.current.x) / z;
+      let nextY = (event.clientY - start.current.y) / z;
       const base = baseRect.current;
       if (base) {
         const loX = edgeInsetPx - base.left;
-        const hiX = (boundsRightPx ?? window.innerWidth - edgeInsetPx) - base.left - base.width;
+        const hiX = (boundsRightPx ?? window.innerWidth / z - edgeInsetPx) - base.left - base.width;
         const loY = edgeInsetPx - base.top;
-        const hiY = window.innerHeight - edgeInsetPx - base.top - base.height;
+        const hiY = window.innerHeight / z - edgeInsetPx - base.top - base.height;
         nextX = Math.min(Math.max(nextX, Math.min(loX, hiX)), Math.max(loX, hiX));
         nextY = Math.min(Math.max(nextY, Math.min(loY, hiY)), Math.max(loY, hiY));
       }
@@ -185,11 +197,13 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
   const reclamp = useCallback(() => {
     const shell = shellRef?.current;
     if (!shell) return;
-    const base = untransformedUnionRect(shell, liveOffset.current);
+    const z = getHudZoomFactor();
+    const dev = untransformedUnionRect(shell, { x: liveOffset.current.x * z, y: liveOffset.current.y * z });
+    const base = { left: dev.left / z, top: dev.top / z, width: dev.width / z, height: dev.height / z };
     const loX = edgeInsetPx - base.left;
-    const hiX = (boundsRightPx ?? window.innerWidth - edgeInsetPx) - base.left - base.width;
+    const hiX = (boundsRightPx ?? window.innerWidth / z - edgeInsetPx) - base.left - base.width;
     const loY = edgeInsetPx - base.top;
-    const hiY = window.innerHeight - edgeInsetPx - base.top - base.height;
+    const hiY = window.innerHeight / z - edgeInsetPx - base.top - base.height;
     const x = Math.min(Math.max(liveOffset.current.x, Math.min(loX, hiX)), Math.max(loX, hiX));
     const y = Math.min(Math.max(liveOffset.current.y, Math.min(loY, hiY)), Math.max(loY, hiY));
     if (x === liveOffset.current.x && y === liveOffset.current.y) return;

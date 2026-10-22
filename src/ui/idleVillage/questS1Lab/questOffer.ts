@@ -27,7 +27,7 @@ import {
   type ResolvedOfferRecord,
   type ScenarioInstance,
 } from './questRun';
-import { defaultStrategy, hashSimInput, simulateQuest, simulateQuestAsync, type QuestSimResult, type SimStrategy } from './questSimulation';
+import { defaultStrategy, hashSimInput, simulateQuest, simulateQuestAsync, type QuestSimResult, type QuestSimulationChunkTiming, type SimStrategy } from './questSimulation';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { localizeScenario } from '@/balancing/config/idleVillage/quests/questContentLocale';
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
@@ -253,7 +253,14 @@ export function estimateForParty(
 export async function estimateForPartyAsync(
   resolvedOffer: ResolvedOfferRecord,
   members: LabMember[],
-  opts?: { runs?: number; seed?: number; strategy?: SimStrategy; chunkRuns?: number; signal?: AbortSignal },
+  opts?: {
+    runs?: number;
+    seed?: number;
+    strategy?: SimStrategy;
+    chunkRuns?: number;
+    signal?: AbortSignal;
+    onChunkTiming?: (timing: QuestSimulationChunkTiming) => void;
+  },
 ): Promise<PartyEstimate> {
   const prepared = prepareEstimateRun(resolvedOffer, members, opts);
   if (prepared === 'incomplete') return 'incomplete';
@@ -262,6 +269,7 @@ export async function estimateForPartyAsync(
     seed: opts?.seed,
     chunkRuns: opts?.chunkRuns,
     signal: opts?.signal,
+    onChunkTiming: opts?.onChunkTiming,
   });
   return { sim, bands: { danger: dangerBandFor(sim.anyDeathPct).id }, nSim: prepared.runs };
 }

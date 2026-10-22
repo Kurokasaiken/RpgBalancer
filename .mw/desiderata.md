@@ -1762,3 +1762,87 @@ Prima slice verticale: **spike dimostrabile** del depth-parallax su una scena
 reale (Theater o lab), valutabile a occhio dal Director prima dell'estensione al
 catalogo.<!-- REQ:v34-invariants -->Config-first, reduced-motion ⇒ nessun
 effetto, skin token, budget WebView profilato, verifiche headless.
+
+## v35 — Visual fork gate: nessuna scelta estetica silenziosa dell'agente
+
+*User-stated*
+
+1. Quando un task crea o modifica elementi grafici e sono possibili
+   rappresentazioni materialmente diverse, l'agente non sceglie a priori:
+   prepara opzioni (default 2, max 3) con documento comparativo e preview
+   visibile; il Director seleziona o rigetta.
+2. Il risultato finale è misurato rispetto all'opzione selezionata iniziale
+   (baseline congelata + emendamenti approvati).
+3. Se non serve fork, l'agente dichiara lo skip con un puntatore verificabile.
+
+*AI inference (marcata)*
+
+4. Il fork vive in esplorazione (`mw-explorer`); fork scoperti in planning
+   attivano `INTENT_GATE_VISUAL_FORK` in `mw-planner` (stop → ruling → resume
+   sullo stesso draft).
+5. Verifica ibrida: misure meccaniche same-viewport + giudizio umano; l'occhio
+   del Director prevale sulla metrica (T-04).
+6. Varianti scartate fuori dal tree di produzione; spike visuali con lifecycle
+   dichiarato (`promote|remove`, default remove); un plan → un bundle (v31).
+7. Preview = pagina servita su localhost aperta dal Director (Preview tab di
+   Devin Desktop suggerita), mai apertura automatica (regola 16).
+8. Enforcement meccanico: `closure:lint` fallisce su bundle che toccano file
+   visivi nel diff reale senza copertura `visual-fork:` (card scope list o
+   skip puntato) nel plan.
+
+**Formulazione approvata (FROZEN):**
+<!-- REQ:v35-fork -->Quando un task crea o modifica elementi grafici e sono
+possibili rappresentazioni materialmente diverse (gerarchia, composizione,
+densità, affordance), l'agente non sceglie a priori: prepara opzioni (default
+2, max 3) con documento comparativo e preview visibile su localhost; il
+Director seleziona o rigetta.<!-- REQ:v35-baseline -->Il risultato finale è
+misurato rispetto all'opzione selezionata iniziale: baseline congelata con
+hash+provenance + ledger emendamenti approvati dal Director.
+<!-- REQ:v35-skip -->Se non serve fork, l'agente dichiara lo skip con un
+puntatore verificabile (riferimento frozen citato, rappresentazione unica
+nominata, o perimetro file non-visivo); uno skip senza puntatore è un difetto.
+<!-- REQ:v35-verifica -->Verifica ibrida: obbligazioni same-viewport
+pre-registrate + human-eye su artefatto side-by-side; l'occhio del Director
+prevale sulla metrica (T-04); variante scartata mai in produzione; spike
+visuale effimero salvo promozione dichiarata nel plan.
+
+*Origine:* R-216; PLAN-047 (battezzato 2026-10-18); dibattito multi-AI web
+converged `mind-weaver/.mw/runs/20261018-visual-fork-gate-debate/`
+(artifact-r003, 5/5 ACCEPT). Implementazione: skill mw-explorer / mw-planner /
+painter / mockup-generator + template `.mw/templates/visual-fork/` +
+estensione `closure:lint`.
+
+---
+
+## v36 — Sistema vivo di contratti per-componente, integrazioni e test sincronizzati su `/game`
+
+**Status:** `FROZEN`
+**Date:** 2026-10-18
+**Authorized by:** Fausto — *"procedi"* (2026-10-18, avallo sulla candidata v36 presentata in sessione)
+**Reason:** il Director vuole evitare che la lista dei bug UI si allunghi e che vecchi bug si ripresentino a ogni ritocco di layout, estendendo la copertura a tutti i componenti e alle integrazioni di `/game` con un ciclo vivo di aggiornamento sincronizzato tra documentazione, contratti di interazione e test.
+
+*User-stated*
+
+1. Fare un audit di tutto ciò che è in `/game`, avere un documento per componente su come si deve comportare e test di validazione che controllino tutto ciò che deve fare e come lo deve fare.
+2. Avere un documento di integrazione per le interazioni con gli altri componenti con cui può interagire.
+3. Poiché il progetto è in divenire, quando si aggiorna un componente e cambia un comportamento, vanno aggiornati il documento e testato/modificato il test corrispondente.
+4. Quando il Director dice *"questa cosa è un bug"* o chiede un comportamento specifico, questo va aggiunto al documento su come deve comportarsi / come devono interagire i componenti e, quando applicabile, va aggiunto o aggiornato il test automatico.
+5. Produrre il piano tramite dibattito **Multi-AI web** (`mw-web-debate`).
+
+*AI inference (marcata)*
+
+6. **Riuso senza duplicazione (DRY / `40-documentation-governance`):** l'inventario meccanico di `/game` e le bozze `SCHEDA` di `PLAN-043 WS-5` (`S11`/`S12`), `COMPONENT_MASTER_INDEX.md`, `.mw/contracts/` e `.mw/surface-map.json` vengono unificati o collegati invece di creare un secondo registro parallelo.
+7. **Granularità dei documenti d'integrazione:** i contratti d'integrazione coprono i flussi/accoppiamenti reali tra componenti su `/game` (es. `PixiWorldMap ↔ GameFrame HUD`, `Roster ↔ SlotRack ↔ QuestExpeditionDetail`, `QuestExpeditionDetail ↔ TimeEngine ↔ MapQuestPoi`, `QuestRunWindow ↔ Astrolabe ↔ Settlement/HUD`, `VillageScreenView ↔ VillageRegistry ↔ Stash/Merchant`), non il prodotto cartesiano di coppie che non interagiscono.
+8. **Binding meccanico con i gate esistenti (`PLAN-044` / `PLAN-051`):** l'aggiornamento sincronizzato `codice ↔ doc componente/integrazione ↔ test` si aggancia a `.mw/surface-map.json`, `contracts:check`, `red-first` e `closure:lint`, distinguendo tra:
+   - *bug* (comportamento rotto rispetto al contratto o segnalato dal Director → test rosso prima del fix + aggiornamento doc/contratto + fix verde),
+   - *evoluzione intenzionale di comportamento* (aggiornamento esplicito di doc/contratto + aggiornamento test nello stesso task, mai test mutato in silenzio).
+
+*Still unresolved (delegati al dibattito Multi-AI web)*
+
+- Struttura esatta dei file (se 1 file per componente + 1 file per contratto d'interazione sotto `src/docs/docs/game_surface/` o `.mw/contracts/`, e come evitare esplosione di boilerplate).
+- Come verificare meccanicamente che una modifica comportamentale a un componente abbia aggiornato anche doc + test senza bloccare i refactor puramente interni.
+- Strategia di migrazione/ritiro delle vecchie spec e suite legacy (`/poi-quest-detail-roster-time-clock`) rispetto a `/game`.
+
+**Formulazione approvata (FROZEN):**
+<!-- REQ:v36-audit-components -->Su `/game` ogni componente attivo ha una scheda/contratto vivo che definisce cosa deve fare e come, collegato ai propri test di validazione;<!-- REQ:v36-integration-contracts --> le interazioni reali tra componenti sono coperte da contratti d'integrazione dedicati e test automatici collegati, a partire dall'audit completo di `/game`.<!-- REQ:v36-living-sync --> Il sistema è mantenuto vivo: (1) ogni modifica che altera il comportamento di un componente o di un'interazione deve aggiornare contestualmente il documento relativo e aggiungere/modificare il test collegato;<!-- REQ:v36-bug-or-spec-capture --> (2) ogni volta che il Director segnala un bug (*"questa cosa è un bug"*) o richiede un comportamento specifico, la regola viene aggiunta al documento del componente/integrazione e protetta da test automatico;<!-- REQ:v36-mechanical-binding --> (3) l'enforcement si integra nei gate meccanici esistenti (`surface-map`, `contracts:check`, `red-first`, `closure:lint`) senza duplicare i registri.<!-- REQ:v36-web-debate --> Il piano esecutivo viene definito tramite dibattito Multi-AI web (`mw-web-debate`).
+

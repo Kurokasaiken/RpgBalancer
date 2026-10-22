@@ -1,5 +1,6 @@
 import { ALL_PORTRAIT_ASSET_URLS } from '@/balancing/config/idleVillage/medalPortraitAssets';
 import { preloadPortrait } from '@/ui/idleVillage/utils/portraitDecodeCache';
+import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 
 // Cursor images named in gameFrameCursors.css, every density the image-set may pick.
 // A CSS cursor is fetched on first use: cold, the browser shows the fallback
@@ -14,6 +15,16 @@ const CURSOR_URLS = CURSOR_NAMES.flatMap((name) =>
 
 // Held for the page lifetime so the decoded cursors are not collected.
 const retainedCursors: HTMLImageElement[] = [];
+
+/* R-239: the quest theatre's first paint was a ~1.1s black frame — the DOM
+ *  `<img>` under `DepthScene` mounts instantly but the big scene jpeg still
+ *  has to be fetched+decoded. Warming the authored scene art at boot (idle
+ *  decode, retained refs) means a scene beat lands on an already-painted
+ *  picture. Unique srcs only — NODE_ART maps many nodes onto shared art. */
+const retainedSceneArt: HTMLImageElement[] = [];
+
+/** Unique authored scene-art URLs for every quest node (`NODE_ART`). */
+export const questSceneArtUrls = (): string[] => [...new Set(Object.values(NODE_ART).map((a) => a.src))];
 
 const decodeQuietly = (img: HTMLImageElement | null) => (img ? img.decode().catch(() => undefined) : undefined);
 
@@ -32,5 +43,11 @@ export function warmGameAssets(): Promise<void> {
     retainedCursors.push(img);
     return decodeQuietly(img);
   });
-  return Promise.allSettled([...portraits, ...cursors]).then(() => undefined);
+  const sceneArt = questSceneArtUrls().map((url) => {
+    const img = new Image();
+    img.src = url;
+    retainedSceneArt.push(img);
+    return decodeQuietly(img);
+  });
+  return Promise.allSettled([...portraits, ...cursors, ...sceneArt]).then(() => undefined);
 }

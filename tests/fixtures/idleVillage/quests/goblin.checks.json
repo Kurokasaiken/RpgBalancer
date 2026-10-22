@@ -92,51 +92,6 @@
         }
       ]
     },
-    "gob-bottino": {
-      "baseScore": 50,
-      "bonus": 0,
-      "successBound": 50,
-      "successPct": 50,
-      "verdicts": {
-        "epicfail": 0.05,
-        "bigwin": 0.05,
-        "win": 0.45,
-        "almost": 0.05,
-        "fail": 0.4
-      },
-      "noHarmPct": 89.99999999999999,
-      "anyWoundPct": 7.150000000000004,
-      "anyDeathPct": 2.8499999999999996,
-      "leaderWoundPct": 0,
-      "leaderDeathPct": 0,
-      "toll": null,
-      "perMember": [
-        {
-          "id": "g1",
-          "healthyPct": 100,
-          "woundPct": 0,
-          "deathPct": 0
-        },
-        {
-          "id": "g2",
-          "healthyPct": 100,
-          "woundPct": 0,
-          "deathPct": 0
-        },
-        {
-          "id": "g3",
-          "healthyPct": 100,
-          "woundPct": 0,
-          "deathPct": 0
-        },
-        {
-          "id": "g4",
-          "healthyPct": 90,
-          "woundPct": 7.150000000000004,
-          "deathPct": 2.8499999999999996
-        }
-      ]
-    },
     "gob-stealth": {
       "baseScore": 50,
       "bonus": 0,

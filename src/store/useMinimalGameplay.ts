@@ -303,6 +303,17 @@ export interface MinimalGameplayState {
    * settlement aggregate write.
    */
   setResidentsOnExpedition: (residentIds: string[], onExpedition: boolean) => void;
+  /**
+   * R-260: transient HUD feedback for the last committed quest settlement —
+   * the grant the report's dismissal just paid out. Lives OUTSIDE `state`
+   * (never persisted: a reload replays settlement through the journal, not
+   * through this stamp); the HUD clears it when the animation ends.
+   */
+  resourceDelta: { gold: number; xp: number; /** Wall-clock ms of the commit — the animation keys on it. */ at: number } | null;
+  /** Publishes the settlement grant as the HUD delta stamp (R-260). */
+  publishResourceDelta: (delta: { gold: number; xp: number }) => void;
+  /** Clears the delta stamp after the readout's animation finished. */
+  clearResourceDelta: () => void;
 }
 
 /**
@@ -584,6 +595,11 @@ const INITIAL_STATE: MinimalGameplayState = {
   applyQuestSettlement: () => [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setResidentsOnExpedition: () => {},
+  resourceDelta: null,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  publishResourceDelta: () => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  clearResourceDelta: () => {},
 };
 
 function mapStoreStateToEngineState(state: MinimalGameplayState['state']): GameState {
@@ -1053,6 +1069,14 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
       return { ...resident, isOnExpedition: onExpedition || undefined };
     });
     if (changed) set({ state: { ...state, residents } });
+  },
+
+  publishResourceDelta: (delta) => {
+    set({ resourceDelta: { gold: delta.gold, xp: delta.xp, at: Date.now() } });
+  },
+
+  clearResourceDelta: () => {
+    if (get().resourceDelta) set({ resourceDelta: null });
   },
 
   buyFood: (quantity) => {

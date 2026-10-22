@@ -37,6 +37,7 @@ import { runIdOf } from '@/ui/idleVillage/quests/questSettlement';
 import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import { isPoiConsumed, poiConsumesOnReportClose, QUEST_HALO_RENDER_MS, QUEST_HALO_STEPS, QUEST_POIS, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
 import { useQuestExpeditionSession } from '@/ui/idleVillage/quests/useQuestExpeditionSession';
+import { composeRosterCompatibility } from '@/ui/idleVillage/quests/rosterCompatibility';
 import { scenarioForQuest } from '@/ui/idleVillage/questS1Lab/questOffer';
 import { questHaloProgress } from '@/ui/idleVillage/questS1Lab/questSchedule';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
@@ -56,7 +57,6 @@ import { QuestStageCluster } from '@/ui/idleVillage/components/gameFrame/QuestSt
 import { QuestSkillCheckColumn } from '@/ui/idleVillage/components/gameFrame/QuestSkillCheckColumn';
 import { checkEventOf, isStaleCheckEvent, useCheckBridge } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { VillageStashPanel } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
-import { readStashDragPayload, readStashDropPayload, routeStashDragEnd } from '@/ui/idleVillage/components/gameFrame/stashDnd';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { MerchantPanel } from '@/ui/idleVillage/components/gameFrame/MerchantPanel';
 import {
@@ -575,6 +575,27 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     wrapDetail: wrapQuestDetail,
   });
   const expeditions = [expeditionGoblin, expeditionRovine];
+  /* R-241 B5 (INV-3): the roster's compatibility resolver is ONE composed
+   *  function — while any session's quest context is live (an unsettled
+   *  expedition run, the POI quest running or uncollected) the whole chain
+   *  abstains so cards paint resident statuses, not planner noise. */
+  const rosterCompatibility = useMemo(
+    () =>
+      composeRosterCompatibility([
+        { contextActive: !!expeditionGoblin.run, getResidentCompatibility: expeditionGoblin.getResidentCompatibility },
+        { contextActive: !!expeditionRovine.run, getResidentCompatibility: expeditionRovine.getResidentCompatibility },
+        { contextActive: session.isQuestRunning || !!session.embarkResult, getResidentCompatibility: session.getResidentCompatibility },
+      ]),
+    [
+      expeditionGoblin.run,
+      expeditionGoblin.getResidentCompatibility,
+      expeditionRovine.run,
+      expeditionRovine.getResidentCompatibility,
+      session.isQuestRunning,
+      session.embarkResult,
+      session.getResidentCompatibility,
+    ],
+  );
   const anyExpeditionDetailOpen = expeditions.some((exp) => exp.isDetailOpen && (!exp.run || exp.run.ended));
   /* PLAN-073 warehouse ledger: hydrate once at page level — the UI gates
    *  mutations on `hydration === 'ready'` so nothing writes before load. */
@@ -927,11 +948,22 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
     if (!wasVisible || panelsForScreen.visible.quest) return;
     dismissSettledRun();
   }, [panelsForScreen, dismissSettledRun]);
+  /* R-260: the report's dismissal COMMITS the settlement — every close path
+   *  (Collect CTA, Escape, the X on the title row) funnels through
+   *  `onClose` here, so this single call is the whole contract. Resources,
+   *  consequences and the loadout release land now, not at arrival. */
   const closeReward = useCallback(() => {
     setRewardDismissed(true);
     if (panelsForScreen.visible.quest) panelsForScreen.set('quest', false);
+    void expeditions.find((exp) => exp.run && exp.run === activeQuestRun.run)?.commitSettlement();
+  }, [panelsForScreen, expeditions, activeQuestRun.run]);
+  /* The run clears once the commit has landed — `dismissSettledRun` reads
+   *  the settled marker, so it waits on the commit's re-render instead of
+   *  inspecting the pre-commit run object. */
+  useEffect(() => {
+    if (!rewardDismissed) return;
     dismissSettledRun();
-  }, [panelsForScreen, dismissSettledRun]);
+  }, [rewardDismissed, activeQuestRun.run, dismissSettledRun]);
 
   // R-196: bag arming is per-item and lives in `useQuestRun.armedFlags` — the
   // window toggles flags through `toggleArmedFlag`, nothing is spent unasked.
@@ -1213,6 +1245,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           phases={activeQuestRun.phases}
           beats={scenarioForQuest(activeQuestId)?.beats ?? GOBLIN_SCENARIO.beats}
           queuedBeats={activeQuestRun.beats}
+          beatCursorRef={activeQuestRun.beatCursorRef}
           beatTiming={questWindow.beats}
           title={scenarioForQuest(activeQuestId)?.title ?? GOBLIN_SCENARIO.title}
           flavour={scenarioForQuest(activeQuestId)?.flavour ?? ''}
@@ -1361,9 +1394,6 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
               expeditions.forEach((exp) => exp.handleDragStart(event));
               return;
             }
-            /* PLAN-073: stash drags carry their own payloads — they must
-             *  never mark a resident as dragging. */
-            if (readStashDragPayload(event.active.data.current)) return;
             startTransition(() => {
               session.handleDragStart(event);
               expeditions.forEach((exp) => exp.handleDragStart(event));
@@ -1372,20 +1402,6 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
           onDragCancel={() => {
             session.setDraggingResidentId(null);
             expeditions.forEach((exp) => exp.setDraggingResidentId(null));
-          }}
-          /* PLAN-073 central router (artifact-r003 A2): stash exchanges
-           *  commit through the ledger — shelf→own bag slot assigns/swaps,
-           *  bag→shelf releases, every other combination cancels without
-           *  mutation. Resident/slot-token drags return early and keep
-           *  their existing monitor chain (roster `onDragEnd` prop). */
-          onDragEnd={(event: DragEndEvent) => {
-            const drag = readStashDragPayload(event.active.data.current);
-            if (!drag) return;
-            const drop = readStashDropPayload(event.over?.data.current);
-            const stash = useVillageStashStore.getState();
-            const verdict = routeStashDragEnd(drag, drop, stash.activeStashOwner);
-            if (verdict.action === 'assign') stash.assignToSlot(verdict.poiId, verdict.itemId, verdict.slotIndex);
-            else if (verdict.action === 'release') stash.release(verdict.poiId, verdict.slotIndex);
           }}
         >
           <GameFrameDragCursor />
@@ -1448,11 +1464,12 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                   if (expeditionRovine.handleResidentSelect(residentId)) return;
                   session.handleResidentSelect(residentId);
                 }}
-                getResidentCompatibility={(residentId) =>
-                  expeditionGoblin.getResidentCompatibility(residentId) ??
-                  expeditionRovine.getResidentCompatibility(residentId) ??
-                  session.getResidentCompatibility(residentId)
-                }
+                /* R-241 B5 (game-frame-pixi.INV-3): while ANY quest context
+                   is live — an expedition run unsettled, the POI quest
+                   running or uncollected — the whole chain abstains so the
+                   roster paints resident statuses, never planner noise like
+                   «Nessuno slot compatibile». */
+                getResidentCompatibility={rosterCompatibility}
                 lockedResidentIds={[
                   ...new Set([
                     ...session.lockedResidentIds,

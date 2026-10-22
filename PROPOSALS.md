@@ -70,3 +70,26 @@ Soglia: pattern visto in almeno due contesti distinti o in due sessioni diverse.
 2. `preview:playwright` va ribuildato dopo OGNI edit sorgente toccato dalla prova; mai diagnosticare su un bundle la cui età non hai verificato.
 3. Probe/spec usa una porta dedicata e dichiarata (`CAPTURE_BASE_URL`), mai la porta del bundle/verify condivisa.
 
+
+## P-006 — La root servita deve essere l'artefatto, non la `index.html` di vite (2026-10-20)
+
+**Stato:** proposta — 2 contesti distinti (stessa famiglia di P-005: «la superficie nel browser non è ciò che credi», meccanismo diverso).
+**Istanze:** (1) `learn-plan047-preview` — `browser_preview` path-scoped: il proxy serve la `index.html` per gli asset → pagina bianca; fix usato: registrazione sulla ROOT + redirect-stub. (2) 2026-10-20 — `python3 -m http.server` sulla root del repo: serve la `index.html` di vite (moduli TSX irrisolvibili) → pagina bianca nella sidebar; fix usato: `--directory .mw/review/<round>/` + symlink per gli asset fuori albero. Entrambe: l'URL che l'utente apre deve risolvere **l'artefatto**, non la entry dell'app.
+
+**Cosa si propone (trappola candidata):**
+1. Prima di consegnare un URL al Director (preview, statico, lab): `curl -s <url>/` deve mostrare il markup dell'artefatto — se risponde `<script type="module" src="/src/main.tsx">` è la entry vite → pagina bianca garantita.
+2. Server statici per artefatti: sempre `--directory <dir-dell-artefatto>` + symlink per asset esterni (http.server li segue); mai la root del repo.
+3. Test dell'artefatto attraverso lo **stesso layer dell'utente** (DOM montato via proxy/screenshot headless), non solo `200` upstream.
+4. Corollario (istanza odierna): «la pagina si aggiorna di continuo» su worktree condiviso = vite HMR che segue le scritture di sessioni parallele — verificare `find src -newermt` prima di diagnosticare; per test Director servire snapshot congelato (build + preview su porta dedicata) o la review page statica.
+
+## P-007 — La metrica percettiva presa sull'ambiente sbagliato mente: preview ≠ dev server (2026-10-21)
+
+**Stato:** **promossa → T-22** (`context/recurring-traps.md`, 2026-10-21, ruling Director «procedi»). 3+ contesti distinti nella stessa famiglia («il layer di verifica non è il layer dell'utente»): P-005 (bundle stantio, stato sbagliato), learn-20261020-2115 A (HMR churn, superficie in movimento), R-238 (ambiente sbagliato, timing non trasferibile).
+**Pattern:** `.mw/runs/learn-20261021-1404/pattern-candidate.md` §A.
+**Istanza:** R-238 Bug A — suite E2E su `vite preview` (build minificata) misurava pointerdown→medaglione 376-431 ms e passava; sul dev server :5173 usato dal Director lo stesso gesto costava 510-732 ms (`jsxDEV` ~5.5 s self-time, `startTransition` a bassa priorità, re-render pagina). Il test era verde sull'ambiente sbagliato e misurava un marker DOM anziché il paint percepito.
+
+**Cosa si propone (estensione della famiglia P-005):**
+1. Per bug di **latenza/percezione** la misura va presa sul runtime che esibisce il sintomo (dev server se il Director lavora lì); il preview build resta il runner della suite, ma la diagnosi e il signoff si fanno sul runtime dell'utente.
+2. Misura l'elemento che l'utente vede, non il marker DOM più precoce disponibile — o fai coincidere i due (stesso `data-debug-*` sul nodo realmente visibile).
+3. «Il test è verde ma il sintomo resta» non è un falso positivo da archiviare: è la discrepanza che indica il divario di layer — investiga dove i due ambienti divergono (instrumentation, scheduling, build).
+4. Corollario tecnico (pattern B della stessa run): quando il commit React è il collo di bottiglia della latenza percepita, il feedback può comparire via DOM diretto sul subtree warm-mounted e cedere al vero render in `useLayoutEffect` pre-paint — handoff seamless, nessun re-render per la comparsa.

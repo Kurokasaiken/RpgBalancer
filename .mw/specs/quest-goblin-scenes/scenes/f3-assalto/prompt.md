@@ -17,4 +17,4 @@ ASSALTO — The lowest, weakest stretch of a crooked goblin palisade seen from t
 ## Generation notes
 
 - «Nothing has happened yet» — il check non è ancora avvenuto.
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

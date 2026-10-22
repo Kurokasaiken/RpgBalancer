@@ -15,4 +15,4 @@ INCALZARE — A rocky defile narrowing between alpine boulders under a vibrant a
 ## Generation notes
 
 - Tolto «stumble/caught»: il check non è avvenuto — la fuga è aperta, non risolta.
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

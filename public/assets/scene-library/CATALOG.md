@@ -14,13 +14,19 @@ che possiamo riutilizzare è meglio riutilizzarlo»).
   `combat`/`forest` da soli non bastano a distinguerle.
 - `no-people`/`no-goblins` = asset wilderness generica, riusabile ovunque.
 - Tutte le immagini sono 3168×1344 (21:9) JPEG q85 progressive.
+- **Contratto formato (PLAN-061, R-231 #8):** il theatre stage renderizza a
+  `theaterAspect` in `gameFrameConfig.questWindow` (oggi 2.4:1), cover-fit.
+  21:9 (2.357) rientra nella tolleranza ±5% (`theaterAssetAspectTolerance`);
+  le nuove generazioni/recodifiche puntano a 3168×1320 (2.4:1 esatto) con
+  soggetto focale nella fascia verticale centrale. Gate:
+  `npm run check:quest-art`.
 
 ## Inventario
 
 | File | Soggetto | Goblin | Figure | Tags | Uso attuale |
 |------|----------|--------|--------|------|-------------|
 | `sentiero-tracce.jpg` | sentiero nel bosco che muore; solchi di ruota, straccio al rovo, fumo basso | no | nessuna | forest, trail, tracks, mystery, daylight, no-people, no-goblins, generic | gob-esplora, gob-tracce-per, gob-tracce-perfor |
-| `carro-nascosto.jpg` | carro mercantile nascosto sotto frasche; forziere con trappola a campanelli | no | nessuna | ravine, wagon, strongbox, loot, trap-bells, midday, no-people, no-goblins, generic | gob-bottino-scelta, gob-bottino |
+| `carro-nascosto.jpg` | carro mercantile nascosto sotto frasche; forziere con trappola a campanelli | no | nessuna | ravine, wagon, strongbox, loot, trap-bells, midday, no-people, no-goblins, generic | gob-bottino |
 | `mercante-strada.jpg` | mercante al bivio con carro coperto; mano alzata in saluto | no | 1 NPC (mercante) | road, fork, npc-merchant, wagon, midday, people-allowed, no-goblins, generic | evento mercante (nodo non ancora authored) |
 | `accampamento-raider.jpg` | accampamento raider spiato tra le fronde: tende di pelle, focolai, palizzata | no | nessuna visibile | camp, palisade, tents, cookfires, dusk, pov-hidden-watcher, no-visible-inhabitants, no-goblins, generic-enemy-camp | gob-accampamento, gob-stealth, gob-assalto |
 | `assalto-goblin.jpg` | campo notturno che erutta: sciame goblin esce dalle tende tra fiamme | **sì — sciame** | goblin (gruppo) | camp, night, fire, combat, goblin-swarm, pre-contact, eruption | gob-combattimento |
@@ -44,8 +50,8 @@ progressive a risoluzione piena 3168×1344.
   tavola, patch ~160×84px a x≈1876-2036 y≈743-827, feather 2px). Violava
   la kill list `NO text`.
 - Nessun'altra lavorazione: le 21:9 si adattano al container Theater
-  (aspect 2.76, `object-cover`, `object-position 50% 40%`) senza crop
-  manuale.
+  (aspect `theaterAspect` da config, `object-cover`,
+  `object-position 50% 40%`) senza crop manuale.
 
 **Mancanti / pending**
 - `viaggio` (transito andata, copre `gob-inizio`) — non ancora generato;
@@ -54,3 +60,8 @@ progressive a risoluzione piena 3168×1344.
   ancora generato; `gob-ritorno` resta su `ritorno.jpg` public-domain.
 - Evento mercante: asset pronto (`mercante-strada.jpg`), nodo quest non
   ancora authored nello scenario.
+- **Stale rispetto al manoscritto v3 (Director 2026-10-18):** `carro-nascosto.jpg`
+  mostra un carro mercantile (fiction revocata: niente carri/strada) —
+  in v3 il nascondiglio è un fagotto sotto tela cerata; `sentiero-tracce.jpg`
+  mostra solchi di ruota (stessa fiction revocata). La rigenerazione
+  richiede ruling Director — i file restano in uso finché non rimpiazzati.

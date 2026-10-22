@@ -1,6 +1,6 @@
 ---
 title: PLAN-031 — /game boot preload + performance measurement
-status: draft
+status: completed
 owner: Mind Weaver (planner)
 created: 2026-10-12
 source_request: R-166

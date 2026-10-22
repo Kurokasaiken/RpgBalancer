@@ -105,7 +105,7 @@ export default defineConfig({
     env: {
       ...process.env,
       VITE_DISABLE_DEV_OVERLAY: 'true',
-      NODE_ENV: 'test',
+      NODE_ENV: process.env.PLAYWRIGHT_NODE_ENV ?? 'test',
     },
   },
   // Global setup for mobile logger integration

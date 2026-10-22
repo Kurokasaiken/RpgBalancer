@@ -16,4 +16,4 @@ RITORNO — An empty dirt road descending from dark forest into a golden valley 
 
 - Calma e apertura totale: il contrasto con `agguato.png` è il beat authored
   «sollievo → shock» (R-103).
-- Aspect 16:9.
+- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.

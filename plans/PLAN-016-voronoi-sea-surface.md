@@ -1,7 +1,7 @@
 ---
 title: PLAN-016 — Superficie marina cellulare (Voronoi) non geometrica
 type: plan
-status: proposto
+status: completed
 updated: 2026-09-10
 richiesta: R-066
 desiderata: v19 (FROZEN)

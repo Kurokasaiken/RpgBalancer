@@ -218,6 +218,7 @@ describe('SkinManager', () => {
       isExperimental: false,
     };
 
+    // INV:skin-manager.INV-1
     it('should register and retrieve presets', () => {
       manager.registerPreset(mockPreset);
       

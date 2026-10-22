@@ -92,6 +92,7 @@ describe('Fase 4 — Drag Roster → SlotRack (logica guard layers)', () => {
   // ── G1: Resident state guards ─────────────────────────────────────────────
 
   describe('Guard Layer G1: Resident stato', () => {
+    // INV:CTR-game-007.INV-2
     it('G1-01: permette drop se residente disponibile e slot vuoto', () => {
       const resident = makeResident('res-1', 'Aelin');
       const result = canDropResidentToSlot(resident, null);
@@ -131,6 +132,7 @@ describe('Fase 4 — Drag Roster → SlotRack (logica guard layers)', () => {
   // ── Assegnazione e stato ──────────────────────────────────────────────────
 
   describe('Assegnazione residente → slot', () => {
+    // INV:CTR-game-007.INV-2
     it('G2-01: dopo drop riuscito, residente è isBusy=true e ha assignedSlot', () => {
       const residents = [
         makeResident('res-1', 'Aelin'),
@@ -168,6 +170,7 @@ describe('Fase 4 — Drag Roster → SlotRack (logica guard layers)', () => {
   // ── Spring-return: unassign ───────────────────────────────────────────────
 
   describe('Spring-return: drop fallito → ritorno al roster', () => {
+    // INV:CTR-game-007.INV-2
     it('G3-01: dopo unassign, residente torna a isBusy=false e assignedSlot=null', () => {
       const residents = [makeResident('res-1', 'Aelin', { isBusy: true, assignedSlot: 'slot-0' })];
       const updated = unassignResident(residents, 'res-1');
@@ -189,6 +192,7 @@ describe('Fase 4 — Drag Roster → SlotRack (logica guard layers)', () => {
   // ── Roster visibility durante drag ───────────────────────────────────────
 
   describe('Roster: visibilità residenti busy durante drag', () => {
+    // INV:CTR-game-007.INV-2
     it('G4-01: roster mostra tutti i residenti anche se busy (non nasconde)', () => {
       const residents = [
         makeResident('res-1', 'Aelin', { isBusy: true }),
@@ -218,6 +222,7 @@ describe('Fase 4 — Drag Roster → SlotRack (logica guard layers)', () => {
   // ── Multi-slot scenario ───────────────────────────────────────────────────
 
   describe('Multi-slot: assegnazione a slot diversi', () => {
+    // INV:CTR-game-007.INV-2
     it('G5-01: due residenti diversi possono occupare slot diversi', () => {
       let residents = [
         makeResident('res-1', 'Aelin'),
