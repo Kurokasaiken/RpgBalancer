@@ -28,6 +28,18 @@ invariants:
       66-116ms in prod). Fix: rendering.gooScale config (default 0.5), shader lavora in field space via uFieldScale
     test_refs:
       - tests/unit/idleVillage/questS1Lab/tarGooConfig.gooScale.test.ts
+  - id: R-234-astrolabe-valley-per-tip
+    source: director-bug
+    source_ref: R-234
+    statement: Each valley of the V6.2 star reads its two neighbouring tips for family and depth (no single global valley)
+    test_refs:
+      - tests/unit/destinyAstrolabeV62/starProfile.test.ts
+  - id: R-234-astrolabe-no-ghost
+    source: director-bug
+    source_ref: R-234
+    statement: 'No hollow ghost petal past the tar wall: the out-of-arena outline is clipped to the tar mask'
+    test_refs:
+      - tests/unit/destinyAstrolabeV62/starProfile.test.ts
 ---
 # destiny-astrolabe-v62
 
