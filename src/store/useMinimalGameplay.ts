@@ -304,6 +304,14 @@ export interface MinimalGameplayState {
    */
   setResidentsOnExpedition: (residentIds: string[], onExpedition: boolean) => void;
   /**
+   * Director/dev tooling (R-264): clears `isDead` on every dead resident so the
+   * canonical roster shows them again. Player-facing death stays permanent —
+   * this exists for playtesting only, wired to the Director panel. The applied-
+   * effects ledger keeps its `dead:` keys, so a settlement replay can never
+   * re-kill a revived resident. Idempotent — returns the revived ids.
+   */
+  reviveDeadResidents: () => string[];
+  /**
    * R-260: transient HUD feedback for the last committed quest settlement —
    * the grant the report's dismissal just paid out. Lives OUTSIDE `state`
    * (never persisted: a reload replays settlement through the journal, not
@@ -593,6 +601,7 @@ const INITIAL_STATE: MinimalGameplayState = {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   triggerSettlementLost: () => {},
   applyQuestSettlement: () => [],
+  reviveDeadResidents: () => [],
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setResidentsOnExpedition: () => {},
   resourceDelta: null,
@@ -1069,6 +1078,20 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
       return { ...resident, isOnExpedition: onExpedition || undefined };
     });
     if (changed) set({ state: { ...state, residents } });
+  },
+
+  reviveDeadResidents: () => {
+    const { state } = get();
+    const revived = state.residents.filter((r) => r.isDead).map((r) => r.id);
+    if (revived.length === 0) return [];
+    set({
+      state: {
+        ...state,
+        residents: state.residents.map((r) => (r.isDead ? { ...r, isDead: undefined } : r)),
+      },
+    });
+    trackTelemetryEvent('director_revive_residents', { count: revived.length, ids: revived });
+    return revived;
   },
 
   publishResourceDelta: (delta) => {

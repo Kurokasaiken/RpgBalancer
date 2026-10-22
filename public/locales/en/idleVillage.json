@@ -1003,7 +1003,8 @@
       "settlementLost": "Settlement lost",
       "merchantMarker": "Merchant marker",
       "levelUp": "Hero level-up",
-      "resetInitial": "Initial state"
+      "resetInitial": "Initial state",
+      "reviveFallen": "Revive fallen"
     },
     "roster": {
       "title": "Roster",

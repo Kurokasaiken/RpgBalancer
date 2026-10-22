@@ -4591,6 +4591,7 @@ Rieseguito anche **PLAN-061 D1-2 1/1 PASS** con il driver corretto; screenshot s
 **Collegamenti:** prompt_library (Volto eroico), art_direction_plan §10.1–10.2 (Motore di Unicità), `src/assets/portraits/README.md`, visual-fork gate (PLAN-047), T-04.
 **Correzione scope (2026-10-22, Director):** il deliverable è il **prompt** (sistema V2 §10.2), non la generazione locale — le prove SDXL locali (base 1.0, cap 77 CLIP token) deriveranno verso ritratti impressionisti domestici, non fantasy medievale; prompt compilati consegnati in `.mw/specs/villager-*/prompt.md` + messaggio sessione.
 **Bug di processo (2026-10-22):** generazione SDXL avviata nonostante deliverable prompt-only → `.mw/bugs/20261022-prompt-deliverable-vs-generation/`; hard gate «Deliverable mode» aggiunto a `coordinator/skills/mockup-generator/SKILL.md` (spec esistente ≠ permesso di generare; ambiguo → domanda prima della GPU).
+**Ruling concept (2026-10-22, Director):** NON «armati malamente» — un popolano non va in quest con scalpelli/forbici/porta; ritrarli nella **vita quotidiana del mestiere**, aria normale (non spaventata, non battle-ready). Riscritti identity.md+prompt.md: Beppe al banco a metà colpo su incastro; Lisetta china sul tavolo a metà sforbiciata su riga di gesso; Baldassarre al ceppo, mannaia consumata a metà taglio, gigante gentile. Kill list ora vieta `battle, weapon brandishing, tavern door`.
 
 ## R-257 — Spring-back: medaglione duplicato; roster filtrato «disponibili» fa resize al assign/remove
 

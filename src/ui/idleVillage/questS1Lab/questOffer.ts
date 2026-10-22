@@ -24,12 +24,14 @@ import {
   registerScenarioInstance,
   scenarioInstanceById,
   type QuestId,
+  type QuestRunState,
   type ResolvedOfferRecord,
   type ScenarioInstance,
 } from './questRun';
 import { defaultStrategy, hashSimInput, simulateQuest, simulateQuestAsync, type QuestSimResult, type QuestSimulationChunkTiming, type SimStrategy } from './questSimulation';
+import type { QuestForecastWorkerRequest, QuestForecastWorkerResponse } from './questForecast.worker';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
-import { localizeScenario } from '@/balancing/config/idleVillage/quests/questContentLocale';
+import { getQuestContentLocale, localizeScenario } from '@/balancing/config/idleVillage/quests/questContentLocale';
 import { ROVINE_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/rovine';
 import { computeScenarioVersion, type QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { dangerBandFor, questPoiById, type QuestPoi } from '@/balancing/config/idleVillage/quests/questPois';
@@ -264,7 +266,7 @@ export async function estimateForPartyAsync(
 ): Promise<PartyEstimate> {
   const prepared = prepareEstimateRun(resolvedOffer, members, opts);
   if (prepared === 'incomplete') return 'incomplete';
-  const sim = await simulateQuestAsync(prepared.run, prepared.strategy, {
+  const sim = await simulateQuestOffThread(prepared.run, prepared.strategy, prepared.instance, {
     runs: prepared.runs,
     seed: opts?.seed,
     chunkRuns: opts?.chunkRuns,
@@ -274,6 +276,74 @@ export async function estimateForPartyAsync(
   return { sim, bands: { danger: dangerBandFor(sim.anyDeathPct).id }, nSim: prepared.runs };
 }
 
+/**
+ * R-265: run the SAME Monte Carlo in a dedicated worker when the platform has
+ * one — 400 runs ≈ ~5 s of CPU on the goblin scenario, and even chunked on
+ * the main thread those slices saturated the page during click-assign (the
+ * measured 5–10 s busy window per click). Inputs/outputs are plain data, so
+ * the worker path is bit-identical to `simulateQuest` (same seeds, same
+ * accumulation order). The instance + content locale ride along because the
+ * worker's module registry and locale state start empty/English (declared
+ * seam of `questContentLocale`). Falls back to the chunked main-thread sim
+ * when `Worker` is unavailable or fails to boot (jsdom, odd embedders).
+ */
+function simulateQuestOffThread(
+  state: QuestRunState,
+  strategy: SimStrategy,
+  instance: NonNullable<ReturnType<typeof scenarioInstanceById>>,
+  opts?: {
+    runs?: number;
+    seed?: number;
+    chunkRuns?: number;
+    signal?: AbortSignal;
+    onChunkTiming?: (timing: QuestSimulationChunkTiming) => void;
+  },
+): Promise<QuestSimResult> {
+  const onMainThread = () =>
+    simulateQuestAsync(state, strategy, {
+      runs: opts?.runs,
+      seed: opts?.seed,
+      chunkRuns: opts?.chunkRuns,
+      signal: opts?.signal,
+      onChunkTiming: opts?.onChunkTiming,
+    });
+  if (typeof Worker === 'undefined') return onMainThread();
+  return new Promise<QuestSimResult>((resolve, reject) => {
+    const startedAt = performance.now();
+    const worker = new Worker(new URL('./questForecast.worker.ts', import.meta.url), { type: 'module' });
+    const cleanup = () => {
+      opts?.signal?.removeEventListener('abort', onAbort);
+      worker.terminate();
+    };
+    const onAbort = () => {
+      cleanup();
+      reject(opts?.signal?.reason ?? new DOMException('The operation was aborted.', 'AbortError'));
+    };
+    worker.onmessage = (event: MessageEvent<QuestForecastWorkerResponse>) => {
+      cleanup();
+      opts?.onChunkTiming?.({ workMs: event.data.workMs, yieldMs: Math.max(0, performance.now() - startedAt - event.data.workMs) });
+      resolve(event.data.sim);
+    };
+    worker.onerror = () => {
+      cleanup();
+      onMainThread().then(resolve, reject);
+    };
+    if (opts?.signal?.aborted) {
+      onAbort();
+      return;
+    }
+    opts?.signal?.addEventListener('abort', onAbort, { once: true });
+    worker.postMessage({
+      state,
+      strategy,
+      runs: Math.max(1, opts?.runs ?? 10000),
+      seed: opts?.seed,
+      instance,
+      locale: getQuestContentLocale(),
+    } satisfies QuestForecastWorkerRequest);
+  });
+}
+
 /** Shared estimate setup: gates completeness (required-slot count, a
  *  `leader`, a registered instance) and builds the run + strategy the sim
  *  consumes — the SAME `ScenarioInstance` a launched run would freeze. */
@@ -281,7 +351,7 @@ function prepareEstimateRun(
   resolvedOffer: ResolvedOfferRecord,
   members: LabMember[],
   opts?: { runs?: number; seed?: number; strategy?: SimStrategy },
-): 'incomplete' | { run: ReturnType<typeof createRun>; strategy: SimStrategy; runs: number } {
+): 'incomplete' | { run: ReturnType<typeof createRun>; strategy: SimStrategy; runs: number; instance: NonNullable<ReturnType<typeof scenarioInstanceById>> } {
   const poi = questPoiById(resolvedOffer.poiId);
   const instance = scenarioInstanceById(resolvedOffer.instanceId);
   if (!poi || !instance) return 'incomplete';
@@ -295,7 +365,7 @@ function prepareEstimateRun(
     resolvedOffer,
   });
   const strategy = { ...defaultStrategy(run), ...opts?.strategy };
-  return { run, strategy, runs: opts?.runs ?? 1000 };
+  return { run, strategy, runs: opts?.runs ?? 1000, instance };
 }
 
 /** The node map an estimate/run resolved through `resolvedOffer` uses —

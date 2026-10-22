@@ -188,6 +188,16 @@ export function useQuestExpeditionSession({
    * pointer release. */
   const pendingSwapRef = useRef<{ fromSlotId: string; toSlotId: string; residentId: string } | null>(null);
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
+  /* R-265: rapid click-assign serialisation reads the REF (synchronous), while
+   *  the STATE lands as a transition — the click's page-wide render becomes
+   *  interruptible instead of one contiguous ~300–700 ms task inside the
+   *  handler. The roster card dims a frame later at worst, and the flight
+   *  itself already starts 50 ms out — the click no longer blocks the page. */
+  const flyingResidentRef = useRef<string | null>(null);
+  const setFlying = useCallback((id: string | null) => {
+    flyingResidentRef.current = id;
+    startTransition(() => setFlyingResidentId(id));
+  }, []);
   /* R-257: resident mid slot→roster return — set urgently with the flight and
    *  released only when the deferred `assignments` clear commits, so the
    *  seat's medallion copy stays suppressed for the whole handoff (the proxy
@@ -1050,23 +1060,23 @@ export function useQuestExpeditionSession({
 
   const handleResidentSelect = useCallback(
     (residentId: string) => {
-      if (flyingResidentId || !isDetailOpen || run) return false;
+      if (flyingResidentRef.current || !isDetailOpen || run) return false;
       const slot = findAcceptingSlot(residentId);
       if (!slot) return false;
       const from = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
       if (!from) return false;
-      setFlyingResidentId(residentId);
+      setFlying(residentId);
       window.setTimeout(() => {
         const to = elementCenter(getSlotComponentElement(slot.id));
         if (!to) {
-          setFlyingResidentId(null);
+          setFlying(null);
           return;
         }
         startFlight({ residentId, slotId: slot.id, isInset: true, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y });
       }, 50);
       return true;
     },
-    [flyingResidentId, isDetailOpen, run, findAcceptingSlot, startFlight],
+    [isDetailOpen, run, findAcceptingSlot, startFlight, setFlying],
   );
 
   /** Extraction → spring-back (R-248): the seat clears AND the extracted
@@ -1078,7 +1088,7 @@ export function useQuestExpeditionSession({
     (slotBlueprintId: string) => {
       const residentId = assignments[slotBlueprintId];
       controller.clearSlot(slotBlueprintId);
-      if (!residentId || flyingResidentId) return;
+      if (!residentId || flyingResidentRef.current) return;
       const from = elementCenter(getSlotComponentElement(slotBlueprintId));
       /* R-257: under a roster filter ('available' and friends) the slotted
        *  card is filtered OUT of the DOM — without a fallback the return
@@ -1090,7 +1100,7 @@ export function useQuestExpeditionSession({
         ?? elementCenter(document.querySelector('[data-testid="drag-test-container"]'));
       if (from && to) {
         setReturningResidentId(residentId);
-        setFlyingResidentId(residentId);
+        setFlying(residentId);
         startFlight({
           residentId,
           slotId: slotBlueprintId,
@@ -1102,7 +1112,7 @@ export function useQuestExpeditionSession({
         });
       }
     },
-    [assignments, controller.clearSlot, flyingResidentId, startFlight],
+    [assignments, controller.clearSlot, startFlight, setFlying],
   );
 
   const handlePageFlightComplete = useCallback(
@@ -1117,10 +1127,10 @@ export function useQuestExpeditionSession({
       } else if (isInset && slotId) {
         handleAssign(slotId, residentId);
       }
-      setFlyingResidentId(null);
+      setFlying(null);
       settleFlight();
     },
-    [handleAssign, settleFlight, commitSwap],
+    [handleAssign, settleFlight, commitSwap, setFlying],
   );
 
   /* R-257: the seat suppression outlives the proxy: it lifts only once the
