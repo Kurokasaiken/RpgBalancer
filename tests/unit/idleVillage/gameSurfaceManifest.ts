@@ -110,6 +110,7 @@ export const GAME_SURFACE_FILES = [
   'src/ui/idleVillage/components/destinyAstrolabeV62/DestinyAstrolabeV62.tsx',
   'src/ui/idleVillage/components/destinyAstrolabeV62/ballGuidance.ts',
   'src/ui/idleVillage/components/destinyAstrolabeV62/engine.ts',
+  'src/ui/idleVillage/components/destinyAstrolabeV62/starProfile.ts',
   'src/ui/idleVillage/components/destinyAstrolabeV62/tarGooRenderer.ts',
   'src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts',
   'src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx',
