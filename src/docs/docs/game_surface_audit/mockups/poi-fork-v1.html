@@ -61,6 +61,18 @@ table.matrix{border-collapse:collapse;width:100%;font-size:15px;margin-top:10px}
 .matrix th,.matrix td{border-bottom:1px solid var(--rule);padding:7px 8px;text-align:left;vertical-align:top}
 .matrix th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label);text-transform:uppercase}
 .win{color:var(--title)}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.board h2{margin-top:0}
+.bcol{border:1px solid var(--rule);border-radius:10px;padding:14px;background:rgba(6,15,22,.35);min-width:0}
+.bcol .one{font-size:15px;color:var(--dim);min-height:46px}
+.brow{display:grid;gap:4px;margin:6px 0 12px}
+.brow .tile{width:auto;height:auto;aspect-ratio:1}
+.bmap{width:100%;aspect-ratio:650/380;position:relative;overflow:hidden;border-radius:8px}
+.bmap .map{transform-origin:0 0;position:absolute;left:0;top:0}
+.bwhy{font-size:14px;margin:0}
+.bwhy b{color:var(--title);font-weight:600}
+.btitle{grid-column:1/-1}
+@media (max-width:980px){.board{grid-template-columns:1fr}}
 .req{columns:2;column-gap:28px;font-size:15px}
 .req li{break-inside:avoid;margin-bottom:6px}
 .tension{border:1px solid #8a6a32;border-radius:8px;padding:10px 14px;background:rgba(201,102,58,.08);margin:10px 0}
@@ -95,6 +107,7 @@ table.matrix{border-collapse:collapse;width:100%;font-size:15px;margin-top:10px}
   </div>
 </section>
 
+<section id="board" class="board"></section>
 <div id="options"></div>
 
 <section>
@@ -263,7 +276,7 @@ function marker(opt, c){
   const routeSvg = route ? `<path d="M-70 64L${f(anchorPt.x-3)} ${f(anchorPt.y+3)}" stroke="rgba(16,20,32,.8)" stroke-width="6"/><path d="M-70 64L${f(anchorPt.x-3)} ${f(anchorPt.y+3)}" stroke="var(--crest)" stroke-width="2.6" ${state==='andata' ? 'stroke-dasharray="40 200"' : ''}/>` : '';
   const party = route ? (() => { const px = state==='andata' ? -52 : anchorPt.x-13, py = state==='andata' ? 50 : anchorPt.y+12; return `<g transform="translate(${f(px)} ${f(py)})"><circle r="7.5" fill="var(--deep)" stroke="var(--crest)" stroke-width="1.8"/><path d="M-3.4 2.6a3.4 2.6 0 0 1 6.8 0M0 -.6a1.8 1.8 0 1 0 0 -3.6a1.8 1.8 0 1 0 0 3.6" fill="var(--poi-ivory)"/></g>`; })() : '';
   const em = { decision:'eye', won:'spark', lost:'blades', locked:'lock' }[state];
-  const w = 132*k, h = 140*k;
+  const w = 132*k*(c.scale||1), h = 140*k*(c.scale||1);
   return `<svg width="${f(w)}" height="${f(h)}" viewBox="-66 -66 132 140" aria-hidden="true" style="${locked ? 'filter:saturate(.25);opacity:.62' : ''}">
     ${routeSvg}${halo}
     <g>${hornsSvg((opt==='A'||opt==='C') ? risk : 0, R, family, ember)}</g>
@@ -314,6 +327,17 @@ for (const o of OPTS){
   <div class="scroll"><div class="detail stage">${RISKS.map((rk,ri)=>`<figure>${marker(o.id,{risk:ri,size:'M'}).replace(/width="([\d.]+)" height="([\d.]+)"/, (m,w,h)=>`width="${w*2}" height="${h*2}"`)}<figcaption>${rk}</figcaption></figure>`).join('')}${RISKS.map((rk,ri)=>`<figure>${marker(o.id,{family:'threat',risk:ri}).replace(/width="([\d.]+)" height="([\d.]+)"/, (m,w,h)=>`width="${w*2}" height="${h*2}"`)}<figcaption>minaccia · ${rk}</figcaption></figure>`).join('')}</div></div>
   </div></section>`;
 }
+const ONE = { A:'Le corna crescono sopra la sagoma; a «letale» l\'ottone diventa brace. Tempo: cerchio magico intorno.', B:'Il contorno stesso si dentella: liscio, tacche, denti, denti spezzati con brace. Tempo: cerchio magico intorno.', C:'Il tempo corre sul bordo della sagoma (niente cerchio intorno); il rischio sono le corna di A.' };
+const WHY = { A:['si contano le corna da lontano, anche in grigio','le corna entrano nell\'alone tra le 10 e le 2'], B:['stesso ingombro di oggi, nessuna collisione','«media» e «alta» si separano poco a 55 px'], C:['il più compatto e leggero','tocca la desiderata v3 FROZEN: va rivista prima'] };
+const BSTATES = [['available','disponibile'],['onsite','in corso'],['decision','decisione'],['expiring','in scadenza*'],['won','vinto'],['lost','perso']];
+document.getElementById('board').innerHTML = `<div class="btitle"><h2>Tavola di confronto</h2><p class="dim">Stessa scala per le tre: marker a taglia d'uso (55 px) su ritagli reali; la mappa è rimpicciolita per stare in colonna. Sotto, ogni opzione per intero.</p></div>` + OPTS.map(o => `<div class="bcol stage"><h2>${o.name}</h2><p class="one">${ONE[o.id]}</p>
+  <h3>Rischio · bassa → letale</h3><div class="brow" style="grid-template-columns:repeat(4,1fr)">${RISKS.map((rk,ri)=>tile('brughiera', marker(o.id,{risk:ri}), rk)).join('')}</div>
+  <h3>Minaccia · bassa → letale</h3><div class="brow" style="grid-template-columns:repeat(4,1fr)">${RISKS.map((rk,ri)=>tile('terra', marker(o.id,{family:'threat',risk:ri}), rk)).join('')}</div>
+  <h3>Stati · rischio alto</h3><div class="brow" style="grid-template-columns:repeat(3,1fr)">${BSTATES.map(([st,lab])=>tile('prato', marker(o.id,{risk:2,state:st}), lab)).join('')}</div>
+  <h3>Tanti POI</h3><div class="bmap"><div class="map" data-fit>${DENSITY.map(d=>marker(o.id,d.c).replace('<svg ','<svg class="m" style="left:'+d.x+'px;top:'+d.y+'px" ')).join('')}</div></div>
+  <p class="bwhy" style="margin-top:10px"><b>Per:</b> ${WHY[o.id][0]}. <b>Contro:</b> ${WHY[o.id][1]}.</p></div>`).join('');
+const fit = () => document.querySelectorAll('[data-fit]').forEach(m => { const w = m.parentElement.clientWidth; m.style.transform = `scale(${w/650})`; });
+fit(); addEventListener('resize', fit);
 document.getElementById('options').innerHTML = html + `<p class="dim" style="font-size:14px">* stato forzato nel mockup: oggi non compare su /game (nessuna finestra d'offerta, nessuna main quest, nessuna fonte per «bloccato»).</p>`;
 
 /* shared defs, mounted once (Medaglione #4) */

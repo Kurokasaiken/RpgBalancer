@@ -1,0 +1,34 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><title>POI colori famiglie</title>
+<style>
+body{margin:0;background:#0b1c22;color:#e9dfc6;font:15px/1.4 Georgia,serif;padding:16px}
+h1{font:600 20px Georgia;color:#f0cf6a;margin:0 0 4px}p{margin:0 0 12px;color:#a9b3ad;max-width:900px}
+.g{display:grid;grid-template-columns:150px repeat(8,128px);gap:6px;width:max-content}
+.l{display:flex;flex-direction:column;justify-content:center;font:600 12px Georgia;letter-spacing:.08em;text-transform:uppercase;color:#c9a84e}
+.l small{font:400 12px Georgia;color:#a9b3ad;text-transform:none;letter-spacing:0}
+.c{font:10px Georgia;text-align:center;color:#a9b3ad;text-transform:uppercase}
+.t{width:128px;height:128px;border-radius:6px;background-size:cover;position:relative;overflow:hidden}
+.t svg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+body.gray .g{filter:grayscale(1)}
+</style></head><body>
+<h1>Colore della ghiera per famiglia</h1>
+<p>Stessa sagoma e stesso glifo: cambia solo il metallo. Bordo senza filo bianco (filo scuro nella tinta del metallo). Marker a 55 px (qui 1,6×) su ritagli reali.</p>
+<div class="g" id="g"></div>
+<script>
+const B=['mare','foresta','prato','sabbia','ocra','terra','neve','brughiera'];
+const M=[
+['Quest','bronzo (deciso)',['#e2c77e','#b38a3c','#6e4c1c'],'#3a2810'],
+['Lavoro','teal (deciso)',['#7fd0c4','#2f8f8a','#17504f'],'#0c2e2d'],
+['Attività A','ferro blu-acciaio',['#b7c6d6','#6c8299','#334657'],'#14202b'],
+['Attività B','avorio / osso',['#f1e8d0','#c9bb98','#8a7d5e'],'#3b3424'],
+['Attività C','verde muschio',['#a9b86a','#6b7d3a','#3a4a1c'],'#1c2610']];
+let h='<div></div>'+B.map(b=>`<div class="c">${b}</div>`).join('');
+M.forEach(([n,s,c,d],i)=>{h+=`<div class="l">${n}<small>${s}</small></div>`;B.forEach(b=>{h+=`<div class="t" style="background-image:url(assets/biome-${b}.jpg)">${mk(i,c,d)}</div>`})});
+function mk(i,c,d){const r=27.5,id='g'+(mk.n=(mk.n||0)+1);
+return `<svg width="150" height="160" viewBox="-66 -66 132 140"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset=".5" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></linearGradient></defs>
+<path d="M0 ${r*1.45}L${r*.53} ${r*.85}A${r} ${r} 0 1 0 ${-r*.53} ${r*.85}Z" fill="url(#${id})" stroke="#0b0a08" stroke-width="3.2"/>
+<path d="M0 ${r*1.45}L${r*.53} ${r*.85}A${r} ${r} 0 1 0 ${-r*.53} ${r*.85}Z" fill="none" stroke="${d}" stroke-width="1.2"/>
+<circle r="${r-5}" fill="none" stroke="${d}" stroke-width="1" opacity=".7"/>
+<circle r="${r-8}" fill="#0c1d22" stroke="#0b0a08" stroke-width="1"/>
+<image href="assets/poi-goblin-camp-128.webp" x="-21" y="-21" width="42" height="42"/></svg>`}
+document.getElementById('g').innerHTML=h;
+</script></body></html>
