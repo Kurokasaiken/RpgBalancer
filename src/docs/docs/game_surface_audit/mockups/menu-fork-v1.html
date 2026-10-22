@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu di gioco /game — fork v1 (Carica, Impostazioni, Esci, Titolo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --display:"Cinzel","Trajan Pro",serif; --serif:"EB Garamond",Georgia,serif;
+  /* token della skin base (stessi di fork-mockups-v5.html / skinCssVariables.ts) — mai viola */
+  --title:#f0cf6a; --text:#F5F2E8; --text2:rgba(245,242,232,.72); --label:#c9a84e;
+  --lacq:#09202a; --lift:#0f2a35; --deep:#060f16; --brass-hi:#cfaf63; --brass:#a0762f;
+  --wound:#a11d33; --ember:#c9663a; --ok:#7bc96f;
+  --page:#0b1c22; --body:#e9dfc6; --dim:#a9b3ad; --rule:rgba(223,184,87,.22);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--body);font:16px/1.5 var(--serif)}
+header,main{max-width:1320px;margin:0 auto;padding:0 16px}
+header{padding-top:28px}
+h1{font:600 24px var(--display);letter-spacing:.06em;color:var(--title);margin:0 0 6px}
+.lead{color:var(--dim);max-width:980px;margin:0 0 10px}
+.fork{border-top:1px solid var(--rule);padding:26px 0}
+.fork h2{font:600 18px var(--display);letter-spacing:.05em;color:var(--label);margin:0 0 4px}
+.why{color:var(--dim);max-width:980px;margin:0 0 14px}
+.cap{font:500 13px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);margin:18px 0 6px}
+.note{font-size:14px;color:var(--dim);margin:6px 0 0;max-width:1000px}
+.matrix{border-collapse:collapse;margin-top:12px;font-size:14px;width:100%;max-width:1280px}
+.matrix th,.matrix td{border-bottom:1px solid var(--rule);padding:5px 8px;text-align:left;vertical-align:top}
+.matrix th{font:500 12px var(--display);letter-spacing:.1em;color:var(--label);text-transform:uppercase}
+code{font:.82em ui-monospace,Menlo,monospace;color:var(--label)}
+
+/* ---- fotogramma 1280×720 (viewport minimo supportato, guida §6.8) ---- */
+.frame{width:1280px;height:720px;position:relative;overflow:hidden;border:1px solid var(--rule);border-radius:6px;
+  background:#06131a url(assets/map-center.jpg) center/cover}
+.frame.lacquer{background:radial-gradient(ellipse 120% 90% at 50% 42%,#12363f 0%,#060f16 62%)}
+.wash{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,15,22,.55),rgba(6,15,22,.8))}
+
+/* ---- lastra di famiglia (HudPlaque panel) ---- */
+.plaque{background:linear-gradient(180deg,var(--lift),var(--deep));border:1.5px solid var(--brass-hi);border-radius:12px;
+  box-shadow:0 10px 24px rgba(3,26,30,.6),inset 0 0 0 3px var(--deep),inset 0 0 0 4px rgba(207,175,99,.3);color:var(--text)}
+.hang{position:absolute;left:16px;top:0;padding:13px 16px 11px;border-radius:0 0 12px 12px;border-top:0;display:flex;gap:8px;align-items:center;
+  font:600 12px var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--title)}
+.hang i{display:block;width:14px;height:10px;border-top:2px solid currentColor;border-bottom:2px solid currentColor;position:relative}
+.hang i::after{content:"";position:absolute;left:0;right:0;top:2px;height:2px;background:currentColor}
+.topfake{position:absolute;right:16px;top:0;height:46px;padding:0 18px;border-radius:0 0 12px 12px;border-top:0;display:flex;align-items:center;gap:18px;font:600 12px var(--display);letter-spacing:.1em;color:var(--text2)}
+
+/* ---- controlli: pillola 26px del materiale (data-hud-controls), nessuna placca CTA ---- */
+.pill{font:600 12px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--label);height:26px;padding:0 12px;
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+  background:linear-gradient(180deg,#123341,#081b24);border:1px solid rgba(207,175,99,.45);border-radius:13px;
+  box-shadow:inset 0 0 0 2px rgba(6,15,22,.9)}
+.pill.on{color:var(--title);border-color:var(--brass-hi);box-shadow:inset 0 0 0 2px rgba(6,15,22,.9),inset 0 0 12px rgba(240,207,106,.2)}
+.pill.dis{color:rgba(201,168,78,.62);border-color:rgba(207,175,99,.28)}
+.pill.big{height:34px;padding:0 20px;border-radius:17px}
+.lbl{font:600 12px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--label)}
+.rule{height:1px;background:var(--rule);margin:10px 0}
+.h{font:600 16px var(--display);letter-spacing:.08em;color:var(--title);margin:0}
+.t{color:var(--text);font-size:15px;line-height:1.35}
+.t2{color:var(--text2);font-size:13.5px;line-height:1.35}
+.row{display:flex;align-items:center;gap:10px}
+.sp{flex:1}
+
+/* ---- slot ---- */
+.slot{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:8px 10px;border:1px solid rgba(207,175,99,.25);border-radius:8px;background:rgba(6,15,22,.45)}
+.slot.sel{border-color:var(--brass-hi);background:linear-gradient(180deg,rgba(18,51,65,.7),rgba(8,27,36,.7));box-shadow:inset 0 0 14px rgba(240,207,106,.12)}
+.thumb{width:112px;height:63px;border-radius:5px;border:1px solid rgba(207,175,99,.4);background:url(assets/map-center.jpg) center/cover}
+.thumb.b{background-position:20% 70%;background-size:230%}.thumb.c{background-position:85% 30%;background-size:260%}.thumb.d{background-position:50% 10%;background-size:300%}
+.thumb.empty{background:repeating-linear-gradient(135deg,#0b1f29 0 8px,#0d2530 8px 16px);border-style:dashed}
+.por{width:24px;height:24px;border-radius:50%;border:1px solid var(--brass-hi);background-size:cover;display:inline-block;margin-right:-6px}
+.hm{background-image:url(assets/hero-mage.jpg)}.hw{background-image:url(assets/hero-warrior.jpg)}
+.tag{font:600 11px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--label);border:1px solid rgba(207,175,99,.4);padding:1px 7px;border-radius:9px}
+.mini{font:500 12px var(--display);letter-spacing:.06em;color:var(--text2)}
+
+/* ---- cursori / opzioni ---- */
+.range{display:flex;align-items:center;gap:12px}
+.track{flex:1;height:6px;border-radius:3px;background:#05121a;border:1px solid rgba(207,175,99,.35);position:relative;min-width:120px}
+.track b{position:absolute;left:0;top:-1px;bottom:-1px;border-radius:3px;background:linear-gradient(90deg,var(--brass),var(--title))}
+.track em{position:absolute;top:-6px;width:12px;height:16px;border-radius:3px;background:var(--title);border:1px solid var(--brass);margin-left:-6px}
+.val{font:600 12px var(--display);color:var(--text);width:40px;text-align:right}
+.opt{display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(223,184,87,.12)}
+.chk{width:18px;height:18px;border-radius:3px;border:1px solid var(--brass-hi);background:#05121a;display:inline-block;position:relative}
+.chk.on::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid var(--title);border-width:0 2px 2px 0;transform:rotate(40deg)}
+.menu-open{position:absolute;left:16px;top:44px;width:250px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.menu-open .pill{width:100%;justify-content:flex-start}
+.menu-open .pill.hl{color:var(--title);border-color:var(--brass-hi)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Menu di gioco /game — fork v1</h1>
+  <p class="lead">DN-7 (PLAN-067): «Carica partita», «Tutte le impostazioni», «Esci al titolo» da implementare. Ogni riquadro è un fotogramma 1280×720 a scala 1:1 (viewport minimo, guida §6.8) con token della skin base, lastre <code>HudPlaque</code>, pillole 26 px <code>data-hud-controls</code> e ritratti/mappa reali; nessun viola, nessuna placca CTA (il pulsante primario resta in attesa di BTN-1: qui è una pillola neutra), nessun testo sopra le immagini. I dati (giorno, nomi, orari) sono segnaposto. <b>Nessuna opzione è raccomandata come decisa</b>: le raccomandazioni sono nel documento di esplorazione.</p>
+</header>
+<main>
+
+<!-- =================== FORK LOAD =================== -->
+<section class="fork" id="load">
+  <h2>LOAD-1 · «Carica partita»: dove vive l'elenco dei salvataggi</h2>
+  <p class="why">Stessi dati in tutti e tre (insediamento, giorno, ora di salvataggio, eroi in squadra, anteprima della mappa, autosalvataggio separato dai manuali); cambia la superficie e quanta mappa resta visibile.</p>
+
+  <div class="cap">A · Lastra centrale sulla mappa (con velo)</div>
+  <div class="frame">
+    <div class="wash"></div>
+    <div class="plaque hang"><i></i><span>Menu</span></div>
+    <div class="plaque" style="position:absolute;left:290px;top:110px;width:700px;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+      <div class="row"><p class="h">Carica partita</p><span class="sp"></span><span class="pill">Chiudi</span></div>
+      <div class="rule" style="margin:0"></div>
+      <div class="slot sel"><div class="thumb"></div><div>
+        <div class="row"><span class="t">Valenflø · Giorno 14</span><span class="tag">Autosalvataggio</span></div>
+        <div class="t2">Oggi 18:42 · 2 minuti fa</div>
+        <div class="row" style="margin-top:4px"><span class="por hm"></span><span class="por hw" style="margin-right:6px"></span><span class="mini">2 eroi · 1 spedizione in corso</span></div></div></div>
+      <div class="slot"><div class="thumb b"></div><div>
+        <div class="t">Valenflø · Giorno 9</div><div class="t2">Ieri 21:05 · Salvataggio 1</div>
+        <div class="row" style="margin-top:4px"><span class="por hw" style="margin-right:6px"></span><span class="mini">1 eroe</span></div></div></div>
+      <div class="slot"><div class="thumb c"></div><div>
+        <div class="t">Valenflø · Giorno 3</div><div class="t2">12 ott. 20:30 · Salvataggio 2</div>
+        <div class="row" style="margin-top:4px"><span class="por hm" style="margin-right:6px"></span><span class="mini">1 eroe</span></div></div></div>
+      <div class="slot"><div class="thumb empty"></div><div><div class="t2">Salvataggio 3 — vuoto</div></div></div>
+      <div class="rule" style="margin:2px 0"></div>
+      <div class="row"><span class="t2">La partita in corso (Giorno 14, non salvata da 2 minuti) verrà sostituita.</span><span class="sp"></span><span class="pill big on">Carica</span><span class="pill big dis">Elimina</span></div>
+    </div>
+  </div>
+  <p class="note">+ resta nel flusso del gioco, la mappa si intravede dietro; − elenco lungo (4 righe già riempiono la lastra), anteprima piccola, velo scuro sulla mappa (la guida §6.6 lo ammette solo per schermate d'azione a pagina intera).</p>
+
+  <div class="cap">B · Schermata a pagina intera con anteprima grande (guida §6b)</div>
+  <div class="frame">
+    <div class="wash" style="background:linear-gradient(90deg,rgba(6,15,22,.92) 0 45%,rgba(6,15,22,.2) 70%)"></div>
+    <div class="plaque hang"><i></i><span>Carica partita</span><span class="pill" style="margin-left:18px">Indietro</span></div>
+    <div style="position:absolute;left:24px;top:70px;width:520px;display:flex;flex-direction:column;gap:8px">
+      <div class="slot sel"><div class="thumb"></div><div><div class="row"><span class="t">Valenflø · Giorno 14</span><span class="tag">Auto</span></div><div class="t2">Oggi 18:42</div></div></div>
+      <div class="slot"><div class="thumb b"></div><div><div class="t">Valenflø · Giorno 9</div><div class="t2">Ieri 21:05 · Salvataggio 1</div></div></div>
+      <div class="slot"><div class="thumb c"></div><div><div class="t">Valenflø · Giorno 3</div><div class="t2">12 ott. 20:30 · Salvataggio 2</div></div></div>
+      <div class="slot"><div class="thumb empty"></div><div><div class="t2">Salvataggio 3 — vuoto</div></div></div>
+    </div>
+    <div class="plaque" style="position:absolute;right:28px;top:70px;width:560px;padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="height:300px;border-radius:8px;border:1px solid var(--brass-hi);background:url(assets/map-center.jpg) center/cover"></div>
+      <div class="row"><p class="h">Valenflø · Giorno 14</p><span class="sp"></span><span class="tag">Autosalvataggio</span></div>
+      <div class="t2">Oggi 18:42 · 2 minuti fa · Versione 0.9.3</div>
+      <div class="row"><span class="por hm"></span><span class="por hw" style="margin-right:8px"></span><span class="t2">Squadra: 2 eroi · 1 spedizione in corso · 340 oro</span></div>
+    </div>
+    <div class="plaque" style="position:absolute;left:0;right:0;bottom:0;border-radius:12px 12px 0 0;border-bottom:0;padding:12px 24px;display:flex;align-items:center;gap:10px">
+      <span class="t2" style="flex:1">La partita in corso (Giorno 14) non è salvata e verrà sostituita.</span><span class="pill big dis">Elimina</span><span class="pill big on">Carica</span></div>
+  </div>
+  <p class="note">+ anteprima leggibile, dettagli senza testo sull'immagine, stesso schema del lab quest (§6b: tre lastre, <code>plinth</code> in basso); − la mappa viva sparisce, schermata da costruire in più (layer <code>boot</code> o simile).</p>
+
+  <div class="cap">C · Lastra laterale compatta accanto al menu (senza velo)</div>
+  <div class="frame">
+    <div class="plaque hang"><i></i><span>Menu</span></div>
+    <div class="plaque menu-open"><span class="lbl">Partita</span>
+      <span class="pill">Salva ora</span><span class="pill hl">Carica partita ▸</span><span class="pill">Esci al titolo</span></div>
+    <div class="plaque" style="position:absolute;left:276px;top:44px;width:380px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+      <span class="lbl">Carica partita</span>
+      <div class="slot sel" style="grid-template-columns:1fr"><div><div class="row"><span class="t">Giorno 14</span><span class="tag">Auto</span><span class="sp"></span><span class="t2">2 min fa</span></div></div></div>
+      <div class="slot" style="grid-template-columns:1fr"><div class="row"><span class="t">Giorno 9</span><span class="sp"></span><span class="t2">ieri 21:05</span></div></div>
+      <div class="slot" style="grid-template-columns:1fr"><div class="row"><span class="t">Giorno 3</span><span class="sp"></span><span class="t2">12 ott.</span></div></div>
+      <div class="slot" style="grid-template-columns:1fr"><div class="t2">Salvataggio 3 — vuoto</div></div>
+      <div class="row"><span class="sp"></span><span class="pill on">Carica ▸ Giorno 14</span></div>
+    </div>
+  </div>
+  <p class="note">+ la mappa resta intatta e animata, costo minimo, coerente col menu a tendina; − niente anteprima, nome dell'insediamento e squadra non entrano, il «sostituire la partita?» deve diventare una seconda lastra.</p>
+
+  <h3 class="cap">Conferma di sostituzione (comune ai tre, da scegliere nel fork QUIT-1)</h3>
+  <table class="matrix"><tr><th>Asse</th><th>A lastra centrale</th><th>B pagina intera</th><th>C laterale</th></tr>
+  <tr><td>Anteprima</td><td>112×63 px</td><td class="win" style="color:var(--title)">grande, 560 px</td><td>nessuna</td></tr>
+  <tr><td>Mappa dietro</td><td>velata</td><td>velata a sinistra</td><td class="win" style="color:var(--title)">intatta e viva</td></tr>
+  <tr><td>Costo implementativo</td><td>medio</td><td>alto (nuova schermata)</td><td class="win" style="color:var(--title)">basso</td></tr>
+  <tr><td>Testi it-IT lunghi</td><td>ok</td><td class="win" style="color:var(--title)">ok, spazio</td><td>rischio</td></tr></table>
+</section>
+
+<!-- =================== FORK SETTINGS =================== -->
+<section class="fork" id="settings">
+  <h2>SET-1 · «Tutte le impostazioni»: forma della schermata</h2>
+  <p class="why">Oggi esistono davvero lingua e dimensione interfaccia (già nel menu); il resto è proposto. Righe segnate «da costruire» nel documento: audio principale/effetti/musica, movimento ridotto, intervallo di autosalvataggio. Non esistono: grafica, comandi rimappabili (le scorciatoie sono fisse: Spazio, 1–4, R, E, Q, H).</p>
+
+  <div class="cap">A · Una lastra, sezioni in colonna</div>
+  <div class="frame">
+    <div class="wash"></div><div class="plaque hang"><i></i><span>Menu</span></div>
+    <div class="plaque" style="position:absolute;left:340px;top:60px;width:640px;padding:18px 22px">
+      <div class="row"><p class="h">Impostazioni</p><span class="sp"></span><span class="pill">Chiudi</span></div>
+      <div class="rule"></div>
+      <span class="lbl">Generale</span>
+      <div class="opt"><span class="t">Lingua</span><div class="row"><span class="pill on">Italiano</span><span class="pill">English</span></div></div>
+      <div class="opt"><span class="t">Autosalvataggio</span><div class="row"><span class="pill on">30 s</span><span class="pill">1 min</span><span class="pill">2 min</span></div></div>
+      <span class="lbl" style="display:block;margin-top:12px">Audio</span>
+      <div class="opt"><span class="t">Principale</span><div class="range"><div class="track"><b style="width:80%"></b><em style="left:80%"></em></div><span class="val">80</span></div></div>
+      <div class="opt"><span class="t">Effetti</span><div class="range"><div class="track"><b style="width:70%"></b><em style="left:70%"></em></div><span class="val">70</span></div></div>
+      <div class="opt"><span class="t">Musica</span><div class="range"><div class="track"><b style="width:50%"></b><em style="left:50%"></em></div><span class="val">50</span></div></div>
+      <span class="lbl" style="display:block;margin-top:12px">Interfaccia</span>
+      <div class="opt"><span class="t">Dimensione</span><div class="row"><span class="pill on">Auto</span><span class="pill">100%</span><span class="pill">125%</span><span class="pill">150%</span><span class="pill">200%</span></div></div>
+      <div class="opt"><span class="t">Movimento ridotto</span><div class="row"><span class="chk on"></span><span class="t2">Meno animazioni e dissolvenze</span></div></div>
+      <div class="row" style="margin-top:12px"><span class="t2">Le modifiche valgono subito.</span><span class="sp"></span><span class="pill">Ripristina</span></div>
+    </div>
+  </div>
+  <p class="note">+ tutto visibile, niente da cercare, lunghezza contenuta (≈ 7 righe); − cresce male se si aggiungono opzioni, scorre sotto i 720 px.</p>
+
+  <div class="cap">B · Pagina intera con binario di categorie (§6b)</div>
+  <div class="frame lacquer">
+    <div class="plaque hang"><i></i><span>Impostazioni</span><span class="pill" style="margin-left:18px">Indietro</span></div>
+    <div style="position:absolute;left:24px;top:76px;width:210px;display:flex;flex-direction:column;gap:6px">
+      <span class="pill on" style="width:100%">Generale</span><span class="pill" style="width:100%">Audio</span><span class="pill" style="width:100%">Interfaccia</span><span class="pill dis" style="width:100%">Comandi (sola lettura)</span></div>
+    <div class="plaque" style="position:absolute;left:256px;right:24px;top:76px;bottom:24px;padding:20px 26px">
+      <p class="h">Audio</p><div class="rule"></div>
+      <div class="opt"><span class="t">Principale</span><div class="range"><div class="track"><b style="width:80%"></b><em style="left:80%"></em></div><span class="val">80</span></div></div>
+      <div class="opt"><span class="t">Effetti</span><div class="range"><div class="track"><b style="width:70%"></b><em style="left:70%"></em></div><span class="val">70</span></div></div>
+      <div class="opt"><span class="t">Musica</span><div class="range"><div class="track"><b style="width:50%"></b><em style="left:50%"></em></div><span class="val">50</span></div></div>
+      <div class="opt"><span class="t">Silenzia a finestra in secondo piano</span><div class="row"><span class="chk on"></span></div></div>
+      <p class="t2" style="margin-top:14px">Le scorciatoie sono fisse: Spazio pausa · 1–4 velocità · R Roster · E Eventi · Q Quest · H nascondi HUD.</p>
+    </div>
+  </div>
+  <p class="note">+ regge nuove categorie (comandi, accessibilità), formato che i giocatori Steam riconoscono; − molto spazio per poche opzioni oggi, la categoria «Comandi» non è modificabile.</p>
+
+  <div class="cap">C · Le opzioni dentro la tendina del menu (nessuna schermata nuova)</div>
+  <div class="frame">
+    <div class="plaque hang"><i></i><span>Menu</span></div>
+    <div class="plaque menu-open" style="width:330px;gap:7px">
+      <span class="lbl">Lingua</span><div class="row"><span class="pill on">Italiano</span><span class="pill">English</span></div>
+      <span class="lbl">Dimensione interfaccia</span><div class="row" style="flex-wrap:wrap"><span class="pill on">Auto</span><span class="pill">100%</span><span class="pill">125%</span><span class="pill">150%</span></div>
+      <span class="lbl">Audio</span>
+      <div class="range"><span class="mini" style="width:70px">Principale</span><div class="track" style="min-width:90px"><b style="width:80%"></b><em style="left:80%"></em></div></div>
+      <div class="range"><span class="mini" style="width:70px">Effetti</span><div class="track" style="min-width:90px"><b style="width:70%"></b><em style="left:70%"></em></div></div>
+      <div class="range"><span class="mini" style="width:70px">Musica</span><div class="track" style="min-width:90px"><b style="width:50%"></b><em style="left:50%"></em></div></div>
+    </div>
+  </div>
+  <p class="note">+ zero nuove superfici, estende ciò che il menu già fa (lingua, dimensione); − la tendina diventa un secondo pannello pieno (oggi ha già 19 voci, INVENTARIO §menu), «Tutte le impostazioni» smette di esistere come voce.</p>
+</section>
+
+<!-- =================== FORK QUIT =================== -->
+<section class="fork" id="quit">
+  <h2>QUIT-1 · «Esci al titolo»: cosa succede alla partita non salvata</h2>
+  <p class="why">Fatto tecnico: l'autosalvataggio gira ogni <code>autosaveIntervalMs</code>; si perde al massimo quell'intervallo. Il gioco può sapere se qualcosa è cambiato dall'ultimo salvataggio (<code>lastSavedAt</code>).</p>
+
+  <div class="cap">A · Conferma sempre, tre scelte</div>
+  <div class="frame"><div class="wash"></div><div class="plaque hang"><i></i><span>Menu</span></div>
+    <div class="plaque" style="position:absolute;left:400px;top:230px;width:480px;padding:20px 24px;display:flex;flex-direction:column;gap:10px">
+      <p class="h">Tornare al titolo?</p>
+      <p class="t">Ultimo salvataggio: 2 minuti fa (Giorno 14). Se esci senza salvare perdi al massimo gli ultimi 30 secondi di gioco.</p>
+      <div class="row" style="margin-top:6px"><span class="pill big">Annulla</span><span class="sp"></span><span class="pill big">Esci senza salvare</span><span class="pill big on">Salva ed esci</span></div>
+    </div></div>
+  <div class="cap">B · Conferma solo se c'è qualcosa da perdere (modello Factorio)</div>
+  <div class="frame"><div class="wash" style="background:none"></div><div class="plaque hang"><i></i><span>Menu</span></div>
+    <div class="plaque menu-open"><span class="lbl">Partita</span><span class="pill">Salva ora</span><span class="pill">Carica partita</span><span class="pill hl">Esci al titolo</span></div>
+    <div class="plaque" style="position:absolute;left:276px;top:140px;width:340px;padding:12px 14px">
+      <span class="t2">Salvato 12 s fa — si esce subito, senza domande.</span></div>
+    <div class="plaque" style="position:absolute;left:276px;top:216px;width:380px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+      <span class="t">Giorno 14 non salvato (3 spedizioni concluse). Salvare prima di uscire?</span><div class="row"><span class="pill">Annulla</span><span class="pill">Non salvare</span><span class="pill on">Salva</span></div></div></div>
+  <p class="note">B mostra due casi sovrapposti per confronto: stato «salvato» (esce senza dialogo) e stato «modificato» (lastra accanto alla voce).</p>
+  <div class="cap">C · Esce sempre salvando da solo (nessuna scelta)</div>
+  <div class="frame"><div class="wash"></div><div class="plaque hang"><i></i><span>Menu</span></div>
+    <div class="plaque" style="position:absolute;left:440px;top:300px;width:400px;padding:18px 22px;text-align:center">
+      <p class="h">Salvataggio…</p><p class="t2" style="margin:6px 0 0">Giorno 14 · Valenflø</p></div></div>
+  <p class="note">+ nessuna domanda, nessuna perdita; − niente «esco senza salvare» (la partita sbagliata sovrascrive l'autosalvataggio), richiede che il salvataggio sia atomico su tutti i dati di progresso.</p>
+</section>
+
+<!-- =================== FORK TITLE =================== -->
+<section class="fork" id="title">
+  <h2>TITLE-1 · La schermata titolo di destinazione</h2>
+  <p class="why">Oggi non esiste: <code>GameBootScreen</code> è solo un velo di caricamento con logo e barra. «Esci al titolo» e «Carica» da fuori partita ne hanno bisogno. Voci: Continua, Nuova partita, Carica partita, Impostazioni, Esci dal gioco (solo desktop).</p>
+
+  <div class="cap">A · Colonna centrale sotto il logo, sulla lacca del velo di boot</div>
+  <div class="frame lacquer" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
+    <img src="assets/wanderlust-logo.png" alt="Wanderlust" style="width:480px;filter:drop-shadow(0 10px 34px rgba(0,0,0,.55))">
+    <div style="width:360px;height:1px;margin:18px 0 22px;background:linear-gradient(90deg,transparent,var(--brass-hi),transparent)"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;width:260px"><span class="pill big on" style="justify-content:center">Continua · Giorno 14</span><span class="pill big" style="justify-content:center">Nuova partita</span><span class="pill big" style="justify-content:center">Carica partita</span><span class="pill big" style="justify-content:center">Impostazioni</span><span class="pill big" style="justify-content:center">Esci dal gioco</span></div>
+  </div>
+  <div class="cap">B · Dipinto della mappa a pieno schermo, colonna a sinistra</div>
+  <div class="frame"><div class="wash" style="background:linear-gradient(90deg,rgba(6,15,22,.9) 0 32%,rgba(6,15,22,.05) 62%)"></div>
+    <img src="assets/wanderlust-logo.png" alt="Wanderlust" style="position:absolute;left:40px;top:40px;width:380px;filter:drop-shadow(0 10px 34px rgba(0,0,0,.55))">
+    <div style="position:absolute;left:60px;top:250px;display:flex;flex-direction:column;gap:8px;width:280px"><span class="pill big on">Continua · Giorno 14</span><span class="pill big">Nuova partita</span><span class="pill big">Carica partita</span><span class="pill big">Impostazioni</span><span class="pill big">Esci dal gioco</span></div></div>
+  <div class="cap">C · Mappa viva con lastra <code>plinth</code> in basso, voci in riga</div>
+  <div class="frame"><div class="plaque" style="position:absolute;left:0;right:0;bottom:0;border-radius:12px 12px 0 0;border-bottom:0;padding:16px 28px;display:flex;align-items:center;gap:14px">
+    <img src="assets/wanderlust-logo.png" alt="Wanderlust" style="height:48px"><span class="sp"></span><span class="pill big on">Continua · Giorno 14</span><span class="pill big">Nuova partita</span><span class="pill big">Carica partita</span><span class="pill big">Impostazioni</span><span class="pill big">Esci</span></div></div>
+  <p class="note">A: il più vicino al velo esistente, costo minimo. B: più «gioco», il dipinto lavora per il titolo. C: titolo e mondo sono la stessa scena (richiederebbe di montare la mappa prima del titolo: costo alto, boot più lungo).</p>
+</section>
+</main>
+</body>
+</html>
