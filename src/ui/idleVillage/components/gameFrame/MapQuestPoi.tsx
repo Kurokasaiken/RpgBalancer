@@ -191,6 +191,10 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseS
   const view = mapQuestPoiView(questStatus, activityProgress, availability, tier);
   const { state, progress } = view;
   const expired = state === 'expired';
+  /* The label says what the marker is AND where the expedition stands (was: always «open the quest»). */
+  const poiAriaLabel = questStatus === 'available'
+    ? t('gameFrame.questPoi.open', { name: activity.label })
+    : t('gameFrame.questPoi.withState', { name: activity.label, state: t(`gameFrame.questPoi.state.${questStatus}`) });
 
   return (
     <div
@@ -199,7 +203,7 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseS
       data-quest-poi-id={activity.id}
       role="button"
       tabIndex={0}
-      aria-label={t('gameFrame.questPoi.open', { name: activity.label })}
+      aria-label={poiAriaLabel}
       onClick={handlePoiClick}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -226,6 +230,11 @@ export const MapQuestPoi: React.FC<MapQuestPoiProps> = ({ session, sizePx: baseS
       }}
     >
       <style>{poiMatericV3_5Styles}</style>
+      {/* Keyboard focus lives in the material: a brass line that follows the silhouette (no browser blue box).
+          Reduced motion: the marker only fades in — no grow. */}
+      <style>{`[data-map-quest-poi-target]:focus-visible { outline: none; }
+[data-map-quest-poi-target]:focus-visible .poiv3_5 { filter: drop-shadow(1.6px 0 0 var(--skin-hud-brass-crest)) drop-shadow(-1.6px 0 0 var(--skin-hud-brass-crest)) drop-shadow(0 1.6px 0 var(--skin-hud-brass-crest)) drop-shadow(0 -1.6px 0 var(--skin-hud-brass-crest)) drop-shadow(0 0 4px var(--skin-hud-brass-crest)); }
+@media (prefers-reduced-motion: reduce) { [data-map-quest-poi-target] { transform: none !important; } }`}</style>
       <div style={{ position: 'relative', width: sizePx, height: sizePx }}>
         {/* The red «decision waiting» dot was removed (Director 2026-10-20: a small circle in the corner must not exist). */}
         <PoiMatericV3_5
