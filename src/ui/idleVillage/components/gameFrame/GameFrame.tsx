@@ -8,6 +8,7 @@ import { HudRibbon } from './HudRibbon';
 import { HudGlyph } from './hudIcons';
 import { EngravedIcon } from './engravedIcons';
 import { HudHideToggle } from './HudHideToggle';
+import { HudTooltip } from './HudTooltip';
 import { useHudMaterial } from './useHudMaterial';
 import {
   DEFAULT_GAME_FRAME_CONFIG,
@@ -293,13 +294,13 @@ export const GameFrame: React.FC<GameFrameProps> = ({
         const isActive = item.id === activeNavId;
         return (
           <React.Fragment key={item.id}>
+          <HudTooltip label={t(item.labelKey)} hint={t('gameFrame.nav.locked')} side="top" wrap when={!!item.locked}>
           <MatericButton
             variant="secondary"
             disabled={item.locked}
             data-nav-id={item.id}
             onClick={item.locked ? undefined : () => onNavSelect?.(item.id)}
             aria-pressed={isActive}
-            title={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : t(item.labelKey)}
             aria-label={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : undefined}
             style={{
               display: 'flex',
@@ -354,6 +355,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
               />
             )}
           </MatericButton>
+          </HudTooltip>
           {index === 1 && recenterSlot}
           </React.Fragment>
         );
