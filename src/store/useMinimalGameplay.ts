@@ -6,6 +6,7 @@
  */
 
 import { create, type StateCreator } from 'zustand';
+import { EMPTY_TALLY, gameOverStats, tallyPlan, type SettlementTally } from '@/ui/idleVillage/settlement/settlementTally';
 import { appendMemorial, memorialEntriesFromPlan, type MemorialContext, type MemorialEntry } from '@/ui/idleVillage/memorial/memorialHall';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { useMemo } from 'react';
@@ -321,6 +322,8 @@ export interface MinimalGameplayState {
   resourceDelta: { gold: number; xp: number; /** Wall-clock ms of the commit — the animation keys on it. */ at: number } | null;
   /** PLAN-067 T-C5 (R-234): the Memoriale — one entry per fallen resident, appended by the settlement. */
   memorial: MemorialEntry[];
+  /** PLAN-067 T-C3 (R-234): what the settled runs paid and completed — feeds the settlement-lost summary. */
+  settlementTally: SettlementTally;
   /** Publishes the settlement grant as the HUD delta stamp (R-260). */
   publishResourceDelta: (delta: { gold: number; xp: number }) => void;
   /** Clears the delta stamp after the readout's animation finished. */
@@ -413,12 +416,18 @@ function mapSnapshotToStoreState(
  * Real loss payload for the run-ending verdict: what the domain actually knows
  * was lost, not narrative flavour.
  */
-function buildGameOverSummary(state: MinimalGameplayState['state']): NonNullable<MinimalGameOverState['summary']> {
+function buildGameOverSummary(
+  state: MinimalGameplayState['state'],
+  tally: SettlementTally = EMPTY_TALLY,
+): NonNullable<MinimalGameOverState['summary']> {
+  /* PLAN-067 T-C3 (R-234): the summary tells the truth — the dead, the displayed day, and what the settled
+   * runs really paid and completed (not the injured, not the 0-based counter, not the gold held). */
+  const stats = gameOverStats(state);
   return {
-    daysSurvived: state.currentDay,
-    goldEarned: state.gold,
-    questsCompleted: 0, // TODO: Track quests when implemented
-    residentsLost: state.residents.filter(r => r.isInjured).length,
+    daysSurvived: stats.daysSurvived,
+    goldEarned: tally.goldEarned,
+    questsCompleted: tally.questsCompleted,
+    residentsLost: stats.residentsLost,
     finalRoster: state.residents.map(r => ({
       id: r.id,
       name: r.name,
@@ -609,6 +618,7 @@ const INITIAL_STATE: MinimalGameplayState = {
   setResidentsOnExpedition: () => {},
   resourceDelta: null,
   memorial: [],
+  settlementTally: EMPTY_TALLY,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   publishResourceDelta: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -893,7 +903,7 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
 
       if (isGameOver && !get().gameOverState.isGameOver) {
         const reason: MinimalGameplayGameOverReason = currentState.food <= 0 ? 'food_depleted' : 'all_injured';
-        const summary = buildGameOverSummary(currentState);
+        const summary = buildGameOverSummary(currentState, get().settlementTally);
 
         set({
           gameOverState: {
@@ -930,7 +940,7 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
 
       if (isGameOver && !get().gameOverState.isGameOver) {
         const reason: MinimalGameplayGameOverReason = latestState.food <= 0 ? 'food_depleted' : 'all_injured';
-        const summary = buildGameOverSummary(latestState);
+        const summary = buildGameOverSummary(latestState, get().settlementTally);
 
         set({
           gameOverState: {
@@ -1066,6 +1076,8 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
     /* T-C5 (R-234): every death of the run lands in the Memoriale once (idempotent by run:effect key). */
     const fresh = memorialEntriesFromPlan(plan, memorialContextFor(state));
     if (fresh.length > 0) set({ memorial: appendMemorial(get().memorial, fresh) });
+    /* T-C3 (R-234): the tally counts each settled run once (gold paid, quest completed). */
+    set({ settlementTally: tallyPlan(get().settlementTally, plan) });
     trackTelemetryEvent('quest_settlement_effects', {
       runId: plan.runId,
       outcome: plan.outcome,
