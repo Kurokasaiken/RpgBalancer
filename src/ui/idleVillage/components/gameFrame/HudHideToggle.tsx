@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { HudTooltip } from './HudTooltip';
 import { EngravedIcon } from './engravedIcons';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 
@@ -20,17 +21,18 @@ export function HudHideToggle({ hidden, onToggle }: HudHideToggleProps) {
   const label = `${t(key)} — ${DEFAULT_GAME_FRAME_CONFIG.hudHide.shortcut.toUpperCase()}`;
   return (
     <div data-hud-controls="" data-hud-hide-toggle="" style={{ position: 'relative', pointerEvents: 'auto' }}>
-      <button
-        type="button"
-        data-testid="hud-hide-toggle"
-        aria-pressed={hidden}
-        aria-label={label}
-        title={label}
-        onClick={onToggle}
-        style={{ width: 40, height: 40 }}
-      >
-        <EngravedIcon id={hidden ? 'cmd-eye-off' : 'cmd-eye'} />
-      </button>
+      <HudTooltip label={t(key)} shortcut={DEFAULT_GAME_FRAME_CONFIG.hudHide.shortcut.toUpperCase()} side="top">
+        <button
+          type="button"
+          data-testid="hud-hide-toggle"
+          aria-pressed={hidden}
+          aria-label={label}
+          onClick={onToggle}
+          style={{ width: 40, height: 40 }}
+        >
+          <EngravedIcon id={hidden ? 'cmd-eye-off' : 'cmd-eye'} />
+        </button>
+      </HudTooltip>
     </div>
   );
 }

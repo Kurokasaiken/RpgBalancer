@@ -1,6 +1,7 @@
 import React from 'react';
 import { HUD_TONE_COLOR, type HudTone } from './hudTones';
 import { useCompactTop } from './useCompactTop';
+import { HudTooltip } from './HudTooltip';
 
 export interface ResourceReadoutItem {
   id: string;
@@ -45,87 +46,87 @@ export const ResourceReadout: React.FC<ResourceReadoutProps> = ({ items }) => {
         const description = item.description ?? `${item.label}: ${item.value}`;
         const critical = item.tone === 'danger';
         return (
-          <div
-            key={item.id}
-            role="group"
-            aria-label={description}
-            title={description}
-            data-tone={item.tone}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 'var(--skin-hud-bar-gap)',
-              minWidth: 0,
-              padding: 'var(--skin-hud-row-padding)',
-              borderRadius: 'var(--skin-hud-row-radius)',
-              border: `1px solid ${critical ? HUD_TONE_COLOR.danger : 'var(--skin-hud-row-filet)'}`,
-              background: critical ? HUD_TONE_COLOR.danger : 'var(--skin-surface-bg)',
-              color: critical ? 'var(--skin-hud-seat)' : 'var(--skin-text-primary)',
-            }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)' }}>
-              <span
-                style={{ display: 'flex', flexShrink: 0, width: ICON_BOX, height: ICON_BOX }}
-              >
-                {item.icon}
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--skin-font-display)',
-                  fontSize: VALUE_SIZE,
-                  fontWeight: 'var(--skin-hud-name-weight)',
-                  letterSpacing: 'var(--skin-hud-name-tracking)',
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                  whiteSpace: 'nowrap',
-                  textShadow: critical ? 'none' : 'var(--skin-hud-engrave)',
-                }}
-              >
-                {item.value}
-                {item.max !== undefined && (
+          <HudTooltip key={item.id} label={item.label} hint={description !== item.label ? description : undefined}>
+            <div
+              role="group"
+              aria-label={description}
+              data-tone={item.tone}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--skin-hud-bar-gap)',
+                minWidth: 0,
+                padding: 'var(--skin-hud-row-padding)',
+                borderRadius: 'var(--skin-hud-row-radius)',
+                border: `1px solid ${critical ? HUD_TONE_COLOR.danger : 'var(--skin-hud-row-filet)'}`,
+                background: critical ? HUD_TONE_COLOR.danger : 'var(--skin-surface-bg)',
+                color: critical ? 'var(--skin-hud-seat)' : 'var(--skin-text-primary)',
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--skin-hud-inline-gap)' }}>
+                <span
+                  style={{ display: 'flex', flexShrink: 0, width: ICON_BOX, height: ICON_BOX }}
+                >
+                  {item.icon}
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'var(--skin-font-display)',
+                    fontSize: VALUE_SIZE,
+                    fontWeight: 'var(--skin-hud-name-weight)',
+                    letterSpacing: 'var(--skin-hud-name-tracking)',
+                    lineHeight: 1,
+                    fontVariantNumeric: 'tabular-nums',
+                    whiteSpace: 'nowrap',
+                    textShadow: critical ? 'none' : 'var(--skin-hud-engrave)',
+                  }}
+                >
+                  {item.value}
+                  {item.max !== undefined && (
+                    <span
+                      style={{
+                        fontSize: 'var(--skin-hud-caps-size)',
+                        fontWeight: 'var(--skin-hud-caps-weight)',
+                        marginLeft: 'var(--skin-hud-control-gap)',
+                      }}
+                    >
+                      /{item.max}
+                    </span>
+                  )}
+                </span>
+                {item.detail && !compact && (
                   <span
+                    aria-hidden="true"
                     style={{
+                      fontFamily: 'var(--skin-font-body, inherit)',
                       fontSize: 'var(--skin-hud-caps-size)',
                       fontWeight: 'var(--skin-hud-caps-weight)',
-                      marginLeft: 'var(--skin-hud-control-gap)',
+                      letterSpacing: 'var(--skin-hud-caps-tracking)',
+                      whiteSpace: 'nowrap',
+                      fontVariantNumeric: 'tabular-nums',
+                      color: critical ? 'inherit' : item.tone ? HUD_TONE_COLOR[item.tone] : 'var(--skin-label-tertiary)',
                     }}
                   >
-                    /{item.max}
+                    {item.detail}
                   </span>
                 )}
               </span>
-              {item.detail && !compact && (
-                <span
-                  aria-hidden="true"
-                  style={{
-                    fontFamily: 'var(--skin-font-body, inherit)',
-                    fontSize: 'var(--skin-hud-caps-size)',
-                    fontWeight: 'var(--skin-hud-caps-weight)',
-                    letterSpacing: 'var(--skin-hud-caps-tracking)',
-                    whiteSpace: 'nowrap',
-                    fontVariantNumeric: 'tabular-nums',
-                    color: critical ? 'inherit' : item.tone ? HUD_TONE_COLOR[item.tone] : 'var(--skin-label-tertiary)',
-                  }}
-                >
-                  {item.detail}
-                </span>
-              )}
-            </span>
-            <span
-              aria-hidden="true"
-              style={{
-                fontFamily: 'var(--skin-font-display)',
-                fontSize: 'var(--skin-hud-caps-size)',
-                fontWeight: 'var(--skin-hud-caps-weight)',
-                letterSpacing: 'var(--skin-hud-caps-tracking)',
-                textTransform: 'uppercase',
-                lineHeight: 1,
-                color: critical ? 'inherit' : 'var(--skin-label-primary)',
-              }}
-            >
-              {item.label}
-            </span>
-          </div>
+              <span
+                aria-hidden="true"
+                style={{
+                  fontFamily: 'var(--skin-font-display)',
+                  fontSize: 'var(--skin-hud-caps-size)',
+                  fontWeight: 'var(--skin-hud-caps-weight)',
+                  letterSpacing: 'var(--skin-hud-caps-tracking)',
+                  textTransform: 'uppercase',
+                  lineHeight: 1,
+                  color: critical ? 'inherit' : 'var(--skin-label-primary)',
+                }}
+              >
+                {item.label}
+              </span>
+            </div>
+          </HudTooltip>
         );
       })}
     </div>
