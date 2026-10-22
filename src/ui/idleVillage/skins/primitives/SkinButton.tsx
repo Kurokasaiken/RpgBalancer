@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 /**
  * SkinButton — a role-tagged button. Inside a <SkinScope> it renders as the
@@ -7,7 +6,7 @@ import { motion } from 'framer-motion';
  *
  *   variant="utility"   → struck-bronze plate (default)
  *   variant="secondary" → engraved-slate ghost
- *   variant="cta"       → teal-enamel plate in a brass frame (the primary action, e.g. "AVVIA")
+ *   variant="cta"       → the primary action: lacquer family plate with a brass hairline (BTN-1 = A; never the old plaque)
  */
 export type SkinButtonVariant = 'utility' | 'secondary' | 'cta';
 
@@ -27,18 +26,15 @@ export const SkinButton: React.FC<SkinButtonProps> = ({
 }) => {
   if (variant === 'cta') {
     const button = (
-      <motion.button
+      <button
         type="button"
         data-skin="cta"
         className={className}
         disabled={disabled}
-        whileHover={disabled ? undefined : { scale: 1.03, y: -1 }}
-        whileTap={disabled ? undefined : { scale: 0.97 }}
-        transition={{ type: 'spring', stiffness: 420, damping: 14 }}
         {...rest}
       >
         {children}
-      </motion.button>
+      </button>
     );
     if (!ornaments) return button;
     return (

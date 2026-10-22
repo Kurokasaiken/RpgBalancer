@@ -18,6 +18,12 @@ invariants:
       gemello skinScope.css, PLAN-067 T-A14)
     test_refs:
       - tests/unit/idleVillage/skinScope.focusRing.test.ts
+  - id: R-234-primary-action-plate
+    source: director-bug
+    source_ref: R-234
+    statement: The primary action is the family plate (brass hairline, lacquer), never the CTA plaque (BTN-1 = A)
+    test_refs:
+      - tests/unit/idleVillage/skinScope.primaryAction.test.ts
 ---
 # skin-scope
 

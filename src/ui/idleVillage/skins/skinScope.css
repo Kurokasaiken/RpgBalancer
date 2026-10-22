@@ -318,39 +318,49 @@
    clip, otherwise both scrollbars paint on the strip's edge. */
 .skin-scope [data-stage-panel]:has([data-collapsed]) { overflow: hidden !important; }
 
-/* ── Primary CTA plaque (the "AVVIA" look) ────────────────────────────── */
+/* ── Primary action — the family plate (PLAN-067 T-B11, BTN-1 = A) ─────────
+   Lacquer plate with a brass hairline and an engraved inner frame, same radius as the HUD pills.
+   NOT the old CTA plaque (clip-path cut, teal enamel, spring-scale): that form is banned everywhere. */
 .skin-scope :where([data-skin="cta"]) {
   position: relative;
-  overflow: hidden;
-  padding: 11px 32px;
-  border: var(--skin-cta-border);
-  clip-path: var(--skin-cta-clip);
-  background: var(--skin-cta-bg);
-  box-shadow: var(--skin-cta-shadow);
-  color: var(--skin-cta-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 20px;
+  border: 1px solid var(--skin-hud-brass-hi);
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--skin-hud-lacquer-base), var(--skin-hud-lacquer-deep));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--skin-title-color) 28%, transparent),
+    inset 0 0 0 2px color-mix(in srgb, var(--skin-hud-lacquer-deep) 90%, black),
+    inset 0 0 0 3px color-mix(in srgb, var(--skin-hud-brass-hi) 22%, transparent);
+  color: var(--skin-title-color);
   font-family: var(--skin-font-display);
   font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.28em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  text-shadow: var(--skin-cta-text-shadow);
   cursor: pointer;
-  transition: filter 0.18s ease, box-shadow 0.18s ease;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
 }
 .skin-scope :where([data-skin="cta"]):hover:not(:disabled) {
-  filter: var(--skin-cta-hover-filter);
-  box-shadow: var(--skin-cta-hover-glow);
+  border-color: var(--skin-title-color);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--skin-title-color) 40%, transparent),
+    inset 0 0 0 2px color-mix(in srgb, var(--skin-hud-lacquer-deep) 90%, black),
+    inset 0 0 14px color-mix(in srgb, var(--skin-title-color) 18%, transparent);
 }
-.skin-scope :where([data-skin="cta"]):disabled { opacity: var(--skin-btn-disabled-opacity); cursor: default; }
-/* flanking ◈ ornaments wrapper */
-.skin-scope :where([data-skin="cta-wrap"]) { display: inline-flex; align-items: center; gap: 10px; }
-.skin-scope :where([data-skin="cta-ornament"]) {
-  font-size: 9px;
-  line-height: 1;
-  opacity: 0.85;
-  color: var(--skin-cta-ornament-color);
-  text-shadow: 0 0 6px var(--skin-cta-ornament-color);
+.skin-scope :where([data-skin="cta"]):disabled {
+  color: color-mix(in srgb, var(--skin-title-color) 38%, transparent);
+  border-color: color-mix(in srgb, var(--skin-hud-brass-hi) 25%, transparent);
+  box-shadow: none;
+  cursor: not-allowed;
 }
+/* legacy ornament wrapper: kept inert so old call sites do not draw flanking ◈ */
+.skin-scope :where([data-skin="cta-wrap"]) { display: inline-flex; align-items: center; }
+.skin-scope :where([data-skin="cta-ornament"]) { display: none; }
 
 /* ── Close button — gold radial coin ──────────────────────────────────── */
 .skin-scope :where([data-skin="close"]) {
