@@ -520,6 +520,10 @@ const VERDICT_TABLE_KEYS = ['epicfail', 'fail', 'almost', 'win', 'bigwin'] as co
 const EpilogueGrantSchema = z.object({
   /** Display line (authored content, Italian). */
   label: z.string(),
+  /** Who receives it (T-C6): a title/disease belongs to a PERSON. `leader` = the expedition
+   *  leader, `survivors` = every member not dead, `wounded` = every wounded member that lived;
+   *  absent = the party as a whole (a group line, no one named). */
+  recipient: z.enum(['leader', 'survivors', 'wounded']).optional(),
   /** Terminal-run flag that grants the entry; absent = no flag gate. */
   requiresFlag: z.string().optional(),
   /** Outcomes that grant the entry; absent = any terminal outcome. */

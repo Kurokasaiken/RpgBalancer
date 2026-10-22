@@ -443,6 +443,7 @@ export const GOBLIN_SCENARIO_AUTHORED = {
     titles: [
       {
         label: 'Goblin Exterminators',
+        recipient: 'leader',
         requiresOutcome: ['reward'],
       },
     ],
