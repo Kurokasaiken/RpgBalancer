@@ -20,7 +20,8 @@ import { DEFAULT_QUEST_THEATRE_FX, type CameraShot } from '@/balancing/config/id
 import { cameraAt, cameraHasTemporalWork, coverFit, TRAUMA_SETTLED_EPS } from '@/ui/idleVillage/questS1Lab/render/depthTransform';
 import { traumaAt } from '@/ui/idleVillage/questS1Lab/render/trauma';
 import { DepthScene } from '@/ui/idleVillage/questS1Lab/render/DepthScene';
-import { AmbientLayer } from '@/ui/idleVillage/questS1Lab/render/AmbientLayer';
+import { AmbientLayer, drawAmbientFrame, seeded } from '@/ui/idleVillage/questS1Lab/render/AmbientLayer';
+import type { AmbientFx } from '@/ui/idleVillage/questS1Lab/render/sceneManifest';
 
 /* ── pixi.js mock — captures the render topology DepthScene builds.
  *  vi.mock factories are hoisted above imports, so every shared fixture
@@ -446,5 +447,75 @@ describe('ambient layer — no fx, no temporal work, no loop', () => {
     expect(rafSpy).toHaveBeenCalled();
     rafSpy.mockRestore();
     ctxStub.mockRestore();
+  });
+});
+
+describe('ambient layer — PLAN-052 showcase fx types', () => {
+  /* A mock 2d context that records the op sequence — jsdom has no
+   *  rasterizer, so the invariant is checked on the op stream. */
+  const recordCtx = () => {
+    const ops: string[] = [];
+    const ctx = {
+      createRadialGradient: (...a: number[]) => {
+        ops.push(`radial:${a.join(',')}`);
+        return { addColorStop: (o: number, c: string) => void ops.push(`stop:${o}:${c}`) };
+      },
+      createLinearGradient: (...a: number[]) => {
+        ops.push(`linear:${a.join(',')}`);
+        return { addColorStop: (o: number, c: string) => void ops.push(`stop:${o}:${c}`) };
+      },
+      beginPath: () => void ops.push('begin'),
+      arc: () => void ops.push('arc'),
+      fill: () => void ops.push('fill'),
+      moveTo: () => void ops.push('move'),
+      lineTo: () => void ops.push('line'),
+      closePath: () => void ops.push('close'),
+      stroke: () => void ops.push('stroke'),
+      clearRect: () => void ops.push('clear'),
+      fillStyle: '',
+      strokeStyle: '',
+      lineWidth: 0,
+      globalCompositeOperation: 'source-over',
+    } as unknown as CanvasRenderingContext2D;
+    return { ctx, ops };
+  };
+  const view = {
+    toX: (x: number) => x * 960,
+    toY: (y: number) => y * 400,
+    lenY: (y: number) => y * 400,
+  };
+  const fx: AmbientFx[] = [
+    { type: 'glint', at: [0.5, 0.6], period: 2, a: 0.8, r: 0.008, color: '#fff4d0' },
+    { type: 'fireflies', band: [0.3, 0.42], xband: [0, 1], count: 6, a: 0.35, color: '#d8f27a' },
+    { type: 'moths', at: [0.7, 0.5], r: 0.035, count: 3, speed: 1, color: '#e8dcc0' },
+    { type: 'shaft', from: [0.6, 0.05], to: [0.55, 0.55], width: 0.12, count: 3, a: 0.1, color: '#fff2cc' },
+  ];
+  const puffsFor = (key: string, n: number) => seeded(7 + key.length, n);
+
+  // INV:ambient-layer.INV-2
+  it('emits canvas ops for the new types and restores source-over (INV:ambient-layer.INV-2)', () => {
+    const { ctx, ops } = recordCtx();
+    /* Scan several clock values — glint and fireflies gate their draw on
+     *  a blink cycle, so no single t shows every type at once. */
+    for (let t = 0; t < 8; t += 0.5) {
+      drawAmbientFrame(ctx, 960, 400, t, view, fx, puffsFor);
+    }
+    expect(ops.some((o) => o.startsWith('linear:'))).toBe(true); // shaft fan gradients
+    expect(ops).toContain('stroke'); // glint cross flare
+    expect(ops.filter((o) => o === 'arc').length).toBeGreaterThan(0); // soft dots drawn
+    expect(ctx.globalCompositeOperation).toBe('source-over');
+  });
+
+  // INV:ambient-layer.INV-2
+  it('is a pure function of the clock — same t, same op stream (INV:ambient-layer.INV-2)', () => {
+    const a = recordCtx();
+    const b = recordCtx();
+    drawAmbientFrame(a.ctx, 960, 400, 3.7, view, fx, puffsFor);
+    drawAmbientFrame(b.ctx, 960, 400, 3.7, view, fx, puffsFor);
+    expect(a.ops).toEqual(b.ops);
+    /* A different clock produces a different stream — not a stale frame. */
+    const c = recordCtx();
+    drawAmbientFrame(c.ctx, 960, 400, 4.9, view, fx, puffsFor);
+    expect(c.ops).not.toEqual(a.ops);
   });
 });

@@ -58,6 +58,53 @@ export const AmbientFxSchema = z.discriminatedUnion('type', [
     a: z.number().min(0).max(0.3).default(0.08),
     color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#cfe4e0'),
   }),
+  /* PLAN-052 showcase set (R-271) — the "life after the shot" types the
+   * authoring contract declares: point twinkle on metal/loot, a wandering
+   * swarm in a band, insects orbiting a light anchor, god-ray fans. All
+   * img-fraction anchored, all pure functions of the shared clock. */
+  z.object({
+    type: z.literal('glint'),
+    at: z.tuple([z.number(), z.number()]),
+    /** Twinkle period in seconds — treasure breathes light slowly. */
+    period: z.number().positive().max(20).default(4),
+    a: z.number().min(0).max(1).default(0.8),
+    /** Radius as a fraction of image height — glints are point-sized. */
+    r: z.number().positive().max(0.05).default(0.008),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#fff4d0'),
+  }),
+  z.object({
+    type: z.literal('fireflies'),
+    /** Wandering region — img-fraction y band the swarm lives in. */
+    band: z.tuple([z.number(), z.number()]),
+    /** Horizontal extent of the swarm, img-fraction (full width default). */
+    xband: z.tuple([z.number(), z.number()]).default([0, 1]),
+    count: z.number().int().min(1).max(16).default(6),
+    a: z.number().min(0).max(0.6).default(0.35),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#d8f27a'),
+  }),
+  z.object({
+    type: z.literal('moths'),
+    at: z.tuple([z.number(), z.number()]),
+    /** Orbit radius as a fraction of image height. */
+    r: z.number().positive().max(0.2).default(0.035),
+    count: z.number().int().min(1).max(6).default(3),
+    /** Orbit speed multiplier — moths are slow, erratic orbiters. */
+    speed: z.number().min(0.2).max(4).default(1),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#e8dcc0'),
+  }),
+  z.object({
+    type: z.literal('shaft'),
+    /** Entry point of the light, img-fraction (usually near the top edge). */
+    from: z.tuple([z.number(), z.number()]),
+    /** Where the fan lands, img-fraction. */
+    to: z.tuple([z.number(), z.number()]),
+    /** Full fan width at the base, as a fraction of image height. */
+    width: z.number().positive().max(0.4).default(0.12),
+    /** Parallel rays in the fan. */
+    count: z.number().int().min(1).max(6).default(3),
+    a: z.number().min(0).max(0.4).default(0.1),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#fff2cc'),
+  }),
 ]);
 export type AmbientFx = z.infer<typeof AmbientFxSchema>;
 
