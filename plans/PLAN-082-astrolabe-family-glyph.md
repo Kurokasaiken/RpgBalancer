@@ -75,3 +75,31 @@ disaccoppiati:
   stazionano sul confine; se emerge jitter si aggiunge isteresi in seguito.
 - `axisProfile` assente (overlay, 1 skill): margine unico → famiglia
   unanime, comportamento coerente col caso colonna.
+
+## Stato esecuzione (2026-10-23)
+
+- **T-001 — done.** `starProfile.ts` riscritto (`boardStarProfile`):
+  voto di maggioranza sui margini grezzi `stat/diff` per asse
+  (fiore ≤10%, stella >10%, magra >35%; >=3 assi su 5 decidono).
+  `mix` uniforme ∈ {0,1} per costruzione; `depth` per-valle dentro la
+  banda della famiglia dal vicino più debole. `engine.ts` passa
+  `axisMargin` grezzi; rimosso `valleyProfiles` disaccoppiato e
+  `V62_VALLEY_FLOWER = 0.3675`. Test 10/10 verdi.
+  Commit `af55d6fb` (src+test+jsonl filtrati T-13) + `5343611f` (docs).
+- **T-002 — quasi done.** `sync:bug` → `destiny-astrolabe-v62.INV-1`;
+  emenda Mode B `R-234-astrolabe-valley-per-tip` (retire journal con
+  provenance R-234, risolvibile al sigillo); contratto aggiornato con
+  `R-275-astrolabe-no-hybrid` + `R-275-astrolabe-family-thresholds`;
+  eccezione `EXC-20261023151050-09f6` per la suite test.
+  Screenshot headless in `.mw/runs/plan082-family-glyph/shots/`:
+  `flower-35-50`, `star-60-50`, `lean-72-50`, `boundary-55-50`,
+  `mixed-flower`, `mixed-lean`.
+- **OB-1 verde** (10/10). **OB-2 verde** via `npx tsc --noEmit` +
+  `npm run build` completo (10m53s — il wrapper `build:check` ha cap
+  180s insufficiente su macchina caricata; lint in quarantine per
+  `idleVillage`, gate reale = tsc). **OB-3**: `contracts:check` rosso
+  solo per derive ambientali (T-13 + sigillo `fe11533b` che non risolve
+  ref post-BASE R-270/271/275 — stesso limite documentato da R-270,
+  sblocco = riforgiatura sigillo Director). **OB-4**: eye-check Director
+  pendente (T-04 — gli screenshot sono pronti). **OB-5**: `closure:lint`
+  rosso sul gate condiviso, non su file di questo scope.
