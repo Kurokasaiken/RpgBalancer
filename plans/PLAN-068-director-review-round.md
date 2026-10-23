@@ -22,13 +22,14 @@
 | G-02 | PLAN-053 · OB-7 eye-check T-005 (rotta journey) | `/game` con journey attiva; baseline `.mw/runs/plan053-t005-route-visual-fork/` | La traccia villaggio→POI si riempie come da card A? | **differita** (visuale, R-236) |
 | G-03 | PLAN-053 · OB-7 eye-check T-006 (strip 3 barre) | `/game`, quest window durante journey | Le 3 barre leggono andata/svolgimento/ritorno? | **differita** (visuale, R-236) |
 | G-04 | PLAN-064 · eye-check moto post-entry | `/theater-lab` oppure PNG `post-entry-t0/t1` | La qualità percettiva del moto è accettabile? | **differita** (visuale, R-236) |
-| G-05 | PLAN-043-S11 · decisioni D9 per batch | **`.mw/review/plan068-round/index.html`** (schede audit renderizzate + screenshot + **riconciliazione 2026-10-20 sera**: gran parte già fixata onda A PLAN-067 o rulata v1–v6) | solo le **decisioni residue**: F7 3 domande, CIN-1/2/3, ROS-H, BTN-1, v6/T-C2 dati, DN-3, DN-6/7, COL-D notte | aperta |
+| G-05 | PLAN-043-S11 · decisioni D9 per batch | **`.mw/review/plan068-round/index.html`** (schede audit renderizzate + screenshot + riconciliazione 2026-10-20 sera; **re-sync 2026-10-23**: rulata BTN-1=A, DN-6=togliere tema, DN-7→PLAN-076 implementato, COL-D=B Ferro+anello notte (T-B12), v6/T-C2 implementato) | solo le **decisioni residue**: F7 3 domande, CIN-1/2/3, ROS-H, DN-3 (fork `mockups/obiettivo-fork-v1.html`: A appeso / B riga / C sigillo) | parziale — residue aperte |
 | G-06 | PLAN-043-S1 · verifica manuale F1 | checklist in `PLAN-043-S1` | F1 passa? | **differita** (visuale, R-236) |
 | G-07 | PLAN-043-S2 · verifica manuale F1 | checklist in `PLAN-043-S2` | F1 passa? | **differita** (visuale, R-236) |
 | G-08 | PLAN-027 · D6 review kit | **`.mw/review/plan068-round/index.html`** §G-08 — kit `src/balancing/config/idleVillage/quests/generation/narrated/race-miniera.kit.ts`, nodi r002 `viaA`/`imboscata`/`vetta` EN+IT | D6 ratificato? | aperta |
 | G-09 | PLAN-050 · T-012 profiling WKWebView | hardware reale | Metriche entro soglia? | **differita** (hardware, R-236) |
 | G-10 | PLAN-019-S1 · playtest quest | `/game` | La quest regge il playtest? | **differita** (esperienziale, R-236) |
-| G-11 | PLAN-051 · trust-set approval | `npm run trusted:check` mostra il drift | Approvi il re-seal di `produceBundle.ts` (schema manifest T-005)? Azione: `npm run trusted:seal` + `npm run approve -- --kind=trust-set` | aperta (ledger) |
+| G-11 | PLAN-051 · trust-set approval | `npm run trusted:check` mostra il drift | Approvi il re-seal di `produceBundle.ts` (schema manifest T-005)? Azione: `npm run trusted:seal` + `npm run approve -- --kind=trust-set` | **chiusa 2026-10-23** — `trusted:check` → `trusted-lock: OK`, nessun drift: non serve re-seal (evidenza sessione Devin) |
+| G-12 | PLAN-079 · T-04 eye-check ritratti villager | `/game` roster/planner; ritratti `src/assets/portraits/` (Bertoldo/Lisetta/Manno) collegati a `visualProfileId` | I ritratti (full + medal crop) stanno bene in roster e planner? | **differita** (visuale — accodato 2026-10-23) |
 
 ### Convenzione di presentazione (R-236, Director 2026-10-20)
 
