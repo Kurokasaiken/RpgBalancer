@@ -1846,3 +1846,73 @@ estensione `closure:lint`.
 **Formulazione approvata (FROZEN):**
 <!-- REQ:v36-audit-components -->Su `/game` ogni componente attivo ha una scheda/contratto vivo che definisce cosa deve fare e come, collegato ai propri test di validazione;<!-- REQ:v36-integration-contracts --> le interazioni reali tra componenti sono coperte da contratti d'integrazione dedicati e test automatici collegati, a partire dall'audit completo di `/game`.<!-- REQ:v36-living-sync --> Il sistema è mantenuto vivo: (1) ogni modifica che altera il comportamento di un componente o di un'interazione deve aggiornare contestualmente il documento relativo e aggiungere/modificare il test collegato;<!-- REQ:v36-bug-or-spec-capture --> (2) ogni volta che il Director segnala un bug (*"questa cosa è un bug"*) o richiede un comportamento specifico, la regola viene aggiunta al documento del componente/integrazione e protetta da test automatico;<!-- REQ:v36-mechanical-binding --> (3) l'enforcement si integra nei gate meccanici esistenti (`surface-map`, `contracts:check`, `red-first`, `closure:lint`) senza duplicare i registri.<!-- REQ:v36-web-debate --> Il piano esecutivo viene definito tramite dibattito Multi-AI web (`mw-web-debate`).
 
+
+## v37 — Astrolabio: silhouette a famiglia uniforme per board, morph accoppiato
+
+**Status:** `FROZEN`
+**Date:** 2026-10-23
+**Authorized by:** Fausto — *"approvo"* (avallo sulla candidata in sessione, dopo i ruling
+sulle soglie 10%/35% e sulla copertura qualitativa)
+**Reason:** la forma deforme ricorrente nelle quest — valli scavate fin quasi al nucleo con
+punte tonde — e' il quadrante proibito che la v17 e PLAN-010 avevano gia' chiuso per
+costruzione e che `starProfile.ts` di V6.2 ha resuscitato disaccoppiando mix e depth.
+
+**Relazione con v16/v17:** la v16 aveva sciolto le tre famiglie discrete («la stella
+dimagrisce per gradi, ogni petalo col proprio delta») e vietato il ritorno alla famiglia
+discreta. Questa desiderata **revoca quel divieto**: la famiglia torna discreta ma decisa
+**a livello di board**, non per petalo — le punte continuano a variare nelle proporzioni.
+Della v17 restano l'accoppiamento morph (punta tonda ⟺ valle alta) e l'impossibilita'
+costruttiva del quadrante proibito; cade la semantica «coverage-wins» come pilota della
+forma — la silhouette diventa un glifo qualitativo.
+
+### User-stated (parole del Director)
+
+1. «Peggore e' il delta x il party = fiore (il party e' in difficolta'), party un po' +
+   forte = stella. Molto + forte = stella magra.»
+2. «Sopra il 10% stella, sopra il 35% stella magra» — il margine e' stat vs difficolta'.
+3. «Nn voglio c sia differenza tra le forme scelte» — tutte e cinque le punte sono della
+   stessa famiglia; «il mezzo fiore strano nn deve apparire mai, alcune punte fiore e
+   alcune punte stella nemmeno».
+4. «Se la maggioranza delle stat sono + grandi [...] tutte le punte sono a forma di stella.
+   Se invece no sono tutte a forma di fiore» — la famiglia si decide a maggioranza.
+5. Ogni vertice ha costruzione propria nelle proporzioni: le lunghezze delle punte seguono
+   le stat reali per asse.
+6. Copertura dipinta: «circa gia' funziona cosi' cambiando le forme, lo stiamo rispettando»
+   — glifo qualitativo, nessun solver esatto.
+
+### AI inference (derivata, marcata come tale)
+
+7. Ogni asse vota la propria famiglia dal margine (fiore <10%, stella 10-35%, magra >35%);
+   il board prende il livello piu' alto che raggiunge la maggioranza (≥3 assi >35% ->
+   magra; altrimenti ≥3 assi >10% -> stella; altrimenti fiore). Con una sola skill gli assi
+   coincidono.
+8. L'accoppiamento morph di `coverage.ts` (PLAN-010 CP-C) e' la forma della soluzione: un
+   solo parametro decide insieme profondita' di valle e forma della punta — il quadrante
+   «valle profonda + punta tonda» non e' costruibile.
+9. Bande di valle di partenza: fiore ~0.42-0.55, stella ~0.15-0.30, magra ~0.15 — numeri
+   da battezzare sui test visuali.
+
+### Cosa questo NON autorizza
+
+- nessuna forma fuori dalle tre famiglie (nessun mezzo-fiore, nessun disco con fessure,
+  nessuna "blade");
+- nessuna famiglia diversa per petalo;
+- nessuna rimozione della stella magra («la stella magra ci serve, nn dobbiamo toglierla»);
+- nessun cambio a verdetto o probabilita' (`skills`, `check.score` invariati — la
+  silhouette e' display-only).
+
+### Still unresolved
+
+- bande di valle esatte e raggio di stiramento della stella magra — si battezzano sui
+  test visuali della pagina V6.2.
+
+**Formulazione approvata (FROZEN):**
+<!-- REQ:v37-family-uniform -->La silhouette dell'astrolabio appartiene a una sola famiglia
+per board — fiore | stella | stella magra — decisa a maggioranza delle stat reali per
+asse;<!-- REQ:v37-thresholds --> soglie sul margine stat/difficolta': sopra il 10% stella,
+sopra il 35% stella magra, altrimenti fiore;<!-- REQ:v37-morph-coupled --> profondita'
+della valle e forma della punta sono accoppiate per costruzione: nessuna forma con valle
+profonda e punta tonda, nessuna mescolanza di famiglie sullo stesso
+board;<!-- REQ:v37-tip-lengths --> le lunghezze delle punte restano per-asse e seguono le
+stat reali;<!-- REQ:v37-coverage-glyph --> la silhouette e' un glifo qualitativo — la
+copertura dipinta e' approssimata dalla famiglia, nessun solver esatto.
