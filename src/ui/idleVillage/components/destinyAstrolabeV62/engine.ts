@@ -10,7 +10,7 @@
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
 import { stepGuidedBall, findZonePoint } from './ballGuidance';
 import { createTarGooRenderer } from './tarGooRenderer';
-import { valleyProfiles } from './starProfile';
+import { boardStarProfile, V62_FLOWER_VALLEY_MAX } from './starProfile';
 import { createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
 
@@ -130,12 +130,15 @@ function recomputeGeometry(skillIndex=0){
   for(let s=0;s<skillAxes.length;s+=1){ for(let n=0;n<skillAxes[s];n+=1) geo.axisSkill.push(s); }
   while(geo.axisSkill.length<AXES) geo.axisSkill.push(geo.axisSkill.length%Math.max(1,skills.length));
   /* per-axis radii: white obelisk = stat, black obelisk = check */
-  geo.axisTip=[]; geo.axisCheck=[];
+  geo.axisTip=[]; geo.axisCheck=[]; geo.axisMargin=[];
   for(let i=0;i<AXES;i+=1){
     const prof=opts.axisProfile?.[i];
     const sk=skills[geo.axisSkill[i]]||{stat:60,difficulty:50};
-    geo.axisTip[i]=rOf(prof? prof.stat : sk.stat);        // success star reaches the white obelisk (stat)
-    geo.axisCheck[i]=rOf(prof? prof.difficulty : sk.difficulty);// failure goo reaches the black obelisk (check)
+    const stat=prof? prof.stat : sk.stat;
+    const diff=prof? prof.difficulty : sk.difficulty;
+    geo.axisTip[i]=rOf(stat);        // success star reaches the white obelisk (stat)
+    geo.axisCheck[i]=rOf(diff);// failure goo reaches the black obelisk (check)
+    geo.axisMargin[i]=stat/Math.max(1e-6,diff);  // margine grezzo — il voto di famiglia v37 si misura qui, non sui radii
   }
   /* save the original stat/difficulty radii for obelisk display (before area solve) */
   geo.obeliskTip=geo.axisTip.slice();   // white obelisks stay on the stat
@@ -177,25 +180,21 @@ function recomputeGeometry(skillIndex=0){
      la soglia e' 1 perche' e' li' che la punta raggiunge la trama.
      Anche i valori erano fuori scala: valle a 0.78 del raggio della punta e'
      quasi un cerchio, valle a 0.12 e' uno spillo. */
-  const elong=Math.min(...geo.starTip.map((s,i)=>s/Math.max(1e-6,geo.axisCheck[i])));
-  /* FAMIGLIA: cambia alla parita', in una finestra stretta. Sotto e' fiore
-     (petali tondi), sopra e' stella (fianchi dritti). Misurato che con la soglia
-     a 1.08 un caso da allungamento 1.072 restava fiore. */
-  /* LA FINESTRA STAVA A CAVALLO DELLA PARITA', NON PRIMA.
-     Con 0.96..1.06, ad allungamento 1.000 — stat esattamente uguale alla
-     difficolta' — smoothstep vale 0.352: la forma era ancora per due terzi
-     fiore proprio nel caso che la regola chiama STELLA. Misurato sui pixel a
-     parita': fianco a 18 gradi fuori di 24.45px e punta larga 8.5 gradi.
-     La regola dice `< 1.00 fiore`, `1.00..1.83 stella`: la transizione deve
-     essere FINITA a 1.00, quindi la finestra si chiude li'. */
-  /* PLAN-067 T-B1b (R-234): famiglia e profondita' si decidono VALLE PER VALLE
-     (`valleyProfiles`): ogni valle legge le due punte fra cui sta. Prima c'era UN
-     solo numero — l'allungamento minimo di tutti gli assi — e con assi diversi
-     l'asse piu' debole decideva ogni valle: un petalo lungo accanto a uno corto
-     si assottigliava in una lama e la figura non era ne' fiore ne' stella. */
-  geo.valleyProf=valleyProfiles(geo.starTip,geo.axisCheck);
-  geo.starMix=geo.valleyProf.reduce((m,v)=>m+v.mix,0)/AXES;      // aggregato, solo cosmetico
-  geo.valleyF=geo.valleyProf.reduce((m,v)=>m+v.depth,0)/AXES;    // aggregato, solo cosmetico
+  /* PLAN-082 (R-275, desiderata v37): UNA famiglia per tutto il board, decisa a
+     maggioranza sui margini grezzi stat/difficolta' (`boardStarProfile`):
+     fiore sotto il check, stella sopra +10%, stella magra sopra +35%. Prima la
+     famiglia si decideva VALLE PER VALLE e mix/depth erano disaccoppiati: con
+     assi diversi uscivano punte di famiglie diverse, e una punta tonda su una
+     valle scavata a 0.3675 era il mezzo-fiore bandito dal Director. Ora il mix
+     e' uniforme (0 o 1) e solo la profondita' varia per valle, dentro la banda
+     della famiglia scelta. Le LUNGHEZZE delle punte restano per-asse. */
+  {
+    const board=boardStarProfile(geo.axisMargin);
+    geo.starFamily=board.family;
+    geo.valleyProf=board.valleys;
+    geo.starMix=geo.valleyProf.reduce((m,v)=>m+v.mix,0)/AXES;      // aggregato, solo cosmetico
+    geo.valleyF=geo.valleyProf.reduce((m,v)=>m+v.depth,0)/AXES;    // aggregato, solo cosmetico
+  }
   geo.starTip=geo.obeliskTip.slice();   // la punta È l'obelisco bianco
   /* probabilità reale, misurata sulla geometria che il giocatore vede.
      Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
@@ -272,7 +271,7 @@ function recomputeGeometry(skillIndex=0){
 /* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
 /* il fianco DRITTO: intersezione del raggio con la corda fra due vertici */
 /* la valle che chiude il tratto `k` (0..9): fra punta i e i+1, i = floor(k/2) */
-const valleyAt=k=>{ const i=((Math.floor(k/2)%AXES)+AXES)%AXES; return (geo.valleyProf&&geo.valleyProf[i])||{mix:0,depth:0.3675}; };
+const valleyAt=k=>{ const i=((Math.floor(k/2)%AXES)+AXES)%AXES; return (geo.valleyProf&&geo.valleyProf[i])||{mix:0,depth:V62_FLOWER_VALLEY_MAX}; };
 const valleyDepthAt=k=>valleyAt(k).depth;
 function chordFromAxes(theta,arr,scale){
   const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;
@@ -451,31 +450,17 @@ const SPD=()=>Math.max(0.25,cfg.speed||1);
 const phaseTS=(durMs)=>phaseT(durMs/SPD());
 const easeOutCubic=t=>1-Math.pow(1-t,3);
 const easeInCubic=t=>t*t*t;
-/* LE TRE FORME, E LE SOGLIE NON SONO INVENTATE.
+/* LE TRE FORME (desiderata v37, R-275) — la regola vive in `starProfile.ts`:
  *
- *   punta < muro            -> FIORE           (petali tondi)
- *   punta ~ muro .. phi^2   -> STELLA NORMALE  (fianchi dritti, valle 0.382)
- *   punta -> phi^2 * muro   -> STELLA STIRATA  (la valle si scava)
+ *   margine <= +10%        -> FIORE          (petali tondi, valle alta)
+ *   margine  > +10%        -> STELLA         (fianchi dritti, valle bassa)
+ *   margine  > +35%        -> STELLA MAGRA   (fianchi dritti, valle piu' scavata)
  *
- * 0.382 non e' a occhio: nella stella a cinque punte il rapporto fra raggio
- * interno ed esterno e' `cos(2pi/5)/cos(pi/5) = 1/phi^2 = 0.381966`. E' LA
- * proporzione della stella, verificata numericamente. La V6 Asterism usa 0.4,
- * che e' la stessa cosa a occhio.
- *
- * E la terza soglia e' quella che il Director ha DEFINITO invece di scegliere:
- * «quando con la stella il goo sarebbe interamente coperto». Il punto piu' basso
- * del bordo e' la valle, quindi la stella copre tutto quando
- *     0.382 * punta >= muro   ->   punta/muro >= 1/0.382 = phi^2 = 2.618
- * Da li' in poi la valle DEVE scavarsi, o il fallimento sparisce dal disegno.
+ * decisa UNA sola volta per board a maggioranza dei cinque assi. Le vecchie
+ * costanti discrete per-valle (`V62_VALLEY_FLOWER = 0.3675`, `V62_VALLEY_STAR`,
+ * `V62_VALLEY_BLADE`) sono il residuo che produceva il mezzo-fiore: rimosse.
  */
-const PHI=(1+Math.sqrt(5))/2;
-const V62_STAR_AT=1.0;            // la parita': da qui e' stella
-const V62_COVER_ALL=PHI*PHI;      // 2.618: qui la stella normale coprirebbe tutto
-const V62_VALLEY_FLOWER=0.3675;   // la costante tarata: parita = 50% dell'area
-const V62_VALLEY_STAR=1/(PHI*PHI);// 0.381966 — la proporzione della stella
-const V62_VALLEY_BLADE=0.22;      // stirata: la valle scavata per non coprire tutto
 const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
-const smoothstep=(t,a,b)=>{ if(t<=a)return 0; if(t>=b)return 1; const m=(t-a)/(b-a); return m*m*(3-2*m); };
 /* V6.2 tar-pour curve: pooled seed → slow spread → settle, no overshoot.
    Follows an S-curve (smoothstep) so the mass has time to look heavy. */
 const tarPour=t=> tarGooConfig.timing.seedReveal
