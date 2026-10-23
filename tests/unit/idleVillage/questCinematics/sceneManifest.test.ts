@@ -85,6 +85,28 @@ describe('ambient fx schema', () => {
     expect(AmbientFxSchema.safeParse({ type: 'smoke', at: [2, 0.5] }).success).toBe(true); // anchor range is a scene concern, schema only needs the tuple
     expect(AmbientFxSchema.safeParse({ type: 'nope' }).success).toBe(false);
   });
+  // INV:ambient-layer.INV-1
+  it('accepts the PLAN-052 showcase types with defaults applied (INV:ambient-layer.INV-1)', () => {
+    expect(AmbientFxSchema.parse({ type: 'glint', at: [0.55, 0.7] })).toMatchObject({
+      type: 'glint', period: 4, r: 0.008, color: '#fff4d0',
+    });
+    expect(AmbientFxSchema.parse({ type: 'fireflies', band: [0.32, 0.42] })).toMatchObject({
+      type: 'fireflies', count: 6, xband: [0, 1], color: '#d8f27a',
+    });
+    expect(AmbientFxSchema.parse({ type: 'moths', at: [0.72, 0.52] })).toMatchObject({
+      type: 'moths', count: 3, speed: 1, r: 0.035,
+    });
+    expect(AmbientFxSchema.parse({ type: 'shaft', from: [0.6, 0.05], to: [0.55, 0.55] })).toMatchObject({
+      type: 'shaft', count: 3, width: 0.12, color: '#fff2cc',
+    });
+  });
+  // INV:ambient-layer.INV-1
+  it('rejects out-of-bounds fields on the new types (INV:ambient-layer.INV-1)', () => {
+    expect(AmbientFxSchema.safeParse({ type: 'glint', at: [0.5, 0.5], r: 0.2 }).success).toBe(false);
+    expect(AmbientFxSchema.safeParse({ type: 'fireflies', band: [0.3, 0.4], count: 20 }).success).toBe(false);
+    expect(AmbientFxSchema.safeParse({ type: 'moths', at: [0.5, 0.5], count: 8 }).success).toBe(false);
+    expect(AmbientFxSchema.safeParse({ type: 'shaft', from: [0.5, 0], to: [0.5, 0.5], a: 0.9 }).success).toBe(false);
+  });
   it('shipped scenes carry authored ambient lists', () => {
     expect(SCENE_CINEMATICS['accampamento-raider'].ambient.some((f) => f.type === 'glow')).toBe(true);
     expect(SCENE_CINEMATICS['agguato-foresta'].ambient.some((f) => f.type === 'dust')).toBe(true);
