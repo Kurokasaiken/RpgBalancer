@@ -4743,3 +4743,13 @@ Rieseguito anche **PLAN-061 D1-2 1/1 PASS** con il driver corretto; screenshot s
 - **Contratto:** `use-quest-expedition-session.INV-4` (sync:bug, red-first registrato — frame illegale osservato `seatHasMedal:true, seatSuppressed:true, proxyAirborne:false`), `test_refs` popolato.
 - **Evidenze:** unit INV-4 rosso→verde (5/5 return-flight, 18/18 suite adiacenti); probe headless rAF-sampled v3: **0 frame senza carrier** su 47 campionati (sede→proxy→card), `test-results/r269-*.png`.
 - **Pendente:** eye-check Director su `/game` (estrarre un residente dalla sede: la medaglia deve volare in un unico moto continuo sede→card, senza flash né cavità vuota).
+
+## R-275 — Skill check: forma "mezzo-fiore" (valli al nucleo + punte tonde) ricompare nelle quest
+
+**Richiesta (verbatim):** *"un errore che è tornato: il componente dello skill check che viene usato nelle quest mostra una forma strana che nn dovrebbe mostrare in alcuni casi. Deve mostrare il fiore o la stella [...] Invece ogni tanto esce qualcosa d strano, che ha le valli troppo 'dentro' e la punta arrotondata"* · *"peggore è il delta x il party = fiore [...] party un po' + forte = stella. Molto + forte = stella magra"* · *"sopra il 10% stella, sopra il 35% stella magra"*
+**Data:** 2026-10-23
+**Stato:** `in corso`
+**Contesto:** `starProfile.ts` V6.2 (R-234) disaccoppia mix/depth e tiene la valle fiore a 0.3675 ≈ nucleo — quadrante proibito già chiuso in v17/PLAN-010 (`coverage.ts` morph). Bug riprodotto headless su pagina V6.2: 35/50 → forma deforme; assi misti → ibrido.
+**Desiderata:** `v37` FROZEN — famiglia uniforme per board a maggioranza, soglie 10%/35%, morph accoppiato, copertura qualitativa.
+**Plan:** `plans/PLAN-082-astrolabe-family-glyph.md`
+**Nota:** numerato R-275 (non R-274) — collisione T-13: l'entry R-274 originale è stata sovrascritta dal buffer dell'editor mentre R-274 veniva assegnato alla richiesta mobile.
