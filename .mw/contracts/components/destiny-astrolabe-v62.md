@@ -12,6 +12,7 @@ scope_files:
   - src/ui/idleVillage/components/destinyAstrolabeV62/DestinyAstrolabeV62.tsx
   - src/ui/idleVillage/components/destinyAstrolabeV62/ballGuidance.ts
   - src/ui/idleVillage/components/destinyAstrolabeV62/engine.ts
+  - src/ui/idleVillage/components/destinyAstrolabeV62/starProfile.ts
   - src/ui/idleVillage/components/destinyAstrolabeV62/tarGooRenderer.ts
   - src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts
 fast_checks:
@@ -31,13 +32,39 @@ invariants:
   - id: R-234-astrolabe-valley-per-tip
     source: director-bug
     source_ref: R-234
-    statement: Each valley of the V6.2 star reads its two neighbouring tips for family and depth (no single global valley)
+    statement: >-
+      The silhouette family is board-uniform (v37/R-275, majority vote over raw stat/difficulty margins);
+      each valley still reads its two neighbouring tips — for DEPTH only, inside the family band
     test_refs:
       - tests/unit/destinyAstrolabeV62/starProfile.test.ts
   - id: R-234-astrolabe-no-ghost
     source: director-bug
     source_ref: R-234
     statement: 'No hollow ghost petal past the tar wall: the out-of-arena outline is clipped to the tar mask'
+    test_refs:
+      - tests/unit/destinyAstrolabeV62/starProfile.test.ts
+  - id: destiny-astrolabe-v62.INV-1
+    source: director-bug
+    source_ref: R-275
+    statement: >-
+      Mezzo-fiore nelle quest: valleyProfiles disaccoppia mix/depth (valle 0.3675 + punta tonda) e lascia famiglie miste
+      per valle; v37 impone famiglia uniforme per board a maggioranza (10%/35%) con morph accoppiato
+    test_refs:
+      - tests/unit/destinyAstrolabeV62/starProfile.test.ts
+  - id: R-275-astrolabe-no-hybrid
+    source: director-bug
+    source_ref: R-275
+    statement: >-
+      No half-flower and no mixed board: valley depth is morph-coupled to the tip family (rounded tip only on
+      a high valley, sharp tip only on a low valley) and the mix is identical on every valley of the board
+    test_refs:
+      - tests/unit/destinyAstrolabeV62/starProfile.test.ts
+  - id: R-275-astrolabe-family-thresholds
+    source: director-bug
+    source_ref: R-275
+    statement: >-
+      Board family by majority over raw stat/difficulty margins (v37): flower at or below +10%, star strictly
+      above +10%, lean star strictly above +35%; the lean star stays in the admissible set
     test_refs:
       - tests/unit/destinyAstrolabeV62/starProfile.test.ts
 ---
