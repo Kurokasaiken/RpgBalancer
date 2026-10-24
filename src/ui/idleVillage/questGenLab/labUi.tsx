@@ -55,7 +55,7 @@ export const LabCard: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ title, aside, children, className = '' }) => (
-  <div className={`rounded-xl border border-white/10 bg-white/5 p-4 ${className}`}>
+  <div className={`min-w-0 rounded-xl border border-white/10 bg-white/5 p-4 ${className}`}>
     <div className="mb-2 flex items-start justify-between gap-2">
       <h4 className="text-sm font-semibold text-white">{title}</h4>
       {aside}
