@@ -7,6 +7,7 @@
  */
 
 import { z } from 'zod';
+import { LongFormSchema } from './questScenario.schema';
 
 import { ResourceDeltaDefinitionSchema, StatRequirementSchema } from '../schemas';
 
@@ -88,6 +89,9 @@ export const QuestPhaseSchema = z.object({
   successEffects: PhaseEffectSchema.optional(),
   failureEffects: PhaseEffectSchema.optional(),
   copy: PhaseCopySchema,
+  /** PLAN-085: authored long-form amanuense page for the phase
+   *  (presentation only — the engine never reads it). */
+  longForm: LongFormSchema.optional(),
   icon: z.string().optional(),
   telemetryTags: z.array(z.string()).optional(),
   riskProfile: RiskProfileSchema.optional(),
