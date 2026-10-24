@@ -321,6 +321,64 @@ export const StageDirectionSchema = z
   .strict();
 export type StageDirectionSchemaType = z.infer<typeof StageDirectionSchema>;
 
+/* ------------------------------------------------------------------ */
+/* Long-form "amanuense" block (PLAN-085, R-279): the verbose scribal    */
+/* version of a node's text — presentation only, never read by engine.  */
+/* ------------------------------------------------------------------ */
+
+/** Inline gloss / nota / drollery anchored to a paragraph of `paragraphKeys`. */
+export const LongFormMarginaliaSchema = z
+  .object({
+    /** Index into `paragraphKeys` — the note renders after that paragraph. */
+    afterParagraph: z.number().int().nonnegative(),
+    /** gloss = commentary (optionally tied to a `lemma` substring in the
+     *  paragraph); nota = red manicule flagging a passage; drollery = pure
+     *  ornament living in the gutter. */
+    kind: z.enum(['gloss', 'nota', 'drollery']),
+    /** Substring of the anchored paragraph the gloss leader-line points to. */
+    lemma: z.string().optional(),
+    /** i18n key for gloss/nota text. */
+    textKey: z.string().optional(),
+    /** Asset id into the drollery registry (gutter ornament). */
+    drolleryId: z.string().optional(),
+  })
+  .strict();
+export type LongFormMarginaliaSchemaType = z.infer<typeof LongFormMarginaliaSchema>;
+
+/** The scribe's closing statement — who copied it, where, when, how much it hurt. */
+export const LongFormColophonSchema = z
+  .object({
+    scribeKey: z.string(),
+    placeKey: z.string().optional(),
+    dateKey: z.string().optional(),
+    complaintKey: z.string().optional(),
+  })
+  .strict();
+export type LongFormColophonSchemaType = z.infer<typeof LongFormColophonSchema>;
+
+/** The authored long-form page opened by the amanuense quill button. */
+export const LongFormSchema = z
+  .object({
+    /** scene = node's illuminated page; lore = lore-drop variant (foxed, sealed). */
+    variant: z.enum(['scene', 'lore']).default('scene'),
+    /** Ornament richness tier 1-3 (drives which frame layers exist). */
+    tier: z.union([z.literal(1), z.literal(2), z.literal(3)]).default(2),
+    /** Motif id into the reusable plate library — fallback/tier-1/lore only. */
+    motif: z.string().optional(),
+    /** Bespoke per-scene painted initial id (preferred when authored). */
+    bespokeInitialId: z.string().optional(),
+    /** i18n key for the rubricated incipit line (single line). */
+    incipitKey: z.string().optional(),
+    /** i18n keys for the prose paragraphs (cap ~220 words enforced by tests). */
+    paragraphKeys: z.array(z.string()).min(1).max(8),
+    marginalia: z.array(LongFormMarginaliaSchema).max(6).default([]),
+    colophon: LongFormColophonSchema.optional(),
+    /** i18n key for the rubricated explicit line («Explicit capitulum…»). */
+    explicitKey: z.string().optional(),
+  })
+  .strict();
+export type LongFormSchemaType = z.infer<typeof LongFormSchema>;
+
 /** Authored quest node — mirrors `QuestNode`. */
 export const QuestNodeSchema = z
   .object({
@@ -366,6 +424,9 @@ export const QuestNodeSchema = z
      * pins live on `QuestPoi.fasi.pins`. Inert on legacy runs.
      */
     fase: z.enum(['andata', 'svolgimento', 'ritorno']).optional(),
+    /** PLAN-085: authored long-form page for the Amanuense quill button
+     *  (presentation only — the engine never reads it). */
+    longForm: LongFormSchema.optional(),
   })
   .strict();
 export type QuestNodeSchemaType = z.infer<typeof QuestNodeSchema>;

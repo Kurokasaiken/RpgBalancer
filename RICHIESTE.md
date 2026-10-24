@@ -4866,6 +4866,18 @@ gemini escluso. Contratto: breakpoint <768 con bound zoom effettivi gated
 44px+«Altro» sheet, panelMode floating|sheet con persistenza disaccoppiata,
 tap-to-place primario, `mobileFitConfig` Zod unico. In attesa di battesimo.
 Traccia 2 (store) = piano separato successivo.
+**Avanzamento (2026-10-24):** battezzato («procedi»). T-001..T-005 implementati —
+`mobileFitConfig` Zod (`src/balancing/config/idleVillage/mobileFitConfig.ts`),
+safeFit cover su `mapFocal` + bound effettivi gated <768 + pinch/pan DOM Pointer
+Events con `pointercancel`→restore in `PixiWorldMap`, nav icon-chip 44px + «Altro»
+sheet (`data-nav-more`) in `GameFrame`, compressione top-HUD + safe-area `env()`,
+`panelMode` sheet full-bleed via `useHudPanelDrag`, hint keyboard-only soppressi
+su `pointer:coarse`. Spec `tests/mobileFit.spec.ts` (progetto `Mobile Fit`):
+**9/9 verde** — nav ≥44px non sovrapposta, HUD senza clip, zoom ≥ cover scale +
+focale centrato, pan clamp, range pinch ≥ floor, hint soppressi, pannelli ≤
+viewport, desktop emit-identical a 1280. **Aperti:** tap-to-place (path primario
+assegnazione medaglioni — non ancora implementato), tap-to-reveal tooltip,
+eye-check Director su device reale (OB-5), sweep 44px residui (B6).
 
 ## R-275 — Skill check: forma "mezzo-fiore" (valli al nucleo + punte tonde) ricompare nelle quest
 
@@ -4926,4 +4938,9 @@ Traccia 2 (store) = piano separato successivo.
 **Stato:** `in corso`
 **Ruling Director (2026-10-24):** opzione **A** — pagina a SINISTRA (cronaca/lettura), skill check resta a destra; **transiente** ("leggi la versione lunga"), info persistenti presentate altrove; estetica **molto carica/barocca**: pagina di libro di fiabe dei cartoon — lettere complesse con illustrazioni, bordi illustrati, ghirighori.
 **Contesto:** il testo lungo è authored per scena — costo contenuto già previsto. Infrastruttura lore esistente (`LoreDrop`/`useQuestLoreDrop`, epilogue `lore` grants) = superficie dati naturale. Testo breve corrente: `node.body` in `QuestRunWindow`, `offer.dispatch`/`objective` nel planner. Coesistenza col skill check = vincolo di layout (CompanionLeft zone o banda separata a sx).
-**Pendente:** ricerca (cappello + prompt potenziato) su come realizzare l'effetto → discussione multi-AI web → poi plan con contratto.
+**Ricerca + dibattito multi-AI web (2026-10-24, converged):** research brief `.mw/research/2026-10-24-amanuense-page/RESEARCH-BRIEF.md`; dibattito `20261024-amanuense-page` (mind-weaver `.mw/runs/`) — artifact-r003 converged, ACCEPT 4/4 (claude, gemini, grok, deepseek; chatgpt rimosso `provider_dead`: temporary-chat URL `local-chatgpt:` non persistite). Copia artifact: `.mw/research/2026-10-24-amanuense-page/artifact-r003.md` (sha256 `a3cc80e5…239c`).
+**Design ratificato dal dibattito:** LeftWingSlot occupant (swap con CompanionLeft, tab inerte, `wasOpen` restore); finestra 760 intoccata, coesistenza ≥1480px, sheet sotto; registro tipografico **umanista** (NO blackletter — secolo sbagliato); densità come invariante reading-rect (≥48ch, ΔL≤3%, gutter assorbe il surplus → "molto carico" su viewport larghi); capilettera **bespoke per scena** default + libreria 12 motivi come fallback; reveal inchiostro one-shot ≤1.8s; catchword rimosso → explicit + vero colophon; marginalia come apparato (gloss/nota/drollery); schema `longForm` strict-Zod; close control wax-seal sempre visibile.
+**Visual fork (2026-10-24, ruling VF-AMAN-001):** card `.mw/runs/2026-10-24-amanuense-fork/visual-fork-amanuense.md`; opzioni A folio sospeso / B codex aperto / C frammento, preview localhost:8791 su harness HTML/CSS. **Ruling: A folio sospeso** — verbatim: *"a, ma dentro un componente della superficie /game. come icona del pulsante un tomo aperto"*. Baseline congelata `baseline-A.png` (sha `226ea1e7…`).
+**Plan:** `plans/PLAN-085-amanuense-page.md` (draft) — T-001..T-006, contratto con regressione permanente + same-viewport vs baseline + living contracts /game.
+**Implementazione avviata (mw-executor):** T-001 ✅ schema `longForm` + tokenizer markup + skin preset, 7/7 test verdi. Restano T-002 componente folio ✅ (3/3 test render). T-003 v1 wiring pagina+tomo in `QuestRunWindow` ✅ (10/10 test; residui solver/zIndex/pill-inerte da verificare a T-006). Restano T-004 reveal, T-005 lore auto-open, T-006 evidenza side-by-side.
+**Pendente:** T-003..T-006 → `verify:bundle` → `fatta`.
