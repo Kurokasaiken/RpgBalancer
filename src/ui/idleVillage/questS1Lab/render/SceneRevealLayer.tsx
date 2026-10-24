@@ -79,8 +79,9 @@ export const SceneRevealLayer: React.FC<{
           }}
         />
       )}
-      {/* The revealed plate — fades in underneath, clipped to the occluder
-       *  region so the surrounding frame keeps the hidden plate. */}
+      {/* The revealed plate — fades in over the WHOLE frame (the risen
+       *  goblins live center-right, beyond the cutout region), while the
+       *  cutout slides away on top of it selling the uncovering. */}
       {revealed && reveal.revealSrc && (
         <img
           src={reveal.revealSrc}
@@ -88,8 +89,7 @@ export const SceneRevealLayer: React.FC<{
           data-testid="scene-revealed-plate"
           style={{
             ...cover,
-            clipPath: cut ? clipFor(cut.region) : undefined,
-            animation: 'sceneRevealFade 0.7s ease-out both',
+            animation: 'sceneRevealFade 0.9s ease-out both',
             zIndex: 3,
           }}
         />
