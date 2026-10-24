@@ -105,6 +105,19 @@ const softDot = (
  * accumulates across frames. Exported so the runtime-invariant tests can
  * drive it with a mock 2d context (jsdom has no rasterizer).
  */
+/** Plate strips are plain Image elements, cached per src. The cache is
+ *  exported so tests can inject stubs (jsdom never fires onload). */
+export const plateCache = new Map<string, HTMLImageElement>();
+const plateImg = (src: string): HTMLImageElement | null => {
+  const cached = plateCache.get(src);
+  if (cached) return cached.complete && cached.naturalWidth ? cached : null;
+  if (typeof Image === 'undefined') return null;
+  const im = new Image();
+  im.src = src;
+  plateCache.set(src, im);
+  return null;
+};
+
 export function drawAmbientFrame(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -358,6 +371,22 @@ export function drawAmbientFrame(
         ctx.lineTo(x0 + f.lean * sl * 2.5, y0 + sl);
       }
       ctx.stroke();
+      continue;
+    }
+
+    if (f.type === 'plate') {
+      /* Region plate: a generated cel strip (video-model clip sliced into
+       * frames) looped inside a feathered region — the painted flame
+       * comes alive, the rest of the painting holds still. Deterministic:
+       * the frame index is a pure function of the clock. */
+      const im = plateImg(f.src);
+      if (!im) continue;
+      const cw = im.naturalWidth / f.frames;
+      const ch = im.naturalHeight;
+      const fr = Math.floor(t * f.fps) % f.frames;
+      const dx = toX(f.at[0] - f.w / 2);
+      const dy = toY(f.at[1] - f.h / 2);
+      ctx.drawImage(im, fr * cw, 0, cw, ch, dx, dy, toX(f.at[0] + f.w / 2) - dx, toY(f.at[1] + f.h / 2) - dy);
       continue;
     }
   }

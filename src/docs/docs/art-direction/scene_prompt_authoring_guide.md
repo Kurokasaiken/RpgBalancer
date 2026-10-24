@@ -78,6 +78,44 @@ Restano fissi:
 - **kill list non cromatica:** no grim, no gore, no symmetry, no flat digital
   surfaces, no sci-fi, no text/UI/frames/watermarks/**signatures/logos**.
 
+## R4bis — Preflight obbligatorio (2026-10-24)
+
+**Mai consegnare un prompt/brief senza aver eseguito questo checklist.**
+Il fallimento 2026-10-24 (brief f2–f6 consegnati senza clausola di
+luminosità, senza pigmenti bibbia, con soggetto ambiguo) dimostra che
+scrivere "a memoria del formato" non basta — il contratto va riapplicato
+meccanicamente a ogni nuovo prompt.
+
+1. **Luminosità** — se il testo contiene `dusk|night|shadow|dark|evening`,
+   la frase canonica DEVE essere presente verbatim:
+   *«The frame stays luminous and high-chroma — light wins over darkness,
+   even the deepest shadow is saturated color, never black murk.»*
+   E dove la narrativa lo permette: una sorgente di luce forte dipinta.
+2. **Pigmenti bibbia** — la sezione PALETTE nomina i quattro fissi:
+   **ultramarine, cinabro, ambra, verde Veronese**; le ombre sono
+   **deep teal / smeraldo / turchese**. Mai inventare palette da zero.
+3. **Cielo** — se visibile: `vibrant azure`, mai "storm-lit/dim sky".
+4. **Direzione dell'azione** — se la scena ha un attore che agisce su
+   qualcosa, il verbo dice CHI e VERSO CHI: «the heroes charge TOWARD
+   the camp», non «a charge happens». L'agente non deduce la direzione.
+5. **Correlazione quattro assi** — archetype × shot × ambient ×
+   interaction hooks dichiarati nel brief prima del prompt.
+6. **Kill-list completa** — elementi runtime-owned (fog, shafts, embers,
+   dust dipinti), soggetti vietati della scena, signatures/watermarks,
+   symmetry, gore, grim, sci-fi, flat digital.
+7. **Formato** — aspect 2.4:1 dichiarato; medium impasto in apertura;
+   prosa unica con ancore CAPS nell'ordine fisso (§R5).
+
+Verifica meccanica minima (grep sul file): `light wins over darkness`
+se c'è una keyword scura; `ultramarine` + `Veronese` in PALETTE;
+una preposizione di direzione (`toward`, `away from`, `up to`) nel SUBJECT.
+
+**Accettazione → bible.** Quando un'immagine viene accettata e wired,
+il suo prompt entra in `public/docs/prompts/prompt_library.md` (Intent +
+Art Stack + blocco prompt + Output Reference con path dell'asset) —
+la libreria è la collezione dei successi e fa crescere il formato.
+Le immagini rigenerate sostituiscono la vecchia entry.
+
 ## R5 — Struttura del prompt esterno (Gemini / Grok / GPT)
 
 **Formato canonico = moodboard library** (`public/docs/prompts/prompt_library.md`

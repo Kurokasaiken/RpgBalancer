@@ -20,6 +20,10 @@ ricerca/opinioni si scrive come EXPLORER, non come executor-spec.
    ruling Director) / voci solitarie (blind spot condiviso possibile).
 7. **Self-check**: «ho codificato la risposta dentro la domanda?» → se sì,
    riscrivere.
+8. **Expand first (Director, 2026-10-24)**: quando il Director pone una
+   domanda aperta, prima di rispondere verificare se esiste una
+   formulazione più ricca — offrire la versione espansa + lo spazio
+   multi-AI, non rispondere dentro il frame minimale.
 
 ## Origine
 

@@ -100,4 +100,8 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
   /* Lab A/B: same painting as viaggio-ritorno with the pre-boost ambient
    *  set — pick it in /theater-lab to compare "prima e dopo". */
   'viaggio-ritorno-prev': { src: '/assets/scene-library/viaggio-ritorno-prev.jpg', fit: 'cover' },
+  /* Showcase "tutto il kit" (2026-10-24): bivacco al crepuscolo — CANOPY
+   *  + SHOULDER, il maggior numero di tipi FX su una scena. */
+  'bivacco': { src: '/assets/scene-library/bivacco.jpg', fit: 'cover' },
+  'intrusi': { src: '/assets/scene-library/intrusi.jpg', fit: 'cover' },
 };

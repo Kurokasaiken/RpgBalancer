@@ -168,3 +168,57 @@ Drago — A majestic ancient dragon perched atop an overgrown marble ruin deep i
 
 - **Image:** [Drago Concept](../../src/assets/mood/drago.png)
 - **Note:** Folder: src/assets/mood
+
+
+# Quest Sterminio Goblin — scene cinematiche v2 (2026-10-24)
+
+## Agguato foresta — SHOULDER
+
+- **Intent:** Ambush pre-check: copertura sx, strada vuota, sagome goblin in treeline. SHOULDER archetype, enter-creep.
+- **Art Stack:** oil impasto, Jones/Easley, palette Wanderlust (ultramarine/cinabro/ambra/verde Veronese, ombre deep teal), aspect 2.4:1.
+- **Scene:** `public/assets/scene-library/agguato-foresta.jpg` — pipeline: bake-depth + manifest FX.
+
+### Prompt (copia/incolla – Agguato foresta — SHOULDER)
+
+```text
+AGGUATO — painted in heavy oil impasto. An ambush at its cocked instant, seen from behind cover — painted before a single arrow is loosed. SUBJECT: a quiet forest road openly sunlit, EMPTY — the attacked party is never drawn; at the treeline edge the wood betrays itself: half-hidden low goblin shapes crouched among roots and undergrowth, crude bows drawn, arrowheads catching stray light in scattered points of glint, ochre war-paint barely readable in the shade — a mass of hidden shapes, never a single readable face. NOTHING FLIES YET — the trap is loaded, not sprung. COMPOSITION: a broad mossy rock-and-root mass fills the lower-left corner and left edge, cropped by frame — the cover we hide behind — a single convex dark mass with a clean silhouette and visible inner depth steps (stacked stones, layered roots, moss strata — never a flat wall, never a thin post); the right two-thirds open onto the sunlit road curving past the treeline — the treeline a dense dark wall of undergrowth where the ambushers hide, stepping back in two clear depth planes; above the treeline a wedge of open sky, smooth low-frequency. NO symmetry — the mass leans asymmetric, the road bends off-axis. LIGHTING: the road blazing in hard midday sun, the near mass in deep saturated shadow — the ambushers read as saturated silhouettes and points of arrowhead glint against the lit road. PALETTE: amber sunlit road, deep teal treeline and mass shadow, Veronese undergrowth, ochre war-paint notes; NO grey, NO brown, NO mud. TECHNIQUE: thick oil impasto, broad palette-knife strokes in the Jaime Jones / Jeff Easley tradition, tactile matter on stone, root, moss and bark; Justin Gerard whimsy in the ambusher shapes — grotesque but vibrant, never horror; rude beauty — weathered and tactile, never squalid. MOOD: the held breath before shock — we are in the open and they are not. The frame stays luminous and high-chroma — light wins over darkness, even the deepest shadow is saturated color, never black murk. NO fog or mist painted, NO smoke, NO light shafts or god rays or visible beams, NO dense dust clouds — paint the sunlit air as soft wash only, NO embers or sparks, NO distinct cloud silhouettes, NO birds, NO people or humanoid figures other than the half-hidden ambushers, NO readable creature faces or anatomy, NO close-up goblins, NO arrows in flight or embedded, NO wounds, NO wire or cords, NO fences or structures, NO bare twig lattices against sky, NO text/UI/watermarks/frames, NO symmetry, NO grim, NO gore, NO blood, NO decay, NO flat digital, NO airbrushed smoothness, NO sci-fi. Ultra-wide cinematic 2.4:1.
+```
+
+### Output Reference – Agguato foresta — SHOULDER
+
+- **Image:** `public/assets/scene-library/agguato-foresta.jpg`
+- **Status:** accepted + wired (cinematic manifest)
+
+## Intrusi — SHOULDER specchiato
+
+- **Intent:** Goblin in infiltrazione visti da copertura dx; sagome in fila, mezzogiorno. Specchio di agguato.
+- **Art Stack:** oil impasto, Jones/Easley, palette Wanderlust (ultramarine/cinabro/ambra/verde Veronese, ombre deep teal), aspect 2.4:1.
+- **Scene:** `public/assets/scene-library/intrusi.jpg` — pipeline: bake-depth + manifest FX.
+
+### Prompt (copia/incolla – Intrusi — SHOULDER specchiato)
+
+```text
+THE INFILTRATORS — painted in heavy oil impasto. A forest path at midday watched from behind cover — the moment before they know we see them. SUBJECT: at the treeline edge, low dark shapes slipping between the trunks — three or four goblin silhouettes crouched in the undergrowth, moving in file toward the clearing — pointed ears and a weapon edge catching stray light, bodies half-swallowed by fern shadow — a mass of sneaking shapes, never one readable face. COMPOSITION: a broad mossy boulder-and-root mass fills the lower-right corner and right edge, cropped by frame — our cover — a single convex dark mass with a clean silhouette and visible inner depth steps (stacked stones, layered roots — never a flat wall, never a thin post); the left two-thirds open onto a sunlit path curving past the treeline where the infiltrators move, the treeline stepping back in two clear depth planes; above the treeline a wedge of pale sky, smooth low-frequency. NO symmetry — the mass leans asymmetric. LIGHTING: hard midday sun on the open path, the near mass in deep saturated shadow — the infiltrators read as saturated silhouettes and points of metal glint against the lit ground. PALETTE: Wanderlust pigments — ambra sunlit path, verde Veronese undergrowth, deep teal/smeraldo shadow, ultramarine in the treeline depth; never grey, never brown, never mud. TECHNIQUE: thick oil impasto, palette-knife strokes, Jaime Jones / Jeff Easley tradition, tactile on stone, root, moss; Justin Gerard whimsy in the goblin shapes — grotesque but vibrant, never horror. MOOD: we see them before they see us — the held breath of advantage. Luminous, high-chroma — light wins over darkness, even the deepest shadow is saturated color, never black murk. NO fog painted, NO shafts, NO smoke, NO embers, NO dust clouds painted, NO readable faces or anatomy, NO close-up goblins, NO weapons raised — they sneak, they do not charge, NO wire or traps, NO text/UI/watermarks, NO symmetry, NO gore, NO grim, NO sci-fi. Ultra-wide cinematic 2.4:1.
+```
+
+### Output Reference – Intrusi — SHOULDER specchiato
+
+- **Image:** `public/assets/scene-library/intrusi.jpg`
+- **Status:** accepted + wired (cinematic manifest)
+
+## Tracce — COULISSE+CANOPY
+
+- **Intent:** Sentiero con impronte e luci ambrate della meta in treeline; nebbia bassa runtime. f1-f2-journey.
+- **Art Stack:** oil impasto, Jones/Easley, palette Wanderlust (ultramarine/cinabro/ambra/verde Veronese, ombre deep teal), aspect 2.4:1.
+- **Scene:** `public/assets/scene-library/sentiero-tracce.jpg` — pipeline: bake-depth + manifest FX.
+
+### Prompt (copia/incolla – Tracce — COULISSE+CANOPY)
+
+```text
+TRACCE — painted in heavy oil impasto. A ground-level close view of a forest floor asking to be read, a scout's eye inches from the ground. SUBJECT: fresh footprints pressed in damp soil — many small hurried feet — twigs snapped at the wrong height, earth churned, a dragged furrow where something heavy was pulled off the trail; the background dissolving into impasto strokes. EVERY MARK IMPLIES A CROWD THAT IS NOWHERE VISIBLE. COMPOSITION diagonal, the tracks leading out of frame. LIGHTING: a shaft of sunlight striking the prints, the forest floor luminous, never murky. PALETTE: Veronese green forest floor, deep teal-emerald shadow, amber light on the prints; NO grey, NO brown, NO mud. TECHNIQUE: thick oil impasto, broad palette-knife strokes in the Jaime Jones / Jeff Easley tradition, tactile matter — wet soil, bark, needles; the sharpest prints rendered clean — split-rendering focal; rude beauty — weathered and tactile, never squalid. MOOD: intelligence + the chill of being read back. Luminous, high-chroma — never black murk. NO grim, NO gore, NO decay, NO mud, NO symmetry, NO flat digital, NO airbrushed smoothness, NO sci-fi, NO text/UI/watermarks/frames, NO people, NO humanoid figures, NO goblins, NO creatures, NO bells, NO tripwires — only the signs on the ground. Ultra-wide cinematic 21:9.
+```
+
+### Output Reference – Tracce — COULISSE+CANOPY
+
+- **Image:** `public/assets/scene-library/sentiero-tracce.jpg`
+- **Status:** accepted + wired (cinematic manifest)
