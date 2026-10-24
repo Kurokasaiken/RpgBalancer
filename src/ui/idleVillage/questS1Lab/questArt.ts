@@ -95,6 +95,7 @@ export const JOURNEY_LEG_ART: Record<'andata' | 'ritorno', { src: string; fit: '
  * through them. Promote to NODE_ART when a node adopts the art.
  */
 export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
+  'santuario-valle': { src: '/assets/scene-library/santuario-valle.jpg', fit: 'cover' },
   /* f3-gola-dusk showcase candidate (bake-tested, contract v2 brief). */
   'gola-raider': { src: '/assets/scene-library/gola-raider.jpg', fit: 'cover' },
   /* Lab A/B: same painting as viaggio-ritorno with the pre-boost ambient

@@ -216,6 +216,19 @@ export const SceneCinematicEntrySchema = z.object({
       panelSrc: z.string().optional(),
       /** What the revealed moment does: sprites entering vs stripes arriving. */
       revealFx: z.enum(['sprites', 'strips']).optional(),
+      /** Scene-authored reveal sprites — extracted cutouts that rise into
+       *  the scene after the panel slides (src + img-fraction home +
+       *  delay + rise duration). NEVER hardcoded per-layer. */
+      sprites: z
+        .array(
+          z.object({
+            src: z.string(),
+            home: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+            delay: z.number().min(0).default(0.5),
+            rise: z.number().positive().default(0.3),
+          }),
+        )
+        .optional(),
       /** The occluder rect the cutout covers, in img-fraction [x,y,w,h]. */
       cutout: z
         .object({
@@ -570,6 +583,11 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
        *  ~85% of the frame and slides left — the scene was behind it. */
       panelSrc: '/assets/scene-library/agguato-panel.png',
       revealFx: 'sprites', // default; lab overrides with ?revealfx=
+      sprites: [
+        { src: '/assets/scene-library/sprites/gob-lunge.png', home: [0.25, 0.15, 0.25, 0.47], delay: 0.4, rise: 0.35 },
+        { src: '/assets/scene-library/sprites/gob-archer.png', home: [0.68, 0.25, 0.2, 0.43], delay: 0.7, rise: 0.25 },
+        { src: '/assets/scene-library/sprites/gob-charge.png', home: [0.42, 0.3, 0.2, 0.3], delay: 0.55, rise: 0.3 },
+      ],
       cutout: { region: [0.0, 0.0, 0.85, 1.0], slide: 'left', slideSeconds: 2.0 },
     },
   },
@@ -578,6 +596,47 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
    *  maximum-coherent-stack showcase: 11 runtime layers on one painted
    *  funnel — the gorge walls carry the parallax, the far glow is the
    *  push-in target. */
+  /* PLAN-087 wide-plate pilot: Rivendell-style sanctuary valley —
+   *  one canvas generated ~2x wide; left crop = foreground cover panel
+   *  (root-ball + stairs), right crop = the revealed valley scene.
+   *  Panel and scene come from the SAME painted plate — coincidence
+   *  guaranteed by construction. */
+  'santuario-valle': {
+    depth: '/assets/depth/santuario-valle.webp',
+    depthWidth: 1584,
+    depthHeight: 672,
+    imgAspect: 3168 / 1344,
+    entrance: 'enter-creep',
+    camera: 'push-in',
+    pose: 'pose-watch',
+    focusAnchor: [0.62, 0.5],
+    ampMul: 0.85,
+    atmosphere: [],
+    ambient: [
+      /* Waterfall drift at the falls base, banners on the bridge. */
+      { type: 'drift', band: [0.45, 0.7], xband: [0.55, 0.8], count: 4, speed: 0.008, a: 0.14, color: '#dff4f8' },
+      { type: 'shaft', from: [0.72, 0.02], to: [0.62, 0.55], width: 0.18, count: 4, a: 0.15, color: '#fff4c8' },
+      { type: 'dust', count: 12 },
+      { type: 'glint', at: [0.66, 0.58], period: 6, r: 0.008 },
+      { type: 'glint', at: [0.7, 0.68], period: 8, r: 0.007 },
+      { type: 'leaves', band: [0.05, 0.5], xband: [0.1, 0.9], count: 5 },
+      { type: 'drift', band: [0.3, 0.45], xband: [0.5, 0.85], count: 3, speed: 0.006, a: 0.1, color: '#a8d88a' },
+    ],
+    reveal: {
+      region: [0.5, 0.3, 0.45, 0.55],
+      trigger: 'click',
+      afterSeconds: 9,
+      burst: [],
+      revealMode: 'panel-slide',
+      panelSrc: '/assets/scene-library/santuario-panel.jpg',
+      revealFx: 'strips',
+      revealSrc: '/assets/scene-library/santuario-valle.jpg',
+      /* The cover slides left until its right edge coincides with the
+       *  scene's left — the SAME painting, coincidence by construction. */
+      cutout: { region: [0.0, 0.0, 0.55, 1.0], slide: 'left', slideSeconds: 2.2 },
+    },
+  },
+
   'gola-raider': {
     depth: '/assets/depth/gola-raider.webp',
     depthWidth: 1584,
