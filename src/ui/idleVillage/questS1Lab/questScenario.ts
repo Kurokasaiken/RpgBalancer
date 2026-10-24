@@ -9,6 +9,7 @@
  * Do not genericize: registries, DSLs, branching engines are S2+ scope.
  */
 
+import type { LongFormSchemaType } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import type { CameraShotId, CinemaCutTag } from '@/balancing/config/idleVillage/quests/questTheatreFx';
 
 /** Mock competence ids used by the lab (mapping to balancer stats is S2 work). */
@@ -137,6 +138,9 @@ export interface QuestNode {
   kind: 'choice' | 'check' | 'info' | 'harm' | 'combat' | 'end';
   title: string;
   body: string;
+  /** PLAN-085: authored long-form page for the Amanuense quill button
+   *  (presentation only — the engine never reads it). */
+  longForm?: import('@/balancing/config/idleVillage/quests/questScenario.schema').LongFormSchemaType;
   /** For check nodes: stats contributing to the group roll. */
   stats?: LabStat[];
   /** Per-slot base risk for check nodes: wound/death in percentage points. */
@@ -320,6 +324,27 @@ export const SCENARIO_NODES: Record<string, QuestNode> = {
     fase: 'andata',
     title: 'Viaggio — il Passo del Corvo',
     body: 'La carovana è stata assalita sul Passo. Un ambulante in fuga offre tre oggetti — ma la borsa non basta per tutto.',
+    /* PLAN-085: la versione lunga dello scriba — pagina dell'amanuense. */
+    longForm: {
+      variant: 'scene',
+      tier: 2,
+      incipitKey: 'Del Passo del Corvo, e di ciò che ivi trovammo',
+      paragraphKeys: [
+        '«Quando il {r|Capitano Orso} giunse al margine del {m|Passo del Corvo}, il vento portava ancora l\'odore della carovana bruciata. Tre carri giacevano rovesciati come ossa di un animale enorme, e fra le ruote spezzate un ambulante faceva leva su un cassone con le dita che gli tremavano.',
+        '«Non mi fermo più» disse, senza alzare gli occhi. «Il Passo si è pagato col mio sangue — quello che resta, vendo.» Stese il telo e gli mostrò la mercanzia: una {r|pozione di ristoro} in un\'ampolla di vetro blu, un {r|fumogeno} legato nella tela cerata, una {m|corda e rampino} che odorava di catrame e di mare.',
+        'Il Capitano soppesò la borsa. Le monete dentro non bastavano per tutto — non bastavano mai. Ma un capitano che sopravvive impara una cosa: sul Passo non scegli ciò che è meglio, scegli ciò di cui non potrai fare a meno.»',
+      ],
+      marginalia: [
+        { afterParagraph: 0, kind: 'gloss', lemma: 'Passo del Corvo', textKey: 'così detto perché i corvi ne fanno il confine: oltre di lì non si torna per la stessa strada' },
+        { afterParagraph: 2, kind: 'nota', textKey: 'NB: la borsa del Capitano — sette monete e un dente' },
+      ],
+      colophon: {
+        scribeKey: 'Scriptum per manus fratris Alderici',
+        placeKey: 'in scriptorio Sancti Corvi',
+        complaintKey: 'qui manus dolet et atramentum friget',
+      },
+      explicitKey: 'Explicit capitulum primum itineris.',
+    },
     beat: 0,
     options: [
       {

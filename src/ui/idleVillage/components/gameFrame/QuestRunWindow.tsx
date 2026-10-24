@@ -81,6 +81,10 @@ import { resolveQuestShellLayout } from './questShellLayout';
 import { BeltItemChips, QuestBeltPlaque } from './QuestBeltPlaque';
 import { QuestPartyRosterPanel } from './QuestPartyRosterPanel';
 import { QuestLogPanel } from './QuestLogPanel';
+import { AmanuensePage } from './AmanuensePage';
+import { getAmanuenseSkinConfig } from '@/ui/idleVillage/skins/amanuenseSkinConfig';
+import { useQuestLoreDrop } from '@/ui/idleVillage/hooks/useQuestLoreDrop';
+import type { LongFormSchemaType } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 
 /** Verdict chip tone: the result reads at a glance, before its authored line. */
 const VERDICT_TONE: Record<Verdict, 'ok' | 'warn' | 'danger'> = { bigwin: 'ok', win: 'ok', almost: 'warn', fail: 'danger', epicfail: 'danger' };
@@ -242,6 +246,58 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   const partyOpen = activePill === 'party';
   const beltOpen = activePill === 'bag';
   const logOpen = activePill === 'log';
+  /* PLAN-085 / VF-AMAN-001: the Amanuense folio occupies the left wing as a
+   *  peer of the companion column — page-open is a MODE: the companion pill
+   *  is stashed (`wasPillRef`) and restored only on manual close; a
+   *  node-change auto-fold never restores it. */
+  const [amanuenseOpen, setAmanuenseOpen] = useState(false);
+  const wasPillRef = useRef<CompanionPill | null>(null);
+  const amanuenseSkin = getAmanuenseSkinConfig();
+  const nodeLongForm = node?.longForm ?? null;
+  const openAmanuense = useCallback(() => {
+    if (!nodeLongForm) return;
+    wasPillRef.current = activePill;
+    setPill(null);
+    setPageIsLore(false);
+    setAmanuenseOpen(true);
+  }, [nodeLongForm, activePill, setPill]);
+  const closeAmanuense = useCallback(() => {
+    setAmanuenseOpen(false);
+    setPageIsLore(false);
+    if (wasPillRef.current) {
+      setPill(wasPillRef.current);
+      wasPillRef.current = null;
+    }
+  }, [setPill]);
+  /* Node change: cross-fade handled by re-render with new content; a node
+   *  without longForm auto-folds the page (no companion restore). */
+  const nodeId = node?.id;
+  useEffect(() => {
+    if (amanuenseOpen && !pageIsLore && !nodeLongForm) setAmanuenseOpen(false);
+  }, [nodeId, amanuenseOpen, nodeLongForm]);
+  /* PLAN-085 T-005: a lore drop discovered at run end auto-opens the folio
+   *  in 'lore' variant — polite announce, never a focus steal. */
+  const { loreDrop, isDiscovered: loreDiscovered } = useQuestLoreDrop({
+    entityId: run.questId, entityType: 'quest', completed: run.ended,
+  });
+  const [pageIsLore, setPageIsLore] = useState(false);
+  const loreLongForm = useMemo<LongFormSchemaType | null>(() => (loreDrop ? {
+    variant: 'lore', tier: 2,
+    incipitKey: loreDrop.titleKey, paragraphKeys: [loreDrop.bodyKey], marginalia: [],
+  } : null), [loreDrop]);
+  const loreAnnouncedRef = useRef(false);
+  useEffect(() => {
+    if (!loreDiscovered || loreAnnouncedRef.current || !loreLongForm) return;
+    loreAnnouncedRef.current = true;
+    if (!amanuenseOpen) {
+      wasPillRef.current = activePill;
+      setPill(null);
+      setPageIsLore(true);
+      setAmanuenseOpen(true);
+    }
+  }, [loreDiscovered, loreLongForm, amanuenseOpen, activePill, setPill]);
+  const pageLongForm = pageIsLore && loreLongForm ? loreLongForm : nodeLongForm;
+  const amanuenseCoexists = vwU >= amanuenseSkin.coexistenceMinViewportPx;
   /* R-199 pt.9: the per-check presentation options popover (skip intro /
    * skip the astrolabe entirely — the verdict still lands as a beat). */
   const checkCfg = DEFAULT_GAME_FRAME_CONFIG.questWindow.skillCheck;
@@ -840,18 +896,40 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
         {/* WS-4: ONE tabbed left column — the header pills switch its content.
             In cluster mode this slot lands exactly on the solver's leftWing
             rect (`clampedLeft` — gap `companionGap` left of the window). */}
-        {leftOpen && (
+        {(leftOpen || (amanuenseOpen && amanuenseCoexists && pageLongForm)) && (
           <div
             data-hud-companion="left"
             data-testid="quest-companion-left"
-            style={{ position: 'absolute', right: `calc(100% + ${companionGap}px)`, top: 0, bottom: 0, width: sideWidth, display: 'flex', flexDirection: 'column', gap: companionGap, minHeight: 0 }}
+            style={{ position: 'absolute', right: `calc(100% + ${companionGap}px)`, top: 0, bottom: 0, width: amanuenseOpen && nodeLongForm ? Math.max(sideWidth, amanuenseSkin.widths.minPx) : sideWidth, display: 'flex', flexDirection: 'column', gap: companionGap, minHeight: 0 }}
           >
-            {partyOpen && <QuestPartyRosterPanel panelId={partyPanelId} run={run} healDeltas={actionPreview.memberDeltas} onClose={closeParty} />}
-            {beltOpen && (
-              <QuestBeltPlaque panelId={beltPanelId} items={bag} statuses={beltStatuses} armedFlags={armedFlags} onToggleFlag={onToggleArmedFlag ?? (() => undefined)} onClose={closeBelt} />
+            {amanuenseOpen && amanuenseCoexists && pageLongForm ? (
+              <AmanuensePage longForm={pageLongForm} onClose={closeAmanuense} loreCategory={loreDrop?.category} pageKey={pageIsLore ? loreDrop?.id : node?.id} />
+            ) : (
+              <>
+                {partyOpen && <QuestPartyRosterPanel panelId={partyPanelId} run={run} healDeltas={actionPreview.memberDeltas} onClose={closeParty} />}
+                {beltOpen && (
+                  <QuestBeltPlaque panelId={beltPanelId} items={bag} statuses={beltStatuses} armedFlags={armedFlags} onToggleFlag={onToggleArmedFlag ?? (() => undefined)} onClose={closeBelt} />
+                )}
+                {logOpen && <QuestLogPanel panelId={logPanelId} run={run} onClose={closeLog} />}
+              </>
             )}
-            {logOpen && <QuestLogPanel panelId={logPanelId} run={run} onClose={closeLog} />}
           </div>
+        )}
+        {/* PLAN-085: below the coexistence width the folio degrades to an
+            overlay sheet pinned to the window's left edge (transient; the
+            wax-seal close is always reachable inside it). */}
+        {amanuenseOpen && !amanuenseCoexists && pageLongForm && (
+          <div
+            data-testid="amanuense-sheet"
+            style={{ position: 'absolute', left: 8, top: 8, bottom: 8, width: `min(92%, ${amanuenseSkin.widths.sheetMaxPx}px)`, zIndex: 30, filter: 'drop-shadow(0 18px 40px rgba(0,0,0,.65))' }}
+          >
+            <AmanuensePage longForm={pageLongForm} onClose={closeAmanuense} loreCategory={loreDrop?.category} pageKey={pageIsLore ? loreDrop?.id : node?.id} />
+          </div>
+        )}
+        {loreDiscovered && loreDrop && (
+          <span role="status" aria-live="polite" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>
+            {t('gameFrame.amanuense.loreFound', 'Fragment discovered')}: {t(loreDrop.titleKey, loreDrop.titleKey)}
+          </span>
         )}
         {/* WS-4 folded roster tab — `ROSTER X/Y ▸`, the 40px marker the solver
             reserves when the left wing is folded. Clicking keeps the tab
@@ -1190,7 +1268,24 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
             <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 13, lineHeight: 1.45, color: TONE.label }}>{run.lastEvent}</p>
           )}
           {node?.body && !run.ended && (
-            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 15, lineHeight: 1.55, color: TONE.text }}>{node.body}</p>
+            <p style={{ margin: 0, fontFamily: FONT.serif, fontSize: 15, lineHeight: 1.55, color: TONE.text }}>
+              {node.body}
+              {/* PLAN-085: the open-tome quill appears only when the node
+                  authors a long-form page — toggles the folio on the left. */}
+              {node.longForm && (
+                <button
+                  type="button"
+                  data-testid="amanuense-open"
+                  data-hud-controls=""
+                  aria-label={t('gameFrame.amanuense.open', 'Read the full page')}
+                  title={t('gameFrame.amanuense.open', 'Read the full page')}
+                  onClick={amanuenseOpen ? closeAmanuense : openAmanuense}
+                  style={{ marginLeft: 8, background: 'none', border: 'none', padding: '0 2px', cursor: 'pointer', fontSize: 15, verticalAlign: '-2px', filter: amanuenseOpen ? 'none' : 'drop-shadow(0 0 4px rgba(232,199,106,.5))' }}
+                >
+                  📖
+                </button>
+              )}
+            </p>
           )}
           {/* v27 pending frontier: the node is maturing — show the authored transit as the breath before the consequences land. */}
           {!run.ended && run.frontier.status === 'pending' && node?.transit && (
