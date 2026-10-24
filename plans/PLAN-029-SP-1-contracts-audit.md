@@ -1,6 +1,7 @@
 ---
 title: 'PLAN-029 SP-1 — Contracts audit + GimmickRegistry'
-status: candidate
+status: completed
+closed: 2026-10-23
 created: 2026-10-12
 parent: PLAN-029
 debate: mw-web-debate `20261012-quest-gen-lab-sp1-contracts` — artifact r003
@@ -8,6 +9,8 @@ debate: mw-web-debate `20261012-quest-gen-lab-sp1-contracts` — artifact r003
 ---
 
 # SP-1 — Contracts audit + GimmickRegistry (artifact r003)
+
+> **AMEND-2(a) — ratifica 2026-10-23:** l'audit copre anche `fase`, `validateQuestJourneyDag`, config journey-fasi POI, e la provenienza per-entry registra il meccanismo di riproduzione + l'evidenza di verifica per classe (registry→regen+hash; imprint→recompile+params+hash; narrated→strutturale; ignoti→`verification-not-claimable`). Vedi PLAN-029 §7.
 
 r003 absorbs acceptance-round objections: chatgpt OBJECT (engineVersion in
 generation envelope), deepseek OBJECT ×2 (localized claim sourcing — now

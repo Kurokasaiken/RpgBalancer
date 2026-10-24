@@ -192,7 +192,8 @@
     "verify:sweep": "tsx scripts/verification/bundle.ts --all-tiers",
     "task:close": "tsx scripts/taskClose.ts",
     "contracts:index-sync": "tsx scripts/verification/contractsIndexSync.ts",
-    "sync:bug": "tsx scripts/verification/syncBug.ts"
+    "sync:bug": "tsx scripts/verification/syncBug.ts",
+    "dev:lan": "vite --mode development --host"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

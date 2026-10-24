@@ -148,8 +148,8 @@ export const MINIERA_VOCAB: DomainVocab = {
 /**
  * BOSCO_GOBLIN_VOCAB — dominio della quest authored «Sterminio dei Goblin»
  * (scenarios/goblin.ts). Trascritto da `quest_sterminio_goblin_spec.md` v3
- * (Director 2026-10-18): il bosco apre e chiude l'arco, i campanelli sono
- * l'allarme del campo, il trofeo si converte in ricompensa al ritorno.
+ * (Director 2026-10-18): il bosco apre e chiude l'arco, il filo d'allarme
+ * corre alla postazione della sentinella, il trofeo si converte in ricompensa al ritorno.
  * GUADO e MASSO revocati dal Director 2026-10-18 — stanno in `vietati`
  * così il gate li blocca meccanicamente. Usato dal refine pipeline
  * (`scripts/questRefine.mts`) per gate e critic sul copy.
@@ -171,13 +171,13 @@ export const BOSCO_GOBLIN_VOCAB: DomainVocab = {
     'l’accampamento goblin',
     'il nascondiglio sotto la tela cerata',
     'la radura',
-    'il filo dei campanelli',
+    'il filo d’allarme',
     'la vecchia quercia',
     'la pietraia',
   ],
   props: [
     'la tela cerata',
-    'il filo dei campanelli',
+    'il filo d’allarme',
     'il fagotto di bottino',
     'la palizzata di pali storti',
     'il trofeo dei goblin',
@@ -192,11 +192,11 @@ export const BOSCO_GOBLIN_VOCAB: DomainVocab = {
     'un filo di fumo tra i tronchi',
     'un ciuffo d’erba che oscilla senza vento',
     'un lembo di tela sotto fronde troppo regolari',
-    'campanelli tesi tra i rami',
+    'un filo teso che sparisce verso l’accampamento',
   ],
   coerenza: [
     'il bosco apre e chiude la quest: la minaccia vive tra gli alberi — niente guado, niente strada dei mercanti',
-    'i goblin sono carne e fango: niente magia, niente portali — allarmi a campanelli e trappole di fortuna',
+    'i goblin sono carne e fango: niente magia, niente portali — allarmi a filo e trappole di fortuna',
     'i goblin superstiti tornano per rabbia e vendetta — aspettano il party, non «si riorganizzano»',
     'il pericolo differito è reale: ciò che fuggi torna — mai promettere morte dove il modello non uccide',
     'il rischio sta in coda alla formazione: chi copre paga, chi guida vede',

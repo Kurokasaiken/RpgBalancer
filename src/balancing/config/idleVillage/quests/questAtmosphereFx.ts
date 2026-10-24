@@ -146,6 +146,31 @@ export const ATMOSPHERE_KITS: Record<string, AtmosphereKit> = z
       travel: 0.6,
       enabled: true,
     },
+    /* Gorge still-fog (gola-raider): same pool mechanics, much slower —
+     *  fog-low at 0.18 tile/s reads as wind on a dusk gorge (Director
+     *  pass: "la nebbia si muove troppo velocemente"). Sentiero keeps
+     *  the tuned 0.18. */
+    'fog-gorge': {
+      kind: 'fog',
+      color: '#c9d6cf',
+      texture: '/assets/atmosphere/fog/fog-noise-tile.png',
+      layers: 4,
+      veilWidth: 1.8,
+      veilHeight: 0.38,
+      sizeVariation: 0.24,
+      band: [0.5, 0.95],
+      speed: 0.06,
+      parallax: 1,
+      alpha: 0.24,
+      blend: 'normal',
+      breathSec: 14,
+      breathFloor: 0.6,
+      speedVariation: 0.35,
+      phaseStep: 0.618,
+      anchorLeft: 0,
+      travel: 0.6,
+      enabled: true,
+    },
     /* Canopy shadow drift — a dark silhouette blob sliding over the
      * scene: `brightness(0)` makes the light-painted sprite a real
      * multiply shadow (pass-2 probe: light sprite × multiply = nil). */
@@ -176,9 +201,11 @@ export const ATMOSPHERE_KITS: Record<string, AtmosphereKit> = z
       heightPx: 315,
       width: 0.7,
       band: [0.0, 0.3],
-      speed: 0.01,
+      /* First live scene (viaggio-andata, Director pass): 0.01/0.22 was
+       *  below the perceptual threshold — visible drift or nothing. */
+      speed: 0.03,
       parallax: 0.9,
-      alpha: 0.22,
+      alpha: 0.32,
       blend: 'screen',
       blurPx: 6,
       anchorLeft: -0.7,

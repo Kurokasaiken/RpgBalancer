@@ -178,14 +178,17 @@ export function drawAmbientFrame(
 
     if (f.type === 'embers') {
       const ps = puffsFor(key, f.count);
+      const s = f.size;
       ctx.globalCompositeOperation = 'lighter';
       for (const p of ps) {
-        /* Short hot lives: 2–4s rise, jitter grows with altitude. */
+        /* Short hot lives: 2–4s rise, jitter grows with altitude. Rise,
+         * wander and dot size all scale with the authored `size` so far
+         * fires spark at their own painted scale. */
         const life = (t * 0.35 * p.rate + p.ph) % 1;
-        const x = f.at[0] + (0.008 + 0.03 * life) * Math.sin(life * 12 + p.wob);
-        const y = f.at[1] - 0.16 * life;
+        const x = f.at[0] + (0.008 + 0.03 * life) * s * Math.sin(life * 12 + p.wob);
+        const y = f.at[1] - 0.16 * s * life;
         const a = 0.85 * (1 - life) * (0.5 + 0.5 * Math.sin(t * 9 + p.wob * 3));
-        soft(toX(x), toY(y), lenY(0.004 + p.r * 0.005), [255, 195, 107], a);
+        soft(toX(x), toY(y), lenY((0.004 + p.r * 0.005) * s), [255, 195, 107], a);
       }
       ctx.globalCompositeOperation = 'source-over';
       continue;
@@ -206,16 +209,11 @@ export function drawAmbientFrame(
         const r = lenY(f.r);
         const rgb = hexRgb(f.color);
         ctx.globalCompositeOperation = 'lighter';
-        soft(x, y, r * 3.2, rgb, a * 0.45);
-        /* Cross flare — the tiny four-point star that reads as "shine". */
-        ctx.strokeStyle = rgba(rgb, a);
-        ctx.lineWidth = Math.max(1, r * 0.4);
-        ctx.beginPath();
-        ctx.moveTo(x - r * 2.4, y);
-        ctx.lineTo(x + r * 2.4, y);
-        ctx.moveTo(x, y - r * 2.4);
-        ctx.lineTo(x, y + r * 2.4);
-        ctx.stroke();
+        /* Round twinkle only — the four-point cross flare read as random
+         * luminous crosses (Director pass on gola-raider). Core + tight
+         * halo keeps it a point of light on water/metal. */
+        soft(x, y, r * 2.2, rgb, a * 0.35);
+        soft(x, y, r, rgb, a);
         ctx.globalCompositeOperation = 'source-over';
       }
       continue;
@@ -299,6 +297,68 @@ export function drawAmbientFrame(
         ctx.fill();
       }
       ctx.globalCompositeOperation = 'source-over';
+      continue;
+    }
+
+    if (f.type === 'leaves') {
+      /* Reference recipe (mengto/falling-leaves, Originkit leaf-fall):
+       * the TUMBLE is what reads as "leaf" — a horizontal squash
+       * scale(cos(spin),1) so the blade turns edge-on and reopens,
+       * lateral slip coupled to the tumble (slips fastest edge-on),
+       * real fall speed (~3-4s through the band), solid opaque fill. */
+      const ps = puffsFor(key, f.count);
+      const rgb = hexRgb(f.color);
+      const fallSpan = f.band[1] - f.band[0];
+      for (const m of ps) {
+        const life = (t * 0.26 * f.speed * m.rate + m.ph) % 1;
+        const y = f.band[0] + life * fallSpan;
+        const spin = life * 7 + m.wob;
+        /* Slip coupled to the tumble angle — slides sideways when
+         * edge-on, hangs when face-on (aerodynamic gait). */
+        const x = f.xband[0] + ((m.x0 + 0.05 * Math.sin(spin) + life * 0.03 * Math.sin(m.wob * 2)) % 1) * (f.xband[1] - f.xband[0]);
+        const fadeIn = Math.min(1, life / 0.04);
+        const fadeOut = Math.min(1, (1 - life) / 0.06);
+        const a = f.a * Math.min(fadeIn, fadeOut);
+        if (a <= 0.02) continue;
+        ctx.save();
+        ctx.translate(toX(x), toY(y));
+        /* In-plane roll + the tumble squash crossing zero = edge-on. */
+        ctx.rotate(life * 5 + m.wob * 0.4);
+        ctx.scale(Math.cos(spin), 1);
+        ctx.fillStyle = rgba(rgb, a);
+        const s = lenY(0.005 + m.r * 0.006);
+        /* Pointed blade: two mirrored quadratics meeting at tips. */
+        ctx.beginPath();
+        ctx.moveTo(0, -s);
+        ctx.quadraticCurveTo(s * 0.9, -s * 0.15, 0, s);
+        ctx.quadraticCurveTo(-s * 0.9, -s * 0.15, 0, -s);
+        ctx.fill();
+        ctx.restore();
+      }
+      continue;
+    }
+
+    if (f.type === 'rain') {
+      /* Rain streaks: thin fast lines on a shared slant — cheap canvas
+       * lines, not dots, so a downpour reads as weather not particles. */
+      const ps = puffsFor(key, f.count);
+      const rgb = hexRgb(f.color);
+      const fallSpan = f.band[1] - f.band[0];
+      ctx.strokeStyle = rgba(rgb, f.a);
+      ctx.lineWidth = Math.max(1, lenY(0.0012));
+      ctx.beginPath();
+      for (const m of ps) {
+        const life = (t * 0.9 * f.speed * m.rate + m.ph) % 1;
+        const y = f.band[0] + life * fallSpan;
+        const x = m.x0 + f.lean * life + 0.004 * Math.sin(t * 3 + m.wob);
+        const x0 = toX(((x % 1) + 1) % 1);
+        const y0 = toY(y);
+        const sl = lenY(0.018 + m.r * 0.02);
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x0 + f.lean * sl * 2.5, y0 + sl);
+      }
+      ctx.stroke();
+      continue;
     }
   }
 }

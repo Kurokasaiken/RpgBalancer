@@ -81,6 +81,10 @@ export interface Manifest {
   intent_gate?: boolean;
   /** PLAN-044 T-006: decision-report.json nella run dir è obbligatorio e schema-checkato. */
   decision_report?: boolean;
+  /** PLAN-081: scope del piano (globs sui file dichiarati a battesimo). I
+   *  gate valutano `changed ∩ scope`; il resto del diff va in
+   *  `bundle.foreign_scope` — advisory, non bloccante (drift altrui, T-13). */
+  scope_files?: string[];
   obligations: Obligation[];
 }
 
@@ -585,6 +589,9 @@ export interface Bundle {
   integrity?: { bundler_sha256: Record<string, string | null> };
   /** PLAN-045 T-005b: gate regime intent — assente = task fuori regime. */
   intent_gate?: { ok: boolean; status: string; reasons: string[] };
+  /** PLAN-081: file nel diff fuori dallo scope dichiarato — advisory,
+   *  mai bloccante (visibilità alla review, anti-smuggling). */
+  foreign_scope?: string[];
 }
 
 export const DECISION_REPORT_FILE = 'decision-report.json';
@@ -630,6 +637,7 @@ export function evaluateManifest(
   integrity?: { bundler_sha256: Record<string, string | null> },
   skipPerceptual?: boolean,
   intentGate?: { ok: boolean; status: string; reasons: string[] },
+  foreignScope?: string[],
 ): Bundle {
   const manifestPath = path.join(runDir, 'verification.json');
   const evaluations = manifest.obligations.map((obl) =>
@@ -677,6 +685,7 @@ export function evaluateManifest(
     trusted_lock: trustedLock,
     integrity,
     intent_gate: intentGate,
+    ...(foreignScope && foreignScope.length > 0 ? { foreign_scope: foreignScope } : {}),
   };
 }
 

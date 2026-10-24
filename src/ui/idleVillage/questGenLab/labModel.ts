@@ -26,6 +26,7 @@ import type { LocalizedFloodDomainKit } from '@/balancing/config/idleVillage/que
 import { DOMAIN_VOCABS } from '@/balancing/config/idleVillage/quests/generation/domainVocabs';
 import { QUEST_TRAITS } from '@/balancing/config/idleVillage/quests/questTraits';
 import { QUEST_LAB_GIMMICKS, type LabGimmick } from '@/balancing/config/idleVillage/quests/generation/labRegistry';
+import { labGimmickIdOf, type LabCandidate } from './candidate';
 
 /* ------------------------------------------------------------------ */
 /* Gimmick + kit resolution                                             */
@@ -347,6 +348,51 @@ export function imprintCatalogEntries(): LabImprintEntry[] {
       },
     ];
   });
+}
+
+/* ------------------------------------------------------------------ */
+/* Explorer entries — baked catalog + lab candidates (SP-2)             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * One row of the explorer list. `entry` is the single source for the
+ * explorer fields (no duplicated payload); `candidate` rides along only
+ * for kind==='candidate' (badge/status chips).
+ */
+export interface LabExplorerEntry {
+  kind: 'baked' | 'candidate';
+  entry: LabCatalogEntry;
+  candidate?: LabCandidate;
+}
+
+/**
+ * Build an explorer entry for a lab candidate — the same scenario-driven
+ * derivations as baked entries; gimmickId/kitId come from provenance,
+ * never from `scenario.id` (a regenerated candidate may share a baked id).
+ */
+export function candidateToExplorerEntry(candidate: LabCandidate): LabExplorerEntry {
+  const g = labGimmickIdOf(candidate.provenance.gimmickId);
+  const kit = labKits().find((k) => k.gimmick === g && k.id === candidate.provenance.kitId);
+  return {
+    kind: 'candidate',
+    entry: {
+      scenario: candidate.scenario,
+      gimmickId: g,
+      gimmick: QUEST_LAB_GIMMICKS[g],
+      kitId: candidate.provenance.kitId,
+      kit,
+      stats: scenarioStats(candidate.scenario),
+      twists: scenarioTwists(candidate.scenario),
+      traitsUsed: scenarioTraitsUsed(candidate.scenario),
+      mechanicsUsed: scenarioMechanicsUsed(candidate.scenario),
+    },
+    candidate,
+  };
+}
+
+/** Wrap a baked catalog entry for the explorer union. */
+export function bakedToExplorerEntry(entry: LabCatalogEntry): LabExplorerEntry {
+  return { kind: 'baked', entry };
 }
 
 /* ------------------------------------------------------------------ */

@@ -6,6 +6,7 @@ import { EngravedIcon } from './engravedIcons';
 import { VillageBuildingIcon, VillageCostIcon, VillagePinFrame, PIN_FRAME_FOR_CATEGORY, type VillageCostResource } from './villageBuildingIcons';
 import { VillageSlotOverlay } from './VillageSlotOverlay';
 import { VillageRegistry, VILLAGE_REGISTRY_ID, type VillageRegistryHandle } from './VillageRegistry';
+import { useCoarsePointer } from '@/hooks/useMobileFit';
 import { MockUpgradeControl } from './MockUpgradeControl';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import {
@@ -156,6 +157,7 @@ const controlButton: CSSProperties = {
 
 export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStash, onOpenMerchant, ref }) => {
   const { t } = useTranslation('idleVillage');
+  const coarsePointer = useCoarsePointer();
   const [entered, setEntered] = useState(false);
   const [tooltip, setTooltip] = useState<{ id: VillageBuildingCatalogId; pinned: boolean } | null>(null);
   const [pos, setPos] = useState<TooltipPlacement | null>(null);
@@ -194,7 +196,6 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
    * hover). The flag lets exactly that synthetic focus land without reopening;
    * a later genuine Tab back to the pin still opens the tooltip. */
   const suppressFocusOpenRef = useRef(false);
-  const coarsePointer = useRef(typeof window !== 'undefined' && Boolean(window.matchMedia?.('(pointer: coarse)').matches));
 
   useEffect(() => {
     const timer = window.setTimeout(() => setEntered(true), 30);
@@ -383,14 +384,14 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
 
   const pinHandlers = (b: VillageBuildingDefinition) => ({
     onPointerEnter: (event: React.PointerEvent) => {
-      if (event.pointerType === 'touch' || coarsePointer.current) return;
+      if (event.pointerType === 'touch' || coarsePointer) return;
       openTooltip(b.id);
       /* Pin → registry sync: the matching row lights (via activeId) and
        *  scrolls into view while the drawer is open. */
       if (drawerOpenRef.current) registryRef.current?.scrollToRow(b.id);
     },
     onPointerLeave: () => {
-      if (coarsePointer.current) return;
+      if (coarsePointer) return;
       scheduleClose();
     },
     onFocus: () => {

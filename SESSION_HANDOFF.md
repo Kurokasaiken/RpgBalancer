@@ -1,5 +1,224 @@
 # Session Handoff — 2026-10-14
 
+## 2026-10-23 — Audit `/game`: test non verdi classificati, doc e contratti risincronizzati
+
+- **Domanda Director:** «la documentazione rispecchia cosa c'è? i test /game
+  vanno tutti bene? se non sono verdi è un bug o una modifica al componente?»
+- **Risposta:** no, non tutti verdi — e la causa dominante era **drift
+  intenzionale non registrato**, più 1 bug reale di prodotto e 2 bug di
+  driver e2e.
+
+### Unit (47 file / 377 test sullo scope /game): 31 rossi → classificati
+
+- **Bug reali di prodotto (fixati):**
+  - `MinimalGameOverModal`: h1 duplicava il titolo del motivo invece di
+    `modalTitle`; nessun gate su `isGameOver`; focus non spostato su
+    «Ricomincia»; focus trap promessa nel JSDoc assente. Componente + test
+    corretti; telemetria riallineata ai campi reali del payload.
+  - `QuestRunWindow`: pip di chiusura «✕» a 8px (guard font <12px di
+    `hudGuards`) → sostituito con l'icona incisa `cmd-close`.
+- **Drift intenzionale (test aggiornati):**
+  - `VillageRosterSection.unit/skin`: sort `rarity-desc` rimosso → `hp-desc`;
+    skin default `minimal_frontier`→`base` (commit `165bfb8d`).
+  - `questRunWindow.test`: il `title` nativo sulle pill è stato rimosso per
+    ruling (R-234 T-A14) a favore di `HudTooltip` Radix — asserzioni portate
+    sul trigger Radix.
+- **Harness rotti (fixati):**
+  - `HUDNotificationLayer.test.tsx`: import `../../../ui/` senza `src/` →
+    mai compilato (morto).
+  - `hudPersistence.test.ts`: `vi.mock` sul SUT (mockava il modulo che
+    testava) → stub `undefined` dal 21-05. Ora mocka solo
+    `PersistenceService`; contratto reale ripristinato.
+  - `hudGuards`: manifest anti-drift stale → rigenerata
+    (`gameSurfaceManifest.ts`).
+- **Esito:** i file toccati sono 66/66 verdi; hudGuards 12/12.
+
+### E2E `game*.spec.ts` (115 test): 15 rossi → classificati
+
+- **Drift driver intenzionale:** titolo planner spostato da
+  `quest-planner-hero` a `quest-planner-title` sopra la hero (PLAN-067
+  T-B10) → `gameQuestLifecycle`/`FullFlow` aggiornati; badge
+  `data-decision-waiting` rimosso per ruling 20-10 → assert rimossa;
+  `frontier.status` 'waiting'→'pending' nel modello journey → D-K corretto.
+- **Bug di driver (fixati):** `flushBeatTheatre`/`playRunPhaseByPhase`
+  cliccavano `.da-tira` **oppure** premevano Enter — mai entrambi.
+  `.da-tira` resta montato e visibile per tutto il check beat held; se il
+  click viene intercettato (verdict card/toast sul board) il driver non
+  premeva mai Enter — l'unica via garantita (`advancePresentation` →
+  `progress()` → `astro.throw()`). Il beat si sbloccava solo via leak-guard
+  45s → budget loop esaurito. Ora: Enter a ogni giro + click THROW quando
+  visibile + click sulla colonna `data-check-armed` come dismiss diretto.
+  Probe dedicata (`_probeQuestBeats.spec.ts`, rimossa dopo l'uso) ha
+  confermato: colonna montata, astrolabe armato `action-trigger`, beat held
+  che sbloccano via leak-guard — **nessun bug di prodotto** nella catena
+  bridge/onDismiss/skip.
+- **Residuo ambientale:** `gamePerf` medal-drag p95 ~183ms (budget 33) e
+  `gameFirstInteraction` terzo hold — sospetto rumore su macchina condivisa
+  (PLAN-079 eye-check/perf in corso), da ri-misurare su macchina scarica.
+
+### E2E — seconda ondata di bug di driver (fixati, 23-10)
+
+- **Click senza `timeout:` = stallo actionability 30s.** `flushBeatTheatre`,
+  `settleCheck`, `dismissColumn` (cluster + lifecycle + fullFlow +
+  inputCoordination) facevano `.click().catch()` su `.da-tira`/colonna/board:
+  il bottone resta *visibile ma coperto* da verdict card/FX e Playwright
+  attende il default 30s per chiamata → i 5 lifecycle e BV-01 morivano per
+  timeout, non per deadlock. Fix: `dispatchEvent('click')` (vero handler
+  React, salta solo l'hit-test) — stessa via già sancita per il radiogroup
+  coperto dalla window. Probe dedicata (`_probeReportDead`, rimossa) ha
+  confermato: run ended → 28 beat held → Enter avanza → report + popup
+  emergono → **nessun bug di prodotto**.
+- **`readyAt` ignorato dal cluster driver:** `reachWaitingFrontier` tornava
+  su `waiting` visibile e `choose()` veniva rifiutato in silenzio (R-199).
+  Ora matura `readyAt` sul clock canonico prima di restituire (+ fix
+  `advanceTicks(lead)` senza `page` nel ramo pending).
+- **Race C→D in BV-01:** due input `progress()` post-mount completavano
+  throw→verdict→auto-settle (`checkVerdictMs` 2400) prima del probe —
+  `driveToCheck` ora ricontrolla la colonna subito dopo ogni click di stage
+  (zero input post-mount, check held deterministico) e il probe D legge
+  subito con `verdictSeen` nel sample.
+- **Beat pile-up:** `driveRunToEnd` ora preme Enter durante la guida — i
+  commit accodano beat più in fretta del replay; senza, alla fine restano
+  ~28 beat held da smaltire nel timeout del test.
+- **BV-04 — il fake clock corre in tempo reale.** La colonna «parked»
+  moriva ~450ms dopo `runFor(760)`: probe strumentata
+  (`_probeBv04`, rimossa) ha dimostrato con log `setCursor`+stack che il
+  killer è l'auto-dismiss R-259 (colonna → `bridge.onDismiss` →
+  `cursor.skip()`) — **comportamento di prodotto corretto**, non un bug.
+  Il meccanismo: `page.clock.install()` di Playwright NON congela —
+  `_syncRealTime` avanza i tick col tempo reale trascorso, quindi ogni
+  probe/`waitForTimeout` bruciava la stessa finestra ~650ms
+  (park +700 → dismiss +1350) che il test misurava. Fix: `pauseAt` dopo
+  `install` → window held interamente deterministica: parked a fake
+  +710, resize 1440→1920 (attraversa `wideAtPx`, RO reale) → repaint
+  esattamente 1, still parked a +1130, colonna auto-dismessa a ~+1400.
+  Caveat documentati in guida e2e: `setFixedTime` non ferma i tick,
+  `clock.uninstall` non esiste nel client API, i timer reali pendenti
+  pre-install non vengono adottati.
+
+### E2E — esito verificato (re-run mirati 23-10)
+
+- `gameQuestLifecycle` 4/4 precedentemente rossi → **verdi** (chiusura
+  rapporto R-200, epilogo+journal, repeatable dopo reload, Director start).
+- `gameQuestCluster` **BV-01 verde** — 5 viewport × stati A–F, zero overlap
+  pairs, `verdictSeen` su 4/5 (2560×1440 ha perso il dwell 2.4s — campionato
+  come tollerato, non nascosto).
+- `gameQuestCluster` **BV-04 verde** (51.9s) — misura deterministic a clock
+  in pausa: `data-astro-idle="parked"` a fake +710, contatore frame congelato,
+  resize 1440→1920 → repaint `rafDelta` esattamente 1, ancora parked a
+  +1130, auto-dismiss confermato oltre +1400 (testimone R-259).
+- Re-run suite completa (33 seriali, 34.5m): **20 passati, 8 rossi, 5 skippati
+  a cascata** — classificati sotto (terza ondata).
+
+### E2E — terza ondata: 1 bug reale di prodotto + race del driver drag
+
+- **BUG REALE — check stale held → deadlock a `checkHoldMs` (fixato).**
+  `astroShownFor` in `QuestRunWindow` teneva held OGNI beat check, ma i
+  presenter (colonna cluster + overlay centrato) montano SOLO se il check è
+  *live* (`checkEventOf` + `isStaleCheckEvent` — `checkSeq <= dismissedUpTo`
+  → nessun presenter). Un check stale (hydration riassorbe i settled via
+  `normalizeRunOverlayIdentity`; `dismissOutcome` del toast alza il mark
+  mid-run) restava quindi held **senza presenter**: `bridge.handle` null →
+  `advancePresentation` faceva `progress()` no-op + `return` → Enter morto →
+  il beat si liberava solo al leak-guard `checkHoldMs` (45s a check) →
+  pile-up → i timeout 120s mid-drive di `epilogo+journal` e `marker dopo
+  reload` (hydration = il caso scatenante tipico) e probabilmente lo stallo
+  420s del FullFlow. **Fix upstream:** `astroShownFor` applica lo stesso gate
+  dei presenter — un check stale scorre come beat a tempo (`checkMs`), mai
+  held. Non è un workaround downstream: è la parità di gate mancante tra chi
+  decide il hold e chi monta il presenter. Invariante
+  `quest-run-window.INV-7` + regression test in
+  `questRunWindow.checkHeld.test.tsx` (red-first registrato: fallisce senza
+  fix, exit 1).
+- **Race driver drag (fixata).** `dragResidentPointer` falliva con
+  `waitForDraggingHook` 2s su card "Assigned"/disabilitate: il commit
+  `onDragEnd`/`onDragStart` della pagina gira in `startTransition` e sotto
+  carico seriale flushava DOPO lo sleep 1.5s, clobberando
+  l'id che il drag successivo aveva appena settato via hook → getter a null
+  → timeout spurio. Fix: `waitForDragSettled` attende `get→null` prima di
+  uscire dall'helper + budget hook 5s; `assignViaRealDrag` usa
+  `scrollIntoView` in-page (`locator.scrollIntoViewIfNeeded` moriva su
+  "element stable" — le card si muovono di continuo sotto Pixi live).
+- **BV-12** — click gated sulla colonna vs auto-dismiss R-259 → dispatch
+  atomico in-page (stessa tecnica del guardedResult).
+- Test 575 `matura a ×4` **verde da solo (3.3m)** — i fallimenti in suite
+  erano borderline budget 120s sotto carico + i due difetti sopra.
+- Re-run mirato (BV-12|R-119|R-183, 16 test) lanciato con fix prodotto +
+  driver nel build — esito in `test-results/rerun-failures.log`.
+
+### E2E — quarta ondata: diagnosi su artefatti (16 test, 9 verdi / 7 rossi)
+
+Esito del run con fix prodotto+driver nel build: **BV-12 verde**, i 7 rossi
+classificati per firma — nessun nuovo bug di prodotto emerso.
+
+- **FullFlow «swap revertito» — race del retry del driver, NON bug.**
+  L'assert `assignments === afterSwap` leggeva `{leader:Beppe, member1:Hero}`
+  = esatto pre-swap. Ricostruzione: il drop dello swap valido committa al
+  **landing** del token (flight ~0.5s + `startTransition`), non al release;
+  `commitSwap` ri-pianifica `planSlotSwap(assignments_correnti, from, to)`
+  all'atterraggio. Se il commit non è atterrato entro i 5s di
+  `waitForAssignment`, il retry del test ri-trascina LEADER→MEMBER_1 sullo
+  stato ormai post-swap → secondo commit legittimo → **revert** (lo swap è
+  non-idempotente, a differenza dell'assign). `planSlotSwap` e il drop
+  rifiutato (Lisetta→leader: `eligible=false → return null → inert`) sono
+  corretti. **Fix driver (v3, testimone nonce — definitiva):** la probe
+  strumentata (`__swapDiag`, poi rimossa) ha mostrato che `getAssignments`
+  può restare pre-commit anche a `__dragFlightActive` false — il getter è
+  una **closure ripubblicata a ogni render di sessione**: flag e commit
+  escono nella stessa transition, ma la vista degli hook può restare una
+  pubblicazione indietro. Il testimone atomico è `getSeatNonces` (già
+  esposto negli hook): `seatNonces[toSlot]` bumpa nella STESSA
+  `startTransition` di `setAssignments` in `commitSwap` → quando il nonce
+  cambia, getter e assegnazioni sono freschi per costruzione. Un drop
+  veramente mancato non bumpa mai → retry sicuro. Driver: prima di ogni
+  retry `seatNonce(target)` come baseline, dopo il drop
+  `awaitSeatNonceBump` (8s) decide se riprovare; il drop rifiutato si
+  asserisce come `nonce immutato + assignments === afterSwap`.
+  FullFlow verde (2.9m) alla prima corsa col driver nonce.
+  Nota latente: `handleAssign` non ha gate di elegibilità (il gate vive in
+  `handleDragEnd`/`assignToSlot`) — oggi inerte perché un drop rifiutato non
+  avvia flight.
+- **Pile-up di beat narrativi — drain rate del driver, NON deadlock.** La
+  firma «20 beats left» con run finita (marker «outcome to collect»,
+  VICTORY toast) non è lo stale-check di INV-7: è produzione > consumo.
+  `skip()` è un update funzionale → N keydown consumano N beat; un Enter
+  per round-trip Playwright (~300ms) perde contro i commit a burst di
+  `advanceTicks`/×4. **Fix driver:** `drainBeats(page, 8)` — keydown
+  sintetici dispatchati su `window` (target non-Element → il guard R-199
+  instrada dritto in `advancePresentation`, focus-proof) in
+  `driveRunToEnd`, `flushBeatTheatre` e `playRunPhaseByPhase`.
+- **Click actionability >10s sotto carico — `dispatchEvent`.**
+  `[data-action-id="quest"]` in `revealQuestPois` (firme 773/798) e
+  «Invia» in `launchGoblinQuest` (firma 730) restavano hit-test-blocked dal
+  layer/scroll residue oltre il default: stesso listener React del click.
+- **Budget strutturale — `test.setTimeout(300_000)` nel beforeEach del
+  describe R-119.** Ogni test guida un ciclo completo (reveal con ancore
+  Pixi fino a 60s + 4 drag CDP ~3-8s + run intera + teatro + settle):
+  120s è stretto per la superficie, FullFlow dichiara già 420s.
+- Re-run wave-3 dei 7 rossi con le fix driver sopra →
+  `test-results/rerun-wave3.log`.
+
+### Documentazione e contratti
+
+- `CURRENT_STATE.md` portato al 23-10 (era fermo al 19-10): onda
+  PLAN-067/053/073/076/078 riassunta + residui onesti.
+- `contracts` (PLAN-054): inventory rigenerato (280 unità/463 strict);
+  +7 contratti skeleton popolati (`hero-level-ceremony`,
+  `legacy-reliquary-panel`, `memorial-hall`, `memorial-panel`,
+  `next-event-tab`, `quest-returned-crew`, `settlement-tally`); scope
+  ownership aggiunti dove ratchet-safe; `COMPONENT_MASTER_INDEX.md`
+  risincronizzato via `contracts:index-sync`.
+- **Residuo Director-gated:** 9 file con 2 owner — il contratto aggregato
+  manuale `game-menu-screens` (12 invarianti reali) si sovrappone ai
+  contratti per-file meccanici. Il ratchet blocca la rimozione membri senza
+  ruling sha256-approval → lasciato com'era, documentato qui. Serve
+  decisione: migrare le invarianti nei per-file e ritirare l'aggregato, o
+  dichiarare l'aggregato owner e svuotare i per-file.
+- **Non toccati (T-13, lavoro concorrente dirty):** `RICHIESTE.md`,
+  `plans/PLAN-078*`, `scripts/sentinel/*`, `.mw/ledger/*`,
+  `MatericEventCard.tsx`, `WorldSurfaceEventCard.tsx`, `DragTestContainer.tsx`,
+  `skinCssVariables.ts`, `VillageRegistry.tsx`.
+
 ## 2026-10-19 — PLAN-066 authorization checkpoint
 
 - Director: «procedi con il plan» — execution authorized for

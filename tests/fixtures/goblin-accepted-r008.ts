@@ -29,10 +29,10 @@ export const GOBLIN_ACCEPTED_R008: Record<string, NarratedNodeCopyR8> = {
     option: { label: 'Esamina il terreno' },
     verdictFlavor: {
       bigwin: {
-        text: 'Sotto le foglie marce affiorano impronte leggere e, più avanti nell’erba alta, il riflesso sottile di un filo di campanelli teso a mezza gamba.',
+        text: 'Sotto le foglie marce affiorano impronte leggere e, più avanti nell’erba alta, il riflesso sottile di un filo teso a mezza gamba, che corre verso il campo.',
         effectBindings: [
           { assertion: 'affiorano impronte leggere', effectId: 'impronte-affiorano' },
-          { assertion: 'il riflesso sottile di un filo di campanelli', effectId: 'filo-avvistato' },
+          { assertion: 'il riflesso sottile di un filo teso', effectId: 'filo-avvistato' },
         ],
       },
       win: {
@@ -113,9 +113,9 @@ export const GOBLIN_ACCEPTED_R008: Record<string, NarratedNodeCopyR8> = {
     option: { label: 'Muoviti nell’ombra' },
     verdictFlavor: {
       bigwin: {
-        text: 'Scivolate oltre un filo di campanelli senza muovere un soffio: siete già alle loro spalle mentre fissano ancora il fuoco.',
+        text: 'Scivolate oltre un filo teso senza muovere un soffio: siete già alle loro spalle mentre fissano ancora il fuoco.',
         effectBindings: [
-          { assertion: 'Scivolate oltre un filo di campanelli', effectId: 'filo-superato' },
+          { assertion: 'Scivolate oltre un filo teso', effectId: 'filo-superato' },
         ],
       },
       win: {
@@ -125,23 +125,23 @@ export const GOBLIN_ACCEPTED_R008: Record<string, NarratedNodeCopyR8> = {
         ],
       },
       almost: {
-        text: 'Sfiorate un campanello che oscilla piano: vicino al fuoco una testa si volta, poi esita.',
+        text: 'Sfiorate il filo e qualcosa tintinna accanto alla postazione: vicino al fuoco una testa si volta, poi esita.',
         effectBindings: [
-          { assertion: 'Sfiorate un campanello che oscilla piano', effectId: 'campanello-oscilla' },
+          { assertion: 'Sfiorate il filo e qualcosa tintinna accanto alla postazione', effectId: 'filo-tintinna' },
           { assertion: 'una testa si volta, poi esita', effectId: 'testa-si-volta' },
         ],
       },
       fail: {
-        text: 'Un filo vi morde lo stivale e un campanello stride nella notte: le sagome attorno al fuoco scattano in piedi.',
+        text: 'Un filo vi morde lo stivale e un tonfo rimbomba accanto alla sentinella: le sagome attorno al fuoco scattano in piedi.',
         effectBindings: [
           { assertion: 'Un filo vi morde lo stivale', effectId: 'filo-morde' },
           { assertion: 'le sagome attorno al fuoco scattano in piedi', effectId: 'sagome-scattano' },
         ],
       },
       epicfail: {
-        text: 'Inciampate in pieno in un filo teso e i campanelli si scatenano in un unico suono: il campo intero si rovescia contro di voi.',
+        text: 'Inciampate in pieno nel filo teso e il carico della postazione precipita in un fracasso: il campo intero si rovescia contro di voi.',
         effectBindings: [
-          { assertion: 'Inciampate in pieno in un filo teso', effectId: 'inciampo-filo' },
+          { assertion: 'Inciampate in pieno nel filo teso', effectId: 'inciampo-filo' },
           { assertion: 'il campo intero si rovescia contro di voi', effectId: 'campo-rovescia' },
         ],
       },
@@ -372,6 +372,11 @@ export const GOBLIN_ACCEPTED_R008: Record<string, NarratedNodeCopyR8> = {
 export const GOBLIN_R008_REVIEWED_SOFT_FLAGS: { code: string; stem: string; reason: string }[] = [
   {
     code: 'PROP_PROPAGATION',
+    stem: 'post',
+    reason: "'postazione/posto' ricorre — il filo d'allarme corre alla postazione della sentinella (ruling Director 2026-10-23: campanelli rimossi, l'allarme è visivo/acustico alla base): prop canonico del nuovo meccanismo, non inventato",
+  },
+  {
+    code: 'PROP_PROPAGATION',
     stem: 'pied',
     reason: "'piede/piedi' ricorre — anatomia condivisa dei fail fisici (piede che cede, scivola, perde appoggio): dispersione tematica, non prop inventato",
   },
@@ -455,7 +460,7 @@ export const GOBLIN_R008_REVIEWED_SOFT_FLAGS: { code: string; stem: string; reas
   {
     code: 'PROP_PROPAGATION',
     stem: 'camp',
-    reason: "'campo/campanelli' — l'accampamento goblin e il filo dei campanelli sono luogo/prop canonici del vocab e del contratto",
+    reason: "'campo/filo d'allarme' — l'accampamento goblin e il filo d'allarme sono luogo/prop canonici del vocab e del contratto",
   },
   {
     code: 'PROP_PROPAGATION',

@@ -56,3 +56,25 @@ Root: `src/ui/idleVillage/questS1Lab/render/AmbientLayer.tsx`.
 - PLAN-054 T-002: partizione generata meccanicamente da `componentInventory.ts`.
 
 <!-- /plan054:generated -->
+
+## Regola occlusione sprite kits (Director ruling 2026-10-24)
+
+I kit `kind: 'sprite'` (`cloud-sky`, `cloud-shadow`, `birds-far`) sono overlay
+DOM piatti: NON possono occludere dietro elementi near-plane dipinti. Prima di
+attaccare un kit sprite a una scena, verificare che nessun occluder near
+attraversi la banda del kit — altrimenti lo sprite legge come velo in primo
+piano (il caso cloud-sky su viaggio-andata: nuvola sopra i pali del cancello =
+"nebbia"). Alternative: bake mask da depth map (estendere il meccanismo pool
+dei kit fog ai sprite) o scene con cielo pulito (la kill list "NO distinct
+cloud silhouettes" esiste anche per questo).
+
+## Bocciature (eye-check Director, 2026-10-24)
+
+- **`flow` v1 (strip-displacement canvas) — BOCCIATO**: spostare strip di
+  texture dipinta dentro una banda smuove il contenuto intorno e non legge
+  come acqua. Il flow vero richiede shader UV-displacement + flow map reale
+  (procedurale o estratta da video) — il tipo è stato rimosso, non
+  resuscitare la versione canvas-strip.
+- **`leaves` v1 (ellipse traslucide ~22s) — BOCCIATO**: foglie = blade
+  appuntita (quadratiche), caduta ~3-4s nella banda, fill opaco, tumble
+  con rotazione. Non ritracciare a pallini soft.

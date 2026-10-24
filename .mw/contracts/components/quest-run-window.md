@@ -268,6 +268,16 @@ invariants:
       sempre e un run ended mantiene l'art di arrivo
     test_refs:
       - tests/unit/idleVillage/questRunWindow.journeyLegArt.test.tsx
+  - id: quest-run-window.INV-7
+    source: code-baseline
+    source_ref: R-119-e2e-audit
+    statement: >-
+      Un check mai presentabile non viene MAI held: colonna e overlay applicano lo stesso gate
+      (`checkEventOf`/`isStaleCheckEvent` — checkSeq <= dismissedUpTo dopo hydration o dismissOutcome mid-run),
+      quindi un check stale non puo' montare nessun presenter e `progress()` no-op sullo handle null terrebbe il
+      beat fermo fino al leak-guard checkHoldMs. Il beat stale scorre come beat a tempo normale.
+    test_refs:
+      - tests/unit/idleVillage/questRunWindow.checkHeld.test.tsx
 ---
 # quest-run-window
 

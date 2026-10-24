@@ -18,6 +18,22 @@ invariants:
       fissa da pillola, niente line-height 1, niente maiuscolo forzato (T-03, PLAN-067 T-A10)
     test_refs:
       - tests/unit/idleVillage/villageRegistry.scopeLeak.test.tsx
+  - id: village-registry.INV-1
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      Riga registry 'Palisade — Defense · Built · On the map' a cavallo del fold scroll di 14.4px (Sentinel
+      fold-straddle, S3, run 0829)
+    test_refs: 
+      - tests/unit/idleVillage/villageRegistry.foldCap.test.tsx
+  - id: village-registry.INV-2
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      Section headers 380x24px sotto il minimo 32px (LIST_BUTTON_RESET height:auto + contenuto 24px; Sentinel
+      small-target S3)
+    test_refs: 
+      - tests/unit/idleVillage/villageRegistry.headerMinHeight.test.tsx
 ---
 # village-registry
 

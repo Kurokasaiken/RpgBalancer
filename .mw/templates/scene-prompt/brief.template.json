@@ -1,0 +1,20 @@
+{
+  "_note": "I campi sono logistica del brief (PLAN-052 §1-6): il compiler li traduce in prosa pittorica. I campi 'prose' sono prosa autoriale libera.",
+  "slug": "scene-slug",
+  "title": "NOME SCENA",
+  "prose": {
+    "subject": "<!-- obbligatorio: prosa — cosa si vede, materia+luce per elemento -->",
+    "composition": "<!-- obbligatorio: POV, focal point, masse near/focal/far in termini pittorici -->",
+    "lighting": "<!-- obbligatorio: sorgenti di luce dipinte, mai particelle FX -->",
+    "palette_extra": "<!-- opzionale: pigmenti extra oltre al blocco canonico -->",
+    "technique_extra": "<!-- opzionale: contrasto di tecnica, materie specifiche -->",
+    "mood": "<!-- obbligatorio: due emozioni specifiche 'X + Y' -->"
+  },
+  "pigment": "deep teal",
+  "occluder": "<-- 'left'|'right'|'both'|null — null richiede no_occluder_reason -->",
+  "no_occluder_reason": null,
+  "calm_zones": ["<-- bande overlay dove vale low-frequency painted area -->"],
+  "fx_anchors": ["<-- sorgenti dipinte: 'fire pit coals', 'oil lantern' (mai particelle) -->"],
+  "kill_extra": ["<-- ban di scena aggiuntivi alla kill list canonica -->"],
+  "aspect": "21:9"
+}

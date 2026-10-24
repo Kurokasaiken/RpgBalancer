@@ -27,7 +27,7 @@ import { HudPlaque, SkinButton, SkinScope } from '@/ui/idleVillage/skins/primiti
 import { HudChip, TONE } from '@/ui/idleVillage/questS1Lab/hud/atoms';
 import { useHudPanelDrag } from '@/ui/idleVillage/components/gameFrame/useHudPanelDrag';
 import { getHudZoomFactor } from '@/ui/idleVillage/components/gameFrame/hudScale';
-import { VillageStashItemIcon } from '@/ui/idleVillage/components/gameFrame/villageStashItemIcons';
+import { stashItemCovers, StashItemTile, StashItemTooltipBody, STASH_TOOLTIP_STYLE, StashQtyBadge } from '@/ui/idleVillage/components/gameFrame/stashItemFace';
 import { stashAnnouncement } from '@/ui/idleVillage/components/gameFrame/VillageStashPanel';
 import { useVillageStashStore } from '@/ui/idleVillage/store/useVillageStashStore';
 import { EngravedIcon, type EngravedIconId } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
@@ -72,16 +72,7 @@ const bandById = (id: string): DangerBand | undefined => DANGER_BANDS.find((b) =
  *  needs for effect tooltips (`descKey` lives on the stash item). */
 const STASH_BY_FLAG = new Map(QUEST_STASH.items.map((i) => [i.flag, i]));
 
-/** Shared tooltip surface styling — same lacquer idiom as QuestRunWindow. */
-const TOOLTIP_STYLE: CSSProperties = {
-  zIndex: 2000,
-  maxWidth: 280,
-  padding: '9px 11px',
-  borderRadius: 8,
-  border: '1px solid color-mix(in srgb, var(--skin-surface-border) 70%, transparent)',
-  background: 'var(--skin-hud-lacquer-deep)',
-  boxShadow: '0 10px 24px color-mix(in srgb, var(--skin-hud-lacquer-deep) 80%, transparent)',
-};
+/** Shared tooltip surface — lives in `stashItemFace` (R-270: one grammar for both stash surfaces). */
 
 /** WS-3 open choreography (artifact-r005, TS-6): compositor-only keyframes —
  *  a slow scale on the cover art, a fade-up on the lower-third, a staggered
@@ -126,24 +117,16 @@ export const BagItemTooltip: React.FC<{ entry: BagStockEntry }> = ({ entry }) =>
 
 /** Mounted only while the tooltip is open, so the boundary is read once the shell exists. */
 const BagItemTooltipContent: React.FC<{ entry: BagStockEntry }> = ({ entry }) => {
-  const { t } = useTranslation('idleVillage');
   const boundary = React.useContext(PlannerBoundaryContext)?.current ?? undefined;
   const { item, qty } = entry;
   const stash = item.engineFlag ? STASH_BY_FLAG.get(item.engineFlag) : undefined;
   const descKey = item.descKey ?? stash?.descKey;
-  const line: CSSProperties = { fontFamily: FONT.serif, fontSize: 12, lineHeight: 1.35, color: TONE.text };
   return (
-      <Tooltip.Content side="top" sideOffset={6} collisionBoundary={boundary} collisionPadding={8} style={TOOLTIP_STYLE}>
-        <div style={{ fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--skin-title-color)', marginBottom: 4 }}>
-          {t(stripNs(item.labelKey))}
-        </div>
-        {descKey && <div style={line}>{t(descKey)}</div>}
-        {stash?.stats && stash.stats.length > 0 && (
-          <div style={{ ...line, color: TONE.secondary }}>
-            {t('questExpedition.bag.covers')} {stash.stats.map((s) => STAT_SHORT[s] ?? s).join(' · ')}
-          </div>
-        )}
-        <div style={{ ...line, color: TONE.secondary }}>{t('questExpedition.bag.stock', { qty })}</div>
+      <Tooltip.Content side="top" sideOffset={6} collisionBoundary={boundary} collisionPadding={8} style={STASH_TOOLTIP_STYLE}>
+        {/* R-270 stash-uniformity (quest-expedition-detail.INV-3): the shared
+         *  vocabulary — name · desc · covers · stock — same body the
+         *  village shelf mounts. */}
+        <StashItemTooltipBody labelKey={stripNs(item.labelKey)} descKey={descKey} covers={stashItemCovers(item.id)} stockQty={qty} />
       </Tooltip.Content>
   );
 };
@@ -274,7 +257,7 @@ const PackedBagItem: React.FC<{
         background: 'none', border: 'none', color: 'var(--skin-title-color)', cursor: 'pointer', padding: 0,
       }}
     >
-      <VillageStashItemIcon icon={entry.item.icon} size={22} />
+      <StashItemTile icon={entry.item.icon} size={44} iconSize={22} />
     </button>
   );
 };
@@ -296,8 +279,10 @@ const QuestBagSlot: React.FC<{
       data-testid={`bag-slot-${slotIndex}`}
       style={{
         width: 44, height: 44, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        border: '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
-        background: 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
+        /* Filled slots are faced by `StashItemTile` (R-270 shared item-face);
+         *  the empty chrome only frames the pouch affordance. */
+        border: entry ? 'none' : '1px solid color-mix(in srgb, var(--skin-surface-border) 60%, transparent)',
+        background: entry ? 'none' : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
       }}
     >
       {entry ? (
@@ -1170,19 +1155,13 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
                                 disabled={full}
                                 onClick={() => onToggleItem(item.id)}
                                 style={{
-                                  position: 'relative', width: 44, height: 44, borderRadius: 8, padding: 0, flexShrink: 0,
-                                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                  border: `1px solid color-mix(in srgb, ${selected ? 'var(--skin-title-color)' : 'var(--skin-surface-border)'} ${selected ? 85 : 50}%, transparent)`,
-                                  background: selected ? `color-mix(in srgb, var(--skin-title-color) 22%, transparent)` : 'color-mix(in srgb, var(--skin-hud-lacquer-deep) 55%, transparent)',
-                                  color: 'var(--skin-title-color)',
+                                  padding: 0, flexShrink: 0, borderRadius: 8, border: 'none', background: 'none',
+                                  display: 'inline-flex', color: 'var(--skin-title-color)',
                                   opacity: full ? 0.65 : 1,
                                   cursor: full ? 'default' : 'pointer',
                                 }}
                               >
-                                <VillageStashItemIcon icon={item.icon} size={22} />
-                                <span aria-hidden style={{ position: 'absolute', right: 1, bottom: 0, fontFamily: FONT.display, fontSize: 12, lineHeight: 1, color: TONE.secondary }}>
-                                  ×{qty}
-                                </span>
+                                <StashItemTile icon={item.icon} qty={qty} size={44} iconSize={22} selected={selected} />
                               </button>
                             </Tooltip.Trigger>
                             <BagItemTooltip entry={entry} />

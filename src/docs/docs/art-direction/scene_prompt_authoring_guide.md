@@ -18,8 +18,8 @@ prompt attorno a un testo sbagliato.
 L'immagine mostra la situazione *prima* della decisione o dello skill check,
 mai l'esito. Errori già visti e da evitare:
 
-- mostrare ciò che il check rivela (il campo visto dall'alto, i campanelli
-  scoperti col bigwin);
+- mostrare ciò che il check rivela (il campo visto dall'alto, il filo d'allarme
+  scoperto col bigwin);
 - mostrare l'esito riuscito (il palo che cade, la palizzata rotta, il bottino
   aperto);
 - mostrare la minaccia già esplosa quando il beat è il presentimento.
@@ -191,6 +191,11 @@ python scripts/lint-scene-prompts.py .mw/specs/<spec>/scenes/
 | Q10 | Kill list | ≥ 8 voci `NO …` nel blocco finale |
 | Q11 | Aspect | `21:9` (scene) o `3:4` (card) dichiarato |
 | Q12 | Tags | riga `**Tags riuso:**` sotto il blocco (scene attive) |
+| Q13 | Medium-first (R9) | token medium nella prima frase + zero token camera prima |
+| Q14 | Register ban (R9) | sub-codici `REG-CAM`/`REG-NUM` nel blocco |
+| Q15 | Floor stile (R9) | ≥3 token stile post-filtro hedge/negazioni |
+| Q16 | Negation bulk (R9) | warn: parole in run `NO/DO NOT/NEVER` vs totale |
+| Q17 | Placeholder (R9) | nessun `<!-- AUTHOR:` residuo nel blocco |
 
 ### Gate umano (non meccanizzabile, checklist di review)
 
@@ -214,6 +219,53 @@ python scripts/lint-scene-prompts.py .mw/specs/<spec>/scenes/
 | Firma fake in frame («JONES») | nomi di artisti senza ban firme | `NO signature, NO watermark, NO logo` nella kill list (R-267/R-263) |
 | Spoils = cianfrusaglia | descritti oggetti domestici (pettine, paiolo) | il premio deve leggere come **valore** a colpo d'occhio: monete, metallo prezioso, gemme/ambra — mai inventario casalingo |
 | Spoils già tutte visibili | tutto il valore esposto → niente da cercare | scena "keep looting" = **saggio + promessa + costo**: refurtiva visibile (il saggio), nascondigli non perquisiti (la promessa), trappole/pericolo visibile (il costo) |
+| Prompt in registro fotografico (dusk-v1, R-272) | apertura `24mm wide-angle, deep depth of field`, ~30% parole in 3 blocchi di negazione, percentuali/coordinate di layout | kernel pittorico obbligatorio (R9): medium-first, register ban Q14, floor stile Q15, bulk negazioni Q16-warn |
+
+## R9 — Kernel pittorico (regole hard del registro, R-272/PLAN-080)
+
+Il blocco prompt (il fenced `text` di `prompt.md`, §7 dei brief PLAN-052)
+è **un dipinto descritto**, mai un brief tecnico. Le sezioni ingegneristiche
+di un brief (depth planes, ancore FX, calm zone, coordinate, percentuali)
+vivono FUORI dal blocco prompt — nei campi §1–6 del brief e nelle
+generation notes. Nel prompt ogni vincolo tecnico è **tradotto in termini
+visivi**:
+
+| Vincolo engineering | Traduzione pittorica nel prompt |
+|---|---|
+| edge occluder | «a broad saturated mass in `<pigmento bibbia>` anchored at the frame edge» (MAI `dark mass`/`black mass` — collide con Q5/Q6) |
+| calm zone | «a low-frequency painted area» con pigmento di scena |
+| ancora FX (embers/smoke/glow) | la **sorgente** dipinta («paint only the light SOURCE») — le particelle sono overlay runtime, mai dipinte |
+| depth planes near/focal/far | masse pittoriche in prosa («near mass», «focal clearing», «far wall of treeline») — niente `x0.4`/percentuali |
+
+Regole meccaniche (verificate da `lint-scene-prompts.py` Q13–Q17):
+
+1. **Medium-first (Q13)**: la prima frase dichiara il medium
+   (`oil painting`/`impasto`/`oil`) e nessun token fotografico lo precede.
+   Il token medium conta come token stile.
+2. **Register ban (Q14)**: nel blocco prompt sono vietati vocabolario
+   fotografico (`24mm`, `depth of field`, `establishing shot`, `f/…`,
+   `bokeh`, `telephoto`, `dslr`, `lens flare`, `shallow focus` → codice
+   `REG-CAM`) e layout numerico (percentuali, `x0.4`/`y0.6`, coppie di
+   coordinate → `REG-NUM`). Leciti da corpus: `cinematic`, `wide-angle`,
+   `golden hour`, `rim light`.
+3. **Floor di stile (Q15)**: ≥3 occorrenze di vocabolario stile
+   (`impasto`, `brushstroke`, `palette-knife`, `painterly`, `oil painting`,
+   `visible layers of paint`) — conteggio dopo aver rimosso clausole negate
+   e hedge (`in the … tradition`, `in the style of`, `reminiscent of` non
+   contano).
+4. **Explicit-negation bulk (Q16, warn)**: parole dentro run espliciti
+   `NO/DO NOT/NEVER` vs totale — stampa il valore col range del corpus;
+   non blocca. Le negazioni in prosa naturale («without», «devoid of»)
+   non contano: la metrica misura il volume delle kill list.
+5. **Placeholder (Q17)**: un marker `<!-- AUTHOR:` residuo nel blocco è
+   failure — scaffold non compilato non può andare al generatore.
+
+**Severità e corpus-invariance**: un check hard resta hard solo finché il
+100% del corpus approvato lo supera (snapshot pre-migrazione, file+commit
+hash nel report di calibrazione). Fallimento → triage: check difettoso →
+fix; violazione reale → migrazione/eccezione motivata; demotion a warn solo
+con accettazione Director. Un warn diventa hard solo dopo pilota con
+eye-check Director su scena rigenerata.
 
 ## Salvataggio dei prompt vincenti
 
@@ -226,3 +278,35 @@ Sì — i prompt che producono asset approvati vanno conservati:
   variante vincente (se il prompt è stato ritoccato in sessione, si salva
   il testo finale, non l'originale);
 - in `SOURCES.md` della directory asset si registra file → provenienza.
+
+## Correlazione a 4 assi (v2, 2026-10-24 — PLAN-052 item 12, PLAN-084)
+
+Ogni brief di scena dichiara QUATTRO decisioni correlate in un'unica
+sezione — mai scelte indipendenti:
+
+1. **`archetype`** — id dalla tassonomia in `composition_archetypes.md`
+   (COULISSE/SHOULDER/VISTA/CANOPY/ARCH/MONOLITH/CASCADE/ISLAND/VOID/
+   CHOKE/GRID/TABLEAUX). Dice dove stanno gli occluder near e cosa resta
+   libero. Si sceglie col decision flow del catalogo + le 8 regole di
+   sequenza (mai adiacenti uguali, ritmo chiuso/aperto, rotazione
+   bordo/orizzonte/mossa/focale, escalation far-zone).
+2. **Shot grammar** — `camera`/`entrance`/`pose`/focale narrativo: la
+   composizione deve servire la mossa (creep su SHOULDER esige texture
+   interna alla massa; push-in su ARCH esige separazione depth al varco).
+3. **Ambient plan** — quali FX runtime convivono col dipinto e quali
+   zone restano calme (fog → terreno basso libero; shaft → cielo; sprite
+   kit → MAI sopra occluder near, v. regola occlusione in
+   `ambient-layer.md`; painted = source, runtime = effetto).
+4. **Interaction hooks** — dal catalogo
+   `scene_interaction_affordances.md`: cosa il player può scoprire/
+   cliccare/toccare, il flag che ne deriva (`revealedAmbush`,
+   `lootUntouched`, `sawEscape`), e cosa il prompt DEVE dipingere per
+   supportarlo — il segreto va dipinto leggibile-ma-camuffato, l'oggetto
+   con un lume/colore che lo distingue, l'elemento fragile con segnali
+   di fragilità.
+
+Per le quest GENERATE (pipeline `questRefine`/`domainVocabs`): la stessa
+correlazione vale — la spec di scena deve portare archetype + hooks come
+campi dati, così il prompt generator li riceve in input e non li inventa.
+L'assegnazione dell'archetipo per sequenza segue la coverage matrix della
+spec (`scenes.md`), non la scelta puntuale del singolo prompt.

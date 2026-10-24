@@ -83,3 +83,26 @@ describe('manifestSchema — PLAN-051 T-005', () => {
     }
   });
 });
+
+describe('scope_files — PLAN-081', () => {
+  it('accetta scope_files (globs) e lo passa al manifest', () => {
+    const res = parseManifest({
+      task: 't',
+      created_at: 'now',
+      scope_files: ['scripts/verification/**', 'plans/PLAN-081*.md'],
+      obligations: [validObligation],
+    });
+    expect(res.ok).toBe(true);
+    if (res.ok) expect(res.manifest.scope_files).toContain('scripts/verification/**');
+  });
+
+  it('rifiuta scope_files vuoto (uno scope vuoto silenzierebbe tutto)', () => {
+    const res = parseManifest({
+      task: 't',
+      created_at: 'now',
+      scope_files: [],
+      obligations: [validObligation],
+    });
+    expect(res.ok).toBe(false);
+  });
+});

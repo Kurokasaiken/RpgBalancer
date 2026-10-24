@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-029 SP-6 — Persistence & export envelope'
-status: candidate
+status: active
 created: 2026-10-12
 parent: PLAN-029
 debate: mw-web-debate `20261012-quest-gen-lab-sp6-persistence-export` — artifact
@@ -15,6 +15,8 @@ depends_on: PLAN-029 SP-1 (receipt shapes pinnate, canonicalize, gate OPEN
 ---
 
 # SP-6 — Persistence & export envelope — artifact r003
+
+> **AMEND-2(b,c) — ratifica 2026-10-23:** il journey-DAG check è gate al seam export/POI-targeting (qui), non run-entry; il freshness claim dei report è esplicito sullo scope — content hash = validità scenario-intrinseca, compatibilità POI dentro il claim o dichiarata fuori. Vedi PLAN-029 §7.
 
 3 revisioni. r003 assorbe: chatgpt OBJECT B-7 (receiptError → discriminated
 union tipata); r002 aveva assorbito chatgpt B-1..B-6 (flush async onesto, gate

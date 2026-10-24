@@ -1,24 +1,30 @@
 {"entity":"PLAN-004","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-004","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
+{"entity":"PLAN-004","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-005","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-005","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
+{"entity":"PLAN-005","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-006","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-006","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
+{"entity":"PLAN-006","kind":"commit","at":"2026-10-05T13:08:01Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"PLAN-007","kind":"verify-artifact","at":"2026-08-18T13:20:23.663Z","confidence":"low"}
 {"entity":"PLAN-007","kind":"verify-artifact","at":"2026-08-18T14:52:36.488Z","confidence":"low"}
 {"entity":"PLAN-007","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-007","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
+{"entity":"PLAN-007","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-008","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-008","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
+{"entity":"PLAN-008","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-009","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-009","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
+{"entity":"PLAN-009","kind":"commit","at":"2026-10-05T18:49:16Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"PLAN-010","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-010","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
+{"entity":"PLAN-010","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-011","kind":"plan-created","at":"2026-08-30T23:23:25+02:00","confidence":"high"}
 {"entity":"PLAN-012","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-012","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
-{"entity":"PLAN-013","kind":"commit","at":"2026-09-08T13:05:47+02:00","cls":"mixed","confidence":"high","meta":"feat(world-surface): PLAN-013 Sea Marks — DOM painted overlay with Zod config an"}
-{"entity":"PLAN-013","kind":"commit","at":"2026-09-08T13:06:58+02:00","cls":"docs","confidence":"high","meta":"docs(kanban): mark R-066-PLAN-013 as completed with evidence link"}
+{"entity":"PLAN-012","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-013","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-013","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
 {"entity":"PLAN-013","kind":"stamp-open","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
@@ -37,12 +43,14 @@
 {"entity":"PLAN-013","kind":"verify-artifact","at":"2026-10-19T16:07:02.548Z","confidence":"low"}
 {"entity":"PLAN-013","kind":"bundle","at":"2026-10-19T16:07:33.799Z","confidence":"high"}
 {"entity":"PLAN-013","kind":"stamp-close","at":"2026-10-19T16:09:04.134Z","confidence":"high"}
+{"entity":"PLAN-013","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-014","kind":"commit","at":"2026-09-08T18:09:36+02:00","cls":"mixed","confidence":"high","meta":"feat(world-surface): PLAN-014 land-breath — T-000a pre-check and T-000b Pixi spi"}
 {"entity":"PLAN-014","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-014","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
+{"entity":"PLAN-014","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-015","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-015","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
-{"entity":"PLAN-015","kind":"commit","at":"2026-10-05T13:06:10Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"PLAN-015","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-016","kind":"debate","at":"2026-09-10T07:10:07.375Z","confidence":"high","meta":"start","durMs":333038}
 {"entity":"PLAN-016","kind":"verify-artifact","at":"2026-09-10T07:15:40.403Z","confidence":"low"}
 {"entity":"PLAN-016","kind":"verify-artifact","at":"2026-09-10T07:15:40.404Z","confidence":"low"}
@@ -51,10 +59,10 @@
 {"entity":"PLAN-016","kind":"debate","at":"2026-09-10T07:15:40.413Z","confidence":"high","meta":"end"}
 {"entity":"PLAN-016","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-016","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
-{"entity":"PLAN-016","kind":"commit","at":"2026-10-05T13:08:01Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"PLAN-016","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-017","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-017","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
-{"entity":"PLAN-017","kind":"commit","at":"2026-10-05T18:49:16Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"PLAN-017","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-018","kind":"debate","at":"2026-09-29T19:18:42.194Z","confidence":"high","meta":"start","durMs":330532}
 {"entity":"PLAN-018","kind":"verify-artifact","at":"2026-09-29T19:24:12.725Z","confidence":"low"}
 {"entity":"PLAN-018","kind":"debate","at":"2026-09-29T19:24:12.726Z","confidence":"high","meta":"end"}
@@ -154,7 +162,7 @@
 {"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:21:23+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-3 — lifecycle POI: repeatable authored, default one-shot"}
 {"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:33:20+02:00","cls":"mixed","confidence":"high","meta":"PLAN-019-S4 T-5 — coverRiskDelta cablato nel motore (D-S4-3)"}
 {"entity":"PLAN-019","kind":"commit","at":"2026-10-10T23:55:11+02:00","cls":"mixed","confidence":"low","meta":"R-123-S4-T6: artefatto «definizione di buona quest» + E2E epilogo/journal — S4 c"}
-{"entity":"PLAN-019","kind":"commit","at":"2026-10-11T07:49:33Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"PLAN-019","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-020","kind":"commit","at":"2026-10-05T14:51:55+02:00","cls":"docs","confidence":"low","meta":"KB audit migration (desiderata v25): authority fixes, registry, stale marking"}
 {"entity":"PLAN-020","kind":"plan-created","at":"2026-10-05T14:51:55+02:00","confidence":"high"}
 {"entity":"PLAN-020","kind":"commit","at":"2026-10-05T17:16:28+02:00","cls":"mixed","confidence":"low","meta":"Add /game shortcut path to game-frame-pixi + TestHub link"}
@@ -163,7 +171,7 @@
 {"entity":"PLAN-021","kind":"plan-created","at":"2026-10-06T18:25:14+02:00","confidence":"high"}
 {"entity":"PLAN-021","kind":"commit","at":"2026-10-09T12:37:01+02:00","cls":"docs","confidence":"low","meta":"PLAN-025 T-011: final safeguards, harness budget evidence, docs"}
 {"entity":"PLAN-021","kind":"commit","at":"2026-10-09T14:31:45+02:00","cls":"docs","confidence":"low","meta":"PLAN-025: fix stale T-012 wording — QuestRunWindow stays canonical"}
-{"entity":"PLAN-021","kind":"commit","at":"2026-10-09T20:48:48Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"PLAN-021","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-022","kind":"commit","at":"2026-10-06T19:57:44+02:00","cls":"mixed","confidence":"low","meta":"R-089: Quest S1 Goblin Extermination — lab polish (scroll, phase art, outcome te"}
 {"entity":"PLAN-022","kind":"plan-created","at":"2026-10-06T19:57:44+02:00","confidence":"high"}
 {"entity":"PLAN-022","kind":"commit","at":"2026-10-06T20:31:42+02:00","cls":"mixed","confidence":"low","meta":"R-089 followup: combat check ~50% — goblinCheckDifficulty subtracted, not added"}
@@ -260,7 +268,7 @@
 {"entity":"PLAN-026","kind":"commit","at":"2026-10-10T16:01:40+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T5: closed quest-trait registry + schema validation"}
 {"entity":"PLAN-026","kind":"commit","at":"2026-10-10T16:18:33+02:00","cls":"mixed","confidence":"high","meta":"PLAN-026 T4: second narrated imprint — race × miniera"}
 {"entity":"PLAN-026","kind":"commit","at":"2026-10-11T23:38:56+02:00","cls":"mixed","confidence":"low","meta":"R-152: primo imprint narrativo compilato in quest reale (gen-impr002-palude)"}
-{"entity":"PLAN-026","kind":"commit","at":"2026-10-12T08:02:00Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"PLAN-026","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-027","kind":"verify-artifact","at":"2026-08-03T19:21:11.069Z","confidence":"low"}
 {"entity":"PLAN-027","kind":"commit","at":"2026-10-10T19:05:02+02:00","cls":"docs","confidence":"high","meta":"PLAN-027: narration-quality plan — r001 converged via multi-AI web debate"}
 {"entity":"PLAN-027","kind":"plan-created","at":"2026-10-10T19:05:02+02:00","confidence":"high"}
@@ -276,6 +284,7 @@
 {"entity":"PLAN-027","kind":"bundle","at":"2026-10-19T07:56:41.154Z","confidence":"high"}
 {"entity":"PLAN-027","kind":"stamp-close","at":"2026-10-19T07:56:41.154Z","confidence":"high"}
 {"entity":"PLAN-027","kind":"verify-artifact","at":"2026-10-19T07:58:34.221Z","confidence":"low"}
+{"entity":"PLAN-027","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-028","kind":"verify-artifact","at":"2026-08-03T20:22:10.375Z","confidence":"low"}
 {"entity":"PLAN-028","kind":"verify-artifact","at":"2026-08-03T20:23:25.683Z","confidence":"low"}
 {"entity":"PLAN-028","kind":"commit","at":"2026-10-12T14:47:00+02:00","cls":"mixed","confidence":"low","meta":"R-161: errata documentazione — il gioco NON è più un idle game"}
@@ -348,6 +357,7 @@
 {"entity":"PLAN-031","kind":"verify-artifact","at":"2026-08-05T07:11:24.294Z","confidence":"low"}
 {"entity":"PLAN-031","kind":"commit","at":"2026-10-12T14:47:00+02:00","cls":"mixed","confidence":"low","meta":"R-161: errata documentazione — il gioco NON è più un idle game"}
 {"entity":"PLAN-031","kind":"plan-created","at":"2026-10-12T14:47:00+02:00","confidence":"high"}
+{"entity":"PLAN-031","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-032","kind":"debate","at":"2026-10-12T08:59:25.000Z","confidence":"high","meta":"start","durMs":3925000}
 {"entity":"PLAN-032","kind":"verify-artifact","at":"2026-10-12T09:06:59.476Z","confidence":"low"}
 {"entity":"PLAN-032","kind":"verify-artifact","at":"2026-10-12T09:08:11.243Z","confidence":"low"}
@@ -485,7 +495,7 @@
 {"entity":"PLAN-032","kind":"bundle","at":"2026-10-14T19:45:12.674Z","confidence":"high"}
 {"entity":"PLAN-032","kind":"stamp-close","at":"2026-10-14T19:45:12.674Z","confidence":"high"}
 {"entity":"PLAN-032","kind":"commit","at":"2026-10-15T15:37:30+02:00","cls":"mixed","confidence":"low","meta":"GameFrame HUD: merchant, stash, hero sheet, bag strip, level-up + cursor set"}
-{"entity":"PLAN-032","kind":"commit","at":"2026-10-16T00:10:03+02:00","cls":"tests","confidence":"low","meta":"chore(game): quest lifecycle spec update (in-flight work)"}
+{"entity":"PLAN-032","kind":"commit","at":"2026-10-15T22:11:13Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"PLAN-033","kind":"commit","at":"2026-10-12T14:47:00+02:00","cls":"mixed","confidence":"low","meta":"R-161: errata documentazione — il gioco NON è più un idle game"}
 {"entity":"PLAN-033","kind":"plan-created","at":"2026-10-12T14:47:00+02:00","confidence":"high"}
 {"entity":"PLAN-033","kind":"stamp-open","at":"2026-10-12T14:47:00+02:00","confidence":"high"}
@@ -506,6 +516,7 @@
 {"entity":"PLAN-033","kind":"verify-artifact","at":"2026-10-20T06:58:58.217Z","confidence":"low"}
 {"entity":"PLAN-033","kind":"verify-artifact","at":"2026-10-20T06:58:58.380Z","confidence":"low"}
 {"entity":"PLAN-033","kind":"verify-artifact","at":"2026-10-20T06:59:13.419Z","confidence":"low"}
+{"entity":"PLAN-033","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-034","kind":"debate","at":"2026-08-05T07:02:19.557Z","confidence":"high","meta":"start","durMs":58084}
 {"entity":"PLAN-034","kind":"debate","at":"2026-08-05T07:03:17.641Z","confidence":"high","meta":"end"}
 {"entity":"PLAN-034","kind":"verify-artifact","at":"2026-08-05T07:03:17.641Z","confidence":"low"}
@@ -539,7 +550,7 @@
 {"entity":"PLAN-034","kind":"commit","at":"2026-10-14T14:40:33+02:00","cls":"docs","confidence":"high","meta":"PLAN-034: chiusura trailer-audit remediation (riga kanban pre-gate)"}
 {"entity":"PLAN-034","kind":"commit","at":"2026-10-15T15:37:30+02:00","cls":"mixed","confidence":"low","meta":"GameFrame HUD: merchant, stash, hero sheet, bag strip, level-up + cursor set"}
 {"entity":"PLAN-034","kind":"plan-created","at":"2026-10-15T15:37:30+02:00","confidence":"high"}
-{"entity":"PLAN-034","kind":"commit","at":"2026-10-15T22:11:13Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"PLAN-034","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-035","kind":"debate","at":"2026-08-05T16:04:32.565Z","confidence":"high","meta":"start","durMs":136450}
 {"entity":"PLAN-035","kind":"debate","at":"2026-08-05T16:06:49.015Z","confidence":"high","meta":"end"}
 {"entity":"PLAN-035","kind":"verify-artifact","at":"2026-08-05T16:06:49.016Z","confidence":"low"}
@@ -970,6 +981,7 @@
 {"entity":"PLAN-041","kind":"verify-artifact","at":"2026-08-14T10:11:43.116Z","confidence":"low"}
 {"entity":"PLAN-041","kind":"commit","at":"2026-10-16T16:42:39+02:00","cls":"mixed","confidence":"low","meta":"feat(game): quest skill-check overlays, village registry, R-208 single-agent piv"}
 {"entity":"PLAN-041","kind":"plan-created","at":"2026-10-16T16:42:39+02:00","confidence":"high"}
+{"entity":"PLAN-041","kind":"commit","at":"2026-10-16T18:04:28+02:00","cls":"other","confidence":"low","meta":"chore(repo): pulizia root junk + .vercelignore completa (fix upload 49k)"}
 {"entity":"PLAN-042","kind":"debate","at":"2026-10-16T08:54:35.000Z","confidence":"high","meta":"start","durMs":4506000}
 {"entity":"PLAN-042","kind":"verify-artifact","at":"2026-10-16T09:03:27.017Z","confidence":"low"}
 {"entity":"PLAN-042","kind":"verify-artifact","at":"2026-10-16T09:26:41.058Z","confidence":"low"}
@@ -1001,7 +1013,7 @@
 {"entity":"PLAN-042","kind":"stamp-close","at":"2026-10-16T13:34:47.914Z","confidence":"high"}
 {"entity":"PLAN-042","kind":"commit","at":"2026-10-16T16:42:39+02:00","cls":"mixed","confidence":"low","meta":"feat(game): quest skill-check overlays, village registry, R-208 single-agent piv"}
 {"entity":"PLAN-042","kind":"plan-created","at":"2026-10-16T16:42:39+02:00","confidence":"high"}
-{"entity":"PLAN-042","kind":"commit","at":"2026-10-16T18:04:28+02:00","cls":"other","confidence":"low","meta":"chore(repo): pulizia root junk + .vercelignore completa (fix upload 49k)"}
+{"entity":"PLAN-042","kind":"commit","at":"2026-10-16T18:05:08+02:00","cls":"mixed","confidence":"low","meta":"chore(repo): applica le cancellazioni del cleanup (rimaste unstaged)"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-08-11T08:27:33.105Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-08-11T08:39:18.880Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-08-11T08:41:24.278Z","confidence":"low"}
@@ -1148,18 +1160,6 @@
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T09:12:11.222Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T09:14:30.389Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T09:17:51.127Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T12:59:07.007Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T12:59:16.029Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T12:59:27.313Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T12:59:33.773Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T12:59:37.507Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T12:59:44.870Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T12:59:51.024Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T12:59:56.347Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T13:00:04.570Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T13:00:11.362Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-19T18:59:15.457Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T05:38:29.639Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T06:01:35.140Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T06:01:35.218Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T06:01:50.415Z","confidence":"low"}
@@ -1178,7 +1178,19 @@
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T08:06:32.683Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T08:54:40.650Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T08:54:41.386Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"commit","at":"2026-10-20T21:25:21+02:00","cls":"code","confidence":"low","meta":"feat(quest): journey route — winding bronze path under the POI, no decision dot"}
+{"entity":"PLAN-043","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:45:46.503Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:45:54.718Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:00.313Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:10.534Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:25.121Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:36.701Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:48.725Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:58.378Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:47:08.148Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:14:04.313Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:14:36.497Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:15:01.925Z","confidence":"low"}
 {"entity":"PLAN-043-S4","kind":"stamp-close","at":"2026-10-20T06:14:19.905Z","confidence":"high"}
 {"entity":"PLAN-044","kind":"debate","at":"2026-10-17T12:20:58.000Z","confidence":"high","meta":"start","durMs":9440000}
 {"entity":"PLAN-044","kind":"verify-artifact","at":"2026-10-17T12:27:09.930Z","confidence":"low"}
@@ -1254,6 +1266,7 @@
 {"entity":"PLAN-044","kind":"bundle","at":"2026-10-18T14:53:35.115Z","confidence":"high"}
 {"entity":"PLAN-044","kind":"stamp-close","at":"2026-10-18T14:55:27.533Z","confidence":"high"}
 {"entity":"PLAN-044","kind":"verify-artifact","at":"2026-10-18T14:57:33.599Z","confidence":"low"}
+{"entity":"PLAN-044","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-045","kind":"debate","at":"2026-10-17T12:41:03.000Z","confidence":"high","meta":"start","durMs":17600000}
 {"entity":"PLAN-045","kind":"verify-artifact","at":"2026-10-17T12:41:34.931Z","confidence":"low"}
 {"entity":"PLAN-045","kind":"verify-artifact","at":"2026-10-17T14:30:03.755Z","confidence":"low"}
@@ -1445,10 +1458,11 @@
 {"entity":"PLAN-045","kind":"verify-artifact","at":"2026-10-18T17:05:57.272Z","confidence":"low"}
 {"entity":"PLAN-045","kind":"bundle","at":"2026-10-18T17:05:57.460Z","confidence":"high"}
 {"entity":"PLAN-045","kind":"verify-artifact","at":"2026-10-18T17:08:42.084Z","confidence":"low"}
+{"entity":"PLAN-045","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-045-INTENT-GATE","kind":"stamp-close","at":"2026-10-18T17:07:39.794Z","confidence":"high"}
 {"entity":"PLAN-046","kind":"commit","at":"2026-10-18T13:19:57+02:00","cls":"mixed","confidence":"high","meta":"PLAN-046 R-213: depth-parallax quest scenes — spike verticale (Mesh+GlProgram, c"}
 {"entity":"PLAN-046","kind":"plan-created","at":"2026-10-18T13:19:57+02:00","confidence":"high"}
-{"entity":"PLAN-046","kind":"commit","at":"2026-10-18T13:24:39+02:00","cls":"config","confidence":"low","meta":"fix(tsconfig): ignoreDeprecations 6.0 -> 5.0 (valore invalido su tsc 5.9, TS5103"}
+{"entity":"PLAN-046","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-047","kind":"stamp-open","at":"2026-10-18T13:52:33.266Z","confidence":"high"}
 {"entity":"PLAN-047","kind":"verify-artifact","at":"2026-10-18T14:40:42.127Z","confidence":"low"}
 {"entity":"PLAN-047","kind":"stamp-close","at":"2026-10-18T14:50:18.492Z","confidence":"high"}
@@ -1464,6 +1478,8 @@
 {"entity":"PLAN-047","kind":"verify-artifact","at":"2026-10-18T15:35:42.381Z","confidence":"low"}
 {"entity":"PLAN-047","kind":"verify-artifact","at":"2026-10-18T15:36:12.724Z","confidence":"low"}
 {"entity":"PLAN-047","kind":"bundle","at":"2026-10-18T15:41:18.772Z","confidence":"high"}
+{"entity":"PLAN-047","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-047","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-048","kind":"verify-artifact","at":"2026-09-07T23:08:55.033Z","confidence":"low"}
 {"entity":"PLAN-048","kind":"verify-artifact","at":"2026-09-07T23:14:45.480Z","confidence":"low"}
 {"entity":"PLAN-048","kind":"verify-artifact","at":"2026-09-07T23:18:32.942Z","confidence":"low"}
@@ -1500,11 +1516,14 @@
 {"entity":"PLAN-048","kind":"verify-artifact","at":"2026-10-18T12:32:22.214Z","confidence":"low"}
 {"entity":"PLAN-048","kind":"bundle","at":"2026-10-18T15:27:04.243Z","confidence":"high"}
 {"entity":"PLAN-048","kind":"stamp-close","at":"2026-10-18T15:27:27.987Z","confidence":"high"}
+{"entity":"PLAN-048","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-048","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-049","kind":"commit","at":"2026-10-19T18:01:08+02:00","cls":"mixed","confidence":"low","meta":"PLAN-053: battesimo + T-001 modello puro quest journey fasi (R-226)"}
 {"entity":"PLAN-049","kind":"plan-created","at":"2026-10-19T18:01:08+02:00","confidence":"high"}
 {"entity":"PLAN-049","kind":"commit","at":"2026-10-19T18:11:05+02:00","cls":"mixed","confidence":"low","meta":"PLAN-053 T-002: characterization suite legacy (R-226)"}
 {"entity":"PLAN-049","kind":"commit","at":"2026-10-19T19:05:08+02:00","cls":"mixed","confidence":"low","meta":"PLAN-053 T-003: quest journey engine — andata/svolgimento/ritorno runtime (R-226"}
 {"entity":"PLAN-049","kind":"commit","at":"2026-10-19T20:23:52+02:00","cls":"mixed","confidence":"low","meta":"feat(quest): PLAN-053 T-004 — authored journey fasi + DAG validator + launch-spe"}
+{"entity":"PLAN-049","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-050","kind":"verify-artifact","at":"2026-09-08T13:04:44.594Z","confidence":"low"}
 {"entity":"PLAN-050","kind":"debate","at":"2026-09-08T13:28:29.938Z","confidence":"high","meta":"start","durMs":1}
 {"entity":"PLAN-050","kind":"verify-artifact","at":"2026-09-08T13:28:29.938Z","confidence":"low"}
@@ -1639,6 +1658,8 @@
 {"entity":"PLAN-050","kind":"verify-artifact","at":"2026-10-20T06:12:17.119Z","confidence":"low"}
 {"entity":"PLAN-050","kind":"verify-artifact","at":"2026-10-20T06:12:17.120Z","confidence":"low"}
 {"entity":"PLAN-050","kind":"bundle","at":"2026-10-20T06:13:35.676Z","confidence":"high"}
+{"entity":"PLAN-050","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-050","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-051","kind":"stamp-open","at":"2026-10-18T14:33:47.921Z","confidence":"high"}
 {"entity":"PLAN-051","kind":"verify-artifact","at":"2026-10-18T14:37:57.029Z","confidence":"low"}
 {"entity":"PLAN-051","kind":"verify-artifact","at":"2026-10-18T14:37:57.371Z","confidence":"low"}
@@ -1647,6 +1668,8 @@
 {"entity":"PLAN-051","kind":"stamp-close","at":"2026-10-18T14:46:47.571Z","confidence":"high"}
 {"entity":"PLAN-051","kind":"bundle","at":"2026-10-18T14:56:47.371Z","confidence":"high"}
 {"entity":"PLAN-051","kind":"verify-artifact","at":"2026-10-18T15:21:48.658Z","confidence":"low"}
+{"entity":"PLAN-051","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-051","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-09-08T15:28:14.292Z","confidence":"low"}
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-09-08T15:31:16.505Z","confidence":"low"}
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-18T17:44:55.382Z","confidence":"low"}
@@ -1655,6 +1678,107 @@
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-18T17:50:51.834Z","confidence":"low"}
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-18T18:01:51.718Z","confidence":"low"}
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-18T18:01:52.253Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-052","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-052","kind":"debate","at":"2026-10-22T17:38:10.000Z","confidence":"high","meta":"start","durMs":19835000}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:44:28.787Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:54:50.658Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:55:03.375Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:55:03.740Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:55:03.748Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:58:05.393Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:58:06.841Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:58:06.924Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T17:58:06.926Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T18:12:17.593Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:23:11.778Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:25:05.426Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:44:00.415Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:44:15.456Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:44:18.326Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:44:19.554Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:50:57.442Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:51:10.895Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:43.734Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.455Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.467Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.475Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.483Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.490Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.498Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.504Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.512Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.522Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T19:56:48.530Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:01:24.309Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:01:31.896Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:01:31.956Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:04:09.381Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:10:04.461Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:10:08.505Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:10:08.576Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:10:08.578Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:10:40.419Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:17:43.402Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:17:45.007Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:27:01.409Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:27:50.107Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:38:18.831Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:38:19.500Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:38:19.543Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:38:19.588Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:39:34.549Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:47:16.598Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:47:23.257Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:47:23.946Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:53:39.020Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T20:53:39.063Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:11:59.830Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:12:01.057Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:12:01.234Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:12:01.235Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:18:50.061Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:18:50.651Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:18:50.755Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:18:50.763Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:27:43.452Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:27:43.465Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:30:20.837Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:30:22.640Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:30:22.977Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:47:42.192Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:47:42.231Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:50:21.949Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:50:24.594Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:50:26.540Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:53:04.107Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T21:53:35.534Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:00:21.961Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:00:35.157Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:00:35.331Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:00:35.331Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:20:09.628Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:20:09.678Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:33:34.752Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:33:36.124Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:33:36.213Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:33:36.219Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:38:35.132Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:38:35.308Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:40:19.964Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:40:29.507Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:40:29.581Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:48:31.371Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:48:31.922Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:48:31.933Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T22:48:31.933Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T23:04:10.492Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T23:04:10.688Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T23:04:10.698Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-22T23:05:14.068Z","confidence":"low"}
+{"entity":"PLAN-052","kind":"debate","at":"2026-10-22T23:08:45.000Z","confidence":"high","meta":"end"}
+{"entity":"PLAN-052","kind":"commit","at":"2026-10-23T01:17:00+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-22T23:17:00.756Z"}
+{"entity":"PLAN-052","kind":"commit","at":"2026-10-23T15:44:51+02:00","cls":"mixed","confidence":"high","meta":"R-271: PLAN-052 showcase ambient FX — glint, fireflies, moths, shaft"}
 {"entity":"PLAN-053","kind":"verify-artifact","at":"2026-09-10T21:21:34.892Z","confidence":"low"}
 {"entity":"PLAN-053","kind":"verify-artifact","at":"2026-09-10T21:21:38.108Z","confidence":"low"}
 {"entity":"PLAN-053","kind":"verify-artifact","at":"2026-09-10T21:24:48.920Z","confidence":"low"}
@@ -2126,6 +2250,8 @@
 {"entity":"PLAN-054","kind":"verify-artifact","at":"2026-10-19T18:32:34.285Z","confidence":"low"}
 {"entity":"PLAN-054","kind":"verify-artifact","at":"2026-10-19T18:32:34.286Z","confidence":"low"}
 {"entity":"PLAN-054","kind":"bundle","at":"2026-10-19T18:33:14.233Z","confidence":"high"}
+{"entity":"PLAN-054","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-054","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-055","kind":"verify-artifact","at":"2026-09-11T07:28:43.375Z","confidence":"low"}
 {"entity":"PLAN-055","kind":"verify-artifact","at":"2026-09-11T07:29:48.012Z","confidence":"low"}
 {"entity":"PLAN-055","kind":"verify-artifact","at":"2026-09-11T07:29:48.014Z","confidence":"low"}
@@ -2179,7 +2305,8 @@
 {"entity":"PLAN-059","kind":"verify-artifact","at":"2026-10-06T08:12:52.642Z","confidence":"low"}
 {"entity":"PLAN-059","kind":"verify-artifact","at":"2026-10-06T08:16:14.566Z","confidence":"low"}
 {"entity":"PLAN-059","kind":"verify-artifact","at":"2026-10-06T08:18:53.176Z","confidence":"low"}
-{"entity":"PLAN-059","kind":"commit","at":"2026-10-06T16:26:17Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"PLAN-059","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-059","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-060","kind":"verify-artifact","at":"2026-10-19T12:36:35.728Z","confidence":"low"}
 {"entity":"PLAN-060","kind":"verify-artifact","at":"2026-10-19T12:52:00.956Z","confidence":"low"}
 {"entity":"PLAN-060","kind":"verify-artifact","at":"2026-10-19T13:00:14.105Z","confidence":"low"}
@@ -2194,6 +2321,8 @@
 {"entity":"PLAN-060","kind":"bundle","at":"2026-10-19T13:02:55.125Z","confidence":"high"}
 {"entity":"PLAN-060","kind":"stamp-close","at":"2026-10-19T13:05:58.355Z","confidence":"high"}
 {"entity":"PLAN-060","kind":"verify-artifact","at":"2026-10-19T13:07:04.834Z","confidence":"low"}
+{"entity":"PLAN-060","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-060","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-061","kind":"verify-artifact","at":"2026-10-19T15:53:38.827Z","confidence":"low"}
 {"entity":"PLAN-061","kind":"verify-artifact","at":"2026-10-19T15:53:55.556Z","confidence":"low"}
 {"entity":"PLAN-061","kind":"verify-artifact","at":"2026-10-19T15:54:26.435Z","confidence":"low"}
@@ -2205,11 +2334,36 @@
 {"entity":"PLAN-061","kind":"verify-artifact","at":"2026-10-19T15:54:59.527Z","confidence":"low"}
 {"entity":"PLAN-061","kind":"bundle","at":"2026-10-19T15:55:54.052Z","confidence":"high"}
 {"entity":"PLAN-061","kind":"stamp-close","at":"2026-10-19T15:56:47.779Z","confidence":"high"}
+{"entity":"PLAN-061","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-061","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-062","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-062","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-063","kind":"debate","at":"2026-10-16T14:06:53.000Z","confidence":"high","meta":"start","durMs":2081000}
 {"entity":"PLAN-063","kind":"verify-artifact","at":"2026-10-16T14:17:04.813Z","confidence":"low"}
 {"entity":"PLAN-063","kind":"debate","at":"2026-10-16T14:41:34.000Z","confidence":"high","meta":"end"}
 {"entity":"PLAN-063","kind":"commit","at":"2026-10-16T17:27:17+02:00","cls":"governance","confidence":"high","meta":"PLAN-063: skill hygiene — AI-debt in auditor-sentinel, scope anchors mw-*"}
-{"entity":"PLAN-063","kind":"commit","at":"2026-10-16T18:05:08+02:00","cls":"mixed","confidence":"low","meta":"chore(repo): applica le cancellazioni del cleanup (rimaste unstaged)"}
+{"entity":"PLAN-063","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-063","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-064","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-064","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-065","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-065","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-065","kind":"debate","at":"2026-10-23T11:39:45.000Z","confidence":"high","meta":"start","durMs":5315000}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:44:25.691Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:44:27.165Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:44:27.209Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:44:27.220Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:46:13.599Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:46:15.530Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:46:15.632Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:46:15.635Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T11:51:50.235Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T12:04:45.867Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T12:30:57.760Z","confidence":"low"}
+{"entity":"PLAN-065","kind":"debate","at":"2026-10-23T13:08:20.000Z","confidence":"high","meta":"end"}
+{"entity":"PLAN-065","kind":"verify-artifact","at":"2026-10-23T13:17:09.217Z","confidence":"low"}
+{"entity":"PLAN-066","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-066","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-20T11:20:50.086Z","confidence":"low"}
 {"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-20T11:21:38.689Z","confidence":"low"}
 {"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-20T11:21:47.806Z","confidence":"low"}
@@ -2307,6 +2461,53 @@
 {"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T10:57:44.713Z","confidence":"low"}
 {"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T10:57:44.718Z","confidence":"low"}
 {"entity":"PLAN-067","kind":"commit","at":"2026-10-22T13:00:21+02:00","cls":"code","confidence":"high","meta":"PLAN-067 T-A14: tooltip della HUD al posto del title nativo (R-234)"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T13:03:17.899Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T13:03:17.917Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T13:03:17.939Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T13:03:17.954Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T15:50:18+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B11: azione primaria = lastra di famiglia, niente placca CTA (BTN-1 ="}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T15:56:02+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso 2 — inventory rigenerato, stub contratti menu, spe"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T16:15:48+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B10: POI detail — immagine senza testo, titolo sopra, sottotitolo e i"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T16:22:20+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B10: l'immagine del planner cede altezza (120→72px a 720) perche la b"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T16:59:29+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C6: titoli e malattie per persona — la concessione autorata indica il"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T15:25:16.766Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T15:25:17.901Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T17:25:54+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C2: rapporto di fine quest — «chi è tornato» a nicchie con stato scri"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T17:52:50+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B5/T-B6: cibo a brace sulla tessera scura, MENU della stessa altezza "}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T18:22:17+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B12: mai viola — stato morte in ferro freddo #93a4ad in ogni skin, an"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:31:44.322Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:32:42.513Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:32:43.816Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:33:05.073Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:55:53.621Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:55:54.520Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:56:08.311Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:56:42.370Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"verify-artifact","at":"2026-10-22T16:56:43.165Z","confidence":"low"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T18:57:35+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B1b: stella V6.2 — famiglia e profondita' per valle, contorno e banda"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T19:09:08+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B1: comando di lancio — bersaglio sulla stella, anello che respira, e"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T19:20:29+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B3: barra della quest = tempo reale su scala che si allunga, sforo a "}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T19:24:42+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B4: magazzino nel planner = icona 36px con tooltip HUD «Magazzino · V"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T19:31:31+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B7/T-B8 (parte): schede teaser nella famiglia Roster — solo Cinzel + "}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T19:41:46+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B8: un oggetto, tre vesti, una famiglia di icone incise — le emoji de"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T19:49:00+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B9: via il badge dal pulsante Pannelli (DN-2); T-B2 non si implementa"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T21:47:45+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 HUD-3 = P1: tre linguette staccate (tempo · prossimo evento · risorse),"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T21:59:04+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 HUD-3: pulsanti d'angolo (menu, pannelli, nascondi) in bronzo — anello "}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T22:13:55+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C1: level-up con cerimonia — il Director apre il roster, il livello s"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T22:32:33+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C5: Sala dei caduti — ogni morte di run finisce nel Memoriale (nome, "}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T22:59:27+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C2 (parte): rapporto di sconfitta EXP A — lapidi per caduto, un titol"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T23:27:58+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C2: il caduto ha il giorno della morte — il run registra il tick di m"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-22T23:55:27+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C3: caduta dell'insediamento — statistiche vere (morti, giorno di gio"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-23T00:08:02+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C4: reliquario dell'eredità — slot = livello dell'edificio costruito "}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-23T00:44:16+02:00","cls":"tests","confidence":"high","meta":"PLAN-067 T-Z: famRoster senza it.each (invariante leggibile dal gate)"}
+{"entity":"PLAN-067","kind":"commit","at":"2026-10-23T08:46:01+02:00","cls":"docs","confidence":"high","meta":"PLAN-067: chiusura con riserve (non verificati e rossi preesistenti elencati)"}
+{"entity":"PLAN-068","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-068","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-068","kind":"commit","at":"2026-10-23T09:23:20+02:00","cls":"mixed","confidence":"low","meta":"docs(plan068): re-sync gate umani — G-11 chiusa (trusted:check OK), G-05 parzial"}
+{"entity":"PLAN-069","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-069","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-070","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-070","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-071","kind":"verify-artifact","at":"2026-10-21T09:22:36.908Z","confidence":"low"}
 {"entity":"PLAN-071","kind":"verify-artifact","at":"2026-10-21T09:26:17.208Z","confidence":"low"}
 {"entity":"PLAN-071","kind":"verify-artifact","at":"2026-10-21T09:30:18.587Z","confidence":"low"}
@@ -2490,21 +2691,147 @@
 {"entity":"PLAN-071","kind":"verify-artifact","at":"2026-10-21T12:43:39.847Z","confidence":"low"}
 {"entity":"PLAN-071","kind":"verify-artifact","at":"2026-10-21T12:43:39.857Z","confidence":"low"}
 {"entity":"PLAN-071","kind":"verify-artifact","at":"2026-10-21T12:47:11.749Z","confidence":"low"}
+{"entity":"PLAN-071","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-071","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-072","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-072","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-073","kind":"stamp-open","at":"2026-10-21T11:00:38.114Z","confidence":"high"}
 {"entity":"PLAN-073","kind":"commit","at":"2026-10-21T14:04:17+02:00","cls":"mixed","confidence":"high","meta":"PLAN-073 (R-240): village stash ledger — warehouse interattivo ↔ bisaccia quest"}
 {"entity":"PLAN-073","kind":"plan-created","at":"2026-10-21T14:04:17+02:00","confidence":"high"}
 {"entity":"PLAN-073","kind":"commit","at":"2026-10-21T15:44:59+02:00","cls":"mixed","confidence":"high","meta":"PLAN-073: Playwright villageStash 11/11 — fix race dragActions + locator/testid "}
 {"entity":"PLAN-073","kind":"commit","at":"2026-10-21T16:54:25+02:00","cls":"docs","confidence":"high","meta":"PLAN-073: verify:bundle r240-village-stash-ledger — BLOCKED solo su governance c"}
+{"entity":"PLAN-073","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-074","kind":"stamp-open","at":"2026-10-22T12:38:10.515Z","confidence":"high"}
+{"entity":"PLAN-074","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-074","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
 {"entity":"PLAN-075","kind":"stamp-open","at":"2026-10-22T12:40:16.339Z","confidence":"high"}
+{"entity":"PLAN-075","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-075","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-075","kind":"commit","at":"2026-10-23T01:17:00+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-22T23:17:00.756Z"}
 {"entity":"PLAN-076","kind":"stamp-open","at":"2026-10-22T12:18:54.667Z","confidence":"high"}
-{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T12:20:18.754Z","confidence":"low"}
-{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T12:20:18.755Z","confidence":"low"}
-{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T12:20:18.757Z","confidence":"low"}
-{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T12:20:18.758Z","confidence":"low"}
 {"entity":"PLAN-076","kind":"commit","at":"2026-10-22T14:26:06+02:00","cls":"docs","confidence":"high","meta":"PLAN-076 T-0/T-1: piano DN-7, card visual-fork, pacchetto di salvataggio atomico"}
 {"entity":"PLAN-076","kind":"plan-created","at":"2026-10-22T14:26:06+02:00","confidence":"high"}
 {"entity":"PLAN-076","kind":"commit","at":"2026-10-22T14:30:25+02:00","cls":"mixed","confidence":"high","meta":"PLAN-076 T-2: slot (auto + 3 manuali), «Salva ora» salva l'intera partita, autos"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:20:56.593Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:13.900Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:26.106Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:27.234Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:28.610Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:33.266Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:38.215Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:41.021Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:47.252Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:25:51.915Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:26:03.402Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:26:03.426Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:31:33.333Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:31:43.767Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:42:28.811Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:42:28.812Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:42:28.813Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-22T13:42:28.813Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"commit","at":"2026-10-22T15:42:40+02:00","cls":"mixed","confidence":"high","meta":"PLAN-076 T-3…T-6: Carica partita, Impostazioni (audio bus + movimento ridotto), "}
+{"entity":"PLAN-076","kind":"bundle","at":"2026-10-22T13:58:22.866Z","confidence":"high"}
+{"entity":"PLAN-076","kind":"commit","at":"2026-10-22T15:58:41+02:00","cls":"mixed","confidence":"high","meta":"PLAN-076 T-7: manifest di chiusura, witness check, bundle (BLOCKED: eye-check Di"}
+{"entity":"PLAN-076","kind":"commit","at":"2026-10-22T16:09:57+02:00","cls":"code","confidence":"high","meta":"PLAN-076: azione primaria di Carica, conferme e titolo = lastra di famiglia (BTN"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-23T06:42:39.956Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-23T06:42:39.957Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-23T06:42:39.957Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-23T06:42:39.957Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-23T06:42:39.957Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-23T06:42:39.958Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-23T06:42:39.958Z","confidence":"low"}
+{"entity":"PLAN-076","kind":"verify-artifact","at":"2026-10-23T06:42:39.958Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"stamp-open","at":"2026-10-22T12:45:32.782Z","confidence":"high"}
+{"entity":"PLAN-077","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
+{"entity":"PLAN-077","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T13:49:21.086Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T13:51:22.970Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T13:51:59.913Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T13:52:19.071Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T13:54:07.361Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T13:54:07.407Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T14:23:50.017Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T14:26:33.631Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T14:26:47.256Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T14:26:58.960Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T14:26:58.962Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T14:28:27.250Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T14:28:47.651Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T14:58:16.717Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T20:49:10.842Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T20:54:23.893Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T20:56:08.295Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T20:59:51.585Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T20:59:51.599Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:03:30.417Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:03:41.808Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:12:31.625Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:13:11.841Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:21:13.162Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:21:36.660Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:21:36.701Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:24:21.526Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:27:39.487Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:27:48.889Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:29:41.033Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:29:41.038Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:29:41.250Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:42:08.058Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:44:33.949Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:47:31.575Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:49:16.071Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:51:04.394Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T21:51:04.402Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T22:12:52.361Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T22:13:12.160Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T22:13:50.694Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T22:16:08.833Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T22:16:08.846Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"bundle","at":"2026-10-22T22:25:49.929Z","confidence":"high"}
+{"entity":"PLAN-077","kind":"verify-artifact","at":"2026-10-22T22:25:49.941Z","confidence":"low"}
+{"entity":"PLAN-077","kind":"commit","at":"2026-10-23T01:17:00+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-22T23:17:00.756Z"}
+{"entity":"PLAN-078","kind":"commit","at":"2026-10-22T16:07:07+02:00","cls":"docs","confidence":"high","meta":"docs(plan): add PLAN-078 Quality Sentinel"}
+{"entity":"PLAN-078","kind":"plan-created","at":"2026-10-22T16:07:07+02:00","confidence":"high"}
+{"entity":"PLAN-078","kind":"commit","at":"2026-10-22T16:07:23+02:00","cls":"docs","confidence":"high","meta":"docs(plan): register PLAN-078 Quality Sentinel"}
+{"entity":"PLAN-078","kind":"debate","at":"2026-10-22T14:22:50.000Z","confidence":"high","meta":"start","durMs":9672000}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:23:28.282Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:25:12.838Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:25:16.382Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:25:16.663Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:25:16.666Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:33:25.140Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:33:27.658Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:33:27.730Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:33:27.730Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:40:51.325Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:42:01.937Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T14:52:14.589Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T15:31:36.739Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T15:38:20.357Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T16:20:05.305Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T16:23:02.283Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T16:23:09.795Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T16:23:10.187Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T16:38:13.059Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T16:40:26.706Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T16:53:08.934Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"debate","at":"2026-10-22T17:04:02.000Z","confidence":"high","meta":"end"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T22:49:42.135Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T22:55:50.500Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T23:04:39.128Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T23:04:56.649Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T23:05:22.097Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T23:06:01.031Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T23:06:35.414Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T23:06:35.415Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T23:07:56.522Z","confidence":"low"}
+{"entity":"PLAN-078","kind":"bundle","at":"2026-10-22T23:07:56.560Z","confidence":"high"}
+{"entity":"PLAN-078","kind":"commit","at":"2026-10-23T01:17:00+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-22T23:17:00.756Z"}
+{"entity":"PLAN-079","kind":"commit","at":"2026-10-23T01:17:00+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-22T23:17:00.756Z"}
+{"entity":"PLAN-079","kind":"plan-created","at":"2026-10-23T01:17:00+02:00","confidence":"high"}
+{"entity":"PLAN-079","kind":"commit","at":"2026-10-23T09:23:20+02:00","cls":"mixed","confidence":"high","meta":"docs(plan068): re-sync gate umani — G-11 chiusa (trusted:check OK), G-05 parzial"}
+{"entity":"PLAN-081","kind":"stamp-open","at":"2026-10-23T14:14:40.235Z","confidence":"high"}
 {"entity":"PLAN-2","kind":"debate","at":"2026-09-10T13:58:42.658Z","confidence":"high","meta":"start","durMs":1037918}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
@@ -2537,16 +2864,6 @@
 {"entity":"R-056","kind":"debate","at":"2026-08-30T20:10:54.020Z","confidence":"high","meta":"end"}
 {"entity":"R-056","kind":"verify-artifact","at":"2026-08-30T20:10:54.020Z","confidence":"low"}
 {"entity":"R-056","kind":"verify-artifact","at":"2026-08-30T20:10:54.020Z","confidence":"low"}
-{"entity":"R-066","kind":"commit","at":"2026-09-08T13:06:58+02:00","cls":"docs","confidence":"high","meta":"docs(kanban): mark R-066-PLAN-013 as completed with evidence link"}
-{"entity":"R-066","kind":"commit","at":"2026-09-08T16:06:43+02:00","cls":"docs","confidence":"high","meta":"docs(kanban): update R-066-RIPPLE with sprite sheet asset and safeguards"}
-{"entity":"R-066","kind":"commit","at":"2026-09-09T01:14:04Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T13:15:42+02:00","cls":"mixed","confidence":"high","meta":"R-067: Destiny Astrolabe V6.3 — semantic/cinematic upgrade (Skill Core CHECK, pr"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T13:39:58+02:00","cls":"mixed","confidence":"high","meta":"R-067 fix: magnetic-snap glide (no ball teleport), zone guides for almost/epic b"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T13:45:04+02:00","cls":"code","confidence":"high","meta":"R-067 fix: draw wound/death risk bands in pre-roll zone guides (red outer band, "}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T13:49:00+02:00","cls":"code","confidence":"high","meta":"R-067 fix: no text overlay in front of board; axis labels show skill icon + real"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T14:22:12+02:00","cls":"code","confidence":"high","meta":"R-067 fix: axis icon+numbers as separate draw layer, visible through armed phase"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T14:24:28+02:00","cls":"code","confidence":"high","meta":"R-067 fix: wheel-of-fortune landing — ball converges during spin tail via positi"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T14:37:12+02:00","cls":"code","confidence":"high","meta":"R-067 fix: fail_wound/fail_dead forced verdicts now set wounded/dead flags so th"}
 {"entity":"R-067","kind":"commit","at":"2026-09-08T19:08:48+02:00","cls":"code","confidence":"high","meta":"R-067 fix: remove stale preroll overlay CSS/Type, fissure visible on star/goo fo"}
 {"entity":"R-067","kind":"commit","at":"2026-09-08T19:13:20+02:00","cls":"code","confidence":"high","meta":"R-067 fix: test page passes real skill icons (not initials) to V6.3 axes"}
 {"entity":"R-067","kind":"commit","at":"2026-09-08T19:46:55+02:00","cls":"code","confidence":"high","meta":"R-067 fix: align arena clip with bronze ring interior so no empty gap/halo appea"}
@@ -2663,22 +2980,22 @@
 {"entity":"R-119","kind":"commit","at":"2026-10-10T16:10:28+02:00","cls":"tests","confidence":"high","meta":"R-119: lifecycle spec — gold readout HUD nel DOM + pannello alto su 720p"}
 {"entity":"R-119","kind":"commit","at":"2026-10-10T16:44:56+02:00","cls":"docs","confidence":"high","meta":"R-119: guida E2E lifecycle goblin — debugging incrementale del flusso"}
 {"entity":"R-119","kind":"commit","at":"2026-10-10T20:50:42+02:00","cls":"mixed","confidence":"high","meta":"R-119: prova E2E Director = pipeline POI + fix race ferite (5 tick)"}
-{"entity":"R-119","kind":"commit","at":"2026-10-10T22:52:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-119","kind":"commit","at":"2026-10-10T22:53:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-120","kind":"commit","at":"2026-10-10T18:56:50+02:00","cls":"mixed","confidence":"high","meta":"R-120 + R-121: /game map fixes — paired cloud shadows, island sits above nav"}
-{"entity":"R-120","kind":"commit","at":"2026-10-10T21:56:08Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-120","kind":"commit","at":"2026-10-10T21:56:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-121","kind":"commit","at":"2026-10-10T18:56:50+02:00","cls":"mixed","confidence":"high","meta":"R-120 + R-121: /game map fixes — paired cloud shadows, island sits above nav"}
 {"entity":"R-121","kind":"commit","at":"2026-10-10T18:58:38+02:00","cls":"docs","confidence":"high","meta":"R-121: bugfix pattern candidate"}
-{"entity":"R-121","kind":"commit","at":"2026-10-10T21:56:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-121","kind":"commit","at":"2026-10-10T22:52:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-123","kind":"commit","at":"2026-10-10T19:07:17+02:00","cls":"mixed","confidence":"high","meta":"R-123: Director «start goblin quest» converge sul tubo canonico del POI"}
 {"entity":"R-123","kind":"commit","at":"2026-10-10T21:06:01+02:00","cls":"docs","confidence":"high","meta":"PLAN-019-S4: piano Integrazione battezzato (R-123)"}
 {"entity":"R-123","kind":"commit","at":"2026-10-10T23:55:11+02:00","cls":"mixed","confidence":"high","meta":"R-123-S4-T6: artefatto «definizione di buona quest» + E2E epilogo/journal — S4 c"}
-{"entity":"R-123","kind":"commit","at":"2026-10-11T07:48:57Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-123","kind":"commit","at":"2026-10-11T07:49:33Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-124","kind":"commit","at":"2026-10-10T22:14:27+02:00","cls":"mixed","confidence":"high","meta":"R-124 /game: POI nascosti finché la Regia non li rivela + halo semantica (vuota→"}
-{"entity":"R-124","kind":"commit","at":"2026-10-10T22:53:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-124","kind":"commit","at":"2026-10-11T01:34:53Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-125","kind":"commit","at":"2026-10-10T22:32:31+02:00","cls":"mixed","confidence":"high","meta":"R-125: «Assigned party» della QuestRunWindow renderizza il PgCard canonico"}
-{"entity":"R-125","kind":"commit","at":"2026-10-11T01:34:53Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-125","kind":"commit","at":"2026-10-11T01:35:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-126","kind":"commit","at":"2026-10-10T22:58:06+02:00","cls":"mixed","confidence":"high","meta":"R-126: roster reale 3 eroi + 3 popolani — party completo via drag reale nel life"}
-{"entity":"R-126","kind":"commit","at":"2026-10-11T01:35:45Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-126","kind":"commit","at":"2026-10-11T07:48:57Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-129","kind":"debate","at":"2026-08-23T15:55:48.338Z","confidence":"high","meta":"start","durMs":0}
 {"entity":"R-129","kind":"debate","at":"2026-08-23T15:55:48.338Z","confidence":"high","meta":"end"}
 {"entity":"R-129","kind":"verify-artifact","at":"2026-08-23T15:55:48.338Z","confidence":"low"}
@@ -2699,39 +3016,39 @@
 {"entity":"R-129","kind":"verify-artifact","at":"2026-08-24T08:39:04.988Z","confidence":"low"}
 {"entity":"R-129","kind":"verify-artifact","at":"2026-08-24T10:52:28.811Z","confidence":"low"}
 {"entity":"R-129","kind":"commit","at":"2026-10-11T13:13:29+02:00","cls":"mixed","confidence":"high","meta":"R-129: /game — nessun POI al boot, reveal/hide con trasformazione, halo vuota"}
-{"entity":"R-129","kind":"commit","at":"2026-10-11T17:01:41Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-129","kind":"commit","at":"2026-10-11T17:02:22Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-130","kind":"commit","at":"2026-10-11T13:18:02+02:00","cls":"mixed","confidence":"high","meta":"R-130: /game Director — «Start goblin quest» apre la QuestRunWindow su run esist"}
-{"entity":"R-130","kind":"commit","at":"2026-10-11T17:02:22Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-130","kind":"commit","at":"2026-10-11T17:48:56Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-131","kind":"commit","at":"2026-10-11T13:21:10+02:00","cls":"docs","confidence":"high","meta":"game: remove dead Director \"Show quest\" action (R-131)"}
-{"entity":"R-131","kind":"commit","at":"2026-10-11T17:48:56Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-131","kind":"commit","at":"2026-10-11T17:49:35Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-132","kind":"commit","at":"2026-10-11T14:30:45+02:00","cls":"mixed","confidence":"high","meta":"game: top-left HUD game menu with save and skin controls (R-132)"}
-{"entity":"R-132","kind":"commit","at":"2026-10-11T17:49:35Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-132","kind":"commit","at":"2026-10-11T19:09:17Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-133","kind":"commit","at":"2026-10-11T14:40:06+02:00","cls":"mixed","confidence":"high","meta":"game: POI click opens detail unless the run is live; roster beside window (R-133"}
-{"entity":"R-133","kind":"commit","at":"2026-10-11T19:09:17Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-133","kind":"commit","at":"2026-10-11T19:09:59Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-136","kind":"commit","at":"2026-10-11T15:33:16+02:00","cls":"mixed","confidence":"high","meta":"game: center top-plaque text; painted resource medallions (R-136)"}
-{"entity":"R-136","kind":"commit","at":"2026-10-11T19:09:59Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-136","kind":"commit","at":"2026-10-11T21:36:13Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-137","kind":"commit","at":"2026-10-11T15:55:38+02:00","cls":"mixed","confidence":"high","meta":"game: roster V2 live sort/filter + game-icons glyphs (R-137)"}
-{"entity":"R-137","kind":"commit","at":"2026-10-11T21:36:13Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-137","kind":"commit","at":"2026-10-11T21:36:53Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-138","kind":"commit","at":"2026-10-11T17:35:39+02:00","cls":"mixed","confidence":"high","meta":"R-138: /game menu dropdown pills + IT/EN language switch"}
-{"entity":"R-138","kind":"commit","at":"2026-10-11T21:49:48Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-138","kind":"commit","at":"2026-10-11T21:50:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-139","kind":"commit","at":"2026-10-11T17:32:29+02:00","cls":"mixed","confidence":"high","meta":"R-139: ferite solo a riposo, popolani 50HP/stat basse, race F10 Director"}
-{"entity":"R-139","kind":"commit","at":"2026-10-11T21:36:53Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-139","kind":"commit","at":"2026-10-11T21:49:48Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-140","kind":"commit","at":"2026-10-11T17:39:31+02:00","cls":"mixed","confidence":"high","meta":"R-140: Quest Generation Lab — pagina test catalogo generato"}
-{"entity":"R-140","kind":"commit","at":"2026-10-11T21:50:30Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-140","kind":"commit","at":"2026-10-11T22:56:38Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-143","kind":"commit","at":"2026-10-11T18:55:23+02:00","cls":"mixed","confidence":"high","meta":"R-143: /game — «Show quest» ripristinata nel Director; POI quest mai esemplare d"}
-{"entity":"R-143","kind":"commit","at":"2026-10-11T22:56:38Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-143","kind":"commit","at":"2026-10-11T22:57:20Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-144","kind":"commit","at":"2026-10-11T19:00:34+02:00","cls":"docs","confidence":"high","meta":"R-144: E2E reveal via vero pulsante Director — mai hook window"}
-{"entity":"R-144","kind":"commit","at":"2026-10-11T22:57:20Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-144","kind":"commit","at":"2026-10-12T02:15:32Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-146","kind":"commit","at":"2026-10-11T19:47:39+02:00","cls":"mixed","confidence":"high","meta":"R-146: planner spedizione su HudPlaque (HUD guide compliance)"}
-{"entity":"R-146","kind":"commit","at":"2026-10-12T02:15:32Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-146","kind":"commit","at":"2026-10-12T02:16:12Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-148","kind":"commit","at":"2026-10-11T22:35:56+02:00","cls":"mixed","confidence":"high","meta":"R-148: /game map fit — coverage floor reso non-critico, cuciture mare chiuse"}
-{"entity":"R-148","kind":"commit","at":"2026-10-12T02:16:12Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-148","kind":"commit","at":"2026-10-12T07:34:00Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-152","kind":"commit","at":"2026-10-11T23:38:56+02:00","cls":"mixed","confidence":"high","meta":"R-152: primo imprint narrativo compilato in quest reale (gen-impr002-palude)"}
-{"entity":"R-152","kind":"commit","at":"2026-10-12T08:00:36Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-152","kind":"commit","at":"2026-10-12T08:02:00Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-155","kind":"commit","at":"2026-10-11T23:35:07+02:00","cls":"mixed","confidence":"high","meta":"R-155/R-156: foresta ovest rischiarata (understory 1.0) + triage recovery richie"}
-{"entity":"R-155","kind":"commit","at":"2026-10-12T07:34:00Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-155","kind":"commit","at":"2026-10-12T07:34:43Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"R-156","kind":"commit","at":"2026-10-11T23:35:07+02:00","cls":"mixed","confidence":"high","meta":"R-155/R-156: foresta ovest rischiarata (understory 1.0) + triage recovery richie"}
-{"entity":"R-156","kind":"commit","at":"2026-10-12T07:34:43Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"R-156","kind":"commit","at":"2026-10-12T08:00:36Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-159","kind":"commit","at":"2026-10-11T23:48:51+02:00","cls":"mixed","confidence":"high","meta":"R-159: seconda istanza imprint compilata (gen-impr002-mare)"}
 {"entity":"R-159","kind":"commit","at":"2026-10-12T09:10:50Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-161","kind":"commit","at":"2026-10-12T14:47:00+02:00","cls":"mixed","confidence":"high","meta":"R-161: errata documentazione — il gioco NON è più un idle game"}
@@ -3111,7 +3428,7 @@
 {"entity":"R-211","kind":"verify-artifact","at":"2026-10-17T14:55:54.889Z","confidence":"low"}
 {"entity":"R-211","kind":"bundle","at":"2026-10-17T14:55:54.892Z","confidence":"high"}
 {"entity":"R-211","kind":"commit","at":"2026-10-18T13:19:28+02:00","cls":"mixed","confidence":"high","meta":"shutdownManager: governance R-211/R-212 — quiet window giorni, backstop non-bloc"}
-{"entity":"R-211","kind":"commit","at":"2026-10-18T13:20:24+02:00","cls":"tests","confidence":"low","meta":"quest planner drag-feedback: fix CustomDragOverlay + test portal/drag-feedback"}
+{"entity":"R-211","kind":"commit","at":"2026-10-18T13:20:32+02:00","cls":"docs","confidence":"low","meta":"governance: desiderata v32/v33/v34, RICHIESTE update, plans/INDEX + handoff"}
 {"entity":"R-212","kind":"verify-artifact","at":"2026-10-17T17:40:16.049Z","confidence":"low"}
 {"entity":"R-212","kind":"verify-artifact","at":"2026-10-17T17:40:40.065Z","confidence":"low"}
 {"entity":"R-212","kind":"verify-artifact","at":"2026-10-17T17:41:07.880Z","confidence":"low"}
@@ -3122,7 +3439,7 @@
 {"entity":"R-212","kind":"verify-artifact","at":"2026-10-17T17:41:20.391Z","confidence":"low"}
 {"entity":"R-212","kind":"bundle","at":"2026-10-17T17:41:20.393Z","confidence":"high"}
 {"entity":"R-212","kind":"commit","at":"2026-10-18T13:19:28+02:00","cls":"mixed","confidence":"high","meta":"shutdownManager: governance R-211/R-212 — quiet window giorni, backstop non-bloc"}
-{"entity":"R-212","kind":"commit","at":"2026-10-18T13:20:32+02:00","cls":"docs","confidence":"low","meta":"governance: desiderata v32/v33/v34, RICHIESTE update, plans/INDEX + handoff"}
+{"entity":"R-212","kind":"commit","at":"2026-10-18T13:24:39+02:00","cls":"config","confidence":"low","meta":"fix(tsconfig): ignoreDeprecations 6.0 -> 5.0 (valore invalido su tsc 5.9, TS5103"}
 {"entity":"R-213","kind":"verify-artifact","at":"2026-10-18T06:33:29.023Z","confidence":"low"}
 {"entity":"R-213","kind":"verify-artifact","at":"2026-10-18T06:33:29.024Z","confidence":"low"}
 {"entity":"R-213","kind":"verify-artifact","at":"2026-10-18T10:40:10.035Z","confidence":"low"}
@@ -3199,6 +3516,7 @@
 {"entity":"R-215","kind":"verify-artifact","at":"2026-10-18T10:06:10.132Z","confidence":"low"}
 {"entity":"R-215","kind":"verify-artifact","at":"2026-10-18T10:06:10.972Z","confidence":"low"}
 {"entity":"R-215","kind":"bundle","at":"2026-10-18T10:07:14.317Z","confidence":"high"}
+{"entity":"R-215","kind":"commit","at":"2026-10-18T13:20:24+02:00","cls":"tests","confidence":"low","meta":"quest planner drag-feedback: fix CustomDragOverlay + test portal/drag-feedback"}
 {"entity":"R-223","kind":"verify-artifact","at":"2026-10-18T18:15:12.046Z","confidence":"low"}
 {"entity":"R-223","kind":"verify-artifact","at":"2026-10-18T18:21:44.651Z","confidence":"low"}
 {"entity":"R-223","kind":"verify-artifact","at":"2026-10-18T18:34:16.594Z","confidence":"low"}
@@ -3356,7 +3674,6 @@
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T12:35:05.867Z","confidence":"low"}
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T12:35:06.295Z","confidence":"low"}
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T12:35:07.123Z","confidence":"low"}
-{"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T19:08:36.854Z","confidence":"low"}
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T19:08:38.558Z","confidence":"low"}
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T19:08:41.217Z","confidence":"low"}
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T19:08:42.117Z","confidence":"low"}
@@ -3364,6 +3681,7 @@
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T19:08:45.416Z","confidence":"low"}
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T19:08:45.417Z","confidence":"low"}
 {"entity":"R-231","kind":"verify-artifact","at":"2026-10-19T19:12:39.325Z","confidence":"low"}
+{"entity":"R-231","kind":"verify-artifact","at":"2026-10-23T13:47:14.115Z","confidence":"low"}
 {"entity":"R-232","kind":"verify-artifact","at":"2026-10-19T16:06:44.527Z","confidence":"low"}
 {"entity":"R-232","kind":"verify-artifact","at":"2026-10-20T05:48:05.914Z","confidence":"low"}
 {"entity":"R-232","kind":"verify-artifact","at":"2026-10-20T05:48:35.946Z","confidence":"low"}
@@ -3379,7 +3697,29 @@
 {"entity":"R-234","kind":"commit","at":"2026-10-20T23:31:47+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 onda A: T-A13 + T-A13b — quest in it-IT (overlay + testi del motore) (R"}
 {"entity":"R-234","kind":"commit","at":"2026-10-22T12:44:08+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 DN-6: tolta la sezione «Tema» dal menu di gioco (R-234)"}
 {"entity":"R-234","kind":"commit","at":"2026-10-22T13:00:21+02:00","cls":"code","confidence":"high","meta":"PLAN-067 T-A14: tooltip della HUD al posto del title nativo (R-234)"}
-{"entity":"R-234","kind":"commit","at":"2026-10-22T13:05:19+02:00","cls":"mixed","confidence":"low","meta":"feat(poi): marker accessibility — brass focus line, state in the label, reduced-"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T15:50:18+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B11: azione primaria = lastra di famiglia, niente placca CTA (BTN-1 ="}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T16:15:48+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B10: POI detail — immagine senza testo, titolo sopra, sottotitolo e i"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T16:22:20+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B10: l'immagine del planner cede altezza (120→72px a 720) perche la b"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T16:59:29+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C6: titoli e malattie per persona — la concessione autorata indica il"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T17:25:54+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C2: rapporto di fine quest — «chi è tornato» a nicchie con stato scri"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T17:52:50+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B5/T-B6: cibo a brace sulla tessera scura, MENU della stessa altezza "}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T18:22:17+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B12: mai viola — stato morte in ferro freddo #93a4ad in ogni skin, an"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T18:57:35+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B1b: stella V6.2 — famiglia e profondita' per valle, contorno e banda"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T19:09:08+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B1: comando di lancio — bersaglio sulla stella, anello che respira, e"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T19:20:29+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B3: barra della quest = tempo reale su scala che si allunga, sforo a "}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T19:24:42+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B4: magazzino nel planner = icona 36px con tooltip HUD «Magazzino · V"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T19:31:31+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B7/T-B8 (parte): schede teaser nella famiglia Roster — solo Cinzel + "}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T19:41:46+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B8: un oggetto, tre vesti, una famiglia di icone incise — le emoji de"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T19:49:00+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-B9: via il badge dal pulsante Pannelli (DN-2); T-B2 non si implementa"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T21:47:45+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 HUD-3 = P1: tre linguette staccate (tempo · prossimo evento · risorse),"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T21:59:04+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 HUD-3: pulsanti d'angolo (menu, pannelli, nascondi) in bronzo — anello "}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T22:13:55+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C1: level-up con cerimonia — il Director apre il roster, il livello s"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T22:32:33+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C5: Sala dei caduti — ogni morte di run finisce nel Memoriale (nome, "}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T22:59:27+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C2 (parte): rapporto di sconfitta EXP A — lapidi per caduto, un titol"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T23:27:58+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C2: il caduto ha il giorno della morte — il run registra il tick di m"}
+{"entity":"R-234","kind":"commit","at":"2026-10-22T23:55:27+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C3: caduta dell'insediamento — statistiche vere (morti, giorno di gio"}
+{"entity":"R-234","kind":"commit","at":"2026-10-23T00:08:02+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C4: reliquario dell'eredità — slot = livello dell'edificio costruito "}
+{"entity":"R-239","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"high","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"R-240","kind":"commit","at":"2026-10-21T14:04:17+02:00","cls":"mixed","confidence":"high","meta":"PLAN-073 (R-240): village stash ledger — warehouse interattivo ↔ bisaccia quest"}
 {"entity":"R-240","kind":"verify-artifact","at":"2026-10-21T14:29:26.765Z","confidence":"low"}
 {"entity":"R-240","kind":"verify-artifact","at":"2026-10-21T14:29:45.320Z","confidence":"low"}
@@ -3453,6 +3793,7 @@
 {"entity":"R-248","kind":"verify-artifact","at":"2026-10-22T06:45:14.986Z","confidence":"low"}
 {"entity":"R-248","kind":"verify-artifact","at":"2026-10-22T07:06:09.791Z","confidence":"low"}
 {"entity":"R-248","kind":"bundle","at":"2026-10-22T07:06:10.017Z","confidence":"high"}
+{"entity":"R-248","kind":"commit","at":"2026-10-22T12:54:52+02:00","cls":"docs","confidence":"low","meta":"docs(poi): Sigillo brief updated with decisions, glyph-asset brief, research and"}
 {"entity":"R-250","kind":"debate","at":"2026-10-21T16:36:21.000Z","confidence":"high","meta":"start","durMs":57457000}
 {"entity":"R-250","kind":"verify-artifact","at":"2026-10-21T16:37:01.548Z","confidence":"low"}
 {"entity":"R-250","kind":"verify-artifact","at":"2026-10-21T16:37:13.625Z","confidence":"low"}
@@ -3516,6 +3857,7 @@
 {"entity":"R-250","kind":"verify-artifact","at":"2026-10-22T08:20:08.829Z","confidence":"low"}
 {"entity":"R-250","kind":"verify-artifact","at":"2026-10-22T08:20:08.863Z","confidence":"low"}
 {"entity":"R-250","kind":"debate","at":"2026-10-22T08:33:58.000Z","confidence":"high","meta":"end"}
+{"entity":"R-250","kind":"commit","at":"2026-10-22T13:05:19+02:00","cls":"mixed","confidence":"low","meta":"feat(poi): marker accessibility — brass focus line, state in the label, reduced-"}
 {"entity":"R-253","kind":"verify-artifact","at":"2026-10-22T11:09:34.275Z","confidence":"low"}
 {"entity":"R-257","kind":"verify-artifact","at":"2026-10-22T09:25:02.444Z","confidence":"low"}
 {"entity":"R-257","kind":"verify-artifact","at":"2026-10-22T10:11:59.771Z","confidence":"low"}
@@ -3530,29 +3872,48 @@
 {"entity":"R-257","kind":"bundle","at":"2026-10-22T11:36:15.973Z","confidence":"high"}
 {"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T08:50:19.605Z","confidence":"low"}
 {"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:20:57.808Z","confidence":"low"}
-{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:37:42.358Z","confidence":"low"}
-{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:39:29.638Z","confidence":"low"}
-{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:39:46.963Z","confidence":"low"}
-{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:41:31.522Z","confidence":"low"}
-{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:41:31.991Z","confidence":"low"}
-{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:41:32.084Z","confidence":"low"}
-{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:41:32.085Z","confidence":"low"}
-{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T09:46:58.731Z","confidence":"low"}
-{"entity":"R-258","kind":"bundle","at":"2026-10-22T09:54:27.122Z","confidence":"high"}
-{"entity":"R-258","kind":"commit","at":"2026-10-22T12:54:52+02:00","cls":"docs","confidence":"low","meta":"docs(poi): Sigillo brief updated with decisions, glyph-asset brief, research and"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-07T15:55:11Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-07T19:46:42Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-07T22:19:21Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T00:33:33Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T05:12:56Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T08:57:28+02:00","cls":"code","confidence":"low","meta":"TEST: Extreme opacity range (50%-100%) to verify mechanism works"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T09:06:53+02:00","cls":"code","confidence":"low","meta":"feat(world-surface-breathing): Final tuning - opacity 80-100%, remove debug logs"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T09:49:05Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T14:31:18+02:00","cls":"mixed","confidence":"low","meta":"feat(world-surface): implement Director-selected coastal ripple on real map"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T13:58:57Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T16:06:11+02:00","cls":"mixed","confidence":"low","meta":"feat(world-surface): animated sea ripple sprite sheet (opzione 3)"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T14:08:18Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T16:10:37+02:00","cls":"code","confidence":"low","meta":"feat(sea-effect-lab): expose sprite sheet ripple as a lab tile"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T12:59:23.400Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T13:01:02.060Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T13:01:02.360Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T13:02:48.081Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T13:37:23.789Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T14:11:41.546Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T14:21:41.905Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T14:21:42.329Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T14:21:42.389Z","confidence":"low"}
+{"entity":"R-258","kind":"bundle","at":"2026-10-22T14:31:17.710Z","confidence":"high"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T15:04:36.295Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T15:04:36.301Z","confidence":"low"}
+{"entity":"R-258","kind":"verify-artifact","at":"2026-10-22T15:04:36.302Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T14:32:12.162Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T14:32:47.600Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T14:33:55.180Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T14:44:58.573Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T14:45:13.955Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T16:33:44.782Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T16:44:05.604Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T16:44:05.625Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T16:50:25.323Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T16:50:48.701Z","confidence":"low"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T16:57:16.497Z","confidence":"low"}
+{"entity":"R-260","kind":"bundle","at":"2026-10-22T17:18:51.646Z","confidence":"high"}
+{"entity":"R-260","kind":"verify-artifact","at":"2026-10-22T17:33:43.094Z","confidence":"low"}
+{"entity":"R-263","kind":"verify-artifact","at":"2026-10-22T15:37:17.093Z","confidence":"low"}
+{"entity":"R-270","kind":"verify-artifact","at":"2026-10-23T11:56:15.479Z","confidence":"low"}
+{"entity":"R-271","kind":"verify-artifact","at":"2026-10-23T13:37:01.083Z","confidence":"low"}
+{"entity":"R-271","kind":"verify-artifact","at":"2026-10-23T13:39:26.698Z","confidence":"low"}
+{"entity":"R-271","kind":"verify-artifact","at":"2026-10-23T13:39:44.287Z","confidence":"low"}
+{"entity":"R-271","kind":"verify-artifact","at":"2026-10-23T13:40:04.550Z","confidence":"low"}
+{"entity":"R-271","kind":"verify-artifact","at":"2026-10-23T13:40:34.706Z","confidence":"low"}
+{"entity":"R-271","kind":"verify-artifact","at":"2026-10-23T13:40:34.706Z","confidence":"low"}
+{"entity":"R-271","kind":"bundle","at":"2026-10-23T13:42:11.407Z","confidence":"high"}
+{"entity":"R-271","kind":"commit","at":"2026-10-23T15:44:51+02:00","cls":"mixed","confidence":"high","meta":"R-271: PLAN-052 showcase ambient FX — glint, fireflies, moths, shaft"}
+{"entity":"R-272","kind":"debate","at":"2026-10-23T13:57:21.000Z","confidence":"high","meta":"start","durMs":990000}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:10:35.897Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:10:37.845Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:10:37.966Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:10:37.999Z","confidence":"low"}
+{"entity":"R-272","kind":"debate","at":"2026-10-23T14:13:51.000Z","confidence":"high","meta":"end"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-08T19:05:48+02:00","cls":"mixed","confidence":"low","meta":"feat(sea-effect-lab): detailBoost and shimmerOpen variants for open sea"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-08T17:53:23Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-08T20:46:17+02:00","cls":"mixed","confidence":"low","meta":"feat(sea-effect-lab): organic caustics variant for open sea"}
@@ -3567,6 +3928,7 @@
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T01:02:45+02:00","cls":"mixed","confidence":"low","meta":"fix(world-surface): replace SVG filter with CSS drift for coastal ripple"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T01:12:42+02:00","cls":"code","confidence":"low","meta":"feat(world-surface): make Water ripple impossible to miss"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T01:51:09+02:00","cls":"mixed","confidence":"low","meta":"fix(world-surface): visible coastal ripple for Water toggle"}
+{"entity":"unattributed","kind":"commit","at":"2026-09-09T01:14:04Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T06:05:18Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T15:12:37Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T18:41:36Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
@@ -3783,11 +4145,13 @@
 {"entity":"unattributed","kind":"commit","at":"2026-10-05T02:25:00Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-05T09:31:11Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-05T09:32:07Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-05T13:06:10Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-06T06:48:37Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-06T06:49:39Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-06T13:03:02+02:00","cls":"mixed","confidence":"low","meta":"Vercel deploy: .vercelignore + guida corretta ai comandi reali"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-06T13:44:04Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-06T13:45:04Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-06T16:26:17Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-06T23:04:42Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-06T23:05:24Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-07T02:21:42Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
@@ -3873,6 +4237,7 @@
 {"entity":"unattributed","kind":"commit","at":"2026-10-09T19:26:12Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-09T19:26:53Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-09T20:48:11Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-09T20:48:48Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-10T06:40:26Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-10T09:03:55Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-10T09:04:36Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
@@ -3894,6 +4259,7 @@
 {"entity":"unattributed","kind":"commit","at":"2026-10-10T20:59:44Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-10T21:00:24Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-10T23:55:19+02:00","cls":"mixed","confidence":"low","meta":"Merge origin/main: coordinator dispatch housekeeping"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-10T21:56:08Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T11:14:35Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T11:15:15Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T11:19:04Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
@@ -3916,6 +4282,7 @@
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T15:37:32Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T16:56:07Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-11T16:56:47Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-11T17:01:41Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-13T08:22:26Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-13T08:23:23Z","cls":"config","confidence":"low","meta":"AI worker: MP-00 [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-13T16:14:52Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
@@ -3936,3 +4303,5 @@
 {"entity":"unattributed","kind":"commit","at":"2026-10-15T20:12:57+02:00","cls":"mixed","confidence":"low","meta":"fix(game): medallion portraits, hold-to-drag, cloud coverage, panel drag"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-15T20:13:45+02:00","cls":"assets","confidence":"low","meta":"chore(game): commit working tree (medallion portraits, drag, clouds, panels, map"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-15T19:11:37Z","cls":"mixed","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-16T00:10:03+02:00","cls":"tests","confidence":"low","meta":"chore(game): quest lifecycle spec update (in-flight work)"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-20T21:25:21+02:00","cls":"code","confidence":"low","meta":"feat(quest): journey route — winding bronze path under the POI, no decision dot"}

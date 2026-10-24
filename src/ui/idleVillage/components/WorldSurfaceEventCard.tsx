@@ -110,6 +110,17 @@ const STICKER_START_Y = 30;
 /** How long the invisible warm-up render stays mounted: enough for decode, filter raster and compositor upload. */
 const WARM_MS = 2500;
 
+/**
+ * world-surface-event-card.INV-2 (R-270): the CTA is inside the
+ * `scale(cardScale)` card — a 36px button measures 31.5px at scale 0.875,
+ * under the 32px interactive minimum (Sentinel S0/S1). The unscaled
+ * min-height must compensate: `ceil(32/cardScale)`, so the scaled rect is
+ * never under the floor. Scales ≥1 yield ≤32px, below the css 36px
+ * baseline — a no-op there.
+ */
+export const ctaActionMinHeightPx = (cardScale: number): number =>
+  Math.ceil(32 / Math.max(cardScale, 0.01));
+
 /** Where a goblin sprite sits on screen, relative to the card anchor, and the sticker scale that matches it. */
 interface StickerPose { x: number; y: number; scale: number }
 
@@ -200,6 +211,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   const [cardGone, setCardGone] = useState(false);
   /** The action arms when the card has finished appearing (R-234): never confirm a card the player has not seen. */
   const [armed, setArmed] = useState(false);
+
   // The host passes inline callbacks that change every render; the stage timers must not restart because of them.
   const onCloseRef = useRef(onClose);
   const onLandRef = useRef(onLand);
@@ -401,6 +413,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
         }
         actionLabel={String(t('world.goblinInvasion.action'))}
         onAction={handleAction}
+        actionStyle={{ minHeight: ctaActionMinHeightPx(cardScale) }}
         style={{
           maxWidth: CARD_W,
           width: CARD_W,

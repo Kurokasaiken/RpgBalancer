@@ -1,6 +1,6 @@
 # Current State — RpgBalancer
 
-**Ultimo aggiornamento:** 2026-10-19
+**Ultimo aggiornamento:** 2026-10-23
 **Superficie canonica:** `/game` (Game Frame Pixi — raggiungibile dal link «Game» in `/test hub`; R-075 v2)
 **Repo remoto:** `https://github.com/Kurokasaiken/RpgBalancer`
 
@@ -31,6 +31,13 @@ Questa è una fotografia; per lo stato più aggiornato verificare `SESSION_HANDO
 - Playwright E2E per drag, POI quest, component hub.
 - **Boot/preload + perf gate su `/game`** (PLAN-031, 2026-10-12): `GameBootScreen` veil con il logo authored su lacca teal HUD, progresso reale e reveal automatico (copre `/game`, `/`, `/game-frame-pixi`); all'apertura della mappa nessun pannello è visibile (registry `defaultVisible:false`, `useHudPanels` senza persistenza); `HudHideToggle` (tasto `h`, cluster bottom-right) fa scorrere i cluster top verso l'alto e quelli bottom verso il basso lasciando solo la perla di richiamo; `PixiWorldMap` con contratto `onBootProgress`/`onReady`, prefetch parallelo a tier, `refit` pre-reveal, `renderer.prepare.upload` (warmup GPU); toggle pannelli fa `refit()` in place invece di ricostruire l'app (fix `safeFitRef`); `__gamePerf` probe + `gamePerfBudgets` (Zod, p95≤33ms / 0 long-frame / boot ≤4s) + `tests/e2e/idleVillage/gamePerf.spec.ts`; drag medaglione fixato con `startTransition` sui handler + `MeasuringStrategy.BeforeDragging` su `DndContext` (0 long frame al floor; `gameQuestExpedition` 14/14 passa).
 - **Map fit `/game` CTR-game-005** (PLAN-054/R-225, 2026-10-19): `safeFit` protegge la terra dal chrome fisso reale; quando `autoHudScale` ingrandisce la HUD via `cssZoom`, gli inset configurati vengono scalati prima di arrivare al renderer. Copertura: matrice viewport contrattuale + caso dedicato `3440×1440`, DPR 2 e probe CLI; bundle `.mw/runs/r225-ultrawide-map-fit/bundle.json` PASS.
+- **Quest journey engine** (PLAN-053 / R-226, 2026-10-19/20): modello puro a fasi andata/svolgimento/ritorno con DAG validator authored (T-001..T-004), characterization suite legacy, journey route overlay su `/game` (sentiero bronzeo sotto il POI, visual fork A) e journey detail UI (3 leg bar, chip parcheggio, badge loot). Semantica frontiera: durante il viaggio la frontiera può restare `pending` (`readyAt` sentinella) finché il marker authored non arriva — non è un timer ordinario.
+- **Onda PLAN-067 / R-234** (2026-10-20…23, ~40 commit): rework UX esteso di `/game` chiuso **con riserve** (commit `2658331b`). In sintesi: fix mappa che sparisce + audit (T-000); overlay e catalogo testi motore in it-IT (T-A13/b); `HudTooltip` Radix al posto del `title` nativo sui controlli HUD (T-A14 — **i test che cercano `title` sono obsoleti per design**); stella V6.2 con famiglia/profondità; comando di lancio con bersaglio sulla stella (SC-1 = A); barra quest in tempo reale su scala che si allunga con sforo a brace e tacche di fase (QW-1 = B); planner POI con immagine senza testo — **titolo sopra la hero**, sottotitolo/icone stat sotto (POI-D = A, T-B10) e hero ridotta a 72px per tenere la bisaccia dentro a 720px; magazzino nel planner come icona 36px con tooltip (PL-3 = A); cibo a brace su tessera scura (HUD-1 = A); famiglia icone incise (emoji → glifi, INV-1 = B); schede teaser Roster solo Cinzel/EB Garamond (FAM-1 = A); mai viola — morte in ferro freddo `#93a4ad` (COL-D = B); **HUD-3**: tre linguette staccate (tempo · prossimo evento · risorse) + pulsanti d'angolo in bronzo (menu/pannelli/nascondi, menu come icona in basso a destra con Esc); badge rimosso dal pulsante Pannelli (DN-2); azione primaria = lastra di famiglia (BTN-1 = A). **Serie T-C (perdita/eredità):** level-up con cerimonia (`HeroLevelCeremony`, lastra per eroe con sigillo romano, LVL = B); rapporto fine quest con nicchie per tornato e caduti in ferro freddo; giorno di morte registrato nel run; rapporto di sconfitta «Expedition lost» EXP A; caduta dell'insediamento con statistiche vere (SET = B); **Sala dei caduti** (`MemorialHall`/`MemorialPanel`, ogni morte nel Memoriale, DEATH-1 = B); **reliquiario dell'eredità** (`LegacyReliquaryPanel`, slot = livello edificio, LEG = B). Roster: default skin `base` (era `minimal_frontier`, commit `165bfb8d`), sort modes `name-asc/desc`, `hp-desc`, `fatigue-asc` (`rarity-desc` rimosso). Il pallino `data-decision-waiting` sui POI è stato rimosso intenzionalmente (20-10).
+- **Village stash ledger** (PLAN-073 / R-240, 2026-10-21): magazzino interattivo ↔ bisaccia quest; Playwright `villageStash` 11/11 dopo fix race `dragActions`; bundle BLOCKED solo su governance condivisa.
+- **Menu di gioco / salvataggio / titolo** (PLAN-076, DN-7, 2026-10-22): pacchetto di salvataggio atomico `gameSave` (slot auto + 3 manuali, «Salva ora», autosalvataggio dedicato), schermate Carica/Impostazioni (audio bus, movimento ridotto)/Esci-al-titolo con conferme, schermata titolo; invarianti in `.mw/contracts/components/game-menu-screens.md`. Bundle BLOCKED su eye-check Director + governance condivisa.
+- **Quality Sentinel** (PLAN-078, 2026-10-22): registrato in `plans/INDEX.md`; harness `scripts/sentinel/*` in lavorazione (worktree dirty, sessione parallela).
+- **Sync documentazione/gate** (PLAN-068, 2026-10-23): re-sync gate umani — G-11 chiusa (`trusted:check` OK), G-05 parziale (rulings BTN-1/DN-6/DN-7/COL-D/T-C2), accodato G-12 eye-check ritratti a PLAN-079.
+- **Audit test+docs `/game`** (2026-10-23, questa sessione): riclassificati i rossi — drift intenzionale (planner hero, tooltip Radix, decision-waiting, frontier `pending`, skin `base`, sort `hp-desc`) vs bug reali (`MinimalGameOverModal`: gate `isGameOver`, titolo duplicato, focus; pip 8px in `QuestRunWindow` → glifo inciso; `hudPersistence.test.ts` si auto-mockava; `HUDNotificationLayer.test.tsx` import rotti). Inventory contratti rigenerato (280 unità / 463 STRICT_FILES), 7 contratti nuovi popolati, scope sincronizzati; residuo: 9 file con 2 owner (aggregato `game-menu-screens` vs per-file + `useCompactTop.ts` riassegnato a `resource-readout`) — serve ruling Director per il ratchet strutturale.
 - **Mission Planner** (PLAN-018, R-078): draft PARTY/LOADOUT → preview deterministica (DP esatta, rng-free) → resolver che campiona lo stesso modello; checkpoint continua/ritirati; docs `mission_planner_spec.md` + `mission_planner_math_spec.md`; E2E `missionPlanner.spec.ts`. Sarà rimappato in PLAN-019 S2/S3.
 - Sistema `Mind Weaver`: `AGENTS.md`, `.mw/desiderata.md`, `RICHIESTE.md`, `context/DECISION_LOG.md`, skill cross-IDE.
 - **Knowledge pipeline** (2026-10-05, R-084/v25): `QUEST_RULES.md` canonico (PLAN-020), registry `context/REJECTED.md` + `context/OPEN.md`, report di ingestion tracciati in `context/ingestions/`, router L0–L4 in `context/INDEX.md`.
@@ -58,13 +65,14 @@ Questa è una fotografia; per lo stato più aggiornato verificare `SESSION_HANDO
 
 ## In corso
 
-Vedi `RICHIESTE.md` per la lista completa. Esempi di richieste recenti (stato preciso in `RICHIESTE.md`):
+Vedi `RICHIESTE.md` per la lista completa. Richieste/plan attivi (stato preciso in `RICHIESTE.md` e `plans/INDEX.md`):
 
+- **PLAN-078** — Quality Sentinel: harness in lavorazione (`scripts/sentinel/*`).
+- **PLAN-079** — follow-up performance + eye-check (include G-12 ritratti accodato da PLAN-068); budget `gamePerf` sotto osservazione (p95 `medal-drag-mount`/`map-pan`/`menu-open` sopra budget nel run del 23-10, da confermare su run pulita).
+- **PLAN-076** — menu/save/titolo implementato; chiusura in attesa di eye-check Director + governance condivisa.
+- **PLAN-067** — chiuso con riserve (2026-10-23): riserve oneste nel plan doc.
 - **R-057** — World Surface: parallasse manina, teca di vetro, resto del piano.
 - **R-003** — World Surface mappa viva: sub-plan A.1/A.2/A.3 in draft, da riesaminare.
-- **R-028** — Golden UI Foundation: Phase 1 Forensic UI/Art Audit.
-- **R-026** — Documentazione AI-friendly + suite di test per integrazione componenti.
-- **R-029/R-030** — Hero components placeholder.
 
 ## Blocchi / limiti noti
 
@@ -72,6 +80,7 @@ Vedi `RICHIESTE.md` per la lista completa. Esempi di richieste recenti (stato pr
 2. `MarketActionCard.tsx` — placeholder, bloccante per Macro-Fase B.
 3. `MinimalActivityPage` — mancante.
 4. Core loop non assemblato in `/minimal-gameplay`.
+5. **Ownership contratti componenti (2026-10-23):** 9 STRICT_FILES con 2 owner — gli 8 file `gameFrame/menu/*` rivendicati sia dall'aggregato `game-menu-screens` sia dai contratti per-file, e `useCompactTop.ts` (riassegnato dal partizionamento a `resource-readout`, ancora rivendicato da `game-frame-pixi`). Il ratchet strutturale vieta la rimozione di membri senza sha256-approval → serve ruling Director (convertire `game-menu-screens` in CTR integration o approvare la deduplicazione).
 
 ## Deprecato
 
