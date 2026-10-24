@@ -71,3 +71,5 @@ Sorgenti: `~/Downloads/andata.jpeg` (1408×768 → crop 2.4:1 + upscale
   in v3 il nascondiglio è un fagotto sotto tela cerata; `sentiero-tracce.jpg`
   mostra solchi di ruota (stessa fiction revocata). La rigenerazione
   richiede ruling Director — i file restano in uso finché non rimpiazzati.
+| `bivacco.jpg` | showcase "tutto il kit" (2026-10-24): bivacco al crepuscolo — fuoco+lanterna+pozza+chioma+treeline; CANOPY+SHOULDER, 12 tipi FX | yes | fog-low | campsite, dusk, campfire, lantern, rain-drips, water-pool, treeline, teal-amber, impasto, showcase | bivacco |
+| `intrusi.jpg` | f3 intrusi — SHOULDER specchiato: massa dx, sagome goblin in fila sul sentiero; mezzogiorno | yes | no | infiltrators, shoulder, boulder-right, goblin-file, sunlit-path, teal, impasto | intrusi |

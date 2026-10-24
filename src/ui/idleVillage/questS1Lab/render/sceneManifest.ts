@@ -132,6 +132,20 @@ export const AmbientFxSchema = z.discriminatedUnion('type', [
     a: z.number().min(0).max(0.8).default(0.35),
     color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#b8ccd8'),
   }),
+  z.object({
+    type: z.literal('plate'),
+    /** Horizontal cel strip (webp), generated from a video-model clip. */
+    src: z.string().regex(/^\/assets\/plates\/.+\.webp$/),
+    /** Number of cels in the strip. */
+    frames: z.number().int().min(2).max(24),
+    /** Center of the plate, img-fraction. */
+    at: z.tuple([z.number(), z.number()]),
+    /** Plate width/height, img-fraction. */
+    w: z.number().positive().max(0.5),
+    h: z.number().positive().max(0.5),
+    /** Playback rate — 8-12 reads as painted loop, not video. */
+    fps: z.number().min(4).max(18).default(10),
+  }),
 ]);
 export type AmbientFx = z.infer<typeof AmbientFxSchema>;
 
@@ -390,19 +404,22 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
   'agguato-foresta': {
     depth: '/assets/depth/agguato-foresta.webp',
     depthWidth: 1584,
-    depthHeight: 672,
-    imgAspect: 3168 / 1344,
-    /* observation/ambush — concealed, watching the sunlit path. */
-    entrance: 'enter-settle-cover',
-    pose: 'pose-watch',
-    focusAnchor: [0.42, 0.5],
-    /* Forest ambush — the Director moved the fog to sentiero-tracce;
-     * the ambush stays on painted atmosphere + ambient only. */
+    depthHeight: 660,
+    imgAspect: 3168 / 1320,
+    /* v2 (2026-10-24): SHOULDER archetype — creep along the left rock
+     * mass toward the treeline where the ambushers hide. */
+    entrance: 'enter-creep',
+    pose: 'pose-tense',
+    focusAnchor: [0.76, 0.45],
+    ampMul: 0.7,
     atmosphere: [],
     ambient: [
       { type: 'dust', count: 12 },
       /* Low warm haze drifting over the sunlit path (band in img fractions). */
       { type: 'drift', band: [0.62, 0.9], count: 3, speed: 0.008, a: 0.07, color: '#e8d9b0' },
+      /* Arrowhead glints in the treeline — the tell that it's alive. */
+      { type: 'glint', at: [0.79, 0.44], period: 5, r: 0.006 },
+      { type: 'glint', at: [0.86, 0.46], period: 7, r: 0.005 },
     ],
   },
   /* ---- PLAN-052 flagship candidate: f3-gola-dusk (brief §6b shot
@@ -453,6 +470,67 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
        * the video pass: 0.07 read as a barely-there line, not a beam. */
       { type: 'shaft', from: [0.58, 0.04], to: [0.6, 0.52], width: 0.16, count: 4, a: 0.13, color: '#ffe9b8' },
       { type: 'dust', count: 10 },
+    ],
+  },
+  /* Showcase "tutto il kit" — bivacco al crepuscolo. Hero motion = il
+   * fuoco (glow+embers+smoke su una sorgente = stesso asse, permesso);
+   * gli altri subordinati per la regola anti-spam del catalogo. */
+  /* f3-intrusi (2026-10-24): SHOULDER specchiato — massa convessa a dx
+   * come copertura; sagome in fila sul sentiero sx. Creep lungo la
+   * massa verso le sagome; glint sulle punte di lancia = il tell. */
+  'intrusi': {
+    depth: '/assets/depth/intrusi.webp',
+    depthWidth: 1584,
+    depthHeight: 660,
+    imgAspect: 3168 / 1320,
+    entrance: 'enter-creep',
+    pose: 'pose-tense',
+    focusAnchor: [0.28, 0.56],
+    ampMul: 0.7,
+    atmosphere: [],
+    ambient: [
+      { type: 'dust', count: 12 },
+      { type: 'drift', band: [0.6, 0.88], count: 3, speed: 0.008, a: 0.07, color: '#e8d9b0' },
+      /* spear-tip glints on the infiltrator file (img-fraction, misurati) */
+      { type: 'glint', at: [0.28, 0.5], period: 5, r: 0.006 },
+      { type: 'glint', at: [0.32, 0.53], period: 7, r: 0.005 },
+    ],
+    tags: ['quest-goblin', 'f3-intrusi'],
+  },
+  'bivacco': {
+    depth: '/assets/depth/bivacco.webp',
+    depthWidth: 1584,
+    depthHeight: 660,
+    imgAspect: 3168 / 1320,
+    entrance: 'enter-creep',
+    pose: 'pose-rest',
+    focusAnchor: [0.365, 0.62],
+    ampMul: 0.6,
+    atmosphere: ['fog-low'],
+    ambient: [
+      /* HERO — the campfire owns the scene: the flame is a generated
+       *  cel plate (Grok video → 12 frames), runtime owns the light. */
+      { type: 'plate', src: '/assets/plates/bivacco-fuoco.webp', frames: 12, at: [0.393, 0.599], w: 0.14, h: 0.28, fps: 10 },
+      { type: 'glow', at: [0.365, 0.615], r: 0.035, color: '#ff9540', a: 0.6, flicker: 0.55 },
+      { type: 'embers', at: [0.365, 0.6], count: 4, size: 0.5 },
+      { type: 'smoke', at: [0.365, 0.58], count: 3, lean: 0.1 },
+      /* The lantern post — a second smaller warm pool + moths + metal. */
+      { type: 'glow', at: [0.573, 0.345], r: 0.022, color: '#ffcc66', a: 0.55, flicker: 0.4 },
+      { type: 'moths', at: [0.573, 0.345], r: 0.03, count: 3 },
+      { type: 'glint', at: [0.573, 0.33], period: 6, r: 0.005 },
+      /* The pool — last light glinting on water, two spots. */
+      { type: 'glint', at: [0.78, 0.86], period: 5, r: 0.008 },
+      { type: 'glint', at: [0.86, 0.84], period: 7, r: 0.006 },
+      /* Treeline darkness on the right = fireflies' band. */
+      { type: 'fireflies', band: [0.3, 0.75], xband: [0.62, 0.95], count: 5 },
+      /* Canopy haze drifting under the overhang. */
+      { type: 'drift', band: [0.3, 0.5], count: 3, speed: 0.008, a: 0.09, color: '#8fa8a0' },
+      /* Faint cool shaft falling through the treeline gap. */
+      { type: 'shaft', from: [0.68, 0.02], to: [0.66, 0.52], width: 0.13, count: 3, a: 0.08, color: '#cfe4e8' },
+      /* The dripping branch sheds leaves + a light drizzle. */
+      { type: 'leaves', band: [0.06, 0.8], xband: [0.05, 0.5], count: 7 },
+      { type: 'rain', band: [0.0, 0.95], count: 45, lean: 0.06, speed: 0.8, a: 0.18 },
+      { type: 'dust', count: 8 },
     ],
   },
 });
