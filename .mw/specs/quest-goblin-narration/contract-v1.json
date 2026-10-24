@@ -12,13 +12,13 @@
       "foglie", "radici", "felci", "muschio", "terra", "fango", "pietre", "roccia", "scarpata",
       "forra", "buca", "pelli", "sagome", "tende", "teli", "strame", "legni", "trave", "pali",
       "barricata", "muro di punte", "fuoco", "fuochi", "braci", "tizzoni", "cenere", "fumo",
-      "filo", "campanelli", "lame", "ferro", "frecce", "scudi", "cuoio", "cassa", "stivali",
+      "filo", "sentinella", "lame", "ferro", "frecce", "scudi", "cuoio", "cassa", "stivali",
       "impugnature", "elsa", "guardia", "denti", "testa", "spalle", "schiena", "tallone", "polso",
       "palmi", "dita", "unghie", "braccia", "respiro", "fiato", "sangue", "notte", "alba",
       "ombra", "penombra", "buio", "luce", "goblin"
     ],
     "canonicalTerms": {
-      "trappola d'allarme": "filo di campanelli"
+      "trappola d'allarme": "filo d'allarme"
     },
     "endSeeds": ["fumo"],
     "bannedSettingTerms": [
@@ -26,7 +26,7 @@
       "debito", "sonagli", "corda d'allarme", "acropole", "villaggio", "città", "viale"
     ],
     "texture": {
-      "sound": ["rami secchi che schioccano", "foglie che frusciano", "campanelli che oscillano", "urla rauche"],
+      "sound": ["rami secchi che schioccano", "foglie che frusciano", "ferraglia che tintinna alla postazione", "urla rauche"],
       "smell": ["muschio bagnato", "legna marcia", "grasso rancido", "fumo basso", "rame caldo"],
       "light": ["braci basse", "penombra sotto le chiome", "lame come lampi storti", "grigio dell'alba"],
       "touch": ["corteccia ruvida", "fango sotto i piedi", "cenere scivolosa", "terreno molle"]
@@ -64,7 +64,7 @@
     }
   ],
   "propGlossary": [
-    { "term": "il filo di campanelli", "meaning": "filo teso a mezza gamba con campanelli appesi — l'allarme primitivo del campo: suonare sveglia i goblin" },
+    { "term": "il filo d'allarme", "meaning": "filo teso a mezza gamba che corre alla postazione della sentinella — se si tende, qualcosa cade o tintinna accanto alla sentinella: l'allarme primitivo del campo" },
     { "term": "il lembo rimesso a posto", "meaning": "un lembo di sottobosco ricomposto con troppa cura — il nascondiglio si avvista solo dall'alto: sorpresa, non conferma" },
     { "term": "la buca di pelli", "meaning": "una buca foderata di pelli sotto il lembo — ciò che i goblin hanno sepolto: si prende a ogni esito, senza prova e senza scelta" },
     { "term": "la barricata", "meaning": "barriera di pali storti e fango attorno al campo — si sfonda o si aggira, decide il primo colpo del combattimento" },
@@ -101,7 +101,7 @@
       "node": "tracce-per",
       "narrativeDelta": "il suolo restituisce o nega la via di approccio silenziosa",
       "rivalAction": "le tracce rimestate apposta dicono che il campo sa di essere cercato",
-      "motifFunction": "il filo di campanelli intravisto al successo pieno preannuncia la meccanica dell'accampamento",
+      "motifFunction": "il filo d'allarme intravisto al successo pieno preannuncia la meccanica dell'accampamento",
       "mechanicalClaims": ["il successo alimenta solo l'approccio furtivo — niente bottino, niente evento nuovo", "l'epicfail è il piede che cede e lo schianto che si sente nel bosco"],
       "endingClaimsAllowed": [],
       "framingFacts": [
@@ -109,11 +109,11 @@
       ],
       "verdictEffects": {
         "bigwin": {
-          "facts": [{ "id": "lettura-piena", "text": "impronte leggere affiorano sotto le foglie marce e più avanti nell'erba alta si intravede un filo di campanelli teso a mezza gamba" }],
-          "revealTerms": ["campanell*"],
+          "facts": [{ "id": "lettura-piena", "text": "impronte leggere affiorano sotto le foglie marce e più avanti nell'erba alta si intravede un filo teso a mezza gamba che corre verso il campo" }],
+          "revealTerms": ["filo*"],
           "canonicalEffects": [
             { "id": "impronte-affiorano", "text": "le impronte affiorano sotto le foglie marce" },
-            { "id": "filo-avvistato", "text": "un filo di campanelli teso a mezza gamba si intravede nell'erba alta" }
+            { "id": "filo-avvistato", "text": "un filo teso a mezza gamba si intravede nell'erba alta" }
           ]
         },
         "win": {
@@ -214,7 +214,7 @@
       "node": "accampamento",
       "narrativeDelta": "da osservatori a esecutori: resta solo da scegliere come entrare",
       "rivalAction": "il campo fuma e dorme — impreparato ma circondato dai propri allarmi",
-      "motifFunction": "i campanelli ritornano come meccanica d'ingresso, non più come indizio",
+      "motifFunction": "il filo ritorna come meccanica d'ingresso, non più come indizio",
       "mechanicalClaims": ["la via furtiva paga di più ma il fallimento allerta; la carica paga meno e il fallimento è gratis", "le opzioni nominano il gesto, mai lo scopo né l'esito"],
       "endingClaimsAllowed": [],
       "titleLock": "Regole d’ingaggio",
@@ -227,7 +227,7 @@
       "node": "stealth",
       "narrativeDelta": "dentro invisibili o dentro scoperti — il campo non ha una terza opzione",
       "rivalAction": "le teste che si alzano dal fuoco mostrano che il campo è pronto a svegliarsi",
-      "motifFunction": "il filo dei campanelli è la scena stessa",
+      "motifFunction": "il filo d'allarme è la scena stessa",
       "mechanicalClaims": ["successo = danno maggiore al combattimento; fallimento = campo allertato"],
       "endingClaimsAllowed": [],
       "framingFacts": [
@@ -235,9 +235,9 @@
       ],
       "verdictEffects": {
         "bigwin": {
-          "facts": [{ "id": "invisibili", "text": "si scivola oltre un filo di campanelli senza muovere un soffio: già alle loro spalle mentre fissano il fuoco" }],
-          "revealTerms": ["campanell*"],
-          "canonicalEffects": [{ "id": "filo-superato", "text": "un filo di campanelli viene superato senza muovere un soffio" }]
+          "facts": [{ "id": "invisibili", "text": "si scivola oltre un filo teso senza muovere un soffio: già alle loro spalle mentre fissano il fuoco" }],
+          "revealTerms": ["filo*"],
+          "canonicalEffects": [{ "id": "filo-superato", "text": "un filo teso viene superato senza muovere un soffio" }]
         },
         "win": {
           "facts": [{ "id": "perimetro", "text": "il perimetro esterno è superato senza che una foglia parli" }],
@@ -245,27 +245,27 @@
           "canonicalEffects": [{ "id": "perimetro-superato", "text": "il perimetro esterno viene superato in silenzio" }]
         },
         "almost": {
-          "facts": [{ "id": "campanello-sfiorato", "text": "un campanello sfiorato oscilla piano e una testa vicino al fuoco si volta, poi esita" }],
-          "revealTerms": ["campanell*"],
+          "facts": [{ "id": "filo-sfiorato", "text": "il filo sfiorato fa tintinnare qualcosa accanto alla postazione e una testa vicino al fuoco si volta, poi esita" }],
+          "revealTerms": ["filo*"],
           "canonicalEffects": [
-            { "id": "campanello-oscilla", "text": "un campanello sfiorato oscilla piano" },
+            { "id": "filo-tintinna", "text": "qualcosa tintinna accanto alla postazione" },
             { "id": "testa-si-volta", "text": "una testa vicino al fuoco si volta, poi esita" }
           ]
         },
         "fail": {
-          "facts": [{ "id": "filo-stride", "text": "un filo morde lo stivale, un campanello stride e le sagome attorno al fuoco scattano in piedi" }],
-          "revealTerms": ["campanell*"],
+          "facts": [{ "id": "filo-stride", "text": "un filo morde lo stivale, un tonfo rimbomba accanto alla sentinella e le sagome attorno al fuoco scattano in piedi" }],
+          "revealTerms": ["filo*"],
           "canonicalEffects": [
             { "id": "filo-morde", "text": "un filo morde lo stivale" },
             { "id": "sagome-scattano", "text": "le sagome attorno al fuoco scattano in piedi" }
           ]
         },
         "epicfail": {
-          "facts": [{ "id": "allarme-pieno", "text": "si inciampa in un filo teso, i campanelli si scatenano e il campo intero si rovescia contro" }],
-          "revealTerms": ["campanell*"],
+          "facts": [{ "id": "allarme-pieno", "text": "si inciampa in un filo teso e il carico della postazione precipita: il campo intero si rovescia contro" }],
+          "revealTerms": ["filo*"],
           "canonicalEffects": [
             { "id": "inciampo-filo", "text": "si inciampa in pieno in un filo teso" },
-            { "id": "campo-rovescia", "text": "i campanelli si scatenano e il campo intero si rovescia contro" }
+            { "id": "campo-rovescia", "text": "il carico della postazione precipita e il campo intero si rovescia contro" }
           ]
         }
       }

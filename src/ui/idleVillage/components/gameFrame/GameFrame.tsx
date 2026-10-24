@@ -15,6 +15,8 @@ import {
   type GameFrameConfig,
   type GameFrameNavItemConfig,
 } from '@/balancing/config/idleVillage/gameFrameConfig';
+import { getMobileFitConfig } from '@/balancing/config/idleVillage/mobileFitConfig';
+import { useMobileFit } from '@/hooks/useMobileFit';
 
 /**
  * GameFrame — the game's persistent shell, v3.
@@ -200,6 +202,32 @@ export const GameFrame: React.FC<GameFrameProps> = ({
    * an event needs the instruments. `hiddenBy` remembers which case we're in. */
   const [hudHidden, setHudHidden] = useState(false);
   const hiddenBy = useRef<'manual' | 'idle'>('manual');
+  /* PLAN-083: below `mobileFitConfig.breakpointPx` the nav compacts to icon
+   * chips + an «Altro» overflow sheet (VF-1 resolved in the debate — the
+   * scroll variant was eliminated a priori: it violates the 44px invariant). */
+  const mobileFit = useMobileFit();
+  const mcfg = getMobileFitConfig();
+  const [navMoreOpen, setNavMoreOpen] = useState(false);
+  const navRootRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!navMoreOpen) return undefined;
+    const onDown = (event: Event) => {
+      const root = navRootRef.current;
+      if (root && event.target instanceof Node && !root.contains(event.target)) setNavMoreOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setNavMoreOpen(false);
+    };
+    window.addEventListener('pointerdown', onDown);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [navMoreOpen]);
+  useEffect(() => {
+    if (!mobileFit) setNavMoreOpen(false);
+  }, [mobileFit]);
   const reducedMotion = useRef(typeof window !== 'undefined' && (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false)).current;
   const slideMs = reducedMotion ? 0 : config.hudHide.slideMs;
   const fadeMs = Math.round(slideMs * 0.55);
@@ -301,80 +329,178 @@ export const GameFrame: React.FC<GameFrameProps> = ({
       ? `rotate(${config.roster.tiltDeg}deg) scale(${config.roster.scale})`
       : '';
 
-  const navContent = (
-    <nav aria-label={t('gameFrame.nav.ariaLabel')} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-      {navItems.map((item, index) => {
-        const isActive = item.id === activeNavId;
-        return (
-          <React.Fragment key={item.id}>
-          <HudTooltip label={t(item.labelKey)} hint={t('gameFrame.nav.locked')} side="top" wrap when={!!item.locked}>
-          <MatericButton
-            variant="secondary"
-            disabled={item.locked}
-            data-nav-id={item.id}
-            onClick={item.locked ? undefined : () => onNavSelect?.(item.id)}
-            aria-pressed={isActive}
-            aria-label={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : undefined}
+  const navTarget = mcfg.minTargetPx;
+  const navItemBtn = (item: GameFrameNavItemConfig, iconOnly: boolean) => {
+    const isActive = item.id === activeNavId;
+    return (
+      <HudTooltip key={item.id} label={t(item.labelKey)} hint={t('gameFrame.nav.locked')} side="top" wrap when={!!item.locked}>
+        <MatericButton
+          variant="secondary"
+          disabled={item.locked}
+          data-nav-id={item.id}
+          onClick={item.locked ? undefined : () => onNavSelect?.(item.id)}
+          aria-pressed={isActive}
+          aria-label={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : iconOnly ? t(item.labelKey) : undefined}
+          style={{
+            display: 'flex',
+            flexDirection: iconOnly ? 'row' : 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: iconOnly ? 0 : 3,
+            padding: iconOnly ? 0 : '6px 18px',
+            minWidth: iconOnly ? navTarget : 40,
+            minHeight: iconOnly ? navTarget : 40,
+            border: 'none',
+            borderRadius: 4,
+            background: isActive
+              ? 'linear-gradient(180deg, rgba(120,220,225,0.30) 0%, rgba(28,120,132,0.22) 55%, rgba(10,50,58,0.35) 100%)'
+              : 'transparent',
+            boxShadow: isActive
+              ? 'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 var(--skin-title-color, #f0cf6a), 0 0 14px rgba(64,190,200,0.25)'
+              : item.locked
+                ? 'inset 0 1px 2px rgba(0,0,0,0.6)'
+                : 'none',
+            opacity: 1,
+            position: 'relative',
+            fontSize: 'var(--skin-hud-caps-size)',
+            color: isActive ? 'var(--skin-title-color, #f0cf6a)' : item.locked ? 'var(--skin-text-secondary)' : undefined,
+          }}
+        >
+          <HudGlyph
+            iconId={item.icon}
+            label={t(item.labelKey)}
+            size={17}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 3,
-              padding: '6px 18px',
-              minWidth: 40,
-              minHeight: 40,
-              border: 'none',
-              borderRadius: 4,
-              // Active = prismatic glass; locked = incised into the lacquer, no badge.
-              background: isActive
-                ? 'linear-gradient(180deg, rgba(120,220,225,0.30) 0%, rgba(28,120,132,0.22) 55%, rgba(10,50,58,0.35) 100%)'
-                : 'transparent',
-              boxShadow: isActive
-                ? 'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 var(--skin-title-color, #f0cf6a), 0 0 14px rgba(64,190,200,0.25)'
+              color: isActive
+                ? 'var(--skin-title-color, #f0cf6a)'
                 : item.locked
-                  ? 'inset 0 1px 2px rgba(0,0,0,0.6)'
-                  : 'none',
-              // Locked = veiled, not dimmed: the text stays at the readable secondary colour (≥ 4.5:1 on the lacquer).
-              opacity: 1, // the disabled base style would dim the text again
-              position: 'relative',
-              fontSize: 'var(--skin-hud-caps-size)',
-              color: isActive ? 'var(--skin-title-color, #f0cf6a)' : item.locked ? 'var(--skin-text-secondary)' : undefined,
+                  ? 'var(--skin-text-secondary)'
+                  : 'var(--skin-icon-color, #dfb857)',
             }}
-          >
-            <HudGlyph
-              iconId={item.icon}
-              label={t(item.labelKey)}
-              size={17}
+          />
+          {!iconOnly && t(item.labelKey)}
+          {item.locked && (
+            <EngravedIcon
+              id="cmd-lock"
+              aria-hidden="true"
+              size="calc(var(--skin-hud-inline-gap) * 2)"
               style={{
-                color: isActive
-                  ? 'var(--skin-title-color, #f0cf6a)'
-                  : item.locked
-                    ? 'var(--skin-text-secondary)'
-                    : 'var(--skin-icon-color, #dfb857)',
+                position: 'absolute',
+                top: 'var(--skin-hud-control-gap)',
+                right: 'var(--skin-hud-inline-gap)',
+                color: 'var(--skin-label-primary)',
               }}
             />
-            {t(item.labelKey)}
-            {item.locked && (
-              <EngravedIcon
-                id="cmd-lock"
-                aria-hidden="true"
-                size="calc(var(--skin-hud-inline-gap) * 2)"
-                style={{
-                  position: 'absolute',
-                  top: 'var(--skin-hud-control-gap)',
-                  right: 'var(--skin-hud-inline-gap)',
-                  color: 'var(--skin-label-primary)',
+          )}
+        </MatericButton>
+      </HudTooltip>
+    );
+  };
+
+  /* Mobile branch (PLAN-083): icon-only 44×44 chips for `navPrimaryIds`
+   * (ordered per config, filtered to existing items) + «Altro» chip opening
+   * a sheet with the full labelled list. Deterministic budget is enforced
+   * by the config schema, not by measurement here. */
+  const navContent = mobileFit ? (
+    <div ref={navRootRef} style={{ position: 'relative' }}>
+      <nav aria-label={t('gameFrame.nav.ariaLabel')} style={{ display: 'flex', alignItems: 'center', gap: mcfg.navGapPx }}>
+        {mcfg.navPrimaryIds
+          .map((id) => navItems.find((it) => it.id === id))
+          .filter((it): it is GameFrameNavItemConfig => !!it)
+          .map((item) => navItemBtn(item, true))}
+        <MatericButton
+          variant="secondary"
+          data-nav-more=""
+          aria-label={t('gameFrame.nav.more')}
+          aria-expanded={navMoreOpen}
+          onClick={() => setNavMoreOpen((v) => !v)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0,
+            minWidth: navTarget,
+            minHeight: navTarget,
+            border: 'none',
+            borderRadius: 4,
+            background: 'transparent',
+          }}
+        >
+          <EngravedIcon id="cmd-panels" aria-hidden="true" size={18} />
+        </MatericButton>
+      </nav>
+      {navMoreOpen && (
+        <HudPlaque
+          shape="panel"
+          as="div"
+          role="menu"
+          aria-label={t('gameFrame.nav.more')}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: 'calc(100% + 10px)',
+            zIndex: 1100,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            padding: '12px 14px',
+            minWidth: 200,
+          }}
+        >
+          {navItems.map((item) => {
+            const isActive = item.id === activeNavId;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="menuitem"
+                disabled={item.locked}
+                data-nav-id={item.id}
+                aria-label={item.locked ? `${t(item.labelKey)} — ${t('gameFrame.nav.locked')}` : t(item.labelKey)}
+                onClick={() => {
+                  if (item.locked) return;
+                  onNavSelect?.(item.id);
+                  setNavMoreOpen(false);
                 }}
-              />
-            )}
-          </MatericButton>
-          </HudTooltip>
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  minHeight: navTarget,
+                  padding: '0 10px',
+                  border: 'none',
+                  borderRadius: 4,
+                  background: 'transparent',
+                  color: isActive ? 'var(--skin-title-color, #f0cf6a)' : 'var(--skin-text-secondary)',
+                  fontFamily: 'var(--skin-font-display)',
+                  fontSize: 'var(--skin-hud-caps-size)',
+                  opacity: item.locked ? 0.55 : 1,
+                  cursor: item.locked ? 'default' : 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <HudGlyph iconId={item.icon} label={t(item.labelKey)} size={17} />
+                {t(item.labelKey)}
+              </button>
+            );
+          })}
+        </HudPlaque>
+      )}
+    </div>
+  ) : (
+    <nav aria-label={t('gameFrame.nav.ariaLabel')} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      {navItems.map((item, index) => {
+        return (
+          <React.Fragment key={item.id}>
+          {navItemBtn(item, false)}
           {index === 1 && recenterSlot}
           </React.Fragment>
         );
       })}
     </nav>
   );
+
 
   return (
     <SkinScope
@@ -447,9 +573,9 @@ export const GameFrame: React.FC<GameFrameProps> = ({
             right: 0,
             zIndex: z.chrome,
             display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)',
+            gridTemplateColumns: mobileFit ? 'minmax(0, 1fr) minmax(0, auto)' : 'minmax(0, 1fr) auto minmax(0, 1fr)',
             columnGap: 12,
-            padding: '0 20px',
+            padding: 'env(safe-area-inset-top, 0px) 20px 0',
             alignItems: 'start',
             pointerEvents: 'none',
             ...chromeZoom,
@@ -459,16 +585,21 @@ export const GameFrame: React.FC<GameFrameProps> = ({
           {/* HUD-3 = P1 (R-234): three DETACHED tabs — time · what's next · resources. The menu left this
            *  row (icon in the bottom-right cluster, Esc opens it); the sky between the tabs stays map. */}
           <div style={{ justifySelf: 'start', alignSelf: 'stretch', minWidth: 0, pointerEvents: 'auto', display: 'flex', alignItems: 'stretch', gap: 10 }}>
-            <HudPlaque shape="hang" as="section" style={{ padding: '10px 20px 10px', display: 'flex', alignItems: 'center' }}>
+            <HudPlaque shape="hang" as="section" style={{ padding: mobileFit ? '8px 12px' : '10px 20px 10px', display: 'flex', alignItems: 'center' }}>
               {whenWhereSlot}
             </HudPlaque>
-            {objectiveSlot != null && <div style={{ alignSelf: 'flex-start' }}>{objectiveSlot}</div>}
+            {/* PLAN-083: secondary top-row tabs move off the strip on mobile-fit —
+             *  objective/next are reachable through the village/quest surfaces;
+             *  only the when-where plaque and the compact resources stay. */}
+            {objectiveSlot != null && !mobileFit && <div style={{ alignSelf: 'flex-start' }}>{objectiveSlot}</div>}
           </div>
-          <div style={{ justifySelf: 'center', minWidth: 0, maxWidth: '100%', pointerEvents: 'none', display: 'flex', alignItems: 'flex-start' }}>{nextSlot}</div>
+          {!mobileFit && (
+            <div style={{ justifySelf: 'center', minWidth: 0, maxWidth: '100%', pointerEvents: 'none', display: 'flex', alignItems: 'flex-start' }}>{nextSlot}</div>
+          )}
           <HudPlaque
             shape="hang"
             as="section"
-            style={{ justifySelf: 'end', maxWidth: '100%', display: 'flex', alignItems: 'center', padding: '10px 22px 10px', pointerEvents: 'auto', alignSelf: 'stretch' }}
+            style={{ justifySelf: 'end', maxWidth: '100%', display: 'flex', alignItems: 'center', padding: mobileFit ? '8px 12px' : '10px 22px 10px', pointerEvents: 'auto', alignSelf: 'stretch' }}
           >
             <div style={{ minWidth: 0, overflow: 'hidden' }}>{resourcesSlot}</div>
           </HudPlaque>
@@ -549,7 +680,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
         <HudPlaque
           shape="plinth"
           as="div"
-          style={{ position: 'absolute', bottom: 0, left: '50%', zIndex: z.chrome, padding: '20px 40px 8px', ...chromeZoom, ...slideChrome('down', 'translateX(-50%)') }}
+          style={{ position: 'absolute', bottom: 0, left: '50%', zIndex: z.chrome, padding: '20px 40px 8px', paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))', ...chromeZoom, ...slideChrome('down', 'translateX(-50%)') }}
         >
           {navContent}
         </HudPlaque>
@@ -576,7 +707,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
 
       {/* ── Bottom-right: utility controls, and the pearl that stays when the rest is hidden ── */}
       {/* Last in the DOM on purpose: Tab reaches the corner utilities after the top bar and the nav (R-234, T-A14). */}
-      <div data-hud-corner="" style={{ position: 'absolute', bottom: inset + 8, right: inset + 8, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8, ...chromeZoom }}>
+      <div data-hud-corner="" style={{ position: 'absolute', bottom: `calc(${inset + 8}px + env(safe-area-inset-bottom, 0px))`, right: `calc(${inset + 8}px + env(safe-area-inset-right, 0px))`, zIndex: z.chrome, display: 'flex', alignItems: 'flex-end', gap: 8, ...chromeZoom }}>
         {menuSlot != null && <div style={slideChrome('down')}>{menuSlot}</div>}
         {utilitySlot != null && <div style={slideChrome('down')}>{utilitySlot}</div>}
         <HudHideToggle hidden={hudHidden} onToggle={toggleHud} />

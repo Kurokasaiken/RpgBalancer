@@ -67,7 +67,7 @@ import { DEFAULT_QUEST_THEATRE_FX, type QuestTheatreFxConfig } from '@/balancing
 import { availableOptions, beltItemStatuses, currentExposure, nextCombatHits, nodesFor, previewArmedActionItems, previewOption, type QuestRunState, type ResolvedCheck } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { useBeatCursor, type BeatTiming, type HarmBeat, type QuestBeat } from '@/ui/idleVillage/questS1Lab/beatSequencer';
-import { publishCheckBridge, type QuestCheckOverlayHandle } from '@/ui/idleVillage/questS1Lab/questRunStore';
+import { checkEventOf, isStaleCheckEvent, publishCheckBridge, type QuestCheckOverlayHandle } from '@/ui/idleVillage/questS1Lab/questRunStore';
 import { QuestCheckOptionsPanel, type QuestCheckOptions } from './QuestCheckOptionsPanel';
 import { QuestJourneyPhaseStrip } from './QuestJourneyPhaseStrip';
 import type { Verdict } from '@/ui/idleVillage/questS1Lab/questScenario';
@@ -346,8 +346,20 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
    *  it fills on mount (skipToResult / throwNow). */
   const checkHandleRef = useRef<QuestCheckOverlayHandle | null>(null);
   const astroShownFor = useCallback(
-    (b: QuestBeat | null | undefined) => b?.kind === 'check' && !checkOpts.skipCheck,
-    [checkOpts.skipCheck],
+    (b: QuestBeat | null | undefined) => {
+      if (!b || b.kind !== 'check' || checkOpts.skipCheck) return false;
+      /* Presenter parity: both astrolabe presenters (right-wing column and
+       * centred overlay) mount ONLY for a live check event — the same
+       * `checkEventOf`/`isStaleCheckEvent` gate. A check the run already
+       * dismissed (`checkSeq <= run.dismissedUpTo` — hydration reabsorbs
+       * settled checks, a mid-run outcome dismissal raises the mark) can
+       * never paint a presenter, so holding its beat would deadlock the
+       * cursor until `checkHoldMs` with `progress()` no-op on a null handle.
+       * Let it flow as an ordinary timed beat instead. */
+      const evt = checkEventOf(run, b.check);
+      return Boolean(evt) && !isStaleCheckEvent(evt, run);
+    },
+    [checkOpts.skipCheck, run],
   );
   const beatCursor = useBeatCursor(queuedBeats, beatTiming, { reducedMotion, hold: astroShownFor, cursorRef: beatCursorRef });
   const presenting = beatCursor.current !== null;
@@ -1523,15 +1535,12 @@ const CombatStrip: React.FC<{
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 999,
-                fontFamily: FONT.display,
-                fontSize: 8,
-                lineHeight: 1,
                 background: i < run.goblinLeft ? TONE.danger : 'transparent',
                 border: `1px solid ${i < run.goblinLeft ? TONE.danger : 'color-mix(in srgb, var(--skin-text-muted) 55%, transparent)'}`,
                 color: 'color-mix(in srgb, var(--skin-text-muted) 70%, transparent)',
               }}
             >
-              {i < run.goblinLeft ? '' : '✕'}
+              {i < run.goblinLeft ? null : <EngravedIcon id="cmd-close" size={7} />}
             </span>
           ))}
         </span>

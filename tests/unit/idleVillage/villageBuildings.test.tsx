@@ -31,6 +31,9 @@ import {
   type VillageCostResource,
 } from '@/ui/idleVillage/components/gameFrame/villageBuildingIcons';
 
+/* jsdom has no matchMedia (VillageScreenView reads (pointer: coarse) via useCoarsePointer). */
+window.matchMedia = ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })) as unknown as typeof window.matchMedia;
+
 const CFG = VILLAGE_BUILDINGS_CONFIG;
 const PAINTED = CFG.buildings.filter(hasFootprint);
 const ASPECT = VILLAGE_CANVAS.widthPx / VILLAGE_CANVAS.heightPx;

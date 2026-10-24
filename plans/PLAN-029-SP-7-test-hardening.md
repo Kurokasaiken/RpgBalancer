@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-029 SP-7 — Test hardening & Playwright smoke'
-status: candidate
+status: active
 created: 2026-10-12
 parent: PLAN-029
 debate: mw-web-debate `20261012-quest-gen-lab-sp7-test-hardening` — artifact

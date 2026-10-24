@@ -156,9 +156,9 @@ describe('VillageRosterSectionSkin', () => {
     render(<VillageRosterSectionSkin {...defaultProps} />);
 
     expect(trackTelemetryEvent).toHaveBeenCalledWith('village_roster_skin_rendered', {
-      skinPresetId: 'minimal_frontier',
+      skinPresetId: 'base',
       pillar: 'frontier',
-      componentTheme: 'minimal_frontier.roster.frontier',
+      componentTheme: 'base.roster.frontier',
       residentCount: 1,
       componentId: 'test-roster',
       hasControls: false,
@@ -230,9 +230,9 @@ describe('VillageRosterSectionSkin', () => {
     render(<VillageRosterSectionSkin {...defaultProps} residents={[]} />);
 
     expect(trackTelemetryEvent).toHaveBeenCalledWith('village_roster_skin_rendered', {
-      skinPresetId: 'minimal_frontier',
+      skinPresetId: 'base',
       pillar: 'frontier',
-      componentTheme: 'minimal_frontier.roster.frontier',
+      componentTheme: 'base.roster.frontier',
       residentCount: 0,
       componentId: 'test-roster',
       hasControls: false,
@@ -251,9 +251,9 @@ describe('VillageRosterSectionSkin', () => {
     );
 
     expect(trackTelemetryEvent).toHaveBeenCalledWith('village_roster_skin_rendered', {
-      skinPresetId: 'minimal_frontier',
+      skinPresetId: 'base',
       pillar: 'frontier',
-      componentTheme: 'minimal_frontier.roster.frontier',
+      componentTheme: 'base.roster.frontier',
       residentCount: 1,
       componentId: 'test-roster',
       hasControls: false,
@@ -275,9 +275,9 @@ describe('VillageRosterSectionSkin', () => {
       );
 
       expect(trackTelemetryEvent).toHaveBeenCalledWith('village_roster_skin_rendered', {
-        skinPresetId: 'minimal_frontier',
+        skinPresetId: 'base',
         pillar,
-        componentTheme: `minimal_frontier.roster.${pillar}`,
+        componentTheme: `base.roster.${pillar}`,
         residentCount: 1,
         componentId: 'test-roster',
         hasControls: false,

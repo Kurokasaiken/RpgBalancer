@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from 'react';
 import { getHudZoomFactor } from './hudScale';
+import { getMobileFitConfig } from '@/balancing/config/idleVillage/mobileFitConfig';
+import { useMobileFit } from '@/hooks/useMobileFit';
 
 /**
  * Lets the player move a HUD panel by its title bar: spread `handleProps` on the header
@@ -77,7 +79,14 @@ export interface HudPanelDragOptions {
 }
 
 export function useHudPanelDrag(options?: HudPanelDragOptions) {
-  const disabled = options?.disabled ?? false;
+  /* PLAN-083 sheet mode: below `mobileFitConfig.breakpointPx` with
+   * `panelMode: 'sheet'` the floating grammar collapses to a full-bleed
+   * sheet — drag is inert, the shell is pinned to the viewport, and the
+   * committed offset is cleared so a desktop drag transform never leaks
+   * into the sheet (persistence decoupled by construction: offsets were
+   * never persisted — session state only). */
+  const sheetMode = useMobileFit() && getMobileFitConfig().panelMode === 'sheet';
+  const disabled = (options?.disabled ?? false) || sheetMode;
   /* Committed offset: React state, applied through `panelStyle`. It changes only on
    * drag start/end and on double-click reset, never per pointermove. */
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -100,6 +109,9 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
 
   const onPointerDown = useCallback(
     (event: PointerEvent<HTMLElement>) => {
+      // Inert in sheet mode / disabled: a drag that starts but can never move
+      // would eat the tap and leave `dragging` latched.
+      if (disabled) return;
       if ((event.target as HTMLElement).closest('button, select, input, label, a')) return;
       event.preventDefault();
       event.stopPropagation();
@@ -138,7 +150,7 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
         /* window listeners below still track the pointer */
       }
     },
-    [shellRef],
+    [shellRef, disabled],
   );
 
   useEffect(() => {
@@ -230,7 +242,24 @@ export function useHudPanelDrag(options?: HudPanelDragOptions) {
 
   // No `zIndex` key unless dragging: spreading `zIndex: undefined` over a panel's own
   // style would erase its layer and drop it under the HUD chrome.
-  const panelStyle: CSSProperties = disabled
+  // Sheet mode (PLAN-083): the panel becomes a full-bleed sheet pinned to the
+  // viewport — fixed inset, no transform, drag inert. Callers must spread
+  // `panelStyle` LAST so it overrides their own anchored geometry.
+  const panelStyle: CSSProperties = sheetMode
+    ? {
+        position: 'fixed',
+        inset: 0,
+        transform: 'none',
+        width: 'auto',
+        height: 'auto',
+        maxWidth: '100vw',
+        maxHeight: '100dvh',
+        margin: 0,
+        zIndex: 1200,
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
+      }
+    : disabled
     ? {}
     : dragging
     ? { transform: `translate(${offset.x}px, ${offset.y}px)`, zIndex: 1000 }

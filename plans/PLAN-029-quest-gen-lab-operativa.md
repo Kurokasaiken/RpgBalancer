@@ -1,7 +1,10 @@
 ---
 title: 'PLAN-029 — Quest Generation Lab «completamente operativa»: pick → generate → validate → play → iterate → export'
-status: candidate
+status: active
 created: 2026-10-12
+ratified: 2026-10-23 (Director ruling — AMEND-THEN-RATIFY, dibattito mw-web-debate
+  `20261023-plan029-ratifica` converged 4/4 su artifact r003 sha256 `6f330e22…240c`;
+  claude escluso adapter_dead. Emendamenti in §7 — disposizione PLAN-069 T-030)
 desiderata: v24 + deroga S5 (PLAN-026); intento operativo Director R-142
 request: R-142 (base: R-140 — pagina lab creata)
 parent: PLAN-026 (sistema di generazione quest)
@@ -12,12 +15,15 @@ documentation_impact: REQUIRED — context/QUEST_GENERATION_* da aggiornare dove
 # PLAN-029 — Quest Generation Lab operativa (master plan, artifact r003 converged)
 
 Progetto: RpgBalancer
-Stato: **candidate** — master plan convergente via mw-web-debate
-`20261012-quest-gen-lab-operativa` (artifact r003, sha256
-`938ac671…afd9`). Voti: chatgpt ACCEPT (T-017), gemini ACCEPT (T-018),
-deepseek CONCEDE (T-015, caveat assorbiti in r002/r003), grok
-provider_dead (capacity-limited; ultima posizione valida CONCEDE su
-r001, nessuna obiezione aperta vs r003). In attesa di ratifica Director.
+Stato: **active** — ratificato dal Director il 2026-10-23 con il verdict
+AMEND-THEN-RATIFY del dibattito di revisione
+`20261023-plan029-ratifica` (converged 4/4, artifact r003 sha256
+`6f330e22…240c`; claude escluso per adapter_dead). Master plan originale
+converged via mw-web-debate `20261012-quest-gen-lab-operativa` (artifact
+r003, sha256 `938ac671…afd9`). Voti originali: chatgpt ACCEPT (T-017),
+gemini ACCEPT (T-018), deepseek CONCEDE (T-015, caveat assorbiti in
+r002/r003), grok provider_dead (capacity-limited; ultima posizione valida
+CONCEDE su r001, nessuna obiezione aperta vs r003).
 Obiettivo: trasformare `/quest-generation-lab` da viewer su 5 scenari
 baked in un loop di authoring chiuso — **pick → generate → validate →
 play → iterate → export** — sul motore canonico, config-first,
@@ -214,6 +220,56 @@ generate → validation report (hard: schema+grafo; diagnostico:
 hook+vocab+MC con soglie in config) → play fino a esito terminale →
 export candidato versionato → re-import e re-parse» — coperto da unit
 test (incl. failure path) più un path smoke Playwright.
+
+## 7. Emendamenti di ratifica (ruling Director 2026-10-23)
+
+Registrati come update del piano, non riscrittura di r003. Prodotti dal
+dibattito di revisione `20261023-plan029-ratifica` sui delta
+2026-10-12 → 2026-10-23 (D1 pipeline narrativa irrobustita; D2 `fase` +
+journey-DAG validator; D3 terza istanza imprint-compiled; D4 metaLayer;
+D5 disposizione PLAN-069). Artifact: `.mw/runs/20261023-plan029-ratifica/artifact-r003.md` (repo mind-weaver).
+
+**AMEND-1 — SP-3 gate inventory re-baseline (delta D1).** Il gate
+inventory di SP-3 va ri-derivato sulla copy pipeline attuale
+(`validateCopy` ~+600 linee, `arcContract` nuovo, `narrationPrompt`/
+`sceneBrief` riscritti, `domainVocabs` estesi): ogni nuovo check
+deterministico va enumerato e classificato PASS/FAIL/WARNING
+esplicitamente. La policy r003 resta immutata: i diagnostici non
+bloccano il run entry in v1; la promozione a bloccante resta
+decisione solo-Director.
+
+**AMEND-2 — fase/journey + generation-surface audit (delta D2+D3).**
+(a) L'audit di SP-1 si estende a: campo `fase`, modulo
+`validateQuestJourneyDag`, config journey-fasi dei POI, E alla
+provenienza per-entry che registra per ogni voce di catalogo il
+**meccanismo di riproduzione** (registry-generate / imprint-compile /
+narrate-only) **più l'evidenza di verifica che sostituisce
+l'equivalenza-per-rigenerazione in quella classe**: registry →
+rigenera + confronta output hash; imprint → ricompila da imprint +
+parametri registrati + confronta hash; narrated → uguaglianza strutturale
+sola, mai copy equality (regola r003 esistente); input di rigenerazione
+ignoti → classificato `verification-not-claimable`, riportato onestamente.
+Registrare solo il meccanismo non soddisfa l'invariante di
+riproducibilità-verificata.
+(b) Classificazione journey-DAG (fatto verificato su codice):
+`validateQuestJourneyDag` consuma config journey POI (pins, travelDays,
+ticksPerDay) — valida una coppia scenario×POI, quindi NON può essere
+hard gate di run-entry nel lab (gli scenari standalone non hanno POI).
+Gate al seam export/targeting POI (SP-6) + diagnostico opzionale SP-3
+quando un POI target è dichiarato.
+(c) Il freshness claim dei report SP-6 è esplicito sullo scope: un
+content hash di scenario certifica solo la validità scenario-intrinseca;
+la compatibilità POI è o dentro l'identità di validazione del report o
+esplicitamente fuori dal suo claim.
+
+**Non emendato** (verificato, nessun intervento): D4 metaLayer (nessun
+contratto di ingest per envelope quest); D5 governance (questa ratifica
+È la disposizione PLAN-069 T-030); conteggi catalogo (provenienza
+per-entry assorbe); smoke Playwright SP-7 (infrastruttura sana).
+
+Subplan toccati: **SP-1** (scope audit), **SP-3** (gate inventory),
+**SP-6** (gate export-seam + freshness scope). Gli altri subplan
+converged non richiedono modifiche.
 
 ## Processo
 

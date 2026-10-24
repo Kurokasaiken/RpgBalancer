@@ -24,6 +24,14 @@ invariants:
       (PLAN-067 T-A12)
     test_refs:
       - tests/unit/idleVillage/worldSurfaceEventCard.armed.test.tsx
+  - id: world-surface-event-card.INV-2
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      CTA scalata sotto 32px: applicare actionStyle minHeight = ceil(32/cardScale) (Sentinel small-target S0/S1, run
+      0829)
+    test_refs: 
+      - tests/unit/idleVillage/worldSurfaceEventCard.armed.test.tsx
 ---
 # world-surface-event-card
 

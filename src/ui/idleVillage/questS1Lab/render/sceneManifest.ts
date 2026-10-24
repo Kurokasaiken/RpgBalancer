@@ -47,6 +47,9 @@ export const AmbientFxSchema = z.discriminatedUnion('type', [
     type: z.literal('embers'),
     at: z.tuple([z.number(), z.number()]),
     count: z.number().int().min(1).max(10).default(5),
+    /** Particle/rise scale vs the default — distant fires need small
+     *  sparks (Director: "particelle non proporzionali alle fiamme"). */
+    size: z.number().positive().max(3).default(1),
   }),
   z.object({
     type: z.literal('drift'),
@@ -105,6 +108,30 @@ export const AmbientFxSchema = z.discriminatedUnion('type', [
     a: z.number().min(0).max(0.4).default(0.1),
     color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#fff2cc'),
   }),
+  z.object({
+    type: z.literal('leaves'),
+    /** Fall window in img-fraction y (top spawn → bottom fade). */
+    band: z.tuple([z.number().min(0).max(1), z.number().min(0).max(1)]),
+    /** Optional x window (defaults to the whole width). */
+    xband: z.tuple([z.number().min(0).max(1), z.number().min(0).max(1)]).default([0, 1]),
+    count: z.number().int().min(1).max(40).default(12),
+    /** Fall speed multiplier — leaves are slow and flutter sideways. */
+    speed: z.number().min(0.2).max(3).default(1),
+    a: z.number().min(0).max(1).default(0.8),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#c99b46'),
+  }),
+  z.object({
+    type: z.literal('rain'),
+    /** Fall window in img-fraction y. */
+    band: z.tuple([z.number().min(0).max(1), z.number().min(0).max(1)]),
+    count: z.number().int().min(4).max(120).default(60),
+    /** Slant of the streaks (x drift per fall, img-fraction). */
+    lean: z.number().min(-0.3).max(0.3).default(0.08),
+    /** Fall speed multiplier. */
+    speed: z.number().min(0.3).max(4).default(1),
+    a: z.number().min(0).max(0.8).default(0.35),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#b8ccd8'),
+  }),
 ]);
 export type AmbientFx = z.infer<typeof AmbientFxSchema>;
 
@@ -162,12 +189,13 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
   'sentiero-tracce': {
     depth: '/assets/depth/sentiero-tracce.webp',
     depthWidth: 1584,
-    depthHeight: 672,
-    imgAspect: 3168 / 1344,
-    /* discovery — creep onto the white rag marker on the right-hand twig. */
+    depthHeight: 660,
+    imgAspect: 3168 / 1320,
+    /* discovery — creep onto the amber lights deep in the treeline
+     * (v2 2026-10-24: replaced wheel-rut art; the camp is foreshadowed). */
     entrance: 'enter-creep',
     pose: 'pose-watch',
-    focusAnchor: [0.62, 0.56],
+    focusAnchor: [0.6, 0.47],
     /* Forest path — ground fog belongs here (Director: "la nebbia deve
      * essere in sentiero tracce, non in foresta agguato"). Pooled by the
      * scene's depth mask, not a suspended band. */
@@ -175,6 +203,15 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
     ambient: [
       { type: 'dust', count: 16 },
       { type: 'drift', band: [0.45, 0.62], count: 3, speed: 0.01, a: 0.12, color: '#dfe8e2' },
+      /* Painted amber lights deep in the treeline = the camp
+       * foreshadowed — glint twinkles on the sources, fireflies in
+       * the dark lower band of the left wall. */
+      { type: 'glint', at: [0.598, 0.47], period: 5, r: 0.006 },
+      { type: 'glint', at: [0.622, 0.45], period: 7, r: 0.005 },
+      { type: 'glint', at: [0.655, 0.48], period: 9, r: 0.005 },
+      { type: 'fireflies', band: [0.55, 0.75], xband: [0.05, 0.45], count: 5 },
+      /* The forest breathes: sparse leaves dropping through the canopy. */
+      { type: 'leaves', band: [0.08, 0.85], xband: [0.15, 0.95], count: 9 },
     ],
   },
   'carro-nascosto': {
@@ -209,6 +246,10 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'smoke', at: [0.552, 0.6], count: 5, lean: 0.14 },
       { type: 'smoke', at: [0.44, 0.56], count: 3, lean: 0.1 },
       { type: 'embers', at: [0.555, 0.62], count: 5 },
+      /* Dusk fireflies over the treeline behind the camp + a dull
+       *  twinkle on the hanging cookware by the tripod. */
+      { type: 'fireflies', band: [0.3, 0.42], xband: [0.15, 0.85], count: 6 },
+      { type: 'glint', at: [0.47, 0.6], period: 8, r: 0.006 },
       { type: 'dust', count: 8 },
     ],
   },
@@ -245,9 +286,11 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
     pose: 'pose-tense',
     focusAnchor: [0.5, 0.66],
     /* Canyon chase at speed — no fog, no drifting cloud (Director OB-8:
-     * "la nebbia non sta bene in tutte le scene — fuga no"). */
+     * "la nebbia non sta bene in tutte le scene — fuga no"). Same
+     * ruling holds the ambient list thin: dust kicked by the run is
+     * the only "life" a pursuit wants. */
     atmosphere: [],
-    ambient: [{ type: 'dust', count: 10 }],
+    ambient: [{ type: 'dust', count: 14 }],
   },
   saccheggio: {
     depth: '/assets/depth/saccheggio.webp',
@@ -280,11 +323,23 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
     /* Narrative focal: the trail vanishing into the forest wall —
      * the direction of the whole leg. */
     focusAnchor: [0.55, 0.55],
+    /* Dawn sky band is wide — but the clouds are PAINTED, so runtime
+     *  cloud-sky was pulled (Director ruling: sprite kits cannot
+     *  occlude behind near planes; a flat cloud crossing the gate
+     *  posts reads as fog on the frame). ampMul halved: wide sky +
+     *  near gate posts read too fast at full warp. */
+    ampMul: 0.6,
     atmosphere: [],
     ambient: [
       /* Ember lantern still burning on the left gate post. */
       { type: 'glow', at: [0.185, 0.46], r: 0.05, color: '#ffb050', a: 0.4, flicker: 0.45 },
       { type: 'embers', at: [0.185, 0.46], count: 3 },
+      { type: 'moths', at: [0.185, 0.46], r: 0.03, count: 3 },
+      /* Hinge/chain hardware catching the dawn on the right gate post. */
+      { type: 'glint', at: [0.78, 0.47], period: 7, r: 0.007 },
+      /* Morning rays spilling through the gate arch onto the road —
+       *  alpha raised after Director pass (0.10 was invisible). */
+      { type: 'shaft', from: [0.42, 0.06], to: [0.5, 0.5], width: 0.16, count: 4, a: 0.15, color: '#ffe9b8' },
       { type: 'dust', count: 12 },
       /* High cloud drift over the peaks. */
       { type: 'drift', band: [0.02, 0.28], count: 3, speed: 0.01, a: 0.07, color: '#e8e2d0' },
@@ -298,11 +353,34 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
     /* journey home — the village valley at sunset; same sweep, mirrored. */
     entrance: 'enter-sweep',
     pose: 'pose-rest',
+    ampMul: 0.65,
     /* Narrative focal: the village below — home, the end of the road. */
     focusAnchor: [0.6, 0.62],
     atmosphere: [],
     ambient: [
       /* Shrine ember on the right frame edge + village chimney smoke. */
+      { type: 'glow', at: [0.865, 0.365], r: 0.05, color: '#ffb050', a: 0.4, flicker: 0.3 },
+      { type: 'moths', at: [0.865, 0.365], r: 0.03, count: 3 },
+      { type: 'glint', at: [0.85, 0.4], period: 6, r: 0.007 },
+      /* Sunset fireflies along the pines' dark line, left of the road. */
+      { type: 'fireflies', band: [0.42, 0.55], xband: [0.1, 0.4], count: 5 },
+      { type: 'smoke', at: [0.55, 0.42], count: 4, lean: 0.1 },
+      { type: 'smoke', at: [0.6, 0.44], count: 3, lean: 0.12 },
+      { type: 'dust', count: 10 },
+    ],
+  },
+  /* Lab A/B twin of viaggio-ritorno — pre-boost ambient set (Director:
+   *  "prima e dopo" on the same painting). */
+  'viaggio-ritorno-prev': {
+    depth: '/assets/depth/viaggio-ritorno.webp',
+    depthWidth: 1584,
+    depthHeight: 660,
+    imgAspect: 3168 / 1320,
+    entrance: 'enter-sweep',
+    pose: 'pose-rest',
+    focusAnchor: [0.6, 0.62],
+    atmosphere: [],
+    ambient: [
       { type: 'glow', at: [0.865, 0.365], r: 0.05, color: '#ffb050', a: 0.4, flicker: 0.3 },
       { type: 'smoke', at: [0.55, 0.42], count: 3, lean: 0.1 },
       { type: 'smoke', at: [0.6, 0.44], count: 2, lean: 0.12 },
@@ -325,6 +403,56 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 12 },
       /* Low warm haze drifting over the sunlit path (band in img fractions). */
       { type: 'drift', band: [0.62, 0.9], count: 3, speed: 0.008, a: 0.07, color: '#e8d9b0' },
+    ],
+  },
+  /* ---- PLAN-052 flagship candidate: f3-gola-dusk (brief §6b shot
+   *  grammar; anchors measured on the baked raster, 2026-10-23). The
+   *  maximum-coherent-stack showcase: 11 runtime layers on one painted
+   *  funnel — the gorge walls carry the parallax, the far glow is the
+   *  push-in target. */
+  'gola-raider': {
+    depth: '/assets/depth/gola-raider.webp',
+    depthWidth: 1584,
+    depthHeight: 660,
+    imgAspect: 3168 / 1320,
+    /* shot grammar (brief §6b): discovery entrance converging on the
+     * enemy glow, then the push the funnel was composed for. */
+    entrance: 'enter-creep',
+    camera: 'push-in',
+    pose: 'pose-watch',
+    /* Narrative focal: the far campfire glow where the gorge bends. */
+    focusAnchor: [0.68, 0.6],
+    /* The near masses cover ~half the frame — halve the warp amplitude
+     *  so the idle drift reads as breath, not swim (Director pass). */
+    ampMul: 0.55,
+    atmosphere: ['fog-gorge', 'cloud-shadow'],
+    ambient: [
+      /* Far campfire — the destination. Small: it's a mile away, and
+       *  its sparks must live at the painted flame's own scale. */
+      { type: 'glow', at: [0.68, 0.6], r: 0.035, color: '#ffb050', a: 0.55, flicker: 0.5 },
+      { type: 'embers', at: [0.68, 0.585], count: 3, size: 0.4 },
+      { type: 'smoke', at: [0.68, 0.575], count: 2, lean: 0.08 },
+      /* Trail torch on the rocky spur — mid-depth waymark. Anchors
+       *  re-measured on the raster (Gemini video pass): the painted
+       *  flame's luminous core sits at ~(0.567, 0.505) — a glow pinned
+       *  low-left read as a detached halo smudge. */
+      { type: 'glow', at: [0.567, 0.508], r: 0.02, color: '#ffcc66', a: 0.6, flicker: 0.55 },
+      /* Single ember: on a point emitter the seeded phases can cluster
+       *  and the sparks read as one pile (Director pass). */
+      { type: 'embers', at: [0.567, 0.5], count: 1, size: 0.55 },
+      { type: 'moths', at: [0.567, 0.505], r: 0.025, count: 3 },
+      /* Fireflies along the mossy base of the left wall (behind the
+       * ledge — v1 anchor moved after the bottom occluder landed). */
+      { type: 'fireflies', band: [0.42, 0.58], xband: [0.1, 0.32], count: 6 },
+      /* Water glints riding the stream diagonal. */
+      { type: 'glint', at: [0.6, 0.82], period: 5, r: 0.009 },
+      { type: 'glint', at: [0.52, 0.71], period: 6.5, r: 0.007 },
+      { type: 'glint', at: [0.64, 0.65], period: 4, r: 0.006 },
+      /* The dusk shaft the generator painted in v1 — now runtime-owned,
+       * falling from the sky wedge into the gorge. Alpha raised after
+       * the video pass: 0.07 read as a barely-there line, not a beam. */
+      { type: 'shaft', from: [0.58, 0.04], to: [0.6, 0.52], width: 0.16, count: 4, a: 0.13, color: '#ffe9b8' },
+      { type: 'dust', count: 10 },
     ],
   },
 });

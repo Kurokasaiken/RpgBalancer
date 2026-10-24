@@ -212,7 +212,14 @@ function DragTestContainer({
   const [isRosterCollapsed, setIsRosterCollapsed] = useState(false);
   const isInlineLayout = layout === 'inline';
   const isGridLayout = layout === 'grid';
-  const listMaxHeightPx = listMaxHeight ?? (isInlineLayout ? 184 : 400);
+  /* drag-test-container.INV-1 (T-A5 rule, R-270): the fold must land on a
+   * card boundary — round the cap DOWN to a multiple of the row pitch (the
+   * pitch already includes the inter-card gap, so the fold lands inside a
+   * gap). The raw 184px default cut the 6th compact row (Sentinel S6). */
+  const listMaxHeightPx = Math.max(
+    itemPitchPx,
+    Math.floor((listMaxHeight ?? (isInlineLayout ? 184 : 400)) / itemPitchPx) * itemPitchPx,
+  );
 
   // Initialize diagnostics logger
   const diagnostics = createSandboxDiagnostics('DragTestContainer', 'drag-test-container');

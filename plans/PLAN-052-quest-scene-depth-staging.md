@@ -34,6 +34,32 @@ eye-check witness rule), not a plan task.
   disposition-footer wording, the T-005a calibration task, existential
   wording in the anchor predicate, FoR-T2I inline citation, calibration
   flag-rate note.
+- **2026-10-23 (PLAN-080/R-272, pre-baptism hygiene):** new contract item
+  10 — the fenced prompt block is a painterly kernel written per the R9
+  rules in `scene_prompt_authoring_guide.md` (medium-first, register ban
+  REG-CAM/REG-NUM, style floor, negation-bulk warn, no `<!-- AUTHOR:`
+  markers); items 1–8 stay engineering, the prompt translates them into
+  visual terms. Root cause: `f3-accampamento-dusk` v1 wrote §7 in brief
+  register and lost the impasto style.
+- **2026-10-23 (T-005a first empirical candidate):** `f3-accampamento-dusk`
+  generated candidate scored against the bound rubric → three contract
+  gaps found: (a) no scorecard criterion covered **generator artifacts**
+  — a visible app-applied watermark survived every clause (`NO
+  watermarks` in the prompt cannot remove a post-processing overlay);
+  (b) staging clauses named zones but not **composition dynamics** —
+  the candidate passed planes/anchors yet read flat: near-mirror
+  symmetry despite `NO symmetry`, a single-shelf midground of same-size
+  tents, no diagonal lead, no declared value ladder; (c) edge masses
+  framed from outside instead of intruding into the frame. Amendments
+  folded into clause 2 (composition dynamics sub-clauses) and clause 8
+  (artifact veto, scored before all criteria). Flagship candidacy moved
+  to `f3-gola-dusk`; accampamento-dusk retained as calibration record.
+  Second empirical pass on the `gola-dusk` candidate (bake stage 2):
+  funnel geometry confirmed in the map but walls bake as smooth
+  gradients, not plateaus — parallax present yet soft; painted light
+  shaft found (kill-list gap, folded into item 8); Director raised the
+  missing **shot-grammar declaration** → new item 11, composition must
+  declare the camera grammar it serves.
 
 ## Intent
 
@@ -82,7 +108,15 @@ names:
 1. **Beat and focal subject** — one focal feature; what the player reads
    first.
 2. **Depth staging** — near / focal / far zones as *named visible masses*
-   with scale + overlap + contrast cues (synthesis §2.1).
+   with scale + overlap + contrast cues (synthesis §2.1). Composition
+   dynamics (T-005a calibration — accampamento-dusk passed staging yet
+   read flat): the brief declares (a) one **diagonal lead** — a named
+   path, stream, or edge entering from a frame edge and receding toward
+   the focal subject; (b) a **staggered midground** — at least three
+   distinct depth steps inside the focal zone, never a single parallel
+   shelf of same-size elements; (c) a **value ladder** — declared tonal
+   steps near→far; (d) **asymmetric balance** stated positively (which
+   side carries the mass), not only a `NO symmetry` negation.
 3. **Edge occluder (heuristic)** — one broad convex mass cropped by a frame
    edge, **or** an explicit "no occluder" line with the scene's reason
    (e.g. open vista). When present, for a left/right edge occluder:
@@ -141,12 +175,49 @@ names:
    perspective is painted only on the far plane. No universal
    near-dark/far-blue rule (OB-3).
 8. **Risk notes / what not to paint** — thin cross-depth geometry (>3
-   depth levels), painted dynamic FX, per-row band exclusions per item 5,
-   multiple competing light sources (synthesis §7).
+   depth levels), painted dynamic FX **including light shafts / god rays
+   / visible light beams** (runtime owns `shaft` since R-271 — the
+   gola-dusk candidate painted the beam and it will smear where it
+   crosses the wall/sky depth boundary; kill list must name it), per-row
+   band exclusions per item 5,
+   multiple competing light sources (synthesis §7). **Artifact veto
+   (T-005a):** any visible generator artifact — watermark, logo, text,
+   UI remnant — anywhere in the frame is a scorecard veto scored before
+   all other criteria; app-applied marks cannot be prompted away, so each
+   candidate declares its remedy (regenerate via a watermark-free route,
+   or post-removal) as part of stage-1 review.
 9. **Generator routing** — production path: Gemini/Nano Banana web UI
    (positive restatement for exclusions; no negative field). Other
    generators get a routing entry when adopted (synthesis §4); one
    negative string is never reused across generators.
+10. **Full prompt = painterly kernel (R-272/PLAN-080)** — the fenced prompt
+    block of each brief's `prompt.md` is written in painterly register,
+    never in engineering register: items 1–8 carry the engineering
+    (depth planes, FX anchors, calm zones, coordinates, percentages);
+    inside the prompt every technical constraint is translated into visual
+    terms per the translation table in
+    `art-direction/scene_prompt_authoring_guide.md` R9 (edge occluder →
+    "broad saturated mass in <bible pigment> anchored at the frame edge";
+    calm zone → "low-frequency painted area"; FX anchor → painted light
+    source only, particles never painted). The block MUST pass
+    `lint-scene-prompts.py` checks Q13–Q17 (medium-first, register ban
+    REG-CAM/REG-NUM, style floor, negation bulk warn, no leftover
+    `<!-- AUTHOR:` markers). Pipeline logistics live in the brief fields
+    and generation notes — never inside the prompt text.
+11. **Shot grammar (T-005a, Director 2026-10-23)** — the brief declares
+    the camera grammar the composition is authored for: `camera`
+    (primary shot for the beat), `entrance` (arrival personality),
+    `pose` (hold stance), and the narrative focal point as a target
+    region — ids must exist in `CameraShotIdSchema`
+    (`questTheatreFx.ts`), lint-checkable by name. The declaration
+    states *how the composition serves each declared shot* (funnel +
+    central target for `push-in`/`enter-creep`; edge occluder on the
+    swept side for `pan-lateral`; focal that survives the entrance
+    offset for `enter-*`), and names shots the composition does *not*
+    serve. A composition that contradicts its declared grammar is a
+    scorecard criterion at stage 1. Measured focal coordinates land in
+    `sceneManifest` config at wiring and stay authoritative there —
+    same intent/authority split as item 6.
 
 ## Production raster
 
@@ -230,3 +301,32 @@ rounds, objections, dispositions, self-check, and the five acceptances are
 journaled in `events.jsonl`; accepted artifact text:
 `artifact-r007.md` (sha256 `9b574c68e66794d9f4d0208ac8021d30b4f0506444e793e48f6f8f378e8301d5`).
 Provenance only; all rulings live in the body above.
+
+## Amendment 2026-10-24 — archetype vocabulary (broadcast research)
+
+Il contratto descrive la MECCANICA del parallasse, non la FORMULA
+compositiva: la convergenza spontanea verso un solo scheletro
+(coulisse-pair + lead diagonale) è il "Default Framing Trap"
+(gemini). Ogni brief dichiara ora:
+
+- **`archetype`**: id dalla tassonomia a 12 voci in
+  `context/research/2026-10-24-composition-archetypes/synthesis.md`
+  (COULISSE, SHOULDER, VISTA, CANOPY, ARCH, MONOLITH, CASCADE,
+  ISLAND, VOID, CHOKE, GRID, TABLEAUX) — con geometric rule, mood,
+  knobs, shot servito e rischi parallax per archetipo.
+- **Sequencing**: le 8 regole anti-monotonia (nessun adiacente uguale,
+  ritmo chiuso/aperto, rotazione bordo/occluder/orizzonte/mossa,
+  escalation far-zone, flag lattice al brief) valgono a livello
+  indice scene — la mappa archetipi per quest si tiene in
+  `scenes.md` della spec.
+- Provenienza media documentata: repoussoir/coulisse (pittura),
+  dirty foreground (cinema), vue sur l'angle Bibiena, Cullen serial
+  vision, manga splash/tight, scenografia (wing flats), Hudson River
+  detail-islands, poster negative space.
+
+### item 12 — interaction hooks (2026-10-24, PLAN-084)
+
+Ogni brief dichiara anche gli `interaction hooks` della scena (catalogo
+`src/docs/docs/art-direction/scene_interaction_affordances.md`): cosa il
+player può cliccare/scoprire e cosa il prompt deve dipingere per
+supportarlo (segreto leggibile-ma-camuffato; mai hotspot su vuoto).

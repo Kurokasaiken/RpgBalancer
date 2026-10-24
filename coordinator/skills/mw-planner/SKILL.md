@@ -56,6 +56,17 @@ Use when there is enough clarity to commit to a concrete plan.
   esistente, il piano lo dichiara esplicitamente (Mode B-amend) con il
   `R-NNN` che lo autorizza — l'amend silenzioso è fail-closed nel gate.
 
+## Dibattito multi-AI sul piano (convenzione ereditata — PLAN-081)
+
+RPG eredita il criterio di `mw-web-debate` (mind-weaver): il dibattito
+web multi-provider è riservato a piani che toccano governance/canon,
+decisioni architetturali materiali, o su richiesta esplicita del
+Director — costo osservato alto (~2h wall-clock su un piano da ~30min di
+implementazione, episodio PLAN-065). Per piani ordinari: critica leggera
+(planner self-review, explorer, singolo provider). Se il piano propone
+un dibattito, dichiaralo nel plan e lascia il via al Director — mai
+default silenzioso.
+
 ## Check pre-battesimo (PLAN-045 T-006, P8)
 
 Prima di proporre il battesimo di un plan che copre desiderata slice:

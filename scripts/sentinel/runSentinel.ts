@@ -181,11 +181,18 @@ async function main() {
           });
           if (!reached) continue;
           for (const pert of node.perturbations.filter((p) => cfg.perturbations.includes(p))) {
-            const { postGestureAt } = await applyPerturbation(ctx, node, pert, cfg);
-            const audit = await auditState(ctx, cfg, node.id, pert, { locale: cell.locale, postGestureAt });
-            audit.findings = tagCell(audit.findings, cell);
-            if (audit.degraded) degradedCells.push(`${node.id}@${cell.key}`);
-            if (audit.findings.length) firstPass.push({ cell, node, pert, audit });
+            /* A failed perturbation or audit (e.g. rehydration not
+             * recovering the node) is evidence, not a fatal — record it
+             * and move on. */
+            try {
+              const { postGestureAt } = await applyPerturbation(ctx, node, pert, cfg);
+              const audit = await auditState(ctx, cfg, node.id, pert, { locale: cell.locale, postGestureAt });
+              audit.findings = tagCell(audit.findings, cell);
+              if (audit.degraded) degradedCells.push(`${node.id}@${cell.key}`);
+              if (audit.findings.length) firstPass.push({ cell, node, pert, audit });
+            } catch (e) {
+              unreachedStates.push(`${node.id}:${pert}@${cell.key}: ${e instanceof Error ? e.message : e}`);
+            }
           }
         }
       } finally {

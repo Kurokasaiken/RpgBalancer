@@ -45,7 +45,13 @@ export async function applyPerturbation(
       ctx.steps.push({ step: `${node.id}:perturb`, how: 'input-reale:reload-mid-state' });
       await ctx.page.reload({ waitUntil: 'domcontentloaded' });
       const postGestureAt = Date.now();
-      await node.reach(ctx);
+      /* After reload the app's test-hook surface remounts asynchronously.
+       * Hook-assisted reaches call it through optional chaining, so
+       * reaching before the mount silently no-ops (S6 fatal race). */
+      await ctx.page
+        .waitForFunction(() => Boolean(window.__idleVillageTestHooks), undefined, { timeout: 30_000 })
+        .catch(() => {});
+      await (node.resume ? node.resume(ctx, node) : node.reach(ctx));
       await ctx.page.locator(node.readySignal).first().waitFor({ state: 'visible', timeout: 30_000 });
       return { applied: true, postGestureAt, note: 'reload-mid-state' };
     }

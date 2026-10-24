@@ -25,16 +25,17 @@ import { DepthScene } from '@/ui/idleVillage/questS1Lab/render/DepthScene';
 import { Letterbox } from '@/ui/idleVillage/skins/primitives';
 import { documentClock, shotEpochFor } from '@/ui/idleVillage/questS1Lab/render/cameraEval';
 import { SCENE_CINEMATICS, artIdFromSrc } from '@/ui/idleVillage/questS1Lab/render/sceneManifest';
-import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
+import { LIBRARY_ART, NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import {
   DEFAULT_QUEST_THEATRE_FX,
   CameraShotIdSchema,
   type CameraShot,
 } from '@/balancing/config/idleVillage/quests/questTheatreFx';
 
-/** All art srcs keyed by their manifest art id (for the scene picker). */
+/** All art srcs keyed by their manifest art id (for the scene picker) —
+ *  quest-node art plus unbound catalog assets (PLAN-052 candidates). */
 const ART_BY_ID: Record<string, { src: string; fit: string }> = Object.fromEntries(
-  Object.entries(NODE_ART).map(([, v]) => [artIdFromSrc(v.src), v]),
+  [...Object.entries(NODE_ART), ...Object.entries(LIBRARY_ART)].map(([, v]) => [artIdFromSrc(v.src), v]),
 );
 
 /** Scenes that actually have a depth map — the only ones worth an eye-check. */

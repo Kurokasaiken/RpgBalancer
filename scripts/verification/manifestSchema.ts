@@ -83,6 +83,9 @@ export const manifestSchema = z
     created_at: z.string().min(1),
     verifier_required: z.boolean().optional(),
     red_first: z.array(z.string()).optional(),
+    /** PLAN-081: scope del piano (globs). Il diff esterno → foreign_scope
+     *  advisory, non bloccante (drift di sessioni parallele, T-13). */
+    scope_files: z.array(z.string()).min(1).optional(),
     intent_gate: z.boolean().optional(),
     decision_report: z.boolean().optional(),
     obligations: z.array(obligationSchema).min(1),

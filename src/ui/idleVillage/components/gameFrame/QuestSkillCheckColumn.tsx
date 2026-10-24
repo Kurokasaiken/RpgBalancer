@@ -331,7 +331,7 @@ export const QuestSkillCheckColumn: React.FC<QuestSkillCheckColumnProps> = ({ br
             the board paints), then the verdict chip once resolved. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 24 }}>
           <EngravedIcon id="ico-spark" size={14} style={{ color: 'var(--skin-title-color)' }} />
-          <span style={{ flex: 1, minWidth: 0, fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', color: 'var(--skin-title-color)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <span style={{ flex: 1, minWidth: 0, fontFamily: FONT.display, fontSize: 13, letterSpacing: '0.08em', color: 'var(--skin-title-color)', textTransform: 'uppercase', overflowWrap: 'break-word' }}>
             {check.title}
           </span>
           {/* R-253: the stats the check tests — one Lucide icon each,

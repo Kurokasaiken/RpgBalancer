@@ -65,11 +65,13 @@ const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
   labTelemetry,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const restartButtonRef = useRef<HTMLButtonElement>(null);
   const labViewedRef = useRef(false);
 
   const reasonKey = gameOverState.reason ?? 'manual_reset';
 
   const {
+    modalTitle,
     title,
     description,
     restartLabel,
@@ -82,7 +84,8 @@ const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
     if (isLegacyConfig(config)) {
       const legacyReason = config.reasons[reasonKey] ?? config.reasons.manual_reset;
       return {
-        title: legacyReason?.title ?? config.modalTitle ?? DEFAULT_MODAL_TITLE,
+        modalTitle: config.modalTitle ?? DEFAULT_MODAL_TITLE,
+        title: legacyReason?.title ?? '',
         description: legacyReason?.description ?? '',
         restartLabel: legacyReason?.restartButton ?? 'Ricomincia',
         statsConfig: {
@@ -101,7 +104,8 @@ const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
 
     const modernReason = config.messages[reasonKey] ?? config.messages.manual_reset;
     return {
-      title: modernReason?.title ?? DEFAULT_MODAL_TITLE,
+      modalTitle: modernReason?.title ?? DEFAULT_MODAL_TITLE,
+      title: modernReason?.title ?? '',
       description: modernReason?.description ?? '',
       restartLabel: modernReason?.ctaText ?? 'Restart',
       statsConfig: {
@@ -163,7 +167,26 @@ const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleEscape = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable.length) {
+          e.preventDefault();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+        return;
+      }
       if (e.key === 'Escape' && closeOnEscape) {
         onClose?.();
         if (labTelemetry) {
@@ -178,14 +201,15 @@ const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [closeOnEscape, isOpen, labTelemetry, onClose]);
 
-  // Focus management
+  // Focus management — land on the restart button (the primary action);
+  // the modal shell is the fallback when restart is disabled.
   useEffect(() => {
-    if (isOpen && modalRef.current) {
-      modalRef.current.focus();
+    if (isOpen) {
+      (restartButtonRef.current ?? modalRef.current)?.focus();
     }
   }, [isOpen]);
 
@@ -244,7 +268,7 @@ const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
     ].filter((card) => card.show);
   }, [statsConfig, summary]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !gameOverState.isGameOver) return null;
 
   return (
     <div
@@ -274,7 +298,7 @@ const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
             id="game-over-title"
             className="text-2xl font-bold text-center text-white"
           >
-            {title || DEFAULT_MODAL_TITLE}
+            {modalTitle || DEFAULT_MODAL_TITLE}
           </h1>
         </div>
 
@@ -336,9 +360,9 @@ const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
             <div className="flex justify-center">
               <button
                 type="button"
+                ref={restartButtonRef}
                 onClick={handleRestart}
                 className="px-8 py-3 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900"
-                autoFocus
               >
                 {restartLabel}
               </button>

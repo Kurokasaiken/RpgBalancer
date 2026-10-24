@@ -322,7 +322,9 @@ export const QuestTheatreFxSchema = z.object({
    *  camera-move semantics (push-in combat, pan travel, hold dialogue,
    *  zoom verdict). */
   camera: QuestCameraFxSchema.prefault({
-    idleDrift: { zoomTo: 1.05, durMs: 16000, ease: 'sineInOut', camVec: [0.7, 0.2], ampMul: 1 },
+    /* Director passes: 16s/[0.7,0.2] read as "troppo veloce" — longer
+     *  cycle and gentler vector; still a living drift, not a freeze. */
+    idleDrift: { zoomTo: 1.05, durMs: 24000, ease: 'sineInOut', camVec: [0.5, 0.14], ampMul: 1 },
     shots: {
       'push-in': { zoomTo: 1.06, durMs: 1600, ease: 'linear', camVec: [0.55, 0.2], ampMul: 1 },
       'pan-lateral': { zoomTo: 1.05, panTo: [0.009, 0], durMs: 6000, ease: 'sineInOut', camVec: [0.8, 0.05], ampMul: 1 },

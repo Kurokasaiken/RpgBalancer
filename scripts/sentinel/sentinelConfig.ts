@@ -109,7 +109,10 @@ export const SentinelConfigSchema = z.object({
       minInteractivePx: z.number().positive().default(32),
       contrastMin: z.number().positive().default(3),
       contrastTextMin: z.number().positive().default(4.5),
-      plaqueClearancePx: z.number().positive().default(22),
+      /* Fallback only — the harness reads
+       * `min(--skin-hud-plaque-clearance, --skin-hud-panel-padding)` (10px)
+       * live; keep the default aligned so titles match the tokens. */
+      plaqueClearancePx: z.number().positive().default(10),
     })
     .prefault({}),
 

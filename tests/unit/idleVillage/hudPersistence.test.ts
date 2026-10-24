@@ -12,38 +12,11 @@ import {
 } from '@/ui/idleVillage/utils/hudPersistence';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 
-// Mock dependencies
+// Mock dependencies — PersistenceService only: the helpers under test
+// (hudPersistence) run against the real implementation.
 vi.mock('@/shared/persistence/PersistenceService', () => ({
   loadData: vi.fn(),
   saveData: vi.fn(),
-}));
-
-vi.mock('@/ui/idleVillage/utils/hudPersistence', () => ({
-  loadHUDState: vi.fn(),
-  saveHUDState: vi.fn(),
-  resetHUDState: vi.fn(),
-  serializeHUDState: vi.fn(),
-  deserializeHUDState: vi.fn(),
-  DEFAULT_HUD_PERSISTENCE_STATE: {
-    preferences: {
-      collapsed: false,
-      maxVisible: 10,
-      sortBy: 'remaining-time',
-      showTypeBadges: true,
-      compactMode: false,
-    },
-    uiState: {
-      selectedTypeFilter: 'all',
-      telemetryPanelOpen: false,
-      position: 'top',
-    },
-    metadata: {
-      lastSaved: Date.now(),
-      version: '1.0.0',
-    },
-  },
-  HUD_PERSISTENCE_KEY: 'idle-village-hud-state',
-  createDebouncedHUDSave: vi.fn(() => vi.fn()),
 }));
 
 describe('HUD Persistence', () => {
@@ -52,6 +25,7 @@ describe('HUD Persistence', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockLoadData.mockResolvedValue(DEFAULT_HUD_PERSISTENCE_STATE);
   });
 
   describe('Persistence Helpers', () => {
@@ -186,17 +160,13 @@ describe('HUD Persistence', () => {
       getActivityState: vi.fn(() => ({ status: 'running' as const })),
     };
 
-    beforeEach(() => {
-      vi.mocked(loadHUDState).mockResolvedValue(DEFAULT_HUD_PERSISTENCE_STATE);
-    });
-
     it('should load persisted state on mount', async () => {
       const customState = {
         ...DEFAULT_HUD_PERSISTENCE_STATE,
         preferences: { ...DEFAULT_HUD_PERSISTENCE_STATE.preferences, maxVisible: 5 },
       };
 
-      vi.mocked(loadHUDState).mockResolvedValue(customState);
+      mockLoadData.mockResolvedValue(customState);
 
       const { result } = renderHook(() => useActiveHUDState(mockProps));
 
@@ -206,7 +176,7 @@ describe('HUD Persistence', () => {
     });
 
     it('should provide default state when loading fails', async () => {
-      vi.mocked(loadHUDState).mockRejectedValue(new Error('Load failed'));
+      mockLoadData.mockRejectedValue(new Error('Load failed'));
 
       const { result } = renderHook(() => useActiveHUDState(mockProps));
 
@@ -278,7 +248,10 @@ describe('HUD Persistence', () => {
         await result.current.saveState();
       });
 
-      expect(saveHUDState).toHaveBeenCalledWith(result.current.persistence);
+      expect(mockSaveData).toHaveBeenCalledWith(HUD_PERSISTENCE_KEY, expect.objectContaining({
+        preferences: result.current.persistence.preferences,
+        uiState: result.current.persistence.uiState,
+      }));
     });
 
     it('should apply maxVisible limit to activities', async () => {
@@ -392,7 +365,7 @@ describe('HUD Persistence', () => {
 
   describe('Persistence Integration', () => {
     it('should save state when preferences change', async () => {
-      vi.mocked(loadHUDState).mockResolvedValue(DEFAULT_HUD_PERSISTENCE_STATE);
+      mockLoadData.mockResolvedValue(DEFAULT_HUD_PERSISTENCE_STATE);
 
       const { result } = renderHook(() => useActiveHUDState({
         config: {} as any,
@@ -410,15 +383,17 @@ describe('HUD Persistence', () => {
         result.current.updatePreferences({ collapsed: true });
       });
 
-      // Wait for debounced save
+      // Wait for debounced save (createDebouncedHUDSave: 1000ms)
       await waitFor(() => {
-        expect(saveHUDState).toHaveBeenCalled();
-      });
+        expect(mockSaveData).toHaveBeenCalledWith(HUD_PERSISTENCE_KEY, expect.objectContaining({
+          preferences: expect.objectContaining({ collapsed: true }),
+        }));
+      }, { timeout: 3000 });
     });
 
     it('should handle persistence errors gracefully', async () => {
-      vi.mocked(loadHUDState).mockRejectedValue(new Error('Load failed'));
-      vi.mocked(saveHUDState).mockRejectedValue(new Error('Save failed'));
+      mockLoadData.mockRejectedValue(new Error('Load failed'));
+      mockSaveData.mockRejectedValue(new Error('Save failed'));
 
       const { result } = renderHook(() => useActiveHUDState({
         config: {} as any,
@@ -500,7 +475,7 @@ describe('HUD Persistence', () => {
       );
 
       await waitFor(() => {
-        expect(result.current.activities).toHaveLength(10); // Default maxVisible
+        expect(result.current.activities).toHaveLength(3); // 3 activities < default maxVisible (10)
       });
 
       act(() => {

@@ -1,11 +1,12 @@
 import React, { useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives/HudPlaque';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
 import { EngravedIcon } from './engravedIcons';
 import { useHudPanelDrag } from './useHudPanelDrag';
 import { villageStashViewModel, type VillageStashRowView } from './villageStashViewModel';
-import { VillageStashItemIcon } from './villageStashItemIcons';
+import { stashItemCovers, StashItemTile, StashItemTooltipBody, STASH_TOOLTIP_STYLE } from './stashItemFace';
 import {
   countReservations,
   reservedElsewhereCount,
@@ -55,20 +56,19 @@ const controlButton: CSSProperties = {
   padding: 0,
 };
 
-/** Shared row face — icon + name ×qty + description — used by both modes so the two surfaces never diverge. */
+/**
+ * Shared row face — `StashItemTile` (the planner's item-face: lacquer tile +
+ * corner ×N badge) + name + description — used by both modes so the two
+ * surfaces never diverge (R-270, village-stash-panel.INV-1).
+ */
 const StashRowFace: React.FC<{ row: VillageStashRowView }> = ({ row }) => {
   const { t } = useTranslation('idleVillage');
   return (
     <>
-      <span aria-hidden="true" style={{ color: 'var(--skin-title-color)', display: 'inline-flex', alignItems: 'center', paddingTop: 1 }}>
-        <VillageStashItemIcon icon={row.icon} size={18} />
-      </span>
+      <StashItemTile icon={row.icon} qty={row.qty} size={32} iconSize={18} />
       <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left' }}>
         <span style={{ font: '600 12px var(--skin-font-serif)', color: 'var(--skin-text-primary)' }}>
           {t(row.nameKey)}
-          <span style={{ color: 'var(--skin-title-color)', fontVariantNumeric: 'tabular-nums' }} aria-label={t('gameFrame.stash.qty', { qty: row.qty })}>
-            {' '}×{row.qty}
-          </span>
         </span>
         <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
           {t(row.descKey)}
@@ -77,6 +77,22 @@ const StashRowFace: React.FC<{ row: VillageStashRowView }> = ({ row }) => {
     </>
   );
 };
+
+/**
+ * The shared stash tooltip (R-270: same vocabulary on both surfaces —
+ * name · desc · covers · stock). Wraps the row element it triggers on;
+ * the village `qty` IS the remaining stock.
+ */
+const StashRowTooltip: React.FC<{ row: VillageStashRowView; children: React.ReactElement }> = ({ row, children }) => (
+  <Tooltip.Root delayDuration={120}>
+    <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
+    <Tooltip.Portal>
+      <Tooltip.Content side="top" sideOffset={6} collisionPadding={8} style={STASH_TOOLTIP_STYLE}>
+        <StashItemTooltipBody labelKey={row.nameKey} descKey={row.descKey} covers={stashItemCovers(row.itemId)} stockQty={row.qty} />
+      </Tooltip.Content>
+    </Tooltip.Portal>
+  </Tooltip.Root>
+);
 
 const rowChrome = (interactive: boolean): CSSProperties => ({
   display: 'flex',
@@ -110,24 +126,25 @@ const InteractiveStashRow: React.FC<{
   const assign = useVillageStashStore((s) => s.assign);
   return (
     <div role="listitem">
-      <button
-        type="button"
-        data-testid={`stash-item-${row.itemId}`}
-        aria-label={t('gameFrame.stash.addToBag', { item: t(row.nameKey) })}
-        title={t(row.descKey)}
-        onClick={() => {
-          if (!owner) return;
-          /* Rejects announce through the store's lastEvent live region — no local echo. */
-          if (assign(owner, row.itemId) === 'ok') {
-            window.requestAnimationFrame(() =>
-              document.querySelector<HTMLElement>(`[data-testid="loadout-item-${row.itemId}"]`)?.focus(),
-            );
-          }
-        }}
-        style={rowChrome(true)}
-      >
-        <StashRowFace row={row} />
-      </button>
+      <StashRowTooltip row={row}>
+        <button
+          type="button"
+          data-testid={`stash-item-${row.itemId}`}
+          aria-label={t('gameFrame.stash.addToBag', { item: t(row.nameKey) })}
+          onClick={() => {
+            if (!owner) return;
+            /* Rejects announce through the store's lastEvent live region — no local echo. */
+            if (assign(owner, row.itemId) === 'ok') {
+              window.requestAnimationFrame(() =>
+                document.querySelector<HTMLElement>(`[data-testid="loadout-item-${row.itemId}"]`)?.focus(),
+              );
+            }
+          }}
+          style={rowChrome(true)}
+        >
+          <StashRowFace row={row} />
+        </button>
+      </StashRowTooltip>
     </div>
   );
 };
@@ -282,6 +299,10 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
       }}
     >
       <SkinScope data-hud-controls="">
+        {/* Shared stash tooltips (R-270): the panel mounts its own provider —
+         *  the planner's app-level provider is not guaranteed above a
+         *  page-anchored sibling surface. */}
+        <Tooltip.Provider delayDuration={120}>
         <HudPlaque
           shape="panel"
           as="section"
@@ -359,9 +380,11 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
               interactive ? (
                 <InteractiveStashRow key={row.itemId} row={row} />
               ) : (
-                <div key={row.itemId} role="listitem" style={rowChrome(false)}>
-                  <StashRowFace row={row} />
-                </div>
+                <StashRowTooltip key={row.itemId} row={row}>
+                  <div role="listitem" style={rowChrome(false)}>
+                    <StashRowFace row={row} />
+                  </div>
+                </StashRowTooltip>
               ),
             )}
           </div>
@@ -394,6 +417,7 @@ export const VillageStashPanel: React.FC<VillageStashPanelProps> = ({ config, le
             {announcement}
           </span>
         </HudPlaque>
+        </Tooltip.Provider>
       </SkinScope>
     </div>
   );

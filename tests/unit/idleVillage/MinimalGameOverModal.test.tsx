@@ -56,6 +56,7 @@ describe('MinimalGameOverModal', () => {
   };
 
   const mockOnRestart = vi.fn();
+  const mockOnClose = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -207,12 +208,14 @@ describe('MinimalGameOverModal', () => {
           gameOverState={mockGameOverState}
           config={mockConfig}
           onRestart={mockOnRestart}
+          onClose={mockOnClose}
         />
       );
 
       fireEvent.keyDown(document, { key: 'Escape' });
 
-      expect(mockOnRestart).toHaveBeenCalledTimes(1);
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+      expect(mockOnRestart).not.toHaveBeenCalled();
     });
 
     it('does not close modal on backdrop click when closeOnBackdropClick is false', () => {
@@ -222,6 +225,7 @@ describe('MinimalGameOverModal', () => {
           gameOverState={mockGameOverState}
           config={mockConfig}
           onRestart={mockOnRestart}
+          onClose={mockOnClose}
           testId="test-modal"
         />
       );
@@ -229,6 +233,7 @@ describe('MinimalGameOverModal', () => {
       const backdrop = screen.getByTestId('test-modal');
       fireEvent.click(backdrop);
 
+      expect(mockOnClose).not.toHaveBeenCalled();
       expect(mockOnRestart).not.toHaveBeenCalled();
     });
   });
@@ -269,7 +274,9 @@ describe('MinimalGameOverModal', () => {
         goldEarned: 1250,
         questsCompleted: 3,
         residentsLost: 1,
+        telemetryTags: [],
         timestamp: expect.any(Number),
+        source: 'minimal_gameplay',
       });
     });
 
@@ -285,6 +292,7 @@ describe('MinimalGameOverModal', () => {
           gameOverState={mockGameOverState}
           config={configWithBackdropClick}
           onRestart={mockOnRestart}
+          onClose={mockOnClose}
           testId="test-modal"
         />
       );
@@ -292,7 +300,8 @@ describe('MinimalGameOverModal', () => {
       const backdrop = screen.getByTestId('test-modal');
       fireEvent.click(backdrop);
 
-      expect(mockOnRestart).toHaveBeenCalledTimes(1);
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+      expect(mockOnRestart).not.toHaveBeenCalled();
     });
   });
 

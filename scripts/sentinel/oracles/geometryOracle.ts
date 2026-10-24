@@ -212,7 +212,7 @@ export async function auditGeometry(
         state_node: stateNode,
         perturbation_kind: perturbation,
         target: `[data-testid="${lens.name}"]`,
-        evidence: { count: lens.L9_tightToFrame, needPx: cfg.geometry.plaqueClearancePx, degraded },
+        evidence: { count: lens.L9_tightToFrame, needPx: (lens.L9_need as number) ?? cfg.geometry.plaqueClearancePx, degraded },
       });
     }
   }
@@ -230,16 +230,16 @@ export async function auditGeometry(
       evidence: { over: o.over, degraded },
     });
   }
-  for (const c of clearance as { plaque: string; el: string; minGap: number }[]) {
+  for (const c of clearance as { plaque: string; el: string; minGap: number; need?: number; minEdge?: string | null; anchored?: string[] }[]) {
     findings.push({
       oracle_id: 'geometry:L5-hit-area-clearance',
       signature: `clearance|${sigKey(c.plaque)}|${sigKey(c.el)}`,
       signature_family: 'clearance',
-      title: `«${c.el}» ${c.minGap}px from plaque edge (need ${cfg.geometry.plaqueClearancePx})`,
+      title: `«${c.el}» ${c.minGap}px from plaque edge (need ${c.need ?? cfg.geometry.plaqueClearancePx})`,
       severity: 'defect',
       state_node: stateNode,
       perturbation_kind: perturbation,
-      evidence: { minGap: c.minGap, degraded },
+      evidence: { minGap: c.minGap, minEdge: c.minEdge, anchoredEdges: c.anchored, degraded },
     });
   }
 

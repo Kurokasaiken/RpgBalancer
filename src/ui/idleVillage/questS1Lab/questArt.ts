@@ -87,3 +87,17 @@ export const JOURNEY_LEG_ART: Record<'andata' | 'ritorno', { src: string; fit: '
   andata: { src: '/assets/scene-library/viaggio-andata.jpg', fit: 'cover' },
   ritorno: { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
 };
+
+/**
+ * Catalogued scene-library assets not yet bound to a quest node
+ * (PLAN-052 flagship candidates previewed in /theater-lab). Entries
+ * here carry a `key` only for the lab picker — no quest node resolves
+ * through them. Promote to NODE_ART when a node adopts the art.
+ */
+export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
+  /* f3-gola-dusk showcase candidate (bake-tested, contract v2 brief). */
+  'gola-raider': { src: '/assets/scene-library/gola-raider.jpg', fit: 'cover' },
+  /* Lab A/B: same painting as viaggio-ritorno with the pre-boost ambient
+   *  set — pick it in /theater-lab to compare "prima e dopo". */
+  'viaggio-ritorno-prev': { src: '/assets/scene-library/viaggio-ritorno-prev.jpg', fit: 'cover' },
+};

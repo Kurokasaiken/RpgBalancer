@@ -897,7 +897,8 @@
       "map": "Mappa",
       "workshop": "Officina",
       "tavern": "Taverna",
-      "locked": "Non ancora"
+      "locked": "Non ancora",
+      "more": "Altro"
     },
     "resources": {
       "gold": "Oro",

@@ -590,6 +590,7 @@ export default interface Resources {
         "ariaLabel": "Game sections",
         "locked": "Not yet",
         "map": "Map",
+        "more": "More",
         "tavern": "Tavern",
         "village": "Village",
         "workshop": "Workshop"

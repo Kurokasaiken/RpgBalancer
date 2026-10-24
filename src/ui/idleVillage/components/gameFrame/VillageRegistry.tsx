@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -60,6 +61,9 @@ import villageArt from '@/assets/mood/villaggio.png';
 export const VILLAGE_REGISTRY_ID = 'village-registry';
 /** Row badge / trailing-glyph test hooks. */
 export const REGISTRY_ROW_ATTR = 'data-registry-row';
+/** Elements whose bottom edge is a legal fold boundary — section headers and
+ *  rows (INV-1: the scroll fold never lands mid-element). */
+const FOLD_BOUNDARY_SEL = '[data-registry-section] > button[aria-expanded], [data-registry-row]';
 
 const RESOURCES: VillageCostResource[] = ['wood', 'iron', 'gold', 'food'];
 type RegistryFilter = 'all' | VillageBuildingState;
@@ -317,6 +321,41 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
     if (!open) setDetailId(null);
   }, [open]);
 
+  /* village-registry.INV-1 — the fold must land on an element boundary
+   * (T-A5 rule, R-270; the boundary-based generalisation of the quest
+   * choices pitch cap, since headers and rows differ in height). The
+   * scroller's natural height is flex-given: uncap it pre-paint, read the
+   * budget, then cap maxHeight to the largest boundary that fits (at least
+   * the first element, so an extreme budget still shows something whole).
+   * Re-measures on resize and whenever the rendered section set changes. */
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return undefined;
+    const measure = () => {
+      scroller.style.maxHeight = 'none';
+      const budget = scroller.clientHeight;
+      let next = '';
+      if (scroller.scrollHeight > budget + 1) {
+        let first = 0;
+        let best = 0;
+        scroller.querySelectorAll<HTMLElement>(FOLD_BOUNDARY_SEL).forEach((el) => {
+          const bottom = el.offsetTop + el.offsetHeight;
+          if (!first) first = bottom;
+          if (bottom <= budget && bottom > best) best = bottom;
+        });
+        const px = best || first;
+        if (px > 0) next = `${Math.floor(px)}px`;
+      }
+      if (scroller.style.maxHeight !== next) scroller.style.maxHeight = next;
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(scroller);
+    return () => ro.disconnect();
+  }, [open, detailId, collapsed, filter, buildings]);
+
   /* When the card mounts, move focus inside it (the back button) — the card
    *  is the only trapped layer in the drawer. */
   useEffect(() => {
@@ -485,8 +524,9 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
             ))}
           </div>
 
-          {/* Scrollable sections. */}
-          <div style={{ overflowY: 'auto', overscrollBehavior: 'contain', display: 'flex', flexDirection: 'column', gap: 4, minHeight: 0 }}>
+          {/* Scrollable sections. `position:relative` makes the scroller the
+           *  offsetParent so fold boundaries resolve in content space. */}
+          <div ref={scrollRef} data-registry-scroll="" style={{ position: 'relative', overflowY: 'auto', overscrollBehavior: 'contain', display: 'flex', flexDirection: 'column', gap: 4, minHeight: 0 }}>
             {sections.map(({ cat, entries, built, total }) => {
               const isCollapsed = collapsed.has(cat);
               return (
@@ -497,6 +537,9 @@ export const VillageRegistry: React.FC<VillageRegistryProps> = ({
                     onClick={() => toggleSection(cat)}
                     style={{
                       ...LIST_BUTTON_RESET,
+                      /* village-registry.INV-2 (R-270): headers are buttons —
+                       * content alone measured 24px, under the 32px floor. */
+                      minHeight: 32,
                       position: 'sticky',
                       top: 0,
                       zIndex: 1,

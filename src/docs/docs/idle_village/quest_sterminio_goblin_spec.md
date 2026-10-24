@@ -374,7 +374,7 @@ party assegnato (nel motore).
 
 | esito | verdictFlavor |
 |---|---|
-| bigwin | «Sotto le foglie marce affiorano impronte leggere e, più avanti nell'erba alta, il riflesso sottile di un filo di campanelli teso a mezza gamba.» |
+| bigwin | «Sotto le foglie marce affiorano impronte leggere e, più avanti nell'erba alta, il riflesso sottile di un filo teso a mezza gamba, che corre verso il campo.» |
 | win | «Talloni nudi nella terra umida e rami spezzati bassi disegnano una traccia obliqua che punta verso l'interno del bosco.» |
 | almost | «Impronte sovrapposte e confuse nella terra molle: qualcuno è passato, ma il verso si perde tra le radici.» |
 | fail | «Solo radici scoperte e terra smossa dalla pioggia. Il suolo non vi concede nulla.» |
@@ -452,16 +452,16 @@ prosegue (Director 2026-10-18; runtime = choice a opzione unica,
 > **body:** «Avanzate piegati dove la penombra del sottobosco tocca il
 > margine della radura, misurando ogni appoggio.»
 >
-> **failHint:** «Il filo si tende sotto il vostro peso. Un campanello
-> vibra appena.»
+> **failHint:** «Il filo si tende sotto il vostro peso: qualcosa cede
+> accanto alla postazione.»
 
 | esito | verdictFlavor |
 |---|---|
-| bigwin | «Scivolate oltre un filo di campanelli senza muovere un soffio: siete già alle loro spalle mentre fissano ancora il fuoco.» |
+| bigwin | «Scivolate oltre un filo teso senza muovere un soffio: siete già alle loro spalle mentre fissano ancora il fuoco.» |
 | win | «Un passo, una pausa, un altro passo nell'ombra. Superate il perimetro esterno senza che una sola foglia parli.» |
-| almost | «Sfiorate un campanello che oscilla piano: vicino al fuoco una testa si volta, poi esita.» |
-| fail | «Un filo vi morde lo stivale e un campanello stride nella notte: le sagome attorno al fuoco scattano in piedi.» |
-| epicfail | «Inciampate in pieno in un filo teso e i campanelli si scatenano in un unico suono: il campo intero si rovescia contro di voi.» |
+| almost | «Sfiorate il filo e qualcosa tintinna accanto alla postazione: vicino al fuoco una testa si volta, poi esita.» |
+| fail | «Un filo vi morde lo stivale e un tonfo rimbomba accanto alla sentinella: le sagome attorno al fuoco scattano in piedi.» |
+| epicfail | «Inciampate in pieno nel filo teso e il carico della postazione precipita in un fracasso: il campo intero si rovescia contro di voi.» |
 
 #### Check `gob-assalto` (STR)
 
@@ -1074,7 +1074,7 @@ the node):
   dell'indice 7 non è più raggiungibile in questa quest.
 
 Applicati 2026-10-08 (P0, solo testo — zero RNG, zero calibrazione):
-campanelli, indizio visibile del masso, assalto fisico, attack
+filo d'allarme, indizio visibile del masso, assalto fisico, attack
 lines, righe di danno per gravità, fix F5-win (contraddiceva lo
 sterminio), cassa semibruciata + righe-per-turno in F6, sollievo→shock
 in F7, epilogo con registro, transit hold ∝ parole (`questLabPacing`).

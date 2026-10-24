@@ -271,7 +271,14 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     await expedition<void>(page, 'send');
     await expect(page.getByTestId('quest-window')).toBeVisible({ timeout: 10_000 });
 
-    const before = (await getRun(page))!;
+    /* PLAN-053: the run opens on a JOURNEY — the outbound travel leg holds
+     *  `frontier.status === 'pending'` (sentinel readyAt) until the marker
+     *  reaches the site. Mature the clock until the first decision opens. */
+    let before = (await getRun(page))!;
+    for (let i = 0; i < 12 && !(before.nodeId === 'gob-esplora' && before.frontier.status === 'waiting'); i++) {
+      await advanceTicks(page, 30);
+      before = (await getRun(page))!;
+    }
     expect(before.nodeId).toBe('gob-esplora');
     expect(before.frontier.status).toBe('waiting');
 
@@ -565,10 +572,12 @@ test.describe('PLAN-019-S2.4 — real quest POI on /game', () => {
     expect(run.ended).toBe(false);
 
     /* And the map says so — under R-127 the marker needs a Director reveal
-     *  even mid-run (nothing pins at boot; the run itself never pauses). */
+     *  even mid-run (nothing pins at boot; the run itself never pauses).
+     *  The separate `decision-waiting` badge dot was removed by ruling
+     *  (2026-10-20): the in-progress marker IS the signal. */
     await page.evaluate(() => (window as TestHooksWindow).__idleVillageTestHooks?.revealQuestPois?.());
-    const badge = page.locator('[data-map-quest-poi-target] [data-decision-waiting="true"]').first();
-    await expect(badge).toBeVisible({ timeout: 15_000 });
+    const marker = page.locator('[data-map-quest-poi-target][data-quest-status="in_progress"]').first();
+    await expect(marker).toBeVisible({ timeout: 15_000 });
   });
 
   test('an active run survives reload and keeps its halo clock (PersistenceService)', async ({ page }) => {

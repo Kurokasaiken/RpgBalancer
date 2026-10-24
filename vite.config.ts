@@ -290,6 +290,11 @@ export default defineConfig(({ mode }) => ({
     'process.env': JSON.stringify(process.env),
   },
   server: {
+    // 'localhost' resolves to both ::1 and 127.0.0.1 on macOS; a default bind
+    // lands on a single family and clients pinned to the other get refused
+    // (R-276: "Failed to fetch dynamically imported module"). IPv4 loopback
+    // always connects; ::1 refuses fast and Happy Eyeballs falls back.
+    host: '127.0.0.1',
     hmr: {
       overlay: false, // Disable HMR overlay to prevent playwright-report errors
     },

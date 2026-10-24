@@ -9,9 +9,16 @@ scope_files:
 fast_checks: []
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: materic-event-card.INV-1
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      CTA 'PREPARE THE DEFENSES' misura 178.6x31.5px dopo cardScale ~0.875 (Sentinel small-target S0/S1): serve
+      actionStyle per minHeight 32/cardScale
+    test_refs: 
+      - tests/unit/idleVillage/matericEventCard.actionStyle.test.tsx
 ---
-
 # materic-event-card
 
 Unità `ui-component` (tier 2, default) — contratto vivo PLAN-054. Root: `src/ui/designSystem/primitives/MatericEventCard.tsx`.

@@ -9,11 +9,13 @@ scope_files:
   - src/ui/designSystem/primitives/index.ts
   - src/ui/idleVillage/archetypeDirectory.ts
   - src/ui/idleVillage/components/gameFrame/GameFrameDragCursor.tsx
+  - src/ui/idleVillage/components/gameFrame/expeditionLostStaging.ts
   - src/ui/idleVillage/components/gameFrame/heroSheetMachine.ts
   - src/ui/idleVillage/components/gameFrame/heroSheetViewModel.ts
   - src/ui/idleVillage/components/gameFrame/hudPanelRegistry.ts
   - src/ui/idleVillage/components/gameFrame/hudTones.ts
   - src/ui/idleVillage/components/gameFrame/index.ts
+  - src/ui/idleVillage/components/gameFrame/nextEvent.ts
   - src/ui/idleVillage/components/gameFrame/poiSigillo.ts
   - src/ui/idleVillage/components/gameFrame/questAvailability.ts
   - src/ui/idleVillage/components/gameFrame/questRevealSchedule.ts
@@ -48,11 +50,13 @@ scope_files:
   - src/ui/idleVillage/questS1Lab/useQuestRun.ts
   - src/ui/idleVillage/quests/rosterCompatibility.ts
   - src/ui/idleVillage/rosterV2/heroLevelCue.ts
+  - src/ui/idleVillage/rosterV2/heroLevelMock.ts
   - src/ui/idleVillage/rosterV2/heroLevelUpEvents.ts
   - src/ui/idleVillage/rosterV2/heroLevelViewModel.ts
   - src/ui/idleVillage/rosterV2/index.ts
   - src/ui/idleVillage/rosterV2/mountedCardRegistry.ts
   - src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts
+  - src/ui/idleVillage/rosterV2/runStagingOpeningRoster.ts
   - src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts
   - src/ui/idleVillage/skins/resolveInitialSkin.ts
   - src/ui/idleVillage/slots/useResidentSlotController.ts
@@ -116,11 +120,13 @@ e2e_trigger_globs:
   - src/ui/designSystem/primitives/index.ts
   - src/ui/idleVillage/archetypeDirectory.ts
   - src/ui/idleVillage/components/gameFrame/GameFrameDragCursor.tsx
+  - src/ui/idleVillage/components/gameFrame/expeditionLostStaging.ts
   - src/ui/idleVillage/components/gameFrame/heroSheetMachine.ts
   - src/ui/idleVillage/components/gameFrame/heroSheetViewModel.ts
   - src/ui/idleVillage/components/gameFrame/hudPanelRegistry.ts
   - src/ui/idleVillage/components/gameFrame/hudTones.ts
   - src/ui/idleVillage/components/gameFrame/index.ts
+  - src/ui/idleVillage/components/gameFrame/nextEvent.ts
   - src/ui/idleVillage/components/gameFrame/poiSigillo.ts
   - src/ui/idleVillage/components/gameFrame/questAvailability.ts
   - src/ui/idleVillage/components/gameFrame/questRevealSchedule.ts
@@ -155,11 +161,13 @@ e2e_trigger_globs:
   - src/ui/idleVillage/questS1Lab/useQuestRun.ts
   - src/ui/idleVillage/quests/rosterCompatibility.ts
   - src/ui/idleVillage/rosterV2/heroLevelCue.ts
+  - src/ui/idleVillage/rosterV2/heroLevelMock.ts
   - src/ui/idleVillage/rosterV2/heroLevelUpEvents.ts
   - src/ui/idleVillage/rosterV2/heroLevelViewModel.ts
   - src/ui/idleVillage/rosterV2/index.ts
   - src/ui/idleVillage/rosterV2/mountedCardRegistry.ts
   - src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts
+  - src/ui/idleVillage/rosterV2/runStagingOpeningRoster.ts
   - src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts
   - src/ui/idleVillage/skins/resolveInitialSkin.ts
   - src/ui/idleVillage/slots/useResidentSlotController.ts

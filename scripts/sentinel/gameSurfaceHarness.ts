@@ -622,23 +622,47 @@ export async function plaqueOverflow(ctx: HarnessCtx, { bandPx = 6 } = {}) {
 }
 
 /**
- * C5c «respiro dalla cornice»: controls closer than
- * `--skin-hud-plaque-clearance` + `--skin-hud-panel-padding` (≈22px) to a
- * plaque edge. Reported per control, sorted worst-first.
+ * C5c «respiro dalla cornice»: controls closer than the standard panel
+ * interior padding (`min(--skin-hud-plaque-clearance, --skin-hud-panel-padding)`
+ * → 10px) to a plaque edge. R-270 calibration: the old 22px composite
+ * flagged every edge-anchored plaque — `hang`/`plinth` edges flush with
+ * the viewport are anchored by design (exempt), token-legitimate
+ * `panel-padding` interiors (10px) pass, scroll-clipped descendants whose
+ * rect lies outside the scrollport are not painted (excluded), and hidden
+ * plaques (closed drawers) are skipped entirely.
  */
 export async function plaqueClearance(ctx: HarnessCtx) {
   return ctx.page.evaluate(() => {
     const cs = getComputedStyle(document.documentElement);
     const px = (v: string) => parseFloat(cs.getPropertyValue(v)) || 0;
-    const need = px('--skin-hud-plaque-clearance') + px('--skin-hud-panel-padding') || 22;
+    const need = Math.min(px('--skin-hud-plaque-clearance') || 12, px('--skin-hud-panel-padding') || 10);
     const out: any[] = [];
     for (const pl of document.querySelectorAll('[data-skin="hud-plaque"]')) {
-      const p = pl.getBoundingClientRect(); if (p.width < 1) continue;
+      const p = pl.getBoundingClientRect();
+      if (p.width < 1 || getComputedStyle(pl).visibility === 'hidden') continue;
+      const anchored: Record<string, boolean> = {
+        left: p.left <= 2, right: p.right >= innerWidth - 2, top: p.top <= 2, bottom: p.bottom >= innerHeight - 2,
+      };
       for (const k of pl.querySelectorAll('button, [role="button"], [role="radio"], [role="group"]')) {
-        const r = k.getBoundingClientRect(); if (r.width < 2) continue;
+        let r = k.getBoundingClientRect();
+        /* Visible portion only: a row clipped by an ancestor's
+         * overflow keeps a layout rect past the clip edge — intersect
+         * with each clipping ancestor between the control and the
+         * plaque (scrollport ≈ its own rect). */
+        for (let a = k.parentElement; a && a !== pl; a = a.parentElement) {
+          const o = getComputedStyle(a);
+          if (o.overflowX === 'visible' && o.overflowY === 'visible') continue;
+          const ar = a.getBoundingClientRect();
+          const l = Math.max(r.left, ar.left), t = Math.max(r.top, ar.top);
+          const ri = Math.min(r.right, ar.right), bo = Math.min(r.bottom, ar.bottom);
+          r = new DOMRect(l, t, Math.max(0, ri - l), Math.max(0, bo - t));
+        }
+        if (r.width < 2 || r.height < 2 || r.bottom < p.top || r.top > p.bottom || r.right < p.left || r.left > p.right) continue;
         const gap = { left: r.left - p.left, right: p.right - r.right, top: r.top - p.top, bottom: p.bottom - r.bottom };
-        const min = Math.min(...Object.values(gap));
-        out.push({ plaque: (pl.textContent || '').replace(/\s+/g, ' ').slice(0, 18), el: (k.getAttribute('aria-label') || k.textContent || '').trim().slice(0, 18), need, minGap: +min.toFixed(1), gap: Object.fromEntries(Object.entries(gap).map(([a, b]) => [a, Math.round(b)])), fail: min < need });
+        const free = Object.entries(gap).filter(([edge]) => !anchored[edge]);
+        const min = free.length ? Math.min(...free.map(([, g]) => g)) : Infinity;
+        const minEdge = free.sort((a, b) => a[1] - b[1])[0]?.[0] ?? null;
+        out.push({ plaque: (pl.textContent || '').replace(/\s+/g, ' ').slice(0, 18), el: (k.getAttribute('aria-label') || k.textContent || '').trim().slice(0, 18), need, minGap: +min.toFixed(1), minEdge, gap: Object.fromEntries(Object.entries(gap).map(([a, b]) => [a, Math.round(b)])), anchored: Object.keys(anchored).filter((e) => anchored[e]), fail: min < need });
       }
     }
     return out.filter((o) => o.fail).sort((a, b) => a.minGap - b.minGap);
@@ -659,7 +683,8 @@ export async function lensAudit(ctx: HarnessCtx) {
     const roots = [...document.querySelectorAll(sel)].filter(vis).filter((r, i, a) => !a.some((o) => o !== r && o.contains(r) && o.matches('[data-hud-panel],[data-stage-panel],[role="dialog"]')));
     const hue = (c: string) => { const m = c.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)/); if (!m) return null; const [r, g, b] = [+m[1] / 255, +m[2] / 255, +m[3] / 255]; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (d < 0.25 || mx < 0.35) return null; let h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; return h; };
     const fam = (h: number | null) => h == null ? null : (h >= 165 && h <= 200) ? 'cyan' : (h >= 85 && h < 165) ? 'green' : (h < 15 || h >= 340) ? 'red' : (h >= 270 && h < 340) ? 'purple' : null;
-    const need = 22;
+    const hudCss = getComputedStyle(document.documentElement);
+    const need = Math.min(parseFloat(hudCss.getPropertyValue('--skin-hud-plaque-clearance')) || 12, parseFloat(hudCss.getPropertyValue('--skin-hud-panel-padding')) || 10);
     return roots.map((root) => {
       const R = root.getBoundingClientRect();
       const name = root.getAttribute('data-hud-panel') || root.getAttribute('data-stage-panel') || root.getAttribute('data-testid') || root.getAttribute('role') || (own(root) || root.textContent || '').replace(/\s+/g, ' ').slice(0, 24) || 'plaque';
@@ -673,10 +698,11 @@ export async function lensAudit(ctx: HarnessCtx) {
       const zeros = texts.filter((e) => /^(0|0%|0\.0|×0|\+0)$/.test(own(e))).length;
       let circSym = 0; root.querySelectorAll('svg,img').forEach((s) => { const p = s.parentElement; if (!p || !vis(s)) return; const ps = getComputedStyle(p), pr = p.getBoundingClientRect(); if (parseFloat(ps.borderTopLeftRadius) >= pr.width / 2 - 1 && Math.abs(pr.width - pr.height) < 3 && (ps.borderTopWidth !== '0px' || ps.backgroundColor !== 'rgba(0, 0, 0, 0)')) circSym++; });
       const small = texts.filter((e) => parseFloat(getComputedStyle(e).fontSize) < 12).map((e) => `${own(e).slice(0, 14)}@${getComputedStyle(e).fontSize}`);
-      let clr = 0; root.querySelectorAll('button,[role="button"]').forEach((b) => { if (!vis(b)) return; const r = b.getBoundingClientRect(); const g = Math.min(r.left - R.left, R.right - r.right, r.top - R.top, R.bottom - r.bottom); if (g < need && root.matches('[data-skin="hud-plaque"]')) clr++; });
+      const rootAnchored: Record<string, boolean> = { left: R.left <= 2, right: R.right >= innerWidth - 2, top: R.top <= 2, bottom: R.bottom >= innerHeight - 2 };
+      let clr = 0; root.querySelectorAll('button,[role="button"]').forEach((b) => { if (!vis(b)) return; const r = b.getBoundingClientRect(); if (r.bottom < R.top || r.top > R.bottom || r.right < R.left || r.left > R.right) return; const free = (Object.entries({ left: r.left - R.left, right: R.right - r.right, top: r.top - R.top, bottom: R.bottom - r.bottom }) as [string, number][]).filter(([e]) => !rootAnchored[e]); const g = free.length ? Math.min(...free.map(([, v]) => v)) : Infinity; if (g < need && root.matches('[data-skin="hud-plaque"]')) clr++; });
       return { name, box: [Math.round(R.x), Math.round(R.y), Math.round(R.width), Math.round(R.height)], texts: texts.length,
         L1_collisions: col.slice(0, 8), L1n: col.length, L2_truncated: trunc.slice(0, 8), L3_fonts: fonts, L4_offPalette: off, L4_samples: offS,
-        L5_buttonGrammars: [...gram], L6_zeroValues: zeros, L7_circleWithSymbol: circSym, L8_small: small.slice(0, 8), L8n: small.length, L9_tightToFrame: clr };
+        L5_buttonGrammars: [...gram], L6_zeroValues: zeros, L7_circleWithSymbol: circSym, L8_small: small.slice(0, 8), L8n: small.length, L9_tightToFrame: clr, L9_need: need };
     });
   });
 }
@@ -714,6 +740,14 @@ export interface SurfaceNode {
   readySignal: string;
   /** Deterministic driver to the state — app signals, never sleeps. */
   reach: (ctx: HarnessCtx) => Promise<void>;
+  /**
+   * Post-reload recovery driver for LIFECYCLE_INTERRUPT. Defaults to
+   * `reach`. Quest-run nodes need it: `demoLaunch` cancels itself when a
+   * run is active (canonical send boundary), so after a mid-run reload
+   * the window must be reopened through the R-133 affordance — clicking
+   * `map-quest-poi` routes the live rehydrated run to QuestRunWindow.
+   */
+  resume?: (ctx: HarnessCtx, node: SurfaceNode) => Promise<void>;
   /** Perturbation operators allowed on this node. */
   perturbations: PerturbationKind[];
   /** Nodes whose perturbation budget may be skipped when absent. */
@@ -745,9 +779,39 @@ async function openVillageView(ctx: HarnessCtx): Promise<void> {
 /** Hovers a building pin then clicks the tooltip's open action (real input). */
 async function openVillageBuildingPanel(ctx: HarnessCtx, pin: string, triggerTestId: string): Promise<void> {
   await openVillageView(ctx);
-  await ctx.page.locator(`[data-building-pin="${pin}"]`).hover();
+  /* R-270 (sentinel run 0829, S4 unreachable): the registry drawer is a
+   * slide-over inside the stage — pins under it are occluded by design and
+   * unhoverable. The canonical affordance while the drawer is open is the
+   * registry row itself (`data-registry-row` is locale-stable): clicking it
+   * pins the same stage tooltip, so the trigger testid path is identical. */
+  const registryOpen = await ctx.page.locator('[data-testid="village-registry"][data-open]').count() > 0;
+  if (registryOpen) {
+    await ctx.page.locator(`[data-registry-row="${pin}"]`).click();
+  } else {
+    await ctx.page.locator(`[data-building-pin="${pin}"]`).hover();
+  }
   await waitVisible(ctx, '[data-testid="village-building-tooltip"]', 10_000);
   await ctx.page.getByTestId(triggerTestId).click();
+}
+
+/**
+ * Post-reload recovery for quest-run nodes (R-133): with a live run the
+ * map POI reopens the run window; `node.reach`'s `demoLaunch` then no-ops
+ * on `anyRunActive` and its driver advances the rehydrated run to the
+ * target node. If no run survived the reload the POI opens the planner
+ * detail instead — the `quest-window` wait then reports the node
+ * unreachable, which is exactly the rehydration finding to surface.
+ */
+async function resumeQuestRun(ctx: HarnessCtx, node: SurfaceNode): Promise<void> {
+  await enterGame(ctx);
+  await ctx.page.evaluate(() => window.__idleVillageTestHooks?.revealQuestPois?.());
+  /* `data-testid="map-quest-poi"` is on the shared PoiMateric sigillo —
+   * one per revealed POI. The unique clickable affordance is the wrapper
+   * carrying `data-quest-poi-id` (R-133: run active → onOpenRun). */
+  await ctx.page.locator(`[data-map-quest-poi-target][data-quest-poi-id="${POI}"]`).click();
+  await waitVisible(ctx, '[data-testid="quest-window"]');
+  note(ctx, 'resume', `input-reale:map-quest-poi[${POI}]`);
+  await node.reach(ctx);
 }
 
 /**
@@ -825,6 +889,7 @@ export const GAME_SURFACE_GRAPH: SurfaceNode[] = [
       note(ctx, 'launch', 'hook-assisted:demoLaunch');
       await waitVisible(ctx, '[data-testid="quest-window"]');
     },
+    resume: resumeQuestRun,
     perturbations: ['VP_SWEEP', 'LIFECYCLE_INTERRUPT'],
   },
   {
@@ -844,6 +909,7 @@ export const GAME_SURFACE_GRAPH: SurfaceNode[] = [
       }
       throw new Error('S8_QuestStageNarrative unreachable within 120s');
     },
+    resume: resumeQuestRun,
     perturbations: ['VP_SWEEP', 'LOCALE_SWEEP', 'LIFECYCLE_INTERRUPT'],
   },
   {
@@ -865,6 +931,7 @@ export const GAME_SURFACE_GRAPH: SurfaceNode[] = [
       }
       throw new Error('S9_QuestStageChoice unreachable within 120s');
     },
+    resume: resumeQuestRun,
     perturbations: ['VP_SWEEP', 'LOCALE_SWEEP', 'LIFECYCLE_INTERRUPT'],
   },
   {
@@ -876,6 +943,7 @@ export const GAME_SURFACE_GRAPH: SurfaceNode[] = [
       await ctx.page.locator('.da-tira').waitFor({ state: 'visible', timeout: 30_000 });
       note(ctx, 'armed', 'driver:armed');
     },
+    resume: resumeQuestRun,
     perturbations: ['VP_SWEEP', 'LOCALE_SWEEP', 'LIFECYCLE_INTERRUPT'],
   },
   {
@@ -890,6 +958,7 @@ export const GAME_SURFACE_GRAPH: SurfaceNode[] = [
       await waitVisible(ctx, '[data-testid="quest-verdict-card"]', 40_000);
       await ctx.page.waitForFunction(() => document.querySelector('[data-astro-idle="parked"]'), undefined, { timeout: 10_000 }).catch(() => {});
     },
+    resume: resumeQuestRun,
     perturbations: ['VP_SWEEP', 'LIFECYCLE_INTERRUPT'],
   },
   {
@@ -936,6 +1005,7 @@ export const GAME_SURFACE_GRAPH: SurfaceNode[] = [
         .waitFor({ state: 'visible', timeout: 60_000 });
       note(ctx, 'settlement', 'driver:runToSettlement');
     },
+    resume: resumeQuestRun,
     perturbations: ['VP_SWEEP', 'LOCALE_SWEEP', 'LIFECYCLE_INTERRUPT'],
   },
   {

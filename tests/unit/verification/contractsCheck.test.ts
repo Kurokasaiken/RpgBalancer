@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  applyScopeFiles,
   checkContractsGate,
   exceptionRecordHash,
   type CoverageException,
@@ -434,5 +435,107 @@ describe('gate-file diffs (T-003, git temp repo)', { timeout: 30000 }, () => {
     put(root, 'scripts/verification/contractsCheck.ts', '// v2');
     const rep = checkContractsGate(root);
     expect(rep.errors.some((e) => e.includes('gate-file') && e.includes('director_answer'))).toBe(true);
+  });
+});
+
+describe('applyScopeFiles / scope_files (PLAN-081, git temp repo)', { timeout: 60000 }, () => {
+  function makeRepo(): string {
+    const dir = mkdtempSync(path.join(tmpdir(), 'cc-scope-'));
+    const g = (a: string) => execSync(`git ${a}`, { cwd: dir });
+    g('init -q');
+    g('config user.email t@t');
+    g('config user.name t');
+    writeFileSync(path.join(dir, 'README.md'), '# x');
+    g('add -A');
+    g('commit -qm init');
+    return dir;
+  }
+  const put = (root: string, rel: string, content: string) => {
+    const full = path.join(root, rel);
+    mkdirSync(path.dirname(full), { recursive: true });
+    writeFileSync(full, content);
+  };
+  /** Mappa approvata che copre i file del piano + la mappa stessa. */
+  const setupApprovedMap = (root: string) => {
+    const map: SurfaceMap = {
+      ...SMALL_MAP,
+      surfaces: [
+        ...SMALL_MAP.surfaces,
+        { id: 'mw-meta', globs: ['.mw/surface-map.json'], expected_checks: [] },
+      ],
+    };
+    put(root, '.mw/surface-map.json', JSON.stringify(map));
+    const diff = diffSurfaceMaps(null, map);
+    const propDir = path.join(root, '.mw/mapping-proposals');
+    mkdirSync(propDir, { recursive: true });
+    const propFile = path.join(propDir, 'p1.json');
+    writeFileSync(
+      propFile,
+      JSON.stringify({ created_at: 'x', created_by: 't', entries: [...diff.added, ...diff.changed], removed_ids: [] }),
+    );
+    const fileSha = createHash('sha256').update(readFileSync(propFile)).digest('hex');
+    appendFileSync(
+      path.join(root, '.mw/mapping-approvals.jsonl'),
+      JSON.stringify({ batch_sha256: fileSha, approved_at: 'x', approved_by: 'director' }) + '\n',
+    );
+  };
+
+  it('partiziona globs e tiene gli exempt fuori da foreign', () => {
+    const changed = ['src/game/a.ts', 'src/foreign/b.ts', '.mw/runs/r1/x.json', 'test-results/t.log'];
+    const { scoped, foreign } = applyScopeFiles(changed, ['src/game/**']);
+    expect(scoped).toEqual(['src/game/a.ts']);
+    expect(foreign).toEqual(['src/foreign/b.ts']);
+  });
+
+  it('scope assente → tutto scoped, nessun foreign', () => {
+    const { scoped, foreign } = applyScopeFiles(['a.ts', 'b.ts'], undefined);
+    expect(scoped).toEqual(['a.ts', 'b.ts']);
+    expect(foreign).toEqual([]);
+  });
+
+  it('file non mappato FUORI scope → foreign_scope advisory, nessun errore (rumore sessione parallela)', () => {
+    const root = makeRepo();
+    setupApprovedMap(root);
+    put(root, 'src/game/a.ts', 'x');       // in scope, mappato
+    put(root, 'src/foreign/b.ts', 'x');    // fuori scope, non mappato → sarebbe errore senza scope
+    const rep = checkContractsGate(root, { scopeFiles: ['src/game/**'] });
+    expect(rep.foreign_scope).toContain('src/foreign/b.ts');
+    expect(rep.errors.some((e) => e.includes('src/foreign/b.ts'))).toBe(false);
+    expect(rep.mapped.map((m) => m.file)).toContain('src/game/a.ts');
+  });
+
+  it('stesso fixture SENZA scope → retrocompat: il file non mappato è errore', () => {
+    const root = makeRepo();
+    setupApprovedMap(root);
+    put(root, 'src/game/a.ts', 'x');
+    put(root, 'src/foreign/b.ts', 'x');
+    const rep = checkContractsGate(root);
+    expect(rep.foreign_scope).toBeUndefined();
+    expect(rep.unmapped).toContain('src/foreign/b.ts');
+    expect(rep.errors.some((e) => e.includes('src/foreign/b.ts'))).toBe(true);
+  });
+
+  it('file IN scope non mappato → continua a bloccare (lo scope non è un bypass)', () => {
+    const root = makeRepo();
+    setupApprovedMap(root);
+    put(root, 'src/game/a.ts', 'x');
+    put(root, 'src/unscoped-but-declared/evil.ts', 'x');  // in scope, non mappato
+    const rep = checkContractsGate(root, { scopeFiles: ['src/game/**', 'src/unscoped-but-declared/**'] });
+    expect(rep.unmapped).toContain('src/unscoped-but-declared/evil.ts');
+    expect(rep.errors.some((e) => e.includes('src/unscoped-but-declared/evil.ts'))).toBe(true);
+  });
+
+  it('changedFiles già filtrato dal chiamante + scopeFiles → partizione coerente', () => {
+    const root = makeRepo();
+    setupApprovedMap(root);
+    put(root, 'src/game/a.ts', 'x');
+    put(root, 'src/foreign/b.ts', 'x');
+    // produceBundle passa il diff intero + scopeFiles: il gate partiziona da solo
+    const rep = checkContractsGate(root, {
+      changedFiles: ['src/game/a.ts', 'src/foreign/b.ts', '.mw/surface-map.json'],
+      scopeFiles: ['src/game/**'],
+    });
+    expect(rep.changed_files).toEqual(['src/game/a.ts']);
+    expect(rep.foreign_scope).toEqual(['src/foreign/b.ts', '.mw/surface-map.json']);
   });
 });

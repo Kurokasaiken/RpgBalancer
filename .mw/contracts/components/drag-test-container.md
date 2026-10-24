@@ -9,9 +9,16 @@ scope_files:
 fast_checks: []
 e2e_checks: []
 e2e_trigger_globs: []
-invariants: []
+invariants:
+  - id: drag-test-container.INV-1
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      Riga residente (div role=button) a cavallo del fold del roster list di 32px — S6 planner (Sentinel fold-straddle,
+      run 0829); cap 184px non multiplo del pitch 36px
+    test_refs: 
+      - tests/unit/idleVillage/dragTestContainer.foldCap.test.tsx
 ---
-
 # drag-test-container
 
 Unità `ui-component` (tier 2, default) — contratto vivo PLAN-054. Root: `src/ui/idleVillage/components/DragTestContainer.tsx`.

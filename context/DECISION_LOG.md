@@ -1476,3 +1476,23 @@ marker dorato delle quest, che al click apre la schermata di preparazione.
 **A:** l'invariante geometrica vive nello **stato espanso**: la title row usa gli stessi content-inset della striscia (placca `panel` 10px + riga `paddingInline '12px 8px'` = content box 22/18 della `hang` `10px 18px`). Il collapse cambia il glifo del toggle, mai la geometria — misurato dx=0/dy=0 su chest/toggle/close. Caveat di misura: `-2px` sotto il cursore = `--skin-btn-hover-lift`, non disallineamento. Convenzione cross-pannello in `hud_component_guide` §«Pannello ridotto a striscia», trappola **T-23**.
 **Motivo:** ruling Director 2026-10-21 verbatim.
 **Fonte:** `RICHIESTE.md` R-251, `.mw/runs/learn-20261022-stash-strip/pattern-candidate.md`, `context/recurring-traps.md` T-23.
+
+## 2026-10-23 — PLAN-029 ratificato con 2 emendamenti (AMEND-THEN-RATIFY)
+
+**Da:** PLAN-029 (quest-generation-lab operativa) era `candidate` dal 2026-10-12: master plan + 8 subplan converged via mw-web-debate, mai ratificati; PLAN-069 T-030 ne chiedeva battezzo o disposizione esplicita.
+**A:** dibattito di revisione `20261023-plan029-ratifica` (4/5 provider — claude escluso per adapter rotto) ha verificato i delta post-convergenza (copy pipeline irrobustita, `fase`+journey-DAG, terza istanza imprint, metaLayer) e raccomandato all'unanimità AMEND-THEN-RATIFY con 2 emendamenti minimi: AMEND-1 = SP-3 gate inventory ri-baselinato sui nuovi check copy deterministici (diagnostici restano non-bloccanti); AMEND-2 = audit SP-1 esteso a `fase`/journey-DAG/provenance-con-meccanismo-di-riproduzione, con journey-DAG classificato gate export-seam (SP-6) e non run-entry (fatto verificato: richiede config POI assente negli scenari standalone). Director ruling: ratificato → `active`. La ratifica È la disposizione richiesta da PLAN-069 T-030.
+**Motivo:** il piano era architetturalmente integro ma due superfici di classificazione erano state converse contro contratti poi cresciuti; un votante ha misclassificato journey-DAG come hard gate in round 1 — prova che l'ambiguità era reale.
+**Fonte:** `plans/PLAN-029-quest-gen-lab-operativa.md` §7, `.mw/runs/20261023-plan029-ratifica/` (repo mind-weaver, artifact-r003 sha256 `6f330e22…240c`), R-142.
+
+## 2026-10-24 — Sprite kit non occludono: cloud-sky tirato da andata
+
+**Da:** i kit atmosphere `sprite` potevano essere attaccati a qualsiasi scena —
+cloud-sky era registry-only solo per gusto ("una nuvola su mezzo campo stona").
+**A:** i kit sprite sono overlay piatti: NON possono passare dietro occluder
+near-plane dipinti. Una nuvola discreta che attraversa i pali del cancello si
+legge come nebbia in primo piano. cloud-sky richiede cielo pulito (kill list
+"NO distinct cloud silhouettes" è anche per questo) O una mask baked —
+estensione possibile ma non implementata. `viaggio-andata` torna a `[]`.
+**Motivo:** prova live su andata — il Director l'ha letta come "nebbia sul
+cancello", non nuvola. Regola ora nel contratto ambient-layer.
+**Fonte:** `.mw/runs/learn-20261024-sprite-occlusion/pattern-candidate.md`

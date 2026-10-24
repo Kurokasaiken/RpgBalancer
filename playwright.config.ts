@@ -56,7 +56,7 @@ export default defineConfig({
         video: 'on-first-retry',
       },
       testMatch: ['**/*mobile*.spec.ts'],
-      testIgnore: ['**/*touch-mode*.spec.ts'], // Exclude touch-mode tests from Safari
+      testIgnore: ['**/*touch-mode*.spec.ts', '**/mobileFit.spec.ts'], // touch-mode + PLAN-083 single-boot suite
     },
     {
       name: 'Mobile Chrome',
@@ -68,6 +68,19 @@ export default defineConfig({
         video: 'on-first-retry',
       },
       testMatch: ['**/*mobile*.spec.ts', '**/*touch-mode*.spec.ts'],
+      testIgnore: ['**/mobileFit.spec.ts'], // PLAN-083 single-boot suite runs on its own project
+    },
+    // PLAN-083 mobile-fit contract: portrait 390x844 touch, single dedicated
+    // project (the spec boots /game once and shares the page serially).
+    {
+      name: 'Mobile Fit',
+      use: {
+        ...devices['iPhone 14 Pro'],
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+      },
+      testMatch: '**/mobileFit.spec.ts',
     },
     // Visual Regression Testing project (Docker only)
     {

@@ -1,6 +1,6 @@
 ---
 title: 'PLAN-029 SP-3 — Validation orchestrator & gate'
-status: candidate
+status: active
 created: 2026-10-12
 parent: PLAN-029
 debate: mw-web-debate `20261012-quest-gen-lab-sp3-validation-gates` — artifact r006
@@ -13,6 +13,8 @@ depends_on: PLAN-029 SP-1 (DIAGNOSTIC_GATE_IDS, canonicalize), SP-2 (LabCandidat
 ---
 
 # SP-3 — Validation orchestrator & gate (artifact r006)
+
+> **AMEND-1+2(b) — ratifica 2026-10-23:** il gate inventory va ri-derivato sulla copy pipeline attuale (validateCopy/arcContract/prompts/vocabs): ogni check classificato PASS/FAIL/WARNING; diagnostici mai bloccanti sul run entry. journey-DAG = gate export-seam SP-6 + diagnostico opzionale con POI target, NON hard gate di run-entry. Vedi PLAN-029 §7.
 
 6 revisioni. r006 assorbe: deepseek REVISE su r001 (B-1 coverage invariant — ogni
 gate registrato produce SEMPRE una riga; B-2 split assi status/execution; B-3

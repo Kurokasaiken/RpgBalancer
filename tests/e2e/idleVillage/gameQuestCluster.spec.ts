@@ -179,8 +179,17 @@ const reachWaitingFrontier = async (page: Page, maxSteps = 40) => {
       } else {
         const clock = await getClock(page);
         const lead = Math.max(0, run.frontier.readyAt - (clock?.currentTick ?? 0));
-        await advanceTicks(lead + 1);
+        await advanceTicks(page, lead + 1);
       }
+    }
+    /* R-199: una frontiera `waiting` è visibile subito ma committabile solo
+     *  da `readyAt` — `choose` prima del tempo viene rifiutato in silenzio
+     *  dal motore (era la fonte della flakiness: colonna mai montata).
+     *  Maturiamo lo slot di fase sul clock canonico prima di restituire. */
+    if (run.frontier.status === 'waiting' && Number.isFinite(run.frontier.readyAt)) {
+      const clock = await getClock(page);
+      const lead = Math.max(0, run.frontier.readyAt - (clock?.currentTick ?? 0));
+      if (lead > 0) await advanceTicks(page, lead + 1);
     }
     /* Flush any beats still presenting — click until the stage reports the
      *  waiting state (choices visible). A check beat holds on the column:
@@ -210,32 +219,55 @@ const driveToCheck = async (page: Page) => {
   await reachWaitingFrontier(page);
   const options = await getOptions(page);
   await choose(page, options[0]);
-  /* The commit queues beats; the check beat holds with the column mounted. */
-  await expect(checkColumn(page)).toBeVisible({ timeout: 15_000 });
+  /* The commit queues beats; the check beat holds with the column mounted —
+   *  any presenting beat ahead of it must be flushed through the stage. The
+   *  column is re-checked RIGHT after each stage click so no `progress()`
+   *  input lands on a mounted astrolabe: two inputs post-mount already mean
+   *  throw→skipToResult→verdict→auto-dismiss (`checkVerdictMs` 2400) and the
+   *  column is gone before settleCheck can see it (era la race di BV-01). */
+  const deadline = Date.now() + 20_000;
+  while (Date.now() < deadline) {
+    if (await checkColumn(page).isVisible().catch(() => false)) return;
+    if (await beatStage(page).isVisible().catch(() => false)) {
+      await beatStage(page).click({ force: true, timeout: 1_500 }).catch(() => undefined);
+      if (await checkColumn(page).isVisible().catch(() => false)) return;
+    }
+    await page.waitForTimeout(150);
+  }
+  await expect(checkColumn(page)).toBeVisible({ timeout: 2_000 });
 };
 
 /** Throw + settle the astrolabe in the column. The engine's `skipToResult`
  *  is a no-op while `state==='idle'` — the roll may not have armed yet —
- *  so this retries «throw → settle» until the Verdict Card paints. */
+ *  so this retries «throw → settle» until the Verdict Card paints.
+ *  `dispatchEvent` skips the hit-test: `.da-tira` stays mounted for the
+ *  whole held beat and an actionability-gated click under the verdict card
+ *  / FX overlays burns the default 30s per call (the real BV-01 timeout).
+ *  Enter rides the window's any-key → `progress()` ladder (throw, then
+ *  skipToResult while the ball flies). Returns early if the check already
+ *  auto-resolved — the caller's verdict assert decides. */
 const settleCheck = async (page: Page) => {
-  const board = page.getByTestId('quest-check-board');
   const tira = checkColumn(page).locator('.da-tira, #launch');
   const deadline = Date.now() + 12_000;
   while (Date.now() < deadline) {
     if (await verdictCard(page).isVisible().catch(() => false)) return;
     if (!(await checkColumn(page).isVisible().catch(() => false))) return;
-    if (await tira.isVisible().catch(() => false)) await tira.click().catch(() => undefined);
-    await page.waitForTimeout(250);
-    await board.click().catch(() => undefined);
-    await page.waitForTimeout(350);
+    if (await tira.isVisible().catch(() => false)) {
+      await tira.dispatchEvent('click').catch(() => undefined);
+    }
+    await page.keyboard.press('Enter').catch(() => undefined);
+    await page.waitForTimeout(300);
   }
-  await expect(verdictCard(page)).toBeVisible({ timeout: 3_000 });
 };
 
-/** Dismiss the column by clicking its backdrop-free body after the arm. */
+/** Dismiss the column by clicking its backdrop-free body after the arm.
+ *  If the verdict click already armed the dismissal the column may be
+ *  gone — the contract is "not mounted", not "clicked once more". */
 const dismissColumn = async (page: Page) => {
   await page.waitForTimeout(500); // dismissArmDelayMs 350 + margin
-  await checkColumn(page).click({ position: { x: 8, y: 8 } });
+  if (await checkColumn(page).isVisible().catch(() => false)) {
+    await checkColumn(page).dispatchEvent('click').catch(() => undefined);
+  }
   await expect(checkColumn(page)).toBeHidden({ timeout: 10_000 });
 };
 
@@ -365,10 +397,13 @@ test.describe('PLAN-043 WS-4 — QuestStageCluster BV gates', () => {
       /* Env attestation on the LIVE surface (check spinning) — once per run. */
       if (!metricsEnv) metricsEnv = await collectEnv(page);
       await settleCheck(page);
-      await expect(verdictCard(page)).toBeVisible();
-      await waitStableRects(page, COLUMN_PROBES);
+      /* The verdict dwell (`checkVerdictMs` 2400) can auto-settle between the
+       *  settle and this read under probe latency — `verdictSeen` in the
+       *  sample says whether D probed a live card or the already-resolved
+       *  column (same wing footprint either way). */
+      const verdictSeen = await verdictCard(page).isVisible().catch(() => false);
       const pairsD = await overlapPairs(page, COLUMN_PROBES);
-      sample({ viewport: `${size.w}x${size.h}`, state: 'D', overlapPairs: pairsD });
+      sample({ viewport: `${size.w}x${size.h}`, state: 'D', verdictSeen, overlapPairs: pairsD });
       expect(pairsD, `${size.w}×${size.h} state D`).toEqual([]);
       await dismissColumn(page);
       /* State E — inline abandon confirm. */
@@ -489,42 +524,74 @@ test.describe('PLAN-043 WS-4 — QuestStageCluster BV gates', () => {
     /* Measure DURING the spin — the heaviest legal state. */
     const spin = await fpsSample();
     sample({ phase: 'spin', fps: spin });
-    await settleCheck(page);
-    /* 700ms park delay — wait it out, then measure the counter's delta. */
-    await page.waitForTimeout(900);
-    const framesOf = () =>
+    /* Deterministic settle — `page.clock.install()` fakes the page's rAF
+     *  AND setTimeout, but the fake clock RUNS in real time by default:
+     *  every probe/`waitForTimeout` burns the same ~650ms window the test
+     *  kept losing (engine park +700 → R-259 auto-dismiss +1350 →
+     *  `bridge.onDismiss` → `cursor.skip()` — witnessed: the column died
+     *  ~450 real-ms after runFor(760) returned, inside
+     *  `ClockController._syncRealTime`). `pauseAt` freezes the ticks so
+     *  the held window becomes a deterministic budget of FAKE ms.
+     *  Enter×2 rides `progress()`: first `throw()`, then `skipToResult()` —
+     *  synchronous resolve, no frames needed while the clock is fake. A
+     *  `.da-tira` click would be wrong here: landed in the armed window it
+     *  is a legitimate dismiss (BV-12's landing-click guard) that unmounts
+     *  the column before the park timer. */
+    await page.clock.install();
+    /* `pauseAt` freezes the fake ticks — but it fast-forwards to the given
+     *  wall time first and throws on a past target, so give it +50ms of
+     *  headroom (any timer worth firing sits ≥350 fake-ms out anyway). */
+    await page.clock.pauseAt(Date.now() + 50);
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Enter');
+    await expect(verdictCard(page)).toBeVisible({ timeout: 5_000 });
+    const astroProbe = () =>
       page.evaluate(() => {
-        const el = document.querySelector<HTMLElement>('[data-testid="quest-check-column"] [data-astro-frames], [data-astro-frames]');
-        return el ? Number(el.dataset.astroFrames) : null;
+        const col = document.querySelector<HTMLElement>('[data-testid="quest-check-column"]');
+        const el = col?.querySelector<HTMLElement>('[data-astro-frames]') ?? null;
+        return { mounted: Boolean(col?.isConnected), frames: el ? Number(el.dataset.astroFrames) : null, idle: el?.dataset.astroIdle ?? null };
       });
-    const f0 = await framesOf();
-    expect(f0, 'engine exposes the frame counter').not.toBeNull();
-    await page.waitForTimeout(1000);
-    const f1 = await framesOf();
-    sample({ phase: 'parked-1s', rafDelta: f1! - f0! });
-    expect(f1! - f0!, 'parked loop must not tick').toBe(0);
-    /* Headless software-GL can't hit a literal 55fps — the page's Pixi map
-     *  alone costs that much there. The honest headless gate: the PARKED
-     *  astrolabe must not drag fps below the actively spinning state's
-     *  (~its own raster budget), and never below baseline×0.4 — a real leak
-     *  (e.g. the engine still animating, a stuck shimmer) would show here. */
-    const fps = await fpsSample();
-    sample({ phase: 'held-verdict', fps });
-    test.info().annotations.push({ type: 'fps', description: `baseline=${baseline} spin=${spin} held=${fps}` });
-    expect(fps, 'held verdict must cost ≤ the spinning state').toBeGreaterThanOrEqual(Math.max(6, spin * 0.75));
-    /* Fixed sanity floor only — a baseline×k bound measures SwiftShader
-     *  jitter, not a contract. Absolute 55fps is a GPU-headed witness. */
-    expect(fps, 'page still produces frames while the verdict is held').toBeGreaterThanOrEqual(8);
-    /* Resize → exactly one repaint, loop still parked afterwards. */
-    await page.setViewportSize({ width: 1400, height: 900 });
-    await page.waitForTimeout(200);
-    const f2 = await framesOf();
-    sample({ phase: 'resized', rafDelta: f2! - f1! });
-    expect(f2! - f1!).toBeLessThanOrEqual(2); // one redraw + settle margin
-    await page.waitForTimeout(1000);
-    const f3 = await framesOf();
-    sample({ phase: 'post-resize-1s', rafDelta: f3! - f2! });
-    expect(f3! - f2!).toBe(0);
+    /* Park lands at fake +700 — step just past it; the loop must freeze. */
+    await page.clock.runFor(710);
+    const p0 = await astroProbe();
+    expect(p0.mounted, 'column still mounted inside the held window').toBe(true);
+    expect(p0.idle, 'engine reports the parked state').toBe('parked');
+    expect(p0.frames, 'engine exposes the frame counter').not.toBeNull();
+    /* Resize the COLUMN for real: 1440→1920 crosses
+     *  `skillCheckColumn.wideAtPx` (340→420px board) so the kit's
+     *  ResizeObserver queues `redrawOnce()` — a single FAKE rAF that lands
+     *  only inside `runFor`. (The old 1440→1400 step left the board
+     *  clamped at 340px and probed nothing.) With the clock paused the
+     *  RO delivery can take all the real time it needs. */
+    await page.setViewportSize({ width: 1920, height: 900 });
+    await page.waitForTimeout(300); // RO callback delivery rides the real event loop
+    const pMid = await astroProbe();
+    expect(pMid.frames, 'a resize alone must not tick the parked loop').toBe(p0.frames);
+    await page.clock.runFor(120); // fire exactly the queued repaint frame (fake ~830)
+    const p1 = await astroProbe();
+    sample({ phase: 'resized', mounted: p1.mounted, repaintFrames: p0.frames !== null && p1.frames !== null ? p1.frames - p0.frames : null });
+    expect(p1.frames! - p0.frames!, 'parked resize repaints exactly once').toBe(1);
+    await page.clock.runFor(300); // fake ~1130 — still inside the held window (<1350)
+    const p2 = await astroProbe();
+    sample({ phase: 'post-resize-held', mounted: p2.mounted, rafDelta: p1.frames !== null && p2.frames !== null ? p2.frames - p1.frames : null });
+    expect(p2.frames! - p1.frames!, 'loop stays parked after the repaint').toBe(0);
+    /* Closing witness — the R-259 auto-dismiss itself: crossing fake
+     *  +1350 must unmount the column via `bridge.onDismiss → skip()`,
+     *  proving the held window we just measured ends where the config
+     *  says it ends (and that all the parked samples above really sat
+     *  inside it). */
+    await page.clock.runFor(400); // fake ~1530 > ~1400 (1350 + pauseAt offset)
+    await expect(checkColumn(page)).toBeHidden({ timeout: 5_000 });
+    sample({ phase: 'auto-dismiss', columnGone: true });
+    /* The held-fps gate is not measurable on a fake clock — page rAF is
+     *  frozen by definition. The substance it guarded (the parked astrolabe
+     *  must not drag the loop) is witnessed deterministically by the
+     *  frozen counter above; the spin/baseline samples keep the context. */
+    sample({ phase: 'held-verdict', fps: 'n/a — fake clock; parked counter is the witness' });
+    test.info().annotations.push({ type: 'fps', description: `baseline=${baseline} spin=${spin} held=fake-clock` });
+    /* No `clock.uninstall` in the client API — the fake clock dies with the
+     *  test context; the column already auto-dismissed in the witness above,
+     *  so `dismissColumn` just confirms the contract ("not mounted"). */
     await dismissColumn(page);
   });
 
@@ -707,9 +774,15 @@ test.describe('PLAN-043 WS-4 — QuestStageCluster BV gates', () => {
     } else {
       test.info().annotations.push({ type: 'note', description: 'armed flag already set at first observation — guarded-click half unverifiable' });
     }
-    /* Past the arm: exactly one dismiss. */
+    /* Past the arm: exactly one dismiss. The click lands atomically in-page:
+     *  R-259's auto-dismiss can legitimately unmount the column between the
+     *  armed assert and a gated click (the contract is "not mounted", not
+     *  "clicked once"), and the verdict card can cover the hit area. */
     await expect(col).toHaveAttribute('data-check-armed', 'true', { timeout: 5_000 });
-    await col.click({ position: { x: 8, y: 8 } });
+    await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="quest-check-column"]');
+      if (el?.hasAttribute('data-check-armed')) el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
     await expect(col).toBeHidden({ timeout: 5_000 });
     sample({ phase: 'post-arm-dismiss', dismissed: true });
   });

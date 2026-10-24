@@ -11,7 +11,8 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { QuestNode } from '@/ui/idleVillage/questS1Lab/questScenario';
 import { scenarioTreeRows, type TreeRow } from './labGraph';
-import { gatesOfOption, type LabCatalogEntry } from './labModel';
+import { gatesOfOption, type LabCatalogEntry, type LabExplorerEntry } from './labModel';
+import type { CandidateStatus, LabCandidate } from './candidate';
 import { Chip, ChipRow, KindBadge, LabCard, StatusBadge } from './labUi';
 import { GenRunPlayer } from './GenRunPlayer';
 
@@ -176,46 +177,64 @@ const TreeRowView: React.FC<{
 /* Explorer                                                             */
 /* ------------------------------------------------------------------ */
 
-export const ScenarioExplorer: React.FC<{ entries: LabCatalogEntry[] }> = ({ entries }) => {
+/** Stable row key: candidate entries carry their own `cand-*` id (a
+ *  regenerated candidate may share the baked scenario id). */
+const rowId = (e: LabExplorerEntry) =>
+  e.kind === 'candidate' ? e.candidate!.id : e.entry.scenario.id;
+
+export const ScenarioExplorer: React.FC<{
+  entries: LabExplorerEntry[];
+  statusOf?: (c: LabCandidate) => CandidateStatus;
+}> = ({ entries, statusOf }) => {
   const { t } = useTranslation('idleVillage');
-  const [selId, setSelId] = useState(entries[0]?.scenario.id ?? '');
+  const [selId, setSelId] = useState(entries[0] ? rowId(entries[0]) : '');
   const [nodeId, setNodeId] = useState<string | null>(null);
-  const entry = entries.find((e) => e.scenario.id === selId) ?? entries[0];
+  const sel = entries.find((e) => rowId(e) === selId) ?? entries[0];
+  const entry = sel?.entry;
   const rows = useMemo(() => (entry ? scenarioTreeRows(entry.scenario) : []), [entry]);
   const selNode = nodeId ? entry?.scenario.nodes[nodeId] : undefined;
 
-  if (!entry) return null;
+  if (!entry || !sel) return null;
   const s = entry.scenario;
 
   return (
     <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
       {/* Catalog list */}
       <div className="space-y-2">
-        {entries.map((e) => (
+        {entries.map((e) => {
+          const id = rowId(e);
+          const status = e.candidate && statusOf ? statusOf(e.candidate) : undefined;
+          return (
           <button
-            key={e.scenario.id}
+            key={id}
             type="button"
             onClick={() => {
-              setSelId(e.scenario.id);
+              setSelId(id);
               setNodeId(null);
             }}
             className={`block w-full rounded-xl border p-3 text-left transition-colors ${
-              e.scenario.id === selId
+              id === selId
                 ? 'border-amber-500/60 bg-amber-500/10'
                 : 'border-white/10 bg-white/5 hover:border-amber-500/30'
             }`}
           >
-            <div className="text-xs font-semibold text-white">{e.scenario.title}</div>
+            <div className="text-xs font-semibold text-white">{e.entry.scenario.title}</div>
             <div className="mt-1 flex flex-wrap gap-1">
-              <Chip>{e.gimmick?.label ?? e.gimmickId}</Chip>
-              <Chip>{e.kitId}</Chip>
-              {e.kit?.origin === 'narrated' && <Chip tone="good">{t('questGenLab.labels.narrated')}</Chip>}
+              <Chip>{e.entry.gimmick?.label ?? e.entry.gimmickId}</Chip>
+              <Chip>{e.entry.kitId}</Chip>
+              {e.entry.kit?.origin === 'narrated' && <Chip tone="good">{t('questGenLab.labels.narrated')}</Chip>}
+              {e.kind === 'candidate' && <Chip tone="mono">{t('questGenLab.labels.candidate')}</Chip>}
+              {status?.kind === 'stale' && <Chip tone="warn">{t('questGenLab.labels.stale')}</Chip>}
+              {status?.kind === 'superseded' && (
+                <Chip tone="warn">{t('questGenLab.labels.superseded')} {status.by}</Chip>
+              )}
             </div>
             <div className="mt-1 font-mono text-[9px] text-slate-500">
-              {e.stats.nodes}n · {e.stats.checks}check · {e.stats.gatedOptions}/{e.stats.options} gated
+              {e.entry.stats.nodes}n · {e.entry.stats.checks}check · {e.entry.stats.gatedOptions}/{e.entry.stats.options} gated
             </div>
           </button>
-        ))}
+          );
+        })}
       </div>
 
       {/* Detail */}

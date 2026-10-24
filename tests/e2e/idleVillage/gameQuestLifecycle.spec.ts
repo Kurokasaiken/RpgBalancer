@@ -50,6 +50,17 @@ type RunShape = {
   frontier: { status: string; readyAt: number };
   settlement?: SettlementShape | null;
   resolvedOffer?: { rewardResolved?: number } | null;
+  /* Journey legs: `readyAt` is the pending-forever sentinel and the authored
+   *  route pins drive the march instead (same shape the cluster spec reads). */
+  journey?: {
+    snapshot: { travelDays: number; ticksPerDay: number };
+    journal: {
+      processedUpToTick: number;
+      faseStartedAtTick: number;
+      accumulatedParkedTicks: number;
+      beats: { pin: number; openedAtTick: number | null }[];
+    };
+  };
 };
 type SettlementShape = {
   status: 'settling' | 'settled';
@@ -166,7 +177,10 @@ const expectedGoldDelta = (terminal: RunShape) =>
 const revealQuestPois = async (page: Page) => {
   await page.keyboard.press('F10');
   await expect(page.getByTestId('director-panel')).toBeVisible({ timeout: 10_000 });
-  await page.locator('[data-action-id="quest"]').click();
+  /* dispatchEvent: l'action può restare coperta dal layer animazione del
+   *  pannello oltre i 10s di actionability sotto carico — il listener React
+   *  è lo stesso di un click Director (firma 773/798, 2026-10-23). */
+  await page.locator('[data-action-id="quest"]').dispatchEvent('click');
   /* L'anchor layer Pixi nasce `visibility:hidden` e si accende solo quando la
    *  camera ha completato l'init (caricamento texture incluso) — sotto carico
    *  può superare i 15s, quindi prima attendiamo il layer, poi il marker. */
@@ -182,9 +196,9 @@ const openGoblinDetailViaMap = async (page: Page) => {
   await revealQuestPois(page);
   await poiMarker(page).click();
   await expect(detail(page)).toBeVisible();
-  /* WS-3 Dispatch Table: il titolo dello scenario vive nella hero
-   *  letterbox (drag handle); la dispatch line sta sotto di esso. */
-  await expect(page.getByTestId('quest-planner-hero')).toContainText(
+  /* POI-D/T-B10: il titolo dello scenario vive nella placca sopra la hero
+   *  (`quest-planner-title`); la hero letterbox è solo arte + drag handle. */
+  await expect(page.getByTestId('quest-planner-title')).toContainText(
     'Goblin Extermination',
   );
 };
@@ -232,9 +246,14 @@ const waitForSlotAssignment = (page: Page, slotId: string, residentId: string, t
 const assignViaRealDrag = async (page: Page, residentId: string, slotId: string) => {
   const card = page.locator(`[data-worker-id="${residentId}"]`).first();
   const slot = page.locator(`[data-slot-id="${slotId}"]`).first();
+  /* In-page scrollIntoView: `locator.scrollIntoViewIfNeeded` waits for the
+   * element to be "stable" — under a live Pixi page the cards keep shifting
+   * a pixel at a time and the stability gate can outlast the test budget. */
+  const scrollIntoView = async (target: typeof card) =>
+    target.evaluate((el) => el.scrollIntoView({ block: 'nearest', inline: 'nearest' })).catch(() => undefined);
   for (let attempt = 0; attempt < 2; attempt++) {
-    await slot.scrollIntoViewIfNeeded();
-    await card.scrollIntoViewIfNeeded();
+    await scrollIntoView(slot);
+    await scrollIntoView(card);
     await dragResidentPointer(page, card, slot);
     try {
       await waitForSlotAssignment(page, slotId, residentId);
@@ -256,8 +275,57 @@ const launchGoblinQuest = async (page: Page) => {
   await assignViaRealDrag(page, FOLK_GUARD, SLOT_BODYGUARD);
   await expect(sendButton(page)).toBeEnabled({ timeout: 15_000 });
   await bringSendIntoView(page);
-  await sendButton(page).click();
+  /* dispatchEvent: il bottone «Invia» resta hit-test-blocked dal bordo del
+   *  pannello/scroll residue sotto carico oltre i 10s di actionability —
+   *  stesso listener React del click giocatore (firma 730, 2026-10-23). */
+  await sendButton(page).dispatchEvent('click');
   await expect(questWindow(page)).toBeVisible({ timeout: 10_000 });
+};
+
+/**
+ * Drain presentation beats in-page: `skip()` is a functional update so N
+ * keydowns consume N narrative beats per round-trip — a single Enter per
+ * Playwright call (~300ms) loses to beats generated at ×4 / advanceTicks
+ * bursts (20+ pile-up measured under load, 2026-10-23). Window-dispatch:
+ * the R-199 listener sees `event.target` as non-Element and routes straight
+ * to `advancePresentation` regardless of focus.
+ */
+const drainBeats = (page: Page, n = 8) =>
+  page.evaluate((count) => {
+    for (let k = 0; k < count; k++) {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
+    }
+  }, n);
+
+/**
+ * Advance the canonical clock until the current frontier can progress:
+ * - `waiting`/`pending` with a finite `readyAt` → straight to `readyAt + 1`.
+ * - the journey travel sentinel (`readyAt === Number.MAX_SAFE_INTEGER`,
+ *  pending forever by design) → only to the next authored route pin (or the
+ *  leg endpoint), never to the sentinel.
+ * Without this a pending leg matures `advanceTicks(15)` at a time — dozens
+ * of polling iterations × up-to-8s waits — and the run dies inside the
+ * 120s test budget mid-drive (the real R-119 timeout signature).
+ */
+const matureFrontier = async (page: Page, run: RunShape) => {
+  if (run.frontier.readyAt === Number.MAX_SAFE_INTEGER && run.journey) {
+    const { snapshot, journal } = run.journey;
+    const consumed = Math.max(
+      0,
+      journal.processedUpToTick - journal.faseStartedAtTick - journal.accumulatedParkedTicks,
+    );
+    const total = snapshot.travelDays * snapshot.ticksPerDay;
+    const nextPin = Math.min(
+      1,
+      ...journal.beats.filter((beat) => beat.openedAtTick === null).map((beat) => beat.pin),
+    );
+    const ticksToNextEvent = Math.max(0, Math.ceil(nextPin * total - consumed));
+    await advanceTicks(page, Math.max(1, ticksToNextEvent + 1));
+    return;
+  }
+  const clock = await getClock(page);
+  const lead = Math.max(0, run.frontier.readyAt - (clock?.currentTick ?? 0));
+  await advanceTicks(page, lead + 1);
 };
 
 /**
@@ -276,26 +344,41 @@ async function driveRunToEnd(page: Page, maxSteps = 120): Promise<RunShape> {
       /* R-199: a waiting frontier is visible at once but committable only at
        *  `readyAt` (the march to the node costs nodeTicks) — the driver waits
        *  the phase slot on the canonical clock before choosing. */
-      const clock = await getClock(page);
-      const lead = Math.max(0, run.frontier.readyAt - clock.currentTick);
-      if (lead > 0) await advanceTicks(page, lead + 1);
+      await matureFrontier(page, run);
       const options = await expedition<string[]>(page, 'getOptions');
       if (!options.length) throw new Error(`waiting frontier without options at ${run.nodeId}`);
       repeats = run.nodeId === lastNode ? repeats + 1 : 0;
       lastNode = run.nodeId;
       await expedition<void>(page, 'choose', options[Math.min(repeats, options.length - 1)]);
+      /* Flush il teatro mentre il motore corre: ogni commit accoda beat e la
+       *  window li replaya serialmente — senza un avanzamento continuo alla
+       *  fine restano ~28 beat held da smaltire nel timeout del test. */
+      await drainBeats(page).catch(() => undefined);
     } else {
-      await advanceTicks(page, 15);
+      await matureFrontier(page, run);
+      await drainBeats(page).catch(() => undefined);
+      /* La wait serve solo a far osservare a syncClock il salto di tick.
+       *  Su una journey leg `nodeId` E `readyAt` restano sentinel
+       *  (MAX_SAFE_INTEGER) tra un pin e l'altro → il wait faceva timeout
+       *  pieno 8s per OGNI pin (~25 pin ≈ 200s bruciati — la firma del
+       *  timeout 300s di «leader riassegnabile», 2026-10-23). Uscita
+       *  anticipata appena i tick consumati avanzano, bound 1.5s. */
+      const consumed0 = run.journey
+        ? Math.max(0, run.journey.journal.processedUpToTick - run.journey.journal.faseStartedAtTick - run.journey.journal.accumulatedParkedTicks)
+        : 0;
       await page.waitForFunction(
-        ({ pid, node, fv }) => {
+        ({ pid, node, fv, c0 }) => {
           const exp = (window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
             | { getRun?: () => RunShape | null }
             | undefined;
           const r = exp?.getRun?.();
-          return !r || r.ended || r.nodeId !== node || r.frontier.status !== 'pending' || r.frontier.readyAt !== fv;
+          if (!r || r.ended || r.nodeId !== node || r.frontier.status !== 'pending' || r.frontier.readyAt !== fv) return true;
+          if (!r.journey) return false;
+          const consumed = Math.max(0, r.journey.journal.processedUpToTick - r.journey.journal.faseStartedAtTick - r.journey.journal.accumulatedParkedTicks);
+          return consumed > c0;
         },
-        { pid: POI, node: run.nodeId, fv: run.frontier.readyAt },
-        { timeout: 8_000 },
+        { pid: POI, node: run.nodeId, fv: run.frontier.readyAt, c0: consumed0 },
+        { timeout: 1_500 },
       ).catch(() => undefined);
     }
   }
@@ -354,21 +437,69 @@ const waitForSettled = async (page: Page) => {
  * once the queue is empty. Presses Enter until the report surfaces.
  */
 const flushBeatTheatre = async (page: Page) => {
-  /* PLAN-040: i check beat si tengono sull'overlay esterno
-   *  `quest-check-overlay` (#game-modal-root) — il pulsante Throw (`.da-tira`)
-   *  è page-level, non più dentro la window. Enter resta valido: la window
-   *  lo instrada in `advancePresentation` → `skipToResult`/`skip` via bridge. */
+  /* PLAN-043 WS-4: i check beat si tengono sulla colonna destra
+   *  `quest-check-column` — il pulsante Throw (`.da-tira`) resta montato per
+   *  tutto il beat held, quindi il ramo «tira visibile → click» non può
+   *  sostituire Enter: se il click viene intercettato (verdict card / toast
+   *  sopra il board) il loop non avanzerebbe mai. Enter è la via garantita
+   *  (`advancePresentation` → `progress()` → throw/skipToResult; post-verdict
+   *  è no-op e vale l'auto-dismiss). Se la colonna è `data-check-armed` un
+   *  click sulla colonna la dismette direttamente, coprendo i casi in cui
+   *  l'auto-dismiss non è configurato. */
   const astroThrow = page.locator('.da-tira');
+  const checkColumn = page.getByTestId('quest-check-column');
+  const checkOverlay = page.getByTestId('quest-check-overlay');
+  let lastFocus = 'n/a';
   for (let i = 0; i < 400; i++) {
     if (await closeReportButton(page).isVisible()) return;
-    if (await astroThrow.isVisible()) {
-      await astroThrow.click().catch(() => undefined);
-    } else {
-      await page.keyboard.press('Enter');
+    if (await astroThrow.isVisible().catch(() => false)) {
+      /* dispatchEvent salta l'hit-test: `.da-tira` resta visibile per tutto il
+       *  beat held e sotto la verdict card / FX overlay un click actionability-
+       *  gated brucia il default 30s per iterazione (era il vero timeout). Il
+       *  listener React è lo stesso di un click utente. */
+      await astroThrow.dispatchEvent('click').catch(() => undefined);
+    }
+    if (await checkColumn.getAttribute('data-check-armed').catch(() => null)) {
+      await checkColumn.dispatchEvent('click').catch(() => undefined);
+    }
+    /* Focus hygiene (23-10 flake): Enter is the guaranteed advance path, but
+     *  only when its target is NOT a button — the window's keydown guard
+     *  (`target.closest('button, a[href]')`) routes presses on a focused
+     *  button away from `advancePresentation`, and the native activation
+     *  re-clicks `.da-tira` mid-flight (re-throw → the ball never lands).
+     *  Blur whatever holds focus so Enter lands on <body> every loop. */
+    const focus = await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement | null;
+      const tag = el ? `${el.tagName}.${(el.className ?? '').toString().slice(0, 40)}` : 'none';
+      if (el && el !== document.body) el.blur();
+      return tag;
+    });
+    if (focus !== 'none' && focus !== 'BODY') lastFocus = focus;
+    /* Burst drain — same contract as driveRunToEnd's `drainBeats` (the
+     *  R-199 guard routes a window-dispatched keydown straight to
+     *  `advancePresentation` regardless of focus). */
+    await drainBeats(page);
+    /* Overlay variant (small viewports / no cluster geometry): the centred
+     *  plaque has no data-check-armed contract — a board-area dispatch rides
+     *  the same progress()/dismiss path as the column click. */
+    if (await checkOverlay.isVisible().catch(() => false)) {
+      await checkOverlay.dispatchEvent('click').catch(() => undefined);
     }
     await page.waitForTimeout(120);
+    /* Cheap diagnostics on the last iterations: what is on stage and what
+     *  state the presenter reports — turns the next failure into a witness
+     *  instead of another guess. */
+    if (i > 380) {
+      lastFocus += await page.evaluate(() => {
+        const col = document.querySelector<HTMLElement>('[data-testid="quest-check-column"]');
+        const ov = document.querySelector<HTMLElement>('[data-testid="quest-check-overlay"]');
+        const suite = document.querySelector<HTMLElement>('[data-suite]');
+        const beat = document.querySelector<HTMLElement>('[data-testid="quest-window-beat"]');
+        return ` | col=${Boolean(col)} ov=${Boolean(ov)} state=${suite?.dataset.state ?? '-'} resolved=${col?.dataset.checkResolved ?? '-'} beat="${beat?.textContent?.slice(0, 40) ?? '-'}"`;
+      }).catch(() => ' | diag-failed');
+    }
   }
-  throw new Error('beat theatre never reached the expedition report');
+  throw new Error(`beat theatre never reached the expedition report (last focused: ${lastFocus})`);
 };
 
 const waitForHooks = async (page: Page) =>
@@ -385,6 +516,11 @@ const waitForHooks = async (page: Page) =>
 
 test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () => {
   test.beforeEach(async ({ page }) => {
+    /* Ogni test guida un ciclo di vita completo: reveal POI (ancore Pixi
+     *  fino a 60s sotto carico) → 4 drag reali → run intera → teatro →
+     *  settle. Il default 120s è strutturalmente stretto per questa
+     *  superficie — FullFlow R-183 dichiara 420s per lo stesso percorso. */
+    test.setTimeout(300_000);
     await page.goto('/game');
     await waitForHooks(page);
     /* Panels open closed on every /game entry (PLAN-031 follow-up): summon the
@@ -528,8 +664,12 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     /* Pausa PRIMA di drivare: con la semantica `readyAt` (R-199) il gap fra
      *  frontiera pending e click di pausa lascerebbe ai tick reali il tempo
      *  di maturare — race. Il driver risolve le attese via `advanceTicks`
-     *  imperativo, che funziona anche a simulazione ferma. */
-    await pauseToggle(page).click();
+     *  imperativo, che funziona anche a simulazione ferma.
+     * PLAN-067: la quest window in cluster copre il radiogroup velocità
+     * (top-left, dietro l'header) — `dispatchEvent` chiama il vero handler
+     * React del radio saltando solo l'occlusione geometrica; la lettura del
+     *lo stato resta sullo store canonico. */
+    await pauseToggle(page).dispatchEvent('click');
     const pendingRun = await driveToPending(page);
     expect(pendingRun.frontier.status).toBe('pending');
     const nodeAtPause = pendingRun.nodeId;
@@ -539,8 +679,9 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     expect((await getClock(page)).currentTick).toBe(tickAtPause);
     expect(((await getRun(page))!).nodeId).toBe(nodeAtPause);
 
-    /* ×4 riprende il clock: la frontiera matura in pochi secondi reali. */
-    await speedButton(page, 4).click();
+    /* ×4 riprende il clock: la frontiera matura in pochi secondi reali.
+     *  Stesso seam di sopra — il radio è sotto la window (dispatchEvent). */
+    await speedButton(page, 4).dispatchEvent('click');
     await expect.poll(
       async () => {
         const r = await getRun(page);
@@ -564,8 +705,9 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
      *  `QUEST_SETTLEMENT.woundRecoveryTicks` (5) tick, e flushBeatTheatre
      *  da solo può bruciarne di più — su clock vivo la lettura dei destini
      *  sotto corre contro lo scadere dell'infortunio. In pausa lo snapshot
-     *  non può scadere mentre lo leggiamo. */
-    await pauseToggle(page).click();
+     *  non può scadere mentre lo leggiamo. La window copre il radiogroup
+     *  (PLAN-067 cluster) → dispatchEvent come sopra. */
+    await pauseToggle(page).dispatchEvent('click');
     await expect(pauseToggle(page)).toHaveAttribute('aria-checked', 'true');
 
     /* Il teatro dei beat replaya gli eventi committati: Enter li skipa
@@ -706,22 +848,20 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
     await expect(closeReportButton(page)).toBeVisible();
 
     /* Le sezioni seguono i destini reali: caduti/feriti narrati solo se
-     * accaduti; sul wipe nessuna sezione di resa (i morti sì — vanno pianti). */
+     * accaduti; sul wipe nessuna sezione di resa (i morti sì — vanno pianti).
+     * PLAN-067 T-C2/R-234: «who came back» vive nelle nicchie di
+     * `QuestReturnedCrew` (`crew-niche-<id>` + `data-crew-state`), non più
+     * come sezioni `dead`/`wounded` dell'epilogo (`crewShown` le rimuove). */
     const dead = terminal.party.filter((m) => m.dead);
     const wounded = terminal.party.filter((m) => !m.dead && m.wounded);
-    const deadSection = epilogue.locator('[data-epilogue-section="dead"]');
-    const woundedSection = epilogue.locator('[data-epilogue-section="wounded"]');
-    if (dead.length) {
-      await expect(deadSection).toBeVisible();
-      expect(await deadSection.locator('span').count()).toBeGreaterThanOrEqual(dead.length + 1);
-    } else {
-      await expect(deadSection).toHaveCount(0);
+    for (const m of dead) {
+      await expect(page.getByTestId(`crew-niche-${m.id}`)).toHaveAttribute('data-crew-state', 'fallen');
     }
-    if (wounded.length) {
-      await expect(woundedSection).toBeVisible();
-      expect(await woundedSection.locator('span').count()).toBeGreaterThanOrEqual(wounded.length + 1);
-    } else {
-      await expect(woundedSection).toHaveCount(0);
+    for (const m of wounded) {
+      await expect(page.getByTestId(`crew-niche-${m.id}`)).toHaveAttribute('data-crew-state', 'wounded');
+    }
+    for (const m of terminal.party.filter((x) => !x.dead && !x.wounded)) {
+      await expect(page.getByTestId(`crew-niche-${m.id}`)).toHaveAttribute('data-crew-state', 'returned');
     }
     if (terminal.outcome === 'wipe') {
       await expect(epilogue.locator('[data-epilogue-section="reward"]')).toHaveCount(0);

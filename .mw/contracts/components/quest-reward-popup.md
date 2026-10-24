@@ -6,6 +6,7 @@ tier: 2
 root_file: src/ui/idleVillage/components/gameFrame/QuestRewardPopup.tsx
 scope_files:
   - src/ui/idleVillage/components/gameFrame/QuestRewardPopup.tsx
+  - src/ui/idleVillage/components/gameFrame/expeditionLost.ts
   - src/ui/idleVillage/quests/questEpilogue.ts
 fast_checks:
   - tests/unit/idleVillage/questRewardPopup.test.tsx

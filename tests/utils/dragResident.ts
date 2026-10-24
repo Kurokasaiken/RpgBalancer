@@ -94,8 +94,28 @@ const waitForDraggingHook = async (page: Page, residentId: string): Promise<void
       return hooks?.getDraggingResidentId?.() === expectedId;
     },
     residentId,
-    { timeout: 2_000 },
+    /* The setter→getter roundtrip crosses a React render + the hook-republish
+     * effect; under suite load that can take longer than a tight budget. */
+    { timeout: 5_000 },
   );
+};
+
+/** Wait until no resident is reported dragging — the drag-end commit lands
+ *  inside a `startTransition` on the page and can flush AFTER the pointer
+ *  release: without settling here, a late flush clobbers the id the next
+ *  drag's `setDraggingResidentId` just set and its liveness probe times out. */
+const waitForDragSettled = async (page: Page): Promise<void> => {
+  await page
+    .waitForFunction(
+      () => {
+        const hooks = (window as IdleVillageWindow).__idleVillageTestHooks;
+        if (!hooks?.getDraggingResidentId) return true;
+        return hooks.getDraggingResidentId() === null;
+      },
+      undefined,
+      { timeout: 5_000 },
+    )
+    .catch(() => undefined);
 };
 
 const initSyntheticDataTransfer = async (page: Page): Promise<void> => {
@@ -531,4 +551,5 @@ export async function dragResidentPointer(
   }
 
   await performCdpDrag(page, source, target, stepDelayMs);
+  await waitForDragSettled(page);
 }

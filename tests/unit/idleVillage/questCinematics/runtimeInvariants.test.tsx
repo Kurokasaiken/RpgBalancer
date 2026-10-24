@@ -466,15 +466,23 @@ describe('ambient layer — PLAN-052 showcase fx types', () => {
       },
       beginPath: () => void ops.push('begin'),
       arc: () => void ops.push('arc'),
+      ellipse: () => void ops.push('ellipse'),
       fill: () => void ops.push('fill'),
       moveTo: () => void ops.push('move'),
       lineTo: () => void ops.push('line'),
+      quadraticCurveTo: () => void ops.push('quad'),
       closePath: () => void ops.push('close'),
       stroke: () => void ops.push('stroke'),
+      save: () => void ops.push('save'),
+      restore: () => void ops.push('restore'),
+      translate: () => void ops.push('translate'),
+      rotate: () => void ops.push('rotate'),
+      drawImage: () => void ops.push('drawImage'),
       clearRect: () => void ops.push('clear'),
       fillStyle: '',
       strokeStyle: '',
       lineWidth: 0,
+      globalAlpha: 1,
       globalCompositeOperation: 'source-over',
     } as unknown as CanvasRenderingContext2D;
     return { ctx, ops };
@@ -489,6 +497,8 @@ describe('ambient layer — PLAN-052 showcase fx types', () => {
     { type: 'fireflies', band: [0.3, 0.42], xband: [0, 1], count: 6, a: 0.35, color: '#d8f27a' },
     { type: 'moths', at: [0.7, 0.5], r: 0.035, count: 3, speed: 1, color: '#e8dcc0' },
     { type: 'shaft', from: [0.6, 0.05], to: [0.55, 0.55], width: 0.12, count: 3, a: 0.1, color: '#fff2cc' },
+    { type: 'leaves', band: [0.05, 0.9], xband: [0.1, 0.9], count: 9, speed: 1, a: 0.8, color: '#c99b46' },
+    { type: 'rain', band: [0.0, 1.0], count: 60, lean: 0.08, speed: 1, a: 0.35, color: '#b8ccd8' },
   ];
   const puffsFor = (key: string, n: number) => seeded(7 + key.length, n);
 
@@ -501,8 +511,11 @@ describe('ambient layer — PLAN-052 showcase fx types', () => {
       drawAmbientFrame(ctx, 960, 400, t, view, fx, puffsFor);
     }
     expect(ops.some((o) => o.startsWith('linear:'))).toBe(true); // shaft fan gradients
-    expect(ops).toContain('stroke'); // glint cross flare
+    /* Glint is a round twinkle (core + halo arcs) — the four-point cross
+     * flare was removed after reading as random luminous crosses. */
     expect(ops.filter((o) => o === 'arc').length).toBeGreaterThan(0); // soft dots drawn
+    expect(ops.filter((o) => o === 'quad').length).toBeGreaterThan(0); // leaf blades
+    expect(ops.filter((o) => o === 'stroke').length).toBeGreaterThan(0); // rain streaks
     expect(ctx.globalCompositeOperation).toBe('source-over');
   });
 

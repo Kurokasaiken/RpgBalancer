@@ -25,6 +25,28 @@ export interface CloudShadow {
   delaySeconds: number;
 }
 
+/**
+ * Harmonization treatment applied to every cloud sprite.
+ *
+ * The hand-cut cloud sprites are anime-style cumuli (bold dark outline, bright
+ * cream fill, side-view profile) sitting over a cartographer-style painting
+ * (ink hatch, muted earth palette, top-down). Rendered raw they read as
+ * stickers pasted on the map. `cloudsLook` muting them into a warm translucent
+ * veil was the Director-approved first attempt (2026-10-24, "prova A, se
+ * fallisce proviamo B" — option B is repainting the sprites in the map's own
+ * grammar).
+ *
+ * `blur` lives inside `filter`, so its px are WORLD px: at zoom ~0.28 a 10 px
+ * blur lands as ~3 screen px — enough to dissolve the cel outline, not enough
+ * to erase the shape.
+ */
+export interface CloudsLook {
+  /** Global multiplier on each band's authored opacity. */
+  opacityScale: number;
+  /** CSS filter applied to every cloud sprite (never to the shadows). */
+  filter: string;
+}
+
 /** A depth layer: same drift speed and opacity for every sprite in it. */
 export interface CloudBand {
   name: 'far' | 'mid' | 'near';
@@ -387,6 +409,8 @@ export interface GlassConfig {
 
 export interface AtmosphereConfig {
   clouds: CloudBand[];
+  /** Harmonization treatment for the cloud sprites (see `CloudsLook`). */
+  cloudsLook: CloudsLook;
   foam: FoamConfig;
   birds: BirdsConfig;
   waves: WavesConfig;
@@ -401,6 +425,10 @@ export interface AtmosphereConfig {
 
 export const atmosphereAssets: AtmosphereConfig = {
   clouds: cloudBands,
+  cloudsLook: {
+    opacityScale: 0.7,
+    filter: 'sepia(0.5) saturate(0.7) brightness(0.96) blur(10px)',
+  },
   foam: {
     texture: 'foam/foam_texture.webp',
     tileWorldPx: 520,

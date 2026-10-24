@@ -93,3 +93,17 @@ Soglia: pattern visto in almeno due contesti distinti o in due sessioni diverse.
 2. Misura l'elemento che l'utente vede, non il marker DOM più precoce disponibile — o fai coincidere i due (stesso `data-debug-*` sul nodo realmente visibile).
 3. «Il test è verde ma il sintomo resta» non è un falso positivo da archiviare: è la discrepanza che indica il divario di layer — investiga dove i due ambienti divergono (instrumentation, scheduling, build).
 4. Corollario tecnico (pattern B della stessa run): quando il commit React è il collo di bottiglia della latenza percepita, il feedback può comparire via DOM diretto sul subtree warm-mounted e cedere al vero render in `useLayoutEffect` pre-paint — handoff seamless, nessun re-render per la comparsa.
+
+## P-008 — `localhost` risolve su due famiglie IP: un dev server bound su una sola produce «Failed to fetch» latched (2026-10-23)
+
+**Stato:** proposta — 2 istanze nello stesso giorno (R-276 mattina e sera), stessa firma utente.
+**Pattern:** `.mw/runs/learn-20261023-dynamic-import-latch/pattern-candidate.md`.
+**Fix già applicato (config, non regola):** `server.host: '127.0.0.1'` in `vite.config.ts`.
+
+**Cosa si propone (trappola candidata, famiglia T-17):**
+1. Su `Failed to fetch dynamically imported module: …?t=<n>`: decodificare `t` (epoch-ms → `date -r`) e incrociare con le mtime dei file salvati in quel minuto — il modulo nominato è il top-level dell'`import()`, non il colpevole.
+2. Verificare il bind, non solo la risposta: `curl -4` e `curl -6` su `localhost` — una famiglia refused mentre il browser può averla in cache = asimmetria da fixare sul `server.host`, non sul codice.
+3. «Persistente nella tab» ≠ «persistente sul server»: l'`ErrorBoundary` latcha il transiente; il test di verità è un **contesto browser fresco**, non il reload ragionato.
+4. Mitigazione opzionale da valutare: auto-reload una-tantum in `ErrorBoundary` sulla classe «dynamically imported module»/ChunkLoadError — nessuna modifica fatta, serve ruling Director.
+
+**Nota operativa appresa:** `nvm use` può dichiarare successo lasciando `node` alla versione cache-hashed della shell — `hash -r` prima di riavviare processi pinati.

@@ -257,15 +257,34 @@ async function playRunPhaseByPhase(page: Page, info: TestInfo): Promise<PhaseRec
         await shot(page, info, '12-run-beat-in-scena', questWindow(page));
       }
       phases.push({ nodeId: run.nodeId, kind: 'beat' });
-      /* PLAN-040: un check beat armato tiene sull'overlay esterno finché il
-       *  giocatore non lancia — `skipToResult` è no-op pre-throw, quindi il
-       *  driver clicca THROW quando lo vede (`.da-tira` è page-level). */
+      /* PLAN-043 WS-4: un check beat armato tiene sulla colonna destra finché
+       *  il giocatore non lancia — `.da-tira` resta montato per tutto il beat
+       *  held, quindi Enter va premuto a OGNI giro (instrada in
+       *  `advancePresentation` → `progress()`), con il click THROW come via
+       *  realistica quando il bottone è raggiungibile e il click sulla
+       *  colonna armata come dismiss diretto post-verdict. */
       const astroThrow = page.locator('.da-tira');
-      if (await astroThrow.isVisible()) {
-        await astroThrow.click().catch(() => undefined);
-      } else {
-        await page.keyboard.press('Enter');
+      const checkColumn = page.getByTestId('quest-check-column');
+      if (await astroThrow.isVisible().catch(() => false)) {
+        /* dispatchEvent salta l'hit-test: `.da-tira` resta visibile per tutto
+         *  il beat held e sotto verdict card / FX overlay un click gated
+         *  attende il default 30s per chiamata (vero timeout osservato). */
+        await astroThrow.dispatchEvent('click').catch(() => undefined);
       }
+      if (await checkColumn.getAttribute('data-check-armed').catch(() => null)) {
+        await checkColumn.dispatchEvent('click').catch(() => undefined);
+      }
+      /* Burst drain — stesso contratto di `drainBeats` nella suite R-119:
+       *  skip() è un update funzionale → N keydown consumano N beat narrativi
+       *  per round-trip; un Enter singolo perde contro i beat prodotti a
+       *  burst (pile-up 20+ osservato sotto carico, 2026-10-23). Il dispatch
+       *  su window ha target non-Element → il guard R-199 va dritto a
+       *  `advancePresentation` anche con focus su un bottone. */
+      await page.evaluate(() => {
+        for (let k = 0; k < 8; k++) {
+          window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
+        }
+      }).catch(() => undefined);
       await page.waitForTimeout(120);
       continue;
     }
@@ -364,7 +383,7 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     /* ── 3. Click sul marker → POI detail (quest planner) ────────────── */
     await marker(page).click();
     await expect(planner(page)).toBeVisible();
-    await expect(page.getByTestId('quest-planner-hero')).toContainText('Goblin Extermination');
+    await expect(page.getByTestId('quest-planner-title')).toContainText('Goblin Extermination');
     await expect(sendButton(page)).toBeDisabled();
     await expect(page.getByTestId('quest-expedition-forecast')).toHaveAttribute('data-forecast-state', 'incomplete');
 
@@ -400,31 +419,70 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     await shot(page, info, '05-party-prima-dello-swap', planner(page));
 
     /* ── 5. SWAP slot↔slot senza estrarre: eroe ⇄ Beppe ─────────────── */
-    /* drop perso (pointerWithin): un giocatore riproverebbe una volta —
-     *  lo swap è idempotente, un secondo tentativo è safe. */
-    let swapped = false;
-    for (let attempt = 0; attempt < 2 && !swapped; attempt++) {
+    /* drop perso (pointerWithin): un giocatore riproverebbe — MA solo dopo
+     *  aver visto il token atterrare: `commitSwap` ri-pianifica allo stato
+     *  CORRENTE al landing (flight + transition possono superare i 5s sotto
+     *  carico), quindi un retry su commit non ancora atterrato ri-swappra e
+     *  produce un revert legittimo, non un drop perso. Il giro giudica su
+     *  assegnazioni STABILI (due letture uguali a 400ms), non sul timeout. */
+    /* `seatNonces[toSlot]` bumpa nella STESSA `startTransition` di
+     *  `setAssignments` dentro `commitSwap` → quando il nonce cambia il
+     *  commit è atterrato e gli hook sono stati ripubblicati con esso —
+     *  il testimone atomico che `getAssignments` (getter = closure
+     *  ripubblicata a ogni render di sessione) non può dare da solo:
+     *  una vista «stabile» può restare pre-commit e un retry su di essa
+     *  ri-swappra → revert legittimo (firma osservata 3×, 2026-10-23).
+     *  Un drop veramente mancato non bumpa MAI il nonce → retry sicuro. */
+    const seatNonce = (slotId: string) =>
+      page.evaluate(({ pid, sid }) => {
+        const exp = (window as HooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
+          | { getSeatNonces?: () => Record<string, number> }
+          | undefined;
+        return exp?.getSeatNonces?.()?.[sid] ?? -1;
+      }, { pid: POI, sid: slotId });
+    const awaitSeatNonceBump = (slotId: string, before: number) =>
+      page.waitForFunction(
+        ({ pid, sid, b }) => {
+          const exp = (window as HooksWindow).__idleVillageTestHooks?.expedition?.[pid] as
+            | { getSeatNonces?: () => Record<string, number> }
+            | undefined;
+          return (exp?.getSeatNonces?.()?.[sid] ?? -1) !== b;
+        },
+        { pid: POI, sid: slotId, b: before },
+        { timeout: 8_000 },
+      ).then(() => true, () => false);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const cur = await assignments(page);
+      if (cur[SLOT_LEADER] === HERO && cur[SLOT_MEMBER_1] === FOLK_FIGHTER) break;
+      if (attempt === 2) break;
+      const nonce0 = await seatNonce(SLOT_MEMBER_1);
       await dragSlotToken(page, SLOT_LEADER, SLOT_MEMBER_1, async () => {
         await expect(page.getByTestId('slot-token-ghost')).toBeVisible();
         /* `[data-drop-state]` qualifica il castone: `data-slot-id` da solo
          * matcha anche le righe BY MEMBER del forecast (WS-3). */
         await expect(page.locator(`[data-slot-id="${SLOT_MEMBER_1}"][data-drop-state]`).first()).toHaveAttribute('data-drop-state', 'valid');
-        await shot(page, info, '06-swap-token-in-aria', planner(page), true);
+        if (attempt === 0) await shot(page, info, '06-swap-token-in-aria', planner(page), true);
       });
-      swapped = await waitForAssignment(page, SLOT_LEADER, HERO).then(() => true, () => false);
+      await awaitSeatNonceBump(SLOT_MEMBER_1, nonce0);
     }
     await waitForAssignment(page, SLOT_LEADER, HERO);
     await waitForAssignment(page, SLOT_MEMBER_1, FOLK_FIGHTER);
-    /* nessuno è uscito dal rack: il party è ancora di 4 */
+    /* nessuno è uscito dal rack: il party è ancora di 4 — `waitForAssignment`
+     *  ha già attestato la vista post-swap (getter fresco per definizione). */
     const afterSwap = await assignments(page);
     expect(Object.values(afterSwap).filter(Boolean)).toHaveLength(4);
     await shot(page, info, '07-party-dopo-lo-swap', planner(page));
 
     /* swap RIFIUTATO: Lisetta (precision) non può fare il capo (edge|fortitude) */
+    const nonceBeforeRefused = await seatNonce(SLOT_MEMBER_2);
     await dragSlotToken(page, SLOT_MEMBER_2, SLOT_LEADER, async () => {
       await expect(page.locator(`[data-slot-id="${SLOT_LEADER}"][data-drop-state]`).first()).toHaveAttribute('data-drop-state', 'invalid');
     });
-    await page.waitForTimeout(400);
+    /* Il drop rifiutato è inerte (`planSlotSwap → null → return false`, mai
+     *  flight): il testimone atomico è il nonce — un commit fantasma lo
+     *  bumperebbe; le assegnazioni lo seguono nello stesso render. */
+    await page.waitForTimeout(600);
+    expect(await seatNonce(SLOT_MEMBER_2)).toBe(nonceBeforeRefused);
     expect(await assignments(page)).toEqual(afterSwap);
 
     /* ── 6. Consumabili: bisaccia a 3 slot + Selection Tray (WS-3) ── */

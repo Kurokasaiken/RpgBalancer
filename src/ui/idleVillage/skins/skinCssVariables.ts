@@ -349,7 +349,9 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-hud-panel-padding': '10px',
   '--skin-hud-stack-gap': '8px',
   '--skin-hud-control-gap': '4px',
-  '--skin-hud-control-height': '26px',
+  /* skin-css-variables.INV-2 (R-270): 32px = interactive minimum — 26px left
+   * every data-hud-controls pill under the hit-area floor (Sentinel S0–S3). */
+  '--skin-hud-control-height': '32px',
   '--skin-hud-control-icon-size': '14px',
   '--skin-hud-inline-gap': '6px',
   '--skin-hud-row-gap': '4px',

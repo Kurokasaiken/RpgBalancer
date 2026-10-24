@@ -7,15 +7,15 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { HUDNotificationLayer } from '../../../ui/idleVillage/components/HUDNotificationLayer';
-import { DEFAULT_HUD_NOTIFICATION_CONFIG } from '../../../balancing/config/idleVillage/hudNotificationConfig';
+import { HUDNotificationLayer } from '@/ui/idleVillage/components/HUDNotificationLayer';
+import { DEFAULT_HUD_NOTIFICATION_CONFIG } from '@/balancing/config/idleVillage/hudNotificationConfig';
 
 // Mock the useHUDNotifications hook
-vi.mock('../../../ui/idleVillage/hooks/useHUDNotifications', () => ({
+vi.mock('@/ui/idleVillage/hooks/useHUDNotifications', () => ({
   useHUDNotifications: vi.fn(),
 }));
 
-import { useHUDNotifications } from '../../../ui/idleVillage/hooks/useHUDNotifications';
+import { useHUDNotifications } from '@/ui/idleVillage/hooks/useHUDNotifications';
 
 const mockUseHUDNotifications = vi.mocked(useHUDNotifications);
 
@@ -152,7 +152,7 @@ describe('HUDNotificationLayer', () => {
 
     render(<HUDNotificationLayer config={DEFAULT_HUD_NOTIFICATION_CONFIG} />);
 
-    const notificationItem = screen.getByText('Completing...').closest('div');
+    const notificationItem = screen.getByRole('alert');
     expect(notificationItem?.className).toContain('translate-x-full');
     expect(notificationItem?.className).toContain('opacity-0');
   });

@@ -28,7 +28,7 @@ choice gets its own painting; sibling nodes showing the same place reuse it.
    (es. il mercante, viandanti, guardie del villaggio).
 2. **Immagine = beat pre-scelta / pre-check, mai esito.** Nessun reveal:
    l'albero si vede da sotto (non dall'alto), la palizzata è integra (pre-
-   impatto), i campanelli del bigwin non appaiono in F1.
+   impatto), il filo d'allarme del bigwin non appare in F1.
 3. **Goblin = archetipi temporanei, con scheda visiva.** Compaiono dove
    obbligatori (`f4-combattimento`, `f5-incalzare`, `f7-agguato`,
    `f7-ultimo-scontro`) come massa/sagome — identità dalla scheda

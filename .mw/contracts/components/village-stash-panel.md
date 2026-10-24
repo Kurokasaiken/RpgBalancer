@@ -9,6 +9,7 @@ scope_files:
 fast_checks:
   - tests/unit/idleVillage/villageStash.test.tsx
   - tests/unit/idleVillage/villageStashLedger.test.ts
+  - tests/unit/idleVillage/villageStash.itemFace.test.tsx
 e2e_checks: []
 e2e_trigger_globs: []
 invariants:
@@ -25,9 +26,9 @@ invariants:
     source: plan
     source_ref: PLAN-073
     statement: >-
-      La disponibilità è derivata dal ledger globale `useVillageStashStore` (qty config − bags − committed);
-      una riga con remaining 0 sparisce e riappare al release; nessuna mutazione prima di `hydration === 'ready'`
-      e nessuna scrittura su persistenza degradata.
+      La disponibilità è derivata dal ledger globale `useVillageStashStore` (qty config − bags − committed); una riga
+      con remaining 0 sparisce e riappare al release; nessuna mutazione prima di `hydration === 'ready'` e nessuna
+      scrittura su persistenza degradata.
     test_refs:
       - tests/unit/idleVillage/villageStashLedger.test.ts
       - tests/unit/idleVillage/villageStash.test.tsx
@@ -47,6 +48,14 @@ invariants:
       schermo (1280×800, PLAN-067 T-A7)
     test_refs:
       - tests/unit/idleVillage/villageStash.capacity.test.ts
+  - id: village-stash-panel.INV-1
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      Stash-uniformity (R-270): la riga shelf usa la stessa item-face del planner — StashItemTile lacquer +
+      StashQtyBadge angolare xN e tooltip condiviso da stashItemFace
+    test_refs: 
+      - tests/unit/idleVillage/villageStash.itemFace.test.tsx
 ---
 # village-stash-panel
 
