@@ -322,6 +322,9 @@ export interface QuestPhase {
   successEffects?: PhaseOutcomeEffects;
   failureEffects?: PhaseOutcomeEffects;
   copy: PhaseCopy;
+  /** PLAN-085: authored long-form amanuense page for the phase
+   *  (presentation only — the engine never reads it). */
+  longForm?: import('./quests/questScenario.schema').LongFormSchemaType;
   icon?: string;
   telemetryTags?: string[];
   riskProfile?: QuestPhaseRiskProfile;

@@ -3,6 +3,7 @@ import type { QuestPhase, QuestPhaseResult, QuestPhaseType } from '@/balancing/c
 import idleVillagePanorama from '@/assets/ui/idleVillage/idle-village-map.jpg';
 import type { LoreDrop } from '@/balancing/config/lore/loreDropTypes';
 import { useQuestLoreDrop } from '@/ui/idleVillage/hooks/useQuestLoreDrop';
+import { AmanuensePage } from '@/ui/idleVillage/components/gameFrame/AmanuensePage';
 import { useTranslation } from '@/localization/useTranslation';
 import {
   getQuestChronicleSkinConfig,
@@ -179,6 +180,10 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
   }, [boardStatus, t]);
 
   const activeNarrative = cards[currentPhaseIndex]?.phase.copy?.narrative ?? null;
+  /* PLAN-085: the phase's authored amanuense page — opened from the
+   *  📖 tome in the Journal sidebar, rendered as a folio sheet overlay. */
+  const [amanuensePhaseOpen, setAmanuensePhaseOpen] = useState(false);
+  const activeLongForm = cards[currentPhaseIndex]?.phase.longForm ?? null;
   const backgroundImage = panoramaUrl ?? idleVillagePanorama;
 
   return (
@@ -334,6 +339,18 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                 >
                   <span style={{ width: 11, height: 1, background: 'rgba(190,145,50,.26)', flexShrink: 0 }} />
                   {t('idleVillage:questChronicle.journal', { defaultValue: 'Journal' })}
+                  {activeLongForm && (
+                    <button
+                      type="button"
+                      data-testid="amanuense-phase-open"
+                      aria-label={t('idleVillage:questChronicle.amanuense.open', { defaultValue: 'Read the full page' })}
+                      title={t('idleVillage:questChronicle.amanuense.open', { defaultValue: 'Read the full page' })}
+                      onClick={(e) => { e.stopPropagation(); setAmanuensePhaseOpen((p) => !p); }}
+                      style={{ marginLeft: 'auto', background: 'none', border: 'none', padding: '0 2px', cursor: 'pointer', fontSize: 13, filter: 'drop-shadow(0 0 4px rgba(232,199,106,.5))' }}
+                    >
+                      📖
+                    </button>
+                  )}
                 </div>
                 {isNarrativeExpanded && (
                   <div style={{
@@ -393,6 +410,21 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* PLAN-085: folio sheet overlay for the phase's long-form —
+                fixed-position degrade (no left-wing contract in this view). */}
+            {amanuensePhaseOpen && activeLongForm && (
+              <div
+                data-testid="amanuense-phase-sheet"
+                style={{ position: 'fixed', left: '2vw', top: '10vh', bottom: '10vh', width: 'min(460px, 90vw)', zIndex: 1200, filter: 'drop-shadow(0 18px 40px rgba(0,0,0,.65))' }}
+              >
+                <AmanuensePage
+                  longForm={activeLongForm}
+                  onClose={() => setAmanuensePhaseOpen(false)}
+                  pageKey={cards[currentPhaseIndex]?.phase.id}
+                />
+              </div>
+            )}
 
             {/* Rope — the whole-quest timer, filling with light as time runs out */}
             {questProgress !== undefined && (
