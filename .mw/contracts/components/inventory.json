@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-10-24T15:24:07.922Z",
+  "generated_at": "2026-10-24T15:48:26.317Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -351,6 +351,7 @@
     "src/ui/idleVillage/quests/amanuenseMarkup.ts",
     "src/ui/idleVillage/quests/questEpilogue.ts",
     "src/ui/idleVillage/quests/questExpedition.ts",
+    "src/ui/idleVillage/quests/questExpeditionRosterSwap.ts",
     "src/ui/idleVillage/quests/questJourney.ts",
     "src/ui/idleVillage/quests/questJourneyAuthoring.ts",
     "src/ui/idleVillage/quests/questJourneyEngine.ts",
@@ -2952,6 +2953,7 @@
         "src/ui/idleVillage/questS1Lab/questEligibility.ts",
         "src/ui/idleVillage/questS1Lab/residentToQuestMember.ts",
         "src/ui/idleVillage/quests/questExpedition.ts",
+        "src/ui/idleVillage/quests/questExpeditionRosterSwap.ts",
         "src/ui/idleVillage/quests/questJourneyAuthoring.ts",
         "src/ui/idleVillage/quests/useQuestExpeditionSession.tsx"
       ],
@@ -3478,10 +3480,10 @@
     }
   ],
   "stats": {
-    "files": 467,
+    "files": 468,
     "units": 282,
     "ui_components": 215,
     "shared_kernels": 67
   },
-  "content_sha256": "6c5abfc8f057f0d2066f3b75fd7032d791d2b946038b536fd941359a43408b29"
+  "content_sha256": "6529d57e402a1ecd0eb754a1a1bcdbcda83eb93b1c1fb85d8e74425cea4e6a05"
 }
