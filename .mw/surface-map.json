@@ -69,6 +69,7 @@
       "globs": [
         "src/ui/idleVillage/quests/**",
         "src/ui/idleVillage/questS1Lab/**",
+        "src/ui/idleVillage/pages/QuestWindowLabPage.tsx",
         "src/balancing/config/idleVillage/quests/**",
         "public/assets/atmosphere/fog/**",
         "scripts/bake-fog-noise.py",
@@ -87,7 +88,7 @@
       "anti_glob_confirmed": true,
       "proposed_by": "plan044-t002-seed + plan054-t003 (CTR-game-006..009)",
       "source": "quest runtime/planner/scenarios",
-      "approved_at": "2026-10-19T17:44:24.040Z"
+      "approved_at": "2026-10-24T17:30:00.000Z"
     },
     {
       "id": "game-tests",
@@ -196,7 +197,7 @@
       "expected_checks": [],
       "anti_glob_confirmed": true,
       "proposed_by": "plan044-t002-seed",
-      "source": "docs/ledger/rules — scrutiny via closure:lint e agents:lint, non surface checks",
+      "source": "docs/ledger/rules \u2014 scrutiny via closure:lint e agents:lint, non surface checks",
       "approved_at": "2026-10-17T22:25:45.465Z"
     },
     {

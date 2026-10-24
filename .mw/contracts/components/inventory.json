@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-10-23T11:54:44.757Z",
+  "generated_at": "2026-10-24T15:24:07.922Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -109,6 +109,7 @@
     "src/ui/idleVillage/components/destinyAstrolabeV62/starProfile.ts",
     "src/ui/idleVillage/components/destinyAstrolabeV62/tarGooRenderer.ts",
     "src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts",
+    "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx",
     "src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx",
     "src/ui/idleVillage/components/gameFrame/GameBootScreen.tsx",
     "src/ui/idleVillage/components/gameFrame/GameFrame.tsx",
@@ -347,6 +348,7 @@
     "src/ui/idleVillage/questS1Lab/residentToQuestMember.ts",
     "src/ui/idleVillage/questS1Lab/useQuestRun.ts",
     "src/ui/idleVillage/quests/QuestExpeditionDetail.tsx",
+    "src/ui/idleVillage/quests/amanuenseMarkup.ts",
     "src/ui/idleVillage/quests/questEpilogue.ts",
     "src/ui/idleVillage/quests/questExpedition.ts",
     "src/ui/idleVillage/quests/questJourney.ts",
@@ -386,6 +388,7 @@
     "src/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinPresets.ts",
     "src/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinSchema.ts",
     "src/ui/idleVillage/skins/activityPoiSkinConfig.ts",
+    "src/ui/idleVillage/skins/amanuenseSkinConfig.ts",
     "src/ui/idleVillage/skins/converted/slotWildernessBronzeConfig.ts",
     "src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts",
     "src/ui/idleVillage/skins/jobPoiSkinConfig.ts",
@@ -560,6 +563,17 @@
         "src/ui/idleVillage/types/ActivitySlotData.ts"
       ],
       "tier_source": "kernel"
+    },
+    {
+      "id": "amanuense-page",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx",
+        "src/ui/idleVillage/quests/amanuenseMarkup.ts"
+      ],
+      "tier_source": "default"
     },
     {
       "id": "ambient-layer",
@@ -1050,6 +1064,7 @@
         "src/ui/idleVillage/config/worldSurfaceConfig.ts",
         "src/ui/idleVillage/frozen/_infra/CanonicalDataBridge.ts",
         "src/ui/idleVillage/hooks/useFrameMetrics.ts",
+        "src/ui/idleVillage/hooks/useQuestLoreDrop.ts",
         "src/ui/idleVillage/hooks/useReducedMotion.ts",
         "src/ui/idleVillage/hooks/useThrottledValue.ts",
         "src/ui/idleVillage/interaction/dragSensors.ts",
@@ -1073,6 +1088,7 @@
         "src/ui/idleVillage/rosterV2/mountedCardRegistry.ts",
         "src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts",
         "src/ui/idleVillage/rosterV2/runStagingOpeningRoster.ts",
+        "src/ui/idleVillage/skins/amanuenseSkinConfig.ts",
         "src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts",
         "src/ui/idleVillage/skins/resolveInitialSkin.ts",
         "src/ui/idleVillage/slots/useResidentSlotController.ts",
@@ -2955,7 +2971,6 @@
         "src/ui/idleVillage/hooks/useActiveHUDStateSync.ts",
         "src/ui/idleVillage/hooks/useMilestoneEngine.ts",
         "src/ui/idleVillage/hooks/useQuestAssignmentPreview.ts",
-        "src/ui/idleVillage/hooks/useQuestLoreDrop.ts",
         "src/ui/idleVillage/quests/useQuestPoiSession.tsx",
         "src/ui/idleVillage/utils/hudPersistence.ts",
         "src/ui/idleVillage/utils/statRequirementDisplay.ts"
@@ -3463,10 +3478,10 @@
     }
   ],
   "stats": {
-    "files": 464,
-    "units": 281,
-    "ui_components": 214,
+    "files": 467,
+    "units": 282,
+    "ui_components": 215,
     "shared_kernels": 67
   },
-  "content_sha256": "2442fd4c9d9aba0c29a1d3bed4db82882651fa9cb36ede3c821ce489965c7610"
+  "content_sha256": "6c5abfc8f057f0d2066f3b75fd7032d791d2b946038b536fd941359a43408b29"
 }

@@ -4960,3 +4960,33 @@ Ricerca fatta: `context/research/2026-10-24-prompt-success-failure/`
 Regola registrata: i dati scena (meccanica nodo, tag, verbo del player,
 feeling) vengono dalla quest-gen → il prompt compila quel dato, non lo
 inventa (PLAN-084 T-007 + PLAN-085 sezione "Radice comune").
+
+## R-282 — Catalogo/wiki di tutti i componenti `/game` + loop critica multi-AI web + mockup upgrade approvati
+
+**Richiesta (verbatim, 2026-10-24):** *"Voglio un plan di catalogo d tutti i componenti in /game. in tutte le situazioni, animazioni, interazioni, stati possibili, ecc. voglio che sia fatta un wiki (tipo), ogni componennte esaminato, cn le info, link alla documentazione (o arricchiamo la documentazione stessa?) lo scopo è prendere ogni elemento, uno ad uno, con i test scritti, sottoporre lo screenshot con la descrizione di cosa è e cosa fa a tutte le AI web con il prompt 'Sei un lead UI senior designer di una compagnia di videogame AAA, fa una ricerca online, dammi una critica spietata e costruttiva di questo componente. Poi proponi delle soluzioni a tua volta, cn esempi di codice, ecc.' magari customizzato x componente. Dobbiamo rendere tutta la UI bella, adeguata, senza errori, migliorata, ecc."* + *"e per gli upgrade e cose del genere voglio vedere dei mockup con varie proposte, che prima devono essere sottoposte agli agente Ai web ed essere approvati, ecc"*
+**Data:** 2026-10-24
+**Stato:** `in corso` — fase esplorativa (mw-explorer). **Nota:** numerato R-282 (collisione T-13 — R-281 assegnato dalla sessione parallela al fix roster→slot, citato in codice).
+**Contesto infrastrutturale (FACT):** esistono già — `GAME_SURFACE_GRAPH` S0..S15 (`scripts/sentinel/gameSurfaceHarness.ts`, reach drivers deterministici + perturbazioni), 286 contratti componente in `.mw/contracts/components/`, `COMPONENT_MASTER_INDEX.md` (373 righe), TestHub kit-backed, `mw-broadcast.py` (one-shot web providers), `mw-web-turn.py` (dibattiti persistenti), convenzione review page `.mw/review/` (R-236), visual-fork gate v35 FROZEN, painter/mockup-generator.
+**Nota tecnica:** gli adapter web (`scripts/web_adapters/*` in mind-weaver) oggi sono **solo testo** — nessun supporto upload immagine; inviare screenshot richiede estensione adapter o canale API vision.
+**Ruling Director (2026-10-24):**
+1. **Perimetro** = solo ciò che il giocatore vede a schermo su `/game` (UI); niente motori/config/pagine interne.
+2. **Non** il catalogo intero prima — si procede **componente per componente**; ogni voce ha uno **stato** (`non assegnato` / `in corso` / `obsoleto` dopo upgrade).
+3. **Pipeline a 3 agenti:** (a) screenshot + compilazione documento; (b) prende le pagine pronte e lavora con le AI web per critica/miglioramenti/mockup; (c) segna `in corso`, implementa i suggerimenti o chiede al Director quale mockup scegliere, poi aggiorna il documento con **Prima/Dopo** + nuovo screenshot.
+4. **Canale immagini**: estendere gli adapter web per upload screenshot (scelta Director su API vision/testo).
+**Ruling Director (2026-10-24, bis):**
+- **Pilot**: Tab HUD in alto (HUD-3: tempo · prossimo evento · risorse).
+- **Approvazione AI web** = filtro/ranking dei mockup → il Director sceglie solo tra gli approvati (ruling resta Director, nessuna deroga al gate v35).
+- Stati catalogo confermati: `non assegnato` → `in corso` → `in revisione` → `aggiornato`; sezione Prima/Dopo permanente (il "Prima" resta come storia).
+**Ruling Director (2026-10-24, ter — architettura):**
+- **3 agenti paralleli e coordinati**: solo il terzo tocca codice; il secondo entra sulla pagina documento solo quando il primo ha finito. Parallelismo = pipeline su componenti diversi.
+- **Versioning, non "obsoleto"**: quando il nuovo screenshot è soddisfacente diventa la versione corrente; la precedente resta come `V1`, `V2`… Se il Director decide un nuovo "giro", la voce torna `non assegnato` e il nuovo risultato diventa attuale.
+- **AI web**: criticano, propongono design per i mockup, valutano i mockup — il Director sceglie quale mockup implementare. Ogni modifica/mockup deve portare **spiegazione e motivazioni**.
+- **Quadro d'insieme**: serve una visione artistica unica per tutto — il per-componente non deve far perdere la coerenza globale (rubrica di art direction condivisa + shot in-context).
+
+## R-281 — Swap medaglioni su slot occupato: roster→slot completa la matrice
+
+**Richiesta (verbatim, 2026-10-24):** *"un personaggio assegnato ad uno slot e trascino un nuovo medaglione sopra uno slot già assegnato si devono swappare. Se quello d partenza era nel roster quello che viene estratto dallo slot va nel roster, se era in 1 altro slot si sposta in quello slot (questo dovrebbe già funzionare). Ci sn altre cose 'del genere' che potrebbero aiutare come quality of life x il giocatore?"*
+**Data:** 2026-10-24
+**Stato:** `in corso`
+**Contesto:** la metà slot↔slot esiste già (R-183 `planSlotSwap`, PLAN-043 WS-1 commit-at-landing). La metà roster→slot-occupato era rifiutata (`handleDragEnd` → `return false` su `slot.assignedResidentId`; bloom `locked` durante il drag roster). Implementato: drop roster su slot occupato = replace eleggibilità-gated, scalzato torna al roster con la return-flight di R-257/R-269 (un solo commit: assign + suppression + proxy), bloom `valid`/`invalid` sui castoni occupati durante il drag roster.
+**QoL (seconda metà della richiesta):** lista proposta in risposta al Director — nessun'altra voce ratificata in questa voce.
