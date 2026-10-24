@@ -243,6 +243,9 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'fireflies', band: [0.55, 0.75], xband: [0.05, 0.45], count: 5 },
       /* The forest breathes: sparse leaves dropping through the canopy. */
       { type: 'leaves', band: [0.08, 0.85], xband: [0.15, 0.95], count: 9 },
+      /* The painted god-ray over the wet print — amplified runtime-owned
+       *  (same rule as gola-raider: painted shaft gets a live shaft). */
+      { type: 'shaft', from: [0.62, 0.03], to: [0.56, 0.55], width: 0.14, count: 3, a: 0.12, color: '#ffe9b8' },
     ],
   },
   'carro-nascosto': {
@@ -296,13 +299,18 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
     focusAnchor: [0.45, 0.55],
     atmosphere: [],
     ambient: [
-      /* Campfire at frame-left raking the trunks. */
-      { type: 'glow', at: [0.14, 0.52], r: 0.13, color: '#ff8c30', a: 0.5, flicker: 0.5 },
-      { type: 'embers', at: [0.15, 0.5], count: 5 },
-      /* The dropped torch guttering on the moss — the panic object. */
-      { type: 'glow', at: [0.63, 0.6], r: 0.05, color: '#ffa040', a: 0.45, flicker: 0.6 },
-      { type: 'embers', at: [0.63, 0.58], count: 3 },
-      { type: 'smoke', at: [0.63, 0.56], count: 2, lean: 0.18 },
+      /* Re-anchored on the painted flames (Director 2026-10-24): main
+       *  fire left at (0.15,0.55), second ember low-left (0.15,0.74),
+       *  dropped torch guttering on the moss at (0.58,0.80). */
+      { type: 'glow', at: [0.15, 0.55], r: 0.13, color: '#ff8c30', a: 0.55, flicker: 0.5 },
+      { type: 'embers', at: [0.15, 0.53], count: 6 },
+      { type: 'smoke', at: [0.15, 0.5], count: 4, lean: 0.14 },
+      { type: 'glow', at: [0.15, 0.74], r: 0.06, color: '#ff9038', a: 0.35, flicker: 0.5 },
+      { type: 'embers', at: [0.15, 0.72], count: 3 },
+      /* The dropped torch on the moss — panic object, animated flame. */
+      { type: 'glow', at: [0.58, 0.80], r: 0.055, color: '#ffa040', a: 0.5, flicker: 0.6 },
+      { type: 'embers', at: [0.58, 0.78], count: 4 },
+      { type: 'smoke', at: [0.58, 0.76], count: 2, lean: 0.18 },
       /* Dust in the lit corridor + slow drift swallowing the far dark. */
       { type: 'dust', count: 12 },
       { type: 'drift', band: [0.3, 0.7], xband: [0.55, 0.95], count: 3, speed: 0.006, a: 0.12, color: '#2a4a52' },
@@ -319,12 +327,18 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
     focusAnchor: [0.55, 0.62],
     atmosphere: [],
     ambient: [
-      /* Big campfire right-of-center + the pot fire under the tripod. */
-      { type: 'glow', at: [0.555, 0.63], r: 0.12, color: '#ff9838', a: 0.5, flicker: 0.45 },
-      { type: 'glow', at: [0.44, 0.585], r: 0.06, color: '#ff9838', a: 0.35, flicker: 0.5 },
-      { type: 'smoke', at: [0.552, 0.6], count: 5, lean: 0.14 },
-      { type: 'smoke', at: [0.44, 0.56], count: 3, lean: 0.1 },
-      { type: 'embers', at: [0.555, 0.62], count: 5 },
+      /* 4 painted fires (re-anchor 2026-10-24 after v2 image): tent
+       *  left, big campfire center, cook fire, palisade right. */
+      { type: 'glow', at: [0.30, 0.48], r: 0.05, color: '#ff9838', a: 0.4, flicker: 0.5 },
+      { type: 'glow', at: [0.43, 0.70], r: 0.12, color: '#ff9838', a: 0.55, flicker: 0.5 },
+      { type: 'glow', at: [0.555, 0.63], r: 0.07, color: '#ff9838', a: 0.45, flicker: 0.45 },
+      { type: 'glow', at: [0.68, 0.61], r: 0.06, color: '#ff9838', a: 0.4, flicker: 0.5 },
+      { type: 'smoke', at: [0.43, 0.65], count: 5, lean: 0.14 },
+      { type: 'smoke', at: [0.555, 0.58], count: 3, lean: 0.1 },
+      { type: 'smoke', at: [0.68, 0.56], count: 2, lean: 0.12 },
+      { type: 'embers', at: [0.43, 0.68], count: 6 },
+      { type: 'embers', at: [0.555, 0.61], count: 3 },
+      { type: 'embers', at: [0.68, 0.59], count: 3 },
       /* Dusk fireflies over the treeline behind the camp + a dull
        *  twinkle on the hanging cookware by the tripod. */
       { type: 'fireflies', band: [0.3, 0.42], xband: [0.15, 0.85], count: 6 },
