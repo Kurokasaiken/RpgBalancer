@@ -1,3 +1,5 @@
+# CESTINATO 2026-10-24 — nessun nodo `gob-spoglie` esiste; il loot vive in `gob-bottino` e `gob-cerca`.
+
 # F6 — Le spoglie (`spoglie-di-guerra`) → `spoglie.jpg` — BRIEF v2 (ISLAND)
 
 Beat: la radura dopo lo scontro — il mucchio della refurtiva recuperata

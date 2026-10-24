@@ -4944,3 +4944,19 @@ eye-check Director su device reale (OB-5), sweep 44px residui (B6).
 **Plan:** `plans/PLAN-085-amanuense-page.md` (draft) — T-001..T-006, contratto con regressione permanente + same-viewport vs baseline + living contracts /game.
 **Implementazione avviata (mw-executor):** T-001 ✅ schema `longForm` + tokenizer markup + skin preset, 7/7 test verdi. Restano T-002 componente folio ✅ (3/3 test render). T-003 v1 wiring pagina+tomo in `QuestRunWindow` ✅ (10/10 test; residui solver/zIndex/pill-inerte da verificare a T-006). T-004 reveal ✅, T-005 lore auto-open ✅. Estensione: `longForm` anche per-fase (schema blueprint + type + tomo nella Chronicle Journal, authored su `scout_tunnels`). Resta T-006 evidenza side-by-side + residui T-003.
 **Pendente:** T-003..T-006 → `verify:bundle` → `fatta`.
+
+## R-280 — Calibrazione giudizio visivo agente + radice comune quest-gen
+
+> «t devi allenare a creare e riconoscere immagini apprezzabili … dopo
+> diverse iterazioni la qualità è solo diminuita … fai studio e ricerca
+> approfondita, impiega anche le AI web … la descrizione della scena deve
+> venire dal programma di creazione quest, quindi una radice comune:
+> meccanica, tag, cosa fa il giocatore, feeling, motivazioni.»
+
+**Status**: `in corso` — PLAN-085.
+Ricerca fatta: `context/research/2026-10-24-prompt-success-failure/`
+(forense successi/fallimenti, broadcast 4/4) e
+`context/research/2026-10-24-agent-visual-calibration/` (metodologia).
+Regola registrata: i dati scena (meccanica nodo, tag, verbo del player,
+feeling) vengono dalla quest-gen → il prompt compila quel dato, non lo
+inventa (PLAN-084 T-007 + PLAN-085 sezione "Radice comune").
