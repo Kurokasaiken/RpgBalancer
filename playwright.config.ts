@@ -75,7 +75,7 @@ export default defineConfig({
     {
       name: 'Mobile Fit',
       use: {
-        ...devices['iPhone 14 Pro'],
+        ...devices['Pixel 7'],
         viewport: { width: 390, height: 844 },
         isMobile: true,
         hasTouch: true,

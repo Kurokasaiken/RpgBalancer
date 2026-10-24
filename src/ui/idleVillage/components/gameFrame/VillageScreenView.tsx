@@ -700,9 +700,14 @@ export const VillageScreenView: React.FC<VillageScreenViewProps> = ({ onOpenStas
                 <span style={{ display: 'inline-flex', minWidth: 13, height: 13, borderRadius: 7, alignItems: 'center', justifyContent: 'center', background: 'var(--skin-hud-lacquer-base)', border: '1px solid var(--skin-surface-border)', color: 'var(--skin-text-secondary)' }}><EngravedIcon id="cmd-lock" size={8} /></span>
                 {t('gameFrame.village.legend.badgeLocked')}
               </span>
-              <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', letterSpacing: '0.02em' }}>
-                {t('gameFrame.village.legend.keys')}
-              </span>
+              {/* PLAN-083: keyboard-only hint — meaningless on touch; the
+               *  legend keeps category/badge semantics, the keys row is a
+               *  fine-pointer affordance only. */}
+              {!coarsePointer && (
+                <span style={{ font: '12px var(--skin-font-serif)', color: 'var(--skin-text-secondary)', letterSpacing: '0.02em' }}>
+                  {t('gameFrame.village.legend.keys')}
+                </span>
+              )}
             </div>
 
             {/* PLAN-042: the Settlement Registry slide-over. It overlaps the

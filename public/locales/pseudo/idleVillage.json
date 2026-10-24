@@ -1910,7 +1910,10 @@
       "mechanicsUsed": "!! ṃṃééççĥĥååññîîççšš üüššééδδ !!",
       "traitsUsed": "!! ţţřřååîîţţšš üüššééδδ !!",
       "tree": "!! ññööδδéé ţţřřéééé !!",
-      "play": "!! ṗṗłłååÿÿ !!"
+      "play": "!! ṗṗłłååÿÿ !!",
+      "candidate": "⟦candidate⟧",
+      "stale": "⟦STALE⟧",
+      "superseded": "⟦SUPERSEDED by⟧"
     },
     "play": {
       "setup": "!! ṗṗřřééṗṗååřřéé ţţĥĥéé řřüüññ !!",
@@ -1939,6 +1942,68 @@
       "wound": "!! ẅẅööüüññδδ !!",
       "death": "!! δδééååţţĥĥ !!",
       "continue": "!! ççööññţţîîññüüéé !!"
+    },
+    "author": {
+      "toggle": "⟦Author mode⟧"
+    },
+    "generate": {
+      "title": "⟦Generate candidate⟧",
+      "authorOnly": "⟦author⟧",
+      "cta": "⟦Generate⟧",
+      "running": "⟦Generating…⟧",
+      "tuning": {
+        "goal": "⟦goal⟧",
+        "twistChance": "⟦twistChance⟧",
+        "twistRearmChance": "⟦twistRearmChance⟧",
+        "limite": "⟦limite⟧",
+        "uscitaGoal": "⟦uscitaGoal⟧",
+        "madreChance": "⟦madreChance⟧",
+        "pareteChance": "⟦pareteChance⟧"
+      },
+      "errors": {
+        "kit-schema": "⟦kit-schema⟧",
+        "tuning-schema": "⟦tuning-schema⟧",
+        "generator-throw": "⟦generator-throw⟧",
+        "hash-failure": "⟦hash-failure⟧"
+      },
+      "export": "⟦Export latest⟧",
+      "importLabel": "⟦Import envelope⟧",
+      "kitDrawer": "⟦Kit payload (JSON)⟧",
+      "kitReadonly": "⟦read-only⟧",
+      "kitReset": "⟦reset⟧"
+    },
+    "gates": {
+      "title": "⟦title⟧",
+      "notRun": "⟦notRun⟧",
+      "run": "⟦run⟧",
+      "running": "⟦running⟧",
+      "cancel": "⟦cancel⟧",
+      "hint": "⟦hint⟧",
+      "issues": "⟦issues⟧",
+      "stale": "⟦stale⟧",
+      "exec": "⟦exec⟧",
+      "schema.ok": "⟦schema.ok⟧",
+      "schema.fail": "⟦schema.fail⟧",
+      "graph.ok": "⟦graph.ok⟧",
+      "graph.fail": "⟦graph.fail⟧",
+      "graph.skipped": "⟦graph.skipped⟧",
+      "hook.ok": "⟦hook.ok⟧",
+      "hook.low": "⟦hook.low⟧",
+      "hook.zero": "⟦hook.zero⟧",
+      "hook.skipped": "⟦hook.skipped⟧",
+      "vocab.ok": "⟦vocab.ok⟧",
+      "vocab.hits": "⟦vocab.hits⟧",
+      "vocab.na": "⟦vocab.na⟧",
+      "copy.na": "⟦copy.na⟧",
+      "copy.deferred": "⟦copy.deferred⟧",
+      "mc.pending": "⟦mc.pending⟧",
+      "journey.na": "⟦journey.na⟧",
+      "journey.exportSeam": "⟦journey.exportSeam⟧",
+      "issues.schemaIssue": "⟦issues.schemaIssue {{args}}⟧",
+      "issues.unreachableNode": "⟦issues.unreachableNode {{args}}⟧",
+      "issues.orphanEnd": "⟦issues.orphanEnd {{args}}⟧",
+      "issues.forbiddenTerm": "⟦issues.forbiddenTerm {{args}}⟧",
+      "issues.hardOptOut": "⟦issues.hardOptOut {{args}}⟧"
     }
   },
   "questExpedition": {
