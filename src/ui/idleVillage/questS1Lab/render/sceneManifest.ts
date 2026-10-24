@@ -184,6 +184,23 @@ export const SceneCinematicEntrySchema = z.object({
     }),
   /** Anchored ambient FX — fires, smoke, fog, dust (PLAN-046 ambient slice). */
   ambient: z.array(AmbientFxSchema).default([]),
+  /** PLAN-084 reveal — a hidden affordance the scene springs on click or
+   *  after a timer: the region in img-fraction, the trigger, and the FX
+   *  burst fired when the secret shows (ambushers revealed, cache found). */
+  reveal: z
+    .object({
+      /** Interactive region [x, y, w, h] in img-fraction coordinates. */
+      region: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+      /** click = player finds it; timed = it springs on its own. */
+      trigger: z.enum(['click', 'timed']),
+      /** Timed trigger delay in seconds (ignored for click). */
+      afterSeconds: z.number().positive().default(8),
+      /** The burst of FX spawned at reveal — the tell becoming visible. */
+      burst: z.array(AmbientFxSchema).default([]),
+      /** Optional flag pushed into run.flags on reveal. */
+      flag: z.string().optional(),
+    })
+    .optional(),
   /** Reserved (later slices): authored foreground cutout descriptor. */
   foregroundCutout: z
     .object({ src: z.string(), depth: z.number().min(0).max(1).optional() })
@@ -241,6 +258,54 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
     ambient: [
       { type: 'dust', count: 20 },
       { type: 'drift', band: [0.1, 0.35], count: 3, speed: 0.009, a: 0.13, color: '#e8ecd8' },
+      /* The hidden chest breathes: a brass glint through the foliage. */
+      { type: 'glint', at: [0.55, 0.48], period: 7, r: 0.007 },
+      { type: 'leaves', band: [0.1, 0.8], xband: [0.1, 0.9], count: 7 },
+      { type: 'fireflies', band: [0.5, 0.7], xband: [0.1, 0.5], count: 4 },
+    ],
+  },
+  bottino: {
+    depth: '/assets/depth/bottino.webp',
+    depthWidth: 1584,
+    depthHeight: 672,
+    imgAspect: 3168 / 1344,
+    /* discovery — the hide-lined pit, the single gold gleam betraying it. */
+    entrance: 'enter-creep',
+    pose: 'pose-rest',
+    focusAnchor: [0.45, 0.58],
+    atmosphere: [],
+    ambient: [
+      { type: 'dust', count: 18 },
+      /* The gleam inside the pit pulses — the tell that keeps the eye. */
+      { type: 'glint', at: [0.46, 0.58], period: 7, r: 0.008 },
+      { type: 'glint', at: [0.5, 0.62], period: 11, r: 0.005 },
+      { type: 'drift', band: [0.05, 0.3], count: 2, speed: 0.007, a: 0.11, color: '#e8ecd8' },
+      /* Sparse canopy leaves over the litter field. */
+      { type: 'leaves', band: [0.1, 0.8], xband: [0.1, 0.9], count: 6 },
+      { type: 'moths', at: [0.46, 0.5], count: 2 },
+    ],
+  },
+  incalzare: {
+    depth: '/assets/depth/incalzare.webp',
+    depthWidth: 1584,
+    depthHeight: 672,
+    imgAspect: 3168 / 1344,
+    /* pursuit — the scattered rout into the dark, dropped torch still lit. */
+    entrance: 'enter-sweep',
+    pose: 'pose-tense',
+    focusAnchor: [0.45, 0.55],
+    atmosphere: [],
+    ambient: [
+      /* Campfire at frame-left raking the trunks. */
+      { type: 'glow', at: [0.14, 0.52], r: 0.13, color: '#ff8c30', a: 0.5, flicker: 0.5 },
+      { type: 'embers', at: [0.15, 0.5], count: 5 },
+      /* The dropped torch guttering on the moss — the panic object. */
+      { type: 'glow', at: [0.63, 0.6], r: 0.05, color: '#ffa040', a: 0.45, flicker: 0.6 },
+      { type: 'embers', at: [0.63, 0.58], count: 3 },
+      { type: 'smoke', at: [0.63, 0.56], count: 2, lean: 0.18 },
+      /* Dust in the lit corridor + slow drift swallowing the far dark. */
+      { type: 'dust', count: 12 },
+      { type: 'drift', band: [0.3, 0.7], xband: [0.55, 0.95], count: 3, speed: 0.006, a: 0.12, color: '#2a4a52' },
     ],
   },
   'accampamento-raider': {
@@ -304,7 +369,14 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
      * ruling holds the ambient list thin: dust kicked by the run is
      * the only "life" a pursuit wants. */
     atmosphere: [],
-    ambient: [{ type: 'dust', count: 14 }],
+    ambient: [
+      { type: 'dust', count: 14 },
+      /* The rolling dust curtain glows amber where the light rakes it. */
+      { type: 'drift', band: [0.45, 0.7], xband: [0.2, 0.7], count: 4, speed: 0.011, a: 0.14, color: '#d8a050' },
+      /* A stray torch abandoned on the rocks — the rout's trace. */
+      { type: 'glint', at: [0.6, 0.55], period: 6, r: 0.007 },
+      { type: 'embers', at: [0.6, 0.53], count: 3 },
+    ],
   },
   saccheggio: {
     depth: '/assets/depth/saccheggio.webp',
@@ -320,6 +392,13 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 16 },
       /* Painted smoke wisp upper-right — a thin column keeps it alive. */
       { type: 'smoke', at: [0.72, 0.35], count: 2, lean: 0.08 },
+      /* The loot talks: coin glints pulsing in the opened chest. */
+      { type: 'glint', at: [0.22, 0.66], period: 5, r: 0.007 },
+      { type: 'glint', at: [0.27, 0.7], period: 8, r: 0.005 },
+      /* Ember-bed still warm under the wreckage + moths on the last light. */
+      { type: 'embers', at: [0.68, 0.5], count: 4 },
+      { type: 'glow', at: [0.68, 0.52], r: 0.05, color: '#ff8c30', a: 0.3, flicker: 0.5 },
+      { type: 'moths', at: [0.68, 0.45], count: 3 },
     ],
   },
   'viaggio-andata': {
@@ -420,7 +499,27 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       /* Arrowhead glints in the treeline — the tell that it's alive. */
       { type: 'glint', at: [0.79, 0.44], period: 5, r: 0.006 },
       { type: 'glint', at: [0.86, 0.46], period: 7, r: 0.005 },
+      { type: 'glint', at: [0.7, 0.5], period: 11, r: 0.005 },
+      /* Leaves stirring over the ambushers — the held breath moves. */
+      { type: 'leaves', band: [0.15, 0.7], xband: [0.1, 0.9], count: 5 },
     ],
+    /* PLAN-084: the ambushers hide in the right treeline — find them or
+     *  they spring themselves. Click the treeline band = discovered;
+     *  timer fallback = the trap reveals. */
+    reveal: {
+      region: [0.55, 0.3, 0.42, 0.4],
+      trigger: 'click',
+      afterSeconds: 9,
+      burst: [
+        { type: 'glint', at: [0.79, 0.44], period: 3, r: 0.01 },
+        { type: 'glint', at: [0.86, 0.46], period: 3, r: 0.009 },
+        { type: 'glint', at: [0.7, 0.5], period: 4, r: 0.008 },
+        { type: 'glint', at: [0.76, 0.42], period: 4, r: 0.007 },
+        { type: 'leaves', band: [0.2, 0.6], xband: [0.55, 0.95], count: 8 },
+        { type: 'dust', count: 8 },
+      ],
+      flag: 'revealedAmbush',
+    },
   },
   /* ---- PLAN-052 flagship candidate: f3-gola-dusk (brief §6b shot
    *  grammar; anchors measured on the baked raster, 2026-10-23). The
@@ -494,6 +593,9 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       /* spear-tip glints on the infiltrator file (img-fraction, misurati) */
       { type: 'glint', at: [0.28, 0.5], period: 5, r: 0.006 },
       { type: 'glint', at: [0.32, 0.53], period: 7, r: 0.005 },
+      /* Distant camp embers in the treeline + dusk fireflies below the ledge. */
+      { type: 'embers', at: [0.55, 0.55], count: 3 },
+      { type: 'fireflies', band: [0.5, 0.72], xband: [0.1, 0.6], count: 4 },
     ],
     tags: ['quest-goblin', 'f3-intrusi'],
   },

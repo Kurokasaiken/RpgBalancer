@@ -1,6 +1,20 @@
 # PLAN-084 — Living stills: reveal narrativi + varianti di scena
 
-**Stato:** draft — rulings Director acquisiti 2026-10-24, in attesa di battesimo
+**Stato:** in corso — slice T1/T3 implementato 2026-10-24 (FX-reveal click→burst→flag su f7-agguato)
+
+### Coperto (bundle 2026-10-24)
+- OB-1 schema `reveal` Zod (forma: `region + trigger: click|timed + afterSeconds + burst[] + flag`) — manca `cameraZ`/`decisionPoint` come trigger
+- OB-2 hotspot img-fraction cliccabile (region `[x,y,w,h]` nel manifest)
+- OB-3 variante FX-reveal (burst glint+leaves, NON grade/mask — decisione presa: FX-reveal prima, grade dopo)
+- OB-7 region-locked + manifest-declared
+- `revealFlag` → `run.flags` (useQuestRun), click→`revealedAmbush` wired
+
+### Aperto
+- OB-4 delta plate pipeline (T-004)
+- OB-5 motivated-cover transition
+- OB-6 determinismo puro (React state oggi, non pure-fn)
+- OB-8 scorecard arte estesa
+- Auto-reveal al check (`decisionPoint` trigger — T-003 seconda metà)
 **Fonte:** R-278; ricerca `context/research/2026-10-24-scene-variants-and-reveal/`
 (broadcast aperto 5/5, prima applicazione del research-prompt-protocol R-278);
 tassonomia archetipi `src/docs/docs/art-direction/composition_archetypes.md`;

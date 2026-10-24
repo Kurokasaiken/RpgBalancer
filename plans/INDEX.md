@@ -132,6 +132,8 @@ The spec of each plan lives in `plans/PLAN-*.md`. Direction and rationale live i
 | [PLAN-041](PLAN-041-model-arena.md) | Model arena R-204: baseline locale vs costo contratto vs arena per-modello (gemini-3.8-flash, gpt-oss-120b groq/cerebras, qwen3.8-27b, nemotron:free, mistral-small), gate correttezza, piano parallelizzazione | **completed** | P1 | 2026-10-16 | — | R-204; 18 run → 0 contract-pass: gemini 503-burst, groq/qwen/mistral 429 quota, cerebras 402, nemotron lavora ma fallisce il gate; `benchmarks/ARENA-REPORT.md`; conferma v31 (locale unico executor affidabile) |
 | [PLAN-040](PLAN-040-quest-window-skillcheck-outcomes.md) | QuestRunWindow rev.3: contenimento pulsanti (harness per-fase + `outsidePlaque`), bag in header, `QuestSkillCheckOverlay` via portal (davanti, click-to-dismiss) + prewarm nel boot veil (fix `useAstrolabeAudio` AudioContext mutato), `QuestOutcomeToast` esiti esterni, reward veloce+CTA+icone | completed | P1 | 2026-10-16 / Director («battezzo, procedi») | T-000..T-007 | R-205; piano nuovo, non prosecuzione R-199; mw-web-debate ×2 converged, artifact r007 sha f2b48df4; harness 0 findings @ 1440×900/1280×800/1280×400; warm droppato measure-first (warm-verdict.json); unico fail = generatedCatalog.bench preesistente |
 
+| [PLAN-086](PLAN-086-ui-catalog-critique-pipeline.md) | UI Catalog & Critique Pipeline: catalogo vivente `.mw/catalog/` (manifest+schede+versioning), 3 stadi (documenter su snapshot congelato / critique+mockup broker su AI web / implementer post-ruling), rubrica ART-DIRECTION condivisa, upload immagini adapter web; pilot = Tab HUD in alto | draft | P2 | 2026-10-24 | — | R-282; dibattito multi-AI richiesto dal Director |
+
 ## Sotto-documenti (non piani)
 
 | File | È | Di |

@@ -78,6 +78,8 @@ export interface QuestRunApi {
   /** Arm or disarm a held bag flag (toggle; no-op on flags not in `run.flags`
    *  and on passive items like the guardian banner). */
   toggleArmedFlag: (flag: string) => void;
+  /** PLAN-084: push a discovery flag from a scene reveal (idempotent). */
+  revealFlag: (flag: string) => void;
   /** Advance the committed frontier: matured timed nodes resolve, the run
    *  stops at the first node needing the player (v27 catch-up). */
   syncClock: (tick: number) => void;
@@ -316,6 +318,18 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
     [run],
   );
 
+  /** PLAN-084: a scene reveal pushes a discovery flag into run.flags —
+   *  inert unless a downstream node reads it (e.g. `revealedAmbush`). */
+  const revealFlag = useCallback(
+    (flag: string) => {
+      if (!run || run.ended || run.flags.includes(flag)) return;
+      const next = { ...run, flags: [...run.flags, flag] };
+      setRun(next);
+      persist(next, phasesRef.current);
+    },
+    [run, persist],
+  );
+
   const syncClock = useCallback(
     (tick: number) => {
       tickRef.current = tick;
@@ -435,6 +449,7 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       choose,
       armedFlags,
       toggleArmedFlag,
+      revealFlag,
       syncClock,
       abandon,
       useHealing: heal,
@@ -445,6 +460,6 @@ export function useQuestRun(questId: QuestId): QuestRunApi {
       applySettlement,
       dismissOutcome,
     }),
-    [run, phases, start, choose, armedFlags, toggleArmedFlag, syncClock, abandon, heal, potion, clear, beats, applySettlement, dismissOutcome],
+    [run, phases, start, choose, armedFlags, toggleArmedFlag, revealFlag, syncClock, abandon, heal, potion, clear, beats, applySettlement, dismissOutcome],
   );
 }
