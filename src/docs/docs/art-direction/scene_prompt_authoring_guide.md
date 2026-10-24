@@ -1,5 +1,10 @@
 # Scene Prompt Authoring Guide — immagini ambientali per quest/eventi
 
+> **Form di compilazione obbligatorio (2026-10-24):** ogni prompt di scena si
+> costruisce compilando [`scene_prompt_form.md`](./scene_prompt_form.md)
+> campo per campo — i pigmenti di bibbia, gli esempi dai prompt approvati e
+> le clausole verbatim vivono lì. Un campo vuoto = FAIL prima del lint.
+
 Guida operativa per agenti che authorano prompt di scena (quadri ambientali,
 non ritratti). Distillata dalla sessione quest «Sterminio dei goblin»
 (`.mw/specs/quest-goblin-scenes/`, R-172) — i problemi incontrati lì sono
