@@ -199,6 +199,22 @@ export const SceneCinematicEntrySchema = z.object({
       burst: z.array(AmbientFxSchema).default([]),
       /** Optional flag pushed into run.flags on reveal. */
       flag: z.string().optional(),
+      /* PLAN-084 plate-swap: the revealed-state plate (same composition,
+       *  secret shown — goblins risen). Rendered over the base plate,
+       *  clipped to the cutout region while the cutout slides away. */
+      revealSrc: z.string().optional(),
+      /* cutout-slide: the authored occluder (a piece of the hidden plate —
+       *  the left rock mass) slides off revealing `revealSrc` beneath.
+       *  fade: plain crossfade of the clipped region. */
+      revealMode: z.enum(['fade', 'cutout-slide']).optional(),
+      /** The occluder rect the cutout covers, in img-fraction [x,y,w,h]. */
+      cutout: z
+        .object({
+          region: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+          slide: z.enum(['left', 'right', 'down']).default('left'),
+          slideSeconds: z.number().positive().default(1.4),
+        })
+        .optional(),
     })
     .optional(),
   /** Reserved (later slices): authored foreground cutout descriptor. */
@@ -539,6 +555,11 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
         { type: 'dust', count: 8 },
       ],
       flag: 'revealedAmbush',
+      revealSrc: '/assets/scene-library/agguato-foresta-revealed.jpg',
+      revealMode: 'cutout-slide',
+      /* The left mossy rock mass covers the ambush lane — on reveal it
+       *  slides out of frame left and the risen goblins show through. */
+      cutout: { region: [0.0, 0.0, 0.42, 1.0], slide: 'left', slideSeconds: 1.6 },
     },
   },
   /* ---- PLAN-052 flagship candidate: f3-gola-dusk (brief §6b shot

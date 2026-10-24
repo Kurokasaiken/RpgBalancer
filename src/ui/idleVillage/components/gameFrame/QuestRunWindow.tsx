@@ -1805,24 +1805,10 @@ const Theater: React.FC<{
             traumaStrength={traumaStrength}
           />
           {/* PLAN-084: the hidden affordance is a live region until the
-           *  player finds it — then the secret fires and the layer is done. */}
-          {reveal && !revealed && (
-            <div
-              role="button"
-              aria-label="Ispeziona"
-              data-testid="scene-reveal-region"
-              onClick={doReveal}
-              style={{
-                position: 'absolute',
-                left: `${reveal.region[0] * 100}%`,
-                top: `${reveal.region[1] * 100}%`,
-                width: `${reveal.region[2] * 100}%`,
-                height: `${reveal.region[3] * 100}%`,
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                zIndex: 5,
-              }}
-            />
+           *  player finds it — then the secret fires: revealed plate +
+           *  sliding cutout (SceneRevealLayer, shared with TheaterLab). */}
+          {reveal && src && (
+            <SceneRevealLayer reveal={reveal} src={src} revealed={revealed} onReveal={doReveal} />
           )}
         </div>
       ) : (

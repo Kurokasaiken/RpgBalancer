@@ -25,6 +25,7 @@ import { DepthScene } from '@/ui/idleVillage/questS1Lab/render/DepthScene';
 import { Letterbox } from '@/ui/idleVillage/skins/primitives';
 import { documentClock, shotEpochFor } from '@/ui/idleVillage/questS1Lab/render/cameraEval';
 import { SCENE_CINEMATICS, artIdFromSrc } from '@/ui/idleVillage/questS1Lab/render/sceneManifest';
+import { SceneRevealLayer } from '@/ui/idleVillage/questS1Lab/render/SceneRevealLayer';
 import { LIBRARY_ART, NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import {
   DEFAULT_QUEST_THEATRE_FX,
@@ -78,6 +79,7 @@ const q0 = new URLSearchParams(window.location.search);
 export const TheaterLabPage: React.FC = () => {
   const [sceneId, setSceneId] = useState(q0.get('scene') ?? 'agguato-foresta');
   const [shotId, setShotId] = useState(q0.get('shot') ?? 'enter-settle');
+  const [revealed, setRevealed] = useState(false);
   const [dust, setDust] = useState(q0.get('dust') !== '0');
   /* Per-effect isolation: each manifest fx type toggles alone so every
    *  effect can be judged "visibile ad occhio" on its own (Director). */
@@ -92,6 +94,8 @@ export const TheaterLabPage: React.FC = () => {
   const [amp, setAmp] = useState(Number(q0.get('amp') ?? 1));
   const [aspect, setAspect] = useState(Number(q0.get('aspect') ?? 2.4));
   const [domOnly, setDomOnly] = useState(q0.get('dom') === '1');
+  /* PLAN-084: lab-local reveal state — the same layer the quest theater
+   *  mounts, so the hidden-affordance is testable here (was T-04 blind). */
   /* PLAN-050 §5 — letterbox per-beat: 'ingresso' fa scendere le bande
    *  DURANTE l'entrata (complete a ~70%), 'fisse' le tiene in hold. */
   const [barsMode, setBarsMode] = useState<BarsMode>((q0.get('bars') as BarsMode | null) ?? 'off');
@@ -147,6 +151,7 @@ export const TheaterLabPage: React.FC = () => {
   const hasDepth = !!entry && art?.fit === 'cover';
 
   const sceneKey = sceneId;
+  useEffect(() => setRevealed(false), [sceneKey]);
 
   /* Bars re-close on every scene/shot/mode change so the showcase replays
    *  the entrance letterbox instead of leaving them stuck down. */
@@ -244,7 +249,7 @@ export const TheaterLabPage: React.FC = () => {
               reducedMotion={reducedMotion}
               clock={clock}
               ambient={dust}
-              ambientFx={entry?.ambient.filter((f) => fxOn[f.type] !== false)}
+              ambientFx={revealed ? [...(entry?.ambient ?? []), ...(entry?.reveal?.burst ?? [])].filter((f) => fxOn[f.type] !== false) : entry?.ambient.filter((f) => fxOn[f.type] !== false)}
               atmosphere={q0.get('atmo') === '0' ? [] : entry?.atmosphere}
               traumaEpoch={shake?.epoch ?? null}
               traumaStrength={shake?.strength ?? 0}
@@ -259,6 +264,9 @@ export const TheaterLabPage: React.FC = () => {
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 40%' }}
               />
             )
+          )}
+          {entry?.reveal && src && (
+            <SceneRevealLayer reveal={entry.reveal} src={src} revealed={revealed} onReveal={() => setRevealed(true)} />
           )}
           <Letterbox
             active={barsActive}
