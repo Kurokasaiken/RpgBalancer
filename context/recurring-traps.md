@@ -570,3 +570,35 @@ Vale anche per il routing delle dipendenze: controllare prima se esiste
 una libreria matura (es. @pixi/particle-emitter) e valutare se adotta o
 se la tecnica si porta sul nostro engine (vincolo: particelle = funzione
 pura del clock per i test deterministici).
+
+## T-16 — Prompt consegnati "a memoria del formato" (saltare il preflight di bibbia)
+
+Un brief/prompt per un generatore esterno NON si scrive a memoria del
+formato: prima della consegna si riapplica meccanicamente il preflight
+`R4bis` di `scene_prompt_authoring_guide.md` — clausola di luminosità
+canonica verbatim su ogni scena non-giorno, pigmenti Wanderlust nominati
+(ultramarine/cinabro/ambra/verde Veronese, ombre deep teal), cielo azure
+vibrante, direzione dell'azione esplicita (chi agisce su chi), kill-list
+completa, correlazione archetype×shot×ambient×hooks. Fallimento reale
+2026-10-24: brief f2–f6 consegnati senza clausola/pigmenti (output dark)
+e f4 con soggetto ambiguo ("a massed charge" letto come i goblin che
+attaccano noi, mentre gli eroi caricano VERSO il campo). Il contratto
+esisteva già — non era stato eseguito come checklist.
+
+## T-24 — Componente desktop-only: il test a 1280 non prova nulla sotto 768
+
+**Surface:** qualsiasi componente/pannello/nav nuovo su `/game` (PLAN-083).
+
+- **Cosa succede:** il componente viene scritto e verificato a 1280px
+  desktop; sotto `mobileFitConfig.breakpointPx` (768) è rotto — clippato,
+  irraggiungibile, con azioni solo-hover/tastiera senza equivalente touch.
+  Non è mai stato "scoperto mobile", solo non guardato.
+- **Istanze:** probe 2026-10-23 su `/game` (`test-results/mobile-probe-
+  2026-10-23/`): nav 452px>390px, top HUD clip, quest window 820px,
+  hint «Esc/Enter/frecce» senza equivalente, 9/13 target <44px.
+- **Regola:** ogni componente `/game` nuovo si verifica a 390×844 touch
+  **prima** del «fatta» — target ≥44px, niente azioni solo-hover/tastiera,
+  `panelMode` sheet regge, niente magic number (mobileFitConfig). Le regole
+  di authoring complete sono in `hud_component_guide.md` §6c; la checklist
+  §6.12 punto 11 le rende obbligatorie. Come T-04 impone l'occhio, questa
+  impone il viewport.

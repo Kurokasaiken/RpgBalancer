@@ -506,7 +506,7 @@ export const GameFrame: React.FC<GameFrameProps> = ({
     <SkinScope
       className={['game-frame', className].filter(Boolean).join(' ')}
       data-hud-hidden={hudHidden ? '' : undefined}
-      style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', ...style }}
+      style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', overscrollBehavior: 'none', ...style }}
     >
       {/* The world. Full-bleed, edge to edge — and the only frame on screen is this shell. */}
       <div style={{ position: 'absolute', inset: 0 }}>{children}</div>

@@ -1948,7 +1948,10 @@
       "mechanicsUsed": "meccaniche usate",
       "traitsUsed": "trait usati",
       "tree": "albero dei nodi",
-      "play": "gioca"
+      "play": "gioca",
+      "candidate": "candidato",
+      "stale": "STALE",
+      "superseded": "SUPERSEDED da"
     },
     "play": {
       "setup": "prepara il run",
@@ -1977,6 +1980,68 @@
       "wound": "ferita",
       "death": "morte",
       "continue": "continua"
+    },
+    "author": {
+      "toggle": "Modalità author"
+    },
+    "generate": {
+      "title": "Genera candidato",
+      "authorOnly": "author",
+      "cta": "Genera",
+      "running": "Generazione…",
+      "tuning": {
+        "goal": "goal",
+        "twistChance": "twist %",
+        "twistRearmChance": "re-arm %",
+        "limite": "limite acqua",
+        "uscitaGoal": "goal uscita",
+        "madreChance": "cassa madre %",
+        "pareteChance": "parete %"
+      },
+      "errors": {
+        "kit-schema": "Kit rifiutato dallo schema",
+        "tuning-schema": "Tuning non valido",
+        "generator-throw": "Il generatore ha lanciato",
+        "hash-failure": "Hash fallito — riprova"
+      },
+      "export": "Esporta ultimo",
+      "importLabel": "Importa envelope",
+      "kitDrawer": "Payload kit (JSON)",
+      "kitReadonly": "sola lettura — kit narrato",
+      "kitReset": "ripristina kit frozen"
+    },
+    "gates": {
+      "title": "Gate di qualità",
+      "notRun": "non eseguiti",
+      "run": "Esegui gate",
+      "running": "In corso…",
+      "cancel": "Annulla",
+      "hint": "Esegui l'inventario dei gate per validare questa voce.",
+      "issues": "issue",
+      "stale": "Report STALE — eseguito su {{reportHash}}… ma il contenuto è {{currentHash}}…",
+      "exec": "exec {{state}}",
+      "schema.ok": "schema ok",
+      "schema.fail": "violazioni schema",
+      "graph.ok": "grafo ok",
+      "graph.fail": "difetti grafo",
+      "graph.skipped": "saltato",
+      "hook.ok": "hook ok",
+      "hook.low": "copertura hook bassa",
+      "hook.zero": "nessuna scena",
+      "hook.skipped": "saltato",
+      "vocab.ok": "vocab ok",
+      "vocab.hits": "termini vietati",
+      "vocab.na": "n/d",
+      "copy.na": "n/d",
+      "copy.deferred": "copy gate rinviato",
+      "mc.pending": "mc in sospeso",
+      "journey.na": "n/d",
+      "journey.exportSeam": "solo seam export",
+      "issues.schemaIssue": "{{path}}: {{message}}",
+      "issues.unreachableNode": "nodo irraggiungibile {{id}}",
+      "issues.orphanEnd": "end orfano {{id}}",
+      "issues.forbiddenTerm": "termine vietato \"{{term}}\"",
+      "issues.hardOptOut": "il gate hard {{id}} non è escludibile"
     }
   },
   "questExpedition": {

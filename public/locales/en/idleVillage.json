@@ -1927,7 +1927,10 @@
       "mechanicsUsed": "mechanics used",
       "traitsUsed": "traits used",
       "tree": "node tree",
-      "play": "play"
+      "play": "play",
+      "candidate": "candidate",
+      "stale": "STALE",
+      "superseded": "SUPERSEDED by"
     },
     "play": {
       "setup": "prepare the run",
@@ -1956,6 +1959,68 @@
       "wound": "wound",
       "death": "death",
       "continue": "continue"
+    },
+    "author": {
+      "toggle": "Author mode"
+    },
+    "generate": {
+      "title": "Generate candidate",
+      "authorOnly": "author",
+      "cta": "Generate",
+      "running": "Generating…",
+      "tuning": {
+        "goal": "goal",
+        "twistChance": "twist chance %",
+        "twistRearmChance": "re-arm %",
+        "limite": "flood limit",
+        "uscitaGoal": "escape goal",
+        "madreChance": "mother lode %",
+        "pareteChance": "wall %"
+      },
+      "errors": {
+        "kit-schema": "Kit rejected by schema",
+        "tuning-schema": "Invalid tuning",
+        "generator-throw": "Generator threw",
+        "hash-failure": "Hash failed — retry"
+      },
+      "export": "Export latest",
+      "importLabel": "Import envelope",
+      "kitDrawer": "Kit payload (JSON)",
+      "kitReadonly": "read-only — narrated kit",
+      "kitReset": "reset to frozen kit"
+    },
+    "gates": {
+      "title": "Quality gates",
+      "notRun": "not run",
+      "run": "Run gates",
+      "running": "Running…",
+      "cancel": "Cancel",
+      "hint": "Run the gate inventory to validate this entry.",
+      "issues": "issues",
+      "stale": "Report STALE — ran on {{reportHash}}… but content is {{currentHash}}…",
+      "exec": "exec {{state}}",
+      "schema.ok": "schema ok",
+      "schema.fail": "schema violations",
+      "graph.ok": "graph ok",
+      "graph.fail": "graph defects",
+      "graph.skipped": "skipped",
+      "hook.ok": "hooks ok",
+      "hook.low": "low hook coverage",
+      "hook.zero": "no scenes",
+      "hook.skipped": "skipped",
+      "vocab.ok": "vocab ok",
+      "vocab.hits": "forbidden terms",
+      "vocab.na": "n/a",
+      "copy.na": "n/a",
+      "copy.deferred": "copy gate deferred",
+      "mc.pending": "mc pending",
+      "journey.na": "n/a",
+      "journey.exportSeam": "export-seam only",
+      "issues.schemaIssue": "{{path}}: {{message}}",
+      "issues.unreachableNode": "unreachable node {{id}}",
+      "issues.orphanEnd": "orphan end {{id}}",
+      "issues.forbiddenTerm": "forbidden term \"{{term}}\"",
+      "issues.hardOptOut": "hard gate {{id}} cannot be opted out"
     }
   },
   "questExpedition": {
