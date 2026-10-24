@@ -205,8 +205,17 @@ export const SceneCinematicEntrySchema = z.object({
       revealSrc: z.string().optional(),
       /* cutout-slide: the authored occluder (a piece of the hidden plate —
        *  the left rock mass) slides off revealing `revealSrc` beneath.
-       *  fade: plain crossfade of the clipped region. */
-      revealMode: z.enum(['fade', 'cutout-slide']).optional(),
+       *  fade: plain crossfade of the clipped region.
+       *  panel-slide (Director 2026-10-24): a full foreground panel covering
+       *  ~85% slides left off-frame — the scene was behind it all along.
+       *  Variants of what shows on reveal: 'sprites' = extracted goblin
+       *  cutouts rise into the scene; 'strips' = the revealed plate arrives
+       *  in vertical stripes left→right. */
+      revealMode: z.enum(['fade', 'cutout-slide', 'panel-slide']).optional(),
+      /** Full-frame foreground panel src — the painted occluder that slides. */
+      panelSrc: z.string().optional(),
+      /** What the revealed moment does: sprites entering vs stripes arriving. */
+      revealFx: z.enum(['sprites', 'strips']).optional(),
       /** The occluder rect the cutout covers, in img-fraction [x,y,w,h]. */
       cutout: z
         .object({
@@ -556,10 +565,12 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       ],
       flag: 'revealedAmbush',
       revealSrc: '/assets/scene-library/agguato-foresta-revealed.jpg',
-      revealMode: 'cutout-slide',
-      /* The left mossy rock mass covers the ambush lane — on reveal it
-       *  slides out of frame left and the risen goblins show through. */
-      cutout: { region: [0.0, 0.0, 0.42, 1.0], slide: 'left', slideSeconds: 1.6 },
+      revealMode: 'panel-slide',
+      /* Director 2026-10-24: the foreground mass (rock+stairs+tree) covers
+       *  ~85% of the frame and slides left — the scene was behind it. */
+      panelSrc: '/assets/scene-library/agguato-panel.png',
+      revealFx: 'sprites', // default; lab overrides with ?revealfx=
+      cutout: { region: [0.0, 0.0, 0.85, 1.0], slide: 'left', slideSeconds: 2.0 },
     },
   },
   /* ---- PLAN-052 flagship candidate: f3-gola-dusk (brief §6b shot

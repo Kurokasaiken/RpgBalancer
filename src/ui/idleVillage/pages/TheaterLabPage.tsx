@@ -266,7 +266,13 @@ export const TheaterLabPage: React.FC = () => {
             )
           )}
           {entry?.reveal && src && (
-            <SceneRevealLayer reveal={entry.reveal} src={src} revealed={revealed} onReveal={() => setRevealed(true)} />
+            <SceneRevealLayer
+              reveal={entry.reveal}
+              src={src}
+              revealed={revealed}
+              onReveal={() => setRevealed(true)}
+              fxOverride={q0.get('revealfx') === 'strips' ? 'strips' : q0.get('revealfx') === 'sprites' ? 'sprites' : undefined}
+            />
           )}
           <Letterbox
             active={barsActive}
