@@ -1,3 +1,4 @@
+
 # Research Prompt Protocol (R-278, Director ruling 2026-10-24)
 
 Ogni domanda a provider esterni (broadcast, debate, mw-ask) formulata per

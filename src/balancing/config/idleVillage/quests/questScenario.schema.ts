@@ -379,6 +379,137 @@ export const LongFormSchema = z
   .strict();
 export type LongFormSchemaType = z.infer<typeof LongFormSchema>;
 
+/* ------------------------------------------------------------------ */
+/* Scene intent — the authored "what this node's plate must do" block.  */
+/* PLAN-086 / multi-AI debate 20261024-scene-quest-data-contract:        */
+/* intent is AUTHORED here (hand or quest-gen), never inferred from      */
+/* prose. The scene prompt compiler consumes this and refuses to emit    */
+/* a prompt for a node without it (fail-closed at compile time).         */
+/* ------------------------------------------------------------------ */
+
+/** Player-facing action the plate must serve. */
+export const ScenePlayerVerbSchema = z.enum([
+  'approach', 'inspect', 'fight', 'flee', 'search', 'choose',
+  'sneak', 'parley', 'loot', 'traverse', 'observe', 'rescue', 'sabotage',
+]);
+
+/** Emotional register the plate must carry (drives palette/light hints). */
+export const SceneFeelingSchema = z.enum([
+  'dread', 'awe', 'relief', 'tension', 'triumph', 'grief', 'wonder', 'menace',
+]);
+
+/** Motivated light source — "mysterious glow" is not a source. */
+export const SceneLightEventSchema = z
+  .object({
+    source: z.enum([
+      'sun-midday', 'dawn', 'dusk-low', 'hearth', 'torch', 'lantern',
+      'moon', 'bioluminescence', 'forge', 'storm-flash', 'ember-bed',
+    ]),
+    event: z.enum(['static', 'flicker', 'sweep', 'bloom', 'shaft', 'drift']),
+  })
+  .strict();
+
+/** Composition archetypes (composition_archetypes.md SSoT). */
+export const SceneArchetypeSchema = z.enum([
+  'shoulder', 'choke', 'tableaux', 'island', 'cascade', 'vista',
+  'canopy', 'arch', 'coulisse', 'monolith', 'void', 'grid',
+]);
+
+/** Ambient FX the plate must leave room for (mirrors AmbientFx type ids). */
+export const SceneAmbientFxSchema = z.enum([
+  'dust', 'glow', 'smoke', 'embers', 'drift', 'glint', 'fireflies',
+  'moths', 'shaft', 'leaves', 'rain', 'plate',
+]);
+
+/** Interaction affordance ids (scene_interaction_affordances.md A1–A8). */
+export const SceneAffordanceIdSchema = z.enum([
+  'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8',
+]);
+
+const FractionRect = z.tuple([
+  z.number().min(0).max(1), z.number().min(0).max(1),
+  z.number().min(0).max(1), z.number().min(0).max(1),
+]);
+
+/** A camouflaged interaction affordance on the plate. */
+export const SceneAffordanceSchema = z
+  .object({
+    id: SceneAffordanceIdSchema,
+    /** [x, y, w, h] in image-fraction coordinates. */
+    rect: FractionRect,
+    /** Which option/choice this hotspot serves (id into options[]). */
+    serves: z.string().optional(),
+    /** Must sit on an occluder layer when true — validated downstream. */
+    camouflage: z.boolean().default(false),
+    depthLayer: z.number().int().min(0).max(3).default(1),
+  })
+  .strict();
+
+/** Authored occluder mass for parallax creep (not segmented at runtime). */
+export const SceneOccluderSchema = z
+  .object({
+    polygon: z.array(z.tuple([z.number().min(0).max(1), z.number().min(0).max(1)])).min(3),
+    depthLayer: z.number().int().min(0).max(3),
+    parallaxFactor: z.number().min(0).max(1).default(0.5),
+  })
+  .strict();
+
+/** Region the runtime owns — the plate must keep it low-conflict. */
+export const SceneReservedRegionSchema = z
+  .object({
+    rect: FractionRect,
+    fxType: SceneAmbientFxSchema,
+  })
+  .strict();
+
+/** Authored depth intent feeding the baked depth pass. */
+export const SceneDepthHintSchema = z
+  .object({
+    focalPlane: z.number().int().min(0).max(3),
+    nearClutter: z.boolean().default(false),
+    farSilhouette: z.boolean().default(false),
+  })
+  .strict();
+
+/** A future variant state (PLAN-084 reveal-ready — shared geometry). */
+export const SceneStateSchema = z
+  .object({
+    id: z.string(),
+    lightEventOverride: SceneLightEventSchema.optional(),
+    fxDelta: z.array(z.string()).optional(),
+    affordanceVisibility: z.record(z.string(), z.boolean()).optional(),
+  })
+  .strict();
+
+/** The authored scene-intent block — the common root between quest-gen
+ *  and the scene pipeline. */
+export const SceneDesignSchema = z
+  .object({
+    /** One-line narrative state — cross-checked against `body`. */
+    beat: z.string().max(140),
+    /** Primary player verb; must appear in options[]/mechanics. */
+    playerVerb: ScenePlayerVerbSchema,
+    /** Option ids this plate's hotspots serve (multi-option fan-out). */
+    verbOptionIds: z.array(z.string()).default([]),
+    feeling: SceneFeelingSchema,
+    lightEvent: SceneLightEventSchema,
+    compositionArchetype: SceneArchetypeSchema,
+    /** Shot grammar — reuses the shared camera vocab. */
+    shotGrammar: CameraShotIdSchema.optional(),
+    /** FX the plate must host — each requires a reservedFXRegions entry. */
+    ambientFX: z.array(SceneAmbientFxSchema).default([]),
+    affordances: z.array(SceneAffordanceSchema).default([]),
+    occluders: z.array(SceneOccluderSchema).default([]),
+    reservedFXRegions: z.array(SceneReservedRegionSchema).default([]),
+    depthHint: SceneDepthHintSchema.optional(),
+    /** Reveal/variant states — shared geometry invariant (PLAN-084). */
+    states: z.array(SceneStateSchema).optional(),
+    /** Provenance gate: unreviewed generated intent is dev-only. */
+    provenance: z.enum(['hand', 'generated', 'generated+reviewed']).default('hand'),
+  })
+  .strict();
+export type SceneDesignSchemaType = z.infer<typeof SceneDesignSchema>;
+
 /** Authored quest node — mirrors `QuestNode`. */
 export const QuestNodeSchema = z
   .object({
@@ -427,6 +558,12 @@ export const QuestNodeSchema = z
     /** PLAN-085: authored long-form page for the Amanuense quill button
      *  (presentation only — the engine never reads it). */
     longForm: LongFormSchema.optional(),
+    /**
+     * PLAN-086: authored scene intent — the common root between quest
+     * creation and scene authoring. Optional at schema level (legacy
+     * nodes); the prompt compiler refuses nodes without it.
+     */
+    sceneDesign: SceneDesignSchema.optional(),
   })
   .strict();
 export type QuestNodeSchemaType = z.infer<typeof QuestNodeSchema>;

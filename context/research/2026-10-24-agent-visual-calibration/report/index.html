@@ -1,0 +1,52 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><title>Scorecard — round cieco 2026-10-24</title>
+<style>
+body{background:#0d1117;color:#d7dde4;font-family:ui-monospace,monospace;max-width:1100px;margin:24px auto;padding:0 16px}
+h1{font-size:20px} h2{font-size:15px;color:#8ab4f8}
+.card{display:flex;gap:18px;margin:22px 0;padding:14px;border:1px solid #263140;border-radius:10px;background:#11181f}
+.card img{width:420px;max-width:45%;border-radius:6px;object-fit:cover}
+.meta{flex:1} .crit{color:#f0a35e;font-style:italic}
+table{border-collapse:collapse;margin-top:8px} td,th{border:1px solid #263140;padding:3px 9px;font-size:12px}
+.pass{color:#7ee787}.fail{color:#ff7b72}.bord{color:#e3b341}
+.mut{color:#8b949e;font-size:12px}
+</style></head><body>
+<h1>Scorecard agente — round cieco (2026-10-24)</h1>
+<p class="mut">Critica avversariale → gate A (bellezza) → gate B (animabilità) → verdetto. Le correzioni del Director vanno nel calibration-log.</p>
+
+<div class="card"><img src="img/8k70.jpg"><div class="meta">
+<h2>8k70 — sentiero con impronte (2.44:1)</h2>
+<p class="crit">«Il sentiero è letteralmente fango marrone — kill list "no mud". Dominanza teal scuro spinge verso murk. Le luci ambrate distanti salvano la gerarchia ma sono flebili.»</p>
+<table><tr><th>Gate</th><th>Esito</th><th>Note</th></tr>
+<tr><td>A bellezza</td><td class="bord">BORDERLINE</td><td>composizione leggibile (path→luci) ma metà frame = massa scura piatta</td></tr>
+<tr><td>B animabilità</td><td class="bord">BORDERLINE</td><td>impronte+anchor luci ✓, occludenti ai bordi ✓, bassa energia</td></tr>
+<tr><td>VERDETTO</td><td class="fail">REJECT-on-border</td><td>plausibilmente il candidato tracce battuto dal v2 wired</td></tr></table>
+</div></div>
+
+<div class="card"><img src="img/1wl64.jpg"><div class="meta">
+<h2>1wl64 — pop-up book "La Tribù del Dente Spezzato" (1.79:1)</h2>
+<p class="crit">«Non è un plate: render di libro fisico, testo pseudo-italiano illeggibile, goblin sticker cartoon. Stile papercraft, non impasto.»</p>
+<table><tr><th>Gate</th><th>Esito</th><th>Note</th></tr>
+<tr><td>A bellezza</td><td>—</td><td>fuori corpus scene (non è un plate)</td></tr>
+<tr><td>VERDETTO</td><td class="fail">ESCLUSO</td><td class="pass">MA: registro perfetto per la Pagina Amanuense (R-279 folio barocco)</td></tr></table>
+</div></div>
+
+<div class="card"><img src="img/gola2.jpg"><div class="meta">
+<h2>gola2 — gola con torrente + fuoco (~2.4:1)</h2>
+<p class="crit">«Forte: canale V con acqua che guida al fuoco, pareti coulisse, torcia+fuoco eventi luce, cielo ambra-blu. Impasto convincente.»</p>
+<table><tr><th>Gate</th><th>Esito</th><th>Note</th></tr>
+<tr><td>A bellezza</td><td class="pass">PASS</td><td>luminoso, gerarchia chiara, pigmenti Wanderlust</td></tr>
+<tr><td>B animabilità</td><td class="pass">PASS forte</td><td>canale=flow region, fuoco=hero FX, pareti=occludenti, cielo=shaft</td></tr>
+<tr><td>VERDETTO</td><td class="pass">ACCEPT</td><td>pairwise vs gola-raider wired = il test successivo</td></tr></table>
+</div></div>
+
+<div class="card"><div class="meta" style="min-width:46%">
+<h2>PAIRWISE — gola2 vs gola-raider (wired)</h2>
+<p class="crit">Il tuo peso dichiarato: pennellata spessa + colore interessante.</p>
+<div style="display:flex;gap:10px">
+<div style="flex:1"><img src="img/gola2.jpg" style="width:100%"><p class="mut">A — gola2 (Downloads)</p></div>
+<div style="flex:1"><img src="img/gola-raider.jpg" style="width:100%"><p class="mut">B — gola-raider (wired)</p></div>
+</div>
+<p>Mio pairwise: <b class="pass">A &gt; B?</b> — gola2 ha impasto + doppio evento luce (torcia+falò); B ha struttura coulisse più collaudata. Il tuo verdetto decide.</p>
+</div></div>
+
+<p class="mut">Correzioni Director → <code>context/research/2026-10-24-agent-visual-calibration/calibration-log.md</code></p>
+</body></html>

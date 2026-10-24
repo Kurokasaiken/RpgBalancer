@@ -95,6 +95,7 @@ export const QuestWindowLabPage: React.FC = () => {
           onAbandon={questRun.abandon}
           armedFlags={questRun.armedFlags}
           onToggleArmedFlag={questRun.toggleArmedFlag}
+          onRevealFlag={questRun.revealFlag}
           onClose={questRun.clear}
           anchor={{ left: 320, top: 60 }}
             widthPx={questWindow.widthPx}

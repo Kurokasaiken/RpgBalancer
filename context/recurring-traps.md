@@ -602,3 +602,23 @@ esisteva già — non era stato eseguito come checklist.
   di authoring complete sono in `hud_component_guide.md` §6c; la checklist
   §6.12 punto 11 le rende obbligatorie. Come T-04 impone l'occhio, questa
   impone il viewport.
+
+## T-17 — Prompt ad-hoc fuori dal canale lintato
+
+Un prompt inviato al generatore che NON è il blocco `text` di un
+`prompt.md` passato al lint scarta silenziosamente il contratto:
+kill list monca, mood singolo, niente titolo, niente Gerard.
+La regola non è avere le regole — è che il canale le applichi.
+Prima di inviare: il testo esce dal file lintato, immutato.
+
+## T-18 — Ancore visive difettate
+
+Reference image con firme/bordi/card-frame insegnano quei difetti al
+generatore; il ban testuale non basta contro l'esempio visivo.
+Ispezionare gli angoli delle ref prima dell'attach; ripulire o cambiare.
+
+## T-19 — Token che descrivono mud senza nominarlo
+
+`turned earth / churned dirt / dug soil / excavated` producono fango
+anche con `NO mud` in kill list. Il terreno si dipinge come muschio,
+ombra teal o lettiera — mai come materia scavata.

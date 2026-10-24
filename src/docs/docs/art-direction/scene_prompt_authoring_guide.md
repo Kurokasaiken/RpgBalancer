@@ -100,15 +100,67 @@ meccanicamente a ogni nuovo prompt.
    the camp», non «a charge happens». L'agente non deduce la direzione.
 5. **Correlazione quattro assi** — archetype × shot × ambient ×
    interaction hooks dichiarati nel brief prima del prompt.
-6. **Kill-list completa** — elementi runtime-owned (fog, shafts, embers,
-   dust dipinti), soggetti vietati della scena, signatures/watermarks,
-   symmetry, gore, grim, sci-fi, flat digital.
-7. **Formato** — aspect 2.4:1 dichiarato; medium impasto in apertura;
-   prosa unica con ancore CAPS nell'ordine fisso (§R5).
+6. **Kill-list verbatim** — la coda finale va copiata *integrale* da R5.7,
+   mai riscritta a memoria: `NO grim, NO gore, NO decay, NO mud, NO
+   symmetry, NO flat digital, NO airbrushed smoothness, NO sci-fi,
+   NO text/UI/watermarks/frames/signatures/logos`. Token persi = bordi
+   card arrotondati e firme «JONES» visti in sessione 2026-10-24.
+6b. **Ref hygiene** — le immagini esempio allegate al generatore vanno
+   ispezionate prima: se portano firme, watermark o cornici/card-frame
+   dipinti, vanno ripulite (crop/inpaint) — il modello copia i difetti
+   visivi dell'ancora anche col ban testuale.
+7. **Formato** — aspect dichiarato; medium-first canonico («A masterful
+   cinematic oil painting in heavy textured impasto: …»); `NOME —` in
+   apertura; mood = coppia di emozioni; prosa unica con ancore CAPS
+   nell'ordine fisso (§R5).
+8. **Canale** — il testo sottomesso al generatore È il fenced `text` del
+   `prompt.md` del brief, dopo `lint-scene-prompts.py` verde. Vietato
+   compilare prompt ad-hoc in chat che non passano dal file lintato.
+9. **Signature hook (V2-ambientale)** — il brief DEVE dichiarare l'unico
+   dettaglio visivo memorabile della scena: il test è «cosa ridisegnerebbe
+   un bambino a memoria». Un quadro corretto senza hook è bocciato
+   (fallimento 2026-10-24: fagotto grigio = fiction giusta, soggetto morto).
+10. **Dominanza cromatica** — la massa dominante del frame è un pigmento
+    di bibbia (smeraldo, ultramarine, ambra, Veronese), MAI un neutro
+    (ocra/bruno/grigio-terra). `NO mud` non basta: un ocra dominante è
+    legal-ma-sbagliato (correzione Director 2026-10-24).
+11. **Natura del moto** — se la scena contiene azione, dichiarare la sua
+    natura: caos vs fila, dispersione vs assalto compatto. Una rotta vera
+    si sparpaglia — "tutti nella stessa direzione" è morto (stessa sessione).
 
 Verifica meccanica minima (grep sul file): `light wins over darkness`
 se c'è una keyword scura; `ultramarine` + `Veronese` in PALETTE;
 una preposizione di direzione (`toward`, `away from`, `up to`) nel SUBJECT.
+
+### Scorecard immagine (output-side, 2026-10-24)
+
+Il giudizio su un'immagine generata applica **tutte** le regole come
+verifica visiva — non solo "è bella". Checklist obbligatoria su ogni
+candidato, in ordine:
+
+| # | Regola | Test visuale |
+|---|--------|--------------|
+| S1 | Fiction-true (R0) | il soggetto è quello del nodo/testo, non una scena inventata |
+| S2 | Beat pre-scelta (R1) | mostra il *prima* — niente esiti, reveal, post-check |
+| S3 | Party assente (R2) | zero eroi/mani/armi alleate; NPC esterni solo se previsti |
+| S4 | Creature da registry (R3) | look creatura conforme alla scheda, o massa indistinta |
+| S5 | Palette bibbia (R4) | ultramarine/Veronese/cinabro/ambra presenti; ombre teal-smeraldo; azure sky se visibile |
+| S6 | Luminosità (R4) | high-chroma anche nell'ombra; niente murk/nero piatto |
+| S7 | NO MUD | zero marrone/fango dominante — "terra smossa" conta come mud |
+| S8 | Kill list resto | no grim/gore/symmetry/flat-digital/sci-fi; no soggetti bannati della scena |
+| S9 | **Artefatti di generazione** | no firme («JONES»), no watermark, no cornici/card-frame/bordi arrotondati, no testo dipinto |
+| S10 | Tecnica | impasto visibile, pennellate spesse leggibili; volti puliti dove presenti (split-rendering) |
+| S11 | Composizione | arco/massa/occludenti come da brief; soggetto non centrato-statico; asimmetria |
+| S12 | Animabilità (Track B) | occludenti ai bordi, regioni FX low-conflict, depth steps, hotspot camuffabili |
+| S13 | Riutilizzo (R7) | niente elementi quest-unici non necessari |
+| S14 | **Hook presente** | il dettaglio signature dichiarato si vede e lavora (barlume d'oro, torcia caduta) — un quadro senza hook leggibile è bocciato |
+| S15 | **Dominanza** | la massa dominante è un pigmento bibbia, non ocra/bruno/grigio |
+| S16 | **Moto naturale** | se c'è azione: caotica/non-sincronizzata dove la fiction la vuole — fila meccanica = fail |
+
+Ogni voce = PASS / FAIL / borderline + nota. Il verdetto finale è
+**AND**: un FAIL hard (S1, S2, S7, S9) scarta l'immagine anche se il
+resto è bello. I FAIL risolvibili (S9 firma in angolo, S6 lieve) si
+segnano come "fix via inpaint/crop" e non come rigenerazione.
 
 **Accettazione → bible.** Quando un'immagine viene accettata e wired,
 il suo prompt entra in `public/docs/prompts/prompt_library.md` (Intent +

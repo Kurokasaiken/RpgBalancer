@@ -226,6 +226,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `activity-log-panel-config` | shared-kernel | 1 | `src/ui/idleVillage/config/activityLogPanelConfig.ts` | `.mw/contracts/components/activity-log-panel-config.md` |
 | `activity-poi` | ui-component | 2 | `src/ui/idleVillage/components/minimal/ActivityPOI.tsx` | `.mw/contracts/components/activity-poi.md` |
 | `activity-slot-data` | shared-kernel | 1 | `src/ui/idleVillage/types/ActivitySlotData.ts` | `.mw/contracts/components/activity-slot-data.md` |
+| `amanuense-page` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx` | `.mw/contracts/components/amanuense-page.md` |
 | `ambient-layer` | ui-component | 2 | `src/ui/idleVillage/questS1Lab/render/AmbientLayer.tsx` | `.mw/contracts/components/ambient-layer.md` |
 | `astro-overlay` | ui-component | 2 | `src/ui/idleVillage/questS1Lab/hud/AstroOverlay.tsx` | `.mw/contracts/components/astro-overlay.md` |
 | `atmosphere-layer` | ui-component | 2 | `src/ui/idleVillage/questS1Lab/render/AtmosphereLayer.tsx` | `.mw/contracts/components/atmosphere-layer.md` |

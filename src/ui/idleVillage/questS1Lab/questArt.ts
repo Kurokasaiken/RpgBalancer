@@ -60,13 +60,13 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-esplora': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
-  'gob-bottino': { src: '/assets/scene-library/carro-nascosto.jpg', fit: 'cover' },
+  'gob-bottino': { src: '/assets/scene-library/bottino.jpg', fit: 'cover' },
   'gob-accampamento': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'gob-stealth': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'gob-assalto': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'gob-combattimento': { src: '/assets/scene-library/assalto-goblin.jpg', fit: 'cover' },
-  'gob-incalzare': { src: '/assets/scene-library/fuga-goblin.jpg', fit: 'cover' },
-  'gob-incalza-check': { src: '/assets/scene-library/fuga-goblin.jpg', fit: 'cover' },
+  'gob-incalzare': { src: '/assets/scene-library/incalzare.jpg', fit: 'cover' },
+  'gob-incalza-check': { src: '/assets/scene-library/incalzare.jpg', fit: 'cover' },
   'gob-esplora-extra': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
   'gob-cerca': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
   'gob-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
@@ -104,4 +104,8 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
    *  + SHOULDER, il maggior numero di tipi FX su una scena. */
   'bivacco': { src: '/assets/scene-library/bivacco.jpg', fit: 'cover' },
   'intrusi': { src: '/assets/scene-library/intrusi.jpg', fit: 'cover' },
+  /* Stock riuso (2026-10-24): fuori nodo — il bottino è ora `bottino`,
+   *  l'incalzare è `incalzare`. Restano asset validi per altri beat. */
+  'carro-nascosto': { src: '/assets/scene-library/carro-nascosto.jpg', fit: 'cover' },
+  'fuga-goblin': { src: '/assets/scene-library/fuga-goblin.jpg', fit: 'cover' },
 };

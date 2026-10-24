@@ -62,6 +62,18 @@ invariants:
       commit)
     test_refs:
       - tests/unit/idleVillage/questExpeditionReturnFlight.test.tsx
+  - id: use-quest-expedition-session.INV-5
+    source: director-spec
+    source_ref: R-281
+    statement: >-
+      Un drop roster su un castone occupato e' uno swap: il trascinato prende il castone se eleggibile
+      (planRosterSlotReplace, stesso gate di un drop su castone vuoto) e lo scalzato torna al roster con la
+      return-flight dell'estrazione — assign + suppression + proxy in un solo commit (INV-4 stessa coreografia);
+      sede non-idle o landing ineleggibile rifiutano senza muovere nulla; durante il drag roster i castoni
+      occupati dipingono valid/invalid dal gate replace, non 'locked'.
+    test_refs:
+      - tests/unit/idleVillage/questExpeditionReturnFlight.test.tsx
+      - tests/unit/idleVillage/quests/residentXpAndSwap.test.ts
 ---
 # use-quest-expedition-session
 

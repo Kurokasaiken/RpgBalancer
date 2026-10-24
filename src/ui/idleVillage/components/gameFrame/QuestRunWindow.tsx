@@ -155,6 +155,8 @@ export interface QuestRunWindowProps {
    *  "nothing armed" (the R-106 contract). */
   armedFlags?: ReadonlySet<string>;
   onToggleArmedFlag?: (flag: string) => void;
+  /** PLAN-084: scene reveal pushes a discovery flag into the run. */
+  onRevealFlag?: (flag: string) => void;
   onClose: () => void;
   /** Anchored position (the drag offset applies on top). Ignored in cluster mode. */
   anchor?: { left: number; top: number };
@@ -212,6 +214,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   onMinimisedChange,
   armedFlags = NO_ARMED,
   onToggleArmedFlag,
+  onRevealFlag,
   onClose,
   anchor,
   inCluster = false,
@@ -1179,6 +1182,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
                   : 0
           }
           reducedMotion={reducedMotion}
+          onRevealFlag={onRevealFlag}
         >
           {/* WS-4: a `reveal` cut opens the frame through the aperture —
               reduced motion degrades it to the config's 150ms fade. */}
@@ -1725,10 +1729,26 @@ const Theater: React.FC<{
   /** PLAN-050 §4 — trauma shake amplitude at this beat's epoch (0 = off). */
   traumaStrength?: number;
   reducedMotion?: boolean;
-}> = ({ src, aspect, children, shot, shotKey = 'idle', traumaStrength = 0, reducedMotion = false }) => {
+  /** PLAN-084: scene reveal pushes the authored flag into the run. */
+  onRevealFlag?: (flag: string) => void;
+}> = ({ src, aspect, children, shot, shotKey = 'idle', traumaStrength = 0, reducedMotion = false, onRevealFlag }) => {
   const img = useRef<HTMLImageElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const cine = useMemo(() => cinematicEntryForSrc(src), [src]);
+  /* PLAN-084 scene reveal: a hidden affordance springs on click or timer —
+   *  the region is interactive only until the secret shows. */
+  const reveal = cine?.reveal ?? null;
+  const [revealed, setRevealed] = useState(false);
+  const doReveal = useCallback(() => {
+    setRevealed(true);
+    if (reveal?.flag) onRevealFlag?.(reveal.flag);
+  }, [reveal, onRevealFlag]);
+  useEffect(() => {
+    setRevealed(false);
+    if (!reveal || reveal.trigger !== 'timed') return;
+    const t = setTimeout(doReveal, reveal.afterSeconds * 1000);
+    return () => clearTimeout(t);
+  }, [reveal, src, doReveal]);
   /* Shot epoch on the shared clock — resets when a new beat lands on stage.
    *  R-242: on a REMOUNT the epoch seeds at now (not 0) — the aperture/push
    *  layers always re-fire on mount, so a `t:0` epoch would leave the GPU
@@ -1779,11 +1799,31 @@ const Theater: React.FC<{
             cfg={DEFAULT_QUEST_THEATRE_FX.depth}
             reducedMotion={reducedMotion}
             ambient
-            ambientFx={cine.ambient}
+            ambientFx={revealed ? [...cine.ambient, ...(cine.reveal?.burst ?? [])] : cine.ambient}
             atmosphere={cine.atmosphere}
             traumaEpoch={epochRef.current.t}
             traumaStrength={traumaStrength}
           />
+          {/* PLAN-084: the hidden affordance is a live region until the
+           *  player finds it — then the secret fires and the layer is done. */}
+          {reveal && !revealed && (
+            <div
+              role="button"
+              aria-label="Ispeziona"
+              data-testid="scene-reveal-region"
+              onClick={doReveal}
+              style={{
+                position: 'absolute',
+                left: `${reveal.region[0] * 100}%`,
+                top: `${reveal.region[1] * 100}%`,
+                width: `${reveal.region[2] * 100}%`,
+                height: `${reveal.region[3] * 100}%`,
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                zIndex: 5,
+              }}
+            />
+          )}
         </div>
       ) : (
         src && <img ref={img} key={src} src={src} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 40%' }} />
