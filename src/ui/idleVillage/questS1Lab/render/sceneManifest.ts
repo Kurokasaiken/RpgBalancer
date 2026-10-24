@@ -302,9 +302,15 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       /* Re-anchored on the painted flames (Director 2026-10-24): main
        *  fire left at (0.15,0.55), second ember low-left (0.15,0.74),
        *  dropped torch guttering on the moss at (0.58,0.80). */
-      { type: 'glow', at: [0.15, 0.55], r: 0.13, color: '#ff8c30', a: 0.55, flicker: 0.5 },
-      { type: 'embers', at: [0.15, 0.53], count: 6 },
-      { type: 'smoke', at: [0.15, 0.5], count: 4, lean: 0.14 },
+      /* Main fire: glow sits ON the flame tip above the woodpile —
+       *  (0.15,0.48), embers rising from (0.15,0.50), smoke over. */
+      { type: 'glow', at: [0.15, 0.48], r: 0.13, color: '#ff8c30', a: 0.55, flicker: 0.5 },
+      { type: 'embers', at: [0.15, 0.50], count: 6 },
+      { type: 'smoke', at: [0.15, 0.46], count: 4, lean: 0.14 },
+      /* Second bonfire bottom-right (Director: era sul goblin a 0.40). */
+      { type: 'glow', at: [0.95, 0.85], r: 0.06, color: '#ff9038', a: 0.45, flicker: 0.5 },
+      { type: 'embers', at: [0.95, 0.83], count: 3 },
+      { type: 'smoke', at: [0.95, 0.8], count: 2, lean: 0.12 },
       { type: 'glow', at: [0.15, 0.74], r: 0.06, color: '#ff9038', a: 0.35, flicker: 0.5 },
       { type: 'embers', at: [0.15, 0.72], count: 3 },
       /* The dropped torch on the moss — panic object, animated flame. */
