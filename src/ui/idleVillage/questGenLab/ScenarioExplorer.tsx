@@ -15,6 +15,7 @@ import { gatesOfOption, type LabCatalogEntry, type LabExplorerEntry } from './la
 import type { CandidateStatus, LabCandidate } from './candidate';
 import { Chip, ChipRow, KindBadge, LabCard, StatusBadge } from './labUi';
 import { GenRunPlayer } from './GenRunPlayer';
+import { QualityGatesPanel } from './QualityGatesPanel';
 
 /* ------------------------------------------------------------------ */
 /* Node detail                                                          */
@@ -185,7 +186,8 @@ const rowId = (e: LabExplorerEntry) =>
 export const ScenarioExplorer: React.FC<{
   entries: LabExplorerEntry[];
   statusOf?: (c: LabCandidate) => CandidateStatus;
-}> = ({ entries, statusOf }) => {
+  sessionEpoch?: number;
+}> = ({ entries, statusOf, sessionEpoch = 0 }) => {
   const { t } = useTranslation('idleVillage');
   const [selId, setSelId] = useState(entries[0] ? rowId(entries[0]) : '');
   const [nodeId, setNodeId] = useState<string | null>(null);
@@ -198,7 +200,7 @@ export const ScenarioExplorer: React.FC<{
   const s = entry.scenario;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
       {/* Catalog list */}
       <div className="space-y-2">
         {entries.map((e) => {
@@ -294,6 +296,9 @@ export const ScenarioExplorer: React.FC<{
           </div>
           {selNode && <div className="mt-2"><NodeDetail node={selNode} /></div>}
         </LabCard>
+
+        {/* Quality gates (SP-3) */}
+        <QualityGatesPanel explorerEntry={sel} sessionEpoch={sessionEpoch} />
 
         {/* Play */}
         <LabCard title={t('questGenLab.labels.play')} aside={<StatusBadge status="implemented" />}>

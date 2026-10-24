@@ -277,3 +277,21 @@ Ogni subplan SP-1…SP-8 riceve un dibattito mw-web-debate dedicato
 (clarification → grounding → proposte → cross-examination →
 convergenza), come da R-142 («approfondiscili uno ad uno sempre cn le
 AI web»). Gli output si registrano in `.mw/runs/` e si consolidano qui.
+
+## 8. Stato implementazione v1 (2026-10-24)
+
+Implementazione v1 completata in-sessione (agente locale, "senza pause"):
+
+| SP | Esito | Note oneste |
+|----|-------|-------------|
+| SP-1 | ✅ | contracts doc + tuple + canonicalize + kitSchemas + registry (32 test) |
+| SP-2 | ✅ | LabCandidate + reducer + epoch + hashing sha256 + serialization + GenerationPanel + explorer parity (12 test) |
+| SP-3 | ✅ | validation/{types,registry,gates,orchestrator,config} + QualityGatesPanel + i18n (6 test) |
+| SP-4 | ✅ | mcDiagnostic async runner registrato (parity BAND_SEED/BAND_RUNS, diagnostic-only, abort-aware) |
+| SP-5 | ⚠️ parziale | kit JSON drawer + tuning override + narrated read-only fatti; drawer dedicati (party what-if, variant entity) non implementati — il percorso variante passa da kit-edit+generate |
+| SP-6 | ✅ core | PersistenceService hydrate+autosave (qgl:v1:candidates), export envelope versionato + staged import, versions.ts (owner creato — risolve T-7) |
+| SP-7 | ⚠️ | spec Playwright `tests/e2e/questGenLab.spec.ts` scritta, NON eseguita qui (serve dev server) — unverified per T-04 |
+| SP-8 | ⚠️ | i18n en/it/pseudo su tutte le nuove superfici; status onesti ovunque; nessuna status-matrix doc dedicata |
+
+Gap residui noti: drawer SP-5 completi, esecuzione smoke, status matrix.
+SP-9/SP-10 restano parked v1.1 come da plan.
