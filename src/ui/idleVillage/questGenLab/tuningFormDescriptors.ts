@@ -4,6 +4,12 @@
  * schema field without a descriptor (or vice versa) breaks the `satisfies`.
  */
 
+import {
+  FLOOD_DEFAULT_TUNING,
+} from '@/balancing/config/idleVillage/quests/generation/floodVault';
+import {
+  RACE_DEFAULT_TUNING,
+} from '@/balancing/config/idleVillage/quests/generation/raceGimmick';
 import type {
   FloodTuningAuthored,
   RaceTuningAuthored,
@@ -33,6 +39,13 @@ export const FLOOD_TUNING_FIELDS: readonly TuningFieldDescriptor[] = [
   { key: 'madreChance', labelKey: 'madreChance', min: 0, max: 100, step: 1 },
   { key: 'pareteChance', labelKey: 'pareteChance', min: 0, max: 100, step: 1 },
 ] satisfies readonly { key: keyof FloodTuningAuthored }[];
+
+/** Effective defaults per gimmick — the generator's own constants
+ *  (single source: the tuning schemas are partial, no embedded defaults). */
+export const TUNING_DEFAULTS: Record<GimmickId, Record<string, number>> = {
+  race: RACE_DEFAULT_TUNING,
+  'flood-vault': FLOOD_DEFAULT_TUNING,
+};
 
 /**
  * The field list for a gimmick — empty list for unknown ids.

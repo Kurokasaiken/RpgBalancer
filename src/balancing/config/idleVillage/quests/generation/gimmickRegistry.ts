@@ -36,6 +36,9 @@ import {
 } from './kitSchemas';
 
 interface GimmickRowBase {
+  /** Generator contract version — bump when the generator or its
+   *  tuning-merge semantics change (receipt provenance, versions.ts). */
+  readonly generatorVersion: string;
   /** DomainVocab ids this gimmick's kits can dress. */
   readonly domains: readonly string[];
   /** Diagnostics the row declares inapplicable — v1 ships empty. */
@@ -77,6 +80,7 @@ export const GIMMICK_REGISTRY: readonly GimmickRow[] = [
     generate: generateRaceScenario,
     kitSchema: RaceDomainKitSchema,
     tuningSchema: RaceTuningPartialSchema,
+    generatorVersion: 'race-gen-v1',
     domains: ['passo-montano', 'palude', 'miniera'],
     declaredOptOuts: [],
   },
@@ -85,6 +89,7 @@ export const GIMMICK_REGISTRY: readonly GimmickRow[] = [
     generate: generateFloodVault,
     kitSchema: FloodDomainKitSchema,
     tuningSchema: FloodTuningPartialSchema,
+    generatorVersion: 'flood-gen-v1',
     domains: ['miniera', 'mare'],
     declaredOptOuts: [],
   },

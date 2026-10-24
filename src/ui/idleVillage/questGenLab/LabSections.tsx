@@ -48,7 +48,7 @@ export const PipelineSection: React.FC = () => {
             {open === step.id && (
               <div className="ml-1 mt-1 rounded-lg border border-white/10 bg-white/[0.03] p-3">
                 <p className="text-[11px] leading-relaxed text-slate-300">{step.desc}</p>
-                <div className="mt-2 grid gap-1 text-[10px] sm:grid-cols-2">
+                <div className="mt-2 grid grid-cols-1 gap-1 text-[10px] sm:grid-cols-2">
                   <div>
                     <span className="uppercase tracking-wider text-slate-500">{t('questGenLab.labels.reads')}: </span>
                     <span className="text-slate-300">{step.reads}</span>
@@ -189,19 +189,19 @@ export const IngredientsSection: React.FC<{ entries: LabCatalogEntry[] }> = ({ e
       </div>
 
       {tab === 'gimmicks' && (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {Object.values(QUEST_LAB_GIMMICKS).map((g) => <GimmickCard key={g.id} g={g} />)}
         </div>
       )}
 
       {tab === 'kits' && (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {kits.map((k) => <KitCard key={k.key} kit={k} />)}
         </div>
       )}
 
       {tab === 'traits' && (
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           {Object.values(QUEST_TRAITS).map((tr) => (
             <LabCard key={tr.id} title={tr.label} aside={<Chip tone="warn">{tr.id}</Chip>}>
               <p className="text-[11px] italic text-slate-300">{tr.description}</p>
@@ -229,7 +229,7 @@ export const IngredientsSection: React.FC<{ entries: LabCatalogEntry[] }> = ({ e
       )}
 
       {tab === 'mechanics' && (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {QUEST_LAB_MECHANICS.map((m) => (
             <LabCard key={m.id} title={m.label} aside={<StatusBadge status={m.status} />}>
               <p className="text-[11px] text-slate-300">{m.desc}</p>
@@ -255,7 +255,7 @@ export const ConsequencesSection: React.FC = () => {
       title={t('questGenLab.sections.consequences')}
       desc={t('questGenLab.sections.consequencesDesc')}
     >
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
         {QUEST_LAB_CONSEQUENCES.map((c) => (
           <LabCard key={c.id} title={c.domain} aside={<StatusBadge status={c.status} />}>
             <p className="text-[11px] text-slate-300">{c.desc}</p>
@@ -281,7 +281,7 @@ export const SystemsSection: React.FC = () => {
         title={t('questGenLab.sections.systems')}
         desc={t('questGenLab.sections.systemsDesc')}
       >
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {QUEST_LAB_SUBSYSTEMS.map((s) => (
             <LabCard
               key={s.id}
@@ -315,7 +315,7 @@ export const SystemsSection: React.FC = () => {
         title={t('questGenLab.sections.open')}
         desc={t('questGenLab.sections.openDesc')}
       >
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {QUEST_LAB_OPEN.map((o) => (
             <LabCard key={o.id} title={o.label} aside={<StatusBadge status="missing" />}>
               <p className="text-[11px] text-slate-300">{o.desc}</p>

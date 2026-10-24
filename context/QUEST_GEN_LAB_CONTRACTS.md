@@ -232,9 +232,9 @@ RunInputEnvelope = {v:1, scenarioHash, party, runSeed, engineVersion}
 |---|---|---|---|
 | `receiptVersion` | modulo receipt SP-6 | bump su cambio forma envelope | PROPOSED |
 | `canonicalizationVersion` | `generation/canonicalize.ts` | bump su cambio semantica | PROPOSED |
-| `schemaVersion` | `questScenario.schema.ts` (costante da aggiungere — OPEN) | bump su cambio schema | OPEN — owner non esiste oggi |
-| `generatorVersion` | per-gimmick nel registry row | bump su cambio generatore/merge | OPEN — non esiste oggi |
-| `engineVersion` | `questRun.ts` (costante da aggiungere — OPEN) | bump su cambio semantica engine | OPEN — non esiste oggi |
+| `schemaVersion` | **`generation/versions.ts` `SCHEMA_VERSION` (risolto SP-6, 2026-10-24)** | bump su cambio schema | **RESOLVED — owner creato ex-novo** |
+| `generatorVersion` | per-gimmick nel registry row (risolto SP-6, 2026-10-24) | bump su cambio generatore/merge | **RESOLVED — `race-gen-v1`/`flood-gen-v1`** |
+| `engineVersion` | **`generation/versions.ts` `ENGINE_VERSION` (risolto SP-6, 2026-10-24)** | bump su cambio semantica engine | **RESOLVED — owner creato ex-novo** |
 | `scenarioHash` | **`computeScenarioVersion` (esistente, L-16)** — `qsv1-` digest | deriva dal contenuto | **VERIFIED — riuso, non nuovo digest** |
 | `generationInputHash`/`runInputHash` | sha256 su `canonicalize(envelope)` | digest sugli input effettivi | OPEN — **nessun sha256 sync in-repo**; fnv1a-32 è il precedente (qsv1) — decisione SP-6/Director se sha256 serve |
 | `party` (projection) | SP-6 dopo audit `createRun` | — | OPEN |

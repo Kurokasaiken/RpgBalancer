@@ -364,7 +364,7 @@ export const QUEST_LAB_PIPELINE: readonly LabPipelineStep[] = [
       'src/balancing/config/idleVillage/quests/generation/kits.ts',
       'src/balancing/config/idleVillage/quests/generation/domainVocabs.ts',
     ],
-    status: 'offline',
+    status: 'implemented',
   },
   {
     id: 'skeleton',
@@ -376,7 +376,7 @@ export const QUEST_LAB_PIPELINE: readonly LabPipelineStep[] = [
       'src/balancing/config/idleVillage/quests/generation/raceGimmick.ts',
       'src/balancing/config/idleVillage/quests/generation/floodVault.ts',
     ],
-    status: 'offline',
+    status: 'implemented',
   },
   {
     id: 'bind',
@@ -388,7 +388,7 @@ export const QUEST_LAB_PIPELINE: readonly LabPipelineStep[] = [
       'src/balancing/config/idleVillage/quests/questTraits.ts',
       'src/balancing/config/idleVillage/quests/questScenario.schema.ts',
     ],
-    status: 'offline',
+    status: 'implemented',
   },
   {
     id: 'emit',
@@ -400,7 +400,7 @@ export const QUEST_LAB_PIPELINE: readonly LabPipelineStep[] = [
       'src/balancing/config/idleVillage/quests/questScenario.schema.ts',
       'src/balancing/config/idleVillage/quests/generation/catalog.ts',
     ],
-    status: 'offline',
+    status: 'implemented',
   },
   {
     id: 'narrate',
@@ -430,7 +430,7 @@ export const QUEST_LAB_PIPELINE: readonly LabPipelineStep[] = [
     reads: 'ScenarioInstance + strategy + seed',
     writes: 'metriche bench (generatedCatalog.bench.test)',
     files: ['src/ui/idleVillage/questS1Lab/questSimulation.ts'],
-    status: 'offline',
+    status: 'implemented',
   },
   {
     id: 'freeze',

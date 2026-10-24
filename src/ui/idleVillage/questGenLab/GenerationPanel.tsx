@@ -24,12 +24,13 @@ import {
   type GimmickId,
 } from '@/balancing/config/idleVillage/quests/generation/gimmickRegistry';
 import type { JsonValue } from '@/balancing/config/idleVillage/quests/generation/canonicalize';
-import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
+import { QuestScenarioSchema, type QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import { kitsByGimmick } from './labGenConfig';
-import { tuningFieldsFor } from './tuningFormDescriptors';
+import { TUNING_DEFAULTS, tuningFieldsFor } from './tuningFormDescriptors';
 import { computeKitHash, computeScenarioHash } from './hash';
 import type { CandidateProvenance, LabCandidate } from './candidate';
 import type { CandidatesApi } from './candidateStore';
+import { buildExportEnvelope, parseExportEnvelope } from './exportEnvelope';
 import { Chip, LabCard } from './labUi';
 
 /** Everything the generation pipeline needs — captured synchronously. */
@@ -75,26 +76,59 @@ export const GenerationPanel: React.FC<GenerationPanelProps> = ({ api, onInputsC
   const kits = kitsByGimmick[gimmickId];
   const kit = kits.find((k) => k.kitId === kitId);
 
-  const defaults = useMemo(() => {
-    const row = gimmickRow(gimmickId);
-    const parsed = row?.tuningSchema.safeParse({});
-    return parsed?.success ? (parsed.data as Record<string, number>) : {};
-  }, [gimmickId]);
+  /* SP-5 — raw-JSON escape hatch: the kit payload is editable as JSON
+   * (validated by the same kitSchema on generate). Narrated kits
+   * ({en,it} localized payloads) are read-only — their copy is frozen
+   * by contract, tuning stays editable. */
+  const kitIsNarrated = useMemo(
+    () =>
+      !!kit &&
+      typeof kit.kit === 'object' &&
+      kit.kit !== null &&
+      'en' in kit.kit &&
+      'it' in kit.kit,
+    [kit],
+  );
+  const [kitDraft, setKitDraft] = useState('');
+  const [kitDirty, setKitDirty] = useState(false);
+  const kitDraftShown = kitDirty
+    ? kitDraft
+    : kit
+      ? JSON.stringify(kit.kit, null, 2)
+      : '';
+
+  /* The tuning schemas are partial (no embedded defaults) — the
+   * effective generator defaults live in TUNING_DEFAULTS; showing
+   * f.min instead would misrepresent what generate() actually uses. */
+  const defaults = useMemo(() => TUNING_DEFAULTS[gimmickId] ?? {}, [gimmickId]);
 
   const pickGimmick = (g: GimmickId) => {
     setGimmickId(g);
     setKitId(kitsByGimmick[g][0]!.kitId);
     setTuning({});
+    setKitDraft('');
+    setKitDirty(false);
     setError(null);
   };
 
   const generate = async () => {
     const row = gimmickRow(gimmickId);
     if (!row || !kit || pending) return;
+    // SP-5: an edited kit draft replaces the frozen kit payload —
+    // same schema validation path, never a silent parse.
+    let effectiveKit: unknown = kit.kit;
+    if (kitDirty) {
+      try {
+        effectiveKit = JSON.parse(kitDraft);
+      } catch {
+        setError({ kind: 'kit-schema', detail: 'invalid-json' });
+        return;
+      }
+    }
     const request: GenerationRequest = {
       gimmickId,
       kitId: kit.kitId,
-      effectiveKit: kit.kit as unknown as JsonValue,
+      effectiveKit: effectiveKit as JsonValue,
       effectiveTuning: { ...defaults, ...tuning } as JsonValue,
       sessionEpoch: api.sessionEpoch,
     };
@@ -189,7 +223,11 @@ export const GenerationPanel: React.FC<GenerationPanelProps> = ({ api, onInputsC
             <button
               key={k.kitId}
               type="button"
-              onClick={() => setKitId(k.kitId)}
+              onClick={() => {
+                setKitId(k.kitId);
+                setKitDraft('');
+                setKitDirty(false);
+              }}
               className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
                 kitId === k.kitId
                   ? 'border-amber-500/60 bg-amber-500/15 text-amber-200'
@@ -200,6 +238,39 @@ export const GenerationPanel: React.FC<GenerationPanelProps> = ({ api, onInputsC
             </button>
           ))}
         </div>
+        {/* SP-5 — kit authoring drawer (raw-JSON escape hatch). */}
+        <details className="rounded-md border border-white/5 bg-white/[0.02] px-2 py-1.5">
+          <summary className="cursor-pointer text-[10px] text-slate-500">
+            {t('questGenLab.generate.kitDrawer')}
+            {kitIsNarrated && (
+              <span className="ml-2 font-mono text-[9px] text-slate-600">
+                {t('questGenLab.generate.kitReadonly')}
+              </span>
+            )}
+          </summary>
+          <textarea
+            value={kitDraftShown}
+            readOnly={kitIsNarrated}
+            spellCheck={false}
+            onChange={(e) => {
+              setKitDraft(e.target.value);
+              setKitDirty(true);
+            }}
+            className="mt-1.5 h-40 w-full resize-y rounded-md border border-white/10 bg-slate-950 p-2 font-mono text-[10px] text-slate-300 read-only:opacity-60"
+          />
+          {kitDirty && (
+            <button
+              type="button"
+              onClick={() => {
+                setKitDraft('');
+                setKitDirty(false);
+              }}
+              className="mt-1 text-[9px] text-slate-500 hover:text-slate-300"
+            >
+              {t('questGenLab.generate.kitReset')}
+            </button>
+          )}
+        </details>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {fields.map((f) => (
             <label key={f.key} className="block text-[10px] text-slate-500">
@@ -233,6 +304,63 @@ export const GenerationPanel: React.FC<GenerationPanelProps> = ({ api, onInputsC
               <span className="ml-1 font-mono text-[9px] text-slate-500">{error.detail}</span>
             </span>
           )}
+        </div>
+        {/* SP-6 — export the latest candidate / import an envelope */}
+        <div className="flex items-start gap-3 border-t border-white/5 pt-2">
+          <button
+            type="button"
+            disabled={api.candidates.length === 0}
+            onClick={() => {
+              const c = api.candidates[api.candidates.length - 1];
+              if (!c) return;
+              const env = buildExportEnvelope(c);
+              const blob = new Blob([JSON.stringify(env, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `${c.id}.export.json`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] text-slate-300 hover:border-amber-500/30 disabled:opacity-40"
+          >
+            {t('questGenLab.generate.export')}
+          </button>
+          <label className="text-[10px] text-slate-500">
+            {t('questGenLab.generate.importLabel')}
+            <input
+              type="file"
+              accept="application/json"
+              className="mt-0.5 block text-[10px] text-slate-400 file:mr-2 file:rounded file:border-white/10 file:bg-white/5 file:px-2 file:py-0.5 file:text-[10px]"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                void file.text().then((text) => {
+                  let raw: unknown;
+                  try { raw = JSON.parse(text); } catch { raw = null; }
+                  const env = parseExportEnvelope(raw);
+                  if (!env) {
+                    setError({ kind: 'kit-schema', detail: 'envelope-parse' });
+                    return;
+                  }
+                  const provenance: CandidateProvenance = {
+                    gimmickId: env.gimmickId as GenerationRequest['gimmickId'],
+                    kitId: `import:${env.generationReceipt.provenance}`,
+                    kitHash: env.generationReceipt.kitHash,
+                    effectiveKit: env.kit as never,
+                    effectiveTuning: env.tuning as never,
+                  };
+                  api.add({
+                    id: `cand-${env.generationReceipt.scenarioHash.slice(7, 15)}-${api.nextSeq}`,
+                    scenario: QuestScenarioSchema.parse(env.scenario) as never,
+                    scenarioHash: env.generationReceipt.scenarioHash,
+                    provenance,
+                  });
+                });
+                e.target.value = '';
+              }}
+            />
+          </label>
         </div>
       </div>
     </LabCard>

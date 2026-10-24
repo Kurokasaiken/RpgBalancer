@@ -21,7 +21,7 @@
  * not chrome.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   bakedToExplorerEntry,
@@ -36,6 +36,10 @@ import {
   type LabCandidate,
 } from '@/ui/idleVillage/questGenLab/candidate';
 import { useCandidates, type CandidatesApi } from '@/ui/idleVillage/questGenLab/candidateStore';
+import {
+  loadCandidates,
+  saveCandidates,
+} from '@/ui/idleVillage/questGenLab/candidatePersistence';
 import { GenerationPanel } from '@/ui/idleVillage/questGenLab/GenerationPanel';
 import { LabSection } from '@/ui/idleVillage/questGenLab/labUi';
 import { ScenarioExplorer } from '@/ui/idleVillage/questGenLab/ScenarioExplorer';
@@ -57,6 +61,31 @@ const QuestGenerationLabPage: React.FC = () => {
   >[1] | null>(null);
 
   const supersededBy = useMemo(() => buildSupersededIndex(api.candidates), [api.candidates]);
+
+  /* SP-6: hydrate persisted candidates once, then autosave every change.
+   * The hydrate guard prevents the autosave effect from wiping storage
+   * before the initial load resolves. */
+  const hydratedRef = useRef(false);
+  const hydrateRef = useRef(api.hydrate);
+  hydrateRef.current = api.hydrate;
+  useEffect(() => {
+    let alive = true;
+    void loadCandidates().then((list) => {
+      if (!alive || list.length === 0) {
+        hydratedRef.current = true;
+        return;
+      }
+      hydrateRef.current(list);
+      hydratedRef.current = true;
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    void saveCandidates(api.candidates);
+  }, [api.candidates]);
 
   const statusOf = useCallback(
     (c: LabCandidate): CandidateStatus =>
@@ -119,7 +148,7 @@ const QuestGenerationLabPage: React.FC = () => {
             </button>
           </div>
           {authorMode && <div className="mb-4"><GenerationPanel api={api} onInputsChange={setCurrentInputs} /></div>}
-          <ScenarioExplorer entries={explorerEntries} statusOf={statusOf} />
+          <ScenarioExplorer entries={explorerEntries} statusOf={statusOf} sessionEpoch={api.sessionEpoch} />
         </LabSection>
         <ConsequencesSection />
         <SystemsSection />

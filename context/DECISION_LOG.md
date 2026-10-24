@@ -1496,3 +1496,23 @@ estensione possibile ma non implementata. `viaggio-andata` torna a `[]`.
 **Motivo:** prova live su andata — il Director l'ha letta come "nebbia sul
 cancello", non nuvola. Regola ora nel contratto ambient-layer.
 **Fonte:** `.mw/runs/learn-20261024-sprite-occlusion/pattern-candidate.md`
+
+### 2026-10-24 — PLAN-029 v1 implementato (SP-1..SP-8 core)
+
+**Cosa:** implementazione integrale della spine v1 in una sessione:
+candidate model+reducer+hash sha256+serialization; GenerationPanel
+(picker+kit drawer JSON+tuning+export/import); validation orchestrator
+con registry+6 gate runner+QualityGatesPanel; MC async runner SP-4 a
+parità con deriveOfferBand; persistenza PersistenceService
+(qgl:v1:candidates)+export envelope versionato; spec Playwright.
+**Version constants risolte:** nuovo modulo `generation/versions.ts`
+(SCHEMA_VERSION/ENGINE_VERSION) + `generatorVersion` sulle righe
+registry — T-7 di SP-1 chiuso con owner creato ex-novo (la scelta
+conservativa documentata: nessun owner affidabile pre-esisteva).
+**Gap onesti registrati:** drawer SP-5 dedicati (party what-if,
+variant entity) non fatti — il flusso variante passa da kit-edit;
+spec e2e scritta ma non eseguita (T-04: nessun claim visivo);
+nessuna status-matrix doc separata.
+**Motivo:** il Director ha ordinato l'implementazione completa senza
+pause ("procedi ad implementare tutto il plan senza fermarti x domande").
+**Fonte:** sessione agente locale, PLAN-029 §8.
