@@ -136,6 +136,67 @@ Recorded verbatim from the Round-4 acceptance (Claude) — adopt during implemen
 
 ## 6. Implementation status (2026-10-22/23)
 
+### 6.1 Runner hardening (2026-10-23, local agent session)
+
+Three defects found running the first full tier-1 sweep, all in
+`scripts/sentinel/**` (in-scope, probe-only — no `src/**` touched):
+
+1. **Hook-mount race after `LIFECYCLE_INTERRUPT` reload** — `applyPerturbation`
+   re-reached the node before `__idleVillageTestHooks` remounted; hook-assisted
+   reaches use optional chaining → silent no-op → fatal `waitVisible` timeout
+   on S6. Fix: `waitForFunction(__idleVillageTestHooks)` post-reload
+   (`perturbationApplier.ts`).
+2. **`demoLaunch` cancels on live run** — after a mid-run reload the rehydrated
+   quest makes `anyRunActive` true, so `demoLaunch` no-ops (canonical send
+   boundary, `useQuestExpeditionSession.tsx:933`). Fix: `SurfaceNode.resume`
+   post-reload driver; quest nodes `S7..S13` use `resumeQuestRun` — the R-133
+   recovery affordance (click `[data-quest-poi-id]` → `onOpenRun` →
+   `quest-window`), then `node.reach` drives the rehydrated run forward.
+   First attempt used `data-testid="map-quest-poi"` which resolves to 2
+   elements (one per revealed POI) — selector is the wrapper
+   `[data-map-quest-poi-target][data-quest-poi-id="poi-goblin"]`.
+3. **Perturbation failure = fatal** — an unreached node after reload killed
+   the whole run. Fix: `runSentinel` records `${node}:${pert}@${cell}` into
+   `unreachedStates` (digest-visible evidence) and continues.
+
+Regression coverage (R-247): `tests/unit/sentinel/perturbationApplier.test.ts`
+(3 tests — hook wait ordering, no-hook fallback, resume preference).
+
+Evidence: `.mw/runs/probe-s6-reload`, `.mw/runs/probe-s7-reload`,
+`.mw/runs/sentinel-2026-10-23T0829/` (full tier-1, 42min, 0 fatal,
+7 confirmed / 14 flaky / 1235 divergent, 4 unreached).
+
+Known residual harness gaps observed in `0829`: S4 stash reach leaves the
+registry panel open → warehouse pin hover intercepted; S8 resume is
+state-dependent (a rehydrated run already past narrative can't re-produce
+`quest-window-beat`); S12/S13 long drives exceed their budgets when the
+rehydrated run is already late-stage.
+
+### 6.2 Harness + oracle calibration (2026-10-23, R-270 ingest session)
+
+1. **S4 reach via registry row** — `openVillageBuildingPanel` hovers the map
+   pin; with the registry drawer open the pin is physically occluded (by
+   design — the drawer is modal). Canonical path while the drawer is open:
+   click `[data-registry-row="<building-id>"]` (locale-independent selector)
+   → row tooltip → `village-open-stash`. `LAYOUT-registry-pin-intercept`
+   withdrawn as oracle false positive.
+2. **L5 plaque-clearance miscalibration** — the oracle required
+   `plaque-clearance + panel-padding` (22px) on **all** edges. Corrected:
+   (a) `plaque-clearance` (12px) is already the horizontal frame breathing
+   room — not summed with `panel-padding`; (b) edges intentionally anchored
+   to the viewport (hang/plinth plaques flush by design) are exempt;
+   (c) scroll-clipped children are measured on their **visible intersection**
+   with clipping ancestors, not the full offscreen rect; (d) vertical floor:
+   `panel-padding` (10px) on free edges. Lens L9 updated to the same
+   calibrated rule. Post-calibration: **0 violations on S0, S1, S2, S3, S6**;
+   `LAYOUT-plaque-clearance-systemic` withdrawn as oracle false positive.
+3. **`sentinelConfig.plaqueClearancePx`** now documents token semantics
+   (horizontal clearance only) so evidence text matches the rule.
+
+R-270 outcome: 5 defects ingested→fixed (truncation, 2× fold-straddle,
+hit-area <32px, stash-uniformity); 2 withdrawn false positives. All ledger
+items at `AWAITING_DIRECTOR` pending `item-confirm`.
+
 All five tasks implemented and verified in the working tree (not committed — shared dirty worktree, T-13):
 
 - **T-001 ✅** — `sentinelConfig.ts` (Zod schema, closed `signature_families`, thresholds), `selectorNormalizer.ts`, `rendererBackend.ts` (darwin→Metal / win32→D3D11 / linux+CI→SwiftShader), `gameSurfaceHarness.ts` (S0–S15 graph, hook-assisted reach with `howStateReached` provenance, per-capture manifest). 21/21 unit tests green.

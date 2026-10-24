@@ -135,11 +135,11 @@ describe('VillageRosterSection Component (Fase 2 - Ordinamento)', () => {
       expect(aelinIdx).toBeGreaterThan(borinIdx);
     });
 
-    it('TEST-022: Renders with rarity-desc sort mode applied', () => {
+    it('TEST-022: Renders with hp-desc sort mode applied', () => {
       const { container } = render(
         <VillageRosterSection
           residents={MOCK_RESIDENTS}
-          sortMode="rarity-desc"
+          sortMode="hp-desc"
           onSortModeChange={vi.fn()}
         />,
         { wrapper: WRAPPER_WITH_DND }
@@ -171,7 +171,7 @@ describe('VillageRosterSection Component (Fase 2 - Ordinamento)', () => {
       rerender(
         <VillageRosterSection
           residents={MOCK_RESIDENTS}
-          sortMode="rarity-desc"
+          sortMode="hp-desc"
           onSortModeChange={onSortModeChange}
         />
       );
@@ -316,7 +316,7 @@ describe('VillageRosterSection Component (Fase 2 - Ordinamento)', () => {
       rerender(
         <VillageRosterSection
           residents={MOCK_RESIDENTS}
-          sortMode="rarity-desc"
+          sortMode="hp-desc"
           onSortModeChange={vi.fn()}
         />
       );
@@ -353,7 +353,7 @@ describe('VillageRosterSection Component (Fase 2 - Ordinamento)', () => {
       rerender(
         <VillageRosterSection
           residents={residentsWithBusy}
-          sortMode="rarity-desc"
+          sortMode="hp-desc"
           onSortModeChange={vi.fn()}
         />
       );

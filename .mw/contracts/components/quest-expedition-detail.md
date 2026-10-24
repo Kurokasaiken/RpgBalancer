@@ -89,6 +89,14 @@ invariants:
     statement: The planner warehouse trigger is a 36px icon with the HUD tooltip (name + shortcut V), no native title (PL-3 = A)
     test_refs:
       - tests/unit/idleVillage/questPlanner.stashButton.test.tsx
+  - id: quest-expedition-detail.INV-3
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      Stash-uniformity (R-270): tray/bag usano il vocabolario condiviso stashItemFace — StashQtyBadge xN e
+      StashItemTooltipBody nome+desc+covers+stock
+    test_refs: 
+      - tests/unit/idleVillage/questExpedition.trayFace.test.tsx
 ---
 # quest-expedition-detail
 

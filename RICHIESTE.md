@@ -2683,7 +2683,7 @@ Conseguenza: verdictTable + vars + arm misto = **unico delta motore v2** da prog
 
 **Richiesta (verbatim):** *"http://localhost:5173/quest-generation-lab deve diventare completamente operativa. Crea un plan insieme alle Ai web per fare tutto, poi dividilo in subplan e approfondiscili uno ad uno sempre cn le AI web"*
 **Data:** 2026-10-12
-**Stato:** `in corso` — fase planning MW.
+**Stato:** `in corso` — fase planning MW conclusa: PLAN-029 + 8 subplan converged 2026-10-12; **ratificato Director 2026-10-23** con 2 emendamenti (dibattito revisione `20261023-plan029-ratifica` converged 4/4, PLAN-029 §7) — pronto per implementazione.
 
 ## R-143 — /game: il POI quest nella demo non deve essere un esemplare — solo contenuto reale
 
@@ -4081,12 +4081,14 @@ quando clicco un pg e si auto assegna agli slot liberi la traiettoria è sbaglia
 
 **Richiesta (verbatim):** *"dobbiamo cercare di capire se e quanto queste cose siano utili e importanti, e se possono essere snellite in qualche modo, automatizzate senza usare un agente o qualcosa del genere. fa una ricerca online, poi chiedi multi ai web con prompt potenziato e cappello"*
 **Data:** 2026-10-18
-**Stato:** `in corso`
+**Stato:** `fatta`
 **Contesto:** segue R-217/PLAN-048 — il forensics report (context/WORKFLOW_METRICS.md) mostra che nell'implementazione ~32% va in burst di produzione artefatti di verifica (command-logs, frames, metrics, bundle) e l'unobserved è inferito ~41% docs · ~20% tests su churn. Domanda: questa spesa (bundle, evidence, trusted docs, gates) ha ROI? Cosa può diventare meccanico senza agente?
 **Metodo richiesto:** ricerca online + dibattito multi-AI web (mw-web-debate, prompt potenziato + hats).
 **Esito (2026-10-18):** dibattito converged — run `mind-weaver/.mw/runs/20261018-verify-roi/`, artifact `artifact-r004.md` (sha256 `ae269a49…`), 4/4 provider ACCEPT (claude, gemini, deepseek, grok; chatgpt escluso — sessione degradata). Ricerca online integrata nel grounding-ledger dello stesso run. Sintesi: la cerimonia NON è teatro ma va ri-puntata — bundle packaging diventa un comando derivato invocato dalla catena dei gate (non dall'agente), enforcement trusted-docs/surface diventa hash-lock meccanico, verifiche percettive diventano tiered per reach con invarianti save/economy always-on; judgment resta su human-eye (T-04), approvazioni Director e authorship dei criteri. Trust anchor = approvazioni firmate Director.
 **Plan:** `plans/PLAN-051-verify-slim.md` (**baptized 2026-10-18**, «procedi»).
-**Implementazione (2026-10-18):** T-001..T-004 fatti + T-005 parziale — `npm run bundle` (wrapper evidence-derivata, `--init`/`--all-tiers`), `trusted.lock.json` + `trusted:seal`/`check`, `npm run approve -- --kind=trust-set` (ledger fuori-repo `~/.rpg-approvals/`, strict-once-established: un lock riforgiato non passa), tiering per reach (`.mw/verify-tiers.json`, `SKIPPED` non bloccante, `verify:sweep` full tier), signoff human-eye bound a `commit_sha`/`frames_sha256`. Test 17/17 + build:check + closure:lint PASS. Attivazione strict: richiede `trusted:seal` + `approve` del Director. Restano T-006 (fixture lying-agent + FP-rate nel report) e T-007 (dogfood misurato pre/post).
+**Implementazione (2026-10-18):** T-001..T-006 fatti — `npm run bundle` (wrapper evidence-derivata, `--init`/`--all-tiers`), `trusted.lock.json` + `trusted:seal`/`check`, `npm run approve -- --kind=trust-set` (ledger fuori-repo `~/.rpg-approvals/`, strict-once-established: un lock riforgiato non passa), tiering per reach (`.mw/verify-tiers.json`, `SKIPPED` non bloccante, `verify:sweep` full tier), signoff human-eye bound a `commit_sha`/`frames_sha256`, fixture lying-agent + seeded faults, sezione "Gate cost" nel report. Test 17/17 + build:check + closure:lint PASS.
+**Trust anchor (2026-10-18):** attivato dal Director (`trusted:seal` + `approve`); verificato `trusted:check` OK il 2026-10-23.
+**Ruling Director 2026-10-23:** T-007 (misura pre/post strumentata) **deposto** — *"misurare così ha poco senso; snellire dove abbiamo problemi"*. Sensore residuo: attrito percepito (ATTRITI/found-by) + FP-rate già visibile in "Gate cost". PLAN-051 → `completed`.
 
 ---
 
@@ -4744,6 +4746,127 @@ Rieseguito anche **PLAN-061 D1-2 1/1 PASS** con il driver corretto; screenshot s
 - **Evidenze:** unit INV-4 rosso→verde (5/5 return-flight, 18/18 suite adiacenti); probe headless rAF-sampled v3: **0 frame senza carrier** su 47 campionati (sede→proxy→card), `test-results/r269-*.png`.
 - **Pendente:** eye-check Director su `/game` (estrarre un residente dalla sede: la medaglia deve volare in un unico moto continuo sede→card, senza flash né cavità vuota).
 
+## R-270 — Uniformità stash villaggio/planner + correzione bug di layout emersi dalla Sentinel
+
+**Richiesta (verbatim, 2026-10-23):** *"lo stash del villaggio è troppo differente dallo stash del planner della quest · I bug d layout vanno aggiunti e corretti, dobbiamo rendere tutto uniforme quando possibile · Dopo che individui gli errori e li segni dove deve lancia il tool d correzione degli errori (o la skill)"*
+**Data:** 2026-10-23
+**Stato:** `in corso`
+**Scope:**
+- Uniformare lo stash villaggio (`VillageStashPanel`, HUD `/game`) e lo stash/bag del quest planner (`QuestExpeditionDetail` — QUEST_STASH bag picker): stessa famiglia visiva/interazione dove possibile. Scelta della rappresentazione canonica → **visual fork gate** (v35 FROZEN): ≥2 rappresentazioni materialmente diverse, la convergenza estetica è ruling Director, non dell'agente.
+- Bug di layout dal digest `sentinel-2026-10-23T0829`: `small-target` (bottone 31.5px < 32 su S0/S1), `fold-straddle` ×2 (riga «Palisade» registry 14.4px; div 32px su S6 post-reload), `L2-truncation` («Move through the shadows» in quest-check-column), candidati forti fra i divergent (sbordi `L3-containment` Settlement Registry 200–400px; pattern `L5-hit-area-clearance` 8–20px vs 22px).
+- Flusso: individuare → segnare nel ledger PLAN-077 (`item-ingest`, kind `defect|change`) e/o RICHIESTE → lanciare skill di correzione (`bugfix`/`mw-executor`).
+**Collegamenti:** `PLAN-078` (Sentinel), `PLAN-077` (ledger bug queue), `.mw/runs/sentinel-2026-10-23T0829/morning-digest.md`, v35 (visual fork gate), `PLAN-047`.
+**Ruling Director (2026-10-23):** stash = *vocabolario condiviso* — container diversi (shelf a righe vs tray a tile), stessa item-face/badge/tooltip/tokens; tutti i defect corretti in sequenza.
+**Stato lavori (2026-10-23):**
+- 5 item fixati con red-first + contratti + probe/screenshot: `LAYOUT-truncation-skillcheck`, `LAYOUT-fold-straddle-registry`, `LAYOUT-fold-straddle-planner` (fix reale in `DragTestContainer`), `LAYOUT-hitarea-below-32px`, `CHANGE-stash-uniformity` (modulo condiviso `stashItemFace.tsx`).
+- 2 item **ritirati come falsi positivi** (ledger `item_withdrawn`): `LAYOUT-registry-pin-intercept` (path canonico riga registry verificato), `LAYOUT-plaque-clearance-systemic` (oracolo L5 mis-calibrato: somma token errata + lati ancorati al viewport — ricalibrato, 0 violazioni su S0–S3/S6).
+- Ledger PLAN-077: i 5 item hanno percorso `contract_amended → item_ready → attempt_started → attempt_finished (manifest hash) → verification_receipt pass → lock_released` → **`AWAITING_DIRECTOR`** — servono `item-confirm` del Director per chiuderli.
+- `closure:lint` rosso — due cause strutturali non sanabili in sessione: (a) `source_ref R-270` non risolvibile a BASE (intent creato dopo il sigillo 2026-10-22 — si risolve al prossimo risigillo/seal, come R-269 della sessione parallela); (b) drift di sessioni parallele nel worktree condiviso (contratti `game-menu-screens`/`game-save`/`game-settings`, INV baseline non catturate — T-13). Scope R-270: contratti, INV test_refs, coverage exceptions, card visual-fork `.mw/runs/r270-sentinel-layout-fixes/` tutti a posto.
+
+## R-272 — Processo di creazione dei prompt immagine debole: analisi comparativa prompt riusciti vs falliti → regole di authoring
+
+**Richiesta (verbatim, 2026-10-23):** *"Il nostro processo di creazione dei prompt è debole. inoltre, abbiamo diversi prompt che ci hanno dato soddisfazioni, dobbiamo capire come e xè quelli si e altri no, e usarli x le nostre regole di creazione dei prompt"*
+**Data:** 2026-10-23
+**Stato:** `in corso`
+**Scope (chiarito 2026-10-23):** prompt di **generazione immagini**. Esemplari vincenti nominati dal Director: «Armatura Antagonista» e «Verso Mordor» in `prompt_library.md` — usati come «stampo» per i recenti (andata/ritorno R-263). Sintomo dichiarato: *«perdono lo stile a pennellate spesse che dovrebbe essere il nostro cavallo di battaglia»* + esempio `f3-accampamento-dusk` (brief a contratto PLAN-052 v2). Obiettivo: capire cosa fanno gli esemplari che gli altri non fanno → rendere le regole di authoring coerenti/uniformi → risultati sempre simili.
+**Analisi (2026-10-23):** il campione conferma una deriva di genere — i prompt «quadro» (esemplari, journey legs, rovine) scrivono *un dipinto* (medium-first, prosa pittorica densa, stile ripetuto, kill list compatta); il prompt FX-ready di PLAN-052 v2 è stato scritto *come il brief tecnico* (linguaggio fotografico `24mm`/`deep depth of field`, percentuali di frame, 3 blocchi di negazioni ~90 parole) e fallisce 11 criteri del lint esistente. L'ingegneria FX/depth appartiene alle sezioni del brief (§1–6), non al blocco prompt (§7).
+**Collegamenti:** R-263 (journey legs — riscritti «a formato denso tipo Verso Mordor» dopo reclamo stile), R-267 (pre-prompt scene + report Deep Research), `scene_prompt_authoring_guide.md` (R0–R8, anti-pattern table), `scripts/lint-scene-prompts.py`, `plans/PLAN-052-quest-scene-depth-staging.md`, `.mw/bugs/20261022-prompt-deliverable-vs-generation/`. *(Rinumerata da R-271 → R-272 il 2026-10-23: collisione con la voce FX ambient della sessione parallela.)*
+**Direzione scelta dal Director (2026-10-23):** *«direi di usare tutt'e 3»* — volume alto di scene in arrivo → implementare A (regole guide + lint esteso), B (painterly kernel nel template/contratto PLAN-052 v2) e C (prompt compiler §7 dai campi del brief).
+**Plan (2026-10-23):** `plans/PLAN-080-scene-prompt-authoring.md` — r003 implementato: guide R9 + PLAN-052 item 10 + lint Q13–Q17 + compiler `build-scene-prompt.py` + migrazione corpus (18 legacy + dusk) + 10 test. `bundle: .mw/runs/plan080-prompt-authoring/bundle.json` — OB-1..5 PASS; verdict BLOCKED solo su gate globali condivisi (T-13, drift estraneo). **Pendente:** eye-check Director su prossima scena generata (claim estetico) + sanificazione gate.
+**Stato:** `in corso` (in attesa di gate pulito / eye-check pilota).
+**Plan-originale:** draft r003, dibattito multi-AI web **CONVERGED 4/4 ACCEPT** (run `mind-weaver/.mw/runs/20261023-r272-scene-prompt-authoring`, artifact-r003 sha `8bbfa012…`; grok provider_dead). In attesa di battesimo Director.
+
+## R-271 — FX ambient showcase: glint, fireflies, moths, shaft in AmbientLayer
+
+**Richiesta (verbatim, 2026-10-23):** *"adesso implementa gli effetti mancanti"*
+**Data:** 2026-10-23
+**Stato:** `in corso`
+**Scope:** tipi FX del showcase PLAN-052 per `AmbientFxSchema` + `AmbientLayer`:
+`glint` (twinkle su punto — metallo/tesoro), `fireflies` (swarm erratico in
+banda, blink ~18% ciclo), `moths` (orbita ellittica+flutter attorno a anchor
+luce), `shaft` (fan di god rays gradiente, blend screen, respiro alpha).
+`sway` **rinviato**: richiede la pipeline `foregroundCutout` (asset
+ritagliato+pivot+accoppiamento parallasse), non un branch del canvas.
+**Collegamenti:** R-267 (PLAN-052 research+debate), brief flagship
+`.mw/specs/quest-goblin-scenes/scenes/f3-accampamento-dusk/` (prompt §7
+riscritto in stile «quadro» dopo lint FAIL 11 criteri — analisi R-270:
+l'ingegneria vive in §1–6, non nel blocco prompt), contratto `ambient-layer`
+INV-1/INV-2 (Mode B-add, source director-spec R-271).
+**Stato lavori (2026-10-23):**
+- 4 tipi implementati + `drawAmbientFrame` estratto/esportato (puro sul
+  clock → op stream testabile con mock ctx). `seeded` esportato.
+- Test: 261/261 `questCinematics` PASS; tag `// INV:ambient-layer.INV-1/2`
+  wired; `redfirst:record` su runtimeInvariants (exit 1 vs codice pre-change).
+- `verify:bundle`: OB-1/2/3 **PASS** — `bundle: .mw/runs/r271-quest-ambient-fx/bundle.json`;
+  verdict BLOCKED **solo** per gates globali pre-rossi da drift di sessioni
+  parallele (T-13): red-first locks su file altrui, mass-fail
+  `executedCount(BASE) unknown`, B-amend su closure condivise con file R-270.
+- `lint-scene-prompts`: TUTTI OK incluso `f3-accampamento-dusk` (362 parole).
+- Pendente (non dichiarato fatto): **human-eye T-04** — qualità del moto dei
+  4 FX su scena authored (review Director); `sway`; chiusura `fatta` dopo
+  sanificazione gates globali condivisi.
+
+## R-273 — Snellire la cerimonia dove fa attrito (post R-220)
+
+**Richiesta (verbatim):** *"misurare così ha poco senso. Ci serve continaure a farlo o cerchiamo di snellire dove abbiamo rpoblemi?"* · *"plan"*
+**Data:** 2026-10-23
+**Stato:** `in corso`
+**Contesto:** audit post-R-220 — la misura formale (PLAN-051 T-007) è deposta; il lavoro restante è sui punti caldi osservati. Item 1: gate globali (contracts-gate, red-first locks, living-sync) valutano `git diff HEAD` su tutto il worktree → sessioni parallele in-flight bloccano piani puliti (osservato: PLAN-078, R-271 — trappola T-13). Item 2 (eye-check batching) già risolto da PLAN-068 — nessun lavoro. Item 3: costo dibattiti web su piani piccoli → convenzione di trigger (file mind-weaver).
+**Plan:** `plans/PLAN-081-gate-foreign-scope.md` — eseguito T-001..T-003.
+**Esito (2026-10-23):** OB-1/2/3 **PASS** — `scope_files` nel manifest,
+foreign_scope advisory (73 file altrui, zero errori su foreign),
+test regressione 8/8, convenzione dibattito primaria su mind-weaver +
+ereditata su RPG. Verdict BLOCKED atteso e non imputabile al piano:
+serve `npm run director:answer -- --gate-diff` (3 gate file modificati)
++ `npm run trusted:seal` + `npm run approve -- --kind=trust-set`.
+Residuo onesto nel piano: i check globali non diff-scoped (living
+contracts ratchet, INV coverage, inventory) restano rumorosi sotto
+sessioni parallele WIP — classe separata, non fixabile per scope.
+**Stato:** `in corso` — chiusura `fatta` dopo le 2 approvazioni Director.
+**Collegamenti:** PLAN-051/R-220 (misura deposta), T-13 recurring-trap, PLAN-068 (gate umani aggregati), PLAN-078/R-271 (episodi di blocco da drift estraneo).
+
+## R-274 — Gioco su mobile: playtest da telefono + valutazione app da store
+
+**Richiesta (verbatim, 2026-10-23):** *"quanto lavoro c'è da fare per fare in modo che il gioco sia anche mobile?"* · *"attualmente per poter testare le cose da cell, ma anche sapere app da store m interessa"*
+**Data:** 2026-10-23
+**Stato:** `in corso` — traccia 1 pianificata (PLAN-083, dibattito convergente), in attesa di battesimo Director
+**Scope (due tracce):** (1) breve termine — poter testare `/game` da telefono;
+(2) lungo termine — valutare pubblicazione come app da store (Tauri mobile /
+TWA / altro shell).
+**Esplorazione (2026-10-23, explorer):** infrastruttura già presente — PWA
+configurata (`VitePWA`, manifest, service worker, `viewport-fit=cover`),
+`TouchSensor` dnd-kit registrato, pointer events ovunque, pipeline Vercel,
+`MOBILE_GUIDELINES.md` storica (scritta per il Balancer, non per `/game`).
+Gap: superficie `/game` progettata su viewport ≥1280px con ~319 valori `*Px`
+fissi (placca quest 820px, `minZeroScrollViewportHeightPx=720`), zoom mappa
+solo `wheel` (niente pinch), hover semantico (dwell trigger, tooltip
+hover-pinnabili, Alt+tilt «glass globe», preview drop-hover), ~290 handler
+tastiera, budget `gamePerf` tarati su Tauri desktop, `dev` server senza
+`--host` (non raggiungibile da LAN), `tauri.conf.json` senza target
+iOS/Android.
+**Tensione di direzione:** desiderata v2 FROZEN e Pillar 1 ancorano il budget
+a «app Tauri desktop su WebView» — l'espansione mobile è decisione di
+direzione che richiede desiderata dedicata, non un task.
+**Cosa manca:** scelta del perimetro mobile (browser giocabile vs esperienza
+touch nativa completa), verifica progressione offline al resume (idle game +
+sospensione WebView mobile), scelta shell per store (Tauri mobile vs TWA vs
+Capacitor).
+**Probe headless 390×844 (2026-10-23):** `/game` si avvia e gira — canvas
+montato, nav touch risponde, vista villaggio apre, marker quest rivelati,
+HUD-hide funziona, zero overflow orizzontale del documento. Break reali: top
+HUD clip orizzontale, bottom nav 452px>390 (TAVERN irraggiungibile), pin
+overlay villaggio illeggibile, mappa letterbox portrait senza pinch, hint
+«Esc/Enter/frecce» senza equivalente touch, target 40px<44px, quest window
+820px. Evidenza: `test-results/mobile-probe-2026-10-23/`.
+**Piano + dibattito multi-AI (2026-10-23):** `plans/PLAN-083-mobile-fit-game-surface.md`
+(r007). Dibattito web 7 round, CONVERGED — chatgpt+deepseek ACCEPT espliciti,
+claude conditional-accept soddisfatto verbatim; grok rimosso provider_dead,
+gemini escluso. Contratto: breakpoint <768 con bound zoom effettivi gated
+(emit-identical desktop strutturale), pinch DOM Pointer Events, nav icon-chip
+44px+«Altro» sheet, panelMode floating|sheet con persistenza disaccoppiata,
+tap-to-place primario, `mobileFitConfig` Zod unico. In attesa di battesimo.
+Traccia 2 (store) = piano separato successivo.
+
 ## R-275 — Skill check: forma "mezzo-fiore" (valli al nucleo + punte tonde) ricompare nelle quest
 
 **Richiesta (verbatim):** *"un errore che è tornato: il componente dello skill check che viene usato nelle quest mostra una forma strana che nn dovrebbe mostrare in alcuni casi. Deve mostrare il fiore o la stella [...] Invece ogni tanto esce qualcosa d strano, che ha le valli troppo 'dentro' e la punta arrotondata"* · *"peggore è il delta x il party = fiore [...] party un po' + forte = stella. Molto + forte = stella magra"* · *"sopra il 10% stella, sopra il 35% stella magra"*
@@ -4754,3 +4877,53 @@ Rieseguito anche **PLAN-061 D1-2 1/1 PASS** con il driver corretto; screenshot s
 **Plan:** `plans/PLAN-082-astrolabe-family-glyph.md`
 **Nota:** numerato R-275 (non R-274) — collisione T-13: l'entry R-274 originale è stata sovrascritta dal buffer dell'editor mentre R-274 veniva assegnato alla richiesta mobile.
 **Avanzamento (2026-10-23):** T-001/T-002 implementati e pushati (`5343611f`, `af55d6fb`, `cd9d65b9`) — `boardStarProfile` con voto di maggioranza sui margini grezzi, `mix` uniforme ∈{0,1}, `depth` per-valle nella banda; mezzo-fiore non più costruibile. Test 10/10, tsc e build vite verdi; 6 screenshot headless in `.mw/runs/plan082-family-glyph/shots/`. Bundle `plan082-family-glyph`: **BLOCKED ambientale** — (a) R-275 post-sigillo `fe11533b` non risolvibile a BASE, (b) import-closure Mode-B flags su file di sessioni parallele (R-270/271/PLAN-081), (c) OB-4 eye-check Director pendente. Chiusura `fatta` subordinata a eye-check + riforgiatura sigillo / chiusura sessioni parallele.
+
+## R-276 — App non si apre: `Failed to fetch dynamically imported module: /src/App.tsx`
+
+**Richiesta (verbatim, 2026-10-23):** *"Error loading app · TypeError: Failed to fetch dynamically imported module: http://localhost:5173/src/App.tsx · l'app nn si apre"*
+**Data:** 2026-10-23
+**Stato:** `in corso`
+**Scope:** ambiente dev locale (nessuna modifica al codice sorgente).
+**Trappole attivate:** T-13 (worktree condiviso — verificato assenza di harness/sentinel/agenti attivi prima del kill), T-04 (witness headless sul load reale).
+
+**Risoluzione (2026-10-23):**
+- **Root cause (`.mw/bugs/20261023-double-vite-server-5173/bug.md`):** due istanze `vite` dello stesso progetto su `localhost:5173` — orfano `--host` delle 16:29 (`*:5173`, IPv4) + seconda istanza delle 18:09 (`[::1]:5173`, IPv6). `localhost` risolve su entrambi gli stack → pagina e dynamic import serviti da server diversi; nel cold-boot del secondo il fetch di `App.tsx` è fallito.
+- **Fix:** kill dell'albero orfano (91628/91609/91141), riavvio di una singola istanza `npm run dev` (Node 22, `.nvmrc`).
+- **Evidenza:** probe Playwright headless su `http://localhost:5173/` — 0 failed request, 0 errori, boot completato con HUD `/game` renderizzata.
+- **Pendente:** conferma Director che l'app si apre nel suo browser (hard-reload consigliato per smaltire il modulo cache stale).
+
+**Seconda istanza (2026-10-23, ~20:08 — stessa firma):**
+- **Root cause:** il dev server riavviato al mattino bindava solo `[::1]` (Vite default `host: 'localhost'` → Node prende il primo risultato DNS). `localhost` su macOS risolve `::1` **e** `127.0.0.1`: i fetch del browser instradati su IPv4 ricevevano `ERR_CONNECTION_REFUSED` → `Failed to fetch dynamically imported module` (Chrome nomina il top-level `App.tsx`, non il fetch reale). L'`ErrorBoundary` ha latchato il transiente nella tab del Director. Orario `?t=` = 20:08:38 = mtime di `useQuestExpeditionSession.tsx` (edit di sessione parallela → invalidazione HMR che ha scatenato il re-fetch).
+- **Fix applicato:** `server.host: '127.0.0.1'` in `vite.config.ts` (determinismo su entrambe le risoluzioni; `--host` CLI resta disponibile per playtest LAN); `rm -rf node_modules/.vite/deps` (metadata optimize-deps con chunk orfano `chunk-DZHKDGRP` → 404 latente); dev server riavviato detached su Node 22.23.1.
+- **Evidenza:** `curl -4 localhost:5173` 200, `127.0.0.1` 200; Playwright headless `/` e `/game`: 0 request fallite (prima 36 `ERR_ABORTED`), 0 errori console, error boundary assente, `#root` montato.
+- **Learn:** `.mw/runs/learn-20261023-dynamic-import-latch/` + osservazione in `.mw/observation.jsonl` + proposta P-008 in `PROPOSALS.md`.
+- **Pendente:** conferma Director (hard-reload della tab).
+
+## R-277 — Nuvole World Surface fuori stile: prova A (armonizzazione in-engine), fallback B (nuovi asset)
+
+**Richiesta (verbatim, 2026-10-24):** *"claude dice che le nuvole che sto utilizando sulla mappa non ci stanno bene, sn d uno stile diverso. Che ne pensi?"* → *"prova A, se fallisce porviamo B"*
+**Data:** 2026-10-24
+**Stato:** `in corso`
+**Contesto:** sprite nuvola = cumuli anime cel-shaded hand-cut (outline scuro, bianco crema, vista laterale — probabile origine `naruto-cloud-wall.png`) su dipinto cartografico (china+acquerello, vista dall'alto). Opacità salite a 0.85/0.92/1.0 vs intento d'autore 0.5/0.62/0.74 di `import-clouds.mjs` → effetto sticker.
+**Prova A (implementata):** `atmosphereAssets.cloudsLook` = `opacityScale 0.7` + `filter: sepia(0.5) saturate(0.7) brightness(0.96) blur(10px)` applicato a ogni sprite in `WorldSurfaceClouds.tsx`; ombre non trattate. INV-1 in `.mw/contracts/components/world-surface-clouds.md` + test `WorldSurfaceClouds.test.tsx` (2 verdi); exception `EXC-20261023221736-9be2` (file era UNMAPPED).
+**Fallback B (se A bocciata):** sprite ridipinti nella grammatica della mappa (china+acquerello), pipeline `import-clouds.mjs`/`scatter-clouds.mjs` già esistente.
+**Evidenza:** `.mw/runs/2026-10-24-cloud-harmonization-provaA/` (simulazioni PIL a0..a3 + README); live A/B headless su `/world-surface` in sessione.
+**Pendente:** eye-check Director a zoom reale (T-04) — il residuo è la forma da cumulo laterale; se bocciato → prova B. Nessun bundle/`fatta` finché il Director non vede.
+
+## R-278 — Scene variants + reveal narrativa + ricerca open-horizon
+
+**Richiesta (verbatim, 2026-10-24):** *"a noi serve un modo interessante anche x fare magari diverse versioni della stessa scena e fare questi effetti d reveal"* + *"i goblin sn nascosti dalla vegetazione e mentre ti avvicini si alzano — invece d fare il parallasse laterale e basta?"* + *"i tuoi prompt sn troppo circoscritti a quello d cui abbiamo discusso, senza dare modo alle altre ai d dare risposte che amplino i nostri orizzonti"*
+**Data:** 2026-10-24
+**Stato:** `in corso`
+**Contesto:** reveal narrativa (idea Director, non prevista): piatto goblin + maschera frangia vegetale + trigger soglia camera → le sagome "si alzano" al creep. Prima FX narrativa vs ambientali. Varianti scena (hidden/risen, before/after, day/dusk) da generare consistenti.
+**Critica metodo:** i broadcast erano scopati a taxonomy — prompt aperto lanciato (`.mw/research/2026-10-24-scene-variants-and-reveal/`): variants, reveal mechanics, tecniche oltre il nostro modello (flow fields, color cycling, masked scroll, grading-travel, stereo, audio coupling) + sfida ai vincoli (single raster, deterministic canvas, no-layer-rule).
+**Pendente:** sintesi report → candidatura `reveal` tipo + pipeline varianti + ruling Director su cosa rompere del contratto.
+
+## R-279 — "Pagina dell'amanuense": componente laterale per testo lungo + lore
+
+**Richiesta (verbatim, 2026-10-24):** *"per il sistema delle quest, mi aspetto c siano persone che vogliano un testo + lungo e prolisso, quindi in determinate situazioni e scene, dove c'è il testo di descrizione breve mettiamo un pulsante che apre lateralmente un componente tipo Pagina di diario dove c'è tutto scritto x bene. deve essere tipo una pagina scritta da un amanuense. E possiamo usarla anche per presentare i pezzi di lore. Dovremmo mostrarlo a destra o a sinistra? mi aspetto che questo componente possa essere mostrato contemporaneamente allo skill check."*
+**Data:** 2026-10-24
+**Stato:** `in corso`
+**Ruling Director (2026-10-24):** opzione **A** — pagina a SINISTRA (cronaca/lettura), skill check resta a destra; **transiente** ("leggi la versione lunga"), info persistenti presentate altrove; estetica **molto carica/barocca**: pagina di libro di fiabe dei cartoon — lettere complesse con illustrazioni, bordi illustrati, ghirighori.
+**Contesto:** il testo lungo è authored per scena — costo contenuto già previsto. Infrastruttura lore esistente (`LoreDrop`/`useQuestLoreDrop`, epilogue `lore` grants) = superficie dati naturale. Testo breve corrente: `node.body` in `QuestRunWindow`, `offer.dispatch`/`objective` nel planner. Coesistenza col skill check = vincolo di layout (CompanionLeft zone o banda separata a sx).
+**Pendente:** ricerca (cappello + prompt potenziato) su come realizzare l'effetto → discussione multi-AI web → poi plan con contratto.

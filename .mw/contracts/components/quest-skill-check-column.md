@@ -65,6 +65,14 @@ invariants:
       motion), engraved label under the dial only while armed (SC-1 = A)
     test_refs:
       - tests/unit/idleVillage/questSkillCheckColumn.launchCommand.test.tsx
+  - id: quest-skill-check-column.INV-3
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      Testo 'Move through the shadows' troncato in quest-check-column su S10 post-reload (Sentinel L2-truncation, run
+      0829)
+    test_refs: 
+      - tests/unit/idleVillage/questSkillCheckColumn.noTruncation.test.tsx
 ---
 # quest-skill-check-column
 

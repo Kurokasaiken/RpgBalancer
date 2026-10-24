@@ -1,0 +1,11 @@
+# accampamento-dusk — scene prompt (compiled from brief.json)
+
+```text
+ACCAMPAMENTO DUSK — painted in heavy textured oil impasto: SUBJECT: a small clearing holding a ragged hide-tent camp — a stone-ringed fire pit with glowing red coals, three broad hide tents, a small oil lantern on a tent pole against a dark tent wall, a metal shield and loot bundle leaning against the right tent; NOTHING FLIES, NOTHING MOVES — only light sources waiting for the runtime COMPOSITION: a hidden watcher's-eye view between branches, the camp small and readable in the central opening; behind it a continuous dark wall of treeline, and above an open dusk sky in a smooth low-frequency gradient a broad saturated mass in deep teal anchored at BOTH the extreme left and right edges of the frame, physically continuing beyond the border — one broad convex silhouette on a single near plane. Under the runtime overlay bands the paint stays a low-frequency deep teal field — broad masses only, no fine relief. LIGHTING: deep dusk — the fire pit the warmest brightest element, the lantern a small secondary warm point, all else falling into saturated teal-veronese shadow The painted light sources are the fire pit coals, oil lantern — particles, smoke and glow are runtime overlays, never painted. PALETTE: deep teal ground, Veronese pine masses, amber-cinnabar firelight, ultramarine sky band; NO grey, NO brown, NO mud; the frame stays luminous and high-chroma — light wins over darkness, even the deepest shadow is saturated color, never black murk. TECHNIQUE: thick oil impasto, broad palette-knife brushstrokes, visible layers of paint adding physical depth — Jaime Jones and Jeff Easley brushwork; tactile matter on hide, raw timber and stone; the world rendered as rude beauty — weathered and tactile, never squalid. MOOD: assessment + the last quiet before violence NO grim, NO gore, NO decay, NO mud, NO symmetry, NO flat digital, NO airbrushed smoothness, NO sci-fi, NO text/UI, NO signature, NO watermark, NO logo, NO frames, NO people, NO humanoid figures, NO readable goblins, NO birds. Aspect 2.4:1 (21:9 window) cinematic scope.
+```
+
+**Tags riuso:** camp, dusk, goblin-distant, no-people
+
+## Generation notes
+
+- Compiled from `brief.json`; regenerate with `python3 scripts/build-scene-prompt.py --brief brief.json --out prompt.md --force`.

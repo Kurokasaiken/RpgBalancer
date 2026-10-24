@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render, screen, renderHook, act, fireEvent } from '@testing-library/react';
+import { render, screen, renderHook, act, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { applyChoice, availableOptions, createRun, submitCommand, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
@@ -344,15 +344,23 @@ describe('R-231 — QuestRunWindow 9-point overhaul invariants', () => {
 
   // INV:quest-window-header-icon-only
   // INV:quest-window-abandon-icon-tooltip
-  it('#3 & #6 header pills and abandon toggle are icon-only buttons with accessible names and tooltips', () => {
+  it('#3 & #6 header pills and abandon toggle are icon-only buttons with accessible names and tooltips', async () => {
     renderWindow(atExploration(42), { onAbandon: () => undefined });
     for (const id of ['quest-party-toggle', 'quest-belt-toggle', 'quest-log-toggle', 'quest-abandon-toggle']) {
       const btn = screen.getByTestId(id);
       expect(btn.querySelector('svg')).toBeTruthy();
       expect(btn.textContent).toBe('');
       expect(btn).toHaveAccessibleName();
-      expect(btn.getAttribute('title')).toBeTruthy();
+      /* R-239 T-B4: the tooltip is the Radix HudTooltip — the trigger marks the
+       *  control with `data-state`, the native `title` is intentionally gone. */
+      expect(btn).toHaveAttribute('data-state');
     }
+
+    /* The tooltip really opens on focus and carries the label text. */
+    fireEvent.focus(screen.getByTestId('quest-party-toggle'));
+    await waitFor(() => {
+      expect(document.querySelector('[data-radix-popper-content-wrapper]')).toBeTruthy();
+    });
   });
 
   // INV:quest-window-minimised-space-between

@@ -113,15 +113,47 @@ post-produzione (dettagli in CATALOG.md).
 3. **F1 check STR+PER esiti:** «presso il masso, terra smossa» → «il terzo
    carro — quello che non è mai tornato — trascinato tra le felci».
 4. **F2 body:** «Sotto il masso, un bottino avvolto in stracci» → il carro
-   trascinato nella boscaglia, cassa ancora chiusa con trappola a campanelli
-   (conserva il flavor «catene, campanelli, un nodo da sciogliere»).
+   trascinato nella boscaglia, cassa ancora chiusa con trappola fisica
+   (flavor «catene, laccio, un nodo da sciogliere»; l'allarme rumoroso era
+   un'allucinazione — una trappola che suona non ha senso su un bottino
+   incustodito, rimossa ovunque per ruling Director 2026-10-23).
    **SUPERSEDED v3 (2026-10-18):** niente carro né trappola — il
    nascondiglio è un fagotto sotto tela cerata avvistato solo dall'alto;
    `gob-bottino-scelta` non esiste più (nodo singolo a gesto unico).
-5. **F3 stealth:** titolo check «Passare il filo dei campanelli» → **«Intrusi»**
+5. **F3 stealth:** titolo check «Passare il filo» → **«Intrusi»**
    (ratificato Director 2026-10-12).
 6. **F6:** titolo «Razzia / il campo conquistato» → **«Spoglie di guerra»**.
 7. **F7/F8:** «Ritorno / Agguato» si spezza in **F7 L'agguato** (evento del
    ritorno) e **F8 Ritorno** (arrivo al villaggio, `gob-fine`).
 8. **F4:** titolo da confermare col Director (nello scenario è
    *«Combat — the goblin camp»*).
+
+## Coverage matrix — archetipi (PLAN-052 amendment 2026-10-24)
+
+Tassonomia: `src/docs/docs/art-direction/composition_archetypes.md`.
+Regole: mai adiacenti uguali, ritmo chiuso/aperto, rotazione bordo/occluder/
+orizzonte/mossa/focale, escalation far-zone, flag lattice al brief.
+
+| Scena | Stato | Archetype | Classe | Bordo occluder | Orizzonte | Shot | Focale |
+|---|---|---|---|---|---|---|---|
+| f0-viaggio | keep (viaggio-andata) | COULISSE+ARCH (cancello) | chiuso | sx+dx | basso | enter-sweep | far |
+| f1-esplorazione | keep | VISTA-variant | aperto | — | medio | pan | far |
+| f1-tracce | v2 generato (in valutazione) | COULISSE | chiuso | sx+dx | basso | enter-creep | mid |
+| f2-bottino | regen (fiction: fagotto visto dall'alto) | TABLEAUX/ISLAND | ibrido | basso | nessuno | hold/push-down | near |
+| f3-accampamento | keep→sostituire con gola | COULISSE | chiuso | sx+dx | basso | enter-settle-cover | mid |
+| f3-gola | v2 live | COULISSE+CANOPY | chiuso | sx+dx+alto | basso | enter-creep | far |
+| f3-intrusi | regen | SHOULDER | chiuso | sx o dx | basso | creep | mid |
+| f4-combattimento | regen | CASCADE | ibrido | diagonale | medio | enter-direct | mid |
+| f5-incalzare | regen | CASCADE | ibrido | diagonale | medio | enter-sweep | mid |
+| f6-spoglie | regen | ISLAND | ibrido | basso/centro | medio | hold | near |
+| f7-agguato | v2 brief scritto | SHOULDER | chiuso | sx+basso | basso | enter-creep | mid |
+| f7-ultimo-scontro | keep | MONOLITH-variant | chiuso | — | medio | verdict-zoom | mid |
+| f8-ritorno | keep (viaggio-ritorno) | SHOULDER+VISTA | ibrido | sx | medio | enter-sweep | far |
+
+Sequenza (ordine di gioco): COULISSE(f0) → VISTA(f1a) → COULISSE(f1b,
+ritorno rimato con knobs diversi) → TABLEAUX(f2, aperto verticale) →
+COULISSE+CANOPY(f3g) → SHOULDER(f3i) → CASCADE(f4) → CASCADE(f5 — FLAG:
+due CASCADE di fila, da mitigare con lato/pendenza/knobs diversi) →
+ISLAND(f6, aperto) → SHOULDER(f7) → MONOLITH(f7b) → VISTA(f8).
+Warning residuo: f4/f5 consecutivi CASCADE — il brief f5 dovrà invertire
+il lato di entrata e cambiare pendenza+mossa.

@@ -113,10 +113,13 @@ test.describe('/game first-interaction contract (R-238)', () => {
     const second = await holdAndMeasure();
     await waitPreviewGone();
     const heroSheetClose2 = page.locator('#hero-sheet button[data-skin="close"]');
-    if (await heroSheetClose2.waitFor({ state: 'visible', timeout: 1_500 }).then(() => true).catch(() => false)) {
+    if (await heroSheetClose2.waitFor({ state: 'visible', timeout: 3_000 }).then(() => true).catch(() => false)) {
       await heroSheetClose2.click();
       await page.waitForSelector('#hero-sheet', { state: 'detached', timeout: 5_000 }).catch(() => undefined);
     }
+    /* The release-click can open the hero sheet a beat late; before the third
+     *  hold guarantee it is fully gone — a lingering layer eats pointerdown. */
+    await page.waitForSelector('#hero-sheet', { state: 'detached', timeout: 5_000 }).catch(() => undefined);
     const third = await holdAndMeasure();
 
     console.log(`[first-interaction] pointerdown→preview: first=${first?.toFixed(0)}ms second=${second?.toFixed(0)}ms third=${third?.toFixed(0)}ms`);

@@ -1,0 +1,19 @@
+{
+  "slug": "accampamento-dusk",
+  "title": "ACCAMPAMENTO DUSK",
+  "prose": {
+    "subject": "a small clearing holding a ragged hide-tent camp — a stone-ringed fire pit with glowing red coals, three broad hide tents, a small oil lantern on a tent pole against a dark tent wall, a metal shield and loot bundle leaning against the right tent; NOTHING FLIES, NOTHING MOVES — only light sources waiting for the runtime",
+    "composition": "a hidden watcher's-eye view between branches, the camp small and readable in the central opening; behind it a continuous dark wall of treeline, and above an open dusk sky in a smooth low-frequency gradient",
+    "lighting": "deep dusk — the fire pit the warmest brightest element, the lantern a small secondary warm point, all else falling into saturated teal-veronese shadow",
+    "palette_extra": "Veronese pine masses, amber-cinnabar firelight, ultramarine sky band;",
+    "technique_extra": "tactile matter on hide, raw timber and stone;",
+    "mood": "assessment + the last quiet before violence"
+  },
+  "pigment": "deep teal",
+  "occluder": "both",
+  "calm_zones": ["fog-low"],
+  "fx_anchors": ["fire pit coals", "oil lantern"],
+  "kill_extra": ["NO people", "NO humanoid figures", "NO readable goblins", "NO birds"],
+  "aspect": "2.4:1",
+  "tags": ["camp", "dusk", "goblin-distant", "no-people"]
+}

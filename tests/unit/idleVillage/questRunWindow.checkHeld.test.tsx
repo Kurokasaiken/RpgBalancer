@@ -93,6 +93,22 @@ describe('QuestRunWindow — a held check owns the window (R-239)', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  // INV:quest-run-window.INV-7 — a stale check event is never held: both
+  // presenters (column + overlay) gate on `isStaleCheckEvent`, so a check the
+  // run already dismissed (`checkSeq <= dismissedUpTo` — hydration reabsorbs
+  // settled checks, `dismissOutcome` raises the mark mid-run) could never
+  // mount a presenter. Holding it deadlocked the cursor to `checkHoldMs`
+  // (~45s per stale check — the real R-119 e2e pile-up); it must flow as an
+  // ordinary timed beat, leaving the close button enabled.
+  it('does not hold a check beat whose event is already dismissed (stale)', () => {
+    const { run, checkBeat } = runWithCheck(42);
+    const check = checkBeat.kind === 'check' ? checkBeat.check : null;
+    expect(check?.checkSeq).toBeGreaterThan(0);
+    run.dismissedUpTo = check!.checkSeq;
+    renderWindow(run, [checkBeat]);
+    expect(screen.getByRole('button', { name: /close panel/i })).not.toBeDisabled();
+  });
+
   // INV:R-239-check-held-window — the strip state is published so the cluster
   // can drop orphaned wings: report on mount, on minimise, on restore, and
   // false again on unmount.

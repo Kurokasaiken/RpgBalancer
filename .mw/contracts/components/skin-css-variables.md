@@ -28,6 +28,14 @@ invariants:
       = B)
     test_refs:
       - tests/unit/idleVillage/noViolet.test.ts
+  - id: skin-css-variables.INV-2
+    source: director-bug
+    source_ref: R-270
+    statement: >-
+      Token --skin-hud-control-height 26px sotto il minimo interattivo 32px: pill pin edificio 40x26, chip registry
+      157x26, filter chips (Sentinel small-target, run 0829)
+    test_refs: 
+      - tests/unit/idleVillage/skinControlHeight.min32.test.ts
 ---
 # skin-css-variables
 

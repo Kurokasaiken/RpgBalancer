@@ -118,7 +118,33 @@ modifica al fit.
 
 **Viewport da coprire sempre:** 1440×900 e 1280×800 (canonici della guida HUD),
 1920×800 e 1600×760 (larghi/bassi, dove il floor vinceva), almeno uno stretto
-(1024×700) e il proprio viewport reale.
+(1024×700), **390×844 portrait touch (mobile-fit, R-274)** e il proprio
+viewport reale.
+
+## Portrait / mobile-fit (R-274, PLAN-083)
+
+Sotto `mobileFitConfig.breakpointPx` (768) il fit a riposo cambia regola:
+
+- **Cover sull'asse corto, non contain.** Il resting zoom è
+  `effectiveMinZoom = max(coverScale, wheelMinBound)`, dove `coverScale =
+  max(W / canvasW, H / canvasH)` — il canvas dipinto copre tutto il
+  viewport (niente letterbox). La camera è centrata su
+  `mobileFitConfig.mapFocal` (frazioni del canvas).
+- **`effectiveMaxZoom = max(wheelMaxBound, effectiveMin ×
+  mobileMaxZoomFactor)`** — il range pinch è garantito non-vuoto anche
+  quando la cover scala sopra il wheel max. Se `min === max` (aspect
+  atipici) il pinch no-op ma il pan resta attivo.
+- **A ≥768 la coppia wheel è verbatim** — i bound effettivi esistono solo
+  nel branch mobile: l'emit-identical desktop è strutturale, non dipende
+  da nessuna precondizione su coverScale o sulla mappa caricata.
+- **Pan clamp** sui bound mare esistenti (±`seaMarginPx/YPx`) alla scala
+  effettiva corrente: dopo un pan massimale la viewport non mostra mai
+  area fuori dalla quad mare.
+- Il pinch è **DOM Pointer Events** sul canvas (pointerType `touch`,
+  `setPointerCapture`, `pointercancel` → restore transform pre-gesto,
+  transizione pan→pinch senza salto); il path mouse/wheel è invariato.
+- Spec: `tests/mobileFit.spec.ts` (progetto Playwright `Mobile Fit`,
+  boot singolo serial).
 
 ## Diagnosi rapida quando "la mappa è troppo grande"
 

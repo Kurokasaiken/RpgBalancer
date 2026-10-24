@@ -88,7 +88,11 @@ export function WorldSurfaceClouds({
               left: 0,
               width: sprite.width * band.scale * scales[band.name],
               height: 'auto',
-              opacity: band.opacity,
+              // INV:world-surface-clouds.INV-1 — opacity and filter are the
+              // harmonization treatment owned by `cloudsLook`, so one config
+              // change retunes every sprite at once.
+              opacity: band.opacity * atmosphereAssets.cloudsLook.opacityScale,
+              filter: atmosphereAssets.cloudsLook.filter,
               willChange: 'transform',
               // Travel a full canvas width plus the sprite's own width, so it is
               // fully off one edge before reappearing at the other.

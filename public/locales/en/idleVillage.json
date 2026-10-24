@@ -891,7 +891,8 @@
       "map": "Map",
       "workshop": "Workshop",
       "tavern": "Tavern",
-      "locked": "Not yet"
+      "locked": "Not yet",
+      "more": "More"
     },
     "resources": {
       "gold": "Gold",

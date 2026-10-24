@@ -25,6 +25,9 @@ export interface MatericEventCardProps {
   actionLabel?: string;
   /** CTA handler. */
   onAction?: () => void;
+  /** Extra styles for the action button — e.g. a `minHeight` compensating a
+   *  parent scale transform so the hit area stays ≥32px (INV-1, R-270). */
+  actionStyle?: React.CSSProperties;
   /** Days-left label shown in reminder mode. */
   daysLeftLabel?: string;
   /** Days-left numeric value; when present the card renders label + large number. */
@@ -66,6 +69,7 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
   image,
   actionLabel,
   onAction,
+  actionStyle,
   daysLeftLabel,
   daysLeftValue,
   children,
@@ -187,6 +191,7 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
                 onClick={onAction}
                 style={{
                   marginTop: 20,
+                  ...actionStyle,
                   background: 'linear-gradient(180deg, #2a9fa8, #1a6b73)',
                   border: '1px solid rgba(170,230,235,.5)',
                   color: '#d4f5f7',

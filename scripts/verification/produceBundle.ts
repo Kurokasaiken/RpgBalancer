@@ -21,7 +21,7 @@ import {
   obligationTier,
   sha256File,
 } from './gateCore';
-import { checkContractsGate, gitChangedFiles } from './contractsCheck';
+import { applyScopeFiles, checkContractsGate, gitChangedFiles } from './contractsCheck';
 import { checkRedFirstGate } from './redFirst';
 import { checkIntentGate } from './intentGate';
 import { checkTrustedLock } from './trustedLock';
@@ -185,18 +185,33 @@ function main(): void {
     writeFileSync(resultsPath, JSON.stringify(commandResults, null, 2));
   }
 
+  // PLAN-081: partizione diff→scope. manifest.scope_files (globs) dichiara
+  // i file del piano; tutto il resto del diff è drift altrui → va in
+  // bundle.foreign_scope (advisory) ed è escluso da contracts/red-first/
+  // intent/tiering — i gate non bloccano più su sessioni parallele (T-13).
+  const changedFiles = gitChangedFiles(process.cwd());
+  const { scoped: scopedChanged, foreign: foreignScope } = applyScopeFiles(
+    changedFiles,
+    parsed.scope_files,
+  );
+  if (parsed.scope_files && foreignScope.length > 0) {
+    console.log(`scope: ${foreignScope.length} file fuori scope → foreign_scope (advisory, non bloccante)`);
+  }
+
   // Gate file→superficie (PLAN-044 T-002): file toccato senza superficie
   // mappata né disposition → il bundle fallisce (fail-closed).
-  const contractsReport = checkContractsGate(process.cwd());
+  const contractsReport = checkContractsGate(process.cwd(), {
+    changedFiles,
+    scopeFiles: parsed.scope_files,
+  });
   const contracts = { ok: contractsReport.errors.length === 0, reasons: contractsReport.errors };
 
   // Gate red-first lockato (PLAN-044 T-004): i test dichiarati in
   // manifest.red_first devono avere un record con hash test + hash log
   // rossa immutati; mutare un test registrato nella diff → rosso.
-  const changedFiles = gitChangedFiles(process.cwd());
   const redFirstReport = checkRedFirstGate(process.cwd(), {
     required: parsed.red_first,
-    changedFiles,
+    changedFiles: scopedChanged,
   });
   const redFirst = { ok: redFirstReport.errors.length === 0, reasons: redFirstReport.errors };
 
@@ -205,7 +220,7 @@ function main(): void {
   // `--all-tiers` (verify:sweep) disabilita lo skip. Config assente o
   // diff vuoto → nessun skip (fail-closed).
   const tiersCfg = loadTiersConfig();
-  const skipPerceptual = !allTiers && !perceptualReached(changedFiles, tiersCfg);
+  const skipPerceptual = !allTiers && !perceptualReached(scopedChanged, tiersCfg);
   if (skipPerceptual) {
     console.log('tiering: nessuna superficie percettiva/core nel diff — obbligazioni percettive SKIPPED');
   }
@@ -233,7 +248,7 @@ function main(): void {
       evaluations,
       commandResults,
       repoRoot: process.cwd(),
-      changedFiles,
+      changedFiles: scopedChanged,
     });
     writeFileSync(path.join(runDir, 'verifier.json'), JSON.stringify(receipt, null, 2));
     console.log('verifier.json: receipt meccanico rigenerato (generated_by presente)');
@@ -263,7 +278,7 @@ function main(): void {
   // Gate regime intent (PLAN-045 T-005b): manifest.intent_gate richiede
   // intent.json con status PASS|WAIVED|SKIPPED_TRIVIAL + catena/integrità.
   const intentReport = parsed.intent_gate === true
-    ? checkIntentGate(runDir, process.cwd(), { changedFiles })
+    ? checkIntentGate(runDir, process.cwd(), { changedFiles: scopedChanged })
     : null;
   const intentGate = intentReport
     ? { ok: intentReport.ok, status: intentReport.status, reasons: intentReport.errors }
@@ -282,6 +297,7 @@ function main(): void {
     integrity,
     skipPerceptual,
     intentGate,
+    parsed.scope_files ? foreignScope : undefined,
   );
   const bundlePath = path.join(runDir, 'bundle.json');
   writeFileSync(bundlePath, JSON.stringify(bundle, null, 2));
@@ -316,6 +332,10 @@ function main(): void {
       console.log('\n=== trusted-lock (hash-lock trust-set) ===');
       bundle.trusted_lock.reasons.forEach((r) => console.log(`  • ${r}`));
     }
+  }
+  if (bundle.foreign_scope && bundle.foreign_scope.length > 0) {
+    console.log('\n=== foreign_scope (diff altrui, advisory — non bloccante) ===');
+    bundle.foreign_scope.forEach((f) => console.log(`  • ${f}`));
   }
   console.log(`\nVerdict: ${bundle.verdict} — bundle: ${bundlePath}`);
   process.exit(bundle.verdict === 'PASS' ? 0 : 1);

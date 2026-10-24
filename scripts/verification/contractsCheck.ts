@@ -97,6 +97,23 @@ export function isExemptFile(rel: string): boolean {
   return EXEMPT_PATTERNS.some((re) => re.test(rel));
 }
 
+/**
+ * PLAN-081: partizione del diff sullo scope dichiarato dal manifest
+ * (`scope_files`, globs stessa convenzione dei contratti). Il gate giudica
+ * solo `scoped`; `foreign` è drift di altre sessioni (T-13) — riportato
+ * advisory in `foreign_scope`, mai bloccante. Scope assente → tutto scoped
+ * (retrocompat: nessun file sparisce dalla valutazione).
+ */
+export function applyScopeFiles(
+  changed: string[],
+  scopeFiles?: string[],
+): { scoped: string[]; foreign: string[] } {
+  if (!scopeFiles || scopeFiles.length === 0) return { scoped: changed, foreign: [] };
+  const scoped = changed.filter((f) => scopeFiles.some((g) => globMatch(g, f)));
+  const foreign = changed.filter((f) => !scoped.includes(f) && !isExemptFile(f));
+  return { scoped, foreign };
+}
+
 function git(repoRoot: string, args: string): string {
   return execSync(`git ${args}`, {
     cwd: repoRoot,
@@ -302,7 +319,10 @@ function headFile(repoRoot: string, rel: string): string | null {
  * `checkContractsGate(repoRoot)` e stampa il report in JSON. Ritorna null
  * se il gate non esiste/è ineseguibile a HEAD (→ bootstrap director_answer).
  */
-export function runCommittedGate(repoRoot: string): ContractsReport | null {
+export function runCommittedGate(
+  repoRoot: string,
+  changedFiles?: string[],
+): ContractsReport | null {
   let scriptsListing: string[];
   try {
     scriptsListing = execSync('git ls-tree -r HEAD --name-only scripts/', {
@@ -338,7 +358,13 @@ export function runCommittedGate(repoRoot: string): ContractsReport | null {
         '// Namespace import + guard: il gate a HEAD può non esportare GATE_FILES.\n' +
         'const gf = (cc as { GATE_FILES?: string[] }).GATE_FILES;\n' +
         'if (Array.isArray(gf)) gf.length = 0;\n' +
-        'const rep = cc.checkContractsGate(process.env.REPO_ROOT as string);\n' +
+        'const rep = cc.checkContractsGate(process.env.REPO_ROOT as string, {\n' +
+        '  // PLAN-081: lo scope del piano arriva via env — il gate a HEAD\n' +
+        '  // valuta lo stesso insieme scopato, non il diff intero.\n' +
+        '  changedFiles: process.env.CONTRACTS_CHANGED_FILES\n' +
+        '    ? (JSON.parse(process.env.CONTRACTS_CHANGED_FILES) as string[])\n' +
+        '    : undefined,\n' +
+        '});\n' +
         'process.stdout.write(JSON.stringify(rep));\n',
     );
     // tsx è risolto dalla posizione del gate in esecuzione (questo file /
@@ -357,7 +383,11 @@ export function runCommittedGate(repoRoot: string): ContractsReport | null {
     const errFd = openSync(errPath, 'w');
     try {
       execFileSync(process.execPath, [tsxCli, runner], {
-        env: { ...process.env, REPO_ROOT: repoRoot },
+        env: {
+          ...process.env,
+          REPO_ROOT: repoRoot,
+          ...(changedFiles ? { CONTRACTS_CHANGED_FILES: JSON.stringify(changedFiles) } : {}),
+        },
         stdio: ['ignore', outFd, errFd],
         timeout: 150_000,
       });
@@ -405,12 +435,15 @@ export interface ContractsReport {
     executed_counts_enforced: number;
   };
   evaluated_by?: 'working-tree' | 'head-gate';
+  /** PLAN-081: file nel diff ma fuori dallo scope dichiarato del piano —
+   *  drift di sessioni parallele (T-13), advisory mai bloccante. */
+  foreign_scope?: string[];
   errors: string[];
 }
 
 export function checkContractsGate(
   repoRoot: string,
-  opts: { changedFiles?: string[] } = {},
+  opts: { changedFiles?: string[]; scopeFiles?: string[] } = {},
 ): ContractsReport {
   const errors: string[] = [];
   const report: ContractsReport = {
@@ -423,13 +456,18 @@ export function checkContractsGate(
     errors,
   };
 
-  let changed: string[];
+  let rawChanged: string[];
   try {
-    changed = opts.changedFiles ?? gitChangedFiles(repoRoot);
+    rawChanged = opts.changedFiles ?? gitChangedFiles(repoRoot);
   } catch (e) {
     errors.push(`baseline git non valutabile: ${(e as Error).message}`);
     return report;
   }
+  // PLAN-081: con scopeFiles il gate giudica solo l'insieme scopato; il
+  // resto del diff (sessioni parallele) va in foreign_scope — advisory.
+  const { scoped, foreign } = applyScopeFiles(rawChanged, opts.scopeFiles);
+  if (opts.scopeFiles && opts.scopeFiles.length > 0) report.foreign_scope = foreign;
+  const changed = scoped;
   report.changed_files = changed;
 
   // Gate-file diffs (T-003): valutati dalla versione gate committata a
@@ -439,9 +477,10 @@ export function checkContractsGate(
   const gateDiff = changed.filter((f) => GATE_FILES.includes(f));
   let gateBootstrap = false;
   if (gateDiff.length > 0) {
-    const delegated = runCommittedGate(repoRoot);
+    const delegated = runCommittedGate(repoRoot, changed);
     if (delegated) {
       delegated.gate_files = gateDiff.map((f) => ({ file: f, via: 'head-gate' as const }));
+      if (opts.scopeFiles && opts.scopeFiles.length > 0) delegated.foreign_scope = foreign;
       return delegated;
     }
     gateBootstrap = true;

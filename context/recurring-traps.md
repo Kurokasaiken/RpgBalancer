@@ -550,3 +550,23 @@ stash, quest window, roster.
      (+4 px lato icona). Misure sempre su bbox live (T-04), non a occhio.
   4. Regression test: ordine dei bottoni nel cluster + padding della placca
      (asserzione di struttura, non di pixel).
+
+## T-14 — Research prompt = executor-spec (codifica la risposta nella domanda)
+
+Quando il Director chiede ricerca — a provider esterni O dentro il repo/web —
+formularla come explorer: domande da rispondere + vincoli, mai la forma del
+deliverable né la lista di file da leggere. Cercare anche lo spazio negativo
+(cosa manca che dovrebbe esserci) e almeno una smentita prima di concludere.
+Checklist obbligatoria: `.mw/contracts/research-prompt-protocol.md` (R-278).
+
+## T-15 — Effetti inventati da zero (non cercare le implementazioni di riferimento)
+
+Prima di implementare un effetto/animazione: cercare come viene fatto nei
+progetti reali (skill pubbliche, librerie, reference canvas/pixi, esempi
+documentati) e riusare la ricetta — il tumble della foglia
+(`scale(cos(spin),1)`) non si inventa, si trova. Il bocciamento delle
+leaves v1 (ellissi traslucide) era evitabile con 5 minuti di ricerca.
+Vale anche per il routing delle dipendenze: controllare prima se esiste
+una libreria matura (es. @pixi/particle-emitter) e valutare se adotta o
+se la tecnica si porta sul nostro engine (vincolo: particelle = funzione
+pura del clock per i test deterministici).

@@ -22,6 +22,11 @@ import 'pixi.js/mesh';
 import { KEEP_GLOBAL_RESOURCES } from './pixiDestroy';
 import { createRefractionNoise, createSeabedArt } from './seabedTexture';
 import { isMapFitTestRuntime, SEA_QUAD_PAD } from './mapFitRuntime';
+import {
+  getMobileFitConfig,
+  isMobileFitViewport,
+  resolveEffectiveZoomBounds,
+} from '@/balancing/config/idleVillage/mobileFitConfig';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { defaultSeaMarksConfig } from '@/ui/idleVillage/config/seaMarksConfig';
@@ -520,6 +525,10 @@ export function PixiWorldMap({
     // Vertical sea is only ever the painted sea layer mirrored: land must never be reflected.
     const marginY = fit?.seaMarginYPx ?? 0;
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    // PLAN-083: mobile-fit policy — a coarse pointer caps the renderer DPR at
+    // `mobileFitConfig.dprCap` (iPhone DPR3 → 2 ≈ 3x fewer pixels; desktop stays 2).
+    const mobileFit = getMobileFitConfig();
+    const coarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false;
     let cleanupInput = () => {};
     let bytes = 0;
     let textureCount = 0;
@@ -539,7 +548,7 @@ export function PixiWorldMap({
         background: stageColor,
         antialias: false,
         autoDensity: true,
-        resolution: Math.min(window.devicePixelRatio || 1, 2),
+        resolution: Math.min(window.devicePixelRatio || 1, coarsePointer ? mobileFit.dprCap : 2),
         preference: 'webgl',
       });
       if (disposed) {
@@ -1446,11 +1455,29 @@ export function PixiWorldMap({
       // and the margins are wide enough that this only binds at extreme aspect ratios.
       const floorZoom = () =>
         Math.max(app.screen.width / (canvas.width + 2 * margin), app.screen.height / (canvas.height + 2 * marginY));
+      /* PLAN-083: effective zoom bounds. Below `mobileFit.breakpointPx` coverage is
+       * primary — `min = max(coverScale, wheelMin)` kills the portrait letterbox and
+       * `max = max(wheelMax, min·factor)` keeps a non-empty pinch range. At ≥768 the
+       * wheel pair is returned verbatim: desktop stays emit-identical by construction. */
+      const coverScale = () =>
+        Math.max(app.screen.width / canvas.width, app.screen.height / canvas.height);
+      const zoomBounds = () =>
+        resolveEffectiveZoomBounds(
+          app.screen.width,
+          coverScale(),
+          cameraConfig.minZoom ?? 0,
+          cameraConfig.maxZoom,
+        );
       // For the user's own zoom-out the manifest's minZoom also applies (readability floor):
       // stricter than coverage, but only on wheel — the fit must be free to go lower.
-      const userFloor = () => Math.max(floorZoom(), cameraConfig.minZoom ?? 0);
+      // In mobile-fit mode the effective minimum IS the cover scale (R-274).
+      const userFloor = () => {
+        const zb = zoomBounds();
+        return zb.mobile ? zb.min : Math.max(floorZoom(), cameraConfig.minZoom ?? 0);
+      };
       const apply = () => {
-        cam.zoom = Math.min(cameraConfig.maxZoom, Math.max(floorZoom(), cam.zoom));
+        const zb = zoomBounds();
+        cam.zoom = Math.min(zb.max, Math.max(zb.mobile ? zb.min : floorZoom(), cam.zoom));
         const visW = app.screen.width / cam.zoom;
         const visH = app.screen.height / cam.zoom;
         cam.panX = Math.min(Math.max(cam.panX, -margin), Math.max(-margin, canvas.width + margin - visW));
@@ -1460,7 +1487,14 @@ export function PixiWorldMap({
         seabedShift(cam.panX, cam.panY, visW, visH);
         camRef.current = cam;
         // Test seam only (dev / playwright builds): lets a test read the camera to find where the painted canvas edges land on screen.
-        if (isMapFitTestRuntime) Object.assign(window as object, { __worldCam: { ...cam, width: canvas.width, height: canvas.height }, __canopySway: canopySway });
+        if (isMapFitTestRuntime)
+          Object.assign(window as object, {
+            __worldCam: { ...cam, width: canvas.width, height: canvas.height },
+            __canopySway: canopySway,
+            // PLAN-083: effective zoom bounds the camera is running under
+            // (wheel pair verbatim at >=768, clamped effective pair below).
+            __worldCamBounds: zoomBounds(),
+          });
         syncAnchors();
       };
       const refit = () => {
@@ -1468,7 +1502,17 @@ export function PixiWorldMap({
         const H = app.screen.height;
         // Read the live fit: panel toggles change only the insets and must refit, not rebuild.
         const liveFit = safeFitRef.current;
-        if (liveFit) {
+        /* PLAN-083 portrait/mobile fit: cover the viewport on the short axis
+         * (`effectiveMinZoom = max(cover, wheelMin)`) centred on the authored
+         * `mapFocal` — the painted sea fills whatever the land does not, so
+         * no letterbox and no protected-edge violation to solve (T-01: only
+         * the camera moves; world bounds/margins/mask are untouched). */
+        if (liveFit && isMobileFitViewport(W)) {
+          const zb = zoomBounds();
+          cam.zoom = zb.min;
+          cam.panX = mobileFit.mapFocal.x * canvas.width - W / 2 / cam.zoom;
+          cam.panY = mobileFit.mapFocal.y * canvas.height - H / 2 / cam.zoom;
+        } else if (liveFit) {
           const left = liveFit.insets.left ?? 0;
           const right = liveFit.insets.right ?? 0;
           const freeW = W - left - right;
@@ -1801,7 +1845,7 @@ export function PixiWorldMap({
         const wx = cam.panX + sx / cam.zoom;
         const wy = cam.panY + sy / cam.zoom;
         cam.zoom *= e.deltaY < 0 ? 1.1 : 1 / 1.1;
-        cam.zoom = Math.min(cameraConfig.maxZoom, Math.max(userFloor(), cam.zoom));
+        cam.zoom = Math.min(zoomBounds().max, Math.max(userFloor(), cam.zoom));
         cam.panX = wx - sx / cam.zoom;
         cam.panY = wy - sy / cam.zoom;
         userMoved = true;
@@ -1823,7 +1867,9 @@ export function PixiWorldMap({
         }
         apply();
         const liveFit = safeFitRef.current;
-        if (!liveFit) return;
+        // PLAN-083: in mobile-fit mode the resting contract is cover+focal —
+        // a resized user camera only needs the bound re-clamp in apply().
+        if (!liveFit || isMobileFitViewport(app.screen.width)) return;
         const W = app.screen.width;
         const H = app.screen.height;
         const freeW = W - (liveFit.insets.left ?? 0) - (liveFit.insets.right ?? 0);
@@ -1839,6 +1885,109 @@ export function PixiWorldMap({
         cam.panY = panYMin > panYMax ? panYMin : Math.min(Math.max(cam.panY, panYMin), panYMax);
         apply();
       };
+      /* ── Touch gestures (PLAN-083, R-274): DOM Pointer Events on the canvas
+       * wrapper — one finger pans, two fingers pinch-zoom. `pointerType ===
+       * 'touch'` only: the mouse keeps the legacy mousedown/mousemove/wheel
+       * path verbatim (desktop emit-identical). Gesture ownership is single:
+       * this recognizer is the only writer of `cam` for touch pointers.
+       * `touch-action: none` keeps the browser from hijacking the gesture;
+       * pointercancel restores the pre-gesture transform (contract: the pinch
+       * never leaves a half-applied zoom). A pinch→one-finger transition
+       * rebinds the pan to the remaining pointer's CURRENT position — no jump. */
+      el.style.touchAction = 'none';
+      const touches = new Map<number, { x: number; y: number }>();
+      let panFinger: { id: number; x: number; y: number } | null = null;
+      let pinchStart: {
+        dist: number;
+        zoom: number;
+        midX: number;
+        midY: number;
+        panX: number;
+        panY: number;
+      } | null = null;
+      const dist2 = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+        Math.hypot(a.x - b.x, a.y - b.y);
+      const onTouchDown = (e: globalThis.PointerEvent) => {
+        if (e.pointerType !== 'touch') return;
+        touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        try {
+          el.setPointerCapture(e.pointerId);
+        } catch {
+          /* pointer already released — the up/cancel path still runs */
+        }
+        if (touches.size === 1) {
+          panFinger = { id: e.pointerId, x: e.clientX, y: e.clientY };
+          pinchStart = null;
+        } else if (touches.size === 2) {
+          panFinger = null;
+          const [p1, p2] = [...touches.values()];
+          const r = el.getBoundingClientRect();
+          pinchStart = {
+            dist: Math.max(dist2(p1, p2), 1),
+            zoom: cam.zoom,
+            midX: (p1.x + p2.x) / 2 - r.left,
+            midY: (p1.y + p2.y) / 2 - r.top,
+            panX: cam.panX,
+            panY: cam.panY,
+          };
+        }
+      };
+      const onTouchMove = (e: globalThis.PointerEvent) => {
+        if (e.pointerType !== 'touch' || !touches.has(e.pointerId)) return;
+        touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pinchStart && touches.size >= 2) {
+          const [p1, p2] = [...touches.values()];
+          const r = el.getBoundingClientRect();
+          const zb = zoomBounds();
+          const nextZoom = Math.min(
+            zb.max,
+            Math.max(zb.min, (pinchStart.zoom * dist2(p1, p2)) / pinchStart.dist),
+          );
+          // The world point under the gesture midpoint at pinch start stays
+          // under the live midpoint — zoom anchored where the fingers are.
+          const wx = pinchStart.panX + pinchStart.midX / pinchStart.zoom;
+          const wy = pinchStart.panY + pinchStart.midY / pinchStart.zoom;
+          const midX = (p1.x + p2.x) / 2 - r.left;
+          const midY = (p1.y + p2.y) / 2 - r.top;
+          cam.zoom = nextZoom;
+          cam.panX = wx - midX / nextZoom;
+          cam.panY = wy - midY / nextZoom;
+          userMoved = true;
+          apply();
+        } else if (panFinger && e.pointerId === panFinger.id) {
+          cam.panX -= (e.clientX - panFinger.x) / cam.zoom;
+          cam.panY -= (e.clientY - panFinger.y) / cam.zoom;
+          panFinger = { id: e.pointerId, x: e.clientX, y: e.clientY };
+          userMoved = true;
+          apply();
+        }
+      };
+      const onTouchEnd = (e: globalThis.PointerEvent) => {
+        if (e.pointerType !== 'touch' || !touches.has(e.pointerId)) return;
+        touches.delete(e.pointerId);
+        try {
+          el.releasePointerCapture(e.pointerId);
+        } catch {
+          /* capture was never taken */
+        }
+        if (e.type === 'pointercancel' && pinchStart) {
+          cam.zoom = pinchStart.zoom;
+          cam.panX = pinchStart.panX;
+          cam.panY = pinchStart.panY;
+          apply();
+        }
+        if (touches.size === 1) {
+          const [id, p] = [...touches.entries()][0];
+          panFinger = { id, x: p.x, y: p.y };
+        } else if (touches.size === 0) {
+          panFinger = null;
+        }
+        if (touches.size < 2) pinchStart = null;
+      };
+      el.addEventListener('pointerdown', onTouchDown);
+      el.addEventListener('pointermove', onTouchMove);
+      el.addEventListener('pointerup', onTouchEnd);
+      el.addEventListener('pointercancel', onTouchEnd);
       el.addEventListener('mousedown', onDown);
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onUp);
@@ -1846,6 +1995,10 @@ export function PixiWorldMap({
       app.renderer.on('resize', onResize);
       cleanupInput = () => {
         cleanupRegions();
+        el.removeEventListener('pointerdown', onTouchDown);
+        el.removeEventListener('pointermove', onTouchMove);
+        el.removeEventListener('pointerup', onTouchEnd);
+        el.removeEventListener('pointercancel', onTouchEnd);
         el.removeEventListener('mousedown', onDown);
         window.removeEventListener('mousemove', onMove);
         window.removeEventListener('mouseup', onUp);

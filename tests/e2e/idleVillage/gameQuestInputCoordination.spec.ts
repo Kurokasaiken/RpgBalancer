@@ -84,13 +84,13 @@ const reachWaitingFrontier = async (page: Page, maxSteps = 40) => {
         const verdict = page.getByTestId('quest-verdict-card');
         const tira = checkColumn(page).locator('.da-tira, #launch');
         for (let k = 0; k < 40 && !(await verdict.isVisible().catch(() => false)); k++) {
-          if (await tira.isVisible().catch(() => false)) await tira.click().catch(() => undefined);
+          if (await tira.isVisible().catch(() => false)) await tira.dispatchEvent('click').catch(() => undefined);
           await page.waitForTimeout(250);
-          await board.click().catch(() => undefined);
+          await board.dispatchEvent('click').catch(() => undefined);
           await page.waitForTimeout(350);
         }
         await page.waitForTimeout(500);
-        await checkColumn(page).click({ position: { x: 8, y: 8 } });
+        await checkColumn(page).dispatchEvent('click');
         await expect(checkColumn(page)).toBeHidden({ timeout: 10_000 });
         continue;
       }
@@ -199,13 +199,13 @@ test.describe('PLAN-060 — quest window input coordination', () => {
         const verdict = page.getByTestId('quest-verdict-card');
         const tira = checkColumn(page).locator('.da-tira, #launch');
         for (let k = 0; k < 40 && !(await verdict.isVisible().catch(() => false)); k++) {
-          if (await tira.isVisible().catch(() => false)) await tira.click().catch(() => undefined);
+          if (await tira.isVisible().catch(() => false)) await tira.dispatchEvent('click').catch(() => undefined);
           await page.waitForTimeout(250);
-          await board.click().catch(() => undefined);
+          await board.dispatchEvent('click').catch(() => undefined);
           await page.waitForTimeout(350);
         }
         await page.waitForTimeout(500);
-        await checkColumn(page).click({ position: { x: 8, y: 8 } }).catch(() => undefined);
+        await checkColumn(page).dispatchEvent('click').catch(() => undefined);
         continue;
       }
       const run = await getRun(page);

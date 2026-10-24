@@ -21,9 +21,22 @@
  * not chrome.
  */
 
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { labCatalogEntries } from '@/ui/idleVillage/questGenLab/labModel';
+import {
+  bakedToExplorerEntry,
+  candidateToExplorerEntry,
+  labCatalogEntries,
+  type LabExplorerEntry,
+} from '@/ui/idleVillage/questGenLab/labModel';
+import {
+  buildSupersededIndex,
+  computeStatus,
+  type CandidateStatus,
+  type LabCandidate,
+} from '@/ui/idleVillage/questGenLab/candidate';
+import { useCandidates, type CandidatesApi } from '@/ui/idleVillage/questGenLab/candidateStore';
+import { GenerationPanel } from '@/ui/idleVillage/questGenLab/GenerationPanel';
 import { LabSection } from '@/ui/idleVillage/questGenLab/labUi';
 import { ScenarioExplorer } from '@/ui/idleVillage/questGenLab/ScenarioExplorer';
 import {
@@ -35,7 +48,39 @@ import {
 
 const QuestGenerationLabPage: React.FC = () => {
   const { t } = useTranslation('idleVillage');
-  const entries = useMemo(() => labCatalogEntries(), []);
+  const api: CandidatesApi = useCandidates();
+  /** Author mode — gates the generation panel (SP-2; SP-8 owns the full IA). */
+  const [authorMode, setAuthorMode] = useState(false);
+  /** Last picker inputs — the staleness reference for candidate badges. */
+  const [currentInputs, setCurrentInputs] = useState<Parameters<
+    typeof computeStatus
+  >[1] | null>(null);
+
+  const supersededBy = useMemo(() => buildSupersededIndex(api.candidates), [api.candidates]);
+
+  const statusOf = useCallback(
+    (c: LabCandidate): CandidateStatus =>
+      computeStatus(
+        c,
+        currentInputs ?? {
+          gimmickId: c.provenance.gimmickId,
+          kitId: c.provenance.kitId,
+          kitHash: c.provenance.kitHash,
+          effectiveTuning: c.provenance.effectiveTuning,
+        },
+        supersededBy.get(c.id),
+      ),
+    [currentInputs, supersededBy],
+  );
+
+  /** Candidates newest-first above baked; explorer fields come from one builder each. */
+  const explorerEntries = useMemo<LabExplorerEntry[]>(
+    () => [
+      ...[...api.candidates].reverse().map(candidateToExplorerEntry),
+      ...labCatalogEntries().map(bakedToExplorerEntry),
+    ],
+    [api.candidates],
+  );
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 text-slate-200">
@@ -54,13 +99,27 @@ const QuestGenerationLabPage: React.FC = () => {
         </header>
 
         <PipelineSection />
-        <IngredientsSection entries={entries} />
+        <IngredientsSection entries={explorerEntries.map((e) => e.entry)} />
         <LabSection
           icon="🗝️"
           title={t('questGenLab.sections.catalog')}
           desc={t('questGenLab.sections.catalogDesc')}
         >
-          <ScenarioExplorer entries={entries} />
+          <div className="mb-3 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setAuthorMode((v) => !v)}
+              className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                authorMode
+                  ? 'border-amber-500/60 bg-amber-500/15 text-amber-200'
+                  : 'border-white/10 bg-white/5 text-slate-400 hover:border-amber-500/30'
+              }`}
+            >
+              {t('questGenLab.author.toggle')}
+            </button>
+          </div>
+          {authorMode && <div className="mb-4"><GenerationPanel api={api} onInputsChange={setCurrentInputs} /></div>}
+          <ScenarioExplorer entries={explorerEntries} statusOf={statusOf} />
         </LabSection>
         <ConsequencesSection />
         <SystemsSection />
