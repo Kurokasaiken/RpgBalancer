@@ -1,9 +1,13 @@
-# Scene Prompt Form — template obbligatorio di compilazione
+# Scene Prompt Form v2 — template obbligatorio di compilazione
 
 Ogni prompt di scena si costruisce compilando **questo form**, campo per
 campo, in ordine. Un campo vuoto o compilato "a memoria" è un FAIL prima
 della generazione (R4bis preflight). Il blocco `text` finale del
 `prompt.md` nasce fondendo i campi compilati — mai prose ad-hoc in chat.
+
+**Principio guida (ChatGPT, canary-verified):** il form specifica
+l'*esito visivo richiesto* dell'immagine — non solo la lingua usata per
+descriverlo. Da template di scrittura a strumento di art direction.
 
 Riferimenti canonici: regole in
 [`scene_prompt_authoring_guide.md`](./scene_prompt_authoring_guide.md);
@@ -12,201 +16,291 @@ Motore di Unicità in `art_direction_plan.md` §10; esempi approvati in
 
 ---
 
-## F1 — TITOLO
+## I 4 JOB del form
+
+Il form è diviso in quattro aree di controllo — un prompt che mescola
+i job senza ordine produce failure che si nascondono l'uno sotto l'altro:
+
+```
+JOB 1 — CONTENT AUTHORITY     cosa esiste, cosa non, cosa non inventare
+JOB 2 — VISUAL HIERARCHY     cosa si legge prima, cosa sopravvive al crop
+JOB 3 — RENDERING & COLOR    impasto, murk, palette, ombre
+JOB 4 — INTEGRATION GEOMETRY crop, parallax, occluder, reveal
+```
+
+---
+
+# JOB 1 — CONTENT AUTHORITY
+
+## A1 — SCENE IDENTITY (era F1)
 
 **Cosa:** nome della scena in CAPS + trattino lungo, prima riga del blocco.
-**Come:** `NOME — A masterful cinematic oil painting in heavy textured
-impasto:` — il medium apre SEMPRE, prima del soggetto (R9 medium-first).
-**Esempio (approvato):** `HIDDEN CACHE — A masterful cinematic oil
-painting in heavy textured impasto: thick, violent palette-knife
-strokes, visible layers of paint adding physical depth.`
-**Fallimento se manca:** il generatore legge il prompt come descrizione
-fotografica, non come quadro — flat digital.
+**Come:** `NOME —` e basta. Il medium non va qui (era dentro F1 v1 —
+era una doppia autorità con F7, causa della diluzione rilevata da
+Gemini+DeepSeek). Il medium-first lo dichiara **C1**, non A1.
+**Esempio:** `HIDDEN CACHE —`
+**Fail se manca:** nessuna.
 
-## F2 — SUBJECT + BEAT
+## A2 — SUBJECT + BEAT (era F2)
 
 **Cosa:** cosa si vede, dal testo authored (R0); SOLO il beat
 pre-scelta/pre-check (R1). Enumerazione materiale fitta: ogni elemento
 porta **materia + comportamento della luce**, non solo il nome.
-**Come si descrive:** non «a stash in a pit» — «a hollow dug between
-root flares, its rim of wrenched roots and black loam still fresh».
-Ogni oggetto prende un aggettivo di materia (wrenched roots, split
-canvas, dull copper) e, se serve, un comportamento alla luce (a metal
-edge catching the dapple).
+**Come:** non «a stash in a pit» — «a hollow dug between root flares,
+its rim of wrenched roots and black loam still fresh». Ogni oggetto:
+aggettivo di materia + luce.
 **Esempio (approvato, f2-bottino):** «at lower-center an unmistakable
 hollow dug between root flares — its rim of wrenched roots and black
 loam — and inside the shadow a humble stash: a carved wooden idol with
 amber eyes, a green-glass vial, a bone whistle, a lumpy leather purse
-with copper coins spilling across a fold of torn hide».
-**Fallimento se manca:** il modello inventa il soggetto — fiction-sbagliata
-(o scena bella ma del nodo sbagliato).
+with copper coins spilling across torn hide».
+**Fail se manca:** il generatore inventa il soggetto.
 
-## F3 — SIGNATURE HOOK
+## A3 — CLOSED INVENTORY (nuovo — Claude/ChatGPT)
 
-**Cosa:** UN dettaglio visivo memorabile, il test è «cosa ridisegnerebbe
-un bambino a memoria». Obbligatorio (R4bis-9) — un quadro senza hook è
-bocciato anche se corretto.
-**Esempio (approvato, f3-accampamento):** «THE SIGNATURE: a crude lookout
-tower, a watch-post of lashed saplings and planks built up the side of
-the tallest pine».
-**Fallimento se manca:** scena corretta ma morta (fagotto grigio, 2026-10-24).
+**Cosa:** clausola positiva che chiude l'inventario: «the ONLY inhabitants
+and props are those listed» + conteggio esatto se rilevante.
+**Come:** «exactly three tents, no more; the only figures are the two
+described goblins».
+**Esempio (da aggiungere come nuova voce):** «exactly the items listed
+above, nothing else enters the frame».
+**Fail se manca:** il modello aggiunge soggetti inventati.
 
-## F4 — COMPOSITION
+## A4 — INLINE CAPS BANS (era F10)
 
-**Cosa:** POV + focal point + asimmetria (mai centrato statico) +
-occludente/massa dove l'archetype lo chiede. In termini pittorici, MAI
-percentuali/coordinate (R9 REG-NUM) — «lower-center», «left third»,
-«framed by», «edge of frame».
-**Esempio (approvato):** «hidden watcher's-eye view — the whole frame
-seen through a dark foliage vignette, the camp below and off-center».
-**Fallimento se manca:** soggetto centrato, orizzonte inventato, cornice
-vuota.
+**Cosa:** ≥1 divieto cardine in CAPS *dentro* il flusso dove conta
+— `NO TRAVELERS`, `NO HEROES`, `NO OTHER HANDS` — non solo in coda.
+**Fail se manca:** il generatore disegna il party/figure non volute.
 
-## F5 — MOTION NATURE (solo se c'è azione)
+## A5 — LOOT SPECIFICITY (nuovo — Claude)
 
-**Cosa:** la natura del moto — caos vs fila, dispersione vs assalto
-compatto (R4bis-11).
+**Cosa:** ogni oggetto porta un attributo non-generico (chipped,
+rune-scored, wax-sealed, lashed, scorched) + banned-generic-nouns.
+**Banned nouns:** plain "potion", "gold coins", "sack", "chest",
+"treasure", "goods" — mai da soli.
+**Esempio corretto:** «a rune-scored bronze whistle», non «a whistle».
+**Fail se manca:** generic merchant goods invece di loot interessante.
+
+## A6 — MOTION NATURE (era F5)
+
+**Cosa:** se c'è azione, la sua natura — caos vs fila, dispersione vs
+assalto compatto (R4bis-11). Se non c'è azione, si omite.
 **Esempio (approvato, f5-incalzare):** «the goblins break in chaos —
 each running a different way into the trunks, no two aligned».
-**Fallimento se manca:** fila meccanica = morto ("tutti nella stessa
-direzione").
 
-## F6 — MOOD
+---
 
-**Cosa:** DUE emozioni specifiche («X + Y»), mai "epic/dark/mysterious".
-**Esempio (approvato):** «relief + residual dread» · «reverence +
-fragile countdown».
-**Fallimento se manca:** scena tecnicamente giusta ma emotivamente piatta.
+# JOB 2 — VISUAL HIERARCHY
 
-## F7 — TECHNIQUE / STYLE
+## B1 — SIGNATURE HOOK (era F3, rafforzato)
 
-**Cosa:** il blocco impasto/split-rendering, aggressivo e mai hedged
-(R5-4, R9): «thick, violent brushstrokes, visible layers of paint» —
-MAI «in the … tradition». Chiusura obbligatoria: «the world rendered
-as rude beauty — weathered and tactile, never squalid».
-**Anchors artisti:** Jaime Jones (materia/impasto), Jeff Easley (peso),
-Sparth (scala monumentale su wide vista), Justin Gerard (creature —
-obbligatorio se la scena ne ha: «grotesque but vibrant, never horror»),
-Ruan Jia (solo punti focali puliti — volti).
-**Fallimento se manca:** flat digital, tecnica diluita.
+**Cosa:** UN dettaglio visivo memorabile, il test «cosa ridisegnerebbe
+un bambino a memoria». Deve essere un **subset di A2** (DeepSeek: hook
+e soggetto non devono divergere) e sopravvivere a **thumbnail** (Claude:
+deve leggere anche in miniatura).
+**Esempio (approvato, f3-accampamento):** «THE SIGNATURE: a crude
+lookout tower of lashed saplings built up the side of the tallest pine».
+**Fail se manca:** scena corretta ma morta.
 
-## F8 — LIGHTING
+## B2 — COMPOSITION (era F4)
 
-**Cosa:** l'evento luce proprio della scena (libera — non Solar Triumph
-forzato), ma dove la narrativa lo permette: una sorgente forte dipinta.
-**Come si descrive:** non «nice light» — «a single raking fire from
-frame-left catching trunk edges amber» / «blinding white midday sun
-breaking through the canopy in prismatic shafts». La sorgente dipinta
-alimenta poi l'FX runtime (glow/embers/shaft) — «paint only the light
-SOURCE», le particelle non si dipingono (R9).
-**Fallimento se manca:** luce piatta uniforme = look digitale.
+**Cosa:** POV + focal point + asimmetria, in termini pittorici —
+«lower-center», «left third», «framed by», «edge of frame». MAI
+percentuali/coordinate (R9 REG-NUM).
+**Regola negativa (DeepSeek):** `NO CENTERED FOCAL POINT` nella
+kill list — il generatore va al centro se non lo vieti.
+**Fail se manca:** soggetto centrato, orizzonte inventato.
 
-## F9 — PALETTE (blocco dedicato, obbligatorio)
+## B3 — VALUE PLAN (nuovo — Claude)
 
-**Cosa:** pigmenti di bibbia declinati sulla scena, con dominanza
-dichiarata (R4bis-10: la massa dominante è SEMPRE un pigmento bibbia,
-mai un neutro/ocra/bruno).
+**Cosa:** 3 valori dichiarati — massa dominante, massa secondaria,
+accento — che garantiscono la gerarchia a scala di grigi.
+**Come:** «dominant: deep teal shadow half-tones; secondary: emerald
+foliage mid-value; accent: cinnabar/amber hot points».
+**Fail se manca:** murk di valori, non solo di hue — il quadro resta
+leggibile anche desaturato.
 
-### I pigmenti Wanderlust (SSoT — non si inventano colori nuovi)
+---
 
-| Pigmento | Come lo scrivi nel prompt | Dove sta |
+# JOB 3 — RENDERING & COLOR
+
+## C1 — MEDIUM + TECHNIQUE (era F1+F7, unificati)
+
+**Cosa:** il medium apre la frase — «A masterful cinematic oil painting
+in heavy textured impasto: thick, violent palette-knife strokes, visible
+layers of paint adding physical depth» — poi la tecnica: impasto Jaime
+Jones / Jeff Easley, split-rendering Ruan Jia solo sui punti focali,
+Sparth per wide vista, Justin Gerard obbligatorio se creature presenti.
+**Chiusura obbligatoria:** «the world rendered as rude beauty —
+weathered and tactile, never squalid».
+**Fail se manca:** flat digital, tecnica diluita.
+
+## C2 — PALETTE + BROWN-GUARD (era F9, rafforzato)
+
+**Cosa:** pigmenti di bibbia declinati sulla scena + **tabella
+materiale→resa satura** per ogni materiale terroso (Claude:
+nessun materiale ammesso senza traduzione).
+
+### Pigmenti Wanderlust (SSoT)
+
+| Pigmento | Come lo scrivi | Dove sta |
 |---|---|---|
-| **Ultramarine** (blu oltremare) | `ultramarine depth`, `ultramarine fall-water`, `deep ultramarine pit shadow` | profondità, acqua, distanze |
-| **Verde Veronese** | `veronese-green foliage`, `Veronese ferns`, `emerald moss` | vegetazione dominante |
-| **Rosso Cinabro** | `cinnabar silk`, `one cinnabar accent`, `cinnabar banner` | L'UNICO accento caldo saturo |
-| **Ambra** | `amber firelight`, `captured gold sunlight`, `amber eye-gleam`, `amber and copper` | sorgenti luce, metalli, occhi |
-| **Ombre** | `deep teal-emerald shadows`, `turquoise in the deepest fold`, `smeraldo` | SEMPRE — mai grey/brown/black |
-| **Luce** | `blinding white light from above, prismatic dust motes` | Solar Triumph dove narrativa regge |
-| **Cielo** | `vibrant azure sky` | solo se il cielo è visibile (§1A) |
+| **Ultramarine** | `ultramarine depth`, `ultramarine fall-water`, `deep ultramarine` | profondità, acqua, distanze |
+| **Verde Veronese** | `veronese-green foliage`, `emerald moss` | vegetazione dominante |
+| **Cinabro** | `one cinnabar accent`, `cinnabar silk` | L'UNICO accento caldo |
+| **Ambra** | `amber firelight`, `captured gold sunlight`, `amber eye-gleam` | sorgenti luce, metalli, occhi |
+| **Ombre** | `deep teal-emerald shadows`, `turquoise in the deepest fold` | SEMPRE — mai grey/brown |
+| **Luce** | `blinding white light from above, prismatic dust motes` | Solar Triumph dove serve |
+| **Cielo** | `vibrant azure sky` | solo se visibile |
 
-### Materiali del mondo (vocabolario materico, bibbia §1)
+### Materiali del mondo (bibbia §1)
 
-`golden thatch` (mai "thatch") · `timber` · `alpine stone` ·
-`Baroque Sun-Bronze` (mai "armor") · `Dolomites peaks` ·
-`crystal-clear river` · `prismatic dust motes` · `pietra alpina` ·
+`golden thatch` · `timber` · `alpine stone` · `Baroque Sun-Bronze` ·
+`Dolomites peaks` · `crystal-clear river` · `prismatic dust motes` ·
 `basalto venato` · `seta iridescente` · `alabaster weathered` ·
 `antique bronze` · `black loam` · `bone` · `copper`
 
-**Esempio compilato (approvato):** «PALETTE: emerald moss and
-veronese-green ferns dominant, ultramarine depth in the pit shadow,
-copper and bone-amber as accents — deep teal-emerald shadows, never
-grey, never brown, NO mud. The frame stays luminous and high-chroma —
-light wins over darkness, even the deepest shadow is saturated color,
-never black murk.»
+### Brown-guard (materiale terroso → resa satura obbligatoria)
+
+| Materiale terroso | Resa satura obbligatoria |
+|---|---|
+| loam/soil | `loam rendered in deep violet-umber`, `black loam` |
+| timber/wood | `amber-lit timber over teal-emerald` |
+| leather | `amber and cinnabar highlights on worn leather` |
+| dirt/earth | `teal-emerald loam flecked with veronese` |
+| brown bark | `mossy umber where the umber reads warm-amber, not grey` |
+
 **Clausola obbligatoria (verbatim):** «The frame stays luminous and
 high-chroma — light wins over darkness, even the deepest shadow is
 saturated color, never black murk.»
-**Fallimento se manca:** murk, ocra dominante, palette inventata.
+**Fail se manca:** murk, ocra dominante, palette inventata.
 
-## F10 — NEGAZIONI INLINE (CAPS)
+## C3 — LIGHTING (era F8)
 
-**Cosa:** ≥1 divieto cardine in CAPS *dentro* il flusso dove conta
-(Q9) — `NO TRAVELERS`, `NO BLADE HAS MET YET`, `NO HEROES` —
-non solo in coda.
-**Fallimento se manca:** il generatore disegna il party/figure non volute.
+**Cosa:** l'evento luce proprio della scena — sorgente forte dipinta
+dove la narrativa lo permette.
+**Come:** «a single raking fire from frame-left catching trunk edges
+amber» / «blinding white midday sun breaking through the canopy in
+prismatic shafts». `Paint only the light SOURCE` — le particelle non si
+dipingono (R9), sono overlay runtime.
 
-## F11 — KILL LIST FINALE (verbatim, integrale)
+## C4 — MOOD → VISUAL MODIFIERS (era F6)
 
-Copiata TAL QUALE da R5.7, mai riscritta a memoria:
+**Cosa:** non solo due emozioni — le emozioni **tradotte in modificatori
+visivi concreti** (Gemini: le emozioni astratte fanno poco al modello).
+**Come:** non «relief + residual dread» — «quiet posture and warm
+slanted light across the moss floor, sharp back-shadows where the
+hidden eye would be».
+**Fail se manca:** scena emotivamente piatta.
+
+---
+
+# JOB 4 — INTEGRATION GEOMETRY (parallax-ready)
+
+## D1 — CANVAS GEOMETRY (nuovo — ChatGPT)
+
+**Cosa:** dimensioni e ratio dichiarati, e dove la finestra si croppa.
+**Come:** «one continuous extra-wide canvas, [2x / 3x] normal width;
+the left [one-third / half] is the occluder mass; the remaining
+[two-thirds / half] is the scene».
+**Fail se manca:** il generatore non sa che è una tela per il crop —
+produce il frame normale.
+
+## D2 — OCCLUDER ZONE (nuovo — ChatGPT)
+
+**Cosa:** il mass occluder — posizione, dimensione della finestra
+coperta, silhouette, trattamento bordo.
+**Come:** «a broad, irregular foreground mass of `<pigment>` and
+`<matter>` covering the left third, its edge a ragged painted fringe».
+**Fail se manca:** l'occluder esce rettangolare o manca.
+
+## D3 — REVEAL ZONE (nuovo — ChatGPT)
+
+**Cosa:** cosa c'è nell'area che si rivela — gerarchia focale dentro
+il crop.
+**Fail se manca:** il reveal mostra contenuto a caso.
+
+## D4 — HIDDEN SUBJECTS (nuovo — ChatGPT)
+
+**Cosa:** entità camuffate nella scena — quante, dove, grado di
+occlusione (distinguibili vs scopribili-solo-nel-reveal).
+**Esempio (approvato, agguato):** «goblin silhouettes barely
+discernible inside the painted fern mass — discoverable on second
+look, never spotlighted».
+**Fail se manca:** i nascosti si mostrano troppo o troppo poco.
+
+## D5 — CROP CONTRACT (nuovo — ChatGPT)
+
+**Cosa:** cosa ogni crop DEVE contenere e cosa DEVE escludere.
+**Fail se manca:** il crop taglia il soggetto o include ciò che non
+doveva entrare.
+
+## D6 — CONTINUITY CONTRACT (nuovo — ChatGPT)
+
+**Cosa:** prospettiva, luce, materia e trattamento **identici** tra
+occluder e scena — niente discontinuità.
+**Clausola:** «NO hard vertical seam, NO abrupt compositional reset,
+NO subject unintentionally clipped by a crop boundary».
+**Fail se manca:** il panel legge come pannello, non come parte della
+tela.
+
+## D7 — PARALLAX DEPTH (nuovo — ChatGPT/Gemini)
+
+**Cosa:** assegnazioni FG/MG/BG e quali forme si muovono / a che
+velocità relativa.
+**Come:** «foreground occluder: root-ball at frame-left; mid-ground:
+fern band; background: treeline and sky».
+**Fail se manca:** il parallasse non ha layer chiari.
+
+## D8 — ASPECT + REUSE TAGS (era F12+F13)
+
+**Cosa:** `21:9` per scene theatre / cover band; `extra-wide panoramic`
+per parallax plates. Sotto il blocco: `**Tags riuso:**` con
+setting/soggetto/figure/ora/creature (R7).
+
+---
+
+## Kill list finale (verbatim — mai riscritta)
+
 `NO grim, NO gore, NO decay, NO mud, NO symmetry, NO flat digital,
 NO airbrushed smoothness, NO sci-fi, NO text/UI/watermarks/frames/
-signatures/logos` + ban specifici della scena.
-`NO signature` sempre: i generatori appicciano firme fake quando il
-prompt nomina artisti.
-**Fallimento se manca:** firme «JONES», cornici card arrotondate, testo.
-
-## F12 — ASPECT
-
-**Cosa:** dettato dal componente di destinazione, mai a sentimento.
-Scene theatre (`StageBand`/`TransitView`) e cover card → **21:9
-cinematic scope**. Per wide-plate parallax (PLAN-087): «extra-wide
-panoramic format, twice normal width».
-
-## F13 — Tags riuso (nel file, sotto il blocco)
-
-`**Tags riuso:**` con setting/soggetto/figure/ora/creature (R7) —
-mai tag narrativi quest-unici.
+signatures/logos, NO CENTERED FOCAL POINT` + ban specifici della scena
++ `NO signature` sempre (il generatore appiccia firme fake).
 
 ---
 
 ## Compilazione → blocco prompt
 
-Ordine fisso nel fenced `text` (R5): `F1` → `F7` medium+tecnica in
-apertura → `F2` SUBJECT (con F10 inline) → `F3` hook → `F4` composition
-→ `F5` motion se c'è → `F8` lighting → `F9` palette+clausola → `F6`
-mood → `F11` kill list → `F12` aspect. ~200–260 parole, prosa unica
-con ancore CAPS.
+Ordine di assemblaggio nel fenced `text`:
+`A1` (title) → `C1` (medium+tecnica) → `A2` SUBJECT (con A4 inline,
+A5 loot specificity) → `B1` hook → `B2` composition (+B3 value plan)
+→ `A6` motion se c'è → `C3` lighting → `C2` palette+clausola → `C4`
+mood-modifiers → `D1..D7` se la scena è parallax → kill list → aspect.
+~200–280 parole, prosa unica con ancore CAPS.
 
-## Preflight (blocca prima di generare)
+## Preflight
 
-`python scripts/lint-scene-prompts.py` verde + R4bis checklist manuale:
-luminosità, pigmenti, cielo, direzione azione, 4 assi, kill list
-integrale, ref-hygiene, formato, canale=blocco lintato, hook,
-dominanza, moto.
+`python scripts/lint-scene-prompts.py` verde + R4bis checklist +
+(aggiunta v2): `CLOSED INVENTORY` presente, `BROWN-GUARD` tabella
+compilata se ci sono materiali terrosi, `VALUE PLAN` dichiarato,
+`D1..D7` compilati solo se la scena è parallax.
 
 ---
 
-## Quanti prompt servono (risposta a «x fare questo lavoro quanti
-prompt ti servono»)
+## La libreria esemplari (10, non 8 — ChatGPT)
 
-Il form si riempie da esempi approvati — copertura per categoria:
-
-| Categoria | Esemplare approvato esistente | Stato |
+| # | Categoria | Esemplare |
 |---|---|---|
-| Ground-level detail | f1-tracce (orme nel muschio) | ✅ |
-| Hidden-cache close-up | f2-bottino (idolo+fiala+rame) | ✅ |
-| Watched-from-cover vista | f3-accampamento (torre su pino) | ✅ |
-| Notte con clausola luminosità | f5-incalzare (torcia caduta) | ✅ |
-| Search-and-find rovine | saccheggio (ritrovamenti sparsi) | ✅ |
-| Wide-plate sanctuary/day | santuario-valle (Rivendell test) | ✅ pilota |
-| Wide vista impero | library «Verso Mordor»/«Impero del Sole» | ✅ |
-| Creatura | Cervo-Faro (§10.5) | ✅ |
-| **Mancanti** | | |
-| Interior/architettura interna | — | da creare quando serve |
-| Artifact/still-life singolo | — | da creare quando serve |
-| Crowd/NPC-allowed | — | da creare quando serve |
-| Underwater/special env | — | da creare quando serve |
+| 1 | Ground-level detail | f1-tracce |
+| 2 | Hidden-cache close-up | f2-bottino |
+| 3 | Watched-from-cover vista | f3-accampamento |
+| 4 | Notte/luminosità | f5-incalzare |
+| 5 | Search-and-find | saccheggio |
+| 6 | Wide-plate sanctuary | santuario-valle |
+| 7 | Wide vista impero | library «Verso Mordor» |
+| 8 | Creatura | Cervo-Faro (§10.5) |
+| 9 | **Parallax occluder/reveal** | da creare (il prossimo pilota) |
+| 10 | **Rendering stress test** | da creare |
 
-→ **Copertura attuale: 8 categorie su ~12.** Il form sta in piedi con
-gli esistenti; le 4 categorie mancanti si aggiungono quando la quest
-le richiede (nuovo esemplare → entra nella libreria approvati).
+Mancanti (da creare al bisogno): interior, artifact/loot-distinctive,
+crowd/NPC, underwater.
