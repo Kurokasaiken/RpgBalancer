@@ -538,9 +538,10 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
     pose: 'pose-watch',
     /* Narrative focal: the far campfire glow where the gorge bends. */
     focusAnchor: [0.68, 0.6],
-    /* The near masses cover ~half the frame — halve the warp amplitude
-     *  so the idle drift reads as breath, not swim (Director pass). */
-    ampMul: 0.55,
+    /* Raised 0.55→0.9 (Director 2026-10-24: "animarla meglio e di più") —
+     *  the coulisse walls carry the warp; still below 1.0 so the idle
+     *  drift reads as breath on the near masses, not swim. */
+    ampMul: 0.9,
     atmosphere: ['fog-gorge', 'cloud-shadow'],
     ambient: [
       /* Far campfire — the destination. Small: it's a mile away, and
@@ -569,6 +570,13 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
        * the video pass: 0.07 read as a barely-there line, not a beam. */
       { type: 'shaft', from: [0.58, 0.04], to: [0.6, 0.52], width: 0.16, count: 4, a: 0.13, color: '#ffe9b8' },
       { type: 'dust', count: 10 },
+      /* Director bundle 2026-10-24: more life in the gorge.
+       * Water-skin drift sliding over the river at the bottom. */
+      { type: 'drift', band: [0.78, 0.95], xband: [0.3, 0.75], count: 3, speed: 0.01, a: 0.1, color: '#9fd4cc' },
+      /* Fine rain threads down the sky wedge — the gorge reads wet. */
+      { type: 'rain', band: [0.0, 0.5], count: 20 },
+      /* Leaves shearing off the wall rims into the funnel. */
+      { type: 'leaves', band: [0.05, 0.5], xband: [0.05, 0.95], count: 6 },
     ],
   },
   /* Showcase "tutto il kit" — bivacco al crepuscolo. Hero motion = il
