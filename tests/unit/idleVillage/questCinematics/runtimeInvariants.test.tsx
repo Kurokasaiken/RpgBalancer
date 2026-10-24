@@ -20,7 +20,7 @@ import { DEFAULT_QUEST_THEATRE_FX, type CameraShot } from '@/balancing/config/id
 import { cameraAt, cameraHasTemporalWork, coverFit, TRAUMA_SETTLED_EPS } from '@/ui/idleVillage/questS1Lab/render/depthTransform';
 import { traumaAt } from '@/ui/idleVillage/questS1Lab/render/trauma';
 import { DepthScene } from '@/ui/idleVillage/questS1Lab/render/DepthScene';
-import { AmbientLayer, drawAmbientFrame, seeded } from '@/ui/idleVillage/questS1Lab/render/AmbientLayer';
+import { AmbientLayer, drawAmbientFrame, plateCache, seeded } from '@/ui/idleVillage/questS1Lab/render/AmbientLayer';
 import type { AmbientFx } from '@/ui/idleVillage/questS1Lab/render/sceneManifest';
 
 /* ── pixi.js mock — captures the render topology DepthScene builds.
@@ -477,6 +477,7 @@ describe('ambient layer — PLAN-052 showcase fx types', () => {
       restore: () => void ops.push('restore'),
       translate: () => void ops.push('translate'),
       rotate: () => void ops.push('rotate'),
+      scale: () => void ops.push('scale'),
       drawImage: () => void ops.push('drawImage'),
       clearRect: () => void ops.push('clear'),
       fillStyle: '',
@@ -499,6 +500,7 @@ describe('ambient layer — PLAN-052 showcase fx types', () => {
     { type: 'shaft', from: [0.6, 0.05], to: [0.55, 0.55], width: 0.12, count: 3, a: 0.1, color: '#fff2cc' },
     { type: 'leaves', band: [0.05, 0.9], xband: [0.1, 0.9], count: 9, speed: 1, a: 0.8, color: '#c99b46' },
     { type: 'rain', band: [0.0, 1.0], count: 60, lean: 0.08, speed: 1, a: 0.35, color: '#b8ccd8' },
+    { type: 'plate', src: '/assets/plates/t.webp', frames: 12, at: [0.4, 0.6], w: 0.12, h: 0.1, fps: 10 },
   ];
   const puffsFor = (key: string, n: number) => seeded(7 + key.length, n);
 
@@ -507,10 +509,13 @@ describe('ambient layer — PLAN-052 showcase fx types', () => {
     const { ctx, ops } = recordCtx();
     /* Scan several clock values — glint and fireflies gate their draw on
      *  a blink cycle, so no single t shows every type at once. */
+    /* Plate strips never finish loading in jsdom — inject a stub. */
+    plateCache.set('/assets/plates/t.webp', { complete: true, naturalWidth: 1700, naturalHeight: 120 } as HTMLImageElement);
     for (let t = 0; t < 8; t += 0.5) {
       drawAmbientFrame(ctx, 960, 400, t, view, fx, puffsFor);
     }
     expect(ops.some((o) => o.startsWith('linear:'))).toBe(true); // shaft fan gradients
+    expect(ops.filter((o) => o === 'drawImage').length).toBeGreaterThan(0); // plate cels
     /* Glint is a round twinkle (core + halo arcs) — the four-point cross
      * flare was removed after reading as random luminous crosses. */
     expect(ops.filter((o) => o === 'arc').length).toBeGreaterThan(0); // soft dots drawn

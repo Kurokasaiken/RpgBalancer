@@ -1,20 +1,33 @@
-# F4 — Combattimento (`gob-combattimento`) → `combattimento.png`
+# F4 — Il combattimento (`assalto-goblin`) → `assalto.jpg` — BRIEF v2 (CASCADE)
 
-Nodi: `gob-combattimento`. Beat: **l'istante in cui il campo esplode** — il
-moverso, non la mischia avvenuta. Party del giocatore mai disegnato; goblin
-come sciame da scheda `creatures/goblin` v0.1.0 (verde, orecchie enormi,
-war-paint ocra/cremisi, armi di legno — letti in silhouette, mai volti).
+Beat: la carica — l'istante dello scontro, massa contro massa. Fiction:
+goblin come MASSA/silhouette, mai volti leggibili; niente fuoco dipinto
+in competizione col runtime.
 
-## Full prompt — generatori esterni (Gemini / Grok / GPT)
+## Correlazione
+
+- **Archetipo: CASCADE** — diagonale Bibiena: la linea d'azione entra
+  basso-SX e sale verso il mid-alto DX — la carica È la diagonale;
+  gradini di massa lungo il percorso, nessuna coppia simmetrica.
+- **Shot**: `enter-direct` (l'impatto, niente introduzione lenta) →
+  `pose-tense` → drift.
+- **Ambient**: `embers` (focolare campo dipinto come sorgente piccola),
+  `glow` torcia, `dust` alzato dalla mischia, `smoke` dal fuoco.
+- **Hooks**: nessuno — scena d'azione, tutta energia.
+- **Kill list**: niente fiamme grandi dipinte (competizione runtime),
+  niente volti goblin, niente sangue/ferite, niente archi di rami
+  sottili.
+
+## Full prompt
 
 ```text
-COMBATTIMENTO — painted in heavy oil impasto. A raider camp at night on the very first heartbeat of eruption, painted the instant before contact. SUBJECT: small wiry goblin raiders boiling out of hide tents — huge pointed ears readable in silhouette, flashes of ochre-and-crimson war-paint, crude wooden clubs and stone-tipped spears snatched on the run — a screaming swarm surging across the firelight toward an enemy NEVER DRAWN. NO BLADE HAS MET YET — no fallen, no blood; only the camp detonating into motion, the charge a breath from impact. COMPOSITION claustrophobic, churning, off-axis. LIGHTING: fierce flame-white cores dominating the frame, embers as scattered points of light, the teal night luminous not black. PALETTE: cinnabar-amber flame, deep teal night, Veronese smoke shadow, ochre war-paint notes; NO grey, NO brown, NO mud. TECHNIQUE: thick oil impasto, violent palette-knife strokes in the Jaime Jones / Jeff Easley tradition, Jeff Easley heroic weight on the swarm mass, Justin Gerard whimsy in the goblin shapes — grotesque but vibrant, never horror; tactile matter on smoke, hide and embers; rude beauty — weathered and tactile, never squalid. MOOD: eruption + the violence that is about to be. The fires win over darkness — never black murk. NO grim, NO gore, NO blood, NO corpses, NO wounded, NO decay, NO mud, NO symmetry, NO flat digital, NO airbrushed smoothness, NO sci-fi, NO text/UI/watermarks/frames, NO people, NO humanoid figures, NO readable creature faces or anatomy, NO melee in progress — nothing has clashed yet. Ultra-wide cinematic 21:9.
+THE CHARGE — painted in heavy oil impasto. The instant of impact — a massed charge into a goblin camp at dusk, seen along the line of action. SUBJECT: our own heroes' warband mid-charge, seen from behind and the flank — a ragged line of armored silhouettes running AWAY from us up a diagonal of churned earth from the lower-left corner toward mid-right — shields, a raised spear, a cloak snapping — readable as attackers in motion, faces never shown; at the far end of the diagonal waits the goblin camp edge: pointed ears and crude spears massed behind a broken fence-line, a small painted torch-source the only flame; the goblins are the ones being assaulted — the charge goes TO them, not toward us. COMPOSITION: the diagonal is the subject — it enters lower-left and exits mid-right; masses staggered along it in three solid steps (the broken fence-line of the camp, a fallen cart-side, stacked crates — all thick silhouettes, never lattice); a small painted torch-source at the camp edge — the only flame, kept small (the runtime owns the fire's life); above, a band of vibrant azure dusk sky. NO symmetry. LIGHTING: hard warm torchlight raking across the charge line, everything else in teal dusk — the diagonal reads by light, the masses by silhouette. PALETTE: Wanderlust pigments — cinabro torchlight, ambra on the charge line, verde Veronese undergrowth, deep teal/smeraldo dusk shadow with ultramarine in the far depth; never grey, never brown, never mud. The frame stays luminous and high-chroma — light wins over darkness, even the deepest shadow is saturated color, never black murk. TECHNIQUE: thick oil impasto, violent palette-knife strokes, Jaime Jones / Jeff Easley tradition — the paint itself should feel like momentum; rude beauty. MOOD: the half-second of commitment — the charge is already launched, the outcome hangs. NO large flames painted — one small torch source only, NO smoke plumes painted, NO embers painted, NO readable faces or anatomy on either side, NO arrows in flight, NO wounds or blood, NO text/UI/watermarks, NO symmetry, NO flat digital, NO sci-fi. Ultra-wide cinematic 2.4:1.
 ```
-
-**Tags riuso:** `camp, night, fire, goblin-swarm, pre-contact, eruption, creature-mass`
 
 ## Generation notes
 
-- Regola applicata: l'immagine è l'eruzione pre-contatto, non il combattimento
-  in corso (che è esito dell'ingresso nel nodo).
-- Aspect ≥ 21:9 — contratto theatre stage 2.4:1 (`theaterAspect` in `gameFrameConfig`, gate `npm run check:quest-art`, tolleranza ±5%); cover-fit, soggetto focale nella fascia verticale centrale. Ricodifica target 3168×1320.
+- **Life plan**: torch = glow+embers+smoke runtime; dust sulla diagonale;
+  le masse stanno ferme (l'energia è nella pittura, non in sprite).
+- **Scorecard**: le sagome devono essere massa — un solo volto leggibile
+  = rigenerare; fiamme grandi dipinte = veto (compete col runtime).
+- Aspect 2.4:1; recode 3168×1320.
