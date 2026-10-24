@@ -21,14 +21,6 @@ type Reveal = NonNullable<SceneCinematicEntry['reveal']>;
 const clipFor = (r: [number, number, number, number]) =>
   `inset(${r[1] * 100}% ${(1 - r[0] - r[2]) * 100}% ${(1 - r[1] - r[3]) * 100}% ${r[0] * 100}%)`;
 
-/** The goblin sprite cutouts (extracted from the revealed plate) and their
- *  home positions/entry motion in img-fraction. */
-const SPRITES: { src: string; home: [number, number, number, number]; delay: number; rise: number }[] = [
-  { src: '/assets/scene-library/sprites/gob-lunge.png', home: [0.25, 0.15, 0.25, 0.47], delay: 0.4, rise: 0.35 },
-  { src: '/assets/scene-library/sprites/gob-archer.png', home: [0.68, 0.25, 0.2, 0.43], delay: 0.7, rise: 0.25 },
-  { src: '/assets/scene-library/sprites/gob-charge.png', home: [0.42, 0.3, 0.2, 0.3], delay: 0.55, rise: 0.3 },
-];
-
 export const SceneRevealLayer: React.FC<{
   reveal: Reveal;
   /** The base (hidden) plate src — the cutout is cropped from it. */
@@ -151,7 +143,7 @@ export const SceneRevealLayer: React.FC<{
 
       {/* revealFx variants — panel-slide aftermath. */}
       {revealed && mode === 'panel-slide' && fx === 'sprites' &&
-        SPRITES.map((s) => (
+        (reveal.sprites ?? []).map((s) => (
           <img
             key={s.src}
             src={s.src}

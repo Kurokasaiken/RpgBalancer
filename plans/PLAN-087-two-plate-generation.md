@@ -55,3 +55,13 @@ vogliamo muoverlo), gola (se la coulisse diventa revealabile).
 
 - F2: bottino — il "tell" (barlume) come lastra separata che si muove
 - F7: agguato — il pezzo mobile vs i sprite estratti (confronto eye-check)
+
+## Addendum — Wide-Plate Convention (Director 2026-10-24)
+
+Regola di generazione: le scene con cover/reveal si generano **molto più
+larghe** dello stage (~2.3x, es. 6300×1344) — il terzo sinistro è il
+foreground-cover (roccia/massa), il terzo destro la scena vera. **Noi
+croppiamo**: `panel = wide[0:panelW]` + `scene = wide[panelW-overlap:]`.
+Coincidenza al pixel per costruzione, niente outpainting (Gemini non lo fa),
+parallasse gratis sull'extra. Si applica a tutte le generazioni con reveal
+da ora in poi.
