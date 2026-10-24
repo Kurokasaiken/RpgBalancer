@@ -130,3 +130,9 @@ inalterato sull'ala destra — coesistenza simultanea.
   quest dei Rovi) — incipit rubricata, 3 paragrafi con {r|}/{m|} markup,
   gloss su «Passo del Corvo» + nota NB sulle monete, explicit+colophon
   (fratris Alderici, «manus dolet et atramentum friget»). 10/10 test verdi.
+
+- Estensione fasi (Director: «le quest devono avere anche tra le
+  informazioni questa per ogni fase»): `longForm` su `QuestPhaseSchema` +
+  `QuestPhase` type; tomo 📖 nella sidebar Journal di `QuestChronicle`
+  (per la fase corrente), overlay sheet fixed-position; contenuto authored
+  su fase `scout_tunnels` (city_rats). 10/10 test verdi, tsc pulito.

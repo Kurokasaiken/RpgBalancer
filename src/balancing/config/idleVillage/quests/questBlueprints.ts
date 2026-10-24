@@ -60,6 +60,27 @@ const RAW_DEFAULT_BLUEPRINTS: Record<string, QuestBlueprint> = {
             'Le squadre di scout percorrono i condotti laterali lasciando segnali alchemici per guidare i combattenti.',
           callToAction: 'Schiera i lantern scout per rivelare i nidi principali.',
         },
+        /* PLAN-085: la versione lunga dello scriba per la fase. */
+        longForm: {
+          variant: 'scene',
+          tier: 2,
+          incipitKey: 'Dei Tunnel Sottostanti, e delle luci che li segnano',
+          paragraphKeys: [
+            '«Prima che le armi scendessero, le {r|lanterne} discesero. I tunnel sotto la città non sono corridoi — sono un luogo diverso: l\'acqua che gocciola ha un suono diverso laggiù, e i {m|segnali alchemici} che gli scout lasciano sui muri brillano di un verde che il sole non ha mai visto.',
+            'Ogni scout porta tre cose: la lanterna, il gesso, e la promessa che nessuno degli altri lo aspetterà all\'uscita se tarda. Così lavorano — lenti, silenziosi, segnando i nodi dove i {m|nidi} respirano, così che i combattenti scendano già sapendo dove l\'oscurità è abitata.',
+            'Quando l\'ultima lanterna risale, il tunnel è ancora buio — ma non più ignoto. E su questa differenza, fra il buio e l\'ignoto, le quest si vincono.»',
+          ],
+          marginalia: [
+            { afterParagraph: 0, kind: 'gloss', lemma: 'segnali alchemici', textKey: 'gesso verde fosforescente: tre spazi, poi il simbolo — v’è chi giura che certi segnali restino accesi un anno' },
+            { afterParagraph: 2, kind: 'nota', textKey: 'NB: la regola della terza lanterna — chi scende terzo, risale primo' },
+          ],
+          colophon: {
+            scribeKey: 'Scriptum per manus fratris Alderici',
+            placeKey: 'in scriptorio Sancti Corvi',
+            complaintKey: 'qui atramentum viride lucet et digitus ungues foedat',
+          },
+          explicitKey: 'Explicit nota prima de specubus.',
+        },
         icon: '🕯️',
         telemetryTags: ['quest_city_rats', 'phase:scout'],
         riskProfile: {
