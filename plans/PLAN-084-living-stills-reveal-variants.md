@@ -1,6 +1,6 @@
 # PLAN-084 — Living stills: reveal narrativi + varianti di scena
 
-**Stato:** in corso — slice T1/T3 implementato 2026-10-24 (FX-reveal click→burst→flag su f7-agguato)
+**Stato:** `fatta` — slice T1/T3 committata e verificata (Director ruling 2026-10-24); residui OB-4/5/8 passano a plan dedicato
 
 ### Coperto (bundle 2026-10-24)
 - OB-1 schema `reveal` Zod (forma: `region + trigger: click|timed + afterSeconds + burst[] + flag`) — manca `cameraZ`/`decisionPoint` come trigger
