@@ -1,5 +1,10 @@
 # Mobile-First Development Guidelines
 
+> **Per `/game`**: le regole di authoring mobile-fit vive in
+> `src/docs/docs/design/hud_component_guide.md` §6c (PLAN-083) + trappola
+> T-24 in `context/recurring-traps.md`. Questa guida resta il riferimento
+> generale mobile-first del progetto.
+
 ## Principi Generali 📱
 
 **REGOLA ORO**: Ogni nuova feature deve funzionare PRIMA su mobile, poi su desktop.

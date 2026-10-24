@@ -2,7 +2,7 @@
 id: PLAN-083
 title: "PLAN-083: Mobile fit della superficie /game — playtest da telefono (R-274)"
 created: 2026-10-23
-status: in corso — battezzato dal Director 2026-10-23 («procedi») su artifact r007 convergente; mobileZoomRangeFloor/navPrimaryIds = default da tuning device, registrati in T-007 evidence
+status: in corso — battezzato dal Director 2026-10-23 («procedi»). T-001..T-005 implementati + spec mobileFit **9/9 verde** (Chromium Pixel 7 390×844, build playwright). Aperti: T-006 tap-to-place (path primario dnd — non ancora implementato), tap-to-reveal tooltip, T-007 chiusura/eye-check Director su device reale.
 debate_artifact: mind-weaver/.mw/runs/20261023-mobile-fit-plan083/artifact-r007.md
 debate_hash: 65709766f0008e62f3554fc563779c5ad771aabdaefdd860564d0d65c0be981c
 ---
@@ -149,6 +149,31 @@ desktop; eye-check Director mobile E desktop; checklist device reale;
 **valore `mobileZoomRangeFloor` + device di tuning registrati** (ruling
 Director — invariante falsificabile); audit reuse formatter i18n T-003.
 
+## Artefatto: tabella priorità gesti (T-006, contratto dibattito)
+
+| Priorità | Gesto | Target | Timeout/soglia | Conflitto → regola |
+|---|---|---|---|---|
+| 1 | **tap** | nav chip, bottoni, pin, sheet rows, menu item | `tapMaxMs:300`, `tapMaxMovePx:10` | vince sempre: nessun hold attivo sotto tapMaxMs |
+| 2 | **pinch** | canvas mappa (2 dita) | `pinchStartDeltaPx:12` | il 2° dito congela il pan → baseline pinch; `pointercancel` → restore pre-gesto |
+| 3 | **pan/drag mappa** | canvas mappa (1 dito) | `panSlopPx:8` | dopo pinch→1 dito: rebind alla posizione corrente, nessun salto |
+| 4 | **drag dnd-kit** | medaglioni roster → slot | `holdToDragMs:180` o `minDragDistance:5` | su touch è ENHANCEMENT — il path primario è tap-to-place (T-006); su drag source `touch-action:none` |
+| 5 | **long-press** | tooltip pin (v1.1) | `longPressMs:550` | declassato: v1 usa tap-to-reveal; mai sullo stesso target del drag |
+| — | **scroll pagina** | ovunque su `/game` | — | soppresso: `touch-action:none` canvas, `overscroll-behavior:none` shell, `pan-y` dentro gli sheet |
+
+## Artefatto: tabella hotkey → UI (T-004, contratto dibattito)
+
+| Hotkey | Azione | Equivalente touch a 390px | Stato |
+|---|---|---|---|
+| `h` | hide/show HUD | perla `data-hud-hide-toggle` (bottom-right) | ✅ tap |
+| `r` | Settlement Registry (villaggio) | chip Registro nel drawer villaggio | ✅ tap |
+| `F10` | Director panel | dev-only, fuori scope mobile | n/a |
+| `Esc` | chiudi pannello/sheet/menu | backdrop tap + close ≥44px (sheet) / X pannello | ✅ tap |
+| `← →` | scorri edifici villaggio | pan/swipe sulla scena villaggio | ✅ tap+pan |
+| `Enter` | dettaglio edificio | tap sul pin edificio | ✅ tap |
+| `Alt` (hold) | glass-globe tilt mappa | nessun equivalente — fuori scope v1 | ➖ v1.1 |
+| `+/-` wheel | zoom mappa | pinch a 2 dita | ✅ gesture |
+| `1-9` panel shortcuts | toggle pannelli HUD | trigger `[data-hud-panels-trigger]` + sheet | ✅ tap |
+
 ## Dibattito multi-AI — esito
 
 Run: `mind-weaver/.mw/runs/20261023-mobile-fit-plan083/` · 7 round ·
@@ -183,3 +208,25 @@ quality profile GPU completo, packaging store (Tauri/TWA — piano separato).
 - Drag&drop touch verificato solo in teoria: il path primario è
   tap-to-place; il drag nativo è enhancement post device-check.
 - `overscroll-behavior`/pull-to-refresh best-effort su iOS Safari.
+
+## Avanzamento implementazione (2026-10-24)
+
+- **T-001..T-005 fatti.** Spec `tests/mobileFit.spec.ts` progetto `Mobile Fit`
+  (Chromium Pixel 7, 390×844, `hasTouch`) — **9/9 PASS**: no overflow, nav
+  ≥44px non sovrapposta + «Altro», HUD senza clip, zoom ≥ cover + focale
+  centrato, pan clamp su quad mare, range pinch ≥ floor, hint tastiera
+  soppressi su coarse, pannelli ≤ viewport, desktop emit-identical a 1280.
+- **T-006 parziale.** Canvas `touch-action:none` + `overscroll-behavior` +
+  tabelle gesti/hotkey nel piano ✅. **Tap-to-assign: GIÀ ESISTENTE su
+  `/game`** (verificato in codice): `PgCard.onSelect` → `onResidentSelect`
+  → `useQuestPoiSession`/`useQuestExpeditionSession.handleResidentSelect`
+  assegnano il residente al primo slot compatibile del dettaglio quest
+  aperto, con flight animation. Limite dichiarato del path: funziona solo a
+  quest-detail aperto + slot compatibile (nessun picker a più slot); gli
+  slot villaggio edificio sono fuori scope (`VillageSlotOverlay` visual-
+  only, `WorkerPickerSheet`/`useSandboxInteractionMode` restano sandbox/
+  legacy). Tap-to-reveal tooltip villaggio → v1.1.
+- **T-007 aperto** — evidence pack, `closure:lint`, eye-check Director su
+  device reale (OB-5).
+- Note: unit `mobileFitConfig` 14/14 PASS; `tsc` clean; WebKit non installato
+  → progetto su Chromium; `__worldCamBounds` seam pubblica i bound effettivi.

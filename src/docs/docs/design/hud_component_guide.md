@@ -408,6 +408,7 @@ Quattro eventi con un nome fisso, da collegare quando esisterà il suono: `ui.ho
 [ ] 8. Movimento §6.7: durate della tabella, reduced-motion verificato
 [ ] 9. Risoluzioni §6.8: screenshot a 1280×720, 1440×900, 2560×1440; fissi non coprono la terra
 [ ] 10. Accessibilità §6.9: contrasto ≥4,5:1, colore mai da solo, Tab nell'ordine visivo, scorciatoia nel tooltip
+[ ] 11. Mobile-fit §6c: verificato a 390×844 touch, target ≥44px, niente azioni solo-hover/tastiera senza equivalente, sheet mode regge, niente magic number (mobileFitConfig)
 ```
 
 ---
@@ -423,6 +424,49 @@ La guida nasce per i pannelli **sopra la mappa** di `/game`, ma il materiale val
 5. **Gli overlay narrativi** (cinematica, verdetto) stanno nel plinth o sopra lo stage con scrim; non aprire drawer/pannelli ad hoc fuori dal telaio.
 
 File di riferimento: `src/ui/idleVillage/questS1Lab/hud/*` (già dentro `STRICT_FILES` della guardia).
+
+---
+
+## 6c. Mobile-fit (PLAN-083, R-274): scrivere componenti che nascono touch-ready
+
+La superficie `/game` vive su **due modalità**, non una: sotto
+`mobileFitConfig.breakpointPx` (768) è attiva la modalità mobile-fit —
+chrome compatto, pannelli `sheet`, gesti touch; a `≥768` il layout desktop
+resta **emit-identical per costruzione**. Un componente che esiste solo nel
+branch desktop è un bug alla nascita: verrà trovato rotto, non mai
+scoperto.
+
+Regole che non si negoziano:
+
+- **Niente magic number mobile.** `768`, `390`, `44`, `180` e ogni soglia di
+  gesto si leggono da `getMobileFitConfig()` — mai inline nel componente.
+- **Target ≥44×44px, gap ≥8px** su ogni elemento interattivo (inclusi chip,
+  icone cliccabili, voci di menu). Se non ci sta, va in overflow (`«Altro»`
+  o sheet), non si rimpicciolisce sotto il minimo.
+- **Ogni azione ha un equivalente touch.** Niente funzionalità solo-hover,
+  solo-tastiera, solo-modificatore (Alt). Gli hint keyboard-only si
+  nascondono su `pointer:coarse` (pattern: `useCoarsePointer()` → render
+  condizionale, vedi `legend.keys` in `VillageScreenView`).
+- **`panelMode`-aware.** Un pannello nuovo deve reggere `sheet` (full-bleed
+  `position:fixed`, `max-height:100dvh`, scroll interno `pan-y`) senza
+  riscrivere il contenuto. Spread `panelStyle` di `useHudPanelDrag` **per
+  ultimo** nello style — in sheet mode sovrascrive la geometria ancorata.
+  Il drag handle è inert in sheet mode per costruzione; non aggiungere
+  handle proprii.
+- **Niente larghezze fisse oltre ~360px** senza variante compatta. Chrome
+  ancorato ai bordi usa `env(safe-area-inset-*)` (pattern: `paddingBottom:
+  'calc(8px + env(safe-area-inset-bottom, 0px))'`).
+- **`touch-action` dichiarato per superficie**: `none` sul canvas mappa e
+  sulle sorgenti drag, `pan-y` dentro gli sheet, `overscroll-behavior:
+  none` sulla shell. Il browser non decide i gesti al posto tuo.
+- **La camera è del piano.** Contenuti nuovi sulla mappa rispettano bound
+  effettivi + pan clamp (`resolveEffectiveZoomBounds`); non scrivere
+  listener pointer propri sul canvas — il recognizer DOM esistente è il
+  solo writer di `cam` per touch.
+- **Test obbligatorio**: se il componente introduce superficie o
+  interazione nuova, aggiungi l'asserzione in `tests/mobileFit.spec.ts` —
+  la verifica a 390×844 touch è parte del «fatta», non un extra (trappola
+  T-24).
 
 ---
 
