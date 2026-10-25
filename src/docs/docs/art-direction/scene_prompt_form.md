@@ -278,6 +278,8 @@ A5 loot specificity) → `B1` hook → `B2` composition (+B3 value plan)
 mood-modifiers → `D1..D7` se la scena è parallax → kill list → aspect.
 ~200–280 parole, prosa unica con ancore CAPS.
 
+- **REF-CLEAN** (R-XXX, da batch 2026-10-25): se si allega una style-reference, ispezionarla per firme/watermark nei corner PRIMA dell'attach — la kill-list non blocca contenuto copiato dal ref. Ref firmata → croppare la banda o scegliere altro ref.
+
 ## Preflight
 
 `python scripts/lint-scene-prompts.py` verde + R4bis checklist +
