@@ -31,6 +31,7 @@ Un caso singolo resta un pattern-candidate: non viene promosso.
 | `page.evaluate`, helper Playwright condivisi, script lanciati via tsx | T-15 |
 | `<select>`/`<button>` nativi dentro pill `data-hud-controls`, hit-area, click "che non fa nulla" | T-21 |
 | misura di latenza/percezione, verde E2E con sintomo ancora presente, preview vs dev server | T-22 |
+| prompt per generatori immagini esterni (Gemini/SD), batch su web-UI, style-reference attach, scorecard scene | T-16, T-25, T-26, T-27, T-28 |
 
 ---
 
@@ -622,3 +623,48 @@ Ispezionare gli angoli delle ref prima dell'attach; ripulire o cambiare.
 `turned earth / churned dirt / dug soil / excavated` producono fango
 anche con `NO mud` in kill list. Il terreno si dipinge come muschio,
 ombra teal o lettiera — mai come materia scavata.
+- **T-20 — Anchor FX stimati, non misurati**: gli `at`/`region` vanno derivati
+  dall'immagine shippata (blob-detect per fuochi, crop-check per glint/firme),
+  mai da memoria/preview. Rileva prima, scrivi dopo.
+- **T-21 — Soggetto senza verb-check**: prima del SUBJECT, rileggi il verbo
+  del nodo (cerca/aggira/fuggi/trova). "Cerca" vuole ritrovamenti sparsi,
+  non un eroe-oggetto mostrato. E "interessante" ≠ "merce".
+
+
+## T-25 — Batch cattura "ultima immagine" senza prova di nuova generazione
+
+Screenshot di `imgs[-1]` dopo il submit: se la generazione non è finita si
+cattura la precedente → N file, pochi md5 unici. Regola: contare gli elementi
+immagine generati prima del submit, attendere l'incremento, catturare
+all'indice nuovo; exit non-zero se non incrementa. Mai fare split di
+identificativi su `-` (id multi-token): leggere il plan JSON.
+Fonte: batch mood-keys 2026-10-25 (12 file, 3 md5 unici).
+
+## T-26 — Registro STYLE non si parafrasa (term-strumenti bibbia)
+
+I prompt battezzati funzionano per lessico, non per struttura: `slams`,
+`blinding`, `searing highlights`, `vibrant azure sky`, `shadowed faces GLOW
+in saturated <pigment>`, `violent palette-knife impasto`, `every plane
+vibrates`, `no flat colors`. Qualsiasi parafrasi ("shafts breaking
+through", "luminous sky") degrada a concept-art smorzata — il batch
+12/12 bocciato 2026-10-25 lo dimostra. Registro canonico:
+`scene_prompt_form.md` §Registro STYLE.
+
+## T-27 — REF-CLEAN: la style-reference insegna i suoi difetti (2a occorrenza)
+
+La kill-list non blocca ciò che è DENTRO la ref: la firma "JONES" di
+`verso mordor.png` è stata copiata su 3/3 output dark-wasteland.
+Preflight obbligatorio: ispezionare i corner della ref per firme/watermark,
+croppare la banda o cambiare ref. E: attach può fallire in silenzio —
+il prompt deve reggere senza ref. Vedi PROPOSALS P-009.
+
+## T-28 — Stessa palette ≠ stesso mood: semantica prima del pigmento
+
+"Famiglia" per palette/tecnica non basta: il Director boccia il *significato*.
+Ogni prompt scena deve portare i campi-prova visibili (pillar signature,
+light-event con verbo+geometria, medium/aria, scale anchor, camera height),
+role-clause sulla triade (creature embodies / place witnesses / relic leaks
+da altra chiave) e MOOD_PROOF (senza nome-chiave, quale relazione visibile
+identifica il mood?). Kill estetici → positivi nel campo nativo; HYGIENE
+cap ~5. Template convergente: `.mw/runs/2026-10-25-mood-keys-learn/pattern-candidate.md`
++ `context/research/2026-10-25-mood-keys/critiques/`.

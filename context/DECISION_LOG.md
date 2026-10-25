@@ -1516,3 +1516,20 @@ nessuna status-matrix doc separata.
 **Motivo:** il Director ha ordinato l'implementazione completa senza
 pause ("procedi ad implementare tutto il plan senza fermarti x domande").
 **Fonte:** sessione agente locale, PLAN-029 §8.
+
+
+## 2026-10-25 — Mood keys: da 2 pilastri a 4 chiavi (evoluzione canone)
+
+**Da:** bibbia §1 prevede DUE pilastri (Wilderness + Empire); "prismatic" come
+qualità trasversale; "deserti basaltici" = geografia Empire.
+**A:** FOUR mood keys (Director ruling in sessione mood-keys): Rude Beauty,
+Impero Solare, **Prismatic** (rovine/invasioni da un ALTRO MULTIVERSO —
+strutture aliene che non appartengono al paesaggio; iridescenza solo su
+veli/membrane/lenti), **Dark Wasteland** (chiave propria: cobalto-vs-arancio,
+oscurità luminosa, NO meteore, impasto violento, niente perfezione).
+**Motivo:** il moodboard evoluto; la tassonomia 4-chiavi serve a generare
+scena-library coerente per bioma.
+**Fonte:** `context/research/2026-10-25-mood-keys/README.md` §Canon evolution.
+**Nota:** la bibbia `art_direction_plan.md` §1 non è ancora aggiornata —
+questa entry registra il ruling; la modifica della bibbia richiede
+approvazione Director.
