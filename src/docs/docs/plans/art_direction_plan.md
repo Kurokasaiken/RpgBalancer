@@ -1,4 +1,4 @@
-# DNA PRISMATIC WANDERLUST – BIBBIA DI DIREZIONE ARTISTICA (v0.14)
+# DNA PRISMATIC WANDERLUST – BIBBIA DI DIREZIONE ARTISTICA (v0.15)
 
 Core Philosophy: Antitesi del dark fantasy. Energia cinetica, libertà, e trionfo solare. Il mondo non è "sporco", è materico. La povertà non è "miseria", è rude bellezza.
 
@@ -19,6 +19,28 @@ Core Philosophy: Antitesi del dark fantasy. Energia cinetica, libertà, e trionf
 - **Geografia:** Deserti basaltici, architetture colossali sospese.
 - **Materiali:** Basalto Nero venato, Bronzo Barocco (Sun-Bronze), Sete iridescenti.
 - **Sky Color:** Indaco profondo / Vuoto Prismatico.
+
+### 1.5 LE QUATTRO MOOD KEYS OPERATIVE (evoluzione — Director ruling 2026-10-25)
+
+I due pilastri restano la struttura del mondo. Operativamente la pipeline
+scena/moodboard usa **quattro chiavi mood**: due sono i pilastri, due sono
+chiavi proprie aggiunte per evoluzione del progetto
+(rif. `context/DECISION_LOG.md` 2026-10-25; template:
+`art-direction/scene_prompt_form.md`; batch di validazione:
+`context/research/2026-10-25-mood-keys/`).
+
+| Chiave | Natura | Firma semantica (prova visibile) | Luce | Medium/aria | Camera |
+| --- | --- | --- | --- | --- | --- |
+| **Rude Beauty** | = Wilderness | il luogo invita il viaggio: una via/porta/vista che tira l'occhio oltre il frame | sole bianco di mezzogiorno che SLAM sulle superfici | chiarezza alpina secca | eye-level, avventurosa |
+| **Impero Solare** | = Empire | gerarchia resa visibile: il vivente è schiacciato dalla scala monumentale | il sole come presenza bianco-calda; luce assiale verticale, cielo dissolto in haze bianco-oro | polvere basaltica dorata | low-angle, soggezione |
+| **Prismatic** | chiave propria — **rovine/invasioni da un altro multiverso** | materiale alieno viola la continuità del paesaggio nativo; la giuntura relitto↔terreno appare sbagliata apposta | sole naturale sul terreno; iridescenza SOLO su veli/membrane/lenti/superfici vitree — MAI beam arcobaleno in cielo (prevedibile, vietato salvo beam motivato da oggetto) | "wrong-medium": particelle e quiete che non appartengono | leggermente disorientata, off-axis |
+| **Dark Wasteland** | chiave propria | sopravvivenza sotto ostilità: una tasca ember-illuminata di resistenza contro il vasto scuro | arancio bruciante che rompe DENTRO la massa di tempesta indaco — MAI meteore/sciami/stelle cadenti | cenere e brace | rasoterra |
+
+**Regole trasversali delle chiavi:**
+- Ogni scena dichiara pillar signature + light-event + medium + scale anchor + camera — non solo palette (T-28, `recurring-traps.md`).
+- Creature: grammatica di famiglia per chiave — wilderness→Mythic Beasts/Forest Parasites; empire→Beasts/Ancient Constructs; prismatic→intrusion-touched (iridescenza solo parti traslucide); wasteland→survivor/war-remnant.
+- Reliquia: porta/leak di potere da UN'ALTRA chiave (tiene le quattro chiavi nello stesso mondo).
+- Ombre mai grigie/marroni ovunque; ogni chiave ha UNA NOT-line: wilderness "non pastorale-carina"; impero "non solo dorato — bianco accecante"; prismatic "iridescenza è materia, non meteo"; wasteland "non grim-mud — oscurità luminosa satura".
 
 ---
 

@@ -10,6 +10,7 @@ The canonical art bible already lives in **`src/docs/docs/plans/art_direction_pl
 ## Key Tenets (see bible §1‑§6)
 
 1. **Dual Pillars** – Wilderness (rude beauty, Dolomiti valleys, Golden Thatch) vs Empire (solar baroque, basalt deserts, Sun-Bronze).
+   - **Evolution (bible §1.5, Director ruling 2026-10-25):** operational FOUR mood keys — Rude Beauty, Impero Solare, Prismatic (multiverse-intrusion ruins), Dark Wasteland — with per-key semantic signature, light-event, medium, camera.
 2. **Split Rendering** – Faces = Ruan Jia polish, bodies/matter = Jaime Jones/Jeff Easley impasto.
 3. **Palette Doctrine** – No grey/brown shadows; default shadows = deep teal/emerald. Light = “Solar Triumph” white with prismatic dust.
 4. **Prompt Guardrails** – Zone-based instructions, material specificity (“Baroque Sun-Bronze”), anti-sci-fi kill list.
