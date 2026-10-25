@@ -28,3 +28,4 @@
 | moodboard | refs | all | canonical domain refs per Director ruling 2026-10-25; aqueduct_FINAL NOT promoted to ref | ruling | — | — | ref set frozen until next ruling |
 | gola-raider | quest-scene | rude-beauty | — | edit: +light-event ambra fondo +rock anchor +contrasto | edit1 | FORK-5 | **candidate** (era ~) | fix = light-event dominant, il deficit ~ esatto | pattern ~→✓ = add motivated light source | fresh |
 | accampamento-raider | quest-scene | rude-beauty | — | edit: +falò focale +palizzata anchor +veronese +teal deep | edit1 | FORK-5 | **candidate** (era ~) | focale rinforzata | same pattern | fresh |
+| santuario-valle | quest-scene | rude-beauty/jungle | jungle-ruins ref as palette-example | edit: warm gold bleed + split-tone + banner fire | edit1 | FORK-5 light/palette | **PASS 6/6 gates** | ref-as-palette-example works (2nd use after aqueduct) | protocol A8 first full pass on 1st edit | fresh |
