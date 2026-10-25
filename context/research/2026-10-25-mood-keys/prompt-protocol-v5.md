@@ -255,3 +255,47 @@ Prompt-phrase: "chromatic movement INSIDE every field — interleaved
 contrasting hues in the same zone: warm flecks within cool fields,
 cool glints within warm fields, like the canopy band where light-green,
 dark-green, teal, flame and sparks live interleaved".
+
+## A12 — NARRATIVE VARIATION & CAUSAL COLOR (ruling Director 2026-10-25)
+
+Lezioni dell'iterazione A11→A12→fiori — sopra il metro "tipo" e
+"intreccio", serve la *storia*:
+
+1. **VARIATION = STORY, not decoration.** "Differenzia i props" non
+   basta: ogni ripetizione (tende, alberi, scogliere, rocce) deve
+   raccontare CHI ci vive — trofei di corna, marchio di guerra,
+   spiedo-carne, pelli ad essiccare, licheni, pino contorto. Regola:
+   "ogni elemento ripetuto ha una motivazione narrativa specifica",
+   mai "dettagli vari". Metro = credibile, vissuto, da abitanti
+   specifici (non abitanti generici).
+
+2. **CAUSAL COLOR FIELD.** Ogni campo colore vuole un *motivo*
+   per cui esiste: la fascia violetta del cielo funziona solo quando
+   è "l'etere che sanguina dall'orizzonte". Campo colore senza causa
+   = decorazione piatta; campo colore causato = grammatica del mondo.
+   Nel prompt: nomina il campo + il suo motivo ("the violet band is
+   the ether's glow bleeding from the horizon", non "violet sky").
+
+3. **ACCENT = DELIBERATE COMPLEMENT.** Un accento non è un colore
+   qualsiasi: va scelto per *scontrarsi* con entrambi i dominanti
+   (cobalto dei fiori vs verde+viola). Regola: "choose the accent
+   that contrasts BOTH dominant fields", non "add color".
+
+4. **PROMOTION = POST-EYE-APPROVAL.** Un'immagine entra nel
+   moodboard/canone solo dopo approvazione Director esplicita.
+   Nessun PASS del gate interno promuove a ref da solo — il gate
+   produce CANDIDATI, il ruling produce CANON.
+
+5. **META — il prompt è la traduzione dei feedback, non il template.**
+   La fonte del gusto è il Director; il protocollo serve a non perdere
+   i feedback tra iterazioni. Ogni correzione va tradotta in regola
+   esplicita e registrata nel ledger — se una regola non deriva da
+   una correzione osservata, è template, non canone.
+
+### Sintesi della catena (evidence)
+- camp: monotonia alberi → betulle+snag+tronchi variati; tende
+  generiche → patchwork, trofei, marchi, rack, ruota, effigie
+- gola: puntini bianchi → rimossi; scogliere ripetute → moss-shelf,
+  licheni, striature viola, pino contorto
+- aqueduct: cielo piatto → aurora sx; violetta decorativa → ether-glow;
+  fiori generici → cobalto complementare
