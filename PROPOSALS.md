@@ -107,3 +107,14 @@ Soglia: pattern visto in almeno due contesti distinti o in due sessioni diverse.
 4. Mitigazione opzionale da valutare: auto-reload una-tantum in `ErrorBoundary` sulla classe «dynamically imported module»/ChunkLoadError — nessuna modifica fatta, serve ruling Director.
 
 **Nota operativa appresa:** `nvm use` può dichiarare successo lasciando `node` alla versione cache-hashed della shell — `hash -r` prima di riavviare processi pinati.
+
+
+## P-009 — REF-CLEAN: la style-reference va ispezionata per firme/difetti prima dell'attach (2026-10-25)
+
+Seconda occorrenza (prima: 2026-10-24 sessione goblin — già in
+`observation.jsonl`). La kill-list del prompt non copre difetti presenti
+nella reference: firma dipinta, watermark, bordo. Proposta: preflight
+meccanico sulle ref — crop/scan dei 4 corner per testo/firme, e veto su ref
+"sporche" nel pipeline di generazione. Oggi: regola manuale in
+`scene_prompt_form.md` + trappola T-27. Un checker d'angolo (OCR-lite o
+contrasto-localizzato) lo renderebbe automatico.
