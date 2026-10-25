@@ -1,11 +1,11 @@
 <!doctype html><html lang="it"><head><meta charset="utf-8"><title>Mood Keys — batch 2026-10-25</title>
 <style>
 body{background:#16181d;color:#e8e6df;font-family:system-ui,sans-serif;margin:0;padding:32px;max-width:1500px}
-h1{font-size:26px} h2{font-size:20px;margin-top:48px;border-top:1px solid #333;padding-top:24px}
+h1{font-size:26px;margin-bottom:4px} h2{font-size:20px;margin-top:48px;border-top:1px solid #333;padding-top:24px}
 h3{font-size:15px;color:#cbb26a;margin:24px 0 8px}
 .grid{display:flex;gap:10px;flex-wrap:wrap}
-figure{margin:0;flex:0 0 auto}
-img{display:block;width:100%;max-width:430px;border-radius:4px}
+figure{margin:0;flex:0 0 auto;position:relative}
+img{display:block;width:100%;max-width:430px;border-radius:4px;cursor:zoom-in}
 figcaption{font-size:11px;color:#999;margin-top:4px;max-width:430px}
 .ref{border:3px solid #cbb26a}
 .kicker{color:#cbb26a;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
@@ -14,15 +14,44 @@ summary{cursor:pointer;color:#7fb3d5;font-size:13px}
 pre{background:#0d0f12;padding:12px;border-radius:6px;font-size:11px;white-space:pre-wrap;line-height:1.5}
 .note{color:#9aa;font-size:13px;max-width:900px;line-height:1.55}
 .bad{border:2px dashed #a55}
-table{border-collapse:collapse;font-size:13px} td,th{padding:4px 10px;border:1px solid #333;text-align:left}
+.pilot{border:2px solid #5a8}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:99;cursor:zoom-out;flex-direction:column}
+#lb img{max-width:96vw;max-height:88vh;width:auto}
+#lbcap{color:#ccc;font-size:14px;margin-top:10px}
+.ev{background:#2a2d33;color:#cbb26a;border:1px solid #444;border-radius:3px;cursor:pointer;font-size:11px;padding:0 5px}
+#evp{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100}
+#evbox{background:#1e2126;border:1px solid #444;border-radius:8px;padding:20px;max-width:560px;font-size:14px;line-height:1.55}
+#evbox button{float:right;background:#333;color:#eee;border:none;border-radius:4px;padding:4px 10px;cursor:pointer}
 </style></head><body>
-<h1>Mood Keys — batch generativo 2026-10-25</h1>
-<p class="note">4 chiavi × 3 scene · triade creatura+luogo+reliquia · template v4 (KEY semantics + role clauses + per-key composition + hygiene) · registro battezzato · ref allegata · 3 draw per scena. Sopra a sinistra la reference del moodboard.</p>
-<h2>Rude Beauty (Wilderness)</h2><div class="grid"><figure><img loading="lazy" src="images/refs/rude-beauty-ref.png"><figcaption>REF — moodboard (autoriale)</figcaption></figure></div>
-<h3>shepherd-shrine <span class="kicker">· MONOLITH</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/rude-beauty-shepherd-shrine.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/rude-beauty-shepherd-shrine_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/rude-beauty-shepherd-shrine_d3.png"><figcaption>draw 3</figcaption></figure>
+<div id="lb" onclick="this.style.display='none'"><img id="lbi"><div id="lbcap"></div></div>
+<div id="evp" onclick="this.style.display='none'"><div id="evbox" onclick="event.stopPropagation()"><button onclick="document.getElementById('evp').style.display='none'">chiudi</button><div id="evtxt"></div></div></div>
+<script>
+function lb(src,cap){document.getElementById('lbi').src=src;document.getElementById('lbcap').textContent=cap;document.getElementById('lb').style.display='flex'}
+function evPop(e,t){e.stopPropagation();document.getElementById('evtxt').textContent=t;document.getElementById('evp').style.display='flex'}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('lb').style.display='none';document.getElementById('evp').style.display='none'}});
+</script>
+<h1>Mood Keys — batch 2026-10-25</h1>
+<p class="note">Click = ingrandisci · ⓘ = valutazione agente (non approvazione — gate = eye-check Director). <b>Le novità stanno sempre in cima, sotto il titolo.</b></p>
+<h2>Protocollo v5 — edit loop (novità)</h2>
+<h3>siege-skeleton — FORK-5 color-field edit <span class="kicker">PASS (valutazione agente)</span></h3><div class="grid">
+<figure class="pilot"><img loading="lazy" src="images/dark-wasteland-siege-skeleton.png" onclick="lb(this.src,'BEFORE — cielo violetto')"><figcaption>BEFORE — cielo violetto</figcaption></figure>
+<figure class="pilot"><img loading="lazy" src="images/dark-wasteland-siege-skeleton_EDIT1.png" onclick="lb(this.src,'EDIT1 — indaco+arancio nella massa ✓ candidato')"><figcaption>EDIT1 — indaco+arancio nella massa ✓ candidato</figcaption></figure>
+</div>
+<h3>shepherd-shrine — sky-fix + edit verde <span class="kicker">edit in corso</span></h3><div class="grid">
+<figure class=""><img loading="lazy" src="images/rude-beauty-shepherd-shrine.png" onclick="lb(this.src,'draw1 v4 — cielo ok, prato spento')"><figcaption>draw1 v4 — cielo ok, prato spento</figcaption></figure>
+<figure class=""><img loading="lazy" src="images/rude-beauty-shepherd-shrine_skytest.png" onclick="lb(this.src,'skytest — cielo cyan saturo, prato ancora olive (difetto Director)')"><figcaption>skytest — cielo cyan saturo, prato ancora olive (difetto Director)</figcaption></figure>
+</div><p class="note">edit verde: PASS al regression gate (valutazione agente, eye-check pendente).</p>
+<h2>Strisce confronto ref→draw1</h2><div class="grid">
+<figure class=""><img loading="lazy" src="sheets/compare4_rude-beauty.png" onclick="lb(this.src,'rude-beauty')"><figcaption>rude-beauty</figcaption></figure>
+<figure class=""><img loading="lazy" src="sheets/compare4_impero-solare.png" onclick="lb(this.src,'impero-solare')"><figcaption>impero-solare</figcaption></figure>
+<figure class=""><img loading="lazy" src="sheets/compare4_prismatic-frontier.png" onclick="lb(this.src,'prismatic-frontier')"><figcaption>prismatic-frontier</figcaption></figure>
+<figure class=""><img loading="lazy" src="sheets/compare4_dark-wasteland.png" onclick="lb(this.src,'dark-wasteland')"><figcaption>dark-wasteland</figcaption></figure>
+</div>
+<h2>Rude Beauty (Wilderness)</h2><div class="grid"><figure class="ref"><img loading="lazy" src="images/refs/rude-beauty-ref.png" onclick="lb(this.src,'REF — moodboard (autoriale)')"><figcaption>REF — moodboard (autoriale)</figcaption></figure></div>
+<h3>shepherd-shrine <span class="kicker">· MONOLITH · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/rude-beauty-shepherd-shrine.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Cielo cyan-turchese saturo post-fix ✓; cappella-cairn leggibile, reliquario ambra che glowa. DIFETTO (Director): prato olive/yellow-brown, non veronese vivo → edit verde in corso.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/rude-beauty-shepherd-shrine_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Variante più aperta, luce più diffusa; prato verde più presente ma ancora spento rispetto al ref.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/rude-beauty-shepherd-shrine_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Composizione più compressa, muflone dominante; erba con zone marroni.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -46,10 +75,10 @@ Palette: sky vivid cyan-turquoise azure at maximum saturation; shadows GLOW satu
 HYGIENE: no signature or painted name-marks anywhere including corners, no text, no watermark, no card corners or vignette border — full-bleed edge-to-edge.
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
-<h3>gorge-bridge <span class="kicker">· CASCADE</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/rude-beauty-gorge-bridge.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/rude-beauty-gorge-bridge_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/rude-beauty-gorge-bridge_d3.png"><figcaption>draw 3</figcaption></figure>
+<h3>gorge-bridge <span class="kicker">· CASCADE · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/rude-beauty-gorge-bridge.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Ponte-quercia sulla gola, capra-serpente scaglie bronzo, idolo su catene sotto — CASCADE leggibile. Cielo cyan post-fix.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/rude-beauty-gorge-bridge_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Variante con più profondità di gola; impasto buono.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/rude-beauty-gorge-bridge_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Angolo diverso, capra più vicina; un po\&#x27; più di marrone sul ponte.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -73,10 +102,10 @@ Palette: sky vivid cyan-turquoise azure at maximum saturation; shadows GLOW satu
 HYGIENE: no signature or painted name-marks anywhere including corners, no text, no watermark, no card corners or vignette border — full-bleed edge-to-edge.
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
-<h3>harvest-waystone <span class="kicker">· VISTA</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/rude-beauty-harvest-waystone.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/rude-beauty-harvest-waystone_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/rude-beauty-harvest-waystone_d3.png"><figcaption>draw 3</figcaption></figure>
+<h3>harvest-waystone <span class="kicker">· VISTA · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/rude-beauty-harvest-waystone.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Forse la più vicina al registro ref: sole bianco con flare, prato veronese, lepre corna-ambra, falce dorata. Candidato forte.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/rude-beauty-harvest-waystone_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Waystone più laterale, cielo più nuvoloso — meno SLAM.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/rude-beauty-harvest-waystone_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Composizione simile a d1, erba più gialla in fg.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -101,11 +130,11 @@ HYGIENE: no signature or painted name-marks anywhere including corners, no text,
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
 </div>
-<h2>Impero Solare (Empire)</h2><div class="grid"><figure><img loading="lazy" src="images/refs/impero-solare-ref.png"><figcaption>REF — moodboard (autoriale)</figcaption></figure></div>
-<h3>sun-forge <span class="kicker">· TABLEAUX</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/impero-solare-sun-forge.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/impero-solare-sun-forge_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/impero-solare-sun-forge_d3.png"><figcaption>draw 3</figcaption></figure>
+<h2>Impero Solare (Empire)</h2><div class="grid"><figure class="ref"><img loading="lazy" src="images/refs/impero-solare-ref.png" onclick="lb(this.src,'REF — moodboard (autoriale)')"><figcaption>REF — moodboard (autoriale)</figcaption></figure></div>
+<h3>sun-forge <span class="kicker">· TABLEAUX · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/impero-solare-sun-forge.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Bianco-oro accecante reale, canali fusi a raggiera, leone criniera-raggi — Solar Triumph fedele. Candidato forte.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/impero-solare-sun-forge_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Variante più scura, meno accecante.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/impero-solare-sun-forge_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Stendardo-sole centrale più leggibile.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -129,10 +158,10 @@ Palette: sky a blinding white-gold light field; shadows pool deep saturated teal
 HYGIENE: no signature or painted name-marks anywhere including corners, no text, no watermark, no card corners or vignette border — full-bleed edge-to-edge.
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
-<h3>gold-aqueduct <span class="kicker">· CASCADE</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/impero-solare-gold-aqueduct.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/impero-solare-gold-aqueduct_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/impero-solare-gold-aqueduct_d3.png"><figcaption>draw 3</figcaption></figure>
+<h3>gold-aqueduct <span class="kicker">· CASCADE · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/impero-solare-gold-aqueduct.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Grifone bianco-oro sull\&#x27;arco, medaglione sul pilone; lettura a \&#x27;parete\&#x27; più che CASCADE discendente — comp. debole (valutazione agente).')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/impero-solare-gold-aqueduct_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Più orizzontale, luce bianca migliore.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/impero-solare-gold-aqueduct_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Grifone più monumentale, acqua più visibile.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -156,10 +185,10 @@ Palette: sky a blinding white-gold light field; shadows pool deep saturated teal
 HYGIENE: no signature or painted name-marks anywhere including corners, no text, no watermark, no card corners or vignette border — full-bleed edge-to-edge.
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
-<h3>processional-stair <span class="kicker">· GRID</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/impero-solare-processional-stair.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/impero-solare-processional-stair_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/impero-solare-processional-stair_d3.png"><figcaption>draw 3</figcaption></figure>
+<h3>processional-stair <span class="kicker">· GRID · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/impero-solare-processional-stair.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'GRID di statue-pilastri, leonessa in barda al terzo inferiore, calice dorato al mid-landing — spec esatta ma meno \&#x27;viva\&#x27;.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/impero-solare-processional-stair_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Reticolo più fermo, ombre teal corrette.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/impero-solare-processional-stair_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Variazione minima.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -184,11 +213,11 @@ HYGIENE: no signature or painted name-marks anywhere including corners, no text,
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
 </div>
-<h2>Prismatic (intrusione multiverso)</h2><div class="grid"><figure><img loading="lazy" src="images/refs/prismatic-frontier-ref.png"><figcaption>REF — moodboard (autoriale)</figcaption></figure></div>
-<h3>crystal-aqueduct <span class="kicker">· ARCH</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/prismatic-frontier-crystal-aqueduct.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/prismatic-frontier-crystal-aqueduct_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/prismatic-frontier-crystal-aqueduct_d3.png"><figcaption>draw 3</figcaption></figure>
+<h2>Prismatic (intrusione multiverso)</h2><div class="grid"><figure class="ref"><img loading="lazy" src="images/refs/prismatic-frontier-ref.png" onclick="lb(this.src,'REF — moodboard (autoriale)')"><figcaption>REF — moodboard (autoriale)</figcaption></figure></div>
+<h3>crystal-aqueduct <span class="kicker">· ARCH · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/prismatic-frontier-crystal-aqueduct.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Drago-falena oil-slick sulla chiave di volta, lente waymarker che focalizza il raggio — firma forte, la più fedele al ref prismatic.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/prismatic-frontier-crystal-aqueduct_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Archi più frontali, meno intrusione-aliena.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/prismatic-frontier-crystal-aqueduct_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Frange spettrali copiate bene.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -212,10 +241,10 @@ Palette: ordinary sky (natural, unspectacular) so the intrusion reads as the ano
 HYGIENE: no signature or painted name-marks anywhere including corners, no text, no watermark, no card corners or vignette border — full-bleed edge-to-edge.
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
-<h3>observatory-dome <span class="kicker">· MONOLITH</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/prismatic-frontier-observatory-dome.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/prismatic-frontier-observatory-dome_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/prismatic-frontier-observatory-dome_d3.png"><figcaption>draw 3</figcaption></figure>
+<h3>observatory-dome <span class="kicker">· MONOLITH · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/prismatic-frontier-observatory-dome.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Cupola eroica + gufo occhi-di-vetro + sfera stellare — ma scena notturna, borderline vs Solar Triumph (valutazione agente).')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/prismatic-frontier-observatory-dome_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Più illuminata, iridescenza su vetro ok.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/prismatic-frontier-observatory-dome_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Gufo più integrato nel bordo.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -239,10 +268,10 @@ Palette: ordinary sky (natural, unspectacular) so the intrusion reads as the ano
 HYGIENE: no signature or painted name-marks anywhere including corners, no text, no watermark, no card corners or vignette border — full-bleed edge-to-edge.
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
-<h3>beacon-tower <span class="kicker">· ISLAND</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/prismatic-frontier-beacon-tower.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/prismatic-frontier-beacon-tower_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/prismatic-frontier-beacon-tower_d3.png"><figcaption>draw 3</figcaption></figure>
+<h3>beacon-tower <span class="kicker">· ISLAND · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/prismatic-frontier-beacon-tower.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Torre-lanterna avvolta dal drago a membrane prismatiche, bussola-sole dentro — ma silhouette \&#x27;windmill\&#x27; e steppa troppo ordinaria.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/prismatic-frontier-beacon-tower_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Torre più snodata, intrusione aliena più chiara.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/prismatic-frontier-beacon-tower_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Variante simile a d1.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -267,11 +296,11 @@ HYGIENE: no signature or painted name-marks anywhere including corners, no text,
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
 </div>
-<h2>Dark Wasteland</h2><div class="grid"><figure><img loading="lazy" src="images/refs/dark-wasteland-ref.png"><figcaption>REF — moodboard (autoriale)</figcaption></figure></div>
-<h3>siege-skeleton <span class="kicker">· VOID</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/dark-wasteland-siege-skeleton.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/dark-wasteland-siege-skeleton_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/dark-wasteland-siege-skeleton_d3.png"><figcaption>draw 3</figcaption></figure>
+<h2>Dark Wasteland</h2><div class="grid"><figure class="ref"><img loading="lazy" src="images/refs/dark-wasteland-ref.png" onclick="lb(this.src,'REF — moodboard (autoriale)')"><figcaption>REF — moodboard (autoriale)</figcaption></figure></div>
+<h3>siege-skeleton <span class="kicker">· VOID · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/dark-wasteland-siege-skeleton.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'VOID: relitto nero vs tempesta; elmo-ember gigante, avvoltoio cinnabar — ma cielo violetto-grigio non indaco-cobalto → EDIT1 risolve (vedi pilot).')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/dark-wasteland-siege-skeleton_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Variante più arancio, più fedele al ref.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/dark-wasteland-siege-skeleton_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Variante scura, meno ember.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -295,10 +324,10 @@ Palette: sky a churning indigo mass with burning orange breaks inside it; cobalt
 HYGIENE: no signature or painted name-marks anywhere including corners, no text, no watermark, no card corners or vignette border — full-bleed edge-to-edge.
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
-<h3>obsidian-fortress <span class="kicker">· MONOLITH</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/dark-wasteland-obsidian-fortress.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/dark-wasteland-obsidian-fortress_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/dark-wasteland-obsidian-fortress_d3.png"><figcaption>draw 3</figcaption></figure>
+<h3>obsidian-fortress <span class="kicker">· MONOLITH · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/dark-wasteland-obsidian-fortress.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'Lastra nera venata ember, mastino in piastre al cancello, lama ember in fg — la più vicina al ref mordor. Uscita senza ref e in-mood.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/dark-wasteland-obsidian-fortress_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Variante più frontale.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/dark-wasteland-obsidian-fortress_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Cancello più alto, ember più diffuso.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -322,10 +351,10 @@ Palette: sky a churning indigo mass with burning orange breaks inside it; cobalt
 HYGIENE: no signature or painted name-marks anywhere including corners, no text, no watermark, no card corners or vignette border — full-bleed edge-to-edge.
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
-<h3>banner-field <span class="kicker">· GRID</span></h3><div class="grid">
-<figure><img loading="lazy" src="images/dark-wasteland-banner-field.png"><figcaption>draw 1</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/dark-wasteland-banner-field_d2.png"><figcaption>draw 2</figcaption></figure>
-<figure><img loading="lazy" src="images/draws/dark-wasteland-banner-field_d3.png"><figcaption>draw 3</figcaption></figure>
+<h3>banner-field <span class="kicker">· GRID · candidato, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/dark-wasteland-banner-field.png" onclick="lb(this.src,'draw 1')"><figcaption>draw 1 <button class="ev" onclick="evPop(event,'GRID pali spezzati + sigillo-anello ember in fg + mastino sopravvissuto — hook forte.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/dark-wasteland-banner-field_d2.png" onclick="lb(this.src,'draw 2')"><figcaption>draw 2 <button class="ev" onclick="evPop(event,'Reticolo più denso, meno respiro.')">ⓘ</button></figcaption></figure>
+<figure><img loading="lazy" src="images/draws/dark-wasteland-banner-field_d3.png" onclick="lb(this.src,'draw 3')"><figcaption>draw 3 <button class="ev" onclick="evPop(event,'Sigillo più grande, composizione più coraggiosa.')">ⓘ</button></figcaption></figure>
 </div>
 <details><summary>prompt v4</summary><pre>Using the attached reference image for STYLE and PAINTING TECHNIQUE only (not its content), paint a new fantasy scene.
 
@@ -350,20 +379,20 @@ HYGIENE: no signature or painted name-marks anywhere including corners, no text,
 
 Wide 21:9 cinematic format, one painted canvas.</pre></details>
 <h2>A/B — prompt originale Villaggio senza ref</h2><div class="grid">
-<figure><img loading="lazy" src="images/gemini-villaggio-orig.png"><figcaption>Gemini — dipinto in famiglia</figcaption></figure>
-<figure><img loading="lazy" src="images/grok-v0.png"><figcaption>Grok — foto paesaggistica (ignora tecnica)</figcaption></figure>
+<figure class=""><img loading="lazy" src="images/gemini-villaggio-orig.png" onclick="lb(this.src,'Gemini — dipinto in famiglia')"><figcaption>Gemini — dipinto in famiglia</figcaption></figure>
+<figure class=""><img loading="lazy" src="images/grok-v0.png" onclick="lb(this.src,'Grok — foto paesaggistica')"><figcaption>Grok — foto paesaggistica</figcaption></figure>
 </div>
-<h2>Rounds rifiutati (v1/v2/v3) — confronto didattico</h2>
-<h3>rude-beauty-shepherd-shrine</h3><div class="grid bad"><figure><img loading="lazy" src="images/rude-beauty-shepherd-shrine_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/rude-beauty-shepherd-shrine_v2.png"><figcaption>v2 (rejected)</figcaption></figure></div>
-<h3>rude-beauty-gorge-bridge</h3><div class="grid bad"><figure><img loading="lazy" src="images/rude-beauty-gorge-bridge_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/rude-beauty-gorge-bridge_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/rude-beauty-gorge-bridge_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>rude-beauty-harvest-waystone</h3><div class="grid bad"><figure><img loading="lazy" src="images/rude-beauty-harvest-waystone_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/rude-beauty-harvest-waystone_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/rude-beauty-harvest-waystone_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>impero-solare-sun-forge</h3><div class="grid bad"><figure><img loading="lazy" src="images/impero-solare-sun-forge_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/impero-solare-sun-forge_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/impero-solare-sun-forge_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>impero-solare-gold-aqueduct</h3><div class="grid bad"><figure><img loading="lazy" src="images/impero-solare-gold-aqueduct_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/impero-solare-gold-aqueduct_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/impero-solare-gold-aqueduct_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>impero-solare-processional-stair</h3><div class="grid bad"><figure><img loading="lazy" src="images/impero-solare-processional-stair_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/impero-solare-processional-stair_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/impero-solare-processional-stair_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>prismatic-frontier-crystal-aqueduct</h3><div class="grid bad"><figure><img loading="lazy" src="images/prismatic-frontier-crystal-aqueduct_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/prismatic-frontier-crystal-aqueduct_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>prismatic-frontier-observatory-dome</h3><div class="grid bad"><figure><img loading="lazy" src="images/prismatic-frontier-observatory-dome_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/prismatic-frontier-observatory-dome_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/prismatic-frontier-observatory-dome_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>prismatic-frontier-beacon-tower</h3><div class="grid bad"><figure><img loading="lazy" src="images/prismatic-frontier-beacon-tower_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/prismatic-frontier-beacon-tower_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/prismatic-frontier-beacon-tower_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>dark-wasteland-siege-skeleton</h3><div class="grid bad"><figure><img loading="lazy" src="images/dark-wasteland-siege-skeleton_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/dark-wasteland-siege-skeleton_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/dark-wasteland-siege-skeleton_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>dark-wasteland-obsidian-fortress</h3><div class="grid bad"><figure><img loading="lazy" src="images/dark-wasteland-obsidian-fortress_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/dark-wasteland-obsidian-fortress_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/dark-wasteland-obsidian-fortress_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
-<h3>dark-wasteland-banner-field</h3><div class="grid bad"><figure><img loading="lazy" src="images/dark-wasteland-banner-field_v1.png"><figcaption>v1 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/dark-wasteland-banner-field_v2.png"><figcaption>v2 (rejected)</figcaption></figure><figure><img loading="lazy" src="images/dark-wasteland-banner-field_v3draft.png"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h2>Rounds rifiutati (v1/v2/v3)</h2>
+<h3>rude-beauty-shepherd-shrine</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/rude-beauty-shepherd-shrine_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/rude-beauty-shepherd-shrine_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure></div>
+<h3>rude-beauty-gorge-bridge</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/rude-beauty-gorge-bridge_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/rude-beauty-gorge-bridge_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/rude-beauty-gorge-bridge_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>rude-beauty-harvest-waystone</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/rude-beauty-harvest-waystone_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/rude-beauty-harvest-waystone_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/rude-beauty-harvest-waystone_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>impero-solare-sun-forge</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-sun-forge_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-sun-forge_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-sun-forge_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>impero-solare-gold-aqueduct</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-gold-aqueduct_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-gold-aqueduct_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-gold-aqueduct_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>impero-solare-processional-stair</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-processional-stair_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-processional-stair_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/impero-solare-processional-stair_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>prismatic-frontier-crystal-aqueduct</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/prismatic-frontier-crystal-aqueduct_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/prismatic-frontier-crystal-aqueduct_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>prismatic-frontier-observatory-dome</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/prismatic-frontier-observatory-dome_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/prismatic-frontier-observatory-dome_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/prismatic-frontier-observatory-dome_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>prismatic-frontier-beacon-tower</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/prismatic-frontier-beacon-tower_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/prismatic-frontier-beacon-tower_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/prismatic-frontier-beacon-tower_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>dark-wasteland-siege-skeleton</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-siege-skeleton_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-siege-skeleton_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-siege-skeleton_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>dark-wasteland-obsidian-fortress</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-obsidian-fortress_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-obsidian-fortress_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-obsidian-fortress_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
+<h3>dark-wasteland-banner-field</h3><div class="grid bad"><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-banner-field_v1.png" onclick="lb(this.src,'v1 (rejected)')"><figcaption>v1 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-banner-field_v2.png" onclick="lb(this.src,'v2 (rejected)')"><figcaption>v2 (rejected)</figcaption></figure><figure class=""><img loading="lazy" src="images/rounds-archive/dark-wasteland-banner-field_v3draft.png" onclick="lb(this.src,'v3 (rejected)')"><figcaption>v3 (rejected)</figcaption></figure></div>
 </body></html>
