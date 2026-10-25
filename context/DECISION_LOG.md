@@ -1533,3 +1533,123 @@ scena-library coerente per bioma.
 **Nota:** la bibbia `art_direction_plan.md` §1 non è ancora aggiornata —
 questa entry registra il ruling; la modifica della bibbia richiede
 approvazione Director.
+
+## 2026-10-25 — Gimmick «indagine»: requisiti Director + modello proposto (non ratificato)
+
+**Contesto:** discussione di design sulla core gimmick investigativa
+(transcript parziale in sessione; parte pomeridiana non recuperabile —
+ingestion `context/ingestions/2026-10-25-gimmick-indagine-e-acquisizione-info.md`).
+Registrata come R-286. La candidata «indagine a soffio» (ARCHITECTURE
+§18.5) passa a modello articolato → ARCHITECTURE §19.
+
+**Director-stated (requisiti di design):**
+
+- Deduzione investigativa **realmente fallibile**: una conclusione
+  sbagliata può perdere la quest — applicazione di QUEST_RULES §9 a una
+  sconfitta epistemica (non ferita/morte/fuga).
+- Stesso indizio **re-investigabile**: più interazioni/domande, valori
+  che evolvono — mai una-tantum.
+- Informazioni raccoglibili **anche passivamente** e **trasversalmente
+  a tutte le gimmick** — requisito architetturale, motivato dal riuso.
+- Estremi del dado: successo critico = convinto del *giusto* con
+  sicurezza alta; fallimento critico = convinto dello *sbagliato* con
+  sicurezza alta.
+
+**Proposte AI (NON ratificate):** sicurezza a tre livelli; separazione
+direzione × sicurezza; `win`→corretta+media / `fail`→sbagliata+media
+(`almost` aperto); sicurezza = convinzione soggettiva del personaggio;
+re-investigazione come nuova osservazione (mai auto-incremento; possibile
+radicamento dell'errore); sistema a tre atti
+acquisizione/interpretazione/deduzione; quattro modalità di acquisizione
+(passiva, intenzionale, interazione, emergente); «evento informativo»
+(informazione ≠ interpretazione); affidabilità per-evento
+(oggettiva/parziale/fallibile).
+
+**Aperto:** → OPEN-023 (7 sub-questioni, incl. semantica `almost`, climax
+a «dichiarazione irrevocabile», layer «interpretazioni» nel run state).
+
+**Fonte:** sessione Director↔AI 2026-10-25; modello in
+`context/QUEST_GENERATION_ARCHITECTURE.md` §19.
+
+## 2026-10-25 — Transcript integrale recuperato: requisiti Director aggiuntivi + correzioni di provenance
+
+**Contesto:** il transcript integrale della conversazione ChatGPT
+22→25 ottobre è stato recuperato dallo share link
+(`context/ingestions/2026-10-22-25-quest-generation-gimmick-transcript.md`)
+e ingerito in supplemento
+(`context/ingestions/2026-10-25-transcript-integrale-gap-analysis.md`,
+ledger S-01..S-25). La parte del 22 ottobre non era mai stata ingerita.
+
+**Director-stated (requisiti recuperati dalla parte mai ingerita):**
+
+- **Gameplay-first (verbatim 22/10 20:44):** «dobbiamo innanzitutto
+  rendere il processo di creazione delle quest meccanicamente divertenti
+  e interessanti online, al resto pensiamo dopo» — priorità su
+  varietà/qualità meccanica prima di narrativa e macro.
+- **Quest per l'amico:** obiettivo immediato = una quest funzionante e
+  comprensibile da far provare; non bloccare la prova in attesa del
+  sistema finale.
+- **Una quest authored per gimmick (25/10):** scrivere autorialmente un
+  tipo di quest per ogni gimmick — fasi tutte agganciate al gameplay,
+  twist e storia interessante insieme.
+
+**Correzioni di provenance:** «non recuperabile» dell'ingestione
+primaria (E-15/E-17/E-21) parzialmente superato — corpus gialli
+(Christie/Doyle, finalisti *Il doppio indizio* e *I quattro sospettati*),
+modello registro/diario/ricostruzione e contenuto del docx di passaggio
+sono nel transcript. Resta mancante la sessione separata del pomeriggio
+25/10 («dichiarazione irrevocabile», soluzioni scartate) → OPEN-023.
+
+**Proposte AI (NON ratificate, nuove):** ranking gimmick (Rituale prima
+candidata, Corruzione, Cargo volatile; Race sconsigliata come modello);
+tassonomia 8 meccaniche investigative + metodo design in 5 step; dossier
+autoriale a 7 voci con twist a ritroso; 5 livelli di generazione con
+target «alto tasso di risultati utilizzabili»; 5 domande di valutazione
++ 6 ingredienti quest; roadmap a 5 fasi; modello i18n narrativo
+(lingua sorgente + versione + glossario).
+
+**Fonte:** `context/ingestions/2026-10-25-transcript-integrale-gap-analysis.md`;
+ARCHITECTURE §19.6 aggiornato; OPEN-023 (e,g parziali; nuove h).
+
+## 2026-10-25 — Modello gimmick corretto: core gimmick vs sfumature sul tema vs domain kit
+
+**Director-stated (modello corretto, sostituisce il censimento piatto):**
+
+- Una core gimmick può avere **più sfumature/varianti sul tema**: stessa
+  algebra del problema, diversa espressione del limite/pressione.
+- Esempio canonico — gimmick «avanzamento sul tracciato» (tracciato +
+  victory point + eventi che spostano avanti/indietro): sfumature =
+  **a tempo** (X VP in N round), **contro avversario** (il limite è il
+  cursore dell'antagonista), **resistenza** (tower-defense: accumulare
+  i VP sopportando N round di pressione). Miglia/km a cavallo = flavour,
+  livello domain kit.
+- Il censimento attuale è **sbagliato**: contiene molte «gimmick» che
+  sono la stessa gimmick con variazioni — «invece di avere 15 gimmick,
+  ne avremo molte di meno». Vanno divise in core + sfumature (task →
+  OPEN-024, R-287).
+- La gimmick «investigation» (§19, OPEN-023) creata in questa
+  discussione è una core gimmick **diversa davvero** — algebra
+  epistemica, non tracciato di VP.
+
+**Conseguenze registrate (PROPOSAL):** asse «condizione-limite
+parametrizzata» da aggiungere al contratto `CoreGimmick` (CONTRACTS §2);
+metrica di varietà strutturale (§18.4) applicata alle core *dopo* il
+collasso delle sfumature.
+
+**Fonte:** Director in sessione 2026-10-25 (voice, verbatim in
+ARCHITECTURE §20.1); modello formalizzato in
+`context/QUEST_GENERATION_ARCHITECTURE.md` §20.
+
+## 2026-10-26 — Parallax plate: struttura E contenuto (A13)
+
+**Da:** il gate parallasse verificava solo la struttura (focale laterale,
+layering, terreno continuabile) — ridge_P1 "passava" ma era una cartolina
+vuota: prato pulito, fireflies diurne senza causa, foreground tappeto.
+**A:** il giudizio su una piastra richiede entrambe le checklist: struttura
+parallasse + contenuto A11/A12. Regole nuove: ambient ancorato alla light
+identity, near layer = massima densità di interesse, accento come campo
+causale con dosaggio verificato, fauna come scala+storia+ancora runtime.
+**Motivo:** 3 edit diretti del Director su ridge P1 (papaveri causali,
+cervi al torrente, fiori multihue nel fg) hanno dimostrato il gap.
+**Fonte:** `.mw/runs/20261026-learn-parallax-plate/pattern-candidate.md`,
+protocollo v5 A13.

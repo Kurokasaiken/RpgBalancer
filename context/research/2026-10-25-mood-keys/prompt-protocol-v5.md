@@ -299,3 +299,49 @@ Lezioni dell'iterazione A11→A12→fiori — sopra il metro "tipo" e
   licheni, striature viola, pino contorto
 - aqueduct: cielo piatto → aurora sx; violetta decorativa → ether-glow;
   fiori generici → cobalto complementare
+
+## A13 — PARALLAX PLATE: structure AND content (ruling Director 2026-10-26)
+
+Lezioni dell'iterazione ridge P1 → user i3 (piastra larga, strada di
+crinale). Il gate strutturale da solo produce "piastre tecnicamente
+corrette ma morte".
+
+1. **STRUCTURE PASS ≠ CONTENT PASS.** Layering, focale laterale e
+   continuabilità sono necessari ma non sufficienti: sulla stessa
+   immagine vanno applicate ANCHE A11 (intreccio) e A12 (storia,
+   causa, accento). Due checklist, un giudizio.
+
+2. **AMBIENT = CAUSED BY LIGHT IDENTITY.** Un effetto dell'arsenale
+   non si piazza mai "perché c'è": deve appartenere all'ora di luce
+   dichiarata. Fireflies azzurre in pieno giorno = rumore; fiori,
+   farfalle, polline e dust motes = gli accenti giusti per il giorno.
+   Fireflies/moths/embers sono notturni o crepuscolari. Nel prompt:
+   nomina l'ancora ambient + perché esiste a quell'ora.
+
+3. **NEAR LAYER = HIGHEST INTEREST DENSITY.** Nel parallasse
+   orizzontale il foreground scorre più veloce e occupa più
+   tempo-schermo: è lo strato che DEVE portare la ricchezza massima
+   — fiori multihue intrecciati, rocce particolareggiate, animali.
+   Un foreground-tappeto è la fascia più visibile E più noiosa.
+   Metro: "lo strato near regge 30 secondi di scroll?"
+
+4. **ACCENT AT LANDSCAPE SCALE.** L'accento complementare può essere
+   un CAMPO, non solo uno spot: la fioritura rossa del pendio (rosso
+   vs azure+veronese+ultramarine) è la stessa regola dei fiori cobalto
+   dell'aqueduct a scala paesaggio. Ma il dosaggio va verificato:
+   accento dominante = overshoot (il Director ha ritirato i2 → i3).
+   Regola: "causal accent FIELD mid-distance + multihue weave in
+   foreground", mai accento ovunque.
+
+5. **FAUNA = SCALE + STORY + RUNTIME ANCHOR.** Una scena di viaggio
+   senza abitanti è una cartolina. Animali che fanno qualcosa (cervi
+   che bevono al torrente condiviso coi viandanti) danno scala al
+   paesaggio, raccontano il mondo, e sono ancore naturali per motion
+   runtime. Nel prompt: "who lives here, where, doing what".
+
+### Sintesi della catena (evidence)
+- ridge P1: prato pulito + fireflies diurne + fg vuoto → i3: papaveri
+  sul pendio (campo causale), cervi al torrente (fauna+scala), fiori
+  viola+gialli nel fg (near-density + weave), rosso ridotto a fascia
+  (dosaggio).
+- Pattern file: .mw/runs/20261026-learn-parallax-plate/pattern-candidate.md
