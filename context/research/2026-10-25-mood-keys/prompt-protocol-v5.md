@@ -142,3 +142,44 @@ bad ref reproduces both). Then route:
 Visual rubric (composition, key-mood, dominant fields, light-event,
 register/impasto, hygiene): each passes on SEEING the image.
 Structural pass ≠ mood pass. Director eye-check = promotion gate.
+
+## A8 — SCENE LIGHT & VARIETY (ruling Director 2026-10-25, provato su gola/camp)
+
+### LIGHT_IDENTITY — campo vincolato
+Ogni scena ha una firma di luce: `orario × temperatura × diffusione × valore
+estetico` (es. gola = "luminosità tenue di fine giorno"). Si dichiara nel
+prompt e si **rispetta negli edit**: un edit può aumentare la VARIETÀ
+dentro l'identità, MAI normalizzarla a un template (tramonto ambra+teal è
+il template-generico che ha distrutto la gola). Ogni scena ha la SUA ora.
+
+### VARIETY rule
+Bellezza = **color-shift locali**, non contrasto globale. Prove ref:
+villaggio sky = 3-4 hue + nuvole; vette = 5+ hue; jungle column = oro su
+un lato, teal sull'altro della STESSA superficie. Scena quieta può essere
+cromaticamente ricca; scena drammatica può essere povera. Il deficit
+"quasi-promossa" non è "poco dramma" ma "poca varietà locale".
+
+### TYPE-VERIFICATION gate (obbligatorio prima di presentare)
+Precondizione: il file PRIMA è pinnato nel confronto — no pin = no check.
+Side-by-side, check sestuple:
+(a) è cambiato DAVVERO? (camp: identico, dichiarato PASS = errore)
+(b) nella direzione chiesta?
+(c) LOCAL hue-variety aumentata E global contrast non appiattito?
+    (varietà = n. hue distinti per superficie, non "più contrasto")
+(d) LIGHT_IDENTITY preservata? — espressa come anchor tecnici
+    (orario × temp × diffusione), NON come etichetta astratta:
+    il modello normalizza "luminosità tenue" → golden-hour generico.
+    Scrivi: "soft late-afternoon overcast, cool-dominant, gentle rim
+    light, NO direct amber sun, NO high-contrast teal/orange grade"
+(e) focal anchor / parallasse invariati?
+(f) UN solo light-event dominante preservato? (niente doppie sorgenti)
+Un solo NO = iterate. DUE fail sullo stesso asse → STOP, rigenera.
+
+### IN-CONVERSATION ITERATION
+Non si presenta l'edit singolo: si itera nella stessa chat finché il
+type-check non passa, poi si presenta solo il risultato verificato.
+
+### REF-as-METRIC
+Il metro del PASS è "stesso livello di ricchezza locale dei ref del
+dominio" (jungle = quieto+ricco; villaggio = luminoso+vario), MAI
+"più drammatico".
