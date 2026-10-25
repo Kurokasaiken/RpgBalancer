@@ -37,10 +37,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElement
 <figure class="pilot"><img loading="lazy" src="images/dark-wasteland-siege-skeleton.png" onclick="lb(this.src,'BEFORE — cielo violetto')"><figcaption>BEFORE — cielo violetto</figcaption></figure>
 <figure class="pilot"><img loading="lazy" src="images/dark-wasteland-siege-skeleton_EDIT1.png" onclick="lb(this.src,'EDIT1 — indaco+arancio nella massa ✓ candidato')"><figcaption>EDIT1 — indaco+arancio nella massa ✓ candidato</figcaption></figure>
 </div>
-<h3>shepherd-shrine — sky-fix + edit verde <span class="kicker">edit in corso</span></h3><div class="grid">
-<figure class=""><img loading="lazy" src="images/rude-beauty-shepherd-shrine.png" onclick="lb(this.src,'draw1 v4 — cielo ok, prato spento')"><figcaption>draw1 v4 — cielo ok, prato spento</figcaption></figure>
-<figure class=""><img loading="lazy" src="images/rude-beauty-shepherd-shrine_skytest.png" onclick="lb(this.src,'skytest — cielo cyan saturo, prato ancora olive (difetto Director)')"><figcaption>skytest — cielo cyan saturo, prato ancora olive (difetto Director)</figcaption></figure>
-</div><p class="note">edit verde: PASS al regression gate (valutazione agente, eye-check pendente).</p>
+<h3>shepherd-shrine — sky-fix + edit verde + edit luce <span class="kicker">2 PASS, eye-check pendente</span></h3><div class="grid">
+<figure><img loading="lazy" src="images/rude-beauty-shepherd-shrine.png" onclick="lb(this.src,'draw1 v4 — cielo ok, prato spento')"><figcaption>draw1 v4 — prato spento</figcaption></figure>
+<figure><img loading="lazy" src="images/rude-beauty-shepherd-shrine_skytest.png" onclick="lb(this.src,'skytest — cielo cyan saturo, prato ancora olive')"><figcaption>skytest — cielo cyan ✓ prato olive</figcaption></figure>
+<figure><img loading="lazy" src="images/rude-beauty-shepherd-shrine_EDIT1.png" onclick="lb(this.src,'EDIT1 — prato veronese vivo')"><figcaption>EDIT1 — prato veronese ✓</figcaption></figure>
+<figure><img loading="lazy" src="images/rude-beauty-shepherd-shrine_EDIT2.png" onclick="lb(this.src,'EDIT2 — luce golden-warm sulle facce illuminate, ombre teal')"><figcaption>EDIT2 — luce golden-warm ✓ candidato</figcaption></figure>
+</div>
+<p class="note">FORK-5 x2 + LIGHT_EVENT chain: 3 PASS, zero rigenerazioni. Valutazione agente — eye-check pendente.</p>
 <h2>Strisce confronto ref→draw1</h2><div class="grid">
 <figure class=""><img loading="lazy" src="sheets/compare4_rude-beauty.png" onclick="lb(this.src,'rude-beauty')"><figcaption>rude-beauty</figcaption></figure>
 <figure class=""><img loading="lazy" src="sheets/compare4_impero-solare.png" onclick="lb(this.src,'impero-solare')"><figcaption>impero-solare</figcaption></figure>
