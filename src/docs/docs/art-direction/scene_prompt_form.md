@@ -320,3 +320,12 @@ Il blocco STYLE/LIGHTING **non ammette parafrasi**. Batch 12-scene bocciato 12/1
 - Suolo/terreno va dichiarato con materia+colore (es. `volcanic rock veined with glowing red`), non con "deep base" astratto
 
 **Anti-pattern dimostrato**: descrivere la luce come fenomeno atmosferico (shafts, dappled, golden-hour) produce concept-art smorzata — i ref battezzati hanno luce che *colpisce*.
+
+
+## Regola: colore dominante = campo primario nel light-event (batch 2026-10-25)
+
+Il colore del cielo/prato/terreno dominante non va nella lista palette —
+va nel **light-event** dichiarato come campo primario della scena:
+"under a VIVID <pigment> SKY — the sky is the dominant saturated color field",
+"meadows blaze in VIVID <pigment>, not <earth-tone>". In lista si diluisce.
+Verificato: 3/3 wilderness con cielo ciano+prato veronese dopo il fix.
