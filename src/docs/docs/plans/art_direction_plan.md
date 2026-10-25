@@ -540,6 +540,28 @@ registry, luce libera per scena (niente Solar Triumph forzato) ma **palette,
 ombre-teal, cielo-azure e luminosità restano vincoli di bibbia** (§1A, §2),
 struttura fissa Subject→Composition→Mood→Style→Lighting→Palette→Avoid→Aspect.
 
+### 10.8 Esemplari scena quest APPROVATI (ruling Director 2026-10-25)
+
+Due scene del lotto goblin sono promosse a **esemplari moodboard** — valgono
+come riferimento-autorevole per le scene quest (non solo mood key):
+
+- **viaggio-andata** (Rude Beauty, ANDATA) — `dist/assets/scene-library/viaggio-andata.jpg`,
+  prompt `/.mw/specs/quest-goblin-scenes/scenes/f0-viaggio/prompt.md`.
+  Perché: registro battuto pieno — sole che SLAM, cielo azure, verde
+  Veronese, ombre teal, impasto. Soglia/andata = il "davanti" della quest.
+- **assalto-goblin / THE CHARGE** — `dist/assets/scene-library/assalto-goblin.jpg`,
+  prompt `/.mw/specs/quest-goblin-scenes/scenes/f4-combattimento/prompt.md`.
+  Perché: CASCADE (diagonale Bibiena) riuscita — carica in silhouette,
+  torcia piccola al campo (runtime owns fire), teal dusk vs cinabro.
+  Dimostra il punto: **le masse/azioni si suggeriscono, non si illustrano**.
+
+**Quasi-promosse** (correzioni note): `gola-raider` (piatto, niente
+light-event dominante, comp frontale), `accampamento-raider` (buono ma
+manca focale-dramma, verde troppo oliva). Iterabili via FORK-5.
+
+La catena completa di cosa funziona vs no in questa famiglia è in
+`context/research/2026-10-25-mood-keys/` (gallery + PROMPT_LEDGER).
+
 ---
 
 ## 11. ICONE — DUE LIVELLI, UNA MATERIA

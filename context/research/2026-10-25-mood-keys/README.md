@@ -386,3 +386,16 @@ La **v1** di crystal-aqueduct resta la base di partenza canonica: concept
 arcate-vetrata slanciate con mondo alieno visibile nei pannelli. v5/v7 =
 esplorazioni laterali (bronzo massiccio, ether channel) — utili come lezioni
 ma NON nuove baseline. Iterazioni future = edit/regen ancorate alla v1.
+
+## Analisi quest-scene (Director 2026-10-25) — promosse vs quasi
+
+**PROMOSSE**: viaggio-andata (registro pieno: sun-slams, azure, veronese,
+teal — la chiave È il subject), assalto-goblin (CASCADE riuscita: azione
+suggerita via silhouette+diagonale+luce, runtime owns fire).
+
+**QUASI**: gola-raider (scena giusta, luce piatta — niente light-event;
+composizione frontale), accampamento-raider (giusto ma focale debole,
+verde-oliva invece di veronese, meno dramma).
+
+**Lezione form**: chiave non descritta = scena "corretta" ma spenta; le
+approvate descrivono la CHIAVE come subject primario (luce/azione).
