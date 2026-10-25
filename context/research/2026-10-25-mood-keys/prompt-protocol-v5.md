@@ -183,3 +183,37 @@ type-check non passa, poi si presenta solo il risultato verificato.
 Il metro del PASS è "stesso livello di ricchezza locale dei ref del
 dominio" (jungle = quieto+ricco; villaggio = luminoso+vario), MAI
 "più drammatico".
+
+## A9 — EVOCAZIONE OBBLIGATORIA + vocabolario per dominio (Director 2026-10-25)
+
+Ogni campo del form deve contenere **almeno un'ancora materiale**:
+pigmento nominato, verbo fisico, o texture tattile. Etichette astratte
+bandite ("green" → "Veronese green"; "rock" → "cracked basalt planes").
+Il modello capisce la narrativa densa, non i tag — struttura SÌ ma ogni
+campo carico di materia. (Google/DeepMind: "describe the scene, don't
+list keywords" — confermato.)
+
+### Vocabolario per dominio (ancore evocative canoniche)
+
+**Rude Beauty** — vibrant azure sky; vivid Veronese green meadows;
+golden thatch catching light; amber-gold sunlit faces; saturated
+teal-emerald shadows; sunlight SLAMS; weathered timber lashed; crystal
+river reflecting sky; warm raking light; sun-drenched ridge;
+thick impasto vibrating; weathered and tactile, never squalid.
+
+**Impero Solare** — blinding white-gold axial light; monumental scale
+compressing the figure; ivory marble + burnished gold; cadmium-cinabro
+banners; deep indigo vault; radiant halo; bronze ceremonial mass;
+processional gravity; hierarchy as composition.
+
+**Prismatic** — deep indigo twilight; oil-slick iridescence ONLY on
+glass/membranes/ether; ether particles seeping like a gas leak —
+cool spectrum (cyan, violet, teal, magenta); anamorphic prismatic
+flare streaks + soft blooms floating confused; moon halo ring;
+wrong-angled ancient relic; majestic BY PROPORTION, not thickness;
+slender delicate tracery; alien world glimpsed inside panes.
+
+**Dark Wasteland** — indigo-cobalt mass devouring sky; ember-orange
+burning INSIDE the dark; torn-paper torn edge; ashen ruins; charcoal
+umber ground; last ember of resistance; ground-hugging camera;
+bone-pale accents; smoke-hung horizon.
