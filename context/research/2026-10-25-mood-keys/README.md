@@ -405,7 +405,7 @@ approvate descrivono la CHIAVE come subject primario (luce/azione).
 - **Rude Beauty**: villaggio.png (ref principale) + drago.png + jungle
   ruins.png + assalto-goblin.jpg (quest-scene approvata)
 - **Impero Solare / Solar Triumph**: impero ref + gate impero solare.png +
-  armatura imperiale.png (**solo concept dell'armatura**) + eroina solar.png
+  armatura imperiale.png (**solo concept dell'armatura**) + eroina solar.png + eroe solare.png
 - **Prismatic**: monumental gate + regina ibrida.jpg (**ibrido
   Prismatic+Solar**)
 - **Dark Wasteland**: verso mordor + villaggio montagne.jpeg + Armatura
