@@ -235,3 +235,23 @@ Il gate "è adeguata" NON è "contrasto/dramma" ma:
    "impasto presente".
 
 Regola d'oro: *aggiungi varietà dentro l'identità, non drama fuori.*
+
+## A11 — LOCAL CONTRAST WEAVE (ruling Director 2026-10-25, esempio assalto)
+
+Contrasto NON è zone di colore (sopra=violetto, sotto=verde) — è
+**micro-opposizioni intrecciate dentro ogni campo**. Metro = fascia alta
+di assalto-goblin: verde chiaro + scuro + teal + fiamme + scintille
+nella STESSA fascia. Ogni regione deve contenere hue opposte intrecciate:
+flecks caldi nei campi freddi, glints freddi nei campi caldi.
+"Aggiungere altri fuochi" ≠ varietà — varietà = tessere contrasto OVUNQUE.
+
+VIETATO (bibbia, violato in gola-E3): nero/murk; marrone (=intristisce,
+non dà contrasto); bianco/grigio come campi dominanti (=mai vibranti,
+noioso). Anche in luce fioca: colori VIBRANTI saturati (assalto è buio
+MA ogni hue è satura). Oggetti marroni spontanei (barchetta, tenda
+vecchia) = difetto da rigenerare.
+
+Prompt-phrase: "chromatic movement INSIDE every field — interleaved
+contrasting hues in the same zone: warm flecks within cool fields,
+cool glints within warm fields, like the canopy band where light-green,
+dark-green, teal, flame and sparks live interleaved".
