@@ -379,3 +379,10 @@ dalle contact-sheet — i candidati sono pari in aderenza, la scelta è estetica
 **Diagnosi A/B**: stesso prompt originale → Grok=foto (ignora "oil painting"), Gemini=dipinto in famiglia → registro battezzato è generator-specific.
 **Fix meccanico**: il colore dominante va nel light-event come CAMPO PRIMARIO — "under a VIVID CYAN-TURQUOISE AZURE SKY — the sky is the dominant saturated color field; meadows blaze in VIVID VERONESE GREEN, not yellow-brown". Risultato: 3/3 wilderness con cielo ciano saturo + prato veronese.
 **Lezione**: il campo colore dominante non va nella lista palette — va nel light-event come soggetto cromatico della scena. Aggiunto al form (palette-field-as-primary-color-field).
+
+## Ruling Director — aqueduct baseline
+
+La **v1** di crystal-aqueduct resta la base di partenza canonica: concept
+arcate-vetrata slanciate con mondo alieno visibile nei pannelli. v5/v7 =
+esplorazioni laterali (bronzo massiccio, ether channel) — utili come lezioni
+ma NON nuove baseline. Iterazioni future = edit/regen ancorate alla v1.
