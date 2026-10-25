@@ -26,3 +26,5 @@
 | crystal-aqueduct | quest-scene | prismatic | f2+ref | f3: moon restored (Director wanted it) + lively sky + pervasive confused bleed | final-v2 | alienation verdict: effect language now matches ref (pervasive chromatic bleed) | ruling: moon is CANON element of the scene, not artifact |
 | crystal-aqueduct | quest-scene | prismatic | f3+ref | f4: big moon like SMEAR + layered sky + spiral+circular flare + dry air | final-v3 | flare spec: circular ring + partially spiraling streak — 'moon halo + coiling chromatic streak' | ruling: moon canonical |
 | moodboard | refs | all | canonical domain refs per Director ruling 2026-10-25; aqueduct_FINAL NOT promoted to ref | ruling | — | — | ref set frozen until next ruling |
+| gola-raider | quest-scene | rude-beauty | — | edit: +light-event ambra fondo +rock anchor +contrasto | edit1 | FORK-5 | **candidate** (era ~) | fix = light-event dominant, il deficit ~ esatto | pattern ~→✓ = add motivated light source | fresh |
+| accampamento-raider | quest-scene | rude-beauty | — | edit: +falò focale +palizzata anchor +veronese +teal deep | edit1 | FORK-5 | **candidate** (era ~) | focale rinforzata | same pattern | fresh |
