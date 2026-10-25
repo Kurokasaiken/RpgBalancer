@@ -401,6 +401,15 @@
       "hp": "Health",
       "stamina": "Stamina",
       "xpTitle": "{name} · {xp} XP"
+    },
+    "ineligibleReason": {
+      "status-dead": "Dead",
+      "status-away": "Away",
+      "status-exhausted": "Exhausted",
+      "in-expedition": "Out on an expedition",
+      "stat-requirement": "Doesn't meet a seat's requirement",
+      "seat-busy": "Seat is busy",
+      "generic": "Not eligible here"
     }
   },
   "slowMo": "Slow Mo",
@@ -2091,7 +2100,16 @@
       "exposurePercent": "{position}: {pct}% of incoming impacts.",
       "exposureNone": "{position}: absorbs no incoming impacts.",
       "slot": "Slot {index}",
-      "leader": "Leader"
+      "leader": "Leader",
+      "dragBlocked": {
+        "status-dead": "Can't swap — this resident is dead.",
+        "status-away": "Can't swap — this resident is away.",
+        "status-exhausted": "Can't swap — this resident is exhausted.",
+        "in-expedition": "Can't swap — this resident is out on an expedition.",
+        "stat-requirement": "Can't swap — a seat's requirement isn't met.",
+        "seat-busy": "Can't swap — that seat is busy.",
+        "ineligible": "Can't swap — not allowed here."
+      }
     },
     "seals": {
       "durationBreakdown": "{out}d out · ~{site}d on site · {back}d back",

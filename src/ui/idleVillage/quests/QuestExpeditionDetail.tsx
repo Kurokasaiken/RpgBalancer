@@ -346,6 +346,9 @@ export interface QuestExpeditionDetailProps {
   /** PLAN-043 WS-1 swap guard: the rack reports each seat's extraction phase;
    *  the session's commitSwap refuses a swap while either seat is non-idle. */
   onSlotPhaseChange?: (slotId: string, phase: SlotSeatPhase) => void;
+  /** R-282: why the hovered seat would refuse the in-flight drop (`null` when
+   *  legal or no drag) — shown in the rack's legend line during the drag. */
+  seatBlockReason?: (slotId: string) => string | null;
   position?: { x: number; y: number };
 }
 
@@ -371,6 +374,7 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
   onSlotClear,
   suppressedResidentIds,
   onSlotPhaseChange,
+  seatBlockReason,
   position,
 }) => {
   const { t } = useTranslation('idleVillage');
@@ -671,6 +675,13 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
     if (!hoveredSlotId) return null;
     return slots.find((s) => s.id === hoveredSlotId)?.assignedResidentId ?? null;
   }, [hoveredSlotId, slots]);
+  /* R-282: while a drag hovers a seat that would refuse the drop, the
+   *  legend line carries the reason (`questExpedition.marching.dragBlocked.*`)
+   *  — the icon half lands after the visual-fork ruling. */
+  const hoveredBlockReason = useMemo(() => {
+    if (!hoveredSlotId || !seatBlockReason) return null;
+    return seatBlockReason(hoveredSlotId);
+  }, [hoveredSlotId, seatBlockReason]);
 
   /** Damage exposure under each castone; positional labels remain available
    *  to assistive technology while the percentage is the visible indicator. */
@@ -695,11 +706,41 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
         : exposurePct === 0
           ? t('questExpedition.marching.exposureNone', { position: exposurePosition })
           : t('questExpedition.marching.exposurePercent', { position: exposurePosition, pct: exposurePct });
+      /* R-282 (ruled B): during a drag, a seat that would refuse the drop
+       *  wears the glyph of its reason class under the castone — the tooltip
+       *  carries the full reason text (questExpedition.marching.dragBlocked.*). */
+      const blockReason = seatBlockReason?.(slot.id) ?? null;
+      const blockGlyph: EngravedIconId =
+        blockReason === 'seat-busy'
+          ? 'cmd-lock'
+          : blockReason === 'stat-requirement'
+            ? 'ico-target'
+            : blockReason === 'status-dead' || blockReason === 'status-away' || blockReason === 'status-exhausted' || blockReason === 'in-expedition'
+              ? 'status-fallen'
+              : 'cmd-close';
       return (
         <div
           data-testid={`exposure-cell-${index}`}
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, minHeight: 30 }}
         >
+          {blockReason && (
+            <Tooltip.Root delayDuration={80}>
+              <Tooltip.Trigger asChild>
+                <span
+                  data-testid={`block-glyph-${index}`}
+                  data-block-reason={blockReason}
+                  style={{ color: 'var(--skin-danger-color, #c96a4a)', lineHeight: 1, cursor: 'help' }}
+                >
+                  <EngravedIcon id={blockGlyph} size={11} aria-hidden />
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content side="top" sideOffset={6} style={STASH_TOOLTIP_STYLE}>
+                  {t(`questExpedition.marching.dragBlocked.${blockReason}`)}
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          )}
           {isLeader && (
             <span data-testid="exposure-leader-crown" title={t('questExpedition.marching.leader')} style={{ color: 'var(--skin-title-color)', lineHeight: 1 }}>
               <EngravedIcon id="role-leader" size={11} aria-hidden />
@@ -724,7 +765,7 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
         </div>
       );
     },
-    [slots, lastOccupiedIndex, exposureWeights, t],
+    [slots, lastOccupiedIndex, exposureWeights, t, seatBlockReason],
   );
 
   const shell: CSSProperties = {
@@ -976,6 +1017,16 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
                 data-testid="quest-planner-rack"
                 className={!requiredFilled && !reducedMotion ? 'animate-pulse' : undefined}
                 style={{ flexShrink: 0 }}
+                /* QoL-2 (R-281): double-click on a seated medallion = the same
+                 *  extraction press-hold performs — consumer-side delegation so
+                 *  the frozen slotRackKit stays untouched; the seat testid
+                 *  carries the slot id. */
+                onDoubleClick={(e) => {
+                  const host = (e.target as HTMLElement).closest?.('[data-testid^="slot-button-"]');
+                  const testid = host?.getAttribute('data-testid');
+                  const slotId = testid?.slice('slot-button-'.length);
+                  if (slotId) onSlotClear?.(slotId);
+                }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                   <span style={SECTION_LABEL}>{t('questExpedition.marching.title')}</span>
@@ -983,7 +1034,9 @@ const QuestExpeditionDetailComponent: React.FC<QuestExpeditionDetailProps> = ({
                     data-testid="exposure-legend"
                     style={{ minWidth: 0, fontFamily: FONT.serif, fontSize: 'var(--skin-hud-caps-size)', color: TONE.secondary }}
                   >
-                    {t('questExpedition.marching.exposureLegend')}
+                    {hoveredBlockReason
+                      ? t(`questExpedition.marching.dragBlocked.${hoveredBlockReason}`)
+                      : t('questExpedition.marching.exposureLegend')}
                   </span>
                 </div>
                 <ResidentSlotRack

@@ -1,0 +1,19 @@
+{
+  "id": "map-quest-poi",
+  "status": "documenting",
+  "sourceHash": "fb1b7135253e3fb2",
+  "version": {
+    "v": 1,
+    "shots": [
+      "shots/V1/planner-context-ctx-a.png"
+    ],
+    "meta": {
+      "partial": true,
+      "failedStates": [
+        "default"
+      ]
+    },
+    "ruling": null
+  },
+  "workerLabel": "documented_partial"
+}

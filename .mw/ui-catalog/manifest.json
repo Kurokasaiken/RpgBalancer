@@ -1,0 +1,3473 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "hud-top-tabs",
+      "title": "Top HUD tab cluster (tempo \u00b7 prossimo evento \u00b7 risorse)",
+      "category": "hud_cluster",
+      "status": "in_review",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S1_WorldMapIdle"
+          },
+          "assertion": {
+            "selector": "[data-hud-panel], [data-nav-id], .hud",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "resource-low",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/hudResourceLow.ts"
+          },
+          "assertion": {
+            "selector": "[data-tone=\"danger\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "event-imminent",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/hudEventImminent.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"hud-next-tab\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "hud-hidden",
+          "driver": {
+            "kind": "surface+key",
+            "surface": "S1_WorldMapIdle",
+            "key": "h"
+          },
+          "assertion": {
+            "selector": "[data-testid='hud-hide-toggle'], [data-hud-pearl]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/NextEventTab.tsx",
+        "src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx",
+        "src/ui/idleVillage/components/gameFrame/resourceReadoutItems.tsx",
+        "src/ui/idleVillage/components/gameFrame/HudRibbon.tsx"
+      ],
+      "sourceHash": "02676285dc6a9d73",
+      "links": {
+        "contract": [],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"hud-next-tab\"]|section:has-text(\"GOLD\")|section:has-text(\"DAY\")",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/default-ctx-a.png",
+            "shots/V1/resource-low-ctx-a.png",
+            "shots/V1/hud-hidden-ctx-a.png"
+          ],
+          "ruling": "round-1: approve B-modified+layout: selettore tacche+perla SENZA guida ottone; placca giorno invariata; TERZO TAB centrale obbligatorio (override renders-null); placche sx/dx stessa dimensione + pi\u00f9 distanza dai bordi. Reject A (halo cibo), C (appeso). Director 2026-10-24",
+          "meta": {
+            "componentId": "hud-top-tabs",
+            "sourceSha": "d53c5bb289a396079be83d30ec807197b6d69999",
+            "sourceHash": "02676285dc6a9d73",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T18:58:02.146Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png",
+                    "default-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S1_WorldMapIdle"
+                },
+                "assertion": {
+                  "selector": "[data-hud-panel], [data-nav-id], .hud",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "resource-low",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "resource-low-ctx-a.png",
+                    "resource-low-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "resource-low-iso-0.png",
+                    "resource-low-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/hudResourceLow.ts"
+                },
+                "assertion": {
+                  "selector": "[data-tone=\"danger\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "event-imminent",
+                "reached": false,
+                "asserted": false
+              },
+              {
+                "id": "hud-hidden",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "hud-hidden-ctx-a.png",
+                    "hud-hidden-ctx-b.png"
+                  ],
+                  "isolated": []
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface+key",
+                  "surface": "S1_WorldMapIdle",
+                  "key": "h"
+                },
+                "assertion": {
+                  "selector": "[data-testid='hud-hide-toggle'], [data-hud-pearl]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "nav-bar",
+      "title": "Bottom navigation bar (VILLAGE\u00b7MAP\u00b7recenter\u00b7WORKSHOP\u00b7TAVERN)",
+      "category": "hud_cluster",
+      "status": "in_review",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S1_WorldMapIdle"
+          },
+          "assertion": {
+            "selector": "nav [data-nav-id]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "village-active",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/navVillage.ts"
+          },
+          "assertion": {
+            "selector": "nav [data-nav-id=\"village\"][aria-pressed=\"true\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "hud-hidden",
+          "driver": {
+            "kind": "surface+key",
+            "surface": "S1_WorldMapIdle",
+            "key": "h"
+          },
+          "assertion": {
+            "selector": "[data-testid='hud-hide-toggle'], [data-hud-pearl]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/GameFrame.tsx",
+        "src/ui/idleVillage/components/gameFrame/HudRecenterButton.tsx",
+        "src/ui/idleVillage/skins/primitives/HudPlaque.tsx",
+        "src/balancing/config/idleVillage/gameFrameConfig.ts"
+      ],
+      "sourceHash": "3af8ee309d3fd0bc",
+      "links": {
+        "contract": [],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "div[data-skin=\"hud-plaque\"]:has(nav)|nav",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/default-ctx-a.png",
+            "shots/V1/village-active-ctx-a.png",
+            "shots/V1/hud-hidden-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "componentId": "nav-bar",
+            "sourceSha": "e061dab386227999c5ab91fd400de0fae8c33be0",
+            "sourceHash": "3af8ee309d3fd0bc",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T20:38:31.727Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png",
+                    "default-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S1_WorldMapIdle"
+                },
+                "assertion": {
+                  "selector": "nav [data-nav-id]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "village-active",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "village-active-ctx-a.png",
+                    "village-active-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "village-active-iso-0.png",
+                    "village-active-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/navVillage.ts"
+                },
+                "assertion": {
+                  "selector": "nav [data-nav-id=\"village\"][aria-pressed=\"true\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "hud-hidden",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "hud-hidden-ctx-a.png",
+                    "hud-hidden-ctx-b.png"
+                  ],
+                  "isolated": []
+                },
+                "deterministicSameBytes": true,
+                "driver": {
+                  "kind": "surface+key",
+                  "surface": "S1_WorldMapIdle",
+                  "key": "h"
+                },
+                "assertion": {
+                  "selector": "[data-testid='hud-hide-toggle'], [data-hud-pearl]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "hud-corner",
+      "title": "Bottom-right control cluster (menu\u00b7panels\u00b7hide toggle)",
+      "category": "hud_cluster",
+      "status": "in_review",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S1_WorldMapIdle"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"hud-hide-toggle\"], [data-testid=\"hud-menu-trigger\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "menu-open",
+          "driver": {
+            "kind": "surface+key",
+            "surface": "S1_WorldMapIdle",
+            "key": "Escape"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"hud-menu-trigger\"]",
+            "property": "aria-expanded",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "panels-open",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/hudPanelsOpen.ts"
+          },
+          "assertion": {
+            "selector": "[data-hud-panels-trigger]",
+            "property": "aria-expanded",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "hud-hidden",
+          "driver": {
+            "kind": "surface+key",
+            "surface": "S1_WorldMapIdle",
+            "key": "h"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"hud-hide-toggle\"]",
+            "property": "aria-pressed",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/HudGameMenu.tsx",
+        "src/ui/idleVillage/components/gameFrame/HudHideToggle.tsx",
+        "src/ui/idleVillage/components/gameFrame/HudPanelsMenu.tsx",
+        "src/ui/idleVillage/components/gameFrame/HudRecenterButton.tsx"
+      ],
+      "sourceHash": "8cfa6f76499ad8db",
+      "links": {
+        "contract": [],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-hud-corner]|[role=\"menu\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/default-ctx-a.png",
+            "shots/V1/menu-open-ctx-a.png",
+            "shots/V1/panels-open-ctx-a.png",
+            "shots/V1/hud-hidden-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "componentId": "hud-corner",
+            "sourceSha": "e061dab386227999c5ab91fd400de0fae8c33be0",
+            "sourceHash": "8cfa6f76499ad8db",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T20:40:14.397Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S1_WorldMapIdle"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"hud-hide-toggle\"], [data-testid=\"hud-menu-trigger\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "menu-open",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "menu-open-ctx-a.png",
+                    "menu-open-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "menu-open-iso-0.png",
+                    "menu-open-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface+key",
+                  "surface": "S1_WorldMapIdle",
+                  "key": "Escape"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"hud-menu-trigger\"]",
+                  "property": "aria-expanded",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "panels-open",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "panels-open-ctx-a.png",
+                    "panels-open-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "panels-open-iso-0.png",
+                    "panels-open-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/hudPanelsOpen.ts"
+                },
+                "assertion": {
+                  "selector": "[data-hud-panels-trigger]",
+                  "property": "aria-expanded",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "hud-hidden",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "hud-hidden-ctx-a.png",
+                    "hud-hidden-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "hud-hidden-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface+key",
+                  "surface": "S1_WorldMapIdle",
+                  "key": "h"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"hud-hide-toggle\"]",
+                  "property": "aria-pressed",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "pixi-world-map",
+      "title": "Pixi world map canvas + anchors layer",
+      "category": "view",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S1_WorldMapIdle"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"world-map-layer\"] canvas",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/pages/game-frame-pixi.tsx",
+        "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx"
+      ],
+      "sourceHash": "d86832c7e6141dd0",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/pixi-world-map.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"world-map-layer\"]|[data-testid=\"pixi-world-canvas\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "pixi-world-map",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "d86832c7e6141dd0",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:50:14.539Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png",
+                    "default-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S1_WorldMapIdle"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"world-map-layer\"] canvas",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "map-quest-poi",
+      "title": "Quest POI sigilli on the continent map",
+      "category": "marker",
+      "status": "documenting",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S1_WorldMapIdle"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"map-quest-poi\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "planner-context",
+          "driver": {
+            "kind": "surface",
+            "id": "S6_QuestPlanner"
+          },
+          "assertion": {
+            "selector": "[data-quest-poi-id]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/MapQuestPoi.tsx",
+        "src/ui/idleVillage/components/poi/PoiMatericV3_5.tsx"
+      ],
+      "sourceHash": "fb1b7135253e3fb2",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/map-quest-poi.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"map-quest-poi\"]|[data-map-quest-poi-target]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "map-quest-poi",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "fb1b7135253e3fb2",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:52:37.516Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": false
+              },
+              {
+                "id": "planner-context",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "planner-context-ctx-a.png",
+                    "planner-context-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "planner-context-iso-0.png",
+                    "planner-context-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S6_QuestPlanner"
+                },
+                "assertion": {
+                  "selector": "[data-quest-poi-id]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": [],
+            "partial": true
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "world-surface-event-card",
+      "title": "World event card + goblin invasion sticker/marker",
+      "category": "overlay",
+      "status": "documenting",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S15_GoblinInvasionEvent"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"invasion-goblin-marker\"], [data-testid=\"world-event-card-body\"], [data-testid=\"goblin-window-sticker\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/WorldSurfaceEventCard.tsx",
+        "src/ui/idleVillage/components/GoblinInvasionWindow.tsx",
+        "src/pages/game-frame-pixi.tsx"
+      ],
+      "sourceHash": "40766eb77d5fdd69",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/world-surface-event-card.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"world-event-card\"]|[data-testid=\"world-event-card-body\"]|[data-testid=\"goblin-window-sticker\"]|[data-testid=\"invasion-goblin-marker\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "world-surface-event-card",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "40766eb77d5fdd69",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:58:45.701Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": false,
+                "asserted": false
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": [],
+            "partial": true
+          }
+        }
+      ],
+      "children": [],
+      "notes": "The goblin event card+sticker were already visible at S1 on the audited build (invasion in progress in the save). S15 drives the canonical trigger."
+    },
+    {
+      "id": "world-surface-event-shroud",
+      "title": "Fullscreen event shroud veil over the map",
+      "category": "overlay",
+      "status": "documenting",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S15_GoblinInvasionEvent"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"ws-event-shroud\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/WorldSurfaceEventShroud.tsx",
+        "src/balancing/config/idleVillage/eventShroudGradeTokens.ts"
+      ],
+      "sourceHash": "6b8a9797a332ae32",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/world-surface-event-shroud.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"ws-event-shroud\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "world-surface-event-shroud",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "6b8a9797a332ae32",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:04:34.166Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": false,
+                "asserted": false
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": [],
+            "partial": true
+          }
+        }
+      ],
+      "children": [],
+      "notes": "aria-hidden fullscreen layer, always mounted; the meaningful state is \"covered\" during an event theatre (dims/grades the map)."
+    },
+    {
+      "id": "objective-cartouche",
+      "title": "Current-objective cartouche (top-left)",
+      "category": "hud_cluster",
+      "status": "documenting",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S1_WorldMapIdle"
+          },
+          "assertion": {
+            "selector": "[aria-labelledby=\"hud-objective-label\"]",
+            "property": "visible",
+            "expected": "false"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/ObjectiveCartouche.tsx"
+      ],
+      "sourceHash": "0d215f879a621423",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/objective-cartouche.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[aria-labelledby=\"hud-objective-label\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "objective-cartouche",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "0d215f879a621423",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:08:03.974Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": false
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": [],
+            "partial": true
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Renders null on /game today: the page mounts the slot but never passes an objective. Assertion expects absence; document a shot only if an objective feed lands."
+    },
+    {
+      "id": "village-screen-view",
+      "title": "Village view (stage, plaque, legend, registry chip)",
+      "category": "view",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S2_VillageView"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"village-screen-view\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/VillageScreenView.tsx",
+        "src/ui/idleVillage/components/gameFrame/villageBuildingIcons.tsx"
+      ],
+      "sourceHash": "add35cfbff32327c",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/village-screen-view.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"village-screen-view\"]|[data-testid=\"village-stage\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "village-screen-view",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "add35cfbff32327c",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:08:33.879Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png",
+                    "default-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S2_VillageView"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"village-screen-view\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "village-building-pins",
+      "title": "Building pins on the village stage",
+      "category": "marker",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S2_VillageView"
+          },
+          "assertion": {
+            "selector": "[data-building-pin]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/VillageScreenView.tsx",
+        "src/ui/idleVillage/components/gameFrame/villageBuildingIcons.tsx"
+      ],
+      "sourceHash": "add35cfbff32327c",
+      "links": {
+        "contract": [],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-building-pin]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "village-building-pins",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "add35cfbff32327c",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:08:41.386Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S2_VillageView"
+                },
+                "assertion": {
+                  "selector": "[data-building-pin]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "11 pins witnessed (lumbermill, quarry, farm, warehouse, inn, smithy, market, infirmary, palisade, watchtower, barracks). Level shown as roman numeral or \"+\"."
+    },
+    {
+      "id": "village-slot-overlay",
+      "title": "Worker slot overlay on village buildings",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S2_VillageView"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"village-slot-overlay\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/VillageSlotOverlay.tsx"
+      ],
+      "sourceHash": "0b568a880baa663e",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/village-slot-overlay.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"village-slot-overlay\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "village-slot-overlay",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "0b568a880baa663e",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:49:03.106Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S2_VillageView"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"village-slot-overlay\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "village-registry",
+      "title": "Village registry drawer (building cards list)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S3_VillageRegistry"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"village-registry\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/VillageRegistry.tsx"
+      ],
+      "sourceHash": "53f174ab4a55f037",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/village-registry.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"village-registry\"]|[data-testid=\"village-registry-list\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "village-registry",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "53f174ab4a55f037",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:48:55.116Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png",
+                    "default-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S3_VillageRegistry"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"village-registry\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "village-building-tooltip",
+      "title": "Pinned building tooltip (open-stash/open-merchant actions)",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/villageBuildingTooltip.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"village-building-tooltip\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/VillageScreenView.tsx"
+      ],
+      "sourceHash": "489e302840c0b9ee",
+      "links": {
+        "contract": [],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"village-building-tooltip\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "village-building-tooltip",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "489e302840c0b9ee",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:51:37.081Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/villageBuildingTooltip.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"village-building-tooltip\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "village-stash-panel",
+      "title": "Village stash panel",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S4_VillageStash"
+          },
+          "assertion": {
+            "selector": "[data-hud-panel=\"villageStash\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/VillageStashPanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/villageStashViewModel.ts",
+        "src/ui/idleVillage/components/gameFrame/stashItemFace.tsx",
+        "src/ui/idleVillage/components/gameFrame/villageStashItemIcons.tsx"
+      ],
+      "sourceHash": "23500fe00fe93d9c",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/village-stash-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-hud-panel=\"villageStash\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "village-stash-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "23500fe00fe93d9c",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:49:33.340Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S4_VillageStash"
+                },
+                "assertion": {
+                  "selector": "[data-hud-panel=\"villageStash\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "merchant-panel",
+      "title": "Merchant panel (Trader Rowen)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S5_Merchant"
+          },
+          "assertion": {
+            "selector": "[data-hud-panel=\"merchant\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/MerchantPanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/MockBuyControl.tsx",
+        "src/ui/idleVillage/components/gameFrame/merchantOfferIcons.tsx"
+      ],
+      "sourceHash": "5962f40186e948e7",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/merchant-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-hud-panel=\"merchant\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "merchant-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "5962f40186e948e7",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:51:36.827Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S5_Merchant"
+                },
+                "assertion": {
+                  "selector": "[data-hud-panel=\"merchant\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "materic-roster-component-v2",
+      "title": "Roster stage panel (V2 materic roster)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface+key",
+            "surface": "S1_WorldMapIdle",
+            "key": "r"
+          },
+          "assertion": {
+            "selector": "[data-stage-panel=\"roster\"], [data-testid=\"resident-roster-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "party-pick",
+          "driver": {
+            "kind": "surface",
+            "id": "S6_QuestPlanner"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"resident-roster-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/rosterV2/MatericRosterComponentV2.tsx",
+        "src/ui/idleVillage/rosterV2/DragTestContainerV2.tsx",
+        "src/ui/idleVillage/rosterV2/ResidentRosterPanelV2.tsx",
+        "src/ui/idleVillage/rosterV2/VillageRosterSectionV2.tsx"
+      ],
+      "sourceHash": "c5cdce3c4865ec1f",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/materic-roster-component-v2.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-stage-panel=\"roster\"]|[data-testid=\"resident-roster-panel\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "materic-roster-component-v2",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "c5cdce3c4865ec1f",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:53:13.485Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png",
+                    "default-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface+key",
+                  "surface": "S1_WorldMapIdle",
+                  "key": "r"
+                },
+                "assertion": {
+                  "selector": "[data-stage-panel=\"roster\"], [data-testid=\"resident-roster-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "party-pick",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "party-pick-ctx-a.png",
+                    "party-pick-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "party-pick-iso-0.png",
+                    "party-pick-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S6_QuestPlanner"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"resident-roster-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Stage-managed panel (left wing). Also force-opens beside the expedition planner as the party picker. Shortcut r."
+    },
+    {
+      "id": "hud-event-ledger",
+      "title": "Event ledger panel (hanging tab)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface+key",
+            "surface": "S1_WorldMapIdle",
+            "key": "e"
+          },
+          "assertion": {
+            "selector": "[data-stage-panel=\"events\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/HudEventLedger.tsx",
+        "src/ui/idleVillage/components/gameFrame/nextEvent.ts"
+      ],
+      "sourceHash": "f60746af819f2cef",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/hud-event-ledger.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-stage-panel=\"events\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "hud-event-ledger",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "f60746af819f2cef",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:58:07.421Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface+key",
+                  "surface": "S1_WorldMapIdle",
+                  "key": "e"
+                },
+                "assertion": {
+                  "selector": "[data-stage-panel=\"events\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Stage-managed panel (right wing). Shortcut e; also listed in the Panels menu."
+    },
+    {
+      "id": "director-panel",
+      "title": "Director panel (staging actions)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface+key",
+            "surface": "S1_WorldMapIdle",
+            "key": "d"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"director-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/DirectorPanel.tsx"
+      ],
+      "sourceHash": "e14a3edd5b172257",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/director-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"director-panel\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/default-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "componentId": "director-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "e14a3edd5b172257",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:47:42.092Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface+key",
+                  "surface": "S1_WorldMapIdle",
+                  "key": "d"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"director-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Dev/trailer instrument \u2014 enabled on /game via gameFrameConfig debug.directorPanel=true. Shortcut d; also in Panels menu."
+    },
+    {
+      "id": "tuning-panel",
+      "title": "Tuning panel (live config sliders)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface+key",
+            "surface": "S1_WorldMapIdle",
+            "key": "t"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"tuning-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/TuningPanel.tsx"
+      ],
+      "sourceHash": "69803742da93a192",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/tuning-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"tuning-panel\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "tuning-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "69803742da93a192",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:49:28.785Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface+key",
+                  "surface": "S1_WorldMapIdle",
+                  "key": "t"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"tuning-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Dev instrument. Shortcut t; also in Panels menu."
+    },
+    {
+      "id": "hero-sheet-panel",
+      "title": "Hero sheet panel (resident detail)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/heroSheetOpen.ts"
+          },
+          "assertion": {
+            "selector": "#hero-sheet",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/HeroSheetPanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/useHeroSheet.tsx",
+        "src/ui/idleVillage/components/gameFrame/heroSheetMachine.ts",
+        "src/ui/idleVillage/components/gameFrame/heroSheetViewModel.ts"
+      ],
+      "sourceHash": "7a9ae13f75ecb01e",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/hero-sheet-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "#hero-sheet",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "hero-sheet-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "7a9ae13f75ecb01e",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:51:36.798Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/heroSheetOpen.ts"
+                },
+                "assertion": {
+                  "selector": "#hero-sheet",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Opens on hover INTENT over a roster rail card (clicks cancel intent; the p shortcut needs a mounted rail). Selector is the element id, not a testid."
+    },
+    {
+      "id": "quest-expedition-detail",
+      "title": "Expedition planner floating panel",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S6_QuestPlanner"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-expedition-detail\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/quests/QuestExpeditionDetail.tsx",
+        "src/ui/idleVillage/components/FloatingPanel.tsx",
+        "src/ui/idleVillage/quests/useQuestExpeditionSession.tsx"
+      ],
+      "sourceHash": "4321f96d4c3d381e",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-expedition-detail.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-expedition-detail\"]|[data-hud-panel^=\"quest-expedition-\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/default-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "componentId": "quest-expedition-detail",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "4321f96d4c3d381e",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:09:29.688Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png",
+                    "default-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S6_QuestPlanner"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"quest-expedition-detail\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "FloatingPanel chrome (minimize/close). Includes party slot rack, exposure cells, loadout/bag, forecast column."
+    },
+    {
+      "id": "quest-run-window",
+      "title": "Quest run window (theatre, beats, choices, belt, log, amanuense, epilogue)",
+      "category": "overlay",
+      "status": "unassigned",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S7_QuestJourneyOutbound"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-window\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "narrative-beat",
+          "driver": {
+            "kind": "surface",
+            "id": "S8_QuestStageNarrative"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-window-beat\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "stage-choice",
+          "driver": {
+            "kind": "surface",
+            "id": "S9_QuestStageChoice"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-window-choice\"]:not([disabled])",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestRunWindow.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestBeltPlaque.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestLogPanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestCheckOptionsPanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestEpilogue.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestReturnedCrew.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestPartyRosterPanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestJourneyPhaseStrip.tsx",
+        "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx"
+      ],
+      "sourceHash": null,
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-run-window.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-window\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null
+        }
+      ],
+      "children": [],
+      "notes": "BLOCKER witnessed 2026-10-24: expedition demoLaunch throws \"Cannot access X before initialization\" (TDZ circular import) and the ErrorBoundary catches it \u2014 on the frozen preview AND the dev server. Quest-run states unreachable this session; selectors taken from source."
+    },
+    {
+      "id": "quest-stage-cluster",
+      "title": "Quest stage cluster: run window + skill-check column/wings",
+      "category": "overlay",
+      "status": "unassigned",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "armed",
+          "driver": {
+            "kind": "surface",
+            "id": "S10_QuestSkillCheckArmed"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-check-column\"], .da-tira",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "verdict",
+          "driver": {
+            "kind": "surface",
+            "id": "S11_QuestSkillCheckParked"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-verdict-card\"], [data-astro-idle=\"parked\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestStageCluster.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestSkillCheckColumn.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestSkillCheckOverlay.tsx",
+        "src/ui/idleVillage/components/gameFrame/QuestVerdictCard.tsx",
+        "src/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit.tsx"
+      ],
+      "sourceHash": null,
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-stage-cluster.md",
+          ".mw/contracts/components/quest-skill-check-column.md",
+          ".mw/contracts/components/quest-skill-check-overlay.md",
+          ".mw/contracts/components/quest-verdict-card.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-stage-cluster\"]|[data-testid=\"quest-check-column\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null
+        }
+      ],
+      "children": [],
+      "notes": "Mounts the astrolabe V6.2 kit (DestinyAstrolabeV62Standalone) + verdict card; overlay variant when the window is minimised. Same TDZ blocker as quest-run-window."
+    },
+    {
+      "id": "quest-reward-popup",
+      "title": "Quest reward popup / settlement report",
+      "category": "overlay",
+      "status": "unassigned",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S13_QuestRewardPopup"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-reward-popup\"], [data-testid=\"quest-window-close-report\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestRewardPopup.tsx"
+      ],
+      "sourceHash": null,
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-reward-popup.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-reward-popup\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null
+        }
+      ],
+      "children": [],
+      "notes": "Same TDZ blocker as quest-run-window."
+    },
+    {
+      "id": "quest-journey-route",
+      "title": "On-map expedition route with progress glint",
+      "category": "overlay",
+      "status": "unassigned",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S7_QuestJourneyOutbound"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-journey-route\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestJourneyRoute.tsx"
+      ],
+      "sourceHash": null,
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-journey-route.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-journey-route\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null
+        }
+      ],
+      "children": [],
+      "notes": "Drawn on the map while a run travels; may sit behind the run window when open. Same TDZ blocker."
+    },
+    {
+      "id": "quest-outcome-toast",
+      "title": "Post-check outcome toast",
+      "category": "overlay",
+      "status": "unassigned",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S11_QuestSkillCheckParked"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-outcome-toast\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestOutcomeToast.tsx",
+        "src/ui/idleVillage/components/gameFrame/questOverlays.tsx"
+      ],
+      "sourceHash": null,
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-outcome-toast.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-outcome-toast\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null
+        }
+      ],
+      "children": [],
+      "notes": "Transient toast after a resolved check (QuestOutcomeToastHost). Same TDZ blocker."
+    },
+    {
+      "id": "title-screen",
+      "title": "Title screen (continue/new/load/settings)",
+      "category": "view",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/titleScreen.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"title-screen\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/menu/TitleScreen.tsx",
+        "src/ui/idleVillage/components/gameFrame/menu/GameEntry.tsx"
+      ],
+      "sourceHash": "b82b31bacf80d74e",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/title-screen.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"title-screen\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "title-screen",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "b82b31bacf80d74e",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:08:47.430Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": true,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/titleScreen.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"title-screen\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Shown only via ?title=1, Tauri launch, or the post-quit session flag \u2014 a plain /game visit goes straight into the game. Driver navigates with ?title=1."
+    },
+    {
+      "id": "game-boot-screen",
+      "title": "Boot veil / loading screen",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S0_BootVeil"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"game-boot-screen\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/GameBootScreen.tsx"
+      ],
+      "sourceHash": "893a8a4016bd6c1e",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/game-boot-screen.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"game-boot-screen\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "game-boot-screen",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "893a8a4016bd6c1e",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:08:23.868Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": []
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S0_BootVeil"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"game-boot-screen\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Transient: phases manifest\u2192assets\u2192ready; gone by the time the map is interactable. Capture races the boot."
+    },
+    {
+      "id": "settings-panel",
+      "title": "Settings dialog (language, interface size, reduced motion)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "title",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/titleSettings.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"settings-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "in-game-menu",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/hudMenuSettings.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"settings-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/menu/SettingsPanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx"
+      ],
+      "sourceHash": "ea8a40e50c07da51",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/settings-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"settings-panel\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/title-ctx-a.png",
+            "shots/V1/in-game-menu-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "componentId": "settings-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "ea8a40e50c07da51",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:09:11.563Z",
+            "states": [
+              {
+                "id": "title",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "title-ctx-a.png",
+                    "title-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "title-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": true,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/titleSettings.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"settings-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "in-game-menu",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "in-game-menu-ctx-a.png",
+                    "in-game-menu-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "in-game-menu-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/hudMenuSettings.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"settings-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Same dialog mounts from the title screen (S14 path needs ?title=1 on plain browser) and from the in-game HUD menu \u2192 Settings."
+    },
+    {
+      "id": "load-game-panel",
+      "title": "Load game dialog",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "in-game-menu",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/hudMenuLoadGame.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"load-game-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        },
+        {
+          "id": "title",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/titleLoadGame.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"load-game-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/menu/LoadGamePanel.tsx",
+        "src/ui/idleVillage/components/gameFrame/menu/GameMenuDialog.tsx"
+      ],
+      "sourceHash": "eb4a943fa8e8fad3",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/load-game-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"load-game-panel\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "load-game-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "eb4a943fa8e8fad3",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:07:11.366Z",
+            "states": [
+              {
+                "id": "in-game-menu",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "in-game-menu-ctx-a.png",
+                    "in-game-menu-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "in-game-menu-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/hudMenuLoadGame.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"load-game-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              },
+              {
+                "id": "title",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "title-ctx-a.png",
+                    "title-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "title-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": true,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/titleLoadGame.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"load-game-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Also opens from the title screen Load button."
+    },
+    {
+      "id": "memorial-panel",
+      "title": "Memorial panel (fallen residents)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/hudMenuMemorial.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"memorial-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/menu/MemorialPanel.tsx"
+      ],
+      "sourceHash": "a5cbd31682ae8e28",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/memorial-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"memorial-panel\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "memorial-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "a5cbd31682ae8e28",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:02:28.061Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/hudMenuMemorial.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"memorial-panel\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "In-game HUD menu \u2192 Memorial."
+    },
+    {
+      "id": "settlement-lost-overlay",
+      "title": "Settlement-lost takeover overlay",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/directorSettlementLost.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"settlement-lost-overlay\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/SettlementLostOverlay.tsx"
+      ],
+      "sourceHash": "9d207c7969fcc56c",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/settlement-lost-overlay.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"settlement-lost-overlay\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "settlement-lost-overlay",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "9d207c7969fcc56c",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:09:06.330Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/directorSettlementLost.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"settlement-lost-overlay\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "No canonical in-game trigger yet (day-30 loss path out of scope); staged via Director action settlementLost."
+    },
+    {
+      "id": "hero-level-ceremony",
+      "title": "Hero level-up ceremony layer",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/directorHeroLevelUp.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"hero-levelup-layer\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/rosterV2/HeroLevelCeremony.tsx",
+        "src/ui/idleVillage/rosterV2/HeroLevelDecor.tsx",
+        "src/ui/idleVillage/rosterV2/runHeroLevelUpStaging.ts"
+      ],
+      "sourceHash": "cd6b4a3ec2e4257e",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/hero-level-ceremony.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"hero-levelup-layer\"]|[data-testid=\"hero-levelup-plate\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "hero-level-ceremony",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "cd6b4a3ec2e4257e",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:09:18.347Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png",
+                    "default-iso-1.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/directorHeroLevelUp.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"hero-levelup-layer\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Staged via Director action levelup (opens roster if needed)."
+    },
+    {
+      "id": "legacy-reliquary-panel",
+      "title": "Legacy reliquary panel (equipment slots)",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/directorLegacyReliquary.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"legacy-reliquary\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/legacy/LegacyReliquaryPanel.tsx"
+      ],
+      "sourceHash": "00a2dff774692170",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/legacy-reliquary-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"legacy-reliquary\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "legacy-reliquary-panel",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "00a2dff774692170",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:09:32.417Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/directorLegacyReliquary.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"legacy-reliquary\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Only reachable via Director action legacy (PLAN-067 T-C4 staging)."
+    },
+    {
+      "id": "region-tooltip",
+      "title": "Map region name plate on hover",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/regionTooltip.ts"
+          },
+          "assertion": {
+            "selector": "[role=\"tooltip\"]:not([data-hud-tooltip])",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/RegionTooltip.tsx"
+      ],
+      "sourceHash": "1a111a7940e4a824",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/region-tooltip.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[role=\"tooltip\"]:not([data-hud-tooltip])",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "region-tooltip",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "1a111a7940e4a824",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:53:13.523Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/regionTooltip.ts"
+                },
+                "assertion": {
+                  "selector": "[role=\"tooltip\"]:not([data-hud-tooltip])",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Pointer-events:none plate over a painted map region; mounts on regionHover. Selector distinguishes it from the radix HUD tooltip."
+    },
+    {
+      "id": "hud-tooltip",
+      "title": "HUD control tooltip plate (radix)",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/hudTooltipHover.ts"
+          },
+          "assertion": {
+            "selector": "[data-hud-tooltip]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/HudTooltip.tsx"
+      ],
+      "sourceHash": "1c84df69c3676f04",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/hud-tooltip.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-hud-tooltip]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "hud-tooltip",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "1c84df69c3676f04",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T22:57:51.970Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/hudTooltipHover.ts"
+                },
+                "assertion": {
+                  "selector": "[data-hud-tooltip]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Shared hover tooltip for HUD chrome (nav items, corner controls, plaques). Mounts in a portal after 350 ms."
+    },
+    {
+      "id": "stage-edge-strips",
+      "title": "Stage edge strips: collapsed-panel tabs and wing rails",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S6_QuestPlanner"
+          },
+          "assertion": {
+            "selector": "[data-stage-strips]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/stageZones/useGameStageZones.tsx"
+      ],
+      "sourceHash": "de3b4aa1d79566c6",
+      "links": {
+        "contract": [],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-stage-strips]|[data-hud-strip-tab]|[data-stage-rail]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "stage-edge-strips",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "de3b4aa1d79566c6",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:07:46.443Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": false,
+                "driver": {
+                  "kind": "surface",
+                  "id": "S6_QuestPlanner"
+                },
+                "assertion": {
+                  "selector": "[data-stage-strips]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Container is always mounted (fullscreen, aria-hidden when empty). Edge tabs appear only when a stage-managed panel is collapsed; wing rails when a zone is squeezed \u2264 wingRailPx. S6 (planner+roster wings) is the most reliable populated regime witnessed."
+    },
+    {
+      "id": "error-boundary",
+      "title": "ErrorBoundary fallback (crash screen)",
+      "category": "overlay",
+      "status": "documenting",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "surface",
+            "id": "S1_WorldMapIdle"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"error-message\"]",
+            "property": "visible",
+            "expected": "false"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/organisms/ErrorBoundary.tsx",
+        "src/App.tsx"
+      ],
+      "sourceHash": "d28b36ddb6a663a9",
+      "links": {
+        "contract": [],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"error-message\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "error-boundary",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "d28b36ddb6a663a9",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:08:13.996Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": false
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": [],
+            "partial": true
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Default assertion expects ABSENCE (a healthy /game shows no error). It was WITNESSED this session covering the whole route after the quest-run TDZ crash."
+    },
+    {
+      "id": "new-game-confirm",
+      "title": "New-game confirm dialog (title screen)",
+      "category": "overlay",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "default",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/newGameConfirm.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"new-game-confirm\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/menu/GameEntry.tsx",
+        "src/ui/idleVillage/components/gameFrame/menu/GameMenuConfirm.tsx"
+      ],
+      "sourceHash": "af7b1f7d5ff39be8",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/game-menu-confirm.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"new-game-confirm\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "componentId": "new-game-confirm",
+            "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+            "sourceHash": "af7b1f7d5ff39be8",
+            "baseURL": "http://localhost:5199",
+            "backend": "metal",
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "capturedAt": "2026-10-24T23:08:52.415Z",
+            "states": [
+              {
+                "id": "default",
+                "reached": true,
+                "asserted": true,
+                "shots": {
+                  "inContext": [
+                    "default-ctx-a.png",
+                    "default-ctx-b.png"
+                  ],
+                  "isolated": [
+                    "default-iso-0.png"
+                  ]
+                },
+                "deterministicSameBytes": true,
+                "driver": {
+                  "kind": "script",
+                  "ref": "scripts/catalog/drivers/newGameConfirm.ts"
+                },
+                "assertion": {
+                  "selector": "[data-testid=\"new-game-confirm\"]",
+                  "property": "visible",
+                  "expected": "true"
+                }
+              }
+            ],
+            "consoleErrors": [],
+            "networkFailures": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "Mounts only when info.hasProgress; a fresh profile skips it (driver returns unreachable honestly). Driver navigates via ?title=1 then clicks the New Game pill."
+    }
+  ]
+}

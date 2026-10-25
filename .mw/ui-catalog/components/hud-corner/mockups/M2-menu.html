@@ -1,0 +1,64 @@
+<!doctype html><html><body style="margin:0;background:linear-gradient(180deg,#3d8a9b,#2f7d8f);font-family:Cinzel,serif;height:100vh;position:relative;overflow:hidden">
+<!-- M2 "Menu, sectioned": the 690px dump becomes a shorter plaque —
+     PANELS removed (single source = panels popover), real title bar,
+     session rows with meta, Quit separated + danger, options as
+     segmented controls. ~430px instead of ~690px. -->
+<div style="position:absolute;right:26px;bottom:26px;display:flex;flex-direction:column;align-items:flex-end;gap:12px">
+
+  <!-- menu plaque -->
+  <div style="background:linear-gradient(180deg,#0f2a35,#09202a);border:1.5px solid #a0762f;border-bottom:3px solid #c2a355;border-radius:6px;width:280px;box-shadow:0 6px 18px rgba(0,0,0,.55);max-height:72vh;display:flex;flex-direction:column">
+
+    <!-- title bar -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px 8px;border-bottom:1px solid rgba(194,163,85,.35)">
+      <span style="color:#cfaf63;font-size:13px;letter-spacing:3px">MENU</span>
+      <span style="color:#7d9aa5;font-size:10px;letter-spacing:1px">ESC</span>
+    </div>
+
+    <div style="padding:8px 12px 10px;display:flex;flex-direction:column;gap:5px;overflow-y:auto">
+      <!-- SESSION -->
+      <div style="color:#8fa9b3;font-size:9px;letter-spacing:2.5px;margin:4px 2px 2px">SESSION</div>
+      <div style="background:#0a1a22;border:1px solid #33505c;border-radius:14px;padding:7px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#d8bd78;font-size:12px;letter-spacing:1.5px">SAVE NOW</span>
+        <span style="color:#5d7279;font-size:10px;font-family:Georgia,serif;font-style:italic">saved 2m ago</span>
+      </div>
+      <div style="background:#0a1a22;border:1px solid #33505c;border-radius:14px;padding:7px 14px"><span style="color:#d8bd78;font-size:12px;letter-spacing:1.5px">LOAD GAME…</span></div>
+      <div style="background:#0a1a22;border:1px solid #33505c;border-radius:14px;padding:7px 14px"><span style="color:#d8bd78;font-size:12px;letter-spacing:1.5px">MEMORIAL…</span></div>
+      <div style="background:#0a1a22;border:1px solid #33505c;border-radius:14px;padding:7px 14px"><span style="color:#d8bd78;font-size:12px;letter-spacing:1.5px">ALL SETTINGS…</span></div>
+
+      <!-- OPTIONS -->
+      <div style="color:#8fa9b3;font-size:9px;letter-spacing:2.5px;margin:8px 2px 2px">OPTIONS</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px">
+        <span style="color:#7d9aa5;font-size:10px;letter-spacing:1.5px">LANGUAGE</span>
+        <span style="display:flex;gap:3px">
+          <span style="background:#1f7f8a;border:1px solid #cfaf63;color:#e8d6ae;font-size:10px;letter-spacing:1px;padding:3px 9px;border-radius:10px">EN</span>
+          <span style="background:#0a1a22;border:1px solid #33505c;color:#8fa9b3;font-size:10px;letter-spacing:1px;padding:3px 9px;border-radius:10px">IT</span>
+        </span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px">
+        <span style="color:#7d9aa5;font-size:10px;letter-spacing:1.5px">SIZE</span>
+        <span style="display:flex;gap:3px">
+          <span style="background:#1f7f8a;border:1px solid #cfaf63;color:#e8d6ae;font-size:10px;padding:3px 7px;border-radius:10px">AUTO</span>
+          <span style="background:#0a1a22;border:1px solid #33505c;color:#8fa9b3;font-size:10px;padding:3px 7px;border-radius:10px">100</span>
+          <span style="background:#0a1a22;border:1px solid #33505c;color:#8fa9b3;font-size:10px;padding:3px 7px;border-radius:10px">125</span>
+          <span style="background:#0a1a22;border:1px solid #33505c;color:#8fa9b3;font-size:10px;padding:3px 7px;border-radius:10px">150</span>
+          <span style="background:#0a1a22;border:1px solid #33505c;color:#8fa9b3;font-size:10px;padding:3px 7px;border-radius:10px">200</span>
+        </span>
+      </div>
+
+      <!-- danger, separated -->
+      <div style="height:1px;background:rgba(194,163,85,.35);margin:8px 2px 4px"></div>
+      <div style="background:linear-gradient(180deg,#3a1d1d,#2a1414);border:1px solid #8c4a3a;border-radius:14px;padding:7px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#d99a8a;font-size:12px;letter-spacing:1.5px">QUIT TO TITLE…</span>
+        <span style="color:#8c6a5a;font-size:9px;font-family:Georgia,serif;font-style:italic">asks confirm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- dock (menu pressed) -->
+  <div style="background:linear-gradient(180deg,#0f2a35,#09202a);border:1.5px solid #a0762f;border-bottom:3px solid #c2a355;border-radius:26px;padding:7px;display:flex;gap:9px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.5)">
+    <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#1f7f8a,#155e66);border:2px solid #cfaf63;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 4px rgba(0,0,0,.45)"><span style="color:#e8d6ae;font-size:17px">☰</span></div>
+    <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#0f2a35,#09202a);border:1.5px solid #c2a355;display:flex;align-items:center;justify-content:center"><span style="color:#cfaf63;font-size:16px">▣</span></div>
+    <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#0f2a35,#09202a);border:1.5px solid #c2a355;display:flex;align-items:center;justify-content:center"><span style="color:#cfaf63;font-size:16px">◉</span></div>
+  </div>
+</div>
+</body></html>

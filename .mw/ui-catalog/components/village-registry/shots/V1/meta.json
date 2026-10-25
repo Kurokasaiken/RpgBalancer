@@ -1,0 +1,41 @@
+{
+  "componentId": "village-registry",
+  "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+  "sourceHash": "53f174ab4a55f037",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T22:48:55.116Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "default-ctx-a.png",
+          "default-ctx-b.png"
+        ],
+        "isolated": [
+          "default-iso-0.png",
+          "default-iso-1.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface",
+        "id": "S3_VillageRegistry"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"village-registry\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

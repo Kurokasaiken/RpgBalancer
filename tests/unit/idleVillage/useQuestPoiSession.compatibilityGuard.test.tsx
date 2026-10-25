@@ -111,6 +111,93 @@ describe('useQuestPoiSession — compatibility abstains while the quest lives (R
   });
 });
 
+describe('useQuestPoiSession — roster stays pickable for the occupied-seat swap (R-283)', () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
+  const poiHooks = () =>
+    (window as unknown as {
+      __idleVillageTestHooks: {
+        assignResident: (residentId: string) => string | null;
+        getSlotAssignments: () => Array<{ id: string; assignedResidentId: string | null }>;
+        openPoiDetail: () => void;
+        getPageFlight: () => { mode: string };
+      };
+    }).__idleVillageTestHooks;
+
+  // INV:use-quest-poi-session.INV-2 — R-283: a never-assigned resident whose
+  // only compatible seat is OCCUPIED must stay 'valid' — PgCard disables the
+  // draggable on 'invalid', so an all-invalid roster made the R-281/QoL-5
+  // roster→occupied-seat swap unreachable exactly when the rack is full.
+  it('marks an unassigned resident compatible when only occupied seats accept it', () => {
+    const { result } = renderHook(() => useQuestPoiSession({ exposeTestHooks: true }));
+
+    /* Fill every quest_city_rats seat — one act per assign so the test-hook
+     *  closures re-register on the fresh assignments. */
+    act(() => { poiHooks().assignResident('hero-sir-spaccaculi'); });  // → slot-0
+    act(() => { poiHooks().assignResident('hero-giggiolillo'); });   // → slot-1
+    act(() => { poiHooks().assignResident('hero-salvatrice'); });    // → slot-2 (ward/clarity)
+    /* The three authored seats are full; the 'infinite' virtual placeholder
+     *  stays free but wants edge+discipline|moth — nobody in the roster can
+     *  fill it, which is exactly the all-invalid rack the Director saw. */
+    const slots = poiHooks().getSlotAssignments();
+    for (const id of ['quest_city_rats-slot-0', 'quest_city_rats-slot-1', 'quest_city_rats-slot-2']) {
+      expect(slots.find((s) => s.id === id)?.assignedResidentId).toBeTruthy();
+    }
+
+    /* 'fortitude' fits only the now-OCCUPIED combatant seats — the replace
+     *  gate must keep the card draggable, not stamp «Nessuno slot compatibile». */
+    expect(result.current.getResidentCompatibility('villager-mastro-beppe')?.state).toBe('valid');
+    expect(result.current.getResidentCompatibility('villager-baldassarre')?.state).toBe('valid');
+
+    /* 'precision' matches NO seat at all — the refusal stays honest. */
+    expect(result.current.getResidentCompatibility(INCOMPATIBLE_RESIDENT)?.state).toBe('invalid');
+  });
+
+  // INV:use-quest-poi-session.INV-2 — R-283: if the seat anchor is missing
+  // when the deferred flight read runs, the flying lock must release — a
+  // stuck `flyingResidentId` killed every later click-assign and left the
+  // card locked 'away' forever (the expedition session already releases it).
+  it('releases the flying lock when the seat anchor is missing', async () => {
+    const { result } = renderHook(() => useQuestPoiSession({ exposeTestHooks: true }));
+    act(() => { poiHooks().openPoiDetail(); });
+
+    /* The roster card exists (the click needs a `from` anchor), but NO seat
+     *  element is mounted — the deferred `to` read resolves null. */
+    const card = document.createElement('div');
+    card.dataset.residentId = 'hero-sir-spaccaculi';
+    document.body.append(card);
+    try {
+      act(() => {
+        result.current.handleResidentSelect('hero-sir-spaccaculi');
+      });
+      await act(async () => { await new Promise((r) => setTimeout(r, 80)); });
+
+      /* The lock must be released — otherwise every later click-assign dies
+       *  on `flyingResidentRef.current` and the card stays 'away' forever. */
+      expect(result.current.lockedResidentIds).not.toContain('hero-sir-spaccaculi');
+
+      /* And a later click-assign is not dead: with the seat anchor mounted
+       *  the flight arms. */
+      const seat = document.createElement('div');
+      seat.dataset.testid = 'slot-button-quest_city_rats-slot-0';
+      document.body.append(seat);
+      try {
+        act(() => {
+          result.current.handleResidentSelect('hero-sir-spaccaculi');
+        });
+        await act(async () => { await new Promise((r) => setTimeout(r, 80)); });
+        expect(poiHooks().getPageFlight().mode).toBe('flight');
+      } finally {
+        seat.remove();
+      }
+    } finally {
+      card.remove();
+    }
+  });
+});
+
 describe('roster composer — no compat while any quest context is live (R-241)', () => {
   // INV:game-frame-pixi.INV-3 — the composed roster resolver returns
   // undefined as soon as ONE session reports a live quest context, so the

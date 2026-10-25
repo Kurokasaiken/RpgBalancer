@@ -1,0 +1,40 @@
+{
+  "componentId": "new-game-confirm",
+  "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+  "sourceHash": "af7b1f7d5ff39be8",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T23:08:52.415Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "default-ctx-a.png",
+          "default-ctx-b.png"
+        ],
+        "isolated": [
+          "default-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": true,
+      "driver": {
+        "kind": "script",
+        "ref": "scripts/catalog/drivers/newGameConfirm.ts"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"new-game-confirm\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

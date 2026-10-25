@@ -1,0 +1,34 @@
+<!doctype html><html><body style="margin:0;background:linear-gradient(180deg,#3d8a9b,#2f7d8f);font-family:Cinzel,serif;height:100vh;position:relative;overflow:hidden">
+<!-- M1 "Dock with real states": the three bare discs become one lacquer dock.
+     Pressed = solid teal fill + brass rim (NO inner halo, NO hanging hardware).
+     Every control gets a visible hotkey chip; panels gets an unread badge;
+     a tooltip plaque shows on the hide control. -->
+<div style="position:absolute;right:26px;bottom:26px;display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+
+  <!-- tooltip on the hide control (always available, shown here on hover-equivalent) -->
+  <div style="background:linear-gradient(180deg,#0f2a35,#09202a);border:1px solid #a0762f;border-radius:4px;padding:5px 10px;color:#d8bd78;font-size:11px;letter-spacing:1.5px;box-shadow:0 3px 10px rgba(0,0,0,.45);margin-bottom:-2px">HIDE UI <span style="color:#7d9aa5">·</span> <span style="color:#cfaf63">H</span></div>
+
+  <!-- the dock: one lacquer pill plaque around the three controls -->
+  <div style="background:linear-gradient(180deg,#0f2a35,#09202a);border:1.5px solid #a0762f;border-bottom:3px solid #c2a355;border-radius:26px;padding:7px;display:flex;gap:9px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.5)">
+
+    <!-- game menu — OPEN: solid teal fill + brass rim, Esc chip -->
+    <div style="position:relative;width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#1f7f8a,#155e66);border:2px solid #cfaf63;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 4px rgba(0,0,0,.45)">
+      <span style="color:#e8d6ae;font-size:17px;line-height:1">☰</span>
+      <span style="position:absolute;right:-4px;bottom:-4px;background:#0c1b24;border:1px solid #a0762f;color:#cfaf63;font:600 8px Cinzel,serif;letter-spacing:.5px;padding:1px 4px;border-radius:4px">ESC</span>
+    </div>
+
+    <!-- panels — closed, unread badge 3, kbd chip -->
+    <div style="position:relative;width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#0f2a35,#09202a);border:1.5px solid #c2a355;display:flex;align-items:center;justify-content:center">
+      <span style="color:#cfaf63;font-size:16px;line-height:1">▣</span>
+      <span style="position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;border-radius:8px;background:#8c2f22;border:1px solid #c2a355;color:#f0d8a0;font:700 10px/14px Georgia,serif;text-align:center;padding:0 3px;box-sizing:border-box">3</span>
+      <span style="position:absolute;right:-4px;bottom:-4px;background:#0c1b24;border:1px solid #a0762f;color:#cfaf63;font:600 8px Cinzel,serif;letter-spacing:.5px;padding:1px 4px;border-radius:4px">P</span>
+    </div>
+
+    <!-- hide toggle — closed, H chip -->
+    <div style="position:relative;width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#0f2a35,#09202a);border:1.5px solid #c2a355;display:flex;align-items:center;justify-content:center">
+      <span style="color:#cfaf63;font-size:16px;line-height:1">◉</span>
+      <span style="position:absolute;right:-4px;bottom:-4px;background:#0c1b24;border:1px solid #a0762f;color:#cfaf63;font:600 8px Cinzel,serif;letter-spacing:.5px;padding:1px 4px;border-radius:4px">H</span>
+    </div>
+  </div>
+</div>
+</body></html>

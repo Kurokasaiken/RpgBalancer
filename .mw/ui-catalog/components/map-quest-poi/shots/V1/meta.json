@@ -1,0 +1,46 @@
+{
+  "componentId": "map-quest-poi",
+  "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+  "sourceHash": "fb1b7135253e3fb2",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T22:52:37.516Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": false
+    },
+    {
+      "id": "planner-context",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "planner-context-ctx-a.png",
+          "planner-context-ctx-b.png"
+        ],
+        "isolated": [
+          "planner-context-iso-0.png",
+          "planner-context-iso-1.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface",
+        "id": "S6_QuestPlanner"
+      },
+      "assertion": {
+        "selector": "[data-quest-poi-id]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

@@ -1,0 +1,40 @@
+{
+  "componentId": "region-tooltip",
+  "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+  "sourceHash": "1a111a7940e4a824",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T22:53:13.523Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "default-ctx-a.png",
+          "default-ctx-b.png"
+        ],
+        "isolated": [
+          "default-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "script",
+        "ref": "scripts/catalog/drivers/regionTooltip.ts"
+      },
+      "assertion": {
+        "selector": "[role=\"tooltip\"]:not([data-hud-tooltip])",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

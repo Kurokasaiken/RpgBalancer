@@ -62,6 +62,7 @@ import { WANDERLUST_PRESENTATION_MANIFEST } from '@/ui/idleVillage/config/presen
 import type { QuestRunApi } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { VILLAGE_STASH_CONFIG } from '@/balancing/config/idleVillage/villageStashConfig';
 import { buildExpeditionParty, loadoutDuration, planSlotSwap, type BagStockEntry } from './questExpedition';
+import { planRosterSlotReplace } from './questExpeditionRosterSwap';
 import type { SlotTokenDragData } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { runIdOf, beginSettlement as beginRunSettlement, commitSettlement as commitRunSettlement, settlementResourceDelta, type SettlementDeps, type SettlementMarker } from './questSettlement';
 import { useRewardAck } from '@/ui/idleVillage/questS1Lab/questRunStore';
@@ -204,6 +205,10 @@ export function useQuestExpeditionSession({
    * commits atomically at the flight's `onComplete` (PLAN-043 WS-1), never at
    * pointer release. */
   const pendingSwapRef = useRef<{ fromSlotId: string; toSlotId: string; residentId: string } | null>(null);
+  /* R-281: a roster card dropped on an occupied seat — commits as a replace
+   *  at the card's landing, sending the displaced occupant back to the roster
+   *  with the extraction's return-flight. */
+  const pendingReplaceRef = useRef<{ toSlotId: string; residentId: string; displacedId: string } | null>(null);
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
   /* R-265: rapid click-assign serialisation reads the REF (synchronous), while
    *  the STATE lands as a transition — the click's page-wide render becomes
@@ -427,12 +432,29 @@ export function useQuestExpeditionSession({
             ? slot
             : { ...slot, dropState: swapAllowed(swapFromSlotId, slot.id) ? ('valid' as const) : ('invalid' as const) },
         )
-      : controller.slots;
+      : /* R-281: a roster drag over an occupied seat gets the same repaint —
+         *  `locked` hides that a replace would be accepted; the bloom reads
+         *  the replace gate (incoming eligibility only — the displaced just
+         *  goes back to the roster). */
+        draggingResidentId
+        ? controller.slots.map((slot) =>
+            slot.assignedResidentId
+              ? {
+                  ...slot,
+                  dropState: planRosterSlotReplace(assignments, slot.id, draggingResidentId, (rid, sid) =>
+                    eligibilityFor(rid, sid).eligible,
+                  )
+                    ? ('valid' as const)
+                    : ('invalid' as const),
+                }
+              : slot,
+          )
+        : controller.slots;
     /* PLAN-043 WS-1: surface each seat's replay counter — defined only after
      * a committed swap, so `data-seat-nonce` never appears on untouched seats
      * and the lab markup is byte-identical. */
     return base.map((slot) => (seatNonces[slot.id] !== undefined ? { ...slot, seatNonce: seatNonces[slot.id] } : slot));
-  }, [swapFromSlotId, controller.slots, swapAllowed, seatNonces]);
+  }, [swapFromSlotId, controller.slots, swapAllowed, seatNonces, draggingResidentId, assignments, eligibilityFor]);
 
   /** First slot that would accept the resident — drives the roster's
    *  per-card compatibility (grayscale/aria-disabled come from there). */
@@ -451,13 +473,30 @@ export function useQuestExpeditionSession({
       if (!isDetailOpen || run) return undefined;
       const slot = findAcceptingSlot(residentId);
       if (slot) return { state: 'valid', slotId: slot.id, slotLabel: slot.label };
+      /* R-283 (INV-6): an OCCUPIED seat that passes the same replace gate the
+       *  drop verdict applies (`planRosterSlotReplace` — the displaced just
+       *  returns to the roster) keeps the card draggable; otherwise a full
+       *  rack stamps 'invalid' on the whole roster and the INV-5 swap can
+       *  never start. */
+      if (!assignedIds.includes(residentId)) {
+        const replaceTarget = controller.slots.find(
+          (s) =>
+            s.assignedResidentId &&
+            planRosterSlotReplace(assignments, s.id, residentId, (rid, sid) =>
+              eligibilityFor(rid, sid).eligible,
+            ) !== null,
+        );
+        if (replaceTarget) {
+          return { state: 'valid', slotId: replaceTarget.id, slotLabel: replaceTarget.label };
+        }
+      }
       const resident = residentsById[residentId];
       const reason = resident
         ? controller.slots.map((s) => eligibilityFor(residentId, s.id)).find((c) => !c.eligible)?.reason
         : undefined;
       return { state: 'invalid', reason };
     },
-    [isDetailOpen, run, findAcceptingSlot, residentsById, controller.slots, eligibilityFor],
+    [isDetailOpen, run, findAcceptingSlot, residentsById, controller.slots, assignedIds, assignments, eligibilityFor],
   );
 
   /** Locked = assigned + in-flight + every resident out on an unsettled
@@ -1041,7 +1080,24 @@ export function useQuestExpeditionSession({
       if (!isDetailOpen || run) return false;
       const resident = residentsById[residentId];
       if (!resident || assignedIds.includes(residentId)) return false;
-      if (slot.assignedResidentId || !eligibilityFor(residentId, slot.id).eligible) return false;
+
+      /* R-281 roster→seat replace: an occupied seat is a legal target when
+       *  the dragged resident could land there — the displaced occupant
+       *  returns to the roster at commit. Same commit-at-landing discipline
+       *  as the slot↔slot swap: the verdict only arms `pendingReplaceRef`,
+       *  `handleFlightComplete` performs it. A mid-extraction seat refuses
+       *  (the guard `commitSwap` re-checks on the target). */
+      if (!planRosterSlotReplace(assignments, slot.id, residentId, (rid, sid) => eligibilityFor(rid, sid).eligible)) {
+        return false;
+      }
+      if (slot.assignedResidentId) {
+        if (slotPhaseRef.current[slot.id] !== 'idle') return false;
+        pendingReplaceRef.current = {
+          toSlotId: slot.id,
+          residentId,
+          displacedId: slot.assignedResidentId,
+        };
+      }
 
       const element = getSlotComponentElement(slot.id);
       return { flightToSlot: { slotId: slot.id, element } };
@@ -1085,15 +1141,117 @@ export function useQuestExpeditionSession({
     [assignments, eligibilityFor, poi.id],
   );
 
+  /* R-281 roster→seat replace commit: fires at the roster card's LANDING on
+   *  the occupied seat (the verdict flight of `handleDragEnd`). One commit
+   *  seats the incoming resident AND puts the displaced medallion on the
+   *  extraction's return flight to its roster card — the single-carrier
+   *  choreography of R-257/R-269, so the displaced medal is never without a
+   *  carrier on a painted frame. When the flight can't run (no anchors, or
+   *  the channel is busy) the replace still lands: the occupant pops back
+   *  into the roster, same fallback `handleSlotClear` uses. */
+  const commitRosterReplace = useCallback(
+    (toSlotId: string, residentId: string, displacedId: string): boolean => {
+      if (slotPhaseRef.current[toSlotId] !== 'idle') return false;
+      const next = planRosterSlotReplace(assignments, toSlotId, residentId, (rid, sid) => eligibilityFor(rid, sid).eligible);
+      if (!next) return false;
+      const from = elementCenter(getSlotComponentElement(toSlotId));
+      const to =
+        elementCenter(document.querySelector(`[data-resident-id="${displacedId}"]`))
+        ?? elementCenter(document.querySelector('[data-resident-count]'))
+        ?? elementCenter(document.querySelector('[data-testid="drag-test-container"]'));
+      /* The seat re-seats its new occupant through the same nonce ceremony a
+       *  swap uses — an occupant swap on an already-seated medallion would
+       *  otherwise render as a bare prop change, not a seating. */
+      if (!from || !to || flyingResidentRef.current) {
+        startTransition(() => {
+          setAssignments(next);
+          setSeatNonces((prev) => ({ ...prev, [toSlotId]: (prev[toSlotId] ?? 0) + 1 }));
+        });
+      } else {
+        flyingResidentRef.current = displacedId;
+        startTransition(() => {
+          setAssignments(next);
+          setSeatNonces((prev) => ({ ...prev, [toSlotId]: (prev[toSlotId] ?? 0) + 1 }));
+          setReturningResidentId(displacedId);
+          setFlyingResidentId(displacedId);
+          startFlight({
+            residentId: displacedId,
+            slotId: toSlotId,
+            isInset: false,
+            fromX: from.x,
+            fromY: from.y,
+            toX: to.x,
+            toY: to.y,
+          });
+        });
+      }
+      trackTelemetryEvent('quest_expedition_swap', {
+        poiId: poi.id,
+        fromSlotId: 'roster',
+        toSlotId,
+        residentId,
+        displacedId,
+      });
+      return true;
+    },
+    [assignments, eligibilityFor, poi.id, startFlight],
+  );
+
+  /* R-282: why a slot↔slot swap landing would be refused — the first
+   *  failing leg wins: dragged → target first (same order `planSlotSwap`
+   *  evaluates), then displaced → source. `null` when the swap is legal. */
+  const swapBlockReasonFor = useCallback(
+    (fromSlotId: string, toSlotId: string): string | null => {
+      const moving = assignments[fromSlotId];
+      if (!moving || fromSlotId === toSlotId) return null;
+      const inbound = eligibilityFor(moving, toSlotId);
+      if (!inbound.eligible) return inbound.reason ?? 'ineligible';
+      const displaced = assignments[toSlotId];
+      if (displaced) {
+        const outbound = eligibilityFor(displaced, fromSlotId);
+        if (!outbound.eligible) return outbound.reason ?? 'ineligible';
+      }
+      return null;
+    },
+    [assignments, eligibilityFor],
+  );
+
+  /* R-282: why the hovered seat would refuse the in-flight drop — swap legs
+   *  during a token drag, dragged eligibility (+ `seat-busy` while the seat's
+   *  extraction machine is mid-cycle) during a roster drag. `null` when the
+   *  drop is legal or no drag is in progress; the detail surfaces it in the
+   *  rack's legend line. */
+  const seatBlockReason = useCallback(
+    (toSlotId: string): string | null => {
+      if (swapFromSlotId) return swapBlockReasonFor(swapFromSlotId, toSlotId);
+      if (draggingResidentId) {
+        const chk = eligibilityFor(draggingResidentId, toSlotId);
+        if (!chk.eligible) return chk.reason ?? 'ineligible';
+        if (assignments[toSlotId] && slotPhaseRef.current[toSlotId] !== 'idle') return 'seat-busy';
+      }
+      return null;
+    },
+    [swapFromSlotId, draggingResidentId, assignments, eligibilityFor, swapBlockReasonFor],
+  );
+
   const handleFlightComplete = useCallback(
     (residentId: string, slotId?: string) => {
+      /* A replace that passed the drag-end gate commits HERE, at landing —
+       *  the residentId+slotId check keeps a stale pending replace from
+       *  hijacking a later roster flight to the same seat. A refused commit
+       *  leaves the occupant in place and the dragged card springs back. */
+      const pending = pendingReplaceRef.current;
+      pendingReplaceRef.current = null;
       if (slotId && slotBlueprints.some((s) => s.id === slotId)) {
+        if (pending && pending.toSlotId === slotId && pending.residentId === residentId) {
+          return commitRosterReplace(pending.toSlotId, pending.residentId, pending.displacedId);
+        }
         handleAssign(slotId, residentId);
         return true;
       }
       return false;
     },
-    [slotBlueprints, handleAssign],
+    [slotBlueprints, handleAssign, commitRosterReplace],
   );
 
   const handleResidentSelect = useCallback(
@@ -1348,6 +1506,7 @@ export function useQuestExpeditionSession({
           onSlotClear={handleSlotClear}
           suppressedResidentIds={suppressedResidentIds}
           onSlotPhaseChange={handleSlotPhaseChange}
+          seatBlockReason={seatBlockReason}
           position={detailPosition}
         />
       )}
@@ -1404,6 +1563,21 @@ export function useQuestExpeditionSession({
        *  and the seat observables BV-04/BV-05 assert on. */
       commitSwap: (fromSlotId: string, toSlotId: string) =>
         commitSwap(fromSlotId, toSlotId, assignments[fromSlotId] ?? ''),
+      /* R-282: same leg-order the commit applies — lets a test assert the
+       *  announced reason without driving a real token drag. */
+      blockReasonFor: (fromSlotId: string, toSlotId: string) =>
+        swapBlockReasonFor(fromSlotId, toSlotId),
+      /* R-281: a roster drop on a seat crosses the REAL drag-end gate — the
+       *  same event shape the roster kit emits (`type:'resident'`), so the
+       *  verdict exercises the eligibility/phase guards, then
+       *  `handleFlightComplete` lands it like the kit's proxy would. */
+      dropResidentOnSlot: (residentId: string, slotBlueprintId: string) =>
+        handleDragEnd({
+          active: { id: residentId, data: { current: { type: 'resident', residentId } } },
+          over: { id: slotBlueprintId },
+        } as unknown as DragEndEvent),
+      completeRosterFlight: (residentId: string, slotBlueprintId: string) =>
+        handleFlightComplete(residentId, slotBlueprintId),
       getSlotPhase: (slotBlueprintId: string) => slotPhaseRef.current[slotBlueprintId] ?? 'idle',
       getSeatNonces: () => seatNonces,
       toggleItem,
@@ -1501,6 +1675,11 @@ export function useQuestExpeditionSession({
     handleFlightComplete,
     handleResidentSelect,
     getResidentCompatibility,
+    /* R-282: why the hovered seat would refuse the in-flight drop (swap legs
+     *  on token-drag, eligibility/`seat-busy` on roster-drag) — `null` when
+     *  the drop is legal. The rack legend surfaces it (icon part: pending
+     *  the R-282 visual-fork ruling). */
+    seatBlockReason,
     lockedResidentIds,
     /** Owns a drop/flight target id — the page composes handlers across
      *  sessions by asking each who owns the target. */

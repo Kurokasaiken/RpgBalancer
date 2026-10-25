@@ -1,0 +1,40 @@
+{
+  "componentId": "village-stash-panel",
+  "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+  "sourceHash": "23500fe00fe93d9c",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T22:49:33.340Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "default-ctx-a.png",
+          "default-ctx-b.png"
+        ],
+        "isolated": [
+          "default-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface",
+        "id": "S4_VillageStash"
+      },
+      "assertion": {
+        "selector": "[data-hud-panel=\"villageStash\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

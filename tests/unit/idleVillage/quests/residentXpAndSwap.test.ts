@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { applyPlanToState, deriveSettlementPlan } from '@/ui/idleVillage/quests/questSettlement';
 import { buildQuestEpilogue } from '@/ui/idleVillage/quests/questEpilogue';
 import { planSlotSwap } from '@/ui/idleVillage/quests/questExpedition';
+import { planRosterSlotReplace } from '@/ui/idleVillage/quests/questExpeditionRosterSwap';
 import { QUEST_SETTLEMENT } from '@/balancing/config/idleVillage/quests/questSettlement';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import type { MinimalGameplayState } from '@/store/useMinimalGameplay';
@@ -116,5 +117,37 @@ describe('R-183 planSlotSwap', () => {
   it('no-op su stesso slot o sorgente vuota', () => {
     expect(planSlotSwap({ s1: 'a' }, 's1', 's1', all)).toBeNull();
     expect(planSlotSwap({ s1: null, s2: 'b' }, 's1', 's2', all)).toBeNull();
+  });
+});
+
+// INV:use-quest-expedition-session.INV-5 — R-281: a roster medallion dropped
+// on an occupied seat takes it; the displaced resident leaves `assignments`
+// entirely (derived roster = back to roster, no gate on the way out). Only
+// the incoming resident crosses the eligibility gate.
+describe('R-281 planRosterSlotReplace', () => {
+  const all = () => true;
+
+  it('slot occupato: il trascinato prende il castone, lo scalzato torna al roster', () => {
+    const next = planRosterSlotReplace({ s1: 'a', s2: 'b' }, 's2', 'c', all);
+    expect(next).toEqual({ s1: 'a', s2: 'c' });
+    expect(Object.values(next!)).not.toContain('b');
+  });
+
+  it('slot vuoto: assegnazione normale', () => {
+    expect(planRosterSlotReplace({ s1: 'a', s2: null }, 's2', 'c', all)).toEqual({ s1: 'a', s2: 'c' });
+  });
+
+  it('rifiuta se il trascinato non è eleggibile per il castone', () => {
+    const gate = (r: string, s: string) => !(r === 'c' && s === 's2');
+    expect(planRosterSlotReplace({ s1: 'a', s2: 'b' }, 's2', 'c', gate)).toBeNull();
+  });
+
+  it('lo scalzato non deve essere eleggibile per nulla — va al roster', () => {
+    const gate = (r: string) => r !== 'b'; // 'b' non eleggibile da nessuna parte: esce comunque
+    expect(planRosterSlotReplace({ s1: 'a', s2: 'b' }, 's2', 'c', gate)).toEqual({ s1: 'a', s2: 'c' });
+  });
+
+  it('no-op su stesso residente (assignments è sparsa: l\u2019esistenza del castone resta al chiamante)', () => {
+    expect(planRosterSlotReplace({ s1: 'a' }, 's1', 'a', all)).toBeNull();
   });
 });

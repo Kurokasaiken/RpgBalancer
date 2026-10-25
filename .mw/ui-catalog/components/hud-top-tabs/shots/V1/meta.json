@@ -1,0 +1,94 @@
+{
+  "componentId": "hud-top-tabs",
+  "sourceSha": "d53c5bb289a396079be83d30ec807197b6d69999",
+  "sourceHash": "02676285dc6a9d73",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T18:58:02.146Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "default-ctx-a.png",
+          "default-ctx-b.png"
+        ],
+        "isolated": [
+          "default-iso-0.png",
+          "default-iso-1.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface",
+        "id": "S1_WorldMapIdle"
+      },
+      "assertion": {
+        "selector": "[data-hud-panel], [data-nav-id], .hud",
+        "property": "visible",
+        "expected": "true"
+      }
+    },
+    {
+      "id": "resource-low",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "resource-low-ctx-a.png",
+          "resource-low-ctx-b.png"
+        ],
+        "isolated": [
+          "resource-low-iso-0.png",
+          "resource-low-iso-1.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "script",
+        "ref": "scripts/catalog/drivers/hudResourceLow.ts"
+      },
+      "assertion": {
+        "selector": "[data-tone=\"danger\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    },
+    {
+      "id": "event-imminent",
+      "reached": false,
+      "asserted": false
+    },
+    {
+      "id": "hud-hidden",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "hud-hidden-ctx-a.png",
+          "hud-hidden-ctx-b.png"
+        ],
+        "isolated": []
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface+key",
+        "surface": "S1_WorldMapIdle",
+        "key": "h"
+      },
+      "assertion": {
+        "selector": "[data-testid='hud-hide-toggle'], [data-hud-pearl]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

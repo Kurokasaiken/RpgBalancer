@@ -1,0 +1,83 @@
+<!doctype html><meta charset="utf-8"><title>Review — hud-top-tabs</title>
+<style>
+body{margin:0;background:#0d1a20;color:#e8d6ae;font-family:Georgia,serif;padding:28px;max-width:1200px}
+h1{font-family:Cinzel,serif;color:#cfaf63;font-size:22px}
+h2{color:#a0762f;font-size:15px;margin:26px 0 8px}
+img{max-width:100%;image-rendering:auto;border:1px solid #5f3f16;border-radius:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.card{background:#09202a;border:1px solid #5f3f16;border-radius:6px;padding:12px}
+.card h3{margin:0 0 8px;font-family:Cinzel,serif;color:#d8bd78;font-size:14px}
+.tone{font-size:11px;color:#7d9aa5}
+table{border-collapse:collapse;font-size:13px}td,th{border:1px solid #5f3f16;padding:4px 10px}
+.ok{color:#9fd07a}.warn{color:#e0a050}.bad{color:#d06a5a}
+blockquote{border-left:3px solid #a0762f;margin:6px 0;padding:4px 12px;color:#c8b98f;font-size:13px}
+</style>
+<h1>UI Catalog — ruling review: <code>hud-top-tabs</code></h1>
+<p class="tone">Status: <b>in_review</b> · V1 · source sha d53c5bb2 · build congelata · 3/3 critiche image-grounded, 2/3 ranking image-grounded (chatgpt degradato: mockup non pervenuti)</p>
+
+<h2>Corrente (V1, in-contesto)</h2><img src="img/current.png" style="max-height:420px">
+<h2 style="color:#9fd07f">D — Direzione APPROVATA dal Director (round 1)</h2>
+<div class="card" style="border-color:#9fd07f"><img src="img/D.png">
+<p><b>Cosa cambia:</b> 3 placche della stessa dimensione, più lontane dai
+bordi. A sx: placca giorno invariata, ma la velocità diventa <b>tacche +
+perla</b> (la perla lacca sta sotto la velocità attiva, niente guida
+d'ottone). Al centro: <b>nuovo terzo tab</b> sempre presente — quando non
+c'è evento mostra "NESSUN EVENTO" (placca vuota, override del contratto
+renders-null approvato). A dx: risorse come ora.</p></div>
+<h2 style="color:#9fd07f">D2 — Stato stabile (apprendimenti applicati)</h2>
+<div class="card" style="border-color:#9fd07f"><img src="img/D2.png">
+<p>Chip risorse a <b>larghezza fissa</b> e anatomia unica: glifo + numero
+grande + tasso (−6/g), niente label ridondante GOLD/FOOD/WOOD.
+Tab centrale: "NESSUN EVENTO".</p></div>
+<h2 style="color:#9fd07f">D3 — Stato critico + tab evento vivo</h2>
+<div class="card" style="border-color:#9fd07f"><img src="img/D3.png">
+<p>FOOD esaurito: badge <b>"CARESTIA"</b> in ferro freddo al posto di
+"0 d left" (microcopy semantica). Tab centrale con evento reale:
+"GOBLIN · 3g".</p></div>
+<h2 style="color:#e0a050">E — Round 2 (bozza, in attesa di ruling)</h2>
+<div class="card" style="border-color:#e0a050"><img src="img/E.png">
+<p><b>Novità:</b> placca giorno più grande con <b>quadrante giorno/notte</b>
+(anello ottone con fase); velocità a <b>frecce progressive</b>
+(pausa · ▶ · ▶▶ · ▶▶▶ — convenzione RimWorld/Frostpunk/CK3) con l'attiva
+in ottone pieno; placche sx/dx identiche, margine laterale ampliato;
+tab centrale "NESSUN EVENTO" sempre presente.</p></div>
+<h2>La critica — cosa non va nel componente ATTUALE (consenso 3/3 AI)</h2>
+<ul style="font-size:14px;line-height:1.55">
+<li><b>La cella FOOD comunica il pericolo con un bordo rosso piatto</b> — il pattern "input in errore" di una dashboard web, la violazione più grave della rubrica ("stati = materia, non colore piatto"). E 1 giorno / 0 giorni hanno lo STESSO aspetto: nessuna escalation.</li>
+<li><b>Il testo del cibo è una stringa da database</b> — <code>2/20 −6/d · 0 d left</code>: l'informazione più importante dell'HUD (quando muori di fame) ha il corpo più piccolo e abbreviazioni da tool ("/d", "d").</li>
+<li><b>I 4 bottoni velocità sono app-like</b> — pill piatti arrotondati con un glow circolare sull'attivo invece di un meccanismo inciso in ottone.</li>
+<li><b>Le placche non sembrano appese</b> — pannelli con un bel bordo ancorati allo schermo, senza materia che le renda oggetti fisici (su questo le AI spingevano ferramenta: REJECTED dal Director).</li>
+<li><b>Glifi piatti</b> — icone vettoriali sovrapposte, non incise.</li>
+<li><b>Emblema circolare ambiguo</b> nel tab tempo (occhio/mirino — solo claude lo nota).</li>
+</ul>
+<h2>Proposte</h2><div class="grid">
+<div class="card"><h3>A — "Brace" <span class="tone">restyle · piccolo intervento</span></h3><img src="img/A.png">
+<p>Cosa cambia: il cibo smette di avere un <b>bordo rosso piatto</b>. Al suo posto, la cella FOOD prende una <b>luce ambra interna</b> (come brace dietro vetro) e il testo va su due righe: "−6 al giorno" piccolo, "1 giorno" grande. Se scendi a 0 giorni, la cella diventa <b>ferro freddo</b> (grigio-blu), non più rossa.<br><b>Identico il resto.</b> Solo la cella del cibo cambia aspetto.</p></div>
+<div class="card"><h3>B — "Regolo" <span class="tone">restyle + nuovo controllo</span></h3><img src="img/B.png">
+<p>Cosa cambia: al posto dei 4 bottoncini (⏸ ×1 ×2 ×4) c'è <b>una guida di ottone con 4 tacche</b> e una perla che scorre sulla velocità attiva. A sinistra, il cerchio decorativo diventa un <b>quadrante del giorno</b> (alba→tramonto). "DAY" resta, il numero cresce.<br><b>Il tab risorse non cambia.</b></p></div>
+<div class="card"><h3>C — "Placche appese" <span class="tone">STRUCTURALE · più invasivo</span></h3><img src="img/C.png">
+<p>Cosa cambia: le placche sembrano davvero <b>appese al soffitto</b>: barrette d'ottone sopra + ombra forte sotto. Il tab risorse diventa <b>una lastra con 3 incavi scavati</b> (non più 3 card separate) e l'avviso del cibo scende su un <b>cartellino attaccato sotto</b> la placca.<br><b>Cambia la forma fisica dell'intero cluster.</b></p></div></div>
+
+<h2>AI ranking (advisory — il ruling è del Director)</h2>
+<table><tr><th></th><th>A</th><th>B</th><th>C</th><th>merge suggerito</th></tr>
+<tr><td>claude</td><td class="ok">1° (r6 h7 f9 r8)</td><td>3°</td><td class="warn">2° (r7 h6 f6 r6)</td><td>base A + ferramenta/incavi C; cartellino solo fallback</td></tr>
+<tr><td>deepseek</td><td>3°</td><td>2°</td><td class="ok">1° (r8 h9 f8 r8)</td><td>tutto C + placca centrale "Nessun evento" (⚠ viola contratto renders-null: eccezione da approvare)</td></tr>
+<tr><td>chatgpt</td><td colspan=3 class="bad">degrado: immagini non pervenute</td><td>—</td></tr></table>
+<p><b>Consenso:</b> structural = C (2/2). Merge raccomandato: cella FOOD materica (A) + ferramenta + incavi (C); cartellino come fallback con tetto altezza; regolo (B) → secondo giro.</p>
+
+<h2>Digest critiche (convergenza)</h2>
+<blockquote>Placche non leggono come oggetto appeso · FOOD = stringa da db · bottoni velocità app-like · scala stati mancante (0 d left deve essere ferro freddo) · glifi piatti</blockquote>
+<p class="tone">Raw: .mw/ui-catalog/components/hud-top-tabs/critiques/ + mockups/rank-*.md</p>
+
+<h2>Contract notes</h2>
+<ul>
+<li>Tab evento: contratto `renders null` — deepseek propone placca vuota "Nessun evento" = eccezione esplicita da approvare, non default.</li>
+<li>Cartellino (C): altezza HUD-3 variabile → tetto dichiarato + fallback mobile 390×844 (PLAN-083).</li>
+<li>Nuovo tono "terminal" (ferro freddo) = aggiunta al contratto data-tone, non deduzione.</li>
+</ul>
+<h2>Ruling record</h2>
+<pre id="ruling">RULED 2026-10-24 — { component:hud-top-tabs, round:1,
+  outcome: approve_B_modified,
+  selected: "selettore velocità a tacche+perla SENZA guida ottone; placca giorno invariata",
+  rejected: "A (halo interno cibo = ruling preesistente violato), C (ferramenta appeso = rejected)",
+  notes: "le AI non conoscevano il ruling 'no halo interno' — aggiunto a ART-DIRECTION rev2" }</pre>

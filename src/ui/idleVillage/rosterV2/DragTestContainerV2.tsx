@@ -20,6 +20,19 @@ import { BezelMolding, WellBronzeBezel } from '@/ui/visualFidelityLab/plateVaria
 import { useTranslation } from 'react-i18next';
 import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
 
+/** QoL-9 (R-281): eligibility reasons with a dedicated roster copy key —
+ *  anything else (raw producer strings, e.g. the POI session's legacy
+ *  'Nessuno slot compatibile') maps to `generic`. */
+const COMPAT_REASON_KEYS = new Set([
+  'status-dead',
+  'status-away',
+  'status-exhausted',
+  'in-expedition',
+  'stat-requirement',
+  'seat-busy',
+]);
+
+
 /**
  * DragTestContainerV2 - Resident Roster Container (CANONICAL VERSION)
  * 
@@ -707,6 +720,14 @@ function DragTestContainerV2({
     const compatibilityLabel = compatibilityInfo?.slotLabel;
     const isCompatibilityInvalid = compatibilityState === 'invalid';
     const interactive = isResidentInteractive(resident) && !isCompatibilityInvalid;
+    /* QoL-9 (R-281): a compatibility-'invalid' card says WHY in its status
+     *  line — the reason was already plumbed to `compatibilityLabel` but
+     *  never rendered. Enum reasons map to roster.ineligibleReason.*;
+     *  anything else (raw producer strings) falls back to the generic copy. */
+    const compatReason = isCompatibilityInvalid ? compatibilityInfo?.reason : undefined;
+    const reasonLabel = compatReason
+      ? t(`roster.ineligibleReason.${COMPAT_REASON_KEYS.has(compatReason) ? compatReason : 'generic'}`)
+      : null;
     // REGOLA 1: Durante il drag, solo il proxy è vivo
     const isLifted = (dragVisualState?.mode === 'dragging' || dragVisualState?.mode === 'flight') &&
                     dragVisualState?.residentId === resident.id;
@@ -779,7 +800,7 @@ function DragTestContainerV2({
             isDragging={isLifted || draggingResidentId === resident.id}
             disabled={!interactive}
             isInteractive={interactive}
-            statusLabel={isLifted ? 'Away' : isLocked ? lockedStatusLabel : describeStatus(resident)}
+            statusLabel={isLifted ? 'Away' : isLocked ? lockedStatusLabel : reasonLabel ?? describeStatus(resident)}
             portraitUrl={getResidentPortraitUrl(resident)}
             compatibilityState={compatibilityState}
             compatibilityLabel={compatibilityLabel}
@@ -821,7 +842,7 @@ function DragTestContainerV2({
             isDragging={isLifted || draggingResidentId === resident.id}
             disabled={!interactive}
             isInteractive={interactive}
-            statusLabel={isLifted ? 'Away' : isLocked ? lockedStatusLabel : describeStatus(resident)}
+            statusLabel={isLifted ? 'Away' : isLocked ? lockedStatusLabel : reasonLabel ?? describeStatus(resident)}
             horizontal={cardVariant === 'horizontal'}
             portraitUrl={getResidentPortraitUrl(resident)}
             compatibilityState={compatibilityState}

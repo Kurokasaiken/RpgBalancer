@@ -88,6 +88,49 @@ export const SceneRevealLayer: React.FC<{
         />
       )}
 
+      {/* parallax-slide (Director spec 2026-10-24): TRUE layered parallax —
+       *  the foreground sprite (alpha-cut) slides left off-frame while the
+       *  background copy drifts ~1/10th the other way. NO crossfade ever —
+       *  only translateX, the ghosting in the video was opacity work. */}
+      {mode === 'parallax-slide' && reveal.panelSrc && (
+        <>
+          {/* bg copy drifting slowly right — the depth sells itself */}
+          <img
+            src={src}
+            alt=""
+            aria-hidden
+            data-testid="scene-reveal-parallax-bg"
+            style={{
+              ...cover,
+              width: '110%',
+              left: '-5%',
+              transform: revealed ? 'translateX(4%)' : 'translateX(0)',
+              transition: `transform ${slideS * 1.15}s ease-in-out`,
+              zIndex: 2,
+            }}
+          />
+          {/* the foreground mass — slides left until fully out of frame */}
+          <img
+            src={reveal.panelSrc}
+            alt=""
+            aria-hidden
+            data-testid="scene-reveal-panel"
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              height: '100%',
+              width: `${(cut?.region[2] ?? 0.66) * 100}%`,
+              objectFit: 'cover',
+              objectPosition: '50% 40%',
+              pointerEvents: 'none',
+              transform: revealed ? 'translateX(-110%)' : 'translateX(0)',
+              transition: `transform ${slideS}s ease-in-out`,
+              zIndex: 6,
+            }}
+          />
+        </>
+      )}
       {/* panel-slide: the FULL foreground panel covers the scene and slides
        *  left off-frame — the goblins were behind it all along. Renders
        *  over the base plate at all times (it's the scene's own cover). */}

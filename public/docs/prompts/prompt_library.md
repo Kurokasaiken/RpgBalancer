@@ -222,3 +222,9 @@ TRACCE — painted in heavy oil impasto. A ground-level close view of a forest f
 
 - **Image:** `public/assets/scene-library/sentiero-tracce.jpg`
 - **Status:** accepted + wired (cinematic manifest)
+
+## Gate Impero Solare – Reference (prompt perso)
+
+- **Image:** [Gate Impero Solare](../../src/assets/mood/gate%20impero%20solare.png)
+- **Note:** Immagine autoriale aggiunta al moodboard 2026-10-24 — prompt di
+  generazione non disponibile. Mood: **Impero Solare**.

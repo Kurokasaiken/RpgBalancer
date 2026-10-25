@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<title>R-282 — fork icona drop rifiutato</title>
+<style>
+  body { background: #14100c; color: #e8dcc8; font-family: Georgia, serif; margin: 0; padding: 32px; }
+  h1 { font-size: 18px; letter-spacing: .15em; text-transform: uppercase; color: #c9a86a; }
+  .row { display: flex; gap: 48px; margin: 32px 0 8px; align-items: flex-start; }
+  .variant { text-align: center; }
+  .variant h2 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: #a88d5e; margin: 12px 0 4px; }
+  .variant p { font-size: 12px; color: #9c8b6f; max-width: 200px; margin: 0 auto; }
+
+  /* mock castone 64px: bezel bronzo + medaglione ritratto, stato invalid (bloom spento + dim) */
+  .seat { position: relative; width: 64px; height: 64px; margin: 0 auto; }
+  .bezel {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #7a5c2e 0%, #4a3418 55%, #2b1e0d 100%);
+    box-shadow: inset 0 0 6px rgba(0,0,0,.8), 0 0 0 2px #1d1408;
+  }
+  .medal {
+    position: absolute; inset: 7px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #8f9aa8 0%, #4c5663 70%, #2f3640 100%);
+    box-shadow: inset 0 0 4px rgba(0,0,0,.6);
+  }
+  .invalid .bezel { filter: saturate(.55) brightness(.8); }
+  .invalid .medal { filter: saturate(.4) brightness(.65); }
+  .invalid .seat { box-shadow: 0 0 0 2px rgba(180, 60, 40, .55), 0 0 10px rgba(180,60,40,.35); border-radius: 50%; }
+  .label { font-size: 10px; letter-spacing: .1em; color: #7a6a4f; margin-top: 6px; text-transform: uppercase; }
+
+  /* A — corner badge */
+  .badge {
+    position: absolute; top: -4px; right: -4px; width: 20px; height: 20px;
+    border-radius: 50%; background: radial-gradient(circle at 35% 30%, #a03c2c, #5c1f14);
+    box-shadow: 0 0 0 2px #14100c, 0 0 6px rgba(0,0,0,.7);
+    display: flex; align-items: center; justify-content: center;
+    color: #f4e3d3; font-size: 12px; font-weight: bold; line-height: 1;
+  }
+
+  /* B — reason glyph sotto-castone */
+  .glyphrow { display: flex; gap: 20px; justify-content: center; }
+  .reason {
+    position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 18px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #3a2c1a, #1c130a);
+    box-shadow: 0 0 0 1px #5c4a2a;
+    display: flex; align-items: center; justify-content: center;
+    color: #e0b872; font-size: 11px; line-height: 1;
+  }
+
+  /* C — center overlay */
+  .overlay {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: rgba(20, 12, 8, .45);
+    display: flex; align-items: center; justify-content: center;
+    color: #d84c30; font-size: 34px; font-weight: bold; line-height: 1;
+    text-shadow: 0 0 6px rgba(0,0,0,.9);
+  }
+</style>
+</head>
+<body>
+  <h1>R-282 — indicatore «drop rifiutato» (mock castone 64px, stato invalid)</h1>
+
+  <div class="row">
+    <div class="variant">
+      <h2>A — corner-badge</h2>
+      <div class="seat invalid">
+        <div class="bezel"></div><div class="medal"></div>
+        <div class="badge">✕</div>
+      </div>
+      <p>Un sigillo angolare: il medaglione resta leggibile, convenzione dei badge qty/Lv già nota.</p>
+      <div class="label">1 glyph statico</div>
+    </div>
+
+    <div class="variant">
+      <h2>B — reason-glyph</h2>
+      <div class="glyphrow">
+        <div class="seat invalid">
+          <div class="bezel"></div><div class="medal"></div>
+          <div class="reason">☠</div>
+        </div>
+        <div class="seat invalid">
+          <div class="bezel"></div><div class="medal"></div>
+          <div class="reason">⌛</div>
+        </div>
+        <div class="seat invalid">
+          <div class="bezel"></div><div class="medal"></div>
+          <div class="reason">⛨</div>
+        </div>
+      </div>
+      <p style="margin-top:12px">Il simbolo porta già la classe del motivo: status ☠, sede occupata ⌛, requisito ⛨.</p>
+      <div class="label">mappa reason→glyph</div>
+    </div>
+
+    <div class="variant">
+      <h2>C — center-overlay</h2>
+      <div class="seat invalid">
+        <div class="bezel"></div><div class="medal"></div>
+        <div class="overlay">⊘</div>
+      </div>
+      <p>Il divieto è inconfondibile anche in drag veloce, ma copre il contenuto del castone.</p>
+      <div class="label">massima visibilità</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px;color:#7a6a4f;max-width:640px">
+    Mock HTML — approssimazione del castone hud64 (bezel bronzo + medaglione) con bloom `invalid` già attivo.
+    Il ruling vale per il trattamento dell'indicatore, non per la resa del castone.
+  </p>
+</body>
+</html>

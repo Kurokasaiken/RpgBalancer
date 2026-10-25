@@ -53,8 +53,17 @@ invariants:
     statement: >-
       R-241 B5: getResidentCompatibility senza guard di contesto restituiva 'Nessuno slot compatibile' anche mentre la
       quest era in corso — deve astenersi finche' il ciclo quest e' attivo (isQuestRunning || embarkResult)
-    test_refs: 
+    test_refs:
       - tests/unit/idleVillage/useQuestPoiSession.compatibilityGuard.test.tsx
+  - id: use-quest-poi-session.INV-2
+    source: director-bug
+    source_ref: R-283
+    statement: >-
+      R-283: (a) getResidentCompatibility marca 'invalid' quando nessun castone LIBERO accetta il residente → card non
+      trascinabile → swap roster→castone occupato irraggiungibile; un castone occupato compatibile
+      (evaluateStatRequirement) deve contare. (b) handleResidentSelect non rilascia flyingResidentId quando l'anchor del
+      castone manca → click-assign morti per tutto il roster.
+    test_refs: []
 ---
 # use-quest-poi-session
 

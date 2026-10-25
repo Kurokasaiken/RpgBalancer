@@ -863,6 +863,15 @@
     "castSpeed": "!! ÇÇååššţţ ŠŠṗṗééééδδ !!"
   },
   "gameFrame": {
+    "legacy": {
+      "title": "!! ŁŁééğğååççÿÿ !!",
+      "noSlots": "!! ÑÑöö ββüüîîłłδδîîññğğ ÿÿééţţ !!",
+      "category": {
+        "items": "!! ÎÎţţééṃṃšš !!",
+        "heroes": "!! ĤĤééřřööééšš !!",
+        "blueprints": "!! ββłłüüééṗṗřřîîññţţšš !!"
+      }
+    },
     "title": "!! ẄẄååññδδééřřłłüüššţţ !!",
     "boot": {
       "progress": "!! ŁŁööååδδîîññğğ ṗṗřřööğğřřééšššš !!",
@@ -883,7 +892,7 @@
       "workshop": "!! ẄẄööřřķķššĥĥööṗṗ !!",
       "tavern": "!! ŢŢååṿṿééřřññ !!",
       "locked": "!! ÑÑööţţ ÿÿééţţ !!",
-      "more": "More"
+      "more": "!! ṀṀööřřéé !!"
     },
     "resources": {
       "gold": "!! ĞĞööłłδδ !!",
@@ -1014,6 +1023,8 @@
       "settlementLost": "!! ŠŠééţţţţłłééṃṃééññţţ łłööššţţ !!",
       "merchantMarker": "!! ṀṀééřřççĥĥååññţţ ṃṃååřřķķééřř !!",
       "levelUp": "!! ĤĤééřřöö łłééṿṿééłł-üüṗṗ !!",
+      "expeditionLost": "!! ÉÉẍẍṗṗééδδîîţţîîööññ łłööššţţ !!",
+      "legacy": "!! ŁŁééğğååççÿÿ !!",
       "resetInitial": "!! ÎÎññîîţţîîååłł ššţţååţţéé !!",
       "reviveFallen": "!! ŘŘééṿṿîîṿṿéé ƒƒååłłłłééññ !!"
     },
@@ -1101,6 +1112,11 @@
       }
     },
     "menu": {
+      "memorial": "!! ṀṀééṃṃööřřîîååłł… !!",
+      "memorialTitle": "!! ṀṀééṃṃööřřîîååłł !!",
+      "memorialEmpty": "!! ÑÑöö ööññéé ĥĥååšš ƒƒååłłłłééññ ÿÿééţţ. !!",
+      "memorialLevel": "!! łłééṿṿééłł {level} !!",
+      "memorialDay": "!! δδååÿÿ {day} !!",
       "title": "!! ṀṀééññüü !!",
       "session": "!! ŠŠééššššîîööññ !!",
       "options": "!! ÖÖṗṗţţîîööññšš !!",
@@ -1209,6 +1225,7 @@
       "bakeFailed": "!! ŠŠååṿṿééδδ ƒƒööřř ţţĥĥîîšš ββřřööẅẅššééřř — ţţĥĥéé ññééẅẅ δδééƒƒååüüłłţţšš ççööüüłłδδ ññööţţ ββéé ẅẅřřîîţţţţééññ ţţöö ţţĥĥéé ççööññƒƒîîğğ (δδééṿṿ ššééřřṿṿééřř ööññłłÿÿ). !!"
     },
     "questWindow": {
+      "fellOnDay": "!! ƒƒééłłłł ööññ δδååÿÿ {day} !!",
       "roster": "!! ÅÅššššîîğğññééδδ ṗṗååřřţţÿÿ !!",
       "bag": "!! ββååğğ !!",
       "chronicle": "!! ÇÇĥĥřřööññîîççłłéé !!",
@@ -1911,9 +1928,9 @@
       "traitsUsed": "!! ţţřřååîîţţšš üüššééδδ !!",
       "tree": "!! ññööδδéé ţţřřéééé !!",
       "play": "!! ṗṗłłååÿÿ !!",
-      "candidate": "⟦candidate⟧",
-      "stale": "⟦STALE⟧",
-      "superseded": "⟦SUPERSEDED by⟧"
+      "candidate": "!! ççååññδδîîδδååţţéé !!",
+      "stale": "!! ŠŠŢŢÅÅŁŁÉÉ !!",
+      "superseded": "!! ŠŠÜÜṖṖÉÉŘŘŠŠÉÉΔΔÉÉΔΔ ββÿÿ !!"
     },
     "play": {
       "setup": "!! ṗṗřřééṗṗååřřéé ţţĥĥéé řřüüññ !!",
@@ -1944,66 +1961,66 @@
       "continue": "!! ççööññţţîîññüüéé !!"
     },
     "author": {
-      "toggle": "⟦Author mode⟧"
+      "toggle": "!! ÅÅüüţţĥĥööřř ṃṃööδδéé !!"
     },
     "generate": {
-      "title": "⟦Generate candidate⟧",
-      "authorOnly": "⟦author⟧",
-      "cta": "⟦Generate⟧",
-      "running": "⟦Generating…⟧",
+      "title": "!! ĞĞééññééřřååţţéé ççååññδδîîδδååţţéé !!",
+      "authorOnly": "!! ååüüţţĥĥööřř !!",
+      "cta": "!! ĞĞééññééřřååţţéé !!",
+      "running": "!! ĞĞééññééřřååţţîîññğğ… !!",
       "tuning": {
-        "goal": "⟦goal⟧",
-        "twistChance": "⟦twistChance⟧",
-        "twistRearmChance": "⟦twistRearmChance⟧",
-        "limite": "⟦limite⟧",
-        "uscitaGoal": "⟦uscitaGoal⟧",
-        "madreChance": "⟦madreChance⟧",
-        "pareteChance": "⟦pareteChance⟧"
+        "goal": "!! ğğööååłł !!",
+        "twistChance": "!! ţţẅẅîîššţţ ççĥĥååññççéé % !!",
+        "twistRearmChance": "!! řřéé-ååřřṃṃ % !!",
+        "limite": "!! ƒƒłłööööδδ łłîîṃṃîîţţ !!",
+        "uscitaGoal": "!! ééššççååṗṗéé ğğööååłł !!",
+        "madreChance": "!! ṃṃööţţĥĥééřř łłööδδéé % !!",
+        "pareteChance": "!! ẅẅååłłłł % !!"
       },
       "errors": {
-        "kit-schema": "⟦kit-schema⟧",
-        "tuning-schema": "⟦tuning-schema⟧",
-        "generator-throw": "⟦generator-throw⟧",
-        "hash-failure": "⟦hash-failure⟧"
+        "kit-schema": "!! ĶĶîîţţ řřééĵĵééççţţééδδ ββÿÿ ššççĥĥééṃṃåå !!",
+        "tuning-schema": "!! ÎÎññṿṿååłłîîδδ ţţüüññîîññğğ !!",
+        "generator-throw": "!! ĞĞééññééřřååţţööřř ţţĥĥřřééẅẅ !!",
+        "hash-failure": "!! ĤĤååššĥĥ ƒƒååîîłłééδδ — řřééţţřřÿÿ !!"
       },
-      "export": "⟦Export latest⟧",
-      "importLabel": "⟦Import envelope⟧",
-      "kitDrawer": "⟦Kit payload (JSON)⟧",
-      "kitReadonly": "⟦read-only⟧",
-      "kitReset": "⟦reset⟧"
+      "export": "!! ÉÉẍẍṗṗööřřţţ łłååţţééššţţ !!",
+      "importLabel": "!! ÎÎṃṃṗṗööřřţţ ééññṿṿééłłööṗṗéé !!",
+      "kitDrawer": "!! ĶĶîîţţ ṗṗååÿÿłłööååδδ (ĴĴŠŠÖÖÑÑ) !!",
+      "kitReadonly": "!! řřééååδδ-ööññłłÿÿ — ññååřřřřååţţééδδ ķķîîţţ !!",
+      "kitReset": "!! řřééššééţţ ţţöö ƒƒřřööžžééññ ķķîîţţ !!"
     },
     "gates": {
-      "title": "⟦title⟧",
-      "notRun": "⟦notRun⟧",
-      "run": "⟦run⟧",
-      "running": "⟦running⟧",
-      "cancel": "⟦cancel⟧",
-      "hint": "⟦hint⟧",
-      "issues": "⟦issues⟧",
-      "stale": "⟦stale⟧",
-      "exec": "⟦exec⟧",
-      "schema.ok": "⟦schema.ok⟧",
-      "schema.fail": "⟦schema.fail⟧",
-      "graph.ok": "⟦graph.ok⟧",
-      "graph.fail": "⟦graph.fail⟧",
-      "graph.skipped": "⟦graph.skipped⟧",
-      "hook.ok": "⟦hook.ok⟧",
-      "hook.low": "⟦hook.low⟧",
-      "hook.zero": "⟦hook.zero⟧",
-      "hook.skipped": "⟦hook.skipped⟧",
-      "vocab.ok": "⟦vocab.ok⟧",
-      "vocab.hits": "⟦vocab.hits⟧",
-      "vocab.na": "⟦vocab.na⟧",
-      "copy.na": "⟦copy.na⟧",
-      "copy.deferred": "⟦copy.deferred⟧",
-      "mc.pending": "⟦mc.pending⟧",
-      "journey.na": "⟦journey.na⟧",
-      "journey.exportSeam": "⟦journey.exportSeam⟧",
-      "issues.schemaIssue": "⟦issues.schemaIssue {{args}}⟧",
-      "issues.unreachableNode": "⟦issues.unreachableNode {{args}}⟧",
-      "issues.orphanEnd": "⟦issues.orphanEnd {{args}}⟧",
-      "issues.forbiddenTerm": "⟦issues.forbiddenTerm {{args}}⟧",
-      "issues.hardOptOut": "⟦issues.hardOptOut {{args}}⟧"
+      "title": "!! QQüüååłłîîţţÿÿ ğğååţţééšš !!",
+      "notRun": "!! ññööţţ řřüüññ !!",
+      "run": "!! ŘŘüüññ ğğååţţééšš !!",
+      "running": "!! ŘŘüüññññîîññğğ… !!",
+      "cancel": "!! ÇÇååññççééłł !!",
+      "hint": "!! ŘŘüüññ ţţĥĥéé ğğååţţéé îîññṿṿééññţţööřřÿÿ ţţöö ṿṿååłłîîδδååţţéé ţţĥĥîîšš ééññţţřřÿÿ. !!",
+      "issues": "!! îîššššüüééšš !!",
+      "stale": "!! ŘŘééṗṗööřřţţ ŠŠŢŢÅÅŁŁÉÉ — řřååññ ööññ {{reportHash}}… ββüüţţ ççööññţţééññţţ îîšš {{currentHash}}… !!",
+      "exec": "!! ééẍẍééçç {{state}} !!",
+      "schema.ok": "!! ššççĥĥééṃṃåå ööķķ !!",
+      "schema.fail": "!! ššççĥĥééṃṃåå ṿṿîîööłłååţţîîööññšš !!",
+      "graph.ok": "!! ğğřřååṗṗĥĥ ööķķ !!",
+      "graph.fail": "!! ğğřřååṗṗĥĥ δδééƒƒééççţţšš !!",
+      "graph.skipped": "!! ššķķîîṗṗṗṗééδδ !!",
+      "hook.ok": "!! ĥĥööööķķšš ööķķ !!",
+      "hook.low": "!! łłööẅẅ ĥĥööööķķ ççööṿṿééřřååğğéé !!",
+      "hook.zero": "!! ññöö ššççééññééšš !!",
+      "hook.skipped": "!! ššķķîîṗṗṗṗééδδ !!",
+      "vocab.ok": "!! ṿṿööççååββ ööķķ !!",
+      "vocab.hits": "!! ƒƒööřřββîîδδδδééññ ţţééřřṃṃšš !!",
+      "vocab.na": "!! ññ/åå !!",
+      "copy.na": "!! ññ/åå !!",
+      "copy.deferred": "!! ççööṗṗÿÿ ğğååţţéé δδééƒƒééřřřřééδδ !!",
+      "mc.pending": "!! ṃṃçç ṗṗééññδδîîññğğ !!",
+      "journey.na": "!! ññ/åå !!",
+      "journey.exportSeam": "!! ééẍẍṗṗööřřţţ-ššééååṃṃ ööññłłÿÿ !!",
+      "issues.schemaIssue": "!! {{path}}: {{message}} !!",
+      "issues.unreachableNode": "!! üüññřřééååççĥĥååββłłéé ññööδδéé {{id}} !!",
+      "issues.orphanEnd": "!! ööřřṗṗĥĥååññ ééññδδ {{id}} !!",
+      "issues.forbiddenTerm": "!! ƒƒööřřββîîδδδδééññ ţţééřřṃṃ \"{{term}}\" !!",
+      "issues.hardOptOut": "!! ĥĥååřřδδ ğğååţţéé {{id}} ççååññññööţţ ββéé ööṗṗţţééδδ ööüüţţ !!"
     }
   },
   "questExpedition": {
@@ -2074,7 +2091,16 @@
       "exposurePercent": "!! {position}: {pct}% ööƒƒ îîññççööṃṃîîññğğ îîṃṃṗṗååççţţšš. !!",
       "exposureNone": "!! {position}: ååββššööřřββšš ññöö îîññççööṃṃîîññğğ îîṃṃṗṗååççţţšš. !!",
       "slot": "!! ŠŠłłööţţ {index} !!",
-      "leader": "!! ŁŁééååδδééřř !!"
+      "leader": "!! ŁŁééååδδééřř !!",
+      "dragBlocked": {
+        "status-dead": "!! ÇÇååññ'ţţ ššẅẅååṗṗ — ţţĥĥîîšš řřééššîîδδééññţţ îîšš δδééååδδ. !!",
+        "status-away": "!! ÇÇååññ'ţţ ššẅẅååṗṗ — ţţĥĥîîšš řřééššîîδδééññţţ îîšš ååẅẅååÿÿ. !!",
+        "status-exhausted": "!! ÇÇååññ'ţţ ššẅẅååṗṗ — ţţĥĥîîšš řřééššîîδδééññţţ îîšš ééẍẍĥĥååüüššţţééδδ. !!",
+        "in-expedition": "!! ÇÇååññ'ţţ ššẅẅååṗṗ — ţţĥĥîîšš řřééššîîδδééññţţ îîšš ööüüţţ ööññ ååññ ééẍẍṗṗééδδîîţţîîööññ. !!",
+        "stat-requirement": "!! ÇÇååññ'ţţ ššẅẅååṗṗ — åå ššééååţţ'šš řřééqqüüîîřřééṃṃééññţţ îîššññ'ţţ ṃṃééţţ. !!",
+        "seat-busy": "!! ÇÇååññ'ţţ ššẅẅååṗṗ — ţţĥĥååţţ ššééååţţ îîšš ββüüššÿÿ. !!",
+        "ineligible": "!! ÇÇååññ'ţţ ššẅẅååṗṗ — ññööţţ ååłłłłööẅẅééδδ ĥĥééřřéé. !!"
+      }
     },
     "seals": {
       "durationBreakdown": "!! {out}δδ ööüüţţ · ~{site}δδ ööññ ššîîţţéé · {back}δδ ββååççķķ !!",

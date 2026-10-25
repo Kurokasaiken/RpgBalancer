@@ -1,0 +1,21 @@
+{
+  "componentId": "world-surface-event-card",
+  "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+  "sourceHash": "40766eb77d5fdd69",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T22:58:45.701Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": false,
+      "asserted": false
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

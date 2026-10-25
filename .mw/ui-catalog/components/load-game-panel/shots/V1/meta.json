@@ -1,0 +1,64 @@
+{
+  "componentId": "load-game-panel",
+  "sourceSha": "80aaec6c644b8edd60546db36c87532d3ecb6489",
+  "sourceHash": "eb4a943fa8e8fad3",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T23:07:11.366Z",
+  "states": [
+    {
+      "id": "in-game-menu",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "in-game-menu-ctx-a.png",
+          "in-game-menu-ctx-b.png"
+        ],
+        "isolated": [
+          "in-game-menu-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "script",
+        "ref": "scripts/catalog/drivers/hudMenuLoadGame.ts"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"load-game-panel\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    },
+    {
+      "id": "title",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "title-ctx-a.png",
+          "title-ctx-b.png"
+        ],
+        "isolated": [
+          "title-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": true,
+      "driver": {
+        "kind": "script",
+        "ref": "scripts/catalog/drivers/titleLoadGame.ts"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"load-game-panel\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}
