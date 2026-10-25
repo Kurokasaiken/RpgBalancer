@@ -294,3 +294,29 @@ Wide 21:9 cinematic format, one painted canvas.
 2. Il blocco `COMPOSITION` in termini pittorici funziona: 10/12 archetipi leggibili al primo colpo.
 3. La triade creatura+luogo+reliquia è rispettata 12/12 — enumerazione esplicita nel SUBJECT efficace.
 4. Kill-list rinforzata su firme/corner-marks da promuovere a standard (il nome autore nello STYLE può indurre firme — Jones nominato solo in rude-beauty, ma la firma è apparsa via ref).
+## Round v2 — registro battezzato (2026-10-25)
+
+**Verdetto Director su v1: tutti bocciati** — tono, colori, pennellate, cielo, illuminazione, composizione cromatica sbagliati.
+
+**Diagnosi**: fallimento sistematico 12/12 → non nei soggetti né nelle composizioni ma nel **blocco STYLE/LIGHTING condiviso**. Confronto con i prompt battezzati della bibbia:
+
+| Bibbia (approvato) | v1 (bocciato) |
+|---|---|
+| light "slams", "blinding", "searing highlights" | "sun breaking through in shafts" → golden-hour |
+| cielo "vibrant azure" / "vibrant indigo" | "luminous sky" → gradiente soft |
+| ombre "glows in saturated teal", "cobalt vs burning orange" | "teal-emerald shadows" come vincolo negativo |
+| "violent brushstrokes, visible layers, no digital smoothing" | "broad palette-knife strokes" → painterly liscio |
+| "every plane vibrates", "no flat colors" | (mancava) |
+| gate: suolo "volcanic rock veined with glowing red" | "deep ultramarine base" → terreno freddo |
+
+**Fix a campo singolo**: riscritto solo il blocco STYLE/LIGHTING con il registro battezzato (soggetti+composizioni congelati) + kill-list estesa (no muted colors, no soft gradient skies, no rounded corners, full-bleed). Rerun completo: **12/12 in famiglia** — le strisce ref→generate quasi senza soluzione di continuità su tutti e 4 i mood.
+
+**Lezione canonica per il form v2**: il blocco STYLE non ammette parafrasi — i termini-strumento sono `slams/blinding/searing`, `vibrant <pigment> sky`, `shadowed faces glow in saturated <pigment>`, `violent palette-knife impasto, visible layers, no digital smoothing`, `every plane vibrates`, `no muted tones, no haze washing color out`. Senza questo registro il generatore degrada a "tasteful muted concept-art" — il fallimento v1.
+
+### Difetti residui v2
+- Angoli arrotondati/vignetta "card" su frontier/impero (clausola full-bleed perde vs default Gemini; su wasteland il torn-edge del ref è stato copiato — meglio)
+- Sparkle watermark piccolo bottom-right su alcune
+- beacon-tower: forma torre libera (windmill-like) — soggetto ok, silhouette non-monolitica
+
+### Immagini v1 bocciate
+Archiviate in `images/v1-rejected/` per confronto didattico.
