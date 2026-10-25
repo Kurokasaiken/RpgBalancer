@@ -1,0 +1,34 @@
+Gemini ha detto
+Cross-Examination Objections & Dispute Rulings
+
+Ruling on Dispute (a): Edit Cap per Thread (2 vs 3)
+
+Objection: Support Gemini (Cap at 2).
+
+Reasoning: In Gemini web UI without seeds, multi-turn attention degradation accelerates exponentially after turn 2. Allowing a 3rd edit guarantees the exact texture collapse and neon saturation overshoot noted in Section 4.2.
+
+Ruling on Dispute (b): Texture Degradation Action (Never Edit vs. 1 Corrective Edit)
+
+Objection: Support Gemini (Never Edit).
+
+Reasoning: Once impasto texture is lost or flat digital smoothing occurs, an edit loop attempting to force it back via prompt re-injection acts as a lagging anchor. The model treats the smooth pixels of the previous image as structural fact, overriding the text request. Texture degradation requires an immediate hard reset to a fresh chat.
+
+Objection on DOMINANT_COLOR_FIELDS Geometric Zones vs. COMPOSITION Collisions
+
+Objection: Declaring "vibrant azure sky occupies upper 60%" directly inside prompt field 3 creates a catastrophic collision with field 5 (COMPOSITION), which also defines planes, horizon lines, and focal hierarchy.
+
+Reasoning: Gemini's text encoder receives conflicting spatial commands (sky percentage in field 3 vs. horizon angle in field 5), leading to warped, fractured perspective rendering. Color fields must be declared as atmospheric dominance ratios, not rigid percentage coordinate maps.
+
+Objection on FORK Rule Omission: The "Hallucinated Reference Mutation" Failure Mode
+
+Objection: The FORK section misses a critical failure mode: Reference Drift via Self-Contamination. When an edited image (Edit 1) is used as the reference anchor for Edit 2, minor artifacts from Edit 1 compound, turning a slight color tint shift into structural hallucination by the second edit.
+
+Reasoning: The protocol must explicitly mandate that all edits must reference the pristine base image (B0), never the immediate predecessor, unless it is a pure lighting pass.
+
+NO OBJECTION to section 1
+
+NO OBJECTION to section 3
+
+NO OBJECTION to section 5
+
+NO OBJECTION to section 7
