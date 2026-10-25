@@ -211,7 +211,7 @@ export const SceneCinematicEntrySchema = z.object({
        *  Variants of what shows on reveal: 'sprites' = extracted goblin
        *  cutouts rise into the scene; 'strips' = the revealed plate arrives
        *  in vertical stripes left→right. */
-      revealMode: z.enum(['fade', 'cutout-slide', 'panel-slide']).optional(),
+      revealMode: z.enum(['fade', 'cutout-slide', 'panel-slide', 'parallax-slide']).optional(),
       /** Full-frame foreground panel src — the painted occluder that slides. */
       panelSrc: z.string().optional(),
       /** What the revealed moment does: sprites entering vs stripes arriving. */
@@ -627,13 +627,11 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       trigger: 'click',
       afterSeconds: 9,
       burst: [],
-      revealMode: 'panel-slide',
-      panelSrc: '/assets/scene-library/santuario-panel.jpg',
-      revealFx: 'strips',
-      revealSrc: '/assets/scene-library/santuario-valle.jpg',
-      /* The cover slides left until its right edge coincides with the
-       *  scene's left — the SAME painting, coincidence by construction. */
-      cutout: { region: [0.0, 0.0, 0.55, 1.0], slide: 'left', slideSeconds: 2.2 },
+      revealMode: 'parallax-slide',
+      panelSrc: '/assets/scene-library/santuario-fg.png',
+      /* The root-ball mass (alpha-cut sprite) slides left off-frame while
+       *  the valley drifts ~1/10th right — parallax, not wipe. */
+      cutout: { region: [0.0, 0.0, 0.66, 1.0], slide: 'left', slideSeconds: 4.5 },
     },
   },
 

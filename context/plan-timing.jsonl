@@ -53,3 +53,17 @@
 {"plan":"PLAN-077","event":"open","at":"2026-10-22T12:45:32.782Z","lane":"local"}
 {"plan":"PLAN-081","event":"open","at":"2026-10-23T14:14:40.235Z"}
 {"plan":"PLAN-082","event":"open","at":"2026-10-23T14:27:16.896Z"}
+{"plan":"PLAN-086","event":"open","at":"2026-10-24T18:38:34.380Z"}
+{"plan":"PLAN-060","event":"open","at":"2026-10-22T15:11:12+02:00","lane":"local","kind":"backfill","text":"planForensics: plan file created (battezzo proxy)"}
+{"plan":"PLAN-054","event":"open","at":"2026-10-22T15:11:12+02:00","lane":"local","kind":"backfill","text":"planForensics: plan file created (battezzo proxy)"}
+{"plan":"PLAN-061","event":"open","at":"2026-10-22T15:11:12+02:00","lane":"local","kind":"backfill","text":"planForensics: plan file created (battezzo proxy)"}
+{"plan":"PLAN-076","event":"close","at":"2026-10-22T13:58:22.866Z","kind":"backfill","text":"planForensics: bundle produced_at"}
+{"plan":"PLAN-077","event":"close","at":"2026-10-22T22:25:49.929Z","kind":"backfill","text":"planForensics: bundle produced_at"}
+{"plan":"PLAN-078","event":"open","at":"2026-10-22T16:07:07+02:00","lane":"local","kind":"backfill","text":"planForensics: plan file created (battezzo proxy)"}
+{"plan":"PLAN-078","event":"close","at":"2026-10-22T23:07:56.560Z","kind":"backfill","text":"planForensics: bundle produced_at"}
+{"plan":"PLAN-080","event":"open","at":"2026-10-24T03:06:31+02:00","lane":"local","kind":"backfill","text":"planForensics: plan file created (battezzo proxy)"}
+{"plan":"PLAN-080","event":"close","at":"2026-10-23T19:05:41.621Z","kind":"backfill","text":"planForensics: bundle produced_at"}
+{"plan":"PLAN-081","event":"close","at":"2026-10-23T17:55:49.597Z","kind":"backfill","text":"planForensics: bundle produced_at"}
+{"plan":"PLAN-082","event":"close","at":"2026-10-23T16:03:25.517Z","kind":"backfill","text":"planForensics: bundle produced_at"}
+{"plan":"PLAN-084","event":"open","at":"2026-10-24T03:06:31+02:00","lane":"local","kind":"backfill","text":"planForensics: plan file created (battezzo proxy)"}
+{"plan":"PLAN-084","event":"close","at":"2026-10-24T15:51:10.475Z","kind":"backfill","text":"planForensics: bundle produced_at"}

@@ -44,7 +44,6 @@
 {"entity":"PLAN-013","kind":"bundle","at":"2026-10-19T16:07:33.799Z","confidence":"high"}
 {"entity":"PLAN-013","kind":"stamp-close","at":"2026-10-19T16:09:04.134Z","confidence":"high"}
 {"entity":"PLAN-013","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
-{"entity":"PLAN-014","kind":"commit","at":"2026-09-08T18:09:36+02:00","cls":"mixed","confidence":"high","meta":"feat(world-surface): PLAN-014 land-breath — T-000a pre-check and T-000b Pixi spi"}
 {"entity":"PLAN-014","kind":"commit","at":"2026-10-05T14:42:31+02:00","cls":"docs","confidence":"low","meta":"Track knowledge artifacts: .mw specs/plans/bugs/templates + plans/"}
 {"entity":"PLAN-014","kind":"plan-created","at":"2026-10-05T14:42:31+02:00","confidence":"high"}
 {"entity":"PLAN-014","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
@@ -292,6 +291,29 @@
 {"entity":"PLAN-029","kind":"commit","at":"2026-10-12T14:47:00+02:00","cls":"mixed","confidence":"low","meta":"R-161: errata documentazione — il gioco NON è più un idle game"}
 {"entity":"PLAN-029","kind":"plan-created","at":"2026-10-12T14:47:00+02:00","confidence":"high"}
 {"entity":"PLAN-029","kind":"commit","at":"2026-10-12T17:45:09+02:00","cls":"mixed","confidence":"low","meta":"fix(idleVillage): goblin quest calibration — reference strategy, duration, test "}
+{"entity":"PLAN-029","kind":"debate","at":"2026-10-23T15:42:42.000Z","confidence":"high","meta":"start","durMs":13330000}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T15:47:22.858Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:30:06.537Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:35:16.721Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:47:18.049Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:52:41.335Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:52:41.550Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:52:41.557Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:52:41.558Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:53:33.233Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:57:39.725Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:57:39.973Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:57:39.984Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:57:39.985Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:57:51.316Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T18:58:01.620Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T19:02:52.177Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T19:10:48.036Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"verify-artifact","at":"2026-10-23T19:18:14.041Z","confidence":"low"}
+{"entity":"PLAN-029","kind":"debate","at":"2026-10-23T19:24:52.000Z","confidence":"high","meta":"end"}
+{"entity":"PLAN-029","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
+{"entity":"PLAN-029","kind":"commit","at":"2026-10-24T09:38:54+02:00","cls":"mixed","confidence":"high","meta":"PLAN-029: loop operativo quest-generation-lab (SP-2..SP-8 v1)"}
+{"entity":"PLAN-029","kind":"commit","at":"2026-10-24T18:31:32+02:00","cls":"docs","confidence":"low","meta":"goblin scenes: borderline re-gen — sentiero moss-prints, accampamento watch-post"}
 {"entity":"PLAN-030","kind":"debate","at":"2026-08-04T14:30:03.070Z","confidence":"high","meta":"start","durMs":43699}
 {"entity":"PLAN-030","kind":"debate","at":"2026-08-04T14:30:46.769Z","confidence":"high","meta":"end"}
 {"entity":"PLAN-030","kind":"verify-artifact","at":"2026-08-04T14:30:46.770Z","confidence":"low"}
@@ -1179,18 +1201,18 @@
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T08:54:40.650Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-20T08:54:41.386Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:45:46.503Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:45:54.718Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:00.313Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:10.534Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:25.121Z","confidence":"low"}
-{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:36.701Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:48.725Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:46:58.378Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T13:47:08.148Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:14:04.313Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:14:36.497Z","confidence":"low"}
 {"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:15:01.925Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:16:01.587Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:16:29.162Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:16:54.612Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:17:17.089Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T14:17:50.201Z","confidence":"low"}
+{"entity":"PLAN-043","kind":"verify-artifact","at":"2026-10-23T15:08:13.176Z","confidence":"low"}
 {"entity":"PLAN-043-S4","kind":"stamp-close","at":"2026-10-20T06:14:19.905Z","confidence":"high"}
 {"entity":"PLAN-044","kind":"debate","at":"2026-10-17T12:20:58.000Z","confidence":"high","meta":"start","durMs":9440000}
 {"entity":"PLAN-044","kind":"verify-artifact","at":"2026-10-17T12:27:09.930Z","confidence":"low"}
@@ -1670,6 +1692,7 @@
 {"entity":"PLAN-051","kind":"verify-artifact","at":"2026-10-18T15:21:48.658Z","confidence":"low"}
 {"entity":"PLAN-051","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"low","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"PLAN-051","kind":"plan-created","at":"2026-10-22T15:11:12+02:00","confidence":"high"}
+{"entity":"PLAN-051","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-09-08T15:28:14.292Z","confidence":"low"}
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-09-08T15:31:16.505Z","confidence":"low"}
 {"entity":"PLAN-052","kind":"verify-artifact","at":"2026-10-18T17:44:55.382Z","confidence":"low"}
@@ -1779,6 +1802,7 @@
 {"entity":"PLAN-052","kind":"debate","at":"2026-10-22T23:08:45.000Z","confidence":"high","meta":"end"}
 {"entity":"PLAN-052","kind":"commit","at":"2026-10-23T01:17:00+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-22T23:17:00.756Z"}
 {"entity":"PLAN-052","kind":"commit","at":"2026-10-23T15:44:51+02:00","cls":"mixed","confidence":"high","meta":"R-271: PLAN-052 showcase ambient FX — glint, fireflies, moths, shaft"}
+{"entity":"PLAN-052","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
 {"entity":"PLAN-053","kind":"verify-artifact","at":"2026-09-10T21:21:34.892Z","confidence":"low"}
 {"entity":"PLAN-053","kind":"verify-artifact","at":"2026-09-10T21:21:38.108Z","confidence":"low"}
 {"entity":"PLAN-053","kind":"verify-artifact","at":"2026-09-10T21:24:48.920Z","confidence":"low"}
@@ -2828,10 +2852,145 @@
 {"entity":"PLAN-078","kind":"verify-artifact","at":"2026-10-22T23:07:56.522Z","confidence":"low"}
 {"entity":"PLAN-078","kind":"bundle","at":"2026-10-22T23:07:56.560Z","confidence":"high"}
 {"entity":"PLAN-078","kind":"commit","at":"2026-10-23T01:17:00+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-22T23:17:00.756Z"}
+{"entity":"PLAN-078","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
 {"entity":"PLAN-079","kind":"commit","at":"2026-10-23T01:17:00+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-22T23:17:00.756Z"}
 {"entity":"PLAN-079","kind":"plan-created","at":"2026-10-23T01:17:00+02:00","confidence":"high"}
 {"entity":"PLAN-079","kind":"commit","at":"2026-10-23T09:23:20+02:00","cls":"mixed","confidence":"high","meta":"docs(plan068): re-sync gate umani — G-11 chiusa (trusted:check OK), G-05 parzial"}
+{"entity":"PLAN-080","kind":"verify-artifact","at":"2026-10-23T18:56:10.835Z","confidence":"low"}
+{"entity":"PLAN-080","kind":"verify-artifact","at":"2026-10-23T19:03:29.276Z","confidence":"low"}
+{"entity":"PLAN-080","kind":"verify-artifact","at":"2026-10-23T19:03:29.599Z","confidence":"low"}
+{"entity":"PLAN-080","kind":"verify-artifact","at":"2026-10-23T19:03:43.183Z","confidence":"low"}
+{"entity":"PLAN-080","kind":"verify-artifact","at":"2026-10-23T19:03:43.208Z","confidence":"low"}
+{"entity":"PLAN-080","kind":"verify-artifact","at":"2026-10-23T19:04:14.090Z","confidence":"low"}
+{"entity":"PLAN-080","kind":"verify-artifact","at":"2026-10-23T19:04:14.091Z","confidence":"low"}
+{"entity":"PLAN-080","kind":"bundle","at":"2026-10-23T19:05:41.621Z","confidence":"high"}
+{"entity":"PLAN-080","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
+{"entity":"PLAN-080","kind":"plan-created","at":"2026-10-24T03:06:31+02:00","confidence":"high"}
 {"entity":"PLAN-081","kind":"stamp-open","at":"2026-10-23T14:14:40.235Z","confidence":"high"}
+{"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:51:05.222Z","confidence":"low"}
+{"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:51:37.061Z","confidence":"low"}
+{"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:52:10.171Z","confidence":"low"}
+{"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:52:14.042Z","confidence":"low"}
+{"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:53:47.921Z","confidence":"low"}
+{"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:53:47.921Z","confidence":"low"}
+{"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:55:49.561Z","confidence":"low"}
+{"entity":"PLAN-081","kind":"bundle","at":"2026-10-23T17:55:49.597Z","confidence":"high"}
+{"entity":"PLAN-081","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
+{"entity":"PLAN-081","kind":"plan-created","at":"2026-10-24T03:06:31+02:00","confidence":"high"}
+{"entity":"PLAN-081","kind":"commit","at":"2026-10-24T09:46:22+02:00","cls":"mixed","confidence":"low","meta":"scenes: ambient FX (flow/glint), rework agguato-foresta, scena intrusi, plate bi"}
+{"entity":"PLAN-082","kind":"stamp-open","at":"2026-10-23T14:27:16.896Z","confidence":"high"}
+{"entity":"PLAN-082","kind":"commit","at":"2026-10-23T16:49:36+02:00","cls":"docs","confidence":"high","meta":"R-275/PLAN-082: desiderata v37 FROZEN + bookkeeping + contratto astrolabe"}
+{"entity":"PLAN-082","kind":"plan-created","at":"2026-10-23T16:49:36+02:00","confidence":"high"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T14:57:45.738Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T14:58:11.479Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T14:58:38.483Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T14:58:58.013Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T14:59:46.586Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T15:07:51.335Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T15:28:44.241Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T15:29:16.537Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T15:29:24.425Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T15:31:24.516Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T15:32:26.274Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"verify-artifact","at":"2026-10-23T15:32:26.322Z","confidence":"low"}
+{"entity":"PLAN-082","kind":"commit","at":"2026-10-23T17:56:59+02:00","cls":"mixed","confidence":"high","meta":"R-275/PLAN-082 T-001: famiglia silhouette uniforme per board (v37)"}
+{"entity":"PLAN-082","kind":"commit","at":"2026-10-23T17:57:56+02:00","cls":"docs","confidence":"high","meta":"PLAN-082: stato esecuzione T-001/T-002"}
+{"entity":"PLAN-082","kind":"bundle","at":"2026-10-23T16:03:25.517Z","confidence":"high"}
+{"entity":"PLAN-082","kind":"commit","at":"2026-10-23T20:16:26+02:00","cls":"other","confidence":"high","meta":"R-275/PLAN-082: retire R-234-astrolabe-no-ghost (emenda v37)"}
+{"entity":"PLAN-082","kind":"commit","at":"2026-10-23T20:16:53+02:00","cls":"docs","confidence":"high","meta":"R-275: avanzamento PLAN-082 in RICHIESTE (in corso — BLOCKED ambientale)"}
+{"entity":"PLAN-083","kind":"debate","at":"2026-10-23T14:55:45.000Z","confidence":"high","meta":"start","durMs":14340000}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:03:12.546Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:09:18.943Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:09:19.579Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:09:19.606Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:09:19.607Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:16:06.392Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:16:07.102Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:16:07.216Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:18:06.700Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:19:22.043Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:19:33.886Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:19:34.084Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:22:27.720Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:22:29.886Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:22:30.152Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:45:22.984Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T15:49:39.642Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T16:02:29.216Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T16:02:33.963Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T16:02:34.081Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T18:21:46.402Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"verify-artifact","at":"2026-10-23T18:54:42.246Z","confidence":"low"}
+{"entity":"PLAN-083","kind":"debate","at":"2026-10-23T18:54:45.000Z","confidence":"high","meta":"end"}
+{"entity":"PLAN-083","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
+{"entity":"PLAN-083","kind":"plan-created","at":"2026-10-24T03:06:31+02:00","confidence":"high"}
+{"entity":"PLAN-083","kind":"commit","at":"2026-10-24T09:37:31+02:00","cls":"mixed","confidence":"high","meta":"PLAN-083 mobile-fit: nav icon-chip + Altro sheet, HUD compressa, hint touch, gui"}
+{"entity":"PLAN-083","kind":"commit","at":"2026-10-24T17:48:32+02:00","cls":"config","confidence":"low","meta":"chore(verification): inventory regen post-commit (468 STRICT_FILES)"}
+{"entity":"PLAN-084","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
+{"entity":"PLAN-084","kind":"plan-created","at":"2026-10-24T03:06:31+02:00","confidence":"high"}
+{"entity":"PLAN-084","kind":"commit","at":"2026-10-24T17:39:54+02:00","cls":"mixed","confidence":"high","meta":"PLAN-084 reveal slice + quest-goblin scene refresh"}
+{"entity":"PLAN-084","kind":"verify-artifact","at":"2026-10-24T15:44:48.855Z","confidence":"low"}
+{"entity":"PLAN-084","kind":"verify-artifact","at":"2026-10-24T15:48:50.579Z","confidence":"low"}
+{"entity":"PLAN-084","kind":"verify-artifact","at":"2026-10-24T15:48:50.609Z","confidence":"low"}
+{"entity":"PLAN-084","kind":"verify-artifact","at":"2026-10-24T15:49:21.158Z","confidence":"low"}
+{"entity":"PLAN-084","kind":"verify-artifact","at":"2026-10-24T15:49:39.260Z","confidence":"low"}
+{"entity":"PLAN-084","kind":"verify-artifact","at":"2026-10-24T15:49:39.261Z","confidence":"low"}
+{"entity":"PLAN-084","kind":"verify-artifact","at":"2026-10-24T15:51:10.436Z","confidence":"low"}
+{"entity":"PLAN-084","kind":"bundle","at":"2026-10-24T15:51:10.475Z","confidence":"high"}
+{"entity":"PLAN-084","kind":"commit","at":"2026-10-24T17:55:32+02:00","cls":"docs","confidence":"high","meta":"PLAN-084: chiusura slice reveal (R-278 fatta — Director ruling)"}
+{"entity":"PLAN-084","kind":"commit","at":"2026-10-24T19:57:21+02:00","cls":"mixed","confidence":"high","meta":"PLAN-084 reveal slice-2: revealed plate + cutout-slide — the rock moves, goblins"}
+{"entity":"PLAN-084","kind":"commit","at":"2026-10-24T20:06:18+02:00","cls":"code","confidence":"low","meta":"reveal: plate fades full-frame (was clipped to cutout band — goblins beyond x0.4"}
+{"entity":"PLAN-085","kind":"commit","at":"2026-10-24T09:46:16+02:00","cls":"mixed","confidence":"high","meta":"PLAN-085 amanuense: pagina-folio transiente dello scriba sulla quest run shell"}
+{"entity":"PLAN-085","kind":"plan-created","at":"2026-10-24T09:46:16+02:00","confidence":"high"}
+{"entity":"PLAN-085","kind":"commit","at":"2026-10-24T10:18:18+02:00","cls":"mixed","confidence":"high","meta":"PLAN-085 amanuense: longForm anche per-fase + tomo nella Chronicle"}
+{"entity":"PLAN-085","kind":"commit","at":"2026-10-24T18:45:40+02:00","cls":"code","confidence":"low","meta":"gola-raider: animation bundle — ampMul 0.9, water drift, fine rain, wall leaves "}
+{"entity":"PLAN-086","kind":"commit","at":"2026-10-24T11:26:56+02:00","cls":"docs","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T09:26:56.124Z"}
+{"entity":"PLAN-086","kind":"plan-created","at":"2026-10-24T11:26:56+02:00","confidence":"high"}
+{"entity":"PLAN-086","kind":"debate","at":"2026-10-24T15:35:49.000Z","confidence":"high","meta":"start","durMs":10830000}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:35:58.914Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:43:22.352Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:43:22.711Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:43:22.719Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:43:22.719Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:48:36.157Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:48:36.456Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:48:36.469Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:48:36.469Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:49:58.052Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:49:58.275Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:49:58.280Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:52:02.638Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:52:02.859Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:52:02.865Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T15:53:34.988Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:02:03.907Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:02:04.253Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:02:04.262Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:02:04.263Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:08:02.339Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:08:19.469Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:15:33.776Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:15:33.777Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:15:33.777Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:15:33.777Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:17:52.314Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:37:01.648Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:48:23.580Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T16:58:12.618Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T17:09:51.914Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T17:21:48.339Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T17:33:47.487Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T17:45:45.534Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T18:00:59.276Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T18:09:24.621Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T18:24:24.893Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T18:24:25.091Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T18:24:25.325Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T18:24:25.564Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T18:24:25.785Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"debate","at":"2026-10-24T18:36:19.000Z","confidence":"high","meta":"end"}
+{"entity":"PLAN-086","kind":"verify-artifact","at":"2026-10-24T18:36:35.687Z","confidence":"low"}
+{"entity":"PLAN-086","kind":"stamp-open","at":"2026-10-24T18:38:34.380Z","confidence":"high"}
 {"entity":"PLAN-2","kind":"debate","at":"2026-09-10T13:58:42.658Z","confidence":"high","meta":"start","durMs":1037918}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
@@ -2864,28 +3023,6 @@
 {"entity":"R-056","kind":"debate","at":"2026-08-30T20:10:54.020Z","confidence":"high","meta":"end"}
 {"entity":"R-056","kind":"verify-artifact","at":"2026-08-30T20:10:54.020Z","confidence":"low"}
 {"entity":"R-056","kind":"verify-artifact","at":"2026-08-30T20:10:54.020Z","confidence":"low"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T19:08:48+02:00","cls":"code","confidence":"high","meta":"R-067 fix: remove stale preroll overlay CSS/Type, fissure visible on star/goo fo"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T19:13:20+02:00","cls":"code","confidence":"high","meta":"R-067 fix: test page passes real skill icons (not initials) to V6.3 axes"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T19:46:55+02:00","cls":"code","confidence":"high","meta":"R-067 fix: align arena clip with bronze ring interior so no empty gap/halo appea"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T19:47:09+02:00","cls":"docs","confidence":"high","meta":"R-067: note nuovi blocchi pallina/ring in RICHIESTE.md"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T20:43:00+02:00","cls":"mixed","confidence":"high","meta":"R-067: default backdrop = teal (test page and tarGooConfig)"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T20:53:37+02:00","cls":"mixed","confidence":"high","meta":"R-067: implement wheel-of-fortune ball landing state machine"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T21:00:20+02:00","cls":"mixed","confidence":"high","meta":"R-067: F4 resolution card — skill-specific narrative + explicit math"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T21:00:39+02:00","cls":"docs","confidence":"high","meta":"R-067: aggiorna RICHIESTE con avanzamento punti piano"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T21:05:13+02:00","cls":"config","confidence":"high","meta":"R-067: tweak default teal backdrop to be more teal and less greenish"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T21:20:09+02:00","cls":"code","confidence":"high","meta":"R-067 F3: auto-throw countdown, Space/Enter, bezel phase opacities"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T21:20:21+02:00","cls":"docs","confidence":"high","meta":"R-067: aggiorna RICHIESTE con F3 completato"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T21:39:20+02:00","cls":"code","confidence":"high","meta":"R-067 F2: skill plaques on bronze bezel, active-skill highlight"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T21:39:36+02:00","cls":"docs","confidence":"high","meta":"R-067: aggiorna RICHIESTE con F2 completato"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T22:17:03+02:00","cls":"mixed","confidence":"high","meta":"R-067 F0: types barrel and phaseDurations centralization"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T22:49:26+02:00","cls":"mixed","confidence":"high","meta":"R-067: ripristina 6.3 a pre-F0; F0 spostato su branch 6.4"}
-{"entity":"R-067","kind":"commit","at":"2026-09-08T22:51:52+02:00","cls":"docs","confidence":"high","meta":"R-067: aggiorna RICHIESTE con spostamento F0 su branch 6.4"}
-{"entity":"R-067","kind":"commit","at":"2026-09-09T01:05:01+02:00","cls":"code","confidence":"high","meta":"R-067 V6.4: route /minimal-destiny-astrolabe-v6-4 con phaseDurations"}
-{"entity":"R-067","kind":"commit","at":"2026-09-09T01:05:36+02:00","cls":"docs","confidence":"high","meta":"R-067: aggiorna RICHIESTE con route V6.4"}
-{"entity":"R-067","kind":"commit","at":"2026-09-09T01:36:06+02:00","cls":"docs","confidence":"high","meta":"R-067: sync plan V6.3 — stato fasi, decisioni chiuse, ordine punti aperti"}
-{"entity":"R-067","kind":"commit","at":"2026-09-09T01:48:12+02:00","cls":"mixed","confidence":"high","meta":"R-067: clone Destiny Astrolabe V6.4 (real files, no symlink)"}
-{"entity":"R-067","kind":"commit","at":"2026-09-09T01:53:56+02:00","cls":"code","confidence":"high","meta":"R-067 V6.4: F3 bezel intensity curve + F4/5.7 per-verdict climax, scrim, zone fl"}
-{"entity":"R-067","kind":"commit","at":"2026-09-09T11:19:07Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-070","kind":"commit","at":"2026-09-10T23:36:32+02:00","cls":"docs","confidence":"high","meta":"Aggiorna Kanban: R-070-V63-GOO completato."}
 {"entity":"R-070","kind":"commit","at":"2026-09-11T06:02:46Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-072","kind":"commit","at":"2026-09-16T20:17:24+02:00","cls":"mixed","confidence":"high","meta":"R-072: Settlement Lost — run-ending takeover (direction C)"}
@@ -3719,6 +3856,7 @@
 {"entity":"R-234","kind":"commit","at":"2026-10-22T23:27:58+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C2: il caduto ha il giorno della morte — il run registra il tick di m"}
 {"entity":"R-234","kind":"commit","at":"2026-10-22T23:55:27+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C3: caduta dell'insediamento — statistiche vere (morti, giorno di gio"}
 {"entity":"R-234","kind":"commit","at":"2026-10-23T00:08:02+02:00","cls":"mixed","confidence":"high","meta":"PLAN-067 T-C4: reliquario dell'eredità — slot = livello dell'edificio costruito "}
+{"entity":"R-234","kind":"commit","at":"2026-10-23T20:16:26+02:00","cls":"other","confidence":"high","meta":"R-275/PLAN-082: retire R-234-astrolabe-no-ghost (emenda v37)"}
 {"entity":"R-239","kind":"commit","at":"2026-10-22T15:11:12+02:00","cls":"mixed","confidence":"high","meta":"Checkpoint worktree condiviso — R-239/240/241/245/246/248/253/254/255/256/257/25"}
 {"entity":"R-240","kind":"commit","at":"2026-10-21T14:04:17+02:00","cls":"mixed","confidence":"high","meta":"PLAN-073 (R-240): village stash ledger — warehouse interattivo ↔ bisaccia quest"}
 {"entity":"R-240","kind":"verify-artifact","at":"2026-10-21T14:29:26.765Z","confidence":"low"}
@@ -3908,29 +4046,41 @@
 {"entity":"R-271","kind":"verify-artifact","at":"2026-10-23T13:40:34.706Z","confidence":"low"}
 {"entity":"R-271","kind":"bundle","at":"2026-10-23T13:42:11.407Z","confidence":"high"}
 {"entity":"R-271","kind":"commit","at":"2026-10-23T15:44:51+02:00","cls":"mixed","confidence":"high","meta":"R-271: PLAN-052 showcase ambient FX — glint, fireflies, moths, shaft"}
-{"entity":"R-272","kind":"debate","at":"2026-10-23T13:57:21.000Z","confidence":"high","meta":"start","durMs":990000}
+{"entity":"R-272","kind":"debate","at":"2026-10-23T13:57:21.000Z","confidence":"high","meta":"start","durMs":15294000}
 {"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:10:35.897Z","confidence":"low"}
 {"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:10:37.845Z","confidence":"low"}
 {"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:10:37.966Z","confidence":"low"}
 {"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:10:37.999Z","confidence":"low"}
-{"entity":"R-272","kind":"debate","at":"2026-10-23T14:13:51.000Z","confidence":"high","meta":"end"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T19:05:48+02:00","cls":"mixed","confidence":"low","meta":"feat(sea-effect-lab): detailBoost and shimmerOpen variants for open sea"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T17:53:23Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T20:46:17+02:00","cls":"mixed","confidence":"low","meta":"feat(sea-effect-lab): organic caustics variant for open sea"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T20:51:58+02:00","cls":"mixed","confidence":"low","meta":"feat(sea-effect-lab): swellOpen variant for organic open-sea motion"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T21:06:02+02:00","cls":"mixed","confidence":"low","meta":"fix(sea-effect-lab): caustics sprite alpha + slower cycle"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T21:18:07+02:00","cls":"mixed","confidence":"low","meta":"feat(sea-effect-lab): flowScroll variant with animated displacement scroll"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T22:15:11+02:00","cls":"mixed","confidence":"low","meta":"feat(sea-effect-lab): static caustics overlay for 09e flowScroll"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T22:18:39+02:00","cls":"mixed","confidence":"low","meta":"feat(world-surface): Water button now toggles coastal ripple"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T20:49:19Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T22:51:57+02:00","cls":"code","confidence":"low","meta":"fix(world-surface): Water button drives coastal wave marks too"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-08T23:38:14+02:00","cls":"config","confidence":"low","meta":"fix(world-surface): make coastal waves visible when Water is on"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-09T01:02:45+02:00","cls":"mixed","confidence":"low","meta":"fix(world-surface): replace SVG filter with CSS drift for coastal ripple"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-09T01:12:42+02:00","cls":"code","confidence":"low","meta":"feat(world-surface): make Water ripple impossible to miss"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-09T01:51:09+02:00","cls":"mixed","confidence":"low","meta":"fix(world-surface): visible coastal ripple for Water toggle"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-09T01:14:04Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-09T06:05:18Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-09T15:12:37Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:28:38.017Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:28:50.693Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:28:51.044Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:28:51.083Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:38:19.206Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:38:19.799Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:38:19.816Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:38:19.816Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T14:46:53.030Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T15:13:46.718Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T17:48:44.046Z","confidence":"low"}
+{"entity":"R-272","kind":"verify-artifact","at":"2026-10-23T17:48:44.224Z","confidence":"low"}
+{"entity":"R-272","kind":"debate","at":"2026-10-23T18:12:15.000Z","confidence":"high","meta":"end"}
+{"entity":"R-275","kind":"commit","at":"2026-10-23T16:49:36+02:00","cls":"docs","confidence":"high","meta":"R-275/PLAN-082: desiderata v37 FROZEN + bookkeeping + contratto astrolabe"}
+{"entity":"R-275","kind":"commit","at":"2026-10-23T17:56:59+02:00","cls":"mixed","confidence":"high","meta":"R-275/PLAN-082 T-001: famiglia silhouette uniforme per board (v37)"}
+{"entity":"R-275","kind":"commit","at":"2026-10-23T20:16:26+02:00","cls":"other","confidence":"high","meta":"R-275/PLAN-082: retire R-234-astrolabe-no-ghost (emenda v37)"}
+{"entity":"R-275","kind":"commit","at":"2026-10-23T20:16:53+02:00","cls":"docs","confidence":"high","meta":"R-275: avanzamento PLAN-082 in RICHIESTE (in corso — BLOCKED ambientale)"}
+{"entity":"R-278","kind":"commit","at":"2026-10-24T17:55:32+02:00","cls":"docs","confidence":"high","meta":"PLAN-084: chiusura slice reveal (R-278 fatta — Director ruling)"}
+{"entity":"R-278","kind":"commit","at":"2026-10-24T19:29:45+02:00","cls":"code","confidence":"low","meta":"incalzare: fire anchors — glow on flame tips, right bonfire was on a goblin"}
+{"entity":"R-281","kind":"verify-artifact","at":"2026-10-24T15:34:48.031Z","confidence":"low"}
+{"entity":"R-281","kind":"verify-artifact","at":"2026-10-24T15:42:47.895Z","confidence":"low"}
+{"entity":"R-281","kind":"verify-artifact","at":"2026-10-24T15:43:06.932Z","confidence":"low"}
+{"entity":"R-281","kind":"verify-artifact","at":"2026-10-24T15:45:06.891Z","confidence":"low"}
+{"entity":"R-281","kind":"verify-artifact","at":"2026-10-24T15:45:09.517Z","confidence":"low"}
+{"entity":"R-281","kind":"verify-artifact","at":"2026-10-24T15:45:09.518Z","confidence":"low"}
+{"entity":"R-281","kind":"bundle","at":"2026-10-24T15:47:54.396Z","confidence":"high"}
+{"entity":"R-281","kind":"commit","at":"2026-10-24T19:11:22+02:00","cls":"mixed","confidence":"low","meta":"goblin scenes v2: bottino silk bolts (value-readable), saccheggio search-scene, "}
+{"entity":"R-282","kind":"verify-artifact","at":"2026-10-24T17:12:51.943Z","confidence":"low"}
+{"entity":"R-282","kind":"verify-artifact","at":"2026-10-24T17:13:00.270Z","confidence":"low"}
+{"entity":"R-282","kind":"commit","at":"2026-10-24T19:32:42+02:00","cls":"mixed","confidence":"low","meta":"bottino v9: fantasy knick-knack stash (idol, vial, whistle, copper coins) — Dire"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T18:41:36Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T21:16:04Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-09T23:22:09Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}

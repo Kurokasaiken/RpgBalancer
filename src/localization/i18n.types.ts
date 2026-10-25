@@ -421,15 +421,6 @@ export default interface Resources {
       "unpin": "Unpin panel"
     },
     "gameFrame": {
-      "legacy": {
-        "title": "Legacy",
-        "noSlots": "No building yet",
-        "category": {
-          "items": "Items",
-          "heroes": "Heroes",
-          "blueprints": "Blueprints"
-        }
-      },
       "boot": {
         "error": "The world could not be prepared",
         "logoAlt": "Wanderlust: Triumph",
@@ -451,10 +442,10 @@ export default interface Resources {
         "recenter": "Re-centre the map"
       },
       "director": {
-        "invasion": "Goblin invasion",
-        "levelUp": "Hero level-up",
         "expeditionLost": "Expedition lost",
+        "invasion": "Goblin invasion",
         "legacy": "Legacy",
+        "levelUp": "Hero level-up",
         "merchantMarker": "Merchant marker",
         "move": "Move",
         "poiTypes": "POI types",
@@ -462,6 +453,7 @@ export default interface Resources {
         "questRun": "Start goblin quest",
         "reset": "Reset scene",
         "resetInitial": "Initial state",
+        "reviveFallen": "Revive fallen",
         "settlementLost": "Settlement lost",
         "skin": "Skin: {name}",
         "title": "Director",
@@ -499,13 +491,12 @@ export default interface Resources {
         }
       },
       "heroLevel": {
-        "a11y": "Level {n,
+        "a11y": "Level {n} hero",
+        "badge": "Lv {n}",
         "ceremonyTitle": "{name} reaches level {level}",
         "continue": "Continue",
+        "floater": "Level {n}",
         "hp": "Hit points"
-      } hero",
-        "badge": "Lv {n}",
-        "floater": "Level {n}"
       },
       "heroSheet": {
         "inventory": "Inventory",
@@ -523,12 +514,18 @@ export default interface Resources {
       "invasion": {
         "body": "A goblin host arrives in {count} days."
       },
+      "legacy": {
+        "category": {
+          "blueprints": "Blueprints",
+          "heroes": "Heroes",
+          "items": "Items"
+        },
+        "noSlots": "No building yet",
+        "title": "Legacy"
+      },
       "menu": {
-        "memorial": "Memorial…",
-        "memorialTitle": "Memorial",
-        "memorialEmpty": "No one has fallen yet.",
-        "memorialLevel": "level {level}",
-        "memorialDay": "day {day}",
+        "cancel": "Cancel",
+        "close": "Close",
         "comingSoon": "Not available yet",
         "interfaceSize": "Interface size",
         "interfaceSizeAuto": "Auto",
@@ -538,16 +535,75 @@ export default interface Resources {
           "en": "English",
           "it-IT": "Italiano"
         },
+        "load": {
+          "deleteAction": "Delete",
+          "deleteAsk": "Delete this save? This cannot be undone.",
+          "deleteConfirm": "Delete",
+          "failed": "The save could not be loaded. The game in progress was not changed.",
+          "loadAction": "Load",
+          "replaceAsk": "Replace the game in progress (Day {day})? Progress since its last save will be lost.",
+          "replaceConfirm": "Replace and load",
+          "replaceNote": "The game in progress (Day {day}) has unsaved progress and will be replaced.",
+          "slotAuto": "Autosave",
+          "slotCorrupt": "Damaged save — it cannot be loaded",
+          "slotDay": "{place} · Day {day}",
+          "slotEmpty": "{name} — empty",
+          "slotManual": "Save {n}",
+          "slotNewer": "Saved by a newer version of the game",
+          "summary": "{heroes, plural, one {# hero} other {# heroes}} · {expeditions, plural, =0 {no expedition under way} one {# expedition under way} other {# expeditions under way}}",
+          "title": "Load game"
+        },
         "loadGame": "Load game…",
+        "memorial": "Memorial…",
+        "memorialDay": "day {day}",
+        "memorialEmpty": "No one has fallen yet.",
+        "memorialLevel": "level {level}",
+        "memorialTitle": "Memorial",
+        "newGame": {
+          "body": "The current game (Day {day}) and its autosave will be replaced. Your manual saves stay as they are.",
+          "confirm": "Start new game",
+          "title": "Start a new game?"
+        },
         "options": "Options",
         "quit": "Quit to title",
+        "quitConfirm": {
+          "lastSaved": "Last save: {when}.",
+          "neverSaved": "This game has not been saved yet.",
+          "quitNoSave": "Quit without saving",
+          "saveAndQuit": "Save and quit",
+          "saveFailed": "The save failed. You are still in the game.",
+          "saving": "Saving…",
+          "title": "Return to the title screen?",
+          "unsavedWarn": "If you leave without saving, you lose what happened since then."
+        },
         "saveNow": "Save now",
         "saved": "Saved",
         "saving": "Saving…",
         "session": "Session",
         "settings": "All settings…",
+        "settingsPanel": {
+          "appliesNow": "Changes apply immediately.",
+          "audio": "Audio",
+          "effects": "Effects",
+          "general": "General",
+          "interface": "Interface",
+          "master": "Master",
+          "music": "Music",
+          "reducedMotion": "Reduced motion",
+          "reducedMotionHint": "Fewer animations and fades",
+          "reset": "Restore defaults",
+          "title": "Settings"
+        },
         "theme": "Theme",
-        "title": "Menu"
+        "title": "Menu",
+        "titleScreen": {
+          "continue": "Continue · Day {day}",
+          "continuePlain": "Continue",
+          "exit": "Quit game",
+          "loadGame": "Load game",
+          "newGame": "New game",
+          "settings": "Settings"
+        }
       },
       "merchant": {
         "buy": {
@@ -694,11 +750,11 @@ export default interface Resources {
         "withState": "{name} — {state}"
       },
       "questWindow": {
-        "fellOnDay": "fell on day {day}",
         "abandon": "Abandon quest",
         "abandonConfirm": "Are you sure you want to abandon the quest?",
         "abandonStay": "Keep going",
         "abandonYes": "Abandon",
+        "awaiting": "Awaiting orders",
         "bag": "Bag",
         "bagEmpty": "Bag is empty",
         "beats": {
@@ -714,6 +770,7 @@ export default interface Resources {
           "passive": "always in effect while packed",
           "shadowed": "covered by another armed item"
         },
+        "checkInProgress": "The check is resolving — finish it first",
         "checkOptions": "Check options",
         "checkOptionsSkipCheck": "Skip the whole check",
         "checkOptionsSkipIntro": "Skip the opening animation",
@@ -721,6 +778,7 @@ export default interface Resources {
           "dismiss": "Dismiss",
           "dismissHint": "Click anywhere to continue — the details stay in the log.",
           "scoreTitle": "Skill {score} vs difficulty {difficulty}",
+          "scoreVs": "{score} vs {difficulty}",
           "throwLabel": "Throw",
           "titleSuffix": "skill check"
         },
@@ -733,7 +791,9 @@ export default interface Resources {
           "incoming": "{count, plural, one {# hit coming} other {# hits coming}}"
         },
         "day": "Day {day} of {total}",
+        "dayEstimate": "Day {day} of ~{total}",
         "dead": "fallen",
+        "fellOnDay": "fell on day {day}",
         "footer": {
           "collapse": "Fold the journey strip",
           "expand": "Unfold the journey strip"
@@ -789,13 +849,13 @@ export default interface Resources {
         "incoming": "+{count} incoming",
         "iron": "Iron",
         "perDay": "−{count}/d",
-        "xp": "XP",
         "tooltip": {
           "amount": "{label} {value}.",
           "food": "{label} {value} of {max}. Residents eat {perDay} a day: enough for {days} days.",
           "incoming": "Incoming from activities in progress: +{count}."
         },
-        "wood": "Wood"
+        "wood": "Wood",
+        "xp": "XP"
       },
       "roster": {
         "ariaLabel": "Resident roster",
@@ -832,9 +892,23 @@ export default interface Resources {
         "openRejected": "{name} is available after the quest"
       },
       "stash": {
+        "addToBag": "Pack {item} into the expedition bag",
+        "alreadyInBag": "Already packed in the bag",
+        "announce": {
+          "assigned": "{item} packed into the bag",
+          "released": "{item} returned to the store",
+          "releasedAll": "Bag emptied — every item returned to the store",
+          "swapped": "{item} packed — the displaced item returned to the store"
+        },
+        "bagFull": "The expedition bag is full",
         "capacity": "{count} of {max} goods in store",
+        "elsewhere": "{count} packed or committed elsewhere",
+        "empty": "The shelf is empty — every copy is packed or away",
+        "notReady": "Store unavailable — ledger could not load",
+        "openHint": "Open a quest planner to pack items into its bag",
         "qty": "{qty} in store",
-        "title": "Village stash"
+        "title": "Village stash",
+        "unavailable": "No copies left in the store"
       },
       "status": {
         "dayLabel": "Day"
@@ -1357,6 +1431,7 @@ export default interface Resources {
         "emptySlot": "Empty bag slot {index}",
         "openPicker": "Choose village items",
         "pickerTitle": "Village warehouse",
+        "releaseAll": "Empty bag",
         "removeSlot": "Remove {item}",
         "stock": "In store: ×{qty}"
       },
@@ -1391,6 +1466,15 @@ export default interface Resources {
       "loadout": "Bag — {count}/{max}",
       "marching": {
         "coda": "CODA",
+        "dragBlocked": {
+          "in-expedition": "Can't swap — this resident is out on an expedition.",
+          "ineligible": "Can't swap — not allowed here.",
+          "seat-busy": "Can't swap — that seat is busy.",
+          "stat-requirement": "Can't swap — a seat's requirement isn't met.",
+          "status-away": "Can't swap — this resident is away.",
+          "status-dead": "Can't swap — this resident is dead.",
+          "status-exhausted": "Can't swap — this resident is exhausted."
+        },
         "exposure": "Exposure",
         "exposureLegend": "Share of incoming impacts assigned by position.",
         "exposureNone": "{position}: absorbs no incoming impacts.",
@@ -1401,7 +1485,7 @@ export default interface Resources {
         "title": "Marching order"
       },
       "members": {
-        "downtime": "≈{days}d down",
+        "downtime": "down ~{days} days",
         "role": {
           "bodyguard": "guard",
           "leader": "leader",
@@ -1413,6 +1497,7 @@ export default interface Resources {
       "seals": {
         "danger": "Danger",
         "duration": "Duration",
+        "durationBreakdown": "{out}d out · ~{site}d on site · {back}d back",
         "reward": "Reward"
       },
       "send": "Send expedition",
@@ -1432,13 +1517,76 @@ export default interface Resources {
         "modeResidents": "Companions",
         "open": "Choose",
         "title": "Selection"
-      },
+      }
     },
     "questGenLab": {
+      "author": {
+        "toggle": "Author mode"
+      },
       "backToHub": "Test Hub",
       "footer": "Quest Generation Lab · authored content in Italian · R-140",
+      "gates": {
+        "cancel": "Cancel",
+        "copy.deferred": "copy gate deferred",
+        "copy.na": "n/a",
+        "exec": "exec {{state}}",
+        "graph.fail": "graph defects",
+        "graph.ok": "graph ok",
+        "graph.skipped": "skipped",
+        "hint": "Run the gate inventory to validate this entry.",
+        "hook.low": "low hook coverage",
+        "hook.ok": "hooks ok",
+        "hook.skipped": "skipped",
+        "hook.zero": "no scenes",
+        "issues": "issues",
+        "issues.forbiddenTerm": "forbidden term \"{{term}}\"",
+        "issues.hardOptOut": "hard gate {{id}} cannot be opted out",
+        "issues.orphanEnd": "orphan end {{id}}",
+        "issues.schemaIssue": "{{path}}: {{message}}",
+        "issues.unreachableNode": "unreachable node {{id}}",
+        "journey.exportSeam": "export-seam only",
+        "journey.na": "n/a",
+        "mc.pending": "mc pending",
+        "notRun": "not run",
+        "run": "Run gates",
+        "running": "Running…",
+        "schema.fail": "schema violations",
+        "schema.ok": "schema ok",
+        "stale": "Report STALE — ran on {{reportHash}}… but content is {{currentHash}}…",
+        "title": "Quality gates",
+        "vocab.hits": "forbidden terms",
+        "vocab.na": "n/a",
+        "vocab.ok": "vocab ok"
+      },
+      "generate": {
+        "authorOnly": "author",
+        "cta": "Generate",
+        "errors": {
+          "generator-throw": "Generator threw",
+          "hash-failure": "Hash failed — retry",
+          "kit-schema": "Kit rejected by schema",
+          "tuning-schema": "Invalid tuning"
+        },
+        "export": "Export latest",
+        "importLabel": "Import envelope",
+        "kitDrawer": "Kit payload (JSON)",
+        "kitReadonly": "read-only — narrated kit",
+        "kitReset": "reset to frozen kit",
+        "running": "Generating…",
+        "title": "Generate candidate",
+        "tuning": {
+          "goal": "goal",
+          "limite": "flood limit",
+          "madreChance": "mother lode %",
+          "pareteChance": "wall %",
+          "twistChance": "twist chance %",
+          "twistRearmChance": "re-arm %",
+          "uscitaGoal": "escape goal"
+        }
+      },
       "labels": {
         "authored": "authored",
+        "candidate": "candidate",
         "inRun": "in-run",
         "mechanicsUsed": "mechanics used",
         "narrated": "narrated",
@@ -1451,6 +1599,8 @@ export default interface Resources {
         "runstart": "run-start",
         "scenarios": "scenarios",
         "scenes": "scenes",
+        "stale": "STALE",
+        "superseded": "SUPERSEDED by",
         "tags": "tags",
         "traitsUsed": "traits used",
         "tree": "node tree",
@@ -1863,6 +2013,15 @@ export default interface Resources {
         "statLabel": "Stat",
         "thresholdAriaLabel": "Filter threshold value",
         "thresholdLabel": "Threshold"
+      },
+      "ineligibleReason": {
+        "generic": "Not eligible here",
+        "in-expedition": "Out on an expedition",
+        "seat-busy": "Seat is busy",
+        "stat-requirement": "Doesn't meet a seat's requirement",
+        "status-away": "Away",
+        "status-dead": "Dead",
+        "status-exhausted": "Exhausted"
       },
       "sort": {
         "fatigueAsc": "Fatigue",

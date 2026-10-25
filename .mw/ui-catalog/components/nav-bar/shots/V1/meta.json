@@ -1,0 +1,89 @@
+{
+  "componentId": "nav-bar",
+  "sourceSha": "e061dab386227999c5ab91fd400de0fae8c33be0",
+  "sourceHash": "3af8ee309d3fd0bc",
+  "baseURL": "http://localhost:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-24T20:38:31.727Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "default-ctx-a.png",
+          "default-ctx-b.png"
+        ],
+        "isolated": [
+          "default-iso-0.png",
+          "default-iso-1.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface",
+        "id": "S1_WorldMapIdle"
+      },
+      "assertion": {
+        "selector": "nav [data-nav-id]",
+        "property": "visible",
+        "expected": "true"
+      }
+    },
+    {
+      "id": "village-active",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "village-active-ctx-a.png",
+          "village-active-ctx-b.png"
+        ],
+        "isolated": [
+          "village-active-iso-0.png",
+          "village-active-iso-1.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "script",
+        "ref": "scripts/catalog/drivers/navVillage.ts"
+      },
+      "assertion": {
+        "selector": "nav [data-nav-id=\"village\"][aria-pressed=\"true\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    },
+    {
+      "id": "hud-hidden",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "hud-hidden-ctx-a.png",
+          "hud-hidden-ctx-b.png"
+        ],
+        "isolated": []
+      },
+      "deterministicSameBytes": true,
+      "driver": {
+        "kind": "surface+key",
+        "surface": "S1_WorldMapIdle",
+        "key": "h"
+      },
+      "assertion": {
+        "selector": "[data-testid='hud-hide-toggle'], [data-hud-pearl]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

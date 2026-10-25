@@ -1,0 +1,16 @@
+{
+  "id": "village-screen-view",
+  "status": "documented",
+  "sourceHash": "add35cfbff32327c",
+  "version": {
+    "v": 1,
+    "shots": [
+      "shots/V1/default-ctx-a.png"
+    ],
+    "meta": {
+      "partial": false,
+      "failedStates": []
+    },
+    "ruling": null
+  }
+}

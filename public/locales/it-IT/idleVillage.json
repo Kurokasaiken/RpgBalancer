@@ -1645,6 +1645,15 @@
       "hp": "Salute",
       "stamina": "Resistenza",
       "xpTitle": "{name} · {xp} PE"
+    },
+    "ineligibleReason": {
+      "status-dead": "Morto",
+      "status-away": "Assente",
+      "status-exhausted": "Esausto",
+      "in-expedition": "In spedizione",
+      "stat-requirement": "Non soddisfa un requisito del castone",
+      "seat-busy": "Castone occupato",
+      "generic": "Non eleggibile qui"
     }
   },
   "questCheckpoint": {
@@ -2112,7 +2121,16 @@
       "exposurePercent": "{position}: {pct}% degli impatti in arrivo.",
       "exposureNone": "{position}: non assorbe impatti in arrivo.",
       "slot": "Slot {index}",
-      "leader": "Capo"
+      "leader": "Capo",
+      "dragBlocked": {
+        "status-dead": "Scambio impossibile — questo residente è morto.",
+        "status-away": "Scambio impossibile — questo residente è assente.",
+        "status-exhausted": "Scambio impossibile — questo residente è esausto.",
+        "in-expedition": "Scambio impossibile — questo residente è in spedizione.",
+        "stat-requirement": "Scambio impossibile — un requisito del castone non è soddisfatto.",
+        "seat-busy": "Scambio impossibile — quel castone è occupato.",
+        "ineligible": "Scambio impossibile qui."
+      }
     },
     "seals": {
       "durationBreakdown": "{out}g andata · ~{site}g sul posto · {back}g ritorno",

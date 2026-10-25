@@ -68,12 +68,31 @@ invariants:
     statement: >-
       Un drop roster su un castone occupato e' uno swap: il trascinato prende il castone se eleggibile
       (planRosterSlotReplace, stesso gate di un drop su castone vuoto) e lo scalzato torna al roster con la
-      return-flight dell'estrazione — assign + suppression + proxy in un solo commit (INV-4 stessa coreografia);
-      sede non-idle o landing ineleggibile rifiutano senza muovere nulla; durante il drag roster i castoni
-      occupati dipingono valid/invalid dal gate replace, non 'locked'.
+      return-flight dell'estrazione — assign + suppression + proxy in un solo commit (INV-4 stessa coreografia); sede
+      non-idle o landing ineleggibile rifiutano senza muovere nulla; durante il drag roster i castoni occupati dipingono
+      valid/invalid dal gate replace, non 'locked'.
     test_refs:
       - tests/unit/idleVillage/questExpeditionReturnFlight.test.tsx
       - tests/unit/idleVillage/quests/residentXpAndSwap.test.ts
+  - id: use-quest-expedition-session.INV-7
+    source: director-spec
+    source_ref: R-282
+    statement: >-
+      R-282: durante un drag, un castone che rifiuterebbe il drop espone il perche' secondo
+      l'ordine delle gambe del commit — trascinato→target, poi scalzato→sorgente (swap
+      slot↔slot); eleggibilita' del trascinato o 'seat-busy' (sede non-idle) per il drop
+      roster su occupato. `seatBlockReason`/`swapBlockReasonFor` guidano la legend del
+      rack; la meta' icona arriva dopo il ruling del visual-fork.
+    test_refs:
+      - tests/unit/idleVillage/questExpeditionReturnFlight.test.tsx
+  - id: use-quest-expedition-session.INV-6
+    source: director-bug
+    source_ref: R-283
+    statement: >-
+      R-283: getResidentCompatibility marca 'invalid' un residente mai assegnato quando nessun castone LIBERO lo accetta
+      → PgCard disabilita il draggable e lo swap roster→castone occupato (INV-5, R-281) e' irraggiungibile. Un castone
+      OCCUPATO eleggibile per il trascinato deve contare come compatibile (lo scalzato torna sempre al roster).
+    test_refs: []
 ---
 # use-quest-expedition-session
 
