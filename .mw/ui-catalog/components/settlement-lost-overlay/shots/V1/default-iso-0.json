@@ -1,0 +1,14 @@
+{
+  "file": "default-iso-0.png",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": "reduce",
+  "rendererClass": "metal",
+  "softwareRenderer": false,
+  "at": "2026-10-24T23:09:10.096Z",
+  "howStateReached": [],
+  "limitation": "Un frame solo: non prova movimento né assenza di movimento (T-04)."
+}

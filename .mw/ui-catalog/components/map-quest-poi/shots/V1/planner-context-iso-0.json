@@ -1,0 +1,16 @@
+{
+  "file": "planner-context-iso-0.png",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": "reduce",
+  "rendererClass": "metal",
+  "softwareRenderer": false,
+  "at": "2026-10-24T22:52:51.704Z",
+  "howStateReached": [
+    "planner:hook-assisted:openDetail"
+  ],
+  "limitation": "Un frame solo: non prova movimento né assenza di movimento (T-04)."
+}

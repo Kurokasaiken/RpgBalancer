@@ -1,0 +1,14 @@
+{
+  "file": "resource-low-ctx-b.png",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": "reduce",
+  "rendererClass": "metal",
+  "softwareRenderer": false,
+  "at": "2026-10-24T18:58:08.582Z",
+  "howStateReached": [],
+  "limitation": "Un frame solo: non prova movimento né assenza di movimento (T-04)."
+}

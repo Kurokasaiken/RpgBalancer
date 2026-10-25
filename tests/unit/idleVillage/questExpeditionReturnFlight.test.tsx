@@ -157,8 +157,12 @@ const Harness: React.FC<{
 type ExpeditionHooks = {
   assignToSlot: (slotId: string, residentId: string) => boolean;
   clearSlot: (slotId: string) => void;
-  checkEligibility: (slotId: string, residentId: string) => { eligible: boolean };
+  checkEligibility: (slotId: string, residentId: string) => { eligible: boolean; reason?: string };
   getAssignments: () => Record<string, string | null>;
+  openDetail: () => void;
+  dropResidentOnSlot: (residentId: string, slotId: string) => unknown;
+  completeRosterFlight: (residentId: string, slotId: string) => unknown;
+  blockReasonFor: (fromSlotId: string, toSlotId: string) => string | null;
 };
 
 const expeditionHooks = (poiId = 'poi-goblin'): ExpeditionHooks =>
@@ -196,6 +200,20 @@ describe('quest expedition — extraction return flight (R-248)', () => {
     /* jsdom lacks `HTMLImageElement.decode` — the medal overlay gates its
      * portrait reveal on it; a resolved stub is enough for the proxy. */
     (HTMLImageElement.prototype as unknown as { decode: () => Promise<void> }).decode = () => Promise.resolve();
+    /* jsdom lacks `window.matchMedia` — opening the detail mounts
+     * QuestExpeditionDetail, which reads it via useMobileFit. */
+    if (!window.matchMedia) {
+      window.matchMedia = ((q: string) => ({
+        matches: false,
+        media: q,
+        addEventListener() {},
+        removeEventListener() {},
+        addListener() {},
+        removeListener() {},
+        onchange: null,
+        dispatchEvent: () => false,
+      })) as unknown as typeof window.matchMedia;
+    }
   });
 
   // INV:use-quest-expedition-session.INV-1 — clearing a slotted seat must
@@ -361,5 +379,183 @@ describe('quest expedition — extraction return flight (R-248)', () => {
     } finally {
       unmountAnchors();
     }
+  });
+
+  // INV:use-quest-expedition-session.INV-5 — R-281: a roster medallion
+  // dropped on an occupied seat takes it; the displaced occupant returns to
+  // the roster on the extraction's return flight — assign + suppression +
+  // proxy in one commit, so the displaced medallion always has a carrier.
+  it('a roster drop on an occupied seat seats the newcomer and flies the displaced back to the roster', async () => {
+    render(<Harness probe={probe} />);
+    act(() => {
+      expeditionHooks().openDetail();
+    });
+    const { slotId, rid } = eligiblePair(probe);
+    const incoming = Object.keys(probe.residentsById).find(
+      (id) => id !== rid && expeditionHooks().checkEligibility(slotId, id).eligible,
+    );
+    if (!incoming) throw new Error('need a second eligible resident — roster or POI config changed');
+
+    act(() => {
+      expect(expeditionHooks().assignToSlot(slotId, rid)).toBe(true);
+    });
+    expect(expeditionHooks().getAssignments()[slotId]).toBe(rid);
+
+    const unmountAnchors = mountAnchors(slotId, rid);
+    try {
+      /* The drag-end gate accepts the drop: the verdict carries the flight
+       *  to the occupied seat instead of refusing it. */
+      let verdict: unknown;
+      act(() => {
+        verdict = expeditionHooks().dropResidentOnSlot(incoming, slotId);
+      });
+      expect(verdict).toMatchObject({ flightToSlot: { slotId } });
+
+      /* At landing: the newcomer seats, the displaced leaves every seat and
+       *  is airborne toward its roster card on the same commit. */
+      act(() => {
+        expeditionHooks().completeRosterFlight(incoming, slotId);
+      });
+      const after = expeditionHooks().getAssignments();
+      expect(after[slotId]).toBe(incoming);
+      expect(Object.values(after)).not.toContain(rid);
+      expect(screen.getByTestId('flight-proxy')).toBeInTheDocument();
+      expect(probe.session!.lockedResidentIds).toContain(rid);
+
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId('flight-proxy')).toBeNull();
+          expect(probe.session!.lockedResidentIds).not.toContain(rid);
+        },
+        /* Two flights land in this test (incoming card + displaced return) —
+         *  4s headroom for the shared worktree's CPU contention; the
+         *  assertions themselves are unchanged. */
+        { timeout: 4000 },
+      );
+    } finally {
+      unmountAnchors();
+    }
+  });
+
+  // INV:use-quest-expedition-session.INV-5 — R-281: the refusal is honest —
+  // an ineligible drop on an occupied seat returns `false` and nothing moves.
+  it('refuses the replace when the dragged resident is not eligible for the seat', () => {
+    render(<Harness probe={probe} />);
+    act(() => {
+      expeditionHooks().openDetail();
+    });
+    const { slotId, rid } = eligiblePair(probe);
+    const ineligible = Object.keys(probe.residentsById).find(
+      (id) => id !== rid && !expeditionHooks().checkEligibility(slotId, id).eligible,
+    );
+    act(() => {
+      expect(expeditionHooks().assignToSlot(slotId, rid)).toBe(true);
+    });
+    const before = expeditionHooks().getAssignments();
+    let verdict: unknown;
+    act(() => {
+      verdict = ineligible
+        ? expeditionHooks().dropResidentOnSlot(ineligible, slotId)
+        : expeditionHooks().dropResidentOnSlot(rid, 'no-such-slot');
+    });
+    expect(verdict).toBeFalsy();
+    expect(expeditionHooks().getAssignments()).toEqual(before);
+    expect(screen.queryByTestId('flight-proxy')).toBeNull();
+  });
+
+  // INV:use-quest-expedition-session.INV-6 — R-283: a never-assigned resident
+  // whose compatible seats are all OCCUPIED must stay 'valid' — PgCard
+  // disables the draggable on 'invalid', so an all-invalid roster made the
+  // INV-5 replace unreachable exactly when the rack is full (Director: «li
+  // devo poter prendere per fare lo swap con 1 slot già occupato»).
+  it('keeps an unassigned resident compatible when its seats are all occupied', () => {
+    render(<Harness probe={probe} />);
+    act(() => {
+      expeditionHooks().openDetail();
+    });
+
+    const slotId = (suffix: string) => {
+      const s = probe.session!.controller.slots.find((sl) => sl.id.endsWith(suffix));
+      if (!s) throw new Error(`no slot id ending with ${suffix} — POI config changed`);
+      return s.id;
+    };
+    /* Fill every seat. Chosen so each resident lands on a seat it is
+     * eligible for (goblin gates: leader edge|fortitude, member-1
+     * edge|fortitude|warden, member-2 precision|clarity, bodyguard
+     * warden|fortitude). */
+    const pairs: Array<[string, string]> = [
+      [slotId('leader'), 'hero-giggiolillo'],
+      [slotId('member-1'), 'hero-sir-spaccaculi'],
+      [slotId('member-2'), 'hero-salvatrice'],
+      [slotId('bodyguard'), 'villager-baldassarre'],
+    ];
+    for (const [sid, rid] of pairs) {
+      act(() => {
+        expect(expeditionHooks().assignToSlot(sid, rid)).toBe(true);
+      });
+    }
+    expect(Object.values(expeditionHooks().getAssignments()).filter(Boolean)).toHaveLength(
+      probe.session!.controller.slots.length,
+    );
+
+    /* Never assigned, fits only OCCUPIED seats → still draggable. */
+    expect(probe.session!.getResidentCompatibility('villager-mastro-beppe')?.state).toBe('valid');
+    expect(probe.session!.getResidentCompatibility('villager-lisetta')?.state).toBe('valid');
+  });
+
+  // INV:use-quest-expedition-session.INV-7 — R-282: the announced reason
+  // follows the commit's leg order — dragged → target first, displaced →
+  // source second; a legal swap reports null. (The icon half lands after
+  // the visual-fork ruling.)
+  it('reports the first failing leg as the swap block reason', () => {
+    render(<Harness probe={probe} />);
+    act(() => {
+      expeditionHooks().openDetail();
+    });
+    const slots = probe.session!.controller.slots.map((s) => s.id);
+    const rids = Object.keys(probe.residentsById);
+    const elig = (sid: string, rid: string) => expeditionHooks().checkEligibility(sid, rid).eligible;
+
+    /* Legal swap: both directions eligible → null. */
+    let assertedLegal = false;
+    outer: for (const a of slots) {
+      for (const b of slots) {
+        if (a === b) continue;
+        const ra = rids.find((r) => elig(a, r) && elig(b, r));
+        const rb = rids.find((r) => r !== ra && elig(a, r) && elig(b, r));
+        if (ra && rb) {
+          act(() => {
+            expect(expeditionHooks().assignToSlot(a, ra)).toBe(true);
+            expect(expeditionHooks().assignToSlot(b, rb)).toBe(true);
+          });
+          expect(expeditionHooks().blockReasonFor(a, b)).toBeNull();
+          assertedLegal = true;
+          break outer;
+        }
+      }
+    }
+    if (!assertedLegal) throw new Error('no legal swap pair — roster or POI config changed');
+
+    /* Refused swap: dragged fits the target, displaced does NOT fit the
+     * source → the reason is the displaced leg's eligibility reason. */
+    let assertedBlocked = false;
+    outer: for (const a of slots) {
+      for (const b of slots) {
+        if (a === b) continue;
+        const ra = rids.find((r) => elig(a, r) && elig(b, r));
+        const rb = rids.find((r) => r !== ra && elig(b, r) && !elig(a, r));
+        if (ra && rb) {
+          act(() => {
+            expect(expeditionHooks().assignToSlot(a, ra)).toBe(true);
+            expect(expeditionHooks().assignToSlot(b, rb)).toBe(true);
+          });
+          const expected = expeditionHooks().checkEligibility(a, rb).reason;
+          expect(expeditionHooks().blockReasonFor(a, b)).toBe(expected ?? 'ineligible');
+          assertedBlocked = true;
+          break outer;
+        }
+      }
+    }
+    if (!assertedBlocked) throw new Error('no refused swap pair — roster or POI config changed');
   });
 });

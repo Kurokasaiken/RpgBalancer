@@ -193,7 +193,9 @@
     "task:close": "tsx scripts/taskClose.ts",
     "contracts:index-sync": "tsx scripts/verification/contractsIndexSync.ts",
     "sync:bug": "tsx scripts/verification/syncBug.ts",
-    "dev:lan": "vite --mode development --host"
+    "dev:lan": "vite --mode development --host",
+    "catalog:validate": "tsx scripts/catalog/catalogValidate.mts",
+    "catalog:document": "tsx scripts/catalog/documentComponent.mts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

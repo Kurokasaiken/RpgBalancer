@@ -306,6 +306,10 @@ export function useQuestPoiSession({
    *  interruptible instead of one contiguous task inside the handler (same
    *  contract as useQuestExpeditionSession). */
   const flyingResidentRef = useRef<string | null>(null);
+  /* R-281/QoL-5: roster card dropped on an occupied seat — commits as a
+   *  replace at the card's landing (displaced flies back to the roster,
+   *  same choreography as `handleSlotClear`). */
+  const pendingReplaceRef = useRef<{ toSlotId: string; residentId: string; displacedId: string } | null>(null);
   const setFlying = useCallback((id: string | null) => {
     flyingResidentRef.current = id;
     startTransition(() => setFlyingResidentId(id));
@@ -513,9 +517,22 @@ export function useQuestPoiSession({
       if (isQuestRunning || embarkResult) return undefined;
       const slot = findAcceptingSlot(residentId);
       if (slot) return { state: 'valid', slotId: slot.id, slotLabel: slot.label };
+      /* R-283 (INV-2): a full rack is not a dead end — an OCCUPIED seat that
+       *  passes the roster→seat replace gate (same `evaluateStatRequirement`
+       *  the drop verdict applies, the displaced always returns to the
+       *  roster) keeps the card draggable, so the swap stays reachable when
+       *  every free seat is gone. */
+      const resident = residentsById[residentId];
+      const replaceTarget =
+        resident && !assignedIds.includes(residentId)
+          ? controller.slots.find(
+              (s) => s.assignedResidentId && evaluateStatRequirement(resident, s.requirement).matches,
+            )
+          : undefined;
+      if (replaceTarget) return { state: 'valid', slotId: replaceTarget.id, slotLabel: replaceTarget.label };
       return { state: 'invalid', reason: 'Nessuno slot compatibile' };
     },
-    [findAcceptingSlot, isQuestRunning, embarkResult],
+    [findAcceptingSlot, isQuestRunning, embarkResult, residentsById, assignedIds, controller.slots],
   );
 
   const assignAnyResident = useCallback(() => {
@@ -583,10 +600,19 @@ export function useQuestPoiSession({
         return;
       }
 
-      const accepted =
-        !slot.assignedResidentId &&
-        evaluateStatRequirement(resident, slot.requirement).matches;
+      /* R-281/QoL-5: an occupied seat accepts the drop when the dragged
+       *  resident matches the requirement — the displaced occupant returns
+       *  to the roster at commit (same swap semantics as the expedition
+       *  planner). */
+      const accepted = evaluateStatRequirement(resident, slot.requirement).matches;
       if (!accepted) return false;
+      if (slot.assignedResidentId) {
+        pendingReplaceRef.current = {
+          toSlotId: slot.id,
+          residentId,
+          displacedId: slot.assignedResidentId,
+        };
+      }
 
       const element = isDetailOpen
         ? getSlotComponentElement(slot.id)
@@ -598,9 +624,35 @@ export function useQuestPoiSession({
 
   const handleFlightComplete = useCallback(
     (residentId: string, slotId?: string) => {
+      /* QoL-5: a pending replace commits at the card's landing — one commit
+       *  seats the newcomer and launches the displaced medallion back to
+       *  its roster card, same carrier handoff as `handleSlotClear`. */
+      const pending = pendingReplaceRef.current;
+      pendingReplaceRef.current = null;
+      if (slotId && pending && pending.toSlotId === slotId && pending.residentId === residentId) {
+        const from = elementCenter(getSlotComponentElement(slotId));
+        const to = elementCenter(document.querySelector(`[data-resident-id="${pending.displacedId}"]`));
+        if (from && to && !flyingResidentRef.current) {
+          flyingResidentRef.current = pending.displacedId;
+          startTransition(() => {
+            handleAssign(slotId, residentId);
+            setFlyingResidentId(pending.displacedId);
+            startFlight({
+              residentId: pending.displacedId,
+              slotId,
+              isInset: false,
+              fromX: from.x,
+              fromY: from.y,
+              toX: to.x,
+              toY: to.y,
+            });
+          });
+          return;
+        }
+      }
       if (slotId) handleAssign(slotId, residentId);
     },
-    [handleAssign],
+    [handleAssign, startFlight],
   );
 
   const handleResidentSelect = useCallback(
@@ -617,7 +669,13 @@ export function useQuestPoiSession({
       setFlying(residentId);
       setTimeout(() => {
         const to = elementCenter(getSlotComponentElement(slot.id));
-        if (!to) return;
+        /* R-283 (INV-2): a missing seat anchor must release the flying lock —
+         *  keeping it killed every later click-assign (`flyingResidentRef`
+         *  guard) and left the card 'away' forever. */
+        if (!to) {
+          setFlying(null);
+          return;
+        }
         startTransition(() =>
           startFlight({
             residentId,
