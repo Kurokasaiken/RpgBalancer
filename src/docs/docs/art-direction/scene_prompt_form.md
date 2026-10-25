@@ -306,3 +306,17 @@ compilata se ci sono materiali terrosi, `VALUE PLAN` dichiarato,
 
 Mancanti (da creare al bisogno): interior, artifact/loot-distinctive,
 crowd/NPC, underwater.
+
+## Registro STYLE canonico (lezione batch 2026-10-25, R-XXX)
+
+Il blocco STYLE/LIGHTING **non ammette parafrasi**. Batch 12-scene bocciato 12/12 per registro addomesticato; rerun identico in soggetti/composizioni con solo il registro corretto → 12/12 in famiglia.
+
+**Termini-strumento obbligatori** (dalla bibbia approvata):
+- Luce come forza: `slams`, `blinding`, `searing highlights` — MAI "shafts breaking through", "soft light", "dappled"
+- Cielo con colore nominato saturo: `vibrant azure sky`, `vibrant indigo sky` — MAI "luminous sky", "dramatic sky"
+- Ombra come evento cromatico positivo: `shadowed faces glow in saturated <pigment>`, `cobalt shadows vs burning orange highlights` — non solo come divieto
+- Tecnica: `thick, violent palette-knife impasto, visible paint layers, loose painterly edges, no digital smoothing` — MAI "broad strokes" da solo
+- Vibrazione: `every plane vibrates with light`, `no flat colors`, `no muted tones, no haze washing color out`
+- Suolo/terreno va dichiarato con materia+colore (es. `volcanic rock veined with glowing red`), non con "deep base" astratto
+
+**Anti-pattern dimostrato**: descrivere la luce come fenomeno atmosferico (shafts, dappled, golden-hour) produce concept-art smorzata — i ref battezzati hanno luce che *colpisce*.
