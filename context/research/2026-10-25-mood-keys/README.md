@@ -372,3 +372,10 @@ In `images/draws/`; contact-sheet per mood in `sheets/sheet_<mood>.png`
 
 Selezione Director: per ogni scena scegliere il draw migliore (base/d2/d3)
 dalle contact-sheet — i candidati sono pari in aderenza, la scelta è estetica.
+
+## Sky/meadow fix (2026-10-25, Director critique v4)
+
+**Critica**: cielo non abbastanza azure/turchese, prati non veronese-vivi, un'immagine sul marrone.
+**Diagnosi A/B**: stesso prompt originale → Grok=foto (ignora "oil painting"), Gemini=dipinto in famiglia → registro battezzato è generator-specific.
+**Fix meccanico**: il colore dominante va nel light-event come CAMPO PRIMARIO — "under a VIVID CYAN-TURQUOISE AZURE SKY — the sky is the dominant saturated color field; meadows blaze in VIVID VERONESE GREEN, not yellow-brown". Risultato: 3/3 wilderness con cielo ciano saturo + prato veronese.
+**Lezione**: il campo colore dominante non va nella lista palette — va nel light-event come soggetto cromatico della scena. Aggiunto al form (palette-field-as-primary-color-field).
