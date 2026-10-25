@@ -1,0 +1,25 @@
+
+…
+Mostra di più
+ChatGPT ha detto:
+
+OBJECT: §5 EDIT ANCHOR RULE contradicts §4’s edit and re-anchor workflow. Edits must reference pristine B0, but texture re-anchoring explicitly requires the current composition and lighting to remain intact. If B0 predates accepted edits, anchoring to B0 can discard those accepted improvements; the lighting-pass exception does not resolve this generally. Define the anchor by operation: B0 for fresh corrective branches; the latest accepted image for a localized edit or re-anchor that must preserve accepted changes.
+
+Potrebbe interessarti anche questo.
+
+The Grid | Stop tracking AI model updates
+
+Stop Model Tracking
+
+Pick a tier once. The Grid handles model changes.
+
+Annuncio
+Opzioni dell'annuncio
+ChatGPT può commettere errori. Verifica le informazioni importanti.
+Ultima risposta
+
+
+
+
+Pensa
+Risposta completata

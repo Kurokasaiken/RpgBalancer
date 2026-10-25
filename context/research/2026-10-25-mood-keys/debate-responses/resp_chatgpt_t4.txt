@@ -1,0 +1,64 @@
+:
+Objections to v5 r001
+
+1. OPEN — Edit cap: choose 2 edits per thread, not 3.
+
+Gemini web has no seed control, and the stated evidence already identifies two regression risks: saturation overshoot and loss of impasto. A third edit is not justified merely because the composition remains acceptable. Adopt gen0 + ≤2 edits; permit a third only as an explicitly authorized exception backed by a specific recovery hypothesis. The six-operation asset budget remains a separate limit.
+
+2. OPEN — Texture degradation: allow one corrective edit, but only conditionally.
+
+“Never edit texture” is too absolute: an edit that restores visible impasto may be recoverable. But reinjecting the style register alone does not establish that the surface will recover. Permit one texture-recovery edit only if composition and subject structure remain intact, the defect is localized, and the instruction explicitly protects color balance and existing brushwork elsewhere. If the surface is broadly smooth/glossy or the first recovery worsens it, terminate the thread. Do not automatically spend the exception.
+
+3. DOMINANT_COLOR_FIELDS as geometric zones — reject as a universal rule.
+
+The diagnosis is sound; the proposed fix is too rigid. Declaring the sky a primary visual subject is consistent with the empirical evidence. Declaring it to occupy the upper 60% is a different instruction: it imposes a geometric layout that can conflict with COMPOSITION, horizon placement, subject silhouette, or camera framing.
+
+Use COLOR_FIELD_ROLE, PIGMENT_IDENTITY, and RELATIVE_VISUAL_DOMINANCE as the canonical fields. Describe spatial extent qualitatively by default. Use percentages only when the composition brief explicitly requires them.
+
+Most importantly, do not downgrade color fields from primary subjects to zones merely to avoid a supposed token collision. That collision is a hypothesis, not established evidence. Test the two formulations before making the change canonical.
+
+4. FORK — missing failure mode: the edit succeeds locally but damages a protected invariant.
+
+The fork classifies the requested defect, but does not explicitly classify the result of the edit. For example, the sky becomes vibrant while impasto disappears or the composition drifts.
+
+Add a post-edit regression gate:
+
+Target improved; invariants preserved; no material regression → accept or continue.
+Target improved; protected property regressed → classify as failed edit and assess recoverability.
+Target unchanged or worsened → do not repeat the same correction blindly.
+
+A correction is not successful merely because its target improved.
+
+5. G7 ONE-VARIABLE conflicts with mandatory style-register reinjection.
+
+Section 4 requires every edit to re-inject the style register; section 3 requires exactly one changed field. If reinjection changes the submitted prompt's style instructions, the diagnostic is no longer a single-field experiment.
+
+Resolve this by distinguishing semantic delta from literal prompt delta. Preserve the register unchanged when it is already present and effective. If it must be strengthened or restored, record that as a second intervention and do not claim single-field attribution.
+
+6. FORK ordering — first match wins can conceal compound failures.
+
+An image can have both incorrect composition and reference contamination. Regenerating with the same defective reference may reproduce the problem. Before regeneration, identify whether the reference contributed to the structural failure and repair the reference strategy as necessary.
+
+Require a brief multi-defect assessment before applying the first matching branch. The first-match rule is useful for selecting an action, but unsafe as a substitute for diagnosis.
+
+7. The two-confirmation conviction rule is insufficiently precise.
+
+Two reproductions are a reasonable minimum for a provisional pattern, not proof of causation—especially without seeds. Define what counts as a confirmation: the same defect, under the same controlled single-field intervention, assessed against the same acceptance criterion. Record contradictory outcomes rather than counting only successes.
+
+8. Subject-class hard thresholds need qualification.
+
+The Impero Solare rule that the living subject must occupy <10% of frame height is more specific than the attested canon. Monumental compression is canonical; that numerical threshold is not. Treat it as a testable composition preset, not a universal requirement, unless the Director explicitly ratifies it.
+
+Likewise, EXPRESSION_VECTOR and GAZE_LOCK are useful fields, but a wrong expression or gaze does not invariably require regeneration. A localized gaze defect may be recoverable through a targeted edit. Classify by structural severity, not by field name alone.
+
+Verdict
+
+Accept the two-edit default and conditional texture recovery. Reject fixed color-zone percentages as a universal rule. Amend the fork with post-edit regression assessment and reference-aware compound-failure diagnosis. These changes preserve the protocol's useful discipline without elevating untested assumptions into canonical constraints.
+
+ChatGPT può commettere errori. Verifica le informazioni importanti.
+Ultima risposta
+
+
+
+
+Pensa
