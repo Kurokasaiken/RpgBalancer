@@ -217,3 +217,21 @@ slender delicate tracery; alien world glimpsed inside panes.
 burning INSIDE the dark; torn-paper torn edge; ashen ruins; charcoal
 umber ground; last ember of resistance; ground-hugging camera;
 bone-pale accents; smoke-hung horizon.
+
+## A10 — ADEQUACY METRIC (Director 2026-10-25): hue-fields + impasto
+
+Il gate "è adeguata" NON è "contrasto/dramma" ma:
+
+1. **HUE-FIELD COUNT**: conta i campi cromatici distinti e leggibili
+   (villaggio=5+, jungle=6). Target = ≥ quello del ref del dominio.
+2. **DOMINANCE STRUCTURE**: *chi* domina e *chi accentua* deve
+   rispecchiare il ref (jungle: verdi dominano + oro accentua;
+   villaggio: azure+veronese dominano + oro accentua). "Gold on
+   everything" = sbagliato anche se il colore singolo è giusto.
+3. **NO BROWN-DRIFT**: giallo+verde possono fondersi in ocra-marrone.
+   Il giallo deve restare *luminoso* su spot esposti, mai cast globale.
+4. **IMPASTO THICKNESS**: spatolate spesse fisiche (knife ridges)
+   vs tratti illustrativi — verifica il registro materico, non solo
+   "impasto presente".
+
+Regola d'oro: *aggiungi varietà dentro l'identità, non drama fuori.*
