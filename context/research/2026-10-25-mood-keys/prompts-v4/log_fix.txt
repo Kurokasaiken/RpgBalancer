@@ -1,0 +1,16 @@
+SKIP rude-beauty-shepherd-shrine (exists)
+SKIP rude-beauty-gorge-bridge (exists)
+SKIP rude-beauty-harvest-waystone (exists)
+SKIP impero-solare-sun-forge (exists)
+SKIP impero-solare-gold-aqueduct (exists)
+SKIP impero-solare-processional-stair (exists)
+SKIP prismatic-frontier-crystal-aqueduct (exists)
+SKIP prismatic-frontier-observatory-dome (exists)
+SKIP prismatic-frontier-beacon-tower (exists)
+>>> dark-wasteland-siege-skeleton ref=mordor_clean.png
+    REF_ATTACH_FAIL TimeoutError
+>>> dark-wasteland-obsidian-fortress ref=mordor_clean.png
+      - <ws connected> ws://127.0.0.1:9222/devtools/browser/c3f4727d-6f4e-476a-bc68-7e051ee6a38d
+>>> dark-wasteland-banner-field ref=mordor_clean.png
+    REF_ATTACHED
+BATCH DONE

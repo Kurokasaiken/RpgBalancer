@@ -320,3 +320,39 @@ Wide 21:9 cinematic format, one painted canvas.
 
 ### Immagini v1 bocciate
 Archiviate in `images/v1-rejected/` per confronto didattico.
+
+## Canon evolution (ruling Director 2026-10-25)
+
+- **Le 4 chiavi esistono** (evoluzione della bibbia §1 che ne prevedeva 2): Rude Beauty (Wilderness), Impero Solare (Empire), Prismatic, Dark Wasteland.
+- **Prismatic = rovine/invasioni da un altro multiverso** — le strutture prismatiche sono relitti alieni che NON appartengono al paesaggio: le scene devono leggerle come intrusioni, non architettura locale. Iridescenza solo su veli/membrane/lenti (legge già in nm-mutants family-dna).
+- **Dark Wasteland**: NO meteore/sciami (fallimento ricorrente del generatore); impasto violento obbligatorio — troppa perfezione è FAIL; oscurità luminosa cobalto-vs-arancio.
+- **Prismatic beams**: non in tutte le immagini — diventa prevedibile/noioso. Al massimo UN beam motivato (la lente waymarker); altrove iridescenza confinata ai materiali.
+- **Prompt structure v3**: blocco `WORLD (why this exists)` prima di SUBJECT — il perché semantico del pilastro guida soggetto e composizione; creature dichiarate con la grammatica della family (mythic beast / imperial beast / intrusion-touched / survivor).
+
+## Critica multi-AI sulla struttura prompt (run `mood-prompt-v3-critique`)
+
+4/5 provider verificati via canary `QUILL-EMBER-9` (gemini, deepseek, chatgpt, grok; claude = sessione mai formata). Testi integrali in `critiques/`.
+
+### Convergenze (tutte e 4)
+- **WORLD era prosa motivazionale** → diventa KEY con campi visibili: pillar signature / light-event / medium / scale anchor
+- **Triade = inventario, non narrativa** → role clause per elemento: creature embodies, place witnesses, relic leaks (da un'altra chiave = tiene le 4 chiavi nello stesso mondo)
+- **Composizione deve essere per-chiave**: wilderness→VISTA/CASCADE eye-level · empire→MONOLITH/ARCH/GRID low-angle · prismatic→ISLAND/TABLEAUX tilt+wreckage-breaks-frame · wasteland→VOID/TABLEAUX rasoterra, horizon alto
+- **Kill list diluita** → cap 5 igiene strutturale; kill estetici riscritti come positivi ("NO meteors" → "orange breaks inside the cloud mass"); 1 NOT-line per chiave
+- Nuovi campi: **light-event** (verbo+geometria), **medium** (aria per chiave), **scale anchor**, **MOOD_PROOF** (test accettazione: senza nome-chiave, quale relazione visibile identifica il mood?)
+
+→ applicato in `prompts-v4` (template convergente) + batch v4.
+
+## Round v4 — template convergente multi-AI (2026-10-25)
+
+Prompt riscritti nel template convergente (KEY semantics + role clauses + per-key composition + hygiene cap). Strisce ref→generate in `/tmp/mood-batch/compare4_*.png`.
+
+### Esito contro le critiche Director
+- **Solar Triumph**: bianco realmente accecante, cielo dissolto in haze bianco-oro — critica "bianco scuro" risolta
+- **Wasteland meteore**: zero — l'arancio brucia dentro la massa indaco; impasto violento; torn-edge copiato dal ref
+- **Prismatic beams**: iridescenza confinata a membrane/lenti/vetro; i relitti leggono come intrusione aliena (torre storta nella steppa ordinaria)
+- **Rude Beauty**: cielo ciano-turchese saturo come il ref
+
+### Note per eye-check Director
+- Angoli arrotondati/vignetta residui su alcune (default Gemini vs clausola full-bleed)
+- Le v1/v2 rifiutate in `images/rounds-archive/`
+- Le 12 v4 finali in `images/`, i 12 prompt in `prompts-v4/`

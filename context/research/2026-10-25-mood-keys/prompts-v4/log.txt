@@ -1,0 +1,24 @@
+SKIP rude-beauty-shepherd-shrine (exists)
+>>> rude-beauty-gorge-bridge ref=villaggio.png
+    REF_ATTACHED
+>>> rude-beauty-harvest-waystone ref=villaggio.png
+    REF_ATTACHED
+>>> impero-solare-sun-forge ref=architettura impero sole.png
+    REF_ATTACHED
+>>> impero-solare-gold-aqueduct ref=architettura impero sole.png
+    REF_ATTACHED
+>>> impero-solare-processional-stair ref=architettura impero sole.png
+    REF_ATTACHED
+>>> prismatic-frontier-crystal-aqueduct ref=prismatic monumental gate.png
+    REF_ATTACHED
+>>> prismatic-frontier-observatory-dome ref=prismatic monumental gate.png
+    REF_ATTACHED
+>>> prismatic-frontier-beacon-tower ref=prismatic monumental gate.png
+    REF_ATTACHED
+>>> dark-wasteland-siege-skeleton ref=verso mordor.png
+    REF_ATTACHED
+>>> dark-wasteland-obsidian-fortress ref=verso mordor.png
+    REF_ATTACHED
+>>> dark-wasteland-banner-field ref=verso mordor.png
+    REF_ATTACHED
+BATCH DONE
