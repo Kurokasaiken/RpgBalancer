@@ -356,3 +356,19 @@ Prompt riscritti nel template convergente (KEY semantics + role clauses + per-ke
 - Angoli arrotondati/vignetta residui su alcune (default Gemini vs clausola full-bleed)
 - Le v1/v2 rifiutate in `images/rounds-archive/`
 - Le 12 v4 finali in `images/`, i 12 prompt in `prompts-v4/`
+
+## Draws 2-3 per scena (protocollo multi-draw)
+
+24 generazioni aggiuntive (12 × d2 + 12 × d3) — tutte uniche, tutte REF_ATTACHED.
+In `images/draws/`; contact-sheet per mood in `sheets/sheet_<mood>.png`
+(riga REF + 3 draw per scena). Strisce confronto ref→v4 in `sheets/compare4_*.png`.
+
+### Lettura batch
+- **Rude Beauty**: 9/9 consistenti — cielo azure, prato veronese, bestie mitiche
+- **Dark Wasteland**: 9/9 cobalto-vs-arancio, ZERO meteore su tutti i draw
+  (la NOT-line+positivo ha risolto il fallimento sistematico), impasto violento
+- **Impero Solare**: bianco accecante reale su tutti i draw
+- **Prismatic**: iridescenza confinata ai materiali; wreckage-come-intrusione leggibile
+
+Selezione Director: per ogni scena scegliere il draw migliore (base/d2/d3)
+dalle contact-sheet — i candidati sono pari in aderenza, la scelta è estetica.
