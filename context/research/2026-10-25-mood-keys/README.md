@@ -413,3 +413,10 @@ approvate descrivono la CHIAVE come subject primario (luce/azione).
 
 **aqueduct_FINAL: NON promosso a riferimento** (ruling) — resta candidato
 dell'iterazione, non ancora canone.
+
+## Learn (2026-10-25) — pattern edit-loop
+
+`.mw/runs/20261025-learn-moodkeys/pattern-candidate.md`: type-verification
+non presence-verification; vocabolario-effetto = dominio; LIGHT_IDENTITY
+vincolata; contrasto = intreccio locale; ogni campo colore va motivato;
+personalizzazione contro ripetizione. Regole già in protocol v5 A8/A10/A11.
