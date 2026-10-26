@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { settlementLostConfig } from '@/balancing/config/idleVillage/settlementLostConfig';
 import { OxidizedGradeFilter } from './OxidizedGradeFilter';
+import { SkinScope, SkinButton } from '../skins/primitives';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
@@ -273,26 +274,11 @@ export const SettlementLostOverlay: React.FC = () => {
                 </div>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
-                <button
-                  type="button"
-                  onClick={handleAcknowledge}
-                  autoFocus
-                  style={{
-                    padding: '10px 26px',
-                    borderRadius: 10,
-                    border: '1px solid rgba(131,153,140,.5)',
-                    background: 'linear-gradient(180deg, #3a6b5e 0%, #2a5045 100%)',
-                    color: '#eef4f0',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    letterSpacing: '0.08em',
-                    cursor: 'pointer',
-                  }}
-                >
+              <SkinScope style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+                <SkinButton variant="cta" onClick={handleAcknowledge} autoFocus>
                   {t(copy.ctaKey)}
-                </button>
-              </div>
+                </SkinButton>
+              </SkinScope>
             </div>
           </motion.div>
         )}
