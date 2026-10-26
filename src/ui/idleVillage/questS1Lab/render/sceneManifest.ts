@@ -390,6 +390,26 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 8 },
     ],
   },
+  'sentiero-tracce-v2': {
+    /* f1 exploration (2026-10-26): dense undergrowth, wet ferns, moss,
+     *  an old climbable oak ahead, quiet fields + sparse gemstone
+     *  accents (A19). Director-approved iteration v7. */
+    depth: '/assets/depth/sentiero-tracce-v2.webp',
+    depthWidth: 789,
+    depthHeight: 336,
+    imgAspect: 1578 / 672,
+    entrance: 'enter-creep',
+    pose: 'pose-watch',
+    focusAnchor: [0.55, 0.5],
+    atmosphere: [],
+    ambient: [
+      /* Dust motes in the light shaft + low mist between fern banks. */
+      { type: 'dust', count: 12 },
+      { type: 'drift', band: [0.55, 0.7], count: 2, lean: 0.3 },
+      { type: 'glint', at: [0.48, 0.78], period: 9, r: 0.005 },
+      { type: 'glint', at: [0.55, 0.7], period: 12, r: 0.004 },
+    ],
+  },
   'ritorno-v2': {
     /* f8 return (2026-10-26): mountain descent through forest, the
      *  golden-thatched village far below at sunset — warm far / cold
