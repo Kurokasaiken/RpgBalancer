@@ -38,10 +38,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElement
 <figure><img loading="lazy" src="images/trav_strip.png" onclick="lb(this.src,'traverse −0.15→+0.15 source-UV: la camera spazza ~30% della piastra, near/mid/far a velocità diverse, zero edge')"><figcaption>strip 5 frame del traverse (t=0→42000)</figcaption></figure>
 </div>
 <div class="grid">
-<figure class="pilot"><video src="images/entr_sweep.mp4" controls muted autoplay style="width:100%;border-radius:6px"></video><figcaption>ENTRATA NORMALE — enter-sweep (arrivo laterale, zoom-out, focus land) + postSettle breathing</figcaption></figure>
-<figure><video src="images/trav_loop.mp4" controls loop muted style="width:100%;border-radius:6px"></video><figcaption>traverse ping-pong (param dev <code>traverse=0.15</code>) — archiviato</figcaption></figure>
+<figure class="pilot"><video src="images/entr_sweep.mp4" controls muted autoplay style="width:100%;border-radius:6px"></video><figcaption>ENTRATA NORMALE — enter-sweep + postSettle breathing</figcaption></figure>
+<figure class="pilot"><video src="images/train_2layer.mp4" controls loop muted autoplay style="width:100%;border-radius:6px"></video><figcaption>TRAIN WINDOW 2-layer — near strip (grass+crags+deer) 5× più veloce del fondo, zero smear, loop infinito</figcaption></figure>
+<figure><video src="images/train_window.mp4" controls loop muted style="width:100%;border-radius:6px"></video><figcaption>single-image depth-warp wrap — il meccanismo funziona ma il near si scioglie dopo ~5s (rubber-sheet, archiviato)</figcaption></figure>
 </div>
-<p class="note">Depth Anything V2 baked (512×142) → DepthScene GPU. Lab: <code>/theater-lab?scene=marcia-crinale&amp;shot=enter-sweep</code>. Ambient diurni: dust, glint sul torrente, cloud drift, shaft dal lato sole. Loop wrap infinito = ricerca in corso (bordi tileabili). Nota: sorgente 1024×285 = preview-res Gemini, la versione finale va ri-generata a risoluzione scena (3168).</p>
+<p class="note">Verdetto: displacement single-image = traversa corta/respirazione OK, loop sostenuto NO (smear ai bordi di depth). Il loop vero = <b>2 layer rigidi</b>: fondo inpainted (Gemini ha continuato prato/strada dietro la fascia erbosa) + strip near alpha-cut tileabile — entrambi offset+heal per tile. Resta una seam lieve nel cielo del fondo (prossimo heal mirato). Lab: <code>/theater-lab?scene=marcia-crinale-loop&amp;train=3</code> (wrap shader mode). Plate: <code>marcia-crinale-loop.jpg</code> = i3 rolled+healed.</p>
 <h2>Chiusura quasi-promosse — iterazioni v2 (novità)</h2>
 <div class="grid">
 <figure class="pilot"><img loading="lazy" src="images/gola-raider_A12.png" onclick="lb(this.src,'gola E5 — hue opposte intrecciate in ogni campo, tenue vibrante')"><figcaption>gola A12 — no white dots, varied cliffs+pino ✓</figcaption></figure>

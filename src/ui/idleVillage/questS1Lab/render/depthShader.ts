@@ -47,22 +47,33 @@ uniform vec2 uViewSize;
  * a rotation around the sampled-window center — FG wobbles ~4× BG. */
 uniform vec3 uTrauma;
 uniform vec2 uTraumaW;
+/* Train-window wrap mode (lab-only experiment): when uWrap>0.5 the x
+ *  coordinate wraps instead of clamping — combined with a linearly
+ *  growing camVec this scrolls every depth plane at its own speed on a
+ *  horizontally tileable plate. */
+uniform float uWrap;
+
+vec2 wrapX(vec2 uv) {
+  if (uWrap > 0.5) uv.x = fract(uv.x);
+  return uv;
+}
 
 vec4 sceneSample(vec2 uv) {
+  uv = wrapX(uv);
   if (uBlurPx <= 0.05) return texture(uScene, uv);
 
   /* Sample around the warped source point in view-pixel units. A mip-only
    * LOD made the entrance look like enlarged coarse pixels, not lens blur. */
   vec2 radius = (2.0 * uWinHalf / uViewSize) * uBlurPx;
   vec4 color = texture(uScene, uv) * 0.25;
-  color += texture(uScene, uv + vec2( radius.x, 0.0)) * 0.125;
-  color += texture(uScene, uv + vec2(-radius.x, 0.0)) * 0.125;
-  color += texture(uScene, uv + vec2(0.0,  radius.y)) * 0.125;
-  color += texture(uScene, uv + vec2(0.0, -radius.y)) * 0.125;
-  color += texture(uScene, uv + vec2( radius.x,  radius.y)) * 0.0625;
-  color += texture(uScene, uv + vec2(-radius.x,  radius.y)) * 0.0625;
-  color += texture(uScene, uv + vec2( radius.x, -radius.y)) * 0.0625;
-  color += texture(uScene, uv + vec2(-radius.x, -radius.y)) * 0.0625;
+  color += texture(uScene, wrapX(uv + vec2( radius.x, 0.0))) * 0.125;
+  color += texture(uScene, wrapX(uv + vec2(-radius.x, 0.0))) * 0.125;
+  color += texture(uScene, wrapX(uv + vec2(0.0,  radius.y))) * 0.125;
+  color += texture(uScene, wrapX(uv + vec2(0.0, -radius.y))) * 0.125;
+  color += texture(uScene, wrapX(uv + vec2( radius.x,  radius.y))) * 0.0625;
+  color += texture(uScene, wrapX(uv + vec2(-radius.x,  radius.y))) * 0.0625;
+  color += texture(uScene, wrapX(uv + vec2( radius.x, -radius.y))) * 0.0625;
+  color += texture(uScene, wrapX(uv + vec2(-radius.x, -radius.y))) * 0.0625;
   return color;
 }
 
@@ -77,7 +88,12 @@ void main() {
   float sa = sin(uTrauma.z * w);
   c = mat2(ca, -sa, sa, ca) * c;
   uv = uWinCenter + c + uTrauma.xy * (w - uTraumaW.x);
-  uv = clamp(uv, uEps, 1.0 - uEps);
+  if (uWrap > 0.5) {
+    uv.x = fract(uv.x);
+    uv.y = clamp(uv.y, uEps, 1.0 - uEps);
+  } else {
+    uv = clamp(uv, uEps, 1.0 - uEps);
+  }
   outColor = sceneSample(uv);
 }
 `;

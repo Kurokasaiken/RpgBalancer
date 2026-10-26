@@ -64,6 +64,10 @@ export interface DepthSceneProps {
    *  authored shots are never corrupted. */
   traumaEpoch?: number | null;
   traumaStrength?: number;
+  /** Lab-only: horizontally tileable plate — the shader wraps x instead
+   *  of clamping, so an unbounded camVec scrolls each depth plane at its
+   *  own speed forever (train-window parallax). */
+  wrap?: boolean;
 }
 
 /** Shared object-position/transform-origin anchor (50% 40% — see THEATER_ANCHOR). */
@@ -95,6 +99,7 @@ export const DepthScene: React.FC<DepthSceneProps> = ({
   atmosphere,
   traumaEpoch = null,
   traumaStrength = 0,
+  wrap = false,
 }) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasHostRef = useRef<HTMLDivElement>(null);
@@ -109,8 +114,8 @@ export const DepthScene: React.FC<DepthSceneProps> = ({
   const [measuredAspect, setMeasuredAspect] = useState<number | null>(null);
   const liveAspect = measuredAspect ?? viewAspect;
   /** Live refs for the ticker — props must never rebuild the app. */
-  const live = useRef({ shot, shotEpoch, viewAspect: liveAspect, ampMul, traumaEpoch, traumaStrength, clock, ambient });
-  live.current = { shot, shotEpoch, viewAspect: liveAspect, ampMul, traumaEpoch, traumaStrength, clock, ambient };
+  const live = useRef({ shot, shotEpoch, viewAspect: liveAspect, ampMul, traumaEpoch, traumaStrength, clock, ambient, wrap });
+  live.current = { shot, shotEpoch, viewAspect: liveAspect, ampMul, traumaEpoch, traumaStrength, clock, ambient, wrap };
 
   /* Measure the host before the first paint, then keep the camera in sync
    *  on every resize (the cluster's width transitions included — the
@@ -267,6 +272,7 @@ export const DepthScene: React.FC<DepthSceneProps> = ({
               value: new Float32Array([cfg.trauma.bgWeight, cfg.trauma.fgWeight]),
               type: 'vec2<f32>',
             },
+            uWrap: { value: 0, type: 'f32' },
           },
         },
       });
@@ -284,7 +290,7 @@ export const DepthScene: React.FC<DepthSceneProps> = ({
           app!.ticker.stop();
           return;
         }
-        const { shot: s, shotEpoch: epoch, viewAspect: va, ampMul: am, ambient: amb } = live.current;
+        const { shot: s, shotEpoch: epoch, viewAspect: va, ampMul: am, ambient: amb, wrap: wr } = live.current;
         const now = live.current.clock();
         const postSettleOn = amb && cfg.postSettle.enabled && (typeof document === 'undefined' || document.visibilityState !== 'hidden');
         const authored = postSettleOn
@@ -312,6 +318,7 @@ export const DepthScene: React.FC<DepthSceneProps> = ({
         (u.uTrauma as Float32Array)[0] = tr ? tr.x : 0;
         (u.uTrauma as Float32Array)[1] = tr ? tr.y : 0;
         (u.uTrauma as Float32Array)[2] = tr ? tr.roll : 0;
+        u.uWrap = wr ? 1 : 0;
         mesh.scale.set(app!.screen.width, app!.screen.height);
         /* The settled frame was just uploaded — one more tick is rendered,
          *  then the stop branch above parks the ticker. */

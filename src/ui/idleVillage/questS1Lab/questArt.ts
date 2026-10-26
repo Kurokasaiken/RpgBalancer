@@ -114,4 +114,9 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
    *  both edges. Picked in /theater-lab with `traverse=<r>` it is the test
    *  bed for true horizontal parallax (A13 protocol rules applied). */
   'marcia-crinale': { src: '/assets/scene-library/marcia-crinale.jpg', fit: 'cover' },
+  /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
+   *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —
+   *  left/right edges now continue into each other (the crag splits
+   *  across the border). Test bed for the `train` wrap-scroll mode. */
+  'marcia-crinale-loop': { src: '/assets/scene-library/marcia-crinale-loop.jpg', fit: 'cover' },
 };

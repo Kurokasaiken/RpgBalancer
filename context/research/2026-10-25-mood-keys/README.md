@@ -403,7 +403,12 @@ approvate descrivono la CHIAVE come subject primario (luce/azione).
 ## MAPPA CANONICA dei riferimenti per dominio (Director ruling 2026-10-25)
 
 - **Rude Beauty**: villaggio.png (ref principale) + drago.png + jungle
-  ruins.png + assalto-goblin.jpg (quest-scene approvata)
+  ruins.png + assalto-goblin.jpg (quest-scene approvata) +
+  **marcia-crinale-i3.png** (wide plate parallasse — versione editata
+  dal Director: papaveri causali sul pendio, cervi al torrente, fiori
+  viola+gialli nel foreground; prompt canonico
+  `prompts-v4/rude-beauty-marcia-crinale_FINAL.txt`; registrata in
+  scene-library + manifest depth, 2026-10-26)
 - **Impero Solare / Solar Triumph**: impero ref + gate impero solare.png +
   armatura imperiale.png (**solo concept dell'armatura**) + eroina solar.png + eroe solare.png
 - **Prismatic**: monumental gate + regina ibrida.jpg (**ibrido

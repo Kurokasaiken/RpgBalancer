@@ -119,6 +119,14 @@ export const TheaterLabPage: React.FC = () => {
    *  duration. The clock maps a triangle wave so the loop has no cut. */
   const travParam = Number(q0.get('traverse') ?? 0);
   const travMs = Number(q0.get('travms') ?? 14000);
+  /* Train-window mode (Director 2026-10-26): `train=<cvRate>` — the
+   *  camera holds still while camVec grows linearly forever on a
+   *  horizontally tileable plate with wrap sampling: every depth plane
+   *  scrolls at speed ∝ its depth (sky still, crag whips) — the anime
+   *  parallax loop. cvRate = camVec growth per second; fastest-plane
+   *  speed ≈ 0.72·(0.012·amp)·cvRate plate-widths/s. */
+  const trainParam = Number(q0.get('train') ?? 0);
+  const TRAIN_DUR_MS = 3600000;
 
   const art = ART_BY_ID[sceneId];
   const entry = SCENE_CINEMATICS[sceneId];
@@ -129,27 +137,49 @@ export const TheaterLabPage: React.FC = () => {
       : cam.shots[CameraShotIdSchema.parse(shotId)];
   const shot: CameraShot = useMemo(
     () =>
-      travParam > 0
+      trainParam > 0
         ? {
             zoomFrom: 1,
             zoomTo: 1,
-            panFrom: [-travParam, 0],
-            panTo: [travParam, 0],
+            panFrom: [0, 0],
+            panTo: [0, 0],
             blurFrom: 0,
             blurTo: 0,
             blurSettleFrac: 1,
-            durMs: Math.round(travMs * tempo),
-            ease: 'sineInOut',
-            camVec: [0.7, 0],
+            durMs: TRAIN_DUR_MS,
+            ease: 'linear',
+            /* camVec_eff = camVec · e = trainParam · t/1000 — grows
+             *  linearly forever; |v|>1 is legal here (lab bypass). */
+            camVec: [(trainParam * TRAIN_DUR_MS) / 1000, 0],
             ampMul: 1,
           }
-        : { ...baseShot, durMs: Math.round(baseShot.durMs * tempo) },
-    [baseShot, tempo, travParam, travMs],
+        : travParam > 0
+          ? {
+              zoomFrom: 1,
+              zoomTo: 1,
+              panFrom: [-travParam, 0],
+              panTo: [travParam, 0],
+              blurFrom: 0,
+              blurTo: 0,
+              blurSettleFrac: 1,
+              durMs: Math.round(travMs * tempo),
+              ease: 'sineInOut',
+              camVec: [0.7, 0],
+              ampMul: 1,
+            }
+          : { ...baseShot, durMs: Math.round(baseShot.durMs * tempo) },
+    [baseShot, tempo, travParam, travMs, trainParam],
   );
 
   const cfg = useMemo(
-    () => ({ ...DEFAULT_QUEST_THEATRE_FX.depth, enabled: !domOnly }),
-    [domOnly],
+    () => ({
+      ...DEFAULT_QUEST_THEATRE_FX.depth,
+      enabled: !domOnly,
+      /* Train mode: focal at the FAR plane — all content scrolls the
+       *  same direction, speed ∝ depth (train window). */
+      focal: trainParam > 0 ? 0.02 : DEFAULT_QUEST_THEATRE_FX.depth.focal,
+    }),
+    [domOnly, trainParam],
   );
 
   /* Shot changes hot-swap via props + new epoch (no remount, no flash —
@@ -159,11 +189,12 @@ export const TheaterLabPage: React.FC = () => {
    * intentionally define the camera epoch although the clock read is pure. */
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const mountEpoch = useMemo(() => documentClock(), [sceneId, shotId, clockMode]);
-  const shotEpoch = shotEpochFor(clockMode, frozenT, mountEpoch);
+  const shotEpoch = trainParam > 0 ? 0 : shotEpochFor(clockMode, frozenT, mountEpoch);
   /* DepthScene reads the clock through its live-ref (params never rebuild
    *  the app) — a plain per-render closure is safe and honest. */
   const clock = () => {
     if (frozenT != null) return frozenT;
+    if (trainParam > 0) return documentClock() - mountEpoch;
     if (travParam > 0 && shot.durMs > 0) {
       /* Triangle wave over 2·durMs: pan out, pan back — a seamless
        *  loop on a finite plate (no wrap content, no cut). */
@@ -279,10 +310,13 @@ export const TheaterLabPage: React.FC = () => {
               reducedMotion={reducedMotion}
               clock={clock}
               ambient={dust}
-              ambientFx={revealed ? [...(entry?.ambient ?? []), ...(entry?.reveal?.burst ?? [])].filter((f) => fxOn[f.type] !== false) : entry?.ambient.filter((f) => fxOn[f.type] !== false)}
+              /* Train mode: anchored FX would detach from the wrapped
+               *  scrolling content — only view-space dust survives. */
+              ambientFx={trainParam > 0 ? [{ type: 'dust', count: 14 }] : revealed ? [...(entry?.ambient ?? []), ...(entry?.reveal?.burst ?? [])].filter((f) => fxOn[f.type] !== false) : entry?.ambient.filter((f) => fxOn[f.type] !== false)}
               atmosphere={q0.get('atmo') === '0' ? [] : entry?.atmosphere}
               traumaEpoch={shake?.epoch ?? null}
               traumaStrength={shake?.strength ?? 0}
+              wrap={trainParam > 0}
             />
           ) : (
             src && (
