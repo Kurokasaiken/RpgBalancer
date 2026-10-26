@@ -781,6 +781,20 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'shaft', from: [0.99, 0.03], to: [0.88, 0.5], width: 0.16, count: 3, a: 0.1, color: '#ffefc4' },
     ],
   },
+  'marcia-crinale-loop': {
+    /* Tileable variant of the ridge plate — depth baked on the healed
+     *  layout. Used with the lab `train` param (wrap scroll); ambient
+     *  list minimal since train mode filters to view-space dust anyway. */
+    depth: '/assets/depth/marcia-crinale-loop.webp',
+    depthWidth: 512,
+    depthHeight: 142,
+    imgAspect: 1024 / 285,
+    entrance: 'enter-sweep',
+    pose: 'pose-rest',
+    focusAnchor: [0.42, 0.6],
+    atmosphere: [],
+    ambient: [{ type: 'dust', count: 14 }],
+  },
 });
 
 /** Art id for a NODE_ART src (`/assets/scene-library/x.jpg` → `x`). */
