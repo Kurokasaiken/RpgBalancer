@@ -11,8 +11,8 @@ Stato = `status` del manifest. «Serve» = cosa manca davvero. Basato sui ruling
 | `title-screen` | documented | Key art di sfondo (dalle capsule); lastra di famiglia sui 3 bottoni | asset |
 | `game-boot-screen` | documented | Solo allineamento a rubrica | — |
 | `hud-top-tabs` | in_review | Ruling HUD = A (pulita); resta terzo tab centrale (hud-tabs-4) e regolo velocità (hud-tabs-3) | codice |
-| `nav-bar` | in_review | Ruling Director su M1/M2/M3 in attesa | ruling |
-| `hud-corner` | in_review | Ruling Director su M1/M2/M3 in attesa | ruling |
+| `nav-bar` | in_review | **Ruling M1 (2026-10-26)**: da implementare (slot uguali, requisiti, recenter nel dock) | codice |
+| `hud-corner` | in_review | **Ruling (2026-10-26)**: dock con recenter, menu senza «Pannelli», HUD nascosta = occhio chiuso senza etichetta | codice |
 | `pixi-world-map` | documented | Pochi problemi emersi; overlay mappa = «debug draw» (da verificare) | verifica |
 | `map-quest-poi` | documenting | Stato non raggiunto in cattura; medaglione vuoto (P0 3/3) | cattura + asset |
 | `objective-cartouche` | documenting | Non documentato (non raggiunto) | cattura |
@@ -72,7 +72,7 @@ _Non collocati: nessuno._
 
 ## Cosa blocca cosa
 
-1. **Ruling su nav-bar e hud-corner** (mockup M1/M2/M3 già pronti) sblocca il Livello 1.
+1. ~~Ruling su nav-bar e hud-corner~~ **fatto 2026-10-26**: il Livello 1 è ora implementabile (nav-bar, hud-corner, barra in alto).
 2. **Fusione del branch del fix TDZ** sblocca la documentazione di 5 componenti quest.
 3. **Un set di 11 icone di edificio + ~10 di oggetto** (dipinte, stessa famiglia delle 18 esistenti) sblocca pin, slot, registro, magazzino e mercante insieme.
 4. **Una vignetta ad hoc per schermata di racconto** (villaggio perduto, memoriale, ricompensa): la prima la generi tu.
