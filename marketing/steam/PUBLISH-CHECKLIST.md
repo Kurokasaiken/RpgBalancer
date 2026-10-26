@@ -29,6 +29,7 @@ Controlli automatici: `npx tsx marketing/steam/tools/check-page.mts` → **45/45
 - **Metadati dell'app da sistemare prima del primo build per Steam** (non bloccano la pagina): `src-tauri/tauri.conf.json` ha ancora `productName` «Progetti Personali», identificatore `com.progetti-personali.app` e descrizione «A tactical combat game» (non è questo gioco). Compaiono nell'installer, nel nome dell'eseguibile e nel titolo finestra.
 - **Achievements:** confermati ma la lista va definita; non vanno nell'About.
 - **Event capsule 800×450** (opzionale): pronta, serve solo per i post di aggiornamento.
+- **Critica esterna capsule (2026-10-25, R-288 `in corso`):** ratificata e applicata — drop shadow + halo dietro il logo su tutte le capsule con logo (leggibilità ~120 px verificata su miniature), `vertical_capsule`/`library_capsule` rigenerate su composizione-eroe, `logo1.png` eliminato (Cestino), `library_logo` con ombra. Tool riproducibile: `tools/capsule-brand-fix.py`. **Pendente:** eye-check Director sulla preview + variante key art con accenno di antagonista (prompt in `marketing/steam/prompts/keyart-antagonist-variant.md`, visual fork). Dettagli: `context/ingestions/2026-10-25-steam-capsule-critique.md`.
 
 ## 4. Passi di upload (Steamworks → Store Page)
 1. Basic Info: short description da `upload/copy/{en,it}/short-description.txt`; link social (Discord ecc.) **nei campi link**, mai nell'About.

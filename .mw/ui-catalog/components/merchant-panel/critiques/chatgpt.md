@@ -12,3 +12,12 @@ Nessuna critica prodotta. Due tentativi, entrambi falliti in fase di attach:
 Quinto episodio consecutivo del giorno di failure attach/percezione
 immagini su chatgpt web. Nessun ulteriore retry per istruzione del
 Director.
+
+---
+
+## Secondo pass serale (2026-10-25, PLAN-086 fill-gap)
+
+- **T-003** (~21:01): `ATTACH_FAILED` — "no upload affordance". La quota
+  upload, riapertasi per ~5 minuti (village-registry ricaricato con successo),
+  era già esaurita. Probes di controllo a 22:04 e 23:05 su
+  village-stash-panel: entrambe `ATTACH_FAILED` → declared blocked.

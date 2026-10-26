@@ -39,16 +39,20 @@ def check(txt):
     return out, len(re.findall(BANNED, t)), re.search(r'forest|fern|trunk|canopy|wood', t)
 
 p = pathlib.Path(sys.argv[1]); txt = p.read_text()
+EDIT = bool(re.search(r'\bsame (image|composition|scene|layout)\b', txt.lower()))
 rows, banned, is_forest = check(txt)
 ok = True
 for name, hits, good in rows:
+    if EDIT and name in ('zones','forest?'):
+        print(f'SKIP {name}: edit prompt, scene anchored by the base image')
+        continue
     mark = 'OK ' if good else 'FAIL'
     if not good: ok = False
     print(f'{mark} {name}: {hits}')
 if banned:
     ok = False
     print(f'FAIL banned terms present: {banned}')
-if is_forest:
+if is_forest and not EDIT:
     c = len(re.findall(CANOPY, txt.lower()))
     if c < 1:
         ok = False
@@ -63,8 +67,8 @@ COLOR = r'(ruby|rub(y|ies)|emerald|sapphire|amethyst|topaz|amber|citrine|jade|tu
 t = txt.lower()
 bare = []
 for m in re.finditer(LIFE_ELS, t):
-    ctx = t[max(0, m.start()-60):m.start()]
-    if not re.search(COLOR + r'[^\n]{0,25}$', ctx):
+    ctx = t[max(0, m.start()-60):m.end()+60]
+    if not re.search(COLOR, ctx):
         bare.append(m.group(1))
 if bare:
     print(f'WARN bare life-elements: {sorted(set(bare))}')

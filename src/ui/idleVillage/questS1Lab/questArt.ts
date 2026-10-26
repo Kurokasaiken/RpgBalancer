@@ -57,9 +57,9 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
    *  files are named by subject, not by quest phase, so other quests can
    *  reuse them. The optional merchant event node is not authored yet —
    *  its art is cataloged as mercante-strada.jpg. */
-  'gob-esplora': { src: '/assets/scene-library/sentiero-tracce-v2.png', fit: 'cover' },
-  'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce-v2.png', fit: 'cover' },
-  'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce-v2.png', fit: 'cover' },
+  'gob-esplora': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
+  'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
+  'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-bottino': { src: '/assets/scene-library/bottino-v2.png', fit: 'cover' },
   'gob-accampamento': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
   'gob-stealth': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },

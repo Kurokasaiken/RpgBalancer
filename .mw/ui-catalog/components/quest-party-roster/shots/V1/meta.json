@@ -1,0 +1,40 @@
+{
+  "componentId": "quest-party-roster",
+  "sourceSha": "b5d3559887584c8b613f65945aeeb937b9691865",
+  "sourceHash": "42cf091e617904e3",
+  "baseURL": "http://127.0.0.1:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-26T20:54:11.012Z",
+  "states": [
+    {
+      "id": "open",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "open-ctx-a.png",
+          "open-ctx-b.png"
+        ],
+        "isolated": [
+          "open-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "script",
+        "ref": "scripts/catalog/drivers/questPartyRoster.ts"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"quest-party-roster\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

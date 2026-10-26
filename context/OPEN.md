@@ -366,3 +366,78 @@ Formato voce:
   le due tassonomie ricompense vanno composte, MACRO §7); OPEN-010
   (economia villaggio); `QUEST_RULES.md` §7 (canali — la skill a livelli
   si appoggia al meccanismo vigente).
+
+## OPEN-023 — Gimmick «indagine»: modello della sicurezza, acquisizione trasversale e climax investigativo
+
+- **Question:** completare il modello della core gimmick investigativa
+  discussa il 2026-10-25. Sub-questioni: (a) semantica del verdetto
+  `almost` nella mappa esiti→interpretazione; (b) ratifica della
+  sicurezza come *convinzione soggettiva del personaggio* (vs probabilità
+  oggettiva) e del numero di livelli (proposta: tre); (c) affidabilità
+  dell'acquisizione — oggettiva / parziale / fallibile **per evento
+  informativo**; (d) forma del climax investigativo: la «dichiarazione
+  irrevocabile della conclusione» discussa nel pomeriggio — cosa si
+  dichiara, quando, con quali conseguenze; (e) modello dati e UI di
+  albero degli indizi / tesi contrapposte / rappresentazione delle
+  convinzioni — **parzialmente coperta dal transcript integrale**:
+  proposta registro indizi / diario / ricostruzione su un unico modello
+  dati (gap analysis S-13); restano aperti modello dati e la forma
+  dell'«albero»/tesi contrapposte; (f) come gli eventi informativi
+  passivi e cross-gimmick entrano nel run state — `info[]` basta o serve
+  un layer «interpretazioni» (direzione × sicurezza × storia
+  re-investigazioni); (g) ri-coprire il contenuto pomeridiano —
+  **parzialmente risolta**: corpus gialli recuperato (finalisti *Il
+  doppio indizio* / *I quattro sospettati*, S-14); restano mancanti la
+  «dichiarazione irrevocabile» e le soluzioni scartate (sessione
+  pomeridiana separata, S-23); (h) **nuove dal transcript**: target di
+  generazione — catalogo/ibrido/dinamico + legame fra quest
+  standalone/persistente/campagna (GenUI mai risposto, S-21); quest
+  spedizioni-fantasy vs investigative-narrative — cambia il prossimo
+  slot gimmick (S-22); banco di prova della fase 3: Race (roadmap
+  22/10) vs Rituale (ranking 25/10) — tensione non ratificata.
+- **Status:** `open` — requisiti Director chiari (deduzione fallibile →
+  sconfitta; indizi re-investigabili; raccolta passiva trasversale;
+  estremi del dado mappati), proposte AI non ratificate. Update
+  2026-10-25: (e) e (g) parzialmente coperte dal transcript integrale
+  recuperato; aggiunte sub-questioni (h).
+- **Source:** `context/ingestions/2026-10-25-gimmick-indagine-e-acquisizione-info.md`;
+  `context/ingestions/2026-10-25-transcript-integrale-gap-analysis.md`
+  (transcript integrale 22→25 ott); modello articolato in
+  `context/QUEST_GENERATION_ARCHITECTURE.md` §19;
+  DECISION_LOG 2026-10-25.
+- **Blocking:** qualsiasi implementazione della gimmick; **non** blocca
+  il roster operativo (cap v1 PLAN-029: `investigation` si accoda dopo
+  `meld`, salvo ruling Director sul prossimo slot).
+- **Related:** ARCHITECTURE §18.5 (candidata «indagine a soffio», origine);
+  OPEN-021 (risorsa informativa trasversale — scope meta-layer, non
+  in-quest); QUEST_RULES §3 (check nascosti R-151 — tensione col regime
+  di acquisizione fallibile) e §9 (losabilità); seam motore: `setInfo`/
+  `requiresInfo`, `verdictTable`, `vars`, `hiddenCheck`.
+
+## OPEN-024 — Re-analisi del censimento gimmick: core vs sfumature sul tema
+
+- **Question:** dividere il censimento delle gimmick (roster operativo +
+  candidate §18.5 + lab registry) in **core gimmick** (algebra del
+  problema) e **sfumature sul tema** (parametrizzazione della condizione-
+  limite sulla stessa algebra), per il modello corretto del Director
+  2026-10-25. Sub-questioni: (a) quali core gimmick reali esistono oltre
+  «avanzamento sul tracciato» e «investigation» — PYL è algebra propria
+  o sfumatura?; (b) criterio di bordo formalizzato — quando una
+  sfumatura diventa gimmick diversa (algebra diversa / operatore
+  decisionale diverso); (c) come il `CoreGimmick` contract esprime la
+  famiglia di condizioni-limite; (d) classificazione per-voce di
+  `flood`, `meld`, `rituale`, `scorta`, `cargo volatile`, `corruzione`,
+  `difesa a ondate`.
+- **Status:** `open` — re-analisi prodotta 2026-10-25 (ARCHITECTURE
+  §20.5): censimento ridotto a 2 core (tracciato, indagine) + PYL caso
+  di bordo + sfumature del tracciato. Resta da ratificare: (a) la
+  classificazione per-voce; (b) il caso PYL; (c) il criterio di bordo;
+  (d) l'asse variants del contratto.
+- **Source:** `context/QUEST_GENERATION_ARCHITECTURE.md` §20/§20.5;
+  DECISION_LOG 2026-10-25; R-287.
+- **Blocking:** la metrica di varietà strutturale (§18.4) e la scelta
+  del prossimo slot nel roster (interagisce con OPEN-023 e con la
+  tensione Race-vs-Rituale del ranking 25/10); **non** blocca il runtime.
+- **Related:** OPEN-023 (gimmick indagine); OPEN-021; ARCHITECTURE
+  §18.4/§18.5/§19/§20; QUEST_GENERATION_CONTRACTS §2 (asse variants da
+  aggiungere).

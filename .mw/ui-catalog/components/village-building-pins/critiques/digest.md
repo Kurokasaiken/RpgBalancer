@@ -1,4 +1,4 @@
-# Digest critiche — village-building-pins (round 1, 1/3 raccolto, scope parziale)
+# Digest critiche — village-building-pins (round 1, 2/3 raccolto, scope parziale+claude)
 
 Provider: chatgpt, claude, deepseek — run `20261025-critique-village-building-pins`,
 turn T-001 (+retry T-002 per chatgpt), prompt verbatim R-282, 3 shot
@@ -8,7 +8,7 @@ allegati (ctx-a, ctx-b, iso-0).
 - chatgpt — 6ª image-perception failure del giorno: `ATTACH_FAILED` ×2
   (T-001 e retry T-002, ora fail-fast a ~18s). Quota upload free-tier
   esaurita (~11h dal probe delle 06:38Z). Vedi `chatgpt.md`.
-- claude — quota messaggi free-tier fino alle 12:20. T-001: POSTED con
+- claude [RECUPERATO v. merge] — quota messaggi free-tier fino alle 12:20. T-001: POSTED con
   `image_attached: 3` ma il composer quota-bloccato ha ingoiato il
   messaggio — `response_count: 0`, banner «esaurito … fino alle» nel DOM
   del failure bundle. Vedi `claude.md`.
@@ -68,3 +68,12 @@ dell'**elemento pin**, non del sistema pin.
   candidato P0 trasversale per il pin system.
 - Ripetere il round dopo il reset delle quote (claude 12:20, chatgpt
   ~18:30) per una lettura della famiglia di pin, non del singolo crop.
+
+
+## Merge claude (refill T-002 su run -r2, post-reset quota 22:20)
+
+claude GROUNDED (~11.4k chars, verbatim in `claude.md`), in-scope sulla famiglia di pin (non solo il crop singolo come il misread deepseek).
+
+**Convergenza con village-slot-overlay/claude**: dischi vuoti che sembrano bug, nessun linguaggio unico di marker, ellissi tratteggiate rumore, ancoraggio vago, contrasto sotto soglia — stesso cluster di difetti confermato da una seconda vista.
+
+**Punti solo claude**: gerarchia informativa capovolta; badge «II» illeggibile; stile incoerente col resto dell'HUD; target/scalabilità. Rafforza il pattern catalogo «stato veicolato male su mappa pittorica».
