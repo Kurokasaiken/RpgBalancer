@@ -57,9 +57,9 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
    *  files are named by subject, not by quest phase, so other quests can
    *  reuse them. The optional merchant event node is not authored yet —
    *  its art is cataloged as mercante-strada.jpg. */
-  'gob-esplora': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
-  'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
-  'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
+  'gob-esplora': { src: '/assets/scene-library/sentiero-tracce-v2.png', fit: 'cover' },
+  'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce-v2.png', fit: 'cover' },
+  'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce-v2.png', fit: 'cover' },
   'gob-bottino': { src: '/assets/scene-library/bottino-v2.png', fit: 'cover' },
   'gob-accampamento': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
   'gob-stealth': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
@@ -127,6 +127,8 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
   'accampamento-raider': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'accampamento-v2': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
   'ritorno-v2': { src: '/assets/scene-library/ritorno-v2.png', fit: 'cover' },
+  'sentiero-tracce': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
+  'sentiero-tracce-v2': { src: '/assets/scene-library/sentiero-tracce-v2.png', fit: 'cover' },
   'viaggio-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
   /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
    *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —
