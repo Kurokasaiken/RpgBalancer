@@ -23,7 +23,7 @@ Elite character portrait of a noble Western male hero. STYLE FOCUS: Extreme cont
 
 ### Output Reference – Volto eroico
 
-- **Image:** [Heroic Portrait Concept](../../src/assets/mood/volto%20eroico.png)
+- **Image:** [Heroic Portrait Concept](../../src/assets/mood/_varie/volto%20eroico.png)
 - **Note:** Folder: public/assets/characters
 
 ---
@@ -41,7 +41,7 @@ Armatura Imperiale — A vibrant, high-key fantasy splash art set in a Prismatic
 
 ### Output Reference – Armatura Imperiale
 
-- **Image:** [Armatura Imperiale Render](../../src/assets/mood/armatura%20imperiale.png)
+- **Image:** [Armatura Imperiale Render](../../src/assets/mood/impero-solare/armatura%20imperiale.png)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -59,7 +59,7 @@ Villaggio — A majestic, wide-angle (21:9) landscape of a frontier village nest
 
 ### Output Reference – Villaggio
 
-- **Image:** [Villaggio Concept](../../src/assets/mood/villaggio.png)
+- **Image:** [Villaggio Concept](../../src/assets/mood/rude-beauty/villaggio.png)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -119,7 +119,7 @@ KANBAN STATUS LINE
 
 ### Output Reference – Armatura Antagonista
 
-- **Image:** [Armatura Antagonista Concept](../../src/assets/mood/Armatura%20antagonista.png)
+- **Image:** [Armatura Antagonista Concept](../../src/assets/mood/dark-wasteland/Armatura%20antagonista.png)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -137,7 +137,7 @@ Jungle Ruins — A massive ancient white-marble column rising from a lush tropic
 
 ### Output Reference – Jungle Ruins
 
-- **Image:** [Jungle Ruins Concept](../../src/assets/mood/jungle%20ruins.png)
+- **Image:** [Jungle Ruins Concept](../../src/assets/mood/rude-beauty/jungle%20ruins.png)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -155,7 +155,7 @@ Verso Mordor — An epic high-fantasy landscape of jagged obsidian cliffs and sh
 
 ### Output Reference – Verso Mordor
 
-- **Image:** [Verso Mordor Concept](../../src/assets/mood/verso%20mordor.png)
+- **Image:** [Verso Mordor Concept](../../src/assets/mood/dark-wasteland/verso%20mordor.png)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -202,7 +202,7 @@ NOTE
 
 ### Output Reference – Prismatic Monumental Gate
 
-- **Image:** [Prismatic Monumental Gate Concept](../../src/assets/mood/prismatic%20monumental%20gate.png)
+- **Image:** [Prismatic Monumental Gate Concept](../../src/assets/mood/prismatic/prismatic%20monumental%20gate.png)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -220,7 +220,7 @@ Architettura Impero del Sole — A monumental white-stone fortress balcony overl
 
 ### Output Reference – Architettura Impero del Sole
 
-- **Image:** [Architettura Impero del Sole Concept](../../src/assets/mood/architettura%20impero%20sole.png)
+- **Image:** [Architettura Impero del Sole Concept](../../src/assets/mood/impero-solare/architettura%20impero%20sole.png)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -238,7 +238,7 @@ Drago — A majestic ancient dragon perched atop an overgrown marble ruin deep i
 
 ### Output Reference – Drago
 
-- **Image:** [Drago Concept](../../src/assets/mood/drago.png)
+- **Image:** [Drago Concept](../../src/assets/mood/rude-beauty/drago.png)
 - **Note:** Folder: src/assets/mood
 
 ---
@@ -256,8 +256,5 @@ Ultra-wide painted plate (~3.5:1) for horizontal parallax: an alpine ridge road 
 
 ### Output Reference – Marcia Crinale
 
-- **Image:** [Marcia Crinale (i3 Director-approved)](../../src/assets/mood/marcia-crinale.png)
-- **Image:** [Layer FAR — cielo+crete](../../src/assets/mood/layer-far.png)
-- **Image:** [Layer MID — colline+papaveri+strada](../../src/assets/mood/layer-mid.png)
-- **Image:** [Layer NEAR — erba+fiori+cervi](../../src/assets/mood/layer-near.png)
+- **Image:** [Marcia Crinale (i3 Director-approved)](../../src/assets/mood/rude-beauty/marcia-crinale.png)
 - **Note:** Folder: src/assets/mood · prompt canonico `context/research/2026-10-25-mood-keys/prompts-v4/rude-beauty-marcia-crinale_FINAL.txt` · manifest `marcia-crinale[-loop]` · lab `/theater-lab?scene=marcia-crinale`
