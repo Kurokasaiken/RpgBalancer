@@ -1,6 +1,8 @@
-# Guida: creare componenti HUD ("Lacquer Atlas")
+# Guida: creare componenti HUD (skin `base`, lacca scura + ottone)
 
 Per chi (persona, skill o agente) deve creare o modificare un componente che sta **sopra la mappa** di `/game`: pannelli, cartigli, lastre, controlli, marker. Leggila prima di scrivere codice. Vale insieme a `primitive_composition_rules.md` (primitive `Materic*`) e alla bibbia (`../plans/art_direction_plan.md`: NON la copia ridotta in `src/docs/plans/`).
+
+> **Nota 2026-10-26:** Lacquer Atlas (teal) è stata bocciata il 2026-10-16; il riferimento è la skin predefinita `base` (lacca petrolio scura + ottone NMM). Dove la guida dice «Lacquer Atlas» leggi `base`; i valori `lacquer_atlas` in §4.1 restano solo come preset selezionabile.
 
 Aggiornata il 2026-10-13 (PLAN-058 Fase 0, R-177). Misure di partenza: `test-results/plan-058-2026-10-13-T0.1-roster-measure.md`.
 
@@ -529,6 +531,25 @@ Regole che non si negoziano:
 - Il dettaglio quest (`ActivityCapsuleDetailSkinAware`) ha la cornice HUD ma va rifatto compatto **dopo** il rework delle quest.
 - Il livello `edgeWash` (pennellate sui bordi) è pronto ma manca l'immagine.
 - Restano: ruoli in `skinScope.css` per il resto della HUD, font EB Garamond incorporati, movimento e prestazioni, regioni cliccabili.
+
+---
+
+## 11b. Dove vive la pennellata: tre livelli (R-282/brushwork-1, Director 2026-10-26)
+
+Il mood-board è dipinto a impasto, ma l'impasto **non** si porta su HUD e dati. Tre livelli:
+
+| Livello | Componenti | Trattamento |
+|---|---|---|
+| **HUD e dati** | placche, controlli, numeri, testo, righe | **Pulito** (ruling «A per HUD»): la materia è la lacca, la grana e la banda d'ottone consumato. Nessuna pennellata o texture dipinta sotto il dato. |
+| **Oggetti** | icone risorse, oggetti, edifici, ritratti (≥32 px) | Dipinti con finitura da illustrazione, più lisci della scena. |
+| **Racconto** | villaggio perduto, ricompensa, memoriale, level-up, titolo, dettaglio spedizione | **Vignetta dipinta ad hoc dentro la cornice** (opzione B), con titolo e dati sotto, su lacca pulita. Un'immagine per schermata, generata apposta con la lista dei divieti della bibbia. |
+
+Regole che ne seguono:
+
+1. **Niente marrone** in bottoni, controlli e superfici HUD (bibbia: «NO grey, NO brown»; Director 2026-10-26). L'ottone resta ottone, mai bronzo-marrone. Il bottone primario è `SkinButton variant="cta"` (lacca + filetto d'ottone): niente bottoni scritti a mano con colori propri.
+2. **Niente testo sull'immagine dipinta** (R-245): titolo e dati stanno sulla lacca sotto la vignetta.
+3. **Un takeover grada il mondo, non l'HUD.** Per la schermata di fine partita la mappa si desatura sulla rampa ossidata (`useSettlementLostGrade`, `OxidizedGradeFilter progress`), con salto diretto sotto reduced-motion. Il grado vive nel livello che contiene mappa e vista villaggio in `game-frame-pixi.tsx`.
+4. Un filtro `url(#id)` che punta a un id non montato fa sparire l'elemento: monta il `<filter>` nello stesso render in cui lo referenzi.
 
 ---
 
