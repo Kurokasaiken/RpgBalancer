@@ -1,0 +1,21 @@
+{
+  "componentId": "quest-outcome-toast",
+  "sourceSha": "c6600bc198d5c2ea1fbe40beaafabf94ca583c31",
+  "sourceHash": "4150432d4c3516e2",
+  "baseURL": "http://127.0.0.1:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-26T19:47:56.036Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": false,
+      "asserted": false
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}
