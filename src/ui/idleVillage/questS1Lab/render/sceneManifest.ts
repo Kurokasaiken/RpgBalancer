@@ -390,6 +390,29 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 8 },
     ],
   },
+  'ritorno-v2': {
+    /* f8 return (2026-10-26): mountain descent through forest, the
+     *  golden-thatched village far below at sunset — warm far / cold
+     *  near split, chimney smoke, mist on the descending path. */
+    depth: '/assets/depth/ritorno-v2.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-sweep',
+    pose: 'pose-rest',
+    focusAnchor: [0.62, 0.62],
+    atmosphere: [],
+    ambient: [
+      /* Chimney smoke + window glints on the far village. */
+      { type: 'smoke', at: [0.6, 0.55], count: 3, lean: 0.15 },
+      { type: 'smoke', at: [0.68, 0.58], count: 2, lean: 0.12 },
+      { type: 'glint', at: [0.62, 0.62], period: 8, r: 0.005 },
+      { type: 'glint', at: [0.58, 0.6], period: 11, r: 0.004 },
+      /* Cold mist pooling on the descending path. */
+      { type: 'drift', band: [0.4, 0.6], xband: [0.1, 0.5], count: 2, lean: 0.3 },
+      { type: 'dust', count: 8 },
+    ],
+  },
   'accampamento-v2': {
     /* f3 raider camp (2026-10-26): tents from hunted pelts with
      *  trophies (antlers, skull totems, war-marks), ember cookfire,
