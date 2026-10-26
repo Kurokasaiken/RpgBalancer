@@ -65,8 +65,8 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-stealth': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'gob-assalto': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'gob-combattimento': { src: '/assets/scene-library/assalto-goblin.jpg', fit: 'cover' },
-  'gob-incalzare': { src: '/assets/scene-library/incalzare.jpg', fit: 'cover' },
-  'gob-incalza-check': { src: '/assets/scene-library/incalzare.jpg', fit: 'cover' },
+  'gob-incalzare': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
+  'gob-incalza-check': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
   'gob-esplora-extra': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
   'gob-cerca': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
   'gob-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
@@ -118,6 +118,8 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
    *  points at bottino-v2 (manifest + fresher art). */
   bottino: { src: '/assets/scene-library/bottino.jpg', fit: 'cover' },
   'bottino-v2': { src: '/assets/scene-library/bottino-v2.png', fit: 'cover' },
+  incalzare: { src: '/assets/scene-library/incalzare.jpg', fit: 'cover' },
+  'incalzare-v2': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
   /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
    *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —
    *  left/right edges now continue into each other (the crag splits
