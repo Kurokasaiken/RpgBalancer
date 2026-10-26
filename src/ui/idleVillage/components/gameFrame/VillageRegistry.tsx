@@ -29,7 +29,7 @@ import {
   type VillageBuildingDefinition,
   type VillageBuildingState,
 } from '@/balancing/config/idleVillage/villageBuildingsConfig';
-import villageArt from '@/assets/mood/villaggio.png';
+import villageArt from '@/assets/mood/rude-beauty/villaggio.png';
 
 /**
  * `VillageRegistry` — the Settlement Registry drawer (PLAN-042, multi-AI
