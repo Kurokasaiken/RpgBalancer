@@ -371,3 +371,12 @@ filtro) / weave 66% / mean val 0.28.
 → Bocciata: murk nero al 23%, marrone 12%, vibrante 1.1% — la vigna
 veronese/teal della scheda non è uscita; il quadro legge warm-buia.
 Iterazione: alzare la fascia veronese/teal, mantenere gli accenti.
+
+## A15 — REF BATTEZZATA OBBLIGATORIA (2026-10-26, ruling Director)
+
+Ogni nuova generazione DEVE allegare una o più immagini già battezzate
+come riferimento stilistico — mai solo testo. Ref: `villaggio.png`
+(diurno/famiglia), `assalto-goblin.jpg` (azione/bosco), `drago.png`,
+`aqueduct` (Prismatic). Il testo porta soggetto+scena+effetti; la ref
+porta il registro pittorico. Senza ref = rischio derive "storybook"
+(osservato f2_v1, f5_v1).
