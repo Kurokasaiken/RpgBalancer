@@ -1,0 +1,11 @@
+{
+  "steps": [
+    {
+      "step": "planner",
+      "how": "hook-assisted:openDetail"
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": [],
+  "rendererClass": "metal"
+}

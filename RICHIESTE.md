@@ -5041,3 +5041,64 @@ inventa (PLAN-084 T-007 + PLAN-085 sezione "Radice comune").
 **Ruling Director (2026-10-24):** (1) SÌ — adozione come contratto `.mw/contracts/web-ai-prompt-protocol.md`; (2) "subit" — adozione immediata, ablazione A0-A4 come verifica a posteriori (non gate); (3) emendamento PLAN-086 T-005: spiegazione richiesta prima di decidere.
 **Fatto (2026-10-24):** contratto `.mw/web-ai-prompt-protocol.md` scritto (= artifact r004 verbatim + ruling note) e indicizzato in `context/INDEX.md` (fixato anche il path R-278: `.mw/contracts/` → `.mw/`). PLAN-086 emendato a **r013**: T-004 canary→throwaway + observed_facts→audit post-hoc (fallback probe, fail-closed retention); T-005 → turn 1 commission + turn 2 selection rubricata, verdict JSON eliminato, digest rules P5; OB-3/OB-4 aggiornati. Invariati: ground_truth fixture, leakage guard, gate documented→in_critique, state machine, mockup gates. **Pendente:** ablazione A0-A4 (verifica a posteriori, non gate); implementazione del template in `critiqueComponent.mts`/`prompts/` come task a sé quando PLAN-086 riprende esecuzione.
 **Ablazione (2026-10-25):** run `20261024-ablation-a0a4x`. Prima passata overnight degradata (Chrome morto a metà ~A3; chatgpt attach rotto). Bug trovato e fixato in mind-weaver `scripts/web_adapters/image_attach.py`: `try_attach` tornava True su `set_input_files` riuscito senza verificare l'anteprima nel composer — su ChatGPT matchava un file input morto → `image_attached:1` falso positivo (modello cieco). Ora verifica il preview prima di tornare True → `ATTACH_FAILED` onesto. Probe canary: chatgpt attach fallisce su tutte le strategie (provider text_only, bug UI-side da investigare); deepseek verificato ("quadrato blu"). **Sostituzione: chatgpt → deepseek** per le 15 rep (capability-class documented); claude completa le 8 rep mancanti. Dati validi: claude A0×3+A1×3+A2-r1 (7 rep ieri).
+
+## R-286 — Gimmick «indagine»: compendio della discussione sul sistema investigativo
+
+**Richiesta (verbatim, 2026-10-25):** *"mi serve un compendio ben preciso d cosa abbiamo discusso oggi, senza tralasciare nulla che io reputo importante x il mio progetto. Puoi farlo? xè tornare indietro a trovare tutto il testo m c vuole troppo tempo"*
+**Data:** 2026-10-25
+**Stato:** `da verificare` (compendio consegnato, eye-check Director pendente)
+**Contesto:** discussione di design sulla core gimmick investigativa — deduzioni fallibili, tesi/indizi/sicurezza sui 5 verdetti, acquisizione passiva e trasversale alle gimmick. Fonte = transcript parziale incollato in sessione + riepilogo di una sessione precedente dello stesso giorno. **Update 2026-10-25:** il transcript integrale 22→25 ott è stato recuperato dallo share link (`context/ingestions/2026-10-22-25-quest-generation-gimmick-transcript.md`) e ingerito in supplemento (`context/ingestions/2026-10-25-transcript-integrale-gap-analysis.md`): ricerca Christie/Doyle, modello registro/diario e contenuto del docx di passaggio recuperati. Resta mancante la sessione separata del pomeriggio («dichiarazione irrevocabile», soluzioni scartate) → OPEN-023.
+**Output:** compendio = ingestion report `context/ingestions/2026-10-25-gimmick-indagine-e-acquisizione-info.md` (ledger E-01..E-21 con provenance); modello PROPOSAL in `context/QUEST_GENERATION_ARCHITECTURE.md` §19; riga roster in `QUEST_GENERATION_SPEC.md` §3.1; OPEN-023; DECISION_LOG 2026-10-25.
+**Desiderata FROZEN:** nessuna dedicata — esplorazione di design pre-plan; la gimmick resta PROPOSAL fino a ruling Director (roster operativo fermo al cap v1 PLAN-029; `meld` è la candidata in coda prima di `investigation`).
+
+## R-287 — Re-analisi del censimento gimmick: core gimmick vs sfumature sul tema
+
+**Richiesta (verbatim, 2026-10-25):** *"una gimmk core può avere + sfumature/ varianti … la gimmick è sempre quella, c'è un tracciato, si avanza sul tracciato … se è la questione a tempo, allora sarà più o meno tempo; se è contro un nemico, il tuo nemico riuscirà prima o dopo ad arrivare; se è una prova di resistenza, il tuo nemico sarà più forte o meno forte e tu comunque devi riuscire a resistere quel numero di round … Questo è un concetto che all'interno della nostra documentazione è sbagliato, perché ci sono tantissime gimmick che sono la stessa identica gimmick ma con delle variazioni sul tema. Quindi invece di avere 15 gimmick, sono abbastanza sicuro che ne avremo molte di meno. Queste vanno analizzate correttamente e vanno divise in core gimmick e poi sfumature sul tema della stessa gimmick."*
+**Data:** 2026-10-25
+**Stato:** `aperta`
+**Contesto:** correzione del modello a tre livelli (core gimmick = algebra del problema; sfumatura = parametrizzazione del limite sulla stessa algebra; domain kit = dressing). Il censimento attuale (roster + §18.5 + lab) confonde i livelli: flood/meld/difesa-a-ondate/… sono verosimilmente sfumature di «avanzamento sul tracciato». Modello formalizzato in ARCHITECTURE §20; lavoro aperto tracciato in OPEN-024. Interagisce con la scelta del prossimo slot roster (cap v1 PLAN-029) e con la tensione Race-vs-Rituale (gap analysis S-08/S-20).
+**Desiderata FROZEN:** nessuna dedicata — correzione di modello di design espressa dal Director; la classificazione per-voce resta da fare (OPEN-024).
+
+## R-280 — Quest Playground: pagina test semplificata (Director 2026-10-25)
+
+"separiamo le due logiche, cn un link x passare dall'una all'altra" —
+nuova pagina `/quest-playground`: play debug sopra (istantaneo, zero
+animazioni, opzioni tutte visibili incluse hidden/gated con motivo, odds
+reali, vars live, verdictTable), controlli generazione sotto; no preset/
+seed picker; save-on-approval → store condiviso. Dibattito multi-AI
+`20261025-quest-playground` converged → `plans/PLAN-086-quest-playground.md`.
+**Stato:** `da pianificare → pronto per implementazione`
+
+## R-288 — Critica esterna capsule/key-art Steam: 3 azioni proposte + antagonista assente
+
+**Richiesta (implicita, 2026-10-25):** il Director ha incollato in sessione una critica esterna della suite capsule/key-art Steam (voti per asset, impatto commerciale, «Azioni Pratiche Immediate»). Nessuna richiesta esplicita allegata → ingerita come fonte di conoscenza; le azioni restano **candidate in attesa di ruling**.
+**Data:** 2026-10-25
+**Stato:** `in corso` (ratificato dal Director 2026-10-25: «ratifico, dobbiamo fare le modifiche dove vanno fatte e in caso rigenerare quello che dobbiamo rigenerare»; eye-check Director pendente)
+**Desiderata FROZEN:** nessuna — marketing/packaging; opera entro R-178 (`in corso`).
+
+**Avanzamento (2026-10-25):**
+- Nuovo tool `marketing/steam/tools/capsule-brand-fix.py` (PIL): cancella il logo dipinto via blur, aggiunge halo scuro radiale + logo authored (`library-logo.png`) con drop shadow reale (sagoma offset sfocata, alpha sottratta sotto la placca).
+- **Drop shadow + halo applicati** a header 920×430, main 1232×706, small 462×174, event 800×450; **vertical 748×896 e library capsule 600×900 rigenerate** su crop della key art eroe (era panorama senza soggetto); **library_logo 1050×720** riesportato con drop shadow. Tutto in `upload/`, preview risincronizzata, `check-page.mts` 47/47.
+- Verifica leggibilità: miniature renderizzate a 120 px — «WANDERLUST TRIUMPH» resta decifrabile (halo separa il logo dai raggi). Self-check visivo fatto; **eye-check Director pendente** via preview.
+- `~/Downloads/logo1.png` → spostato nel Cestino (fuori circolazione, recuperabile).
+- **Antagonista:** prompt pronto in `marketing/steam/prompts/keyart-antagonist-variant.md` (minaccia ambientale: fumo+stormo+blight, niente mostri — vincolo claim-ledger). Da generare → visual fork → ruling; poi `capsule-brand-fix.py` produce i crop.
+- **Safeguards (2026-10-25):** `check-page.mts` 47/47, `build:check` PASS, `closure:lint` — i 15 errori sul mio scope azzerati via coverage_exception `EXC-20261025220949-8ff8` (glob `marketing/steam/**`); restano ~105 errori preesistenti di drift contratti da sessioni parallele (file test INV, coverage tier-1, `report_tmp.jpg` a root) + lint lento ~100s su worktree dirty — fuori scope R-288, segnalato. `npm run lint -- marketing/` non applicabile (superficie fuori ESLint).
+
+**Cosa dice la fonte (sintesi):**
+- Key art con eroe di spalle («Header Capsule.png») = asset migliore (9/10): conferma indipendente della scelta R-178.
+- Panorami senza soggetto («Library Capsule.png», «main capsule.png» sorgenti) = 6.5/10: belli ma non comunicano genere né fermano lo scroll — stessa diagnosi di `REVIEW-2026-10-12` §3.
+- `library hero` panorama = 8/10, adeguato al suo slot.
+- `logo1.png` (3D arancione su mare) = 5/10, datato: da eliminare; brand = logo placca+sole (conferma R-151).
+- Suite tutta «idilliaca»: nessun accenno di antagonista/pericolo — per un roguelite/strategico un accenno di conflitto aumenta l'interesse.
+
+**Azioni candidate (da ratificare):**
+1. Composizione-eroe come base per tutti i formati capsule di vendita — **già vera** per header/main/event; aperta per `vertical_capsule_748x896` e `library_capsule_600x900` (oggi panoramiche).
+2. Drop shadow scuro dietro il testo del logo nella key art (il sole dietro l'emblema mangia il contrasto dei bordi); accettazione: leggibile a ~120 px.
+3. Eliminare `~/Downloads/logo1.png` dalla circolazione (era tenuto «come art di sfondo alternativo», R-151).
+- **Questione aperta:** aggiungere un accenno di minaccia (ombra/creatura/bioma corrotto) in key art o capsule secondaria? Veritiero (goblin/permadeath esistono) ma richiede nuova generazione/paintover.
+
+**Attenzione nomi:** la critica valuta i sorgenti `~/Downloads/`, non gli slot `upload/` — mappatura reale in ingestion. «main capsule» panoramica ≠ slot main_capsule (già eroe).
+
+**Fonte/evidence:** `context/ingestions/2026-10-25-steam-capsule-critique.md` (ledger E-01..E-12, mappatura file→slot, impatto implementazione). Puntatore operativo in `marketing/steam/PUBLISH-CHECKLIST.md` §3.
+**Implementazione (2026-10-26):** `scripts/catalog/critiqueComponent.mts` + `scripts/catalog/prompts/` (turn1-commission, turn1-text-only, turn2-rubric, canary-probe) + npm script `catalog:critique`. Implementa r013: lint bloccante P2 sulla commission (mai rubrica/schema/counts/canary), probe throwaway, turn1 commission+shot, turn2 rubrica solo sulle proposte+P0-P3, capability-class per provider, audit post-hoc vs ground_truth, digest mapper-non-judge (P5). Tsc: nessun errore proprio (i warning JSX-mdx sono ambient). Da testare end-to-end al prossimo giro di critica.
+**Verdetto blind Director (2026-10-26):** ablazione — R-25(A4 commission→rubrica t2) > R-12(A2 eng+search) > R-30(A0 free) > R-63(A1 engineered) > R-75(A3 commission+rubrica t1). P7 chiuso: protocollo confermato su giudizio umano; rubrica in turn-2 batte turn-1; search persa era il difetto dominante insieme alla forma-specification. Caveat n=1/provider. Hats gate P6: applicati system_design/ui_developer/objective_critic/critique_and_counterplan (stance-with-cost) + clausola "chiedi contesto" in base enhancer; cancellati software_engineer/cloud_architect/create_proposal. Untested: ruthless_critique/create_plan/game_director.

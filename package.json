@@ -195,7 +195,8 @@
     "sync:bug": "tsx scripts/verification/syncBug.ts",
     "dev:lan": "vite --mode development --host",
     "catalog:validate": "tsx scripts/catalog/catalogValidate.mts",
-    "catalog:document": "tsx scripts/catalog/documentComponent.mts"
+    "catalog:document": "tsx scripts/catalog/documentComponent.mts",
+    "catalog:critique": "tsx scripts/catalog/critiqueComponent.mts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

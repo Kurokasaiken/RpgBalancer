@@ -146,7 +146,17 @@ avanzamento) e `flood` (la volta che allaga) implementate offline;
 `meld` (**proposta R-149**, 2026-10-12 — bonus a scadenza *non
 dichiarata* in stile XCOM: vars `rotta`/`soglia`/`scadenza`, indicatore
 a stati nominati con «ultima chiamata», opzioni rapide ad alto rischio
-ferita/morte → ARCHITECTURE §17).
+ferita/morte → ARCHITECTURE §17); `investigation` (**discussione
+2026-10-25**, R-286 — deduzioni realmente fallibili, indizio →
+direzione × sicurezza sui 5 verdetti, acquisizione passiva trasversale
+alle gimmick → ARCHITECTURE §19, OPEN-023).
+
+> **Correzione di modello (Director 2026-10-25):** il roster qui sopra
+> confonde core gimmick e **sfumature sul tema** — es. `flood`, `meld` e
+> la candidata `difesa a ondate` sono verosimilmente varianti di
+> «avanzamento sul tracciato» (limite a tempo / cursore avversario /
+> resistenza), non gimmick distinte. Modello a tre livelli e criterio di
+> bordo in ARCHITECTURE §20; re-analisi del censimento = OPEN-024.
 
 ### 3.2 Scene gimmick e archetipi decisionali
 

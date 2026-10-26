@@ -1,4 +1,4 @@
-# Digest critiche — new-game-confirm (round 1, 0/3 grounded sul componente)
+# Digest critiche — new-game-confirm (round 1, 1/3 grounded sul componente + claude)
 
 Provider: chatgpt, claude, deepseek — run `20261025-critique-new-game-confirm`,
 turn T-001 (+retry T-002 per chatgpt), prompt verbatim R-282, 3 shot
@@ -8,7 +8,7 @@ allegati (ctx-a, ctx-b, iso-0).
 - chatgpt — 5ª image-perception failure del giorno: `ATTACH_FAILED` ×2
   (T-001 e retry T-002). Quota upload free-tier esaurita (~11h dal probe
   delle 06:38Z). Vedi `chatgpt.md`.
-- claude — quota messaggi free-tier fino alle 12:20 (DOM verbatim «Hai
+- claude [RECUPERATO v. merge] — quota messaggi free-tier fino alle 12:20 (DOM verbatim «Hai
   esaurito i messaggi gratuiti fino alle 12:20»). T-001: immagini
   attaccate (`image_attached: 3`) ma submit impossibile — press Enter
   timeout 30s su composer disabilitato. Vedi `claude.md`.
@@ -59,3 +59,12 @@ un altro worker oggi).
 - La critica raccolta non va buttata: è input utile per
   `components/title-screen/critiques/` (run `20261025-critique-title-screen`
   in corso da worker parallelo — coordinare prima di copiare).
+
+
+## Merge claude (refill T-003, post-reset quota 22:20)
+
+claude GROUNDED (~12.6k chars, verbatim in `claude.md`, run 20261025-critique-new-game-confirm dopo reseed). A differenza del misread deepseek (che criticò il main menu), claude è in-scope sul dialogo di conferma.
+
+**Punti claude**: 1) gerarchia che «dice il contrario di quello che vuole» (l'azione distruttiva non è separata); 2) quattro bottoni in tre linguaggi visivi; 3) stile incoerente col logo; 4) testo minuscolo; 5) ritmo verticale rotto; 6) sfondo vuoto; 7) mancanza di struttura; 8) navigazione/accessibilità non dimostrata.
+
+**Nota**: il misread deepseek resta segnalato sopra; claude fornisce la prima critica realmente in-scope del componente.

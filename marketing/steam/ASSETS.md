@@ -2,6 +2,8 @@
 
 > **Aggiornamento 2026-10-13:** la fonte di verità per l'upload è **`upload/`** (nomi e misure degli slot Steam attuali; vedi `PUBLISH-CHECKLIST.md`). I file in `assets/` con le misure 616×353 / 460×215 / 231×87 / 374×448 e i vecchi `0N-*.png` sono **superati** (mappa + logo, misure pre-2024).
 
+> **Aggiornamento 2026-10-25 (R-288):** tutte le capsule con logo sono passate per `tools/capsule-brand-fix.py` — logo dipinto cancellato via blur, halo scuro + logo authored con drop shadow (leggibilità verificata a 120 px). `vertical` e `library capsule` ora usano la composizione-eroe (era panorama). Per rigenerare: `python3 marketing/steam/tools/capsule-brand-fix.py` → `assets/candidates/fixed/` → copiare in `upload/`.
+
 Generati dalla sorgente a 3072×2049 (`public/assets/world/wanderlust/base/
 layers/base_flat.graded.webp`) + screenshot in-engine 1920×1080 + logo
 tipografico Cinzel (`tools/make-logo.mts`).

@@ -88,3 +88,9 @@ modo corretto è nominare la tensione e chiedere se la direzione va rivista — 
 quale delle due vince. Quella scelta è di Fausto.
 
 Se non sai, dillo. Non dedurre una direzione che non è scritta.
+
+## Scene authoring (obbligatorio)
+
+Qualsiasi lavoro su arte di scena quest/teatro passa SEMPRE dalla skill
+`.agents/skills/scene-author/SKILL.md` prima di generare, iterare o
+presentare immagini. Il suo gate meccanico sostituisce la memoria.

@@ -1,0 +1,21 @@
+{
+  "componentId": "amanuense-page",
+  "sourceSha": "d4a276e29490f12dca303905cb34998d4d3cfe83",
+  "sourceHash": "2f3a83b77197af74",
+  "baseURL": "http://127.0.0.1:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-26T20:58:06.510Z",
+  "states": [
+    {
+      "id": "open",
+      "reached": false,
+      "asserted": false
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

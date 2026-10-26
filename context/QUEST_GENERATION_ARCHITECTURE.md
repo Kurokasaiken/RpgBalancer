@@ -740,3 +740,252 @@ membro — unico asse interno al party), **indagine a soffio**
 (prove/sospetto/scadenza). Nessuna adottata: per il `GimmickRegistry`
 operativo il prossimo slot dopo `meld` resta una decisione del
 Director (cap v1 di PLAN-029).
+
+## 19. Gimmick candidata «indagine» — deduzioni fallibili e acquisizione trasversale (R-286, 2026-10-25)
+
+Discussione Director↔AI del 2026-10-25. Compendio completo:
+`context/ingestions/2026-10-25-gimmick-indagine-e-acquisizione-info.md`.
+**Status: PROPOSAL** — sviluppa la candidata «indagine a soffio» di
+§18.5; nessuna ratifica, nessuna implementazione autorizzata, cap v1
+del roster invariato.
+
+### 19.1 Requisiti espressi dal Director
+
+- **Fallibilità epistemica reale:** una deduzione sbagliata può
+  determinare la sconfitta della quest — non solo testo diverso o uno
+  svantaggio. Applicazione del principio vigente (QUEST_RULES §9) a una
+  forma di sconfitta nuova: non ferita/morte/fuga ma *errore di
+  conclusione*.
+- **Indizi re-investigabili:** sullo stesso indizio si può tornare più
+  volte (più interazioni, più domande); interpretazione e sicurezza
+  evolvono nel tempo, non sono una-tantum.
+- **Raccolta passiva e trasversale:** le informazioni si raccolgono
+  anche in giro, dentro altre situazioni e come conseguenza di scelte
+  fatte per altri motivi — il meccanismo deve essere riusabile da
+  *tutte* le gimmick future, non vivere solo nelle scene investigative.
+- **Ancore della mappa esiti:** successo critico = convinzione
+  *corretta* con sicurezza alta; fallimento critico = convinzione
+  *sbagliata* con sicurezza alta.
+
+### 19.2 Il modello proposto (AI, non ratificato)
+
+Due variabili separate per ogni interpretazione di un indizio:
+
+- **Direzione** — l'indizio sostiene o contraddice la tesi.
+- **Sicurezza** — quanto il personaggio *crede* alla propria lettura:
+  tre livelli proposti (basso/medio/alto). La sicurezza è **soggettiva**:
+  non la probabilità che l'interpretazione sia vera. È ciò che rende
+  possibile «assolutamente convinto del falso» senza che il gioco bari
+  sui dadi — il tiro decide la convinzione, la verità resta authored.
+
+Mappa esiti→interpretazione (estremi Director; intermedi proposti):
+
+| Verdetto | Direzione | Sicurezza |
+|---|---|---|
+| `bigwin` | corretta | alta |
+| `win` | corretta | media |
+| `almost` | **aperta** (candidato: esito parziale / incertezza tra due letture) | **aperta** |
+| `fail` | sbagliata | media |
+| `epicfail` | sbagliata | alta — errore *radicato*, non semplice |
+
+**Re-investigazione senza grinding:** ogni interazione è una *nuova*
+osservazione/domanda/verifica che può rafforzare, indebolire, ribaltare
+la direzione, o **radicare una convinzione falsa** — scavare più a fondo
+nell'errore è un esito possibile. Mai un incremento automatico della
+stessa barra (altrimenti «ripeti fino a certezza»).
+
+### 19.3 Acquisizione: il sistema in tre atti
+
+La parte realmente mancante individuata dalla discussione: non
+l'interpretazione ma la **raccolta**. Proposta: l'indagine non è una
+modalità di gioco separata ma un sistema trasversale —
+
+1. **Acquisizione** — come il personaggio entra in possesso
+   dell'informazione;
+2. **Interpretazione** — quale tesi l'informazione sembra sostenere e
+   con che sicurezza (§19.2);
+3. **Deduzione** — come le informazioni permettono di formulare e
+   verificare una conclusione.
+
+Quattro modalità di acquisizione proposte — **ingressi dello stesso
+meccanismo, non quattro sistemi**:
+
+| Modalità | Trigger | Note |
+|---|---|---|
+| Percezione passiva | ingresso scena, evento, azione, tratto/stat del PG | realizza il requisito Director E-03 |
+| Osservazione intenzionale | scelta esplicita del giocatore | qui entrano i check a 5 verdetti |
+| Interazione | domande, dialoghi, negoziazioni, reazioni NPC | dipende da situazione e interlocutore |
+| Scoperta emergente | conseguenza di *qualsiasi* altra meccanica | il ponte verso le gimmick future |
+
+**Concetto chiave — «evento informativo»:** qualunque scena o meccanica
+può emettere un evento che contiene ciò che il personaggio ha
+percepito/appreso; il sistema investigativo decide quali interpretazioni
+ne derivano. **Informazione acquisita ≠ interpretazione** — è questa
+separazione a rendere gli errori deduttivi non arbitrari: il giocatore
+può sbagliare *interpretando*, non perché il dado ha mentito.
+
+### 19.4 Aperto: affidabilità dell'acquisizione
+
+Due regimi possibili, **da decidere per-evento** (proposta AI):
+
+- **A — oggettiva:** il gioco comunica ciò che il personaggio ha notato;
+  l'errore nasce solo in interpretazione.
+- **B — fallibile:** comunica ciò che *crede* di aver notato; l'errore
+  può nascere già in acquisizione (personaggi inaffidabili). Più
+  potente, meno leggibile.
+
+Terza via proposta: ogni evento informativo dichiara se è oggettivo,
+parziale o soggetto a interpretazione fallibile. Tensione da progettare:
+il regime B incontra la regola vigente dei check nascosti (QUEST_RULES
+§3, R-151 — «il perché delle cose non si nasconde mai dopo»): quando
+l'errore si risolve, la rivelazione retroattiva va scritta nel design.
+
+### 19.5 Seam motore esistenti (FACT)
+
+Il layer base esiste già: 5 verdetti con `verdictTable` dichiarativa,
+`setInfo`/`requiresInfo` (info-gating usato da `raceGimmick`), `vars`
+numerico, `armRolls`/`rollFlag`, `hiddenCheck` (R-151). Quello che
+**non** esiste: un layer «interpretazioni» sopra `info[]` (direzione ×
+sicurezza × storia delle re-investigazioni) e un punto di
+**dichiarazione** nel grafo — il climax investigativo.
+
+### 19.6 Materiale recuperato dal transcript integrale (2026-10-25, update)
+
+Il transcript integrale della conversazione 22→25 ottobre è stato
+recuperato (`context/ingestions/2026-10-22-25-quest-generation-gimmick-transcript.md`;
+gap analysis `context/ingestions/2026-10-25-transcript-integrale-gap-analysis.md`
+S-11..S-14). Recuperati:
+
+- **Riferimenti gialli (era «candidatura Agatha Christie»):** corpus di
+  5 racconti valutati col criterio «la scelta del sospettato può
+  diventare condizione di vittoria/sconfitta senza meccanica estranea?».
+  Finalisti: *Il doppio indizio* (Christie — 4 sospettati, 2 indizi di
+  cui uno possibile depistaggio; semplice ma sconfitta da verificare) e
+  *I quattro sospettati* (Christie/Marple — 4 candidati, ricostruzione
+  articolata). Analizzati e scartati come primo modello: *Il carbonchio
+  azzurro*, *Boscombe Valley*, *Il nobile italiano*, *Testimone d'accusa*.
+- **Rappresentazione delle convinzioni (era in «grafica delle
+  convinzioni»):** tre componenti su un unico modello dati — *registro
+  degli indizi* («cosa so», consultabile a ogni turno), *diario
+  dell'indagine* («cosa è successo»), *ricostruzione delle conoscenze*
+  (confronto fra indizi; collegamenti espliciti in seguito). Principi:
+  la memoria del giocatore non è un requisito; niente tabellone in v1;
+  niente auto-interpretazione — la deduzione resta al giocatore.
+- **Tassonomia meccaniche investigative:** 8 famiglie a livello di
+  regole (interrogazione con feedback vincolato, raccolta a costo,
+  propagazione dei vincoli, combinazione, verifica di ipotesi, ricerca
+  nello spazio delle possibilità, confronto testimonianze, deduzione
+  indiretta) con decomposizione input/feedback/aggiornamento/decisione —
+  livello *regole* sotto le modalità di acquisizione di §19.3.
+
+**Ancora non recuperato** — la sessione separata del pomeriggio 25/10
+(gimmick/race/indagine) non è nel transcript: mancano i dettagli su
+**dichiarazione irrevocabile della conclusione** (cosa si dichiara,
+quando, con quali conseguenze) e l'**elenco delle soluzioni alla
+fallibilità valutate e scartate**. «Albero degli indizi» e «tesi
+contrapposte» sono solo sfiorati (registro/ricostruzione sopra) →
+da ri-coprire col Director → OPEN-023.
+
+## 20. Core gimmick vs sfumature sul tema vs domain kit — modello corretto (Director 2026-10-25)
+
+**Direttiva Director:** una core gimmick può avere **più sfumature/
+varianti sul tema**, e la documentazione attuale è **sbagliata** perché
+censisce come gimmick cose che sono la stessa gimmick con variazioni —
+«invece di avere 15 gimmick, ne avremo molte di meno». Vanno analizzate
+e divise in core gimmick + sfumature sul tema.
+
+### 20.1 Esempio canonico — «avanzamento sul tracciato» (race)
+
+La gimmick è: esiste un **tracciato**, si accumulano **victory point**,
+eventi possono far avanzare o retrocedere sul tracciato, agevolare o
+ostacolare il raggiungimento del traguardo. Sullo *stesso* macchinario:
+
+| Sfumatura | Come si esprime il limite |
+|---|---|
+| **a tempo** | X VP entro N round fissi |
+| **contro avversario** | stessi X VP; il limite è il cursore dell'antagonista — chi arriva prima vince |
+| **resistenza** (tower-defense/DotA-like) | sopportare N round di pressione esterna = accumulare i VP resistendo |
+
+Le miglia corse / miglia nautiche / km a cavallo sono **flavour** —
+livello domain kit, separato.
+
+### 20.2 Il modello a tre livelli
+
+1. **Core gimmick** — l'algebra del problema: variabili, operatore di
+   avanzamento, *famiglia* delle condizioni-limite.
+2. **Sfumatura sul tema** — come il limite si esprime sulla **stessa
+   algebra** (tempo fisso / cursore avversario / sopravvivenza). Non è
+   una gimmick diversa e non è solo dressing: è una parametrizzazione
+   meccanica del pattern di pressione.
+3. **Domain kit** — rivestimento (fiction, nomi, props, creature).
+
+**Criterio di bordo (da raffinare):** stesso set di vars + stesso
+operatore di avanzamento, con la pressione riparametrizzabile →
+sfumatura; algebra o operatore decisionale diversi → gimmick diversa.
+
+### 20.3 Correzione del censimento (ipotesi da verificare per-voce → OPEN-024)
+
+Sotto questo modello gran parte delle «candidate gimmick» di §18.5 e del
+roster sono verosimilmente **sfumature di «avanzamento sul tracciato»**:
+
+| Voce attuale | Lettura nel modello corretto |
+|---|---|
+| `race` (implementata) | sfumatura «contro avversario» del tracciato |
+| `flood-vault` | sfumatura a tempo/pressione ambientale (l'acqua sale → esci col bottino) |
+| `meld` | sfumatura a scadenza (tracciato bonus) |
+| `difesa a ondate` (§18.5) | sfumatura «resistenza» — identica a quella descritta dal Director |
+| `scorta`, `cargo volatile`, `rituale`, `corruzione` | da classificare: cursore secondario / oggetto-pericolo / escalation temporale — probabili sfumature o cugini stretti |
+| `investigation` (§19) | **gimmick diversa davvero** — algebra epistemica (indizio → direzione×sicurezza → dichiarazione), nessun tracciato di VP |
+| push-your-luck (F6 goblin) | da verificare: il suo operatore caratteristico è la decisione stop/continua — potenzialmente un'altra algebra |
+
+### 20.4 Conseguenze (PROPOSAL)
+
+- **`CoreGimmick` contract (CONTRACTS §2):** serve un asse per le
+  sfumature — la condizione-limite come *famiglia parametrizzata*
+  (deadline / cursore avversario / round di pressione), non hardcoded
+  nella singola gimmick.
+- **Metrica di varietà strutturale (§18.4):** va applicata alle core
+  gimmick *dopo* il collasso delle sfumature — contare `race` e
+  `difesa a ondate` come due gimmick sovrastima la varietà reale.
+- **Re-analisi del censimento** = task aperto → OPEN-024: produrre la
+  lista vera delle core gimmick e, per ciascuna, le sue sfumature.
+
+### 20.5 Re-analisi del censimento (2026-10-25, PROPOSAL — classificazione per-voce da ratificare)
+
+Verifica sui descriptor `QUEST_LAB_GIMMICKS` e sui generatori: **tutte le
+gimmick implementate condividono la stessa algebra** — un cursore del
+party verso un goal, un cursore-limite che avanza, eventi che spostano
+l'uno o l'altro. Cambia solo *come il limite è espresso*:
+
+| Voce | Algebra osservata | Classificazione proposta |
+|---|---|---|
+| `race` (offline) | `you` vs `rival` → `goal`; il rivale avanza sui tuoi fail/scelte lente | tracciato — sfumatura **contro avversario** |
+| `flood-vault` (offline) | `uscita` vs `acqua` (auto-avanzante a OGNI azione) → goal/limite | tracciato — **contro avversario (ambiente auto-escalante)**; vena PYL secondaria: ogni presa di loot = mini-decisione continua/cassa sotto pressione crescente |
+| `meld` (proposal) | `rotta` → `soglia`; `scadenza` decresce a ogni azione (nascosta, a stati nominati) | tracciato — sfumatura **a tempo** (deadline velata = scelta di presentazione, non algebra nuova) |
+| `difesa a ondate` (§18.5) | sopportare N round di pressione = accumulare i VP resistendo | tracciato — sfumatura **resistenza** (la forma descritta dal Director verbatim) |
+| `rituale` (§18.5) | il rituale si potenzia col tempo = cursore avversario auto-escalante; climax PYL | tracciato — contro avversario; il climax PYL è un operatore di scena, non la core (da verificare) |
+| `scorta` (§18.5) | avanzamento proprio + HP del VIP = secondo cursore che **non deve** completarsi | tracciato — variante «cursore da proteggere» (il limite è una seconda traccia vulnerabile) |
+| `cargo volatile` (§18.5) | l'oggetto portato degrada → deadline internalizzata nel carico | tracciato — sfumatura a tempo con il timer *dentro* l'inventario |
+| `corruzione` (§18.5) | cursore su un membro del party — asse interno | tracciato — variante «cursore interno» (borderline: la pressione è dentro il party, non nel mondo) |
+| infiltrazione/**allarme** (esempio R-127/128) | l'allarme avanza **solo sui tuoi fallimenti** | tracciato — variante «pressione = errori propri» (cursor fed by failure, cf. warning F12) |
+| `investigation` (§19) | indizio → interpretazione (direzione × sicurezza) → dichiarazione | **core gimmick diversa** — algebra epistemica, nessun tracciato di VP |
+| **push-your-luck** (F6 goblin) | pot che cresce, rischio di bust in escalation, operatore **continua/cassa** | **caso di bordo** — candidato a core propria: l'operatore caratteristico è *quando fermarsi*, non *come arrivare prima*. Quando il limite è deterministico e dichiarato (il «muro certo» di F6) collassa in tracciato-resistenza; PYL vera = bust stocastico/nascosto |
+
+**Sotto il livello gimmick** (non candidati): `inganno-agente` (indizio
+falso piazzato → spazio dell'indagine, regime acquisizione B §19.4);
+`boon-faustiano` (benefit ora / costo dopo → archetipo di scena o tipo
+di twist); `stanza-?`, `luce-vs-furtivita`, `male-minore` — semi di
+meccaniche di scena, non problemi-quest.
+
+**Esito:** il censimento si riduce a **2 core gimmick** («avanzamento
+sul tracciato», «indagine») + **1 caso di bordo** (PYL, da sciogliere
+col criterio operatore-decisionale) + una famiglia di sfumature del
+tracciato. La «varietà» del roster attuale è interamente sfumatura —
+coerente con la diagnosi Director.
+
+**Nota su race come modello (collega tensione S-08/S-20):** nel modello
+corretto la race implementata non è «la gimmick race» ma la sfumatura
+*contro avversario* del tracciato — qualsiasi ranking di gimmick
+(rituale prima, race sconsigliata «poco fantasy») valutava **sfumature
+dello stesso core**, non core diverse. Il ranking resta valido come
+scelta della *sfumatura banco di prova*, non del core.

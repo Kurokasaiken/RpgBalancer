@@ -19,3 +19,13 @@
 >   critique runs (yesterday the same transport attached 4–10 images fine).
 >
 > No critique was produced. This file must not feed the visual fork.
+
+---
+
+## Secondo pass serale (2026-10-25, PLAN-086 fill-gap)
+
+- **T-002** su run `20261025-critique-director-panel-r2` (~21:02):
+  `ATTACH_FAILED` — "no upload affordance". Quota upload ri-esaurita subito
+  dopo il refill riuscito di village-registry (~20:56, run gemella `-r2`).
+  Probes 22:04 e 23:05 su village-stash-panel: entrambe `ATTACH_FAILED` →
+  declared blocked. La run originale resta poisoned (binding homepage).

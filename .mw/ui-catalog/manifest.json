@@ -2145,7 +2145,13 @@
           }
         }
       ],
-      "children": [],
+      "children": [
+        "amanuense-page",
+        "quest-belt",
+        "quest-chronicle",
+        "quest-epilogue",
+        "quest-party-roster"
+      ],
       "notes": "BLOCKER witnessed 2026-10-24: expedition demoLaunch throws \"Cannot access X before initialization\" (TDZ circular import) and the ErrorBoundary catches it — on the frozen preview AND the dev server. Quest-run states unreachable this session; selectors taken from source."
     },
     {
@@ -2263,7 +2269,9 @@
           }
         }
       ],
-      "children": [],
+      "children": [
+        "quest-returned-crew"
+      ],
       "notes": "Same TDZ blocker as quest-run-window."
     },
     {
@@ -3502,6 +3510,301 @@
       ],
       "children": [],
       "notes": "Mounts only when info.hasProgress; a fresh profile skips it (driver returns unreachable honestly). Driver navigates via ?title=1 then clicks the New Game pill."
+    },
+    {
+      "id": "quest-party-roster",
+      "title": "Quest party in the field (run window companion plaque)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "open",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/questPartyRoster.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-party-roster\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestPartyRosterPanel.tsx"
+      ],
+      "sourceHash": "42cf091e617904e3",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-party-roster-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-party-roster\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/open-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "partial": false,
+            "failedStates": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "R-282 quest flow: one of three roster presentations (global roster, planner slots, this plaque)."
+    },
+    {
+      "id": "quest-belt",
+      "title": "Quest bag / belt (run window companion plaque)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "open",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/questBelt.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-belt\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestBeltPlaque.tsx"
+      ],
+      "sourceHash": "72b4140681533ff2",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-belt-plaque.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-belt\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/open-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "partial": false,
+            "failedStates": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "R-282 quest flow: one of two inventory presentations (planner loadout, this belt) plus the micro-belt above the choices."
+    },
+    {
+      "id": "quest-chronicle",
+      "title": "Quest chronicle / log (run window companion plaque)",
+      "category": "panel",
+      "status": "documented",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "open",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/questChronicle.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-log-panel\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestLogPanel.tsx"
+      ],
+      "sourceHash": "48b35c5a325b4ef6",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-chronicle.md",
+          ".mw/contracts/components/quest-log-panel.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-log-panel\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [
+            "shots/V1/open-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "partial": false,
+            "failedStates": []
+          }
+        }
+      ],
+      "children": [],
+      "notes": "R-282 quest flow."
+    },
+    {
+      "id": "amanuense-page",
+      "title": "Amanuense folio — extended phase description",
+      "category": "overlay",
+      "status": "documenting",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "open",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/questAmanuense.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"amanuense-page\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx"
+      ],
+      "sourceHash": "2f3a83b77197af74",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/amanuense-page.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"amanuense-page\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "partial": true,
+            "failedStates": [
+              "open"
+            ]
+          }
+        }
+      ],
+      "children": [],
+      "notes": "R-282 quest flow. Opener is an emoji (📖) button in the run window — against the emoji ban."
+    },
+    {
+      "id": "quest-epilogue",
+      "title": "Quest epilogue — end-of-run report inside the run window",
+      "category": "overlay",
+      "status": "documenting",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "ended",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/questRunEnded.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-epilogue\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestEpilogue.tsx"
+      ],
+      "sourceHash": "8d798ee6696dae1d",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-epilogue.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-epilogue\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "partial": true,
+            "failedStates": [
+              "ended"
+            ]
+          }
+        }
+      ],
+      "children": [],
+      "notes": "R-282 quest flow: one of two final reports (this one in the window, quest-reward-popup outside)."
+    },
+    {
+      "id": "quest-returned-crew",
+      "title": "Who came back — end-of-run crew niches",
+      "category": "panel",
+      "status": "documenting",
+      "currentVersion": 1,
+      "states": [
+        {
+          "id": "ended",
+          "driver": {
+            "kind": "script",
+            "ref": "scripts/catalog/drivers/questRunEnded.ts"
+          },
+          "assertion": {
+            "selector": "[data-testid=\"quest-returned-crew\"]",
+            "property": "visible",
+            "expected": "true"
+          }
+        }
+      ],
+      "scopeFiles": [
+        "src/ui/idleVillage/components/gameFrame/QuestReturnedCrew.tsx"
+      ],
+      "sourceHash": "e13877adb6522ca4",
+      "links": {
+        "contract": [
+          ".mw/contracts/components/quest-returned-crew.md"
+        ],
+        "trusted": []
+      },
+      "groundTruth": [],
+      "captureSelector": "[data-testid=\"quest-returned-crew\"]",
+      "groundTruthApproved": null,
+      "versions": [
+        {
+          "v": 1,
+          "shots": [],
+          "ruling": null,
+          "meta": {
+            "partial": true,
+            "failedStates": [
+              "ended"
+            ]
+          }
+        }
+      ],
+      "children": [],
+      "notes": "R-282 quest flow."
     }
   ]
 }
