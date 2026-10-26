@@ -390,6 +390,25 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 8 },
     ],
   },
+  'incalzare-v2': {
+    /* f5 pursuit (2026-10-26): chaotic flee through dense forest — backs
+     *  swallowed by the green, no rocks/gorge (Director ruling). */
+    depth: '/assets/depth/incalzare-v2.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-sweep',
+    pose: 'pose-tense',
+    focusAnchor: [0.3, 0.5],
+    atmosphere: [],
+    ambient: [
+      /* Ember light spilling from the camp behind — painted, plus runtime. */
+      { type: 'glow', at: [0.06, 0.45], r: 0.09, color: '#ff8c30', a: 0.4, flicker: 0.4 },
+      { type: 'embers', at: [0.05, 0.5], count: 4 },
+      { type: 'dust', count: 9 },
+      { type: 'drift', band: [0.2, 0.32], xband: [0.3, 0.7], count: 2, lean: 0.25 },
+    ],
+  },
   'bottino-v2': {
     /* f2 hidden find (2026-10-26): modest stash in a hide-lined hollow
      *  under set-back undergrowth. Intimate downward look — creep in,
