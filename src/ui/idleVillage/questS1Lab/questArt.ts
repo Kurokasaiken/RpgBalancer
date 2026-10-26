@@ -60,7 +60,7 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-esplora': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
-  'gob-bottino': { src: '/assets/scene-library/bottino.jpg', fit: 'cover' },
+  'gob-bottino': { src: '/assets/scene-library/bottino-v2.png', fit: 'cover' },
   'gob-accampamento': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'gob-stealth': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'gob-assalto': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
@@ -114,6 +114,10 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
    *  both edges. Picked in /theater-lab with `traverse=<r>` it is the test
    *  bed for true horizontal parallax (A13 protocol rules applied). */
   'marcia-crinale': { src: '/assets/scene-library/marcia-crinale.jpg', fit: 'cover' },
+  /* Legacy f2 image retained for the lab catalog — the quest node now
+   *  points at bottino-v2 (manifest + fresher art). */
+  bottino: { src: '/assets/scene-library/bottino.jpg', fit: 'cover' },
+  'bottino-v2': { src: '/assets/scene-library/bottino-v2.png', fit: 'cover' },
   /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
    *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —
    *  left/right edges now continue into each other (the crag splits
