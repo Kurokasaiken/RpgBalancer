@@ -61,9 +61,9 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-tracce-per': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-tracce-perfor': { src: '/assets/scene-library/sentiero-tracce.jpg', fit: 'cover' },
   'gob-bottino': { src: '/assets/scene-library/bottino-v2.png', fit: 'cover' },
-  'gob-accampamento': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
-  'gob-stealth': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
-  'gob-assalto': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
+  'gob-accampamento': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
+  'gob-stealth': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
+  'gob-assalto': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
   'gob-combattimento': { src: '/assets/scene-library/assalto-goblin.jpg', fit: 'cover' },
   'gob-incalzare': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
   'gob-incalza-check': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
@@ -124,6 +124,8 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
   'spoglie-v2': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
   'agguato-foresta': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
   'agguato-v2': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
+  'accampamento-raider': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
+  'accampamento-v2': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
   /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
    *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —
    *  left/right edges now continue into each other (the crag splits
