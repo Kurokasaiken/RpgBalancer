@@ -1,0 +1,17 @@
+RUDE BEAUTY — MARCIA DEL CARAVAN SU STRADA DI CRINALE — canonical prompt (Director-edited i3, A13+)
+
+REF directive: the attached image is STYLE/TECHNIQUE only — do NOT reproduce its subject matter.
+
+FORMAT: ultra-wide painted plate (~3.5:1) — a single continuous canvas much wider than the viewport. This is a PARALLAX PLATE: the image will be scrolled laterally at runtime.
+LAYOUT: the road is the scroll guide — an alpine ridge road running along the mountainside, entering from one edge and exiting the other at compatible heights. FOCAL SUBJECT LATERAL (caravan small, off-center ~40% width) so the long strip reveals new background while scrolling. Terrain continues past BOTH edges — the flank goes on; no single unique landmark near the borders; repeating-but-varied masses (peaks, spruces, grass bands).
+DEPTH STAGING: readable near/mid/far — foreground grass bank with rocks (the FAST layer, needs the most detail), midground road+caravan+spruces+waystone, distant jagged Dolomite spires, sky slowest.
+
+SUBJECT: a small merchant caravan mid-march on the road (2-3 wagons + riders, silhouettes with readable shapes), a leaning WAYSTONE at the road bend, a cold stream in the lower left where TWO RED DEER drink (antlered stag + doe — fauna gives scale and life: who lives here, doing what).
+CAUSAL COLOR FIELD: the mid-slope carries a wide band of RED ALPINE POPPIES in bloom — a motivated color field at landscape scale (the red clashes with azure+veronese+ultramarine deliberately). NOT uniform red: poppies interleaved with grass.
+NEAR-LAYER DENSITY: the foreground grass is NOT a carpet — woven multihue interest: VIOLET asters + YELLOW buttercups scattered through the veronese grass, lichen-amber flecks on the pale rocks, varied tufts. The foreground scrolls fastest on screen — it must stay interesting for the whole pan.
+LIGHT: Solar Triumph white-gold sun SLAMS from the right — lit faces gold, shadowed planes saturated teal; high-chroma alpine air, crisp not hazy.
+FIELDS: azure sky / white-gold clouds / ultramarine spires / veronese meadows with lime highlights / grey-violet rocks with amber lichen / gold road dust / teal shadows / RED poppy band / violet+yellow foreground weave — each readable, contrast interleaved per region (local weave, not macro zones).
+AMBIENT ZONES (for runtime, painted to support): dust motes over the sunlit road; water glints on the stream; slow cloud drift in the sky band; warm light pooling on the right cliff. DAYLIGHT ambient only — NO fireflies, NO embers.
+STYLE: masterful cinematic oil painting in thick violent palette-knife impasto — gouged ridges, visible layers, nothing smooth (Jaime Jones, Jeff Easley). Every plane vibrates, no muted tones, no flat colors.
+HYGIENE: no signatures/text/watermark, no rounded corners, no vignette card — full-bleed edge-to-edge. NO black murk, NO brown drift, NO grey-white dominant fields, NO night, NO stars.
+NOT-LINE: not a sunset, not a monument, not a single focal postcard — the scene is a TRAVELED PLACE that continues past the frame.
