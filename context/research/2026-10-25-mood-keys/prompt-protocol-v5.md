@@ -345,3 +345,29 @@ corrette ma morte".
   viola+gialli nel fg (near-density + weave), rosso ridotto a fascia
   (dosaggio).
 - Pattern file: .mw/runs/20261026-learn-parallax-plate/pattern-candidate.md
+
+## A14 — NUMERIC ART CHECK obbligatorio (post-gen, pre-presentazione)
+
+Dopo ogni generazione e PRIMA di sottoporre al Director, eseguire il check
+colori quantitativo (script PIL/np: HSV + hue histogram + cell-grid weave).
+Soglie di bocciatura (v1, calibrate su batch 2026-10):
+
+- **black** (val<0.13) > 10% → murk vietato
+- **brown** (hue 15-45, sat .25-.75, val .18-.62) > 8% → drift marrone
+- **grey-flat** (sat<0.15, val>0.4) > 10% → campi morti
+- **vibrant** (sat>0.6, val>0.45) < 4% → mancano accenti vibranti
+- **hue families** (sat>0.4, val>0.3): almeno 3 famiglie > 3% ciascuna,
+  e NON una sola famiglia > 60% (mono-campo)
+- **weave**: >= 50% delle celle 40px con >= 2 famiglie hue (intreccio locale)
+- **mean val**: fuori banda 0.35-0.7 → troppo scuro/schiarito per il registro
+
+Ogni FAIL si riporta col numero, mai "sembra ok". Il check non sostituisce
+l'eye-check Director: lo prepara.
+
+### f2-bottino v1 — primo check A14 (FAIL)
+black 22.8% / brown 11.9% / grey 3.1% / vibrant 1.1% /
+famiglie: orange 47.7 + yellow 27.3 (warm-dominant, i verdi non passano il
+filtro) / weave 66% / mean val 0.28.
+→ Bocciata: murk nero al 23%, marrone 12%, vibrante 1.1% — la vigna
+veronese/teal della scheda non è uscita; il quadro legge warm-buia.
+Iterazione: alzare la fascia veronese/teal, mantenere gli accenti.
