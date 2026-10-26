@@ -138,6 +138,9 @@ Preferenze (dalle critiche libere R-282, convergenti 3/3 su più componenti):
 | roster-base | 2026-10-13 | Il Roster è la base di tutti i componenti; le guide mirano a quello. |
 | fantasy-6b | 2026-10-13 | «il pallino davanti alla freccia è orribile»: niente elementi generici da UI kit. |
 | brushwork-1 | 2026-10-26 | HUD = pulita (opzione A). Racconto = vignetta dipinta ad hoc in cornice (opzione B). Il marrone è bandito da Wanderlust DNA e guide, bottoni compresi. |
+| icons-1 | 2026-10-26 | D-1 = B: cose del mondo (edifici, risorse, oggetti) dipinte; comandi e stati incisi. |
+| halo-1 | 2026-10-26 | D-4 = A: alone solo sui marker della mappa; nell'HUD stato con sagoma + testo + filetto pieno. Il registro edifici sta nella schermata Villaggio. |
+| motion-1 | 2026-10-26 | D-6 = A: movimento sobrio nell'HUD, senza overshoot né particelle. `game_feel_design_guide.md` va riallineata (oggi prescrive spring/overshoot/confetti). Il registro edifici sta solo nella schermata Villaggio, mai sulla mappa (verificato: `VillageRegistry` è montato solo in `VillageScreenView`). |
 | mappa-ferma | 2026-10-14 | La mappa non si muove mai per un pannello. |
 
 ## Livello 3 — Giudizi contestuali (richiedono il Director)
@@ -184,7 +187,8 @@ Un mockup non esce se:
 Ogni voce: contraddizione trovata, fonti in conflitto, opzioni. Nessuna
 opzione è marcata come raccomandata.
 
-- **D-1 — Icone: dipinte o incise?** La rev 3 diceva «glifi incisi»
+- **D-1 — RISOLTA 2026-10-26: B (due livelli).** Cose del mondo dipinte, comandi e stati incisi. Vedi registro `icons-1`.
+- ~~**D-1 — Icone: dipinte o incise?**~~ (testo originale) La rev 3 diceva «glifi incisi»
   ovunque, citando INV-1 B; ma INV-1 B (PLAN-067 T-B8) riguarda solo
   l'icona dell'oggetto uguale in tray, magazzino e mercante. La
   produzione usa icone risorse dipinte nella barra in alto; Gemini chiede
@@ -205,7 +209,8 @@ opzione è marcata come raccomandata.
   la cornice esterna dello schermo e per le schermate a pagina intera,
   non per le placche HUD; (B) vale anche per le placche principali
   (ribbon, nav); (C) va tolta dal pilastro.
-- **D-4 — Alone come segnale.** La rev 3 diceva «stato comunicato da
+- **D-4 — RISOLTA 2026-10-26: A (alone solo sui marker della mappa).** Director: «ma dovrebbe esserci un'altra schermata per quelle cose, non sulla mappa» → il registro edifici vive nella schermata Villaggio, non come pannello sulla mappa. Vedi registro `halo-1`.
+- ~~**D-4 — Alone come segnale.**~~ (testo originale) La rev 3 diceva «stato comunicato da
   halo/badge»; la guida §6b vieta i dischetti e vuole la sagoma di un
   oggetto; hud-tabs-1 vieta l'alone nella cella cibo; il Sigillo POI di
   R-177 (non ratificato) usa l'alone per la valenza. Opzioni: (A) alone
@@ -216,7 +221,8 @@ opzione è marcata come raccomandata.
   mobile-fit. La rev 3 diceva «≥44px» senza contesto. Opzioni: (A) 26 px
   desktop, 44 in mobile-fit (lettura attuale); (B) 44 ovunque (tutte le
   pillole vanno rifatte).
-- **D-6 — Movimento: bounce e confetti.** La rubrica li vieta come «da
+- **D-6 — RISOLTA 2026-10-26: A (sobrio) nell'HUD.** Dissolvenze brevi, nessun rimbalzo né particelle. Livello «momenti di racconto» ancora da dichiarare. Vedi registro `motion-1`.
+- ~~**D-6 — Movimento: bounce e confetti.**~~ (testo originale) La rubrica li vieta come «da
   app»; `game_feel_design_guide.md` li prescrive (spring, overshoot,
   squash-stretch, `particles: "confetti"`). Il tono «sobrio,
   conseguenziale, frontiera» pende per il divieto; la richiesta di quest
