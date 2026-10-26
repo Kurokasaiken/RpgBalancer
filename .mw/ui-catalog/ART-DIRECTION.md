@@ -53,7 +53,7 @@
   duro 1/3; la mappa è l'eroe [guida §1.5].
 
 **Colore**
-- **Mai viola** né derivati, in nessun ruolo, morte compresa. Morte =
+- **Mai viola** né derivati (violetto, magenta), **in nessun ruolo e in nessun livello: UI, icone, testo, pulsanti, stati, arte di scena e prompt di generazione** [Director 2026-10-20 e 2026-10-26]. Morte =
   ferro freddo `#93a4ad` [Director 2026-10-20; COL-D = B, PLAN-068].
 
 **Controlli**
@@ -141,6 +141,10 @@ Preferenze (dalle critiche libere R-282, convergenti 3/3 su più componenti):
 | icons-1 | 2026-10-26 | D-1 = B: cose del mondo (edifici, risorse, oggetti) dipinte; comandi e stati incisi. |
 | halo-1 | 2026-10-26 | D-4 = A: alone solo sui marker della mappa; nell'HUD stato con sagoma + testo + filetto pieno. Il registro edifici sta nella schermata Villaggio. |
 | motion-1 | 2026-10-26 | D-6 = A: movimento sobrio nell'HUD, senza overshoot né particelle. `game_feel_design_guide.md` va riallineata (oggi prescrive spring/overshoot/confetti). Il registro edifici sta solo nella schermata Villaggio, mai sulla mappa (verificato: `VillageRegistry` è montato solo in `VillageScreenView`). |
+| targets-1 | 2026-10-26 | D-5: 26 px desktop, ≥44 px in mobile-fit (lettura attuale approvata). |
+| ranking-1 | 2026-10-26 | D-7: l'AI controlla le regole, il Director decide il gusto a vista. |
+| prompt-2 | 2026-10-26 | D-8: prompt di critica verbatim, nessun dossier. |
+| purple-2 | 2026-10-26 | D-9: viola bandito ovunque, arte di scena compresa. Supera la lettura «solo UI». |
 | mappa-ferma | 2026-10-14 | La mappa non si muove mai per un pannello. |
 
 ## Livello 3 — Giudizi contestuali (richiedono il Director)
@@ -216,7 +220,8 @@ opzione è marcata come raccomandata.
   R-177 (non ratificato) usa l'alone per la valenza. Opzioni: (A) alone
   vietato nell'HUD, ammesso solo sui marker della mappa; (B) vietato
   ovunque; (C) ammesso come rinforzo secondario dove non c'è dato dentro.
-- **D-5 — Dimensione dei target.** Guida §5: pillole 26 px su desktop.
+- **D-5 — RISOLTA 2026-10-26: approvata la lettura attuale** (26 px desktop, ≥44 px in mobile-fit). Registro `targets-1`.
+- ~~**D-5 — Dimensione dei target.**~~ (testo originale) Guida §5: pillole 26 px su desktop.
   Guida §6c: «≥44×44 su ogni elemento interattivo» nelle regole
   mobile-fit. La rev 3 diceva «≥44px» senza contesto. Opzioni: (A) 26 px
   desktop, 44 in mobile-fit (lettura attuale); (B) 44 ovunque (tutte le
@@ -230,16 +235,20 @@ opzione è marcata come raccomandata.
   (A) vietati nell'HUD, ammessi nei momenti di ricompensa/scena; (B)
   vietati ovunque e la guida game feel va riscritta; (C) ammessi come da
   guida game feel.
-- **D-7 — Chi classifica i mockup.** Su hud-top-tabs il ranking AI ha
+- **D-7 — RISOLTA 2026-10-26: A.** L'AI controlla solo le regole (viola, glifi unicode, testo <12 px, marrone); il ranking di gusto lo fa il Director a vista. Registro `ranking-1`.
+- ~~**D-7 — Chi classifica i mockup.**~~ (testo originale) Su hud-top-tabs il ranking AI ha
   scelto all'unanimità C (placche appese) fusa con A (brace nella cella
   cibo): proprio le due che il Director ha poi vietato. Opzioni: (A) il
   ranking AI sparisce, l'AI fa solo il controllo delle regole; (B)
   ranking AI mostrato **dopo** la scelta del Director, come confronto;
   (C) invariato.
-- **D-8 — «Prompt potenziati» vs R-282/prompt.** Il Director chiede ora
+- **D-8 — RISOLTA 2026-10-26: A (prompt verbatim invariato).** Director: la richiesta di prompt potenziati era una svista, R-282/prompt resta. Il dossier allegato non è adottato. Registro `prompt-2`.
+- ~~**D-8 — «Prompt potenziati» vs R-282/prompt.**~~ (testo originale) Il Director chiede ora
   critiche «con cappello» e prompt potenziati; il ruling del 24/10 fissa
   il prompt verbatim perché la versione arricchita aveva reso peggio.
   Opzioni: (A) prompt verbatim invariato; (B) prompt verbatim invariato +
   dossier allegato come file (genere, pubblico, pilastri, riferimenti,
   ruling con immagini), prima in A/B su 2 componenti; (C) nuovo prompt
   scritto dal Director.
+
+- **D-9 — RISOLTA 2026-10-26: viola bandito ovunque.** Director: «nella UI niente viola, una scritta viola è brutta, o un'icona, o un pulsante; non intendevo mai viola da nessuna parte, a livello artistico». Il divieto del viola vale quindi **anche per l'arte di scena e i prompt di generazione** (kill list: no purple, no violet, no magenta). Conseguenza: i riferimenti del mood-board con viola/magenta forti (armatura antagonista, armatura imperiale, chiave Prismatic) non vanno usati come riferimento di palette senza rettifica. Registro `purple-2`.

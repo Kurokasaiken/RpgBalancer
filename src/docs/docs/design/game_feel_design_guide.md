@@ -1,5 +1,8 @@
 # Game Feel & Juice Design Guide
 
+> **Ruling Director 2026-10-26 (R-282 / `motion-1`, D-6 = A) — vincola questa guida.** Nell'**HUD** il movimento è **sobrio**: dissolvenze brevi (≈200 ms), anelli sottili, stati che cambiano senza festa. **Niente spring, overshoot, bounce, squash-stretch, coriandoli o scosse di schermo nell'HUD.** Le sezioni sotto che li prescrivono (principio 2 «Satisfying Impact», esempi con `cubic-bezier(0.68, -0.55, …)`, `particles: "confetti"`, «Collect Overshoot») valgono **solo** se il Director dichiara un livello «momenti di racconto» (ricompensa, villaggio perduto): quel livello **non è ancora deciso**. Fino ad allora, nel dubbio, sobrio. `prefers-reduced-motion` salta sempre allo stato finale.
+
+
 ## Overview
 This document defines the "game feel" and "juice" principles for the RPG Balancer project. It serves as the authoritative guide for implementing responsive, satisfying interactions that make the UI feel alive and responsive to user actions.
 
