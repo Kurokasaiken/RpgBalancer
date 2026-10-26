@@ -389,3 +389,27 @@ goblin (v1→finale, gate per ogni step):
 [iterazioni-quest-goblin.html](iterazioni-quest-goblin.html)
 (servita da `http://127.0.0.1:8734/iterazioni-quest-goblin.html` quando il
 server della gallery è attivo)
+
+## A16 — CHECK ESTESO (2026-10-26, integrazioni Director)
+
+Il check qualitativo non si ferma a famiglie+contatori. Per OGNI immagine:
+
+- **Contrasto per zona**: OGNI zona (sky/mid/low/fg) deve avere vera
+  opposizione cromatica — coppie complementari presenti nella STESSA zona,
+  non solo varietà globale. Una zona mono-campo è un FAIL anche se le
+  altre sono ricche.
+- **Cielo mai piatto**: la fascia cielo richiede >=3 famiglie hue + variazione
+  interna (gradiente, nuvole diverse, frange). Due colori nel cielo = FAIL
+  automatico.
+- **Colori = pietre preziose**: nel PROMPT e nel check la vibranza va
+  descritta in linguaggio gemma — sapphire/azure, emerald/veronese,
+  ruby/cinnabar, amber/topaz, amethyst/violet. "Vibrante" da solo non basta:
+  ogni accento deve leggersi come gemma incastonata nel campo.
+- **Armonia, non solo diversità**: controllare che le hue presenti stiano
+  BENE insieme — contrasto complementare deliberato + sfumature analoghe
+  coerenti dentro ogni campo (es. verdi che degradano lime→veronese→teal
+  NELLO STESSO prato). Diversi colori messi insieme a caso = FAIL anche se
+  i conteggi passano. La domanda del check è "queste sfumature convivono?",
+  non "quanti colori ci sono?"
+- **Impasto**: cell-std proxy >= ~20 per registro materico; sotto ~15 la
+  superficie legge liscia/digitale.
