@@ -145,6 +145,8 @@ Preferenze (dalle critiche libere R-282, convergenti 3/3 su più componenti):
 | ranking-1 | 2026-10-26 | D-7: l'AI controlla le regole, il Director decide il gusto a vista. |
 | prompt-2 | 2026-10-26 | D-8: prompt di critica verbatim, nessun dossier. |
 | purple-3 | 2026-10-26 | D-9: viola vietato nella UI (pannelli, componenti, pulsanti, testo, icone, stati); libero nell'arte. Sostituisce la lettura errata «ovunque» (purple-2, annullata). |
+| nav-1 | 2026-10-26 | nav-bar = M1: quattro slot di larghezza uguale; i bloccati dicono il requisito («Req · Lv 2»); stato attivo su tre canali (fondo, filetto, etichetta); il recenter esce dalla barra. |
+| corner-1 | 2026-10-26 | hud-corner: dock unico con 4 comandi (recenter, menu, pannelli con badge, nascondi) e tasti rapidi; menu senza il doppione «Pannelli»; con HUD nascosta solo l'icona dell'occhio chiuso, senza etichetta. |
 | mappa-ferma | 2026-10-14 | La mappa non si muove mai per un pannello. |
 
 ## Livello 3 — Giudizi contestuali (richiedono il Director)
