@@ -752,6 +752,35 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 8 },
     ],
   },
+  'marcia-crinale': {
+    /* PLAN-052 wide-plate parallax experiment (2026-10-26): 1024×285
+     * painted ridge march — caravan focal lateral-left, road continuing
+     * past both edges. Daylight ambient set only (A13: no fireflies in
+     * sun); the `traverse` lab param sweeps the camera along the long
+     * axis to test true horizontal depth-parallax. */
+    depth: '/assets/depth/marcia-crinale.webp',
+    depthWidth: 512,
+    depthHeight: 142,
+    imgAspect: 1024 / 285,
+    entrance: 'enter-sweep',
+    pose: 'pose-rest',
+    /* Narrative focal: the caravan mid-march on the road. */
+    focusAnchor: [0.4, 0.6],
+    atmosphere: [],
+    ambient: [
+      { type: 'dust', count: 16 },
+      /* Stream sparkle where the deer drink (water glints, day-true). */
+      { type: 'glint', at: [0.33, 0.9], period: 6, r: 0.006, color: '#dff4ff' },
+      { type: 'glint', at: [0.36, 0.96], period: 8, r: 0.005, color: '#dff4ff' },
+      /* High cloud drift — the painted sky already carries the motion
+       *  cue; runtime wisps ride the same band, slow. */
+      { type: 'drift', band: [0.02, 0.2], count: 4, speed: 0.008, a: 0.06, color: '#f2f6ff' },
+      /* The painted sun rakes from the right edge — a subtle warm shaft
+       *  down the lit cliff face amplifies it (same rule as painted
+       *  god-rays elsewhere: runtime amplifies what the art declares). */
+      { type: 'shaft', from: [0.99, 0.03], to: [0.88, 0.5], width: 0.16, count: 3, a: 0.1, color: '#ffefc4' },
+    ],
+  },
 });
 
 /** Art id for a NODE_ART src (`/assets/scene-library/x.jpg` → `x`). */
