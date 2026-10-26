@@ -390,6 +390,26 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 8 },
     ],
   },
+  'bottino-v2': {
+    /* f2 hidden find (2026-10-26): modest stash in a hide-lined hollow
+     *  under set-back undergrowth. Intimate downward look — creep in,
+     *  the foreground fronds occlude the reveal. */
+    depth: '/assets/depth/bottino-v2.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-creep',
+    pose: 'pose-watch',
+    focusAnchor: [0.5, 0.58],
+    atmosphere: [],
+    ambient: [
+      /* Coin edge inside the bundle — painted glint + runtime twinkle. */
+      { type: 'glint', at: [0.5, 0.63], period: 9, r: 0.005 },
+      /* Sunlit motes in the shaft + faint mist pooling far back. */
+      { type: 'dust', count: 10 },
+      { type: 'drift', band: [0.18, 0.3], xband: [0.05, 0.5], count: 2, lean: 0.3 },
+    ],
+  },
   'assalto-goblin': {
     depth: '/assets/depth/assalto-goblin.webp',
     depthWidth: 1584,
