@@ -59,3 +59,10 @@ web, immagini) — lì la codifica avviene nella domanda, non nel prompt:
 Vedi `context/research/2026-10-25-mood-keys/prompt-protocol-v5.md` sezione A14.
 Dopo ogni gen: HSV stats + hue families + cell-weave + banned-% — soglie
 di bocciatura numeriche, FAIL riportato coi numeri prima del Director check.
+
+## A16 (2026-10-26) — check esteso per zona+cielo+gemme+armonia
+
+Vedi `context/research/2026-10-25-mood-keys/prompt-protocol-v5.md` A16:
+contrasto complementare per OGNI zona, cielo >=3 famiglie con variazione
+interna, accenti descritti come pietre preziose, armonia sfumature
+(analoghe coerenti + complementare deliberato), impasto-std >=~20.
