@@ -256,6 +256,10 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   const [amanuenseOpen, setAmanuenseOpen] = useState(false);
   const wasPillRef = useRef<CompanionPill | null>(null);
   const amanuenseSkin = getAmanuenseSkinConfig();
+  /* Hoisted above the first read (`nodeLongForm`): a `const` read before its
+   *  declaration throws a TDZ ReferenceError on every render of the window. */
+  const allNodes = nodesFor(run);
+  const node = allNodes[run.nodeId];
   const nodeLongForm = node?.longForm ?? null;
   const openAmanuense = useCallback(() => {
     if (!nodeLongForm) return;
@@ -300,7 +304,6 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
     }
   }, [loreDiscovered, loreLongForm, amanuenseOpen, activePill, setPill]);
   const pageLongForm = pageIsLore && loreLongForm ? loreLongForm : nodeLongForm;
-  const amanuenseCoexists = vwU >= amanuenseSkin.coexistenceMinViewportPx;
   /* R-199 pt.9: the per-check presentation options popover (skip intro /
    * skip the astrolabe entirely — the verdict still lands as a beat). */
   const checkCfg = DEFAULT_GAME_FRAME_CONFIG.questWindow.skillCheck;
@@ -329,6 +332,7 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   const hudZoom = getHudZoomFactor();
   const vwU = vw / hudZoom;
   const vhU = vh / hudZoom;
+  const amanuenseCoexists = vwU >= amanuenseSkin.coexistenceMinViewportPx;
   useEffect(() => {
     const onResize = () => {
       setVw(window.innerWidth);
@@ -381,8 +385,6 @@ export const QuestRunWindow: React.FC<QuestRunWindowProps> = ({
   onMinimisedChangeRef.current = onMinimisedChange;
   useEffect(() => { onMinimisedChangeRef.current?.(minimised); }, [minimised]);
   useEffect(() => () => onMinimisedChangeRef.current?.(false), []);
-  const allNodes = nodesFor(run);
-  const node = allNodes[run.nodeId];
   /* R-199 pt.11: `nowTick` marks options locked while their frontier's slot
    *  on the time bar has not arrived — visible, not yet committable. */
   const options = useMemo(() => availableOptions(run, nowTick), [run, nowTick]);
