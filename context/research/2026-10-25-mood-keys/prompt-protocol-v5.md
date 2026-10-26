@@ -380,3 +380,12 @@ come riferimento stilistico — mai solo testo. Ref: `villaggio.png`
 `aqueduct` (Prismatic). Il testo porta soggetto+scena+effetti; la ref
 porta il registro pittorico. Senza ref = rischio derive "storybook"
 (osservato f2_v1, f5_v1).
+
+## Iterazioni quest — pagina evidenzia
+
+Link diretto alla pagina con tutte le iterazioni delle scene Sterminio
+goblin (v1→finale, gate per ogni step):
+
+[iterazioni-quest-goblin.html](iterazioni-quest-goblin.html)
+(servita da `http://127.0.0.1:8734/iterazioni-quest-goblin.html` quando il
+server della gallery è attivo)
