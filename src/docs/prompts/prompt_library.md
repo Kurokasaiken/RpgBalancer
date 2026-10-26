@@ -240,3 +240,24 @@ Drago — A majestic ancient dragon perched atop an overgrown marble ruin deep i
 
 - **Image:** [Drago Concept](../../src/assets/mood/drago.png)
 - **Note:** Folder: src/assets/mood
+
+---
+
+## Marcia Crinale – Wide Plate Parallasse Prompt
+
+- **Intent:** Piastra larga (~3.5:1) per parallasse orizzontale del Theater — marcia di caravan su strada di crinale, focale laterale, terreno continuabile ai bordi.
+- **Art Stack:** Jaime Jones impasto, Rude Beauty (veronese+azure+ultramarine, accento rosso papaveri causale), luce Solar Triumph da destra.
+
+### Prompt (copia/incolla – Marcia Crinale)
+
+```text
+Ultra-wide painted plate (~3.5:1) for horizontal parallax: an alpine ridge road running along the mountainside, entering one edge and exiting the other at compatible heights. Small merchant caravan mid-march (lateral focal ~40%), leaning waystone at a road bend, cold stream lower-left with TWO RED DEER drinking. Mid-slope wide band of RED ALPINE POPPIES (causal color field vs azure/veronese/ultramarine). Foreground grass woven with VIOLET asters + YELLOW buttercups, amber lichen on pale rocks — the fast layer, max detail. Terrain continues past BOTH edges, repeating-but-varied peaks/spruces. Solar Triumph sun SLAMS from right, lit gold / teal shadows, crisp alpine air. Thick violent palette-knife impasto (Jaime Jones), no flat colors. No signatures, no rounded corners, no black murk, no brown, no night.
+```
+
+### Output Reference – Marcia Crinale
+
+- **Image:** [Marcia Crinale (i3 Director-approved)](../../src/assets/mood/marcia-crinale.png)
+- **Image:** [Layer FAR — cielo+crete](../../src/assets/mood/layer-far.png)
+- **Image:** [Layer MID — colline+papaveri+strada](../../src/assets/mood/layer-mid.png)
+- **Image:** [Layer NEAR — erba+fiori+cervi](../../src/assets/mood/layer-near.png)
+- **Note:** Folder: src/assets/mood · prompt canonico `context/research/2026-10-25-mood-keys/prompts-v4/rude-beauty-marcia-crinale_FINAL.txt` · manifest `marcia-crinale[-loop]` · lab `/theater-lab?scene=marcia-crinale`
