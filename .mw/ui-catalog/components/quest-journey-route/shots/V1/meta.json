@@ -1,0 +1,40 @@
+{
+  "componentId": "quest-journey-route",
+  "sourceSha": "c6600bc198d5c2ea1fbe40beaafabf94ca583c31",
+  "sourceHash": "3fe21b1812dd51ba",
+  "baseURL": "http://127.0.0.1:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-26T19:47:42.657Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "default-ctx-a.png",
+          "default-ctx-b.png"
+        ],
+        "isolated": [
+          "default-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface",
+        "id": "S7_QuestJourneyOutbound"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"quest-journey-route\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

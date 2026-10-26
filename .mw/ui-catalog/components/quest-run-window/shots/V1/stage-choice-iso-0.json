@@ -1,0 +1,18 @@
+{
+  "file": "stage-choice-iso-0.png",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": "reduce",
+  "rendererClass": "metal",
+  "softwareRenderer": false,
+  "at": "2026-10-26T19:40:58.925Z",
+  "howStateReached": [
+    "launch:hook-assisted:demoLaunch",
+    "launch:hook-assisted:demoLaunch",
+    "launch:hook-assisted:demoLaunch"
+  ],
+  "limitation": "Un frame solo: non prova movimento né assenza di movimento (T-04)."
+}

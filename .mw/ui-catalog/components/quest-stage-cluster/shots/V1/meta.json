@@ -1,0 +1,29 @@
+{
+  "componentId": "quest-stage-cluster",
+  "sourceSha": "c6600bc198d5c2ea1fbe40beaafabf94ca583c31",
+  "sourceHash": "a83279f005261b85",
+  "baseURL": "http://127.0.0.1:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-26T19:41:08.448Z",
+  "states": [
+    {
+      "id": "armed",
+      "reached": false,
+      "asserted": false
+    },
+    {
+      "id": "verdict",
+      "reached": false,
+      "asserted": false
+    }
+  ],
+  "consoleErrors": [
+    "Error: Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at Vo (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:27648)\n    at Kr (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:27173)\n    at qi (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:59208)\n    at Th (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:58823)\n    at et (http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:296)\n    at http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:388\n    at Array.map (<anonymous>)\n    at http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:372\n    at et (http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:296)\n    at http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:388",
+    "Uncaught error: Error: Minified React error #185; visit https://react.dev/errors/185 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at Vo (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:27648)\n    at Kr (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:27173)\n    at qi (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:59208)\n    at Th (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:58823)\n    at et (http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:296)\n    at http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:388\n    at Array.map (<anonymous>)\n    at http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:372\n    at et (http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:296)\n    at http://127.0.0.1:5199/assets/index-CgxqEg0F.js:1:388 {componentStack: \n    at span (<anonymous>)\n    at http://127.0.0.1…127.0.0.1:5199/assets/index-CZ50IdxV.js:95:70440)}"
+  ],
+  "networkFailures": []
+}
