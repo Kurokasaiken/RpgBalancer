@@ -444,3 +444,9 @@ monoculture senza vita. Regole nuove, tutte misurabili o verificabili:
 Soglie check esteso (v2): green-scale vs ref ±10pt, cool >=8% outdoor,
 vibr >=4% E almeno 3 elementi-vita verificabili a vista, almeno 1 coppia
 complementare per zona, impasto-std >=20.
+
+## Enforcement meccanico (2026-10-26)
+
+Il check NON è opzionale: `python scripts/check-scene-art.py <img> [refs]`
+è uno step obbligatorio del flusso di generazione — i numeri vanno nel
+report al Director. Markdown solo = si dimentica (dimostrato in batch).
