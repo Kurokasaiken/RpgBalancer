@@ -66,3 +66,11 @@ Vedi `context/research/2026-10-25-mood-keys/prompt-protocol-v5.md` A16:
 contrasto complementare per OGNI zona, cielo >=3 famiglie con variazione
 interna, accenti descritti come pietre preziose, armonia sfumature
 (analoghe coerenti + complementare deliberato), impasto-std >=~20.
+
+## A17 (2026-10-26) — palette-profile vs ref + elementi-vita + identità
+
+Vedi `context/research/2026-10-25-mood-keys/prompt-protocol-v5.md` A17.
+Profilo warm/green/cool confrontato col ref battezzato, cool>=8% outdoor,
+vita obbligatoria (fauna/funghi/fiori/acqua), ogni elemento motivato,
+masse in fuga scomposte in direzioni diverse, figure con identità,
+cielo variato+lampi motivati, edit>regen su battezzate, una chat a scena.
