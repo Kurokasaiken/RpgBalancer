@@ -258,3 +258,57 @@ Ultra-wide painted plate (~3.5:1) for horizontal parallax: an alpine ridge road 
 
 - **Image:** [Marcia Crinale (i3 Director-approved)](../../src/assets/mood/rude-beauty/marcia-crinale.png)
 - **Note:** Folder: src/assets/mood · prompt canonico `context/research/2026-10-25-mood-keys/prompts-v4/rude-beauty-marcia-crinale_FINAL.txt` · manifest `marcia-crinale[-loop]` · lab `/theater-lab?scene=marcia-crinale`
+
+---
+
+## Aqueduct Prismatic – Crystal Arches Final Prompt
+
+- **Intent:** Mood-canonica Prismatic — arcate-vetrata con mondo alieno nei pannelli, etere che scorre, falena corallina, luna con alone.
+- **Art Stack:** violent palette-knife impasto, bronze/indigo/iridescent su superfici consentite, niente giallo Solar.
+
+### Prompt (copia/incolla – Aqueduct)
+
+```text
+The attached v1 image is the CANONICAL BASE — same composition, slender arched structure, windowed panels into another world; majestic by PROPORTION not thickness. Continuous connected arches, slender tracery + glass. Terrain: saturated green, moss, cobalt-blue cornflower flowers. ETHER: thin luminous semi-transparent flow under arches. CREATURE: small winged moth-dragon off-center, coral-branched horns. LENS: passive glint only, no beam. SKY: indigo twilight + moon with prismatic halo, layered aurora wisps left, low violet band = ether-glow bleeding from horizon (motivated). AIR: soft prismatic blooms + short chromatic streaks, interleaved per field. STYLE: violent impasto, no black murk, no brown, no grey-white dominant, no gold/yellow sun wash. Ultra-wide 21:9.
+```
+
+### Output Reference – Aqueduct Prismatic
+
+- **Image:** [Aqueduct Prismatic](../../src/assets/mood/prismatic/aqueduct-prismatic.png)
+- **Note:** prompt canonico `context/research/2026-10-25-mood-keys/prompts-v4/prismatic-frontier-crystal-aqueduct_FINAL.txt`
+
+---
+
+## Assalto Goblin – Quest Scene Cascade Prompt
+
+- **Intent:** Scena quest battezzata — azione suggerita via silhouette+diagonale+luce, runtime owns fire.
+- **Art Stack:** impasto Rude Beauty, chioma multi-verde con intreccio fiamme/scintille (metro di contrasto intrecciato).
+
+### Prompt (copia/incolla – Assalto Goblin)
+
+```text
+Vedi spec canonico .mw/specs/quest-goblin-scenes/scenes/f*-*/prompt.md — chiave Rude Beauty descritta come subject primario: azione in diagonale, silhouette goblin vs fiamme, verdi multipli intrecciati con scintille nel canopy band.
+```
+
+### Output Reference – Assalto Goblin
+
+- **Image:** [Assalto Goblin](../../src/assets/mood/rude-beauty/assalto-goblin.jpg)
+- **Note:** spec `.mw/specs/quest-goblin-scenes/` · scene-library `assalto-goblin.jpg`
+
+---
+
+## Viaggio Andata – Journey Leg Prompt
+
+- **Intent:** Leg di viaggio outbound — cancello dell'alba, strada che si apre nella wilderness; scena PROMOSSA.
+- **Art Stack:** Rude Beauty pieno registro (sun-slams, azure, veronese, teal).
+
+### Prompt (copia/incolla – Viaggio Andata)
+
+```text
+Vedi spec canonico .mw/specs/quest-journey-legs/scenes/andata/prompt.md — threshold gate all'alba, la strada si dipana nella wilderness, lanterna-ember sui pali, raggi mattutini, cloud drift sulle vette.
+```
+
+### Output Reference – Viaggio Andata
+
+- **Image:** [Viaggio Andata](../../src/assets/mood/rude-beauty/viaggio-andata.jpg)
+- **Note:** spec `.mw/specs/quest-journey-legs/` · manifest `viaggio-andata` (baked depth + ambient authored)
