@@ -67,8 +67,8 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-combattimento': { src: '/assets/scene-library/assalto-goblin.jpg', fit: 'cover' },
   'gob-incalzare': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
   'gob-incalza-check': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
-  'gob-esplora-extra': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
-  'gob-cerca': { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
+  'gob-esplora-extra': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
+  'gob-cerca': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
   'gob-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
   'gob-agguato': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
   'gob-agguato-scelta': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
@@ -120,6 +120,8 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
   'bottino-v2': { src: '/assets/scene-library/bottino-v2.png', fit: 'cover' },
   incalzare: { src: '/assets/scene-library/incalzare.jpg', fit: 'cover' },
   'incalzare-v2': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
+  saccheggio: { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
+  'spoglie-v2': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
   /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
    *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —
    *  left/right edges now continue into each other (the crag splits
