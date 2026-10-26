@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Prompt pre-flight gate (A15-A17): run on every scene prompt BEFORE submit.
+
+Usage: python scripts/check-scene-prompt.py <prompt.txt>
+Fails (exit 1) with named violations when the prompt misses required
+elements so the failure is mechanical, not remembered.
+
+Checks:
+- GEMS: accents must use gemstone/precious vocabulary (A16)
+- LIFE: at least 2 life elements (fauna/fungi/flowers/water) (A17)
+- EFFECT ZONES: ambient FX declared + painted (manifest parity)
+- ZONES: parallax staging (fg/mid/far) described
+- FORBIDDEN: no banned scene elements (skulls, people where banned…)
+- REGISTER: impasto + palette direction present
+- CANOPIES: forest scenes require varied canopies (A18)
+"""
+import re, sys, pathlib
+
+GEMS = r'\b(ruby|rub(y|ies)|emerald|sapphire|amethyst|topaz|amber|citrine|jade|turquoise|lapis|garnet|onyx|opal|pearl|crimson|vermilion|ultramarine|veronese)\b'
+LIFE = r'\b(bird|jay|lizard|beetle|insect|butterfly|moth|deer|hare|rabbit|fox|squirrel|crow|fly|bees?|mushroom|amanita|fungus|fungi|flowers?|blossom|petals?|water|pool|puddle|stream|creek|moss|fern|berries|leaves)\b'
+FX = r'\b(motes|dust|embers|smoke|glow|glint|mist|fog|drift|shaft|leaves|rain|light shaft|reflection)\b'
+ZONES = r'\b(foreground|foreground occluder|occluder|mid-?frame|midground|background|far|distance|depth|parallax|treeline|ridge|horizon)\b'
+BANNED = r'\b(skulls?|skeletons?|corpses?\b|dead bodies|gore|signature|watermark|lens flare|photoreal|anime|cartoon)\b'
+STYLE = r'\b(impasto|brushstroke|brushwork|palette knife|Jaime Jones|Rude Beauty|thick (paint|strokes))\b'
+CANOPY = r'\b(pale birch|turquoise|different canop|varied canop|lighter foliage|maple|crimson)\b'
+
+def check(txt):
+    t = txt.lower()
+    out = []
+    def need(pat, name, ok):
+        hits = len(re.findall(pat, t))
+        out.append((name, hits, ok(hits)))
+    need(GEMS, 'gems', lambda h: h >= 2)
+    need(LIFE, 'life', lambda h: h >= 2)
+    need(FX, 'fx', lambda h: h >= 1)
+    need(ZONES, 'zones', lambda h: h >= 2)
+    need(STYLE, 'style', lambda h: h >= 1)
+    need(r'\bforest|fern|tree|trunk|canopy|wood\b', 'forest?', lambda h: h >= 1)
+    return out, len(re.findall(BANNED, t)), re.search(r'forest|fern|trunk|canopy|wood', t)
+
+p = pathlib.Path(sys.argv[1]); txt = p.read_text()
+rows, banned, is_forest = check(txt)
+ok = True
+for name, hits, good in rows:
+    mark = 'OK ' if good else 'FAIL'
+    if not good: ok = False
+    print(f'{mark} {name}: {hits}')
+if banned:
+    ok = False
+    print(f'FAIL banned terms present: {banned}')
+if is_forest:
+    c = len(re.findall(CANOPY, txt.lower()))
+    if c < 1:
+        ok = False
+        print('FAIL canopies: forest scene without varied-canopy trees (A18)')
+    else:
+        print(f'OK  canopies: {c}')
+
+
+# --- strict pass: life-elements must carry a color/gem adjective within 4 words ---
+LIFE_ELS = r'(amanita|mushroom|fungus|flower|blossom|bird|jay|lizard|beetle|butterfly|moth|deer|hare|crow|berries|leaves|leaf|fern|moss|pool|puddle|water|stream)'
+COLOR = r'(ruby|rub(y|ies)|emerald|sapphire|amethyst|topaz|amber|citrine|jade|turquoise|lapis|garnet|onyx|opal|pearl|crimson|vermilion|ultramarine|veronese|scarlet|violet|indigo|azure|teal|golden|gold|silver|copper|bronze|coral|magenta|chartreuse|lime|moss-green|sky-blue|ice-blue|bone-white|white|black|dark|pale|red|orange|yellow|green|blue|purple|pink|brown|grey|gray)'
+t = txt.lower()
+bare = []
+for m in re.finditer(LIFE_ELS, t):
+    ctx = t[max(0, m.start()-60):m.start()]
+    if not re.search(COLOR + r'[^\n]{0,25}$', ctx):
+        bare.append(m.group(1))
+if bare:
+    print(f'WARN bare life-elements: {sorted(set(bare))}')
+    if len(set(bare)) >= 2:
+        ok = False
+        print('FAIL strict: life-elements need color adjectives (A16 gemma)')
+else:
+    print('OK  strict: every life-element carries a color adjective')
+print('PROMPT-GATE:', 'PASS' if ok else 'FAIL')
+sys.exit(0 if ok else 1)
