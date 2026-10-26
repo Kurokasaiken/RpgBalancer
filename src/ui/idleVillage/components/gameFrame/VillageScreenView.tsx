@@ -19,7 +19,7 @@ import {
   type VillageBuildingCatalogId,
   type VillageBuildingDefinition,
 } from '@/balancing/config/idleVillage/villageBuildingsConfig';
-import villageArt from '@/assets/mood/villaggio.png';
+import villageArt from '@/assets/mood/rude-beauty/villaggio.png';
 
 /**
  * `VillageScreenView` — the full-area village/buildings screen on `/game`
