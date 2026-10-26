@@ -390,6 +390,29 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 8 },
     ],
   },
+  'spoglie-v2': {
+    /* f6 war spoils (2026-10-26): the same camp minutes later — torn
+     *  tents, dying embers, searchable points spread across the
+     *  clearing (bodies, unopened tents, scattered metal). */
+    depth: '/assets/depth/spoglie-v2.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-settle-cover',
+    pose: 'pose-watch',
+    focusAnchor: [0.5, 0.6],
+    atmosphere: [],
+    ambient: [
+      /* Dying embers + thin smoke + ash motes in the half-light. */
+      { type: 'glow', at: [0.25, 0.62], r: 0.07, color: '#ff9838', a: 0.4, flicker: 0.45 },
+      { type: 'glow', at: [0.62, 0.6], r: 0.1, color: '#ff9838', a: 0.5, flicker: 0.5 },
+      { type: 'smoke', at: [0.25, 0.55], count: 3, lean: 0.1 },
+      { type: 'smoke', at: [0.62, 0.52], count: 4, lean: 0.12 },
+      { type: 'embers', at: [0.62, 0.58], count: 5 },
+      { type: 'glint', at: [0.76, 0.68], period: 11, r: 0.005 },
+      { type: 'dust', count: 8 },
+    ],
+  },
   'incalzare-v2': {
     /* f5 pursuit (2026-10-26): chaotic flee through dense forest — backs
      *  swallowed by the green, no rocks/gorge (Director ruling). */
