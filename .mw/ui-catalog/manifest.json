@@ -3,7 +3,7 @@
   "entries": [
     {
       "id": "hud-top-tabs",
-      "title": "Top HUD tab cluster (tempo \u00b7 prossimo evento \u00b7 risorse)",
+      "title": "Top HUD tab cluster (tempo · prossimo evento · risorse)",
       "category": "hud_cluster",
       "status": "in_review",
       "currentVersion": 1,
@@ -80,7 +80,7 @@
             "shots/V1/resource-low-ctx-a.png",
             "shots/V1/hud-hidden-ctx-a.png"
           ],
-          "ruling": "round-1: approve B-modified+layout: selettore tacche+perla SENZA guida ottone; placca giorno invariata; TERZO TAB centrale obbligatorio (override renders-null); placche sx/dx stessa dimensione + pi\u00f9 distanza dai bordi. Reject A (halo cibo), C (appeso). Director 2026-10-24",
+          "ruling": "round-1: approve B-modified+layout: selettore tacche+perla SENZA guida ottone; placca giorno invariata; TERZO TAB centrale obbligatorio (override renders-null); placche sx/dx stessa dimensione + più distanza dai bordi. Reject A (halo cibo), C (appeso). Director 2026-10-24",
           "meta": {
             "componentId": "hud-top-tabs",
             "sourceSha": "d53c5bb289a396079be83d30ec807197b6d69999",
@@ -181,7 +181,7 @@
     },
     {
       "id": "nav-bar",
-      "title": "Bottom navigation bar (VILLAGE\u00b7MAP\u00b7recenter\u00b7WORKSHOP\u00b7TAVERN)",
+      "title": "Bottom navigation bar (VILLAGE·MAP·recenter·WORKSHOP·TAVERN)",
       "category": "hud_cluster",
       "status": "in_review",
       "currentVersion": 1,
@@ -246,7 +246,7 @@
             "shots/V1/village-active-ctx-a.png",
             "shots/V1/hud-hidden-ctx-a.png"
           ],
-          "ruling": null,
+          "ruling": "2026-10-26 Director: M1 (4 slot uguali, requisito sui bloccati, recenter fuori dalla barra nel dock in basso a destra). Mockup: mockups/v2-M1.png",
           "meta": {
             "componentId": "nav-bar",
             "sourceSha": "e061dab386227999c5ab91fd400de0fae8c33be0",
@@ -342,7 +342,7 @@
     },
     {
       "id": "hud-corner",
-      "title": "Bottom-right control cluster (menu\u00b7panels\u00b7hide toggle)",
+      "title": "Bottom-right control cluster (menu·panels·hide toggle)",
       "category": "hud_cluster",
       "status": "in_review",
       "currentVersion": 1,
@@ -421,7 +421,7 @@
             "shots/V1/panels-open-ctx-a.png",
             "shots/V1/hud-hidden-ctx-a.png"
           ],
-          "ruling": null,
+          "ruling": "2026-10-26 Director: M1 dock con recenter (4 comandi in una pillola, tasti rapidi sotto, badge pannelli); menu come M2 senza «Pannelli» (resta nel dock); HUD nascosta = solo icona occhio chiuso, NIENTE etichetta. Mockup: mockups/v2-M1.png, v2-M2.png, v2-M3.png (M3 da correggere: icona senza etichetta)",
           "meta": {
             "componentId": "hud-corner",
             "sourceSha": "e061dab386227999c5ab91fd400de0fae8c33be0",
@@ -1803,7 +1803,7 @@
         }
       ],
       "children": [],
-      "notes": "Dev/trailer instrument \u2014 enabled on /game via gameFrameConfig debug.directorPanel=true. Shortcut d; also in Panels menu."
+      "notes": "Dev/trailer instrument — enabled on /game via gameFrameConfig debug.directorPanel=true. Shortcut d; also in Panels menu."
     },
     {
       "id": "tuning-panel",
@@ -2137,7 +2137,7 @@
         }
       ],
       "children": [],
-      "notes": "BLOCKER witnessed 2026-10-24: expedition demoLaunch throws \"Cannot access X before initialization\" (TDZ circular import) and the ErrorBoundary catches it \u2014 on the frozen preview AND the dev server. Quest-run states unreachable this session; selectors taken from source."
+      "notes": "BLOCKER witnessed 2026-10-24: expedition demoLaunch throws \"Cannot access X before initialization\" (TDZ circular import) and the ErrorBoundary catches it — on the frozen preview AND the dev server. Quest-run states unreachable this session; selectors taken from source."
     },
     {
       "id": "quest-stage-cluster",
@@ -2413,7 +2413,7 @@
         }
       ],
       "children": [],
-      "notes": "Shown only via ?title=1, Tauri launch, or the post-quit session flag \u2014 a plain /game visit goes straight into the game. Driver navigates with ?title=1."
+      "notes": "Shown only via ?title=1, Tauri launch, or the post-quit session flag — a plain /game visit goes straight into the game. Driver navigates with ?title=1."
     },
     {
       "id": "game-boot-screen",
@@ -2494,7 +2494,7 @@
         }
       ],
       "children": [],
-      "notes": "Transient: phases manifest\u2192assets\u2192ready; gone by the time the map is interactable. Capture races the boot."
+      "notes": "Transient: phases manifest→assets→ready; gone by the time the map is interactable. Capture races the boot."
     },
     {
       "id": "settings-panel",
@@ -2617,7 +2617,7 @@
         }
       ],
       "children": [],
-      "notes": "Same dialog mounts from the title screen (S14 path needs ?title=1 on plain browser) and from the in-game HUD menu \u2192 Settings."
+      "notes": "Same dialog mounts from the title screen (S14 path needs ?title=1 on plain browser) and from the in-game HUD menu → Settings."
     },
     {
       "id": "load-game-panel",
@@ -2820,7 +2820,7 @@
         }
       ],
       "children": [],
-      "notes": "In-game HUD menu \u2192 Memorial."
+      "notes": "In-game HUD menu → Memorial."
     },
     {
       "id": "settlement-lost-overlay",
@@ -3319,7 +3319,7 @@
         }
       ],
       "children": [],
-      "notes": "Container is always mounted (fullscreen, aria-hidden when empty). Edge tabs appear only when a stage-managed panel is collapsed; wing rails when a zone is squeezed \u2264 wingRailPx. S6 (planner+roster wings) is the most reliable populated regime witnessed."
+      "notes": "Container is always mounted (fullscreen, aria-hidden when empty). Edge tabs appear only when a stage-managed panel is collapsed; wing rails when a zone is squeezed ≤ wingRailPx. S6 (planner+roster wings) is the most reliable populated regime witnessed."
     },
     {
       "id": "error-boundary",
