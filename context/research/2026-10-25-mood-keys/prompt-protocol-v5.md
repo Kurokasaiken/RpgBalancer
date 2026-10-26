@@ -450,3 +450,10 @@ complementare per zona, impasto-std >=20.
 Il check NON è opzionale: `python scripts/check-scene-art.py <img> [refs]`
 è uno step obbligatorio del flusso di generazione — i numeri vanno nel
 report al Director. Markdown solo = si dimentica (dimostrato in batch).
+
+## A18 — CHIOME DIVERSE (2026-10-26, ruling Director)
+
+Gli alberi non hanno mai tutti la stessa foglia: ogni scena bosco deve
+avere chiome SPARSE ma presenti di colore diverso — betulle pallide,
+chiome turchese, aceri cremisi/gialli. Pochi esemplari, sparsi, ma devono
+esistere. Una selva uniformemente verde = FAIL.
