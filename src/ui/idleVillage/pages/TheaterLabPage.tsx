@@ -15,6 +15,10 @@
  *   shake   trauma strength 0..1 injected at t=0 — with `t=<ms>` captures a
  *           deterministic mid-wobble frame;
  *   width   theater width in px (default: fills the left column).
+ *   traverse  wide-plate experiment (2026-10-26): replaces the shot with a
+ *           linear pan −r→+r in source-UV over `travms` (default 14s),
+ *           clock mapped on a triangle wave — a seamless ping-pong loop
+ *           for judging horizontal depth-parallax on wide plates.
  *
  * Every variant mounts the same DepthScene the real Theater mounts — what
  * the Director reviews here is what runs on /game.
@@ -110,6 +114,11 @@ export const TheaterLabPage: React.FC = () => {
   });
   const tParam = q0.get('t');
   const frozenT = tParam != null && tParam !== 'loop' ? Number(tParam) : null;
+  /* Wide-plate traverse experiment (Director 2026-10-26): `traverse=<r>`
+   *  overrides the shot with a −r→+r source-UV pan; `travms` sets the leg
+   *  duration. The clock maps a triangle wave so the loop has no cut. */
+  const travParam = Number(q0.get('traverse') ?? 0);
+  const travMs = Number(q0.get('travms') ?? 14000);
 
   const art = ART_BY_ID[sceneId];
   const entry = SCENE_CINEMATICS[sceneId];
@@ -119,8 +128,23 @@ export const TheaterLabPage: React.FC = () => {
       ? cam.idleDrift
       : cam.shots[CameraShotIdSchema.parse(shotId)];
   const shot: CameraShot = useMemo(
-    () => ({ ...baseShot, durMs: Math.round(baseShot.durMs * tempo) }),
-    [baseShot, tempo],
+    () =>
+      travParam > 0
+        ? {
+            zoomFrom: 1,
+            zoomTo: 1,
+            panFrom: [-travParam, 0],
+            panTo: [travParam, 0],
+            blurFrom: 0,
+            blurTo: 0,
+            blurSettleFrac: 1,
+            durMs: Math.round(travMs * tempo),
+            ease: 'sineInOut',
+            camVec: [0.7, 0],
+            ampMul: 1,
+          }
+        : { ...baseShot, durMs: Math.round(baseShot.durMs * tempo) },
+    [baseShot, tempo, travParam, travMs],
   );
 
   const cfg = useMemo(
@@ -138,12 +162,18 @@ export const TheaterLabPage: React.FC = () => {
   const shotEpoch = shotEpochFor(clockMode, frozenT, mountEpoch);
   /* DepthScene reads the clock through its live-ref (params never rebuild
    *  the app) — a plain per-render closure is safe and honest. */
-  const clock = () =>
-    frozenT != null
-      ? frozenT
-      : clockMode === 'loop' && shot.durMs > 0
-        ? documentClock() % shot.durMs
-        : documentClock();
+  const clock = () => {
+    if (frozenT != null) return frozenT;
+    if (travParam > 0 && shot.durMs > 0) {
+      /* Triangle wave over 2·durMs: pan out, pan back — a seamless
+       *  loop on a finite plate (no wrap content, no cut). */
+      const tt = documentClock() % (2 * shot.durMs);
+      return tt < shot.durMs ? tt : 2 * shot.durMs - tt;
+    }
+    return clockMode === 'loop' && shot.durMs > 0
+      ? documentClock() % shot.durMs
+      : documentClock();
+  };
 
   const src = art?.src;
   const depthSrc = entry?.depth ?? '/assets/depth/agguato-foresta.webp';

@@ -109,4 +109,9 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
    *  l'incalzare è `incalzare`. Restano asset validi per altri beat. */
   'carro-nascosto': { src: '/assets/scene-library/carro-nascosto.jpg', fit: 'cover' },
   'fuga-goblin': { src: '/assets/scene-library/fuga-goblin.jpg', fit: 'cover' },
+  /* PLAN-052 wide-plate experiment (2026-10-26): the alpine ridge march —
+   *  a 3.6:1 painted plate, lateral focal subject, terrain continuing past
+   *  both edges. Picked in /theater-lab with `traverse=<r>` it is the test
+   *  bed for true horizontal parallax (A13 protocol rules applied). */
+  'marcia-crinale': { src: '/assets/scene-library/marcia-crinale.jpg', fit: 'cover' },
 };
