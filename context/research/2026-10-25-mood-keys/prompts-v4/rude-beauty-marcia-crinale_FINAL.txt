@@ -15,3 +15,8 @@ AMBIENT ZONES (for runtime, painted to support): dust motes over the sunlit road
 STYLE: masterful cinematic oil painting in thick violent palette-knife impasto — gouged ridges, visible layers, nothing smooth (Jaime Jones, Jeff Easley). Every plane vibrates, no muted tones, no flat colors.
 HYGIENE: no signatures/text/watermark, no rounded corners, no vignette card — full-bleed edge-to-edge. NO black murk, NO brown drift, NO grey-white dominant fields, NO night, NO stars.
 NOT-LINE: not a sunset, not a monument, not a single focal postcard — the scene is a TRAVELED PLACE that continues past the frame.
+
+## Director retouch corrections (2026-10-26 — APPROVED final version)
+
+- FLOWERS: the violet asters and yellow buttercups must be VIVIDLY SATURATED — strong readable pigment, not pale/pastel washes. The foreground weave needs chroma that punches through.
+- SKY: needs internal interest — varied cloud forms and subtle color movement inside the azure, not a flat uniform band (wisps, gradient variation, lit/dark cloud edges).
