@@ -53,3 +53,9 @@ web, immagini) — lì la codifica avviene nella domanda, non nel prompt:
 6. **Bucket esterni > bucket propri**: quando esiste una classificazione
    authored (del Director, del manoscritto, del contratto), si parte da
    quella — mai ricostruire categorie da zero e darle per scontate.
+
+## A14 (2026-10-26) — numeric art check obbligatorio
+
+Vedi `context/research/2026-10-25-mood-keys/prompt-protocol-v5.md` sezione A14.
+Dopo ogni gen: HSV stats + hue families + cell-weave + banned-% — soglie
+di bocciatura numeriche, FAIL riportato coi numeri prima del Director check.
