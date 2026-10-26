@@ -39,10 +39,16 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElement
 </div>
 <div class="grid">
 <figure class="pilot"><video src="images/entr_sweep.mp4" controls muted autoplay style="width:100%;border-radius:6px"></video><figcaption>ENTRATA NORMALE — enter-sweep + postSettle breathing</figcaption></figure>
-<figure class="pilot"><video src="images/train_2layer.mp4" controls loop muted autoplay style="width:100%;border-radius:6px"></video><figcaption>TRAIN WINDOW 2-layer — near strip (grass+crags+deer) 5× più veloce del fondo, zero smear, loop infinito</figcaption></figure>
-<figure><video src="images/train_window.mp4" controls loop muted style="width:100%;border-radius:6px"></video><figcaption>single-image depth-warp wrap — il meccanismo funziona ma il near si scioglie dopo ~5s (rubber-sheet, archiviato)</figcaption></figure>
+<figure class="pilot"><video src="images/train_3layer.mp4" controls loop muted autoplay style="width:100%;border-radius:6px"></video><figcaption>TRAIN 3-LAYER — far/mid/near dipinti su magenta, chroma-key, 3 velocità, loop infinito rigido</figcaption></figure>
+<figure><video src="images/train_2layer.mp4" controls loop muted style="width:100%;border-radius:6px"></video><figcaption>2-layer da i3 derivata — bocciato (seam cielo + 2 soli piani)</figcaption></figure>
+<figure><video src="images/train_window.mp4" controls loop muted style="width:100%;border-radius:6px"></video><figcaption>single-image depth-warp — smear &gt;5s (archiviato)</figcaption></figure>
 </div>
-<p class="note">Verdetto: displacement single-image = traversa corta/respirazione OK, loop sostenuto NO (smear ai bordi di depth). Il loop vero = <b>2 layer rigidi</b>: fondo inpainted (Gemini ha continuato prato/strada dietro la fascia erbosa) + strip near alpha-cut tileabile — entrambi offset+heal per tile. Resta una seam lieve nel cielo del fondo (prossimo heal mirato). Lab: <code>/theater-lab?scene=marcia-crinale-loop&amp;train=3</code> (wrap shader mode). Plate: <code>marcia-crinale-loop.jpg</code> = i3 rolled+healed.</p>
+<div class="grid">
+<figure><img loading="lazy" src="images/layer_far_v1.png" onclick="lb(this.src,'FAR — cielo+crete Dolomiti, full-bleed, impasto')"><figcaption>layer FAR (vel ~0.15×)</figcaption></figure>
+<figure><img loading="lazy" src="images/layer_mid_v1.png" onclick="lb(this.src,'MID — colline+papaveri+strada+caravan+waystone su magenta')"><figcaption>layer MID (~0.5×) — magenta bg</figcaption></figure>
+<figure><img loading="lazy" src="images/layer_near_v1.png" onclick="lb(this.src,'NEAR — erba+fiori+rocce+cervi+crag su magenta')"><figcaption>layer NEAR (~1.3×) — magenta bg</figcaption></figure>
+</div>
+<p class="note">Pipeline vincente: <b>layer dipinti separatamente su magenta #ff00ff</b> → chroma-key (distanza hue + despill + erode) → rigid scroll a velocità ∝ 1/depth → loop infinito pulito. Consultazione AI (4/4 provider) in <code>consult-parallax-broadcast.md</code>: sway camminata sui layer near (non camera), dolly via amp-ramp, tilt asse parallasse, focus-pull+dim, micro-beat di regia. Lab: <code>/theater-lab?scene=marcia-crinale-loop&amp;train=3</code>.</p>
 <h2>Chiusura quasi-promosse — iterazioni v2 (novità)</h2>
 <div class="grid">
 <figure class="pilot"><img loading="lazy" src="images/gola-raider_A12.png" onclick="lb(this.src,'gola E5 — hue opposte intrecciate in ogni campo, tenue vibrante')"><figcaption>gola A12 — no white dots, varied cliffs+pino ✓</figcaption></figure>
