@@ -32,6 +32,8 @@ import { WorldSurfaceEventShroud } from '@/ui/idleVillage/components/WorldSurfac
 import { WorldSurfaceEventCard } from '@/ui/idleVillage/components/WorldSurfaceEventCard';
 import { questRunTimeLabel, timeBarModel } from '@/ui/idleVillage/questS1Lab/questTickCounter';
 import { SettlementLostOverlay } from '@/ui/idleVillage/components/SettlementLostOverlay';
+import { OxidizedGradeFilter } from '@/ui/idleVillage/components/OxidizedGradeFilter';
+import { useSettlementLostGrade, SETTLEMENT_LOST_WORLD_FILTER_ID } from '@/ui/idleVillage/hooks/useSettlementLostGrade';
 import { useQuestRun } from '@/ui/idleVillage/questS1Lab/useQuestRun';
 import { GOBLIN_SCENARIO } from '@/balancing/config/idleVillage/quests/scenarios/goblin';
 import { type QuestId, type QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
@@ -448,6 +450,9 @@ export default function GameFramePixiPage() {
   const settlementLostActive = useMinimalGameplayStore(
     (s) => s.gameOverState.isGameOver && s.gameOverState.reason === 'settlement_lost',
   );
+  /* Run-ending takeover: the world (map + village view, not the HUD) is regraded to
+   * the oxidised ramp over the iris sweep — same grade `/world-surface` already shows. */
+  const settlementLostGrade = useSettlementLostGrade();
   // E2E seam: the march state the marker is drawn from (dev/playwright builds read it; production builds carry it harmlessly).
   useEffect(() => {
     const hooks = ((window as unknown as { __idleVillageTestHooks?: Record<string, unknown> }).__idleVillageTestHooks ??= {});
@@ -1770,7 +1775,18 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
               </>
             }
             renderMap={({ recenterSignal, focusRequest }) => (
-              <div style={{ position: 'absolute', inset: 0, isolation: 'isolate' }}>
+              <div
+                data-testid="world-grade-layer"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  isolation: 'isolate',
+                  filter: settlementLostGrade > 0 ? `url(#${SETTLEMENT_LOST_WORLD_FILTER_ID})` : undefined,
+                }}
+              >
+                {settlementLostGrade > 0 && (
+                  <OxidizedGradeFilter progress={settlementLostGrade} filterId={SETTLEMENT_LOST_WORLD_FILTER_ID} />
+                )}
                 {/* CTR-game-001/REG-001: the map NEVER unmounts in village view —
                  *  the WebGL context, ticker and camera stay alive under an
                  *  opaque-hidden layer that is also inert and aria-hidden so
