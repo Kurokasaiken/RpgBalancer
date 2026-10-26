@@ -396,8 +396,8 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
      *  near split, chimney smoke, mist on the descending path. */
     depth: '/assets/depth/ritorno-v2.webp',
     depthWidth: 512,
-    depthHeight: 217,
-    imgAspect: 1024 / 434,
+    depthHeight: 213,
+    imgAspect: 1024 / 426,
     entrance: 'enter-sweep',
     pose: 'pose-rest',
     focusAnchor: [0.62, 0.62],
