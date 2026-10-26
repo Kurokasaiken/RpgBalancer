@@ -1,5 +1,7 @@
 # INTERACTION_TOKENS.md - Mapping Fisica-Narrativa-UI
 
+> **Nota 2026-10-26 (R-282):** la «placca CTA» è vietata (BTN-1 = A: lastra di famiglia), il movimento nell'HUD è sobrio (`motion-1`: niente overshoot/bounce), niente marrone nei controlli e niente viola nella UI. I valori «sun-bronze» e «CTA» qui sotto sono storici: vanno riletti contro `.mw/ui-catalog/ART-DIRECTION.md` prima di essere usati in nuovi componenti.
+
 ## Overview
 Questo documento definisce il mapping completo tra contesti narrativi, preset fisici del Physics Lab, colori di feedback UI e cue audio. È la fonte di verità per tutte le implementazioni di interazioni nel progetto RPG Balancer.
 
