@@ -53,7 +53,7 @@
   duro 1/3; la mappa è l'eroe [guida §1.5].
 
 **Colore**
-- **Mai viola** né derivati (violetto, magenta), **in nessun ruolo e in nessun livello: UI, icone, testo, pulsanti, stati, arte di scena e prompt di generazione** [Director 2026-10-20 e 2026-10-26]. Morte =
+- **Mai viola** né derivati (violetto, magenta) **nella UI**: pannelli, componenti, pulsanti, testo, icone, stati, morte compresa. **L'arte (scene, personaggi, mood-board, prompt di generazione) può usarlo liberamente** [Director 2026-10-20 e 2026-10-26]. Morte =
   ferro freddo `#93a4ad` [Director 2026-10-20; COL-D = B, PLAN-068].
 
 **Controlli**
@@ -144,7 +144,7 @@ Preferenze (dalle critiche libere R-282, convergenti 3/3 su più componenti):
 | targets-1 | 2026-10-26 | D-5: 26 px desktop, ≥44 px in mobile-fit (lettura attuale approvata). |
 | ranking-1 | 2026-10-26 | D-7: l'AI controlla le regole, il Director decide il gusto a vista. |
 | prompt-2 | 2026-10-26 | D-8: prompt di critica verbatim, nessun dossier. |
-| purple-2 | 2026-10-26 | D-9: viola bandito ovunque, arte di scena compresa. Supera la lettura «solo UI». |
+| purple-3 | 2026-10-26 | D-9: viola vietato nella UI (pannelli, componenti, pulsanti, testo, icone, stati); libero nell'arte. Sostituisce la lettura errata «ovunque» (purple-2, annullata). |
 | mappa-ferma | 2026-10-14 | La mappa non si muove mai per un pannello. |
 
 ## Livello 3 — Giudizi contestuali (richiedono il Director)
@@ -251,4 +251,4 @@ opzione è marcata come raccomandata.
   ruling con immagini), prima in A/B su 2 componenti; (C) nuovo prompt
   scritto dal Director.
 
-- **D-9 — RISOLTA 2026-10-26: viola bandito ovunque.** Director: «nella UI niente viola, una scritta viola è brutta, o un'icona, o un pulsante; non intendevo mai viola da nessuna parte, a livello artistico». Il divieto del viola vale quindi **anche per l'arte di scena e i prompt di generazione** (kill list: no purple, no violet, no magenta). Conseguenza: i riferimenti del mood-board con viola/magenta forti (armatura antagonista, armatura imperiale, chiave Prismatic) non vanno usati come riferimento di palette senza rettifica. Registro `purple-2`.
+- **D-9 — RISOLTA 2026-10-26: viola vietato nella UI, libero nell'arte.** Director: «non ho detto ovunque, solo per pannelli, componenti, pulsanti, ecc. Per arte e cose del genere va benissimo» (rettifica della mia lettura precedente «ovunque»). I riferimenti viola/magenta del mood-board e la chiave Prismatic restano validi. Registro `purple-3`.
