@@ -145,8 +145,8 @@ describe('atmosphere authoring — conservative scene ownership', () => {
 
 describe('cinematicEntryForSrc', () => {
   it('returns the entry for a manifest scene src', () => {
-    const art = Object.values(NODE_ART).find((a) => artIdFromSrc(a.src) === 'agguato-foresta')!;
-    expect(cinematicEntryForSrc(art.src)).toEqual(SCENE_CINEMATICS['agguato-foresta']);
+    const art = Object.values(NODE_ART).find((a) => artIdFromSrc(a.src) === 'agguato-v2')!;
+    expect(cinematicEntryForSrc(art.src)).toEqual(SCENE_CINEMATICS['agguato-v2']);
   });
   it('returns null for scenes without depth (DOM path)', () => {
     const noDepth = Object.values(NODE_ART).find((a) => !SCENE_CINEMATICS[artIdFromSrc(a.src)]);

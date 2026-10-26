@@ -70,9 +70,9 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-esplora-extra': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
   'gob-cerca': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
   'gob-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
-  'gob-agguato': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
-  'gob-agguato-scelta': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
-  'gob-ultimo-scontro': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
+  'gob-agguato': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
+  'gob-agguato-scelta': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
+  'gob-ultimo-scontro': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
   'gob-fine': { src: ART.village, fit: 'contain' },
 };
 
@@ -122,6 +122,8 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
   'incalzare-v2': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
   saccheggio: { src: '/assets/scene-library/saccheggio.jpg', fit: 'cover' },
   'spoglie-v2': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
+  'agguato-foresta': { src: '/assets/scene-library/agguato-foresta.jpg', fit: 'cover' },
+  'agguato-v2': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
   /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
    *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —
    *  left/right edges now continue into each other (the crag splits
