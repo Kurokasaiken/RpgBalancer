@@ -10,7 +10,7 @@ Stato = `status` del manifest. «Serve» = cosa manca davvero. Basato sui ruling
 |---|---|---|---|
 | `title-screen` | documented | Key art di sfondo (dalle capsule); lastra di famiglia sui 3 bottoni | asset |
 | `game-boot-screen` | documented | Solo allineamento a rubrica | — |
-| `hud-top-tabs` | in_review | Ruling HUD = A (pulita); resta terzo tab centrale (hud-tabs-4) e regolo velocità (hud-tabs-3) | codice |
+| `hud-top-tabs` | in_review | **Ruling C (2026-10-26)**: cartiglio centrale con ali; da implementare (regolo, chip a larghezza fissa, evento sempre presente) | codice |
 | `nav-bar` | in_review | **Ruling M1 (2026-10-26)**: da implementare (slot uguali, requisiti, recenter nel dock) | codice |
 | `hud-corner` | in_review | **Ruling (2026-10-26)**: dock con recenter, menu senza «Pannelli», HUD nascosta = occhio chiuso senza etichetta | codice |
 | `pixi-world-map` | documented | Pochi problemi emersi; overlay mappa = «debug draw» (da verificare) | verifica |

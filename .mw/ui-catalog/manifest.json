@@ -80,7 +80,7 @@
             "shots/V1/resource-low-ctx-a.png",
             "shots/V1/hud-hidden-ctx-a.png"
           ],
-          "ruling": "round-1: approve B-modified+layout: selettore tacche+perla SENZA guida ottone; placca giorno invariata; TERZO TAB centrale obbligatorio (override renders-null); placche sx/dx stessa dimensione + più distanza dai bordi. Reject A (halo cibo), C (appeso). Director 2026-10-24",
+          "ruling": "2026-10-26 Director: composizione C — cartiglio centrale più profondo (evento, sempre presente, stato vuoto) con due ali di pari misura che lo toccano; ala sinistra = giorno (emblema invariato) + regolo a tacche con perla senza binario; ala destra = chip risorse a larghezza minima fissa. HUD pulita (A). Mockup: mockups/v2-C.png. Da misurare: il cartiglio non deve coprire terra.",
           "meta": {
             "componentId": "hud-top-tabs",
             "sourceSha": "d53c5bb289a396079be83d30ec807197b6d69999",
