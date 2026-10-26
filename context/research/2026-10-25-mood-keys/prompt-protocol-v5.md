@@ -457,3 +457,11 @@ Gli alberi non hanno mai tutti la stessa foglia: ogni scena bosco deve
 avere chiome SPARSE ma presenti di colore diverso — betulle pallide,
 chiome turchese, aceri cremisi/gialli. Pochi esemplari, sparsi, ma devono
 esistere. Una selva uniformemente verde = FAIL.
+
+## Enforcement input-side (2026-10-26)
+
+`python scripts/check-scene-prompt.py <prompt.txt>` — gate PRE-submit:
+gemme presenti, elementi-vita con aggettivo colore/gemma attaccato (strict),
+zone parallasse, FX dichiarati, stile, chiome varie per boschi, termini
+vietati. Un prompt che falla non si sottomette. (La falla trovata: parole
+gemma globali presenti MA accenti critici descritti generici.)
