@@ -1,0 +1,40 @@
+{
+  "componentId": "quest-chronicle",
+  "sourceSha": "d4a276e29490f12dca303905cb34998d4d3cfe83",
+  "sourceHash": "48b35c5a325b4ef6",
+  "baseURL": "http://127.0.0.1:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-26T20:54:38.243Z",
+  "states": [
+    {
+      "id": "open",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "open-ctx-a.png",
+          "open-ctx-b.png"
+        ],
+        "isolated": [
+          "open-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "script",
+        "ref": "scripts/catalog/drivers/questChronicle.ts"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"quest-log-panel\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

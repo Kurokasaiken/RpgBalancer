@@ -1,0 +1,126 @@
+{
+  "base": "http://127.0.0.1:5199",
+  "frames": [
+    {
+      "n": 1,
+      "id": "planner",
+      "title": "Planner — Dispatch Table (empty slots)",
+      "file": "01-planner.png",
+      "note": "hook-assisted: revealQuestPois + openDetail"
+    },
+    {
+      "n": 2,
+      "id": "planner-filled",
+      "title": "Planner — party assigned",
+      "file": "02-planner-filled.png",
+      "note": "hook-assisted: fillRequiredResidentSlots"
+    },
+    {
+      "n": 3,
+      "id": "outbound",
+      "title": "Run window — outbound leg",
+      "file": "03-outbound.png",
+      "note": "hook-assisted: demoLaunch"
+    },
+    {
+      "n": 4,
+      "id": "outbound-route",
+      "title": "Map route during the outbound leg",
+      "file": "04-outbound-route.png",
+      "note": "same moment, for the on-map route"
+    },
+    {
+      "n": 5,
+      "id": "party",
+      "title": "Party in the field (companion plaque)",
+      "file": "05-party.png",
+      "note": ""
+    },
+    {
+      "n": 6,
+      "id": "belt",
+      "title": "Bag / belt (companion plaque)",
+      "file": "06-belt.png",
+      "note": ""
+    },
+    {
+      "n": 7,
+      "id": "chronicle",
+      "title": "Chronicle (companion plaque)",
+      "file": "07-chronicle.png",
+      "note": ""
+    },
+    {
+      "n": 8,
+      "id": "beat",
+      "title": "Narrative beat",
+      "file": "08-beat.png",
+      "note": ""
+    },
+    {
+      "n": 9,
+      "id": "amanuense",
+      "title": "Extended phase description",
+      "file": null,
+      "note": "the goblin quest has no node with a long-form page (longForm lives on the S1-lab scenario and quest blueprints, not on the demoLaunch quest)"
+    },
+    {
+      "n": 10,
+      "id": "choice",
+      "title": "Choice — approaches with odds",
+      "file": "10-choice.png",
+      "note": ""
+    },
+    {
+      "n": 11,
+      "id": "check-armed",
+      "title": "Skill check — armed (before the throw)",
+      "file": "11-check-armed.png",
+      "note": ""
+    },
+    {
+      "n": 12,
+      "id": "check-rolling",
+      "title": "Skill check — rolling",
+      "file": "12-check-rolling.png",
+      "note": "captured ~0.9s after the throw"
+    },
+    {
+      "n": 13,
+      "id": "check-verdict",
+      "title": "Skill check — verdict",
+      "file": "13-check-verdict.png",
+      "note": ""
+    },
+    {
+      "n": 14,
+      "id": "outcome-toast",
+      "title": "Outcome toast",
+      "file": null,
+      "note": "toast not shown after dismissing the verdict (the column may consume it by design)"
+    },
+    {
+      "n": 15,
+      "id": "epilogue",
+      "title": "Final report — epilogue inside the window",
+      "file": "15-epilogue.png",
+      "note": ""
+    },
+    {
+      "n": 16,
+      "id": "reward-popup",
+      "title": "Final report — expedition report popup",
+      "file": "16-reward-popup.png",
+      "note": ""
+    },
+    {
+      "n": 17,
+      "id": "returned-crew",
+      "title": "Who came back",
+      "file": "17-returned-crew.png",
+      "note": ""
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": []
+}

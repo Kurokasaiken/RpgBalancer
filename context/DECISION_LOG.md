@@ -1653,3 +1653,15 @@ causale con dosaggio verificato, fauna come scala+storia+ancora runtime.
 cervi al torrente, fiori multihue nel fg) hanno dimostrato il gap.
 **Fonte:** `.mw/runs/20261026-learn-parallax-plate/pattern-candidate.md`,
 protocollo v5 A13.
+
+## 2026-10-26 — commission-vs-specification confermato per ablazione
+
+**Da:** pattern-prompt-sovereignty come ipotesi (run 2026-10-24) — il prompt
+Director verbatim è la spec.
+**A:** confermato empiricamente: blind rank Director su ablazione A0-A4 —
+commission→rubrica-t2 batte engineered, free, e commission+rubrica-t1.
+La rubrica conta per POSIZIONE (turn-2), la search persa era il difetto
+dominante singolo.
+**Motivo:** ablazione 5 arm × {claude, deepseek} × 3 + blind scoring.
+**Fonte:** `.mw/runs/pattern-commission-vs-specification.md`,
+`mind-weaver/.mw/runs/20261024-ablation-a0a4x/`, `20261026-hats-gate/`.

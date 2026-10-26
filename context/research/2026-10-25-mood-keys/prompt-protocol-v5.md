@@ -465,3 +465,12 @@ gemme presenti, elementi-vita con aggettivo colore/gemma attaccato (strict),
 zone parallasse, FX dichiarati, stile, chiome varie per boschi, termini
 vietati. Un prompt che falla non si sottomette. (La falla trovata: parole
 gemma globali presenti MA accenti critici descritti generici.)
+
+## A19 — GEMME SPARSE (2026-10-26, ruling Director)
+
+Gemma = elemento piccolo e nominato (amanita, uccello, fiori, glint
+d'acqua, lettiera). I campi larghi (felci, fogliame, tronchi, terra)
+restano MATERICI e quieti (veronese/teal con variazione interna) — MAI
+tutti vibranti. Se >~15% dell'immagine è sat>0.6+val>0.45 il piatto è
+"carnival": fallito. Regola: campi calmi prima, gemme dopo, niente
+simmetria decorativa, pochi esemplari per cluster.

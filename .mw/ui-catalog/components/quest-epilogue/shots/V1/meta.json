@@ -1,0 +1,24 @@
+{
+  "componentId": "quest-epilogue",
+  "sourceSha": "d4a276e29490f12dca303905cb34998d4d3cfe83",
+  "sourceHash": "8d798ee6696dae1d",
+  "baseURL": "http://127.0.0.1:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-26T20:54:47.583Z",
+  "states": [
+    {
+      "id": "ended",
+      "reached": false,
+      "asserted": false
+    }
+  ],
+  "consoleErrors": [
+    "ReferenceError: SceneRevealLayer is not defined\n    at Xa (http://127.0.0.1:5199/assets/useVillageStashStore-DT7GHMWN.js:1:64548)\n    at bs (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:47994)\n    at ks (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:70756)\n    at Qh (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:81089)\n    at zd (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:116837)\n    at qy (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:115883)\n    at ru (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:115715)\n    at vd (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:112514)\n    at jd (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:124419)\n    at eo (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:122967)",
+    "Uncaught error: ReferenceError: SceneRevealLayer is not defined\n    at Xa (http://127.0.0.1:5199/assets/useVillageStashStore-DT7GHMWN.js:1:64548)\n    at bs (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:47994)\n    at ks (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:70756)\n    at Qh (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:81089)\n    at zd (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:116837)\n    at qy (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:115883)\n    at ru (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:115715)\n    at vd (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:112514)\n    at jd (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:124419)\n    at eo (http://127.0.0.1:5199/assets/index-CZ50IdxV.js:49:122967) {componentStack: \n    at Xa (http://127.0.0.1:5199/assets/useVillag…127.0.0.1:5199/assets/index-CZ50IdxV.js:95:70440)}"
+  ],
+  "networkFailures": []
+}
