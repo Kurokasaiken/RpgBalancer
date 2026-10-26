@@ -390,6 +390,30 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 8 },
     ],
   },
+  'accampamento-v2': {
+    /* f3 raider camp (2026-10-26): tents from hunted pelts with
+     *  trophies (antlers, skull totems, war-marks), ember cookfire,
+     *  goblin silhouettes — spied from the ferns. Director ruling:
+     *  raider-not-hobo, varied dyed hides not grey canvas. */
+    depth: '/assets/depth/accampamento-v2.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-settle-cover',
+    pose: 'pose-watch',
+    focusAnchor: [0.5, 0.55],
+    atmosphere: [],
+    ambient: [
+      /* Cookfire + embers pooling warm on the clearing. */
+      { type: 'glow', at: [0.5, 0.62], r: 0.1, color: '#ff9838', a: 0.5, flicker: 0.5 },
+      { type: 'smoke', at: [0.5, 0.56], count: 4, lean: 0.12 },
+      { type: 'embers', at: [0.5, 0.6], count: 5 },
+      /* Hanging pot glint + dusk mist at the clearing edge. */
+      { type: 'glint', at: [0.52, 0.5], period: 9, r: 0.005 },
+      { type: 'drift', band: [0.55, 0.72], count: 2, lean: 0.25 },
+      { type: 'dust', count: 8 },
+    ],
+  },
   'agguato-v2': {
     /* f7 ambush (2026-10-26): empty cold-dusk road through the treeline,
      *  pale waypost, right-edge occluder trunk = the corner the player
