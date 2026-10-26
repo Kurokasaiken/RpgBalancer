@@ -413,3 +413,34 @@ Il check qualitativo non si ferma a famiglie+contatori. Per OGNI immagine:
   non "quanti colori ci sono?"
 - **Impasto**: cell-std proxy >= ~20 per registro materico; sotto ~15 la
   superficie legge liscia/digitale.
+
+## A17 — PALETTE PROFILO vs REF + VITA (2026-10-26, lezione batch goblin)
+
+Le scene fallite non erano "palette sbagliate" nei conteggi — erano
+monoculture senza vita. Regole nuove, tutte misurabili o verificabili:
+
+- **Profilo 3-band vs ref**: misurare warm(0-60°) / green(60-190°) /
+  cool(190-360°) sui pixel sat>0.3 — confrontare col ref battezzato dello
+  stesso ambiente. Scene bosco: cool <8% = FAIL (manca cielo/acqua/apertura);
+  green >55% con warm+cool deboli = monocultura FAIL.
+- **Vibrante = gemma, non metrica**: il check "vibrant" non basta — ogni
+  scena DEVE avere elementi-vita nel prompt E nell'immagine: fauna piccola
+  (lucertole, uccelli, insetti, api, mammiferi), funghi colorati, fiori,
+  specchio d'acqua, piante non-verdi. Verde-ovunque = morta.
+- **Elementi con perché**: oggetto senza motivo narrativo = errore
+  (coperta sollevata da sola, nebbia arancione inspiegata). Ogni cosa
+  nella scena deve avere causa nella fiction.
+- **Movimento soggetto**: "fuga disordinata" = direzioni DIVERSE, non un
+  gruppo che corre in parallelo. Le azioni di massa vanno scomposte.
+- **Identità figure**: sagome anonime = FAIL. I goblin sono raider — hanno
+  colori/attributi che li mimetizzano nel verde MA con identità (marchi,
+  trofei, equipaggiamento).
+- **Cielo**: >=3 famiglie + variazione interna; lampo/evento atmosferico
+  ammesso quando motivato (agguato → lampo in lontananza).
+- **Edit vs regen**: migliorare l'originale battezzato quando esiste
+  (ritorno v1 era già golden-hour giusta — rigenerare ha perso qualità).
+- **Una conversazione per scena** — mai condividere chat tra soggetti.
+
+Soglie check esteso (v2): green-scale vs ref ±10pt, cool >=8% outdoor,
+vibr >=4% E almeno 3 elementi-vita verificabili a vista, almeno 1 coppia
+complementare per zona, impasto-std >=20.
