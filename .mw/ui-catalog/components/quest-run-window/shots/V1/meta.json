@@ -1,0 +1,69 @@
+{
+  "componentId": "quest-run-window",
+  "sourceSha": "c6600bc198d5c2ea1fbe40beaafabf94ca583c31",
+  "sourceHash": "ff2898d13b9bed82",
+  "baseURL": "http://127.0.0.1:5199",
+  "backend": "metal",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-10-26T19:38:48.634Z",
+  "states": [
+    {
+      "id": "default",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "default-ctx-a.png",
+          "default-ctx-b.png"
+        ],
+        "isolated": [
+          "default-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface",
+        "id": "S7_QuestJourneyOutbound"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"quest-window\"]",
+        "property": "visible",
+        "expected": "true"
+      }
+    },
+    {
+      "id": "narrative-beat",
+      "reached": false,
+      "asserted": false
+    },
+    {
+      "id": "stage-choice",
+      "reached": true,
+      "asserted": true,
+      "shots": {
+        "inContext": [
+          "stage-choice-ctx-a.png",
+          "stage-choice-ctx-b.png"
+        ],
+        "isolated": [
+          "stage-choice-iso-0.png"
+        ]
+      },
+      "deterministicSameBytes": false,
+      "driver": {
+        "kind": "surface",
+        "id": "S9_QuestStageChoice"
+      },
+      "assertion": {
+        "selector": "[data-testid=\"quest-window-choice\"]:not([disabled])",
+        "property": "visible",
+        "expected": "true"
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

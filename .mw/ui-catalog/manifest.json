@@ -2068,7 +2068,7 @@
       "id": "quest-run-window",
       "title": "Quest run window (theatre, beats, choices, belt, log, amanuense, epilogue)",
       "category": "overlay",
-      "status": "unassigned",
+      "status": "documenting",
       "currentVersion": 1,
       "states": [
         {
@@ -2119,7 +2119,7 @@
         "src/ui/idleVillage/components/gameFrame/QuestJourneyPhaseStrip.tsx",
         "src/ui/idleVillage/components/gameFrame/AmanuensePage.tsx"
       ],
-      "sourceHash": null,
+      "sourceHash": "ff2898d13b9bed82",
       "links": {
         "contract": [
           ".mw/contracts/components/quest-run-window.md"
@@ -2132,8 +2132,17 @@
       "versions": [
         {
           "v": 1,
-          "shots": [],
-          "ruling": null
+          "shots": [
+            "shots/V1/default-ctx-a.png",
+            "shots/V1/stage-choice-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "partial": true,
+            "failedStates": [
+              "narrative-beat"
+            ]
+          }
         }
       ],
       "children": [],
@@ -2143,7 +2152,7 @@
       "id": "quest-stage-cluster",
       "title": "Quest stage cluster: run window + skill-check column/wings",
       "category": "overlay",
-      "status": "unassigned",
+      "status": "documenting",
       "currentVersion": 1,
       "states": [
         {
@@ -2178,7 +2187,7 @@
         "src/ui/idleVillage/components/gameFrame/QuestVerdictCard.tsx",
         "src/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit.tsx"
       ],
-      "sourceHash": null,
+      "sourceHash": "a83279f005261b85",
       "links": {
         "contract": [
           ".mw/contracts/components/quest-stage-cluster.md",
@@ -2195,7 +2204,14 @@
         {
           "v": 1,
           "shots": [],
-          "ruling": null
+          "ruling": null,
+          "meta": {
+            "partial": true,
+            "failedStates": [
+              "armed",
+              "verdict"
+            ]
+          }
         }
       ],
       "children": [],
@@ -2205,7 +2221,7 @@
       "id": "quest-reward-popup",
       "title": "Quest reward popup / settlement report",
       "category": "overlay",
-      "status": "unassigned",
+      "status": "documenting",
       "currentVersion": 1,
       "states": [
         {
@@ -2224,7 +2240,7 @@
       "scopeFiles": [
         "src/ui/idleVillage/components/gameFrame/QuestRewardPopup.tsx"
       ],
-      "sourceHash": null,
+      "sourceHash": "54c342a804d16c58",
       "links": {
         "contract": [
           ".mw/contracts/components/quest-reward-popup.md"
@@ -2238,7 +2254,13 @@
         {
           "v": 1,
           "shots": [],
-          "ruling": null
+          "ruling": null,
+          "meta": {
+            "partial": true,
+            "failedStates": [
+              "default"
+            ]
+          }
         }
       ],
       "children": [],
@@ -2248,7 +2270,7 @@
       "id": "quest-journey-route",
       "title": "On-map expedition route with progress glint",
       "category": "overlay",
-      "status": "unassigned",
+      "status": "documented",
       "currentVersion": 1,
       "states": [
         {
@@ -2267,7 +2289,7 @@
       "scopeFiles": [
         "src/ui/idleVillage/components/gameFrame/QuestJourneyRoute.tsx"
       ],
-      "sourceHash": null,
+      "sourceHash": "3fe21b1812dd51ba",
       "links": {
         "contract": [
           ".mw/contracts/components/quest-journey-route.md"
@@ -2280,8 +2302,14 @@
       "versions": [
         {
           "v": 1,
-          "shots": [],
-          "ruling": null
+          "shots": [
+            "shots/V1/default-ctx-a.png"
+          ],
+          "ruling": null,
+          "meta": {
+            "partial": false,
+            "failedStates": []
+          }
         }
       ],
       "children": [],
@@ -2291,7 +2319,7 @@
       "id": "quest-outcome-toast",
       "title": "Post-check outcome toast",
       "category": "overlay",
-      "status": "unassigned",
+      "status": "documenting",
       "currentVersion": 1,
       "states": [
         {
@@ -2311,7 +2339,7 @@
         "src/ui/idleVillage/components/gameFrame/QuestOutcomeToast.tsx",
         "src/ui/idleVillage/components/gameFrame/questOverlays.tsx"
       ],
-      "sourceHash": null,
+      "sourceHash": "4150432d4c3516e2",
       "links": {
         "contract": [
           ".mw/contracts/components/quest-outcome-toast.md"
@@ -2325,7 +2353,13 @@
         {
           "v": 1,
           "shots": [],
-          "ruling": null
+          "ruling": null,
+          "meta": {
+            "partial": true,
+            "failedStates": [
+              "default"
+            ]
+          }
         }
       ],
       "children": [],
