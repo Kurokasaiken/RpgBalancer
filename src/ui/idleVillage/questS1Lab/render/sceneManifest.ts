@@ -390,6 +390,46 @@ export const SCENE_CINEMATICS: Record<string, SceneCinematicEntry> = SceneCinema
       { type: 'dust', count: 8 },
     ],
   },
+  'agguato-v2': {
+    /* f7 ambush (2026-10-26): empty cold-dusk road through the treeline,
+     *  pale waypost, right-edge occluder trunk = the corner the player
+     *  turns. Tension by composition, nothing shown. */
+    depth: '/assets/depth/agguato-v2.webp',
+    depthWidth: 512,
+    depthHeight: 217,
+    imgAspect: 1024 / 434,
+    entrance: 'enter-creep',
+    pose: 'pose-tense',
+    focusAnchor: [0.72, 0.5],
+    atmosphere: [],
+    ambient: [
+      { type: 'dust', count: 10 },
+      /* Cold mist drifting across the road. */
+      { type: 'drift', band: [0.55, 0.75], count: 3, speed: 0.007, a: 0.08, color: '#cfe4e8' },
+      /* Tells in the treeline — faint gleams where shapes could hide. */
+      { type: 'glint', at: [0.62, 0.45], period: 6, r: 0.005 },
+      { type: 'glint', at: [0.86, 0.42], period: 9, r: 0.005 },
+      /* The just-snapped leaves stirring. */
+      { type: 'leaves', band: [0.2, 0.6], xband: [0.5, 0.9], count: 4 },
+    ],
+    /* The ambush springs from behind the right occluder + treeline
+     *  gaps — click the treeline to spot them, or the trap reveals
+     *  itself on timeout. Same-composition revealed variant swaps in. */
+    reveal: {
+      region: [0.5, 0.3, 0.48, 0.45],
+      trigger: 'click',
+      afterSeconds: 8,
+      burst: [
+        { type: 'glint', at: [0.62, 0.45], period: 3, r: 0.009 },
+        { type: 'glint', at: [0.86, 0.42], period: 3, r: 0.008 },
+        { type: 'leaves', band: [0.2, 0.6], xband: [0.5, 0.95], count: 9 },
+        { type: 'dust', count: 8 },
+      ],
+      flag: 'revealedAmbush',
+      revealSrc: '/assets/scene-library/agguato-v2-revealed.png',
+      revealFx: 'sprites',
+    },
+  },
   'spoglie-v2': {
     /* f6 war spoils (2026-10-26): the same camp minutes later — torn
      *  tents, dying embers, searchable points spread across the
