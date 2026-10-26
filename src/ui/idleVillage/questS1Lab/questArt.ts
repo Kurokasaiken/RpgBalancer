@@ -69,7 +69,7 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'gob-incalza-check': { src: '/assets/scene-library/incalzare-v2.png', fit: 'cover' },
   'gob-esplora-extra': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
   'gob-cerca': { src: '/assets/scene-library/spoglie-v2.png', fit: 'cover' },
-  'gob-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
+  'gob-ritorno': { src: '/assets/scene-library/ritorno-v2.png', fit: 'cover' },
   'gob-agguato': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
   'gob-agguato-scelta': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
   'gob-ultimo-scontro': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
@@ -126,6 +126,8 @@ export const LIBRARY_ART: Record<string, { src: string; fit: 'cover' }> = {
   'agguato-v2': { src: '/assets/scene-library/agguato-v2.png', fit: 'cover' },
   'accampamento-raider': { src: '/assets/scene-library/accampamento-raider.jpg', fit: 'cover' },
   'accampamento-v2': { src: '/assets/scene-library/accampamento-v2.png', fit: 'cover' },
+  'ritorno-v2': { src: '/assets/scene-library/ritorno-v2.png', fit: 'cover' },
+  'viaggio-ritorno': { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
   /* Horizontally TILEABLE variant of the same plate (2026-10-26): the
    *  i3 image rolled 50%, the center seam healed in Gemini, rolled back —
    *  left/right edges now continue into each other (the crag splits
