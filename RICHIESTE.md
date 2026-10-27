@@ -5102,3 +5102,18 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Fonte/evidence:** `context/ingestions/2026-10-25-steam-capsule-critique.md` (ledger E-01..E-12, mappatura file→slot, impatto implementazione). Puntatore operativo in `marketing/steam/PUBLISH-CHECKLIST.md` §3.
 **Implementazione (2026-10-26):** `scripts/catalog/critiqueComponent.mts` + `scripts/catalog/prompts/` (turn1-commission, turn1-text-only, turn2-rubric, canary-probe) + npm script `catalog:critique`. Implementa r013: lint bloccante P2 sulla commission (mai rubrica/schema/counts/canary), probe throwaway, turn1 commission+shot, turn2 rubrica solo sulle proposte+P0-P3, capability-class per provider, audit post-hoc vs ground_truth, digest mapper-non-judge (P5). Tsc: nessun errore proprio (i warning JSX-mdx sono ambient). Da testare end-to-end al prossimo giro di critica.
 **Verdetto blind Director (2026-10-26):** ablazione — R-25(A4 commission→rubrica t2) > R-12(A2 eng+search) > R-30(A0 free) > R-63(A1 engineered) > R-75(A3 commission+rubrica t1). P7 chiuso: protocollo confermato su giudizio umano; rubrica in turn-2 batte turn-1; search persa era il difetto dominante insieme alla forma-specification. Caveat n=1/provider. Hats gate P6: applicati system_design/ui_developer/objective_critic/critique_and_counterplan (stance-with-cost) + clausola "chiedi contesto" in base enhancer; cancellati software_engineer/cloud_architect/create_proposal. Untested: ruthless_critique/create_plan/game_director.
+
+## R-289 — Set icone di gioco: stats, esiti, consumabili, blueprint, stash, mercante, e ricambio icone «giallo oro»
+
+**Richiesta:** *"dobbiamo generare un bel numero di asset: icone per le stats, per indicare la Vittoria, Per la sconfitta, pericolo, i consumables (dobbiamo fare una lista?), blueprint, il simbolo x vedere lo stash del villaggio, il mercante, tutte quelle che adesso sono semplici giallo oro e anche altre che nn sn adeguatamente belle"*
+**Data:** 2026-10-27
+**Stato:** `da chiarire`
+**Desiderata FROZEN:** nessuna dedicata; opera dentro ruling `icons-1` (D-1=B, due livelli: cose del mondo dipinte, comandi/stati incisi) e pipeline `src/docs/docs/art-direction/icons/registry.yaml` + `prompt_kit.yaml` (PLAN-058).
+
+**Audit (2026-10-27):**
+- **Già in volo (stato `prompted`)**: `ui-victory`, `ui-danger-1..4`, `stat-str`, `stat-per`, `item-healing-draught` (lotto planner di `.mw/ui-catalog/components/quest-expedition-detail/ASSET-LIST.md`), `time-dawn/day/dusk/night`.
+- **Da aggiungere al registro**: emblema **sconfitta** (assente), stat `agi/con/int/cha` + pietra sigillata, consumabili `questItems.ts` rimanenti (11), blueprint, simbolo stash villaggio, mercante, ricompense (arma/armatura/ciondolo/cavalcatura/abilità/compagno/titolo/pietra «?»), ferro.
+- **«Giallo oro» attuali**: emoji in `questItems.ts` (🐎🗡️🛡️🚩🧪🪙) e `statGlyphMap` (⚔️🎯🌀❤️); glifi incisi `ico-*` usati per cose-del-mondo nello stash/mercante/planner (INV-1=B li rende coerenti ma piatti); `statIcons.tsx` disegnati a mano; `gameIcons.tsx` (game-icons.net CC-BY); `characterIcons.ts` legacy (mago viola — viola vietato in UI).
+- **Ambiguità da ruling**: gli edifici villaggio sono incisi per ruling PLAN-035/042 — ma D-1=B li qualificherebbe come «cose del mondo» dipinte; confermare se restano incisi.
+
+**Decisioni aperte per il Director:** soggetto emblema sconfitta; forma del simbolo stash/mercante (dipinto come gli altri oggetti del mondo?); se le stat oltre str/per seguono lo stesso livello; perimetro «altre non belle».
