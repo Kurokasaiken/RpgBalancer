@@ -56,6 +56,14 @@ def check(path):
     # impasto proxy
     lum=a.mean(2);lv=[lum[y:y+8,x:x+8].std() for y in range(0,h-8,8) for x in range(0,w-8,8) if lum[y:y+8,x:x+8].mean()>20]
     print(f"{path.split('/')[-1]}: murk {murk:.1f} brown {brown:.1f} vibr {vibrant:.1f} val {val.mean():.2f} impasto-std {np.mean(lv):.1f}")
+    # green quality split (luminous vs bottle) — A20, moment-aware threshold
+    gm=((hue_all>60)&(hue_all<190)&(sat>0.25)&(val>0.15))
+    gv=val[gm]
+    if len(gv):
+        glum=(((gv>0.45)&(sat[gm]>0.4)).mean()*100)
+        gdark=((gv<0.35).mean()*100)
+        flag='OK' if glum>=M['green_lum']*100 else 'LOW'
+        print(f"  GREEN-SPLIT luminous={glum:.0f}% dark={gdark:.0f}% mean-val={gv.mean():.2f} (moment={ar.moment} want>={int(M['green_lum']*100)}% -> {flag})")
     # zones: sky band (top 20%), upper-mid, lower-mid, fg (bottom 25%)
     zone_report(a[:int(h*0.22)],'sky')
     zone_report(a[int(h*0.22):int(h*0.55)],'mid')
