@@ -62,4 +62,9 @@ def check(path):
     zone_report(a[int(h*0.55):int(h*0.78)],'low')
     zone_report(a[int(h*0.78):],'fg')
 
-for p in sys.argv[1:]: check(p)
+import argparse
+ap=argparse.ArgumentParser()
+ap.add_argument('files',nargs='+')
+ap.add_argument('--domain',default='rude-beauty',choices=['rude-beauty','impero-solare','prismatic','dark-wasteland'])
+ar=ap.parse_args()
+for p in ar.files: check(p)
