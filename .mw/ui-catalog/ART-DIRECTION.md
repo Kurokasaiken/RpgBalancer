@@ -148,6 +148,12 @@ Preferenze (dalle critiche libere R-282, convergenti 3/3 su più componenti):
 | nav-1 | 2026-10-26 | nav-bar = M1: quattro slot di larghezza uguale; i bloccati dicono il requisito («Req · Lv 2»); stato attivo su tre canali (fondo, filetto, etichetta); il recenter esce dalla barra. |
 | corner-1 | 2026-10-26 | hud-corner: dock unico con 4 comandi (recenter, menu, pannelli con badge, nascondi) e tasti rapidi; menu senza il doppione «Pannelli»; con HUD nascosta solo l'icona dell'occhio chiuso, senza etichetta. |
 | topbar-1 | 2026-10-26 | Barra in alto = C: cartiglio centrale più profondo per l'evento (sempre presente, stato vuoto), due ali di pari misura che lo toccano (giorno + regolo a sinistra, risorse a destra). Niente più due placche staccate agli angoli. |
+| skull-1 | 2026-10-27 | Il teschio è ammesso come **indicatore di pericolo** (cinque in fila, accesi = grado; spenti = la stessa immagine attenuata). Non per la morte di un singolo eroe. Emenda PLAN-058 D3 «niente teschi» per questo uso; resta per le icone incise e per le minacce già approvate. Si applica con `deroga` nel registro delle icone. |
+| laurel-1 | 2026-10-27 | L'alloro è ammesso come **soggetto** (emblema di vittoria). La regola del kit «niente foglie» valeva per i decori, non per il soggetto. |
+| drops-1 | 2026-10-27 | Le ricompense si mostrano senza probabilità: oggi ogni drop è al 100%. Se in futuro esistono drop casuali, va riaperta la questione. |
+| risk-role-1 | 2026-10-27 | Il rischio per ruolo deve far capire **quale ruolo è in pericolo**; numero, barra o gauge sono indifferenti. |
+| seal-1 | 2026-10-27 | Il sigillo del verdetto può sporgere dal bordo del pannello certificato (deroga al «pannello chiuso»). |
+| assets-1 | 2026-10-27 | Gli asset dipinti li genera il Director con i prompt del kit; l'AI prepara registro, prompt e deroghe. |
 | mappa-ferma | 2026-10-14 | La mappa non si muove mai per un pannello. |
 
 ## Livello 3 — Giudizi contestuali (richiedono il Director)
