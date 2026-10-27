@@ -42,7 +42,19 @@ ap = argparse.ArgumentParser()
 ap.add_argument('file')
 ap.add_argument('--domain', default='rude-beauty',
   choices=['rude-beauty','impero-solare','prismatic','dark-wasteland'])
+ap.add_argument('--moment', default='day',
+  choices=['dawn','day','golden','dusk','night'])
 a = ap.parse_args()
+# luminous-green vocabulary per (domain,moment): day fields need bright greens;
+# dusk/golden fields go amber-lit; night fields go blue/teal (green drops out)
+LUM_GREENS = {
+ 'dawn':   'emerald|spring|veronese|dewy|pale green',
+ 'day':    'emerald|spring|veronese|sunlit|translucent|lime',
+ 'golden': 'amber-lit|golden-green|honeyed|warm green',
+ 'dusk':   'shadowed emerald|dusky green|teal shadow',
+ 'night':  'moonlit|silvered|blue-green|teal',
+}
+DARK_GREENS = 'bottle|swamp|murky green|dark green'
 # per-domain thresholds (vocabulary + minimums)
 DOM = {
  'rude-beauty':    dict(gems=2, life=2, zones=2, canopy=True),
@@ -65,6 +77,12 @@ for name, hits, good in rows:
 if banned:
     ok = False
     print(f'FAIL banned terms present: {banned}')
+mom_ok = True
+if is_forest and not EDIT:
+    lum = len(re.findall(LUM_GREENS[a.moment], t))
+    dark = len(re.findall(DARK_GREENS, t))
+    checks.append(('green-tone('+a.moment+')', lum, lum >= 1 and dark == 0))
+    mom_ok = lum >= 1 and dark == 0
 if is_forest and not EDIT and D['canopy']:
     c = len(re.findall(CANOPY, txt.lower()))
     if c < 1:
