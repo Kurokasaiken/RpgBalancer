@@ -5,7 +5,7 @@ import React from 'react';
  *
  * Solid monochrome glyphs on a 24 grid: `fill="currentColor"`, never a stroke, so the colour
  * comes from the container token exactly like text does. One heavy silhouette per glyph
- * filling ~70–80% of the square, symmetric and centred (D2), no skulls (D3), no
+ * filling ~70–80% of the square, symmetric and centred (D2), no skulls in this engraved set (D3; the painted danger indicator `ui-danger-skull` is a Director-approved exception, 2026-10-27), no
  * circle-with-a-symbol badges and no ticks (D6). Holes are `evenodd` cut-outs, never an
  * overlaid second colour.
  *

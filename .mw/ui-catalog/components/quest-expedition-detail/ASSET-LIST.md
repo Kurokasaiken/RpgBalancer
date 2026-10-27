@@ -15,8 +15,8 @@ Proposta: due **sigilli** (oggetti dipinti, famiglia «medaglione» come quelli 
 | # | Asset | Note |
 |---|---|---|
 | 1 | Cornice del sigillo (anello d'ottone + campo lacca) | una sola, riusata dai due sigilli e dalle quattro fasce |
-| 2 | Emblema **vittoria** | soggetto da decidere (es. lama alzata con alloro, o vessillo); sostituisce «Chance of victory» |
-| 3–6 | Emblema **pericolo ×4 fasce** (bassa, media, alta, letale) | un'icona per fascia che cresce di intensità: **al posto dei trattini e della parola «High»**. Parte da `threat-claws` (già approvata) ma servono 4 gradi |
+| 2 | Emblema **vittoria** | **deciso 2026-10-27: due spade incrociate su una corona d'alloro** (deroga `laurel-1`); sostituisce «Chance of victory» |
+| 3 | **Teschio** del pericolo (uno solo) | **deciso 2026-10-27: cinque teschi in fila**, accesi = grado, spenti = la stessa immagine attenuata dal gioco (deroga `skull-1`). Al posto dei trattini e della parola «High». Sostituisce i 4 artigli |
 | 7 | (opzionale) Tavola dei numeri: cifre 0–9 e «%» in metallo/lacca | solo se il numero in Cinzel verde continua a non piacere; altrimenti si lavora con il carattere e un filo d'ottone |
 
 ### B. Statistiche (6 + 1)
