@@ -77,3 +77,11 @@ Nessuna immagine entra in NODE_ART, manifest runtime o produzione senza
 approvazione esplicita del Director. Integrare un candidato non
 battezzato = violazione grave. Il flusso corretto: gate → mostra →
 Director decide → SOLO ALLORA bake+manifest+re-point+commit.
+
+## Studio-context trap
+
+Mai usare "painting", "matte", "present", "frame", "canvas" nei prompt:
+Gemini tende a rendere l'immagine come foto-di-quadro (cornice,
+cavalletto, tavolozza). Usa "same image", "the forest scene",
+"edge to edge". Se la chat ha già prodotto studio-context, OGNI output
+successivo lo eredita — conviene croppare e restare su quella base.
