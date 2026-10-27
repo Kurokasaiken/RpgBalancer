@@ -41,7 +41,9 @@ def zone_report(px,label):
             comp.append(f"{i*15}°+{j*15}°")
     vibrant=((s>0.6)&(v>0.45)).mean()*100
     murk=((v<0.13)&(s<0.35)).mean()*100
-    print(f"  {label}: fams {fams} | comp-pairs {comp[:3]} | vibr {vibrant:.1f}% murk {murk:.1f}%")
+    dom = max(fams.values()) if fams else 0
+    dflag = ' MONO-FIELD' if dom >= 55 and label != 'sky' else ''
+    print(f"  {label}: fams {fams} | comp-pairs {comp[:3]} | vibr {vibrant:.1f}% murk {murk:.1f}%{dflag}")
 
 def check(path):
     a=np.asarray(Image.open(path).convert('RGB')).astype(np.float32)
