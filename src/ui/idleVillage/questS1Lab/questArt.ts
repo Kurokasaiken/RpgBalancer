@@ -31,7 +31,7 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
   'rientra-o-rischi': { src: ART.goblinTotem, fit: 'contain' },
   'check-forziere': { src: ART.goblinTotem, fit: 'contain' },
   risveglio: { src: ART.goblinMarch, fit: 'contain' },
-  ritorno: { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
+  ritorno: { src: '/assets/scene-library/ritorno-v2.png', fit: 'cover' },
   /* ---- Le Rovine sotto il Fiume — downloaded scene art (public domain,
    *  one image per phase, per Director request 2026-10-04) --------------- */
   'rv-mercante': { src: '/assets/quest-robine/mercante.jpg', fit: 'cover' },
@@ -85,7 +85,7 @@ export const NODE_ART: Record<string, { src: string; fit: 'contain' | 'cover' }>
  */
 export const JOURNEY_LEG_ART: Record<'andata' | 'ritorno', { src: string; fit: 'cover' }> = {
   andata: { src: '/assets/scene-library/viaggio-andata.jpg', fit: 'cover' },
-  ritorno: { src: '/assets/scene-library/viaggio-ritorno.jpg', fit: 'cover' },
+  ritorno: { src: '/assets/scene-library/ritorno-v2.png', fit: 'cover' },
 };
 
 /**

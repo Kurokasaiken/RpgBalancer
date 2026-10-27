@@ -35,41 +35,6 @@
       "title": "Planner — after dragging onto poi-goblin:goblin-slot-bodyguard",
       "file": "05-after-poi-goblin:goblin-slot-bodyguard.png",
       "note": "assigned by real drag"
-    },
-    {
-      "n": 6,
-      "id": "bag",
-      "title": "Planner — bag packed",
-      "file": "06-bag.png",
-      "note": "3 item(s) picked by click"
-    },
-    {
-      "n": 7,
-      "id": "ready",
-      "title": "Planner — ready to send (forecast filled)",
-      "file": "07-ready.png",
-      "note": ""
-    },
-    {
-      "n": 8,
-      "id": "member-hover",
-      "title": "Planner — hovering a member in the forecast",
-      "file": "08-member-hover.png",
-      "note": "lights the matching marching-order slot"
-    },
-    {
-      "n": 9,
-      "id": "launched",
-      "title": "Run window after the real Send",
-      "file": "09-launched.png",
-      "note": ""
-    },
-    {
-      "n": 10,
-      "id": "party-4",
-      "title": "Party in the field — four heroes",
-      "file": "10-party-4.png",
-      "note": ""
     }
   ],
   "log": [
