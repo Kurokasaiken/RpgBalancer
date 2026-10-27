@@ -51,9 +51,14 @@ def style_for(kit: dict, materia: str = "bronze") -> str:
     return kit["style"].replace(default, kit["materials"][materia])
 
 
-def render_variant(kit: dict, key: str, subject: str, materia: str = "bronze", anchor: bool = True) -> str:
+def render_variant(kit: dict, key: str, subject: str, materia: str = "bronze", anchor: bool = True, deroga: dict | None = None) -> str:
     v = kit["variants"][key]
-    kill = "; ".join(kit["kill_list"]) + "."
+    # Deroga del Director per singola icona (registro: `deroga.kill_omit`): toglie voci dalla kill list.
+    omit = set((deroga or {}).get("kill_omit", []))
+    unknown = omit - set(kit["kill_list"])
+    if unknown:
+        raise SystemExit(f"ERRORE deroga: voci non presenti nella kill list: {sorted(unknown)}")
+    kill = "; ".join(i for i in kit["kill_list"] if i not in omit) + "."
     # le non-ancore si agganciano alle ancore (T3.1); le materie non-bronze
     # chiedono solo luce e pennellata, non metallo (R-191).
     ref_key = "reference" if materia == "bronze" else "reference_natural"
@@ -84,6 +89,7 @@ def render_prompt_md(kit: dict, icon: dict) -> str:
         + (" · **ancora**" if icon.get("ancora") else ""),
         f"- **taglie:** {taglie} px · **file finale:** `{icon['file']}`",
         f"- **fonte:** {icon.get('fonte', '—')}",
+        *([f"- **deroga del Director:** {icon['deroga']['motivo']}"] if icon.get("deroga") else []),
         "",
         "Incolla la variante dello strumento che usi. Le varianti differiscono solo",
         "per intestazione, nome della kill list e contratto d'uscita (sfondo).",
@@ -94,7 +100,7 @@ def render_prompt_md(kit: dict, icon: dict) -> str:
             f"## {kit['variants'][key]['title']}",
             "",
             "```text",
-            render_variant(kit, key, icon["soggetto"].strip(), icon.get("materia", "bronze"), bool(icon.get("ancora"))),
+            render_variant(kit, key, icon["soggetto"].strip(), icon.get("materia", "bronze"), bool(icon.get("ancora")), icon.get("deroga")),
             "```",
         ]
     return "\n".join(lines) + "\n"

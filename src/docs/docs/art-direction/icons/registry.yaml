@@ -21,6 +21,9 @@
 #   file        destinazione dell'asset finale nel repo (null = da decidere in T3.2).
 #   fonte       da dove viene il soggetto nel contenuto canonico.
 #   file (dipinte) = master 512; le taglie 128/64/32 stanno accanto con suffisso `-128`, `-64`, `-32`.
+#   deroga      (facoltativa, solo dipinte) eccezione del Director alla kill list del kit per UNA icona:
+#               {motivo, kill_omit: [voci della kill list da togliere, testo identico], allow_terms: [termini
+#               di `banned_terms` ammessi nel soggetto]}. Letta da gen-icon-prompts.py e lint-icon-prompts.py.
 #   provenance  null finché non c'è un'immagine; poi
 #               {tool, model, variant: gpt|gemini|grok, date, operator, source_file}.
 #
@@ -384,7 +387,11 @@ icons:
   - id: ui-victory
     livello: dipinta
     famiglia: verdetto
-    soggetto: "A tall spear standing upright, bearing one swallow-tailed pennant that hangs straight down in a single heavy fold, the spear tip and a short crossbar cast as bold solid shapes; patina accent: verdigris green on the pennant."
+    soggetto: "Two straight swords crossed over each other, blades up and hilts down, laid across a closed wreath of laurel, fully symmetrical; patina accent: verdigris green on the laurel."
+    deroga:
+      motivo: "Director 2026-10-27: l'alloro è ammesso come soggetto della vittoria (la regola «niente foglie» valeva per i decori, non per il soggetto)"
+      kill_omit: ["no leaves, vines, flowers or sprigs"]
+      allow_terms: ["leaf", "leaves"]
     taglie: [512, 128, 64, 32]
     display_px: 48
     stato: prompted
@@ -392,53 +399,21 @@ icons:
     file: public/assets/ui/planner/ui-victory.webp
     fonte: planner B8 · riquadro vittoria (sostituisce «Chance of victory»)
     provenance: null
-  - id: ui-danger-1
+  - id: ui-danger-skull
     livello: dipinta
     famiglia: verdetto
-    soggetto: "One single deep claw gouge torn diagonally through a flat slab of bronze, a clean narrow slash with raised torn lips; patina accent: faint ember on the inner edge."
+    soggetto: "A single bold skull seen from the front with a heavy brow, hollow eye sockets and a clenched jaw, cast as one solid symmetrical shape; patina accent: ember glowing deep in the eye sockets."
     materia: ember
+    deroga:
+      motivo: "Director 2026-10-27: i teschi sono ammessi come indicatore di pericolo (non per la morte di un eroe). Cinque teschi in fila: accesi = grado; gli spenti sono la stessa immagine attenuata dal gioco, non un secondo asset."
+      kill_omit: ["no skulls or bones"]
+      allow_terms: ["skulls?"]
     taglie: [512, 128, 64, 32]
-    display_px: 48
+    display_px: 36
     stato: prompted
-    prompt: .mw/specs/icons/ui-danger-1/prompt.md
-    file: public/assets/ui/planner/ui-danger-1.webp
-    fonte: planner B8 · fascia pericolo «bassa» (bassa/media/alta/letale)
-    provenance: null
-  - id: ui-danger-2
-    livello: dipinta
-    famiglia: verdetto
-    soggetto: "Two parallel deep claw gouges torn diagonally through a flat slab of bronze, clean narrow slashes with raised torn lips; patina accent: ember on the inner edges."
-    materia: ember
-    taglie: [512, 128, 64, 32]
-    display_px: 48
-    stato: prompted
-    prompt: .mw/specs/icons/ui-danger-2/prompt.md
-    file: public/assets/ui/planner/ui-danger-2.webp
-    fonte: planner B8 · fascia pericolo «media»
-    provenance: null
-  - id: ui-danger-3
-    livello: dipinta
-    famiglia: verdetto
-    soggetto: "Three parallel deep claw gouges torn diagonally through a flat slab of bronze, the middle one longest, clean slashes with raised torn lips; patina accent: bright ember on the inner edges."
-    materia: ember
-    taglie: [512, 128, 64, 32]
-    display_px: 48
-    stato: prompted
-    prompt: .mw/specs/icons/ui-danger-3/prompt.md
-    file: public/assets/ui/planner/ui-danger-3.webp
-    fonte: planner B8 · fascia pericolo «alta» (rifà threat-claws nella stessa famiglia)
-    provenance: null
-  - id: ui-danger-4
-    livello: dipinta
-    famiglia: verdetto
-    soggetto: "Four parallel deep claw gouges torn diagonally through a flat slab of bronze, wide and ragged with heavily raised torn lips; patina accent: white-hot ember glowing in the deepest cuts."
-    materia: ember
-    taglie: [512, 128, 64, 32]
-    display_px: 48
-    stato: prompted
-    prompt: .mw/specs/icons/ui-danger-4/prompt.md
-    file: public/assets/ui/planner/ui-danger-4.webp
-    fonte: planner B8 · fascia pericolo «letale»
+    prompt: .mw/specs/icons/ui-danger-skull/prompt.md
+    file: public/assets/ui/planner/ui-danger-skull.webp
+    fonte: "planner B8 · indicatore pericolo, 5 teschi (bassa 1-2, media 3, alta 4, letale 5; soglie da fissare)"
     provenance: null
   - id: stat-str
     livello: dipinta

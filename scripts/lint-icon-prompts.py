@@ -57,12 +57,19 @@ def painted_ids() -> set[str]:
     return {i["id"] for i in icons if i["livello"] == "dipinta"}
 
 
+def deroga_of(icon_id: str) -> dict:
+    icons = yaml.safe_load(REGISTRY.read_text())["icons"]
+    return next((i.get("deroga") or {} for i in icons if i["id"] == icon_id), {})
+
+
 def sentences(text: str) -> int:
     parts = [p for p in re.split(r"[.!?](?:\s+|$)", text.strip()) if p.strip()]
     return len(parts)
 
 
-def lint_block(kit: dict, key: str, body: str) -> list[str]:
+def lint_block(kit: dict, key: str, body: str, deroga: dict | None = None) -> list[str]:
+    omit = set((deroga or {}).get("kill_omit", []))
+    allow = list((deroga or {}).get("allow_terms", []))
     v = kit["variants"][key]
     errs: list[str] = []
     lines = body.splitlines()
@@ -99,7 +106,7 @@ def lint_block(kit: dict, key: str, body: str) -> list[str]:
     else:
         kill_line = kill_lines[0]
         pos = 0
-        for item in kit["kill_list"]:
+        for item in [i for i in kit["kill_list"] if i not in omit]:
             idx = kill_line.find(item, pos)
             if idx < 0:
                 errs.append(f"I4 kill list: manca o fuori ordine `{item}`")
@@ -108,7 +115,7 @@ def lint_block(kit: dict, key: str, body: str) -> list[str]:
 
     # I5 termini vietati fuori dalla kill list
     rest = "\n".join(ln for ln in lines if ln != kill_line)
-    for term in kit["banned_terms"]:
+    for term in [t for t in kit["banned_terms"] if t not in allow]:
         m = re.search(rf"\b{term}\b", rest, re.I)
         if m:
             errs.append(f"I5 vietato: `{m.group(0)}` fuori dalla kill list")
@@ -137,7 +144,7 @@ def lint_file(kit: dict, ids: set[str], path: pathlib.Path) -> list[str]:
         if v["title"] not in blocks:
             errs.append(f"I1 varianti: manca `## {v['title']}` con blocco ```text")
             continue
-        errs += [f"[{key}] {e}" for e in lint_block(kit, key, blocks[v["title"]])]
+        errs += [f"[{key}] {e}" for e in lint_block(kit, key, blocks[v["title"]], deroga_of(icon_id))]
     return errs
 
 
