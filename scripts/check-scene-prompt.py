@@ -14,7 +14,7 @@ Checks:
 - REGISTER: impasto + palette direction present
 - CANOPIES: forest scenes require varied canopies (A18)
 """
-import re, sys, pathlib
+import re, sys, pathlib, argparse
 
 GEMS = r'\b(ruby|rub(y|ies)|emerald|sapphire|amethyst|topaz|amber|citrine|jade|turquoise|lapis|garnet|onyx|opal|pearl|crimson|vermilion|ultramarine|veronese)\b'
 LIFE = r'\b(bird|jay|lizard|beetle|insect|butterfly|moth|deer|hare|rabbit|fox|squirrel|crow|fly|bees?|mushroom|amanita|fungus|fungi|flowers?|blossom|petals?|water|pool|puddle|stream|creek|moss|fern|berries|leaves)\b'
@@ -30,15 +30,28 @@ def check(txt):
     def need(pat, name, ok):
         hits = len(re.findall(pat, t))
         out.append((name, hits, ok(hits)))
-    need(GEMS, 'gems', lambda h: h >= 2)
-    need(LIFE, 'life', lambda h: h >= 2)
+    need(GEMS, 'gems', lambda h: h >= D['gems'])
+    need(LIFE, 'life', lambda h: h >= D['life'])
     need(FX, 'fx', lambda h: h >= 1)
-    need(ZONES, 'zones', lambda h: h >= 2)
+    need(ZONES, 'zones', lambda h: h >= D['zones'])
     need(STYLE, 'style', lambda h: h >= 1)
     need(r'\bforest|fern|tree|trunk|canopy|wood\b', 'forest?', lambda h: h >= 1)
     return out, len(re.findall(BANNED, t)), re.search(r'forest|fern|trunk|canopy|wood', t)
 
-p = pathlib.Path(sys.argv[1]); txt = p.read_text()
+ap = argparse.ArgumentParser()
+ap.add_argument('file')
+ap.add_argument('--domain', default='rude-beauty',
+  choices=['rude-beauty','impero-solare','prismatic','dark-wasteland'])
+a = ap.parse_args()
+# per-domain thresholds (vocabulary + minimums)
+DOM = {
+ 'rude-beauty':    dict(gems=2, life=2, zones=2, canopy=True),
+ 'impero-solare':  dict(gems=2, life=2, zones=2, canopy=True),
+ 'prismatic':      dict(gems=3, life=1, zones=2, canopy=False),
+ 'dark-wasteland': dict(gems=1, life=1, zones=2, canopy=True),
+}
+D = DOM[a.domain]
+p = pathlib.Path(a.file); txt = p.read_text()
 EDIT = bool(re.search(r'\bsame (image|composition|scene|layout)\b', txt.lower()))
 rows, banned, is_forest = check(txt)
 ok = True
@@ -52,7 +65,7 @@ for name, hits, good in rows:
 if banned:
     ok = False
     print(f'FAIL banned terms present: {banned}')
-if is_forest and not EDIT:
+if is_forest and not EDIT and D['canopy']:
     c = len(re.findall(CANOPY, txt.lower()))
     if c < 1:
         ok = False
