@@ -380,6 +380,99 @@ icons:
     file: public/assets/ui/time/time-night.webp
     fonte: WhenWhereCluster (medaglione) · PLAN-058 T1.2
     provenance: null
+  # ── Dipinte · planner «Dispatch Table» (lotto di prova, 2026-10-27, ASSET-LIST.md) ─────────
+  - id: ui-victory
+    livello: dipinta
+    famiglia: verdetto
+    soggetto: "A tall spear standing upright, bearing one swallow-tailed pennant that hangs straight down in a single heavy fold, the spear tip and a short crossbar cast as bold solid shapes; patina accent: verdigris green on the pennant."
+    taglie: [512, 128, 64, 32]
+    display_px: 48
+    stato: prompted
+    prompt: .mw/specs/icons/ui-victory/prompt.md
+    file: public/assets/ui/planner/ui-victory.webp
+    fonte: planner B8 · riquadro vittoria (sostituisce «Chance of victory»)
+    provenance: null
+  - id: ui-danger-1
+    livello: dipinta
+    famiglia: verdetto
+    soggetto: "One single deep claw gouge torn diagonally through a flat slab of bronze, a clean narrow slash with raised torn lips; patina accent: faint ember on the inner edge."
+    materia: ember
+    taglie: [512, 128, 64, 32]
+    display_px: 48
+    stato: prompted
+    prompt: .mw/specs/icons/ui-danger-1/prompt.md
+    file: public/assets/ui/planner/ui-danger-1.webp
+    fonte: planner B8 · fascia pericolo «bassa» (bassa/media/alta/letale)
+    provenance: null
+  - id: ui-danger-2
+    livello: dipinta
+    famiglia: verdetto
+    soggetto: "Two parallel deep claw gouges torn diagonally through a flat slab of bronze, clean narrow slashes with raised torn lips; patina accent: ember on the inner edges."
+    materia: ember
+    taglie: [512, 128, 64, 32]
+    display_px: 48
+    stato: prompted
+    prompt: .mw/specs/icons/ui-danger-2/prompt.md
+    file: public/assets/ui/planner/ui-danger-2.webp
+    fonte: planner B8 · fascia pericolo «media»
+    provenance: null
+  - id: ui-danger-3
+    livello: dipinta
+    famiglia: verdetto
+    soggetto: "Three parallel deep claw gouges torn diagonally through a flat slab of bronze, the middle one longest, clean slashes with raised torn lips; patina accent: bright ember on the inner edges."
+    materia: ember
+    taglie: [512, 128, 64, 32]
+    display_px: 48
+    stato: prompted
+    prompt: .mw/specs/icons/ui-danger-3/prompt.md
+    file: public/assets/ui/planner/ui-danger-3.webp
+    fonte: planner B8 · fascia pericolo «alta» (rifà threat-claws nella stessa famiglia)
+    provenance: null
+  - id: ui-danger-4
+    livello: dipinta
+    famiglia: verdetto
+    soggetto: "Four parallel deep claw gouges torn diagonally through a flat slab of bronze, wide and ragged with heavily raised torn lips; patina accent: white-hot ember glowing in the deepest cuts."
+    materia: ember
+    taglie: [512, 128, 64, 32]
+    display_px: 48
+    stato: prompted
+    prompt: .mw/specs/icons/ui-danger-4/prompt.md
+    file: public/assets/ui/planner/ui-danger-4.webp
+    fonte: planner B8 · fascia pericolo «letale»
+    provenance: null
+  - id: stat-str
+    livello: dipinta
+    famiglia: statistica
+    soggetto: "A heavy single-bit battle axe standing upright with its broad crescent blade at the top and a thick straight haft; patina accent: cinnabar on the haft binding."
+    taglie: [512, 128, 64, 32]
+    display_px: 48
+    stato: prompted
+    prompt: .mw/specs/icons/stat-str/prompt.md
+    file: public/assets/ui/planner/stat-str.webp
+    fonte: planner B8 · statistica Forza (`str` ← danno)
+    provenance: null
+  - id: stat-per
+    livello: dipinta
+    famiglia: statistica
+    soggetto: "One large open almond eye seen from the front, a heavy bronze lid and lower lid around a round iris with a bold round pupil, symmetrical; patina accent: pale teal on the iris."
+    taglie: [512, 128, 64, 32]
+    display_px: 48
+    stato: prompted
+    prompt: .mw/specs/icons/stat-per/prompt.md
+    file: public/assets/ui/planner/stat-per.webp
+    fonte: planner B8 · statistica Percezione (`perc` ← TxC)
+    provenance: null
+  - id: item-healing-draught
+    livello: dipinta
+    famiglia: oggetto
+    soggetto: "A round-bellied glass-and-bronze flask with a short neck and a cork stopper, half full of a thick liquid; patina accent: deep cinnabar red liquid."
+    taglie: [512, 128, 64, 32]
+    display_px: 56
+    stato: prompted
+    prompt: .mw/specs/icons/item-healing-draught/prompt.md
+    file: public/assets/ui/planner/item-healing-draught.webp
+    fonte: planner B8 · borsa · infuso curativo (`quest_consumable_healing_draught`)
+    provenance: null
   # ── Incise · comandi (SVG pieni currentColor, griglia 24 — T3.2) ─────────
   - {id: cmd-menu, livello: incisa, famiglia: comando, soggetto: three stacked solid bars, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: HudGameMenu, provenance: null}
   - {id: cmd-pause, livello: incisa, famiglia: comando, soggetto: two solid upright bars, taglie: [24], stato: approved, prompt: null, file: src/ui/idleVillage/components/gameFrame/engravedIcons.tsx, fonte: controlli tempo, provenance: null}
