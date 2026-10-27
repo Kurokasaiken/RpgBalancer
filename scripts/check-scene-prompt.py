@@ -64,7 +64,7 @@ DOM = {
 }
 D = DOM[a.domain]
 p = pathlib.Path(a.file); txt = p.read_text()
-EDIT = bool(re.search(r'\bsame (image|composition|scene|layout)\b', txt.lower()))
+EDIT = bool(re.search(r'\bsame (image|composition|scene|layout|painting|plate)\b', txt.lower()))
 rows, banned, is_forest = check(txt)
 ok = True
 for name, hits, good in rows:
@@ -78,11 +78,14 @@ if banned:
     ok = False
     print(f'FAIL banned terms present: {banned}')
 mom_ok = True
+mom_ok = True
 if is_forest and not EDIT:
-    lum = len(re.findall(LUM_GREENS[a.moment], t))
-    dark = len(re.findall(DARK_GREENS, t))
-    checks.append(('green-tone('+a.moment+')', lum, lum >= 1 and dark == 0))
-    mom_ok = lum >= 1 and dark == 0
+    lum = len(re.findall(LUM_GREENS[a.moment], txt.lower()))
+    dark = len(re.findall(DARK_GREENS, txt.lower()))
+    good = lum >= 1 and dark == 0
+    if not good: ok = False
+    print(f'{"OK " if good else "FAIL"} green-tone({a.moment}): luminous-greens {lum}, banned-dark {dark}')
+    mom_ok = good
 if is_forest and not EDIT and D['canopy']:
     c = len(re.findall(CANOPY, txt.lower()))
     if c < 1:
@@ -93,7 +96,7 @@ if is_forest and not EDIT and D['canopy']:
 
 
 # --- strict pass: life-elements must carry a color/gem adjective within 4 words ---
-LIFE_ELS = r'(amanita|mushroom|fungus|flower|blossom|bird|jay|lizard|beetle|butterfly|moth|deer|hare|crow|berries|leaves|leaf|fern|moss|pool|puddle|water|stream)'
+LIFE_ELS = r'\b(amanita|mushroom|fungus|flower|blossom|bird|jay|lizard|beetle|butterfly|moth|deer|hare|crow|berries|leaves|leaf|fern|moss|pool|puddle|water|stream)\b'
 COLOR = r'(ruby|rub(y|ies)|emerald|sapphire|amethyst|topaz|amber|citrine|jade|turquoise|lapis|garnet|onyx|opal|pearl|crimson|vermilion|ultramarine|veronese|scarlet|violet|indigo|azure|teal|golden|gold|silver|copper|bronze|coral|magenta|chartreuse|lime|moss-green|sky-blue|ice-blue|bone-white|white|black|dark|pale|red|orange|yellow|green|blue|purple|pink|brown|grey|gray)'
 t = txt.lower()
 bare = []
