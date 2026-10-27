@@ -1,0 +1,601 @@
+[
+ {
+  "zone": "[data-testid=\"quest-expedition-detail\"]",
+  "box": [
+   444,
+   102,
+   610,
+   541
+  ]
+ },
+ {
+  "t": "Goblin Extermination",
+  "px": 17,
+  "fam": "Cinzel",
+  "col": "rgb(240, 207, 106)",
+  "x": 444,
+  "y": 102
+ },
+ {
+  "t": "Follow their tracks to the camp. None of them mu",
+  "px": 13,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 444,
+  "y": 262
+ },
+ {
+  "t": "Marching order",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 444,
+  "y": 326
+ },
+ {
+  "t": "Share of incoming impacts assigned by position.",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 580,
+  "y": 326
+ },
+ {
+  "t": "Expedition leader",
+  "px": 9,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(148, 163, 184)",
+  "x": 444,
+  "y": 416
+ },
+ {
+  "t": "0%",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 481,
+  "y": 446
+ },
+ {
+  "t": "Fighter",
+  "px": 9,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(148, 163, 184)",
+  "x": 560,
+  "y": 416
+ },
+ {
+  "t": "0%",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 570,
+  "y": 434
+ },
+ {
+  "t": "Scout",
+  "px": 9,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(148, 163, 184)",
+  "x": 640,
+  "y": 416
+ },
+ {
+  "t": "20%",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 642,
+  "y": 434
+ },
+ {
+  "t": "Bodyguard",
+  "px": 9,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(148, 163, 184)",
+  "x": 704,
+  "y": 416
+ },
+ {
+  "t": "80%",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 718,
+  "y": 434
+ },
+ {
+  "t": "Bag — 3/3",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 488,
+  "y": 483
+ },
+ {
+  "t": "Empty bag",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(237, 224, 196, 0.92)",
+  "x": 932,
+  "y": 485
+ },
+ {
+  "t": "Covers",
+  "px": 10,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 444,
+  "y": 515
+ },
+ {
+  "t": "STR",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(123, 201, 111)",
+  "x": 495,
+  "y": 514
+ },
+ {
+  "t": "PER",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(123, 201, 111)",
+  "x": 549,
+  "y": 514
+ },
+ {
+  "t": "Smoke bomb — +15 infiltration packed into the ba",
+  "px": 16,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(237, 224, 196, 0.92)",
+  "x": 444,
+  "y": 474
+ },
+ {
+  "t": "Send expedition",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(240, 207, 106)",
+  "x": 444,
+  "y": 604
+ },
+ {
+  "t": "Back to map",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(223, 184, 87)",
+  "x": 904,
+  "y": 601
+ },
+ {
+  "zone": "[data-testid=\"quest-expedition-forecast-column\"]",
+  "box": [
+   1074,
+   100,
+   340,
+   564
+  ]
+ },
+ {
+  "t": "Danger",
+  "px": 11,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1118,
+  "y": 118
+ },
+ {
+  "t": "High",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(161, 29, 51)",
+  "x": 1178,
+  "y": 117
+ },
+ {
+  "t": "Reward",
+  "px": 11,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1256,
+  "y": 118
+ },
+ {
+  "t": "Decent · 60",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(123, 201, 111)",
+  "x": 1316,
+  "y": 117
+ },
+ {
+  "t": "Duration",
+  "px": 11,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1118,
+  "y": 152
+ },
+ {
+  "t": "26 days",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(245, 242, 232)",
+  "x": 1193,
+  "y": 151
+ },
+ {
+  "t": "Forecast",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1088,
+  "y": 182
+ },
+ {
+  "t": "Success 68%",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(123, 201, 111)",
+  "x": 1088,
+  "y": 235
+ },
+ {
+  "t": "(",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(123, 201, 111)",
+  "x": 1190,
+  "y": 238
+ },
+ {
+  "t": "Wounds 100%",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(217, 138, 74)",
+  "x": 1239,
+  "y": 235
+ },
+ {
+  "t": "Deaths 96%",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "color(srgb 0.763137 0.447843 0.483922)",
+  "x": 1088,
+  "y": 266
+ },
+ {
+  "t": "(",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(161, 29, 51)",
+  "x": 1184,
+  "y": 269
+ },
+ {
+  "t": "Wipe 0%",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "color(srgb 0.763137 0.447843 0.483922)",
+  "x": 1240,
+  "y": 266
+ },
+ {
+  "t": "By member",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1088,
+  "y": 298
+ },
+ {
+  "t": "Giggiolillo",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 1092,
+  "y": 320
+ },
+ {
+  "t": "·",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1140,
+  "y": 321
+ },
+ {
+  "t": "wounds 59% · deaths 1%",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1214,
+  "y": 320
+ },
+ {
+  "t": "down ~2 days",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1333,
+  "y": 320
+ },
+ {
+  "t": "Sir Spaccaculi",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 1092,
+  "y": 343
+ },
+ {
+  "t": "·",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1154,
+  "y": 344
+ },
+ {
+  "t": "wounds 87% · deaths 2%",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1214,
+  "y": 343
+ },
+ {
+  "t": "down ~3 days",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1333,
+  "y": 343
+ },
+ {
+  "t": "Salvatrice",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 1092,
+  "y": 366
+ },
+ {
+  "t": "·",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1135,
+  "y": 367
+ },
+ {
+  "t": "wounds 94% · deaths 6%",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1214,
+  "y": 366
+ },
+ {
+  "t": "down ~3 days",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1333,
+  "y": 366
+ },
+ {
+  "t": "Bertoldo",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 1092,
+  "y": 389
+ },
+ {
+  "t": "·",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1132,
+  "y": 390
+ },
+ {
+  "t": "wounds 5% · deaths 95%",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1285,
+  "y": 389
+ },
+ {
+  "t": "Key stats",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1088,
+  "y": 425
+ },
+ {
+  "t": "Primary",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1088,
+  "y": 450
+ },
+ {
+  "t": "Strength",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(123, 201, 111)",
+  "x": 1178,
+  "y": 447
+ },
+ {
+  "t": "Secondary",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1088,
+  "y": 478
+ },
+ {
+  "t": "Perception",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgb(123, 201, 111)",
+  "x": 1178,
+  "y": 475
+ },
+ {
+  "t": "Intel",
+  "px": 12,
+  "fam": "Cinzel",
+  "col": "rgba(245, 242, 232, 0.7)",
+  "x": 1088,
+  "y": 507
+ },
+ {
+  "t": "Amid smoke and flame, even the shadows seem to h",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 1088,
+  "y": 528
+ },
+ {
+  "t": "Among the rocks, every turn erases for an instan",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 1088,
+  "y": 547
+ },
+ {
+  "t": "The smoke veils the camp again; the burnt wood g",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 1088,
+  "y": 583
+ },
+ {
+  "t": "Among the trees, the shadows move before you can",
+  "px": 12,
+  "fam": "\"EB Garamond\"",
+  "col": "rgb(245, 242, 232)",
+  "x": 1088,
+  "y": 618
+ },
+ {
+  "zone": "roster",
+  "box": [
+   24,
+   92,
+   400,
+   268
+  ]
+ },
+ {
+  "icons": [
+   [
+    14,
+    14
+   ],
+   [
+    14,
+    14
+   ],
+   [
+    16,
+    16
+   ],
+   [
+    13,
+    13
+   ],
+   [
+    64,
+    64
+   ],
+   [
+    64,
+    64
+   ],
+   [
+    44,
+    44
+   ],
+   [
+    11,
+    11
+   ],
+   [
+    64,
+    64
+   ],
+   [
+    64,
+    64
+   ],
+   [
+    44,
+    44
+   ],
+   [
+    64,
+    64
+   ],
+   [
+    64,
+    64
+   ],
+   [
+    44,
+    44
+   ],
+   [
+    64,
+    64
+   ],
+   [
+    64,
+    64
+   ],
+   [
+    44,
+    44
+   ],
+   [
+    14,
+    14
+   ],
+   [
+    14,
+    14
+   ],
+   [
+    12,
+    12
+   ],
+   [
+    12,
+    12
+   ],
+   [
+    14,
+    14
+   ],
+   [
+    14,
+    14
+   ],
+   [
+    14,
+    14
+   ]
+  ]
+ }
+]
