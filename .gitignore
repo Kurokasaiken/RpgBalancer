@@ -130,3 +130,7 @@ coordinator/skills/mockup-generator/
 coordinator/skills/painter/
 coordinator/skills/skills
 .vercel
+
+# Python cache
+__pycache__/
+*.pyc
