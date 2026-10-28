@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-10-24T15:48:26.317Z",
+  "generated_at": "2026-10-28T18:35:22.324Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -276,6 +276,7 @@
     "src/ui/idleVillage/hooks/useSandboxTiming.ts",
     "src/ui/idleVillage/hooks/useSandboxTimingBridge.tsx",
     "src/ui/idleVillage/hooks/useSensoryAudio.ts",
+    "src/ui/idleVillage/hooks/useSettlementLostGrade.ts",
     "src/ui/idleVillage/hooks/useSkinBinding.ts",
     "src/ui/idleVillage/hooks/useSkinHarness.ts",
     "src/ui/idleVillage/hooks/useSkinPreferences.ts",
@@ -1067,6 +1068,7 @@
         "src/ui/idleVillage/hooks/useFrameMetrics.ts",
         "src/ui/idleVillage/hooks/useQuestLoreDrop.ts",
         "src/ui/idleVillage/hooks/useReducedMotion.ts",
+        "src/ui/idleVillage/hooks/useSettlementLostGrade.ts",
         "src/ui/idleVillage/hooks/useThrottledValue.ts",
         "src/ui/idleVillage/interaction/dragSensors.ts",
         "src/ui/idleVillage/interaction/magneticCollision.ts",
@@ -3480,10 +3482,10 @@
     }
   ],
   "stats": {
-    "files": 468,
+    "files": 469,
     "units": 282,
     "ui_components": 215,
     "shared_kernels": 67
   },
-  "content_sha256": "6529d57e402a1ecd0eb754a1a1bcdbcda83eb93b1c1fb85d8e74425cea4e6a05"
+  "content_sha256": "cac18980ffbafac65f21b59a005772f77e85ed59fce704c55568a4ecf66d3551"
 }

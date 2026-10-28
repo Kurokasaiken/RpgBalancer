@@ -161,6 +161,7 @@ Arcipelago/Atollo (O).
 - Se `/mappa2-lab` resta lab-only o diventa superficie tuning permanente.
 - Scelta visual-fork su clouds/waterfall/micro-entities/village se servono
   alternative.
+- visual-fork: skipped — `src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx` e `src/ui/idleVillage/config/worldSurfaceConfig.ts`: diff additive e pack-gated (`WorldSurfacePackSchema` strict; `/game` resta sul manifest wanderlust invariato), superficie `/mappa2-lab` lab sperimentale — il fork visivo scatta alla promozione in `/game` secondo acceptance — RICHIESTE.md#R-291
 - Se usare il pack del JPEG corrente o fare paintover dopo il testbed.
 - Quali scenario additions dipingere dopo review: torre rovina, shrine/faro,
   vent/lava, rovine sommerse, spirit tree, mine/goblin camp, shipwreck/bones,
