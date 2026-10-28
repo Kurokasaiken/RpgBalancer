@@ -43,7 +43,7 @@ ap.add_argument('file')
 ap.add_argument('--domain', default='rude-beauty',
   choices=['rude-beauty','impero-solare','prismatic','dark-wasteland'])
 ap.add_argument('--moment', default='day',
-  choices=['dawn','day','golden','dusk','night'])
+  choices=['dawn','day','golden','dusk','night','gloom'])
 a = ap.parse_args()
 # luminous-green vocabulary per (domain,moment): day fields need bright greens;
 # dusk/golden fields go amber-lit; night fields go blue/teal (green drops out)
@@ -53,6 +53,7 @@ LUM_GREENS = {
  'golden': 'amber-lit|golden-green|honeyed|warm green',
  'dusk':   'shadowed emerald|dusky green|teal shadow',
  'night':  'moonlit|silvered|blue-green|teal',
+ 'gloom':  'emerald|veronese|jade|deep emerald|saturated green|amber-lit|pools of',
 }
 DARK_GREENS = 'bottle|swamp|murky green|dark green'
 # per-domain thresholds (vocabulary + minimums)
