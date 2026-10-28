@@ -1,4 +1,4 @@
-All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md`, `.mw/desiderata.md` e `context/INDEX.md` (se esiste).
+All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md`, `.mw/desiderata.md`, `context/INDEX.md` (se esiste) e `context/auto/` (advisory lane NON canonica: preferenze/veto durevoli — su conflitto vince il canonico).
 
 ## Cosa sono, e cosa non sono
 
@@ -74,6 +74,39 @@ Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione e
   - `RPG/.agents/skills/bugfix/SKILL.md` — workflow generico di bugfix.
 - **Output delle deliberazioni:** `RPG/.mw/runs/<timestamp>/` per i risultati di
   `mw-iterative-deliberate.py` e delle skill `learn`/`bugfix`.
+
+## Lane advisory (`context/auto/`) — PLAN-090
+
+- **Ingest-time delta:** quando il Director incolla una discussione/ricerca esterna in
+  `context/ingestions/`, estrarre item durevoli (preferenze, scelte, veto, correzioni,
+  vincoli) e appenderli in `context/auto/director-profile.jsonl` via
+  `mind-weaver/scripts/mw-delta.py append` (provenance+confidence+review_by).
+- **Mid-session delta (come il tool bio di ChatGPT):** quando il Director esprime in
+  conversazione una preferenza, un gusto, un veto, una correzione o un "fallo così"
+  con valenza durevole (non solo questo task), appenderlo SUBITO con
+  `mw-delta.py append` — non aspettare la chiusura. Dubbio → appendi con
+  confidence:low e review_by breve; meglio una nota in più che una persa.
+- **Close-time delta:** alla chiusura di un task, appendere SOLO item non derivabili
+  da codice/git/file canonici (filtro "skip derivable").
+- Le note sono ADVISORY: mai riscrivere/contraddire CANON/desiderata/RICHIESTE; su
+  conflitto il canonico vince (lint advisory-vs-canonical fail-closed).
+- `context/auto/veto-block.md` = blocco surfacing deterministico dei veto attivi.
+
+## Director memory (`director-knowledge`) — desiderata MW v57
+
+Il vault `~/progetti_personali/director-knowledge/` è la memoria curata del
+Director: persona, gusti, direzione e dossier cross-progetto etichettati
+`FACT`/`DECISION`/`PROPOSAL`/`REJECTED`/`OPEN`/`INFERENCE` (indice in
+`README.md` del vault, limiti in `FONTI_E_INCOGNITE.md`).
+
+- **Consultare** quando servono preferenze/gusti del Director, contesto
+  cross-progetto, o la ripresa di una conversazione esterna. Dossier rilevanti
+  per RPG: `DOSSIER_WANDERLUST_RPG.md`, `DOSSIER_QUEST_E_INDAGINI.md`,
+  `DOSSIER_ARTE_CREATURE_MAPPE.md`, `DOSSIER_MUSICA.md`.
+- **Non consultare** per stato o decisioni di progetto: quelli restano nei
+  canonical docs locali (CANON/desiderata/RICHIESTE), che su conflitto vincono.
+- **Read-only**: questo progetto non scrive nel vault. Gli aggiornamenti
+  passano da knowledge-extractor (dossier curati) e `mw-delta` (advisory lane).
 
 ## Cosa fai
 
