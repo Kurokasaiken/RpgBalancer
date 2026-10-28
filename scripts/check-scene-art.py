@@ -82,11 +82,11 @@ import argparse
 ap=argparse.ArgumentParser()
 ap.add_argument('files',nargs='+')
 ap.add_argument('--domain',default='rude-beauty',choices=['rude-beauty','impero-solare','prismatic','dark-wasteland'])
-ap.add_argument('--moment',default='day',choices=['dawn','day','golden','dusk','night'])
+ap.add_argument('--moment',default='day',choices=['dawn','day','golden','dusk','night','gloom'])
 ar=ap.parse_args()
 # moment-aware thresholds: green luminosity + value expectations shift with time
 MOMENT={'dawn':dict(green_lum=0.15,min_val=0.30),'day':dict(green_lum=0.20,min_val=0.45),
         'golden':dict(green_lum=0.05,min_val=0.35),'dusk':dict(green_lum=0.05,min_val=0.25),
-        'night':dict(green_lum=0.0,min_val=0.10)}
+        'night':dict(green_lum=0.0,min_val=0.10),'gloom':dict(green_lum=0.08,min_val=0.22)}
 M=MOMENT[ar.moment]
 for p in ar.files: check(p)
