@@ -78,3 +78,12 @@ luminoso.
 - Montagne/roccia: viola-ardesia o roccia calda attenuata con creste
   argentee — mai un monocromo blu: serve una seconda tinta dentro il
   materiale.
+
+## Impasto come vettore di colore (Director, 2026-10-28)
+
+L'impasto NON è decorazione: è il meccanismo con cui la famiglia porta
+colore nelle superfici piatte. Ogni campo piatto è dichiarato come
+"built from broken visible impasto strokes carrying neighboring hues"
+— cielo = cobalto+violetto+teal a pennellate, mai gradiente liscio;
+prato = verdi spezzati; acqua = tratti argento-turchese. Se una
+superficie è liscia/gradiente, è un FAIL del registro RB.
