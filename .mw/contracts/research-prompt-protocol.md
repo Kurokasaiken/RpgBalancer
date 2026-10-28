@@ -70,3 +70,11 @@ luminoso.
 - Regola materiali notturni: ogni materiale mantiene il COLORE della sua
   identità attenuato, mai sbiadito — paglia = oro smorzato lunare, non
   grigio; legno = umber profondo, non marrone-morto.
+
+## Vegetazione/roccia in notturna (Director, 2026-10-28)
+
+- Alberi: verde PROFONDO SATURO (emerald/veronese scuro) con rim d'argento
+  lunare — il verde resta vivo, mai "blu triste" né spruce spento.
+- Montagne/roccia: viola-ardesia o roccia calda attenuata con creste
+  argentee — mai un monocromo blu: serve una seconda tinta dentro il
+  materiale.
