@@ -107,6 +107,11 @@ Director: persona, gusti, direzione e dossier cross-progetto etichettati
   canonical docs locali (CANON/desiderata/RICHIESTE), che su conflitto vincono.
 - **Read-only**: questo progetto non scrive nel vault. Gli aggiornamenti
   passano da knowledge-extractor (dossier curati) e `mw-delta` (advisory lane).
+- **Trigger (mw-director)**: su task non banali — design, architettura,
+  direzione, scelte che dipendono da gusti/preferenze del Director — lanciare
+  `python3 ~/progetti_personali/mind-weaver/scripts/mw-director.py bootstrap`
+  all'avvio e `recall --topic "<tema>"` prima di proporre. Il progetto è
+  auto-rilevato dal cwd (`--project rpg` per forzare).
 
 ## Cosa fai
 
