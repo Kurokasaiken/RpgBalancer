@@ -180,8 +180,49 @@ describe('validateWorldSurfaceManifest', () => {
     expect(parsed.visualStates[1].id).toBe('corrupted');
   });
 
-  it('throws on missing required fields', () => {
-    expect(() => validateWorldSurfaceManifest({})).toThrow();
+  it('accepts a versioned generated pack contract', () => {
+    const parsed = validateWorldSurfaceManifest({
+      ...validManifest,
+      pack: {
+        packVersion: 1,
+        packRoot: '/assets/world/mappa2/base/',
+        generator: {
+          sourceSha256: 'e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a',
+          pipelineVersion: 'mappa2-assets-v1',
+          maskRevision: 1,
+        },
+        maskFiles: {
+          sea: 'masks/sea_mask.webp',
+          land: 'masks/land_mask.webp',
+          shallow: 'masks/shallow_mask.webp',
+          internalWater: 'masks/internal_water_mask.webp',
+          coastDistance: 'masks/coast_distance.webp',
+          foam: 'masks/foam_mask.webp',
+        },
+        anchorFiles: { points: 'points.json' },
+        regionIndex: { idsFile: 'region_ids.png', metadataFile: 'regions.json', biomesFile: 'biomes.json' },
+        canopyLayers: [],
+        fxAtlases: {},
+        bootPhases: {},
+      },
+    });
+    expect(parsed.pack?.generator.sourceSha256).toBe('e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a');
+  });
+
+  it('rejects an unsupported pack major version and unknown pack fields', () => {
+    const pack = {
+      packVersion: 2,
+      packRoot: '/assets/world/mappa2/base/',
+      generator: { sourceSha256: 'e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a', pipelineVersion: 'v1', maskRevision: 1 },
+      maskFiles: { sea: 'sea.webp', land: 'land.webp', shallow: 'shallow.webp', internalWater: 'water.webp', coastDistance: 'coast.webp', foam: 'foam.webp' },
+      anchorFiles: { points: 'points.json' },
+      regionIndex: { idsFile: 'ids.png', metadataFile: 'regions.json', biomesFile: 'biomes.json' },
+      canopyLayers: [],
+      fxAtlases: {},
+      bootPhases: {},
+      unknown: true,
+    };
+    expect(() => validateWorldSurfaceManifest({ ...validManifest, pack })).toThrow();
   });
 });
 

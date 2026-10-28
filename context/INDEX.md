@@ -11,8 +11,9 @@ Format: `[filename](path) — one sentence — \`tag\``
 
 ## Retrieval layers — «se la risposta non basta, dove guardo dopo?»
 
-- **L0 — Orientation:** `AGENTS.md`, `CURRENT_STATE.md` — cosa è il progetto e
-  dov'è lo stato attuale.
+- **L0 — Orientation:** `AGENTS.md`, `CURRENT_STATE.md`, `context/auto/` (advisory lane,
+  NON canon — preferenze/veto durevoli estratti; canonical wins su conflitto) —
+  cosa è il progetto, dov'è lo stato, e cosa il Director ha già deciso.
 - **L1 — Canonical facts:** `CANON.md` (mappa delle autorità),
   `QUEST_RULES.md`, `src/docs/docs/architecture_state.md`, i doc canonici di
   dominio. Se la domanda è «cosa vale oggi», rispondi da qui.
@@ -97,6 +98,8 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[context/ingestions/2026-10-22-25-quest-generation-gimmick-transcript.md](context/ingestions/2026-10-22-25-quest-generation-gimmick-transcript.md) — transcript integrale conversazione ChatGPT 22→25 ott (share link, decodifica turbo-stream): audit generazione, ranking gimmick, meccaniche investigative, corpus gialli — `evidence` `quest` `L4`
 |[context/ingestions/2026-10-25-transcript-integrale-gap-analysis.md](context/ingestions/2026-10-25-transcript-integrale-gap-analysis.md) — ingestion supplementare del transcript integrale: gap analysis vs ingestione primaria, ledger S-01..S-25 (requisiti Director gameplay-first/quest-amico/authored-per-gimmick, ranking gimmick, dossier autoriale, tassonomia 8 meccaniche, corpus Christie, audit 22+25 ott) — `knowledge` `evidence` `quest` `L4`
 |[context/ingestions/2026-10-25-steam-capsule-critique.md](context/ingestions/2026-10-25-steam-capsule-critique.md) — ingestion critica esterna capsule/key-art Steam: conferma key art eroe + logo placca+sole (R-178/R-151), difetto contrasto logo a ~120px, panorami senza soggetto, logo1 da eliminare, antagonista assente; mappatura nomi Downloads→slot upload; azioni → R-288 `proposta` — `knowledge` `evidence` `steam` `marketing` `L4`
+|[context/auto/](context/auto/) — advisory lane (PLAN-090 Task 4): `director-profile.jsonl` preferenze/veto/scelte durevoli con provenance+confidence+review_by, `veto-block.md` blocco surfacing HUD; scritta da mw-delta.py, MAI canonica — `advisory` `memory` `L0`
+|[context/ingestions/2026-10-28-deep-research-context-architecture/](context/ingestions/2026-10-28-deep-research-context-architecture/) — R-292: 4 ricerche AI verbatim su architettura memoria/contesto di ChatGPT Deep Research (memoria stratificata, loop agentico RL, context engineering, survey RAG) per replicarne la profondità in Mind Weaver — `knowledge` `evidence` `mw` `architecture` `L4`
 |[src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md](src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md) — piano ombrello per placeholder scheda/equip/consumabili/skill — `plan` `idle-village` `hero`
 |[src/docs/docs/plans/idle_village_hero_sheet_dynamic_stats_plan.md](src/docs/docs/plans/idle_village_hero_sheet_dynamic_stats_plan.md) — Sub-Plan A2: hero sheet con stat dinamiche dal Balancer registry, Lv/XP mock, skill equipaggiate (R-073) — `plan` `idle-village` `hero`
 |[CANON.md](CANON.md) — mappa delle autorità documentali — `governance` `canon`

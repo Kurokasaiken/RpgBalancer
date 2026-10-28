@@ -1,0 +1,687 @@
+{
+  "version": "1.2.0",
+  "world": "mappa2",
+  "variant": "base",
+  "coordinateSystem": {
+    "space": "world_pixels",
+    "origin": "top_left",
+    "unit": "px",
+    "canvas": {
+      "width": 2752,
+      "height": 1536
+    }
+  },
+  "resolutionHint": {
+    "runtime": {
+      "width": 2752,
+      "height": 1536
+    },
+    "source": {
+      "width": 2752,
+      "height": 1536
+    },
+    "scaleTarget": 1
+  },
+  "assetPolicy": {
+    "resolution": "prefer_hd"
+  },
+  "camera": {
+    "minZoom": 0.18,
+    "maxZoom": 3,
+    "defaultZoom": 1,
+    "panEnabled": true,
+    "zoomEnabled": true,
+    "bounds": {
+      "minX": 0,
+      "maxX": 2752,
+      "minY": 0,
+      "maxY": 1536
+    }
+  },
+  "renderer": {
+    "mode": "auto",
+    "domObjectThreshold": 50,
+    "enableForParticles": true,
+    "enableForShaders": true,
+    "fallbackToDom": true,
+    "imageFit": "fill",
+    "autoFit": true
+  },
+  "surfaceLayers": [
+    {
+      "id": "base_flat",
+      "file": "base_flat.webp",
+      "type": "texture",
+      "zIndex": 5,
+      "tags": [
+        "background",
+        "flattened"
+      ]
+    },
+    {
+      "id": "sea",
+      "file": "Mare.webp",
+      "type": "texture",
+      "zIndex": 10,
+      "tags": [
+        "water"
+      ]
+    },
+    {
+      "id": "foreground",
+      "file": "Foreground.webp",
+      "type": "texture",
+      "zIndex": 80,
+      "tags": [
+        "foreground"
+      ]
+    }
+  ],
+  "atmosphereLayers": [],
+  "visualStates": [
+    {
+      "id": "default",
+      "labelKey": "world.states.default",
+      "base": true,
+      "overrides": []
+    }
+  ],
+  "regions": [
+    {
+      "id": "snow_peaks",
+      "nameKey": "world.region.snow_peaks",
+      "bounds": {
+        "x": 760,
+        "y": 0,
+        "width": 1341,
+        "height": 391
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "waterfall_plateau",
+      "nameKey": "world.region.waterfall_plateau",
+      "bounds": {
+        "x": 850,
+        "y": 270,
+        "width": 831,
+        "height": 351
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "western_forest",
+      "nameKey": "world.region.western_forest",
+      "bounds": {
+        "x": 260,
+        "y": 300,
+        "width": 741,
+        "height": 661
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "bayou",
+      "nameKey": "world.region.bayou",
+      "bounds": {
+        "x": 160,
+        "y": 860,
+        "width": 861,
+        "height": 521
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "central_valley",
+      "nameKey": "world.region.central_valley",
+      "bounds": {
+        "x": 980,
+        "y": 560,
+        "width": 831,
+        "height": 521
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "dry_steppe",
+      "nameKey": "world.region.dry_steppe",
+      "bounds": {
+        "x": 1620,
+        "y": 290,
+        "width": 711,
+        "height": 431
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "red_canyons",
+      "nameKey": "world.region.red_canyons",
+      "bounds": {
+        "x": 2040,
+        "y": 610,
+        "width": 611,
+        "height": 521
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "volcanic_massif",
+      "nameKey": "world.region.volcanic_massif",
+      "bounds": {
+        "x": 1810,
+        "y": 1030,
+        "width": 891,
+        "height": 506
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "coral_lagoon",
+      "nameKey": "world.region.coral_lagoon",
+      "bounds": {
+        "x": 820,
+        "y": 1050,
+        "width": 1011,
+        "height": 486
+      },
+      "tags": [
+        "biome"
+      ]
+    },
+    {
+      "id": "western_archipelago",
+      "nameKey": "world.region.western_archipelago",
+      "bounds": {
+        "x": 0,
+        "y": 610,
+        "width": 421,
+        "height": 671
+      },
+      "tags": [
+        "biome"
+      ]
+    }
+  ],
+  "anchors": [],
+  "tags": [
+    "world-map",
+    "mappa2"
+  ],
+  "pack": {
+    "packVersion": 1,
+    "packRoot": "/assets/world/mappa2/base/",
+    "generator": {
+      "sourceSha256": "e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a",
+      "pipelineVersion": "mappa2-assets-v1",
+      "maskRevision": 2
+    },
+    "maskFiles": {
+      "sea": "masks/sea_mask.webp",
+      "land": "masks/land_mask.webp",
+      "shallow": "masks/shallow_mask.webp",
+      "internalWater": "masks/internal_water_mask.webp",
+      "coastDistance": "masks/coast_distance.webp",
+      "foam": "masks/foam_mask.webp"
+    },
+    "anchorFiles": {
+      "points": "points.json"
+    },
+    "regionIndex": {
+      "idsFile": "region_ids.png",
+      "metadataFile": "regions.json",
+      "biomesFile": "biomes.json"
+    },
+    "canopyLayers": [
+      {
+        "id": "forest_canopy_01",
+        "file": "forest_canopy_01.webp",
+        "rect": {
+          "x": 801,
+          "y": 286,
+          "width": 106,
+          "height": 116,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_02",
+        "file": "forest_canopy_02.webp",
+        "rect": {
+          "x": 1184,
+          "y": 310,
+          "width": 91,
+          "height": 59,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_03",
+        "file": "forest_canopy_03.webp",
+        "rect": {
+          "x": 810,
+          "y": 362,
+          "width": 43,
+          "height": 55,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_04",
+        "file": "forest_canopy_04.webp",
+        "rect": {
+          "x": 1011,
+          "y": 395,
+          "width": 175,
+          "height": 58,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_05",
+        "file": "forest_canopy_05.webp",
+        "rect": {
+          "x": 1419,
+          "y": 413,
+          "width": 88,
+          "height": 64,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_06",
+        "file": "forest_canopy_06.webp",
+        "rect": {
+          "x": 875,
+          "y": 442,
+          "width": 150,
+          "height": 95,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_07",
+        "file": "forest_canopy_07.webp",
+        "rect": {
+          "x": 1129,
+          "y": 455,
+          "width": 105,
+          "height": 66,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_08",
+        "file": "forest_canopy_08.webp",
+        "rect": {
+          "x": 1545,
+          "y": 454,
+          "width": 65,
+          "height": 98,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_09",
+        "file": "forest_canopy_09.webp",
+        "rect": {
+          "x": 799,
+          "y": 489,
+          "width": 64,
+          "height": 110,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_10",
+        "file": "forest_canopy_10.webp",
+        "rect": {
+          "x": 1036,
+          "y": 493,
+          "width": 178,
+          "height": 120,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_11",
+        "file": "forest_canopy_11.webp",
+        "rect": {
+          "x": 981,
+          "y": 522,
+          "width": 49,
+          "height": 58,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_12",
+        "file": "forest_canopy_12.webp",
+        "rect": {
+          "x": 807,
+          "y": 593,
+          "width": 77,
+          "height": 91,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_13",
+        "file": "forest_canopy_13.webp",
+        "rect": {
+          "x": 831,
+          "y": 683,
+          "width": 165,
+          "height": 133,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_14",
+        "file": "forest_canopy_14.webp",
+        "rect": {
+          "x": 574,
+          "y": 765,
+          "width": 37,
+          "height": 53,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_15",
+        "file": "forest_canopy_15.webp",
+        "rect": {
+          "x": 850,
+          "y": 899,
+          "width": 150,
+          "height": 122,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_16",
+        "file": "forest_canopy_16.webp",
+        "rect": {
+          "x": 920,
+          "y": 1010,
+          "width": 97,
+          "height": 66,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_17",
+        "file": "forest_canopy_17.webp",
+        "rect": {
+          "x": 795,
+          "y": 1072,
+          "width": 65,
+          "height": 51,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_18",
+        "file": "forest_canopy_18.webp",
+        "rect": {
+          "x": 1361,
+          "y": 1113,
+          "width": 69,
+          "height": 61,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_19",
+        "file": "forest_canopy_19.webp",
+        "rect": {
+          "x": 1303,
+          "y": 1326,
+          "width": 62,
+          "height": 52,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      }
+    ],
+    "cloudBands": [
+      {
+        "name": "far",
+        "driftSeconds": 2600,
+        "opacity": 0.62,
+        "shadowOpacity": 0.026,
+        "scale": 0.76,
+        "sprites": [
+          {
+            "src": "fx/clouds/mappa2_cloud_01.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_01_shadow.webp",
+            "width": 263,
+            "y": 160,
+            "delaySeconds": 0
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_02.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_02_shadow.webp",
+            "width": 305,
+            "y": 490,
+            "delaySeconds": 710
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_03.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_03_shadow.webp",
+            "width": 246,
+            "y": 820,
+            "delaySeconds": 1420
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_04.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_04_shadow.webp",
+            "width": 231,
+            "y": 1150,
+            "delaySeconds": 2130
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_05.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_05_shadow.webp",
+            "width": 216,
+            "y": 1480,
+            "delaySeconds": 2840
+          }
+        ]
+      },
+      {
+        "name": "mid",
+        "driftSeconds": 1700,
+        "opacity": 0.74,
+        "shadowOpacity": 0.034,
+        "scale": 1.05,
+        "sprites": [
+          {
+            "src": "fx/clouds/mappa2_cloud_05.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_05_shadow.webp",
+            "width": 216,
+            "y": 110,
+            "delaySeconds": 220
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_06.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_06_shadow.webp",
+            "width": 190,
+            "y": 430,
+            "delaySeconds": 780
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_07.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_07_shadow.webp",
+            "width": 185,
+            "y": 750,
+            "delaySeconds": 1340
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_08.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_08_shadow.webp",
+            "width": 130,
+            "y": 1070,
+            "delaySeconds": 1900
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_09.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_09_shadow.webp",
+            "width": 169,
+            "y": 1390,
+            "delaySeconds": 2460
+          }
+        ]
+      },
+      {
+        "name": "near",
+        "driftSeconds": 1150,
+        "opacity": 0.92,
+        "shadowOpacity": 0.044,
+        "scale": 1.38,
+        "sprites": [
+          {
+            "src": "fx/clouds/mappa2_cloud_09.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_09_shadow.webp",
+            "width": 169,
+            "y": 80,
+            "delaySeconds": 370
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_10.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_10_shadow.webp",
+            "width": 95,
+            "y": 440,
+            "delaySeconds": 820
+          },
+          {
+            "src": "fx/clouds/mappa2_cloud_11.webp",
+            "shadowSrc": "fx/clouds/mappa2_cloud_11_shadow.webp",
+            "width": 96,
+            "y": 800,
+            "delaySeconds": 1270
+          }
+        ]
+      }
+    ],
+    "fxAtlases": {
+      "ambientSeaLife": "fx/ambient-sea-life.webp",
+      "ambientLandLife": "fx/ambient-land-life.webp",
+      "ambientWeather": "fx/ambient-weather.webp",
+      "rare": "fx/rare-events.webp"
+    },
+    "bootPhases": {
+      "manifest": [
+        "manifest.json"
+      ],
+      "core-paint": [
+        "layers/base_flat.webp",
+        "layers/Mare.webp",
+        "layers/Foreground.webp",
+        "layers/base_flat.nocanopy.webp",
+        "layers/base_flat.clean.webp"
+      ],
+      "terrain-masks": [
+        "masks/sea_mask.webp",
+        "masks/land_mask.webp",
+        "masks/shallow_mask.webp",
+        "masks/internal_water_mask.webp",
+        "masks/coast_distance.webp",
+        "masks/foam_mask.webp"
+      ],
+      "ambient": [
+        "layers/forest_canopy_01.canopy.webp",
+        "layers/forest_canopy_02.canopy.webp",
+        "layers/forest_canopy_03.canopy.webp",
+        "layers/forest_canopy_04.canopy.webp",
+        "layers/forest_canopy_05.canopy.webp",
+        "layers/forest_canopy_06.canopy.webp",
+        "layers/forest_canopy_07.canopy.webp",
+        "layers/forest_canopy_08.canopy.webp",
+        "layers/forest_canopy_09.canopy.webp",
+        "layers/forest_canopy_10.canopy.webp",
+        "layers/forest_canopy_11.canopy.webp",
+        "layers/forest_canopy_12.canopy.webp",
+        "layers/forest_canopy_13.canopy.webp",
+        "layers/forest_canopy_14.canopy.webp",
+        "layers/forest_canopy_15.canopy.webp",
+        "layers/forest_canopy_16.canopy.webp",
+        "layers/forest_canopy_17.canopy.webp",
+        "layers/forest_canopy_18.canopy.webp",
+        "layers/forest_canopy_19.canopy.webp",
+        "fx/clouds/mappa2_cloud_01.webp",
+        "fx/clouds/mappa2_cloud_02.webp",
+        "fx/clouds/mappa2_cloud_03.webp",
+        "fx/clouds/mappa2_cloud_04.webp",
+        "fx/clouds/mappa2_cloud_05.webp",
+        "fx/clouds/mappa2_cloud_05.webp",
+        "fx/clouds/mappa2_cloud_06.webp",
+        "fx/clouds/mappa2_cloud_07.webp",
+        "fx/clouds/mappa2_cloud_08.webp",
+        "fx/clouds/mappa2_cloud_09.webp",
+        "fx/clouds/mappa2_cloud_09.webp",
+        "fx/clouds/mappa2_cloud_10.webp",
+        "fx/clouds/mappa2_cloud_11.webp",
+        "fx/clouds/mappa2_cloud_01_shadow.webp",
+        "fx/clouds/mappa2_cloud_02_shadow.webp",
+        "fx/clouds/mappa2_cloud_03_shadow.webp",
+        "fx/clouds/mappa2_cloud_04_shadow.webp",
+        "fx/clouds/mappa2_cloud_05_shadow.webp",
+        "fx/clouds/mappa2_cloud_05_shadow.webp",
+        "fx/clouds/mappa2_cloud_06_shadow.webp",
+        "fx/clouds/mappa2_cloud_07_shadow.webp",
+        "fx/clouds/mappa2_cloud_08_shadow.webp",
+        "fx/clouds/mappa2_cloud_09_shadow.webp",
+        "fx/clouds/mappa2_cloud_09_shadow.webp",
+        "fx/clouds/mappa2_cloud_10_shadow.webp",
+        "fx/clouds/mappa2_cloud_11_shadow.webp"
+      ],
+      "ambient-fx": [
+        "fx/ambient-sea-life.webp",
+        "fx/ambient-land-life.webp",
+        "fx/ambient-weather.webp"
+      ],
+      "rare": [
+        "fx/rare-events.webp"
+      ],
+      "region-hover": [
+        "region_ids.png",
+        "regions.json",
+        "biomes.json"
+      ]
+    }
+  }
+}
