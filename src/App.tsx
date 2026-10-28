@@ -82,6 +82,7 @@ const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').
 const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabPage').then(m => ({ default: m.PoiMarkerLabPage })));
 const GameFramePage = lazy(() => import('./pages/game-frame').then(m => ({ default: m.default })));
 const MapBenchmarkPage = lazy(() => import('./pages/map-benchmark').then(m => ({ default: m.default })));
+const Mappa2LabPage = lazy(() => import('./pages/mappa2-lab').then(m => ({ default: m.default })));
 const GameFramePixiPage = lazy(() => import('./pages/game-frame-pixi').then(m => ({ default: m.default })));
 const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
@@ -289,6 +290,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/game-frame';
   const isMapBenchmarkPath =
     typeof window !== 'undefined' && window.location.pathname === '/map-benchmark';
+  const isMappa2LabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/mappa2-lab';
   const isGameFramePixiPath =
     typeof window !== 'undefined' && window.location.pathname === '/game-frame-pixi';
   const isGamePath =
@@ -1068,6 +1071,16 @@ function App() {
       <ErrorBoundary componentName="Map Benchmark Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Map Benchmark...</div>}>
           <MapBenchmarkPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMappa2LabPath) {
+    return (
+      <ErrorBoundary componentName="Mappa2 Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Mappa2 Lab...</div>}>
+          <Mappa2LabPage />
         </Suspense>
       </ErrorBoundary>
     );

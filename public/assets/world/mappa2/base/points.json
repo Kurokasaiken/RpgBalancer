@@ -1,0 +1,546 @@
+{
+  "canvas": {
+    "width": 2752,
+    "height": 1536
+  },
+  "points": [
+    {
+      "id": "coast_01",
+      "type": "coast",
+      "x": 509,
+      "y": 1058,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_02",
+      "type": "coast",
+      "x": 873,
+      "y": 521,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_03",
+      "type": "coast",
+      "x": 2226,
+      "y": 890,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_04",
+      "type": "coast",
+      "x": 335,
+      "y": 1170,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_05",
+      "type": "coast",
+      "x": 480,
+      "y": 717,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_06",
+      "type": "coast",
+      "x": 307,
+      "y": 1352,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_07",
+      "type": "coast",
+      "x": 2068,
+      "y": 1511,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_08",
+      "type": "coast",
+      "x": 1275,
+      "y": 1209,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_09",
+      "type": "coast",
+      "x": 2468,
+      "y": 1066,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_10",
+      "type": "coast",
+      "x": 2544,
+      "y": 896,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_11",
+      "type": "coast",
+      "x": 2488,
+      "y": 1337,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_12",
+      "type": "coast",
+      "x": 1825,
+      "y": 1307,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_13",
+      "type": "coast",
+      "x": 2669,
+      "y": 1091,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_14",
+      "type": "coast",
+      "x": 2641,
+      "y": 301,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_15",
+      "type": "coast",
+      "x": 1106,
+      "y": 330,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_16",
+      "type": "coast",
+      "x": 2176,
+      "y": 570,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_17",
+      "type": "coast",
+      "x": 233,
+      "y": 477,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "coast_18",
+      "type": "coast",
+      "x": 1920,
+      "y": 1175,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_01",
+      "type": "sea",
+      "x": 544,
+      "y": 291,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_02",
+      "type": "sea",
+      "x": 2221,
+      "y": 242,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_03",
+      "type": "sea",
+      "x": 2244,
+      "y": 1217,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_04",
+      "type": "sea",
+      "x": 1878,
+      "y": 40,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_05",
+      "type": "sea",
+      "x": 1399,
+      "y": 1508,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_06",
+      "type": "sea",
+      "x": 1656,
+      "y": 42,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_07",
+      "type": "sea",
+      "x": 625,
+      "y": 982,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_08",
+      "type": "sea",
+      "x": 2418,
+      "y": 801,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_09",
+      "type": "sea",
+      "x": 1119,
+      "y": 1402,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_10",
+      "type": "sea",
+      "x": 1819,
+      "y": 1437,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_11",
+      "type": "sea",
+      "x": 1003,
+      "y": 10,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_12",
+      "type": "sea",
+      "x": 329,
+      "y": 707,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_13",
+      "type": "sea",
+      "x": 537,
+      "y": 605,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "sea_14",
+      "type": "sea",
+      "x": 1578,
+      "y": 1369,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_01",
+      "type": "shallow",
+      "x": 868,
+      "y": 274,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_02",
+      "type": "shallow",
+      "x": 916,
+      "y": 1202,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_03",
+      "type": "shallow",
+      "x": 2351,
+      "y": 1186,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_04",
+      "type": "shallow",
+      "x": 142,
+      "y": 27,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_05",
+      "type": "shallow",
+      "x": 2135,
+      "y": 145,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_06",
+      "type": "shallow",
+      "x": 585,
+      "y": 1452,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_07",
+      "type": "shallow",
+      "x": 2696,
+      "y": 952,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_08",
+      "type": "shallow",
+      "x": 372,
+      "y": 1347,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_09",
+      "type": "shallow",
+      "x": 2182,
+      "y": 516,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "shallow_10",
+      "type": "shallow",
+      "x": 611,
+      "y": 1041,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_01",
+      "type": "land",
+      "x": 1701,
+      "y": 447,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_02",
+      "type": "land",
+      "x": 2639,
+      "y": 186,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_03",
+      "type": "land",
+      "x": 1073,
+      "y": 591,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_04",
+      "type": "land",
+      "x": 2084,
+      "y": 545,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_05",
+      "type": "land",
+      "x": 1713,
+      "y": 954,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_06",
+      "type": "land",
+      "x": 36,
+      "y": 1122,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_07",
+      "type": "land",
+      "x": 1425,
+      "y": 760,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_08",
+      "type": "land",
+      "x": 2713,
+      "y": 1514,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_09",
+      "type": "land",
+      "x": 2681,
+      "y": 463,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "land_10",
+      "type": "land",
+      "x": 289,
+      "y": 1508,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "internal_water_01",
+      "type": "internal_water",
+      "x": 1401,
+      "y": 516,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "internal_water_02",
+      "type": "internal_water",
+      "x": 2697,
+      "y": 351,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "internal_water_03",
+      "type": "internal_water",
+      "x": 1111,
+      "y": 671,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "internal_water_04",
+      "type": "internal_water",
+      "x": 77,
+      "y": 981,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "internal_water_05",
+      "type": "internal_water",
+      "x": 1766,
+      "y": 1185,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "internal_water_06",
+      "type": "internal_water",
+      "x": 1036,
+      "y": 986,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "internal_water_07",
+      "type": "internal_water",
+      "x": 81,
+      "y": 627,
+      "confidence": 0.004,
+      "source": "auto"
+    },
+    {
+      "id": "internal_water_08",
+      "type": "internal_water",
+      "x": 29,
+      "y": 1411,
+      "confidence": 0.004,
+      "source": "auto"
+    }
+  ],
+  "wonder": [
+    {
+      "x": 544,
+      "y": 291
+    },
+    {
+      "x": 2221,
+      "y": 242
+    },
+    {
+      "x": 2244,
+      "y": 1217
+    },
+    {
+      "x": 1878,
+      "y": 40
+    },
+    {
+      "x": 1399,
+      "y": 1508
+    },
+    {
+      "x": 1656,
+      "y": 42
+    },
+    {
+      "x": 625,
+      "y": 982
+    },
+    {
+      "x": 2418,
+      "y": 801
+    },
+    {
+      "x": 1119,
+      "y": 1402
+    },
+    {
+      "x": 1819,
+      "y": 1437
+    },
+    {
+      "x": 1003,
+      "y": 10
+    },
+    {
+      "x": 329,
+      "y": 707
+    },
+    {
+      "x": 537,
+      "y": 605
+    },
+    {
+      "x": 1578,
+      "y": 1369
+    }
+  ]
+}

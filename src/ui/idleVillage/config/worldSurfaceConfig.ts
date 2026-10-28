@@ -280,6 +280,82 @@ export const WorldSurfaceAnchorSchema = z.object({
   labelKey: z.string().optional(),
 });
 
+const WorldSurfacePackPathSchema = z.string().min(1);
+
+/**
+ * Generated-pack metadata for worlds built by an offline asset pipeline.
+ * `packVersion` is a strict major-version contract: unsupported or unknown
+ * pack shapes fail manifest validation instead of being silently ignored.
+ */
+export const WorldSurfacePackSchema = z
+  .object({
+    packVersion: z.literal(1),
+    packRoot: WorldSurfacePackPathSchema,
+    generator: z
+      .object({
+        sourceSha256: z.string().regex(/^[0-9a-f]{64}$/),
+        pipelineVersion: z.string().min(1),
+        maskRevision: z.number().int().nonnegative(),
+      })
+      .strict(),
+    maskFiles: z
+      .object({
+        sea: WorldSurfacePackPathSchema,
+        land: WorldSurfacePackPathSchema,
+        shallow: WorldSurfacePackPathSchema,
+        internalWater: WorldSurfacePackPathSchema,
+        coastDistance: WorldSurfacePackPathSchema,
+        foam: WorldSurfacePackPathSchema,
+      })
+      .strict(),
+    anchorFiles: z.object({ points: WorldSurfacePackPathSchema }).strict(),
+    regionIndex: z
+      .object({
+        idsFile: WorldSurfacePackPathSchema,
+        metadataFile: WorldSurfacePackPathSchema,
+        biomesFile: WorldSurfacePackPathSchema,
+      })
+      .strict(),
+    canopyLayers: z
+      .array(
+        z
+          .object({
+            id: z.string(),
+            file: WorldSurfacePackPathSchema,
+            rect: LayerSourceRectSchema.optional(),
+          })
+          .strict(),
+      )
+      .default([]),
+    cloudBands: z
+      .array(
+        z
+          .object({
+            name: z.enum(['far', 'mid', 'near']),
+            driftSeconds: z.number().positive(),
+            opacity: z.number().min(0).max(1),
+            shadowOpacity: z.number().min(0).max(1),
+            scale: z.number().positive(),
+            sprites: z.array(
+              z
+                .object({
+                  src: WorldSurfacePackPathSchema,
+                  width: z.number().positive(),
+                  y: z.number(),
+                  delaySeconds: z.number().nonnegative(),
+                  shadowSrc: WorldSurfacePackPathSchema,
+                })
+                .strict(),
+            ),
+          })
+          .strict(),
+      )
+      .default([]),
+    fxAtlases: z.record(z.string(), WorldSurfacePackPathSchema).default({}),
+    bootPhases: z.record(z.string(), z.array(WorldSurfacePackPathSchema)).default({}),
+  })
+  .strict();
+
 export const WorldSurfaceManifestSchema = z.object({
   version: z.string(),
   world: z.string(),
@@ -295,6 +371,7 @@ export const WorldSurfaceManifestSchema = z.object({
   regions: z.array(WorldSurfaceRegionSchema).default([]),
   anchors: z.array(WorldSurfaceAnchorSchema).default([]),
   tags: z.array(z.string()).default([]),
+  pack: WorldSurfacePackSchema.optional(),
 });
 
 export type AssetResolutionPolicy = z.infer<typeof AssetResolutionPolicySchema>;
@@ -320,6 +397,7 @@ export type VisualStateActivation = z.infer<typeof VisualStateActivationSchema>;
 export type WorldSurfaceVisualState = z.infer<typeof WorldSurfaceVisualStateSchema>;
 export type WorldSurfaceRegion = z.infer<typeof WorldSurfaceRegionSchema>;
 export type WorldSurfaceAnchor = z.infer<typeof WorldSurfaceAnchorSchema>;
+export type WorldSurfacePack = z.infer<typeof WorldSurfacePackSchema>;
 export type WorldSurfaceManifest = z.infer<typeof WorldSurfaceManifestSchema>;
 
 export interface RendererSelectionInput {
