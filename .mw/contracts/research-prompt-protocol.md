@@ -87,3 +87,12 @@ colore nelle superfici piatte. Ogni campo piatto è dichiarato come
 — cielo = cobalto+violetto+teal a pennellate, mai gradiente liscio;
 prato = verdi spezzati; acqua = tratti argento-turchese. Se una
 superficie è liscia/gradiente, è un FAIL del registro RB.
+
+## Varianti di famiglia (zero-shot > ancora) — prova empirica 2026-10-28
+
+Per generare una variante della famiglia (notte/dusk/alba di una scena):
+**prompt completo da zero**, non "same image" ancorato. La ref ancorata
+trascina lo stile del pixel (incluse lisciature e debolezze); il prompt
+completo impone il registro dichiarato. Verificato su villaggio-night
+(zero-shot impasto 22.6 vs edit 17-21, composizione asimmetrica migliore)
+e f1-night-zero (intera scheda notturna in un colpo).
