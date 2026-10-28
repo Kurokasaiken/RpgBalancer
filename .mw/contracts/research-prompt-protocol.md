@@ -96,3 +96,13 @@ trascina lo stile del pixel (incluse lisciature e debolezze); il prompt
 completo impone il registro dichiarato. Verificato su villaggio-night
 (zero-shot impasto 22.6 vs edit 17-21, composizione asimmetrica migliore)
 e f1-night-zero (intera scheda notturna in un colpo).
+
+## Momento `gloom` (penombra di bosco, Director 2026-10-28)
+
+Quinto momento oltre dawn/day/golden/dusk/night: il buio della foresta
+fitta DI GIORNO. La luce non è "assente" — filtra come lame/pozze calde
+tra le chiome; l'ombra è la massa verde stessa. Soglie: green_lum>=8%
+(i punti illuminati devono essere luminosi), min_val 0.22. Nel prompt
+vietato vocabolario notturno (luna/aurora/argento): la luce è ambra
+diurna in pozze, non argento lunare. Nei boschi: scuri SATURI veronese/
+emerald + lame che portano luce — mai murk lavato.
