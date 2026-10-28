@@ -106,3 +106,17 @@ tra le chiome; l'ombra è la massa verde stessa. Soglie: green_lum>=8%
 vietato vocabolario notturno (luna/aurora/argento): la luce è ambra
 diurna in pozze, non argento lunare. Nei boschi: scuri SATURI veronese/
 emerald + lame che portano luce — mai murk lavato.
+
+## Fauna-gemma per scena (Director, 2026-10-28)
+
+Ogni scena nomina 1-2 accenti di vita SPECIFICI (mai "uccelli/fiori"
+generici). Vocabolario bosco:
+- serpente corallo (bande ruby-gold-nero) — accento vip
+- salamandra nera a pois citrine
+- ragno/tela catturata da una lama di luce
+- mantide su fiore amethyst
+- scarabeo iridescente emerald-copper sul muschio
+- farfalla sapphire, lucertola lime-veronese, lumaca a conchiglia
+  ambra su tronco
+- insetti/vita debbono stare sotto soglia di salienza: dettaglio
+  ricompensa, non soggetto.
