@@ -16,10 +16,7 @@ PLAN-052); contesto v5/v6 (mockup protocol). Nessun nuovo item desiderata
 rivendicato: il plan estende il contratto di un plan esistente, non apre
 direzione.
 
-visual-fork: skipped — il plan tocca solo docs, script e file spec testuali
-(`src/docs/**`, `plans/**`, `.mw/specs/**`, `scripts/*.py`,
-`.mw/templates/**`, `tests/**`); nessun elemento grafico creato o modificato,
-nessuna rigenerazione di immagini in scope — PLAN-080 §2.
+visual-fork: skipped — il plan tocca solo docs, script e file spec testuali (`src/docs/**`, `plans/**`, `.mw/specs/**`, `scripts/*.py`, `.mw/templates/**`, `tests/**`); nessun elemento grafico creato o modificato, nessuna rigenerazione di immagini in scope — plans/PLAN-080-scene-prompt-authoring.md §2
 
 ## 1. Scope
 
