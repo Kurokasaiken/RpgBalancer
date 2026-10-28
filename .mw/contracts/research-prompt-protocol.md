@@ -52,3 +52,21 @@ tutti i gate numerici verdi.
 - pungenti/strutturali: holly (aperto a roveto), horsetail
 
 Regola: 1 massa dominante + 2-3 tipologie secondarie con colori diversi.
+
+## Regola acqua/riflessi (Director, 2026-10-28)
+
+In notturna e in ogni scena con corpi d'acqua: **l'acqua è lo specchio
+della luce** — deve essere dichiarata esplicitamente brillante e
+luminosa ("the river runs bright and luminous, mirroring the moonlight"
+/ "catches the light source"). Mai lasciare l'acqua al buio del campo:
+è la superficie che amplifica la chiave di luce e dà il secondo piano
+luminoso.
+
+## Vocabolario accenti notturni (Director, 2026-10-28)
+
+- **fuochi fatui / will-o'-the-wisps**: sfere eteree che fluttuano
+  lente — accento notturno preferito, più "di mondo" delle lucciole
+- **lucciole**: scintille ambra-fredde in aria (cold-amber pinpoints)
+- Regola materiali notturni: ogni materiale mantiene il COLORE della sua
+  identità attenuato, mai sbiadito — paglia = oro smorzato lunare, non
+  grigio; legno = umber profondo, non marrone-morto.
