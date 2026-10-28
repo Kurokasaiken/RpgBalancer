@@ -33,3 +33,22 @@ scorecard 0-8 una quinta voce (scala a 0-10):
 Regola: un soggetto eroico (quercia, torre, cancello) deve avere
 superficie lavorata visibile — se è un blob liscio è FAIL anche con
 tutti i gate numerici verdi.
+
+## Rude-beauty life vocabulary (obbligatorio, 2026-10-28)
+
+**Funghi** — mai amanita col puntino (cliché "puffi"). Scegliere da:
+- Lactarius indigo — indigo/ultramarino
+- Chlorociboria — calici turchese-veronese su legno marcio
+- Sarcoscypha — calici scarlet su rami caduti
+- Clavaria zollingeri — corallo amethyst
+- Calocera — cornetti topazio/lime gelatinosi
+- Mycena — micro-cluster ice-blue sul muschio
+
+**Sottobosco vario** — mai "tutte felci scure". Mescolare ≥3 tipologie:
+- basse: wood sorrel (trifoglio pallido), dog's mercury, ground ivy
+- fiorite: bluebell, bugle (spighe blu), foxglove, sweet violet, wood anemone
+- rampicanti/coprenti: bramble, ivy, honeysuckle, wild clematis
+- erbe/grani: yorkshire fog (lanugine grigio-verde), soft rush, wood melick
+- pungenti/strutturali: holly (aperto a roveto), horsetail
+
+Regola: 1 massa dominante + 2-3 tipologie secondarie con colori diversi.
