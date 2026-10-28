@@ -1,0 +1,178 @@
+{
+  "size": [
+    2752,
+    1536
+  ],
+  "regions": [
+    {
+      "id": "snow_peaks",
+      "index": 1,
+      "nameKey": "world.region.snow_peaks",
+      "label": "Vette Innevate e Ghiacciaio",
+      "center": [
+        0.5223,
+        0.1178
+      ],
+      "bounds": {
+        "x": 760,
+        "y": 0,
+        "width": 1341,
+        "height": 391
+      },
+      "areaFraction": 0.1085
+    },
+    {
+      "id": "waterfall_plateau",
+      "index": 2,
+      "nameKey": "world.region.waterfall_plateau",
+      "label": "Altopiano della Cascata e Lago Alpino",
+      "center": [
+        0.4602,
+        0.2899
+      ],
+      "bounds": {
+        "x": 850,
+        "y": 270,
+        "width": 831,
+        "height": 351
+      },
+      "areaFraction": 0.0626
+    },
+    {
+      "id": "western_forest",
+      "index": 3,
+      "nameKey": "world.region.western_forest",
+      "label": "Foresta Densa",
+      "center": [
+        0.2303,
+        0.4147
+      ],
+      "bounds": {
+        "x": 260,
+        "y": 300,
+        "width": 741,
+        "height": 661
+      },
+      "areaFraction": 0.107
+    },
+    {
+      "id": "bayou",
+      "index": 4,
+      "nameKey": "world.region.bayou",
+      "label": "Bayou/Palude di Mangrovie",
+      "center": [
+        0.2169,
+        0.7292
+      ],
+      "bounds": {
+        "x": 160,
+        "y": 860,
+        "width": 861,
+        "height": 521
+      },
+      "areaFraction": 0.0905
+    },
+    {
+      "id": "central_valley",
+      "index": 5,
+      "nameKey": "world.region.central_valley",
+      "label": "Valle Fluviale e Praterie Centrali",
+      "center": [
+        0.5033,
+        0.5353
+      ],
+      "bounds": {
+        "x": 980,
+        "y": 560,
+        "width": 831,
+        "height": 521
+      },
+      "areaFraction": 0.1
+    },
+    {
+      "id": "dry_steppe",
+      "index": 6,
+      "nameKey": "world.region.dry_steppe",
+      "label": "Steppe Aride",
+      "center": [
+        0.7233,
+        0.3282
+      ],
+      "bounds": {
+        "x": 1620,
+        "y": 290,
+        "width": 711,
+        "height": 431
+      },
+      "areaFraction": 0.0647
+    },
+    {
+      "id": "red_canyons",
+      "index": 7,
+      "nameKey": "world.region.red_canyons",
+      "label": "Canyon Rossi e Arco Naturale",
+      "center": [
+        0.8489,
+        0.5709
+      ],
+      "bounds": {
+        "x": 2040,
+        "y": 610,
+        "width": 611,
+        "height": 521
+      },
+      "areaFraction": 0.0709
+    },
+    {
+      "id": "volcanic_massif",
+      "index": 8,
+      "nameKey": "world.region.volcanic_massif",
+      "label": "Massiccio Vulcanico Nero",
+      "center": [
+        0.816,
+        0.8417
+      ],
+      "bounds": {
+        "x": 1810,
+        "y": 1030,
+        "width": 891,
+        "height": 506
+      },
+      "areaFraction": 0.1
+    },
+    {
+      "id": "coral_lagoon",
+      "index": 9,
+      "nameKey": "world.region.coral_lagoon",
+      "label": "Laguna Corallina",
+      "center": [
+        0.4868,
+        0.8387
+      ],
+      "bounds": {
+        "x": 820,
+        "y": 1050,
+        "width": 1011,
+        "height": 486
+      },
+      "areaFraction": 0.1105
+    },
+    {
+      "id": "western_archipelago",
+      "index": 10,
+      "nameKey": "world.region.western_archipelago",
+      "label": "Arcipelago e Atollo",
+      "center": [
+        0.0738,
+        0.6195
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 610,
+        "width": 421,
+        "height": 671
+      },
+      "areaFraction": 0.064
+    }
+  ]
+}

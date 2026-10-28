@@ -215,6 +215,72 @@ function hudTuningDefaultsPlugin(): Plugin {
   };
 }
 
+
+/**
+ * Dev-only: bake `/mappa2-lab` vectors into the checked-in defaults.
+ *
+ * The lab POSTs the current sliders/colors here and the endpoint rewrites the
+ * `CODE_DEFAULTS` literal in-place, so the Director's accepted tuning becomes
+ * the code default for every later run/session. Input is whitelisted and
+ * coerced before touching source.
+ */
+function mappa2LabDefaultsPlugin(): Plugin {
+  const TARGET = path.resolve(dirname, 'src/pages/mappa2-lab.tsx');
+  const NUMERIC_KEYS = ['wonderEveryS', 'forestSway', 'cloudOpacityScale', 'cloudTintAmount', 'seaTone', 'seaLineOpacity', 'foamStrength'] as const;
+  const COLOR_KEYS = ['seaLineColor', 'foamColor'] as const;
+
+  return {
+    name: 'mappa2-lab-defaults',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__mappa2-lab-defaults', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('Method Not Allowed');
+          return;
+        }
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk;
+          if (body.length > 8192) req.destroy();
+        });
+        req.on('end', () => {
+          try {
+            const raw = (JSON.parse(body) as { defaults?: Record<string, unknown> }).defaults ?? {};
+            const lines: string[] = [];
+            for (const key of NUMERIC_KEYS) {
+              const value = Number(raw[key]);
+              if (!Number.isFinite(value)) throw new Error(`invalid ${key}`);
+              lines.push(`  ${key}: ${value},`);
+            }
+            for (const key of COLOR_KEYS) {
+              const value = String(raw[key] ?? '');
+              if (!/^#[0-9a-fA-F]{6}$/.test(value)) throw new Error(`invalid ${key}`);
+              lines.push(`  ${key}: '${value}',`);
+            }
+
+            const source = fs.readFileSync(TARGET, 'utf-8');
+            const marker = 'const CODE_DEFAULTS: LabDefaults = {';
+            const start = source.indexOf(marker);
+            if (start === -1) throw new Error('CODE_DEFAULTS not found');
+            const end = source.indexOf('};', start);
+            if (end === -1) throw new Error('unterminated CODE_DEFAULTS');
+            const next = `${source.slice(0, start)}${marker}\n${lines.join('\n')}\n${source.slice(end)}`;
+            fs.writeFileSync(TARGET, next, 'utf-8');
+
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: true }));
+          } catch (error) {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: false, error: (error as Error).message }));
+          }
+        });
+      });
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -279,6 +345,7 @@ export default defineConfig(({ mode }) => ({
     },
     seaPatternDefaultsPlugin(),
     hudTuningDefaultsPlugin(),
+    mappa2LabDefaultsPlugin(),
     ...(process.env.GUARDIAN_BUILD_STATS === 'true' ? [guardianStatsPlugin()] : [])
   ],
   resolve: {
