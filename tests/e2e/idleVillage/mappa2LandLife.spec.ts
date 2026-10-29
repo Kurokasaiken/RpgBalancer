@@ -23,7 +23,7 @@ const saveShot = (name: string, png: PNG) => {
   writeFileSync(`${EVIDENCE_DIR}/${name}`, PNG.sync.write(png));
 };
 
-interface LlAnchor { id: string; x: number; y: number; regionId: string; type: string; weight: number; radius: number }
+interface LlAnchor { id: string; x: number; y: number; biomeId: string; type: string; weight: number; radius: number }
 interface Cam { panX: number; panY: number; zoom: number; width: number; height: number }
 interface Rect { x: number; y: number; w: number; h: number }
 

@@ -1,0 +1,22 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch({ headless: true });
+const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+await p.goto('http://localhost:5173/mappa2-lab', { waitUntil: 'networkidle' });
+await p.getByRole('button', { name: 'sea', exact: true }).click();
+// ambient on + max visibility
+const amb = p.locator('label', { hasText: 'ambient director' }).locator('input');
+if (!(await amb.isChecked())) await amb.check();
+const setR = async (name, v) => { const r = p.locator('label', { hasText: name }).locator('input[type=range]'); await r.evaluate((el, val) => { const s = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set; s.call(el, val); el.dispatchEvent(new Event('input', { bubbles: true })); }, v); };
+await setR('intensity', 2); await setR('shoal alpha', 0.4); await setR('shoal probability', 0);
+await p.waitForFunction(() => window.__worldCamCtl, null, { timeout: 90000 });
+await p.evaluate(() => { const Z = 1.4; window.__worldCamCtl.set({ panX: 2336 - (400 + 520) / Z, panY: 992 - 450 / Z, zoom: Z }); });
+await p.evaluate(() => window.__ambientDebug?.director?.triggerShoal('shoal-z-14-6'));
+await p.waitForTimeout(2500);
+await p.screenshot({ path: 'test-results/plan-094-mappa2-ambient-director/shoal-visible-zoom.png' });
+await p.evaluate(() => window.__worldCamCtl.set({ panX: 0, panY: 0, zoom: 1.0 }));
+await p.evaluate(() => window.__worldCamCtl.refit?.());
+await p.evaluate(() => window.__ambientDebug?.director?.triggerShoal('shoal-z-14-6'));
+await p.waitForTimeout(2500);
+await p.screenshot({ path: 'test-results/plan-094-mappa2-ambient-director/shoal-visible-fit.png' });
+await b.close();
+console.log('done');

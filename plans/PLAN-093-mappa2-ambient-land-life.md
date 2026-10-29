@@ -14,6 +14,14 @@ doc_targets:
 
 # PLAN-093 — Ambient Land-Life su `/mappa2-lab`
 
+> **Nota PLAN-099 (2026-10-29): regioni ≠ biomi.** `regions.json` ora contiene 20 *territori* di gioco
+> (stile Risiko, mare incluso) e **non sono più biomi**; i biomi sono in `biomes.json` / `biome_ids.png`
+> (13, ripetibili in zone lontane). Dove questo piano dice «regione», per le **animazioni** leggi
+> «bioma»: `western_forest`→`temperate_forest`, `central_valley`→`meadow`, `bayou`→`mangrove_bayou` (+`tropical_beach`), `coral_lagoon` (isolette)→`tropical_isles`; l'anchor porta `biomeId` (non più `regionId`). Già implementato in `build-mappa2-assets.py`.
+> Gli id sotto sono quelli storici (`western_forest`, `central_valley`, `dry_steppe`…) e non esistono più.
+> Vedi `plans/PLAN-099-mappa2-territories-and-biomes.md`.
+
+
 ## Provenance
 
 Il Director ha incollato in sessione il piano «PLAN-092 — mappa2 Ambient

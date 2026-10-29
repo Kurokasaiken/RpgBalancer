@@ -153,12 +153,15 @@
       color: var(--text-primary);
       font-family: var(--font-body, 'Crimson Text', serif);
       background-color: var(--surface-base, #050706);
+      min-height: 100vh;
+    }
+
+    body:not([data-mappa2-lab]) {
       background-image: url('/assets/ui/bg.webp');
       background-size: cover;
       background-repeat: no-repeat;
       background-attachment: fixed;
       background-position: center;
-      min-height: 100vh;
     }
 
     h1,

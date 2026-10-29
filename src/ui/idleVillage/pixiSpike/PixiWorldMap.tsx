@@ -32,6 +32,19 @@ import {
   resolveEffectiveZoomBounds,
 } from '@/balancing/config/idleVillage/mobileFitConfig';
 import { Mappa2SecondaryWaterSchema, type Mappa2SecondaryWater } from '../config/mappa2SecondaryWaterConfig';
+import { parseMappa2AmbientDirector } from '../config/mappa2AmbientDirectorConfig';
+import { AmbientDirector, DEFAULT_AMBIENT_DIRECTOR_CONFIG, type AmbientDirectorConfig, type ShoalZone } from './ambient/ambientDirector';
+import { ShoalAdapter } from './ambient/ambientShoal';
+import { Mappa2SeaLifeSchema } from '../config/mappa2SeaLifeConfig';
+import { mountRegionalWeather } from './regionalWeatherOverlay';
+
+/** PLAN-094: deep-merge the lab ambient config over director defaults. */
+const mergeAmbientDirectorConfig = (over?: Partial<AmbientDirectorConfig>): AmbientDirectorConfig => ({
+  ...DEFAULT_AMBIENT_DIRECTOR_CONFIG,
+  ...over,
+  families: { shoal: { ...DEFAULT_AMBIENT_DIRECTOR_CONFIG.families.shoal, ...over?.families?.shoal } },
+  rare: { ...DEFAULT_AMBIENT_DIRECTOR_CONFIG.rare, ...over?.rare },
+});
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { defaultSeaMarksConfig } from '@/ui/idleVillage/config/seaMarksConfig';
@@ -154,6 +167,8 @@ export interface PixiWorldMapProps {
   cloudTint?: string;
   /** Signed base-water tone: negative darkens the painted sea, positive lightens it. */
   seaTone?: number;
+  /** Baked multiply sheet (white = untouched) that darkens the northern rock; `opacity` 0-1 blends it in. Omit to skip loading it. */
+  mountainShade?: { url: string; opacity: number };
   /**
    * Translucent sea: a seabed (ruins, chests) shows through the water and slides slower than the
    * camera, so panning reads as depth. `opacity` is how much of it shows; `parallax` < 1 is its
@@ -177,6 +192,7 @@ export interface PixiWorldMapProps {
    * tick: `enabled: false` hides the overlay container, never a rebuild.
    */
   landLifeConfig?: Partial<PixiLandLifeConfig>;
+  ambientDirectorConfig?: Partial<AmbientDirectorConfig>;
   onStats?: (stats: { textures: number; textureMB: number }) => void;
   /** Real boot progress for the title veil: assets resolve in parallel, then the scene builds. */
   onBootProgress?: (progress: PixiBootProgress) => void;
@@ -229,6 +245,16 @@ export interface PixiWaterfallConfig {
   foamPulse: number;
   /** PLAN-092: scroll the painted falls tile instead of white streak overlays. */
   paintedFlow: boolean;
+  /** PLAN-092 flipbook cadence, painted poses per second — this is the falls speed. */
+  flipFps: number;
+  /** Impact splash (expanding foam rings + spray), 0-1. */
+  splash: number;
+  /** Rainbow rare event peak intensity over the plunge mist, 0-1 (0 = never). */
+  rainbow: number;
+  /** Average seconds between two rainbows (random wait of 0.6x to 1.4x). */
+  rainbowEveryS: number;
+  /** Bump this number to make a rainbow appear now (Director button). */
+  rainbowRequest: number;
   /** Sinusoidal skew amplitude on the painted layer, radians (cap ~0.03). */
   skewAmp: number;
   /** Skew oscillation frequency, Hz. */
@@ -247,6 +273,12 @@ export interface PixiSecondaryWaterConfig {
   lakeShimmer: number;
   /** Alpha of confluence foam pulses, 0-0.6. */
   confluenceFoam: number;
+  /** Falls-basin ripple poses per second (the user's speed; 0 = still). */
+  basinPosesPerS: number;
+  /** Bays and river mouths: poses per second (the user's speed; 0 = still). */
+  seaPatchPosesPerS: number;
+  /** Open sea below the delta: poses per second (0 = still). */
+  deltaSeaPosesPerS: number;
 }
 
 const DEFAULT_SECONDARY_WATER_CONFIG: PixiSecondaryWaterConfig = {
@@ -255,6 +287,9 @@ const DEFAULT_SECONDARY_WATER_CONFIG: PixiSecondaryWaterConfig = {
   riverFlowStrength: 0.24,
   lakeShimmer: 0.22,
   confluenceFoam: 0.25,
+  basinPosesPerS: 4,
+  seaPatchPosesPerS: 3,
+  deltaSeaPosesPerS: 3,
 };
 
 const DEFAULT_WATERFALL_CONFIG: PixiWaterfallConfig = {
@@ -265,6 +300,11 @@ const DEFAULT_WATERFALL_CONFIG: PixiWaterfallConfig = {
   ripples: 0.7,
   foamPulse: 0.3,
   paintedFlow: true,
+  flipFps: 42,
+  splash: 0.6,
+  rainbow: 0.7,
+  rainbowEveryS: 150,
+  rainbowRequest: 0,
   skewAmp: 0.03,
   skewFreq: 0.7,
 };
@@ -522,6 +562,8 @@ const CLOUD_PARALLAX = [0.1, 0.22, 0.4] as const;
 const REGION_RING_Z = 5;
 const CLOUD_BAND_Z = 10;
 const NIGHT_WASH_Z = 20;
+/** Baked rock shade: over the land and canopies, under the region rings and clouds. */
+const MOUNTAIN_SHADE_Z = 3;
 /** Village roofs where smoke rises (world px), puffs per chimney, and a puff's life. */
 const VILLAGE_CHIMNEYS = [
   { x: 2119, y: 1473 },
@@ -613,6 +655,7 @@ export function PixiWorldMap({
   cloudOpacityScale = 1,
   cloudTint = '#ffffff',
   seaTone = 0,
+  mountainShade,
   seabed,
   regions,
   tune: tuneProp,
@@ -623,6 +666,7 @@ export function PixiWorldMap({
   waterfallConfig,
   secondaryWaterConfig,
   landLifeConfig,
+  ambientDirectorConfig,
   onStats,
   onBootProgress,
   onReady,
@@ -655,12 +699,17 @@ export function PixiWorldMap({
   secondaryWaterConfigRef.current = { ...DEFAULT_SECONDARY_WATER_CONFIG, ...secondaryWaterConfig };
   const landLifeConfigRef = useRef<PixiLandLifeConfig>({ ...DEFAULT_LAND_LIFE_CONFIG, ...landLifeConfig });
   landLifeConfigRef.current = { ...DEFAULT_LAND_LIFE_CONFIG, ...landLifeConfig };
+  const ambientDirectorConfigRef = useRef<AmbientDirectorConfig>(mergeAmbientDirectorConfig(ambientDirectorConfig));
+  ambientDirectorConfigRef.current = mergeAmbientDirectorConfig(ambientDirectorConfig);
   const cloudOpacityScaleRef = useRef(cloudOpacityScale);
   cloudOpacityScaleRef.current = cloudOpacityScale;
   const cloudTintRef = useRef(cloudTint);
   cloudTintRef.current = cloudTint;
   const seaToneRef = useRef(seaTone);
   seaToneRef.current = seaTone;
+  const mountainShadeRef = useRef(mountainShade);
+  mountainShadeRef.current = mountainShade;
+  const mountainShadeUrl = mountainShade?.url;
   const forcedWonderRef = useRef(wonderRequest);
   forcedWonderRef.current = wonderRequest;
   const ambientRef = useRef(ambient);
@@ -736,12 +785,21 @@ export function PixiWorldMap({
     let bytes = 0;
     let textureCount = 0;
 
+    // Unique textures only: Assets.load caches by url, so a second load() of the same file is not
+    // a second GPU texture. The report is a dev/test seam (same pattern as __pixiApp).
+    const textureReport = new Map<string, { w: number; h: number }>();
+    Object.assign(window as object, {
+      __pixiTextureReport: () => [...textureReport].map(([url, t]) => ({ url, w: t.w, h: t.h, mb: +((t.w * t.h * 4 * 1.33) / 1048576).toFixed(2) })),
+    });
     const load = async (url: string) => {
       const texture = (await Assets.load(url)) as Texture;
       texture.source.autoGenerateMipmaps = true;
       texture.source.updateMipmaps();
-      bytes += texture.source.pixelWidth * texture.source.pixelHeight * 4 * 1.33;
-      textureCount += 1;
+      if (!textureReport.has(url)) {
+        textureReport.set(url, { w: texture.source.pixelWidth, h: texture.source.pixelHeight });
+        bytes += texture.source.pixelWidth * texture.source.pixelHeight * 4 * 1.33;
+        textureCount += 1;
+      }
       return texture;
     };
 
@@ -902,7 +960,6 @@ export function PixiWorldMap({
       }
       const regionsBase = regionsRef.current?.assetBase;
       if (regionsOn && regionsBase) {
-        wantAsset(`${regionsBase}/region_ids.png`);
         void fetchJson<{ size: [number, number]; regions: PixiRegion[] }>(`${regionsBase}/regions.json`);
         bootTotal += 1;
       }
@@ -937,6 +994,7 @@ export function PixiWorldMap({
       const landLifeBox = new Container();
       Object.assign(window as object, { __landLifeBox: landLifeBox }); // dev/test seam (same pattern as __pixiApp)
       const secondaryWaterBox = new Container();
+      const ambientSeaLayer = new Container(); // PLAN-094: shoal blobs below secondaryWater/foam
       for (const layer of layers) {
         const swapBase = canopyOn && layer.id === 'base_flat';
         const texture = await load(layerUrl(manifest.world, swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file));
@@ -968,6 +1026,7 @@ export function PixiWorldMap({
           seaSprites.push(sprite);
           seaTexture = texture;
           world.addChild(landLifeBox);
+          world.addChild(ambientSeaLayer);
           // PLAN-095 z-order: after `sea` (Mare.webp is opaque over the
           // sea-swallowed river pixels), before waterfall/foreground/clouds.
           // Canopy sprites need no ordering clause: class excludes canopy.
@@ -1066,7 +1125,9 @@ export function PixiWorldMap({
          * the sprite layers below. */
         let wfMesh: Mesh | null = null;
         let wfShader: Shader | null = null;
-        if (meshOk && wf.flowMask) {
+        // With painted flipbook poses the shader mesh is never shown (see `usePainted`), so skip it: its
+        // mask is a full-world 2752x1536 decode and its base_flat load is a second copy of the painting.
+        if (meshOk && wf.flowMask && !wf.paintedFlowFrames?.length) {
           const baseTex = await load(layerUrl(manifest.world, 'base_flat.webp'));
           const wfMaskTex = await load(packAssetUrl(pack.packRoot, wf.flowMask));
           wfShader = Shader.from({
@@ -1095,7 +1156,12 @@ export function PixiWorldMap({
         // PLAN-092 flipbook (chosen approach B): N painted poses cycled at 10fps —
         // painted cel animation, identical on WebGL and Canvas (plain Sprite + mask).
         let flip: Sprite | null = null;
+        // Second sprite on the NEXT pose, faded in by the clock's fraction: poses are tiny steps, so the
+        // cross-fade reads as continuous motion at the display rate instead of a stepped flipbook.
+        let flipNext: Sprite | null = null;
         let flipTexes: Texture[] = [];
+        let flipClock = 0;
+        let flipLastT = -1;
         if (wf.paintedFlowFrames?.length) {
           flipTexes = await Promise.all(wf.paintedFlowFrames.map((f) => load(packAssetUrl(pack.packRoot, f))));
           const fR = wf.paintedFlowRect ?? wf.flowRect;
@@ -1113,6 +1179,21 @@ export function PixiWorldMap({
           box.addChild(fClip);
           flip.mask = fClip;
           box.addChild(flip);
+          flipNext = new Sprite(flipTexes[1 % flipTexes.length]);
+          flipNext.position.copyFrom(flip.position);
+          flipNext.width = flip.width;
+          flipNext.height = flip.height;
+          const fClipNext = new Graphics();
+          if (wf.paintedFlowClip && wf.paintedFlowClip.length > 2) {
+            fClipNext.poly(wf.paintedFlowClip.flatMap(([px, py]) => [px * wsx, py * wsy]));
+          } else {
+            fClipNext.rect(flowR.x, flowR.y, flowR.w, flowR.h);
+          }
+          fClipNext.fill(0xffffff);
+          box.addChild(fClipNext);
+          flipNext.mask = fClipNext;
+          flipNext.alpha = 0;
+          box.addChild(flipNext);
         }
 
         // Source lake: the same streak tile clipped to the lake polygon, scrolled
@@ -1136,7 +1217,7 @@ export function PixiWorldMap({
         const rippleTex = wfFx.waterfallRipple ? await load(packAssetUrl(pack.packRoot, wfFx.waterfallRipple)) : null;
         if (disposed) return;
 
-        const MIST_MAX = 7;
+        const MIST_MAX = 12;
         const mist: { s: Sprite; born: number; life: number; x: number; y: number; drift: number }[] = [];
         if (mistTex) {
           for (let i = 0; i < MIST_MAX; i++) {
@@ -1167,6 +1248,72 @@ export function PixiWorldMap({
             drops.push({ s, born: -1, life: 1, x: 0, y: 0, vx: 0 });
           }
         }
+
+        // Impact splash (PLAN-092): fast bright foam rings expanding from the plunge point,
+        // plus a few spray puffs thrown up and back down. Sprites only — Canvas-safe.
+        const SPLASH_RINGS = 3;
+        const SPRAY_MAX = 9;
+        const splashRings: { s: Sprite }[] = [];
+        const spray: { s: Sprite; born: number; life: number; vx: number; vy: number }[] = [];
+        if (rippleTex && mistTex) {
+          for (let i = 0; i < SPLASH_RINGS; i++) {
+            const s = new Sprite(rippleTex);
+            s.anchor.set(0.5);
+            s.tint = 0xf4fdff;
+            s.visible = false;
+            box.addChild(s);
+            splashRings.push({ s });
+          }
+          for (let i = 0; i < SPRAY_MAX; i++) {
+            const s = new Sprite(mistTex);
+            s.anchor.set(0.5);
+            s.tint = 0xffffff;
+            s.visible = false;
+            box.addChild(s);
+            spray.push({ s, born: -1, life: 0.8, vx: 0, vy: 0 });
+          }
+        }
+
+        // Rainbow rare event (PLAN-092): a soft additive arc over the plunge mist, fading in,
+        // holding and out. Procedural canvas texture — no asset, identical on WebGL and Canvas.
+        const rainbowCanvas = document.createElement('canvas');
+        rainbowCanvas.width = 512;
+        rainbowCanvas.height = 256;
+        const rbCtx = rainbowCanvas.getContext('2d');
+        let rainbow: Sprite | null = null;
+        if (rbCtx) {
+          const grad = rbCtx.createRadialGradient(256, 256, 150, 256, 256, 250);
+          const bands: [number, string][] = [
+            [0, 'rgba(120,80,255,0)'], [0.1, 'rgba(140,100,255,0.7)'], [0.25, 'rgba(70,160,255,0.8)'],
+            [0.4, 'rgba(90,240,170,0.8)'], [0.55, 'rgba(255,245,100,0.85)'], [0.7, 'rgba(255,170,70,0.85)'],
+            [0.87, 'rgba(255,80,80,0.75)'], [1, 'rgba(255,80,80,0)'],
+          ];
+          bands.forEach(([o, c]) => grad.addColorStop(o, c));
+          rbCtx.fillStyle = grad;
+          rbCtx.fillRect(0, 0, 512, 256);
+          // Fade the arc's feet into the mist instead of a hard horizontal cut.
+          rbCtx.globalCompositeOperation = 'destination-in';
+          const feet = rbCtx.createLinearGradient(0, 0, 0, 256);
+          feet.addColorStop(0, 'rgba(0,0,0,1)');
+          feet.addColorStop(0.55, 'rgba(0,0,0,1)');
+          feet.addColorStop(1, 'rgba(0,0,0,0)');
+          rbCtx.fillStyle = feet;
+          rbCtx.fillRect(0, 0, 512, 256);
+          rbCtx.globalCompositeOperation = 'source-over';
+          rainbow = new Sprite(Texture.from(rainbowCanvas));
+          rainbow.anchor.set(0.5, 1);
+          rainbow.position.set(impactPt.x, impactPt.y - impactR.h * 0.05);
+          rainbow.width = impactR.w * 1.05;
+          rainbow.height = (impactR.w * 1.05) / 2;
+          rainbow.blendMode = 'screen';
+          rainbow.alpha = 0;
+          rainbow.visible = false;
+          box.addChild(rainbow);
+        }
+        let rbBorn = -1;
+        let rbEvent = 0;
+        let rbSeenRequest = waterfallConfigRef.current.rainbowRequest;
+        let rbNextAt = -1;
 
         const ripples: { s: Sprite; born: number; life: number; cx: number; cy: number; maxR: number; squash: number }[] = [];
         const basinCx = basinR.x + basinR.w / 2;
@@ -1232,8 +1379,17 @@ export function PixiWorldMap({
           }
           if (flip && flipTexes.length) {
             flip.visible = useFlip && live;
-            // Cel cadence: 10fps, each pose already a seamless rolled tile.
-            flip.texture = flipTexes[Math.floor(t * 10) % flipTexes.length];
+            // Cel cadence from config; an accumulated clock so a live speed change
+            // never jumps to an unrelated pose.
+            if (flipLastT >= 0) flipClock += Math.max(0, t - flipLastT) * cfg.flipFps;
+            flipLastT = t;
+            const poseIdx = Math.floor(flipClock);
+            flip.texture = flipTexes[poseIdx % flipTexes.length];
+            if (flipNext) {
+              flipNext.visible = flip.visible;
+              flipNext.texture = flipTexes[(poseIdx + 1) % flipTexes.length];
+              flipNext.alpha = flipClock - poseIdx;
+            }
           }
           if (lake) {
             lake.alpha = cfg.flowStrength * 0.32;
@@ -1270,6 +1426,72 @@ export function PixiWorldMap({
             d.s.alpha = Math.sin(p * Math.PI) * 0.4;
           }
 
+          // Splash: staggered expanding rings + spray puffs at the plunge point.
+          for (let i = 0; i < splashRings.length; i++) {
+            const r = splashRings[i];
+            const period = 1.1;
+            const p = (((t / period) + i / splashRings.length) % 1);
+            const rad = impactR.w * (0.05 + 0.22 * p);
+            r.s.visible = live && cfg.splash > 0;
+            r.s.position.set(impactPt.x, impactPt.y);
+            r.s.scale.set((rad * 2) / r.s.texture.width, ((rad * 2) / r.s.texture.width) * 0.42);
+            r.s.alpha = cfg.splash * 0.6 * (1 - p) * (1 - p);
+          }
+          for (let i = 0; i < spray.length; i++) {
+            const sp = spray[i];
+            if (!live || cfg.splash <= 0 || i >= Math.max(1, Math.round(cfg.splash * spray.length))) {
+              sp.s.visible = false;
+              sp.born = -1;
+              continue;
+            }
+            if (sp.born < 0 || t - sp.born > sp.life) {
+              const gen = Math.floor(t * 3) + i * 53;
+              sp.born = t + hash01(i, gen + 1) * 0.5;
+              sp.life = 0.55 + hash01(i, gen + 2) * 0.5;
+              sp.vx = (hash01(i, gen + 3) - 0.5) * impactR.w * 0.4;
+              sp.vy = impactR.h * (0.18 + hash01(i, gen + 4) * 0.2);
+            }
+            if (t < sp.born) {
+              sp.s.visible = false;
+              continue;
+            }
+            const p = Math.min(1, (t - sp.born) / sp.life);
+            const k = impactR.w / 420;
+            sp.s.visible = true;
+            sp.s.scale.set((0.1 + 0.08 * (1 - p)) * k, (0.14 + 0.1 * (1 - p)) * k);
+            sp.s.position.set(
+              impactPt.x + (hash01(i, 9) - 0.5) * impactR.w * 0.18 + sp.vx * p,
+              impactPt.y - sp.vy * 4 * p * (1 - p),
+            );
+            sp.s.alpha = Math.sin(p * Math.PI) * 0.5 * cfg.splash;
+          }
+
+          // Rainbow rare event.
+          if (rainbow) {
+            if (rbNextAt < 0) rbNextAt = t + cfg.rainbowEveryS * (0.3 + hash01(rbEvent, 5) * 0.4);
+            const forced = cfg.rainbowRequest !== rbSeenRequest;
+            if (forced) rbSeenRequest = cfg.rainbowRequest;
+            if (rbBorn < 0 && live && cfg.rainbow > 0 && (forced || (cfg.rainbowEveryS > 0 && t >= rbNextAt))) {
+              rbBorn = t;
+              rbEvent += 1;
+              rbNextAt = t + cfg.rainbowEveryS * (0.6 + hash01(rbEvent, 5) * 0.8);
+            }
+            if (rbBorn >= 0) {
+              const age = t - rbBorn;
+              const IN = 3.5, HOLD = 7, OUT = 5;
+              if (age > IN + HOLD + OUT) {
+                rbBorn = -1;
+                rainbow.visible = false;
+                rainbow.alpha = 0;
+              } else {
+                const env = age < IN ? age / IN : age < IN + HOLD ? 1 : 1 - (age - IN - HOLD) / OUT;
+                const eased = env * env * (3 - 2 * env);
+                rainbow.visible = true;
+                rainbow.alpha = Math.min(1, cfg.rainbow * 0.8) * eased * (0.9 + 0.1 * Math.sin(t * 0.8));
+              }
+            }
+          }
+
           if (foam) {
             const pulse = live ? 0.5 + 0.5 * Math.sin(t * 5.2) * Math.sin(t * 1.7 + 1.3) : 0;
             foam.alpha = cfg.foamPulse * (0.15 + 0.3 * pulse);
@@ -1301,8 +1523,8 @@ export function PixiWorldMap({
             const grow = (0.5 + 1.4 * p) * (impactR.w / 420);
             m.s.visible = true;
             m.s.scale.set(grow, grow * 0.75);
-            m.s.position.set(m.x + m.drift * p, m.y - 18 * p);
-            m.s.alpha = Math.sin(p * Math.PI) * 0.26;
+            m.s.position.set(m.x + m.drift * p, m.y - 34 * p * (impactR.w / 420 + 0.4));
+            m.s.alpha = Math.sin(p * Math.PI) * 0.32;
           }
 
           // Basin ripples: off-centre, irregular timing/radius/squash — never a
@@ -1363,6 +1585,19 @@ export function PixiWorldMap({
           const wakeTex = wfFx?.waterfallRipple ? await load(packAssetUrl(pack.packRoot, wfFx.waterfallRipple)) : glintTex;
 
           const segSprites: { sp: TilingSprite; baseScale: number; speed: number }[] = [];
+          // PLAN-095 v2: painted flow-map poses (same recipe as the falls flipbook).
+          // RGBA poses carry their own feathered water alpha — no clip mask needed.
+          const poseSprites: { sp: Sprite; texes: Texture[]; enabled: boolean; sea: 0 | 1 | 2 }[] = [];
+          const addFlowPoses = async (poses: NonNullable<Mappa2SecondaryWater['rivers'][number]['flowPoses']>, enabled: boolean, sea: 0 | 1 | 2 = 0) => {
+            const texes = await Promise.all(poses.frames.map((f) => load(packAssetUrl(pack.packRoot, f))));
+            const sp = new Sprite(texes[0]);
+            sp.position.set(poses.rect.x * wsx2, poses.rect.y * wsy2);
+            sp.width = poses.rect.width * wsx2;
+            sp.height = poses.rect.height * wsy2;
+            sp.visible = enabled;
+            secondaryWaterBox.addChild(sp);
+            poseSprites.push({ sp, texes, enabled, sea });
+          };
           const featureBoxes: Record<string, Container> = {};
           const glints: { sp: Sprite; x: number; y: number; ph: number; lake: boolean }[] = [];
           const wakes: { sp: Sprite; x: number; y: number; maxR: number; ph: number }[] = [];
@@ -1381,8 +1616,10 @@ export function PixiWorldMap({
             clip.fill(0xffffff);
             fc.addChild(clip);
             fc.mask = clip; // never clip.visible=false (WITNESS-01): visibility lives on the container
+            if (river.flowPoses) await addFlowPoses(river.flowPoses, river.enabled);
             const tint = parseInt(river.tint.slice(1), 16);
-            for (const seg of river.segments) {
+            // Streak overlay only as fallback for a river without painted poses.
+            for (const seg of river.flowPoses ? [] : river.segments) {
               const sp = new TilingSprite({ texture: tileTex, width: seg.length * wsx2, height: seg.width * wsy2 });
               sp.anchor.set(0.5);
               sp.position.set(seg.cx * wsx2, seg.cy * wsy2);
@@ -1398,6 +1635,25 @@ export function PixiWorldMap({
             featureBoxes[river.id] = fc;
           }
 
+          // Falls basin: outward ripple poses, cross-faded between consecutive poses, own clock and speed.
+          let basinSprite: Sprite | null = null;
+          let basinNext: Sprite | null = null;
+          let basinTexes: Texture[] = [];
+          if (swData.basin?.flowPoses) {
+            const bp = swData.basin.flowPoses;
+            basinTexes = await Promise.all(bp.frames.map((f) => load(packAssetUrl(pack.packRoot, f))));
+            const mk = () => {
+              const s = new Sprite(basinTexes[0]);
+              s.position.set(bp.rect.x * wsx2, bp.rect.y * wsy2);
+              s.width = bp.rect.width * wsx2;
+              s.height = bp.rect.height * wsy2;
+              s.visible = false;
+              secondaryWaterBox.addChild(s);
+              return s;
+            };
+            basinSprite = mk();
+            basinNext = mk();
+          }
           for (const lake of swData.lakes) {
             const fc = new Container();
             fc.visible = lake.enabled;
@@ -1408,6 +1664,7 @@ export function PixiWorldMap({
             clip.fill(0xffffff);
             fc.addChild(clip);
             fc.mask = clip;
+            if (lake.flowPoses) await addFlowPoses(lake.flowPoses, lake.enabled);
             for (const g of lake.glintPoints) glints.push({ sp: null as never, x: g.x * wsx2, y: g.y * wsy2, ph: hash3(g.x, g.y), lake: true });
             secondaryWaterBox.addChild(fc);
             featureBoxes[lake.id] = fc;
@@ -1426,8 +1683,11 @@ export function PixiWorldMap({
             gi += 1;
           }
 
+          for (const patch of swData.seaPatches ?? []) await addFlowPoses(patch.flowPoses, true, patch.id === 'delta_sea' ? 2 : 1);
+
           const confBox = new Container();
-          for (const c of swData.confluences) {
+          // Director 2026-10-29: the ring wakes sat on the banks, not on the water — none are spawned.
+          for (const c of [] as typeof swData.confluences) {
             const sp = new Sprite(wakeTex);
             sp.anchor.set(0.5);
             sp.position.set(c.x * wsx2, c.y * wsy2);
@@ -1438,14 +1698,44 @@ export function PixiWorldMap({
           secondaryWaterBox.addChild(confBox);
 
           Object.assign(window as object, {
-            __secondaryWaterDebug: { box: secondaryWaterBox, featureBoxes, segCount: segSprites.length, glintCount: glints.length, wakeCount: wakes.length },
+            __secondaryWaterDebug: { box: secondaryWaterBox, featureBoxes, segCount: segSprites.length, poseCount: poseSprites.length, glintCount: glints.length, wakeCount: wakes.length },
           });
 
+          let poseClock = 0;
+          let poseLastT = -1;
+          let seaClock = 0;
+          let deltaClock = 0;
+          let basinClock = 0;
+          let basinLastT = -1;
           ticks.push((t) => {
             const cfg = secondaryWaterConfigRef.current;
             secondaryWaterBox.visible = cfg.riversOn;
             if (!cfg.riversOn) return;
             const live = !reducedMotion;
+            if (basinSprite && basinNext) {
+              // The user's speed: poses per second, accumulated so a live change never jumps a pose.
+              if (basinLastT >= 0 && live) basinClock += Math.max(0, t - basinLastT) * cfg.basinPosesPerS;
+              basinLastT = t;
+              const idx = Math.floor(basinClock);
+              const frac = basinClock - idx;
+              basinSprite.visible = live && cfg.basinPosesPerS > 0;
+              basinNext.visible = basinSprite.visible;
+              basinSprite.texture = basinTexes[idx % basinTexes.length];
+              basinNext.texture = basinTexes[(idx + 1) % basinTexes.length];
+              basinSprite.alpha = 1;
+              basinNext.alpha = frac;
+            }
+            // 12 poses/s at 1x; accumulated so a live speed change never jumps a pose.
+            if (poseLastT >= 0 && live) {
+              poseClock += Math.max(0, t - poseLastT) * 12 * cfg.riverFlowSpeed;
+              seaClock += Math.max(0, t - poseLastT) * cfg.seaPatchPosesPerS;
+              deltaClock += Math.max(0, t - poseLastT) * cfg.deltaSeaPosesPerS;
+            }
+            poseLastT = t;
+            for (const ps of poseSprites) {
+              ps.sp.visible = ps.enabled && live;
+              ps.sp.texture = ps.texes[Math.floor(ps.sea === 2 ? deltaClock : ps.sea === 1 ? seaClock : poseClock) % ps.texes.length];
+            }
             const z = world.scale.x;
             const lodScale = z >= 0.65 ? 1.0 : z >= 0.32 ? 1.5 : 2.2;
             const lodAlpha = z >= 0.45 ? 1.0 : 0.35 + 0.65 * smooth((z - 0.18) / Math.max(1e-6, 0.45 - 0.18));
@@ -1473,6 +1763,76 @@ export function PixiWorldMap({
         }
       }
 
+      /* ── AmbientDirector + shoal (PLAN-094): deterministic admission
+       * scheduler + zone-based blob pool over real shallows. The Director
+       * only admits spawns (spawn log, cooldowns, caps, rare lock);
+       * ShoalAdapter owns sprites/lifecycle. Live config via ref. ── */
+      const ambAtlasPath = manifest.pack?.fxAtlases.ambientSeaLife;
+      if (pack && ambAtlasPath && ambientSeaLayer.parent === world) {
+        // leaf file, fetched by name — pack.* stays strict-schema clean
+        // (same pattern as secondary-water.json, PLAN-095).
+        const adJson = await fetchJson<unknown>(packAssetUrl(pack.packRoot, 'ambient-director.json')).catch(() => null);
+        const directorData = adJson ? parseMappa2AmbientDirector(adJson) : null;
+        const atlasTex = await load(packAssetUrl(pack.packRoot, ambAtlasPath)).catch(() => null);
+        if (disposed) return;
+        if (directorData) {
+          const asx = canvas.width / directorData.canvas[0];
+          const zones: ShoalZone[] = directorData.zones.map((z) => ({
+            id: z.id, biome: z.biome, cx: z.cells[0][0], cy: z.cells[0][1],
+            heading: z.heading, maxTravelPx: z.maxTravelPx, tintRow: z.tintRow,
+            weight: z.cells[0][2],
+          }));
+          const director = new AmbientDirector(zones, () => ambientDirectorConfigRef.current);
+          // read-only occupancy declarations for the rare-event gate
+          // (artifact-r003): existing effects stay independent; the
+          // registry is the ONLY coupling the Director has to them.
+          director.occupancy.declare('seaPattern', 'sea', 0.4);
+          director.occupancy.declare('coastFoam', 'coast', 0.3);
+          director.occupancy.declare('seaMarks', 'sea', 0.2);
+          director.occupancy.declare('birds', 'sky', 0.3);
+          director.occupancy.declare('clouds', 'sky', 0.3);
+          director.occupancy.declare('waterfall', 'land', 0.3);
+          director.occupancy.declare('landLife', 'land', 0.3);
+          director.occupancy.declare('secondaryWater', 'water', 0.4);
+          const shoal = new ShoalAdapter(zones, atlasTex, () => ambientDirectorConfigRef.current, asx);
+          ambientSeaLayer.addChild(shoal.container);
+          // Director's hinged silhouettes (sea-life.json leaf + png parts); placeholders stay until they load.
+          void (async () => {
+            const rigJson = await fetchJson<unknown>(packAssetUrl(pack.packRoot, 'sea-life.json')).catch(() => null);
+            const parsed = rigJson ? Mappa2SeaLifeSchema.safeParse(rigJson) : null;
+            if (!parsed?.success || disposed) return;
+            const files = new Set<string>();
+            for (const an of Object.values(parsed.data.animals)) for (const part of an.parts) files.add(part.file);
+            const texByFile = new Map<string, Texture>();
+            await Promise.all([...files].map(async (f) => {
+              const t = await load(packAssetUrl(pack.packRoot, f)).catch(() => null);
+              if (t) texByFile.set(f, t);
+            }));
+            if (!disposed) shoal.setRigs(parsed.data.animals, (f) => texByFile.get(f));
+          })();
+          Object.assign(window as object, {
+            __ambientDebug: { layer: ambientSeaLayer, director, shoal, zones: zones.length },
+          });
+          let lastMs = -1;
+          ticks.push((t) => {
+            const cfg = ambientDirectorConfigRef.current;
+            ambientSeaLayer.visible = cfg.enabled;
+            const nowMs = t * 1000;
+            const dMs = lastMs >= 0 ? nowMs - lastMs : 16.7;
+            lastMs = nowMs;
+            for (const a of director.tick(dMs, () => shoal.activeCount(), reducedMotion)) {
+              shoal.spawn(a, t);
+            }
+            shoal.update(t, reducedMotion);
+          });
+        }
+      }
+
+      // PLAN-098: mist + embers leaf overlay (self-contained mount; no-op off-mappa2).
+      if (pack && manifest.world === 'mappa2') {
+        await mountRegionalWeather({ pack, world, canvasW: canvas.width, canvasH: canvas.height, load, fetchJson, ticks, reducedMotion, packAssetUrl, disposed: () => disposed });
+      }
+
       /* ── Ambient land-life (PLAN-093): micro-life bound to real foliage.
        * Leaves fall/sway out of canopy-mask anchors, motes drift over crowns
        * and candidate biomes, flutters trace small zigzags on warm land.
@@ -1485,7 +1845,7 @@ export function PixiWorldMap({
         type LlAnchor = { x: number; y: number; r: number; w: number };
         const anchorsPayload = await fetchJson<{
           canvas: { width: number; height: number };
-          anchors: { id: string; x: number; y: number; regionId: string; type: string; weight: number; radius: number }[];
+          anchors: { id: string; x: number; y: number; biomeId: string; type: string; weight: number; radius: number }[];
         }>(packAssetUrl(pack.packRoot, llPack.anchorsFile)).catch(() => null);
         const asx = anchorsPayload ? canvas.width / anchorsPayload.canvas.width : 1;
         const asy = anchorsPayload ? canvas.height / anchorsPayload.canvas.height : 1;
@@ -1629,6 +1989,19 @@ export function PixiWorldMap({
         wash.height = canvas.height + 2 * marginY + 4000;
         wash.visible = true;
       });
+      if (mountainShadeUrl) {
+        const shadeTex = await load(mountainShadeUrl);
+        const shade = new Sprite(shadeTex);
+        shade.blendMode = 'multiply';
+        shade.zIndex = MOUNTAIN_SHADE_Z;
+        shade.width = canvas.width;
+        shade.height = canvas.height;
+        world.addChild(shade);
+        ticks.push(() => {
+          shade.alpha = Math.min(1, Math.max(0, mountainShadeRef.current?.opacity ?? 0));
+          shade.visible = shade.alpha > 0.001;
+        });
+      }
       ticks.push((t) => {
         for (const c of canopySway) {
           const ts = t * tn.forestSwaySpeed;
@@ -2514,25 +2887,40 @@ export function PixiWorldMap({
       let cleanupRegions = () => {};
       if (regionsOn && regionsRef.current) {
         const base = regionsRef.current.assetBase;
-        const [meta, idTexture] = await Promise.all([
+        const [meta, idBitmap] = await Promise.all([
           fetchJson<{ size: [number, number]; regions: PixiRegion[] }>(`${base}/regions.json`),
-          load(`${base}/region_ids.png`),
+          // The id map is only ever READ on the CPU: decode it straight to a bitmap, not to a Pixi texture
+          // (a world-size RGBA decode kept alive for nothing).
+          fetch(`${base}/region_ids.png`)
+            .then((r) => r.blob())
+            .then((b) => createImageBitmap(b, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' })),
         ]);
-        if (disposed) return;
+        if (disposed) {
+          idBitmap.close();
+          return;
+        }
         const [mw, mh] = meta.size;
         const idCanvas = document.createElement('canvas');
         idCanvas.width = mw;
         idCanvas.height = mh;
         const idCtx = idCanvas.getContext('2d', { willReadFrequently: true });
-        const source = idTexture.source.resource as CanvasImageSource;
-        idCtx?.drawImage(source, 0, 0, mw, mh);
-        const ids = idCtx?.getImageData(0, 0, mw, mh).data;
+        idCtx?.drawImage(idBitmap, 0, 0, mw, mh);
+        idBitmap.close();
+        const idRgba = idCtx?.getImageData(0, 0, mw, mh).data;
+        // One byte per pixel (the red channel is the id); the RGBA readback is dropped right away.
+        let ids: Uint8Array | undefined;
+        if (idRgba) {
+          ids = new Uint8Array(mw * mh);
+          for (let i = 0; i < ids.length; i += 1) ids[i] = idRgba[i * 4];
+        }
+        idCanvas.width = 0;
+        idCanvas.height = 0;
         const regionByIndex = new Map(meta.regions.map((r) => [r.index, r]));
         const idAt = (wx: number, wy: number) => {
           if (!ids || wx < 0 || wy < 0 || wx >= canvas.width || wy >= canvas.height) return 0;
           const x = Math.floor((wx / canvas.width) * mw);
           const y = Math.floor((wy / canvas.height) * mh);
-          return ids[(y * mw + x) * 4];
+          return ids[y * mw + x];
         };
         const highlights = new Map<number, Sprite>();
         const highlightFor = (index: number) => {
@@ -2554,7 +2942,7 @@ export function PixiWorldMap({
             // runs in straight-ish segments that follow the shape rather than its stair steps. The ink is clipped to the
             // shape, so only its inner half shows, and the warm wash fills the same polygon.
             const thickW = Math.max(2, Math.round((tn.regionLinePx * W) / canvas.width));
-            const loops = traceBoundaryLoops(mw, mh, (x, y) => x >= 0 && y >= 0 && x < mw && y < mh && ids[(y * mw + x) * 4] === index)
+            const loops = traceBoundaryLoops(mw, mh, (x, y) => x >= 0 && y >= 0 && x < mw && y < mh && ids[y * mw + x] === index)
               .map((loop) => simplifyLoop(loop, REGION_OUTLINE_SIMPLIFY_PX * (mw / canvas.width)));
             const tracePath = () => {
               ctx.beginPath();

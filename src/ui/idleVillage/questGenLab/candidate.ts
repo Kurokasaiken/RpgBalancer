@@ -45,6 +45,13 @@ export interface LabCandidate {
   readonly provenance: CandidateProvenance;
   /** Only stored lineage field — the candidate this one was regenerated from. */
   readonly supersedes?: string;
+  /** PLAN-102: non-breaking extension for editor-saved candidates. */
+  readonly editedProvenance?: {
+    kind: 'edited'; parentSource: string; parentRef: string;
+    parentScenarioHash: string;
+    editSummary: { opCount: number; ops: string[] };
+    fidelityWaivers: string[];
+  };
 }
 
 /** Status of a candidate on the two independent axes. */

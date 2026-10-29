@@ -209,3 +209,31 @@ la verifica percettiva finale di Director su tutte le animazioni T-007+.
 - **Cloud alpha hole fix (2026-10-28):** Director ha rilevato che le nuvole mostravano buchi invece di chiaro/scuro pittorico. Corretto `scripts/build-mappa2-assets.py`: threshold silhouette `24 → 14`, close `7px`, fill dei cavity interni tramite contour esterno e feather solo sul bordo. Evidenza: `visual-checks/check-047-cloud-filled-final.png` e `visual-checks/check-048-clouds-live-filled.png`. Gate: `py_compile` PASS, `useWorldSurface` 12/12, `build:check` PASS, `closure:lint` timeout >30s nel worktree condiviso.
 - **Dense forest canopy restore (2026-10-28):** Director ha rilevato che la foresta grande/scura non si muove più. Root cause: la maschera biome-only escludeva il corpo della foresta perché cade in `central_valley`. Aggiunto `DENSE_FOREST_CORE_POLYGON` senza riaprire tutta la valle; `maskRevision 4`, canopy `19 → 25`, coverage `1.62% → 3.16%`, patch principale `forest_canopy_14` `566×276`. Runtime witness: `__canopySway=25`, Canvas fallback sprite `dx≈-1.36px` in 700ms; ROI diff mean `3.55`, `1669px>20`. Evidenza `visual-checks/check-054-forest-a.png`. Gate: `useWorldSurface` 12/12, `build:check` PASS, scoped lint 0 errori/file ignorati, `closure:lint` timeout 30s.
 - **Canopy coverage restore (2026-10-28):** Director ha rilevato che molte altre foreste non si muovevano. Sostituito il whitelist-biome troppo stretto con classificatore `green_score = G - mean(R,B) >= 30` + `edge_density >= .45` + HSV `18–100 / S>=40 / V<=200`, escludendo `snow_peaks`, `dry_steppe`, `red_canyons`, `volcanic_massif`; `DENSE_FOREST_CORE_POLYGON` resta come boost mirato. `maskRevision 5`, canopy `25 → 39`, coverage `3.16% → 5.95%`, patch foresta grande `652×458`. Overlay accettato: `visual-checks/check-058-canopy-broad-full.png`; live `visual-checks/check-059-canopy-broad-live.png` con `__canopySway=39` e movimento Canvas fallback. Gate: `useWorldSurface` 12/12, `build:check` PASS, scoped lint 0 errori/file ignorati, `closure:lint` timeout 30s.
+
+## Decisioni Director 2026-10-29 — idee di ambiente (dopo ricerca e lista proposte)
+
+Fonte unica delle scelte; i piani figli riportano solo la parte loro.
+
+**Sì / da fare**
+- **Strutture scoperte persistenti:** una struttura trovata esplorando resta visibile sulla mappa da lì in poi; se cambia stato, il cambio si vede sulla mappa. La comparsa "dipinta a pennello" vale come principio, **non** come animazione: per ora comparsa normale (le cose dinamiche si decidono dopo).
+- **Stormo casuale** ogni tanto (sprite nuovi per mappa2) → PLAN-097.
+- **Branchi:** sì, ma creature meno banali e più fantasy (specie da decidere) → PLAN-097.
+- **Coda di balena** che emerge lontano → PLAN-094.
+- **Sirena** che ogni tanto si appoggia su uno scoglio → PLAN-094 (evento raro).
+- **Vita marina:** banchi di pesci + "qualcosa di più grande" → PLAN-094.
+- **Pioggia locale** e **nuvole che si formano sulle montagne con lampi** → PLAN-098 (seconda fetta).
+- **Giorno/notte:** da ritestare sulla mappa2 (era stato tolto perché brutto sulla mappa precedente) → PLAN-098.
+- **Arcobaleno raro** sotto la cascata → fatto (PLAN-092).
+- **Suono della cascata quando ci si zooma sopra**; altri suoni di zona da valutare → PLAN-100.
+- **Segreti cliccabili** solo in zone super specifiche: 1 clic = suono, 3 clic = animazione nascosta (riferimento: tabellone di Hearthstone) → PLAN-100.
+
+**No / non ora**
+- Animazione a pennello della scoperta, penna/cartografo, "qui ci sono draghi" dinamici: rimandati (dinamiche decise dopo).
+- Sentieri che si consumano: la mappa non ha sentieri.
+- Cicatrici/conquista di zone: non è prevista la meccanica di conquista (idea buona, archiviata).
+- Viaggio visibile: esiste già qualcosa di simile.
+- Mulino/ruota ad acqua: al massimo nel villaggio, non convince.
+- Faro: non per ora.
+- Piccoli oggetti cliccabili sparsi che reagiscono: fastidiosi (solo i segreti in punti specifici).
+
+> **Asset:** l'elenco unico (pose, dimensioni, stato) è in [`ASSETS-mappa2.md`](ASSETS-mappa2.md).

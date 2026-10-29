@@ -34,7 +34,7 @@ export interface ExportEnvelope {
     readonly scenarioHash: string;
     readonly kitHash: string;
     readonly generatedAt: string;
-    readonly provenance: 'generated' | 'imported';
+    readonly provenance: 'generated' | 'imported' | 'edited';
   };
   /** Historical/advisory snapshot — stale detection is by hash, not trust. */
   readonly validationSnapshot?: ValidationReport;
@@ -54,7 +54,7 @@ export const ExportEnvelopeSchema = z
       scenarioHash: z.string().min(1),
       kitHash: z.string().min(1),
       generatedAt: z.string().min(1),
-      provenance: z.enum(['generated', 'imported']),
+      provenance: z.enum(['generated', 'imported', 'edited']),
     }),
     validationSnapshot: z.unknown().optional(),
     scenario: z.unknown(),
