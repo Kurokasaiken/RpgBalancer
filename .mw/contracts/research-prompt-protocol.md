@@ -120,3 +120,20 @@ generici). Vocabolario bosco:
   ambra su tronco
 - insetti/vita debbono stare sotto soglia di salienza: dettaglio
   ricompensa, non soggetto.
+
+## Le 5 regole della luce che brucia (Director, 2026-10-28)
+
+1. Contorno scuro: ogni accento dichiara il suo anello scuro immediato
+   ("turquoise elfcup against deep umber shadow").
+2. Complemento: il bagliore massimo = accento su scuro complementare
+   (turchese su umber-arancio, scarlet su verde-blu, ambra su viola).
+3. Corona/spill: la sorgente sparge alone sui materiali vicini —
+   senza alone = adesivo, con alone = luce.
+4. Campo desaturato calcolato: i campi quieti stanno a chroma 30-50%
+   così le gemme a 80%+ esplodono; mai "tutto saturo".
+5. Gerarchia: una sorgente primaria + secondari subordinati +
+   micro-accenti — se tutto urla, niente urla.
+## Scuri potenti (Director, 2026-10-28)
+Scuri = valore basso + chroma ALTA (umber, veronese, cobalt profondo —
+colore pieno nel buio). Mai grigio, mai opaco, mai "scuro lavato". Il
+massimo contrasto è tra scuro SATURO e accento vibrante.
