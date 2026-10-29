@@ -31,6 +31,7 @@ import {
   isMobileFitViewport,
   resolveEffectiveZoomBounds,
 } from '@/balancing/config/idleVillage/mobileFitConfig';
+import { Mappa2SecondaryWaterSchema, type Mappa2SecondaryWater } from '../config/mappa2SecondaryWaterConfig';
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
 import { atmosphereAssets } from '@/ui/idleVillage/config/atmosphereAssets';
 import { defaultSeaMarksConfig } from '@/ui/idleVillage/config/seaMarksConfig';
@@ -165,6 +166,17 @@ export interface PixiWorldMapProps {
   stageColor?: string;
   seaPatternConfig?: SeaPatternConfig;
   coastFoamConfig?: CoastFoamConfig;
+  /**
+   * Waterfall overlay tuning (mappa2 pack). Read from a ref every tick: changing it never
+   * rebuilds the world — `enabled: false` just hides the overlay container.
+   */
+  waterfallConfig?: Partial<PixiWaterfallConfig>;
+  secondaryWaterConfig?: Partial<PixiSecondaryWaterConfig>;
+  /**
+   * Ambient land-life tuning (mappa2 pack, PLAN-093). Read from a ref every
+   * tick: `enabled: false` hides the overlay container, never a rebuild.
+   */
+  landLifeConfig?: Partial<PixiLandLifeConfig>;
   onStats?: (stats: { textures: number; textureMB: number }) => void;
   /** Real boot progress for the title veil: assets resolve in parallel, then the scene builds. */
   onBootProgress?: (progress: PixiBootProgress) => void;
@@ -200,6 +212,87 @@ export interface PixiMapAnchor {
   node: ReactNode;
 }
 
+
+/** Live-tunable waterfall overlay contract (PLAN-091). All values apply per-tick, no rebuild. */
+export interface PixiWaterfallConfig {
+  /** Master switch — false hides the whole overlay container (no world rebuild). */
+  enabled: boolean;
+  /** Downward scroll speed of the streak layer, in world px/s. */
+  flowSpeed: number;
+  /** Alpha of the streak layer, 0-1. */
+  flowStrength: number;
+  /** Impact mist density, 0-1 (fraction of the sprite pool active). */
+  mistAmount: number;
+  /** Basin ripple density, 0-1 (fraction of the ring pool active). */
+  ripples: number;
+  /** Intermittent brightness pulse on the impact foam, 0-1. */
+  foamPulse: number;
+  /** PLAN-092: scroll the painted falls tile instead of white streak overlays. */
+  paintedFlow: boolean;
+  /** Sinusoidal skew amplitude on the painted layer, radians (cap ~0.03). */
+  skewAmp: number;
+  /** Skew oscillation frequency, Hz. */
+  skewFreq: number;
+}
+
+/** Live-tunable secondary water contract (PLAN-095). All values apply per-tick, no rebuild. */
+export interface PixiSecondaryWaterConfig {
+  /** Master switch — false hides the whole secondary-water container (no world rebuild). */
+  riversOn: boolean;
+  /** Flow scroll speed multiplier, 0-2 (base speed comes from the contract). */
+  riverFlowSpeed: number;
+  /** Alpha of the river streak sprites, 0-0.6. */
+  riverFlowStrength: number;
+  /** Alpha of lake/shallow glints, 0-0.6. */
+  lakeShimmer: number;
+  /** Alpha of confluence foam pulses, 0-0.6. */
+  confluenceFoam: number;
+}
+
+const DEFAULT_SECONDARY_WATER_CONFIG: PixiSecondaryWaterConfig = {
+  riversOn: true,
+  riverFlowSpeed: 1.0,
+  riverFlowStrength: 0.24,
+  lakeShimmer: 0.22,
+  confluenceFoam: 0.25,
+};
+
+const DEFAULT_WATERFALL_CONFIG: PixiWaterfallConfig = {
+  enabled: true,
+  flowSpeed: 130,
+  flowStrength: 0.34,
+  mistAmount: 0.45,
+  ripples: 0.7,
+  foamPulse: 0.3,
+  paintedFlow: true,
+  skewAmp: 0.03,
+  skewFreq: 0.7,
+};
+
+/** Live-tunable ambient land-life contract (PLAN-093). All values apply per-tick, no rebuild. */
+export interface PixiLandLifeConfig {
+  /** Master switch — false hides the whole land-life container (no world rebuild). */
+  enabled: boolean;
+  /** Falling-leaf density, 0-1 (fraction of the leaf pool active). */
+  leaves: number;
+  /** Drifting mote density, 0-1 (fraction of the mote pool active). */
+  motes: number;
+  /** Butterfly/insect density, 0-1 (fraction of the flutter pool active). */
+  flutter: number;
+  /** Global motion-speed multiplier. */
+  speed: number;
+  /** Global alpha multiplier for every land-life sprite, 0-1. */
+  opacity: number;
+}
+
+const DEFAULT_LAND_LIFE_CONFIG: PixiLandLifeConfig = {
+  enabled: true,
+  leaves: 0.45,
+  motes: 0.55,
+  flutter: 0,
+  speed: 1,
+  opacity: 0.55,
+};
 
 const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true, landLife: true };
 
@@ -245,6 +338,70 @@ void main() {
   }
   float a = texture(uPattern, (w + offset) / uPatternScale).a * uLineOpacity * sea;
   outColor = vec4(uLineColor * a, a);
+}
+`;
+
+
+/* PLAN-092 option 2: the waterfall column is the PAINTED texture sampled through a
+ * warping UV — a vertical pan (two half-phase samples crossfaded so the wrap seam
+ * never shows) plus a horizontal wobble that grows toward the bottom of the falls.
+ * The painting's own streaks ripple and slide: no synthetic overlay, no repaint.
+ * WebGL only (meshOk); the Canvas fallback keeps the sprite overlay. */
+const WATERFALL_FLOW_FRAG = `#version 300 es
+precision highp float;
+in vec2 vUV;
+out vec4 outColor;
+uniform sampler2D uBase;
+uniform sampler2D uMask;
+uniform float uTime;
+uniform vec2 uWorld;
+uniform vec4 uFlowRect;
+uniform float uSpeed;
+uniform float uAmp;
+uniform float uFreq;
+uniform float uOsc;
+uniform float uStrength;
+float vnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = fract(sin(dot(i, vec2(127.1, 311.7))) * 43758.5453);
+  float b = fract(sin(dot(i + vec2(1.0, 0.0), vec2(127.1, 311.7))) * 43758.5453);
+  float c = fract(sin(dot(i + vec2(0.0, 1.0), vec2(127.1, 311.7))) * 43758.5453);
+  float d = fract(sin(dot(i + vec2(1.0, 1.0), vec2(127.1, 311.7))) * 43758.5453);
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+void main() {
+  vec2 w = uFlowRect.xy + vUV * uFlowRect.zw;
+  float m = clamp((texture(uMask, w / uWorld).a - 0.18) * 1.9, 0.0, 1.0) * uStrength;
+  if (m <= 0.001) { outColor = vec4(0.0); return; }
+  // Stepped time (10fps): painted animation cadence — 60fps fluid reads as CG.
+  float t2 = floor(uTime * 10.0) / 10.0;
+  // Blurred painting: the static painted streaks die out, so the moving streak
+  // field is the only crisp detail — no fighting patterns. Colour/form preserved.
+  vec4 base = textureLod(uBase, w / uWorld, 3.5);
+  float paintLum = dot(base.rgb, vec3(0.30, 0.59, 0.11));
+  // Procedural streak field: anisotropic noise (x ~14, y scaled to world px via
+  // uFreq), advected DOWNWARD. Seamless by construction — no wrap, no ghosting.
+  // Per-lane speed (shear): each column scrolls at its own velocity — uniform
+  // scroll is what reads as a sliding shutter.
+  float lane = vnoise(vec2(floor(vUV.x * 22.0) * 0.37, 3.7));
+  float laneSpeed = uSpeed * (0.62 + 0.85 * lane);
+  float ys = (vUV.y * uFlowRect.w - t2 * laneSpeed) * uFreq;
+  float s1 = vnoise(vec2(vUV.x * 11.0, ys * 0.5));
+  float s2 = vnoise(vec2(vUV.x * 23.0 + 40.0, ys * 1.3));
+  float streak = s1 * 0.68 + s2 * 0.32;
+  // Crest brightens, trough darkens — luminance modulation scaled by the
+  // painting's own brightness so it stays inside the painting's language.
+  float band = (streak - 0.5) * (0.16 + paintLum * 0.14) * 2.0;
+  // Edge fade + slight acceleration cue: stronger band contrast near the bottom.
+  float depth = smoothstep(0.05, 0.6, vUV.y);
+  float shade = 1.0 + band * (0.5 + 0.5 * depth);
+  // Micro lateral ripple only (~0.5px) so no sideways translation is perceived.
+  float ux = w.x / uWorld.x + sin(vUV.y * 40.0 - t2 * 6.0) * uAmp * 0.08 / uWorld.x;
+  float uy = w.y / uWorld.y;
+  vec4 c = textureLod(uBase, vec2(ux, uy), 3.5);
+  outColor = vec4(mix(c.rgb, c.rgb * shade, m), c.a * m);
 }
 `;
 
@@ -463,6 +620,9 @@ export function PixiWorldMap({
   wonderRequest = 0,
   seaPatternConfig = DEFAULT_SEA_PATTERN_CONFIG,
   coastFoamConfig = DEFAULT_COAST_FOAM_CONFIG,
+  waterfallConfig,
+  secondaryWaterConfig,
+  landLifeConfig,
   onStats,
   onBootProgress,
   onReady,
@@ -489,6 +649,12 @@ export function PixiWorldMap({
   seaPatternConfigRef.current = seaPatternConfig;
   const coastFoamConfigRef = useRef(coastFoamConfig);
   coastFoamConfigRef.current = coastFoamConfig;
+  const waterfallConfigRef = useRef<PixiWaterfallConfig>({ ...DEFAULT_WATERFALL_CONFIG, ...waterfallConfig });
+  waterfallConfigRef.current = { ...DEFAULT_WATERFALL_CONFIG, ...waterfallConfig };
+  const secondaryWaterConfigRef = useRef<PixiSecondaryWaterConfig>({ ...DEFAULT_SECONDARY_WATER_CONFIG, ...secondaryWaterConfig });
+  secondaryWaterConfigRef.current = { ...DEFAULT_SECONDARY_WATER_CONFIG, ...secondaryWaterConfig };
+  const landLifeConfigRef = useRef<PixiLandLifeConfig>({ ...DEFAULT_LAND_LIFE_CONFIG, ...landLifeConfig });
+  landLifeConfigRef.current = { ...DEFAULT_LAND_LIFE_CONFIG, ...landLifeConfig };
   const cloudOpacityScaleRef = useRef(cloudOpacityScale);
   cloudOpacityScaleRef.current = cloudOpacityScale;
   const cloudTintRef = useRef(cloudTint);
@@ -551,6 +717,8 @@ export function PixiWorldMap({
     if (!host || !manifest || !cameraConfig) return;
     let disposed = false;
     const app = new Application();
+    (window as unknown as { __pixiBuildCount?: number }).__pixiBuildCount =
+      ((window as unknown as { __pixiBuildCount?: number }).__pixiBuildCount ?? 0) + 1;
     const hidden = new Set(hiddenKey ? hiddenKey.split('|') : []);
     const fit = safeFitRef.current;
     const fxOn = JSON.parse(fxKey) as PixiWorldMapEffects;
@@ -703,6 +871,19 @@ export function PixiWorldMap({
       wantAsset(seaMaskUrl);
       if (fxOn.seaPattern || (fxOn.seabed && (seabed?.opacity ?? 0) > 0)) wantAsset('/assets/world/wanderlust/base/layers/sea_pattern_tile.png');
       if (fxOn.coastFoam) wantAsset(coastDistanceUrl);
+      if (manifest.pack?.waterfall && manifest.pack.fxAtlases.waterfallFlow) {
+        wantAsset(packAssetUrl(manifest.pack.packRoot, manifest.pack.fxAtlases.waterfallFlow));
+        if (manifest.pack.fxAtlases.waterfallMist) wantAsset(packAssetUrl(manifest.pack.packRoot, manifest.pack.fxAtlases.waterfallMist));
+        if (manifest.pack.fxAtlases.waterfallRipple) wantAsset(packAssetUrl(manifest.pack.packRoot, manifest.pack.fxAtlases.waterfallRipple));
+      }
+      if (manifest.pack?.landLife) {
+        const llFx = manifest.pack.fxAtlases;
+        if (llFx.landLifeLeaf) wantAsset(packAssetUrl(manifest.pack.packRoot, llFx.landLifeLeaf));
+        if (llFx.landLifeMote) wantAsset(packAssetUrl(manifest.pack.packRoot, llFx.landLifeMote));
+        if (llFx.landLifeFlutter) wantAsset(packAssetUrl(manifest.pack.packRoot, llFx.landLifeFlutter));
+        void fetchJson(packAssetUrl(manifest.pack.packRoot, manifest.pack.landLife.anchorsFile)).catch(() => null);
+        bootTotal += 1;
+      }
       if (fxOn.waves) for (const mark of atmosphereAssets.waves?.marks ?? []) wantAsset(`/assets/atmosphere/${mark.src}`);
       if (fxOn.seaMarks && defaultSeaMarksConfig.enabled) for (const mark of defaultSeaMarksConfig.marks) wantAsset(`/assets/atmosphere/${mark.src}`);
       if (fxOn.wonders && seaWonderCatalog.length > 0) {
@@ -750,6 +931,12 @@ export function PixiWorldMap({
       emitBootProgress('build');
       if (disposed) return;
 
+      /* Land-life overlay (PLAN-093): mounts above terrain+canopy but under the
+       * painted foreground vignette — the empty container is pinned right after
+       * the sea layer and populated later by the dedicated block. */
+      const landLifeBox = new Container();
+      Object.assign(window as object, { __landLifeBox: landLifeBox }); // dev/test seam (same pattern as __pixiApp)
+      const secondaryWaterBox = new Container();
       for (const layer of layers) {
         const swapBase = canopyOn && layer.id === 'base_flat';
         const texture = await load(layerUrl(manifest.world, swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file));
@@ -780,6 +967,11 @@ export function PixiWorldMap({
           seaToneSprites.push({ base: sprite, lift, opacity: layer.opacity ?? 1 });
           seaSprites.push(sprite);
           seaTexture = texture;
+          world.addChild(landLifeBox);
+          // PLAN-095 z-order: after `sea` (Mare.webp is opaque over the
+          // sea-swallowed river pixels), before waterfall/foreground/clouds.
+          // Canopy sprites need no ordering clause: class excludes canopy.
+          world.addChild(secondaryWaterBox);
         }
         if (swapBase) await addCanopies(layer.file.includes('.graded') ? '.graded' : '');
       }
@@ -787,6 +979,629 @@ export function PixiWorldMap({
 
       const ticks: ((seconds: number) => void)[] = [];
       const bandLayers: { layer: Container; parallax: number }[] = [];
+
+      /* ── Waterfall overlay (PLAN-091): interior-only motion over the painted falls.
+       * The painting keeps the silhouette; the overlay only scrolls streaks inside it,
+       * spawns mist at the impact point and rings in the basin. Sprites + a Graphics
+       * mask only — no mesh/shader/texture-mask — so WebGL and the Canvas fallback
+       * render it identically. Live config comes from a ref every tick: toggles and
+       * sliders never rebuild the world. ── */
+      const wf = manifest.pack?.waterfall;
+      const wfFx = manifest.pack?.fxAtlases;
+      if (wf && pack && wfFx?.waterfallFlow) {
+        const wsx = canvas.width / wf.flowRect.sourceWidth;
+        const wsy = canvas.height / wf.flowRect.sourceHeight;
+        const flowR = { x: wf.flowRect.x * wsx, y: wf.flowRect.y * wsy, w: wf.flowRect.width * wsx, h: wf.flowRect.height * wsy };
+        const impactR = { x: wf.impactRect.x * wsx, y: wf.impactRect.y * wsy, w: wf.impactRect.width * wsx, h: wf.impactRect.height * wsy };
+        const basinR = { x: wf.basinRect.x * wsx, y: wf.basinRect.y * wsy, w: wf.basinRect.width * wsx, h: wf.basinRect.height * wsy };
+        const lakeR = wf.lakeRect ? { x: wf.lakeRect.x * wsx, y: wf.lakeRect.y * wsy, w: wf.lakeRect.width * wsx, h: wf.lakeRect.height * wsy } : null;
+        const impactPt = { x: wf.impactPoint.x * wsx, y: wf.impactPoint.y * wsy };
+        const box = new Container();
+        world.addChild(box);
+
+        const flowTex = await load(packAssetUrl(pack.packRoot, wfFx.waterfallFlow));
+        flowTex.source.style.addressMode = 'repeat';
+        const tileScale = flowR.w / flowTex.width;
+        const flow = new TilingSprite({ texture: flowTex, width: flowR.w, height: flowR.h });
+        // Dark-teal lanes over the white falls: the painting itself is white foam
+        // on cyan water — darker streaks are what reads as "moving water" on it.
+        flow.tint = 0x7fb4c6;
+        flow.tileScale.set(tileScale, tileScale);
+        flow.position.set(flowR.x, flowR.y);
+        // Clip = true mask contour when the pack ships it (pixel-accurate, never spills
+        // onto the rocks); tapered inset rect as fallback. Graphics mask — Canvas-safe.
+        const clip = new Graphics();
+        if (wf.flowPolygon && wf.flowPolygon.length > 2) {
+          clip.poly(wf.flowPolygon.flatMap(([px, py]) => [px * wsx, py * wsy]));
+        } else {
+          const insetX = flowR.w * 0.14;
+          const taper = flowR.w * 0.08;
+          clip.poly([
+            flowR.x + insetX + taper, flowR.y - 2,
+            flowR.x + flowR.w - insetX - taper, flowR.y - 2,
+            flowR.x + flowR.w - insetX * 0.55, flowR.y + flowR.h,
+            flowR.x + insetX * 0.55, flowR.y + flowR.h,
+          ]);
+        }
+        clip.fill(0xffffff);
+        box.addChild(clip);
+        flow.mask = clip;
+        box.addChild(flow);
+        // Second, broader streak layer at half speed (Taiji/Zelda trick): the large
+        // slow bands are what reads as "falling" at overview zoom — fine streaks
+        // alone are sub-pixel there.
+        const flowWide = new TilingSprite({ texture: flowTex, width: flowR.w, height: flowR.h });
+        flowWide.tint = 0x9fd0dd;
+        flowWide.tileScale.set(tileScale * 1.9, tileScale * 1.9);
+        flowWide.position.set(flowR.x, flowR.y);
+        flowWide.mask = clip;
+        box.addChild(flowWide);
+
+        // PLAN-092 core: the PAINTED falls crop, Y-tileable, scrolled + sinusoidal
+        // skew — the motion rides the painted pixels, so it reads even on a white
+        // falls. Clip = inner-inset polygon (skew never reaches the silhouette).
+        let painted: TilingSprite | null = null;
+        if (wf.paintedFlowTile) {
+          const paintedTex = await load(packAssetUrl(pack.packRoot, wf.paintedFlowTile));
+          paintedTex.source.style.addressMode = 'repeat';
+          const pR = wf.paintedFlowRect ?? wf.flowRect;
+          painted = new TilingSprite({ texture: paintedTex, width: pR.width * wsx, height: pR.height * wsy });
+          painted.anchor.set(0.5);
+          painted.position.set((pR.x + pR.width / 2) * wsx, (pR.y + pR.height / 2) * wsy);
+          const pClip = new Graphics();
+          if (wf.paintedFlowClip && wf.paintedFlowClip.length > 2) {
+            pClip.poly(wf.paintedFlowClip.flatMap(([px, py]) => [px * wsx, py * wsy]));
+          } else {
+            pClip.rect(flowR.x, flowR.y, flowR.w, flowR.h);
+          }
+          pClip.fill(0xffffff);
+          box.addChild(pClip);
+          painted.mask = pClip;
+          box.addChild(painted);
+        }
+
+        /* WebGL path (PLAN-092, option 2): a Mesh samples the painted layer through a
+         * warped UV — the falls' own painted streaks ripple and slide down, so motion
+         * rides the real brushwork instead of an overlaid tile. Canvas fallback keeps
+         * the sprite layers below. */
+        let wfMesh: Mesh | null = null;
+        let wfShader: Shader | null = null;
+        if (meshOk && wf.flowMask) {
+          const baseTex = await load(layerUrl(manifest.world, 'base_flat.webp'));
+          const wfMaskTex = await load(packAssetUrl(pack.packRoot, wf.flowMask));
+          wfShader = Shader.from({
+            gl: { vertex: VERT, fragment: WATERFALL_FLOW_FRAG },
+            resources: {
+              uBase: baseTex.source,
+              uMask: wfMaskTex.source,
+              u: {
+                uTime: { value: 0, type: 'f32' },
+                uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
+                uFlowRect: { value: new Float32Array([flowR.x, flowR.y, flowR.w, flowR.h]), type: 'vec4<f32>' },
+                uSpeed: { value: 0, type: 'f32' },
+                uAmp: { value: 0, type: 'f32' },
+                uFreq: { value: 0.126, type: 'f32' },
+                uOsc: { value: 0, type: 'f32' },
+                uStrength: { value: 1, type: 'f32' },
+              },
+            },
+          });
+          wfMesh = new Mesh({ geometry: quad(flowR.w, flowR.h), shader: wfShader });
+          wfMesh.position.set(flowR.x, flowR.y);
+          wfMesh.visible = false;
+          box.addChild(wfMesh);
+        }
+
+        // PLAN-092 flipbook (chosen approach B): N painted poses cycled at 10fps —
+        // painted cel animation, identical on WebGL and Canvas (plain Sprite + mask).
+        let flip: Sprite | null = null;
+        let flipTexes: Texture[] = [];
+        if (wf.paintedFlowFrames?.length) {
+          flipTexes = await Promise.all(wf.paintedFlowFrames.map((f) => load(packAssetUrl(pack.packRoot, f))));
+          const fR = wf.paintedFlowRect ?? wf.flowRect;
+          flip = new Sprite(flipTexes[0]);
+          flip.position.set(fR.x * wsx, fR.y * wsy);
+          flip.width = fR.width * wsx;
+          flip.height = fR.height * wsy;
+          const fClip = new Graphics();
+          if (wf.paintedFlowClip && wf.paintedFlowClip.length > 2) {
+            fClip.poly(wf.paintedFlowClip.flatMap(([px, py]) => [px * wsx, py * wsy]));
+          } else {
+            fClip.rect(flowR.x, flowR.y, flowR.w, flowR.h);
+          }
+          fClip.fill(0xffffff);
+          box.addChild(fClip);
+          flip.mask = fClip;
+          box.addChild(flip);
+        }
+
+        // Source lake: the same streak tile clipped to the lake polygon, scrolled
+        // slowly toward the falls lip — the water feeding the falls reads alive too.
+        let lake: TilingSprite | null = null;
+        if (lakeR && wf.lakePolygon && wf.lakePolygon.length > 2) {
+          const lakeClip = new Graphics()
+            .poly(wf.lakePolygon.flatMap(([px, py]) => [px * wsx, py * wsy]))
+            .fill(0xffffff);
+          box.addChild(lakeClip);
+          lake = new TilingSprite({ texture: flowTex, width: lakeR.w, height: lakeR.h });
+          lake.tileScale.set(tileScale * 2.2, tileScale * 2.2);
+          lake.rotation = Math.PI / 2;
+          lake.position.set(lakeR.x, lakeR.y);
+          lake.mask = lakeClip;
+          lake.alpha = 0.16;
+          box.addChild(lake);
+        }
+
+        const mistTex = wfFx.waterfallMist ? await load(packAssetUrl(pack.packRoot, wfFx.waterfallMist)) : null;
+        const rippleTex = wfFx.waterfallRipple ? await load(packAssetUrl(pack.packRoot, wfFx.waterfallRipple)) : null;
+        if (disposed) return;
+
+        const MIST_MAX = 7;
+        const mist: { s: Sprite; born: number; life: number; x: number; y: number; drift: number }[] = [];
+        if (mistTex) {
+          for (let i = 0; i < MIST_MAX; i++) {
+            const s = new Sprite(mistTex);
+            s.anchor.set(0.5);
+            s.visible = false;
+            box.addChild(s);
+            mist.push({ s, born: -1, life: 2, x: impactPt.x, y: impactPt.y, drift: 0 });
+          }
+        }
+        const foam = mistTex ? new Sprite(mistTex) : null;
+        if (foam) {
+          foam.anchor.set(0.5);
+          foam.position.set(impactPt.x, impactPt.y);
+          box.addChild(foam);
+        }
+
+        // Lateral droplets: sparse small mist sprites flung just outside the falls
+        // edges — the Director asked for "qualche goccia lateralmente", not a wide sheet.
+        const DROPS_MAX = 5;
+        const drops: { s: Sprite; born: number; life: number; x: number; y: number; vx: number }[] = [];
+        if (mistTex) {
+          for (let i = 0; i < DROPS_MAX; i++) {
+            const s = new Sprite(mistTex);
+            s.anchor.set(0.5);
+            s.visible = false;
+            box.addChild(s);
+            drops.push({ s, born: -1, life: 1, x: 0, y: 0, vx: 0 });
+          }
+        }
+
+        const ripples: { s: Sprite; born: number; life: number; cx: number; cy: number; maxR: number; squash: number }[] = [];
+        const basinCx = basinR.x + basinR.w / 2;
+        const basinCy = basinR.y + basinR.h / 2;
+        if (rippleTex) {
+          // Rings live INSIDE the basin water only: clip the whole ripple layer to
+          // the basin contour so no arc ever paints on the rock/shore.
+          const rippleLayer = new Container();
+          const basinClip = new Graphics();
+          if (wf.basinPolygon && wf.basinPolygon.length > 2) {
+            basinClip.poly(wf.basinPolygon.flatMap(([px, py]) => [px * wsx, py * wsy]));
+          } else {
+            basinClip.ellipse(basinCx, basinCy, basinR.w * 0.46, basinR.h * 0.42);
+          }
+          basinClip.fill(0xffffff);
+          box.addChild(basinClip);
+          rippleLayer.mask = basinClip;
+          box.addChild(rippleLayer);
+          for (let i = 0; i < 4; i++) {
+            const s = new Sprite(rippleTex);
+            s.anchor.set(0.5);
+            s.visible = false;
+            rippleLayer.addChild(s);
+            ripples.push({ s, born: -1, life: 3.2, cx: basinCx, cy: basinCy, maxR: basinR.w * 0.22, squash: 1 });
+          }
+        }
+
+        /** Deterministic per-slot jitter — no RNG inside the tick, so runs replay identically. */
+        const hash01 = (a: number, b: number) => {
+          const v = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+          return v - Math.floor(v);
+        };
+
+        ticks.push((t) => {
+          const cfg = waterfallConfigRef.current;
+          box.visible = cfg.enabled;
+          if (!cfg.enabled) return;
+          const live = !reducedMotion;
+          flow.alpha = cfg.flowStrength;
+          flow.tilePosition.y = (t * cfg.flowSpeed) / Math.max(0.0001, tileScale);
+          flowWide.alpha = cfg.flowStrength * 0.55;
+          flowWide.tilePosition.y = (t * cfg.flowSpeed * 0.55) / Math.max(0.0001, tileScale * 1.9);
+          const useFlip = cfg.paintedFlow && Boolean(flip);
+          const usePainted = cfg.paintedFlow && !flip && Boolean(painted || wfMesh);
+          flow.alpha = usePainted || useFlip ? 0 : cfg.flowStrength;
+          flowWide.alpha = usePainted || useFlip ? 0 : cfg.flowStrength * 0.55;
+          if (painted) {
+            // Canvas fallback only — on WebGL the shader mesh replaces this sprite.
+            painted.visible = usePainted && !wfMesh;
+            // texture is already world-scale (1 tex px = 1 world px).
+            painted.tilePosition.y = t * cfg.flowSpeed;
+            painted.skew.x = Math.sin(t * cfg.skewFreq * Math.PI * 2) * cfg.skewAmp;
+            painted.alpha = live ? 1 : 0;
+          }
+          if (wfMesh && wfShader) {
+            wfMesh.visible = usePainted;
+            const u = wfShader.resources.u.uniforms;
+            u.uTime = t;
+            u.uSpeed = cfg.flowSpeed;
+            u.uAmp = cfg.skewAmp * 160;
+            u.uOsc = cfg.skewFreq * 15;
+            u.uStrength = Math.min(1, cfg.flowStrength * 2.6);
+          }
+          if (flip && flipTexes.length) {
+            flip.visible = useFlip && live;
+            // Cel cadence: 10fps, each pose already a seamless rolled tile.
+            flip.texture = flipTexes[Math.floor(t * 10) % flipTexes.length];
+          }
+          if (lake) {
+            lake.alpha = cfg.flowStrength * 0.32;
+            lake.tilePosition.y = (t * cfg.flowSpeed * 0.18) / Math.max(0.0001, tileScale * 2.2);
+          }
+
+          // Lateral droplets: fall down just outside the falls edges, sparse and staggered.
+          for (let i = 0; i < drops.length; i++) {
+            const d = drops[i];
+            if (!live || i >= 0) {
+              d.s.visible = false;
+              d.born = -1;
+              continue;
+            }
+            if (d.born < 0 || t - d.born > d.life) {
+              const gen = Math.floor(t * 2) + i * 71;
+              const side = hash01(i, gen) > 0.5 ? 1 : -1;
+              d.born = t + hash01(i, gen + 3) * 0.9;
+              d.life = 0.7 + hash01(i, gen + 5) * 0.7;
+              // hug the falls edges — drops fly off the lip/edge, not the rocks.
+              d.x = flowR.x + flowR.w / 2 + side * flowR.w * (0.3 + hash01(i, gen + 7) * 0.15);
+              d.y = flowR.y + flowR.h * (0.1 + hash01(i, gen + 11) * 0.45);
+              d.vx = side * (5 + hash01(i, gen + 13) * 12);
+            }
+            if (t < d.born) {
+              d.s.visible = false;
+              continue;
+            }
+            const p = Math.min(1, (t - d.born) / d.life);
+            const sc = (0.06 + 0.05 * (1 - p)) * (impactR.w / 420);
+            d.s.visible = true;
+            d.s.scale.set(sc, sc * 1.8);
+            d.s.position.set(d.x + d.vx * p, d.y + 130 * p * p);
+            d.s.alpha = Math.sin(p * Math.PI) * 0.4;
+          }
+
+          if (foam) {
+            const pulse = live ? 0.5 + 0.5 * Math.sin(t * 5.2) * Math.sin(t * 1.7 + 1.3) : 0;
+            foam.alpha = cfg.foamPulse * (0.15 + 0.3 * pulse);
+            const fs = (0.9 + 0.25 * pulse) * (impactR.w / 300);
+            foam.scale.set(fs, fs * 0.55);
+          }
+
+          const mistTarget = live ? Math.round(cfg.mistAmount * mist.length) : 0;
+          for (let i = 0; i < mist.length; i++) {
+            const m = mist[i];
+            if (i >= mistTarget) {
+              m.s.visible = false;
+              m.born = -1;
+              continue;
+            }
+            if (m.born < 0 || t - m.born > m.life) {
+              const gen = Math.floor(t);
+              m.born = t + i * 0.37;
+              m.life = 1.6 + hash01(i, gen) * 1.4;
+              m.x = impactPt.x + (hash01(i, gen + 7) - 0.5) * impactR.w * 0.55;
+              m.y = impactPt.y + (hash01(i, gen + 13) - 0.5) * impactR.h * 0.4;
+              m.drift = (hash01(i, gen + 29) - 0.5) * 26;
+            }
+            if (t < m.born) {
+              m.s.visible = false;
+              continue;
+            }
+            const p = Math.min(1, (t - m.born) / m.life);
+            const grow = (0.5 + 1.4 * p) * (impactR.w / 420);
+            m.s.visible = true;
+            m.s.scale.set(grow, grow * 0.75);
+            m.s.position.set(m.x + m.drift * p, m.y - 18 * p);
+            m.s.alpha = Math.sin(p * Math.PI) * 0.26;
+          }
+
+          // Basin ripples: off-centre, irregular timing/radius/squash — never a
+          // perfect metronome of concentric circles.
+          const rippleTarget = live ? Math.round(cfg.ripples * ripples.length) : 0;
+          for (let i = 0; i < ripples.length; i++) {
+            const r = ripples[i];
+            if (i >= rippleTarget) {
+              r.s.visible = false;
+              r.born = -1;
+              continue;
+            }
+            if (r.born < 0 || t - r.born > r.life) {
+              const gen = Math.floor(t) + i * 97;
+              r.born = t + hash01(i, gen + 2) * 1.4;
+              r.life = 2.2 + hash01(i, gen + 4) * 1.8;
+              // spawn inside the water: biased toward impact but jittered within
+              // the basin's inner 60% so arcs start on water, not on the shore.
+              r.cx = basinCx + (hash01(i, gen + 6) - 0.5) * basinR.w * 0.5;
+              r.cy = basinCy + (hash01(i, gen + 8) - 0.5) * basinR.h * 0.45;
+              r.maxR = basinR.w * (0.08 + hash01(i, gen + 10) * 0.04);
+              r.squash = 0.72 + hash01(i, gen + 12) * 0.4;
+            }
+            if (t < r.born) {
+              r.s.visible = false;
+              continue;
+            }
+            const p = Math.min(1, (t - r.born) / r.life);
+            const sc = (0.18 + 0.82 * p) * ((r.maxR * 2) / r.s.texture.width);
+            r.s.visible = true;
+            r.s.scale.set(sc, sc * r.squash);
+            r.s.position.set(r.cx, r.cy);
+            r.s.alpha = (1 - p) * (1 - p) * 0.5;
+          }
+        });
+      }
+
+      /* ── Secondary water (PLAN-095): the painted river/lakes come alive.
+       * Authored corridors + eroded safe-polygons clip everything; oriented
+       * TilingSprite streaks scroll along each river leg; deterministic
+       * glints breathe on pools/lakes; small foam pulses mark confluences.
+       * Graphics masks + sprites only — identical on WebGL and Canvas.
+       * Contract: `secondary-water.json` (leaf schema, lab-mandatory);
+       * `/game` never fetches it. Live config via ref, never in fxKey. ── */
+      if (pack && manifest.world === 'mappa2') {
+        const swRaw = await fetchJson<unknown>(packAssetUrl(pack.packRoot, 'secondary-water.json')).catch(() => null);
+        const swParsed = swRaw ? Mappa2SecondaryWaterSchema.safeParse(swRaw) : null;
+        if (swRaw && !swParsed?.success) {
+          throw new Error(`secondary-water.json failed Mappa2SecondaryWaterSchema: ${swParsed?.error.issues[0]?.message ?? 'unknown'}`);
+        }
+        const swData: Mappa2SecondaryWater | null = swParsed?.success ? swParsed.data : null;
+        if (swData && !disposed) {
+          const wsx2 = canvas.width / 2752;
+          const wsy2 = canvas.height / 1536;
+          const tileTex = await load(packAssetUrl(pack.packRoot, swData.riverFlowTile));
+          tileTex.source.style.addressMode = 'repeat';
+          const glintTex = wfFx?.waterfallMist ? await load(packAssetUrl(pack.packRoot, wfFx.waterfallMist)) : tileTex;
+          const wakeTex = wfFx?.waterfallRipple ? await load(packAssetUrl(pack.packRoot, wfFx.waterfallRipple)) : glintTex;
+
+          const segSprites: { sp: TilingSprite; baseScale: number; speed: number }[] = [];
+          const featureBoxes: Record<string, Container> = {};
+          const glints: { sp: Sprite; x: number; y: number; ph: number; lake: boolean }[] = [];
+          const wakes: { sp: Sprite; x: number; y: number; maxR: number; ph: number }[] = [];
+          const hash3 = (a: number, b: number) => {
+            const v = Math.sin(a * 269.5 + b * 183.3) * 43758.5453;
+            return v - Math.floor(v);
+          };
+
+          for (const river of swData.rivers) {
+            const fc = new Container();
+            fc.visible = river.enabled;
+            const clip = new Graphics();
+            for (const poly of river.safePolygons) {
+              clip.poly(poly.flatMap(([px, py]) => [px * wsx2, py * wsy2]));
+            }
+            clip.fill(0xffffff);
+            fc.addChild(clip);
+            fc.mask = clip; // never clip.visible=false (WITNESS-01): visibility lives on the container
+            const tint = parseInt(river.tint.slice(1), 16);
+            for (const seg of river.segments) {
+              const sp = new TilingSprite({ texture: tileTex, width: seg.length * wsx2, height: seg.width * wsy2 });
+              sp.anchor.set(0.5);
+              sp.position.set(seg.cx * wsx2, seg.cy * wsy2);
+              sp.rotation = seg.angleRad;
+              sp.tint = tint;
+              const baseScale = Math.max(0.05, (seg.width * wsy2) / 256);
+              sp.tileScale.set(baseScale, baseScale);
+              fc.addChild(sp);
+              segSprites.push({ sp, baseScale, speed: 42 * wsx2 });
+            }
+            for (const g of river.glintPoints) glints.push({ sp: null as never, x: g.x * wsx2, y: g.y * wsy2, ph: hash3(g.x, g.y), lake: false });
+            secondaryWaterBox.addChild(fc);
+            featureBoxes[river.id] = fc;
+          }
+
+          for (const lake of swData.lakes) {
+            const fc = new Container();
+            fc.visible = lake.enabled;
+            const clip = new Graphics();
+            for (const poly of lake.safePolygons) {
+              clip.poly(poly.flatMap(([px, py]) => [px * wsx2, py * wsy2]));
+            }
+            clip.fill(0xffffff);
+            fc.addChild(clip);
+            fc.mask = clip;
+            for (const g of lake.glintPoints) glints.push({ sp: null as never, x: g.x * wsx2, y: g.y * wsy2, ph: hash3(g.x, g.y), lake: true });
+            secondaryWaterBox.addChild(fc);
+            featureBoxes[lake.id] = fc;
+          }
+
+          let gi = 0;
+          for (const g of glints) {
+            const sp = new Sprite(glintTex);
+            sp.anchor.set(0.5);
+            sp.position.set(g.x, g.y);
+            const sc = (g.lake ? 0.5 : 0.32) + hash3(gi, 7) * 0.25;
+            sp.scale.set(sc);
+            sp.tint = 0xd8f4f8;
+            secondaryWaterBox.addChild(sp);
+            g.sp = sp;
+            gi += 1;
+          }
+
+          const confBox = new Container();
+          for (const c of swData.confluences) {
+            const sp = new Sprite(wakeTex);
+            sp.anchor.set(0.5);
+            sp.position.set(c.x * wsx2, c.y * wsy2);
+            sp.tint = 0xeafcff;
+            wakes.push({ sp, x: c.x * wsx2, y: c.y * wsy2, maxR: Math.max(2, c.radiusPx * wsx2 * 6), ph: hash3(c.x, c.y) });
+            confBox.addChild(sp);
+          }
+          secondaryWaterBox.addChild(confBox);
+
+          Object.assign(window as object, {
+            __secondaryWaterDebug: { box: secondaryWaterBox, featureBoxes, segCount: segSprites.length, glintCount: glints.length, wakeCount: wakes.length },
+          });
+
+          ticks.push((t) => {
+            const cfg = secondaryWaterConfigRef.current;
+            secondaryWaterBox.visible = cfg.riversOn;
+            if (!cfg.riversOn) return;
+            const live = !reducedMotion;
+            const z = world.scale.x;
+            const lodScale = z >= 0.65 ? 1.0 : z >= 0.32 ? 1.5 : 2.2;
+            const lodAlpha = z >= 0.45 ? 1.0 : 0.35 + 0.65 * smooth((z - 0.18) / Math.max(1e-6, 0.45 - 0.18));
+            for (const seg of segSprites) {
+              seg.sp.alpha = cfg.riverFlowStrength * lodAlpha;
+              seg.sp.tileScale.set(seg.baseScale * lodScale);
+              if (live) {
+                const period = 256 * seg.baseScale * lodScale;
+                seg.sp.tilePosition.x = (t * seg.speed * cfg.riverFlowSpeed) % period;
+              }
+            }
+            for (let i = 0; i < glints.length; i += 1) {
+              const g = glints[i];
+              const p = (t * 0.35 + g.ph) % 1;
+              g.sp.alpha = live ? cfg.lakeShimmer * Math.sin(p * Math.PI) : cfg.lakeShimmer * 0.4;
+              g.sp.rotation = g.ph * 6.28 + (live ? t * 0.05 : 0);
+            }
+            for (const w of wakes) {
+              const p = (t * 0.5 + w.ph) % 1;
+              const r = w.maxR * (0.3 + 0.7 * p);
+              w.sp.scale.set(Math.max(0.02, r / 64));
+              w.sp.alpha = live ? cfg.confluenceFoam * (1 - p) : 0;
+            }
+          });
+        }
+      }
+
+      /* ── Ambient land-life (PLAN-093): micro-life bound to real foliage.
+       * Leaves fall/sway out of canopy-mask anchors, motes drift over crowns
+       * and candidate biomes, flutters trace small zigzags on warm land.
+       * Sprite pools + deterministic hash jitter only — Canvas-safe, no
+       * mesh/shader/mask, painting untouched. Live config via ref:
+       * `enabled:false` hides the container, sliders retune per-tick. ── */
+      const llPack = manifest.pack?.landLife;
+      if (pack && llPack && landLifeBox.parent === world) {
+        const llFx = pack.fxAtlases;
+        type LlAnchor = { x: number; y: number; r: number; w: number };
+        const anchorsPayload = await fetchJson<{
+          canvas: { width: number; height: number };
+          anchors: { id: string; x: number; y: number; regionId: string; type: string; weight: number; radius: number }[];
+        }>(packAssetUrl(pack.packRoot, llPack.anchorsFile)).catch(() => null);
+        const asx = anchorsPayload ? canvas.width / anchorsPayload.canvas.width : 1;
+        const asy = anchorsPayload ? canvas.height / anchorsPayload.canvas.height : 1;
+        const byType: Record<'leaf' | 'mote' | 'flutter', LlAnchor[]> = { leaf: [], mote: [], flutter: [] };
+        for (const a of anchorsPayload?.anchors ?? []) {
+          const slot = byType[a.type as keyof typeof byType];
+          if (slot) slot.push({ x: a.x * asx, y: a.y * asy, r: a.radius * asx, w: a.weight });
+        }
+        const leafTex = llFx.landLifeLeaf ? await load(packAssetUrl(pack.packRoot, llFx.landLifeLeaf)) : null;
+        const moteTex = llFx.landLifeMote ? await load(packAssetUrl(pack.packRoot, llFx.landLifeMote)) : null;
+        const flutterTex = llFx.landLifeFlutter ? await load(packAssetUrl(pack.packRoot, llFx.landLifeFlutter)) : null;
+        if (disposed) return;
+
+        /** Deterministic per-slot jitter — no RNG inside the tick, runs replay identically. */
+        const hash2 = (a: number, b: number) => {
+          const v = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+          return v - Math.floor(v);
+        };
+        const pickAnchor = (list: LlAnchor[], i: number, gen: number) => list[Math.floor(hash2(i, gen) * list.length)];
+
+        const leaves: { s: Sprite; born: number; life: number; x: number; y: number; fall: number; amp: number; frq: number; ph: number; sc: number }[] = [];
+        if (leafTex && byType.leaf.length) {
+          const n = Math.min(llPack.maxLeaves, Math.max(4, byType.leaf.length));
+          for (let i = 0; i < n; i++) {
+            const s = new Sprite(leafTex);
+            s.anchor.set(0.5);
+            s.visible = false;
+            landLifeBox.addChild(s);
+            leaves.push({ s, born: -1, life: 7, x: 0, y: 0, fall: 120, amp: 22, frq: 1.4, ph: 0, sc: 0.6 });
+          }
+        }
+
+        const motes: { s: Sprite; ax: number; ay: number; rx: number; ry: number; f1: number; f2: number; ph: number; sc: number }[] = [];
+        if (moteTex && byType.mote.length) {
+          const n = Math.min(llPack.maxMotes, byType.mote.length * 2 + 8);
+          for (let i = 0; i < n; i++) {
+            const a = byType.mote[i % byType.mote.length];
+            const s = new Sprite(moteTex);
+            s.anchor.set(0.5);
+            landLifeBox.addChild(s);
+            motes.push({ s, ax: a.x, ay: a.y, rx: a.r * (0.3 + hash2(i, 5) * 0.5), ry: a.r * (0.2 + hash2(i, 9) * 0.35), f1: 0.10 + hash2(i, 13) * 0.16, f2: 0.07 + hash2(i, 17) * 0.13, ph: hash2(i, 21) * Math.PI * 2, sc: 0.5 + 0.35 * hash2(i, 71) });
+          }
+        }
+
+        const flutters: { s: Sprite; ax: number; ay: number; r: number; ph: number; f1: number; f2: number }[] = [];
+        if (flutterTex && byType.flutter.length) {
+          const n = Math.min(llPack.maxFlutters, byType.flutter.length * 2);
+          for (let i = 0; i < n; i++) {
+            const a = byType.flutter[i % byType.flutter.length];
+            const s = new Sprite(flutterTex);
+            s.anchor.set(0.5);
+            s.visible = false;
+            landLifeBox.addChild(s);
+            flutters.push({ s, ax: a.x, ay: a.y, r: a.r, ph: hash2(i, 31) * Math.PI * 2, f1: 0.9 + hash2(i, 37) * 0.7, f2: 1.6 + hash2(i, 41) * 1.1 });
+          }
+        }
+
+        ticks.push((t) => {
+          const cfg = landLifeConfigRef.current;
+          landLifeBox.visible = cfg.enabled;
+          if (!cfg.enabled) return;
+          const live = !reducedMotion;
+          const ts = t * cfg.speed;
+
+          const leafTarget = live ? Math.round(cfg.leaves * leaves.length) : 0;
+          for (let i = 0; i < leaves.length; i++) {
+            const L = leaves[i];
+            if (i >= leafTarget) { L.s.visible = false; L.born = -1; continue; }
+            if (L.born < 0 || ts - L.born > L.life) {
+              const gen = Math.floor(ts) * 7 + i * 53;
+              const a = pickAnchor(byType.leaf, i, gen);
+              L.born = ts + hash2(i, gen + 2) * 1.8;
+              L.life = 6 + hash2(i, gen + 4) * 4;
+              L.x = a.x + (hash2(i, gen + 6) - 0.5) * a.r * 0.55;
+              L.y = a.y + (hash2(i, gen + 8) - 0.5) * a.r * 0.22;
+              L.fall = 36 + hash2(i, gen + 10) * 34;
+              L.amp = 6 + hash2(i, gen + 12) * 9;
+              L.frq = 1.1 + hash2(i, gen + 14) * 1.2;
+              L.ph = hash2(i, gen + 16) * Math.PI * 2;
+              L.sc = 0.14 + hash2(i, gen + 18) * 0.12;
+            }
+            if (ts < L.born) { L.s.visible = false; continue; }
+            const p = Math.min(1, (ts - L.born) / L.life);
+            L.s.visible = true;
+            L.s.position.set(L.x + Math.sin(ts * L.frq + L.ph) * L.amp * (0.3 + 0.7 * p), L.y + L.fall * p);
+            L.s.rotation = Math.sin(ts * L.frq * 0.8 + L.ph) * 0.55;
+            L.s.scale.set(L.sc);
+            L.s.alpha = Math.sin(p * Math.PI) * 0.75 * cfg.opacity;
+          }
+
+          const moteTarget = live ? Math.round(cfg.motes * motes.length) : Math.round(0.4 * motes.length);
+          for (let i = 0; i < motes.length; i++) {
+            const M = motes[i];
+            M.s.visible = i < moteTarget;
+            if (!M.s.visible) continue;
+            M.s.position.set(M.ax + Math.sin(ts * M.f1 + M.ph) * M.rx, M.ay + Math.cos(ts * M.f2 + M.ph * 1.3) * M.ry);
+            M.s.scale.set(M.sc);
+            M.s.alpha = Math.max(0, 0.35 + 0.3 * Math.sin(ts * 0.9 + M.ph * 2.1)) * cfg.opacity;
+          }
+
+          const flutTarget = live ? Math.round(cfg.flutter * flutters.length) : 0;
+          for (let i = 0; i < flutters.length; i++) {
+            const F = flutters[i];
+            F.s.visible = i < flutTarget;
+            if (!F.s.visible) continue;
+            F.s.position.set(
+              F.ax + Math.sin(ts * F.f1 + F.ph) * F.r * 0.45 + Math.sin(ts * F.f2 + F.ph * 2) * 16,
+              F.ay + Math.cos(ts * F.f1 * 0.8 + F.ph) * F.r * 0.35 + Math.sin(ts * 3.1 + F.ph) * 6,
+            );
+            F.s.rotation = Math.cos(ts * F.f1 + F.ph) * 0.5;
+            F.s.scale.set(0.8 * (0.7 + 0.3 * Math.abs(Math.sin(ts * 14 + F.ph))), 0.8);
+            F.s.alpha = (0.7 + 0.3 * Math.sin(ts * 1.7 + F.ph)) * cfg.opacity;
+          }
+        });
+      }
+
       // Time of day: a multiply wash over the whole world (no filter: a world-sized filter renders off-screen at a lower
       // resolution and blurred everything). Night tints blue-grey and darker, dawn and dusk amber; eased slowly.
       const wash = new Sprite(Texture.WHITE);
@@ -1124,6 +1939,7 @@ export function PixiWorldMap({
             },
           },
         });
+
         const seaQuad = quad(canvas.width + 2 * (margin + SEA_QUAD_PAD), canvas.height + 2 * (marginY + SEA_QUAD_PAD));
         const seaMesh = new Mesh({ geometry: seaQuad, shader });
         seaMesh.position.set(-margin - SEA_QUAD_PAD, -marginY - SEA_QUAD_PAD);

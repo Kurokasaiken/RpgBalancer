@@ -1,0 +1,350 @@
+{
+  "canvas": {
+    "width": 2752,
+    "height": 1536
+  },
+  "anchors": [
+    {
+      "id": "leaf_01",
+      "x": 814,
+      "y": 1095,
+      "regionId": "bayou",
+      "type": "leaf",
+      "weight": 0.723,
+      "radius": 58
+    },
+    {
+      "id": "leaf_02",
+      "x": 1385,
+      "y": 938,
+      "regionId": "central_valley",
+      "type": "leaf",
+      "weight": 0.915,
+      "radius": 58
+    },
+    {
+      "id": "leaf_03",
+      "x": 898,
+      "y": 523,
+      "regionId": "western_forest",
+      "type": "leaf",
+      "weight": 0.674,
+      "radius": 58
+    },
+    {
+      "id": "leaf_04",
+      "x": 1196,
+      "y": 608,
+      "regionId": "central_valley",
+      "type": "leaf",
+      "weight": 0.625,
+      "radius": 58
+    },
+    {
+      "id": "leaf_05",
+      "x": 292,
+      "y": 100,
+      "regionId": "unassigned",
+      "type": "leaf",
+      "weight": 0.842,
+      "radius": 58
+    },
+    {
+      "id": "leaf_06",
+      "x": 1144,
+      "y": 422,
+      "regionId": "waterfall_plateau",
+      "type": "leaf",
+      "weight": 0.614,
+      "radius": 58
+    },
+    {
+      "id": "leaf_07",
+      "x": 2695,
+      "y": 422,
+      "regionId": "unassigned",
+      "type": "leaf",
+      "weight": 0.696,
+      "radius": 58
+    },
+    {
+      "id": "leaf_08",
+      "x": 1559,
+      "y": 785,
+      "regionId": "central_valley",
+      "type": "leaf",
+      "weight": 0.75,
+      "radius": 58
+    },
+    {
+      "id": "leaf_09",
+      "x": 1134,
+      "y": 796,
+      "regionId": "central_valley",
+      "type": "leaf",
+      "weight": 1.11,
+      "radius": 58
+    },
+    {
+      "id": "leaf_10",
+      "x": 1303,
+      "y": 803,
+      "regionId": "central_valley",
+      "type": "leaf",
+      "weight": 1.073,
+      "radius": 58
+    },
+    {
+      "id": "leaf_11",
+      "x": 905,
+      "y": 714,
+      "regionId": "western_forest",
+      "type": "leaf",
+      "weight": 0.95,
+      "radius": 58
+    },
+    {
+      "id": "leaf_12",
+      "x": 1416,
+      "y": 1121,
+      "regionId": "coral_lagoon",
+      "type": "leaf",
+      "weight": 0.822,
+      "radius": 58
+    },
+    {
+      "id": "leaf_13",
+      "x": 1633,
+      "y": 556,
+      "regionId": "waterfall_plateau",
+      "type": "leaf",
+      "weight": 0.666,
+      "radius": 58
+    },
+    {
+      "id": "leaf_14",
+      "x": 1128,
+      "y": 1015,
+      "regionId": "central_valley",
+      "type": "leaf",
+      "weight": 0.991,
+      "radius": 58
+    },
+    {
+      "id": "leaf_15",
+      "x": 864,
+      "y": 340,
+      "regionId": "western_forest",
+      "type": "leaf",
+      "weight": 0.634,
+      "radius": 58
+    },
+    {
+      "id": "leaf_16",
+      "x": 943,
+      "y": 1016,
+      "regionId": "bayou",
+      "type": "leaf",
+      "weight": 0.743,
+      "radius": 58
+    },
+    {
+      "id": "leaf_17",
+      "x": 136,
+      "y": 197,
+      "regionId": "unassigned",
+      "type": "leaf",
+      "weight": 0.685,
+      "radius": 58
+    },
+    {
+      "id": "leaf_18",
+      "x": 2585,
+      "y": 84,
+      "regionId": "unassigned",
+      "type": "leaf",
+      "weight": 0.71,
+      "radius": 58
+    },
+    {
+      "id": "mote_01",
+      "x": 1528,
+      "y": 725,
+      "regionId": "central_valley",
+      "type": "mote",
+      "weight": 1.25,
+      "radius": 130
+    },
+    {
+      "id": "mote_02",
+      "x": 2602,
+      "y": 364,
+      "regionId": "unassigned",
+      "type": "mote",
+      "weight": 0.858,
+      "radius": 130
+    },
+    {
+      "id": "mote_03",
+      "x": 1149,
+      "y": 473,
+      "regionId": "waterfall_plateau",
+      "type": "mote",
+      "weight": 1.088,
+      "radius": 130
+    },
+    {
+      "id": "mote_04",
+      "x": 392,
+      "y": 1007,
+      "regionId": "western_archipelago",
+      "type": "mote",
+      "weight": 1.063,
+      "radius": 130
+    },
+    {
+      "id": "mote_05",
+      "x": 1742,
+      "y": 1179,
+      "regionId": "coral_lagoon",
+      "type": "mote",
+      "weight": 1.088,
+      "radius": 130
+    },
+    {
+      "id": "mote_06",
+      "x": 1068,
+      "y": 683,
+      "regionId": "central_valley",
+      "type": "mote",
+      "weight": 1.221,
+      "radius": 130
+    },
+    {
+      "id": "mote_07",
+      "x": 1340,
+      "y": 1371,
+      "regionId": "coral_lagoon",
+      "type": "mote",
+      "weight": 0.852,
+      "radius": 130
+    },
+    {
+      "id": "mote_08",
+      "x": 1116,
+      "y": 1058,
+      "regionId": "coral_lagoon",
+      "type": "mote",
+      "weight": 1.249,
+      "radius": 130
+    },
+    {
+      "id": "mote_09",
+      "x": 807,
+      "y": 392,
+      "regionId": "western_forest",
+      "type": "mote",
+      "weight": 0.894,
+      "radius": 130
+    },
+    {
+      "id": "mote_10",
+      "x": 1423,
+      "y": 463,
+      "regionId": "waterfall_plateau",
+      "type": "mote",
+      "weight": 0.724,
+      "radius": 130
+    },
+    {
+      "id": "mote_11",
+      "x": 2567,
+      "y": 104,
+      "regionId": "unassigned",
+      "type": "mote",
+      "weight": 0.927,
+      "radius": 130
+    },
+    {
+      "id": "mote_12",
+      "x": 363,
+      "y": 507,
+      "regionId": "western_forest",
+      "type": "mote",
+      "weight": 0.634,
+      "radius": 130
+    },
+    {
+      "id": "mote_13",
+      "x": 1112,
+      "y": 1293,
+      "regionId": "coral_lagoon",
+      "type": "mote",
+      "weight": 0.615,
+      "radius": 130
+    },
+    {
+      "id": "mote_14",
+      "x": 17,
+      "y": 344,
+      "regionId": "unassigned",
+      "type": "mote",
+      "weight": 1.072,
+      "radius": 130
+    },
+    {
+      "id": "flutter_01",
+      "x": 758,
+      "y": 1182,
+      "regionId": "bayou",
+      "type": "flutter",
+      "weight": 1.249,
+      "radius": 110
+    },
+    {
+      "id": "flutter_02",
+      "x": 1199,
+      "y": 1027,
+      "regionId": "central_valley",
+      "type": "flutter",
+      "weight": 1.027,
+      "radius": 110
+    },
+    {
+      "id": "flutter_03",
+      "x": 1757,
+      "y": 874,
+      "regionId": "central_valley",
+      "type": "flutter",
+      "weight": 1.198,
+      "radius": 110
+    },
+    {
+      "id": "flutter_04",
+      "x": 1452,
+      "y": 818,
+      "regionId": "central_valley",
+      "type": "flutter",
+      "weight": 1.25,
+      "radius": 110
+    },
+    {
+      "id": "flutter_05",
+      "x": 1071,
+      "y": 616,
+      "regionId": "central_valley",
+      "type": "flutter",
+      "weight": 1.25,
+      "radius": 110
+    },
+    {
+      "id": "flutter_06",
+      "x": 1791,
+      "y": 1256,
+      "regionId": "coral_lagoon",
+      "type": "flutter",
+      "weight": 0.758,
+      "radius": 110
+    }
+  ]
+}
