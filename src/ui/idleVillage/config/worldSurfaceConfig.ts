@@ -287,6 +287,47 @@ const WorldSurfacePackPathSchema = z.string().min(1);
  * `packVersion` is a strict major-version contract: unsupported or unknown
  * pack shapes fail manifest validation instead of being silently ignored.
  */
+const WorldSurfacePackWaterfallSchema = z
+  .object({
+    flowMask: WorldSurfacePackPathSchema,
+    impactMask: WorldSurfacePackPathSchema,
+    basinMask: WorldSurfacePackPathSchema,
+    flowRect: LayerSourceRectSchema,
+    impactRect: LayerSourceRectSchema,
+    basinRect: LayerSourceRectSchema,
+    impactPoint: Vector2Schema,
+    /** Source-lake clip (the alpine lake feeding the falls) — PLAN-091. */
+    lakeMask: WorldSurfacePackPathSchema.optional(),
+    lakeRect: LayerSourceRectSchema.optional(),
+    lakePolygon: z.array(z.tuple([z.number(), z.number()])).optional(),
+    /** True contour of the falls flow mask — pixel-accurate Graphics clip, no lateral spill. */
+    flowPolygon: z.array(z.tuple([z.number(), z.number()])).optional(),
+    /** Basin water contour — ripple clip so rings never reach the rock. */
+    basinPolygon: z.array(z.tuple([z.number(), z.number()])).optional(),
+    /** PLAN-092: painted-falls tile (crop of the painting, Y-tileable) + inner-inset clip. */
+    paintedFlowTile: WorldSurfacePackPathSchema.optional(),
+    paintedFlowRect: LayerSourceRectSchema.optional(),
+    paintedFlowClip: z.array(z.tuple([z.number(), z.number()])).optional(),
+    /** Flipbook poses (painted cel animation) — rolled tile frames cycled at ~10fps. */
+    paintedFlowFrames: z.array(WorldSurfacePackPathSchema).optional(),
+  })
+  .strict();
+
+/**
+ * Ambient land-life pack section (PLAN-093): pointer to the generated anchor
+ * file plus pool caps. Anchors are scattered inside the extracted canopy mask
+ * and candidate land biomes by `scripts/build-mappa2-assets.py`, so every
+ * spawned entity is bound to real painted foliage/terrain.
+ */
+const WorldSurfacePackLandLifeSchema = z
+  .object({
+    anchorsFile: WorldSurfacePackPathSchema,
+    maxLeaves: z.number().int().positive(),
+    maxMotes: z.number().int().positive(),
+    maxFlutters: z.number().int().positive(),
+  })
+  .strict();
+
 export const WorldSurfacePackSchema = z
   .object({
     packVersion: z.literal(1),
@@ -308,6 +349,8 @@ export const WorldSurfacePackSchema = z
         foam: WorldSurfacePackPathSchema,
       })
       .strict(),
+    waterfall: WorldSurfacePackWaterfallSchema.optional(),
+    landLife: WorldSurfacePackLandLifeSchema.optional(),
     anchorFiles: z.object({ points: WorldSurfacePackPathSchema }).strict(),
     regionIndex: z
       .object({
