@@ -28,6 +28,20 @@ const RiverSegmentSchema = z.object({
   width: z.number().positive(),
 });
 
+/**
+ * PLAN-095 v2: painted flow-map poses for one feature (RGBA, alpha = the
+ * feature's feathered water mask), cycled by the runtime. Rect in world px.
+ */
+const FlowPosesSchema = z.object({
+  frames: z.array(z.string().regex(/^fx\/water\/[a-z0-9_]+_f\d+\.webp$/)).min(2).max(16),
+  rect: z.object({
+    x: z.number().int().nonnegative(),
+    y: z.number().int().nonnegative(),
+    width: z.number().int().positive(),
+    height: z.number().int().positive(),
+  }),
+});
+
 const RiverFeatureSchema = z.object({
   id: z.string().min(1),
   enabled: z.boolean(),
@@ -35,6 +49,7 @@ const RiverFeatureSchema = z.object({
   glintPoints: z.array(GlintPointSchema).default([]),
   safePolygons: z.array(PolygonSchema).min(1),
   segments: z.array(RiverSegmentSchema).min(1),
+  flowPoses: FlowPosesSchema.optional(),
 });
 
 const LakeFeatureSchema = z.object({
@@ -42,6 +57,7 @@ const LakeFeatureSchema = z.object({
   enabled: z.boolean(),
   safePolygons: z.array(PolygonSchema).min(1),
   glintPoints: z.array(GlintPointSchema).min(1),
+  flowPoses: FlowPosesSchema.optional(),
 });
 
 const ConfluenceSchema = z.object({
@@ -61,9 +77,13 @@ export const Mappa2SecondaryWaterSchema = z
     riverFlowTileSha256: Sha256Schema,
     riverFlowMask: z.literal('masks/river_flow_mask.webp'),
     lakeShimmerMask: z.literal('masks/lake_shimmer_mask.webp'),
-    rivers: z.array(RiverFeatureSchema).min(1).max(4),
+    rivers: z.array(RiverFeatureSchema).min(1).max(8),
     lakes: z.array(LakeFeatureSchema).min(1).max(8),
     confluences: z.array(ConfluenceSchema).min(1).max(8),
+    /** Falls basin: outward ripple poses (PLAN-092 v3), optional. */
+    basin: z.object({ flowPoses: FlowPosesSchema }).optional(),
+    /** Sea water animated with painted poses: bays and river mouths. */
+    seaPatches: z.array(z.object({ id: z.string().min(1), flowPoses: FlowPosesSchema })).optional(),
   })
   .superRefine((value, ctx) => {
     const ids = new Set<string>();
@@ -81,8 +101,8 @@ export const Mappa2SecondaryWaterSchema = z
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: `total vertices ${totalVerts} > 400` });
     }
     const totalSegs = value.rivers.reduce((sum, r) => sum + r.segments.length, 0);
-    if (totalSegs > 22) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: `total segments ${totalSegs} > 22` });
+    if (totalSegs > 64) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: `total segments ${totalSegs} > 64` });
     }
     const totalBbox = value.rivers.reduce(
       (sum, r) => sum + r.segments.reduce((acc, s) => acc + s.length * s.width, 0),

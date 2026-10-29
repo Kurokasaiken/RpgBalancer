@@ -1,0 +1,5171 @@
+{
+  "accepted": [
+    {
+      "id": "shoal-z-13-1",
+      "family": "shoal",
+      "biome": "open_sea",
+      "cell": 64,
+      "cells": [
+        [
+          2208,
+          224,
+          1.0
+        ]
+      ],
+      "heading": [
+        0.707,
+        -0.707
+      ],
+      "maxTravelPx": 96.0,
+      "coastPx": 103.3,
+      "paintL": 53.5,
+      "tintRow": "deepTeal",
+      "deltaL": 5.61
+    },
+    {
+      "id": "shoal-z-14-5",
+      "family": "shoal",
+      "biome": "open_sea",
+      "cell": 64,
+      "cells": [
+        [
+          2336,
+          928,
+          1.0
+        ]
+      ],
+      "heading": [
+        0.981,
+        0.193
+      ],
+      "maxTravelPx": 96.0,
+      "coastPx": 88.8,
+      "paintL": 52.6,
+      "tintRow": "deepTeal",
+      "deltaL": 5.41
+    },
+    {
+      "id": "shoal-z-9-8",
+      "family": "shoal",
+      "biome": "coral_reef",
+      "cell": 64,
+      "cells": [
+        [
+          1504,
+          1312,
+          1.0
+        ]
+      ],
+      "heading": [
+        0.603,
+        0.797
+      ],
+      "maxTravelPx": 96.0,
+      "coastPx": 100.4,
+      "paintL": 54.5,
+      "tintRow": "deepTeal",
+      "deltaL": 5.83
+    }
+  ],
+  "rejected": [
+    {
+      "zone": "shoal-z-0-0",
+      "reason": "coastBand",
+      "coastPx": 39.6
+    },
+    {
+      "zone": "shoal-z-0-0",
+      "reason": "coverage",
+      "coverage": 0.876
+    },
+    {
+      "zone": "shoal-z-1-0",
+      "reason": "coverage",
+      "coverage": 0.845
+    },
+    {
+      "zone": "shoal-z-1-0",
+      "reason": "coverage",
+      "coverage": 0.729
+    },
+    {
+      "zone": "shoal-z-1-0",
+      "reason": "coastBand",
+      "coastPx": 35.3
+    },
+    {
+      "zone": "shoal-z-2-0",
+      "reason": "coastBand",
+      "coastPx": 49.0
+    },
+    {
+      "zone": "shoal-z-2-0",
+      "reason": "coastBand",
+      "coastPx": 79.0
+    },
+    {
+      "zone": "shoal-z-3-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-3-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-3-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-4-0",
+      "reason": "coastBand",
+      "coastPx": 57.3
+    },
+    {
+      "zone": "shoal-z-4-0",
+      "reason": "coverage",
+      "coverage": 0.843
+    },
+    {
+      "zone": "shoal-z-5-0",
+      "reason": "coverage",
+      "coverage": 0.507
+    },
+    {
+      "zone": "shoal-z-5-0",
+      "reason": "coastBand",
+      "coastPx": 41.2
+    },
+    {
+      "zone": "shoal-z-5-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-6-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-6-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-7-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-7-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-7-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-8-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-8-0",
+      "reason": "coastBand",
+      "coastPx": 63.1
+    },
+    {
+      "zone": "shoal-z-9-0",
+      "reason": "coastBand",
+      "coastPx": 29.3
+    },
+    {
+      "zone": "shoal-z-9-0",
+      "reason": "coastBand",
+      "coastPx": 58.3
+    },
+    {
+      "zone": "shoal-z-9-0",
+      "reason": "coastBand",
+      "coastPx": 78.1
+    },
+    {
+      "zone": "shoal-z-10-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-10-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-0",
+      "reason": "coastBand",
+      "coastPx": 168.5
+    },
+    {
+      "zone": "shoal-z-11-0",
+      "reason": "coastBand",
+      "coastPx": 166.9
+    },
+    {
+      "zone": "shoal-z-11-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-12-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-12-0",
+      "reason": "coastBand",
+      "coastPx": 80.8
+    },
+    {
+      "zone": "shoal-z-13-0",
+      "reason": "coastBand",
+      "coastPx": 28.9
+    },
+    {
+      "zone": "shoal-z-13-0",
+      "reason": "coverage",
+      "coverage": 0.502
+    },
+    {
+      "zone": "shoal-z-13-0",
+      "reason": "coverage",
+      "coverage": 0.297
+    },
+    {
+      "zone": "shoal-z-14-0",
+      "reason": "coverage",
+      "coverage": 0.861
+    },
+    {
+      "zone": "shoal-z-14-0",
+      "reason": "coverage",
+      "coverage": 0.198
+    },
+    {
+      "zone": "shoal-z-15-0",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-15-0",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-15-0",
+      "reason": "coverage",
+      "coverage": 0.054
+    },
+    {
+      "zone": "shoal-z-16-0",
+      "reason": "coverage",
+      "coverage": 0.532
+    },
+    {
+      "zone": "shoal-z-16-0",
+      "reason": "coverage",
+      "coverage": 0.035
+    },
+    {
+      "zone": "shoal-z-17-0",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-0",
+      "reason": "coverage",
+      "coverage": 0.867
+    },
+    {
+      "zone": "shoal-z-0-0",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-0",
+      "reason": "coverage",
+      "coverage": 0.05
+    },
+    {
+      "zone": "shoal-z-1-0",
+      "reason": "coverage",
+      "coverage": 0.066
+    },
+    {
+      "zone": "shoal-z-1-0",
+      "reason": "coverage",
+      "coverage": 0.107
+    },
+    {
+      "zone": "shoal-z-2-0",
+      "reason": "coverage",
+      "coverage": 0.656
+    },
+    {
+      "zone": "shoal-z-2-0",
+      "reason": "coverage",
+      "coverage": 0.823
+    },
+    {
+      "zone": "shoal-z-3-0",
+      "reason": "coastBand",
+      "coastPx": 59.8
+    },
+    {
+      "zone": "shoal-z-3-0",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-0",
+      "reason": "coastBand",
+      "coastPx": 82.8
+    },
+    {
+      "zone": "shoal-z-4-0",
+      "reason": "coastBand",
+      "coastPx": 24.6
+    },
+    {
+      "zone": "shoal-z-4-0",
+      "reason": "coverage",
+      "coverage": 0.345
+    },
+    {
+      "zone": "shoal-z-5-0",
+      "reason": "coverage",
+      "coverage": 0.177
+    },
+    {
+      "zone": "shoal-z-5-0",
+      "reason": "coverage",
+      "coverage": 0.628
+    },
+    {
+      "zone": "shoal-z-5-0",
+      "reason": "coastBand",
+      "coastPx": 48.6
+    },
+    {
+      "zone": "shoal-z-6-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-6-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-7-0",
+      "reason": "coastBand",
+      "coastPx": 58.4
+    },
+    {
+      "zone": "shoal-z-7-0",
+      "reason": "coastBand",
+      "coastPx": 62.0
+    },
+    {
+      "zone": "shoal-z-7-0",
+      "reason": "coastBand",
+      "coastPx": 42.6
+    },
+    {
+      "zone": "shoal-z-8-0",
+      "reason": "coastBand",
+      "coastPx": 32.8
+    },
+    {
+      "zone": "shoal-z-8-0",
+      "reason": "coastBand",
+      "coastPx": 30.9
+    },
+    {
+      "zone": "shoal-z-9-0",
+      "reason": "coverage",
+      "coverage": 0.374
+    },
+    {
+      "zone": "shoal-z-9-0",
+      "reason": "coverage",
+      "coverage": 0.65
+    },
+    {
+      "zone": "shoal-z-9-0",
+      "reason": "coverage",
+      "coverage": 0.896
+    },
+    {
+      "zone": "shoal-z-10-0",
+      "reason": "coastBand",
+      "coastPx": 50.1
+    },
+    {
+      "zone": "shoal-z-10-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-0",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-12-0",
+      "reason": "coastBand",
+      "coastPx": 79.8
+    },
+    {
+      "zone": "shoal-z-12-0",
+      "reason": "coastBand",
+      "coastPx": 73.8
+    },
+    {
+      "zone": "shoal-z-13-0",
+      "reason": "coastBand",
+      "coastPx": 35.4
+    },
+    {
+      "zone": "shoal-z-13-0",
+      "reason": "coverage",
+      "coverage": 0.884
+    },
+    {
+      "zone": "shoal-z-13-0",
+      "reason": "coverage",
+      "coverage": 0.813
+    },
+    {
+      "zone": "shoal-z-14-0",
+      "reason": "coastBand",
+      "coastPx": 34.7
+    },
+    {
+      "zone": "shoal-z-14-0",
+      "reason": "coverage",
+      "coverage": 0.769
+    },
+    {
+      "zone": "shoal-z-15-0",
+      "reason": "coverage",
+      "coverage": 0.583
+    },
+    {
+      "zone": "shoal-z-15-0",
+      "reason": "coverage",
+      "coverage": 0.273
+    },
+    {
+      "zone": "shoal-z-15-0",
+      "reason": "coverage",
+      "coverage": 0.075
+    },
+    {
+      "zone": "shoal-z-16-0",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-0",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-17-0",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-1",
+      "reason": "coastBand",
+      "coastPx": 32.4
+    },
+    {
+      "zone": "shoal-z-0-1",
+      "reason": "coverage",
+      "coverage": 0.381
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coverage",
+      "coverage": 0.274
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coverage",
+      "coverage": 0.862
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coverage",
+      "coverage": 0.747
+    },
+    {
+      "zone": "shoal-z-2-1",
+      "reason": "coastBand",
+      "coastPx": 23.4
+    },
+    {
+      "zone": "shoal-z-2-1",
+      "reason": "coverage",
+      "coverage": 0.886
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "coastBand",
+      "coastPx": 65.0
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-1",
+      "reason": "coastBand",
+      "coastPx": 39.0
+    },
+    {
+      "zone": "shoal-z-4-1",
+      "reason": "coastBand",
+      "coastPx": 28.9
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coverage",
+      "coverage": 0.473
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coverage",
+      "coverage": 0.511
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coastBand",
+      "coastPx": 38.0
+    },
+    {
+      "zone": "shoal-z-6-1",
+      "reason": "coastBand",
+      "coastPx": 34.2
+    },
+    {
+      "zone": "shoal-z-6-1",
+      "reason": "coastBand",
+      "coastPx": 30.5
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.802
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.866
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.869
+    },
+    {
+      "zone": "shoal-z-8-1",
+      "reason": "coverage",
+      "coverage": 0.367
+    },
+    {
+      "zone": "shoal-z-8-1",
+      "reason": "coastBand",
+      "coastPx": 13.8
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coverage",
+      "coverage": 0.148
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coverage",
+      "coverage": 0.33
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coverage",
+      "coverage": 0.499
+    },
+    {
+      "zone": "shoal-z-10-1",
+      "reason": "coverage",
+      "coverage": 0.755
+    },
+    {
+      "zone": "shoal-z-10-1",
+      "reason": "coastBand",
+      "coastPx": 32.1
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coastBand",
+      "coastPx": 65.8
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coastBand",
+      "coastPx": 48.3
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coastBand",
+      "coastPx": 34.0
+    },
+    {
+      "zone": "shoal-z-12-1",
+      "reason": "coverage",
+      "coverage": 0.833
+    },
+    {
+      "zone": "shoal-z-12-1",
+      "reason": "coastBand",
+      "coastPx": 41.8
+    },
+    {
+      "zone": "shoal-z-13-1",
+      "reason": "coastBand",
+      "coastPx": 81.6
+    },
+    {
+      "zone": "shoal-z-13-1",
+      "reason": "coastBand",
+      "coastPx": 80.9
+    },
+    {
+      "zone": "shoal-z-13-1",
+      "reason": "coastBand",
+      "coastPx": 81.6
+    },
+    {
+      "zone": "shoal-z-14-1",
+      "reason": "coastBand",
+      "coastPx": 80.5
+    },
+    {
+      "zone": "shoal-z-14-1",
+      "reason": "coastBand",
+      "coastPx": 42.3
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coverage",
+      "coverage": 0.758
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coverage",
+      "coverage": 0.539
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-17-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-1",
+      "reason": "coastBand",
+      "coastPx": 48.2
+    },
+    {
+      "zone": "shoal-z-0-1",
+      "reason": "coverage",
+      "coverage": 0.8
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coverage",
+      "coverage": 0.108
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coverage",
+      "coverage": 0.057
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coverage",
+      "coverage": 0.764
+    },
+    {
+      "zone": "shoal-z-2-1",
+      "reason": "coverage",
+      "coverage": 0.649
+    },
+    {
+      "zone": "shoal-z-2-1",
+      "reason": "coastBand",
+      "coastPx": 45.3
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-1",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-1",
+      "reason": "coastBand",
+      "coastPx": 71.6
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coastBand",
+      "coastPx": 42.0
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coastBand",
+      "coastPx": 35.2
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coverage",
+      "coverage": 0.661
+    },
+    {
+      "zone": "shoal-z-6-1",
+      "reason": "coverage",
+      "coverage": 0.341
+    },
+    {
+      "zone": "shoal-z-6-1",
+      "reason": "coverage",
+      "coverage": 0.683
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.287
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.603
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.745
+    },
+    {
+      "zone": "shoal-z-8-1",
+      "reason": "coverage",
+      "coverage": 0.034
+    },
+    {
+      "zone": "shoal-z-8-1",
+      "reason": "coastBand",
+      "coastPx": 13.6
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coverage",
+      "coverage": 0.435
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coastBand",
+      "coastPx": 16.7
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coastBand",
+      "coastPx": 17.7
+    },
+    {
+      "zone": "shoal-z-10-1",
+      "reason": "coverage",
+      "coverage": 0.509
+    },
+    {
+      "zone": "shoal-z-10-1",
+      "reason": "coverage",
+      "coverage": 0.179
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coverage",
+      "coverage": 0.817
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coverage",
+      "coverage": 0.619
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coverage",
+      "coverage": 0.088
+    },
+    {
+      "zone": "shoal-z-12-1",
+      "reason": "coverage",
+      "coverage": 0.184
+    },
+    {
+      "zone": "shoal-z-12-1",
+      "reason": "coastBand",
+      "coastPx": 31.2
+    },
+    {
+      "zone": "shoal-z-13-1",
+      "reason": "coastBand",
+      "coastPx": 65.3
+    },
+    {
+      "zone": "shoal-z-13-1",
+      "reason": "coastBand",
+      "coastPx": 73.6
+    },
+    {
+      "zone": "shoal-z-14-1",
+      "reason": "notTurquoise",
+      "turq": 0.34
+    },
+    {
+      "zone": "shoal-z-14-1",
+      "reason": "coastBand",
+      "coastPx": 28.0
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coverage",
+      "coverage": 0.755
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coastBand",
+      "coastPx": 27.0
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coverage",
+      "coverage": 0.809
+    },
+    {
+      "zone": "shoal-z-16-1",
+      "reason": "coverage",
+      "coverage": 0.606
+    },
+    {
+      "zone": "shoal-z-16-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-17-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-1",
+      "reason": "coverage",
+      "coverage": 0.616
+    },
+    {
+      "zone": "shoal-z-0-1",
+      "reason": "coverage",
+      "coverage": 0.822
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coastBand",
+      "coastPx": 22.9
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coastBand",
+      "coastPx": 25.3
+    },
+    {
+      "zone": "shoal-z-1-1",
+      "reason": "coverage",
+      "coverage": 0.845
+    },
+    {
+      "zone": "shoal-z-2-1",
+      "reason": "coverage",
+      "coverage": 0.808
+    },
+    {
+      "zone": "shoal-z-2-1",
+      "reason": "coastBand",
+      "coastPx": 53.7
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "coastBand",
+      "coastPx": 171.4
+    },
+    {
+      "zone": "shoal-z-3-1",
+      "reason": "coastBand",
+      "coastPx": 162.6
+    },
+    {
+      "zone": "shoal-z-4-1",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-1",
+      "reason": "coastBand",
+      "coastPx": 50.7
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coverage",
+      "coverage": 0.841
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coverage",
+      "coverage": 0.473
+    },
+    {
+      "zone": "shoal-z-5-1",
+      "reason": "coverage",
+      "coverage": 0.752
+    },
+    {
+      "zone": "shoal-z-6-1",
+      "reason": "coverage",
+      "coverage": 0.864
+    },
+    {
+      "zone": "shoal-z-6-1",
+      "reason": "coastBand",
+      "coastPx": 13.2
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.389
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.172
+    },
+    {
+      "zone": "shoal-z-7-1",
+      "reason": "coverage",
+      "coverage": 0.145
+    },
+    {
+      "zone": "shoal-z-8-1",
+      "reason": "coverage",
+      "coverage": 0.033
+    },
+    {
+      "zone": "shoal-z-8-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coverage",
+      "coverage": 0.055
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coverage",
+      "coverage": 0.219
+    },
+    {
+      "zone": "shoal-z-9-1",
+      "reason": "coverage",
+      "coverage": 0.74
+    },
+    {
+      "zone": "shoal-z-10-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-1",
+      "reason": "coverage",
+      "coverage": 0.359
+    },
+    {
+      "zone": "shoal-z-12-1",
+      "reason": "coastBand",
+      "coastPx": 20.8
+    },
+    {
+      "zone": "shoal-z-13-1",
+      "reason": "coverage",
+      "coverage": 0.698
+    },
+    {
+      "zone": "shoal-z-13-1",
+      "reason": "coverage",
+      "coverage": 0.851
+    },
+    {
+      "zone": "shoal-z-13-1",
+      "reason": "coastBand",
+      "coastPx": 72.6
+    },
+    {
+      "zone": "shoal-z-14-1",
+      "reason": "notTurquoise",
+      "turq": 0.06
+    },
+    {
+      "zone": "shoal-z-14-1",
+      "reason": "coastBand",
+      "coastPx": 69.4
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coastBand",
+      "coastPx": 74.9
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coastBand",
+      "coastPx": 56.7
+    },
+    {
+      "zone": "shoal-z-15-1",
+      "reason": "coastBand",
+      "coastPx": 15.2
+    },
+    {
+      "zone": "shoal-z-16-1",
+      "reason": "coastBand",
+      "coastPx": 28.9
+    },
+    {
+      "zone": "shoal-z-16-1",
+      "reason": "coverage",
+      "coverage": 0.312
+    },
+    {
+      "zone": "shoal-z-17-1",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-2",
+      "reason": "coverage",
+      "coverage": 0.073
+    },
+    {
+      "zone": "shoal-z-0-2",
+      "reason": "coverage",
+      "coverage": 0.005
+    },
+    {
+      "zone": "shoal-z-1-2",
+      "reason": "coverage",
+      "coverage": 0.414
+    },
+    {
+      "zone": "shoal-z-1-2",
+      "reason": "coverage",
+      "coverage": 0.588
+    },
+    {
+      "zone": "shoal-z-1-2",
+      "reason": "coverage",
+      "coverage": 0.874
+    },
+    {
+      "zone": "shoal-z-2-2",
+      "reason": "coastBand",
+      "coastPx": 64.2
+    },
+    {
+      "zone": "shoal-z-2-2",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-2",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-2",
+      "reason": "coastBand",
+      "coastPx": 189.1
+    },
+    {
+      "zone": "shoal-z-3-2",
+      "reason": "coastBand",
+      "coastPx": 163.1
+    },
+    {
+      "zone": "shoal-z-4-2",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-2",
+      "reason": "coastBand",
+      "coastPx": 39.8
+    },
+    {
+      "zone": "shoal-z-5-2",
+      "reason": "coverage",
+      "coverage": 0.421
+    },
+    {
+      "zone": "shoal-z-5-2",
+      "reason": "coverage",
+      "coverage": 0.005
+    },
+    {
+      "zone": "shoal-z-5-2",
+      "reason": "coverage",
+      "coverage": 0.812
+    },
+    {
+      "zone": "shoal-z-6-2",
+      "reason": "coastBand",
+      "coastPx": 22.1
+    },
+    {
+      "zone": "shoal-z-6-2",
+      "reason": "coverage",
+      "coverage": 0.42
+    },
+    {
+      "zone": "shoal-z-7-2",
+      "reason": "coverage",
+      "coverage": 0.287
+    },
+    {
+      "zone": "shoal-z-7-2",
+      "reason": "coverage",
+      "coverage": 0.44
+    },
+    {
+      "zone": "shoal-z-7-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-2",
+      "reason": "coverage",
+      "coverage": 0.023
+    },
+    {
+      "zone": "shoal-z-10-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-2",
+      "reason": "coverage",
+      "coverage": 0.052
+    },
+    {
+      "zone": "shoal-z-13-2",
+      "reason": "coverage",
+      "coverage": 0.052
+    },
+    {
+      "zone": "shoal-z-13-2",
+      "reason": "coverage",
+      "coverage": 0.818
+    },
+    {
+      "zone": "shoal-z-13-2",
+      "reason": "coastBand",
+      "coastPx": 54.7
+    },
+    {
+      "zone": "shoal-z-14-2",
+      "reason": "coastBand",
+      "coastPx": 38.1
+    },
+    {
+      "zone": "shoal-z-14-2",
+      "reason": "coastBand",
+      "coastPx": 45.1
+    },
+    {
+      "zone": "shoal-z-15-2",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-15-2",
+      "reason": "coastBand",
+      "coastPx": 80.2
+    },
+    {
+      "zone": "shoal-z-15-2",
+      "reason": "coastBand",
+      "coastPx": 48.5
+    },
+    {
+      "zone": "shoal-z-16-2",
+      "reason": "coverage",
+      "coverage": 0.785
+    },
+    {
+      "zone": "shoal-z-16-2",
+      "reason": "coverage",
+      "coverage": 0.087
+    },
+    {
+      "zone": "shoal-z-17-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-2",
+      "reason": "coverage",
+      "coverage": 0.04
+    },
+    {
+      "zone": "shoal-z-1-2",
+      "reason": "coverage",
+      "coverage": 0.462
+    },
+    {
+      "zone": "shoal-z-2-2",
+      "reason": "coastBand",
+      "coastPx": 50.0
+    },
+    {
+      "zone": "shoal-z-2-2",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-2",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-2",
+      "reason": "coastBand",
+      "coastPx": 178.2
+    },
+    {
+      "zone": "shoal-z-3-2",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-2",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-2",
+      "reason": "coastBand",
+      "coastPx": 51.8
+    },
+    {
+      "zone": "shoal-z-5-2",
+      "reason": "coverage",
+      "coverage": 0.64
+    },
+    {
+      "zone": "shoal-z-5-2",
+      "reason": "coverage",
+      "coverage": 0.422
+    },
+    {
+      "zone": "shoal-z-5-2",
+      "reason": "coverage",
+      "coverage": 0.732
+    },
+    {
+      "zone": "shoal-z-6-2",
+      "reason": "coverage",
+      "coverage": 0.039
+    },
+    {
+      "zone": "shoal-z-6-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-2",
+      "reason": "coverage",
+      "coverage": 0.01
+    },
+    {
+      "zone": "shoal-z-7-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-2",
+      "reason": "coverage",
+      "coverage": 0.199
+    },
+    {
+      "zone": "shoal-z-13-2",
+      "reason": "coverage",
+      "coverage": 0.808
+    },
+    {
+      "zone": "shoal-z-14-2",
+      "reason": "coverage",
+      "coverage": 0.231
+    },
+    {
+      "zone": "shoal-z-14-2",
+      "reason": "coverage",
+      "coverage": 0.807
+    },
+    {
+      "zone": "shoal-z-15-2",
+      "reason": "coastBand",
+      "coastPx": 74.1
+    },
+    {
+      "zone": "shoal-z-15-2",
+      "reason": "coastBand",
+      "coastPx": 75.5
+    },
+    {
+      "zone": "shoal-z-15-2",
+      "reason": "coastBand",
+      "coastPx": 46.7
+    },
+    {
+      "zone": "shoal-z-16-2",
+      "reason": "coverage",
+      "coverage": 0.836
+    },
+    {
+      "zone": "shoal-z-16-2",
+      "reason": "coverage",
+      "coverage": 0.127
+    },
+    {
+      "zone": "shoal-z-17-2",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-3",
+      "reason": "coverage",
+      "coverage": 0.002
+    },
+    {
+      "zone": "shoal-z-0-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coverage",
+      "coverage": 0.06
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coverage",
+      "coverage": 0.647
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coverage",
+      "coverage": 0.266
+    },
+    {
+      "zone": "shoal-z-2-3",
+      "reason": "coverage",
+      "coverage": 0.807
+    },
+    {
+      "zone": "shoal-z-2-3",
+      "reason": "coastBand",
+      "coastPx": 55.4
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-3",
+      "reason": "coastBand",
+      "coastPx": 52.5
+    },
+    {
+      "zone": "shoal-z-4-3",
+      "reason": "coverage",
+      "coverage": 0.817
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.708
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.503
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.122
+    },
+    {
+      "zone": "shoal-z-6-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.177
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.187
+    },
+    {
+      "zone": "shoal-z-14-3",
+      "reason": "coverage",
+      "coverage": 0.715
+    },
+    {
+      "zone": "shoal-z-14-3",
+      "reason": "coverage",
+      "coverage": 0.487
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "coastBand",
+      "coastPx": 57.6
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "coastBand",
+      "coastPx": 35.2
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "coverage",
+      "coverage": 0.338
+    },
+    {
+      "zone": "shoal-z-16-3",
+      "reason": "coverage",
+      "coverage": 0.085
+    },
+    {
+      "zone": "shoal-z-16-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-17-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-3",
+      "reason": "coverage",
+      "coverage": 0.025
+    },
+    {
+      "zone": "shoal-z-0-3",
+      "reason": "coverage",
+      "coverage": 0.148
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coverage",
+      "coverage": 0.661
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coastBand",
+      "coastPx": 28.5
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coverage",
+      "coverage": 0.372
+    },
+    {
+      "zone": "shoal-z-2-3",
+      "reason": "coverage",
+      "coverage": 0.818
+    },
+    {
+      "zone": "shoal-z-2-3",
+      "reason": "coastBand",
+      "coastPx": 48.9
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-3",
+      "reason": "coastBand",
+      "coastPx": 32.6
+    },
+    {
+      "zone": "shoal-z-4-3",
+      "reason": "coverage",
+      "coverage": 0.24
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.11
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.335
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.047
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.715
+    },
+    {
+      "zone": "shoal-z-14-3",
+      "reason": "coastBand",
+      "coastPx": 36.2
+    },
+    {
+      "zone": "shoal-z-14-3",
+      "reason": "coastBand",
+      "coastPx": 32.0
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "coastBand",
+      "coastPx": 58.1
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "coastBand",
+      "coastPx": 21.9
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "coastBand",
+      "coastPx": 23.6
+    },
+    {
+      "zone": "shoal-z-16-3",
+      "reason": "coastBand",
+      "coastPx": 27.0
+    },
+    {
+      "zone": "shoal-z-16-3",
+      "reason": "coverage",
+      "coverage": 0.29
+    },
+    {
+      "zone": "shoal-z-17-3",
+      "reason": "coverage",
+      "coverage": 0.042
+    },
+    {
+      "zone": "shoal-z-0-3",
+      "reason": "coverage",
+      "coverage": 0.127
+    },
+    {
+      "zone": "shoal-z-0-3",
+      "reason": "coverage",
+      "coverage": 0.154
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coastBand",
+      "coastPx": 23.2
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coastBand",
+      "coastPx": 37.7
+    },
+    {
+      "zone": "shoal-z-1-3",
+      "reason": "coastBand",
+      "coastPx": 26.7
+    },
+    {
+      "zone": "shoal-z-2-3",
+      "reason": "coastBand",
+      "coastPx": 53.4
+    },
+    {
+      "zone": "shoal-z-2-3",
+      "reason": "coastBand",
+      "coastPx": 76.3
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "coastBand",
+      "coastPx": 77.3
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "coastBand",
+      "coastPx": 79.9
+    },
+    {
+      "zone": "shoal-z-3-3",
+      "reason": "coastBand",
+      "coastPx": 73.4
+    },
+    {
+      "zone": "shoal-z-4-3",
+      "reason": "coastBand",
+      "coastPx": 51.3
+    },
+    {
+      "zone": "shoal-z-4-3",
+      "reason": "coverage",
+      "coverage": 0.658
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.053
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-5-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.041
+    },
+    {
+      "zone": "shoal-z-13-3",
+      "reason": "coverage",
+      "coverage": 0.425
+    },
+    {
+      "zone": "shoal-z-14-3",
+      "reason": "coastBand",
+      "coastPx": 43.5
+    },
+    {
+      "zone": "shoal-z-14-3",
+      "reason": "notTurquoise",
+      "turq": 0.01
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "coastBand",
+      "coastPx": 67.4
+    },
+    {
+      "zone": "shoal-z-15-3",
+      "reason": "coastBand",
+      "coastPx": 76.0
+    },
+    {
+      "zone": "shoal-z-16-3",
+      "reason": "coastBand",
+      "coastPx": 64.4
+    },
+    {
+      "zone": "shoal-z-16-3",
+      "reason": "coverage",
+      "coverage": 0.878
+    },
+    {
+      "zone": "shoal-z-17-3",
+      "reason": "coverage",
+      "coverage": 0.288
+    },
+    {
+      "zone": "shoal-z-0-4",
+      "reason": "coverage",
+      "coverage": 0.55
+    },
+    {
+      "zone": "shoal-z-0-4",
+      "reason": "coverage",
+      "coverage": 0.694
+    },
+    {
+      "zone": "shoal-z-1-4",
+      "reason": "coverage",
+      "coverage": 0.547
+    },
+    {
+      "zone": "shoal-z-1-4",
+      "reason": "coverage",
+      "coverage": 0.885
+    },
+    {
+      "zone": "shoal-z-1-4",
+      "reason": "coastBand",
+      "coastPx": 73.5
+    },
+    {
+      "zone": "shoal-z-2-4",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-2-4",
+      "reason": "coastBand",
+      "coastPx": 55.3
+    },
+    {
+      "zone": "shoal-z-3-4",
+      "reason": "coverage",
+      "coverage": 0.839
+    },
+    {
+      "zone": "shoal-z-3-4",
+      "reason": "coastBand",
+      "coastPx": 26.8
+    },
+    {
+      "zone": "shoal-z-3-4",
+      "reason": "coverage",
+      "coverage": 0.826
+    },
+    {
+      "zone": "shoal-z-4-4",
+      "reason": "coastBand",
+      "coastPx": 59.1
+    },
+    {
+      "zone": "shoal-z-4-4",
+      "reason": "coastBand",
+      "coastPx": 28.9
+    },
+    {
+      "zone": "shoal-z-5-4",
+      "reason": "coverage",
+      "coverage": 0.129
+    },
+    {
+      "zone": "shoal-z-5-4",
+      "reason": "coverage",
+      "coverage": 0.123
+    },
+    {
+      "zone": "shoal-z-5-4",
+      "reason": "coverage",
+      "coverage": 0.133
+    },
+    {
+      "zone": "shoal-z-6-4",
+      "reason": "coverage",
+      "coverage": 0.147
+    },
+    {
+      "zone": "shoal-z-6-4",
+      "reason": "coverage",
+      "coverage": 0.034
+    },
+    {
+      "zone": "shoal-z-7-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-4",
+      "reason": "coverage",
+      "coverage": 0.014
+    },
+    {
+      "zone": "shoal-z-8-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-4",
+      "reason": "coverage",
+      "coverage": 0.584
+    },
+    {
+      "zone": "shoal-z-14-4",
+      "reason": "coastBand",
+      "coastPx": 40.4
+    },
+    {
+      "zone": "shoal-z-14-4",
+      "reason": "notTurquoise",
+      "turq": 0.03
+    },
+    {
+      "zone": "shoal-z-15-4",
+      "reason": "notTurquoise",
+      "turq": 0.03
+    },
+    {
+      "zone": "shoal-z-15-4",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-15-4",
+      "reason": "coastBand",
+      "coastPx": 83.8
+    },
+    {
+      "zone": "shoal-z-16-4",
+      "reason": "coastBand",
+      "coastPx": 48.5
+    },
+    {
+      "zone": "shoal-z-16-4",
+      "reason": "coverage",
+      "coverage": 0.817
+    },
+    {
+      "zone": "shoal-z-17-4",
+      "reason": "coverage",
+      "coverage": 0.827
+    },
+    {
+      "zone": "shoal-z-0-4",
+      "reason": "coverage",
+      "coverage": 0.805
+    },
+    {
+      "zone": "shoal-z-0-4",
+      "reason": "coverage",
+      "coverage": 0.892
+    },
+    {
+      "zone": "shoal-z-1-4",
+      "reason": "coastBand",
+      "coastPx": 27.3
+    },
+    {
+      "zone": "shoal-z-1-4",
+      "reason": "coastBand",
+      "coastPx": 37.3
+    },
+    {
+      "zone": "shoal-z-1-4",
+      "reason": "coastBand",
+      "coastPx": 78.6
+    },
+    {
+      "zone": "shoal-z-2-4",
+      "reason": "coastBand",
+      "coastPx": 52.5
+    },
+    {
+      "zone": "shoal-z-2-4",
+      "reason": "coastBand",
+      "coastPx": 20.9
+    },
+    {
+      "zone": "shoal-z-3-4",
+      "reason": "coastBand",
+      "coastPx": 16.9
+    },
+    {
+      "zone": "shoal-z-3-4",
+      "reason": "coverage",
+      "coverage": 0.315
+    },
+    {
+      "zone": "shoal-z-3-4",
+      "reason": "coverage",
+      "coverage": 0.418
+    },
+    {
+      "zone": "shoal-z-4-4",
+      "reason": "coastBand",
+      "coastPx": 52.1
+    },
+    {
+      "zone": "shoal-z-4-4",
+      "reason": "coastBand",
+      "coastPx": 57.2
+    },
+    {
+      "zone": "shoal-z-5-4",
+      "reason": "coastBand",
+      "coastPx": 20.3
+    },
+    {
+      "zone": "shoal-z-5-4",
+      "reason": "coverage",
+      "coverage": 0.307
+    },
+    {
+      "zone": "shoal-z-5-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-4",
+      "reason": "coverage",
+      "coverage": 0.056
+    },
+    {
+      "zone": "shoal-z-8-4",
+      "reason": "coverage",
+      "coverage": 0.212
+    },
+    {
+      "zone": "shoal-z-8-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-4",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-4",
+      "reason": "coverage",
+      "coverage": 0.297
+    },
+    {
+      "zone": "shoal-z-14-4",
+      "reason": "coastBand",
+      "coastPx": 34.6
+    },
+    {
+      "zone": "shoal-z-14-4",
+      "reason": "notTurquoise",
+      "turq": 0.06
+    },
+    {
+      "zone": "shoal-z-15-4",
+      "reason": "notTurquoise",
+      "turq": 0.07
+    },
+    {
+      "zone": "shoal-z-15-4",
+      "reason": "coastBand",
+      "coastPx": 80.5
+    },
+    {
+      "zone": "shoal-z-15-4",
+      "reason": "coastBand",
+      "coastPx": 30.3
+    },
+    {
+      "zone": "shoal-z-16-4",
+      "reason": "coverage",
+      "coverage": 0.785
+    },
+    {
+      "zone": "shoal-z-16-4",
+      "reason": "coverage",
+      "coverage": 0.706
+    },
+    {
+      "zone": "shoal-z-17-4",
+      "reason": "coverage",
+      "coverage": 0.725
+    },
+    {
+      "zone": "shoal-z-0-5",
+      "reason": "coverage",
+      "coverage": 0.171
+    },
+    {
+      "zone": "shoal-z-0-5",
+      "reason": "coverage",
+      "coverage": 0.101
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coverage",
+      "coverage": 0.327
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coverage",
+      "coverage": 0.769
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coastBand",
+      "coastPx": 54.4
+    },
+    {
+      "zone": "shoal-z-2-5",
+      "reason": "coastBand",
+      "coastPx": 28.9
+    },
+    {
+      "zone": "shoal-z-2-5",
+      "reason": "coverage",
+      "coverage": 0.569
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coastBand",
+      "coastPx": 21.5
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coverage",
+      "coverage": 0.76
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coverage",
+      "coverage": 0.144
+    },
+    {
+      "zone": "shoal-z-4-5",
+      "reason": "coastBand",
+      "coastPx": 31.4
+    },
+    {
+      "zone": "shoal-z-4-5",
+      "reason": "coastBand",
+      "coastPx": 54.5
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coverage",
+      "coverage": 0.724
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coverage",
+      "coverage": 0.123
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coverage",
+      "coverage": 0.046
+    },
+    {
+      "zone": "shoal-z-6-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-5",
+      "reason": "coverage",
+      "coverage": 0.137
+    },
+    {
+      "zone": "shoal-z-8-5",
+      "reason": "coverage",
+      "coverage": 0.145
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coverage",
+      "coverage": 0.552
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coverage",
+      "coverage": 0.782
+    },
+    {
+      "zone": "shoal-z-14-5",
+      "reason": "coverage",
+      "coverage": 0.895
+    },
+    {
+      "zone": "shoal-z-14-5",
+      "reason": "coastBand",
+      "coastPx": 75.0
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "notTurquoise",
+      "turq": 0.16
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "coastBand",
+      "coastPx": 66.9
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "coastBand",
+      "coastPx": 18.8
+    },
+    {
+      "zone": "shoal-z-16-5",
+      "reason": "coverage",
+      "coverage": 0.457
+    },
+    {
+      "zone": "shoal-z-16-5",
+      "reason": "coverage",
+      "coverage": 0.087
+    },
+    {
+      "zone": "shoal-z-17-5",
+      "reason": "coverage",
+      "coverage": 0.211
+    },
+    {
+      "zone": "shoal-z-0-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coverage",
+      "coverage": 0.176
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coverage",
+      "coverage": 0.853
+    },
+    {
+      "zone": "shoal-z-2-5",
+      "reason": "coastBand",
+      "coastPx": 35.4
+    },
+    {
+      "zone": "shoal-z-2-5",
+      "reason": "coastBand",
+      "coastPx": 51.3
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coastBand",
+      "coastPx": 48.6
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coastBand",
+      "coastPx": 32.5
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coverage",
+      "coverage": 0.895
+    },
+    {
+      "zone": "shoal-z-4-5",
+      "reason": "coastBand",
+      "coastPx": 46.5
+    },
+    {
+      "zone": "shoal-z-4-5",
+      "reason": "coastBand",
+      "coastPx": 19.2
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coastBand",
+      "coastPx": 28.6
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coastBand",
+      "coastPx": 32.0
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coverage",
+      "coverage": 0.826
+    },
+    {
+      "zone": "shoal-z-6-5",
+      "reason": "coverage",
+      "coverage": 0.065
+    },
+    {
+      "zone": "shoal-z-6-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-5",
+      "reason": "coverage",
+      "coverage": 0.256
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-5",
+      "reason": "coverage",
+      "coverage": 0.021
+    },
+    {
+      "zone": "shoal-z-12-5",
+      "reason": "coverage",
+      "coverage": 0.167
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coverage",
+      "coverage": 0.064
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coverage",
+      "coverage": 0.65
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coastBand",
+      "coastPx": 30.5
+    },
+    {
+      "zone": "shoal-z-14-5",
+      "reason": "coastBand",
+      "coastPx": 27.9
+    },
+    {
+      "zone": "shoal-z-14-5",
+      "reason": "coastBand",
+      "coastPx": 83.9
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "coastBand",
+      "coastPx": 49.5
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "coverage",
+      "coverage": 0.624
+    },
+    {
+      "zone": "shoal-z-16-5",
+      "reason": "coverage",
+      "coverage": 0.434
+    },
+    {
+      "zone": "shoal-z-16-5",
+      "reason": "coverage",
+      "coverage": 0.486
+    },
+    {
+      "zone": "shoal-z-17-5",
+      "reason": "coverage",
+      "coverage": 0.766
+    },
+    {
+      "zone": "shoal-z-0-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-5",
+      "reason": "coverage",
+      "coverage": 0.068
+    },
+    {
+      "zone": "shoal-z-2-5",
+      "reason": "coverage",
+      "coverage": 0.727
+    },
+    {
+      "zone": "shoal-z-2-5",
+      "reason": "coverage",
+      "coverage": 0.803
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coverage",
+      "coverage": 0.712
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coastBand",
+      "coastPx": 54.3
+    },
+    {
+      "zone": "shoal-z-3-5",
+      "reason": "coastBand",
+      "coastPx": 84.6
+    },
+    {
+      "zone": "shoal-z-4-5",
+      "reason": "coastBand",
+      "coastPx": 70.0
+    },
+    {
+      "zone": "shoal-z-4-5",
+      "reason": "coastBand",
+      "coastPx": 20.8
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coverage",
+      "coverage": 0.814
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coverage",
+      "coverage": 0.785
+    },
+    {
+      "zone": "shoal-z-5-5",
+      "reason": "coverage",
+      "coverage": 0.436
+    },
+    {
+      "zone": "shoal-z-6-5",
+      "reason": "coverage",
+      "coverage": 0.026
+    },
+    {
+      "zone": "shoal-z-6-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-5",
+      "reason": "coverage",
+      "coverage": 0.096
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.255
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.331
+    },
+    {
+      "zone": "shoal-z-9-5",
+      "reason": "coverage",
+      "coverage": 0.26
+    },
+    {
+      "zone": "shoal-z-10-5",
+      "reason": "coverage",
+      "coverage": 0.064
+    },
+    {
+      "zone": "shoal-z-10-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-5",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-5",
+      "reason": "coverage",
+      "coverage": 0.179
+    },
+    {
+      "zone": "shoal-z-12-5",
+      "reason": "coverage",
+      "coverage": 0.288
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coverage",
+      "coverage": 0.61
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coastBand",
+      "coastPx": 20.0
+    },
+    {
+      "zone": "shoal-z-13-5",
+      "reason": "coverage",
+      "coverage": 0.735
+    },
+    {
+      "zone": "shoal-z-14-5",
+      "reason": "coastBand",
+      "coastPx": 25.5
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "coastBand",
+      "coastPx": 69.1
+    },
+    {
+      "zone": "shoal-z-15-5",
+      "reason": "coastBand",
+      "coastPx": 36.3
+    },
+    {
+      "zone": "shoal-z-16-5",
+      "reason": "coastBand",
+      "coastPx": 20.0
+    },
+    {
+      "zone": "shoal-z-16-5",
+      "reason": "coastBand",
+      "coastPx": 19.8
+    },
+    {
+      "zone": "shoal-z-17-5",
+      "reason": "coverage",
+      "coverage": 0.545
+    },
+    {
+      "zone": "shoal-z-0-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-6",
+      "reason": "coverage",
+      "coverage": 0.073
+    },
+    {
+      "zone": "shoal-z-1-6",
+      "reason": "coverage",
+      "coverage": 0.45
+    },
+    {
+      "zone": "shoal-z-1-6",
+      "reason": "coverage",
+      "coverage": 0.705
+    },
+    {
+      "zone": "shoal-z-2-6",
+      "reason": "coverage",
+      "coverage": 0.66
+    },
+    {
+      "zone": "shoal-z-2-6",
+      "reason": "coverage",
+      "coverage": 0.145
+    },
+    {
+      "zone": "shoal-z-3-6",
+      "reason": "coverage",
+      "coverage": 0.752
+    },
+    {
+      "zone": "shoal-z-3-6",
+      "reason": "coastBand",
+      "coastPx": 52.5
+    },
+    {
+      "zone": "shoal-z-3-6",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-4-6",
+      "reason": "notTurquoise",
+      "turq": 0.44
+    },
+    {
+      "zone": "shoal-z-4-6",
+      "reason": "coastBand",
+      "coastPx": 58.2
+    },
+    {
+      "zone": "shoal-z-5-6",
+      "reason": "coverage",
+      "coverage": 0.651
+    },
+    {
+      "zone": "shoal-z-5-6",
+      "reason": "coverage",
+      "coverage": 0.012
+    },
+    {
+      "zone": "shoal-z-5-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-8-6",
+      "reason": "coverage",
+      "coverage": 0.142
+    },
+    {
+      "zone": "shoal-z-9-6",
+      "reason": "coverage",
+      "coverage": 0.669
+    },
+    {
+      "zone": "shoal-z-9-6",
+      "reason": "coverage",
+      "coverage": 0.818
+    },
+    {
+      "zone": "shoal-z-9-6",
+      "reason": "coverage",
+      "coverage": 0.002
+    },
+    {
+      "zone": "shoal-z-10-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-13-6",
+      "reason": "coverage",
+      "coverage": 0.078
+    },
+    {
+      "zone": "shoal-z-13-6",
+      "reason": "coverage",
+      "coverage": 0.851
+    },
+    {
+      "zone": "shoal-z-13-6",
+      "reason": "coverage",
+      "coverage": 0.854
+    },
+    {
+      "zone": "shoal-z-14-6",
+      "reason": "coastBand",
+      "coastPx": 51.2
+    },
+    {
+      "zone": "shoal-z-15-6",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-15-6",
+      "reason": "coastBand",
+      "coastPx": 45.0
+    },
+    {
+      "zone": "shoal-z-15-6",
+      "reason": "coastBand",
+      "coastPx": 29.4
+    },
+    {
+      "zone": "shoal-z-16-6",
+      "reason": "coastBand",
+      "coastPx": 30.4
+    },
+    {
+      "zone": "shoal-z-16-6",
+      "reason": "coverage",
+      "coverage": 0.725
+    },
+    {
+      "zone": "shoal-z-17-6",
+      "reason": "coverage",
+      "coverage": 0.204
+    },
+    {
+      "zone": "shoal-z-0-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-6",
+      "reason": "coverage",
+      "coverage": 0.283
+    },
+    {
+      "zone": "shoal-z-1-6",
+      "reason": "coverage",
+      "coverage": 0.838
+    },
+    {
+      "zone": "shoal-z-1-6",
+      "reason": "coastBand",
+      "coastPx": 32.8
+    },
+    {
+      "zone": "shoal-z-1-6",
+      "reason": "coastBand",
+      "coastPx": 33.7
+    },
+    {
+      "zone": "shoal-z-2-6",
+      "reason": "coverage",
+      "coverage": 0.133
+    },
+    {
+      "zone": "shoal-z-2-6",
+      "reason": "coverage",
+      "coverage": 0.715
+    },
+    {
+      "zone": "shoal-z-3-6",
+      "reason": "coastBand",
+      "coastPx": 21.9
+    },
+    {
+      "zone": "shoal-z-3-6",
+      "reason": "coverage",
+      "coverage": 0.896
+    },
+    {
+      "zone": "shoal-z-3-6",
+      "reason": "coastBand",
+      "coastPx": 65.1
+    },
+    {
+      "zone": "shoal-z-4-6",
+      "reason": "coastBand",
+      "coastPx": 71.3
+    },
+    {
+      "zone": "shoal-z-4-6",
+      "reason": "coastBand",
+      "coastPx": 38.6
+    },
+    {
+      "zone": "shoal-z-5-6",
+      "reason": "coverage",
+      "coverage": 0.808
+    },
+    {
+      "zone": "shoal-z-5-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-5-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-6",
+      "reason": "coverage",
+      "coverage": 0.023
+    },
+    {
+      "zone": "shoal-z-7-6",
+      "reason": "coverage",
+      "coverage": 0.539
+    },
+    {
+      "zone": "shoal-z-7-6",
+      "reason": "coverage",
+      "coverage": 0.362
+    },
+    {
+      "zone": "shoal-z-8-6",
+      "reason": "coverage",
+      "coverage": 0.583
+    },
+    {
+      "zone": "shoal-z-8-6",
+      "reason": "coastBand",
+      "coastPx": 20.1
+    },
+    {
+      "zone": "shoal-z-9-6",
+      "reason": "coastBand",
+      "coastPx": 36.1
+    },
+    {
+      "zone": "shoal-z-9-6",
+      "reason": "coastBand",
+      "coastPx": 30.4
+    },
+    {
+      "zone": "shoal-z-9-6",
+      "reason": "coverage",
+      "coverage": 0.323
+    },
+    {
+      "zone": "shoal-z-10-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-10-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-6",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-12-6",
+      "reason": "coverage",
+      "coverage": 0.016
+    },
+    {
+      "zone": "shoal-z-13-6",
+      "reason": "coverage",
+      "coverage": 0.517
+    },
+    {
+      "zone": "shoal-z-13-6",
+      "reason": "coverage",
+      "coverage": 0.406
+    },
+    {
+      "zone": "shoal-z-13-6",
+      "reason": "coverage",
+      "coverage": 0.442
+    },
+    {
+      "zone": "shoal-z-14-6",
+      "reason": "coastBand",
+      "coastPx": 52.5
+    },
+    {
+      "zone": "shoal-z-14-6",
+      "reason": "notTurquoise",
+      "turq": 0.15
+    },
+    {
+      "zone": "shoal-z-15-6",
+      "reason": "coastBand",
+      "coastPx": 49.8
+    },
+    {
+      "zone": "shoal-z-15-6",
+      "reason": "coverage",
+      "coverage": 0.759
+    },
+    {
+      "zone": "shoal-z-15-6",
+      "reason": "coverage",
+      "coverage": 0.469
+    },
+    {
+      "zone": "shoal-z-16-6",
+      "reason": "coastBand",
+      "coastPx": 50.9
+    },
+    {
+      "zone": "shoal-z-16-6",
+      "reason": "coverage",
+      "coverage": 0.769
+    },
+    {
+      "zone": "shoal-z-17-6",
+      "reason": "coverage",
+      "coverage": 0.044
+    },
+    {
+      "zone": "shoal-z-0-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-7",
+      "reason": "coverage",
+      "coverage": 0.041
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coverage",
+      "coverage": 0.164
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coverage",
+      "coverage": 0.706
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coastBand",
+      "coastPx": 35.0
+    },
+    {
+      "zone": "shoal-z-2-7",
+      "reason": "coverage",
+      "coverage": 0.403
+    },
+    {
+      "zone": "shoal-z-2-7",
+      "reason": "coverage",
+      "coverage": 0.18
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coverage",
+      "coverage": 0.641
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coverage",
+      "coverage": 0.74
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coastBand",
+      "coastPx": 49.4
+    },
+    {
+      "zone": "shoal-z-4-7",
+      "reason": "coverage",
+      "coverage": 0.866
+    },
+    {
+      "zone": "shoal-z-4-7",
+      "reason": "coverage",
+      "coverage": 0.253
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coverage",
+      "coverage": 0.01
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-6-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coverage",
+      "coverage": 0.432
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coastBand",
+      "coastPx": 31.8
+    },
+    {
+      "zone": "shoal-z-8-7",
+      "reason": "coastBand",
+      "coastPx": 21.5
+    },
+    {
+      "zone": "shoal-z-8-7",
+      "reason": "coverage",
+      "coverage": 0.277
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coverage",
+      "coverage": 0.255
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coverage",
+      "coverage": 0.746
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coastBand",
+      "coastPx": 26.7
+    },
+    {
+      "zone": "shoal-z-10-7",
+      "reason": "coverage",
+      "coverage": 0.388
+    },
+    {
+      "zone": "shoal-z-10-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.003
+    },
+    {
+      "zone": "shoal-z-12-7",
+      "reason": "coverage",
+      "coverage": 0.164
+    },
+    {
+      "zone": "shoal-z-12-7",
+      "reason": "coverage",
+      "coverage": 0.753
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coastBand",
+      "coastPx": 26.8
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coverage",
+      "coverage": 0.164
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coverage",
+      "coverage": 0.871
+    },
+    {
+      "zone": "shoal-z-14-7",
+      "reason": "coastBand",
+      "coastPx": 64.9
+    },
+    {
+      "zone": "shoal-z-14-7",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coastBand",
+      "coastPx": 30.7
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coverage",
+      "coverage": 0.845
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coverage",
+      "coverage": 0.809
+    },
+    {
+      "zone": "shoal-z-16-7",
+      "reason": "coastBand",
+      "coastPx": 48.1
+    },
+    {
+      "zone": "shoal-z-16-7",
+      "reason": "coverage",
+      "coverage": 0.897
+    },
+    {
+      "zone": "shoal-z-17-7",
+      "reason": "coverage",
+      "coverage": 0.242
+    },
+    {
+      "zone": "shoal-z-0-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coverage",
+      "coverage": 0.454
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coastBand",
+      "coastPx": 11.8
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coastBand",
+      "coastPx": 33.4
+    },
+    {
+      "zone": "shoal-z-2-7",
+      "reason": "coverage",
+      "coverage": 0.887
+    },
+    {
+      "zone": "shoal-z-2-7",
+      "reason": "coverage",
+      "coverage": 0.567
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coverage",
+      "coverage": 0.618
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coastBand",
+      "coastPx": 41.4
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coastBand",
+      "coastPx": 52.5
+    },
+    {
+      "zone": "shoal-z-4-7",
+      "reason": "coverage",
+      "coverage": 0.63
+    },
+    {
+      "zone": "shoal-z-4-7",
+      "reason": "coverage",
+      "coverage": 0.023
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coverage",
+      "coverage": 0.263
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coverage",
+      "coverage": 0.522
+    },
+    {
+      "zone": "shoal-z-6-7",
+      "reason": "coverage",
+      "coverage": 0.163
+    },
+    {
+      "zone": "shoal-z-6-7",
+      "reason": "coverage",
+      "coverage": 0.53
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coverage",
+      "coverage": 0.817
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coverage",
+      "coverage": 0.811
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coastBand",
+      "coastPx": 18.8
+    },
+    {
+      "zone": "shoal-z-8-7",
+      "reason": "coverage",
+      "coverage": 0.276
+    },
+    {
+      "zone": "shoal-z-8-7",
+      "reason": "coverage",
+      "coverage": 0.033
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coverage",
+      "coverage": 0.1
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coverage",
+      "coverage": 0.408
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coastBand",
+      "coastPx": 33.9
+    },
+    {
+      "zone": "shoal-z-10-7",
+      "reason": "coverage",
+      "coverage": 0.827
+    },
+    {
+      "zone": "shoal-z-10-7",
+      "reason": "coverage",
+      "coverage": 0.303
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.075
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.121
+    },
+    {
+      "zone": "shoal-z-12-7",
+      "reason": "coverage",
+      "coverage": 0.819
+    },
+    {
+      "zone": "shoal-z-12-7",
+      "reason": "coastBand",
+      "coastPx": 33.7
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coastBand",
+      "coastPx": 26.9
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coastBand",
+      "coastPx": 26.1
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coastBand",
+      "coastPx": 58.5
+    },
+    {
+      "zone": "shoal-z-14-7",
+      "reason": "coastBand",
+      "coastPx": 81.6
+    },
+    {
+      "zone": "shoal-z-14-7",
+      "reason": "coastBand",
+      "coastPx": 56.3
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coastBand",
+      "coastPx": 57.2
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coastBand",
+      "coastPx": 69.9
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coastBand",
+      "coastPx": 61.3
+    },
+    {
+      "zone": "shoal-z-16-7",
+      "reason": "coastBand",
+      "coastPx": 35.1
+    },
+    {
+      "zone": "shoal-z-16-7",
+      "reason": "coverage",
+      "coverage": 0.72
+    },
+    {
+      "zone": "shoal-z-17-7",
+      "reason": "coverage",
+      "coverage": 0.501
+    },
+    {
+      "zone": "shoal-z-0-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-7",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coverage",
+      "coverage": 0.023
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coverage",
+      "coverage": 0.763
+    },
+    {
+      "zone": "shoal-z-1-7",
+      "reason": "coastBand",
+      "coastPx": 38.7
+    },
+    {
+      "zone": "shoal-z-2-7",
+      "reason": "coastBand",
+      "coastPx": 61.7
+    },
+    {
+      "zone": "shoal-z-2-7",
+      "reason": "coastBand",
+      "coastPx": 59.6
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coastBand",
+      "coastPx": 47.1
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coastBand",
+      "coastPx": 41.7
+    },
+    {
+      "zone": "shoal-z-3-7",
+      "reason": "coastBand",
+      "coastPx": 56.3
+    },
+    {
+      "zone": "shoal-z-4-7",
+      "reason": "coastBand",
+      "coastPx": 45.1
+    },
+    {
+      "zone": "shoal-z-4-7",
+      "reason": "coastBand",
+      "coastPx": 26.8
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coverage",
+      "coverage": 0.753
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coastBand",
+      "coastPx": 27.4
+    },
+    {
+      "zone": "shoal-z-5-7",
+      "reason": "coastBand",
+      "coastPx": 49.0
+    },
+    {
+      "zone": "shoal-z-6-7",
+      "reason": "coastBand",
+      "coastPx": 37.5
+    },
+    {
+      "zone": "shoal-z-6-7",
+      "reason": "coastBand",
+      "coastPx": 26.5
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coastBand",
+      "coastPx": 18.9
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coverage",
+      "coverage": 0.813
+    },
+    {
+      "zone": "shoal-z-7-7",
+      "reason": "coastBand",
+      "coastPx": 45.1
+    },
+    {
+      "zone": "shoal-z-8-7",
+      "reason": "coastBand",
+      "coastPx": 32.2
+    },
+    {
+      "zone": "shoal-z-8-7",
+      "reason": "coastBand",
+      "coastPx": 26.1
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coastBand",
+      "coastPx": 27.2
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coastBand",
+      "coastPx": 50.4
+    },
+    {
+      "zone": "shoal-z-9-7",
+      "reason": "coastBand",
+      "coastPx": 40.8
+    },
+    {
+      "zone": "shoal-z-10-7",
+      "reason": "coverage",
+      "coverage": 0.89
+    },
+    {
+      "zone": "shoal-z-10-7",
+      "reason": "coastBand",
+      "coastPx": 22.0
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.71
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.378
+    },
+    {
+      "zone": "shoal-z-11-7",
+      "reason": "coverage",
+      "coverage": 0.71
+    },
+    {
+      "zone": "shoal-z-12-7",
+      "reason": "coastBand",
+      "coastPx": 19.1
+    },
+    {
+      "zone": "shoal-z-12-7",
+      "reason": "coverage",
+      "coverage": 0.872
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coverage",
+      "coverage": 0.183
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coastBand",
+      "coastPx": 34.8
+    },
+    {
+      "zone": "shoal-z-13-7",
+      "reason": "coastBand",
+      "coastPx": 75.7
+    },
+    {
+      "zone": "shoal-z-14-7",
+      "reason": "coastBand",
+      "coastPx": 45.8
+    },
+    {
+      "zone": "shoal-z-14-7",
+      "reason": "coverage",
+      "coverage": 0.793
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coastBand",
+      "coastPx": 23.2
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coastBand",
+      "coastPx": 42.9
+    },
+    {
+      "zone": "shoal-z-15-7",
+      "reason": "coastBand",
+      "coastPx": 29.9
+    },
+    {
+      "zone": "shoal-z-16-7",
+      "reason": "coverage",
+      "coverage": 0.794
+    },
+    {
+      "zone": "shoal-z-16-7",
+      "reason": "coverage",
+      "coverage": 0.723
+    },
+    {
+      "zone": "shoal-z-17-7",
+      "reason": "coverage",
+      "coverage": 0.219
+    },
+    {
+      "zone": "shoal-z-0-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-8",
+      "reason": "coverage",
+      "coverage": 0.087
+    },
+    {
+      "zone": "shoal-z-1-8",
+      "reason": "coverage",
+      "coverage": 0.787
+    },
+    {
+      "zone": "shoal-z-2-8",
+      "reason": "coastBand",
+      "coastPx": 33.0
+    },
+    {
+      "zone": "shoal-z-2-8",
+      "reason": "coastBand",
+      "coastPx": 67.6
+    },
+    {
+      "zone": "shoal-z-3-8",
+      "reason": "coastBand",
+      "coastPx": 34.6
+    },
+    {
+      "zone": "shoal-z-3-8",
+      "reason": "coverage",
+      "coverage": 0.274
+    },
+    {
+      "zone": "shoal-z-3-8",
+      "reason": "coverage",
+      "coverage": 0.894
+    },
+    {
+      "zone": "shoal-z-4-8",
+      "reason": "coastBand",
+      "coastPx": 73.9
+    },
+    {
+      "zone": "shoal-z-4-8",
+      "reason": "coastBand",
+      "coastPx": 77.8
+    },
+    {
+      "zone": "shoal-z-5-8",
+      "reason": "coastBand",
+      "coastPx": 38.9
+    },
+    {
+      "zone": "shoal-z-5-8",
+      "reason": "coverage",
+      "coverage": 0.69
+    },
+    {
+      "zone": "shoal-z-5-8",
+      "reason": "coastBand",
+      "coastPx": 49.7
+    },
+    {
+      "zone": "shoal-z-6-8",
+      "reason": "coastBand",
+      "coastPx": 53.9
+    },
+    {
+      "zone": "shoal-z-6-8",
+      "reason": "coverage",
+      "coverage": 0.696
+    },
+    {
+      "zone": "shoal-z-7-8",
+      "reason": "coverage",
+      "coverage": 0.802
+    },
+    {
+      "zone": "shoal-z-7-8",
+      "reason": "coastBand",
+      "coastPx": 60.4
+    },
+    {
+      "zone": "shoal-z-7-8",
+      "reason": "coastBand",
+      "coastPx": 45.9
+    },
+    {
+      "zone": "shoal-z-8-8",
+      "reason": "coverage",
+      "coverage": 0.818
+    },
+    {
+      "zone": "shoal-z-8-8",
+      "reason": "coastBand",
+      "coastPx": 36.5
+    },
+    {
+      "zone": "shoal-z-9-8",
+      "reason": "coastBand",
+      "coastPx": 75.8
+    },
+    {
+      "zone": "shoal-z-9-8",
+      "reason": "coastBand",
+      "coastPx": 67.5
+    },
+    {
+      "zone": "shoal-z-10-8",
+      "reason": "coastBand",
+      "coastPx": 31.3
+    },
+    {
+      "zone": "shoal-z-10-8",
+      "reason": "coverage",
+      "coverage": 0.379
+    },
+    {
+      "zone": "shoal-z-11-8",
+      "reason": "coastBand",
+      "coastPx": 19.3
+    },
+    {
+      "zone": "shoal-z-11-8",
+      "reason": "coverage",
+      "coverage": 0.838
+    },
+    {
+      "zone": "shoal-z-11-8",
+      "reason": "coverage",
+      "coverage": 0.739
+    },
+    {
+      "zone": "shoal-z-12-8",
+      "reason": "coastBand",
+      "coastPx": 22.5
+    },
+    {
+      "zone": "shoal-z-12-8",
+      "reason": "coverage",
+      "coverage": 0.57
+    },
+    {
+      "zone": "shoal-z-13-8",
+      "reason": "coverage",
+      "coverage": 0.862
+    },
+    {
+      "zone": "shoal-z-13-8",
+      "reason": "coastBand",
+      "coastPx": 58.4
+    },
+    {
+      "zone": "shoal-z-13-8",
+      "reason": "coastBand",
+      "coastPx": 64.2
+    },
+    {
+      "zone": "shoal-z-14-8",
+      "reason": "coverage",
+      "coverage": 0.851
+    },
+    {
+      "zone": "shoal-z-14-8",
+      "reason": "coverage",
+      "coverage": 0.308
+    },
+    {
+      "zone": "shoal-z-15-8",
+      "reason": "coverage",
+      "coverage": 0.074
+    },
+    {
+      "zone": "shoal-z-15-8",
+      "reason": "coverage",
+      "coverage": 0.725
+    },
+    {
+      "zone": "shoal-z-15-8",
+      "reason": "coverage",
+      "coverage": 0.128
+    },
+    {
+      "zone": "shoal-z-16-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-17-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-8",
+      "reason": "coverage",
+      "coverage": 0.029
+    },
+    {
+      "zone": "shoal-z-0-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-8",
+      "reason": "coverage",
+      "coverage": 0.046
+    },
+    {
+      "zone": "shoal-z-2-8",
+      "reason": "coverage",
+      "coverage": 0.729
+    },
+    {
+      "zone": "shoal-z-2-8",
+      "reason": "coverage",
+      "coverage": 0.858
+    },
+    {
+      "zone": "shoal-z-3-8",
+      "reason": "coastBand",
+      "coastPx": 27.9
+    },
+    {
+      "zone": "shoal-z-3-8",
+      "reason": "coverage",
+      "coverage": 0.815
+    },
+    {
+      "zone": "shoal-z-3-8",
+      "reason": "coverage",
+      "coverage": 0.748
+    },
+    {
+      "zone": "shoal-z-4-8",
+      "reason": "coastBand",
+      "coastPx": 28.4
+    },
+    {
+      "zone": "shoal-z-4-8",
+      "reason": "coastBand",
+      "coastPx": 43.6
+    },
+    {
+      "zone": "shoal-z-5-8",
+      "reason": "coastBand",
+      "coastPx": 27.9
+    },
+    {
+      "zone": "shoal-z-5-8",
+      "reason": "coastBand",
+      "coastPx": 34.9
+    },
+    {
+      "zone": "shoal-z-5-8",
+      "reason": "coastBand",
+      "coastPx": 72.6
+    },
+    {
+      "zone": "shoal-z-6-8",
+      "reason": "coastBand",
+      "coastPx": 82.3
+    },
+    {
+      "zone": "shoal-z-6-8",
+      "reason": "coastBand",
+      "coastPx": 62.9
+    },
+    {
+      "zone": "shoal-z-7-8",
+      "reason": "coastBand",
+      "coastPx": 72.5
+    },
+    {
+      "zone": "shoal-z-7-8",
+      "reason": "notTurquoise",
+      "turq": 0.0
+    },
+    {
+      "zone": "shoal-z-7-8",
+      "reason": "coastBand",
+      "coastPx": 42.2
+    },
+    {
+      "zone": "shoal-z-8-8",
+      "reason": "coverage",
+      "coverage": 0.516
+    },
+    {
+      "zone": "shoal-z-8-8",
+      "reason": "coverage",
+      "coverage": 0.84
+    },
+    {
+      "zone": "shoal-z-9-8",
+      "reason": "coastBand",
+      "coastPx": 79.3
+    },
+    {
+      "zone": "shoal-z-9-8",
+      "reason": "notTurquoise",
+      "turq": 0.04
+    },
+    {
+      "zone": "shoal-z-9-8",
+      "reason": "notTurquoise",
+      "turq": 0.24
+    },
+    {
+      "zone": "shoal-z-10-8",
+      "reason": "coastBand",
+      "coastPx": 64.8
+    },
+    {
+      "zone": "shoal-z-10-8",
+      "reason": "coastBand",
+      "coastPx": 25.5
+    },
+    {
+      "zone": "shoal-z-11-8",
+      "reason": "coastBand",
+      "coastPx": 29.5
+    },
+    {
+      "zone": "shoal-z-11-8",
+      "reason": "coastBand",
+      "coastPx": 45.2
+    },
+    {
+      "zone": "shoal-z-11-8",
+      "reason": "coastBand",
+      "coastPx": 54.0
+    },
+    {
+      "zone": "shoal-z-12-8",
+      "reason": "coastBand",
+      "coastPx": 60.6
+    },
+    {
+      "zone": "shoal-z-12-8",
+      "reason": "coastBand",
+      "coastPx": 47.1
+    },
+    {
+      "zone": "shoal-z-13-8",
+      "reason": "coastBand",
+      "coastPx": 64.1
+    },
+    {
+      "zone": "shoal-z-13-8",
+      "reason": "coastBand",
+      "coastPx": 48.8
+    },
+    {
+      "zone": "shoal-z-13-8",
+      "reason": "coastBand",
+      "coastPx": 32.1
+    },
+    {
+      "zone": "shoal-z-14-8",
+      "reason": "coverage",
+      "coverage": 0.577
+    },
+    {
+      "zone": "shoal-z-14-8",
+      "reason": "coverage",
+      "coverage": 0.291
+    },
+    {
+      "zone": "shoal-z-15-8",
+      "reason": "coverage",
+      "coverage": 0.005
+    },
+    {
+      "zone": "shoal-z-15-8",
+      "reason": "coverage",
+      "coverage": 0.307
+    },
+    {
+      "zone": "shoal-z-15-8",
+      "reason": "coverage",
+      "coverage": 0.05
+    },
+    {
+      "zone": "shoal-z-16-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-17-8",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-9",
+      "reason": "coverage",
+      "coverage": 0.059
+    },
+    {
+      "zone": "shoal-z-0-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-2-9",
+      "reason": "coverage",
+      "coverage": 0.018
+    },
+    {
+      "zone": "shoal-z-2-9",
+      "reason": "coverage",
+      "coverage": 0.046
+    },
+    {
+      "zone": "shoal-z-3-9",
+      "reason": "coverage",
+      "coverage": 0.286
+    },
+    {
+      "zone": "shoal-z-3-9",
+      "reason": "coverage",
+      "coverage": 0.042
+    },
+    {
+      "zone": "shoal-z-3-9",
+      "reason": "coverage",
+      "coverage": 0.317
+    },
+    {
+      "zone": "shoal-z-4-9",
+      "reason": "coverage",
+      "coverage": 0.65
+    },
+    {
+      "zone": "shoal-z-4-9",
+      "reason": "coverage",
+      "coverage": 0.693
+    },
+    {
+      "zone": "shoal-z-5-9",
+      "reason": "coverage",
+      "coverage": 0.47
+    },
+    {
+      "zone": "shoal-z-5-9",
+      "reason": "coverage",
+      "coverage": 0.84
+    },
+    {
+      "zone": "shoal-z-5-9",
+      "reason": "coastBand",
+      "coastPx": 40.3
+    },
+    {
+      "zone": "shoal-z-6-9",
+      "reason": "coastBand",
+      "coastPx": 62.4
+    },
+    {
+      "zone": "shoal-z-6-9",
+      "reason": "notTurquoise",
+      "turq": 0.32
+    },
+    {
+      "zone": "shoal-z-7-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-7-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-7-9",
+      "reason": "coastBand",
+      "coastPx": 76.5
+    },
+    {
+      "zone": "shoal-z-8-9",
+      "reason": "coastBand",
+      "coastPx": 54.4
+    },
+    {
+      "zone": "shoal-z-8-9",
+      "reason": "coastBand",
+      "coastPx": 64.9
+    },
+    {
+      "zone": "shoal-z-9-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-9-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-9-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-10-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-10-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-12-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-12-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-13-9",
+      "reason": "coastBand",
+      "coastPx": 56.1
+    },
+    {
+      "zone": "shoal-z-13-9",
+      "reason": "coverage",
+      "coverage": 0.646
+    },
+    {
+      "zone": "shoal-z-13-9",
+      "reason": "coverage",
+      "coverage": 0.203
+    },
+    {
+      "zone": "shoal-z-14-9",
+      "reason": "coverage",
+      "coverage": 0.74
+    },
+    {
+      "zone": "shoal-z-14-9",
+      "reason": "coastBand",
+      "coastPx": 19.9
+    },
+    {
+      "zone": "shoal-z-15-9",
+      "reason": "coverage",
+      "coverage": 0.326
+    },
+    {
+      "zone": "shoal-z-15-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-15-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-17-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-0-9",
+      "reason": "coverage",
+      "coverage": 0.064
+    },
+    {
+      "zone": "shoal-z-0-9",
+      "reason": "coverage",
+      "coverage": 0.11
+    },
+    {
+      "zone": "shoal-z-1-9",
+      "reason": "coverage",
+      "coverage": 0.084
+    },
+    {
+      "zone": "shoal-z-1-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-1-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-2-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-2-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-3-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-3-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-3-9",
+      "reason": "coverage",
+      "coverage": 0.243
+    },
+    {
+      "zone": "shoal-z-4-9",
+      "reason": "coverage",
+      "coverage": 0.277
+    },
+    {
+      "zone": "shoal-z-4-9",
+      "reason": "coverage",
+      "coverage": 0.723
+    },
+    {
+      "zone": "shoal-z-5-9",
+      "reason": "coverage",
+      "coverage": 0.532
+    },
+    {
+      "zone": "shoal-z-5-9",
+      "reason": "coverage",
+      "coverage": 0.356
+    },
+    {
+      "zone": "shoal-z-5-9",
+      "reason": "coverage",
+      "coverage": 0.651
+    },
+    {
+      "zone": "shoal-z-6-9",
+      "reason": "coastBand",
+      "coastPx": 29.4
+    },
+    {
+      "zone": "shoal-z-6-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-7-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-7-9",
+      "reason": "coastBand",
+      "coastPx": 164.4
+    },
+    {
+      "zone": "shoal-z-7-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-8-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-8-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-9-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-9-9",
+      "reason": "coastBand",
+      "coastPx": 195.1
+    },
+    {
+      "zone": "shoal-z-9-9",
+      "reason": "coastBand",
+      "coastPx": 197.7
+    },
+    {
+      "zone": "shoal-z-10-9",
+      "reason": "coastBand",
+      "coastPx": 164.4
+    },
+    {
+      "zone": "shoal-z-10-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-11-9",
+      "reason": "coastBand",
+      "coastPx": 163.7
+    },
+    {
+      "zone": "shoal-z-11-9",
+      "reason": "coastBand",
+      "coastPx": 172.0
+    },
+    {
+      "zone": "shoal-z-12-9",
+      "reason": "sweptFootprint"
+    },
+    {
+      "zone": "shoal-z-12-9",
+      "reason": "coastBand",
+      "coastPx": 63.2
+    },
+    {
+      "zone": "shoal-z-13-9",
+      "reason": "coverage",
+      "coverage": 0.814
+    },
+    {
+      "zone": "shoal-z-13-9",
+      "reason": "coverage",
+      "coverage": 0.156
+    },
+    {
+      "zone": "shoal-z-13-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-14-9",
+      "reason": "coverage",
+      "coverage": 0.016
+    },
+    {
+      "zone": "shoal-z-14-9",
+      "reason": "coverage",
+      "coverage": 0.346
+    },
+    {
+      "zone": "shoal-z-15-9",
+      "reason": "coverage",
+      "coverage": 0.644
+    },
+    {
+      "zone": "shoal-z-15-9",
+      "reason": "coverage",
+      "coverage": 0.09
+    },
+    {
+      "zone": "shoal-z-15-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-16-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    },
+    {
+      "zone": "shoal-z-17-9",
+      "reason": "coverage",
+      "coverage": 0.0
+    }
+  ],
+  "acceptedCount": 3,
+  "rejectedCount": 1028
+}

@@ -188,3 +188,23 @@ navi/fauna (riservato a T-009); paintover; `/game` untouched.
   controlli Water tab wired + LabDefaults. `esbuild` syntax OK, lint scoped
   pass. NON ancora verificato in browser reale (T-04): serve T-004.
 - **T-004 pending**: suite E2E + mutant + visual witness.
+
+## Avanzamento 2026-10-29 — v2: pose dipinte (decisione Director)
+
+Le striature `TilingSprite` non si leggevano come acqua in movimento (stesso
+esito della cascata, PLAN-092). Il Director ha scelto «Pose come la cascata»:
+- **Pipeline** (`build_water_flow_poses` in `scripts/build-mappa2-assets.py`):
+  per fiume e ogni lago 8 pose RGBA (`fx/water/<id>_f0..f7.webp`), alpha = maschera
+  di classe sfumata. Banchi/ombre fermi; scorre solo il dettaglio fine, flow-map
+  a due fasi sfasate con dissolvenza, piu veloce a centro canale, rumore per zona.
+  Direzione: tangente a valle della centerline (fiume), verso l'uscita (alpine),
+  angolo fisso (altri laghi). `geometrySha256` invariato: le pose sono solo
+  `flowPoses` aggiuntivo nel JSON.
+- **Schema**: `flowPoses` opzionale (`frames` in `fx/water/`, `rect`), 2 test nuovi.
+- **Runtime**: sprite a pose cliccate a 12 pose/s x `riverFlowSpeed`, orologio
+  accumulato; i segmenti-striature restano solo come fallback senza pose.
+  Slider "river flow speed" 0-3x. Glint e confluenze invariati.
+- **Misura** (WebGL headless, solo pixel d'acqua, pose in moto vs ferme): fiume 2.6x,
+  alpine 1.5x, canyon 7.7x, west_shallows 2.0x, bayou_west 1.6x, bayou_east 1.0x
+  (89 px: invisibile).
+- **T-004 resta aperto** (E2E, mutant, review OB-5 del Director).

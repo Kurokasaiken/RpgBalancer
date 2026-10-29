@@ -1,5 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { PixiWorldMap, type PixiBootProgress, type PixiMapTune, type PixiRegionHover, type PixiWorldMapEffects } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { RegionalAtmosphereControls } from './regional-atmosphere-controls';
+import { Mappa2GradeControls } from './mappa2-grade-controls';
+import { mountainShadeLive } from './mappa2-grade';
 
 const MANIFEST_PATH = '/assets/world/mappa2/base/manifest.json';
 const REGIONS_BASE = '/assets/world/mappa2/base';
@@ -26,11 +29,12 @@ const EFFECT_TOGGLES: { id: keyof PixiWorldMapEffects; label: string }[] = [
   { id: 'landLife', label: 'canopy' },
 ];
 
-const LAB_TABS = ['scene', 'water', 'sky', 'land'] as const;
+const LAB_TABS = ['scene', 'water', 'sea', 'sky', 'land'] as const;
 type LabTab = typeof LAB_TABS[number];
 const TAB_EFFECTS: Record<LabTab, (keyof PixiWorldMapEffects)[]> = {
   scene: ['wonders'],
-  water: ['seaPattern', 'coastFoam', 'seabed'],
+  water: [],
+  sea: ['seaPattern', 'coastFoam', 'seabed'],
   sky: ['clouds', 'cloudShadows', 'birds'],
   land: ['landLife'],
 };
@@ -52,8 +56,15 @@ interface LabDefaults {
   waterfallRipples: number;
   waterfallFoam: number;
   waterfallPainted: number;
+  waterfallFlipFps: number;
+  waterfallSplash: number;
+  waterfallRainbow: number;
+  waterfallRainbowEveryS: number;
   swRiversOn: number;
   swRiverFlowSpeed: number;
+  swBasinPosesPerS: number;
+  swSeaPatchPosesPerS: number;
+  swDeltaSeaPosesPerS: number;
   swRiverFlowStrength: number;
   swLakeShimmer: number;
   swConfluenceFoam: number;
@@ -63,6 +74,11 @@ interface LabDefaults {
   landLifeFlutter: number;
   landLifeSpeed: number;
   landLifeOpacity: number;
+  ambOn: number;
+  ambIntensity: number;
+  ambProb: number;
+  ambAlpha: number;
+  ambRare: number;
 }
 
 const CODE_DEFAULTS: LabDefaults = {
@@ -80,14 +96,26 @@ const CODE_DEFAULTS: LabDefaults = {
   waterfallRipples: 0.7,
   waterfallFoam: 0.3,
   waterfallPainted: 1,
+  waterfallFlipFps: 23,
+  waterfallSplash: 0.6,
+  waterfallRainbow: 0.7,
+  waterfallRainbowEveryS: 150,
   swRiversOn: 1,
-  swRiverFlowSpeed: 1.0,
+  swRiverFlowSpeed: 1,
+  swBasinPosesPerS: 4,
+  swSeaPatchPosesPerS: 3.5,
+  swDeltaSeaPosesPerS: 3.5,
   swRiverFlowStrength: 0.24,
   swLakeShimmer: 0.22,
   swConfluenceFoam: 0.25,
+  ambOn: 1,
+  ambIntensity: 0.6,
+  ambProb: 0.25,
+  ambAlpha: 0.16,
+  ambRare: 0,
   landLifeOn: 1,
-  landLifeLeaves: 0.45,
-  landLifeMotes: 0.55,
+  landLifeLeaves: 0,
+  landLifeMotes: 0,
   landLifeFlutter: 0,
   landLifeSpeed: 1,
   landLifeOpacity: 0.55,
@@ -154,8 +182,16 @@ export default function Mappa2LabPage() {
   const [waterfallRipples, setWaterfallRipples] = useState(CODE_DEFAULTS.waterfallRipples);
   const [waterfallFoam, setWaterfallFoam] = useState(CODE_DEFAULTS.waterfallFoam);
   const [waterfallPainted, setWaterfallPainted] = useState(CODE_DEFAULTS.waterfallPainted === 1);
+  const [waterfallFlipFps, setWaterfallFlipFps] = useState(CODE_DEFAULTS.waterfallFlipFps);
+  const [waterfallSplash, setWaterfallSplash] = useState(CODE_DEFAULTS.waterfallSplash);
+  const [waterfallRainbow, setWaterfallRainbow] = useState(CODE_DEFAULTS.waterfallRainbow);
+  const [waterfallRainbowEveryS, setWaterfallRainbowEveryS] = useState(CODE_DEFAULTS.waterfallRainbowEveryS);
+  const [rainbowRequest, setRainbowRequest] = useState(0);
   const [swRiversOn, setSwRiversOn] = useState(CODE_DEFAULTS.swRiversOn === 1);
   const [swRiverFlowSpeed, setSwRiverFlowSpeed] = useState(CODE_DEFAULTS.swRiverFlowSpeed);
+  const [swBasinPosesPerS, setSwBasinPosesPerS] = useState(CODE_DEFAULTS.swBasinPosesPerS);
+  const [swSeaPatchPosesPerS, setSwSeaPatchPosesPerS] = useState(CODE_DEFAULTS.swSeaPatchPosesPerS);
+  const [swDeltaSeaPosesPerS, setSwDeltaSeaPosesPerS] = useState(CODE_DEFAULTS.swDeltaSeaPosesPerS);
   const [swRiverFlowStrength, setSwRiverFlowStrength] = useState(CODE_DEFAULTS.swRiverFlowStrength);
   const [swLakeShimmer, setSwLakeShimmer] = useState(CODE_DEFAULTS.swLakeShimmer);
   const [swConfluenceFoam, setSwConfluenceFoam] = useState(CODE_DEFAULTS.swConfluenceFoam);
@@ -165,8 +201,21 @@ export default function Mappa2LabPage() {
   const [landLifeFlutter, setLandLifeFlutter] = useState(CODE_DEFAULTS.landLifeFlutter);
   const [landLifeSpeed, setLandLifeSpeed] = useState(CODE_DEFAULTS.landLifeSpeed);
   const [landLifeOpacity, setLandLifeOpacity] = useState(CODE_DEFAULTS.landLifeOpacity);
+  const [ambOn, setAmbOn] = useState(CODE_DEFAULTS.ambOn === 1);
+  const [ambIntensity, setAmbIntensity] = useState(CODE_DEFAULTS.ambIntensity);
+  const [ambProb, setAmbProb] = useState(CODE_DEFAULTS.ambProb);
+  const [ambAlpha, setAmbAlpha] = useState(CODE_DEFAULTS.ambAlpha);
+  const [ambRare, setAmbRare] = useState(CODE_DEFAULTS.ambRare === 1);
+  const [ambLogTick, setAmbLogTick] = useState(0);
   const [savedDefaultsNote, setSavedDefaultsNote] = useState('');
   const [wonderRequest, setWonderRequest] = useState(0);
+
+  useLayoutEffect(() => {
+    document.body.dataset.mappa2Lab = 'true';
+    return () => {
+      delete document.body.dataset.mappa2Lab;
+    };
+  }, []);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -229,11 +278,13 @@ export default function Mappa2LabPage() {
         cloudOpacityScale={cloudOpacityScale}
         cloudTint={mixHex('#ffffff', '#bfeff2', cloudTintAmount)}
         seaTone={seaTone}
+        mountainShade={mountainShadeLive}
         seaPatternConfig={seaPatternConfig}
         coastFoamConfig={coastFoamConfig}
-        waterfallConfig={{ enabled: waterfallOn, flowSpeed: waterfallFlowSpeed, flowStrength: waterfallFlowStrength, mistAmount: waterfallMist, ripples: waterfallRipples, foamPulse: waterfallFoam, paintedFlow: waterfallPainted }}
-        secondaryWaterConfig={{ riversOn: swRiversOn, riverFlowSpeed: swRiverFlowSpeed, riverFlowStrength: swRiverFlowStrength, lakeShimmer: swLakeShimmer, confluenceFoam: swConfluenceFoam }}
+        waterfallConfig={{ enabled: waterfallOn, flowSpeed: waterfallFlowSpeed, flowStrength: waterfallFlowStrength, mistAmount: waterfallMist, ripples: waterfallRipples, foamPulse: waterfallFoam, paintedFlow: waterfallPainted, flipFps: waterfallFlipFps, splash: waterfallSplash, rainbow: waterfallRainbow, rainbowEveryS: waterfallRainbowEveryS, rainbowRequest }}
+        secondaryWaterConfig={{ riversOn: swRiversOn, basinPosesPerS: swBasinPosesPerS, seaPatchPosesPerS: swSeaPatchPosesPerS, deltaSeaPosesPerS: swDeltaSeaPosesPerS, riverFlowSpeed: swRiverFlowSpeed, riverFlowStrength: swRiverFlowStrength, lakeShimmer: swLakeShimmer, confluenceFoam: swConfluenceFoam }}
         landLifeConfig={{ enabled: landLifeOn, leaves: landLifeLeaves, motes: landLifeMotes, flutter: landLifeFlutter, speed: landLifeSpeed, opacity: landLifeOpacity }}
+        ambientDirectorConfig={{ enabled: ambOn, intensity: ambIntensity, families: { shoal: { enabled: ambOn, probability: ambProb, alpha: ambAlpha } }, rare: { enabled: ambRare, p: 0.15 } }}
         regions={{ assetBase: REGIONS_BASE, onHover: setHover }}
         focusRequest={focusRequest}
         wonderRequest={wonderRequest}
@@ -253,6 +304,9 @@ export default function Mappa2LabPage() {
           zIndex: 20,
           padding: 12,
           width: 390,
+          maxHeight: 'calc(100vh - 24px)',
+          overflowY: 'auto',
+          boxSizing: 'border-box',
           color: '#e5eef7',
           background: 'rgba(3, 14, 24, 0.88)',
           border: '1px solid rgba(125, 180, 220, 0.35)',
@@ -313,6 +367,7 @@ export default function Mappa2LabPage() {
 
         {activeTab === 'scene' && (
           <>
+            <Mappa2GradeControls />
             <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 10 }}>
               {FOCUS_PRESETS.map((preset) => (
                 <button
@@ -341,6 +396,85 @@ export default function Mappa2LabPage() {
 
         {activeTab === 'water' && (
           <>
+            <div style={{ marginTop: 10, borderTop: '1px solid rgba(125,180,220,0.25)', paddingTop: 8 }}>
+              <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input type="checkbox" checked={waterfallOn} onChange={(e) => setWaterfallOn(e.target.checked)} />
+                waterfall
+              </label>
+              <label>
+                <input type="checkbox" checked={waterfallPainted} onChange={(e) => setWaterfallPainted(e.target.checked)} />
+                painted scroll
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                falls speed {waterfallFlipFps} poses/s
+                <input type="range" min={6} max={90} step={1} value={waterfallFlipFps} onChange={(e) => setWaterfallFlipFps(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                flow speed {waterfallFlowSpeed} px/s
+                <input type="range" min={0} max={200} step={2} value={waterfallFlowSpeed} onChange={(e) => setWaterfallFlowSpeed(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                flow strength {waterfallFlowStrength.toFixed(2)}
+                <input type="range" min={0} max={1} step={0.02} value={waterfallFlowStrength} onChange={(e) => setWaterfallFlowStrength(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                mist {waterfallMist.toFixed(2)}
+                <input type="range" min={0} max={1} step={0.02} value={waterfallMist} onChange={(e) => setWaterfallMist(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                impact splash {waterfallSplash.toFixed(2)}
+                <input type="range" min={0} max={1} step={0.02} value={waterfallSplash} onChange={(e) => setWaterfallSplash(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                rainbow {waterfallRainbow.toFixed(2)} · every ~{waterfallRainbowEveryS}s
+                <input type="range" min={0} max={1} step={0.02} value={waterfallRainbow} onChange={(e) => setWaterfallRainbow(Number(e.target.value))} style={{ width: '100%' }} />
+                <input type="range" min={30} max={600} step={10} value={waterfallRainbowEveryS} onChange={(e) => setWaterfallRainbowEveryS(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <button type="button" onClick={() => setRainbowRequest((n) => n + 1)} style={{ marginTop: 6, padding: '4px 8px', border: '1px solid #56758d', borderRadius: 4, color: 'inherit', background: '#172b40', cursor: 'pointer' }}>
+                Trigger rainbow
+              </button>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                basin ripples {waterfallRipples.toFixed(2)}
+                <input type="range" min={0} max={1} step={0.02} value={waterfallRipples} onChange={(e) => setWaterfallRipples(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                foam pulse {waterfallFoam.toFixed(2)}
+                <input type="range" min={0} max={1} step={0.02} value={waterfallFoam} onChange={(e) => setWaterfallFoam(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input type="checkbox" checked={swRiversOn} onChange={(e) => setSwRiversOn(e.target.checked)} />
+                rivers & lakes
+              </label>
+              <label>
+                falls basin speed {swBasinPosesPerS} poses/s
+                <input type="range" min={0} max={20} step={1} value={swBasinPosesPerS} onChange={(e) => setSwBasinPosesPerS(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label>
+                bay & river mouths speed {swSeaPatchPosesPerS.toFixed(1)} poses/s
+                <input type="range" min={0} max={12} step={0.5} value={swSeaPatchPosesPerS} onChange={(e) => setSwSeaPatchPosesPerS(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label>
+                sea below delta speed {swDeltaSeaPosesPerS.toFixed(1)} poses/s
+                <input type="range" min={0} max={12} step={0.5} value={swDeltaSeaPosesPerS} onChange={(e) => setSwDeltaSeaPosesPerS(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                river flow speed {swRiverFlowSpeed.toFixed(2)}x ({Math.round(12 * swRiverFlowSpeed)} poses/s)
+                <input type="range" min={0} max={3} step={0.05} value={swRiverFlowSpeed} onChange={(e) => setSwRiverFlowSpeed(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label>
+                river strength {swRiverFlowStrength.toFixed(2)}
+                <input type="range" min={0} max={0.6} step={0.02} value={swRiverFlowStrength} onChange={(e) => setSwRiverFlowStrength(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <label>
+                lake shimmer {swLakeShimmer.toFixed(2)}
+                <input type="range" min={0} max={0.6} step={0.02} value={swLakeShimmer} onChange={(e) => setSwLakeShimmer(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'sea' && (
+          <>
             <label style={{ display: 'block', marginTop: 8 }}>
               sea tone (darker ↔ lighter) {seaTone.toFixed(2)}
               <input type="range" min={-0.45} max={0.45} step={0.01} value={seaTone} onChange={(e) => setSeaTone(Number(e.target.value))} style={{ width: '100%' }} />
@@ -361,53 +495,59 @@ export default function Mappa2LabPage() {
             </label>
             <div style={{ marginTop: 10, borderTop: '1px solid rgba(125,180,220,0.25)', paddingTop: 8 }}>
               <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <input type="checkbox" checked={waterfallOn} onChange={(e) => setWaterfallOn(e.target.checked)} />
-                waterfall
+                <input type="checkbox" checked={ambOn} onChange={(e) => setAmbOn(e.target.checked)} />
+                ambient director
               </label>
               <label>
-                <input type="checkbox" checked={waterfallPainted} onChange={(e) => setWaterfallPainted(e.target.checked)} />
-                painted scroll
+                intensity {ambIntensity.toFixed(2)}
+                <input type="range" min={0} max={2} step={0.05} value={ambIntensity} onChange={(e) => setAmbIntensity(Number(e.target.value))} style={{ width: '100%' }} />
               </label>
-              <label style={{ display: 'block', marginTop: 6 }}>
-                flow speed {waterfallFlowSpeed} px/s
-                <input type="range" min={0} max={200} step={2} value={waterfallFlowSpeed} onChange={(e) => setWaterfallFlowSpeed(Number(e.target.value))} style={{ width: '100%' }} />
+              <label>
+                shoal probability {ambProb.toFixed(2)}
+                <input type="range" min={0} max={1} step={0.05} value={ambProb} onChange={(e) => setAmbProb(Number(e.target.value))} style={{ width: '100%' }} />
               </label>
-              <label style={{ display: 'block', marginTop: 6 }}>
-                flow strength {waterfallFlowStrength.toFixed(2)}
-                <input type="range" min={0} max={1} step={0.02} value={waterfallFlowStrength} onChange={(e) => setWaterfallFlowStrength(Number(e.target.value))} style={{ width: '100%' }} />
-              </label>
-              <label style={{ display: 'block', marginTop: 6 }}>
-                mist {waterfallMist.toFixed(2)}
-                <input type="range" min={0} max={1} step={0.02} value={waterfallMist} onChange={(e) => setWaterfallMist(Number(e.target.value))} style={{ width: '100%' }} />
-              </label>
-              <label style={{ display: 'block', marginTop: 6 }}>
-                basin ripples {waterfallRipples.toFixed(2)}
-                <input type="range" min={0} max={1} step={0.02} value={waterfallRipples} onChange={(e) => setWaterfallRipples(Number(e.target.value))} style={{ width: '100%' }} />
-              </label>
-              <label style={{ display: 'block', marginTop: 6 }}>
-                foam pulse {waterfallFoam.toFixed(2)}
-                <input type="range" min={0} max={1} step={0.02} value={waterfallFoam} onChange={(e) => setWaterfallFoam(Number(e.target.value))} style={{ width: '100%' }} />
+              <label>
+                shoal alpha {ambAlpha.toFixed(2)}
+                <input type="range" min={0} max={0.4} step={0.01} value={ambAlpha} onChange={(e) => setAmbAlpha(Number(e.target.value))} style={{ width: '100%' }} />
               </label>
               <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <input type="checkbox" checked={swRiversOn} onChange={(e) => setSwRiversOn(e.target.checked)} />
-                rivers & lakes
+                <input type="checkbox" checked={ambRare} onChange={(e) => setAmbRare(e.target.checked)} />
+                rare events (nullRare)
               </label>
-              <label>
-                river flow speed {swRiverFlowSpeed.toFixed(2)}x
-                <input type="range" min={0} max={2} step={0.05} value={swRiverFlowSpeed} onChange={(e) => setSwRiverFlowSpeed(Number(e.target.value))} style={{ width: '100%' }} />
-              </label>
-              <label>
-                river strength {swRiverFlowStrength.toFixed(2)}
-                <input type="range" min={0} max={0.6} step={0.02} value={swRiverFlowStrength} onChange={(e) => setSwRiverFlowStrength(Number(e.target.value))} style={{ width: '100%' }} />
-              </label>
-              <label>
-                lake shimmer {swLakeShimmer.toFixed(2)}
-                <input type="range" min={0} max={0.6} step={0.02} value={swLakeShimmer} onChange={(e) => setSwLakeShimmer(Number(e.target.value))} style={{ width: '100%' }} />
-              </label>
-              <label>
-                confluence foam {swConfluenceFoam.toFixed(2)}
-                <input type="range" min={0} max={0.6} step={0.02} value={swConfluenceFoam} onChange={(e) => setSwConfluenceFoam(Number(e.target.value))} style={{ width: '100%' }} />
-              </label>
+              <button
+                type="button"
+                style={{ marginTop: 6, fontSize: 12 }}
+                onClick={() => {
+                  (window as unknown as { __ambientDebug?: { director?: { triggerShoal: (zoneId?: string) => void } } }).__ambientDebug?.director?.triggerShoal('shoal-z-14-6');
+                  setAmbLogTick((v) => v + 1);
+                }}
+              >
+                Trigger Shoal
+              </button>
+              <button
+                type="button"
+                style={{ marginTop: 4, fontSize: 12 }}
+                onClick={() => setAmbLogTick((v) => v + 1)}
+              >
+                refresh log
+              </button>
+              <div style={{ marginTop: 6, fontSize: 11, fontFamily: 'monospace', maxHeight: 110, overflow: 'auto', opacity: 0.8 }} data-amb-logtick={ambLogTick}>
+                {(() => {
+                  const dbg = (window as unknown as {
+                    __ambientDebug?: { director?: { log?: { simT: number; family: string; zoneId: string; outcome: string; reason?: string }[]; occupancy?: { count: () => number } } };
+                  }).__ambientDebug;
+                  const occ = dbg?.director?.occupancy?.count() ?? 0;
+                  const rows = (dbg?.director?.log ?? []).slice(-10).reverse();
+                  return (
+                    <>
+                      <div>occupancy: {occ} · log {rows.length} entries</div>
+                      {rows.map((r, i) => (
+                        <div key={i}>{`t${r.simT} ${r.family} ${r.zoneId} ${r.outcome}${r.reason ? ` (${r.reason})` : ''}`}</div>
+                      ))}
+                    </>
+                  );
+                })()}
+              </div>
             </div>
           </>
         )}
@@ -422,6 +562,7 @@ export default function Mappa2LabPage() {
               cloud cyan tint {Math.round(cloudTintAmount * 100)}%
               <input type="range" min={0} max={1} step={0.01} value={cloudTintAmount} onChange={(e) => setCloudTintAmount(Number(e.target.value))} style={{ width: '100%' }} />
             </label>
+            <RegionalAtmosphereControls />
           </>
         )}
 
@@ -464,7 +605,7 @@ export default function Mappa2LabPage() {
           <button
             type="button"
             onClick={() => {
-              const defaults: LabDefaults = { wonderEveryS, forestSway, cloudOpacityScale, cloudTintAmount, seaTone, seaLineColor, seaLineOpacity, foamColor, foamStrength, waterfallOn: waterfallOn ? 1 : 0, waterfallFlowSpeed, waterfallFlowStrength, waterfallMist, waterfallRipples, waterfallFoam, waterfallPainted: waterfallPainted ? 1 : 0, swRiversOn: swRiversOn ? 1 : 0, swRiverFlowSpeed, swRiverFlowStrength, swLakeShimmer, swConfluenceFoam, landLifeOn: landLifeOn ? 1 : 0, landLifeLeaves, landLifeMotes, landLifeFlutter, landLifeSpeed, landLifeOpacity };
+              const defaults: LabDefaults = { wonderEveryS, forestSway, cloudOpacityScale, cloudTintAmount, seaTone, seaLineColor, seaLineOpacity, foamColor, foamStrength, waterfallOn: waterfallOn ? 1 : 0, waterfallFlowSpeed, waterfallFlowStrength, waterfallMist, waterfallRipples, waterfallFoam, waterfallPainted: waterfallPainted ? 1 : 0, waterfallFlipFps, waterfallSplash, waterfallRainbow, waterfallRainbowEveryS, swRiversOn: swRiversOn ? 1 : 0, swRiverFlowSpeed, swBasinPosesPerS, swSeaPatchPosesPerS, swDeltaSeaPosesPerS, swRiverFlowStrength, swLakeShimmer, swConfluenceFoam, landLifeOn: landLifeOn ? 1 : 0, landLifeLeaves, landLifeMotes, landLifeFlutter, landLifeSpeed, landLifeOpacity, ambOn: ambOn ? 1 : 0, ambIntensity, ambProb, ambAlpha, ambRare: ambRare ? 1 : 0 };
               setSavedDefaultsNote('saving…');
               void fetch('/__mappa2-lab-defaults', {
                 method: 'POST',
@@ -485,7 +626,7 @@ export default function Mappa2LabPage() {
           <button
             type="button"
             onClick={() => {
-              setWonderEveryS(CODE_DEFAULTS.wonderEveryS); setForestSway(CODE_DEFAULTS.forestSway); setCloudOpacityScale(CODE_DEFAULTS.cloudOpacityScale); setCloudTintAmount(CODE_DEFAULTS.cloudTintAmount); setSeaTone(CODE_DEFAULTS.seaTone); setSeaLineColor(CODE_DEFAULTS.seaLineColor); setSeaLineOpacity(CODE_DEFAULTS.seaLineOpacity); setFoamColor(CODE_DEFAULTS.foamColor); setFoamStrength(CODE_DEFAULTS.foamStrength); setWaterfallOn(CODE_DEFAULTS.waterfallOn === 1); setWaterfallFlowSpeed(CODE_DEFAULTS.waterfallFlowSpeed); setWaterfallFlowStrength(CODE_DEFAULTS.waterfallFlowStrength); setWaterfallMist(CODE_DEFAULTS.waterfallMist); setWaterfallRipples(CODE_DEFAULTS.waterfallRipples); setWaterfallFoam(CODE_DEFAULTS.waterfallFoam); setWaterfallPainted(CODE_DEFAULTS.waterfallPainted === 1); setSwRiversOn(CODE_DEFAULTS.swRiversOn === 1); setSwRiverFlowSpeed(CODE_DEFAULTS.swRiverFlowSpeed); setSwRiverFlowStrength(CODE_DEFAULTS.swRiverFlowStrength); setSwLakeShimmer(CODE_DEFAULTS.swLakeShimmer); setSwConfluenceFoam(CODE_DEFAULTS.swConfluenceFoam); setLandLifeOn(CODE_DEFAULTS.landLifeOn === 1); setLandLifeLeaves(CODE_DEFAULTS.landLifeLeaves); setLandLifeMotes(CODE_DEFAULTS.landLifeMotes); setLandLifeFlutter(CODE_DEFAULTS.landLifeFlutter); setLandLifeSpeed(CODE_DEFAULTS.landLifeSpeed); setLandLifeOpacity(CODE_DEFAULTS.landLifeOpacity);
+              setWonderEveryS(CODE_DEFAULTS.wonderEveryS); setForestSway(CODE_DEFAULTS.forestSway); setCloudOpacityScale(CODE_DEFAULTS.cloudOpacityScale); setCloudTintAmount(CODE_DEFAULTS.cloudTintAmount); setSeaTone(CODE_DEFAULTS.seaTone); setSeaLineColor(CODE_DEFAULTS.seaLineColor); setSeaLineOpacity(CODE_DEFAULTS.seaLineOpacity); setFoamColor(CODE_DEFAULTS.foamColor); setFoamStrength(CODE_DEFAULTS.foamStrength); setWaterfallOn(CODE_DEFAULTS.waterfallOn === 1); setWaterfallFlowSpeed(CODE_DEFAULTS.waterfallFlowSpeed); setWaterfallFlowStrength(CODE_DEFAULTS.waterfallFlowStrength); setWaterfallMist(CODE_DEFAULTS.waterfallMist); setWaterfallRipples(CODE_DEFAULTS.waterfallRipples); setWaterfallFoam(CODE_DEFAULTS.waterfallFoam); setWaterfallPainted(CODE_DEFAULTS.waterfallPainted === 1); setWaterfallFlipFps(CODE_DEFAULTS.waterfallFlipFps); setWaterfallSplash(CODE_DEFAULTS.waterfallSplash); setWaterfallRainbow(CODE_DEFAULTS.waterfallRainbow); setWaterfallRainbowEveryS(CODE_DEFAULTS.waterfallRainbowEveryS); setSwRiversOn(CODE_DEFAULTS.swRiversOn === 1); setSwRiverFlowSpeed(CODE_DEFAULTS.swRiverFlowSpeed); setSwBasinPosesPerS(CODE_DEFAULTS.swBasinPosesPerS); setSwSeaPatchPosesPerS(CODE_DEFAULTS.swSeaPatchPosesPerS); setSwDeltaSeaPosesPerS(CODE_DEFAULTS.swDeltaSeaPosesPerS); setSwRiverFlowStrength(CODE_DEFAULTS.swRiverFlowStrength); setSwLakeShimmer(CODE_DEFAULTS.swLakeShimmer); setSwConfluenceFoam(CODE_DEFAULTS.swConfluenceFoam); setLandLifeOn(CODE_DEFAULTS.landLifeOn === 1); setLandLifeLeaves(CODE_DEFAULTS.landLifeLeaves); setLandLifeMotes(CODE_DEFAULTS.landLifeMotes); setLandLifeFlutter(CODE_DEFAULTS.landLifeFlutter); setLandLifeSpeed(CODE_DEFAULTS.landLifeSpeed); setLandLifeOpacity(CODE_DEFAULTS.landLifeOpacity); setAmbOn(CODE_DEFAULTS.ambOn === 1); setAmbIntensity(CODE_DEFAULTS.ambIntensity); setAmbProb(CODE_DEFAULTS.ambProb); setAmbAlpha(CODE_DEFAULTS.ambAlpha); setAmbRare(CODE_DEFAULTS.ambRare === 1);
             }}
             style={{ padding: '5px 9px', border: '1px solid #8bb7d5', borderRadius: 4, color: '#dff4ff', background: '#31465f', cursor: 'pointer' }}
           >

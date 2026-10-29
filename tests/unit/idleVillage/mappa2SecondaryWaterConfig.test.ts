@@ -65,9 +65,9 @@ describe('Mappa2SecondaryWaterSchema (PLAN-095 leaf contract)', () => {
     expect(() => Mappa2SecondaryWaterSchema.parse(payload)).toThrow(/duplicate feature id/);
   });
 
-  it('rejects more than 22 total segments', () => {
+  it('rejects more than 64 total segments', () => {
     const payload = validPayload();
-    payload.rivers[0].segments = Array.from({ length: 23 }, (_, i) => ({
+    payload.rivers[0].segments = Array.from({ length: 65 }, (_, i) => ({
       cx: 100 + i,
       cy: 100,
       angleRad: 0,
@@ -95,6 +95,28 @@ describe('Mappa2SecondaryWaterSchema (PLAN-095 leaf contract)', () => {
     const payload = validPayload();
     payload.rivers[0].segments[1].angleRad = payload.rivers[0].segments[0].angleRad + Math.PI;
     expect(() => Mappa2SecondaryWaterSchema.parse(payload)).toThrow(/uphill/);
+  });
+
+  it('keeps flow poses on rivers and lakes (PLAN-095 v2)', () => {
+    const payload = validPayload();
+    const poses = {
+      frames: ['fx/water/river_central_f0.webp', 'fx/water/river_central_f1.webp'],
+      rect: { x: 1148, y: 581, width: 367, height: 383 },
+    };
+    Object.assign(payload.rivers[0], { flowPoses: poses });
+    Object.assign(payload.lakes[0], { flowPoses: { ...poses, frames: ['fx/water/lake_alpine_f0.webp', 'fx/water/lake_alpine_f1.webp'] } });
+    const parsed = parseMappa2SecondaryWater(payload);
+    expect(parsed.rivers[0].flowPoses?.frames).toHaveLength(2);
+    expect(parsed.lakes[0].flowPoses?.rect.width).toBe(367);
+  });
+
+  it('rejects flow poses outside fx/water or with a single frame', () => {
+    const outside = validPayload();
+    Object.assign(outside.rivers[0], { flowPoses: { frames: ['../x_f0.webp', 'fx/water/a_f1.webp'], rect: { x: 0, y: 0, width: 1, height: 1 } } });
+    expect(() => Mappa2SecondaryWaterSchema.parse(outside)).toThrow();
+    const single = validPayload();
+    Object.assign(single.rivers[0], { flowPoses: { frames: ['fx/water/a_f0.webp'], rect: { x: 0, y: 0, width: 1, height: 1 } } });
+    expect(() => Mappa2SecondaryWaterSchema.parse(single)).toThrow();
   });
 
   it('rejects missing lakes', () => {

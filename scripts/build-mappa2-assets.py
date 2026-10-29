@@ -53,6 +53,44 @@ RIVER_SPECS = [
         # shimmer pockets measured from the painted mask.
         "poolGlintAnchors": [(1175, 640), (1160, 675), (1249, 598), (1309, 737), (1382, 821), (1401, 896), (1485, 949), (1455, 790), (1290, 780)],
     },
+    {
+        # Director 2026-10-29: the tributary east of the delta, flowing west into it.
+        "id": "river_east_tributary", "enabled": True, "tint": "#8fd8e2",
+        "insetPx": 2.0, "corridorWidth": 56,
+        "centerline": [(1735, 882), (1660, 912), (1590, 927), (1540, 935), (1500, 946), (1472, 968), (1458, 1000)],
+        "hsvLo": (66, 45, 55), "hsvHi": (118, 255, 255),
+        "exclusions": [],
+        "poolGlintAnchors": [],
+    },
+    {
+        # Director 2026-10-29: the short river leaving the falls pool to the east.
+        "id": "river_falls_east", "enabled": True, "tint": "#8fd8e2",
+        "insetPx": 2.0, "corridorWidth": 36,
+        # Downstream runs from the cliff end towards the falls pool (Director: the first guess was reversed).
+        "centerline": [(1483, 512), (1505, 517), (1521, 528), (1527, 542), (1519, 556), (1500, 566), (1477, 577), (1450, 585), (1410, 581), (1385, 590)],
+        "hsvLo": (66, 45, 55), "hsvHi": (118, 255, 255),
+        # Grey reflective stretch fails the blue band; thin forced line so grass/dirt never join the mask.
+        "forceWaterLines": [([(1445, 585), (1471, 580), (1482, 571), (1492, 565), (1502, 560), (1511, 551), (1520, 540)], 9)],
+        "exclusions": [[(1265, 540), (1335, 540), (1335, 579), (1265, 579)]],
+        "poolGlintAnchors": [],
+    },
+    {
+        # Director 2026-10-29: the last reach of the falls-east river, running west into river_central's head.
+        "id": "river_falls_link", "enabled": True, "tint": "#8fd8e2",
+        "insetPx": 2.0, "corridorWidth": 36,
+        "centerline": [(1385, 590), (1362, 599), (1334, 598), (1310, 589), (1286, 590), (1262, 594), (1240, 600)],
+        "hsvLo": (66, 45, 55), "hsvHi": (118, 255, 255),
+        "exclusions": [[(1265, 540), (1335, 540), (1335, 579), (1265, 579)]],
+        "poolGlintAnchors": [],
+    },
+    {
+        # Director 2026-10-29: the river winding between the red mountains, round the canyon marsh.
+        "id": "river_red_mountains", "enabled": True, "tint": "#8fd8e2",
+        "insetPx": 2.0, "corridorWidth": 40,
+        "centerline": [(1737, 737), (1767, 767), (1797, 782), (1837, 782), (1867, 793), (1893, 810), (1893, 830), (1877, 853), (1857, 870), (1830, 873), (1767, 863), (1730, 880), (1680, 890)],
+        "hsvLo": (66, 45, 55), "hsvHi": (118, 255, 255),
+        "exclusions": [], "poolGlintAnchors": [],
+    },
 ]
 # NOTE (T-001 finding, 2026-10-28): the west "branch" is a fragmented shallow
 # streamlet field (y~673-690, x~860-1239, broken by fords/vegetation), not a
@@ -65,15 +103,24 @@ RIVER_SPECS = [
 # its worth at authoring time — no false-positive feature ships.
 LAKE_SPECS = [
     {"id": "lake_alpine", "enabled": True, "insetPx": 4.0, "glintCount": 10,
-     "polygon": None},  # filled below with WATERFALL_LAKE_POLYGON
+     "polygon": None,  # filled below with WATERFALL_LAKE_POLYGON
+     "drift": {"toward": (1340, 380), "px": 12.0}},  # feeds the falls lip
     {"id": "lake_canyon_pond", "enabled": True, "insetPx": 2.0, "glintCount": 1,
-     "polygon": np.array([(1840, 812), (1895, 812), (1902, 858), (1882, 892), (1835, 882), (1828, 845)], np.int32)},
+     "polygon": np.array([(1840, 812), (1895, 812), (1902, 858), (1882, 892), (1835, 882), (1828, 845)], np.int32),
+     "drift": {"angleDeg": 90.0, "px": 8.0}},
     {"id": "west_shallows", "enabled": True, "insetPx": 2.0, "glintCount": 4,
-     "polygon": np.array([(860, 660), (1030, 656), (1210, 660), (1215, 705), (1030, 710), (865, 700)], np.int32)},
+     "polygon": np.array([(860, 660), (1030, 656), (1210, 660), (1215, 705), (1030, 710), (865, 700)], np.int32),
+     "drift": {"angleDeg": 180.0, "px": 18.0}},  # Director 2026-10-29: the painted streamlets run WEST, not east
     {"id": "lake_bayou_west", "enabled": True, "insetPx": 4.0, "glintCount": 3,
-     "polygon": np.array([(1048, 905), (1105, 900), (1115, 960), (1100, 1025), (1050, 1025), (1042, 965)], np.int32)},
+     "polygon": np.array([(1048, 905), (1105, 900), (1115, 960), (1100, 1025), (1050, 1025), (1042, 965)], np.int32),
+     "drift": {"angleDeg": 90.0, "px": 8.0}},
+    # Estuary pool below the river mouth: the river dives south into the sea (Director 2026-10-29: delta was still).
+    {"id": "lake_estuary", "enabled": True, "insetPx": 2.0, "glintCount": 0,
+     "polygon": np.array([(1395, 960), (1530, 955), (1540, 1010), (1400, 1015)], np.int32),
+     "drift": {"angleDeg": 90.0, "px": 22.0}},
     {"id": "lake_bayou_east", "enabled": True, "insetPx": 4.0, "glintCount": 1,
-     "polygon": np.array([(1205, 925), (1265, 920), (1272, 955), (1255, 985), (1210, 980), (1198, 950)], np.int32)},
+     "polygon": np.array([(1205, 925), (1265, 920), (1272, 955), (1255, 985), (1210, 980), (1198, 950)], np.int32),
+     "drift": {"angleDeg": 0.0, "px": 8.0}},
 ]
 LAKE_SPECS[0]["polygon"] = WATERFALL_LAKE_POLYGON
 CONFLUENCE_SPECS = [
@@ -86,21 +133,42 @@ CONFLUENCE_SPECS = [
 ]
 SW_MAX_BEND_DEG = 28.0
 SW_SEG_CAP_PER_RIVER = 12
-SW_TOTAL_SEG_CAP = 22
+SW_TOTAL_SEG_CAP = 64
 SW_MAX_JOINT_DEG = 60.0
 
-REGION_SPECS = [
-    ("snow_peaks", "Vette Innevate e Ghiacciaio", [(760, 0), (2050, 0), (2100, 340), (900, 390)]),
-    ("waterfall_plateau", "Altopiano della Cascata e Lago Alpino", [(850, 280), (1620, 270), (1680, 620), (900, 610)]),
-    ("western_forest", "Foresta Densa", [(300, 300), (980, 330), (1000, 960), (260, 940)]),
-    ("bayou", "Bayou/Palude di Mangrovie", [(220, 860), (980, 900), (1020, 1380), (160, 1320)]),
-    ("central_valley", "Valle Fluviale e Praterie Centrali", [(980, 560), (1770, 560), (1810, 1080), (980, 1080)]),
-    ("dry_steppe", "Steppe Aride", [(1620, 300), (2290, 290), (2330, 720), (1720, 720)]),
-    ("red_canyons", "Canyon Rossi e Arco Naturale", [(2050, 620), (2600, 610), (2650, 1130), (2040, 1130)]),
-    ("volcanic_massif", "Massiccio Vulcanico Nero", [(1830, 1030), (2660, 1060), (2700, 1536), (1810, 1536)]),
-    ("coral_lagoon", "Laguna Corallina", [(820, 1050), (1830, 1050), (1810, 1536), (900, 1536)]),
-    ("western_archipelago", "Arcipelago e Atollo", [(0, 620), (390, 610), (420, 1280), (0, 1280)]),
-]
+# Territories (regions) and biomes are baked by `build-mappa2-territories.py` (PLAN-099) into
+# `region_ids.png` / `biome_ids.png`. Regions are gameplay territories; every animation, canopy and
+# ambient decision below keys on BIOMES, never on regions.
+SHOAL_BIOME_SEA = "sea"  # fallback label when a shoal cell has no biome (never expected)
+CANOPY_BLOCKED_BIOMES = {"alpine", "red_badlands", "volcanic"}
+LANDLIFE_MOTE_BIOMES = {"temperate_forest", "mangrove_bayou", "tropical_beach", "meadow", "tropical_isles"}
+LANDLIFE_FLUTTER_BIOMES = {"meadow", "mangrove_bayou", "tropical_beach", "tropical_isles"}
+
+
+def load_territory_maps(out: Path) -> dict:
+    """Read the maps `build-mappa2-territories.py` wrote. Fails loudly instead of inventing territories."""
+    needed = [out / n for n in ("region_ids.png", "biome_ids.png", "regions.json", "biomes.json")]
+    missing = [str(n) for n in needed if not n.exists()]
+    if missing:
+        raise SystemExit(f"missing territory maps {missing}: run scripts/build-mappa2-territories.py first")
+    region_ids = np.array(Image.open(out / "region_ids.png"))
+    biome_ids = np.array(Image.open(out / "biome_ids.png"))
+    regions = json.loads((out / "regions.json").read_text(encoding="utf-8"))["regions"]
+    biomes = json.loads((out / "biomes.json").read_text(encoding="utf-8"))["biomes"]
+    if region_ids.shape != (WORLD_H, WORLD_W) or biome_ids.shape != (WORLD_H, WORLD_W):
+        raise SystemExit("territory maps do not match the world canvas")
+    return {
+        "region_ids": region_ids,
+        "biome_ids": biome_ids,
+        "regions": regions,
+        "biomes": biomes,
+        "biome_name": {b["index"]: b["id"] for b in biomes},
+        "biome_index": {b["id"]: b["index"] for b in biomes},
+    }
+
+
+def biome_mask(biome_ids: np.ndarray, biome_index: dict[str, int], wanted: set[str]) -> np.ndarray:
+    return np.isin(biome_ids, [biome_index[b] for b in wanted])
 
 
 def save_webp_rgba(rgb: np.ndarray, alpha: np.ndarray, path: Path, quality: int = 92) -> None:
@@ -272,6 +340,10 @@ def build_secondary_water(
             # Global HSV water band applies; east canyon uses its wider
             # corridor-scoped greenish-teal candidate instead.
             feature_class &= water > 0
+        # Painted water that reads grey/neutral (reflective stretch) fails the blue HSV band:
+        # author a polygon that forces it in (still clipped to the corridor).
+        for pts_f, width_f in spec.get("forceWaterLines", []):
+            feature_class |= (_stroke_polyline(shape, pts_f, width_f) > 0) & corridor & ~exclusion
         feature_class = cv2.morphologyEx(
             feature_class.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((9, 9), np.uint8)) > 0
         feature_class &= corridor
@@ -583,7 +655,586 @@ def build_secondary_water(
         "internalWater": internal_water,
         "gateFailures": failures,
         "geometry": geometry_json,
+        "riverClassMasks": river_class_masks,
+        "lakeClassMasks": lake_class_masks,
     }
+
+
+WATER_POSE_N = 8
+
+
+# --- PLAN-094 ambient director: shoal zones + route schema v0 -------------
+SHOAL_CELL_PX = 64
+SHOAL_COAST_MIN = 85.0          # 1.5 x maxRadius (55) + margin
+SHOAL_COAST_MAX = 160.0
+SHOAL_MIN_COVERAGE = 0.9
+SHOAL_POISSON_PX = 300.0
+SHOAL_MAX_RADIUS = 55.0
+SHOAL_MAX_TRAVEL = 96.0
+SHOAL_ALPHA = 0.22
+SHOAL_LSTAR_MIN = 2.0           # perceived |deltaL*| below -> zone "invisible"
+SHOAL_LSTAR_MAX = 6.0           # above -> zone "tooLoud" (stain/inversion)
+# Director 2026-10-29: shoal = dark "underwater shadow" readable ONLY on the
+# light turquoise water — zones gate on turquoise coverage, tint is the
+# sampled deep-blue (15,91,115), not a contrast-row pick.
+SHOAL_TURQ_MIN = 0.5            # min fraction of cell in the turquoise class
+SHOAL_TINT_ROWS = [
+    {"id": "deepTeal", "lStar": 28.0},
+    {"id": "shallowTeal", "lStar": 24.0},
+    {"id": "slate", "lStar": 32.0},
+    {"id": "paleTeal", "lStar": 36.0},
+]
+ROUTE_SCHEMA_VERSION = 0  # experimental — not emitted to manifest until ships
+
+
+def _lstar_image(rgb: np.ndarray) -> np.ndarray:
+    """CIE L* (0-100) per pixel."""
+    lab = cv2.cvtColor(rgb, cv2.COLOR_RGB2LAB).astype(np.float32)
+    return lab[:, :, 0] * (100.0 / 255.0)
+
+
+def validate_routes(routes: list[dict], sea: np.ndarray, land: np.ndarray,
+                    internal_water: np.ndarray, coast_px: np.ndarray,
+                    sample_step_px: float = 4.0) -> list[dict]:
+    """PLAN-094 route schema v0 offline validator. Every sampled point of a
+    route polyline — plus its +/-widthPx/2 corridor offsets — must lie on sea
+    mask and outside land/internal_water; coast_px must clear clearancePx
+    except within endpoint slack. Returns per-route {id, ok, failures[]}."""
+    results = []
+    for r in routes:
+        pts = [tuple(p) for p in r["polyline"]]
+        wid = float(r.get("widthPx", 24))
+        clear = float(r.get("clearancePx", 40))
+        slack = float(r.get("endpointSlackPx", 60))
+        fails: list[str] = []
+        samples: list[tuple[float, float]] = []
+        for i in range(len(pts) - 1):
+            ax, ay = pts[i]; bx, by = pts[i + 1]
+            seg = float(np.hypot(bx - ax, by - ay))
+            n = max(2, int(seg / sample_step_px) + 1)
+            for k in range(n):
+                t = k / (n - 1)
+                samples.append((ax + (bx - ax) * t, ay + (by - ay) * t))
+        def inside(m, x, y):
+            xi, yi = int(round(x)), int(round(y))
+            return 0 <= xi < WORLD_W and 0 <= yi < WORLD_H and m[yi, xi]
+        # self-intersection (non-adjacent segment pairs)
+        def seg_hit(a, b, c, d):
+            def ccw(p, q, r):
+                return (r[1] - p[1]) * (q[0] - p[0]) > (q[1] - p[1]) * (r[0] - p[0])
+            return ccw(a, c, d) != ccw(b, c, d) and ccw(a, b, c) != ccw(a, b, d)
+        for i in range(len(pts) - 1):
+            for j in range(i + 2, len(pts) - 1):
+                if seg_hit(pts[i], pts[i + 1], pts[j], pts[j + 1]):
+                    fails.append(f"self_intersection_{i}_{j}")
+        for idx, (x, y) in enumerate(samples):
+            if not inside(sea, x, y):
+                fails.append(f"off_sea@{x:.0f},{y:.0f}"); continue
+            if inside(land, x, y) or inside(internal_water, x, y):
+                fails.append(f"on_land_or_internal@{x:.0f},{y:.0f}")
+            # corridor offsets along local normal
+            near_end = min(idx, len(samples) - 1 - idx) * sample_step_px <= slack
+            if idx + 1 < len(samples):
+                dx, dy = samples[idx + 1][0] - x, samples[idx + 1][1] - y
+                ln = float(np.hypot(dx, dy)) or 1.0
+                nx, ny = -dy / ln, dx / ln
+                for sgn in (1, -1):
+                    ox, oy = x + nx * sgn * wid / 2.0, y + ny * sgn * wid / 2.0
+                    if not inside(sea, ox, oy):
+                        fails.append(f"corridor_off_sea@{ox:.0f},{oy:.0f}")
+            xi, yi = int(round(x)), int(round(y))
+            if not near_end and coast_px[yi, xi] < clear:
+                fails.append(f"clearance@{x:.0f},{y:.0f}:{coast_px[yi, xi]:.0f}px")
+        # min curvature radius via discrete turn angle
+        for i in range(1, len(pts) - 1):
+            a = np.array(pts[i - 1], float); b = np.array(pts[i], float); c = np.array(pts[i + 1], float)
+            v1, v2 = b - a, c - b
+            n1, n2 = np.hypot(*v1), np.hypot(*v2)
+            if n1 > 0 and n2 > 0:
+                ang = float(np.degrees(np.arccos(np.clip(np.dot(v1, v2) / (n1 * n2), -1, 1))))
+                radius = min(n1, n2) / (2 * np.sin(np.radians(ang) / 2)) if ang > 1 else 1e6
+                if radius < 120.0:
+                    fails.append(f"curvature@{b[0]:.0f},{b[1]:.0f}:r{radius:.0f}px")
+        results.append({"id": r.get("id", f"route_{len(results)}"), "ok": not fails,
+                        "failures": fails[:24], "samples": len(samples)})
+    return results
+
+
+def build_ambient_director(*, rgb: np.ndarray, sea: np.ndarray, land: np.ndarray,
+                           internal_water: np.ndarray, shallow: np.ndarray,
+                           coast_px: np.ndarray, foam: np.ndarray,
+                           exclusion_masks: dict[str, np.ndarray],
+                           confluences: list[dict], source_hash: str,
+                           debug_dir: Path, biome_ids: np.ndarray, biome_name: dict[int, str],
+                           lstar: np.ndarray | None = None) -> dict:
+    """PLAN-094: bake shoal spawn zones + exclusion list + maskDigest.
+    Returns {"json": ambient-director payload, "report": per-zone report,
+    "zonesMask": uint8 mask, "failures": [str]}."""
+    rng = np.random.default_rng(
+        int(hashlib.sha256(str(source_hash).encode()).hexdigest()[:16], 16) ^ 0xA4B1E)
+    lstar = lstar if lstar is not None else _lstar_image(rgb)
+    shape = (WORLD_H, WORLD_W)
+    # shallow_mask is a soft gradient (exp decay from coast): it is the zone
+    # WEIGHT, never a binary gate — coverage is measured on sea_mask, since
+    # the coast band [85,160] sits where shallow has already decayed <127.
+    sea_bin = sea > 0
+    # Shoal domain (Director 2026-10-29): the shoal reads as a dark underwater
+    # shadow ONLY on the light turquoise water — zones require SHOAL_TURQ_MIN
+    # coverage of sea pixels in the light-teal HSV band.
+    _hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    turquoise = sea_bin & (lstar >= 50.0) & (_hsv[:, :, 0] >= 75) & (_hsv[:, :, 0] <= 105) & (_hsv[:, :, 1] >= 50)
+
+    # exclusion union: dilated foam + waterfall/river masks + confluence buffers
+    excl = np.zeros(shape, dtype=bool)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (49, 49))
+    excl |= cv2.dilate((foam > 0).astype(np.uint8), kernel) > 0
+    excl_reasons: list[dict] = [{"type": "foam", "dilatePx": 24}]
+    for name, m in exclusion_masks.items():
+        if m is None:
+            continue
+        em = cv2.dilate((m > 0).astype(np.uint8), kernel) > 0
+        excl |= em
+        excl_reasons.append({"type": name, "dilatePx": 24})
+    for c in confluences:
+        cm = np.zeros(shape, dtype=np.uint8)
+        cv2.circle(cm, (c["x"], c["y"]), 40, 255, -1)
+        excl |= cm > 0
+    excl_reasons.append({"type": "confluences", "bufferPx": 40, "count": len(confluences)})
+
+    coast_grad_y, coast_grad_x = np.gradient(coast_px.astype(np.float32))
+
+    candidates: list[dict] = []
+    rejected: list[dict] = []
+    half = SHOAL_CELL_PX // 2
+    for y0 in range(0, WORLD_H, SHOAL_CELL_PX):
+        for x0 in range(0, WORLD_W, SHOAL_CELL_PX):
+            cx, cy = x0 + half, y0 + half
+            cell = (slice(y0, y0 + SHOAL_CELL_PX), slice(x0, x0 + SHOAL_CELL_PX))
+            zone_id = f"shoal-z-{cx // 160}-{cy // 160}"
+            cov = float(np.count_nonzero(sea_bin[cell])) / (SHOAL_CELL_PX * SHOAL_CELL_PX)
+            if cov < SHOAL_MIN_COVERAGE:
+                rejected.append({"zone": zone_id, "reason": "coverage", "coverage": round(cov, 3)})
+                continue
+            cd = float(coast_px[cell].mean())
+            if not (SHOAL_COAST_MIN <= cd <= SHOAL_COAST_MAX):
+                rejected.append({"zone": zone_id, "reason": "coastBand", "coastPx": round(cd, 1)})
+                continue
+            if excl[cy, cx] or float(np.count_nonzero(excl[cell])) > 0.10 * SHOAL_CELL_PX * SHOAL_CELL_PX:
+                rejected.append({"zone": zone_id, "reason": "excluded"})
+                continue
+            biome = biome_name.get(int(biome_ids[cy, cx]), SHOAL_BIOME_SEA)
+            # heading = seaward (increasing coast distance), fallback tangential
+            gx, gy = float(coast_grad_x[cy, cx]), float(coast_grad_y[cy, cx])
+            n = float(np.hypot(gx, gy))
+            hx, hy = (gx / n, gy / n) if n > 1e-4 else (1.0, 0.0)
+            # swept-footprint validation: capsule of radius maxRadius along
+            # heading*maxTravel; every perimeter point must stay sea & shallow
+            # (the 1.5x soft-falloff margin is already baked in coastDistMin).
+            ok = True
+            r_foot = SHOAL_MAX_RADIUS
+            for t in np.linspace(0.0, SHOAL_MAX_TRAVEL, 9):
+                sx, sy = cx + hx * t, cy + hy * t
+                for ang in np.linspace(0.0, 2 * np.pi, 8, endpoint=False):
+                    xi = int(round(sx + np.cos(ang) * r_foot))
+                    yi = int(round(sy + np.sin(ang) * r_foot))
+                    if not (0 <= xi < WORLD_W and 0 <= yi < WORLD_H and sea_bin[yi, xi] and shallow[yi, xi] > 0):
+                        ok = False
+                        break
+                if not ok:
+                    break
+            if not ok:
+                rejected.append({"zone": zone_id, "reason": "sweptFootprint"})
+                continue
+            paint_l = float(lstar[cell].mean())
+            turq_cov = float(np.count_nonzero(turquoise[cell])) / (SHOAL_CELL_PX * SHOAL_CELL_PX)
+            if turq_cov < SHOAL_TURQ_MIN:
+                rejected.append({"zone": zone_id, "reason": "notTurquoise", "turq": round(turq_cov, 2)})
+                continue
+            candidates.append({
+                "id": zone_id, "family": "shoal", "biome": biome,
+                "cell": SHOAL_CELL_PX, "cells": [[cx, cy, round(cov, 3)]],
+                "heading": [round(hx, 3), round(hy, 3)], "maxTravelPx": SHOAL_MAX_TRAVEL,
+                "coastPx": round(cd, 1), "paintL": round(paint_l, 1),
+                "tintRow": "deepTeal", "deltaL": round(SHOAL_ALPHA * abs(paint_l - 28.0), 2),
+            })
+
+    # deterministic Poisson repulsion: seeded order, greedy keep >=300px
+    order = rng.permutation(len(candidates))
+    zones: list[dict] = []
+    for i in order:
+        z = candidates[i]
+        cx, cy = z["cells"][0][0], z["cells"][0][1]
+        if all((cx - q["cells"][0][0]) ** 2 + (cy - q["cells"][0][1]) ** 2 >= SHOAL_POISSON_PX ** 2
+               for q in zones):
+            zones.append(z)
+    zones.sort(key=lambda z: z["id"])
+    zones_mask = np.zeros(shape, dtype=np.uint8)
+    for z in zones:
+        cv2.rectangle(zones_mask, (z["cells"][0][0] - half, z["cells"][0][1] - half),
+                      (z["cells"][0][0] + half, z["cells"][0][1] + half), 255, 1)
+
+    mask_files = ["masks/sea_mask.webp", "masks/land_mask.webp", "masks/shallow_mask.webp",
+                  "masks/coast_distance.webp", "masks/foam_mask.webp",
+                  "masks/internal_water_mask.webp", "masks/river_flow_mask.webp",
+                  "masks/waterfall_mask.webp"]
+    digest_src = b"".join((debug_dir.parent / f).read_bytes()
+                          for f in mask_files if (debug_dir.parent / f).exists())
+    payload = {
+        "version": 1, "canvas": [WORLD_W, WORLD_H], "seed": "mappa2-v1",
+        "maskDigest": hashlib.sha256(digest_src).hexdigest(),
+        "constants": {
+            "cellPx": SHOAL_CELL_PX, "coastPx": [SHOAL_COAST_MIN, SHOAL_COAST_MAX],
+            "poissonPx": SHOAL_POISSON_PX, "maxRadiusPx": SHOAL_MAX_RADIUS,
+            "maxTravelPx": SHOAL_MAX_TRAVEL, "alpha": SHOAL_ALPHA,
+            "deltaLBand": [SHOAL_LSTAR_MIN, SHOAL_LSTAR_MAX],
+            "tintRows": SHOAL_TINT_ROWS,
+        },
+        "zones": zones,
+        "exclusions": excl_reasons,
+        "routes": [],  # schema v0: not emitted to manifest until ships (slice 2)
+        "generatedFrom": {"sourceSha256": source_hash, "artifact": "ambient-director artifact-r003"},
+    }
+    report = {"accepted": zones, "rejected": rejected,
+              "acceptedCount": len(zones), "rejectedCount": len(rejected)}
+    dbg = rgb.copy()
+    dbg[zones_mask > 0] = np.clip(dbg[zones_mask > 0].astype(np.int16) + [0, 90, 40], 0, 255).astype(np.uint8)
+    Image.fromarray(dbg).save(debug_dir / "ambient-director-preview.webp", quality=90, method=4)
+    return {"json": payload, "report": report, "zonesMask": zones_mask,
+            "failures": [] if zones else ["no_shoal_zones_accepted"]}
+
+
+def build_shoal_atlas(out_path: Path, source_hash: str) -> dict:
+    """PLAN-094: procedural ambient-sealife atlas 512x256 — 4 tint rows x
+    3 blob variants (128x64 cells, rightmost column reserved). Seeded
+    gaussian blobs + low-freq noise + blue-noise dither."""
+    rng = np.random.default_rng(
+        int(hashlib.sha256(str(source_hash).encode()).hexdigest()[:16], 16) ^ 0x5EAF)
+    tints = {"deepTeal": (15, 91, 115), "shallowTeal": (10, 72, 96),
+             "slate": (22, 110, 130), "paleTeal": (30, 128, 138)}
+    canvas_rgb = np.zeros((256, 512, 3), dtype=np.uint8)
+    canvas_a = np.zeros((256, 512), dtype=np.uint8)
+    for row, rw in enumerate(SHOAL_TINT_ROWS):
+        rgb_t = tints[rw["id"]]
+        for col in range(3):
+            yy, xx = np.mgrid[0:64, 0:128].astype(np.float32)
+            cx, cy = 64.0 + rng.uniform(-8, 8), 32.0 + rng.uniform(-4, 4)
+            sx, sy = rng.uniform(34, 48), rng.uniform(16, 24)
+            base = np.exp(-(((xx - cx) / sx) ** 2 + ((yy - cy) / sy) ** 2))
+            noise = cv2.resize(rng.uniform(0.7, 1.3, (8, 16)).astype(np.float32), (128, 64))
+            noise = cv2.GaussianBlur(noise, (0, 0), 2.0)
+            alpha = np.clip(base * noise * 235, 0, 255)
+            alpha += rng.integers(-1, 2, alpha.shape).astype(np.float32)  # dither
+            alpha = np.clip(alpha, 0, 255).astype(np.uint8)
+            y0, x0 = row * 64, col * 128
+            canvas_rgb[y0:y0 + 64, x0:x0 + 128] = rgb_t
+            canvas_a[y0:y0 + 64, x0:x0 + 128] = alpha
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    save_webp_rgba_lossless(canvas_rgb, canvas_a, out_path)
+    sha = hashlib.sha256(out_path.read_bytes()).hexdigest()
+    return {"file": f"fx/ambient-sea-life.webp", "sha256": sha,
+            "layout": {"rows": [r["id"] for r in SHOAL_TINT_ROWS], "cols": ["blob_a", "blob_b", "blob_c", "reserved"],
+                       "cell": [128, 64], "frames": 12}}
+
+
+def build_water_flow_poses(
+    rgb: np.ndarray, class_mask: np.ndarray, flow_dir: np.ndarray, disp_px: float,
+    out_dir: Path, prefix: str, seed: int, pad: int = 6,
+) -> dict | None:
+    """PLAN-095 v2 (Director 2026-10-29, same recipe as the falls flipbook):
+    painted cinemagraph poses for one river/lake. The low-frequency painting
+    (banks, shading) never moves; only its fine painted detail flows along
+    `flow_dir` (unit vectors, HxW x2), flow-map style — two phases half a
+    cycle apart, each faded out before it resets. Faster mid-channel, slower
+    at the banks, per-region speed/phase noise so nothing moves as a strip.
+    RGBA poses: alpha = feathered class mask, so at rest a pose IS the
+    painting and the runtime needs no clip mask."""
+    ys, xs = np.where(class_mask)
+    if ys.size == 0:
+        return None
+    y0, y1 = max(0, int(ys.min()) - pad), min(WORLD_H, int(ys.max()) + pad + 1)
+    x0, x1 = max(0, int(xs.min()) - pad), min(WORLD_W, int(xs.max()) + pad + 1)
+    h, w = y1 - y0, x1 - x0
+    src = rgb[y0:y1, x0:x1].astype(np.float32)
+    m = class_mask[y0:y1, x0:x1].astype(np.uint8)
+    low = cv2.GaussianBlur(src, (0, 0), 3.0)
+    detail = src - low
+    # flowing detail is drawn only from the water itself: bank texture never smears in
+    src_gate = cv2.GaussianBlur(m.astype(np.float32), (0, 0), 1.0)
+    # Flat painted water (lake centres, estuary) has no detail to carry: add fine anisotropic
+    # luminance streaks (stretched along the flow) so the whole surface moves, not only the rims.
+    srng = np.random.default_rng(seed + 7)
+    synth = cv2.GaussianBlur(srng.standard_normal((h, w)).astype(np.float32), (0, 0), 1.3)
+    synth = synth - cv2.GaussianBlur(synth, (0, 0), 5.0)
+    synth = synth / (np.abs(synth).max() + 1e-6) * 14.0
+    detail = detail + synth[..., None]
+    # Warm (brown/sand/orange) pixels are bank, never water: they neither flow nor get replaced by a pose.
+    warm = np.clip((cv2.GaussianBlur(src[..., 0] - src[..., 2], (0, 0), 1.0) - 22.0) / 23.0, 0.0, 1.0)
+    src_gate = src_gate * (1.0 - warm)
+    flow_src = detail * src_gate[..., None]
+    alpha = cv2.GaussianBlur(cv2.erode(m, np.ones((3, 3), np.uint8)).astype(np.float32), (0, 0), 1.2)
+    alpha = alpha * (1.0 - warm)
+    dt = cv2.distanceTransform(m, cv2.DIST_L2, 3)
+    mid = np.clip(dt / max(1.0, float(np.percentile(dt[m > 0], 90))), 0, 1)
+    rng = np.random.default_rng(seed)
+
+    def noise(sigma: float) -> np.ndarray:
+        n = cv2.GaussianBlur(rng.standard_normal((h, w)).astype(np.float32), (0, 0), sigma)
+        return n / (np.abs(n).max() + 1e-6)
+
+    speed = disp_px * (0.45 + 0.55 * mid) * (1.0 + 0.35 * noise(6.0)) * alpha
+    phase = noise(14.0) * 0.5 + 0.5
+    fd = flow_dir[y0:y1, x0:x1]
+    dx, dy = fd[..., 0] * speed, fd[..., 1] * speed
+    gx, gy = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
+
+    def layer(ph: np.ndarray) -> np.ndarray:
+        return cv2.remap(flow_src, (gx - dx * ph).astype(np.float32), (gy - dy * ph).astype(np.float32),
+                         cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+
+    frames = []
+    for k in range(WATER_POSE_N):
+        pa = (k / WATER_POSE_N + phase) % 1.0
+        pb = (pa + 0.5) % 1.0
+        wa = 1.0 - np.abs(2.0 * pa - 1.0)
+        wb = 1.0 - wa
+        # boost mid-fade contrast only where the two phases are displaced apart
+        norm = 1.0 + (np.sqrt(wa ** 2 + wb ** 2) - 1.0) * np.clip(speed / 6.0, 0, 1)
+        mix = (layer(pa) * wa[..., None] + layer(pb) * wb[..., None]) / norm[..., None]
+        pose = low + detail * (1 - src_gate[..., None]) + mix
+        name = f"{prefix}_f{k}.webp"
+        save_webp_rgba(np.clip(pose, 0, 255).astype(np.uint8),
+                       np.clip(alpha * 255, 0, 255).astype(np.uint8), out_dir / name, quality=90)
+        frames.append(f"fx/water/{name}")
+    return {"frames": frames, "rect": {"x": x0, "y": y0, "width": w, "height": h}}
+
+
+def polyline_flow_field(points: list[tuple[int, int]]) -> np.ndarray:
+    """Unit downstream tangent of the nearest centerline leg, for every world px
+    (labelled distance transform over the rasterized polyline), smoothed."""
+    tangent = np.zeros((WORLD_H, WORLD_W, 2), np.float32)
+    line = np.full((WORLD_H, WORLD_W), 255, np.uint8)
+    for (ax, ay), (bx, by) in zip(points[:-1], points[1:]):
+        v = np.array([bx - ax, by - ay], np.float32)
+        v /= max(1e-6, float(np.hypot(*v)))
+        seg = np.zeros((WORLD_H, WORLD_W), np.uint8)
+        cv2.line(seg, (ax, ay), (bx, by), 1, 1, cv2.LINE_8)
+        tangent[seg > 0] = v
+        line[seg > 0] = 0
+    _, labels = cv2.distanceTransformWithLabels(line, cv2.DIST_L2, 5, labelType=cv2.DIST_LABEL_PIXEL)
+    zy, zx = np.where(line == 0)
+    by_label = np.zeros((int(labels.max()) + 1, 2), np.float32)
+    by_label[labels[zy, zx]] = tangent[zy, zx]
+    field = cv2.GaussianBlur(by_label[labels], (0, 0), 6.0)
+    return field / np.maximum(1e-6, np.linalg.norm(field, axis=2, keepdims=True))
+
+
+def drift_flow_field(drift: dict) -> np.ndarray:
+    """Lake surface drift: toward a point (outflow) or along a fixed angle."""
+    if "toward" in drift:
+        tx, ty = drift["toward"]
+        gx, gy = np.meshgrid(np.arange(WORLD_W, dtype=np.float32), np.arange(WORLD_H, dtype=np.float32))
+        field = np.dstack([tx - gx, ty - gy])
+        return field / np.maximum(1e-6, np.linalg.norm(field, axis=2, keepdims=True))
+    a = np.deg2rad(drift["angleDeg"])
+    field = np.empty((WORLD_H, WORLD_W, 2), np.float32)
+    field[..., 0], field[..., 1] = np.cos(a), np.sin(a)
+    return field
+
+
+
+# --- PLAN-098: regional weather anchors (mist + embers v1) -----------------
+WEATHER_DRIFT_MAX = {"mist": 6, "ember": 12, "volcano": 90}
+WEATHER_MIN_REACH = {"mist": 12, "ember": 14}
+WEATHER_MIN_RADIUS = {"mist": 5, "ember": 5}
+WEATHER_MIN_SPACING = {"mist": 40.0, "ember": 45.0}
+WEATHER_SEED = 97421
+
+
+def _weather_domain(kind: str, *, sea, land, internal_water, biome_ids, bidx):
+    """PLAN-098 + PLAN-099 re-key: eligible domain per family, BIOME-keyed."""
+    if kind == "mist":
+        return biome_mask(biome_ids, bidx, {"mangrove_bayou", "coral_reef", "shallow_waters"}) & internal_water
+    if kind == "ember":
+        return biome_mask(biome_ids, bidx, {"volcanic"}) & land & ~sea
+    raise ValueError(kind)
+
+
+def build_weather_anchors(*, sea, land, internal_water, biome_ids, bidx,
+                          source_hash: str, debug_dir: Path, out: Path) -> dict:
+    """Emit weather-anchors.json (leaf contract) + debug preview. Mist+embers
+    only for v1; dust/glint caps pinned at 0 (stretch families)."""
+    rng = np.random.default_rng(WEATHER_SEED)
+    anchors, rejected = [], []
+    # The painting has no volcano: the Director picked the tall dark southern peak (apex ~ (1754,982),
+    # 2026-10-29 «cima 1»); the crater glow, lava veins and the smoke plume are all runtime.
+    VOLCANO_VENTS = [(1754, 982, 26.0)]
+    for vi, (vx, vy, vr) in enumerate(VOLCANO_VENTS):
+        anchors.append({"id": f"volcano_{vi+1:02d}", "type": "volcano", "x": vx, "y": vy,
+                        "radius": vr, "reach": vr + 90.0,
+                        "weight": 1.0 if vi == 0 else 0.6,
+                        "phase": round(float(rng.random()), 4)})
+    # ── orographic cloud bank + snow glints (Director second-slice 2026-10-29):
+    # one bank anchor per alpine massif >=3000px (peak-reach point + coverage
+    # radius); glints scattered on alpine land at wide spacing.
+    alpine = biome_mask(biome_ids, bidx, {"alpine"}) & land & ~sea
+    n_m, lab_m, stats_m, cent_m = cv2.connectedComponentsWithStats(alpine.astype(np.uint8))
+    oi = 0
+    for i in sorted(range(1, n_m), key=lambda k: -stats_m[k, 4]):
+        if stats_m[i, 4] < 3000 or oi >= 6:
+            break
+        oi += 1
+        comp = lab_m == i
+        rr = cv2.distanceTransform(comp.astype(np.uint8), cv2.DIST_L2, 5)
+        my, mx = np.unravel_index(int(np.argmax(rr)), rr.shape)
+        cov = min(330.0, float(np.sqrt(stats_m[i, 4]) * 1.55))
+        anchors.append({"id": f"orographic_{oi:02d}", "type": "orographic",
+                        "x": int(mx), "y": int(my), "radius": round(cov * 0.35, 1),
+                        "reach": round(cov, 1), "weight": round(min(1.0, stats_m[i, 4] / 90000.0), 3),
+                        "phase": round(float(rng.random()), 4)})
+    gi = 0
+    g_reach = cv2.distanceTransform(alpine.astype(np.uint8), cv2.DIST_L2, 5)
+    gys, gxs = np.nonzero(alpine)
+    for i in rng.permutation(len(gxs)):
+        x, y = int(gxs[i]), int(gys[i])
+        r = float(g_reach[y, x])
+        if r < 8 or gi >= 14:
+            if gi >= 14:
+                break
+            continue
+        if any((x - a["x"]) ** 2 + (y - a["y"]) ** 2 < 110.0 * 110.0 for a in anchors if a["type"] == "glint"):
+            continue
+        gi += 1
+        anchors.append({"id": f"glint_{gi:02d}", "type": "glint", "x": x, "y": y,
+                        "radius": round(min(24.0, max(2.0, r - 8.0)), 1), "reach": round(r, 1),
+                        "weight": 1.0, "phase": round(float(rng.random()), 4)})
+    caps = {"mist": 16, "ember": 0, "volcano": 16}
+    for kind, cap in (("mist", caps["mist"]),):
+        domain = _weather_domain(kind, sea=sea, land=land, internal_water=internal_water,
+                                 biome_ids=biome_ids, bidx=bidx)
+        reach = cv2.distanceTransform(domain.astype(np.uint8), cv2.DIST_L2, 5)
+        ys, xs = np.nonzero(domain)
+        order = rng.permutation(len(xs))
+        picked = []
+        if kind == "ember":
+            # Coverage-first: top-reach candidate per coarse grid cell of the
+            # domain bbox — volcanic spans massif + SE isles and a depth-only
+            # scatter strands every anchor on the deepest block (the isles),
+            # leaving the visible massif bare (Director eye-check 2026-10-29).
+            gx0, gy0 = xs.min(), ys.min()
+            gw = max(1, (xs.max() - gx0 + 1) // 4)
+            gh = max(1, (ys.max() - gy0 + 1) // 3)
+            cells: dict[tuple[int, int], list[int]] = {}
+            for i in order:
+                cells.setdefault(((xs[i] - gx0) // gw, (ys[i] - gy0) // gh), []).append(i)
+            cells = dict(sorted(cells.items()))
+            for cell, idxs in cells.items():
+                best = max(idxs, key=lambda i: (reach[ys[i], xs[i]], -i))
+                x, y = int(xs[best]), int(ys[best])
+                r = float(reach[y, x])
+                if r < WEATHER_MIN_REACH[kind]:
+                    continue
+                radius = min(90.0, r - WEATHER_DRIFT_MAX[kind])
+                if radius < WEATHER_MIN_RADIUS[kind]:
+                    continue
+                sp = WEATHER_MIN_SPACING[kind]
+                if any((x - a["x"]) ** 2 + (y - a["y"]) ** 2 < sp * sp for a in picked):
+                    continue
+                picked.append({"id": f"ember_{len(picked)+1:02d}", "type": kind, "x": x, "y": y,
+                               "radius": round(radius, 1), "reach": round(r, 1),
+                               "weight": round(min(1.0, r / 180.0), 3), "phase": round(float(rng.random()), 4)})
+                if len(picked) >= cap:
+                    break
+        else:
+            for i in order:
+                x, y = int(xs[i]), int(ys[i])
+                r = float(reach[y, x])
+                if r < WEATHER_MIN_REACH[kind]:
+                    continue
+                radius = r - WEATHER_DRIFT_MAX[kind]
+                if radius < WEATHER_MIN_RADIUS[kind]:
+                    continue
+                radius = min(120.0, radius)
+                sp = WEATHER_MIN_SPACING[kind]
+                if any((x - a["x"]) ** 2 + (y - a["y"]) ** 2 < sp * sp for a in picked):
+                    continue
+                picked.append({"id": f"{kind}_{len(picked)+1:02d}", "type": kind, "x": x, "y": y,
+                               "radius": round(radius, 1), "reach": round(r, 1),
+                               "weight": round(min(1.0, r / 180.0), 3), "phase": round(float(rng.random()), 4)})
+                if len(picked) >= cap:
+                    break
+        anchors += picked
+        rejected += [{"type": kind, "count_domain_px": int(domain.sum()), "accepted": len(picked)}]
+    payload = {
+        "schemaVersion": 1, "seed": WEATHER_SEED,
+        "canvas": {"width": WORLD_W, "height": WORLD_H},
+        "caps": {"mist": caps["mist"], "embers": 0, "volcano": caps["volcano"],
+                 "orographic": 12, "glints": 14, "dust": 0},
+        "thresholds": {"minReach": {"mist": WEATHER_MIN_REACH["mist"], "ember": WEATHER_MIN_REACH["ember"], "volcano": 40, "orographic": 40, "dust": 40, "glint": 8},
+                       "minSpacing": {"mist": WEATHER_MIN_SPACING["mist"], "ember": WEATHER_MIN_SPACING["ember"], "volcano": 60.0, "orographic": 60.0, "dust": 60.0, "glint": 110.0},
+                       "shorelineMargin": 24,
+                       "driftMax": {"mist": WEATHER_DRIFT_MAX["mist"], "ember": WEATHER_DRIFT_MAX["ember"], "volcano": WEATHER_DRIFT_MAX["volcano"], "orographic": 24, "dust": 30, "glint": 0}},
+        "generatedFrom": {"sourceSha256": source_hash, "artifact": "PLAN-098 v1 mist+embers (biome-keyed)"},
+        "anchors": sorted(anchors, key=lambda a: a["id"]),
+    }
+    (out / "weather-anchors.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    # debug preview: domain tint + accepted markers
+    dbg = np.zeros((WORLD_H, WORLD_W, 3), np.uint8)
+    dbg[_weather_domain("mist", sea=sea, land=land, internal_water=internal_water,
+                        biome_ids=biome_ids, bidx=bidx)] = (140, 160, 255)
+    dbg[_weather_domain("ember", sea=sea, land=land, internal_water=internal_water,
+                        biome_ids=biome_ids, bidx=bidx)] = (255, 120, 40)
+    for a in anchors:
+        c = (255, 255, 255) if a["type"] == "mist" else (255, 200, 0)
+        cv2.circle(dbg, (a["x"], a["y"]), int(a["radius"]), c, 2)
+        cv2.circle(dbg, (a["x"], a["y"]), int(a["reach"]), tuple(v // 2 for v in c), 1)
+        cv2.circle(dbg, (a["x"], a["y"]), 4, (255, 0, 255), -1)
+    Image.fromarray(dbg, "RGB").save(debug_dir / "weather-anchors-preview.webp", quality=90, method=4)
+    return {"payload": payload, "report": rejected}
+
+
+def build_weather_textures(out_fx: Path, debug_dir: Path) -> dict:
+    """fx/weather/{mist_blob,ash,ember}.webp — deterministic procedural sprites."""
+    out_fx.mkdir(parents=True, exist_ok=True)
+    files = {}
+    # mist_blob: 256px soft radial alpha blob (RGB white, alpha gaussian)
+    g = np.zeros((256, 256), np.float32)
+    yy, xx = np.mgrid[0:256, 0:256]
+    d2 = ((xx - 128) ** 2 + (yy - 128) ** 2) / (110.0 ** 2)
+    a = np.clip(np.exp(-d2 * 2.2) - 0.04, 0, 1)
+    a = cv2.GaussianBlur(a, (0, 0), 9)
+    rgb = np.full((256, 256, 3), 235, np.uint8)
+    save_webp_rgba_lossless(rgb, (a * 255).astype(np.uint8), out_fx / "mist_blob.webp")
+    files["mist"] = "fx/weather/mist_blob.webp"
+    # ash: 16px dark speck; ember: 16px amber dot with baked glow (never additive blend)
+    for name, col, sigma in (("ash", (70, 62, 58), 2.6), ("ember", (255, 176, 70), 3.2)):
+        yy, xx = np.mgrid[0:16, 0:16]
+        dd = ((xx - 8) ** 2 + (yy - 8) ** 2) / 36.0
+        al = np.clip(np.exp(-dd * sigma) - 0.05, 0, 1)
+        rgb = np.dstack([np.full((16, 16), col[0]), np.full((16, 16), col[1]),
+                         np.full((16, 16), col[2])]).astype(np.uint8)
+        save_webp_rgba_lossless(rgb, (al * 255).astype(np.uint8), out_fx / f"{name}.webp")
+        files[name] = f"fx/weather/{name}.webp"
+    # snow_glint: 24px 4-point star sparkle (white-cyan)
+    gl = np.zeros((24, 24), np.float32)
+    for i in range(24):
+        for j in range(24):
+            dx, dy = abs(i - 12), abs(j - 12)
+            gl[i, j] = max(0.0, 1.0 - (dx + dy * 2.4) / 11.0) if dx < 12 else 0.0
+            gl[i, j] = max(gl[i, j], max(0.0, 1.0 - (dx * 2.4 + dy) / 11.0))
+    gl = np.clip(gl, 0, 1) ** 1.4
+    gcol = np.dstack([np.full((24, 24), 215), np.full((24, 24), 240), np.full((24, 24), 255)]).astype(np.uint8)
+    save_webp_rgba_lossless(gcol, (gl * 255).astype(np.uint8), out_fx / "snow_glint.webp")
+    files["glint"] = "fx/weather/snow_glint.webp"
+    # fx preview: swatches on dark plate
+    prev = np.zeros((64, 3 * 80 + 16, 3), np.uint8)
+    for i, p in enumerate((out_fx / "mist_blob.webp", out_fx / "ash.webp", out_fx / "ember.webp")):
+        t = np.array(Image.open(p).convert("RGBA").resize((64, 64)))
+        bg = prev[:, 8 + i * 80:8 + i * 80 + 64]
+        alpha = t[:, :, 3:4].astype(np.float32) / 255.0
+        prev[:, 8 + i * 80:8 + i * 80 + 64] = (t[:, :, :3] * alpha + bg * (1 - alpha)).astype(np.uint8)
+    Image.fromarray(prev, "RGB").save(debug_dir / "weather-fx-preview.webp", quality=90, method=4)
+    return files
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -624,17 +1275,23 @@ def main() -> None:
     cv2.fillPoly(foreground, [np.array([(0, 1160), (0, 1536), (610, 1536), (320, 1180)], np.int32)], 255)
     cv2.fillPoly(foreground, [np.array([(2752, 1120), (2752, 1536), (2130, 1536), (2420, 1160)], np.int32)], 255)
     foreground = (foreground > 0) & land
-    canopy_blocked_regions = {"snow_peaks", "dry_steppe", "red_canyons", "volcanic_massif"}
-    canopy_blocked = np.zeros((WORLD_H, WORLD_W), dtype=np.uint8)
-    for region_id, _, polygon in REGION_SPECS:
-        if region_id in canopy_blocked_regions:
-            cv2.fillPoly(canopy_blocked, [np.array(polygon, np.int32)], 255)
-    canopy_blocked = canopy_blocked > 0
+    territory = load_territory_maps(out)
+    biome_ids = territory["biome_ids"]
+    canopy_blocked = biome_mask(biome_ids, territory["biome_index"], CANOPY_BLOCKED_BIOMES)
     dense_forest_core = fill_polygon((WORLD_H, WORLD_W), DENSE_FOREST_CORE_POLYGON) > 0
 
     Image.fromarray(rgb, "RGB").convert("RGBA").save(layers / "base_flat.webp", quality=94, method=4)
     save_webp_rgba(rgb, (sea.astype(np.uint8) * 255), layers / "Mare.webp", quality=94)
-    save_webp_rgba(rgb, (foreground.astype(np.uint8) * 255), layers / "Foreground.webp", quality=94)
+    # Foreground is two corner wedges: ship only the strip that holds them (layer `rect` maps it
+    # back to world px), not a 2752x1536 texture that is 92% transparent (PLAN-092 GPU diet).
+    fg_ys, fg_xs = np.where(foreground)
+    fg_x0, fg_x1 = max(0, int(fg_xs.min()) - 2), min(WORLD_W, int(fg_xs.max()) + 3)
+    fg_y0, fg_y1 = max(0, int(fg_ys.min()) - 2), min(WORLD_H, int(fg_ys.max()) + 3)
+    foreground_rect = {"x": fg_x0, "y": fg_y0, "width": fg_x1 - fg_x0, "height": fg_y1 - fg_y0,
+                       "sourceWidth": WORLD_W, "sourceHeight": WORLD_H}
+    save_webp_rgba(rgb[fg_y0:fg_y1, fg_x0:fg_x1],
+                   (foreground[fg_y0:fg_y1, fg_x0:fg_x1].astype(np.uint8) * 255),
+                   layers / "Foreground.webp", quality=94)
 
     gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
     laplacian = np.abs(cv2.Laplacian(gray, cv2.CV_32F, ksize=3))
@@ -839,16 +1496,65 @@ def main() -> None:
         np.full((pf_h, pf_w), 255, dtype=np.uint8),
         waterfall_fx_dir / "painted_flow_tile.webp", quality=92)
 
-    # PLAN-092 flipbook (choice B): N painted poses = the Y-tileable tile rolled
-    # by k*(H/N) per frame — every pose is seamless by construction (the tile
-    # already wraps). Runtime cycles them at 10fps = painted cel animation.
-    FLIP_N = 6
+    # PLAN-092 flipbook (choice B): painted cinemagraph poses built on the
+    # UNFILLED painting crop (pose at rest == the base painting, no pop). A
+    # rigid roll of the whole tile read as a sliding shutter (the bright lip
+    # travelled down), so: the low-frequency structure (lip, shading, rock
+    # edges) never moves; only the fine painted detail flows, flow-map style —
+    # two phases half a cycle apart, each faded out before it resets, so a
+    # pose step is a few px. Speed is per lane (smooth across x -> shear, not
+    # a strip) and accelerates down the drop; zero outside the falls mask.
+    FLIP_N = 24
+    pf_rows = slice(pf_crop_y0, pf_crop_y0 + pf_h)
+    pf_cols = slice(int(flow_rect["x"]), int(flow_rect["x"]) + pf_w)
+    flip_src = rgb[pf_rows, pf_cols].astype(np.float32)
+    flip_low = cv2.GaussianBlur(flip_src, (0, 0), 6.0)
+    flip_detail = flip_src - flip_low
+    flip_rng = np.random.default_rng(92)
+
+    def flip_lanes(sigma: float) -> np.ndarray:
+        v = cv2.GaussianBlur(flip_rng.standard_normal((1, pf_w)).astype(np.float32), (0, 0), sigma)[0]
+        return v / (np.abs(v).max() + 1e-6)
+
+    flip_m = cv2.GaussianBlur((waterfall_mask[pf_rows, pf_cols] > 127).astype(np.float32), (0, 0), 5.0)
+    flip_rows_in = np.where(flip_m.max(axis=1) > 0.5)[0]
+    flip_lip, flip_foot = int(flip_rows_in.min()), int(flip_rows_in.max())
+    flip_drop = np.clip((np.arange(pf_h, dtype=np.float32) - flip_lip) / max(1, flip_foot - flip_lip), 0, 1)
+    # cycle displacement in px: ~64px per 0.8s loop, x0.6..x1.4 by lane, x0.5..x1.3 down
+    # the drop. The mask starts on the river above the painted lip (~0.14 of the
+    # drop): hold still through it, ease in below, so the bright lip stays crisp.
+    flip_ease = np.clip((flip_drop - 0.16) / 0.16, 0, 1)
+    flip_ease = flip_ease ** 2 * (3 - 2 * flip_ease)
+    flip_disp = 64.0 * (1.0 + 0.4 * flip_lanes(5.0))[None, :] * (flip_ease * (0.5 + 0.8 * flip_drop))[:, None] * flip_m
+    flip_phase = flip_lanes(9.0) * 0.5 + 0.5
+    flip_xs = np.broadcast_to(np.arange(pf_w, dtype=np.float32)[None, :], (pf_h, pf_w))
+    flip_ys = np.arange(pf_h, dtype=np.float32)[:, None]
+
+    # The flowing detail is drawn only from the falls body: the strong dark/bright
+    # edge of the painted lip, dragged down, reads as dark bubbles in the water.
+    flip_gate = np.clip((flip_drop - 0.2) / 0.08, 0, 1)
+    flip_src = flip_detail * (flip_gate * flip_gate * (3 - 2 * flip_gate))[:, None, None]
+    # where the water holds still (above the ease) the painting keeps its own detail
+    flip_w = flip_m * flip_ease[:, None]
+
+    def flip_layer(ph: np.ndarray) -> np.ndarray:
+        return cv2.remap(flip_src, flip_xs, (flip_ys - flip_disp * ph[None, :]).astype(np.float32),
+                         cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+
     flip_files = []
     for k in range(FLIP_N):
-        rolled = np.roll(pf_tile, -k * (pf_h // FLIP_N), axis=0)
+        pa = (k / FLIP_N + flip_phase) % 1.0
+        pb = (pa + 0.5) % 1.0
+        wa = (1.0 - np.abs(2.0 * pa - 1.0))[None, :, None]
+        wb = 1.0 - wa
+        # the two phases only decorrelate where they are displaced apart: boost the
+        # mid-fade contrast there, never where the water holds still (no pulsing)
+        flip_norm = 1.0 + (np.sqrt(wa ** 2 + wb ** 2) - 1.0) * np.clip(flip_disp / 8.0, 0, 1)[..., None]
+        mix = (flip_layer(pa) * wa + flip_layer(pb) * wb) / flip_norm
+        pose = flip_low + flip_detail * (1 - flip_w[..., None]) + mix * flip_w[..., None]
         fname = f"flip_f{k}.webp"
         save_webp_rgba(
-            np.clip(rolled, 0, 255).astype(np.uint8),
+            np.clip(pose, 0, 255).astype(np.uint8),
             np.full((pf_h, pf_w), 255, dtype=np.uint8),
             waterfall_fx_dir / fname, quality=90)
         flip_files.append(f"fx/waterfall/{fname}")
@@ -913,6 +1619,90 @@ def main() -> None:
         "lakes": sw_geometry["lakes"],
         "confluences": sw_geometry["confluences"],
     }
+    # PLAN-095 v2: painted flow poses per feature (outside geometrySha256 — the
+    # geometry contract is unchanged; poses only add what the runtime cycles).
+    for i, spec in enumerate(RIVER_SPECS):
+        poses = build_water_flow_poses(
+            rgb, sw_result["riverClassMasks"][spec["id"]], polyline_flow_field(spec["centerline"]),
+            28.0, water_fx_dir, spec["id"], seed=950 + i)
+        if poses:
+            next(r for r in secondary_water_json["rivers"] if r["id"] == spec["id"])["flowPoses"] = poses
+    for i, spec in enumerate(LAKE_SPECS):
+        poses = build_water_flow_poses(
+            rgb, sw_result["lakeClassMasks"][spec["id"]], drift_flow_field(spec["drift"]),
+            spec["drift"]["px"], water_fx_dir, spec["id"], seed=960 + i)
+        if poses:
+            next(lk for lk in secondary_water_json["lakes"] if lk["id"] == spec["id"])["flowPoses"] = poses
+    # Falls basin (PLAN-092 v3): the water around the plunge point drifts OUTWARD, so the painted arcs
+    # read as ripples leaving the impact. Same recipe as the river poses; the lip and rock stay still.
+    basin_class = (fill_polygon((WORLD_H, WORLD_W), WATERFALL_BASIN_POLYGON) > 0) & internal_water
+    bgy, bgx = np.meshgrid(np.arange(WORLD_H, dtype=np.float32), np.arange(WORLD_W, dtype=np.float32), indexing="ij")
+    radial = np.dstack([bgx - WATERFALL_IMPACT_POINT["x"], bgy - WATERFALL_IMPACT_POINT["y"]]).astype(np.float32)
+    radial /= np.maximum(1e-6, np.linalg.norm(radial, axis=2, keepdims=True))
+    basin_poses = build_water_flow_poses(rgb, basin_class, radial, 14.0, water_fx_dir, "basin", seed=970)
+    if basin_poses:
+        secondary_water_json["basin"] = {"flowPoses": basin_poses}
+    # Sea patches (Director 2026-10-29): bay 2 and the river mouths. Painted poses over the sea water itself;
+    # flow runs away from the shore / away from the river, so freshwater visibly spills out.
+    sea_patches = []
+    kern = lambda r: cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * r + 1, 2 * r + 1))
+    sea_u8 = sea.astype(np.uint8)
+    hsv_img = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    teal_m = (hsv_img[..., 0] >= 70) & (hsv_img[..., 0] <= 105) & (hsv_img[..., 1] >= 80) & (hsv_img[..., 2] >= 70)
+    near_coast = sea & ~(cv2.morphologyEx(sea_u8, cv2.MORPH_OPEN, kern(28)) > 0) & teal_m
+    near_coast = cv2.morphologyEx(cv2.morphologyEx(near_coast.astype(np.uint8), cv2.MORPH_OPEN, kern(3)), cv2.MORPH_CLOSE, kern(5))
+    n_cc, lab_cc, st_cc, cen_cc = cv2.connectedComponentsWithStats(near_coast)
+    bay2 = None
+    for i in range(1, n_cc):
+        if st_cc[i, 4] > 2500 and abs(cen_cc[i][0] - 2032) < 60 and abs(cen_cc[i][1] - 905) < 60:
+            bay2 = lab_cc == i
+    land_dist = cv2.distanceTransform(sea_u8, cv2.DIST_L2, 5)
+    gy_l, gx_l = np.gradient(cv2.GaussianBlur(land_dist, (0, 0), 8.0))
+    away_shore = np.dstack([gx_l, gy_l]).astype(np.float32)
+    away_shore /= np.maximum(1e-6, np.linalg.norm(away_shore, axis=2, keepdims=True))
+    if bay2 is not None:
+        bp = build_water_flow_poses(rgb, bay2, away_shore, 10.0, water_fx_dir, "bay2", seed=980)
+        if bp:
+            sea_patches.append({"id": "bay_2", "flowPoses": bp})
+    # River mouths: sea within 45 px of the inland water, drifting away from it.
+    iw_u8 = internal_water.astype(np.uint8)
+    iw_dist = cv2.distanceTransform(1 - iw_u8, cv2.DIST_L2, 5)
+    mouth = sea & (iw_dist < 45) & teal_m
+    mouth = cv2.morphologyEx(mouth.astype(np.uint8), cv2.MORPH_OPEN, kern(2)) > 0
+    # Only the main delta (stray lagoon spots of the inland-water mask would balloon the pose rect), and
+    # never where a river/lake pose already draws, so no two pose sprites stack on the same pixels.
+    n_m, lab_m, st_m, _ = cv2.connectedComponentsWithStats(mouth.astype(np.uint8))
+    n_m, lab_m, st_m, cen_m = cv2.connectedComponentsWithStats(mouth.astype(np.uint8))
+    delta_ids = [i for i in range(1, n_m) if st_m[i, 4] > 8000 and abs(cen_m[i][0] - 1460) < 120 and abs(cen_m[i][1] - 985) < 120]
+    mouth = np.isin(lab_m, delta_ids)
+    for cm in list(sw_result["riverClassMasks"].values()) + list(sw_result["lakeClassMasks"].values()):
+        mouth &= ~cm
+    if mouth.sum() > 400:
+        gy_m, gx_m = np.gradient(cv2.GaussianBlur(iw_dist, (0, 0), 6.0))
+        away_river = np.dstack([gx_m, gy_m]).astype(np.float32)
+        away_river /= np.maximum(1e-6, np.linalg.norm(away_river, axis=2, keepdims=True))
+        mp = build_water_flow_poses(rgb, mouth, away_river, 16.0, water_fx_dir, "mouths", seed=990)
+        if mp:
+            sea_patches.append({"id": "river_mouths", "flowPoses": mp})
+    # Open water below the delta (between the two coasts, around the island): the river water keeps
+    # spreading south, so the surface drifts away from the mouth. Director 2026-10-29.
+    lagoon = np.zeros_like(sea)
+    lagoon[990:1295, 1250:1720] = True
+    lagoon &= sea & teal_m
+    lagoon = cv2.morphologyEx(lagoon.astype(np.uint8), cv2.MORPH_OPEN, kern(2)) > 0
+    for prev in [mouth]:
+        lagoon &= ~prev
+    for cm in list(sw_result["riverClassMasks"].values()) + list(sw_result["lakeClassMasks"].values()):
+        lagoon &= ~cm
+    if lagoon.sum() > 2000:
+        lgy, lgx = np.meshgrid(np.arange(WORLD_H, dtype=np.float32), np.arange(WORLD_W, dtype=np.float32), indexing="ij")
+        spread = np.dstack([(lgx - 1465.0) * 0.6, (lgy - 985.0)]).astype(np.float32)
+        spread /= np.maximum(1e-6, np.linalg.norm(spread, axis=2, keepdims=True))
+        lp = build_water_flow_poses(rgb, lagoon, spread, 16.0, water_fx_dir, "delta_sea", seed=995)
+        if lp:
+            sea_patches.append({"id": "delta_sea", "flowPoses": lp})
+    if sea_patches:
+        secondary_water_json["seaPatches"] = sea_patches
     (out / "secondary-water.json").write_text(json.dumps(secondary_water_json, indent=2), encoding="utf-8")
 
     save_alpha_mask((sea.astype(np.uint8) * 255), masks_dir / "sea_mask.webp")
@@ -932,38 +1722,39 @@ def main() -> None:
     ])
     Image.fromarray(dist_rgb, "RGB").save(masks_dir / "coast_distance.webp", lossless=True, method=4)
 
-    region_ids = np.zeros((WORLD_H, WORLD_W), dtype=np.uint8)
-    regions_meta = []
-    biome_seeds = []
-    paintable = land | internal_water | sea
-    for idx, (rid, label, poly) in enumerate(REGION_SPECS, start=1):
-        p = np.array(poly, np.int32)
-        zone = np.zeros((WORLD_H, WORLD_W), dtype=np.uint8)
-        cv2.fillPoly(zone, [p], 255)
-        take = (zone > 0) & paintable
-        region_ids[take] = idx
-        yy, xx = np.nonzero(take)
-        meta = {
-            "id": rid,
-            "index": idx,
-            "nameKey": f"world.region.{rid}",
-            "label": label,
-            "center": [round(float(xx.mean()) / WORLD_W, 4), round(float(yy.mean()) / WORLD_H, 4)] if len(xx) else [0, 0],
-            "bounds": {
-                "x": int(xx.min()) if len(xx) else 0,
-                "y": int(yy.min()) if len(yy) else 0,
-                "width": int(xx.max() - xx.min() + 1) if len(xx) else 0,
-                "height": int(yy.max() - yy.min() + 1) if len(yy) else 0,
-            },
-            "areaFraction": round(float(len(xx) / region_ids.size), 4),
-        }
-        regions_meta.append(meta)
-        biome_seeds.append({"id": rid, "index": idx, "label": label, "polygon": poly})
+    # ── Ambient director (PLAN-094): shoal zones + route schema v0 ─────────
+    ambient_exclusions: dict[str, np.ndarray] = {
+        "waterfall": waterfall_mask,
+        "waterfallImpact": waterfall_impact,
+        "waterfallBasin": waterfall_basin,
+    }
+    river_flow_file = masks_dir / "river_flow_mask.webp"
+    if river_flow_file.exists():
+        ambient_exclusions["riverFlow"] = np.array(
+            Image.open(river_flow_file).convert("RGBA"))[:, :, 3]
+    ambient_result = build_ambient_director(
+        rgb=rgb, sea=sea, land=land, internal_water=internal_water,
+        shallow=shallow, coast_px=coast_px, foam=foam,
+        exclusion_masks=ambient_exclusions,
+        confluences=sw_result["geometry"]["confluences"],
+        source_hash=source_hash, debug_dir=debug_dir,
+        biome_ids=biome_ids, biome_name=territory["biome_name"])
+    (out / "ambient-director.json").write_text(
+        json.dumps(ambient_result["json"], indent=2), encoding="utf-8")
+    (debug_dir / "ambient-zones-report.json").write_text(
+        json.dumps(ambient_result["report"], indent=2), encoding="utf-8")
+    if ambient_result["failures"]:
+        print("AMBIENT-DIRECTOR GATE FAILURES:", ambient_result["failures"])
+    ambient_atlas = build_shoal_atlas(out / "fx" / "ambient-sea-life.webp", source_hash)
+    # NOTE: ambient is a LEAF contract (ambient-director.json fetched by
+    # name, atlas via fxAtlases.ambientSeaLife) — no pack.* field, since
+    # WorldSurfacePackSchema is strict (PLAN-095 leaf pattern, zero
+    # contracts:check cascade).
+    ambient_atlas_layout = ambient_atlas["layout"]
 
-    Image.fromarray(region_ids, mode="L").save(out / "region_ids.png", optimize=True)
-    (out / "regions.json").write_text(json.dumps({"size": [WORLD_W, WORLD_H], "regions": regions_meta}, indent=2), encoding="utf-8")
-    (out / "biomes.json").write_text(json.dumps({"canvas": {"width": WORLD_W, "height": WORLD_H}, "biomes": regions_meta}, indent=2), encoding="utf-8")
-    (out / "biomes.seed.json").write_text(json.dumps({"canvas": {"width": WORLD_W, "height": WORLD_H}, "seeds": biome_seeds}, indent=2), encoding="utf-8")
+    # Territories + biomes come from build-mappa2-territories.py (already loaded as `territory`).
+    region_ids = territory["region_ids"]
+    regions_meta = territory["regions"]
 
     rng = np.random.default_rng(int(source_hash[:8], 16))
     land_dist = cv2.distanceTransform(land.astype(np.uint8), cv2.DIST_L2, 5)
@@ -980,17 +1771,28 @@ def main() -> None:
     }
     (out / "points.json").write_text(json.dumps(points_payload, indent=2), encoding="utf-8")
 
+
+    # ── Regional weather (PLAN-098 v1): mist + embers, biome-keyed ────────
+    weather = build_weather_anchors(
+        sea=sea, land=land, internal_water=internal_water,
+        biome_ids=biome_ids, bidx=territory["biome_index"],
+        source_hash=source_hash, debug_dir=debug_dir, out=out)
+    (debug_dir / "weather-anchors-report.json").write_text(
+        json.dumps(weather["report"], indent=2), encoding="utf-8")
+    weather_fx = build_weather_textures(out / "fx" / "weather", debug_dir)
+    print("WEATHER:", weather["report"], weather_fx)
+
     # ── Ambient land-life (PLAN-093) ──────────────────────────────────────
     # Anchors must be born from real painted entities (T-07): leaves scatter
     # inside the extracted canopy mask, motes above canopy + candidate land
     # biomes, flutters on meadow/lagoon/bayou land. Seeded like the rest of
     # the pack so every rebuild reproduces the same layout.
     ll_rng = np.random.default_rng(int(source_hash[:16], 16) ^ 0x1EAFF5)
-    region_by_index = {idx: rid for idx, (rid, _label, _poly) in enumerate(REGION_SPECS, start=1)}
+    biome_name = territory["biome_name"]
 
     def landlife_scatter(zone_mask: np.ndarray, count: int, min_sep: float, prefix: str, radius: float, min_density: float = 0.0) -> list[dict]:
-        """Deterministic anchor scatter inside a zone mask, with region attribution
-        from `region_ids` and weight = local density of the zone itself.
+        """Deterministic anchor scatter inside a zone mask, with biome attribution
+        from `biome_ids` and weight = local density of the zone itself.
         `min_density` keeps anchors inside foliage mass, not on thin edge slivers."""
         density = cv2.boxFilter((zone_mask > 0).astype(np.float32), -1, (61, 61), normalize=True)
         ys, xs = np.nonzero(zone_mask)
@@ -1005,7 +1807,7 @@ def main() -> None:
                     "id": f"{prefix}_{len(chosen) + 1:02d}",
                     "x": x,
                     "y": y,
-                    "regionId": region_by_index.get(int(region_ids[y, x]), "unassigned"),
+                    "biomeId": biome_name.get(int(biome_ids[y, x]), "unassigned"),
                     "type": prefix,
                     "weight": round(float(density[y, x]) + 0.25, 3),
                     "radius": radius,
@@ -1014,18 +1816,11 @@ def main() -> None:
                     break
         return chosen
 
-    def region_zone(region_ids_wanted: set[str]) -> np.ndarray:
-        zone = np.zeros((WORLD_H, WORLD_W), dtype=np.uint8)
-        for rid, _label, poly in REGION_SPECS:
-            if rid in region_ids_wanted:
-                cv2.fillPoly(zone, [np.array(poly, np.int32)], 255)
-        return zone > 0
-
     mote_zone = (
         (cv2.dilate(canopy_mask.astype(np.uint8), np.ones((25, 25), np.uint8)) > 0)
-        | (land & ~foreground & region_zone({"western_forest", "bayou", "central_valley", "coral_lagoon"}))
+        | (land & ~foreground & biome_mask(biome_ids, territory["biome_index"], LANDLIFE_MOTE_BIOMES))
     )
-    flutter_zone = land & ~foreground & region_zone({"coral_lagoon", "central_valley", "bayou"})
+    flutter_zone = land & ~foreground & biome_mask(biome_ids, territory["biome_index"], LANDLIFE_FLUTTER_BIOMES)
 
     landlife_anchors = (
         landlife_scatter(canopy_mask, 18, 150, "leaf", 58, min_density=0.35)
@@ -1169,8 +1964,8 @@ def main() -> None:
     gate_failures = []
     if float((land | sea).mean()) < 0.95:
         gate_failures.append("coverage_below_0.95")
-    if len(unique_ids) != len(REGION_SPECS):
-        gate_failures.append(f"region_ids_{len(unique_ids)}_expected_{len(REGION_SPECS)}")
+    if len(unique_ids) != len(regions_meta):
+        gate_failures.append(f"region_ids_{len(unique_ids)}_expected_{len(regions_meta)}")
     if len(canopy_layers) == 0:
         gate_failures.append("no_canopy_layers")
     if len(anchors) < 12:
@@ -1208,7 +2003,8 @@ def main() -> None:
             "anchors": len(landlife_anchors),
             "fxFiles": ["fx/land-life/leaf.webp", "fx/land-life/mote.webp", "fx/land-life/butterfly.webp"],
         },
-        "regions": len(REGION_SPECS),
+        "regions": len(regions_meta),
+        "biomes": len(territory["biomes"]),
         "anchors": len(anchors),
         "gate": {"status": "pass" if not gate_failures else "needs_manual_mask", "failures": gate_failures},
         "files": sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file()),
@@ -1227,11 +2023,11 @@ def main() -> None:
         "surfaceLayers": [
             {"id": "base_flat", "file": "base_flat.webp", "type": "texture", "zIndex": 5, "tags": ["background", "flattened"]},
             {"id": "sea", "file": "Mare.webp", "type": "texture", "zIndex": 10, "tags": ["water"]},
-            {"id": "foreground", "file": "Foreground.webp", "type": "texture", "zIndex": 80, "tags": ["foreground"]},
+            {"id": "foreground", "file": "Foreground.webp", "rect": foreground_rect, "type": "texture", "zIndex": 80, "tags": ["foreground"]},
         ],
         "atmosphereLayers": [],
         "visualStates": [{"id": "default", "labelKey": "world.states.default", "base": True, "overrides": []}],
-        "regions": [{k: v for k, v in r.items() if k in ("id", "nameKey", "bounds", "tags")} | {"tags": ["biome"]} for r in regions_meta],
+        "regions": [{k: v for k, v in r.items() if k in ("id", "nameKey", "bounds", "tags")} | {"tags": ["region"]} for r in regions_meta],
         "anchors": [],
         "tags": ["world-map", "mappa2"],
         "pack": {

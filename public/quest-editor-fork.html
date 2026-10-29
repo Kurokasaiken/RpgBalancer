@@ -1,0 +1,97 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Quest Editor — layout</title>
+<style>
+body{background:#0b0f14;color:#e5eef7;font:13px/1.45 system-ui;margin:0;padding:22px}
+h1{font-size:17px;margin:0 0 2px}h2{font-size:14px;margin:22px 0 6px;color:#9fd0ff}
+.page{max-width:1240px}
+.hdr{display:flex;gap:8px;align-items:center;border:1px solid #2b3a4a;border-radius:6px;padding:8px 12px;background:#10161e;margin-bottom:8px}
+.pill{border:1px solid #3a5a78;border-radius:12px;padding:2px 10px;color:#b8cde0;background:#16202b}
+.pill.hot{border-color:#c9a54e;color:#ffd98a}
+.btn{border:1px solid #8bb7d5;border-radius:4px;padding:4px 12px;background:#31465f;color:#dff4ff;font-size:12px}
+.play{display:flex;gap:8px;border:1px solid #2b3a4a;border-radius:6px;padding:8px;background:#0e141b}
+.art{flex:0 0 300px;height:190px;border-radius:4px;background:linear-gradient(135deg,#1c2c22,#274a3a 45%,#10161e);display:flex;align-items:center;justify-content:center;color:#7fae8f;border:1px solid #2b4a3a;font-size:12px}
+.mid{flex:1;display:flex;flex-direction:column;gap:6px}
+.node{border:1px solid #2b3a4a;border-radius:4px;padding:8px;background:#16202b}
+.ed{border-bottom:1px dashed #5a7a9a;cursor:text}
+.ed:hover{background:#1d2c3d}
+.opt{display:flex;justify-content:space-between;gap:8px;border:1px solid #3a5a78;border-radius:4px;padding:6px 8px;background:#1a2836}
+.opt.locked{opacity:.55;border-style:dashed}
+.odds{color:#8fd8a2;font-variant-numeric:tabular-nums;white-space:nowrap}
+.odds b{color:#ffd98a}
+.party{display:flex;gap:6px}
+.m{flex:1;border:1px solid #2b3a4a;border-radius:4px;padding:4px 6px;background:#141d27;font-size:11px}
+.bar{height:5px;border-radius:2px;background:#22303f;margin-top:4px}
+.bar i{display:block;height:100%;border-radius:2px;background:#5fae6f}
+.m.dead .bar i{background:#8a2f2f}
+.strip{display:flex;gap:6px;align-items:center;overflow-x:auto;border:1px solid #2b3a4a;border-radius:6px;padding:6px;background:#0e141b;margin-top:8px}
+.scene{border:1px solid #3a5a78;border-radius:4px;padding:4px 10px;white-space:nowrap;background:#16202b}
+.scene.here{border-color:#c9a54e;color:#ffd98a;background:#2a2118}
+.scene.add{border-style:dashed;color:#8fd8a2}
+.edit{display:flex;gap:8px;border:1px solid #2b3a4a;border-radius:6px;padding:8px;background:#0e141b;margin-top:8px}
+.fgroup{flex:1;border:1px solid #2b3a4a;border-radius:4px;padding:8px;background:#16202b;display:flex;flex-direction:column;gap:6px}
+.f{border:1px dashed #33506b;border-radius:3px;padding:4px 8px;color:#b8cde0;background:#101823}
+.label{color:#7f9ab0;font-size:10px;text-transform:uppercase;letter-spacing:.07em}
+.warn{border-color:#8a5a2f;color:#ffd98a}
+.rail{width:200px;flex:0 0 200px}
+</style></head><body>
+<div class="page">
+<h1>Quest Editor — la pagina come la userai</h1>
+<div class="label">Sopra giochi · la striscia dice dove sei · sotto scrivi. Un solo flusso verticale (modello Inky: edit↔play senza fratture).</div>
+
+<div class="hdr">
+ <span class="pill">quest: <b>gen-race-miniera</b></span>
+ <span class="pill">party: 4 membri · 1 eroe</span>
+ <span class="pill hot">● run: seed 7 — stale (hai modificato)</span>
+ <span class="pill">lingua: <b>EN</b> | IT</span>
+ <span style="flex:1"></span>
+ <span class="btn">⟲ re-seed</span>
+ <span class="btn">Carica ▾</span>
+ <span class="btn" style="border-color:#c9a54e;color:#ffd98a">Salva candidato</span>
+ <span class="btn">Esporta</span>
+</div>
+<div class="label" style="margin:0 0 8px 4px">Carica ▾ = catalogo · candidati salvati · authored (goblin/rovine) · <b>Nuova da gimmick ▸ race / flood / meld + kit</b></div>
+
+<h2>① GIOCHI (motore vero, zero animazioni)</h2>
+<div class="play">
+ <div class="art">immagine scena<br>(NODE_ART del nodo)</div>
+ <div class="mid">
+  <div class="node"><b class="ed" title="clicca e scrivi">Il bivio della fornace</b> <span class="label">· check</span><br><span class="ed" title="body — editable in place">L'aria vibra di calore. Due gallerie si aprono: una respira fumo, l'altra tace.</span><br><span class="label">transit:</span> <span class="ed">Il sentiero scende tra i calcinacci…</span> <span class="warn" style="font-size:11px">IT stale → <span class="ed" style="color:#c9a54e">ricontrolla la luce alle tue spalle… (modifica IT qui)</span></span></div>
+  <div class="opt"><span class="ed" title="label+detail editabili in place">Attraversa la galleria fumante — <i>STR</i></span><span class="odds">win 62% · wound <b>18%</b> · death 4%</span></div>
+  <div class="opt"><span class="ed">Esamina la galleria muta — <i>PER</i></span><span class="odds">win 71% · wound 8% · death 0</span></div>
+  <div class="opt locked"><span class="ed">Segui il canto</span><span class="odds">richiede info: canto-madre —</span></div>
+  <div class="f" style="display:flex;gap:6px;align-items:center"><span class="label">stats del check:</span><span class="pill">str ✕</span><span class="pill">per ✕</span><span class="pill" style="border-style:dashed;color:#8fd8a2">+ stat</span><span class="label" style="margin-left:auto">consumabili: 🧪 cura ×2 · 🛡 scudo ×1 — spendibili prima del check</span></div>
+  <div class="party">
+   <div class="m"><b>Eroe</b> · 100/100<div class="bar"><i style="width:100%"></i></div></div>
+   <div class="m"><b>Bruno</b> · 46/60<div class="bar"><i style="width:77%"></i></div></div>
+   <div class="m"><b>Selce</b> · ferito<div class="bar"><i style="width:52%"></i></div></div>
+   <div class="m dead"><b>Nara</b> · morta<div class="bar"><i style="width:0%"></i></div></div>
+  </div>
+ </div>
+</div>
+
+<h2>② DOVE SEI = cosa editi — la run è REALE e stateful: HP persi/loot/flag restano mentre avanzi cliccando i pulsanti (niente teleport)</h2>
+<div class="strip">
+ <span class="scene">partenza</span><span class="scene">sentiero</span><span class="scene here">▶ bivio-fornace</span>
+ <span class="scene">risveglio</span><span class="scene">obiettivo</span><span class="scene">ritorno</span>
+ <span class="scene add">+ scena</span><span class="scene" style="color:#ff9a9a">− scena</span>
+ <span style="flex:1"></span><span class="label">4/7 scene visitate</span>
+</div>
+
+<h2>③ SCRIVI — il testo si edita dove lo vedi (sopra); qui solo ciò che non è visibile in play</h2>
+<div class="edit">
+
+ <div class="fgroup"><span class="label">Numeri (balance)</span>
+  <div class="f">risk.wound <b>18%</b> → odds a fianco</div>
+  <div class="f">risk.death 4% · stats [str]</div>
+  <div class="f">upfrontDamage — · costDays —</div>
+ </div>
+ <div class="fgroup"><span class="label">Opzioni & esiti</span>
+  <div class="f">opt1 → CHECK:sc-fornace-str</div>
+  <div class="f">opt2 → CHECK:sc-fornace-per</div>
+  <div class="f">opt3 gated: requiresInfo canto-madre</div>
+  <div class="f">verdictFlavor: bigwin/win/almost/fail/epicfail</div>
+  <div class="f warn">engine-owned routing (nodo legacy): read-only</div>
+ </div>
+</div>
+</div></body></html>
+EOF
+echo ok

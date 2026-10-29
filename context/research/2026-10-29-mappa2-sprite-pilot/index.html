@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Pilota A2 stormo — mappa2 (2026-10-29)</title>
+<style>
+  :root { --bg:#14161c; --panel:#1d2028; --ink:#e8e4da; --dim:#9a958a; --acc:#e0a94e; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:1240px; margin:0 auto; padding:28px 20px 80px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  h2 { font-size:17px; margin:36px 0 10px; color:var(--acc); }
+  .sub { color:var(--dim); margin-bottom:18px; }
+  .card { background:var(--panel); border:1px solid #2a2e38; border-radius:10px; padding:14px; margin:10px 0; }
+  .row { display:flex; gap:14px; flex-wrap:wrap; }
+  .row > * { flex:1 1 0; min-width:260px; }
+  img, canvas { display:block; max-width:100%; border-radius:6px; }
+  .magenta { background:#ff00ff; }
+  .cap { font-size:12.5px; color:var(--dim); margin-top:6px; }
+  table { border-collapse:collapse; width:100%; font-size:13.5px; }
+  th, td { border:1px solid #2a2e38; padding:6px 9px; text-align:left; vertical-align:top; }
+  th { color:var(--acc); }
+  .dec { background:#232a1e; border-left:3px solid var(--acc); padding:10px 14px; border-radius:6px; }
+  .dec b { color:var(--acc); }
+  code { background:#0d0f14; padding:1px 5px; border-radius:4px; font-size:12.5px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Pilota di stile A2 — stormo su mappa2</h1>
+<p class="sub">Gemini web · ref = crop del dipinto · chat <code>d421750996f038c5</code> · niente integrato, attende battesimo.</p>
+
+<div class="dec card">
+  <b>Decisioni richieste — in cima le cose nuove</b><br>
+  1. <b>A5 balena — rig a parti va bene?</b> Giudica silhouette e scala a 60px; poi animazione (coda+pinne).<br>
+  2. A4 sirena — <b>design battezzato ✓</b> (scheda del Director): ciclo 7 pose estratto, sezione 2.<br>
+  3. A3 coda balena — <b>bocciata</b>; A2 stormo — <b>battezzato ✓</b>, strip definitiva da produrre.
+</div>
+
+<h2>1 · A5 — balena ridipinta (open_sea, Rude Beauty)</h2>
+<div class="row">
+  <div class="card"><div class="magenta"><img src="out/a5-whale-v2-0.png"></div>
+    <div class="cap">v2 — balena intera, naso a destra: dorso teal profondo, cirripedi ambrati, sfiatatoio, bordo chiaro dove prende la luce. Ref: <b>mappa intera</b>. (v1 a parti = scartata, montaggio illeggibile).</div></div>
+  <div class="card"><div class="magenta"><img src="out/a5-blow3-0.png"></div>
+    <div class="cap"><b>Strip dorso v3</b> — cupole lisce basse (solo dorso, mai la testa): gobba → dorso fuori con sfiatatoio a V → affonda. La nebbia dello sbuffo NON è nello sprite: è procedurale (mist blob C9, come da piano) perché non chiavabile da magenta senza artefatti. Research: sbuffo vero = nuvola «bushy» di condensa, non fontana.</div></div>
+    <div class="card"><img src="out/a5-blow-cycle.png"><div class="cap">Ciclo sul mare — le pose opache; in animazione il puff procedurale entra sui frame 4–5.</div></div>
+</div>
+<div class="card">
+  <canvas id="bcv" width="1200" height="570" style="width:100%"></canvas>
+  <div class="cap">Mock runtime: evento raro — la gobba emerge, sbuffa, sprofonda. Pausa lunga tra cicli. <button id="btog">pausa/play</button> · taglia: <input id="bsz" type="range" min="30" max="90" value="55" style="width:40%"> <span id="bszv">55px</span></div>
+</div>
+
+<h2>1 · A4 — sirena sullo scoglio (rocky_coast, Rude Beauty) — FORK DESIGN</h2>
+<div class="dec card"><b>Ruling Director (2026-10-29):</b> colori/stile v1 bocciati (troppo fiabesca). <b>Prima si sceglie la creatura, poi l'animazione</b> (serve più frame — la spec arriva a 14 pose). Scegli la variante:</div>
+<div class="row">
+  <div class="card"><div class="magenta"><img src="out/a4-mermaid-v1-0.png"></div><div class="cap"><b>v1</b> — capelli scuri, pelle ambrata, coda teal. <b>BOCCIATA</b> (troppo Disney).</div></div>
+  <div class="card"><div class="magenta"><img src="out/a4-mermaid-vB-0.png"></div><div class="cap"><b>vB</b> — capelli rame-oro, pelle dorata, coda muschio scuro con riflessi bronzo. Calda, da palette terrestre Rude Beauty.</div></div>
+  <div class="card"><div class="magenta"><img src="out/a4-mermaid-vC-0.png"></div><div class="cap"><b>vC</b> — capelli argento-seta, pelle lunare, coda indaco con flecks bioluminescenti e riflesso viola sulla pinna. Creatura di mare profondo, «altra».</div></div>
+</div>
+<div class="card"><img src="out/a4-fork-onrock.png"><div class="cap">Le tre varianti a <b>20px</b> sullo scoglio vero — a quella scala il giudizio pesa silhouette+contrasto; il design si decide sul full-size sopra.</div></div>
+<div class="row">
+  <div class="card"><div class="magenta"><img src="out/a4-mermaid-v5-0.png"></div>
+    <div class="cap"><b>v5 — ARMONIA</b>: rigenerata dopo lo screenshot «adesivo» — capelli grigio-teal, pelle nei toni caldi della roccia, coda teal-bruno = pigmenti della mappa stessa, pennellata più morbida della figura.</div></div>
+  <div class="card"><img src="out/a4-v5-onrock.png"><div class="cap">v5 a <b>20px</b> sul ciglio a filo d'acqua dello scoglio basso + ombra di contatto — ora si fonde col dipinto (forse quasi troppo: valuta se serve un filo più di presenza per l'evento raro).</div></div>
+</div>
+<div class="card"><img src="out/a4-final-cycle.png"><div class="cap"><b>Ciclo finale (design battezzato):</b> emerge → testa+spalle → nuoto → seduta bordo → si pettina → seduta ferma → tuffo coda-su. Estratto dalle strip Gemini (`a4f-pose-1..7`).</div></div>
+<div class="card">
+  <canvas id="fcv" width="1200" height="570" style="width:100%"></canvas>
+  <div class="cap">Mock runtime: evento one-shot arrivo→seduta→tuffo a 24px, acqua-line dello scoglio basso. <button id="ftog">pausa/play</button> · taglia: <input id="fsz" type="range" min="14" max="40" value="24" style="width:40%"> <span id="fszv">24px</span></div>
+</div>
+<div class="card">
+  <canvas id="v5cv" width="900" height="855" style="width:100%"></canvas>
+  <div class="cap"><b>Posiziona v5</b> — taglia:
+    <input id="v5s" type="range" min="10" max="60" value="24" style="width:24%"> <span id="v5sv">24px</span> ·
+    X: <input id="v5x" type="range" min="0" max="100" value="30" style="width:24%"> <span id="v5xv">30%</span> ·
+    Y: <input id="v5y" type="range" min="0" max="100" value="50" style="width:24%"> <span id="v5yv">50%</span> ·
+    <b>mappa: <span id="v5m">–</span></b>
+  </div>
+</div>
+<div class="card">
+  <canvas id="a4mock" width="1350" height="520" style="width:100%"></canvas>
+  <div class="cap">Mock live — le tre varianti sullo scoglio, stessa taglia. <b>Taglia: <input id="a4sz" type="range" min="10" max="48" value="20" style="width:55%"> <span id="a4szv">20px</span></b></div>
+</div>
+<div class="card"><div class="cap">Nota animazione: la strip v2 (6 pose arco) esiste solo in palette v1 — si ridà la strip sulla variante scelta, con più pose (arrivo 4 · seduta 4 · tuffo 6 = 14) per togliere la scattosità.</div></div>
+
+<h2>2 · A3 — coda di balena lontana (mare, Rude Beauty)</h2>
+<div class="row">
+  <div class="card"><div class="magenta"><img src="out/a3-whale-v1-0.png"></div>
+    <div class="cap">Design v1 — pinna blu-grigia, cirripedi, riflessi teal. Vista obliqua.</div></div>
+  <div class="card"><div class="magenta"><img src="out/a3-whale-v3strip-0.png"></div>
+    <div class="cap">Strip v3 — 7 pose emersione→tuffo (chieste 8, Gemini ne dà 7: accettabile per il ciclo, da rifinire in atlante).</div></div>
+</div>
+<div class="card"><img src="out/a3-emerge-cycle-35px.png"><div class="cap">Ciclo completo a <b>35px</b> in fila sul mare (ordinato per lettura, non per posa reale).</div></div>
+<div class="card">
+  <canvas id="a3mock" width="1200" height="330" style="width:100%"></canvas>
+  <div class="cap">Mock live — le 7 pose in fila sul mare, stessa taglia. <b>Taglia: <input id="a3sz" type="range" min="16" max="56" value="35" style="width:55%"> <span id="a3szv">35px</span></b></div>
+</div>
+<div class="row">
+  <div class="card"><img src="out/a3-size-compare.png"><div class="cap">Posa piena a <b>30 / 35 / 40px</b> — tutte leggibili, spec 30–40px confermata.</div></div>
+  <div class="card">
+    <canvas id="whale" width="1200" height="480" style="width:100%"></canvas>
+    <div class="cap">Mock runtime: emersione in un punto, ciclo ~6s, anello d'acqua finto (il vero anello/scie è C9, procedurale). Ferma: <button id="wtog">pausa/play</button> · taglia: <input id="wsz" type="range" min="20" max="50" value="35"> <span id="wszv">35px</span></div>
+  </div>
+</div>
+
+
+<h2>3 · A2 stormo — asset generati</h2>
+<div class="row">
+  <div class="card"><div class="magenta"><img src="out/a2-stormo-v4-0.png" alt="uccello singolo"></div>
+    <div class="cap">Design v4 — passeriforme fantasy: dorso/ali teal, petto ambrato, gola cremisi. Vista ¾.</div></div>
+  <div class="card"><div class="magenta"><img src="out/a2-stormo-v5strip-0.png" alt="strip 6 pose"></div>
+    <div class="cap">Strip v5 — 6 pose vista dall'alto, stesso uccello (edit ancorato nella stessa chat).</div></div>
+</div>
+<div class="card">
+  <div class="cap">Pose ritagliate con alpha (ordine ciclo battito usabile: 1 → 2 → 4 → 5):</div>
+  <div class="magenta" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+    <img src="out/a2-pose-1.png" style="width:15%"><img src="out/a2-pose-2.png" style="width:15%">
+    <img src="out/a2-pose-3.png" style="width:15%"><img src="out/a2-pose-4.png" style="width:15%">
+    <img src="out/a2-pose-5.png" style="width:15%"><img src="out/a2-pose-6.png" style="width:15%">
+  </div>
+</div>
+
+<h2>4 · A2 stormo sulla mappa (mock statico)</h2>
+<div class="row">
+  <div class="card"><img src="out/a2-sticker-test.png"><div class="cap">Pose a <b>14px</b> su patch reali — spec attuale: quasi invisibili.</div></div>
+  <div class="card"><img src="out/a2-size-compare.png"><div class="cap">Stesso uccello a <b>14 / 20 / 26px</b> — leggibile solo da ~20px.</div></div>
+</div>
+<div class="card"><img src="out/a2-flightline-20px.png"><div class="cap">4 pose a <b>20px</b> in fila sul bosco — si legge «qualcosa che vola».</div></div>
+<div class="card">
+  <canvas id="a2mock" width="1200" height="330" style="width:100%"></canvas>
+  <div class="cap">Mock live — stormo di 3 sul bosco+fiume, pose casuali del ciclo. <b>Taglia: <input id="a2sz" type="range" min="8" max="32" value="20" style="width:55%"> <span id="a2szv">20px</span></b></div>
+</div>
+
+<h2>5 · A2 stormo — animazione viva</h2>
+<div class="card">
+  <canvas id="fly" width="1200" height="500" style="width:100%"></canvas>
+  <div class="cap">Mock runtime: 3 uccelli a 20px ciclo 4 pose (~9fps), traiettoria + fasi diverse, ombra morbida sotto. Ferma: <button id="tog">pausa/play</button> · taglia: <input id="sz" type="range" min="10" max="30" value="20"> <span id="szv">20px</span></div>
+</div>
+
+<h2>6 · Note di pipeline</h2>
+<table>
+<tr><th>Cosa</th><th>Esito</th></tr>
+<tr><td>Stile dipinto vs «adesivo»</td><td>PASS — pigmenti saturati nella gamma del dipinto</td></tr>
+<tr><td>Metodo generazione</td><td>lock design (soggetto singolo) → edit ancorato per la strip. Evitare «sprite sheet» (fa concept-sheet con titoli)</td></tr>
+<tr><td>Pose a celle uniformi</td><td>NO — vanno ritagliate per componenti (fatto: a2-pose-*.png)</td></tr>
+<tr><td>Bug runner trovati</td><td>prompt spezzato dagli \n nel composer (inviava solo la prima riga) · locator.first metodo · rilevamento via GENERATED-IMAGE</td></tr>
+<tr><td>Non verificato</td><td>nessuna integrazione runtime — questi sono compositi PIL/canvas, non il lab</td></tr>
+</table>
+</main>
+
+<script>
+const cv = document.getElementById('fly'), g = cv.getContext('2d');
+const map = new Image(); map.src = '/public/assets/world/mappa2/base/layers/base_flat.webp';
+const poses = [1,2,4,5].map(i => { const im = new Image(); im.src = `out/a2-pose-${i}.png`; return im; });
+const CROP = {x:800, y:650, w:600, h:250}; // zona bosco+fiume in px mappa
+let t = 0, run = true, size = 20;
+const birds = [
+  {f:0.0, x:0.15, y:0.45, s:1.0, ph:0},
+  {f:0.0, x:0.05, y:0.55, s:0.85, ph:2},
+  {f:0.0, x:-0.05, y:0.38, s:0.75, ph:4},
+];
+function draw() {
+  g.drawImage(map, CROP.x, CROP.y, CROP.w, CROP.h, 0, 0, cv.width, cv.height);
+  birds.forEach((b, bi) => {
+    const px = (b.x * cv.width + (t * 0.35 * b.s) % (cv.width + 160)) - 80;
+    const py = b.y * cv.height + Math.sin((t * 0.02 + bi) * 2) * 6;
+    const fr = poses[(Math.floor(t * 0.15 + b.ph) % poses.length + poses.length) % poses.length];
+    const w = size * b.s * 2, h = w * (fr.height / fr.width);
+    if (fr.complete && fr.naturalWidth) {
+      // ombra morbida (la farebbe il runtime)
+      g.save(); g.globalAlpha = 0.22; g.fillStyle = '#0a2018';
+      g.beginPath(); g.ellipse(px, py + 26 * b.s, w * 0.32, w * 0.09, 0, 0, 7); g.fill(); g.restore();
+      g.drawImage(fr, px - w / 2, py - h / 2, w, h);
+    }
+  });
+}
+function loop() { if (run) { t++; draw(); } requestAnimationFrame(loop); }
+document.getElementById('tog').onclick = () => { run = !run; };
+document.getElementById('sz').oninput = (e) => { size = +e.target.value; document.getElementById('szv').textContent = size + 'px'; };
+map.onload = draw; loop();
+
+// --- A3 whale tail emerge cycle ---
+const wcv = document.getElementById('whale'), wg = wcv.getContext('2d');
+const wmap = new Image(); wmap.src = '/public/assets/world/mappa2/base/layers/base_flat.webp';
+const wposes = [1,2,3,4,5,6,7].map(i => { const im = new Image(); im.src = `out/a3-pose-${i}.png`; return im; });
+const WCROP = {x:2100, y:780, w:600, h:240};
+let wt = 0, wrun = true, wsize = 35;
+// timeline: poses 1..7 emerge-dive, then pause underwater (alpha 0)
+const CYCLE = 340; // frames
+function wdraw() {
+  wg.drawImage(wmap, WCROP.x, WCROP.y, WCROP.w, WCROP.h, 0, 0, wcv.width, wcv.height);
+  const ph = wt % CYCLE;
+  const wx = wcv.width * 0.55, wy = wcv.height * 0.52;
+  let idx = Math.floor(ph / (CYCLE * 0.7 / wposes.length)); // 70% of cycle = surface
+  const under = idx >= wposes.length;
+  if (!under) {
+    const fr = wposes[Math.min(idx, wposes.length - 1)];
+    if (fr.complete && fr.naturalWidth) {
+      const w = wsize * 2, h = w * (fr.height / fr.width);
+      // anello d'acqua crescente (finto: il vero è C9 runtime)
+      const rp = idx / (wposes.length - 1);
+      wg.save(); wg.strokeStyle = 'rgba(220,255,250,0.5)'; wg.lineWidth = 2;
+      wg.beginPath(); wg.ellipse(wx, wy + 6, (30 + rp * 60) * (wsize / 35), (10 + rp * 20) * (wsize / 35), 0, 0, 7); wg.stroke();
+      wg.globalAlpha = 0.35; wg.beginPath(); wg.ellipse(wx, wy + 6, (55 + rp * 80) * (wsize / 35), (18 + rp * 26) * (wsize / 35), 0, 0, 7); wg.stroke(); wg.restore();
+      wg.drawImage(fr, wx - w / 2, wy - h + 10, w, h);
+    }
+  }
+}
+function wloop() { if (wrun) { wt++; wdraw(); } requestAnimationFrame(wloop); }
+document.getElementById('wtog').onclick = () => { wrun = !wrun; };
+document.getElementById('wsz').oninput = (e) => { wsize = +e.target.value; document.getElementById('wszv').textContent = wsize + 'px'; };
+wmap.onload = wdraw; wloop();
+
+// A4 mermaid: in attesa del ruling sulla variante — strip/animazione si rifanno sul design scelto.
+
+// --- mock con slider di taglia (mappa vera + sprite alle dimensioni reali) ---
+function spr(g, img, cx, yBottom, w) {
+  if (!img.complete || !img.naturalWidth) return;
+  const h = w * (img.height / img.width);
+  g.drawImage(img, cx - w / 2, yBottom - h, w, h);
+}
+// A4: le 3 varianti affiancate sullo scoglio
+const a4m = new Image(); a4m.src = '/public/assets/world/mappa2/base/layers/base_flat.webp';
+const a4imgs = ['a4-v1-cut', 'a4-vB-cut', 'a4-vC-cut'].map(n => { const i = new Image(); i.src = `out/${n}.png`; return i; });
+const a4cv = document.getElementById('a4mock'), a4g = a4cv.getContext('2d'), a4sl = document.getElementById('a4sz');
+function renderA4() {
+  document.getElementById('a4szv').textContent = a4sl.value + 'px';
+  const s = +a4sl.value * 3, tw = a4cv.width / 3;
+  a4imgs.forEach((im, k) => {
+    a4g.drawImage(a4m, 2350, 950, 402, 380, k * tw, 0, tw, a4cv.height);
+    const cx = k * tw + tw * 0.30, yB = a4cv.height * 0.545; // ciglio a filo d'acqua dello scoglio basso
+    if (im.complete && im.naturalWidth) {
+      const h = s * (im.height / im.width);
+      // ombra di contatto sulla roccia (il runtime la calcola; qui mock)
+      a4g.save(); a4g.globalAlpha = 0.3; a4g.fillStyle = '#06222b';
+      a4g.beginPath(); a4g.ellipse(cx - s * 0.12, yB - 2, s * 0.34, s * 0.11, 0, 0, 7); a4g.fill(); a4g.restore();
+      a4g.drawImage(im, cx - s / 2, yB - h, s, h);
+    }
+  });
+}
+a4sl.oninput = renderA4; a4m.addEventListener('load', renderA4); if (a4m.complete) renderA4();
+// A2: stormo di 3 su bosco+fiume
+const a2imgs = ['a2-pose-1', 'a2-pose-3', 'a2-pose-5'].map(n => { const i = new Image(); i.src = `out/${n}.png`; return i; });
+const a2cv = document.getElementById('a2mock'), a2g = a2cv.getContext('2d'), a2sl = document.getElementById('a2sz');
+function renderA2() {
+  document.getElementById('a2szv').textContent = a2sl.value + 'px';
+  const s = +a2sl.value * 2;
+  a2g.drawImage(map, 800, 650, 600, 165, 0, 0, a2cv.width, a2cv.height);
+  a2imgs.forEach((im, k) => spr(a2g, im, a2cv.width * (0.25 + 0.25 * k), a2cv.height * (0.62 - 0.08 * k), s));
+}
+a2sl.oninput = renderA2; map.addEventListener('load', renderA2); if (map.complete) renderA2();
+// A3: 7 pose in fila sul mare
+const a3imgs = [1, 2, 3, 4, 5, 6, 7].map(i => { const m = new Image(); m.src = `out/a3-pose-${i}.png`; return m; });
+const a3cv = document.getElementById('a3mock'), a3g = a3cv.getContext('2d'), a3sl = document.getElementById('a3sz');
+function renderA3() {
+  document.getElementById('a3szv').textContent = a3sl.value + 'px';
+  const s = +a3sl.value * 2;
+  a3g.drawImage(wmap, 2100, 780, 600, 165, 0, 0, a3cv.width, a3cv.height);
+  a3imgs.forEach((im, k) => spr(a3g, im, a3cv.width * (0.08 + 0.14 * k), a3cv.height * 0.62, s));
+}
+a3sl.oninput = renderA3; wmap.addEventListener('load', renderA3); if (wmap.complete) renderA3();
+// A4 v5: posizionamento interattivo (taglia + X + Y, readout in px mappa)
+const v5img = new Image(); v5img.src = 'out/a4-v5-cut.png';
+const v5cv = document.getElementById('v5cv'), v5g = v5cv.getContext('2d');
+const V5CROP = {x: 2350, y: 950, w: 402, h: 380};
+function renderV5() {
+  const s = +document.getElementById('v5s').value * 2.5;
+  const fx = +document.getElementById('v5x').value / 100, fy = +document.getElementById('v5y').value / 100;
+  document.getElementById('v5sv').textContent = Math.round(s / 2.5) + 'px';
+  document.getElementById('v5xv').textContent = document.getElementById('v5x').value + '%';
+  document.getElementById('v5yv').textContent = document.getElementById('v5y').value + '%';
+  v5g.drawImage(a4m, V5CROP.x, V5CROP.y, V5CROP.w, V5CROP.h, 0, 0, v5cv.width, v5cv.height);
+  const cx = fx * v5cv.width, yB = fy * v5cv.height;
+  document.getElementById('v5m').textContent = `x=${Math.round(V5CROP.x + fx * V5CROP.w)} y=${Math.round(V5CROP.y + fy * V5CROP.h)}`;
+  if (v5img.complete && v5img.naturalWidth) {
+    const h = s * (v5img.height / v5img.width);
+    v5g.save(); v5g.globalAlpha = 0.3; v5g.fillStyle = '#06222b';
+    v5g.beginPath(); v5g.ellipse(cx - s * 0.1, yB - 2, s * 0.34, s * 0.1, 0, 0, 7); v5g.fill(); v5g.restore();
+    v5g.drawImage(v5img, cx - s / 2, yB - h, s, h);
+  }
+}
+['v5s', 'v5x', 'v5y'].forEach(id => document.getElementById(id).oninput = renderV5);
+a4m.addEventListener('load', renderV5); v5img.addEventListener('load', renderV5);
+if (a4m.complete && v5img.complete) renderV5();
+// A4 FINAL: ciclo evento one-shot sulle pose estratte (design battezzato)
+const fposes = [1,2,3,4,5,6,7].map(i => { const im = new Image(); im.src = `out/a4f-pose-${i}.png`; return im; });
+const fcv = document.getElementById('fcv'), fg = fcv.getContext('2d');
+let ft = 0, frun = true;
+document.getElementById('ftog').onclick = () => { frun = !frun; };
+document.getElementById('fsz').oninput = () => {};
+const FCYC = 560;
+function fdraw() {
+  document.getElementById('fszv').textContent = document.getElementById('fsz').value + 'px';
+  const s = +document.getElementById('fsz').value * 2.5;
+  fg.drawImage(a4m, V5CROP.x, V5CROP.y, V5CROP.w, V5CROP.h, 0, 0, fcv.width, fcv.height);
+  const ph = ft % FCYC;
+  const seq = [0,0,1,1,2,2,3,3,4,4,4,4,4,4,5,5,6,6,6,6]; // 4-5 = seduta lunga
+  const idx = ph < seq.length * 12 ? seq[Math.floor(ph / 12)] : -1;
+  if (idx >= 0) {
+    const fr = fposes[idx];
+    if (fr.complete && fr.naturalWidth) {
+      const w = s, h = s * (fr.height / fr.width);
+      // pose 0-2 in acqua a sx; 3-5 sul ciglio; 6 tuffo in acqua a dx dello scoglio
+      const px = idx < 3 ? fcv.width * 0.30 : idx < 6 ? fcv.width * 0.38 : fcv.width * 0.48;
+      const py = idx < 3 || idx === 6 ? fcv.height * 0.56 : fcv.height * 0.50;
+      if (idx === 0 || idx === 6) {
+        fg.save(); fg.strokeStyle = 'rgba(220,255,250,0.5)'; fg.lineWidth = 2;
+        fg.beginPath(); fg.ellipse(px, py + 6, 26 * s / 60, 9 * s / 60, 0, 0, 7); fg.stroke(); fg.restore();
+      }
+      fg.drawImage(fr, px - w / 2, py - h + 8, w, h);
+    }
+  }
+}
+function floop() { if (frun) { ft++; fdraw(); } requestAnimationFrame(floop); }
+a4m.addEventListener('load', fdraw); floop();
+// A5: evento emersione+sbuffo (rare one-shot)
+const bposes = [1,2,3,4,5].map(i => { const im = new Image(); im.src = `out/a5b-pose-${i}.png`; return im; });
+const bcv = document.getElementById('bcv'), bg = bcv.getContext('2d');
+let bt = 0, brun = true;
+document.getElementById('btog').onclick = () => { brun = !brun; };
+const BCYC = 520;
+function bdraw() {
+  document.getElementById('bszv').textContent = document.getElementById('bsz').value + 'px';
+  const s = +document.getElementById('bsz').value * 2;
+  bg.drawImage(wmap, 2100, 780, 600, 285, 0, 0, bcv.width, bcv.height);
+  const ph = bt % BCYC;
+  const seq = [0,0,1,1,2,2,2,3,3,4,4,4,4,4]; // cresta bassa: emerge → fuori → sbuffo → affonda
+  const idx = ph < seq.length * 14 ? seq[Math.floor(ph / 14)] : -1;
+  if (idx >= 0) {
+    const fr = bposes[idx];
+    if (fr.complete && fr.naturalWidth) {
+      const w = s, h = s * (fr.height / fr.width);
+      const px = bcv.width * 0.55, py = bcv.height * 0.52;
+      // anello d'acqua quando emerge
+      if (idx <= 2) {
+        bg.save(); bg.strokeStyle = 'rgba(220,255,250,0.45)'; bg.lineWidth = 2;
+        bg.beginPath(); bg.ellipse(px, py + 4, (20 + idx * 14) * s / 110, (7 + idx * 5) * s / 110, 0, 0, 7); bg.stroke(); bg.restore();
+      }
+      bg.drawImage(fr, px - w / 2, py - h + 16, w, h);
+      // nebbia dello sbuffo PROCEDURALE (runtime userà mist_blob C9) — puff che sale, si allarga, deriva
+      const mist = {3: {r: 0.9, dr: 10, a: 0.55}, 4: {r: 1.5, dr: 34, a: 0.32}}[idx];
+      if (mist) {
+        bg.save();
+        for (let q = 0; q < 5; q++) {
+          const rr = (18 + q * 14) * mist.r * s / 110;
+          bg.globalAlpha = mist.a * (1 - q * 0.16);
+          bg.fillStyle = '#e2eef2';
+          bg.beginPath();
+          bg.ellipse(px + mist.dr * s / 110 + q * 6, py - h + 6 - q * 10 * mist.r, rr, rr * 0.7, 0, 0, 7);
+          bg.fill();
+        }
+        bg.restore();
+      }
+    }
+  }
+}
+function bloop() { if (brun) { bt++; bdraw(); } requestAnimationFrame(bloop); }
+document.getElementById('bsz').oninput = bdraw;
+wmap.addEventListener('load', bdraw); bloop();
+</script>
+</body>
+</html>

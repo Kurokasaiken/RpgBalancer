@@ -1,0 +1,5 @@
+That's an environment tileset — wrong deliverable. What I need is an ANIMATION STRIP of a SINGLE creature, not tiles.
+
+Same painted style and palette as the reference. Paint: one small fantasy songbird — a plump passerine with a teal-green back and wings, a warm amber breast, one small crimson throat fleck — shown in ONE horizontal row of exactly 6 poses: the SAME bird, identical size, evenly spaced on a single line, in horizontal flight toward the RIGHT, viewed from a high oblique aerial angle (about 45 degrees — we see its back and the top of its wings, never a side profile). The 6 poses are one wingbeat cycle: wings raised high, wings up-mid, wings level, wings down-mid, wings fully down, wings level.
+
+Flat solid magenta #FF00FF background edge to edge. No text, no labels, no grid, no borders, no tiles, no trees, no rocks, no scenery, no shadows, no other objects — only the 6 bird poses on magenta.

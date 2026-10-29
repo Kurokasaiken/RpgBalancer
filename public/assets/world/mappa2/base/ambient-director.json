@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "canvas": [
+    2752,
+    1536
+  ],
+  "seed": "mappa2-v1",
+  "maskDigest": "a4dd2142300915c69b64b4ec2c8eee74e32334085a231e118b41a1f08f8dd835",
+  "constants": {
+    "cellPx": 64,
+    "coastPx": [
+      85.0,
+      160.0
+    ],
+    "poissonPx": 300.0,
+    "maxRadiusPx": 55.0,
+    "maxTravelPx": 96.0,
+    "alpha": 0.22,
+    "deltaLBand": [
+      2.0,
+      6.0
+    ],
+    "tintRows": [
+      {
+        "id": "deepTeal",
+        "lStar": 28.0
+      },
+      {
+        "id": "shallowTeal",
+        "lStar": 24.0
+      },
+      {
+        "id": "slate",
+        "lStar": 32.0
+      },
+      {
+        "id": "paleTeal",
+        "lStar": 36.0
+      }
+    ]
+  },
+  "zones": [
+    {
+      "id": "shoal-z-13-1",
+      "family": "shoal",
+      "biome": "open_sea",
+      "cell": 64,
+      "cells": [
+        [
+          2208,
+          224,
+          1.0
+        ]
+      ],
+      "heading": [
+        0.707,
+        -0.707
+      ],
+      "maxTravelPx": 96.0,
+      "coastPx": 103.3,
+      "paintL": 53.5,
+      "tintRow": "deepTeal",
+      "deltaL": 5.61
+    },
+    {
+      "id": "shoal-z-14-5",
+      "family": "shoal",
+      "biome": "open_sea",
+      "cell": 64,
+      "cells": [
+        [
+          2336,
+          928,
+          1.0
+        ]
+      ],
+      "heading": [
+        0.981,
+        0.193
+      ],
+      "maxTravelPx": 96.0,
+      "coastPx": 88.8,
+      "paintL": 52.6,
+      "tintRow": "deepTeal",
+      "deltaL": 5.41
+    },
+    {
+      "id": "shoal-z-9-8",
+      "family": "shoal",
+      "biome": "coral_reef",
+      "cell": 64,
+      "cells": [
+        [
+          1504,
+          1312,
+          1.0
+        ]
+      ],
+      "heading": [
+        0.603,
+        0.797
+      ],
+      "maxTravelPx": 96.0,
+      "coastPx": 100.4,
+      "paintL": 54.5,
+      "tintRow": "deepTeal",
+      "deltaL": 5.83
+    }
+  ],
+  "exclusions": [
+    {
+      "type": "foam",
+      "dilatePx": 24
+    },
+    {
+      "type": "waterfall",
+      "dilatePx": 24
+    },
+    {
+      "type": "waterfallImpact",
+      "dilatePx": 24
+    },
+    {
+      "type": "waterfallBasin",
+      "dilatePx": 24
+    },
+    {
+      "type": "riverFlow",
+      "dilatePx": 24
+    },
+    {
+      "type": "confluences",
+      "bufferPx": 40,
+      "count": 6
+    }
+  ],
+  "routes": [],
+  "generatedFrom": {
+    "sourceSha256": "e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a",
+    "artifact": "ambient-director artifact-r003"
+  }
+}

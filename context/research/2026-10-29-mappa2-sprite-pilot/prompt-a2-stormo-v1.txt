@@ -1,0 +1,13 @@
+Using the attached image — a crop of a painted fantasy world map — for STYLE, PALETTE, PAINTING TECHNIQUE and CAMERA ANGLE only, create a game sprite sheet.
+
+SUBJECT: one small fantasy songbird — a plump passerine with a teal-green back and wings, a warm amber breast, and one small crimson throat fleck — plumage drawn from the map's own palette.
+
+SHEET LAYOUT: a single horizontal strip of exactly 6 equal cells in one row, the same bird at identical size in every cell. Each cell shows the bird in horizontal flight toward the RIGHT, seen from the same high oblique aerial angle as the map (about 45 degrees, three-quarter top view — we see its back and the top of its wings, never a flat side profile). The 6 cells are one full wingbeat cycle: wings raised high, wings up-mid, wings level, wings down-mid, wings fully down, wings level again. The body stays level; only the wings change position. Cells evenly spaced, no borders, no grid, no numbers.
+
+BACKGROUND: flat solid magenta #FF00FF filling the whole canvas edge to edge. No gradient, no scenery, no ground, no shadow — the runtime adds shadows later.
+
+STYLE: same painted technique as the reference — visible painterly brushwork, soft impasto edges, saturated pigments, light from the upper-left like the map. NOT anime, NOT cel shading, NO black outline, NOT pixel art, NOT photoreal.
+
+KILL LIST: no text, no signatures, no watermarks, no frame borders, no cast shadows, no scenery, no extra birds, no side-profile view, no background other than solid magenta.
+
+One image, horizontal strip, 6 cells.

@@ -423,64 +423,64 @@
     {
       "id": "internal_water_01",
       "type": "internal_water",
-      "x": 1322,
-      "y": 496,
+      "x": 170,
+      "y": 916,
       "confidence": 0.004,
       "source": "auto"
     },
     {
       "id": "internal_water_02",
       "type": "internal_water",
-      "x": 1035,
-      "y": 917,
+      "x": 1349,
+      "y": 580,
       "confidence": 0.004,
       "source": "auto"
     },
     {
       "id": "internal_water_03",
       "type": "internal_water",
-      "x": 125,
-      "y": 983,
+      "x": 1421,
+      "y": 316,
       "confidence": 0.004,
       "source": "auto"
     },
     {
       "id": "internal_water_04",
       "type": "internal_water",
-      "x": 892,
-      "y": 681,
+      "x": 1734,
+      "y": 882,
       "confidence": 0.004,
       "source": "auto"
     },
     {
       "id": "internal_water_05",
       "type": "internal_water",
-      "x": 30,
-      "y": 1413,
+      "x": 1030,
+      "y": 929,
       "confidence": 0.004,
       "source": "auto"
     },
     {
       "id": "internal_water_06",
       "type": "internal_water",
-      "x": 1309,
-      "y": 228,
+      "x": 1093,
+      "y": 672,
       "confidence": 0.004,
       "source": "auto"
     },
     {
       "id": "internal_water_07",
       "type": "internal_water",
-      "x": 263,
-      "y": 1368,
+      "x": 1660,
+      "y": 652,
       "confidence": 0.004,
       "source": "auto"
     },
     {
       "id": "internal_water_08",
       "type": "internal_water",
-      "x": 2698,
-      "y": 357,
+      "x": 1517,
+      "y": 951,
       "confidence": 0.004,
       "source": "auto"
     }

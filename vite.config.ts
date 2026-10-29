@@ -226,7 +226,7 @@ function hudTuningDefaultsPlugin(): Plugin {
  */
 function mappa2LabDefaultsPlugin(): Plugin {
   const TARGET = path.resolve(dirname, 'src/pages/mappa2-lab.tsx');
-  const NUMERIC_KEYS = ['wonderEveryS', 'forestSway', 'cloudOpacityScale', 'cloudTintAmount', 'seaTone', 'seaLineOpacity', 'foamStrength', 'waterfallOn', 'waterfallFlowSpeed', 'waterfallFlowStrength', 'waterfallMist', 'waterfallRipples', 'waterfallFoam', 'waterfallPainted', 'landLifeOn', 'landLifeLeaves', 'landLifeMotes', 'landLifeFlutter', 'landLifeSpeed', 'landLifeOpacity'] as const;
+  const NUMERIC_KEYS = ['wonderEveryS', 'forestSway', 'cloudOpacityScale', 'cloudTintAmount', 'seaTone', 'seaLineOpacity', 'foamStrength', 'waterfallOn', 'waterfallFlowSpeed', 'waterfallFlowStrength', 'waterfallMist', 'waterfallRipples', 'waterfallFoam', 'waterfallPainted', 'waterfallFlipFps', 'waterfallSplash', 'waterfallRainbow', 'waterfallRainbowEveryS', 'swRiversOn', 'swRiverFlowSpeed', 'swBasinPosesPerS', 'swSeaPatchPosesPerS', 'swDeltaSeaPosesPerS', 'swRiverFlowStrength', 'swLakeShimmer', 'swConfluenceFoam', 'ambOn', 'ambIntensity', 'ambProb', 'ambAlpha', 'ambRare', 'landLifeOn', 'landLifeLeaves', 'landLifeMotes', 'landLifeFlutter', 'landLifeSpeed', 'landLifeOpacity'] as const;
   const COLOR_KEYS = ['seaLineColor', 'foamColor'] as const;
 
   return {

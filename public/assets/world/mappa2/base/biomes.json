@@ -5,174 +5,247 @@
   },
   "biomes": [
     {
-      "id": "snow_peaks",
+      "id": "alpine",
       "index": 1,
-      "nameKey": "world.region.snow_peaks",
-      "label": "Vette Innevate e Ghiacciaio",
-      "center": [
-        0.5223,
-        0.1178
-      ],
+      "nameKey": "world.biome.alpine",
+      "label": "Alpino e Ghiacciai",
+      "kind": "land",
+      "areaFraction": 0.0485,
       "bounds": {
-        "x": 760,
-        "y": 0,
-        "width": 1341,
-        "height": 391
+        "x": 916,
+        "y": 44,
+        "width": 901,
+        "height": 545
       },
-      "areaFraction": 0.1085
+      "regions": [
+        "snow_peaks"
+      ]
     },
     {
-      "id": "waterfall_plateau",
+      "id": "highland",
       "index": 2,
-      "nameKey": "world.region.waterfall_plateau",
-      "label": "Altopiano della Cascata e Lago Alpino",
-      "center": [
-        0.4602,
-        0.2899
-      ],
+      "nameKey": "world.biome.highland",
+      "label": "Altopiano e Lago Alpino",
+      "kind": "land",
+      "areaFraction": 0.0275,
       "bounds": {
-        "x": 850,
-        "y": 270,
-        "width": 831,
-        "height": 351
+        "x": 1082,
+        "y": 250,
+        "width": 419,
+        "height": 397
       },
-      "areaFraction": 0.0626
+      "regions": [
+        "waterfall_plateau"
+      ]
     },
     {
-      "id": "western_forest",
+      "id": "temperate_forest",
       "index": 3,
-      "nameKey": "world.region.western_forest",
-      "label": "Foresta Densa",
-      "center": [
-        0.2303,
-        0.4147
-      ],
+      "nameKey": "world.biome.temperate_forest",
+      "label": "Foresta",
+      "kind": "land",
+      "areaFraction": 0.0706,
       "bounds": {
-        "x": 260,
-        "y": 300,
-        "width": 741,
-        "height": 661
+        "x": 69,
+        "y": 5,
+        "width": 2683,
+        "height": 1357
       },
-      "areaFraction": 0.107
+      "regions": [
+        "waterfall_plateau",
+        "ridge_forest",
+        "deep_forest",
+        "river_meadows",
+        "bayou",
+        "nw_archipelago",
+        "east_cliffs"
+      ]
     },
     {
-      "id": "bayou",
+      "id": "meadow",
       "index": 4,
-      "nameKey": "world.region.bayou",
-      "label": "Bayou/Palude di Mangrovie",
-      "center": [
-        0.2169,
-        0.7292
-      ],
+      "nameKey": "world.biome.meadow",
+      "label": "Prateria",
+      "kind": "land",
+      "areaFraction": 0.0288,
       "bounds": {
-        "x": 160,
-        "y": 860,
-        "width": 861,
-        "height": 521
+        "x": 848,
+        "y": 212,
+        "width": 1131,
+        "height": 1077
       },
-      "areaFraction": 0.0905
+      "regions": [
+        "river_meadows",
+        "bayou"
+      ]
     },
     {
-      "id": "central_valley",
+      "id": "red_badlands",
       "index": 5,
-      "nameKey": "world.region.central_valley",
-      "label": "Valle Fluviale e Praterie Centrali",
-      "center": [
-        0.5033,
-        0.5353
-      ],
+      "nameKey": "world.biome.red_badlands",
+      "label": "Deserto e Canyon Rossi",
+      "kind": "land",
+      "areaFraction": 0.0689,
       "bounds": {
-        "x": 980,
-        "y": 560,
-        "width": 831,
-        "height": 521
+        "x": 1562,
+        "y": 174,
+        "width": 710,
+        "height": 1154
       },
-      "areaFraction": 0.1
+      "regions": [
+        "red_desert",
+        "red_canyons",
+        "volcanic_massif"
+      ]
     },
     {
-      "id": "dry_steppe",
+      "id": "volcanic",
       "index": 6,
-      "nameKey": "world.region.dry_steppe",
-      "label": "Steppe Aride",
-      "center": [
-        0.7233,
-        0.3282
-      ],
+      "nameKey": "world.biome.volcanic",
+      "label": "Vulcanico",
+      "kind": "land",
+      "areaFraction": 0.0608,
       "bounds": {
-        "x": 1620,
-        "y": 290,
-        "width": 711,
-        "height": 431
+        "x": 1532,
+        "y": 593,
+        "width": 1220,
+        "height": 943
       },
-      "areaFraction": 0.0647
+      "regions": [
+        "red_canyons",
+        "volcanic_massif",
+        "se_volcanic_isles"
+      ]
     },
     {
-      "id": "red_canyons",
+      "id": "mangrove_bayou",
       "index": 7,
-      "nameKey": "world.region.red_canyons",
-      "label": "Canyon Rossi e Arco Naturale",
-      "center": [
-        0.8489,
-        0.5709
-      ],
+      "nameKey": "world.biome.mangrove_bayou",
+      "label": "Bayou e Mangrovie",
+      "kind": "land",
+      "areaFraction": 0.0168,
       "bounds": {
-        "x": 2040,
-        "y": 610,
-        "width": 611,
-        "height": 521
+        "x": 878,
+        "y": 855,
+        "width": 564,
+        "height": 461
       },
-      "areaFraction": 0.0709
+      "regions": [
+        "bayou"
+      ]
     },
     {
-      "id": "volcanic_massif",
+      "id": "tropical_beach",
       "index": 8,
-      "nameKey": "world.region.volcanic_massif",
-      "label": "Massiccio Vulcanico Nero",
-      "center": [
-        0.816,
-        0.8417
-      ],
-      "bounds": {
-        "x": 1810,
-        "y": 1030,
-        "width": 891,
-        "height": 506
-      },
-      "areaFraction": 0.1
-    },
-    {
-      "id": "coral_lagoon",
-      "index": 9,
-      "nameKey": "world.region.coral_lagoon",
-      "label": "Laguna Corallina",
-      "center": [
-        0.4868,
-        0.8387
-      ],
-      "bounds": {
-        "x": 820,
-        "y": 1050,
-        "width": 1011,
-        "height": 486
-      },
-      "areaFraction": 0.1105
-    },
-    {
-      "id": "western_archipelago",
-      "index": 10,
-      "nameKey": "world.region.western_archipelago",
-      "label": "Arcipelago e Atollo",
-      "center": [
-        0.0738,
-        0.6195
-      ],
+      "nameKey": "world.biome.tropical_beach",
+      "label": "Spiaggia Tropicale",
+      "kind": "land",
+      "areaFraction": 0.0493,
       "bounds": {
         "x": 0,
-        "y": 610,
-        "width": 421,
-        "height": 671
+        "y": 389,
+        "width": 2235,
+        "height": 1147
       },
-      "areaFraction": 0.064
+      "regions": [
+        "bayou",
+        "sandy_coast",
+        "west_atoll"
+      ]
+    },
+    {
+      "id": "tropical_isles",
+      "index": 9,
+      "nameKey": "world.biome.tropical_isles",
+      "label": "Isole Tropicali",
+      "kind": "land",
+      "areaFraction": 0.0652,
+      "bounds": {
+        "x": 0,
+        "y": 20,
+        "width": 1536,
+        "height": 1370
+      },
+      "regions": [
+        "green_islet",
+        "nw_archipelago",
+        "west_atoll"
+      ]
+    },
+    {
+      "id": "rocky_coast",
+      "index": 10,
+      "nameKey": "world.biome.rocky_coast",
+      "label": "Scogliere",
+      "kind": "land",
+      "areaFraction": 0.0541,
+      "bounds": {
+        "x": 57,
+        "y": 0,
+        "width": 2695,
+        "height": 1344
+      },
+      "regions": [
+        "snow_peaks",
+        "east_cliffs"
+      ]
+    },
+    {
+      "id": "coral_reef",
+      "index": 11,
+      "nameKey": "world.biome.coral_reef",
+      "label": "Barriera Corallina",
+      "kind": "sea",
+      "areaFraction": 0.1303,
+      "bounds": {
+        "x": 488,
+        "y": 809,
+        "width": 1573,
+        "height": 727
+      },
+      "regions": [
+        "coral_lagoon"
+      ]
+    },
+    {
+      "id": "shallow_waters",
+      "index": 12,
+      "nameKey": "world.biome.shallow_waters",
+      "label": "Acque Basse",
+      "kind": "sea",
+      "areaFraction": 0.2984,
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 2752,
+        "height": 1536
+      },
+      "regions": [
+        "sea_west",
+        "sea_north",
+        "sea_east",
+        "sea_south"
+      ]
+    },
+    {
+      "id": "open_sea",
+      "index": 13,
+      "nameKey": "world.biome.open_sea",
+      "label": "Mare Aperto",
+      "kind": "sea",
+      "areaFraction": 0.0808,
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 2752,
+        "height": 1536
+      },
+      "regions": [
+        "sea_west",
+        "sea_north",
+        "sea_east",
+        "sea_south"
+      ]
     }
   ]
 }

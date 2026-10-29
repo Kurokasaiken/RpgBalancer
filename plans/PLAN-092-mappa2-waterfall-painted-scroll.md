@@ -94,3 +94,33 @@ overlay interior-only (inner-inset doppio: mask + skew margin).
 ## Implementation log
 
 _(vuoto — piano nato dal dibattito, in attesa di battesimo)_
+
+## Avanzamento 2026-10-29 — splash, mist e arcobaleno (Director)
+
+- **Splash**: 3 anelli di schiuma che si allargano dal punto d'impatto (appiattiti 0.42x) + fino a 9 spruzzi parabolici; slider "impact splash" (0-1).
+- **Mist**: pool 7→12 sprite, sale di ~34px (era 18), alpha max 0.32 (era 0.26).
+- **Arcobaleno**: evento raro, arco additivo ('screen') su texture canvas procedurale (nessun asset), piedi sfumati; entra 3.5s, tiene 7s, esce 5s; intervallo medio `rainbowEveryS` (default 150s, attesa 0.6x-1.4x), intensita `rainbow` (default 0.7). Bottone "Trigger rainbow" nel lab, come l'evento marino. Indipendente dal giorno/notte (ciclo tolto dal Director). Con reduced-motion non compare.
+- Goccioline laterali: restano spente (`i >= 0` nel tick); da rivalutare dal vivo.
+- Suono (rombo): non fatto — deciso dal Director solo se zoomato; manca la scelta tra sintesi WebAudio e asset registrato.
+
+## Avanzamento 2026-10-29 — dieta texture (Director: «ritagliare quelle grandi quanto la mappa»)
+
+Misura con intercettazione degli upload WebGL (headless Metal, movimento normale):
+- **In GPU** finiscono solo `base_flat.nocanopy`, `Mare`, `sea_mask`, `coast_distance` (2752x1536) + `Foreground` + `sea_pattern_tile` (2048x1448). `region_ids`, `waterfall_mask` e il doppione di `base_flat` venivano decodificati (RAM) ma mai caricati in GPU: il contatore del lab li contava come GPU.
+- Contatore del lab: 212 MB → 132 MB (texture uniche, stesso schema di stima: x1.33 mipmap).
+- Tagli fatti: (1) `Foreground.webp` a striscia 2752x418 con `rect` di livello (pipeline `build-mappa2-assets.py`; −12 MB in GPU reale); (2) `waterfall_mask` + ricarica di `base_flat` non più create se esistono le pose del flipbook (la mesh shader non è mai mostrata); (3) `region_ids.png` letta con `fetch`+`createImageBitmap` (nessuna texture Pixi), 1 byte per pixel, canvas di lettura rilasciato — 0 pixel diversi su 2752x1536 (20 id).
+- Scartato: «nocanopy a patch» — con la canopy attiva `nocanopy` sostituisce `base_flat`, non si somma.
+- `load()` ora conta le texture uniche ed espone `window.__pixiTextureReport()` (seam dev/test).
+- Test permanente: `tests/unit/idleVillage/mappa2ForegroundCrop.test.ts`.
+- Da valutare a occhio (restano i veri consumi in GPU): `sea_mask`, `coast_distance`, `Mare` a metà risoluzione; texture compresse KTX2.
+
+## Avanzamento 2026-10-29 — fluidità della cascata (Director: «frame rate troppo basso»)
+
+Dalla registrazione schermo del Director (60 fps): la cascata cambiava 13,6 volte/s (23% dei fotogrammi) con distanze di 1-7 fotogrammi tra un cambio e l'altro → a scatti.
+Fix: 24 pose (`FLIP_N` 8→24, passi 3x più piccoli, stesso spostamento per ciclo) + dissolvenza tra pose consecutive nel runtime (secondo `Sprite` sulla posa successiva con alpha = frazione dell'orologio); default `flipFps` 14→42 (stessa velocità apparente), slider 6-90 pose/s. Misura nel runtime WebGL: 149/149 fotogrammi cambiano a 60 fps, regolari (p10 0.94, mediana 1.13, p90 1.43).
+
+## Avanzamento 2026-10-29 — bacino della cascata (Director: «linee bianche ferme nel bacino», velocità scelta da lui)
+
+- Gli archi bianchi nel bacino sono dipinti nell'immagine di base: restano fermi. Ora l'acqua del bacino (maschera del bacino ∩ acqua interna) ha 8 pose che si espandono dal punto d'impatto (stessa ricetta dei fiumi, direzione radiale). Contratto in `secondary-water.json` → `basin.flowPoses` (schema opzionale).
+- Runtime: sprite a dissolvenza tra pose consecutive; velocità = slider **falls basin speed** nel tab Water, poses/s, 0–20, default 4 (lento). Misura nel runtime: slider 0 → fermo; 4 → ~4–5 cambi/s; 12 → ~12 cambi/s.
+- Da verificare dal vivo, da zoomato: a vista d'insieme il bacino è piccolo.

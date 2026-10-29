@@ -89,6 +89,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idl
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
 const QuestS1LabPage = lazy(() => import('./ui/idleVillage/pages/QuestS1LabPage'));
 const QuestGenerationLabPage = lazy(() => import('./ui/idleVillage/pages/QuestGenerationLabPage'));
+const QuestEditorPage = lazy(() => import('./ui/idleVillage/pages/QuestEditorPage'));
 const MacroGameplayLabPage = lazy(() => import('./ui/idleVillage/pages/MacroGameplayLabPage'));
 const GoblinEventLabPage = lazy(() => import('./ui/idleVillage/pages/GoblinEventLabPage').then(m => ({ default: m.GoblinEventLabPage })));
 const QuestWindowLabPage = lazy(() => import('./ui/idleVillage/pages/QuestWindowLabPage'));
@@ -318,6 +319,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/goblin-event-lab';
   const isQuestWindowLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/quest-window-lab';
+  const isQuestEditorPath =
+    typeof window !== 'undefined' && window.location.pathname === '/quest-editor';
   const isTheaterLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/theater-lab';
   const isRootPath =
@@ -1165,6 +1168,16 @@ function App() {
       <ErrorBoundary componentName="Quest Generation Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Generation Lab…</div>}>
           <QuestGenerationLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isQuestEditorPath) {
+    return (
+      <ErrorBoundary componentName="Quest Editor Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Editor…</div>}>
+          <QuestEditorPage />
         </Suspense>
       </ErrorBoundary>
     );

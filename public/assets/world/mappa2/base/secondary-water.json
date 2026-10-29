@@ -1,7 +1,7 @@
 {
   "generatedFrom": "PLAN-095 authored corridors + local candidates",
   "sourceSha256": "e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a",
-  "geometrySha256": "c55c39cfe9a6750d06d221b1871b7a2bc94d2658bdd16933558cbe545f3471cc",
+  "geometrySha256": "4d056c4be750333529682a6508a6ef8b2751ac72c60e59bbb3683621b091524d",
   "waterfallFlowPolygonSha256": "69ee8cc081a071bc1887016bd53ee2b91cbd2179e9b2a2855480939f91a0c460",
   "riverFlowTile": "fx/water/river_flow_tile.webp",
   "riverFlowTileSha256": "90ed4336dce93d870fe124adb41b8ba65b217a82e397745d0b1f9a07eedfda3c",
@@ -330,7 +330,892 @@
           "length": 36.6,
           "width": 26.0
         }
-      ]
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/river_central_f0.webp",
+          "fx/water/river_central_f1.webp",
+          "fx/water/river_central_f2.webp",
+          "fx/water/river_central_f3.webp",
+          "fx/water/river_central_f4.webp",
+          "fx/water/river_central_f5.webp",
+          "fx/water/river_central_f6.webp",
+          "fx/water/river_central_f7.webp"
+        ],
+        "rect": {
+          "x": 1148,
+          "y": 581,
+          "width": 367,
+          "height": 383
+        }
+      }
+    },
+    {
+      "id": "river_east_tributary",
+      "enabled": true,
+      "tint": "#8fd8e2",
+      "glintPoints": [
+        {
+          "x": 1451,
+          "y": 1013
+        },
+        {
+          "x": 1547,
+          "y": 954
+        }
+      ],
+      "safePolygons": [
+        [
+          [
+            1620.0,
+            926.0
+          ],
+          [
+            1614.0,
+            924.0
+          ],
+          [
+            1594.0,
+            925.0
+          ],
+          [
+            1583.0,
+            920.0
+          ],
+          [
+            1567.0,
+            921.0
+          ],
+          [
+            1541.0,
+            930.0
+          ],
+          [
+            1528.0,
+            938.0
+          ],
+          [
+            1502.0,
+            944.0
+          ],
+          [
+            1490.0,
+            944.0
+          ],
+          [
+            1479.0,
+            936.0
+          ],
+          [
+            1470.0,
+            935.0
+          ],
+          [
+            1464.0,
+            940.0
+          ],
+          [
+            1465.0,
+            951.0
+          ],
+          [
+            1460.0,
+            954.0
+          ],
+          [
+            1460.0,
+            963.0
+          ],
+          [
+            1441.0,
+            972.0
+          ],
+          [
+            1445.0,
+            977.0
+          ],
+          [
+            1445.0,
+            988.0
+          ],
+          [
+            1436.0,
+            993.0
+          ],
+          [
+            1481.0,
+            1013.0
+          ],
+          [
+            1498.0,
+            981.0
+          ],
+          [
+            1512.0,
+            970.0
+          ],
+          [
+            1525.0,
+            965.0
+          ],
+          [
+            1523.0,
+            957.0
+          ],
+          [
+            1556.0,
+            950.0
+          ],
+          [
+            1555.0,
+            936.0
+          ],
+          [
+            1559.0,
+            931.0
+          ],
+          [
+            1571.0,
+            927.0
+          ],
+          [
+            1606.0,
+            929.0
+          ]
+        ],
+        [
+          [
+            1734.0,
+            878.0
+          ],
+          [
+            1726.0,
+            883.0
+          ],
+          [
+            1711.0,
+            885.0
+          ],
+          [
+            1729.0,
+            884.0
+          ]
+        ]
+      ],
+      "segments": [
+        {
+          "cx": 1697.5,
+          "cy": 897.0,
+          "angleRad": 2.7611,
+          "length": 81.8,
+          "width": 12.0
+        },
+        {
+          "cx": 1625.0,
+          "cy": 919.5,
+          "angleRad": 2.9305,
+          "length": 72.8,
+          "width": 11.0
+        },
+        {
+          "cx": 1565.0,
+          "cy": 931.0,
+          "angleRad": 2.9829,
+          "length": 53.5,
+          "width": 35.0
+        },
+        {
+          "cx": 1520.0,
+          "cy": 940.5,
+          "angleRad": 2.8732,
+          "length": 50.0,
+          "width": 35.0
+        },
+        {
+          "cx": 1490.0,
+          "cy": 953.5,
+          "angleRad": 2.4981,
+          "length": 46.2,
+          "width": 61.0
+        },
+        {
+          "cx": 1474.0,
+          "cy": 969.5,
+          "angleRad": 2.1855,
+          "length": 34.7,
+          "width": 55.0
+        },
+        {
+          "cx": 1463.0,
+          "cy": 989.0,
+          "angleRad": 1.9974,
+          "length": 30.0,
+          "width": 62.0
+        }
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/river_east_tributary_f0.webp",
+          "fx/water/river_east_tributary_f1.webp",
+          "fx/water/river_east_tributary_f2.webp",
+          "fx/water/river_east_tributary_f3.webp",
+          "fx/water/river_east_tributary_f4.webp",
+          "fx/water/river_east_tributary_f5.webp",
+          "fx/water/river_east_tributary_f6.webp",
+          "fx/water/river_east_tributary_f7.webp"
+        ],
+        "rect": {
+          "x": 1424,
+          "y": 857,
+          "width": 340,
+          "height": 178
+        }
+      }
+    },
+    {
+      "id": "river_falls_east",
+      "enabled": true,
+      "tint": "#8fd8e2",
+      "glintPoints": [],
+      "safePolygons": [
+        [
+          [
+            1527.0,
+            541.0
+          ],
+          [
+            1512.0,
+            525.0
+          ],
+          [
+            1503.0,
+            519.0
+          ],
+          [
+            1486.0,
+            513.0
+          ],
+          [
+            1483.0,
+            516.0
+          ],
+          [
+            1485.0,
+            519.0
+          ],
+          [
+            1505.0,
+            527.0
+          ],
+          [
+            1512.0,
+            534.0
+          ],
+          [
+            1514.0,
+            540.0
+          ],
+          [
+            1511.0,
+            547.0
+          ],
+          [
+            1497.0,
+            559.0
+          ],
+          [
+            1484.0,
+            565.0
+          ],
+          [
+            1468.0,
+            577.0
+          ],
+          [
+            1442.0,
+            583.0
+          ],
+          [
+            1407.0,
+            579.0
+          ],
+          [
+            1382.0,
+            588.0
+          ],
+          [
+            1386.0,
+            590.0
+          ],
+          [
+            1401.0,
+            583.0
+          ],
+          [
+            1439.0,
+            585.0
+          ],
+          [
+            1446.0,
+            589.0
+          ],
+          [
+            1471.0,
+            584.0
+          ],
+          [
+            1495.0,
+            567.0
+          ],
+          [
+            1505.0,
+            563.0
+          ],
+          [
+            1523.0,
+            548.0
+          ]
+        ]
+      ],
+      "segments": [
+        {
+          "cx": 1494.0,
+          "cy": 514.5,
+          "angleRad": 0.2235,
+          "length": 26.3,
+          "width": 18.0
+        },
+        {
+          "cx": 1510.5,
+          "cy": 521.0,
+          "angleRad": 0.6288,
+          "length": 18.4,
+          "width": 17.0
+        },
+        {
+          "cx": 1519.0,
+          "cy": 528.0,
+          "angleRad": 0.7854,
+          "length": 13.6,
+          "width": 19.0
+        },
+        {
+          "cx": 1523.5,
+          "cy": 534.5,
+          "angleRad": 1.1659,
+          "length": 16.0,
+          "width": 21.0
+        },
+        {
+          "cx": 1525.0,
+          "cy": 541.5,
+          "angleRad": 1.5708,
+          "length": 17.4,
+          "width": 22.0
+        },
+        {
+          "cx": 1523.0,
+          "cy": 548.5,
+          "angleRad": 2.0899,
+          "length": 17.2,
+          "width": 21.0
+        },
+        {
+          "cx": 1517.0,
+          "cy": 555.5,
+          "angleRad": 2.4228,
+          "length": 15.7,
+          "width": 18.0
+        },
+        {
+          "cx": 1506.5,
+          "cy": 562.5,
+          "angleRad": 2.6477,
+          "length": 17.1,
+          "width": 17.0
+        },
+        {
+          "cx": 1488.5,
+          "cy": 571.5,
+          "angleRad": 2.6955,
+          "length": 27.1,
+          "width": 16.0
+        },
+        {
+          "cx": 1463.5,
+          "cy": 581.0,
+          "angleRad": 2.8535,
+          "length": 32.6,
+          "width": 16.0
+        },
+        {
+          "cx": 1430.0,
+          "cy": 583.0,
+          "angleRad": -3.0419,
+          "length": 45.7,
+          "width": 13.0
+        },
+        {
+          "cx": 1397.5,
+          "cy": 585.5,
+          "angleRad": 2.796,
+          "length": 29.3,
+          "width": 12.0
+        }
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/river_falls_east_f0.webp",
+          "fx/water/river_falls_east_f1.webp",
+          "fx/water/river_falls_east_f2.webp",
+          "fx/water/river_falls_east_f3.webp",
+          "fx/water/river_falls_east_f4.webp",
+          "fx/water/river_falls_east_f5.webp",
+          "fx/water/river_falls_east_f6.webp",
+          "fx/water/river_falls_east_f7.webp"
+        ],
+        "rect": {
+          "x": 1362,
+          "y": 506,
+          "width": 173,
+          "height": 100
+        }
+      }
+    },
+    {
+      "id": "river_falls_link",
+      "enabled": true,
+      "tint": "#8fd8e2",
+      "glintPoints": [
+        {
+          "x": 1231,
+          "y": 607
+        }
+      ],
+      "safePolygons": [
+        [
+          [
+            1239.0,
+            601.0
+          ],
+          [
+            1241.0,
+            605.0
+          ],
+          [
+            1245.0,
+            600.0
+          ],
+          [
+            1257.0,
+            600.0
+          ],
+          [
+            1277.0,
+            589.0
+          ],
+          [
+            1303.0,
+            590.0
+          ],
+          [
+            1340.0,
+            601.0
+          ],
+          [
+            1365.0,
+            599.0
+          ],
+          [
+            1386.0,
+            590.0
+          ],
+          [
+            1385.0,
+            587.0
+          ],
+          [
+            1367.0,
+            596.0
+          ],
+          [
+            1358.0,
+            598.0
+          ],
+          [
+            1334.0,
+            598.0
+          ],
+          [
+            1319.0,
+            593.0
+          ],
+          [
+            1306.0,
+            581.0
+          ],
+          [
+            1278.0,
+            581.0
+          ],
+          [
+            1267.0,
+            583.0
+          ],
+          [
+            1264.0,
+            588.0
+          ],
+          [
+            1245.0,
+            595.0
+          ]
+        ]
+      ],
+      "segments": [
+        {
+          "cx": 1373.5,
+          "cy": 594.5,
+          "angleRad": 2.7686,
+          "length": 27.2,
+          "width": 12.0
+        },
+        {
+          "cx": 1348.0,
+          "cy": 598.5,
+          "angleRad": -3.1059,
+          "length": 32.1,
+          "width": 11.0
+        },
+        {
+          "cx": 1322.0,
+          "cy": 593.5,
+          "angleRad": -2.7828,
+          "length": 29.3,
+          "width": 10.0
+        },
+        {
+          "cx": 1298.0,
+          "cy": 589.5,
+          "angleRad": 3.1,
+          "length": 28.5,
+          "width": 17.0
+        },
+        {
+          "cx": 1274.0,
+          "cy": 592.0,
+          "angleRad": 2.9764,
+          "length": 26.4,
+          "width": 18.0
+        },
+        {
+          "cx": 1251.0,
+          "cy": 597.0,
+          "angleRad": 2.8753,
+          "length": 23.6,
+          "width": 16.0
+        }
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/river_falls_link_f0.webp",
+          "fx/water/river_falls_link_f1.webp",
+          "fx/water/river_falls_link_f2.webp",
+          "fx/water/river_falls_link_f3.webp",
+          "fx/water/river_falls_link_f4.webp",
+          "fx/water/river_falls_link_f5.webp",
+          "fx/water/river_falls_link_f6.webp",
+          "fx/water/river_falls_link_f7.webp"
+        ],
+        "rect": {
+          "x": 1218,
+          "y": 566,
+          "width": 190,
+          "height": 54
+        }
+      }
+    },
+    {
+      "id": "river_red_mountains",
+      "enabled": true,
+      "tint": "#8fd8e2",
+      "glintPoints": [],
+      "safePolygons": [
+        [
+          [
+            1692.0,
+            886.0
+          ],
+          [
+            1679.0,
+            891.0
+          ],
+          [
+            1687.0,
+            890.0
+          ]
+        ],
+        [
+          [
+            1743.0,
+            870.0
+          ],
+          [
+            1726.0,
+            883.0
+          ],
+          [
+            1706.0,
+            881.0
+          ],
+          [
+            1696.0,
+            883.0
+          ],
+          [
+            1718.0,
+            886.0
+          ],
+          [
+            1729.0,
+            884.0
+          ],
+          [
+            1738.0,
+            878.0
+          ]
+        ],
+        [
+          [
+            1767.0,
+            862.0
+          ],
+          [
+            1756.0,
+            864.0
+          ],
+          [
+            1762.0,
+            866.0
+          ]
+        ],
+        [
+          [
+            1871.0,
+            851.0
+          ],
+          [
+            1864.0,
+            861.0
+          ],
+          [
+            1850.0,
+            870.0
+          ],
+          [
+            1838.0,
+            869.0
+          ],
+          [
+            1834.0,
+            872.0
+          ],
+          [
+            1847.0,
+            873.0
+          ],
+          [
+            1866.0,
+            867.0
+          ]
+        ],
+        [
+          [
+            1888.0,
+            815.0
+          ],
+          [
+            1890.0,
+            820.0
+          ],
+          [
+            1889.0,
+            833.0
+          ],
+          [
+            1877.0,
+            846.0
+          ],
+          [
+            1892.0,
+            834.0
+          ],
+          [
+            1892.0,
+            819.0
+          ]
+        ],
+        [
+          [
+            1829.0,
+            783.0
+          ],
+          [
+            1843.0,
+            785.0
+          ],
+          [
+            1869.0,
+            797.0
+          ],
+          [
+            1845.0,
+            780.0
+          ],
+          [
+            1839.0,
+            779.0
+          ]
+        ],
+        [
+          [
+            1760.0,
+            755.0
+          ],
+          [
+            1760.0,
+            756.0
+          ],
+          [
+            1762.0,
+            758.0
+          ],
+          [
+            1763.0,
+            761.0
+          ],
+          [
+            1765.0,
+            763.0
+          ],
+          [
+            1764.0,
+            762.0
+          ],
+          [
+            1763.0,
+            759.0
+          ],
+          [
+            1760.0,
+            756.0
+          ]
+        ]
+      ],
+      "segments": [
+        {
+          "cx": 1752.0,
+          "cy": 752.0,
+          "angleRad": 0.7854,
+          "length": 43.9,
+          "width": 9.0
+        },
+        {
+          "cx": 1782.0,
+          "cy": 774.5,
+          "angleRad": 0.4636,
+          "length": 36.7,
+          "width": 8.0
+        },
+        {
+          "cx": 1817.0,
+          "cy": 782.0,
+          "angleRad": 0.0,
+          "length": 43.3,
+          "width": 8.0
+        },
+        {
+          "cx": 1852.0,
+          "cy": 787.5,
+          "angleRad": 0.3514,
+          "length": 35.7,
+          "width": 13.0
+        },
+        {
+          "cx": 1880.0,
+          "cy": 801.5,
+          "angleRad": 0.5791,
+          "length": 36.3,
+          "width": 8.0
+        },
+        {
+          "cx": 1893.0,
+          "cy": 820.0,
+          "angleRad": 1.5708,
+          "length": 28.5,
+          "width": 10.0
+        },
+        {
+          "cx": 1885.0,
+          "cy": 841.5,
+          "angleRad": 2.1786,
+          "length": 32.9,
+          "width": 11.0
+        },
+        {
+          "cx": 1867.0,
+          "cy": 861.5,
+          "angleRad": 2.4371,
+          "length": 31.9,
+          "width": 13.0
+        },
+        {
+          "cx": 1843.5,
+          "cy": 871.5,
+          "angleRad": 3.0309,
+          "length": 32.0,
+          "width": 11.0
+        },
+        {
+          "cx": 1798.5,
+          "cy": 868.0,
+          "angleRad": -2.9842,
+          "length": 67.3,
+          "width": 8.0
+        },
+        {
+          "cx": 1748.5,
+          "cy": 871.5,
+          "angleRad": 2.7109,
+          "length": 45.3,
+          "width": 11.0
+        },
+        {
+          "cx": 1705.0,
+          "cy": 885.0,
+          "angleRad": 2.9442,
+          "length": 52.2,
+          "width": 10.0
+        }
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/river_red_mountains_f0.webp",
+          "fx/water/river_red_mountains_f1.webp",
+          "fx/water/river_red_mountains_f2.webp",
+          "fx/water/river_red_mountains_f3.webp",
+          "fx/water/river_red_mountains_f4.webp",
+          "fx/water/river_red_mountains_f5.webp",
+          "fx/water/river_red_mountains_f6.webp",
+          "fx/water/river_red_mountains_f7.webp"
+        ],
+        "rect": {
+          "x": 1659,
+          "y": 747,
+          "width": 241,
+          "height": 164
+        }
+      }
     }
   ],
   "lakes": [
@@ -514,7 +1399,25 @@
           "x": 1358,
           "y": 419
         }
-      ]
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/lake_alpine_f0.webp",
+          "fx/water/lake_alpine_f1.webp",
+          "fx/water/lake_alpine_f2.webp",
+          "fx/water/lake_alpine_f3.webp",
+          "fx/water/lake_alpine_f4.webp",
+          "fx/water/lake_alpine_f5.webp",
+          "fx/water/lake_alpine_f6.webp",
+          "fx/water/lake_alpine_f7.webp"
+        ],
+        "rect": {
+          "x": 1189,
+          "y": 297,
+          "width": 265,
+          "height": 190
+        }
+      }
     },
     {
       "id": "lake_canyon_pond",
@@ -582,7 +1485,25 @@
           "x": 1862,
           "y": 865
         }
-      ]
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/lake_canyon_pond_f0.webp",
+          "fx/water/lake_canyon_pond_f1.webp",
+          "fx/water/lake_canyon_pond_f2.webp",
+          "fx/water/lake_canyon_pond_f3.webp",
+          "fx/water/lake_canyon_pond_f4.webp",
+          "fx/water/lake_canyon_pond_f5.webp",
+          "fx/water/lake_canyon_pond_f6.webp",
+          "fx/water/lake_canyon_pond_f7.webp"
+        ],
+        "rect": {
+          "x": 1827,
+          "y": 806,
+          "width": 73,
+          "height": 75
+        }
+      }
     },
     {
       "id": "west_shallows",
@@ -770,7 +1691,25 @@
           "x": 895,
           "y": 681
         }
-      ]
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/west_shallows_f0.webp",
+          "fx/water/west_shallows_f1.webp",
+          "fx/water/west_shallows_f2.webp",
+          "fx/water/west_shallows_f3.webp",
+          "fx/water/west_shallows_f4.webp",
+          "fx/water/west_shallows_f5.webp",
+          "fx/water/west_shallows_f6.webp",
+          "fx/water/west_shallows_f7.webp"
+        ],
+        "rect": {
+          "x": 859,
+          "y": 653,
+          "width": 361,
+          "height": 56
+        }
+      }
     },
     {
       "id": "lake_bayou_west",
@@ -864,7 +1803,129 @@
           "x": 1055,
           "y": 977
         }
-      ]
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/lake_bayou_west_f0.webp",
+          "fx/water/lake_bayou_west_f1.webp",
+          "fx/water/lake_bayou_west_f2.webp",
+          "fx/water/lake_bayou_west_f3.webp",
+          "fx/water/lake_bayou_west_f4.webp",
+          "fx/water/lake_bayou_west_f5.webp",
+          "fx/water/lake_bayou_west_f6.webp",
+          "fx/water/lake_bayou_west_f7.webp"
+        ],
+        "rect": {
+          "x": 1036,
+          "y": 901,
+          "width": 71,
+          "height": 131
+        }
+      }
+    },
+    {
+      "id": "lake_estuary",
+      "enabled": true,
+      "safePolygons": [
+        [
+          [
+            1529.0,
+            956.0
+          ],
+          [
+            1460.0,
+            959.0
+          ],
+          [
+            1458.0,
+            965.0
+          ],
+          [
+            1441.0,
+            972.0
+          ],
+          [
+            1445.0,
+            977.0
+          ],
+          [
+            1445.0,
+            988.0
+          ],
+          [
+            1433.0,
+            997.0
+          ],
+          [
+            1425.0,
+            999.0
+          ],
+          [
+            1400.0,
+            998.0
+          ],
+          [
+            1401.0,
+            1014.0
+          ],
+          [
+            1508.0,
+            1010.0
+          ],
+          [
+            1508.0,
+            1003.0
+          ],
+          [
+            1531.0,
+            990.0
+          ],
+          [
+            1534.0,
+            984.0
+          ],
+          [
+            1530.0,
+            982.0
+          ],
+          [
+            1530.0,
+            975.0
+          ],
+          [
+            1526.0,
+            971.0
+          ],
+          [
+            1526.0,
+            960.0
+          ]
+        ]
+      ],
+      "glintPoints": [
+        {
+          "x": 1497,
+          "y": 994
+        }
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/lake_estuary_f0.webp",
+          "fx/water/lake_estuary_f1.webp",
+          "fx/water/lake_estuary_f2.webp",
+          "fx/water/lake_estuary_f3.webp",
+          "fx/water/lake_estuary_f4.webp",
+          "fx/water/lake_estuary_f5.webp",
+          "fx/water/lake_estuary_f6.webp",
+          "fx/water/lake_estuary_f7.webp"
+        ],
+        "rect": {
+          "x": 1392,
+          "y": 949,
+          "width": 150,
+          "height": 73
+        }
+      }
     },
     {
       "id": "lake_bayou_east",
@@ -887,10 +1948,28 @@
       ],
       "glintPoints": [
         {
-          "x": 1226,
-          "y": 950
+          "x": 1217,
+          "y": 954
         }
-      ]
+      ],
+      "flowPoses": {
+        "frames": [
+          "fx/water/lake_bayou_east_f0.webp",
+          "fx/water/lake_bayou_east_f1.webp",
+          "fx/water/lake_bayou_east_f2.webp",
+          "fx/water/lake_bayou_east_f3.webp",
+          "fx/water/lake_bayou_east_f4.webp",
+          "fx/water/lake_bayou_east_f5.webp",
+          "fx/water/lake_bayou_east_f6.webp",
+          "fx/water/lake_bayou_east_f7.webp"
+        ],
+        "rect": {
+          "x": 1203,
+          "y": 925,
+          "width": 72,
+          "height": 61
+        }
+      }
     }
   ],
   "confluences": [
@@ -928,7 +2007,92 @@
       "id": "estuary",
       "x": 1472,
       "y": 970,
-      "radiusPx": 2.2
+      "radiusPx": 6.8
+    }
+  ],
+  "basin": {
+    "flowPoses": {
+      "frames": [
+        "fx/water/basin_f0.webp",
+        "fx/water/basin_f1.webp",
+        "fx/water/basin_f2.webp",
+        "fx/water/basin_f3.webp",
+        "fx/water/basin_f4.webp",
+        "fx/water/basin_f5.webp",
+        "fx/water/basin_f6.webp",
+        "fx/water/basin_f7.webp"
+      ],
+      "rect": {
+        "x": 1128,
+        "y": 491,
+        "width": 307,
+        "height": 106
+      }
+    }
+  },
+  "seaPatches": [
+    {
+      "id": "bay_2",
+      "flowPoses": {
+        "frames": [
+          "fx/water/bay2_f0.webp",
+          "fx/water/bay2_f1.webp",
+          "fx/water/bay2_f2.webp",
+          "fx/water/bay2_f3.webp",
+          "fx/water/bay2_f4.webp",
+          "fx/water/bay2_f5.webp",
+          "fx/water/bay2_f6.webp",
+          "fx/water/bay2_f7.webp"
+        ],
+        "rect": {
+          "x": 1933,
+          "y": 871,
+          "width": 172,
+          "height": 68
+        }
+      }
+    },
+    {
+      "id": "river_mouths",
+      "flowPoses": {
+        "frames": [
+          "fx/water/mouths_f0.webp",
+          "fx/water/mouths_f1.webp",
+          "fx/water/mouths_f2.webp",
+          "fx/water/mouths_f3.webp",
+          "fx/water/mouths_f4.webp",
+          "fx/water/mouths_f5.webp",
+          "fx/water/mouths_f6.webp",
+          "fx/water/mouths_f7.webp"
+        ],
+        "rect": {
+          "x": 1355,
+          "y": 900,
+          "width": 196,
+          "height": 179
+        }
+      }
+    },
+    {
+      "id": "delta_sea",
+      "flowPoses": {
+        "frames": [
+          "fx/water/delta_sea_f0.webp",
+          "fx/water/delta_sea_f1.webp",
+          "fx/water/delta_sea_f2.webp",
+          "fx/water/delta_sea_f3.webp",
+          "fx/water/delta_sea_f4.webp",
+          "fx/water/delta_sea_f5.webp",
+          "fx/water/delta_sea_f6.webp",
+          "fx/water/delta_sea_f7.webp"
+        ],
+        "rect": {
+          "x": 1244,
+          "y": 1030,
+          "width": 482,
+          "height": 271
+        }
+      }
     }
   ]
 }

@@ -68,3 +68,4 @@
 {"plan":"PLAN-084","event":"open","at":"2026-10-24T03:06:31+02:00","lane":"local","kind":"backfill","text":"planForensics: plan file created (battezzo proxy)"}
 {"plan":"PLAN-084","event":"close","at":"2026-10-24T15:51:10.475Z","kind":"backfill","text":"planForensics: bundle produced_at"}
 {"plan":"PLAN-091","event":"open","at":"2026-10-28T18:37:05.522Z"}
+{"plan":"PLAN-102","event":"open","at":"2026-10-29T14:01:09.657Z"}

@@ -1,0 +1,299 @@
+{
+  "version": 1,
+  "animals": {
+    "pesce": {
+      "lengthPx": 160,
+      "parts": [
+        {
+          "role": "body",
+          "file": "fx/sea-life/pesce_body.png",
+          "width": 161,
+          "height": 66
+        },
+        {
+          "role": "part1",
+          "file": "fx/sea-life/pesce_part1.png",
+          "width": 43,
+          "height": 37,
+          "pivot": [
+            42.7,
+            16.1
+          ],
+          "attach": [
+            -80.0,
+            -2.4
+          ],
+          "gapPx": 5.9,
+          "offset": [
+            -107.8,
+            -0.1
+          ]
+        }
+      ]
+    },
+    "pescione": {
+      "lengthPx": 384,
+      "parts": [
+        {
+          "role": "body",
+          "file": "fx/sea-life/pescione_body.png",
+          "width": 387,
+          "height": 226
+        },
+        {
+          "role": "part1",
+          "file": "fx/sea-life/pescione_part1.png",
+          "width": 129,
+          "height": 196,
+          "pivot": [
+            127.3,
+            89.1
+          ],
+          "attach": [
+            -192.0,
+            -9.2
+          ],
+          "gapPx": 8.4,
+          "offset": [
+            -261.2,
+            -0.5
+          ]
+        }
+      ]
+    },
+    "martello": {
+      "lengthPx": 384,
+      "parts": [
+        {
+          "role": "body",
+          "file": "fx/sea-life/martello_body.png",
+          "width": 387,
+          "height": 292
+        },
+        {
+          "role": "part1",
+          "file": "fx/sea-life/martello_part1.png",
+          "width": 166,
+          "height": 143,
+          "pivot": [
+            163.5,
+            76.5
+          ],
+          "attach": [
+            -192.0,
+            -6.7
+          ],
+          "gapPx": 9.5,
+          "offset": [
+            -276.7,
+            -14.4
+          ]
+        }
+      ]
+    },
+    "delfino": {
+      "lengthPx": 288,
+      "parts": [
+        {
+          "role": "body",
+          "file": "fx/sea-life/delfino_body.png",
+          "width": 290,
+          "height": 53
+        },
+        {
+          "role": "part1",
+          "file": "fx/sea-life/delfino_part1.png",
+          "width": 55,
+          "height": 90,
+          "pivot": [
+            54.2,
+            41.8
+          ],
+          "attach": [
+            -144.0,
+            -3.2
+          ],
+          "gapPx": 10.6,
+          "offset": [
+            -185.0,
+            -0.1
+          ]
+        },
+        {
+          "role": "part2",
+          "file": "fx/sea-life/delfino_part2.png",
+          "width": 36,
+          "height": 51,
+          "pivot": [
+            15.6,
+            0.8
+          ],
+          "attach": [
+            48.0,
+            24.6
+          ],
+          "gapPx": 7.2,
+          "offset": [
+            50.6,
+            55.2
+          ]
+        },
+        {
+          "role": "part3",
+          "file": "fx/sea-life/delfino_part3.png",
+          "width": 36,
+          "height": 51,
+          "pivot": [
+            15.3,
+            50.2
+          ],
+          "attach": [
+            48.3,
+            -24.9
+          ],
+          "gapPx": 7.1,
+          "offset": [
+            50.6,
+            -55.2
+          ]
+        }
+      ]
+    },
+    "manta": {
+      "lengthPx": 384,
+      "parts": [
+        {
+          "role": "body",
+          "file": "fx/sea-life/manta_body.png",
+          "width": 387,
+          "height": 536
+        },
+        {
+          "role": "part1",
+          "file": "fx/sea-life/manta_part1.png",
+          "width": 125,
+          "height": 20,
+          "pivot": [
+            123.2,
+            4.1
+          ],
+          "attach": [
+            -192.0,
+            -5.8
+          ],
+          "gapPx": 19.2,
+          "offset": [
+            -254.3,
+            -0.3
+          ]
+        }
+      ]
+    },
+    "tartaruga": {
+      "lengthPx": 224,
+      "parts": [
+        {
+          "role": "body",
+          "file": "fx/sea-life/tartaruga_body.png",
+          "width": 226,
+          "height": 160
+        },
+        {
+          "role": "part1",
+          "file": "fx/sea-life/tartaruga_part1.png",
+          "width": 121,
+          "height": 95,
+          "pivot": [
+            89.4,
+            4.4
+          ],
+          "attach": [
+            88.4,
+            49.1
+          ],
+          "gapPx": 4.8,
+          "offset": [
+            71.4,
+            103.1
+          ]
+        },
+        {
+          "role": "part2",
+          "file": "fx/sea-life/tartaruga_part2.png",
+          "width": 120,
+          "height": 87,
+          "pivot": [
+            91.0,
+            81.9
+          ],
+          "attach": [
+            85.6,
+            -57.5
+          ],
+          "gapPx": 6.8,
+          "offset": [
+            68.1,
+            -108.5
+          ]
+        },
+        {
+          "role": "part3",
+          "file": "fx/sea-life/tartaruga_part3.png",
+          "width": 79,
+          "height": 72,
+          "pivot": [
+            73.5,
+            2.0
+          ],
+          "attach": [
+            -48.1,
+            49.1
+          ],
+          "gapPx": 6.2,
+          "offset": [
+            -88.6,
+            87.8
+          ]
+        },
+        {
+          "role": "part4",
+          "file": "fx/sea-life/tartaruga_part4.png",
+          "width": 76,
+          "height": 69,
+          "pivot": [
+            73.5,
+            63.9
+          ],
+          "attach": [
+            -50.1,
+            -48.7
+          ],
+          "gapPx": 8.2,
+          "offset": [
+            -93.5,
+            -85.3
+          ]
+        },
+        {
+          "role": "part5",
+          "file": "fx/sea-life/tartaruga_part5.png",
+          "width": 67,
+          "height": 44,
+          "pivot": [
+            1.6,
+            31.1
+          ],
+          "attach": [
+            110.0,
+            7.6
+          ],
+          "gapPx": 4.4,
+          "offset": [
+            142.8,
+            -1.4
+          ]
+        }
+      ]
+    }
+  }
+}
