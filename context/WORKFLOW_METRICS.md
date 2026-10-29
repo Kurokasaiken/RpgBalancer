@@ -10,10 +10,9 @@
 
 | entity | window | intake | debate | implementation (code·docs·gov·tests·unobs) | verify+closure | status |
 |---|---|---|---|---|---|---|
-| R-2 | 2026-08-17 → 2026-08-17 | — | — | — | — | open |
 | R-056 | 2026-08-30 → 2026-08-30 | — | — | — | — | open |
 | PLAN-011 | 2026-08-30 → 2026-08-30 | — | — | — | — | open |
-| PLAN-2 | 2026-09-10 → 2026-09-11 | 17m | 17m | — | — | open |
+| PLAN-2 | 2026-09-10 → 2026-09-10 | 17m | 17m | — | — | open |
 | R-073 | 2026-09-16 → 2026-09-16 | — | — | — | — | open |
 | R-076 | 2026-10-03 → 2026-10-03 | — | — | — | — | open |
 | R-081 | 2026-10-03 → 2026-10-04 | — | — | — | — | open |
@@ -79,7 +78,6 @@
 | R-226 | 2026-10-19 → 2026-10-20 | — | — | — | — | open |
 | PLAN-053 | 2026-09-10 → 2026-10-20 | 927h10m | 16h55m | 3h25m — verification 4% · unobserved 96% → unobs≈ tests 48% · code 37% · docs 9% · config 4% · assets 1% (file-mix) | — | closed |
 | R-240 | 2026-10-21 → 2026-10-21 | — | — | 2h49m — verification 14% · unobserved 86% → unobs≈ config 56% · tests 20% · code 13% · docs 11% · assets 1% · other 0% (file-mix) | — | open |
-| R-247 | 2026-10-21 → 2026-10-21 | — | — | 8m — verification 18% · unobserved 82% | — | open |
 | R-241 | 2026-10-21 → 2026-10-21 | — | — | 1h17m — verification 100% · unobserved 0% | — | open |
 | R-242 | 2026-10-21 → 2026-10-21 | — | — | 3m — verification 100% · unobserved 0% | — | open |
 | R-248 | 2026-10-21 → 2026-10-22 | — | — | 9h47m — verification 100% · unobserved 0% → unobs≈ docs 100% (file-mix) | — | open |
@@ -126,7 +124,7 @@
 | R-260 | 2026-10-22 → 2026-10-22 | — | — | 2h47m — verification 87% · unobserved 13% | — | open |
 | PLAN-075 | 2026-10-22 → 2026-10-23 | — | — | — | — | open |
 | R-262 | 2026-10-22 → 2026-10-23 | — | — | 9h40m — mixed 4% · verification 87% · unobserved 8% → unobs≈ code 32% · config 21% · docs 20% · tests 12% · other 9% · governance 4% · assets 1% (file-mix) | — | open |
-| PLAN-076 | 2026-10-22 → 2026-10-23 | — | — | 1h39m — docs 7% · mixed 5% · verification 22% · unobserved 67% → unobs≈ code 36% · config 22% · docs 16% · tests 15% · other 9% · assets 1% (file-mix) | — | open |
+| PLAN-076 | 2026-10-22 → 2026-10-23 | — | — | 1h39m — docs 7% · mixed 5% · verification 22% · unobserved 67% → unobs≈ code 36% · config 22% · docs 16% · tests 15% · other 9% · assets 1% (file-mix) | — | closed |
 | PLAN-067 | 2026-10-20 → 2026-10-23 | 1m | — | — | — | open |
 | PLAN-079 | 2026-10-23 → 2026-10-23 | — | — | — | — | open |
 | PLAN-068 | 2026-10-22 → 2026-10-23 | — | — | — | — | open |
@@ -137,32 +135,41 @@
 | R-272 | 2026-10-23 → 2026-10-23 | 4h15m | 4h15m | — | — | open |
 | R-234 | 2026-10-20 → 2026-10-23 | — | — | — | — | open |
 | R-275 | 2026-10-23 → 2026-10-23 | — | — | — | — | open |
-| PLAN-082 | 2026-10-23 → 2026-10-23 | — | — | 1h36m — docs 24% · mixed 26% · verification 36% · unobserved 14% → unobs≈ docs 57% · other 23% · code 12% · tests 8% (file-mix) | — | open |
+| PLAN-082 | 2026-10-23 → 2026-10-23 | — | — | 1h36m — docs 24% · mixed 26% · verification 36% · unobserved 14% → unobs≈ docs 57% · other 23% · code 12% · tests 8% (file-mix) | — | closed |
 | R-220 | 2026-10-18 → 2026-10-24 | — | — | 23m — verification 30% · unobserved 70% → unobs≈ docs 43% · tests 20% · code 18% · governance 8% · config 7% · other 4% · assets 0% (file-mix) | — | open |
 | R-222 | 2026-09-08 → 2026-10-24 | 1063h41m | 5h31m | — | — | open |
-| PLAN-078 | 2026-10-22 → 2026-10-24 | 2h57m | 2h41m | 6h04m — verification 5% · unobserved 95% → unobs≈ docs 42% · code 32% · tests 20% · config 4% · governance 1% · other 1% · assets 0% (file-mix) | — | open |
-| PLAN-080 | 2026-10-23 → 2026-10-24 | 6h10m | — | — | — | open |
-| PLAN-081 | 2026-10-23 → 2026-10-24 | — | — | 3h41m — verification 2% · unobserved 98% → unobs≈ docs 60% · code 22% · tests 11% · config 4% · assets 2% · governance 1% · other 0% (file-mix) | — | open |
+| PLAN-078 | 2026-10-22 → 2026-10-24 | 2h57m | 2h41m | 6h04m — verification 5% · unobserved 95% → unobs≈ code 45% · docs 34% · tests 20% · config 1% · other 0% · assets 0% (file-mix) | — | closed |
+| PLAN-080 | 2026-10-23 → 2026-10-24 | 6h10m | — | — | — | closed |
+| PLAN-081 | 2026-10-23 → 2026-10-24 | — | — | 3h41m — verification 2% · unobserved 98% → unobs≈ docs 60% · code 22% · tests 11% · config 4% · assets 2% · governance 1% · other 0% (file-mix) | — | closed |
 | PLAN-083 | 2026-10-23 → 2026-10-24 | 10h11m | 3h59m | — | — | open |
 | PLAN-029 | 2026-10-12 → 2026-10-24 | 270h38m | 3h42m | — | — | open |
 | PLAN-085 | 2026-10-24 → 2026-10-24 | — | — | — | — | open |
-| R-281 | 2026-10-24 → 2026-10-24 | — | — | 13m — verification 79% · unobserved 21% → unobs≈ code 77% · assets 15% · docs 8% (file-mix) | — | open |
-| PLAN-084 | 2026-10-24 → 2026-10-24 | — | — | 14h45m — mixed 99% · verification 1% · unobserved 1% → unobs≈ code 48% · docs 40% · config 7% · tests 4% · assets 1% · governance 0% · other 0% (file-mix) | — | open |
-| PLAN-086 | 2026-10-24 → 2026-10-24 | 9h09m | 3h01m | — | — | open |
+| R-281 | 2026-10-24 → 2026-10-24 | — | — | 13m — verification 79% · unobserved 21% → unobs≈ code 100% (file-mix) | — | open |
+| PLAN-084 | 2026-10-24 → 2026-10-24 | — | — | 14h45m — mixed 99% · verification 1% · unobserved 1% → unobs≈ code 47% · docs 40% · config 7% · tests 4% · assets 2% · governance 0% · other 0% (file-mix) | — | closed |
+| PLAN-087 | 2026-10-24 → 2026-10-25 | — | — | — | — | open |
+| PLAN-088 | 2026-10-24 → 2026-10-25 | — | — | — | — | open |
+| R-001 | 2026-10-24 → 2026-10-25 | 1h32m | 46m | — | — | open |
+| R-247 | 2026-10-21 → 2026-10-26 | — | — | 8m — verification 18% · unobserved 82% → unobs≈ code 41% · tests 35% · docs 10% · other 6% · governance 4% · config 3% · assets 2% (file-mix) | — | open |
+| PLAN-086 | 2026-10-24 → 2026-10-26 | 9h09m | 3h01m | — | — | open |
+| R-292 | 2026-10-28 → 2026-10-28 | 1h24m | 1h24m | — | — | open |
+| R-2 | 2026-08-17 → 2026-10-28 | 1724h16m | 33h11m | — | — | open |
+| PLAN-089 | 2026-10-28 → 2026-10-28 | — | — | — | — | open |
+| PLAN-090 | 2026-10-28 → 2026-10-28 | — | — | — | — | open |
+| PLAN-091 | 2026-10-28 → 2026-10-28 | — | — | — | — | open |
 
 ## Where the time goes (aggregate, attributed intervals)
 
-- **impl:unobserved**: 794h58m (59% of active work)
-- **intake**: 267h49m (20% of active work)
+- **impl:unobserved**: 794h58m (57% of active work)
+- **intake**: 274h03m (20% of active work)
 - **impl:verification**: 151h54m (11% of active work)
-- **debate**: 91h25m (7% of active work)
-- **impl:mixed**: 20h26m (2% of active work)
+- **debate**: 126h46m (9% of active work)
+- **impl:mixed**: 20h26m (1% of active work)
 - **impl:config**: 19h01m (1% of active work)
 - **impl:docs**: 30m (0% of active work)
 - **verify+closure**: 15m (0% of active work)
 - **impl:unobserved — inferred composition** (churn file-mix dei commit di impl, non tempo osservato): docs 58% · config 15% · code 13% · tests 11% · other 3% · assets 1% · governance 0%
-- **wait** (gaps >45min, idle/attesa Director — not work): 35893h06m
-- **unattributed commits**: 374 (other×130 mixed×122 config×81) — no entity id, >12h from any active entity
+- **wait** (gaps >45min, idle/attesa Director — not work): 37761h20m
+- **unattributed commits**: 461 (mixed×151 other×103 config×82) — no entity id, >12h from any active entity
 
 ## Plan features → smoothness (PLAN-059 — rework, non richness)
 
@@ -188,6 +195,7 @@
 | R-281 | 20 | yes | 8 | 13m | 0% | 100% | 1 | 0 |
 | PLAN-043 | 20 | yes | 8 | 13h26m | 0% | 100% | 0 | 0 |
 | R-088 | 6 | — | 41 | — | 0% | 100% | 0 | — |
+| PLAN-086 | 2 | — | 6 | — | 0% | 100% | 0 | — |
 | PLAN-008 | 3 | — | 15 | — | 1% | 99% | 0 | — |
 | PLAN-012 | 4 | — | 0 | — | 1% | 99% | 0 | — |
 | PLAN-016 | 5 | — | 4 | — | 0% | 99% | 0 | 0 |
@@ -209,6 +217,7 @@
 | PLAN-021 | 5 | — | 44 | — | 1% | 99% | 0 | — |
 | R-104 | 4 | — | 68 | — | 1% | 99% | 0 | — |
 | PLAN-024 | 3 | — | 36 | — | 1% | 99% | 0 | — |
+| PLAN-087 | 0 | — | 0 | — | 1% | 99% | 0 | — |
 | R-226 | 28 | yes | 98 | — | 0% | 99% | 0 | — |
 | PLAN-053 | 10 | yes | 25 | 3h25m | 0% | 99% | 1 | 0 |
 | PLAN-031 | 8 | — | 9 | — | 0% | 99% | 0 | — |
@@ -238,7 +247,7 @@
 | R-231 | 47 | yes | 67 | — | 0% | 95% | 0 | 0 |
 | R-262 | 45 | yes | 75 | 9h40m | 0% | 95% | 1 | — |
 | PLAN-079 | 19 | — | 0 | — | 0% | 95% | 0 | — |
-| PLAN-029 | 5 | — | 7 | — | 3% | 95% | 0 | — |
+| PLAN-029 | 5 | — | 7 | — | 3% | 94% | 0 | — |
 | PLAN-032 | 8 | — | 11 | 53h10m | 2% | 94% | 1 | 0 |
 | PLAN-068 | 6 | yes | 5 | — | 1% | 93% | 0 | — |
 | R-123 | 11 | — | 0 | — | 7% | 93% | 0 | — |
@@ -248,12 +257,12 @@
 | PLAN-075 | 3 | yes | 16 | — | 0% | 90% | 0 | — |
 | R-107 | 22 | — | 85 | — | 2% | 90% | 0 | — |
 | R-220 | 17 | yes | 43 | 23m | 1% | 89% | 3 | — |
-| PLAN-080 | 17 | yes | 25 | — | 2% | 89% | 1 | 0 |
 | R-217 | 21 | yes | 44 | 3h34m | 0% | 89% | 2 | — |
 | PLAN-074 | 4 | yes | 40 | — | 1% | 89% | 0 | — |
 | R-114 | 11 | — | 0 | — | 2% | 89% | 0 | — |
 | R-106 | 11 | — | 85 | — | 1% | 88% | 0 | — |
 | R-085 | 9 | — | 6 | — | 3% | 88% | 0 | — |
+| PLAN-080 | 18 | yes | 25 | — | 2% | 87% | 1 | 0 |
 | PLAN-076 | 12 | yes | 14 | 1h39m | 0% | 87% | 2 | 0 |
 | R-084 | 9 | — | 6 | — | 6% | 87% | 0 | — |
 | PLAN-038 | 13 | — | 26 | 1h13m | 1% | 86% | 1 | 0 |
@@ -261,27 +270,31 @@
 | PLAN-084 | 4 | yes | 13 | 14h45m | 4% | 86% | 3 | 0 |
 | PLAN-040 | 19 | yes | 36 | 2h51m | 0% | 85% | 1 | 0 |
 | PLAN-030 | 5 | — | 13 | — | 1% | 85% | 0 | — |
+| PLAN-090 | 13 | — | 3 | — | 0% | 82% | 0 | — |
 | PLAN-027 | 10 | — | 0 | 206h52m | 0% | 81% | 0 | 0 |
 | R-234 | 25 | yes | 30 | — | 0% | 81% | 0 | — |
 | PLAN-071 | 8 | yes | 22 | — | 0% | 79% | 0 | 0 |
-| PLAN-083 | 5 | yes | 45 | — | 4% | 78% | 0 | — |
+| PLAN-083 | 5 | yes | 45 | — | 3% | 79% | 0 | — |
 | R-186 | 11 | — | 0 | — | 4% | 78% | 0 | — |
 | PLAN-022 | 4 | — | 9 | — | 3% | 77% | 0 | — |
-| PLAN-078 | 37 | yes | 29 | 6h04m | 2% | 74% | 2 | 0 |
+| PLAN-088 | 1 | — | 5 | — | 0% | 74% | 0 | — |
+| R-247 | 68 | yes | 40 | 8m | 0% | 62% | 29 | 0 |
 | PLAN-073 | 24 | yes | 21 | — | 0% | 61% | 0 | — |
-| PLAN-085 | 5 | yes | 18 | — | 1% | 53% | 0 | — |
+| PLAN-078 | 37 | yes | 29 | 6h04m | 1% | 55% | 1 | 0 |
+| PLAN-085 | 5 | yes | 18 | — | 1% | 54% | 0 | — |
 | PLAN-067 | 23 | yes | 20 | — | 0% | 43% | 0 | 0 |
 | PLAN-082 | 7 | yes | 9 | 1h36m | 0% | 42% | 2 | 0 |
 | PLAN-035 | 29 | — | 27 | 3h09m | 1% | 42% | 2 | 0 |
 | R-194 | 34 | — | 38 | — | 1% | 40% | 0 | 0 |
+| PLAN-089 | 12 | — | 42 | — | 0% | 37% | 0 | — |
 | PLAN-018 | 16 | — | 21 | — | 1% | 28% | 0 | 0 |
 | R-275 | 11 | yes | 16 | — | 0% | 28% | 0 | — |
 | R-240 | 102 | yes | 96 | 2h49m | 0% | 2% | 0 | 0 |
+| R-292 | 13 | — | 3 | — | 0% | 0% | 0 | — |
 | PLAN-011 | 9 | — | 7 | — | — | — | 0 | — |
 | R-223 | 20 | yes | 8 | 16h00m | — | — | 0 | 0 |
 | R-225 | 93 | yes | 86 | 13m | — | — | 0 | 0 |
 | R-232 | 65 | yes | 27 | 13h51m | — | — | 0 | 0 |
-| R-247 | 68 | yes | 40 | 8m | — | — | 0 | 0 |
 | R-241 | 25 | yes | 30 | 1h17m | — | — | 0 | 0 |
 | R-242 | 53 | yes | 41 | 3m | — | — | 0 | 0 |
 | PLAN-054 | 47 | yes | 19 | — | — | — | 0 | 0 |
@@ -289,15 +302,15 @@
 | PLAN-061 | 4 | yes | 6 | — | — | — | 0 | 0 |
 | R-260 | 17 | yes | 56 | 2h47m | — | — | 0 | 0 |
 | PLAN-065 | 31 | — | 18 | — | — | — | 0 | — |
-| R-272 | 21 | yes | 57 | — | — | — | 0 | — |
-| PLAN-086 | 2 | — | 6 | — | — | — | 0 | — |
+| R-272 | 22 | yes | 57 | — | — | — | 0 | — |
+| PLAN-091 | 5 | yes | 29 | — | — | — | 0 | — |
 
-Spearman ρ (files_named vs −oop scope churn): **0.2** — n=32, directional.
+Spearman ρ (files_named vs −oop scope churn): **0.26** — n=33, directional.
 
 ## Gate cost (PLAN-051 T-006)
 
 - **Ultimi bundle per run** (n=103): PASS 70 · BLOCKED 33
 - **Risultati obbligazioni** (tutti i bundle): PASS 456 · FAIL 27 · NOT_RUN 26 · MISSING_ARTIFACT 3
-- **Director burden** (azioni registrate): answers 17 · exceptions 85 · mapping-approvals 16 · trust-approvals 16
+- **Director burden** (azioni registrate): answers 17 · exceptions 89 · mapping-approvals 16 · trust-approvals 16
 - **Trust anchor**: 142 file sigillati @ 2026-10-24T15:43:31.677Z — ledger fuori-repo attivo
 - _Gap di misura noto:_ bundle.json viene sovrascritto a ogni run → il flip-rate BLOCKED→PASS (retry / falsi positivi) non è osservabile su disco; va journalato o stimato da seeded-fault (trustedLock.test copre tamper, lock riforgiato, drift non approvato).

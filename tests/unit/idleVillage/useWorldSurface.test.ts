@@ -201,12 +201,29 @@ describe('validateWorldSurfaceManifest', () => {
         },
         anchorFiles: { points: 'points.json' },
         regionIndex: { idsFile: 'region_ids.png', metadataFile: 'regions.json', biomesFile: 'biomes.json' },
+        waterfall: {
+          flowMask: 'masks/waterfall_mask.webp',
+          impactMask: 'masks/waterfall_impact_mask.webp',
+          basinMask: 'masks/waterfall_basin_mask.webp',
+          flowRect: { x: 1258, y: 372, width: 167, height: 168, sourceWidth: 2752, sourceHeight: 1536 },
+          impactRect: { x: 1200, y: 485, width: 260, height: 95, sourceWidth: 2752, sourceHeight: 1536 },
+          basinRect: { x: 1115, y: 495, width: 356, height: 96, sourceWidth: 2752, sourceHeight: 1536 },
+          impactPoint: { x: 1340, y: 532 },
+        },
+        landLife: {
+          anchorsFile: 'land-life-anchors.json',
+          maxLeaves: 24,
+          maxMotes: 36,
+          maxFlutters: 10,
+        },
         canopyLayers: [],
         fxAtlases: {},
         bootPhases: {},
       },
     });
     expect(parsed.pack?.generator.sourceSha256).toBe('e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a');
+    expect(parsed.pack?.waterfall?.impactPoint).toEqual({ x: 1340, y: 532 });
+    expect(parsed.pack?.landLife).toEqual({ anchorsFile: 'land-life-anchors.json', maxLeaves: 24, maxMotes: 36, maxFlutters: 10 });
   });
 
   it('rejects an unsupported pack major version and unknown pack fields', () => {

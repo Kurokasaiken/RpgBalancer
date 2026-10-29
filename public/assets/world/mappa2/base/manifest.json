@@ -229,7 +229,7 @@
     "generator": {
       "sourceSha256": "e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a",
       "pipelineVersion": "mappa2-assets-v1",
-      "maskRevision": 2
+      "maskRevision": 5
     },
     "maskFiles": {
       "sea": "masks/sea_mask.webp",
@@ -247,15 +247,318 @@
       "metadataFile": "regions.json",
       "biomesFile": "biomes.json"
     },
+    "waterfall": {
+      "flowMask": "masks/waterfall_mask.webp",
+      "impactMask": "masks/waterfall_impact_mask.webp",
+      "basinMask": "masks/waterfall_basin_mask.webp",
+      "flowRect": {
+        "x": 1258,
+        "y": 372,
+        "width": 168,
+        "height": 169,
+        "sourceWidth": 2752,
+        "sourceHeight": 1536
+      },
+      "impactRect": {
+        "x": 1200,
+        "y": 485,
+        "width": 261,
+        "height": 96,
+        "sourceWidth": 2752,
+        "sourceHeight": 1536
+      },
+      "basinRect": {
+        "x": 1115,
+        "y": 495,
+        "width": 356,
+        "height": 96,
+        "sourceWidth": 2752,
+        "sourceHeight": 1536
+      },
+      "impactPoint": {
+        "x": 1340,
+        "y": 532
+      },
+      "lakeMask": "masks/waterfall_lake_mask.webp",
+      "lakeRect": {
+        "x": 1150,
+        "y": 300,
+        "width": 421,
+        "height": 181,
+        "sourceWidth": 2752,
+        "sourceHeight": 1536
+      },
+      "lakePolygon": [
+        [
+          1150,
+          335
+        ],
+        [
+          1320,
+          308
+        ],
+        [
+          1490,
+          300
+        ],
+        [
+          1570,
+          340
+        ],
+        [
+          1560,
+          410
+        ],
+        [
+          1480,
+          465
+        ],
+        [
+          1360,
+          480
+        ],
+        [
+          1220,
+          455
+        ],
+        [
+          1150,
+          400
+        ]
+      ],
+      "flowPolygon": [
+        [
+          1318.0,
+          375.0
+        ],
+        [
+          1323.0,
+          381.0
+        ],
+        [
+          1317.0,
+          396.0
+        ],
+        [
+          1322.0,
+          409.0
+        ],
+        [
+          1318.0,
+          488.0
+        ],
+        [
+          1311.0,
+          491.0
+        ],
+        [
+          1311.0,
+          502.0
+        ],
+        [
+          1301.0,
+          514.0
+        ],
+        [
+          1390.0,
+          515.0
+        ],
+        [
+          1400.0,
+          504.0
+        ],
+        [
+          1373.0,
+          495.0
+        ],
+        [
+          1370.0,
+          479.0
+        ],
+        [
+          1359.0,
+          466.0
+        ],
+        [
+          1357.0,
+          385.0
+        ],
+        [
+          1367.0,
+          376.0
+        ]
+      ],
+      "basinPolygon": [
+        [
+          1243.0,
+          522.0
+        ],
+        [
+          1249.0,
+          557.0
+        ],
+        [
+          1278.0,
+          568.0
+        ],
+        [
+          1278.0,
+          574.0
+        ],
+        [
+          1260.0,
+          588.0
+        ],
+        [
+          1310.0,
+          586.0
+        ],
+        [
+          1322.0,
+          577.0
+        ],
+        [
+          1346.0,
+          582.0
+        ],
+        [
+          1382.0,
+          574.0
+        ],
+        [
+          1409.0,
+          560.0
+        ],
+        [
+          1428.0,
+          535.0
+        ],
+        [
+          1428.0,
+          523.0
+        ],
+        [
+          1415.0,
+          508.0
+        ],
+        [
+          1372.0,
+          499.0
+        ],
+        [
+          1320.0,
+          497.0
+        ],
+        [
+          1293.0,
+          519.0
+        ],
+        [
+          1265.0,
+          522.0
+        ],
+        [
+          1252.0,
+          512.0
+        ]
+      ],
+      "paintedFlowTile": "fx/waterfall/painted_flow_tile.webp",
+      "paintedFlowRect": {
+        "x": 1258,
+        "y": 332,
+        "width": 168,
+        "height": 249,
+        "sourceWidth": 2752,
+        "sourceHeight": 1536
+      },
+      "paintedFlowClip": [
+        [
+          1327.0,
+          379.0
+        ],
+        [
+          1327.0,
+          394.0
+        ],
+        [
+          1324.0,
+          399.0
+        ],
+        [
+          1326.0,
+          447.0
+        ],
+        [
+          1322.0,
+          461.0
+        ],
+        [
+          1322.0,
+          492.0
+        ],
+        [
+          1315.0,
+          495.0
+        ],
+        [
+          1315.0,
+          506.0
+        ],
+        [
+          1310.0,
+          511.0
+        ],
+        [
+          1386.0,
+          511.0
+        ],
+        [
+          1384.0,
+          503.0
+        ],
+        [
+          1366.0,
+          496.0
+        ],
+        [
+          1366.0,
+          483.0
+        ],
+        [
+          1363.0,
+          478.0
+        ],
+        [
+          1356.0,
+          476.0
+        ],
+        [
+          1353.0,
+          381.0
+        ],
+        [
+          1357.0,
+          379.0
+        ]
+      ],
+      "paintedFlowFrames": [
+        "fx/waterfall/flip_f0.webp",
+        "fx/waterfall/flip_f1.webp",
+        "fx/waterfall/flip_f2.webp",
+        "fx/waterfall/flip_f3.webp",
+        "fx/waterfall/flip_f4.webp",
+        "fx/waterfall/flip_f5.webp"
+      ]
+    },
     "canopyLayers": [
       {
         "id": "forest_canopy_01",
         "file": "forest_canopy_01.webp",
         "rect": {
-          "x": 801,
-          "y": 286,
-          "width": 106,
-          "height": 116,
+          "x": 2629,
+          "y": 0,
+          "width": 123,
+          "height": 57,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -264,10 +567,10 @@
         "id": "forest_canopy_02",
         "file": "forest_canopy_02.webp",
         "rect": {
-          "x": 1184,
-          "y": 310,
-          "width": 91,
-          "height": 59,
+          "x": 55,
+          "y": 45,
+          "width": 291,
+          "height": 198,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -276,10 +579,10 @@
         "id": "forest_canopy_03",
         "file": "forest_canopy_03.webp",
         "rect": {
-          "x": 810,
-          "y": 362,
-          "width": 43,
-          "height": 55,
+          "x": 2530,
+          "y": 47,
+          "width": 99,
+          "height": 72,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -288,10 +591,10 @@
         "id": "forest_canopy_04",
         "file": "forest_canopy_04.webp",
         "rect": {
-          "x": 1011,
-          "y": 395,
-          "width": 175,
-          "height": 58,
+          "x": 2647,
+          "y": 47,
+          "width": 105,
+          "height": 71,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -300,10 +603,10 @@
         "id": "forest_canopy_05",
         "file": "forest_canopy_05.webp",
         "rect": {
-          "x": 1419,
-          "y": 413,
-          "width": 88,
-          "height": 64,
+          "x": 2622,
+          "y": 109,
+          "width": 130,
+          "height": 70,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -312,10 +615,10 @@
         "id": "forest_canopy_06",
         "file": "forest_canopy_06.webp",
         "rect": {
-          "x": 875,
-          "y": 442,
-          "width": 150,
-          "height": 95,
+          "x": 289,
+          "y": 214,
+          "width": 76,
+          "height": 47,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -324,10 +627,10 @@
         "id": "forest_canopy_07",
         "file": "forest_canopy_07.webp",
         "rect": {
-          "x": 1129,
-          "y": 455,
-          "width": 105,
-          "height": 66,
+          "x": 2598,
+          "y": 274,
+          "width": 154,
+          "height": 100,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -336,10 +639,10 @@
         "id": "forest_canopy_08",
         "file": "forest_canopy_08.webp",
         "rect": {
-          "x": 1545,
-          "y": 454,
-          "width": 65,
-          "height": 98,
+          "x": 839,
+          "y": 278,
+          "width": 43,
+          "height": 72,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -348,10 +651,10 @@
         "id": "forest_canopy_09",
         "file": "forest_canopy_09.webp",
         "rect": {
-          "x": 799,
-          "y": 489,
-          "width": 64,
-          "height": 110,
+          "x": 2666,
+          "y": 323,
+          "width": 86,
+          "height": 151,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -360,10 +663,10 @@
         "id": "forest_canopy_10",
         "file": "forest_canopy_10.webp",
         "rect": {
-          "x": 1036,
-          "y": 493,
-          "width": 178,
-          "height": 120,
+          "x": 0,
+          "y": 335,
+          "width": 71,
+          "height": 107,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -372,10 +675,10 @@
         "id": "forest_canopy_11",
         "file": "forest_canopy_11.webp",
         "rect": {
-          "x": 981,
-          "y": 522,
-          "width": 49,
-          "height": 58,
+          "x": 93,
+          "y": 341,
+          "width": 72,
+          "height": 56,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -384,10 +687,10 @@
         "id": "forest_canopy_12",
         "file": "forest_canopy_12.webp",
         "rect": {
-          "x": 807,
-          "y": 593,
-          "width": 77,
-          "height": 91,
+          "x": 810,
+          "y": 355,
+          "width": 78,
+          "height": 57,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -396,10 +699,10 @@
         "id": "forest_canopy_13",
         "file": "forest_canopy_13.webp",
         "rect": {
-          "x": 831,
-          "y": 683,
-          "width": 165,
-          "height": 133,
+          "x": 1249,
+          "y": 375,
+          "width": 68,
+          "height": 30,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -408,10 +711,10 @@
         "id": "forest_canopy_14",
         "file": "forest_canopy_14.webp",
         "rect": {
-          "x": 574,
-          "y": 765,
-          "width": 37,
-          "height": 53,
+          "x": 1012,
+          "y": 402,
+          "width": 185,
+          "height": 65,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -420,10 +723,10 @@
         "id": "forest_canopy_15",
         "file": "forest_canopy_15.webp",
         "rect": {
-          "x": 850,
-          "y": 899,
-          "width": 150,
-          "height": 122,
+          "x": 1421,
+          "y": 416,
+          "width": 85,
+          "height": 73,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -432,10 +735,10 @@
         "id": "forest_canopy_16",
         "file": "forest_canopy_16.webp",
         "rect": {
-          "x": 920,
-          "y": 1010,
-          "width": 97,
-          "height": 66,
+          "x": 879,
+          "y": 443,
+          "width": 158,
+          "height": 97,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -444,10 +747,10 @@
         "id": "forest_canopy_17",
         "file": "forest_canopy_17.webp",
         "rect": {
-          "x": 795,
-          "y": 1072,
-          "width": 65,
-          "height": 51,
+          "x": 1133,
+          "y": 461,
+          "width": 111,
+          "height": 67,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -456,10 +759,10 @@
         "id": "forest_canopy_18",
         "file": "forest_canopy_18.webp",
         "rect": {
-          "x": 1361,
-          "y": 1113,
-          "width": 69,
-          "height": 61,
+          "x": 981,
+          "y": 518,
+          "width": 71,
+          "height": 80,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -468,10 +771,250 @@
         "id": "forest_canopy_19",
         "file": "forest_canopy_19.webp",
         "rect": {
-          "x": 1303,
-          "y": 1326,
+          "x": 734,
+          "y": 524,
+          "width": 45,
+          "height": 43,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_20",
+        "file": "forest_canopy_20.webp",
+        "rect": {
+          "x": 1573,
+          "y": 529,
+          "width": 120,
+          "height": 85,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_21",
+        "file": "forest_canopy_21.webp",
+        "rect": {
+          "x": 899,
+          "y": 536,
+          "width": 98,
+          "height": 28,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_22",
+        "file": "forest_canopy_22.webp",
+        "rect": {
+          "x": 1389,
+          "y": 539,
+          "width": 72,
+          "height": 41,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_23",
+        "file": "forest_canopy_23.webp",
+        "rect": {
+          "x": 1087,
+          "y": 555,
+          "width": 53,
+          "height": 59,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_24",
+        "file": "forest_canopy_24.webp",
+        "rect": {
+          "x": 1038,
+          "y": 558,
+          "width": 240,
+          "height": 108,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_25",
+        "file": "forest_canopy_25.webp",
+        "rect": {
+          "x": 1214,
+          "y": 577,
+          "width": 200,
+          "height": 111,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_26",
+        "file": "forest_canopy_26.webp",
+        "rect": {
+          "x": 801,
+          "y": 617,
+          "width": 83,
+          "height": 84,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_27",
+        "file": "forest_canopy_27.webp",
+        "rect": {
+          "x": 890,
+          "y": 621,
+          "width": 64,
+          "height": 39,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_28",
+        "file": "forest_canopy_28.webp",
+        "rect": {
+          "x": 1333,
+          "y": 645,
+          "width": 73,
+          "height": 41,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_29",
+        "file": "forest_canopy_29.webp",
+        "rect": {
+          "x": 794,
+          "y": 670,
+          "width": 652,
+          "height": 458,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_30",
+        "file": "forest_canopy_30.webp",
+        "rect": {
+          "x": 548,
+          "y": 681,
+          "width": 80,
+          "height": 125,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_31",
+        "file": "forest_canopy_31.webp",
+        "rect": {
+          "x": 1313,
+          "y": 692,
+          "width": 350,
+          "height": 229,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_32",
+        "file": "forest_canopy_32.webp",
+        "rect": {
+          "x": 380,
+          "y": 764,
           "width": 62,
-          "height": 52,
+          "height": 36,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_33",
+        "file": "forest_canopy_33.webp",
+        "rect": {
+          "x": 1482,
+          "y": 813,
+          "width": 221,
+          "height": 127,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_34",
+        "file": "forest_canopy_34.webp",
+        "rect": {
+          "x": 1229,
+          "y": 941,
+          "width": 74,
+          "height": 40,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_35",
+        "file": "forest_canopy_35.webp",
+        "rect": {
+          "x": 368,
+          "y": 1051,
+          "width": 93,
+          "height": 86,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_36",
+        "file": "forest_canopy_36.webp",
+        "rect": {
+          "x": 799,
+          "y": 1064,
+          "width": 118,
+          "height": 107,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_37",
+        "file": "forest_canopy_37.webp",
+        "rect": {
+          "x": 1100,
+          "y": 1088,
+          "width": 68,
+          "height": 59,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_38",
+        "file": "forest_canopy_38.webp",
+        "rect": {
+          "x": 1341,
+          "y": 1099,
+          "width": 163,
+          "height": 73,
+          "sourceWidth": 2752,
+          "sourceHeight": 1536
+        }
+      },
+      {
+        "id": "forest_canopy_39",
+        "file": "forest_canopy_39.webp",
+        "rect": {
+          "x": 996,
+          "y": 1106,
+          "width": 66,
+          "height": 71,
           "sourceWidth": 2752,
           "sourceHeight": 1536
         }
@@ -495,21 +1038,21 @@
           {
             "src": "fx/clouds/mappa2_cloud_02.webp",
             "shadowSrc": "fx/clouds/mappa2_cloud_02_shadow.webp",
-            "width": 305,
+            "width": 312,
             "y": 490,
             "delaySeconds": 710
           },
           {
             "src": "fx/clouds/mappa2_cloud_03.webp",
             "shadowSrc": "fx/clouds/mappa2_cloud_03_shadow.webp",
-            "width": 246,
+            "width": 305,
             "y": 820,
             "delaySeconds": 1420
           },
           {
             "src": "fx/clouds/mappa2_cloud_04.webp",
             "shadowSrc": "fx/clouds/mappa2_cloud_04_shadow.webp",
-            "width": 231,
+            "width": 255,
             "y": 1150,
             "delaySeconds": 2130
           },
@@ -553,14 +1096,14 @@
           {
             "src": "fx/clouds/mappa2_cloud_08.webp",
             "shadowSrc": "fx/clouds/mappa2_cloud_08_shadow.webp",
-            "width": 130,
+            "width": 131,
             "y": 1070,
             "delaySeconds": 1900
           },
           {
             "src": "fx/clouds/mappa2_cloud_09.webp",
             "shadowSrc": "fx/clouds/mappa2_cloud_09_shadow.webp",
-            "width": 169,
+            "width": 111,
             "y": 1390,
             "delaySeconds": 2460
           }
@@ -576,21 +1119,21 @@
           {
             "src": "fx/clouds/mappa2_cloud_09.webp",
             "shadowSrc": "fx/clouds/mappa2_cloud_09_shadow.webp",
-            "width": 169,
+            "width": 111,
             "y": 80,
             "delaySeconds": 370
           },
           {
             "src": "fx/clouds/mappa2_cloud_10.webp",
             "shadowSrc": "fx/clouds/mappa2_cloud_10_shadow.webp",
-            "width": 95,
+            "width": 96,
             "y": 440,
             "delaySeconds": 820
           },
           {
             "src": "fx/clouds/mappa2_cloud_11.webp",
             "shadowSrc": "fx/clouds/mappa2_cloud_11_shadow.webp",
-            "width": 96,
+            "width": 77,
             "y": 800,
             "delaySeconds": 1270
           }
@@ -601,7 +1144,19 @@
       "ambientSeaLife": "fx/ambient-sea-life.webp",
       "ambientLandLife": "fx/ambient-land-life.webp",
       "ambientWeather": "fx/ambient-weather.webp",
-      "rare": "fx/rare-events.webp"
+      "rare": "fx/rare-events.webp",
+      "waterfallFlow": "fx/waterfall/flow_streaks.webp",
+      "waterfallMist": "fx/waterfall/mist_blob.webp",
+      "waterfallRipple": "fx/waterfall/ripple_ring.webp",
+      "landLifeLeaf": "fx/land-life/leaf.webp",
+      "landLifeMote": "fx/land-life/mote.webp",
+      "landLifeFlutter": "fx/land-life/butterfly.webp"
+    },
+    "landLife": {
+      "anchorsFile": "land-life-anchors.json",
+      "maxLeaves": 24,
+      "maxMotes": 36,
+      "maxFlutters": 10
     },
     "bootPhases": {
       "manifest": [
@@ -620,7 +1175,10 @@
         "masks/shallow_mask.webp",
         "masks/internal_water_mask.webp",
         "masks/coast_distance.webp",
-        "masks/foam_mask.webp"
+        "masks/foam_mask.webp",
+        "masks/waterfall_mask.webp",
+        "masks/waterfall_impact_mask.webp",
+        "masks/waterfall_basin_mask.webp"
       ],
       "ambient": [
         "layers/forest_canopy_01.canopy.webp",
@@ -642,6 +1200,26 @@
         "layers/forest_canopy_17.canopy.webp",
         "layers/forest_canopy_18.canopy.webp",
         "layers/forest_canopy_19.canopy.webp",
+        "layers/forest_canopy_20.canopy.webp",
+        "layers/forest_canopy_21.canopy.webp",
+        "layers/forest_canopy_22.canopy.webp",
+        "layers/forest_canopy_23.canopy.webp",
+        "layers/forest_canopy_24.canopy.webp",
+        "layers/forest_canopy_25.canopy.webp",
+        "layers/forest_canopy_26.canopy.webp",
+        "layers/forest_canopy_27.canopy.webp",
+        "layers/forest_canopy_28.canopy.webp",
+        "layers/forest_canopy_29.canopy.webp",
+        "layers/forest_canopy_30.canopy.webp",
+        "layers/forest_canopy_31.canopy.webp",
+        "layers/forest_canopy_32.canopy.webp",
+        "layers/forest_canopy_33.canopy.webp",
+        "layers/forest_canopy_34.canopy.webp",
+        "layers/forest_canopy_35.canopy.webp",
+        "layers/forest_canopy_36.canopy.webp",
+        "layers/forest_canopy_37.canopy.webp",
+        "layers/forest_canopy_38.canopy.webp",
+        "layers/forest_canopy_39.canopy.webp",
         "fx/clouds/mappa2_cloud_01.webp",
         "fx/clouds/mappa2_cloud_02.webp",
         "fx/clouds/mappa2_cloud_03.webp",
@@ -672,7 +1250,13 @@
       "ambient-fx": [
         "fx/ambient-sea-life.webp",
         "fx/ambient-land-life.webp",
-        "fx/ambient-weather.webp"
+        "fx/ambient-weather.webp",
+        "fx/waterfall/flow_streaks.webp",
+        "fx/waterfall/mist_blob.webp",
+        "fx/waterfall/ripple_ring.webp",
+        "fx/land-life/leaf.webp",
+        "fx/land-life/mote.webp",
+        "fx/land-life/butterfly.webp"
       ],
       "rare": [
         "fx/rare-events.webp"
