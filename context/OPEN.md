@@ -428,11 +428,13 @@ Formato voce:
   famiglia di condizioni-limite; (d) classificazione per-voce di
   `flood`, `meld`, `rituale`, `scorta`, `cargo volatile`, `corruzione`,
   `difesa a ondate`.
-- **Status:** `open` — re-analisi prodotta 2026-10-25 (ARCHITECTURE
-  §20.5): censimento ridotto a 2 core (tracciato, indagine) + PYL caso
-  di bordo + sfumature del tracciato. Resta da ratificare: (a) la
-  classificazione per-voce; (b) il caso PYL; (c) il criterio di bordo;
-  (d) l'asse variants del contratto.
+- **Status:** `open` — re-analisi prodotta e formalizzata 2026-10-25
+  (ARCHITECTURE §20.5–§20.9): censimento ridotto a 2 core + PYL come 3ª
+  candidata; criterio di bordo a 3 assi abbozzato (§20.6); verdetto
+  PYL proposto (§20.7 — core se bust stocastico/nascosto, sfumatura
+  tracciato se deterministico); asse `LimitPattern` abbozzato (§20.8).
+  Resta da ratificare: (a) classificazione per-voce; (b) verdetto PYL;
+  (c) criterio di bordo; (d) forma del contratto variants.
 - **Source:** `context/QUEST_GENERATION_ARCHITECTURE.md` §20/§20.5;
   DECISION_LOG 2026-10-25; R-287.
 - **Blocking:** la metrica di varietà strutturale (§18.4) e la scelta
