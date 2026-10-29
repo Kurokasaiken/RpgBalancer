@@ -1665,3 +1665,69 @@ dominante singolo.
 **Motivo:** ablazione 5 arm × {claude, deepseek} × 3 + blind scoring.
 **Fonte:** `.mw/runs/pattern-commission-vs-specification.md`,
 `mind-weaver/.mw/runs/20261024-ablation-a0a4x/`, `20261026-hats-gate/`.
+
+## 2026-10-29 — `mappa2`: regioni (territori) e biomi sono due livelli distinti
+
+**Da:** `regions.json` == `biomes.json` (10 voci, poligoni grossolani); le animazioni leggevano le
+regioni come biomi.
+**A:** regioni = 20 territori di gioco contigui stile Risiko (mare incluso, `region_ids.png`);
+biomi = 13 tipi di terreno ripetibili in zone lontane (`biome_ids.png`). **Le animazioni, la canopy e il
+meteo chiavano a bioma, mai a regione.**
+**Motivo:** richiesta Director R-293 — le zone di gioco e il look del terreno non coincidono (stesso
+bioma in posti distanti; una regione può contenere più biomi).
+**Fonte:** `plans/PLAN-099-mappa2-territories-and-biomes.md`, `RICHIESTE.md` R-293.
+
+
+## 2026-10-29 — Scope della gimmick: core perdura e si interlaccia; gimmick di scena ammesse
+
+**Director-stated:** una quest deve avere una core gimmick che **perdura
+per tutta la storia (o quasi)** e **si interlaccia con le varie scene**;
+possono esistere anche **gimmick specifiche di una singola scena**.
+
+**Conseguenze registrate (PROPOSAL):** le algebre (tracciato /
+indagine / cash-out) sono ortogonali allo scope — istanziabili come
+core o come gimmick locale (scena-interrogatorio, micro-PYL, fuga a
+tempo); distinzione gimmick-di-scena (algebra giocabile) vs archetipo
+decisionale (forma di scelta, non sempre algebra); «interlacciarsi»
+formalizzato dalla regola 75% + hook (§2).
+
+**Fonte:** Director in sessione 2026-10-29; modello in
+`context/QUEST_GENERATION_ARCHITECTURE.md` §20.10.
+
+## 2026-10-29 — Tassonomia gimmick definita dal Director (versione corrente)
+
+**Director-stated (tassonomia):**
+
+- **Tracciato** — arrivare alla fine del tracciato; varianti: a tempo,
+  a tempo reward, tracciati multipli (gara), inverso (difesa), scorta,
+  avvelenato (HP di un membro del party).
+- **Livello di allarme** — valore su/giù; a soglia +1 livello → quest
+  più difficile/pericolosa (dial a gradini, non corsa).
+- **Investigazione** — doppio tracciato per pista: ogni punto = indizio
+  su pro/contro, con alta/bassa convinzione.
+- **Tiro contrapposto** — X tiri a media successo; ritenti quanto vuoi
+  ma ogni tiro costa di più (danni, difficoltà).
+- Skin/domain kit rinviati («c pensiamo poi»).
+
+**Aperto:** a tempo reward (variante vs modificatore ortogonale),
+allarme come core vs modulo, PYL vs tiro contrapposto, conferma modello
+doppio-tracciato indagine → §21.6.
+
+**Fonte:** Director in sessione 2026-10-29; canonico in
+`context/QUEST_GENERATION_ARCHITECTURE.md` §21 (supera §20.3/§20.5
+dove diverge).
+
+## 2026-10-29 — Ruling: reward-time ortogonale, cash-out meccanica innestabile, gimmick componibili
+
+**Director-stated:**
+
+- «A tempo reward» è **ortogonale** (asse di reward, non variante) —
+  applicabile a qualsiasi variante di tracciato.
+- **Cash-out** forse «meccanica su + gimmik» — leaning innestabile, non
+  core propria («è da pensare», non ratificato).
+- **Le gimmick potranno essere innestabili tra loro, anche
+  investigare** — composizione come proprietà generale (core +
+  moduli/gimmick innestati + gimmick di scena).
+
+**Fonte:** Director in sessione 2026-10-29; registrato in
+`context/QUEST_GENERATION_ARCHITECTURE.md` §21.7.

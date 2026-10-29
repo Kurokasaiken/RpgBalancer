@@ -989,3 +989,227 @@ corretto la race implementata non è «la gimmick race» ma la sfumatura
 (rituale prima, race sconsigliata «poco fantasy») valutava **sfumature
 dello stesso core**, non core diverse. Il ranking resta valido come
 scelta della *sfumatura banco di prova*, non del core.
+
+### 20.6 Criterio di bordo formalizzato — quando una sfumatura diventa gimmick diversa (PROPOSAL)
+
+Una voce è **sfumatura** della stessa core gimmick se cambia solo il
+modo in cui il limite/pressione si esprime, a parità di algebra.
+Diventa **core gimmick diversa** quando cambia ALMENO una di:
+
+| Asse | Domanda di discrimine | Tracciato | Indagine |
+|---|---|---|---|
+| **Algebra dello stato** | le vars sono cursori di avanzamento? | sì | no — interpretazioni (direzione × sicurezza), verità nascosta authored |
+| **Operatore decisionale** | qual è la domanda caratteristica del giocatore? | «come arrivo prima?» | «cosa dichiaro vero?» |
+| **Forma della sconfitta** | si perde quando un cursore-limite si completa? | sì | no — si perde per conclusione errata |
+
+Basta UN asse diverso per uscire dalla sfumatura. Una sfumatura non crea
+mai un operatore decisionale nuovo: se il giocatore deve rispondere a
+una domanda che non è «come arrivo prima?», non è più solo una variante
+del limite.
+
+### 20.7 Verdetto proposto su push-your-luck — terza core candidata (PROPOSAL)
+
+PYL soddisfa il criterio di bordo su **due** assi:
+
+- **Operatore decisionale diverso:** «continuo o casso?» — una decisione
+  di *ritiro*, non di avanzamento. Nel tracciato ogni scelta serve ad
+  andare più veloci/sicuri; in PYL il bottino è già tuo e la domanda è
+  se rischiarlo per altro.
+- **Forma della sconfitta diversa:** nel tracciato si perde quando il
+  limite *esterno* si completa (tempo, rivale, acqua); in PYL si perde
+  quando *hai scelto di continuare una volta di troppo* — il fallimento
+  è auto-inflitto dal timing, non da un cursore che ti raggiunge.
+
+**Ma:** la PYL *vera* richiede che il punto di bust sia **stocastico o
+nascosto**. Quando il limite è deterministico e dichiarato — il «muro
+certo» di F6 goblin (razzia infinita → wipe certo) — il giocatore può
+contare i round e la decisione torna «arrivare prima del limite noto»:
+**collassa dentro tracciato-resistenza**. Conseguenze:
+
+- **G-C «rischio crescente / cash-out»** — core gimmick candidata:
+  algebra = pot che cresce + bust nascosto/stocastico + operatore
+  continua/cassa.
+- **PYL-deterministica** (F6 goblin, vena loot di `flood`) = sfumatura
+  tracciato con sotto-decisioni di ritiro — le due algebre **si
+  compongono**: tracciato come core della quest, PYL come operatore di
+  scena/vena secondaria. Composizione ammessa: un hook di scena può
+  essere una micro-PYL dentro una quest-tracciato.
+
+### 20.8 Abbozzo dell'asse `variants` nel contratto `CoreGimmick` (PROPOSAL)
+
+La condizione-limite diventa una **famiglia parametrizzata**, non un
+dettaglio della singola gimmick. Bozza (non contract-ready):
+
+```ts
+type LimitPattern =
+  | { kind: 'deadline'; rounds: number; visibility: 'declared'|'named-states'|'hidden' }
+  | { kind: 'rival-cursor'; advanceOn: 'failures'|'actions'|'timer'; visibility?: ... }
+  | { kind: 'endurance'; rounds: number; pressureProfile: ... }
+  | { kind: 'vulnerable-cursor'; scope: 'external'|'member'|'carried' }
+```
+
+Mappatura sul censimento: `race` = rival-cursor/failures; `flood` =
+rival-cursor/actions (+vena PYL); `meld` = deadline/named-states;
+`rituale` = rival-cursor/timer; `difesa a ondate` = endurance;
+`infiltrazione` = rival-cursor/failures; `scorta` =
+vulnerable-cursor/external; `corruzione` = vulnerable-cursor/member;
+`cargo volatile` = vulnerable-cursor/carried.
+
+**La visibilità è un asse ortogonale** (regola meld: numero nascosto →
+stati nominati; estendibile a qualsiasi pattern) — non una sfumatura.
+
+Cosa NON cambia tra sfumature: vars di avanzamento, operatore «arriva
+prima», hook accettati, algebra dei verdetti. Un kit domain veste la
+coppia (gimmick, pattern); il contratto scena dichiara quali pattern sa
+leggere (una scena che «rallenta il rivale» non vale sotto `endurance`
+→ compatibilità pattern↔scena da dichiarare, stesso meccanismo degli
+hookTypes).
+
+### 20.9 Esito aggiornato del censimento
+
+| Core gimmick | Algebra | Sfumature / istanze |
+|---|---|---|
+| **G-A «avanzamento sul tracciato»** | cursori → goal, operatore «arriva prima» | deadline (`meld`, `cargo volatile`) · rival-cursor (`race`, `flood`, `rituale`, `infiltrazione`) · endurance (`difesa a ondate`) · vulnerable-cursor (`scorta`, `corruzione`, `cargo`) · reskin (`preda`, `salmento`, `doppio fronte`) |
+| **G-B «indagine»** | indizio → direzione×sicurezza → dichiarazione | §19 + 8 meccaniche investigative (S-11) + regime acquisizione A/B |
+| **G-C «rischio crescente / cash-out»** (candidata) | pot + bust nascosto + continua/cassa | PYL stocastica; le istanze deterministiche restano in G-A |
+
+### 20.10 Scope della gimmick: core vs di scena (definizione Director 2026-10-29)
+
+**Definizione Director:** una quest deve avere una **core gimmick** che
+**perdura per tutta la storia (o quasi)** e si **interlaccia con le
+varie scene**; possono però esistere anche **gimmick specifiche di una
+singola scena**.
+
+Mapping sul framework esistente (§1, SPEC §3.2): è la distinzione già
+presente tra Livello A (gimmick core) e Livello B (scene gimmick /
+archetipi decisionali), qui resa esplicita come **regola di scope**:
+
+- **Core gimmick** — persiste lungo la quest: le scene la leggono e la
+  scrivono (regola 75%, §2), il climax la risolve. «Interlacciarsi con
+  le scene» = gli hook: la scena ha significato locale E modifica le
+  variabili/condizioni core.
+- **Gimmick di scena** — algebra locale a una scena: entra, si gioca,
+  esce. Non è tenuta a persistere né ad agganciare la core (può farlo:
+  allora è *anche* un hook).
+
+**Le algebre (G-A tracciato / G-B indagine / G-C cash-out) sono
+ortogonali allo scope** — la stessa algebra può istanziarsi come core
+di una quest o come gimmick locale di una scena:
+
+| Esempio | Core | Scena |
+|---|---|---|
+| tracciato | `race`, `flood`, `meld` come core | una scena «fuga a tempo» dentro una quest-indagine |
+| indagine | `investigation` (§19) come core | scena-interrogatorio (meccanica Mastermind S-11) dentro una quest-tracciato |
+| cash-out | PYL-stocastica come core | vena loot di `flood`: micro-continua/cassa dentro tracciato |
+
+**Distinzione da tenere:** *gimmick di scena* (un'istanza d'algebra
+giocabile) vs *archetipo decisionale* (una forma di scelta — «chi si
+espone», «acquisire X rinunciando a Y» — che può non portare algebra:
+è un bivio, non un mini-gioco). Gli archetipi restano il catalogo delle
+scene; alcuni di essi sono algebre miniaturizzate, altri no.
+
+## 21. Tassonomia corrente delle gimmick (Director 2026-10-29 — versione definitiva proposta)
+
+**Questa sezione è la tassonomia di riferimento.** Sostituisce la
+classificazione di §20.3/§20.5/§20.9 dove diverge (quelle restano come
+storia del ragionamento). Regola di scope invariata (§20.10): ogni
+gimmick può essere core di una quest o gimmick di una singola scena.
+Le skin/domain kit sono rinviate («c pensiamo poi», Director).
+
+### 21.1 G-A «Tracciato» — arrivare alla fine del tracciato
+
+Devi arrivare alla fine del tracciato. **Varianti** (limite/condizione
+sulla stessa algebra):
+
+| Variante | Definizione |
+|---|---|
+| **A tempo** | arrivare entro X turni |
+| **A tempo reward** | prima arrivi, migliore il reward |
+| **Tracciati multipli** | il primo che completa il tracciato vince (gara contro avversario) |
+| **Inverso** | gli avversari NON devono completare il tracciato in X tempo (difesa) |
+| **Scorta** | arrivare a fine tracciato prima che il compagno muoia / l'oggetto sia distrutto |
+| **Avvelenato** | come scorta, ma il cursore sono gli HP di un membro del party |
+
+**Mapping delle istanze esistenti:** `race` → tracciati multipli;
+`flood` → tracciati multipli contro ambiente (+vena cash-out);
+`meld` → a tempo (deadline velata); `difesa a ondate`/`inverso` →
+inverso; `rituale` → tracciati multipli/auto-escalazione; `scorta` →
+scorta; `cargo volatile` → scorta-oggetto; `corruzione` → avvelenato;
+`preda`/`salmento`/`doppio fronte` → reskin (non contano).
+
+### 21.2 G-D «Livello di allarme»
+
+Un valore che puoi **aumentare o diminuire**: quando arriva a X il
+livello di allarme sale di 1 e la quest diventa **più difficile /
+pericolosa** (ecc.). La sorgente canonica: l'infiltrazione di R-127/128
+(l'allarme che sale). Nota strutturale: a differenza del tracciato, il
+cursore che raggiunge la soglia **non termina** la quest — la peggiora;
+è un *dial* di pressione a gradini, non una corsa a eliminazione.
+
+### 21.3 G-B «Investigazione»
+
+**Doppio tracciato per pista d'indagine:** ogni punto del tracciato
+rappresenta **un indizio** e può muoversi su **pro e contro**, con
+**alta o bassa % di convinzione**. Riconciliazione con §19: il cursore
+di ogni indizio porta la *direzione* (pro/contro la tesi) e la
+*sicurezza* — il tracciato qui è lo strumento di rappresentazione della
+convinzione, non una corsa verso un traguardo (nessun «chi arriva
+prima vince»: si vince/perde sulla dichiarazione). Restano vigenti i
+requisiti Director di §19: deduzione fallibile → sconfitta,
+re-investigazione senza grinding, acquisizione passiva trasversale.
+
+### 21.4 G-E «Tiro contrapposto»
+
+Devi fare X tiri e ottenere **mediamente successo**. Puoi fare tutti i
+tiri che vuoi, **ma ogni tiro ha un costo crescente**: sempre più danni,
+difficoltà che aumenta, ecc. L'operatore caratteristico: accumulare
+successi pagando il prezzo di ogni ritentativo — il dilemma è *quanto*
+insistere, non *come*.
+
+### 21.5 Candidate non ancora collocate
+
+- **Cash-out / push-your-luck** (G-C candidata di §20.7): «continuo o
+  casso?» sotto bust crescente. Overlap parziale col tiro contrapposto
+  (economia del ritentativo): differenza = in PYL decidi **di smettere**,
+  in tiro contrapposto decidi **quanto insistere per arrivare a X**.
+  Da sciogliere: PYL core propria, sfumatura di tiro contrapposto, o
+  operatore di scena.
+- **Famiglia hazard / ricompensa ingannevole** (§18): nodi senza scelta
+  nel momento (mimic & c.) — gimmick di scena per natura, mai core.
+- Semi di scena §18.4 (`boon-faustiano`, `stanza-?`, `luce-vs-furtivita`,
+  `male-minore`): sotto il livello gimmick.
+
+### 21.6 Dubbi aperti (da sciogliere col Director)
+
+1. **A tempo reward**: cambia la *funzione di reward*, non la condizione
+   di sconfitta — è variante o modificatore ortogonale applicabile ad
+   altre varianti (es. primo dei tracciati multipli → reward migliore)?
+2. **Livello di allarme** è core autonoma o un *modulo di pressione*
+   innestabile su altre core (una tracciato con dial d'allarme)? Oggi
+   scritta come core per definizione Director; la domanda resta aperta.
+3. **Tiro contrapposto vs cash-out**: l'economia «ritenta a costo
+   crescente» assorbe parte di PYL — vedi §21.5.
+4. **Doppio tracciato indagine**: conferma che ogni indizio = un
+   cursore pro/contro con livello di convinzione (≥2 livelli, il «medio»
+   di §19.2 resta compatibile come gradino intermedio)?
+
+### 21.7 Ruling Director sui dubbi (2026-10-29)
+
+- **A tempo reward → modificatore ortogonale, non variante.** «È
+  ortogonale, hai ragione» — la scala reward-per-velocità si applica a
+  qualsiasi variante di tracciato (e potenzialmente ad altre core).
+  Riclassificato da «variante» a **asse di reward**, accanto alla
+  visibilità del limite (§20.8): due modificatori trasversali, non
+  sfumature.
+- **Cash-out → meccanica innestabile, non core** (leaning, «è da
+  pensare»). Il tiro contrapposto assorbe la forma «ritenta a costo
+  crescente»; ciò che resta di PYL — la decisione *continuo/casso* —
+  è candidata a **meccanica applicabile su più gimmick** (vena loot di
+  flood ne è già un'istanza), non a core autonoma. Da confermare.
+- **Innestabilità — proprietà generale.** «Queste gimmik potranno
+  essere innestabili tra loro, anche investigare»: qualsiasi gimmick
+  può essere innestata dentro un'altra — un segmento d'indagine dentro
+  una quest-tracciato, un dial d'allarme dentro una quest-investigativa,
+  una micro-cash-out dentro una scena. Estende §20.10 (scope core vs
+  scena) in **composizione**: core principale + gimmick/moduli
+  innestati + gimmick di scena.
