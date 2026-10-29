@@ -8,171 +8,598 @@
       "id": "snow_peaks",
       "index": 1,
       "nameKey": "world.region.snow_peaks",
-      "label": "Vette Innevate e Ghiacciaio",
+      "label": "Vette Nevose",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.5223,
-        0.1178
+        0.5185,
+        0.1961
       ],
       "bounds": {
-        "x": 760,
-        "y": 0,
-        "width": 1341,
-        "height": 391
+        "x": 916,
+        "y": 44,
+        "width": 901,
+        "height": 545
       },
-      "areaFraction": 0.1085
+      "areaFraction": 0.0531,
+      "biomes": {
+        "alpine": 0.903,
+        "rocky_coast": 0.093
+      },
+      "neighbors": [
+        "red_desert",
+        "ridge_forest",
+        "river_meadows",
+        "sea_north",
+        "waterfall_plateau"
+      ]
     },
     {
       "id": "waterfall_plateau",
       "index": 2,
       "nameKey": "world.region.waterfall_plateau",
-      "label": "Altopiano della Cascata e Lago Alpino",
+      "label": "Altopiano della Cascata",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.4602,
-        0.2899
+        0.4733,
+        0.2918
       ],
       "bounds": {
-        "x": 850,
-        "y": 270,
-        "width": 831,
-        "height": 351
+        "x": 1082,
+        "y": 250,
+        "width": 419,
+        "height": 397
       },
-      "areaFraction": 0.0626
+      "areaFraction": 0.0319,
+      "biomes": {
+        "highland": 0.861,
+        "temperate_forest": 0.116
+      },
+      "neighbors": [
+        "deep_forest",
+        "ridge_forest",
+        "river_meadows",
+        "snow_peaks"
+      ]
     },
     {
-      "id": "western_forest",
+      "id": "ridge_forest",
       "index": 3,
-      "nameKey": "world.region.western_forest",
-      "label": "Foresta Densa",
+      "nameKey": "world.region.ridge_forest",
+      "label": "Bosco del Crinale",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.2303,
-        0.4147
+        0.3314,
+        0.3699
       ],
       "bounds": {
-        "x": 260,
-        "y": 300,
-        "width": 741,
-        "height": 661
+        "x": 698,
+        "y": 278,
+        "width": 445,
+        "height": 610
       },
-      "areaFraction": 0.107
+      "areaFraction": 0.0269,
+      "biomes": {
+        "temperate_forest": 0.994
+      },
+      "neighbors": [
+        "coral_lagoon",
+        "deep_forest",
+        "sea_north",
+        "sea_west",
+        "snow_peaks",
+        "waterfall_plateau"
+      ]
     },
     {
-      "id": "bayou",
+      "id": "deep_forest",
       "index": 4,
-      "nameKey": "world.region.bayou",
-      "label": "Bayou/Palude di Mangrovie",
+      "nameKey": "world.region.deep_forest",
+      "label": "Selva Profonda",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.2169,
-        0.7292
+        0.4175,
+        0.5043
       ],
       "bounds": {
-        "x": 160,
-        "y": 860,
-        "width": 861,
-        "height": 521
+        "x": 893,
+        "y": 615,
+        "width": 447,
+        "height": 300
       },
-      "areaFraction": 0.0905
+      "areaFraction": 0.0218,
+      "biomes": {
+        "temperate_forest": 0.984
+      },
+      "neighbors": [
+        "bayou",
+        "coral_lagoon",
+        "ridge_forest",
+        "river_meadows",
+        "waterfall_plateau"
+      ]
     },
     {
-      "id": "central_valley",
+      "id": "river_meadows",
       "index": 5,
-      "nameKey": "world.region.central_valley",
-      "label": "Valle Fluviale e Praterie Centrali",
+      "nameKey": "world.region.river_meadows",
+      "label": "Praterie del Fiume",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.5033,
-        0.5353
+        0.5605,
+        0.4972
       ],
       "bounds": {
-        "x": 980,
-        "y": 560,
-        "width": 831,
-        "height": 521
+        "x": 1325,
+        "y": 571,
+        "width": 428,
+        "height": 459
       },
-      "areaFraction": 0.1
+      "areaFraction": 0.0313,
+      "biomes": {
+        "temperate_forest": 0.155,
+        "meadow": 0.845
+      },
+      "neighbors": [
+        "bayou",
+        "coral_lagoon",
+        "deep_forest",
+        "red_canyons",
+        "red_desert",
+        "snow_peaks",
+        "volcanic_massif",
+        "waterfall_plateau"
+      ]
     },
     {
-      "id": "dry_steppe",
+      "id": "red_desert",
       "index": 6,
-      "nameKey": "world.region.dry_steppe",
-      "label": "Steppe Aride",
+      "nameKey": "world.region.red_desert",
+      "label": "Deserto Rosso",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.7233,
-        0.3282
+        0.7025,
+        0.2828
       ],
       "bounds": {
-        "x": 1620,
-        "y": 290,
-        "width": 711,
-        "height": 431
+        "x": 1695,
+        "y": 174,
+        "width": 485,
+        "height": 451
       },
-      "areaFraction": 0.0647
+      "areaFraction": 0.0308,
+      "biomes": {
+        "red_badlands": 0.986
+      },
+      "neighbors": [
+        "east_cliffs",
+        "red_canyons",
+        "river_meadows",
+        "sea_east",
+        "sea_north",
+        "snow_peaks"
+      ]
     },
     {
       "id": "red_canyons",
       "index": 7,
       "nameKey": "world.region.red_canyons",
-      "label": "Canyon Rossi e Arco Naturale",
+      "label": "Canyon Rossi",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.8489,
-        0.5709
+        0.7178,
+        0.4809
       ],
       "bounds": {
-        "x": 2040,
-        "y": 610,
-        "width": 611,
-        "height": 521
+        "x": 1728,
+        "y": 586,
+        "width": 544,
+        "height": 324
       },
-      "areaFraction": 0.0709
+      "areaFraction": 0.0295,
+      "biomes": {
+        "red_badlands": 0.795,
+        "volcanic": 0.197
+      },
+      "neighbors": [
+        "east_cliffs",
+        "red_desert",
+        "river_meadows",
+        "sea_east",
+        "volcanic_massif"
+      ]
     },
     {
       "id": "volcanic_massif",
       "index": 8,
       "nameKey": "world.region.volcanic_massif",
-      "label": "Massiccio Vulcanico Nero",
+      "label": "Massiccio Vulcanico",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.816,
-        0.8417
+        0.6611,
+        0.6865
       ],
       "bounds": {
-        "x": 1810,
-        "y": 1030,
-        "width": 891,
-        "height": 506
+        "x": 1532,
+        "y": 845,
+        "width": 600,
+        "height": 513
       },
-      "areaFraction": 0.1
+      "areaFraction": 0.0357,
+      "biomes": {
+        "red_badlands": 0.424,
+        "volcanic": 0.563
+      },
+      "neighbors": [
+        "coral_lagoon",
+        "red_canyons",
+        "river_meadows",
+        "sea_east"
+      ]
     },
     {
-      "id": "coral_lagoon",
+      "id": "bayou",
       "index": 9,
-      "nameKey": "world.region.coral_lagoon",
-      "label": "Laguna Corallina",
+      "nameKey": "world.region.bayou",
+      "label": "Bayou",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.4868,
-        0.8387
+        0.4107,
+        0.663
       ],
       "bounds": {
-        "x": 820,
-        "y": 1050,
-        "width": 1011,
-        "height": 486
+        "x": 869,
+        "y": 855,
+        "width": 575,
+        "height": 461
       },
-      "areaFraction": 0.1105
+      "areaFraction": 0.0272,
+      "biomes": {
+        "temperate_forest": 0.263,
+        "meadow": 0.039,
+        "mangrove_bayou": 0.62,
+        "tropical_beach": 0.079
+      },
+      "neighbors": [
+        "coral_lagoon",
+        "deep_forest",
+        "river_meadows",
+        "sandy_coast"
+      ]
     },
     {
-      "id": "western_archipelago",
+      "id": "sandy_coast",
       "index": 10,
-      "nameKey": "world.region.western_archipelago",
-      "label": "Arcipelago e Atollo",
+      "nameKey": "world.region.sandy_coast",
+      "label": "Costa Sabbiosa",
+      "kind": "land",
+      "continent": "mainland",
       "center": [
-        0.0738,
-        0.6195
+        0.1718,
+        0.8738
       ],
       "bounds": {
         "x": 0,
-        "y": 610,
-        "width": 421,
-        "height": 671
+        "y": 901,
+        "width": 973,
+        "height": 635
       },
-      "areaFraction": 0.064
+      "areaFraction": 0.0449,
+      "biomes": {
+        "tropical_beach": 0.994
+      },
+      "neighbors": [
+        "bayou",
+        "coral_lagoon",
+        "sea_west",
+        "west_atoll"
+      ]
+    },
+    {
+      "id": "green_islet",
+      "index": 11,
+      "nameKey": "world.region.green_islet",
+      "label": "Isolotto Verde",
+      "kind": "land",
+      "continent": "islands",
+      "center": [
+        0.5073,
+        0.7757
+      ],
+      "bounds": {
+        "x": 1282,
+        "y": 1100,
+        "width": 254,
+        "height": 290
+      },
+      "areaFraction": 0.0057,
+      "biomes": {
+        "temperate_forest": 0.174,
+        "tropical_isles": 0.822
+      },
+      "neighbors": [
+        "coral_lagoon"
+      ]
+    },
+    {
+      "id": "nw_archipelago",
+      "index": 12,
+      "nameKey": "world.region.nw_archipelago",
+      "label": "Arcipelago Nord-Ovest",
+      "kind": "land",
+      "continent": "islands",
+      "center": [
+        0.1317,
+        0.0874
+      ],
+      "bounds": {
+        "x": 46,
+        "y": 20,
+        "width": 848,
+        "height": 256
+      },
+      "areaFraction": 0.0132,
+      "biomes": {
+        "temperate_forest": 0.248,
+        "tropical_isles": 0.725,
+        "rocky_coast": 0.026
+      },
+      "neighbors": [
+        "sea_north",
+        "sea_west"
+      ]
+    },
+    {
+      "id": "west_atoll",
+      "index": 13,
+      "nameKey": "world.region.west_atoll",
+      "label": "Atollo e Arco Ovest",
+      "kind": "land",
+      "continent": "islands",
+      "center": [
+        0.0588,
+        0.5309
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 270,
+        "width": 644,
+        "height": 1115
+      },
+      "areaFraction": 0.0538,
+      "biomes": {
+        "tropical_beach": 0.048,
+        "tropical_isles": 0.946
+      },
+      "neighbors": [
+        "sandy_coast",
+        "sea_west"
+      ]
+    },
+    {
+      "id": "east_cliffs",
+      "index": 14,
+      "nameKey": "world.region.east_cliffs",
+      "label": "Scogliere Orientali",
+      "kind": "land",
+      "continent": "islands",
+      "center": [
+        0.934,
+        0.2713
+      ],
+      "bounds": {
+        "x": 2090,
+        "y": 0,
+        "width": 662,
+        "height": 1214
+      },
+      "areaFraction": 0.0497,
+      "biomes": {
+        "temperate_forest": 0.043,
+        "rocky_coast": 0.957
+      },
+      "neighbors": [
+        "red_canyons",
+        "red_desert",
+        "sea_east",
+        "sea_north",
+        "sea_south"
+      ]
+    },
+    {
+      "id": "se_volcanic_isles",
+      "index": 15,
+      "nameKey": "world.region.se_volcanic_isles",
+      "label": "Isolotti Vulcanici",
+      "kind": "land",
+      "continent": "islands",
+      "center": [
+        0.8923,
+        0.8886
+      ],
+      "bounds": {
+        "x": 1998,
+        "y": 893,
+        "width": 754,
+        "height": 643
+      },
+      "areaFraction": 0.035,
+      "biomes": {
+        "volcanic": 0.999
+      },
+      "neighbors": [
+        "coral_lagoon",
+        "sea_east",
+        "sea_south"
+      ]
+    },
+    {
+      "id": "sea_west",
+      "index": 16,
+      "nameKey": "world.region.sea_west",
+      "label": "Mare Ovest",
+      "kind": "sea",
+      "continent": "sea",
+      "center": [
+        0.1469,
+        0.4831
+      ],
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 895,
+        "height": 1430
+      },
+      "areaFraction": 0.1245,
+      "biomes": {
+        "shallow_waters": 0.86,
+        "open_sea": 0.14
+      },
+      "neighbors": [
+        "coral_lagoon",
+        "nw_archipelago",
+        "ridge_forest",
+        "sandy_coast",
+        "sea_north",
+        "west_atoll"
+      ]
+    },
+    {
+      "id": "sea_north",
+      "index": 17,
+      "nameKey": "world.region.sea_north",
+      "label": "Mare Nord",
+      "kind": "sea",
+      "continent": "sea",
+      "center": [
+        0.4525,
+        0.1007
+      ],
+      "bounds": {
+        "x": 153,
+        "y": 0,
+        "width": 2314,
+        "height": 518
+      },
+      "areaFraction": 0.1154,
+      "biomes": {
+        "shallow_waters": 0.652,
+        "open_sea": 0.348
+      },
+      "neighbors": [
+        "east_cliffs",
+        "nw_archipelago",
+        "red_desert",
+        "ridge_forest",
+        "sea_east",
+        "sea_west",
+        "snow_peaks"
+      ]
+    },
+    {
+      "id": "sea_east",
+      "index": 18,
+      "nameKey": "world.region.sea_east",
+      "label": "Mare Est",
+      "kind": "sea",
+      "continent": "sea",
+      "center": [
+        0.8716,
+        0.4806
+      ],
+      "bounds": {
+        "x": 1943,
+        "y": 0,
+        "width": 809,
+        "height": 1285
+      },
+      "areaFraction": 0.1093,
+      "biomes": {
+        "shallow_waters": 0.813,
+        "open_sea": 0.187
+      },
+      "neighbors": [
+        "coral_lagoon",
+        "east_cliffs",
+        "red_canyons",
+        "red_desert",
+        "se_volcanic_isles",
+        "sea_north",
+        "sea_south",
+        "volcanic_massif"
+      ]
+    },
+    {
+      "id": "coral_lagoon",
+      "index": 19,
+      "nameKey": "world.region.coral_lagoon",
+      "label": "Laguna Corallina",
+      "kind": "sea",
+      "continent": "sea",
+      "center": [
+        0.4622,
+        0.8431
+      ],
+      "bounds": {
+        "x": 488,
+        "y": 809,
+        "width": 1573,
+        "height": 727
+      },
+      "areaFraction": 0.1303,
+      "biomes": {
+        "coral_reef": 1.0
+      },
+      "neighbors": [
+        "bayou",
+        "deep_forest",
+        "green_islet",
+        "ridge_forest",
+        "river_meadows",
+        "sandy_coast",
+        "se_volcanic_isles",
+        "sea_east",
+        "sea_south",
+        "sea_west",
+        "volcanic_massif"
+      ]
+    },
+    {
+      "id": "sea_south",
+      "index": 20,
+      "nameKey": "world.region.sea_south",
+      "label": "Mare Sud",
+      "kind": "sea",
+      "continent": "sea",
+      "center": [
+        0.8297,
+        0.8646
+      ],
+      "bounds": {
+        "x": 1940,
+        "y": 1076,
+        "width": 812,
+        "height": 460
+      },
+      "areaFraction": 0.03,
+      "biomes": {
+        "shallow_waters": 0.91,
+        "open_sea": 0.09
+      },
+      "neighbors": [
+        "coral_lagoon",
+        "east_cliffs",
+        "se_volcanic_isles",
+        "sea_east"
+      ]
     }
   ]
 }

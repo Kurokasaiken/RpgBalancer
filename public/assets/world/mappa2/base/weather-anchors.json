@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "seed": 97421,
+  "canvas": {
+    "width": 2752,
+    "height": 1536
+  },
+  "caps": {
+    "mist": 16,
+    "embers": 0,
+    "volcano": 16,
+    "orographic": 12,
+    "glints": 14,
+    "dust": 0
+  },
+  "thresholds": {
+    "minReach": {
+      "mist": 12,
+      "ember": 14,
+      "volcano": 40,
+      "orographic": 40,
+      "dust": 40,
+      "glint": 8
+    },
+    "minSpacing": {
+      "mist": 40.0,
+      "ember": 45.0,
+      "volcano": 60.0,
+      "orographic": 60.0,
+      "dust": 60.0,
+      "glint": 110.0
+    },
+    "shorelineMargin": 24,
+    "driftMax": {
+      "mist": 6,
+      "ember": 12,
+      "volcano": 90,
+      "orographic": 24,
+      "dust": 30,
+      "glint": 0
+    }
+  },
+  "generatedFrom": {
+    "sourceSha256": "e3760858fc36e509fb0aba06a0bc56772bd09a64aa1b268de572deef779e884a",
+    "artifact": "PLAN-098 v1 mist+embers (biome-keyed)"
+  },
+  "anchors": [
+    {
+      "id": "glint_01",
+      "type": "glint",
+      "x": 1612,
+      "y": 245,
+      "radius": 6.0,
+      "reach": 14.0,
+      "weight": 1.0,
+      "phase": 0.226
+    },
+    {
+      "id": "glint_02",
+      "type": "glint",
+      "x": 1604,
+      "y": 390,
+      "radius": 24.0,
+      "reach": 56.6,
+      "weight": 1.0,
+      "phase": 0.4624
+    },
+    {
+      "id": "glint_03",
+      "type": "glint",
+      "x": 1591,
+      "y": 515,
+      "radius": 24.0,
+      "reach": 39.6,
+      "weight": 1.0,
+      "phase": 0.5134
+    },
+    {
+      "id": "glint_04",
+      "type": "glint",
+      "x": 1720,
+      "y": 358,
+      "radius": 24.0,
+      "reach": 79.5,
+      "weight": 1.0,
+      "phase": 0.3622
+    },
+    {
+      "id": "glint_05",
+      "type": "glint",
+      "x": 1084,
+      "y": 410,
+      "radius": 5.0,
+      "reach": 13.0,
+      "weight": 1.0,
+      "phase": 0.3597
+    },
+    {
+      "id": "glint_06",
+      "type": "glint",
+      "x": 968,
+      "y": 262,
+      "radius": 4.4,
+      "reach": 12.4,
+      "weight": 1.0,
+      "phase": 0.2828
+    },
+    {
+      "id": "glint_07",
+      "type": "glint",
+      "x": 1115,
+      "y": 256,
+      "radius": 2.0,
+      "reach": 8.8,
+      "weight": 1.0,
+      "phase": 0.3402
+    },
+    {
+      "id": "glint_08",
+      "type": "glint",
+      "x": 1441,
+      "y": 80,
+      "radius": 2.0,
+      "reach": 8.6,
+      "weight": 1.0,
+      "phase": 0.5003
+    },
+    {
+      "id": "glint_09",
+      "type": "glint",
+      "x": 1505,
+      "y": 303,
+      "radius": 2.0,
+      "reach": 8.4,
+      "weight": 1.0,
+      "phase": 0.4855
+    },
+    {
+      "id": "glint_10",
+      "type": "glint",
+      "x": 1701,
+      "y": 539,
+      "radius": 5.2,
+      "reach": 13.2,
+      "weight": 1.0,
+      "phase": 0.1769
+    },
+    {
+      "id": "glint_11",
+      "type": "glint",
+      "x": 1501,
+      "y": 441,
+      "radius": 2.0,
+      "reach": 9.0,
+      "weight": 1.0,
+      "phase": 0.7573
+    },
+    {
+      "id": "glint_12",
+      "type": "glint",
+      "x": 1329,
+      "y": 242,
+      "radius": 2.0,
+      "reach": 9.6,
+      "weight": 1.0,
+      "phase": 0.6784
+    },
+    {
+      "id": "glint_13",
+      "type": "glint",
+      "x": 1286,
+      "y": 138,
+      "radius": 2.0,
+      "reach": 8.4,
+      "weight": 1.0,
+      "phase": 0.0909
+    },
+    {
+      "id": "glint_14",
+      "type": "glint",
+      "x": 973,
+      "y": 401,
+      "radius": 2.0,
+      "reach": 8.6,
+      "weight": 1.0,
+      "phase": 0.6648
+    },
+    {
+      "id": "mist_01",
+      "type": "mist",
+      "x": 1034,
+      "y": 950,
+      "radius": 7.8,
+      "reach": 13.8,
+      "weight": 0.077,
+      "phase": 0.3101
+    },
+    {
+      "id": "mist_02",
+      "type": "mist",
+      "x": 1512,
+      "y": 959,
+      "radius": 10.4,
+      "reach": 16.4,
+      "weight": 0.091,
+      "phase": 0.6366
+    },
+    {
+      "id": "mist_03",
+      "type": "mist",
+      "x": 1465,
+      "y": 990,
+      "radius": 16.6,
+      "reach": 22.6,
+      "weight": 0.126,
+      "phase": 0.7483
+    },
+    {
+      "id": "mist_04",
+      "type": "mist",
+      "x": 1080,
+      "y": 954,
+      "radius": 6.8,
+      "reach": 12.8,
+      "weight": 0.071,
+      "phase": 0.8449
+    },
+    {
+      "id": "orographic_01",
+      "type": "orographic",
+      "x": 1647,
+      "y": 435,
+      "radius": 115.5,
+      "reach": 330.0,
+      "weight": 1.0,
+      "phase": 0.22
+    },
+    {
+      "id": "orographic_02",
+      "type": "orographic",
+      "x": 1065,
+      "y": 383,
+      "radius": 58.7,
+      "reach": 167.8,
+      "weight": 0.13,
+      "phase": 0.4974
+    },
+    {
+      "id": "orographic_03",
+      "type": "orographic",
+      "x": 1027,
+      "y": 210,
+      "radius": 43.9,
+      "reach": 125.5,
+      "weight": 0.073,
+      "phase": 0.1422
+    },
+    {
+      "id": "orographic_04",
+      "type": "orographic",
+      "x": 1138,
+      "y": 199,
+      "radius": 36.1,
+      "reach": 103.1,
+      "weight": 0.049,
+      "phase": 0.5114
+    },
+    {
+      "id": "orographic_05",
+      "type": "orographic",
+      "x": 1325,
+      "y": 218,
+      "radius": 34.4,
+      "reach": 98.3,
+      "weight": 0.045,
+      "phase": 0.8274
+    },
+    {
+      "id": "volcano_01",
+      "type": "volcano",
+      "x": 1754,
+      "y": 982,
+      "radius": 26.0,
+      "reach": 116.0,
+      "weight": 1.0,
+      "phase": 0.9507
+    }
+  ]
+}

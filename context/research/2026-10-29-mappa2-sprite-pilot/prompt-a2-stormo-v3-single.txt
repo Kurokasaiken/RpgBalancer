@@ -1,0 +1,9 @@
+Using the attached image — a crop of a painted fantasy world map — for STYLE, PALETTE, PAINTING TECHNIQUE and CAMERA ANGLE only, paint a single game sprite subject.
+
+SUBJECT: one small fantasy songbird in flight — a plump passerine with a teal-green back and wings, a warm amber breast, one small crimson throat fleck. Wings raised mid-wingbeat, flying toward the RIGHT. Viewed from the same high oblique aerial angle as the map (about 45 degrees): we see its back, the top of its head and the top of its wings — NOT a flat side profile, NOT front view.
+
+BACKGROUND: flat solid magenta #FF00FF filling the whole canvas edge to edge. No scenery, no ground, no shadow.
+
+STYLE: same painted technique as the reference — visible painterly brushwork, soft impasto edges, saturated pigments, light from the upper-left. NOT anime, NOT cel shading, NO black outline, NOT pixel art, NOT photoreal, NOT a concept sheet.
+
+KILL LIST: no text, no title, no labels, no numbers, no grid, no borders, no sheet layout, no watermark, no signature, no cast shadow, no scenery, no extra birds — only the ONE bird on magenta, filling the center of the image.
