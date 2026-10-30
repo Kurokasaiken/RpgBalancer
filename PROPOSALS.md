@@ -118,3 +118,14 @@ meccanico sulle ref — crop/scan dei 4 corner per testo/firme, e veto su ref
 "sporche" nel pipeline di generazione. Oggi: regola manuale in
 `scene_prompt_form.md` + trappola T-27. Un checker d'angolo (OCR-lite o
 contrasto-localizzato) lo renderebbe automatico.
+
+## P-010 — Gate di qualità visiva pre-ruling: l'agente filtra, il Director decide (2026-10-30)
+
+**Stato:** proposta — n-esima occorrenza segnalata dal Director («questo errore è successo troppe volte»), istanza odierna: visual-fork peak-clouds giro 1 rigettato (`nessuno`) perché le 3 opzioni erano sub-soglia (B coperta amorfa, C invisibile, A adesivi in fila).
+**Pattern:** il visual-fork gate (v35) prescrive *cosa* sottoporre ma non un *pavimento di qualità*: l'agente ha usato il Director come filtro di qualità invece che come decisore tra candidati validi.
+
+**Cosa si propone:**
+1. **Self-witness prima del ruling**: nessun candidato visivo viene presentato senza che l'agente l'abbia renderizzato e *guardato* (screenshot letto, non solo generato) — estende T-04 dal claim alla fase di proposta.
+2. **Autocritica obbligatoria a voce**: ogni opzione arriva al Director con la critica più forte già scritta dall'agente; se l'autocritica dice "scarso", si itera prima di presentare — il ruling non è il filtro qualità.
+3. **Asse di variazione onesto al giro 2**: se il rigetto può dipendere da un asse non variato (materia, scala, palette), il giro 2 dichiara l'asse e lo varia — non ri-proporre la stessa materia riarrangiata.
+4. Sede naturale della regola: estendere il gate v35 / `visual-fork-card.md` con un campo `self_critique` per opzione, o una trappola dedicata in `context/recurring-traps.md`. La promozione resta del Director.

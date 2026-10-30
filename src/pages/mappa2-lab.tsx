@@ -44,7 +44,9 @@ const TAB_EFFECTS: Record<LabTab, (keyof PixiWorldMapEffects)[]> = {
   village: [],
 };
 
-const VILLAGE_STAGES = ['4 casette + cantiere', '7 casette', 'palizzata + torri'];
+const VILLAGE_STAGES = ['nessuna casa', '7 casette'];
+const VILLAGE_ELEMENTS = ['palizzata', 'muro', 'torre-legno-1', 'torre-legno-2', 'torre-pietra-1', 'torre-pietra-2'];
+const VILLAGE_EXCLUSIVE = [['palizzata','muro'], ['torre-legno-1','torre-pietra-1'], ['torre-legno-2','torre-pietra-2']];
 
 interface LabDefaults {
   wonderEveryS: number;
@@ -224,7 +226,10 @@ export default function Mappa2LabPage() {
   const [ambRare, setAmbRare] = useState(CODE_DEFAULTS.ambRare === 1);
   const [ambLogTick, setAmbLogTick] = useState(0);
   const [villageOn, setVillageOn] = useState(true);
-  const [villageStage, setVillageStage] = useState(1);
+  const [villageStage, setVillageStage] = useState(2);
+  const [villageArmed, setVillageArmed] = useState<string | null>(null);
+  const [villageParts, setVillageParts] = useState<{ part: string; x: number; y: number }[]>([]);
+  const [villageElements, setVillageElements] = useState<string[]>([]);
   const [savedDefaultsNote, setSavedDefaultsNote] = useState('');
   const [wonderRequest, setWonderRequest] = useState(0);
   const [defaultsLoaded, setDefaultsLoaded] = useState(false);
@@ -282,7 +287,13 @@ export default function Mappa2LabPage() {
   useEffect(() => {
     villageZoneLive.visible = villageOn;
     villageZoneLive.stage = villageStage;
-  }, [villageOn, villageStage]);
+    villageZoneLive.armed = villageArmed;
+    villageZoneLive.parts = villageParts;
+    villageZoneLive.elements = villageElements;
+  }, [villageOn, villageStage, villageArmed, villageParts, villageElements]);
+  useEffect(() => {
+    if (hover) { villageZoneLive.hoverX = hover.x; villageZoneLive.hoverY = hover.y; }
+  }, [hover]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -353,7 +364,11 @@ export default function Mappa2LabPage() {
         secondaryWaterConfig={{ riversOn: swRiversOn, basinPosesPerS: swBasinPosesPerS, seaPatchPosesPerS: swSeaPatchPosesPerS, deltaSeaPosesPerS: swDeltaSeaPosesPerS, riverFlowSpeed: swRiverFlowSpeed, riverFlowStrength: swRiverFlowStrength, lakeShimmer: swLakeShimmer, confluenceFoam: swConfluenceFoam }}
         landLifeConfig={{ enabled: landLifeOn, leaves: landLifeLeaves, motes: landLifeMotes, flutter: landLifeFlutter, speed: landLifeSpeed, opacity: landLifeOpacity }}
         ambientDirectorConfig={{ enabled: ambOn, intensity: ambIntensity, families: { shoal: { enabled: ambOn, probability: ambProb, alpha: ambAlpha } }, rare: { enabled: ambRare, p: 0.15 } }}
-        regions={{ assetBase: REGIONS_BASE, onHover: setHover }}
+        regions={{ assetBase: REGIONS_BASE, onHover: setHover, onSelect: () => {
+          if (villageZoneLive.armed && villageZoneLive.hoverX) {
+            setVillageParts((cur) => [...cur, { part: villageZoneLive.armed!, x: villageZoneLive.hoverX, y: villageZoneLive.hoverY }]);
+          }
+        } }}
         focusRequest={focusRequest}
         wonderRequest={wonderRequest}
         onStats={setStats}
@@ -682,7 +697,7 @@ export default function Mappa2LabPage() {
               </label>
               <label style={{ display: 'block', marginTop: 6 }}>
                 stage: {VILLAGE_STAGES[Math.round(villageStage)] ?? ''} ({villageStage.toFixed(2)})
-                <input type="range" min={0} max={2} step={0.01} value={villageStage} onChange={(e) => setVillageStage(Number(e.target.value))} style={{ width: '100%' }} />
+                <input type="range" min={0} max={1} step={0.01} value={villageStage} onChange={(e) => setVillageStage(Number(e.target.value))} style={{ width: '100%' }} />
               </label>
               <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 6 }}>
                 {VILLAGE_STAGES.map((name, i) => (
@@ -696,8 +711,54 @@ export default function Mappa2LabPage() {
                   </button>
                 ))}
               </div>
+              <div style={{ marginTop: 10, borderTop: '1px solid rgba(125,180,220,0.25)', paddingTop: 8 }}>
+                <div style={{ fontSize: 12, marginBottom: 4 }}>difesa — toggle separati:</div>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {VILLAGE_ELEMENTS.map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setVillageElements((cur) => {
+                        if (cur.includes(id)) return cur.filter((x) => x !== id);
+                        const excl = VILLAGE_EXCLUSIVE.find((g) => g.includes(id)) ?? [id];
+                        return [...cur.filter((x) => !excl.includes(x)), id];
+                      })}
+                      style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: villageElements.includes(id) ? '#0d1f2d' : 'inherit', background: villageElements.includes(id) ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
+                    >
+                      {id}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ fontSize: 12, margin: '8px 0 4px', opacity: 0.75 }}>piazzamento manuale parti:</div>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {['pal-straight','pal-curve','pal-gate','tower-wood','wall-straight','wall-curve','wall-gate','tower-stone'].map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setVillageArmed((cur) => (cur === p ? null : p))}
+                      style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: villageArmed === p ? '#0d1f2d' : 'inherit', background: villageArmed === p ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                  {villageArmed && (
+                    <button
+                      type="button"
+                      onClick={() => setVillageParts((cur) => [...cur, { part: villageArmed, x: villageZoneLive.hoverX, y: villageZoneLive.hoverY }])}
+                      style={{ padding: '3px 6px', border: '1px solid #e0a94e', borderRadius: 4, fontSize: 11, color: '#e0a94e', background: 'rgba(60,40,10,0.6)', cursor: 'pointer' }}
+                    >
+                      PIAZZA qui
+                    </button>
+                  )}
+                  {villageParts.length > 0 && (
+                    <button type="button" onClick={() => setVillageParts([])} style={{ padding: '3px 6px', border: '1px solid #8d5757', borderRadius: 4, fontSize: 11, color: '#ffb0a0', background: 'rgba(80,20,20,0.6)', cursor: 'pointer' }}>
+                      clear ({villageParts.length})
+                    </button>
+                  )}
+                </div>
+              </div>
               <div style={{ marginTop: 8, fontSize: 12, opacity: 0.75 }}>
-                zona villaggio sulla mappa (x1220 y570): 4 casette+cantiere → 7 casette → palizzata+torri. Slider continuo = cross-fade tra stage.
+                zona villaggio (x1399 y572): slider = crescita case (nessuna → 3 → 7). Difese = toggle separati assemblati dalle parti. PIAZZA = arma un pezzo poi clicchi per posarlo al punto hover.
               </div>
             </div>
           </>

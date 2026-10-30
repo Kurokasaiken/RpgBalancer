@@ -237,3 +237,20 @@ Fonte unica delle scelte; i piani figli riportano solo la parte loro.
 - Piccoli oggetti cliccabili sparsi che reagiscono: fastidiosi (solo i segreti in punti specifici).
 
 > **Asset:** l'elenco unico (pose, dimensioni, stato) è in [`ASSETS-mappa2.md`](ASSETS-mappa2.md).
+
+## Aggiornamento 2026-10-30 — schiuma di costa v2 (Director: «la schiuma intensa deve avere un'animazione adeguata; il mockup ha più bianco nel mare»)
+
+Il bianco intenso dipinto (basi di scogliera, arco di roccia) restava fermo: il vecchio effetto era solo un velo di creste (forza 0.4). Ora:
+`coast_distance.webp` ha il canale blu = **dove il dipinto ha già surf intenso** (pixel quasi bianchi in mare entro 70 px dalla riva, sfocati; ~1% della
+mappa), e `COAST_FOAM_FRAG` ha tre strati: **anelli** che si allontanano dalla riva (più pieni dove c'è surf), **risacca** (un nastro di schiuma che
+avanza e si ritira sulla riva, fase variata lungo la costa, più forte dove c'è surf) e **raffiche** di merletto pulsante sul surf; in più i **tratti
+verde-acqua scuro** accanto a ogni cresta, come nel mockup. Verificato con 3 fotogrammi a zoom sull'arco/roccia. Da fare: slider dedicati nel lab
+(oggi segue forza e velocità delle creste), onde lunghe di mare aperto e bordo bianco più spesso come nel mockup (decisione Director).
+
+**Correzione 2026-10-30 (Director: «il bianco deve sparire e risalire sulla scogliera, non ha senso cosa hai animato»):** la v2 sopra animava un
+nastro inventato sopra il mare, non il bianco dipinto. Rifatta: la pipeline produce `masks/foam_clean.webp` (acqua ricostruita sotto la schiuma =
+riempimento liscio dai soli pixel d'acqua scura lontani dal bordo del bianco; alpha = dove la schiuma è dipinta) e il shader fa **ritirare il bianco
+dipinto** verso la scogliera (reach 3→56 px per costa, fase diversa lungo la riva, ciclo ~9 s: risale veloce, tiene, defluisce lento). Tolti nastro,
+raffiche e anelli inventati; restano i vecchi anelli deboli. Verificato con 6 fotogrammi a zoom: il bianco attorno alla roccia sparisce e torna.
+Limiti noti: dove il bianco si ritira restano leggeri aloni grigio-verdi (acqua ricostruita piatta); non è ancora un «risalire» sulla parete.
+

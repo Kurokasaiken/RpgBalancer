@@ -2874,6 +2874,8 @@
 {"entity":"PLAN-080","kind":"commit","at":"2026-10-24T03:06:31+02:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-24T01:06:31.549Z"}
 {"entity":"PLAN-080","kind":"plan-created","at":"2026-10-24T03:06:31+02:00","confidence":"high"}
 {"entity":"PLAN-080","kind":"stamp-open","at":"2026-10-24T03:06:31+02:00","confidence":"high"}
+{"entity":"PLAN-080","kind":"commit","at":"2026-10-28T19:37:20+01:00","cls":"mixed","confidence":"low","meta":"closure:lint remediation: exceptions asset mappa2, visual-fork marker, inventory"}
+{"entity":"PLAN-080","kind":"commit","at":"2026-10-28T21:17:39+01:00","cls":"docs","confidence":"low","meta":"f1+fauna: fox, robin, poppies, coral snake rule registered (fauna-gemma vocabula"}
 {"entity":"PLAN-081","kind":"stamp-open","at":"2026-10-23T14:14:40.235Z","confidence":"high"}
 {"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:51:05.222Z","confidence":"low"}
 {"entity":"PLAN-081","kind":"verify-artifact","at":"2026-10-23T17:51:37.061Z","confidence":"low"}
@@ -3016,10 +3018,65 @@
 {"entity":"PLAN-088","kind":"commit","at":"2026-10-25T10:03:08+01:00","cls":"docs","confidence":"low","meta":"mood-keys v4: convergent multi-AI template — semantics, per-key composition, hyg"}
 {"entity":"PLAN-089","kind":"commit","at":"2026-10-28T18:24:28+01:00","cls":"assets","confidence":"high","meta":"WIP mappa2 living world: lab page, pipeline asset, PLAN-089/090, R-290/R-291"}
 {"entity":"PLAN-089","kind":"plan-created","at":"2026-10-28T18:24:28+01:00","confidence":"high"}
+{"entity":"PLAN-089","kind":"commit","at":"2026-10-28T19:37:20+01:00","cls":"mixed","confidence":"low","meta":"closure:lint remediation: exceptions asset mappa2, visual-fork marker, inventory"}
+{"entity":"PLAN-089","kind":"commit","at":"2026-10-29T01:51:41+01:00","cls":"assets","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T00:51:41.070Z"}
+{"entity":"PLAN-089","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-089","kind":"commit","at":"2026-10-30T16:32:50+01:00","cls":"assets","confidence":"high","meta":"chore(mappa2): track villageZoneOverlay + stage assets (PLAN-089 T-012)"}
+{"entity":"PLAN-089","kind":"commit","at":"2026-10-30T16:42:34+01:00","cls":"code","confidence":"low","meta":"chore: align git tree with deployed worktree (parallel sessions)"}
 {"entity":"PLAN-090","kind":"commit","at":"2026-10-28T18:24:28+01:00","cls":"assets","confidence":"low","meta":"WIP mappa2 living world: lab page, pipeline asset, PLAN-089/090, R-290/R-291"}
 {"entity":"PLAN-090","kind":"plan-created","at":"2026-10-28T18:24:28+01:00","confidence":"high"}
-{"entity":"PLAN-090","kind":"commit","at":"2026-10-28T19:33:56+01:00","cls":"docs","confidence":"low","meta":"page: side-by-side crop compare g1/g2/g3 — the palette arms made visible at huma"}
+{"entity":"PLAN-090","kind":"commit","at":"2026-10-28T21:06:33+01:00","cls":"docs","confidence":"low","meta":"f1 G3-as-reference: same Shishkin register, denser true gloom (val .17) — strong"}
 {"entity":"PLAN-091","kind":"stamp-open","at":"2026-10-28T18:37:05.522Z","confidence":"high"}
+{"entity":"PLAN-091","kind":"verify-artifact","at":"2026-10-28T19:05:22.957Z","confidence":"low"}
+{"entity":"PLAN-091","kind":"verify-artifact","at":"2026-10-28T19:05:58.903Z","confidence":"low"}
+{"entity":"PLAN-091","kind":"verify-artifact","at":"2026-10-28T19:06:19.469Z","confidence":"low"}
+{"entity":"PLAN-091","kind":"verify-artifact","at":"2026-10-28T19:06:19.490Z","confidence":"low"}
+{"entity":"PLAN-091","kind":"verify-artifact","at":"2026-10-28T19:06:19.490Z","confidence":"low"}
+{"entity":"PLAN-091","kind":"verify-artifact","at":"2026-10-28T19:10:32.721Z","confidence":"low"}
+{"entity":"PLAN-091","kind":"bundle","at":"2026-10-28T19:11:52.412Z","confidence":"high"}
+{"entity":"PLAN-091","kind":"commit","at":"2026-10-29T01:51:41+01:00","cls":"assets","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T00:51:41.070Z"}
+{"entity":"PLAN-091","kind":"plan-created","at":"2026-10-29T01:51:41+01:00","confidence":"high"}
+{"entity":"PLAN-091","kind":"commit","at":"2026-10-29T12:26:45+01:00","cls":"docs","confidence":"low","meta":"remove off-spec demo image (human figure, not the forest scene)"}
+{"entity":"PLAN-092","kind":"commit","at":"2026-10-29T01:51:41+01:00","cls":"assets","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T00:51:41.070Z"}
+{"entity":"PLAN-092","kind":"plan-created","at":"2026-10-29T01:51:41+01:00","confidence":"high"}
+{"entity":"PLAN-092","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-093","kind":"verify-artifact","at":"2026-10-28T20:57:03.301Z","confidence":"low"}
+{"entity":"PLAN-093","kind":"verify-artifact","at":"2026-10-28T22:12:50.555Z","confidence":"low"}
+{"entity":"PLAN-093","kind":"verify-artifact","at":"2026-10-28T22:14:56.930Z","confidence":"low"}
+{"entity":"PLAN-093","kind":"verify-artifact","at":"2026-10-28T22:17:04.038Z","confidence":"low"}
+{"entity":"PLAN-093","kind":"verify-artifact","at":"2026-10-28T22:17:04.177Z","confidence":"low"}
+{"entity":"PLAN-093","kind":"verify-artifact","at":"2026-10-28T22:17:04.178Z","confidence":"low"}
+{"entity":"PLAN-093","kind":"bundle","at":"2026-10-28T22:21:45.430Z","confidence":"high"}
+{"entity":"PLAN-093","kind":"commit","at":"2026-10-29T01:51:41+01:00","cls":"assets","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T00:51:41.070Z"}
+{"entity":"PLAN-093","kind":"plan-created","at":"2026-10-29T01:51:41+01:00","confidence":"high"}
+{"entity":"PLAN-093","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-094","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-094","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-094","kind":"commit","at":"2026-10-30T16:47:22+01:00","cls":"mixed","confidence":"low","meta":"chore: commit remaining worktree changes (assets, tools, tests, docs)"}
+{"entity":"PLAN-095","kind":"commit","at":"2026-10-29T01:51:41+01:00","cls":"assets","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T00:51:41.070Z"}
+{"entity":"PLAN-095","kind":"plan-created","at":"2026-10-29T01:51:41+01:00","confidence":"high"}
+{"entity":"PLAN-095","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-096","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-096","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-097","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-097","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-098","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-098","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-099","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-099","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-100","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-100","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-101","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-101","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-102","kind":"stamp-open","at":"2026-10-29T14:01:09.657Z","confidence":"high"}
+{"entity":"PLAN-102","kind":"verify-artifact","at":"2026-10-29T14:08:38.375Z","confidence":"low"}
+{"entity":"PLAN-102","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-102","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-103","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-103","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-104","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
+{"entity":"PLAN-104","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
+{"entity":"PLAN-105","kind":"stamp-open","at":"2026-10-30T21:11:44.132Z","confidence":"high"}
 {"entity":"PLAN-2","kind":"debate","at":"2026-09-10T13:58:42.658Z","confidence":"high","meta":"start","durMs":1037918}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
@@ -3636,7 +3693,7 @@
 {"entity":"R-2","kind":"debate","at":"2026-10-28T14:50:55.282Z","confidence":"high","meta":"start","durMs":0}
 {"entity":"R-2","kind":"debate","at":"2026-10-28T14:50:55.282Z","confidence":"high","meta":"end"}
 {"entity":"R-2","kind":"verify-artifact","at":"2026-10-28T14:50:55.282Z","confidence":"low"}
-{"entity":"R-2","kind":"commit","at":"2026-10-28T18:19:26+01:00","cls":"docs","confidence":"low","meta":"f1 palette arms: Shishkin register wins — 7 greens + varied browns + golden shaf"}
+{"entity":"R-2","kind":"commit","at":"2026-10-28T20:13:52+01:00","cls":"docs","confidence":"low","meta":"page: sort giros newest-first (8..2) with ordering note"}
 {"entity":"R-200","kind":"debate","at":"2026-10-15T21:49:33.000Z","confidence":"high","meta":"start","durMs":2332000}
 {"entity":"R-200","kind":"verify-artifact","at":"2026-10-15T21:50:07.001Z","confidence":"low"}
 {"entity":"R-200","kind":"verify-artifact","at":"2026-10-15T21:56:51.015Z","confidence":"low"}
@@ -4191,8 +4248,12 @@
 {"entity":"R-282","kind":"commit","at":"2026-10-24T20:06:18+02:00","cls":"code","confidence":"low","meta":"reveal: plate fades full-frame (was clipped to cutout band — goblins beyond x0.4"}
 {"entity":"R-285","kind":"commit","at":"2026-10-24T22:29:04+02:00","cls":"docs","confidence":"high","meta":"R-285: scene prompt form — mandatory fill-in template with bible pigments, appro"}
 {"entity":"R-285","kind":"commit","at":"2026-10-25T08:43:39+01:00","cls":"docs","confidence":"low","meta":"mood-keys v2: bible register fix — 12/12 in family after STYLE rewrite"}
+{"entity":"R-286","kind":"commit","at":"2026-10-29T12:40:47+01:00","cls":"docs","confidence":"high","meta":"docs(quest-gen): tassonomia gimmick Director + investigation compendium (R-286/R"}
+{"entity":"R-287","kind":"commit","at":"2026-10-29T12:40:47+01:00","cls":"docs","confidence":"high","meta":"docs(quest-gen): tassonomia gimmick Director + investigation compendium (R-286/R"}
 {"entity":"R-290","kind":"commit","at":"2026-10-28T18:24:28+01:00","cls":"assets","confidence":"high","meta":"WIP mappa2 living world: lab page, pipeline asset, PLAN-089/090, R-290/R-291"}
+{"entity":"R-290","kind":"commit","at":"2026-10-28T20:34:28+01:00","cls":"docs","confidence":"low","meta":"f1 G5: golden-soil complement landed — copper litter vs green field; strong impa"}
 {"entity":"R-291","kind":"commit","at":"2026-10-28T18:24:28+01:00","cls":"assets","confidence":"high","meta":"WIP mappa2 living world: lab page, pipeline asset, PLAN-089/090, R-290/R-291"}
+{"entity":"R-291","kind":"commit","at":"2026-10-28T20:42:24+01:00","cls":"docs","confidence":"low","meta":"f1 G3-edit: amplified jewels+painterly sky on Shishkin base"}
 {"entity":"R-292","kind":"debate","at":"2026-10-28T11:15:33.000Z","confidence":"high","meta":"start","durMs":5064000}
 {"entity":"R-292","kind":"verify-artifact","at":"2026-10-28T11:20:52.999Z","confidence":"low"}
 {"entity":"R-292","kind":"verify-artifact","at":"2026-10-28T11:21:04.461Z","confidence":"low"}
@@ -4204,22 +4265,27 @@
 {"entity":"R-292","kind":"verify-artifact","at":"2026-10-28T11:36:50.547Z","confidence":"low"}
 {"entity":"R-292","kind":"verify-artifact","at":"2026-10-28T11:43:41.962Z","confidence":"low"}
 {"entity":"R-292","kind":"debate","at":"2026-10-28T12:39:57.000Z","confidence":"high","meta":"end"}
-{"entity":"R-292","kind":"commit","at":"2026-10-28T18:16:05+01:00","cls":"docs","confidence":"low","meta":"AGENTS.md: sezione Director memory (director-knowledge, MW v57)"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-13T18:50:22Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-13T21:13:52Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-13T23:13:42Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-14T01:13:32Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-14T06:26:55Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-14T13:16:24Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
+{"entity":"R-292","kind":"commit","at":"2026-10-28T19:46:31+01:00","cls":"docs","confidence":"low","meta":"AGENTS.md: trigger mw-director nella sezione Director memory"}
+{"entity":"R-297","kind":"verify-artifact","at":"2026-10-30T10:38:06.582Z","confidence":"low"}
+{"entity":"R-297","kind":"verify-artifact","at":"2026-10-30T10:46:47.141Z","confidence":"low"}
+{"entity":"R-297","kind":"verify-artifact","at":"2026-10-30T10:47:42.226Z","confidence":"low"}
+{"entity":"R-297","kind":"verify-artifact","at":"2026-10-30T10:48:32.054Z","confidence":"low"}
+{"entity":"R-297","kind":"verify-artifact","at":"2026-10-30T10:48:32.099Z","confidence":"low"}
+{"entity":"R-297","kind":"verify-artifact","at":"2026-10-30T10:48:32.099Z","confidence":"low"}
+{"entity":"R-297","kind":"bundle","at":"2026-10-30T10:50:13.459Z","confidence":"high"}
+{"entity":"R-297","kind":"commit","at":"2026-10-30T14:01:56+01:00","cls":"mixed","confidence":"high","meta":"feat(mappa2-lab): mobile landing + per-device tuning persistence (R-297)"}
+{"entity":"R-297","kind":"commit","at":"2026-10-30T15:54:01+01:00","cls":"mixed","confidence":"high","meta":"chore(mappa2-lab): rename Copy defaults → Share config (R-297)"}
+{"entity":"R-297","kind":"commit","at":"2026-10-30T16:39:02+01:00","cls":"config","confidence":"low","meta":"chore(mappa2): track regional weather config used by committed controls"}
+{"entity":"R-299","kind":"verify-artifact","at":"2026-10-30T18:34:13.018Z","confidence":"low"}
+{"entity":"R-299","kind":"verify-artifact","at":"2026-10-30T19:16:13.052Z","confidence":"low"}
+{"entity":"R-299","kind":"verify-artifact","at":"2026-10-30T19:16:13.068Z","confidence":"low"}
+{"entity":"R-299","kind":"verify-artifact","at":"2026-10-30T19:16:36.024Z","confidence":"low"}
+{"entity":"R-299","kind":"verify-artifact","at":"2026-10-30T19:16:36.024Z","confidence":"low"}
+{"entity":"R-299","kind":"bundle","at":"2026-10-30T19:17:47.490Z","confidence":"high"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-14T17:07:40+02:00","cls":"mixed","confidence":"low","meta":"Fix: World Surface water field z-index and animation"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-14T17:45:37+02:00","cls":"code","confidence":"low","meta":"Fix: sea pattern overlay z-index, motion and default scale"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-14T19:39:34+02:00","cls":"code","confidence":"low","meta":"Fix: sea pattern rendering incomplete past the WebKit texture edge limit"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-14T18:43:47Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-14T22:07:47Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-15T00:38:51Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-15T05:24:44Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T12:16:38+02:00","cls":"mixed","confidence":"low","meta":"feat: ReminderComponent V1 redesign with inverted hierarchy, band-transition-onl"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-15T10:20:57Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T15:20:56+02:00","cls":"code","confidence":"low","meta":"Fix: river glint invisible (fractional z-index), remove dead reaction-zone code"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T15:36:18+02:00","cls":"code","confidence":"low","meta":"refactor: ReminderComponent — remove dead code and simplify prop interface"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T15:36:34+02:00","cls":"code","confidence":"low","meta":"feat: add progress bar to ReminderComponent for non-color urgency signaling"}
@@ -4227,10 +4293,8 @@
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T15:46:25+02:00","cls":"code","confidence":"low","meta":"refactor: use standard surface background for WorldSurfaceEventCard modal"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T16:26:24+02:00","cls":"code","confidence":"low","meta":"refactor: improve MatericEventCard badge styling and button color"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T16:47:16+02:00","cls":"mixed","confidence":"low","meta":"redesign: ReminderComponent horizontal layout matching mockup reference"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-15T15:09:14Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T17:30:06+02:00","cls":"mixed","confidence":"low","meta":"fix: ReminderComponent text centering and threatSurface color"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T17:45:30+02:00","cls":"mixed","confidence":"low","meta":"refactor: integrate i18n translations in ReminderComponent V1"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-15T19:01:40Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T21:48:25+02:00","cls":"code","confidence":"low","meta":"Lock in tuned sea pattern values as the shipped default, always on"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T22:28:16+02:00","cls":"code","confidence":"low","meta":"Default River glint off, Water (coastal ripple) on"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-15T22:10:20Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
@@ -4666,3 +4730,9 @@
 {"entity":"unattributed","kind":"commit","at":"2026-10-28T17:40:46+01:00","cls":"mixed","confidence":"low","meta":"gates: add gloom moment (forest gloom by day) — prompt vocab + art thresholds; d"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-28T17:53:38+01:00","cls":"docs","confidence":"low","meta":"f1-gloom: gloom moment passes — day shafts in forest dark, luminous emerald pool"}
 {"entity":"unattributed","kind":"commit","at":"2026-10-28T18:01:20+01:00","cls":"docs","confidence":"low","meta":"f1-gloom-zero: strongest f1 — true forest gloom, green-lum at threshold, all acc"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-28T18:16:05+01:00","cls":"docs","confidence":"low","meta":"AGENTS.md: sezione Director memory (director-knowledge, MW v57)"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-28T18:19:26+01:00","cls":"docs","confidence":"low","meta":"f1 palette arms: Shishkin register wins — 7 greens + varied browns + golden shaf"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-28T19:33:56+01:00","cls":"docs","confidence":"low","meta":"page: side-by-side crop compare g1/g2/g3 — the palette arms made visible at huma"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-29T12:02:04+01:00","cls":"docs","confidence":"low","meta":"protocol: 5 glow rules + powerful-darks rule (low value, high chroma)"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-29T12:07:03+01:00","cls":"docs","confidence":"low","meta":"glow-complement demo: jewels clustered on saturated dark grounds — mechanism pro"}
+{"entity":"unattributed","kind":"commit","at":"2026-10-30T16:38:49+01:00","cls":"code","confidence":"low","meta":"chore(mappa2): track mappa2 grade/weather deps used by committed lab"}

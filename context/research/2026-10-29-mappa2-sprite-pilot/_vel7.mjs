@@ -1,0 +1,15 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({viewport:{width:1600,height:950}});
+const errs=[]; p.on('pageerror',e=>errs.push(e.message.slice(0,100)));
+await p.goto('http://localhost:5173/mappa2-lab', {waitUntil:'domcontentloaded', timeout:60000}).catch(()=>{});
+await p.waitForSelector('body[data-mappa2-lab="true"]', {timeout:90000}).catch(()=>{});
+await p.waitForTimeout(6000);
+await p.click('button:has-text("village")').catch(()=>{});
+await p.waitForTimeout(400);
+await p.screenshot({path:'context/research/2026-10-29-mappa2-sprite-pilot/out/_v2-base.png', clip:{x:700,y:370,width:520,height:380}});
+for (const el of ['palizzata','torre-legno-1','torre-legno-2']) await p.click(`button:has-text("${el}")`).catch(()=>{});
+await p.waitForTimeout(800);
+await p.screenshot({path:'context/research/2026-10-29-mappa2-sprite-pilot/out/_v2-pal.png', clip:{x:700,y:370,width:520,height:380}});
+console.log('errs:', JSON.stringify(errs));
+await b.close();

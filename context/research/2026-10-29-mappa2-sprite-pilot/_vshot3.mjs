@@ -1,0 +1,17 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({viewport:{width:1600,height:950}});
+const errs=[]; p.on('pageerror',e=>errs.push(e.message.slice(0,100)));
+await p.goto('http://localhost:5173/mappa2-lab', {waitUntil:'domcontentloaded', timeout:60000}).catch(()=>{});
+await p.waitForSelector('body[data-mappa2-lab="true"]', {timeout:90000}).catch(()=>{});
+await p.waitForTimeout(6000);
+await p.click('button:has-text("village")').catch(()=>{});
+await p.waitForTimeout(800);
+await p.click('button:has-text("pal-straight")').catch(()=>{});
+await p.mouse.move(800,500); await p.waitForTimeout(400);
+await p.mouse.click(800,500); await p.waitForTimeout(400);
+await p.click('button:has-text("tower-wood")').catch(()=>{});
+await p.mouse.move(950,550); await p.mouse.click(950,550); await p.waitForTimeout(400);
+await p.screenshot({path:'context/research/2026-10-29-mappa2-sprite-pilot/out/_lab-parts.png'});
+console.log('errs:', JSON.stringify(errs));
+await b.close();
