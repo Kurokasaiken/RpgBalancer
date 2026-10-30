@@ -53,14 +53,14 @@ test.describe('mappa2-lab tuning persistence (R-297)', () => {
     await expect(note).not.toContainText(/fail/i);
   });
 
-  test('«Copy defaults» produces shareable text (share sheet or clipboard)', async ({ page }) => {
+  test('«Share config» produces shareable text (share sheet or clipboard)', async ({ page }) => {
     // headless Chromium denies clipboard-write without an explicit grant;
     // real browsers allow it under user gesture on HTTPS.
     await page.context().grantPermissions(['clipboard-write']);
     await page.goto('/mappa2-lab');
     await page.waitForSelector(LAB_MARKER, { timeout: 90000 });
 
-    await page.getByRole('button', { name: 'Copy defaults' }).click();
+    await page.getByRole('button', { name: 'Share config' }).click();
     const note = page.locator('text=/copied|shared/i').last();
     await expect(note).toBeVisible({ timeout: 15000 });
   });

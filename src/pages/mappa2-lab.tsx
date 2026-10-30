@@ -5,7 +5,8 @@ import { useIsMobile } from '@/hooks/useMediaQuery';
 import { RegionalAtmosphereControls } from './regional-atmosphere-controls';
 import { Mappa2GradeControls } from './mappa2-grade-controls';
 import { useMappa2Grade } from './useMappa2Grade';
-import { mountainShadeLive } from './mappa2-grade';
+import { mountainShadeLive, seaGradeLive } from './mappa2-grade';
+import { villageZoneLive } from '@/ui/idleVillage/pixiSpike/villageZoneOverlay';
 
 const MANIFEST_PATH = '/assets/world/mappa2/base/manifest.json';
 const REGIONS_BASE = '/assets/world/mappa2/base';
@@ -32,7 +33,7 @@ const EFFECT_TOGGLES: { id: keyof PixiWorldMapEffects; label: string }[] = [
   { id: 'landLife', label: 'canopy' },
 ];
 
-const LAB_TABS = ['scene', 'water', 'sea', 'sky', 'land'] as const;
+const LAB_TABS = ['scene', 'water', 'sea', 'sky', 'land', 'village'] as const;
 type LabTab = typeof LAB_TABS[number];
 const TAB_EFFECTS: Record<LabTab, (keyof PixiWorldMapEffects)[]> = {
   scene: [],
@@ -40,7 +41,10 @@ const TAB_EFFECTS: Record<LabTab, (keyof PixiWorldMapEffects)[]> = {
   sea: ['seaPattern', 'coastFoam', 'seabed'],
   sky: ['clouds', 'cloudShadows', 'birds'],
   land: ['landLife'],
+  village: [],
 };
+
+const VILLAGE_STAGES = ['4 casette + cantiere', '7 casette', 'palizzata + torri'];
 
 interface LabDefaults {
   wonderEveryS: number;
@@ -219,6 +223,8 @@ export default function Mappa2LabPage() {
   const [ambAlpha, setAmbAlpha] = useState(CODE_DEFAULTS.ambAlpha);
   const [ambRare, setAmbRare] = useState(CODE_DEFAULTS.ambRare === 1);
   const [ambLogTick, setAmbLogTick] = useState(0);
+  const [villageOn, setVillageOn] = useState(true);
+  const [villageStage, setVillageStage] = useState(1);
   const [savedDefaultsNote, setSavedDefaultsNote] = useState('');
   const [wonderRequest, setWonderRequest] = useState(0);
   const [defaultsLoaded, setDefaultsLoaded] = useState(false);
@@ -271,6 +277,12 @@ export default function Mappa2LabPage() {
       delete document.body.dataset.mappa2Lab;
     };
   }, []);
+
+  // Sync village-zone knobs into the overlay's live ref (read per-tick).
+  useEffect(() => {
+    villageZoneLive.visible = villageOn;
+    villageZoneLive.stage = villageStage;
+  }, [villageOn, villageStage]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -334,6 +346,7 @@ export default function Mappa2LabPage() {
         cloudTint={mixHex('#ffffff', '#bfeff2', cloudTintAmount)}
         seaTone={seaTone}
         mountainShade={mountainShadeLive}
+        seaGrade={seaGradeLive}
         seaPatternConfig={seaPatternConfig}
         coastFoamConfig={coastFoamConfig}
         waterfallConfig={{ enabled: waterfallOn, flowSpeed: waterfallFlowSpeed, flowStrength: waterfallFlowStrength, mistAmount: waterfallMist, ripples: waterfallRipples, foamPulse: waterfallFoam, paintedFlow: waterfallPainted, flipFps: waterfallFlipFps, splash: waterfallSplash, rainbow: waterfallRainbow, rainbowEveryS: waterfallRainbowEveryS, rainbowRequest }}
@@ -660,6 +673,36 @@ export default function Mappa2LabPage() {
           </>
         )}
 
+        {activeTab === 'village' && (
+          <>
+            <div style={{ marginTop: 10, borderTop: '1px solid rgba(125,180,220,0.25)', paddingTop: 8 }}>
+              <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input type="checkbox" checked={villageOn} onChange={(e) => setVillageOn(e.target.checked)} />
+                village zone
+              </label>
+              <label style={{ display: 'block', marginTop: 6 }}>
+                stage: {VILLAGE_STAGES[Math.round(villageStage)] ?? ''} ({villageStage.toFixed(2)})
+                <input type="range" min={0} max={2} step={0.01} value={villageStage} onChange={(e) => setVillageStage(Number(e.target.value))} style={{ width: '100%' }} />
+              </label>
+              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 6 }}>
+                {VILLAGE_STAGES.map((name, i) => (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => setVillageStage(i)}
+                    style={{ padding: '4px 7px', border: '1px solid #56758d', borderRadius: 4, color: Math.round(villageStage) === i ? '#dff4ff' : 'inherit', background: Math.round(villageStage) === i ? '#17415f' : 'rgba(20, 55, 80, 0.75)', cursor: 'pointer', fontSize: 12 }}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+              <div style={{ marginTop: 8, fontSize: 12, opacity: 0.75 }}>
+                zona villaggio sulla mappa (x1220 y570): 4 casette+cantiere → 7 casette → palizzata+torri. Slider continuo = cross-fade tra stage.
+              </div>
+            </div>
+          </>
+        )}
+
         <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
           <button
             type="button"
@@ -726,7 +769,7 @@ export default function Mappa2LabPage() {
             }}
             style={{ padding: '5px 9px', border: '1px solid #d5c98b', borderRadius: 4, color: '#fff4d0', background: '#5f4f1f', cursor: 'pointer' }}
           >
-            Copy defaults
+            Share config
           </button>
         </div>
         {savedDefaultsNote && <div style={{ color: '#8bd5b8', marginTop: 5 }}>{savedDefaultsNote}</div>}

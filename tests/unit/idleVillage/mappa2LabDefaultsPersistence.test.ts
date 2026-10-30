@@ -32,6 +32,6 @@ describe('mappa2-lab defaults persistence (R-297)', () => {
     expect(LAB_SRC).toContain('isMobile && typeof navigator.share');
     expect(LAB_SRC).toContain('navigator.clipboard');
     expect(LAB_SRC).toContain('defaults da cuocere nel codice');
-    expect(LAB_SRC).toContain('Copy defaults');
+    expect(LAB_SRC).toContain('Share config');
   });
 });
