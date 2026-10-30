@@ -1,0 +1,18 @@
+{
+  "zone": {
+    "x": 1392,
+    "y": 651,
+    "w": 155,
+    "h": 111
+  },
+  "stages": [
+    "stage0.webp",
+    "stage1.webp",
+    "stage2.webp"
+  ],
+  "stageNames": [
+    "4 casette + cantiere",
+    "7 casette",
+    "palizzata + torri"
+  ]
+}
