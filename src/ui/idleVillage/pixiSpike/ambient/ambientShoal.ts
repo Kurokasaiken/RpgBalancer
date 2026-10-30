@@ -1,5 +1,5 @@
 import { Container, Sprite, Texture } from 'pixi.js';
-import type { Admission, AmbientDirectorConfig, ShoalZone } from './ambientDirector';
+import type { Admission, AmbientDirectorConfig, SeaLifeKind, ShoalZone } from './ambientDirector';
 import { hash01 } from './ambientDirector';
 import { animateRig, buildRig, type RigInst, type RigSpec } from './ambientRig';
 
@@ -13,7 +13,7 @@ import { animateRig, buildRig, type RigInst, type RigSpec } from './ambientRig';
  */
 
 const POOL = 3;
-const FADE_SEC = 3;
+const FADE_SEC = 2;
 const FISH_PER_SCHOOL = 16;
 /** Silhouette colour: the painted deep sea. */
 const DEEP = 'rgb(7, 46, 72)';
@@ -27,7 +27,7 @@ const DOLPHIN_CHANCE = 0.25;
 const BUBBLES = 10;
 const RINGS = 6;
 const DOLPHIN_LIFE = 6;
-type Kind = 'school' | 'giant' | 'turtle' | 'dolphin';
+type Kind = SeaLifeKind;
 
 interface FishState {
   sp: Sprite;
@@ -282,7 +282,6 @@ function makeBubbleTexture(): Texture {
 export class ShoalAdapter {
   readonly container = new Container();
   /** Lab/test seam: force the next admission to this kind (null = natural odds). */
-  forceKind: Kind | null = null;
   private rigsReady = false;
 
   /** Swap the procedural placeholders for the Director's hinged silhouettes (once the art has loaded). */
@@ -301,12 +300,18 @@ export class ShoalAdapter {
       for (const id of ['manta', 'pescione', 'martello']) {
         const r = make(id);
         if (r) {
+          r.id = id;
+          if (id === 'manta') {
+            // a manta's tail is a long whip: stretch it along its length from the hinge (Director 2026-10-30)
+            for (const p of r.parts) if (p.kind === 'tail') { p.baseSx = 2.1; p.sp.scale.set(2.1, 1); }
+          }
           b.school.addChild(r.root);
           b.rigGiants[id] = r;
         }
       }
       const t = make('tartaruga');
       if (t) {
+        t.id = 'tartaruga';
         b.school.addChild(t.root);
         b.rigTurtle = t;
       }
@@ -434,20 +439,29 @@ export class ShoalAdapter {
   spawn(a: Admission, simTime: number): boolean {
     const c = this.cfg().families.shoal;
     const zone = this.zoneById.get(a.zoneId);
-    const b = this.blobs.find((q) => !q.active);
+    let b = this.blobs.find((q) => !q.active);
+    if (!b && a.manual) {
+      // a manual lab pick must always show: recycle the oldest live slot instead of dropping it
+      const oldest = this.blobs.reduce((o, q) => (q.born < o.born ? q : o));
+      oldest.active = false;
+      oldest.school.visible = false;
+      oldest.fx.visible = false;
+      b = oldest;
+    }
     if (!zone || !b) return false;
     const specialBusy = this.blobs.some((q) => q.active && q.kind !== 'school');
     const u = hash01(a.seed, 'g');
     b.kind = specialBusy ? 'school' : u < GIANT_CHANCE ? 'giant' : u < TURTLE_CHANCE ? 'turtle' : u < DOLPHIN_CHANCE ? 'dolphin' : 'school';
-    if (this.forceKind) b.kind = this.forceKind;
+    if (a.kind) b.kind = a.kind; // manual lab pick wins over the natural roll
     b.isGiant = b.kind === 'giant';
     const s = c.sizePx[0] + hash01(a.seed, 's') * (c.sizePx[1] - c.sizePx[0]);
     b.size = s * this.scale;
-    b.life = (c.lifeSec[0] + hash01(a.seed, 'l') * (c.lifeSec[1] - c.lifeSec[0])) * (b.isGiant ? 1.3 : 1);
-    b.speed = (c.speedPxS[0] + hash01(a.seed, 'p') * (c.speedPxS[1] - c.speedPxS[0])) * this.scale * (b.isGiant ? 0.7 : 1);
+    // short passes: each form crosses its whole safe path in ~10 s, so it clearly travels instead of hovering
+    b.life = 9 + hash01(a.seed, 'l') * 4 + (b.isGiant ? 2 : 0);
+    b.speed = (zone.maxTravelPx ?? 96) / (b.life * 0.85);
     if (b.kind === 'dolphin') {
       b.life = DOLPHIN_LIFE;
-      b.speed = ((zone.maxTravelPx ?? 96) * this.scale) / (DOLPHIN_LIFE * 0.9); // cross the whole safe path, fast
+      b.speed = (zone.maxTravelPx ?? 96) / (DOLPHIN_LIFE * 0.9); // cross the whole safe path, fast
     }
     b.hx = zone.heading[0];
     b.hy = zone.heading[1];
@@ -488,8 +502,9 @@ export class ShoalAdapter {
       // sunflower spiral = even spacing (no overlap blob), stretched along the heading, small jitter
       const r = Math.sqrt((k + 0.5) / b.fish.length);
       const t = k * 2.399963 + hash01(a.seed, `t${k}`) * 0.5;
-      f.ox = Math.cos(t) * r * radius * 1.7 + (hash01(a.seed, `j${k}`) - 0.5) * radius * 0.25;
-      f.oy = Math.sin(t) * r * radius * 0.85 + (hash01(a.seed, `q${k}`) - 0.5) * radius * 0.25;
+      const spread = this.rigsReady ? 0.55 : 1;
+      f.ox = (Math.cos(t) * r * radius * 1.7 + (hash01(a.seed, `j${k}`) - 0.5) * radius * 0.25) * spread;
+      f.oy = (Math.sin(t) * r * radius * 0.85 + (hash01(a.seed, `q${k}`) - 0.5) * radius * 0.25) * spread;
       f.ph = hash01(a.seed, `p${k}`) * Math.PI * 2;
       f.sz = (0.9 + hash01(a.seed, `z${k}`) * 0.5) * this.scale * 0.95;
       f.sp.scale.set(f.sz);
@@ -514,25 +529,25 @@ export class ShoalAdapter {
         const r = b.rigFish[k];
         r.root.visible = true;
         r.root.rotation = ang;
-        r.root.scale.set(b.fish[k].sz * (48 / (r.lengthPx * 1.25)));
+        r.root.scale.set(b.fish[k].sz * (22 / (r.lengthPx * 1.25)));
       }
     } else if (b.kind === 'giant') {
       const ids = Object.keys(b.rigGiants);
-      const r = b.rigGiants[ids[Math.floor(hash01(a.seed, 'k') * ids.length)]];
+      const r = b.rigGiants[a.species && b.rigGiants[a.species] ? a.species : ids[Math.floor(hash01(a.seed, 'k') * ids.length)]];
       r.root.visible = true;
       r.root.rotation = ang;
-      r.root.scale.set((b.size * 1.9) / (r.lengthPx * 1.3));
+      r.root.scale.set((b.size * 1.3) / (r.lengthPx * 1.3)); // bigger than a dolphin, far smaller than the first pass (1.9)
       b.rig = r;
     } else if (b.kind === 'turtle' && b.rigTurtle) {
       b.rigTurtle.root.visible = true;
       b.rigTurtle.root.rotation = ang;
-      b.rigTurtle.root.scale.set((b.size * 0.8) / b.rigTurtle.lengthPx);
+      b.rigTurtle.root.scale.set((b.size * 0.42) / b.rigTurtle.lengthPx);
       b.rig = b.rigTurtle;
     } else if (b.kind === 'dolphin') {
       for (const r of b.rigDolphins) {
         r.root.visible = true;
         r.root.rotation = ang;
-        r.root.scale.set(b.size / (r.lengthPx * 1.2));
+        r.root.scale.set((b.size * 0.42) / r.lengthPx);
       }
     }
   }
@@ -565,13 +580,18 @@ export class ShoalAdapter {
       const travel = Math.min(b.speed * age, zone?.maxTravelPx ?? 96 * this.scale);
       b.school.position.set((zone?.cx ?? 0) * this.scale + b.hx * travel, (zone?.cy ?? 0) * this.scale + b.hy * travel);
       if (b.kind === 'giant' && b.rig) {
-        b.rig.root.rotation = Math.atan2(b.hy, b.hx) + 0.03 * Math.sin(simTime * 0.7);
-        animateRig(b.rig, simTime, 0, 0.7);
+        // the whole body swings side to side while the tail beats wide; a manta also flaps its wings
+        b.rig.root.rotation = Math.atan2(b.hy, b.hx) + 0.1 * Math.sin(simTime * 0.9);
+        animateRig(b.rig, simTime, 0, 1);
+        if (b.rig.id === 'manta') b.rig.body.scale.y = 1 + 0.09 * Math.sin(simTime * 1.7);
         this.emitBubbles(b, zone, age);
         continue;
       }
       if (b.kind === 'turtle' && b.rig) {
         animateRig(b.rig, simTime, 0);
+        // glide: the shell surges forward on each stroke and sways a little
+        b.rig.root.rotation = Math.atan2(b.hy, b.hx) + 0.06 * Math.sin(simTime * 0.75);
+        b.rig.body.scale.set(1 + 0.025 * Math.sin(simTime * 1.5 + 0.6));
         continue;
       }
       if (b.kind === 'giant') {
@@ -602,8 +622,8 @@ export class ShoalAdapter {
         for (let k = 0; k < b.rigFish.length; k += 1) {
           const f = b.fish[k];
           const r = b.rigFish[k];
-          const wx = f.ox * breathe + Math.sin(simTime * 0.7 + f.ph) * 10 * this.scale;
-          const wy = f.oy * breathe + Math.sin(simTime * 1.1 + f.ph * 1.3) * 2.5 * this.scale;
+          const wx = f.ox * breathe + Math.sin(simTime * 0.9 + f.ph) * 6 * this.scale;
+          const wy = f.oy * breathe + Math.sin(simTime * 1.4 + f.ph * 1.3) * 1.6 * this.scale;
           r.root.position.set(wx * cx - wy * sx, wx * sx + wy * cx);
           r.root.rotation = ang + 0.06 * Math.sin(simTime * 1.1 + f.ph * 1.3);
           animateRig(r, simTime, f.ph);
@@ -672,7 +692,7 @@ export class ShoalAdapter {
       const [px, py] = posAt(t, d === 0 ? -1 : 1);
       // school position is the zone origin: dolphins are placed absolutely inside it
       sp.position.set(px - zx, py - zy);
-      sp.scale.set((rig ? b.size / (rig.lengthPx * 1.2) : (b.size * 0.8) / 96) * (1 + 0.5 * h));
+      sp.scale.set((rig ? (b.size * 0.42) / rig.lengthPx : (b.size * 0.4) / 96) * (1 + 0.25 * h));
       if (rig) animateRig(rig, simTime, d);
       sp.alpha = 0.35 + 0.65 * h;
       sp.rotation = Math.atan2(b.hy, b.hx) + 0.06 * Math.sin(simTime * 3 + d);

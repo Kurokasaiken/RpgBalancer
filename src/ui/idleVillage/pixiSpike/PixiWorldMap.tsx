@@ -37,6 +37,7 @@ import { AmbientDirector, DEFAULT_AMBIENT_DIRECTOR_CONFIG, type AmbientDirectorC
 import { ShoalAdapter } from './ambient/ambientShoal';
 import { Mappa2SeaLifeSchema } from '../config/mappa2SeaLifeConfig';
 import { mountRegionalWeather } from './regionalWeatherOverlay';
+import { mountVillageZone } from './villageZoneOverlay';
 
 /** PLAN-094: deep-merge the lab ambient config over director defaults. */
 const mergeAmbientDirectorConfig = (over?: Partial<AmbientDirectorConfig>): AmbientDirectorConfig => ({
@@ -169,6 +170,8 @@ export interface PixiWorldMapProps {
   seaTone?: number;
   /** Baked multiply sheet (white = untouched) that darkens the northern rock; `opacity` 0-1 blends it in. Omit to skip loading it. */
   mountainShade?: { url: string; opacity: number };
+  /** Baked sea grade as two sheets over the painting (multiply + additive stored x2, water only); `opacity` 0-1 blends it in. */
+  seaGrade?: { multUrl: string; addUrl: string; opacity: number };
   /**
    * Translucent sea: a seabed (ruins, chests) shows through the water and slides slower than the
    * camera, so panning reads as depth. `opacity` is how much of it shows; `parallax` < 1 is its
@@ -656,6 +659,7 @@ export function PixiWorldMap({
   cloudTint = '#ffffff',
   seaTone = 0,
   mountainShade,
+  seaGrade,
   seabed,
   regions,
   tune: tuneProp,
@@ -710,6 +714,10 @@ export function PixiWorldMap({
   const mountainShadeRef = useRef(mountainShade);
   mountainShadeRef.current = mountainShade;
   const mountainShadeUrl = mountainShade?.url;
+  const seaGradeRef = useRef(seaGrade);
+  seaGradeRef.current = seaGrade;
+  const seaGradeMultUrl = seaGrade?.multUrl;
+  const seaGradeAddUrl = seaGrade?.addUrl;
   const forcedWonderRef = useRef(wonderRequest);
   forcedWonderRef.current = wonderRequest;
   const ambientRef = useRef(ambient);
@@ -1831,6 +1839,8 @@ export function PixiWorldMap({
       // PLAN-098: mist + embers leaf overlay (self-contained mount; no-op off-mappa2).
       if (pack && manifest.world === 'mappa2') {
         await mountRegionalWeather({ pack, world, canvasW: canvas.width, canvasH: canvas.height, load, fetchJson, ticks, reducedMotion, packAssetUrl, disposed: () => disposed });
+        // PLAN-089 T-012 pilot: village-cradle stage layer (no-op without village.json).
+        await mountVillageZone({ pack, world, load, fetchJson, ticks, packAssetUrl, disposed: () => disposed });
       }
 
       /* ── Ambient land-life (PLAN-093): micro-life bound to real foliage.
@@ -2000,6 +2010,25 @@ export function PixiWorldMap({
         ticks.push(() => {
           shade.alpha = Math.min(1, Math.max(0, mountainShadeRef.current?.opacity ?? 0));
           shade.visible = shade.alpha > 0.001;
+        });
+      }
+      if (seaGradeMultUrl && seaGradeAddUrl) {
+        const [multTex, addTex] = await Promise.all([load(seaGradeMultUrl), load(seaGradeAddUrl)]);
+        const mult = new Sprite(multTex);
+        const add = new Sprite(addTex);
+        mult.blendMode = 'multiply';
+        add.blendMode = 'add';
+        for (const sp of [mult, add]) {
+          sp.zIndex = MOUNTAIN_SHADE_Z;
+          sp.width = canvas.width;
+          sp.height = canvas.height;
+          world.addChild(sp);
+        }
+        ticks.push(() => {
+          const o = Math.min(1, Math.max(0, seaGradeRef.current?.opacity ?? 0));
+          mult.alpha = o;
+          add.alpha = 0.5 * o; // the additive sheet is stored x2
+          mult.visible = add.visible = o > 0.001;
         });
       }
       ticks.push((t) => {
