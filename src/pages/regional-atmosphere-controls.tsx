@@ -46,8 +46,8 @@ export function RegionalAtmosphereControls() {
         <input type="range" min={0} max={1} step={0.05} value={cfg.orographic ?? 0} onChange={(e) => set({ orographic: Number(e.target.value) })} style={{ width: '100%' }} />
       </label>
       <label style={{ display: 'block', marginTop: 4 }}>
-        snow glints {Math.round(cfg.glints * 100)}%
-        <input type="range" min={0} max={1} step={0.05} value={cfg.glints} onChange={(e) => set({ glints: Number(e.target.value) })} style={{ width: '100%' }} />
+        north river {Math.round((cfg.river ?? 1) * 100)}%
+        <input type="range" min={0} max={1} step={0.05} value={cfg.river ?? 1} onChange={(e) => set({ river: Number(e.target.value) })} style={{ width: '100%' }} />
       </label>
       <label style={{ display: 'block', marginTop: 4 }}>
         weather speed {cfg.speed.toFixed(2)}x
