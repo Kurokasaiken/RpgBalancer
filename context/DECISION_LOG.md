@@ -1731,3 +1731,10 @@ dove diverge).
 
 **Fonte:** Director in sessione 2026-10-29; registrato in
 `context/QUEST_GENERATION_ARCHITECTURE.md` §21.7.
+
+## 2026-10-30 — Lock di forma su upscale generativo: la banda compositata, non il modello
+
+**Da:** PLAN-096 assumeva che il lock di forma dipendesse dal generatore giusto (denoise/ControlNet corretti).
+**A:** Il lock pixel-exact è la banda di contorno compositata dal master neutrale come ultimo passo; il generatore è intercambiabile — Gemini-web col prompt diretto del Director (D-228) dentro il lock ha dato la migliore fedeltà misurata (edgeIoU 0.61) e batte ComfyUI anche sul tempo per tile. Ricetta completa nel dibattito `mind-weaver/.mw/runs/20261030-mappa2-upscale-recipes/artifact-r003.md` (4/4 ACCEPT).
+**Motivo:** evidenza misurata sul crop cascata/vegetazione: ogni generatore senza lock muove i contorni; dentro il lock la scelta del generatore diventa questione solo estetica/costo.
+**Fonte:** `.mw/runs/20261030-upscale-learn/pattern-candidate.md`

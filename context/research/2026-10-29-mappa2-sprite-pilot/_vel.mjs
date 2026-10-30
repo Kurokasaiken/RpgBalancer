@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({viewport:{width:1600,height:950}});
+const errs=[]; p.on('pageerror',e=>errs.push(e.message.slice(0,120)));
+await p.goto('http://localhost:5173/mappa2-lab', {waitUntil:'domcontentloaded', timeout:60000}).catch(()=>{});
+await p.waitForSelector('body[data-mappa2-lab="true"]', {timeout:90000}).catch(()=>{});
+await p.waitForTimeout(6000);
+await p.click('button:has-text("village")').catch(()=>{});
+await p.waitForTimeout(500);
+await p.click('button:has-text("palizzata")').catch(()=>{});
+await p.click('button:has-text("torre-legno-1")').catch(()=>{});
+await p.click('button:has-text("torre-legno-2")').catch(()=>{});
+await p.waitForTimeout(800);
+await p.screenshot({path:'context/research/2026-10-29-mappa2-sprite-pilot/out/_lab-elements.png'});
+console.log('errs:', JSON.stringify(errs));
+await b.close();

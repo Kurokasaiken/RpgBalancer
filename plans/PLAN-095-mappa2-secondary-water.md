@@ -208,3 +208,25 @@ esito della cascata, PLAN-092). Il Director ha scelto «Pose come la cascata»:
   alpine 1.5x, canyon 7.7x, west_shallows 2.0x, bayou_west 1.6x, bayou_east 1.0x
   (89 px: invisibile).
 - **T-004 resta aperto** (E2E, mutant, review OB-5 del Director).
+
+## Avanzamento 2026-10-30 — seaPatch `sea_arch` (R-299)
+
+- **R-299**: il Director chiede il mare con foam dell'arco/scogliera ovest
+  (`x≈0-560, y≈350-800`) animato — stessa ricetta dei seaPatches esistenti.
+- Nuovo patch `sea_arch` in `secondary-water.json`: maschera = `sea &
+  land_dist≤90 & box & teal` (come near_coast di bay_2, banda più larga per le
+  scie dipinte), flusso `away_shore` (schiuma che si allontana dagli scogli),
+  disp 20px, seed 996, `flow_whole` (v2, Director: «la spuma continua ad essere ferma» —
+  l'intera immagine dentro la maschera scorre, non solo il dettaglio: anche le
+  chiazze bianche di schiuma si muovono; `build_water_flow_poses` ha ora il flag
+  `flow_whole`, default False invariato per gli altri patch), pose `fx/water/sea_arch_f0..f7.webp` (rect 0,344 566×462).
+- Blocco generatore aggiunto a `build-mappa2-assets.py` (parità future regen) +
+  runner one-off `scripts/build-mappa2-sea-arch-patch.py` (pose + upsert JSON).
+- Runtime invariato: `seaPatches` cicla da solo sul `seaClock`
+  (`seaPatchPosesPerS`, lab slider "sea patch poses/s").
+- Test permanente (R-247): `tests/unit/idleVillage/mappa2SeaArchPatch.test.ts`
+  — JSON reale valido, rect sulla costa ovest, frame su disco, frame
+  consecutivi diversi.
+- Witness headless `/mappa2-lab` (T-04): `test-results/r299-sea-arch-foam/` —
+  mare attorno a scogli e arco in moto, mare aperto a est fermo, nessuna
+  cucitura a riposo. OB-4 human-eye Director aperto.

@@ -938,7 +938,8 @@ def build_shoal_atlas(out_path: Path, source_hash: str) -> dict:
 
 def build_water_flow_poses(
     rgb: np.ndarray, class_mask: np.ndarray, flow_dir: np.ndarray, disp_px: float,
-    out_dir: Path, prefix: str, seed: int, pad: int = 6,
+    out_dir: Path, prefix: str, seed: int, pad: int = 6, flow_whole: bool = False,
+    foam_pulse: float = 0.0,
 ) -> dict | None:
     """PLAN-095 v2 (Director 2026-10-29, same recipe as the falls flipbook):
     painted cinemagraph poses for one river/lake. The low-frequency painting
@@ -947,7 +948,14 @@ def build_water_flow_poses(
     cycle apart, each faded out before it resets. Faster mid-channel, slower
     at the banks, per-region speed/phase noise so nothing moves as a strip.
     RGBA poses: alpha = feathered class mask, so at rest a pose IS the
-    painting and the runtime needs no clip mask."""
+    painting and the runtime needs no clip mask.
+    `foam_pulse` (0..1) fades the pose alpha per frame on a spatial phase wave:
+    painted foam dissolves and re-forms as it drifts — surf breathing, not a
+    fixed drawing sliding (R-299 v3, Director).
+    With `flow_whole` the FULL painting inside the mask flows (R-299: painted
+    surf around rocks — the white foam blobs are low-frequency, so a detail-only
+    flow leaves them frozen); the pose keeps the still painting under the
+    feathered mask edge, so banks never smear."""
     ys, xs = np.where(class_mask)
     if ys.size == 0:
         return None
@@ -970,7 +978,7 @@ def build_water_flow_poses(
     # Warm (brown/sand/orange) pixels are bank, never water: they neither flow nor get replaced by a pose.
     warm = np.clip((cv2.GaussianBlur(src[..., 0] - src[..., 2], (0, 0), 1.0) - 22.0) / 23.0, 0.0, 1.0)
     src_gate = src_gate * (1.0 - warm)
-    flow_src = detail * src_gate[..., None]
+    flow_src = src * src_gate[..., None] if flow_whole else detail * src_gate[..., None]
     alpha = cv2.GaussianBlur(cv2.erode(m, np.ones((3, 3), np.uint8)).astype(np.float32), (0, 0), 1.2)
     alpha = alpha * (1.0 - warm)
     dt = cv2.distanceTransform(m, cv2.DIST_L2, 3)
@@ -998,12 +1006,24 @@ def build_water_flow_poses(
         wa = 1.0 - np.abs(2.0 * pa - 1.0)
         wb = 1.0 - wa
         # boost mid-fade contrast only where the two phases are displaced apart
-        norm = 1.0 + (np.sqrt(wa ** 2 + wb ** 2) - 1.0) * np.clip(speed / 6.0, 0, 1)
+        # (detail flow only: on the whole painting it would pulse brightness ~1.4x)
+        norm = np.ones_like(wa) if flow_whole else 1.0 + (np.sqrt(wa ** 2 + wb ** 2) - 1.0) * np.clip(speed / 6.0, 0, 1)
         mix = (layer(pa) * wa[..., None] + layer(pb) * wb[..., None]) / norm[..., None]
-        pose = low + detail * (1 - src_gate[..., None]) + mix
+        if flow_whole:
+            # Whole painting flows: inside the mask the pose IS the displaced
+            # painting (foam blobs travel); under the feathered edge it stays the
+            # original painting — no `low` re-add or the base is counted twice.
+            pose = src * (1 - src_gate[..., None]) + mix
+        else:
+            pose = low + detail * (1 - src_gate[..., None]) + mix
+        a = alpha
+        if foam_pulse > 0:
+            # Per-pixel phase wave: foam dissolves (painting shows through) then
+            # re-forms as the cycle turns — a spatial pulse, never a global blink.
+            a = alpha * np.clip(1.0 - foam_pulse + foam_pulse * (0.5 + 0.5 * np.sin(2 * np.pi * (k / WATER_POSE_N + phase))), 0.0, 1.0)
         name = f"{prefix}_f{k}.webp"
         save_webp_rgba(np.clip(pose, 0, 255).astype(np.uint8),
-                       np.clip(alpha * 255, 0, 255).astype(np.uint8), out_dir / name, quality=90)
+                       np.clip(a * 255, 0, 255).astype(np.uint8), out_dir / name, quality=90)
         frames.append(f"fx/water/{name}")
     return {"frames": frames, "rect": {"x": x0, "y": y0, "width": w, "height": h}}
 
@@ -1701,6 +1721,17 @@ def main() -> None:
         lp = build_water_flow_poses(rgb, lagoon, spread, 16.0, water_fx_dir, "delta_sea", seed=995)
         if lp:
             sea_patches.append({"id": "delta_sea", "flowPoses": lp})
+    # Sea arch + stacks on the west rim (Director 2026-10-30): the painted surf
+    # around the rocks animates with the same flow-pose recipe as the bays.
+    # Mask = sea within ~90 px of land inside the authored box, so the open sea
+    # to the east and the arch channel (not sea) stay still.
+    arch_box = np.zeros_like(sea)
+    arch_box[350:800, 0:560] = True
+    arch = sea & (land_dist <= 90) & arch_box & teal_m
+    if arch.sum() > 2000:
+        ap = build_water_flow_poses(rgb, arch, away_shore, 26.0, water_fx_dir, "sea_arch", seed=996, flow_whole=True, foam_pulse=0.5)
+        if ap:
+            sea_patches.append({"id": "sea_arch", "flowPoses": ap})
     if sea_patches:
         secondary_water_json["seaPatches"] = sea_patches
     (out / "secondary-water.json").write_text(json.dumps(secondary_water_json, indent=2), encoding="utf-8")
@@ -1715,12 +1746,36 @@ def main() -> None:
     save_alpha_mask(shallow, masks_dir / "shallow_mask.webp")
     foam = (sea & (coast_px <= 20)).astype(np.uint8) * 255
     save_alpha_mask(foam, masks_dir / "foam_mask.webp")
+    # Blue channel (PLAN-094 foam v2, Director 2026-10-29): where the PAINTING already has intense white
+    # surf at the waterline (cliff bases, rock arches), so the runtime swash can push harder there.
+    sea_near = cv2.dilate(sea.astype(np.uint8), np.ones((9, 9), np.uint8)) > 0
+    painted_white = (rgb.min(axis=2) >= 182) & sea_near & (coast_px <= 70)
+    painted_white = cv2.morphologyEx(painted_white.astype(np.uint8), cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))
+    surf = np.clip(cv2.GaussianBlur(painted_white.astype(np.float32), (0, 0), 7.0) * 3.2, 0, 1)
     dist_rgb = np.dstack([
         (np.clip(coast_px / D_MAX, 0, 1) * 255).astype(np.uint8),
         (sea.astype(np.uint8) * 255),
-        np.zeros((WORLD_H, WORLD_W), dtype=np.uint8),
+        (surf * 255).astype(np.uint8),
     ])
     Image.fromarray(dist_rgb, "RGB").save(masks_dir / "coast_distance.webp", lossless=True, method=4)
+
+    # Clean plate under the painted surf (Director 2026-10-30): the runtime lets the painted white RECEDE and
+    # climb back up the cliff, so it needs the water that would be there without the foam. RGB = a smooth fill
+    # from the surrounding foam-free sea (normalised convolution); alpha = where the foam is painted.
+    foam_px = (rgb.min(axis=2) >= 168) & sea_near & (coast_px <= 70)
+    foam_px = cv2.dilate(foam_px.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))) > 0
+    # fill only from clearly-water pixels, well clear of the foam's bright halo (else the plate comes out washed-out)
+    near_foam = cv2.dilate(foam_px.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))) > 0
+    valid = (sea & ~near_foam & (rgb.min(axis=2) < 125) & (coast_px > 2)).astype(np.float32)
+    rgbf = rgb.astype(np.float32)
+    num = cv2.GaussianBlur(rgbf * valid[..., None], (0, 0), 9.0)
+    den = cv2.GaussianBlur(valid, (0, 0), 9.0)[..., None]
+    num2 = cv2.GaussianBlur(rgbf * valid[..., None], (0, 0), 28.0)
+    den2 = cv2.GaussianBlur(valid, (0, 0), 28.0)[..., None]
+    fill = np.where(den > 0.03, num / np.maximum(den, 1e-4), num2 / np.maximum(den2, 1e-4))
+    foam_a = cv2.GaussianBlur(foam_px.astype(np.float32), (0, 0), 1.6)
+    foam_a = np.clip(foam_a * 1.25, 0, 1)
+    save_webp_rgba_lossless(np.clip(fill, 0, 255).astype(np.uint8), (foam_a * 255).astype(np.uint8), masks_dir / "foam_clean.webp")
 
     # ── Ambient director (PLAN-094): shoal zones + route schema v0 ─────────
     ambient_exclusions: dict[str, np.ndarray] = {

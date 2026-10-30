@@ -518,6 +518,7 @@ precision highp float;
 in vec2 vUV;
 out vec4 outColor;
 uniform sampler2D uDist;
+uniform sampler2D uClean;
 uniform vec2 uWorld;
 uniform float uTime;
 uniform float uDMax;
@@ -526,6 +527,7 @@ uniform float uStrength;
 uniform float uDissolveStart;
 uniform float uDissolveEnd;
 uniform float uCrestSpeed;
+uniform float uSwash;
 float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float vnoise(vec2 p) {
   vec2 i = floor(p), f = fract(p);
@@ -534,17 +536,31 @@ float vnoise(vec2 p) {
 }
 void main() {
   vec4 t = texture(uDist, vUV);
+  vec4 cl = texture(uClean, vUV); // water without the painted surf; alpha = where the surf is painted
   float water = smoothstep(0.45, 0.6, t.g);
   float d = t.r * uDMax;
-  if (water < 0.01 || d > 130.0) { outColor = vec4(0.0); return; }
   vec2 w = vUV * uWorld;
-  float u = (d + uTime * uCrestSpeed) / 38.0 + vnoise(w * 0.004) * 1.5;
-  float f = fract(u);
-  float crest = smoothstep(0.78, 0.9, f) * (1.0 - smoothstep(0.9, 1.0, f));
-  crest *= (1.0 - smoothstep(30.0, 110.0, d)) * smoothstep(uDissolveStart, uDissolveEnd, d);
-  float lace = smoothstep(0.30, 0.62, vnoise(w * 0.09 + vec2(0.0, uTime * 0.05)));
-  float a = clamp(crest * 0.55 * lace * water * uStrength, 0.0, 1.0);
-  outColor = vec4(uFoamColor * a, a);
+  // The painted white surf RECEDES from the sea and climbs back up the cliff. Each stretch of coast has its own
+  // phase. s = how far the foam reaches: it surges back fast, holds, then drains away slowly.
+  float cyc = fract((uTime * 0.11 + vnoise(w * 0.008) * 0.9) );
+  float rush = smoothstep(0.0, 0.16, cyc);
+  float drain = 1.0 - smoothstep(0.42, 0.97, cyc);
+  float s = 0.08 + 0.92 * min(rush, drain + step(cyc, 0.42) * 1.0);
+  float reach = mix(3.0, 56.0, s * uSwash + (1.0 - uSwash));
+  float gone = smoothstep(reach - 5.0, reach + 5.0, d); // 1 where the foam has left, the sea shows again
+  float hideA = cl.a * gone;
+  // faint crest rings (as before) over the open water
+  float foamA = 0.0;
+  if (water > 0.01 && d <= 130.0) {
+    float u = (d + uTime * uCrestSpeed) / 38.0 + vnoise(w * 0.004) * 1.5;
+    float f = fract(u);
+    float crest = smoothstep(0.78, 0.9, f) * (1.0 - smoothstep(0.9, 1.0, f));
+    crest *= (1.0 - smoothstep(30.0, 110.0, d)) * smoothstep(uDissolveStart, uDissolveEnd, d);
+    float lace = smoothstep(0.30, 0.62, vnoise(w * 0.09 + vec2(0.0, uTime * 0.05)));
+    foamA = clamp(crest * 0.55 * lace * water * uStrength, 0.0, 1.0);
+  }
+  vec3 premult = uFoamColor * foamA * (1.0 - hideA) + cl.rgb * hideA;
+  outColor = vec4(premult, foamA * (1.0 - hideA) + hideA);
 }
 `;
 
@@ -2509,11 +2525,14 @@ export function PixiWorldMap({
       // ── Coastal foam (shader) ──
       if (fxOn.coastFoam && meshOk) {
         const dist = await load(coastDistanceUrl);
+        // clean plate under the painted surf (pipeline: masks/foam_clean.webp); absent -> the surf just stays put
+        const clean = await load(coastDistanceUrl.replace('coast_distance.webp', 'foam_clean.webp')).catch(() => null);
         const c = coastFoamConfig;
         const shader = Shader.from({
           gl: { vertex: VERT, fragment: COAST_FOAM_FRAG },
           resources: {
             uDist: dist.source,
+            uClean: (clean ?? Texture.EMPTY).source,
             u: {
               uTime: { value: 0, type: 'f32' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
@@ -2523,6 +2542,7 @@ export function PixiWorldMap({
               uDissolveStart: { value: c.dissolveStartWorldPx, type: 'f32' },
               uDissolveEnd: { value: c.dissolveEndWorldPx, type: 'f32' },
               uCrestSpeed: { value: c.crestSpeedWorldPxPerSecond, type: 'f32' },
+              uSwash: { value: clean ? 1 : 0, type: 'f32' },
             },
           },
         });
