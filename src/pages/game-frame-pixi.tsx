@@ -55,7 +55,7 @@ import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente
 import { initializeMinimalGameplayStore, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { DEFAULT_HUD_BAND_PX, setHudBandPx, useHudBandPx } from '@/ui/idleVillage/skins/primitives';
 import { useHudScale } from '@/ui/idleVillage/components/gameFrame/useHudScale';
-import { MapDemoPoi, QuestJourneyRoute, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, VillageScreenView, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
+import { MapDemoPoi, QuestJourneyRoute, QuestOverlays, QuestRewardPopup, QuestRunWindow, RegionTooltip, TuningPanel, useHeroSheet, useHudPanels, usePanelWhileOpen, VillageDirectorView, type HeroSheetApi, type HudEvent, type HudPanelId, type HudPanelsApi, type TuningField, type VillageScreenViewHandle } from '@/ui/idleVillage/components/gameFrame';
 import { resolveQuestShellLayout, solveQuestClusterGeometry } from '@/ui/idleVillage/components/gameFrame/questShellLayout';
 import { QuestStageCluster } from '@/ui/idleVillage/components/gameFrame/QuestStageCluster';
 import { QuestSkillCheckColumn } from '@/ui/idleVillage/components/gameFrame/QuestSkillCheckColumn';
@@ -1837,7 +1837,7 @@ const availEqual = (a: QuestAvailability | undefined, b: QuestAvailability | und
                   <WorldSurfaceEventShroud covered={shroudCovered} zIndex={6} />
                 </div>
                 {viewMode === 'village' && (
-                  <VillageScreenView
+                  <VillageDirectorView
                     ref={villageViewRef}
                     onOpenStash={(trigger) => openVillagePanel('villageStash', trigger)}
                     onOpenMerchant={(trigger) => openVillagePanel('merchant', trigger)}

@@ -26,10 +26,12 @@ export interface RigSpec {
 export type PartKind = 'tail' | 'head' | 'fin' | 'flipperFront' | 'flipperRear';
 
 export interface RigInst {
+  /** Animal id in sea-life.json (`manta`, `tartaruga`...), set by the adapter. */
+  id: string;
   root: Container;
   lengthPx: number;
   body: Sprite;
-  parts: { sp: Sprite; kind: PartKind; side: number; ph: number }[];
+  parts: { sp: Sprite; kind: PartKind; side: number; ph: number; baseSx: number; baseSy: number }[];
 }
 
 /** Role of a part from where it attaches (head points to +x). */
@@ -60,14 +62,17 @@ export function buildRig(spec: RigSpec, tex: (file: string) => Texture | undefin
     if (!t) continue;
     const sp = new Sprite(t);
     sp.anchor.set(p.pivot[0] / p.width, p.pivot[1] / p.height);
-    sp.position.set(p.attach[0], p.attach[1]);
-    sp.tint = tint;
     const kind = classifyPart(p.attach, spec.lengthPx);
+    // tuck flippers and head into the shell so no seam shows while they move
+    const inset = kind === 'flipperFront' || kind === 'flipperRear' ? 16 : kind === 'head' ? 8 : 0;
+    const dist = Math.hypot(p.attach[0], p.attach[1]) || 1;
+    sp.position.set(p.attach[0] * (1 - inset / dist), p.attach[1] * (1 - inset / dist));
+    sp.tint = tint;
     // draw the tail/fins under the body so the hinge tab tucks in
     root.addChildAt(sp, 0);
-    parts.push({ sp, kind, side: p.attach[1] < 0 ? -1 : 1, ph: (parts.length * 1.7) % (Math.PI * 2) });
+    parts.push({ sp, kind, side: p.attach[1] < 0 ? -1 : 1, ph: (parts.length * 1.7) % (Math.PI * 2), baseSx: 1, baseSy: 1 });
   }
-  return { root, lengthPx: spec.lengthPx, body, parts };
+  return { id: '', root, lengthPx: spec.lengthPx, body, parts };
 }
 
 /** Swim the hinged parts: tail sway, fin flutter, turtle rowing. `ph` offsets individuals. */
@@ -75,20 +80,28 @@ export function animateRig(r: RigInst, t: number, ph = 0, amp = 1): void {
   for (const p of r.parts) {
     const w = t + ph;
     switch (p.kind) {
-      case 'tail':
-        p.sp.rotation = 0.38 * amp * Math.sin(w * 4.6 + p.ph);
+      case 'tail': {
+        // a tail is a wave, not a hinge: modest swing, slower beat, and the piece thins/lengthens a little on each
+        // stroke so it reads as flexing instead of a rigid paddle flapping at the side (Director 2026-10-30)
+        const sw = Math.sin(w * 3.1 + p.ph);
+        p.sp.rotation = 0.2 * amp * sw;
+        p.sp.scale.set(p.baseSx * (1 - 0.06 * Math.abs(sw)), p.baseSy * (1 + 0.05 * Math.abs(sw)));
         break;
+      }
       case 'head':
         p.sp.rotation = 0.05 * Math.sin(w * 1.3);
         break;
       case 'fin':
         p.sp.rotation = p.side * 0.2 * amp * Math.sin(w * 3 + p.ph);
         break;
-      case 'flipperFront':
-        p.sp.rotation = p.side * 0.5 * Math.sin(w * 2.2 + (p.side > 0 ? Math.PI : 0));
+      // a sea turtle flaps both front flippers TOGETHER (mirrored): a power stroke back, a slower recovery
+      case 'flipperFront': {
+        const ph = Math.sin(w * 1.5);
+        p.sp.rotation = p.side * (0.08 + 0.26 * (ph > 0 ? ph : ph * 0.6));
         break;
+      }
       case 'flipperRear':
-        p.sp.rotation = p.side * 0.25 * Math.sin(w * 2.2 + (p.side > 0 ? 0 : Math.PI));
+        p.sp.rotation = p.side * (0.06 + 0.09 * Math.sin(w * 1.5 + 0.9));
         break;
     }
   }

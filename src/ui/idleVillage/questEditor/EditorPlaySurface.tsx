@@ -5,7 +5,7 @@
  * plus: node image, party HP bars, consumables row, inline text edit
  * (edit-where-you-see), stat chips, stale-run banner.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   applyChoice,
   availableOptions,
@@ -58,18 +58,26 @@ export const EditorPlaySurface: React.FC<{
   /** IT overlay edits — keyed `${nodeId}.${field}`, persisted in the candidate. */
   itEdits: Record<string, string>;
   onItEdit: (key: string, v: string) => void;
-}> = ({ snapshot, workingCopy, onOpsChange, dirty, seed, onReseed, itEdits, onItEdit }) => {
+  /** Fires when the run moves to a different node — the strip follows it. */
+  onNodeChange?: (nodeId: string) => void;
+}> = ({ snapshot, workingCopy, onOpsChange, dirty, seed, onReseed, itEdits, onItEdit, onNodeChange }) => {
   const [presetId, setPresetId] = useState(PARTY_PRESETS[0]!.id);
   const [run, setRun] = useState<QuestRunState | null>(null);
   const [localSeed, setLocalSeed] = useState(seed);
   const preset = PARTY_PRESETS.find((p) => p.id === presetId) ?? PARTY_PRESETS[0]!;
 
+  // Auto-start once a scenario snapshot exists — the page opens already playing.
+  useEffect(() => { if (!run) start(localSeed); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [snapshot]);
+
   const start = (s: number) => {
     const instance = createScenarioInstance(snapshot, { dangerScale: 1, rewardScale: 1 }, 'gen');
     loopEvent('reseed');
-    setRun(createRun({ party: { members: preset.members.map((m) => ({ ...m })), gold: preset.gold, presetId: preset.id }, seed: s, questId: 'gen', scenarioInstance: instance }));
+    const r0 = createRun({ party: { members: preset.members.map((m) => ({ ...m })), gold: preset.gold, presetId: preset.id }, seed: s, questId: 'gen', scenarioInstance: instance });
+    setRun(r0); onNodeChange?.(r0.nodeId);
     onReseed(s);
   };
+
+  const advance = (next: QuestRunState) => { setRun(next); if (next.nodeId !== run?.nodeId) onNodeChange?.(next.nodeId); };
 
   const node: QuestNode | undefined = run ? nodesFor(run)[run.nodeId] : undefined;
   const opts = run ? availableOptions(run) : [];
@@ -89,7 +97,7 @@ export const EditorPlaySurface: React.FC<{
           <input className="w-14 rounded border border-slate-600 bg-slate-900 px-1" type="number" value={localSeed} onChange={(e) => setLocalSeed(Number(e.target.value))} />
         </label>
         <button className="rounded border border-sky-400/60 px-2 py-0.5" onClick={() => start(localSeed)}>{run ? '⟲ re-seed' : '▶ start'}</button>
-        <button className="rounded border border-amber-400/60 px-2 py-0.5" onClick={() => run && setRun(flee(run))} disabled={!run || run.ended}>flee</button>
+        <button className="rounded border border-amber-400/60 px-2 py-0.5" onClick={() => run && advance(flee(run))} disabled={!run || run.ended}>flee</button>
         {dirty && <span className="rounded border border-amber-500/60 px-2 py-0.5 text-amber-300">● stale run — edits since this run started</span>}
         {run?.ended && <span className="rounded border border-slate-500 px-2 py-0.5">outcome: {run.outcome}</span>}
       </div>
@@ -111,7 +119,7 @@ export const EditorPlaySurface: React.FC<{
             {opts.map((o, i) => {
               const p = node.options?.[i] ? previewOption(run, o.id) : null;
               return (
-                <button key={o.id} disabled={o.disabled || run.ended} onClick={() => setRun(applyChoice(run, o.id))}
+                <button key={o.id} disabled={o.disabled || run.ended} onClick={() => advance(applyChoice(run, o.id))}
                   className={`flex items-center justify-between gap-2 rounded border px-2 py-1 text-left ${o.disabled ? 'border-dashed border-slate-600 opacity-50' : 'border-slate-500 hover:bg-slate-700/40'}`}>
                   <Ed v={o.label + (o.detail ? ` — ${o.detail}` : '')} onSave={(v) => { const [label, ...d] = v.split(' — '); const wc = { ...workingCopy, ops: [...workingCopy.ops] }; applyEditorOp(wc, { kind: 'setOptionField', nodeId: run.nodeId, optionIdx: i, field: 'label', value: label }); if (d.length) applyEditorOp(wc, { kind: 'setOptionField', nodeId: run.nodeId, optionIdx: i, field: 'detail', value: d.join(' — ') }); onOpsChange(wc); }} />
                   <span className="whitespace-nowrap text-emerald-300">{p && 'wound' in p ? `win ${Math.round((p as { success?: number }).success ?? 0)}% · wound ${(p as { wound?: number }).wound ?? 0}% · death ${(p as { death?: number }).death ?? 0}%` : ''}</span>
@@ -132,7 +140,7 @@ export const EditorPlaySurface: React.FC<{
                 </select>
                 {(() => { const c = consumableBonusFor(run, node); return c ? (
                   <button className="ml-auto rounded border border-emerald-500/60 px-1.5 text-emerald-300" title={`usa ${c.label}`}
-                    onClick={() => { const o = opts.find((x) => !x.disabled); if (o) setRun(applyChoice(run, o.id, { useConsumable: true })); }}>
+                    onClick={() => { const o = opts.find((x) => !x.disabled); if (o) advance(applyChoice(run, o.id, { useConsumable: true })); }}>
                     🧪 {c.label} +{c.bonus}%
                   </button>) : null; })()}
               </div>

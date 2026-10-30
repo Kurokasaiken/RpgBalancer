@@ -4,7 +4,7 @@
  * (▶ = where you are = what you edit) → inspector (numbers/options/next).
  */
 import { useEffect, useMemo, useState } from 'react';
-import { LabPanel } from '@/ui/idleVillage/questGenLab/labUi';
+import { LabCard } from '@/ui/idleVillage/questGenLab/labUi';
 import type { QuestNode } from '@/ui/idleVillage/questS1Lab/questScenario';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import {
@@ -116,12 +116,12 @@ export default function QuestEditorPage() {
 
         {scenario && wc && (
           <>
-            <LabPanel title="① play — run reale (stateful)">
+            <LabCard title="① play — run reale (stateful)">
               <EditorPlaySurface snapshot={scenario} workingCopy={wc} onOpsChange={setWc} dirty={dirty} seed={seed}
-                onReseed={(s) => { setSeed(s); setRunStartedAt(wc.ops.length); }} itEdits={itEdits} onItEdit={(k, v) => setItEdits((m) => ({ ...m, [k]: v }))} />
-            </LabPanel>
+                onReseed={(s) => { setSeed(s); setRunStartedAt(wc.ops.length); }} itEdits={itEdits} onItEdit={(k, v) => setItEdits((m) => ({ ...m, [k]: v }))} onNodeChange={setSelected} />
+            </LabCard>
 
-            <LabPanel title="② scene — ▶ dove sei = cosa editi">
+            <LabCard title="② scene — ▶ dove sei = cosa editi">
               <div className="flex flex-wrap items-center gap-1">
                 {Object.keys(scenario.nodes).map((id) => (
                   <button key={id} onClick={() => setSelected(id)}
@@ -139,36 +139,10 @@ export default function QuestEditorPage() {
                     }}>− scena</button>
                 )}
               </div>
-            </LabPanel>
-
-            {diag && (
-              <LabPanel title={`validation — ${diag.valid ? 'valid' : 'INVALID'} · gates Approve/Export`}>
-                <div className="flex flex-wrap gap-x-4 gap-y-1">
-                  {diag.schemaErrors.map((e, i) => <span key={i} className="text-red-300">schema: {e.slice(0, 90)}</span>)}
-                  {diag.dangling.map((d, i) => <span key={i} className="text-red-300">dangling {d.from} → {d.to}</span>)}
-                  {diag.unreachable.length > 0 && <span className="text-amber-300">unreachable: {diag.unreachable.join(', ')}</span>}
-                  {diag.engineOwned.length > 0 && <span className="text-slate-400">engine-owned: {diag.engineOwned.length} nodi (routing read-only)</span>}
-                  {diag.valid && !diag.unreachable.length && <span className="text-emerald-300">✓ schema + grafo puliti</span>}
-                </div>
-              </LabPanel>
-            )}
-
-            {blockedFidelity.length > 0 && (
-              <LabPanel title={`fork fidelity — ${blockedFidelity.length} comportamenti persi su questId 'gen' (W-04: bloccanti)`}>
-                <div className="flex flex-col gap-1">
-                  {FORK_FIDELITY_MANIFEST[loaded!.parent.parentRef].map((i) => (
-                    <label key={i.key} className="flex items-center gap-2">
-                      <input type="checkbox" checked={waived.has(i.key)} onChange={(e) => setWaived((w) => { const n = new Set(w); e.target.checked ? n.add(i.key) : n.delete(i.key); return n; })} />
-                      <span className={waived.has(i.key) ? 'text-slate-500 line-through' : ''}>{i.label}</span>
-                      <span className="text-slate-600">{waived.has(i.key) ? 'waived — registrato nel candidato' : ''}</span>
-                    </label>
-                  ))}
-                </div>
-              </LabPanel>
-            )}
+            </LabCard>
 
             {node && selected && (
-              <LabPanel title={`③ ${selected} · ${node.kind}`}>
+              <LabCard title={`③ ${selected} · ${node.kind}`}>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="flex flex-col gap-1">
                     <span className="text-slate-500">numeri</span>
@@ -206,8 +180,32 @@ export default function QuestEditorPage() {
                     {!inbound.length && <span className="text-slate-600">nessuno — rimozione sicura</span>}
                   </div>
                 </div>
-              </LabPanel>
+              </LabCard>
             )}
+
+            <details className="rounded border border-slate-700 bg-slate-900 px-3 py-2" open={!!diag && (!diag.valid || blockedFidelity.length > 0)}>
+              <summary className="cursor-pointer text-slate-400">diagnostica — {diag ? (diag.valid ? 'valid' : 'INVALID') : '…'}{blockedFidelity.length ? ` · fidelity: ${blockedFidelity.length} da risolvere` : ''}</summary>
+              {diag && (
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                  {diag.schemaErrors.map((e, i) => <span key={i} className="text-red-300">schema: {e.slice(0, 90)}</span>)}
+                  {diag.dangling.map((d, i) => <span key={i} className="text-red-300">dangling {d.from} → {d.to}</span>)}
+                  {diag.unreachable.length > 0 && <span className={diag.legacyRouted ? 'text-slate-400' : 'text-amber-300'}>{diag.legacyRouted ? 'nota:' : 'unreachable:'} {diag.unreachable.join(', ')}{diag.legacyRouted ? ' — raggiungibili via routing engine (authored)' : ''}</span>}
+                  {diag.engineOwned.length > 0 && <span className="text-slate-400">engine-owned: {diag.engineOwned.length} nodi (routing read-only)</span>}
+                  {diag.valid && <span className="text-emerald-300">✓ schema pulito</span>}
+                </div>
+              )}
+              {blockedFidelity.length > 0 && (
+                <div className="mt-2 flex flex-col gap-1">
+                  <span className="text-amber-300">fork fidelity — comportamenti persi su 'gen' (bloccano Salva candidato):</span>
+                  {FORK_FIDELITY_MANIFEST[loaded!.parent.parentRef].map((i) => (
+                    <label key={i.key} className="flex items-center gap-2">
+                      <input type="checkbox" checked={waived.has(i.key)} onChange={(e) => setWaived((w) => { const n = new Set(w); e.target.checked ? n.add(i.key) : n.delete(i.key); return n; })} />
+                      <span className={waived.has(i.key) ? 'text-slate-500 line-through' : ''}>{i.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </details>
           </>
         )}
       </div>

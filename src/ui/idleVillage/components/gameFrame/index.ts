@@ -64,5 +64,6 @@ export type { PanelResolution, StageLayout, StageOccupant, StagePanelId, StageRe
 export { heroSheetViewModel, type HeroSheetViewModel } from './heroSheetViewModel';
 // PLAN-035 — the village view (full-area buildings screen on /game).
 export { VillageScreenView, VILLAGE_TOOLTIP_ID, placeTooltip, type VillageScreenViewProps, type VillageScreenViewHandle, type TooltipPlacement, type TooltipSide } from './VillageScreenView';
+export { VillageDirectorView } from './VillageDirectorView';
 export { MockUpgradeControl, type MockUpgradeControlProps } from './MockUpgradeControl';
 export { VillageBuildingIcon, VillageCostIcon, type VillageBuildingIconProps } from './villageBuildingIcons';
