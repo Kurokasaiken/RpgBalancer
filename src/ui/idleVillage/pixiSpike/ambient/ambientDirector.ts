@@ -75,6 +75,11 @@ export interface ShoalZone {
   weight: number;
 }
 
+/** Sea-life form a shoal admission takes (manual lab triggers pick one; natural spawns roll it from the seed). */
+export type SeaLifeKind = 'school' | 'giant' | 'turtle' | 'dolphin';
+/** Giant species, when the kind is `giant`. */
+export type GiantSpecies = 'manta' | 'pescione' | 'martello';
+
 export interface Admission {
   family: 'shoal';
   zoneId: string;
@@ -82,6 +87,8 @@ export interface Admission {
   tick: number;
   seed: number;
   manual?: boolean;
+  kind?: SeaLifeKind;
+  species?: GiantSpecies;
 }
 
 export interface SpawnRecord {
@@ -132,12 +139,13 @@ export class AmbientDirector {
   }
 
   /** Manual lab trigger — tagged, bypasses cadence, respects caps. */
-  triggerShoal(zoneId?: string): Admission | null {
+  triggerShoal(zoneId?: string, pick?: { kind?: SeaLifeKind; species?: GiantSpecies }): Admission | null {
     const c = this.cfg();
-    const z = zoneId ? this.zones.find((q) => q.id === zoneId) : this.zones[0];
+    // unknown id (zones are baked per seed) falls back to the first zone instead of silently doing nothing
+    const z = (zoneId && this.zones.find((q) => q.id === zoneId)) || this.zones[0];
     if (!c.enabled || !c.families.shoal.enabled || !z) return null;
     const seed = hash32(c.seed, 'shoal', 'manual', this.ordinal++);
-    const adm: Admission = { family: 'shoal', zoneId: z.id, biome: z.biome, tick: this.simT, seed, manual: true };
+    const adm: Admission = { family: 'shoal', zoneId: z.id, biome: z.biome, tick: this.simT, seed, manual: true, kind: pick?.kind, species: pick?.species };
     this.manualQueue.push(adm); // drained by the next tick() — no time skew
     return adm;
   }
