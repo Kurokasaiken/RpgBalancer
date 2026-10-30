@@ -1,14 +1,66 @@
 {
   "zone": {
-    "x": 750,
-    "y": 380,
-    "w": 900,
-    "h": 620
+    "x": 1450,
+    "y": 520,
+    "w": 300,
+    "h": 260
   },
   "stages": [
+    null,
     "stage1.webp"
   ],
   "stageNames": [
-    "7 casette (piccole)"
-  ]
+    "nessuna casa",
+    "7 casette"
+  ],
+  "elements": {
+    "palizzata": {
+      "file": "el-palizzata.png",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "ax": 0,
+      "ay": 0
+    },
+    "muro": {
+      "file": "el-muro.png",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "ax": 0,
+      "ay": 0
+    },
+    "torre-legno-1": {
+      "file": "el-torre-legno-1.png",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "ax": 0,
+      "ay": 0
+    },
+    "torre-legno-2": {
+      "file": "el-torre-legno-2.png",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "ax": 0,
+      "ay": 0
+    },
+    "torre-pietra-1": {
+      "file": "el-torre-pietra-1.png",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "ax": 0,
+      "ay": 0
+    },
+    "torre-pietra-2": {
+      "file": "el-torre-pietra-2.png",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "ax": 0,
+      "ay": 0
+    }
+  }
 }

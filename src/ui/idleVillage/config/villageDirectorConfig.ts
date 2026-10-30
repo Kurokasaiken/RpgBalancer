@@ -20,7 +20,10 @@ export const VILLAGE_DIRECTOR_ASSETS: VillageDirectorAssets = villageDirectorAss
   basePlate: '/assets/village/base-plate.png',
   defaultSprite: '/assets/village/cottage.png',
   sprites: {
-    // populated as the per-building battery lands: lumbermill, quarry, farm…
+    inn: '/assets/village/inn.png',
+    smithy: '/assets/village/smithy.png',
+    watchtower: '/assets/village/watchtower.png',
+    // populated as the per-building battery lands: farm, market, warehouse…
   } as Partial<Record<PaintedBuildingId, string>>,
 });
 
@@ -35,15 +38,22 @@ const villagePlotSchema = z.object({
 });
 export type VillagePlot = z.infer<typeof villagePlotSchema>;
 
-export const VILLAGE_PLOTS: VillagePlot[] = [
-  { id: 'p1', x: 0.20, y: 0.66, rx: 0.085, ry: 0.11 },
-  { id: 'p2', x: 0.36, y: 0.56, rx: 0.085, ry: 0.11 },
-  { id: 'p3', x: 0.50, y: 0.44, rx: 0.075, ry: 0.10 },
-  { id: 'p4', x: 0.62, y: 0.62, rx: 0.085, ry: 0.11 },
-  { id: 'p5', x: 0.78, y: 0.55, rx: 0.085, ry: 0.11 },
-  { id: 'p6', x: 0.30, y: 0.80, rx: 0.09, ry: 0.12 },
-  { id: 'p7', x: 0.55, y: 0.84, rx: 0.09, ry: 0.12 },
-  { id: 'p8', x: 0.84, y: 0.74, rx: 0.085, ry: 0.11 },
+/* Piazzole = centri dei `region` degli 11 edifici dipinti su villaggio.png
+ *  (coordinate autoralate nel config — vbase vi è allineata). Modello B:
+ *  qualunque tipo va su qualunque piazzola; `hint` è solo il ricordo di dove
+ *  l'edificio era nel dipinto originale. */
+export const VILLAGE_PLOTS: (VillagePlot & { hint?: string })[] = [
+  { id: 'pl-inn',        x: 0.14, y: 0.55, rx: 0.055, ry: 0.075, hint: 'inn' },
+  { id: 'pl-quarry',     x: 0.20, y: 0.12, rx: 0.055, ry: 0.075, hint: 'quarry' },
+  { id: 'pl-smithy',     x: 0.30, y: 0.54, rx: 0.055, ry: 0.075, hint: 'smithy' },
+  { id: 'pl-farm',       x: 0.37, y: 0.74, rx: 0.055, ry: 0.075, hint: 'farm' },
+  { id: 'pl-market',     x: 0.47, y: 0.60, rx: 0.055, ry: 0.075, hint: 'market' },
+  { id: 'pl-infirmary',  x: 0.57, y: 0.60, rx: 0.055, ry: 0.075, hint: 'infirmary' },
+  { id: 'pl-barracks',   x: 0.67, y: 0.50, rx: 0.055, ry: 0.075, hint: 'barracks' },
+  { id: 'pl-lumbermill', x: 0.72, y: 0.20, rx: 0.055, ry: 0.075, hint: 'lumbermill' },
+  { id: 'pl-palisade',   x: 0.10, y: 0.86, rx: 0.055, ry: 0.075, hint: 'palisade' },
+  { id: 'pl-watchtower', x: 0.90, y: 0.12, rx: 0.055, ry: 0.075, hint: 'watchtower' },
+  { id: 'pl-warehouse',  x: 0.86, y: 0.50, rx: 0.055, ry: 0.075, hint: 'warehouse' },
 ];
 
 /** Building types assignable to a plot (chassis families share the cottage

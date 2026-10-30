@@ -1,5 +1,5 @@
 import { Container, Sprite, Texture } from 'pixi.js';
-import { NORTH_PEAKS, createMountainStorm } from './mountainStorm';
+import { SNOW_PEAKS, createMountainStorm } from './mountainStorm';
 import { createFeederRiver } from './feederRiver';
 import {
   Mappa2RegionalWeatherSchema,
@@ -116,17 +116,16 @@ export async function mountRegionalWeather(deps: RegionalWeatherMountDeps): Prom
   };
   // mist blob: world-width ~8x anchor radius (floor 110px) over a 256px texture
   mkSlots('mist', data.caps.mist, mistTex, (r) => Math.max(r * 3.2, 90) / 440);
-  // orographic bank: big squashed storm-white blobs riding the massif tops
-  // Localized snowstorm on the northern peaks (Director 2026-10-30; see mountainStorm.ts): cloud bank attached to the
-  // summit, whiteout haze, wind-streaked snow, ridge banner and intra-cloud lightning. Replaces the old drifting
-  // "storm clouds" blobs. The cells are the orographic anchors of the alpine north (the red massif has no snow).
-  const stormCells = data.anchors.some((a) => a.type === 'orographic') ? NORTH_PEAKS : [];
+  // Storm crowns on every grey snowy summit (Director 2026-10-30 ruling, PLAN-105 / fork B'' frozen baseline):
+  // a ring of soft mist_blob puffs per peak — light crown / slate belly, tip through the hole, cast shadow,
+  // wind-streaked snow, ridge banner, intra-crown lightning. Replaces both the old drifting blobs and the
+  // cumulus-sheet bank. Cells live in SNOW_PEAKS (all painted snowy maxima, not the red massif).
+  const stormCells = data.anchors.some((a) => a.type === 'orographic') ? SNOW_PEAKS : [];
   const storm = stormCells.length
     ? createMountainStorm({
         cells: stormCells,
         wsx,
         wsy,
-        cloudTex: await Promise.all(['03', '06'].map((n) => load(packAssetUrl(pack.packRoot, `fx/clouds/mappa2_cloud_${n}.webp`)))),
         blobTex: mistTex,
         reducedMotion,
       })
