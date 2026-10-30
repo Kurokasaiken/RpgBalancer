@@ -22,20 +22,30 @@ export interface Mappa2Grade {
   contrast: number;
   /** 0-1 opacity of the baked northern-rock shade (PixiWorldMap `mountainShade`). */
   mountainShade: number;
+  /** 0-1 opacity of the baked sapphire sea (PixiWorldMap `seaGrade`). */
+  seaSapphire: number;
 }
 
 export const DEFAULT_MAPPA2_GRADE: Mappa2Grade = {
-  enabled: true,
+  enabled: false, // the look-dev filter would grade the sapphire sea a second time: off by default, still available in the panel
   palette: 1,
   warm: 0.6,
   coolShadows: 0.6,
   saturation: 1.15,
   contrast: 1.06,
-  mountainShade: 0.8,
+  mountainShade: 1,
+  seaSapphire: 1,
 };
 
 /** Live object handed to PixiWorldMap; the controls mutate `opacity`, the map reads it every tick (no rebuild). */
 export const mountainShadeLive = { url: '/assets/world/mappa2/base/fx/mountain-shade.webp', opacity: DEFAULT_MAPPA2_GRADE.mountainShade };
+
+/** Live object handed to PixiWorldMap, same pattern as `mountainShadeLive`. */
+export const seaGradeLive = {
+  multUrl: '/assets/world/mappa2/base/fx/sea-sapphire-mult.webp',
+  addUrl: '/assets/world/mappa2/base/fx/sea-sapphire-add.webp',
+  opacity: DEFAULT_MAPPA2_GRADE.seaSapphire,
+};
 
 /** Rows R', G', B' over [R, G, B, 1]. Greys stay grey (rows sum to ~1 with ~0 offset). */
 export const PALETTE_MATRIX: readonly (readonly number[])[] = [
