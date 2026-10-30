@@ -60,7 +60,7 @@ Valgono per tutte le righe della sezione A, salvo nota.
 
 | ID | Asset | Piano | Pose / contenuto | In mappa | Sorgente (4×) | Stato | Note |
 |---|---|---|---|---|---|---|---|
-| A1 | Creatura di branco fantasy | PLAN-097 | cammino 8 · fermo 4 · reazione 2 | 16–20 px | 64–80 px | da decidere | specie da scegliere: «meno banale, più fantasy». Il cervo era solo segnaposto. Bioma `meadow` + margini `temperate_forest` |
+| A1 | Creatura di branco fantasy | PLAN-097 | cammino 8 · fermo 4 · reazione 2 | 16–20 px | 64–80 px | specie battezzate (3) — strip da produrre | Director 2026-10-30: approvate **sauropode nano** (prateria), **mammuth lanoso** (alpi), **cervoide cristallo** (foresta). Design v1 + compositi nel pilota (sezione 1). Restano pose cammino/fermo/reazione per specie |
 | A2 | Stormo (uccello singolo) | PLAN-097 | volo 8 · decollo 3 · atterraggio 3 | 10–14 px | 40–56 px | design battezzato ✓ — strip definitiva da produrre | visto dall'alto in obliquo; gli uccelli esistenti (`atmosphere/birds`) non reggono su mappa2. Bioma `temperate_forest` + `meadow`. **Pilota fatto 2026-10-29** (`context/research/2026-10-29-mappa2-sprite-pilot/`): stile PASS; ruling Director 2026-10-29 «battezzato» (design v4 + approccio 20–24px). Resta: strip 8+3+3 e montaggio atlante |
 | A12 | Airone / egretta | PLAN-097 | in piedi 2 · decollo 4 · volo 6 | 18–22 px | 88 px | da decidere | rive `mangrove_bayou` + bordi laghi; da spec piano slice 1 |
 | A13 | Aquila | PLAN-097 | cerchio ampio, evento raro | 30–36 px | 144 px | da decidere | `alpine` + `highland`; da spec piano slice 2 |
@@ -85,8 +85,8 @@ Valgono per tutte le righe della sezione A, salvo nota.
 |---|---|---|---|---|---|---|---|
 | A3 | Coda di balena lontana | PLAN-094 | emersione + tuffo, 8–12 pose | 30–40 px | 120–160 px | **bocciata** (Director 2026-10-29, saltata) | candidati archiviati in `context/research/2026-10-29-mappa2-sprite-pilot/` (sezione 3b) — riprendere con brief diverso se torna in campo |
 | A5 | Balena (ridipinta) | PLAN-094 | corpo + coda + pinne **separati** (per rig) | ~60 px | ~240 px | **bocciata** (Director 2026-10-29, saltata) | prove archiviate: evento ridotto a dorsale+sbuffo (cresta bassa, sbuffo procedurale) — in statico quasi invisibile a spec 60px; se torna: cresta più spessa/contrastata |
-| A6 | Kraken (ridipinto) | PLAN-094 | corpo + 6–8 tentacoli **separati** | ~73 px | ~290 px | da produrre | sostituisce `kraken1.webp`; candidato anche in acque `volcanic` (mood Wasteland se spawna lì — decidere alla consegna) |
-| A7 | Nave pirata (ridipinta) | PLAN-094 | scafo + vele separate | ~53 px | ~210 px | da produrre | sostituisce `nave-pirata1.webp`; serve una vista coerente con le rotte (PLAN-101) |
+| A6 | Kraken (ridipinto) | PLAN-094 | corpo + 6–8 tentacoli **separati** | ~73 px | ~290 px | **saltato** (Director 2026-10-30) | candidati archiviati nel pilota (`a6-kraken-v1`) — se torna: da capo il brief |
+| A7 | Nave pirata (ridipinta) | PLAN-094 | scafo + vele separate | ~53 px | ~210 px | **battezzata ✓** (Director 2026-10-30) | design v1 approvato. Prossimo: scafo+vele separati per rig/rotte (PLAN-101) |
 
 | A18 | Pesce del banco (silhouette dall'alto) | PLAN-094 | **corpo** + **coda** (cerniera) in 2 file separati, testa a destra | ~12 px | 96×48 | **consegnato e integrato 2026-10-29** — sostituisce i segnaposto procedurali | forma piena in un solo colore (lo tinge il runtime col blu del mare profondo); animo io: coda che ondeggia, deviazioni, banco coordinato |
 | A19 | Ombra gigante: manta e pescione | PLAN-094 | 1 silhouette statica per animale, testa a destra, posa dritta | 130–290 px | 512×192 | **consegnato e integrato 2026-10-29** | animo io: ondulazione automatica (mesh piegata) + bolle procedurali |
@@ -98,7 +98,7 @@ Valgono per tutte le righe della sezione A, salvo nota.
 | ID | Asset | Piano | Pose / contenuto | In mappa | Sorgente (4×) | Stato | Note |
 |---|---|---|---|---|---|---|---|
 | A8 | Animazioni dei segreti | PLAN-100 | 1 animazione one-shot per segreto | — | — | da decidere | dipende dalla scelta dei 4–6 punti (O-1); il mood segue il bioma del punto |
-| A9 | Villaggio, una tavola per incarnazione | PLAN-089 T-012 | 1 immagine per incarnazione (+ fumo dal runtime) | ~300×300 px | ~1200 px | da decidere | elenco incarnazioni da definire; ipotesi: una incarnazione per chiave mood (4 tavole) |
+| A9 | Villaggio, patch regionale per incarnazione | PLAN-089 T-012 | regione cradle + tavola hi-res zona villaggio scalata dentro (+ fumo runtime) | patch ~900×620, zona ~540×320 | tavola 1417×752 (`a9-zoneplate-0.png`) | in corso | pipeline: ref moodboard `rude-beauty/villaggio.png` + crop regione; Gemini non scala via edit → la scala la controlla il composito (zone-plate hi-res → downscale + tone-match); stage = edit ancorati (dimostrato: 4 case+cantiere, palizzata+torri); zona villaggio = layer a sé ~380×260 swap‑stage |
 | A10 | Strutture scopribili, una tavola per stato | da assegnare | 1 immagine per struttura per stato | 100–200 px | 400–800 px | da decidere | regola: restano visibili dopo la scoperta e mostrano lo stato; mood per bioma della struttura |
 | A11 | Tasselli ad alta risoluzione | PLAN-096 | tasselli 2× e 4× (ingranditore + ridipintura) | — | — | da decidere | solo se si sceglie lo zoom 3 a qualità piena; copre tutti i mood |
 | A17 | Carovana (carri) | PLAN-097 | marcia lenta su polilinea, pausa | 22–28 px | 112 px | da decidere | strade dipinte della valle (`meadow`); da spec piano slice 2 |

@@ -210,6 +210,14 @@ produzione `/game`, paintover.
   come ripiego). Banco = pesce; ombra gigante = manta / pescione / pesce martello a caso (+ bolle); tartaruga; delfini. Verificato con
   catture a 3× di tutti e quattro i tipi. Da fare: eye-check Director sul movimento.
 
+- **Correzione dimensioni e movimento (2026-10-30, feedback Director: «enormi e statici, tranne i delfini; la tartaruga è fatta male»):**
+  banco: pesci da ~22 px (erano ~48, grandi come i delfini) e gruppo più stretto; ombre giganti da ×1.9 a ×1.3 della taglia; tartaruga da ×0.8 a ×0.42.
+  Movimento: ogni forma attraversa il suo percorso sicuro in ~9–13 s (prima 14–29 s a 2–5 px/s, sembrava ferma); le ombre giganti sbandano col
+  corpo e battono la coda larga, la manta batte le ali (scala Y del corpo). Tartaruga: le pinne anteriori ora battono **insieme e speculari**
+  (prima alternate, sembrava che camminasse), con fase di spinta e di recupero; pinne e testa incassate nel guscio (nessuna fessura). Pulsanti
+  per animazione nel tab Sea; click manuale libera il posto più vecchio; zona sconosciuta → prima zona. Verificato con sequenze a 3 fotogrammi
+  e 6 fotogrammi ravvicinati della tartaruga.
+
 ## Decisioni Director 2026-10-29 (vita marina)
 
 - Confermata la direzione: **banchi di pesci** + **qualcosa di più grande**.

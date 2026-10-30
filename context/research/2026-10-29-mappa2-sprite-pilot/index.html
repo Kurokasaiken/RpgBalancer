@@ -31,12 +31,63 @@
 
 <div class="dec card">
   <b>Decisioni richieste — in cima le cose nuove</b><br>
-  1. <b>A5 balena — rig a parti va bene?</b> Giudica silhouette e scala a 60px; poi animazione (coda+pinne).<br>
-  2. A4 sirena — <b>design battezzato ✓</b> (scheda del Director): ciclo 7 pose estratto, sezione 2.<br>
-  3. A3 coda balena — <b>bocciata</b>; A2 stormo — <b>battezzato ✓</b>, strip definitiva da produrre.
+  1. <b>A9 villaggio come patch regionale (v3) — promuovi?</b> Approccio PLAN-089: regione cradle ridipinta col villaggio dentro. Sprite v1/v2 bocciati.<br>
+  2. A5 balena — <b>bocciata</b> · A6 kraken — <b>saltato</b> · A7 nave — <b>battezzata ✓</b> (parti v2 consegnate).<br>
+  3. A4 sirena — <b>design battezzato ✓</b>, ciclo 7 pose · A2 stormo — <b>battezzato ✓</b> · A1 — 3 specie approvate.
 </div>
 
-<h2>1 · A5 — balena ridipinta (open_sea, Rude Beauty)</h2>
+<h2>-1 · Villaggio /game — piastra base + edifici componibili (NUOVA PISTA)</h2>
+<div class="dec card"><b>Requisito Director:</b> la HUD del villaggio (`/game`, oggi = <code>villaggio.png</code> piatto + pin) diventa <b>base plate vuota + sprite per-edificio</b> aggiungibili/upgradabili a runtime. Il config <code>villageBuildingsConfig.ts</code> ha già anchor+footprint per gli 11 edifici dipinti (lumbermill, quarry, farm, warehouse, inn, smithy, market, infirmary, palisade, watchtower, barracks) e tiers 1–5.</div>
+<div class="row">
+  <div class="card"><img src="out/vbase-0.png"><div class="cap"><b>Base plate vuota</b> (<code>vbase-0.png</code>): stessa scena, ZERO edifici — prato, fiume, sentieri, montagne. È il fondale su cui si compongono gli edifici.</div></div>
+  <div class="card"><div class="magenta"><img src="out/bldg-cottage-0.png" style="max-height:300px"></div><div class="cap"><b>Sprite edificio pilota</b>: cottage paglia+graticcio+pietra, stesso angolo/luce della piastra, su magenta → estratto con alpha (<code>bldg-cottage-spr.png</code>, 811×554).</div></div>
+</div>
+<div class="card"><img src="out/vbase-demo.png"><div class="cap"><b>Composito runtime simulato</b>: 4 istanze dello sprite cottage sulla piastra, posizioni/scale diverse + ombra di contatto. È il meccanismo: <code>built</code> → sprite on, <code>buildable</code> → slot marker, upgrade → sprite del tier superiore. Manca: 11 tipi edificio × tier, posizioni dagli anchor del config.</div></div>
+
+<h2>0 · A9 — villaggio stage-0 come PATCH REGIONALE (village cradle, Rude Beauty) — v3 CANDIDATO</h2>
+<div class="dec card"><b>Cambiamento di approccio (v3):</b> lo sprite ritagliato (v1/v2) non funziona — v1 aveva la base verde sbagliata, v2 era un asset-pack isometrico mediocre. PLAN-089 T-012 chiede <b>patch regionali</b>: la regione della cradle ridipinta con il villaggio dentro, bordi su confini naturali (fiumi/bosco) + fusione runtime. Ref corretto: <code>src/assets/mood/rude-beauty/villaggio.png</code> (moodboard) + crop regione + mappa intera.</div>
+<div class="row">
+  <div class="card"><img src="out/a9-village-v3-0.png"><div class="cap"><b>v3 — regione ridipinta col villaggio</b>: 7 casette a paglia dorata + edificio alto, nel centro del prato a destra dell'ansa del fiume, sentiero di terra, stessa pennellata/luce della mappa. <code>a9-village-v3-0.png</code></div></div>
+  <div class="card"><img src="out/a9-v3-compare.png"><div class="cap">Prima → dopo: stessa regione, solo il villaggio aggiunto (il resto viene ridipinto da Gemini con leggere differenze di tono — la patch si fonde ai bordi naturali).</div></div>
+</div>
+<div class="row">
+  <div class="card"><img src="out/a9-zoneplate-0.png"><div class="cap"><b>Tavola hi-res della zona</b> (<code>a9-zoneplate-0.png</code>, 1417×752): prato+casette a dettaglio pieno — paglia, graticci, pietra, sentieri. È l'asset riusabile: si riduce nella patch e regge lo zoom (4× la dimensione d'uso).</div></div>
+  <div class="card"><img src="out/a9-v6-composite.png"><div class="cap"><b>v6 — composito a scala corretta</b>: la tavola hi-res ridotta e incollata nel prato con tone-match + feather. Le case ora sono alte quanto un albero (v4/v5 edit-ancorati non scendevano oltre ~10%: la scala la controlla la pipeline, non Gemini). Un filo di seam sul bordo destro da levigare.</div></div>
+</div>
+<div class="card"><img src="out/a9-v3-onmap.png"><div class="cap"><b>Sulla mappa intera</b> (patch a 900×620 su x750 y380, bordo sfumato): il villaggio è un cluster dorato nel prato sotto la cascata — integrato, non incollato. In produzione la patch sarebbe un layer regionale del pack (PLAN-089: blend/tone/grain contract), non uno sprite mobile.</div></div>
+<div class="card">
+  <canvas id="svcv" width="900" height="620" style="width:100%"></canvas>
+  <div class="cap"><b>Crescita del villaggio</b> — trascina: <input id="svst" type="range" min="0" max="200" value="200" style="width:50%"> <span id="svstv">palizzata</span><br>
+  Stage generati come <b>edit ancorati sulla stessa regione</b> (Gemini tiene fermo tutto il resto): <b>0</b> = 4 casette + catasta di tronchi (cantiere) · <b>1</b> = 7 casette · <b>2</b> = anello di pali acuminati + 2 torri di guardia + porta sul sentiero. Stessa tecnica per: mattoni, mura in pietra, torri con sentinella, edifici speciali.<br>
+  <b>Zona a sé:</b> in produzione si swappa solo il rettangolo del villaggio (<code>a9-r-stageN-zone.jpg</code>, 380×260 su x470 y190 della regione), non tutta la regione — la cradle resta base map, il villaggio è il suo layer evolutivo con cross-fade tra stage.</div>
+</div>
+<div class="card"><div class="cap" style="color:var(--dim)">Archivio approcci scartati: <b>v1</b> sprite con base verde teal dipinta sotto (bocciato: "niente sotto") · <b>v2</b> sprite architettura giusta ma rendering asset-pack isometrico CG (bocciato: mediocre). File: <code>a9-village-v1-0.png</code>, <code>a9-v2-chat2.png</code>.</div></div>
+
+<h2>1 · A1 — branco fantasy (tutte e 3 le specie approvate dal Director)</h2>
+<div class="row">
+  <div class="card"><div class="magenta"><img src="out/a1-sauro-v1-0.png"></div><div class="cap"><b>Sauropode nano</b> — muschio + chiazze calde · bioma prateria</div></div>
+  <div class="card"><div class="magenta"><img src="out/a1-mammoth-v1-0.png"></div><div class="cap"><b>Mammuth lanoso</b> — pelliccia bruno-crema · bioma alpi</div></div>
+  <div class="card"><div class="magenta"><img src="out/a1-deer-v1-0.png"></div><div class="cap"><b>Cervoide cristallo</b> — corna con punte di cristallo · bioma foresta</div></div>
+</div>
+<div class="card"><img src="out/a1-fork-biomes.png"><div class="cap">Le tre specie a ~16–20px sui rispettivi biomi (branco di 3 esemplari) — si leggono come animali reali, non adesivi. Prossimo: pose cammino+fermo+reazione per specie.</div></div>
+
+<h2>2 · A7 — nave pirata ridipinta (open_sea, Rude Beauty)</h2>
+<div class="row">
+  <div class="card"><div class="magenta"><img src="out/a7-ship-v1-0.png"></div>
+    <div class="cap">Design v1 — caravella dipinta, scafo legno caldo, vele crema in luce dorata, bandierine, prua a destra, vista obliqua ¾ da sopra-dietro. Ref: mappa intera. <b>Tagliata: <code>a7-v1-cut.png</code></b></div></div>
+  <div class="card"><img src="out/a7-onsea.png"><div class="cap">Sul mare a <b>~40 / 53 / 70px</b> (spec ~53px) — veliero naturale sull'acqua. <b>Design battezzato ✓</b></div></div>
+  <div class="card"><div class="magenta"><img src="out/a7-parts2-0.png"></div>
+    <div class="cap">Parti v2 (edit preciso): <code>a7p2-hull/sails-main/sails-mizzen/flags/bowsprit.png</code> — scafo senza alberi, vele quasi pulite. <img src="out/a7-rig-test2.png" style="margin-top:6px"> si ricompone sul mare; i pivot esatti li fissa il rig runtime.</div></div>
+</div>
+
+<h2>2 · A6 — kraken ridipinto — SALTATO</h2>
+<div class="row">
+  <div class="card"><div class="magenta"><img src="out/a6-kraken-v1-0.png"></div>
+    <div class="cap">Design v1 (archivio) — calamaro indaco-viola, luce ambrata. Saltato dal Director.</div></div>
+  <div class="card"><img src="out/a6-onsea.png"><div class="cap">Archivio — composito a 55/73/90px.</div></div>
+</div>
+
+<h2>3 · A5 — balena ridipinta (open_sea, Rude Beauty) — BOCCIATA</h2>
 <div class="row">
   <div class="card"><div class="magenta"><img src="out/a5-whale-v2-0.png"></div>
     <div class="cap">v2 — balena intera, naso a destra: dorso teal profondo, cirripedi ambrati, sfiatatoio, bordo chiaro dove prende la luce. Ref: <b>mappa intera</b>. (v1 a parti = scartata, montaggio illeggibile).</div></div>
@@ -356,6 +407,24 @@ function bdraw() {
 function bloop() { if (brun) { bt++; bdraw(); } requestAnimationFrame(bloop); }
 document.getElementById('bsz').oninput = bdraw;
 wmap.addEventListener('load', bdraw); bloop();
+</script>
+<script>
+// A9 — crescita villaggio: cross-fade tra stage (edit ancorati)
+const svcv = document.getElementById('svcv'), sctx = svcv.getContext('2d');
+const sstages = ['out/a9-r-stage0.jpg','out/a9-r-stage1.jpg','out/a9-r-stage2.jpg'].map(s => { const i = new Image(); i.src = s; return i; });
+const snames = ['4 casette + cantiere','7 casette','palizzata + torri'];
+function sdraw() {
+  const t = +document.getElementById('svst').value; // 0..200
+  const i0 = Math.min(Math.floor(t/100), 1), i1 = i0 + 1;
+  const f = (t - i0*100)/100;
+  document.getElementById('svstv').textContent = t < 50 ? snames[0] : t > 150 ? snames[2] : snames[1];
+  sctx.clearRect(0,0,svcv.width,svcv.height);
+  const a = sstages[i0], b = sstages[i1];
+  if (a.complete && a.naturalWidth) sctx.drawImage(a,0,0,svcv.width,svcv.height);
+  if (b.complete && b.naturalWidth) { sctx.globalAlpha = f; sctx.drawImage(b,0,0,svcv.width,svcv.height); sctx.globalAlpha = 1; }
+}
+document.getElementById('svst').oninput = sdraw;
+sstages.forEach(i => i.addEventListener('load', sdraw)); sdraw();
 </script>
 </body>
 </html>

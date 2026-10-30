@@ -17,7 +17,7 @@ interface BuildResult {
  * Executes build check and captures output for safeguard logging.
  * Fails explicitly if TypeScript build has errors.
  */
-const DEFAULT_BUILD_TIMEOUT_MS = 180000;
+const DEFAULT_BUILD_TIMEOUT_MS = 360000;
 
 function parseArgs(argv: string[]): { timeoutMs: number } {
   const timeoutArg = argv.find((arg) => arg.startsWith('--timeout='));

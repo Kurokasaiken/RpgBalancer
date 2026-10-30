@@ -48,9 +48,11 @@ describe('mappa2 look-dev grade', () => {
   });
 
   it('builds the filter markup and a CSS filter only when enabled', () => {
-    expect(gradeFilterMarkup(DEFAULT_MAPPA2_GRADE)).toContain(`id="${GRADE_FILTER_ID}"`);
-    expect(gradeCssFilter(DEFAULT_MAPPA2_GRADE)).toContain(`url(#${GRADE_FILTER_ID})`);
+    const on = { ...DEFAULT_MAPPA2_GRADE, enabled: true };
+    expect(gradeFilterMarkup(on)).toContain(`id="${GRADE_FILTER_ID}"`);
+    expect(gradeCssFilter(on)).toContain(`url(#${GRADE_FILTER_ID})`);
     expect(gradeCssFilter({ ...DEFAULT_MAPPA2_GRADE, enabled: false })).toBe('');
+    expect(DEFAULT_MAPPA2_GRADE.enabled).toBe(false); // sapphire sea is baked; the look-dev filter is opt-in
   });
 
   it('hands PixiWorldMap a live mountain-shade object that starts at the default opacity and points at a baked asset', () => {
