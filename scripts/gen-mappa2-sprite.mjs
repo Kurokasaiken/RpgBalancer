@@ -74,6 +74,22 @@ async function previewVisible(page, timeoutMs = 4500) {
   return false;
 }
 
+async function uploadFailed(page) {
+  // chip di anteprima con errore (icona rossa / "riprova") — l'upload è fallito
+  // anche se la thumbnail esiste
+  return page.evaluate(() => {
+    // scope: solo dentro il composer (il disclaimer a piè pagina "può fare errori"
+    // è un falso positivo se si cerca in tutto il documento)
+    const box = document.querySelector('div[contenteditable="true"], .ql-editor, textarea');
+    const root = box ? (box.closest('form') || box.closest('[class*="input"], [class*="composer"]') || box.parentElement.parentElement.parentElement) : document.body;
+    const err = [...root.querySelectorAll('[aria-label], mat-icon, button, [class*="error" i], [class*="warn" i]')];
+    return err.some((e) => {
+      const t = ((e.getAttribute && e.getAttribute('aria-label')) || e.textContent || '').toLowerCase();
+      return /riprova|retry|failed|non riuscit|errore di caricamento|upload error/.test(t) && e.offsetParent !== null;
+    });
+  }).catch(() => false);
+}
+
 async function tryAttach(page, imgPath) {
   // strategy -1 (fast): gli input[type=file] sono già nel DOM — set diretto, niente menu
   try {
@@ -81,7 +97,11 @@ async function tryAttach(page, imgPath) {
     for (let q = 0; q < Math.min(await inputs.count(), 5); q++) {
       try {
         await inputs.nth(q).setInputFiles(imgPath, { timeout: 2500 });
-        if (await previewVisible(page, 8000)) { console.log('  attach direct-input:', q); return true; }
+        if (await previewVisible(page, 8000)) {
+          await page.waitForTimeout(6000); // lascia finire l'upload
+          if (await uploadFailed(page)) { console.log('  attach direct-input:', q, '→ upload error, retry'); continue; }
+          console.log('  attach direct-input:', q); return true;
+        }
       } catch {}
     }
   } catch {}
@@ -98,9 +118,12 @@ async function tryAttach(page, imgPath) {
       if ((await ob.count()) === 0 || !(await ob.isVisible({ timeout: 800 }))) continue;
       console.log('  trying open:', openSel);
       await ob.click({ timeout: 3000 });
-      await page.waitForTimeout(900); // lascia aprire il menu
+      // attende che il menu sia davvero aperto (fisso 900ms era flaky)
+      await page.waitForSelector('[role="menu"], mat-action-list', { state: 'visible', timeout: 4000 }).catch(() => {});
+      await page.waitForTimeout(400);
       let ok = false;
       for (const itemSel of [
+        '[role="menuitem"]:has-text("Carica file")', 'button[role="menuitem"]:has-text("Carica")',
         '[role="menuitem"]:has-text("file")', '[role="option"]:has-text("File")',
         'mat-menu button:has-text("File")', '[role="menu"] button:has-text("File")',
         'button:has-text("File")', 'button:has-text("Carica file")',
@@ -129,7 +152,11 @@ async function tryAttach(page, imgPath) {
             }
             if (!done) { try { await page.setInputFiles('input[type="file"]', imgPath); done = true; } catch {} }
           }
-          if (done && await previewVisible(page, 8000)) { ok = true; break; }
+          if (done && await previewVisible(page, 8000)) {
+            await page.waitForTimeout(6000);
+            if (await uploadFailed(page)) { console.log('    upload error after attach — retry next'); done = false; }
+            else { ok = true; break; }
+          }
         } catch {}
       }
       if (ok) return true;
@@ -152,8 +179,20 @@ if (chatUrl) {
 await page.waitForSelector('div[contenteditable="true"], .ql-editor, textarea', { state: 'attached', timeout: 60000 });
 await page.waitForTimeout(2500); // settle composer visibile
 
+// ripulisce chip di allegati stale (upload falliti dei run precedenti)
+try {
+  for (const b of await page.locator('button[aria-label*="chiudi allegato" i]:visible').all()) {
+    await b.click({ timeout: 1500 }).catch(() => {});
+    await page.waitForTimeout(300);
+  }
+} catch {}
+
 for (const ref of refs) {
-  const ok = await tryAttach(page, path.resolve(ref));
+  let ok = false;
+  for (let att = 0; att < 3 && !ok; att++) {
+    if (att) { console.log(`  attach retry ${att}`); await page.keyboard.press('Escape'); await page.waitForTimeout(800); }
+    ok = await tryAttach(page, path.resolve(ref));
+  }
   console.log(`attach ${ref}: ${ok ? 'ok' : 'FAILED'}`);
   if (!ok) {
     const dump = await page.evaluate(() =>
@@ -176,7 +215,26 @@ console.log('generated imgs before:', before);
 const box = page.locator('div[contenteditable="true"], .ql-editor, textarea').first();
 await box.click();
 await page.keyboard.press('Meta+a');
-await page.keyboard.type(prompt, { delay: 1 });
+// insert atomico + verifica: keyboard.type perdeva l'inizio del prompt quando il
+// composer re-renderizza durante il settle degli upload
+let typedOk = false;
+for (let attempt = 0; attempt < 3 && !typedOk; attempt++) {
+  await page.evaluate((txt) => {
+    const el = document.querySelector('div[contenteditable="true"], .ql-editor, textarea');
+    el.focus();
+    document.execCommand('selectAll', false);
+    document.execCommand('insertText', false, txt);
+  }, prompt);
+  await page.waitForTimeout(500);
+  const got = await page.evaluate(() =>
+    (document.querySelector('div[contenteditable="true"], .ql-editor, textarea')?.textContent || '').trim());
+  typedOk = got.endsWith(prompt.slice(-40));
+  if (!typedOk) console.log(`  prompt verify failed (got ${got.length}/${prompt.length} chars), retry`);
+}
+if (!typedOk) {
+  await page.screenshot({ path: `${outPrefix}-PROMPTFAIL.png` });
+  console.error('PROMPT_INCOMPLETE'); await browser.close(); process.exit(5);
+}
 await page.waitForTimeout(800);
 await page.keyboard.press('Enter');
 console.log('prompt submitted, waiting for generation…');

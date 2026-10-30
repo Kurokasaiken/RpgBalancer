@@ -54,8 +54,8 @@ test.describe('mappa2 Regional Weather mist+volcano+storm (PLAN-098)', () => {
     expect(counts.mist).toBeGreaterThanOrEqual(4);
     expect(counts.volcano).toBeGreaterThanOrEqual(4);
     expect(counts.orographic).toBeGreaterThanOrEqual(4);
-    expect(counts.glint).toBeGreaterThanOrEqual(4);
-    expect(counts.mist + counts.volcano + counts.orographic + counts.glint).toBeLessThanOrEqual(60);
+    expect(counts.glint ?? 0).toBe(0); // snow glints removed (Director 2026-10-30)
+    expect(counts.mist + counts.volcano).toBeLessThanOrEqual(60);
 
     // Determinism: freeze the clock, pin simT twice -> identical positions.
     const snap = async () => {
