@@ -78,7 +78,7 @@ export type WeatherAnchor = Mappa2RegionalWeather['anchors'][number];
  * within the <=4-line diff budget (T-13).
  */
 export const regionalWeatherConfigRef: { current: RegionalWeatherLiveConfig } = {
-  current: { enabled: true, mist: 1, embers: 0, volcano: 1, orographic: 1, dust: 0, glints: 1, speed: 1, opacity: 0.6 },
+  current: { enabled: true, mist: 1, embers: 0, volcano: 1, orographic: 1, dust: 0, glints: 0, river: 1, speed: 1, opacity: 0.6 },
 };
 
 /** Live lab-driven config (same ref pattern as ambient/secondaryWater). */
@@ -89,7 +89,8 @@ export interface RegionalWeatherLiveConfig {
   volcano: number; // 0..1 → plume density fraction of cap
   orographic: number; // 0..1 → cloud-bank density fraction of cap
   dust: number;   // reserved (cap 0 in v1)
-  glints: number; // reserved (cap 0 in v1)
+  glints: number; // removed 2026-10-30: always 0, no UI
+  river: number;  // 0..1 north water chain (snow-melt -> small fall -> lake)
   speed: number;  // 0.25..3
   opacity: number; // 0..1 global multiplier
 }
