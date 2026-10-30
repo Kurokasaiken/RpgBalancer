@@ -330,6 +330,9 @@ function App() {
 
   const { config, initialized, isInitializing, initializeConfig } = useIdleVillageConfig();
   const isMobile = useIsMobile();
+  // Mobile landing (R-297): on mobile the root path lands on the mappa2 lab
+  // instead of the game frame; desktop keeps the game frame.
+  const isMobileLandingPath = isMobile && isRootPath;
 
   const getInitialTab = useCallback((): AppNavTabId => {
     // Priority 1: URL parameter (for deep linking and tests)
@@ -380,6 +383,22 @@ function App() {
       window.location.replace('/minimal-gameplay');
     }
   }, [shouldRedirectToMinimalMode]);
+
+  // Mobile landing (R-297): canonicalize the URL to /mappa2-lab without a
+  // reload — the same page component is already rendered for this path.
+  useEffect(() => {
+    if (
+      isMobileLandingPath &&
+      typeof window !== 'undefined' &&
+      window.location.pathname !== '/mappa2-lab'
+    ) {
+      window.history.replaceState(
+        null,
+        '',
+        `/mappa2-lab${window.location.search}${window.location.hash}`,
+      );
+    }
+  }, [isMobileLandingPath]);
 
   useEffect(() => {
     const handleNavigate = () => setActiveTab('spellCreationNew');
@@ -1057,7 +1076,7 @@ function App() {
     );
   }
 
-  if (isGameFramePixiPath || isGamePath || isRootPath) {
+  if (isGameFramePixiPath || isGamePath || (isRootPath && !isMobileLandingPath)) {
     return (
       <ErrorBoundary componentName="Game Frame Pixi Page">
         <Suspense fallback={<GameBootScreen phase="manifest" indeterminate />}>
@@ -1079,7 +1098,7 @@ function App() {
     );
   }
 
-  if (isMappa2LabPath) {
+  if (isMappa2LabPath || isMobileLandingPath) {
     return (
       <ErrorBoundary componentName="Mappa2 Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Mappa2 Lab...</div>}>

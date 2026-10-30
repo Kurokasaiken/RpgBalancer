@@ -1,7 +1,10 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { PixiWorldMap, type PixiBootProgress, type PixiMapTune, type PixiRegionHover, type PixiWorldMapEffects } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { loadData, saveData } from '@/shared/persistence/PersistenceService';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import { RegionalAtmosphereControls } from './regional-atmosphere-controls';
 import { Mappa2GradeControls } from './mappa2-grade-controls';
+import { useMappa2Grade } from './useMappa2Grade';
 import { mountainShadeLive } from './mappa2-grade';
 
 const MANIFEST_PATH = '/assets/world/mappa2/base/manifest.json';
@@ -32,7 +35,7 @@ const EFFECT_TOGGLES: { id: keyof PixiWorldMapEffects; label: string }[] = [
 const LAB_TABS = ['scene', 'water', 'sea', 'sky', 'land'] as const;
 type LabTab = typeof LAB_TABS[number];
 const TAB_EFFECTS: Record<LabTab, (keyof PixiWorldMapEffects)[]> = {
-  scene: ['wonders'],
+  scene: [],
   water: [],
   sea: ['seaPattern', 'coastFoam', 'seabed'],
   sky: ['clouds', 'cloudShadows', 'birds'],
@@ -132,9 +135,18 @@ const DEFAULT_EFFECTS: PixiWorldMapEffects = {
   birds: true,
   clouds: true,
   seabed: true,
-  wonders: true,
+  wonders: false, // old sea wonders removed from the lab (Director 2026-10-30)
   landLife: true,
 };
+
+/** Per-device storage key for the lab tuning (PersistenceService → localStorage on web). */
+const LAB_STORAGE_KEY = 'mappa2-lab:defaults:v1';
+
+/** What gets persisted per device: the slider/color defaults plus the effect toggles. */
+interface LabPersistedState {
+  defaults: LabDefaults;
+  effects: PixiWorldMapEffects;
+}
 
 interface FrameStats { p50: number; p95: number; worst: number; frames: number }
 
@@ -209,6 +221,49 @@ export default function Mappa2LabPage() {
   const [ambLogTick, setAmbLogTick] = useState(0);
   const [savedDefaultsNote, setSavedDefaultsNote] = useState('');
   const [wonderRequest, setWonderRequest] = useState(0);
+  const [defaultsLoaded, setDefaultsLoaded] = useState(false);
+  const isMobile = useIsMobile();
+  const mappa2Grade = useMappa2Grade();
+
+  /** Current slider/color values as a LabDefaults record (toggles as 0/1, colors as hex). */
+  const collectLabDefaults = (): LabDefaults => ({
+    wonderEveryS, forestSway, cloudOpacityScale, cloudTintAmount, seaTone, seaLineColor, seaLineOpacity, foamColor, foamStrength,
+    waterfallOn: waterfallOn ? 1 : 0, waterfallFlowSpeed, waterfallFlowStrength, waterfallMist, waterfallRipples, waterfallFoam,
+    waterfallPainted: waterfallPainted ? 1 : 0, waterfallFlipFps, waterfallSplash, waterfallRainbow, waterfallRainbowEveryS,
+    swRiversOn: swRiversOn ? 1 : 0, swRiverFlowSpeed, swBasinPosesPerS, swSeaPatchPosesPerS, swDeltaSeaPosesPerS, swRiverFlowStrength, swLakeShimmer, swConfluenceFoam,
+    landLifeOn: landLifeOn ? 1 : 0, landLifeLeaves, landLifeMotes, landLifeFlutter, landLifeSpeed, landLifeOpacity,
+    ambOn: ambOn ? 1 : 0, ambIntensity, ambProb, ambAlpha, ambRare: ambRare ? 1 : 0,
+  });
+
+  /** Applies a LabDefaults record to every lab control — shared by Reset and by the storage restore. */
+  const applyLabDefaults = (d: LabDefaults) => {
+    setWonderEveryS(d.wonderEveryS); setForestSway(d.forestSway); setCloudOpacityScale(d.cloudOpacityScale); setCloudTintAmount(d.cloudTintAmount); setSeaTone(d.seaTone); setSeaLineColor(d.seaLineColor); setSeaLineOpacity(d.seaLineOpacity); setFoamColor(d.foamColor); setFoamStrength(d.foamStrength); setWaterfallOn(d.waterfallOn === 1); setWaterfallFlowSpeed(d.waterfallFlowSpeed); setWaterfallFlowStrength(d.waterfallFlowStrength); setWaterfallMist(d.waterfallMist); setWaterfallRipples(d.waterfallRipples); setWaterfallFoam(d.waterfallFoam); setWaterfallPainted(d.waterfallPainted === 1); setWaterfallFlipFps(d.waterfallFlipFps); setWaterfallSplash(d.waterfallSplash); setWaterfallRainbow(d.waterfallRainbow); setWaterfallRainbowEveryS(d.waterfallRainbowEveryS); setSwRiversOn(d.swRiversOn === 1); setSwRiverFlowSpeed(d.swRiverFlowSpeed); setSwBasinPosesPerS(d.swBasinPosesPerS); setSwSeaPatchPosesPerS(d.swSeaPatchPosesPerS); setSwDeltaSeaPosesPerS(d.swDeltaSeaPosesPerS); setSwRiverFlowStrength(d.swRiverFlowStrength); setSwLakeShimmer(d.swLakeShimmer); setSwConfluenceFoam(d.swConfluenceFoam); setLandLifeOn(d.landLifeOn === 1); setLandLifeLeaves(d.landLifeLeaves); setLandLifeMotes(d.landLifeMotes); setLandLifeFlutter(d.landLifeFlutter); setLandLifeSpeed(d.landLifeSpeed); setLandLifeOpacity(d.landLifeOpacity); setAmbOn(d.ambOn === 1); setAmbIntensity(d.ambIntensity); setAmbProb(d.ambProb); setAmbAlpha(d.ambAlpha); setAmbRare(d.ambRare === 1);
+  };
+
+  // Restore the per-device tuning saved by autosave — works on any surface (dev, preview, Vercel).
+  useEffect(() => {
+    void loadData<LabPersistedState | null>(LAB_STORAGE_KEY, null)
+      .then((saved) => {
+        if (saved && typeof saved === 'object') {
+          applyLabDefaults({ ...CODE_DEFAULTS, ...(saved.defaults ?? {}) });
+          if (saved.effects && typeof saved.effects === 'object') {
+            setEffects({ ...DEFAULT_EFFECTS, ...saved.effects });
+          }
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => setDefaultsLoaded(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- apply-once restore at mount
+  }, []);
+
+  // Autosave every change per device (same pattern as grade / regional weather).
+  const labPayload: LabPersistedState = { defaults: collectLabDefaults(), effects };
+  const labPayloadJson = JSON.stringify(labPayload);
+  useEffect(() => {
+    if (!defaultsLoaded) return;
+    void saveData(LAB_STORAGE_KEY, labPayload).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the serialized payload
+  }, [labPayloadJson, defaultsLoaded]);
 
   useLayoutEffect(() => {
     document.body.dataset.mappa2Lab = 'true';
@@ -367,7 +422,7 @@ export default function Mappa2LabPage() {
 
         {activeTab === 'scene' && (
           <>
-            <Mappa2GradeControls />
+            <Mappa2GradeControls grade={mappa2Grade.grade} onPatch={mappa2Grade.set} />
             <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 10 }}>
               {FOCUS_PRESETS.map((preset) => (
                 <button
@@ -380,17 +435,6 @@ export default function Mappa2LabPage() {
                 </button>
               ))}
             </div>
-            <label style={{ display: 'block', marginTop: 10 }}>
-              wonder cadence {wonderEveryS}s
-              <input type="range" min={10} max={120} value={wonderEveryS} onChange={(e) => setWonderEveryS(Number(e.target.value))} style={{ width: '100%' }} />
-            </label>
-            <button
-              type="button"
-              onClick={() => setWonderRequest((n) => n + 1)}
-              style={{ marginTop: 8, padding: '5px 9px', border: '1px solid #8bb7d5', borderRadius: 4, color: '#dff4ff', background: '#17415f', cursor: 'pointer' }}
-            >
-              Trigger rare sea event
-            </button>
           </>
         )}
 
@@ -514,16 +558,31 @@ export default function Mappa2LabPage() {
                 <input type="checkbox" checked={ambRare} onChange={(e) => setAmbRare(e.target.checked)} />
                 rare events (nullRare)
               </label>
-              <button
-                type="button"
-                style={{ marginTop: 6, fontSize: 12 }}
-                onClick={() => {
-                  (window as unknown as { __ambientDebug?: { director?: { triggerShoal: (zoneId?: string) => void } } }).__ambientDebug?.director?.triggerShoal('shoal-z-14-6');
-                  setAmbLogTick((v) => v + 1);
-                }}
-              >
-                Trigger Shoal
-              </button>
+              <div style={{ marginTop: 6, fontSize: 11, opacity: 0.8 }}>sea life · click to spawn now</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                {([
+                  ['banco di pesci', 'school', undefined],
+                  ['manta', 'giant', 'manta'],
+                  ['pescione', 'giant', 'pescione'],
+                  ['pesce martello', 'giant', 'martello'],
+                  ['tartaruga', 'turtle', undefined],
+                  ['delfini', 'dolphin', undefined],
+                ] as const).map(([label, kind, species]) => (
+                  <button
+                    key={label}
+                    type="button"
+                    style={{ fontSize: 12 }}
+                    onClick={() => {
+                      (window as unknown as {
+                        __ambientDebug?: { director?: { triggerShoal: (zoneId?: string, pick?: { kind?: string; species?: string }) => void } };
+                      }).__ambientDebug?.director?.triggerShoal(undefined, { kind, species });
+                      setAmbLogTick((v) => v + 1);
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
                 style={{ marginTop: 4, fontSize: 12 }}
@@ -605,19 +664,27 @@ export default function Mappa2LabPage() {
           <button
             type="button"
             onClick={() => {
-              const defaults: LabDefaults = { wonderEveryS, forestSway, cloudOpacityScale, cloudTintAmount, seaTone, seaLineColor, seaLineOpacity, foamColor, foamStrength, waterfallOn: waterfallOn ? 1 : 0, waterfallFlowSpeed, waterfallFlowStrength, waterfallMist, waterfallRipples, waterfallFoam, waterfallPainted: waterfallPainted ? 1 : 0, waterfallFlipFps, waterfallSplash, waterfallRainbow, waterfallRainbowEveryS, swRiversOn: swRiversOn ? 1 : 0, swRiverFlowSpeed, swBasinPosesPerS, swSeaPatchPosesPerS, swDeltaSeaPosesPerS, swRiverFlowStrength, swLakeShimmer, swConfluenceFoam, landLifeOn: landLifeOn ? 1 : 0, landLifeLeaves, landLifeMotes, landLifeFlutter, landLifeSpeed, landLifeOpacity, ambOn: ambOn ? 1 : 0, ambIntensity, ambProb, ambAlpha, ambRare: ambRare ? 1 : 0 };
+              const defaults = collectLabDefaults();
               setSavedDefaultsNote('saving…');
-              void fetch('/__mappa2-lab-defaults', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ defaults }),
-              })
-                .then(async (res) => {
-                  const body = await res.json() as { ok?: boolean; error?: string };
-                  if (!res.ok || !body.ok) throw new Error(body.error ?? 'save failed');
-                  setSavedDefaultsNote('code defaults saved');
+              // The bake endpoint only exists on the vite dev server (MODE==='development');
+              // playwright-mode builds report DEV=true but have no middleware.
+              if (import.meta.env.MODE === 'development') {
+                void fetch('/__mappa2-lab-defaults', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ defaults }),
                 })
-                .catch((err: unknown) => setSavedDefaultsNote(err instanceof Error ? err.message : 'save failed'));
+                  .then(async (res) => {
+                    const body = await res.json() as { ok?: boolean; error?: string };
+                    if (!res.ok || !body.ok) throw new Error(body.error ?? 'save failed');
+                    setSavedDefaultsNote('code defaults saved');
+                  })
+                  .catch((err: unknown) => setSavedDefaultsNote(err instanceof Error ? err.message : 'save failed'));
+              } else {
+                void saveData(LAB_STORAGE_KEY, { defaults, effects })
+                  .then(() => setSavedDefaultsNote('saved on this device'))
+                  .catch(() => setSavedDefaultsNote('save failed'));
+              }
             }}
             style={{ padding: '5px 9px', border: '1px solid #8bd5b8', borderRadius: 4, color: '#dfffe8', background: '#145f43', cursor: 'pointer' }}
           >
@@ -625,12 +692,41 @@ export default function Mappa2LabPage() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setWonderEveryS(CODE_DEFAULTS.wonderEveryS); setForestSway(CODE_DEFAULTS.forestSway); setCloudOpacityScale(CODE_DEFAULTS.cloudOpacityScale); setCloudTintAmount(CODE_DEFAULTS.cloudTintAmount); setSeaTone(CODE_DEFAULTS.seaTone); setSeaLineColor(CODE_DEFAULTS.seaLineColor); setSeaLineOpacity(CODE_DEFAULTS.seaLineOpacity); setFoamColor(CODE_DEFAULTS.foamColor); setFoamStrength(CODE_DEFAULTS.foamStrength); setWaterfallOn(CODE_DEFAULTS.waterfallOn === 1); setWaterfallFlowSpeed(CODE_DEFAULTS.waterfallFlowSpeed); setWaterfallFlowStrength(CODE_DEFAULTS.waterfallFlowStrength); setWaterfallMist(CODE_DEFAULTS.waterfallMist); setWaterfallRipples(CODE_DEFAULTS.waterfallRipples); setWaterfallFoam(CODE_DEFAULTS.waterfallFoam); setWaterfallPainted(CODE_DEFAULTS.waterfallPainted === 1); setWaterfallFlipFps(CODE_DEFAULTS.waterfallFlipFps); setWaterfallSplash(CODE_DEFAULTS.waterfallSplash); setWaterfallRainbow(CODE_DEFAULTS.waterfallRainbow); setWaterfallRainbowEveryS(CODE_DEFAULTS.waterfallRainbowEveryS); setSwRiversOn(CODE_DEFAULTS.swRiversOn === 1); setSwRiverFlowSpeed(CODE_DEFAULTS.swRiverFlowSpeed); setSwBasinPosesPerS(CODE_DEFAULTS.swBasinPosesPerS); setSwSeaPatchPosesPerS(CODE_DEFAULTS.swSeaPatchPosesPerS); setSwDeltaSeaPosesPerS(CODE_DEFAULTS.swDeltaSeaPosesPerS); setSwRiverFlowStrength(CODE_DEFAULTS.swRiverFlowStrength); setSwLakeShimmer(CODE_DEFAULTS.swLakeShimmer); setSwConfluenceFoam(CODE_DEFAULTS.swConfluenceFoam); setLandLifeOn(CODE_DEFAULTS.landLifeOn === 1); setLandLifeLeaves(CODE_DEFAULTS.landLifeLeaves); setLandLifeMotes(CODE_DEFAULTS.landLifeMotes); setLandLifeFlutter(CODE_DEFAULTS.landLifeFlutter); setLandLifeSpeed(CODE_DEFAULTS.landLifeSpeed); setLandLifeOpacity(CODE_DEFAULTS.landLifeOpacity); setAmbOn(CODE_DEFAULTS.ambOn === 1); setAmbIntensity(CODE_DEFAULTS.ambIntensity); setAmbProb(CODE_DEFAULTS.ambProb); setAmbAlpha(CODE_DEFAULTS.ambAlpha); setAmbRare(CODE_DEFAULTS.ambRare === 1);
-            }}
+            onClick={() => applyLabDefaults(CODE_DEFAULTS)}
             style={{ padding: '5px 9px', border: '1px solid #8bb7d5', borderRadius: 4, color: '#dff4ff', background: '#31465f', cursor: 'pointer' }}
           >
             Reset
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              // WhatsApp-ready text: label + single-line JSON the agent can bake into CODE_DEFAULTS.
+              const text = `mappa2-lab tuning — defaults da cuocere nel codice:\n${JSON.stringify({ defaults: collectLabDefaults(), effects })}`;
+              const writeClipboard = () =>
+                Promise.resolve()
+                  .then(() => navigator.clipboard.writeText(text))
+                  .then(() => setSavedDefaultsNote('defaults copied — paste in chat (WhatsApp/Telegram)'))
+                  .catch(() => setSavedDefaultsNote('copy failed'));
+              // Phone only: native share sheet → straight into WhatsApp.
+              // Desktop Chrome also exposes navigator.share but the sheet can hang
+              // headless / steal focus — clipboard is the right path there.
+              if (isMobile && typeof navigator.share === 'function') {
+                void navigator.share({ text })
+                  .then(() => setSavedDefaultsNote('defaults shared'))
+                  .catch((err: unknown) => {
+                    if (err instanceof Error && err.name === 'AbortError') {
+                      setSavedDefaultsNote('share cancelled');
+                      return;
+                    }
+                    void writeClipboard();
+                  });
+              } else {
+                void writeClipboard();
+              }
+            }}
+            style={{ padding: '5px 9px', border: '1px solid #d5c98b', borderRadius: 4, color: '#fff4d0', background: '#5f4f1f', cursor: 'pointer' }}
+          >
+            Copy defaults
           </button>
         </div>
         {savedDefaultsNote && <div style={{ color: '#8bd5b8', marginTop: 5 }}>{savedDefaultsNote}</div>}
