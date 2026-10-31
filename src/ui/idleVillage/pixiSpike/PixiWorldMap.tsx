@@ -519,6 +519,9 @@ in vec2 vUV;
 out vec4 outColor;
 uniform sampler2D uDist;
 uniform sampler2D uClean;
+uniform sampler2D uBase;
+uniform sampler2D uLand;
+uniform sampler2D uStrokes;
 uniform vec2 uWorld;
 uniform float uTime;
 uniform float uDMax;
@@ -540,27 +543,119 @@ void main() {
   float water = smoothstep(0.45, 0.6, t.g);
   float d = t.r * uDMax;
   vec2 w = vUV * uWorld;
-  // The painted white surf RECEDES from the sea and climbs back up the cliff. Each stretch of coast has its own
-  // phase. s = how far the foam reaches: it surges back fast, holds, then drains away slowly.
-  float cyc = fract((uTime * 0.11 + vnoise(w * 0.008) * 0.9) );
-  float rush = smoothstep(0.0, 0.16, cyc);
-  float drain = 1.0 - smoothstep(0.42, 0.97, cyc);
-  float s = 0.08 + 0.92 * min(rush, drain + step(cyc, 0.42) * 1.0);
-  float reach = mix(3.0, 56.0, s * uSwash + (1.0 - uSwash));
-  float gone = smoothstep(reach - 5.0, reach + 5.0, d); // 1 where the foam has left, the sea shows again
-  float hideA = cl.a * gone;
-  // faint crest rings (as before) over the open water
+  // The painted surf is gone for good: wherever the clean plate covers it, the shader draws
+  // LIVE surf instead — fronts that rush up the coast-distance contours, hold as churning
+  // lace, then drain back out. Every stretch of coast runs on its own phase (vnoise(w*0.008))
+  // so the bay never flashes in sync. Continuous motion at render rate, no bitmap to slide.
+  float hideA = cl.a;
+  // Flow map FIRST — the advected painted image feeds both the travelling water and the surf:
+  // the painted white strokes themselves are the foam material (same look, same colour as the
+  // painting), carried toward the rocks in a seamless two-phase loop.
+  vec3 flowed = vec3(0.0);
+  float flowOk = 0.0;
+  if (water > 0.01 && d <= 140.0) {
+    vec2 e = 1.5 / uWorld;
+    vec2 grad = vec2(
+      texture(uDist, vUV + vec2(e.x, 0.0)).r - texture(uDist, vUV - vec2(e.x, 0.0)).r,
+      texture(uDist, vUV + vec2(0.0, e.y)).r - texture(uDist, vUV - vec2(0.0, e.y)).r);
+    float gl = length(grad);
+    if (gl > 1e-5) {
+      vec2 dir = -grad / gl; // d grows seaward -> -grad d points at the rocks
+      vec2 amp = vec2(18.0) / uWorld; // ~18 world px of travel per loop
+      float loopT = 6.0;
+      float t1 = fract(uTime / loopT);
+      float t2 = fract(t1 + 0.5);
+      vec2 o1 = (t1 - 0.5) * amp * dir;
+      vec2 o2 = (t2 - 0.5) * amp * dir;
+      // never pull a land pixel into the water
+      if (texture(uDist, vUV + o1).g < 0.5) o1 = vec2(0.0);
+      if (texture(uDist, vUV + o2).g < 0.5) o2 = vec2(0.0);
+      float w1 = 1.0 - abs(2.0 * t1 - 1.0);
+      float w2 = 1.0 - abs(2.0 * t2 - 1.0);
+      flowed = (texture(uBase, vUV + o1).rgb * w1 + texture(uBase, vUV + o2).rgb * w2) / (w1 + w2);
+      flowOk = 1.0;
+    }
+  }
   float foamA = 0.0;
+  vec3 foamPix = vec3(0.90, 0.97, 1.0); // fallback foam colour (procedural fill, rock climb)
+  if (cl.a > 0.003 && water > 0.01) {
+    float ph = vnoise(w * 0.008) * 0.9;
+    float cyc = fract(uTime * 0.11 + ph);
+    // surge lands fast, holds, then drains in place — foam dissolves where it lies, it doesn't slide back.
+    float rush = smoothstep(0.0, 0.16, cyc);
+    float hold = 1.0 - smoothstep(0.35, 0.95, cyc);
+    float energy = rush * hold;
+    float zone = 1.0 - smoothstep(70.0, 105.0, d);  // taper far out — the painted tails reach ~100px, thinning
+    float shore = 1.0 - smoothstep(4.0, 22.0, d);   // the breaking band pinned to the rocks
+    // lace breakup: holes first — strokes and dark water between, never a solid sheet.
+    float lace = smoothstep(0.48, 0.85, vnoise(w * 0.10 + vec2(uTime * 0.10, -uTime * 0.06))
+                                 + 0.35 * vnoise(w * 0.028 + vec2(0.0, uTime * 0.05)));
+    // bright leading edge that runs shoreward while the surge lands.
+    float frontD = mix(78.0, 4.0, smoothstep(0.0, 0.16, cyc));
+    float edge = 1.6 * exp(-pow((d - frontD) * 0.12, 2.0)) * (1.0 - smoothstep(0.16, 0.4, cyc));
+    float surf = clamp(zone * energy * (0.15 + 0.85 * lace) + shore * (0.7 + 0.3 * lace) + edge, 0.0, 1.0);
+    // THE FOAM IS THE PAINTING: the extracted painted strokes (uStrokes) travel with the same
+    // two-phase advection — exact original colour and shape, moving. Coverage = strokes that
+    // have flowed here × the surge cycle: they wash in on the rush and dissolve in the drain.
+    float strkA = 0.0; vec3 strkC = vec3(0.92, 0.98, 1.0);
+    if (flowOk > 0.5) {
+      vec2 amp = vec2(18.0) / uWorld;
+      float loopT = 6.0;
+      float t1 = fract(uTime / loopT);
+      float t2 = fract(t1 + 0.5);
+      vec2 dir = vec2(0.0);
+      vec2 e2 = 1.5 / uWorld;
+      vec2 grad = vec2(
+        texture(uDist, vUV + vec2(e2.x, 0.0)).r - texture(uDist, vUV - vec2(e2.x, 0.0)).r,
+        texture(uDist, vUV + vec2(0.0, e2.y)).r - texture(uDist, vUV - vec2(0.0, e2.y)).r);
+      dir = -grad / max(length(grad), 1e-6);
+      vec2 o1 = (t1 - 0.5) * amp * dir;
+      vec2 o2 = (t2 - 0.5) * amp * dir;
+      float w1 = 1.0 - abs(2.0 * t1 - 1.0);
+      float w2 = 1.0 - abs(2.0 * t2 - 1.0);
+      vec4 s1 = texture(uStrokes, vUV + o1);
+      vec4 s2 = texture(uStrokes, vUV + o2);
+      strkA = (s1.a * w1 + s2.a * w2) / (w1 + w2);
+      strkC = (s1.rgb * s1.a * w1 + s2.rgb * s2.a * w2) / max(strkA * (w1 + w2), 1e-4);
+    }
+    float cov = clamp(surf * 0.35 + strkA * (zone * energy + shore) * 1.6, 0.0, 1.0);
+    foamPix = mix(vec3(0.92, 0.98, 1.0), strkC, clamp(strkA * 2.0, 0.0, 1.0));
+    foamA = cl.a * cov * min(1.0, uStrength * 2.0);
+  }
+  // The same surge climbs the ROCKS: whitewater runs up the face at the rush and slides back
+  // in the drain. uLand: R = px-to-sea, G = land flag, B = surf adjacency (baked).
+  vec4 lt = texture(uLand, vUV);
+  if (lt.g > 0.5 && lt.b > 0.05) {
+    float ld = lt.r * uDMax;
+    if (ld <= 30.0) {
+      float ph = vnoise(w * 0.008) * 0.9;
+      float cyc = fract(uTime * 0.11 + ph);
+      float rush = smoothstep(0.0, 0.16, cyc);
+      float hold = 1.0 - smoothstep(0.35, 0.95, cyc);
+      float energy = rush * hold;
+      float climbH = mix(2.0, 24.0, energy) * lt.b; // run-up height in rock px
+      float up = 1.0 - smoothstep(climbH - 4.0, climbH, ld);
+      float lace2 = smoothstep(0.42, 0.8, vnoise(w * 0.10 + vec2(uTime * 0.10, -uTime * 0.06))
+                                    + 0.35 * vnoise(w * 0.028 + vec2(0.0, uTime * 0.05)));
+      foamA = max(foamA, up * (0.5 + 0.5 * lace2) * 0.85 * lt.b);
+    }
+  }
+  // faint crest rings over the open water (as before)
   if (water > 0.01 && d <= 130.0) {
     float u = (d + uTime * uCrestSpeed) / 38.0 + vnoise(w * 0.004) * 1.5;
     float f = fract(u);
     float crest = smoothstep(0.78, 0.9, f) * (1.0 - smoothstep(0.9, 1.0, f));
     crest *= (1.0 - smoothstep(30.0, 110.0, d)) * smoothstep(uDissolveStart, uDissolveEnd, d);
     float lace = smoothstep(0.30, 0.62, vnoise(w * 0.09 + vec2(0.0, uTime * 0.05)));
-    foamA = clamp(crest * 0.55 * lace * water * uStrength, 0.0, 1.0);
+    foamA = max(foamA, crest * 0.55 * lace * water * uStrength);
   }
-  vec3 premult = uFoamColor * foamA * (1.0 - hideA) + cl.rgb * hideA;
-  outColor = vec4(premult, foamA * (1.0 - hideA) + hideA);
+  // thin foam reads cyan like the painted strokes; dense foam keeps its painted colour.
+  vec3 foamTint = mix(vec3(0.85, 0.96, 1.0), vec3(1.0), smoothstep(0.1, 0.55, foamA));
+  vec3 surfCol = foamPix * foamTint * foamA + cl.rgb * hideA * (1.0 - foamA);
+  float aSurf = foamA + hideA * (1.0 - foamA);
+  float aFlow = water * (1.0 - smoothstep(100.0, 140.0, d)) * (1.0 - aSurf) * flowOk;
+  vec3 premult = surfCol * aSurf + flowed * aFlow;
+  outColor = vec4(premult, aSurf + aFlow);
 }
 `;
 
@@ -1611,16 +1706,23 @@ export function PixiWorldMap({
           const segSprites: { sp: TilingSprite; baseScale: number; speed: number }[] = [];
           // PLAN-095 v2: painted flow-map poses (same recipe as the falls flipbook).
           // RGBA poses carry their own feathered water alpha — no clip mask needed.
-          const poseSprites: { sp: Sprite; texes: Texture[]; enabled: boolean; sea: 0 | 1 | 2 }[] = [];
+          const poseSprites: { sp: Sprite; spNext: Sprite | null; texes: Texture[]; enabled: boolean; sea: 0 | 1 | 2 }[] = [];
           const addFlowPoses = async (poses: NonNullable<Mappa2SecondaryWater['rivers'][number]['flowPoses']>, enabled: boolean, sea: 0 | 1 | 2 = 0) => {
             const texes = await Promise.all(poses.frames.map((f) => load(packAssetUrl(pack.packRoot, f))));
-            const sp = new Sprite(texes[0]);
-            sp.position.set(poses.rect.x * wsx2, poses.rect.y * wsy2);
-            sp.width = poses.rect.width * wsx2;
-            sp.height = poses.rect.height * wsy2;
-            sp.visible = enabled;
-            secondaryWaterBox.addChild(sp);
-            poseSprites.push({ sp, texes, enabled, sea });
+            const mk = () => {
+              const sp = new Sprite(texes[0]);
+              sp.position.set(poses.rect.x * wsx2, poses.rect.y * wsy2);
+              sp.width = poses.rect.width * wsx2;
+              sp.height = poses.rect.height * wsy2;
+              sp.visible = enabled;
+              secondaryWaterBox.addChild(sp);
+              return sp;
+            };
+            const sp = mk();
+            // Sea patches are repainted keyframes (R-299): crossfade into the next pose every render
+            // frame — the same frac-alpha technique as the basin — instead of hard-swapping textures.
+            const spNext = sea !== 0 ? mk() : null;
+            poseSprites.push({ sp, spNext, texes, enabled, sea });
           };
           const featureBoxes: Record<string, Container> = {};
           const glints: { sp: Sprite; x: number; y: number; ph: number; lake: boolean }[] = [];
@@ -1758,7 +1860,16 @@ export function PixiWorldMap({
             poseLastT = t;
             for (const ps of poseSprites) {
               ps.sp.visible = ps.enabled && live;
-              ps.sp.texture = ps.texes[Math.floor(ps.sea === 2 ? deltaClock : ps.sea === 1 ? seaClock : poseClock) % ps.texes.length];
+              const clock = ps.sea === 2 ? deltaClock : ps.sea === 1 ? seaClock : poseClock;
+              if (ps.spNext) {
+                const idx = Math.floor(clock);
+                ps.sp.texture = ps.texes[idx % ps.texes.length];
+                ps.spNext.texture = ps.texes[(idx + 1) % ps.texes.length];
+                ps.spNext.visible = ps.sp.visible;
+                ps.spNext.alpha = clock - idx;
+              } else {
+                ps.sp.texture = ps.texes[Math.floor(clock) % ps.texes.length];
+              }
             }
             const z = world.scale.x;
             const lodScale = z >= 0.65 ? 1.0 : z >= 0.32 ? 1.5 : 2.2;
@@ -2527,12 +2638,21 @@ export function PixiWorldMap({
         const dist = await load(coastDistanceUrl);
         // clean plate under the painted surf (pipeline: masks/foam_clean.webp); absent -> the surf just stays put
         const clean = await load(coastDistanceUrl.replace('coast_distance.webp', 'foam_clean.webp')).catch(() => null);
+        // painted base, re-sampled at displaced uv for the flow map (the water itself travels)
+        const baseTex = await load(packAssetUrl(pack.packRoot, 'layers/base_flat.webp')).catch(() => null);
+        // land distance + surf adjacency: the whitewater that climbs the rock faces (pipeline: masks/land_distance.webp)
+        const landDist = await load(coastDistanceUrl.replace('coast_distance.webp', 'land_distance.webp')).catch(() => null);
+        // extracted painted surf strokes — the foam material is the painting itself (pipeline: masks/foam_strokes.webp)
+        const strokes = await load(coastDistanceUrl.replace('coast_distance.webp', 'foam_strokes.webp')).catch(() => null);
         const c = coastFoamConfig;
         const shader = Shader.from({
           gl: { vertex: VERT, fragment: COAST_FOAM_FRAG },
           resources: {
             uDist: dist.source,
             uClean: (clean ?? Texture.EMPTY).source,
+            uBase: (baseTex ?? Texture.EMPTY).source,
+            uLand: (landDist ?? Texture.EMPTY).source,
+            uStrokes: (strokes ?? Texture.EMPTY).source,
             u: {
               uTime: { value: 0, type: 'f32' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },

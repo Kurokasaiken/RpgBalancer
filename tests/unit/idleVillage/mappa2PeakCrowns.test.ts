@@ -8,8 +8,10 @@ import {
   CROWN_TINT_TOP,
   MAX_STORM_SPRITES,
   SNOW_PEAKS,
+  crownPresence,
   crownSpec,
 } from '@/ui/idleVillage/pixiSpike/mountainStorm';
+const phases = SNOW_PEAKS.map((_, i) => (i * 0.6180339887) % 1); // golden-ratio spread like the seeded draw
 
 const lum = (hex: number) => ((hex >> 16) & 255) + ((hex >> 8) & 255) + (hex & 255);
 
@@ -66,6 +68,25 @@ describe('mappa2 peak storm crowns (visual-fork B\'\' baseline)', () => {
     expect(a.puffs).toEqual(b.puffs);
     const c = crownSpec(SNOW_PEAKS[4], 43);
     expect(c.puffs).not.toEqual(a.puffs);
+  });
+
+  it('cycles per cell — never all 15 crowns at once (Director 2026-10-31)', () => {
+    for (const [seed, t] of [[0.3, 0], [0.3, 1000], [0.7, 250000], [0.9, 900000]]) {
+      const v = crownPresence(seed, t);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+    // duty cycle: mean presence over a full cycle is well under 1
+    let sum = 0;
+    const N = 400;
+    for (let i = 0; i < N; i += 1) sum += crownPresence(0.5, (i / N) * (1 / 0.00035));
+    expect(sum / N).toBeLessThan(0.75);
+    // at several instants a spread of phases is never all-visible
+    for (const t of [0, 30000, 120000, 500000]) {
+      const on = phases.filter((ph) => crownPresence(ph, t) > 0.4).length;
+      expect(on).toBeLessThan(SNOW_PEAKS.length);
+      expect(on).toBeGreaterThan(0);
+    }
   });
 
   it('stays under the storm sprite budget (crowns + haze + shadow + glow per cell)', () => {

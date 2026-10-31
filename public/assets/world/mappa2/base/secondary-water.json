@@ -2093,27 +2093,6 @@
           "height": 271
         }
       }
-    },
-    {
-      "id": "sea_arch",
-      "flowPoses": {
-        "frames": [
-          "fx/water/sea_arch_f0.webp",
-          "fx/water/sea_arch_f1.webp",
-          "fx/water/sea_arch_f2.webp",
-          "fx/water/sea_arch_f3.webp",
-          "fx/water/sea_arch_f4.webp",
-          "fx/water/sea_arch_f5.webp",
-          "fx/water/sea_arch_f6.webp",
-          "fx/water/sea_arch_f7.webp"
-        ],
-        "rect": {
-          "x": 0,
-          "y": 344,
-          "width": 566,
-          "height": 462
-        }
-      }
     }
   ]
 }

@@ -204,6 +204,21 @@ export function boltPath(rnd: () => number, x0: number, y0: number, wsx = 1, wsy
   return pts;
 }
 
+/**
+ * Per-cell weather cycle (Director 2026-10-31: «non devono essere tutte e 15
+ * contemporaneamente sempre»). Each crown fades in, holds, dissolves and stays
+ * absent for part of a ~40-90 s loop, phase-seeded per peak — so the massif
+ * always carries a drifting subset of crowns, never the full 15 at once.
+ * @returns 0..1 presence envelope for a cell with cycle phase `seed01` at `simT`.
+ */
+export const CROWN_CYCLE_RATE = 0.00035;
+export function crownPresence(seed01: number, simT: number): number {
+  const f = ((simT * CROWN_CYCLE_RATE + seed01) % 1 + 1) % 1;
+  const fadeIn = Math.min(1, f / 0.12);
+  const fadeOut = Math.min(1, Math.max(0, (0.75 - f) / 0.25));
+  return Math.min(fadeIn, fadeOut);
+}
+
 /** Gust factor 0.55..1.25: slow swell + two faster incommensurate ripples, per-cell phase. */
 export function gust(simT: number, phase: number): number {
   return 0.9 + 0.22 * Math.sin(simT * 0.012 + phase) + 0.1 * Math.sin(simT * 0.037 + phase * 2.3) + 0.04 * Math.sin(simT * 0.045 + phase * 5.1);
@@ -239,6 +254,7 @@ export function createMountainStorm(deps: MountainStormDeps): MountainStorm {
     glow: Sprite;
     streaks: { u: number; v: number; sp: number; len: number; bright: boolean }[];
     gustPhase: number;
+    cycPhase: number;
     strike: Strike;
     rnd: () => number;
   }
@@ -286,6 +302,7 @@ export function createMountainStorm(deps: MountainStormDeps): MountainStorm {
       glow,
       streaks,
       gustPhase: rnd() * 6.283,
+      cycPhase: rnd(),
       strike: { next: 500 + rnd() * 700, phase: 0, shape: 0, t0: 0, pts: [] },
       rnd,
     };
@@ -306,20 +323,22 @@ export function createMountainStorm(deps: MountainStormDeps): MountainStorm {
     for (const r of rts) {
       const g = animate ? gust(simT, r.gustPhase) : 0.9;
       const gk = Math.max(0, Math.min(1, (g - 0.5) / 0.7)); // 0..1 how hard it blows now
-      // haze + shadow: pinned to the cell (the crown's own products, T-07)
+      // weather cycle: the crown fades in/holds/dissolves/absent — never all 15 at once (Director 2026-10-31)
+      const env = crownPresence(r.cycPhase, animate ? simT : 0);
+      // haze + shadow: pinned to the cell (the crown's own products, T-07 — same envelope as the crown)
       r.haze.position.set(r.cx, r.cy + r.w * 0.1 * wsy);
       r.haze.scale.set((r.w * 1.5 * wsx) / 256, (r.w * 0.7 * wsy) / 256);
-      r.haze.alpha = Math.min(0.4, opacity * intensity * (0.16 + 0.12 * gk));
-      r.shadow.alpha = Math.min(0.3, opacity * intensity * 0.5 * (0.8 + 0.2 * gk));
+      r.haze.alpha = Math.min(0.4, opacity * intensity * (0.16 + 0.12 * gk)) * env;
+      r.shadow.alpha = Math.min(0.3, opacity * intensity * 0.5 * (0.8 + 0.2 * gk)) * env;
       // crown: each puff breathes on its own seeded phase — attached, never travelling
       const live = Math.round(r.crown.length * Math.min(1, 0.3 + 0.7 * intensity));
       for (let i = 0; i < live; i += 1) {
         const p = r.crown[i];
         const breathe = animate ? Math.sin(simT * 0.006 + p.ph) : 0;
         p.sp.position.set(r.cx + (p.dx + breathe * 2) * wsx, r.cy + (p.dy + breathe * 1.2) * wsy);
-        const s = (p.size * (1 + 0.05 * breathe)) / 256;
+        const s = (p.size * (1 + 0.05 * breathe) * (0.85 + 0.15 * env)) / 256;
         p.sp.scale.set(s * wsx, s * 0.55 * wsy);
-        p.sp.alpha = Math.min(0.95, p.base * opacity * 1.7 * intensity * (0.7 + 0.3 * gk));
+        p.sp.alpha = Math.min(0.95, p.base * opacity * 1.7 * intensity * (0.7 + 0.3 * gk) * env);
       }
       for (let i = live; i < r.crown.length; i += 1) r.crown[i].sp.alpha = 0;
       // snow: born under the crown's south rim, carried down-wind, faded at both ends.
@@ -332,8 +351,8 @@ export function createMountainStorm(deps: MountainStormDeps): MountainStorm {
         const run = r.w * 0.2 * s.sp;
         const x = x0 + p * run * WIND.x;
         const y = baseY + p * run * (WIND.y * 0.55 + 0.45);
-        const env = Math.min(1, p / 0.12) * (1 - Math.max(0, (p - 0.3) / 0.7));
-        const a = Math.min(0.85, opacity * 1.6 * env * (0.5 + 0.5 * gk) * intensity);
+        const senv = Math.min(1, p / 0.12) * (1 - Math.max(0, (p - 0.3) / 0.7));
+        const a = Math.min(0.85, opacity * 1.6 * senv * (0.5 + 0.5 * gk) * intensity) * env;
         (s.bright ? brights : dims).push([x * wsx, y * wsy, s.len, a]);
       }
       // snow banner off the crown's lee side (SE): a few steady trailing strokes
@@ -341,7 +360,7 @@ export function createMountainStorm(deps: MountainStormDeps): MountainStorm {
         const x0 = r.cx / wsx + r.w * CROWN.rx * 0.5 + (k - 1.5) * 3;
         const y0 = r.cy / wsy - r.w * CROWN.ry * 0.3 + k * 1.4;
         const L = (14 + k * 4) * (0.8 + 0.3 * gk);
-        const a = Math.min(0.5, opacity * 1.1 * intensity * (0.35 + 0.4 * gk));
+        const a = Math.min(0.5, opacity * 1.1 * intensity * (0.35 + 0.4 * gk)) * env;
         snow.moveTo(x0 * wsx, y0 * wsy);
         snow.lineTo((x0 + L * WIND.x) * wsx, (y0 + L * (WIND.y * 0.55 + 0.45)) * wsy);
         snow.stroke({ width: (2.0 - k * 0.35) * wsx, color: 0xf2f7ff, alpha: a * 0.55 });
@@ -364,6 +383,8 @@ export function createMountainStorm(deps: MountainStormDeps): MountainStorm {
     if (reducedMotion || intensity < 0.05) return;
     for (const r of rts) {
       const st = r.strike;
+      const env = crownPresence(r.cycPhase, reducedMotion ? 0 : simT);
+      if (env < 0.5) continue; // lightning only while the crown is actually there
       if (!frozen && st.phase === 0 && simT >= st.next) {
         st.phase = 1;
         st.t0 = simT;
