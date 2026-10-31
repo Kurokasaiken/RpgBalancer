@@ -216,7 +216,7 @@ esito della cascata, PLAN-092). Il Director ha scelto «Pose come la cascata»:
 - Nuovo patch `sea_arch` in `secondary-water.json`: maschera = `sea &
   land_dist≤90 & box & teal` (come near_coast di bay_2, banda più larga per le
   scie dipinte), flusso `away_shore` (schiuma che si allontana dagli scogli),
-  disp 20px, seed 996, `flow_whole` (v2, Director: «la spuma continua ad essere ferma» —
+  disp 20px, seed 996, `flow_whole` → **v3 flipbook dipinto**: 4 varianti Gemini del crop (orig→surged→breaking→drained), scelta Director "B" —
   l'intera immagine dentro la maschera scorre, non solo il dettaglio: anche le
   chiazze bianche di schiuma si muovono; `build_water_flow_poses` ha ora il flag
   `flow_whole`, default False invariato per gli altri patch), pose `fx/water/sea_arch_f0..f7.webp` (rect 0,344 566×462).
