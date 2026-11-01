@@ -593,7 +593,10 @@ void main() {
     // bright leading edge that runs shoreward while the surge lands.
     float frontD = mix(78.0, 4.0, smoothstep(0.0, 0.16, cyc));
     float edge = 1.6 * exp(-pow((d - frontD) * 0.12, 2.0)) * (1.0 - smoothstep(0.16, 0.4, cyc));
-    float surf = clamp(zone * energy * (0.15 + 0.85 * lace) + shore * (0.7 + 0.3 * lace) + edge, 0.0, 1.0);
+    // proximity ramp: denser AND whiter the closer to land — thin wisps offshore, thick white at the rocks.
+    float prox = 1.0 - smoothstep(6.0, 70.0, d);
+    float surf = clamp(zone * energy * (0.15 + 0.85 * lace) * (0.30 + 0.70 * prox)
+                     + shore * (0.75 + 0.25 * lace) + edge, 0.0, 1.0);
     // THE FOAM IS THE PAINTING: the extracted painted strokes (uStrokes) travel with the same
     // two-phase advection — exact original colour and shape, moving. Coverage = strokes that
     // have flowed here × the surge cycle: they wash in on the rush and dissolve in the drain.
@@ -618,8 +621,9 @@ void main() {
       strkA = (s1.a * w1 + s2.a * w2) / (w1 + w2);
       strkC = (s1.rgb * s1.a * w1 + s2.rgb * s2.a * w2) / max(strkA * (w1 + w2), 1e-4);
     }
-    float cov = clamp(surf * 0.35 + strkA * (zone * energy + shore) * 1.6, 0.0, 1.0);
+    float cov = clamp(surf * 0.35 + strkA * (zone * energy * (0.4 + 0.6 * prox) + shore) * 1.6, 0.0, 1.0);
     foamPix = mix(vec3(0.92, 0.98, 1.0), strkC, clamp(strkA * 2.0, 0.0, 1.0));
+    foamPix = mix(foamPix, vec3(0.99, 1.0, 1.0), prox * 0.55); // whiter the closer to land
     foamA = cl.a * cov * min(1.0, uStrength * 2.0);
   }
   // The same surge climbs the ROCKS: whitewater runs up the face at the rush and slides back
