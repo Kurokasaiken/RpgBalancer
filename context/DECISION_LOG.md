@@ -1738,3 +1738,19 @@ dove diverge).
 **A:** Il lock pixel-exact è la banda di contorno compositata dal master neutrale come ultimo passo; il generatore è intercambiabile — Gemini-web col prompt diretto del Director (D-228) dentro il lock ha dato la migliore fedeltà misurata (edgeIoU 0.61) e batte ComfyUI anche sul tempo per tile. Ricetta completa nel dibattito `mind-weaver/.mw/runs/20261030-mappa2-upscale-recipes/artifact-r003.md` (4/4 ACCEPT).
 **Motivo:** evidenza misurata sul crop cascata/vegetazione: ogni generatore senza lock muove i contorni; dentro il lock la scelta del generatore diventa questione solo estetica/costo.
 **Fonte:** `.mw/runs/20261030-upscale-learn/pattern-candidate.md`
+
+## 2026-11-01 — Deploy verification: «200 OK» non è «done»; landing unificata su /mappa2-lab
+
+**Da:** il ciclo commit→push→deploy si chiudeva sul successo del deploy guard
+(pagine che rispondono 200 + contenuto). La landing su `/` era game frame su
+desktop e mappa2-lab su mobile (R-297).
+**A:** (1) il deploy è «done» solo con verifica post-deploy sul path reale —
+per superfici Pixi probe headless con WebGL (`--enable-unsafe-swiftshader`),
+perché senza GPU il renderer cade su Canvas e salta i code path mesh/shader
+(crash `pack.packRoot` su /game invisibile ai check 200); invariante in
+`00-project-invariants.md`, probe `scripts/_tmp-*.mjs`. (2) `/` renderizza
+`Mappa2LabPage` su tutti i device + canonicalizza URL (R-305, estende R-297);
+il game frame resta su `/game` e `/game-frame-pixi`.
+**Motivo:** deploy del 2026-11-01 dichiarato OK con `/game` rotto per gli
+utenti WebGL; il Director ha imposto verifica-fino-a-verde e landing unica.
+**Fonte:** `.mw/runs/20261101-deploy-verify-learn/pattern-candidate.md`

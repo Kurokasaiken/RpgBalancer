@@ -501,6 +501,12 @@ generale: verifica su un layer diverso da quello dell'utente.
   server 510-732 ms reale; il residuo era il commit React del subtree
   overlay, invisibile alla metrica su preview. Sibling: P-005 (`[swapdbg]`
   su bundle stantio), learn-20261020-2115 A (churn HMR sotto il Director).
+  R-304 (2026-11-01) — probe + deploy guard verdi mentre `/game` crashava
+  sul browser reale: headless senza GPU → CanvasRenderer → `meshOk=false`
+  → blocco `coastFoam && meshOk` saltato → `pack.packRoot` unguarded
+  invisibile. Layer sbagliato = interi code path non esercitati; probe
+  Pixi vogliono `--enable-unsafe-swiftshader`
+  (`.mw/bugs/20261101-packroot-canvas-fallback/`).
 - **Regola:**
   1. Per latenza/percezione: diagnosi e signoff sul runtime che esibisce il
      sintomo (dev server se il Director vive lì); il preview build resta il
