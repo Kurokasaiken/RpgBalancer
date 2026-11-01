@@ -1,0 +1,14 @@
+import { chromium } from 'playwright';
+const b = await chromium.connectOverCDP('http://127.0.0.1:9222');
+const ctx = b.contexts()[0];
+const p = await ctx.newPage();
+await p.goto('https://gemini.google.com/app/62fef4ba9be16c58', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await p.waitForTimeout(5000);
+await p.click('button[aria-label*="selettore modalità"]');
+await p.waitForTimeout(1200);
+await p.click(':has-text("3.1 Pro")');
+await p.waitForTimeout(800);
+const now = await p.evaluate(() => document.querySelector('button[aria-label*="selettore modalità"]')?.textContent?.trim());
+console.log('model now:', now);
+await p.close();
+await b.close();

@@ -84,6 +84,7 @@ const GameFramePage = lazy(() => import('./pages/game-frame').then(m => ({ defau
 const MapBenchmarkPage = lazy(() => import('./pages/map-benchmark').then(m => ({ default: m.default })));
 const Mappa2LabPage = lazy(() => import('./pages/mappa2-lab').then(m => ({ default: m.default })));
 const HudLabPage = lazy(() => import('./pages/hud-lab').then(m => ({ default: m.default })));
+const HudComparePage = lazy(() => import('./pages/hud-compare').then(m => ({ default: m.default })));
 const GameFramePixiPage = lazy(() => import('./pages/game-frame-pixi').then(m => ({ default: m.default })));
 const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
@@ -296,6 +297,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/mappa2-lab';
   const isHudLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/hud-lab';
+  const isHudComparePath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-compare';
   const isGameFramePixiPath =
     typeof window !== 'undefined' && window.location.pathname === '/game-frame-pixi';
   const isGamePath =
@@ -1117,6 +1120,16 @@ function App() {
       <ErrorBoundary componentName="Hud Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Hud Lab...</div>}>
           <HudLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isHudComparePath) {
+    return (
+      <ErrorBoundary componentName="Hud Compare Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Hud Compare...</div>}>
+          <HudComparePage />
         </Suspense>
       </ErrorBoundary>
     );

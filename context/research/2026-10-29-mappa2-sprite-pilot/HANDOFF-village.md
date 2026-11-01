@@ -69,7 +69,7 @@ Anti-pattern verificati falliti: sprite magenta sulla mappa; pezze di terreno ri
 
 ### Coordinate chiave (mappa 2752×1536)
 - Regione cradle (master 900×620): offset `(750,380)`.
-- Zona villaggio attuale nel pack: `x1230 y565 360×280` (ritaglio degli stage).
+- Zona villaggio: SUPERATO — la fonte unica è `public/assets/world/mappa2/base/fx/village/village.json` (PLAN-106).
 - Cluster case: ~`(1410,715)` centro.
 
 ## 5. Pista B — /game VILLAGE (town-center)

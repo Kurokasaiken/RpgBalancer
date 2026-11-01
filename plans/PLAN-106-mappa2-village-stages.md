@@ -1,5 +1,17 @@
 # Village Upgrades on mappa2 — Pipeline + Runtime Plan (artifact r009)
 
+> **Director ruling 2026-11-01 (3):** FAR-ZOOM IDENTITY — plates must never add
+> scenario elements absent from the base map (no new trees/rocks/terrain):
+> identical silhouette at low zoom, richer detail up close. Upgrades add ONLY
+> the requested buildings/defences. Enforce in every chain prompt + eye-check.
+>
+> **Director ruling 2026-11-01 (2):** stage1.webp NOT reused — cottages regenerated in the chain with the reference village identity (villaggio.png: golden roofs). Style anchor the first cottage edit on that ref.
+
+> **Director ruling 2026-11-01:** towers are PER-SLOT independent — ALL
+> combinations ship in v1 (2 slots × {none,wood,stone} = 9 tower states ×
+> 2 walls = 18 defended plates + 4 growth ≈ 22 total). Material = swap on
+> the SAME slot positions (tower stone occupies exactly where tower wood was).
+
 > r007 amendments from fifth acceptance round:
 > - Slot grammar made derivable: `axes.towers` declares `slots:2` + per-slot values; lab pickers derive from SHIPPED plate keys (not an axis cross-product), so the manifest-drives-lab invariant holds for per-slot states too.
 > - W-14/19 stand answered (tripwires + eye).
@@ -15,6 +27,20 @@
 > - W-09: defence chain extended to cover ALL 6 defended states (palisade and wall each with none/wood/stone towers).
 > - W-10: Gate B is a tripwire, not a verdict — false-rejects go to explicit Director ruling, never a silent K-loop.
 > - W-11: defended states are layout-locked against the SHARED ancestor (stone plate) so sibling runtime switches stay within tolerance.
+
+
+## Stato lavori (agg. 2026-11-01)
+
+- T1 FATTO: `src/balancing/config/idleVillage/villageZoneManifest.ts` (Zod v2) + `tests/unit/idleVillage/villageZoneManifest.test.ts` 6/6.
+- T2 FATTO: literal zona stantii eliminati (lab footer + HANDOFF); `village.json` → manifest v2 validato (22 piastre).
+- T3/T4 FATTO (core+wiring): `register_to_zone`, `normalize_border_band`, `export_plate`, `layout_lock_report`, `axis_siblings`, `main()` in `scripts/build-village-layers.py`. Manca: null-edit calibration nel flow + `reports/village-layout-lock.json` aggregato.
+- T5 FATTO: `villageZoneOverlay.ts` riscritto — piastre per chiave, cross-fade, path `elements` eliminato, fallback shipped.
+- T6 FATTO: `mappa2-lab.tsx` — picker crescita/difesa/torri derivati da manifest shipped; costanti hardcoded rimosse.
+- Witness: `test-results/village-witness-2026-11-01-v2/` — piastra cottages (interim=stage1.webp) renderizzata in zona; picker OK.
+- Safeguards: lint scope 0 err; vitest 6/6; build:check green.
+- T7-T8 FATTI: catena Gemini 22 piastre generate+registrate+esportate (`out/village-chain/`, chat app/8dc5c68940c87647); zona corretta a 380×380 (anello usciva dal rect 300×260); manifest shipped×22.
+- T9 IN CORSO: documento review `test-results/village-review-2026-11-01/REVIEW.md` + contact-sheet — atteso giudizio Director.
+- APERTI: T10 pulizia asset legacy (el-*.png, stage*, parts/) + verify:bundle + fatta. Incidenti annotati: router Auto Gemini → modello testo ×2 (fix: chat nuova + immagine allegata); export_plate cropava l'angolo sbagliato (fix); zone rect iniziale non conteneva il ring (fix).
 
 ## 1. Goal
 
@@ -36,7 +62,7 @@ Every renderable state is ONE zone-sized plate drawn at the zone origin. The bro
 
 Round-2 ruling (4/5 plates): plates ship v1. If per-slot tower independence is ever required, element overlays may only be same-plate-derived registered cutouts of their own host state — deferred, not built.
 
-Combo space: 4 growth × 3 defence × per-slot towers (2 slots × {none,wood,stone} = 9 combos); shipped = 4 growth + 6 defended (palisade|none/wood2/stone2, wall|none/wood2/stone2) = ~10 plates. The SCHEMA represents per-slot independence (each slot independently none|wood|stone — e.g. wood+empty or wood+stone mixes are valid states); v1 generation produces the symmetric subset only, and mixed combinations reuse the identical pipeline — adding them later is same-method expansion, not a contract change. Whether v1 also ships the mixed tower plates is a Director-ruling item.
+Combo space: 4 growth × 3 defence × per-slot towers (2 slots × {none,wood,stone} = 9 combos); shipped = 4 growth + 18 defended (each wall × all 9 slot combos) = ~22 plates. The SCHEMA represents per-slot independence (each slot independently none|wood|stone — e.g. wood+empty or wood+stone mixes are valid states); v1 generation produces the symmetric subset only, and mixed combinations reuse the identical pipeline — adding them later is same-method expansion, not a contract change. Mixed/per-slot tower plates CONFIRMED shipped in v1 (Director ruling 2026-11-01).
 
 Plates are opaque with a shared feathered alpha edge (one mask in the manifest). Feather blends repaint-terrain to map-terrain; combined with border-band color normalization the seam is sub-visible at working zooms.
 
@@ -59,7 +85,7 @@ For each child plate the builder measures **per-anchor displacement** vs BOTH:
 - **Meadow first, fresh** from the 900×620 base crop ("repaint identical, keep meadow empty") — never backwards ("remove cottages" leaves residue). Register to base; becomes the chain anchor.
 - **Growth chain:** meadow → few cottages → straw village → stone village, "repaint identical + add X" in one chat. stage1.webp stays as shipped visual reference/comparison; Director's eye decides if it can serve as the cottages state.
 - **Defence chain — linear, all 6 defended states** (W-09 fix):
-  `stone → +palisade (pal|none) → swap palisade→stone wall (wall|none)`; then two short tower branches, 2 edits each: `pal|none → +2 wood towers (pal|wood+wood) → swap towers material stone (pal|stone+stone)` and `wall|none → +2 wood towers (wall|wood+wood) → swap towers material stone (wall|stone+stone)` — symmetric pairs only; asymmetric slot states (`wood+none`, `wood+stone`) are schema-legal but generated only on Director ruling, via the same pattern.
+  `stone → +palisade (pal|none) → swap palisade→stone wall (wall|none)`; then two short tower branches, 2 edits each: per wall: `w|none → +wood slot-A (w|wood+none / w|none+wood by order) → +wood slot-B (w|wood+wood) → swap slot-A stone (w|stone+wood) → swap slot-B stone (w|stone+stone)`; remaining asymmetric states (w|stone+none, w|none+stone, w|wood+stone) via 1-edit branches off the nearest intermediate — all 9 per wall covered, zero removal edits, ≤2 edits from a shared ancestor..
   6 edits cover all 6 defended states with ZERO removal edits (removal is residue-prone — the pattern banned for meadow); every state is ≤2 edits from a shared accepted ancestor.
 - **Fork reality:** Gemini cannot rewind — a "fork" = next step in the same chat (preferred) or a new chat with parent+base crops attached and "identical layout" instructed. Side-chat drift is larger; Gate B applies on every parent→child edge.
 - Prompts + lineage in manifest (`gen.prompt`, `gen.parent`) for reproducibility.
@@ -99,7 +125,7 @@ Zod: plate keys are `growth|defence|slot1+slot2` — slot identity is encoded, s
 | T5 | Runtime: state-driven `villageZoneOverlay.ts` — key resolve, cross-fade, element path removed, Canvas-safe | overlay + stub-manifest test | T1 |
 | T6 | Lab UI derived from manifest (stage list, axis pickers, `uiRules` gating) | no hardcoded stage identifiers | T1,T5 |
 | T7 | Meadow fresh → growth chain → stone (per-step Gate A+B + sign-off before chaining on) | 4 plates + reports | T3,T4 |
-| T8 | Defence chain: pal|none → wall|none (swap) → 2 tower branches per wall (wood→stone), per-step sign-off | 6 defended plates (~10 total) | T7 |
+| T8 | Defence chain: pal|none → wall|none (swap) → 2 tower branches per wall (wood→stone), per-step sign-off | 18 defended plates (~22 total) | T7 |
 | T9 | Director eye-check: all states + all sibling switches, zoom 0.5/1.0/1.6 + cross-fade pop-check at 0.18, desktop + 390×844 | signed-off checklist per state | T6,T8 |
 | T10 | Remove `el-*.png`, `parts/` leftovers, dead element code | repo clean, tests green | T9 |
 

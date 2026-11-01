@@ -1,49 +1,31 @@
 import { chromium } from 'playwright';
-const OUT = '/Users/faustoboni/progetti_personali/RPG/test-results/village-witness-2026-10-30';
-const b = await chromium.launch();
+const OUT = '/Users/faustoboni/progetti_personali/RPG/test-results/village-witness-2026-11-01-all';
+const b = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
 const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
-await p.goto('http://localhost:5173/mappa2-lab', { waitUntil: 'domcontentloaded', timeout: 60000 });
-await p.waitForFunction(() => window.__worldCam && window.__worldCamCtl, { timeout: 60000 });
+p.on('pageerror', (e) => console.log('[pageerror]', String(e).slice(0,200)));
+p.on('console', (m) => { if (m.type() === 'error') console.log('[pg-err]', m.text().slice(0, 160)); });
+for (let att = 0; att < 3; att++) {
+  await p.goto('http://localhost:5173/mappa2-lab', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  try { await p.waitForFunction(() => window.__worldCam && window.__worldCamCtl, { timeout: 90000 }); break; }
+  catch { console.log('boot retry', att); await p.waitForTimeout(3000); }
+}
 await p.waitForTimeout(2500);
-// Centre the village zone (1450,520 300x260 → centre 1600,650) at zoom ~1.6
 await p.evaluate(() => {
-  const zoom = 1.6;
-  window.__worldCamCtl.set({ panX: 1600 - 720 / zoom, panY: 650 - 450 / zoom, zoom });
+  const zoom = 1.5;
+  window.__worldCamCtl.set({ panX: 1615 - 720 / zoom, panY: 700 - 450 / zoom, zoom });
 });
 await p.waitForTimeout(800);
-// open village tab
-await p.click('button:has-text("village")').catch(() => {});
+await p.click('button:has-text("village")');
 await p.waitForTimeout(400);
-await p.screenshot({ path: `${OUT}/01-zone-context.png` });
-// stage 0 = nessuna casa
-await p.click('button:has-text("nessuna casa")').catch((e) => console.log('stage0 click', e.message.slice(0, 80)));
-await p.waitForTimeout(600);
-await p.screenshot({ path: `${OUT}/02-stage0-bare.png` });
-// stage 1 = 7 casette
-await p.click('button:has-text("7 casette")').catch((e) => console.log('stage1 click', e.message.slice(0, 80)));
-await p.waitForTimeout(600);
-await p.screenshot({ path: `${OUT}/03-stage1-houses.png` });
-// + palizzata
-await p.click('button:has-text("palizzata")').catch(() => {});
-await p.waitForTimeout(500);
-await p.screenshot({ path: `${OUT}/04-palizzata.png` });
-// + torri legno
-await p.click('button:has-text("torre-legno-1")').catch(() => {});
-await p.click('button:has-text("torre-legno-2")').catch(() => {});
-await p.waitForTimeout(500);
-await p.screenshot({ path: `${OUT}/05-palizzata-torri.png` });
-// switch to muro + torri pietra
-await p.click('button:has-text("muro")').catch(() => {});
-await p.click('button:has-text("torre-pietra-1")').catch(() => {});
-await p.click('button:has-text("torre-pietra-2")').catch(() => {});
-await p.waitForTimeout(500);
-await p.screenshot({ path: `${OUT}/06-muro-torri-pietra.png` });
-// zoom out a bit for context
-await p.evaluate(() => {
-  const zoom = 1.0;
-  window.__worldCamCtl.set({ panX: 1600 - 720 / zoom, panY: 650 - 450 / zoom, zoom });
-});
-await p.waitForTimeout(600);
-await p.screenshot({ path: `${OUT}/07-context-zoom1.png` });
+const clickBtn = (t) => p.evaluate((x) => { const b = [...document.querySelectorAll('button')].find((e) => e.textContent.trim() === x); if (b) { b.click(); return true; } return false; }, t);
+const shot = async (n) => { await p.waitForTimeout(1100); await p.screenshot({ path: `${OUT}/${n}.png` }); };
+for (const g of ['meadow', 'cottages', 'straw', 'stone']) { console.log('g', g, await clickBtn(g)); await shot(`g-${g}`); }
+for (const [def, combos] of [
+  ['palisade', ['none+none', 'wood+none', 'none+wood', 'wood+wood', 'stone+none', 'none+stone', 'wood+stone', 'stone+wood', 'stone+stone']],
+  ['wall',     ['none+none', 'wood+none', 'none+wood', 'wood+wood', 'stone+none', 'none+stone', 'wood+stone', 'stone+wood', 'stone+stone']],
+]) {
+  console.log('def', def, await clickBtn(def));
+  for (const c of combos) { console.log('  c', c, await clickBtn(c)); await shot(`${def}-${c.replace('+', '_')}`); }
+}
 await b.close();
-console.log('done');
+console.log('done all 22');

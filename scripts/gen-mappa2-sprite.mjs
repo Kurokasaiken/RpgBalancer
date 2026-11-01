@@ -168,14 +168,31 @@ async function tryAttach(page, imgPath) {
 
 const browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
 const ctx = browser.contexts()[0];
+
+/** Open a tab without stealing the Director's foreground (CTR-foreground-001):
+ *  Target.createTarget background:true — same technique as mw-web-turn.py. */
+async function newBackgroundPage(url) {
+  const session = await browser.newBrowserCDPSession();
+  const { targetId } = await session.send('Target.createTarget', { url, background: true });
+  for (let i = 0; i < 60; i++) {
+    const p = ctx.pages().find((pg) => {
+      try { return pg.url() === url && !pg.isClosed(); } catch { return false; }
+    });
+    if (p) return p;
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  // fallback: locate the target we just created by URL fragment
+  return ctx.pages().find((pg) => pg.url().includes('gemini.google.com')) ?? ctx.pages()[ctx.pages().length - 1];
+}
+
 let page;
 if (chatUrl) {
-  page = ctx.pages().find((p) => p.url().startsWith(chatUrl)) || (await ctx.newPage());
-  if (!page.url().startsWith(chatUrl)) await page.goto(chatUrl, { waitUntil: 'domcontentloaded' });
+  page = ctx.pages().find((p) => p.url().startsWith(chatUrl));
+  if (!page) { page = await newBackgroundPage(chatUrl); } else { /* riusa il tab esistente senza riaprire */ }
 } else {
-  page = await ctx.newPage();
-  await page.goto('https://gemini.google.com/app', { waitUntil: 'domcontentloaded' });
+  page = await newBackgroundPage('https://gemini.google.com/app');
 }
+await page.waitForLoadState('domcontentloaded').catch(() => {});
 await page.waitForSelector('div[contenteditable="true"], .ql-editor, textarea', { state: 'attached', timeout: 60000 });
 await page.waitForTimeout(2500); // settle composer visibile
 

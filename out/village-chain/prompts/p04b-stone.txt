@@ -1,0 +1,1 @@
+Edit this image: the 7 cottages in the centre become sturdier stone-built houses — grey stone walls, keep the golden thatched roofs, same positions, same scale, same footprint, same dirt footpath. Everything else stays identical — same trees, rocks, river, mountains, same painted style and warm light. Output the edited image.
