@@ -5337,7 +5337,8 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Stato:** `in corso`
 **Decisioni Director (2026-11-01):** sfondo = **mappa viva PixiWorldMap** (mappa2, senza HUD produzione); pezzi = **crop dai mockup ora, iterazioni React dopo**; iterazioni = **tutto + HUD attuale** come confronto.
 **Contesto:** continuazione di R-290 (critica HUD, «4 tavole»). Fonti: 6 mockup nuovi `~/Downloads` (famiglia Zanara, incluse 2 tavole già fatte) + `input-mockup1.png` (mockup GPT v1, layout classico) + screenshot produzione `/game`.
-**Dibattito lanciato (2026-11-01):** PLAN-107 sottoposto a mw-web-debate run `20261101-hud-zanara-real-components` (chatgpt 8 immagini allegate, gemini contact-sheet 1 immagine, claude/grok/deepseek testo). Clarification T-001 in volo.
+**PLAN-107 APPROVATO CON GO (2026-11-01):** verdict Director "APPROVATO — GO" + 4 integrazioni chirurgiche applicate come artifact-r005-director-amendments (criteri qualità materica T-002 cornice/superficie/inserti + asset quality rule; T-102b test anche superficie interna; T-101b misura 18% precisa bbox+perceived union su viewport reale; T-303 a11y estesa; T-302 baselines dual-skin deterministiche; guidance: niente mockup interi, qualità replicabile non perfezione singola, sistema materico non reskin). Piano battezzato, ledger aperto.
+**Dibattito CONVERGED (2026-11-01):** run `20261101-hud-zanara-real-components` → artifact-r004 ACCEPT 3/3 (chatgpt, claude, deepseek; grok+gemini provider_dead), sha256 `e68872f8`. Plan aggiornato in `plans/PLAN-107-hud-zanara-real-components.md`. Ruling Director: emblem-only logo, entrambi gli ornamenti con binding funzionale, zanara preset selezionabile accanto a base.
 
 **Implementazione:** route `/hud-lab` — PixiWorldMap mappa2 + slot overlay per componente (brand, risorse, roster, pannello contestuale, nav, angoli, sigillo) con stepper per ciclare le iterazioni + galleria per vedere tutte le varianti. Pipeline: `scripts/build-hud-lab-crops.mjs` (sharp, box per fonte → `public/mockups/hud-lab/` gitignored + `manifest.json`), `scripts/capture-hud-production.mjs` (playwright → crop produzione).
 
@@ -5348,7 +5349,7 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Stato:** `fatta`
 **Contesto:** il deploy del 2026-11-01 passò i check del guardian (pagine 200) ma `/game` crashava su browser con WebGL reale (`pack.packRoot` su manifest senza pack — il probe headless senza GPU cade su renderer Canvas e non esercita il path mesh). Lezione: "pagina risponde" ≠ "mondo preparato".
 **Requisito:** dopo commit+push+deploy la verifica deve esercitare il path reale (probe con WebGL/swiftshader su `/` e superfici Pixi), non solo HTTP 200; su failure si itera il fix finché tutto è verde.
-**Attuazione (2026-11-01):** invariante "Deploy verification" registrato in `.windsurf/rules/00-project-invariants.md`; probe riutilizzabili `scripts/_tmp-boot-wait.mjs` + `_tmp-landing-check.mjs`; fix `pack.packRoot` (b738eed2) verificato in produzione con WebGL.
+**Attuazione (2026-11-01):** invariante "Deploy verification" registrato in `.windsurf/rules/00-project-invariants.md`; **gate meccanico**: `scripts/deploy/webglBootProbe.mjs` cablata nella post-verification di `guardian:deploy-guard` (`webglProbeRoutes: ['/', '/game']` — boot error/page exception/no-canvas → deploy FAILED, exit non-zero); probe manuali `scripts/_tmp-*.mjs`; fix `pack.packRoot` (b738eed2) verificato in produzione con WebGL.
 
 ## R-305 — Landing page identica su desktop e mobile: `/` → `/mappa2-lab`
 

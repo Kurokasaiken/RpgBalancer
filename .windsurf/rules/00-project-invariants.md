@@ -93,8 +93,10 @@ If any safeguard fails, the task is **BLOCKED**, not complete.
   ['--enable-unsafe-swiftshader'] })`) — without a GPU the renderer falls back
   to Canvas and skips mesh/shader code paths entirely (R-304 incident:
   `pack.packRoot` crash invisible to plain probes).
-- Reusable probes live in `scripts/_tmp-boot-wait.mjs` (boot completes, no
-  `[role="alert"]`) and `scripts/_tmp-landing-check.mjs`.
+- Mechanical gate: `scripts/deploy/webglBootProbe.mjs` is wired into
+  `guardian:deploy-guard` post-verification (`webglProbeRoutes: ['/', '/game']`)
+  — a boot error, page exception or missing world canvas FAILS the deployment.
+  Manual probes: `scripts/_tmp-boot-wait.mjs`, `scripts/_tmp-landing-check.mjs`.
 - On any verification failure: fix the problem and iterate until the whole
   cycle (safeguards → deploy → post-deploy verification) is green. Never report
   "deploy OK" on a failed or unverified check — say what was not verified (T-04).
