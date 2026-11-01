@@ -23,6 +23,7 @@ interface DeploymentGuardConfig {
   postDeployVerification: boolean;
   maxDeployWaitTime: number; // minutes
   criticalPages: string[];
+  webglProbeRoutes: string[];
   vercelProject?: string;
 }
 
@@ -45,7 +46,10 @@ class VercelDeploymentGuard {
       '/idle-village',
       '/punch-club',
       '/sts'
-    ]
+    ],
+    // R-304: Pixi surfaces probed with WebGL on — a 200/HTML check cannot see
+    // boot crashes inside mesh/shader paths (Canvas fallback skips them).
+    webglProbeRoutes: ['/', '/game']
   };
 
   /**
@@ -212,6 +216,14 @@ class VercelDeploymentGuard {
         };
       }
       
+      // R-304: exercise the real render path on Pixi surfaces. Without a GPU
+      // the probe would fall back to the Canvas renderer and silently skip
+      // mesh/shader code — the probe forces a software WebGL instead.
+      const probeResult = await this.runWebglBootProbe(deploymentUrl);
+      if (!probeResult.success) {
+        return probeResult;
+      }
+
       console.log('✅ Post-deployment verification passed');
       return { success: true };
     } catch (error: any) {
@@ -220,6 +232,34 @@ class VercelDeploymentGuard {
         error: `Post-deployment verification failed: ${error.message}`
       };
     }
+  }
+
+  /**
+   * R-304: runs scripts/deploy/webglBootProbe.mjs against each critical Pixi
+   * route. Any boot error, page exception or missing world canvas fails the
+   * deployment verification — the caller must fix and redeploy.
+   */
+  private async runWebglBootProbe(deploymentUrl: string): Promise<{ success: boolean; error?: string }> {
+    console.log('🌐 Running WebGL boot probes...');
+    for (const route of this.config.webglProbeRoutes) {
+      const target = `${deploymentUrl}${route === '/' ? '/' : route}`;
+      try {
+        execSync(`node scripts/deploy/webglBootProbe.mjs "${target}"`, {
+          encoding: 'utf8',
+          stdio: 'pipe',
+          timeout: 200000,
+        });
+        console.log(`  ✅ WebGL boot probe passed: ${route}`);
+      } catch (error: any) {
+        const detail = `${error.stdout ?? ''}${error.stderr ?? ''}`.trim().slice(0, 400);
+        console.log(`  ❌ WebGL boot probe failed: ${route}`);
+        return {
+          success: false,
+          error: `WebGL boot probe failed on ${route}: ${detail || error.message}`
+        };
+      }
+    }
+    return { success: true };
   }
 
   /**
