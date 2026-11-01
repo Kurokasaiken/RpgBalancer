@@ -7,6 +7,7 @@ import { Mappa2GradeControls } from './mappa2-grade-controls';
 import { useMappa2Grade } from './useMappa2Grade';
 import { mountainShadeLive, seaGradeLive } from './mappa2-grade';
 import { villageZoneLive } from '@/ui/idleVillage/pixiSpike/villageZoneOverlay';
+import { villageManifestSchema, type VillageManifestV2 } from '@/balancing/config/idleVillage/villageZoneManifest';
 
 const MANIFEST_PATH = '/assets/world/mappa2/base/manifest.json';
 const REGIONS_BASE = '/assets/world/mappa2/base';
@@ -44,9 +45,7 @@ const TAB_EFFECTS: Record<LabTab, (keyof PixiWorldMapEffects)[]> = {
   village: [],
 };
 
-const VILLAGE_STAGES = ['nessuna casa', '7 casette'];
-const VILLAGE_ELEMENTS = ['palizzata', 'muro', 'torre-legno-1', 'torre-legno-2', 'torre-pietra-1', 'torre-pietra-2'];
-const VILLAGE_EXCLUSIVE = [['palizzata','muro'], ['torre-legno-1','torre-pietra-1'], ['torre-legno-2','torre-pietra-2']];
+const VILLAGE_MANIFEST_PATH = '/assets/world/mappa2/base/fx/village/village.json';
 
 interface LabDefaults {
   wonderEveryS: number;
@@ -226,10 +225,12 @@ export default function Mappa2LabPage() {
   const [ambRare, setAmbRare] = useState(CODE_DEFAULTS.ambRare === 1);
   const [ambLogTick, setAmbLogTick] = useState(0);
   const [villageOn, setVillageOn] = useState(true);
-  const [villageStage, setVillageStage] = useState(2);
+  const [villageGrowth, setVillageGrowth] = useState('stone');
+  const [villageDefence, setVillageDefence] = useState('none');
+  const [villageTowers, setVillageTowers] = useState('none+none');
   const [villageArmed, setVillageArmed] = useState<string | null>(null);
   const [villageParts, setVillageParts] = useState<{ part: string; x: number; y: number }[]>([]);
-  const [villageElements, setVillageElements] = useState<string[]>([]);
+  const [villageManifest, setVillageManifest] = useState<VillageManifestV2 | null>(null);
   const [savedDefaultsNote, setSavedDefaultsNote] = useState('');
   const [wonderRequest, setWonderRequest] = useState(0);
   const [defaultsLoaded, setDefaultsLoaded] = useState(false);
@@ -283,14 +284,27 @@ export default function Mappa2LabPage() {
     };
   }, []);
 
+  // Fetch the village manifest (single source of truth for pickers).
+  useEffect(() => {
+    let dead = false;
+    fetch(VILLAGE_MANIFEST_PATH)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((raw) => { if (!dead && raw) { const p = villageManifestSchema.safeParse(raw); if (p.success) setVillageManifest(p.data); } })
+      .catch(() => undefined);
+    return () => { dead = true; };
+  }, []);
+
   // Sync village-zone knobs into the overlay's live ref (read per-tick).
   useEffect(() => {
+    const [t1, t2] = villageTowers.split('+');
     villageZoneLive.visible = villageOn;
-    villageZoneLive.stage = villageStage;
+    villageZoneLive.growth = villageGrowth;
+    villageZoneLive.defence = villageDefence;
+    villageZoneLive.tower1 = t1 as typeof villageZoneLive.tower1;
+    villageZoneLive.tower2 = t2 as typeof villageZoneLive.tower2;
     villageZoneLive.armed = villageArmed;
     villageZoneLive.parts = villageParts;
-    villageZoneLive.elements = villageElements;
-  }, [villageOn, villageStage, villageArmed, villageParts, villageElements]);
+  }, [villageOn, villageGrowth, villageDefence, villageTowers, villageArmed, villageParts]);
   useEffect(() => {
     if (hover) { villageZoneLive.hoverX = hover.x; villageZoneLive.hoverY = hover.y; }
   }, [hover]);
@@ -695,40 +709,54 @@ export default function Mappa2LabPage() {
                 <input type="checkbox" checked={villageOn} onChange={(e) => setVillageOn(e.target.checked)} />
                 village zone
               </label>
-              <label style={{ display: 'block', marginTop: 6 }}>
-                stage: {VILLAGE_STAGES[Math.round(villageStage)] ?? ''} ({villageStage.toFixed(2)})
-                <input type="range" min={0} max={1} step={0.01} value={villageStage} onChange={(e) => setVillageStage(Number(e.target.value))} style={{ width: '100%' }} />
-              </label>
-              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 6 }}>
-                {VILLAGE_STAGES.map((name, i) => (
+              <div style={{ fontSize: 12, marginTop: 6, marginBottom: 4 }}>crescita:</div>
+              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                {(villageManifest?.growth ?? [villageGrowth]).map((g) => (
                   <button
-                    key={name}
+                    key={g}
                     type="button"
-                    onClick={() => setVillageStage(i)}
-                    style={{ padding: '4px 7px', border: '1px solid #56758d', borderRadius: 4, color: Math.round(villageStage) === i ? '#dff4ff' : 'inherit', background: Math.round(villageStage) === i ? '#17415f' : 'rgba(20, 55, 80, 0.75)', cursor: 'pointer', fontSize: 12 }}
+                    onClick={() => setVillageGrowth(g)}
+                    style={{ padding: '4px 7px', border: '1px solid #56758d', borderRadius: 4, color: villageGrowth === g ? '#dff4ff' : 'inherit', background: villageGrowth === g ? '#17415f' : 'rgba(20, 55, 80, 0.75)', cursor: 'pointer', fontSize: 12 }}
                   >
-                    {name}
+                    {g}
                   </button>
                 ))}
               </div>
               <div style={{ marginTop: 10, borderTop: '1px solid rgba(125,180,220,0.25)', paddingTop: 8 }}>
-                <div style={{ fontSize: 12, marginBottom: 4 }}>difesa — toggle separati:</div>
+                <div style={{ fontSize: 12, marginBottom: 4 }}>difesa:</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                  {VILLAGE_ELEMENTS.map((id) => (
+                  {(villageManifest?.axes.defence.values ?? ['none']).map((d) => (
                     <button
-                      key={id}
+                      key={d}
                       type="button"
-                      onClick={() => setVillageElements((cur) => {
-                        if (cur.includes(id)) return cur.filter((x) => x !== id);
-                        const excl = VILLAGE_EXCLUSIVE.find((g) => g.includes(id)) ?? [id];
-                        return [...cur.filter((x) => !excl.includes(x)), id];
-                      })}
-                      style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: villageElements.includes(id) ? '#0d1f2d' : 'inherit', background: villageElements.includes(id) ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
+                      onClick={() => { setVillageDefence(d); if (d === 'none') setVillageTowers('none+none'); }}
+                      style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: villageDefence === d ? '#0d1f2d' : 'inherit', background: villageDefence === d ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
                     >
-                      {id}
+                      {d}
                     </button>
                   ))}
                 </div>
+                {villageDefence !== 'none' && (
+                  <>
+                    <div style={{ fontSize: 12, margin: '8px 0 4px' }}>torri (slot1+slot2):</div>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                      {Array.from(new Set(
+                        (villageManifest?.plates ?? [])
+                          .filter((p) => p.shipped && p.key.startsWith(`${villageGrowth}|${villageDefence}|`))
+                          .map((p) => p.key.split('|')[2]),
+                      )).sort().map((combo) => (
+                        <button
+                          key={combo}
+                          type="button"
+                          onClick={() => setVillageTowers(combo)}
+                          style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: villageTowers === combo ? '#0d1f2d' : 'inherit', background: villageTowers === combo ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
+                        >
+                          {combo}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
                 <div style={{ fontSize: 12, margin: '8px 0 4px', opacity: 0.75 }}>piazzamento manuale parti:</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                   {['pal-straight','pal-curve','pal-gate','tower-wood','wall-straight','wall-curve','wall-gate','tower-stone'].map((p) => (
@@ -758,7 +786,7 @@ export default function Mappa2LabPage() {
                 </div>
               </div>
               <div style={{ marginTop: 8, fontSize: 12, opacity: 0.75 }}>
-                zona villaggio (x1399 y572): slider = crescita case (nessuna → 3 → 7). Difese = toggle separati assemblati dalle parti. PIAZZA = arma un pezzo poi clicchi per posarlo al punto hover.
+                zona villaggio: definita in village.json (manifest v2 = unica fonte). crescita/difesa/torri = picker derivati dalle piastre shipped. PIAZZA = arma un pezzo poi clicchi per posarlo al punto hover.
               </div>
             </div>
           </>

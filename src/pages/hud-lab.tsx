@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { PixiWorldMap, type PixiBootProgress } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { RosterSpike } from './hud-lab/spikes/RosterSpike';
+import { PanelFrameSpike } from './hud-lab/spikes/PanelFrameSpike';
 
 const MAP_MANIFEST = '/assets/world/mappa2/base/manifest.json';
 const STAGE_COLOR = '#1675ad';
 const HUD_MANIFEST_URL = '/mockups/hud-lab/manifest.json';
 
-interface HudIteration { id: string; label: string; src: string; provenance: string }
+interface HudIteration { id: string; label: string; src: string; provenance: string; react?: string }
 interface HudSlot { id: string; label: string; iterations: HudIteration[] }
 interface HudManifest { generated: string; slots: HudSlot[] }
 
@@ -23,16 +25,26 @@ const FAMILY_LABELS: Record<string, string> = {
   production: 'Produzione /game',
 };
 
-interface SlotLayout { style: CSSProperties; controls: 'above' | 'below' }
+interface SlotLayout { style: CSSProperties }
 const SLOT_LAYOUT: Record<string, SlotLayout> = {
-  brand: { style: { left: '0.6%', top: '0.6%', width: '27%' }, controls: 'below' },
-  resources: { style: { right: '0.8%', top: '0.8%', width: '40%' }, controls: 'below' },
-  seal: { style: { right: '0.8%', top: '11.5%', width: '12%' }, controls: 'below' },
-  roster: { style: { left: '0.4%', top: '20%', width: '15%' }, controls: 'above' },
-  panel: { style: { right: '0.8%', top: '31%', width: '20%' }, controls: 'above' },
-  nav: { style: { left: '50%', bottom: '0.6%', width: '56%', transform: 'translateX(-50%)' }, controls: 'above' },
-  cornerBL: { style: { left: '0.4%', bottom: '0.6%', width: '18%' }, controls: 'above' },
-  cornerBR: { style: { right: '0.6%', bottom: '0.6%', width: '20%' }, controls: 'above' },
+  brand: { style: { left: '0.6%', top: '0.6%', width: '27%' } },
+  resources: { style: { right: '0.8%', top: '0.8%', width: '40%' } },
+  seal: { style: { right: '0.8%', top: '12.5%', width: '12%' } },
+  roster: { style: { left: '0.4%', top: '20%', width: '15%' } },
+  panel: { style: { right: '0.8%', top: '33%', width: '20%' } },
+  nav: { style: { left: '50%', bottom: '0.6%', width: '56%', transform: 'translateX(-50%)' } },
+  cornerBL: { style: { left: '0.4%', bottom: '0.6%', width: '18%' } },
+  cornerBR: { style: { right: '0.6%', bottom: '0.6%', width: '20%' } },
+};
+
+/** React-rendered spike iterations (T-102a/b) injected into the slot lists. */
+const REACT_COMPONENTS: Record<string, () => JSX.Element> = {
+  'react-roster-v3': RosterSpike,
+  'react-panel-v1': PanelFrameSpike,
+};
+const REACT_ITERATIONS: Record<string, HudIteration[]> = {
+  roster: [{ id: 'react-roster-v3', label: 'React spike v3 (closed, SVG)', src: '', provenance: 'spike', react: 'react-roster-v3' }],
+  panel: [{ id: 'react-panel-v1', label: 'React spike v1 (CSS)', src: '', provenance: 'spike', react: 'react-panel-v1' }],
 };
 
 const ctrlBtn: CSSProperties = {
@@ -52,19 +64,29 @@ const SlotControl = ({
   slot: HudSlot; index: number; total: number;
   onStep: (delta: number) => void; onGallery: () => void;
 }) => (
-  <div style={{
+  <div data-hud-lab-control={slot.id} style={{
     display: 'flex', alignItems: 'center', gap: 4, pointerEvents: 'auto',
     background: 'rgba(3, 14, 24, 0.82)', border: '1px solid rgba(125,180,220,0.35)',
-    borderRadius: 6, padding: '2px 5px', width: 'max-content', maxWidth: '100%',
+    borderRadius: 6, padding: '2px 5px', width: 'max-content',
   }}>
-    <span style={{ fontSize: 10, opacity: 0.75, textTransform: 'uppercase', letterSpacing: 0.4 }}>{slot.label}</span>
+    <span style={{ fontSize: 10, opacity: 0.75, textTransform: 'uppercase', letterSpacing: 0.4, whiteSpace: 'nowrap' }}>{slot.label}</span>
     <button type="button" style={ctrlBtn} onClick={() => onStep(-1)} disabled={total < 2}>‹</button>
-    <span style={{ fontSize: 11, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 190 }}>
+    <span style={{ fontSize: 11, minWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
       {slot.iterations[index]?.label ?? '—'} <span style={{ opacity: 0.6 }}>{index + 1}/{total}</span>
     </span>
     <button type="button" style={ctrlBtn} onClick={() => onStep(1)} disabled={total < 2}>›</button>
     <button type="button" style={ctrlBtn} onClick={onGallery} title="tutte le iterazioni">≡</button>
   </div>
+);
+
+/** Non-interactive label tag pinned on each slot (controls live in the rail). */
+const SlotTag = ({ label }: { label: string }) => (
+  <span style={{
+    position: 'absolute', top: -2, left: 0, zIndex: 5,
+    fontSize: 9, letterSpacing: 0.8, textTransform: 'uppercase',
+    color: '#dff4ff', background: 'rgba(3,14,24,0.7)', border: '1px solid rgba(125,180,220,0.3)',
+    borderRadius: 4, padding: '1px 5px', fontFamily: 'ui-monospace, monospace',
+  }}>{label}</span>
 );
 
 export default function HudLabPage() {
@@ -76,11 +98,16 @@ export default function HudLabPage() {
   const [boot, setBoot] = useState<PixiBootProgress | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [rulingJson, setRulingJson] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(HUD_MANIFEST_URL)
       .then((r) => { if (!r.ok) throw new Error(`manifest ${r.status}`); return r.json(); })
       .then((m: HudManifest) => {
+        for (const s of m.slots) {
+          const extra = REACT_ITERATIONS[s.id];
+          if (extra) s.iterations.push(...extra);
+        }
         setManifest(m);
         const init: Record<string, number> = {};
         for (const s of m.slots) init[s.id] = 0;
@@ -153,24 +180,37 @@ export default function HudLabPage() {
         const layout = SLOT_LAYOUT[slot.id];
         if (!layout || slot.iterations.length === 0) return null;
         const it = slot.iterations[sel[slot.id] ?? 0];
-        const control = controlsVisible ? (
-          <SlotControl
-            slot={slot} index={sel[slot.id] ?? 0} total={slot.iterations.length}
-            onStep={(d) => step(slot.id, d)}
-            onGallery={() => setGallerySlot(slot.id)}
-          />
-        ) : null;
         return (
           <div key={slot.id} data-hud-lab-slot={slot.id} style={{ position: 'absolute', pointerEvents: 'none', ...layout.style }}>
-            {layout.controls === 'above' && control}
-            <img
-              src={it?.src} alt={it?.label} draggable={false}
-              style={{ width: '100%', height: 'auto', display: 'block' }}
-            />
-            {layout.controls === 'below' && control}
+            {controlsVisible && <SlotTag label={slot.label} />}
+            {it?.react && REACT_COMPONENTS[it.react]
+              ? (() => { const C = REACT_COMPONENTS[it.react!]; return <C />; })()
+              : (
+                <img
+                  src={it?.src} alt={it?.label} draggable={false}
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
+                />
+              )}
           </div>
         );
       })}
+
+      {/* Control rail — all slot steppers in one always-accessible column */}
+      {controlsVisible && (
+        <div data-hud-lab-rail style={{
+          position: 'absolute', left: '16.2%', top: '34%', zIndex: 40,
+          display: 'flex', flexDirection: 'column', gap: 4, pointerEvents: 'auto',
+        }}>
+          {manifest?.slots.map((slot) => (
+            <SlotControl
+              key={slot.id}
+              slot={slot} index={sel[slot.id] ?? 0} total={slot.iterations.length}
+              onStep={(d) => step(slot.id, d)}
+              onGallery={() => setGallerySlot(slot.id)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Lab chrome */}
       {controlsVisible && (
@@ -193,6 +233,19 @@ export default function HudLabPage() {
               <option key={f} value={f}>{FAMILY_LABELS[f] ?? f}</option>
             ))}
           </select>
+          <button
+            type="button" style={ctrlBtn}
+            title="esporta la selezione corrente come JSON (ruling T-001)"
+            onClick={() => {
+              const ruling: Record<string, { id: string; label: string; src: string }> = {};
+              for (const s of manifest?.slots ?? []) {
+                const it = s.iterations[sel[s.id] ?? 0];
+                if (it) ruling[s.id] = { id: it.id, label: it.label, src: it.src };
+              }
+              void navigator.clipboard.writeText(JSON.stringify(ruling, null, 2)).catch(() => undefined);
+              setRulingJson(JSON.stringify(ruling, null, 2));
+            }}
+          >Ruling ⬇</button>
           <button type="button" style={ctrlBtn} onClick={() => setControlsVisible(false)}>Hide UI (H)</button>
         </div>
       )}
@@ -206,6 +259,24 @@ export default function HudLabPage() {
       {error && (
         <div style={{ position: 'absolute', top: 44, left: '50%', transform: 'translateX(-50%)', color: '#fca5a5', fontSize: 12, fontFamily: 'monospace', zIndex: 40 }}>
           manifest error: {error}
+        </div>
+      )}
+
+      {/* Ruling export overlay (T-001) */}
+      {rulingJson && (
+        <div
+          style={{
+            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 60,
+            background: 'rgba(3, 14, 24, 0.96)', border: '1px solid rgba(125,180,220,0.5)',
+            borderRadius: 8, padding: '12px 14px', color: '#e5eef7',
+            fontFamily: 'ui-monospace, monospace', fontSize: 11, maxWidth: '46vw',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+            <span style={{ fontWeight: 700 }}>ruling corrente (copiato negli appunti)</span>
+            <button type="button" style={ctrlBtn} onClick={() => setRulingJson(null)}>chiudi</button>
+          </div>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', maxHeight: '50vh', overflowY: 'auto' }}>{rulingJson}</pre>
         </div>
       )}
 

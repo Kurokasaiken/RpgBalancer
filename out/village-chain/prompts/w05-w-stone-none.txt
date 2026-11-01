@@ -1,0 +1,1 @@
+Edit this image: keep EVERYTHING identical — same trees, rocks, river, mountains, same 7 stone houses, same stone wall ring and gate. Change ONLY the wooden watchtower beside the gate into a STONE watchtower — grey stone guard tower, same position and scale. No other changes. Output the edited image.

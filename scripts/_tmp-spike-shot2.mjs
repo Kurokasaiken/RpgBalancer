@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1600, height: 900 } });
+p.on('pageerror', e => console.log('[pageerror]', String(e).slice(0,300)));
+await p.goto('http://localhost:5173/hud-lab');
+await p.waitForTimeout(14000);
+const rosterBtns = await p.locator('[data-hud-lab-slot="roster"] button').count();
+const panelBtns = await p.locator('[data-hud-lab-slot="panel"] button').count();
+console.log('rosterBtns:', rosterBtns, 'panelBtns:', panelBtns);
+console.log('slots:', await p.locator('[data-hud-lab-slot]').count());
+await p.screenshot({ path: 'test-results/hud-lab-state.png' });
+await b.close();

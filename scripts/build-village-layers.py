@@ -119,3 +119,167 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PLAN-106 T3 — Gate A: rigid frame registration to the base map (r009)
+# Each raw Gemini crop is registered to the base-map crop: rigid
+# translation+scale (MOTION_EUCLIDEAN) estimated on un-edited context, masked
+# to exclude zone+margin. Residual on the 40-80px band around the zone.
+# Calibration: a null-edit control repaint sets the drift noise floor.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def register_to_zone(raw_bgr, base_bgr, zone, mask_margin=40, band=(40, 80)):
+    """Warp `raw_bgr` (same crop as `base_bgr`) onto the base frame via rigid
+    ECC on un-edited context. `zone` = (x,y,w,h) in CROP coords (excluded).
+    Returns (warped, residual_px, ok). Residual = mean abs diff on the band
+    `band` px around the zone rect, after warp."""
+    x, y, w, h = zone
+    H, W = base_bgr.shape[:2]
+    mask = np.ones((H, W), np.uint8) * 255
+    cv2.rectangle(mask, (x - mask_margin, y - mask_margin),
+                  (x + w + mask_margin, y + h + mask_margin), 0, -1)
+    g_raw = cv2.cvtColor(raw_bgr, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
+    g_bas = cv2.cvtColor(base_bgr, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
+    warp = np.eye(2, 3, dtype=np.float32)
+    try:
+        cv2.findTransformECC(g_bas, g_raw, warp, cv2.MOTION_EUCLIDEAN,
+                             (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 200, 1e-5),
+                             mask, 5)
+    except cv2.error:
+        warp = np.eye(2, 3, dtype=np.float32)  # ECC no-converge → identity, residual will flag
+    warped = cv2.warpAffine(raw_bgr, warp, (W, H),
+                            flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP,
+                            borderMode=cv2.BORDER_REPLICATE)
+    # band residual 40-80px around zone
+    band_mask = np.zeros((H, W), np.uint8)
+    cv2.rectangle(band_mask, (x - band[1], y - band[1]), (x + w + band[1], y + h + band[1]), 255, -1)
+    cv2.rectangle(band_mask, (x - band[0], y - band[0]), (x + w + band[0], y + h + band[0]), 0, -1)
+    diff = cv2.absdiff(warped, base_bgr).mean(axis=2)
+    residual = float(diff[band_mask > 0].mean())
+    return warped, residual, True
+
+def normalize_border_band(warped_bgr, base_bgr, zone, band_px=24):
+    """Per-channel mean/std match of the zone's outer border band to the base
+    map (band-limited Reinhard) — kills tone seams before feathering."""
+    x, y, w, h = zone
+    roi_w, roi_b = warped_bgr[y:y+h, x:x+w], base_bgr[y:y+h, x:x+w]
+    band = np.zeros((h, w), bool)
+    band[:band_px, :] = band[-band_px:, :] = True
+    band[:, :band_px] = band[:, -band_px:] = True
+    src, dst = roi_w[band].astype(np.float32), roi_b[band].astype(np.float32)
+    for c in range(3):
+        s, d = src[:, c], dst[:, c]
+        roi_w[:, :, c] = np.clip((roi_w[:, :, c].astype(np.float32) - s.mean())
+                                 * (d.std() / max(s.std(), 1e-3)) + d.mean(), 0, 255)
+    out = warped_bgr.copy(); out[y:y+h, x:x+w] = roi_w.astype(np.uint8)
+    return out
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PLAN-106 T4 — Gate B: paired-anchor layout-lock (r009)
+# The operator marks the SAME physical structure on parent and child (paired
+# correspondence sets — the human is the oracle, not coordinate coincidence).
+# For each child plate, per-anchor displacement is measured vs (1) generation
+# parent, (2) shared ancestor (defended states: stone), (3) runtime-adjacent
+# shipped states (pairs differing in exactly one axis value on one slot).
+# Tripwire: over layoutLockMaxPx → hold for regeneration, never silent.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def anchor_displacement(parent_anchors, child_anchors):
+    """Max and mean displacement (px) between paired anchor lists."""
+    if len(parent_anchors) != len(child_anchors) or not parent_anchors:
+        return None, None
+    d = [float(np.hypot(cx - px, cy - py))
+         for (px, py), (cx, cy) in zip(parent_anchors, child_anchors)]
+    return max(d), sum(d) / len(d)
+
+def axis_siblings(key, keys):
+    """Shipped keys differing from `key` in exactly one axis value on one
+    slot (defence swap, per-slot tower swap, or single growth step)."""
+    g, d, slots = key.split('|'); s1, s2 = slots.split('+')
+    out = []
+    for k in keys:
+        if k == key: continue
+        kg, kd, kslots = k.split('|'); ks1, ks2 = kslots.split('+')
+        diffs = (g != kg) + (d != kd) + (s1 != ks1) + (s2 != ks2)
+        if diffs == 1:
+            out.append(k)
+    return out
+
+def layout_lock_report(child_key, anchors_by_key, parent_key, ancestor_key, shipped_keys, max_px):
+    """Build the Gate B report for one plate. anchors_by_key maps key ->
+    {buildings:[(x,y)], ring:[(x,y)]}. Returns dict; caller decides hold/pass."""
+    checks = {}
+    for label, other in (("parent", parent_key), ("ancestor", ancestor_key)):
+        if other and other in anchors_by_key:
+            for kind in ("buildings", "ring"):
+                mx, mn = anchor_displacement(
+                    anchors_by_key[other].get(kind) or [],
+                    anchors_by_key[child_key].get(kind) or [])
+                if mx is not None:
+                    checks[f"{label}:{kind}"] = {"max": mx, "mean": mn, "ok": mx <= max_px}
+    for sib in axis_siblings(child_key, shipped_keys):
+        if sib in anchors_by_key:
+            mx, mn = anchor_displacement(
+                anchors_by_key[sib].get("buildings") or [],
+                anchors_by_key[child_key].get("buildings") or [])
+            if mx is not None:
+                checks[f"sibling:{sib}"] = {"max": mx, "mean": mn, "ok": mx <= max_px}
+    ok = all(c["ok"] for c in checks.values()) if checks else False
+    return {"key": child_key, "checks": checks, "verdict": "pass" if ok else "hold"}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PLAN-106 — orchestration: raw Gemini crop → Gate A → normalize → crop zone →
+# feathered RGBA plate + reports. Run:
+#   python3 scripts/build-village-layers.py --plate <key> --raw <900x620.png>
+#       [--parent <key>] [--ancestor <key>] [--null-edit]
+# ─────────────────────────────────────────────────────────────────────────────
+import json, argparse
+
+def crop_rect(img, rect):
+    x, y, w, h = [int(v) for v in rect]
+    return img[y:y + h, x:x + w]
+
+def export_plate(warped_bgr, base_zone_bgr, zone, out_webp, feather_px=24):
+    """Crop zone, border-band normalize vs base, feather ellipse alpha, write RGBA webp."""
+    x, y, w, h = [int(v) for v in zone]
+    z_warp = normalize_border_band(
+        warped_bgr[y:y + h, x:x + w].copy(),
+        base_zone_bgr, (0, 0, w, h), band_px=min(feather_px * 2, 40))
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    cx, cy, rx, ry = w / 2, h / 2, w / 2 - 1, h / 2 - 1
+    d = np.sqrt(((xx - cx) / rx) ** 2 + ((yy - cy) / ry) ** 2)
+    a = np.clip((1.0 - d) * min(rx, ry) / max(feather_px, 1), 0, 1)
+    a = a * a * (3 - 2 * a)
+    rgba = np.dstack([cv2.cvtColor(z_warp, cv2.COLOR_BGR2RGB), a * 255]).astype(np.uint8)
+    Image.fromarray(rgba, 'RGBA').save(out_webp, quality=95, method=6)
+    return out_webp
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--plate'); ap.add_argument('--raw')
+    ap.add_argument('--parent'); ap.add_argument('--ancestor')
+    ap.add_argument('--zone', default='275,130,380,380', help='zone rect in CROP coords (world 1425,510,380,380 - crop 1150,380,900,660)')
+    ap.add_argument('--crop', default='1150,380,900,660')
+    ap.add_argument('--max-px', type=float, default=2.0)
+    ap.add_argument('--reports', default='reports')
+    args = ap.parse_args()
+    zone = tuple(int(v) for v in args.zone.split(','))
+    Path(args.reports).mkdir(exist_ok=True)
+    raw = cv2.imread(args.raw)
+    base = cv2.imread(str(ROOT / 'public/assets/world/mappa2/base/layers/base_flat.webp'))
+    crop = tuple(int(v) for v in args.crop.split(','))
+    base_crop = crop_rect(base, crop)
+    if raw.shape[:2] != base_crop.shape[:2]:
+        raw = cv2.resize(raw, (base_crop.shape[1], base_crop.shape[0]), interpolation=cv2.INTER_AREA)
+    warped, residual, _ = register_to_zone(raw, base_crop, zone)
+    rep = {'plate': args.plate, 'gateA_residual': residual}
+    out = VIL / (args.plate.replace('|', '-').replace('+', '-') + '.webp')
+    # zone is in CROP coords; world-zone rect = crop origin + zone offset
+    world_zone = (crop[0] + zone[0], crop[1] + zone[1], zone[2], zone[3])
+    export_plate(warped, crop_rect(base, world_zone), zone, out)
+    rep['exported'] = str(out)
+    (Path(args.reports) / f"village-{args.plate.replace('|','_')}.json").write_text(json.dumps(rep, indent=1))
+    print(json.dumps(rep))
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,1 @@
+Edit this image: keep EVERYTHING identical — same trees, rocks, river, mountains, same 7 stone houses, same stone wall ring and gate, same wooden watchtower beside the gate. Add a SECOND identical wooden watchtower on the upper-right side of the village, opposite the gate. No other changes. Output the edited image.

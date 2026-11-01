@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 const [,,mode,a,b,c] = process.argv;
 const b2 = await chromium.connectOverCDP('http://127.0.0.1:9222');
 const ctx = b2.contexts()[0];
-const p = await ctx.newPage();
+let p = ctx.pages().find(x=>!x.url().includes("google.com/app/")); if(!p) p = ctx.pages()[0];
 if(mode==='new'){
   await p.goto('https://gemini.google.com/app', {waitUntil:'commit', timeout:60000});
   await p.waitForTimeout(12000);
