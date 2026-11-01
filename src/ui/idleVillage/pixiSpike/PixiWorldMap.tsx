@@ -2643,7 +2643,7 @@ export function PixiWorldMap({
         // clean plate under the painted surf (pipeline: masks/foam_clean.webp); absent -> the surf just stays put
         const clean = await load(coastDistanceUrl.replace('coast_distance.webp', 'foam_clean.webp')).catch(() => null);
         // painted base, re-sampled at displaced uv for the flow map (the water itself travels)
-        const baseTex = await load(packAssetUrl(pack.packRoot, 'layers/base_flat.webp')).catch(() => null);
+        const baseTex = pack ? await load(packAssetUrl(pack.packRoot, 'layers/base_flat.webp')).catch(() => null) : null;
         // land distance + surf adjacency: the whitewater that climbs the rock faces (pipeline: masks/land_distance.webp)
         const landDist = await load(coastDistanceUrl.replace('coast_distance.webp', 'land_distance.webp')).catch(() => null);
         // extracted painted surf strokes — the foam material is the painting itself (pipeline: masks/foam_strokes.webp)
