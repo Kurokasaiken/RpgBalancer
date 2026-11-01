@@ -1,107 +1,74 @@
-# PLAN-107 — HUD Zanara: dai mockup ai componenti reali su /game
+# PLAN-107 — HUD Zanara: dai mockup ai componenti reali su /game — HUD Zanara → componenti reali /game
 
-**Status:** draft — attende battesimo Director
-**Parent:** R-290 (critica HUD + ruling «base = Mockup 1, migliorala»), R-303 (hud-lab)
-**Desiderata di riferimento:** v6 FROZEN (CSS/React-first → asset ad hoc solo per il non-riproducibile, paintover consentito), v8 (Golden UI Foundation)
-**Superficie fork:** `/hud-lab` — ogni ruling per-slot su questa pagina È il visual-fork gate della fase corrispondente.
+**Status:** converged — dibattito mw-web-debate `20261101-hud-zanara-real-components` (run dir in mind-weaver/.mw/runs/), artifact-r004 ACCEPT 3/3 (chatgpt, claude, deepseek; grok+gemini provider_dead), sha256 `e68872f8afd9acc210b98799700bb78f75318329be72977c231edd0ecdb2c699`.
+**Parent:** R-290, R-303. **Fork surface:** `/hud-lab`.
+Cronologia: v1 draft → T-003 critiche convergenti → T-004..T-006 tre round di OBJECT chirurgici → r004.
 
-## Scopo
+## Director rulings (fixed, seq 21)
+- D-1: emblem ONLY in game HUD (reuse authored boot logo asset); word plaque stays title/boot.
+- D-2 + D-3: cornerBL compass+coords AND victory seal BOTH stay. T-002 declares the INTENDED presentation mode per ornament, independent of whether its consumer exists today (e.g. "cornerBL = persistent real-coords readout", "seal = persistent victory-legacy readout"). Persistent inclusion at T-203/T-301 is gated on VERIFIED wiring; if wiring is not verified, the element renders floating/on-demand and is excluded from the fixed budget. Every persistently-rendered element counts toward the 18% budget regardless of binding. No dead chrome.
+- D-4: zanara = SELECTABLE preset next to `base` (base stays default).
+- D-5: per-slot baseline mix allowed, sha256-registered.
+- D-6: react-vN iterations registered in /hud-lab manifest.
+- Metrics: HUD≤18% = perceived surface of fixed chrome; T-102 pass = Director eye-check + numeric proxy (edge/contrast diff) as support.
 
-Trasformare la direzione visiva dei mockup (smalto smeraldo + oro antico + alabastro, famiglia «Zanara» scelta col ruling R-290) nella **HUD e UI reale di `/game`**: token, skin preset, primitive, componenti. Non un'altra iterazione di immagini — la critica 2026-11-01 ha fissato il problema giusto: serve gerarchia e qualità per-componente, non un'altra schermata.
+## Hierarchy
+L0 tokens/assets → L1 HudPlaque/medallion → L2 components → L3 composition. Slots: brand(emblem)+time, resources, roster, panel family (10), nav, cornerBL, cornerBR, seal.
 
-## Divergenza dichiarata da tenere aperta
+## Fase 0 — freeze referenze (nessun codice)
+- T-001: ruling per-slot su /hud-lab; sha256 per crop scelto. (fork gate)
+- T-002: per slot con ruling → asset manifest (cosa è CSS/token vs raster) + PROVISIONAL texture-memory budget proposal (frozen later, after spikes) + ornament presentation modes (wired/persistent vs floating) + emblem legibility check at HUD scale + one-paragraph "why this mix reads coherent" in design-intent.
+- T-002 MATERIAL QUALITY CRITERIA (Director amendment): per ogni superficie si distinguono tre layer — cornice (metallo: microtexture, micro-incisioni, bevel, riflessi controllati), superficie interna (gradienti naturali, profondità cromatica, finitura), inserti (gemme, vetro, smalto, dettagli indipendenti). Criteri di accettazione: nitidezza (no sfocatura/pixel visibili), frequenza del dettaglio (microtexture raffinata, non rumore), profondità cromatica (gradienti e variazioni naturali), material separation (oro/smalto/alabastro distinguibili anche senza decorazioni). Risoluzioni definitive NON fissate a priori: derivate dagli spike e dalle dimensioni reali a schermo.
+- ANIMATED ORNAMENTS (Director amendment 2026-11-01): gli ornamenti funzionali (rosa dei venti/bussola, sigillo, gemme) ricevono piccole animazioni — non asset animati pesanti: mode decisa dagli spike (preferenza: transform/mask CSS o shader Pixi leggero; sprite-sheet/raster-frame solo se necessario e dentro il texture budget). Ogni animazione rispetta prefers-reduced-motion e il perf budget.
+- ASSET QUALITY RULE (Director amendment): ogni asset principale richiede riferimento visivo approvato + dimensioni di produzione + modalità di scaling (9-slice dove appropriato, niente stretching delle decorazioni, varianti per dimensioni reali) + verifica qualità a runtime (alpha reale, nessuna compressione che rovini gradienti/microtexture, texture comuni condivise).
 
-La skin di riferimento corrente è `base` (lacca petrolio `#0f2a35→#060f16` + ottone NMM; ruling 2026-10-16). I mockup sono **smalto verde smeraldo** — più chiaro e più verde. Il ruling R-290 secondo giro ha preferito il look del mockup: il piano assume un **nuovo preset** (`zanara`, nome provvisorio) nel `skinConfigRegistry` invece di mutare `base` in place — decisione D-4 sotto.
+## Fase 1 — spike prima, contratti dopo (ORDINE FISSO)
+- T-102a: medallion spike (roster) — CSS vs raster decision, measured memory cost.
+- T-102b: alabaster panel-frame spike — same decision on the second non-CSS-able surface. Tests BOTH the frame AND its inner surface (gradienti/finitura): a beautiful frame with a flat interior is a FAILED spike.
+- SPIKE FAILURE PATH (bounded): on a failed verdict, work stops; return to T-001/T-002 for a revised reference (new mockup generation ONLY under the design-intent/asset-identity/prompt/provenance canon gate); re-run ONLY the failed spike; max TWO revision rounds total; after that the Director decides rescope (e.g. CSS-only look for that surface) or park PLAN-107.
+- T-101 (freeze, AFTER spike verdicts): preset `zanara` in skinConfigRegistry + --skin-hud-* audit + token migration note (dead tokens) + new families allowed under Zod + dual-preset parity spec (every migrated component renders under BOTH base and zanara; no hardcoded color leaks) + explicit base rollback test + FROZEN texture-memory budget (per-component + total, built on measured spike costs — the T-002 proposal is only provisional input).
+- T-101b: 18% measurement METHOD defined with TWO figures, both computed (Director amendment): (1) DOM bounding box of fixed chrome — conservative measure; (2) perceived-surface overlay — union of actually-occupied pixels including ornaments, astrolabes, gems, shadows, external decoration; overlapping elements counted once (surface union, no double counting). Denominator = the actually-available game viewport at canon sizes 1280/1440/1920/3440 + 390x844 mobile-fit. Every persistently-visible element counts. Run once in Fase 1, re-run gates each Fase-2 closure and T-301.
+- T-103: ONLY the HudPlaque variants the spikes prove needed (no speculative variants).
 
-## Gerarchia dei componenti
+## Fase 2 — componenti in ordine di rischio/valore
+- T-202 resources (least risky, near-final baseline, validates plaque bevel) →
+- T-204 roster: two-state component — CLOSED = vertical medallion column per zanara-v3 mockup (mini state) with an expand control to open the full production roster panel reskinned Zanara; OPEN = production roster structure (LV shields, name, portrait, HP/mana bars, dimmed states) in the Zanara material language. + explicit state→gem CONFIG MAP against real resident states (village/quest/injured/dead/resting — not the mockup's 3; regression test on the map) →
+- T-201 nav + T-203 corners (cornerBR roundels; cornerBL = real-coords readout per T-002 mode; seal consumer wiring per T-002 mode) →
+- T-205 quest-expedition-detail (panel recipe capofila: frame + tokens + editorial hierarchy; per-panel layouts stay) →
+- T-206a registry+merchant+stash ("table" family) →
+- T-206b hero-sheet+event-ledger+memorial+reliquary+settings+load-game ("editorial" family) — separate eye-checks.
 
-Livello 0 = asset/token; L1 = primitive/placche; L2 = cluster/pannelli; L3 = composizione schermata.
+## Fase 3 — composizione/chiusura
+- T-301: composition /game + continuous 18%-budget check (folds old T-207 as checklist: tooltip/toast/popup coherence only, no new modals) + verify ornament bindings landed per T-002 modes.
+- T-302: deterministic baselines per migrated component for BOTH base and zanara at EVERY canon viewport (incl. 390x844 mobile-fit) (Director amendment): animations and dynamic values controlled so diffs catch real regressions, not noise.
+- T-303: perf (gamePerfBudgets non degradato) + a11y (Director amendment: contrast testo/sfondi, focus visibile, navigazione da tastiera, aree cliccabili adeguate, etichette accessibili per le icone, supporto prefers-reduced-motion; 12px = limite minimo assoluto solo per elementi secondari, non la dimensione consigliata) + i18n complete.
 
-| Mockup slot (/hud-lab) | Componente reale target | L1 usata | Note di gerarchia |
+## Contratto di chiusura
+- OB-1 `npm run lint -- src/pages src/ui src/skins src/balancing` verde.
+- OB-2 `npm run build:check` verde.
+- OB-3 regression tests per componente toccato + dual-preset parity spec.
+- OB-4 human-eye Director side-by-side baseline /hud-lab vs implementazione su /game a OGNI viewport canonico: 1280/1440/1920/3440 + 390x844 mobile-fit.
+- OB-5 `npm run closure:lint` verde.
+- Eccezione: Fase 1 spikes — verdict = Director eye-check + numeric proxy; obbligazione human-eye compensativa.
+
+## Guidance Director (GO 2026-11-01)
+- No more full-screen mockups: references frozen in Fase 0, art direction not reopened.
+- Replicable quality over per-component perfection: establish the quality level once, then progressive refinement across later phases.
+- The goal is a material-quality component SYSTEM — not a green-gold reskin of today's HUD.
+
+## Residual watch-items
+- Emblem legibility at HUD scale (checked T-002).
+- Ornament functional bindings (hard sub-requirement T-203/T-301).
+
+## Ruling registrati (T-001 — Director 2026-11-01)
+
+| Slot | Iterazione scelta | sha256 crop (16) | Note |
 |---|---|---|---|
-| `brand` (logo+tempo) | `hud-top-tabs` tab sinistra + (decisione D-1) | `HudPlaque` + asset emblema | Mockup fonde logo+orologio in un'unica placca |
-| `resources` | `hud-top-tabs` tab risorse | `HudPlaque` + icone gemma per risorsa | Critica: «quasi definitivo» — solo superfici e leggibilità |
-| `roster` | `materic-roster-component-v2` (`ResidentRosterPanelV2`) | medaglione ritratto + placca nome + barra + gemma stato | Richiede stati: ready/traveling/wounded come gemme |
-| `panel` | **famiglia pannelli contestuali**: `quest-expedition-detail` (capofila), poi `village-registry`, `merchant-panel`, `village-stash-panel`, `hero-sheet-panel`, `hud-event-ledger`, `memorial-panel`, `legacy-reliquary-panel`, `settings-panel`, `load-game-panel` | frame alabastro + illustrazione verticale + gerarchia editoriale (titolo/tag/testo/ricompense/requisiti/CTA) | Una sola ricetta frame → propagata per famiglia |
-| `nav` | `nav-bar` | plinth + tab incisi + ornamento centrale | Critica: astrolabio ridotto, icone più distintive |
-| `cornerBR` | `hud-corner` | bottoni roundel incisi | Solo funzionali: niente forziere decorativo (critica) |
-| `cornerBL` | — nessun equivalente | — | Decisione D-2: ornamentale, probabilmente escluso |
-| `seal` | — non esiste oggi | — | Decisione D-3: parcheggiato finché non c'è un consumatore |
-
-Fuori scope v1 (inherited automaticamente dai token, non task dedicati): `hud-tooltip`, `quest-outcome-toast`, `quest-reward-popup`, companions di `quest-run-window`, `objective-cartouche`, `stage-edge-strips` — passano alla Fase 3 solo come verifica di coerenza, poi eventuali task di rifinitura separati.
-
-## Fasi e task
-
-### Fase 0 — Freeze delle referenze (gate visivo, nessun codice)
-
-- **T-001 Ruling per slot su `/hud-lab`.** Per ognuno degli 8 slot il Director sceglie l'iterazione baseline (stepper/galleria già operativi). Registro: `plans/PLAN-107-hud-zanara-real-components.md` §Ruling + sha256 del crop scelto in `public/mockups/hud-lab/crops/<slot>/<iter>.webp`. *Questo sostituisce la visual-fork card: la pagina è la superficie di ruling, il crop è la baseline (`baseline_kind: png`).*
-- **T-002 Asset manifest per componente.** Per ogni slot con ruling: lista di ciò che è riproducibile in CSS/token vs ciò che diventa asset (texture smalto, filigrana, medaglione, icone, ornamenti) → `.mw/specs/hud-zanara/asset-manifest.md` + `design-intent.md` + `asset-identity.md` (gate canonico mockup-generator).
-
-### Fase 1 — Token + prova implementativa (chiude il gap «implementabile 5.5/10»)
-
-- **T-101 Preset `zanara` in `skinConfigRegistry`.** Nuovo preset: smalto smeraldo, oro antico opaco, alabastro, gemme (violaceo ammesso come accento per ruling 2026-10-28). Scala `--skin-hud-*` esistente + eventuali token nuovi (Zod). Test snapshot del preset.
-- **T-102 Spike implementabilità sul medaglione roster.** Un solo componente ricostruito davvero (`hud-lab` come iterazione `react-v1` oppure sandbox): gradienti CSS vs texture raster per metallo/smalto/bevel. **Gate: se il medaglione non è riproducibile fedelmente, le tavole vanno riviste prima di proseguire** — non si scala un look non costruibile.
-- **T-103 Estensioni `HudPlaque` minime.** Solo le varianti necessarie dai risultati dello spike (bordo inciso, inserto gemma, bevel). Nessun refactor.
-
-### Fase 2 — Componenti in ordine di dipendenza
-
-Ogni task porta: iterazione `react-vN` registrata in `/hud-lab` (stessa superficie di confronto), regression test permanente (`INV` dove il componente è contrattato — Mode B-amend sui cambi di comportamento), obbligazione `human-eye` con side-by-side baseline vs implementazione a viewport registrato.
-
-- **T-201 `nav-bar`** — plinth + tab incisi + ornamento centrale ridotto. (Più semplice, sblocca il pattern per le tab.)
-- **T-202 `hud-top-tabs`** — barra risorse plated + eventuale placca brand (subordinata a D-1).
-- **T-203 `hud-corner`** — bottoni d'angolo roundel incisi.
-- **T-204 Roster v2 → colonna medaglioni** — stati come gemme, selezione, differenziazione medaglioni.
-- **T-205 `quest-expedition-detail`** — primo pannello con la ricetta «pannello contestuale» (illustrazione verticale + gerarchia editoriale).
-- **T-206 Propagazione famiglia pannelli** — registry, merchant, stash, hero sheet, event ledger, memorial, reliquary, settings, load game. Batch per-file, stessa ricetta.
-- **T-207 Tooltip + toast + popup** — skin pass di coerenza (solo se emergono dissonanze all'eye-check).
-
-### Fase 3 — Composizione, baselines, chiusura
-
-- **T-301 Composizione finale su `/game`.** Layout a schermo intero con tutti i componenti migrati; verifica 18% HUD a riposo; D-1/D-2/D-3 applicate.
-- **T-302 Baseline deterministiche** — screenshot baseline per componente migrato (stessa infrastruttura delle regression esistenti).
-- **T-303 Perf + a11y sweep** — `gamePerfBudgets` non degradato, nessun testo <12px, i18n completo (chiavi nuove nei JSON, mai inline).
-
-## Decisioni aperte (NON decise dal planner — ruling Director)
-
-- **D-1 Logo in HUD di gioco**: i mockup mostrano la placca WANDERLUST nella HUD; produzione non ce l'ha. Tenere o solo title/boot?
-- **D-2 `cornerBL`** (bussola+coordinate): ornamentale — la critica dice via i decorativi. Escludere o dargli una funzione (es. readout coordinate reali)?
-- **D-3 `seal` vittoria**: nessun consumatore attuale. Parcheggiare (nessuno slot in produzione) o anticiparlo?
-- **D-4 Preset**: `zanara` come nuovo preset selezionabile accanto a `base`, o `zanara` diventa il default? (Ruling 2026-10-16 fissava `base` come default.)
-- **D-5 Mix per-componente**: il ruling T-001 può produrre una famiglia mista (es. roster da v2, pannello da v3) — inteso.
-- **D-6 Iterazioni React in `/hud-lab`**: registrare `react-vN` come iterazioni dello stesso manifest (consigliato: stessa superficie di confronto) o confronto solo su `/game`?
-
-## Contratto di chiusura (plan-level)
-
-- **OB-1** `npm run lint -- src/pages src/ui src/skins src/balancing` verde.
-- **OB-2** `npm run build:check` verde.
-- **OB-3** regression test per ogni componente toccato: `npm run test -- tests/unit/idleVillage` + spec e2e di superficie verdi (o emendate via `sync:bug` Mode B dove il comportamento cambia di proposito).
-- **OB-4** `human-eye` Director: side-by-side baseline `/hud-lab` vs implementazione su `/game` per ogni slot migrato (stesso viewport 1600×900, artefatto in `test-results/plan-107/`).
-- **OB-5** `npm run closure:lint` verde.
-- Eccezione dichiarata: per le iterazioni React Fase 1-2 il regression-test permanente è lo skin/component spec esistente; dove non esiste, obbligazione `human-eye` compensativa.
-
-## Trappole applicate
-
-- **T-04**: nessun claim percettivo senza side-by-side; l'eye-check Director chiude ogni fase.
-- **T-05**: nessuna riscrittura di componenti trusted/frozen senza aggiornare contratto + `*_trusted.md` + master index (40-documentation-governance).
-- **T-13**: worktree condiviso — nessun commit scoped che catturi lavoro altrui; probe in retry.
-- **Invarianti**: preset in `skinConfigRegistry` (mai `.css` standalone), niente valori hardcoded, i18n per ogni stringa nuova, riuso primitive (`src/ui/atoms`, `idleVillage/skins/primitives`, `frozen/kits`) prima di componenti nuovi.
-- **Mockup**: niente generazione senza `design-intent`/`asset-identity`/`prompt` (`--enforce-canon`); raw mockups mai committati (`public/mockups/` è gitignored).
-
-## Cosa questo piano NON è
-
-- Non è un piano di generazione immagini: le tavole esistono già (`/hud-lab`), il lavoro è a valle.
-- Non tocca la mappa (`mappa2` resta nel suo binario PLAN-089 figli).
-- Non ridisegna il layout di produzione: la composizione resta quella di `/game` salvo ruling D-1..D-3.
-
-## Ruling registrati (si compila a T-001)
-
-| Slot | Iterazione scelta | sha256 crop | Note |
-|---|---|---|---|
-| brand | — | — | |
-| resources | — | — | |
-| roster | — | — | |
-| panel | — | — | |
-| nav | — | — | |
-| cornerBL | — | — | |
-| cornerBR | — | — | |
-| seal | — | — | |
+| brand | board-palette | 275bd04bde4caa1c | → emblem only per D-1 |
+| resources | zanara-v3 | 7181c2ba22a49f06 | |
+| roster | zanara-v3 | acb1b625e1463578 | **closed = colonna medaglioni del mockup + pulsante espansione**; open = roster di produzione reskinned |
+| panel | zanara-v3 (alt ref: board-palette a96be5fd) | 8e641e83d79c1475 | |
+| nav | — nessun ruling ancora | — | default provvisorio: zanara-v1 24b8bd98 |
+| cornerBL | zanara-v1 | 8ab9ba9b9fbd50be | OPEN: doppia rosa dei venti con brand/nav? → serve nuova idea |
+| cornerBR | board-breakdown | b8b6e98f78d69f0b | |
+| seal | mockup1-classic | 7f57428788e6bd4e | unica fonte con sigillo → wired legacy (D-3) |

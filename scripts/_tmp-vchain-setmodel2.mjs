@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.connectOverCDP('http://127.0.0.1:9222');
+const ctx = b.contexts()[0];
+const p = await ctx.newPage();
+await p.goto('https://gemini.google.com/app/62fef4ba9be16c58', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await p.waitForTimeout(5000);
+await p.click('button[aria-label*="selettore modalità"]');
+await p.waitForTimeout(1500);
+await p.screenshot({ path: 'out/village-chain/model-menu.png' });
+const cands = await p.evaluate(() => [...document.querySelectorAll('*')].filter((el) => /3\.1 Pro|Argon|Flash/i.test(el.textContent || '') && el.children.length < 4).map((el) => ({ tag: el.tagName, text: (el.textContent || '').trim().slice(0, 70), role: el.getAttribute('role') })));
+console.log(JSON.stringify(cands.slice(0, 12), null, 1));
+await p.close();
+await b.close();
