@@ -333,9 +333,10 @@ function App() {
 
   const { config, initialized, isInitializing, initializeConfig } = useIdleVillageConfig();
   const isMobile = useIsMobile();
-  // Mobile landing (R-297): on mobile the root path lands on the mappa2 lab
-  // instead of the game frame; desktop keeps the game frame.
-  const isMobileLandingPath = isMobile && isRootPath;
+  // Landing (R-297 mobile → estesa a desktop, Director 2026-11-01): the root
+  // path lands on the mappa2 lab on every device; the game frame lives at
+  // /game and /game-frame-pixi.
+  const isLandingPath = isRootPath;
 
   const getInitialTab = useCallback((): AppNavTabId => {
     // Priority 1: URL parameter (for deep linking and tests)
@@ -387,11 +388,11 @@ function App() {
     }
   }, [shouldRedirectToMinimalMode]);
 
-  // Mobile landing (R-297): canonicalize the URL to /mappa2-lab without a
+  // Landing (R-297): canonicalize the URL to /mappa2-lab without a
   // reload — the same page component is already rendered for this path.
   useEffect(() => {
     if (
-      isMobileLandingPath &&
+      isLandingPath &&
       typeof window !== 'undefined' &&
       window.location.pathname !== '/mappa2-lab'
     ) {
@@ -401,7 +402,7 @@ function App() {
         `/mappa2-lab${window.location.search}${window.location.hash}`,
       );
     }
-  }, [isMobileLandingPath]);
+  }, [isLandingPath]);
 
   useEffect(() => {
     const handleNavigate = () => setActiveTab('spellCreationNew');
@@ -1079,7 +1080,7 @@ function App() {
     );
   }
 
-  if (isGameFramePixiPath || isGamePath || (isRootPath && !isMobileLandingPath)) {
+  if (isGameFramePixiPath || isGamePath) {
     return (
       <ErrorBoundary componentName="Game Frame Pixi Page">
         <Suspense fallback={<GameBootScreen phase="manifest" indeterminate />}>
@@ -1101,7 +1102,7 @@ function App() {
     );
   }
 
-  if (isMappa2LabPath || isMobileLandingPath) {
+  if (isMappa2LabPath || isLandingPath) {
     return (
       <ErrorBoundary componentName="Mappa2 Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Mappa2 Lab...</div>}>

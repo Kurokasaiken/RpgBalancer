@@ -5340,3 +5340,18 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Dibattito lanciato (2026-11-01):** PLAN-107 sottoposto a mw-web-debate run `20261101-hud-zanara-real-components` (chatgpt 8 immagini allegate, gemini contact-sheet 1 immagine, claude/grok/deepseek testo). Clarification T-001 in volo.
 
 **Implementazione:** route `/hud-lab` — PixiWorldMap mappa2 + slot overlay per componente (brand, risorse, roster, pannello contestuale, nav, angoli, sigillo) con stepper per ciclare le iterazioni + galleria per vedere tutte le varianti. Pipeline: `scripts/build-hud-lab-crops.mjs` (sharp, box per fonte → `public/mockups/hud-lab/` gitignored + `manifest.json`), `scripts/capture-hud-production.mjs` (playwright → crop produzione).
+
+## R-304 — Deploy Vercel: il deploy non è "fatto" finché la verifica post-deploy non è verde; altrimenti fix-iterare finché non passa
+
+**Richiesta (verbatim, 2026-11-01):** *"Dobbimao assicurarci che quando viene fatto commit andn push e il deploy su vercel debba essere controllato che sia andato a buon fine, se così nn è,bisogna fixare i problemi fino a quando nn va tutto con successo"*
+**Data:** 2026-11-01
+**Stato:** `in corso`
+**Contesto:** il deploy del 2026-11-01 passò i check del guardian (pagine 200) ma `/game` crashava su browser con WebGL reale (`pack.packRoot` su manifest senza pack — il probe headless senza GPU cade su renderer Canvas e non esercita il path mesh). Lezione: "pagina risponde" ≠ "mondo preparato".
+**Requisito:** dopo commit+push+deploy la verifica deve esercitare il path reale (probe con WebGL/swiftshader su `/` e superfici Pixi), non solo HTTP 200; su failure si itera il fix finché tutto è verde.
+
+## R-305 — Landing page identica su desktop e mobile: `/` → `/mappa2-lab`
+
+**Richiesta (verbatim, 2026-11-01):** *"la landing page deve essre la stessa anche x desktop"* (riferimento: `http://127.0.0.1:5173/mappa2-lab` *"questa dovrebbe essere la landing page"*)
+**Data:** 2026-11-01
+**Stato:** `in corso`
+**Decisione:** estende R-297 (mobile landing su `/mappa2-lab`) a tutti i device: `/` renderizza `Mappa2LabPage` ovunque e canonicalizza l'URL a `/mappa2-lab`; il game frame resta su `/game` e `/game-frame-pixi`.
