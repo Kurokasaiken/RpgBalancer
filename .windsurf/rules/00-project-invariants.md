@@ -84,6 +84,21 @@ npm run closure:lint
 ```
 If any safeguard fails, the task is **BLOCKED**, not complete.
 
+## Deploy verification (R-304, Director 2026-11-01)
+- A Vercel deploy is **not "done"** until post-deploy verification is green on
+  the production alias (`rpg-balancer.vercel.app`), not just "deployment live".
+- "Page responds 200" is not proof: the check must exercise the real runtime
+  path. For Pixi surfaces (`/`, `/game`, `/mappa2-lab`, `/hud-lab`) that means a
+  headless probe **with WebGL enabled** (`chromium.launch({ args:
+  ['--enable-unsafe-swiftshader'] })`) — without a GPU the renderer falls back
+  to Canvas and skips mesh/shader code paths entirely (R-304 incident:
+  `pack.packRoot` crash invisible to plain probes).
+- Reusable probes live in `scripts/_tmp-boot-wait.mjs` (boot completes, no
+  `[role="alert"]`) and `scripts/_tmp-landing-check.mjs`.
+- On any verification failure: fix the problem and iterate until the whole
+  cycle (safeguards → deploy → post-deploy verification) is green. Never report
+  "deploy OK" on a failed or unverified check — say what was not verified (T-04).
+
 ## Workflow operativo (R-208, Director 2026-10-16)
 
 - La kanban board (`src/docs/docs/coordinator/agent_assignments.md`), il
