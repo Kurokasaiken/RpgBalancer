@@ -1261,7 +1261,7 @@ def main() -> None:
     parser.add_argument("--source", default=str(Path.home() / "Downloads" / "mappa2.jpeg"))
     parser.add_argument("--out", default="public/assets/world/mappa2/base")
     parser.add_argument("--pipeline-version", default="mappa2-assets-v1")
-    parser.add_argument("--mask-revision", type=int, default=5)
+    parser.add_argument("--mask-revision", type=int, default=6)
     parser.add_argument("--cloud-source", default=str(Path.home() / "Downloads" / "nuvole.jpeg"))
     args = parser.parse_args()
 
@@ -1297,6 +1297,13 @@ def main() -> None:
     foreground = (foreground > 0) & land
     territory = load_territory_maps(out)
     biome_ids = territory["biome_ids"]
+    # mask-revision 6: the border-connected water class also swallows painted
+    # snow/glacier and bright forest that touch the sea — the surf shader then
+    # draws jagged foam on the peaks. The authored biome map knows that land:
+    # cut sea∩land_biomes back out; carved pixels become land, never water.
+    land_area = np.isin(biome_ids, [b["index"] for b in territory["biomes"] if b.get("kind") == "land"])
+    sea &= ~land_area
+    land = ~(sea | internal_water)
     canopy_blocked = biome_mask(biome_ids, territory["biome_index"], CANOPY_BLOCKED_BIOMES)
     dense_forest_core = fill_polygon((WORLD_H, WORLD_W), DENSE_FOREST_CORE_POLYGON) > 0
 

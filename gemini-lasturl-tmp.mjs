@@ -7,4 +7,4 @@ await p.waitForTimeout(15000);
 const big=[];
 for(const im of await p.$$('img')){const bb=await im.boundingBox().catch(()=>null);if(bb&&bb.width>300)big.push(im);}
 if(big.length){await big[big.length-1].screenshot({path:out});console.log('SAVED',big.length);}
-await b.close();
+

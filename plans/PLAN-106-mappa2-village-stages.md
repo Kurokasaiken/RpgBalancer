@@ -39,7 +39,7 @@
 - Witness: `test-results/village-witness-2026-11-01-v2/` — piastra cottages (interim=stage1.webp) renderizzata in zona; picker OK.
 - Safeguards: lint scope 0 err; vitest 6/6; build:check green.
 - T7-T8 FATTI: catena Gemini 22 piastre generate+registrate+esportate (`out/village-chain/`, chat app/8dc5c68940c87647); zona corretta a 380×380 (anello usciva dal rect 300×260); manifest shipped×22.
-- T9 IN CORSO: documento review `test-results/village-review-2026-11-01/REVIEW.md` + contact-sheet — atteso giudizio Director.
+- T9 IN CORSO (v4): zona corretta 510×350 (ring clip fix), picker piatto 26 stati, +4 piastre cottages/straw difese; documento review `test-results/village-review-2026-11-01/REVIEW.md` + contact-sheet — atteso giudizio Director.
 - APERTI: T10 pulizia asset legacy (el-*.png, stage*, parts/) + verify:bundle + fatta. Incidenti annotati: router Auto Gemini → modello testo ×2 (fix: chat nuova + immagine allegata); export_plate cropava l'angolo sbagliato (fix); zone rect iniziale non conteneva il ring (fix).
 
 ## 1. Goal

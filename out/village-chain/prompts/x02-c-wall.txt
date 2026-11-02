@@ -1,0 +1,1 @@
+Edit this image: keep EVERYTHING identical — same trees, rocks, river, mountains, same 3 cottages with golden roofs in the same positions. Add a STONE WALL — a continuous grey stone rampart — encircling the cottages in the meadow, with a small gate opening facing the footpath. Same painted style, same scale, same light. No towers, no extra buildings. Output the edited image.
