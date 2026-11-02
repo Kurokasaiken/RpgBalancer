@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { PixiWorldMap, type PixiBootProgress } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
+import { mountainClarityLive, mountainShadeLive, seaGradeLive } from './mappa2-grade';
 import { RosterSpike } from './hud-lab/spikes/RosterSpike';
 import { PanelFrameSpike } from './hud-lab/spikes/PanelFrameSpike';
 
@@ -156,6 +157,9 @@ export default function HudLabPage() {
       <PixiWorldMap
         manifestPath={MAP_MANIFEST}
         stageColor={STAGE_COLOR}
+        mountainShade={mountainShadeLive}
+        mountainClarity={mountainClarityLive}
+        seaGrade={seaGradeLive}
         onBootProgress={setBoot}
         onReady={() => setMapReady(true)}
         onBootError={(err) => setMapError(err.message)}
@@ -247,6 +251,7 @@ export default function HudLabPage() {
             }}
           >Ruling ⬇</button>
           <button type="button" style={ctrlBtn} onClick={() => setControlsVisible(false)}>Hide UI (H)</button>
+          <a href="/fork-mountains/index.html" target="_blank" rel="noreferrer" style={{ ...ctrlBtn, textDecoration: 'none', display: 'inline-block' }}>Fork montagne</a>
         </div>
       )}
       {!controlsVisible && (

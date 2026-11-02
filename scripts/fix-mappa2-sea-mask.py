@@ -60,9 +60,11 @@ def main() -> None:
 
     # sanity: the reproduction must match the shipped sea_mask before carving
     shipped_sea = np.array(Image.open(pack / "masks" / "sea_mask.webp").getchannel("A")) > 128
-    diff = int((sea_raw != shipped_sea).sum())
-    print(f"reproduced sea vs shipped: {diff} px differ")
-    if diff > 120000:  # shipped was classified on the source JPEG; webp re-encode wobbles ~2px of boundary
+    # Invariant: shipped sea must be a subset of the raw class (minus edge wobble).
+    # The other direction (raw minus shipped) is exactly the previous carve.
+    over = int((shipped_sea & ~sea_raw).sum())
+    print(f"shipped sea outside raw class: {over} px (edge wobble expected)")
+    if over > 60000:
         raise SystemExit("reproduction diverges from the shipped mask — aborting instead of corrupting the pack")
 
     # ── carve authored land biomes out of the sea partition ──
@@ -72,6 +74,15 @@ def main() -> None:
     land_area = np.isin(biome_ids, land_idx)
     fake_sea = sea_raw & land_area
     sea = sea_raw & ~fake_sea
+    # Second pass: the carve itself fragments the sea — pockets of fake water
+    # inside sea-kind biomes (the peak tips) get stranded fully landlocked.
+    # A real sea reach keeps a water path to the border; drop what doesn't.
+    sea_n, sea_lab = cv2.connectedComponents(sea.astype(np.uint8), connectivity=8)
+    sea_bl = np.unique(np.concatenate([sea_lab[0], sea_lab[-1], sea_lab[:, 0], sea_lab[:, -1]]))
+    stranded = sea & ~np.isin(sea_lab, sea_bl[sea_bl > 0])
+    sea &= ~stranded
+    fake_sea |= stranded
+    internal_water = internal_water & ~fake_sea
     land = ~(sea | internal_water)
     print(f"carved {int(fake_sea.sum())} px of swallowed land out of sea ({fake_sea.sum() / sea_raw.sum() * 100:.1f}% of old sea)")
     for b in biomes:
@@ -92,16 +103,38 @@ def main() -> None:
     painted_white = cv2.morphologyEx(painted_white.astype(np.uint8), cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))
     surf = np.clip(cv2.GaussianBlur(painted_white.astype(np.float32), (0, 0), 7.0) * 3.2, 0, 1)
     # painted surf recede plate (same recipe as the pipeline's foam_clean)
-    foam_px = (rgb.min(axis=2) >= 168) & sea_near & (coast_px <= 70)
+    # Bright AND not warm: beach sand passes the brightness test too, and plating it read as cyan blobs with a
+    # dark rim on every beach (Director 2026-11-02, «macchie di sporco»). Painted surf is white-to-cyan (B >= R).
+    # rock FOOT only: sea straight below (within 25 px) and rock on both sides — the side silhouettes of
+    # a cliff have sea below them too in this top-down-angled painting, and their bright rim became a line
+    sea_u = sea.astype(np.uint8)
+    below = np.zeros_like(sea)
+    for k in range(1, 26):
+        below[:-k] |= sea[k:]
+    landish = ~sea
+    sides = np.zeros_like(sea)
+    sides[:, 8:-8] = landish[:, :-16] & landish[:, 16:]
+    rock_foot = ~sea & (land_px <= 25) & below & sides
+    # ...and the surf painted ON the rock foot (within 25 px of the sea): left unplated it stayed white
+    # forever while the waves came and went beside it (Director 2026-11-02, «bianco sempre disegnato»).
+    foam_px = ((rgb.min(axis=2) >= 168) & (rgb[..., 2].astype(np.int16) - rgb[..., 0] >= -12)
+               & ((sea_near & (coast_px <= 70)) | rock_foot))
     foam_px = cv2.dilate(foam_px.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))) > 0
-    near_foam = cv2.dilate(foam_px.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))) > 0
-    valid = (sea & ~near_foam & (rgb.min(axis=2) < 125) & (coast_px > 2)).astype(np.float32)
+    # Fill the foam footprint from its nearest non-foam neighbours (water, sand, rock alike), smallest scale
+    # first: a normalised convolution cascade. A blur of "clearly water" fell back to deep-sea blue at the
+    # shore (blue streak on beaches); cv2.inpaint smeared streaks and rock blobs across wide footprints
+    # (Director 2026-11-02, «macchie di sporco», grey smear at the rock feet).
+    hole = cv2.dilate(foam_px.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
+    valid = (~hole & (rgb.min(axis=2) < 168)).astype(np.float32)
     rgbf = rgb.astype(np.float32)
-    num = cv2.GaussianBlur(rgbf * valid[..., None], (0, 0), 9.0)
-    den = cv2.GaussianBlur(valid, (0, 0), 9.0)[..., None]
-    num2 = cv2.GaussianBlur(rgbf * valid[..., None], (0, 0), 28.0)
-    den2 = cv2.GaussianBlur(valid, (0, 0), 28.0)[..., None]
-    fill = np.where(den > 0.03, num / np.maximum(den, 1e-4), num2 / np.maximum(den2, 1e-4))
+    fill = rgbf.copy()
+    todo = hole.copy()
+    for sigma in (3.0, 6.0, 12.0, 24.0, 48.0):
+        den = cv2.GaussianBlur(valid, (0, 0), sigma)
+        num = cv2.GaussianBlur(rgbf * valid[..., None], (0, 0), sigma)
+        ok = todo & (den > 0.15)
+        fill[ok] = num[ok] / den[ok][:, None]
+        todo &= ~ok
     foam_a = np.clip(cv2.GaussianBlur(foam_px.astype(np.float32), (0, 0), 1.6) * 1.25, 0, 1)
 
     masks_dir = pack / "masks"

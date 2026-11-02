@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+p.setDefaultTimeout(90000);
+await p.goto('http://localhost:5173/mappa2-lab', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await p.waitForFunction(() => window.__worldCamCtl, { timeout: 90000 });
+await p.waitForTimeout(2500);
+await p.evaluate(() => { const e = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'village'); e?.click(); });
+await p.waitForTimeout(800);
+const labels = await p.evaluate(() => [...document.querySelectorAll('button')].map((x) => x.textContent.trim()).filter(Boolean));
+console.log(labels.join('\n'));
+await b.close();

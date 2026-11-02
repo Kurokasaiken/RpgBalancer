@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+p.setDefaultTimeout(90000);
+await p.goto('http://localhost:5173/mappa2-lab', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await p.waitForFunction(() => window.__worldCamCtl, { timeout: 90000 });
+await p.waitForTimeout(4000);
+await p.evaluate(() => { window.__worldCamCtl.set({ panX: 1292 - 720 / 1.2, panY: 200 - 450 / 1.2, zoom: 1.2 }); });
+await p.waitForTimeout(1500);
+await p.screenshot({ path: 'test-results/village-witness-2026-11-02/bay-fixed.png' });
+await b.close(); console.log('done');

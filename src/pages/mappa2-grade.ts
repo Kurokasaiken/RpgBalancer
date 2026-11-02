@@ -22,6 +22,8 @@ export interface Mappa2Grade {
   contrast: number;
   /** 0-1 opacity of the baked northern-rock shade (PixiWorldMap `mountainShade`). */
   mountainShade: number;
+  /** 0-1 opacity of the clarity plate over the massif (PixiWorldMap `mountainClarity`, fork C 2026-11-02). */
+  mountainClarity: number;
   /** 0-1 opacity of the baked sapphire sea (PixiWorldMap `seaGrade`). */
   seaSapphire: number;
 }
@@ -34,11 +36,15 @@ export const DEFAULT_MAPPA2_GRADE: Mappa2Grade = {
   saturation: 1.15,
   contrast: 1.06,
   mountainShade: 1,
+  mountainClarity: 1,
   seaSapphire: 1,
 };
 
 /** Live object handed to PixiWorldMap; the controls mutate `opacity`, the map reads it every tick (no rebuild). */
 export const mountainShadeLive = { url: '/assets/world/mappa2/base/fx/mountain-shade.webp', opacity: DEFAULT_MAPPA2_GRADE.mountainShade };
+
+/** Clarity (unsharp-on-L) plate over the massif — fork C ruling 2026-11-02; `opacity` 0-1 live. */
+export const mountainClarityLive = { url: '/assets/world/mappa2/base/fx/mountain-clarity.webp', opacity: DEFAULT_MAPPA2_GRADE.mountainClarity };
 
 /** Live object handed to PixiWorldMap, same pattern as `mountainShadeLive`. */
 export const seaGradeLive = {

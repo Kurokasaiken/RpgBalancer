@@ -27,15 +27,21 @@ function Row({ name, lv, hp, img }: { name: string; lv: number; hp: number; img:
       <img src={ROW_SRC} alt="" draggable={false} style={{ width: '100%', display: 'block' }} />
       {/* portrait fitted to measured ring hole: cx≈34.4%, cy≈51%, d≈28.5% of row */}
       <div style={{
-        position: 'absolute', left: '20%', top: '50%', transform: 'translateY(-50%)',
-        width: '28.5%', aspectRatio: '1', borderRadius: '50%', overflow: 'hidden',
+        position: 'absolute', left: '14%', top: '70.4%', transform: 'translateY(-50%)',
+        width: '25%', aspectRatio: '1', borderRadius: '50%', overflow: 'hidden',
         boxShadow: 'inset 0 4px 9px rgba(0,0,0,0.7)',
       }}>
         <img src={img} alt={name} draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 16%, rgba(255,255,255,0.14), transparent 55%)' }} />
       </div>
-      {/* name + lv + hp inside measured plaque interior (x≈52-92%, y≈26-82%) */}
-      <div style={{ position: 'absolute', left: '52%', top: '30%', right: '8%' }}>
+      {/* enamel backing inside measured plaque body (x 45-89%, y 42-89%) */}
+      <div style={{
+        position: 'absolute', left: '46%', top: '46%', right: '12%', height: '38%',
+        background: 'linear-gradient(160deg, #0d3b30, #0a2e25)',
+        borderRadius: '0 10px 10px 0', boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.55)',
+      }} />
+      {/* name + lv + hp inside plaque interior */}
+      <div style={{ position: 'absolute', left: '50%', top: '50%', right: '14%' }}>
         <div style={{ fontFamily: '"EB Garamond", serif', fontSize: 15, color: IVORY, lineHeight: 1.1, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{name}</div>
         <div style={{ fontFamily: '"EB Garamond", serif', fontSize: 10, color: '#a8cdbb', lineHeight: 1.4 }}>Lv. {lv}</div>
         <div style={{ marginTop: 4, width: '82%', height: 5, borderRadius: 2.5, background: 'rgba(0,0,0,0.45)', border: '1px solid rgba(212,175,55,0.45)', overflow: 'hidden' }}>

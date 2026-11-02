@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
-import { DEFAULT_MAPPA2_GRADE, GRADE_FILTER_ID, gradeCssFilter, gradeFilterMarkup, mountainShadeLive, seaGradeLive, type Mappa2Grade } from './mappa2-grade';
+import { DEFAULT_MAPPA2_GRADE, GRADE_FILTER_ID, gradeCssFilter, gradeFilterMarkup, mountainClarityLive, mountainShadeLive, seaGradeLive, type Mappa2Grade } from './mappa2-grade';
 
 const STORAGE_KEY = 'mappa2-lab:grade:v3';
 
@@ -38,6 +38,7 @@ export function useMappa2Grade() {
     }
     seaGradeLive.opacity = grade.seaSapphire;
     mountainShadeLive.opacity = grade.mountainShade; // the north-mountain grade is part of the map look: independent of the look-dev checkbox
+    mountainClarityLive.opacity = grade.mountainClarity;
     svg.innerHTML = gradeFilterMarkup(grade);
     const apply = () => {
       const cv = pixiCanvas();

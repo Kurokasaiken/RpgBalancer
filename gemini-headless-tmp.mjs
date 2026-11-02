@@ -18,13 +18,13 @@ if(mode==='new'){
     await p.waitForTimeout(9000);
     await p.keyboard.press('Escape').catch(()=>{});
     const fi = p.locator('input[type="file"]').first();
-    if(await fi.count()){ await fi.setInputFiles(a); uploaded=true; break; }
+    if(await fi.count()){ await fi.setInputFiles(a.split(',')); uploaded=true; break; }
     const fcP=p.waitForEvent('filechooser',{timeout:12000}).catch(()=>null);
     await p.locator('button[aria-label*="pload"], button[aria-label*="Caricamento"], [aria-label*="tools"]').first().click({force:true,timeout:8000}).catch(()=>{});
     await p.waitForTimeout(1200);
     await p.locator('[role="menuitem"]:has-text("File"), [role="menuitem"]:has-text("ile"), button:has-text("File")').first().click({force:true,timeout:8000}).catch(()=>{});
     const fc=await fcP;
-    if(fc){ await fc.setFiles(a); uploaded=true; }
+    if(fc){ await fc.setFiles(a.split(',')); uploaded=true; }
     else console.log('upload attempt',attempt,'failed');
   }
   if(!uploaded){console.log('NO FILECHOOSER x3');await browser.close();process.exit(1);}

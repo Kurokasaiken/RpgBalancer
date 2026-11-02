@@ -1,1177 +1,1288 @@
 {
-  "version": 2,
-  "zone": {
-    "x": 1260,
-    "y": 505,
-    "w": 510,
-    "h": 390,
-    "feather": {
-      "shape": "ellipse",
-      "px": 28
-    }
+ "version": 2,
+ "zone": {
+  "x": 1260,
+  "y": 505,
+  "w": 510,
+  "h": 390,
+  "feather": {
+   "shape": "ellipse",
+   "px": 28
+  }
+ },
+ "growth": [
+  "meadow",
+  "cottages",
+  "straw",
+  "stone"
+ ],
+ "axes": {
+  "defence": {
+   "values": [
+    "none",
+    "palisade",
+    "wall"
+   ]
   },
-  "growth": [
-    "meadow",
-    "cottages",
-    "straw",
+  "towers": {
+   "slots": 2,
+   "each": [
+    "none",
+    "wood",
     "stone"
-  ],
-  "axes": {
-    "defence": {
-      "values": [
-        "none",
-        "palisade",
-        "wall"
-      ]
-    },
-    "towers": {
-      "slots": 2,
-      "each": [
-        "none",
-        "wood",
-        "stone"
-      ]
-    }
+   ]
+  }
+ },
+ "uiRules": {
+  "towersRequireDefence": false
+ },
+ "registration": {
+  "nullEditResidualPx": null,
+  "layoutLockMaxPx": 2
+ },
+ "plates": [
+  {
+   "key": "meadow|none|none+none",
+   "src": "meadow-none-none-none.webp",
+   "gen": {
+    "prompt": "fresh meadow repaint of base crop"
+   },
+   "shipped": true
   },
-  "uiRules": {
-    "towersRequireDefence": true
+  {
+   "key": "cottages|none|none+none",
+   "src": "cottages-none-none-none.webp",
+   "gen": {
+    "parent": "meadow|none|none+none"
+   },
+   "shipped": true
   },
-  "registration": {
-    "nullEditResidualPx": null,
-    "layoutLockMaxPx": 2
+  {
+   "key": "straw|none|none+none",
+   "src": "straw-none-none-none.webp",
+   "gen": {
+    "parent": "cottages|none|none+none"
+   },
+   "shipped": true
   },
-  "plates": [
-    {
-      "key": "meadow|none|none+none",
-      "src": "meadow-none-none-none.webp",
-      "gen": {
-        "prompt": "fresh meadow repaint of base crop"
-      },
-      "shipped": true
-    },
-    {
-      "key": "cottages|none|none+none",
-      "src": "cottages-none-none-none.webp",
-      "gen": {
-        "parent": "meadow|none|none+none"
-      },
-      "shipped": true
-    },
-    {
-      "key": "straw|none|none+none",
-      "src": "straw-none-none-none.webp",
-      "gen": {
-        "parent": "cottages|none|none+none"
-      },
-      "shipped": true
-    },
-    {
-      "key": "stone|none|none+none",
-      "src": "stone-none-none-none.webp",
-      "gen": {
-        "parent": "straw|none|none+none"
-      },
-      "shipped": true
-    },
-    {
-      "key": "stone|palisade|none+none",
-      "src": "stone-palisade-none-none.webp",
-      "gen": {
-        "parent": "stone|none|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|palisade|wood+none",
-      "src": "stone-palisade-wood-none.webp",
-      "gen": {
-        "parent": "stone|palisade|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|palisade|none+wood",
-      "src": "stone-palisade-none-wood.webp",
-      "gen": {
-        "parent": "stone|palisade|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|palisade|wood+wood",
-      "src": "stone-palisade-wood-wood.webp",
-      "gen": {
-        "parent": "stone|palisade|wood+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|palisade|stone+none",
-      "src": "stone-palisade-stone-none.webp",
-      "gen": {
-        "parent": "stone|palisade|wood+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|palisade|none+stone",
-      "src": "stone-palisade-none-stone.webp",
-      "gen": {
-        "parent": "stone|palisade|none+wood"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|palisade|wood+stone",
-      "src": "stone-palisade-wood-stone.webp",
-      "gen": {
-        "parent": "stone|palisade|wood+wood"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|palisade|stone+wood",
-      "src": "stone-palisade-stone-wood.webp",
-      "gen": {
-        "parent": "stone|palisade|wood+wood"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|palisade|stone+stone",
-      "src": "stone-palisade-stone-stone.webp",
-      "gen": {
-        "parent": "stone|palisade|stone+wood"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|none+none",
-      "src": "stone-wall-none-none.webp",
-      "gen": {
-        "parent": "stone|palisade|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|wood+none",
-      "src": "stone-wall-wood-none.webp",
-      "gen": {
-        "parent": "stone|wall|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|none+wood",
-      "src": "stone-wall-none-wood.webp",
-      "gen": {
-        "parent": "stone|wall|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|wood+wood",
-      "src": "stone-wall-wood-wood.webp",
-      "gen": {
-        "parent": "stone|wall|wood+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|stone+none",
-      "src": "stone-wall-stone-none.webp",
-      "gen": {
-        "parent": "stone|wall|wood+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|none+stone",
-      "src": "stone-wall-none-stone.webp",
-      "gen": {
-        "parent": "stone|wall|none+wood"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|wood+stone",
-      "src": "stone-wall-wood-stone.webp",
-      "gen": {
-        "parent": "stone|wall|wood+wood"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|stone+wood",
-      "src": "stone-wall-stone-wood.webp",
-      "gen": {
-        "parent": "stone|wall|wood+wood"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "stone|wall|stone+stone",
-      "src": "stone-wall-stone-stone.webp",
-      "gen": {
-        "parent": "stone|wall|stone+wood"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "cottages|palisade|none+none",
-      "src": "cottages-palisade-none-none.webp",
-      "gen": {
-        "parent": "cottages|none|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "cottages|wall|none+none",
-      "src": "cottages-wall-none-none.webp",
-      "gen": {
-        "parent": "cottages|none|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "straw|palisade|none+none",
-      "src": "straw-palisade-none-none.webp",
-      "gen": {
-        "parent": "straw|none|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    },
-    {
-      "key": "straw|wall|none+none",
-      "src": "straw-wall-none-none.webp",
-      "gen": {
-        "parent": "straw|none|none+none"
-      },
-      "shipped": true,
-      "anchors": {
-        "ring": [
-          {
-            "x": 251,
-            "y": 58
-          },
-          {
-            "x": 461,
-            "y": 186
-          },
-          {
-            "x": 251,
-            "y": 314
-          },
-          {
-            "x": 41,
-            "y": 186
-          }
-        ],
-        "buildings": [
-          {
-            "x": 190,
-            "y": 130
-          },
-          {
-            "x": 300,
-            "y": 130
-          },
-          {
-            "x": 190,
-            "y": 230
-          },
-          {
-            "x": 300,
-            "y": 230
-          },
-          {
-            "x": 245,
-            "y": 180
-          }
-        ]
-      }
-    }
-  ]
+  {
+   "key": "stone|none|none+none",
+   "src": "stone-none-none-none.webp",
+   "gen": {
+    "parent": "straw|none|none+none"
+   },
+   "shipped": true
+  },
+  {
+   "key": "stone|palisade|none+none",
+   "src": "stone-palisade-none-none.webp",
+   "gen": {
+    "parent": "stone|none|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|palisade|wood+none",
+   "src": "stone-palisade-wood-none.webp",
+   "gen": {
+    "parent": "stone|palisade|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|palisade|none+wood",
+   "src": "stone-palisade-none-wood.webp",
+   "gen": {
+    "parent": "stone|palisade|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|palisade|wood+wood",
+   "src": "stone-palisade-wood-wood.webp",
+   "gen": {
+    "parent": "stone|palisade|wood+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|palisade|stone+none",
+   "src": "stone-palisade-stone-none.webp",
+   "gen": {
+    "parent": "stone|palisade|wood+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|palisade|none+stone",
+   "src": "stone-palisade-none-stone.webp",
+   "gen": {
+    "parent": "stone|palisade|none+wood"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|palisade|wood+stone",
+   "src": "stone-palisade-wood-stone.webp",
+   "gen": {
+    "parent": "stone|palisade|wood+wood"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|palisade|stone+wood",
+   "src": "stone-palisade-stone-wood.webp",
+   "gen": {
+    "parent": "stone|palisade|wood+wood"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|palisade|stone+stone",
+   "src": "stone-palisade-stone-stone.webp",
+   "gen": {
+    "parent": "stone|palisade|stone+wood"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|none+none",
+   "src": "stone-wall-none-none.webp",
+   "gen": {
+    "parent": "stone|palisade|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|wood+none",
+   "src": "stone-wall-wood-none.webp",
+   "gen": {
+    "parent": "stone|wall|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|none+wood",
+   "src": "stone-wall-none-wood.webp",
+   "gen": {
+    "parent": "stone|wall|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|wood+wood",
+   "src": "stone-wall-wood-wood.webp",
+   "gen": {
+    "parent": "stone|wall|wood+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|stone+none",
+   "src": "stone-wall-stone-none.webp",
+   "gen": {
+    "parent": "stone|wall|wood+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|none+stone",
+   "src": "stone-wall-none-stone.webp",
+   "gen": {
+    "parent": "stone|wall|none+wood"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|wood+stone",
+   "src": "stone-wall-wood-stone.webp",
+   "gen": {
+    "parent": "stone|wall|wood+wood"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|stone+wood",
+   "src": "stone-wall-stone-wood.webp",
+   "gen": {
+    "parent": "stone|wall|wood+wood"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "stone|wall|stone+stone",
+   "src": "stone-wall-stone-stone.webp",
+   "gen": {
+    "parent": "stone|wall|stone+wood"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "cottages|palisade|none+none",
+   "src": "cottages-palisade-none-none.webp",
+   "gen": {
+    "parent": "cottages|none|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "cottages|wall|none+none",
+   "src": "cottages-wall-none-none.webp",
+   "gen": {
+    "parent": "cottages|none|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "straw|palisade|none+none",
+   "src": "straw-palisade-none-none.webp",
+   "gen": {
+    "parent": "straw|none|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "straw|wall|none+none",
+   "src": "straw-wall-none-none.webp",
+   "gen": {
+    "parent": "straw|none|none+none"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "straw|none|wood+none",
+   "src": "straw-none-wood-none.webp",
+   "gen": {
+    "parent": "straw|none|none+none",
+    "note": "composed: canonical slot-1 wood tower on ringless straw"
+   },
+   "shipped": true
+  },
+  {
+   "key": "straw|palisade|wood+none",
+   "src": "straw-palisade-wood-none.webp",
+   "gen": {
+    "parent": "straw|palisade|none+none",
+    "note": "composed: canonical wood tower slot1"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  },
+  {
+   "key": "straw|palisade|wood+wood",
+   "src": "straw-palisade-wood-wood.webp",
+   "gen": {
+    "parent": "straw|palisade|none+none",
+    "note": "composed: canonical wood towers slot1+slot2"
+   },
+   "shipped": true,
+   "anchors": {
+    "ring": [
+     {
+      "x": 251,
+      "y": 58
+     },
+     {
+      "x": 461,
+      "y": 186
+     },
+     {
+      "x": 251,
+      "y": 314
+     },
+     {
+      "x": 41,
+      "y": 186
+     }
+    ],
+    "buildings": [
+     {
+      "x": 190,
+      "y": 130
+     },
+     {
+      "x": 300,
+      "y": 130
+     },
+     {
+      "x": 190,
+      "y": 230
+     },
+     {
+      "x": 300,
+      "y": 230
+     },
+     {
+      "x": 245,
+      "y": 180
+     }
+    ]
+   }
+  }
+ ]
 }

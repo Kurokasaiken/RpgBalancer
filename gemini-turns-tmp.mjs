@@ -13,7 +13,7 @@ if(mode==='new'){
     await fi.setInputFiles(a);
   } else {
     const fcP = p.waitForEvent('filechooser',{timeout:20000}).catch(()=>null);
-    await p.locator('button[aria-label*="Caricamento"]').first().click({force:true,timeout:10000}).catch(async()=>{await p.evaluate(()=>{const x=[...document.querySelectorAll('button')].find(e=>(e.getAttribute('aria-label')||'').includes('Caricamento'));x&&x.click();});});
+    await p.evaluate(()=>{const b=[...document.querySelectorAll('button')].find(e=>/caricamento|upload|file|tools|add/i.test((e.getAttribute('aria-label')||'')+(e.getAttribute('mattooltip')||'')+(e.title||'')));b&&b.click();});
     await p.waitForTimeout(2500);
     await p.locator('button:has-text("File"), [role="menuitem"]:has-text("File")').first().click({force:true,timeout:8000}).catch(()=>{});
     const fc = await fcP;
@@ -25,6 +25,7 @@ if(mode==='new'){
   await p.goto(a, {waitUntil:'commit', timeout:60000});
   await p.waitForTimeout(12000);
 }
+if(c==='NOPROMPT'){console.log('READY',p.url());process.exit(0);}
 const box = p.locator('div[contenteditable="true"], .ql-editor, textarea').first();
 await box.click(); await p.keyboard.type(c,{delay:1});
 await p.waitForTimeout(800); await p.keyboard.press('Enter');

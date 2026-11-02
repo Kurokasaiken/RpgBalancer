@@ -26,7 +26,8 @@ export function Mappa2GradeControls({ grade, onPatch }: { grade: Mappa2Grade; on
       {slider('ombre fredde', 'coolShadows', 0, 1, 0.05)}
       {slider('saturazione', 'saturation', 0.8, 1.5, 0.01)}
       {slider('contrasto', 'contrast', 0.9, 1.3, 0.01)}
-      {slider('montagne nord scure', 'mountainShade', 0, 1, 0.05)}
+      {slider('montagne nord scure', 'mountainShade', 0, 2, 0.05)}
+      {slider('dettaglio montagne', 'mountainClarity', 0, 1, 0.05)}
       {slider('mare zaffiro', 'seaSapphire', 0, 1, 0.05)}
       <button type="button" onClick={() => onPatch({ ...DEFAULT_MAPPA2_GRADE })} style={{ marginTop: 6, padding: '2px 6px', border: '1px solid #56758d', borderRadius: 4, color: 'inherit', background: '#172b40', cursor: 'pointer' }}>reset</button>
     </div>
