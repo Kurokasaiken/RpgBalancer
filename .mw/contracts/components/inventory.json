@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-10-28T18:35:22.324Z",
+  "generated_at": "2026-11-02T10:00:51.485Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -148,6 +148,7 @@
     "src/ui/idleVillage/components/gameFrame/RegionTooltip.tsx",
     "src/ui/idleVillage/components/gameFrame/ResourceReadout.tsx",
     "src/ui/idleVillage/components/gameFrame/TuningPanel.tsx",
+    "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageRegistry.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageScreenView.tsx",
     "src/ui/idleVillage/components/gameFrame/VillageSlotOverlay.tsx",
@@ -226,6 +227,10 @@
     "src/ui/idleVillage/config/gamePerfBudgets.ts",
     "src/ui/idleVillage/config/generatedClouds.ts",
     "src/ui/idleVillage/config/hudCrewConfig.ts",
+    "src/ui/idleVillage/config/mappa2AmbientDirectorConfig.ts",
+    "src/ui/idleVillage/config/mappa2RegionalWeatherConfig.ts",
+    "src/ui/idleVillage/config/mappa2SeaLifeConfig.ts",
+    "src/ui/idleVillage/config/mappa2SecondaryWaterConfig.ts",
     "src/ui/idleVillage/config/minimalFeedbackConfig.ts",
     "src/ui/idleVillage/config/pgCardFrameConfig.ts",
     "src/ui/idleVillage/config/presentationConfig.ts",
@@ -235,6 +240,7 @@
     "src/ui/idleVillage/config/rosterSortConfig.ts",
     "src/ui/idleVillage/config/seaMarksConfig.ts",
     "src/ui/idleVillage/config/seaWonders.ts",
+    "src/ui/idleVillage/config/villageDirectorConfig.ts",
     "src/ui/idleVillage/config/wanderlustBaseManifest.json",
     "src/ui/idleVillage/config/worldSurfaceConfig.ts",
     "src/ui/idleVillage/controllers/CrewSchedulerController.ts",
@@ -304,10 +310,17 @@
     "src/ui/idleVillage/map/validators/locationDropValidators.ts",
     "src/ui/idleVillage/memorial/memorialHall.ts",
     "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+    "src/ui/idleVillage/pixiSpike/ambient/ambientDirector.ts",
+    "src/ui/idleVillage/pixiSpike/ambient/ambientRig.ts",
+    "src/ui/idleVillage/pixiSpike/ambient/ambientShoal.ts",
+    "src/ui/idleVillage/pixiSpike/feederRiver.ts",
     "src/ui/idleVillage/pixiSpike/mapFitRuntime.ts",
+    "src/ui/idleVillage/pixiSpike/mountainStorm.ts",
     "src/ui/idleVillage/pixiSpike/pixiDestroy.ts",
     "src/ui/idleVillage/pixiSpike/regionOutline.ts",
+    "src/ui/idleVillage/pixiSpike/regionalWeatherOverlay.ts",
     "src/ui/idleVillage/pixiSpike/seabedTexture.ts",
+    "src/ui/idleVillage/pixiSpike/villageZoneOverlay.ts",
     "src/ui/idleVillage/questS1Lab/beatSequencer.ts",
     "src/ui/idleVillage/questS1Lab/hud/ActionZone.tsx",
     "src/ui/idleVillage/questS1Lab/hud/AstroOverlay.tsx",
@@ -1946,13 +1959,24 @@
       "scope_files": [
         "src/ui/idleVillage/config/atmosphereAssets.ts",
         "src/ui/idleVillage/config/generatedClouds.ts",
+        "src/ui/idleVillage/config/mappa2AmbientDirectorConfig.ts",
+        "src/ui/idleVillage/config/mappa2RegionalWeatherConfig.ts",
+        "src/ui/idleVillage/config/mappa2SeaLifeConfig.ts",
+        "src/ui/idleVillage/config/mappa2SecondaryWaterConfig.ts",
         "src/ui/idleVillage/config/seaMarksConfig.ts",
         "src/ui/idleVillage/config/seaWonders.ts",
         "src/ui/idleVillage/hooks/useWorldSurface.ts",
         "src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx",
+        "src/ui/idleVillage/pixiSpike/ambient/ambientDirector.ts",
+        "src/ui/idleVillage/pixiSpike/ambient/ambientRig.ts",
+        "src/ui/idleVillage/pixiSpike/ambient/ambientShoal.ts",
+        "src/ui/idleVillage/pixiSpike/feederRiver.ts",
         "src/ui/idleVillage/pixiSpike/mapFitRuntime.ts",
+        "src/ui/idleVillage/pixiSpike/mountainStorm.ts",
         "src/ui/idleVillage/pixiSpike/regionOutline.ts",
-        "src/ui/idleVillage/pixiSpike/seabedTexture.ts"
+        "src/ui/idleVillage/pixiSpike/regionalWeatherOverlay.ts",
+        "src/ui/idleVillage/pixiSpike/seabedTexture.ts",
+        "src/ui/idleVillage/pixiSpike/villageZoneOverlay.ts"
       ],
       "tier_source": "ctr-reference"
     },
@@ -3087,6 +3111,17 @@
       "tier_source": "default"
     },
     {
+      "id": "village-director-view",
+      "role": "ui-component",
+      "tier": 2,
+      "root_file": "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx",
+      "scope_files": [
+        "src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx",
+        "src/ui/idleVillage/config/villageDirectorConfig.ts"
+      ],
+      "tier_source": "default"
+    },
+    {
       "id": "village-registry",
       "role": "ui-component",
       "tier": 2,
@@ -3482,10 +3517,10 @@
     }
   ],
   "stats": {
-    "files": 469,
-    "units": 282,
-    "ui_components": 215,
+    "files": 482,
+    "units": 283,
+    "ui_components": 216,
     "shared_kernels": 67
   },
-  "content_sha256": "cac18980ffbafac65f21b59a005772f77e85ed59fce704c55568a4ecf66d3551"
+  "content_sha256": "2e8eebf23798ce5f8fc64f92abbebfe5ac974d03500370dc7b7e020523fdf088"
 }

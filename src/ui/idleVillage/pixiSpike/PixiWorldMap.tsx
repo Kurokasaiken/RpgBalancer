@@ -77,6 +77,8 @@ export interface PixiWorldMapEffects {
   seabed: boolean;
   wonders: boolean;
   landLife: boolean;
+  /** Upscale-lab pilot: swap canopy textures for the LP+HP detailed variants where they exist (falls back per-canopy). */
+  canopyDetail?: boolean;
 }
 
 /** A territory of the id map (`scripts/bake-region-ids.py`). `center` is a fraction of the world canvas. */
@@ -170,6 +172,8 @@ export interface PixiWorldMapProps {
   seaTone?: number;
   /** Baked multiply sheet (white = untouched) that darkens the northern rock; `opacity` 0-1 blends it in. Omit to skip loading it. */
   mountainShade?: { url: string; opacity: number };
+  /** Baked clarity (unsharp-on-L) plate of the northern massif, normal blend over the painting; `opacity` 0-1 blends it in. Director ruling 2026-11-02 fork C. */
+  mountainClarity?: { url: string; opacity: number };
   /** Baked sea grade as two sheets over the painting (multiply + additive stored x2, water only); `opacity` 0-1 blends it in. */
   seaGrade?: { multUrl: string; addUrl: string; opacity: number };
   /**
@@ -337,7 +341,7 @@ const DEFAULT_LAND_LIFE_CONFIG: PixiLandLifeConfig = {
   opacity: 0.55,
 };
 
-const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true, landLife: true };
+const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true, landLife: true, canopyDetail: false };
 
 const VERT = `#version 300 es
 in vec2 aPosition;
@@ -522,6 +526,7 @@ uniform sampler2D uClean;
 uniform sampler2D uBase;
 uniform sampler2D uLand;
 uniform sampler2D uStrokes;
+uniform sampler2D uZones;
 uniform vec2 uWorld;
 uniform float uTime;
 uniform float uDMax;
@@ -537,9 +542,20 @@ float vnoise(vec2 p) {
   f = f * f * (3.0 - 2.0 * f);
   return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
 }
+// Swell comes in sets: 5 strong waves (each its own size), then 2 lull waves.
+float waveAmp(float idx, float seg) {
+  float k = mod(idx, 7.0);
+  return k < 4.5 ? mix(0.6, 1.0, hash(vec2(idx, seg) * 0.137)) : 0.15;
+}
 void main() {
+  // Whitelist (masks/surf_zones.webp, alpha): no surf on the snow peaks rising from the sea, nor on inland lakes.
+  float zone = texture(uZones, vUV).a;
+  if (zone < 0.004) { outColor = vec4(0.0); return; }
   vec4 t = texture(uDist, vUV);
   vec4 cl = texture(uClean, vUV); // water without the painted surf; alpha = where the surf is painted
+  // Pixi uploads textures premultiplied: weighting cl.rgb by its alpha again darkened every plate edge
+  // into a dark rim around a cyan blob (Director 2026-11-02, «macchie di sporco»). Work in straight colour.
+  vec3 clRgb = cl.rgb / max(cl.a, 1e-4);
   float water = smoothstep(0.45, 0.6, t.g);
   float d = t.r * uDMax;
   vec2 w = vUV * uWorld;
@@ -547,6 +563,7 @@ void main() {
   // LIVE surf instead — fronts that rush up the coast-distance contours, hold as churning
   // lace, then drain back out. Every stretch of coast runs on its own phase (vnoise(w*0.008))
   // so the bay never flashes in sync. Continuous motion at render rate, no bitmap to slide.
+  // Hide it on land pixels too: left visible there, the beach line doubled beside its moving copy.
   float hideA = cl.a;
   // Flow map FIRST — the advected painted image feeds both the travelling water and the surf:
   // the painted white strokes themselves are the foam material (same look, same colour as the
@@ -570,78 +587,132 @@ void main() {
       // never pull a land pixel into the water
       if (texture(uDist, vUV + o1).g < 0.5) o1 = vec2(0.0);
       if (texture(uDist, vUV + o2).g < 0.5) o2 = vec2(0.0);
-      float w1 = 1.0 - abs(2.0 * t1 - 1.0);
-      float w2 = 1.0 - abs(2.0 * t2 - 1.0);
+      // cubed: one phase dominates except around the swap — an even mix of two copies 6 px apart
+      // blurred the painted lace into a veil (bay detail at 80% of the painting, 2026-11-02).
+      float w1 = pow(1.0 - abs(2.0 * t1 - 1.0), 3.0);
+      float w2 = pow(1.0 - abs(2.0 * t2 - 1.0), 3.0);
       flowed = (texture(uBase, vUV + o1).rgb * w1 + texture(uBase, vUV + o2).rgb * w2) / (w1 + w2);
       flowOk = 1.0;
     }
   }
   float foamA = 0.0;
-  vec3 foamPix = vec3(0.90, 0.97, 1.0); // fallback foam colour (procedural fill, rock climb)
-  if (cl.a > 0.003 && water > 0.01) {
-    float ph = vnoise(w * 0.008) * 0.9;
-    float cyc = fract(uTime * 0.09 + ph);
-    // THE BORE MODEL (research: Rare/NVIDIA DF-crest + foam-as-decaying-product): a breaking
-    // front runs shoreward along the distance contours; foam is born at the front and decays
-    // exponentially BEHIND it — trailing lace, not a sheet popping in place.
-    float frontD = mix(85.0, 2.0, smoothstep(0.0, 0.55, cyc)); // bore sweeps in over ~6s
-    float arrived = smoothstep(0.52, 0.7, cyc);               // bore spent at the rocks
-    float age = d - frontD;                                    // px behind the moving front
-    float sheet = exp(-max(age, 0.0) / 22.0) * step(0.0, age) * (1.0 - smoothstep(60.0, 85.0, d));
-    float bore = exp(-pow(age * 0.10, 2.0)) * (1.0 - arrived * 0.4); // white leading face
-    float zone = 1.0 - smoothstep(60.0, 85.0, d);   // taper — the painted tails reach ~80px, thinning
-    float shore = 1.0 - smoothstep(4.0, 22.0, d);   // the breaking band pinned to the rocks
-    // lace breakup: holes first — strokes and dark water between, never a solid sheet.
-    float lace = smoothstep(0.48, 0.85, vnoise(w * 0.10 + vec2(uTime * 0.10, -uTime * 0.06))
-                                 + 0.35 * vnoise(w * 0.028 + vec2(0.0, uTime * 0.05)));
-    // proximity ramp: denser AND whiter the closer to land — thin wisps offshore, thick white at the rocks.
-    float prox = 1.0 - smoothstep(6.0, 70.0, d);
-    float surf = clamp(bore * 1.5 + sheet * (0.35 + 0.65 * lace) * (0.30 + 0.70 * prox)
-                     + shore * (0.75 + 0.25 * lace), 0.0, 1.0);
-    // THE FOAM IS THE PAINTING: the extracted painted strokes (uStrokes) travel with the same
-    // two-phase advection — exact original colour and shape, moving. Coverage = strokes that
-    // have flowed here × the surge cycle: they wash in on the rush and dissolve in the drain.
+  vec3 foamPix = vec3(0.96, 0.99, 1.0);
+  // SURF AS EVENTS, NOT A COAT OF WHITE (Director 2026-11-02: «il bianco sempre disegnato», «arriva,
+  // si ritira», «prima saliva di più»). Research notes in context/research/2026-11-02-foam-surf:
+  //  - swell arrives in SETS: a few strong waves, then a lull of small ones (sets of ~3-7);
+  //  - on a steep rock face the wave does not spill, it SLAMS: the water is thrown up the face to
+  //    ~2x the wave height (much more for the odd big one), hangs, then drains back down in streaks;
+  //  - the foam is a PRODUCT of the impact: born at the waterline, pushed seaward by the backwash,
+  //    torn into lace and gone before the next wave — between waves the water is dark again.
+  // Per stretch of coast (own phase): wave clock T ~ 9 s, impact at 45% of the wave.
+  float segPh = vnoise(w * 0.008) * 0.9;
+  float tw = uTime * 0.11 + segPh;
+  float wi = floor(tw);
+  float cyc = fract(tw);
+  float seg = floor(vnoise(w * 0.004) * 6.0);
+  float ampNow = waveAmp(wi, seg);
+  float hit = step(0.45, cyc);
+  float aImp = mix(waveAmp(wi - 1.0, seg), ampNow, hit);          // the wave whose impact we are living after
+  float tSince = (hit > 0.5 ? cyc - 0.45 : cyc + 0.55) * 9.0;      // seconds since that impact
+  // whitewater holds dense for ~1 s, then dissolves (~0 before the next one); decaying from the first
+  // instant it was only ever half there — a grey veil, never the painting's white
+  float residual = aImp * (tSince < 1.0 ? 1.0 : exp(-(tSince - 1.0) / 1.8));
+  float flash = aImp * exp(-tSince / 0.7);                         // the burst of white right at impact
+  float lace = smoothstep(0.45, 0.8, vnoise(w * 0.10 + vec2(uTime * 0.10, -uTime * 0.06))
+                               + 0.35 * vnoise(w * 0.028 + vec2(0.0, uTime * 0.05)));
+  if (cl.a > 0.003) {
+    // incoming wave: a thin white face running shoreward along the distance contours
+    float frontD = mix(85.0, 0.0, smoothstep(0.0, 0.45, cyc));
+    float bore = ampNow * (1.0 - hit) * exp(-pow((d - frontD) * 0.12, 2.0)) * smoothstep(0.05, 0.2, cyc);
+    // backwash: the impact foam spreads seaward and thins, then dissolves
+    // the whole breaking zone goes white AT ONCE on impact (starting from the waterline it never showed the
+    // painted mass in full), then the backwash carries it a little further out while it dissolves
+    float spread = 40.0 + 30.0 * (1.0 - exp(-tSince / 1.4));
+    float field = residual * (1.0 - smoothstep(spread * 0.45, spread, d));
+    float shore = 1.0 - smoothstep(3.0, 16.0, d);
+    // THE FOAM IS THE PAINTING: the painted strokes (uStrokes) carry the white, moving with the flow,
+    // but only while a wave has put foam there — never as a permanent coat.
     float strkA = 0.0; vec3 strkC = vec3(0.92, 0.98, 1.0);
     if (flowOk > 0.5) {
       vec2 amp = vec2(12.0) / uWorld;
       float loopT = 6.0;
       float t1 = fract(uTime / loopT);
       float t2 = fract(t1 + 0.5);
-      vec2 dir = vec2(0.0);
       vec2 e2 = 1.5 / uWorld;
       vec2 grad = vec2(
         texture(uDist, vUV + vec2(e2.x, 0.0)).r - texture(uDist, vUV - vec2(e2.x, 0.0)).r,
         texture(uDist, vUV + vec2(0.0, e2.y)).r - texture(uDist, vUV - vec2(0.0, e2.y)).r);
-      dir = -grad / max(length(grad), 1e-6);
+      vec2 dir = -grad / max(length(grad), 1e-6);
       vec2 o1 = (t1 - 0.5) * amp * dir;
       vec2 o2 = (t2 - 0.5) * amp * dir;
-      float w1 = 1.0 - abs(2.0 * t1 - 1.0);
-      float w2 = 1.0 - abs(2.0 * t2 - 1.0);
+      // cubed: one phase dominates except around the swap (an even mix of two copies blurred the lace)
+      float w1 = pow(1.0 - abs(2.0 * t1 - 1.0), 3.0);
+      float w2 = pow(1.0 - abs(2.0 * t2 - 1.0), 3.0);
       vec4 s1 = texture(uStrokes, vUV + o1);
       vec4 s2 = texture(uStrokes, vUV + o2);
       strkA = (s1.a * w1 + s2.a * w2) / (w1 + w2);
-      strkC = (s1.rgb * s1.a * w1 + s2.rgb * s2.a * w2) / max(strkA * (w1 + w2), 1e-4);
+      strkC = (s1.rgb * w1 + s2.rgb * w2) / max(strkA * (w1 + w2), 1e-4); // rgb is premultiplied already
+    } else {
+      vec4 s0 = texture(uStrokes, vUV); // the waterline itself (beach line on land pixels): strokes stay put
+      strkA = s0.a;
+      strkC = s0.rgb / max(s0.a, 1e-4);
     }
-    float cov = clamp(surf * 0.22 + strkA * (sheet * (0.4 + 0.6 * prox) + bore + shore) * 1.6, 0.0, 1.0);
-    foamPix = mix(vec3(0.92, 0.98, 1.0), strkC, clamp(strkA * 2.0, 0.0, 1.0));
-    foamPix = mix(foamPix, vec3(0.99, 1.0, 1.0), prox * 0.55); // whiter the closer to land
-    foamA = cl.a * cov * min(1.0, uStrength * 2.0);
+    // the brushwork's own coverage and colour: saturating it to 1 and pushing it to flat white turned the
+    // painted lace into a pale cut-out slab at every impact (2026-11-02)
+    float strokes = strkA;
+    float wave = max(max(bore, field), flash * shore);
+    // the impact churn is on every plate pixel at the waterline, the rock foot included (where the painting
+    // had its white): high-frequency froth so it reads as whitewater, not a filled shape
+    float froth = smoothstep(0.35, 0.65, vnoise(w * 0.19 + vec2(uTime * 0.4, -uTime * 0.7)) + 0.3 * lace);
+    float cov = max(strokes * clamp(wave * 2.2, 0.0, 1.0),                 // painted white, while a wave is here
+                    max(water * lace * field * 0.8, froth * flash * shore * 1.2)); // churn of the impact itself
+    cov = max(cov, water * bore * 0.7);                                     // the incoming face, thin
+    foamPix = mix(strkA > 0.02 ? strkC : vec3(0.93, 0.98, 1.0), vec3(0.98, 1.0, 1.0), 0.25 * clamp(wave, 0.0, 1.0));
+    // NOT scaled by the strength slider: the plate removes 100% of the painted surf, so its replacement
+    // must be able to reach 100% too — capped at strength*2 (0.68 in the lab) the painting's white could
+    // never come back, only a grey-blue veil of it (2026-11-02). The slider keeps driving the crest rings.
+    foamA = cl.a * cov;
   }
-  // The same surge climbs the ROCKS: whitewater runs up the face at the rush and slides back
-  // in the drain. uLand: R = px-to-sea, G = land flag, B = surf adjacency (baked).
+  // THE SLAM CLIMBS THE ROCK: at impact the water is thrown up the face (fast), hangs, then drains
+  // down in streaks. Height scales with the wave: set waves climb far, lull waves barely wet the foot.
+  // uLand: R = px-to-sea, G = land flag, B = surf adjacency (baked).
   vec4 lt = texture(uLand, vUV);
   if (lt.g > 0.5 && lt.b > 0.05) {
     float ld = lt.r * uDMax;
-    if (ld <= 30.0) {
-      float ph = vnoise(w * 0.008) * 0.9;
-      float cyc = fract(uTime * 0.09 + ph);
-      // swash is an EVENT, not a pulse: it fires when the bore lands — quick uprush, slow rundown.
-      float climbE = smoothstep(0.5, 0.62, cyc) * (1.0 - smoothstep(0.72, 0.98, cyc));
-      float climbH = mix(1.0, 26.0, climbE) * lt.b; // run-up height in rock px
-      float up = 1.0 - smoothstep(climbH - 4.0, climbH, ld);
-      float lace2 = smoothstep(0.42, 0.8, vnoise(w * 0.10 + vec2(uTime * 0.10, -uTime * 0.06))
-                                    + 0.35 * vnoise(w * 0.028 + vec2(0.0, uTime * 0.05)));
-      foamA = max(foamA, up * (0.5 + 0.5 * lace2) * 0.85 * lt.b);
+    // height follows the face's exposure to the surf (lt.b), as the run-up that climbed well did:
+    // scaled flat, it painted a thin stack white to the top and drew a line up a sheltered edge.
+    // sqrt: the bay's feet sit at adjacency ~0.26 (median), which kept the climb to ~11 px
+    float reach = aImp * (26.0 + 34.0 * aImp) * sqrt(lt.b);              // big wave ~30 px median, ~55 px exposed
+    // The painting is seen from above at an angle: water reaches a rock only at its FOOT, where the
+    // nearest sea lies BELOW on screen. Along the side silhouettes the sea lies beside/behind the rock —
+    // climbing there drew a white line up the whole outline of the arch. ld grows away from the sea, so
+    // at a foot it grows upward (-y): keep the faces whose distance gradient points up.
+    vec2 eL = 5.0 / uWorld; // wide: the 8-bit distance is stepped, a 2 px gradient cut white shards
+    vec2 gL = vec2(texture(uLand, vUV + vec2(eL.x, 0.0)).r - texture(uLand, vUV - vec2(eL.x, 0.0)).r,
+                   texture(uLand, vUV + vec2(0.0, eL.y)).r - texture(uLand, vUV - vec2(0.0, eL.y)).r);
+    float facing = smoothstep(0.1, 0.5, -gL.y / max(length(gL), 1e-5));   // 1 = sea straight below
+    reach *= facing;
+    if (reach > 2.0 && ld <= reach + 8.0) {
+      float rise = smoothstep(0.0, 0.35, tSince);                          // uprush ~0.35 s
+      float fall = 1.0 - smoothstep(1.0, 3.0, tSince);                     // hang, then drain
+      float ragged = 0.65 + 0.7 * vnoise(vec2(w.x * 0.07 + w.y * 0.03, wi * 3.1));  // tongues, not a ruler line
+      float h = reach * ragged * rise * mix(0.25, 1.0, fall);              // the sheet sinks as it drains
+      // THE PAINTED FOAM ITSELF CLIMBS: the strokes painted at the foot are carried up the face by h
+      // (and slide back down as h sinks) — the real brushwork travelling, not a drawn shape (a procedural
+      // body read as flat white shards, 2026-11-02). Two taps stretch the mass into a trail.
+      vec4 c1 = texture(uStrokes, vUV + vec2(0.0, h / uWorld.y));
+      vec4 c2 = texture(uStrokes, vUV + vec2(0.0, 0.55 * h / uWorld.y));
+      // coverage AND colour come from the brushwork (lace with dark gaps); a flat white fill of the
+      // stroke footprint read as a pale cut-out slab (2026-11-02)
+      float climbA = max(c1.a, 0.8 * c2.a);
+      vec3 climbC = (c1.a >= 0.8 * c2.a ? c1.rgb / max(c1.a, 1e-4) : c2.rgb / max(c2.a, 1e-4));
+      climbA *= 1.0 - smoothstep(h, h + 5.0, ld);
+      // a few flecks of spray thrown past the top at the rush
+      float spray = smoothstep(0.62, 0.74, vnoise(w * 0.22 + vec2(0.0, uTime * 1.5)))
+                  * (1.0 - smoothstep(h, h + 8.0, ld)) * step(h, ld) * (1.0 - smoothstep(0.3, 0.9, tSince));
+      float sheetA = max(climbA, spray);
+      if (sheetA * fall > foamA) foamPix = mix(climbC, vec3(0.98, 1.0, 1.0), climbA > spray ? 0.3 : 1.0);
+      foamA = max(foamA, clamp(sheetA, 0.0, 1.0) * fall * 0.95);
     }
   }
   // faint crest rings over the open water (as before)
@@ -654,12 +725,12 @@ void main() {
     foamA = max(foamA, crest * 0.55 * lace * water * uStrength);
   }
   // thin foam reads cyan like the painted strokes; dense foam keeps its painted colour.
-  vec3 foamTint = mix(vec3(0.85, 0.96, 1.0), vec3(1.0), smoothstep(0.1, 0.55, foamA));
-  vec3 surfCol = foamPix * foamTint * foamA + cl.rgb * hideA * (1.0 - foamA);
+  vec3 foamTint = mix(vec3(0.88, 0.97, 1.0), vec3(1.0), smoothstep(0.05, 0.3, foamA));
+  vec3 surfCol = foamPix * foamTint * foamA + clRgb * hideA * (1.0 - foamA); // premultiplied (weighted by its alpha)
   float aSurf = foamA + hideA * (1.0 - foamA);
   float aFlow = water * (1.0 - smoothstep(70.0, 110.0, d)) * (1.0 - aSurf) * flowOk;
-  vec3 premult = surfCol * aSurf + flowed * aFlow;
-  outColor = vec4(premult, aSurf + aFlow);
+  vec3 premult = surfCol + flowed * aFlow;
+  outColor = vec4(premult, aSurf + aFlow) * zone;
 }
 `;
 
@@ -774,6 +845,7 @@ export function PixiWorldMap({
   cloudTint = '#ffffff',
   seaTone = 0,
   mountainShade,
+  mountainClarity,
   seaGrade,
   seabed,
   regions,
@@ -829,6 +901,9 @@ export function PixiWorldMap({
   const mountainShadeRef = useRef(mountainShade);
   mountainShadeRef.current = mountainShade;
   const mountainShadeUrl = mountainShade?.url;
+  const mountainClarityRef = useRef(mountainClarity);
+  mountainClarityRef.current = mountainClarity;
+  const mountainClarityUrl = mountainClarity?.url;
   const seaGradeRef = useRef(seaGrade);
   seaGradeRef.current = seaGrade;
   const seaGradeMultUrl = seaGrade?.multUrl;
@@ -1009,7 +1084,11 @@ export function PixiWorldMap({
         for (const l of layered.surfaceLayers) {
           if (!l.rect || !/forest|trees/.test(l.id)) continue;
           const stem = l.file.replace('.webp', '');
-          const tex = await load(layerUrl(manifest.world, `${stem}.canopy${variant}.webp`));
+          let tex: Texture | null = null;
+          if (fxOn.canopyDetail) {
+            tex = await load(layerUrl(manifest.world, `${stem}.canopy.detail.webp`)).catch(() => null);
+          }
+          if (!tex) tex = await load(layerUrl(manifest.world, `${stem}.canopy${variant}.webp`));
           if (disposed) return;
           const r = l.rect;
           const scale = ((r.width / r.sourceWidth) * canvas.width) / tex.width;
@@ -2132,15 +2211,35 @@ export function PixiWorldMap({
       });
       if (mountainShadeUrl) {
         const shadeTex = await load(mountainShadeUrl);
+        // Two stacked multiply passes: opacity >1 keeps compounding the sheet's darkness (look-dev "più scuro").
         const shade = new Sprite(shadeTex);
-        shade.blendMode = 'multiply';
-        shade.zIndex = MOUNTAIN_SHADE_Z;
-        shade.width = canvas.width;
-        shade.height = canvas.height;
-        world.addChild(shade);
+        const shade2 = new Sprite(shadeTex);
+        for (const sp of [shade, shade2]) {
+          sp.blendMode = 'multiply';
+          sp.zIndex = MOUNTAIN_SHADE_Z;
+          sp.width = canvas.width;
+          sp.height = canvas.height;
+          sp.visible = false;
+          world.addChild(sp);
+        }
         ticks.push(() => {
-          shade.alpha = Math.min(1, Math.max(0, mountainShadeRef.current?.opacity ?? 0));
+          const o = Math.max(0, mountainShadeRef.current?.opacity ?? 0);
+          shade.alpha = Math.min(1, o);
+          shade2.alpha = Math.min(1, Math.max(0, o - 1));
           shade.visible = shade.alpha > 0.001;
+          shade2.visible = shade2.alpha > 0.001;
+        });
+      }
+      if (mountainClarityUrl) {
+        const detTex = await load(mountainClarityUrl);
+        const det = new Sprite(detTex);
+        det.zIndex = MOUNTAIN_SHADE_Z + 0.5;
+        det.width = canvas.width;
+        det.height = canvas.height;
+        world.addChild(det);
+        ticks.push(() => {
+          det.alpha = Math.min(1, Math.max(0, mountainClarityRef.current?.opacity ?? 0));
+          det.visible = det.alpha > 0.001;
         });
       }
       if (seaGradeMultUrl && seaGradeAddUrl) {
@@ -2648,6 +2747,8 @@ export function PixiWorldMap({
         const landDist = await load(coastDistanceUrl.replace('coast_distance.webp', 'land_distance.webp')).catch(() => null);
         // extracted painted surf strokes — the foam material is the painting itself (pipeline: masks/foam_strokes.webp)
         const strokes = await load(coastDistanceUrl.replace('coast_distance.webp', 'foam_strokes.webp')).catch(() => null);
+        // where the surf may exist at all (pipeline: masks/surf_zones.webp); absent -> everywhere, as before
+        const zones = await load(coastDistanceUrl.replace('coast_distance.webp', 'surf_zones.webp')).catch(() => null);
         const c = coastFoamConfig;
         const shader = Shader.from({
           gl: { vertex: VERT, fragment: COAST_FOAM_FRAG },
@@ -2657,6 +2758,7 @@ export function PixiWorldMap({
             uBase: (baseTex ?? Texture.EMPTY).source,
             uLand: (landDist ?? Texture.EMPTY).source,
             uStrokes: (strokes ?? Texture.EMPTY).source,
+            uZones: (zones ?? Texture.WHITE).source,
             u: {
               uTime: { value: 0, type: 'f32' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
@@ -2670,7 +2772,7 @@ export function PixiWorldMap({
             },
           },
         });
-        world.addChild(new Mesh({ geometry: quad(canvas.width, canvas.height), shader }));
+        world.addChild(new Mesh({ geometry: quad(canvas.width, canvas.height), shader, label: 'coast-foam' }));
         ticks.push((t) => {
           const cfg = coastFoamConfigRef.current;
           const uniforms = shader.resources.u.uniforms;

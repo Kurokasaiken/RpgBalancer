@@ -21,6 +21,42 @@ def load_rgba(name):
     im = cv2.imread(str(VIL / name), cv2.IMREAD_UNCHANGED)
     return cv2.cvtColor(im, cv2.COLOR_BGRA2RGBA)
 
+def raw_to_plate(path):
+    """Generated raw (900x660-crop space) -> registered plate space (510x390)."""
+    import PIL.Image
+    im = PIL.Image.open(path).convert('RGBA').resize((900, 660))
+    return np.array(im.crop((110, 125, 620, 515)))
+
+def extract_filled(host_rgba, src_rgba, roi, poly=None, thr=20):
+    """Solid-silhouette cutout: diff inside roi -> close -> largest blobs ->
+    fill their contours (tower is a solid object; fills gaps where its pixels
+    coincided with the wall it stands in front of)."""
+    x, y, w, h = roi
+    diff = cv2.absdiff(src_rgba[:,:,:3], host_rgba[:,:,:3]).max(axis=2)
+    mask = np.zeros(diff.shape, np.uint8)
+    mask[y:y+h, x:x+w] = 255
+    m = ((diff > thr) & (mask > 0)).astype(np.uint8) * 255
+    m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, np.ones((9,9),np.uint8))
+    n, lab, stats, _ = cv2.connectedComponentsWithStats(m)
+    if n < 2: return None
+    keep = np.zeros_like(m)
+    for i in 1 + np.argsort(stats[1:,4])[-2:]:
+        keep[lab == i] = 255
+    cnts, _ = cv2.findContours(keep, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    fill = np.zeros_like(m)
+    for c in cnts:
+        if cv2.contourArea(c) > 800:
+            cv2.drawContours(fill, [c], -1, 255, -1)
+    if poly is not None:
+        pm = np.zeros_like(m)
+        cv2.fillPoly(pm, [np.array(poly, np.int32)], 255)
+        fill = cv2.bitwise_and(fill, pm)
+    fill = cv2.GaussianBlur(fill, (7,7), 0)
+    out = src_rgba.copy()
+    out[:,:,3] = np.minimum(src_rgba[:,:,3], fill)
+    ys, xs = np.where(fill > 60)
+    return out[ys.min()-4:ys.max()+5, xs.min()-4:xs.max()+5], (int(xs.min()), int(ys.min()))
+
 def extract_sprite(host_rgba, src_rgba, roi, thr=32):
     """RGBA cutout of what changed vs host inside roi (x,y,w,h)."""
     x, y, w, h = roi
@@ -42,11 +78,18 @@ def extract_sprite(host_rgba, src_rgba, roi, thr=32):
     ys, xs = np.where(keep > 60)
     return out[ys.min()-4:ys.max()+5, xs.min()-4:xs.max()+5], (int(xs.min()), int(ys.min()))
 
-def stamp(base_rgba, sprite_rgba, bottom_center):
-    """Alpha-over sprite with its bottom-centre at bottom_center (x,y)."""
+def stamp(base_rgba, sprite_rgba, foot):
+    """Alpha-over sprite with its *footprint* (mean x of the opaque bottom rows,
+    lowest opaque row) at foot=(fx,fy) — anchors bases, not sprite centres, so
+    wood and stone towers stand at exactly the same spot."""
     h, w = sprite_rgba.shape[:2]
-    cx, cy = bottom_center
-    x0, y0 = cx - w//2, cy - h
+    fx, fy = foot
+    al = sprite_rgba[:, :, 3] > 60
+    ys, xs = np.where(al)
+    ybot = ys.max()
+    fc = xs[ys >= ybot - 8].mean()
+    x0, y0 = int(fx - fc), int(fy - (ybot + 4))
+    cx, cy = x0 + w // 2, y0 + h
     x1, y1 = x0 + w, y0 + h
     bx0, by0, bx1, by1 = max(0,x0), max(0,y0), min(base_rgba.shape[1],x1), min(base_rgba.shape[0],y1)
     if bx1 <= bx0 or by1 <= by0: return
@@ -58,19 +101,28 @@ def stamp(base_rgba, sprite_rgba, bottom_center):
     reg[:,:,3] = np.maximum(reg[:,:,3], sp[:,:,3]*255*a[:,:,0:1].reshape(-1,1) if False else sp[:,:,3].astype(np.float32))
     base_rgba[by0:by1, bx0:bx1] = reg.astype(np.uint8)
 
-# canonical sources: (slot, material) -> (plate file, roi, stamp-anchor bottom-center)
+# canonical sources: (slot, material) -> (source, host, roi, stamp-anchor)
+# slot1 (south, NEAR side): tower stands IN FRONT of the ring -> solid
+# silhouette from wall-family raws, where Gemini drew full-height towers.
+RAW = ROOT / 'out/village-chain'
 HOSTS = {'palisade': 'stone-palisade-none-none.webp', 'wall': 'stone-wall-none-none.webp'}
 SRC = {
-    (1,'wood'):  ('stone-wall-wood-none.webp',      'wall',    (40,170,170,210), (110,300)),
-    (1,'stone'): ('stone-palisade-stone-none.webp', 'palisade',(40,180,210,210), (115,295)),
-    (2,'wood'):  ('stone-wall-none-wood.webp',      'wall',    (330,0,180,190),  (415,210)),
-    (2,'stone'): ('stone-wall-none-stone.webp',     'wall',    (310,20,190,210), (415,210)),
+    # towers stand INSIDE the ring (Director 2026-11-02): s1 = west inner,
+    # s2 = east inner; anchors are footprint points, aligned across materials.
+    (1,'wood'):  (RAW/'w-wood-none-0.png',   RAW/'w-none-none-0.png', 'filled', (55,130,130,230), None, (148,278)),
+    (1,'stone'): (RAW/'w-stone-stone-0.png', RAW/'w-none-none-0.png', 'filled', (55,130,130,220),
+                  [(82,195),(140,198),(140,240),(136,293),(88,294),(82,250),(78,205)], (148,278)),
+    (2,'wood'):  ('stone-wall-none-wood.webp',  'wall', 'sprite', (330,0,180,190), None, (415,240)),
+    (2,'stone'): ('stone-wall-none-stone.webp', 'wall', 'sprite', (310,20,190,210), None, (410,245)),
 }
 def main():
     hosts = {d: load_rgba(f) for d, f in HOSTS.items()}
     sprites = {}
-    for (slot,mat),(src,hostkey,roi,anchor) in SRC.items():
-        got = extract_sprite(hosts[hostkey], load_rgba(src), roi)
+    for (slot,mat),(src,hostkey,mode,roi,poly,anchor) in SRC.items():
+        if mode == 'filled':
+            got = extract_filled(raw_to_plate(hostkey), raw_to_plate(src), roi, poly)
+        else:
+            got = extract_sprite(hosts[hostkey], load_rgba(src), roi)
         if not got: print('EXTRACT FAIL', slot, mat); continue
         sp, off = got
         cv2.imwrite(str(VIL/f'_tower-s{slot}-{mat}.png'), cv2.cvtColor(sp, cv2.COLOR_RGBA2BGRA))
