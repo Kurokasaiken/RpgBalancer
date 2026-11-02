@@ -47,6 +47,16 @@ export default function HudComparePage() {
       minHeight: '100vh', background: 'linear-gradient(180deg, #071a2a, #041018)',
       padding: '48px 24px 24px', display: 'flex', flexDirection: 'column', gap: 56, color: '#e8f4ff',
     }}>
+      <Pair name="Composizione intera — mockup zanara vs ricostruzione live"
+        left={<Pane title="mockup originale (zanara-v2)" w={700}>
+          <img src="/mockups/hud-lab/sources/zanara-v2.png" alt="mockup zanara-v2 intero" draggable={false}
+            style={{ display: 'block', width: 700, height: 'auto' }} />
+        </Pane>}
+        right={<Pane title="/hud-compose live (scaled 0.44)" w={700}>
+          <iframe src="/hud-compose" title="hud-compose live" scrolling="no"
+            style={{ width: 1600, height: 900, border: 0, transform: 'scale(0.4375)', transformOrigin: 'top left', pointerEvents: 'none' }} />
+        </Pane>} />
+
       <Pair name="Roster — zanara-v2"
         left={<Pane title="originale" w={300}>{img('/mockups/hud-lab/attach/roster-full-src.png', 300, 'roster originale')}</Pane>}
         right={<Pane title="spike v7 (asset generati + montati)"><RosterSpike /></Pane>} />

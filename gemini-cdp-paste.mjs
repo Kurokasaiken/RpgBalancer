@@ -1,0 +1,30 @@
+import fs from 'fs';
+const [,,conv,infile] = process.argv;
+let id=0; const pend=new Map();
+const send=(ws,method,params={})=>new Promise((res,rej)=>{const i=++id;pend.set(i,{res,rej});ws.send(JSON.stringify({id:i,method,params}));});
+const list = await (await fetch('http://127.0.0.1:9222/json/list')).json();
+const target = list.find(t=>t.url.includes('gemini.google.com')) || list[0];
+const ws = new WebSocket(target.webSocketDebuggerUrl);
+await new Promise(r=>ws.onopen=r);
+ws.addEventListener('message',e=>{const m=JSON.parse(e.data);if(m.id&&pend.has(m.id)){const p=pend.get(m.id);pend.delete(m.id);m.error?p.rej(new Error(m.error.message)):p.res(m.result);}});
+await send(ws,'Page.enable'); await send(ws,'Runtime.enable');
+await send(ws,'Page.navigate',{url:conv==='new'?'https://gemini.google.com/app':conv});
+await new Promise(r=>setTimeout(r,13000));
+const b64 = fs.readFileSync(infile).toString('base64');
+const {result} = await send(ws,'Runtime.evaluate',{expression:`
+  (async()=>{
+    const r = await fetch('data:image/png;base64,${b64.length>200000?'':b64}');
+    const blob = await r.blob();
+    const file = new File([blob], 'map.png', {type:'image/png'});
+    const dt = new DataTransfer(); dt.items.add(file);
+    const box = document.querySelector('div[contenteditable="true"], .ql-editor, textarea');
+    box.focus();
+    const ev = new ClipboardEvent('paste', {clipboardData: dt, bubbles:true, cancelable:true});
+    box.dispatchEvent(ev);
+    await new Promise(r=>setTimeout(r,4000));
+    const imgs=[...document.querySelectorAll('img')].filter(i=>i.src.startsWith('blob:')||i.src.startsWith('data:'));
+    return imgs.length;
+  })()`,awaitPromise:true,returnByValue:true});
+console.log('attached imgs:',result.value);
+console.log('URL:',target.url);
+ws.close();

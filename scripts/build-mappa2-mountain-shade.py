@@ -24,6 +24,7 @@ def main() -> None:
     src = np.asarray(Image.open(args.source).convert("RGB")).astype(np.float32) / 255
     bio = np.array(Image.open(pack / "biome_ids.png"))
     land = np.array(Image.open(pack / "masks" / "land_mask.webp"))[..., 3] > 127
+    sea = np.array(Image.open(pack / "masks" / "sea_mask.webp"))[..., 3] > 127
 
     lab = cv2.cvtColor(src, cv2.COLOR_RGB2LAB)
     L, a, b = lab[..., 0], lab[..., 1], lab[..., 2]
@@ -38,6 +39,10 @@ def main() -> None:
     t = np.clip((L - 62) / 12, 0, 1) * np.clip((22 - chroma) / 10, 0, 1)
     snow = cv2.GaussianBlur(t, (0, 0), 2)
     w = area * (1 - snow)
+    # ...and NEVER the sea: the `watery` colour test misses the dark bays between the peaks, and the
+    # 18px area blur bleeds the shade past the shoreline — both darkened the bays (Director 2026-11-02).
+    sea_bleed = cv2.dilate(sea.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))) > 0
+    w *= (~sea_bleed).astype(np.float32)
 
     # "cinematic" target on the rock: gamma on L (deeper shadows) + local contrast (clarity) + fine sharpening.
     # Expressed as two sheets so the runtime needs no filter: multiply (<=1, darkens) and add (>=0, lifts the
@@ -50,7 +55,10 @@ def main() -> None:
     lab2[..., 1:] *= 1.08                                   # a touch more chroma, rock reads richer
     target = np.clip(cv2.cvtColor(lab2, cv2.COLOR_LAB2RGB), 0, 1)
     tgt = src * (1 - w[..., None]) + target * w[..., None]  # only on rock
-    ratio = np.clip(tgt / np.maximum(src, 1e-3), 0, 1)
+    # divide-by-tiny-src: where the painting is ~black in a channel (dark water R≈0), tgt/src ≈ 0/0.001
+    # → 0, and the sheet multiplied that channel to zero — the bays went dark (Director 2026-11-02).
+    # Where the shade does not apply the sheet must be pure white, unconditionally.
+    ratio = np.where(w[..., None] > 0.001, np.clip(tgt / np.maximum(src, 1e-3), 0, 1), 1.0)
     mult = np.minimum(ratio, 1.0)
     add = np.clip(tgt - src * mult, 0, 1)
     pack_fx = pack / "fx"

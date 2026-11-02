@@ -171,6 +171,43 @@ def biome_mask(biome_ids: np.ndarray, biome_index: dict[str, int], wanted: set[s
     return np.isin(biome_ids, [biome_index[b] for b in wanted])
 
 
+# Coast surf whitelist (R-299, Director 2026-11-02: «tocchiamo solo le zone corrette»). The surf shader decides
+# what is painted foam from brightness near the shore, and on mappa2 the snow peaks rise straight out of the sea:
+# their white tips read as foam, got "cleaned" to water and grew run-up. Every surf mechanism is multiplied by
+# this mask, so foam can only exist away from these biomes and from the inland lakes.
+SURF_EXCLUDED_BIOMES = {"alpine"}
+SURF_BIOME_PAD_PX = 24
+SURF_LAKE_PAD_PX = 20
+SURF_LAKE_MIN_PX = 500  # smaller "lakes" are shadowed sea misread by the water classifier (one sits at the arch's cliff foot)
+SURF_FEATHER_PX = 6.0
+
+
+def build_foam_strokes(rgb: np.ndarray, plate_alpha: np.ndarray, zones: np.ndarray) -> np.ndarray:
+    """RGBA (straight) of the painted surf strokes the shader animates (masks/foam_strokes.webp).
+
+    Alpha is the stroke itself — a brightness ramp of the painting, cool whites only — not the plate's
+    dilated footprint: animating the footprint turned a few-px painted surf line into a white sausage."""
+    mn = rgb.min(axis=2).astype(np.float32)
+    cool = np.clip((rgb[..., 2].astype(np.float32) - rgb[..., 0] + 24.0) / 16.0, 0, 1)  # sand fades out
+    # 130: the painted lace sits at min-rgb ~130-180; 150 kept only its brightest cores
+    alpha = np.clip((mn - 130.0) / 55.0, 0, 1) * cool * (plate_alpha > 8) * (zones / 255.0)
+    return np.dstack([rgb, (alpha * 255).astype(np.uint8)]).astype(np.uint8)
+
+
+def build_surf_zones(biome_ids: np.ndarray, biome_index: dict[str, int], internal_water: np.ndarray) -> np.ndarray:
+    """0..255 where the coast surf may draw (alpha of masks/surf_zones.webp)."""
+    def pad(mask: np.ndarray, px: int) -> np.ndarray:
+        k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * px + 1, 2 * px + 1))
+        return cv2.dilate(mask.astype(np.uint8), k) > 0
+
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(internal_water.astype(np.uint8), connectivity=8)
+    lakes = np.isin(labels, [i for i in range(1, count) if stats[i, cv2.CC_STAT_AREA] >= SURF_LAKE_MIN_PX])
+    excluded = pad(biome_mask(biome_ids, biome_index, SURF_EXCLUDED_BIOMES), SURF_BIOME_PAD_PX) | pad(lakes, SURF_LAKE_PAD_PX)
+    allowed = cv2.GaussianBlur((~excluded).astype(np.float32), (0, 0), SURF_FEATHER_PX)
+    allowed[excluded] = 0.0  # the feather only runs outward: an excluded pixel never gets surf
+    return (np.clip(allowed, 0, 1) * 255).astype(np.uint8)
+
+
 def save_webp_rgba(rgb: np.ndarray, alpha: np.ndarray, path: Path, quality: int = 92) -> None:
     rgba = np.dstack([rgb, alpha]).astype(np.uint8)
     Image.fromarray(rgba, "RGBA").save(path, quality=quality, method=4)
@@ -1263,7 +1300,19 @@ def main() -> None:
     parser.add_argument("--pipeline-version", default="mappa2-assets-v1")
     parser.add_argument("--mask-revision", type=int, default=6)
     parser.add_argument("--cloud-source", default=str(Path.home() / "Downloads" / "nuvole.jpeg"))
+    parser.add_argument("--only-surf-masks", action="store_true",
+                        help="rebuild masks/surf_zones.webp + masks/foam_strokes.webp from the shipped pack, nothing else")
     args = parser.parse_args()
+    if args.only_surf_masks:
+        out = Path(args.out)
+        territory = load_territory_maps(out)
+        lakes = np.array(Image.open(out / "masks" / "internal_water_mask.webp").convert("RGBA"))[..., 3] > 127
+        zones = build_surf_zones(territory["biome_ids"], territory["biome_index"], lakes)
+        save_alpha_mask(zones, out / "masks" / "surf_zones.webp")
+        base = np.array(Image.open(out / "layers" / "base_flat.webp").convert("RGB"))
+        plate_a = np.array(Image.open(out / "masks" / "foam_clean.webp").convert("RGBA"))[..., 3]
+        Image.fromarray(build_foam_strokes(base, plate_a, zones), "RGBA").save(out / "masks" / "foam_strokes.webp", lossless=True, quality=100, method=4)
+        return
 
     source = Path(args.source).expanduser().resolve()
     out = Path(args.out)
@@ -1302,7 +1351,16 @@ def main() -> None:
     # draws jagged foam on the peaks. The authored biome map knows that land:
     # cut sea∩land_biomes back out; carved pixels become land, never water.
     land_area = np.isin(biome_ids, [b["index"] for b in territory["biomes"] if b.get("kind") == "land"])
-    sea &= ~land_area
+    fake_sea = sea & land_area
+    sea &= ~fake_sea
+    # the biome carve strands pockets of fake water inside sea-kind biomes
+    # (peak tips): a real sea reach keeps a water path to the border — drop
+    # what the carve landlocked, or the surf shader still pulses on snow.
+    _sea_n, _sea_lab = cv2.connectedComponents(sea.astype(np.uint8), connectivity=8)
+    _sea_bl = np.unique(np.concatenate([_sea_lab[0], _sea_lab[-1], _sea_lab[:, 0], _sea_lab[:, -1]]))
+    fake_sea |= sea & ~np.isin(_sea_lab, _sea_bl[_sea_bl > 0])
+    sea &= ~fake_sea
+    internal_water &= ~fake_sea
     land = ~(sea | internal_water)
     canopy_blocked = biome_mask(biome_ids, territory["biome_index"], CANOPY_BLOCKED_BIOMES)
     dense_forest_core = fill_polygon((WORLD_H, WORLD_W), DENSE_FOREST_CORE_POLYGON) > 0
@@ -1769,20 +1827,47 @@ def main() -> None:
     # Clean plate under the painted surf (Director 2026-10-30): the runtime lets the painted white RECEDE and
     # climb back up the cliff, so it needs the water that would be there without the foam. RGB = a smooth fill
     # from the surrounding foam-free sea (normalised convolution); alpha = where the foam is painted.
-    foam_px = (rgb.min(axis=2) >= 168) & sea_near & (coast_px <= 70)
+    # Bright AND not warm: beach sand passes the brightness test too, and plating it read as cyan blobs with a
+    # dark rim on every beach (Director 2026-11-02, «macchie di sporco»). Painted surf is white-to-cyan (B >= R).
+    land_px = cv2.distanceTransform((~sea).astype(np.uint8), cv2.DIST_L2, 5)
+    # rock FOOT only: sea straight below (within 25 px) and rock on both sides — the side silhouettes of
+    # a cliff have sea below them too in this top-down-angled painting, and their bright rim became a line
+    sea_u = sea.astype(np.uint8)
+    below = np.zeros_like(sea)
+    for k in range(1, 26):
+        below[:-k] |= sea[k:]
+    landish = ~sea
+    sides = np.zeros_like(sea)
+    sides[:, 8:-8] = landish[:, :-16] & landish[:, 16:]
+    rock_foot = ~sea & (land_px <= 25) & below & sides
+    # ...and the surf painted ON the rock foot (within 25 px of the sea): left unplated it stayed white
+    # forever while the waves came and went beside it (Director 2026-11-02, «bianco sempre disegnato»).
+    foam_px = ((rgb.min(axis=2) >= 168) & (rgb[..., 2].astype(np.int16) - rgb[..., 0] >= -12)
+               & ((sea_near & (coast_px <= 70)) | rock_foot))
     foam_px = cv2.dilate(foam_px.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))) > 0
     # fill only from clearly-water pixels, well clear of the foam's bright halo (else the plate comes out washed-out)
-    near_foam = cv2.dilate(foam_px.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))) > 0
-    valid = (sea & ~near_foam & (rgb.min(axis=2) < 125) & (coast_px > 2)).astype(np.float32)
+    # Fill the foam footprint from its nearest non-foam neighbours (water, sand, rock alike), smallest scale
+    # first: a normalised convolution cascade. A blur of "clearly water" fell back to deep-sea blue at the
+    # shore (blue streak on beaches); cv2.inpaint smeared streaks and rock blobs across wide footprints
+    # (Director 2026-11-02, «macchie di sporco», grey smear at the rock feet).
+    hole = cv2.dilate(foam_px.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
+    valid = (~hole & (rgb.min(axis=2) < 168)).astype(np.float32)
     rgbf = rgb.astype(np.float32)
-    num = cv2.GaussianBlur(rgbf * valid[..., None], (0, 0), 9.0)
-    den = cv2.GaussianBlur(valid, (0, 0), 9.0)[..., None]
-    num2 = cv2.GaussianBlur(rgbf * valid[..., None], (0, 0), 28.0)
-    den2 = cv2.GaussianBlur(valid, (0, 0), 28.0)[..., None]
-    fill = np.where(den > 0.03, num / np.maximum(den, 1e-4), num2 / np.maximum(den2, 1e-4))
+    fill = rgbf.copy()
+    todo = hole.copy()
+    for sigma in (3.0, 6.0, 12.0, 24.0, 48.0):
+        den = cv2.GaussianBlur(valid, (0, 0), sigma)
+        num = cv2.GaussianBlur(rgbf * valid[..., None], (0, 0), sigma)
+        ok = todo & (den > 0.15)
+        fill[ok] = num[ok] / den[ok][:, None]
+        todo &= ~ok
     foam_a = cv2.GaussianBlur(foam_px.astype(np.float32), (0, 0), 1.6)
     foam_a = np.clip(foam_a * 1.25, 0, 1)
     save_webp_rgba_lossless(np.clip(fill, 0, 255).astype(np.uint8), (foam_a * 255).astype(np.uint8), masks_dir / "foam_clean.webp")
+    surf_zones = build_surf_zones(biome_ids, territory["biome_index"], internal_water)
+    save_alpha_mask(surf_zones, masks_dir / "surf_zones.webp")
+    Image.fromarray(build_foam_strokes(rgb, (foam_a * 255).astype(np.uint8), surf_zones), "RGBA").save(
+        masks_dir / "foam_strokes.webp", lossless=True, quality=100, method=4)
 
     # ── Ambient director (PLAN-094): shoal zones + route schema v0 ─────────
     ambient_exclusions: dict[str, np.ndarray] = {
