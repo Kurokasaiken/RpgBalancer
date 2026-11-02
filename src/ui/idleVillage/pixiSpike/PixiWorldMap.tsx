@@ -561,7 +561,7 @@ void main() {
     float gl = length(grad);
     if (gl > 1e-5) {
       vec2 dir = -grad / gl; // d grows seaward -> -grad d points at the rocks
-      vec2 amp = vec2(18.0) / uWorld; // ~18 world px of travel per loop
+      vec2 amp = vec2(12.0) / uWorld; // ~12 world px of travel per loop (wider blurs the painted shallow ring)
       float loopT = 6.0;
       float t1 = fract(uTime / loopT);
       float t2 = fract(t1 + 0.5);
@@ -580,29 +580,30 @@ void main() {
   vec3 foamPix = vec3(0.90, 0.97, 1.0); // fallback foam colour (procedural fill, rock climb)
   if (cl.a > 0.003 && water > 0.01) {
     float ph = vnoise(w * 0.008) * 0.9;
-    float cyc = fract(uTime * 0.11 + ph);
-    // surge lands fast, holds, then drains in place — foam dissolves where it lies, it doesn't slide back.
-    float rush = smoothstep(0.0, 0.16, cyc);
-    float hold = 1.0 - smoothstep(0.35, 0.95, cyc);
-    float energy = rush * hold;
-    float zone = 1.0 - smoothstep(70.0, 105.0, d);  // taper far out — the painted tails reach ~100px, thinning
+    float cyc = fract(uTime * 0.09 + ph);
+    // THE BORE MODEL (research: Rare/NVIDIA DF-crest + foam-as-decaying-product): a breaking
+    // front runs shoreward along the distance contours; foam is born at the front and decays
+    // exponentially BEHIND it — trailing lace, not a sheet popping in place.
+    float frontD = mix(85.0, 2.0, smoothstep(0.0, 0.55, cyc)); // bore sweeps in over ~6s
+    float arrived = smoothstep(0.52, 0.7, cyc);               // bore spent at the rocks
+    float age = d - frontD;                                    // px behind the moving front
+    float sheet = exp(-max(age, 0.0) / 22.0) * step(0.0, age) * (1.0 - smoothstep(60.0, 85.0, d));
+    float bore = exp(-pow(age * 0.10, 2.0)) * (1.0 - arrived * 0.4); // white leading face
+    float zone = 1.0 - smoothstep(60.0, 85.0, d);   // taper — the painted tails reach ~80px, thinning
     float shore = 1.0 - smoothstep(4.0, 22.0, d);   // the breaking band pinned to the rocks
     // lace breakup: holes first — strokes and dark water between, never a solid sheet.
     float lace = smoothstep(0.48, 0.85, vnoise(w * 0.10 + vec2(uTime * 0.10, -uTime * 0.06))
                                  + 0.35 * vnoise(w * 0.028 + vec2(0.0, uTime * 0.05)));
-    // bright leading edge that runs shoreward while the surge lands.
-    float frontD = mix(78.0, 4.0, smoothstep(0.0, 0.16, cyc));
-    float edge = 1.6 * exp(-pow((d - frontD) * 0.12, 2.0)) * (1.0 - smoothstep(0.16, 0.4, cyc));
     // proximity ramp: denser AND whiter the closer to land — thin wisps offshore, thick white at the rocks.
     float prox = 1.0 - smoothstep(6.0, 70.0, d);
-    float surf = clamp(zone * energy * (0.15 + 0.85 * lace) * (0.30 + 0.70 * prox)
-                     + shore * (0.75 + 0.25 * lace) + edge, 0.0, 1.0);
+    float surf = clamp(bore * 1.5 + sheet * (0.35 + 0.65 * lace) * (0.30 + 0.70 * prox)
+                     + shore * (0.75 + 0.25 * lace), 0.0, 1.0);
     // THE FOAM IS THE PAINTING: the extracted painted strokes (uStrokes) travel with the same
     // two-phase advection — exact original colour and shape, moving. Coverage = strokes that
     // have flowed here × the surge cycle: they wash in on the rush and dissolve in the drain.
     float strkA = 0.0; vec3 strkC = vec3(0.92, 0.98, 1.0);
     if (flowOk > 0.5) {
-      vec2 amp = vec2(18.0) / uWorld;
+      vec2 amp = vec2(12.0) / uWorld;
       float loopT = 6.0;
       float t1 = fract(uTime / loopT);
       float t2 = fract(t1 + 0.5);
@@ -621,7 +622,7 @@ void main() {
       strkA = (s1.a * w1 + s2.a * w2) / (w1 + w2);
       strkC = (s1.rgb * s1.a * w1 + s2.rgb * s2.a * w2) / max(strkA * (w1 + w2), 1e-4);
     }
-    float cov = clamp(surf * 0.35 + strkA * (zone * energy * (0.4 + 0.6 * prox) + shore) * 1.6, 0.0, 1.0);
+    float cov = clamp(surf * 0.22 + strkA * (sheet * (0.4 + 0.6 * prox) + bore + shore) * 1.6, 0.0, 1.0);
     foamPix = mix(vec3(0.92, 0.98, 1.0), strkC, clamp(strkA * 2.0, 0.0, 1.0));
     foamPix = mix(foamPix, vec3(0.99, 1.0, 1.0), prox * 0.55); // whiter the closer to land
     foamA = cl.a * cov * min(1.0, uStrength * 2.0);
@@ -633,11 +634,10 @@ void main() {
     float ld = lt.r * uDMax;
     if (ld <= 30.0) {
       float ph = vnoise(w * 0.008) * 0.9;
-      float cyc = fract(uTime * 0.11 + ph);
-      float rush = smoothstep(0.0, 0.16, cyc);
-      float hold = 1.0 - smoothstep(0.35, 0.95, cyc);
-      float energy = rush * hold;
-      float climbH = mix(2.0, 24.0, energy) * lt.b; // run-up height in rock px
+      float cyc = fract(uTime * 0.09 + ph);
+      // swash is an EVENT, not a pulse: it fires when the bore lands — quick uprush, slow rundown.
+      float climbE = smoothstep(0.5, 0.62, cyc) * (1.0 - smoothstep(0.72, 0.98, cyc));
+      float climbH = mix(1.0, 26.0, climbE) * lt.b; // run-up height in rock px
       float up = 1.0 - smoothstep(climbH - 4.0, climbH, ld);
       float lace2 = smoothstep(0.42, 0.8, vnoise(w * 0.10 + vec2(uTime * 0.10, -uTime * 0.06))
                                     + 0.35 * vnoise(w * 0.028 + vec2(0.0, uTime * 0.05)));
@@ -657,7 +657,7 @@ void main() {
   vec3 foamTint = mix(vec3(0.85, 0.96, 1.0), vec3(1.0), smoothstep(0.1, 0.55, foamA));
   vec3 surfCol = foamPix * foamTint * foamA + cl.rgb * hideA * (1.0 - foamA);
   float aSurf = foamA + hideA * (1.0 - foamA);
-  float aFlow = water * (1.0 - smoothstep(100.0, 140.0, d)) * (1.0 - aSurf) * flowOk;
+  float aFlow = water * (1.0 - smoothstep(70.0, 110.0, d)) * (1.0 - aSurf) * flowOk;
   vec3 premult = surfCol * aSurf + flowed * aFlow;
   outColor = vec4(premult, aSurf + aFlow);
 }

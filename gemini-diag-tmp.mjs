@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+import yaml from 'js-yaml';
+import fs from 'fs';
+const sess = yaml.load(fs.readFileSync('/Users/faustoboni/progetti_personali/mind-weaver/.mw/providers/sessions/gemini-web.yaml','utf8'));
+const browser = await chromium.launch({headless:true});
+const ctx = await browser.newContext({userAgent: sess.headers['User-Agent'], viewport:{width:1440,height:1000}});
+await ctx.addCookies(sess.cookies.map(k=>({name:k.name,value:String(k.value),domain:k.domain,path:k.path||'/',expires:k.expires||-1,secure:!!k.secure,httpOnly:!!k.httpOnly})));
+const p = await ctx.newPage();
+await p.goto('https://gemini.google.com/app',{waitUntil:'domcontentloaded',timeout:60000});
+await p.waitForTimeout(12000);
+console.log('URL:',p.url());
+console.log('file inputs:',await p.locator('input[type="file"]').count());
+console.log('contenteditable:',await p.locator('div[contenteditable="true"]').count());
+console.log('buttons:',(await p.$$eval('button',e=>e.slice(0,12).map(b=>(b.getAttribute('aria-label')||b.textContent||'').slice(0,40)))).join(' | '));
+await p.screenshot({path:'test-results/mappa2-upscale/atlas/diag.png'});
+await browser.close();

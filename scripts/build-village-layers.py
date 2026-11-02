@@ -258,7 +258,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--plate'); ap.add_argument('--raw')
     ap.add_argument('--parent'); ap.add_argument('--ancestor')
-    ap.add_argument('--zone', default='275,130,380,380', help='zone rect in CROP coords (world 1425,510,380,380 - crop 1150,380,900,660)')
+    ap.add_argument('--zone', default='110,125,510,390', help='zone rect in CROP coords (world 1260,505,510,390 - crop 1150,380,900,660)')
     ap.add_argument('--crop', default='1150,380,900,660')
     ap.add_argument('--max-px', type=float, default=2.0)
     ap.add_argument('--reports', default='reports')

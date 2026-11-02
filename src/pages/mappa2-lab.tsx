@@ -709,54 +709,24 @@ export default function Mappa2LabPage() {
                 <input type="checkbox" checked={villageOn} onChange={(e) => setVillageOn(e.target.checked)} />
                 village zone
               </label>
-              <div style={{ fontSize: 12, marginTop: 6, marginBottom: 4 }}>crescita:</div>
-              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-                {(villageManifest?.growth ?? [villageGrowth]).map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => setVillageGrowth(g)}
-                    style={{ padding: '4px 7px', border: '1px solid #56758d', borderRadius: 4, color: villageGrowth === g ? '#dff4ff' : 'inherit', background: villageGrowth === g ? '#17415f' : 'rgba(20, 55, 80, 0.75)', cursor: 'pointer', fontSize: 12 }}
-                  >
-                    {g}
-                  </button>
-                ))}
-              </div>
-              <div style={{ marginTop: 10, borderTop: '1px solid rgba(125,180,220,0.25)', paddingTop: 8 }}>
-                <div style={{ fontSize: 12, marginBottom: 4 }}>difesa:</div>
-                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                  {(villageManifest?.axes.defence.values ?? ['none']).map((d) => (
+              <div style={{ fontSize: 12, marginTop: 6, marginBottom: 4 }}>stati ({(villageManifest?.plates ?? []).filter((pl) => pl.shipped).length}):</div>
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                {(villageManifest?.plates ?? []).filter((pl) => pl.shipped).map((pl) => {
+                  const cur = `${villageGrowth}|${villageDefence}|${villageTowers}`;
+                  const sel = cur === pl.key;
+                  const [g, d, s] = pl.key.split('|');
+                  return (
                     <button
-                      key={d}
+                      key={pl.key}
                       type="button"
-                      onClick={() => { setVillageDefence(d); if (d === 'none') setVillageTowers('none+none'); }}
-                      style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: villageDefence === d ? '#0d1f2d' : 'inherit', background: villageDefence === d ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
+                      onClick={() => { setVillageGrowth(g); setVillageDefence(d); setVillageTowers(s); }}
+                      style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: sel ? '#0d1f2d' : 'inherit', background: sel ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
                     >
-                      {d}
+                      {g} · {d === 'none' ? '—' : d} · {s === 'none+none' ? '—' : s}
                     </button>
-                  ))}
-                </div>
-                {villageDefence !== 'none' && (
-                  <>
-                    <div style={{ fontSize: 12, margin: '8px 0 4px' }}>torri (slot1+slot2):</div>
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {Array.from(new Set(
-                        (villageManifest?.plates ?? [])
-                          .filter((p) => p.shipped && p.key.startsWith(`${villageGrowth}|${villageDefence}|`))
-                          .map((p) => p.key.split('|')[2]),
-                      )).sort().map((combo) => (
-                        <button
-                          key={combo}
-                          type="button"
-                          onClick={() => setVillageTowers(combo)}
-                          style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: villageTowers === combo ? '#0d1f2d' : 'inherit', background: villageTowers === combo ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
-                        >
-                          {combo}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
+                  );
+                })}
+              </div>
                 <div style={{ fontSize: 12, margin: '8px 0 4px', opacity: 0.75 }}>piazzamento manuale parti:</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                   {['pal-straight','pal-curve','pal-gate','tower-wood','wall-straight','wall-curve','wall-gate','tower-stone'].map((p) => (
@@ -784,9 +754,8 @@ export default function Mappa2LabPage() {
                     </button>
                   )}
                 </div>
-              </div>
               <div style={{ marginTop: 8, fontSize: 12, opacity: 0.75 }}>
-                zona villaggio: definita in village.json (manifest v2 = unica fonte). crescita/difesa/torri = picker derivati dalle piastre shipped. PIAZZA = arma un pezzo poi clicchi per posarlo al punto hover.
+                zona villaggio: definita in village.json (manifest v2 = unica fonte). ogni bottone = una piastra shipped: clicchi e vedi quella versione. PIAZZA = arma un pezzo poi clicchi per posarlo al punto hover.
               </div>
             </div>
           </>

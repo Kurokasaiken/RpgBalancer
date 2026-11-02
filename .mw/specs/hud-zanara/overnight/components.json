@@ -1,0 +1,54 @@
+{
+  "components": [
+    {
+      "id": "emblem-alato",
+      "title": "Medaglione alato brand (compass-rose + ali aquila)",
+      "ref": "public/mockups/hud-lab/attach/roster-full-src.png",
+      "cropRef": "emblem top region of the attached roster column",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE large ornate winged compass-rose medallion for a fantasy HUD header — a green-jeweled compass rose set in an antique-gold circular frame with engraved details, flanked by two sweeping golden eagle wings spreading outward symmetrically, a small emerald diamond gem at top. Rich deep gold relief, glossy green enamel compass face, painterly but crisp. Centered, orthographic front view, no text, no shadow, no vignette, no watermark. Match the materials of the reference."
+    },
+    {
+      "id": "pillar-banda",
+      "title": "Pilastro laterale banda larga (smalto+oro+gemme giunti)",
+      "ref": "public/mockups/hud-lab/attach/roster-full-src.png",
+      "cropRef": "the left ornamental band of the attached roster column",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE wide vertical ornamental PILLAR BAND for a fantasy HUD roster column — a substantial dark emerald-green enamel vertical band bordered by ornate antique-gold edging on both edges, decorated with engraved gold ivy vines wrapping diagonally across it, and faceted emerald diamond gems set in ornate gold sockets at regular intervals (the junction points). Rich metal relief, glossy enamel, painterly crisp. Full image height, centered; orthographic front view, no text, no shadow, no vignette, no watermark."
+    },
+    {
+      "id": "panel-alabastro",
+      "title": "Cornice pannello contestuale alabastro",
+      "ref": "public/mockups/hud-lab/crops/panel/zanara-v3.webp",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE ornate fantasy UI panel FRAME — an alabaster/ivory carved stone frame with soft veining, trimmed with antique-gold filigree corner ornaments and small emerald gem accents, hollow EMPTY dark navy interior (a frame only, no content, no text). Wide horizontal panel aspect, painterly crisp detail, matte stone texture (not glossy). Orthographic front view, no shadow, no vignette, no watermark. Match the attached reference's design language."
+    },
+    {
+      "id": "nav-plinth",
+      "title": "Barra navigazione plinth + ornamenti",
+      "ref": "public/mockups/hud-lab/crops/nav/zanara-v1.webp",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE wide horizontal fantasy HUD navigation plinth — a dark emerald-green enamel bar inside an ornate antique-gold frame, with a central astrolabe/compass medallion integrated at center, small gem accents, and EMPTY circular icon sockets evenly spaced along the bar (no icons, no text). Rich gold relief, painterly crisp. Orthographic front view, no shadow, no vignette, no watermark. Match the attached reference's design."
+    },
+    {
+      "id": "resources-bar",
+      "title": "Barra risorse (tabella + icone gemme)",
+      "ref": "public/mockups/hud-lab/crops/resources/zanara-v3.webp",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE horizontal fantasy HUD resource bar — a slim dark emerald-green enamel plaque in an antique-gold frame, containing empty gold-trimmed slots for resource icons and values (no numbers, no text), small decorative gem accents at the ends and between slots. Rich gold relief, painterly crisp. Orthographic front view, no text, no shadow, no vignette, no watermark. Match the attached reference."
+    },
+    {
+      "id": "corner-br",
+      "title": "Cluster roundels angolo basso destra",
+      "ref": "public/mockups/hud-lab/crops/cornerBR/board-breakdown.webp",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE cluster of ornate fantasy HUD corner buttons — several small circular gold-framed roundels (engraved antique gold rings with dark emerald enamel centers, EMPTY interiors no icons) arranged in a compact decorative grouping connected by gold filigree, plus one larger medallion. Rich metal relief, painterly crisp. Orthographic front view, no text, no shadow, no vignette, no watermark. Match the attached reference's design language."
+    },
+    {
+      "id": "corner-bl",
+      "title": "Pezzo angolo basso sinistra (bussola/coords)",
+      "ref": "public/mockups/hud-lab/crops/cornerBL/zanara-v1.webp",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE ornate fantasy HUD corner instrument — an engraved antique-gold sextant/navigation instrument mounted on a small dark emerald enamel plaque, with a tiny empty coordinates plate beneath it (no numbers, no text), small gem accents. Rich metal relief, painterly crisp. Orthographic front view, no shadow, no vignette, no watermark. Match the attached reference's design language."
+    },
+    {
+      "id": "seal",
+      "title": "Sigillo vittoria (hero piece standalone)",
+      "ref": "public/mockups/hud-lab/crops/seal/mockup1-classic.webp",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE ornate fantasy victory SEAL medallion — a large circular antique-gold seal with a laurel/leaf wreath border engraved in deep relief, a polished dark emerald enamel center with an EMPTY central emblem socket (no text, no percentage), small gem accents at cardinal points. Hero-piece detail, rich metal relief, painterly crisp. Orthographic front view, no shadow, no vignette, no watermark. Match the attached reference's design."
+    }
+  ]
+}
