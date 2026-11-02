@@ -7,4 +7,4 @@ const big=[];
 for(const im of await p.$$('img')){const bb=await im.boundingBox().catch(()=>null);if(bb&&bb.width>300)big.push(im);}
 console.log('imgs:',big.length);
 if(big.length){await big[big.length-1].screenshot({path:'/tmp/mappa2-upscale-test/bayou_v7.png'});console.log('SAVED');}
-await b.close();
+

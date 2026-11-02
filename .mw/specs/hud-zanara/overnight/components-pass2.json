@@ -1,0 +1,25 @@
+{
+  "components": [
+    { "id": "emblem-alato", "title": "Medaglione alato — ali più larghe",
+      "chat": "https://gemini.google.com/app/e2c40bb519d8d7ac",
+      "prompt": "Keep the same winged compass-rose medallion — same gold frame, same green jeweled compass face, same emerald diamond on top. Change ONLY the wings: make them spread slightly wider and more open, like eagle wings unfurled horizontally. Same flat navy background. Generate the corrected image." },
+    { "id": "panel-alabastro", "title": "Frame alabastro — togliere figure scolpite",
+      "chat": "https://gemini.google.com/app/e51c83402f18b053",
+      "prompt": "Keep the same alabaster frame with gold filigree corners and green gem inlays. Change ONLY the sculpted human figures on the left and right edges: replace them with elegant carved alabaster scrollwork columns (no human figures, no faces). Keep the empty dark navy interior. Generate the corrected image." },
+    { "id": "nav-plinth", "title": "Nav plinth — variante più compatta",
+      "chat": "https://gemini.google.com/app/9816b3fbf1148094",
+      "prompt": "Keep the same navigation plinth — dark emerald enamel bar in antique-gold frame, central astrolabe medallion, empty circular icon sockets. Change ONLY: make the bar a bit slimmer and lower-profile overall, keep 4 sockets per side. Same navy background. Generate the corrected image." },
+    { "id": "resources-bar", "title": "Resources bar — divisori puliti",
+      "chat": "https://gemini.google.com/app/de3f4b1d06ffa2d6",
+      "prompt": "Keep the same slim resource bar — gold frame, dark emerald enamel, gemmed end caps, 4 empty slots. Change ONLY the small medallions between the slots: replace the ones with the S-shaped letter with plain small gold diamond-shaped separators (no letters, no symbols). Keep everything else identical. Generate the corrected image." },
+    { "id": "corner-br", "title": "Cluster roundels — variante",
+      "chat": "https://gemini.google.com/app/f2eddb2bb98aa041",
+      "prompt": "Generate one more variant of the same cluster: engraved antique-gold circular roundels with dark emerald enamel empty centers, grouped compactly around a larger central webbed medallion with small emerald accents — but make it slightly more compact and rounder overall, same navy background." },
+    { "id": "brand-plaque", "title": "Placca titolo WANDERLUST (nuovo pezzo)",
+      "ref": "public/mockups/hud-lab/attach/roster-full-src.png",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE wide horizontal fantasy title plaque — an antique-gold engraved frame plaque with ornate winged/filigree ends and a dark emerald-green enamel EMPTY center band for title text (no text, no letters). A small emerald gem accent centered below. Rich gold relief, painterly crisp, matching the ornamental style at the top right of the attached reference. Orthographic front view, no shadow, no watermark." },
+    { "id": "cta-button", "title": "Bottone CTA INIZIA (nuovo pezzo)",
+      "ref": "public/mockups/hud-lab/crops/panel/zanara-v3.webp",
+      "prompt": "Generate an image: isolated game-UI production asset on a flat uniform navy background #0a1622. ONE wide fantasy HUD call-to-action button — a dark emerald-green enamel pill button inside an ornate antique-gold engraved frame with a small compass-rose medallion on the left end, EMPTY center for button text (no text, no letters). Rich gold relief, glossy enamel, painterly crisp, matching the button at the bottom of the attached reference. Orthographic front view, no shadow, no watermark." }
+  ]
+}
