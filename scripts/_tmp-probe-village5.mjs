@@ -1,0 +1,16 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
+const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+await p.goto('http://localhost:5173/mappa2-lab', { waitUntil: 'networkidle' });
+await p.waitForFunction(() => window.__worldCamCtl, null, { timeout: 90000 });
+await p.waitForTimeout(5000);
+await p.getByRole('button', { name: 'village', exact: true }).click();
+await p.waitForTimeout(400);
+const labels = await p.locator('button').allTextContents();
+const villageBtn = labels.filter((t) => /stone.*wall.*stone/i.test(t));
+console.log('matching:', JSON.stringify(villageBtn));
+if (villageBtn.length) await p.getByRole('button', { name: villageBtn[0].trim(), exact: true }).first().click();
+await p.evaluate(() => window.__worldCamCtl.set({ panX: 1155, panY: 415, zoom: 2 }));
+await p.waitForTimeout(2500);
+await p.screenshot({ path: '/tmp/v5-zone.png', clip: { x: 400, y: 0, width: 1040, height: 900 } });
+await b.close(); console.log('done');

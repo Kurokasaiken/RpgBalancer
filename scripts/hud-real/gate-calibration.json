@@ -1,0 +1,101 @@
+{
+  "positive": {
+    "file": ".mw/specs/hud-real/C1/S1-row0-swinir.png",
+    "metrics": {
+      "counts": 11,
+      "purple_frac": 0.0010518824800531915,
+      "bg_dev": 12.131087891558414,
+      "navy_bg": false,
+      "glyphs": true,
+      "edge_ssim": 0.849852790343955,
+      "mask_iou": 0.989439361495036,
+      "mad": 2.9352836879432624,
+      "sym_diff": 48.477344172877544,
+      "lap_ratio": 0.05185820091583177
+    },
+    "verdict": {
+      "tierA": "PASS",
+      "tierA_reasons": [],
+      "tierB_fail": [
+        "sym_diff",
+        "lap_ratio",
+        "glyph-like clusters"
+      ],
+      "tierB": "ALARM"
+    }
+  },
+  "negatives": [
+    {
+      "file": "/tmp/r1prev/row-vec.png",
+      "metrics": {
+        "counts": 1,
+        "purple_frac": 0.0,
+        "bg_dev": 13.390287769784173,
+        "navy_bg": false,
+        "glyphs": true,
+        "edge_ssim": 0.12253245026038165,
+        "mask_iou": 0.849110704787234,
+        "mad": 47.554978390957444,
+        "sym_diff": 20.902312842361535,
+        "lap_ratio": 1.1594669571720928
+      },
+      "verdict": {
+        "tierA": "PASS",
+        "tierA_reasons": [],
+        "tierB_fail": [
+          "edge_ssim",
+          "mask_iou",
+          "sym_diff",
+          "mad",
+          "lap_ratio",
+          "glyph-like clusters"
+        ],
+        "tierB": "ALARM"
+      }
+    },
+    {
+      "file": ".mw/specs/hud-real/C1/S1-row0-esrgan.png",
+      "metrics": {
+        "counts": 8,
+        "purple_frac": 0.0009324094082446808,
+        "bg_dev": 10.68953506273574,
+        "navy_bg": false,
+        "glyphs": true,
+        "edge_ssim": 0.7560214339840364,
+        "mask_iou": 0.9516625164786876,
+        "mad": 7.568885749113475,
+        "sym_diff": 48.40908696617674,
+        "lap_ratio": 0.11028621846876563
+      },
+      "verdict": {
+        "tierA": "PASS",
+        "tierA_reasons": [],
+        "tierB_fail": [
+          "edge_ssim",
+          "sym_diff",
+          "mad",
+          "lap_ratio",
+          "glyph-like clusters"
+        ],
+        "tierB": "ALARM"
+      }
+    }
+  ],
+  "calibration": {
+    "tierA": {
+      "purple_frac_max": 0.0,
+      "glyph_clusters": 0,
+      "bg_dev_max": 18.19663183733762,
+      "counts_tol": 0
+    },
+    "tierB": {
+      "edge_ssim_min": 0.765,
+      "mask_iou_min": 0.93,
+      "sym_diff_max": 58.17,
+      "mad_max": 4.0,
+      "lap_ratio_min": 0.05
+    },
+    "base_counts": 5
+  },
+  "calibration_ok": true
+}

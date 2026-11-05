@@ -1,0 +1,79 @@
+{
+  "when": "2026-11-03T16:01:51.460Z",
+  "url": "https://gemini.google.com/app#g0-76542-mw0vl9rp",
+  "buttons": [
+    {
+      "aria": "Cerca nelle chat",
+      "text": "search"
+    },
+    {
+      "aria": "Chiudi barra laterale",
+      "text": ""
+    },
+    {
+      "aria": "Altro",
+      "text": "Altro"
+    },
+    {
+      "aria": "Attività delle app Gemini",
+      "text": "Attività"
+    },
+    {
+      "aria": "Impostazioni",
+      "text": ""
+    },
+    {
+      "aria": "Scorri fino in fondo",
+      "text": ""
+    },
+    {
+      "aria": "",
+      "text": "Visualizza utilizzo"
+    },
+    {
+      "aria": "",
+      "text": "Esegui l'upgrade"
+    },
+    {
+      "aria": "Caricamento e strumenti",
+      "text": ""
+    },
+    {
+      "aria": "Detta (⌘⇧D)",
+      "text": ""
+    },
+    {
+      "aria": "",
+      "text": "Scarica app"
+    },
+    {
+      "aria": "",
+      "text": "Fai l'upgrade"
+    },
+    {
+      "aria": "Chat temporanea",
+      "text": ""
+    }
+  ],
+  "pickerGuess": [
+    "Attività delle app Gemini"
+  ],
+  "banners": [
+    "Il limite verrà reimpostato alle ore 7:01 PMIl limite verrà reimpostato alle ore 7:01 PM Visualizza utilizzo  Esegui l'upgrade",
+    "Il limite verrà reimpostato alle ore 7:01 PMIl limite verrà reimpostato alle ore 7:01 PM",
+    "Il limite verrà reimpostato alle ore 7:01 PM",
+    "Visualizza utilizzo  Esegui l'upgrade",
+    "Visualizza utilizzo",
+    "Esegui l'upgrade"
+  ],
+  "attach": [
+    {
+      "target": 1,
+      "sentFiles": 1,
+      "setOk": false,
+      "chipsVisible": 0,
+      "toasts": []
+    }
+  ],
+  "inputsMultiple": []
+}

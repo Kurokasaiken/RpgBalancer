@@ -1,0 +1,42 @@
+{
+  "component": "C9",
+  "jobs": [
+    {
+      "id": "bust-1",
+      "zone": "bust",
+      "refs": [
+        ".mw/specs/hud-real/bust/design-bust.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/bust/prompt-bust.txt",
+      "out": ".mw/specs/hud-real/bust/gen/bust-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/bust/gen/bust-1-0.png",
+      "sha16": "08ac15ae7bb38e50"
+    },
+    {
+      "id": "bust-2",
+      "zone": "bust",
+      "refs": [
+        ".mw/specs/hud-real/bust/design-bust.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/bust/prompt-bust.txt",
+      "out": ".mw/specs/hud-real/bust/gen/bust-2",
+      "status": "failed"
+    },
+    {
+      "id": "bust-3",
+      "zone": "bust",
+      "refs": [
+        ".mw/specs/hud-real/bust/design-bust.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/bust/prompt-bust.txt",
+      "out": ".mw/specs/hud-real/bust/gen/bust-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/bust/gen/bust-3-0.png",
+      "sha16": "f9740cc8daa31a6f"
+    }
+  ]
+}

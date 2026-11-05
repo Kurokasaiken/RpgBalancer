@@ -1,0 +1,44 @@
+{
+  "component": "N1",
+  "jobs": [
+    {
+      "id": "brand-nr-1",
+      "zone": "brand",
+      "refs": [
+        ".mw/specs/hud-real/brand/design-brand.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-brand.txt",
+      "out": ".mw/specs/hud-real/norose/gen/brand-nr-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/brand-nr-1-0.png",
+      "sha16": "36f9aee4048a7bf5"
+    },
+    {
+      "id": "brand-nr-2",
+      "zone": "brand",
+      "refs": [
+        ".mw/specs/hud-real/brand/design-brand.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-brand.txt",
+      "out": ".mw/specs/hud-real/norose/gen/brand-nr-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/brand-nr-2-0.png",
+      "sha16": "f0c53a8cb0669fd6"
+    },
+    {
+      "id": "brand-nr-3",
+      "zone": "brand",
+      "refs": [
+        ".mw/specs/hud-real/brand/design-brand.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-brand.txt",
+      "out": ".mw/specs/hud-real/norose/gen/brand-nr-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/brand-nr-3-0.png",
+      "sha16": "6539b04e586590d8"
+    }
+  ]
+}

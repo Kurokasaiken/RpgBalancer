@@ -1,0 +1,320 @@
+{
+ "version": 1,
+ "note": "Libreria dei motivi del linguaggio HUD. Ogni voce è un MOTIVO (soggetto + significato), non ancora una scelta di posizione. I significati e gli usi sono PROPOSTE ancorate ai componenti reali del gioco (catalogo UI .mw/ui-catalog), da validare dal Director.",
+ "items": [
+  {
+   "id": "MT-001",
+   "file": "raw/phoenix.png",
+   "name": "Fenice di smeraldo",
+   "motif": "creatura araldica",
+   "meaning": [
+    "rinascita",
+    "gloria",
+    "leggenda"
+   ],
+   "silhouette": {
+    "form": "ali spiegate, simmetrico",
+    "ratio": "largo (≈1,2:1)",
+    "minPx": 200
+   },
+   "uses": [
+    {
+     "slot": "cimiero del roster",
+     "fit": "ottimo",
+     "why": "la silhouette inquadra la colonna; pendente di gemme che scende nella banda"
+    },
+    {
+     "slot": "cerimonia di livello eroe (hero-level-ceremony)",
+     "fit": "ottimo",
+     "why": "rinascita = crescita; animabile (ali, bagliore della gemma)"
+    },
+    {
+     "slot": "sigillo di vittoria / lascito",
+     "fit": "buono",
+     "why": "ruling seal-1: il sigillo può sporgere dal pannello"
+    },
+    {
+     "slot": "schermata finale o titolo",
+     "fit": "buono",
+     "why": "emblema d'apertura"
+    }
+   ],
+   "pairs": [
+    "MT-005"
+   ],
+   "avoid": "su pannelli stretti (< 200 px)",
+   "tags": [
+    "mistico",
+    "araldico",
+    "simmetrico",
+    "luminoso",
+    "animabile"
+   ],
+   "image": "/assets/ui/hud-real/library/MT-001.webp",
+   "w": 213.1,
+   "h": 240.0,
+   "asset2x": [
+    426,
+    480
+   ],
+   "status": "schizzo 1024² (non scelto)"
+  },
+  {
+   "id": "MT-002",
+   "file": "raw/chalice.png",
+   "name": "Calice di luce",
+   "motif": "oggetto sacro",
+   "meaning": [
+    "ristoro",
+    "ricompensa",
+    "grazia"
+   ],
+   "silhouette": {
+    "form": "verticale, stretto",
+    "ratio": "alto (≈0,7:1)",
+    "minPx": 120
+   },
+   "uses": [
+    {
+     "slot": "cimiero del roster",
+     "fit": "ottimo",
+     "why": "forma verticale e compatta, sta bene in cima a una colonna"
+    },
+    {
+     "slot": "popup ricompense (quest-reward-popup)",
+     "fit": "ottimo",
+     "why": "la luce che trabocca dice «ricevi»"
+    },
+    {
+     "slot": "stato di cura / eroe ferito",
+     "fit": "possibile",
+     "why": "ristoro; non è una meccanica nuova, solo un'icona"
+    },
+    {
+     "slot": "magazzino / mercante",
+     "fit": "possibile",
+     "why": "ricompensa in forma di oggetto"
+    }
+   ],
+   "pairs": [
+    "MT-005"
+   ],
+   "avoid": "come simbolo di pericolo",
+   "tags": [
+    "mistico",
+    "verticale",
+    "luminoso",
+    "animabile (gocce, vapore)"
+   ],
+   "image": "/assets/ui/hud-real/library/MT-002.webp",
+   "w": 108.0,
+   "h": 240.0,
+   "asset2x": [
+    216,
+    480
+   ],
+   "status": "schizzo 1024² (non scelto)"
+  },
+  {
+   "id": "MT-003",
+   "file": "raw/eye.png",
+   "name": "Occhio che vede",
+   "motif": "simbolo arcano",
+   "meaning": [
+    "vigilanza",
+    "conoscenza",
+    "rivelazione"
+   ],
+   "silhouette": {
+    "form": "tondo con raggiera",
+    "ratio": "quasi quadrato",
+    "minPx": 140
+   },
+   "uses": [
+    {
+     "slot": "scheda POI / informazioni sulla spedizione (intel)",
+     "fit": "ottimo",
+     "why": "mostrare cosa si sa e cosa no di un luogo"
+    },
+    {
+     "slot": "evento o allarme sulla mappa (world-surface-event-card)",
+     "fit": "buono",
+     "why": "«qualcosa è stato visto»"
+    },
+    {
+     "slot": "esplorazione / nebbia della mappa",
+     "fit": "possibile",
+     "why": "scoperta"
+    }
+   ],
+   "pairs": [],
+   "avoid": "cimiero (troppo largo, tono inquietante in cima agli eroi)",
+   "tags": [
+    "mistico",
+    "enigmatico",
+    "tondo",
+    "animabile (pupilla)"
+   ],
+   "image": "/assets/ui/hud-real/library/MT-003.webp",
+   "w": 221.1,
+   "h": 240.0,
+   "asset2x": [
+    442,
+    480
+   ],
+   "status": "schizzo 1024² (non scelto)"
+  },
+  {
+   "id": "MT-004",
+   "file": "raw/arcana.png",
+   "name": "Arcano",
+   "motif": "carta dei tarocchi",
+   "meaning": [
+    "destino",
+    "scelta",
+    "sorte"
+   ],
+   "silhouette": {
+    "form": "rettangolo verticale con cornice",
+    "ratio": "alto (≈0,65:1)",
+    "minPx": 100
+   },
+   "uses": [
+    {
+     "slot": "dorso/cornice delle carte di quest ed eventi",
+     "fit": "ottimo",
+     "why": "DESIGN_PILLARS: le carte hanno peso narrativo; è la cornice naturale"
+    },
+    {
+     "slot": "pannello esito di prova (skill check)",
+     "fit": "buono",
+     "why": "«la carta dell'esito»"
+    },
+    {
+     "slot": "cimiero del roster",
+     "fit": "possibile",
+     "why": "originale e pulito, ma più sobrio degli altri"
+    }
+   ],
+   "pairs": [
+    "MT-003"
+   ],
+   "avoid": "dove serve una silhouette scultorea",
+   "tags": [
+    "mistico",
+    "cornice",
+    "rettangolare",
+    "9-slice possibile"
+   ],
+   "image": "/assets/ui/hud-real/library/MT-004.webp",
+   "w": 145.5,
+   "h": 240.0,
+   "asset2x": [
+    291,
+    480
+   ],
+   "status": "schizzo 1024² (non scelto)"
+  },
+  {
+   "id": "MT-005",
+   "file": "raw/crown.png",
+   "name": "Corona-reliquia",
+   "motif": "insegna di rango",
+   "meaning": [
+    "comando",
+    "rango",
+    "dominio"
+   ],
+   "silhouette": {
+    "form": "verticale con raggi larghi",
+    "ratio": "quasi quadrato",
+    "minPx": 160
+   },
+   "uses": [
+    {
+     "slot": "cimiero del roster",
+     "fit": "buono",
+     "why": "regale; i raggi la fanno sembrare luminosa"
+    },
+    {
+     "slot": "villaggio / insediamento (village-screen-view)",
+     "fit": "buono",
+     "why": "il capo del villaggio"
+    },
+    {
+     "slot": "grado o titolo di un eroe",
+     "fit": "possibile",
+     "why": "rango"
+    }
+   ],
+   "pairs": [
+    "MT-001",
+    "MT-002"
+   ],
+   "avoid": "troppi raggi su sfondi chiari",
+   "tags": [
+    "regale",
+    "luminoso",
+    "verticale",
+    "animabile (anello di luce)"
+   ],
+   "image": "/assets/ui/hud-real/library/MT-005.webp",
+   "w": 240.0,
+   "h": 233.3,
+   "asset2x": [
+    480,
+    467
+   ],
+   "status": "schizzo 1024² (non scelto)"
+  },
+  {
+   "id": "MT-006",
+   "file": "raw/dragon.png",
+   "name": "Drago avvolto",
+   "motif": "creatura araldica",
+   "meaning": [
+    "potere antico",
+    "minaccia",
+    "rarità"
+   ],
+   "silhouette": {
+    "form": "tondo con ali",
+    "ratio": "largo (≈1,2:1)",
+    "minPx": 200
+   },
+   "uses": [
+    {
+     "slot": "minaccia / invasione (map-quest-poi, world-surface-event-card)",
+     "fit": "buono",
+     "why": "potere ostile; coerente con la grammatica delle minacce (ruling teschi per il pericolo)"
+    },
+    {
+     "slot": "cimelio o oggetto leggendario",
+     "fit": "buono",
+     "why": "rarità massima"
+    },
+    {
+     "slot": "cimiero del roster",
+     "fit": "possibile",
+     "why": "molto ricco, ma è un simbolo di forza ostile sopra gli eroi"
+    }
+   ],
+   "pairs": [],
+   "avoid": "dove serve calma o ristoro",
+   "tags": [
+    "potente",
+    "araldico",
+    "tondo",
+    "ricco di dettaglio"
+   ],
+   "image": "/assets/ui/hud-real/library/MT-006.webp",
+   "w": 210.1,
+   "h": 240.0,
+   "asset2x": [
+    420,
+    480
+   ],
+   "status": "schizzo 1024² (non scelto)"
+  }
+ ]
+}

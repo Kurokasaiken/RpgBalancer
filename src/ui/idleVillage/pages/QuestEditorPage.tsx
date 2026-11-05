@@ -14,6 +14,7 @@ import {
 import { loadAuthored, loadFromCandidate, loadFromCatalog } from '@/ui/idleVillage/questEditor/loaders';
 
 import { GENERATED_CATALOG } from '@/balancing/config/idleVillage/quests/generation/catalog';
+import { CONTENT_OVERLAYS } from '@/balancing/config/idleVillage/quests/questContentLocale';
 import { EditorPlaySurface } from '@/ui/idleVillage/questEditor/EditorPlaySurface';
 import { clearDraft, loadDraft, saveDraft } from '@/ui/idleVillage/questEditor/draftPersistence';
 import { loopEvent } from '@/ui/idleVillage/questEditor/loopInstrument';
@@ -41,7 +42,7 @@ export default function QuestEditorPage() {
   const dirty = !!wc && wc.ops.length !== runStartedAt;
 
   const pick = (l: LoadedScenario | null) => {
-    setLoaded(l); setWc(l?.workingCopy ?? null); setSelected(null); setRunStartedAt(0); setMsg(l ? `loaded ${l.parent.parentSource}/${l.parent.parentRef}` : 'not found');
+    setLoaded(l); setWc(l?.workingCopy ?? null); setSelected(null); setRunStartedAt(0); setItEdits(l?.overlayEdits ?? {}); setMsg(l ? `loaded ${l.parent.parentSource}/${l.parent.parentRef}` : 'not found');
   };
   const mut = (op: Parameters<typeof applyEditorOp>[1], label: string) => {
     if (!wc) return;
@@ -118,7 +119,8 @@ export default function QuestEditorPage() {
           <>
             <LabCard title="① play — run reale (stateful)">
               <EditorPlaySurface snapshot={scenario} workingCopy={wc} onOpsChange={setWc} dirty={dirty} seed={seed}
-                onReseed={(s) => { setSeed(s); setRunStartedAt(wc.ops.length); }} itEdits={itEdits} onItEdit={(k, v) => setItEdits((m) => ({ ...m, [k]: v }))} onNodeChange={setSelected} />
+                onReseed={(s) => { setSeed(s); setRunStartedAt(wc.ops.length); }} itEdits={itEdits} onItEdit={(k, v) => setItEdits((m) => ({ ...m, [k]: v }))}
+                lang={lang} authoredOverlay={loaded?.overlayQuestId ? CONTENT_OVERLAYS['it-IT']?.[loaded.overlayQuestId] : undefined} onNodeChange={setSelected} />
             </LabCard>
 
             <LabCard title="② scene — ▶ dove sei = cosa editi">

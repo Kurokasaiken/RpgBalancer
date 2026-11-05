@@ -1,0 +1,22 @@
+{
+  "D-01": {
+    "zone": "ring",
+    "text": "irregular gem volutes \u2014 volutes differ between generated and design"
+  },
+  "D-02": {
+    "zone": "ring",
+    "text": "warm earth cast leaking into enamel \u2014 restore teal/green enamel"
+  },
+  "D-03": {
+    "zone": "plaque-tip",
+    "text": "placca too long relative to design \u2014 restore proportion"
+  },
+  "D-04": {
+    "zone": "band-joint",
+    "text": "undulating edge where band meets ring \u2014 straighten"
+  },
+  "D-05": {
+    "zone": "ring",
+    "text": "specular sheen discontinuous across the band junction"
+  }
+}

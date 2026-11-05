@@ -1,0 +1,60 @@
+{
+  "chatUrl": "https://gemini.google.com/app/a43296edffe393b6",
+  "when": "2026-11-03T14:25:07.388Z",
+  "images": [
+    {
+      "i": 1,
+      "natural": [
+        559,
+        1024
+      ],
+      "how": "download",
+      "file": ".mw/specs/hud-real/probe/originals/orig-01.png"
+    },
+    {
+      "i": 2,
+      "natural": [
+        1024,
+        1024
+      ],
+      "how": "download",
+      "file": ".mw/specs/hud-real/probe/originals/orig-02.png"
+    },
+    {
+      "i": 3,
+      "natural": [
+        1024,
+        1024
+      ],
+      "how": "download",
+      "file": ".mw/specs/hud-real/probe/originals/orig-03.png"
+    },
+    {
+      "i": 4,
+      "natural": [
+        1024,
+        1024
+      ],
+      "how": "download",
+      "file": ".mw/specs/hud-real/probe/originals/orig-04.png"
+    },
+    {
+      "i": 5,
+      "natural": [
+        1024,
+        1024
+      ],
+      "how": "download",
+      "file": ".mw/specs/hud-real/probe/originals/orig-05.png"
+    },
+    {
+      "i": 6,
+      "natural": [
+        1024,
+        1024
+      ],
+      "how": "download",
+      "file": ".mw/specs/hud-real/probe/originals/orig-06.png"
+    }
+  ]
+}

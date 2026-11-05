@@ -197,3 +197,19 @@ Cause trovate lungo la strada:
 Misura (scansione deterministica `TIMES=` nella sonda, uTime pilotato): baia — 0 px bianchi fissi,
 pausa ~0, picco ~2400 vs dipinto ~2070; isola — 0 fissi, picco ~330 vs dipinto ~157.
 Aperto: la risalita è visibile ma moderata; valutare altezza maggiore dopo occhio del Director.
+
+## Aggiornamento 2026-11-02 — specks sulla scogliera (R-307)
+
+- Sintomo Director: «effetti della schiuma arrivano dove nn dovrebbero, su questa scogliera,
+  tipo piccoli effetti di luce» (rim est, parete scura).
+- Causa: `facing` (gradiente del campo distanza 8-bit) passa a frammenti sulle silhouette il cui
+  mare è dietro/laterale; lo `spray` (vnoise) ci accendeva flecks bianchi — `foam_strokes` su
+  terra = 0, quindi era SOLO spray/procedurale.
+- Fix in `COAST_FOAM_FRAG`: dopo `reach *= facing`, probe `seaBelow` — 6 tap su `uDist.g` in cono
+  verso il basso a `rr = ld*(0.7|1.3)+4`; `reach *= smoothstep(0.3,0.5,seaBelow)`. Sheet+spray
+  muoiono dove il mare non sta sotto.
+- Misura: `scripts/_tmp-probe-foam-land-leak.mjs` (whiteLeaks = land brightened, fuori plate,
+  ld≥12, senza mare sotto): ~migliaia di specks → total 23 ≤ 96 su 5 viste × 6 tempi.
+- Contratto: `pixi-world-map.INV-4` (director-bug, R-307), red-first registrato, test in
+  `mappa2SurfZones.test.ts` (leak class + gate). Bug dir `.mw/bugs/2026-11-02-mappa2-foam-on-cliff/`.
+- Aperto: occhio Director OB-4; `source_ref R-307` diventa citabile dopo commit (come R-306/R-308).
