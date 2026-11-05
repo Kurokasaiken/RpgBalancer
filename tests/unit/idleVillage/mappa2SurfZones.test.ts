@@ -84,7 +84,7 @@ describe('mappa2 surf zones (R-299)', () => {
 
   it('gates the coast foam shader with the zone mask', () => {
     const src = readFileSync(resolve(ROOT, 'src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx'), 'utf-8');
-    expect(src).toContain("'surf_zones.webp'");
+    expect(src).toContain('surf_zones');
     expect(src).toContain('outColor = vec4(premult, aSurf + aFlow) * zone;');
   });
 });
@@ -145,5 +145,63 @@ describe('mappa2 foam clean plate (R-299)', () => {
     const src = readFileSync(resolve(ROOT, 'src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx'), 'utf-8');
     expect(src).toContain('float waveAmp(float idx, float seg)');
     expect(src).toContain('float residual = aImp * (tSince < 1.0 ? 1.0 : exp(-(tSince - 1.0) / 1.8));');
+  });
+});
+
+/**
+ * R-307 (2026-11-02): specks of white — «piccoli effetti di luce» — appeared on the east-rim
+ * cliff face, far above the waterline. `land_distance` R measures distance to the NEAREST sea
+ * in any direction, so silhouette edges where the sea sits behind/beside the rock stay
+ * "close"; the `facing` gradient gate (8-bit stepped field) lets them through in broken
+ * fragments, and there the spray term paints noise flecks with no painted stroke below.
+ * The run-up must verify the waterline really lies BELOW the pixel before it may paint.
+ */
+describe('mappa2 run-up sea-below gate (R-307)', () => {
+  // INV:pixi-world-map.INV-4 — run-up (sheet + spray) may only paint on land pixels whose
+  // waterline lies below; sea behind/beside a silhouette must not light the face.
+  it('probes the sea flag in a downward cone before allowing the run-up', () => {
+    const src = readFileSync(resolve(ROOT, 'src/ui/idleVillage/pixiSpike/PixiWorldMap.tsx'), 'utf-8');
+    const facing = src.indexOf('reach *= facing;');
+    const gate = src.indexOf('reach *= smoothstep(0.3, 0.5, seaBelow);');
+    const paint = src.indexOf('if (reach > 2.0 && ld <= reach + 8.0)');
+    expect(facing).toBeGreaterThan(-1);
+    expect(src).toContain('float seaBelow');
+    expect(src).toContain('texture(uDist, vUV + vec2(0.0, rr / uWorld.y)).g');
+    expect(gate).toBeGreaterThan(facing);
+    expect(paint).toBeGreaterThan(gate);
+  });
+
+  it('has a real leak class to gate: surf-adjacent land with no water below', async () => {
+    // Witness for the invariant: on the east-rim cliff (world x 2350-2752, y 320-1020)
+    // ~2.8k land pixels are surf-adjacent and within climb reach while every downward
+    // probe stays on land — unguarded, the run-up lit them all.
+    const reg = { left: 2350, top: 320, width: 402, height: 700 };
+    const crop = async (file: string) => {
+      const { data, info } = await sharp(resolve(BASE, 'masks', file))
+        .extract(reg).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      return { px: data, w: info.width, h: info.height };
+    };
+    const ld = await crop('land_distance.webp');
+    const cd = await crop('coast_distance.webp');
+    const seaAt = (x: number, y: number) => {
+      const xi = Math.round(x), yi = Math.round(y);
+      if (xi < 0 || yi < 0 || xi >= ld.w || yi >= ld.h) return 0;
+      return cd.px[(yi * ld.w + xi) * 4 + 1];
+    };
+    let leaks = 0;
+    for (let y = 0; y < ld.h; y += 1)
+      for (let x = 0; x < ld.w; x += 1) {
+        const i = (y * ld.w + x) * 4;
+        if (ld.px[i + 1] <= 128 || ld.px[i + 2] / 255 <= 0.05) continue;
+        const ldd = (ld.px[i] / 255) * 160;
+        if (ldd > 68) continue;
+        let below = 0;
+        for (const s of [0.7, 1.3]) {
+          const rr = ldd * s + 4;
+          below = Math.max(below, seaAt(x, y + rr), seaAt(x + rr * 0.4, y + rr * 0.92), seaAt(x - rr * 0.4, y + rr * 0.92));
+        }
+        if (below <= 128) leaks += 1;
+      }
+    expect(leaks).toBeGreaterThan(1500);
   });
 });

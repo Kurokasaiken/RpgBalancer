@@ -1,0 +1,404 @@
+{
+  "viewport": [
+    1600,
+    900
+  ],
+  "base": {
+    "objective": [],
+    "nextEvent": [],
+    "plaques": [
+      {
+        "x": 20,
+        "y": 0,
+        "w": 294,
+        "h": 73,
+        "tag": "section",
+        "text": "DAY 2 ×1 ×2 ×4"
+      },
+      {
+        "x": 1220,
+        "y": 0,
+        "w": 360,
+        "h": 73,
+        "tag": "section",
+        "text": "15 GOLD 2/20 −6/d · 0 d left FOOD 0 WOOD"
+      },
+      {
+        "x": 534,
+        "y": 822,
+        "w": 532,
+        "h": 78,
+        "tag": "div",
+        "text": "VILLAGE MAP WORKSHOP TAVERN"
+      }
+    ],
+    "nav": [
+      {
+        "x": 574,
+        "y": 842,
+        "w": 452,
+        "h": 50,
+        "tag": "nav",
+        "text": "VILLAGE MAP WORKSHOP TAVERN"
+      }
+    ],
+    "corner": [
+      {
+        "x": 1438,
+        "y": 834,
+        "w": 136,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      }
+    ],
+    "roster": [],
+    "questDetail": [],
+    "poi": [
+      {
+        "x": 964,
+        "y": 272,
+        "w": 55,
+        "h": 55,
+        "tag": "div",
+        "text": ""
+      }
+    ],
+    "strips": [],
+    "hudControls": [
+      {
+        "x": 1438,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 1486,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 1534,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      }
+    ]
+  },
+  "rosterOpen": {
+    "objective": [],
+    "nextEvent": [],
+    "plaques": [
+      {
+        "x": 20,
+        "y": 0,
+        "w": 294,
+        "h": 73,
+        "tag": "section",
+        "text": "DAY 2 ×1 ×2 ×4"
+      },
+      {
+        "x": 1220,
+        "y": 0,
+        "w": 360,
+        "h": 73,
+        "tag": "section",
+        "text": "15 GOLD 2/20 −6/d · 0 d left FOOD 0 WOOD"
+      },
+      {
+        "x": 592,
+        "y": 92,
+        "w": 400,
+        "h": 268,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 534,
+        "y": 822,
+        "w": 532,
+        "h": 78,
+        "tag": "div",
+        "text": "VILLAGE MAP WORKSHOP TAVERN"
+      }
+    ],
+    "nav": [
+      {
+        "x": 574,
+        "y": 842,
+        "w": 452,
+        "h": 50,
+        "tag": "nav",
+        "text": "VILLAGE MAP WORKSHOP TAVERN"
+      }
+    ],
+    "corner": [
+      {
+        "x": 1438,
+        "y": 834,
+        "w": 136,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      }
+    ],
+    "roster": [
+      {
+        "x": 592,
+        "y": 92,
+        "w": 400,
+        "h": 268,
+        "tag": "div",
+        "text": "Roster 6/6 ALL All Heroes Injured Available Exhausted Away F"
+      },
+      {
+        "x": 592,
+        "y": 92,
+        "w": 400,
+        "h": 268,
+        "tag": "section",
+        "text": "Roster 6/6 ALL All Heroes Injured Available Exhausted Away F"
+      }
+    ],
+    "questDetail": [],
+    "poi": [
+      {
+        "x": 964,
+        "y": 272,
+        "w": 55,
+        "h": 55,
+        "tag": "div",
+        "text": ""
+      }
+    ],
+    "strips": [],
+    "hudControls": [
+      {
+        "x": 714,
+        "y": 114,
+        "w": 256,
+        "h": 32,
+        "tag": "div",
+        "text": "ALL All Heroes Injured Available Exhausted Away Fallen SORT "
+      },
+      {
+        "x": 1438,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 1486,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 1534,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      }
+    ]
+  },
+  "detailOpen": {
+    "objective": [],
+    "nextEvent": [],
+    "plaques": [
+      {
+        "x": 20,
+        "y": 0,
+        "w": 294,
+        "h": 73,
+        "tag": "section",
+        "text": "DAY 2 ×1 ×2 ×4"
+      },
+      {
+        "x": 1220,
+        "y": 0,
+        "w": 360,
+        "h": 73,
+        "tag": "section",
+        "text": "15 GOLD 2/20 −6/d · 0 d left FOOD 0 WOOD"
+      },
+      {
+        "x": 72,
+        "y": 92,
+        "w": 400,
+        "h": 268,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 534,
+        "y": 822,
+        "w": 532,
+        "h": 78,
+        "tag": "div",
+        "text": "VILLAGE MAP WORKSHOP TAVERN"
+      },
+      {
+        "x": 1248,
+        "y": 136,
+        "w": 230,
+        "h": 688,
+        "tag": "div",
+        "text": "PANELS ROSTER R EVENTS E VILLAGE STASH V MERCHANT M DIRECTOR"
+      },
+      {
+        "x": 546,
+        "y": 92,
+        "w": 680,
+        "h": 587,
+        "tag": "section",
+        "text": "GOBLIN EXTERMINATION Follow their tracks to the camp. None o"
+      },
+      {
+        "x": 1234,
+        "y": 100,
+        "w": 340,
+        "h": 382,
+        "tag": "aside",
+        "text": "DANGER High REWARD Decent · 61 DURATION 26 days FORECAST Fil"
+      }
+    ],
+    "nav": [
+      {
+        "x": 574,
+        "y": 842,
+        "w": 452,
+        "h": 50,
+        "tag": "nav",
+        "text": "VILLAGE MAP WORKSHOP TAVERN"
+      }
+    ],
+    "corner": [
+      {
+        "x": 1438,
+        "y": 834,
+        "w": 136,
+        "h": 40,
+        "tag": "div",
+        "text": "PANELS ROSTER R EVENTS E VILLAGE STASH V MERCHANT M DIRECTOR"
+      }
+    ],
+    "roster": [
+      {
+        "x": 72,
+        "y": 92,
+        "w": 400,
+        "h": 268,
+        "tag": "div",
+        "text": "Roster 6/6 ALL All Heroes Injured Available Exhausted Away F"
+      },
+      {
+        "x": 72,
+        "y": 92,
+        "w": 400,
+        "h": 268,
+        "tag": "section",
+        "text": "Roster 6/6 ALL All Heroes Injured Available Exhausted Away F"
+      }
+    ],
+    "questDetail": [
+      {
+        "x": 558,
+        "y": 102,
+        "w": 656,
+        "h": 565,
+        "tag": "div",
+        "text": "GOBLIN EXTERMINATION Follow their tracks to the camp. None o"
+      }
+    ],
+    "poi": [
+      {
+        "x": 964,
+        "y": 272,
+        "w": 55,
+        "h": 55,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 1061,
+        "y": 414,
+        "w": 44,
+        "h": 44,
+        "tag": "div",
+        "text": ""
+      }
+    ],
+    "strips": [],
+    "hudControls": [
+      {
+        "x": 194,
+        "y": 114,
+        "w": 256,
+        "h": 32,
+        "tag": "div",
+        "text": "ALL All Heroes Injured Available Exhausted Away Fallen SORT "
+      },
+      {
+        "x": 1438,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": "PANELS ROSTER R EVENTS E VILLAGE STASH V MERCHANT M DIRECTOR"
+      },
+      {
+        "x": 1486,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 1534,
+        "y": 834,
+        "w": 40,
+        "h": 40,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 1139,
+        "y": 139,
+        "w": 68,
+        "h": 32,
+        "tag": "div",
+        "text": ""
+      },
+      {
+        "x": 558,
+        "y": 474,
+        "w": 656,
+        "h": 58,
+        "tag": "div",
+        "text": "BAG — 0/3 COVERS STR — PER —"
+      },
+      {
+        "x": 558,
+        "y": 538,
+        "w": 656,
+        "h": 44,
+        "tag": "div",
+        "text": ""
+      }
+    ]
+  }
+}

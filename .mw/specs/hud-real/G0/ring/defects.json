@@ -1,0 +1,13 @@
+{
+  "zone": "C1 / ring / row0",
+  "status": "DRAFT for the G-0 probe: not yet confirmed by the Director (G-1)",
+  "source": "zanara-v2, SwinIR x4 base plate",
+  "keep": ["enamel crescent with gems on the left of the ring", "gem on the bottom axis", "gold rims with engraving", "emerald enamel band", "empty centre"],
+  "defects": [
+    {"id": 1, "cat": "S", "text": "the gold band has the same thickness all around the ring (the right side is currently thicker than the left)"},
+    {"id": 2, "cat": "E", "text": "the inner gold rim is a perfect circle, concentric with the outer rim, with no wobble"},
+    {"id": 3, "cat": "R", "text": "the gems set on the enamel crescent are identical in size, cut and setting, evenly spaced along the crescent"},
+    {"id": 4, "cat": "S", "text": "the bottom diamond gem sits exactly on the vertical axis of the ring"},
+    {"id": 5, "cat": "R", "text": "the engraving on the rims repeats with equal pitch and no fused or melted ornaments"}
+  ]
+}

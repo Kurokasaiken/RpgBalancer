@@ -1,0 +1,11 @@
+{
+  "component": "C1", "zone": "band-joint",
+  "task": "Restore the junction where the ring band meets the ring ornament.",
+  "design_png": "public/mockups/r1v0/C1-roster.webp",
+  "guide_png": ".mw/specs/hud-real/C1/zones/guide-band-joint.png",
+  "material_ref": ".mw/specs/hud-zanara/kit/approved/K9-giunto.png",
+  "preserve": ["band axis", "junction silhouette", "gem count"],
+  "repair": ["edge undulation", "gold ramp at junction", "enamel transition"],
+  "defects": ["D-04"],
+  "extra": "Gold ramp must stay inside the approved gamut."
+}

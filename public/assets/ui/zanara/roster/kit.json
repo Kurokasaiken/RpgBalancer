@@ -1,0 +1,44 @@
+{
+  "dpr": 2,
+  "units": "design px (1600x900)",
+  "source": ".mw/specs/hud-zanara/kit/approved/SELECTION.md",
+  "ring": {
+    "size": 59.83,
+    "outerD": 56,
+    "holeD": 40.47,
+    "gemX": 29.92,
+    "gemY": 54.24,
+    "gemD": 4.38
+  },
+  "plaque": {
+    "h": 50,
+    "leftW": 23.17,
+    "rightW": 30.89,
+    "naturalW": 256.56,
+    "bodyTop": 1.93,
+    "bodyBottom": 47.88
+  },
+  "band": {
+    "w": 14,
+    "tileH": 23.81,
+    "nodeH": 9.43
+  },
+  "bandEnd": {
+    "w": 17.32,
+    "h": 54.02,
+    "bandX": 1.56
+  },
+  "emblem": {
+    "w": 84,
+    "h": 84.0
+  },
+  "gem": {
+    "d": 12
+  },
+  "lastra": {
+    "slice": 44,
+    "corner": 22,
+    "assetW": 392,
+    "assetH": 193
+  }
+}

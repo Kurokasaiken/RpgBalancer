@@ -1,0 +1,44 @@
+{
+  "component": "C2",
+  "jobs": [
+    {
+      "id": "bar3-1",
+      "zone": "res-bar3",
+      "refs": [
+        ".mw/specs/hud-real/resources/design-bar3.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/resources/prompt-bar3.txt",
+      "out": ".mw/specs/hud-real/resources/gen/bar3-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/resources/gen/bar3-1-0.png",
+      "sha16": "85da2059fe70df60"
+    },
+    {
+      "id": "bar3-2",
+      "zone": "res-bar3",
+      "refs": [
+        ".mw/specs/hud-real/resources/design-bar3.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/resources/prompt-bar3.txt",
+      "out": ".mw/specs/hud-real/resources/gen/bar3-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/resources/gen/bar3-2-0.png",
+      "sha16": "4b67abc5dd9318c7"
+    },
+    {
+      "id": "bar3-3",
+      "zone": "res-bar3",
+      "refs": [
+        ".mw/specs/hud-real/resources/design-bar3.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/resources/prompt-bar3.txt",
+      "out": ".mw/specs/hud-real/resources/gen/bar3-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/resources/gen/bar3-3-0.png",
+      "sha16": "4748d0188e98a61b"
+    }
+  ]
+}

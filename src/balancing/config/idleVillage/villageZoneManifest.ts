@@ -39,6 +39,16 @@ export const villageManifestSchema = z.object({
     towers: z.object({ slots: z.literal(2), each: z.array(z.enum(SLOT_VALUES)).min(1) }),
   }),
   uiRules: z.object({ towersRequireDefence: z.boolean() }).default({ towersRequireDefence: true }),
+  /**
+   * Per-slot upgrade chain (Director 2026-11-04): a slot's tower climbs `chain` in
+   * order; a level may need a defence (stone towers only with the stone wall).
+   */
+  upgrades: z.object({
+    towers: z.object({
+      chain: z.array(z.enum(SLOT_VALUES)).min(2),
+      requires: z.record(z.string(), z.object({ defence: z.string().min(1) })),
+    }),
+  }).optional(),
   registration: z.object({
     nullEditResidualPx: z.number().nullable(),
     layoutLockMaxPx: z.number().positive(),
@@ -61,3 +71,19 @@ export const villageManifestSchema = z.object({
 });
 
 export type VillageManifestV2 = z.infer<typeof villageManifestSchema>;
+
+
+type Upgrades = NonNullable<VillageManifestV2['upgrades']>;
+
+/** Is `level` unlocked for a slot under `defence`? No `upgrades` block = anything goes. */
+export function towerLevelAllowed(up: Upgrades | undefined, level: string, defence: string): boolean {
+  const need = up?.towers.requires[level];
+  return !need || need.defence === defence;
+}
+
+/** Next level of the chain above `level` that `defence` unlocks, or null (top / locked). */
+export function nextTowerLevel(up: Upgrades | undefined, level: string, defence: string): string | null {
+  const chain = up?.towers.chain ?? [];
+  const next = chain[chain.indexOf(level as never) + 1];
+  return next && towerLevelAllowed(up, next, defence) ? next : null;
+}

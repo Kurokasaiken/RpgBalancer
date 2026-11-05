@@ -1,6 +1,6 @@
 {
   "schema": "plan054-component-inventory/1",
-  "generated_at": "2026-11-02T10:00:51.485Z",
+  "generated_at": "2026-11-02T11:34:10.483Z",
   "strict_files": [
     "src/pages/game-frame-pixi.tsx",
     "src/pages/game-frame.tsx",
@@ -228,6 +228,7 @@
     "src/ui/idleVillage/config/generatedClouds.ts",
     "src/ui/idleVillage/config/hudCrewConfig.ts",
     "src/ui/idleVillage/config/mappa2AmbientDirectorConfig.ts",
+    "src/ui/idleVillage/config/mappa2FaunaConfig.ts",
     "src/ui/idleVillage/config/mappa2RegionalWeatherConfig.ts",
     "src/ui/idleVillage/config/mappa2SeaLifeConfig.ts",
     "src/ui/idleVillage/config/mappa2SecondaryWaterConfig.ts",
@@ -313,6 +314,7 @@
     "src/ui/idleVillage/pixiSpike/ambient/ambientDirector.ts",
     "src/ui/idleVillage/pixiSpike/ambient/ambientRig.ts",
     "src/ui/idleVillage/pixiSpike/ambient/ambientShoal.ts",
+    "src/ui/idleVillage/pixiSpike/ambient/ambientStormo.ts",
     "src/ui/idleVillage/pixiSpike/feederRiver.ts",
     "src/ui/idleVillage/pixiSpike/mapFitRuntime.ts",
     "src/ui/idleVillage/pixiSpike/mountainStorm.ts",
@@ -1960,6 +1962,7 @@
         "src/ui/idleVillage/config/atmosphereAssets.ts",
         "src/ui/idleVillage/config/generatedClouds.ts",
         "src/ui/idleVillage/config/mappa2AmbientDirectorConfig.ts",
+        "src/ui/idleVillage/config/mappa2FaunaConfig.ts",
         "src/ui/idleVillage/config/mappa2RegionalWeatherConfig.ts",
         "src/ui/idleVillage/config/mappa2SeaLifeConfig.ts",
         "src/ui/idleVillage/config/mappa2SecondaryWaterConfig.ts",
@@ -1970,6 +1973,7 @@
         "src/ui/idleVillage/pixiSpike/ambient/ambientDirector.ts",
         "src/ui/idleVillage/pixiSpike/ambient/ambientRig.ts",
         "src/ui/idleVillage/pixiSpike/ambient/ambientShoal.ts",
+        "src/ui/idleVillage/pixiSpike/ambient/ambientStormo.ts",
         "src/ui/idleVillage/pixiSpike/feederRiver.ts",
         "src/ui/idleVillage/pixiSpike/mapFitRuntime.ts",
         "src/ui/idleVillage/pixiSpike/mountainStorm.ts",
@@ -3517,10 +3521,10 @@
     }
   ],
   "stats": {
-    "files": 482,
+    "files": 484,
     "units": 283,
     "ui_components": 216,
     "shared_kernels": 67
   },
-  "content_sha256": "2e8eebf23798ce5f8fc64f92abbebfe5ac974d03500370dc7b7e020523fdf088"
+  "content_sha256": "a2182c7d5ca2ae1c1a972079ccf5b7cebb4c1625d3aaf308ec8f544e11174af6"
 }

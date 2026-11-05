@@ -21,6 +21,7 @@ import { NODE_ART } from '@/ui/idleVillage/questS1Lab/questArt';
 import { consumableBonusFor } from '@/ui/idleVillage/questS1Lab/questRun';
 import { LabStatSchema } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
+import type { ContentOverlay } from '@/balancing/config/idleVillage/quests/questContentLocale';
 import { applyEditorOp, type WorkingCopy } from './workingCopy';
 import { loopEvent } from './loopInstrument';
 
@@ -30,7 +31,7 @@ const Ed: React.FC<{ v: string; onSave: (v: string) => void; className?: string 
   const [draft, setDraft] = useState(v);
   if (!editing)
     return (
-      <span className={`cursor-text border-b border-dashed border-slate-500 hover:bg-slate-700/40 ${className ?? ''}`} title="click to edit" onClick={() => { setDraft(v); setEditing(true); }}>
+      <span className={`cursor-text border-b border-dashed border-slate-500 hover:bg-slate-700/40 ${className ?? ''}`} title="click to edit" onClick={(e) => { e.stopPropagation(); setDraft(v); setEditing(true); }}>
         {v}
       </span>
     );
@@ -39,10 +40,65 @@ const Ed: React.FC<{ v: string; onSave: (v: string) => void; className?: string 
       autoFocus
       className="w-full rounded border border-sky-500 bg-slate-900 px-1 text-slate-100"
       value={draft}
+      onClick={(e) => e.stopPropagation()}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={() => { setEditing(false); if (draft !== v) onSave(draft); }}
       onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); if (e.key === 'Escape') setEditing(false); }}
     />
+  );
+};
+
+/** Preview language of the play surface — EN edits the base manuscript, IT edits the overlay in place. */
+export type EditorLang = 'EN' | 'IT';
+
+/**
+ * IT copy resolution for the in-place preview (PLAN-102 W-03): the session's
+ * minimal write wins; then the authored overlay — only when its stored English
+ * source still matches the live text (`stale` otherwise); nothing → `missing`
+ * and the English shows. `key` is the W-03 key `${nodeId}.${field}`; the
+ * authored overlay is keyed `nodes.${key}`.
+ */
+export const resolveItCopy = (
+  key: string,
+  en: string,
+  overlay: ContentOverlay | undefined,
+  edits: Record<string, string>,
+): { v: string; mark?: 'missing' | 'stale' } => {
+  const edited = edits[key];
+  if (edited) return { v: edited };
+  const hit = overlay?.[`nodes.${key}`];
+  if (!hit) return { v: en, mark: 'missing' };
+  return hit[0] === en ? { v: hit[1] } : { v: en, mark: 'stale' };
+};
+
+/** Amber badge naming a stale/missing IT entry — the same affordance rewrites it. */
+const ItMark: React.FC<{ mark: 'missing' | 'stale' }> = ({ mark }) => (
+  <span
+    className="ml-1 whitespace-nowrap rounded border border-amber-500/60 px-1 text-amber-300"
+    title={mark === 'stale' ? 'la sorgente EN è cambiata — riscrivere la traduzione' : 'nessuna traduzione IT — la riga mostra il testo EN'}
+  >
+    IT {mark}
+  </span>
+);
+
+/** Translatable {@link Ed}: EN edits the base field via `onSave`, IT shows/edits the overlay copy in place. */
+const TEd: React.FC<{
+  lang: EditorLang;
+  en: string;
+  itKey: string;
+  overlay?: ContentOverlay;
+  edits: Record<string, string>;
+  onItEdit: (k: string, v: string) => void;
+  onSave: (v: string) => void;
+  className?: string;
+}> = ({ lang, en, itKey, overlay, edits, onItEdit, onSave, className }) => {
+  if (lang === 'EN') return <Ed v={en} onSave={onSave} className={className} />;
+  const r = resolveItCopy(itKey, en, overlay, edits);
+  return (
+    <span className={className}>
+      <Ed v={r.v} onSave={(v) => onItEdit(itKey, v)} />
+      {r.mark && <ItMark mark={r.mark} />}
+    </span>
   );
 };
 
@@ -58,9 +114,13 @@ export const EditorPlaySurface: React.FC<{
   /** IT overlay edits — keyed `${nodeId}.${field}`, persisted in the candidate. */
   itEdits: Record<string, string>;
   onItEdit: (key: string, v: string) => void;
+  /** Preview language — EN edits the manuscript, IT shows/edits the overlay copy in place. */
+  lang?: EditorLang;
+  /** Authored it-IT overlay of the parent quest — resolves fresh copy and stale/missing marks. */
+  authoredOverlay?: ContentOverlay;
   /** Fires when the run moves to a different node — the strip follows it. */
   onNodeChange?: (nodeId: string) => void;
-}> = ({ snapshot, workingCopy, onOpsChange, dirty, seed, onReseed, itEdits, onItEdit, onNodeChange }) => {
+}> = ({ snapshot, workingCopy, onOpsChange, dirty, seed, onReseed, itEdits, onItEdit, lang = 'EN', authoredOverlay, onNodeChange }) => {
   const [presetId, setPresetId] = useState(PARTY_PRESETS[0]!.id);
   const [run, setRun] = useState<QuestRunState | null>(null);
   const [localSeed, setLocalSeed] = useState(seed);
@@ -111,17 +171,41 @@ export const EditorPlaySurface: React.FC<{
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="rounded border border-slate-700 bg-slate-800/60 p-2">
-              <Ed v={node.title ?? run.nodeId} onSave={(v) => edit(run.nodeId, 'title', v)} className="font-bold" /> <span className="text-slate-500">· {node.kind}</span>
-              <div className="mt-1"><Ed v={node.body ?? ''} onSave={(v) => edit(run.nodeId, 'body', v)} /></div>
-              {node.transit && <div className="mt-0.5 text-slate-400">transit: <Ed v={node.transit} onSave={(v) => edit(run.nodeId, 'transit', v)} /></div>}
-              <div className="mt-0.5 text-amber-300/80">IT: <Ed v={itEdits[`${run.nodeId}.body`] ?? ''} onSave={(v) => onItEdit(`${run.nodeId}.body`, v)} /></div>
+              <TEd lang={lang} en={node.title ?? run.nodeId} itKey={`${run.nodeId}.title`} overlay={authoredOverlay} edits={itEdits} onItEdit={onItEdit} onSave={(v) => edit(run.nodeId, 'title', v)} className="font-bold" /> <span className="text-slate-500">· {node.kind}</span>
+              <div className="mt-1"><TEd lang={lang} en={node.body ?? ''} itKey={`${run.nodeId}.body`} overlay={authoredOverlay} edits={itEdits} onItEdit={onItEdit} onSave={(v) => edit(run.nodeId, 'body', v)} /></div>
+              {node.transit && <div className="mt-0.5 text-slate-400">transit: <TEd lang={lang} en={node.transit} itKey={`${run.nodeId}.transit`} overlay={authoredOverlay} edits={itEdits} onItEdit={onItEdit} onSave={(v) => edit(run.nodeId, 'transit', v)} /></div>}
+              {lang === 'EN' && <div className="mt-0.5 text-amber-300/80">IT: <Ed v={itEdits[`${run.nodeId}.body`] ?? ''} onSave={(v) => onItEdit(`${run.nodeId}.body`, v)} /></div>}
             </div>
             {opts.map((o, i) => {
               const p = node.options?.[i] ? previewOption(run, o.id) : null;
+              const labelKey = `${run.nodeId}.options[${i}].label`;
+              const detailKey = `${run.nodeId}.options[${i}].detail`;
+              const enText = o.label + (o.detail ? ` — ${o.detail}` : '');
+              let text = enText;
+              let mark: 'missing' | 'stale' | undefined;
+              let onSave = (v: string) => {
+                const [label, ...d] = v.split(' — ');
+                const wc = { ...workingCopy, ops: [...workingCopy.ops] };
+                applyEditorOp(wc, { kind: 'setOptionField', nodeId: run.nodeId, optionIdx: i, field: 'label', value: label });
+                if (d.length) applyEditorOp(wc, { kind: 'setOptionField', nodeId: run.nodeId, optionIdx: i, field: 'detail', value: d.join(' — ') });
+                onOpsChange(wc);
+              };
+              // Engine-synthesized options (info/combat) have no authored copy — nothing to overlay.
+              if (lang === 'IT' && node.options?.[i]) {
+                const rl = resolveItCopy(labelKey, o.label, authoredOverlay, itEdits);
+                const rd = o.detail ? resolveItCopy(detailKey, o.detail, authoredOverlay, itEdits) : undefined;
+                text = rl.v + (rd ? ` — ${rd.v}` : '');
+                mark = rl.mark === 'stale' || rd?.mark === 'stale' ? 'stale' : rl.mark ?? rd?.mark;
+                onSave = (v) => {
+                  const [label, ...d] = v.split(' — ');
+                  onItEdit(labelKey, label ?? '');
+                  if (d.length) onItEdit(detailKey, d.join(' — '));
+                };
+              }
               return (
                 <button key={o.id} disabled={o.disabled || run.ended} onClick={() => advance(applyChoice(run, o.id))}
                   className={`flex items-center justify-between gap-2 rounded border px-2 py-1 text-left ${o.disabled ? 'border-dashed border-slate-600 opacity-50' : 'border-slate-500 hover:bg-slate-700/40'}`}>
-                  <Ed v={o.label + (o.detail ? ` — ${o.detail}` : '')} onSave={(v) => { const [label, ...d] = v.split(' — '); const wc = { ...workingCopy, ops: [...workingCopy.ops] }; applyEditorOp(wc, { kind: 'setOptionField', nodeId: run.nodeId, optionIdx: i, field: 'label', value: label }); if (d.length) applyEditorOp(wc, { kind: 'setOptionField', nodeId: run.nodeId, optionIdx: i, field: 'detail', value: d.join(' — ') }); onOpsChange(wc); }} />
+                  <span><Ed v={text} onSave={onSave} />{mark && <ItMark mark={mark} />}</span>
                   <span className="whitespace-nowrap text-emerald-300">{p && 'wound' in p ? `win ${Math.round((p as { success?: number }).success ?? 0)}% · wound ${(p as { wound?: number }).wound ?? 0}% · death ${(p as { death?: number }).death ?? 0}%` : ''}</span>
                 </button>
               );
@@ -153,7 +237,7 @@ export const EditorPlaySurface: React.FC<{
                 </div>
               ))}
             </div>
-            {verdictFlavorEditor(node, workingCopy, onOpsChange)}
+            {verdictFlavorEditor(node, workingCopy, onOpsChange, lang, authoredOverlay, itEdits, onItEdit)}
           </div>
         </div>
       )}
@@ -162,14 +246,23 @@ export const EditorPlaySurface: React.FC<{
 };
 
 /** verdictFlavor per-verdict — the 5 outcome sentences of the node. */
-function verdictFlavorEditor(node: QuestNode, wc: WorkingCopy, onOps: (w: WorkingCopy) => void) {
+function verdictFlavorEditor(
+  node: QuestNode,
+  wc: WorkingCopy,
+  onOps: (w: WorkingCopy) => void,
+  lang: EditorLang,
+  overlay: ContentOverlay | undefined,
+  edits: Record<string, string>,
+  onItEdit: (k: string, v: string) => void,
+) {
   const vf = (node.verdictFlavor ?? {}) as Record<string, string>;
   return (
     <details className="rounded border border-slate-700 p-1">
       <summary className="cursor-pointer text-slate-500">verdictFlavor + numeri</summary>
       {VERDICTS.map((k) => (
         <div key={k} className="flex gap-1"><span className="w-16 text-slate-500">{k}</span>
-          <Ed v={vf[k] ?? ''} onSave={(v) => { const n = { ...wc, ops: [...wc.ops] }; applyEditorOp(n, { kind: 'setNodeField', nodeId: node.id, field: 'verdictFlavor', value: { ...vf, [k]: v } }); onOps(n); }} className="flex-1" />
+          <TEd lang={lang} en={vf[k] ?? ''} itKey={`${node.id}.verdictFlavor.${k}`} overlay={overlay} edits={edits} onItEdit={onItEdit}
+            onSave={(v) => { const n = { ...wc, ops: [...wc.ops] }; applyEditorOp(n, { kind: 'setNodeField', nodeId: node.id, field: 'verdictFlavor', value: { ...vf, [k]: v } }); onOps(n); }} className="flex-1" />
         </div>
       ))}
     </details>

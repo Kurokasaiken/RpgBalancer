@@ -1,0 +1,27 @@
+{
+  "bandW": 29.0,
+  "tile": {
+    "w": 29.58,
+    "h": 125.28
+  },
+  "joint": {
+    "w": 48.18,
+    "h": 116.91,
+    "bandCx": 23.58
+  },
+  "end": {
+    "w": 34.98,
+    "h": 130.39,
+    "bandCx": 17.38
+  },
+  "crest": {
+    "w": 140.15,
+    "h": 196.0
+  },
+  "source": {
+    "spine": ".mw/specs/hud-real/approved/C1-band.png",
+    "joint": ".mw/specs/hud-real/approved/C1-joint.png",
+    "end": ".mw/specs/hud-real/approved/C1-end.png",
+    "crest": ".mw/specs/hud-real/crest/gen/clock-2-0.png"
+  }
+}

@@ -1,0 +1,134 @@
+[
+  {
+    "label": "v1",
+    "src": ".mw/specs/hud-zanara/kit/gen/K6/v1/img-0.png",
+    "W": 1407,
+    "H": 768,
+    "bg": [
+      13,
+      23,
+      33
+    ],
+    "ring": {
+      "bboxW": 190,
+      "bboxH": 735,
+      "dia": 735
+    },
+    "hole": null,
+    "crestHue": {
+      "median": 38.9,
+      "pct35_45": 94.2,
+      "pctOver50": 2.2
+    },
+    "purpleFrac": 0,
+    "brownFrac": 3.043,
+    "innerNavyFrac": 0.88,
+    "edgesTouched": [
+      "top"
+    ],
+    "seamV": null,
+    "seamH": null,
+    "itemCount": null,
+    "items": [],
+    "alphaFile": ".mw/specs/hud-zanara/kit/gen/K6/v1-alpha.png"
+  },
+  {
+    "label": "v2",
+    "src": ".mw/specs/hud-zanara/kit/gen/K6/v2/img-0.png",
+    "W": 1407,
+    "H": 768,
+    "bg": [
+      10,
+      22,
+      34
+    ],
+    "ring": {
+      "bboxW": 227,
+      "bboxH": 735,
+      "dia": 735
+    },
+    "hole": null,
+    "crestHue": {
+      "median": 41.1,
+      "pct35_45": 76.5,
+      "pctOver50": 4.6
+    },
+    "purpleFrac": 0,
+    "brownFrac": 1.983,
+    "innerNavyFrac": 8.29,
+    "edgesTouched": [
+      "top"
+    ],
+    "seamV": null,
+    "seamH": null,
+    "itemCount": null,
+    "items": [],
+    "alphaFile": ".mw/specs/hud-zanara/kit/gen/K6/v2-alpha.png"
+  },
+  {
+    "label": "v3",
+    "src": ".mw/specs/hud-zanara/kit/gen/K6/v3/img-0.png",
+    "W": 1407,
+    "H": 768,
+    "bg": [
+      10,
+      22,
+      34
+    ],
+    "ring": {
+      "bboxW": 242,
+      "bboxH": 742,
+      "dia": 742
+    },
+    "hole": null,
+    "crestHue": {
+      "median": 38.9,
+      "pct35_45": 90.8,
+      "pctOver50": 3.2
+    },
+    "purpleFrac": 0,
+    "brownFrac": 2.779,
+    "innerNavyFrac": 14.08,
+    "edgesTouched": [
+      "top"
+    ],
+    "seamV": null,
+    "seamH": null,
+    "itemCount": null,
+    "items": [],
+    "alphaFile": ".mw/specs/hud-zanara/kit/gen/K6/v3-alpha.png"
+  },
+  {
+    "label": "v4",
+    "src": ".mw/specs/hud-zanara/kit/gen/K6/v4/img-0.png",
+    "W": 1407,
+    "H": 768,
+    "bg": [
+      12,
+      22,
+      32
+    ],
+    "ring": {
+      "bboxW": 198,
+      "bboxH": 717,
+      "dia": 717
+    },
+    "hole": null,
+    "crestHue": {
+      "median": 40.2,
+      "pct35_45": 86.7,
+      "pctOver50": 4.3
+    },
+    "purpleFrac": 0,
+    "brownFrac": 3.381,
+    "innerNavyFrac": 3.11,
+    "edgesTouched": [
+      "top"
+    ],
+    "seamV": null,
+    "seamH": null,
+    "itemCount": null,
+    "items": [],
+    "alphaFile": ".mw/specs/hud-zanara/kit/gen/K6/v4-alpha.png"
+  }
+]

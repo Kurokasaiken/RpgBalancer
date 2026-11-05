@@ -1,0 +1,27 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 1200, height: 750 } });
+p.setDefaultTimeout(90000);
+p.on('pageerror', (e) => console.log('PAGEERROR', e.message.slice(0, 300)));
+p.on('console', (m) => { if (['error', 'warning'].includes(m.type())) console.log('CONSOLE', m.type(), m.text().slice(0, 200)); });
+await p.goto('http://localhost:5173/mappa2-lab', { waitUntil: 'domcontentloaded', timeout: 60000 });
+await p.waitForFunction(() => window.__worldCamCtl && window.__villageZoneLive?.zone, { timeout: 90000 });
+p.on('framenavigated', (f) => { if (f === p.mainFrame()) console.log('NAV', f.url()); });
+await p.waitForTimeout(3000);
+const clickText = (t) => p.evaluate((t) => [...document.querySelectorAll('button')].find((x) => x.textContent.trim().toLowerCase().startsWith(t))?.click(), t);
+await clickText('village');
+await p.waitForTimeout(300);
+await p.evaluate(() => [...document.querySelectorAll('label')].find((l) => l.textContent.includes('prototipo R-313'))?.querySelector('input')?.click());
+const Z = 1.5, panX = 1515 - 600 / Z, panY = 720 - 375 / Z;
+await p.evaluate(([Z, panX, panY]) => window.__worldCamCtl.set({ panX, panY, zoom: Z }), [Z, panX, panY]);
+await clickText('+ tower-stone');
+await p.waitForTimeout(300);
+console.log('armed', await p.evaluate(() => window.__villageZoneLive.armed));
+await p.keyboard.press('h'); await p.waitForTimeout(300);
+const [sx, sy] = [((1260 + 300) - panX) * Z, ((505 + 150) - panY) * Z];
+await p.mouse.move(sx - 5, sy - 5); await p.mouse.move(sx, sy, { steps: 4 }); await p.waitForTimeout(200);
+console.log('hover', await p.evaluate(() => [window.__villageZoneLive.hoverX, window.__villageZoneLive.hoverY]));
+await p.mouse.down(); await p.mouse.up(); await p.waitForTimeout(800);
+for (const w of [800, 2000]) { await p.waitForTimeout(w); console.log('after click', JSON.stringify(await p.evaluate(() => ({ mode: window.__villageZoneLive?.mode, vis: window.__villageZoneLive?.visible, els: window.__villageZoneLive?.elements, drawn: window.__villageZoneLive?.drawnElements })))); }
+await p.screenshot({ path: 'test-results/village-elements-2026-11-04/click1.png' });
+await b.close();

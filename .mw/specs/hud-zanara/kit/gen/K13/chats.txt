@@ -1,0 +1,4 @@
+v1	n/a	exit:4	attempt:1
+v1	n/a	exit:4	attempt:2
+v1	n/a	exit:3	attempt:3
+v2	n/a	exit:3	attempt:1

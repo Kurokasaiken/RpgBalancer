@@ -1,0 +1,11 @@
+{
+  "window": "2026-11-03",
+  "probe": 7,
+  "first": 50,
+  "repair": 2,
+  "slack": 4,
+  "zones": {
+    "emblem": 2
+  },
+  "blocked": false
+}

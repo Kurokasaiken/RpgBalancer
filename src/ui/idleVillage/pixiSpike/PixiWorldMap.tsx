@@ -33,7 +33,9 @@ import {
 } from '@/balancing/config/idleVillage/mobileFitConfig';
 import { Mappa2SecondaryWaterSchema, type Mappa2SecondaryWater } from '../config/mappa2SecondaryWaterConfig';
 import { parseMappa2AmbientDirector } from '../config/mappa2AmbientDirectorConfig';
-import { AmbientDirector, DEFAULT_AMBIENT_DIRECTOR_CONFIG, type AmbientDirectorConfig, type ShoalZone } from './ambient/ambientDirector';
+import { parseMappa2Fauna, type Mappa2StormoConfig } from '../config/mappa2FaunaConfig';
+import { AmbientDirector, DEFAULT_AMBIENT_DIRECTOR_CONFIG, type AmbientDirectorConfig, type ShoalZone, type TakeoffZone } from './ambient/ambientDirector';
+import { StormoAdapter } from './ambient/ambientStormo';
 import { ShoalAdapter } from './ambient/ambientShoal';
 import { Mappa2SeaLifeSchema } from '../config/mappa2SeaLifeConfig';
 import { mountRegionalWeather } from './regionalWeatherOverlay';
@@ -43,7 +45,10 @@ import { mountVillageZone } from './villageZoneOverlay';
 const mergeAmbientDirectorConfig = (over?: Partial<AmbientDirectorConfig>): AmbientDirectorConfig => ({
   ...DEFAULT_AMBIENT_DIRECTOR_CONFIG,
   ...over,
-  families: { shoal: { ...DEFAULT_AMBIENT_DIRECTOR_CONFIG.families.shoal, ...over?.families?.shoal } },
+  families: {
+    shoal: { ...DEFAULT_AMBIENT_DIRECTOR_CONFIG.families.shoal, ...over?.families?.shoal },
+    stormo: { ...DEFAULT_AMBIENT_DIRECTOR_CONFIG.families.stormo, ...over?.families?.stormo },
+  },
   rare: { ...DEFAULT_AMBIENT_DIRECTOR_CONFIG.rare, ...over?.rare },
 });
 import { useWorldSurface } from '@/ui/idleVillage/hooks/useWorldSurface';
@@ -79,6 +84,8 @@ export interface PixiWorldMapEffects {
   landLife: boolean;
   /** Upscale-lab pilot: swap canopy textures for the LP+HP detailed variants where they exist (falls back per-canopy). */
   canopyDetail?: boolean;
+  /** Upscale-lab: mount the 2x repainted base (`base_flat.hi.webp`) and hide the painted overlays that would cover it. */
+  hiRes?: boolean;
 }
 
 /** A territory of the id map (`scripts/bake-region-ids.py`). `center` is a fraction of the world canvas. */
@@ -183,7 +190,13 @@ export interface PixiWorldMapProps {
    */
   seabed?: { opacity: number; parallax: number };
   /** Clickable territories: hover lights one up and reports it; a click (not a drag) selects it. Off when omitted. */
-  regions?: { assetBase: string; onHover?: (hover: PixiRegionHover | null) => void; onSelect?: (region: PixiRegion) => void };
+  regions?: {
+    assetBase: string;
+    onHover?: (hover: PixiRegionHover | null) => void;
+    onSelect?: (region: PixiRegion) => void;
+    /** Pointer position in world px on every move (lab placement tools; R-313). */
+    onPointer?: (world: { x: number; y: number }) => void;
+  };
   /** Stage colour behind the map; match the sea so seams between sprites cannot show a dark line. */
   stageColor?: string;
   seaPatternConfig?: SeaPatternConfig;
@@ -341,7 +354,7 @@ const DEFAULT_LAND_LIFE_CONFIG: PixiLandLifeConfig = {
   opacity: 0.55,
 };
 
-const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true, landLife: true, canopyDetail: false };
+const ALL_EFFECTS: PixiWorldMapEffects = { seaPattern: true, coastFoam: true, waves: true, seaMarks: true, cloudShadows: true, birds: true, clouds: true, seabed: true, wonders: true, landLife: true, canopyDetail: false, hiRes: false };
 
 const VERT = `#version 300 es
 in vec2 aPosition;
@@ -692,6 +705,19 @@ void main() {
                    texture(uLand, vUV + vec2(0.0, eL.y)).r - texture(uLand, vUV - vec2(0.0, eL.y)).r);
     float facing = smoothstep(0.1, 0.5, -gL.y / max(length(gL), 1e-5));   // 1 = sea straight below
     reach *= facing;
+    // The 8-bit stepped distance field lets the facing gate through in broken fragments on
+    // silhouettes whose sea lies behind/beside the rock — and there the spray term alone
+    // lit scattered specks on cliff faces (Director 2026-11-02, «piccoli effetti di luce»).
+    // Verify the waterline is really below: probe the sea flag in a downward cone at
+    // ~the measured sea distance; on those faces every tap stays on land → reach dies.
+    float seaBelow = 0.0;
+    for (int s = 0; s < 2; s++) {
+      float rr = ld * (0.7 + 0.6 * float(s)) + 4.0;
+      seaBelow = max(seaBelow, texture(uDist, vUV + vec2(0.0, rr / uWorld.y)).g);
+      seaBelow = max(seaBelow, texture(uDist, vUV + vec2(rr * 0.4 / uWorld.x, rr * 0.92 / uWorld.y)).g);
+      seaBelow = max(seaBelow, texture(uDist, vUV + vec2(-rr * 0.4 / uWorld.x, rr * 0.92 / uWorld.y)).g);
+    }
+    reach *= smoothstep(0.3, 0.5, seaBelow);
     if (reach > 2.0 && ld <= reach + 8.0) {
       float rise = smoothstep(0.0, 0.35, tSince);                          // uprush ~0.35 s
       float fall = 1.0 - smoothstep(1.0, 3.0, tSince);                     // hang, then drain
@@ -892,6 +918,8 @@ export function PixiWorldMap({
   landLifeConfigRef.current = { ...DEFAULT_LAND_LIFE_CONFIG, ...landLifeConfig };
   const ambientDirectorConfigRef = useRef<AmbientDirectorConfig>(mergeAmbientDirectorConfig(ambientDirectorConfig));
   ambientDirectorConfigRef.current = mergeAmbientDirectorConfig(ambientDirectorConfig);
+  /** PLAN-108: fauna.json stormo cadence — composed over the lab merge in the director's cfg getter. */
+  const faunaStormoRef = useRef<Mappa2StormoConfig | null>(null);
   const cloudOpacityScaleRef = useRef(cloudOpacityScale);
   cloudOpacityScaleRef.current = cloudOpacityScale;
   const cloudTintRef = useRef(cloudTint);
@@ -1197,9 +1225,11 @@ export function PixiWorldMap({
       Object.assign(window as object, { __landLifeBox: landLifeBox }); // dev/test seam (same pattern as __pixiApp)
       const secondaryWaterBox = new Container();
       const ambientSeaLayer = new Container(); // PLAN-094: shoal blobs below secondaryWater/foam
+      const hiRes = fxOn.hiRes === true;
       for (const layer of layers) {
-        const swapBase = canopyOn && layer.id === 'base_flat';
-        const texture = await load(layerUrl(manifest.world, swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file));
+        const swapBase = canopyOn && !hiRes && layer.id === 'base_flat';
+        const fileName = hiRes && layer.id === 'base_flat' ? layer.file.replace('.webp', '.hi.webp') : swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file;
+        const texture = await load(layerUrl(manifest.world, fileName));
         if (disposed) return;
         const place = (sprite: Sprite) => {
           const rect = layer.rect;
@@ -1216,6 +1246,7 @@ export function PixiWorldMap({
         };
         const sprite = new Sprite(texture);
         place(sprite);
+        if (hiRes && layer.id !== 'base_flat') sprite.visible = false;
         world.addChild(sprite);
         if (layer.id === 'sea') {
           const lift = new Sprite(texture);
@@ -1981,6 +2012,7 @@ export function PixiWorldMap({
         }
       }
 
+      let stormoMounted = false;
       /* ── AmbientDirector + shoal (PLAN-094): deterministic admission
        * scheduler + zone-based blob pool over real shallows. The Director
        * only admits spawns (spawn log, cooldowns, caps, rare lock);
@@ -1992,6 +2024,28 @@ export function PixiWorldMap({
         const adJson = await fetchJson<unknown>(packAssetUrl(pack.packRoot, 'ambient-director.json')).catch(() => null);
         const directorData = adJson ? parseMappa2AmbientDirector(adJson) : null;
         const atlasTex = await load(packAssetUrl(pack.packRoot, ambAtlasPath)).catch(() => null);
+        // PLAN-108: fauna leaf — stormo flock zones + cadence. Missing/invalid
+        // means NO birds on mappa2, never a legacy fallback (debate r002).
+        const faunaJson = await fetchJson<unknown>(packAssetUrl(pack.packRoot, 'fauna.json')).catch(() => null);
+        let faunaStormo: Mappa2StormoConfig | null = null;
+        let faunaAtlasFile = '';
+        let faunaAtlasFrames = 4;
+        let faunaCanvasW = 2752;
+        let stormoZones: TakeoffZone[] = [];
+        if (faunaJson) {
+          try {
+            const fauna = parseMappa2Fauna(faunaJson);
+            faunaStormo = { ...fauna.stormo, enabled: fauna.stormo.enabled && fxOn.birds };
+            faunaAtlasFile = fauna.atlas.file;
+            faunaAtlasFrames = fauna.atlas.frames;
+            faunaCanvasW = fauna.canvas[0];
+            stormoZones = fauna.takeoffs.map((t) => ({ id: t.id, biome: t.biome, cx: t.x, cy: t.y, heading: t.heading, weight: t.weight }));
+          } catch {
+            console.warn('[mappa2] fauna.json failed strict parse — no birds on mappa2');
+          }
+        } else {
+          console.warn('[mappa2] fauna.json missing — no birds on mappa2');
+        }
         if (disposed) return;
         if (directorData) {
           const asx = canvas.width / directorData.canvas[0];
@@ -2000,20 +2054,46 @@ export function PixiWorldMap({
             heading: z.heading, maxTravelPx: z.maxTravelPx, tintRow: z.tintRow,
             weight: z.cells[0][2],
           }));
-          const director = new AmbientDirector(zones, () => ambientDirectorConfigRef.current);
+          faunaStormoRef.current = faunaStormo;
+          const director = new AmbientDirector({ shoal: zones, stormo: stormoZones }, () => {
+            const base = ambientDirectorConfigRef.current;
+            const faunaFam = faunaStormoRef.current;
+            return faunaFam
+              ? { ...base, families: { ...base.families, stormo: faunaFam } }
+              : base;
+          });
           // read-only occupancy declarations for the rare-event gate
           // (artifact-r003): existing effects stay independent; the
           // registry is the ONLY coupling the Director has to them.
           director.occupancy.declare('seaPattern', 'sea', 0.4);
           director.occupancy.declare('coastFoam', 'coast', 0.3);
           director.occupancy.declare('seaMarks', 'sea', 0.2);
-          director.occupancy.declare('birds', 'sky', 0.3);
+          director.occupancy.declare(faunaStormo ? 'stormo' : 'birds', 'sky', 0.3);
           director.occupancy.declare('clouds', 'sky', 0.3);
           director.occupancy.declare('waterfall', 'land', 0.3);
           director.occupancy.declare('landLife', 'land', 0.3);
           director.occupancy.declare('secondaryWater', 'water', 0.4);
           const shoal = new ShoalAdapter(zones, atlasTex, () => ambientDirectorConfigRef.current, asx);
           ambientSeaLayer.addChild(shoal.container);
+          /* PLAN-108: stormo flock adapter — painted atlas birds rising from
+           * takeoff anchors, below the cloud band (z=9 < CLOUD_BAND_Z=10). */
+          const stormoLayer = new Container();
+          stormoLayer.zIndex = CLOUD_BAND_Z - 1;
+          world.addChild(stormoLayer);
+          let stormo: StormoAdapter | null = null;
+          if (faunaStormo) {
+            const stormoAtlas = await load(packAssetUrl(pack.packRoot, faunaAtlasFile)).catch(() => null);
+            if (stormoAtlas) {
+              const fw = stormoAtlas.source.width / faunaAtlasFrames;
+              const frames = Array.from({ length: faunaAtlasFrames }, (_, i) =>
+                new Texture({ source: stormoAtlas.source, frame: new Rectangle(i * fw, 0, fw, stormoAtlas.source.height) }));
+              const asxF = canvas.width / faunaCanvasW;
+              const cfgRef = faunaStormo;
+              stormo = new StormoAdapter(stormoZones, frames, () => cfgRef, asxF);
+              stormoLayer.addChild(stormo.container);
+              stormoMounted = true;
+            }
+          }
           // Director's hinged silhouettes (sea-life.json leaf + png parts); placeholders stay until they load.
           void (async () => {
             const rigJson = await fetchJson<unknown>(packAssetUrl(pack.packRoot, 'sea-life.json')).catch(() => null);
@@ -2029,7 +2109,7 @@ export function PixiWorldMap({
             if (!disposed) shoal.setRigs(parsed.data.animals, (f) => texByFile.get(f));
           })();
           Object.assign(window as object, {
-            __ambientDebug: { layer: ambientSeaLayer, director, shoal, zones: zones.length },
+            __ambientDebug: { layer: ambientSeaLayer, director, shoal, stormo, zones: zones.length },
           });
           let lastMs = -1;
           ticks.push((t) => {
@@ -2038,10 +2118,15 @@ export function PixiWorldMap({
             const nowMs = t * 1000;
             const dMs = lastMs >= 0 ? nowMs - lastMs : 16.7;
             lastMs = nowMs;
-            for (const a of director.tick(dMs, () => shoal.activeCount(), reducedMotion)) {
-              shoal.spawn(a, t);
+            for (const a of director.tick(dMs, () => shoal.activeCount() + (stormo?.activeCount() ?? 0), reducedMotion)) {
+              if (a.family === 'stormo') {
+                if (!stormo?.spawn(a, t)) director.noteSuppressed(a, 'adapter_rejected');
+              } else {
+                shoal.spawn(a, t);
+              }
             }
             shoal.update(t, reducedMotion);
+            stormo?.update(t, reducedMotion);
           });
         }
       }
@@ -2738,17 +2823,18 @@ export function PixiWorldMap({
       buildStep();
       // ── Coastal foam (shader) ──
       if (fxOn.coastFoam && meshOk) {
-        const dist = await load(coastDistanceUrl);
+        const hiSuf = hiRes ? '.hi' : '';
+        const dist = await load(coastDistanceUrl.replace('.webp', `${hiSuf}.webp`));
         // clean plate under the painted surf (pipeline: masks/foam_clean.webp); absent -> the surf just stays put
-        const clean = await load(coastDistanceUrl.replace('coast_distance.webp', 'foam_clean.webp')).catch(() => null);
+        const clean = await load(coastDistanceUrl.replace('coast_distance.webp', `foam_clean${hiSuf}.webp`)).catch(() => null);
         // painted base, re-sampled at displaced uv for the flow map (the water itself travels)
-        const baseTex = pack ? await load(packAssetUrl(pack.packRoot, 'layers/base_flat.webp')).catch(() => null) : null;
+        const baseTex = pack ? await load(packAssetUrl(pack.packRoot, `layers/base_flat${hiSuf}.webp`)).catch(() => null) : null;
         // land distance + surf adjacency: the whitewater that climbs the rock faces (pipeline: masks/land_distance.webp)
-        const landDist = await load(coastDistanceUrl.replace('coast_distance.webp', 'land_distance.webp')).catch(() => null);
+        const landDist = await load(coastDistanceUrl.replace('coast_distance.webp', `land_distance${hiSuf}.webp`)).catch(() => null);
         // extracted painted surf strokes — the foam material is the painting itself (pipeline: masks/foam_strokes.webp)
-        const strokes = await load(coastDistanceUrl.replace('coast_distance.webp', 'foam_strokes.webp')).catch(() => null);
+        const strokes = await load(coastDistanceUrl.replace('coast_distance.webp', `foam_strokes${hiSuf}.webp`)).catch(() => null);
         // where the surf may exist at all (pipeline: masks/surf_zones.webp); absent -> everywhere, as before
-        const zones = await load(coastDistanceUrl.replace('coast_distance.webp', 'surf_zones.webp')).catch(() => null);
+        const zones = await load(coastDistanceUrl.replace('coast_distance.webp', `surf_zones${hiSuf}.webp`)).catch(() => null);
         const c = coastFoamConfig;
         const shader = Shader.from({
           gl: { vertex: VERT, fragment: COAST_FOAM_FRAG },
@@ -2786,7 +2872,7 @@ export function PixiWorldMap({
       }
 
       // ── Birds: flocks crossing on a cycle, wings from a horizontal frame strip ──
-      if (fxOn.birds && atmosphereAssets.birds && atmosphereAssets.birds.flights.length > 0) {
+      if (fxOn.birds && !stormoMounted && atmosphereAssets.birds && atmosphereAssets.birds.flights.length > 0) {
         const cfg = atmosphereAssets.birds;
         const strip = await load(`/assets/atmosphere/${cfg.strip}`);
         const fw = strip.source.width / cfg.frameCount;
@@ -3284,6 +3370,7 @@ export function PixiWorldMap({
         };
         const onHoverMove = (e: MouseEvent) => {
           const { wx, wy } = worldPoint(e);
+          regionsRef.current?.onPointer?.({ x: wx, y: wy });
           const index = drag ? 0 : idAt(wx, wy);
           if (drag) el2.dataset.cursor = 'move';
           else if (regionByIndex.has(index)) el2.dataset.cursor = 'point';

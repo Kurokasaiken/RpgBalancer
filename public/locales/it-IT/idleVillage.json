@@ -1055,6 +1055,19 @@
         "placeholder": "Ordina per…",
         "asc": "Crescente",
         "desc": "Decrescente"
+      },
+      "zanara": {
+        "expand": "Apri il roster completo",
+        "listLabel": "Eroi",
+        "stamina": "Resistenza",
+        "state": {
+          "away": "In viaggio",
+          "exhausted": "Esausto",
+          "injured": "Ferito",
+          "dead": "Caduto"
+        },
+        "scrollUp": "Eroi precedenti",
+        "scrollDown": "Altri eroi"
       }
     },
     "next": {

@@ -1,0 +1,191 @@
+{
+  "when": "2026-11-03T19:12:09.967Z",
+  "url": "https://gemini.google.com/app#g0-7717-mw12e1uy",
+  "buttons": [
+    {
+      "aria": "Cerca nelle chat",
+      "text": "search"
+    },
+    {
+      "aria": "Chiudi barra laterale",
+      "text": ""
+    },
+    {
+      "aria": "Altro",
+      "text": "Altro"
+    },
+    {
+      "aria": "Attiva/disattiva Notebook",
+      "text": "Notebook"
+    },
+    {
+      "aria": "Attiva/disattiva Tutte",
+      "text": "Tutte"
+    },
+    {
+      "aria": "Filtri",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Limite Raggiunto Per Immagini",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Rifiuto modifica mappa dipinta",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Emblem Detail Image Generation Limit",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per AAA Game Asset Finial Render",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per AAA Game Asset Image Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per AAA Game Emblem Asset Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per AAA Game Wing Emblem Render",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per AAA Game Compass Emblem Redraw",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per AAA Game Asset Compass Redraw",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per AAA Game UI Asset Rendering",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per AAA Fantasy HUD Emblem Render",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Winged Emblem Game Asset Refinement",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Painterly Integration of Stone Towers",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Refined Fantasy Game Emblem Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Refined Strategy Game Emblem Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Refined Fantasy Game Emblem Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Refined Fantasy HUD Emblem Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Winged Emerald Emblem Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy Name Plaque Redesign",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy Game Plaque Redesign",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy HUD Name Plaque Redesign",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy Name Plaque Redesign",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Name Plaque Redesign Specifications",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy HUD Name Plaque Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Wooden Guard Tower Art Request",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Wooden Watchtower Art Prompt",
+      "text": ""
+    },
+    {
+      "aria": "Attività delle app Gemini",
+      "text": "Attività"
+    },
+    {
+      "aria": "Aggiorna posizione",
+      "text": ""
+    },
+    {
+      "aria": "Impostazioni",
+      "text": ""
+    },
+    {
+      "aria": "Scorri fino in fondo",
+      "text": ""
+    },
+    {
+      "aria": "Caricamento e strumenti",
+      "text": ""
+    },
+    {
+      "aria": "Apri selettore modalità, attualmente Gemini Auto",
+      "text": "GeminiAuto"
+    },
+    {
+      "aria": "Detta (⌘⇧D)",
+      "text": ""
+    },
+    {
+      "aria": "",
+      "text": "Scarica app"
+    },
+    {
+      "aria": "",
+      "text": "Fai l'upgrade"
+    },
+    {
+      "aria": "Chat temporanea",
+      "text": ""
+    }
+  ],
+  "pickerGuess": [
+    "Altre opzioni per Limite Raggiunto Per Immagini",
+    "Altre opzioni per Wooden Watchtower Art Prompt",
+    "Attività delle app Gemini",
+    "Apri selettore modalità, attualmente Gemini Auto"
+  ],
+  "banners": [],
+  "attach": [
+    {
+      "target": 1,
+      "sentFiles": 1,
+      "setOk": false,
+      "chipsVisible": 0,
+      "toasts": []
+    }
+  ],
+  "inputsMultiple": []
+}

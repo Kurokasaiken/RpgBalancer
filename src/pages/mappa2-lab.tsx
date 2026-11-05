@@ -7,7 +7,7 @@ import { Mappa2GradeControls } from './mappa2-grade-controls';
 import { useMappa2Grade } from './useMappa2Grade';
 import { mountainClarityLive, mountainShadeLive, seaGradeLive } from './mappa2-grade';
 import { villageZoneLive } from '@/ui/idleVillage/pixiSpike/villageZoneOverlay';
-import { villageManifestSchema, type VillageManifestV2 } from '@/balancing/config/idleVillage/villageZoneManifest';
+import { villageManifestSchema, towerLevelAllowed, type VillageManifestV2 } from '@/balancing/config/idleVillage/villageZoneManifest';
 
 const MANIFEST_PATH = '/assets/world/mappa2/base/manifest.json';
 const REGIONS_BASE = '/assets/world/mappa2/base';
@@ -33,12 +33,13 @@ const EFFECT_TOGGLES: { id: keyof PixiWorldMapEffects; label: string }[] = [
   { id: 'wonders', label: 'wonders' },
   { id: 'landLife', label: 'canopy' },
   { id: 'canopyDetail', label: 'detail' },
+  { id: 'hiRes', label: 'hi-res' },
 ];
 
 const LAB_TABS = ['scene', 'water', 'sea', 'sky', 'land', 'village'] as const;
 type LabTab = typeof LAB_TABS[number];
 const TAB_EFFECTS: Record<LabTab, (keyof PixiWorldMapEffects)[]> = {
-  scene: [],
+  scene: ['hiRes'],
   water: [],
   sea: ['seaPattern', 'coastFoam', 'seabed'],
   sky: ['clouds', 'cloudShadows', 'birds'],
@@ -144,6 +145,7 @@ const DEFAULT_EFFECTS: PixiWorldMapEffects = {
   wonders: false, // old sea wonders removed from the lab (Director 2026-10-30)
   landLife: true,
   canopyDetail: false,
+  hiRes: false,
 };
 
 /** Per-device storage key for the lab tuning (PersistenceService → localStorage on web). */
@@ -249,7 +251,10 @@ export default function Mappa2LabPage() {
   const [villageManifest, setVillageManifest] = useState<VillageManifestV2 | null>(null);
   const [villageStep, setVillageStep] = useState(0);
   const [villagePlaying, setVillagePlaying] = useState(false);
-  const [villageStepSec, setVillageStepSec] = useState(2.5);
+  const [villageStepSec, setVillageStepSec] = useState(1);
+  // R-313 prototype: runtime elements instead of one plate per combination
+  const [villageMode, setVillageMode] = useState<'plates' | 'elements'>('plates');
+  const [villageElements, setVillageElements] = useState<{ kind: string; x: number; y: number }[]>([]);
   const [savedDefaultsNote, setSavedDefaultsNote] = useState('');
   const [wonderRequest, setWonderRequest] = useState(0);
   const [defaultsLoaded, setDefaultsLoaded] = useState(false);
@@ -296,6 +301,10 @@ export default function Mappa2LabPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the serialized payload
   }, [labPayloadJson, defaultsLoaded]);
 
+  useEffect(() => {
+    if (import.meta.env.DEV) (window as unknown as { __villageZoneLive?: typeof villageZoneLive }).__villageZoneLive = villageZoneLive;
+  }, []);
+
   useLayoutEffect(() => {
     document.body.dataset.mappa2Lab = 'true';
     return () => {
@@ -323,7 +332,9 @@ export default function Mappa2LabPage() {
     villageZoneLive.tower2 = t2 as typeof villageZoneLive.tower2;
     villageZoneLive.armed = villageArmed;
     villageZoneLive.parts = villageParts;
-  }, [villageOn, villageGrowth, villageDefence, villageTowers, villageArmed, villageParts]);
+    villageZoneLive.mode = villageMode;
+    villageZoneLive.elements = villageElements;
+  }, [villageOn, villageGrowth, villageDefence, villageTowers, villageArmed, villageParts, villageMode, villageElements]);
 
   /** Applies one timeline step's plate key to the three axis states. */
   const applyVillageKey = (key: string) => {
@@ -331,12 +342,15 @@ export default function Mappa2LabPage() {
     setVillageGrowth(g); setVillageDefence(d); setVillageTowers(s);
   };
   useEffect(() => { applyVillageKey(VILLAGE_TIMELINE[villageStep].key); }, [villageStep]);
-  // keep the slider in sync when a flat state button is picked directly
+  // Keep the slider in sync when a flat state button is picked directly.
+  // Deps are the axes ONLY: also depending on `villageStep` made this fight the
+  // step→axes effect above (step N+1 seen against still-old axes → step reset to N),
+  // ping-ponging the plate during autoplay (the "flicker").
   useEffect(() => {
     const cur = `${villageGrowth}|${villageDefence}|${villageTowers}`;
     const i = VILLAGE_TIMELINE.findIndex((s) => s.key === cur);
-    if (i >= 0 && i !== villageStep) setVillageStep(i);
-  }, [villageGrowth, villageDefence, villageTowers, villageStep]);
+    if (i >= 0) setVillageStep(i);
+  }, [villageGrowth, villageDefence, villageTowers]);
   // Teaser autoplay: advance one step every `villageStepSec`, stop at the last.
   useEffect(() => {
     if (!villagePlaying) return;
@@ -348,9 +362,6 @@ export default function Mappa2LabPage() {
     }, villageStepSec * 1000);
     return () => window.clearInterval(id);
   }, [villagePlaying, villageStepSec]);
-  useEffect(() => {
-    if (hover) { villageZoneLive.hoverX = hover.x; villageZoneLive.hoverY = hover.y; }
-  }, [hover]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -422,7 +433,16 @@ export default function Mappa2LabPage() {
         secondaryWaterConfig={{ riversOn: swRiversOn, basinPosesPerS: swBasinPosesPerS, seaPatchPosesPerS: swSeaPatchPosesPerS, deltaSeaPosesPerS: swDeltaSeaPosesPerS, riverFlowSpeed: swRiverFlowSpeed, riverFlowStrength: swRiverFlowStrength, lakeShimmer: swLakeShimmer, confluenceFoam: swConfluenceFoam }}
         landLifeConfig={{ enabled: landLifeOn, leaves: landLifeLeaves, motes: landLifeMotes, flutter: landLifeFlutter, speed: landLifeSpeed, opacity: landLifeOpacity }}
         ambientDirectorConfig={{ enabled: ambOn, intensity: ambIntensity, families: { shoal: { enabled: ambOn, probability: ambProb, alpha: ambAlpha } }, rare: { enabled: ambRare, p: 0.15 } }}
-        regions={{ assetBase: REGIONS_BASE, onHover: setHover, onSelect: () => {
+        regions={{ assetBase: REGIONS_BASE, onHover: setHover, onPointer: (w) => { villageZoneLive.hoverX = w.x; villageZoneLive.hoverY = w.y; }, onSelect: () => {
+          // read live state only: PixiWorldMap keeps the handler from its first render
+          const zone = villageZoneLive.zone;
+          if (villageZoneLive.mode === 'elements' && villageZoneLive.armed?.startsWith('el:') && zone && villageZoneLive.hoverX) {
+            const kind = villageZoneLive.armed.slice(3);
+            const x = Math.round(villageZoneLive.hoverX - zone.x);
+            const y = Math.round(villageZoneLive.hoverY - zone.y);
+            if (x >= 0 && y >= 0 && x <= zone.w && y <= zone.h) setVillageElements((cur) => [...cur, { kind, x, y }]);
+            return;
+          }
           if (villageZoneLive.armed && villageZoneLive.hoverX) {
             setVillageParts((cur) => [...cur, { part: villageZoneLive.armed!, x: villageZoneLive.hoverX, y: villageZoneLive.hoverY }]);
           }
@@ -753,6 +773,35 @@ export default function Mappa2LabPage() {
                 <input type="checkbox" checked={villageOn} onChange={(e) => setVillageOn(e.target.checked)} />
                 village zone
               </label>
+              <label style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
+                <input type="checkbox" checked={villageMode === 'elements'} onChange={(e) => { setVillageMode(e.target.checked ? 'elements' : 'plates'); setVillageArmed(null); }} />
+                elementi a runtime (prototipo R-313)
+              </label>
+              {villageMode === 'elements' && (
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', margin: '4px 0' }}>
+                  {['tower-wood', 'tower-stone'].map((k) => {
+                    const id = `el:${k}`;
+                    const locked = !towerLevelAllowed(villageManifest?.upgrades, k.replace('tower-', ''), villageDefence);
+                    return (
+                      <button
+                        key={k}
+                        type="button"
+                        disabled={locked}
+                        title={locked ? 'serve prima il muro di pietra' : undefined}
+                        onClick={() => setVillageArmed((cur) => (cur === id ? null : id))}
+                        style={{ padding: '3px 6px', border: '1px solid #56758d', borderRadius: 4, fontSize: 11, color: villageArmed === id ? '#0d1f2d' : 'inherit', background: villageArmed === id ? '#e0a94e' : 'rgba(20,55,80,0.75)', cursor: 'pointer' }}
+                      >
+                        + {k} (clic sulla mappa)
+                      </button>
+                    );
+                  })}
+                  {villageElements.length > 0 && (
+                    <button type="button" onClick={() => setVillageElements([])} style={{ padding: '3px 6px', border: '1px solid #8d5757', borderRadius: 4, fontSize: 11, color: '#ffb0a0', background: 'rgba(80,20,20,0.6)', cursor: 'pointer' }}>
+                      clear elementi ({villageElements.length})
+                    </button>
+                  )}
+                </div>
+              )}
               <div style={{ fontSize: 12, marginTop: 6, marginBottom: 2 }}>
                 timeline: <b>{villageStep + 1}/{VILLAGE_TIMELINE.length}</b> — {VILLAGE_TIMELINE[villageStep].label}
               </div>

@@ -3034,6 +3034,7 @@
 {"entity":"PLAN-091","kind":"verify-artifact","at":"2026-10-28T19:06:19.490Z","confidence":"low"}
 {"entity":"PLAN-091","kind":"verify-artifact","at":"2026-10-28T19:10:32.721Z","confidence":"low"}
 {"entity":"PLAN-091","kind":"bundle","at":"2026-10-28T19:11:52.412Z","confidence":"high"}
+{"entity":"PLAN-091","kind":"stamp-close","at":"2026-10-28T19:11:52.412Z","confidence":"high"}
 {"entity":"PLAN-091","kind":"commit","at":"2026-10-29T01:51:41+01:00","cls":"assets","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T00:51:41.070Z"}
 {"entity":"PLAN-091","kind":"plan-created","at":"2026-10-29T01:51:41+01:00","confidence":"high"}
 {"entity":"PLAN-091","kind":"commit","at":"2026-10-29T12:26:45+01:00","cls":"docs","confidence":"low","meta":"remove off-spec demo image (human figure, not the forest scene)"}
@@ -3047,8 +3048,10 @@
 {"entity":"PLAN-093","kind":"verify-artifact","at":"2026-10-28T22:17:04.177Z","confidence":"low"}
 {"entity":"PLAN-093","kind":"verify-artifact","at":"2026-10-28T22:17:04.178Z","confidence":"low"}
 {"entity":"PLAN-093","kind":"bundle","at":"2026-10-28T22:21:45.430Z","confidence":"high"}
+{"entity":"PLAN-093","kind":"stamp-close","at":"2026-10-28T22:21:45.430Z","confidence":"high"}
 {"entity":"PLAN-093","kind":"commit","at":"2026-10-29T01:51:41+01:00","cls":"assets","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T00:51:41.070Z"}
 {"entity":"PLAN-093","kind":"plan-created","at":"2026-10-29T01:51:41+01:00","confidence":"high"}
+{"entity":"PLAN-093","kind":"stamp-open","at":"2026-10-29T01:51:41+01:00","confidence":"high"}
 {"entity":"PLAN-093","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
 {"entity":"PLAN-094","kind":"commit","at":"2026-10-30T00:26:12+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-29T23:26:09.119Z"}
 {"entity":"PLAN-094","kind":"plan-created","at":"2026-10-30T00:26:12+01:00","confidence":"high"}
@@ -3083,9 +3086,14 @@
 {"entity":"PLAN-105","kind":"plan-created","at":"2026-10-30T23:28:04+01:00","confidence":"high"}
 {"entity":"PLAN-106","kind":"commit","at":"2026-10-31T18:59:23+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-10-31T17:59:23.890Z"}
 {"entity":"PLAN-106","kind":"plan-created","at":"2026-10-31T18:59:23+01:00","confidence":"high"}
+{"entity":"PLAN-106","kind":"commit","at":"2026-11-01T20:46:14+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-11-01T19:46:14.112Z"}
+{"entity":"PLAN-106","kind":"commit","at":"2026-11-02T02:06:17+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-11-02T01:06:17.250Z"}
+{"entity":"PLAN-106","kind":"commit","at":"2026-11-02T11:02:46+01:00","cls":"mixed","confidence":"low","meta":"feat(mappa2): surf a eventi + mountain clarity (fork C) + canopy detail + upscal"}
 {"entity":"PLAN-107","kind":"commit","at":"2026-11-01T13:10:59+01:00","cls":"code","confidence":"high","meta":"feat(hud-lab): route /hud-lab — crop mockup HUD sulla mappa viva (R-303, PLAN-10"}
 {"entity":"PLAN-107","kind":"plan-created","at":"2026-11-01T13:10:59+01:00","confidence":"high"}
 {"entity":"PLAN-107","kind":"stamp-open","at":"2026-11-01T14:08:16.534Z","confidence":"high"}
+{"entity":"PLAN-107","kind":"commit","at":"2026-11-01T20:46:14+01:00","cls":"mixed","confidence":"low","meta":"chore(ops): pre-shutdown auto-commit 2026-11-01T19:46:14.112Z"}
+{"entity":"PLAN-108","kind":"stamp-open","at":"2026-11-02T11:02:14.973Z","confidence":"high"}
 {"entity":"PLAN-2","kind":"debate","at":"2026-09-10T13:58:42.658Z","confidence":"high","meta":"start","durMs":1037918}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
@@ -3142,7 +3150,6 @@
 {"entity":"R-056","kind":"verify-artifact","at":"2026-08-30T20:10:54.020Z","confidence":"low"}
 {"entity":"R-056","kind":"verify-artifact","at":"2026-08-30T20:10:54.020Z","confidence":"low"}
 {"entity":"R-074","kind":"commit","at":"2026-09-17T17:56:23+02:00","cls":"mixed","confidence":"high","meta":"R-074: PgDetailCard redesign — elegant 2-column layout with stat icons"}
-{"entity":"R-074","kind":"commit","at":"2026-09-18T01:36:42Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"R-076","kind":"commit","at":"2026-10-03T11:25:32+02:00","cls":"mixed","confidence":"high","meta":"R-076: astrolabe ball arrival seamless via Reynolds Arrive steering"}
 {"entity":"R-076","kind":"commit","at":"2026-10-03T11:39:00+02:00","cls":"mixed","confidence":"high","meta":"R-076: quest S1 — declared primary stats + per-slot risk preview"}
 {"entity":"R-076","kind":"commit","at":"2026-10-03T11:58:18+02:00","cls":"mixed","confidence":"high","meta":"R-076: quest S1 i18n + astrolabe input/destroy hardening + it-IT resolution fix"}
@@ -4297,14 +4304,10 @@
 {"entity":"R-304","kind":"commit","at":"2026-11-01T14:15:56+01:00","cls":"code","confidence":"high","meta":"feat(landing): / → mappa2-lab anche su desktop (R-305) + probe boot WebGL (R-304"}
 {"entity":"R-304","kind":"commit","at":"2026-11-01T14:33:46+01:00","cls":"mixed","confidence":"high","meta":"docs(rules): deploy verification invariant (R-304) + chiusura R-304/R-305"}
 {"entity":"R-304","kind":"commit","at":"2026-11-01T14:40:13+01:00","cls":"docs","confidence":"high","meta":"docs(context): learn R-304/R-305 — istanza T-22 (headless-no-GPU), decision log,"}
+{"entity":"R-304","kind":"commit","at":"2026-11-01T15:20:51+01:00","cls":"mixed","confidence":"high","meta":"feat(deploy): WebGL boot probe nel guardian deploy-guard (R-304)"}
 {"entity":"R-305","kind":"commit","at":"2026-11-01T14:15:56+01:00","cls":"code","confidence":"high","meta":"feat(landing): / → mappa2-lab anche su desktop (R-305) + probe boot WebGL (R-304"}
 {"entity":"R-305","kind":"commit","at":"2026-11-01T14:33:46+01:00","cls":"mixed","confidence":"high","meta":"docs(rules): deploy verification invariant (R-304) + chiusura R-304/R-305"}
 {"entity":"R-305","kind":"commit","at":"2026-11-01T14:40:13+01:00","cls":"docs","confidence":"high","meta":"docs(context): learn R-304/R-305 — istanza T-22 (headless-no-GPU), decision log,"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-17T14:21:01Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-17T18:24:45Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-17T21:38:37Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-17T23:43:08Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-18T06:40:49Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-18T11:53:11Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-18T15:58:58Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-18T19:00:23Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}

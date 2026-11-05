@@ -1,0 +1,232 @@
+{
+  "when": "2026-11-02T16:32:06.828Z",
+  "url": "https://gemini.google.com/app#g0-47659-mvzh8cd3",
+  "buttons": [
+    {
+      "aria": "Cerca nelle chat",
+      "text": "search"
+    },
+    {
+      "aria": "Chiudi barra laterale",
+      "text": ""
+    },
+    {
+      "aria": "Altro",
+      "text": "Altro"
+    },
+    {
+      "aria": "Attiva/disattiva Notebook",
+      "text": "Notebook"
+    },
+    {
+      "aria": "Attiva/disattiva Tutte",
+      "text": "Tutte"
+    },
+    {
+      "aria": "Filtri",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Failed Game Asset Image Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy Strategy Victory Seal Request",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy Strategy Game UI Asset",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Failed Image Generation Request",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Image Generation Limit Reached",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy Game HUD Asset Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy Game UI Asset Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Emerald Fantasy Strategy HUD Cartouche",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy HUD Cartouche UI Asset",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy Strategy HUD Cartouche Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Fantasy HUD Cartouche Asset Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Alabaster Stone Texture Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Seamless Alabaster Stone Texture",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Seamless Alabaster Stone Texture",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Seamless Alabaster Stone Texture Generation",
+      "text": ""
+    },
+    {
+      "aria": "Altre opzioni per Emerald Enamel Texture Generation",
+      "text": ""
+    },
+    {
+      "aria": "Attività delle app Gemini",
+      "text": "Attività"
+    },
+    {
+      "aria": "Aggiorna posizione",
+      "text": ""
+    },
+    {
+      "aria": "Impostazioni",
+      "text": ""
+    },
+    {
+      "aria": "Scorri fino in fondo",
+      "text": ""
+    },
+    {
+      "aria": "",
+      "text": "Visualizza utilizzo"
+    },
+    {
+      "aria": "",
+      "text": "Esegui l'upgrade"
+    },
+    {
+      "aria": "Caricamento e strumenti",
+      "text": ""
+    },
+    {
+      "aria": "Apri selettore modalità, attualmente Gemini Auto",
+      "text": "GeminiAuto"
+    },
+    {
+      "aria": "Detta (⌘⇧D)",
+      "text": ""
+    },
+    {
+      "aria": "",
+      "text": "Scarica app"
+    },
+    {
+      "aria": "",
+      "text": "Fai l'upgrade"
+    },
+    {
+      "aria": "Chat temporanea",
+      "text": ""
+    }
+  ],
+  "pickerGuess": [
+    "Attività delle app Gemini",
+    "Apri selettore modalità, attualmente Gemini Auto"
+  ],
+  "banners": [
+    "Il limite verrà reimpostato alle ore 6:01 PMIl limite verrà reimpostato alle ore 6:01 PM Visualizza utilizzo  Esegui l'upgrade",
+    "Il limite verrà reimpostato alle ore 6:01 PMIl limite verrà reimpostato alle ore 6:01 PM",
+    "Il limite verrà reimpostato alle ore 6:01 PM",
+    "Visualizza utilizzo  Esegui l'upgrade",
+    "Visualizza utilizzo",
+    "Esegui l'upgrade"
+  ],
+  "attach": [
+    {
+      "target": 1,
+      "sentFiles": 1,
+      "setOk": false,
+      "chipsVisible": 0,
+      "toasts": []
+    },
+    {
+      "target": 3,
+      "sentFiles": 2,
+      "setOk": false,
+      "chipsVisible": 0,
+      "toasts": []
+    },
+    {
+      "target": 5,
+      "sentFiles": 2,
+      "setOk": false,
+      "chipsVisible": 0,
+      "toasts": []
+    },
+    {
+      "target": 8,
+      "sentFiles": 3,
+      "setOk": false,
+      "chipsVisible": 0,
+      "toasts": []
+    },
+    {
+      "target": 12,
+      "sentFiles": 4,
+      "setOk": false,
+      "chipsVisible": 0,
+      "toasts": []
+    }
+  ],
+  "inputsMultiple": []
+}

@@ -1,0 +1,10 @@
+[2026-11-03T20:03:19.798Z] queue start, budget {"maxTotal":170,"used":2,"note":"Immagini Gemini che questa coda può ancora generare (tetto di sicurezza per il limite settimanale). Si cambia a mano."}
+[2026-11-03T20:03:19.801Z] C2/bar3-1: generating (attempt 1)
+[2026-11-03T20:04:04.895Z] bar3-1: done
+[2026-11-03T20:04:16.898Z] C2/bar3-2: generating (attempt 1)
+[2026-11-03T20:05:05.377Z] bar3-2: done
+[2026-11-03T20:05:17.431Z] C2/bar3-3: generating (attempt 1)
+[2026-11-03T20:06:17.504Z] bar3-3: exit 3 (attach/prompt/unknown), soft fail 1
+[2026-11-03T20:07:17.508Z] C2/bar3-3: generating (attempt 2)
+[2026-11-03T20:08:40.083Z] bar3-3: done
+[2026-11-03T20:08:52.110Z] queue empty — done

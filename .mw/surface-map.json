@@ -13,7 +13,8 @@
         "src/pages/game-frame-pixi.tsx",
         "src/pages/game-frame.tsx",
         "scripts/probe-game-map-fit.cjs",
-        "src/ui/idleVillage/components/WorldSurfaceEventCard.tsx"
+        "src/ui/idleVillage/components/WorldSurfaceEventCard.tsx",
+        "src/ui/idleVillage/pixiSpike/ambient/**"
       ],
       "expected_checks": [
         "CTR-game-001",
@@ -197,7 +198,7 @@
       "expected_checks": [],
       "anti_glob_confirmed": true,
       "proposed_by": "plan044-t002-seed",
-      "source": "docs/ledger/rules \u2014 scrutiny via closure:lint e agents:lint, non surface checks",
+      "source": "docs/ledger/rules — scrutiny via closure:lint e agents:lint, non surface checks",
       "approved_at": "2026-10-17T22:25:45.465Z"
     },
     {

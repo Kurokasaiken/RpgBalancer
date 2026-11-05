@@ -462,6 +462,7 @@ La fonte normativa è `.mw/contracts/**` + `.mw/contracts/components/inventory.j
 | `verb-card` | ui-component | 2 | `src/ui/idleVillage/legacy/VerbCard.tsx` | `.mw/contracts/components/verb-card.md` |
 | `verdict-card` | ui-component | 2 | `src/ui/idleVillage/questS1Lab/hud/VerdictCard.tsx` | `.mw/contracts/components/verdict-card.md` |
 | `village-building-icons` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/villageBuildingIcons.tsx` | `.mw/contracts/components/village-building-icons.md` |
+| `village-director-view` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/VillageDirectorView.tsx` | `.mw/contracts/components/village-director-view.md` |
 | `village-registry` | ui-component | 2 | `src/ui/idleVillage/components/gameFrame/VillageRegistry.tsx` | `.mw/contracts/components/village-registry.md` |
 | `village-roster-section` | ui-component | 2 | `src/ui/idleVillage/components/VillageRosterSection.tsx` | `.mw/contracts/components/village-roster-section.md` |
 | `village-roster-section-v2` | ui-component | 2 | `src/ui/idleVillage/rosterV2/VillageRosterSectionV2.tsx` | `.mw/contracts/components/village-roster-section-v2.md` |

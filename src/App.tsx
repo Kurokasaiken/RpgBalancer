@@ -88,6 +88,12 @@ const HudLabPage = lazy(() => import('./pages/hud-lab').then(m => ({ default: m.
 const HudComparePage = lazy(() => import('./pages/hud-compare').then(m => ({ default: m.default })));
 const HudComposePage = lazy(() => import('./pages/hud-compose').then(m => ({ default: m.default })));
 const HudRosterCropPage = lazy(() => import('./pages/hud-roster-crop').then(m => ({ default: m.default })));
+const HudTargetPage = lazy(() => import('./pages/hud-target').then(m => ({ default: m.default })));
+const HudZanaraRosterPage = lazy(() => import('./pages/hud-zanara-roster').then(m => ({ default: m.default })));
+const HudR1Page = lazy(() => import('./pages/hud-r1').then(m => ({ default: m.default })));
+const HudRealRosterPage = lazy(() => import('./pages/hud-real-roster').then(m => ({ default: m.default })));
+const HudLibraryPage = lazy(() => import('./pages/hud-library').then(m => ({ default: m.default })));
+const HudDefectsPage = lazy(() => import('./pages/hud-defects').then(m => ({ default: m.default })));
 const GameFramePixiPage = lazy(() => import('./pages/game-frame-pixi').then(m => ({ default: m.default })));
 const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
@@ -308,6 +314,18 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/hud-compose';
   const isHudRosterCropPath =
     typeof window !== 'undefined' && window.location.pathname === '/hud-roster-crop';
+  const isHudTargetPath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-target';
+  const isHudZanaraRosterPath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-zanara-roster';
+  const isHudR1Path =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-r1';
+  const isHudRealRosterPath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-real-roster';
+  const isHudLibraryPath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-library';
+  const isHudDefectsPath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-defects';
   const isGameFramePixiPath =
     typeof window !== 'undefined' && window.location.pathname === '/game-frame-pixi';
   const isGamePath =
@@ -1148,6 +1166,48 @@ function App() {
     return (
       <Suspense fallback={null}>
           <HudComposePage />
+      </Suspense>
+    );
+  }
+  if (isHudLibraryPath) {
+    return (
+      <Suspense fallback={null}>
+        <HudLibraryPage />
+      </Suspense>
+    );
+  }
+  if (isHudRealRosterPath) {
+    return (
+      <Suspense fallback={null}>
+        <HudRealRosterPage />
+      </Suspense>
+    );
+  }
+  if (isHudR1Path) {
+    return (
+      <Suspense fallback={null}>
+        <HudR1Page />
+      </Suspense>
+    );
+  }
+  if (isHudDefectsPath) {
+    return (
+      <Suspense fallback={null}>
+        <HudDefectsPage />
+      </Suspense>
+    );
+  }
+  if (isHudZanaraRosterPath) {
+    return (
+      <Suspense fallback={null}>
+        <HudZanaraRosterPage />
+      </Suspense>
+    );
+  }
+  if (isHudTargetPath) {
+    return (
+      <Suspense fallback={null}>
+        <HudTargetPage />
       </Suspense>
     );
   }

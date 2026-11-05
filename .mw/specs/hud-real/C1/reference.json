@@ -1,0 +1,49 @@
+{
+  "component": "C1 roster (colonna)",
+  "source": "public/mockups/hud-lab/sources/zanara-v2.png",
+  "sha256": "9eb79d66a4a2f23808f30c9022a2a9b22e2db51dc3ff711e55c5775b185398aa",
+  "sourceSize": [
+    1672,
+    941
+  ],
+  "toDesign": 0.9569377990430622,
+  "designSize": [
+    1600,
+    900
+  ],
+  "pieces": {
+    "top": {
+      "box": [
+        0,
+        0,
+        232,
+        227
+      ],
+      "note": "emblema alato + testa della banda"
+    },
+    "row": {
+      "box": [
+        0,
+        227,
+        256,
+        321
+      ],
+      "pitch": 94,
+      "note": "una riga; il mockup ne mostra 4 (y0 227, 321, 415, 509)"
+    },
+    "bottom": {
+      "box": [
+        0,
+        603,
+        120,
+        668
+      ],
+      "note": "coda della banda + pendente"
+    }
+  },
+  "positionInR1": {
+    "x": 0,
+    "y": 0,
+    "scaleToDesign": 0.9569377990430622
+  }
+}

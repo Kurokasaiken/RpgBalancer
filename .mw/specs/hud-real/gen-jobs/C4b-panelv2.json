@@ -1,0 +1,57 @@
+{
+  "component": "C4b",
+  "jobs": [
+    {
+      "id": "panelv2-1",
+      "zone": "panel",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/panel/prompt-panel-v2.txt",
+      "out": ".mw/specs/hud-real/panel/gen/panelv2-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/panel/gen/panelv2-1-0.png",
+      "sha16": "ddb8d8058e2f9c7a"
+    },
+    {
+      "id": "panelv2-2",
+      "zone": "panel",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/panel/prompt-panel-v2.txt",
+      "out": ".mw/specs/hud-real/panel/gen/panelv2-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/panel/gen/panelv2-2-0.png",
+      "sha16": "d20b7d7bf772c3f4"
+    },
+    {
+      "id": "panelv2-3",
+      "zone": "panel",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/panel/prompt-panel-v2.txt",
+      "out": ".mw/specs/hud-real/panel/gen/panelv2-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/panel/gen/panelv2-3-0.png",
+      "sha16": "4c978f9ee89cd36d"
+    },
+    {
+      "id": "panelv2-4",
+      "zone": "panel",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/panel/prompt-panel-v2.txt",
+      "out": ".mw/specs/hud-real/panel/gen/panelv2-4",
+      "status": "done",
+      "file": ".mw/specs/hud-real/panel/gen/panelv2-4-0.png",
+      "sha16": "b3acb77b63d26c27"
+    }
+  ]
+}

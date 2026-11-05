@@ -1,0 +1,58 @@
+{
+ "dial": {
+  "box": [
+   246,
+   247,
+   686,
+   687
+  ],
+  "desc": "the round compass dial at the centre: an emerald-enamel dial with fine gold radial lines and rings, an eight-point gold compass star with engraved arms, and a large faceted emerald in the middle",
+  "in": [
+   1024,
+   1024
+  ],
+  "mask": "circle:466,467,206"
+ },
+ "wing": {
+  "box": [
+   560,
+   100,
+   900,
+   740
+  ],
+  "desc": "the feathered ivory wing on the right side of the emblem, with a darker emerald-tinted wing tip at the top, layered feathers curling around the gold rim",
+  "in": [
+   544,
+   1024
+  ],
+  "mask": "box"
+ },
+ "finial": {
+  "box": [
+   380,
+   40,
+   560,
+   240
+  ],
+  "desc": "the sword-hilt finial on top of the emblem: a gold pommel and an emerald-enamel grip with a small gold ornament set with a pointed emerald, rising from the gold rim",
+  "in": [
+   922,
+   1024
+  ],
+  "mask": "box"
+ },
+ "pendant": {
+  "box": [
+   380,
+   700,
+   560,
+   960
+  ],
+  "desc": "the pointed gold pendant hanging below the emblem, set with a long diamond-shaped faceted emerald",
+  "in": [
+   709,
+   1024
+  ],
+  "mask": "box"
+ }
+}

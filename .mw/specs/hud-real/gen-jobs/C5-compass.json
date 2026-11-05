@@ -1,0 +1,42 @@
+{
+  "component": "C5",
+  "jobs": [
+    {
+      "id": "compass-1",
+      "zone": "compass",
+      "refs": [
+        ".mw/specs/hud-real/compass/design-compass.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/compass/prompt-compass.txt",
+      "out": ".mw/specs/hud-real/compass/gen/compass-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/compass/gen/compass-1-0.png",
+      "sha16": "d371c8af146336d7"
+    },
+    {
+      "id": "compass-2",
+      "zone": "compass",
+      "refs": [
+        ".mw/specs/hud-real/compass/design-compass.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/compass/prompt-compass.txt",
+      "out": ".mw/specs/hud-real/compass/gen/compass-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/compass/gen/compass-2-0.png",
+      "sha16": "2ee3791ebffc6bab"
+    },
+    {
+      "id": "compass-3",
+      "zone": "compass",
+      "refs": [
+        ".mw/specs/hud-real/compass/design-compass.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/compass/prompt-compass.txt",
+      "out": ".mw/specs/hud-real/compass/gen/compass-3",
+      "status": "failed"
+    }
+  ]
+}

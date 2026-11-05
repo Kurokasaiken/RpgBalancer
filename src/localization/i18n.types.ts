@@ -878,7 +878,20 @@ export default interface Resources {
           "desc": "Descending",
           "placeholder": "Sort by…"
         },
-        "title": "Roster"
+        "title": "Roster",
+        "zanara": {
+          "expand": "Open the full roster",
+          "listLabel": "Heroes",
+          "scrollDown": "More heroes",
+          "scrollUp": "Previous heroes",
+          "stamina": "Stamina",
+          "state": {
+            "away": "Away",
+            "dead": "Fallen",
+            "exhausted": "Exhausted",
+            "injured": "Injured"
+          }
+        }
       },
       "speed": {
         "ariaLabel": "Simulation speed",

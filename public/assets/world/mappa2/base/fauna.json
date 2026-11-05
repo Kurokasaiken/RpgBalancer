@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "canvas": [2752, 1536],
+  "atlas": {
+    "file": "fx/fauna/stormo_flight.webp",
+    "cellPx": 400,
+    "frames": 6,
+    "sha256": "d22fcfc0a784f9449cba76edb0f4a7cf34b9ac08bdd08d7b176cb1cbe204faeb"
+  },
+  "stormo": {
+    "enabled": true,
+    "slotSec": 20,
+    "probability": 0.2,
+    "cooldownSec": 90,
+    "biomeCooldownSec": 150,
+    "maxActive": 2,
+    "sizeWorldPx": 22,
+    "flockCount": [5, 8],
+    "formation": "v",
+    "lifeSec": [9, 13],
+    "speedPxS": [60, 80],
+    "flapHz": 9,
+    "opacity": 0.95,
+    "climbPx": 26,
+    "climbScaleIn": 0.7
+  },
+  "takeoffs": [
+    {
+      "id": "to-meadow-sw",
+      "x": 1105,
+      "y": 1112,
+      "biome": "meadow",
+      "biomeIndex": 4,
+      "heading": [-0.75, -0.66],
+      "weight": 1
+    },
+    {
+      "id": "to-forest-west",
+      "x": 950,
+      "y": 650,
+      "biome": "temperate_forest",
+      "biomeIndex": 3,
+      "heading": [-0.85, 0.53],
+      "weight": 1
+    },
+    {
+      "id": "to-forest-north",
+      "x": 1450,
+      "y": 450,
+      "biome": "temperate_forest",
+      "biomeIndex": 3,
+      "heading": [-0.9, -0.44],
+      "weight": 1
+    }
+  ],
+  "exclusions": [
+    { "type": "rect", "id": "village", "x": 1260, "y": 505, "w": 510, "h": 390 }
+  ]
+}

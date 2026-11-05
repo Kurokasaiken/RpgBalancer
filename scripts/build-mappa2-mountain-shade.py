@@ -38,7 +38,15 @@ def main() -> None:
     # snow / bright neutral stays untouched
     t = np.clip((L - 62) / 12, 0, 1) * np.clip((22 - chroma) / 10, 0, 1)
     snow = cv2.GaussianBlur(t, (0, 0), 2)
-    w = area * (1 - snow)
+    # ...and warm brown rock stays untouched too: the alpine biome id also labels the massif's warm
+    # foothills (red+ochre in Lab reads brown, grey rock is near-neutral), and the grade turned them
+    # maroon (Director 2026-11-02: «lo voglio solo sulle montagne grigiastre»). Two gates: the pixel's
+    # own warmth, plus a wider warm-neighbourhood context — the dark crevice pixels inside the brown
+    # terrain are nearly neutral in Lab and kept the full shade (Director 2026-11-02: «ancora troppo scure»).
+    warm = np.clip((a - 4) / 7, 0, 1) * np.clip((b - 7) / 12, 0, 1)
+    warm = cv2.GaussianBlur(warm, (0, 0), 4)
+    warm_ctx = np.clip((cv2.GaussianBlur(((a > 5) & (b > 8)).astype(np.float32), (0, 0), 12) - 0.12) / 0.3, 0, 1)
+    w = area * (1 - snow) * (1 - warm) * (1 - warm_ctx)
     # ...and NEVER the sea: the `watery` colour test misses the dark bays between the peaks, and the
     # 18px area blur bleeds the shade past the shoreline — both darkened the bays (Director 2026-11-02).
     sea_bleed = cv2.dilate(sea.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))) > 0

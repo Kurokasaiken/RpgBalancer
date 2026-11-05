@@ -1,5 +1,5 @@
 import { Container, Sprite, Texture } from 'pixi.js';
-import { villageManifestSchema, type VillageManifestV2 } from '@/balancing/config/idleVillage/villageZoneManifest';
+import { villageManifestSchema, towerLevelAllowed, type VillageManifestV2 } from '@/balancing/config/idleVillage/villageZoneManifest';
 
 /**
  * PLAN-106: the village-cradle zone as full-zone painted plates on `/mappa2-lab`.
@@ -16,7 +16,11 @@ import { villageManifestSchema, type VillageManifestV2 } from '@/balancing/confi
  * effect without remounting.
  */
 
-export const VILLAGE_ZONE_Z = 4;
+/* The zone is a fixed stage for the upgrade teaser: it must stay legible, so it
+ * renders above the drifting cloud bands (CLOUD_BAND_Z = 10 in PixiWorldMap) —
+ * cloud cover used to hide half the ring/towers («non visibili»). Only the
+ * night wash (20) stays on top. */
+export const VILLAGE_ZONE_Z = 11;
 
 export type VillageTowerValue = 'none' | 'wood' | 'stone';
 
@@ -39,7 +43,39 @@ export const villageZoneLive = {
   hoverY: 0,
   /** Show/hide the placed-parts layer. */
   partsVisible: true,
+  /**
+   * R-313 prototype: 'elements' draws only the growth base plate and stacks the
+   * defence ring + every element (`elements/elements.json`) at runtime, sorted
+   * by foot y — no per-combination plate.
+   */
+  mode: 'plates' as 'plates' | 'elements',
+  /** Free elements placed in elements mode (zone px, foot position). */
+  elements: [] as { kind: string; x: number; y: number }[],
+  /** Zone rect (world px), set at mount — lets map click handlers convert world → zone px. */
+  zone: null as { x: number; y: number; w: number; h: number } | null,
+  /** Live element count drawn in elements mode (witness probe). */
+  drawnElements: 0,
 };
+
+/** `fx/village/elements/elements.json` — exported by compose-village-towers.py. */
+interface VillageElementsSpec {
+  slots: Record<string, [number, number]>;
+  rings: Record<string, string>;
+  kinds: Record<string, { src: string; foot: [number, number]; shadow: { src: string; foot: [number, number] } }>;
+}
+
+/** Elements wanted this tick: slot towers from the live selection + free placements. */
+export function villageElementList(spec: Pick<VillageElementsSpec, 'slots'>,
+  live: Pick<typeof villageZoneLive, 'tower1' | 'tower2' | 'elements'> = villageZoneLive,
+  defence = villageZoneLive.defence, upgrades?: VillageManifestV2['upgrades']) {
+  const out: { kind: string; x: number; y: number }[] = [];
+  ([['1', live.tower1], ['2', live.tower2]] as const).forEach(([slot, mat]) => {
+    const foot = spec.slots[slot];
+    if (!towerLevelAllowed(upgrades, mat, defence)) return;
+    if (mat !== 'none' && foot) out.push({ kind: `tower-${mat}`, x: foot[0], y: foot[1] });
+  });
+  return out.concat(live.elements);
+}
 
 export interface VillageZoneMountDeps {
   pack: { packRoot: string };
@@ -80,11 +116,17 @@ export async function mountVillageZone(deps: VillageZoneMountDeps): Promise<Vill
   const shipped = manifest.plates.filter((p) => p.shipped);
   const entries = await Promise.all(
     shipped.map((p) =>
-      load(packAssetUrl(pack.packRoot, `fx/village/${p.src}`)).then((tex) => [p.key, tex] as const).catch(() => null)),
+      // ?v=bake stamp: baked plates keep the same URL between iterations — the
+      // manifest's `bake` field (rewritten by compose-village-towers.py) forces a
+      // fresh fetch after each re-bake (stale-webp bug reports).
+      load(packAssetUrl(pack.packRoot, `fx/village/${p.src}?v=${(raw as { bake?: string }).bake ?? manifest.version}`)).then((tex) => [p.key, tex] as const).catch(() => null)),
   );
+  const failed = shipped.filter((_, i) => !entries[i]).map((p) => p.key);
+  if (failed.length) console.warn('[village-zone] plate textures failed to load (fallback will show)', failed);
   const textures = new Map<string, Texture>(entries.filter((e): e is readonly [string, Texture] => !!e));
   if (!textures.size || disposed()) return null;
 
+  villageZoneLive.zone = { x: zone.x, y: zone.y, w: zone.w, h: zone.h };
   const box = new Container();
   box.label = 'village-zone';
   box.zIndex = VILLAGE_ZONE_Z;
@@ -100,9 +142,66 @@ export async function mountVillageZone(deps: VillageZoneMountDeps): Promise<Vill
     sp.height = zone.h;
     box.addChild(sp);
   }
+  // GPU warm-up: textures upload lazily on first render — cycling them through
+  // the upper sprite at near-zero alpha uploads them all up front, so the
+  // teaser timeline's first display of each plate doesn't hitch/flash.
+  const warmup = [...textures.values()];
+  let warmupIdx = 0;
+
+  /* ── R-313 elements layer (prototype): rings + y-sorted elements over the base plate ── */
+  const elemRoot = 'fx/village/elements/';
+  const spec = await fetchJson<VillageElementsSpec>(packAssetUrl(pack.packRoot, `${elemRoot}elements.json`)).catch(() => null);
+  const elemTex = new Map<string, Texture>();
+  if (spec) {
+    const files = [...Object.values(spec.rings), ...Object.values(spec.kinds).flatMap((k) => [k.src, k.shadow.src])];
+    await Promise.all(files.map((f) => load(packAssetUrl(pack.packRoot, `${elemRoot}${f}`))
+      .then((t) => { elemTex.set(f, t); })
+      .catch(() => console.warn('[village-zone] element texture failed', f))));
+  }
+  const elemBox = new Container();
+  elemBox.label = 'village-elements';
+  box.addChild(elemBox);
+  const ringSprites = new Map<string, Sprite>();
+  for (const [d, f] of Object.entries(spec?.rings ?? {})) {
+    const t = elemTex.get(f);
+    if (!t) continue;
+    const sp = new Sprite(t);
+    sp.width = zone.w;
+    sp.height = zone.h;
+    sp.alpha = 0;
+    elemBox.addChild(sp);
+    ringSprites.set(d, sp);
+  }
+  const elemLayer = new Container();
+  elemLayer.sortableChildren = true;
+  elemBox.addChild(elemLayer);
+  const live = new Map<string, { node: Container; target: number }>();
+  /** One element = shadow + sprite, positioned so both feet land on (x,y). */
+  const makeElement = (kind: string, x: number, y: number): Container | null => {
+    const k = spec?.kinds[kind];
+    const tex = k && elemTex.get(k.src);
+    if (!k || !tex) return null;
+    const node = new Container();
+    node.position.set(x, y);
+    node.zIndex = y;
+    const shTex = elemTex.get(k.shadow.src);
+    if (shTex) {
+      const sh = new Sprite(shTex);
+      sh.position.set(-k.shadow.foot[0], -k.shadow.foot[1]);
+      node.addChild(sh);
+    }
+    const sp = new Sprite(tex);
+    sp.position.set(-k.foot[0], -k.foot[1]);
+    node.addChild(sp);
+    node.alpha = 0;
+    elemLayer.addChild(node);
+    return node;
+  };
 
   let currentKey = first;
+  let fadeKey = first;
   let fade = 0; // 0 = settled on lower; >0 = blending toward upper
+  let lastT = -1;
 
   /* ── free parts layer (lab PIAZZA toy — unchanged contract) ── */
   const parts = (manifest as { parts?: Record<string, { file: string; scale: number }> }).parts;
@@ -126,7 +225,42 @@ export async function mountVillageZone(deps: VillageZoneMountDeps): Promise<Vill
   ticks.push((t) => {
     box.visible = villageZoneLive.visible;
     if (box.visible) {
-      let target = villageStateKey(manifest);
+      // warm-up pass: one new texture per frame at invisible alpha
+      if (warmupIdx < warmup.length) {
+        upper.texture = warmup[warmupIdx++];
+        upper.alpha = 0.001;
+        lastT = t;
+        return;
+      }
+      if (warmupIdx === warmup.length) { upper.alpha = 0; warmupIdx++; }
+      const dt = lastT < 0 ? 0.016 : Math.max(0, t - lastT);
+      lastT = t;
+      const elementsMode = villageZoneLive.mode === 'elements' && !!spec;
+      elemBox.visible = elementsMode;
+      if (elementsMode) {
+        // ring cross-fade toward the live defence
+        const k = Math.min(1, dt / 0.25);
+        for (const [d, sp] of ringSprites) sp.alpha += ((villageZoneLive.defence === d ? 1 : 0) - sp.alpha) * k;
+        // element diff: new ones fade in, removed ones fade out — nothing else moves
+        const want = new Set<string>();
+        for (const e of villageElementList(spec, villageZoneLive, villageZoneLive.defence, manifest.upgrades)) {
+          const key = `${e.kind}@${e.x},${e.y}`;
+          want.add(key);
+          if (!live.has(key)) {
+            const node = makeElement(e.kind, e.x, e.y);
+            if (node) live.set(key, { node, target: 1 });
+          } else live.get(key)!.target = 1;
+        }
+        for (const [key, el] of live) {
+          if (!want.has(key)) el.target = 0;
+          el.node.alpha += Math.sign(el.target - el.node.alpha) * Math.min(Math.abs(el.target - el.node.alpha), dt / 0.25);
+          // replace animation: the element grows out of / sinks into its foot while it fades
+          el.node.scale.set(0.94 + 0.06 * el.node.alpha);
+          if (el.target === 0 && el.node.alpha <= 0) { el.node.destroy({ children: true }); live.delete(key); }
+        }
+        villageZoneLive.drawnElements = live.size;
+      }
+      let target = elementsMode ? `${villageZoneLive.growth}|none|none+none` : villageStateKey(manifest);
       if (!textures.has(target)) {
         // nearest shipped fallback: same growth, none defence/towers
         target = textures.has(`${villageZoneLive.growth}|none|none+none`)
@@ -136,15 +270,17 @@ export async function mountVillageZone(deps: VillageZoneMountDeps): Promise<Vill
       if (target !== currentKey && fade === 0) {
         upper.texture = textures.get(target) as Texture;
         upper.alpha = 0;
+        fadeKey = target;
         fade = 0.0001;
       }
       if (fade > 0) {
-        fade = Math.min(1, fade + t * 0.05);
+        // real frame-delta: ~0.15 s snap-dissolve regardless of fps (t is elapsed, not delta)
+        fade = Math.min(1, fade + dt / 0.15);
         upper.alpha = fade;
         if (fade >= 1) {
           lower.texture = upper.texture;
           upper.alpha = 0;
-          currentKey = target;
+          currentKey = fadeKey;
           fade = 0;
         }
       }

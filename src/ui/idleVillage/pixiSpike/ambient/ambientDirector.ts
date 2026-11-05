@@ -21,12 +21,22 @@ export interface ShoalFamilyConfig {
   speedPxS: [number, number];
 }
 
+/** PLAN-108: cadence for the stormo (bird flock) family — render params live in fauna.json, not here. */
+export interface StormoFamilyConfig {
+  enabled: boolean;
+  probability: number;
+  slotSec: number;
+  cooldownSec: number;
+  biomeCooldownSec: number;
+  maxActive: number;
+}
+
 export interface AmbientDirectorConfig {
   enabled: boolean;
   seed: string;
   intensity: number;
   maxConcurrentGlobal: number;
-  families: { shoal: ShoalFamilyConfig };
+  families: { shoal: ShoalFamilyConfig; stormo: StormoFamilyConfig };
   rare: { enabled: boolean; attemptSec: number; p: number; globalCooldownSec: number };
 }
 
@@ -40,6 +50,10 @@ export const DEFAULT_AMBIENT_DIRECTOR_CONFIG: AmbientDirectorConfig = {
       enabled: true, probability: 0.25, slotSec: 8,
       cooldownSec: 25, biomeCooldownSec: 60, maxActive: 2,
       alpha: 0.16, sizePx: [56, 110], lifeSec: [14, 22], speedPxS: [3, 8],
+    },
+    stormo: {
+      enabled: true, probability: 0.2, slotSec: 20,
+      cooldownSec: 90, biomeCooldownSec: 150, maxActive: 2,
     },
   },
   rare: { enabled: false, attemptSec: 90, p: 0.15, globalCooldownSec: 180 },
@@ -80,8 +94,20 @@ export type SeaLifeKind = 'school' | 'giant' | 'turtle' | 'dolphin';
 /** Giant species, when the kind is `giant`. */
 export type GiantSpecies = 'manta' | 'pescione' | 'martello';
 
+/** PLAN-108: takeoff anchor for land-fauna families (stormo). ShoalZone shape minus sea fields. */
+export interface TakeoffZone {
+  id: string;
+  biome: string;
+  cx: number;
+  cy: number;
+  heading: [number, number];
+  weight: number;
+}
+
+export type AmbientFamily = 'shoal' | 'stormo';
+
 export interface Admission {
-  family: 'shoal';
+  family: AmbientFamily;
   zoneId: string;
   biome: string;
   tick: number;
@@ -96,7 +122,8 @@ export interface SpawnRecord {
   family: string;
   ordinal: number;
   zoneId: string;
-  outcome: 'spawned' | 'skipped';
+  /** 'suppressed': admission consumed but the adapter could not render it (pool full / disabled / reduced-motion). */
+  outcome: 'spawned' | 'skipped' | 'suppressed';
   reason?: string;
 }
 
@@ -112,12 +139,19 @@ export class OccupancyRegistry {
   count(): number { return this.decl.size; }
 }
 
+/** Zones grouped by family (PLAN-108): shoal zones from ambient-director.json, stormo takeoffs from fauna.json. */
+export interface ZonesByFamily {
+  shoal: ShoalZone[];
+  stormo: TakeoffZone[];
+}
+
 export class AmbientDirector {
   simT = 0;
   droppedTicks = 0;
   droppedDeltaMs = 0;
   private carryMs = 0;
-  private ordinal = 0;
+  /** Per-family ordinal namespaces (PLAN-108 r002): a stormo admission never renumbers shoal ordinals. */
+  private readonly ordinalByFamily = new Map<string, number>();
   private lastSpawnTick = new Map<string, number>();
   private lastBiomeTick = new Map<string, number>();
   readonly log: SpawnRecord[] = [];
@@ -128,10 +162,16 @@ export class AmbientDirector {
   private readonly manualQueue: Admission[] = [];
 
   constructor(
-    private readonly zones: ShoalZone[],
+    private readonly zonesByFamily: ZonesByFamily,
     private readonly cfg: () => AmbientDirectorConfig,
     readonly occupancy: OccupancyRegistry = new OccupancyRegistry(),
   ) {}
+
+  private nextOrdinal(family: string): number {
+    const n = this.ordinalByFamily.get(family) ?? 0;
+    this.ordinalByFamily.set(family, n + 1);
+    return n;
+  }
 
   private record(r: SpawnRecord): void {
     this.log.push(r);
@@ -141,13 +181,31 @@ export class AmbientDirector {
   /** Manual lab trigger — tagged, bypasses cadence, respects caps. */
   triggerShoal(zoneId?: string, pick?: { kind?: SeaLifeKind; species?: GiantSpecies }): Admission | null {
     const c = this.cfg();
+    const zones = this.zonesByFamily.shoal;
     // unknown id (zones are baked per seed) falls back to the first zone instead of silently doing nothing
-    const z = (zoneId && this.zones.find((q) => q.id === zoneId)) || this.zones[0];
+    const z = (zoneId && zones.find((q) => q.id === zoneId)) || zones[0];
     if (!c.enabled || !c.families.shoal.enabled || !z) return null;
-    const seed = hash32(c.seed, 'shoal', 'manual', this.ordinal++);
+    const seed = hash32(c.seed, 'shoal', 'manual', this.nextOrdinal('shoal'));
     const adm: Admission = { family: 'shoal', zoneId: z.id, biome: z.biome, tick: this.simT, seed, manual: true, kind: pick?.kind, species: pick?.species };
     this.manualQueue.push(adm); // drained by the next tick() — no time skew
     return adm;
+  }
+
+  /** PLAN-108: manual lab trigger for a stormo takeoff — same manual namespace as triggerShoal. */
+  triggerStormo(zoneId?: string): Admission | null {
+    const c = this.cfg();
+    const zones = this.zonesByFamily.stormo;
+    const z = (zoneId && zones.find((q) => q.id === zoneId)) || zones[0];
+    if (!c.enabled || !c.families.stormo.enabled || !z) return null;
+    const seed = hash32(c.seed, 'stormo', 'manual', this.nextOrdinal('stormo'));
+    const adm: Admission = { family: 'stormo', zoneId: z.id, biome: z.biome, tick: this.simT, seed, manual: true };
+    this.manualQueue.push(adm);
+    return adm;
+  }
+
+  /** Adapter could not render an admitted event — the admission stays consumed and the log says why. */
+  noteSuppressed(a: Admission, reason: string): void {
+    this.record({ simT: this.simT, family: a.family, ordinal: this.nextOrdinal(a.family), zoneId: a.zoneId, outcome: 'suppressed', reason });
   }
 
   /** Advance logical time: <=1 tick/frame, excess discarded deterministically. */
@@ -166,7 +224,7 @@ export class AmbientDirector {
     const c = this.cfg();
     if (!c.enabled) return out;
     for (const m of this.manualQueue.splice(0)) {
-      this.record({ simT: this.simT, family: m.family, ordinal: this.ordinal++, zoneId: m.zoneId, outcome: 'spawned', reason: 'manual' });
+      this.record({ simT: this.simT, family: m.family, ordinal: this.nextOrdinal(m.family), zoneId: m.zoneId, outcome: 'spawned', reason: 'manual' });
       out.push({ ...m, tick: this.simT });
     }
 
@@ -194,31 +252,37 @@ export class AmbientDirector {
     if (this.rareActive || reducedMotion) return out; // lock held / frozen: no scheduled spawns
 
     if (this.simT % EVAL_TICKS !== 0) return out;
-    const fam = c.families.shoal;
-    if (!fam.enabled) return out;
-    const slotTicks = Math.max(1, Math.round((fam.slotSec * 1000) / TICK_MS));
-    if (this.simT % slotTicks !== 0) return out;
+    // PLAN-108: evaluate each family in a fixed order on its own zone set and
+    // ordinal namespace — shoal rolls/seeds are unchanged byte-for-byte.
+    const families: ['shoal', 'stormo'] = ['shoal', 'stormo'];
+    for (const family of families) {
+      const fam = c.families[family];
+      const zones = this.zonesByFamily[family] as { id: string; biome: string }[];
+      if (!fam.enabled || zones.length === 0) continue;
+      const slotTicks = Math.max(1, Math.round((fam.slotSec * 1000) / TICK_MS));
+      if (this.simT % slotTicks !== 0) continue;
 
-    const ordinal = this.ordinal++;
-    for (const z of this.zones) {
-      const roll = hash01(c.seed, 'shoal', this.simT, ordinal, z.id);
-      if (roll >= fam.probability * c.intensity) continue;
-      if (activeCount() + out.length >= Math.min(c.maxConcurrentGlobal, fam.maxActive)) {
-        this.record({ simT: this.simT, family: 'shoal', ordinal, zoneId: z.id, outcome: 'skipped', reason: 'cap' });
-        break;
+      const ordinal = this.nextOrdinal(family);
+      for (const z of zones) {
+        const roll = hash01(c.seed, family, this.simT, ordinal, z.id);
+        if (roll >= fam.probability * c.intensity) continue;
+        if (activeCount() + out.length >= Math.min(c.maxConcurrentGlobal, fam.maxActive)) {
+          this.record({ simT: this.simT, family, ordinal, zoneId: z.id, outcome: 'skipped', reason: 'cap' });
+          break;
+        }
+        const lastF = this.lastSpawnTick.get(family) ?? -Infinity;
+        const lastR = this.lastBiomeTick.get(z.biome) ?? -Infinity;
+        if (this.simT - lastF < (fam.cooldownSec * 1000) / TICK_MS) {
+          this.record({ simT: this.simT, family, ordinal, zoneId: z.id, outcome: 'skipped', reason: 'cooldown' });
+          continue;
+        }
+        if (this.simT - lastR < (fam.biomeCooldownSec * 1000) / TICK_MS) continue;
+        this.lastSpawnTick.set(family, this.simT);
+        this.lastBiomeTick.set(z.biome, this.simT);
+        this.record({ simT: this.simT, family, ordinal, zoneId: z.id, outcome: 'spawned' });
+        out.push({ family, zoneId: z.id, biome: z.biome, tick: this.simT, seed: hash32(c.seed, family, this.simT, ordinal, z.id) });
+        return out; // one admission per eval tick (world-level cap enforced above)
       }
-      const lastF = this.lastSpawnTick.get('shoal') ?? -Infinity;
-      const lastR = this.lastBiomeTick.get(z.biome) ?? -Infinity;
-      if (this.simT - lastF < (fam.cooldownSec * 1000) / TICK_MS) {
-        this.record({ simT: this.simT, family: 'shoal', ordinal, zoneId: z.id, outcome: 'skipped', reason: 'cooldown' });
-        continue;
-      }
-      if (this.simT - lastR < (fam.biomeCooldownSec * 1000) / TICK_MS) continue;
-      this.lastSpawnTick.set('shoal', this.simT);
-      this.lastBiomeTick.set(z.biome, this.simT);
-      this.record({ simT: this.simT, family: 'shoal', ordinal, zoneId: z.id, outcome: 'spawned' });
-      out.push({ family: 'shoal', zoneId: z.id, biome: z.biome, tick: this.simT, seed: hash32(c.seed, 'shoal', this.simT, ordinal, z.id) });
-      break; // one admission per eval tick (world-level cap enforced above)
     }
     return out;
   }

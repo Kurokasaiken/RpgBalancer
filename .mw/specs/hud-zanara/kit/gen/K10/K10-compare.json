@@ -1,0 +1,126 @@
+[
+  {
+    "label": "v1",
+    "src": ".mw/specs/hud-zanara/kit/gen/K10/v1/img-0.png",
+    "W": 1407,
+    "H": 768,
+    "bg": [
+      13,
+      23,
+      33
+    ],
+    "ring": {
+      "bboxW": 527,
+      "bboxH": 714,
+      "dia": 714
+    },
+    "hole": null,
+    "crestHue": {
+      "median": 43.8,
+      "pct35_45": 84.4,
+      "pctOver50": 0.1
+    },
+    "purpleFrac": 0,
+    "brownFrac": 0.343,
+    "innerNavyFrac": 0.67,
+    "edgesTouched": [],
+    "seamV": null,
+    "seamH": null,
+    "itemCount": null,
+    "items": [],
+    "alphaFile": ".mw/specs/hud-zanara/kit/gen/K10/v1-alpha.png"
+  },
+  {
+    "label": "v2",
+    "src": ".mw/specs/hud-zanara/kit/gen/K10/v2/img-0.png",
+    "W": 896,
+    "H": 1200,
+    "bg": [
+      11,
+      24,
+      33
+    ],
+    "ring": {
+      "bboxW": 734,
+      "bboxH": 1043,
+      "dia": 1043
+    },
+    "hole": null,
+    "crestHue": {
+      "median": 43.8,
+      "pct35_45": 56.5,
+      "pctOver50": 13.2
+    },
+    "purpleFrac": 0,
+    "brownFrac": 0.098,
+    "innerNavyFrac": 1.18,
+    "edgesTouched": [],
+    "seamV": null,
+    "seamH": null,
+    "itemCount": null,
+    "items": [],
+    "alphaFile": ".mw/specs/hud-zanara/kit/gen/K10/v2-alpha.png"
+  },
+  {
+    "label": "v3",
+    "src": ".mw/specs/hud-zanara/kit/gen/K10/v3/img-0.png",
+    "W": 896,
+    "H": 1200,
+    "bg": [
+      11,
+      24,
+      33
+    ],
+    "ring": {
+      "bboxW": 736,
+      "bboxH": 1065,
+      "dia": 1065
+    },
+    "hole": null,
+    "crestHue": {
+      "median": 39.5,
+      "pct35_45": 88,
+      "pctOver50": 0.8
+    },
+    "purpleFrac": 0,
+    "brownFrac": 0.125,
+    "innerNavyFrac": 1.38,
+    "edgesTouched": [],
+    "seamV": null,
+    "seamH": null,
+    "itemCount": null,
+    "items": [],
+    "alphaFile": ".mw/specs/hud-zanara/kit/gen/K10/v3-alpha.png"
+  },
+  {
+    "label": "v4",
+    "src": ".mw/specs/hud-zanara/kit/gen/K10/v4/img-0.png",
+    "W": 896,
+    "H": 1200,
+    "bg": [
+      12,
+      25,
+      34
+    ],
+    "ring": {
+      "bboxW": 794,
+      "bboxH": 1093,
+      "dia": 1093
+    },
+    "hole": null,
+    "crestHue": {
+      "median": 43.8,
+      "pct35_45": 74.9,
+      "pctOver50": 0.4
+    },
+    "purpleFrac": 0,
+    "brownFrac": 0.133,
+    "innerNavyFrac": 0.71,
+    "edgesTouched": [],
+    "seamV": null,
+    "seamH": null,
+    "itemCount": null,
+    "items": [],
+    "alphaFile": ".mw/specs/hud-zanara/kit/gen/K10/v4-alpha.png"
+  }
+]

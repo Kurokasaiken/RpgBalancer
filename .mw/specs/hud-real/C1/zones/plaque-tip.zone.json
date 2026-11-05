@@ -1,0 +1,11 @@
+{
+  "component": "C1", "zone": "plaque-tip",
+  "task": "Restore the right-pointing name plaque + tip of a roster row.",
+  "design_png": "public/mockups/r1v0/C1-roster.webp",
+  "guide_png": ".mw/specs/hud-real/C1/zones/guide-plaque-tip.png",
+  "material_ref": ".mw/specs/hud-zanara/kit/approved/K2-placca.png",
+  "preserve": ["silhouette", "tip point position", "palette", "bevel width"],
+  "repair": ["placca length", "edge undulation", "enamel depth"],
+  "defects": ["D-03"],
+  "extra": "No glyph marks inside the plaque — it is content-free in G."
+}
