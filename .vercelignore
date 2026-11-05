@@ -19,3 +19,4 @@ var
 *.psd
 *.zip
 .DS_Store
+.sdx-venv
