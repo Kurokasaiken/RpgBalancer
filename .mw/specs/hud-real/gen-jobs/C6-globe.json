@@ -1,0 +1,44 @@
+{
+  "component": "C6",
+  "jobs": [
+    {
+      "id": "globe-1",
+      "zone": "globe",
+      "refs": [
+        ".mw/specs/hud-real/globe/design-globe.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/globe/prompt-globe.txt",
+      "out": ".mw/specs/hud-real/globe/gen/globe-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/globe/gen/globe-1-0.png",
+      "sha16": "be615a474ebd0e4a"
+    },
+    {
+      "id": "globe-2",
+      "zone": "globe",
+      "refs": [
+        ".mw/specs/hud-real/globe/design-globe.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/globe/prompt-globe.txt",
+      "out": ".mw/specs/hud-real/globe/gen/globe-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/globe/gen/globe-2-0.png",
+      "sha16": "cd999bcbeed44c1e"
+    },
+    {
+      "id": "globe-3",
+      "zone": "globe",
+      "refs": [
+        ".mw/specs/hud-real/globe/design-globe.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/globe/prompt-globe.txt",
+      "out": ".mw/specs/hud-real/globe/gen/globe-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/globe/gen/globe-3-0.png",
+      "sha16": "7b0d0fe1e1dccaf2"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "ring": {
+    "w": 89.22,
+    "h": 88.05,
+    "hole": {
+      "cx": 34.53,
+      "cy": 43.97,
+      "r": 32.68
+    }
+  },
+  "band": {
+    "w": 26.88,
+    "tileH": 17.35,
+    "offsetFromHoleCx": -47.92,
+    "ringLeftFromBand": 13.39
+  },
+  "source": ".mw/specs/hud-real/rowmod/gen/row-3-0.png"
+}

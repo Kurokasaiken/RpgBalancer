@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "slots": {
+    "1": [
+      183,
+      262
+    ],
+    "2": [
+      395,
+      262
+    ]
+  },
+  "rings": {
+    "palisade": "ring-palisade.webp",
+    "wall": "ring-wall.webp"
+  },
+  "kinds": {
+    "tower-wood": {
+      "src": "tower-wood.png",
+      "foot": [
+        21.4,
+        86
+      ],
+      "shadow": {
+        "src": "tower-wood-shadow.png",
+        "foot": [
+          15,
+          21
+        ]
+      }
+    },
+    "tower-stone": {
+      "src": "tower-stone.png",
+      "foot": [
+        26.1,
+        78
+      ],
+      "shadow": {
+        "src": "tower-stone-shadow.png",
+        "foot": [
+          23,
+          31
+        ]
+      }
+    }
+  }
+}

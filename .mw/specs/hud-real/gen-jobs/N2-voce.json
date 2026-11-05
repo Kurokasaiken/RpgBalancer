@@ -1,0 +1,44 @@
+{
+  "component": "N2",
+  "jobs": [
+    {
+      "id": "voce-nr-1",
+      "zone": "voce",
+      "refs": [
+        ".mw/specs/hud-real/voce/design-voce.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-voce.txt",
+      "out": ".mw/specs/hud-real/norose/gen/voce-nr-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/voce-nr-1-0.png",
+      "sha16": "13ae9f731762f15e"
+    },
+    {
+      "id": "voce-nr-2",
+      "zone": "voce",
+      "refs": [
+        ".mw/specs/hud-real/voce/design-voce.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-voce.txt",
+      "out": ".mw/specs/hud-real/norose/gen/voce-nr-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/voce-nr-2-0.png",
+      "sha16": "101c1f2425b6f6f3"
+    },
+    {
+      "id": "voce-nr-3",
+      "zone": "voce",
+      "refs": [
+        ".mw/specs/hud-real/voce/design-voce.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-voce.txt",
+      "out": ".mw/specs/hud-real/norose/gen/voce-nr-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/voce-nr-3-0.png",
+      "sha16": "1a2c1d2c7153ea7a"
+    }
+  ]
+}

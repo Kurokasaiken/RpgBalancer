@@ -53,6 +53,33 @@ export default function Mappa2UpscaleReview() {
         </figcaption>
       </figure>
 
+      <h2 style={{ fontSize: 17, marginTop: 28 }}>MAPPA COMPLETA — 20 tile ridipinte (Gemini+ChatGPT)</h2>
+      <figure style={{ margin:0 }}>
+        <img src={`${BASE}/mappa2_src_vs_rework.png`} style={{ maxWidth:1100, borderRadius:6, display:'block' }} />
+        <figcaption style={{ fontSize:12, opacity:0.75, marginTop:4 }}>sopra: sorgente 2752×1536 | sotto: rework 20 tile feathered</figcaption>
+      </figure>
+
+      <h2 style={{ fontSize: 17, marginTop: 28 }}>STRISCIA COMPOSITA — 3 tile + feather (giunzioni)</h2>
+      <figure style={{ margin:0 }}>
+        <img src={`${BASE}/strip_src_vs_composite.png`} style={{ maxWidth:1100, borderRadius:6, display:'block' }} />
+        <figcaption style={{ fontSize:12, opacity:0.75, marginTop:4 }}>sopra: sorgente neutro | sotto: composite w+c+e con feather 60px</figcaption>
+      </figure>
+
+      <h2 style={{ fontSize: 17, marginTop: 28 }}>STRISCIA PILOTA — rework "alberi fatti a mano" (y 615-915)</h2>
+      <div style={{ display:'flex', gap:14, flexWrap:'wrap' }}>
+        {['strip_w','strip_c','strip_e'].map((n) => (
+          <figure key={n} style={{ margin:0 }}>
+            {n === 'strip_e'
+              ? <div style={{ display:'flex', gap:8 }}>
+                  <img src={`${BASE}/strip_e_src.png`} style={{ maxWidth:214, borderRadius:6, display:'block' }} />
+                  <img src={`${BASE}/strip_e_chatgpt.png`} style={{ maxWidth:214, borderRadius:6, display:'block' }} />
+                </div>
+              : <img src={`${BASE}/${n}_rework.png`} style={{ maxWidth:440, borderRadius:6, display:'block' }} />}
+            <figcaption style={{ fontSize:12, opacity:0.75, marginTop:4 }}>{n === 'strip_e' ? 'strip_e — src | ChatGPT (Gemini quota esaurita)' : n + ' — tile ridipinta'}</figcaption>
+          </figure>
+        ))}
+      </div>
+
       <h2 style={{ fontSize: 17, marginTop: 28 }}>FORMULA VINCENTE — "alberi fatti a mano" (deep_forest)</h2>
       <Pair
         a={`${BASE}/deep_forest_src4x.png`} b={`${BASE}/df_treerework.png`}

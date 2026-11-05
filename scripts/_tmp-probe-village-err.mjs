@@ -1,0 +1,11 @@
+import { chromium } from '@playwright/test';
+const b = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
+const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+const logs = [];
+p.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));
+p.on('pageerror', (e) => logs.push(`[ERR] ${e.message}`));
+await p.goto('http://localhost:5173/mappa2-lab', { waitUntil: 'networkidle' });
+await p.waitForFunction(() => window.__worldCamCtl, null, { timeout: 90000 });
+await p.waitForTimeout(5000);
+console.log('LOGS:', logs.filter((x) => /village|warn|err|pixi|asset/i.test(x)).join('\n') || 'none');
+await b.close();

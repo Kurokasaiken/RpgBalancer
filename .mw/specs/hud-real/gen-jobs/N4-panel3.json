@@ -1,0 +1,44 @@
+{
+  "component": "N4",
+  "jobs": [
+    {
+      "id": "panel-v3-1",
+      "zone": "panel",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-panel3.txt",
+      "out": ".mw/specs/hud-real/norose/gen/panel-v3-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/panel-v3-1-0.png",
+      "sha16": "e301d514536657f6"
+    },
+    {
+      "id": "panel-v3-2",
+      "zone": "panel",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-panel3.txt",
+      "out": ".mw/specs/hud-real/norose/gen/panel-v3-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/panel-v3-2-0.png",
+      "sha16": "8413a50aeebe01ab"
+    },
+    {
+      "id": "panel-v3-3",
+      "zone": "panel",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/norose/prompt-panel3.txt",
+      "out": ".mw/specs/hud-real/norose/gen/panel-v3-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/norose/gen/panel-v3-3-0.png",
+      "sha16": "77aa042a33d195a7"
+    }
+  ]
+}

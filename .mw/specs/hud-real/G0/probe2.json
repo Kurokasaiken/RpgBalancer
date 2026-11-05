@@ -1,0 +1,58 @@
+{
+  "when": "2026-11-02T16:33:23.154Z",
+  "selectorLabel": "Apri selettore modalità, attualmente Gemini Auto",
+  "modeMenu": [
+    "Auto Modelli di Gemini 3",
+    "3.1 Pro Ragionamento avanzato",
+    "4 Argon Attività complesse",
+    "Livello di ragionamento"
+  ],
+  "plusAria": "Caricamento e strumenti",
+  "plusMenu": [
+    "Attività",
+    "Carica file",
+    "Aggiungi da Drive",
+    "Altri caricamenti",
+    "Crea immagine",
+    "Crea video",
+    "Altri strumenti"
+  ],
+  "attach": [
+    {
+      "target": 1,
+      "sent": 1,
+      "chips": 1,
+      "err": null,
+      "msgs": []
+    },
+    {
+      "target": 3,
+      "sent": 2,
+      "chips": 3,
+      "err": null,
+      "msgs": []
+    },
+    {
+      "target": 5,
+      "sent": 2,
+      "chips": 5,
+      "err": null,
+      "msgs": []
+    },
+    {
+      "target": 8,
+      "sent": 3,
+      "chips": 8,
+      "err": null,
+      "msgs": []
+    },
+    {
+      "target": 12,
+      "sent": 4,
+      "chips": 10,
+      "err": null,
+      "msgs": []
+    }
+  ],
+  "chooserMultiple": true
+}

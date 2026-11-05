@@ -1,0 +1,44 @@
+{
+  "component": "C1r",
+  "jobs": [
+    {
+      "id": "rail-1",
+      "zone": "rail",
+      "refs": [
+        ".mw/specs/hud-real/rail/design-rail.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/rail/prompt-rail.txt",
+      "out": ".mw/specs/hud-real/rail/gen/rail-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/rail/gen/rail-1-0.png",
+      "sha16": "3d990647e58d9ef3"
+    },
+    {
+      "id": "rail-2",
+      "zone": "rail",
+      "refs": [
+        ".mw/specs/hud-real/rail/design-rail.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/rail/prompt-rail.txt",
+      "out": ".mw/specs/hud-real/rail/gen/rail-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/rail/gen/rail-2-0.png",
+      "sha16": "c1da46cffa5b9595"
+    },
+    {
+      "id": "rail-3",
+      "zone": "rail",
+      "refs": [
+        ".mw/specs/hud-real/rail/design-rail.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/rail/prompt-rail.txt",
+      "out": ".mw/specs/hud-real/rail/gen/rail-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/rail/gen/rail-3-0.png",
+      "sha16": "283816fda693b0d6"
+    }
+  ]
+}

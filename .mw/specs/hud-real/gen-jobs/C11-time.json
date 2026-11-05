@@ -1,0 +1,44 @@
+{
+  "component": "C11",
+  "jobs": [
+    {
+      "id": "time-1",
+      "zone": "time",
+      "refs": [
+        ".mw/specs/hud-real/time/design-time.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/time/prompt-time.txt",
+      "out": ".mw/specs/hud-real/time/gen/time-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/time/gen/time-1-0.png",
+      "sha16": "4a296158f298fc64"
+    },
+    {
+      "id": "time-2",
+      "zone": "time",
+      "refs": [
+        ".mw/specs/hud-real/time/design-time.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/time/prompt-time.txt",
+      "out": ".mw/specs/hud-real/time/gen/time-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/time/gen/time-2-0.png",
+      "sha16": "8416fdff0e20f1c3"
+    },
+    {
+      "id": "time-3",
+      "zone": "time",
+      "refs": [
+        ".mw/specs/hud-real/time/design-time.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/time/prompt-time.txt",
+      "out": ".mw/specs/hud-real/time/gen/time-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/time/gen/time-3-0.png",
+      "sha16": "58f0907c3fafc8a8"
+    }
+  ]
+}

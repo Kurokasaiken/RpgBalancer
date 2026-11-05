@@ -1,0 +1,36 @@
+{
+  "units": "design px (1600x900), assets 2x",
+  "source": {
+    "ring": ".mw/specs/hud-real/approved/C1-ring.png",
+    "plaque": ".mw/specs/hud-real/plaque/gen/g4-0.png",
+    "emblem": null
+  },
+  "ring": {
+    "w": 88.02,
+    "h": 86.03,
+    "hole": {
+      "cx": 46.12,
+      "cy": 42.93,
+      "r": 32.06
+    },
+    "scale": 0.10479102251855435,
+    "asset2x": [
+      176,
+      172
+    ]
+  },
+  "plaque": {
+    "w": 200.41,
+    "h": 72.73,
+    "field": {
+      "x": 30.04,
+      "y": 14.47,
+      "w": 152.05,
+      "h": 45.07
+    },
+    "asset2x": [
+      401,
+      145
+    ]
+  }
+}

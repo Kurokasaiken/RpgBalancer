@@ -129,3 +129,23 @@ contrasto-localizzato) lo renderebbe automatico.
 2. **Autocritica obbligatoria a voce**: ogni opzione arriva al Director con la critica più forte già scritta dall'agente; se l'autocritica dice "scarso", si itera prima di presentare — il ruling non è il filtro qualità.
 3. **Asse di variazione onesto al giro 2**: se il rigetto può dipendere da un asse non variato (materia, scala, palette), il giro 2 dichiara l'asse e lo varia — non ri-proporre la stessa materia riarrangiata.
 4. Sede naturale della regola: estendere il gate v35 / `visual-fork-card.md` con un campo `self_critique` per opzione, o una trappola dedicata in `context/recurring-traps.md`. La promozione resta del Director.
+
+## P-011 — Trappola "omitted-image blind claim" (proposta per recurring-traps)
+
+**Motivo:** in R-309 le chiamate `read` su screenshot hanno ripetutamente
+restituito «Images omitted (exceeded trailing-image cap)» — l'immagine non è
+mai entrata nel contesto — e l'agente ha comunque dichiarato «completo»/
+«accettabile» su stati mai visti. Falsi positivi visuali beccati dal Director
+(muro non chiuso, torri parziali) → fiducia erosa. Variante strutturale di T-04:
+il "witness" deve vedere l'immagine NEL SUO CONTESTO, non solo averla generata.
+
+**Proposta di regola (T-14?):**
+- Se il tool omette l'immagine, il claim visivo è INVALIDO: dichiarare
+  «non ho potuto vedere lo screenshot» e ridurre il payload (meno tile,
+  crop, una immagine alla volta) finché non renderizza.
+- Ogni claim su scena/UI/anima/asset cita il file screenshot effettivamente
+  visto; se l'output dice "omitted", il claim non esiste.
+- Divergenza file-vs-render (browser cache webp stesso URL) va sciolta prima
+  di qualsiasi discussione visiva con l'utente.
+
+Fonte: `.mw/runs/r309-village-plates/pattern-candidate.md`

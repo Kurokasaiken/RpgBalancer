@@ -1,0 +1,44 @@
+{
+  "component": "C3b",
+  "jobs": [
+    {
+      "id": "nav2-1",
+      "zone": "nav",
+      "refs": [
+        ".mw/specs/hud-real/nav/design-nav.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/nav/prompt-nav2.txt",
+      "out": ".mw/specs/hud-real/nav/gen/nav2-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/nav/gen/nav2-1-0.png",
+      "sha16": "d226580b81257180"
+    },
+    {
+      "id": "nav2-2",
+      "zone": "nav",
+      "refs": [
+        ".mw/specs/hud-real/nav/design-nav.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/nav/prompt-nav2.txt",
+      "out": ".mw/specs/hud-real/nav/gen/nav2-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/nav/gen/nav2-2-0.png",
+      "sha16": "38de23f6966c74a4"
+    },
+    {
+      "id": "nav2-3",
+      "zone": "nav",
+      "refs": [
+        ".mw/specs/hud-real/nav/design-nav.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/nav/prompt-nav2.txt",
+      "out": ".mw/specs/hud-real/nav/gen/nav2-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/nav/gen/nav2-3-0.png",
+      "sha16": "1504f7713301c9f9"
+    }
+  ]
+}

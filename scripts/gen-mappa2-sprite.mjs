@@ -32,6 +32,7 @@ const promptFile = opt('prompt');
 const outPrefix = opt('out');
 const chatUrl = opt('chat', null);
 const TIMEOUT_S = parseInt(opt('timeout', '240'), 10);
+const CLOSE_TAB = args.includes('--close-tab'); // batch mode: close own tab after capture
 
 if (!promptFile || !outPrefix) {
   console.error('need --prompt and --out');
@@ -91,6 +92,29 @@ async function uploadFailed(page) {
 }
 
 async function tryAttach(page, imgPath) {
+  // strategy -2 (verified 2026-11-03, PLAN-110 G-0): the composer has no input[type=file]
+  // until the "+" menu is open; "Caricamento e strumenti" → menuitem "Carica file" fires a
+  // multi-file chooser. Count the attachment chips before/after to prove the upload.
+  try {
+    const chips = () => page.evaluate(() => document.querySelectorAll('button[aria-label*="chiudi allegato" i], button[aria-label*="rimuovi" i], button[aria-label*="remove" i]').length);
+    const before = await chips();
+    const plus = page.locator('button[aria-label*="Caricamento e strumenti" i]').first();
+    if ((await plus.count()) > 0) {
+      await plus.click({ timeout: 4000 });
+      await page.waitForSelector('[role="menu"], mat-action-list', { state: 'visible', timeout: 4000 }).catch(() => {});
+      await page.waitForTimeout(400);
+      const item = page.locator('[role="menuitem"]:has-text("Carica file"), button:has-text("Carica file")').first();
+      const [fc] = await Promise.all([page.waitForEvent('filechooser', { timeout: 6000 }), item.click({ timeout: 4000 })]);
+      await fc.setFiles(imgPath);
+      for (let i = 0; i < 30; i++) {
+        await page.waitForTimeout(500);
+        if ((await chips()) > before) break;
+      }
+      await page.waitForTimeout(4000);
+      if ((await chips()) > before && !(await uploadFailed(page))) { console.log('  attach menu+chooser ok'); return true; }
+      console.log('  attach menu+chooser: no new chip');
+    }
+  } catch (e) { console.log('  attach menu+chooser failed:', String(e).slice(0, 100)); await page.keyboard.press('Escape').catch(() => {}); }
   // strategy -1 (fast): gli input[type=file] sono già nel DOM — set diretto, niente menu
   try {
     const inputs = page.locator('input[type="file"]');
@@ -173,16 +197,19 @@ const ctx = browser.contexts()[0];
  *  Target.createTarget background:true — same technique as mw-web-turn.py. */
 async function newBackgroundPage(url) {
   const session = await browser.newBrowserCDPSession();
-  const { targetId } = await session.send('Target.createTarget', { url, background: true });
+  // unique URL marker: parallel batch runs must never steal each other's tab
+  // (2026-11-02: two workers found the same '/app' tab, one closed it mid-run)
+  const marker = `kg-${process.pid}-${Date.now().toString(36)}`;
+  const { targetId } = await session.send('Target.createTarget', { url: `${url}#${marker}`, background: true });
   for (let i = 0; i < 60; i++) {
     const p = ctx.pages().find((pg) => {
-      try { return pg.url() === url && !pg.isClosed(); } catch { return false; }
+      try { return pg.url().includes(marker) && !pg.isClosed(); } catch { return false; }
     });
     if (p) return p;
     await new Promise((r) => setTimeout(r, 200));
   }
   // fallback: locate the target we just created by URL fragment
-  return ctx.pages().find((pg) => pg.url().includes('gemini.google.com')) ?? ctx.pages()[ctx.pages().length - 1];
+  return ctx.pages().find((pg) => pg.url().includes(marker)) ?? ctx.pages()[ctx.pages().length - 1];
 }
 
 let page;
@@ -195,6 +222,17 @@ if (chatUrl) {
 await page.waitForLoadState('domcontentloaded').catch(() => {});
 await page.waitForSelector('div[contenteditable="true"], .ql-editor, textarea', { state: 'attached', timeout: 60000 });
 await page.waitForTimeout(2500); // settle composer visibile
+// la pagina può mostrare l'interstiziale "Gemini sul Mac" al posto della chat: va in Nuova chat o si ricarica /app
+for (let i = 0; i < 3; i++) {
+  const promo = await page.getByText(/Gemini sul Mac|Download per macOS/i).first().isVisible().catch(() => false);
+  const hasTools = await page.locator('button[aria-label*="Caricamento e strumenti" i]:visible').count().catch(() => 0);
+  if (!promo && hasTools) break;
+  console.log(`  chat non pronta (promo=${promo}, strumenti=${hasTools}), provo Nuova chat (${i + 1})`);
+  const nuova = page.getByRole('link', { name: /Nuova chat/i }).first();
+  if (await nuova.isVisible().catch(() => false)) await nuova.click({ timeout: 3000 }).catch(() => {});
+  else await page.goto('https://gemini.google.com/app', { waitUntil: 'domcontentloaded' }).catch(() => {});
+  await page.waitForTimeout(3500);
+}
 
 // ripulisce chip di allegati stale (upload falliti dei run precedenti)
 try {
@@ -316,5 +354,6 @@ for (let i = Math.max(0, genCount - (after - before)); i < genCount && saved < 4
 await page.screenshot({ path: `${outPrefix}-page.png` });
 console.log(`CHAT_URL ${page.url()}`);
 console.log(saved > 0 ? 'DONE' : 'CAPTURE_EMPTY');
+if (CLOSE_TAB && !chatUrl) { try { await page.close(); } catch {} }
 await browser.close();
 process.exit(saved > 0 ? 0 : 5);

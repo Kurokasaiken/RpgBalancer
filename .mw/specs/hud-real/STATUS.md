@@ -1,0 +1,45 @@
+# Stato (aggiornato a ogni passo importante)
+
+Ultimo aggiornamento: 2026-11-03 sera. Vedi `queue.json` per lo stato dei componenti.
+- 2026-11-03 C2: HudRealResources montato in hud-compose (bar3-2). Prossimo: C3 nav.
+- C3 nav: job in coda; al termine scegliere variante, costruire asset a 7 alloggi + HudRealNav.
+- C3 nav: HudRealNav montato in hud-compose (vecchio nav-plinth rimosso), verificato DPR2 (4 voci, attivo, bloccati). Prossimo: C4 pannello contestuale.
+- C4 pannello: design-panel.png + prompt + 3 job in coda (gen-queue avviata 20:26Z). Al termine: scegliere, asset con campo/finestra/placca misurati, HudRealPanel con dati POI reali.
+- C4 pannello: HudRealPanel montato e verificato (cattura full 1600x900, nessun errore). Prossimo: C5 bussola + piastrina (basso sx).
+- C5–C10: design, prompt e 15 job in coda (gen-queue, 21:22Z in poi, ~1 immagine/min). Al termine: contact sheet per componente, scelta, asset, componenti React.
+- C5 bussola e C10 Voce: componenti montati e verificati a DPR2. In attesa quota Gemini per C6 globo, C7 sigillo, C8 marchio, C9 busto (coda in attesa, riparte dopo :04). compass-3 in attesa.
+- C6 globo e C7 sigillo: componenti montati e verificati (cattura full 1600x900, nessun errore). Voce: testo ridotto per stare nella placca. Restano C8 marchio e C9 busto (in generazione).
+- 2026-11-04: fix interstiziale Gemini in gen-mappa2-sprite.mjs; C8 marchio rimesso in coda; bust-1 fatta, bust-2 in corso.
+- 2026-11-04: C8 marchio e C9 busto fatti. Tutti C1–C10 a 'component'. Prossimo: esame finale REVIEW.md.
+- 2026-11-04: esame finale parziale eseguito: REVIEW-REPORT.md (verdetto d'insieme: da ritoccare). LINGUAGGIO-v2 §11. Correzioni 1–4 elencate; verifiche mancanti in fondo al rapporto.
+- 2026-11-04: correzione colore applicata (regrade-assets.py) a C2,C3,C5,C6,C7,C8; oro e smalto L nei limiti, smalto C ancora basso su risorse e sigillo. Prossime correzioni del rapporto: gerarchia di peso, stella ripetuta, icone nav.
+- 2026-11-04: verifiche automatiche interazione/contrasto/corpo minimo fatte (REVIEW-REPORT). Corretti kicker a 12 px e overflow del titolo marchio.
+- 2026-11-04: stress A.7 eseguito (/hud-compose?stress): corretti marchio, risorse, Voce, pannello, bussola (REVIEW-REPORT).
+- 2026-11-04: verifica inglese rimandata: macchina sotto carico (load ~250, Chrome Canary/WindowServer), Playwright va in timeout sul caricamento di /hud-compose. Riprovare a carico normale: locale en-US via newContext({locale:'en-US'}) (il detector usa navigator).
+- 2026-11-04: inglese verificato (nessuna troncatura/errore); italiano via chiavi non verificabile con navigator, serve setLocale.
+- 2026-11-04: italiano verificato (localStorage rpg-locale-config). Restano zone mare/giungla e prima/dopo /game.
+- 2026-11-04: corretta la selezione di testo/immagini sulla HUD (user-select none). Zone di mappa: pan non disponibile in /hud-compose.
+- 2026-11-04: prima/dopo contro /game: lacune (tempo C11, comandi C12 base fatto, dettaglio cibo). HudRealRoundButton creato.
+- 2026-11-04 04:2x: C11 tempo: job in coda (3 varianti).
+- 2026-11-04: C11 tempo costruito (HudRealTime) e montato in /hud-compose; verificato a DPR2 con clic.
+- 2026-11-04: tsc pulito; eslint (con --no-ignore) 0 errori sui componenti hudReal e hud-compose (2 warning di import limitato nella pagina di prova). NB: src/ui/idleVillage/hudReal è coperto da un ignore pattern di eslint (combinedIgnorePatterns): da decidere se includerlo. Corretto un no-constant-binary-expression in HudRealRoster.
+- 2026-11-04: scritto DECISIONI-APERTE.md (11 decisioni con raccomandazione e costo). Lavoro autonomo bloccato su decisioni del Director: niente altro da generare.
+- 2026-11-04: critica Director su roster/pannello/cimiero. Regrade smeraldo ripristinato (solo oro), roster con emblema marchio, nav con etichette, bussola con N/E/S/W; generazione rail e panelv2 in corso (Canary 9222 rilanciato nascosto).
+- 2026-11-04: placca roster ritinteggiata (teal come mockup). Sulla pagina di prova il roster ora mostra le placche a riposo (plaques=rest).
+- 2026-11-04: roster con fascia ornata (rail-1) e pannello panelv2-3; da mostrare al Director per il giudizio.
+- 2026-11-04: smalto unificato (unify-enamel.py) su 14 asset e layout riordinato in /hud-compose; verificato a vista 1600x900.
+- 2026-11-04: HUD-108 audit scritto (HUD-108-AUDIT.md), nessuna modifica al codice.
+- 2026-11-04: HUD-108 passo 1 fatto (griglia M=24, colonna destra allineata, Voce in basso a sinistra, bussola/globo tolti). Prossimo: roster chiuso, smalto vs mare, rose dei venti.
+- 2026-11-04: roster con fascia larga (rail2-1) montato e verificato a DPR2; manca terminale inferiore.
+- 2026-11-04: smalto a tinta 168/L19/C20 + contorno scuro; separato dal mare a vista.
+- 2026-11-04: roster direzione B rifinita (nomi 17px, selezione con alone, terminale fascia).
+- 2026-11-04: rose dei venti tolte da marchio, Voce, INIZIA; resta solo l'astrolabio della nav.
+- 2026-11-04: pannello v3 (panel-v3-1) montato, busto tolto dal pannello.
+- 2026-11-04: tela fluida in /hud-compose, colonna destra allineata sul bordo reale (misurato a 2000 e 1600).
+- 2026-11-04: nav compatta 2+2 montata, etichette sotto la barra, verificata a DPR2.
+- 2026-11-04: Voce a scala piena (440 px, testo 14px), verificata normale e stress.
+- 2026-11-04: Voce con espansione, chiusura e animazioni ingresso/uscita; verificata.
+- 2026-11-04: pannello completo (illustrazione, ricompense, requisiti) verificato a DPR2.
+- 2026-11-04: verifica a 4 risoluzioni dopo il rifacimento: ok; roster a 4 righe, Leggi tutto nowrap.
+- 2026-11-04: ingombro percepito: persistenti 18,6-20,1%, tutto 34-36%; terzo sinistro 28-30% (squilibrio). Proposta: ridurre marchio/roster a sinistra.
+- 2026-11-04: R-315 centerpiece romano — generate 3 varianti della fenice MT-001 in chiave di insegne romane (crest-roman/: aquila-1 aquila+fulmini+alloro, galea-1 cimiero su galea, sol-1 corona radiata+medaglione d'alloro). Contact sheet in crest-roman/contact.png. In attesa di ruling Director sul fork.

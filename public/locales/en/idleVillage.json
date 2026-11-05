@@ -1058,6 +1058,19 @@
         "placeholder": "Sort by…",
         "asc": "Ascending",
         "desc": "Descending"
+      },
+      "zanara": {
+        "expand": "Open the full roster",
+        "listLabel": "Heroes",
+        "stamina": "Stamina",
+        "state": {
+          "away": "Away",
+          "exhausted": "Exhausted",
+          "injured": "Injured",
+          "dead": "Fallen"
+        },
+        "scrollUp": "Previous heroes",
+        "scrollDown": "More heroes"
       }
     },
     "next": {

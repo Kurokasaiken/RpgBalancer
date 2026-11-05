@@ -1,0 +1,44 @@
+{
+  "component": "C8",
+  "jobs": [
+    {
+      "id": "brand-1",
+      "zone": "brand",
+      "refs": [
+        ".mw/specs/hud-real/brand/design-brand.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/brand/prompt-brand.txt",
+      "out": ".mw/specs/hud-real/brand/gen/brand-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/brand/gen/brand-1-0.png",
+      "sha16": "797af2ac36bf0d28"
+    },
+    {
+      "id": "brand-2",
+      "zone": "brand",
+      "refs": [
+        ".mw/specs/hud-real/brand/design-brand.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/brand/prompt-brand.txt",
+      "out": ".mw/specs/hud-real/brand/gen/brand-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/brand/gen/brand-2-0.png",
+      "sha16": "f4bd6660a45e2f73"
+    },
+    {
+      "id": "brand-3",
+      "zone": "brand",
+      "refs": [
+        ".mw/specs/hud-real/brand/design-brand.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/brand/prompt-brand.txt",
+      "out": ".mw/specs/hud-real/brand/gen/brand-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/brand/gen/brand-3-0.png",
+      "sha16": "45eef56f9c0c6b33"
+    }
+  ]
+}

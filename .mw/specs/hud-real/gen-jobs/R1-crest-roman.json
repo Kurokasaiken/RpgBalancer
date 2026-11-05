@@ -1,0 +1,44 @@
+{
+  "component": "R1",
+  "jobs": [
+    {
+      "id": "crest-aquila-1",
+      "zone": "crest-roman",
+      "refs": [
+        ".mw/specs/hud-real/crest2/gen/phoenix-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/crest-roman/prompt-aquila.txt",
+      "out": ".mw/specs/hud-real/crest-roman/gen/aquila-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/crest-roman/gen/aquila-1-0.png",
+      "sha16": "bb80e54d992e4934"
+    },
+    {
+      "id": "crest-galea-1",
+      "zone": "crest-roman",
+      "refs": [
+        ".mw/specs/hud-real/crest2/gen/phoenix-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/crest-roman/prompt-galea.txt",
+      "out": ".mw/specs/hud-real/crest-roman/gen/galea-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/crest-roman/gen/galea-1-0.png",
+      "sha16": "08cc9fd88600dd6c"
+    },
+    {
+      "id": "crest-sol-1",
+      "zone": "crest-roman",
+      "refs": [
+        ".mw/specs/hud-real/crest2/gen/phoenix-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/crest-roman/prompt-sol.txt",
+      "out": ".mw/specs/hud-real/crest-roman/gen/sol-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/crest-roman/gen/sol-1-0.png",
+      "sha16": "b2d947cf8f4c8f39"
+    }
+  ]
+}

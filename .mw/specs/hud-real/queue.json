@@ -1,0 +1,129 @@
+{
+  "updated": "2026-11-03",
+  "stages": [
+    "design",
+    "generated",
+    "assets",
+    "component",
+    "verified"
+  ],
+  "components": [
+    {
+      "id": "C1",
+      "name": "Roster (colonna)",
+      "mockup": "zanara-v2",
+      "stage": "component",
+      "next": "banda più larga, arco d'oro esterno, cimiero provvisorio (MT-001 fenice), pezzi gen-queue",
+      "done": [
+        "anello g4",
+        "placca g4",
+        "modulo di riga",
+        "banda 2",
+        "fermagli",
+        "terminale",
+        "scorrimento",
+        "placche al passaggio"
+      ],
+      "review": "da ritoccare",
+      "note": "fascia ornata con edera da rail-1 (tile gemma+edera ogni riga); emblema marchio in cima; placca teal; placche a riposo (plaques=rest) o hover"
+    },
+    {
+      "id": "C2",
+      "name": "Risorse",
+      "mockup": "zanara-v3",
+      "stage": "component",
+      "next": "scegliere varianti (auto), asset, componente con ResourceReadoutItem[]",
+      "note": "bar3-2 scelta (binari puliti, 3 alloggi, angolo con gemme); montata in hud-compose, verifica DPR2 da fare; catturato DPR2 insieme alla nav",
+      "review": "pronto"
+    },
+    {
+      "id": "C3",
+      "name": "Nav (4 voci + recenter)",
+      "mockup": "zanara-v1",
+      "stage": "component",
+      "next": "moduli: centro (astrolabio=recenter), lato sinistro 2 voci, lato destro 2 voci",
+      "note": "nav-3 scelta (tondi di vetro scuro, silhouette pulita); asset 6 tondi + HudRealNav con navItems reali (4 voci: villaggio, mappa, 2 bloccate), astrolabio = ricentra. Da fare: icone incise oro al posto dei glifi generici, 2 tondi esterni vuoti (rigenerare a 4?), verifica hover",
+      "review": "da ritoccare"
+    },
+    {
+      "id": "C4",
+      "name": "Pannello contestuale + INIZIA",
+      "mockup": "zanara-v3",
+      "stage": "component",
+      "next": "cornice alabastro (angoli + lati) + finestra illustrazione + bottone",
+      "note": "panelv2-3 scelta per TRATTI del mockup (statua, drappo, angoli smaltati, edera, finestra ad arco, bottone con medaglione a bussola); sostituisce panel-2/3. Mancano: illustrazione nella finestra, sezione requisiti, icone ricompense",
+      "review": "pronto"
+    },
+    {
+      "id": "C5",
+      "name": "Bussola + piastrina (basso sx)",
+      "mockup": "zanara-v1",
+      "stage": "component",
+      "next": "medaglione quadrante (senza ago) + piastrina; contenuto: giorno/fase (D-5 rimandata)",
+      "note": "compass-1 scelta; HudRealCompass (2 righe live: posizione e fase); il tondino della placca può ospitare l'icona della fase; D-5 contenuto ancora aperto",
+      "review": "da ritoccare"
+    },
+    {
+      "id": "C6",
+      "name": "Globo (basso dx)",
+      "mockup": "globe-voyage",
+      "stage": "component",
+      "next": "pulsante globo; azione: ricentra? (da verificare nel contratto dock)",
+      "note": "globe-2 scelta (dritto, base, sfaccettato); HudRealGlobe = pulsante rotondo generico (label, onClick, scorciatoia), hover/focus/premuto; azione da assegnare (il ricentra è già l'astrolabio)",
+      "review": "da ritoccare"
+    },
+    {
+      "id": "C7",
+      "name": "Sigillo del verdetto",
+      "mockup": "mockup1-classic",
+      "stage": "component",
+      "next": "alloro + spade + disco + fascia 5 castoni (teschi)",
+      "note": "seal-1 scelta (campo di vetro vuoto per il valore + fascia smeraldo con 5 tondini); HudRealSeal (valore + 5 marchi win/danger/off, teschi), tooltip; dati reali non collegati",
+      "review": "pronto"
+    },
+    {
+      "id": "C8",
+      "name": "Marchio (emblema + placca)",
+      "mockup": "board-palette",
+      "stage": "component",
+      "next": "placca vuota; WANDERLUST in codice con carattere dedicato",
+      "note": "brand-1 scelta (medaglione pulito, placca liscia); HudRealBrand con titolo in codice (Cinzel); nessuna ala (brand-2 le ha ma placca macchiata)",
+      "review": "da ritoccare"
+    },
+    {
+      "id": "C9",
+      "name": "Busto destro",
+      "mockup": "busts-voce",
+      "stage": "component",
+      "next": "busto sx rimosso dal Director",
+      "note": "bust-1 scelta (statuetta guardiana oro e smeraldo con foglie); HudRealBust decorativo (aria-hidden, no pointer), montato sull'angolo del pannello",
+      "review": "pronto"
+    },
+    {
+      "id": "C10",
+      "name": "Voce dell'Amanuense",
+      "mockup": "busts-voce",
+      "stage": "component",
+      "next": "busto + medaglione + placca messaggio; dati: obiettivo/evento/esiti esistenti",
+      "note": "voce-2 scelta; HudRealVoce (titolo + testo) montata sopra la nav a sinistra come toast; nessun dato di gioco collegato",
+      "review": "pronto"
+    },
+    {
+      "id": "C11",
+      "name": "Tempo (giorno + pausa + velocità)",
+      "mockup": "nessuno (da /game)",
+      "stage": "component",
+      "next": "/game ha DAY 3 + pausa + x1/x2/x4 in alto a sinistra; manca nel set dei mockup. Proposta: placca come marchio/bussola (medaglione piccolo + placca) con 4 tondi HudRealRoundButton; 1–3 immagini per la placca oppure riuso del pezzo compass",
+      "note": "time-3 scelta (medaglione smeraldo, cappuccio appuntito coerente con nav/marchio); HudRealTime con stesso contratto dei controlli di produzione (paused, speed, due callback); regrade colore; clic verificato; da collegare al clock reale"
+    },
+    {
+      "id": "C12",
+      "name": "Comandi tondi (menu, pannelli, nascondi)",
+      "mockup": "nessuno (da /game)",
+      "stage": "component",
+      "note": "HudRealRoundButton (anello d'oro su vetro, ritagliato da un tondo della nav); cluster di prova in alto al centro con EngravedIcon cmd-menu/panels/eye; posizione definitiva da decidere (in /game è in basso a destra)"
+    }
+  ],
+  "library": "public/assets/ui/hud-real/library/library.json",
+  "review": "REVIEW-REPORT.md (parziale, 2026-11-04): insieme da ritoccare; nessun componente ancora \"verified\" per verifiche mancanti"
+}

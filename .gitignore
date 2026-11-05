@@ -134,3 +134,7 @@ coordinator/skills/skills
 # Python cache
 __pycache__/
 *.pyc
+.sdx-venv/
+
+# PLAN-110 restoration models (local, large)
+tools/hud-real/models/

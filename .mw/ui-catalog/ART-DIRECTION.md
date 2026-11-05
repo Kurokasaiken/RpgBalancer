@@ -155,6 +155,19 @@ Preferenze (dalle critiche libere R-282, convergenti 3/3 su più componenti):
 | seal-1 | 2026-10-27 | Il sigillo del verdetto può sporgere dal bordo del pannello certificato (deroga al «pannello chiuso»). |
 | assets-1 | 2026-10-27 | Gli asset dipinti li genera il Director con i prompt del kit; l'AI prepara registro, prompt e deroghe. |
 | mappa-ferma | 2026-10-14 | La mappa non si muove mai per un pannello. |
+| zanara-Z1 | 2026-11-02 | HUD Zanara (LINGUAGGIO-v1): si disegna alla scala degli slot reali di `/game` e dentro il budget 18%; dai mockup solo materia e modo di costruire, mai layout, voci, quantità, densità. |
+| zanara-Z2 | 2026-11-02 | Banda del roster: smalto, oro e gemme, senza edera («niente foglie» resta). |
+| zanara-Z3 | 2026-11-02 | Niente bottone INIZIA a placca CTA: azione primaria = lastra F1 maggiore con gemma accesa, senza rosa dei venti. |
+| zanara-Z4 | 2026-11-02 | Medaglioni e roundel solo per soggetti (ritratto, emblema, POI); i comandi del dock restano pillole. |
+| zanara-Z5 | 2026-11-02 | Bussola in basso a sinistra: niente coordinate X/Y (non esistono). Legge ora del giorno e punto cardinale della vista, o si toglie; mai una terza rosa dei venti decorativa. |
+| zanara-Z6 | 2026-11-02 | Il sigillo è il verdetto della spedizione (probabilità + teschi di pericolo) nel dettaglio spedizione; la lettura del lascito si decide a parte. Emenda D-3 per il sigillo. |
+| zanara-Z7 | 2026-11-02 | Con il preset zanara la regola madre è LINGUAGGIO-v1; il riferimento è il primo componente costruito dal kit (anchor-first). `base` e roster-base restano per il preset `base`. |
+| zanara-Z8 | 2026-11-02 | Oro zanara = NMM opaco, unico per tutta la HUD, verificato a tonalità 35–45°. |
+| zanara-Z9 | 2026-11-02 | Busti scolpiti ammessi come **terminali delle due ali della barra in alto** (al massimo due, avorio-alabastro e oro, niente foglie). Eccezione dichiarata a «niente oggettini»; risolve D-3 per la barra alta. Riferimento: mockup `busts-voce`. |
+| zanara-Z10 | 2026-11-02 | Roster chiuso = **colonna verticale** di medaglioni (non striscia orizzontale). |
+| zanara-Z11 | 2026-11-02 | La **Voce** (busto + medaglione + messaggio, in basso a sinistra) entra nella HUD: mostra dati che esistono già (obiettivo, prossimo evento, esiti, registro), nessuna meccanica nuova. Il narratore è **l'Amanuense** (confermato dal Director 2026-11-02), la stessa voce del folio delle quest. La bussola vive nel suo medaglione, non come pezzo a sé. |
+| plan110-G0 | 2026-11-02 | PLAN-110 (restauro dei componenti scelti): per questa traccia sono **sospesi** Z-1 (scala), Z-2 e «niente foglie», CTA/BTN-1 per il bottone INIZIA del pannello, Z-4 per il dock (roundel con icone incise), D-1 di PLAN-107 (marchio = emblema + placca). Restano: viola vietato nella UI, sigillo nel dettaglio spedizione, astrolabio della nav = recenter con 4 voci vere. Il kit generico K2–K17 (PLAN-109) è **chiuso, fallito** (2026-11-02): risultato giudicato povero. **Aggiornamento sera:** la generazione con Gemini è di nuovo ammessa ma solo come rigenerazione guidata delle zone del mockup (Sottopiano G, §12 di PLAN-110). |
+| plan110-AAA | 2026-11-03 | PLAN-110: il mockup fissa il concept (parti, disposizione, proporzioni, materiali), non l'identità al pixel; la resa può e deve superarlo (più bello, più AAA), senza parti nuove. I pezzi diventano componenti React veri con dati reali. |
 
 ## Livello 3 — Giudizi contestuali (richiedono il Director)
 

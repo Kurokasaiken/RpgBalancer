@@ -1,0 +1,5 @@
+v1	https://gemini.google.com/app/6f66d12fa8edcacc	exit:0	attempt:1
+v2	https://gemini.google.com/app/b28b90418bc92e74	exit:0	attempt:1
+v3	n/a	exit:4	attempt:1
+v3	https://gemini.google.com/app/ad01e71ff36d27c5	exit:0	attempt:2
+v4	https://gemini.google.com/app/49f0333d12b1fdb1	exit:0	attempt:1

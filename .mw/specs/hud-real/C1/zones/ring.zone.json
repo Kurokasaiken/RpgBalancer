@@ -1,0 +1,11 @@
+{
+  "component": "C1", "zone": "ring",
+  "task": "Restore one ornamental portrait ring of the HUD roster column.",
+  "design_png": "public/mockups/r1v0/C1-roster.webp",
+  "guide_png": ".mw/specs/hud-real/C1/zones/guide-ring.png",
+  "material_ref": ".mw/specs/hud-zanara/kit/approved/K1-ring-ritratto.png",
+  "preserve": ["silhouette", "proportions", "palette", "motif identity", "gem count", "volute count"],
+  "repair": ["gem volute detail", "enamel finish", "specular continuity"],
+  "defects": ["D-01", "D-02", "D-05"],
+  "extra": "Specular continuity must match the band junction."
+}
