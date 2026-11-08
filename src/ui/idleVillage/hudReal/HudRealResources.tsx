@@ -23,7 +23,7 @@ const C = {
   shadow: '0 1px 2px rgba(3, 26, 30, 0.9)',
   focus: '#e8c766',
 } as const;
-const G = { pad: 7, icon: 28, gap: 6, valueSize: 17, labelSize: 12 } as const;
+const G = { pad: 6, icon: 26, gap: 5, valueSize: 19, labelSize: 13 } as const;
 
 const SCOPED_CSS = `
 [data-hudreal-resources] [data-hr-res]:focus { outline: none; }

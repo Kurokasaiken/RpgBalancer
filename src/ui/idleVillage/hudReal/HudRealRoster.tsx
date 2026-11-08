@@ -37,8 +37,8 @@ const L = {
   visibleRows: 5,
   slidePx: 46,          // how far the plaque travels out from behind the ring
   slideMs: 200,
-  text: { nameSize: 17, nameSizeLong: 14, longName: 10, subSize: 12, barH: 3, barGap: 2 },
-  textWidth: 0.7,       // of the enamel field: the text stops before the diamond socket
+  text: { nameSize: 19, nameSizeLong: 16, longName: 10, subSize: 14, barH: 3, barGap: 2 },
+  textWidth: 0.78,       // of the enamel field: the text stops before the diamond socket
   // Anchors measured on the chosen mockup (zanara-v2, src px x 1600/1672), relative to the
   // column's top-left at the screen corner: spine x 17..46, ring centres x 83.1, first y 262.2.
   bandCx: 31.6,
@@ -139,13 +139,13 @@ function Row({ resident, locked, lockedStatusLabel, selected, onSelect, joint, o
       <div data-hr-plaque="" aria-hidden={!open}
         style={{ position: 'absolute', left: inset + plaqueLeft, top: ringTop + plaqueTop, width: G.plaque.w, height: G.plaque.h }}>
         <img src={ASSETS.plaque} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
-        <div style={{ position: 'absolute', left: f.x + 6, top: f.y - 2, width: f.w * L.textWidth, height: f.h + 4, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+        <div style={{ position: 'absolute', left: f.x + 6, top: f.y - 6, width: f.w * L.textWidth, height: f.h + 10, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
           <span title={name} style={{
             fontFamily: '"EB Garamond", serif', fontWeight: 600, fontSize: name.length > L.text.longName ? L.text.nameSizeLong : L.text.nameSize,
-            lineHeight: '18px', flexShrink: 0, color: C.name,
+            lineHeight: '20px', flexShrink: 0, color: C.name,
             textShadow: C.textShadow, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>{name}</span>
-          <span style={{ fontFamily: '"EB Garamond", serif', fontSize: L.text.subSize, lineHeight: '13px', flexShrink: 0, color: C.sub, whiteSpace: 'nowrap', textShadow: C.textShadow }}>
+          <span style={{ fontFamily: '"EB Garamond", serif', fontSize: L.text.subSize, lineHeight: '14px', flexShrink: 0, color: C.sub, whiteSpace: 'nowrap', textShadow: C.textShadow }}>
             {levelText}
             {stateLabel && <span style={{ color: view.state === 'dead' ? C.fallen : C.exception }}>{levelText ? ' · ' : ''}{stateLabel}</span>}
           </span>

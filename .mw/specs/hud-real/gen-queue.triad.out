@@ -1,0 +1,10 @@
+[2026-11-06T16:54:41.250Z] queue start, budget {"maxTotal":170,"used":78,"note":"Immagini Gemini che questa coda può ancora generare (tetto di sicurezza per il limite settimanale). Si cambia a mano."}
+[2026-11-06T16:54:41.253Z] A-triad-frames/mobile-compagnia-1: generating (attempt 1)
+[2026-11-06T16:55:49.796Z] mobile-compagnia-1: done
+[2026-11-06T16:56:01.812Z] A-triad-frames/mobile-compagnia-2: generating (attempt 1)
+[2026-11-06T16:57:10.093Z] mobile-compagnia-2: done
+[2026-11-06T16:57:22.099Z] A-triad-frames/planner-arredo-1: generating (attempt 1)
+[2026-11-06T16:58:29.836Z] planner-arredo-1: done
+[2026-11-06T16:58:41.842Z] A-triad-frames/planner-arredo-2: generating (attempt 1)
+[2026-11-06T16:59:55.678Z] planner-arredo-2: done
+[2026-11-06T17:00:07.693Z] queue empty — done

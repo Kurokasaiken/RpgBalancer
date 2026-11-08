@@ -21,3 +21,10 @@ Zone di mappa mare e giungla e prima/dopo vero contro `/game` (servono `/game` c
 
 ## Dove guardare
 `/hud-compose` (insieme), `/hud-compose?stress` (contenuti estremi), `/hud-library` (motivi), `REVIEW-REPORT.md` (misure, verdetti, costi), `LINGUAGGIO-v2.md` (regole e trappole), `DECISIONS.md` (cronologia delle scelte).
+
+## Nota autonoma 2026-11-05 (sessione notturna)
+- Roster (C1): il cimiero fenice+Sol Invictus e il pannello aperto da /game richiedono l'amend G1 #4 (PLAN-112 §28). Non deciso in autonomia: è una modifica firmata alla pianta. Raccomandazione: approvare.
+- 2026-11-05: Director risponde «Non ancora» all'emendamento G1 #4. Decisione sospesa: il roster resta com'è; nessun lavoro su cimiero/pannello aperto come parte della pianta firmata finché il Director non si esprime.
+
+## Roster con placche vs budget (2026-11-05)
+Vedi PLAN-112 §31: con la colonna a 268 px il budget persistente supera il 18% sotto 1440 e il pannello aperto si sovrappone a 1280. Scelte: A placche solo al passaggio (88 px a riposo), B budget più alto per il roster, C pannello aperto che sostituisce quello destro sotto 1440.

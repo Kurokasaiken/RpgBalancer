@@ -1754,3 +1754,10 @@ il game frame resta su `/game` e `/game-frame-pixi`.
 **Motivo:** deploy del 2026-11-01 dichiarato OK con `/game` rotto per gli
 utenti WebGL; il Director ha imposto verifica-fino-a-verde e landing unica.
 **Fonte:** `.mw/runs/20261101-deploy-verify-learn/pattern-candidate.md`
+
+## 2026-11-07 — expedition-session-mount-contract (learn dal port cassetto)
+
+**Da:** montare `useQuestExpeditionSession` fuori da `/game` sembrava bastasse il hook.
+**A:** la catena completa è: `isDetailOpen` (gate di tutta l'assegnazione/eleggibilità/stima) → `wrapDetail:()=>null` (nasconde il dettaglio produzione, la nuova superficie È il dettaglio) → `{session.overlays}` (contiene `DragOutcomeFlight` che scrive `assignments` a volo atterrato — senza, il volo non completa mai) → `<DndContext sensors>` → `data-testid="slot-button-{id}"` (geometria volo) → `data-resident-id` sulle card. Ogni pezzo mancato produce un fallimento silenzioso diverso.
+**Motivo:** il port del cassetto Zanara ha esposto l'intero contratto implicito di montaggio — la sessione è progettata per /game e nessun pezzo documenta che è obbligatorio.
+**Fonte:** `.mw/runs/20261107-hud-cassetto-learn/pattern-candidate.md`

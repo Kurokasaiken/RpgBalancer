@@ -30,6 +30,11 @@ def main() -> None:
     ap.add_argument("--deep-hue", type=float, default=265)
     ap.add_argument("--deep-l", type=float, default=15)
     ap.add_argument("--depth-gain", type=float, default=1.55)
+    # «Solo banda acqua» (R-318): the grade must not reach painted rock faces whose wet highlights
+    # read as water (SW cliff teal gouges). Water is chromatic (Lab C ~27+); rock glints are grey
+    # (C ~20-24). A soft chroma ramp keeps real shallows, drops the faces.
+    ap.add_argument("--chroma-lo", type=float, default=20.0)
+    ap.add_argument("--chroma-hi", type=float, default=30.0)
     a = ap.parse_args()
     pack = Path(a.pack)
     src = np.asarray(Image.open(a.source).convert("RGB")).astype(np.float32) / 255
@@ -38,6 +43,17 @@ def main() -> None:
     bio = np.array(Image.open(pack / "biome_ids.png"))
     hsv = cv2.cvtColor(src, cv2.COLOR_RGB2HSV)
     water = ((hsv[..., 0] >= 150) & (hsv[..., 0] <= 260) & (hsv[..., 1] > 0.38) & (hsv[..., 2] > 0.2)).astype(np.float32)
+    _, chC = lch(src)
+    # «Solo banda acqua» (R-318): the grade must not reach painted rock faces whose wet highlights
+    # read as water (SW cliff teal gouges). No mask marks those faces as land — every classifier
+    # calls them sea — so the only discriminator is chroma: water is chromatic (Lab C ~27+),
+    # rock glints are grey (C ~20-24). But clipping globally starves dark open sea (Director
+    # 2026-11-05, «manca un pezzo»), so the gate only bites inside the coastal fringe (near land),
+    # where the painted rock lives; open water keeps full coverage.
+    chroma_gate = cv2.GaussianBlur(np.clip((chC - a.chroma_lo) / max(a.chroma_hi - a.chroma_lo, 1e-3), 0, 1), (0, 0), 8.0)
+    land = np.array(Image.open(pack / "masks" / "land_mask.webp"))[..., 3].astype(np.float32) / 255
+    near_land = np.clip(cv2.GaussianBlur((land > 0.5).astype(np.float32), (0, 0), 35.0) * 3.0, 0, 1)
+    water *= (1.0 - near_land) + near_land * chroma_gate
     water = cv2.GaussianBlur(water, (0, 0), 2.0)
     reef = cv2.GaussianBlur((bio == 11).astype(np.float32), (0, 0), 20)
 

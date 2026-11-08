@@ -86,10 +86,13 @@ const Mappa2LabPage = lazy(() => import('./pages/mappa2-lab').then(m => ({ defau
 const Mappa2UpscaleReviewPage = lazy(() => import('./pages/mappa2-upscale-review').then(m => ({ default: m.default })));
 const HudLabPage = lazy(() => import('./pages/hud-lab').then(m => ({ default: m.default })));
 const HudComparePage = lazy(() => import('./pages/hud-compare').then(m => ({ default: m.default })));
+const HudPanelComparePage = lazy(() => import('./pages/hud-panel-compare').then(m => ({ default: m.default })));
+const HudLayoutPage = lazy(() => import('./pages/hud-layout').then(m => ({ default: m.default })));
 const HudComposePage = lazy(() => import('./pages/hud-compose').then(m => ({ default: m.default })));
 const HudRosterCropPage = lazy(() => import('./pages/hud-roster-crop').then(m => ({ default: m.default })));
 const HudTargetPage = lazy(() => import('./pages/hud-target').then(m => ({ default: m.default })));
 const HudZanaraRosterPage = lazy(() => import('./pages/hud-zanara-roster').then(m => ({ default: m.default })));
+const HudRosterMockupPage = lazy(() => import('./pages/hud-roster-mockup').then(m => ({ default: m.default })));
 const HudR1Page = lazy(() => import('./pages/hud-r1').then(m => ({ default: m.default })));
 const HudRealRosterPage = lazy(() => import('./pages/hud-real-roster').then(m => ({ default: m.default })));
 const HudLibraryPage = lazy(() => import('./pages/hud-library').then(m => ({ default: m.default })));
@@ -312,12 +315,18 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/hud-compare';
   const isHudComposePath =
     typeof window !== 'undefined' && window.location.pathname === '/hud-compose';
+  const isHudPanelComparePath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-panel-compare';
+  const isHudLayoutPath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-layout';
   const isHudRosterCropPath =
     typeof window !== 'undefined' && window.location.pathname === '/hud-roster-crop';
   const isHudTargetPath =
     typeof window !== 'undefined' && window.location.pathname === '/hud-target';
   const isHudZanaraRosterPath =
     typeof window !== 'undefined' && window.location.pathname === '/hud-zanara-roster';
+  const isHudRosterMockupPath =
+    typeof window !== 'undefined' && window.location.pathname === '/hud-roster-mockup';
   const isHudR1Path =
     typeof window !== 'undefined' && window.location.pathname === '/hud-r1';
   const isHudRealRosterPath =
@@ -1162,6 +1171,20 @@ function App() {
     );
   }
 
+  if (isHudPanelComparePath) {
+    return (
+      <Suspense fallback={null}>
+          <HudPanelComparePage />
+      </Suspense>
+    );
+  }
+  if (isHudLayoutPath) {
+    return (
+      <Suspense fallback={null}>
+          <HudLayoutPage />
+      </Suspense>
+    );
+  }
   if (isHudComposePath) {
     return (
       <Suspense fallback={null}>
@@ -1194,6 +1217,13 @@ function App() {
     return (
       <Suspense fallback={null}>
         <HudDefectsPage />
+      </Suspense>
+    );
+  }
+  if (isHudRosterMockupPath) {
+    return (
+      <Suspense fallback={null}>
+        <HudRosterMockupPage />
       </Suspense>
     );
   }

@@ -1,0 +1,43 @@
+{
+  "component": "F3m",
+  "jobs": [
+    {
+      "id": "med-1",
+      "zone": "medallion",
+      "refs": [
+        ".mw/specs/hud-real/approved/C1-ring.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/f3/prompt-medallion.txt",
+      "out": ".mw/specs/hud-real/f3/gen/med-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/f3/gen/med-1-0.png",
+      "sha16": "7d6929bb0e04a82b"
+    },
+    {
+      "id": "med-2",
+      "zone": "medallion",
+      "refs": [
+        ".mw/specs/hud-real/approved/C1-ring.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/f3/prompt-medallion.txt",
+      "out": ".mw/specs/hud-real/f3/gen/med-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/f3/gen/med-2-0.png",
+      "sha16": "ea0c237bd6ed1eb6"
+    },
+    {
+      "id": "med-3",
+      "zone": "medallion",
+      "refs": [
+        ".mw/specs/hud-real/approved/C1-ring.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/f3/prompt-medallion.txt",
+      "out": ".mw/specs/hud-real/f3/gen/med-3",
+      "status": "skipped",
+      "note": "saltata: quota oraria esaurita, due tentativi falliti; non cambia la raccomandazione (2026-11-05)"
+    }
+  ]
+}

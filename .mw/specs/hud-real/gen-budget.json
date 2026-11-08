@@ -1,5 +1,5 @@
 {
   "maxTotal": 170,
-  "used": 57,
+  "used": 82,
   "note": "Immagini Gemini che questa coda può ancora generare (tetto di sicurezza per il limite settimanale). Si cambia a mano."
 }
