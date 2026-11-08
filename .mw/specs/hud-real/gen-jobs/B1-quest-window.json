@@ -1,0 +1,44 @@
+{
+  "component": "B1-quest-window",
+  "jobs": [
+    {
+      "id": "qwin-1",
+      "zone": "quest-window",
+      "refs": [
+        ".mw/specs/hud-real/f3/gen/pf-3-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-quest-window.txt",
+      "out": ".mw/specs/hud-real/kit/gen/qwin-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/kit/gen/qwin-1-0.png",
+      "sha16": "e463401647ac6649"
+    },
+    {
+      "id": "qwin-2",
+      "zone": "quest-window",
+      "refs": [
+        ".mw/specs/hud-real/f3/gen/pf-3-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-quest-window.txt",
+      "out": ".mw/specs/hud-real/kit/gen/qwin-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/kit/gen/qwin-2-0.png",
+      "sha16": "e149ad8120e9c764"
+    },
+    {
+      "id": "qwin-3",
+      "zone": "quest-window",
+      "refs": [
+        ".mw/specs/hud-real/f3/gen/pf-3-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-quest-window.txt",
+      "out": ".mw/specs/hud-real/kit/gen/qwin-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/kit/gen/qwin-3-0.png",
+      "sha16": "21e7bcc8c3bb05af"
+    }
+  ]
+}

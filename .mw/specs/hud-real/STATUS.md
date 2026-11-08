@@ -43,3 +43,77 @@ Ultimo aggiornamento: 2026-11-03 sera. Vedi `queue.json` per lo stato dei compon
 - 2026-11-04: verifica a 4 risoluzioni dopo il rifacimento: ok; roster a 4 righe, Leggi tutto nowrap.
 - 2026-11-04: ingombro percepito: persistenti 18,6-20,1%, tutto 34-36%; terzo sinistro 28-30% (squilibrio). Proposta: ridurre marchio/roster a sinistra.
 - 2026-11-04: R-315 centerpiece romano — generate 3 varianti della fenice MT-001 in chiave di insegne romane (crest-roman/: aquila-1 aquila+fulmini+alloro, galea-1 cimiero su galea, sol-1 corona radiata+medaglione d'alloro). Contact sheet in crest-roman/contact.png. In attesa di ruling Director sul fork.
+- 2026-11-05: scala del testo applicata (hudType.ts); a 1280 didascalie ancora 10,4 reali.
+- 2026-11-05: comandi tondi in basso a destra; sigillo a sinistra del gruppo.
+- 2026-11-05: sigillo v2 leggero montato (disc+strip, spade/numero/teschi in codice).
+- 2026-11-05: PLAN-112 D1 = pianta B (roster compatto). Prossimo: F1 sulla pianta B dopo il battesimo del piano.
+- 2026-11-05: D5 e D6 decisi (solo ritratti; tela 1440x810 + step 100/125/150). Restano spike-deferred G2.
+- 2026-11-05: PLAN-112 battezzato; F1 pianta B: hudLayoutB.ts + /hud-layout + test 36 verdi; LAYOUT-SPEC.md. Manca firma G1.
+- 2026-11-05: riflusso barra alta/riga bassa implementato (D6b); 67 test verdi; passi 125% ovunque, 150% solo ultrawide (D6c aperta).
+- 2026-11-05: D6c: pannello a scorrimento, 150% ovunque; eccezione budget 24% al 150% proposta.
+- 2026-11-05: budget 18% (100/125%) e 24% (150%) confermato dal Director.
+- 2026-11-05: fit check F1 fatto (hudLayoutFit.test.ts); slot pannello 340; 3 regole per F2. Mancano scheda varianti, scroll lungo, mobile, firma G1.
+- 2026-11-05: F1.5 scheda varianti B1/B2/B3 pronta (.mw/runs/plan112-f1/); in attesa del ruling.
+- 2026-11-05: ruling pianta B1 (una riga allineata). Mancano per G1: pannello a scorrimento lungo, mobile, firma.
+- 2026-11-05: prova pannello a scorrimento lungo fatta (sonda in /hud-layout?probe=1); minimo ~4 righe al 150% 1080p (D6d). Restano mobile e firma G1.
+- 2026-11-05: vista mobile fatta (D10, fallback sotto 768 agganciato a mobile-fit); trovato D10b (testo <14 px su finestre basse). 138 test verdi. Resta firma G1 + D6d/D10b.
+- 2026-11-05: D10b = tela 1440x720 (REF_H 720); 124 test verdi; costi: fissi 12,3% a 100%, 17,2% a 125%; niente 150% su finestre basse. Restano D6d e firma G1.
+- 2026-11-05: D6d chiusa: il limite delle 4 righe era un errore di unità (reali vs tela); corpo al minimo = ~7,7 righe. Resta solo la firma G1.
+- 2026-11-05: G1 FIRMATO dal Director (pianta B1, tela 1440x720). Prossimo F2.
+- 2026-11-05: F2 fatto (CONTENT-CONTRACTS.md, hudContracts.ts, hudType.ts su 1440x720, 11 test). Aperte A1-A4. Prossimo: F3 (materiali) previo via.
+- 2026-11-05: AMEND G1 #1 (slot toast sopra la Voce); contratto 31b7bdaeda9c32b6; 130 test verdi; passi invariati, roster -righe a 125/150% sulle finestre basse.
+- 2026-11-05: A2-A4 risolti (tasti gia' legati nel gioco; scheda eroe compatibile non renderizzata; icone solo oro/cibo/legno). Scoperta A5: il gioco scala in pixel CSS con zoom>=1, la pianta firmata e' proporzionale. Da decidere prima di F3.
+- 2026-11-05: AMEND G1 #2 (A5-a): modello di scala del gioco; 145 test verdi; correzione: i 'tsc pulito' erano vuoti (tsconfig radice files:[]), trovati e corretti 2 errori veri.
+- 2026-11-05 F3.1 fatto: bersagli di colore misurati (f3/COLOR-TARGETS.md); smalto piu' scuro/verde e oro piu' saturo del mockup. Prossimo F3.2 (tratti) e F3.3 (spike).
+- 2026-11-05 F3.2 fatto: f3/TRAITS-CARDS.md (tratti medaglione e cornice, scorecard). Prossimo F3.3 generazione.
+- 2026-11-05 F3.3 medaglione: med-1/2 generati (med-3 in attesa quota); scanalatura arco non serve (arco in codice sul foro); med-1 non migliora l'approvato.
+- 2026-11-05 F3.3 cornice: 3 varianti valutate + prova su mappa (/hud-panel-compare); pf-1/pf-3 piu' alte dello slot 340x470 (decisione G2); pf-4 in corso. Medaglione: tenere approvato.
+- 2026-11-05 F3.3: generazione chiusa (med-3 e pf-4 saltate per quota); coda ferma. Pacchetto G2 da presentare.
+- 2026-11-05 F3 chiuso lato lavoro: pacchetto G2 pronto (f3/G2-PACKAGE.md). In attesa dei ruling G2-1..6. F4 non parte.
+- 2026-11-05 G2-1: Director sceglie pf-3. Altri G2 aperti (slot 520, medaglione, colore, soglie).
+- 2026-11-05 G2-1 eseguito: pf-3 montata (asset, geometria con campo action, HudRealPanel riscritto); sforamento slot 470 -> G2-2 aperto.
+- 2026-11-05: AMEND G1 #3 (slot pannello 340x520); contratto aggiornato; 145 test verdi; passi invariati. Aperti G2-3 medaglione, G2-4 colore, G2-6 soglie.
+- 2026-11-05 G2-4: palette oro A + smalto B applicata a 25 asset (rollback in f3/rollback-color); medie nelle soglie, per pezzo 20/25 oro oltre soglia -> G2-6 aperta. Aperto anche G2-3.
+- 2026-11-05 G2-6: soglia allargata (oro C 28-37, p90<=87; L50 50-73 mia). check-palette.py + test permanente verde; 25 pezzi 0 fuori. Aperto solo G2-3.
+- 2026-11-05: G2-3 deciso (si tiene il medaglione approvato) -> GATE G2 CHIUSO. F4 puo' partire. Quota 65/170.
+- 2026-11-05: F4 gruppo 1 fatto — barra alta sul contratto: bar-slim (risorse 360x58, tempo 419.5x54), roster a medaglioni B1, compose su resolveSlots+zoom. Probe rects PASS DPR2; test 135/135 verdi (inclusa palette). Prossimo: roster con stati (arco salute + gemma).
+- 2026-11-05: stati sul medaglione fatti (arco salute in codice + gemma lit/dim/iron; verificato a DPR2: arco oro sul selezionato, gemme smeraldo). Prossimo: nav sul contratto (460x88).
+- 2026-11-05: Director respinge arco+gemma sul medaglione -> ripristinato (solo anello+ritratto, alone su selezione). Stati sul medaglione: da ridisegnare. Prossimo: nav sul contratto.
+- 2026-11-05: fix giunzione cap/pill della barra risorse (Director: "incastrata male") — cap staccato dal vetro con fascia di smalto; verificato a DPR2.
+- 2026-11-05: nav sul contratto (460, astrolabio sopra lo slot); sigillo layout=row dentro il pannello (verificato DPR2). Restano: notifiche+comandi sul contratto, stati medaglione da ridisegnare, famiglie pannello su dati reali.
+- 2026-11-05: fix bandiera hover (clip CSS overflow-y) + RULING PALETTE: ripristinati i 25 asset vivi pre-G2-4 (riferimento = astrolabio nav), oro pannello alzato a 38.9, soglie check-palette aggiornate -> 27/27 verdi.
+- 2026-11-05: rimosso build-slim-bars.py — risorse e tempo tornano sugli asset originali integri (chiusura a gabbia intera, slot 1 chiuso, goccia pendente sotto il corpo), scalati uniformemente sullo slot. Verificato a DPR2.
+- 2026-11-05 (autonomo, sessione notturna): stato verificato, nessun componente promosso a `verified`.
+  - Coda generazione vuota dal log (15:26Z: pf-4 saltata per quota; med-3 saltata). Budget 65/170: non rilanciata, nessun job nuovo preparato (il cimiero richiede una decisione di concept e l'amend G1 #4, non ancora firmato).
+  - Blocco C1 (roster): il cimiero in cima e il pannello aperto da /game richiedono l'amend G1 #4 (PLAN-112 §28), che è una decisione firmata del Director. Non auto-deciso.
+  - Lavoro fatto: mockup `/hud-roster-mockup` (closed ribbon + crest + open panel), verificato con misure (nessuna card tagliata) e catture DPR1 1440x810; cimiero più ricco ma non ancora a scala uguale all'astrolabio.
+  - Test HUD: 150/150 verdi (hudLayoutVariants, hudLayoutContract, hudPaletteCheck, hudTypeScale, zanaraRosterState + gli altri file hudLayout).
+  - Prossimo passo (non autonomo): firma o rifiuto dell'amend G1 #4; poi C1 a DPR2 vs zanara-v2, e C2–C10 con la stessa verifica.
+- 2026-11-05: F4 completata su /hud-compose — Voce (360, fondo a f.H-6) + toast sopra Voce (amend #1), comandi e astrolabio collegati ad azioni reali, tutti gli 8 slot montati sul contratto firmato. Probe rects PASS DPR2, palette 25/25. Restano aperti per F5/G3: ridisegno stati medaglione (dopo veto Director), collegamento famiglie pannello/sigillo/notifiche agli eventi reali di /game, matrice catture F5.
+- 2026-11-05: AMEND G1 #4 approvato dal Director (PLAN-112 §29). Prossimo: tradurre lo slot cimiero e lo slot pannello roster in `hudLayoutB.ts` con test di fit; poi C1 a DPR2.
+- 2026-11-05: AMEND G1 #4 nel contratto (PLAN-112 §30): slot crest + rosterOpen in hudLayoutB.ts, 129 test HUD verdi, budget persistente 13,9–15,7% (sotto 18%). Aperti: larghezza roster 88 vs 267 del mockup (decisione), montaggio cimiero in /hud-compose e verifica DPR2 di C1.
+- 2026-11-05: ruling «Con placche» applicato (ROSTER_W 268). Il contratto NON regge: budget persistente 19,7–22,4% sotto 1440, pannello aperto sovrapposto a 1280, B2 centro alto. 3 test falliscono. Decisione aperta: opzioni A/B/C in PLAN-112 §31. Nessun vincolo firmato è stato allentato.
+- 2026-11-05 (autonomo, ciclo successivo): gen-queue vuota (ultimo evento: pf-4 saltata per quota). Budget 65/170. Nessun job nuovo: nessun pezzo mancante senza decisione del Director.
+  - C1 roster: bloccato dalla decisione A/B/C sulle placche (PLAN-112 §31). Non auto-deciso (AUTONOMY: i vincoli firmati non si cambiano in autonomia).
+  - C2 risorse e tempo: cattura DPR2 1440×810 di /hud-compose (test-results/hud-autonomo-2026-11-05/compose-1440x810-dpr2.png). Risorse e barra tempo leggibili, nav intera. NON promosso a verified: manca il confronto a scala col mockup zanara-v3 e la verifica per il tempo.
+  - C4 pannello: difetto visto in cattura: nella riga «Ricompense» l'ultima icona (legno) è tagliata a destra. Da correggere nel componente (non verified).
+  - C1 in /hud-compose: il roster è ancora la colonna a medaglioni vecchia (88 px), non il componente nuovo a 268 px: la verifica DPR2 di C1 resta aperta.
+- 2026-11-05: ruling B applicato: budget 24% a ogni zoom; pannello aperto con larghezza libera tra roster e pannello destro. 128/129 test HUD verdi; rosso: B2 spazio libero centro 416 < 500 (decisione del Director). PLAN-112 §32.
+- 2026-11-05: spazio libero centro alto accettato (416 px); test HUD tutti verdi. Prossimo: verifica DPR2 di C1 in /hud-compose (cimiero da montare).
+- 2026-11-05: cimiero (HudRealCrest) montato in /hud-compose nello slot crest; DPR2 ok per posizione. C1 resta da fare: nastro a 268 px con placche in produzione. C4: correggere riga ricompense. PLAN-112 §34.
+- 2026-11-05 C4: riga Ricompense a capo (no taglio) in hud-compose; verificata DPR2. Da portare nel componente di produzione e decidere se il legno va su riga propria. PLAN-112 §35.
+- 2026-11-05 C4: verificato che HudRealPanel riceve le ricompense come children; nessuna modifica al componente necessaria. Riga corretta in hud-compose (unico consumatore). PLAN-112 §36.
+- 2026-11-05: PLAN-112 §37 stato consolidato e lista di cosa resta, con passi e decisioni aperte.
+
+## 2026-11-05 — F4 ruling Voce/frame delicato (verificati)
+- Voce split busto/placca: chiudi → solo la bandiera esce (slide+fade), il busto resta e riapre al click. Rimosso onDismiss-unmount in /hud-compose. Testimone DPR2: /tmp/f5-closed.png.
+- Frame delicato (doppio binario oro + punta ornata) mintato da build-voce-parts.py: frame-200 (placca roster), frame-320 (toast esito spedizione). Testimone: /tmp/f5-open.png. Placca roster verificata via DOM (opacity 1, img 400px); cattura visiva aperta in race T-13.
+- Ruling in DECISIONS.md.
+- Placca roster: testimone visivo acquisito (/tmp/f5c-placca.png) — frame-200 delicato corretto su hover (la placca verificata e' quella della 2a riga, y162; i crop precedenti miravano alla 1a).
+- 2026-11-05 Director: stati medaglione ANNULLATI (fuori scope). Placca: punta sinistra nascosta sotto il medaglione (left -40). Voce chiusa: busto standalone ricostruito senza bandiera (erase campo+telaio, edge organico) — verificato DPR2.
+- 2026-11-06: C1 roster in produzione — HudRealRosterRibbon.tsx (port del mockup: band-tile zanara, rulli oro, righe RosterRow x1.25 con placche a riposo, incurvatura rotateX sotto i rulli, contatori sopra/sotto, band-end). Montato nello slot roster (268px, anelli centrati sotto il cimiero). ?n=1|5|14 su /hud-compose per le catture di non-taglio. Verificato DPR2: n=1 (un eroe tra rulli+band-end), n=14 scrollato (contatori 4/5, stati Injured/Fallen/Away sulle placche, caduto desaturato). Probe rects PASS su contratto emendato (crest 156 + roster 268@158).
+- 2026-11-06: rosterOpen in produzione — HudRealRosterOpen.tsx (port OpenRoster: tab, sort/filtro reali /game, densita, griglia snap). Montato nello slot contestuale (click cimiero o ?view=context). Verificato DPR2. Resta: rulli/pannello in CSS stand-in (asset in attesa quota), test permanente non-taglio, confronto cimiero/astrolabio.
+- 2026-11-06 Director ruling: rimossi rulli e contatori dal nastro (HudRealRosterRibbon). Nastro = banda+righe+fade sui bordi. Testimone DPR2 n=14.
+- 2026-11-06 Director ruling palette: kit zanara armonizzato sull'oro vivo della nav (harmonize-zanara-kit.py, 14 pezzi, backup rollback-zanara/). Testimone DPR2 /tmp/ribbon-harm.png.
+- 2026-11-06 Director ruling: cimiero = asset armillare estratto (crest/crest.webp) in HudRealCrest al posto di fenice+SVG. Verificato DPR2.
+- 2026-11-06 Director ruling: rosterOpen = VillageRosterSection (componente roster fidato /game) al posto di HudRealRosterOpen bocciato. Verificato DPR2: ROSTER 6/6, filtri/ordinamento, card eroe.

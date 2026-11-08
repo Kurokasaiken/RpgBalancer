@@ -1674,6 +1674,9 @@ export function useQuestExpeditionSession({
     handleDragEnd,
     handleFlightComplete,
     handleResidentSelect,
+    /* R-248 extraction path — slot clears through here replay the return
+     *  flight + one-commit choreography; raw `controller.clearSlot` skips it. */
+    handleSlotClear,
     getResidentCompatibility,
     /* R-282: why the hovered seat would refuse the in-flight drop (swap legs
      *  on token-drag, eligibility/`seat-busy` on roster-drag) — `null` when

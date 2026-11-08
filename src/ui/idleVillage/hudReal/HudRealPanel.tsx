@@ -13,10 +13,10 @@ import { PANEL_FRAME as F } from './panelFrameGeometry';
 const ASSET = '/assets/ui/hud-real/panel/frame.webp';
 const C = { ink: '#2b2118', muted: '#6b5a3e', cta: '#f3ead0', focus: '#e8c766', shadow: '0 1px 2px rgba(3, 26, 30, 0.85)' } as const;
 const PAD = 12;
-/* the measured plaque box is the eroded green only: the real enamel is about twice as tall, centre the label on it */
-const CTA = { x: F.plaque.x, y: F.plaque.y, w: F.plaque.w, h: Math.max(F.plaque.h, 40) };
+/* F.action: the free enamel of the button (after the medallion, before the tip), measured on the cropped button (2026-11-05) */
+const CTA = F.action;
 /* text column height minus kicker, a two-line title and margins, in 19 px lines */
-const BODY_LINES = Math.max(2, Math.floor((F.window.h - 15 - 44 - 14) / 19));
+
 
 const SCOPED_CSS = `
 [data-hudreal-panel] [data-hr-cta]:focus { outline: none; }
@@ -39,28 +39,35 @@ export interface HudRealPanelProps {
 }
 
 export function HudRealPanel({ kicker, title, body, illustration, children, action, ariaLabel }: HudRealPanelProps) {
-  const textRight = F.window.x - 8;
-  const belowTop = F.window.y + F.window.h + 2;
+  /* Text starts at the top of the alabaster field and runs beside the window; the free block below starts under the window.
+   * The window is drawn only when an illustration exists (F2: never an empty glass window); without it the text uses the full field width. */
+  const hasWindow = !!illustration;
+  const textLeft = F.field.x + PAD;
+  const textW = (hasWindow ? F.window.x - 8 : F.field.x + F.field.w - PAD) - textLeft;
+  const textTop = F.field.y + 6;
+  const belowTop = hasWindow ? F.window.y + F.window.h + 8 : textTop + 160;
   return (
     <section data-hudreal-panel="" aria-label={ariaLabel ?? title} style={{ position: 'relative', userSelect: 'none', width: F.w, height: F.h }}>
       <style>{SCOPED_CSS}</style>
       <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
       <div style={{
-        position: 'absolute', left: F.field.x + PAD, top: F.window.y, width: textRight - F.field.x - PAD, height: F.window.h,
+        position: 'absolute', left: textLeft, top: textTop, width: textW, height: belowTop - textTop - 8,
         overflow: 'hidden', fontFamily: '"EB Garamond", serif', color: C.ink,
       }}>
-        {kicker && <div style={{ fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', color: C.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kicker}</div>}
-        <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 18, fontWeight: 600, lineHeight: '22px', margin: '2px 0 6px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{title}</div>
-        {body && <div style={{ fontSize: 13.5, lineHeight: '19px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: BODY_LINES, overflow: 'hidden' }}>{body}</div>}
+        {kicker && <div style={{ fontSize: 14, letterSpacing: 1, textTransform: 'uppercase', color: C.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kicker}</div>}
+        <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 21, fontWeight: 600, lineHeight: '23px', margin: '1px 0 3px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{title}</div>
+        {body && <div style={{ fontSize: 16, lineHeight: '21px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: Math.max(2, Math.floor((belowTop - textTop - 8 - 16 - 46) / 21)), overflow: 'hidden' }}>{body}</div>}
       </div>
-      <div data-hr-window="" style={{
-        position: 'absolute', left: F.window.x, top: F.window.y, width: F.window.w, height: F.window.h,
-        overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: '36px 36px 22px 22px / 30px 30px 22px 22px',
-      }}>{illustration}</div>
+      {hasWindow && (
+        <div data-hr-window="" style={{
+          position: 'absolute', left: F.window.x, top: F.window.y, width: F.window.w, height: F.window.h,
+          overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: '30px 30px 18px 18px / 26px 26px 18px 18px',
+        }}>{illustration}</div>
+      )}
       {children && (
         <div style={{
-          position: 'absolute', left: F.field.x + PAD, right: F.w - (F.field.x + F.field.w) + PAD, top: belowTop,
-          height: CTA.y - belowTop - 2, overflow: 'hidden', fontFamily: '"EB Garamond", serif', color: C.ink, fontSize: 13.5,
+          position: 'absolute', left: textLeft, right: F.w - (F.field.x + F.field.w) + PAD, top: belowTop,
+          height: CTA.y - belowTop - 4, overflow: 'hidden', fontFamily: '"EB Garamond", serif', color: C.ink, fontSize: 16,
         }}>{children}</div>
       )}
       {action && (
@@ -68,7 +75,7 @@ export function HudRealPanel({ kicker, title, body, illustration, children, acti
           style={{
             position: 'absolute', left: CTA.x, top: CTA.y, width: CTA.w, height: CTA.h, background: 'transparent',
             border: 0, padding: 0, cursor: action.disabled ? 'default' : 'pointer', opacity: action.disabled ? 0.55 : 1,
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 16, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase',
+            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 16, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', whiteSpace: 'nowrap',
             color: C.cta, textShadow: C.shadow,
           }}>{action.label}</button>
       )}

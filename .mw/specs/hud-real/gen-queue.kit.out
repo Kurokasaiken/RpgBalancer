@@ -1,0 +1,18 @@
+[2026-11-06T12:52:21.687Z] queue start, budget {"maxTotal":170,"used":65,"note":"Immagini Gemini che questa coda può ancora generare (tetto di sicurezza per il limite settimanale). Si cambia a mano."}
+[2026-11-06T12:52:21.704Z] K1-kit/kit-tab-1: generating (attempt 1)
+[2026-11-06T12:53:10.518Z] kit-tab-1: done
+[2026-11-06T12:53:22.531Z] K1-kit/kit-tab-2: generating (attempt 1)
+[2026-11-06T12:54:09.230Z] kit-tab-2: done
+[2026-11-06T12:54:21.238Z] K1-kit/kit-buttons-1: generating (attempt 1)
+[2026-11-06T12:55:07.577Z] kit-buttons-1: done
+[2026-11-06T12:55:19.585Z] K1-kit/kit-buttons-2: generating (attempt 1)
+[2026-11-06T12:56:12.029Z] kit-buttons-2: done
+[2026-11-06T12:56:24.038Z] K1-kit/kit-divider-1: generating (attempt 1)
+[2026-11-06T12:57:18.841Z] kit-divider-1: done
+[2026-11-06T12:57:30.880Z] K1-kit/kit-divider-2: generating (attempt 1)
+[2026-11-06T12:58:20.554Z] kit-divider-2: done
+[2026-11-06T12:58:32.566Z] K1-kit/kit-tooltip-1: generating (attempt 1)
+[2026-11-06T12:59:21.718Z] kit-tooltip-1: done
+[2026-11-06T12:59:33.734Z] K1-kit/kit-tooltip-2: generating (attempt 1)
+[2026-11-06T13:00:22.323Z] kit-tooltip-2: done
+[2026-11-06T13:00:34.332Z] queue empty — done

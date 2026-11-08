@@ -1,54 +1,104 @@
 /**
- * HudRealSeal — verdict seal of PLAN-110 C7: laurel medallion with crossed swords, an empty dark
- * field for the live value (e.g. success chance) and five sockets holding live danger/victory marks.
- * One generated image (build-fullbar-assets.py --square --field); value and marks are code.
- * Rulings: only victory + danger marks (skulls ok), no drop %. A view only.
+ * HudRealSeal — verdict seal of PLAN-110 C7 (v2, light): a thin gold laurel ring (empty teal glass), crossed swords and a
+ * big gold figure in code, and below it a strip with five large skulls. Two generated images (build-seal2-assets.py:
+ * disc + strip); everything inside is live content. Rulings: only victory + danger marks (skulls ok), no drop %.
+ * A view only.
  */
 import { HudTooltip } from '@/ui/idleVillage/components/gameFrame/HudTooltip';
-import { SEAL_BAR as G } from './sealGeometry';
+import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
+import { SEAL2 as G } from './seal2Geometry';
 
-const ASSET = '/assets/ui/hud-real/seal/bar.webp';
-const C = { value: '#f3ead0', danger: '#e0583f', win: '#f1d88a', off: '#3b4a4a', shadow: '0 1px 2px rgba(3, 26, 30, 0.9)' } as const;
+const DISC = '/assets/ui/hud-real/seal/disc.webp';
+const STRIP = '/assets/ui/hud-real/seal/strip.webp';
+const C = { value: '#f3d98a', sign: '#e8dcb4', danger: '#ee6a52', win: '#e9e3b0', off: '#4a5a5c', shadow: '0 1px 2px rgba(2, 20, 22, 0.95)' } as const;
 
 export type SealMark = 'win' | 'danger' | 'off';
 
-function Skull({ color }: { color: string }) {
+function Skull({ color, size }: { color: string; size: number }) {
   return (
-    <svg width="17" height="17" viewBox="0 0 16 16" aria-hidden="true" style={{ display: 'block' }}>
-      <path d="M8 1.5c-3.3 0-5.5 2.2-5.5 5 0 1.8.9 3 2 3.7V13h2v-1.5h3V13h2V10.2c1.1-.7 2-1.9 2-3.7 0-2.8-2.2-5-5.5-5zM5.6 8.6a1.3 1.3 0 110-2.6 1.3 1.3 0 010 2.6zm4.8 0a1.3 1.3 0 110-2.6 1.3 1.3 0 010 2.6z" fill={color} fillRule="evenodd" />
+    <svg width={size} height={size} viewBox="0 0 16 16" aria-hidden="true" style={{ display: 'block', filter: 'drop-shadow(0 1px 1px rgba(2, 20, 22, 0.9))' }}>
+      <path d="M8 1.2c-3.5 0-5.8 2.3-5.8 5.2 0 1.9 1 3.2 2.2 3.9V13h2.1v-1.6h3V13h2.1V10.3c1.2-.7 2.2-2 2.2-3.9 0-2.9-2.3-5.2-5.8-5.2zM5.5 8.7a1.4 1.4 0 110-2.8 1.4 1.4 0 010 2.8zm5 0a1.4 1.4 0 110-2.8 1.4 1.4 0 010 2.8zM7.2 10.4h1.6l-.8 1.3z" fill={color} fillRule="evenodd" />
     </svg>
   );
 }
 
 export interface HudRealSealProps {
-  /** Text in the central field, already formatted (e.g. "68%"). */
+  /** Number shown in the disc, already formatted without the sign (e.g. "68"). */
   value: string;
-  /** One mark per socket (extra marks are dropped, missing ones stay empty). */
+  /** One mark per skull (extra marks are dropped, missing ones stay dim). */
   marks?: SealMark[];
-  /** Accessible and tooltip description. */
   label: string;
   hint?: string;
+  /** 'stack' (default) keeps the PLAN-110 column; 'row' lays disc + skull strip side by side —
+   *  the compact probability row that lives INSIDE the panel's free zone (PLAN-112 contract). */
+  layout?: 'stack' | 'row';
+  /** Row layout height in px (default 96): the probability row must fit the panel's free zone. */
+  rowHeight?: number;
 }
 
-export function HudRealSeal({ value, marks = [], label, hint }: HudRealSealProps) {
-  const f = G.field;
+export function HudRealSeal({ value, marks = [], label, hint, layout = 'stack', rowHeight = 96 }: HudRealSealProps) {
+  const d = G.disc;
+  const s = G.strip;
+  const width = Math.max(d.w, s.w);
+  const discLeft = s.offsetX < 0 ? -s.offsetX : 0;
+  const stripLeft = s.offsetX < 0 ? 0 : s.offsetX;
+  const stripTop = d.h + G.gap;
+  const f = s.field;
+  const slots = 5;
+  const slotW = f.w / slots;
+  if (layout === 'row') {
+    const H = rowHeight;
+    const k = H / d.h;                                    // the disc sets the row height
+    const dw = d.w * k, dh = d.h * k;
+    const strip = { w: s.w * k, h: s.h * k, y: (dh - s.h * k) / 2 };
+    const fs = { x: dw + f.x * k, y: strip.y + f.y * k, w: f.w * k, h: f.h * k };
+    return (
+      <HudTooltip label={label} hint={hint} side="top" wrap>
+        <section data-hudreal-seal="" data-layout="row" aria-label={`${label}: ${value}%`}
+          style={{ position: 'relative', userSelect: 'none', width: dw + s.w * k, height: dh }}>
+          <img src={DISC} alt="" draggable={false} style={{ position: 'absolute', left: 0, top: 0, width: dw, height: dh, display: 'block' }} />
+          <div style={{ position: 'absolute', left: (d.cx - d.r) * k, top: (d.cy - d.r) * k, width: d.r * 2 * k, height: d.r * 2 * k, display: 'grid', gridTemplateRows: 'auto auto', placeContent: 'center', justifyItems: 'center', gap: 0 }}>
+            <span style={{ color: C.sign, filter: 'drop-shadow(0 1px 2px rgba(2, 20, 22, 0.9))' }}><EngravedIcon id="evt-combat" size={Math.round(d.r * 0.82 * k)} /></span>
+            <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontWeight: 600, fontSize: Math.round(d.r * 0.74 * k), lineHeight: 1, color: C.value, textShadow: C.shadow, fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline' }}>
+              {value}<span style={{ fontSize: Math.round(d.r * 0.3 * k), marginLeft: 2, color: C.sign }}>%</span>
+            </span>
+          </div>
+          <img src={STRIP} alt="" draggable={false} style={{ position: 'absolute', left: dw, top: strip.y, width: strip.w, height: strip.h, display: 'block' }} />
+          <div style={{ position: 'absolute', left: fs.x, top: fs.y, width: fs.w, height: fs.h, display: 'flex' }}>
+            {Array.from({ length: slots }, (_, i) => {
+              const m = marks[i] ?? 'off';
+              return (
+                <div key={i} data-mark={m} style={{ width: fs.w / slots, height: '100%', display: 'grid', placeItems: 'center' }}>
+                  <Skull color={m === 'danger' ? C.danger : m === 'win' ? C.win : C.off} size={Math.min(16, fs.h - 4)} />
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </HudTooltip>
+    );
+  }
   return (
     <HudTooltip label={label} hint={hint} side="top" wrap>
-      <section data-hudreal-seal="" aria-label={`${label}: ${value}`} style={{ position: 'relative', userSelect: 'none', width: G.w, height: G.h }}>
-        <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
-        <div style={{
-          position: 'absolute', left: f.x, top: f.y, width: f.w, height: f.h, display: 'grid', placeItems: 'center',
-          fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 32, fontWeight: 600, color: C.value, textShadow: C.shadow, fontVariantNumeric: 'tabular-nums',
-        }}>{value}</div>
-        {G.slots.map((slot, i) => {
-          const m = marks[i];
-          if (!m) return null;
-          return (
-            <div key={i} data-mark={m} style={{ position: 'absolute', left: slot.x, top: slot.y, width: slot.w, height: slot.h, display: 'grid', placeItems: 'center' }}>
-              <Skull color={m === 'danger' ? C.danger : m === 'win' ? C.win : C.off} />
-            </div>
-          );
-        })}
+      <section data-hudreal-seal="" aria-label={`${label}: ${value}%`} style={{ position: 'relative', userSelect: 'none', width, height: stripTop + s.h }}>
+        <img src={DISC} alt="" draggable={false} style={{ position: 'absolute', left: discLeft, top: 0, width: d.w, height: d.h, display: 'block' }} />
+        <div style={{ position: 'absolute', left: discLeft + d.cx - d.r, top: d.cy - d.r, width: d.r * 2, height: d.r * 2, display: 'grid', gridTemplateRows: 'auto auto', placeContent: 'center', justifyItems: 'center', gap: 0 }}>
+          <span style={{ color: C.sign, filter: 'drop-shadow(0 1px 2px rgba(2, 20, 22, 0.9))' }}><EngravedIcon id="evt-combat" size={Math.round(d.r * 0.82)} /></span>
+          <span style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontWeight: 600, fontSize: Math.round(d.r * 0.74), lineHeight: 1, color: C.value, textShadow: C.shadow, fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline' }}>
+            {value}<span style={{ fontSize: Math.round(d.r * 0.3), marginLeft: 2, color: C.sign }}>%</span>
+          </span>
+        </div>
+        <img src={STRIP} alt="" draggable={false} style={{ position: 'absolute', left: stripLeft, top: stripTop, width: s.w, height: s.h, display: 'block' }} />
+        <div style={{ position: 'absolute', left: stripLeft + f.x, top: stripTop + f.y, width: f.w, height: f.h, display: 'flex' }}>
+          {Array.from({ length: slots }, (_, i) => {
+            const m = marks[i] ?? 'off';
+            return (
+              <div key={i} data-mark={m} style={{ width: slotW, height: '100%', display: 'grid', placeItems: 'center' }}>
+                <Skull color={m === 'danger' ? C.danger : m === 'win' ? C.win : C.off} size={Math.min(26, f.h - 4)} />
+              </div>
+            );
+          })}
+        </div>
       </section>
     </HudTooltip>
   );

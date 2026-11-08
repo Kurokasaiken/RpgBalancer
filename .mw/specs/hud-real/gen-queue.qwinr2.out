@@ -1,0 +1,6 @@
+[2026-11-06T16:49:21.385Z] queue start, budget {"maxTotal":170,"used":76,"note":"Immagini Gemini che questa coda può ancora generare (tetto di sicurezza per il limite settimanale). Si cambia a mano."}
+[2026-11-06T16:49:21.394Z] B1b-quest-window-rich/qwinr-1: generating (attempt 1)
+[2026-11-06T16:50:29.369Z] qwinr-1: done
+[2026-11-06T16:50:41.380Z] B1b-quest-window-rich/qwinr-2: generating (attempt 1)
+[2026-11-06T16:51:45.858Z] qwinr-2: done
+[2026-11-06T16:51:57.955Z] queue empty — done

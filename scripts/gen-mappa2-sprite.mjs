@@ -92,6 +92,15 @@ async function uploadFailed(page) {
 }
 
 async function tryAttach(page, imgPath) {
+  // Sidebar can cover the composer on this account — close it if expanded so
+  // the attach buttons are clickable.
+  try {
+    const sideToggle = page.locator('button[aria-label*="Chiudi barra laterale" i], button[aria-label*="Close sidebar" i]').first();
+    if ((await sideToggle.count()) > 0) {
+      await sideToggle.click({ timeout: 2000 }).catch(() => {});
+      await page.waitForTimeout(500);
+    }
+  } catch {}
   // strategy -2 (verified 2026-11-03, PLAN-110 G-0): the composer has no input[type=file]
   // until the "+" menu is open; "Caricamento e strumenti" → menuitem "Carica file" fires a
   // multi-file chooser. Count the attachment chips before/after to prove the upload.

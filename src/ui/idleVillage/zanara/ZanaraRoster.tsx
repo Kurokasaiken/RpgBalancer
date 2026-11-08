@@ -57,7 +57,8 @@ function Bar({ value, fill, label }: { value: number; fill: string; label: strin
   );
 }
 
-function RosterRow({ resident, locked, lockedStatusLabel, onSelect }: {
+/** One hero row (ring + portrait + plaque); exported for the roster ribbon mockup (PLAN-112). */
+export function RosterRow({ resident, locked, lockedStatusLabel, onSelect }: {
   resident: ResidentState; locked: boolean; lockedStatusLabel?: string; onSelect?: (id: string) => void;
 }) {
   const { t } = useTranslation('idleVillage');

@@ -1,0 +1,56 @@
+{
+  "component": "F3p",
+  "jobs": [
+    {
+      "id": "pf-1",
+      "zone": "panel-frame",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/f3/prompt-panel-frame.txt",
+      "out": ".mw/specs/hud-real/f3/gen/pf-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/f3/gen/pf-1-0.png",
+      "sha16": "4462b6ec6448dd4f"
+    },
+    {
+      "id": "pf-2",
+      "zone": "panel-frame",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/f3/prompt-panel-frame.txt",
+      "out": ".mw/specs/hud-real/f3/gen/pf-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/f3/gen/pf-2-0.png",
+      "sha16": "a42f13999f1210cc"
+    },
+    {
+      "id": "pf-3",
+      "zone": "panel-frame",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/f3/prompt-panel-frame.txt",
+      "out": ".mw/specs/hud-real/f3/gen/pf-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/f3/gen/pf-3-0.png",
+      "sha16": "53d5e1ffc1ba9a0e"
+    },
+    {
+      "id": "pf-4",
+      "zone": "panel-frame",
+      "refs": [
+        ".mw/specs/hud-real/panel/design-panel.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/f3/prompt-panel-frame.txt",
+      "out": ".mw/specs/hud-real/f3/gen/pf-4",
+      "status": "skipped",
+      "note": "saltata 2026-11-05: quota oraria esaurita; 3 cornici bastano per G2"
+    }
+  ]
+}

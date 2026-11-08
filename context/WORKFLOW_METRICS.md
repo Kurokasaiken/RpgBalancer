@@ -176,21 +176,30 @@
 | R-304 | 2026-11-01 → 2026-11-01 | — | — | — | — | open |
 | PLAN-107 | 2026-11-01 → 2026-11-01 | — | — | — | — | open |
 | PLAN-106 | 2026-10-31 → 2026-11-02 | — | — | — | — | open |
-| PLAN-108 | 2026-11-02 → 2026-11-02 | — | — | — | — | open |
+| R-307 | 2026-11-02 → 2026-11-02 | — | — | 6m — verification 78% · unobserved 22% | — | open |
+| R-308 | 2026-11-02 → 2026-11-02 | — | — | 1h36m — verification 98% · unobserved 2% | — | open |
+| R-309 | 2026-11-02 → 2026-11-02 | — | — | 4m — verification 60% · unobserved 40% | — | open |
+| PLAN-110 | 2026-11-02 → 2026-11-05 | 64h16m | 16h16m | — | — | open |
+| PLAN-108 | 2026-11-02 → 2026-11-05 | — | — | — | — | open |
+| PLAN-109 | 2026-11-05 → 2026-11-05 | — | — | — | — | open |
+| PLAN-111 | 2026-11-05 → 2026-11-05 | — | — | — | — | open |
+| R-317 | 2026-11-05 → 2026-11-05 | — | — | — | — | open |
+| PLAN-112 | 2026-11-05 → 2026-11-05 | 1h19m | 50m | — | — | open |
+| PLAN-113 | 2026-11-06 → 2026-11-06 | 1h01m | 55m | — | — | open |
 
 ## Where the time goes (aggregate, attributed intervals)
 
-- **impl:unobserved**: 795h32m (57% of active work)
-- **intake**: 276h42m (20% of active work)
-- **impl:verification**: 152h58m (11% of active work)
-- **debate**: 126h46m (9% of active work)
+- **impl:unobserved**: 795h36m (56% of active work)
+- **intake**: 278h29m (20% of active work)
+- **impl:verification**: 154h38m (11% of active work)
+- **debate**: 144h47m (10% of active work)
 - **impl:mixed**: 20h26m (1% of active work)
 - **impl:config**: 19h01m (1% of active work)
 - **impl:docs**: 30m (0% of active work)
 - **verify+closure**: 15m (0% of active work)
 - **impl:unobserved — inferred composition** (churn file-mix dei commit di impl, non tempo osservato): docs 58% · config 15% · code 13% · tests 11% · other 3% · assets 1% · governance 0%
-- **wait** (gaps >45min, idle/attesa Director — not work): 37978h33m
-- **unattributed commits**: 428 (mixed×146 config×83 other×77) — no entity id, >12h from any active entity
+- **wait** (gaps >45min, idle/attesa Director — not work): 38119h13m
+- **unattributed commits**: 400 (mixed×145 config×83 docs×77) — no entity id, >12h from any active entity
 
 ## Plan features → smoothness (PLAN-059 — rework, non richness)
 
@@ -255,6 +264,8 @@
 | PLAN-072 | 9 | — | 1 | — | 1% | 98% | 0 | — |
 | PLAN-042 | 10 | yes | 11 | 48m | 0% | 98% | 2 | 0 |
 | PLAN-098 | 7 | yes | 17 | — | 0% | 98% | 0 | — |
+| PLAN-108 | 13 | yes | 23 | — | 0% | 98% | 0 | — |
+| PLAN-111 | 2 | — | 2 | — | 0% | 98% | 0 | — |
 | R-210 | 51 | yes | 68 | 5h46m | 0% | 98% | 2 | — |
 | PLAN-106 | 4 | — | 1 | — | 0% | 97% | 0 | — |
 | R-199 | 11 | yes | 21 | 9h00m | 1% | 97% | 2 | 0 |
@@ -297,6 +308,7 @@
 | R-106 | 11 | — | 85 | — | 1% | 88% | 0 | — |
 | R-085 | 9 | — | 6 | — | 3% | 88% | 0 | — |
 | PLAN-080 | 18 | yes | 25 | — | 2% | 87% | 1 | 0 |
+| PLAN-109 | 12 | — | 2 | — | 0% | 87% | 0 | — |
 | PLAN-076 | 12 | yes | 14 | 1h39m | 0% | 87% | 2 | 0 |
 | R-084 | 9 | — | 6 | — | 6% | 87% | 0 | — |
 | PLAN-038 | 13 | — | 26 | 1h13m | 1% | 86% | 1 | 0 |
@@ -319,6 +331,7 @@
 | PLAN-088 | 1 | — | 5 | — | 0% | 74% | 0 | — |
 | R-247 | 68 | yes | 40 | 8m | 0% | 62% | 29 | 0 |
 | PLAN-073 | 24 | yes | 21 | — | 0% | 61% | 0 | — |
+| PLAN-110 | 44 | — | 7 | — | 0% | 57% | 0 | — |
 | PLAN-078 | 37 | yes | 29 | 6h04m | 1% | 55% | 1 | 0 |
 | PLAN-085 | 5 | yes | 18 | — | 1% | 54% | 0 | — |
 | PLAN-095 | 15 | yes | 18 | — | 0% | 46% | 0 | — |
@@ -345,14 +358,16 @@
 | R-272 | 22 | yes | 57 | — | — | — | 0 | — |
 | R-299 | 21 | yes | 48 | 44m | — | — | 0 | 0 |
 | R-300 | 6 | yes | 11 | 7m | — | — | 0 | 0 |
-| PLAN-108 | 11 | yes | 22 | — | — | — | 0 | — |
+| R-317 | 64 | yes | 24 | — | — | — | 0 | 0 |
+| PLAN-112 | 21 | yes | 17 | — | — | — | 0 | 0 |
+| PLAN-113 | 5 | yes | 25 | — | — | — | 0 | — |
 
 Spearman ρ (files_named vs −oop scope churn): **0.25** — n=35, directional.
 
 ## Gate cost (PLAN-051 T-006)
 
-- **Ultimi bundle per run** (n=108): PASS 70 · BLOCKED 38
-- **Risultati obbligazioni** (tutti i bundle): PASS 474 · FAIL 27 · NOT_RUN 26 · MISSING_ARTIFACT 6 · SKIPPED 2
-- **Director burden** (azioni registrate): answers 17 · exceptions 100 · mapping-approvals 16 · trust-approvals 16
+- **Ultimi bundle per run** (n=112): PASS 71 · BLOCKED 41
+- **Risultati obbligazioni** (tutti i bundle): PASS 485 · NOT_RUN 27 · FAIL 27 · MISSING_ARTIFACT 6 · SKIPPED 4
+- **Director burden** (azioni registrate): answers 17 · exceptions 104 · mapping-approvals 16 · trust-approvals 16
 - **Trust anchor**: 142 file sigillati @ 2026-10-24T15:43:31.677Z — ledger fuori-repo attivo
 - _Gap di misura noto:_ bundle.json viene sovrascritto a ogni run → il flip-rate BLOCKED→PASS (retry / falsi positivi) non è osservabile su disco; va journalato o stimato da seeded-fault (trustedLock.test copre tamper, lock riforgiato, drift non approvato).

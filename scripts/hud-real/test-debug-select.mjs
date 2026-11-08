@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({args:['--enable-unsafe-swiftshader']});
+const page = await b.newPage({viewport:{width:1600,height:900}});
+page.on('console', m => { if (m.text().includes('cassetto-host')) console.log('LOG', m.text().slice(0,300)); });
+await page.goto('http://localhost:5173/hud-compose?comp=cassetto&view=context',{waitUntil:'networkidle',timeout:30000});
+await page.waitForTimeout(4500);
+await page.locator('[data-cassetto-debug="select-first"]').click();
+await page.waitForTimeout(1500);
+await page.screenshot({path:'test-results/dbg-select.png'});
+await b.close(); console.log('done');
