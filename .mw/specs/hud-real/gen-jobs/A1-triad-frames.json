@@ -1,0 +1,57 @@
+{
+  "component": "A-triad-frames",
+  "jobs": [
+    {
+      "id": "mobile-compagnia-1",
+      "zone": "mobile-compagnia",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/qwinr-1-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-mobile-compagnia.txt",
+      "out": ".mw/specs/hud-real/kit/gen/mobile-compagnia-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/kit/gen/mobile-compagnia-1-0.png",
+      "sha16": "27d1c3013fa8c5f6"
+    },
+    {
+      "id": "mobile-compagnia-2",
+      "zone": "mobile-compagnia",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/qwinr-1-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-mobile-compagnia.txt",
+      "out": ".mw/specs/hud-real/kit/gen/mobile-compagnia-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/kit/gen/mobile-compagnia-2-0.png",
+      "sha16": "96c7678ad5ee3ec4"
+    },
+    {
+      "id": "planner-arredo-1",
+      "zone": "planner-arredo",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/qwinr-1-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-planner-arredo.txt",
+      "out": ".mw/specs/hud-real/kit/gen/planner-arredo-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/kit/gen/planner-arredo-1-0.png",
+      "sha16": "f7ac4c51a0b69026"
+    },
+    {
+      "id": "planner-arredo-2",
+      "zone": "planner-arredo",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/qwinr-1-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-planner-arredo.txt",
+      "out": ".mw/specs/hud-real/kit/gen/planner-arredo-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/kit/gen/planner-arredo-2-0.png",
+      "sha16": "4561d851b65bbb2a"
+    }
+  ]
+}

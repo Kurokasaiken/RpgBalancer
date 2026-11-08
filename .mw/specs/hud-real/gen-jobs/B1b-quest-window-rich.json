@@ -1,0 +1,27 @@
+{
+  "component": "B1b-quest-window-rich",
+  "jobs": [
+    {
+      "id": "qwinr-1",
+      "zone": "quest-window",
+      "refs": [
+        ".mw/specs/hud-real/f3/gen/qwin-2-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-quest-window-rich.txt",
+      "out": ".mw/specs/hud-real/kit/gen/qwinr-1",
+      "status": "failed"
+    },
+    {
+      "id": "qwinr-2",
+      "zone": "quest-window",
+      "refs": [
+        ".mw/specs/hud-real/f3/gen/qwin-2-0.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/kit/prompt-quest-window-rich.txt",
+      "out": ".mw/specs/hud-real/kit/gen/qwinr-2",
+      "status": "failed"
+    }
+  ]
+}

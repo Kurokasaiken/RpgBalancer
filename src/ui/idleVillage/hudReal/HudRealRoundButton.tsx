@@ -31,7 +31,7 @@ export interface HudRealRoundButtonProps {
 
 export function HudRealRoundButton({ label, children, onClick, active = false, disabled = false, shortcut, size = 40 }: HudRealRoundButtonProps) {
   return (
-    <HudTooltip label={label} shortcut={shortcut} side="bottom" wrap>
+    <HudTooltip label={label} shortcut={shortcut} side="top" wrap>
       <button type="button" data-hudreal-round="" aria-label={label} aria-pressed={active} disabled={disabled} onClick={onClick}
         style={{
           position: 'relative', width: size, height: size, padding: 0, border: 0, borderRadius: '50%', userSelect: 'none',

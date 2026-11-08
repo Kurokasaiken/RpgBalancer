@@ -1,0 +1,14 @@
+[2026-11-06T16:45:07.231Z] queue start, budget {"maxTotal":170,"used":76,"note":"Immagini Gemini che questa coda può ancora generare (tetto di sicurezza per il limite settimanale). Si cambia a mano."}
+[2026-11-06T16:45:07.237Z] B1b-quest-window-rich/qwinr-1: generating (attempt 1)
+[2026-11-06T16:45:53.555Z] qwinr-1: exit 1 (attach/prompt/unknown), soft fail 1
+[2026-11-06T16:46:53.567Z] B1b-quest-window-rich/qwinr-1: generating (attempt 2)
+[2026-11-06T16:47:32.040Z] qwinr-1: exit 3 (attach/prompt/unknown), soft fail 2
+[2026-11-06T16:48:32.045Z] B1b-quest-window-rich/qwinr-1: generating (attempt 3)
+[2026-11-06T16:48:56.432Z] qwinr-1: exit 3 (attach/prompt/unknown), soft fail 3
+[2026-11-06T16:49:08.473Z] B1b-quest-window-rich/qwinr-2: generating (attempt 1)
+[2026-11-06T16:49:35.787Z] qwinr-2: exit 3 (attach/prompt/unknown), soft fail 1
+[2026-11-06T16:50:35.804Z] B1b-quest-window-rich/qwinr-2: generating (attempt 2)
+[2026-11-06T16:51:07.220Z] qwinr-2: exit 3 (attach/prompt/unknown), soft fail 2
+[2026-11-06T16:52:07.296Z] B1b-quest-window-rich/qwinr-2: generating (attempt 3)
+[2026-11-06T16:52:50.351Z] qwinr-2: exit 3 (attach/prompt/unknown), soft fail 3
+[2026-11-06T16:53:02.366Z] queue empty — done

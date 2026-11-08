@@ -1,0 +1,44 @@
+{
+  "component": "C7b",
+  "jobs": [
+    {
+      "id": "seal2-1",
+      "zone": "seal",
+      "refs": [
+        ".mw/specs/hud-real/seal/design-seal.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/seal/prompt-seal2.txt",
+      "out": ".mw/specs/hud-real/seal/gen/seal2-1",
+      "status": "done",
+      "file": ".mw/specs/hud-real/seal/gen/seal2-1-0.png",
+      "sha16": "66af8f0877463b7f"
+    },
+    {
+      "id": "seal2-2",
+      "zone": "seal",
+      "refs": [
+        ".mw/specs/hud-real/seal/design-seal.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/seal/prompt-seal2.txt",
+      "out": ".mw/specs/hud-real/seal/gen/seal2-2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/seal/gen/seal2-2-0.png",
+      "sha16": "da40da224b2a8942"
+    },
+    {
+      "id": "seal2-3",
+      "zone": "seal",
+      "refs": [
+        ".mw/specs/hud-real/seal/design-seal.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/seal/prompt-seal2.txt",
+      "out": ".mw/specs/hud-real/seal/gen/seal2-3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/seal/gen/seal2-3-0.png",
+      "sha16": "fd253a929af38039"
+    }
+  ]
+}

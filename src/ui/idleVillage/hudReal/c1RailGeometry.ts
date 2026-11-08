@@ -3,6 +3,7 @@ export const C1_RAIL = {
   "w": 149.81,
   "tileH": 96.0,
   "endH": 83.16,
+  "capH": 120.46,
   "asset2x": [
     300,
     192

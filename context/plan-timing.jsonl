@@ -75,3 +75,6 @@
 {"plan":"PLAN-093","event":"open","at":"2026-10-29T01:51:41+01:00","lane":"local","kind":"backfill","text":"planForensics: plan file created (battezzo proxy)"}
 {"plan":"PLAN-093","event":"close","at":"2026-10-28T22:21:45.430Z","kind":"backfill","text":"planForensics: bundle produced_at"}
 {"plan":"PLAN-108","event":"open","at":"2026-11-02T11:02:14.973Z"}
+{"plan":"PLAN-112","event":"open","at":"2026-11-05T11:45:51.163Z"}
+{"plan":"PLAN-112","event":"open","at":"2026-11-05T12:27:09.578Z"}
+{"plan":"PLAN-113","event":"open","at":"2026-11-06T11:48:48.420Z"}

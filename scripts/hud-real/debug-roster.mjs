@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({args:['--enable-unsafe-swiftshader']});
+const page = await b.newPage({viewport:{width:1600,height:900}});
+page.on('pageerror', e => console.log('PAGEERR', e.message?.slice(0,250)));
+await page.goto('http://localhost:5173/hud-compose?comp=cassetto&view=context',{waitUntil:'networkidle',timeout:30000});
+await page.waitForTimeout(4500);
+console.log('data-resident-id:', await page.locator('[data-resident-id]').count());
+console.log('roster-ish:', await page.locator('[data-roster], [class*=roster], [class*=Roster]').count());
+await page.screenshot({path:'test-results/host-debug.png'});
+await b.close(); console.log('done');
