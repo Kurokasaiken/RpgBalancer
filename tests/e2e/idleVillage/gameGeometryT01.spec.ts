@@ -70,7 +70,7 @@ test.describe('contratto geometrico /game — classe T-01', () => {
       page,
     }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('/game');
+      await page.goto('/gameOld');
       await page.waitForSelector(CANVAS, { state: 'attached' });
       await page.waitForSelector(BOOT, { state: 'detached' });
       // un frame perché refit() sia applicato al nuovo viewport
@@ -139,7 +139,7 @@ test.describe('CTR-game-005 — map fit & sea continuity (plan054 T-001)', () =>
   for (const vp of MAP_FIT_VIEWPORTS) {
     test(`INV-1 land↔fixed-chrome disjoint at rest/refit @${vp.label} (DPR 1)`, async ({ page }) => {
       await page.setViewportSize({ width: vp.w, height: vp.h });
-      await page.goto('/game');
+      await page.goto('/gameOld');
       await waitForWorldCam(page);
 
       const atRest = evaluateMapFit(await measure(page), vp);
@@ -159,7 +159,7 @@ test.describe('CTR-game-005 — map fit & sea continuity (plan054 T-001)', () =>
   test('INV-1 land↔fixed-chrome disjoint @3440x1440 (HUD auto zoom)', async ({ page }) => {
     const vp = { w: 3440, h: 1440, label: '3440x1440' };
     await page.setViewportSize({ width: vp.w, height: vp.h });
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForWorldCam(page);
 
     const atRest = evaluateMapFit(await measure(page), vp);
@@ -183,7 +183,7 @@ test.describe('CTR-game-005 — map fit & sea continuity (plan054 T-001)', () =>
     });
     const page = await context.newPage();
     try {
-      await page.goto('/game');
+      await page.goto('/gameOld');
       await waitForWorldCam(page);
       const verdict = evaluateMapFit(await measure(page), vp);
       expect(verdict.ok, `dpr2 ${vp.label}: ${verdictMessage(verdict)}`).toBe(true);
@@ -197,7 +197,7 @@ test.describe('CTR-game-005 — map fit & sea continuity (plan054 T-001)', () =>
   // floating panel open (insets change → refit must protect the land).
   test('INV-2 south-pin survives user zoom + resize + floating panel', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 800 });
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForWorldCam(page);
 
     await page.mouse.move(960, 400);
@@ -230,7 +230,7 @@ test.describe('CTR-game-005 — map fit & sea continuity (plan054 T-001)', () =>
   test('INV-3 sea quad coverage + scanline at pan bounds', async ({ page }) => {
     const vp = { w: 1440, h: 900 };
     await page.setViewportSize({ width: vp.w, height: vp.h });
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForWorldCam(page);
 
     // Jump deterministically to the left pan bound and the bottom pan bound

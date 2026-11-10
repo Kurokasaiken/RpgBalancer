@@ -375,7 +375,8 @@
       "shallow": "masks/shallow_mask.webp",
       "internalWater": "masks/internal_water_mask.webp",
       "coastDistance": "masks/coast_distance.webp",
-      "foam": "masks/foam_mask.webp"
+      "foam": "masks/foam_mask.webp",
+      "seaZones": "masks/sea_zones.webp"
     },
     "anchorFiles": {
       "points": "points.json"

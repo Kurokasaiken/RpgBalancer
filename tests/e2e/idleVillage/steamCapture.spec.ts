@@ -1,7 +1,7 @@
 /**
  * steamCapture.spec.ts — R-117: Steam "Coming Soon" screenshot candidates.
  *
- * Captures REAL in-engine frames from the canonical `/game` surface at
+ * Captures REAL in-engine frames from the canonical `/gameOld` surface at
  * 1920×1080 — no mocks, no staging pages, same rules as the refined plan:
  * every shot must be a scene the build actually produces.
  *
@@ -57,7 +57,7 @@ const shot = async (page: Page, name: string) => {
  *  the quest offers are revealed through the test seam the Director drives. */
 const bootGame = async (page: Page, tod?: 'day' | 'dusk' | 'night') => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await page.goto(`/game?capture=1${tod ? `&tod=${tod}` : ''}`);
+  await page.goto(`/gameOld?capture=1${tod ? `&tod=${tod}` : ''}`);
   await page.waitForFunction(() => window.__idleVillageTestHooks, { timeout: 30_000 });
   await page.evaluate(() => window.__idleVillageTestHooks?.revealQuestPois?.());
   await expect(page.locator(`[data-quest-poi-id="${POI}"]`)).toBeVisible({ timeout: 20_000 });

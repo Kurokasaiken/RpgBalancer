@@ -5,7 +5,7 @@
  * only the topmost screen, and the title row carries the single Close control.
  * Buttons are the neutral HUD pills (`data-hud-controls`) — no CTA plaque while BTN-1 is open.
  */
-import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { HudPlaque, SkinScope } from '@/ui/idleVillage/skins/primitives';
@@ -24,10 +24,15 @@ export interface GameMenuDialogProps {
   'data-testid'?: string;
 }
 
+/**
+ * Layer of the menu dialogs. In game they sit on `questCheck`; the title screen (on `boot`, above everything) provides
+ * `boot + 1`, otherwise its Load / Settings / New-game screens drew UNDER the title, invisible (found 2026-11-10).
+ */
+export const MenuDialogLayer = createContext<number>(DEFAULT_GAME_FRAME_CONFIG.zLayers.questCheck);
+
 const VEIL_STYLE: CSSProperties = {
   position: 'fixed',
   inset: 0,
-  zIndex: DEFAULT_GAME_FRAME_CONFIG.zLayers.questCheck,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -48,11 +53,12 @@ export function GameMenuDialog({ title, onClose, width = 700, hideClose = false,
     return () => previous?.focus?.({ preventScroll: true });
   }, []);
 
+  const layer = useContext(MenuDialogLayer);
   const root = ensureGameModalRoot();
   if (!root) return null;
   return createPortal(
     <SkinScope>
-      <div style={VEIL_STYLE} data-testid="game-menu-veil">
+      <div style={{ ...VEIL_STYLE, zIndex: layer }} data-testid="game-menu-veil">
         {/* The focus target is a wrapper: HudPlaque owns its own ref (it measures itself to draw the frame). */}
         <div ref={focusRef} tabIndex={-1} style={{ outline: 'none', display: 'flex', maxHeight: 'calc(100vh - 48px)' }}>
         <HudPlaque

@@ -2,7 +2,7 @@
  * steamCaptureVideo.spec.ts — R-117: Steam trailer slot-1 clip.
  *
  * A ~25s authentic gameplay beat recorded straight off the canonical
- * `/game` surface (Playwright video at 1920×1080): living map → planner →
+ * `/gameOld` surface (Playwright video at 1920×1080): living map → planner →
  * send → run opener → a real waiting decision → consequence. No staged
  * scenes, no fake continuity — the sequence is what a player would see.
  *
@@ -48,7 +48,7 @@ const advanceTicks = (page: Page, n: number) =>
   page.evaluate((ticks) => (window as TestHooksWindow).__idleVillageTestHooks?.advanceTicks?.(ticks), n);
 
 test('Steam trailer clip: map → planner → send → choice → consequence', async ({ page }) => {
-  await page.goto('/game?capture=1');
+  await page.goto('/gameOld?capture=1');
   await page.waitForFunction(() => window.__idleVillageTestHooks, { timeout: 30_000 });
   /* `?capture=1` hides the Director — reveal the quest offers through the
    *  same seam the «Mostra quest» action drives (R-124: no POI before it). */

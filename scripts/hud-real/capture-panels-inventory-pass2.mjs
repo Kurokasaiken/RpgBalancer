@@ -33,7 +33,7 @@ const main = async () => {
   const page = await browser.newPage({ viewport: { width: VW, height: VH } });
   page.on('console', (m) => { if (m.type() === 'error') console.log('[page]', m.text().slice(0, 140)); });
 
-  await page.goto(`${BASE_URL}/game`);
+  await page.goto(`${BASE_URL}/gameOld`);
   await page.waitForFunction(() => Boolean(window.__idleVillageTestHooks?.expedition?.['poi-goblin']), undefined, { timeout: 45_000 });
   await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), undefined, { timeout: 30_000 }).catch(() => {});
   await page.waitForTimeout(2500);

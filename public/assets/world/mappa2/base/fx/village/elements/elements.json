@@ -2,12 +2,12 @@
   "version": 1,
   "slots": {
     "1": [
-      183,
-      262
+      202,
+      302
     ],
     "2": [
-      395,
-      262
+      413,
+      294
     ]
   },
   "rings": {
@@ -29,19 +29,21 @@
         ]
       }
     },
-    "tower-stone": {
-      "src": "tower-stone.png",
+    "bastion-s1": {
+      "src": "bastion-s1.png",
       "foot": [
-        26.1,
-        78
+        12.8,
+        61
       ],
-      "shadow": {
-        "src": "tower-stone-shadow.png",
-        "foot": [
-          23,
-          31
-        ]
-      }
+      "shadow": null
+    },
+    "bastion-s2": {
+      "src": "bastion-s2.png",
+      "foot": [
+        38.9,
+        80
+      ],
+      "shadow": null
     }
   }
 }

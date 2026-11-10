@@ -1,5 +1,5 @@
 /**
- * gameQuestReveal.spec.ts — R-200 / PLAN-037: on `/game` the authored quest
+ * gameQuestReveal.spec.ts — R-200 / PLAN-037: on `/gameOld` the authored quest
  * offers reveal themselves once the boot veil is gone — one at a time,
  * `questReveal.staggerMs` of wall clock apart (config-first pacing: 1s first
  * entrance, 5s stagger) — and never hide again.
@@ -29,7 +29,7 @@ interface HooksWindow extends Window {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/game');
+  await page.goto('/gameOld');
   /* The expedition sessions mount with the page (before the veil lifts);
    *  waiting on them guarantees the reveal machinery is live. */
   await page.waitForFunction(

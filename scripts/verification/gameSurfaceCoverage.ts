@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * gameSurfaceCoverage — R-232: matrice unità → test → doc per la superficie
- * `/game`, derivata meccanicamente (mai a mano).
+ * `/gameOld`, derivata meccanicamente (mai a mano).
  *
  * Sorgenti:
  *  - unità: partizione di `componentInventory.ts` (dominatori sul grafo
@@ -65,7 +65,7 @@ export interface CoverageReport {
   schema: 'r232-game-surface-coverage/1';
   generated_at: string;
   units: UnitCoverage[];
-  /** Spec e2e che navigano a `/game` — copertura di pagina, non attribuibile a una unità. */
+  /** Spec e2e che navigano a `/gameOld` — copertura di pagina, non attribuibile a una unità. */
   page_level_e2e: string[];
   stats: {
     units: number;
@@ -367,7 +367,7 @@ const cell = (items: string[], empty = '—') => {
 
 export function emitCoverageMd(r: CoverageReport): string {
   const lines: string[] = [
-    '# Game Surface Coverage — `/game`',
+    '# Game Surface Coverage — `/gameOld`',
     '',
     '<!-- GENERATED — do not edit by hand. Regenerate: npm run surface:coverage -->',
     `<!-- coverage-sha256: ${r.content_sha256} -->`,
@@ -382,7 +382,7 @@ export function emitCoverageMd(r: CoverageReport): string {
     `|---|---|---|---|---|---|---|`,
     `| ${r.stats.units} | ${r.stats.ui_components} | ${r.stats.with_unit_tests} | ${r.stats.with_e2e} | ${r.stats.with_docs} | ${r.stats.with_contract} | ${r.stats.zero_coverage} |`,
     '',
-    '## Spec di pagina (navigano a `/game`, copertura trasversale)',
+    '## Spec di pagina (navigano a `/gameOld`, copertura trasversale)',
     '',
     ...r.page_level_e2e.map((f) => `- \`${f}\``),
     '',

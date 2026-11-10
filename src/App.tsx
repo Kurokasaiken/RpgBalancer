@@ -98,6 +98,8 @@ const HudRealRosterPage = lazy(() => import('./pages/hud-real-roster').then(m =>
 const HudLibraryPage = lazy(() => import('./pages/hud-library').then(m => ({ default: m.default })));
 const HudDefectsPage = lazy(() => import('./pages/hud-defects').then(m => ({ default: m.default })));
 const GameFramePixiPage = lazy(() => import('./pages/game-frame-pixi').then(m => ({ default: m.default })));
+// /game (2026-11-10): approved mappa2 + signed HUD surfaces; the previous game page moved to /gameOld.
+const GameMappa2Page = lazy(() => import('./pages/game-mappa2').then(m => ({ default: m.default })));
 const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
@@ -339,6 +341,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/game-frame-pixi';
   const isGamePath =
     typeof window !== 'undefined' && window.location.pathname === '/game';
+  const isGameOldPath =
+    typeof window !== 'undefined' && window.location.pathname === '/gameOld';
   const isSeaEffectLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/sea-effect-lab';
   const isWorldPresentationDirectorPath =
@@ -1119,12 +1123,24 @@ function App() {
     );
   }
 
-  if (isGameFramePixiPath || isGamePath) {
+  if (isGameFramePixiPath || isGameOldPath) {
     return (
       <ErrorBoundary componentName="Game Frame Pixi Page">
         <Suspense fallback={<GameBootScreen phase="manifest" indeterminate />}>
           <GameEntry>
             <GameFramePixiPage />
+          </GameEntry>
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isGamePath) {
+    return (
+      <ErrorBoundary componentName="Game Page">
+        <Suspense fallback={<GameBootScreen phase="manifest" indeterminate />}>
+          <GameEntry>
+            <GameMappa2Page />
           </GameEntry>
         </Suspense>
       </ErrorBoundary>

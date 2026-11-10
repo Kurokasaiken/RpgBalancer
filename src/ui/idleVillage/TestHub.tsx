@@ -223,9 +223,17 @@ const EXTRA_PAGES: TestPageLink[] = [
   {
     id: 'game',
     title: 'Game',
-    description: 'Game Frame su mappa Pixi con quest POI interattiva e Director panel per test/trailer (R-075 v2)',
+    description: 'Mappa2 approvata (10/11) + superfici HUD firmate: tempo, risorse, nav con bussola',
     path: '/game',
     icon: '🎮',
+    status: 'ok',
+  },
+  {
+    id: 'game-old',
+    title: 'Game (old)',
+    description: 'Vecchio Game Frame su mappa Pixi con quest POI interattiva e Director panel per test/trailer (R-075 v2)',
+    path: '/gameOld',
+    icon: '🗺️',
     status: 'ok',
   },
   // Non-kit page: Sea Effect Lab - side-by-side water effect attempts.

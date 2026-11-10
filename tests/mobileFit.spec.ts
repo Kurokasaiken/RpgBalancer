@@ -1,5 +1,5 @@
 /**
- * mobileFit.spec.ts — contratto mobile-fit `/game` (PLAN-083, R-274).
+ * mobileFit.spec.ts — contratto mobile-fit `/gameOld` (PLAN-083, R-274).
  *
  * mobileSmoke suite (viewport portrait 390x844, touch): asserzioni
  * COMPORTAMENTALI sui break osservati nel probe 2026-10-23
@@ -47,7 +47,7 @@ const coverScale = (vw: number, vh: number) =>
 async function bootGame(browser: Browser): Promise<Page> {
   const page = await browser.newPage();
   await page.setViewportSize(MOBILE);
-  await page.goto('/game');
+  await page.goto('/gameOld');
   await page.waitForSelector(CANVAS, { state: 'attached' });
   await page.waitForSelector(BOOT, { state: 'detached' });
   // una volta renderizzato: un frame perché refit() sia applicato
@@ -244,7 +244,7 @@ test.describe('desktopEmitIdentical — PLAN-083', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await page.waitForSelector(CANVAS, { state: 'attached' });
     await page.waitForSelector(BOOT, { state: 'detached' });
     await page.waitForTimeout(300);

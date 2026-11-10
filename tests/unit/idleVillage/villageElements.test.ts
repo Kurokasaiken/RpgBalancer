@@ -14,7 +14,7 @@ describe('villageElementList (R-313 prototype)', () => {
   it('maps slot towers to their canonical feet, per material', () => {
     expect(villageElementList(spec, { tower1: 'wood', tower2: 'stone', elements: [] })).toEqual([
       { kind: 'tower-wood', x: 183, y: 262 },
-      { kind: 'tower-stone', x: 395, y: 262 },
+      { kind: 'bastion-s2', x: 395, y: 262 },
     ]);
   });
 
@@ -26,7 +26,7 @@ describe('villageElementList (R-313 prototype)', () => {
   it('stone towers need the stone wall when the rule is on; wood towers never do', () => {
     const live = { tower1: 'stone' as const, tower2: 'wood' as const, elements: [] };
     expect(villageElementList(spec, live, 'palisade', up).map((e) => e.kind)).toEqual(['tower-wood']);
-    expect(villageElementList(spec, live, 'wall', up).map((e) => e.kind)).toEqual(['tower-stone', 'tower-wood']);
+    expect(villageElementList(spec, live, 'wall', up).map((e) => e.kind)).toEqual(['bastion-s1', 'tower-wood']);
   });
 
   it('upgrade chain: wood → stone, stone only under the wall, nothing above stone', () => {

@@ -58,7 +58,7 @@ test.describe('invasion scene after the confirmation', () => {
   // INV:CTR-game-004.INV-5
   // INV:goblin-invasion-window.INV-1
   test('one goblin at a time, a steady map, and the card folds into a ledger row that stays', async ({ page }) => {
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await page.waitForFunction(() => (window as HooksWindow).__idleVillageTestHooks?.startInvasion, { timeout: 60_000 });
     // Boot + warm-up of the card, as a player would have by the time an invasion arrives.
     await page.waitForTimeout(8_000);

@@ -1,0 +1,61 @@
+{
+  "component": "R5-rail-forms",
+  "jobs": [
+    {
+      "id": "rail-seals",
+      "zone": "roster-rail",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-rail-seals.txt",
+      "out": ".mw/specs/hud-real/roster/gen/rail-seals",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/rail-seals-0.png",
+      "sha16": "639d56500546a472"
+    },
+    {
+      "id": "rail-laurel",
+      "zone": "roster-rail",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-rail-laurel.txt",
+      "out": ".mw/specs/hud-real/roster/gen/rail-laurel",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/rail-laurel-0.png",
+      "sha16": "f25d29d83b171d29"
+    },
+    {
+      "id": "rail-fan",
+      "zone": "roster-rail",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-rail-fan.txt",
+      "out": ".mw/specs/hud-real/roster/gen/rail-fan",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/rail-fan-0.png",
+      "sha16": "21dce08605aac48b"
+    },
+    {
+      "id": "roster-open-final",
+      "zone": "roster-panel",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-roster-open-final.txt",
+      "out": ".mw/specs/hud-real/roster/gen/roster-open-final",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/roster-open-final-0.png",
+      "sha16": "1de25ac6b64ba133"
+    }
+  ]
+}

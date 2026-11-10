@@ -1,0 +1,119 @@
+{
+  "size": [
+    3168,
+    1344
+  ],
+  "base": "base.webp",
+  "layers": [
+    {
+      "id": "house-small-west",
+      "file": "house-small-west.webp",
+      "box": [
+        679,
+        669,
+        464,
+        318
+      ],
+      "source": "painting"
+    },
+    {
+      "id": "hut-far-1",
+      "file": "hut-far-1.webp",
+      "box": [
+        1564,
+        760,
+        200,
+        212
+      ],
+      "source": "painting"
+    },
+    {
+      "id": "lumber",
+      "file": "lumber.webp",
+      "box": [
+        1239,
+        829,
+        390,
+        168
+      ],
+      "source": "added"
+    },
+    {
+      "id": "hut-far-2",
+      "file": "hut-far-2.webp",
+      "box": [
+        1697,
+        716,
+        315,
+        266
+      ],
+      "source": "painting"
+    },
+    {
+      "id": "house-stone-mid",
+      "file": "house-stone-mid.webp",
+      "box": [
+        1917,
+        528,
+        483,
+        474
+      ],
+      "source": "painting"
+    },
+    {
+      "id": "house-thatch-big",
+      "file": "house-thatch-big.webp",
+      "box": [
+        2267,
+        351,
+        765,
+        731
+      ],
+      "source": "painting"
+    },
+    {
+      "id": "house-east-edge",
+      "file": "house-east-edge.webp",
+      "box": [
+        2821,
+        121,
+        347,
+        961
+      ],
+      "source": "painting"
+    },
+    {
+      "id": "chief-house",
+      "file": "chief-house.webp",
+      "box": [
+        925,
+        550,
+        527,
+        437
+      ],
+      "source": "added"
+    },
+    {
+      "id": "inn",
+      "file": "inn.webp",
+      "box": [
+        527,
+        610,
+        716,
+        389
+      ],
+      "source": "added"
+    },
+    {
+      "id": "house-big-west",
+      "file": "house-big-west.webp",
+      "box": [
+        0,
+        279,
+        795,
+        773
+      ],
+      "source": "painting"
+    }
+  ]
+}

@@ -22,7 +22,7 @@ const FRAMES = path.join(RUN_DIR, 'frames');
 
 async function serverUp(): Promise<boolean> {
   try {
-    const r = await fetch(`${BASE}/game`, { method: 'HEAD' });
+    const r = await fetch(`${BASE}/gameOld`, { method: 'HEAD' });
     return r.status < 500;
   } catch {
     return false;
@@ -158,7 +158,7 @@ async function main(): Promise<void> {
       );
     };
 
-    await page.goto(`${BASE}/game`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/gameOld`, { waitUntil: 'domcontentloaded' });
     try {
       await page.waitForFunction(
         () => !!(window as unknown as { __idleVillageTestHooks?: { startInvasion?: () => void } })

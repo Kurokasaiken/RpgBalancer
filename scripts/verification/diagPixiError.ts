@@ -75,7 +75,7 @@ async function main(): Promise<void> {
   const rel = () => `+${Date.now() - t0}ms`;
   const QUICK = process.env.QUICK === '1';
   console.log(rel(), 'goto /game');
-  await page.goto(`${BASE}/game`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE}/gameOld`, { waitUntil: 'domcontentloaded' });
 
   await page.waitForFunction(
     () => !!(window as unknown as { __idleVillageTestHooks?: { startInvasion?: () => void } })
