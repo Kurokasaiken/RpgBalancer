@@ -3183,6 +3183,8 @@
 {"entity":"PLAN-112","kind":"verify-artifact","at":"2026-11-05T13:41:03.729Z","confidence":"low"}
 {"entity":"PLAN-112","kind":"verify-artifact","at":"2026-11-05T14:11:18.654Z","confidence":"low"}
 {"entity":"PLAN-112","kind":"verify-artifact","at":"2026-11-05T15:39:57.869Z","confidence":"low"}
+{"entity":"PLAN-112","kind":"commit","at":"2026-11-08T16:47:09+01:00","cls":"mixed","confidence":"low","meta":"feat(hud-real): Zanara surfaces ported on /hud-compose (PLAN-113/114)"}
+{"entity":"PLAN-112","kind":"plan-created","at":"2026-11-08T16:47:09+01:00","confidence":"high"}
 {"entity":"PLAN-113","kind":"debate","at":"2026-11-06T10:47:50.000Z","confidence":"high","meta":"start","durMs":3290000}
 {"entity":"PLAN-113","kind":"verify-artifact","at":"2026-11-06T10:48:03.914Z","confidence":"low"}
 {"entity":"PLAN-113","kind":"verify-artifact","at":"2026-11-06T10:50:24.331Z","confidence":"low"}
@@ -3199,6 +3201,134 @@
 {"entity":"PLAN-113","kind":"verify-artifact","at":"2026-11-06T11:00:43.071Z","confidence":"low"}
 {"entity":"PLAN-113","kind":"debate","at":"2026-11-06T11:42:40.000Z","confidence":"high","meta":"end"}
 {"entity":"PLAN-113","kind":"stamp-open","at":"2026-11-06T11:48:48.420Z","confidence":"high"}
+{"entity":"PLAN-113","kind":"commit","at":"2026-11-08T16:47:09+01:00","cls":"mixed","confidence":"high","meta":"feat(hud-real): Zanara surfaces ported on /hud-compose (PLAN-113/114)"}
+{"entity":"PLAN-113","kind":"plan-created","at":"2026-11-08T16:47:09+01:00","confidence":"high"}
+{"entity":"PLAN-114","kind":"commit","at":"2026-11-08T16:47:09+01:00","cls":"mixed","confidence":"low","meta":"feat(hud-real): Zanara surfaces ported on /hud-compose (PLAN-113/114)"}
+{"entity":"PLAN-114","kind":"plan-created","at":"2026-11-08T16:47:09+01:00","confidence":"high"}
+{"entity":"PLAN-115","kind":"stamp-open","at":"2026-11-10T16:12:01.478Z","confidence":"high"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:14:27.672Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:16:20.414Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:16:33.979Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:17:13.781Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:17:36.477Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:17:52.646Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:18:05.404Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:18:29.397Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:31:21.835Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:31:38.670Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:31:41.951Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:31:45.673Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:31:49.156Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:31:53.014Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:31:56.511Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:32:48.634Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:16.370Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:19.682Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:23.247Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:26.547Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:30.132Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:34.188Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:47.237Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:50.890Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:54.757Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:33:58.174Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:34:02.012Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:34:05.581Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:34:16.486Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:34:17.256Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:34:18.222Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:34:19.058Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:34:20.001Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:34:21.039Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:35:01.462Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:35:32.602Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:35:34.633Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:35:34.636Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:35:34.780Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:36:12.421Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:36:28.504Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:36:32.384Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:36:36.112Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:36:39.479Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:36:43.328Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:36:46.925Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:36:59.498Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:37:03.118Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:37:07.025Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:37:10.760Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:37:14.764Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:37:19.611Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:37:30.252Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:44:31.327Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:44:52.054Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:44:55.885Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:44:59.940Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:03.893Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:08.009Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:12.589Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:26.898Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:31.339Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:35.098Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:38.565Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:43.289Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:47.090Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:45:55.385Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:49:16.628Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:49:34.509Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:49:47.795Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:49:53.082Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:50:05.339Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:50:09.950Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:50:11.392Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T16:53:23.456Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:04:22.534Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:04:27.719Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:04:32.853Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:04:41.319Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:04:50.925Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:05:08.195Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:05:28.916Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:05:42.416Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:05:43.157Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:14:02.837Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:15:16.626Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:15:27.796Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:15:30.697Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:15:33.989Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:15:43.431Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:15:46.657Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:15:49.989Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:15:52.277Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:19:14.171Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T17:31:16.691Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:14:48.114Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:16:50.588Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:16:58.099Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:30:30.145Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:30:59.959Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:33:05.759Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:33:28.398Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:47:10.445Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:47:21.493Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:47:26.251Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:47:31.920Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:47:35.263Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:47:41.284Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:47:45.482Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:47:45.497Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:48:00.780Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:48:15.549Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:49:08.415Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:49:20.364Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:49:20.444Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:49:20.518Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:49:21.998Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:49:22.020Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:50:48.655Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:50:48.655Z","confidence":"low"}
+{"entity":"PLAN-115","kind":"bundle","at":"2026-11-10T18:52:10.856Z","confidence":"high"}
+{"entity":"PLAN-115","kind":"verify-artifact","at":"2026-11-10T18:52:10.862Z","confidence":"low"}
+{"entity":"PLAN-116","kind":"stamp-open","at":"2026-11-10T19:58:28.187Z","confidence":"high"}
 {"entity":"PLAN-2","kind":"debate","at":"2026-09-10T13:58:42.658Z","confidence":"high","meta":"start","durMs":1037918}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
 {"entity":"PLAN-2","kind":"verify-artifact","at":"2026-09-10T13:58:42.659Z","confidence":"low"}
@@ -4500,33 +4630,6 @@
 {"entity":"R-317","kind":"verify-artifact","at":"2026-11-05T11:22:11.698Z","confidence":"low"}
 {"entity":"R-317","kind":"verify-artifact","at":"2026-11-05T11:22:11.711Z","confidence":"low"}
 {"entity":"R-317","kind":"verify-artifact","at":"2026-11-05T11:22:11.719Z","confidence":"low"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-22T11:57:28Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-22T16:48:59Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-22T19:57:22Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-22T22:53:29Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-23T01:18:15Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-23T06:08:51Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-23T11:39:22Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-23T15:35:18Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-23T19:14:33Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-23T22:22:30Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-24T00:43:17Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-24T05:32:02Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-24T10:29:58Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-24T15:29:07Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-24T19:29:09Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-24T22:43:05Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-25T00:56:02Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-25T06:04:39Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-25T11:46:20Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-25T15:58:20Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-25T19:59:36Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-25T23:16:24Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-26T01:42:49Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-26T06:41:34Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-26T11:51:54Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-26T15:42:55Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
-{"entity":"unattributed","kind":"commit","at":"2026-09-26T18:45:11Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-26T21:38:05Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-26T23:56:10Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}
 {"entity":"unattributed","kind":"commit","at":"2026-09-27T05:06:03Z","cls":"other","confidence":"low","meta":"Coordinator: auto-migrate and dispatch [ci skip]"}

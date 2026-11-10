@@ -23,7 +23,7 @@ type FirstInteractionMarks = { downAt: number; previewAt: number };
 
 /** Apre /game e il pannello roster (shortcut HUD 'r'), pronto alle misure. */
 async function openGameWithRoster(page: Page): Promise<void> {
-  await page.goto('/game');
+  await page.goto('/gameOld');
   await page.waitForSelector('[data-testid="pixi-world-canvas"]', { timeout: 30_000 });
   await page.waitForSelector('[data-testid="game-boot-screen"]', { state: 'detached', timeout: 30_000 });
   await page.keyboard.press('r');

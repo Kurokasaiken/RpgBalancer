@@ -1,6 +1,6 @@
 /**
  * gameVillageView.spec.ts — PLAN-035 (artifact r005, Desiderata v30):
- * the Village view on `/game`.
+ * the Village view on `/gameOld`.
  *
  * Covers the verification contract in `.mw/runs/plan-035-village-view/`:
  *  BV-2  dual entry (nav plinth + painted village region on the Pixi map),
@@ -33,7 +33,7 @@ type HooksWindow = Window & {
 /** Wait for the Pixi map to boot AND the boot-screen overlay to clear —
  *  it keeps intercepting pointer events while assets finish (`data-boot-phase`). */
 const waitForGame = async (page: Page) => {
-  await page.goto('/game');
+  await page.goto('/gameOld');
   await expect(page.locator(`${MAP_LAYER} canvas`).first()).toBeVisible({ timeout: 60_000 });
   await page.waitForFunction(() => Boolean((window as HooksWindow).__pixiApp), undefined, { timeout: 60_000 });
   await page.locator('[data-testid="game-boot-screen"]').waitFor({ state: 'detached', timeout: 60_000 }).catch(async () => {

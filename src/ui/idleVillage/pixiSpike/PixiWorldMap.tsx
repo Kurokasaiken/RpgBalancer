@@ -40,6 +40,7 @@ import { ShoalAdapter } from './ambient/ambientShoal';
 import { Mappa2SeaLifeSchema } from '../config/mappa2SeaLifeConfig';
 import { mountRegionalWeather } from './regionalWeatherOverlay';
 import { mountVillageZone } from './villageZoneOverlay';
+import { DEFAULT_TILE_BUDGET, mountBaseTiles, type TileBudget } from './baseTiles';
 
 /** PLAN-094: deep-merge the lab ambient config over director defaults. */
 const mergeAmbientDirectorConfig = (over?: Partial<AmbientDirectorConfig>): AmbientDirectorConfig => ({
@@ -181,8 +182,38 @@ export interface PixiWorldMapProps {
   mountainShade?: { url: string; opacity: number };
   /** Baked clarity (unsharp-on-L) plate of the northern massif, normal blend over the painting; `opacity` 0-1 blends it in. Director ruling 2026-11-02 fork C. */
   mountainClarity?: { url: string; opacity: number };
-  /** Baked sea grade as two sheets over the painting (multiply + additive stored x2, water only); `opacity` 0-1 blends it in. */
-  seaGrade?: { multUrl: string; addUrl: string; opacity: number };
+  /**
+   * Baked sea grade as two sheets over the painting (multiply + additive, water only); `opacity` 0-1 blends it in.
+   * `addScale` is how the additive sheet is stored: 2 (default) = x2, drawn at alpha 0.5; 1 = stored as is (the
+   * combined /game grade, whose add reaches 0.92 and would clip at x2).
+   */
+  seaGrade?: { multUrl: string; addUrl: string; opacity: number; addScale?: number };
+  /**
+   * GPU-budget options (2026-11-10, /game). Read once at boot. Each one trades a few levels of 8-bit precision in a
+   * map effect for a full-world texture fewer or smaller; the lab omits them and stays on the full-size sources.
+   * - `halfDistanceMasks`: coast/land distance fields at half resolution (`*.half.webp`, smooth fields) for the surf.
+   * - `halfSeaTile`: the open-sea line tile at half resolution (`fx/sea_pattern_tile.half.png`); caustics keep their size.
+   * - `foamBaseFromDisplayed`: the surf re-samples the painting the map actually shows (canopy-free base) instead of
+   *   loading the full `base_flat.webp` a second time.
+   * - `halfFoamMasks` / `halfSeaField` (PLAN-115 mobile profile): the surf plates (`foam_clean`, `foam_strokes`) and the
+   *   packed sea field (`sea_zones`) at half resolution (`*.half.webp`, `scripts/build-mappa2-mobile-assets.py`).
+   */
+  gpuLight?: { halfDistanceMasks?: boolean; halfSeaTile?: boolean; foamBaseFromDisplayed?: boolean; halfFoamMasks?: boolean; halfSeaField?: boolean };
+  /**
+   * PLAN-115: hi-res LAND under the approved overlays (unlike `effects.hiRes`, which hides every other layer). Read once
+   * at boot and only on the canopy path (canopy-free base + swaying cut-outs): `baseFile` replaces
+   * `base_flat.nocanopy.webp` (any resolution — the sprite is sized to the 2752 world), each cut-out loads
+   * `<stem>.canopy<canopySuffix>.webp` (falls back to the 2752 one). `revealSeaFile` (decision D2 b, the sea painted in
+   * the hi-res base): the sea layer loads this file instead of `Mare.webp` and is drawn ONLY while the seabed reveal
+   * is active, so the drag still thins a painted sea of the same colours over the bed. `fullBaseFile`: the base WITH
+   * its trees used when the canopy path is off (reduced motion), so that look matches too.
+   */
+  hiLand?: { baseFile: string; canopySuffix: string; revealSeaFile?: string; fullBaseFile?: string };
+  /**
+   * PLAN-115 F3: hi-res cells streamed over the resident base where the camera magnifies it (`./baseTiles`). Read once
+   * at boot; omitted = no tiles (the map stays on the resident base).
+   */
+  baseTiles?: { manifestUrl: string; budget?: Partial<TileBudget> };
   /**
    * Translucent sea: a seabed (ruins, chests) shows through the water and slides slower than the
    * camera, so panning reads as depth. `opacity` is how much of it shows; `parallax` < 1 is its
@@ -377,6 +408,7 @@ in vec2 vUV;
 out vec4 outColor;
 uniform sampler2D uPattern;
 uniform sampler2D uSeaMask;
+uniform vec4 uSeaSel; // channel that holds the sea mask: .a of sea_mask.webp, or .r of the packed sea_zones.webp
 uniform float uTime;
 uniform vec2 uWorld;
 uniform vec4 uExtent;
@@ -391,7 +423,7 @@ void main() {
   vec2 w = uExtent.xy + vUV * uExtent.zw;
   vec2 maskUV = w / uWorld;
   // Past the painted canvas the mirrored margins are open water all the way.
-  float sea = (maskUV.x < 0.0 || maskUV.y < 0.0 || maskUV.x > 1.0 || maskUV.y > 1.0) ? 1.0 : clamp((texture(uSeaMask, maskUV).a - 0.16) * 1.8, 0.0, 1.0);
+  float sea = (maskUV.x < 0.0 || maskUV.y < 0.0 || maskUV.x > 1.0 || maskUV.y > 1.0) ? 1.0 : clamp((dot(texture(uSeaMask, maskUV), uSeaSel) - 0.16) * 1.8, 0.0, 1.0);
   vec2 offset = vec2(0.0);
   if (uMotion > 0.5 && uMotionPeriod > 0.0) {
     offset = uMotionDir * uMotionAmount * sin(uTime * 6.2831853 / uMotionPeriod);
@@ -474,6 +506,7 @@ in vec2 vUV;
 out vec4 outColor;
 uniform sampler2D uSea;
 uniform sampler2D uSeaMask;
+uniform vec4 uSeaSel; // see SEA_PATTERN_FRAG
 uniform vec4 uExt;
 uniform vec2 uWorld;
 uniform vec3 uDeep;
@@ -494,7 +527,7 @@ void main() {
   // Inside the painted canvas the deep sea only lays a fading veil over open water near the edge, so the two
   // meet in a gradient instead of a rectangle.
   float inner = inside ? min(min(uv.x * uWorld.x, (1.0 - uv.x) * uWorld.x), min(uv.y * uWorld.y, (1.0 - uv.y) * uWorld.y)) : 0.0;
-  float veil = inside ? (1.0 - smoothstep(48.0, uBand, inner)) * clamp((textureLod(uSeaMask, uv, 0.0).a - 0.16) * 1.8, 0.0, 1.0) : 1.0;
+  float veil = inside ? (1.0 - smoothstep(48.0, uBand, inner)) * clamp((dot(textureLod(uSeaMask, uv, 0.0), uSeaSel) - 0.16) * 1.8, 0.0, 1.0) : 1.0;
   if (veil <= 0.001) { outColor = vec4(0.0); return; }
   // Explicit mip 0 everywhere: the uv mapping jumps at the canvas edge, and automatic mip selection there picked a
   // coarser level for one pixel row, drawing a thin dark line.
@@ -540,6 +573,7 @@ uniform sampler2D uBase;
 uniform sampler2D uLand;
 uniform sampler2D uStrokes;
 uniform sampler2D uZones;
+uniform vec4 uZoneSel; // .a of surf_zones.webp, or .g of the packed sea_zones.webp
 uniform vec2 uWorld;
 uniform float uTime;
 uniform float uDMax;
@@ -561,8 +595,8 @@ float waveAmp(float idx, float seg) {
   return k < 4.5 ? mix(0.6, 1.0, hash(vec2(idx, seg) * 0.137)) : 0.15;
 }
 void main() {
-  // Whitelist (masks/surf_zones.webp, alpha): no surf on the snow peaks rising from the sea, nor on inland lakes.
-  float zone = texture(uZones, vUV).a;
+  // Whitelist (masks/surf_zones.webp alpha, or sea_zones.webp G): no surf on the snow peaks rising from the sea, nor on inland lakes.
+  float zone = dot(texture(uZones, vUV), uZoneSel);
   if (zone < 0.004) { outColor = vec4(0.0); return; }
   vec4 t = texture(uDist, vUV);
   vec4 cl = texture(uClean, vUV); // water without the painted surf; alpha = where the surf is painted
@@ -873,6 +907,9 @@ export function PixiWorldMap({
   mountainShade,
   mountainClarity,
   seaGrade,
+  gpuLight,
+  hiLand,
+  baseTiles,
   seabed,
   regions,
   tune: tuneProp,
@@ -894,6 +931,18 @@ export function PixiWorldMap({
   const pack = manifest?.pack;
   const seaMaskUrl = pack ? packAssetUrl(pack.packRoot, pack.maskFiles.sea) : '/assets/atmosphere/terrain/sea_mask.webp';
   const coastDistanceUrl = pack ? packAssetUrl(pack.packRoot, pack.maskFiles.coastDistance) : '/assets/atmosphere/terrain/coast_distance.webp';
+  /* GPU budget (2026-11-10): packs that ship `sea_zones.webp` (R = sea mask alpha, G = surf zones alpha, opaque) let
+   * the sea veil, sea pattern, seabed and coast surf share ONE texture instead of two alpha-only masks. Shaders read
+   * the channel through a selector, so every sample equals the alpha it replaces. Packs without it keep the masks. */
+  const seaZonesUrl = pack?.maskFiles.seaZones ? packAssetUrl(pack.packRoot, pack.maskFiles.seaZones) : null;
+  const seaFieldUrl = seaZonesUrl ? (gpuLight?.halfSeaField ? seaZonesUrl.replace('.webp', '.half.webp') : seaZonesUrl) : seaMaskUrl;
+  const halfSeaTile = Boolean(gpuLight?.halfSeaTile && pack);
+  const seaTileUrl = halfSeaTile && pack ? packAssetUrl(pack.packRoot, 'fx/sea_pattern_tile.half.png') : '/assets/world/wanderlust/base/layers/sea_pattern_tile.png';
+  const halfDistanceMasks = Boolean(gpuLight?.halfDistanceMasks && pack);
+  const foamBaseFromDisplayed = Boolean(gpuLight?.foamBaseFromDisplayed && pack);
+  const seaSel = new Float32Array(seaZonesUrl ? [1, 0, 0, 0] : [0, 0, 0, 1]);
+  /** Byte offset of the sea mask inside an RGBA pixel of `seaFieldUrl` (CPU readers). */
+  const seaFieldByte = seaZonesUrl ? 0 : 3;
   const pointsUrl = pack ? packAssetUrl(pack.packRoot, pack.anchorFiles.points) : '/assets/atmosphere/terrain/points.json';
   const canopyManifestUrl = pack ? undefined : '/assets/world/wanderlust/base/manifest.json';
   const cloudBands = pack?.cloudBands.length ? pack.cloudBands : atmosphereAssets.clouds;
@@ -1063,6 +1112,8 @@ export function PixiWorldMap({
       // ── Base layers (+ mirrored sea margins for the base and sea layers) ──
       /** The painted sea and the deep sea around it: the see-through reveal thins them out as one. */
       const seaSprites: Container[] = [];
+      let seaRevealOnly = false; // PLAN-115 D2 b: sea layer shown only during the seabed reveal
+      let baseSprite: Sprite | null = null; // PLAN-115 F3: the hi-res tiles go right above it
       const seaToneSprites: { base: Sprite; lift: Sprite; opacity: number }[] = [];
       let seaTexture: Texture | null = null;
       const canopySway: { positions?: Float32Array; orig?: Float32Array; buffer?: { update: () => void }; sprite?: Sprite; baseX?: number; baseY?: number; scale: number; phase: number; visibilityBoost: number }[] = [];
@@ -1116,14 +1167,16 @@ export function PixiWorldMap({
           if (fxOn.canopyDetail) {
             tex = await load(layerUrl(manifest.world, `${stem}.canopy.detail.webp`)).catch(() => null);
           }
+          if (!tex && hiLand && !variant) tex = await load(layerUrl(manifest.world, `${stem}.canopy${hiLand.canopySuffix}.webp`)).catch(() => null);
           if (!tex) tex = await load(layerUrl(manifest.world, `${stem}.canopy${variant}.webp`));
           if (disposed) return;
           const r = l.rect;
           const scale = ((r.width / r.sourceWidth) * canvas.width) / tex.width;
           const visibilityBoost = Math.min(2, Math.max(1, Math.sqrt(280000 / (r.width * r.height))));
           if (meshOk) {
-            const colsX = Math.max(6, Math.round(tex.width / 28));
-            const rowsY = Math.max(5, Math.round(tex.height / 28));
+            // grid density in WORLD px, so a 2x (hi-res) cut-out sways exactly like the 2752 one (same as tex px at 1x)
+            const colsX = Math.max(6, Math.round(((r.width / r.sourceWidth) * canvas.width) / 28));
+            const rowsY = Math.max(5, Math.round(((r.height / r.sourceHeight) * canvas.height) / 28));
             const mesh = new MeshPlane({ texture: tex, verticesX: colsX, verticesY: rowsY });
             mesh.position.set((r.x / r.sourceWidth) * canvas.width, (r.y / r.sourceHeight) * canvas.height);
             mesh.scale.set(scale, ((r.height / r.sourceHeight) * canvas.height) / tex.height);
@@ -1154,11 +1207,16 @@ export function PixiWorldMap({
       };
       for (const layer of layers) {
         const swapBase = canopyOn && layer.id === 'base_flat';
-        wantAsset(layerUrl(manifest.world, swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file));
+        if (layer.id === 'sea' && hiLand?.revealSeaFile && !fxOn.hiRes) {
+          // mirrors the build below: the reveal-only sea is fetched only when the seabed can show it
+          if (fxOn.seabed && seabed && seabed.opacity > 0) wantAsset(layerUrl(manifest.world, hiLand.revealSeaFile));
+          continue;
+        }
+        wantAsset(layerUrl(manifest.world, swapBase ? (hiLand && !fxOn.hiRes ? hiLand.baseFile : layer.file.replace('.webp', '.nocanopy.webp')) : hiLand?.fullBaseFile && layer.id === 'base_flat' ? hiLand.fullBaseFile : layer.file));
       }
-      wantAsset(seaMaskUrl);
-      if (fxOn.seaPattern || (fxOn.seabed && (seabed?.opacity ?? 0) > 0)) wantAsset('/assets/world/wanderlust/base/layers/sea_pattern_tile.png');
-      if (fxOn.coastFoam) wantAsset(coastDistanceUrl);
+      wantAsset(seaFieldUrl);
+      if (fxOn.seaPattern || (fxOn.seabed && (seabed?.opacity ?? 0) > 0)) wantAsset(seaTileUrl);
+      if (fxOn.coastFoam) wantAsset(halfDistanceMasks && !fxOn.hiRes ? coastDistanceUrl.replace('.webp', '.half.webp') : coastDistanceUrl);
       if (manifest.pack?.waterfall && manifest.pack.fxAtlases.waterfallFlow) {
         wantAsset(packAssetUrl(manifest.pack.packRoot, manifest.pack.fxAtlases.waterfallFlow));
         if (manifest.pack.fxAtlases.waterfallMist) wantAsset(packAssetUrl(manifest.pack.packRoot, manifest.pack.fxAtlases.waterfallMist));
@@ -1228,8 +1286,14 @@ export function PixiWorldMap({
       const hiRes = fxOn.hiRes === true;
       for (const layer of layers) {
         const swapBase = canopyOn && !hiRes && layer.id === 'base_flat';
-        const fileName = hiRes && layer.id === 'base_flat' ? layer.file.replace('.webp', '.hi.webp') : swapBase ? layer.file.replace('.webp', '.nocanopy.webp') : layer.file;
-        const texture = await load(layerUrl(manifest.world, fileName));
+        const fileName = hiRes && layer.id === 'base_flat'
+          ? layer.file.replace('.webp', '.hi.webp')
+          : swapBase ? (hiLand ? hiLand.baseFile : layer.file.replace('.webp', '.nocanopy.webp'))
+            : hiLand?.fullBaseFile && layer.id === 'base_flat' ? hiLand.fullBaseFile : layer.file;
+        const revealOnlySea = Boolean(hiLand?.revealSeaFile && (canopyOn || hiLand.fullBaseFile) && !hiRes && layer.id === 'sea');
+        // reveal-only sea with no seabed (e.g. touch profile: the Alt glass globe is unreachable) = never drawn: no load
+        const seabedOn = Boolean(fxOn.seabed && seabed && seabed.opacity > 0);
+        const texture = revealOnlySea && !seabedOn ? Texture.EMPTY : await load(layerUrl(manifest.world, revealOnlySea ? hiLand!.revealSeaFile! : fileName));
         if (disposed) return;
         const place = (sprite: Sprite) => {
           const rect = layer.rect;
@@ -1246,7 +1310,12 @@ export function PixiWorldMap({
         };
         const sprite = new Sprite(texture);
         place(sprite);
+        if (layer.id === 'base_flat') baseSprite = sprite;
         if (hiRes && layer.id !== 'base_flat') sprite.visible = false;
+        if (revealOnlySea) {
+          sprite.visible = false; // the hi-res base already paints the sea; this copy only serves the seabed reveal
+          seaRevealOnly = true;
+        }
         world.addChild(sprite);
         if (layer.id === 'sea') {
           const lift = new Sprite(texture);
@@ -1270,6 +1339,26 @@ export function PixiWorldMap({
       buildStep();
 
       const ticks: ((seconds: number) => void)[] = [];
+      // PLAN-115 F3 — after `ticks` exists (the tile logic runs on it); the layer is inserted right above the base anyway.
+      if (baseTiles && baseSprite && !hiRes && canopyOn) { // cells are canopy-free: only under the swaying cut-outs
+        const tiles = await mountBaseTiles({
+          world,
+          base: baseSprite,
+          manifestUrl: baseTiles.manifestUrl,
+          budget: { ...DEFAULT_TILE_BUDGET, ...baseTiles.budget },
+          camera: () => {
+            const c = camRef.current;
+            return c ? { panX: c.panX, panY: c.panY, zoom: c.zoom, screenW: app.screen.width, screenH: app.screen.height, resolution: app.renderer.resolution } : null;
+          },
+          ticks,
+          disposed: () => disposed,
+        }).catch((err: unknown) => {
+          // the tiles are an enhancement: a failure leaves the map on the resident base, never blocks the boot
+          console.error('[PixiWorldMap] base tiles disabled:', err);
+          return null;
+        });
+        if (tiles && import.meta.env.DEV) Object.assign(window as object, { __baseTiles: tiles.stats });
+      }
       const bandLayers: { layer: Container; parallax: number }[] = [];
 
       /* ── Waterfall overlay (PLAN-091): interior-only motion over the painted falls.
@@ -2342,7 +2431,7 @@ export function PixiWorldMap({
         ticks.push(() => {
           const o = Math.min(1, Math.max(0, seaGradeRef.current?.opacity ?? 0));
           mult.alpha = o;
-          add.alpha = 0.5 * o; // the additive sheet is stored x2
+          add.alpha = o / (seaGradeRef.current?.addScale ?? 2); // the additive sheet is stored x addScale
           mult.visible = add.visible = o > 0.001;
         });
       }
@@ -2391,7 +2480,7 @@ export function PixiWorldMap({
       // ── Deep sea around the painted canvas (replaces the mirrored copies of the map) ──
       if (seaTexture && (margin > 0 || marginY > 0) && meshOk) {
         const edge = seaTexture as Texture;
-        const deepSeaMask = await load(seaMaskUrl);
+        const deepSeaMask = await load(seaFieldUrl);
         edge.source.style.addressMode = 'clamp-to-edge';
         // Reach past the pan bounds (±margin): the quad edge is fog-flat and unreachable,
         // so the stage colour can never draw a bright line at the screen border.
@@ -2405,6 +2494,7 @@ export function PixiWorldMap({
             uSea: edge.source,
             uSeaMask: deepSeaMask.source,
             u: {
+              uSeaSel: { value: seaSel, type: 'vec4<f32>' },
               uExt: { value: new Float32Array([extX, extY, extW, extH]), type: 'vec4<f32>' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
               uDeep: { value: hexToRgb01(DEEP_SEA_COLOR), type: 'vec3<f32>' },
@@ -2459,8 +2549,8 @@ export function PixiWorldMap({
           gctx.fillRect(2, 15, 28, 2);
         }
         const glintTexture = Texture.from(glintCanvas);
-        const seaMaskForBed = await load(seaMaskUrl);
-        const causticTexture = await load('/assets/world/wanderlust/base/layers/sea_pattern_tile.png');
+        const seaMaskForBed = await load(seaFieldUrl);
+        const causticTexture = await load(seaTileUrl);
         causticTexture.source.style.addressMode = 'repeat';
         if (disposed) return;
 
@@ -2471,7 +2561,7 @@ export function PixiWorldMap({
         floor.height = extH;
         far.addChild(floor);
         const caustics = new TilingSprite({ texture: causticTexture, width: extW, height: extH });
-        caustics.tileScale.set(1.6);
+        caustics.tileScale.set(halfSeaTile ? 3.2 : 1.6); // same world size whichever tile resolution is loaded
         caustics.tint = 0xfff6d8;
         caustics.alpha = 0.55;
         caustics.blendMode = 'add';
@@ -2520,7 +2610,7 @@ export function PixiWorldMap({
             for (let x = 0; x < maskCanvas.width; x += 1) {
               const i = (y * maskCanvas.width + x) * 4;
               const inside = x >= cx && x < cx + cw && y >= cy && y < cy + ch;
-              const a = inside ? Math.min(255, Math.max(0, (data.data[i + 3] - 40) * 1.8)) : 255;
+              const a = inside ? Math.min(255, Math.max(0, (data.data[i + seaFieldByte] - 40) * 1.8)) : 255;
               data.data[i] = 255;
               data.data[i + 1] = 255;
               data.data[i + 2] = 255;
@@ -2573,6 +2663,7 @@ export function PixiWorldMap({
           bedBox.filters = on && !reducedMotion ? [refraction] : null;
           seaAlpha.alpha = 1 - (1 - clearest) * r.value;
           seaGroup.filters = on ? [seaAlpha] : null;
+          if (seaRevealOnly) for (const sprite of seaSprites) sprite.visible = on;
         });
 
         const depthNear = seabed.parallax;
@@ -2632,9 +2723,9 @@ export function PixiWorldMap({
       buildStep();
       // ── Open-sea pattern (shader) ──
       if (fxOn.seaPattern && meshOk) {
-        const pattern = await load('/assets/world/wanderlust/base/layers/sea_pattern_tile.png');
+        const pattern = await load(seaTileUrl);
         pattern.source.style.addressMode = 'repeat';
-        const seaMask = await load(seaMaskUrl);
+        const seaMask = await load(seaFieldUrl);
         const rad = (seaPatternConfig.motionAngle * Math.PI) / 180;
         const shader = Shader.from({
           gl: { vertex: VERT, fragment: SEA_PATTERN_FRAG },
@@ -2642,6 +2733,7 @@ export function PixiWorldMap({
             uPattern: pattern.source,
             uSeaMask: seaMask.source,
             u: {
+              uSeaSel: { value: seaSel, type: 'vec4<f32>' },
               uTime: { value: 0, type: 'f32' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
               // Same reach as the deep-sea quad (SEA_QUAD_PAD past the pan bounds).
@@ -2824,17 +2916,25 @@ export function PixiWorldMap({
       // ── Coastal foam (shader) ──
       if (fxOn.coastFoam && meshOk) {
         const hiSuf = hiRes ? '.hi' : '';
-        const dist = await load(coastDistanceUrl.replace('.webp', `${hiSuf}.webp`));
+        // distance fields: full / .hi (hi-res base) / .half (gpuLight) — smooth fields, sampled in world px (uWorld)
+        const distSuf = hiRes ? '.hi' : halfDistanceMasks ? '.half' : '';
+        const dist = await load(coastDistanceUrl.replace('.webp', `${distSuf}.webp`));
         // clean plate under the painted surf (pipeline: masks/foam_clean.webp); absent -> the surf just stays put
-        const clean = await load(coastDistanceUrl.replace('coast_distance.webp', `foam_clean${hiSuf}.webp`)).catch(() => null);
+        const foamSuf = hiRes ? '.hi' : gpuLight?.halfFoamMasks ? '.half' : '';
+        const clean = await load(coastDistanceUrl.replace('coast_distance.webp', `foam_clean${foamSuf}.webp`)).catch(() => null);
         // painted base, re-sampled at displaced uv for the flow map (the water itself travels)
-        const baseTex = pack ? await load(packAssetUrl(pack.packRoot, `layers/base_flat${hiSuf}.webp`)).catch(() => null) : null;
+        const displayedBase = hiLand ? `layers/${hiLand.baseFile}` : 'layers/base_flat.nocanopy.webp';
+        const baseFile = foamBaseFromDisplayed && !hiRes && canopyOn ? displayedBase : `layers/base_flat${hiSuf}.webp`;
+        const baseTex = pack ? await load(packAssetUrl(pack.packRoot, baseFile)).catch(() => null) : null;
         // land distance + surf adjacency: the whitewater that climbs the rock faces (pipeline: masks/land_distance.webp)
-        const landDist = await load(coastDistanceUrl.replace('coast_distance.webp', `land_distance${hiSuf}.webp`)).catch(() => null);
+        const landDist = await load(coastDistanceUrl.replace('coast_distance.webp', `land_distance${distSuf}.webp`)).catch(() => null);
         // extracted painted surf strokes — the foam material is the painting itself (pipeline: masks/foam_strokes.webp)
-        const strokes = await load(coastDistanceUrl.replace('coast_distance.webp', `foam_strokes${hiSuf}.webp`)).catch(() => null);
+        const strokes = await load(coastDistanceUrl.replace('coast_distance.webp', `foam_strokes${foamSuf}.webp`)).catch(() => null);
         // where the surf may exist at all (pipeline: masks/surf_zones.webp); absent -> everywhere, as before
-        const zones = await load(coastDistanceUrl.replace('coast_distance.webp', `surf_zones${hiSuf}.webp`)).catch(() => null);
+        const zonesPacked = Boolean(seaZonesUrl) && !hiRes; // the hi-res surf keeps its own .hi zones mask
+        const zones = zonesPacked
+          ? await load(seaFieldUrl)
+          : await load(coastDistanceUrl.replace('coast_distance.webp', `surf_zones${hiSuf}.webp`)).catch(() => null);
         const c = coastFoamConfig;
         const shader = Shader.from({
           gl: { vertex: VERT, fragment: COAST_FOAM_FRAG },
@@ -2846,6 +2946,7 @@ export function PixiWorldMap({
             uStrokes: (strokes ?? Texture.EMPTY).source,
             uZones: (zones ?? Texture.WHITE).source,
             u: {
+              uZoneSel: { value: new Float32Array(zonesPacked ? [0, 1, 0, 0] : [0, 0, 0, 1]), type: 'vec4<f32>' },
               uTime: { value: 0, type: 'f32' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
               uDMax: { value: 160, type: 'f32' },

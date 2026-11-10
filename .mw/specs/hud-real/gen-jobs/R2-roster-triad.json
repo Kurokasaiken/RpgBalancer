@@ -1,0 +1,32 @@
+{
+  "component": "R2-roster-triad",
+  "jobs": [
+    {
+      "id": "roster-alone",
+      "zone": "roster-column",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        ".mw/specs/hud-real/resources/material-strip.png"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-roster-alone.txt",
+      "out": ".mw/specs/hud-real/roster/gen/roster-alone",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/roster-alone-0.png",
+      "sha16": "94a1f005f87e5105"
+    },
+    {
+      "id": "triad-full",
+      "zone": "triad-cluster",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        ".mw/specs/hud-real/resources/material-strip.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-triad.txt",
+      "out": ".mw/specs/hud-real/roster/gen/triad-full",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/triad-full-0.png",
+      "sha16": "c09cc17ee742631d"
+    }
+  ]
+}

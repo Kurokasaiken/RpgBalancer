@@ -1,6 +1,6 @@
 /**
  * gameSettings — the player's settings that have no store of their own
- * (PLAN-076 T-4): audio levels and reduced motion. Language and interface size
+ * (PLAN-076 T-4): audio levels, reduced motion and (PLAN-115 D4) map graphics quality. Language and interface size
  * keep their existing stores (`useLocalization`, `useHudScale`).
  *
  * Levels are 0..1 and sanitised on every write and read; the record persists
@@ -12,15 +12,23 @@ import './reducedMotion.css';
 
 export const GAME_SETTINGS_KEY = 'wanderlust_settings_v1';
 
+/**
+ * Map graphics quality (PLAN-115, Director 2026-11-10 «Sì, nelle impostazioni»): `auto` picks the device tier
+ * (`detectTier`); `high` / `medium` / `low` force the Desktop / Steam Deck / Mobile profile of `mappa2Tiers`.
+ */
+export type MapQuality = 'auto' | 'high' | 'medium' | 'low';
+export const MAP_QUALITIES: readonly MapQuality[] = ['auto', 'high', 'medium', 'low'];
+
 export interface GameSettings {
   master: number;
   effects: number;
   /** In the model and the record, but /game has no music source yet: the panel shows no row for it. */
   music: number;
   reducedMotion: boolean;
+  mapQuality: MapQuality;
 }
 
-export const DEFAULT_GAME_SETTINGS: GameSettings = { master: 1, effects: 1, music: 1, reducedMotion: false };
+export const DEFAULT_GAME_SETTINGS: GameSettings = { master: 1, effects: 1, music: 1, reducedMotion: false, mapQuality: 'auto' };
 
 export interface SettingsIO {
   read: (key: string) => Promise<unknown | null>;
@@ -44,6 +52,7 @@ function sanitize(base: GameSettings, patch: unknown): GameSettings {
     if (typeof value === 'number' && Number.isFinite(value)) next[key] = clamp01(value);
   }
   if (typeof source.reducedMotion === 'boolean') next.reducedMotion = source.reducedMotion;
+  if (typeof source.mapQuality === 'string' && (MAP_QUALITIES as readonly string[]).includes(source.mapQuality)) next.mapQuality = source.mapQuality as MapQuality;
   return next;
 }
 
@@ -59,7 +68,7 @@ function apply(next: GameSettings): void {
   listeners.forEach((fn) => fn());
 }
 
-const same = (a: GameSettings, b: GameSettings) => a.master === b.master && a.effects === b.effects && a.music === b.music && a.reducedMotion === b.reducedMotion;
+const same = (a: GameSettings, b: GameSettings) => a.master === b.master && a.effects === b.effects && a.music === b.music && a.reducedMotion === b.reducedMotion && a.mapQuality === b.mapQuality;
 
 export const getGameSettings = (): GameSettings => current;
 

@@ -1189,7 +1189,15 @@
         "reducedMotion": "Reduced motion",
         "reducedMotionHint": "Fewer animations and fades",
         "reset": "Restore defaults",
-        "appliesNow": "Changes apply immediately."
+        "appliesNow": "Changes apply immediately.",
+        "mapQuality": "Graphics quality",
+        "mapQualityHint": "Map detail and memory use. Auto picks what this device can hold.",
+        "mapQualityOptions": {
+          "auto": "Auto",
+          "high": "High",
+          "medium": "Medium",
+          "low": "Low"
+        }
       },
       "quitConfirm": {
         "title": "Return to the title screen?",

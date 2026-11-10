@@ -21,6 +21,9 @@ scope_files:
   - src/ui/idleVillage/pixiSpike/seabedTexture.ts
 fast_checks:
   - tests/unit/idleVillage/mappa2Stormo.test.ts
+  - tests/unit/idleVillage/baseTiles.test.ts
+  - tests/unit/idleVillage/mappa2ApprovedLook.test.ts
+  - tests/unit/idleVillage/mappa2Tiers.test.ts
   - tests/unit/idleVillage/WorldSurfaceLayerOrder.test.tsx
   - tests/unit/idleVillage/WorldSurfaceRenderer.test.tsx
   - tests/unit/idleVillage/regionOutline.test.ts
@@ -72,6 +75,43 @@ invariants:
       a 6 pose il 2026-11-04, fallback documentato in PLAN-108 rischi).
     test_refs:
       - tests/unit/idleVillage/mappa2Stormo.test.ts
+  - id: pixi-world-map.INV-6
+    source: plan
+    source_ref: PLAN-115
+    statement: >-
+      Un pack che spedisce masks/sea_zones.webp (R = alfa della maschera mare, G = alfa delle zone surf, opaca) fa
+      leggere mare e zone da quella sola texture tramite un selettore di canale in ogni shader e nel fondale; un pack
+      senza torna all'alfa delle due maschere. Ogni campione vale quanto l'alfa che sostituisce (prova A/B 0 px).
+    test_refs:
+      - tests/unit/idleVillage/mappa2ApprovedLook.test.ts
+  - id: pixi-world-map.INV-7
+    source: plan
+    source_ref: PLAN-115
+    statement: >-
+      I tasselli hi-res della base (baseTiles) si montano subito sopra la base residente, solo sul percorso chiome e
+      dopo che `ticks` esiste; un fallimento lascia la mappa sulla base residente senza bloccare il boot. Le celle
+      compaiono solo oltre minScale px fisici per px mondo e restano entro il budget (LRU, mai una cella voluta).
+    test_refs:
+      - tests/unit/idleVillage/baseTiles.test.ts
+  - id: pixi-world-map.INV-8
+    source: plan
+    source_ref: PLAN-115
+    statement: >-
+      `hiLand` sostituisce solo la base e i ritagli chioma lasciando sopra gli strati approvati; il mare solo-fondale
+      non viene né scaricato né caricato quando il fondale è spento; i ritagli 2x ondeggiano come quelli 1x (griglia in
+      px mondo) e ricadono sui 2752 se mancano.
+    test_refs:
+      - tests/unit/idleVillage/mappa2ApprovedLook.test.ts
+      - tests/unit/idleVillage/mappa2Tiers.test.ts
+  - id: pixi-world-map.INV-9
+    source: plan
+    source_ref: PLAN-115
+    statement: >-
+      `seaGrade.addScale` (predefinito 2) rende la coppia di grade del lab invariata e permette la coppia combinata di
+      /game salvata x1; le opzioni `gpuLight` (distanze, tassello mare, base della schiuma, lastre schiuma e campo mare a
+      metà) valgono solo se passate: senza, il renderer carica le sorgenti piene.
+    test_refs:
+      - tests/unit/idleVillage/mappa2ApprovedLook.test.ts
 ---
 # pixi-world-map
 

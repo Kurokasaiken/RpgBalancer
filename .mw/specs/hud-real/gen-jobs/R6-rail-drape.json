@@ -1,0 +1,19 @@
+{
+  "component": "R6-rail-drape",
+  "jobs": [
+    {
+      "id": "rail-drape",
+      "zone": "roster-rail",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        ".mw/specs/hud-real/resources/cassetto-frame.png",
+        ".mw/specs/hud-real/resources/panel-frame.png"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-rail-drape.txt",
+      "out": ".mw/specs/hud-real/roster/gen/rail-drape",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/rail-drape-0.png",
+      "sha16": "c20c9c473f9a430c"
+    }
+  ]
+}

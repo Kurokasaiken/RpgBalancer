@@ -42,7 +42,7 @@ test.describe('PLAN-053 T-006 — journey detail strip in the quest window', () 
 
   test('real launch mounts the three legs and they follow the journal', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/game?capture=1');
+    await page.goto('/gameOld?capture=1');
     await page.waitForFunction(
       (poiId) => Boolean((window as JourneyHooksWindow).__idleVillageTestHooks?.expedition?.[poiId]?.demoLaunch),
       GOBLIN_POI,

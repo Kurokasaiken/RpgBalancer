@@ -1,0 +1,34 @@
+{
+  "component": "R10-garland-tile",
+  "jobs": [
+    {
+      "id": "garland-tile",
+      "zone": "roster-garland-tile",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        ".mw/specs/hud-real/resources/cassetto-frame.png",
+        ".mw/specs/hud-real/roster/gen/rail-laurel-0.png",
+        "public/assets/ui/hud-real/C1/ring-fused.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-garland-tile.txt",
+      "out": ".mw/specs/hud-real/roster/gen/garland-tile",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/garland-tile-0.png",
+      "sha16": "eff3768a24ad9f06"
+    },
+    {
+      "id": "drape-cloth",
+      "zone": "roster-drape",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        ".mw/specs/hud-real/resources/cassetto-frame.png",
+        ".mw/specs/hud-real/resources/panel-frame.png"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-drape-cloth.txt",
+      "out": ".mw/specs/hud-real/roster/gen/drape-cloth",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/drape-cloth-0.png",
+      "sha16": "168792411125ca0e"
+    }
+  ]
+}

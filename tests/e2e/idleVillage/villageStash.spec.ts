@@ -1,6 +1,6 @@
 /**
  * villageStash.spec.ts — PLAN-073 (R-240): the village warehouse as a REAL
- * shared reservation ledger on `/game`.
+ * shared reservation ledger on `/gameOld`.
  *
  *
  * Covered flows: planner-bound interactive shelf (click-assign → first free
@@ -51,7 +51,7 @@ const boxesDisjoint = async (page: Page, selA: string, selB: string) => {
 };
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/game');
+  await page.goto('/gameOld');
   /* A clean ledger per test: the playwright-mode persistence lives in
    * sessionStorage, which survives the goto inside one context. */
   await page.evaluate(() => sessionStorage.removeItem('idleVillage.stashLedger.v1'));

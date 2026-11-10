@@ -1761,3 +1761,24 @@ utenti WebGL; il Director ha imposto verifica-fino-a-verde e landing unica.
 **A:** la catena completa è: `isDetailOpen` (gate di tutta l'assegnazione/eleggibilità/stima) → `wrapDetail:()=>null` (nasconde il dettaglio produzione, la nuova superficie È il dettaglio) → `{session.overlays}` (contiene `DragOutcomeFlight` che scrive `assignments` a volo atterrato — senza, il volo non completa mai) → `<DndContext sensors>` → `data-testid="slot-button-{id}"` (geometria volo) → `data-resident-id` sulle card. Ogni pezzo mancato produce un fallimento silenzioso diverso.
 **Motivo:** il port del cassetto Zanara ha esposto l'intero contratto implicito di montaggio — la sessione è progettata per /game e nessun pezzo documenta che è obbligatorio.
 **Fonte:** `.mw/runs/20261107-hud-cassetto-learn/pattern-candidate.md`
+
+## 2026-11-09 — mockup-signed-is-not-an-asset (learn dalla F3 Zanara)
+
+**Da:** portare una superficie firmata = usare il mockup come `<img>` e coprire il testo dipinto con `<Cover>` opachi — bastava che dati e interazioni fossero reali.
+**A:** un mockup firmato è un CONCEPT (sfondo cucito, testo/widget dipinti). L'asset runtime è un FRAME PULITO: alpha RGBA scontornata al pixel + interni svuotati nell'asset (graft da asset fratelli, fill smalto, inpaint del testo) — zero toppe CSS. Zone misurate con griglia `cv2.line`, pulizia verificata a pixel (`bright-frac`), fit per dimensione vincolante, e "allineato" solo dopo side-by-side col firmato (T-04).
+**Motivo:** tre giri di "toppe" bocciati dal Director (`ritagliato rozzamente`, `inaccettabile`) — la verifica era su dati/interazioni, non sul confronto visivo col firmato.
+**Fonte:** `.mw/runs/2026-11-09-hud-real-f3/pattern-candidate.md` + `.mw/specs/hud-real/MOCKUP-TO-ASSET-GUIDE.md`
+
+## 2026-11-10 — harmonize-object-in-scene-then-reclaim (learn dalla pagina Village)
+
+**Da:** aggiungere un edificio ritagliandolo da un'immagine generata (su verde o da una composizione AI), poi ritoccando bordi e ombre; posizione presa dall'immagine generata e giudicata a occhio.
+**A:** armonizzare l'edificio dentro la scena reale composta (l'AI ridipinge solo edificio e base), riprendere solo edificio+base allineati via ORB sul fondo, misurare la linea di terra del proprio dipinto, verificare dal vivo con confronto all'originale.
+**Motivo:** i ritagli restavano adesivi; l'immagine generata ridipinge fiume e prato, quindi le sue coordinate locali non valgono sul nostro dipinto (spostamento globale ~0 non implica geometria locale coincidente); la verifica sulla sola composizione non basta.
+**Fonte:** `.mw/runs/2026-11-10-village-building-layers/pattern-candidate.md`
+
+## 2026-11-10 — cassetto-colonna-testata-integrata (ruling R-323)
+
+**Da:** cassetto 360 px con la barra risorse appoggiata sopra la testata (due cornici sovrapposte), poi anteprima a 480 px con arte allargata.
+**A:** cassetto = colonna destra a tutta altezza, più stretta (420 px a 1440, 400 a 1280); le risorse diventano targhette nella testata della cornice (la barra perde cornice e medaglione), sotto il titolo il costo della spedizione; CONFIRM con proporzioni native (solo scala uniforme) e aria; ornamenti mai stirati.
+**Motivo:** il Director ha giudicato l'anteprima meno elegante, il fondo ammassato e la testata non legata; tra «risorse dentro la cornice» e «barra sopra, colonna sotto» ha scelto la prima. Regola collegata: critica da senior UI AAA prima di ogni parere o piano HUD/UI.
+**Fonte:** `.mw/runs/20261110-cassetto-explore/visual-fork-cassetto-colonna.md`

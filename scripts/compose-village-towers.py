@@ -18,6 +18,7 @@ ring (diff-driven mask, dilated + feathered), taken from the approved stone
 plates. Towers stand INSIDE the ring (Director 2026-11-02): s1 = west inner,
 s2 = east inner.
 """
+import json
 import json as _json_mod
 import cv2
 import numpy as np
@@ -45,7 +46,14 @@ SRC_DE = (_XR / 95.6) ** 2 + (_YR / 154.9) ** 2
 # Canonical tower feet (plate px), shared by every material and defence.
 # Kept well INSIDE the courtyard (Director: towers at the wall line merge into
 # the ring and read as «half not visible»; these sit in open ground).
-FEET = {1: (183, 262), 2: (395, 262)}  # SRC_DE ≈ 0.73: west/east inner courtyard
+# Slot feet = the painted stone bastions' feet (parts/bastions.json, 2× px → plate px):
+# wood and stone towers share them, so an upgrade stays on the same spot and both sit
+# ON the defence line (Director 2026-11-09: stone towers belong in the wall).
+_B = json.load(open(VIL / 'parts/bastions.json'))
+# The patch foot is the bottom of the painted bastion incl. its grass shadow; the tower body
+# stands ~WOOD_UP px higher, which is where the wood tower must stand to sit ON the line.
+WOOD_UP = 18
+FEET = {int(k): (round(v['foot2x'][0] / 2), round(v['foot2x'][1] / 2) - WOOD_UP) for k, v in _B.items()}
 TOWER_SCALE = {'wood': 0.108, 'stone': 0.14}
 
 GROWTHS = ('cottages', 'straw', 'stone')
@@ -217,7 +225,7 @@ def shadow_sprite(width: float) -> tuple[np.ndarray, tuple[int, int]]:
     return rgba, (foot[0] - x0, foot[1] - y0)
 
 
-def export_elements(rings: dict, kinds: dict[str, tuple[np.ndarray, float]]) -> None:
+def export_elements(rings: dict, kinds: dict[str, tuple[np.ndarray, float]], bastions: dict[str, int]) -> None:
     """R-313 prototype: the same layers this script bakes into plates, exported
     as runtime elements (`fx/village/elements/`): one RGBA per ring, one per
     element kind with its foot anchor + shadow. The plate path is unchanged."""
@@ -234,6 +242,15 @@ def export_elements(rings: dict, kinds: dict[str, tuple[np.ndarray, float]]) -> 
         Image.fromarray(sh, 'RGBA').save(out_dir / f'{kind}-shadow.png')
         spec['kinds'][kind] = {'src': f'{kind}.png', 'foot': [round(foot[0], 1), foot[1]],
                                'shadow': {'src': f'{kind}-shadow.png', 'foot': [int(v) for v in sh_foot]}}
+    for kind, slot in bastions.items():
+        spr = Image.open(VIL / f'parts/bastion-s{slot}.png').convert('RGBA')
+        spr = spr.resize((spr.width // 2, spr.height // 2), Image.LANCZOS)
+        ox, oy = _B[str(slot)]['origin2x']
+        fx, fy = _B[str(slot)]['foot2x']
+        fy -= 2 * WOOD_UP  # element anchor = the slot foot, like the wood tower
+        spr.save(out_dir / f'{kind}.png')
+        # painted-in: the patch carries its own shadow and wall course, no procedural shadow
+        spec['kinds'][kind] = {'src': f'{kind}.png', 'foot': [round(fx / 2 - ox / 2, 1), round(fy / 2 - oy / 2)], 'shadow': None}
     with open(out_dir / 'elements.json', 'w') as f:
         _json_mod.dump(spec, f, indent=2)
     print('elements exported', list(spec['kinds']))
@@ -255,10 +272,18 @@ def main() -> None:
     # out of that repaint with the known silhouette (`parts/tower-stone-int.png`,
     # Gemini-res, ×STONE_INT_SCALE to plate). Gemini left the west one untouched
     # twice, so the east cut is the canonical sprite for both slots.
-    stone_int = load_rgba('parts/tower-stone-int.png')
+    def bastion_layer(slot: int) -> np.ndarray:
+        """Plate-size RGBA of the painted in-wall bastion (cut by cut-village-bastions.py)."""
+        spr = Image.open(VIL / f'parts/bastion-s{slot}.png').convert('RGBA')
+        ox, oy = _B[str(slot)]['origin2x']
+        spr = spr.resize((spr.width // 2, spr.height // 2), Image.LANCZOS)
+        layer = Image.new('RGBA', (510, 390), (0, 0, 0, 0))
+        layer.paste(spr, (ox // 2, oy // 2))
+        return np.array(layer)
 
-    export_elements(rings, {'tower-wood': (towers['wood'], TOWER_SCALE['wood']),
-                            'tower-stone': (stone_int, STONE_INT_SCALE)})
+
+    export_elements(rings, {'tower-wood': (towers['wood'], TOWER_SCALE['wood'])},
+                    {f'bastion-s{k}': k for k in (1, 2)})
 
     def plate(growth: str, defence: str, t1: str, t2: str) -> np.ndarray:
         out = load_rgba(f'{growth}-none-none-none.webp')
@@ -266,8 +291,7 @@ def main() -> None:
             out = over(out, rings[defence])
         for slot, mat in ((1, t1), (2, t2)):
             if mat == 'stone':
-                cast_shadow(out, FEET[slot], stone_int.shape[1] * STONE_INT_SCALE)
-                stamp_foot(out, stone_int, FEET[slot], STONE_INT_SCALE)
+                out = over(out, bastion_layer(slot))
             elif mat != 'none':
                 stamp_foot(out, towers[mat], FEET[slot], TOWER_SCALE[mat])
         return out

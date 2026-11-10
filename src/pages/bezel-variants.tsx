@@ -19,6 +19,10 @@ import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 type BezelPreset = NonNullable<ResidentSlotRackProps['bezelPreset']>;
 
 const PRESET_META: Record<BezelPreset, { name: string; desc: string }> = {
+  zanara: {
+    name: 'ZANARA — PLAN-116 F0',
+    desc: 'Full-width band, short wide claws rooted in the band biting the medallion rim, no bezel gem (lab-only).',
+  },
   stock: {
     name: 'STOCK',
     desc: 'Certified hud64: claws 270/30/150, upper-left rim arc, shadow translate(1.3,1.7).',
@@ -41,7 +45,7 @@ const PRESET_META: Record<BezelPreset, { name: string; desc: string }> = {
   },
 };
 
-const PRESET_ORDER: BezelPreset[] = ['stock', 'a', 'b', 'c', 'ab'];
+const PRESET_ORDER: BezelPreset[] = ['zanara', 'stock', 'a', 'b', 'c', 'ab'];
 
 /** Row labels mirror the planner's marching order (head → tail). */
 const ROW_LABELS = ['TESTA', 'II', 'III', 'CODA'];

@@ -1186,7 +1186,15 @@
         "reducedMotion": "Movimento ridotto",
         "reducedMotionHint": "Meno animazioni e dissolvenze",
         "reset": "Ripristina",
-        "appliesNow": "Le modifiche valgono subito."
+        "appliesNow": "Le modifiche valgono subito.",
+        "mapQuality": "Qualità grafica",
+        "mapQualityHint": "Dettaglio della mappa e memoria usata. Automatica sceglie quella adatta al dispositivo.",
+        "mapQualityOptions": {
+          "auto": "Automatica",
+          "high": "Alta",
+          "medium": "Media",
+          "low": "Bassa"
+        }
       },
       "quitConfirm": {
         "title": "Tornare al titolo?",

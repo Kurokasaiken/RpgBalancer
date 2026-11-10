@@ -1,6 +1,6 @@
 /**
  * r241QuestWorkflow.spec.ts — R-241 integration evidence on the canonical
- * `/game` surface. One live «Sterminio dei goblin» run exercises the five
+ * `/gameOld` surface. One live «Sterminio dei goblin» run exercises the five
  * Director-reported defects end to end:
  *
  *   B1 — choice → CHECK: the theatre ART stays latched on the displayed
@@ -241,7 +241,7 @@ const flushMetrics = async (page: Page, metrics: WorkflowMetrics) => {
 
 test.describe('R-241 — quest workflow on /game', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForHooks(page);
     await page.keyboard.press('r');
     await expect(

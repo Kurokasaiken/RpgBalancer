@@ -133,7 +133,7 @@ const overlaps = (a: Box, b: Box) =>
   !(a.x + a.width <= b.x + 1 || b.x + b.width <= a.x + 1 || a.y + a.height <= b.y + 1 || b.y + b.height <= a.y + 1);
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/game');
+  await page.goto('/gameOld');
   await page.waitForFunction(
     ([g, r]) => {
       const exp = (window as HooksWindow).__idleVillageTestHooks?.expedition;

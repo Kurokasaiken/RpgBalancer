@@ -65,7 +65,7 @@ export interface HarnessCtx {
 const note = (ctx: HarnessCtx, step: string, how: string) => ctx.steps.push({ step, how });
 
 /**
- * Opens `/game` headless and waits for the app-ready signal (expedition hook
+ * Opens `/gameOld` headless and waits for the app-ready signal (expedition hook
  * for `poi`), not a timeout. The GL backend comes from `resolveAngleBackend()`
  * so a software renderer is always declared, never silently assumed.
  */
@@ -113,7 +113,7 @@ export async function openGame({
   /* domcontentloaded (not `load`) + generous timeout: the app-ready poll
    * below owns readiness; on a loaded dev server `load` can wait for slow
    * assets that don't matter to the harness. */
-  await page.goto(`${baseURL}/game`, { waitUntil: 'domcontentloaded', timeout: 90_000 });
+  await page.goto(`${baseURL}/gameOld`, { waitUntil: 'domcontentloaded', timeout: 90_000 });
   /* If a title screen stands between boot and the game, continue through it —
    * the same click the Director makes (input-reale). Polls both conditions so
    * a title-less boot (auto-continue) wastes no time. */

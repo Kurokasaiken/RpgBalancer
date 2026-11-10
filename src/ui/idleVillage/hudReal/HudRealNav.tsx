@@ -14,6 +14,7 @@ import type { GameFrameNavItemConfig } from '@/balancing/config/idleVillage/game
 import { HudGlyph } from '@/ui/idleVillage/components/gameFrame/hudIcons';
 import { HudTooltip } from '@/ui/idleVillage/components/gameFrame/HudTooltip';
 import { NAV_BAR as BAR } from './navBarGeometry';
+import { hudPx } from './hudType';
 
 const ASSET = '/assets/ui/hud-real/nav/bar.webp';
 const C = { gold: '#f1d88a', dim: '#7d8f86', focus: '#e8c766', glow: 'rgba(240, 201, 135, 0.55)' } as const;
@@ -31,6 +32,9 @@ export interface HudRealNavProps {
   activeNavId: string;
   onNavSelect?: (id: string) => void;
   onRecenter: () => void;
+  /** Narrow screens: outer labels move this many design px outwards and inner ones as much towards the compass, so the
+   *  compensated labels never touch (measured 2026-11-10 on 390 px: «Workshop|Tavern», «Villaggio|Mappa»). Default 0. */
+  labelSpread?: number;
 }
 
 /** Socket index per voice: inner sockets first, left and right alternating so the dock stays symmetric. */
@@ -43,7 +47,7 @@ function socketOrder(n: number): number[] {
   return out.sort((a, b) => a - b);
 }
 
-export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter }: HudRealNavProps) {
+export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter, labelSpread = 0 }: HudRealNavProps) {
   const { t } = useTranslation('idleVillage');
   const order = socketOrder(navItems.length);
   const half = BAR.slots.length / 2;
@@ -83,10 +87,13 @@ export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter }: H
       {navItems.slice(0, order.length).map((item, i) => {
         const slot = BAR.slots[order[i]];
         const active = item.id === activeNavId;
+        // outer labels move outwards, inner ones towards the compass (which carries no label): every pair separates
+        const side = order[i] < half ? -1 : 1;
+        const outer = order[i] === 0 || order[i] === BAR.slots.length - 1 ? side : -side;
         return (
           <span key={`l-${item.id}`} aria-hidden="true" style={{
-            position: 'absolute', left: slot.x - 16, top: slot.y + slot.h + 17, width: slot.w + 32, textAlign: 'center', pointerEvents: 'none',
-            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 13, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', whiteSpace: 'nowrap',
+            position: 'absolute', left: slot.x - 16 + outer * labelSpread, top: slot.y + slot.h + 17, width: slot.w + 32, textAlign: 'center', pointerEvents: 'none',
+            fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: hudPx(13), fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', whiteSpace: 'nowrap',
             color: active ? C.gold : item.locked ? C.dim : '#e6dcb8', textShadow: '0 0 4px rgba(2, 18, 22, 1), 0 1px 2px rgba(2, 18, 22, 1), 0 0 8px rgba(2, 18, 22, 0.9)',
           }}>{t(item.labelKey)}</span>
         );

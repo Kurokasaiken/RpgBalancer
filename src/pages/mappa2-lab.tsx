@@ -779,9 +779,9 @@ export default function Mappa2LabPage() {
               </label>
               {villageMode === 'elements' && (
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', margin: '4px 0' }}>
-                  {['tower-wood', 'tower-stone'].map((k) => {
+                  {['tower-wood', 'bastion-s1', 'bastion-s2'].map((k) => {
                     const id = `el:${k}`;
-                    const locked = !towerLevelAllowed(villageManifest?.upgrades, k.replace('tower-', ''), villageDefence);
+                    const locked = !towerLevelAllowed(villageManifest?.upgrades, k.startsWith('bastion') ? 'stone' : 'wood', villageDefence);
                     return (
                       <button
                         key={k}

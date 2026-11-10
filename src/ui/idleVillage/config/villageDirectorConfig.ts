@@ -17,7 +17,7 @@ const villageDirectorAssetsSchema = z.object({
 export type VillageDirectorAssets = z.infer<typeof villageDirectorAssetsSchema>;
 
 export const VILLAGE_DIRECTOR_ASSETS: VillageDirectorAssets = villageDirectorAssetsSchema.parse({
-  basePlate: '/assets/village/base-plate.png',
+  basePlate: '/assets/village/layers/base.webp',
   defaultSprite: '/assets/village/cottage.png',
   sprites: {
     inn: '/assets/village/inn.png',

@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 
 test('probe5: BV-01 exact sequence', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
-  await page.goto('/game');
+  await page.goto('/gameOld');
   await page.waitForFunction(() => Boolean((window as any).__idleVillageTestHooks?.expedition?.['poi-goblin']), null, { timeout: 30_000 });
   const exp = (act: string, ...a: any[]) => page.evaluate(({ act, a }) => (window as any).__idleVillageTestHooks.expedition['poi-goblin'][act](...a), { act, a });
   const run = () => exp('getRun');

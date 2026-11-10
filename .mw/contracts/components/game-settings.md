@@ -38,6 +38,14 @@ invariants:
     statement: Il movimento ridotto è un attributo del documento a cui risponde il foglio di stile
     test_refs:
       - tests/unit/idleVillage/gameSettings.test.ts
+  - id: INV-5
+    source: director-spec
+    source_ref: R-322
+    statement: >-
+      La qualità grafica della mappa (PLAN-115 D4) è un'impostazione: automatica per predefinito, accetta solo
+      automatica/alta/media/bassa (un valore sconosciuto lascia quello di prima) e persiste con le altre
+    test_refs:
+      - tests/unit/idleVillage/gameSettings.test.ts
 ---
 # game-settings
 

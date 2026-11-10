@@ -93,6 +93,16 @@ describe('GameEntry — title screen', () => {
     expect(rows.find((r) => r.slot === 'slot-1')?.state).toBe('ok');
   });
 
+  // INV:game-menu-screens.INV-13 — the screens opened from the title (Settings, Load, New-game confirm) draw ABOVE the title (R-322)
+  it('opens its panels above the title screen, not under it', async () => {
+    render(<GameEntry><div /></GameEntry>);
+    const title = await screen.findByTestId('title-screen');
+    await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.titleScreen.settings' }));
+    await screen.findByTestId('settings-panel');
+    const veil = screen.getByTestId('game-menu-veil');
+    expect(Number(veil.style.zIndex)).toBeGreaterThan(Number(title.style.zIndex));
+  });
+
   // INV:game-menu-screens.INV-9 — «Esci dal gioco» exists only in the desktop app
   it('has no «Esci dal gioco» outside the desktop app', async () => {
     render(<GameEntry><div /></GameEntry>);
@@ -115,6 +125,22 @@ describe('SettingsPanel', () => {
     expect(setLocale).toHaveBeenCalledWith('it-IT');
     await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.settingsPanel.reset' }));
     expect(getGameSettings()).toMatchObject({ master: 1, reducedMotion: false });
+  });
+});
+
+describe('SettingsPanel — Qualità grafica', () => {
+  // INV:game-menu-screens.INV-14 — the map graphics quality is a setting: four choices, applied and stored at once (PLAN-115 D4)
+  it('offers Auto/High/Medium/Low and stores the choice', async () => {
+    render(<SettingsPanel onClose={vi.fn()} />);
+    const group = screen.getByRole('radiogroup', { name: 'gameFrame.menu.settingsPanel.mapQuality' });
+    const radios = Array.from(group.querySelectorAll('[role="radio"]')).map((r) => r.getAttribute('data-map-quality'));
+    expect(radios).toEqual(['auto', 'high', 'medium', 'low']);
+    expect(getGameSettings().mapQuality).toBe('auto');
+    await userEvent.click(screen.getByRole('radio', { name: 'gameFrame.menu.settingsPanel.mapQualityOptions.low' }));
+    expect(getGameSettings().mapQuality).toBe('low');
+    expect(screen.getByRole('radio', { name: 'gameFrame.menu.settingsPanel.mapQualityOptions.low' })).toHaveAttribute('aria-checked', 'true');
+    await userEvent.click(screen.getByRole('button', { name: 'gameFrame.menu.settingsPanel.reset' }));
+    expect(getGameSettings().mapQuality).toBe('auto');
   });
 });
 

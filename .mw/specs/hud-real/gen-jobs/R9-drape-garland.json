@@ -1,0 +1,21 @@
+{
+  "component": "R9-drape-garland",
+  "jobs": [
+    {
+      "id": "drape-garland",
+      "zone": "roster-rail",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        ".mw/specs/hud-real/resources/cassetto-frame.png",
+        ".mw/specs/hud-real/roster/gen/rail-laurel-0.png",
+        "public/assets/ui/hud-real/C1/ring-fused.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-drape-garland.txt",
+      "out": ".mw/specs/hud-real/roster/gen/drape-garland",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/drape-garland-0.png",
+      "sha16": "751da46d6e1de29f"
+    }
+  ]
+}

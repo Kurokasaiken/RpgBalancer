@@ -74,7 +74,7 @@ const verdictOf = (v) => ({
   const openGame = async (w, h) => {
     const page = await browser.newPage();
     await page.setViewport({ width: w, height: h });
-    await page.goto(`${baseUrl}/game?capture=1`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.goto(`${baseUrl}/gameOld?capture=1`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForFunction(() => window.__worldCam != null, { timeout: 45000 });
     return page;
   };

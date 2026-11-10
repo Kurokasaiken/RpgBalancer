@@ -1,6 +1,6 @@
 /**
  * gameQuestLifecycle.spec.ts — R-119: the COMPLETE lifecycle of the quest
- * «Goblin Extermination» on the canonical `/game` surface, validated piece
+ * «Goblin Extermination» on the canonical `/gameOld` surface, validated piece
  * by piece:
  *
  *   map + roster boot → Director «Show quest» (the REAL button) → click the
@@ -521,7 +521,7 @@ test.describe('R-119 — ciclo di vita «Goblin Extermination» su /game', () =>
      *  settle. Il default 120s è strutturalmente stretto per questa
      *  superficie — FullFlow R-183 dichiara 420s per lo stesso percorso. */
     test.setTimeout(300_000);
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForHooks(page);
     /* Panels open closed on every /game entry (PLAN-031 follow-up): summon the
      * roster as a player would before looking for its cards. */

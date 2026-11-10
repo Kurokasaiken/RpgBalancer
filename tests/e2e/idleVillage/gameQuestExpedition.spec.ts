@@ -1,6 +1,6 @@
 /**
  * gameQuestExpedition.spec.ts — PLAN-019-S2.4 T-5: the REAL quest POI flow on
- * `/game`: planning surface → roster → slot assignment → dynamic forecast →
+ * `/gameOld`: planning surface → roster → slot assignment → dynamic forecast →
  * «Invia spedizione» → canonical `QuestRunWindow`, with the D-J/D-K clock
  * contract (halo = elapsed/live-duration, catch-up consumes matured nodes).
  *
@@ -98,7 +98,7 @@ const getClock = (page: Page) =>
 const getRun = (page: Page) => expedition<RunShape | null>(page, 'getRun');
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/game');
+  await page.goto('/gameOld');
   // Wait for the expedition sessions + hooks to be live (canvas/map may lag).
   await page.waitForFunction(
     ([goblin, rovine]) => {

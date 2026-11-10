@@ -28,7 +28,7 @@ const main = async () => {
   const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
   page.on('console', (m) => { if (m.type() === 'error') console.log('[page]', m.text().slice(0, 160)); });
 
-  await page.goto(`${BASE_URL}/game`);
+  await page.goto(`${BASE_URL}/gameOld`);
   await page.waitForFunction(() => {
     const exp = window.__idleVillageTestHooks?.expedition;
     return Boolean(exp && exp['poi-goblin'] && exp['poi-rovine']);

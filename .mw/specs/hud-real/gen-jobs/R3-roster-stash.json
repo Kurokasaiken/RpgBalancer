@@ -1,0 +1,47 @@
+{
+  "component": "R3-roster-stash",
+  "jobs": [
+    {
+      "id": "roster-rail-v2",
+      "zone": "roster-rail",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-roster-alone.txt",
+      "out": ".mw/specs/hud-real/roster/gen/roster-rail-v2",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/roster-rail-v2-0.png",
+      "sha16": "41a9caeb263d6cdb"
+    },
+    {
+      "id": "roster-open",
+      "zone": "roster-panel",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-roster-open.txt",
+      "out": ".mw/specs/hud-real/roster/gen/roster-open",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/roster-open-0.png",
+      "sha16": "037b9381eebbd92e"
+    },
+    {
+      "id": "stash-open",
+      "zone": "stash-panel",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-stash-open.txt",
+      "out": ".mw/specs/hud-real/roster/gen/stash-open",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/stash-open-0.png",
+      "sha16": "eed98455fdaae2db"
+    }
+  ]
+}

@@ -55,10 +55,10 @@ describe('EditorPlaySurface lingua toggle', () => {
   it('IT editing writes the W-03 overlay key, not the manuscript', async () => {
     const onItEdit = vi.fn();
     render(<EditorPlaySurface {...props} lang="IT" onItEdit={onItEdit} />);
-    fireEvent.click(await screen.findByText('Esplorazione'));
-    const input = screen.getByDisplayValue('Esplorazione');
-    fireEvent.change(input, { target: { value: 'Esplorazione!' } });
-    fireEvent.blur(input);
+    const ed = await screen.findByText('Esplorazione');
+    fireEvent.click(ed);
+    ed.textContent = 'Esplorazione!';
+    fireEvent.blur(ed);
     expect(onItEdit).toHaveBeenCalledWith('gob-esplora.title', 'Esplorazione!');
     expect(props.onOpsChange).not.toHaveBeenCalled();
   });

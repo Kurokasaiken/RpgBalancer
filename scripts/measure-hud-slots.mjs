@@ -44,7 +44,7 @@ const measure = (page) => page.evaluate((sels) => {
 
 const browser = await chromium.launch({ args: ['--use-angle=metal', '--enable-gpu'] });
 const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
-await page.goto(`${BASE_URL}/game`);
+await page.goto(`${BASE_URL}/gameOld`);
 await page.waitForFunction(() => Boolean(window.__idleVillageTestHooks?.expedition), undefined, { timeout: 60_000 });
 await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), undefined, { timeout: 30_000 }).catch(() => {});
 await page.waitForTimeout(3000);

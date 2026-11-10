@@ -18,7 +18,7 @@ const main = async () => {
   const browser = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
   page.on('console', (m) => { if (m.type() === 'error') console.log('[page]', m.text().slice(0, 140)); });
-  await page.goto(`${BASE_URL}/game`);
+  await page.goto(`${BASE_URL}/gameOld`);
   await page.waitForFunction((poi) => Boolean(window.__idleVillageTestHooks?.expedition?.[poi]), POI, { timeout: 45_000 });
   await page.waitForFunction(() => !document.querySelector('[data-testid="game-boot-screen"]'), undefined, { timeout: 30_000 }).catch(() => {});
   await page.waitForTimeout(2500);

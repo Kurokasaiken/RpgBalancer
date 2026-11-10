@@ -1,5 +1,5 @@
 /**
- * Catalog driver: land on the title screen. `/game` goes straight into the
+ * Catalog driver: land on the title screen. `/gameOld` goes straight into the
  * game on a plain browser visit (`shouldShowTitle`: only `?title=1`, Tauri,
  * or the post-quit session flag) — so the driver navigates with the request
  * param. Verifies via `title-screen`.

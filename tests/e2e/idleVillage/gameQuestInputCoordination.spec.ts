@@ -110,7 +110,7 @@ test.describe('PLAN-060 — quest window input coordination', () => {
   test.describe.configure({ mode: 'serial' });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForHooks(page);
   });
 

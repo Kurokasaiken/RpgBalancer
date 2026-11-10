@@ -1,6 +1,6 @@
 /**
  * gameQuestCluster.spec.ts — PLAN-043 WS-4 (artifact-r003 §6): the blocking
- * acceptance matrix BV-01..BV-14 on the canonical `/game` surface.
+ * acceptance matrix BV-01..BV-14 on the canonical `/gameOld` surface.
  *
  *   Zero-overlap solver probes (BV-01/03/11), drag-intent reversibility
  *   (BV-02), astrolabe settledIdle park + FPS (BV-04), single-verdict /
@@ -339,7 +339,7 @@ test.describe('PLAN-043 WS-4 — QuestStageCluster BV gates', () => {
   test.beforeEach(async ({ page }) => {
     metricsBag = [];
     metricsEnv = null;
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForHooks(page);
   });
 
@@ -371,7 +371,7 @@ test.describe('PLAN-043 WS-4 — QuestStageCluster BV gates', () => {
     ]) {
       const ctx = await browser.newContext({ viewport: { width: size.w, height: size.h } });
       const page = await ctx.newPage();
-      await page.goto('/game');
+      await page.goto('/gameOld');
       await waitForHooks(page);
       await launchQuest(page);
       await reachWaitingFrontier(page);
@@ -807,7 +807,7 @@ test.describe('PLAN-043 WS-4 — QuestStageCluster BV gates', () => {
       }
     });
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForHooks(page);
     await launchQuest(page);
     await reachWaitingFrontier(page);

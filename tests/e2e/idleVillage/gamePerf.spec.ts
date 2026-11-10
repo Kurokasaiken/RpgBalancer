@@ -1,7 +1,7 @@
 /**
  * gamePerf.spec.ts — the /game performance contract (PLAN-031 T-B4).
  *
- * Loads `/game`, waits for the boot veil to lift, then runs the in-page
+ * Loads `/gameOld`, waits for the boot veil to lift, then runs the in-page
  * gesture suite (`__gamePerf.runSuite()`: scripted map pan, zoom, menu,
  * medal-drag mount) plus a REAL mouse drag on a roster medal — dnd-kit's
  * PointerSensor only activates from trusted input, so the cold-drag path is
@@ -40,7 +40,7 @@ const EVIDENCE_PATH = 'test-results/plan-031-game-perf';
 
 test.describe('/game performance budget (PLAN-031)', () => {
   test('boot and gestures stay inside the perf budget', async ({ page }) => {
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await page.waitForSelector('[data-testid="pixi-world-canvas"]', { timeout: 30_000 });
     await page.waitForSelector('[data-testid="game-boot-screen"]', { state: 'detached', timeout: 30_000 });
 

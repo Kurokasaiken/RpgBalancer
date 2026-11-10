@@ -1,6 +1,6 @@
 /**
  * gameQuestFullFlow.spec.ts — R-183: la quest «Goblin Extermination» giocata
- * su `/game` SOLO con input reali, dall'apparizione del POI fino alla HUD.
+ * su `/gameOld` SOLO con input reali, dall'apparizione del POI fino alla HUD.
  *
  *   Regia F10 → «Show quest» (il POI quest compare sulla mappa)
  *   → click sul marker → planner (POI detail)
@@ -356,7 +356,7 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
     test.setTimeout(420_000);
 
     /* ── 1. Boot: auto-reveal R-200, roster aperto col tasto R ───────── */
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await page.waitForFunction(
       (pid) => Boolean((window as HooksWindow).__idleVillageTestHooks?.expedition?.[pid]),
       POI,
@@ -657,7 +657,7 @@ test.describe('R-183 — quest goblin dal vero su /game (solo input reali)', () 
 
   // INV:CTR-game-007.INV-3
   test('il roster segue il POI detail: si apre se era chiuso e si richiude col detail; se era aperto resta aperto', async ({ page }, info) => {
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await page.waitForFunction(
       (pid) => Boolean((window as HooksWindow).__idleVillageTestHooks?.expedition?.[pid]),
       POI,

@@ -11,6 +11,8 @@ export interface DraftRecord {
   parentRef: string;          // catalog id / candidate id / questId / envelope hash
   parentScenarioHash: string;
   ops: EditorOp[];
+  /** W-03 IT overlay edits (`${nodeId}.${field}` → text) saved with the draft. */
+  overlayEdits?: Record<string, string>;
   savedAt: string;
 }
 

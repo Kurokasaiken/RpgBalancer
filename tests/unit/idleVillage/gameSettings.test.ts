@@ -26,6 +26,21 @@ describe('gameSettings', () => {
     document.documentElement.removeAttribute('data-reduced-motion');
   });
 
+  // INV:game-settings.INV-5 — map graphics quality (PLAN-115 D4): auto by default, only the four values, persisted with the rest
+  it('stores the map graphics quality, rejects unknown values and brings it back after a reload', async () => {
+    const { io, store } = memoryIO();
+    expect(getGameSettings().mapQuality).toBe('auto');
+    setGameSettings({ mapQuality: 'medium' }, io);
+    setGameSettings({ mapQuality: 'ultra' as never }, io);
+    expect(getGameSettings().mapQuality).toBe('medium');
+    expect((store.get(GAME_SETTINGS_KEY) as { mapQuality: string }).mapQuality).toBe('medium');
+    resetGameSettings();
+    await hydrateGameSettings(io);
+    expect(getGameSettings().mapQuality).toBe('medium');
+    await hydrateGameSettings(memoryIO({ [GAME_SETTINGS_KEY]: { mapQuality: 42 } }).io);
+    expect(getGameSettings().mapQuality).toBe(DEFAULT_GAME_SETTINGS.mapQuality);
+  });
+
   // INV:game-settings.INV-1 — levels stay within 0..1 and nonsense falls back to the defaults
   it('clamps levels and ignores invalid values', async () => {
     const { io } = memoryIO();

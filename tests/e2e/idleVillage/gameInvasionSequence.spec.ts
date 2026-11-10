@@ -17,7 +17,7 @@ for (const vp of VIEWPORTS) {
 
     test('BV-1: closed curtains meet at the centre, with no strip of map', async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('/game?capture=1');
+      await page.goto('/gameOld?capture=1');
       await page.waitForFunction(() => (window as HooksWindow).__idleVillageTestHooks?.startInvasion, { timeout: 30_000 });
       await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.startInvasion?.());
       await expect(page.locator('[data-testid="ws-event-shroud"] .ws-event-shroud__half--closed')).toHaveCount(2, { timeout: 5_000 });
@@ -41,7 +41,7 @@ for (const vp of VIEWPORTS) {
     // INV:world-surface-event-card.INV-1
     test('BV-2: the announcement card sits fully inside the viewport, in the middle band', async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('/game?capture=1');
+      await page.goto('/gameOld?capture=1');
       await page.waitForFunction(() => (window as HooksWindow).__idleVillageTestHooks?.startInvasion, { timeout: 30_000 });
       await page.evaluate(() => (window as HooksWindow).__idleVillageTestHooks?.startInvasion?.());
       // The wrapper is 0x0 (it only anchors the card); the visible body is the modal inside it.

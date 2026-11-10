@@ -347,6 +347,8 @@ export const WorldSurfacePackSchema = z
         internalWater: WorldSurfacePackPathSchema,
         coastDistance: WorldSurfacePackPathSchema,
         foam: WorldSurfacePackPathSchema,
+        /** Opaque pack of the two alpha-only masks: R = sea mask, G = surf zones (`scripts/mappa2_sea_zones.py`). */
+        seaZones: WorldSurfacePackPathSchema.optional(),
       })
       .strict(),
     waterfall: WorldSurfacePackWaterfallSchema.optional(),
