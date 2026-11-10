@@ -93,7 +93,7 @@ export const SLOT_VARIANT_SPECS: Record<SlotVariant, SlotVariantSpec> = {
  * byte-identical. Presets other than `stock` are LAB-ONLY: do not pass them
  * from production surfaces until a Director ruling promotes one.
  */
-export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab';
+export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara';
 
 /**
  * Resolved paint knobs for a bezel preset. All values are SVG units of the
@@ -116,6 +116,13 @@ export interface BezelKnobs {
   shadeCenterDeg?: number;
   /** Multiplier on the cavity inset-shadow translates (5,6 / 2.5,3 / 1,1.2). Stock: 1. */
   cavityShadowScale?: number;
+  /** Bezel band stroke width (units). Stock literal: 4 (thin band in the middle of R_BZ_IN..R_BZ_OUT). */
+  ringWidth?: number;
+  /** Claw length / base width (units). Stock: geometry TOOTH_HEIGHT / TOOTH_WIDTH. */
+  toothHeight?: number;
+  toothWidth?: number;
+  /** Hide the bezel's own 6-o'clock gem (the seated medallion carries its gem). */
+  hideGemPointer?: boolean;
 }
 
 export const BEZEL_PRESETS: Record<BezelPreset, BezelKnobs> = {
@@ -148,6 +155,16 @@ export const BEZEL_PRESETS: Record<BezelPreset, BezelKnobs> = {
     shadowOffset: [0, 0.9],
     cavityShadowScale: 0.6,
     rivetAngles: [0, 90, 180, 270],
+  },
+  /** Zanara (PLAN-116 F0, LAB-ONLY until ruled): full-width band, short wide claws rooted in the band's
+   *  inner edge that bite the seated medallion's outer gold rim; the medallion's own gem replaces the pointer. */
+  zanara: {
+    rimMode: 'arc',
+    shadowOffset: [1.3, 1.7],
+    ringWidth: 12,
+    toothHeight: 10,
+    toothWidth: 10,
+    hideGemPointer: true,
   },
 };
 
@@ -337,7 +354,7 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
     const wasPre = wasPreRef.current;
     wasPreRef.current = pre;
     if (!wasPre || pre) return;
-    const retractPx = geometry.TOOTH_HEIGHT + 2;
+    const retractPx = (bezel.toothHeight ?? geometry.TOOTH_HEIGHT) + 2;
     for (const el of toothRefs.current) {
       if (!el || typeof el.animate !== 'function') continue;
       const anim = el.animate(
@@ -346,7 +363,7 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
       );
       anim.onfinish = () => anim.cancel();
     }
-  }, [pre, geometry.TOOTH_HEIGHT]);
+  }, [pre, geometry.TOOTH_HEIGHT, bezel.toothHeight]);
 
   /* Single derivation point: the pre-state presentation override is applied HERE, where the
    * bezel transform / tooth extrusion / slam predicate are computed — the first committed DOM
@@ -387,7 +404,7 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
     >
       {(() => {
         // Use thinner bezel matching HTML reference
-        const ringW = 4; // Fixed width like in HTML
+        const ringW = bezel.ringWidth ?? 4; // stock: fixed width like in HTML
         const R_BZ_MID = (geometry.R_BZ_IN + geometry.R_BZ_OUT) / 2;
         return (
           <>
@@ -521,8 +538,8 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
               const angle = (deg * Math.PI) / 180;
               const x = geometry.R_BZ_IN * Math.cos(angle);
               const y = geometry.R_BZ_IN * Math.sin(angle);
-              const TH = geometry.TOOTH_HEIGHT;
-              const TW = geometry.TOOTH_WIDTH;
+              const TH = bezel.toothHeight ?? geometry.TOOTH_HEIGHT;
+              const TW = bezel.toothWidth ?? geometry.TOOTH_WIDTH;
               const path = `M${-TW/2},0 Q${-TW/2-0.8},${TH*0.12} 0,${TH*0.16} Q${TW/2+0.8},${TH*0.12} ${TW/2},0 L 0.8,${-TH} L -0.8,${-TH} Z`;
               // Local +y (after the group rotation) points away from the slot
               // center: translating by (1-extrusion)*(TH+2) slides the tooth
@@ -1088,7 +1105,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
 
   /* Layer 4: gem pointer at 6 o'clock — the seated counterpart of the dragged
    * token's gem. Painted after the bezel so it sits above the frame. */
-  const gemPointer = resolvedState.medalVisible ? <SlotGemPointer cy={geometry.R_MED_OUT + 4} /> : null;
+  const gemPointer = resolvedState.medalVisible && !bezel.hideGemPointer ? <SlotGemPointer cy={geometry.R_MED_OUT + 4} /> : null;
 
   const seatCycle = (
     /* Layer 3: Bezel + Teeth — keyed SeatCycle subtree (PLAN-043 WS-1 T1.2). */

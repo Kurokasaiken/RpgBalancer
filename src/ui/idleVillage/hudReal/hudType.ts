@@ -19,3 +19,11 @@ export const HUD_TYPE = {
 export const HUD_TYPE_FLOOR_REAL = { caption: 12, secondary: 13, body: 14, name: 16, nameLong: 14, value: 18, title: 20 } as const;
 
 export type HudTypeToken = keyof typeof HUD_TYPE;
+
+/**
+ * A text size that survives the uniform scale of an integral bar (PLAN-112 §28: bars are scaled whole to their slot).
+ * The page that scales a bar by `s` sets `--hud-text-k: 1/s` on its wrapper, so the text renders at its designed px
+ * instead of shrinking with the art (found 2026-11-10 on /game: nav labels 11.4 px, under the 12 px caption floor).
+ * Without the variable the factor is 1: unchanged rendering.
+ */
+export const hudPx = (px: number): string => `calc(${px}px * var(--hud-text-k, 1))`;

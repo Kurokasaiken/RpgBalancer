@@ -1,6 +1,6 @@
 // DEPRECATED (PLAN-054 T-003, 2026-10-19): suite del vecchio harness
 // `/poi-quest-detail-roster-time-clock`, non più superficie canonica.
-// Gli scenari validi su `/game` sono coperti dagli INV di CTR-game-007/008/009
+// Gli scenari validi su `/gameOld` sono coperti dagli INV di CTR-game-007/008/009
 // (mappatura completa in `poi_quest_detail_roster_time_clock_error_registry.md`).
 // Conservata come riferimento storico finché la route esiste.
 import { test, expect, Page } from '@playwright/test';

@@ -40,7 +40,7 @@ const saveArtifact = (testInfo: TestInfo, filename: string, bytes: Buffer) => {
 test.use({ viewport: { width: 1280, height: 800 } });
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/game');
+  await page.goto('/gameOld');
   await page.waitForSelector('[data-testid="game-boot-screen"]', { state: 'detached', timeout: 60_000 });
   await page.waitForFunction(
     (poiId) => Boolean((window as QuestHookWindow).__idleVillageTestHooks?.expedition?.[poiId]),

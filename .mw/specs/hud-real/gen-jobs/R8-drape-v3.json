@@ -1,0 +1,20 @@
+{
+  "component": "R8-drape-v3",
+  "jobs": [
+    {
+      "id": "rail-drape-v3",
+      "zone": "roster-rail",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        ".mw/specs/hud-real/resources/cassetto-frame.png",
+        ".mw/specs/hud-real/roster/gen/rail-laurel-0.png",
+        ".mw/specs/hud-real/roster/gen/rail-drape-v2-0.png"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-rail-drape-v3.txt",
+      "out": ".mw/specs/hud-real/roster/gen/rail-drape-v3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/rail-drape-v3-0.png",
+      "sha16": "42eea5038969eb75"
+    }
+  ]
+}

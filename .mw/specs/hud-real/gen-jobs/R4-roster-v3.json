@@ -1,0 +1,47 @@
+{
+  "component": "R4-roster-v3",
+  "jobs": [
+    {
+      "id": "rail-v3",
+      "zone": "roster-rail",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-rail-v3.txt",
+      "out": ".mw/specs/hud-real/roster/gen/rail-v3",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/rail-v3-0.png",
+      "sha16": "57d743c7a626e82f"
+    },
+    {
+      "id": "roster-open-a",
+      "zone": "roster-panel",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-roster-open-v2a.txt",
+      "out": ".mw/specs/hud-real/roster/gen/roster-open-a",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/roster-open-a-0.png",
+      "sha16": "c08a6efdcab39430"
+    },
+    {
+      "id": "roster-open-b",
+      "zone": "roster-panel",
+      "refs": [
+        ".mw/specs/hud-real/kit/gen/hud-game.png",
+        "public/assets/ui/hud-real/cassetto/frame.webp",
+        "public/assets/ui/hud-real/panel/frame.webp"
+      ],
+      "prompt": ".mw/specs/hud-real/roster/prompt-roster-open-v2b.txt",
+      "out": ".mw/specs/hud-real/roster/gen/roster-open-b",
+      "status": "done",
+      "file": ".mw/specs/hud-real/roster/gen/roster-open-b-0.png",
+      "sha16": "5ef8bd4f3ba87193"
+    }
+  ]
+}

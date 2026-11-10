@@ -1,6 +1,6 @@
 /**
  * Catalog driver: click the VILLAGE nav item so the bottom nav bar shows
- * its active/pressed state on the village surface (`/game` owns the
+ * its active/pressed state on the village surface (`/gameOld` owns the
  * selection via `activeNavId={viewMode}` — the click is the real seam,
  * not a store poke). Verifies via `aria-pressed`, never a blind sleep.
  */

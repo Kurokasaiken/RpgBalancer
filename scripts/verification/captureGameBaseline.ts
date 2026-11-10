@@ -27,7 +27,7 @@ function parseArgs(): Args {
   };
   const [w, h] = get('--viewport', '1366x768').split('x').map(Number);
   return {
-    url: get('--url', 'http://localhost:5173/game'),
+    url: get('--url', 'http://localhost:5173/gameOld'),
     w, h,
     out: path.resolve(get('--out', 'test-results/plan-043/ws5/baseline')),
     settleMs: Number(get('--settle', '6000')),

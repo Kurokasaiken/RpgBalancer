@@ -78,3 +78,6 @@
 {"plan":"PLAN-112","event":"open","at":"2026-11-05T11:45:51.163Z"}
 {"plan":"PLAN-112","event":"open","at":"2026-11-05T12:27:09.578Z"}
 {"plan":"PLAN-113","event":"open","at":"2026-11-06T11:48:48.420Z"}
+{"plan":"PLAN-115","event":"open","at":"2026-11-10T16:12:01.478Z"}
+{"plan":"PLAN-116","event":"open","at":"2026-11-10T19:58:28.187Z"}
+{"plan":"PLAN-115","event":"close","at":"2026-11-10T18:52:10.856Z","kind":"backfill","text":"planForensics: bundle produced_at"}

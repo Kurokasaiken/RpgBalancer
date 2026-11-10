@@ -8,10 +8,13 @@ import { LabCard } from '@/ui/idleVillage/questGenLab/labUi';
 import type { QuestNode } from '@/ui/idleVillage/questS1Lab/questScenario';
 import type { QuestScenario } from '@/balancing/config/idleVillage/quests/questScenario.schema';
 import {
-  applyEditorOp, derive, inboundRefs, resetToParent, undo,
-  type LoadedScenario, type WorkingCopy,
+  applyEditorOp, createWorkingCopy, derive, inboundRefs, resetToParent, undo,
+  type DraftRecord, type LoadedScenario, type WorkingCopy,
 } from '@/ui/idleVillage/questEditor';
 import { loadAuthored, loadFromCandidate, loadFromCatalog } from '@/ui/idleVillage/questEditor/loaders';
+
+/** Strips the `CHECK:` routing prefix — mirrors editorOps' internal stripCheck. */
+const stripCheckT = (t?: string) => (t?.startsWith('CHECK:') ? t.slice(6) : t);
 
 import { GENERATED_CATALOG } from '@/balancing/config/idleVillage/quests/generation/catalog';
 import { CONTENT_OVERLAYS } from '@/balancing/config/idleVillage/quests/questContentLocale';
@@ -27,22 +30,43 @@ export default function QuestEditorPage() {
   const [loaded, setLoaded] = useState<LoadedScenario | null>(null);
   const [wc, setWc] = useState<WorkingCopy | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [jump, setJump] = useState<{ nodeId: string; tick: number } | null>(null);
   const [seed, setSeed] = useState(1);
   const [runStartedAt, setRunStartedAt] = useState(0); // op count at last re-seed
   const [candList, setCandList] = useState<{ id: string }[]>([]);
   const [msg, setMsg] = useState('');
   const [waived, setWaived] = useState<Set<string>>(new Set());
   const [itEdits, setItEdits] = useState<Record<string, string>>({});
-  const [lang, setLang] = useState<'EN' | 'IT'>('EN');
+  const [lang, setLang] = useState<'EN' | 'IT'>('IT');
+  const [pendingDraft, setPendingDraft] = useState<DraftRecord | null>(null);
 
   // Director 2026-10-29: the goblin quest loads by default.
   useEffect(() => { pick(loadAuthored('goblin')); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+
+  // Autosave (R-320): ops + IT overlay notes persist as draft — no manual save.
+  // Salva candidato / Esporta restano per il contenuto approvato.
+  useEffect(() => {
+    if (!wc || !loaded || (!wc.ops.length && !Object.keys(itEdits).length)) return;
+    const t = setTimeout(() => {
+      void saveDraft({ v: 1, ...loaded.parent, ops: [...wc.ops], overlayEdits: itEdits, savedAt: new Date().toISOString() });
+    }, 800);
+    return () => clearTimeout(t);
+  }, [wc, itEdits, loaded]);
 
   const scenario: QuestScenario | null = useMemo(() => (wc ? derive(wc) : null), [wc]);
   const dirty = !!wc && wc.ops.length !== runStartedAt;
 
   const pick = (l: LoadedScenario | null) => {
     setLoaded(l); setWc(l?.workingCopy ?? null); setSelected(null); setRunStartedAt(0); setItEdits(l?.overlayEdits ?? {}); setMsg(l ? `loaded ${l.parent.parentSource}/${l.parent.parentRef}` : 'not found');
+    void loadDraft().then((d) => setPendingDraft(d && l && d.parentRef === l.parent.parentRef ? d : null));
+  };
+
+  const restoreDraft = () => {
+    if (!pendingDraft || !loaded) return;
+    setWc(createWorkingCopy(loaded.workingCopy.base, pendingDraft.ops));
+    setItEdits(pendingDraft.overlayEdits ?? {});
+    setPendingDraft(null);
+    setMsg(`draft ripristinato: ${pendingDraft.ops.length} ops — re-seed per vederlo in play`);
   };
   const mut = (op: Parameters<typeof applyEditorOp>[1], label: string) => {
     if (!wc) return;
@@ -115,29 +139,50 @@ export default function QuestEditorPage() {
         </div>
         {msg && <div className="text-slate-400">{msg}</div>}
 
+        {pendingDraft && (
+          <div className="flex items-center gap-2 rounded border border-sky-500/60 bg-sky-500/10 px-3 py-1.5 text-sky-200">
+            <span>draft trovato: {pendingDraft.ops.length} ops{pendingDraft.overlayEdits && Object.keys(pendingDraft.overlayEdits).length ? ` + ${Object.keys(pendingDraft.overlayEdits).length} note IT` : ''} · {pendingDraft.savedAt.slice(0, 16).replace('T', ' ')}</span>
+            <button className="rounded border border-sky-400/60 px-2 py-0.5" onClick={restoreDraft}>ripristina</button>
+            <button className="rounded border border-slate-600 px-2 py-0.5 text-slate-400" onClick={() => { void clearDraft(); setPendingDraft(null); }}>scarta</button>
+          </div>
+        )}
+
         {scenario && wc && (
           <>
             <LabCard title="① play — run reale (stateful)">
               <EditorPlaySurface snapshot={scenario} workingCopy={wc} onOpsChange={setWc} dirty={dirty} seed={seed}
                 onReseed={(s) => { setSeed(s); setRunStartedAt(wc.ops.length); }} itEdits={itEdits} onItEdit={(k, v) => setItEdits((m) => ({ ...m, [k]: v }))}
-                lang={lang} authoredOverlay={loaded?.overlayQuestId ? CONTENT_OVERLAYS['it-IT']?.[loaded.overlayQuestId] : undefined} onNodeChange={setSelected} />
+                lang={lang} authoredOverlay={loaded?.overlayQuestId ? CONTENT_OVERLAYS['it-IT']?.[loaded.overlayQuestId] : undefined} onNodeChange={setSelected} jumpRequest={jump} />
             </LabCard>
 
             <LabCard title="② scene — ▶ dove sei = cosa editi">
               <div className="flex flex-wrap items-center gap-1">
-                {Object.keys(scenario.nodes).map((id) => (
-                  <button key={id} onClick={() => setSelected(id)}
-                    className={`rounded border px-1.5 py-0.5 ${selected === id ? 'border-amber-400 bg-amber-500/10 text-amber-200' : 'border-slate-600'}`}>
-                    {selected === id ? '▶ ' : ''}{id}
-                  </button>
-                ))}
+                {Object.entries(scenario.nodes).map(([id, n]) => {
+                  const isCheck = (n as QuestNode).kind === 'check';
+                  return (
+                    <button key={id}
+                      onClick={() => { setSelected(id); if (!isCheck) setJump({ nodeId: id, tick: Date.now() }); }}
+                      title={isCheck ? 'nodo check — non una scena: si raggiunge tirando il dado dalla scelta' : undefined}
+                      className={`rounded border px-1.5 py-0.5 ${selected === id ? 'border-amber-400 bg-amber-500/10 text-amber-200' : isCheck ? 'border-dashed border-slate-700 text-slate-500' : 'border-slate-600'}`}>
+                      {selected === id ? '▶ ' : isCheck ? '🎲 ' : ''}{id}
+                    </button>
+                  );
+                })}
                 <button className="rounded border border-dashed border-emerald-500/50 px-1.5 py-0.5 text-emerald-300"
-                  onClick={() => { const id = `nuova-${Object.keys(scenario.nodes).length}`; mut({ kind: 'addNode', node: { id, kind: 'info', title: id, body: '' } as QuestNode }, `+ ${id}`); setSelected(id); }}>+ scena</button>
+                  onClick={() => { const id = `nuova-${Object.keys(scenario.nodes).length}`; mut({ kind: 'addNode', node: { id, kind: 'info', title: id, body: '' } as QuestNode }, `+ ${id}`); setSelected(id); setJump({ nodeId: id, tick: Date.now() }); }}>+ scena</button>
                 {selected && (
                   <button className="rounded border border-red-500/60 px-1.5 py-0.5 text-red-300"
+                    title={inbound.length ? `riassegnazione automatica di ${inbound.length} riferimenti entranti` : 'rimuove la scena'}
                     onClick={() => {
-                      if (inbound.length) { setMsg(`✗ ${inbound.length} riferimenti entranti — riassegna sotto prima di rimuovere`); return; }
-                      mut({ kind: 'removeNode', nodeId: selected }, `− ${selected}`); setSelected(null);
+                      if (!node || !scenario) return;
+                      if (scenario.startNode === selected) { setMsg(`✗ ${selected} è il nodo iniziale — non rimuovibile`); return; }
+                      // Auto-rewire every inbound ref to a safe target: the node's own
+                      // outbound, else the scenario startNode — then remove.
+                      const own = stripCheckT((node as { next?: string }).next) ?? stripCheckT(node.options?.[0]?.next);
+                      const fallback = own && own !== selected && scenario.nodes[own] ? own : scenario.startNode;
+                      const rewires = inbound.map((r) => ({ fromNodeId: r.nodeId, optionIdx: r.optionIdx, to: fallback }));
+                      mut({ kind: 'removeNode', nodeId: selected, rewires }, `− ${selected}${rewires.length ? ` (rewire→${fallback})` : ''}`);
+                      setSelected(null);
                     }}>− scena</button>
                 )}
               </div>

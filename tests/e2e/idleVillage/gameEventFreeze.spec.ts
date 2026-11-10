@@ -22,7 +22,7 @@ test.describe('event theatre', () => {
   test.use({ locale: 'en-US' });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/game?capture=1');
+    await page.goto('/gameOld?capture=1');
     await page.waitForFunction(
       () => {
         const h = (window as HooksWindow).__idleVillageTestHooks;

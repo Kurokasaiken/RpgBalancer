@@ -8,7 +8,7 @@
 import type { TimeContract } from './contracts/hudContracts';
 import { HudTooltip } from '@/ui/idleVillage/components/gameFrame/HudTooltip';
 import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
-import { HUD_TYPE } from './hudType';
+import { HUD_TYPE, hudPx } from './hudType';
 import { TIME_BAR as BAR } from './timeGeometry';
 
 const ASSET = '/assets/ui/hud-real/time/bar.webp';
@@ -38,7 +38,7 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
       <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
       <div style={{
         position: 'absolute', left: f.x + 8, top: f.y, width: f.w - 24, height: f.h, display: 'flex', alignItems: 'center', gap: 8,
-        fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: HUD_TYPE.value, letterSpacing: 1, color: C.text, textShadow: C.shadow, whiteSpace: 'nowrap', overflow: 'hidden',
+        fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: hudPx(HUD_TYPE.value), letterSpacing: 1, color: C.text, textShadow: C.shadow, whiteSpace: 'nowrap', overflow: 'hidden',
       }}>
         <span aria-hidden="true" title={isDayPhase ? 'day' : 'night'} style={{ flex: 'none', width: 12, height: 12, borderRadius: '50%', background: `conic-gradient(${isDayPhase ? C.dayTint : C.nightTint} ${progress * 360}deg, rgba(255,255,255,0.18) 0)`, boxShadow: `0 0 6px ${isDayPhase ? C.glow : 'rgba(150,190,240,0.4)'}` }} />
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{dayLabel}</span>
@@ -55,7 +55,7 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
           return (
             <HudTooltip key={s} label={labels.speed(s)} shortcut={String(i + 1)} side="bottom" wrap>
               <button type="button" role="radio" data-hr-time={`x${s}`} aria-checked={speed.multiplier === s} aria-label={labels.speed(s)} disabled={locked} onClick={() => speed.onChange(s)}
-                style={{ ...pos(i + 1), color: on ? C.gold : C.dim, fontFamily: '"EB Garamond", serif', fontWeight: 700, fontSize: HUD_TYPE.secondary, textShadow: C.shadow, ...ring(on) }}>×{s}</button>
+                style={{ ...pos(i + 1), color: on ? C.gold : C.dim, fontFamily: '"EB Garamond", serif', fontWeight: 700, fontSize: hudPx(HUD_TYPE.secondary), textShadow: C.shadow, ...ring(on) }}>×{s}</button>
             </HudTooltip>
           );
         })}

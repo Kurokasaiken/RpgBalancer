@@ -18,7 +18,7 @@ const MARCH_DAYS = 30;
 
 const boot = async (page: Page) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await page.goto('/game?capture=1');
+  await page.goto('/gameOld?capture=1');
   await page.waitForFunction(() => (window as HooksWindow).__idleVillageTestHooks?.getInvasion, { timeout: 30_000 });
 };
 

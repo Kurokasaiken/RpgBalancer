@@ -1,7 +1,7 @@
 /**
  * SettingsPanel — «Impostazioni» (PLAN-076 T-4, SET-1 A): one plaque, sections
  * in a column. Every row is a real setting that acts immediately: language,
- * audio levels, interface size (desktop app only), reduced motion. The music
+ * audio levels, interface size (desktop app only), reduced motion, map graphics quality (PLAN-115 D4). The music
  * level exists in the model but has no source in /game yet, so it has no row.
  */
 import { useSyncExternalStore, type CSSProperties } from 'react';
@@ -10,7 +10,7 @@ import { GameMenuDialog } from './GameMenuDialog';
 import { MENU_LOCALES } from './menuFlow';
 import { useLocalization } from '@/hooks/useLocalization';
 import { HUD_SCALE_MODES, type HudScaleControl } from '../hudScale';
-import { getGameSettings, resetGameSettings, setGameSettings, subscribeGameSettings } from '../../../state/gameSettings';
+import { getGameSettings, MAP_QUALITIES, resetGameSettings, setGameSettings, subscribeGameSettings } from '../../../state/gameSettings';
 
 export interface SettingsPanelProps {
   onClose: () => void;
@@ -81,6 +81,19 @@ export function SettingsPanel({ onClose, scale }: SettingsPanelProps) {
             </span>
           </div>
         )}
+        <div style={ROW}>
+          <span style={LABEL}>{t('gameFrame.menu.settingsPanel.mapQuality')}</span>
+          <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span data-hud-controls="" role="radiogroup" aria-label={t('gameFrame.menu.settingsPanel.mapQuality')} style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {MAP_QUALITIES.map((id) => (
+                <button key={id} type="button" role="radio" data-map-quality={id} aria-checked={settings.mapQuality === id} aria-pressed={settings.mapQuality === id} onClick={() => setGameSettings({ mapQuality: id })}>
+                  <span>{t(`gameFrame.menu.settingsPanel.mapQualityOptions.${id}`)}</span>
+                </button>
+              ))}
+            </span>
+            <span style={MUTED}>{t('gameFrame.menu.settingsPanel.mapQualityHint')}</span>
+          </span>
+        </div>
         <div style={ROW}>
           <span style={LABEL}>{t('gameFrame.menu.settingsPanel.reducedMotion')}</span>
           <span data-hud-controls="" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

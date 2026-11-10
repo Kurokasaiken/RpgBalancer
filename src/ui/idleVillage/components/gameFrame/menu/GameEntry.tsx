@@ -10,9 +10,11 @@
  */
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 import { TitleScreen } from './TitleScreen';
 import { LoadGamePanel } from './LoadGamePanel';
 import { SettingsPanel } from './SettingsPanel';
+import { MenuDialogLayer } from './GameMenuDialog';
 import { GameMenuConfirm } from './GameMenuConfirm';
 import { consumeShowTitle, pickContinueSlot, shouldShowTitle } from './menuFlow';
 import { isTauriRuntime } from '@/shared/persistence/runtime';
@@ -118,6 +120,9 @@ export function GameEntry({ children }: { children: ReactNode }) {
         onSettings={() => setPanel('settings')}
         onExit={onExit}
       />
+      {/* The title sits on zLayers.boot (40) and the menu dialogs on questCheck (30): opened from the title they drew
+          UNDER it, invisible (found 2026-11-10 verifying PLAN-115 D4). The dialogs portal out, so the layer travels by context. */}
+      <MenuDialogLayer.Provider value={DEFAULT_GAME_FRAME_CONFIG.zLayers.boot + 1}>
       {panel === 'load' && <LoadGamePanel inGame={false} unsaved={false} onClose={() => setPanel(null)} onLoaded={enterGame} />}
       {panel === 'settings' && <SettingsPanel onClose={() => setPanel(null)} />}
       {panel === 'newgame' && (
@@ -131,6 +136,7 @@ export function GameEntry({ children }: { children: ReactNode }) {
           <span>{t('gameFrame.menu.newGame.body', { day: info?.day ?? 0 })}</span>
         </GameMenuConfirm>
       )}
+      </MenuDialogLayer.Provider>
     </>
   );
 }

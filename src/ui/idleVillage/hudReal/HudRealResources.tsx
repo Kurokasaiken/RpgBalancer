@@ -14,6 +14,7 @@ import { HUD_TONE_COLOR } from '@/ui/idleVillage/components/gameFrame/hudTones';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
 import { ZanaraTooltip } from '@/ui/idleVillage/zanara/ZanaraTooltip';
 import { RESOURCES_BAR as BAR } from './resourcesBarGeometry';
+import { hudPx } from './hudType';
 
 const ASSET = '/assets/ui/hud-real/resources/bar.webp';
 
@@ -74,16 +75,16 @@ export function HudRealResources({ items }: HudRealResourcesProps) {
               <div style={{ width: G.icon, height: G.icon, flex: 'none', filter: 'drop-shadow(0 1px 2px rgba(3, 26, 30, 0.85))' }}>{item.icon}</div>
               <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 <span style={{
-                  fontFamily: '"EB Garamond", serif', fontSize: G.valueSize, fontWeight: danger ? 700 : 600, lineHeight: '18px',
+                  fontFamily: '"EB Garamond", serif', fontSize: hudPx(G.valueSize), fontWeight: danger ? 700 : 600, lineHeight: hudPx(18),
                   fontVariantNumeric: 'tabular-nums', color: danger ? HUD_TONE_COLOR.danger : C.value, textShadow: C.shadow,
                   whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4,
                 }}>
                   {compact(item.value)}
-                  {item.max !== undefined && String(item.value).length <= 3 && <span style={{ fontSize: G.labelSize, fontWeight: 500, opacity: 0.8 }}>/{item.max}</span>}
+                  {item.max !== undefined && String(item.value).length <= 3 && <span style={{ fontSize: hudPx(G.labelSize), fontWeight: 500, opacity: 0.8 }}>/{item.max}</span>}
                   {danger && <Hourglass color={toneColor} />}
                 </span>
                 <span style={{
-                  fontFamily: '"EB Garamond", serif', fontSize: G.labelSize, lineHeight: '13px', color: C.label, textShadow: C.shadow,
+                  fontFamily: '"EB Garamond", serif', fontSize: hudPx(G.labelSize), lineHeight: hudPx(13), color: C.label, textShadow: C.shadow,
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 0.4,
                 }}>{item.label}</span>
                 {danger && <span aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, bottom: -3, height: 2, background: toneColor, borderRadius: 1 }} />}

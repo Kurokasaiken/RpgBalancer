@@ -9,7 +9,7 @@ const SLOT_MEMBER = `${POI}:goblin-slot-member-1`;
 const LEADER = 'hero-sir-spaccaculi';
 const MEMBER = 'hero-giggiolillo';
 
-/** Browser seams exposed by the real `/game` expedition session. */
+/** Browser seams exposed by the real `/gameOld` expedition session. */
 interface QuestTestWindow extends Window {
   __idleVillageTestHooks?: {
     expedition?: Record<string, Record<string, (...args: unknown[]) => unknown>>;
@@ -45,7 +45,7 @@ const writeEvidence = (testInfo: TestInfo, name: string, content: Buffer | strin
 test.use({ viewport: { width: 1280, height: 800 } });
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/game');
+  await page.goto('/gameOld');
   await page.waitForSelector('[data-testid="game-boot-screen"]', { state: 'detached', timeout: 60_000 });
   await page.waitForFunction(
     (poiId) => Boolean((window as QuestTestWindow).__idleVillageTestHooks?.expedition?.[poiId]),

@@ -28,6 +28,7 @@ import { HudRealMemorial } from '@/ui/idleVillage/hudReal/HudRealMemorial';
 import { HudRealLevelUp } from '@/ui/idleVillage/hudReal/HudRealLevelUp';
 import { HudRealExpeditionLost } from '@/ui/idleVillage/hudReal/HudRealExpeditionLost';
 import { HudRealAstrolabe } from '@/ui/idleVillage/hudReal/HudRealAstrolabe';
+import { HudRealRosterDrape } from '@/ui/idleVillage/hudReal/HudRealRosterDrape';
 import { dispatchHeroLevelUp } from '@/ui/idleVillage/rosterV2/heroLevelUpEvents';
 import type { QuestRunState } from '@/ui/idleVillage/questS1Lab/questRun';
 import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
@@ -114,7 +115,8 @@ export default function HudComposePage() {
   const [rosterOpenState, setRosterOpenState] = useState(false);
   const [hudHidden, setHudHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [toastOpen, setToastOpen] = useState(true);
+  const [toastOpen] = useState(true);
+  void toastOpen; // toast plaque removed — esito text is Voce's output (Director ruling)
   const hasExplicitView = params.has('view');
   const inView = (id: string) => {
     if (id === 'commands') return true;
@@ -134,16 +136,18 @@ export default function HudComposePage() {
         transform: `scale(${f.scale})`, transformOrigin: 'top left',
       }}>
 
+      {/* Cimiero (armillary crest) — always mounted where the roster family lives;
+          in ?comp=roster it is the piece the drape hangs from. */}
       {inView('roster') && (
-        <>
         <div data-hudslot="crest" style={{ ...place(rects.crest), zIndex: 6, overflow: 'visible' }}>
           <HudRealCrest size={CREST_SIZE} ready={residents.filter((r) => r.status === 'available').length} total={residents.length} open={rosterOpenState} onToggle={() => setRosterOpenState((o) => !o)} />
         </div>
+      )}
+      {inView('roster') && params.get('comp') !== 'roster' && (
         <div data-hudslot="roster" style={{ ...place(rects.roster), zIndex: 4, overflow: 'visible' }}>
           <HudRealRosterColumn residents={residents} height={rects.roster.h}
             selectedResidentId={residents[1]?.id ?? null} />
         </div>
-        </>
       )}
 
       {!isTriad && inView('rosterOpen') && (
@@ -167,7 +171,7 @@ export default function HudComposePage() {
         </div>
       )}
 
-      {inView('resources') && (
+      {inView('resources') && params.get('comp') !== 'cassetto' && (
         <div data-hudslot="resources" style={{ ...place(rects.resources), zIndex: 5 }}>
           {/* original intact bar (395.79x118.86, slot row centre at y=44.3; pendant hangs below the body):
               scale uniformly to slot width, align the slot row on the 56 px slot's centre */}
@@ -237,16 +241,27 @@ export default function HudComposePage() {
 
       {/* PLAN-113/114 family B — the signed cassetto planner (dossier on map, right-edge drawer):
           real ResidentSlotRack ghiera + signed internals (skull risk, journey band, enamel CONFIRM). */}
+      {/* Cassetto — owns the right column; commands + resources slots hidden
+          (Director ruling 2026-11-10); resources incorporated as a top-right band
+          inside the cassetto's space so nothing is separate. The host manages
+          its own drawer geometry. */}
       {params.get('comp') === 'cassetto' && (
-        <div data-hudslot="cassetto" style={{ position: 'absolute', right: 24, top: 92, bottom: 92, width: 330, zIndex: 7 }}>
-          <HudRealCassettoHost />
-        </div>
+        <>
+          <div style={{ position: 'absolute', right: 16, top: 8, zIndex: 8 }}>
+            <div style={{ transform: 'scale(0.8)', transformOrigin: 'top right' }}>
+              <HudRealResources items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />
+            </div>
+          </div>
+          <div data-hudslot="cassetto" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 360, zIndex: 7 }}>
+            <HudRealCassettoHost />
+          </div>
+        </>
       )}
 
       {/* PLAN-113/114 E3 — reliquary: real legacySlotsFor(villageBuildingLevel) + mock picks
           (production semantics: in-memory only), signed 3-column inheritance table. */}
       {params.get('comp') === 'reliquary' && (
-        <div data-hudslot="reliquary" style={{ position: 'absolute', left: 680, top: 160, width: 560, height: 380, zIndex: 7 }}>
+        <div data-hudslot="reliquary" style={{ position: 'absolute', left: 540, top: 180, width: 720, height: 451, zIndex: 7 }}>
           <HudRealReliquary />
         </div>
       )}
@@ -255,7 +270,7 @@ export default function HudComposePage() {
           ?seed=memorial writes lab fixture entries into the store once so the signed visual
           has real-Shape witnesses (kit resident names, fixture level/place/day). */}
       {params.get('comp') === 'memorial' && (
-        <div data-hudslot="memorial" style={{ position: 'absolute', left: 740, top: 92, width: 460, height: 720, zIndex: 7 }}>
+        <div data-hudslot="memorial" style={{ position: 'absolute', left: 520, top: 200, width: 760, height: 420, zIndex: 7 }}>
           <HudRealMemorial />
         </div>
       )}
@@ -263,6 +278,11 @@ export default function HudComposePage() {
       {/* PLAN-113/114 B2 — skill-check astrolabe: the REAL frozen V62 inside the signed
           Zanara furniture. The dial's own palette is its frozen css — internal recolor
           is a separate frozen-kit contract task (flagged in HudRealAstrolabe header). */}
+      {/* PLAN-113/114 R — roster gagliardetto ACCANTONATO (rilievi Director
+          2026-11-10: troppo poco visibile, non centrato come colonna, cimiero sotto
+          non sopra, colori sbagliati — vedi .mw/specs/hud-real/roster/NOTES-rilievi-2026-11-10.md).
+          Il drappo non monta: restano solo cimiero + voce. */}
+
       {params.get('comp') === 'astrolabe' && (
         <div data-hudslot="astrolabe" style={{ position: 'absolute', left: 780, top: 150, width: 420, height: 560, zIndex: 7 }}>
           <HudRealAstrolabe skillName={t('gameFrame.questWindow.checkOverlay.titleSuffix')} stat={62} />
@@ -299,28 +319,8 @@ export default function HudComposePage() {
         </div>
       )}
 
-      {inView('toast') && toastOpen && (
-        <div data-hudslot="toast" role="status" aria-live="polite" style={{ ...place(rects.toast), zIndex: 5 }}>
-          {/* Voce's bust rises above its 96 px slot when anchored at f.H-6 (top at f.H-6-188.6): lift the toast
-              above Voce's real top with an 8 px gap so the two never overlap */}
-          <div style={{
-            position: 'absolute', left: 0,
-            top: ((f.H - 6) - 230.56 * (rects.voce.w / 440) - 8 - rects.toast.h) - rects.toast.y,
-            width: rects.toast.w, height: rects.toast.h,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '8px 14px 8px 30px', boxSizing: 'border-box',
-            background: 'url(/assets/ui/hud-real/voce/frame-320.webp) center / 100% 100% no-repeat',
-            fontFamily: '"EB Garamond", serif', color: '#f3ead0',
-          }}>
-            <div style={{ minWidth: 0, textShadow: '0 1px 2px rgba(3,26,30,.9)' }}>
-              <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 12, letterSpacing: 1, color: '#f0d58c', textTransform: 'uppercase' }}>Esito spedizione</div>
-              <div style={{ fontSize: 15, lineHeight: '18px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Le Cascate di Zanara · Vittoria (+350 Oro)</div>
-            </div>
-            <button type="button" data-hr-toast-close="" aria-label="Chiudi" onClick={() => setToastOpen(false)}
-              style={{ font: '700 13px "EB Garamond", serif', color: '#f0d58c', background: 'rgba(5, 32, 26, 0.85)', border: '1px solid rgba(240, 213, 140, 0.5)', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', padding: 0, flex: 'none', marginLeft: 10 }}>×</button>
-          </div>
-        </div>
-      )}
+      {/* toast removed (Director ruling): the esito plaque was a compose fixture,
+          not a production component — outcome messages come out of Voce itself. */}
 
       {inView('voce') && (
         <div data-hudslot="voce" style={{ ...place(rects.voce), zIndex: 5 }}>
@@ -334,7 +334,7 @@ export default function HudComposePage() {
         </div>
       )}
 
-      {inView('commands') && (
+      {inView('commands') && params.get('comp') !== 'cassetto' && (
         <div data-hudslot="commands" style={{ ...centred(rects.commands, 132, 40), zIndex: 6, display: 'flex', gap: 6 }}>
           {menuOpen && (
             <div role="menu" data-hr-cmd-menu="" style={{
@@ -356,9 +356,86 @@ export default function HudComposePage() {
       )}
 
       </div>
+
+      {/* Surface switcher — the baptized comps live behind ?comp=/?panel= params;
+          this rail makes every signed surface one click away (lab discoverability).
+          Outside the scaled layer: constant size at every zoom. */}
+      <ComposeSwitcher />
+
     </div>
   );
 }
+
+/** The baptized surfaces — every signed/portable comp on this lab page. `params`
+ *  is the query it navigates to; `match` marks the chip active on the current URL. */
+const COMPOSE_SURFACES: ReadonlyArray<{ id: string; label: string; params: string; match: (p: URLSearchParams) => boolean }> = [
+  { id: 'hud', label: 'HUD', params: '', match: (p) => !p.has('comp') && !p.has('panel') },
+  { id: 'triad', label: 'Triade', params: 'comp=triad', match: (p) => p.get('comp') === 'triad' },
+  { id: 'roster', label: 'Roster', params: 'comp=roster', match: (p) => p.get('comp') === 'roster' },
+  { id: 'cassetto', label: 'Cassetto', params: 'comp=cassetto', match: (p) => p.get('comp') === 'cassetto' },
+  { id: 'reliquary', label: 'Reliquario', params: 'comp=reliquary', match: (p) => p.get('comp') === 'reliquary' },
+  { id: 'memorial', label: 'Memoriale', params: 'comp=memorial&seed=memorial', match: (p) => p.get('comp') === 'memorial' },
+  { id: 'levelup', label: 'Level-up', params: 'comp=levelup', match: (p) => p.get('comp') === 'levelup' },
+  { id: 'lost', label: 'Lost', params: 'comp=lost', match: (p) => p.get('comp') === 'lost' },
+  { id: 'astrolabe', label: 'Astrolabio', params: 'comp=astrolabe', match: (p) => p.get('comp') === 'astrolabe' },
+  { id: 'merchant', label: 'Mercante', params: 'panel=merchant', match: (p) => p.get('panel') === 'merchant' },
+  { id: 'ledger', label: 'Ledger', params: 'panel=ledger', match: (p) => p.get('panel') === 'ledger' },
+];
+
+/** Collapsible rail of signed surfaces — a chip per baptized comp, navigates
+ *  preserving the ambient params (view/zoom/n/stress). */
+const ComposeSwitcher: React.FC = () => {
+  const [open, setOpen] = useState(true);
+  const p = new URLSearchParams(window.location.search);
+  const go = (params: string) => {
+    const next = new URLSearchParams(params);
+    /* carry the ambient knobs that aren't comp/panel-specific */
+    for (const k of ['view', 'zoom', 'n', 'stress']) {
+      if (p.has(k) && !next.has(k)) next.set(k, p.get(k)!);
+    }
+    window.location.search = next.toString();
+  };
+  return (
+    <div data-hudswitcher="" style={{ position: 'fixed', left: 10, bottom: 10, zIndex: 3000, display: 'flex', alignItems: 'flex-end', gap: 6 }}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        title="Superfici"
+        style={{
+          width: 34, height: 34, borderRadius: 9, cursor: 'pointer',
+          background: 'linear-gradient(180deg,#143229,#07121a)', border: '1.5px solid #c9a55a',
+          color: '#f0d58c', fontSize: 15, lineHeight: 1,
+        }}
+      >{open ? '×' : '☰'}</button>
+      {open && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 10px', borderRadius: 10, background: 'rgba(7,18,26,.92)', border: '1.5px solid #8a6f35' }}>
+          <div style={{ fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 9.5, letterSpacing: 2.4, color: '#8fb2a2', textTransform: 'uppercase' }}>Superfici</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxWidth: 340 }}>
+            {COMPOSE_SURFACES.map((s) => {
+              const active = s.match(p);
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  data-switcher={s.id}
+                  aria-pressed={active}
+                  onClick={() => go(s.params)}
+                  style={{
+                    fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: 10.5, letterSpacing: 1.2, textTransform: 'uppercase',
+                    padding: '5px 10px', borderRadius: 7, cursor: 'pointer',
+                    color: active ? '#052015' : '#f0d58c',
+                    background: active ? 'linear-gradient(180deg,#2fd4a3,#1fb877)' : 'rgba(20,50,41,.9)',
+                    border: `1px solid ${active ? '#0d5c40' : '#c9a55a88'}`,
+                  }}
+                >{s.label}</button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 /** PLAN-113/114 F1 lab: mounts the signed level-up layer on the REAL presentation bus and
  *  exposes a trigger chip that dispatches a real `hero_levelup_mock` for a real resident —

@@ -104,6 +104,23 @@ invariants:
       chiavi duplicate (un duplicato trasforma in silenzio un'etichetta in un oggetto e manda in crash la pagina)
     test_refs:
       - tests/unit/idleVillage/menuI18n.test.ts
+  - id: game-menu-screens.INV-13
+    source: director-bug
+    source_ref: R-322
+    statement: >-
+      Dalla schermata del titolo i pannelli Impostazioni, Carica e conferma Nuova partita si aprono SOTTO il titolo
+      (dialoghi su zLayers.questCheck 30, titolo su boot 40) e restano invisibili
+    test_refs:
+      - tests/unit/idleVillage/menuScreens.test.tsx
+  - id: game-menu-screens.INV-14
+    source: director-spec
+    source_ref: R-322
+    statement: >-
+      Impostazioni ha la Qualità grafica (Automatica, Alta, Media, Bassa; PLAN-115 D4, «Sì, nelle impostazioni»): la
+      scelta vale subito, si salva con le altre impostazioni e /game carica la mappa con il profilo corrispondente
+    test_refs:
+      - tests/unit/idleVillage/menuScreens.test.tsx
+      - tests/unit/idleVillage/mappa2Tiers.test.ts
 ---
 # game-menu-screens
 

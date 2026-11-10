@@ -3,7 +3,7 @@
  * suite (PLAN-078 T-003).
  *
  * Each fault reproduces a real defect class observed in PLAN-067/071 audits
- * or R-2xx reports. Mutators run inside the live `/game` page before a
+ * or R-2xx reports. Mutators run inside the live `/gameOld` page before a
  * Sentinel pass; the oracle under test must detect them, and the negative
  * controls (unmutated states) must produce zero defect-severity findings.
  *

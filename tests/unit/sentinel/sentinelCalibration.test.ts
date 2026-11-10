@@ -1,7 +1,7 @@
 /**
  * sentinelCalibration — T-003 seeded-fault gate (PLAN-078).
  *
- * Drives a live `/game` surface through the Sentinel oracles with 10 injected
+ * Drives a live `/gameOld` surface through the Sentinel oracles with 10 injected
  * fault classes and 5 negative controls. Acceptance:
  *   - every seeded fault is detected by the expected oracle family;
  *   - negative controls produce only findings that reproduce (FP ≤ 5% —
@@ -46,7 +46,7 @@ const URL_ = process.env.SENTINEL_URL ?? CFG.baseURL;
 
 async function serverReachable(url: string): Promise<boolean> {
   try {
-    const res = await fetch(`${url}/game`, { signal: AbortSignal.timeout(3000) });
+    const res = await fetch(`${url}/gameOld`, { signal: AbortSignal.timeout(3000) });
     return res.ok;
   } catch {
     return false;

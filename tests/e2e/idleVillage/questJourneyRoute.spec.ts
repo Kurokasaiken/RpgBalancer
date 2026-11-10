@@ -44,7 +44,7 @@ test.describe('PLAN-053 T-005 — journey route map overlay', () => {
   // INV:game-frame-pixi.INV-2
   test('real launch fills the selected route and the overlay follows camera pan', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/game?capture=1');
+    await page.goto('/gameOld?capture=1');
     await page.waitForFunction(
       (poiId) => Boolean((window as JourneyHooksWindow).__idleVillageTestHooks?.expedition?.[poiId]?.demoLaunch),
       GOBLIN_POI,

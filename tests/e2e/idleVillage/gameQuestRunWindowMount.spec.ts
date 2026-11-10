@@ -1,6 +1,6 @@
 /**
  * gameQuestRunWindowMount.spec.ts — R-247 regression: the quest run window
- * mounts on `/game` through the canonical `expedition demoLaunch` hook.
+ * mounts on `/gameOld` through the canonical `expedition demoLaunch` hook.
  *
  * Bug it guards: `QuestRunWindow` read `node` and `vwU` before their `const`
  * declarations in the same render (a temporal-dead-zone ReferenceError). Every
@@ -34,7 +34,7 @@ test.describe('R-247 — quest run window mounts via demoLaunch', () => {
       if (/before initialization/.test(err.message)) renderErrors.push(err.message);
     });
 
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await page.waitForFunction(
       (poiId) => Boolean((window as TestHooksWindow).__idleVillageTestHooks?.expedition?.[poiId]),
       POI,

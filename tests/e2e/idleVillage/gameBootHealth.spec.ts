@@ -27,7 +27,7 @@ test.describe('boot health (CTR-game-001)', () => {
   test('the ticker stays alive more than 10s after boot', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForGame(page);
 
     const first = await page.evaluate(() => (window as BootWindow).__pixiApp!.ticker.lastTime);
@@ -40,7 +40,7 @@ test.describe('boot health (CTR-game-001)', () => {
   test('zero pageerror in the observed window', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForGame(page);
     await page.waitForTimeout(2_000);
     expect(errors).toEqual([]);
@@ -48,7 +48,7 @@ test.describe('boot health (CTR-game-001)', () => {
 
   // INV:CTR-game-001.INV-3
   test('the Director wonder button produces one wonder within ~2s', async ({ page }) => {
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForGame(page);
 
     await page.keyboard.press('F10');
@@ -65,7 +65,7 @@ test.describe('boot health (CTR-game-001)', () => {
 
   // INV:CTR-game-001.INV-4
   test('no mounted renderable requires a render pipe the active renderer lacks', async ({ page }) => {
-    await page.goto('/game');
+    await page.goto('/gameOld');
     await waitForGame(page);
 
     const offenders = await page.evaluate(() => {

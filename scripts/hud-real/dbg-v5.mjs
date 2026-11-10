@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({args:['--enable-unsafe-swiftshader']});
+const page = await b.newPage({viewport:{width:1600,height:900}});
+const errs = [];
+page.on('console', m => errs.push(m.type()+': '+m.text().slice(0,400)));
+await page.goto('http://localhost:5173/hud-compose?comp=cassetto&view=narrative',{waitUntil:'domcontentloaded',timeout:30000});
+await page.waitForTimeout(5000);
+const bodyText = await page.evaluate(() => document.body.innerText.slice(0,1500));
+console.log('BODY:', bodyText);
+console.log('CONSOLE:', errs.filter(e=>!e.startsWith('log')).slice(0,8).join('\n---\n'));
+await b.close();

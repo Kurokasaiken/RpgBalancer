@@ -9,6 +9,10 @@ import cv2
 import numpy as np
 from PIL import Image
 
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))  # works under `python -I` too
+from mappa2_sea_zones import pack_sea_zones  # noqa: E402 — sea_mask + surf_zones packed into one texture
+
 WORLD_W = 2752
 WORLD_H = 1536
 D_MAX = 160.0
@@ -1309,6 +1313,7 @@ def main() -> None:
         lakes = np.array(Image.open(out / "masks" / "internal_water_mask.webp").convert("RGBA"))[..., 3] > 127
         zones = build_surf_zones(territory["biome_ids"], territory["biome_index"], lakes)
         save_alpha_mask(zones, out / "masks" / "surf_zones.webp")
+        pack_sea_zones(out / "masks")
         base = np.array(Image.open(out / "layers" / "base_flat.webp").convert("RGB"))
         plate_a = np.array(Image.open(out / "masks" / "foam_clean.webp").convert("RGBA"))[..., 3]
         Image.fromarray(build_foam_strokes(base, plate_a, zones), "RGBA").save(out / "masks" / "foam_strokes.webp", lossless=True, quality=100, method=4)
@@ -1866,6 +1871,7 @@ def main() -> None:
     save_webp_rgba_lossless(np.clip(fill, 0, 255).astype(np.uint8), (foam_a * 255).astype(np.uint8), masks_dir / "foam_clean.webp")
     surf_zones = build_surf_zones(biome_ids, territory["biome_index"], internal_water)
     save_alpha_mask(surf_zones, masks_dir / "surf_zones.webp")
+    pack_sea_zones(masks_dir)  # sea_mask alpha -> R, surf_zones alpha -> G: one texture fewer at runtime
     Image.fromarray(build_foam_strokes(rgb, (foam_a * 255).astype(np.uint8), surf_zones), "RGBA").save(
         masks_dir / "foam_strokes.webp", lossless=True, quality=100, method=4)
 
@@ -2188,6 +2194,7 @@ def main() -> None:
                 "internalWater": "masks/internal_water_mask.webp",
                 "coastDistance": "masks/coast_distance.webp",
                 "foam": "masks/foam_mask.webp",
+                "seaZones": "masks/sea_zones.webp",
             },
             "anchorFiles": {"points": "points.json"},
             "regionIndex": {"idsFile": "region_ids.png", "metadataFile": "regions.json", "biomesFile": "biomes.json"},

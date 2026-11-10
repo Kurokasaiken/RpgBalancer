@@ -61,7 +61,7 @@ export const villageZoneLive = {
 interface VillageElementsSpec {
   slots: Record<string, [number, number]>;
   rings: Record<string, string>;
-  kinds: Record<string, { src: string; foot: [number, number]; shadow: { src: string; foot: [number, number] } }>;
+  kinds: Record<string, { src: string; foot: [number, number]; shadow: { src: string; foot: [number, number] } | null }>;
 }
 
 /** Elements wanted this tick: slot towers from the live selection + free placements. */
@@ -72,7 +72,7 @@ export function villageElementList(spec: Pick<VillageElementsSpec, 'slots'>,
   ([['1', live.tower1], ['2', live.tower2]] as const).forEach(([slot, mat]) => {
     const foot = spec.slots[slot];
     if (!towerLevelAllowed(upgrades, mat, defence)) return;
-    if (mat !== 'none' && foot) out.push({ kind: `tower-${mat}`, x: foot[0], y: foot[1] });
+    if (mat !== 'none' && foot) out.push({ kind: mat === 'stone' ? `bastion-s${slot}` : `tower-${mat}`, x: foot[0], y: foot[1] });
   });
   return out.concat(live.elements);
 }
@@ -153,7 +153,7 @@ export async function mountVillageZone(deps: VillageZoneMountDeps): Promise<Vill
   const spec = await fetchJson<VillageElementsSpec>(packAssetUrl(pack.packRoot, `${elemRoot}elements.json`)).catch(() => null);
   const elemTex = new Map<string, Texture>();
   if (spec) {
-    const files = [...Object.values(spec.rings), ...Object.values(spec.kinds).flatMap((k) => [k.src, k.shadow.src])];
+    const files = [...Object.values(spec.rings), ...Object.values(spec.kinds).flatMap((k) => (k.shadow ? [k.src, k.shadow.src] : [k.src]))];
     await Promise.all(files.map((f) => load(packAssetUrl(pack.packRoot, `${elemRoot}${f}`))
       .then((t) => { elemTex.set(f, t); })
       .catch(() => console.warn('[village-zone] element texture failed', f))));
@@ -184,8 +184,8 @@ export async function mountVillageZone(deps: VillageZoneMountDeps): Promise<Vill
     const node = new Container();
     node.position.set(x, y);
     node.zIndex = y;
-    const shTex = elemTex.get(k.shadow.src);
-    if (shTex) {
+    const shTex = k.shadow ? elemTex.get(k.shadow.src) : null;
+    if (shTex && k.shadow) {
       const sh = new Sprite(shTex);
       sh.position.set(-k.shadow.foot[0], -k.shadow.foot[1]);
       node.addChild(sh);

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import { loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import crypto from 'crypto';
@@ -281,6 +282,60 @@ function mappa2LabDefaultsPlugin(): Plugin {
   };
 }
 
+/**
+ * Dev-only: quest-editor IT→EN auto-translation.
+ *
+ * `POST /__qe-translate` `{texts: string[]}` → `{translations: string[]}`.
+ * The API key stays server-side (`GROQ_API_KEY` from .env via loadEnv) — the
+ * lab page only ever sees this endpoint, never the key. 503 when unconfigured,
+ * 502 on upstream failure; the page degrades to IT-only edits.
+ */
+function questEditorTranslatePlugin(): Plugin {
+  let apiKey: string | undefined;
+  return {
+    name: 'quest-editor-translate',
+    apply: 'serve',
+    configureServer(server) {
+      apiKey = loadEnv(server.config.mode, server.config.root, '').GROQ_API_KEY ?? process.env.GROQ_API_KEY;
+      server.middlewares.use('/__qe-translate', (req, res) => {
+        if (req.method !== 'POST') { res.statusCode = 405; res.end(); return; }
+        let body = '';
+        req.on('data', (c) => { body += c; });
+        req.on('end', () => {
+          void (async () => {
+            try {
+              if (!apiKey) { res.statusCode = 503; res.end(JSON.stringify({ error: 'GROQ_API_KEY missing' })); return; }
+              const { texts } = JSON.parse(body) as { texts?: string[] };
+              if (!Array.isArray(texts) || !texts.length) { res.statusCode = 400; res.end(JSON.stringify({ error: 'texts[] required' })); return; }
+              const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+                body: JSON.stringify({
+                  model: 'openai/gpt-oss-120b',
+                  temperature: 0.2,
+                  response_format: { type: 'json_object' },
+                  messages: [
+                    { role: 'system', content: 'You translate Italian fantasy-RPG quest text into English. Reply with JSON only: {"translations":["...", ...]} — same order, same count as the input array, no commentary. Literary tone, second person ("you"), keep em-dashes and structure.' },
+                    { role: 'user', content: JSON.stringify(texts) },
+                  ],
+                }),
+              });
+              if (!r.ok) { res.statusCode = 502; res.end(JSON.stringify({ error: `upstream ${r.status}` })); return; }
+              const j = await r.json() as { choices?: { message?: { content?: string } }[] };
+              const parsed = JSON.parse(j.choices?.[0]?.message?.content ?? '{}') as { translations?: string[] };
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ translations: parsed.translations ?? [] }));
+            } catch (e) {
+              res.statusCode = 502;
+              res.end(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }));
+            }
+          })();
+        });
+      });
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -346,6 +401,7 @@ export default defineConfig(({ mode }) => ({
     seaPatternDefaultsPlugin(),
     hudTuningDefaultsPlugin(),
     mappa2LabDefaultsPlugin(),
+    questEditorTranslatePlugin(),
     ...(process.env.GUARDIAN_BUILD_STATS === 'true' ? [guardianStatsPlugin()] : [])
   ],
   resolve: {
