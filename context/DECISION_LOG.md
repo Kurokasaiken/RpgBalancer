@@ -1782,3 +1782,42 @@ utenti WebGL; il Director ha imposto verifica-fino-a-verde e landing unica.
 **A:** cassetto = colonna destra a tutta altezza, più stretta (420 px a 1440, 400 a 1280); le risorse diventano targhette nella testata della cornice (la barra perde cornice e medaglione), sotto il titolo il costo della spedizione; CONFIRM con proporzioni native (solo scala uniforme) e aria; ornamenti mai stirati.
 **Motivo:** il Director ha giudicato l'anteprima meno elegante, il fondo ammassato e la testata non legata; tra «risorse dentro la cornice» e «barra sopra, colonna sotto» ha scelto la prima. Regola collegata: critica da senior UI AAA prima di ogni parere o piano HUD/UI.
 **Fonte:** `.mw/runs/20261110-cassetto-explore/visual-fork-cassetto-colonna.md`
+
+## 2026-11-11 — Due famiglie di opportunità sulla mappa (OPEN-026, parziale)
+
+**Da:** proposta esterna (ChatGPT) di tre categorie sulla mappa — quest (storia), job (incarico), attività (esplora / studia / costruisci) — ognuna con icona-verbo e colore propri.
+**A:** sulla mappa di `/game` il giocatore vede **due famiglie**: **spedizione** (una volta, a rischio, passa dal planner) e **lavoro** (continuativo, con slot e resa). «Esplora / studia / costruisci» **non** sono una famiglia: sono verbi che possono stare in entrambe; il verbo compare come icona di riga dentro l'Hub, non sul marker (sul marker il glifo resta il luogo, Sigillo D1).
+**Motivo:** la differenza che conta per il giocatore è meccanica, non tematica; «Activity» nel codice è già l'ombrello di tutti i POI (`ActivityDefinition`), quindi come terza famiglia avrebbe rotto il vocabolario.
+**Da confermare:** la minaccia/evento (rombo) resta una variante della spedizione con la sua sagoma, come già nel Sigillo — non è stata rimessa in discussione dalla domanda.
+**Resta aperto (OPEN-026):** ritorno della famiglia lavoro su `/game` (oggi `deprecated`, CTR-game-008); metallo dell'anello per famiglia (R-177).
+**Fonte:** Director in sessione 2026-11-11 («2 famiglie»); `context/ingestions/2026-11-11-poi-stati-hub-opportunita.md`
+
+## 2026-11-11 — Luogo sulla mappa: hover = scheda alabastro, clic = ventaglio (OPEN-025, parziale)
+
+**Da:** tre forme proposte per il componente Luogo (punto della mappa con più attività correlate): A pergamena con righe, B teatro con sigilli in fila, C ventaglio di sigilli attorno al luogo.
+**A:** combinazione su due gesti, sulla mappa e senza cambiare pagina:
+- **mouse over** sul Luogo → la scheda verde e alabastro (linguaggio `HudRealPanel`: testo + immagine) che presenta il luogo;
+- **clic** sul Luogo → **ventaglio**: i sigilli delle sue attività si aprono attorno al luogo sulla mappa, ognuno con il proprio halo di tempo (stessa grammatica del Sigillo); il clic su un sigillo apre il dettaglio esistente.
+**Motivo:** l'hover dà contesto (immagine, racconto) senza impegno; il ventaglio tiene l'azione nel mondo e riusa la grammatica di stato già decisa per i POI. Le critiche dell'explorer a C (niente posto per immagine/descrizione) sono assorbite dalla scheda in hover.
+**Aggiunta (stesso giorno):** oltre ~6–8 attività il ventaglio si dispone su **due anelli concentrici** di sigilli (scelto contro «8 più urgenti + sigillo «altre»»).
+**Aggiunta (stesso giorno):** anello interno = **urgenza** (in scadenza / finito da ritirare), esterno = il resto. Motivo del Director: oltre al villaggio i posti con tante attività saranno pochi e fatti quasi solo di job, quindi la famiglia distinguerebbe poco; le eccezioni urgenti sono rare e proprio per questo contano. Il clic su un sigillo del ventaglio apre il **dettaglio specifico** dell'attività (oggi, per le quest, il cassetto laterale del planner).
+**Resta aperto (OPEN-025):** forma e taglia della scheda in hover (quella attuale è fatta per una sola attività con placca d'azione); dettaglio dei job (non esiste ancora un equivalente del cassetto); capienza oltre i due anelli (improbabile); collisioni con i POI vicini; chiusura del ventaglio; equivalente senza mouse (controller/touch).
+**Fonte:** Director in sessione 2026-11-11 («mouse over il componente di alabastro … onClick ventaglio»).
+
+## 2026-11-11 — POI prima, da soli; POI vicini diventano automaticamente un Luogo
+
+**Da:** PLAN-117 rev. 1 con POI Zanara e Luogo nello stesso piano.
+**A:** si lavora **prima sul POI da solo** (PLAN-117 rev. 2); il Luogo va in un piano successivo, dopo il ruling sul POI. Regola nuova: **se molti POI sono vicini diventano automaticamente un Luogo** e si mostrano nel modo nuovo (hover scheda alabastro / clic ventaglio) — un Luogo può nascere dalla vicinanza, non solo essere scritto a mano.
+**Motivo:** il ventaglio è fatto di POI (taglia e sagoma ne decidono le distanze); il POI serve ovunque, il Luogo in pochi posti; una decisione per volta.
+**Aggiunta (stesso giorno):** «vicini» = **distanza nel mondo** (fissa a ogni zoom, non dipende dallo schermo). La soglia si misura allo zoom più lontano, dove i POI non raggruppati sono più vicini sullo schermo (PLAN-117 D-8, F1 T1.3).
+**Resta aperto:** il valore della soglia.
+**Fonte:** Director in sessione 2026-11-11 («lavoriamo sul POI da solo, se ce ne sn tanti vicini deve divnetare automaticamente un luogo …»).
+
+
+## 2026-11-11 — Alabastro: solo per pochi elementi «eccezionali»
+
+**Da:** design-intent v2 del kit Zanara (ruling 2026-11-06): «La lingua vera (NON alabastro)» — il kit pf-3 tutto in alabastro era un errore di ancoraggio.
+**A:** la regola resta (la lingua di base è smalto smeraldo/navy + oro inciso + gemme, **non** tutto in alabastro), ma l'alabastro è **ammesso per pochi elementi scelti**, come componente eccezionale. Primo uso approvato: la scheda in hover del Luogo (testo + immagine), PLAN-117 / OPEN-025.
+**Motivo:** Director: «nn deve essere tutto fatto in alabastro, cm accadeva prima. Ma x pochi elementi scelti può andare, e questo mi sembra un ottimo modo x usare quel componente "eccezionale"».
+**Come si applica:** POI, barre, pannelli ricorrenti restano su smalto + oro; l'alabastro va proposto solo come eccezione dichiarata, un elemento alla volta.
+**Fonte:** Director in sessione 2026-11-11.
