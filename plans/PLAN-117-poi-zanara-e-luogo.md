@@ -65,6 +65,7 @@
 
 ### F0 — Fondamenta (nessun pixel nuovo)
 - T0.1 Catture headless di riferimento di `/game` (1440×900, 1280×800) su 4 biomi + mare, con i ritagli dove cadranno POI e Luogo-villaggio; e del Sigillo attuale da `/gameOld` per confronto.
+  - ✅ **Fatto 2026-11-11** — `scripts/capture-poi-map-matrix.mjs` → `test-results/poi-zanara-f0/` (86 PNG): 7 zone (villaggio + foresta, neve, canyon, vulcano, laguna, mare ovest) × 3 zoom (`zfloor` coverage, `zmin` manifest 0.18, `zmid` 1.0) × full+crop 400×400 alle due viewport; baseline `gameold-sigillo-*.png`. **Misurato per D-8: coverage floor = 0.586 @1440×900, 0.521 @1280×800** (manifest minZoom 0.18; `__worldCamCtl.set`/`__worldCam`, seam CTR-game-005). Nota T1.3: «zoom più lontano» per la misura = coverage floor (il clamp effettivo della camera), non il minZoom manifest — da confermare in lettura di D-8.
 - T0.2 Funzione pura `orderPlaceActivities(activities, views)` → `{ inner, outer }`: interno = `expiring` + `done` (le urgenti), esterno = il resto; ordine stabile dentro l'anello; capienza per anello dichiarata in config (non stimata). **Test di regressione permanente** `tests/unit/idleVillage/placeOrdering.test.ts` (R-247).
 - T0.3 Schema config `placesConfig.ts` (Zod, `deepFreeze`): `id`, punto nel mondo, `titleKey`/`bodyKey` i18n (en + it-IT, ICU), immagine, elenco attività; Luogo-villaggio da fixture (D-2).
 
