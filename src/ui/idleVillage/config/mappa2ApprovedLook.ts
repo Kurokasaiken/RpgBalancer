@@ -167,3 +167,4 @@ export const MAPPA2_V2_TILES = {
   manifestUrl: '/assets/world/mappa2/base/tiles/v2/tiles.json',
   budget: { budgetCells: 72 }, // desktop Retina: at overview the whole map (66 cells, ~70 MB) is already magnified 1.17x
 } as const;
+

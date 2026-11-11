@@ -4,7 +4,7 @@
  */
 
 import type { IdleVillageConfig } from './types';
-import type { MinimalConfig, MinimalHUDFieldConfig } from './minimalConfig';
+import { DEFAULT_MINIMAL_CONFIG, type MinimalConfig, type MinimalHUDFieldConfig } from './minimalConfig';
 import type { MinimalGameplayConfig } from './minimalGameplayConfig';
 
 // Extend IdleVillageConfig to include UI properties for transformation
@@ -81,14 +81,12 @@ function deriveGlobalRules(idleConfig: IdleVillageConfig) {
     dailyFoodConsumptionPerResident: globalRules.foodConsumptionPerResidentPerDay || 2,
     fatigueDecayPerRestTick: globalRules.fatigueRecoveryPerDay || 5,
     injuryProbabilityThreshold: globalRules.baseLightInjuryChanceAtMaxFatigue || 0.05,
-    dayLengthInTimeUnits: globalRules.dayLengthInTimeUnits || 60,
+    // fallbacks = the minimal engine config's own defaults (single source), never literals here
+    dayLengthInTimeUnits: globalRules.dayLengthInTimeUnits || DEFAULT_MINIMAL_CONFIG.globalRules.dayLengthInTimeUnits,
     dayNightCycle: globalRules.dayNightCycle ? {
       dayTimeUnits: globalRules.dayNightCycle.dayTimeUnits,
       nightTimeUnits: globalRules.dayNightCycle.nightTimeUnits,
-    } : {
-      dayTimeUnits: 40,
-      nightTimeUnits: 20,
-    },
+    } : { ...DEFAULT_MINIMAL_CONFIG.globalRules.dayNightCycle },
     secondsPerTimeUnit: globalRules.secondsPerTimeUnit || 1,
     rngSeed: globalRules.defaultRandomSeed || 734_003,
   };

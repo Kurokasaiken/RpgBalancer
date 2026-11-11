@@ -4,6 +4,7 @@
 `refs/director-base-{1..5}.png`: barra risorse, strip DAY+speed, hero card, nav inferiore.
 
 ## La lingua vera (NON alabastro)
+> **Precisazione Director 2026-11-11:** non tutto in alabastro, ma per **pochi elementi scelti** va bene come componente «eccezionale» (primo uso: scheda in hover del Luogo). Vedi `context/DECISION_LOG.md` 2026-11-11.
 - **Campi**: smalto smeraldo profondo / navy scuro — NON avorio/ivory (l'alabastro era errore di ancoraggio su pf-3)
 - **Binari**: oro antico inciso a filigrana organica (rami, foglie, volute — fantasy, non geometrico barocco)
 - **Gemme**: smeraldi sfaccettati/cabochon incastonati in castoni oro, cluster agli angoli

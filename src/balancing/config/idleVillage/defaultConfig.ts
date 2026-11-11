@@ -1186,10 +1186,12 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
     defaultActivityFatigueGain: 10,
     startingResidentFatigue: 0,
     fatigueRecoveryPerDay: 50,
-    dayLengthInTimeUnits: 5,
+    // Director 2026-11-11: a game day is day + night (the counter ticks only at dawn); night is a third of it.
+    // At x1 (1 tick/s): day 40 s, night 20 s, one game day 60 s. Was 5 + 5 with a 5-tick "day" = half a cycle.
+    dayLengthInTimeUnits: 60,
     dayNightCycle: {
-      dayTimeUnits: 5,
-      nightTimeUnits: 5,
+      dayTimeUnits: 40,
+      nightTimeUnits: 20,
     },
     secondsPerTimeUnit: 1,
     fatigueYellowThreshold: 33,

@@ -189,6 +189,17 @@ export interface PixiWorldMapProps {
    */
   seaGrade?: { multUrl: string; addUrl: string; opacity: number; addScale?: number };
   /**
+   * Night «luna e torce» (Director 2026-11-11): multiply + additive plates over the whole world, faded in by the time
+   * of day (`ambient.light`: 1 = day, 0.35 = deepest night). When set, the old uniform night wash stays off.
+   */
+  nightLight?: {
+    multUrl: string; addUrl: string; bioAUrl?: string; bioBUrl?: string;
+    /** All tuning comes from `gameFrameConfig.timeOfDay.map.plates` (no literals here). */
+    easePerFrame: number; fullNightAt: number;
+    lightsBreath: { depth: number; freqA: number; freqB: number };
+    bio: { startAt: number; floor: number; speed: number };
+  };
+  /**
    * GPU-budget options (2026-11-10, /game). Read once at boot. Each one trades a few levels of 8-bit precision in a
    * map effect for a full-world texture fewer or smaller; the lab omits them and stays on the full-size sources.
    * - `halfDistanceMasks`: coast/land distance fields at half resolution (`*.half.webp`, smooth fields) for the surf.
@@ -907,6 +918,7 @@ export function PixiWorldMap({
   mountainShade,
   mountainClarity,
   seaGrade,
+  nightLight,
   gpuLight,
   hiLand,
   baseTiles,
@@ -982,6 +994,12 @@ export function PixiWorldMap({
   mountainClarityRef.current = mountainClarity;
   const mountainClarityUrl = mountainClarity?.url;
   const seaGradeRef = useRef(seaGrade);
+  const nightLightRef = useRef(nightLight);
+  nightLightRef.current = nightLight;
+  const nightMultUrl = nightLight?.multUrl;
+  const nightAddUrl = nightLight?.addUrl;
+  const nightBioAUrl = nightLight?.bioAUrl;
+  const nightBioBUrl = nightLight?.bioBUrl;
   seaGradeRef.current = seaGrade;
   const seaGradeMultUrl = seaGrade?.multUrl;
   const seaGradeAddUrl = seaGrade?.addUrl;
@@ -2364,6 +2382,7 @@ export function PixiWorldMap({
       const lit = { light: 1, warm: 0 };
       ticks.push(() => {
         const target = ambientRef.current ?? { light: 1, warm: 0 };
+        if (nightLightRef.current) { wash.visible = false; return; } // the night plates own the night
         lit.light += (target.light - lit.light) * 0.015;
         lit.warm += (target.warm - lit.warm) * 0.015;
         if (lit.light > 0.995 && lit.warm < 0.005) {
@@ -2433,6 +2452,46 @@ export function PixiWorldMap({
           mult.alpha = o;
           add.alpha = o / (seaGradeRef.current?.addScale ?? 2); // the additive sheet is stored x addScale
           mult.visible = add.visible = o > 0.001;
+        });
+      }
+      if (nightMultUrl && nightAddUrl) {
+        const [multTex, addTex, bioATex, bioBTex] = await Promise.all([
+          load(nightMultUrl), load(nightAddUrl),
+          nightBioAUrl ? load(nightBioAUrl) : Promise.resolve(null), nightBioBUrl ? load(nightBioBUrl) : Promise.resolve(null),
+        ]);
+        const nMult = new Sprite(multTex);
+        const nAdd = new Sprite(addTex);
+        nMult.blendMode = 'multiply';
+        nAdd.blendMode = 'add';
+        // bioluminescence: two blob patterns of the same glowing field, cross-faded so the plankton shimmers in patches
+        const bio = [bioATex, bioBTex].filter((t): t is Texture => Boolean(t)).map((t) => { const sp = new Sprite(t); sp.blendMode = 'add'; return sp; });
+        for (const sp of [nMult, nAdd, ...bio]) {
+          sp.zIndex = NIGHT_WASH_Z;
+          sp.width = canvas.width;
+          sp.height = canvas.height;
+          sp.visible = false;
+          world.addChild(sp);
+        }
+        let amount = 0;
+        ticks.push((t) => {
+          const nl = nightLightRef.current;
+          if (!nl) return;
+          const light = ambientRef.current?.light ?? 1;
+          const target = Math.min(1, Math.max(0, (1 - light) / nl.fullNightAt));
+          amount += (target - amount) * nl.easePerFrame;
+          if (amount < 0.003) { nMult.visible = nAdd.visible = false; for (const b of bio) b.visible = false; return; }
+          nMult.visible = nAdd.visible = true;
+          // the sea glows only in the deep night (it starts after the windows), and breathes slowly
+          const bioOn = Math.min(1, Math.max(0, (amount - nl.bio.startAt) / (1 - nl.bio.startAt)));
+          bio.forEach((b, i) => {
+            const phase = 0.5 + 0.5 * Math.sin(t * nl.bio.speed + i * Math.PI);
+            b.alpha = bioOn * (nl.bio.floor + (1 - nl.bio.floor) * phase);
+            b.visible = b.alpha > 0.003;
+          });
+          nMult.alpha = amount;
+          // windows and lava breathe a little: two slow incommensurate waves (depth/frequencies from config)
+          const br = nl.lightsBreath;
+          nAdd.alpha = amount * (1 - br.depth + br.depth * Math.sin(t * br.freqA) * Math.sin(t * br.freqB + 1.1));
         });
       }
       ticks.push((t) => {

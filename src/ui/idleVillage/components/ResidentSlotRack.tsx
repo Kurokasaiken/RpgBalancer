@@ -10,7 +10,7 @@ import type { VerbVisualVariant } from '@/ui/idleVillage/legacy/VerbCard';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { useSensoryAudio } from '@/ui/idleVillage/hooks/useSensoryAudio';
 import { useSlotSounds } from '@/ui/idleVillage/hooks/useSlotSounds';
-import { WanderlustMedalOverlay } from '@/ui/idleVillage/components/WanderlustMedalOverlay';
+import { C1Medallion } from '@/ui/idleVillage/components/C1Medallion';
 import type { MedalBehaviorControls } from '@/ui/idleVillage/hooks/useSlottedMedalBehavior';
 import { FeatureFlags } from '@/shared/config/featureFlags';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
@@ -436,7 +436,7 @@ const DetailSlot = memo(({
   useEffect(() => {
     if (!activityState) return;
     /* The medal-behavior hook is reserved for a behavior-controlled medal
-     * (WanderlustMedalOverlay has none today) — it must NOT gate telemetry. */
+     * (C1Medallion has none today) — it must NOT gate telemetry. */
     const behavior = medalBehaviorRef.current;
     if (activityState.state === 'failed') {
       behavior?.handleFailed?.(activityState.failureType);
@@ -724,7 +724,7 @@ const DetailSlot = memo(({
                   data-testid={`slot-medal-${slot.id}`}
                   className={`absolute inset-0 flex items-center justify-center z-10 transition-all duration-560 ease-out ${isExtracting ? 'opacity-0 scale-75' : 'opacity-100 scale-100'} ${isShaking ? styles.animateSlotShake : ''}`}
                 >
-                  <WanderlustMedalOverlay
+                  <C1Medallion
                     portraitUrl={assignedAvatarUrl}
                     isDragging={false}
                     sizePx={isHud64 ? 44 : 40}

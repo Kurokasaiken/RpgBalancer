@@ -927,7 +927,8 @@
       "recenter": "Ricentra la mappa"
     },
     "status": {
-      "dayLabel": "Giorno"
+      "dayLabel": "Giorno",
+      "nightLabel": "Notte"
     },
     "subtitle": "",
     "place": "Le Marche Orientali",

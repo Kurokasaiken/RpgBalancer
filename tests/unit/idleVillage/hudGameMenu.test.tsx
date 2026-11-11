@@ -143,3 +143,21 @@ describe('unlisted panels (PLAN-043 T1.3, Director 2026-10-16)', () => {
     expect(HUD_PANEL_KEY_TO_ID.m).toBe('merchant');
   });
 });
+
+// Director 2026-11-11 («Devi portare i menù»): /game mounts the real menu with its own trigger and only the panels it has.
+describe('HudGameMenu on /game', () => {
+  it('draws the caller trigger and hides the Panels section when the page has no panels', async () => {
+    const { render, screen, fireEvent } = await import('@testing-library/react');
+    const { HudGameMenu } = await import('@/ui/idleVillage/components/gameFrame/HudGameMenu');
+    const visible = { roster: false, events: false, stash: false, merchant: false, director: false, tuning: false } as never;
+    render(
+      <HudGameMenu visible={visible} onTogglePanel={() => {}} panelIds={[]}
+        renderTrigger={({ open, onToggle, label }) => <button type="button" data-testid="custom-trigger" aria-expanded={open} onClick={onToggle}>{label}</button>} />,
+    );
+    expect(screen.queryByTestId('hud-menu-trigger')).toBeNull();
+    fireEvent.click(screen.getByTestId('custom-trigger'));
+    expect(screen.getByTestId('custom-trigger').getAttribute('aria-expanded')).toBe('true');
+    expect(screen.queryAllByRole('menuitemcheckbox')).toHaveLength(0);
+    expect(screen.getAllByRole('menuitem').length).toBeGreaterThan(0);
+  });
+});

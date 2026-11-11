@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({args:['--enable-unsafe-swiftshader']});
+const page = await b.newPage({viewport:{width:1500,height:1500}});
+await page.goto('http://localhost:5173/bezel-variants',{waitUntil:'domcontentloaded',timeout:30000});
+await page.waitForSelector('[data-testid="bezel-row-zanara2"]',{timeout:30000});
+await page.waitForTimeout(4000);
+const sec = await page.locator('section', {hasText: 'GHIERA DAL MOCKUP'}).first();
+await sec.screenshot({path:'/tmp/proof-abc-full.png'});
+console.log('done');
+await b.close();

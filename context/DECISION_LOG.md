@@ -1821,3 +1821,12 @@ utenti WebGL; il Director ha imposto verifica-fino-a-verde e landing unica.
 **Motivo:** Director: «nn deve essere tutto fatto in alabastro, cm accadeva prima. Ma x pochi elementi scelti può andare, e questo mi sembra un ottimo modo x usare quel componente "eccezionale"».
 **Come si applica:** POI, barre, pannelli ricorrenti restano su smalto + oro; l'alabastro va proposto solo come eccezione dichiarata, un elemento alla volta.
 **Fonte:** Director in sessione 2026-11-11.
+
+## 2026-11-11 — POI: il glifo dice il tipo, non il luogo; blu ammesso; forma «cheap» bocciata
+
+**Da:** Sigillo D1 (`poi_family_spec.md` § Sigillo, anatomia riga 6): «Glyph = the **place**, not the verb».
+**A:** il glifo del POI mostra **il tipo** di attività. Motivo del Director: *«è giusto che mostri il tipo e nn il luogo: dove è è già il luogo, xè dovrei indicarlo?»* — la posizione sulla mappa dice già il luogo. Conseguenza: il tipo è portato dal glifo (leggibile anche senza colore), quindi colore e sagoma non sono più l'unico veicolo della famiglia.
+**Colore:** il **blu** del mockup Gemini 2026-11-11 (`.mw/runs/20261111-poi-zanara/gen/director-gemini-open-prompt.webp`) va bene; il teal/verde-acqua precedente no.
+**Forma e materiale:** bocciati come *«troppo cheap, troppo dozzinale, plastico»* (medaglioni a stella-bussola tutti uguali, gemme ovunque, lucido uniforme).
+**Supera:** Sigillo D1 (glifo = luogo) — OBSOLETE → questa voce, 2026-11-11.
+**Fonte:** Director in sessione 2026-11-11.

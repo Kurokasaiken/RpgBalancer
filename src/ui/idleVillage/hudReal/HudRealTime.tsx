@@ -10,8 +10,11 @@ import { HudTooltip } from '@/ui/idleVillage/components/gameFrame/HudTooltip';
 import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
 import { HUD_TYPE, hudPx } from './hudType';
 import { TIME_BAR as BAR } from './timeGeometry';
+import { DEFAULT_GAME_FRAME_CONFIG, type GameFrameConfig } from '@/balancing/config/idleVillage/gameFrameConfig';
 
 const ASSET = '/assets/ui/hud-real/time/bar.webp';
+/** Sun / moon dial — every value (geometry measured on bar.webp, ticks, colours, art) from `gameFrameConfig.timeOfDay.dial`. */
+type DialConfig = GameFrameConfig['timeOfDay']['dial'];
 const C = { text: '#f3ead0', gold: '#f1d88a', dim: '#cdbf8e', shadow: '0 1px 2px rgba(3, 26, 30, 0.9)', focus: '#e8c766', glow: 'rgba(240, 201, 135, 0.55)', dayTint: '#f1d88a', nightTint: '#b9d2f0' } as const;
 const SCOPED_CSS = `
 [data-hudreal-time] button { background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: 50%; user-select: none; }
@@ -24,9 +27,10 @@ const SCOPED_CSS = `
 export interface HudRealTimeLabels {
   pause: string; resume: string; speedGroup: string; speed: (s: number) => string; spaceKey: string; paused: string;
 }
-export interface HudRealTimeProps extends TimeContract { labels: HudRealTimeLabels }
+export interface HudRealTimeProps extends TimeContract { labels: HudRealTimeLabels; dial?: DialConfig }
 
-export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, locked, speed, labels }: HudRealTimeProps) {
+export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, locked, speed, labels, dial: DIAL = DEFAULT_GAME_FRAME_CONFIG.timeOfDay.dial }: HudRealTimeProps) {
+  const DC = DIAL.colors;
   const f = BAR.field;
   const ring = (on: boolean) => (on ? { boxShadow: `0 0 0 2px ${C.gold}, 0 0 10px ${C.glow}` } : undefined);
   const pos = (i: number) => ({ position: 'absolute' as const, left: BAR.slots[i].x, top: BAR.slots[i].y, width: BAR.slots[i].w, height: BAR.slots[i].h, display: 'grid', placeItems: 'center' });
@@ -36,11 +40,36 @@ export function HudRealTime({ dayLabel, isDayPhase, cycleProgress, isPaused, loc
     <section data-hudreal-time="" data-paused={isPaused ? 'true' : 'false'} aria-label={dayLabel} style={{ position: 'relative', userSelect: 'none', width: BAR.w, height: BAR.h }}>
       <style>{SCOPED_CSS}</style>
       <img src={ASSET} alt="" draggable={false} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
+      {/* phase dial (Director 2026-11-11): sun or moon seated small in the emerald, framed by a crown of engraved ticks
+       *  that light one by one as the phase runs — warm gold by day, silver-blue by night; unlit ticks stay dull bronze. */}
+      <svg aria-hidden="true" width={DIAL.r * 2} height={DIAL.r * 2} viewBox={`${-DIAL.r} ${-DIAL.r} ${DIAL.r * 2} ${DIAL.r * 2}`}
+        style={{ position: 'absolute', left: DIAL.cx - DIAL.r, top: DIAL.cy - DIAL.r, overflow: 'visible', pointerEvents: 'none' }}>
+        <circle r={DIAL.r - 0.5} fill={DC.well} />
+        {Array.from({ length: DIAL.ticks }, (_, i) => {
+          const lit = i < Math.round(progress * DIAL.ticks);
+          const major = i % DIAL.majorEvery === 0;
+          const a = (i / DIAL.ticks) * Math.PI * 2 - Math.PI / 2;
+          const r0 = DIAL.disc + DIAL.tick.gap, r1 = DIAL.r - (major ? DIAL.tick.insetMajor : DIAL.tick.insetMinor);
+          const col = lit ? (isDayPhase ? DC.dayLit : DC.nightLit) : DC.unlit;
+          return (
+            <line key={i} x1={Math.cos(a) * r0} y1={Math.sin(a) * r0} x2={Math.cos(a) * r1} y2={Math.sin(a) * r1}
+              stroke={col} strokeWidth={major ? DIAL.tick.widthMajor : DIAL.tick.widthMinor} strokeLinecap="round"
+              style={lit ? { filter: `drop-shadow(0 0 ${DIAL.tick.glowPx}px ${isDayPhase ? DC.dayGlow : DC.nightGlow})` } : undefined} />
+          );
+        })}
+      </svg>
+      <div data-hr-time="phase" data-phase={isDayPhase ? 'day' : 'night'} aria-hidden="true"
+        style={{ position: 'absolute', left: DIAL.cx - DIAL.disc, top: DIAL.cy - DIAL.disc, width: DIAL.disc * 2, height: DIAL.disc * 2, borderRadius: '50%', overflow: 'hidden', pointerEvents: 'none',
+          boxShadow: DIAL.discFrame }}>
+        {(['day', 'night'] as const).map((ph) => (
+          <img key={ph} src={ph === 'day' ? DIAL.sunUrl : DIAL.moonUrl} alt="" draggable={false}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: (ph === 'day') === isDayPhase ? 1 : 0, transition: `opacity ${DIAL.fadeMs}ms ease` }} />
+        ))}
+      </div>
       <div style={{
         position: 'absolute', left: f.x + 8, top: f.y, width: f.w - 24, height: f.h, display: 'flex', alignItems: 'center', gap: 8,
         fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: hudPx(HUD_TYPE.value), letterSpacing: 1, color: C.text, textShadow: C.shadow, whiteSpace: 'nowrap', overflow: 'hidden',
       }}>
-        <span aria-hidden="true" title={isDayPhase ? 'day' : 'night'} style={{ flex: 'none', width: 12, height: 12, borderRadius: '50%', background: `conic-gradient(${isDayPhase ? C.dayTint : C.nightTint} ${progress * 360}deg, rgba(255,255,255,0.18) 0)`, boxShadow: `0 0 6px ${isDayPhase ? C.glow : 'rgba(150,190,240,0.4)'}` }} />
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{dayLabel}</span>
       </div>
       <HudTooltip label={isPaused ? labels.resume : labels.pause} shortcut={labels.spaceKey} side="bottom" wrap>

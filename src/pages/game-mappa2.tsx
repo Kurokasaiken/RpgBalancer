@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PixiWorldMap, type PixiBootProgress } from '@/ui/idleVillage/pixiSpike/PixiWorldMap';
 import { MAPPA2_APPROVED_MAP_PROPS, MAPPA2_GAME_GRADE, MAPPA2_REGIONS_BASE, MAPPA2_V2_LAND, MAPPA2_V2_TILES } from '@/ui/idleVillage/config/mappa2ApprovedLook';
@@ -21,6 +21,17 @@ import {
   useMinimalGameplayWithIdleVillageConfig,
 } from '@/store/useMinimalGameplay';
 import { useTimeEngineLoop } from '@/ui/idleVillage/hooks/useTimeEngineLoop';
+import { HudGameMenu } from '@/ui/idleVillage/components/gameFrame/HudGameMenu';
+import { useGameMenuFlow } from '@/ui/idleVillage/components/gameFrame/menu/useGameMenuFlow';
+import { MenuDialogDress } from '@/ui/idleVillage/components/gameFrame/menu/GameMenuDialog';
+import { useHudPanels } from '@/ui/idleVillage/components/gameFrame/useHudPanels';
+import type { HudPanelId } from '@/ui/idleVillage/components/gameFrame/hudPanelRegistry';
+import { EngravedIcon } from '@/ui/idleVillage/components/gameFrame/engravedIcons';
+import { HudRealRoundButton } from '@/ui/idleVillage/hudReal/HudRealRoundButton';
+import { HudRealMenuPanel } from '@/ui/idleVillage/hudReal/HudRealMenuPanel';
+import { saveNowToManualSlot } from '@/ui/idleVillage/state/gameSaveService';
+import { useGameAutosave } from '@/ui/idleVillage/state/useGameAutosave';
+import { ambientForPhase, DAYLIGHT, nightShownAt, offeredSpeeds, type Ambient } from '@/ui/idleVillage/config/timeOfDay';
 
 /**
  * `/game` (2026-11-10) — the approved mappa2 look (`mappa2ApprovedLook`, Director ruling the same day) with the three
@@ -42,6 +53,12 @@ const DETECTED_TIER = detectTier(readTierEnv());
 
 /* Dev A/B seam for the pixel-identity proof: `?grade=split` draws the four live lab sheets instead of the combined pair. */
 const SPLIT_GRADE = DEV_Q.get('grade') === 'split';
+/** Dev: `?tod=night|dusk|day` previews a time of day whatever the clock says (same seam as /gameOld). */
+const TOD_PREVIEW = DEV_Q.get('tod');
+const PAGE = DEFAULT_GAME_FRAME_CONFIG.gamePage;
+const TOD = DEFAULT_GAME_FRAME_CONFIG.timeOfDay.map;
+const HIDE = DEFAULT_GAME_FRAME_CONFIG.hudHide;
+const CORNER = PAGE.corner;
 /* Dev A/B seam for the GPU-budget options: `?light=none` or a subset `?light=dist,tile,base,foam,field`; default = the profile's. */
 const LIGHT_Q = DEV_Q.get('light');
 /* Dev A/B seam for the hi-res base (Director 2026-11-10, «voglio che i player possano zoomare»): `?hires=1`. */
@@ -85,6 +102,34 @@ export default function GameMappa2Page() {
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
   useTimeEngineLoop(gameplay);
+  /* Time of day on the map — curve, preview and max speed from `gameFrameConfig.timeOfDay.map`; while paused the map keeps
+   * the light it had; faster than `maxSpeed` it holds daylight (the dial still turns). */
+  const lastAmbient = useRef<Ambient>(DAYLIGHT);
+  const { isDayPhase, cycleProgress, speedMultiplier, isPaused: clockPaused } = state;
+  const ambient = useMemo(() => {
+    if (TOD_PREVIEW === 'night' || TOD_PREVIEW === 'dusk' || TOD_PREVIEW === 'day') return TOD.preview[TOD_PREVIEW];
+    if (clockPaused) return lastAmbient.current;
+    if (!nightShownAt(TOD, speedMultiplier)) return (lastAmbient.current = DAYLIGHT);
+    return (lastAmbient.current = ambientForPhase(TOD, isDayPhase, cycleProgress ?? 0));
+  }, [clockPaused, speedMultiplier, isDayPhase, cycleProgress]);
+  /* Keys 1..n pick the configured speeds in order, as on the old page. Space is owned by useTimeEngineLoop.
+   * Same guards as the old page: no modifiers, no repeats, no typing targets, and a key another handler already claimed is left alone. */
+  const { setSpeedMultiplier, resumeGame } = gameplay;
+  useEffect(() => {
+    const speeds = offeredSpeeds(PAGE.speeds, gameplay.config.loop.maxSpeedMultiplier);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.repeat || event.defaultPrevented) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName))) return;
+      if (!/^[1-9]$/.test(event.key)) return;
+      const speed = speeds[Number(event.key) - 1];
+      if (!speed) return;
+      setSpeedMultiplier(speed);
+      if (useMinimalGameplayStore.getState().state.isPaused) resumeGame('user');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [gameplay.config.loop.maxSpeedMultiplier, setSpeedMultiplier, resumeGame]);
   const settings = useSyncExternalStore(subscribeGameSettings, getGameSettings);
   const tier = tierForQuality(settings.mapQuality, DETECTED_TIER, TIER_Q);
   const map = useMemo(() => mapOptionsFor(TIER_PROFILES[tier]), [tier]);
@@ -96,7 +141,9 @@ export default function GameMappa2Page() {
       .then(() => {
         if (cancelled) return;
         const g = useMinimalGameplayStore.getState();
-        if (g.state.isPaused) g.resumeGame('auto');
+        /* Director 2026-11-11: /game opens paused (`gamePage.startPaused`); the player starts the clock (Space, speeds, keys). */
+        if (PAGE.startPaused && !g.state.isPaused) g.pauseGame('auto');
+        else if (!PAGE.startPaused && g.state.isPaused) g.resumeGame('auto');
       })
       .catch((err) => console.error('[game] gameplay init failed:', err));
     return () => { cancelled = true; };
@@ -120,6 +167,29 @@ export default function GameMappa2Page() {
 
   const resources = buildResourceReadoutItems(selectResourceOutlook(state, config), t);
 
+  /* Bottom-right corner (Director 2026-11-11: «Devi portare i menù»): the REAL game menu of /gameOld (save, load,
+   * memorial, title, language, settings — useGameMenuFlow) and the hide-HUD toggle, dressed as Zanara round buttons.
+   * Panels /game does not have yet stay out of the menu (`gamePage.menuPanels`). Autosave as on the old page. */
+  const flushGameplay = useCallback(() => gameplay.saveNow(), [gameplay]);
+  const menuFlow = useGameMenuFlow({ currentTick: state.currentTick, currentDay: state.currentDay, flush: flushGameplay });
+  useGameAutosave({ intervalMs: config.loop.autosaveIntervalMs, getTick: () => state.currentTick, flush: flushGameplay, enabled: import.meta.env.MODE !== 'test' });
+  const panels = useHudPanels();
+  const [hudHidden, setHudHidden] = useState(false);
+  const toggleHud = useCallback(() => setHudHidden((v) => !v), []);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.repeat || event.defaultPrevented) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName))) return;
+      if (event.key.toLowerCase() !== HIDE.shortcut.toLowerCase()) return;
+      toggleHud();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [toggleHud]);
+  const hideKey = HIDE.shortcut.toUpperCase();
+  const barsHidden: React.CSSProperties = { opacity: hudHidden ? 0 : 1, pointerEvents: hudHidden ? 'none' : undefined, transition: `opacity ${HIDE.slideMs}ms ease` };
+
   return (
     <div data-testid="game-mappa2" data-tier={tier} data-hudreal-lift="" data-view={view} data-map-ready={ready || undefined} style={{ position: 'fixed', inset: 0, background: '#04161c' }}>
       <style>{`[data-hudslot]{filter:drop-shadow(0 2px 5px rgba(1,14,18,.7)) drop-shadow(0 0 1px rgba(1,14,18,.9))}`}</style>
@@ -137,6 +207,8 @@ export default function GameMappa2Page() {
           mountainShade={SPLIT_GRADE ? mountainShadeLive : undefined}
           mountainClarity={SPLIT_GRADE ? mountainClarityLive : undefined}
           seaGrade={SPLIT_GRADE ? seaGradeLive : map.grade}
+          ambient={ambient}
+          nightLight={TOD.plates}
           hiLand={map.hiLand}
           baseTiles={map.tiles}
           gpuLight={map.gpuLight}
@@ -165,7 +237,7 @@ export default function GameMappa2Page() {
         />
       )}
 
-      <div style={{ position: 'absolute', left: 0, top: 0, width: hud.frame.W, height: hud.frame.H, transform: `scale(${hud.frame.scale})`, transformOrigin: 'top left', pointerEvents: 'none' }} data-hud-mode={hud.mode}>
+      <div style={{ position: 'absolute', left: 0, top: 0, width: hud.frame.W, height: hud.frame.H, transform: `scale(${hud.frame.scale})`, transformOrigin: 'top left', pointerEvents: 'none', ...barsHidden }} data-hud-mode={hud.mode} data-hud-hidden={hudHidden || undefined}>
         {/* each signed bar is scaled whole (PLAN-112 §28); --hud-text-k keeps its text at the designed px (hudPx) */}
         <div data-hudslot="time" style={barStyle(hud.time)}>
           <HudRealTimeConnected />
@@ -180,9 +252,34 @@ export default function GameMappa2Page() {
             onNavSelect={(id) => setView(id === 'village' ? 'village' : 'map')}
             onRecenter={onRecenter}
             labelSpread={hud.navLabelSpread}
+            showLabels={PAGE.navShowLabels}
           />
         </div>
       </div>
+
+      <div data-hud-corner="" style={{ position: 'absolute', right: `calc(${CORNER.offsetPx}px + env(safe-area-inset-right, 0px))`, bottom: `calc(${CORNER.offsetPx}px + env(safe-area-inset-bottom, 0px))`, zIndex: 6, display: 'flex', alignItems: 'flex-end', gap: CORNER.gapPx }}>
+        <div style={barsHidden}>
+          <HudGameMenu
+            visible={panels.visible}
+            onTogglePanel={panels.toggle}
+            panelIds={PAGE.menuPanels as HudPanelId[]}
+            onSaveNow={() => saveNowToManualSlot({ flush: flushGameplay })}
+            {...menuFlow.menuProps}
+            renderTrigger={({ open, onToggle, label }) => (
+              <HudRealRoundButton label={label} shortcut="Esc" active={open} onClick={onToggle} size={CORNER.buttonPx}
+                buttonProps={{ 'aria-haspopup': 'menu', 'aria-expanded': open, 'data-testid': 'hud-menu-trigger' }}>
+                <EngravedIcon id="cmd-menu" size={CORNER.iconPx} />
+              </HudRealRoundButton>
+            )}
+            renderPanel={({ children, panelProps }) => <HudRealMenuPanel panelProps={panelProps}>{children}</HudRealMenuPanel>}
+          />
+        </div>
+        <HudRealRoundButton label={t(hudHidden ? 'gameFrame.hud.show' : 'gameFrame.hud.hide')} shortcut={hideKey} active={hudHidden} onClick={toggleHud} size={CORNER.buttonPx}
+          buttonProps={{ 'data-testid': 'hud-hide-toggle' }}>
+          <EngravedIcon id="cmd-eye" size={CORNER.iconPx} />
+        </HudRealRoundButton>
+      </div>
+      <MenuDialogDress.Provider value="zanara">{menuFlow.screens}</MenuDialogDress.Provider>
     </div>
   );
 }

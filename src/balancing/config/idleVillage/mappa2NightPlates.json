@@ -1,0 +1,43 @@
+{
+  "_doc": "Night «luna e torce» plates for mappa2 (Director 2026-11-11). Read by scripts/build-mappa2-night.py; every colour, intensity and threshold lives here (no literals in the script). Colours are RGB 0..1. After editing, rebuild the plates: .mw/venv/bin/python -I scripts/build-mappa2-night.py",
+  "output": { "dir": "public/assets/world/mappa2/base/fx/night", "downscale": 2, "quality": 92 },
+  "moon": {
+    "land": [0.64, 0.69, 0.84],
+    "sea": [0.50, 0.56, 0.60],
+    "snow": [0.86, 0.91, 1.00],
+    "snowDetect": { "valueFrom": 185, "valueRange": 45, "saturationBelow": 60, "saturationRange": 40, "blur": 1.5 }
+  },
+  "windows": {
+    "village": { "plate": "stone-none-none-none.webp", "under": "meadow-none-none-none.webp" },
+    "detect": { "blur": 1.5, "threshold": 30, "minArea": 25, "areaPerLight": 500, "maxLightsPerBlock": 5 },
+    "radius": { "base": 7, "max": 8, "areaFactor": 0.2 },
+    "colour": [1.00, 0.70, 0.32],
+    "core": { "radiusK": 0.45, "strength": 0.75 },
+    "halo": { "radiusK": 2.0, "strength": 0.10 },
+    "relight": { "radiusK": 3.0, "strength": 0.8 }
+  },
+  "lava": {
+    "radius": 70,
+    "colour": [1.00, 0.34, 0.08],
+    "core": { "radiusK": 0.35, "strength": 0.6 },
+    "halo": { "radiusK": 1.6, "strength": 0.22 },
+    "relight": { "radiusK": 2.2, "strength": 0.9 }
+  },
+  "relightColour": [1.00, 0.93, 0.80],
+  "moonPath": { "dirX": 0.42, "dirY": 0.91, "centre": 1650, "width": 420, "strength": 0.07, "colour": [0.60, 0.75, 1.00] },
+  "snowSheen": { "strength": 0.08, "colour": [0.70, 0.80, 1.00] },
+  "bioluminescence": {
+    "files": [{ "name": "bio-a.webp", "seed": 7 }, { "name": "bio-b.webp", "seed": 19 }],
+    "plankton": [0.30, 0.90, 1.00],
+    "coral": [0.35, 0.70, 1.00],
+    "biomes": { "reef": 11, "bayou": 7 },
+    "patches": { "blur": 10, "from": 0.42, "range": 0.3, "power": 1.4 },
+    "sparks": { "density": 0.008, "blur": 0.9, "gain": 4 },
+    "seabed": { "radius": 25, "minContrast": 12, "range": 30, "blur": 1.5, "gain": 1.6, "floor": 0.45, "sparks": 0.5 },
+    "shallow": { "floor": 0.10, "patch": 0.55, "deepFromShallowK": 3 },
+    "reef": { "blur": 6, "strength": 0.25 },
+    "bayou": { "blurBiome": 8, "blurWater": 1.5, "gain": 2, "strength": 0.45, "floor": 0.3 },
+    "foam": { "blur": 1.2, "gain": 1.4, "strength": 0.10 },
+    "deepSparks": 0.18
+  }
+}
