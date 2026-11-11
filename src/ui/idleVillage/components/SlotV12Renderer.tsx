@@ -93,7 +93,7 @@ export const SLOT_VARIANT_SPECS: Record<SlotVariant, SlotVariantSpec> = {
  * byte-identical. Presets other than `stock` are LAB-ONLY: do not pass them
  * from production surfaces until a Director ruling promotes one.
  */
-export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara';
+export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara' | 'zanara2';
 
 /**
  * Resolved paint knobs for a bezel preset. All values are SVG units of the
@@ -123,6 +123,35 @@ export interface BezelKnobs {
   toothWidth?: number;
   /** Hide the bezel's own 6-o'clock gem (the seated medallion carries its gem). */
   hideGemPointer?: boolean;
+  /**
+   * `arms` (LAB-ONLY, PLAN-116 "ganasce a doppio braccio"): the teeth become four
+   * articulated clamp arms — tapered forged arm + visible hinge pin seated on the
+   * band, claw tip biting the medallion rim. Reuses the frozen tooth extrusion.
+   */
+  armStyle?: 'arms';
+  /** Deep-teal enamel inlay painted inside the bezel band (Zanara material). */
+  enamelBand?: boolean;
+  /**
+   * Seat collar (PLAN-116, "no gap" ruling): a gold annulus filling the cavity
+   * ring between the portrait's outer edge and the bezel's inner edge, so the
+   * closed ghiera and the medallion read as one contiguous assembly.
+   */
+  seatCollar?: boolean;
+  /** Arm angle (deg) whose hinge pin carries an emerald — the closure index. */
+  armGemDeg?: number;
+  /**
+   * Open-state bezel rotation override (PLAN-116 "aperto a + / chiuso a X").
+   * Default comes from the skin's empty state (-30°); zanara2 uses -45° so the
+   * same slam visibly rotates the cardinal (+) open arms onto the diagonal (X)
+   * closed position — the rotation IS the mechanism.
+   */
+  bezelOpenRotateDeg?: number;
+  /**
+   * Open-state bezel scale override (PLAN-116): the open ghiera hovers "lontana"
+   * from the medallion — scaled up and rotated — then the slam shrinks + rotates
+   * it shut. Default = skin's empty bezelScale (1.18); zanara2 lifts it further.
+   */
+  bezelOpenScale?: number;
 }
 
 export const BEZEL_PRESETS: Record<BezelPreset, BezelKnobs> = {
@@ -164,6 +193,24 @@ export const BEZEL_PRESETS: Record<BezelPreset, BezelKnobs> = {
     ringWidth: 12,
     toothHeight: 10,
     toothWidth: 10,
+    hideGemPointer: true,
+  },
+  /** Zanara-2 (PLAN-116, Director-ruled "aperto a + / chiuso a X", LAB-ONLY):
+   *  arms drawn at the diagonals (closed pose) — the open state rotates the whole
+   *  bezel -45°, showing them at the cardinals; the existing slam is the closing
+   *  rotation itself. Seat collar fills the cavity ring; the stock gem at 6 is
+   *  free again once the arms sit on the diagonals. */
+  zanara2: {
+    rimMode: 'arc',
+    shadowOffset: [1.3, 1.7],
+    ringWidth: 12,
+    toothAngles: [45, 135, 225, 315],
+    toothHeight: 9,
+    armStyle: 'arms',
+    enamelBand: true,
+    seatCollar: true,
+    bezelOpenRotateDeg: -45,
+    bezelOpenScale: 1.3,
     hideGemPointer: true,
   },
 };
@@ -373,14 +420,19 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
   const clampedProgress = Math.min(extractionProgress, 1.0);
   const bezelProgress = extractionProgress > 0 ? Math.max(0, (clampedProgress - TEETH_PHASE) / (1 - TEETH_PHASE)) : 0;
   const extractionScale = 1.0 + bezelProgress * 0.08;
-  const extractionRotation = 0 - bezelProgress * 30;
+  const openRotateDeg = bezel.bezelOpenRotateDeg ?? -30;
+  const extractionRotation = bezelProgress * openRotateDeg;
   const springScale = extractionProgress > 1.0 ? extractionScale * (1.0 + (extractionProgress - 1.0) * 0.15) : extractionScale;
   const bezelClosed = (eff.bezelRotateDeg ?? 0) === 0;
   const teethExtrusion = extractionProgress > 0 ? Math.max(0, 1 - clampedProgress / TEETH_PHASE) : bezelClosed ? 1 : 0;
+  /* Open presentation rotates the bezel to its disarmed pose (preset-overridable:
+     zanara2 opens at -45° so the arms read "+" and slam shut onto "X"). */
+  const effRotate = eff.medalVisible ? (eff.bezelRotateDeg ?? 0) : (bezel.bezelOpenRotateDeg ?? eff.bezelRotateDeg ?? 0);
+  const effScale = eff.medalVisible ? (eff.bezelScale ?? 1) : (bezel.bezelOpenScale ?? eff.bezelScale ?? 1);
   const bezelTransform =
     extractionProgress > 0
       ? `scale(${springScale}) rotate(${extractionRotation}deg)`
-      : `scale(${eff.bezelScale ?? 1}) rotate(${eff.bezelRotateDeg ?? 0}deg)`;
+      : `scale(${effScale}) rotate(${effRotate}deg)`;
   const bezelSlamActive = eff.medalVisible && extractionProgress === 0 && (eff.bezelRotateDeg ?? 0) === 0;
   const P = spec.defPrefix;
 
@@ -411,7 +463,38 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
             <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke={formatColor(tok('bezel.foundation'))} strokeWidth={ringW + 3} />
             <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke={`url(#${P}slot-v12-silver)`} strokeWidth={ringW} />
             <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke={`url(#${P}slot-v12-bevel)`} strokeWidth={ringW} />
+            {/* Deep-teal enamel inlay (Zanara): sits inside the gold fillets so the
+                band reads as metal-edged lacquer, not a flat green stripe. */}
+            {bezel.enamelBand && (
+              <>
+                <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="rgba(11,52,44,0.92)" strokeWidth={ringW - 4} />
+                <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="rgba(30,110,92,0.55)" strokeWidth={ringW - 7} />
+                <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="rgba(120,220,190,0.40)" strokeWidth="1.1"
+                  strokeDasharray={`${R_BZ_MID * 0.95} 999`} strokeDashoffset={`${R_BZ_MID * 1.22}`} strokeLinecap="round" />
+              </>
+            )}
             <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="rgba(10,10,16,0)" strokeWidth={ringW} filter={`url(#${P}fn-oxide)`} opacity={spec.material.oxideLayerOpacity} />
+
+            {/* Seat collar (PLAN-116 "no gap" ruling): gold annulus filling the
+                cavity ring between the medallion's outer edge and the bezel's
+                inner edge — closed assembly reads as one contiguous piece. */}
+            {bezel.seatCollar && (() => {
+              const rIn = spec.domSizePx
+                ? (spec.portraitSizePx / 2) * (158 / spec.domSizePx) - 0.6
+                : geometry.R_MED_OUT + 0.8;
+              const rOut = geometry.R_BZ_IN + 0.4;
+              return (
+                <>
+                  <circle cx="0" cy="0" r={(rIn + rOut) / 2} fill="none" stroke={formatColor(tok('bezel.foundation'))} strokeWidth={rOut - rIn + 0.6} />
+                  <circle cx="0" cy="0" r={(rIn + rOut) / 2} fill="none" stroke={`url(#${P}slot-v12-collar)`} strokeWidth={rOut - rIn} />
+                  <circle cx="0" cy="0" r={rIn + 0.7} fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="1.3" />
+                  <circle cx="0" cy="0" r={rIn + 2.1} fill="none" stroke="rgba(255,235,180,0.16)" strokeWidth="0.7" />
+                  <circle cx="0" cy="0" r={(rIn + rOut) / 2 + 1.4} fill="none" stroke="rgba(2,2,6,0.35)" strokeWidth="0.6" />
+                  <circle cx="0" cy="0" r={rOut - 1.2} fill="none" stroke="rgba(0,0,0,0.60)" strokeWidth="1.5" />
+                  <circle cx="0" cy="0" r={rOut - 2.8} fill="none" stroke="rgba(255,235,180,0.12)" strokeWidth="0.6" />
+                </>
+              );
+            })()}
 
             {/* Oxide spots */}
             {[[28, 5.4, 0.34], [118, 3.0, 0.24], [204, 6.8, 0.18], [312, 3.8, 0.28], [72, 2.4, 0.15], [250, 5.5, 0.22]].map(([angle, size, opacity], i) => {
@@ -541,6 +624,13 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
               const TH = bezel.toothHeight ?? geometry.TOOTH_HEIGHT;
               const TW = bezel.toothWidth ?? geometry.TOOTH_WIDTH;
               const path = `M${-TW/2},0 Q${-TW/2-0.8},${TH*0.12} 0,${TH*0.16} Q${TW/2+0.8},${TH*0.12} ${TW/2},0 L 0.8,${-TH} L -0.8,${-TH} Z`;
+              /* Articulated clamp arm ("ganasce a doppio braccio", PLAN-116): a tapered
+                 forged arm — pointed claw tip inward (bites the medallion rim), wide
+                 shoulder, rounded base reaching the band's outer edge — plus a hinge
+                 pin seated on the band. Local -y points to the slot center. The tip
+                 rides on TH; the body/base are fixed so the silhouette stays stubby
+                 and legible at 64px. */
+              const armPath = `M0,${-(TH + 1)} L3.4,${-(TH + 1) + 5.5} L6.4,2 L7,8 Q7.6,11.5 0,12.5 Q-7.6,11.5 -7,8 L-6.4,2 L-3.4,${-(TH + 1) + 5.5} Z`;
               // Local +y (after the group rotation) points away from the slot
               // center: translating by (1-extrusion)*(TH+2) slides the tooth
               // back under the bezel ring.
@@ -553,16 +643,53 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
                 // so the bite lands ON the impact instead of gliding out late.
                 transition: extractionProgress > 0 ? 'none' : TOOTH_TRANSITION_CSS,
               };
+              const arm = bezel.armStyle === 'arms';
               return (
                 <g key={`tooth-${i}`} transform={`translate(${x.toFixed(2)}, ${y.toFixed(2)}) rotate(${(deg - 90).toFixed(1)})`}>
                 <g ref={(el) => { toothRefs.current[i] = el; }} style={teethStyle}>
-                  <path d={path} fill="rgba(0,0,0,0.75)" transform="translate(0.7, 1.0)" />
-                  <path d={path} fill={`url(#${P}slot-v12-claw)`} />
-                  <path d={path} fill={`url(#${P}slot-v12-bevel)`} opacity="0.75" />
-                  <path d={path} fill="none" stroke="rgba(2,2,6,0.88)" strokeWidth="0.9" />
-                  <path d={`M${-TW/2+0.7},0 L -0.6,${-TH+2}`} fill="none" stroke="rgba(255,255,255,0.34)" strokeWidth="0.9" strokeLinecap="round" />
-                  <ellipse cx="0" cy={`${-TH+1}`} rx="2.2" ry="1.0" fill="rgba(0,0,0,0.48)" />
-                  <circle cx="0" cy={`${-TH}`} r="0.9" fill={formatColor(tok('tip.glow'))} />
+                  {arm ? (
+                    <>
+                      {/* Arm — drop shadow, forged body, bevel light, dark outline */}
+                      <path d={armPath} fill="rgba(0,0,0,0.72)" transform="translate(0.8, 1.1)" />
+                      <path d={armPath} fill={`url(#${P}slot-v12-claw)`} />
+                      <path d={armPath} fill={`url(#${P}slot-v12-bevel)`} opacity="0.8" />
+                      <path d={armPath} fill="none" stroke="rgba(2,2,6,0.88)" strokeWidth="1.1" />
+                      {/* Shoulder engraving — reads as the arm's knuckle line */}
+                      <path d="M-5.4,1 Q0,4.5 5.4,1" fill="none" stroke="rgba(2,2,6,0.5)" strokeWidth="0.8" />
+                      <path d={`M-3.4,${-(TH + 1) + 5.5} L-0.8,${-(TH + 1) + 1}`} fill="none" stroke="rgba(255,255,255,0.30)" strokeWidth="0.9" strokeLinecap="round" />
+                      {/* Contact shadow under the claw tip where it bites the rim */}
+                      <ellipse cx="0" cy={`${-(TH + 1) + 1.5}`} rx="2.6" ry="1.1" fill="rgba(0,0,0,0.5)" />
+                      {/* Hinge pin on the band — the visible pivot of the double arm
+                          (local +5 ≈ radius 67, mid-band, over the arm's own base). */}
+                      <circle cx="0" cy="5" r="3.6" fill="rgba(0,0,0,0.6)" transform="translate(0.5, 0.6)" />
+                      <circle cx="0" cy="5" r="3.2" fill={`url(#${P}slot-v12-silver)`} />
+                      <circle cx="0" cy="5" r="3.2" fill={`url(#${P}slot-v12-bevel)`} opacity="0.7" />
+                      <circle cx="0" cy="5" r="3.2" fill="none" stroke="rgba(2,2,6,0.9)" strokeWidth="0.9" />
+                      {bezel.armGemDeg === deg ? (
+                        /* Closure index — small emerald set in the south pin */
+                        <>
+                          <path d="M0,2.9 L1.55,5 L0,7.1 L-1.55,5 Z" fill="#0e5f45" />
+                          <path d="M0,3.4 L1.15,5 L0,6.6 L-1.15,5 Z" fill="#1fae7e" />
+                          <circle cx="-0.35" cy="4.5" r="0.5" fill="rgba(220,255,240,0.8)" />
+                        </>
+                      ) : (
+                        <>
+                          <circle cx="0" cy="5" r="1.05" fill="rgba(8,6,4,0.85)" />
+                          <circle cx="-0.9" cy="4" r="0.8" fill="rgba(255,255,255,0.5)" />
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <path d={path} fill="rgba(0,0,0,0.75)" transform="translate(0.7, 1.0)" />
+                      <path d={path} fill={`url(#${P}slot-v12-claw)`} />
+                      <path d={path} fill={`url(#${P}slot-v12-bevel)`} opacity="0.75" />
+                      <path d={path} fill="none" stroke="rgba(2,2,6,0.88)" strokeWidth="0.9" />
+                      <path d={`M${-TW/2+0.7},0 L -0.6,${-TH+2}`} fill="none" stroke="rgba(255,255,255,0.34)" strokeWidth="0.9" strokeLinecap="round" />
+                      <ellipse cx="0" cy={`${-TH+1}`} rx="2.2" ry="1.0" fill="rgba(0,0,0,0.48)" />
+                      <circle cx="0" cy={`${-TH}`} r="0.9" fill={formatColor(tok('tip.glow'))} />
+                    </>
+                  )}
                 </g>
                 </g>
               );
@@ -655,7 +782,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
     ? Math.max(0, (clampedProgress - TEETH_PHASE) / (1 - TEETH_PHASE))
     : 0;
   const extractionScale = 1.0 + (bezelProgress * 0.08); // 1.0 -> 1.08 (teeth touch medal)
-  const extractionRotation = 0 - (bezelProgress * 30); // 0° -> -30°
+  const extractionRotation = bezelProgress * (bezel.bezelOpenRotateDeg ?? -30); // 0° -> open pose (stock -30°, zanara2 -45°)
 
   // Add spring effect for overshoot
   const springScale = extractionProgress > 1.0
@@ -663,13 +790,20 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
     : extractionScale;
 
   /* Bezel transform for the `.slot-v12__bezel` class rule (the element's inline
-   *  transform — derived inside SeatCycle — wins anyway; kept identical here). */
+   *  transform — derived inside SeatCycle — wins anyway; kept identical here).
+   * Preset override: the open-state rotation may differ from the skin's -30°. */
+  const stateBezelRotate = resolvedState.medalVisible
+    ? (resolvedState.bezelRotateDeg ?? 0)
+    : (bezel.bezelOpenRotateDeg ?? resolvedState.bezelRotateDeg ?? 0);
+  const stateBezelScale = resolvedState.medalVisible
+    ? (resolvedState.bezelScale ?? 1)
+    : (bezel.bezelOpenScale ?? resolvedState.bezelScale ?? 1);
   const bezelTransform = extractionProgress > 0 
     ? `scale(${springScale}) rotate(${extractionRotation}deg)`
-    : `scale(${resolvedState.bezelScale ?? 1}) rotate(${resolvedState.bezelRotateDeg ?? 0}deg)`;
+    : `scale(${stateBezelScale}) rotate(${stateBezelRotate}deg)`;
 
-  const bezelStartScale = slotV12SkinData.states.empty.bezelScale ?? 1.18;
-  const bezelStartRotate = slotV12SkinData.states.empty.bezelRotateDeg ?? -30;
+  const bezelStartScale = bezel.bezelOpenScale ?? slotV12SkinData.states.empty.bezelScale ?? 1.18;
+  const bezelStartRotate = bezel.bezelOpenRotateDeg ?? slotV12SkinData.states.empty.bezelRotateDeg ?? -30;
 
   const cssText = useMemo(
     () => `

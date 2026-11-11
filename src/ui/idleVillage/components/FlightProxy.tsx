@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { WanderlustMedalOverlay } from './WanderlustMedalOverlay';
+import { C1Medallion } from './C1Medallion';
 import { getDragConfig } from '../config/dragConfig';
 import { getHudZoomFactor } from './gameFrame/hudScale';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
@@ -99,7 +99,7 @@ export function FlightProxy({
         ease: [0.55, 0.06, 0.85, 0.4],
       }}
     >
-      <WanderlustMedalOverlay
+      <C1Medallion
         portraitUrl={residentsById?.[residentId]?.portraitUrl}
         isDragging={false}
         sizePx={getDragConfig().overlay.medalSizePx}

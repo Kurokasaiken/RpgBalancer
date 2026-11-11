@@ -753,6 +753,91 @@ const gameFrameQuestPoiSchema = z.object({
   availableDays: z.number().positive(),
 });
 
+/**
+ * /game page behaviour (Director 2026-11-11): the clock opens paused; speeds offered (keys 1..n pick them in order,
+ * filtered by `loop.maxSpeedMultiplier`); nav labels under the icons (off: tooltip and aria-label still carry them).
+ */
+const gameFrameGamePageSchema = z.object({
+  startPaused: z.boolean(),
+  speeds: z.array(z.number().positive()).min(1),
+  navShowLabels: z.boolean(),
+  /** Panels the game menu lists on /game (ids of hudPanelRegistry); empty = the Panels section is hidden until /game has them. */
+  menuPanels: z.array(z.string()),
+  /** Bottom-right corner (menu + hide HUD): offset from the screen edge, gap between buttons, button diameter (px). */
+  corner: z.object({ offsetPx: z.number().nonnegative(), gapPx: z.number().nonnegative(), buttonPx: z.number().positive(), iconPx: z.number().positive() }),
+  /** Zanara game menu (dropdown over the corner): sizes in px; colours are the signed Zanara palette (zanaraOrn `Z`). */
+  menu: z.object({
+    minWidthPx: z.number().positive(), padX: z.number().nonnegative(), padY: z.number().nonnegative(), gapPx: z.number().nonnegative(),
+    liftPx: z.number().nonnegative(), rowHeightPx: z.number().positive(), rowRadiusPx: z.number().nonnegative(),
+    rowFontPx: z.number().positive(), labelFontPx: z.number().positive(), radius: z.number().nonnegative(),
+  }),
+  /** Zanara screens opened by the menu (Load, Settings, Memorial, confirmations): sizes in px. */
+  dialog: z.object({
+    padX: z.number().nonnegative(), padY: z.number().nonnegative(), radius: z.number().nonnegative(), titlePx: z.number().positive(),
+    controlRadiusPx: z.number().nonnegative(), controlHeightPx: z.number().positive(), veilAlpha: z.number().min(0).max(1),
+  }),
+});
+
+const lightSchema = z.object({ light: z.number().min(0).max(1), warm: z.number().min(0).max(1) });
+/**
+ * Time of day on the /game map and on the time bar's dial (Director 2026-11-11: «Luna e torce», sole/luna, notte fino a ×2).
+ * Curve: `p` = progress through the current phase (0..1). Day: light falls from 1 to `nightLight` over [dayFallStart, 1];
+ * warm (amber dusk) rises over [duskWarmStart, duskWarmPeak] and fades over [duskWarmFadeStart, 1]. Night: light rises back
+ * over [dawnRiseStart, 1]; warm (dawn) over [dawnWarmStart, dawnWarmPeak], fading over [dawnWarmFadeStart, 1].
+ */
+const gameFrameTimeOfDaySchema = z.object({
+  map: z.object({
+    /** The night shows only up to this speed; faster, the light holds day (a night would last seconds). */
+    maxSpeed: z.number().positive(),
+    nightLight: z.number().min(0).max(1),
+    curve: z.object({
+      dayFallStart: z.number().min(0).max(1),
+      duskWarmStart: z.number().min(0).max(1),
+      duskWarmPeak: z.number().min(0).max(1),
+      duskWarmFadeStart: z.number().min(0).max(1),
+      dawnRiseStart: z.number().min(0).max(1),
+      dawnWarmStart: z.number().min(0).max(1),
+      dawnWarmPeak: z.number().min(0).max(1),
+      dawnWarmFadeStart: z.number().min(0).max(1),
+    }),
+    /** Dev `?tod=night|dusk|day` previews. */
+    preview: z.object({ night: lightSchema, dusk: lightSchema, day: lightSchema }),
+    /** Night plates (built by `scripts/build-mappa2-night.py` from `mappa2NightPlates.json`) and their live tuning. */
+    plates: z.object({
+      multUrl: z.string(),
+      addUrl: z.string(),
+      bioAUrl: z.string(),
+      bioBUrl: z.string(),
+      /** Per-frame easing toward the target (0.015 ≈ a few seconds of dusk). */
+      easePerFrame: z.number().positive().max(1),
+      /** Night amount = (1 - light) / fullNightAt, clamped: the plates reach full strength at this darkness. */
+      fullNightAt: z.number().positive().max(1),
+      /** Window/lava breathing: alpha × (1 - depth + depth · sin(t·freqA)·sin(t·freqB + 1.1)). */
+      lightsBreath: z.object({ depth: z.number().min(0).max(1), freqA: z.number().positive(), freqB: z.number().positive() }),
+      /** Bioluminescence: starts past `startAt` night amount, alternates two patterns at `speed` rad/s, never below `floor`. */
+      bio: z.object({ startAt: z.number().min(0).max(1), floor: z.number().min(0).max(1), speed: z.number().positive() }),
+    }),
+  }),
+  /** Time bar dial: sun/moon disc seated over the bar's emerald, framed by a crown of ticks lit as the phase runs. */
+  dial: z.object({
+    /** Emerald centre and radius on `time/bar.webp`, design px (measured on its alpha). */
+    cx: z.number(),
+    cy: z.number(),
+    r: z.number().positive(),
+    disc: z.number().positive(),
+    ticks: z.number().int().positive(),
+    majorEvery: z.number().int().positive(),
+    fadeMs: z.number().nonnegative(),
+    sunUrl: z.string(),
+    moonUrl: z.string(),
+    /** Tick geometry (design px): gap from the disc, inset from the emerald rim (major/minor), stroke widths, glow blur. */
+    tick: z.object({ gap: z.number(), insetMajor: z.number(), insetMinor: z.number(), widthMajor: z.number().positive(), widthMinor: z.number().positive(), glowPx: z.number().nonnegative() }),
+    /** CSS box-shadow framing the sun/moon disc (thin gold wire + dark seat). */
+    discFrame: z.string(),
+    colors: z.object({ dayLit: z.string(), nightLit: z.string(), unlit: z.string(), dayGlow: z.string(), nightGlow: z.string(), well: z.string() }),
+  }),
+});
+
 const gameFrameConfigSchema = z.object({
   insets: gameFrameInsetsSchema,
   /** Default nav rail. Only unlocked ids are expected to have working content. */
@@ -775,6 +860,8 @@ const gameFrameConfigSchema = z.object({
   heroSheet: gameFrameHeroSheetSchema,
   debug: gameFrameDebugSchema,
   stageZones: gameFrameStageZonesSchema,
+  gamePage: gameFrameGamePageSchema,
+  timeOfDay: gameFrameTimeOfDaySchema,
 });
 
 export type GameFrameInsetsConfig = z.infer<typeof gameFrameInsetsSchema>;
@@ -1092,6 +1179,45 @@ const RAW_DEFAULT_GAME_FRAME_CONFIG: GameFrameConfig = {
         naturalWidthPx: 380,
         minHeightPx: 200,
         naturalHeightPx: 400,
+      },
+    },
+  },
+  gamePage: {
+    startPaused: true, speeds: [1, 2, 4, 8], navShowLabels: false,
+    menuPanels: [],
+    corner: { offsetPx: 18, gapPx: 8, buttonPx: 44, iconPx: 22 },
+    menu: { minWidthPx: 250, padX: 18, padY: 18, gapPx: 6, liftPx: 14, rowHeightPx: 34, rowRadiusPx: 8, rowFontPx: 13, labelFontPx: 11, radius: 16 },
+    dialog: { padX: 24, padY: 22, radius: 18, titlePx: 18, controlRadiusPx: 8, controlHeightPx: 32, veilAlpha: 0.72 },
+  },
+  timeOfDay: {
+    map: {
+      maxSpeed: 2,
+      nightLight: 0.35,
+      curve: {
+        dayFallStart: 0.8, duskWarmStart: 0.65, duskWarmPeak: 0.85, duskWarmFadeStart: 0.95,
+        dawnRiseStart: 0.8, dawnWarmStart: 0.8, dawnWarmPeak: 0.92, dawnWarmFadeStart: 0.97,
+      },
+      preview: { night: { light: 0.35, warm: 0 }, dusk: { light: 0.7, warm: 1 }, day: { light: 1, warm: 0 } },
+      plates: {
+        multUrl: '/assets/world/mappa2/base/fx/night/night-mult.webp',
+        addUrl: '/assets/world/mappa2/base/fx/night/night-add.webp',
+        bioAUrl: '/assets/world/mappa2/base/fx/night/bio-a.webp',
+        bioBUrl: '/assets/world/mappa2/base/fx/night/bio-b.webp',
+        easePerFrame: 0.015,
+        fullNightAt: 0.65,
+        lightsBreath: { depth: 0.04, freqA: 1.7, freqB: 0.63 },
+        bio: { startAt: 0.4, floor: 0.25, speed: 0.38 },
+      },
+    },
+    dial: {
+      cx: 69.25, cy: 43, r: 27, disc: 18, ticks: 24, majorEvery: 3, fadeMs: 600,
+      sunUrl: '/assets/ui/hud-real/time/sun.webp',
+      moonUrl: '/assets/ui/hud-real/time/moon.webp',
+      tick: { gap: 2.6, insetMajor: 1.6, insetMinor: 3.2, widthMajor: 1.6, widthMinor: 1.1, glowPx: 1.6 },
+      discFrame: '0 0 0 1px rgba(60, 40, 10, 0.9), 0 0 0 2px rgba(241, 216, 138, 0.55), 0 0 6px 2px rgba(2, 14, 18, 0.9)',
+      colors: {
+        dayLit: '#ffe7a3', nightLit: '#cfe2ff', unlit: 'rgba(150, 118, 58, 0.55)',
+        dayGlow: 'rgba(255, 200, 90, 0.95)', nightGlow: 'rgba(150, 195, 255, 0.95)', well: 'rgba(2, 16, 20, 0.62)',
       },
     },
   },

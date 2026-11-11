@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { DragOverlay, type Modifier, type DropAnimation, type DropAnimationFunctionArguments } from '@dnd-kit/core';
 import { useDragContext } from './DragContextStore';
 import { useDragPreviewInstrumentation } from '@/ui/idleVillage/hooks/useDragPreviewInstrumentation';
-import { WanderlustMedalOverlay } from './WanderlustMedalOverlay';
+import { C1Medallion } from './C1Medallion';
 import { getDragConfig } from '../config/dragConfig';
 import WorkerCard from './WorkerCard';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
@@ -584,7 +584,7 @@ export function CustomDragOverlay({
   }, [activeId, setDragPreviewCenter]);
 
   const overlayContent = usePgCardPreview && activeResident ? (
-    <WanderlustMedalOverlay
+    <C1Medallion
       portraitUrl={activeResident ? getResidentPortraitUrl(activeResident) : undefined}
       isDragging={true}
       sizePx={getDragConfig().overlay.medalSizePx}
@@ -635,7 +635,7 @@ export function CustomDragOverlay({
             pointerEvents: 'none',
           }}
         >
-          <WanderlustMedalOverlay
+          <C1Medallion
             portraitUrl={getResidentPortraitUrl(warmResident)}
             sizePx={getDragConfig().overlay.medalSizePx}
           />

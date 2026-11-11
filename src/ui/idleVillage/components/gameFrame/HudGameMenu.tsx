@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EngravedIcon } from './engravedIcons';
 import { HudTooltip } from './HudTooltip';
@@ -27,6 +27,15 @@ export interface HudGameMenuProps {
   onQuit?: () => void;
   /** Offer the dev-only panels (Director, Tuning). Off in a production build. */
   includeDev?: boolean;
+  /**
+   * Panels this page actually has (/game, 2026-11-11: none yet). Omitted = every listed panel (old behaviour);
+   * an empty list hides the Panels section.
+   */
+  panelIds?: readonly HudPanelId[];
+  /** Draw the trigger yourself (/game: the Zanara round button). Gets the same state and handler the default icon uses. */
+  renderTrigger?: (trigger: { open: boolean; onToggle: () => void; label: string }) => ReactNode;
+  /** Draw the dropdown surface yourself (/game: the Zanara plaque). Spread `panelProps` (role, label, anchoring) on it. */
+  renderPanel?: (panel: { children: ReactNode; panelProps: { role: 'menu'; 'aria-label': string; style: CSSProperties } }) => ReactNode;
 }
 
 const SECTION_LABEL_STYLE = {
@@ -44,7 +53,7 @@ const MENU_LOCALES: readonly SupportedLocale[] = ['en', 'it-IT'];
  * today (panel toggles, manual save, language and skin choice) plus the disabled
  * entries (Load, Settings, Quit) that open their screens (PLAN-076).
  */
-export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGame, onOpenSettings, onOpenMemorial, onQuit, includeDev = false }: HudGameMenuProps) {
+export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGame, onOpenSettings, onOpenMemorial, onQuit, includeDev = false, panelIds: panelIdsProp, renderTrigger, renderPanel }: HudGameMenuProps) {
   const { t } = useTranslation('idleVillage');
   const { locale, setLocale } = useLocalization();
   const [open, setOpen] = useState(false);
@@ -79,7 +88,8 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  const panelIds = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => isHudPanelListed(id) && (includeDev || !HUD_PANEL_DEV_ONLY.has(id)));
+  const panelIds = HUD_PANELS.map((p) => p.id as HudPanelId).filter((id) => isHudPanelListed(id) && (includeDev || !HUD_PANEL_DEV_ONLY.has(id)))
+    .filter((id) => !panelIdsProp || panelIdsProp.includes(id));
 
   const toggleMenu = () => {
     setOpen((v) => {
@@ -107,6 +117,7 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
 
   return (
     <div ref={root} data-hud-controls="" style={{ position: 'relative', pointerEvents: 'auto' }}>
+      {renderTrigger ? renderTrigger({ open, onToggle: toggleMenu, label: t('gameFrame.menu.title') }) : (
       <HudTooltip label={t('gameFrame.menu.title')} shortcut="Esc" side="top">
         <button
           type="button"
@@ -120,16 +131,13 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
           <EngravedIcon id="cmd-menu" />
         </button>
       </HudTooltip>
+      )}
 
-      {open && (
-        <HudPlaque
-          shape="panel"
-          as="div"
-          role="menu"
-          aria-label={t('gameFrame.menu.title')}
-          style={{ position: 'absolute', bottom: 'calc(100% + 10px)', right: 0, zIndex: 1100, display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 14px', minWidth: 230 }}
-        >
-          <span style={SECTION_LABEL_STYLE}>{t('gameFrame.panels.title')}</span>
+      {open && (() => {
+        const panelStyle: CSSProperties = { position: 'absolute', bottom: 'calc(100% + 10px)', right: 0, zIndex: 1100, display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 14px', minWidth: 230 };
+        const content = (
+        <>
+          {panelIds.length > 0 && <span style={SECTION_LABEL_STYLE}>{t('gameFrame.panels.title')}</span>}
           {panelIds.map((id) => (
             <button
               key={id}
@@ -148,7 +156,7 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
             </button>
           ))}
 
-          <div aria-hidden="true" style={{ height: 1, margin: '4px 0', background: 'var(--skin-surface-border)' }} />
+          {panelIds.length > 0 && <div aria-hidden="true" style={{ height: 1, margin: '4px 0', background: 'var(--skin-surface-border)' }} />}
           <span style={SECTION_LABEL_STYLE}>{t('gameFrame.menu.session')}</span>
           <button
             type="button"
@@ -215,8 +223,16 @@ export function HudGameMenu({ visible, onTogglePanel, onSaveNow, scale, onLoadGa
           <button type="button" role="menuitem" {...entryProps(onOpenSettings)}>
             <span>{t('gameFrame.menu.settings')}</span>
           </button>
-        </HudPlaque>
-      )}
+        </>
+        );
+        return renderPanel
+          ? renderPanel({ children: content, panelProps: { role: 'menu', 'aria-label': t('gameFrame.menu.title'), style: panelStyle } })
+          : (
+            <HudPlaque shape="panel" as="div" role="menu" aria-label={t('gameFrame.menu.title')} style={panelStyle}>
+              {content}
+            </HudPlaque>
+          );
+      })()}
     </div>
   );
 }

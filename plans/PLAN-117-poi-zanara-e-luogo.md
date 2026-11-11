@@ -1,135 +1,136 @@
-# PLAN-117 — POI nel linguaggio Zanara + componente Luogo (hover alabastro, clic ventaglio)
+# PLAN-117 — Layer opportunità della mappa: POI Zanara, Luoghi fissi, Eventi strategici, Regioni
 
-**Stato:** bozza rev. 3 (2026-11-11) — rev. 2 + ruling D-8 del Director + revisione post-dibattito multi-AI web (run `20261111-plan117-poi-zanara`, converged 3/3 su r003), in attesa di battesimo.
+**Stato:** bozza rev. 4 (2026-11-11) — emendamento Director durante l'iterazione F1; in preparazione al dibattito multi-AI web (run 2), poi battesimo.
 
-> **Rev. 3 — cosa cambia (esito dibattito multi-AI web, ACCEPT 3/3: chatgpt, claude, deepseek):**
-> - **Igiene del contratto:** rev. 2 lasciava nel testo riferimenti a lavoro sospeso (fork F2, «baseline F1/F2», scheda/ventaglio in T4.1). Ora il contratto cita solo ciò che questa rev. consegna.
-> - **T1.3 sulla superficie viva:** la soglia si misura nel lab su anchor DOM reali (`PixiWorldMap`), non solo su ritagli composti; sull'asset congelato dal gate F1; la soglia = il massimo tra vincoli indipendenti (sagome, halo, hit-area) — l'interferenza POI↔scheda resta osservazione contestuale, non entra nella soglia (WITNESS-01).
-> - **OB-10 non più hollow:** accettazione geometrica (nessun overlap hit-area alla soglia, sopra e sotto), unità e riferimento documentati, numero **provisional** finché il piano successore decide isteresi e clustering.
-> - **Copertura stati:** OB-3 esteso a matrice stato×famiglia (7 stati, `veiled` incluso); vermiglio sul token risolto con test negativo; halo a 0 = zero pixel disegnati.
-> - **Nota dibattito su D-8:** il bivio *cluster authored* (attività co-localizzate su un punto — il caso-motore villaggio, deterministico, senza soglia) vs *aggregazione emergente* (l'unica che usa la soglia) è stato sollevato dal dibattito; il ruling chiude la semantica «distanza nel mondo» per la regola emergente. I 2 POI live distano ~540 unità mondo: a densità attuale la regola scatta raramente — registrato come evidenza per il piano Luogo, non riapre la decisione.
-> - **§5:** rischi nuovi — collo di bottiglia generazione + uscita «nessuna opzione vince», stacking HUD firmata non verificato nel lab (T-03), regola emergente possibile dead code.
+> **Rev. 4 — emendamento strutturale (ruling Director 2026-11-11, iterazione sul mockup):**
+> - **Luogo = entità autoriale, non emergente.** Bocciata l'aggregazione per vicinanza («POI vicini diventano Luogo»): ogni POI appartiene a un **Luogo/Regione fissa** decisa dal world design. D-8 e la misura di soglia (T1.3, OB-10) **morte** — la domanda non esiste più.
+> - **Eventi ≠ POI.** Gli eventi strategici di medio-lungo termine (es. «invasione goblin tra X giorni», positivi e negativi, obiettivi del giocatore) non sono marker sulla mappa: richiedono un **componente dedicato** (lista/timeline ordinata per scadenza, in chiave Zanara; il reminder obsoleto è il riferimento, non il riuso).
+> - **Anello temporale riscritto.** Orario = in corso (colore di famiglia: blu quest / verde job); antiorario = countdown turni alla scomparsa (**arancione**); urgenza = **solo pulsazione luminosa**, niente vermiglio né cambio colore — risolve anche il caso daltonico rosso/verde.
+> - **Famiglie visive coerenti.** Stessa cornice stellata Zanara per tutti i tipi; la differenziazione sta nella **forma delle punte/gioielli** e nel glifo — non in sagome radicalmente diverse né nel solo colore.
+> - **Regioni da ridisegnare.** L'overlay territoriale «stile Risiko» (verde piatto in hover) è brutto e fuori lingua; le regioni stesse (regions.json) furono definite casualmente → lavoro di ridisegno intelligente.
+> - **Generazione:** il Director ha delegato la generazione immagini all'agente (pipeline Gemini web + canvas-readback, quota esaurita in giornata — fallback altri provider o attesa).
+> - **Direzione visiva emersa:** mockup del Director come riferimento; preferita «cartografia incisa» — cornice stellata con punte, contorno scuro, campo smalto saturo scuro, glifo piatto (es. arco avorio su blu). Le 3 direzioni A/B/C generate (smalto/oro/gemma senza bordo scuro) bocciate: oro sul perimetro si mimetizza.
 
-> **Rev. 2 — scope ridotto al POI (Director 2026-11-11, verbatim):** *«lavoriamo sul POI da solo, se ce ne sn tanti vicini deve divnetare automaticamente un luogo e mostrare + POI in questo nuovo modo»*.
-> - **In questo piano:** F0 (solo T0.1), F1, F3 (solo T3.1 + test del POI), F4 sul POI.
-> - **Sospesi → piano successivo dopo il ruling F1:** T0.2, T0.3, tutta F2, T3.2–T3.4 (scheda in hover, ventaglio, `MapPlace`), D-2, D-3, D-5, D-6, D-7.
-> - **Regola nuova (vincolo, non si progetta qui):** POI troppo vicini diventano **automaticamente un Luogo** e si mostrano nel modo nuovo (hover scheda / clic ventaglio). Un Luogo quindi non è solo scritto a mano (villaggio): può nascere dalla vicinanza. In F1 si misura **la distanza a cui due POI cominciano a disturbarsi**: è la soglia che farà scattare il Luogo (D-8).
-> - Contratto di chiusura rev. 2: OB-3, OB-4, OB-6, OB-7, OB-8, OB-9 + **OB-10** (soglia di vicinanza misurata e scritta in config). OB-1, OB-2, OB-5 passano al piano del Luogo.
-**Parent:** R-324 (questa richiesta), OPEN-025 (Luogo), OPEN-026 (famiglie), R-323/PLAN-113 (HUD Zanara su `/game`), PLAN-116 (cassetto, in corso in un'altra sessione).
-**Origine (Director, 2026-11-11, verbatim):**
-- *«Un componente che ti dica tutte le attività che ci sn su un determinati punto che ha + attività correlate, che io inizialmente avevo chiamato Luoghi […] Potremmo usare come base il componente verde e alabastro come "contenitore" […] ma quella forma nn è adeguata x il nostro scopo.»*
-- *«direi tipo: mouse over il componente di alabastro di cui ti parlavo con testo e immagine. onClick ventaglio»* → ventaglio su **due anelli**, interno = **urgenza**; clic su un sigillo = dettaglio specifico (oggi il cassetto del planner per le quest).
-- *«e in tutto ciò: nn facciamo dei nuovi POI che siano adeguati alla nuova HUD e UI?»* → sì: il ventaglio è fatto di POI, quindi i POI nuovi vengono **prima** del Luogo.
+> **Rev. 3 (storico):** igiene contratto post-dibattito run `20261111-plan117-poi-zanara` (converged 3/3). I suoi punti tecnici restano dove ancora applicabili (misure su superficie viva, accettazione geometrica, copertura stati), ma le parti legate alla soglia di vicinanza sono superate da rev. 4.
+>
+> **Rev. 2 (storico):** scope ridotto al POI. Rev. 4 riunifica: POI + Luoghi autoriali + Eventi + Regioni = un solo layer "opportunità della mappa".
 
-**Decisioni già prese (non si riaprono qui):** `context/DECISION_LOG.md` 2026-11-11 (due famiglie: spedizione e lavoro; hover = scheda alabastro, clic = ventaglio, due anelli, interno = urgenza). Grammatica funzionale del Sigillo (`src/docs/docs/idle_village/poi_family_spec.md` § Sigillo): **bordo = essere visto, sagoma = famiglia, glifo = luogo, halo = tempo**; stati available / expiring / working / done / expired / veiled; vermiglio solo per l'urgenza; niente etichetta col nome sopra il POI (R-177, 15/10).
+**Parent:** R-324, OPEN-025 (Luogo), OPEN-026 (famiglie — rivisitata: si propongono 3 tipi visivi), R-323/PLAN-113 (HUD Zanara), PLAN-116 (cassetto, in corso in un'altra sessione — file non toccabili).
+
+**Origine (Director, verbatim):**
+- 2026-11-11 mattina: Luogo come aggregato di attività su un punto; hover scheda alabastro, clic ventaglio a due anelli (interno = urgenza); POI nuovi nel linguaggio Zanara *prima* del Luogo.
+- 2026-11-11 sera (iterazione F1): *«il vermiglio sull'urgenza per adesso nn mi interessa, possiamo scartarlo […] orario se qualcuno c sta lavorando, anti orario se abbiamo X turni prima che sparisca. Con i colori diversi: arancione x la scadenza, l'altro a seconda se è job o quest»* · *«famiglie visive.. magari cambiamo la forma della punta? ma devono rimanere relativamente simili»* · *«Urgenza al massimo facciamo pulsare e basta»* · *«vorrei che ci fossero degli eventi […] negativi o positivi e rappresentano davvero gli obiettivi a medio e lungo termine […] come POI sulla mappa nn hanno senso […] un componente (che in teoria già c'è ma è obsoleto) che mostra in ordine di scadenza tutte le quest, eventi, ecc.»* · *«usiamo il luogo di per se, come già sn divisi in regioni […] i poi appariranno sempre in regioni specifiche […] nn è che i luoghi verranno creati sul momento x vicinanza d POI»* · *«la mappa è divisa tipo risk ma verde è molto brutto e va migliorato […] le regioni le abbiamo definite casualmente, dobbiamo pensarci meglio»*.
+
+**Decisioni già prese (non si riaprono qui):** `context/DECISION_LOG.md` 2026-11-11 — **eccetto** i punti esplicitamente rivisitati da rev. 4: la famiglia «minaccia/evento» torna discussa (3 tipi visivi, non più solo "variante di spedizione"), la regola «vermiglio = urgenza» è sostituita dalla pulsazione, l'aggregazione emergente è bocciata. Restano: hover = scheda alabastro, clic = ventaglio a due anelli (interno = urgenza), niente nome scritto sopra il POI, grammatica **bordo/sagoma/glifo/anello** (l'anello ora = direzione + colore di stato, non più vermiglio).
 
 **Cosa NON è:**
-- non cambia la vista Village né costruisce la sua vista ibrida veloce (cosa c'è, blueprint): è **successivo** (OPEN-025, correzione Director 2026-11-11);
-- non disegna il dettaglio dei job: il clic su un sigillo-lavoro non apre ancora nulla di nuovo (D-3);
-- non riattiva la famiglia `job` nel motore né collega edifici e attività: il contenuto del Luogo-villaggio è **fixture etichettata** finché quel legame non esiste (D-2);
-- non tocca i file che PLAN-116 sta modificando (`SlotV12Renderer.tsx`, `ResidentSlotRack.tsx`, `C1Medallion.tsx`, cassetto): li legge soltanto;
-- niente telefono (< 768 px), niente nuove regole di gioco (tempi, ricompense, rischio).
+- non monta POI su `/game`: il flusso POI→quest è PLAN-116 D8; il lavoro vive nel lab `/lab/poi-luogo` (D-1) e su compositi;
+- non disegna il dettaglio dei job (D-3);
+- non tocca file di PLAN-116 (slot, ghiera, medaglione C1, cassetto): li legge soltanto;
+- niente telefono (< 768 px), niente nuove regole di gioco;
+- il componente Eventi è **specificato** qui (architettura + pelle), non implementato fino al suo gate.
 
 ## 0. Fatti verificati (2026-11-11)
 
-- **`/game` oggi non ha POI.** `src/pages/game-mappa2.tsx` monta `PixiWorldMap` + HUD firmato, nessun marker; il flusso POI→quest esiste solo su `/gameOld` (`MapQuestPoi` → `PoiMatericV3_5 sigillo`). PLAN-116 D8 lo dichiara già fuori scope. `PixiWorldMap` ha però la prop `anchors` (DOM fissato a punti del mondo, dimensione schermo costante) e `worldLayer`: il punto di aggancio esiste.
-- **Il Sigillo attuale è nel linguaggio vecchio** (lacca + bronzo del Roster V2, bordo avorio): non appartiene alla famiglia Zanara (smalto smeraldo, oro inciso, gemme sfaccettate — ref canonico `/game` chrome, ruling 2026-11-06). Lo stato viene solo da `mapQuestPoiView` (T-07), testato in `tests/unit/idleVillage/poiSigillo.test.tsx` e `mapQuestPoi.test.ts` (contratto CTR-game-008).
-- **Contenitore alabastro:** `src/ui/idleVillage/hudReal/HudRealPanel.tsx` + `panel/frame.webp` (340×512 a 1440). Catture 2026-11-11 in scratch (`panel.png`, `ledger.png`): forma fatta per **una** attività (finestra ad arco ~1:2,6, sigillo esito, placca «INIZIA»); usata come lista (`HudRealLedgerPanel`) lascia finestra vuota, placca senza testo, 2 righe visibili su 4. La cornice dipinta non si stira (DECISION_LOG «mockup-signed-is-not-an-asset»; P2 di PLAN-116): una forma nuova = cornice ricomposta a pezzi (tecnica `column/frame_v2.py` di PLAN-116) o asset nuovo generato dal Director.
-- **Vecchio Luoghi:** `TheaterView` (immagine «teatro» + slot affiancati) è commentato in `src/ui/idleVillage/map/MapPage.tsx`: non è visibile dal vivo.
-- **Dati:** nessun concetto di Luogo nel codice; catalogo edifici `villageBuildingsConfig.ts` (16 edifici, mock) non collegato alle attività; quest reali su `/gameOld`: `poi-goblin` (ripetibile), `poi-rovine`.
-- **Desiderata:** ultima FROZEN v37 (astrolabio): nessuna slice coperta → niente check di disposizione P8. Valgono v35 (visual fork) e v36 (contratti vivi).
-- **Superfici e trappole:** HUD su mappa e `PixiWorldMap` → T-01; halo/archi → T-02; popover/hover su `/game` → T-03 (`SkinScope` + `data-hud-controls`); prove visive → T-04; stato derivato → T-07; hit-area → T-21; prompt per immagini → T-16/T-25..T-28. Surface-map `game-interaction` → `npm run test -- tests/unit/idleVillage`.
+- **`/game` non ha POI**; il flusso POI→quest esiste solo su `/gameOld` (`MapQuestPoi` → `PoiMatericV3_5`, Sigillo SVG). `PixiWorldMap` espone `anchors` + seam dev `__worldCamCtl`/`__worldCam` (CTR-game-005).
+- **T0.1 fatto:** `scripts/capture-poi-map-matrix.mjs` → `test-results/poi-zanara-f0/` (86 PNG, 7 zone × 2 viewport × 3 zoom + baseline Sigillo). Coverage floor misurato: 0.586 @1440×900, 0.521 @1280×800.
+- **Iterazione visiva fatta:** 3 direzioni generate e bocciate (`gen/A,B,C`); mockup Director (`refs/director-mockup.jpg`) estratto e composto (`card-mock/`); stati+deuteranopia simulati (`card-states/`). Evidenze: contorno scuro necessario; cornice a punte legge a 32px; famiglia per solo colore crolla a 44px e in grigio; micro-architettura si confonde con edifici scena; verde/vermiglio confondibili in deuteranopia.
+- **Regioni attuali:** `public/assets/world/mappa2/base/regions.json` (20 regioni, centro+bbox+biomi) con overlay hover "Risk-style" piatto — definite casualmente, da ripensare.
+- **Reminder obsoleto:** componenti `ReminderComponentV2/V3` + feed decisioni (`QuestDecisionFeed*`): riferimento per il componente Eventi, non riuso diretto.
+- **Eventi nel mondo:** `seaWonders.ts` e materiali di `villageZoneManifest` contengono semi di eventi; il concetto "invasione/evento a scadenza" non ha superficie propria oggi.
 
 ## 1. Principi
 
-- **P1 — Grammatica invariata, materiali nuovi.** I POI nuovi cambiano aspetto, non significato: bordo/sagoma/glifo/halo e i 7 stati restano quelli del Sigillo; lo stato resta letto da una sola view-model (T-07).
-- **P2 — Prima vedere, poi costruire.** Ogni decisione estetica passa da una visual-fork card (v35) con anteprime **sulla mappa vera** (catture headless di `/game` a 1440×900 e 1280×800, almeno 4 biomi + mare), poi ruling del Director.
-- **P3 — Asset puliti, niente stiramenti** (come PLAN-116 P2). Gli asset dipinti li genera il Director dai prompt preparati qui (ruling 2026-10-27); l'agente prepara prompt, ritagli e misure.
-- **P4 — Leggibilità misurata:** POI distinguibili per sagoma in scala di grigi a 32 px su ogni bioma (`poi-terrain-gate` esistente, bordo ≥ 3:1); testi della scheda ≥ 12,8 px CSS a 1280×800.
-- **P5 — Headless/background** per ogni cattura e prova (regola 16); l'occhio del Director è un passo manuale.
+- **P1 — Grammatica, non pixel.** Bordo=essere visto, sagoma=famiglia, glifo=luogo, anello=tempo (direzione+colore di stato). I materiali cambiano (Zanara), il significato no — tranne dove rev. 4 lo dichiara esplicitamente (vermiglio→pulsazione).
+- **P2 — Prima vedere, poi costruire.** Fork card su catture vere, ruling Director, baseline congelata (v35).
+- **P3 — Generazione agente, ruling Director.** L'agente scrive prompt, genera (quota permettendo), compone, misura; il Director vede e decide.
+- **P4 — Leggibilità misurata + accessibilità.** Sagoma distinta a 32px in grigio; nessun canale informativo affidato al solo rosso/verde (urgente = pulsazione; lavoro vs quest = forma+icona, colore solo rinforzo).
+- **P5 — Ogni cosa al suo posto.** POI = opportunità puntuali in un Luogo; Luogo = nodo territoriale autoriale; Evento = obiettivo strategico a scadenza (componente dedicato); Regione = partizione geografica ridisegnata. Nessuno si improvvisa nell'altro.
+- **P6 — Headless/background** (regola 16).
 
-## 2. Decisioni aperte (da chiudere al battesimo o al gate indicato)
+## 2. Decisioni aperte
 
-| ID | Decisione | Proposta del planner | Quando |
+| ID | Decisione | Proposta | Quando |
 |---|---|---|---|
-| **D-1** | Superficie di sviluppo e prova | Lab `/lab/poi-luogo` sopra la mappa2 vera (`PixiWorldMap` + `anchors`), `spike: promote`; il montaggio su `/game` arriva con il flusso POI→quest (PLAN-116 D8), non qui | battesimo |
-| **D-2** | Contenuto del Luogo-villaggio | **sospesa → piano Luogo** (fixture etichettata 5–9 attività, proposta registrata) | piano Luogo |
-| **D-3** | Clic su un sigillo-lavoro | **sospesa → piano Luogo** (feedback «presto» non bloccante, proposta registrata) | piano Luogo |
-| **D-4** | Aspetto del POI nuovo | Fork F1 | gate F1 |
-| **D-5** | Come si presenta un Luogo chiuso | **sospesa → piano Luogo** (fork: luogo dipinto senza marker vs sigillo-luogo con halo urgenza max) | piano Luogo |
-| **D-6** | Forma della scheda in hover | **sospesa → piano Luogo** (fork: più bassa, senza placca d'azione e senza sigillo esito) | piano Luogo |
-| **D-7** | Forma del ventaglio | **sospesa → piano Luogo** (fork: cerchio pieno vs arco, raggi, collisioni, chiusura) | piano Luogo |
-| **D-8** | Cosa vuol dire «vicini» per far scattare il Luogo automatico | **Deciso 2026-11-11: distanza nel mondo** (px del manifest mappa2), fissa a ogni zoom. Conseguenza: la soglia va misurata **allo zoom più lontano** (`floorZoom`, T-01), perché è lì che due POI non raggruppati sono più vicini sullo schermo | chiusa |
+| **D-1** | Superficie dev/prova | Lab `/lab/poi-luogo` su `PixiWorldMap` + anchors | battesimo |
+| **D-4** | Preset POI definitivo | Direzione «cartografia incisa» (preferita) vs varianti post-dibattito | gate F1 |
+| **D-9** (nuova) | Quanti tipi visivi | 3 (quest/event/job, sagome proprie+punte proprie) — rivisita OPEN-026 | dibattito/battesimo |
+| **D-10** (nuova) | Colore famiglia | Ammesso come **rinforzo** (blu/verde scuri); famiglia resta su sagoma+punte+icona | battesimo |
+| **D-11** (nuova) | Secondo canale urgenza | Pulsazione luminosa (ruling già dato: niente vermiglio, niente badge) — confermare che basta | battesimo |
+| **D-12** (nuova) | Confine Eventi | Eventi = lista/timeline dedicata, **mai** marker mappa; nome/superficie del componente | dibattito |
+| **D-13** (nuova) | Luogo autoriale | Luogo = regione o nodo co-locato scritto nel manifest; ogni POI ha `placeId` obbligatorio | dibattito |
+| **D-14** (nuova) | Ridisegno regioni | Feedback territoriale in lingua Zanara (non verde piatto); definizioni regioni ripensate | dibattito/gate F6 |
+| **D-5/6/7** | Scheda hover, ventaglio, Luogo chiuso | Restano valide le scelte del mattino (scheda bassa, due anelli interno=urgenza) | gate F2 |
+| **D-2/3** | Fixture villaggio, clic job | Invariati | piano |
 
 ## 3. Fasi
 
-### F0 — Fondamenta (nessun pixel nuovo)
-- T0.1 Catture headless di riferimento di `/game` (1440×900, 1280×800) su 4 biomi + mare, con i ritagli dove cadranno POI e Luogo-villaggio; e del Sigillo attuale da `/gameOld` per confronto.
-  - ✅ **Fatto 2026-11-11** — `scripts/capture-poi-map-matrix.mjs` → `test-results/poi-zanara-f0/` (86 PNG): 7 zone (villaggio + foresta, neve, canyon, vulcano, laguna, mare ovest) × 3 zoom (`zfloor` coverage, `zmin` manifest 0.18, `zmid` 1.0) × full+crop 400×400 alle due viewport; baseline `gameold-sigillo-*.png`. **Misurato per D-8: coverage floor = 0.586 @1440×900, 0.521 @1280×800** (manifest minZoom 0.18; `__worldCamCtl.set`/`__worldCam`, seam CTR-game-005). Nota T1.3: «zoom più lontano» per la misura = coverage floor (il clamp effettivo della camera), non il minZoom manifest — da confermare in lettura di D-8.
-- T0.2 Funzione pura `orderPlaceActivities(activities, views)` → `{ inner, outer }`: interno = `expiring` + `done` (le urgenti), esterno = il resto; ordine stabile dentro l'anello; capienza per anello dichiarata in config (non stimata). **Test di regressione permanente** `tests/unit/idleVillage/placeOrdering.test.ts` (R-247).
-- T0.3 Schema config `placesConfig.ts` (Zod, `deepFreeze`): `id`, punto nel mondo, `titleKey`/`bodyKey` i18n (en + it-IT, ICU), immagine, elenco attività; Luogo-villaggio da fixture (D-2).
+### F0 — Fondamenta
+- ✅ **T0.1 fatto** (matrice catture + baseline Sigillo; vedi §0).
+- T0.2 `orderPlaceActivities(activities, views)` → `{ inner, outer }` (interno = urgenti: expiring+done; ordine stabile; capienza da config) + test permanente `placeOrdering.test.ts`.
+- T0.3 Schema `placesConfig.ts` (Zod, deepFreeze): `id`, punto/regione nel mondo (`placeId` ↔ regione), i18n, immagine, elenco attività; `poiConfig` con `placeId` obbligatorio; niente campi soglia/cluster emergenti.
+- T0.4 (nuovo) Inventario Eventi: fonti esistenti (`seaWonders`, manifest, `ReminderComponent*`, feed decisioni) e modello dati minimo `{ id, kind: positive|negative, deadlineTurn, placeId?, titleKey, bodyKey }`.
 
-**Gate F0:** test verdi, `tsc --noEmit` verde. Nessuna richiesta al Director.
+### F1 — POI Zanara (visual fork)
+- ✅ **T1.1 fatto (iterazione 1–2):** 3 direzioni generate+bocciate; mockup Director come reference; ipotesi bordo scuro validata su compositi.
+- T1.2b Varianti «cartografia incisa» per le **3 sagome** (spedizione, lavoro, evento — differenza in punte/gioielli+glifo, D-9): composite su catture F0 a 32/44/55/69, colore+grigio+deuteranopia; stati anello nuovi (CW famiglia / CCW arancione / pulsazione) disegnati; `poi-terrain-gate` su ogni opzione.
+- **Gate F1 (D-4, D-9, D-10, D-11):** ruling + baseline congelata (sha256).
+- ~~T1.3 misura soglia vicinanza~~ **eliminata (rev. 4).**
 
-### F1 — POI nel linguaggio Zanara (visual fork)
-- T1.1 Prompt per 2–3 direzioni materialmente diverse (stessa grammatica, materiali diversi: es. medaglione in oro inciso con campo smaltato; sigillo a placca smeraldo con incastonatura di gemma; una terza solo se vince almeno un asse), per le 3 sagome (spedizione = tondo con coda, lavoro = tassello, minaccia = rombo). Il Director genera; l'agente ritaglia, pulisce, misura (`scripts/hud-real/check-palette.py`, oro nelle soglie G2-6).
-- T1.2 Card `.mw/runs/<run>/visual-fork-poi-zanara.md`: anteprime composte sulle catture F0 (colore + grigi, 32/44/55/69 px), halo nei 3 modi (scadenza, lavoro, fatto) a 0 / 25 / 100 %, `poi-terrain-gate` per opzione. Assi: gerarchia/densità, token skin, stati, reduced-motion, costo.
-- T1.3 Misura della soglia di vicinanza (rev. 3, **sulla superficie viva** — i ritagli composti di T1.2 servono al fork visivo, non alla misura): nel lab `/lab/poi-luogo`, con gli anchor DOM reali di `PixiWorldMap`, **sull'opzione congelata al gate F1** (non per tutte): serie di distanze decrescenti tra i centri (es. 80 → 24 px) a taglia dichiarata, **allo zoom più lontano** (`floorZoom`, T-01) a 1280×800 e 1440×900 — è lì che due POI non raggruppati sono più vicini sullo schermo. Per ogni distanza si registra: contatto sagome, leggibilità halo, overlap hit-area (≥ 32 px, T-21). L'interferenza POI↔scheda alabastro si misura a parte come osservazione contestuale (input per il posizionamento scheda del piano Luogo): **non** entra nella soglia, che è una relazione POI↔POI (WITNESS-01). La soglia candidata = **il massimo** tra i vincoli indipendenti (deve scattare prima che qualunque criterio fallisca); la distanza sullo schermo si converte in **px del mondo** e diventa la soglia del Luogo automatico (D-8, distanza nel mondo), scritta in config a F3 (OB-10).
-- **Gate F1 (D-4):** ruling del Director + baseline congelata (sha256).
+### F2 — Luogo autoriale (fork)
+- T2.1 Scheda hover bassa (come da decisioni mattina); T2.2 ventaglio due anelli (interno = urgenti secondo la nuova grammatica); T2.3 Luogo chiuso (dipinto o sigillo-luogo); T2.4 card lab con hover+clic su Luogo-villaggio fixture.
+- **Gate F2 (D-5, D-6, D-7):** ruling + baseline.
 
-### F2 — SOSPESA → piano Luogo (D-5, D-6, D-7)
-
-> Contenuto originale conservato sotto come riferimento per il piano successore. Non è lavoro di questa rev.
-- T2.1 Scheda in hover: 2 forme basse ricavate dai pezzi di `frame.webp` (o prompt al Director se i pezzi non bastano) — es. orizzontale (immagine larga a sinistra, testo a destra) e verticale bassa (banda immagine sopra, testo sotto); solo titolo, occhiello, testo, immagine e un riassunto delle attività (conteggi per famiglia).
-- T2.2 Ventaglio: 2 disposizioni con i POI scelti in F1 — cerchio pieno su due anelli vs arco superiore su due file — e la regola per i POI vicini (abbassati sotto il ventaglio) e la chiusura (clic fuori, Esc, secondo clic sul Luogo).
-- T2.3 Luogo chiuso (D-5): 2 opzioni sulle catture.
-- T2.4 Card `.mw/runs/<run>/visual-fork-luogo.md` con anteprima interattiva nel lab (D-1) per hover e clic.
-- **Gate F2 (D-5, D-6, D-7):** ruling + baseline congelate.
-
-### F3 — Componenti (solo l'opzione scelta)
-- T3.1 POI Zanara come preset additivo del marker (il Sigillo attuale resta per `/gameOld` e i lab), stato letto da `mapQuestPoiView`; nessuna modifica alle INV di CTR-game-008 (Mode B-add: nuovo componente con le sue invarianti).
-- ~~T3.2 `PlaceHoverCard`…~~ **sospeso → piano Luogo.**
-- ~~T3.3 `MapPlace` nel lab…~~ **sospeso → piano Luogo.**
-- T3.4 Test (rev. 3): `poiProximity.test.ts` (OB-10) + estensione di `poiSigillo.test.tsx` al preset nuovo con matrice **stato×famiglia** completa (7 stati, `veiled` incluso): vermiglio asserito sul **token risolto** con test negativo (nessuno stato non-urgente risolve in tonalità vermiglia); halo a 0 = zero pixel disegnati (asserzione automatizzata, T-02); hit-area ≥ 32 px (T-21).
+### F3 — Componenti (opzioni scelte)
+- T3.1 POI Zanara: preset additivo del Sigillo (SVG — halo, punte, pulsazione, stati nuovi), `/gameOld` e lab invariati; stato da `mapQuestPoiView`; nessuna modifica alle INV di CTR-game-008.
+- T3.2 `PlaceHoverCard` + `MapPlace` nel lab (Luogo autoriale, da `placesConfig`).
+- T3.3 Test: `poiSigillo.test.tsx` esteso (matrice stato×famiglia×tipo, 3 sagome; pulsazione asserita via attributo/classe, non colore; anello a 0 = zero pixel; hit-area ≥32px) + `placeOrdering.test.ts` + `mapPlace.test.tsx` (DOM-over-Pixi: clic vs pan).
 
 ### F4 — Chiusura
-- T4.1 Confronto affiancato stessa viewport baseline vs lab (1440×900, 1280×800, + cattura a `floorZoom`) **per il solo POI**; criteri di confronto **pre-registrati**: viewport, zoom, bioma, hash asset, regioni di confronto; regressioni strutturali separate dal giudizio estetico (che resta del Director); `NOT_COMPARABLE` è un esito legittimo.
-- T4.2 `verification.json` → `verify:bundle` → `bundle.json`; voce in `RICHIESTE.md`.
-- T4.3 Occhio del Director sul lab (manuale). Dichiarare cosa non è stato visto dal vivo (es. snap urgente, pulsazione, montaggio su `/game`).
+- T4.1 confronto affiancato pre-registrato (viewport/zoom/bioma/hash/regioni; `NOT_COMPARABLE` legittimo); T4.2 `verify:bundle`; T4.3 occhio Director + dichiarazione del non-visto.
+
+### F5 — Eventi strategici (componente dedicato — D-12)
+- T5.1 Fork superficie: lista verticale in chrome Zanara vs strip orizzontale tipo speed-controls vs drawer dedicato; voci ordinate per `deadlineTurn`, segno positivo/negativo leggibile senza colore-solo (icona+glifo).
+- T5.2 Preset e integrazione HUD (post-ruling): vive nella HUD firmata, mai come marker mappa; può linkare un Luogo (se l'evento ha `placeId`).
+- **Gate F5 (D-12):** ruling sul fork + baseline.
+
+### F6 — Regioni (ridisegno — D-14)
+- T6.1 Fork feedback territoriale: contorno inciso/glow + tinta smalto tenue vs pattern filigrana su bordi; **mai** verde piatto; grigio-safe.
+- T6.2 Revisione definizioni: regioni semantiche dal world design (non casuali), con `regionId` usato da `placesConfig` (D-13); minimo una re-bucketing documentata.
+- **Gate F6 (D-14):** ruling + baseline.
 
 ## 4. Contratto di chiusura
 
 | OB | Tipo | Obbligazione | Comando / artefatto |
 |---|---|---|---|
-| OB-1 | — | **sospesa → piano Luogo** (ordinamento anelli) | — |
-| OB-2 | — | **sospesa → piano Luogo** (hover/clic/chiusura) | — |
-| OB-3 | state, blocking | Grammatica invariata sul preset nuovo: matrice **stato×famiglia** completa (7 stati, `veiled` incluso); vermiglio solo urgenza asserito sul token risolto con test negativo; halo a 0 = zero pixel | `npm run test -- tests/unit/idleVillage/poiSigillo.test.tsx` (esteso al preset) |
+| OB-1 | state, blocking | `orderPlaceActivities` + test permanente (interno=urgenti secondo nuova grammatica) | `npm run test -- tests/unit/idleVillage/placeOrdering.test.ts` |
+| OB-2 | state, blocking | Luogo lab: hover scheda, clic ventaglio, chiusura; clic-vs-pan DOM/Pixi | `mapPlace.test.tsx` (+ e2e se serve) |
+| OB-3 | state, blocking | Preset POI: matrice stato×famiglia×tipo (3 sagome, 7 stati, `veiled`); pulsazione = attributo non colore (nessun rosso/vermiglio risolto, test negativo); anello 0 = zero pixel; hit-area ≥32px | `npm run test -- tests/unit/idleVillage/poiSigillo.test.tsx` |
 | OB-4 | state, blocking | Surface `game-interaction` | `npm run test -- tests/unit/idleVillage` |
-| OB-5 | — | **sospesa → piano Luogo** (e2e Luogo) | — |
+| OB-5 | state, blocking | `placesConfig`/`eventsConfig` Zod-validati, `placeId` obbligatorio su ogni POI, fixture villaggio etichettata | schema test |
 | OB-6 | state, blocking | Build e tipi | `npm run build:check`, `npx tsc --noEmit` |
-| OB-7 | state, blocking | Leggibilità: per-marker **e** su cluster alla soglia T1.3 (≥2 biomi); overlay atmosferici/notte dichiarati NOT VERIFIED o una cattura aggiunta | `python3 scripts/poi-terrain-gate.py` sul preset nuovo (bordo ≥ 3:1, sagome distinte in grigio a 32 px) |
-| OB-8 | visual, blocking | Same-viewport vs baseline **F1** (criteri pre-registrati: viewport/zoom/bioma/hash asset/regioni; `NOT_COMPARABLE` legittimo) | report affiancato |
-| OB-9 | human-eye | Occhio del Director sul lab; **montaggio su `/game` = NOT VERIFIED by design (D-1)** — il lab prova il preset sulla superficie mappa reale, non l'integrazione | screenshot + nota |
-| OB-10 | state, blocking | **Contratto produttore→consumatore** (rev. 3): (a) distinzione authored/emergente registrata in config; (b) soglia in **px del mondo** (D-8), misurata su anchor live a `floorZoom` (T1.3), copre **solo il caso emergente**; (c) accettazione geometrica — alla soglia registrata nessuna coppia di hit-area (≥32 px) si sovrappone, verificato sopra e sotto soglia sul preset reale; (d) campi documentati `unit`/`reference` (hitArea\|edge\|center) e comportamento al bordo; (e) numero **provisional, non frozen**: isteresi, clustering mode, famiglie/stati misti, `veiled`, cluster vuoto/singolo/oversize = **prerequisiti del piano successore** elencati in «Successor constraints», non decisi né disegnati qui | `npm run test -- tests/unit/idleVillage/poiProximity.test.ts` |
+| OB-7 | state, blocking | Leggibilità: 3 sagome distinte a 32px in grigio su ≥2 biomi; punte/icone distinguibili; deuteranopia simulata documentata; atmosferici/notte NOT VERIFIED o cattura | `python3 scripts/poi-terrain-gate.py` |
+| OB-8 | visual, blocking | Same-viewport vs baseline pre-registrato (per preset F1 e fork F2/F5/F6) | report affiancato |
+| OB-9 | human-eye | Occhio Director sul lab; `/game` = NOT VERIFIED by design | screenshot + nota |
+| ~~OB-10~~ | — | **eliminata (rev. 4)** — nessuna soglia di vicinanza: Luoghi autoriali | — |
+| OB-11 (nuovo) | state, blocking | Eventi: modello dati + ordinamento per scadenza testato; componente **assente** dalla mappa (nessun marker evento nei test) | `npm run test -- tests/unit/idleVillage/eventTimeline.test.ts` |
+| OB-12 (nuovo) | state, blocking | Regioni: `regionId` ↔ `placeId` coerenti nel config; feedback territoriale non "verde piatto" asserito a token (niente fill primario verde sull'overlay) | test + gate visivo F6 |
 
-Visual fork: **obbligatorio solo per D-4** (card F1); D-5/D-6/D-7 sospesi al piano Luogo.
+Visual fork: D-4 (F1), D-5/6/7 (F2), F5, F6 — ognuna con card su superficie vera.
 
 ## 5. Rischi
 
-- **Collisione con PLAN-116** (stessa area HUD, file slot/medaglione non committati in un'altra sessione): F3 non tocca quei file; se il preset POI vuole riusare l'anello C1 si legge l'asset, non si modifica il componente.
-- **Asset:** se i pezzi di `frame.webp` non bastano per la scheda bassa serve un giro di generazione del Director (tempo non stimabile qui).
-- **Dati finti scambiati per veri:** la fixture del villaggio è etichettata in config e nel lab (come `poiDemo`, R-131/R-200).
-- **Collo di bottiglia generazione (rev. 3):** la catena F1 è seriale su una risorsa scarsa (prompt → generazione Director → misura → F3). Mitigazioni: il harness di misura T1.3 e i test OB-10 si costruiscono su sagome placeholder mentre le immagini non ci sono; F1 si ferma a 2 direzioni salvo vittoria di un asse; esito «nessuna opzione vince» esplicito (prompt rivisti, non baseline forzata).
-- **Stacking HUD firmata non verificato (rev. 3):** il lab monta `PixiWorldMap` + anchor ma non il chrome HUD completo (`SkinScope`, `data-hud-controls`, T-03): «funziona nel lab» ≠ «funziona sotto la HUD firmata». La prova d'integrazione reale resta nel piano del montaggio su `/game`.
-- **La regola emergente potrebbe essere dead code (rev. 3):** a densità attuale la soglia emergente scatta raramente (POI live a ~540 unità mondo); se il piano Luogo adottasse cluster authored, la soglia resta fallback documentato — dichiarato apertamente invece di spenderci una fork cycle in silenzio.
+- **Collisione PLAN-116** (file HUD in altra sessione): F3 non li tocca.
+- **Quota generazione:** Gemini out-of-quota in giornata; fallback ChatGPT/Grok o attesa — le sagome possono anche essere **disegnate in SVG** dal componente (il Sigillo è già SVG).
+- **Scope esploso:** rev. 4 unifica 4 lavori (POI/Luoghi/Eventi/Regioni); il rischio è il blocco seriale — i gate sono pensati per chiudere F1 prima di F2, e F5/F6 possono slittare in piani successori se il dibattito lo conferma.
+- **3 tipi vs 2 famiglie:** D-9 rivisita OPEN-026 — se il dibattito/battesimo torna a 2, le sagome evento restano prodotte ma inutilizzate (costo accettato).
+- **Icone come famiglia:** se glifo=famiglia (mockup), la lettura "icona=luogo" si perde — trade-off registrato per il dibattito (opzione: glifo = famiglia + dettaglio luogo nel sigillo? da discutere).
+- **Stacking HUD non verificato nel lab** (T-03) — resta.
+- **Fixture scambiate per vere** — resta (config etichettata).
 
-## 6. Successor constraints (rev. 3 — registrati, non disegnati)
+## 6. Successor constraints (rev. 4)
 
-Prerequisiti che il piano Luogo deve risolvere **prima** di implementare l'aggregazione. Elencati come vincoli aperti ereditati dal dibattito multi-AI — questo piano li registra, non li decide:
-
-- **Bivio authored vs emergente:** il piano Luogo decide se un Luogo nasce anche da cluster authored (attività configurate sullo stesso punto — deterministico, copre il caso-motore villaggio) o solo dalla soglia emergente di OB-10. Evidenza: a densità attuale la regola emergente scatta raramente (POI live a ~540 unità mondo).
-- **Isteresi:** soglia di ingresso vs uscita (evitare flicker quando la distanza oscilla intorno al valore — oggi la distanza nel mondo è fissa, ma stato/posizione dei POI cambiano).
-- **Clustering:** transitivity e membership deterministiche (A~B, B~C, non A~C → componente connessa vs diametro limitato); cluster vuoto, singleton, oversize.
-- **Famiglie/stati misti:** cosa entra in un Luogo automatico (spedizione+lavoro insieme? stati diversi?); eleggibilità di `veiled` (per grammatica nasconde informazione: conta per la vicinanza? rivela la sua esistenza nel Luogo?).
-- **Semantica del consumatore:** come il Luogo legge la soglia — `unit`/`reference`/bordo dal contratto OB-10, senza reinterpretarla.
-- **Interazione DOM-over-Pixi:** click-vs-pan su anchor, hit-area a tutti gli zoom, pass-through wheel/pinch — superficie dove i marker muoiono (T-21/T-03), oggi non provata da nessuna parte.
+- **Aggregazione emergente eliminata** — non ereditare D-8/OB-10; i Luoghi sono autoriali. Se un giorno tornasse la prossimità, è un piano nuovo.
+- **Eventi:** il componente è specificato qui ma il design di dettaglio (voci, glifi, click→dettaglio) è del fork F5.
+- **Regioni:** la rideterminazione geografica è F6; `regions.json` attuale = baseline non canonica.
+- **Interazione DOM-over-Pixi** (clic vs pan, hit-area): da testare in F3 lab prima di qualsiasi montaggio `/game` (piano futuro).

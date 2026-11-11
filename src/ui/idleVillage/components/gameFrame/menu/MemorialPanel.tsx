@@ -4,25 +4,16 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { HudPlaque } from '@/ui/idleVillage/skins/primitives';
+import { GameMenuDialog } from './GameMenuDialog';
 import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 
 export const MemorialPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { t } = useTranslation('idleVillage');
   const entries = useMinimalGameplayStore((s) => s.memorial);
+  /* Through the shared menu shell (2026-11-11): Esc closes it, focus returns, veil, and the page's dress (Zanara on /game). */
   return (
-    <HudPlaque
-      shape="panel"
-      as="section"
-      role="dialog"
-      aria-label={t('gameFrame.menu.memorialTitle')}
-      data-testid="memorial-panel"
-      style={{ position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 2600, width: 420, maxHeight: '70vh', overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ font: '600 13px var(--skin-font-display)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--skin-title-color)' }}>{t('gameFrame.menu.memorialTitle')}</span>
-        <button type="button" onClick={onClose}>{t('gameFrame.menu.cancel')}</button>
-      </div>
+    <GameMenuDialog title={t('gameFrame.menu.memorialTitle')} onClose={onClose} width={420} data-testid="memorial-panel">
+      <div style={{ overflowY: 'auto', maxHeight: '60vh' }}>
       {entries.length === 0 ? (
         <span style={{ font: 'italic 14px var(--skin-font-serif)', color: 'var(--skin-text-secondary)' }}>{t('gameFrame.menu.memorialEmpty')}</span>
       ) : (
@@ -37,7 +28,8 @@ export const MemorialPanel: React.FC<{ onClose: () => void }> = ({ onClose }) =>
           ))}
         </ol>
       )}
-    </HudPlaque>
+      </div>
+    </GameMenuDialog>
   );
 };
 

@@ -35,6 +35,8 @@ export interface HudRealNavProps {
   /** Narrow screens: outer labels move this many design px outwards and inner ones as much towards the compass, so the
    *  compensated labels never touch (measured 2026-11-10 on 390 px: «Workshop|Tavern», «Villaggio|Mappa»). Default 0. */
   labelSpread?: number;
+  /** Show the engraved label under each voice. Off on /game: the tooltip and aria-label still carry it. Default true. */
+  showLabels?: boolean;
 }
 
 /** Socket index per voice: inner sockets first, left and right alternating so the dock stays symmetric. */
@@ -47,7 +49,7 @@ function socketOrder(n: number): number[] {
   return out.sort((a, b) => a - b);
 }
 
-export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter, labelSpread = 0 }: HudRealNavProps) {
+export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter, labelSpread = 0, showLabels = true }: HudRealNavProps) {
   const { t } = useTranslation('idleVillage');
   const order = socketOrder(navItems.length);
   const half = BAR.slots.length / 2;
@@ -90,6 +92,7 @@ export function HudRealNav({ navItems, activeNavId, onNavSelect, onRecenter, lab
         // outer labels move outwards, inner ones towards the compass (which carries no label): every pair separates
         const side = order[i] < half ? -1 : 1;
         const outer = order[i] === 0 || order[i] === BAR.slots.length - 1 ? side : -side;
+        if (!showLabels) return null;
         return (
           <span key={`l-${item.id}`} aria-hidden="true" style={{
             position: 'absolute', left: slot.x - 16 + outer * labelSpread, top: slot.y + slot.h + 17, width: slot.w + 32, textAlign: 'center', pointerEvents: 'none',

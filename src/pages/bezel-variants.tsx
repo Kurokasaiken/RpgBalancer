@@ -5,6 +5,7 @@ import {
   type ResidentSlotRackProps,
 } from '@/ui/idleVillage/frozen/kits/slotRackKit';
 import { useCanonicalRosterBundle } from '@/ui/idleVillage/roster';
+import { C1Medallion } from '@/ui/idleVillage/components/C1Medallion';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 
 /**
@@ -20,8 +21,12 @@ type BezelPreset = NonNullable<ResidentSlotRackProps['bezelPreset']>;
 
 const PRESET_META: Record<BezelPreset, { name: string; desc: string }> = {
   zanara: {
-    name: 'ZANARA — PLAN-116 F0',
+    name: 'ZANARA — PLAN-116 F0 (scartata)',
     desc: 'Full-width band, short wide claws rooted in the band biting the medallion rim, no bezel gem (lab-only).',
+  },
+  zanara2: {
+    name: 'ZANARA-2 — GANASCE A DOPPIO BRACCIO',
+    desc: 'Director-ruled concept: 4 articulated arms at the cardinals, hinge pins on a teal-enamel band, seat collar closing the gap, emerald index on the south pin (lab-only).',
   },
   stock: {
     name: 'STOCK',
@@ -45,7 +50,7 @@ const PRESET_META: Record<BezelPreset, { name: string; desc: string }> = {
   },
 };
 
-const PRESET_ORDER: BezelPreset[] = ['zanara', 'stock', 'a', 'b', 'c', 'ab'];
+const PRESET_ORDER: BezelPreset[] = ['zanara2', 'zanara', 'stock', 'a', 'b', 'c', 'ab'];
 
 /** Row labels mirror the planner's marching order (head → tail). */
 const ROW_LABELS = ['TESTA', 'II', 'III', 'CODA'];
@@ -106,6 +111,113 @@ function BezelVariantsContent() {
             Centerlines {showCenterlines ? 'on' : 'off'}
           </button>
         </header>
+
+        {/* Reference: the baptized C1 medallion (signed ring + resident portrait)
+            — the real thing the ghiera must enclose. */}
+        <section className="rounded-lg border border-slate-800 bg-slate-900/40 p-5">
+          <div className="mb-4 flex items-baseline gap-4">
+            <h2 className="text-sm font-semibold tracking-[0.25em] text-amber-100/90">
+              MEDAGLIONE BATTEZZATO — C1
+            </h2>
+            <p className="text-xs text-slate-500">
+              Ring C1 firmato + ritratto nel foro — questo è il medaglione che la ghiera racchiude.
+            </p>
+          </div>
+          <div className="flex items-center gap-10">
+            <C1Medallion portraitUrl={residents[0]?.portraitUrl} sizePx={64} />
+            <div className="relative h-48 w-48 shrink-0 overflow-hidden rounded-md border border-slate-700/60 bg-black/40">
+              <div className="relative" style={{ transform: 'scale(2.2)', transformOrigin: '0 0' }}>
+                <C1Medallion portraitUrl={residents[0]?.portraitUrl} sizePx={64} />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Proof: the signed mockup ghiera (ganasce a doppio braccio) extracted
+            as a transparent asset, mounted over the real C1 medallion. */}
+        <section className="rounded-lg border border-amber-800/60 bg-slate-900/40 p-5">
+          <div className="mb-4 flex items-baseline gap-4">
+            <h2 className="text-sm font-semibold tracking-[0.25em] text-amber-100/90">
+              GHIERA DAL MOCKUP — PROOF
+            </h2>
+            <p className="text-xs text-slate-500">
+              L'arte del mockup firmato estratta come asset trasparente, montata sopra il C1 vero.
+            </p>
+          </div>
+          <div className="flex items-center gap-10">
+            {[64, 96, 128, 160].map((g) => (
+              <div key={g} className="relative shrink-0" style={{ width: g, height: g }}>
+                <div
+                  className="absolute"
+                  style={{
+                    width: g * 0.49,
+                    height: g * 0.49,
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%,-50%)',
+                  }}
+                >
+                  <C1Medallion portraitUrl={residents[0]?.portraitUrl} sizePx={g * 0.49} />
+                </div>
+                <img
+                  src="/assets/ui/hud-real/ghiera-doppiobraccio.webp"
+                  alt=""
+                  draggable={false}
+                  className="absolute inset-0 h-full w-full"
+                />
+              </div>
+            ))}
+            <p className="max-w-xs text-xs text-slate-500">
+              Taglie libere 64/96/128/160. La ghiera è in posa chiusa (X); in
+              apertura ruota di -45° e le ganasce vanno sui cardinali (+).
+            </p>
+          </div>
+          <div className="mt-6 flex items-start gap-12">
+            {/* OPZIONE C — real 64px slot, painted ghiera overflowing the box */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="relative">
+                <ResidentSlotRack
+                  slots={slots.slice(0, 1)}
+                  layout="detail"
+                  slotSize={64}
+                  slotMaterial="hud-gold"
+                  slotVariant="hud64"
+                  bezelPreset="stock"
+                />
+                <img
+                  src="/assets/ui/hud-real/ghiera-doppiobraccio.webp"
+                  alt=""
+                  draggable={false}
+                  className="pointer-events-none absolute"
+                  style={{ width: 92, height: 92, left: '50%', top: 22, transform: 'translate(-50%,-50%)' }}
+                />
+              </div>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-amber-200/80">
+                C — slot 64 + ghiera overflow
+              </span>
+            </div>
+            {/* OPZIONE A — bigger slot: same composite at rack-real size */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="relative" style={{ width: 128, height: 128 }}>
+                <div
+                  className="absolute"
+                  style={{ width: 63, height: 63, left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}
+                >
+                  <C1Medallion portraitUrl={residents[0]?.portraitUrl} sizePx={63} />
+                </div>
+                <img
+                  src="/assets/ui/hud-real/ghiera-doppiobraccio.webp"
+                  alt=""
+                  draggable={false}
+                  className="absolute inset-0 h-full w-full"
+                />
+              </div>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-amber-200/80">
+                A — slot ~96-128px
+              </span>
+            </div>
+          </div>
+        </section>
 
         {PRESET_ORDER.map((preset) => (
           <section
