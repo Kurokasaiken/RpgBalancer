@@ -5643,5 +5643,5 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Stato:** `proposta` — PLAN-117 in bozza, in attesa di battesimo.
 **Decisioni:** `context/DECISION_LOG.md` 2026-11-11 (due famiglie; hover/ventaglio/due anelli/urgenza). Correzione: la vista Village non si ripensa; la sua vista ibrida veloce è successiva (OPEN-025).
 **Fonte:** `context/ingestions/2026-11-11-poi-stati-hub-opportunita.md`; catture in scratch della sessione (vista Village, `HudRealPanel`, ledger).
-**Piano:** `plans/PLAN-117-poi-zanara-e-luogo.md` rev. 3 — F0 fondamenta → F1 fork POI Zanara (+ misura soglia vicinanza su anchor live) → F3 preset POI → F4 chiusura; Luogo sospeso a piano successivo. Revisionata da dibattito multi-AI web (`20261111-plan117-poi-zanara`, converged 3/3: chatgpt/claude/deepseek; grok e gemini caduti).
+**Piano:** `plans/PLAN-117-poi-zanara-e-luogo.md` rev. 4 — layer unificato: POI Zanara (direzione «cartografia incisa») → Luoghi fissi autoriali → componente Eventi strategici → ridisegno Regioni. Emendata da ruling Director: niente aggregazione emergente (D-8/OB-10 morte), Eventi separati dai POI, vermiglio scartato (urgenza = pulsazione), anello CW famiglia / CCW arancione. Dibattito precedente: `20261111-plan117-poi-zanara` (converged 3/3); nuovo dibattito su rev. 4 in corso (`20261111-plan117-rev4`).
 

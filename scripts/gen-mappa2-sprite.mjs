@@ -199,7 +199,9 @@ async function tryAttach(page, imgPath) {
   return false;
 }
 
-const browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
+// CDP attach enumerates every target: a busy Chrome (many tabs, a parallel web debate) can exceed
+// Playwright's 30 s default. Override with CDP_TIMEOUT_MS (2026-11-11, PLAN-117 POI mockups).
+const browser = await chromium.connectOverCDP('http://127.0.0.1:9222', { timeout: Number(process.env.CDP_TIMEOUT_MS || 30000) });
 const ctx = browser.contexts()[0];
 
 /** Open a tab without stealing the Director's foreground (CTR-foreground-001):

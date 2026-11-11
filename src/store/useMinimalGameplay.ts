@@ -17,6 +17,12 @@ import {
 } from '@/shared/persistence/PersistenceService';
 import { trackTelemetryEvent, traceMinimalGameplay } from '@/analytics/telemetry/telemetryProvider';
 import { transformIdleVillageToMinimalConfig } from '@/balancing/config/idleVillage/transformations';
+import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
+/** The day/night cycle of the pre-load fallback configs comes from the shipped config (single source, Director 2026-11-11). */
+const DEFAULT_TIME_RULES = {
+  dayLengthInTimeUnits: DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.dayLengthInTimeUnits,
+  dayNightCycle: DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.dayNightCycle,
+};
 import type { MinimalConfig } from '@/balancing/config/idleVillage/minimalConfig';
 import type { MinimalGameplayGameOverReason } from '@/balancing/config/idleVillage/minimalGameplayConfig';
 import type { MinimalGameplayDropReason } from '@/balancing/config/idleVillage/minimalConfig';
@@ -505,8 +511,7 @@ const INITIAL_STATE: MinimalGameplayState = {
         defaultActivityFatigueGain: 10,
         startingResidentFatigue: 100,
         fatigueRecoveryPerDay: 50,
-        dayLengthInTimeUnits: 5,
-        dayNightCycle: { dayTimeUnits: 5, nightTimeUnits: 5 },
+        ...DEFAULT_TIME_RULES,
         secondsPerTimeUnit: 1,
         fatigueYellowThreshold: 33,
         fatigueRedThreshold: 66,
@@ -544,8 +549,7 @@ const INITIAL_STATE: MinimalGameplayState = {
       defaultActivityFatigueGain: 10,
       startingResidentFatigue: 100,
       fatigueRecoveryPerDay: 50,
-      dayLengthInTimeUnits: 5,
-      dayNightCycle: { dayTimeUnits: 5, nightTimeUnits: 5 },
+      ...DEFAULT_TIME_RULES,
       secondsPerTimeUnit: 1,
       fatigueYellowThreshold: 33,
       fatigueRedThreshold: 66,
@@ -1826,8 +1830,7 @@ export function useMinimalGameplayWithIdleVillageConfig() {
         defaultActivityFatigueGain: 10,
         startingResidentFatigue: 100,
         fatigueRecoveryPerDay: 50,
-        dayLengthInTimeUnits: 5,
-        dayNightCycle: { dayTimeUnits: 5, nightTimeUnits: 5 },
+        ...DEFAULT_TIME_RULES,
         secondsPerTimeUnit: 1,
         fatigueYellowThreshold: 33,
         fatigueRedThreshold: 66,

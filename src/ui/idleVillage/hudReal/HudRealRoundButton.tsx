@@ -5,7 +5,7 @@
  * States derive from the same image: hover = brighter, active = gold halo, focus = outline outside.
  * A view only; the caller owns the action.
  */
-import type { ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { HudTooltip } from '@/ui/idleVillage/components/gameFrame/HudTooltip';
 
 const ASSET = '/assets/ui/hud-real/round/round.webp';
@@ -27,12 +27,14 @@ export interface HudRealRoundButtonProps {
   shortcut?: string;
   /** Diameter in design px (the image scales). */
   size?: number;
+  /** Extra attributes for the button (menu triggers: aria-haspopup, aria-expanded, data-testid). */
+  buttonProps?: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'disabled' | 'style'> & Record<`data-${string}`, string | undefined>;
 }
 
-export function HudRealRoundButton({ label, children, onClick, active = false, disabled = false, shortcut, size = 40 }: HudRealRoundButtonProps) {
+export function HudRealRoundButton({ label, children, onClick, active = false, disabled = false, shortcut, size = 40, buttonProps }: HudRealRoundButtonProps) {
   return (
     <HudTooltip label={label} shortcut={shortcut} side="top" wrap>
-      <button type="button" data-hudreal-round="" aria-label={label} aria-pressed={active} disabled={disabled} onClick={onClick}
+      <button type="button" data-hudreal-round="" aria-label={label} aria-pressed={active} {...buttonProps} disabled={disabled} onClick={onClick}
         style={{
           position: 'relative', width: size, height: size, padding: 0, border: 0, borderRadius: '50%', userSelect: 'none',
           background: `url(${ASSET}) center / 100% 100% no-repeat`, cursor: 'pointer', display: 'grid', placeItems: 'center',

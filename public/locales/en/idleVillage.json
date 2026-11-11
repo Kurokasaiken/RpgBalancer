@@ -930,7 +930,8 @@
       "recenter": "Re-centre the map"
     },
     "status": {
-      "dayLabel": "Day"
+      "dayLabel": "Day",
+      "nightLabel": "Night"
     },
     "subtitle": "",
     "place": "The Eastern Marches",

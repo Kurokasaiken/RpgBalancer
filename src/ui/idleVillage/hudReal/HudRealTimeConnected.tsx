@@ -6,17 +6,19 @@
 import { useTranslation } from 'react-i18next';
 import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { HudRealTime } from './HudRealTime';
+import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
+import { offeredSpeeds } from '@/ui/idleVillage/config/timeOfDay';
 
 export function HudRealTimeConnected({ locked = false }: { locked?: boolean }) {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
-  const available = [1, 2, 4, 8].filter((s) => s <= config.loop.maxSpeedMultiplier);
+  const available = offeredSpeeds(DEFAULT_GAME_FRAME_CONFIG.gamePage.speeds, config.loop.maxSpeedMultiplier);
   const onChange = (s: number) => { if (locked) return; gameplay.setSpeedMultiplier(s); if (state.isPaused) gameplay.resumeGame('user'); };
   const onTogglePause = () => { if (locked) return; if (state.isPaused) gameplay.resumeGame('user'); else gameplay.pauseGame('user'); };
   return (
     <HudRealTime
-      dayLabel={`${t('gameFrame.status.dayLabel')} ${state.currentDay + 1}`}
+      dayLabel={`${t(state.isDayPhase ? 'gameFrame.status.dayLabel' : 'gameFrame.status.nightLabel')} ${state.currentDay + 1}`}
       isDayPhase={state.isDayPhase}
       cycleProgress={state.cycleProgress}
       isPaused={state.isPaused}
