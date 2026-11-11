@@ -1,7 +1,7 @@
 ---
 title: Open Questions Registry
 type: registry
-updated: 2026-10-10
+updated: 2026-11-11
 ---
 
 # OPEN — Unresolved Questions Registry
@@ -443,3 +443,81 @@ Formato voce:
 - **Related:** OPEN-023 (gimmick indagine); OPEN-021; ARCHITECTURE
   §18.4/§18.5/§19/§20; QUEST_GENERATION_CONTRACTS §2 (asse variants da
   aggiungere).
+
+## OPEN-025 — LocationHub: luoghi con molte opportunità
+
+- **Question:** i luoghi con molte opportunità concentrate (villaggio di
+  partenza; in futuro gilda, accampamento, biblioteca, fortezza, rovine)
+  diventano un **Hub** con un solo marker sulla mappa che, al click, apre un
+  pannello generico con dentro quest/job/attività? Sotto-questioni: (a) quali
+  luoghi sono Hub e quali POI restano singoli; (b) cosa mostra il marker
+  dell'Hub (conteggi per tipo? halo dell'elemento più urgente? segnale
+  «novità»); (c) layout del pannello (lista a sinistra + dettaglio a destra
+  proposto) e come convive con il planner reale `QuestExpeditionDetail`;
+  (d) nome e contratto del componente (`LocationHub` proposto).
+- **Status:** `open` (parziale) — **decisa 2026-11-11 l'interazione**:
+  mouse over sul Luogo → scheda verde e alabastro (testo + immagine); clic →
+  ventaglio di sigilli attorno al luogo sulla mappa, **su due anelli
+  concentrici** quando le attività sono troppe per uno (DECISION_LOG
+  2026-11-11); anello interno = urgenza; clic su un sigillo → dettaglio
+  specifico (oggi il cassetto del planner per le quest). Pochi posti densi
+  oltre al villaggio, quasi solo job. **POI troppo vicini diventano
+  automaticamente un Luogo** — vicinanza misurata **nel mondo**, fissa a
+  ogni zoom (DECISION_LOG 2026-11-11; valore della soglia in PLAN-117 F1). Restano aperti: forma/taglia della
+  scheda in hover, dettaglio dei job, collisioni con POI vicini, chiusura, equivalente
+  senza mouse.
+- **Context:** oggi su `/game` il villaggio non è cliccabile e non esiste
+  alcun concetto di cluster/hub nel codice.
+- **Requisito Director 2026-11-11:** l'Hub del villaggio deve rappresentare
+  **cosa si può fare**, e questo **dipende dagli edifici**: base (tagliare
+  legna, esplorare, ronda) e produzione avanzata (equip, pozioni, magie,
+  ospedale). Cosa si può fare e come dipende dal **menu villaggio** (pulsante
+  Village di `/game`), che oggi è solo un dipinto dove mostrare/costruire
+  edifici: va ripensato insieme all'Hub. Fatti: `VillageDirectorView` mostra
+  10 strati dipinti (case, locanda, casa del capo, legnaia) con un pannello
+  di debug; il catalogo `villageBuildingsConfig.ts` ha 16 edifici con livelli
+  (mock, nessun legame con le attività); i job in `defaultConfig.ts`
+  (woodcutting, scouting, defense, scholar…) non sono legati a edifici.
+- **Correzione Director 2026-11-11 (stesso giorno):** la vista Village
+  **non** va ripensata come Hub e non diventa la superficie dell'Hub; il
+  legame è solo di contenuto (cosa offre il Luogo-villaggio deriva da cosa
+  c'è nella vista Village). **Successivo** (non ora): una vista ibrida
+  veloce del menu Village — cosa c'è, blueprint disponibili e simili, oltre
+  al clic sui singoli edifici («fare tutto tramite dipinto è follia»).
+  **Ora:** solo cosa appare **sulla mappa, senza cambiare pagina** — un
+  componente che elenca tutte le attività di un punto con più attività
+  correlate (nome originario del Director: **Luoghi**; vecchia forma:
+  immagine cinematografica + POI affiancati sotto, `TheaterView`, oggi
+  commentato in `map/MapPage.tsx`). Base proposta dal Director come
+  contenitore: il pannello verde e alabastro `HudRealPanel` («bel modo di
+  presentare testo + immagine»), ma con una forma diversa da quella attuale.
+- **Source:** `context/ingestions/2026-11-11-poi-stati-hub-opportunita.md`
+  (E-07…E-11).
+- **Blocking:** il disegno del marker-luogo e del pannello Hub; non blocca
+  il Sigillo dei POI singoli.
+- **Related:** OPEN-026; `poi_family_spec.md` § Sigillo (stato da
+  `mapQuestPoiView`, T-07); ruling 20/10 «info nella preview destra».
+
+## OPEN-026 — Tassonomia quest / job / attività sulla mappa di `/game`
+
+- **Question:** quante famiglie di opportunità vede il giocatore e come si
+  chiamano? Sotto-questioni: (a) «esplora / studia / costruisci» sono una
+  famiglia «attività» o verbi dentro quest e job?; (b) se si usa «attività»
+  come famiglia, va risolto il conflitto con il codice, dove
+  `ActivityDefinition` è l'ombrello di tutti i POI (`kind` =
+  job/quest/training/maintenance/cooldown); (c) i job tornano su `/game`
+  (oggi `deprecated`, CTR-game-008)?; (d) come si distinguono a colpo
+  d'occhio (sagoma già decisa: tondo con coda = impresa, tassello = lavoro,
+  rombo = minaccia; metallo d'anello per famiglia ancora aperto in R-177).
+- **Status:** `open` (parziale) — **(a) e (b) decise 2026-11-11**: due
+  famiglie sulla mappa, **spedizione** (una volta, a rischio, planner) e
+  **lavoro** (continuativo, slot, resa); i verbi esplora/studia/costruisci
+  stanno dentro entrambe e compaiono come icona di riga solo nell'Hub;
+  nessuna famiglia «attività» (DECISION_LOG 2026-11-11). Restano aperte (c)
+  e (d); da confermare che la minaccia (rombo) resti variante della
+  spedizione.
+- **Source:** `context/ingestions/2026-11-11-poi-stati-hub-opportunita.md`
+  (E-05, E-06, E-17).
+- **Blocking:** glifi e metallo per famiglia; contenuto dei filtri dell'Hub
+  (OPEN-025).
+- **Related:** R-025, R-177, CTR-game-008, OPEN-025.
