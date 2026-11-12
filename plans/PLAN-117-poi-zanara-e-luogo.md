@@ -87,8 +87,8 @@
 - **Gate F1 (D-4, D-9, D-10, D-11):** ruling + baseline congelata (sha256).
 
 **F2 — Luogo autoriale (fork)**
-- T2.1 scheda hover bassa (ancorata, non modale — GX-0042); T2.2 ventaglio due anelli (interno = urgenti; non bloccante); T2.3 Luogo chiuso; T2.4 card lab su Luogo-villaggio fixture.
-- **Gate F2 (D-5, D-6, D-7):** ruling + baseline.
+- ✅ **T2.1–T2.4 fatto 2026-11-12:** `src/pages/poi-luogo-lab.tsx` (lab `/lab/poi-luogo` su mappa2 reale, route registrata in `App.tsx` + `TestHub`); `PlaceHoverCard.tsx` (scheda verde/alabastro ancorata, `role=tooltip`, `pointer-events:none`); `PlaceFan.tsx` (ventaglio due anelli da `orderPlaceActivities`, overlay `pointer-events:none` + sigilli `auto`); `MapPlace.tsx` (marker ottagonale autoriale, hover→scheda, clic→ventaglio, Esc/reclic chiude, `open=false` → sigillo dormiente D-7); `mapPlace.test.tsx` 8 test OB-2 (hover, fan open/close, ordine anelli, tastiera, no-modale).
+- **Gate F2 (D-5, D-6, D-7):** in attesa di review visiva Director sul lab + baseline.
 
 **F3 — Componenti (opzioni scelte)**
 - T3.1 Preset additivo Sigillo (SVG — punte, archi geometrici, pulsazione+statico, stati), `/gameOld` e lab invariati; stato da `mapQuestPoiView`; INV CTR-game-008 rispettate.

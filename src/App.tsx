@@ -83,6 +83,7 @@ const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabP
 const GameFramePage = lazy(() => import('./pages/game-frame').then(m => ({ default: m.default })));
 const MapBenchmarkPage = lazy(() => import('./pages/map-benchmark').then(m => ({ default: m.default })));
 const Mappa2LabPage = lazy(() => import('./pages/mappa2-lab').then(m => ({ default: m.default })));
+const PoiLuogoLabPage = lazy(() => import('./pages/poi-luogo-lab').then(m => ({ default: m.default })));
 const Mappa2UpscaleReviewPage = lazy(() => import('./pages/mappa2-upscale-review').then(m => ({ default: m.default })));
 const HudLabPage = lazy(() => import('./pages/hud-lab').then(m => ({ default: m.default })));
 const HudComparePage = lazy(() => import('./pages/hud-compare').then(m => ({ default: m.default })));
@@ -311,6 +312,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/mappa2-upscale-review';
   const isMappa2LabPath =
     typeof window !== 'undefined' && window.location.pathname === '/mappa2-lab';
+  const isPoiLuogoLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/lab/poi-luogo';
   const isHudLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/hud-lab';
   const isHudComparePath =
@@ -1162,6 +1165,16 @@ function App() {
       <ErrorBoundary componentName="Mappa2 Upscale Review Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Upscale Review...</div>}>
           <Mappa2UpscaleReviewPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isPoiLuogoLabPath) {
+    return (
+      <ErrorBoundary componentName="Poi Luogo Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Poi Luogo Lab...</div>}>
+          <PoiLuogoLabPage />
         </Suspense>
       </ErrorBoundary>
     );

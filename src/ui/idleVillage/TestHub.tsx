@@ -75,6 +75,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🔬',
     status: 'ok',
   },
+  // Non-kit page: PLAN-117 F2 — authored Place (hover card + two-ring fan) on real mappa2, fixture village.
+  {
+    id: 'poi-luogo-lab',
+    title: 'POI-Luogo Lab',
+    description: 'PLAN-117 Luogo autoriale: scheda hover, ventaglio 2 anelli, fixture villaggio su mappa2',
+    path: '/lab/poi-luogo',
+    icon: '📍',
+    status: 'ok',
+  },
   // Non-kit page: bronze POI V3 / V3.5 / V4 side-by-side comparison.
   {
     id: 'poi-bronze-compare',
