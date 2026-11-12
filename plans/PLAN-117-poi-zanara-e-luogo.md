@@ -76,10 +76,10 @@
 
 **F0 — Fondamenta**
 - ✅ **T0.1 fatto** (matrice catture + baseline Sigillo).
-- T0.2 `orderPlaceActivities(activities, views)` → `{ inner, outer }` (interno = urgenti; ordine stabile; capienza da config) + `placeOrdering.test.ts`.
-- T0.3 Schema `placesConfig.ts` (Zod, deepFreeze): `placeId` opaco stabile, punto nel mondo, i18n, immagine, elenco attività; `poiConfig` con `placeId` obbligatorio; `regionId` campo `provisional` marcato (integrità referenziale verificata a F6, non nel core).
-- T0.4 Inventario Eventi: fonti (`seaWonders`, manifest, `ReminderComponent*`, feed) + modello `{ id, kind: positive|negative, deadlineTurn, placeId?, titleKey, bodyKey }`.
-- **T0.5 (nuovo)** Semantic draft del modello `Region 1:N Place 1:N POI`: nomi, campi minimi, esempi — una pagina nel piano/config doc prima di scrivere schema.
+- ✅ **T0.2 fatto 2026-11-12:** `src/ui/idleVillage/components/gameFrame/placeOrdering.ts` + `tests/unit/idleVillage/placeOrdering.test.ts` (5 test: inner=expired→expiring(progress asc)→done, stabile, capienza da `PLACES_CONFIG.fan`, overflow in coda esterna).
+- ✅ **T0.3 fatto 2026-11-12:** `src/balancing/config/idleVillage/placesConfig.ts` (`placeId` opaco, `worldPoint`, `regionId` provisional opzionale, `regionWide`, i18n, `activityIds`, `fixture`) + `poiConfig.ts` (`MapPOIType` quest/job/event-locale, `placeId` obbligatorio, `deadlineTurn`, `activityRef`) — entrambi Zod+deepFreeze, fixture villaggio marcata; integrità referenziale in `placesConfig.test.ts` (OB-5).
+- ✅ **T0.4 fatto 2026-11-12:** `src/balancing/config/idleVillage/eventsConfig.ts` — inventario fonti in testata (seaWonders, eventReminderTokens, goblinEventModalTokens, ReminderComponentV2/V3, QuestDecisionFeed, villageZoneManifest) + `StrategicEventDefinition` (`kind` positive/negative, `deadlineTurn`, `placeId?` link mai marker) + `sortStrategicEvents` (stabile, non-mutante).
+- ✅ **T0.5 fatto 2026-11-12:** semantic draft `Region 1:N Place 1:N POI` in testata di `placesConfig.ts` (regione autoriale non canonica, place autoriale mai emergente, `placeId` opaco/stabile, `regionId` provisional fino a F6).
 
 **F1 — POI Zanara (visual fork)**
 - ✅ **T1.1 fatto (iterazione 1–2):** direzioni bocciate; mockup Director; bordo scuro validato su compositi.
