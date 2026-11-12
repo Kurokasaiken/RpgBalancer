@@ -12,6 +12,7 @@
  * il workstream POI (sessione parallela); qui conta la disposizione anelli.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PoiMatericV3_5, poiMatericV3_5Styles } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import type { MapQuestPoiView } from './MapQuestPoi';
 import type { PoiType } from '@/ui/idleVillage/components/poi/PoiMarker';
@@ -41,6 +42,7 @@ function ringPositions(count: number, radiusPx: number): { x: number; y: number 
 }
 
 export const PlaceFan: React.FC<PlaceFanProps> = ({ activities, views, sealPx = 44, onSelect }) => {
+  const { t } = useTranslation('idleVillage');
   const { inner, outer } = useMemo(
     () => orderPlaceActivities(activities, views),
     [activities, views],
@@ -69,7 +71,7 @@ export const PlaceFan: React.FC<PlaceFanProps> = ({ activities, views, sealPx = 
         type="button"
         data-testid={`place-fan-seal-${ring}`}
         data-activity-id={a.id}
-        aria-label={a.titleKey ?? a.id}
+        aria-label={a.titleKey ? t(a.titleKey) : a.id}
         onClick={(e) => {
           e.stopPropagation();
           onSelect?.(a.id);

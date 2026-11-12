@@ -18,7 +18,7 @@ export interface PlaceHoverCardProps {
 }
 
 export const PlaceHoverCard: React.FC<PlaceHoverCardProps> = ({ place, widthPx = 240 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('idleVillage');
   return (
     <div
       data-testid="place-hover-card"

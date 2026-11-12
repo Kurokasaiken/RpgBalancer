@@ -26,12 +26,12 @@ type FixtureScenario = 'mixed' | 'allCalm' | 'allUrgent';
 
 /** Fake activities on the village Place — content is fake on purpose (D-2). */
 const FIXTURE_ACTIVITIES: PlaceFanActivity[] = [
-  { id: 'act_quest_cassa', type: 'quest', titleKey: 'idleVillage.places.villageStart.act.cassa' },
-  { id: 'act_job_farm', type: 'job', titleKey: 'idleVillage.places.villageStart.act.farm' },
-  { id: 'act_job_smith', type: 'job', titleKey: 'idleVillage.places.villageStart.act.smith' },
-  { id: 'act_event_fair', type: 'event', titleKey: 'idleVillage.places.villageStart.act.fair' },
-  { id: 'act_quest_ruins', type: 'quest', titleKey: 'idleVillage.places.villageStart.act.ruins' },
-  { id: 'act_job_mill', type: 'job', titleKey: 'idleVillage.places.villageStart.act.mill' },
+  { id: 'act_quest_cassa', type: 'quest', titleKey: 'places.villageStart.act.cassa' },
+  { id: 'act_job_farm', type: 'job', titleKey: 'places.villageStart.act.farm' },
+  { id: 'act_job_smith', type: 'job', titleKey: 'places.villageStart.act.smith' },
+  { id: 'act_event_fair', type: 'event', titleKey: 'places.villageStart.act.fair' },
+  { id: 'act_quest_ruins', type: 'quest', titleKey: 'places.villageStart.act.ruins' },
+  { id: 'act_job_mill', type: 'job', titleKey: 'places.villageStart.act.mill' },
 ];
 
 const v = (over: Partial<MapQuestPoiView>): MapQuestPoiView => ({

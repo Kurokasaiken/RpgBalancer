@@ -67,7 +67,7 @@ const RAW_POI_CONFIG = {
       type: 'quest',
       placeId: 'place_village_start',
       activityRef: 'cassa',
-      titleKey: 'idleVillage.places.villageStart.poiFixture',
+      titleKey: 'places.villageStart.poiFixture',
       fixture: true,
     },
   ],
