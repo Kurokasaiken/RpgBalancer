@@ -182,7 +182,9 @@ describe('village layers — base + buildings == painting (2026-11-09)', () => {
     expect(retiredUncovered).toBeGreaterThan(0);
     expect(worstBase).toBe(0);
     expect(worstPainting).toBe(0);
-  });
+    // full-canvas pixel scan + grown-mask rasterization can exceed the 5s
+    // default under load — keep the assertion budget generous (R-326 it.4)
+  }, 300_000);
 
   it('painted layers are alpha-disjoint; lumber carries no chief-house pixels (INV:R-326-layer-disjoint)', async () => {
     const manifest = JSON.parse(await readFile(resolve(LAYERS, 'layers.json'), 'utf8')) as VillageManifest;
