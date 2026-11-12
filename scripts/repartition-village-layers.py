@@ -9,11 +9,17 @@ one owner, chosen at the real building boundary:
 
 - ``house-small-west`` always loses: it is retired from the manifest, and its
   contested stone strip must stay with ``house-big-west`` (R-247 note).
-- ``hut-far-1`` × ``hut-far-2``: split at x=1755.
-- ``hut-far-2`` × ``house-stone-mid``: split at x=2030 (contested annex strip is
-  hut-far-2's).
-- ``house-stone-mid`` × ``house-thatch-big``: split at x=2400 (thatch porch
-  posts start right of it).
+- ``hut-far-1`` × ``hut-far-2``: boundary follows hut-far-2's left silhouette —
+  shadow slit ~x1750 above the eave, eave tip jutting left to ~x1728 at
+  y~860-890, then the wall post ~x1742 down to the ground.
+- ``hut-far-2`` × ``house-stone-mid``: boundary follows stone-mid's left gable
+  silhouette — roof slope ~x1995 at the top down to the eave corner ~x1958 at
+  y~800, then the corner post ~x1962 (the cart and shadow slit stay with
+  hut-far-2).
+- ``house-stone-mid`` × ``house-thatch-big``: boundary follows thatch-big's
+  left gable silhouette — ~x2370 above the eave line, the slope edge down to
+  the eave tip ~x2258 at y~780, then the wall/base edge ~x2250-2270 (stone-mid
+  keeps only the shadow gap, no gable slice).
 - ``house-thatch-big`` × ``house-east-edge``: split at east-edge's polygon left
   edge polyline.
 - Fallback (any other contested pair): signed-distance argmax to the source
@@ -49,9 +55,19 @@ RETIRED = {'house-small-west'}
 # canvas_x < boundary(y) goes to left_id.
 VERTICAL = 10_000
 SPLITS = {
-    ('hut-far-1', 'hut-far-2'): [(0, 1755), (VERTICAL, 1755)],
-    ('hut-far-2', 'house-stone-mid'): [(0, 2030), (VERTICAL, 2030)],
-    ('house-stone-mid', 'house-thatch-big'): [(0, 2400), (VERTICAL, 2400)],
+    ('hut-far-1', 'hut-far-2'): [
+        (0, 1757), (840, 1755), (860, 1730), (890, 1728), (900, 1740),
+        (960, 1744), (VERTICAL, 1744)
+    ],
+    ('hut-far-2', 'house-stone-mid'): [
+        (0, 1997), (560, 1995), (620, 1985), (700, 1973), (800, 1958),
+        (860, 1960), (940, 1963), (VERTICAL, 1963)
+    ],
+    ('house-stone-mid', 'house-thatch-big'): [
+        (0, 2370), (500, 2368), (560, 2345), (620, 2320), (700, 2295),
+        (760, 2262), (820, 2258), (880, 2268), (960, 2255),
+        (VERTICAL, 2250)
+    ],
     ('house-thatch-big', 'house-east-edge'): [
         (330, 2960), (420, 2850), (520, 2842), (640, 2880), (VERTICAL, 2880)
     ],
