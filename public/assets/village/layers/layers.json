@@ -6,17 +6,6 @@
   "base": "base.webp",
   "layers": [
     {
-      "id": "house-small-west",
-      "file": "house-small-west.webp",
-      "box": [
-        679,
-        669,
-        464,
-        318
-      ],
-      "source": "painting"
-    },
-    {
       "id": "hut-far-1",
       "file": "hut-far-1.webp",
       "box": [
@@ -31,10 +20,10 @@
       "id": "lumber",
       "file": "lumber.webp",
       "box": [
-        1239,
+        1389,
         829,
-        390,
-        168
+        276,
+        171
       ],
       "source": "added"
     },
