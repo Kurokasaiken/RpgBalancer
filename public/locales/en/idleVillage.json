@@ -2162,5 +2162,20 @@
       "ricca": "Rich",
       "leggendaria": "Legendary"
     }
+  },
+  "places": {
+    "villageStart": {
+      "title": "The Three Bridges Crossing",
+      "body": "The village at the river crossing — hub for expeditions, jobs and the fair.",
+      "poiFixture": "Expedition: the lost chest",
+      "act": {
+        "cassa": "Lost chest",
+        "farm": "River harvest",
+        "smith": "Crossing smithy",
+        "fair": "Half-moon fair",
+        "ruins": "Old bridge ruins",
+        "mill": "Windmill"
+      }
+    }
   }
 }

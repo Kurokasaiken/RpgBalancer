@@ -2183,5 +2183,20 @@
       "ricca": "Ricca",
       "leggendaria": "Leggendaria"
     }
+  },
+  "places": {
+    "villageStart": {
+      "title": "Il Bivio dei Tre Ponti",
+      "body": "Il villaggio al crocevia del fiume — punto di raccolta per spedizioni, lavori e fiera.",
+      "poiFixture": "Spedizione: la cassa perduta",
+      "act": {
+        "cassa": "Cassa perduta",
+        "farm": "Raccolto del fiume",
+        "smith": "Forgia del bivio",
+        "fair": "Fiera di mezza luna",
+        "ruins": "Rovine del ponte vecchio",
+        "mill": "Mulino a vento"
+      }
+    }
   }
 }
