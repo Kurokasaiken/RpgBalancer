@@ -455,7 +455,11 @@ Formato voce:
   «novità»); (c) layout del pannello (lista a sinistra + dettaglio a destra
   proposto) e come convive con il planner reale `QuestExpeditionDetail`;
   (d) nome e contratto del componente (`LocationHub` proposto).
-- **Status:** `open` (parziale) — **decisa 2026-11-11 l'interazione**:
+- **Status:** `resolved` 2026-11-12 — **PLAN-117 baptized (rev. 5, D-13)**:
+  Luogo = nodo autoriale nel modello `Region 1:N Place 1:N POI`, mai emergente
+  da prossimità; scheda hover ancorata + ventaglio due anelli confermati
+  (D-5/6/7 al gate F2); `placeId` obbligatorio su ogni POI. Storia:
+  **decisa 2026-11-11 l'interazione**:
   mouse over sul Luogo → scheda verde e alabastro (testo + immagine); clic →
   ventaglio di sigilli attorno al luogo sulla mappa, **su due anelli
   concentrici** quando le attività sono troppe per uno (DECISION_LOG
@@ -509,13 +513,16 @@ Formato voce:
   (oggi `deprecated`, CTR-game-008)?; (d) come si distinguono a colpo
   d'occhio (sagoma già decisa: tondo con coda = impresa, tassello = lavoro,
   rombo = minaccia; metallo d'anello per famiglia ancora aperto in R-177).
-- **Status:** `open` (parziale) — **(a) e (b) decise 2026-11-11**: due
-  famiglie sulla mappa, **spedizione** (una volta, a rischio, planner) e
-  **lavoro** (continuativo, slot, resa); i verbi esplora/studia/costruisci
-  stanno dentro entrambe e compaiono come icona di riga solo nell'Hub;
-  nessuna famiglia «attività» (DECISION_LOG 2026-11-11). Restano aperte (c)
-  e (d); da confermare che la minaccia (rombo) resti variante della
-  spedizione.
+- **Status:** `resolved` 2026-11-12 — **PLAN-117 baptized (rev. 5, D-9)**:
+  3 tipi visivi — **quest / job / event-locale** (evento puntuale con
+  scadenza), sagome+punte proprie nel linguaggio «cartografia incisa»
+  (cornice stellata, contorno scuro, campo smalto saturo). Gli Eventi
+  strategici non sono una famiglia di POI: vivono nella timeline dedicata
+  (D-12). Storia: **(a) e (b) decise 2026-11-11**: due famiglie, spedizione
+  e lavoro; i verbi stanno dentro entrambe; nessuna famiglia «attività»
+  (DECISION_LOG 2026-11-11). La «minaccia» (rombo) è stata riassorbita nel
+  tipo event-locale (D-9). Resta aperta solo (c): i job su `/game` dipendono
+  da PLAN-116 D8, non da questo piano.
 - **Source:** `context/ingestions/2026-11-11-poi-stati-hub-opportunita.md`
   (E-05, E-06, E-17).
 - **Blocking:** glifi e metallo per famiglia; contenuto dei filtri dell'Hub
