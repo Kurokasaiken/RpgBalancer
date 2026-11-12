@@ -1830,3 +1830,30 @@ utenti WebGL; il Director ha imposto verifica-fino-a-verde e landing unica.
 **Forma e materiale:** bocciati come *«troppo cheap, troppo dozzinale, plastico»* (medaglioni a stella-bussola tutti uguali, gemme ovunque, lucido uniforme).
 **Supera:** Sigillo D1 (glifo = luogo) — OBSOLETE → questa voce, 2026-11-11.
 **Fonte:** Director in sessione 2026-11-11.
+
+## 2026-11-12 — POI: le punte della sagoma restano (sono ciò che lo rende leggibile)
+
+**Scoperta (2026-11-11, mockup Gemini a stella-bussola):** le punte della sagoma rompono la texture della mappa e fanno staccare il POI su ogni bioma; insieme al campo scuro sono la causa della leggibilità misurata sulla mappa2 (prova `.mw/runs/20261111-poi-zanara/evidence/G-*`).
+**Regola:** la sagoma con le punte **resta**. La critica del 2026-11-11 riguardava le **4 gemme identiche** sulle punte (copia del gioiello della nav), non le punte: le punte restano in oro, il gioiello colorato è uno solo.
+**Errore corretto:** nel brief di aggiustamento v3 l'agente aveva chiesto di togliere le punte laterali e in basso — regressione su una scoperta già fatta; corretto su segnalazione del Director 2026-11-12.
+
+## 2026-11-12 — POI: strada «v4 ricca» indicata dal Director
+
+**Direzione:** la tavola `.mw/runs/20261111-poi-zanara/gen/director-v4-ricco.webp` (smalto bombato con craquelure, cornice d'oro a rivetti con ornamenti, punte, gemme) è per il Director «la strada corretta»; proposta sua: **blu per le quest al posto dell'oro**.
+**Prova a 48 px sulla mappa2 (`evidence/v4-zoom-48.png`):** il campo d'oro si perde su deserto e montagna (conferma la proposta blu); il blu si legge ovunque; il verde sulla foresta è debole; icone multi-materiale (scudo+spade, figura incappucciata) diventano rumore a 48 px; l'icona bussola compete con il gioiello della nav.
+**Stato:** direzione indicata, non ancora approvata come baseline.
+
+## 2026-11-12 — PLAN-117 battezzato (rev. 5): layer opportunità della mappa
+
+**Approvato dal Director («approvo») dopo dibattito multi-AI `20261111-plan117-rev4` (converged 4/4, artifact-r002).** Decisioni prese:
+- **D-1:** lab `/lab/poi-luogo` su `PixiWorldMap` + anchors (niente montaggio su `/game` finché il flusso POI→quest di PLAN-116 D8 non esiste).
+- **D-9:** **3 tipi POI** — quest / job / event-locale (evento puntuale con scadenza), sagome+punte proprie; gli Eventi strategici restano fuori mappa. Divergenza di claude (preferiva 2) registrata; OB-7 = criterio oggettivo di distinguibilità a 32px in grigio.
+- **D-10:** colore famiglia ammesso come **rinforzo**; l'identità sta su sagoma+punte (daltonismo-safe).
+- **D-11:** urgenza = pulsazione **+ equivalente statico** non-colore (niente vermiglio); attivo con prefers-reduced-motion.
+- **D-12:** `StrategicEventKind` = componente timeline dedicato ordinato per scadenza, **mai** marker mappa; `event` in `MapPOIType` = solo evento locale puntuale.
+- **D-13:** modello canonico `Region 1:N Place 1:N POI`; `placeId` obbligatorio opaco; `regionId` provisional con consolidamento al gate F6.
+- **D-15:** chiusura a due livelli — il core F0–F4 chiude PLAN-117; F5 (Eventi) e F6 (Regioni) possono spin-off in piani successori con contratti propri.
+- **Grammatica Sigillo rev. 5 (P1):** bordo=visibilità, sagoma+punte=famiglia, glifo=attività puntuale (non famiglia, non luogo — il luogo lo danno posizione e scheda hover), anello=tempo con verso semantico CW=in corso (colore famiglia) / CCW=countdown (arancione) + geometria ridondante (pieno capo tondo vs tacche+gioiello terminale).
+- **Veto modali GX-0042 esteso al core:** scheda hover e ventaglio ancorati non bloccanti, dettaglio in sezione dedicata.
+**Supera/integra:** voci 2026-11-11 su POI (aggregazione emergente bocciata definitivamente; «vermiglio=urgenza» sostituito; famiglia evento ridefinita come evento-locale).
+**Fonte:** `plans/PLAN-117-poi-zanara-e-luogo.md` rev. 5; run `mind-weaver/.mw/runs/20261111-plan117-rev4/` (report.md, artifact-r002.md).
