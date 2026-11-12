@@ -32,7 +32,10 @@ describe('placesConfig — authored Place model (Region 1:N Place 1:N POI, D-13)
   it('the village fixture is labelled fixture (D-2)', () => {
     const village = placeById('place_village_start')!;
     expect(village.fixture).toBe(true);
-    expect(village.titleKey.startsWith('idleVillage.')).toBe(true);
+    /* Keys are namespace-relative (idleVillage ns) — callers resolve via
+       `useTranslation('idleVillage')` / `t('idleVillage:'+key)`. */
+    expect(village.titleKey).not.toContain('idleVillage.');
+    expect(village.titleKey.length).toBeGreaterThan(0);
   });
 });
 

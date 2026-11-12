@@ -41,7 +41,7 @@ export const MapPlace: React.FC<MapPlaceProps> = ({
   sizePx = 56,
   onSelectActivity,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('idleVillage');
   const [hovered, setHovered] = useState(false);
   const [fanOpen, setFanOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
