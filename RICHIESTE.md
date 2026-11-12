@@ -5640,7 +5640,7 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 
 **Richiesta (verbatim, 2026-11-11):** *«Un componente che ti dica tutte le attività che ci sn su un determinati punto che ha + attività correlate, che io inizialmente avevo chiamato Luoghi […] Potremmo usare come base il componente verde e alabastro come "contenitore" […] ma quella forma nn è adeguata x il nostro scopo.»* · *«mouse over il componente di alabastro […] onClick ventaglio»* · *«Due anelli»* · *«Direi per urgenza»* · *«e in tutto ciò: nn facciamo dei nuovi POI che siano adeguati alla nuova HUD e UI?»*
 **Data:** 2026-11-11
-**Stato:** `proposta` — PLAN-117 in bozza, in attesa di battesimo.
+**Stato:** `in corso` — PLAN-117 **baptized 2026-11-12** (rev. 5, dibattito `20261111-plan117-rev4` converged 4/4).
 **Decisioni:** `context/DECISION_LOG.md` 2026-11-11 (due famiglie; hover/ventaglio/due anelli/urgenza). Correzione: la vista Village non si ripensa; la sua vista ibrida veloce è successiva (OPEN-025).
 **Fonte:** `context/ingestions/2026-11-11-poi-stati-hub-opportunita.md`; catture in scratch della sessione (vista Village, `HudRealPanel`, ledger).
 **Piano:** `plans/PLAN-117-poi-zanara-e-luogo.md` rev. 5 — layer unificato: POI Zanara (direzione «cartografia incisa») → Luoghi fissi autoriali → componente Eventi strategici → ridisegno Regioni. Dibattiti: `20261111-plan117-poi-zanara` (converged 3/3, rev. 3) e `20261111-plan117-rev4` (**converged 4/4** su artifact-r002, rev. 5) — P1 a canali disgiunti, anello CW/CCW + geometria ridondante, urgenza = pulsazione+statico, 3 tipi POI con evento-locale distinto dagli Eventi strategici, chiusura a due livelli (core F0–F4, successori F5/F6).

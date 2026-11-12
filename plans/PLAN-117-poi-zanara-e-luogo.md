@@ -1,6 +1,6 @@
 # PLAN-117 — Layer opportunità della mappa: POI Zanara, Luoghi fissi, Eventi strategici, Regioni
 
-**Stato:** bozza rev. 5 (2026-11-12) — post-dibattito multi-AI web run `20261111-plan117-rev4` (**converged**, acceptance 4/4 su artifact-r002; grok escluso per output degenere). In attesa di battesimo Director: aperte D-1, D-4, D-9, D-10, D-11, D-12, D-13, D-15.
+**Stato:** **baptized 2026-11-12** (approvazione Director «approvo») — rev. 5, post-dibattito multi-AI web run `20261111-plan117-rev4` (**converged**, acceptance 4/4 su artifact-r002; grok escluso per output degenere). Decisioni di battesimo prese come da colonna Proposta (D-1, D-9, D-10, D-11, D-12, D-13, D-15); restano ai gate di fase D-4 (F1) e D-5/6/7 (F2).
 
 > **Rev. 5 — emendamenti dal dibattito (9 claim, tutti AGREE o REFINE convergenti):**
 > - **P1 riscritta a canali disgiunti** (C1): bordo=visibilità, sagoma+punte=famiglia, glifo=attività puntuale, anello=tempo. Il luogo NON è codificato sul marker: lo danno posizione e scheda hover del Luogo.
@@ -58,15 +58,15 @@
 
 | ID | Decisione | Proposta post-dibattito | Quando |
 |---|---|---|---|
-| **D-1** | Superficie dev/prova | Lab `/lab/poi-luogo` su `PixiWorldMap` + anchors | battesimo |
+| **D-1** ✅ | Superficie dev/prova | Lab `/lab/poi-luogo` su `PixiWorldMap` + anchors | **presa 2026-11-12** |
 | **D-4** | Preset POI definitivo | «Cartografia incisa» (preferita) vs varianti | gate F1 |
-| **D-9** | Tipi visivi | **3**: quest / job / event-locale (sagome+punte proprie); se il Director torna a 2, la terza forma → glifo timeline | battesimo |
-| **D-10** | Colore famiglia | Rinforzo (blu/verde scuri); identità su sagoma+punte | battesimo |
-| **D-11** | Canale urgenza | Pulsazione **+ equivalente statico** (ruling niente vermiglio confermato) | battesimo |
-| **D-12** | Confine Eventi | `StrategicEventKind` = timeline dedicata, mai marker; `event` in MapPOIType = solo evento locale puntuale | battesimo |
-| **D-13** | Luogo autoriale | `Region 1:N Place 1:N POI`; `placeId` obbligatorio opaco; `regionId` provisional fino a F6 | battesimo |
+| **D-9** ✅ | Tipi visivi | **3**: quest / job / event-locale (sagome+punte proprie); se il Director torna a 2, la terza forma → glifo timeline | **presa 2026-11-12** |
+| **D-10** ✅ | Colore famiglia | Rinforzo (blu/verde scuri); identità su sagoma+punte | **presa 2026-11-12** |
+| **D-11** ✅ | Canale urgenza | Pulsazione **+ equivalente statico** (ruling niente vermiglio confermato) | **presa 2026-11-12** |
+| **D-12** ✅ | Confine Eventi | `StrategicEventKind` = timeline dedicata, mai marker; `event` in MapPOIType = solo evento locale puntuale | **presa 2026-11-12** |
+| **D-13** ✅ | Luogo autoriale | `Region 1:N Place 1:N POI`; `placeId` obbligatorio opaco; `regionId` provisional fino a F6 | **presa 2026-11-12** |
 | **D-14** | Ridisegno regioni | Feedback in lingua Zanara + definizioni semantiche | gate F6 (successore) |
-| **D-15** (nuova) | Chiusura a due livelli | Core F0–F4 chiude PLAN-117; F5/F6 spin-off in piani successori con contratti propri | battesimo |
+| **D-15** ✅ | Chiusura a due livelli | Core F0–F4 chiude PLAN-117; F5/F6 spin-off in piani successori con contratti propri | **presa 2026-11-12** |
 | **D-5/6/7** | Scheda hover, ventaglio, Luogo chiuso | Invariate | gate F2 |
 | **D-2/3** | Fixture villaggio, clic job | Invariati | piano |
 
