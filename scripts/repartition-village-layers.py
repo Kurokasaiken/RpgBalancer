@@ -14,8 +14,9 @@ one owner, chosen at the real building boundary:
   y~860-890, then the wall post ~x1742 down to the ground.
 - ``hut-far-2`` × ``house-stone-mid``: boundary follows stone-mid's left gable
   silhouette — roof slope ~x1995 at the top down to the eave corner ~x1958 at
-  y~800, then the corner post ~x1962 (the cart and shadow slit stay with
-  hut-far-2).
+  y~800 — then swings right to ~x2020 below y~830 so hut-far-2's lean-to annex
+  and cart (which stand in front of stone-mid's wall) stay whole with
+  hut-far-2.
 - ``house-stone-mid`` × ``house-thatch-big``: boundary follows thatch-big's
   left gable silhouette — ~x2370 above the eave line, the slope edge down to
   the eave tip ~x2258 at y~780, then the wall/base edge ~x2250-2270 (stone-mid
@@ -26,10 +27,14 @@ one owner, chosen at the real building boundary:
   polygons in buildings.json.
 
 Because contested pixels carry identical painting RGB, reassigning alpha keeps
-the base + painted-layers == painting identity exact. Retired buildings (in
-buildings.json but not in layers.json) keep only their exclusive region, which
-the layer file no longer needs — the file/manifest entry for house-small-west
-is removed.
+the base + painted-layers == painting identity exact. A second "sweep" pass
+then moves EXCLUSIVE pixels sitting on the wrong side of a silhouette boundary
+(e.g. stone-mid's exclusive sliver left of its gable, the birch wedge in
+house-east-edge) to the other layer of the pair — RGB comes from the painting,
+and the receiving layer's box is expanded if the pixel lies outside it.
+Retired buildings (in buildings.json but not in layers.json) keep only their
+exclusive region, which the layer file no longer needs — the file/manifest
+entry for house-small-west is removed.
 
 Usage:
     python3 scripts/repartition-village-layers.py [--dry-run]
@@ -61,7 +66,7 @@ SPLITS = {
     ],
     ('hut-far-2', 'house-stone-mid'): [
         (0, 1997), (560, 1995), (620, 1985), (700, 1973), (800, 1958),
-        (860, 1960), (940, 1963), (VERTICAL, 1963)
+        (830, 1995), (870, 2018), (1000, 2020), (VERTICAL, 2020)
     ],
     ('house-stone-mid', 'house-thatch-big'): [
         (0, 2370), (500, 2368), (560, 2345), (620, 2320), (700, 2295),
@@ -69,7 +74,7 @@ SPLITS = {
         (VERTICAL, 2250)
     ],
     ('house-thatch-big', 'house-east-edge'): [
-        (330, 2960), (420, 2850), (520, 2842), (640, 2880), (VERTICAL, 2880)
+        (0, 2818), (730, 2818), (760, 2880), (VERTICAL, 2880)
     ],
 }
 
@@ -152,18 +157,52 @@ def main():
         best = max(alive, key=lambda i: signed[i][ys[k], xs[k]])
         owner[k] = ids.index(best)
 
-    # apply
-    new_alpha = {i: (alpha[i] > 0).copy() for i in ids}
+    # apply — track the ALPHA VALUE per layer: a contested pixel's winner gets
+    # the combined coverage of the stack, losers zero out, and a swept-in
+    # pixel inherits the donor's value (feathered edges stay intact and the
+    # composite keeps reproducing the painting exactly).
+    new_val = {i: np.where(alpha[i] > 0, alpha[i], 0).astype(np.uint8)
+               for i in ids}
     for k in range(len(ys)):
         win = ids[owner[k]]
+        cov = 0
         for j in range(len(ids)):
             if cand[k, j]:
-                new_alpha[ids[j]][ys[k], xs[k]] = (ids[j] == win)
+                v = int(alpha[ids[j]][ys[k], xs[k]])
+                cov = 255 - (255 - cov) * (255 - v) // 255
+        for j in range(len(ids)):
+            if cand[k, j]:
+                new_val[ids[j]][ys[k], xs[k]] = cov if ids[j] == win else 0
+
+    # sweep pass: exclusive pixels on the wrong side of a silhouette boundary
+    # change owner too (they are foreign slivers a straight split cannot fix).
+    # Region = currently owned by one of the pair — sequential, so a pixel
+    # already re-homed by an earlier pair is not reconsidered.
+    painting = np.array(Image.open(
+        os.path.join(ROOT, 'src/assets/mood/rude-beauty/villaggio.png')
+    ).convert('RGBA'))[..., :3]
+    swept = 0
+    for (left, right), poly in SPLITS.items():
+        if left not in new_val or right not in new_val:
+            continue
+        region = (new_val[left] > 0) | (new_val[right] > 0)
+        pys, pxs = np.nonzero(region)
+        for k in range(len(pys)):
+            py, px = int(pys[k]), int(pxs[k])
+            want = left if px < boundary_x(poly, py) else right
+            owner_now = left if new_val[left][py, px] > 0 else right
+            if owner_now == want:
+                continue
+            new_val[want][py, px] = new_val[owner_now][py, px]
+            new_val[owner_now][py, px] = 0
+            imgs[want][py, px, :3] = painting[py, px]
+            swept += 1
+    print(f'swept pixels: {swept}')
 
     stats = {}
     for i in ids:
         before = int((alpha[i] > 0).sum())
-        after = int(new_alpha[i].sum())
+        after = int((new_val[i] > 0).sum())
         stats[i] = (before, after, before - after)
     for i in ids:
         print(f'{i:20s} alpha {stats[i][0]:>7} -> {stats[i][1]:>7}  (lost {stats[i][2]})')
@@ -176,8 +215,16 @@ def main():
         if i in RETIRED:
             continue
         x, y, w, h = ly['box']
+        pys, pxs = np.nonzero(new_val[i] > 0)
+        if len(pxs):
+            x0, x1 = min(x, int(pxs.min())), max(x + w, int(pxs.max()) + 1)
+            y0, y1 = min(y, int(pys.min())), max(y + h, int(pys.max()) + 1)
+            if (x0, y0, x1, y1) != (x, y, x + w, y + h):
+                ly['box'] = [x0, y0, x1 - x0, y1 - y0]
+                print(f'{i}: box {x},{y},{w},{h} -> {x0},{y0},{x1 - x0},{y1 - y0}')
+        x, y, w, h = ly['box']
         sub = imgs[i][y:y + h, x:x + w].copy()
-        sub[..., 3] = np.where(new_alpha[i][y:y + h, x:x + w], sub[..., 3], 0)
+        sub[..., 3] = new_val[i][y:y + h, x:x + w]
         Image.fromarray(sub).save(os.path.join(LAYERS, ly['file']), lossless=True)
 
     # retire house-small-west: remove manifest entry + layer file

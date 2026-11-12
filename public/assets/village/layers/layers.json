@@ -12,7 +12,7 @@
         1564,
         760,
         200,
-        212
+        222
       ],
       "source": "painting"
     },
@@ -32,9 +32,9 @@
       "file": "hut-far-2.webp",
       "box": [
         1697,
-        716,
-        315,
-        266
+        555,
+        323,
+        447
       ],
       "source": "painting"
     },
@@ -53,9 +53,9 @@
       "id": "house-thatch-big",
       "file": "house-thatch-big.webp",
       "box": [
-        2267,
+        2255,
         351,
-        765,
+        777,
         731
       ],
       "source": "painting"
@@ -64,9 +64,9 @@
       "id": "house-east-edge",
       "file": "house-east-edge.webp",
       "box": [
-        2821,
+        2818,
         121,
-        347,
+        350,
         961
       ],
       "source": "painting"
