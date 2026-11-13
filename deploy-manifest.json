@@ -1,0 +1,2355 @@
+{
+  "generated": "2026-11-13T08:31:56.926Z",
+  "generator": "scripts/deploy/deployManifest.mjs",
+  "profile": "slim",
+  "keptRoutes": [
+    {
+      "path": "/",
+      "match": "exact"
+    },
+    {
+      "path": "/game",
+      "match": "exact"
+    },
+    {
+      "path": "/index.html",
+      "match": "exact"
+    },
+    {
+      "path": "/mappa2-lab",
+      "match": "exact"
+    }
+  ],
+  "labPaths": [
+    "/adversary-shapes",
+    "/bezel-variants",
+    "/design-system",
+    "/design-vs-fidelity",
+    "/equipment-creator",
+    "/equipment-library",
+    "/game-frame",
+    "/game-frame-pixi",
+    "/gameOld",
+    "/goblin-event-lab",
+    "/harmonization-gallery",
+    "/hero-components-lab",
+    "/hud-compare",
+    "/hud-compose",
+    "/hud-defects",
+    "/hud-lab",
+    "/hud-layout",
+    "/hud-library",
+    "/hud-panel-compare",
+    "/hud-r1",
+    "/hud-real-roster",
+    "/hud-roster-crop",
+    "/hud-roster-mockup",
+    "/hud-target",
+    "/hud-zanara-roster",
+    "/lab/poi-luogo",
+    "/macro-gameplay",
+    "/map-benchmark",
+    "/mappa2-upscale-review",
+    "/minimal-clock",
+    "/minimal-destiny-astrolabe",
+    "/minimal-destiny-astrolabe-v10",
+    "/minimal-destiny-astrolabe-v15",
+    "/minimal-destiny-astrolabe-v16",
+    "/minimal-destiny-astrolabe-v2",
+    "/minimal-destiny-astrolabe-v3",
+    "/minimal-destiny-astrolabe-v4",
+    "/minimal-destiny-astrolabe-v5",
+    "/minimal-destiny-astrolabe-v6",
+    "/minimal-destiny-astrolabe-v6-2",
+    "/minimal-destiny-astrolabe-v6-3",
+    "/minimal-destiny-astrolabe-v6-4",
+    "/minimal-destiny-astrolabe-v7",
+    "/minimal-destiny-astrolabe-v8",
+    "/minimal-destiny-astrolabe-v9",
+    "/minimal-gameplay",
+    "/minimal-job-poi-roster-integration",
+    "/minimal-job-poi-roster-time-integration",
+    "/minimal-market",
+    "/minimal-outcome",
+    "/minimal-poi",
+    "/minimal-questcard",
+    "/minimal-resourcehud",
+    "/minimal-roster",
+    "/minimal-roster-slot-integration",
+    "/minimal-skillcheck",
+    "/minimal-skillcheck-v6",
+    "/minimal-slotRack",
+    "/minimal-slottedmedal",
+    "/missing-hub",
+    "/mockup-to-component",
+    "/poi-bronze-compare",
+    "/poi-detail-verification",
+    "/poi-job-detail-roster-integration",
+    "/poi-marker-lab",
+    "/poi-quest-detail-roster-integration",
+    "/poi-quest-detail-roster-time-clock",
+    "/primitives",
+    "/quest-editor",
+    "/quest-generation-lab",
+    "/quest-s1-lab",
+    "/quest-window-lab",
+    "/sea-effect-lab",
+    "/skill-check-v15",
+    "/skill-check-v16",
+    "/skill-check-web-v1",
+    "/skin-lab",
+    "/skin-sandbox",
+    "/slot",
+    "/spell-creator",
+    "/test",
+    "/test-hub",
+    "/test-hub/steam-trailer-hub",
+    "/theater-lab",
+    "/trailer",
+    "/use-client",
+    "/v9-skin-sandbox",
+    "/visual-fidelity-lab",
+    "/visual-grammar-validation",
+    "/world-presentation-director",
+    "/world-surface",
+    "/world-surface-demo"
+  ],
+  "routeMatchSemantics": {
+    "/": "exact",
+    "/adversary-shapes": "registry",
+    "/bezel-variants": "registry",
+    "/design-system": "registry",
+    "/design-vs-fidelity": "registry",
+    "/equipment-creator": "registry",
+    "/equipment-library": "registry",
+    "/game": "exact",
+    "/game-frame": "registry",
+    "/game-frame-pixi": "exact",
+    "/gameOld": "exact",
+    "/goblin-event-lab": "registry",
+    "/harmonization-gallery": "registry",
+    "/hero-components-lab": "registry",
+    "/hud-compare": "registry",
+    "/hud-compose": "registry",
+    "/hud-defects": "registry",
+    "/hud-lab": "registry",
+    "/hud-layout": "registry",
+    "/hud-library": "registry",
+    "/hud-panel-compare": "registry",
+    "/hud-r1": "registry",
+    "/hud-real-roster": "registry",
+    "/hud-roster-crop": "registry",
+    "/hud-roster-mockup": "registry",
+    "/hud-target": "registry",
+    "/hud-zanara-roster": "registry",
+    "/index.html": "exact",
+    "/lab/poi-luogo": "registry",
+    "/macro-gameplay": "registry",
+    "/map-benchmark": "registry",
+    "/mappa2-lab": "exact",
+    "/mappa2-upscale-review": "registry",
+    "/minimal-clock": "registry",
+    "/minimal-destiny-astrolabe": "registry",
+    "/minimal-destiny-astrolabe-v10": "registry",
+    "/minimal-destiny-astrolabe-v15": "registry",
+    "/minimal-destiny-astrolabe-v16": "registry",
+    "/minimal-destiny-astrolabe-v2": "registry",
+    "/minimal-destiny-astrolabe-v3": "registry",
+    "/minimal-destiny-astrolabe-v4": "registry",
+    "/minimal-destiny-astrolabe-v5": "registry",
+    "/minimal-destiny-astrolabe-v6": "registry",
+    "/minimal-destiny-astrolabe-v6-2": "registry",
+    "/minimal-destiny-astrolabe-v6-3": "registry",
+    "/minimal-destiny-astrolabe-v6-4": "registry",
+    "/minimal-destiny-astrolabe-v7": "registry",
+    "/minimal-destiny-astrolabe-v8": "registry",
+    "/minimal-destiny-astrolabe-v9": "registry",
+    "/minimal-gameplay": "exact",
+    "/minimal-job-poi-roster-integration": "registry",
+    "/minimal-job-poi-roster-time-integration": "registry",
+    "/minimal-market": "registry",
+    "/minimal-outcome": "registry",
+    "/minimal-poi": "registry",
+    "/minimal-questcard": "registry",
+    "/minimal-resourcehud": "registry",
+    "/minimal-roster": "registry",
+    "/minimal-roster-slot-integration": "registry",
+    "/minimal-skillcheck": "registry",
+    "/minimal-skillcheck-v6": "registry",
+    "/minimal-slotRack": "registry",
+    "/minimal-slottedmedal": "registry",
+    "/missing-hub": "registry",
+    "/mockup-to-component": "registry",
+    "/poi-bronze-compare": "registry",
+    "/poi-detail-verification": "registry",
+    "/poi-job-detail-roster-integration": "registry",
+    "/poi-marker-lab": "registry",
+    "/poi-quest-detail-roster-integration": "registry",
+    "/poi-quest-detail-roster-time-clock": "registry",
+    "/primitives": "registry",
+    "/quest-editor": "registry",
+    "/quest-generation-lab": "registry",
+    "/quest-s1-lab": "registry",
+    "/quest-window-lab": "registry",
+    "/sea-effect-lab": "registry",
+    "/skill-check-v15": "registry",
+    "/skill-check-v16": "registry",
+    "/skill-check-web-v1": "registry",
+    "/skin-lab": "registry",
+    "/skin-sandbox": "registry",
+    "/slot": "registry",
+    "/spell-creator": "registry",
+    "/test": "registry",
+    "/test-hub": "registry",
+    "/test-hub/steam-trailer-hub": "registry",
+    "/theater-lab": "registry",
+    "/trailer": "registry",
+    "/use-client": "registry",
+    "/v9-skin-sandbox": "registry",
+    "/visual-fidelity-lab": "registry",
+    "/visual-grammar-validation": "registry",
+    "/world-presentation-director": "registry",
+    "/world-surface": "registry",
+    "/world-surface-demo": "registry"
+  },
+  "public": {
+    "totalFiles": 3084,
+    "referencedCount": 314,
+    "dynamicPrefixes": [
+      "/assets/atmosphere/",
+      "/assets/atmosphere/fog/mask-",
+      "/assets/audio/",
+      "/assets/ui/cursors/game-",
+      "/assets/ui/poi/icon_",
+      "/assets/ui/resources/res-",
+      "/assets/world/",
+      "/assets/world/wanderlust/base/layers/event_shroud_left_",
+      "/assets/world/wanderlust/base/layers/event_shroud_right_",
+      "/hud-target/game-",
+      "/locales/"
+    ],
+    "devOnlyCandidateDirs": [
+      "mockups",
+      "lab-fan-mock",
+      "hud-target",
+      "fork-mountains",
+      "spike-land-breath",
+      "example-circle-star",
+      "lab-preview",
+      "labs"
+    ],
+    "srcToDevPublicRefs": [
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/sources/zanara-v2.png"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/attach/roster-full-src.png"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/crops/panel/zanara-v3.webp"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/attach/panel-alabastro-alpha.png"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/crops/nav/zanara-v1.webp"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/attach/nav-plinth-alpha.png"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/crops/resources/zanara-v3.webp"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/attach/resources-bar-alpha.png"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/crops/cornerBL/zanara-v1.webp"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/attach/corner-bl-alpha.png"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/crops/cornerBR/board-breakdown.webp"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/attach/corner-br-alpha.png"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/crops/seal/mockup1-classic.webp"
+      },
+      {
+        "file": "src/pages/hud-compare.tsx",
+        "path": "/mockups/hud-lab/attach/seal-alpha.png"
+      },
+      {
+        "file": "src/pages/hud-defects.tsx",
+        "path": "/mockups/hud-defects/defects.json"
+      },
+      {
+        "file": "src/pages/hud-lab/spikes/RosterCropSpike.tsx",
+        "path": "/mockups/hud-lab/roster-crop/"
+      },
+      {
+        "file": "src/pages/hud-lab/spikes/RosterSpike.tsx",
+        "path": "/mockups/hud-lab/attach/sheet-row-0.png"
+      },
+      {
+        "file": "src/pages/hud-lab/spikes/RosterSpike.tsx",
+        "path": "/mockups/hud-lab/attach/pillar-band-tile.png"
+      },
+      {
+        "file": "src/pages/hud-lab/spikes/RosterSpike.tsx",
+        "path": "/mockups/hud-lab/attach/emblem-alato.png"
+      },
+      {
+        "file": "src/pages/hud-lab/spikes/RosterSpike.tsx",
+        "path": "/mockups/hud-lab/attach/gem-cut.png"
+      },
+      {
+        "file": "src/pages/hud-lab.tsx",
+        "path": "/mockups/hud-lab/manifest.json"
+      },
+      {
+        "file": "src/pages/hud-lab.tsx",
+        "path": "/fork-mountains/index.html"
+      },
+      {
+        "file": "src/pages/hud-r1.tsx",
+        "path": "/mockups/r1v0/r1v0.json"
+      },
+      {
+        "file": "src/pages/hud-r1.tsx",
+        "path": "/mockups/hud-lab/sources/zanara-v2.png"
+      },
+      {
+        "file": "src/pages/hud-real-roster.tsx",
+        "path": "/mockups/hud-lab/sources/zanara-v2.png"
+      },
+      {
+        "file": "src/pages/hud-roster-crop.tsx",
+        "path": "/mockups/hud-lab/roster-crop/ref/"
+      },
+      {
+        "file": "src/pages/hud-target.tsx",
+        "path": "/mockups/hud-lab/crops/"
+      }
+    ],
+    "orphanCandidates": [
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/free_blue_noise_textures.zip",
+        "bytes": 42288737
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/hdris/studio_small_08_4k.hdr",
+        "bytes": 23545064
+      },
+      {
+        "path": "/assets/scene-library/marcia-crinale-v2.png",
+        "bytes": 16379896
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/grain/custom_film_grain_2048.png",
+        "bytes": 11587547
+      },
+      {
+        "path": "/assets/ui/bg.png",
+        "bytes": 9313376
+      },
+      {
+        "path": "/assets/village/base-plate.png",
+        "bytes": 6136920
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble023_1K-JPG.zip",
+        "bytes": 4597736
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/1024_1024/LDR_RGBA_0.png",
+        "bytes": 4202841
+      },
+      {
+        "path": "/assets/creatures/reference/regina-ibrida-concept.png",
+        "bytes": 2511228
+      },
+      {
+        "path": "/assets/creatures/reference/regina-pathfinder-concept.png",
+        "bytes": 2474206
+      },
+      {
+        "path": "/assets/maps/base/mare.png",
+        "bytes": 1905570
+      },
+      {
+        "path": "/assets/ui/hud-real/roster/drape-laurel.png",
+        "bytes": 1444304
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023_1K-JPG_Color.jpg",
+        "bytes": 1415591
+      },
+      {
+        "path": "/assets/maps/base/foreste.png",
+        "bytes": 1412962
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_diff_2k.jpg",
+        "bytes": 1269188
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_spec_2k.jpg",
+        "bytes": 1173058
+      },
+      {
+        "path": "/assets/tiles/grass.png",
+        "bytes": 1140875
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023_1K-JPG.blend",
+        "bytes": 1099620
+      },
+      {
+        "path": "/assets/maps/base/terreno.png",
+        "bytes": 1060103
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/512_512/LDR_RGBA_0.png",
+        "bytes": 1049488
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_ao_2k.jpg",
+        "bytes": 999921
+      },
+      {
+        "path": "/assets/scene-library/santuario-panel.jpg",
+        "bytes": 998974
+      },
+      {
+        "path": "/assets/fantasy_ui/card_bg_fantasy.png",
+        "bytes": 904712
+      },
+      {
+        "path": "/ui/fantasy/card-background.png",
+        "bytes": 904712
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/512_512/LDR_RGB1_0.png",
+        "bytes": 900682
+      },
+      {
+        "path": "/assets/scene-library/mercante-strada.jpg",
+        "bytes": 880648
+      },
+      {
+        "path": "/assets/maps/base/città.png",
+        "bytes": 834238
+      },
+      {
+        "path": "/assets/ui/hud-real/C1/column-r1.png",
+        "bytes": 824733
+      },
+      {
+        "path": "/assets/fantasy_ui/icon_work.png",
+        "bytes": 800292
+      },
+      {
+        "path": "/ui/fantasy/icon-work.png",
+        "bytes": 800292
+      },
+      {
+        "path": "/assets/fantasy_ui/card_border_gold.png",
+        "bytes": 790467
+      },
+      {
+        "path": "/ui/fantasy/card-border-gold.png",
+        "bytes": 790467
+      },
+      {
+        "path": "/assets/maps/base/montagne.png",
+        "bytes": 790075
+      },
+      {
+        "path": "/assets/creatures/reference/gohul-esploratore.jpeg",
+        "bytes": 781426
+      },
+      {
+        "path": "/assets/creatures/reference/guardia-reale.jpeg",
+        "bytes": 753353
+      },
+      {
+        "path": "/assets/ref/poi-gemini-mockup.png",
+        "bytes": 752927
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023_1K-JPG_Displacement.jpg",
+        "bytes": 737999
+      },
+      {
+        "path": "/assets/creatures/reference/gohul-combattente.jpeg",
+        "bytes": 720915
+      },
+      {
+        "path": "/assets/fantasy_ui/icon_combat.png",
+        "bytes": 720276
+      },
+      {
+        "path": "/ui/fantasy/icon-combat.png",
+        "bytes": 720276
+      },
+      {
+        "path": "/assets/fantasy_ui/icon_quest.png",
+        "bytes": 713541
+      },
+      {
+        "path": "/ui/fantasy/icon-quest.png",
+        "bytes": 713541
+      },
+      {
+        "path": "/assets/village/layers/house-big-west.webp",
+        "bytes": 706062
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/512_512/LDR_RG01_0.png",
+        "bytes": 705573
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-job-base.webp",
+        "bytes": 642106
+      },
+      {
+        "path": "/assets/maps/base/bordi.png",
+        "bytes": 626262
+      },
+      {
+        "path": "/assets/fantasy_ui/card_glow.png",
+        "bytes": 564060
+      },
+      {
+        "path": "/ui/fantasy/card-glow.png",
+        "bytes": 564060
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_0.png",
+        "bytes": 524772
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_1.png",
+        "bytes": 524772
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_2.png",
+        "bytes": 524772
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_4.png",
+        "bytes": 524772
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_5.png",
+        "bytes": 524772
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_6.png",
+        "bytes": 524772
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_7.png",
+        "bytes": 524772
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGBA_3.png",
+        "bytes": 524770
+      },
+      {
+        "path": "/assets/tiles/stone.png",
+        "bytes": 504001
+      },
+      {
+        "path": "/assets/quest-goblin/assegnazione.jpg",
+        "bytes": 496631
+      },
+      {
+        "path": "/assets/ui/hud-real/ghiera-doppiobraccio.webp",
+        "bytes": 488728
+      },
+      {
+        "path": "/assets/village/layers/house-thatch-big.webp",
+        "bytes": 441348
+      },
+      {
+        "path": "/assets/creatures/reference/regina-ibrida.jpg",
+        "bytes": 432136
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023.png",
+        "bytes": 410984
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/particles/pexels-gold-dust-1146728.png",
+        "bytes": 396628
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGB_0.png",
+        "bytes": 393660
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGB_1.png",
+        "bytes": 393660
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGB_2.png",
+        "bytes": 393660
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGB_3.png",
+        "bytes": 393660
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGB_4.png",
+        "bytes": 393660
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGB_5.png",
+        "bytes": 393660
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGB_6.png",
+        "bytes": 393660
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_RGB_7.png",
+        "bytes": 393660
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/512_512/LDR_LLL1_0.png",
+        "bytes": 392823
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_nor_dx_2k.jpg",
+        "bytes": 380229
+      },
+      {
+        "path": "/assets/quest-goblin/quest-card.jpg",
+        "bytes": 367159
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023_1K-JPG_NormalDX.jpg",
+        "bytes": 340524
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023_1K-JPG_NormalGL.jpg",
+        "bytes": 339722
+      },
+      {
+        "path": "/assets/quest-goblin/bottino.jpg",
+        "bytes": 337568
+      },
+      {
+        "path": "/assets/village/layers/house-east-edge.webp",
+        "bytes": 311970
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_rough_2k.jpg",
+        "bytes": 281388
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_LA_0.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_LA_1.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_LA_2.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_LA_3.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_LA_4.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_LA_5.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_LA_6.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_LA_7.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGBA_0.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGBA_1.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGBA_2.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGBA_3.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGBA_4.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGBA_5.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGBA_6.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGBA_7.png",
+        "bytes": 262548
+      },
+      {
+        "path": "/assets/village/layers/inn.webp",
+        "bytes": 246766
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble023/Marble023_1K-JPG_Roughness.jpg",
+        "bytes": 245284
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_disp_2k.jpg",
+        "bytes": 231514
+      },
+      {
+        "path": "/assets/village/layers/chief-house.webp",
+        "bytes": 226186
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGB1_0.png",
+        "bytes": 225447
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGB1_1.png",
+        "bytes": 225416
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGB1_2.png",
+        "bytes": 225408
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGB1_5.png",
+        "bytes": 225405
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGB1_4.png",
+        "bytes": 225402
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGB1_3.png",
+        "bytes": 225399
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGB1_6.png",
+        "bytes": 225396
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RGB1_7.png",
+        "bytes": 225381
+      },
+      {
+        "path": "/assets/quest-goblin/incalzare.jpg",
+        "bytes": 219625
+      },
+      {
+        "path": "/assets/alt-visuals/v8/columns/Marble01/marble01_arm_2k.jpg",
+        "bytes": 214100
+      },
+      {
+        "path": "/assets/quest-goblin/combattimento.jpg",
+        "bytes": 184708
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RG01_5.png",
+        "bytes": 176956
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RG01_2.png",
+        "bytes": 176923
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RG01_1.png",
+        "bytes": 176877
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RG01_4.png",
+        "bytes": 176868
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RG01_6.png",
+        "bytes": 176865
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RG01_7.png",
+        "bytes": 176864
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RG01_3.png",
+        "bytes": 176860
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_RG01_0.png",
+        "bytes": 176829
+      },
+      {
+        "path": "/assets/ui/hud-real/seal/bar.webp",
+        "bytes": 171810
+      },
+      {
+        "path": "/assets/ui/poi-radial/hub.webp",
+        "bytes": 162444
+      },
+      {
+        "path": "/assets/village/layers/house-stone-mid.webp",
+        "bytes": 159994
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-quest-base.webp",
+        "bytes": 153760
+      },
+      {
+        "path": "/assets/ui/hud-real/C1/emblem.webp",
+        "bytes": 152792
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-green-base.webp",
+        "bytes": 136594
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/poi-job-frame.webp",
+        "bytes": 135464
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_0.png",
+        "bytes": 131436
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_1.png",
+        "bytes": 131436
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_2.png",
+        "bytes": 131436
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_3.png",
+        "bytes": 131436
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_4.png",
+        "bytes": 131436
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_5.png",
+        "bytes": 131436
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_6.png",
+        "bytes": 131436
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/HDR_L_7.png",
+        "bytes": 131436
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_4.png",
+        "bytes": 124912
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_12.png",
+        "bytes": 124906
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_3.png",
+        "bytes": 124906
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_9.png",
+        "bytes": 124904
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_14.png",
+        "bytes": 124900
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_1.png",
+        "bytes": 124898
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_13.png",
+        "bytes": 124897
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_10.png",
+        "bytes": 124893
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_5.png",
+        "bytes": 124888
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_6.png",
+        "bytes": 124884
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_8.png",
+        "bytes": 124884
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_11.png",
+        "bytes": 124881
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_15.png",
+        "bytes": 124881
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_7.png",
+        "bytes": 124874
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_2.png",
+        "bytes": 124873
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGBA_0.png",
+        "bytes": 124870
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-arc-top.webp",
+        "bytes": 124746
+      },
+      {
+        "path": "/assets/quest-goblin/razzia.jpg",
+        "bytes": 124164
+      },
+      {
+        "path": "/assets/ui/hud-real/reliquary/frame.webp",
+        "bytes": 121724
+      },
+      {
+        "path": "/assets/quest-goblin/ritorno.jpg",
+        "bytes": 110454
+      },
+      {
+        "path": "/assets/quest-goblin/accampamento.jpg",
+        "bytes": 110451
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/poi-glow-gold.webp",
+        "bytes": 108968
+      },
+      {
+        "path": "/assets/ui/hud-real/kit-divider.png",
+        "bytes": 100155
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_3.png",
+        "bytes": 99283
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_6.png",
+        "bytes": 99248
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_0.png",
+        "bytes": 99216
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_4.png",
+        "bytes": 99205
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_1.png",
+        "bytes": 99204
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_5.png",
+        "bytes": 99194
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_7.png",
+        "bytes": 99137
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/256_256/LDR_LLL1_2.png",
+        "bytes": 99123
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_10.png",
+        "bytes": 93725
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_12.png",
+        "bytes": 93722
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_4.png",
+        "bytes": 93722
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_14.png",
+        "bytes": 93719
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_6.png",
+        "bytes": 93716
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_11.png",
+        "bytes": 93715
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_3.png",
+        "bytes": 93713
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_13.png",
+        "bytes": 93712
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_7.png",
+        "bytes": 93709
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_15.png",
+        "bytes": 93708
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_2.png",
+        "bytes": 93707
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_1.png",
+        "bytes": 93705
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_8.png",
+        "bytes": 93702
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_9.png",
+        "bytes": 93699
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_0.png",
+        "bytes": 93696
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_RGB_5.png",
+        "bytes": 93696
+      },
+      {
+        "path": "/assets/village/layers/hut-far-2.webp",
+        "bytes": 85344
+      },
+      {
+        "path": "/assets/alt-visuals/v8/goo/surface_imperfections_leaks_001_1k_NormalGL.png",
+        "bytes": 83934
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/poi-quest-frame.webp",
+        "bytes": 78634
+      },
+      {
+        "path": "/assets/ui/poi/offer-forage.webp",
+        "bytes": 67548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_0.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_1.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_10.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_11.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_12.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_13.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_14.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_15.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_2.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_3.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_4.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_5.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_6.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_7.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_8.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGBA_9.png",
+        "bytes": 65752
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_3.png",
+        "bytes": 62543
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_0.png",
+        "bytes": 62540
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_14.png",
+        "bytes": 62540
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_12.png",
+        "bytes": 62538
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_6.png",
+        "bytes": 62538
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_15.png",
+        "bytes": 62535
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_8.png",
+        "bytes": 62534
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_7.png",
+        "bytes": 62533
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_2.png",
+        "bytes": 62532
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_1.png",
+        "bytes": 62531
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_4.png",
+        "bytes": 62529
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_13.png",
+        "bytes": 62528
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_11.png",
+        "bytes": 62527
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_10.png",
+        "bytes": 62525
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_5.png",
+        "bytes": 62525
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_LA_9.png",
+        "bytes": 62521
+      },
+      {
+        "path": "/assets/ui/time/time-day.webp",
+        "bytes": 61664
+      },
+      {
+        "path": "/assets/ui/time/time-night.webp",
+        "bytes": 60270
+      },
+      {
+        "path": "/assets/ui/zanara/roster/emblem.png",
+        "bytes": 59073
+      },
+      {
+        "path": "/assets/ui/poi/offer-assault.webp",
+        "bytes": 58506
+      },
+      {
+        "path": "/assets/ui/hud-real/C1/rail-cap.webp",
+        "bytes": 56646
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_15.png",
+        "bytes": 56507
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_12.png",
+        "bytes": 56505
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_0.png",
+        "bytes": 56500
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_4.png",
+        "bytes": 56499
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_6.png",
+        "bytes": 56497
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_9.png",
+        "bytes": 56497
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_13.png",
+        "bytes": 56495
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_2.png",
+        "bytes": 56495
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_11.png",
+        "bytes": 56494
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_14.png",
+        "bytes": 56491
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_3.png",
+        "bytes": 56489
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_7.png",
+        "bytes": 56489
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_10.png",
+        "bytes": 56484
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_5.png",
+        "bytes": 56484
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_8.png",
+        "bytes": 56484
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RGB1_1.png",
+        "bytes": 56482
+      },
+      {
+        "path": "/assets/ui/poi/threat-claws.webp",
+        "bytes": 55858
+      },
+      {
+        "path": "/assets/ui/poi/threat-invasion.webp",
+        "bytes": 55252
+      },
+      {
+        "path": "/assets/village/layers/lumber.webp",
+        "bytes": 54284
+      },
+      {
+        "path": "/assets/ui/time/time-dawn.webp",
+        "bytes": 53666
+      },
+      {
+        "path": "/assets/ui/poi/threat-goblin-king.webp",
+        "bytes": 53598
+      },
+      {
+        "path": "/assets/ui/poi/threat-beasts.webp",
+        "bytes": 52330
+      },
+      {
+        "path": "/assets/ui/poi/offer-caravan.webp",
+        "bytes": 51662
+      },
+      {
+        "path": "/assets/ui/poi/poi-ruins.webp",
+        "bytes": 50772
+      },
+      {
+        "path": "/assets/ui/poi/offer-delve.webp",
+        "bytes": 49914
+      },
+      {
+        "path": "/assets/ui/poi/offer-people.webp",
+        "bytes": 48876
+      },
+      {
+        "path": "/assets/village/layers/hut-far-1.webp",
+        "bytes": 47134
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_15.png",
+        "bytes": 44573
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_6.png",
+        "bytes": 44569
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_11.png",
+        "bytes": 44567
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_7.png",
+        "bytes": 44567
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_8.png",
+        "bytes": 44566
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_9.png",
+        "bytes": 44566
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_2.png",
+        "bytes": 44564
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_4.png",
+        "bytes": 44562
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_13.png",
+        "bytes": 44558
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_10.png",
+        "bytes": 44551
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_14.png",
+        "bytes": 44550
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_12.png",
+        "bytes": 44548
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_1.png",
+        "bytes": 44543
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_3.png",
+        "bytes": 44543
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_0.png",
+        "bytes": 44540
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_RG01_5.png",
+        "bytes": 44497
+      },
+      {
+        "path": "/assets/ui/poi/offer-recon.webp",
+        "bytes": 44350
+      },
+      {
+        "path": "/assets/ui/poi/poi-goblin-camp.webp",
+        "bytes": 44148
+      },
+      {
+        "path": "/assets/icons/app/icon-512.png",
+        "bytes": 43653
+      },
+      {
+        "path": "/assets/ui/hud-real/panel/cta.webp",
+        "bytes": 42870
+      },
+      {
+        "path": "/assets/ui/poi-radial/disc-job.webp",
+        "bytes": 42780
+      },
+      {
+        "path": "/assets/ui/poi-radial/disc-quest.webp",
+        "bytes": 41350
+      },
+      {
+        "path": "/assets/ui/hud-real/time/bar-slim.webp",
+        "bytes": 39550
+      },
+      {
+        "path": "/assets/ui/hud-real/roster/drape-cloth.webp",
+        "bytes": 36666
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_death_0.png",
+        "bytes": 36497
+      },
+      {
+        "path": "/assets/ui/poi-radial/disc-event.webp",
+        "bytes": 36330
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_run_2.png",
+        "bytes": 36274
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_jump_0.png",
+        "bytes": 35772
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_death_1.png",
+        "bytes": 34768
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_plain/character_death_1.png",
+        "bytes": 34454
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_jump_1.png",
+        "bytes": 34342
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_plain/character_jump_0.png",
+        "bytes": 33963
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_run_0.png",
+        "bytes": 33764
+      },
+      {
+        "path": "/assets/ui/hud-real/voce/frame-320.webp",
+        "bytes": 33508
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_plain/character_jump_1.png",
+        "bytes": 33107
+      },
+      {
+        "path": "/assets/ui/hud-real/resources/bar-slim.webp",
+        "bytes": 32204
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_0.png",
+        "bytes": 31364
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_9.png",
+        "bytes": 31362
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_6.png",
+        "bytes": 31359
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_7.png",
+        "bytes": 31356
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_14.png",
+        "bytes": 31355
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_5.png",
+        "bytes": 31355
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_15.png",
+        "bytes": 31354
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_8.png",
+        "bytes": 31354
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_10.png",
+        "bytes": 31353
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_12.png",
+        "bytes": 31353
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_2.png",
+        "bytes": 31353
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_3.png",
+        "bytes": 31353
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_11.png",
+        "bytes": 31350
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_13.png",
+        "bytes": 31349
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_4.png",
+        "bytes": 31347
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/HDR_L_1.png",
+        "bytes": 31346
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_56.png",
+        "bytes": 28287
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_30.png",
+        "bytes": 28282
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_43.png",
+        "bytes": 28281
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_60.png",
+        "bytes": 28281
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_19.png",
+        "bytes": 28280
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_22.png",
+        "bytes": 28280
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_53.png",
+        "bytes": 28280
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_6.png",
+        "bytes": 28280
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_44.png",
+        "bytes": 28279
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_51.png",
+        "bytes": 28278
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_1.png",
+        "bytes": 28277
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_25.png",
+        "bytes": 28277
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_54.png",
+        "bytes": 28277
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_17.png",
+        "bytes": 28276
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_27.png",
+        "bytes": 28276
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_29.png",
+        "bytes": 28276
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_40.png",
+        "bytes": 28276
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_41.png",
+        "bytes": 28276
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_52.png",
+        "bytes": 28276
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_13.png",
+        "bytes": 28275
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_36.png",
+        "bytes": 28275
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_45.png",
+        "bytes": 28275
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_46.png",
+        "bytes": 28275
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_62.png",
+        "bytes": 28275
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_8.png",
+        "bytes": 28275
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_4.png",
+        "bytes": 28274
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_16.png",
+        "bytes": 28273
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_34.png",
+        "bytes": 28273
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_50.png",
+        "bytes": 28273
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_55.png",
+        "bytes": 28272
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_58.png",
+        "bytes": 28272
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_10.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_15.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_18.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_23.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_3.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_33.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_38.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_61.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_9.png",
+        "bytes": 28271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_31.png",
+        "bytes": 28270
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_37.png",
+        "bytes": 28269
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_7.png",
+        "bytes": 28269
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_2.png",
+        "bytes": 28268
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_35.png",
+        "bytes": 28268
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_47.png",
+        "bytes": 28268
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_48.png",
+        "bytes": 28268
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_63.png",
+        "bytes": 28268
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_20.png",
+        "bytes": 28267
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_21.png",
+        "bytes": 28267
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_26.png",
+        "bytes": 28267
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_12.png",
+        "bytes": 28266
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_24.png",
+        "bytes": 28266
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_39.png",
+        "bytes": 28266
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_32.png",
+        "bytes": 28265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_49.png",
+        "bytes": 28265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_57.png",
+        "bytes": 28265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_0.png",
+        "bytes": 28264
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_5.png",
+        "bytes": 28264
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_14.png",
+        "bytes": 28263
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_28.png",
+        "bytes": 28263
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_42.png",
+        "bytes": 28262
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_59.png",
+        "bytes": 28261
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGBA_11.png",
+        "bytes": 28260
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_run_1.png",
+        "bytes": 27006
+      },
+      {
+        "path": "/assets/characters/prototypes/fantasy_vector/knight_blade/character_run_3.png",
+        "bytes": 27006
+      },
+      {
+        "path": "/assets/ui/hud-real/C1/band-end.webp",
+        "bytes": 26942
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_2.png",
+        "bytes": 25795
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_12.png",
+        "bytes": 25756
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_7.png",
+        "bytes": 25755
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_13.png",
+        "bytes": 25751
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_10.png",
+        "bytes": 25747
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_14.png",
+        "bytes": 25746
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_8.png",
+        "bytes": 25746
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_4.png",
+        "bytes": 25740
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_9.png",
+        "bytes": 25737
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_11.png",
+        "bytes": 25735
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_3.png",
+        "bytes": 25734
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_15.png",
+        "bytes": 25711
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_1.png",
+        "bytes": 25707
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_5.png",
+        "bytes": 25706
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_6.png",
+        "bytes": 25693
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/128_128/LDR_LLL1_0.png",
+        "bytes": 25681
+      },
+      {
+        "path": "/assets/ui/hud-real/C1/band-tile.webp",
+        "bytes": 24330
+      },
+      {
+        "path": "/assets/ui/zanara/roster/plaque-mid.png",
+        "bytes": 22378
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-arc-inc.webp",
+        "bytes": 21948
+      },
+      {
+        "path": "/assets/ui/zanara/roster/ring.png",
+        "bytes": 21385
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_47.png",
+        "bytes": 21272
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_39.png",
+        "bytes": 21271
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_10.png",
+        "bytes": 21269
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_9.png",
+        "bytes": 21269
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_0.png",
+        "bytes": 21267
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_13.png",
+        "bytes": 21267
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_22.png",
+        "bytes": 21266
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_49.png",
+        "bytes": 21266
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_2.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_25.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_31.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_36.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_46.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_51.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_6.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_7.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_8.png",
+        "bytes": 21265
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_1.png",
+        "bytes": 21264
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_21.png",
+        "bytes": 21264
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_27.png",
+        "bytes": 21264
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_63.png",
+        "bytes": 21264
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_12.png",
+        "bytes": 21263
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_24.png",
+        "bytes": 21263
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_29.png",
+        "bytes": 21263
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_42.png",
+        "bytes": 21263
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_62.png",
+        "bytes": 21263
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_20.png",
+        "bytes": 21262
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_4.png",
+        "bytes": 21262
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_59.png",
+        "bytes": 21262
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_61.png",
+        "bytes": 21262
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_16.png",
+        "bytes": 21261
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_18.png",
+        "bytes": 21261
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_23.png",
+        "bytes": 21261
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_32.png",
+        "bytes": 21261
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_40.png",
+        "bytes": 21261
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_44.png",
+        "bytes": 21261
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_5.png",
+        "bytes": 21261
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_15.png",
+        "bytes": 21260
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_43.png",
+        "bytes": 21260
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_52.png",
+        "bytes": 21260
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_53.png",
+        "bytes": 21260
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_14.png",
+        "bytes": 21259
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_17.png",
+        "bytes": 21259
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_30.png",
+        "bytes": 21259
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_35.png",
+        "bytes": 21259
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_19.png",
+        "bytes": 21258
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_26.png",
+        "bytes": 21258
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_28.png",
+        "bytes": 21258
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_3.png",
+        "bytes": 21258
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_41.png",
+        "bytes": 21258
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_48.png",
+        "bytes": 21258
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_56.png",
+        "bytes": 21258
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_60.png",
+        "bytes": 21258
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_33.png",
+        "bytes": 21257
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_50.png",
+        "bytes": 21257
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_38.png",
+        "bytes": 21256
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_54.png",
+        "bytes": 21256
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_58.png",
+        "bytes": 21256
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_34.png",
+        "bytes": 21255
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_55.png",
+        "bytes": 21255
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_57.png",
+        "bytes": 21254
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_11.png",
+        "bytes": 21253
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_37.png",
+        "bytes": 21252
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/HDR_RGB_45.png",
+        "bytes": 21247
+      },
+      {
+        "path": "/docs/prompts/prompt_library.md",
+        "bytes": 19979
+      },
+      {
+        "path": "/assets/ui/hud-real/poi/layers/poi-arc-tube.webp",
+        "bytes": 17430
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_0.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_1.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_10.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_11.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_12.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_13.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_14.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_15.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_16.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_17.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_18.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_19.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_2.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_20.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_21.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_22.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_23.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_24.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_25.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_26.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_27.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_28.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_29.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_3.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_30.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_31.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_32.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_33.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_34.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_35.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_36.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_37.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_38.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_39.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_4.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_40.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_41.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_42.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_43.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_44.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_45.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_46.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_47.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_48.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_49.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_5.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_50.png",
+        "bytes": 16521
+      }
+    ],
+    "orphanBytes": 204275926
+  }
+}

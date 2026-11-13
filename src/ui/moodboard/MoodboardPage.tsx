@@ -64,6 +64,7 @@ const computeImageSortKey = (id: string, fileName: string): number => {
 
 const moodImageModules = import.meta.glob<{ default: string }>('@/assets/mood/**/*.{png,jpg,jpeg,webp,avif,gif}', {
   eager: true,
+  query: '?url',
 });
 
 const MOOD_IMAGES: MoodImage[] = Object.entries(moodImageModules)
@@ -334,6 +335,8 @@ export function MoodboardPage() {
                       key={activeImage.id}
                       src={activeImage.src}
                       alt={activeImage.fileName}
+                      loading="lazy"
+                      decoding="async"
                       onLoad={handleImageLoaded}
                     />
                     <div className="pointer-events-none absolute inset-0 rounded-3xl border border-white/5 shadow-inner shadow-black/40" />
@@ -421,7 +424,7 @@ export function MoodboardPage() {
                         onClick={() => goDirectlyToImage(image.id)}
                         aria-label={`Mostra ${image.fileName}`}
                       >
-                        <img src={image.src} alt={image.fileName} loading="lazy" />
+                        <img src={image.src} alt={image.fileName} loading="lazy" decoding="async" />
                         <span className="moodboard-thumb__meta">
                           <span className="moodboard-thumb__file" title={image.fileName}>
                             {image.fileName}

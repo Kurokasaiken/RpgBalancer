@@ -134,7 +134,7 @@ export function PromptReferenceGallery({
           >
             <div className="prompt-thumb-card__preview">
               {image.url ? (
-                <img src={image.url} alt={image.title} loading="lazy" />
+                <img src={image.url} alt={image.title} loading="lazy" decoding="async" />
               ) : (
                 <span className="prompt-thumb-card__missing">Missing</span>
               )}

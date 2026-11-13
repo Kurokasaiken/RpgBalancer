@@ -1,0 +1,11 @@
+{
+ "defects": [
+  {"id":"v1","zone":"ring","text":"guidata v1 — design=colonna intera (bug): testo+scope drift","mockup":"/mockups/hud-defects/design-ring.png","result":"/mockups/hud-defects/v1.png"},
+  {"id":"v2a","zone":"ring","text":"guidata v2 — anello vuoto (gate: viola 0.006 marginale)","mockup":"/mockups/hud-defects/design-ring.png","result":"/mockups/hud-defects/v2a-vuoto.png"},
+  {"id":"v2b","zone":"ring","text":"guidata v2 — anello+ritratto (gate: Tier-A PASS)","mockup":"/mockups/hud-defects/design-ring.png","result":"/mockups/hud-defects/v2b-ritratto.png"},
+  {"id":"v3a","zone":"ring","text":"guidata v3 — anello vuoto (gate: viola 0.006 marginale)","mockup":"/mockups/hud-defects/design-ring.png","result":"/mockups/hud-defects/v3a-vuoto.png"},
+  {"id":"v3b","zone":"ring","text":"guidata v3 — anello+ritratto (gate: Tier-A PASS)","mockup":"/mockups/hud-defects/design-ring.png","result":"/mockups/hud-defects/v3b-ritratto.png"},
+  {"id":"v4a","zone":"ring","text":"guidata v4 — anello vuoto (gate: viola 0.006 marginale)","mockup":"/mockups/hud-defects/design-ring.png","result":"/mockups/hud-defects/v4a-vuoto.png"},
+  {"id":"v4b","zone":"ring","text":"guidata v4 — anello+ritratto (gate: Tier-A PASS)","mockup":"/mockups/hud-defects/design-ring.png","result":"/mockups/hud-defects/v4b-ritratto.png"}
+ ]
+}

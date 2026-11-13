@@ -27,6 +27,33 @@ const STATIC_CACHE = `${CACHE_VERSION_PREFIX}${SW_VERSION.replace(/\./g, '-')}`;
 const DYNAMIC_CACHE = `${CACHE_VERSION_PREFIX}${SW_VERSION.replace(/\./g, '-')}-dynamic`;
 
 /**
+ * PLAN-118 T-3: cap esplicito sulle cache runtime (handler hand-written,
+ * niente ExpirationPlugin). Senza bound, il cache-first-everything riempie
+ * la quota su mobile → QuotaExceeded → SW update fallito → client stuck.
+ */
+const RUNTIME_CACHE_MAX_ENTRIES = 200;
+const RUNTIME_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Inserisce una response in cache applicando il bound: rimuove le entry più
+ * vecchie di RUNTIME_CACHE_MAX_AGE_MS (via header Date della response, fallback
+ * in-memory) e mantiene al massimo RUNTIME_CACHE_MAX_ENTRIES entry (eviction
+ * in ordine di inserimento — keys() è FIFO).
+ */
+async function putWithCap(cache: Cache, request: Request, response: Response): Promise<void> {
+  const dateHeader = response.headers.get('date');
+  const ageMs = dateHeader ? Date.now() - Date.parse(dateHeader) : 0;
+  if (ageMs > RUNTIME_CACHE_MAX_AGE_MS) return;
+  await cache.put(request, response.clone());
+  const keys = await cache.keys();
+  if (keys.length > RUNTIME_CACHE_MAX_ENTRIES) {
+    for (const key of keys.slice(0, keys.length - RUNTIME_CACHE_MAX_ENTRIES)) {
+      await cache.delete(key);
+    }
+  }
+}
+
+/**
  * Cold start performance tracking
  */
 interface ColdStartMetrics {
@@ -241,7 +268,7 @@ self.addEventListener('fetch', (event) => {
         const freshCache = await caches.open(`${CACHE_VERSION_PREFIX}${SW_VERSION.replace(/\./g, '-')}`);
         const response = await fetch(request);
         if (response.ok) {
-          await freshCache.put(request, response.clone());
+          await putWithCap(freshCache, request, response);
         }
         return response;
       }
@@ -267,8 +294,8 @@ self.addEventListener('fetch', (event) => {
       const networkResponse = await fetch(request);
       
       if (networkResponse.ok) {
-        // Cache successful responses
-        await cache.put(request, networkResponse.clone());
+        // Cache successful responses (bounded: PLAN-118 T-3)
+        await putWithCap(cache, request, networkResponse);
       }
       
       return networkResponse;
@@ -628,7 +655,7 @@ async function networkFirstStrategy(request: Request): Promise<Response> {
     if (networkResponse.ok) {
       // Cache successful responses
       const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      await putWithCap(cache, request, networkResponse);
       diagnostics.info('Cached Punch Club response', { url: request.url });
     }
     return networkResponse;
@@ -675,7 +702,7 @@ async function cacheFirstStrategy(request: Request): Promise<Response> {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
       const cache = await caches.open(STATIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      await putWithCap(cache, request, networkResponse);
       diagnostics.info('Cached static asset', { url: request.url });
     }
     return networkResponse;

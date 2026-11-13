@@ -26,5 +26,13 @@
     "swordCount": "{count, plural, one {one sword} other {# swords}}",
     "riskLevel": "{level, select, low {Low risk} medium {Medium risk} high {High risk} other {Unknown risk}}",
     "characterGreeting": "{gender, select, male {Welcome, my lord} female {Welcome, my lady} other {Welcome, adventurer}}"
+  },
+  "deploy": {
+    "routeUnavailable": {
+      "kicker": "Deploy slim",
+      "title": "Not available",
+      "body": "This page is a development lab and is not part of the mobile deploy.",
+      "backHome": "Back to home"
+    }
   }
 }

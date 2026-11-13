@@ -15,5 +15,13 @@
     "swordCount": "{count, plural, one {سيف واحد} other {# سيوف}}",
     "riskLevel": "{level, select, low {مخاطرة منخفضة} medium {مخاطرة متوسطة} high {مخاطرة عالية} other {مخاطرة غير معروفة}}",
     "characterGreeting": "{gender, select, male {أهلاً بك يا سيدي} female {أهلاً بك يا سيدتي} other {أهلاً بك يا مغامر}}"
+  },
+  "deploy": {
+    "routeUnavailable": {
+      "kicker": "Deploy slim",
+      "title": "غير متاح",
+      "body": "هذه الصفحة مختبر تطوير وليست جزءًا من نسخة الجوال.",
+      "backHome": "عودة للرئيسية"
+    }
   }
 }

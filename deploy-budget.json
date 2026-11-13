@@ -1,0 +1,7 @@
+{
+  "$comment": "PLAN-118 P5/T-6: soglie tarate il 2026-11-13 = misura primo slim build verificato + 15%. dist 568.2 MB, cold max 8.5 MB (/game), install (precache) 4.9 MB.",
+  "tuned": true,
+  "distMaxBytes": 685000000,
+  "coldTransferMaxBytes": 10500000,
+  "installTransferMaxBytes": 6000000
+}

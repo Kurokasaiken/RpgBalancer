@@ -5,7 +5,7 @@ import { PromptReferenceGallery } from './PromptReferenceGallery';
 import './promptStyles.css';
 import { CreatureDevelopmentRoom } from './CreatureDevelopmentRoom';
 
-const assetModules = import.meta.glob<{ default: string }>('@/assets/**/*', { eager: true });
+const assetModules = import.meta.glob<{ default: string }>('@/assets/**/*', { eager: true, query: '?url' });
 const assetUrlMap = new Map<string, string>();
 Object.entries(assetModules).forEach(([key, mod]) => {
   const normalized = normalizeAssetKey(key);

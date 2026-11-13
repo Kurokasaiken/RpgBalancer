@@ -7,7 +7,7 @@
     "dev": "vite --mode development",
     "start": "vite --mode development",
     "build": "vite build",
-    "build:deploy": "vite build --mode production",
+    "build:deploy": "VITE_DEPLOY_SLIM=true vite build --mode production && node scripts/deploy/assertDeployShape.mjs",
     "build:minimal": "vite build --mode production",
     "build:playwright": "vite build --mode playwright --outDir dist-playwright",
     "lint": "eslint",
