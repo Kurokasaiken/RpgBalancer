@@ -1,0 +1,145 @@
+{
+  "timestamp": "2026-09-08T16:01:53.672Z",
+  "pad": 64,
+  "canvas": {
+    "width": 4240,
+    "height": 2828
+  },
+  "composites": [
+    {
+      "biome": "forests",
+      "file": "composite-forests.webp",
+      "layers": [
+        {
+          "id": "forest_1_top_left",
+          "file": "Foresta 1 Alto Sin.webp",
+          "zIndex": 65
+        },
+        {
+          "id": "forest_1_light_top_left",
+          "file": "Foresta 1 chiara alto sin.webp",
+          "zIndex": 70
+        },
+        {
+          "id": "forest_2_dark_bottom_left",
+          "file": "Foresta 2 scura basso sin.webp",
+          "zIndex": 75
+        },
+        {
+          "id": "forest_3_dark_bottom",
+          "file": "Foresta 3 scura basso.webp",
+          "zIndex": 80
+        },
+        {
+          "id": "forest_light_right_center",
+          "file": "Foresta chiara destra centro.webp",
+          "zIndex": 85
+        },
+        {
+          "id": "forest_dark_north",
+          "file": "Foresta scura nord.webp",
+          "zIndex": 89
+        }
+      ],
+      "size": {
+        "width": 4368,
+        "height": 2956
+      }
+    },
+    {
+      "biome": "islands",
+      "file": "composite-islands.webp",
+      "layers": [
+        {
+          "id": "island_bottom_left",
+          "file": "Isola basso sinistra.webp",
+          "zIndex": 15
+        },
+        {
+          "id": "island_bottom_right",
+          "file": "Isola basso a destra.webp",
+          "zIndex": 20
+        },
+        {
+          "id": "mountain_island_bottom_left",
+          "file": "Montagna isola basso sinistra.webp",
+          "zIndex": 25
+        }
+      ],
+      "size": {
+        "width": 4368,
+        "height": 2956
+      }
+    },
+    {
+      "biome": "mountains",
+      "file": "composite-mountains.webp",
+      "layers": [
+        {
+          "id": "mountains_dark_bottom",
+          "file": "Montagne scure basso.webp",
+          "zIndex": 30
+        },
+        {
+          "id": "mountains_light_bottom_right",
+          "file": "Montagne chiare basso destra.webp",
+          "zIndex": 35
+        },
+        {
+          "id": "mountains_dark_right",
+          "file": "Montagne scure destra.webp",
+          "zIndex": 40
+        },
+        {
+          "id": "mountain_zone_north",
+          "file": "Zona montana nord.webp",
+          "zIndex": 45
+        }
+      ],
+      "size": {
+        "width": 4368,
+        "height": 2956
+      }
+    },
+    {
+      "biome": "settlement",
+      "file": "composite-settlement.webp",
+      "layers": [
+        {
+          "id": "village",
+          "file": "Villaggio.webp",
+          "zIndex": 90
+        }
+      ],
+      "size": {
+        "width": 4368,
+        "height": 2956
+      }
+    },
+    {
+      "biome": "terrain",
+      "file": "composite-terrain.webp",
+      "layers": [
+        {
+          "id": "trees_brown_hills_center",
+          "file": "Alberi e colline marroni al centro.webp",
+          "zIndex": 50
+        },
+        {
+          "id": "small_trees_center",
+          "file": "Alberelli centro mappa.webp",
+          "zIndex": 55
+        },
+        {
+          "id": "trees_center_right",
+          "file": "Alberi destra centrali.webp",
+          "zIndex": 60
+        }
+      ],
+      "size": {
+        "width": 4368,
+        "height": 2956
+      }
+    }
+  ]
+}

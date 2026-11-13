@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goblin Invasion V4 — Dread Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --dread-bg: #080503;
+      --dread-iron: #2a2a28;
+      --dread-rust: #7a3a1a;
+      --dread-goblin: #5a6a3a;
+      --dread-bone: #c4b48a;
+      --dread-ash: #1a1614;
+      --danger-glow: rgba(220, 40, 20, 0.65);
+      --text: #f5f2e8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      font-family: 'Cinzel', Georgia, serif;
+      overflow: hidden;
+    }
+
+    #clouds {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.32) contrast(1.15);
+      z-index: 0;
+    }
+
+    #vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, transparent 10%, rgba(0,0,0,0.75) 100%);
+      z-index: 1;
+    }
+
+    .card-wrap {
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 0 40px rgba(0,0,0,0.9));
+    }
+
+    .card {
+      position: relative;
+      width: min(86vw, 360px);
+      clip-path: polygon(
+        12px 0, calc(100% - 8px) 0, 100% 12px,
+        calc(100% - 12px) 50%, 100% calc(100% - 12px),
+        calc(100% - 8px) 100%, 12px 100%,
+        0 calc(100% - 12px), 4px 50%, 0 12px
+      );
+      background:
+        radial-gradient(circle at 30% 25%, rgba(90,120,40,0.18) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(140,50,20,0.16) 0%, transparent 32%),
+        repeating-linear-gradient(135deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 2px),
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.15) 0 1px, transparent 1px 3px),
+        linear-gradient(180deg, #1a1614 0%, #0f0c0b 55%, #090605 100%);
+      padding: 10px;
+      animation: card-pulse 3.2s ease-in-out infinite;
+    }
+
+    @keyframes card-pulse {
+      0%, 100% { box-shadow: 0 0 0 1px #000, 0 0 36px rgba(220,40,20,0.35), inset 0 0 0 1px rgba(0,0,0,0.9); }
+      50% { box-shadow: 0 0 0 1px #000, 0 0 58px rgba(220,40,20,0.60), inset 0 0 0 1px rgba(0,0,0,0.9); }
+    }
+
+    .card-inner {
+      clip-path: polygon(
+        12px 0, calc(100% - 8px) 0, 100% 12px,
+        calc(100% - 12px) 50%, 100% calc(100% - 12px),
+        calc(100% - 8px) 100%, 12px 100%,
+        0 calc(100% - 12px), 4px 50%, 0 12px
+      );
+      background: linear-gradient(145deg, #3a3a38 0%, #1a1a18 60%, #0a0a08 100%);
+      padding: 3px;
+    }
+
+    .card-face {
+      clip-path: polygon(
+        12px 0, calc(100% - 8px) 0, 100% 12px,
+        calc(100% - 12px) 50%, 100% calc(100% - 12px),
+        calc(100% - 8px) 100%, 12px 100%,
+        0 calc(100% - 12px), 4px 50%, 0 12px
+      );
+      background:
+        radial-gradient(circle at 50% 0%, rgba(220,40,20,0.12) 0%, transparent 50%),
+        linear-gradient(180deg, #12100e 0%, #0a0807 100%);
+      padding: 54px 24px 28px;
+      text-align: center;
+    }
+
+    .badge {
+      position: absolute;
+      top: -58px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 118px;
+      filter: drop-shadow(0 0 16px rgba(220,40,20,0.45));
+    }
+
+    .badge-shield {
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 0, 100% 16%, 100% 58%, 50% 100%, 0 58%, 0 16%);
+      background: #0a0a0a;
+      border: 3px solid #5a6a3a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .badge svg {
+      width: 88%;
+      height: 88%;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 0 4px rgba(0,0,0,0.9));
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.65rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+      background: linear-gradient(180deg, #c4b48a 0%, #8a9a5a 45%, #6a3a1a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.95));
+    }
+
+    .counter {
+      width: 116px;
+      height: 116px;
+      margin: 18px auto 8px;
+      clip-path: polygon(50% 0, 95% 22%, 100% 50%, 95% 78%, 50% 100%, 5% 78%, 0 50%, 5% 22%);
+      background:
+        radial-gradient(circle at 35% 35%, #241a18 0%, #0f0a0a 60%, #050403 100%);
+      border: 3px solid #7a3a1a;
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.8), 0 0 18px rgba(220,40,20,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .counter span {
+      font-size: 4.4rem;
+      font-weight: 900;
+      line-height: 0.9;
+      background: linear-gradient(180deg, #c4b48a 0%, #8a9a5a 45%, #6a3a1a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,0.95)) drop-shadow(0 0 12px rgba(220,40,20,0.55));
+    }
+
+    .days {
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 22px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.95);
+    }
+
+    /* Hearthstone-style two-layer CTA */
+    .cta-frame {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      padding: 0 2px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #4a4a48 0%, #2a2a28 35%, #0a0a08 100%);
+      box-shadow:
+        0 0 0 1px #000,
+        0 4px 14px rgba(0,0,0,0.7),
+        0 0 16px rgba(220,40,20,0.25);
+    }
+
+    .cta-button {
+      position: relative;
+      display: block;
+      width: 100%;
+      border: 3px solid #5a4a3a;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #5a3a20 0%, #3a2212 40%, #1a0f08 100%);
+      padding: 14px 20px;
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 0.9rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #f5f2e8;
+      text-shadow: 0 2px 3px rgba(0,0,0,0.95);
+      cursor: pointer;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      transform-origin: center;
+      transition: filter 0.1s ease;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 1px;
+      background: linear-gradient(180deg, #4a2a18 0%, #2a1508 50%, #1a0c06 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 4px rgba(0,0,0,0.45);
+      z-index: 0;
+    }
+
+    .cta-text {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(180deg, #f5f2e8 0%, #c4b48a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .rivet {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #9a9a98 0%, #4a4a48 50%, #1a1a18 100%);
+      box-shadow: 0 1px 1px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.25);
+      z-index: 2;
+    }
+    .rivet.tl { top: 4px; left: 4px; }
+    .rivet.tr { top: 4px; right: 4px; }
+    .rivet.bl { bottom: 4px; left: 4px; }
+    .rivet.br { bottom: 4px; right: 4px; }
+
+    /* Press / release animations */
+    .cta-button.pressing {
+      transform: scale(0.96) rotate(-0.8deg);
+      transition: transform 0.04s linear;
+    }
+
+    .cta-button.releasing {
+      animation: cta-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes cta-pop {
+      0% { transform: scale(0.96) rotate(-0.8deg); }
+      35% { transform: scale(1.06) rotate(0.4deg); }
+      60% { transform: scale(0.98) rotate(-0.2deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .cta-button:hover { filter: brightness(1.08); }
+
+    /* Docked reminder */
+    .docked-wrap {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+    }
+
+    .docked {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 14px;
+      clip-path: polygon(8px 0, calc(100% - 6px) 0, 100% 8px, calc(100% - 8px) 50%, 100% calc(100% - 8px), calc(100% - 6px) 100%, 8px 100%, 0 calc(100% - 8px), 2px 50%, 0 8px);
+      background:
+        radial-gradient(circle at 30% 25%, rgba(90,120,40,0.18) 0%, transparent 40%),
+        repeating-linear-gradient(135deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 2px),
+        linear-gradient(180deg, #1a1614 0%, #090605 100%);
+      border: 2px solid #5a6a3a;
+      box-shadow: 0 0 0 1px #000, 0 4px 14px rgba(0,0,0,0.7), 0 0 14px rgba(220,40,20,0.25);
+    }
+
+    .docked .badge-shield { width: 40px; height: 40px; border-width: 2px; }
+    .docked .badge-shield svg { mix-blend-mode: screen; }
+    .docked-title { font-size: 0.8rem; font-weight: 900; background: linear-gradient(180deg, #c4b48a 0%, #6a3a1a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .docked-sub { font-size: 0.55rem; letter-spacing: 0.12em; color: var(--text); opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <img id="clouds" src="../assets/trailer/muro-di-nuvole-naruto.png" alt="" />
+  <div id="vignette"></div>
+
+  <div class="card-wrap">
+    <div class="badge">
+      <div class="badge-shield">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- crossed axes -->
+          <path d="M14 14 L86 86 M86 14 L14 86" stroke="#5a4a3a" stroke-width="8" stroke-linecap="round" />
+          <!-- skull -->
+          <circle cx="50" cy="44" r="20" fill="#c4b48a" />
+          <!-- eyes -->
+          <circle cx="43" cy="42" r="4.5" fill="#1a0f0a" />
+          <circle cx="57" cy="42" r="4.5" fill="#1a0f0a" />
+          <!-- nose -->
+          <path d="M50 50 L46 58 L54 58 Z" fill="#1a0f0a" />
+          <!-- mouth -->
+          <path d="M42 64 Q50 70 58 64" stroke="#1a0f0a" stroke-width="3" fill="none" stroke-linecap="round" />
+          <!-- ears -->
+          <path d="M30 34 L22 18 L36 30" fill="#c4b48a" />
+          <path d="M70 34 L78 18 L64 30" fill="#c4b48a" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-inner">
+        <div class="card-face">
+          <h1>Goblin Invasion!</h1>
+
+          <div class="counter">
+            <span>2</span>
+          </div>
+          <div class="days">Days Remaining</div>
+
+          <div class="cta-frame">
+            <button class="cta-button" id="cta">
+              <span class="cta-text">Prepare the Defenses</span>
+              <span class="rivet tl"></span>
+              <span class="rivet tr"></span>
+              <span class="rivet bl"></span>
+              <span class="rivet br"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="docked-wrap">
+    <div class="docked">
+      <div class="badge-shield">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 14 L86 86 M86 14 L14 86" stroke="#5a4a3a" stroke-width="8" stroke-linecap="round" />
+          <circle cx="50" cy="44" r="20" fill="#c4b48a" />
+          <circle cx="43" cy="42" r="4.5" fill="#1a0f0a" />
+          <circle cx="57" cy="42" r="4.5" fill="#1a0f0a" />
+          <path d="M50 50 L46 58 L54 58 Z" fill="#1a0f0a" />
+          <path d="M42 64 Q50 70 58 64" stroke="#1a0f0a" stroke-width="3" fill="none" stroke-linecap="round" />
+          <path d="M30 34 L22 18 L36 30" fill="#c4b48a" />
+          <path d="M70 34 L78 18 L64 30" fill="#c4b48a" />
+        </svg>
+      </div>
+      <div>
+        <div class="docked-title">Goblin Invasion!</div>
+        <div class="docked-sub">2 Days Remaining</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cta = document.getElementById('cta');
+    cta.addEventListener('pointerdown', () => {
+      cta.classList.remove('releasing');
+      cta.classList.add('pressing');
+    });
+
+    const release = () => {
+      if (!cta.classList.contains('pressing')) return;
+      cta.classList.remove('pressing');
+      cta.classList.add('releasing');
+      setTimeout(() => cta.classList.remove('releasing'), 420);
+    };
+
+    cta.addEventListener('pointerup', release);
+    cta.addEventListener('pointerleave', release);
+    cta.addEventListener('pointercancel', release);
+  </script>
+</body>
+</html>

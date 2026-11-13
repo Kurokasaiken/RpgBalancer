@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import crypto from 'crypto';
 import path from 'path';
-import fs from 'node:fs';
+import fs, { existsSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
@@ -15,7 +15,46 @@ if (!globalThis.crypto) {
   // @ts-ignore
   globalThis.crypto = crypto.webcrypto;
 }
+// PLAN-118: slim deploy gate — env only, mai `mode` (playwright resta full).
+const DEPLOY_SLIM = process.env.VITE_DEPLOY_SLIM === 'true';
+
+// PLAN-118 T-2: dev-public/ servita agli stessi URL in dev E preview
+// (apply:'serve' non copre vite preview — serve configurePreviewServer).
+const DEV_PUBLIC_DIR = path.resolve(dirname, 'dev-public');
+const DEV_PUBLIC_MIME: Record<string, string> = {
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp',
+  '.gif': 'image/gif', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
+  '.html': 'text/html; charset=utf-8', '.json': 'application/json; charset=utf-8',
+  '.css': 'text/css', '.js': 'text/javascript', '.mp4': 'video/mp4', '.webm': 'video/webm',
+  '.woff': 'font/woff', '.woff2': 'font/woff2', '.avif': 'image/avif'
+};
+/** Serve i file dev-only da dev-public/ agli stessi path URL di public/. */
+function devPublicMiddleware(req: { url?: string }, res: { setHeader: (k: string, v: string) => void; end: (b?: unknown) => void; statusCode: number }, next: () => void) {
+  try {
+    const pathname = decodeURIComponent((req.url || '').split('?')[0]);
+    if (!pathname || pathname.includes('..')) return next();
+    const file = path.join(DEV_PUBLIC_DIR, pathname);
+    if (!file.startsWith(DEV_PUBLIC_DIR) || !existsSync(file) || !statSync(file).isFile()) return next();
+    res.setHeader('Content-Type', DEV_PUBLIC_MIME[path.extname(file).toLowerCase()] ?? 'application/octet-stream');
+    res.end(readFileSync(file));
+  } catch {
+    next();
+  }
+}
+const devPublicPlugin = {
+  name: 'dev-public-serving',
+  configureServer(server: { middlewares: { use: (m: typeof devPublicMiddleware) => void } }) {
+    server.middlewares.use(devPublicMiddleware);
+  },
+  configurePreviewServer(server: { middlewares: { use: (m: typeof devPublicMiddleware) => void } }) {
+    server.middlewares.use(devPublicMiddleware);
+  }
+};
 const alias: Record<string, string> = {
+  // NOTA: più specifico prima di '@' (prefix match vince per ordine).
+  ...(DEPLOY_SLIM
+    ? { '@/deploy/labRoutes': path.resolve(dirname, 'src/deploy/labRoutes.slim.ts') }
+    : {}),
   '@': path.resolve(dirname, 'src'),
   '@docs': path.resolve(dirname, 'src/docs')
 };
@@ -339,18 +378,18 @@ function questEditorTranslatePlugin(): Plugin {
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
-    react(), 
+    react(),
+    devPublicPlugin,
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: null,
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        globIgnores: ['**/wanderlust-mockup.html']
+        // PLAN-118 T-3: precache solo shell — niente immagini (costo mobile).
+        // Eccezione nominata: icone PWA d'installazione + manifest.
+        globPatterns: ['**/*.{js,css,html,ico,woff2}', 'vite.svg', 'manifest.json', 'manifest.webmanifest'],
       },
       injectManifest: {
-        // Wanderlust mockups and other design surfaces exceed the default 2 MiB cap
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
-        globIgnores: ['**/wanderlust-mockup.html']
       },
       srcDir: 'src',
       filename: 'service-worker.ts',
@@ -431,6 +470,8 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     copyPublicDir: true,
+    // PLAN-118: il manifest moduli→chunk serve ad assertDeployShape (solo slim).
+    manifest: DEPLOY_SLIM,
     rollupOptions: {
       external: mode === 'production' ? [
         // Exclude analytics and telemetry in production

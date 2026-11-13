@@ -1,0 +1,18 @@
+{
+  "out_dir": "/Users/faustoboni/progetti_personali/RPG/public/mockups/alpha-test/turn-20260814",
+  "device": "mps",
+  "seed": 196512,
+  "steps": 20,
+  "resolution": [
+    768,
+    768
+  ],
+  "total_time_s": 289.9,
+  "white_time_s": null,
+  "black_time_s": null,
+  "pct_confident": 11.71,
+  "pct_edge": 88.29,
+  "mean_diff_foreground": 0.0629,
+  "mean_diff_background": null,
+  "mean_alpha_edge": 0.7013
+}

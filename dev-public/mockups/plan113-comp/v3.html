@@ -1,0 +1,41 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>V3 — Roster-anchored</title>
+<style>
+  body{margin:0;background:#0e1a20}
+  .stage{position:relative;width:1920px;height:1080px;transform-origin:top left}
+  .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .tag{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:99;
+       font:12px Georgia,serif;color:#e8d9b0;background:rgba(14,26,32,.82);
+       padding:6px 14px;border:1px solid #6b5a2e;border-radius:4px;letter-spacing:.04em;white-space:nowrap}
+  .back{position:fixed;top:10px;right:14px;z-index:99;font:12px Georgia,serif;color:#c9a94e}
+  .panel{position:absolute;object-fit:cover}
+  .ribbon{position:absolute;left:0;top:180px;width:96px;height:560px;
+          border:2px solid #a8894a;border-radius:0 12px 12px 0;background:rgba(20,34,42,.55)}
+  .ribbon::after{content:'roster ribbon (ancora)';position:absolute;left:6px;bottom:-22px;font:10px Georgia,serif;color:#c9a94e;width:200px}
+  .ribbon span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);
+               font:11px Georgia,serif;color:#e8d9b0;letter-spacing:.18em;white-space:nowrap}
+  .hang{position:absolute;border:2px solid #a8894a;border-radius:10px;
+        background:rgba(20,34,42,.35);box-shadow:0 8px 40px rgba(0,0,0,.5);pointer-events:none}
+  .hang::before{content:'';position:absolute;left:-14px;top:24px;width:12px;height:2px;background:#a8894a}
+  .hang::after{content:attr(data-l);position:absolute;left:10px;top:-18px;font:10px Georgia,serif;color:#c9a94e}
+</style></head><body>
+<div class="tag">V3 — Roster-anchored: stash e planner sbocciano dalla ribbon come estensioni (gesto = heroSheet dalla card) · idle = solo ribbon (composito spaziale, arte in F2)</div>
+<a class="back" href="index.html">← varianti</a>
+<div class="stage">
+  <img class="bg" src="base.png" alt="">
+  <div class="ribbon"><span>ROSTER 6/6</span></div>
+  <!-- stash sboccia dalla ribbon -->
+  <div class="hang" data-l="stash (estensione)" style="left:110px;top:180px;width:392px;height:300px"></div>
+  <img class="panel" src="stash.png" style="left:116px;top:186px;width:380px;height:288px">
+  <!-- roster aperto sopra lo stash quando serve -->
+  <div class="hang" data-l="roster aperto (estensione)" style="left:110px;top:500px;width:412px;height:280px"></div>
+  <img class="panel" src="roster.png" style="left:116px;top:506px;width:400px;height:268px">
+  <!-- planner sboccia a destra delle estensioni -->
+  <div class="hang" data-l="planner (estensione maggiore)" style="left:560px;top:88px;width:692px;height:595px"></div>
+  <img class="panel" src="planner.png" style="left:566px;top:94px;width:680px;height:587px">
+  <!-- forecast resta nel suo slot storico dx -->
+  <div class="hang" data-l="forecast (rightWing)" style="left:1554px;top:88px;width:352px;height:390px"></div>
+  <img class="panel" src="forecast.png" style="left:1560px;top:94px;width:340px;height:382px">
+</div>
+<script>const s=document.querySelector('.stage'),f=Math.min(innerWidth/1920,innerHeight/1080);s.style.transform='scale('+f+')';</script>
+</body></html>

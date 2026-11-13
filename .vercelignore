@@ -20,3 +20,9 @@ var
 *.zip
 .DS_Store
 .sdx-venv
+
+# PLAN-118: split dev-only fuori dal deploy + riduzione upload sorgente.
+# MAI escludere file importati (?raw in src/docs/plans|prompts non coperti).
+dev-public/
+coverage/
+src/docs/docs/game_surface_audit/
