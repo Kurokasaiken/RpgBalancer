@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Living Atlas — HUD mockup</title>
+<style>
+  :root {
+    --azure-world: #23889A;
+    --deep-teal: #082E35;
+    --night-azure: #081621;
+    --sun-bronze: #C58A32;
+    --solar-gold: #E2BD63;
+    --solar-white: #F4ECD5;
+    --parchment: #E7D3A3;
+    --parchment-ink: #302516;
+    --cinnabar: #B84B38;
+    --scrim: rgba(8, 30, 35, 0.55);
+    --scrim-line: rgba(226, 189, 99, 0.35);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    background: url('../../assets/world/wanderlust/base/layers/base_flat.webp') center / cover no-repeat var(--night-azure);
+    position: relative;
+  }
+
+  /* ---------- top-center: time + place sliver ---------- */
+  .time-sliver {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 34px;
+    padding: 0 18px;
+    background: var(--scrim);
+    backdrop-filter: blur(6px);
+    border-radius: 17px;
+    border: 1px solid var(--scrim-line);
+    box-shadow: 0 4px 18px rgba(8, 46, 53, 0.45);
+    color: var(--solar-white);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .time-sliver .day { font-weight: 600; }
+  .time-sliver .place { opacity: 0.85; font-style: italic; }
+  .time-sliver .sep { width: 1px; height: 16px; background: var(--scrim-line); }
+  .threat-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: rgba(184, 75, 56, 0.22);
+    border: 1px solid rgba(184, 75, 56, 0.55);
+    color: #F0B7A8;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .threat-chip svg { width: 12px; height: 12px; }
+
+  /* ---------- left edge: resource medallions ---------- */
+  .resources {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .medallion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding-right: 12px;
+    background: var(--scrim);
+    backdrop-filter: blur(5px);
+    border-radius: 20px;
+    border: 1px solid rgba(226, 189, 99, 0.18);
+    box-shadow: 0 3px 12px rgba(8, 46, 53, 0.4);
+    color: var(--solar-white);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .medallion .coin {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(circle at 32% 28%, #F0D68A 0%, #C58A32 45%, #7A4E16 100%);
+    box-shadow:
+      inset 0 -2px 4px rgba(46, 26, 6, 0.55),
+      inset 0 2px 3px rgba(244, 236, 213, 0.5),
+      0 0 0 1px rgba(46, 26, 6, 0.6);
+  }
+  .medallion .coin svg { width: 18px; height: 18px; color: #2E1A06; }
+
+  /* ---------- top-right: objective parchment tag ---------- */
+  .objective-tag {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    width: 230px;
+    padding: 12px 16px 14px;
+    transform: rotate(1.4deg);
+    background:
+      linear-gradient(160deg, #EFE0B4 0%, var(--parchment) 55%, #D9C08C 100%);
+    border-radius: 4px 14px 4px 14px;
+    box-shadow:
+      inset 0 0 0 1px rgba(197, 138, 50, 0.65),
+      inset 0 0 0 4px rgba(231, 211, 163, 0.9),
+      inset 0 0 0 5px rgba(197, 138, 50, 0.4),
+      0 8px 22px rgba(8, 46, 53, 0.55);
+    color: var(--parchment-ink);
+  }
+  .objective-tag .kicker {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #7A5A24;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  .objective-tag .text {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 14px;
+    line-height: 1.35;
+    font-style: italic;
+  }
+  .objective-tag::before {
+    content: "";
+    position: absolute;
+    top: -7px; left: 50%;
+    width: 14px; height: 14px;
+    transform: translateX(-50%) rotate(45deg);
+    background: radial-gradient(circle at 35% 30%, #F0D68A, #C58A32 60%, #7A4E16);
+    border-radius: 3px;
+    box-shadow: 0 2px 5px rgba(8, 46, 53, 0.5);
+  }
+
+  /* ---------- bottom-left: roster medallions ---------- */
+  .roster {
+    position: absolute;
+    left: 16px;
+    bottom: 18px;
+    display: flex;
+    gap: 8px;
+  }
+  .portrait {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(circle at 50% 30%, #1C4A52 0%, var(--deep-teal) 70%);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    box-shadow:
+      0 0 0 2px #C58A32,
+      0 0 0 3px rgba(46, 26, 6, 0.7),
+      0 4px 12px rgba(8, 46, 53, 0.55);
+    color: var(--solar-gold);
+    font-family: Georgia, serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+  .portrait.dim { color: rgba(226, 189, 99, 0.55); }
+
+  /* ---------- bottom-center: nav pill ---------- */
+  .nav {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    padding: 6px 10px;
+    background: var(--scrim);
+    backdrop-filter: blur(6px);
+    border-radius: 22px;
+    border: 1px solid var(--scrim-line);
+    box-shadow: 0 6px 20px rgba(8, 46, 53, 0.5);
+  }
+  .nav .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 14px 6px;
+    border-radius: 16px;
+    color: rgba(244, 236, 213, 0.75);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .nav .item svg { width: 20px; height: 20px; }
+  .nav .item.active {
+    color: var(--solar-gold);
+    background: rgba(226, 189, 99, 0.08);
+    box-shadow: inset 0 -2px 0 var(--sun-bronze);
+  }
+
+  /* ---------- bottom-right: speed control ---------- */
+  .speed {
+    position: absolute;
+    right: 18px;
+    bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 34px;
+    padding: 0 8px;
+    background: var(--scrim);
+    backdrop-filter: blur(6px);
+    border-radius: 17px;
+    border: 1px solid var(--scrim-line);
+    box-shadow: 0 4px 16px rgba(8, 46, 53, 0.45);
+    color: var(--solar-white);
+  }
+  .speed button {
+    appearance: none;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 9px;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+  }
+  .speed .active {
+    color: var(--solar-gold);
+    box-shadow: inset 0 -2px 0 var(--sun-bronze);
+  }
+  .speed svg { width: 13px; height: 13px; vertical-align: -2px; }
+</style>
+</head>
+<body>
+
+  <!-- time + place + threat -->
+  <div class="time-sliver">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="#E2BD63"><circle cx="12" cy="12" r="5"/><g stroke="#E2BD63" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/><line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/></g></svg>
+    <span class="day">Giorno 12</span>
+    <span class="sep"></span>
+    <span class="place">Valle di Heartholm</span>
+    <span class="threat-chip">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 L22 20 H2 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="14.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17.4" r="1.4" fill="currentColor"/></svg>
+      Incursione · 2g
+    </span>
+  </div>
+
+  <!-- resources: edge medallions -->
+  <div class="resources">
+    <div class="medallion"><span class="coin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg></span>240</div>
+    <div class="medallion"><span class="coin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18"/><path d="M12 7c-3-1-5-3-5-6 3 0 5 2 5 6zM12 7c3-1 5-3 5-6-3 0-5 2-5 6zM12 13c-3-1-5-3-5-6 3 0 5 2 5 6zM12 13c3-1 5-3 5-6-3 0-5 2-5 6zM12 19c-3-1-5-3-5-6 3 0 5 2 5 6zM12 19c3-1 5-3 5-6-3 0-5 2-5 6z"/></svg></span>38<span style="opacity:.55;font-weight:400">/50</span></div>
+    <div class="medallion"><span class="coin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 17 L17 4"/><path d="M4 13 L13 4" opacity=".55"/><path d="M8 20 L20 8" opacity=".55"/><circle cx="4.5" cy="16.5" r="1.6"/><circle cx="8.5" cy="19.5" r="1.6"/></svg></span>75</div>
+  </div>
+
+  <!-- objective tag -->
+  <div class="objective-tag">
+    <div class="kicker">Obiettivo</div>
+    <div class="text">Scorta il convoglio di rifornimenti fino al Faro di Bramar.</div>
+  </div>
+
+  <!-- roster medallions -->
+  <div class="roster">
+    <div class="portrait">A</div>
+    <div class="portrait">M</div>
+    <div class="portrait dim">?</div>
+  </div>
+
+  <!-- navigation -->
+  <nav class="nav">
+    <div class="item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.4 13.4 8.5 15.5 10.6 10.6 Z" fill="currentColor" stroke="none"/></svg>Mondo</div>
+    <div class="item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 20 V10 L9 6 V20"/><path d="M9 20 V12 L14 9 V20"/><path d="M14 20 V14 L20 11 V20"/><line x1="3" y1="20" x2="21" y2="20"/></svg>Insediamento</div>
+    <div class="item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="9" r="3"/><path d="M3.5 19 c0-3 2-5 4.5-5 s4.5 2 4.5 5"/><circle cx="16.5" cy="10" r="2.4"/><path d="M14 19 c0-2.4 1.6-4 3.8-4 1.5 0 2.7.8 3.3 2"/></svg>Compagnia</div>
+    <div class="item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 4 h11 a2 2 0 0 1 2 2 v14 H7 a2 2 0 0 1 -2 -2 Z"/><path d="M5 18 a2 2 0 0 1 2 -2 h11"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="11" x2="13" y2="11"/></svg>Cronaca</div>
+  </nav>
+
+  <!-- speed -->
+  <div class="speed">
+    <button aria-label="Pausa"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+    <button class="active">×1</button>
+    <button>×2</button>
+    <button>×4</button>
+    <button>×8</button>
+  </div>
+
+</body>
+</html>

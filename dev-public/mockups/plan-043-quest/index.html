@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>PLAN-043 quest redesign mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lift:#0f2a35; --base:#09202a; --deep:#060f16;
+  --crest:#d8bd78; --hi:#cfaf63; --mid:#c2a355; --low:#a0762f; --foot:#71501f;
+  --title:#f0cf6a; --text:#f5f2e8; --muted:rgba(245,242,232,.58); --faint:rgba(245,242,232,.32);
+  --met:#7bc96f; --unmet:#d98a4a; --wound:#c0453c;
+  --display:"Cinzel","Trajan Pro",serif; --serif:"EB Garamond",Georgia,serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#000;overflow:hidden}
+#stage{position:relative;background-size:cover;background-position:0 0}
+.plaque{position:absolute;background:linear-gradient(180deg,var(--lift),var(--base) 46%,var(--deep));border:1px solid var(--low);border-radius:14px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,230,160,.14),inset 0 0 0 1px rgba(207,175,99,.08),0 18px 44px rgba(0,0,0,.5);color:var(--text)}
+/* ---------- window ---------- */
+.win{padding:14px 16px 12px}
+.win .head{display:flex;align-items:center;gap:10px;height:34px}
+.win h1{margin:0;font:600 18px/1 var(--display);letter-spacing:.07em;color:var(--title);white-space:nowrap}
+.win .sub{font:italic 400 15px/1.2 var(--serif);color:var(--muted);margin:4px 0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px 0 10px;border-radius:14px;border:1px solid rgba(207,175,99,.42);
+  background:rgba(255,255,255,.03);color:var(--text);font:500 14px/1 var(--serif);white-space:nowrap}
+.pill svg{color:var(--hi)} .pill b{font-weight:600;color:var(--crest)}
+.pill.on{background:rgba(207,175,99,.16);border-color:var(--hi)}
+.ibtn{width:28px;height:28px;border-radius:14px;border:1px solid rgba(207,175,99,.42);background:rgba(255,255,255,.03);display:inline-grid;place-items:center;color:var(--hi)}
+.scene{position:relative;border-radius:10px;overflow:hidden;background:#000}
+.scene img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+.scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 58%,rgba(9,32,42,.92) 100%)}
+.scene .cap{position:absolute;left:16px;bottom:12px;z-index:2;font:600 13px/1 var(--display);letter-spacing:.1em;color:var(--crest);text-shadow:0 1px 2px #000}
+.story{font:400 18px/1.45 var(--serif);color:var(--text);margin:12px 2px 12px}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:12px;min-height:48px;padding:8px 10px 8px 12px;border-radius:12px;
+  border:1px solid rgba(207,175,99,.30);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));color:var(--text);text-align:left;font:inherit}
+.choice.hover{border-color:var(--hi);background:linear-gradient(180deg,rgba(207,175,99,.14),rgba(207,175,99,.05));box-shadow:0 0 0 1px rgba(207,175,99,.25)}
+.num{width:24px;height:24px;border-radius:12px;display:grid;place-items:center;border:1px solid rgba(207,175,99,.5);font:600 12px/1 var(--display);color:var(--crest)}
+.ctext{font:400 16px/1.3 var(--serif);color:var(--muted)}
+.ctext b{font:600 16px/1.3 var(--serif);color:var(--text);margin-right:6px}
+.prob{display:inline-flex;align-items:baseline;gap:4px;height:26px;padding:0 10px;border-radius:13px;border:1px solid rgba(123,201,111,.45);color:var(--met);font:600 15px/26px var(--serif);white-space:nowrap}
+.prob small{font:400 12px var(--serif);color:var(--muted)}
+.prob.mid{border-color:rgba(217,138,74,.5);color:var(--unmet)}
+.foot{display:flex;align-items:center;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(207,175,99,.18);font:400 14px/1 var(--serif);color:var(--muted)}
+.pips{display:flex;gap:5px}.pips i{width:8px;height:8px;border-radius:4px;background:rgba(207,175,99,.25)}.pips i.d{background:var(--hi)}.pips i.n{background:var(--title);box-shadow:0 0 6px var(--title)}
+.link{color:var(--muted);font:400 14px var(--serif);border:0;background:none;padding:4px 6px;border-radius:8px}
+.confirm{display:flex;align-items:center;gap:10px;margin-left:auto;color:var(--text);font:400 15px var(--serif)}
+.btn{height:32px;padding:0 16px;border-radius:16px;font:600 12px/32px var(--display);letter-spacing:.08em;border:1px solid rgba(207,175,99,.45);background:rgba(255,255,255,.04);color:var(--crest);white-space:nowrap}
+.btn.primary{background:linear-gradient(180deg,#e2c87e,#b99549);border-color:#e6cf8c;color:#1f1608;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 2px 6px rgba(0,0,0,.35)}
+.btn.danger{background:linear-gradient(180deg,#b5483d,#8c2f28);border-color:#d0675c;color:#fff4ee}
+/* ---------- side column: check + verdict (no plaque) ---------- */
+.side{position:absolute;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text)}
+.side .cap1{font:600 16px/1.1 var(--display);letter-spacing:.08em;color:var(--title);text-shadow:0 1px 3px #000,0 0 12px rgba(0,0,0,.8);display:flex;align-items:center;gap:8px}
+.side .cap2{font:400 15px/1 var(--serif);color:var(--text);text-shadow:0 1px 3px #000;opacity:.85;margin-top:-4px}
+.side .board{border-radius:50%;filter:drop-shadow(0 16px 30px rgba(0,0,0,.6))}
+.toggles{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.tog{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 6px;border-radius:15px;background:rgba(6,15,22,.78);border:1px solid rgba(207,175,99,.35);font:400 14px var(--serif);color:var(--text)}
+.tog .sw{width:30px;height:18px;border-radius:9px;background:rgba(255,255,255,.12);position:relative}.tog .sw::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:7px;background:#cbbf9a}
+.tog.on .sw{background:rgba(207,175,99,.6)}.tog.on .sw::after{left:14px;background:#fff3cf}
+.verdict{width:100%;padding:14px 16px 14px;border-radius:14px;background:linear-gradient(180deg,rgba(15,42,53,.94),rgba(6,15,22,.94));border:1px solid var(--low);
+  box-shadow:inset 0 1px 0 rgba(255,230,160,.14),0 14px 34px rgba(0,0,0,.5);text-align:center}
+.verdict .word{font:700 30px/1 var(--display);letter-spacing:.14em;color:var(--title);text-shadow:0 0 18px rgba(240,207,106,.35)}
+.verdict .word.fail{color:#e07b6e;text-shadow:0 0 18px rgba(192,69,60,.35)}
+.verdict .cons{font:400 17px/1.35 var(--serif);color:var(--text);margin:8px 0 12px}
+.verdict .row{display:flex;justify-content:center;gap:10px}
+.dim{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(6,15,22,.10),rgba(6,15,22,.45))}
+/* ---------- companions ---------- */
+.comp{padding:12px 14px}
+.comp h2{display:flex;align-items:center;gap:8px;margin:0 0 10px;font:600 13px/1 var(--display);letter-spacing:.1em;color:var(--title)}
+.comp h2 .spacer{flex:1}
+.mem{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;padding:6px 0;border-top:1px solid rgba(207,175,99,.12)}
+.mem:first-of-type{border-top:0}
+.av{width:40px;height:40px;border-radius:20px;background:#0c1c22 center/cover;border:2px solid var(--low);box-shadow:0 0 0 1px #000}
+.av.sil{display:grid;place-items:center;color:#2b3c42}
+.mname{font:600 16px/1.1 var(--serif);color:var(--text)} .mrole{font:400 14px var(--serif);color:var(--muted);margin-left:6px}
+.bar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#5aa864,#8bd27a);border-radius:3px}
+.bag{display:flex;gap:10px}
+.slot{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:12px;border:1px solid rgba(207,175,99,.3);background:rgba(255,255,255,.03);font:400 14px/1.15 var(--serif);color:var(--text);text-align:center}
+.slot svg{color:var(--hi)} .slot.empty{color:var(--faint);border-style:dashed}
+.rostertab{position:absolute;display:flex;align-items:center;gap:8px;height:34px;padding:0 14px;border-radius:17px;font:600 12px/1 var(--display);letter-spacing:.1em;color:var(--title)}
+.tag{position:absolute;font:600 13px/1.3 system-ui,sans-serif;color:#111;background:#ffe36e;border-radius:6px;padding:3px 8px;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+</style></head><body><div id="stage"></div>
+<script>
+const IC = {"role-member": "\n      <circle cx=\"12\" cy=\"7.6\" r=\"4.2\" />\n      <path d=\"M3.8 21c0-5.8 3.6-8.2 8.2-8.2s8.2 2.4 8.2 8.2z\" />\n    ", "ico-pouch": "\n      <path d=\"M8.2 2.2h7.6l-1 3H9.2z\" />\n      <path d=\"M12 7.4c5 0 8.6 3.6 8.6 8 0 3.6-2.6 5.8-6 5.8H9.4c-3.4 0-6-2.2-6-5.8 0-4.4 3.6-8 8.6-8z\" />\n      <path d=\"M9.2 6.4h5.6l.4 1.6H8.8z\" />\n    ", "ico-scroll": "<g transform=\"rotate(-16 12 12)\">\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M5.8 2.6h12.4a2.2 2.2 0 0 1 0 4.4H5.8a2.2 2.2 0 0 1 0-4.4zM17.4 3.8a1 1 0 1 0 0 2 1 1 0 1 0 0-2z\" />\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M7 7.6h10v8.8H7zM9 10v1.2h6V10zM9 13v1.2h4v-1.2z\" />\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M5.8 17h12.4a2.2 2.2 0 0 1 0 4.4H5.8a2.2 2.2 0 0 1 0-4.4zM17.4 18.2a1 1 0 1 0 0 2 1 1 0 1 0 0-2z\" />\n    </g>", "cmd-minimize": "<rect x=\"4\" y=\"14.6\" width=\"16\" height=\"3.4\" rx=\"1\" />", "cmd-close": "<path d=\"M5.4 3.6 12 10.2l6.6-6.6 1.8 1.8L13.8 12l6.6 6.6-1.8 1.8L12 13.8l-6.6 6.6-1.8-1.8L10.2 12 3.6 5.4z\" />", "role-leader": "\n      <path d=\"M3.5 16.2V7.4L8 12l4-7.6L16 12l4.5-4.6v8.8z\" />\n      <rect x=\"3.5\" y=\"17.6\" width=\"17\" height=\"3.1\" rx=\".9\" />\n    ", "role-bodyguard": "<path\n      fill-rule=\"evenodd\" clip-rule=\"evenodd\"\n      d=\"M12 2.4l8 2.8v6.3c0 5-3.5 8.5-8 10.3-4.5-1.8-8-5.3-8-10.3V5.2zM6.6 8.6V11L12 15.2 17.4 11V8.6L12 12.8z\"\n    />", "role-scout": "\n      <path d=\"M9.8 3.4C18.4 6.4 18.4 17.6 9.8 20.6v-2.2c5.2-2.8 5.2-9.6 0-12.8z\" />\n      <rect x=\"9.2\" y=\"3.8\" width=\"1.2\" height=\"16.4\" />\n      <rect x=\"3\" y=\"11.4\" width=\"17.4\" height=\"1.2\" rx=\".3\" />\n      <path d=\"M22.8 12 19.8 10.1v3.8z\" />\n      <path d=\"M2.6 9.8 5.6 11.4H2.6zM2.6 14.2 5.6 12.6H2.6z\" />\n    ", "ico-salve": "<path d=\"M12 20.6C6.8 16.6 3.2 13.4 3.2 9.2 3.2 6.2 5.5 4 8.4 4c1.6 0 3 .8 3.6 2 .6-1.2 2-2 3.6-2 2.9 0 5.2 2.2 5.2 5.2 0 4.2-3.6 7.4-8.8 11.4z\" />", "ico-spark": "<path d=\"M12 2.4c.8 5.6 4 8.8 9.6 9.6-5.6.8-8.8 4-9.6 9.6-.8-5.6-4-8.8-9.6-9.6 5.6-.8 8.8-4 9.6-9.6z\" />,\n\n  /* R-196 belt items \u2014 authored in the set's idiom (solid silhouette, evenodd\n   * holes, ~75% fill). target = two rings + centre; grapnel = ring, shaft and\n   * twin flukes; salve = lobed heart; banner = swallow-tailed pennant on a pole. */"};
+const ic=(k,s=16)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="currentColor" aria-hidden="true">${IC[k]}</svg>`;
+const [state, size] = (location.hash.slice(1)||'A-1920').split('-');
+const W = size==='1280'?1280:1920, H = size==='1280'?720:1080;
+const stage=document.getElementById('stage'); stage.style.width=W+'px'; stage.style.height=H+'px'; stage.style.backgroundImage=`url(bg-${W}.jpg)`;
+const L = W===1920 ? {win:{x:436,y:104,w:960}, side:{x:1416,y:104,w:480}, comp:{x:24,y:104,w:390}, aspect:2.4, board:420}
+                   : {win:{x:24,y:96,w:760}, side:{x:800,y:96,w:360}, comp:{x:24,y:96,w:300}, aspect:3.4, board:300};
+const choices=[['Slip past the bell wire','Agility. Bigger bonus, but if they see you the camp is alerted.','58%','mid'],['Assault','Strength. Moderate bonus — failure costs nothing.','72%','']];
+function windowHTML(opts={}){
+  const pills = `<span class="pill ${opts.party?'on':''}">${ic('role-member')}Party <b>4/4</b></span><span class="pill ${opts.bag?'on':''}">${ic('ico-pouch')}Bag <b>2/3</b></span><span class="pill">${ic('ico-scroll')}Log</span>`;
+  const foot = opts.confirm
+    ? `<span class="pips">${'<i class=d></i>'.repeat(3)}<i class=n></i>${'<i></i>'.repeat(4)}</span><span>Phase 4 of 8</span><div class="confirm">Abandon the expedition? The party returns with what it carries. <button class="btn">Keep going</button><button class="btn danger">Abandon</button></div>`
+    : `<span class="pips">${'<i class=d></i>'.repeat(3)}<i class=n></i>${'<i></i>'.repeat(4)}</span><span>Phase 4 of 8</span><span>·</span><span>Day 2 of about 5</span><span class="spacer"></span><button class="link">Abandon…</button>`;
+  return `<div class="plaque win" style="left:${L.win.x}px;top:${L.win.y}px;width:${L.win.w}px">
+    <div class="head"><h1>GOBLIN EXTERMINATION</h1><span class="spacer"></span>${pills}<span class="ibtn">${ic('cmd-minimize',14)}</span><span class="ibtn">${ic('cmd-close',14)}</span></div>
+    <div class="sub">The ford is closed by fear. Exterminate them.</div>
+    <div class="scene" style="aspect-ratio:${L.aspect}"><img src="/assets/scene-library/accampamento-raider.jpg" alt=""><span class="cap">THE GOBLIN CAMP</span></div>
+    <div class="story">Smoke among the tents. From here you strike in one way only — yours.</div>
+    <div class="choices">${choices.map((c,i)=>`<button class="choice ${i===0&&opts.hover?'hover':''}"><span class="num">${i+1}</span><span class="ctext"><b>${c[0]}</b>${c[1]}</span><span class="prob ${c[3]}">${c[2]} <small>success</small></span></button>`).join('')}</div>
+    <div class="foot">${foot}</div></div>`;
+}
+function sideHTML(verdict){
+  const top = `<div class="cap1">${ic('ico-spark',16)} LOOKING FOR TRACKS</div><div class="cap2">Perception 60 against 50</div>`;
+  const board = `<img class="board" src="${verdict?'board-verdict.png':'board-spin.png'}" width="${L.board}" height="${L.board}" alt="">`;
+  const under = verdict
+    ? `<div class="verdict"><div class="word">VICTORY</div><div class="cons">Fresh tracks heading north. You know how to approach — <b style="color:var(--crest);font-weight:600">Stealth bonus</b>.</div><div class="row"><button class="btn primary">Continue</button></div></div>`
+    : `<div class="toggles"><span class="tog"><span class="sw"></span>Skip the opening</span><span class="tog"><span class="sw"></span>Skip the roll</span></div>`;
+  return `<div class="side" style="left:${L.side.x}px;top:${L.side.y}px;width:${L.side.w}px">${top}${board}${under}</div>`;
+}
+function compHTML(){
+  const mem=[['Sir Spaccaculi','leader','/assets/portraits/portrait male warrior.png',100],['Mastro Beppe','fighter','',90],['Lisetta','scout','',60],['Baldassarre','bodyguard','',100]];
+  return `<div class="plaque comp" style="left:${L.comp.x}px;top:${L.comp.y}px;width:${L.comp.w}px">
+   <h2>${ic('role-member',14)} PARTY<span class="spacer"></span><span class="ibtn" style="width:24px;height:24px">${ic('cmd-close',12)}</span></h2>
+   ${mem.map(m=>`<div class="mem"><div class="av ${m[2]?'':'sil'}" style="${m[2]?`background-image:url('${m[2]}')`:''}">${m[2]?'':ic('role-member',22)}</div><div><div><span class="mname">${m[0]}</span><span class="mrole">${m[1]}</span></div><div class="bar"><i style="width:${m[3]}%"></i></div></div></div>`).join('')}
+   <h2 style="margin-top:16px">${ic('ico-pouch',14)} BAG</h2>
+   <div class="bag"><div class="slot">${ic('ico-salve',22)}Healing kit</div><div class="slot">${ic('ico-spark',22)}Perception draught</div><div class="slot empty">${ic('ico-pouch',22)}Empty</div></div></div>`;
+}
+let html='';
+if(state==='A') html=windowHTML({hover:true});
+if(state==='B') { L.win.x = W===1920?436:340; html=compHTML()+windowHTML({party:true,bag:true}); }
+if(state==='C') html=windowHTML()+sideHTML(false);
+if(state==='D') html=windowHTML()+sideHTML(true);
+if(state==='E') html=windowHTML({confirm:true});
+if(W===1280) html += `<div class="plaque rostertab" style="left:24px;top:${H-60}px">${ic('role-member',14)} ROSTER 6/6 ▸</div>`;
+stage.innerHTML=html;
+</script></body></html>

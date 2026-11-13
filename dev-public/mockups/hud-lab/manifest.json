@@ -1,0 +1,347 @@
+{
+  "generated": "2026-11-01T11:03:34.854Z",
+  "slots": [
+    {
+      "id": "brand",
+      "label": "Logo / Brand",
+      "iterations": [
+        {
+          "id": "zanara-v1",
+          "label": "Zanara v1",
+          "src": "/mockups/hud-lab/crops/brand/zanara-v1.webp",
+          "provenance": "sources/zanara-v1.png"
+        },
+        {
+          "id": "zanara-v2",
+          "label": "Zanara v2 (statuette)",
+          "src": "/mockups/hud-lab/crops/brand/zanara-v2.webp",
+          "provenance": "sources/zanara-v2.png"
+        },
+        {
+          "id": "zanara-v3",
+          "label": "Zanara v3",
+          "src": "/mockups/hud-lab/crops/brand/zanara-v3.webp",
+          "provenance": "sources/zanara-v3.png"
+        },
+        {
+          "id": "board-palette",
+          "label": "Tavola palette",
+          "src": "/mockups/hud-lab/crops/brand/board-palette.webp",
+          "provenance": "sources/board-palette.png"
+        },
+        {
+          "id": "board-breakdown",
+          "label": "Tavola breakdown",
+          "src": "/mockups/hud-lab/crops/brand/board-breakdown.webp",
+          "provenance": "sources/board-breakdown.png"
+        },
+        {
+          "id": "mockup1-classic",
+          "label": "Mockup 1 (classico)",
+          "src": "/mockups/hud-lab/crops/brand/mockup1-classic.webp",
+          "provenance": "sources/mockup1-classic.png"
+        },
+        {
+          "id": "production-base",
+          "label": "Produzione /game",
+          "src": "/mockups/hud-lab/crops/brand/production-base.webp",
+          "provenance": "sources/production-base.png"
+        }
+      ]
+    },
+    {
+      "id": "resources",
+      "label": "Risorse",
+      "iterations": [
+        {
+          "id": "zanara-v1",
+          "label": "Zanara v1",
+          "src": "/mockups/hud-lab/crops/resources/zanara-v1.webp",
+          "provenance": "sources/zanara-v1.png"
+        },
+        {
+          "id": "zanara-v2",
+          "label": "Zanara v2 (statuette)",
+          "src": "/mockups/hud-lab/crops/resources/zanara-v2.webp",
+          "provenance": "sources/zanara-v2.png"
+        },
+        {
+          "id": "zanara-v3",
+          "label": "Zanara v3",
+          "src": "/mockups/hud-lab/crops/resources/zanara-v3.webp",
+          "provenance": "sources/zanara-v3.png"
+        },
+        {
+          "id": "board-palette",
+          "label": "Tavola palette",
+          "src": "/mockups/hud-lab/crops/resources/board-palette.webp",
+          "provenance": "sources/board-palette.png"
+        },
+        {
+          "id": "board-breakdown",
+          "label": "Tavola breakdown",
+          "src": "/mockups/hud-lab/crops/resources/board-breakdown.webp",
+          "provenance": "sources/board-breakdown.png"
+        },
+        {
+          "id": "mockup1-classic",
+          "label": "Mockup 1 (classico)",
+          "src": "/mockups/hud-lab/crops/resources/mockup1-classic.webp",
+          "provenance": "sources/mockup1-classic.png"
+        },
+        {
+          "id": "production-base",
+          "label": "Produzione /game",
+          "src": "/mockups/hud-lab/crops/resources/production-base.webp",
+          "provenance": "sources/production-base.png"
+        }
+      ]
+    },
+    {
+      "id": "roster",
+      "label": "Roster",
+      "iterations": [
+        {
+          "id": "zanara-v1",
+          "label": "Zanara v1",
+          "src": "/mockups/hud-lab/crops/roster/zanara-v1.webp",
+          "provenance": "sources/zanara-v1.png"
+        },
+        {
+          "id": "zanara-v2",
+          "label": "Zanara v2 (statuette)",
+          "src": "/mockups/hud-lab/crops/roster/zanara-v2.webp",
+          "provenance": "sources/zanara-v2.png"
+        },
+        {
+          "id": "zanara-v3",
+          "label": "Zanara v3",
+          "src": "/mockups/hud-lab/crops/roster/zanara-v3.webp",
+          "provenance": "sources/zanara-v3.png"
+        },
+        {
+          "id": "board-palette",
+          "label": "Tavola palette",
+          "src": "/mockups/hud-lab/crops/roster/board-palette.webp",
+          "provenance": "sources/board-palette.png"
+        },
+        {
+          "id": "board-breakdown",
+          "label": "Tavola breakdown",
+          "src": "/mockups/hud-lab/crops/roster/board-breakdown.webp",
+          "provenance": "sources/board-breakdown.png"
+        },
+        {
+          "id": "mockup1-classic",
+          "label": "Mockup 1 (classico)",
+          "src": "/mockups/hud-lab/crops/roster/mockup1-classic.webp",
+          "provenance": "sources/mockup1-classic.png"
+        },
+        {
+          "id": "production-roster",
+          "label": "Produzione /game",
+          "src": "/mockups/hud-lab/crops/roster/production-roster.webp",
+          "provenance": "sources/production-roster.png"
+        }
+      ]
+    },
+    {
+      "id": "panel",
+      "label": "Pannello contestuale",
+      "iterations": [
+        {
+          "id": "zanara-v1",
+          "label": "Zanara v1",
+          "src": "/mockups/hud-lab/crops/panel/zanara-v1.webp",
+          "provenance": "sources/zanara-v1.png"
+        },
+        {
+          "id": "zanara-v2",
+          "label": "Zanara v2 (statuette)",
+          "src": "/mockups/hud-lab/crops/panel/zanara-v2.webp",
+          "provenance": "sources/zanara-v2.png"
+        },
+        {
+          "id": "zanara-v3",
+          "label": "Zanara v3",
+          "src": "/mockups/hud-lab/crops/panel/zanara-v3.webp",
+          "provenance": "sources/zanara-v3.png"
+        },
+        {
+          "id": "board-palette",
+          "label": "Tavola palette",
+          "src": "/mockups/hud-lab/crops/panel/board-palette.webp",
+          "provenance": "sources/board-palette.png"
+        },
+        {
+          "id": "board-breakdown",
+          "label": "Tavola breakdown",
+          "src": "/mockups/hud-lab/crops/panel/board-breakdown.webp",
+          "provenance": "sources/board-breakdown.png"
+        },
+        {
+          "id": "mockup1-classic",
+          "label": "Mockup 1 (classico)",
+          "src": "/mockups/hud-lab/crops/panel/mockup1-classic.webp",
+          "provenance": "sources/mockup1-classic.png"
+        },
+        {
+          "id": "production-panel",
+          "label": "Produzione /game",
+          "src": "/mockups/hud-lab/crops/panel/production-panel.webp",
+          "provenance": "sources/production-panel.png"
+        }
+      ]
+    },
+    {
+      "id": "nav",
+      "label": "Navigazione",
+      "iterations": [
+        {
+          "id": "zanara-v1",
+          "label": "Zanara v1",
+          "src": "/mockups/hud-lab/crops/nav/zanara-v1.webp",
+          "provenance": "sources/zanara-v1.png"
+        },
+        {
+          "id": "zanara-v2",
+          "label": "Zanara v2 (statuette)",
+          "src": "/mockups/hud-lab/crops/nav/zanara-v2.webp",
+          "provenance": "sources/zanara-v2.png"
+        },
+        {
+          "id": "zanara-v3",
+          "label": "Zanara v3",
+          "src": "/mockups/hud-lab/crops/nav/zanara-v3.webp",
+          "provenance": "sources/zanara-v3.png"
+        },
+        {
+          "id": "board-palette",
+          "label": "Tavola palette",
+          "src": "/mockups/hud-lab/crops/nav/board-palette.webp",
+          "provenance": "sources/board-palette.png"
+        },
+        {
+          "id": "board-breakdown",
+          "label": "Tavola breakdown",
+          "src": "/mockups/hud-lab/crops/nav/board-breakdown.webp",
+          "provenance": "sources/board-breakdown.png"
+        },
+        {
+          "id": "mockup1-classic",
+          "label": "Mockup 1 (classico)",
+          "src": "/mockups/hud-lab/crops/nav/mockup1-classic.webp",
+          "provenance": "sources/mockup1-classic.png"
+        },
+        {
+          "id": "production-base",
+          "label": "Produzione /game",
+          "src": "/mockups/hud-lab/crops/nav/production-base.webp",
+          "provenance": "sources/production-base.png"
+        }
+      ]
+    },
+    {
+      "id": "cornerBL",
+      "label": "Angolo basso sx",
+      "iterations": [
+        {
+          "id": "zanara-v1",
+          "label": "Zanara v1",
+          "src": "/mockups/hud-lab/crops/cornerBL/zanara-v1.webp",
+          "provenance": "sources/zanara-v1.png"
+        },
+        {
+          "id": "zanara-v2",
+          "label": "Zanara v2 (statuette)",
+          "src": "/mockups/hud-lab/crops/cornerBL/zanara-v2.webp",
+          "provenance": "sources/zanara-v2.png"
+        },
+        {
+          "id": "zanara-v3",
+          "label": "Zanara v3",
+          "src": "/mockups/hud-lab/crops/cornerBL/zanara-v3.webp",
+          "provenance": "sources/zanara-v3.png"
+        },
+        {
+          "id": "board-palette",
+          "label": "Tavola palette",
+          "src": "/mockups/hud-lab/crops/cornerBL/board-palette.webp",
+          "provenance": "sources/board-palette.png"
+        },
+        {
+          "id": "board-breakdown",
+          "label": "Tavola breakdown",
+          "src": "/mockups/hud-lab/crops/cornerBL/board-breakdown.webp",
+          "provenance": "sources/board-breakdown.png"
+        },
+        {
+          "id": "mockup1-classic",
+          "label": "Mockup 1 (classico)",
+          "src": "/mockups/hud-lab/crops/cornerBL/mockup1-classic.webp",
+          "provenance": "sources/mockup1-classic.png"
+        }
+      ]
+    },
+    {
+      "id": "cornerBR",
+      "label": "Angolo basso dx",
+      "iterations": [
+        {
+          "id": "zanara-v1",
+          "label": "Zanara v1",
+          "src": "/mockups/hud-lab/crops/cornerBR/zanara-v1.webp",
+          "provenance": "sources/zanara-v1.png"
+        },
+        {
+          "id": "zanara-v2",
+          "label": "Zanara v2 (statuette)",
+          "src": "/mockups/hud-lab/crops/cornerBR/zanara-v2.webp",
+          "provenance": "sources/zanara-v2.png"
+        },
+        {
+          "id": "zanara-v3",
+          "label": "Zanara v3",
+          "src": "/mockups/hud-lab/crops/cornerBR/zanara-v3.webp",
+          "provenance": "sources/zanara-v3.png"
+        },
+        {
+          "id": "board-palette",
+          "label": "Tavola palette",
+          "src": "/mockups/hud-lab/crops/cornerBR/board-palette.webp",
+          "provenance": "sources/board-palette.png"
+        },
+        {
+          "id": "board-breakdown",
+          "label": "Tavola breakdown",
+          "src": "/mockups/hud-lab/crops/cornerBR/board-breakdown.webp",
+          "provenance": "sources/board-breakdown.png"
+        },
+        {
+          "id": "mockup1-classic",
+          "label": "Mockup 1 (classico)",
+          "src": "/mockups/hud-lab/crops/cornerBR/mockup1-classic.webp",
+          "provenance": "sources/mockup1-classic.png"
+        },
+        {
+          "id": "production-base",
+          "label": "Produzione /game",
+          "src": "/mockups/hud-lab/crops/cornerBR/production-base.webp",
+          "provenance": "sources/production-base.png"
+        }
+      ]
+    },
+    {
+      "id": "seal",
+      "label": "Sigillo vittoria",
+      "iterations": [
+        {
+          "id": "mockup1-classic",
+          "label": "Mockup 1 (classico)",
+          "src": "/mockups/hud-lab/crops/seal/mockup1-classic.webp",
+          "provenance": "sources/mockup1-classic.png"
+        }
+      ]
+    }
+  ]
+}

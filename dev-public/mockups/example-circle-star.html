@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>D100 Board Example — Circle + Star</title>
+  <style>
+    body { margin: 0; background: #050509; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; color: #f0efe4; font-family: system-ui, sans-serif; }
+    h1 { font-size: 1.1rem; color: #e4b048; margin-bottom: 1rem; }
+    svg { display: block; }
+    .legend { margin-top: 1rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem 1.5rem; font-size: 0.75rem; }
+    .legend span { display: flex; align-items: center; gap: 0.4rem; }
+    .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <h1>Example: circle (SKILL) + star (CHECK) — equal-vector, 50% at par</h1>
+  <svg width="420" height="420" viewBox="0 0 420 420">
+    <defs>
+      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- SKILL boundary circle -->
+    <circle cx="210" cy="210" r="190" fill="none" stroke="#8a5a18" stroke-width="4" />
+
+    <!-- epicfail: outer rim inside the circle -->
+    <path id="epic-ring" d="M 210 20 A 190 190 0 1 1 209.9 20" fill="none" stroke="#5a0a18" stroke-width="28" opacity="0.95" />
+
+    <!-- fail: middle ring -->
+    <circle cx="210" cy="210" r="152" fill="none" stroke="#4a4a7a" stroke-width="46" opacity="0.9" />
+
+    <!-- almost: ring just outside the star -->
+    <circle cx="210" cy="210" r="123" fill="none" stroke="#b08035" stroke-width="28" opacity="0.85" />
+
+    <!-- CHECK: star (success zone) scaled to ~50% of circle area -->
+    <polygon points="210,70 237,147 318,147 254,197 279,280 210,232 141,280 166,197 102,147 183,147" fill="#e4b048" stroke="#c9a227" stroke-width="2" />
+
+    <!-- win: inner star minus bigwin -->
+    <polygon points="210,95 231,156 296,156 244,195 265,257 210,220 155,257 176,195 124,156 189,156" fill="#fce890" stroke="none" />
+
+    <!-- bigwin: tiny center -->
+    <circle cx="210" cy="210" r="18" fill="#fff" stroke="#c9a227" stroke-width="2" filter="url(#glow)" />
+
+    <!-- wounded: transversal band -->
+    <line x1="60" y1="340" x2="360" y2="80" stroke="#ff3df0" stroke-width="8" stroke-linecap="butt" opacity="0.8" />
+
+    <!-- dead: transversal band crossing the first -->
+    <line x1="60" y1="80" x2="360" y2="340" stroke="#5a6bff" stroke-width="6" stroke-linecap="butt" opacity="0.8" />
+
+    <!-- ball example -->
+    <circle cx="250" cy="190" r="7" fill="#fff" stroke="#e4b048" stroke-width="2" filter="url(#glow)" />
+  </svg>
+
+  <div class="legend">
+    <span><span class="dot" style="background:#fff"></span>bigwin</span>
+    <span><span class="dot" style="background:#fce890"></span>win</span>
+    <span><span class="dot" style="background:#e4b048"></span>CHECK / star</span>
+    <span><span class="dot" style="background:#b08035"></span>almost</span>
+    <span><span class="dot" style="background:#4a4a7a"></span>fail</span>
+    <span><span class="dot" style="background:#5a0a18"></span>epicfail (inner rim)</span>
+    <span><span class="dot" style="background:#ff3df0"></span>wounded</span>
+    <span><span class="dot" style="background:#5a6bff"></span>dead</span>
+  </div>
+</body>
+</html>

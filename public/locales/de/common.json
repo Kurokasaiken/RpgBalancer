@@ -15,5 +15,13 @@
     "swordCount": "{count, plural, one {ein einzelnes Schwert} other {# Schwerter}}",
     "riskLevel": "{level, select, low {Niedriges Risiko} medium {Mittleres Risiko} high {Hohes Risiko} other {Unbekanntes Risiko}}",
     "characterGreeting": "{gender, select, male {Willkommen, mein Lord} female {Willkommen, meine Lady} other {Willkommen, Abenteurer}}"
+  },
+  "deploy": {
+    "routeUnavailable": {
+      "kicker": "Deploy slim",
+      "title": "Nicht verfügbar",
+      "body": "Diese Seite ist ein Entwicklungs-Lab und nicht Teil des Mobile-Deploys.",
+      "backHome": "Zurück zur Startseite"
+    }
   }
 }

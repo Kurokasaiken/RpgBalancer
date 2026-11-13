@@ -1,0 +1,41 @@
+{
+  "source": "public/mockups/hud-lab/sources/zanara-v2.png",
+  "units": "source px (1672x941)",
+  "pitch": 94,
+  "rowTile": {
+    "w": 256,
+    "h": 94,
+    "hole": {
+      "cx": 86.8,
+      "cy": 47.1,
+      "r": 35.0
+    },
+    "name": [
+      138,
+      26,
+      200,
+      46
+    ],
+    "lv": [
+      138,
+      48,
+      196,
+      64
+    ],
+    "bar": [
+      134,
+      66,
+      219,
+      78
+    ]
+  },
+  "topCap": {
+    "w": 232,
+    "h": 227
+  },
+  "bottomCap": {
+    "w": 120,
+    "h": 65
+  },
+  "mockupRowsTop": 227
+}
