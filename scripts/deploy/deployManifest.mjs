@@ -60,6 +60,23 @@ function extractRouteTable() {
     .map(([path, match]) => ({ path, match }));
 }
 
+/** `.vercelignore` = file set deployato via CLI (vercel --prod). Il manifest
+ *  modella quello, non il worktree — altrimenti drift garantito sul remote. */
+const IGNORE_PATTERNS = existsSync(join(ROOT, '.vercelignore'))
+  ? readFileSync(join(ROOT, '.vercelignore'), 'utf8').split('\n')
+      .map(l => l.trim()).filter(l => l && !l.startsWith('#'))
+  : [];
+function isIgnored(relPath) {
+  const base = relPath.split('/').pop();
+  for (const p of IGNORE_PATTERNS) {
+    const pat = p.replace(/\/$/, '');
+    if (pat.startsWith('*')) { if (base.endsWith(pat.slice(1))) return true; continue; }
+    if (pat.includes('/')) { if (relPath === pat || relPath.startsWith(pat + '/')) return true; continue; }
+    if (relPath.split('/').includes(pat) || base === pat) return true;
+  }
+  return base === '.DS_Store';
+}
+
 /** Raccoglie tutti i file sotto una dir come path relativi `/`-prefissati. */
 function walkPublic() {
   const out = [];
@@ -68,8 +85,9 @@ function walkPublic() {
       const abs = join(dir, name);
       const rel = `${prefix}/${name}`;
       const st = statSync(abs);
-      if (st.isDirectory()) walk(abs, rel);
-      else out.push({ path: rel.replace(/^\/public/, ''), bytes: st.size });
+      if (st.isDirectory()) { if (!isIgnored(rel.replace(/^\/public\//, 'public/'))) walk(abs, rel); continue; }
+      if (isIgnored(rel.replace(/^\/public\//, 'public/'))) continue;
+      out.push({ path: rel.replace(/^\/public/, ''), bytes: st.size });
     }
   };
   walk(PUBLIC_DIR, '/public');
@@ -106,12 +124,13 @@ function collectPublicRefs() {
   visit(join(ROOT, 'index.html'), readFileSync(join(ROOT, 'index.html'), 'utf8'), true);
 
   // JSON config-driven dentro public/ (layers.json, regions.json, …)
-  const walkJson = (dir) => {
+  const walkJson = (dir, prefix = 'public') => {
     for (const name of readdirSync(dir)) {
       const abs = join(dir, name);
+      const rel = `${prefix}/${name}`;
       const st = statSync(abs);
-      if (st.isDirectory()) { walkJson(abs); continue; }
-      if (!name.endsWith('.json')) continue;
+      if (st.isDirectory()) { if (!isIgnored(rel)) walkJson(abs, rel); continue; }
+      if (!name.endsWith('.json') || isIgnored(rel)) continue;
       for (const m of readFileSync(abs, 'utf8').matchAll(/"(\/[^"]+)"/g)) referenced.add(m[1]);
     }
   };

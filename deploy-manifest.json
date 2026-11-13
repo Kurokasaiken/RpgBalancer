@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-13T08:31:56.926Z",
+  "generated": "2026-11-13T09:08:20.213Z",
   "generator": "scripts/deploy/deployManifest.mjs",
   "profile": "slim",
   "keptRoutes": [
@@ -213,7 +213,7 @@
     "/world-surface-demo": "registry"
   },
   "public": {
-    "totalFiles": 3084,
+    "totalFiles": 3080,
     "referencedCount": 314,
     "dynamicPrefixes": [
       "/assets/atmosphere/",
@@ -350,10 +350,6 @@
     ],
     "orphanCandidates": [
       {
-        "path": "/assets/alt-visuals/v8/background/noise/free_blue_noise_textures.zip",
-        "bytes": 42288737
-      },
-      {
         "path": "/assets/alt-visuals/v8/background/hdris/studio_small_08_4k.hdr",
         "bytes": 23545064
       },
@@ -372,10 +368,6 @@
       {
         "path": "/assets/village/base-plate.png",
         "bytes": 6136920
-      },
-      {
-        "path": "/assets/alt-visuals/v8/columns/Marble023_1K-JPG.zip",
-        "bytes": 4597736
       },
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/1024_1024/LDR_RGBA_0.png",
@@ -2348,8 +2340,16 @@
       {
         "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_50.png",
         "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_51.png",
+        "bytes": 16521
+      },
+      {
+        "path": "/assets/alt-visuals/v8/background/noise/Data/64_64/LDR_RGBA_52.png",
+        "bytes": 16521
       }
     ],
-    "orphanBytes": 204275926
+    "orphanBytes": 157375109
   }
 }
