@@ -187,14 +187,13 @@ function verifyMobileRedirect(): { success: boolean; message: string; details?: 
     
     // Check for mobile detection logic
     const hasMobileDetection = appContent.includes('useIsMobile');
-    // R-297: on mobile the root path `/` lands on the mappa2 lab page
-    // (`isMobileLandingPath` gates both the game-frame exclusion and the
-    // Mappa2LabPage render branch).
-    const hasMappa2Landing =
-      appContent.includes('isMobileLandingPath') &&
-      appContent.includes('isRootPath && !isMobileLandingPath') &&
-      appContent.includes('isMappa2LabPath || isMobileLandingPath') &&
-      appContent.includes('Mappa2LabPage');
+    // R-328 (supera R-297/R-305): the root path `/` lands on the game surface
+    // on every device (`isGameLandingPath = isGamePath || isRootPath` feeds
+    // the GameMappa2Page branch); /mappa2-lab stays on its own route.
+    const hasGameLanding =
+      appContent.includes('isGameLandingPath = isGamePath || isRootPath') &&
+      appContent.includes('if (isGameLandingPath)') &&
+      appContent.includes('GameMappa2Page');
 
     if (!hasMobileDetection) {
       return {
@@ -203,10 +202,10 @@ function verifyMobileRedirect(): { success: boolean; message: string; details?: 
       };
     }
 
-    if (!hasMappa2Landing) {
+    if (!hasGameLanding) {
       return {
         success: false,
-        message: 'Missing mobile landing logic: / must render Mappa2LabPage on mobile (R-297)'
+        message: 'Missing game landing logic: / must render the game surface on every device (R-328)'
       };
     }
     
