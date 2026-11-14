@@ -1,0 +1,21 @@
+{
+ "centre": [
+  892.4912624869174,
+  878.1980629436448
+ ],
+ "ringRadius": 365.7687706453247,
+ "innerRadius": 0.845,
+ "outerRadius": 0.972,
+ "zeroAngle": "12 o'clock",
+ "drain": "counter-clockwise (expiry), fill clockwise (work)",
+ "familyGreen": "#226a40",
+ "urgentRed": "#e8553a",
+ "urgentStartsAtRemaining": 0.25,
+ "order": [
+  "base",
+  "arc-mask*tube*colour",
+  "arc-inc (multiply)",
+  "arc-top"
+ ],
+ "familyGreenNote": "tra il 75\u00b0 (#185d35) e il 90\u00b0 percentile (#2d784c) dei verdi della cupola; pi\u00f9 scuro del 90\u00b0 su richiesta del Director"
+}

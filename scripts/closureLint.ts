@@ -7,6 +7,7 @@ import { checkRedFirstGate } from './verification/redFirst';
 import { checkManifestBaseSha, readSyncSeal } from './verification/livingSyncGate';
 import { checkVisualForkGate } from './verification/visualForkGate';
 import { checkIntentGate } from './verification/intentGate';
+import { checkResourceLifecycleGate } from './verification/resourceLifecycleGate';
 
 /**
  * closure:lint — gate di chiusura (R-189), ridotto all'essenziale (R-208).
@@ -145,6 +146,14 @@ async function main() {
   });
   errors.push(...visualFork.errors);
   for (const w of visualFork.warnings) {
+    console.error(` ⚠ ${w}`);
+  }
+
+  // Gate resource-lifecycle (MW PLAN-071, R-LIFECYCLE): nessuna risorsa
+  // unowned (leak/orfana/expired) sotto il cwd del progetto a chiusura.
+  const resGate = checkResourceLifecycleGate(process.cwd());
+  errors.push(...resGate.errors);
+  for (const w of resGate.warnings) {
     console.error(` ⚠ ${w}`);
   }
 

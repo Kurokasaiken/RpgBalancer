@@ -115,6 +115,10 @@ export interface PixiMapTune {
   wonderEveryS: number;
   /** How far (world px) the painted sea's edge colour holds before sinking into deep water. */
   deepSeaFadePx: number;
+  /** Open-water colour the margin fades to (default {@link DEEP_SEA_COLOR}, tuned to the old map's navy). */
+  deepSeaColor?: string;
+  /** Far 'fog of the unexplored' colour (default {@link DEEP_SEA_FOG}). */
+  deepSeaFog?: string;
   /** How far (world px) the forest canopies sway in the wind; 0 keeps them still. */
   forestSway: number;
   /** Speed multiplier of the wind over the forests (1 = a gust every ~8 s). */
@@ -170,7 +174,7 @@ export interface PixiWorldMapProps {
    */
   seaMargin?: { xPx: number; yPx: number };
   recenterSignal?: number;
-  /** Glide the camera to a point (fractions of the world canvas, 0-1); `n` makes a repeat request on the same point count. */
+  /** Glide the camera to a point (fractions of the world canvas, 0-1); `n` makes a repeat request on the same point count. `zoom` overrides the glide's target zoom — without it the glide zooms in to `max(cam.zoom, floor*1.5)`. */
   focusRequest?: { x: number; y: number; n: number; zoom?: number } | null;
   effects?: Partial<PixiWorldMapEffects>;
   /** Overrides every cloud band's shadow opacity (the generated bands ship at 2-4%, which is invisible). */
@@ -295,6 +299,13 @@ export interface PixiMapAnchor {
   x: number;
   y: number;
   node: ReactNode;
+  /** How much the marker grows when the camera zooms in from the resting fit:
+   *  screen scale = (zoom / fitZoom)^exp — 0/omitted keeps constant size. */
+  zoomScaleExp?: number;
+  /** Optional LOD switch: below this zoomRatio the anchor is tagged
+   *  `data-poi-zoom="far"`, at/above `"near"` — markers with LOD-aware CSS
+   *  (e.g. Zanara halo) restyle without any React re-render (2026-11-14). */
+  zoomLod?: number;
 }
 
 
@@ -1035,18 +1046,25 @@ export function PixiWorldMap({
   const worldBoxRef = useRef<HTMLDivElement>(null);
   const worldOverlayBoxRef = useRef<HTMLDivElement>(null);
   const worldOverlayLayerRef = useRef<HTMLDivElement>(null);
-  /** Current camera, readable by the anchor layer between Pixi frames. */
-  const camRef = useRef<{ panX: number; panY: number; zoom: number } | null>(null);
+  /** Current camera, readable by the anchor layer between Pixi frames.
+   *  `fitZoom` is the resting zoom captured at the first apply — the reference
+   *  for the anchors' zoomScaleExp. */
+  const camRef = useRef<{ panX: number; panY: number; zoom: number; fitZoom?: number } | null>(null);
   const syncAnchors = useCallback(() => {
     const layer = anchorLayerRef.current;
     const cam = camRef.current;
     if (!layer) return;
     layer.style.visibility = cam ? 'visible' : 'hidden';
     if (!cam) return;
+    const zoomRatio = cam.fitZoom ? cam.zoom / cam.fitZoom : 1;
     for (const child of Array.from(layer.children) as HTMLElement[]) {
       const sx = (Number(child.dataset.worldX) - cam.panX) * cam.zoom;
       const sy = (Number(child.dataset.worldY) - cam.panY) * cam.zoom;
-      child.style.transform = `translate3d(${sx}px, ${sy}px, 0) translate(-50%, -50%)`;
+      const exp = Number(child.dataset.zoomExp ?? 0);
+      const s = exp > 0 ? Math.min(2.4, Math.max(0.75, Math.pow(zoomRatio, exp))) : 1;
+      const lod = Number(child.dataset.zoomLod ?? NaN);
+      if (!Number.isNaN(lod)) child.dataset.poiZoom = zoomRatio < lod ? 'far' : 'near';
+      child.style.transform = `translate3d(${sx}px, ${sy}px, 0) translate(-50%, -50%)${s === 1 ? '' : ` scale(${s.toFixed(3)})`}`;
     }
     const box = worldBoxRef.current;
     if (box) box.style.transform = `translate3d(${-cam.panX * cam.zoom}px, ${-cam.panY * cam.zoom}px, 0) scale(${cam.zoom})`;
@@ -2567,8 +2585,8 @@ export function PixiWorldMap({
               uSeaSel: { value: seaSel, type: 'vec4<f32>' },
               uExt: { value: new Float32Array([extX, extY, extW, extH]), type: 'vec4<f32>' },
               uWorld: { value: new Float32Array([canvas.width, canvas.height]), type: 'vec2<f32>' },
-              uDeep: { value: hexToRgb01(DEEP_SEA_COLOR), type: 'vec3<f32>' },
-              uFog: { value: hexToRgb01(DEEP_SEA_FOG), type: 'vec3<f32>' },
+              uDeep: { value: hexToRgb01(tn.deepSeaColor ?? DEEP_SEA_COLOR), type: 'vec3<f32>' },
+              uFog: { value: hexToRgb01(tn.deepSeaFog ?? DEEP_SEA_FOG), type: 'vec3<f32>' },
               uFade: { value: tn.deepSeaFadePx, type: 'f32' },
               uBand: { value: DEEP_SEA_BAND_PX, type: 'f32' },
               uTime: { value: 0, type: 'f32' },
@@ -3269,7 +3287,7 @@ export function PixiWorldMap({
 
       buildStep();
       // ── Camera: safe-fit like the DOM kit, pan bounded to canvas ± sea margin ──
-      const cam = { panX: 0, panY: 0, zoom: 1 };
+      const cam = { panX: 0, panY: 0, zoom: 1, fitZoom: undefined as number | undefined };
       // Coverage floor only: the viewport must stay inside the sea the camera can reach
       // (canvas + margins). It is NOT the content floor — refit() picks the resting zoom
       // and the margins are wide enough that this only binds at extreme aspect ratios.
@@ -3305,6 +3323,9 @@ export function PixiWorldMap({
         world.scale.set(cam.zoom);
         world.position.set(-cam.panX * cam.zoom, -cam.panY * cam.zoom);
         seabedShift(cam.panX, cam.panY, visW, visH);
+        /* The first apply lands on the resting fit: that zoom is the reference
+         *  for the anchors' zoomScaleExp (marker grows only from here up). */
+        if (cam.fitZoom === undefined) cam.fitZoom = cam.zoom;
         camRef.current = cam;
         // Test seam only (dev / playwright builds): lets a test read the camera to find where the painted canvas edges land on screen.
         if (isMapFitTestRuntime)
@@ -3978,6 +3999,8 @@ export function PixiWorldMap({
             data-anchor-id={anchor.id}
             data-world-x={anchor.x}
             data-world-y={anchor.y}
+            data-zoom-exp={anchor.zoomScaleExp ?? 0}
+            data-zoom-lod={anchor.zoomLod}
             style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'auto' }}
           >
             {anchor.node}

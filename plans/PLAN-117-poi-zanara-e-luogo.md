@@ -1,6 +1,6 @@
 # PLAN-117 — Layer opportunità della mappa: POI Zanara, Luoghi fissi, Eventi strategici, Regioni
 
-**Stato:** **baptized 2026-11-12** (approvazione Director «approvo») — rev. 5, post-dibattito multi-AI web run `20261111-plan117-rev4` (**converged**, acceptance 4/4 su artifact-r002; grok escluso per output degenere). Decisioni di battesimo prese come da colonna Proposta (D-1, D-9, D-10, D-11, D-12, D-13, D-15); restano ai gate di fase D-4 (F1) e D-5/6/7 (F2).
+**Stato:** **baptized 2026-11-12** (approvazione Director «approvo») — rev. 5, post-dibattito multi-AI web run `20261111-plan117-rev4` (**converged**, acceptance 4/4 su artifact-r002; grok escluso per output degenere). Decisioni di battesimo prese come da colonna Proposta (D-1, D-9, D-10, D-11, D-12, D-13, D-15); restano ai gate di fase D-4 (F1) e D-5/6/7 (F2). **Emendamento F2 proposto 2026-11-12** in appendice A: il prototipo F2 esiste, ma il gate visuale e di interazione non e' passato.
 
 > **Rev. 5 — emendamenti dal dibattito (9 claim, tutti AGREE o REFINE convergenti):**
 > - **P1 riscritta a canali disgiunti** (C1): bordo=visibilità, sagoma+punte=famiglia, glifo=attività puntuale, anello=tempo. Il luogo NON è codificato sul marker: lo danno posizione e scheda hover del Luogo.
@@ -87,8 +87,8 @@
 - **Gate F1 (D-4, D-9, D-10, D-11):** ruling + baseline congelata (sha256).
 
 **F2 — Luogo autoriale (fork)**
-- ✅ **T2.1–T2.4 fatto 2026-11-12:** `src/pages/poi-luogo-lab.tsx` (lab `/lab/poi-luogo` su mappa2 reale, route registrata in `App.tsx` + `TestHub`); `PlaceHoverCard.tsx` (scheda verde/alabastro ancorata, `role=tooltip`, `pointer-events:none`); `PlaceFan.tsx` (ventaglio due anelli da `orderPlaceActivities`, overlay `pointer-events:none` + sigilli `auto`); `MapPlace.tsx` (marker ottagonale autoriale, hover→scheda, clic→ventaglio, Esc/reclic chiude, `open=false` → sigillo dormiente D-7); `mapPlace.test.tsx` 8 test OB-2 (hover, fan open/close, ordine anelli, tastiera, no-modale).
-- **Gate F2 (D-5, D-6, D-7):** in attesa di review visiva Director sul lab + baseline.
+- **Prototipo 2026-11-12, NON approvato:** `src/pages/poi-luogo-lab.tsx`, `PlaceHoverCard.tsx`, `PlaceFan.tsx`, `MapPlace.tsx`, `mapPlace.test.tsx` (8 test tecnici). Il Director ha bocciato marker-Luogo e sigilli orbitanti; la revisione ad arco e i mock radiali non sono baseline. I test del vecchio comportamento non certificano il nuovo.
+- **Gate F2 (D-5, D-6, D-7):** riaperto: vedere appendice A per nuovo perimetro, ruling e baseline.
 
 **F3 — Componenti (opzioni scelte)**
 - T3.1 Preset additivo Sigillo (SVG — punte, archi geometrici, pulsazione+statico, stati), `/gameOld` e lab invariati; stato da `mapQuestPoiView`; INV CTR-game-008 rispettate.
@@ -152,3 +152,34 @@
 - **Eventi:** design di dettaglio (voci, glifi, click→dettaglio) nel fork F5; integrazione HUD dopo PLAN-116.
 - **Regioni:** rideterminazione geografica in F6; `regions.json` attuale = baseline non canonica; `regionId` provisional fino al consolidamento.
 - **Interazione DOM-over-Pixi** (clic vs pan, hit-area): testare in F3 lab prima di qualsiasi montaggio `/game`.
+
+## Appendice A — Emendamento F2 proposto (2026-11-12, NON battezzato)
+
+**Provenienza:** R-324, messaggi Director sul radial inclinato e sul nuovo ordine di riempimento; mock Gemini come riferimento d'intento, non specifica pixel. Questa appendice non sostituisce automaticamente le decisioni rev. 5: mette in evidenza i punti da rivedere al gate F2.
+
+**Intento espresso:** il Luogo rimane un'entita' autoriale della mappa, non una nuova famiglia di POI. Il click sull'elemento geografico apre un menu radiale inclinato con un perno centrale progettato per le dimensioni desiderate; ogni settore mostra icona e colore dell'attivita', senza testo. Le posizioni si aggiungono fino a completare il cerchio, continuando nella parte inferiore dopo la superiore. Il primo settore isolato va *in alto a destra dello schermo*: il Director lo chiama «Nord Ovest», ma la posizione visiva e' il riferimento finche' non si chiarisce la convenzione cardinale. Non assumere che il primo sia a ore 12.
+
+**Interazione espressa:** dopo una permanenza su un settore compare una scheda informativa flottante non bloccante; cambiando settore la scheda resta montata e aggiorna il contenuto. Click fuori o Esc chiudono il radial e la scheda; click sul settore apre il planner in sezione dedicata e chiude radial e scheda. Nessun popup/modale bloccante (GX-0042). Colore non esclusivo per distinguere le attivita'.
+
+**Materiale di partenza:** il POI Zanara battezzato nel workstream parallelo e' il riferimento visuale, non `PoiMatericV3_5` come scelta definitiva. Per il perno sono aperte due strade: asset del Luogo rielaborato (ritaglio, prospettiva e piedistallo calibrati) oppure immagine dedicata coerente con quell'asset; *non* duplicare automaticamente il villaggio reale sotto al perno. Blur della mappa = ipotesi da provare in lab, non decisione.
+
+**Rischio di occlusione (ruling Director 2026-11-12):** nessuna regola fissa — dipende dalle dimensioni delle fette. Ammesso lo spicchio disegnato **in grigio, non funzionale**, quando il disegno lo copre troppo; ammessi altri escamotage. Il sotto-piano deve presentare al Director **soluzioni alternative** confrontabili, non un'unica risposta.
+
+**Ordinamento (ruling Director 2026-11-12): STABILE** — ogni attivita' mantiene il suo spicchio finche' esiste; l'urgenza si legge da pulsazione + fallback statico, non dalla posizione. **Supera il criterio «interno=urgenti» di D-6**: `placeOrdering.ts` (commit `66709ab8`) va rifattorizzato nel sotto-piano — partenza NE (alto a destra), riempimento continuo fino al cerchio, posizioni persistenti per identita' attivita'.
+
+**Dibattito multi-AI web (confermato Director 2026-11-12):** scope chiuso sul radial — prospettiva misurata dall'ellisse della palizzata, perno (asset villaggio rielaborato vs arte dedicata), regole di occlusione e alternative, sequenza menu->scheda->planner. Non riapre F0/F1/F5/F6.
+
+**Gesti risolti dal Director 2026-11-12 (revisione del punto 3 della desiderata v30):** sul villaggio dipinto nella mappa, **hover** = scheda avorio con spiegazioni (D-5), **click** = radial delle azioni del Luogo; il pulsante **`Village`** nella nav inferiore apre la vista Villaggio a tutta area. Il click sulla mappa non apre piu' la vista Villaggio: questa revisione va registrata nel punto 3 della v30 alla prossima modifica autorizzata di `.mw/desiderata.md`. Restano separati eventi strategici (F5), regioni (F6) e HUD/PLAN-116.
+
+**Decomposizione consigliata:** sotto-piano *F2 radial Luogo* collegato a PLAN-117, non nuovo piano per POI/Eventi/Regioni; il contratto F2 supera la scala di un task (perno art, geometria e hit test in prospettiva, overflow, scheda persistente, planner e verifica visiva). Gate ordinati: (1) risolvere collisione v30 e convenzione del primo settore; (2) comparare due soluzioni per il perno e due trattamenti sfondo sul medesimo crop e viewport reali, ruling Director/baseline; (3) prototipo interattivo lab con ordine/occlusione, hover persistente, chiusura, focus e planner di prova; (4) safeguard e testimone visivo a 1440x900 e 1280x800. Fino al ruling non riscrivere `MapPlace`/`PlaceFan` come se il nuovo design fosse congelato.
+
+**Chiarimento Director 2026-11-12 (proposta, non ancora revisione della FROZEN v30):** «Village è il pulsante nel menù in basso, non sulla mappa»; primo settore a **Nord Est sullo schermo (alto a destra)**, non Nord Ovest. Nel sotto-piano F2 valutare un dibattito multi-AI limitato a prospettiva, perno, occlusioni, accessibilita' e sequenza menu→scheda→planner, senza riaprire F0/F1/F5/F6. Prima dell'integrazione `/game` serve la revisione esplicita del punto 3 della desiderata v30 che attualmente assegna anche al click sulla regione `village` l'apertura della vista Villaggio.
+
+### Esito dibattito multi-AI web (run `20261112-plan117-radial-f2`, converged 3/3)
+
+Artifact `artifact-r003` (sha 39a6b4ed) in `mind-weaver/.mw/runs/20261112-plan117-radial-f2/`. Risolto: inclinazione = misura ellisse palizzata all'art-lock -> tilt derivato, un solo valore globale; geometria di riferimento 12 slot da 30 gradi con bande contigue (hub 0-95, collare 95-105, spicchi 105-205, rim 205-230); NO blur/desaturazione globale (vignetta navy locale opzionale); disco sempre pieno, slot vuoti traslucidi pointer-events:none, locked!=vuoto; hit-test via path SVG + inversa CSS3D, pan mai bloccato, seam NE=index0; card dwell 350ms poi swap istantaneo, posizionamento deterministico; doppia pista rim (esterna CW solida+chevron, interna CCW tratteggiata+vuota) componibile sulla stessa slice; urgenza su gemma (pulse+rivetto, orologio condiviso); costanti geometriche congelate solo dopo la misura, gate prototipo al tilt derivato su 1280x800 e 1440x900 con hitbox distinguibili e render grayscale 100%.
+**Ruling Director (mockup, 2026-11-12):** riempimento **orario da NE** (NE,E,SE,S,SW,W,NW,N); slice = **8x45 gradi** (i centri cadono esatti sui punti cardinali); socket vuoti = **vetro traslucido**; hub = **medaglione uniforme** (navy + oro inciso + punte-gemma, NON inset villaggio). Con 8 slot il tetto attivita' per Luogo e' 8; oltre 8 = affordance hub -> planner (design-error case). Geometria di riferimento aggiornata: slot da 45 gradi, angoli identici al compass che il Director ha enumerato; capienza tipica 4-6 lascia 2-4 socket vetro.
+
+**Gate materiale F2 (2026-11-13, ancora aperto):** il kit generato per `/lab/poi-luogo` è **candidato, non battezzato**. La prima cattura mostrata al Director aveva scacchiera rasterizzata, collari duplicati e archi grossi; segnalazione «tanti errori» e riproduzione `.mw/bugs/2026-11-13-poi-radial-material/`. Una correzione tecnica dei layer/alpha/scala non equivale a ruling sull'arte, sull'occlusione del villaggio o sul trattamento finale della scheda slice. Nessuna integrazione in `/game` finché non c'è gate visivo Director.
+
+**Ruling composizione 2026-11-13 (Director: «niente testo, x il resto uguale al mockup»):** baseline = `.mw/specs/poi-radial/refs/mockup-hub-fan-village.jpg` (sha `2bec1c46dde3fdf6`) — **ventaglio di carte-smalto sovrapposte**, non disco unico; niente etichette testo. Sostituisce i ruling 2026-11-12 su disco unico/medaglione navy/socket vetro; restano vigenti direzione CW da NE, ordine stabile, dwell 350 ms, GX-0042, pan mai bloccato. Sub-plan draft con contratto OB-F1..F6 e open gates OG-1..OG-3 in `plans/PLAN-117-F2-fan-luogo.md` — **la strada del disco inclinato (`PlaceRadial` + kit `disc-*`) va considerata superata come baseline F2**: resta nel lab come fallback fino a nuovo ruling, nessun altro investimento su quella direzione senza ruling esplicito.

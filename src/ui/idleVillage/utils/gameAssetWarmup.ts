@@ -29,6 +29,22 @@ export const questSceneArtUrls = (): string[] => [...new Set(Object.values(NODE_
 const decodeQuietly = (img: HTMLImageElement | null) => (img ? img.decode().catch(() => undefined) : undefined);
 
 /**
+ * Loads and decodes just the brass game cursors — a CSS cursor is fetched on
+ * first use, so cold the browser shows the system fallback for a beat. Used by
+ * `warmGameAssets` and by pages that need the cursors but not the
+ * roster/quest art yet. Never rejects.
+ */
+export function warmGameCursors(): Promise<unknown>[] {
+  if (typeof document === 'undefined') return [];
+  return CURSOR_URLS.map((url) => {
+    const img = new Image();
+    img.src = url;
+    retainedCursors.push(img);
+    return decodeQuietly(img);
+  });
+}
+
+/**
  * Loads and decodes what /game needs on its first interaction but does not
  * render at boot: portraits (roster, hero sheet, medallion) live in panels that
  * are closed while the veil is up, and cursors load only when first shown.
@@ -37,12 +53,7 @@ const decodeQuietly = (img: HTMLImageElement | null) => (img ? img.decode().catc
 export function warmGameAssets(): Promise<void> {
   if (typeof document === 'undefined') return Promise.resolve();
   const portraits = ALL_PORTRAIT_ASSET_URLS.map((url) => decodeQuietly(preloadPortrait(url)));
-  const cursors = CURSOR_URLS.map((url) => {
-    const img = new Image();
-    img.src = url;
-    retainedCursors.push(img);
-    return decodeQuietly(img);
-  });
+  const cursors = warmGameCursors();
   const sceneArt = questSceneArtUrls().map((url) => {
     const img = new Image();
     img.src = url;

@@ -127,3 +127,12 @@ Il Director: la fenice diventa un centerpiece con iconografia dell'antica Roma, 
 - 2026-11-06 Director: «questa nuova versione e' tagliata, c'e' un buco nel mezzo» (Voce). Causa: bust.webp alpha-croppato (offset persi) e renderizzato a 196px mentre copre 259px — la zona placca cancellata diventava una striscia trasparente visibile. Fix: build-voce-parts.py emette bust.webp senza alpha-crop (520x461 registrato 1:1 col piece); in HudRealVoce il busto renderizza a 260x230.5 alle coordinate originali — la placca overlay copre la zona cancellata. Verificato DPR2: aperto senza buco, chiuso medaglione intero.
 - 2026-11-06 Director: pannello Compagnia (HudRealRosterOpen) BOCCIATO. Nello slot rosterOpen va il vecchio componente roster fidato: VillageRosterSection (da @/ui/idleVillage/roster) dentro DragProvider, in wrapper smeraldo+oro. HudRealRosterOpen.tsx resta nel repo inutilizzato (da rimuovere o riusare dopo ruling).
 - 2026-11-06 Director: medaglioni del roster chiuso ripristinati a quelli precedenti — HudRealRosterColumn (anello oro+smeraldi+ritratto, placca al passaggio) al posto di HudRealRosterRibbon (righe zanara con placche a riposo). Il nastro resta nel repo non montato. Verificato DPR2: /tmp/roster-restore.png.
+
+## 2026-11-14 — Ghiera DRAGHI battezzata come slot corretto (R-333)
+Ghiera firmata Director (banda treccia + X con kite + ring oro + disco drago)
+montata nella meccanica reale: sandwich disco-dietro / medaglione-residente /
+ring+banda-davanti; chiusura tuned ghiera ×1.15 · medaglione ×0.9 (relativa);
+medaglione v3 = FRAME con ritratto reale; gold ri-matchato sul medaglione in
+LAB. Preset `BEZEL_PRESETS.draghi`; montata in `HudRealCassetto` (slotSize 42).
+Asset: `public/assets/ui/hud-real/ghiera-draghi{,-top}.webp`,
+`medaglione-battezzato-v3-frame.webp`.

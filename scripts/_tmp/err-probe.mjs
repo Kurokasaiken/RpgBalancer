@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage();
+const errs = [];
+p.on('console', m => { if (m.type() === 'error') errs.push(m.text().slice(0, 400)); });
+p.on('pageerror', e => errs.push('PAGEERROR: ' + String(e).slice(0, 500)));
+await p.goto('http://localhost:5173/game', { waitUntil: 'domcontentloaded', timeout: 120000 });
+await p.waitForTimeout(45000);
+const state = await p.evaluate(() => ({ cam: !!window.__worldCam, markers: document.querySelectorAll('[data-poi-zanara]').length, veil: !!document.querySelector('[class*=veil], [class*=load]') }));
+console.log(JSON.stringify(state));
+console.log('ERRS:', errs.length);
+errs.slice(0, 10).forEach(e => console.log(' -', e));
+await b.close();

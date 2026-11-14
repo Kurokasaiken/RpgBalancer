@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { useTranslation } from '@/localization/useTranslation';
 import {
@@ -93,7 +94,7 @@ export const SLOT_VARIANT_SPECS: Record<SlotVariant, SlotVariantSpec> = {
  * byte-identical. Presets other than `stock` are LAB-ONLY: do not pass them
  * from production surfaces until a Director ruling promotes one.
  */
-export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara' | 'zanara2';
+export type BezelPreset = 'stock' | 'a' | 'b' | 'c' | 'ab' | 'zanara' | 'zanara2' | 'draghi';
 
 /**
  * Resolved paint knobs for a bezel preset. All values are SVG units of the
@@ -152,6 +153,62 @@ export interface BezelKnobs {
    * it shut. Default = skin's empty bezelScale (1.18); zanara2 lifts it further.
    */
   bezelOpenScale?: number;
+  /**
+   * Painted band asset (LAB-ONLY): an SVG `<image>` drawn inside the bezel
+   * transform group — it inherits the certified slam / open-pose / extraction
+   * choreography verbatim, replacing the vectorial band paint.
+   */
+  bandImageHref?: string;
+  /** Inner-edge radius of the painted band's hole as a fraction of the image
+   *  half-width (measured on the asset). Used to land the hole on the
+   *  medallion rim — the band covers the medal's outer edge ("incastonato"). */
+  bandImageHoleFrac?: number;
+  /**
+   * When the painted band replaces the vector paint: suppress the stock band
+   * circles, rim light, decor lines, rotating segments, oxide spots, shade —
+   * everything except the teeth.
+   */
+  hidePaintedBand?: boolean;
+  /**
+   * Teeth extrusion while the bezel is OPEN (0 = fully retracted under the
+   * band, stock). Values in (0,1) keep the claw tips resting visible on the
+   * rim — "visibili e ritratti" (Director ruling on the draghi castone).
+   */
+  openToothExtrusion?: number;
+  /**
+   * Scale factor for the DOM medallion (hud64 rack portrait) when the painted
+   * band carries its own face disc (draghi): <1 shrinks the resident medallion
+   * so the painted emblem ring stays visible around it ("medaglione davanti
+   * al centro", Director ruling). 1/undefined = certified size, untouched.
+   */
+  portraitScale?: number;
+  /**
+   * Painted medallion asset replacing the DOM C1Medallion at the seat centre
+   * (draghi: the signed `medaglione-battezzato-v3`). Rendered in the rack's
+   * portrait plane — the "medaglione davanti al centro" — centred on the slot.
+   */
+  medallionImageHref?: string;
+  /** Outer ring radius of the medallion image as a fraction of the asset
+   *  half-width — the img box is sized so the RING rim lands on the ghiera's
+   *  inner edge; the baked portrait/crescent protrusions overhang it. */
+  medallionImageRingFrac?: number;
+  /** Radius of the medallion asset's transparent portrait hole as a fraction
+   *  of the image half-width. When set the asset is a FRAME (no baked face):
+   *  the rack paints the real resident portrait in a circle of this radius
+   *  behind the frame (production use — cassetto). */
+  medallionImageHoleFrac?: number;
+  /** Optional second painted layer of the same band asset with the centre
+   *  punched transparent (draghi: ring+braid only). Rendered inside the bezel
+   *  group — i.e. in the z-20 over-SVG plane, ABOVE the rack's z-10 DOM
+   *  medallion — so the resident medallion sits sandwiched between the
+   *  portal face-disc (z-5) and the outer ring ("sotto l'outer ring",
+   *  Director ruling). When set, the in-group fallback of `bandImageHref`
+   *  is skipped — the portal already carries the integral image. */
+  bandImageTopHref?: string;
+  /** Constant extra scale applied to the painted band layers (portal img and
+   *  in-group image) — i.e. how far the castone closes onto the medallion.
+   *  1/undefined = asset at its measured landing. Lab tuning knob. */
+  bandImageScale?: number;
 }
 
 export const BEZEL_PRESETS: Record<BezelPreset, BezelKnobs> = {
@@ -212,6 +269,27 @@ export const BEZEL_PRESETS: Record<BezelPreset, BezelKnobs> = {
     bezelOpenRotateDeg: -45,
     bezelOpenScale: 1.3,
     hideGemPointer: true,
+  },
+  /** Draghi (LAB-ONLY): the signed dragon-band ghiera extracted from the
+   *  approved castone composite (outer braid removed) mounted inside the real
+   *  bezel group — same slam, same open pose (scale 1.18 / -30°), same tooth
+   *  mechanics; teeth rest visible-retracted on the rim while open. */
+  draghi: {
+    bandImageHref: '/assets/ui/hud-real/ghiera-draghi.webp',
+    bandImageHoleFrac: 0.651,
+    hidePaintedBand: true,
+    hideGemPointer: true,
+    toothAngles: [],
+    bezelOpenScale: 1.18,
+    /* Director-tuned ratio (lab sliders): the ring's gold inner edge lands on
+     * the medallion rim — RELATIVE factors, so the proportion holds at any
+     * slot size (cassetto reuse). Ghiera ×1.15 / medaglione ×0.9. */
+    portraitScale: 0.9,
+    bandImageScale: 1.15,
+    medallionImageHref: '/assets/ui/hud-real/medaglione-battezzato-v3-frame.webp',
+    medallionImageRingFrac: 0.743,
+    medallionImageHoleFrac: 0.674,
+    bandImageTopHref: '/assets/ui/hud-real/ghiera-draghi-top.webp',
   },
 };
 
@@ -338,6 +416,11 @@ interface SeatCycleProps {
   spec: SlotVariantSpec;
   /** Resolved bezel preset knobs — `BEZEL_PRESETS.stock` is the empty object. */
   bezel: BezelKnobs;
+  /** DOM host for the painted-band layer (hud64 only): when set, the band image
+   *  portals out of the over-SVG into a div BELOW the DOM portrait, so the
+   *  medallion paints in front of the band's face disc ("davanti al centro").
+   *  Absent (lab variant) = image stays inside the bezel group. */
+  bandHost?: HTMLElement | null;
 }
 
 /**
@@ -365,6 +448,7 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
   seatNonce,
   spec,
   bezel,
+  bandHost,
 }) => {
   const [pre, setPre] = useState(() => (seatNonce ?? 0) > 0);
   const toothRefs = useRef<(SVGGElement | null)[]>([]);
@@ -401,7 +485,7 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
     const wasPre = wasPreRef.current;
     wasPreRef.current = pre;
     if (!wasPre || pre) return;
-    const retractPx = (bezel.toothHeight ?? geometry.TOOTH_HEIGHT) + 2;
+    const retractPx = (1 - (bezel.openToothExtrusion ?? 0)) * ((bezel.toothHeight ?? geometry.TOOTH_HEIGHT) + 2);
     for (const el of toothRefs.current) {
       if (!el || typeof el.animate !== 'function') continue;
       const anim = el.animate(
@@ -410,7 +494,7 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
       );
       anim.onfinish = () => anim.cancel();
     }
-  }, [pre, geometry.TOOTH_HEIGHT, bezel.toothHeight]);
+  }, [pre, geometry.TOOTH_HEIGHT, bezel.toothHeight, bezel.openToothExtrusion]);
 
   /* Single derivation point: the pre-state presentation override is applied HERE, where the
    * bezel transform / tooth extrusion / slam predicate are computed — the first committed DOM
@@ -424,7 +508,7 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
   const extractionRotation = bezelProgress * openRotateDeg;
   const springScale = extractionProgress > 1.0 ? extractionScale * (1.0 + (extractionProgress - 1.0) * 0.15) : extractionScale;
   const bezelClosed = (eff.bezelRotateDeg ?? 0) === 0;
-  const teethExtrusion = extractionProgress > 0 ? Math.max(0, 1 - clampedProgress / TEETH_PHASE) : bezelClosed ? 1 : 0;
+  const teethExtrusion = extractionProgress > 0 ? Math.max(0, 1 - clampedProgress / TEETH_PHASE) : bezelClosed ? 1 : (bezel.openToothExtrusion ?? 0);
   /* Open presentation rotates the bezel to its disarmed pose (preset-overridable:
      zanara2 opens at -45° so the arms read "+" and slam shut onto "X"). */
   const effRotate = eff.medalVisible ? (eff.bezelRotateDeg ?? 0) : (bezel.bezelOpenRotateDeg ?? eff.bezelRotateDeg ?? 0);
@@ -435,6 +519,55 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
       : `scale(${effScale}) rotate(${effRotate}deg)`;
   const bezelSlamActive = eff.medalVisible && extractionProgress === 0 && (eff.bezelRotateDeg ?? 0) === 0;
   const P = spec.defPrefix;
+
+  /* Painted ghiera band (LAB-ONLY, draghi) — shared sizing for both render
+   * paths. The hole's inner edge lands just inside the medallion rim so the
+   * band covers the medal's outer filo (castone + gemma). `bandHost` picks the
+   * DOM-under-portrait layer (hud64); otherwise the image stays in the bezel
+   * group (lab variant). */
+  const bandHoleFrac = bezel.bandImageHoleFrac ?? 0.713;
+  const bandScale = bezel.bandImageScale ?? 1;
+  const bandMedalEdge = spec.domSizePx
+    ? (spec.portraitSizePx / 2) * (158 / spec.domSizePx) - 1.8
+    : geometry.R_BZ_IN - 8;
+  const bandImgR = bandMedalEdge / bandHoleFrac;
+  const bandIsOpen = !bezelClosed && extractionProgress === 0;
+  const bandPortal = bezel.bandImageHref && bandHost
+    ? createPortal(
+        <div
+          data-layer="bezel-band"
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            width: bandImgR * 2 * ((spec.domSizePx ?? 64) / 158),
+            height: bandImgR * 2 * ((spec.domSizePx ?? 64) / 158),
+            /* centre via negative margins — the slam keyframes own `transform`
+             * wholesale and would eat a translate(-50%,-50%). */
+            marginLeft: -bandImgR * ((spec.domSizePx ?? 64) / 158),
+            marginTop: -bandImgR * ((spec.domSizePx ?? 64) / 158),
+            transform: bezelTransform,
+            transformOrigin: '50% 50%',
+            ...(bezelSlamActive ? { animation: 'bezelSlam 440ms both' } : {}),
+            ...(bandIsOpen ? { filter: 'brightness(0.82)' } : {}),
+          }}
+        >
+          <img
+            src={bezel.bandImageHref}
+            alt=""
+            draggable={false}
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              transform: bandScale !== 1 ? `scale(${bandScale})` : undefined,
+            }}
+          />
+        </div>,
+        bandHost,
+      )
+    : null;
 
   return (
     <g
@@ -460,6 +593,41 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
         const R_BZ_MID = (geometry.R_BZ_IN + geometry.R_BZ_OUT) / 2;
         return (
           <>
+            {/* Painted ghiera band (LAB-ONLY, draghi): inherits the bezel
+                transform verbatim. With a DOM `bandHost` (hud64) it portals
+                below the portrait; otherwise it stays here inside the group. */}
+            {bandPortal}
+            {(() => {
+              /* In-group painted layer: the holed TOP asset (ring+braid, z-20
+               * over the DOM medallion — the sandwich's upper slice); falling
+               * back to the integral image only when no portal host exists. */
+              const groupBandHref = bezel.bandImageTopHref ?? (!bandHost ? bezel.bandImageHref : undefined);
+              return groupBandHref && (() => {
+              return (
+                <g transform={bandScale !== 1 ? `scale(${bandScale})` : undefined}>
+                  <image
+                    href={groupBandHref}
+                    x={-bandImgR}
+                    y={-bandImgR}
+                    width={bandImgR * 2}
+                    height={bandImgR * 2}
+                    preserveAspectRatio="xMidYMid meet"
+                    style={bandIsOpen ? { filter: 'brightness(0.82)' } : undefined}
+                  />
+                  {/* Open castone seam — dark lip on the hole edge so the wide
+                      disarmed band reads as a separate piece waiting to clamp. */}
+                  {bandIsOpen && (
+                    <circle
+                      cx="0" cy="0" r={bandMedalEdge + 1.6}
+                      fill="none" stroke="rgba(4,3,8,0.60)" strokeWidth={3}
+                    />
+                  )}
+                </g>
+              );
+              })();
+            })()}
+            {!bezel.hidePaintedBand && (
+            <>
             <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke={formatColor(tok('bezel.foundation'))} strokeWidth={ringW + 3} />
             <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke={`url(#${P}slot-v12-silver)`} strokeWidth={ringW} />
             <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke={`url(#${P}slot-v12-bevel)`} strokeWidth={ringW} />
@@ -615,6 +783,8 @@ const SeatCycle: React.FC<SeatCycleProps> = ({
               );
             })}
 
+            </>
+            )}
             {/* Complex teeth - removed fn-silver filter to prevent gray square artifact */}
             {/* Extruded only when the bezel is closed; they retract as phase 1 of extraction */}
             {toothAngles.map((deg, i) => {
@@ -717,6 +887,8 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
 }) => {
   const { t } = useTranslation('idleVillage');
   const tok = (key: string): TokenValue => (palette === 'hud-gold' ? SLOT_HUD_GOLD_TOKENS[key] : undefined) ?? getTokenValue(key);
+  /* DOM host for the painted-band portal layer (hud64 only — see SeatCycleProps.bandHost). */
+  const [bandHost, setBandHost] = useState<HTMLElement | null>(null);
 
   const ARCANE_RGB = String(tok('arcane.rgb') || '162,188,255');
   const geometry = slotV12SkinData.geometry;
@@ -960,6 +1132,17 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
    * 1px rim light — it is dropped from the bezel ramp per the material contract. */
   const bezelRamp = isHud64 ? [gradients.bezel[1], gradients.bezel[2], gradients.bezel[4]] : gradients.bezel;
 
+  /* Bezel clip: painted-band presets (draghi) reach past R_BZ_OUT while open —
+     * the disc must cover image half-width × open scale, or the wide band gets
+     * a flat-cut outer edge. Stock keeps the certified R_BZ_OUT+2. */
+  const clipBezelR = bezel.bandImageHref
+    ? Math.ceil(
+        ((spec.portraitSizePx / 2) * (158 / (spec.domSizePx ?? 64)) - 1.8)
+          / (bezel.bandImageHoleFrac ?? 0.713)
+          * (bezel.bezelOpenScale ?? 1)
+      ) + 4
+    : geometry.R_BZ_OUT + 2;
+
   const defsNode = (
     <defs>
       {/* Complex filters from HTML reference */}
@@ -1068,7 +1251,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
         <circle cx="0" cy="0" r={geometry.R_CAV + 4} />
       </clipPath>
       <clipPath id={`${P}slot-v12-clip-bezel`}>
-        <circle cx="0" cy="0" r={geometry.R_BZ_OUT + 2} />
+        <circle cx="0" cy="0" r={clipBezelR} />
       </clipPath>
     </defs>
   );
@@ -1254,13 +1437,15 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
       seatNonce={seatNonce}
       spec={spec}
       bezel={bezel}
+      bandHost={bandHost}
     />
   );
 
   if (isHud64) {
     /* Two-plane layout (PLAN-043 WS-1 T1.1): under-SVG (socket/cavity/arcane/glyph)
-     * → DOM portrait (44px, mounted by the rack at z-10) → over-SVG (bezel+teeth,
-     * pointer-events:none, overflow:visible for the bounded slam overhang). */
+     * → band host (z-5, draghi portal target) → DOM portrait (44px, mounted by
+     * the rack at z-10) → over-SVG (bezel+teeth, pointer-events:none,
+     * overflow:visible for the bounded slam overhang). */
     const bitePx = spec.portraitSizePx / 2 - (geometry.R_BZ_IN - geometry.TOOTH_HEIGHT) * ((spec.domSizePx ?? 64) / 158);
     const planeStyle: React.CSSProperties = { display: 'block', width: '100%', height: '100%' };
     return (
@@ -1284,6 +1469,14 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
           {cavityLayer}
           {roleGlyph}
         </svg>
+        {/* Painted-band DOM layer (draghi): receives the SeatCycle portal —
+            sits BELOW the rack's z-10 portrait so the medallion paints in
+            front of the band's face disc. */}
+        <div
+          ref={setBandHost}
+          aria-hidden
+          style={{ position: 'absolute', inset: 0, zIndex: 5, pointerEvents: 'none' }}
+        />
         <svg
           className="slot-v12__over"
           viewBox={spec.viewBox}

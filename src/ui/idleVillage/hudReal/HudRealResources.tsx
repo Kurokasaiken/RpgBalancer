@@ -10,6 +10,7 @@
  * Danger (halo-1): vermilion value + incised hourglass + full filet; trend/detail text goes
  * to the tooltip, never crammed into the slot.
  */
+import type { ReactNode } from 'react';
 import { HUD_TONE_COLOR } from '@/ui/idleVillage/components/gameFrame/hudTones';
 import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
 import { ZanaraTooltip } from '@/ui/idleVillage/zanara/ZanaraTooltip';
@@ -19,25 +20,55 @@ import { hudPx } from './hudType';
 const ASSET = '/assets/ui/hud-real/resources/bar.webp';
 
 const C = {
-  value: '#f3ead0',
+  value: '#f7efd8',
   label: '#b9d2c4',
   shadow: '0 1px 2px rgba(3, 26, 30, 0.9)',
+  emboss: '0 1px 0 rgba(255, 240, 200, 0.16), 0 1px 2px rgba(3, 26, 30, 0.9)',
   focus: '#e8c766',
 } as const;
-const G = { pad: 6, icon: 26, gap: 5, valueSize: 19, labelSize: 13 } as const;
+const G = { pad: 7, socket: 36, glyph: 22, gap: 7, valueSize: 19, labelSize: 12 } as const;
 
 const SCOPED_CSS = `
 [data-hudreal-resources] [data-hr-res]:focus { outline: none; }
 [data-hudreal-resources] [data-hr-res]:focus-visible { outline: 2px solid ${C.focus}; outline-offset: -3px; border-radius: 6px; }
 `;
 
-/** Incised hourglass: the "time is running out" shape (rubric §1.6b). */
+/** Incised hourglass: the "time is running out" emblem (rubric §1.6b) — rendered
+ *  inline after the label, never as value punctuation. */
 function Hourglass({ color }: { color: string }) {
   return (
-    <svg width="9" height="12" viewBox="0 0 9 12" aria-hidden="true" style={{ flex: 'none' }}>
+    <svg width="9" height="12" viewBox="0 0 9 12" aria-hidden="true" style={{ display: 'block', flex: 'none' }}>
       <path d="M1 0.75h7M1 11.25h7M1.6 0.75c0 3 2.9 3.6 2.9 5.25S1.6 8.25 1.6 11.25M7.4 0.75c0 3-2.9 3.6-2.9 5.25s2.9 2.25 2.9 5.25"
-        fill="none" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+        fill="none" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
     </svg>
+  );
+}
+
+/** Engraved brass socket — the icon's seat, same grammar as the nav round
+ *  buttons: bronze rim, dark well, top sheen, inner shadow behind the glyph. */
+function IconSocket({ children }: { children: ReactNode }) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        width: G.socket,
+        height: G.socket,
+        flex: 'none',
+        borderRadius: '50%',
+        display: 'grid',
+        placeItems: 'center',
+        background: 'radial-gradient(circle at 34% 26%, #33514a 0%, #14302b 55%, #0a1f1c 100%)',
+        boxShadow: [
+          'inset 0 1px 1px rgba(255, 236, 180, 0.22)',
+          'inset 0 -2px 3px rgba(0, 0, 0, 0.6)',
+          '0 0 0 1.5px #7a6230',
+          '0 0 0 3px rgba(20, 12, 4, 0.9)',
+          '0 1px 3px rgba(0, 0, 0, 0.75)',
+        ].join(', '),
+      }}
+    >
+      <div style={{ width: G.glyph, height: G.glyph, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.8))' }}>{children}</div>
+    </div>
   );
 }
 
@@ -71,23 +102,33 @@ export function HudRealResources({ items }: HudRealResourcesProps) {
               style={{
                 position: 'absolute', left: slot.x, top: slot.y, width: slot.w, height: slot.h, boxSizing: 'border-box',
                 padding: `0 ${G.pad}px`, display: 'flex', alignItems: 'center', gap: G.gap, cursor: 'default',
+                borderRadius: 10,
+                /* Danger: vermilion enamel rim on the slice itself — the slot glows,
+                 *  the hourglass sits at the right edge as an emblem. No hairline. */
+                ...(danger
+                  ? { boxShadow: `inset 0 0 0 1.5px ${HUD_TONE_COLOR.danger}d9, inset 0 0 9px ${HUD_TONE_COLOR.danger}40` }
+                  : {}),
               }}>
-              <div style={{ width: G.icon, height: G.icon, flex: 'none', filter: 'drop-shadow(0 1px 2px rgba(3, 26, 30, 0.85))' }}>{item.icon}</div>
+              <IconSocket>{item.icon}</IconSocket>
               <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 <span style={{
                   fontFamily: '"EB Garamond", serif', fontSize: hudPx(G.valueSize), fontWeight: danger ? 700 : 600, lineHeight: hudPx(18),
-                  fontVariantNumeric: 'tabular-nums', color: danger ? HUD_TONE_COLOR.danger : C.value, textShadow: C.shadow,
-                  whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4,
+                  fontVariantNumeric: 'tabular-nums', color: danger ? HUD_TONE_COLOR.danger : C.value, textShadow: C.emboss,
+                  whiteSpace: 'nowrap', display: 'flex', alignItems: 'baseline', gap: 3,
                 }}>
                   {compact(item.value)}
-                  {item.max !== undefined && String(item.value).length <= 3 && <span style={{ fontSize: hudPx(G.labelSize), fontWeight: 500, opacity: 0.8 }}>/{item.max}</span>}
-                  {danger && <Hourglass color={toneColor} />}
+                  {item.max !== undefined && String(item.value).length <= 3 && (
+                    <span style={{ fontSize: hudPx(G.labelSize), fontWeight: 500, color: C.label, opacity: 0.85 }}>/{item.max}</span>
+                  )}
                 </span>
                 <span style={{
                   fontFamily: '"EB Garamond", serif', fontSize: hudPx(G.labelSize), lineHeight: hudPx(13), color: C.label, textShadow: C.shadow,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 0.4,
-                }}>{item.label}</span>
-                {danger && <span aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, bottom: -3, height: 2, background: toneColor, borderRadius: 1 }} />}
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: 0.6,
+                  display: 'flex', alignItems: 'center', gap: 5,
+                }}>
+                  {item.label}
+                  {danger && <Hourglass color={toneColor} />}
+                </span>
               </div>
             </div>
           </ZanaraTooltip>

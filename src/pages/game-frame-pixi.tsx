@@ -388,10 +388,13 @@ export default function GameFramePixiPage() {
      *  can see the HUD «+N» chip + count-up without driving an expedition. */
     hooks.debugResourceDelta = (delta: { gold?: number; xp?: number }) =>
       useMinimalGameplayStore.getState().publishResourceDelta({ gold: delta.gold ?? 0, xp: delta.xp ?? 0 });
+    /* Same seam for «POI types»: mounts the job/event exemplars under capture. */
+    hooks.togglePoiDemo = () => setPoiDemo((on) => !on);
     return () => {
       delete hooks.revealQuestPois;
       delete hooks.startInvasion;
       delete hooks.debugResourceDelta;
+      delete hooks.togglePoiDemo;
     };
   }, []);
 

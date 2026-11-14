@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+const b = await chromium.connectOverCDP('http://localhost:9222');
+const p = b.contexts()[0].pages().filter(pg => pg.url().includes('grok.com')).pop();
+const box = p.locator('textarea:visible, [contenteditable="true"]:visible').first();
+await box.click({timeout:10000});
+const msg = `Ignore attachments. Generate an image from this exact description: a single ornate circular mechanical bezel ring, a fantasy game UI component, viewed straight-on from above. Antique matte dark bronze metal with engraved scrollwork, a recessed band of deep emerald green enamel, four thin elegant curved claw-teeth reaching inward on the diagonals (X formation), small round hinge pins at the base of each tooth, one faceted emerald gem at 12 o'clock. The center is an empty circular hole. Plain dark charcoal background, centered, no text, no callouts, no extra objects. Painterly AAA game asset quality, soft metallic highlights.`;
+await box.fill(msg);
+await p.keyboard.press('Enter');
+console.log('sent, waiting...');
+await p.waitForTimeout(90000);
+await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+await p.waitForTimeout(3000);
+const srcs = await p.evaluate(() => [...document.querySelectorAll('img')].map(i=>({src:i.src.slice(0,160),w:i.naturalWidth})).filter(i=>i.src.includes('generated')));
+console.log(JSON.stringify(srcs));
+await p.screenshot({path:'/tmp/grok-tail3.png'});
+process.exit(0);

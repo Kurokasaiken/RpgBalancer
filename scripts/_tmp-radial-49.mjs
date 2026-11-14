@@ -1,0 +1,20 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
+const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+page.on('pageerror', (e) => console.error('[pageerror]', String(e).slice(0, 200)));
+await page.goto('http://127.0.0.1:5173/lab/poi-luogo', { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => Boolean(window.__worldCam && window.__worldCamCtl), undefined, { timeout: 120_000 });
+// wait for focusRequest pan to the village (onReady fired)
+await page.waitForFunction(() => { const c = window.__worldCam; return c && Math.abs(c.panX - (1515 - c.width / 2 / c.zoom)) < 220; }, undefined, { timeout: 30_000 }).catch(() => {});
+await page.waitForTimeout(1500);
+await page.screenshot({ path: 'test-results/poi-luogo-radial/v2-idle.png' });
+const hit = page.locator('[data-testid="place-village-hit"]');
+await hit.hover();
+await page.waitForTimeout(500);
+await page.screenshot({ path: 'test-results/poi-luogo-radial/v2-hover.png' });
+await hit.click();
+await page.waitForTimeout(700);
+await page.screenshot({ path: 'test-results/poi-luogo-radial/v2-radial.png' });
+const slots = await page.locator('[data-testid^="place-radial-slot-"]').count();
+console.log(JSON.stringify({ slots }));
+await browser.close();

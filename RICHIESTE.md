@@ -5653,6 +5653,8 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Ruling Director 2026-11-12 (verbatim):** *«NE, E, SE, ecc / HUB devo decidere cn mockup / Socket vuoti: mockup / Slice: mockup»* — direzione riempimento = **oraria da NE** (NE→E→SE→S→SW→W→NW→N); hub, socket vuoti e numero slice (12×30° vs 8×45°) si decidono **su mockup** (visual fork PLAN-047).
 **Ruling Director sui mockup 2026-11-12 (verbatim):** *«slice 8 / vetro / medaglione zona»* — slice = **8×45°** (centri sui punti cardinali NE,E,SE,S,SW,W,NW,N); socket vuoti = **vetro traslucido**; hub = **medaglione** (letto come medaglione uniforme, opzione B del fork D-b).
 **Revisione visiva 2026-11-13 (verbatim):** *«tanti errori»* — screenshot del radiale con kit materiale appena generato: scacchiera rasterizzata visibile, collare/medaglione duplicati, socket non realmente trasparenti e barre temporali sovradimensionate. Correzione tecnica in `/lab/poi-luogo` in corso; i candidati non sono approvati né battezzati, composizione e scala restano al gate visivo del Director. Evidenza `.mw/bugs/2026-11-13-poi-radial-material/`.
+**Ruling composizione 2026-11-13 (verbatim):** *«niente testo, x il resto uguale al mockup»* — il mockup Gemini di riferimento identificato e salvato in `.mw/specs/poi-radial/refs/mockup-hub-fan-village.jpg` (sha256 `2bec1c46dde3fdf6`): **ventaglio di carte-smalto sovrapposte** (non disco unico), piastre trapezoidali con bordo oro inciso + gemme, diorama villaggio 3/4 dominante su piedistallo oro al centro, slot vuoti = piastra scura con triangolino. **Ruling: nessuna etichetta testo sulle carte** (il mockup mostra TAGLIALEGNA/MINA/… — esclusi); tutto il resto uguale al mockup. Questo ruling **sostituisce** quello del 2026-11-12 su disco unico inclinato / medaglione navy / socket vetro; restano vigenti direzione oraria da NE, ordine stabile, dwell 350 ms scheda ancorata, niente modali, pan mai bloccato. **Sub-plan draft:** `plans/PLAN-117-F2-fan-luogo.md` — contratto OB-F1..F6.
+**Ruling open gate 2026-11-13 (verbatim):** *«1 si / 2 fisso / 3 io avevo chiesto d fare una animazione: considera che l'ultimo step del'animazione sia quella posizione»* — OG-1: progress = smalto che scrive scuro orario da ore 12 della carta; OG-2: arco fisso (carte distanziate, mai giganti); OG-3: diorama dedicato dove **la posa finale dell'animazione piedistallo frontale→3/4 coincide con la posizione del mockup** — l'asset va generato come sequenza flipbook (o pose finale + frame intermedi) il cui ultimo step è il diorama 3/4 del mockup. In attesa di battesimo sub-plan.
 
 ## R-325 — `/game` (mappa2): ripristino funzioni del vecchio `/game` + schermata principale di produzione
 
@@ -5695,22 +5697,12 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 
 **Richiesta (verbatim, 2026-11-13):** *"noi abbiamo un deploy su vercel, attualmente è molto pesante, ha tutto, dovremmo mandare solo le cose effettivamente navigabili da cellulare e poco altro, come dovremmo fare? facciamo un plan x escludere tutto quello che nn serve?"*
 **Data:** 2026-11-13
-**Stato:** `in corso`
+**Stato:** `in corso` (deploy fatto + OB-6 verde; chiusura `fatta` in attesa di bundle)
 **Contesto rilevato (2026-11-13):** `dist/` ≈ 1.0 GB. Composizione: `dist/assets` 622 MB (di cui JS solo ~7.4 MB; ~540 MB di media emessi dal grafo import — `src/docs` 516 MB + `src/assets` 97 MB, trascinati da pagine lab/docs/moodboard), `dist/mockups` 372 MB, `lab-fan-mock` 24 MB, ecc. `public/` = 819 MB copiato interamente (`copyPublicDir`). ~110 route lazy, la maggior parte lab/test/dev. Il service worker (`precacheAndRoute`, `globPatterns` con `png` fino a 6 MiB) precacha centinaia di MB di PNG al primo avvio — costo concreto su mobile. Superfici oggi rilevanti in produzione: `/` (landing → `mappa2-lab`, R-297) e `/game` (probe WebGL `guardian:deploy-guard`).
 **Da decidere col Director:** whitelist route navigabili da mobile (proposta: `/` + `/game`); destino asset dev-only fuori da `public/` (spostamento vs eliminazione); comportamento delle route escluse (redirect vs fallback); slim anche per preview deploy.
 **Decisioni (2026-11-13):** whitelist = `/`, `/game` + shell menu (Balancer/Moodboard/ecc.); route escluse → fallback «non disponibile»; destino asset dev-only deciso post-audit (D-1); lazy-load tab menu approvato.
 **Dibattito multi-AI (2026-11-13):** run `20261113-plan118-deploy-slim` — 4/4 provider REVISE/ACCEPT, correzioni integrate (report in `.mw/runs/…/report.md`). Grok escluso per bug adapter.
 **Plan:** `plans/PLAN-118-deploy-slim-mobile.md` — **battezzato 2026-11-13** (approvato dal Director).
-
----
-
-## R-328 — Landing `/` torna al game frame (supera R-297 + R-305)
-
-**Richiesta (verbatim, 2026-11-13):** *"il deploy nn è verificato, la landing page dovrebbbe essere /game e nn lo è"* → ruling Director: **nuovo ruling — `/` → `/game` su tutti i device**.
-**Data:** 2026-11-13
-**Stato:** `in corso`
-**Decisione:** `/` renderizza `GameMappa2Page` (la superficie `/game` di R-322) su ogni device, senza canonicalizzazione URL — comportamento pre-R-297. `/mappa2-lab` resta navigabile alla sua route diretta (kept nella whitelist PLAN-118). **Supera:** R-297 (landing mobile → mappa2-lab) e R-305 (estensione a tutti i device + canonicalizzazione `/`→`/mappa2-lab`).
-**Nota deploy:** un `vercel --prod` da worktree sporco pubblicherebbe i file WIP non committati (POI, ~117 path — T-13) → il rilascio passa dal canale git (commit scoped → push → build remoto), che richiede la fix del drift manifest su file set committato.
 
 ---
 
@@ -5768,3 +5760,30 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 
 ---
 
+## R-332 — Mobile: il gioco va giocato in orizzontale (landscape), non verticale
+
+**Richiesta (verbatim, 2026-11-14):** *"sarebbe da giocare in orizzontale, nn in verticale"* — detto durante il fork visivo sulle proporzioni HUD mobile.
+**Data:** 2026-11-14
+**Stato:** `aperta`
+**Tensione da nominare:** PLAN-083 (mobile-fit /game) elenca landscape phone tra i **non-goals rimandati a v1.1**. Questo ruling inverte il deferral: landscape diventa l'orientamento target su telefono. Impatti: il reflow stacked <768px di `gameHudPlacement.ts` è pensato per portrait (844px di altezza) — in landscape (390px di altezza) occuperebbe quasi tutto lo schermo; servirà un ramo landscape (verosimilmente più vicino al blueprint B1, dato che i rapporti d'aspetto si avvicinano al desktop). Anche il fork HUD-proporzioni (R-329) va rivalutato su viewport landscape.
+
+---
+
+## R-333 — Ghiera DRAGHI battezzata come slot corretto; montata nel cassetto
+
+**Richiesta (verbatim, 2026-11-14):** *"perfetto. adesso questo è battezzato come slot corretto, segnalo ovunque nella documentazione. Poi deve sostituire nel componente cassetto lo slot che c'è adesso, d quella dimensione"*.
+**Data:** 2026-11-14
+**Stato:** `in corso`
+**Cosa è battezzato:** preset `BEZEL_PRESETS.draghi` in `SlotV12Renderer.tsx` — ghiera firmata dall'utente (medaglione-draghi: banda treccia + cornici a X con kite smeraldo + ring interno oro + disco smaltato col drago) dentro la meccanica reale dello slot (slam 440ms, posa aperta -30°/1.18×, niente denti). Layering sandwich: disco-drago dietro (portal z-5) → medaglione residente (z-10) → ring+banda forata davanti (z-20 in bezel group). Proporzione tuned dal Director via slider lab: `bandImageScale 1.15` / `portraitScale 0.9` (fattori relativi → valgono a ogni taglia). Medaglione = `medaglione-battezzato-v3` firmato; per la produzione è FRAME (`medaglione-battezzato-v3-frame.webp`, foro ritratto trasparente) con il ritratto reale del residente nel foro. Oro ghiera ri-matchato sul gold del medaglione in LAB (L' 1.75L-15.9, chroma ×1.43; smeraldo allineato).
+**Montato:** `HudRealCassetto.tsx` `bezelPreset="b"` → `"draghi"` (stesso `slotSize 42` / `scale(0.56)`). Lab `/bezel-variants` prima riga con slider tuning.
+**Asset:** `public/assets/ui/hud-real/ghiera-draghi.webp` (integrale, 1012²), `ghiera-draghi-top.webp` (foro r<330), `medaglione-battezzato-v3-frame.webp` (foro r256), fonte `.mw/runs/20261110-chatgpt-ghiera/medaglione-battezzato-v3.png`.
+
+---
+
+## R-334 — Il POI su /game apre il cassetto firmato coi dati reali
+
+**Richiesta (verbatim, 2026-11-14):** *"quando clicco un POI sulla /game appare il cassetto con i dati corretti collegaati? se no deve farlo"*.
+**Data:** 2026-11-14
+**Stato:** `in corso`
+**Implementazione:** `/game` montava `QuestExpeditionDetail` via `wrapQuestDetail`; ora `src/ui/idleVillage/hudReal/HudRealCassettoDetail.tsx` è un drop-in che accetta le stesse `QuestExpeditionDetailProps` — lette dal nodo wrappato dentro `wrapDetail` in `game-mappa2.tsx` — e renderizza `HudRealCassetto` dentro `StagePanelFrame` (stage ownership, suspension ed Escape arbitration invariati). Niente stato duplicato: slots, estimate, items, canSend, send, onSlotClear, suppressedResidentIds sono quelli della sessione `useQuestExpeditionSession` reale per-POI.
+**Verificato dal vivo (Playwright, `?poiDemo=1`):** click `poi-goblin` → cassetto con "Goblin Extermination", briefing, journey 2d/2d, loadout reale (toggle item `false→true`), CONFIRM disabilitato a slot vuoti; ESC chiude; click `poi-rovine` → cassetto "The Ruins Beneath the…" con journey 3d/3d (niente leak tra sessioni); drag roster→slot committa l'assegnazione reale ("GIGGIOLILLO ASSIGNED" nel roster + ritratto nel medaglione). `tsc` pulito, lint 0 errori. Limiti noti: niente bottone stash né close nel frame firmato (ESC chiude); `estimate.riskLabel` grezzo della banda.

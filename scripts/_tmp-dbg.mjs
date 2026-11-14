@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
+const pg = await b.newPage({ viewport: { width: 1280, height: 800 } });
+pg.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') console.log('[con]', m.text().slice(0, 300)); });
+pg.on('pageerror', e => console.log('[pageerror]', String(e).slice(0, 500)));
+await pg.goto('http://localhost:5173/game?poiDemo=1', { waitUntil: 'domcontentloaded' });
+await pg.waitForTimeout(45000);
+console.log('zanara:', await pg.locator('[data-poi-zanara]').count());
+console.log('canvas:', await pg.locator('canvas').count());
+await b.close();
