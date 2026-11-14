@@ -81,7 +81,7 @@ function loadHeadFiles() {
   for (const rec of git(['ls-tree', '-r', '-l', '-z', 'HEAD']).toString('utf8').split('\0')) {
     if (!rec) continue;
     const tab = rec.indexOf('\t');
-    const [mode, type, sha, size] = rec.slice(0, tab).split(' ');
+    const [mode, type, sha, size] = rec.slice(0, tab).trim().split(/\s+/);
     if (type !== 'blob' || !mode.startsWith('100')) continue;
     map.set(rec.slice(tab + 1), { sha, bytes: Number(size) });
   }
