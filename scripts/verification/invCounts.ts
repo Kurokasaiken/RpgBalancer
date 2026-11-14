@@ -44,10 +44,18 @@ export function loadCountEntries(repoRoot: string): InvCountEntry[] {
     const push = (e: InvCountEntry) => {
       if (e && typeof e.file === 'string') byKey.set(`${e.file}${e.title}`, e);
     };
-    if (text.trimStart().startsWith('{')) {
-      const raw = JSON.parse(text) as { entries?: InvCountEntry[] };
-      if (Array.isArray(raw.entries)) for (const e of raw.entries) push(e);
-      else push(raw as unknown as InvCountEntry);
+    /* Il JSONL comincia anch'esso con '{' — si prova prima il documento
+     * JSON intero e si ripiega sul parse per-linea (una entry per
+     * tentativo; vince l'ultima = tentativo finale). */
+    let doc: { entries?: InvCountEntry[] } | null = null;
+    try {
+      doc = JSON.parse(text) as { entries?: InvCountEntry[] };
+    } catch {
+      /* JSONL: ogni riga e' una entry a sé */
+    }
+    if (doc && typeof doc === 'object') {
+      if (Array.isArray(doc.entries)) for (const e of doc.entries) push(e);
+      else push(doc as unknown as InvCountEntry);
     } else {
       for (const line of text.split('\n')) {
         if (!line.trim().startsWith('{')) continue;
@@ -62,10 +70,17 @@ export function loadCountEntries(repoRoot: string): InvCountEntry[] {
 
 /** Il titolo template `test.each` matcha un full title runtime: `%*` → jolly. */
 export function titleMatches(template: string, runtimeTitle: string, describePath: string[]): boolean {
-  const full = [...describePath, template].join(' ');
   const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const re = new RegExp(`^${esc(full).replace(/%[a-zA-Z]/g, '.*')}(\\s.*)?$`);
-  return re.test(runtimeTitle) || re.test(runtimeTitle.replace(/\s+/g, ' '));
+  const wild = (s: string) => esc(s).replace(/%[a-zA-Z]/g, '.*');
+  const norm = runtimeTitle.replace(/\s+/g, ' ');
+  const full = [...describePath, template].join(' ');
+  const re = new RegExp(`^${wild(full)}(\\s.*)?$`);
+  if (re.test(runtimeTitle) || re.test(norm)) return true;
+  /* Blocchi INV fusi su più describe o più file (stesso id): il blocco
+   * tiene un solo describePath — il titolo taggato conta anche come
+   * suffisso del full title runtime. */
+  const suffix = new RegExp(`(^|\\s)${wild(template)}(\\s.*)?$`);
+  return suffix.test(runtimeTitle) || suffix.test(norm);
 }
 
 /**
@@ -84,9 +99,14 @@ export function resolveExecutedCount(
   const file = rel(block.file);
   const matched: number[] = [];
   for (const t of block.testTitles) {
-    const rows = entries.filter(
+    let rows = entries.filter(
       (e) => rel(e.file).endsWith(file) || file.endsWith(rel(e.file)),
     ).filter((e) => titleMatches(t, e.title, block.describePath));
+    if (!rows.length) {
+      /* Tag multi-file (stesso INV asserto in file diversi): il blocco
+       * fuso indica un solo file — il titolo conta ovunque sia eseguito. */
+      rows = entries.filter((e) => titleMatches(t, e.title, block.describePath));
+    }
     if (!rows.length) return null;
     /* test.each: minimo sulle istanze; titolo singolo: entry finale. */
     matched.push(Math.min(...rows.map((r) => r.assertionCalls)));

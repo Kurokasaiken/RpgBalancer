@@ -29,7 +29,16 @@ if (ENABLED) {
     const file = ctx.task.file?.filepath
       ? relative(process.cwd(), resolve(ctx.task.file.filepath)).split('\\').join('/')
       : String(ctx.task.file?.name ?? 'unknown');
-    const title = ctx.task.name ?? '';
+    /* Full title come lo attende invCounts.titleMatches: describePath +
+     * test name. ctx.task.name e' solo il titolo foglia — si risale la
+     * catena suite fermandosi al task file (type 'file'). */
+    const chain: string[] = [];
+    let suite = ctx.task.suite as { name?: string; type?: string; suite?: typeof suite } | undefined;
+    while (suite && suite.type !== 'file') {
+      if (suite.name) chain.unshift(suite.name);
+      suite = suite.suite;
+    }
+    const title = [...chain, ctx.task.name ?? ''].join(' ');
     const status = ctx.task.result?.state === 'pass' ? 'passed' : ctx.task.result?.state === 'fail' ? 'failed' : 'skipped';
     try {
       mkdirSync(dirname(OUT), { recursive: true });

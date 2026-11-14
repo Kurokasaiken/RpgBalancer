@@ -1,20 +1,25 @@
 // src/ui/idleVillage/components/C1Medallion.tsx
-// The baptized C1 medallion (PLAN-116): ring-fused.webp — the signed ring with
-// its fused crescent ornament (the file Director approved as 'medaglione
-// battezzato') — with the resident portrait mounted inside its circular hole.
+// The baptized C1 medallion (PLAN-116): the signed ring with its crescent
+// ornament and the resident portrait mounted inside its circular hole.
 // Drop-in replacement for WanderlustMedalOverlay at the production call sites
 // (planner slot rack, drag overlay, return flight proxy): identical props
 // contract so drag, swap and ghost paths keep working untouched.
 //
-// Centering: the fused asset is asymmetric — the crescent extends to the left,
-// so the portrait hole sits left of the asset's bounding box. The component
+// R-335 (2026-11-14): the asset is `ring.webp`, not `ring-fused.webp`. The
+// fused file is a row-module piece — its left gem band is CUT at the image
+// edge because the band tile continues it (Director: «l'immagine mozzata»).
+// `ring.webp` carries the same ornament complete inside the bounds, with its
+// own measured mount geometry (C1_GEOMETRY); the roster columns already use it.
+//
+// Centering: the asset is asymmetric — the crescent sits left of the hole,
+// so the portrait hole does not sit at the asset centre. The component
 // centres the HOLE (the visual centre of the medallion), not the asset bounds.
 
 import React from 'react';
 import { getMedalPortraitUrl } from '@/balancing/config/idleVillage/medalPortraitAssets';
-import { C1_ROWMOD } from '@/ui/idleVillage/hudReal/c1RowModGeometry';
+import { C1_GEOMETRY } from '@/ui/idleVillage/hudReal/c1Geometry';
 
-const C1_RING = '/assets/ui/hud-real/C1/ring-fused.webp';
+const C1_RING = '/assets/ui/hud-real/C1/ring.webp';
 
 export interface C1MedallionProps {
   /** Full resident portrait URL (resolved via getMedalPortraitUrl like the old overlay). */
@@ -39,7 +44,7 @@ export const C1Medallion: React.FC<C1MedallionProps> = ({
   className,
 }) => {
   const medalUrl = portraitUrl ? getMedalPortraitUrl(portraitUrl) : undefined;
-  const R = C1_ROWMOD.ring;
+  const R = C1_GEOMETRY.ring;
   // The ring's visible circle is the asset height (the extra width is the
   // crescent extension); the box is a square centred on the portrait hole.
   const scale = sizePx / R.h;

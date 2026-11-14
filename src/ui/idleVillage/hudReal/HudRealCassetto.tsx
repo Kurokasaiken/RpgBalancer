@@ -8,11 +8,14 @@
  * the REAL village stash bag, and the live CONFIRM button sit directly inside the
  * clean painted enamel/navy wells.
  */
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 import { StashItemTile } from '@/ui/idleVillage/components/gameFrame/stashItemFace';
+import type { ResourceReadoutItem } from '@/ui/idleVillage/components/gameFrame/ResourceReadout';
+import { HudRealResources } from './HudRealResources';
+import { RESOURCES_BAR } from './resourcesBarGeometry';
 
 const FRAME_SRC = '/assets/ui/hud-real/cassetto/frame.webp';
 /** Cut-out RGBA asset dimensions (x=9..648, y=10..1623 of the 656×1632 signed source). */
@@ -51,6 +54,12 @@ export interface HudRealCassettoProps {
   quest: CassettoQuest;
   /** The REAL rack view models — the session's `controller.slots`, never lab fabrications. */
   slots: ResidentSlotViewModel[];
+  /** The REAL village resource readout — mounted inside the empty navy well the
+   *  signed frame paints at the top interior (Director 2026-11-14: «il mockup
+   *  aveva il componente risorse in alto al suo interno»). Without it the
+   *  drawer's body covers the page's own resources slot and the readout
+   *  "scompare" whenever the cassetto is open. */
+  resourceItems?: ResourceReadoutItem[];
   onSlotClick?: (slotId: string) => void;
   onSlotClear?: (slotId: string) => void;
   suppressedResidentIds?: readonly string[];
@@ -63,6 +72,7 @@ export interface HudRealCassettoProps {
 interface Zone { x: number; y: number; w: number; h: number }
 
 const Z = {
+  resources: { x: 208, y: 22, w: 396, h: 126 },
   title: { x: 227, y: 176, w: 318, h: 42 },
   subtitle: { x: 216, y: 238, w: 340, h: 38 },
   briefing: { x: 215, y: 300, w: 342, h: 256 },
@@ -101,9 +111,23 @@ const RACK_SCOPED_CSS = `
 `;
 
 export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
-  quest, slots, onSlotClick, onSlotClear, suppressedResidentIds, loadoutRows = [], canSend = true, onConfirm,
+  quest, slots, resourceItems, onSlotClick, onSlotClear, suppressedResidentIds, loadoutRows = [], canSend = true, onConfirm,
 }) => {
   const { t } = useTranslation('idleVillage');
+
+  /* The resources bar is a fixed-design-px component (`RESOURCES_BAR`) while the
+   *  drawer scales with the column: measure its well and fit the bar inside. */
+  const resWellRef = useRef<HTMLDivElement | null>(null);
+  const [resFit, setResFit] = useState(0);
+  useEffect(() => {
+    const el = resWellRef.current;
+    if (!el || !resourceItems) return;
+    const fit = () => setResFit(Math.min(el.clientWidth / RESOURCES_BAR.w, el.clientHeight / RESOURCES_BAR.h) * 0.94);
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [resourceItems]);
   return (
     <div
       data-hudreal-cassetto=""
@@ -131,6 +155,20 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           draggable={false}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}
         />
+
+        {/* REAL resources bar inside the empty navy well the frame paints at
+            the top interior (where the signed mockup's control band sits). */}
+        {resourceItems && (
+          <div
+            ref={resWellRef}
+            data-cassetto-resources=""
+            style={{ ...pct(Z.resources), display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <div style={{ transform: `scale(${resFit})`, transformOrigin: 'center center', opacity: resFit > 0 ? 1 : 0 }}>
+              <HudRealResources items={resourceItems} />
+            </div>
+          </div>
+        )}
 
         {/* Title inside the clean emerald cartouche */}
         <div style={{ ...pct(Z.title), display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2%' }}>
@@ -169,7 +207,10 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
           data-cassetto-rack=""
           style={{ ...pct(Z.slots), display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}
         >
-          <div style={{ transform: 'scale(0.56)', transformOrigin: 'center center' }}>
+          {/* R-335: the draghi bezels paint wider than their 44 px token boxes —
+           *  at 0.56 their outer edges kiss the well's margins. 0.44 keeps the
+           *  painted band clear on every side. */}
+          <div style={{ transform: 'scale(0.44)', transformOrigin: 'center center' }}>
             <ResidentSlotRack
               slots={slots}
               layout="detail"

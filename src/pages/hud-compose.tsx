@@ -242,20 +242,13 @@ export default function HudComposePage() {
       {/* PLAN-113/114 family B — the signed cassetto planner (dossier on map, right-edge drawer):
           real ResidentSlotRack ghiera + signed internals (skull risk, journey band, enamel CONFIRM). */}
       {/* Cassetto — owns the right column; commands + resources slots hidden
-          (Director ruling 2026-11-10); resources incorporated as a top-right band
-          inside the cassetto's space so nothing is separate. The host manages
-          its own drawer geometry. */}
+          (Director ruling 2026-11-10); the resources band lives INSIDE the
+          drawer's top-interior navy well (R-335), mounted by the host itself —
+          no separate overlay. The host manages its own drawer geometry. */}
       {params.get('comp') === 'cassetto' && (
-        <>
-          <div style={{ position: 'absolute', right: 16, top: 8, zIndex: 8 }}>
-            <div style={{ transform: 'scale(0.8)', transformOrigin: 'top right' }}>
-              <HudRealResources items={buildResourceReadoutItems(selectResourceOutlook(state, config), t)} />
-            </div>
-          </div>
-          <div data-hudslot="cassetto" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 360, zIndex: 7 }}>
-            <HudRealCassettoHost />
-          </div>
-        </>
+        <div data-hudslot="cassetto" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 360, zIndex: 7 }}>
+          <HudRealCassettoHost />
+        </div>
       )}
 
       {/* PLAN-113/114 E3 — reliquary: real legacySlotsFor(villageBuildingLevel) + mock picks
@@ -393,7 +386,7 @@ const ComposeSwitcher: React.FC = () => {
     for (const k of ['view', 'zoom', 'n', 'stress']) {
       if (p.has(k) && !next.has(k)) next.set(k, p.get(k)!);
     }
-    window.location.search = next.toString();
+    window.location.assign(`?${next.toString()}`);
   };
   return (
     <div data-hudswitcher="" style={{ position: 'fixed', left: 10, bottom: 10, zIndex: 3000, display: 'flex', alignItems: 'flex-end', gap: 6 }}>

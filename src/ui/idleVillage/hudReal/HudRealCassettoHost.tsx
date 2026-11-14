@@ -20,6 +20,8 @@ import { scenarioForQuest } from '@/ui/idleVillage/questS1Lab/questOffer';
 import { DndContext } from '@dnd-kit/core';
 import { MatericRosterComponentV2 } from '@/ui/idleVillage/rosterV2';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives';
+import { selectResourceOutlook, useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
+import { buildResourceReadoutItems } from '@/ui/idleVillage/components/gameFrame';
 import { HudRealCassetto, type CassettoQuest, type LoadoutRow } from './HudRealCassetto';
 
 const POI_ID = 'poi-goblin';
@@ -29,6 +31,14 @@ const EMPTY_BAG: readonly (string | null)[] = [];
 
 export const HudRealCassettoHost: React.FC = () => {
   const { t } = useTranslation('idleVillage');
+  /* The same live readout the page's resources slot shows — the cassetto owns
+   *  it as its top-interior band (Director ruling: resources incorporated
+   *  inside the cassetto's space, not as a separate overlay). */
+  const { state: gpState, config: gpConfig } = useMinimalGameplayWithIdleVillageConfig();
+  const resourceItems = useMemo(
+    () => buildResourceReadoutItems(selectResourceOutlook(gpState, gpConfig), t),
+    [gpState, gpConfig, t],
+  );
   const poi = useMemo(() => questPoiById(POI_ID), []);
   const questRun = useQuestRun('goblin');
   const activeRuns = useMemo(() => [questRun.run].filter((r): r is NonNullable<typeof r> => Boolean(r)), [questRun.run]);
@@ -157,6 +167,7 @@ export const HudRealCassettoHost: React.FC = () => {
       <HudRealCassetto
         quest={quest}
         slots={slots}
+        resourceItems={resourceItems}
         onSlotClear={(slotId) => session.handleSlotClear(slotId)}
         suppressedResidentIds={session.suppressedResidentIds}
         loadoutRows={loadoutRows}
