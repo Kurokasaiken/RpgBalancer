@@ -31,7 +31,7 @@ test.describe('/game — mappa2 + signed HUD (2026-11-10)', () => {
     await expect(root).toHaveAttribute('data-view', 'map');
   });
 
-  test('camera: wheel-out lowers zoom below the resting cover fit and HUD stays fixed', async ({ page }) => {
+  test('camera: wheel clamps at the resting fit (max zoom-out), HUD stays fixed, no page zoom', async ({ page }) => {
     test.setTimeout(300_000);
     await page.goto('/game', { waitUntil: 'domcontentloaded', timeout: 120_000 });
     const root = page.locator('[data-testid="game-mappa2"]');
@@ -44,24 +44,24 @@ test.describe('/game — mappa2 + signed HUD (2026-11-10)', () => {
     const navBox = await nav.boundingBox();
     expect(navBox).toBeTruthy();
 
-    // INV:pixi-world-map.INV-10 — wheel-out over the map zooms out below the cover fit
-    // (was: floor = cover = resting zoom → zoom-out mathematically dead, R-331).
+    // INV:pixi-world-map.INV-10 (ruling R-331): the resting cover fit is the widest
+    // allowed zoom — wheel-out clamps there, the sea margin is never shown.
     await page.mouse.move(720, 450);
     await page.mouse.wheel(0, 240);
     await page.waitForTimeout(150);
     const afterOut = await cam();
-    expect(afterOut.zoom, 'wheel-out must reduce zoom below resting').toBeLessThan(resting.zoom - 0.001);
+    expect(afterOut.zoom, 'wheel-out must clamp at the resting cover fit').toBeCloseTo(resting.zoom, 3);
     // The HUD must keep its screen rect while the world camera moves (R-331:
     // «la HUD deve rimanere fissa nella posizione e nelle proporzioni»).
-    expect((await nav.boundingBox()), 'HUD rect must not move/scale on zoom-out').toEqual(navBox);
+    expect((await nav.boundingBox()), 'HUD rect must not move/scale on zoom').toEqual(navBox);
 
     // Same INV — a wheel over the HUD chrome (nav plinth) reaches the map as a
-    // zoom, not a dead zone; and never becomes a browser page-zoom (HUD fixed).
+    // zoom-in, not a dead zone; and never becomes a browser page-zoom (HUD fixed).
     await page.mouse.move(navBox.x + navBox.width / 2, navBox.y + navBox.height / 2);
-    await page.mouse.wheel(0, 240);
+    await page.mouse.wheel(0, -240);
     await page.waitForTimeout(150);
     const afterHudWheel = await cam();
-    expect(afterHudWheel.zoom, 'wheel over HUD chrome must zoom the map').toBeLessThan(afterOut.zoom - 0.001);
+    expect(afterHudWheel.zoom, 'wheel over HUD chrome must zoom the map').toBeGreaterThan(afterOut.zoom + 0.001);
     await page.keyboard.down('Control');
     await page.mouse.wheel(0, -240);
     await page.keyboard.up('Control');
@@ -70,9 +70,9 @@ test.describe('/game — mappa2 + signed HUD (2026-11-10)', () => {
     expect(vvScale, 'ctrl+wheel must not page-zoom the HUD').toBe(1);
   });
 
-  // INV:pixi-world-map.INV-11 — the village nav restores the resting contract:
-  // back on the map the camera is at default zoom/centre, not the stale user one.
-  test('camera: village nav resets zoom to the default fit on return to map', async ({ page }) => {
+  // INV:pixi-world-map.INV-11 — the map nav restores the resting contract:
+  // back on the map the camera is centred on the village at default zoom, not the stale user one.
+  test('camera: map nav returns the camera to the village at the default fit (R-331)', async ({ page }) => {
     test.setTimeout(300_000);
     await page.goto('/game', { waitUntil: 'domcontentloaded', timeout: 120_000 });
     const root = page.locator('[data-testid="game-mappa2"]');
@@ -81,17 +81,32 @@ test.describe('/game — mappa2 + signed HUD (2026-11-10)', () => {
 
     const cam = () => page.evaluate(() => ({ ...window.__worldCam }));
     const resting = await cam();
-    await page.evaluate(() => window.__worldCamCtl.set({ zoom: window.__worldCam.fitZoom * 1.6, panX: -300 }));
+    await page.evaluate((rz) => window.__worldCamCtl.set({ zoom: rz * 1.6, panX: -300 }), resting.zoom);
     await page.waitForTimeout(100);
 
     await page.locator('[data-nav-id="village"]').click();
     await expect(root).toHaveAttribute('data-view', 'village');
     await page.locator('[data-nav-id="map"]').click();
     await expect(root).toHaveAttribute('data-view', 'map');
-    await page.waitForTimeout(300);
+    // Refit lands instantly; the glide to the village point takes ~700 ms.
+    await page.waitForTimeout(900);
 
     const back = await cam();
-    expect(back.zoom, 'village nav must reset zoom to the resting fit').toBeCloseTo(resting.zoom, 3);
+    expect(back.zoom, 'map nav must reset zoom to the resting fit').toBeCloseTo(resting.zoom, 3);
+    // place_village_start.worldPoint = (1515, 700) world px. At the resting fit the
+    // viewport covers nearly the whole canvas, so the pan clamp cannot centre the
+    // camera exactly on the village — assert the village projects near screen centre.
+    const villageScreen = await page.evaluate(() => {
+      const c = window.__worldCam;
+      return {
+        x: (1515 - c.panX) * c.zoom,
+        y: (700 - c.panY) * c.zoom,
+        iw: innerWidth,
+        ih: innerHeight,
+      };
+    });
+    expect(Math.abs(villageScreen.x - villageScreen.iw / 2), 'village must project near screen centre').toBeLessThan(villageScreen.iw * 0.15);
+    expect(Math.abs(villageScreen.y - villageScreen.ih / 2), 'village must project near screen centre').toBeLessThan(villageScreen.ih * 0.15);
   });
 
   test('/gameOld still serves the previous game page', async ({ page }) => {

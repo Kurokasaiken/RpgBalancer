@@ -115,13 +115,13 @@ invariants:
   - id: pixi-world-map.INV-10
     source: director-bug
     source_ref: R-331
-    statement: 'mappa2 cover-fit senza margini mare: floorZoom=cover=resting zoom, zoom-out utente matematicamente morto'
+    statement: 'su mappa2 il resting cover fit e il massimo zoom-out consentito (ruling Director): wheel-out clampa al resting, il margine mare procedurale non si mostra mai; wheel su chrome HUD non scrollabile delega lo zoom alla mappa e ctrl/meta+wheel non fa mai page-zoom'
     test_refs:
       - tests/e2e/idleVillage/gameMappa2.spec.ts
   - id: pixi-world-map.INV-11
     source: director-bug
     source_ref: R-331
-    statement: 'nav village su /game lascia la camera utente stantia: al ritorno su map zoom/pan non tornano al fit di default'
+    statement: 'nav map su /game riporta la camera centrata sul villaggio al fit di default: zoom/pan utente stanti non sopravvivono'
     test_refs:
       - tests/e2e/idleVillage/gameMappa2.spec.ts
 ---

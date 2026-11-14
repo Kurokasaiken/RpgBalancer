@@ -171,7 +171,7 @@ export interface PixiWorldMapProps {
   seaMargin?: { xPx: number; yPx: number };
   recenterSignal?: number;
   /** Glide the camera to a point (fractions of the world canvas, 0-1); `n` makes a repeat request on the same point count. */
-  focusRequest?: { x: number; y: number; n: number } | null;
+  focusRequest?: { x: number; y: number; n: number; zoom?: number } | null;
   effects?: Partial<PixiWorldMapEffects>;
   /** Overrides every cloud band's shadow opacity (the generated bands ship at 2-4%, which is invisible). */
   cloudShadowOpacity?: number;
@@ -1030,7 +1030,7 @@ export function PixiWorldMap({
    * (camera bounds) rebuilds the world — not every open/close (PLAN-031 T-A4). */
   const safeFitRef = useRef(safeFit);
   safeFitRef.current = safeFit;
-  const focusRef = useRef<((x: number, y: number) => void) | null>(null);
+  const focusRef = useRef<((x: number, y: number, zoom?: number) => void) | null>(null);
   const anchorLayerRef = useRef<HTMLDivElement>(null);
   const worldBoxRef = useRef<HTMLDivElement>(null);
   const worldOverlayBoxRef = useRef<HTMLDivElement>(null);
@@ -3385,13 +3385,13 @@ export function PixiWorldMap({
         });
       // Glide to a world point, centred in the free area; zooms in a little when the map is at its widest.
       let glide = 0;
-      focusRef.current = (wx, wy) => {
+      focusRef.current = (wx, wy, zoomWanted) => {
         cancelAnimationFrame(glide);
         const left = safeFitRef.current?.insets.left ?? 0;
         const right = safeFitRef.current?.insets.right ?? 0;
         const top = safeFitRef.current?.insets.top ?? 0;
         const bottom = safeFitRef.current?.insets.bottom ?? 0;
-        const zoomTo = Math.min(cameraConfig.maxZoom, Math.max(cam.zoom, floorZoom() * 1.5));
+        const zoomTo = zoomWanted ?? Math.min(cameraConfig.maxZoom, Math.max(cam.zoom, floorZoom() * 1.5));
         const freeW = app.screen.width - left - right;
         const freeH = app.screen.height - top - bottom;
         const target = { zoom: zoomTo, panX: wx - (left + freeW / 2) / zoomTo, panY: wy - (top + freeH / 2) / zoomTo };
@@ -3936,7 +3936,7 @@ export function PixiWorldMap({
   useEffect(() => {
     if (!focusRequest || !manifest) return;
     const { width, height } = manifest.coordinateSystem.canvas;
-    focusRef.current?.(focusRequest.x * width, focusRequest.y * height);
+    focusRef.current?.(focusRequest.x * width, focusRequest.y * height, focusRequest.zoom);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusRequest?.n]);
 
