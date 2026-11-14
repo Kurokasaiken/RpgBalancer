@@ -5711,3 +5711,14 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Stato:** `in corso`
 **Decisione:** `/` renderizza `GameMappa2Page` (la superficie `/game` di R-322) su ogni device, senza canonicalizzazione URL — comportamento pre-R-297. `/mappa2-lab` resta navigabile alla sua route diretta (kept nella whitelist PLAN-118). **Supera:** R-297 (landing mobile → mappa2-lab) e R-305 (estensione a tutti i device + canonicalizzazione `/`→`/mappa2-lab`).
 **Nota deploy:** un `vercel --prod` da worktree sporco pubblicherebbe i file WIP non committati (POI, ~117 path — T-13) → il rilascio passa dal canale git (commit scoped → push → build remoto), che richiede la fix del drift manifest su file set committato.
+
+---
+
+## R-328 — Landing `/` torna al game frame (supera R-297 + R-305)
+
+**Richiesta (verbatim, 2026-11-13):** *"il deploy nn è verificato, la landing page dovrebbbe essere /game e nn lo è"* → ruling Director: **nuovo ruling — `/` → `/game` su tutti i device**.
+**Data:** 2026-11-13
+**Stato:** `in corso`
+**Decisione:** `/` renderizza `GameMappa2Page` (la superficie `/game` di R-322) su ogni device, senza canonicalizzazione URL — comportamento pre-R-297. `/mappa2-lab` resta navigabile alla sua route diretta (kept nella whitelist PLAN-118). **Supera:** R-297 (landing mobile → mappa2-lab) e R-305 (estensione a tutti i device + canonicalizzazione `/`→`/mappa2-lab`).
+**Nota deploy:** un `vercel --prod` da worktree sporco pubblicherebbe i file WIP non committati (POI, ~117 path — T-13) → il rilascio passa dal canale git (commit scoped → push → build remoto), che richiede la fix del drift manifest su file set committato.
+**Esito deploy (2026-11-14):** canale git sbloccato — fix manifest `ls-tree -l` padding (bytes=0) + probe `git rev-parse` (stub `.git` Vercel). Deploy `rpg-balancer-a4awsqpvk` **● Ready** su `rpg-balancer.vercel.app`. Verifica post-deploy: bundle servito contiene `k = isGamePath || isRootPath` (no `replaceState`); probe WebGL su `/` raggiunge `bootPhase=assets` (boot game, non lab); crash headless oltre asset-load = limite ambiente SwiftShader, già presente su deploy precedenti.
