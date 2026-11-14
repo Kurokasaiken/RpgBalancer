@@ -123,10 +123,10 @@ function App() {
 
   const { config, initialized, isInitializing, initializeConfig } = useIdleVillageConfig();
   const isMobile = useIsMobile();
-  // Landing (R-297 mobile → estesa a desktop, Director 2026-11-01): the root
-  // path lands on the mappa2 lab on every device; the game frame lives at
-  // /game and /game-frame-pixi.
-  const isLandingPath = isRootPath;
+  // Landing (R-328, Director 2026-11-13 — supera R-297/R-305): the root path
+  // lands on the game surface on every device; /mappa2-lab stays on its own
+  // route.
+  const isGameLandingPath = isGamePath || isRootPath;
 
   const getInitialTab = useCallback((): AppNavTabId => {
     // Priority 1: URL parameter (for deep linking and tests)
@@ -178,21 +178,8 @@ function App() {
     }
   }, [shouldRedirectToMinimalMode]);
 
-  // Landing (R-297): canonicalize the URL to /mappa2-lab without a
-  // reload — the same page component is already rendered for this path.
-  useEffect(() => {
-    if (
-      isLandingPath &&
-      typeof window !== 'undefined' &&
-      window.location.pathname !== '/mappa2-lab'
-    ) {
-      window.history.replaceState(
-        null,
-        '',
-        `/mappa2-lab${window.location.search}${window.location.hash}`,
-      );
-    }
-  }, [isLandingPath]);
+  // Landing (R-328): the root path renders the game surface directly — no
+  // URL rewrite, mirroring the pre-R-297 contract.
 
   useEffect(() => {
     const handleNavigate = () => setActiveTab('spellCreationNew');
@@ -329,7 +316,7 @@ function App() {
     );
   }
 
-  if (isGamePath) {
+  if (isGameLandingPath) {
     return (
       <ErrorBoundary componentName="Game Page">
         <Suspense fallback={<GameBootScreen phase="manifest" indeterminate />}>
@@ -341,7 +328,7 @@ function App() {
     );
   }
 
-  if (isMappa2LabPath || isLandingPath) {
+  if (isMappa2LabPath) {
     return (
       <ErrorBoundary componentName="Mappa2 Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Mappa2 Lab...</div>}>

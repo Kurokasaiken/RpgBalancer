@@ -5701,3 +5701,13 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Decisioni (2026-11-13):** whitelist = `/`, `/game` + shell menu (Balancer/Moodboard/ecc.); route escluse → fallback «non disponibile»; destino asset dev-only deciso post-audit (D-1); lazy-load tab menu approvato.
 **Dibattito multi-AI (2026-11-13):** run `20261113-plan118-deploy-slim` — 4/4 provider REVISE/ACCEPT, correzioni integrate (report in `.mw/runs/…/report.md`). Grok escluso per bug adapter.
 **Plan:** `plans/PLAN-118-deploy-slim-mobile.md` — **battezzato 2026-11-13** (approvato dal Director).
+
+---
+
+## R-328 — Landing `/` torna al game frame (supera R-297 + R-305)
+
+**Richiesta (verbatim, 2026-11-13):** *"il deploy nn è verificato, la landing page dovrebbbe essere /game e nn lo è"* → ruling Director: **nuovo ruling — `/` → `/game` su tutti i device**.
+**Data:** 2026-11-13
+**Stato:** `in corso`
+**Decisione:** `/` renderizza `GameMappa2Page` (la superficie `/game` di R-322) su ogni device, senza canonicalizzazione URL — comportamento pre-R-297. `/mappa2-lab` resta navigabile alla sua route diretta (kept nella whitelist PLAN-118). **Supera:** R-297 (landing mobile → mappa2-lab) e R-305 (estensione a tutti i device + canonicalizzazione `/`→`/mappa2-lab`).
+**Nota deploy:** un `vercel --prod` da worktree sporco pubblicherebbe i file WIP non committati (POI, ~117 path — T-13) → il rilascio passa dal canale git (commit scoped → push → build remoto), che richiede la fix del drift manifest su file set committato.
