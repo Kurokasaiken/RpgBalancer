@@ -5732,3 +5732,12 @@ seed picker; save-on-approval → store condiviso. Dibattito multi-AI
 **Stato:** `aperta`
 **Contesto rilevato:** su viewport phone la HUD blueprint B1 (PLAN-112, pensata ≥768px) non deve applicarsi — il reflow stacked <768px è specificato in `gameHudPlacement.ts` (PLAN-083 mobile-fit) ed è **in lavorazione attiva** (file hud-real modificati non committati nel worktree). Il deploy `a4awsqpvk` contiene la HUD pre-fit.
 **Verifica da fare:** dopo il merge/deploy del lavoro hud-real corrente, controllare su viewport 390×844 che resources/time/nav siano stacked e scalati alla larghezza; se ancora sproporzionata → bug da fixare, non scope nuovo.
+
+---
+
+## R-330 — Icona PWA "salva su Home" da rivedere (rinviata)
+
+**Richiesta (verbatim, 2026-11-14):** *"ho salvato sul mobile quella pagina cm app e c'è una icona strana, possiamo cambiarla?"* → *"c pensiamo poi all'icona"*.
+**Data:** 2026-11-14
+**Stato:** `aperta` (rinviata dal Director — scelta artistica da fare insieme)
+**Difetti tecnici già accertati (indipendenti dall'arte):** `apple-touch-icon` punta a `/vite.svg` — iOS non supporta SVG come icona Home e usa uno screenshot della pagina (l'«icona strana» vista); il manifest dichiara `maskable-icon-512.png` che non esiste (404 su Android); manca `apple-touch-icon` PNG 180×180.
