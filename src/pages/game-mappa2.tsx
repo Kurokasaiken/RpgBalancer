@@ -249,7 +249,12 @@ export default function GameMappa2Page() {
           <HudRealNav
             navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
             activeNavId={view}
-            onNavSelect={(id) => setView(id === 'village' ? 'village' : 'map')}
+            /* R-331: il pulsante village riporta la camera al fit di default — al ritorno
+             * su map lo zoom/pan utente stantio non deve sopravvivere (INV-11). */
+            onNavSelect={(id) => {
+              setView(id === 'village' ? 'village' : 'map');
+              if (id === 'village') onRecenter();
+            }}
             onRecenter={onRecenter}
             labelSpread={hud.navLabelSpread}
             showLabels={PAGE.navShowLabels}
