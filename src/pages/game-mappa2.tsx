@@ -11,6 +11,7 @@ import { HudRealNav } from '@/ui/idleVillage/hudReal/HudRealNav';
 import { zoomFor } from '@/ui/idleVillage/hudReal/layout/hudLayoutB';
 import { placeGameHud, type BarPlacement } from '@/ui/idleVillage/hudReal/layout/gameHudPlacement';
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
+import { placeById } from '@/balancing/config/idleVillage/placesConfig';
 import { buildResourceReadoutItems } from '@/ui/idleVillage/components/gameFrame';
 import { VillageDirectorView } from '@/ui/idleVillage/components/gameFrame/VillageDirectorView';
 import { GameBootScreen } from '@/ui/idleVillage/components/gameFrame/GameBootScreen';
@@ -59,6 +60,8 @@ const PAGE = DEFAULT_GAME_FRAME_CONFIG.gamePage;
 const TOD = DEFAULT_GAME_FRAME_CONFIG.timeOfDay.map;
 const HIDE = DEFAULT_GAME_FRAME_CONFIG.hudHide;
 const CORNER = PAGE.corner;
+const MAPPA2_CANVAS = { w: 2752, h: 1536 } as const;
+const MAPPA2_VILLAGE_ORIGIN = { x: 1515, y: 700 } as const;
 /* Dev A/B seam for the GPU-budget options: `?light=none` or a subset `?light=dist,tile,base,foam,field`; default = the profile's. */
 const LIGHT_Q = DEV_Q.get('light');
 /* Dev A/B seam for the hi-res base (Director 2026-11-10, «voglio che i player possano zoomare»): `?hires=1`. */
@@ -159,6 +162,7 @@ export default function GameMappa2Page() {
 
   const [view, setView] = useState<'map' | 'village'>('map');
   const [recenterSignal, setRecenterSignal] = useState(0);
+  const [focusRequest, setFocusRequest] = useState<{ x: number; y: number; n: number; zoom?: number } | null>(null);
   const [boot, setBoot] = useState<PixiBootProgress>({ phase: 'assets', loaded: 0, total: 0 });
   const [ready, setReady] = useState(false);
   const [veilGone, setVeilGone] = useState(false);
@@ -213,6 +217,7 @@ export default function GameMappa2Page() {
           baseTiles={map.tiles}
           gpuLight={map.gpuLight}
           recenterSignal={recenterSignal}
+          focusRequest={focusRequest}
           regions={{ assetBase: MAPPA2_REGIONS_BASE }}
           onBootProgress={setBoot}
           onReady={() => setReady(true)}
@@ -249,11 +254,15 @@ export default function GameMappa2Page() {
           <HudRealNav
             navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
             activeNavId={view}
-            /* R-331: il pulsante village riporta la camera al fit di default — al ritorno
-             * su map lo zoom/pan utente stantio non deve sopravvivere (INV-11). */
+            /* R-331: il pulsante MAPPA glissa la camera sul villaggio allo zoom di default
+             * (cover fit) — zoom/pan utente stanti non sopravvivono (INV-11). */
             onNavSelect={(id) => {
               setView(id === 'village' ? 'village' : 'map');
-              if (id === 'village') onRecenter();
+              if (id === 'map') {
+                const vp = placeById('place_village_start')?.worldPoint ?? MAPPA2_VILLAGE_ORIGIN;
+                const fit = Math.max(innerWidth / MAPPA2_CANVAS.w, innerHeight / MAPPA2_CANVAS.h);
+                setFocusRequest((prev) => ({ x: vp.x / MAPPA2_CANVAS.w, y: vp.y / MAPPA2_CANVAS.h, n: (prev?.n ?? 0) + 1, zoom: fit }));
+              }
             }}
             onRecenter={onRecenter}
             labelSpread={hud.navLabelSpread}
