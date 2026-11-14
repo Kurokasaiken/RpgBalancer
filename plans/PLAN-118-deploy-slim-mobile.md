@@ -69,7 +69,7 @@
 - In slim build alias → `labRoutes.slim.ts`: `LAB_ROUTES = {}` + `LAB_PATHS` pieno (stessa interfaccia TS identica — il typecheck non deve rompere, correzione Gemini). I `import()` lab non entrano nel grafo.
 - Ordine di valutazione: `LAB_PATHS` match → `<RouteUnavailable/>` **prima** del ramo default dello shell menu (correzione Claude: il default altrimenti cattura tutto).
 - `RouteUnavailable`: solo primitivi esistenti + i18n `common` (`deploy.routeUnavailable.*`) + link a `/`. **Zero asset da `public/`/`dev-public/`** (correzione DeepSeek: in preview slim dev-public non è servita).
-  - `visual-fork: skipped — puntatore: RouteUnavailable usa FantasyCard+FantasyButton esistenti (src/ui/fantasy/atoms/) con layout min-h-screen centrato, nessuna variante visiva introdotta; unico render alternativo plausibile (redirect silenzioso a /) già scartato dal ruling Director "fallback non disponibile".`
+  - `visual-fork: skipped — RouteUnavailable usa FantasyCard+FantasyButton esistenti con layout min-h-screen centrato, nessuna variante visiva introdotta; unico render alternativo plausibile (redirect silenzioso a /) già scartato dal ruling Director "fallback non disponibile" — puntatore: src/ui/fantasy/atoms/`
 - **Gate flag** vitest-safe: `const DEPLOY_SLIM = ((import.meta as {env?: Record<string,string|undefined>}).env?.VITE_DEPLOY_SLIM) === 'true';`
 
 ### T-1b — Tab del menu a consumo on-demand (mobile/deploy) ✅ (2026-11-13)

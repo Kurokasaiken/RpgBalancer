@@ -349,7 +349,17 @@ export function scanInvBlocks(
         if (ts.isCallExpression(d2)) {
           const c = calleeName(d2);
           if (c && isDescribeCall(c)) {
-            const title = d2.arguments[0] ? canonText(d2.arguments[0]) : '';
+            /* Fold del literal come per testTitles: canonText terrebbe le
+             * virgolette sorgente ('desc') e titleMatches non risolverebbe
+             * mai il full title runtime (desc senza quote). */
+            const arg0 = d2.arguments[0];
+            const folded = arg0 ? literalFold(arg0) : { ok: false as const };
+            const title =
+              arg0 && folded.ok && typeof folded.value === 'string'
+                ? folded.value
+                : arg0
+                  ? canonText(arg0)
+                  : '';
             describePath.unshift(title);
           }
         }

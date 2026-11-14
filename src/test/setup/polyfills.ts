@@ -25,3 +25,19 @@ if (typeof globalThis.structuredClone !== 'function') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   globalThis.structuredClone = structuredClonePolyfill as any;
 }
+
+// jsdom does not implement window.matchMedia; components that read viewport
+// breakpoints (useMediaQuery/useMobileFit) would crash the render. A fixed
+// matches:false stub is deterministic for the unit suite.
+if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
+  window.matchMedia = ((query: string): MediaQueryList => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    dispatchEvent: () => false,
+  })) as typeof window.matchMedia;
+}

@@ -1277,8 +1277,13 @@ export default function GameMappa2Page() {
     [t, legacyOpen, settlementLostActive, deadResidentCount, skinId, invasion, poiDemo, questShown, autoRevealedIds, questRun.run, activeQuestRun.run, expeditionGoblin, residentsById, panels],
   );
 
+  /* R-335: `game-frame` alone is not enough — the page must also sit inside
+   * `skin-scope` like /gameOld (GameFrame wraps its whole subtree in
+   * <SkinScope>). Without it `skinScope.css` never matches: the roster's
+   * native <select>s (INV:drag-test-container-v2.INV-1) stay visible and the
+   * filter/sort pills paint their value text next to the engraved icons. */
   return (
-    <div data-testid="game-mappa2" data-tier={tier} data-hudreal-lift="" data-view={view} data-map-ready={ready || undefined} className="game-frame" style={{ position: 'fixed', inset: 0, background: '#04161c' }}>
+    <div data-testid="game-mappa2" data-tier={tier} data-hudreal-lift="" data-view={view} data-map-ready={ready || undefined} className="game-frame skin-scope" style={{ position: 'fixed', inset: 0, background: '#04161c' }}>
       <style>{`[data-hudslot]{filter:drop-shadow(0 2px 5px rgba(1,14,18,.7)) drop-shadow(0 0 1px rgba(1,14,18,.9))}`}</style>
       {/* R-325: the shared drag context — roster cards fly into expedition
        *  planner slots / the activity session through the same ownership
