@@ -67,7 +67,14 @@ function extractRouteTable() {
  *  checkout è già HEAD. Senza `.git` (builder Vercel post-clone/upload) si
  *  ripiega sul FS, che lì coincide con l'albero deployato.
  *  DEPLOY_MANIFEST_FS=1 forza la modalità FS (debug). */
-const GIT_MODE = !process.env.DEPLOY_MANIFEST_FS && existsSync(join(ROOT, '.git'));
+/** Il builder Vercel lascia uno stub `.git` non utilizzabile: non basta
+ *  existsSync — serve un probe reale per decidere la modalità. */
+function gitProbe() {
+  if (!existsSync(join(ROOT, '.git'))) return false;
+  const r = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: ROOT, stdio: 'pipe' });
+  return r.status === 0;
+}
+const GIT_MODE = !process.env.DEPLOY_MANIFEST_FS && gitProbe();
 
 function git(args, opts = {}) {
   const r = spawnSync('git', args, { cwd: ROOT, maxBuffer: 256 * 1024 * 1024, ...opts });
