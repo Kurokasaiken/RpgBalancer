@@ -108,7 +108,7 @@ for (const ref of manifest.public.srcToDevPublicRefs ?? manifest.public.keptToDe
 
 // ---- 7. drift manifest ----
 try {
-  execSync(`node ${join(ROOT, 'scripts/deploy/deployManifest.mjs')} --profile slim --check`, { stdio: 'pipe' });
+  execSync(`node ${join(ROOT, 'scripts/deploy/deployManifest.mjs')} --profile slim --check`, { stdio: 'inherit' });
 } catch {
   fail('deploy-manifest.json in drift (rigenera con deployManifest.mjs)');
 }
