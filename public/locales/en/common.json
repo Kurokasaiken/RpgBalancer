@@ -34,5 +34,10 @@
       "body": "This page is a development lab and is not part of the mobile deploy.",
       "backHome": "Back to home"
     }
+  },
+  "questS1Lab": {
+    "verdict": {
+      "win": "Success"
+    }
   }
 }
