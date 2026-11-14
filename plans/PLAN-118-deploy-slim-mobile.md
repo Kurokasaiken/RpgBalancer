@@ -1,6 +1,6 @@
 # PLAN-118 — Deploy Vercel slim: solo le superfici navigabili da mobile
 
-**Stato:** `battezzato — in esecuzione` (open @ 2026-11-13; dibattito multi-AI integrato in rev2) (run `20261113-plan118-deploy-slim`, report in `.mw/runs/…/report.md`; 4/4 provider: REVISE con correzioni convergenti integrate in questa rev).
+**Stato:** `deployato + verificato` (2026-11-13; `guardian:deploy-guard` verde: build remoto slim + WebGL probe `/`,`/game` PASS in produzione — OB-6 ✓; bundle in corso `.mw/runs/plan118-deploy-slim/`) (run `20261113-plan118-deploy-slim`, report in `.mw/runs/…/report.md`; 4/4 provider: REVISE con correzioni convergenti integrate in questa rev).
 
 **Parent:** R-327.
 
@@ -59,6 +59,7 @@
 - `scripts/deploy/deployManifest.mjs --profile=<slim|full>`: (a) import graph dalle pagine kept → asset emessi attesi; (b) risoluzione dei path `/…` referenziati da config e manifest JSON (`layers.json`, `regions.json`, `fx/**`, locales, fonts, `manifest.json`, icone, cursori); (c) enumera la **semantica di match** delle route esistenti (exact, `startsWith`, parametri, redirect) così il registry la rappresenta fedelmente; (d) rileva riferimenti dal grafo kept verso path dev-only (→ OB-1 blocking); (e) output `deploy-manifest.json` = `{ routes, publicPaths, matchSemantics, orphanCandidates[{path,bytes}] }` + `LAB_PATHS` pure-data generato dalla route table.
 - Decide D-1/D-3 con numeri.
 - **Deliverable:** script + manifest committato (rigenerabile, drift check in T-4, like-for-like per profilo).
+- **Errata corrige (2026-11-13, drift remoto):** il manifest modellava il *worktree* minus `.vercelignore` → i deploy git (clone HEAD) fallivano su `assertDeployShape` non appena il worktree aveva file untracked/modificati sotto `public/`/`src/` (i 3 FAIL di oggi). Ora il generatore è una **funzione pura di HEAD**: con `.git` presente legge file set e contenuti da `git ls-tree`/`cat-file --batch`; senza `.git` (builder Vercel) ripiega sul FS, che lì coincide con l'albero deployato. Conseguenza: deploy git sempre riproducibile; deploy CLI da worktree sporco fallisce il drift check *by design* (segnala file non committati). `DEPLOY_MANIFEST_FS=1` forza la modalità FS.
 
 ### T-1 — Route registry + fallback «non disponibile» ✅ (2026-11-13)
 
@@ -68,7 +69,7 @@
 - In slim build alias → `labRoutes.slim.ts`: `LAB_ROUTES = {}` + `LAB_PATHS` pieno (stessa interfaccia TS identica — il typecheck non deve rompere, correzione Gemini). I `import()` lab non entrano nel grafo.
 - Ordine di valutazione: `LAB_PATHS` match → `<RouteUnavailable/>` **prima** del ramo default dello shell menu (correzione Claude: il default altrimenti cattura tutto).
 - `RouteUnavailable`: solo primitivi esistenti + i18n `common` (`deploy.routeUnavailable.*`) + link a `/`. **Zero asset da `public/`/`dev-public/`** (correzione DeepSeek: in preview slim dev-public non è servita).
-  - `visual-fork: skipped — placca-notice da primitivi esistenti, nessuna seconda forma plausibile per un avviso utilitario.`
+  - `visual-fork: skipped — puntatore: RouteUnavailable usa FantasyCard+FantasyButton esistenti (src/ui/fantasy/atoms/) con layout min-h-screen centrato, nessuna variante visiva introdotta; unico render alternativo plausibile (redirect silenzioso a /) già scartato dal ruling Director "fallback non disponibile".`
 - **Gate flag** vitest-safe: `const DEPLOY_SLIM = ((import.meta as {env?: Record<string,string|undefined>}).env?.VITE_DEPLOY_SLIM) === 'true';`
 
 ### T-1b — Tab del menu a consumo on-demand (mobile/deploy) ✅ (2026-11-13)

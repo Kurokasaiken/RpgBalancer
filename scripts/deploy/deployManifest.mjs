@@ -19,6 +19,7 @@
  */
 import { readdirSync, readFileSync, statSync, existsSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 const ROOT = new URL('../../', import.meta.url).pathname;
 const MANIFEST_PATH = join(ROOT, 'deploy-manifest.json');
@@ -43,7 +44,7 @@ const checkOnly = args.has('--check');
 
 /** Estrae i path routable da App.tsx e la semantica di match. */
 function extractRouteTable() {
-  const src = readFileSync(APP_TSX, 'utf8');
+  const src = readText('src/App.tsx');
   const entries = new Map(); // path -> match kind
   for (const m of src.matchAll(/pathname\s*===\s*'([^']+)'/g)) {
     entries.set(m[1], 'exact');
@@ -60,12 +61,59 @@ function extractRouteTable() {
     .map(([path, match]) => ({ path, match }));
 }
 
-/** `.vercelignore` = file set deployato via CLI (vercel --prod). Il manifest
- *  modella quello, non il worktree — altrimenti drift garantito sul remote. */
-const IGNORE_PATTERNS = existsSync(join(ROOT, '.vercelignore'))
-  ? readFileSync(join(ROOT, '.vercelignore'), 'utf8').split('\n')
-      .map(l => l.trim()).filter(l => l && !l.startsWith('#'))
-  : [];
+/** Sorgente file set: con `.git` presente il manifest è funzione pura di HEAD
+ *  (ls-tree + cat-file --batch) — worktree sporco (untracked, modifiche non
+ *  committate) non causa drift né qui né sul builder git remoto, il cui
+ *  checkout è già HEAD. Senza `.git` (builder Vercel post-clone/upload) si
+ *  ripiega sul FS, che lì coincide con l'albero deployato.
+ *  DEPLOY_MANIFEST_FS=1 forza la modalità FS (debug). */
+const GIT_MODE = !process.env.DEPLOY_MANIFEST_FS && existsSync(join(ROOT, '.git'));
+
+function git(args, opts = {}) {
+  const r = spawnSync('git', args, { cwd: ROOT, maxBuffer: 256 * 1024 * 1024, ...opts });
+  if (r.status !== 0) throw new Error(`git ${args[0]}: ${String(r.stderr).slice(0, 300)}`);
+  return r.stdout;
+}
+
+/** relPath → {sha, bytes} per i blob a HEAD (esclusi symlink/submodule). */
+function loadHeadFiles() {
+  const map = new Map();
+  for (const rec of git(['ls-tree', '-r', '-l', '-z', 'HEAD']).toString('utf8').split('\0')) {
+    if (!rec) continue;
+    const tab = rec.indexOf('\t');
+    const [mode, type, sha, size] = rec.slice(0, tab).split(' ');
+    if (type !== 'blob' || !mode.startsWith('100')) continue;
+    map.set(rec.slice(tab + 1), { sha, bytes: Number(size) });
+  }
+  return map;
+}
+
+/** Contenuti @HEAD in un unico `git cat-file --batch` (per sha, ordine = input). */
+function gitBatchBlobs(paths, headMap) {
+  const input = paths.map((p) => headMap.get(p).sha).join('\n') + '\n';
+  const buf = git(['cat-file', '--batch'], { input, maxBuffer: 1024 * 1024 * 1024 });
+  const texts = new Map();
+  let off = 0;
+  for (const p of paths) {
+    const nl = buf.indexOf(0x0a, off); // '\n'
+    const size = Number(buf.toString('utf8', off, nl).split(' ')[2]);
+    texts.set(p, buf.toString('utf8', nl + 1, nl + 1 + size));
+    off = nl + 1 + size + 1; // blob + '\n' terminator
+  }
+  return texts;
+}
+
+const headFiles = GIT_MODE ? loadHeadFiles() : null;
+
+/** `.vercelignore` = file set escluso dal deploy. In GIT_MODE si legge la
+ *  versione committata: è quella che il builder git applica al clone. */
+const VERCELIGNORE_SRC = GIT_MODE
+  ? (headFiles.has('.vercelignore')
+      ? gitBatchBlobs(['.vercelignore'], headFiles).get('.vercelignore')
+      : '')
+  : (existsSync(join(ROOT, '.vercelignore')) ? readFileSync(join(ROOT, '.vercelignore'), 'utf8') : '');
+const IGNORE_PATTERNS = VERCELIGNORE_SRC.split('\n')
+  .map(l => l.trim()).filter(l => l && !l.startsWith('#'));
 function isIgnored(relPath) {
   const base = relPath.split('/').pop();
   for (const p of IGNORE_PATTERNS) {
@@ -77,9 +125,34 @@ function isIgnored(relPath) {
   return base === '.DS_Store';
 }
 
-/** Raccoglie tutti i file sotto una dir come path relativi `/`-prefissati. */
+const SRC_TEXT_EXT = /\.(ts|tsx|js|jsx|mjs|css|html|json)$/;
+const hasDocsComponent = (rel) => rel.split('/').includes('docs');
+
+// In GIT_MODE: contenuti @HEAD di tutti i sorgenti testuali in un solo batch.
+let srcTextPaths = null;
+let publicJsonPaths = null;
+let headText = null;
+if (GIT_MODE) {
+  srcTextPaths = [...headFiles.keys()].filter(
+    (p) => p.startsWith('src/') && SRC_TEXT_EXT.test(p) && !hasDocsComponent(p));
+  publicJsonPaths = [...headFiles.keys()].filter(
+    (p) => p.startsWith('public/') && p.endsWith('.json') && !isIgnored(p));
+  const extra = ['index.html'].filter((p) => headFiles.has(p));
+  headText = gitBatchBlobs([...srcTextPaths, ...publicJsonPaths, ...extra], headFiles);
+}
+
+const readText = (rel) => (GIT_MODE ? (headText.get(rel) ?? '') : readFileSync(join(ROOT, rel), 'utf8'));
+
+/** Raccoglie tutti i file sotto public/ come path relativi `/`-prefissati. */
 function walkPublic() {
   const out = [];
+  if (GIT_MODE) {
+    for (const [p, meta] of headFiles) {
+      if (!p.startsWith('public/') || isIgnored(p)) continue;
+      out.push({ path: p.slice('public'.length), bytes: meta.bytes });
+    }
+    return out;
+  }
   const walk = (dir, prefix) => {
     for (const name of readdirSync(dir)) {
       const abs = join(dir, name);
@@ -100,16 +173,25 @@ function collectPublicRefs() {
   const dynamicPrefixes = new Set();
   const srcToDevPublic = [];
 
-  const visit = (file, text, isKeptGraph) => {
+  const visit = (relFile, text, isKeptGraph) => {
     for (const m of text.matchAll(/['"`](\/(?:assets|locales|fonts|ui|docs|audio|mockups|labs?[^'"`/]*|lab-fan-mock|fork-mountains|hud-target|spike-[^'"`/]*|example-[^'"`/]*)\/[^'"`\\]*)['"`]/g)) {
       const p = m[1];
       if (p.includes('${')) { dynamicPrefixes.add(p.slice(0, p.indexOf('${'))); continue; }
       referenced.add(p);
       if (isKeptGraph && DEV_ONLY_CANDIDATE_DIRS.some(d => p.startsWith(`/${d}/`))) {
-        srcToDevPublic.push({ file: relative(ROOT, file), path: p });
+        srcToDevPublic.push({ file: relFile, path: p });
       }
     }
   };
+
+  if (GIT_MODE) {
+    for (const rel of srcTextPaths) visit(rel, headText.get(rel), true);
+    if (headText.has('index.html')) visit('index.html', headText.get('index.html'), true);
+    for (const rel of publicJsonPaths) {
+      for (const m of headText.get(rel).matchAll(/"(\/[^"]+)"/g)) referenced.add(m[1]);
+    }
+    return { referenced, dynamicPrefixes, srcToDevPublic };
+  }
 
   const walkSrc = (dir) => {
     for (const name of readdirSync(dir)) {
@@ -117,11 +199,11 @@ function collectPublicRefs() {
       const st = statSync(abs);
       if (st.isDirectory()) { if (name !== 'docs') walkSrc(abs); continue; }
       if (!/\.(ts|tsx|js|jsx|mjs|css|html|json)$/.test(name)) continue;
-      visit(abs, readFileSync(abs, 'utf8'), true);
+      visit(relative(ROOT, abs), readFileSync(abs, 'utf8'), true);
     }
   };
   walkSrc(SRC_DIR);
-  visit(join(ROOT, 'index.html'), readFileSync(join(ROOT, 'index.html'), 'utf8'), true);
+  visit('index.html', readFileSync(join(ROOT, 'index.html'), 'utf8'), true);
 
   // JSON config-driven dentro public/ (layers.json, regions.json, …)
   const walkJson = (dir, prefix = 'public') => {
@@ -141,8 +223,8 @@ function collectPublicRefs() {
 const routes = extractRouteTable();
 // PLAN-118 T-1: la route table autorevole delle lab vive in labRouteData.ts
 const LAB_DATA = join(ROOT, 'src/deploy/labRouteData.ts');
-if (existsSync(LAB_DATA)) {
-  const dataSrc = readFileSync(LAB_DATA, 'utf8');
+if (GIT_MODE ? headFiles.has('src/deploy/labRouteData.ts') : existsSync(LAB_DATA)) {
+  const dataSrc = readText('src/deploy/labRouteData.ts');
   const known = new Set(routes.map(r => r.path));
   for (const m of dataSrc.matchAll(/['"](\/[^'"]*)['"]/g)) {
     if (!known.has(m[1])) routes.push({ path: m[1], match: 'registry' });
@@ -152,13 +234,16 @@ if (existsSync(LAB_DATA)) {
 const labRoutes = routes.filter(r => !KEPT_ROUTES.has(r.path));
 const keptRoutes = routes.filter(r => KEPT_ROUTES.has(r.path));
 const { referenced, dynamicPrefixes, srcToDevPublic } = collectPublicRefs();
+// Ordinamento deterministico: la walk FS segue readdir (ordine OS-dipendente),
+// ls-tree è già ordinato — uniformiamo perché --check confronta il JSON.
+srcToDevPublic.sort((a, b) => (a.file + '' + a.path).localeCompare(b.file + '' + b.path));
 
 const publicFiles = walkPublic();
 const orphans = publicFiles
   .filter(f => !referenced.has(f.path)
     && ![...dynamicPrefixes].some(dp => f.path.startsWith(dp)))
   .map(f => ({ path: f.path, bytes: f.bytes }))
-  .sort((a, b) => b.bytes - a.bytes);
+  .sort((a, b) => b.bytes - a.bytes || a.path.localeCompare(b.path));
 
 const manifest = {
   generated: new Date().toISOString(),
@@ -182,14 +267,34 @@ if (checkOnly) {
   const prev = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
   const strip = ({ generated: _g, ...rest }) => rest;
   const same = JSON.stringify(strip(prev)) === JSON.stringify(strip(manifest));
-  if (!same) { console.error('[deploy-manifest] DRIFT: rigenera con deployManifest.mjs'); process.exit(1); }
-  console.log('[deploy-manifest] OK: committato == rigenerato');
+  if (!same) {
+    // Diagnosi minima: quale sezione diverge + primi path (es. file untracked
+    // uploadati da un deploy CLI, o file committati senza rigenerare).
+    const diffs = [];
+    const pp = prev.public ?? {};
+    const mp = manifest.public;
+    if (pp.totalFiles !== mp.totalFiles) diffs.push(`public.totalFiles ${pp.totalFiles} → ${mp.totalFiles}`);
+    if (pp.referencedCount !== mp.referencedCount) diffs.push(`referencedCount ${pp.referencedCount} → ${mp.referencedCount}`);
+    if (pp.orphanBytes !== mp.orphanBytes) diffs.push(`orphanBytes ${pp.orphanBytes} → ${mp.orphanBytes}`);
+    const prevRefs = pp.srcToDevPublicRefs ?? pp.keptToDevPublicRefs ?? [];
+    if (prevRefs.length !== mp.srcToDevPublicRefs.length)
+      diffs.push(`srcToDevPublicRefs ${prevRefs.length} → ${mp.srcToDevPublicRefs.length}`);
+    const prevOr = new Set((pp.orphanCandidates ?? []).map((o) => o.path));
+    const nowOr = new Set(mp.orphanCandidates.map((o) => o.path));
+    for (const p of [...prevOr].filter((x) => !nowOr.has(x)).slice(0, 8)) diffs.push(`- orphan solo nel committato: ${p}`);
+    for (const p of [...nowOr].filter((x) => !prevOr.has(x)).slice(0, 8)) diffs.push(`+ orphan solo nel rigenerato: ${p}`);
+    if (!diffs.length) diffs.push('diff in routes/refs/bytes — confronta il JSON');
+    console.error(`[deploy-manifest] DRIFT (sorgente: ${GIT_MODE ? 'HEAD' : 'FS'}) — rigenera con deployManifest.mjs`);
+    for (const d of diffs) console.error(`  ${d}`);
+    process.exit(1);
+  }
+  console.log(`[deploy-manifest] OK: committato == rigenerato (sorgente: ${GIT_MODE ? 'HEAD' : 'FS'})`);
   process.exit(0);
 }
 
 writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n');
 const mb = (b) => `${(b / 1048576).toFixed(1)} MB`;
-console.log(`[deploy-manifest] profile=${profile}`);
+console.log(`[deploy-manifest] profile=${profile} source=${GIT_MODE ? 'HEAD' : 'FS'}`);
 console.log(`  routes: ${routes.length} totali, kept=${keptRoutes.length}, lab=${labRoutes.length}`);
 console.log(`  public: ${publicFiles.length} file, refs=${referenced.size}, orphans=${orphans.length} (${mb(manifest.public.orphanBytes)})`);
 console.log(`  dynamicPrefixes=${dynamicPrefixes.size}, srcToDevPublic refs=${srcToDevPublic.length}`);
