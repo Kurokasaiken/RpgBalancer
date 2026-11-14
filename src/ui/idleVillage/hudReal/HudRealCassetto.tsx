@@ -122,6 +122,35 @@ const RACK_SCOPED_CSS = `
   align-items: start !important;
   justify-items: center !important;
 }
+/* CONFIRM — the plaque is baked into the column art, so the feedback lives
+   on an invisible sheen + the text layer: hover ignites an emerald glow,
+   press sinks the text and darkens the plaque's face, focus gets a ring. */
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"] .confirm-sheen {
+  position: absolute; inset: 8% 6%; border-radius: 999px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(170,255,214,0.55), rgba(90,225,150,0.22) 55%, transparent 78%);
+  box-shadow: inset 0 0 0 1.5px rgba(214,255,234,0.6), inset 0 -8px 18px rgba(0,42,20,0.4), 0 0 30px rgba(96,232,164,0.45);
+  opacity: 0; transition: opacity 160ms ease; pointer-events: none;
+}
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):hover .confirm-sheen { opacity: 1; }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-sheen {
+  opacity: 1;
+  background: radial-gradient(ellipse at 50% 58%, rgba(0,34,17,0.5), rgba(0,22,10,0.2) 60%, transparent 80%);
+  box-shadow: inset 0 0 0 1.5px rgba(126,222,172,0.4), inset 0 9px 20px rgba(0,26,13,0.7);
+}
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"] .confirm-text {
+  transition: transform 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94), text-shadow 160ms ease;
+}
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):hover .confirm-text {
+  text-shadow: 0 0 12px rgba(152,255,202,0.6), 0 1px 4px rgba(0,0,0,0.9);
+}
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:not(:disabled):active .confirm-text { transform: translateY(1px) scale(0.965); }
+[data-hudreal-cassetto] [data-testid="cassetto-confirm"]:focus-visible { outline: 2px solid rgba(196,255,224,0.75); outline-offset: -5px; border-radius: 14px; }
+/* Bag slots — pouch brightens on hover, packed tiles lift and glow. */
+[data-hudreal-cassetto] [data-testid^="bag-slot-empty-"] svg { transition: opacity 160ms ease, filter 160ms ease; }
+[data-hudreal-cassetto] [data-testid^="bag-slot-empty-"]:hover svg { opacity: 0.95 !important; filter: drop-shadow(0 0 6px rgba(223,184,87,0.6)); }
+[data-hudreal-cassetto] [data-testid^="loadout-item-"] { transition: filter 160ms ease, transform 120ms ease; border-radius: 8px; }
+[data-hudreal-cassetto] [data-testid^="loadout-item-"]:hover { filter: brightness(1.18) drop-shadow(0 0 5px rgba(223,184,87,0.45)); transform: translateY(-1px); }
+[data-hudreal-cassetto] [data-testid^="loadout-item-"]:active { transform: translateY(0) scale(0.95); }
 `;
 
 export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
@@ -413,7 +442,8 @@ export const HudRealCassetto: React.FC<HudRealCassettoProps> = ({
             opacity: canSend ? 1 : 0.55,
           }}
         >
-          <span style={{
+          <span className="confirm-sheen" aria-hidden />
+          <span className="confirm-text" style={{
             fontFamily: 'Cinzel, "EB Garamond", serif', fontSize: fz(30), fontWeight: 800,
             letterSpacing: '0.28em', textTransform: 'uppercase', color: '#eafff5',
             textShadow: '0 1px 4px rgba(0,0,0,.9)',
